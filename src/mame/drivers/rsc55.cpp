@@ -49,6 +49,7 @@ public:
 	required_device<i8x9x_device> m_maincpu;
 
 	sc55_state(const machine_config &mconfig, device_type type, const char *tag);
+	void sc55(machine_config &config);
 };
 
 sc55_state::sc55_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -64,7 +65,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sc55_io, AS_IO, 16, sc55_state )
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( sc55, sc55_state )
+MACHINE_CONFIG_START(sc55_state::sc55)
 	MCFG_CPU_ADD( "maincpu", P8098, XTAL_20MHz )    // probably not?
 	MCFG_CPU_PROGRAM_MAP( sc55_map )
 	MCFG_CPU_IO_MAP( sc55_io )
@@ -80,4 +81,4 @@ ROM_START( sc55 )
 	ROM_LOAD( "roland-gss.c_r15209281.ic26", 0x200000, 0x100000, CRC(e21ebc04) SHA1(7454b817778179806f3f9d1985b3a2ef67ace76f) )
 ROM_END
 
-CONS( 1991, sc55,  0, 0, sc55, sc55, driver_device, 0, "Roland", "Sound Canvas SC-55",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 1991, sc55,  0, 0, sc55, sc55, sc55_state, 0, "Roland", "Sound Canvas SC-55",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

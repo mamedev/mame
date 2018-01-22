@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, R. Belmont, Pierpaolo Prazzoli
 /*
-  Dragonball Z                  (c) 1993 Banpresto
-  Dragonball Z 2 - Super Battle (c) 1994 Banpresto
+  Dragon Ball Z                  (c) 1993 Banpresto
+  Dragon Ball Z 2 - Super Battle (c) 1994 Banpresto
 
   Driver by David Haywood, R. Belmont and Pierpaolo Prazzoli
 
@@ -53,11 +53,13 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/dbz.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/dbz.h"
+#include "speaker.h"
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::dbz_scanline)
@@ -112,7 +114,7 @@ static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16, dbz_state )
 	AM_RANGE(0x498000, 0x49ffff) AM_DEVREAD("k056832", k056832_device, rom_word_8000_r)  // code near a60 in dbz2, subroutine at 730 in dbz
 	AM_RANGE(0x4a0000, 0x4a0fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w)
 	AM_RANGE(0x4a1000, 0x4a3fff) AM_RAM
-	AM_RANGE(0x4a8000, 0x4abfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // palette
+	AM_RANGE(0x4a8000, 0x4abfff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette
 	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREAD("k053246", k053247_device, k053246_word_r)
 	AM_RANGE(0x4c0000, 0x4c0007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
 	AM_RANGE(0x4c4000, 0x4c4007) AM_DEVWRITE("k053246", k053247_device, k053246_word_w)
@@ -192,15 +194,17 @@ static INPUT_PORTS_START( dbz )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0400, 0x0400, "SW1:3" )                       // seems unused
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:4")   // Definitely correct
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Japanese ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x1000, 0x1000, "SW1:5" )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC(  0x2000, IP_ACTIVE_LOW, "SW1:6" )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Japanese ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW1:7" )                       // seems unused
 	PORT_DIPNAME( 0x8000, 0x0000, "Mask ROM Test" )     PORT_DIPLOCATION("SW1:8")           //NOP'd
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
@@ -267,6 +271,9 @@ static INPUT_PORTS_START( dbz2 )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Level_Select ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Language ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Japanese ) )
 INPUT_PORTS_END
 
 /**********************************************************************************/
@@ -318,7 +325,7 @@ void dbz_state::machine_reset()
 	m_control = 0;
 }
 
-static MACHINE_CONFIG_START( dbz, dbz_state )
+MACHINE_CONFIG_START(dbz_state::dbz)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
@@ -377,7 +384,7 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -584,6 +591,6 @@ DRIVER_INIT_MEMBER(dbz_state,dbz2)
 	ROM[0xae8/2] = 0x4e71;    /* 0x005e */
 }
 
-GAME( 1993, dbz,  0,   dbz, dbz, dbz_state,  dbz,  ROT0, "Banpresto", "Dragonball Z (rev B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
-GAME( 1993, dbza, dbz, dbz, dbza, dbz_state, dbza, ROT0, "Banpresto", "Dragonball Z (rev A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dbz2, 0,   dbz, dbz2, dbz_state, dbz2, ROT0, "Banpresto", "Dragonball Z 2 - Super Battle", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
+GAME( 1993, dbz,  0,   dbz, dbz,  dbz_state, dbz,  ROT0, "Banpresto", "Dragon Ball Z (rev B)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test
+GAME( 1993, dbza, dbz, dbz, dbza, dbz_state, dbza, ROT0, "Banpresto", "Dragon Ball Z (rev A)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dbz2, 0,   dbz, dbz2, dbz_state, dbz2, ROT0, "Banpresto", "Dragon Ball Z 2 - Super Battle", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // crashes MAME in tile/PSAC2 ROM test

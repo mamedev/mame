@@ -53,6 +53,8 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -88,6 +90,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void diverboy(machine_config &config);
 };
 
 
@@ -161,7 +164,7 @@ static ADDRESS_MAP_START( diverboy_map, AS_PROGRAM, 16, diverboy_state )
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundcmd_w)
-	AM_RANGE(0x140000, 0x1407ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW")
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("COINS")
@@ -263,7 +266,7 @@ void diverboy_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( diverboy, diverboy_state )
+MACHINE_CONFIG_START(diverboy_state::diverboy)
 
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* guess */
 	MCFG_CPU_PROGRAM_MAP(diverboy_map)
@@ -291,7 +294,7 @@ static MACHINE_CONFIG_START( diverboy, diverboy_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1320000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -338,4 +341,4 @@ ROM_END
 
 
 
-GAME( 1992, diverboy, 0, diverboy, diverboy, driver_device, 0, ORIENTATION_FLIP_X, "Gamart (Electronic Devices Italy license)", "Diver Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, diverboy, 0, diverboy, diverboy, diverboy_state, 0, ORIENTATION_FLIP_X, "Gamart (Electronic Devices Italy license)", "Diver Boy", MACHINE_SUPPORTS_SAVE )

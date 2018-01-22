@@ -50,6 +50,7 @@ public:
 	uint8_t m_led1;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
+	emu_timer *m_reset_timer;
 
 	DECLARE_WRITE8_MEMBER(sub_cpu_halt_w);
 	DECLARE_READ8_MEMBER(track_0_r);
@@ -85,6 +86,8 @@ public:
 	void gridiron_draw_led(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t led,int player);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void tehkanwcb(machine_config &config);
+	void tehkanwc(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
 Lady Frog (c) 1990 Mondial Games
@@ -9,6 +9,9 @@ Touche Me - Unknown Manfacturer (likely the same as Lady Frog)
 driver by Tomasz Slanina
 
 'N.Y. Captor' (TAITO) hardware , without sub cpu.
+
+TODO:
+- merge with flstory.cpp
 
 Sound rom is 'borrowed' from NYC.
 1.115 = a80_16.i26 + a80_17.i25
@@ -49,9 +52,14 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/ladyfrog.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/ladyfrog.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(ladyfrog_state::from_snd_r)
@@ -142,7 +150,7 @@ static ADDRESS_MAP_START( ladyfrog_sound_map, AS_PROGRAM, 8, ladyfrog_state )
 	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(to_main_w)
 	AM_RANGE(0xd200, 0xd200) AM_READNOP AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xd600, 0xd600) AM_WRITENOP
+	AM_RANGE(0xd600, 0xd600) AM_READNOP AM_DEVWRITE("dac", dac_byte_interface, write)       /* signed 8-bit DAC - unknown read */
 	AM_RANGE(0xe000, 0xefff) AM_NOP
 ADDRESS_MAP_END
 
@@ -278,14 +286,14 @@ void ladyfrog_state::machine_reset()
 	m_snd_data = 0;
 }
 
-static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )
+MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,8000000/2)
+	MCFG_CPU_ADD("maincpu", Z80,XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(ladyfrog_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ladyfrog_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,8000000/2)
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(ladyfrog_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ladyfrog_state, irq0_line_hold, 2*60)
 
@@ -294,10 +302,11 @@ static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 29*8-1) // black borders in ladyfrog gameplay are correct
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1) // black borders in ladyfrog gameplay are correct
+	MCFG_SCREEN_RAW_PARAMS( XTAL_8MHz, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(ladyfrog_state, screen_update_ladyfrog)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -310,12 +319,12 @@ static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_8MHz/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ladyfrog_state, unk_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ladyfrog_state, unk_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
+	MCFG_SOUND_ADD("msm", MSM5232, XTAL_8MHz/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1
@@ -328,9 +337,13 @@ static MACHINE_CONFIG_START( ladyfrog, ladyfrog_state )
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
+
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( toucheme, ladyfrog )
+MACHINE_CONFIG_DERIVED(ladyfrog_state::toucheme, ladyfrog)
 	MCFG_VIDEO_START_OVERRIDE(ladyfrog_state,toucheme)
 MACHINE_CONFIG_END
 
@@ -383,8 +396,8 @@ ROM_START( touchemea )
 	ROM_LOAD( "8.ic10",   0x20000, 0x10000, CRC(fc6808bf) SHA1(f1f1b75a79dfdb500012f9b52c6364f0a13dce2d) )
 ROM_END
 
-GAME( 1990, ladyfrog, 0, ladyfrog, ladyfrog, driver_device, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ladyfrog, 0, ladyfrog, ladyfrog, ladyfrog_state, 0, ORIENTATION_SWAP_XY, "Mondial Games", "Lady Frog", MACHINE_SUPPORTS_SAVE )
 
 // toucheme art style is similar to ladyfrog, so it's probably the same manufacturer
-GAME( 19??, toucheme, 0,        toucheme, toucheme, driver_device, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, touchemea,toucheme, toucheme, toucheme, driver_device, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 2, harder)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, toucheme,  0,        toucheme, toucheme, ladyfrog_state, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 19??, touchemea, toucheme, toucheme, toucheme, ladyfrog_state, 0, ORIENTATION_SWAP_XY, "<unknown>",     "Touche Me (set 2, harder)", MACHINE_SUPPORTS_SAVE )

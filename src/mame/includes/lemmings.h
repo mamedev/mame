@@ -53,8 +53,6 @@ public:
 
 	DECLARE_WRITE16_MEMBER(lemmings_control_w);
 	DECLARE_READ16_MEMBER(lemmings_trackball_r);
-	void lemmings_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
-	DECLARE_WRITE8_MEMBER(lemmings_sound_ack_w);
 	DECLARE_WRITE16_MEMBER(lemmings_pixel_0_w);
 	DECLARE_WRITE16_MEMBER(lemmings_pixel_1_w);
 	DECLARE_WRITE16_MEMBER(lemmings_vram_w);
@@ -62,9 +60,10 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_lemmings(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_lemmings(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_lemmings);
 	void lemmings_copy_bitmap(bitmap_rgb32& bitmap, bitmap_ind16& srcbitmap, int* xscroll, int* yscroll, const rectangle& cliprect);
 
 	DECLARE_READ16_MEMBER( lem_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( lem_protection_region_0_146_w );
+	void lemmings(machine_config &config);
 };

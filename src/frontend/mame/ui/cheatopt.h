@@ -23,7 +23,7 @@ public:
 	virtual ~menu_cheat() override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 
@@ -35,7 +35,7 @@ public:
 	virtual ~menu_autofire() override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	float refresh;

@@ -29,8 +29,8 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "cpu/arm/arm.h"
 #include "includes/archimds.h"
+#include "cpu/arm/arm.h"
 #include "debugger.h"
 
 static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
@@ -43,27 +43,20 @@ void archimedes_state::archimedes_request_irq_a(int mask)
 {
 	m_ioc_regs[IRQ_STATUS_A] |= mask;
 
-	if (m_ioc_regs[IRQ_STATUS_A] & m_ioc_regs[IRQ_MASK_A])
-	{
+	if ((m_ioc_regs[IRQ_STATUS_A] & m_ioc_regs[IRQ_MASK_A]) || (m_ioc_regs[IRQ_STATUS_B] & m_ioc_regs[IRQ_MASK_B]))
 		m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
-	}
-
-	if ((m_ioc_regs[IRQ_STATUS_A] & m_ioc_regs[IRQ_MASK_A]) == 0)
-	{
+	else
 		m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
-	}
 }
 
 void archimedes_state::archimedes_request_irq_b(int mask)
 {
 	m_ioc_regs[IRQ_STATUS_B] |= mask;
 
-	if (m_ioc_regs[IRQ_STATUS_B] & m_ioc_regs[IRQ_MASK_B])
-	{
-		generic_pulse_irq_line(*m_maincpu, ARM_IRQ_LINE, 1);
-		//m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
-		//m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
-	}
+	if ((m_ioc_regs[IRQ_STATUS_A] & m_ioc_regs[IRQ_MASK_A]) || (m_ioc_regs[IRQ_STATUS_B] & m_ioc_regs[IRQ_MASK_B]))
+		m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
+	else
+		m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
 }
 
 void archimedes_state::archimedes_request_fiq(int mask)
@@ -74,7 +67,7 @@ void archimedes_state::archimedes_request_fiq(int mask)
 
 	if (m_ioc_regs[FIQ_STATUS] & m_ioc_regs[FIQ_MASK])
 	{
-		generic_pulse_irq_line(*m_maincpu, ARM_FIRQ_LINE, 1);
+		m_maincpu->pulse_input_line(ARM_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 
 		//m_maincpu->set_input_line(ARM_FIRQ_LINE, CLEAR_LINE);
 		//m_maincpu->set_input_line(ARM_FIRQ_LINE, ASSERT_LINE);
@@ -90,7 +83,7 @@ void archimedes_state::archimedes_clear_irq_a(int mask)
 void archimedes_state::archimedes_clear_irq_b(int mask)
 {
 	m_ioc_regs[IRQ_STATUS_B] &= ~mask;
-	//archimedes_request_irq_b(0);
+	archimedes_request_irq_b(0);
 }
 
 void archimedes_state::archimedes_clear_fiq(int mask)
@@ -116,7 +109,7 @@ void archimedes_state::vidc_vblank()
 	archimedes_request_irq_a(ARCHIMEDES_IRQA_VBL);
 
 	// set up for next vbl
-	m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
+	m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time));
 }
 
 /* video DMA */
@@ -131,9 +124,9 @@ void archimedes_state::vidc_video_tick()
 	uint32_t m_vidc_ccur;
 	uint32_t offset_ptr;
 
-	size = m_vidc_vidend-m_vidc_vidstart+0x10;
+	size = (m_vidc_vidend - m_vidc_vidstart + 0x10) & 0x1fffff;
 
-	offset_ptr = m_vidc_vidstart+m_vidc_vidinit;
+	offset_ptr = m_vidc_vidinit;
 	if(offset_ptr >= m_vidc_vidend+0x10) // TODO: correct?
 		offset_ptr = m_vidc_vidstart;
 
@@ -155,7 +148,7 @@ void archimedes_state::vidc_video_tick()
 
 	if(m_video_dma_on)
 	{
-		m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
+		m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time+1));
 	}
 	else
 		m_vid_timer->adjust(attotime::never);
@@ -204,9 +197,9 @@ void archimedes_state::vidc_audio_tick()
 		56,    48,    40,    32,    24,    16,     8,     0
 	};
 
-	for(ch=0;ch<8;ch++)
+	for(ch=0; ch<8; ch++)
 	{
-		uint8_t ulaw_temp = (space.read_byte(m_vidc_sndstart+m_vidc_sndcur + ch)) ^ 0xff;
+		uint8_t ulaw_temp = (space.read_byte(m_vidc_sndcur + ch)) ^ 0xff;
 
 		ulaw_comp = (ulaw_temp>>1) | ((ulaw_temp&1)<<7);
 
@@ -217,18 +210,23 @@ void archimedes_state::vidc_audio_tick()
 
 	m_vidc_sndcur+=8;
 
-	if (m_vidc_sndcur >= (m_vidc_sndend-m_vidc_sndstart)+0x10)
+	if (m_vidc_sndcur >= m_vidc_sndendcur)
 	{
-		m_vidc_sndcur = 0;
 		archimedes_request_irq_b(ARCHIMEDES_IRQB_SOUND_EMPTY);
 
 		if(!m_audio_dma_on)
 		{
 			m_snd_timer->adjust(attotime::never);
-			for(ch=0;ch<8;ch++)
+			for(ch=0; ch<8; ch++)
 			{
 				m_dac[ch & 7]->write(0);
 			}
+		}
+		else
+		{
+			//printf("Chaining to next: start %x end %x\n", m_vidc_sndstart, m_vidc_sndend);
+			m_vidc_sndcur = m_vidc_sndstart;
+			m_vidc_sndendcur = m_vidc_sndend;
 		}
 	}
 }
@@ -260,6 +258,10 @@ void archimedes_state::ioc_timer(int param)
 	// all timers always run
 	a310_set_timer(param);
 
+	// keep FIQ line ASSERTED if there are active requests
+	if (m_ioc_regs[FIQ_STATUS] & m_ioc_regs[FIQ_MASK])
+		archimedes_request_fiq(0);
+
 	// but only timers 0 and 1 generate IRQs
 	switch (param)
 	{
@@ -289,6 +291,9 @@ void archimedes_state::archimedes_reset()
 	m_ioc_regs[IRQ_STATUS_B] = 0x00; //set up IL[1] On
 	m_ioc_regs[FIQ_STATUS] = 0x80;   //set up Force FIQ
 	m_ioc_regs[CONTROL] = 0xff;
+
+	m_vidc_vblank_time = 10000; // set a stupidly high time so it doesn't fire off
+	m_vbl_timer->adjust(attotime::never);
 }
 
 void archimedes_state::archimedes_init()
@@ -494,7 +499,7 @@ bool archimedes_state::check_floppy_ready()
 	}
 
 	if(floppy)
-		return floppy->ready_r();
+		return !floppy->ready_r();
 
 	return false;
 }
@@ -503,7 +508,7 @@ bool archimedes_state::check_floppy_ready()
 READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 {
 	if(IOC_LOG)
-	logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], m_ioc_regs[offset&0x1f], m_maincpu->pc(),offset & 0x1f);
+		logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], m_ioc_regs[offset&0x1f], m_maincpu->pc(),offset & 0x1f);
 
 	switch (offset & 0x1f)
 	{
@@ -570,7 +575,7 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 		case T3_LATCH_HI: return (m_ioc_timerout[3]>>8)&0xff;
 		default:
 			if(!IOC_LOG)
-				logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], m_ioc_regs[offset&0x1f], space.device() .safe_pc( ),offset & 0x1f);
+				logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], m_ioc_regs[offset&0x1f], m_maincpu->pc(), offset & 0x1f);
 			break;
 	}
 
@@ -581,7 +586,7 @@ READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 {
 	if(IOC_LOG)
-	logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], space.device() .safe_pc( ));
+	logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], m_maincpu->pc());
 
 	switch (offset&0x1f)
 	{
@@ -617,7 +622,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			archimedes_request_irq_a((data & 0x80) ? ARCHIMEDES_IRQA_FORCE : 0);
 
 			if(data & 0x08) //set up the VBLANK timer
-				m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
+				m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time));
 
 			break;
 
@@ -699,7 +704,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 
 		default:
 			if(!IOC_LOG)
-				logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], space.device() .safe_pc( ));
+				logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], m_maincpu->pc());
 
 			m_ioc_regs[offset&0x1f] = data & 0xff;
 			break;
@@ -842,7 +847,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 								---- x--- floppy controller reset
 								*/
 								m_fdc->dden_w(BIT(data, 1));
-								if(data & 8)
+								if (!(data & 8))
 									m_fdc->soft_reset();
 								if(data & ~0xa)
 									printf("%02x Latch B\n",data);
@@ -878,7 +883,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 	}
 
 
-	logerror("(PC=%08x) I/O: W %x @ %x (mask %08x)\n", space.device().safe_pc(), data, (offset*4)+0x3000000, mem_mask);
+	logerror("(PC=%08x) I/O: W %x @ %x (mask %08x)\n", m_maincpu->pc(), data, (offset*4)+0x3000000, mem_mask);
 }
 
 READ32_MEMBER(archimedes_state::archimedes_vidc_r)
@@ -901,7 +906,6 @@ void archimedes_state::vidc_dynamic_res_change()
 		*/
 		if((m_vidc_regs[VIDC_HCR] >= m_vidc_regs[VIDC_HBER]) &&
 			(m_vidc_regs[VIDC_HBER] >= m_vidc_regs[VIDC_HBSR]) &&
-			(m_vidc_regs[VIDC_VCR] >= m_vidc_regs[VIDC_VBER]) &&
 			(m_vidc_regs[VIDC_VBER] >= m_vidc_regs[VIDC_VBSR]))
 		{
 			rectangle visarea;
@@ -912,13 +916,14 @@ void archimedes_state::vidc_dynamic_res_change()
 			visarea.max_x = m_vidc_regs[VIDC_HBER] - m_vidc_regs[VIDC_HBSR] - 1;
 			visarea.max_y = (m_vidc_regs[VIDC_VBER] - m_vidc_regs[VIDC_VBSR]) * (m_vidc_interlace+1);
 
-			//logerror("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
+			m_vidc_vblank_time = m_vidc_regs[VIDC_VBER] * (m_vidc_interlace+1);
+			//logerror("Configuring: htotal %d vtotal %d border %d x %d display origin %d x %d vblank = %d\n",
 			//  m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR],
 			//  visarea.max_x, visarea.max_y,
-			//  m_vidc_regs[VIDC_HDER]-m_vidc_regs[VIDC_HDSR],m_vidc_regs[VIDC_VDER]-m_vidc_regs[VIDC_VDSR]+1);
+			//  m_vidc_regs[VIDC_HDER]-m_vidc_regs[VIDC_HDSR],m_vidc_regs[VIDC_VDER]-m_vidc_regs[VIDC_VDSR]+1,
+			//  m_vidc_vblank_time);
 
-			/* FIXME: pixel clock */
-			refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_vidc_pixel_clk]*2) * m_vidc_regs[VIDC_HCR] * m_vidc_regs[VIDC_VCR];
+			refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_vidc_pixel_clk]) * m_vidc_regs[VIDC_HCR] * m_vidc_regs[VIDC_VCR];
 
 			m_screen->configure(m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR] * (m_vidc_interlace+1), visarea, refresh);
 		}
@@ -965,7 +970,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 		r = (val & 0x000f) >> 0;
 
 		if(reg == 0x40 && val & 0xfff)
-			logerror("WARNING: border color write here (PC=%08x)!\n",space.device().safe_pc());
+			logerror("WARNING: border color write here (PC=%08x)!\n",m_maincpu->pc());
 
 		m_palette->set_pen_color(reg >> 2, pal4bit(r), pal4bit(g), pal4bit(b) );
 
@@ -977,13 +982,15 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 			for(i=0;i<0x100;i+=0x10)
 			{
 				b = ((val & 0x700) >> 8) | ((i & 0x80) >> 4);
-				g = ((val & 0x030) >> 4) | ((i & 0x20) >> 3) | ((i & 0x40) >> 3);
+				g = ((val & 0x030) >> 4) | ((i & 0x60) >> 3);
 				r = ((val & 0x007) >> 0) | ((i & 0x10) >> 1);
 
 				m_palette->set_pen_color((reg >> 2) + 0x100 + i, pal4bit(r), pal4bit(g), pal4bit(b) );
 			}
 		}
 
+		// update partials
+		machine().first_screen()->update_partial(machine().first_screen()->vpos());
 	}
 	else if (reg >= 0x60 && reg <= 0x7c)
 	{
@@ -1002,20 +1009,17 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 			case VIDC_HDSR: m_vidc_regs[VIDC_HDSR] = (val >> 14);   break;
 			case VIDC_HDER: m_vidc_regs[VIDC_HDER] = (val >> 14);   break;
 			case VIDC_HBER: m_vidc_regs[VIDC_HBER] = ((val >> 14)<<1)+1;    break;
-			case VIDC_HCSR: m_vidc_regs[VIDC_HCSR] = (val >> 13) & 0x7ff; break;
-//          #define VIDC_HCSR       0x98
+			case VIDC_HCSR: m_vidc_regs[VIDC_HCSR] = ((val >> 13) & 0x7ff) + 6; break;
 //          #define VIDC_HIR        0x9c
 
-			case VIDC_VCR:  m_vidc_regs[VIDC_VCR] = ((val >> 14)<<1)+1; break;
+			case VIDC_VCR:  m_vidc_regs[VIDC_VCR] = ((val >> 14))+1; break;
 //          #define VIDC_VSWR       0xa4
 			case VIDC_VBSR: m_vidc_regs[VIDC_VBSR] = (val >> 14)+1; break;
 			case VIDC_VDSR: m_vidc_regs[VIDC_VDSR] = (val >> 14)+1; break;
 			case VIDC_VDER: m_vidc_regs[VIDC_VDER] = (val >> 14)+1; break;
 			case VIDC_VBER: m_vidc_regs[VIDC_VBER] = (val >> 14)+1; break;
-			case VIDC_VCSR: m_vidc_regs[VIDC_VCSR] = (val >> 14) & 0x3ff; break;
-			case VIDC_VCER: m_vidc_regs[VIDC_VCER] = (val >> 14) & 0x3ff; break;
-//          #define VIDC_VCSR       0xb8
-//          #define VIDC_VCER       0xbc
+			case VIDC_VCSR: m_vidc_regs[VIDC_VCSR] = ((val >> 14) & 0x3ff) + 1; break;
+			case VIDC_VCER: m_vidc_regs[VIDC_VCER] = ((val >> 14) & 0x3ff) + 1; break;
 		}
 
 
@@ -1026,7 +1030,19 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 
 		vidc_dynamic_res_change();
 	}
-	else if(reg == 0xe0)
+	else if (reg == 0xc0)
+	{
+		m_vidc_regs[reg] = val & 0xffff;
+
+		if (m_audio_dma_on)
+		{
+			double sndhz = 1e6 / ((m_vidc_regs[0xc0] & 0xff) + 2);
+			sndhz /= 8.0;
+			m_snd_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
+			//printf("VIDC: sound freq to %d, sndhz = %f\n", (val & 0xff)-2, sndhz);
+		}
+	}
+	else if (reg == 0xe0)
 	{
 		m_vidc_bpp_mode = ((val & 0x0c) >> 2);
 		m_vidc_interlace = ((val & 0x40) >> 6);
@@ -1055,7 +1071,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 		{
 			case 0: /* video init */
 				m_cursor_enabled = false;
-				m_vidc_vidinit = ((data>>2)&0x7fff)*16;
+				m_vidc_vidinit = 0x2000000 | ((data>>2)&0x7fff)*16;
 				//printf("MEMC: VIDINIT %08x\n",m_vidc_vidinit);
 				break;
 
@@ -1094,7 +1110,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 			case 7: /* Control */
 				m_memc_pagesize = ((data>>2) & 3);
 
-				logerror("(PC = %08x) MEMC: %x to Control (page size %d, %s, %s)\n", space.device().safe_pc(), data & 0x1ffc, page_sizes[m_memc_pagesize], ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
+				logerror("(PC = %08x) MEMC: %x to Control (page size %d, %s, %s)\n", m_maincpu->pc(), data & 0x1ffc, page_sizes[m_memc_pagesize], ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
 
 				m_video_dma_on = ((data>>10)&1);
 				m_audio_dma_on = ((data>>11)&1);
@@ -1102,19 +1118,20 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 				if ((data>>10)&1)
 				{
 					m_vidc_vidcur = 0;
-					m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
+					m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time+1));
 				}
 
-				if ((data>>11)&1)
+				if ((data>>11) & 1)
 				{
-					double sndhz;
+					//printf("MEMC: Starting audio DMA at %d uSec, buffer from %x to %x\n", ((m_vidc_regs[0xc0]&0xff)-2)*8, m_vidc_sndstart, m_vidc_sndend);
 
-					/* FIXME: is the frequency correct? */
-					sndhz = (250000.0 / 2) / (double)((m_vidc_regs[0xc0]&0xff)+2);
-
-					printf("MEMC: Starting audio DMA at %f Hz, buffer from %x to %x\n", sndhz, m_vidc_sndstart, m_vidc_sndend);
-
+					double sndhz = 1e6 / ((m_vidc_regs[0xc0] & 0xff) + 2);
+					sndhz /= 8.0;
 					m_snd_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
+					//printf("MEMC: audio DMA start, sound freq %d, sndhz = %f\n", (m_vidc_regs[0xc0] & 0xff)-2, sndhz);
+
+					m_vidc_sndcur = m_vidc_sndstart;
+					m_vidc_sndendcur = m_vidc_sndend;
 				}
 
 				break;
@@ -1199,5 +1216,5 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_page_w)
 	// now go ahead and set the mapping in the page table
 	m_memc_pages[log] = phys + (memc*0x80);
 
-//  printf("PC=%08x = MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", space.device().safe_pc(),memc_pagesize, data, log, phys, memc, perms);
+//  printf("PC=%08x = MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", m_maincpu->pc(),memc_pagesize, data, log, phys, memc, perms);
 }

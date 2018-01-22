@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol,Stefan Jokisch
-#ifndef _VIDEO_TIA_H_
-#define _VIDEO_TIA_H_
+#ifndef MAME_VIDEO_VIDEO_TIA_H
+#define MAME_VIDEO_VIDEO_TIA_H
+
+#pragma once
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -61,7 +63,7 @@ public:
 
 protected:
 	// construction/destruction
-	tia_video_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, uint32_t clock);
+	tia_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -210,10 +212,11 @@ class tia_pal_video_device : public tia_video_device
 public:
 	tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(tia_pal);
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	DECLARE_PALETTE_INIT(tia_pal);
 };
 
 class tia_ntsc_video_device : public tia_video_device
@@ -221,15 +224,16 @@ class tia_ntsc_video_device : public tia_video_device
 public:
 	tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(tia_ntsc);
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	DECLARE_PALETTE_INIT(tia_ntsc);
 };
 
 
 // device type definition
-extern const device_type TIA_PAL_VIDEO;
-extern const device_type TIA_NTSC_VIDEO;
+DECLARE_DEVICE_TYPE(TIA_PAL_VIDEO, tia_pal_video_device)
+DECLARE_DEVICE_TYPE(TIA_NTSC_VIDEO, tia_ntsc_video_device)
 
-#endif /* _VIDEO_TIA_H_ */
+#endif // MAME_VIDEO_TIA_H

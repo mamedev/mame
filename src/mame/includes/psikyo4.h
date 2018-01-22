@@ -6,12 +6,12 @@
 
 *************************************************************************/
 
-#define MASTER_CLOCK 57272700   // main oscillator frequency
-
-#include "emu.h"
-#include "cpu/sh2/sh2.h"
+#include "cpu/sh/sh2.h"
 #include "sound/ymf278b.h"
 #include "machine/eepromser.h"
+#include "screen.h"
+
+#define MASTER_CLOCK 57272700   // main oscillator frequency
 
 class psikyo4_state : public driver_device
 {
@@ -75,4 +75,6 @@ public:
 	uint32_t screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(psikyosh_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t scr);
+	void ps4big(machine_config &config);
+	void ps4small(machine_config &config);
 };

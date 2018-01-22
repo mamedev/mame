@@ -202,10 +202,13 @@ TI-86 ports:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ti85.h"
+
 #include "cpu/z80/z80.h"
 #include "imagedev/snapquik.h"
-#include "includes/ti85.h"
 #include "machine/bankdev.h"
+#include "screen.h"
+
 
 /* port i/o functions */
 
@@ -561,7 +564,7 @@ static INPUT_PORTS_START (ti83)
 INPUT_PORTS_END
 
 /* machine definition */
-static MACHINE_CONFIG_START( ti81, ti85_state )
+MACHINE_CONFIG_START(ti85_state::ti81)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(ti81_mem)
@@ -584,7 +587,7 @@ static MACHINE_CONFIG_START( ti81, ti85_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ti85, ti81 )
+MACHINE_CONFIG_DERIVED(ti85_state::ti85, ti81)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
 	MCFG_CPU_IO_MAP(ti85_io)
@@ -595,20 +598,17 @@ static MACHINE_CONFIG_DERIVED( ti85, ti81 )
 	MCFG_SCREEN_SIZE(128, 64)
 	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 64-1)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ti85d, ti85 )
+MACHINE_CONFIG_DERIVED(ti85_state::ti85d, ti85)
 	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav", 0)
 	//MCFG_TI85SERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ti82, ti81 )
+MACHINE_CONFIG_DERIVED(ti85_state::ti82, ti81)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
 	MCFG_CPU_IO_MAP(ti82_io)
@@ -625,21 +625,17 @@ static MACHINE_CONFIG_DERIVED( ti82, ti81 )
 	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
 	MCFG_T6A04_SIZE(96, 64)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	//MCFG_TI82SERIAL_ADD( "tiserial" )
+	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ti81v2, ti82 )
+MACHINE_CONFIG_DERIVED(ti85_state::ti81v2, ti82)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(ti81v2_io)
 
-	//MCFG_DEVICE_REMOVE( "tiserial" )
+	MCFG_DEVICE_REMOVE("linkport")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ti83, ti81 )
+MACHINE_CONFIG_DERIVED(ti85_state::ti83, ti81)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(6000000)        /* 6 MHz */
 	MCFG_CPU_IO_MAP(ti83_io)
@@ -657,7 +653,7 @@ static MACHINE_CONFIG_DERIVED( ti83, ti81 )
 	MCFG_T6A04_SIZE(96, 64)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ti86, ti85 )
+MACHINE_CONFIG_DERIVED(ti85_state::ti86, ti85)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ti86_mem)
 	MCFG_CPU_IO_MAP(ti86_io)
@@ -666,10 +662,9 @@ static MACHINE_CONFIG_DERIVED( ti86, ti85 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85 )
 
 	MCFG_SNAPSHOT_ADD("snapshot", ti85_state, ti8x, "sav", 0)
-	//MCFG_TI86SERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ti83p, ti81 )
+MACHINE_CONFIG_DERIVED(ti85_state::ti83p, ti81)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(6000000)        /* 8 MHz running at 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(ti83p_asic_mem)
@@ -688,40 +683,36 @@ static MACHINE_CONFIG_DERIVED( ti83p, ti81 )
 	MCFG_DEVICE_ADD("membank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(ti83p_banked_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("membank2", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(ti83p_banked_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("membank3", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(ti83p_banked_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("membank4", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(ti83p_banked_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("t6a04", T6A04, 0)
 	MCFG_T6A04_SIZE(96, 64)
 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_TI8X_LINK_PORT_ADD("linkport", default_ti8x_link_devices, nullptr)
 
 	MCFG_AMD_29F400T_ADD("flash")
-
-	//MCFG_TI83PSERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ti83pse, ti83p )
+MACHINE_CONFIG_DERIVED(ti85_state::ti83pse, ti83p)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( 15000000)
 	MCFG_CPU_IO_MAP(ti83pse_io)
@@ -740,11 +731,9 @@ static MACHINE_CONFIG_DERIVED( ti83pse, ti83p )
 
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti83pse )
 	MCFG_DEVICE_REPLACE("flash", FUJITSU_29F160T, 0)
-
-	//MCFG_TI83PSERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ti84p, ti83pse )
+MACHINE_CONFIG_DERIVED(ti85_state::ti84p, ti83pse)
 	MCFG_DEVICE_MODIFY("membank1")
 	MCFG_DEVICE_PROGRAM_MAP(ti84p_banked_mem)
 
@@ -761,12 +750,12 @@ static MACHINE_CONFIG_DERIVED( ti84p, ti83pse )
 	MCFG_DEVICE_REPLACE("flash", AMD_29F800T , 0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ti84pse, ti83pse )
+MACHINE_CONFIG_DERIVED(ti85_state::ti84pse, ti83pse)
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti84pse )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ti73, ti83p )
-	//MCFG_DEVICE_REMOVE( "tiserial" )
+MACHINE_CONFIG_DERIVED(ti85_state::ti73, ti83p)
+	MCFG_DEVICE_REMOVE("linkport")
 	//MCFG_TI73SERIAL_ADD( "tiserial" )
 MACHINE_CONFIG_END
 
@@ -912,20 +901,34 @@ ROM_END
 
 ROM_START (ti84p)
 	ROM_REGION (0x100000, "flash",0)
-	ROM_DEFAULT_BIOS("b100v255mp")
-	ROM_SYSTEM_BIOS( 0, "b100v255mp", "Boot 1.00 OS V 2.55MP" )
-	ROMX_LOAD( "ti84pb100v255mp.bin", 0x00000, 0x100000, CRC(4af31251) SHA1(8f67269346644b87e7cd0f353f5f4030e787cf57), ROM_BIOS(1) )
+	ROM_DEFAULT_BIOS("v255mp")
+	ROM_SYSTEM_BIOS( 0, "v221", "Boot 1.00 OS V 2.21" )
+	ROMX_LOAD( "ti84pb100v221.bin", 0x00000, 0x100000, CRC(2f55c4d9) SHA1(04e91c5d089b4a56f12e949f0bd6936df6539d2a), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v222", "Boot 1.00 OS V 2.22" )
+	ROMX_LOAD( "ti84pb100v222.bin", 0x00000, 0x100000, CRC(bdb80f06) SHA1(7c6e1557acd90bb649a353616d3fc96fcbb59b10), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "v230", "Boot 1.00 OS V 2.30" )
+	ROMX_LOAD( "ti84pb100v230.bin", 0x00000, 0x100000, CRC(ce3229f6) SHA1(abbb228cb6efbca724008d15ac724919821163d8), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 3, "v240", "Boot 1.00 OS V 2.40" )
+	ROMX_LOAD( "ti84pb100v240.bin", 0x00000, 0x100000, CRC(4d0b1e08) SHA1(53ae06d4c492402ce5ae999c9d8be7437c0797ed), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS( 4, "v241", "Boot 1.00 OS V 2.41" )
+	ROMX_LOAD( "ti84pb100v241.bin", 0x00000, 0x100000, CRC(5879e99a) SHA1(8e7651fe10b05e870ab5e211c1ff800e60f2a933), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 5, "v243", "Boot 1.00 OS V 2.43" )
+	ROMX_LOAD( "ti84pb100v243.bin", 0x00000, 0x100000, CRC(0234caea) SHA1(d50b70fd2e141e920807e083b53056f6bbe2870c), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS( 6, "v253mp", "Boot 1.00 OS V 2.53MP" )
+	ROMX_LOAD( "ti84pb100v253mp.bin", 0x00000, 0x100000, CRC(84ab2f4f) SHA1(4083f416c8698af4e1c512b21c526bc7e1aa1c23), ROM_BIOS(7) )
+	ROM_SYSTEM_BIOS( 7, "v255mp", "Boot 1.00 OS V 2.55MP" )
+	ROMX_LOAD( "ti84pb100v255mp.bin", 0x00000, 0x100000, CRC(4af31251) SHA1(8f67269346644b87e7cd0f353f5f4030e787cf57), ROM_BIOS(8) )
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT   COMPANY                 FULLNAME                        FLAGS */
-COMP( 1990, ti81,       0,      0,      ti81,   ti81, driver_device,   0,     "Texas Instruments",    "TI-81",                        MACHINE_NO_SOUND )
-COMP( 1992, ti85,       0,      0,      ti85d,  ti85, driver_device,   0,     "Texas Instruments",    "TI-85",                        MACHINE_NO_SOUND )
-COMP( 1993, ti82,       0,      0,      ti82,   ti82, driver_device,   0,     "Texas Instruments",    "TI-82",                        MACHINE_NO_SOUND )
-COMP( 1994, ti81v2,     ti81,   0,      ti81v2, ti81, driver_device,   0,     "Texas Instruments",    "TI-81 v2.0",                   MACHINE_NO_SOUND )
-COMP( 1996, ti83,       0,      0,      ti83,   ti83, driver_device,   0,     "Texas Instruments",    "TI-83",                        MACHINE_NO_SOUND )
-COMP( 1997, ti86,       0,      0,      ti86,   ti85, driver_device,   0,     "Texas Instruments",    "TI-86",                        MACHINE_NO_SOUND )
-COMP( 1998, ti73,       0,      0,      ti73,   ti82, driver_device,   0,     "Texas Instruments",    "TI-73",                        MACHINE_NO_SOUND )
-COMP( 1999, ti83p,      0,      0,      ti83p,  ti82, driver_device,   0,     "Texas Instruments",    "TI-83 Plus",                   MACHINE_NO_SOUND )
-COMP( 2001, ti83pse,    0,      0,      ti83pse,   ti82, driver_device,   0,     "Texas Instruments",    "TI-83 Plus Silver Edition", MACHINE_NO_SOUND )
-COMP( 2004, ti84p,      0,      0,      ti84p,   ti82, driver_device,   0,   "Texas Instruments",    "TI-84 Plus",                    MACHINE_NO_SOUND )
-COMP( 2004, ti84pse,    0,      0,      ti84pse,   ti82, driver_device,   0,     "Texas Instruments",    "TI-84 Plus Silver Edition", MACHINE_NO_SOUND )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY              FULLNAME                     FLAGS
+COMP( 1990, ti81,       0,      0,      ti81,    ti81,  ti85_state,  0,     "Texas Instruments", "TI-81",                     MACHINE_NO_SOUND_HW )
+COMP( 1992, ti85,       0,      0,      ti85d,   ti85,  ti85_state,  0,     "Texas Instruments", "TI-85",                     MACHINE_NO_SOUND_HW )
+COMP( 1993, ti82,       0,      0,      ti82,    ti82,  ti85_state,  0,     "Texas Instruments", "TI-82",                     MACHINE_NO_SOUND_HW )
+COMP( 1994, ti81v2,     ti81,   0,      ti81v2,  ti81,  ti85_state,  0,     "Texas Instruments", "TI-81 v2.0",                MACHINE_NO_SOUND_HW )
+COMP( 1996, ti83,       0,      0,      ti83,    ti83,  ti85_state,  0,     "Texas Instruments", "TI-83",                     MACHINE_NO_SOUND_HW )
+COMP( 1997, ti86,       0,      0,      ti86,    ti85,  ti85_state,  0,     "Texas Instruments", "TI-86",                     MACHINE_NO_SOUND_HW )
+COMP( 1998, ti73,       0,      0,      ti73,    ti82,  ti85_state,  0,     "Texas Instruments", "TI-73",                     MACHINE_NO_SOUND_HW )
+COMP( 1999, ti83p,      0,      0,      ti83p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-83 Plus",                MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2001, ti83pse,    0,      0,      ti83pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-83 Plus Silver Edition", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2004, ti84p,      0,      0,      ti84p,   ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus",                MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+COMP( 2004, ti84pse,    0,      0,      ti84pse, ti82,  ti85_state,  0,     "Texas Instruments", "TI-84 Plus Silver Edition", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

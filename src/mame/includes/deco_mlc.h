@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
 #include "machine/eepromser.h"
 #include "machine/deco146.h"
+#include "machine/timer.h"
 #include "sound/ymz280b.h"
+#include "screen.h"
 
 
 class deco_mlc_state : public driver_device
@@ -42,7 +45,6 @@ public:
 	std::unique_ptr<uint16_t[]> m_mlc_spriteram;
 	std::unique_ptr<uint16_t[]> m_mlc_spriteram_spare;
 	std::unique_ptr<uint16_t[]> m_mlc_buffered_spriteram;
-	DECLARE_READ32_MEMBER(test2_r);
 	DECLARE_READ32_MEMBER(mlc_440008_r);
 	DECLARE_READ32_MEMBER(mlc_44001c_r);
 	DECLARE_WRITE32_MEMBER(mlc_44001c_w);
@@ -67,7 +69,7 @@ public:
 	DECLARE_MACHINE_RESET(mlc);
 	DECLARE_VIDEO_START(mlc);
 	uint32_t screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_mlc(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mlc);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
 	void draw_sprites( const rectangle &cliprect, int scanline, uint32_t* dest);
 	void descramble_sound(  );
@@ -82,4 +84,8 @@ public:
 
 	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );
+	void mlc(machine_config &config);
+	void mlc_6bpp(machine_config &config);
+	void avengrgs(machine_config &config);
+	void mlc_5bpp(machine_config &config);
 };

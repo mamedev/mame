@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __MD_SLOT_H
-#define __MD_SLOT_H
+#ifndef MAME_BUS_MEGADRIVE_MD_SLOT_H
+#define MAME_BUS_MEGADRIVE_MD_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -89,9 +91,9 @@ enum
 
 class device_md_cart_interface : public device_slot_card_interface
 {
+	friend class base_md_cart_slot_device;
 public:
 	// construction/destruction
-	device_md_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_md_cart_interface();
 
 	// reading and writing
@@ -120,6 +122,9 @@ public:
 	void rom_map_setup(uint32_t size);
 	uint32_t get_padded_size(uint32_t size);
 
+protected:
+	device_md_cart_interface(const machine_config &mconfig, device_t &device);
+
 	int m_nvram_start, m_nvram_end;
 	int m_nvram_active, m_nvram_readonly;
 
@@ -129,7 +134,9 @@ public:
 	int m_nvram_handlers_installed;
 
 	// internal state
+public: // FIXME: this needs to be public becuase the S&K "lock-on" cart is implemented in a really dodgy way
 	uint16_t  *m_rom;
+protected:
 	uint32_t  m_rom_size;
 	std::vector<uint16_t> m_nvram;
 
@@ -145,12 +152,11 @@ class base_md_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~base_md_cart_slot_device();
 
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -165,13 +171,13 @@ public:
 	virtual bool is_reset_on_load() const override { return 1; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
 
 	image_init_result load_list();
 	image_init_result load_nonlist();
-	int get_cart_type(uint8_t *ROM, uint32_t len);
+	static int get_cart_type(const uint8_t *ROM, uint32_t len);
 
 	void setup_custom_mappers();
 	void setup_nvram();
@@ -234,9 +240,9 @@ public:
 
 
 // device type definition
-extern const device_type MD_CART_SLOT;
-extern const device_type PICO_CART_SLOT;
-extern const device_type COPERA_CART_SLOT;
+DECLARE_DEVICE_TYPE(MD_CART_SLOT,     md_cart_slot_device)
+DECLARE_DEVICE_TYPE(PICO_CART_SLOT,   pico_cart_slot_device)
+DECLARE_DEVICE_TYPE(COPERA_CART_SLOT, copera_cart_slot_device)
 
 
 /***************************************************************************
@@ -263,4 +269,4 @@ extern const device_type COPERA_CART_SLOT;
 	static_cast<md_cart_slot_device *>(device)->set_must_be_loaded(false);
 
 
-#endif
+#endif // MAME_BUS_MEGADRIVE_MD_SLOT_H

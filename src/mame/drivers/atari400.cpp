@@ -45,6 +45,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/atarifdc.h"
 #include "sound/dac.h"
 #include "sound/pokey.h"
@@ -52,7 +53,9 @@
 #include "bus/a800/a800_slot.h"
 #include "bus/a800/a800_carts.h"
 #include "bus/a800/a8sio.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /******************************************************************************
     Atari 800 memory map (preliminary)
@@ -297,6 +300,19 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(a800xl_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(a5200_interrupt);
 
+	void atari_common_nodac(machine_config &config);
+	void atari_common(machine_config &config);
+	void a800pal(machine_config &config);
+	void a400pal(machine_config &config);
+	void a5200(machine_config &config);
+	void a800(machine_config &config);
+	void a1200xl(machine_config &config);
+	void a800xlpal(machine_config &config);
+	void a130xe(machine_config &config);
+	void a800xl(machine_config &config);
+	void a600xl(machine_config &config);
+	void xegs(machine_config &config);
+	void a400(machine_config &config);
 protected:
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<ram_device> m_ram;
@@ -2075,16 +2091,16 @@ WRITE8_MEMBER(a400_state::a800xl_pia_pb_w)
  **************************************************************/
 
 
-static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
+MACHINE_CONFIG_START(a400_state::atari_common_nodac)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
+	MCFG_CPU_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
 
 	MCFG_MACHINE_RESET_OVERRIDE( a400_state, a400 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1))
-	MCFG_SCREEN_VISIBLE_AREA(MIN_X, MAX_X, MIN_Y, MAX_Y)
+	MCFG_SCREEN_VISIBLE_AREA_ANTIC()
 	MCFG_SCREEN_UPDATE_DEVICE("antic", antic_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -2103,7 +2119,7 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
+	MCFG_SOUND_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
 	MCFG_POKEY_POT0_R_CB(IOPORT("analog_0"))
 	MCFG_POKEY_POT1_R_CB(IOPORT("analog_1"))
 	MCFG_POKEY_POT2_R_CB(IOPORT("analog_2"))
@@ -2120,7 +2136,7 @@ static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atari_common, atari_common_nodac )
+MACHINE_CONFIG_DERIVED(a400_state::atari_common, atari_common_nodac)
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.03)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
@@ -2149,7 +2165,7 @@ MACHINE_CONFIG_END
 
 
 // memory map A400 + NTSC screen
-static MACHINE_CONFIG_DERIVED( a400, atari_common )
+MACHINE_CONFIG_DERIVED(a400_state::a400, atari_common)
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
@@ -2158,13 +2174,13 @@ static MACHINE_CONFIG_DERIVED( a400, atari_common )
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
-	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
+	MCFG_SCREEN_SIZE_ANTIC_60HZ()
 MACHINE_CONFIG_END
 
 
 // memory map A400 + PAL screen
-static MACHINE_CONFIG_DERIVED( a400pal, atari_common )
+MACHINE_CONFIG_DERIVED(a400_state::a400pal, atari_common)
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
@@ -2173,13 +2189,13 @@ static MACHINE_CONFIG_DERIVED( a400pal, atari_common )
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a400 )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
-	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
+	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
+	MCFG_SCREEN_SIZE_ANTIC_50HZ()
 MACHINE_CONFIG_END
 
 
 // memory map A800 + NTSC screen + Right cartslot
-static MACHINE_CONFIG_DERIVED( a800, atari_common )
+MACHINE_CONFIG_DERIVED(a400_state::a800, atari_common)
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
@@ -2188,15 +2204,15 @@ static MACHINE_CONFIG_DERIVED( a800, atari_common )
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
-	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
+	MCFG_SCREEN_SIZE_ANTIC_60HZ()
 
 	MCFG_A800_CARTRIDGE_ADD("cartright", a800_right, nullptr)
 MACHINE_CONFIG_END
 
 
 // memory map A800 + PAL screen + Right cartslot
-static MACHINE_CONFIG_DERIVED( a800pal, atari_common )
+MACHINE_CONFIG_DERIVED(a400_state::a800pal, atari_common)
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a400_mem)
@@ -2205,15 +2221,15 @@ static MACHINE_CONFIG_DERIVED( a800pal, atari_common )
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800 )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
-	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
+	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
+	MCFG_SCREEN_SIZE_ANTIC_50HZ()
 
 	MCFG_A800_CARTRIDGE_ADD("cartright", a800_right, nullptr)
 MACHINE_CONFIG_END
 
 
 // memory map A600XL (same as 800XL but less RAM) + NTSC screen + MMU via PIA portB
-static MACHINE_CONFIG_DERIVED( a600xl, atari_common )
+MACHINE_CONFIG_DERIVED(a400_state::a600xl, atari_common)
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a600xl_mem)
@@ -2225,8 +2241,8 @@ static MACHINE_CONFIG_DERIVED( a600xl, atari_common )
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a800xl )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
-	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
+	MCFG_SCREEN_SIZE_ANTIC_60HZ()
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
@@ -2234,7 +2250,7 @@ MACHINE_CONFIG_END
 
 
 // memory map A800XL + NTSC screen + MMU via PIA portB
-static MACHINE_CONFIG_DERIVED( a800xl, atari_common )
+MACHINE_CONFIG_DERIVED(a400_state::a800xl, atari_common)
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a800xl_mem)
@@ -2249,20 +2265,20 @@ static MACHINE_CONFIG_DERIVED( a800xl, atari_common )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
-	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
+	MCFG_SCREEN_SIZE_ANTIC_60HZ()
 MACHINE_CONFIG_END
 
 
 // memory map A800XL + PAL screen + MMU via PIA portB
-static MACHINE_CONFIG_DERIVED( a800xlpal, a800xl )
+MACHINE_CONFIG_DERIVED(a400_state::a800xlpal, a800xl)
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( 1773000 )
 
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_50HZ)
-	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_50HZ)
+	MCFG_SCREEN_REFRESH_RATE_ANTIC_50HZ()
+	MCFG_SCREEN_SIZE_ANTIC_50HZ()
 
 	MCFG_SOUND_MODIFY("pokey")
 	MCFG_SOUND_CLOCK(1773000)
@@ -2270,7 +2286,7 @@ MACHINE_CONFIG_END
 
 
 // memory map A1200XL+ MMU via PIA portB
-static MACHINE_CONFIG_DERIVED( a1200xl, a800xl )
+MACHINE_CONFIG_DERIVED(a400_state::a1200xl, a800xl)
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a1200xl_mem)
@@ -2281,7 +2297,7 @@ MACHINE_CONFIG_END
 
 
 // memory map A130XE (extra RAM only partially emulated)
-static MACHINE_CONFIG_DERIVED( a130xe, a800xl )
+MACHINE_CONFIG_DERIVED(a400_state::a130xe, a800xl)
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a130xe_mem)
@@ -2292,7 +2308,7 @@ MACHINE_CONFIG_END
 
 
 // memory map XEGS, only XEGS bankswitch supported
-static MACHINE_CONFIG_DERIVED( xegs, a800xl )
+MACHINE_CONFIG_DERIVED(a400_state::xegs, a800xl)
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(xegs_mem)
@@ -2305,7 +2321,7 @@ MACHINE_CONFIG_END
 
 
 // memory map A5200, different ports, less RAM
-static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
+MACHINE_CONFIG_DERIVED(a400_state::a5200, atari_common_nodac)
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(a5200_mem)
@@ -2333,8 +2349,8 @@ static MACHINE_CONFIG_DERIVED( a5200, atari_common_nodac )
 	MCFG_MACHINE_START_OVERRIDE( a400_state, a5200 )
 
 	MCFG_SCREEN_MODIFY( "screen" )
-	MCFG_SCREEN_REFRESH_RATE(FRAME_RATE_60HZ)
-	MCFG_SCREEN_SIZE(HWIDTH*8, TOTAL_LINES_60HZ)
+	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
+	MCFG_SCREEN_SIZE_ANTIC_60HZ()
 
 	MCFG_A5200_CARTRIDGE_ADD("cartleft", a5200_carts, nullptr)
 
@@ -2459,19 +2475,19 @@ ROM_END
  *
  **************************************************************/
 
-/*     YEAR  NAME      PARENT    COMPAT MACHINE     INPUT    INIT      COMPANY    FULLNAME */
-COMP ( 1979, a400,     0,        0,     a400,       a800,   driver_device,    0,    "Atari",   "Atari 400 (NTSC)",     0)
-COMP ( 1979, a400pal,  a400,     0,     a400pal,    a800,   driver_device,    0,    "Atari",   "Atari 400 (PAL)",      0)
-COMP ( 1979, a800,     0,        0,     a800,       a800,   driver_device,    0,    "Atari",   "Atari 800 (NTSC)",     0)
-COMP ( 1979, a800pal,  a800,     0,     a800pal,    a800,   driver_device,    0,    "Atari",   "Atari 800 (PAL)",      0)
-COMP ( 1982, a1200xl,  a800,     0,     a1200xl,    a800xl, driver_device,    0,    "Atari",   "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
-COMP ( 1983, a600xl,   a800xl,   0,     a600xl,     a800xl, driver_device,    0,    "Atari",   "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
-COMP ( 1983, a800xl,   0,        0,     a800xl,     a800xl, driver_device,    0,    "Atari",   "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP ( 1983, a800xlp,  a800xl,   0,     a800xlpal,  a800xl, driver_device,    0,    "Atari",   "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP ( 1986, a65xe,    a800xl,   0,     a800xl,     a800xl, driver_device,    0,    "Atari",   "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP ( 1986, a65xea,   a800xl,   0,     a800xl,     a800xl, driver_device,    0,    "Atari",   "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING )
-COMP ( 1986, a130xe,   a800xl,   0,     a130xe,     a800xl, driver_device,    0,    "Atari",   "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM
-COMP ( 1986, a800xe,   a800xl,   0,     a800xl,     a800xl, driver_device,    0,    "Atari",   "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
-COMP ( 1987, xegs,     0,        0,     xegs,       a800xl, driver_device,    0,    "Atari",   "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
+/*     YEAR  NAME      PARENT    COMPAT MACHINE     INPUT   STATE          INIT  COMPANY    FULLNAME */
+COMP ( 1979, a400,     0,        0,     a400,       a800,   a400_state,    0,    "Atari",   "Atari 400 (NTSC)",     0)
+COMP ( 1979, a400pal,  a400,     0,     a400pal,    a800,   a400_state,    0,    "Atari",   "Atari 400 (PAL)",      0)
+COMP ( 1979, a800,     0,        0,     a800,       a800,   a400_state,    0,    "Atari",   "Atari 800 (NTSC)",     0)
+COMP ( 1979, a800pal,  a800,     0,     a800pal,    a800,   a400_state,    0,    "Atari",   "Atari 800 (PAL)",      0)
+COMP ( 1982, a1200xl,  a800,     0,     a1200xl,    a800xl, a400_state,    0,    "Atari",   "Atari 1200XL",         MACHINE_NOT_WORKING )      // 64k RAM
+COMP ( 1983, a600xl,   a800xl,   0,     a600xl,     a800xl, a400_state,    0,    "Atari",   "Atari 600XL",          MACHINE_IMPERFECT_GRAPHICS )      // 16k RAM
+COMP ( 1983, a800xl,   0,        0,     a800xl,     a800xl, a400_state,    0,    "Atari",   "Atari 800XL (NTSC)",   MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP ( 1983, a800xlp,  a800xl,   0,     a800xlpal,  a800xl, a400_state,    0,    "Atari",   "Atari 800XL (PAL)",    MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP ( 1986, a65xe,    a800xl,   0,     a800xl,     a800xl, a400_state,    0,    "Atari",   "Atari 65XE",           MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP ( 1986, a65xea,   a800xl,   0,     a800xl,     a800xl, a400_state,    0,    "Atari",   "Atari 65XE (Arabic)",  MACHINE_NOT_WORKING )
+COMP ( 1986, a130xe,   a800xl,   0,     a130xe,     a800xl, a400_state,    0,    "Atari",   "Atari 130XE",          MACHINE_NOT_WORKING )      // 128k RAM
+COMP ( 1986, a800xe,   a800xl,   0,     a800xl,     a800xl, a400_state,    0,    "Atari",   "Atari 800XE",          MACHINE_IMPERFECT_GRAPHICS )      // 64k RAM
+COMP ( 1987, xegs,     0,        0,     xegs,       a800xl, a400_state,    0,    "Atari",   "Atari XE Game System", MACHINE_IMPERFECT_GRAPHICS )  // 64k RAM
 
-CONS ( 1982, a5200,    0,        0,     a5200,      a5200,  driver_device,    0,    "Atari",   "Atari 5200",           0)
+CONS ( 1982, a5200,    0,        0,     a5200,      a5200,  a400_state,    0,    "Atari",   "Atari 5200",           0)

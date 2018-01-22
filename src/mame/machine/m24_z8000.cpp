@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+#include "emu.h"
 #include "m24_z8000.h"
 
-const device_type M24_Z8000 = &device_creator<m24_z8000_device>;
+DEFINE_DEVICE_TYPE(M24_Z8000, m24_z8000_device, "m24_z8000", "Olivetti M24 Z8000 Adapter")
 
 m24_z8000_device::m24_z8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, M24_Z8000, "Olivetti M24 Z8000 Adapter", tag, owner, clock, "m24_z8000", __FILE__),
+	device_t(mconfig, M24_Z8000, tag, owner, clock),
 	m_z8000(*this, "z8000"),
 	m_maincpu(*this, ":maincpu"),
 	m_pic(*this, ":mb:pic8259"),
@@ -62,7 +63,7 @@ static ADDRESS_MAP_START(z8000_io, AS_IO, 16, m24_z8000_device)
 	AM_RANGE(0x8000, 0x83ff) AM_READWRITE(i86_io_r, i86_io_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( m24_z8000 )
+MACHINE_CONFIG_START(m24_z8000_device::device_add_mconfig)
 	MCFG_CPU_ADD("z8000", Z8001, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(z8000_prog)
 	MCFG_CPU_DATA_MAP(z8000_data)
@@ -81,11 +82,6 @@ static MACHINE_CONFIG_FRAGMENT( m24_z8000 )
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 MACHINE_CONFIG_END
 
-machine_config_constructor m24_z8000_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( m24_z8000 );
-}
-
 const uint8_t m24_z8000_device::pmem_table[16][4] =
 	{{0, 1, 2, 3}, {1, 2, 3, 255}, {4, 5, 6, 7}, {46, 40, 41, 42},
 	{255, 255, 255, 255}, {255, 255, 255, 47}, {1, 2, 3, 255}, {255, 255, 255, 255},
@@ -98,14 +94,14 @@ READ16_MEMBER(m24_z8000_device::pmem_r)
 	uint8_t hostseg;
 	offset <<= 1;
 	if(!m_z8000_mem)
-		return memregion(subtag("z8000").c_str())->u16(offset >> 1);
+		return memregion(subtag("z8000").c_str())->as_u16(offset >> 1);
 
 	hostseg = pmem_table[(offset >> 16) & 0xf][(offset >> 14) & 3];
 	if(hostseg == 255)
 		return 0;
 	offset = (offset & 0x3fff) | (hostseg << 14);
 	if((hostseg >= 40) && (hostseg <= 47))
-		offset = (offset & 0xf0000) | BITSWAP16(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0); // move A6/A7 so CGA framebuffer appears linear
+		offset = (offset & 0xf0000) | bitswap<16>(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0); // move A6/A7 so CGA framebuffer appears linear
 	ret = m_maincpu->space(AS_PROGRAM).read_word(offset, (mem_mask << 8) | (mem_mask >> 8));
 	return (ret << 8) | (ret >> 8);
 }
@@ -120,7 +116,7 @@ WRITE16_MEMBER(m24_z8000_device::pmem_w)
 		return;
 	offset = (offset & 0x3fff) | (hostseg << 14);
 	if((hostseg >= 40) && (hostseg <= 47))
-		offset = (offset & 0xf0000) | BITSWAP16(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
+		offset = (offset & 0xf0000) | bitswap<16>(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
 	m_maincpu->space(AS_PROGRAM).write_word(offset, data, (mem_mask << 8) | (mem_mask >> 8));
 }
 
@@ -140,7 +136,7 @@ READ16_MEMBER(m24_z8000_device::dmem_r)
 		return 0;
 	offset = (offset & 0x3fff) | (hostseg << 14);
 	if((hostseg >= 40) && (hostseg <= 47))
-		offset = (offset & 0xf0000) | BITSWAP16(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
+		offset = (offset & 0xf0000) | bitswap<16>(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
 	ret = m_maincpu->space(AS_PROGRAM).read_word(offset, (mem_mask << 8) | (mem_mask >> 8));
 	return (ret << 8) | (ret >> 8);
 }
@@ -155,7 +151,7 @@ WRITE16_MEMBER(m24_z8000_device::dmem_w)
 		return;
 	offset = (offset & 0x3fff) | (hostseg << 14);
 	if((hostseg >= 40) && (hostseg <= 47))
-		offset = (offset & 0xf0000) | BITSWAP16(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
+		offset = (offset & 0xf0000) | bitswap<16>(offset,15,7,6,14,13,12,11,10,9,8,5,4,3,2,1,0);
 	m_maincpu->space(AS_PROGRAM).write_word(offset, data, (mem_mask << 8) | (mem_mask >> 8));
 }
 

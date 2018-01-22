@@ -3,6 +3,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "screen.h"
 
 class fantland_state : public driver_device
 {
@@ -78,4 +79,8 @@ public:
 	void borntofi_adpcm_start( msm5205_device *device, int voice );
 	void borntofi_adpcm_stop( msm5205_device *device, int voice );
 	void borntofi_adpcm_int( msm5205_device *device, int voice );
+	void fantland(machine_config &config);
+	void wheelrun(machine_config &config);
+	void borntofi(machine_config &config);
+	void galaxygn(machine_config &config);
 };

@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/mman.h>
+#include <sys/sysctl.h>
 #include <sys/types.h>
 #include <signal.h>
 #include <dlfcn.h>
@@ -52,52 +53,8 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 
 void osd_process_kill()
 {
-	std::fflush(stdout);
-	std::fflush(stderr);
 	kill(getpid(), SIGKILL);
 }
-
-//============================================================
-//  osd_malloc
-//============================================================
-
-void *osd_malloc(size_t size)
-{
-#ifndef MALLOC_DEBUG
-	return malloc(size);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
-
-//============================================================
-//  osd_malloc_array
-//============================================================
-
-void *osd_malloc_array(size_t size)
-{
-#ifndef MALLOC_DEBUG
-	return malloc(size);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
-
-//============================================================
-//  osd_free
-//============================================================
-
-void osd_free(void *ptr)
-{
-#ifndef MALLOC_DEBUG
-	free(ptr);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
 
 //============================================================
 //  osd_alloc_executable
@@ -136,13 +93,22 @@ void osd_free_executable(void *ptr, size_t size)
 
 void osd_break_into_debugger(const char *message)
 {
-	#ifdef MAME_DEBUG
-	printf("MAME exception: %s\n", message);
-	printf("Attempting to fall into debugger\n");
-	kill(getpid(), SIGTRAP);
-	#else
-	printf("Ignoring MAME exception: %s\n", message);
-	#endif
+	pid_t const mypid = getpid();
+	int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, int(mypid) };
+	struct kinfo_proc info;
+	info.kp_proc.p_flag = 0;
+	std::size_t infosz = sizeof(info);
+	sysctl(mib, ARRAY_LENGTH(mib), &info, &infosz, nullptr, 0);
+	if (info.kp_proc.p_flag & P_TRACED)
+	{
+		printf("MAME exception: %s\n", message);
+		printf("Attempting to fall into debugger\n");
+		kill(mypid, SIGTRAP);
+	}
+	else
+	{
+		printf("Ignoring MAME exception: %s\n", message);
+	}
 }
 
 
@@ -205,7 +171,7 @@ char *osd_get_clipboard_text(void)
 				CFIndex const length = CFDataGetLength(data_ref);
 				CFRange const range = CFRangeMake(0, length);
 
-				result = reinterpret_cast<char *>(osd_malloc_array(length + 1));
+				result = reinterpret_cast<char *>(malloc(length + 1));
 				if (result)
 				{
 					CFDataGetBytes(data_ref, range, reinterpret_cast<unsigned char *>(result));

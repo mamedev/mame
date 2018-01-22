@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __ASTROCADE_SLOT_H
-#define __ASTROCADE_SLOT_H
+#ifndef MAME_BUS_ASTROCADE_SLOT_H
+#define MAME_BUS_ASTROCADE_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -26,7 +28,6 @@ class device_astrocade_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_astrocade_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_astrocade_cart_interface();
 
 	// reading and writing
@@ -37,6 +38,8 @@ public:
 	uint32_t get_rom_size() { return m_rom_size; }
 
 protected:
+	device_astrocade_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -53,10 +56,6 @@ public:
 	// construction/destruction
 	astrocade_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~astrocade_cart_slot_device();
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -75,12 +74,14 @@ public:
 	virtual const char *file_extensions() const override { return "bin"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 	int m_type;
 	device_astrocade_cart_interface*       m_cart;
@@ -89,7 +90,7 @@ protected:
 
 
 // device type definition
-extern const device_type ASTROCADE_CART_SLOT;
+DECLARE_DEVICE_TYPE(ASTROCADE_CART_SLOT, astrocade_cart_slot_device)
 
 
 /***************************************************************************
@@ -101,4 +102,5 @@ extern const device_type ASTROCADE_CART_SLOT;
 #define MCFG_ASTROCADE_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
 	MCFG_DEVICE_ADD(_tag, ASTROCADE_CART_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-#endif
+
+#endif // MAME_BUS_ASTROCADE_SLOT_H

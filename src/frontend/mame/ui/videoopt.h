@@ -23,7 +23,7 @@ public:
 	virtual ~menu_video_targets() override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 
@@ -45,7 +45,7 @@ private:
 		VIDEO_ITEM_VIEW
 	};
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	render_target *target;

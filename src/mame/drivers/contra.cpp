@@ -19,18 +19,19 @@ Dip locations and factory settings verified with manual
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/contra.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
-#include "includes/konamipt.h"
-#include "includes/contra.h"
+#include "speaker.h"
 
 
 INTERRUPT_GEN_MEMBER(contra_state::contra_interrupt)
 {
-	address_space &space = generic_space();
-	if (m_k007121_1->ctrlram_r(space, 7) & 0x02)
+	if (m_k007121_1->ctrlram_r(7) & 0x02)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
@@ -193,14 +194,14 @@ void contra_state::machine_start()
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
 }
 
-static MACHINE_CONFIG_START( contra, contra_state )
+MACHINE_CONFIG_START(contra_state::contra)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, XTAL_24MHz / 2 /* 3000000*4? */)
+	MCFG_CPU_ADD("maincpu", HD6309E, XTAL_24MHz / 8) /* 3000000? (HD63C09EP) */
 	MCFG_CPU_PROGRAM_MAP(contra_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", contra_state,  contra_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_24MHz/8) /* 3000000? */
+	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL_24MHz/8) /* 3000000? (HD68B09EP) */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* enough for the sound CPU to read all commands */
@@ -560,13 +561,13 @@ ROM_START( contrabj1 )
 	ROM_LOAD( "633f11.20g",   0x0300, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    /* 007121 #1 char lookup table */
 ROM_END
 
-GAME( 1987, contra,    0,      contra, contra,  driver_device, 0, ROT90, "Konami", "Contra (US / Asia, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, contra1,   contra, contra, contra,  driver_device, 0, ROT90, "Konami", "Contra (US / Asia, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, contrae,   contra, contra, contra,  driver_device, 0, ROT90, "Konami", "Contra (US / Asia, set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, contraj,   contra, contra, contra,  driver_device, 0, ROT90, "Konami", "Contra (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, contraj1,  contra, contra, contra,  driver_device, 0, ROT90, "Konami", "Contra (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gryzor,    contra, contra, gryzor,  driver_device, 0, ROT90, "Konami", "Gryzor (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gryzor1,   contra, contra, gryzor,  driver_device, 0, ROT90, "Konami", "Gryzor (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, contrab,   contra, contra, contra,  driver_device, 0, ROT90, "bootleg", "Contra (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, contrabj,  contra, contra, contra,  driver_device, 0, ROT90, "bootleg", "Contra (Japan bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, contrabj1, contra, contra, contra,  driver_device, 0, ROT90, "bootleg", "Contra (Japan bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contra,    0,      contra, contra,  contra_state, 0, ROT90, "Konami",  "Contra (US / Asia, set 1)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contra1,   contra, contra, contra,  contra_state, 0, ROT90, "Konami",  "Contra (US / Asia, set 2)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contrae,   contra, contra, contra,  contra_state, 0, ROT90, "Konami",  "Contra (US / Asia, set 3)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contraj,   contra, contra, contra,  contra_state, 0, ROT90, "Konami",  "Contra (Japan, set 1)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contraj1,  contra, contra, contra,  contra_state, 0, ROT90, "Konami",  "Contra (Japan, set 2)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gryzor,    contra, contra, gryzor,  contra_state, 0, ROT90, "Konami",  "Gryzor (set 1)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gryzor1,   contra, contra, gryzor,  contra_state, 0, ROT90, "Konami",  "Gryzor (set 2)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contrab,   contra, contra, contra,  contra_state, 0, ROT90, "bootleg", "Contra (bootleg)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contrabj,  contra, contra, contra,  contra_state, 0, ROT90, "bootleg", "Contra (Japan bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, contrabj1, contra, contra, contra,  contra_state, 0, ROT90, "bootleg", "Contra (Japan bootleg, set 2)", MACHINE_SUPPORTS_SAVE )

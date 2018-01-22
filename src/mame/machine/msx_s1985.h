@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef __MSX_S1985_H
-#define __MSX_S1985_H
+#ifndef MAME_MACHINE_MSX_S1985_H
+#define MAME_MACHINE_MSX_S1985_H
 
 
 #include "msx_switched.h"
 
 
-extern const device_type MSX_S1985;
+DECLARE_DEVICE_TYPE(MSX_S1985, msx_s1985_device)
 
 
 #define MCFG_MSX_S1985_ADD(_tag) \
@@ -43,4 +43,4 @@ private:
 	uint8_t m_pattern;
 };
 
-#endif
+#endif // MAME_MACHINE_MSX_S1985_H

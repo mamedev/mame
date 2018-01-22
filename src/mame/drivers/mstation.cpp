@@ -30,9 +30,12 @@
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/intelfsh.h"
-#include "machine/rp5c01.h"
 #include "machine/ram.h"
+#include "machine/rp5c01.h"
+#include "machine/timer.h"
 #include "rendlay.h"
+#include "screen.h"
+
 
 class mstation_state : public driver_device
 {
@@ -94,6 +97,7 @@ public:
 	DECLARE_PALETTE_INIT(mstation);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_1hz_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_kb_timer);
+	void mstation(machine_config &config);
 };
 
 
@@ -433,7 +437,7 @@ PALETTE_INIT_MEMBER(mstation_state, mstation)
 }
 
 
-static MACHINE_CONFIG_START( mstation, mstation_state )
+MACHINE_CONFIG_START(mstation_state::mstation)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)      //unknown clock
 	MCFG_CPU_PROGRAM_MAP(mstation_mem)
@@ -467,13 +471,13 @@ static MACHINE_CONFIG_START( mstation, mstation_state )
 	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	/* internal ram */
@@ -492,5 +496,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1999, mstation,  0,       0,  mstation,   mstation, driver_device,  0,   "CIDCO",   "MailStation",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY  FULLNAME       FLAGS
+COMP( 1999, mstation, 0,      0,      mstation, mstation, mstation_state, 0,    "CIDCO", "MailStation", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

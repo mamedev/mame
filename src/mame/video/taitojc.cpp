@@ -317,7 +317,7 @@ void taitojc_state::video_start()
 	m_tile_ram = make_unique_clear<uint32_t[]>(0x4000/4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(*m_palette, taitojc_char_layout, (uint8_t *)m_char_ram.get(), 0, m_palette->entries() / 16, 0));
+	m_gfxdecode->set_gfx(m_gfx_index, std::make_unique<gfx_element>(m_palette, taitojc_char_layout, (uint8_t *)m_char_ram.get(), 0, m_palette->entries() / 16, 0));
 }
 
 uint32_t taitojc_state::screen_update_taitojc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

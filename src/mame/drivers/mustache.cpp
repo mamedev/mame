@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /***************************************************************************
 
@@ -30,9 +30,12 @@ YM2151:
 
 ***************************************************************************/
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/mustache.h"
 #include "audio/t5182.h"
+
+#include "cpu/z80/z80.h"
+#include "speaker.h"
+
 
 #define XTAL1  14318180
 #define XTAL2  18432000
@@ -43,7 +46,8 @@ YM2151:
 
 
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0x0000, 0x7fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
+	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
 	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
@@ -61,8 +65,8 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, mustache_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, mustache_state )
+	AM_RANGE(0x0000, 0x7fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
@@ -91,25 +95,25 @@ static INPUT_PORTS_START( mustache )
 	PORT_BIT( 0xf9, IP_ACTIVE_LOW, IPT_UNUSED  )
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW 2:!1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW 2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW 2:!2,!3")
+	PORT_DIPNAME( 0x06, 0x04, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW 2:2,3")
 	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW 2:!4,!5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW 2:4,5")
 	PORT_DIPSETTING(    0x10, "1" )
 	PORT_DIPSETTING(    0x18, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW 2:!6")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW 2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW 1:!1,!2,!3")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW 1:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
@@ -118,16 +122,18 @@ static INPUT_PORTS_START( mustache )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW 1:!4,!5")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW 1:4,5")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_SERVICE( 0x20, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW 1:!6")
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW 1:!7")
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW ) PORT_DIPLOCATION("SW 1:6")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW 1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-// There is an 8th dipswitch here, which controls screen flip, but the operator sheet implies it does it via hardware, i.e. not readable by cpu. May need further investigation.
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW 1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 INPUT_PORTS_END
 
@@ -171,7 +177,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mustache_state::scanline)
 
 
 
-static MACHINE_CONFIG_START( mustache, mustache_state )
+MACHINE_CONFIG_START(mustache_state::mustache)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -179,8 +185,10 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mustache_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("t5182", T5182, 0)
+	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
+	MCFG_DEVICE_ROM("maincpu")
 
+	MCFG_DEVICE_ADD("t5182", T5182, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -192,8 +200,7 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mustache)
-	MCFG_PALETTE_ADD("palette", 8*16+16*8)
-	MCFG_PALETTE_INIT_OWNER(mustache_state, mustache)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -273,10 +280,10 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 	{
 		uint16_t w;
 
-		buf[i] = BITSWAP8(gfx1[i], 0,5,2,6,4,1,7,3);
+		buf[i] = bitswap<8>(gfx1[i], 0,5,2,6,4,1,7,3);
 
 		w = (gfx1[i+G1] << 8) | gfx1[i+G1*2];
-		w = BITSWAP16(w, 14,1,13,5,9,2,10,6, 3,8,4,15,0,11,12,7);
+		w = bitswap<16>(w, 14,1,13,5,9,2,10,6, 3,8,4,15,0,11,12,7);
 
 		buf[i+G1]   = w >> 8;
 		buf[i+G1*2] = w & 0xff;
@@ -284,7 +291,7 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 
 	/* BG address lines */
 	for (i = 0; i < 3*G1; i++)
-		gfx1[i] = buf[BITSWAP16(i,15,14,13,2,1,0,12,11,10,9,8,7,6,5,4,3)];
+		gfx1[i] = buf[bitswap<16>(i,15,14,13,2,1,0,12,11,10,9,8,7,6,5,4,3)];
 
 	/* SPR data lines */
 	for (i=0;i<G2; i++)
@@ -292,7 +299,7 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 		uint16_t w;
 
 		w = (gfx2[i] << 8) | gfx2[i+G2];
-		w = BITSWAP16(w, 5,7,11,4,15,10,3,14, 9,2,13,8,1,12,0,6 );
+		w = bitswap<16>(w, 5,7,11,4,15,10,3,14, 9,2,13,8,1,12,0,6 );
 
 		buf[i]    = w >> 8;
 		buf[i+G2] = w & 0xff;
@@ -300,9 +307,7 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 
 	/* SPR address lines */
 	for (i = 0; i < 2*G2; i++)
-		gfx2[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,12,11,10,9,8,7,6,5,4,13,14,3,2,1,0)];
-
-	seibu_sound_device::apply_decrypt(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000);
+		gfx2[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,12,11,10,9,8,7,6,5,4,13,14,3,2,1,0)];
 }
 
 

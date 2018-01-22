@@ -3,8 +3,10 @@
 
 // Williams Pinball Controller lamp control
 
-#ifndef WPC_LAMP_H
-#define WPC_LAMP_H
+#ifndef MAME_MACHINE_WPC_LAMP_H
+#define MAME_MACHINE_WPC_LAMP_H
+
+#pragma once
 
 #define MCFG_WPC_LAMP_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, WPC_LAMP, 0 )
@@ -33,6 +35,6 @@ protected:
 	void update();
 };
 
-extern const device_type WPC_LAMP;
+DECLARE_DEVICE_TYPE(WPC_LAMP, wpc_lamp_device)
 
-#endif
+#endif // MAME_MACHINE_WPC_LAMP_H

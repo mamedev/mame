@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
+// copyright-holders:Fabio Priuli, Acho A. Tang, R. Belmont
+#ifndef MAME_VIDEO_K037122_H
+#define MAME_VIDEO_K037122_H
 #pragma once
-#ifndef __K037122_H__
-#define __K037122_H__
 
 class k037122_device : public device_t,
 						public device_video_interface,
@@ -10,7 +10,6 @@ class k037122_device : public device_t,
 {
 public:
 	k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~k037122_device() {}
 
 	// static configuration
 	static void static_set_gfx_index(device_t &device, int index) { downcast<k037122_device &>(device).m_gfx_index = index; }
@@ -43,7 +42,7 @@ private:
 	void update_palette_color( uint32_t palette_base, int color );
 };
 
-extern const device_type K037122;
+DECLARE_DEVICE_TYPE(K037122, k037122_device)
 
 #define MCFG_K037122_ADD(_tag, _screen) \
 	MCFG_DEVICE_ADD(_tag, K037122, 0) \
@@ -52,4 +51,4 @@ extern const device_type K037122;
 #define MCFG_K037122_PALETTE(_palette_tag) \
 	MCFG_GFX_PALETTE(_palette_tag)
 
-#endif
+#endif // MAME_VIDEO_K037122_H

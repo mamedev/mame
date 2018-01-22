@@ -53,14 +53,10 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
 		m_bg_tilemap->mark_all_dirty();
 	}
 
-	/* BM:  bit 7 is suspected to be MCU reset, the evidence for this is that
-	 the games tilt mode reset sequence shows the main CPU must be able to
-	 directly control the reset line of the MCU, else the game will crash
-	 leaving the tilt screen (as the MCU is now out of sync with main CPU
-	 which resets itself).  This bit is the likely candidate as it is flipped
-	 early in bootup just prior to accessing the MCU for the first time. */
-	if (m_mcu.found()) // Bootlegs don't have the MCU but still set this bit
-		m_mcu->set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	// bit 7 resets the MCU and semaphore flipflops
+	// This bit is flipped early in bootup just prior to accessing the MCU for the first time.
+	if (m_mcuintf.found()) // Bootlegs don't have the MCU but still set this bit
+		m_mcuintf->reset_w(BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

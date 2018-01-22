@@ -23,6 +23,7 @@
 			[".cpp"] = "Sources",
 			[".cxx"] = "Sources",
 			[".dylib"] = "Frameworks",
+			[".bundle"] = "Frameworks",
 			[".framework"] = "Frameworks",
 			[".tbd"] = "Frameworks",
 			[".m"] = "Sources",
@@ -78,6 +79,7 @@
 			[".css"]       = "text.css",
 			[".cxx"]       = "sourcecode.cpp.cpp",
 			[".entitlements"] = "text.xml",
+			[".bundle"]    = "wrapper.cfbundle",
 			[".framework"] = "wrapper.framework",
 			[".tbd"]       = "sourcecode.text-based-dylib-definition",
 			[".gif"]       = "image.gif",
@@ -119,6 +121,7 @@
 			[".css"]       = "text.css",
 			[".cxx"]       = "sourcecode.cpp.cpp",
 			[".entitlements"] = "text.xml",
+			[".bundle"]    = "wrapper.cfbundle",
 			[".framework"] = "wrapper.framework",
 			[".tbd"]       = "wrapper.framework",
 			[".gif"]       = "image.gif",
@@ -156,6 +159,7 @@
 			WindowedApp = "com.apple.product-type.application",
 			StaticLib   = "com.apple.product-type.library.static",
 			SharedLib   = "com.apple.product-type.library.dynamic",
+			Bundle      = "com.apple.product-type.bundle",
 		}
 		return types[node.cfg.kind]
 	end
@@ -176,6 +180,7 @@
 			WindowedApp = "wrapper.application",
 			StaticLib   = "archive.ar",
 			SharedLib   = "\"compiled.mach-o.dylib\"",
+			Bundle      = "wrapper.cfbundle",
 		}
 		return types[node.cfg.kind]
 	end
@@ -649,16 +654,13 @@
 		local wrapperWritten = false
 
 		local function doblock(id, name, which)
-			-- start with the project-level commands (most common)
-			local prjcmds = tr.project[which]
-			local commands = table.join(prjcmds, {})
-
-			-- see if there are any config-specific commands to add
+			-- see if there are any commands to add for each config
+			local commands = {}
 			for _, cfg in ipairs(tr.configs) do
 				local cfgcmds = cfg[which]
-				if #cfgcmds > #prjcmds then
+				if #cfgcmds > 0 then
 					table.insert(commands, 'if [ "${CONFIGURATION}" = "' .. xcode.getconfigname(cfg) .. '" ]; then')
-					for i = #prjcmds + 1, #cfgcmds do
+					for i = 1, #cfgcmds do
 						local cmd = cfgcmds[i]
 						cmd = cmd:gsub('\\','\\\\')
 						table.insert(commands, cmd)
@@ -787,6 +789,10 @@
 			_p(4,'EXECUTABLE_EXTENSION = %s;', ext)
 		end
 
+		if cfg.flags.ObjcARC then
+			_p(4,'CLANG_ENABLE_OBJC_ARC = YES;')
+		end
+
 		local outdir = path.getdirectory(cfg.buildtarget.bundlepath)
 		if outdir ~= "." then
 			_p(4,'CONFIGURATION_BUILD_DIR = %s;', outdir)
@@ -804,6 +810,7 @@
 			WindowedApp = '"$(HOME)/Applications"',
 			SharedLib = '/usr/local/lib',
 			StaticLib = '/usr/local/lib',
+			Bundle    = '"$(LOCAL_LIBRARY_DIR)/Bundles"',
 		}
 		_p(4,'INSTALL_PATH = %s;', installpaths[cfg.kind])
 
@@ -820,7 +827,16 @@
 			_p(4,'INFOPLIST_FILE = "%s";', infoplist_file)
 		end
 
+		if cfg.kind == "Bundle" then
+			_p(4, 'PRODUCT_BUNDLE_IDENTIFIER = "genie.%s";', cfg.buildtarget.basename:gsub("%s+", '.')) --replace spaces with .
+		end
+
 		_p(4,'PRODUCT_NAME = "%s";', cfg.buildtarget.basename)
+
+		if cfg.kind == "Bundle" then
+			_p(4, 'WRAPPER_EXTENSION = bundle;')
+		end
+
 		_p(3,'};')
 		_p(3,'name = "%s";', cfgname)
 		_p(2,'};')
@@ -830,15 +846,37 @@
 	local function cfg_excluded_files(prj, cfg)
 		local excluded = {}
 
+		-- Converts a file path to a pattern with no relative parts, prefixed with `*`.
+		local function exclude_pattern(file)
+			if path.isabsolute(file) then
+				return file
+			end
+
+			-- handle `foo/../bar`
+			local start, term = file:findlast("/%.%./")
+			if term then
+				return path.join("*", file:sub(term + 1))
+			end
+
+			-- handle `../foo/bar`
+			start, term = file:find("%.%./")
+			if start == 1 then
+				return path.join("*", file:sub(term + 1))
+			end
+
+			-- handle `foo/bar`
+			return path.join("*", file)
+		end
+
 		local function add_file(file)
-			local name = path.getname(file)
+			local name = exclude_pattern(file)
 			if not table.icontains(excluded, name) then
 				table.insert(excluded, name)
 			end
 		end
 
 		local function verify_file(file)
-			local name = path.getname(file)
+			local name = exclude_pattern(file)
 			if table.icontains(excluded, name) then
 				-- xcode only allows us to exclude files based on filename, not path...
 				error("'" .. file .. "' would be excluded by the rule to exclude '" .. name .. "'")
@@ -998,7 +1036,9 @@
 			_p(4,'SYMROOT = "%s";', targetdir)
 		end
 
-		if cfg.flags.ExtraWarnings then
+		if cfg.flags.PedanticWarnings
+		or cfg.flags.ExtraWarnings
+		then
 			_p(4,'WARNING_CFLAGS = "-Wall";')
 		end
 

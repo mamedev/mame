@@ -54,6 +54,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void speeddrv(machine_config &config);
 protected:
 
 	// devices
@@ -75,7 +76,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( speeddrv, speeddrv_state )
+MACHINE_CONFIG_START(speeddrv_state::speeddrv)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I486, 40000000 ) // ?? at least a pentium
 	MCFG_CPU_PROGRAM_MAP(speeddrv_map)
@@ -113,5 +114,5 @@ DRIVER_INIT_MEMBER(speeddrv_state,speeddrv)
 {
 }
 
-GAME( 2004,  speeddrv,  0,  speeddrv,  speeddrv, speeddrv_state,  speeddrv,  ROT0,  "IGS",    "Speed Driver",    MACHINE_IS_SKELETON )
-GAME( 200?,  eztouch,   0,  speeddrv,  speeddrv, speeddrv_state,  speeddrv,  ROT0,  "IGS",    "EZ Touch (v116 China)",    MACHINE_IS_SKELETON )
+GAME( 2004,  speeddrv,  0,  speeddrv,  speeddrv, speeddrv_state,  speeddrv,  ROT0,  "IGS",    "Speed Driver",          MACHINE_IS_SKELETON )
+GAME( 200?,  eztouch,   0,  speeddrv,  speeddrv, speeddrv_state,  speeddrv,  ROT0,  "IGS",    "EZ Touch (v116 China)", MACHINE_IS_SKELETON )

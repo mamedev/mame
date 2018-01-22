@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "machine/timer.h"
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
 
@@ -49,4 +50,5 @@ public:
 	DECLARE_WRITE16_MEMBER( skullxbo_mobmsb_w );
 
 	static const atari_motion_objects_config s_mob_config;
+	void skullxbo(machine_config &config);
 };

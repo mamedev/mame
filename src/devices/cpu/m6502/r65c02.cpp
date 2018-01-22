@@ -10,22 +10,23 @@
 
 #include "emu.h"
 #include "r65c02.h"
+#include "r65c02d.h"
 
-const device_type R65C02 = &device_creator<r65c02_device>;
+DEFINE_DEVICE_TYPE(R65C02, r65c02_device, "r65c02", "R65C02")
 
 r65c02_device::r65c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m65c02_device(mconfig, R65C02, "R65C02", tag, owner, clock, "r65c02", __FILE__)
+	r65c02_device(mconfig, R65C02, tag, owner, clock)
 {
 }
 
-r65c02_device::r65c02_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	m65c02_device(mconfig, type, name, tag, owner, clock, shortname, source)
+r65c02_device::r65c02_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	m65c02_device(mconfig, type, tag, owner, clock)
 {
 }
 
-offs_t r65c02_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *r65c02_device::create_disassembler()
 {
-	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
+	return new r65c02_disassembler;
 }
 
 #include "cpu/m6502/r65c02.hxx"

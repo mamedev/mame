@@ -132,6 +132,7 @@ passing offs+2 which lacks the extra priority bit
 
 #include "emu.h"
 #include "decospr.h"
+#include "screen.h"
 
 DECOSPR_COLOUR_CB_MEMBER(decospr_device::default_col_cb)
 {
@@ -145,10 +146,10 @@ void decospr_device::set_gfx_region(device_t &device, int gfxregion)
 //  printf("decospr_device::set_gfx_region()\n");
 }
 
-const device_type DECO_SPRITE = &device_creator<decospr_device>;
+DEFINE_DEVICE_TYPE(DECO_SPRITE, decospr_device, "decospr", "DECO 52 Sprite")
 
 decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECO_SPRITE, "DECO 52 Sprite", tag, owner, clock, "decospr", __FILE__),
+	: device_t(mconfig, DECO_SPRITE, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		m_gfxregion(0),
 		m_is_bootleg(false),
@@ -190,7 +191,7 @@ void decospr_device::device_reset()
 
 void decospr_device::alloc_sprite_bitmap()
 {
-	m_screen->register_screen_bitmap(m_sprite_bitmap);
+	screen().register_screen_bitmap(m_sprite_bitmap);
 }
 
 template<class _BitmapClass>
@@ -247,7 +248,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 			w = y & 0x0800;
 
 
-			if (!(flash && (m_screen->frame_number() & 1)))
+			if (!(flash && (screen().frame_number() & 1)))
 			{
 				x = spriteram[offs + 2];
 
@@ -362,7 +363,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											colour,
 											fx,fy,
 											x,ypos,
-											m_screen->priority(),pri,m_transpen);
+											screen().priority(),pri,m_transpen);
 									else
 										m_gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
 											sprite - multi * inc,
@@ -381,7 +382,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 												colour,
 												fx,fy,
 												!flipscreen ? x-16 : x+16,ypos,
-												m_screen->priority(),pri,m_transpen);
+												screen().priority(),pri,m_transpen);
 									else
 										m_gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
 												(sprite - multi * inc)-mult2,
@@ -431,7 +432,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 			x = spriteram[offs+1];
 
-			if (!((y&0x2000) && (m_screen->frame_number() & 1)))
+			if (!((y&0x2000) && (screen().frame_number() & 1)))
 			{
 				if (!m_sprite_bitmap.valid())
 					colour = (spriteram[offs+2] >>0) & 0x1f;
@@ -486,7 +487,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											colour,
 											fx,fy,
 												x + mult * (w-xx),ypos,
-											m_screen->priority(),pri,m_transpen);
+											screen().priority(),pri,m_transpen);
 								}
 
 								ypos -= 512; // wrap-around y
@@ -498,7 +499,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 											colour,
 											fx,fy,
 											x + mult * (w-xx),ypos,
-											m_screen->priority(),pri,m_transpen);
+											screen().priority(),pri,m_transpen);
 								}
 
 							}

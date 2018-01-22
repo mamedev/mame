@@ -43,6 +43,9 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK     XTAL_12MHz
 #define SOUND_CLOCK      XTAL_45MHz
@@ -63,8 +66,8 @@ public:
 		m_vidattrram(*this, "vidattrram"),
 		m_spriteram(*this, "spriteram"),
 		m_mwarr_ram(*this, "mwarr_ram"),
+		m_okibank(*this, "okibank"),
 		m_maincpu(*this, "maincpu"),
-		m_oki2(*this, "oki2"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
@@ -79,6 +82,8 @@ public:
 	required_shared_ptr<uint16_t> m_vidattrram;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_mwarr_ram;
+
+	required_memory_bank m_okibank;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
@@ -107,9 +112,9 @@ public:
 	uint32_t screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
-	required_device<okim6295_device> m_oki2;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void mwarr(machine_config &config);
 };
 
 
@@ -145,7 +150,7 @@ WRITE16_MEMBER(mwarr_state::tx_videoram_w)
 
 WRITE16_MEMBER(mwarr_state::oki1_bank_w)
 {
-	m_oki2->set_rom_bank(data & 3);
+	m_okibank->set_entry(data & 3);
 }
 
 WRITE16_MEMBER(mwarr_state::sprites_commands_w)
@@ -215,7 +220,7 @@ static ADDRESS_MAP_START( mwarr_map, AS_PROGRAM, 16, mwarr_state )
 	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_SHARE("mlow_scrollram")
 	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_SHARE("mhigh_scrollram")
 	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_SHARE("vidattrram")
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x110000, 0x110001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("SYSTEM")
@@ -226,6 +231,13 @@ static ADDRESS_MAP_START( mwarr_map, AS_PROGRAM, 16, mwarr_state )
 	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_SHARE("mwarr_ram")
 	AM_RANGE(0x180000, 0x180001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x190000, 0x190001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( oki2_map, 0, 8, mwarr_state)
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is what gets switched */
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM AM_REGION("oki2", 0)
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
 
@@ -541,6 +553,8 @@ uint32_t mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &b
 
 void mwarr_state::machine_start()
 {
+	m_okibank->configure_entries(0, 4, memregion("oki2")->base(), 0x20000);
+
 	save_item(NAME(m_which));
 }
 
@@ -549,7 +563,7 @@ void mwarr_state::machine_reset()
 	m_which = 0;
 }
 
-static MACHINE_CONFIG_START( mwarr, mwarr_state )
+MACHINE_CONFIG_START(mwarr_state::mwarr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
@@ -573,11 +587,12 @@ static MACHINE_CONFIG_START( mwarr, mwarr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", SOUND_CLOCK/48 , OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", SOUND_CLOCK/48 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", SOUND_CLOCK/48 , OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", SOUND_CLOCK/48 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 MACHINE_CONFIG_END
 
 
@@ -631,20 +646,8 @@ ROM_START( mwarr )
 	ROM_REGION( 0x40000, "oki1", 0 ) /* Samples */
 	ROM_LOAD( "oki0",   0x000000, 0x40000, CRC(005811ce) SHA1(9149bc8e9cc16ce3db4e22f8cb7ea8a57a66980e) )
 
-	ROM_REGION( 0x080000, "user1", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "oki2", 0 ) /* Samples */
 	ROM_LOAD( "oki1",   0x000000, 0x80000, CRC(bcde2330) SHA1(452d871360fa907d2e4ebad93c3fba9a3fa32fa7) )
-
-	/* $00000-$20000 stays the same in all sound banks, */
-	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x100000, "oki2", 0 ) /* Samples */
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x020000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user1", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user1", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "user1", 0x060000, 0x0e0000, 0x020000)
 ROM_END
 
 /*************************************
@@ -653,4 +656,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 199?, mwarr, 0, mwarr, mwarr, driver_device, 0, ROT0,  "Elettronica Video-Games S.R.L.", "Mighty Warriors", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, mwarr, 0, mwarr, mwarr, mwarr_state, 0, ROT0,  "Elettronica Video-Games S.R.L.", "Mighty Warriors", MACHINE_SUPPORTS_SAVE )

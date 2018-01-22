@@ -17,9 +17,10 @@
 #include "emu.h"
 #include "debugger.h"
 #include "am29000.h"
+#include "am29dasm.h"
 
 
-const device_type AM29000 = &device_creator<am29000_cpu_device>;
+DEFINE_DEVICE_TYPE(AM29000, am29000_cpu_device, "am29000", "AMC Am29000")
 
 
 /***************************************************************************
@@ -79,7 +80,7 @@ const device_type AM29000 = &device_creator<am29000_cpu_device>;
 ***************************************************************************/
 
 am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, AM29000, "AMD Am29000", tag, owner, clock, "am29000", __FILE__)
+	: cpu_device(mconfig, AM29000, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 32, 32, 0)
 	, m_data_config("data", ENDIANNESS_BIG, 32, 32, 0)
@@ -118,13 +119,21 @@ am29000_cpu_device::am29000_cpu_device(const machine_config &mconfig, const char
 	m_next_pc = 0;
 }
 
+device_memory_interface::space_config_vector am29000_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 void am29000_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_data = &space(AS_DATA);
-	m_datadirect = &m_data->direct();
+	m_datadirect = m_data->direct<0>();
 	m_io = &space(AS_IO);
 	m_cfg = (PRL_AM29000 | PRL_REV_D) << CFG_PRL_SHIFT;
 
@@ -694,9 +703,7 @@ void am29000_cpu_device::execute_set_input(int inputnum, int state)
 	// TODO : CHECK IRQs
 }
 
-
-offs_t am29000_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *am29000_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( am29000 );
-	return CPU_DISASSEMBLE_NAME(am29000)(this, buffer, pc, oprom, opram, options);
+	return new am29000_disassembler;
 }

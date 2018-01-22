@@ -12,7 +12,7 @@
 Notes:
 
 - mjcamerb and mmcamera is the medal version of mjcamera, however the
-   two don't run on the same hardware. mjcamera is in nbmj8688.c.
+   two don't run on the same hardware. mjcamera is in nbmj8688.cpp.
 
 - In mjfocus(Medal Type), sometimes CPU's hands are forced out from the screen.
   This is correct behaviour.
@@ -42,12 +42,14 @@ TODO:
 
 #include "emu.h"
 #include "includes/nbmj8891.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 DRIVER_INIT_MEMBER(nbmj8891_state,gionbana)
@@ -62,7 +64,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,gionbana)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
+		prot[i] = bitswap<8>(prot[i],2,7,3,5,0,6,4,1);
 	}
 }
 
@@ -79,7 +81,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,omotesnd)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
+		prot[i] = bitswap<8>(prot[i],2,7,3,5,0,6,4,1);
 	}
 #endif
 
@@ -112,7 +114,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,telmahjn)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i + 0x20000],7,0,4,1,5,2,6,3);
+		prot[i] = bitswap<8>(prot[i + 0x20000],7,0,4,1,5,2,6,3);
 	}
 }
 
@@ -128,7 +130,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mgmen89)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],5,6,1,0,7,3,2,4);
+		prot[i] = bitswap<8>(prot[i],5,6,1,0,7,3,2,4);
 	}
 }
 
@@ -148,7 +150,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjfocus)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i + 0x20000],7,0,4,1,5,2,6,3);
+		prot[i] = bitswap<8>(prot[i + 0x20000],7,0,4,1,5,2,6,3);
 	}
 }
 
@@ -188,7 +190,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjnanpas)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i + 0x20000],0,5,2,3,6,7,1,4);
+		prot[i] = bitswap<8>(prot[i + 0x20000],0,5,2,3,6,7,1,4);
 	}
 #endif
 }
@@ -205,7 +207,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,pairsnb)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],5,6,1,0,7,3,2,4);
+		prot[i] = bitswap<8>(prot[i],5,6,1,0,7,3,2,4);
 	}
 }
 
@@ -221,7 +223,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,pairsten)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i + 0x20000],5,6,0,4,3,7,1,2);
+		prot[i] = bitswap<8>(prot[i + 0x20000],5,6,0,4,3,7,1,2);
 	}
 }
 
@@ -1555,31 +1557,8 @@ static INPUT_PORTS_START( club90s )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSWB") // not populated on the PCB
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8891_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
@@ -1739,31 +1718,9 @@ static INPUT_PORTS_START( chinmoku )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
+	/* does not physically exist on PCB - MT 06592 */
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nbmj8891_state, nb1413m3_busyflag_r, nullptr)    // DRAW BUSY
@@ -2219,7 +2176,7 @@ static INPUT_PORTS_START( taiwanmb )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( gionbana, nbmj8891_state )
+MACHINE_CONFIG_START(nbmj8891_state::gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */
@@ -2253,7 +2210,7 @@ static MACHINE_CONFIG_START( gionbana, nbmj8891_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mgion, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mgion, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2266,7 +2223,7 @@ static MACHINE_CONFIG_DERIVED( mgion, gionbana )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( omotesnd, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::omotesnd, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2285,14 +2242,14 @@ static MACHINE_CONFIG_DERIVED( omotesnd, gionbana )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( abunai, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::abunai, gionbana)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_ABUNAI )
 MACHINE_CONFIG_END
 
 /* NBMJDRV2 */
-static MACHINE_CONFIG_DERIVED( mjcamerb, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mjcamerb, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2309,7 +2266,7 @@ static MACHINE_CONFIG_DERIVED( mjcamerb, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mmcamera, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mmcamera, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2326,7 +2283,7 @@ static MACHINE_CONFIG_DERIVED( mmcamera, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hanamomo, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::hanamomo, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2342,7 +2299,7 @@ static MACHINE_CONFIG_DERIVED( hanamomo, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( msjiken, hanamomo )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::msjiken, hanamomo)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2354,7 +2311,7 @@ static MACHINE_CONFIG_DERIVED( msjiken, hanamomo )
 MACHINE_CONFIG_END
 
 /* NBMJDRV3 */
-static MACHINE_CONFIG_DERIVED( telmahjn, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::telmahjn, gionbana)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_TELMAHJN )
@@ -2363,7 +2320,7 @@ static MACHINE_CONFIG_DERIVED( telmahjn, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mgmen89, telmahjn )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mgmen89, telmahjn)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MGMEN89 )
@@ -2371,7 +2328,7 @@ static MACHINE_CONFIG_DERIVED( mgmen89, telmahjn )
 MACHINE_CONFIG_END
 
 /* NBMJDRV4 */
-static MACHINE_CONFIG_DERIVED( mjfocus, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mjfocus, gionbana)
 
 	/* basic machine hardware */
 
@@ -2382,20 +2339,20 @@ static MACHINE_CONFIG_DERIVED( mjfocus, gionbana )
 	MCFG_VIDEO_START_OVERRIDE(nbmj8891_state,_1layer)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pairsnb, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::pairsnb, gionbana)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_PAIRSNB )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pairsten, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::pairsten, gionbana)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_PAIRSTEN )
 MACHINE_CONFIG_END
 
 /* NBMJDRV5 */
-static MACHINE_CONFIG_DERIVED( mjnanpas, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mjnanpas, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2405,7 +2362,7 @@ static MACHINE_CONFIG_DERIVED( mjnanpas, gionbana )
 	MCFG_NB1413M3_TYPE( NB1413M3_MJNANPAS )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maiko, mjnanpas )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::maiko, mjnanpas)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2416,7 +2373,7 @@ static MACHINE_CONFIG_DERIVED( maiko, mjnanpas )
 	MCFG_NB1413M3_TYPE( NB1413M3_MAIKO )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mmaiko, maiko )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mmaiko, maiko)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2428,7 +2385,7 @@ static MACHINE_CONFIG_DERIVED( mmaiko, maiko )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lovehous, mjnanpas )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::lovehous, mjnanpas)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2441,7 +2398,7 @@ static MACHINE_CONFIG_DERIVED( lovehous, mjnanpas )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hanaoji, maiko )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::hanaoji, maiko)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2453,7 +2410,7 @@ static MACHINE_CONFIG_DERIVED( hanaoji, maiko )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hnxmasev, maiko )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::hnxmasev, maiko)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2461,7 +2418,7 @@ static MACHINE_CONFIG_DERIVED( hnxmasev, maiko )
 	MCFG_CPU_IO_MAP(maiko_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hnageman, maiko )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::hnageman, maiko)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2469,7 +2426,7 @@ static MACHINE_CONFIG_DERIVED( hnageman, maiko )
 	MCFG_CPU_IO_MAP(maiko_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( scandal, hanamomo )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::scandal, hanamomo)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2480,7 +2437,7 @@ static MACHINE_CONFIG_DERIVED( scandal, hanamomo )
 	MCFG_NB1413M3_TYPE( NB1413M3_SCANDAL )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bananadr, mjnanpas )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::bananadr, mjnanpas)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2493,26 +2450,26 @@ static MACHINE_CONFIG_DERIVED( bananadr, mjnanpas )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( club90s, mjnanpas )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::club90s, mjnanpas)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_CLUB90S )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mladyhtr, mjnanpas )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mladyhtr, mjnanpas)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_MLADYHTR )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chinmoku, mjnanpas )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::chinmoku, mjnanpas)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_CHINMOKU )
 MACHINE_CONFIG_END
 
 /* NBMJDRV6 */
-static MACHINE_CONFIG_DERIVED( mjfocusm, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::mjfocusm, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2536,13 +2493,13 @@ static MACHINE_CONFIG_DERIVED( mjfocusm, gionbana )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( scandalm, mjfocusm )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::scandalm, mjfocusm)
 
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_SCANDALM )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( taiwanmb, gionbana )
+MACHINE_CONFIG_DERIVED(nbmj8891_state::taiwanmb, gionbana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3558,38 +3515,38 @@ ROM_START( hnageman )
 ROM_END
 
 
-//     YEAR,     NAME,   PARENT,  MACHINE,    INPUT,     INIT, MONITOR,COMPANY,FULLNAME,FLAGS)
-GAME( 1988, msjiken,   0,        msjiken,  msjiken,   driver_device,        0, ROT270, "Nichibutsu", "Mahjong Satsujin Jiken (Japan 881017)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hanamomo,  0,        hanamomo, hanamomo,  driver_device,        0, ROT0,   "Nichibutsu", "Mahjong Hana no Momoko gumi (Japan 881201)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hanamomb,  hanamomo, hanamomo, hanamomo,  driver_device,        0, ROT0,   "Nichibutsu", "Mahjong Hana no Momoko gumi (Japan 881125)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, telmahjn,  0,        telmahjn, msjiken, nbmj8891_state, telmahjn, ROT270, "Nichibutsu", "Telephone Mahjong (Japan 890111)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,          INIT,     MONITOR,COMPANY,FULLNAME,FLAGS)
+GAME( 1988, msjiken,   0,        msjiken,  msjiken,  nbmj8891_state, 0,        ROT270, "Nichibutsu", "Mahjong Satsujin Jiken (Japan 881017)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hanamomo,  0,        hanamomo, hanamomo, nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Mahjong Hana no Momoko gumi (Japan 881201)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hanamomb,  hanamomo, hanamomo, hanamomo, nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Mahjong Hana no Momoko gumi (Japan 881125)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, telmahjn,  0,        telmahjn, msjiken,  nbmj8891_state, telmahjn, ROT270, "Nichibutsu", "Telephone Mahjong (Japan 890111)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, gionbana,  0,        gionbana, gionbana, nbmj8891_state, gionbana, ROT0,   "Nichibutsu", "Gionbana (Japan 890120)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mgion,     0,        mgion,    mgion,     driver_device,        0, ROT0,   "Nichibutsu", "Gionbana [BET] (Japan 890207)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mgion,     0,        mgion,    mgion,    nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Gionbana [BET] (Japan 890207)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, omotesnd,  0,        omotesnd, omotesnd, nbmj8891_state, omotesnd, ROT0,   "Anime Tec", "Omotesandou (Japan 890215)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, abunai,    0,        abunai,   abunai,    driver_device,        0, ROT0,   "Green Soft", "Abunai Houkago - Mou Matenai (Japan 890325)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjfocus,   0,        mjfocus,  mjfocus, nbmj8891_state,  mjfocus,  ROT0,   "Nichibutsu", "Mahjong Focus (Japan 890313)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, abunai,    0,        abunai,   abunai,   nbmj8891_state, 0,        ROT0,   "Green Soft", "Abunai Houkago - Mou Matenai (Japan 890325)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjfocus,   0,        mjfocus,  mjfocus,  nbmj8891_state, mjfocus,  ROT0,   "Nichibutsu", "Mahjong Focus (Japan 890313)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjfocusm,  mjfocus,  mjfocusm, mjfocusm, nbmj8891_state, mjfocusm, ROT0,   "Nichibutsu", "Mahjong Focus [BET] (Japan 890510)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, peepshow,  mjfocus,  mjfocus,  mjfocus, nbmj8891_state, mjfocus,  ROT0,   "AC", "Nozokimeguri Mahjong Peep Show (Japan 890404)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mjcamerb,  0,        mjcamerb, mjcamerb, driver_device,         0, ROT0,   "Miki Syouji", "Mahjong Camera Kozou (set 2) (Japan 881109)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mmcamera,  mjcamerb, mmcamera, mmcamera, driver_device,         0, ROT0,   "Miki Syouji", "Mahjong Camera Kozou [BET] (Japan 890509)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, scandal,   0,        scandal,  scandal, nbmj8891_state,  scandal,  ROT0,   "Nichibutsu", "Scandal Mahjong (Japan 890213)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, scandalm,  scandal,  scandalm, scandalm, driver_device,         0, ROT0,   "Nichibutsu", "Scandal Mahjong [BET] (Japan 890217)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, peepshow,  mjfocus,  mjfocus,  mjfocus,  nbmj8891_state, mjfocus,  ROT0,   "AC", "Nozokimeguri Mahjong Peep Show (Japan 890404)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mjcamerb,  0,        mjcamerb, mjcamerb, nbmj8891_state, 0,        ROT0,   "Miki Syouji", "Mahjong Camera Kozou (set 2) (Japan 881109)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mmcamera,  mjcamerb, mmcamera, mmcamera, nbmj8891_state, 0,        ROT0,   "Miki Syouji", "Mahjong Camera Kozou [BET] (Japan 890509)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, scandal,   0,        scandal,  scandal,  nbmj8891_state, scandal,  ROT0,   "Nichibutsu", "Scandal Mahjong (Japan 890213)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, scandalm,  scandal,  scandalm, scandalm, nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Scandal Mahjong [BET] (Japan 890217)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mgmen89,   0,        mgmen89,  mgmen89,  nbmj8891_state, mgmen89,  ROT0,   "Nichibutsu", "Mahjong G-MEN'89 (Japan 890425)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnanpas,  0,        mjnanpas, mjnanpas, nbmj8891_state, mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Japan 890713)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnanpaa,  mjnanpas, mjnanpas, mjnanpaa, nbmj8891_state, mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Japan 890712)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnanpau,  mjnanpas, mjnanpas, mjnanpas, nbmj8891_state, mjnanpas, ROT0,   "Brooks", "Mahjong Nanpa Story (Ura) (Japan 890805)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bananadr,  0,        bananadr, bananadr, driver_device,         0, ROT0,   "Digital Soft", "Mahjong Banana Dream [BET] (Japan 891124)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mladyhtr,  0,        mladyhtr, mladyhtr, driver_device,         0, ROT0,   "Nichibutsu", "Mahjong The Lady Hunter (Japan 900509)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, chinmoku,  0,        chinmoku, chinmoku, driver_device,         0, ROT0,   "Nichibutsu", "Mahjong Chinmoku no Hentai (Japan 900511)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, maiko,     0,        maiko,    maiko,    driver_device,         0, ROT0,   "Nichibutsu", "Maikobana (Japan 900802)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mmaiko,    0,        mmaiko,   mmaiko,   driver_device,         0, ROT0,   "Nichibutsu", "Maikobana [BET] (Japan 900911)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hnxmasev,  0,        hnxmasev, maiko,    driver_device,         0, ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Christmas Eve (Japan 901204)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hnageman,  0,        hnageman, maiko,    driver_device,         0, ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Ageman (Japan 900716)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, club90s,   0,        club90s,  club90s,  driver_device,         0, ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 1) (Japan 900919)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, club90sa,  club90s,  club90s,  club90s,  driver_device,         0, ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 2) (Japan 900919)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, lovehous,  club90s,  lovehous, lovehous, driver_device,         0, ROT0,   "Nichibutsu", "Mahjong Love House [BET] (Japan 901024)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, hanaoji,   0,        hanaoji,  hanaoji,  driver_device,         0, ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (ver 1.01, 1991/12/09)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, hanaojia,  hanaoji,  hanaoji,  hanaoji,  driver_device,         0, ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (ver 1.00, 1991/08/23)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, taiwanmb,  0,        taiwanmb, taiwanmb, driver_device,         0, ROT0,   "Miki Syouji", "Taiwan Mahjong [BET] (Japan 881208)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pairsnb,   0,        pairsnb, pairsnb,  nbmj8891_state,  pairsnb,  ROT0,   "Nichibutsu", "Pairs (Nichibutsu) (Japan 890822)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pairsten,  pairsnb,  pairsten, pairsnb, nbmj8891_state,  pairsten, ROT0,   "System Ten", "Pairs (System Ten) (Japan 890826)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bananadr,  0,        bananadr, bananadr, nbmj8891_state, 0,        ROT0,   "Digital Soft", "Mahjong Banana Dream [BET] (Japan 891124)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mladyhtr,  0,        mladyhtr, mladyhtr, nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Mahjong The Lady Hunter (Japan 900509)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, chinmoku,  0,        chinmoku, chinmoku, nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Mahjong Chinmoku no Hentai (Japan 900511)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, maiko,     0,        maiko,    maiko,    nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Maikobana (Japan 900802)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mmaiko,    0,        mmaiko,   mmaiko,   nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Maikobana [BET] (Japan 900911)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hnxmasev,  0,        hnxmasev, maiko,    nbmj8891_state, 0,        ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Christmas Eve (Japan 901204)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hnageman,  0,        hnageman, maiko,    nbmj8891_state, 0,        ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Ageman (Japan 900716)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, club90s,   0,        club90s,  club90s,  nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 1) (Japan 900919)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, club90sa,  club90s,  club90s,  club90s,  nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 2) (Japan 900919)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lovehous,  club90s,  lovehous, lovehous, nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Mahjong Love House [BET] (Japan 901024)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hanaoji,   0,        hanaoji,  hanaoji,  nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (ver 1.01, 1991/12/09)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, hanaojia,  hanaoji,  hanaoji,  hanaoji,  nbmj8891_state, 0,        ROT0,   "Nichibutsu", "Hana to Ojisan [BET] (ver 1.00, 1991/08/23)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, taiwanmb,  0,        taiwanmb, taiwanmb, nbmj8891_state, 0,        ROT0,   "Miki Syouji", "Taiwan Mahjong [BET] (Japan 881208)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pairsnb,   0,        pairsnb,  pairsnb,  nbmj8891_state, pairsnb,  ROT0,   "Nichibutsu", "Pairs (Nichibutsu) (Japan 890822)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pairsten,  pairsnb,  pairsten, pairsnb,  nbmj8891_state, pairsten, ROT0,   "System Ten", "Pairs (System Ten) (Japan 890826)", MACHINE_SUPPORTS_SAVE )

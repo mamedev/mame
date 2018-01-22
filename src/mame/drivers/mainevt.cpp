@@ -23,13 +23,16 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/mainevt.h"
+#include "includes/konamipt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
-#include "includes/konamipt.h"
-#include "includes/mainevt.h"
+#include "speaker.h"
+
 
 INTERRUPT_GEN_MEMBER(mainevt_state::mainevt_interrupt)
 {
@@ -102,7 +105,7 @@ WRITE8_MEMBER(mainevt_state::mainevt_sh_bankswitch_w)
 {
 	int bank_A, bank_B;
 
-//logerror("CPU #1 PC: %04x bank switch = %02x\n",space.device().safe_pc(),data);
+//logerror("CPU #1 PC: %04x bank switch = %02x\n", m_audiocpu->pc(),data);
 
 	/* bits 0-3 select the 007232 banks */
 	bank_A = (data & 0x3);
@@ -117,7 +120,7 @@ WRITE8_MEMBER(mainevt_state::dv_sh_bankswitch_w)
 {
 	int bank_A, bank_B;
 
-//logerror("CPU #1 PC: %04x bank switch = %02x\n",space.device().safe_pc(),data);
+//logerror("CPU #1 PC: %04x bank switch = %02x\n",m_audiocpu->pc(),data);
 
 	/* bits 0-3 select the 007232 banks */
 	bank_A = (data & 0x3);
@@ -170,7 +173,7 @@ static ADDRESS_MAP_START( mainevt_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 
 	AM_RANGE(0x4000, 0x5dff) AM_RAM
-	AM_RANGE(0x5e00, 0x5fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x5e00, 0x5fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -194,7 +197,7 @@ static ADDRESS_MAP_START( devstors_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 
 	AM_RANGE(0x4000, 0x5dff) AM_RAM
-	AM_RANGE(0x5e00, 0x5fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x5e00, 0x5fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -236,16 +239,16 @@ static INPUT_PORTS_START( mainevt )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 
 	PORT_START("P1")
-	KONAMI8_B21_UNK(1)
+	KONAMI8_B12_UNK(1)
 
 	PORT_START("P2")
-	KONAMI8_B21_UNK(2)
+	KONAMI8_B12_UNK(2)
 
 	PORT_START("P3")
-	KONAMI8_B21_UNK(3)
+	KONAMI8_B12_UNK(3)
 
 	PORT_START("P4")
-	KONAMI8_B21_UNK(4)
+	KONAMI8_B12_UNK(4)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2,3,4")
@@ -403,7 +406,7 @@ INTERRUPT_GEN_MEMBER(mainevt_state::devstors_sound_timer_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( mainevt, mainevt_state )
+MACHINE_CONFIG_START(mainevt_state::mainevt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* ?? */
@@ -451,7 +454,7 @@ static MACHINE_CONFIG_START( mainevt, mainevt_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( devstors, mainevt_state )
+MACHINE_CONFIG_START(mainevt_state::devstors)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* ?? */
@@ -717,11 +720,11 @@ ROM_END
 
 
 
-GAME( 1988, mainevt,  0,        mainevt,  mainevt, driver_device,  0, ROT0,  "Konami", "The Main Event (4 Players ver. Y)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mainevto, mainevt,  mainevt,  mainevt, driver_device,  0, ROT0,  "Konami", "The Main Event (4 Players ver. F)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, driver_device, 0, ROT0,  "Konami", "The Main Event (2 Players ver. X)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, driver_device, 0, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors, 0,        devstors, devstors, driver_device, 0, ROT90, "Konami", "Devastators (ver. Z)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors2,devstors, devstors, devstor2, driver_device, 0, ROT90, "Konami", "Devastators (ver. X)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, devstors3,devstors, devstors, devstors, driver_device, 0, ROT90, "Konami", "Devastators (ver. V)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, garuka,   devstors, devstors, devstor2, driver_device, 0, ROT90, "Konami", "Garuka (Japan ver. W)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevt,  0,        mainevt,  mainevt,  mainevt_state, 0, ROT0,  "Konami", "The Main Event (4 Players ver. Y)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevto, mainevt,  mainevt,  mainevt,  mainevt_state, 0, ROT0,  "Konami", "The Main Event (4 Players ver. F)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mainevt2p,mainevt,  mainevt,  mainev2p, mainevt_state, 0, ROT0,  "Konami", "The Main Event (2 Players ver. X)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ringohja, mainevt,  mainevt,  mainev2p, mainevt_state, 0, ROT0,  "Konami", "Ring no Ohja (Japan 2 Players ver. N)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors, 0,        devstors, devstors, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. Z)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors2,devstors, devstors, devstor2, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. X)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, devstors3,devstors, devstors, devstors, mainevt_state, 0, ROT90, "Konami", "Devastators (ver. V)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1988, garuka,   devstors, devstors, devstor2, mainevt_state, 0, ROT90, "Konami", "Garuka (Japan ver. W)",                 MACHINE_SUPPORTS_SAVE )

@@ -8,8 +8,9 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "video/mc6845.h"
 #include "machine/pic8259.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 
 class multi16_state : public driver_device
@@ -36,6 +37,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_multi16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void multi16(machine_config &config);
 };
 
 
@@ -75,7 +77,7 @@ uint32_t multi16_state::screen_update_multi16(screen_device &screen, bitmap_ind1
 		{
 			for(xi=0;xi<16;xi++)
 			{
-				int dot = (BITSWAP16(m_p_vram[count],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-xi)) & 0x1;
+				int dot = (bitswap<16>(m_p_vram[count],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-xi)) & 0x1;
 
 				if(screen.visible_area().contains(x*16+xi, y))
 					bitmap.pix16(y, x*16+xi) = m_palette->pen(dot);
@@ -129,7 +131,7 @@ void multi16_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( multi16, multi16_state )
+MACHINE_CONFIG_START(multi16_state::multi16)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(multi16_map)
@@ -152,7 +154,8 @@ static MACHINE_CONFIG_START( multi16, multi16_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), GND, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -163,5 +166,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1986, multi16, 0,      0,       multi16,   multi16, driver_device, 0,   "Mitsubishi", "Multi 16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY       FULLNAME    FLAGS
+COMP( 1986, multi16, 0,      0,       multi16,   multi16, multi16_state, 0,    "Mitsubishi", "Multi 16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

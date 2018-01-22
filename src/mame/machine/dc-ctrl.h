@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef _DC_CTRL_H_
-#define _DC_CTRL_H_
+#ifndef MAME_MACHINE_DC_CTRL_H
+#define MAME_MACHINE_DC_CTRL_H
+
+#pragma once
 
 #include "mapledev.h"
 
@@ -53,6 +55,6 @@ private:
 	ioport_port *port[8];
 };
 
-extern const device_type DC_CONTROLLER;
+DECLARE_DEVICE_TYPE(DC_CONTROLLER, dc_controller_device)
 
-#endif // _DC_CTRL_H_
+#endif // MAME_MACHINE_DC_CTRL_H

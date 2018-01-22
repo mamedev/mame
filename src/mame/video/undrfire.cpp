@@ -2,6 +2,7 @@
 // copyright-holders:Bryan McPhail, David Graves
 #include "emu.h"
 #include "includes/undrfire.h"
+#include "screen.h"
 
 
 

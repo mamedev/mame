@@ -63,10 +63,10 @@ static const uint8_t track_SD[][2] = {
     MAME DEVICE INTERFACE
 ***************************************************************************/
 
-const device_type MICROPOLIS = &device_creator<micropolis_device>;
+DEFINE_DEVICE_TYPE(MICROPOLIS, micropolis_device, "micropolis", "Micropolis FDC")
 
 micropolis_device::micropolis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MICROPOLIS, "MICROPOLIS", tag, owner, clock, "micropolis", __FILE__),
+	: device_t(mconfig, MICROPOLIS, tag, owner, clock),
 	m_read_dden(*this),
 	m_write_intrq(*this),
 	m_write_drq(*this),
@@ -82,11 +82,8 @@ micropolis_device::micropolis_device(const machine_config &mconfig, const char *
 	m_sector_length(0),
 	m_drive(nullptr)
 {
-	for (auto & elem : m_buffer)
-		elem = 0;
-
-	for (auto & elem : m_floppy_drive_tags)
-		elem = nullptr;
+	std::fill(std::begin(m_buffer), std::end(m_buffer), 0);
+	std::fill(std::begin(m_floppy_drive_tags), std::end(m_floppy_drive_tags), nullptr);
 }
 
 //-------------------------------------------------
@@ -163,7 +160,7 @@ void micropolis_device::write_sector()
 {
 #if 0
 	/* at this point, the disc is write enabled, and data
-	 * has been transfered into our buffer - now write it to
+	 * has been transferred into our buffer - now write it to
 	 * the disc image or to the real disc
 	 */
 
@@ -306,7 +303,7 @@ WRITE8_MEMBER( micropolis_device::data_w )
 	else
 	{
 		if (VERBOSE)
-			logerror("%s: micropolis_data_w $%02X\n", space.machine().describe_context(), data);
+			logerror("%s: micropolis_data_w $%02X\n", machine().describe_context(), data);
 	}
 	m_data = data;
 }

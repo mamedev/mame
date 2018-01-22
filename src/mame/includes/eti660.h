@@ -5,7 +5,6 @@
 #ifndef __ETI660__
 #define __ETI660__
 
-#include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
@@ -55,6 +54,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( eti660 );
 	required_shared_ptr<uint8_t> m_p_videoram;
 
+	void eti660(machine_config &config);
 private:
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;

@@ -3,8 +3,8 @@
 
 // Williams Pinball Controller Shift-based protection simulation
 
-#ifndef WPC_SHIFT_H
-#define WPC_SHIFT_H
+#ifndef MAME_MACHINE_WPC_SHIFT_H
+#define MAME_MACHINE_WPC_SHIFT_H
 
 #define MCFG_WPC_SHIFT_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, WPC_SHIFT, 0 )
@@ -34,6 +34,6 @@ protected:
 	virtual void device_reset() override;
 };
 
-extern const device_type WPC_SHIFT;
+DECLARE_DEVICE_TYPE(WPC_SHIFT, wpc_shift_device)
 
-#endif
+#endif // MAME_MACHINE_WPC_SHIFT_H

@@ -127,8 +127,12 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
 #include "includes/warpwarp.h"
+
+#include "cpu/i8085/i8085.h"
+#include "machine/74259.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "geebee.lh"
 #include "navarone.lh"
@@ -190,40 +194,47 @@ WRITE8_MEMBER(warpwarp_state::geebee_out6_w)
 	}
 }
 
-WRITE8_MEMBER(warpwarp_state::geebee_out7_w)
+WRITE_LINE_MEMBER(warpwarp_state::lamp_1_w)
 {
-	switch (offset & 7)
-	{
-		case 0:
-			output().set_led_value(0,data & 1);
-			break;
-		case 1:
-			output().set_led_value(1,data & 1);
-			break;
-		case 2:
-			output().set_led_value(2,data & 1);
-			break;
-		case 3:
-			machine().bookkeeping().coin_counter_w(0,data & 1);
-			break;
-		case 4:
-			if (strcmp(machine().system().name, "geebeeb"))
-				machine().bookkeeping().coin_lockout_global_w(~data & 1);
-			break;
-		case 5:
-			if( m_geebee_bgw != (data & 1) )
-				machine().tilemap().mark_all_dirty();
-			m_geebee_bgw = data & 1;
-			break;
-		case 6:
-			m_ball_on = data & 1;
-			if (~data & 1)
-				m_maincpu->set_input_line(0, CLEAR_LINE);
-			break;
-		case 7:
-			flip_screen_set(data & 1);
-			break;
-	}
+	output().set_led_value(0, state);
+}
+
+WRITE_LINE_MEMBER(warpwarp_state::lamp_2_w)
+{
+	output().set_led_value(1, state);
+}
+
+WRITE_LINE_MEMBER(warpwarp_state::lamp_3_w)
+{
+	output().set_led_value(2, state);
+}
+
+WRITE_LINE_MEMBER(warpwarp_state::counter_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(warpwarp_state::lock_out_w)
+{
+	machine().bookkeeping().coin_lockout_global_w(!state);
+}
+
+WRITE_LINE_MEMBER(warpwarp_state::geebee_bgw_w)
+{
+	m_geebee_bgw = state;
+	machine().tilemap().mark_all_dirty();
+}
+
+WRITE_LINE_MEMBER(warpwarp_state::ball_on_w)
+{
+	m_ball_on = state;
+	if (!state)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(warpwarp_state::inv_w)
+{
+	flip_screen_set(state);
 }
 
 
@@ -277,39 +288,6 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_out0_w)
 	}
 }
 
-WRITE8_MEMBER(warpwarp_state::warpwarp_out3_w)
-{
-	switch (offset & 7)
-	{
-		case 0:
-			output().set_led_value(0,data & 1);
-			break;
-		case 1:
-			output().set_led_value(1,data & 1);
-			break;
-		case 2:
-			output().set_led_value(2,data & 1);
-			break;
-		case 3:
-			/* n.c. */
-			break;
-		case 4:
-			machine().bookkeeping().coin_lockout_global_w(~data & 1);
-			break;
-		case 5:
-			machine().bookkeeping().coin_counter_w(0,data & 1);
-			break;
-		case 6:
-			m_ball_on = data & 1;
-			if (~data & 1)
-				m_maincpu->set_input_line(0, CLEAR_LINE);
-			break;
-		case 7:
-			flip_screen_set(data & 1);
-			break;
-	}
-}
-
 
 
 static ADDRESS_MAP_START( geebee_map, AS_PROGRAM, 8, warpwarp_state )
@@ -319,13 +297,13 @@ static ADDRESS_MAP_START( geebee_map, AS_PROGRAM, 8, warpwarp_state )
 	AM_RANGE(0x4000, 0x40ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_READ(geebee_in_r)
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(geebee_out6_w)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(geebee_out7_w)
+	AM_RANGE(0x7000, 0x7007) AM_MIRROR(0x0ff8) AM_DEVWRITE("latch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( geebee_port_map, AS_IO, 8, warpwarp_state )
 	AM_RANGE(0x50, 0x53) AM_READ(geebee_in_r)
 	AM_RANGE(0x60, 0x6f) AM_WRITE(geebee_out6_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(geebee_out7_w)
+	AM_RANGE(0x70, 0x77) AM_MIRROR(0x08) AM_DEVWRITE("latch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -337,7 +315,7 @@ static ADDRESS_MAP_START( bombbee_map, AS_PROGRAM, 8, warpwarp_state )
 	AM_RANGE(0x6000, 0x600f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
 	AM_RANGE(0x6010, 0x601f) AM_READ(warpwarp_vol_r) AM_DEVWRITE("warpwarp_custom", warpwarp_sound_device, music1_w)
 	AM_RANGE(0x6020, 0x602f) AM_READ(warpwarp_dsw1_r) AM_DEVWRITE("warpwarp_custom", warpwarp_sound_device, music2_w)
-	AM_RANGE(0x6030, 0x603f) AM_WRITE(warpwarp_out3_w)
+	AM_RANGE(0x6030, 0x6037) AM_MIRROR(0x0008) AM_DEVWRITE("latch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( warpwarp_map, AS_PROGRAM, 8, warpwarp_state )
@@ -348,7 +326,7 @@ static ADDRESS_MAP_START( warpwarp_map, AS_PROGRAM, 8, warpwarp_state )
 	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
 	AM_RANGE(0xc010, 0xc01f) AM_READ(warpwarp_vol_r) AM_DEVWRITE("warpwarp_custom", warpwarp_sound_device, music1_w)
 	AM_RANGE(0xc020, 0xc02f) AM_READ(warpwarp_dsw1_r) AM_DEVWRITE("warpwarp_custom", warpwarp_sound_device, music2_w)
-	AM_RANGE(0xc030, 0xc03f) AM_WRITE(warpwarp_out3_w)
+	AM_RANGE(0xc030, 0xc037) AM_MIRROR(0x0008) AM_DEVWRITE("latch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -727,13 +705,23 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( geebee, warpwarp_state )
+MACHINE_CONFIG_START(warpwarp_state::geebee)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(geebee_map)
 	MCFG_CPU_IO_MAP(geebee_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpwarp_state, vblank_irq)
+
+	MCFG_DEVICE_ADD("latch", LS259, 0) // 5N
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(warpwarp_state, lamp_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(warpwarp_state, lamp_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(warpwarp_state, lamp_3_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(warpwarp_state, counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(warpwarp_state, lock_out_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(warpwarp_state, geebee_bgw_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(warpwarp_state, ball_on_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(warpwarp_state, inv_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -754,7 +742,12 @@ static MACHINE_CONFIG_START( geebee, warpwarp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( navarone, geebee )
+MACHINE_CONFIG_DERIVED(warpwarp_state::geebeeb, geebee)
+	MCFG_DEVICE_MODIFY("latch")
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // remove coin lockout
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_DERIVED(warpwarp_state::navarone, geebee)
 
 	/* basic machine hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 2k)
@@ -765,12 +758,22 @@ static MACHINE_CONFIG_DERIVED( navarone, geebee )
 	MCFG_VIDEO_START_OVERRIDE(warpwarp_state,navarone)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bombbee, warpwarp_state )
+MACHINE_CONFIG_START(warpwarp_state::bombbee)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)
 	MCFG_CPU_PROGRAM_MAP(bombbee_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpwarp_state, vblank_irq)
+
+	MCFG_DEVICE_ADD("latch", LS259, 0) // 6L on Warp Warp
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(warpwarp_state, lamp_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(warpwarp_state, lamp_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(warpwarp_state, lamp_3_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // n.c.
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(warpwarp_state, lock_out_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(warpwarp_state, counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(warpwarp_state, ball_on_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(warpwarp_state, inv_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -793,7 +796,7 @@ static MACHINE_CONFIG_START( bombbee, warpwarp_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( warpwarp, bombbee )
+MACHINE_CONFIG_DERIVED(warpwarp_state::warpwarp, bombbee)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -994,7 +997,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,warpwarp)
 
 /* B & W games */
 GAMEL(1978, geebee,     0,        geebee,   geebee,    warpwarp_state, geebee,   ROT90, "Namco", "Gee Bee (Japan)", MACHINE_SUPPORTS_SAVE, layout_geebee )
-GAMEL(1978, geebeeb,    geebee,   geebee,   geebeeb,   warpwarp_state, geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", MACHINE_SUPPORTS_SAVE, layout_geebee ) // Fratelli Bertolino
+GAMEL(1978, geebeeb,    geebee,   geebeeb,  geebeeb,   warpwarp_state, geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", MACHINE_SUPPORTS_SAVE, layout_geebee ) // Fratelli Bertolino
 GAMEL(1978, geebeeg,    geebee,   geebee,   geebee,    warpwarp_state, geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", MACHINE_SUPPORTS_SAVE, layout_geebee )
 
 GAMEL(1980, navarone,   0,        navarone, navarone,  warpwarp_state, navarone, ROT90, "Namco", "Navarone", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_navarone )

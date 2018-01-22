@@ -2,8 +2,8 @@
 // copyright-holders:Olivier Galibert
 // Creative labs SB0400 Audigy2 Value
 
-#ifndef SB0400_H
-#define SB0400_H
+#ifndef MAME_SOUND_SB0400_H
+#define MAME_SOUND_SB0400_H
 
 #include "machine/pci.h"
 
@@ -22,6 +22,6 @@ private:
 	DECLARE_ADDRESS_MAP(map, 32);
 };
 
-extern const device_type SB0400;
+DECLARE_DEVICE_TYPE(SB0400, sb0400_device)
 
-#endif
+#endif // MAME_SOUND_SB0400_H

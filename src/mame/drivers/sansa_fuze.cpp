@@ -22,6 +22,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	void sansa_fuze(machine_config &config);
 };
 
 
@@ -38,7 +39,7 @@ static INPUT_PORTS_START( sansa_fuze )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sansa_fuze, sansa_fuze_state )
+MACHINE_CONFIG_START(sansa_fuze_state::sansa_fuze)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, 50000000) // arm based, speed unknown
@@ -68,5 +69,5 @@ ROM_START( sanfuze2 )
 ROM_END
 
 
-/*   YEAR  NAME   PARENT  COMPAT  MACHINE        INPUT          CLASS      INIT  COMPANY      FULLNAME            FLAGS */
-CONS(200?, sanfuze2, 0,     0,    sansa_fuze,    sansa_fuze, driver_device,  0,  "Sandisk", "Sansa Fuze 2", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT  COMPANY    FULLNAME        FLAGS
+CONS( 200?, sanfuze2, 0,      0,      sansa_fuze, sansa_fuze, sansa_fuze_state, 0,    "Sandisk", "Sansa Fuze 2", MACHINE_IS_SKELETON )

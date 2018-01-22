@@ -1,12 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller,Ernesto Corvi
+#ifndef MAME_CPU_Z8000_Z8000_H
+#define MAME_CPU_Z8000_Z8000_H
+
 #pragma once
 
-#ifndef __Z8000_H__
-#define __Z8000_H__
-
-#include "cpu/z80/z80daisy.h"
-
+#include "8000dasm.h"
 
 enum
 {
@@ -33,18 +32,19 @@ enum
 #define MCFG_Z8000_MO(_devcb) \
 	devcb = &z8002_device::set_mo_callback(*device, DEVCB_##_devcb);
 
-class z8002_device : public cpu_device, public z80_daisy_chain_interface
+class z8002_device : public cpu_device, public z8000_disassembler::config
 {
 public:
 	// construction/destruction
 	z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	z8002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~z8002_device();
 
-	template<class _Object> static devcb_base &set_mo_callback(device_t &device, _Object object) { return downcast<z8002_device &>(device).m_mo_out.set_callback(object); }
+	template <class Object> static devcb_base &set_mo_callback(device_t &device, Object &&cb) { return downcast<z8002_device &>(device).m_mo_out.set_callback(std::forward<Object>(cb)); }
 	DECLARE_WRITE_LINE_MEMBER(mi_w) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
 
 protected:
+	z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int iobits, int vecmult);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -58,23 +58,15 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			case AS_IO:      return &m_io_config;
-			default:         return nullptr;
-		}
-	}
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
+
+	void init_tables();
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -104,14 +96,14 @@ protected:
 	int m_mi;
 	address_space *m_program;
 	address_space *m_data;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_io;
 	int m_icount;
 	int m_vector_mult;
 
 	void clear_internal_state();
 	void register_debug_state();
-	virtual int segmented_mode();
+	virtual bool get_segmented_mode() const override;
 	static inline uint32_t addr_add(uint32_t addr, uint32_t addend);
 	static inline uint32_t addr_sub(uint32_t addr, uint32_t subtrahend);
 	inline uint16_t RDOP();
@@ -119,12 +111,12 @@ protected:
 	inline uint32_t get_addr_operand(int opnum);
 	inline uint32_t get_raw_addr_operand(int opnum);
 	virtual uint32_t adjust_addr_for_nonseg_mode(uint32_t addr);
-	inline uint8_t RDMEM_B(address_spacenum spacenum, uint32_t addr);
-	inline uint16_t RDMEM_W(address_spacenum spacenum, uint32_t addr);
-	inline uint32_t RDMEM_L(address_spacenum spacenum, uint32_t addr);
-	inline void WRMEM_B(address_spacenum spacenum, uint32_t addr, uint8_t value);
-	inline void WRMEM_W(address_spacenum spacenum, uint32_t addr, uint16_t value);
-	inline void WRMEM_L(address_spacenum spacenum, uint32_t addr, uint32_t value);
+	inline uint8_t RDMEM_B(int spacenum, uint32_t addr);
+	inline uint16_t RDMEM_W(int spacenum, uint32_t addr);
+	inline uint32_t RDMEM_L(int spacenum, uint32_t addr);
+	inline void WRMEM_B(int spacenum, uint32_t addr, uint8_t value);
+	inline void WRMEM_W(int spacenum, uint32_t addr, uint16_t value);
+	inline void WRMEM_L(int spacenum, uint32_t addr, uint32_t value);
 	inline uint8_t RDPORT_B(int mode, uint16_t addr);
 	virtual uint16_t RDPORT_W(int mode, uint16_t addr);
 	inline void WRPORT_B(int mode, uint16_t addr, uint8_t value);
@@ -211,7 +203,6 @@ protected:
 	virtual uint32_t PSA_ADDR();
 	virtual uint32_t read_irq_vector();
 
-public:
 	void zinvalid();
 	void Z00_0000_dddd_imm8();
 	void Z00_ssN0_dddd();
@@ -623,6 +614,23 @@ public:
 	void ZE_cccc_dsp8();
 	void ZF_dddd_0dsp7();
 	void ZF_dddd_1dsp7();
+
+private:
+	// structure for the opcode definition table
+	typedef void (z8002_device::*opcode_func)();
+
+	struct Z8000_init {
+		int     beg, end, step;
+		int     size, cycles;
+		opcode_func opcode;
+	};
+
+	/* opcode execution table */
+	static const Z8000_init table[];
+	u16 z8000_exec[0x10000];
+
+	/* zero, sign and parity flags for logical byte operations */
+	u8 z8000_zsp[256];
 };
 
 
@@ -638,23 +646,11 @@ protected:
 	virtual void device_reset() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			case AS_DATA:    return &m_data_config;
-			case AS_IO:      return &m_io_config;
-			default:         return nullptr;
-		}
-	}
-
-	// device_disasm_interface overrides
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
+	virtual space_config_vector memory_space_config() const override;
 
 	address_space_config m_data_config;
 
-	virtual int segmented_mode() override;
+	virtual bool get_segmented_mode() const override;
 	virtual uint32_t adjust_addr_for_nonseg_mode(uint32_t addr) override;
 	virtual uint16_t RDPORT_W(int mode, uint16_t addr) override;
 	virtual void WRPORT_W(int mode, uint16_t addr, uint16_t value) override;
@@ -665,14 +661,11 @@ protected:
 	virtual uint32_t F_SEG_Z8001() override;
 	virtual uint32_t PSA_ADDR() override;
 	virtual uint32_t read_irq_vector() override;
-
-private:
-	void z8k_disass_mode(int ref, int params, const char *param[]);
 };
 
 
-extern const device_type Z8001;
-extern const device_type Z8002;
+DECLARE_DEVICE_TYPE(Z8001, z8001_device)
+DECLARE_DEVICE_TYPE(Z8002, z8002_device)
 
 
 /* possible values for z8k_segm_mode */
@@ -680,4 +673,4 @@ extern const device_type Z8002;
 #define Z8K_SEGM_MODE_SEG    1
 #define Z8K_SEGM_MODE_AUTO   2
 
-#endif /* __Z8000_H__ */
+#endif // MAME_CPU_Z8000_Z8000_H

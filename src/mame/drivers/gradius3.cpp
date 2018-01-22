@@ -23,14 +23,17 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gradius3.h"
+#include "includes/konamipt.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
-#include "includes/konamipt.h"
-#include "includes/gradius3.h"
+
+#include "speaker.h"
+
 
 READ16_MEMBER(gradius3_state::k052109_halfword_r)
 {
@@ -45,7 +48,7 @@ WRITE16_MEMBER(gradius3_state::k052109_halfword_w)
 	/* is this a bug in the game or something else? */
 	if (!ACCESSING_BITS_0_7)
 		m_k052109->write(space, offset, (data >> 8) & 0xff);
-//      logerror("%06x half %04x = %04x\n",space.device().safe_pc(),offset,data);
+//      logerror("%s half %04x = %04x\n",machine().describe_context(),offset,data);
 }
 
 READ16_MEMBER(gradius3_state::k051937_halfword_r)
@@ -90,7 +93,7 @@ WRITE16_MEMBER(gradius3_state::cpuA_ctrl_w)
 		m_irqAen = data & 0x20;
 
 		/* other bits unknown */
-	//logerror("%06x: write %04x to c0000\n",space.device().safe_pc(),data);
+	//logerror("%s: write %04x to c0000\n",machine().describe_context(),data);
 	}
 }
 
@@ -122,11 +125,11 @@ WRITE16_MEMBER(gradius3_state::cpuB_irqtrigger_w)
 {
 	if (m_irqBmask & 4)
 	{
-		logerror("%04x trigger cpu B irq 4 %02x\n",space.device().safe_pc(),data);
+		logerror("%04x trigger cpu B irq 4 %02x\n",m_maincpu->pc(),data);
 		m_subcpu->set_input_line(4, HOLD_LINE);
 	}
 	else
-		logerror("%04x MISSED cpu B irq 4 %02x\n",space.device().safe_pc(),data);
+		logerror("%04x MISSED cpu B irq 4 %02x\n",m_maincpu->pc(),data);
 }
 
 WRITE16_MEMBER(gradius3_state::sound_irq_w)
@@ -149,7 +152,7 @@ WRITE8_MEMBER(gradius3_state::sound_bank_w)
 static ADDRESS_MAP_START( gradius3_map, AS_PROGRAM, 16, gradius3_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(cpuA_ctrl_w)  /* halt cpu B, irq enable, priority, coin counters, other? */
 	AM_RANGE(0x0c8000, 0x0c8001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c8002, 0x0c8003) AM_READ_PORT("P1")
@@ -271,7 +274,7 @@ void gradius3_state::machine_reset()
 
 }
 
-static MACHINE_CONFIG_START( gradius3, gradius3_state )
+MACHINE_CONFIG_START(gradius3_state::gradius3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -506,7 +509,7 @@ ROM_END
 
 
 
-GAME( 1989, gradius3,  0,        gradius3, gradius3, driver_device, 0, ROT0, "Konami", "Gradius III (World, program code R)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3j, gradius3, gradius3, gradius3, driver_device, 0, ROT0, "Konami", "Gradius III (Japan, program code S)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3js, gradius3, gradius3, gradius3, driver_device, 0, ROT0, "Konami", "Gradius III (Japan, program code S, split)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3a, gradius3, gradius3, gradius3, driver_device, 0, ROT0, "Konami", "Gradius III (Asia)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3,   0,        gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (World, program code R)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3j,  gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Japan, program code S)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3js, gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Japan, program code S, split)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3a,  gradius3, gradius3, gradius3, gradius3_state, 0, ROT0, "Konami", "Gradius III (Asia)",                         MACHINE_SUPPORTS_SAVE )

@@ -107,14 +107,15 @@ Interrupts:
 *******************************************************************************/
 
 #include "emu.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
 #include "includes/primo.h"
+
 #include "cpu/z80/z80.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/primoptp.h"
-#include "bus/cbmiec/cbmiec.h"
+
 
 static ADDRESS_MAP_START( primoa_port, AS_IO, 8, primo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -239,7 +240,7 @@ static const struct CassetteOptions primo_cassette_options = {
 	22050   /* sample frequency */
 };
 
-static MACHINE_CONFIG_START( primoa32, primo_state )
+MACHINE_CONFIG_START(primo_state::primoa32)
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", Z80, 2500000 )
 	MCFG_CPU_PROGRAM_MAP( primo32_mem)
@@ -283,38 +284,38 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primoa48, primoa32 )
+MACHINE_CONFIG_DERIVED(primo_state::primoa48, primoa32)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(primo48_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primoa64, primoa32 )
+MACHINE_CONFIG_DERIVED(primo_state::primoa64, primoa32)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(primo64_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primob32, primoa32 )
+MACHINE_CONFIG_DERIVED(primo_state::primob32, primoa32)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primob48, primoa48 )
+MACHINE_CONFIG_DERIVED(primo_state::primob48, primoa48)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primob64, primoa64 )
+MACHINE_CONFIG_DERIVED(primo_state::primob64, primoa64)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 
 	MCFG_MACHINE_RESET_OVERRIDE(primo_state, primob)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primoc64, primoa64 )
+MACHINE_CONFIG_DERIVED(primo_state::primoc64, primoa64)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(primob_port)
 
@@ -372,11 +373,11 @@ ROM_START( primoc64 )
 	ROM_LOAD( "c64_4.rom", 0x13000, 0x1000, CRC(3770e3e6) SHA1(792cc71d8f89eb447f94aded5afc70d626a26030) )
 ROM_END
 
-/*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT     COMPANY  FULLNAME */
-COMP ( 1984, primoa32, 0,        0,     primoa32, primo, primo_state, primo32, "Microkey", "Primo A-32" , 0)
-COMP ( 1984, primoa48, primoa32, 0,     primoa48, primo, primo_state, primo48, "Microkey", "Primo A-48" , 0)
-COMP ( 1984, primoa64, primoa32, 0,     primoa64, primo, primo_state, primo64, "Microkey", "Primo A-64" , 0)
-COMP ( 1984, primob32, primoa32, 0,     primob32, primo, primo_state, primo32, "Microkey", "Primo B-32" , 0)
-COMP ( 1984, primob48, primoa32, 0,     primob48, primo, primo_state, primo48, "Microkey", "Primo B-48" , 0)
-COMP ( 1984, primob64, primoa32, 0,     primob64, primo, primo_state, primo64, "Microkey", "Primo B-64" , 0)
-COMP ( 1984, primoc64, primoa32, 0,     primoc64, primo, primo_state, primo64, "Microkey", "Primo C-64" , MACHINE_NOT_WORKING)
+//     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  STATE        INIT     COMPANY     FULLNAME       FLAGS
+COMP ( 1984, primoa32, 0,        0,     primoa32, primo, primo_state, primo32, "Microkey", "Primo A-32" , 0 )
+COMP ( 1984, primoa48, primoa32, 0,     primoa48, primo, primo_state, primo48, "Microkey", "Primo A-48" , 0 )
+COMP ( 1984, primoa64, primoa32, 0,     primoa64, primo, primo_state, primo64, "Microkey", "Primo A-64" , 0 )
+COMP ( 1984, primob32, primoa32, 0,     primob32, primo, primo_state, primo32, "Microkey", "Primo B-32" , 0 )
+COMP ( 1984, primob48, primoa32, 0,     primob48, primo, primo_state, primo48, "Microkey", "Primo B-48" , 0 )
+COMP ( 1984, primob64, primoa32, 0,     primob64, primo, primo_state, primo64, "Microkey", "Primo B-64" , 0 )
+COMP ( 1984, primoc64, primoa32, 0,     primoc64, primo, primo_state, primo64, "Microkey", "Primo C-64" , MACHINE_NOT_WORKING )

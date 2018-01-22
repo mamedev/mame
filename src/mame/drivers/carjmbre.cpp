@@ -6,8 +6,11 @@
     Omori Electric CAD (OEC) 1983
 
     TODO:
-    - colors are wrong
-    - sprite priorities?
+    - colors are probably wrong
+    - sprite priorities? (eg. player car jumping on the ramp, 1 part disappears)
+    - first 2 letters on titlescreen look misaligned with the tilemap
+    - The spriteram holds 2 sprite lists (00-7f and 80-ff), they are identical.
+      Is it an unused feature? Or a RAM access speed workaround?
 
 ----------------------------------------------------------------------------
 
@@ -41,8 +44,10 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 class carjmbre_state : public driver_device
 {
@@ -80,6 +85,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
+	void carjmbre(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -176,7 +182,7 @@ uint32_t carjmbre_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void carjmbre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (int offs = 0x80 - 4; offs >= 0; offs -= 4)
 	{
 		int sy = m_spriteram[offs];
 		int code = m_spriteram[offs + 1];
@@ -343,7 +349,7 @@ static GFXDECODE_START( carjmbre )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( carjmbre, carjmbre_state )
+MACHINE_CONFIG_START(carjmbre_state::carjmbre)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
@@ -417,4 +423,4 @@ ROM_START( carjmbre )
 ROM_END
 
 
-GAME( 1983, carjmbre, 0, carjmbre, carjmbre, driver_device, 0, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, carjmbre, 0, carjmbre, carjmbre, carjmbre_state, 0, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS )

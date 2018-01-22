@@ -3,11 +3,12 @@
 /***************************************************************************
 
     Acclaim RAX Sound Board
- 
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "rax.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -93,7 +94,7 @@ READ16_MEMBER( acclaim_rax_device::adsp_control_r )
 WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
 {
 	m_control_regs[offset] = data;
-	
+
 	switch (offset)
 	{
 		case 0x1:
@@ -116,9 +117,9 @@ WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
 			uint32_t dir = (m_control_regs[BDMA_CONTROL_REG] >> 2) & 1;
 			uint32_t type = m_control_regs[BDMA_CONTROL_REG] & 3;
 			uint32_t src_addr = (page << 14) | m_control_regs[BDMA_EXT_ADDR_REG];
-			
+
 			uint32_t count = m_control_regs[BDMA_WORD_COUNT_REG];
-			
+
 			address_space* addr_space = (type == 0 ? m_program : m_data);
 
 			if (dir == 0)
@@ -129,7 +130,7 @@ WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
 					{
 						uint32_t src_dword = (adsp_rom[src_addr + 0] << 16) | (adsp_rom[src_addr + 1] << 8) | adsp_rom[src_addr + 2];
 
-						addr_space->write_dword(m_control_regs[BDMA_INT_ADDR_REG] * 4, src_dword);
+						addr_space->write_dword(m_control_regs[BDMA_INT_ADDR_REG], src_dword);
 
 						src_addr += 3;
 						++m_control_regs[BDMA_INT_ADDR_REG];
@@ -139,10 +140,10 @@ WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
 				else if (type == 1)
 				{
 					while (count)
-					{						
+					{
 						uint16_t src_word = (adsp_rom[src_addr + 0] << 8) | adsp_rom[src_addr + 1];
 
-						addr_space->write_word(m_control_regs[BDMA_INT_ADDR_REG] * 2, src_word);
+						addr_space->write_word(m_control_regs[BDMA_INT_ADDR_REG], src_word);
 
 						src_addr += 2;
 						++m_control_regs[BDMA_INT_ADDR_REG];
@@ -152,12 +153,12 @@ WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
 				else
 				{
 					int shift = type == 2 ? 8 : 0;
-					
+
 					while (count)
-					{						
+					{
 						uint16_t src_word = adsp_rom[src_addr] << shift;
 
-						addr_space->write_word(m_control_regs[BDMA_INT_ADDR_REG] * 2, src_word);
+						addr_space->write_word(m_control_regs[BDMA_INT_ADDR_REG], src_word);
 
 						++src_addr;
 						++m_control_regs[BDMA_INT_ADDR_REG];
@@ -167,7 +168,9 @@ WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
 			}
 			else
 			{
-				fatalerror("DMA to byte memory!");
+				// TODO: last stage in Batman Forever!?
+				// page = 0, dir = 1, type = 1, src_addr = 0xfd
+				fatalerror("%s DMA to byte memory!",this->tag());
 			}
 
 			attotime word_period = attotime::from_hz(m_cpu->unscaled_clock());
@@ -176,7 +179,7 @@ WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
 
 			break;
 		}
-			
+
 		case S1_AUTOBUF_REG:
 			/* autobuffer off: nuke the timer, and disable the DAC */
 			if ((data & 0x0002) == 0)
@@ -184,7 +187,7 @@ WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
 				dmadac_enable(&m_dmadac[1], 1, 0);
 			}
 			break;
-			
+
 		case S0_AUTOBUF_REG:
 			/* autobuffer off: nuke the timer, and disable the DAC */
 			if ((data & 0x0002) == 0)
@@ -193,7 +196,7 @@ WRITE16_MEMBER( acclaim_rax_device::adsp_control_w )
 				m_reg_timer[0]->reset();
 			}
 			break;
-			
+
 		case S1_CONTROL_REG:
 			if (((data >> 4) & 3) == 2)
 				fatalerror("DCS: Oh no!, the data is compressed with u-law encoding\n");
@@ -220,11 +223,11 @@ TIMER_DEVICE_CALLBACK_MEMBER( acclaim_rax_device::dma_timer_callback )
 	m_control_regs[BDMA_EXT_ADDR_REG] = param & 0x3fff;
 	m_control_regs[BDMA_CONTROL_REG] &= ~0xff00;
 	m_control_regs[BDMA_CONTROL_REG] |= ((param >> 14) & 0xff) << 8;
-	
+
 	if (m_control_regs[BDMA_CONTROL_REG] & 8)
 		m_cpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	else
-		m_cpu->machine().driver_data()->generic_pulse_irq_line(*m_cpu, ADSP2181_BDMA, 1);
+		m_cpu->pulse_input_line(ADSP2181_BDMA, m_cpu->minimum_quantum_time());
 
 	timer.adjust(attotime::never);
 }
@@ -298,10 +301,10 @@ void acclaim_rax_device::device_start()
 
 	m_dmadac[0] = subdevice<dmadac_sound_device>("dacl");
 	m_dmadac[1] = subdevice<dmadac_sound_device>("dacr");
-	
+
 	m_reg_timer[0] = subdevice<timer_device>("adsp_reg_timer0");
 	m_dma_timer = subdevice<timer_device>("adsp_dma_timer");
-	
+
 	// 1 bank for internal
 	membank("databank")->configure_entries(0, 5, auto_alloc_array(machine(), uint16_t, 0x2000 * 5), 0x2000*sizeof(uint16_t));
 }
@@ -322,15 +325,15 @@ void acclaim_rax_device::device_reset()
 
 	m_adsp_snd_pf0 = 1;
 	m_rom_bank = 0;
-	
+
 	/* initialize our state structure and install the transmit callback */
 	m_size[0] = 0;
 	m_incs[0] = 0;
 	m_ireg[0] = 0;
-	
+
 	/* initialize the ADSP control regs */
 	memset(m_control_regs, 0, sizeof(m_control_regs));
-	
+
 	m_dmovlay_val = 0;
 	m_data_bank = 0;
 	update_data_ram_bank();
@@ -344,15 +347,15 @@ void acclaim_rax_device::adsp_irq(int which)
 
 	/* get the index register */
 	int reg = m_cpu->state_int(ADSP2100_I0 + m_ireg[which]);
-	
+
 	/* copy the current data into the buffer */
 	int count = m_size[which] / (4 * (m_incs[which] ? m_incs[which] : 1));
-	
+
 	int16_t buffer[0x100];
 
 	for (uint32_t i = 0; i < count; i++)
 	{
-		buffer[i] = m_data->read_word(reg * 2);
+		buffer[i] = m_data->read_word(reg);
 		reg += m_incs[which];
 	}
 
@@ -378,15 +381,15 @@ TIMER_DEVICE_CALLBACK_MEMBER( acclaim_rax_device::adsp_irq0 )
 void acclaim_rax_device::recompute_sample_rate(int which)
 {
 	/* calculate how long until we generate an interrupt */
-	
+
 	/* frequency the time per each bit sent */
 	attotime sample_period = attotime::from_hz(m_cpu->unscaled_clock()) * (1 * (m_control_regs[which ? S1_SCLKDIV_REG : S0_SCLKDIV_REG] + 1));
-	
+
 	/* now put it down to samples, so we know what the channel frequency has to be */
 	sample_period = sample_period * (16 * 1);
 	dmadac_set_frequency(&m_dmadac[0], 2, ATTOSECONDS_TO_HZ(sample_period.attoseconds()));
 	dmadac_enable(&m_dmadac[0], 2, 1);
-	
+
 	/* fire off a timer which will hit every half-buffer */
 	if (m_incs[which])
 	{
@@ -398,7 +401,7 @@ void acclaim_rax_device::recompute_sample_rate(int which)
 WRITE32_MEMBER(acclaim_rax_device::adsp_sound_tx_callback)
 {
 	int which = offset;
-	
+
 	if (which != 0)
 		return;
 
@@ -413,27 +416,27 @@ WRITE32_MEMBER(acclaim_rax_device::adsp_sound_tx_callback)
 			/* get the autobuffer registers */
 			int     mreg, lreg;
 			uint16_t  source;
-			
+
 			m_ireg[which] = (m_control_regs[autobuf_reg] >> 9) & 7;
 			mreg = (m_control_regs[autobuf_reg] >> 7) & 3;
 			mreg |= m_ireg[which] & 0x04; /* msb comes from ireg */
 			lreg = m_ireg[which];
-			
+
 			/* now get the register contents in a more legible format */
 			/* we depend on register indexes to be continuous (which is the case in our core) */
 			source = m_cpu->state_int(ADSP2100_I0 + m_ireg[which]);
 			m_incs[which] = m_cpu->state_int(ADSP2100_M0 + mreg);
 			m_size[which] = m_cpu->state_int(ADSP2100_L0 + lreg);
-			
+
 			/* get the base value, since we need to keep it around for wrapping */
 			source -= m_incs[which];
-			
+
 			/* make it go back one so we dont lose the first sample */
 			m_cpu->set_state_int(ADSP2100_I0 + m_ireg[which], source);
-			
+
 			/* save it as it is now */
 			m_ireg_base[which] = source;
-			
+
 			/* recompute the sample rate and timer */
 			recompute_sample_rate(which);
 			return;
@@ -441,10 +444,10 @@ WRITE32_MEMBER(acclaim_rax_device::adsp_sound_tx_callback)
 		else
 			logerror( "ADSP SPORT1: trying to transmit and autobuffer not enabled!\n" );
 	}
-	
+
 	/* if we get there, something went wrong. Disable playing */
 	dmadac_enable(&m_dmadac[0], 2, 0);
-	
+
 	/* remove timer */
 	m_reg_timer[which]->reset();
 }
@@ -463,13 +466,28 @@ WRITE32_MEMBER(acclaim_rax_device::dmovlay_callback)
 }
 
 
-/*************************************
- *
- *  Machine Driver
- *
- *************************************/
+DEFINE_DEVICE_TYPE(ACCLAIM_RAX, acclaim_rax_device, "rax_audio", "Acclaim RAX")
 
-MACHINE_CONFIG_FRAGMENT( rax )
+//-------------------------------------------------
+//  acclaim_rax_device - constructor
+//-------------------------------------------------
+
+acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ACCLAIM_RAX, tag, owner, clock)
+	, m_cpu(*this, "adsp")
+	, m_adsp_pram(*this, "adsp_pram")
+	, m_adsp_data_bank(*this, "databank")
+	, m_data_in(*this, "data_in")
+	, m_data_out(*this, "data_out")
+{
+
+}
+
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_START(acclaim_rax_device::device_add_mconfig)
 	MCFG_CPU_ADD("adsp", ADSP2181, XTAL_16_67MHz)
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(acclaim_rax_device, adsp_sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(acclaim_rax_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
@@ -491,32 +509,4 @@ MACHINE_CONFIG_FRAGMENT( rax )
 	MCFG_SOUND_ADD("dacr", DMADAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
-
-
-const device_type ACCLAIM_RAX = &device_creator<acclaim_rax_device>;
-
-//-------------------------------------------------
-//  acclaim_rax_device - constructor
-//-------------------------------------------------
-
-acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ACCLAIM_RAX, "Acclaim RAX", tag, owner, clock, "rax_audio", __FILE__),
-		m_cpu(*this, "adsp"),
-		m_adsp_pram(*this, "adsp_pram"),
-		m_adsp_data_bank(*this, "databank"),
-		m_data_in(*this, "data_in"),
-		m_data_out(*this, "data_out")
-{
-
-}
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor acclaim_rax_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( rax );
-}
 

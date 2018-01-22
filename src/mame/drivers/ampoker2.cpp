@@ -235,7 +235,7 @@
   an oscilloscope, I measured a value of 60 uS = 1538 Hz. We used a NMI period of 1536 Hz due
   to a better binary composition (1024+512).
 
-  Inputs/Ouputs are driven through 74LS251 and 74LS259 multiplexers. Each one handles 1 bit
+  Inputs/Outputs are driven through 74LS251 and 74LS259 multiplexers. Each one handles 1 bit
   from data bus, and there are many devices as addressed ports (8x 74LS251 and 8x 74LS259).
 
   Input ports are mapped to offsets 0xC410 through 0xC417. Output ports are mapped to 0xC4000
@@ -316,7 +316,7 @@
   - Reworked the color routines switching to resnet system.
   - Added a resistor network diagram.
   - Switch to pre-defined crystal value.
-  - Changed the WATCHDOG_TIME_INIT to be based on miliseconds instead of hertz.
+  - Changed the WATCHDOG_TIME_INIT to be based on milliseconds instead of hertz.
   - Other minor cleanup/fixes.
   - Updated technical notes.
 
@@ -377,12 +377,16 @@
 #define MASTER_CLOCK    XTAL_6MHz
 
 #include "emu.h"
+#include "includes/ampoker2.h"
+
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "ampoker2.lh"
 #include "sigmapkr.lh"
-#include "includes/ampoker2.h"
 
 /**********************
 * Read/Write Handlers *
@@ -686,7 +690,7 @@ static INPUT_PORTS_START( ampoker2 )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Out") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Supervisor Key") PORT_TOGGLE PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Supervisor Key") PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, "Remote Credits" ) PORT_DIPLOCATION("SW1:1") /* DSW1 */
 	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1", 0x08, EQUALS,0x08)
 	PORT_DIPSETTING(    0x00, "Cred x  50" ) PORT_CONDITION("IN1", 0x08, EQUALS,0x08)
@@ -708,7 +712,7 @@ static INPUT_PORTS_START( ampoker2 )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Return Line") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("TILT") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT ) PORT_NAME("TILT")
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -752,7 +756,7 @@ static INPUT_PORTS_START( ampkr95 )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Operator Key") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Operator Key") PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, "Remote Mode" )
 	PORT_DIPSETTING(    0x08, "Mode 1" )
 	PORT_DIPSETTING(    0x00, "Mode 2" )
@@ -767,11 +771,11 @@ static INPUT_PORTS_START( ampkr95 )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout")
 
 	PORT_START("IN3")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Out") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Supervisor Key") PORT_TOGGLE PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Supervisor Key") PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, "Remote Credits" ) PORT_DIPLOCATION("SW1:1") /* DSW1 */
 	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,EQUALS,0x08)
 	PORT_DIPSETTING(    0x00, "Cred x  50" ) PORT_CONDITION("IN1",0x08,EQUALS,0x08)
@@ -793,7 +797,7 @@ static INPUT_PORTS_START( ampkr95 )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Return Line") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("TILT") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT ) PORT_NAME("TILT")
 	PORT_DIPNAME( 0x08, 0x08, "Rate Table SW1" ) PORT_DIPLOCATION("SW1:3") /* DSW3 (should be arranged with DSW4) */
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -837,7 +841,7 @@ static INPUT_PORTS_START( sigmapkr )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Operator Key") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Operator Key") PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, "Remote Mode" )
 	PORT_DIPSETTING(    0x08, "Mode 1" )
 	PORT_DIPSETTING(    0x00, "Mode 2" )
@@ -852,17 +856,17 @@ static INPUT_PORTS_START( sigmapkr )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Payout")
 
 	PORT_START("IN3")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Out") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Supervisor Key") PORT_TOGGLE PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Supervisor Key") PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, "Remote Credits" ) PORT_DIPLOCATION("SW1:1") /* DSW1 */
 	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,EQUALS,0x08)
 	PORT_DIPSETTING(    0x00, "Cred x  50" ) PORT_CONDITION("IN1",0x08,EQUALS,0x08)
 	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,EQUALS,0x00) /* x100 in ampkr95 */
 	PORT_DIPSETTING(    0x00, "Remote Off" ) PORT_CONDITION("IN1",0x08,EQUALS,0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Double") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double")
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* not used */
@@ -878,7 +882,7 @@ static INPUT_PORTS_START( sigmapkr )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Return Line") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("TILT") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT ) PORT_NAME("TILT")
 	PORT_DIPNAME( 0x08, 0x08, "Rate Table SW1" ) PORT_DIPLOCATION("SW1:3") /* DSW3 (should be arranged with DSW4) */
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -921,7 +925,7 @@ static INPUT_PORTS_START( sigma2k )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Operator Key") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE ) PORT_NAME("Operator Key") PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -945,7 +949,7 @@ static INPUT_PORTS_START( sigma2k )
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Supervisor Key") PORT_TOGGLE PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Supervisor Key") PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1041,8 +1045,8 @@ static INPUT_PORTS_START( piccolop )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Hopper Out") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Supervisor Key") PORT_TOGGLE PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Out") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Supervisor Key") PORT_TOGGLE
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1052,7 +1056,7 @@ static INPUT_PORTS_START( piccolop )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Hopper Low") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Low") PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Hold 4 / Red")
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
@@ -1063,8 +1067,8 @@ static INPUT_PORTS_START( piccolop )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Return Line") PORT_CODE(KEYCODE_J)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("TILT") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Return Line") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT ) PORT_NAME("TILT")
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1088,7 +1092,7 @@ static INPUT_PORTS_START( piccolop )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Coin Refill") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Coin Refill") PORT_CODE(KEYCODE_R)
 INPUT_PORTS_END
 
 
@@ -1135,7 +1139,7 @@ GFXDECODE_END
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( ampoker2, ampoker2_state )
+MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/2)        /* 3 MHz */
@@ -1169,7 +1173,7 @@ static MACHINE_CONFIG_START( ampoker2, ampoker2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sigma2k, ampoker2 )
+MACHINE_CONFIG_DERIVED(ampoker2_state::sigma2k, ampoker2)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", sigma2k)
@@ -1388,7 +1392,7 @@ DRIVER_INIT_MEMBER(ampoker2_state, rabbitpk)
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 1, 2, 5, 4, 3, 0, 7, 6) ^ dec_base[(i >> 2) & 0x1f];
+		rom[i] = bitswap<8>(rom[i], 1, 2, 5, 4, 3, 0, 7, 6) ^ dec_base[(i >> 2) & 0x1f];
 	}
 }
 
@@ -1440,16 +1444,16 @@ DRIVER_INIT_MEMBER(ampoker2_state, piccolop)
 *************************/
 
 //     YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY              FULLNAME                             FLAGS                   LAYOUT
-GAMEL( 1990, ampoker2, 0,        ampoker2, ampoker2, driver_device,  0,        ROT0, "Novomatic",         "American Poker II",                  MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1990, ampkr2b1, ampoker2, ampoker2, ampoker2, driver_device,  0,        ROT0, "bootleg",           "American Poker II (bootleg, set 1)", MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, driver_device,  0,        ROT0, "bootleg",           "American Poker II (bootleg, set 2)", MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, driver_device,  0,        ROT0, "bootleg",           "American Poker II (bootleg, set 3)", MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1994, ampkr2b4, ampoker2, ampoker2, ampoker2, driver_device,  0,        ROT0, "bootleg",           "American Poker II (bootleg, set 4)", MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1994, ampkr228, ampoker2, ampoker2, ampoker2, driver_device,  0,        ROT0, "bootleg?",          "American Poker II (iamp2 v28)",      MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  driver_device,  0,        ROT0, "bootleg",           "American Poker 95",                  MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, driver_device,  0,        ROT0, "bootleg",           "Poker De Win",                       MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, driver_device,  0,        ROT0, "bootleg",           "Videomat (Polish bootleg)",          MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
+GAMEL( 1990, ampoker2, 0,        ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "Novomatic",         "American Poker II",                  MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
+GAMEL( 1990, ampkr2b1, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 1)", MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
+GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 2)", MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
+GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 3)", MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
+GAMEL( 1994, ampkr2b4, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "bootleg",           "American Poker II (bootleg, set 4)", MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
+GAMEL( 1994, ampkr228, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "bootleg?",          "American Poker II (iamp2 v28)",      MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
+GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  ampoker2_state, 0,        ROT0, "bootleg",           "American Poker 95",                  MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
+GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "bootleg",           "Poker De Win",                       MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
+GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        ROT0, "bootleg",           "Videomat (Polish bootleg)",          MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
 GAMEL( 1990, rabbitpk, ampoker2, ampoker2, ampoker2, ampoker2_state, rabbitpk, ROT0, "bootleg",           "Rabbit Poker (Arizona Poker v1.1?)", MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
-GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, driver_device,  0,        ROT0, "Sigma Inc.",        "Sigma Poker",                        MACHINE_SUPPORTS_SAVE,  layout_sigmapkr )
-GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k,  driver_device,  0,        ROT0, "Sigma Inc.",        "Sigma Poker 2000",                   MACHINE_SUPPORTS_SAVE,  layout_sigmapkr )
+GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, ampoker2_state, 0,        ROT0, "Sigma Inc.",        "Sigma Poker",                        MACHINE_SUPPORTS_SAVE,  layout_sigmapkr )
+GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k,  ampoker2_state, 0,        ROT0, "Sigma Inc.",        "Sigma Poker 2000",                   MACHINE_SUPPORTS_SAVE,  layout_sigmapkr )
 GAME(  1990, piccolop, ampoker2, ampoker2, piccolop, ampoker2_state, piccolop, ROT0, "Admiral/Novomatic", "Piccolo Poker 100",                  MACHINE_SUPPORTS_SAVE )

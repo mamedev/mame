@@ -114,15 +114,16 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/astrocde.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "includes/astrocde.h"
 #include "machine/z80ctc.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "sound/votrax.h"
 
-#include "audio/wow.h"
-#include "audio/gorf.h"
+#include "speaker.h"
 
 #include "gorf.lh"
 #include "seawolf2.lh"
@@ -292,7 +293,6 @@ READ8_MEMBER(astrocde_state::wow_io_r)
 }
 
 
-
 /*************************************
  *
  *  Gorf specific input/output
@@ -313,11 +313,7 @@ READ8_MEMBER(astrocde_state::gorf_io_1_r)
 		case 5: m_sparkle[3] = data;    break;
 		case 6:
 			m_astrocade_sound1->set_output_gain(0, data ? 0.0 : 1.0);
-#if USE_FAKE_VOTRAX
-			m_samples->set_output_gain(0, data ? 1.0 : 0.0);
-#else
 			m_votrax->set_output_gain(0, data ? 1.0 : 0.0);
-#endif
 			break;
 		case 7: osd_printf_debug("io_1:%d\n", data); break;
 	}
@@ -459,13 +455,6 @@ WRITE8_MEMBER(astrocde_state::demndrgn_sound_w)
  *
  *************************************/
 
-WRITE8_MEMBER(astrocde_state::tenpindx_sound_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-
 WRITE8_MEMBER(astrocde_state::tenpindx_lamp_w)
 {
 	/* lamps */
@@ -511,6 +500,28 @@ WRITE8_MEMBER(astrocde_state::tenpindx_lights_w)
 	output().set_lamp_value(18, (which == 9));
 }
 
+
+/*************************************
+ *
+ *  Votrax SC01 specific input/output
+ *
+ *************************************/
+
+READ8_MEMBER( astrocde_state::votrax_speech_r )
+{
+	uint8_t data = offset >> 8;
+	m_votrax->inflection_w(space, 0, data >> 6);
+	m_votrax->write(space, 0, data);
+
+	/* Note : We should really also use volume in this as well as frequency */
+	return data;                                   /* Return nicely */
+}
+
+
+CUSTOM_INPUT_MEMBER( astrocde_state::votrax_speech_status_r )
+{
+	return m_votrax->request();
+}
 
 
 /*************************************
@@ -650,6 +661,20 @@ static ADDRESS_MAP_START( port_map_16col_pattern_nosound, AS_IO, 8, astrocde_sta
 	AM_RANGE(0x00c0, 0x00c5) AM_MIRROR(0xff00) AM_WRITE(profpac_screenram_ctrl_w)
 	AM_RANGE(0x00f3, 0x00f3) AM_MIRROR(0xff00) AM_WRITE(demndrgn_banksw_w)
 	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(protected_ram_enable_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( port_map_16col_pattern_tenpindx, AS_IO, 8, astrocde_state )
+	AM_RANGE(0x0060, 0x0060) AM_MIRROR(0xff00) AM_READ_PORT("P60")
+	AM_RANGE(0x0061, 0x0061) AM_MIRROR(0xff00) AM_READ_PORT("P61")
+	AM_RANGE(0x0062, 0x0062) AM_MIRROR(0xff00) AM_READ_PORT("P62")
+	AM_RANGE(0x0063, 0x0063) AM_MIRROR(0xff00) AM_READ_PORT("P63")
+	AM_RANGE(0x0064, 0x0064) AM_MIRROR(0xff00) AM_READ_PORT("P64")
+	AM_RANGE(0x0065, 0x0066) AM_MIRROR(0xff00) AM_WRITE(tenpindx_lamp_w)
+	AM_RANGE(0x0067, 0x0067) AM_MIRROR(0xff00) AM_WRITE(tenpindx_counter_w)
+	AM_RANGE(0x0068, 0x0068) AM_MIRROR(0xff00) AM_WRITE(tenpindx_lights_w)
+	AM_RANGE(0x0097, 0x0097) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_IMPORT_FROM(port_map_16col_pattern_nosound)
 ADDRESS_MAP_END
 
 
@@ -879,7 +904,7 @@ static INPUT_PORTS_START( wow )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrocde_state, wow_speech_status_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrocde_state, votrax_speech_status_r, nullptr)
 
 	PORT_START("P4HANDLE")
 	/* "If S1:1,2,3 are all ON or all OFF, only coin meter number 1 will count." */
@@ -949,7 +974,7 @@ static INPUT_PORTS_START( gorf )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrocde_state, gorf_speech_status_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrocde_state, votrax_speech_status_r, nullptr)
 
 	PORT_START("P4HANDLE")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("S1:1")
@@ -1220,7 +1245,7 @@ static const z80_daisy_config tenpin_daisy_chain[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( astrocade_base, astrocde_state )
+MACHINE_CONFIG_START(astrocde_state::astrocade_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)
@@ -1239,14 +1264,14 @@ static MACHINE_CONFIG_START( astrocade_base, astrocde_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( astrocade_16color_base, astrocade_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::astrocade_16color_base, astrocade_base)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("bank4000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank4000_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1263,7 +1288,7 @@ static MACHINE_CONFIG_DERIVED( astrocade_16color_base, astrocade_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( astrocade_mono_sound )
+MACHINE_CONFIG_START(astrocde_state::astrocade_mono_sound)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1273,7 +1298,7 @@ static MACHINE_CONFIG_FRAGMENT( astrocade_mono_sound )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_FRAGMENT( astrocade_stereo_sound )
+MACHINE_CONFIG_START(astrocde_state::astrocade_stereo_sound)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1293,7 +1318,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static MACHINE_CONFIG_DERIVED( seawolf2, astrocade_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::seawolf2, astrocade_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1319,7 +1344,7 @@ static MACHINE_CONFIG_DERIVED( seawolf2, astrocade_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ebases, astrocade_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::ebases, astrocade_base)
 	MCFG_FRAGMENT_ADD(astrocade_mono_sound)
 
 	/* basic machine hardware */
@@ -1329,7 +1354,7 @@ static MACHINE_CONFIG_DERIVED( ebases, astrocade_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spacezap, astrocade_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::spacezap, astrocade_base)
 	MCFG_FRAGMENT_ADD(astrocade_mono_sound)
 
 	/* basic machine hardware */
@@ -1338,7 +1363,7 @@ static MACHINE_CONFIG_DERIVED( spacezap, astrocade_base )
 	MCFG_CPU_IO_MAP(port_map_mono_pattern)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wow, astrocade_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::wow, astrocade_base)
 	MCFG_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
@@ -1354,18 +1379,12 @@ static MACHINE_CONFIG_DERIVED( wow, astrocade_base )
 	/* sound hardware */
 	MCFG_SPEAKER_ADD("center", 0.0, 0.0, 1.0)
 
-#if USE_FAKE_VOTRAX
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(wow_sample_names)
-#else
-	MCFG_VOTRAX_SC01_ADD("votrax", VOTRAX_SC01, 720000)
-#endif
+	MCFG_SOUND_ADD("votrax", VOTRAX_SC01, 720000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "center", 0.85)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gorf, astrocade_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::gorf, astrocade_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1386,18 +1405,12 @@ static MACHINE_CONFIG_DERIVED( gorf, astrocade_base )
 	MCFG_ASTROCADE_ADD("astrocade2", ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lower", 1.0)
 
-#if USE_FAKE_VOTRAX
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(gorf_sample_names)
-#else
-	MCFG_VOTRAX_SC01_ADD("votrax", VOTRAX_SC01, 720000)
-#endif
+	MCFG_SOUND_ADD("votrax", VOTRAX_SC01, 720000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "upper", 0.85)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( robby, astrocade_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::robby, astrocade_base)
 	MCFG_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
@@ -1409,7 +1422,7 @@ static MACHINE_CONFIG_DERIVED( robby, astrocade_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( profpac, astrocade_16color_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::profpac, astrocade_16color_base)
 	MCFG_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
@@ -1419,11 +1432,11 @@ static MACHINE_CONFIG_DERIVED( profpac, astrocade_16color_base )
 
 	MCFG_DEVICE_MODIFY("bank4000")
 	MCFG_DEVICE_PROGRAM_MAP(profpac_bank4000_map)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(20)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(20)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( demndrgn, astrocade_16color_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::demndrgn, astrocade_16color_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1432,12 +1445,12 @@ static MACHINE_CONFIG_DERIVED( demndrgn, astrocade_16color_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tenpindx, astrocade_16color_base )
+MACHINE_CONFIG_DERIVED(astrocde_state::tenpindx, astrocade_16color_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(profpac_map)
-	MCFG_CPU_IO_MAP(port_map_16col_pattern_nosound)
+	MCFG_CPU_IO_MAP(port_map_16col_pattern_tenpindx)
 
 	MCFG_CPU_ADD("sub", Z80, ASTROCADE_CLOCK/4) /* real clock unknown */
 	MCFG_Z80_DAISY_CHAIN(tenpin_daisy_chain)
@@ -1451,6 +1464,7 @@ static MACHINE_CONFIG_DERIVED( tenpindx, astrocade_16color_base )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("sub", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("aysnd", AY8912, ASTROCADE_CLOCK/4)  /* real clock unknown */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DIPSW"))
@@ -1709,7 +1723,7 @@ DRIVER_INIT_MEMBER(astrocde_state,wow)
 {
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
 	m_maincpu->space(AS_IO).install_read_handler(0x15, 0x15, 0, 0xf000, 0x0f00, read8_delegate(FUNC(astrocde_state::wow_io_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, 0, 0x0000, 0xff00, read8_delegate(FUNC(astrocde_state::wow_speech_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, 0, 0x0000, 0xff00, read8_delegate(FUNC(astrocde_state::votrax_speech_r), this));
 }
 
 
@@ -1718,7 +1732,7 @@ DRIVER_INIT_MEMBER(astrocde_state,gorf)
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
 	m_maincpu->space(AS_IO).install_read_handler(0x15, 0x15, 0, 0xf000, 0x0f00, read8_delegate(FUNC(astrocde_state::gorf_io_1_r), this));
 	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, 0, 0xf000, 0x0f00, read8_delegate(FUNC(astrocde_state::gorf_io_2_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, 0, 0x0000, 0xff00, read8_delegate(FUNC(astrocde_state::gorf_speech_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, 0, 0x0000, 0xff00, read8_delegate(FUNC(astrocde_state::votrax_speech_r), this));
 }
 
 
@@ -1761,18 +1775,7 @@ DRIVER_INIT_MEMBER(astrocde_state,demndrgn)
 
 DRIVER_INIT_MEMBER(astrocde_state,tenpindx)
 {
-	address_space &iospace = m_maincpu->space(AS_IO);
-
 	m_video_config = 0x00;
-	iospace.install_read_port(0x60, 0x60, 0xff00, "P60");
-	iospace.install_read_port(0x61, 0x61, 0xff00, "P61");
-	iospace.install_read_port(0x62, 0x62, 0xff00, "P62");
-	iospace.install_read_port(0x63, 0x63, 0xff00, "P63");
-	iospace.install_read_port(0x64, 0x64, 0xff00, "P64");
-	iospace.install_write_handler(0x65, 0x66, 0, 0xff00, 0x0000, write8_delegate(FUNC(astrocde_state::tenpindx_lamp_w), this));
-	iospace.install_write_handler(0x67, 0x67, 0, 0xff00, 0x0000, write8_delegate(FUNC(astrocde_state::tenpindx_counter_w), this));
-	iospace.install_write_handler(0x68, 0x68, 0, 0xff00, 0x0000, write8_delegate(FUNC(astrocde_state::tenpindx_lights_w), this));
-	iospace.install_write_handler(0x97, 0x97, 0, 0xff00, 0x0000, write8_delegate(FUNC(astrocde_state::tenpindx_sound_w), this));
 
 	/* configure banking */
 	m_bank8000->configure_entries(0, 4, memregion("banks")->base() + 0x4000, 0x8000);
@@ -1788,29 +1791,29 @@ DRIVER_INIT_MEMBER(astrocde_state,tenpindx)
  *************************************/
 
 /* 90002 CPU board + 90700 game board + 91312 "characterization card" */
-GAMEL(1978, seawolf2, 0,    seawolf2, seawolf2, astrocde_state, seawolf2, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf2 )
+GAMEL(1978, seawolf2, 0,    seawolf2, seawolf2,  astrocde_state, seawolf2, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf2 )
 
 /* 91354 CPU board + 90700 game board + 91356 RAM board */
-GAMEL(1980, ebases,   0,    ebases,   ebases, astrocde_state,   ebases,   ROT0,   "Dave Nutting Associates / Midway", "Extra Bases", MACHINE_SUPPORTS_SAVE, layout_spacezap )
+GAMEL(1980, ebases,   0,    ebases,   ebases,    astrocde_state, ebases,   ROT0,   "Dave Nutting Associates / Midway", "Extra Bases", MACHINE_SUPPORTS_SAVE, layout_spacezap )
 
 /* 91354 CPU board + 90706 game board + 91356 RAM board + 91355 pattern board */
-GAMEL(1980, spacezap, 0,    spacezap, spacezap, astrocde_state, spacezap, ROT0,   "Midway", "Space Zap", MACHINE_SUPPORTS_SAVE, layout_spacezap )
+GAMEL(1980, spacezap, 0,    spacezap, spacezap,  astrocde_state, spacezap, ROT0,   "Midway", "Space Zap", MACHINE_SUPPORTS_SAVE, layout_spacezap )
 
 /* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91397 memory board */
-GAME( 1980, wow,      0,    wow,      wow, astrocde_state,      wow,      ROT0,   "Dave Nutting Associates / Midway", "Wizard of Wor", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, wowg,     wow,  wow,      wowg, astrocde_state,     wow,      ROT0,   "Dave Nutting Associates / Midway", "Wizard of Wor (with German Language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, wow,      0,    wow,      wow,       astrocde_state, wow,      ROT0,   "Dave Nutting Associates / Midway", "Wizard of Wor", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, wowg,     wow,  wow,      wowg,      astrocde_state, wow,      ROT0,   "Dave Nutting Associates / Midway", "Wizard of Wor (with German Language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 /* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91364 ROM/RAM board */
-GAMEL(1981, gorf,     0,    gorf,     gorf, astrocde_state,     gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf  )
-GAMEL(1981, gorfpgm1, gorf, gorf,     gorf, astrocde_state,     gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf (program 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
-GAMEL(1981, gorfpgm1g,gorf, gorf,     gorfpgm1g, astrocde_state,gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf (program 1, with German Language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
+GAMEL(1981, gorf,     0,    gorf,     gorf,      astrocde_state, gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf  )
+GAMEL(1981, gorfpgm1, gorf, gorf,     gorf,      astrocde_state, gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf (program 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
+GAMEL(1981, gorfpgm1g,gorf, gorf,     gorfpgm1g, astrocde_state, gorf,     ROT270, "Dave Nutting Associates / Midway", "Gorf (program 1, with German Language ROM)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gorf )
 
 /* 91354 CPU board + 90708 game board + 91356 RAM board + 91355 pattern board + 91423 memory board */
-GAME( 1981, robby,    0,    robby,    robby, astrocde_state,    robby,    ROT0,   "Dave Nutting Associates / Bally Midway", "The Adventures of Robby Roto!", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, robby,    0,    robby,    robby,     astrocde_state, robby,    ROT0,   "Dave Nutting Associates / Bally Midway", "The Adventures of Robby Roto!", MACHINE_SUPPORTS_SAVE )
 
 /* 91465 CPU board + 91469 game board + 91466 RAM board + 91488 pattern board + 91467 memory board + 91846 EPROM board */
-GAME( 1983, profpac,  0,    profpac,  profpac, astrocde_state,  profpac,  ROT0,   "Dave Nutting Associates / Bally Midway", "Professor Pac-Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, profpac,  0,    profpac,  profpac,   astrocde_state, profpac,  ROT0,   "Dave Nutting Associates / Bally Midway", "Professor Pac-Man", MACHINE_SUPPORTS_SAVE )
 
 /* 91465 CPU board + 91699 game board + 91466 RAM board + 91488 pattern board + 91467 memory board */
-GAME( 1982, demndrgn, 0,    demndrgn, demndrgn, astrocde_state, demndrgn, ROT0,   "Dave Nutting Associates / Bally Midway", "Demons & Dragons (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAMEL(1983, tenpindx, 0,    tenpindx, tenpindx, astrocde_state, tenpindx, ROT0,   "Dave Nutting Associates / Bally Midway", "Ten Pin Deluxe", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL, layout_tenpindx )
+GAME( 1982, demndrgn, 0,    demndrgn, demndrgn,  astrocde_state, demndrgn, ROT0,   "Dave Nutting Associates / Bally Midway", "Demons & Dragons (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL(1983, tenpindx, 0,    tenpindx, tenpindx,  astrocde_state, tenpindx, ROT0,   "Dave Nutting Associates / Bally Midway", "Ten Pin Deluxe", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL, layout_tenpindx )

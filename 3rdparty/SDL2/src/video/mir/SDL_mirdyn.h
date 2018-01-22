@@ -36,13 +36,13 @@ int SDL_MIR_LoadSymbols(void);
 void SDL_MIR_UnloadSymbols(void);
 
 /* Declare all the function pointers and wrappers... */
-#define SDL_MIR_MODULE(modname)
 #define SDL_MIR_SYM(rc,fn,params) \
     typedef rc (*SDL_DYNMIRFN_##fn) params; \
     extern SDL_DYNMIRFN_##fn MIR_##fn;
+#define SDL_MIR_SYM_CONST(type, name) \
+    typedef type SDL_DYMMIRCONST_##name; \
+    extern SDL_DYMMIRCONST_##name MIR_##name;
 #include "SDL_mirsym.h"
-#undef SDL_MIR_MODULE
-#undef SDL_MIR_SYM
 
 #ifdef __cplusplus
 }

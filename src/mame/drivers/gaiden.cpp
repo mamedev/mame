@@ -131,30 +131,32 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gaiden.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/gaiden.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
+
+
+WRITE16_MEMBER(gaiden_state::irq_ack_w)
+{
+	m_maincpu->set_input_line(5, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(gaiden_state::drgnbowl_irq_ack_w)
+{
+	m_maincpu->set_input_line(5, CLEAR_LINE);
+}
 
 WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_soundlatch->write(space, 0, data & 0xff);   /* Ninja Gaiden */
-	if (ACCESSING_BITS_8_15)
-		m_soundlatch->write(space, 0, data >> 8); /* Tecmo Knight */
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-WRITE16_MEMBER(gaiden_state::drgnbowl_sound_command_w)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		m_soundlatch->write(space, 0, data >> 8);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-	}
+	// Ninja Gaiden writes only to the lower byte; Tecmo Knight and Strato Fighter write to the upper byte instead.
+	// It's not clear which 8 data lines are actually used, but byte smearing is almost certainly involved.
+	m_soundlatch->write(space, 0, data & 0xff);
 }
 
 
@@ -176,7 +178,7 @@ WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n",space.device().safe_pc(),data);
+//      logerror("PC %06x: prot = %02x\n",m_maincpu->pc(),data);
 
 		switch (data & 0xf0)
 		{
@@ -214,7 +216,7 @@ WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 
 READ16_MEMBER(gaiden_state::wildfang_protection_r)
 {
-//  logerror("PC %06x: read prot %02x\n", space.device().safe_pc(), m_prot);
+//  logerror("PC %06x: read prot %02x\n", m_maincpu->pc(), m_prot);
 	return m_prot;
 }
 
@@ -230,7 +232,7 @@ startup codes
 it reads 00/36/0e/11/33/34/2d, fetching some code copied to RAM,
 and a value which is used as an offset to point to the code in RAM.
 19/12/31/28 are read repeatedly, from the interrupt, and the returned
-value chanes, some kind of mode set command?
+value changes, some kind of mode set command?
 
 level codes
 
@@ -331,7 +333,7 @@ WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 	{
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n", space.device().safe_pc(), data);
+//      logerror("PC %06x: prot = %02x\n", m_maincpu->pc(), data);
 
 		switch (data & 0xf0)
 		{
@@ -377,7 +379,7 @@ WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 
 READ16_MEMBER(gaiden_state::raiga_protection_r)
 {
-//  logerror("PC %06x: read prot %02x\n", space.device().safe_pc(), m_prot);
+//  logerror("PC %06x: read prot %02x\n", m_maincpu->pc(), m_prot);
 	return m_prot;
 }
 
@@ -388,7 +390,7 @@ static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram3_w) AM_SHARE("videoram3")
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2") AM_WRITE(gaiden_sproffsety_w)
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
@@ -403,7 +405,7 @@ static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07a30c, 0x07a30d) AM_WRITE(gaiden_bgscrollx_w)
 	AM_RANGE(0x07a800, 0x07a801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x07a802, 0x07a803) AM_WRITE(gaiden_sound_command_w)
-	AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
+	AM_RANGE(0x07a806, 0x07a807) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
 ADDRESS_MAP_END
 
@@ -414,12 +416,12 @@ static ADDRESS_MAP_START( drgnbowl_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram3_w) AM_SHARE("videoram3")
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
-	AM_RANGE(0x07a00e, 0x07a00f) AM_WRITE(drgnbowl_sound_command_w)
-	AM_RANGE(0x07e000, 0x07e001) AM_WRITENOP
+	AM_RANGE(0x07a00e, 0x07a00f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
+	AM_RANGE(0x07e000, 0x07e001) AM_WRITE8(drgnbowl_irq_ack_w, 0xff00)
 	AM_RANGE(0x07f000, 0x07f001) AM_WRITE(gaiden_bgscrolly_w)
 	AM_RANGE(0x07f002, 0x07f003) AM_WRITE(gaiden_bgscrollx_w)
 	AM_RANGE(0x07f004, 0x07f005) AM_WRITE(gaiden_fgscrolly_w)
@@ -739,12 +741,12 @@ static GFXDECODE_START( drgnbowl )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( shadoww, gaiden_state )
+MACHINE_CONFIG_START(gaiden_state::shadoww)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 18432000/2) /* 9.216 MHz */
 	MCFG_CPU_PROGRAM_MAP(gaiden_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -774,7 +776,7 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	MCFG_TECMO_MIXER_SHIFTS(10,9,4)
 	MCFG_TECMO_MIXER_BLENDCOLS(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 )
 	MCFG_TECMO_MIXER_REGULARCOLS( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 )
-	MCFG_TECMO_MIXER_BLENDSOUCE( 0x0800 + 0x000, 0x0800 + 0x200)
+	MCFG_TECMO_MIXER_BLENDSOURCE( 0x0800 + 0x000, 0x0800 + 0x200)
 	MCFG_TECMO_MIXER_REVSPRITETILE
 	MCFG_TECMO_MIXER_BGPEN(0x000 + 0x200)
 
@@ -784,6 +786,7 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -798,11 +801,11 @@ static MACHINE_CONFIG_START( shadoww, gaiden_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( raiga, shadoww )
+MACHINE_CONFIG_DERIVED(gaiden_state::raiga, shadoww)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(gaiden_state, screen_update_raiga)
@@ -811,12 +814,12 @@ static MACHINE_CONFIG_DERIVED( raiga, shadoww )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", raiga)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
+MACHINE_CONFIG_START(gaiden_state::drgnbowl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000/2) /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(drgnbowl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 12000000/2)   /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(drgnbowl_sound_map)
@@ -838,7 +841,7 @@ static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	/* NOT using Tecmo Sprite device - signifcant changes, maybe a clone of something else */
+	/* NOT using Tecmo Sprite device - significant changes, maybe a clone of something else */
 
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
 
@@ -846,11 +849,12 @@ static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -901,13 +905,45 @@ Others
 */
 
 static ADDRESS_MAP_START( mastninj_sound_map, AS_PROGRAM, 8, gaiden_state )
-	AM_RANGE(0x0000, 0xdfff) AM_ROM
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("adpcm_bank")
+	AM_RANGE(0xc400, 0xc401) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
+	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
+	AM_RANGE(0xcc00, 0xcc00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("adpcm_select2", ls157_device, ba_w)
+	AM_RANGE(0xd400, 0xd400) AM_WRITE(adpcm_bankswitch_w)
+	AM_RANGE(0xd800, 0xd800) AM_DEVWRITE("adpcm_select1", ls157_device, ba_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xc400, 0xc401) AM_DEVWRITE("ym1", ym2203_device, write)
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ym2", ym2203_device, write)
-//  AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
-//  AM_RANGE(0xfc20, 0xfc20) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
+
+WRITE_LINE_MEMBER(gaiden_state::vck_flipflop_w)
+{
+	if (!state)
+		return;
+
+	m_adpcm_toggle = !m_adpcm_toggle;
+	m_adpcm_select[0]->select_w(m_adpcm_toggle);
+	m_adpcm_select[1]->select_w(m_adpcm_toggle);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_adpcm_toggle);
+}
+
+WRITE8_MEMBER(gaiden_state::adpcm_bankswitch_w)
+{
+	m_msm[0]->reset_w(BIT(data, 3));
+	m_msm[1]->reset_w(BIT(data, 4));
+	m_adpcm_bank->set_entry(data & 7);
+}
+
+MACHINE_START_MEMBER(gaiden_state,mastninj)
+{
+	MACHINE_START_CALL_MEMBER(raiga);
+
+	m_adpcm_bank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
+	m_adpcm_bank->set_entry(0);
+
+	m_adpcm_toggle = 0;
+	save_item(NAME(m_adpcm_toggle));
+}
 
 static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -916,7 +952,7 @@ static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram3_w) AM_SHARE("videoram3")
 	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 //  AM_RANGE(0x078800, 0x079fff) AM_RAM
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
@@ -928,23 +964,23 @@ static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07f004, 0x07f005) AM_WRITE(gaiden_fgscrolly_w)
 	AM_RANGE(0x07f006, 0x07f007) AM_WRITE(gaiden_fgscrollx_w)
 	AM_RANGE(0x07a800, 0x07a801) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x07e000, 0x07e001) AM_WRITE(gaiden_sound_command_w)
 //  AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
 //  AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
+	AM_RANGE(0x07a00e, 0x07a00f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
+	AM_RANGE(0x07e000, 0x07e001) AM_WRITE8(drgnbowl_irq_ack_w, 0xff00)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mastninj, gaiden_state )
+MACHINE_CONFIG_START(gaiden_state::mastninj)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz? */
 	MCFG_CPU_PROGRAM_MAP(mastninj_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaiden_state,  irq5_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)  /* ?? MHz */
 	MCFG_CPU_PROGRAM_MAP(mastninj_sound_map)
-								/* IRQs are triggered by the YM2203 */
 
-	MCFG_MACHINE_START_OVERRIDE(gaiden_state,raiga)
+	MCFG_MACHINE_START_OVERRIDE(gaiden_state,mastninj)
 	MCFG_MACHINE_RESET_OVERRIDE(gaiden_state,raiga)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -970,23 +1006,36 @@ static MACHINE_CONFIG_START( mastninj, gaiden_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ym1", YM2203, 4000000) /* ?? MHz */
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	// YM2203 clocks chosen by analogy with Automat; actual rate unknown, but 4 MHz is obviously too fast
+	MCFG_SOUND_ADD("ym1", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 4000000) /* ?? MHz */
+	MCFG_SOUND_ADD("ym2", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	/* no OKI on the bootleg */
-//  MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
-//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_DEVICE_ADD("adpcm_select1", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm1", msm5205_device, data_w))
+
+	MCFG_DEVICE_ADD("adpcm_select2", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm2", msm5205_device, data_w))
+
+	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("msm2", msm5205_device, vclk_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(gaiden_state, vck_flipflop_w))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+
+	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -1211,7 +1260,7 @@ ROM_START( mastninj )
 	ROM_LOAD16_BYTE( "4.ic26",    0x20000, 0x10000, CRC(d375c5f6) SHA1(925e84d79f35595a344a417125d74dc46ebec310) ) // 1ST AND 2ND HALF IDENTICAL (but correct?)
 	ROM_LOAD16_BYTE( "2.ic29",    0x20001, 0x10000, CRC(6b53b8b1) SHA1(68bffc992fecae5e113592a9481c0cee80925135) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x20000, "audiocpu", 0 )
 	ROM_LOAD( "5.ic35",       0x000000, 0x10000, CRC(ba528424) SHA1(5ab93059e26483a756d80b8c18d9669d2a3416de) )
 
 	ROM_REGION( 0x010000, "gfx1", 0 )
@@ -1572,7 +1621,7 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 		memcpy(&buffer[0], ROM, size);
 		for( i = 0; i < size; i++ )
 		{
-			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,
+			ROM[i] = buffer[bitswap<24>(i,23,22,21,20,
 										19,18,17,15,
 								16,14,13,12,
 								11,10, 9, 8,
@@ -1589,7 +1638,7 @@ void gaiden_state::descramble_drgnbowl(int descramble_cpu)
 		memcpy(&buffer[0],ROM,size);
 		for( i = 0; i < size; i++ )
 		{
-			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,
+			ROM[i] = buffer[bitswap<24>(i,23,22,21,20,
 										19,18,16,17,
 										15,14,13, 4,
 											3,12,11,10,
@@ -1623,7 +1672,7 @@ void gaiden_state::descramble_mastninj_gfx(uint8_t* src)
 		int i;
 		for (i = 0;i < len; i++)
 		{
-			buffer[i] = src[BITSWAP24(i,
+			buffer[i] = src[bitswap<24>(i,
 			23,22,21,20,
 			19,18,17,16,
 			15,5,14,13,12,
@@ -1639,7 +1688,7 @@ void gaiden_state::descramble_mastninj_gfx(uint8_t* src)
 		int i;
 		for (i = 0; i < len; i++)
 		{
-			buffer[i] = src[BITSWAP24(i,
+			buffer[i] = src[bitswap<24>(i,
 			23,22,21,20,
 			19,18,17,16,
 			15,6,14,13,12,
@@ -1659,19 +1708,19 @@ DRIVER_INIT_MEMBER(gaiden_state,mastninj)
 	DRIVER_INIT_CALL(shadoww);
 }
 
-//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1988, shadoww,   0,        shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Shadow Warriors (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, shadowwa,  shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Shadow Warriors (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gaiden,    shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Ninja Gaiden (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ryukendn,  shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Ninja Ryukenden (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, ryukendna, shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Ninja Ryukenden (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mastninj,  shadoww,  mastninj, common, gaiden_state,   mastninj, ROT0,   "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too. - it is confirmed the curtains don't scroll on the pcb
-GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, gaiden_state, drgnbowl, ROT0,   "Nics",  "Dragon Bowl (set 1, encrypted program)", MACHINE_SUPPORTS_SAVE ) // Draogn Bowl is based on Ninja Gaiden code
-GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, gaiden_state, drgnbowla,ROT0,   "Nics",  "Dragon Bowl (set 2, unencrypted program)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    STATE,        INIT,     MONITOR,COMPANY,   FULLNAME,FLAGS
+GAME( 1988, shadoww,   0,        shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Shadow Warriors (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, shadowwa,  shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Shadow Warriors (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gaiden,    shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Ninja Gaiden (US)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ryukendn,  shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Ninja Ryukenden (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, ryukendna, shadoww,  shadoww,  common,   gaiden_state, shadoww,  ROT0,   "Tecmo",   "Ninja Ryukenden (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mastninj,  shadoww,  mastninj, common,   gaiden_state, mastninj, ROT0,   "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too. - it is confirmed the curtains don't scroll on the pcb
+GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, gaiden_state, drgnbowl, ROT0,   "Nics",    "Dragon Bowl (set 1, encrypted program)",   MACHINE_SUPPORTS_SAVE ) // Dragon Bowl is based on Ninja Gaiden code
+GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, gaiden_state, drgnbowla,ROT0,   "Nics",    "Dragon Bowl (set 2, unencrypted program)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, wildfang,  0,        shadoww,  wildfang, gaiden_state, wildfang, ROT0,   "Tecmo", "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wildfangs, wildfang, shadoww,  tknight, gaiden_state,  wildfang, ROT0,   "Tecmo", "Wild Fang", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tknight,   wildfang, shadoww,  tknight, gaiden_state,  wildfang, ROT0,   "Tecmo", "Tecmo Knight", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wildfang,  0,        shadoww,  wildfang, gaiden_state, wildfang, ROT0,   "Tecmo",   "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wildfangs, wildfang, shadoww,  tknight,  gaiden_state, wildfang, ROT0,   "Tecmo",   "Wild Fang",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tknight,   wildfang, shadoww,  tknight,  gaiden_state, wildfang, ROT0,   "Tecmo",   "Tecmo Knight",             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, stratof,   0,        raiga,    raiga, gaiden_state,    raiga,    ROT0,   "Tecmo", "Raiga - Strato Fighter (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, raiga,     stratof,  raiga,    raiga, gaiden_state,    raiga,    ROT0,   "Tecmo", "Raiga - Strato Fighter (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, stratof,   0,        raiga,    raiga,    gaiden_state, raiga,    ROT0,   "Tecmo",   "Raiga - Strato Fighter (US)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, raiga,     stratof,  raiga,    raiga,    gaiden_state, raiga,    ROT0,   "Tecmo",   "Raiga - Strato Fighter (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -214,12 +214,6 @@ namespace glm
 	// -- Accesses --
 
 	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER GLM_CONSTEXPR typename tmat4x2<T, P>::length_type tmat4x2<T, P>::length() const
-	{
-		return 4;
-	}
-
-	template <typename T, precision P>
 	GLM_FUNC_QUALIFIER typename tmat4x2<T, P>::col_type & tmat4x2<T, P>::operator[](typename tmat4x2<T, P>::length_type i)
 	{
 		assert(i < this->length());

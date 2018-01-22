@@ -34,14 +34,14 @@
 /* bear this legend.                                                         */
 /*                                                                           */
 /*****************************************************************************/
-#pragma once
+#ifndef MAME_SOUND_TIASOUND_H
+#define MAME_SOUND_TIASOUND_H
 
-#ifndef __TIASOUND_H__
-#define __TIASOUND_H__
+#pragma once
 
 void *tia_sound_init(device_t *device, int clock, int sample_rate, int gain);
 void tia_sound_free(void *chip);
-void tia_process (void *chip, stream_sample_t *buffer, int length);
+void tia_process(void *chip, stream_sample_t *buffer, int length);
 void tia_write(void *chip, offs_t offset, uint8_t data);
 
-#endif  /* __TIASOUND_H__ */
+#endif // MAME_SOUND_TIASOUND_H

@@ -846,7 +846,7 @@ void galaxian_state::stars_update_origin()
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::galaxian_stars_blink_timer)
+TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::scramble_stars_blink_timer)
 {
 	m_stars_blink_state++;
 }
@@ -1054,9 +1054,9 @@ void galaxian_state::turtles_draw_background(bitmap_rgb32 &bitmap, const rectang
 
 void galaxian_state::frogger_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	/* color split point verified on real machine */
-	/* hmmm, according to schematics it is at 128+8; which is right? */
-	background_draw_colorsplit(bitmap, cliprect, rgb_t(0,0,0x47), 128+8, 128-8);
+	/* according to schematics it is at 128+8; but it has been verified different on real machine.
+	Video proof: http://www.youtube.com/watch?v=ssr69mQf224 */
+	background_draw_colorsplit(bitmap, cliprect, rgb_t(0,0,0x47), 128, 128);
 }
 
 void galaxian_state::quaak_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)

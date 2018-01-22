@@ -13,6 +13,7 @@
 #include "sound/dac.h"
 #include "machine/i2cmem.h"
 #include "machine/wd_fdc.h"
+#include "screen.h"
 
 // interrupt definitions.  these are for the real Archimedes computer - arcade
 // and gambling knockoffs likely are a bit different.
@@ -91,6 +92,7 @@ public:
 	uint8_t m_ioc_regs[0x80/4];
 	uint8_t m_vidc_bpp_mode;
 	uint8_t m_vidc_interlace;
+	uint16_t m_vidc_vblank_time;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -98,7 +100,7 @@ public:
 protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<i2cmem_device> m_i2cmem;
-	optional_device<wd1772_t> m_fdc;
+	optional_device<wd1772_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	required_memory_region m_region_maincpu;
@@ -130,7 +132,7 @@ private:
 	int m_memc_latchrom;
 	uint32_t m_ioc_timercnt[4], m_ioc_timerout[4];
 	uint32_t m_vidc_vidstart, m_vidc_vidend, m_vidc_vidinit, m_vidc_vidcur,m_vidc_cinit;
-	uint32_t m_vidc_sndstart, m_vidc_sndend, m_vidc_sndcur;
+	uint32_t m_vidc_sndstart, m_vidc_sndend, m_vidc_sndcur, m_vidc_sndendcur;
 	uint8_t m_video_dma_on,m_audio_dma_on;
 	uint8_t m_vidc_pixel_clk;
 	uint8_t m_vidc_stereo_reg[8];

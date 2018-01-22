@@ -161,7 +161,7 @@ int
 SDL_EGL_LoadLibrary(_THIS, const char *egl_path, NativeDisplayType native_display)
 {
     void *dll_handle = NULL, *egl_dll_handle = NULL; /* The naming is counter intuitive, but hey, I just work here -- Gabriel */
-    char *path = NULL;
+    const char *path = NULL;
 #if SDL_VIDEO_DRIVER_WINDOWS || SDL_VIDEO_DRIVER_WINRT
     const char *d3dcompiler;
 #endif
@@ -558,7 +558,8 @@ int
 SDL_EGL_GetSwapInterval(_THIS)
 {
     if (!_this->egl_data) {
-        return SDL_SetError("EGL not initialized");
+        SDL_SetError("EGL not initialized");
+        return 0;
     }
     
     return _this->egl_data->egl_swapinterval;

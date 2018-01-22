@@ -59,6 +59,7 @@ chdman createhd -o ST125N.chd -chs 41921,1,1 -ss 512
 
 */
 
+#include "emu.h"
 #include <functional>
 
 #include "includes/rmnimbus.h"
@@ -231,7 +232,7 @@ void rmnimbus_state::machine_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("nimbus_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&rmnimbus_state::debug_command, this, _1, _2, _3));
+		machine().debugger().console().register_command("nimbus_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&rmnimbus_state::debug_command, this, _1, _2));
 
 		/* set up the instruction hook */
 		m_maincpu->debug()->set_instruction_hook(instruction_hook);
@@ -241,12 +242,12 @@ void rmnimbus_state::machine_start()
 	m_fdc->dden_w(0);
 }
 
-void rmnimbus_state::debug_command(int ref, int params, const char *param[])
+void rmnimbus_state::debug_command(int ref, const std::vector<std::string> &params)
 {
-	if (params > 0)
+	if (params.size() > 0)
 	{
 		int temp;
-		sscanf(param[0],"%d",&temp);
+		sscanf(params[0].c_str(), "%d", &temp);
 		m_debug_machine = temp;
 	}
 	else
@@ -1072,7 +1073,7 @@ READ8_MEMBER(rmnimbus_state::scsi_r)
 {
 	int result = 0;
 
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 	char drive[5];
 	floppy_image_device *floppy;
 
@@ -1152,7 +1153,7 @@ WRITE8_MEMBER(rmnimbus_state::fdc_ctl_w)
 
 WRITE8_MEMBER(rmnimbus_state::scsi_w)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 
 	if(LOG_DISK_HDD)
 		logerror("Nimbus HDCW at %05X write of %02X to %04X\n",pc,data,(offset*2)+0x410);
@@ -1271,7 +1272,7 @@ void rmnimbus_state::ipc_dumpregs()
 
 READ8_MEMBER(rmnimbus_state::nimbus_pc8031_r)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 	uint8_t   result;
 
 	switch(offset*2)
@@ -1295,7 +1296,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_r)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_w)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 
 	switch(offset*2)
 	{
@@ -1321,7 +1322,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_w)
 
 READ8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_r)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_iocpu->pc();
 	uint8_t   result = 0;
 
 	switch (offset & 0x01)
@@ -1346,7 +1347,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_r)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_iocpu->pc();
 
 	if(LOG_PC8031)
 		logerror("8031 PCIOW %04X write of %02X to %04X\n",pc,data,offset);
@@ -1385,7 +1386,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_iou_w)
 
 READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port_r)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_iocpu->pc();
 	uint8_t   result = 0;
 
 	if(LOG_PC8031_PORT)
@@ -1403,7 +1404,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_pc8031_port_r)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port_w)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_iocpu->pc();
 
 	switch (offset)
 	{
@@ -1434,7 +1435,7 @@ WRITE8_MEMBER(rmnimbus_state::nimbus_pc8031_port_w)
 /* IO Unit */
 READ8_MEMBER(rmnimbus_state::nimbus_iou_r)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 	uint8_t   result=0;
 
 	if(offset==0)
@@ -1450,7 +1451,7 @@ READ8_MEMBER(rmnimbus_state::nimbus_iou_r)
 
 WRITE8_MEMBER(rmnimbus_state::nimbus_iou_w)
 {
-	int pc=space.device().safe_pc();
+	int pc=m_maincpu->pc();
 
 	if(LOG_IOU)
 		logerror("Nimbus IOUW %08X write of %02X to %04X\n",pc,data,(offset*2)+0x92);
@@ -1486,7 +1487,7 @@ void rmnimbus_state::rmni_sound_reset()
 {
 	m_msm->reset_w(1);
 
-	m_last_playmode = MSM5205_S48_4B;
+	m_last_playmode = msm5205_device::S48_4B;
 	m_msm->playmode_w(m_last_playmode);
 
 	m_ay8910_a=0;

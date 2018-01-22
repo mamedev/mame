@@ -9,8 +9,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "i8089_channel.h"
+
+#include "i8089.h"
+
+#include "debugger.h"
 
 
 //**************************************************************************
@@ -18,7 +21,7 @@
 //**************************************************************************
 
 #define VERBOSE      1
-#define VERBOSE_DMA  1
+#define VERBOSE_DMA  0
 
 // channel control register fields
 #define CC_TMC     ((m_r[CC].w >>  0) & 0x07)   // terminate on masked compare
@@ -37,7 +40,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type I8089_CHANNEL = &device_creator<i8089_channel>;
+DEFINE_DEVICE_TYPE(I8089_CHANNEL, i8089_channel_device, "i8089_channel", "Intel 8089 I/O Channel")
 
 
 //**************************************************************************
@@ -45,11 +48,11 @@ const device_type I8089_CHANNEL = &device_creator<i8089_channel>;
 //**************************************************************************
 
 //-------------------------------------------------
-//  i8089_channel - constructor
+//  i8089_channel_device - constructor
 //-------------------------------------------------
 
-i8089_channel::i8089_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, I8089_CHANNEL, "Intel 8089 I/O Channel", tag, owner, clock, "i8089_channel", __FILE__),
+i8089_channel_device::i8089_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, I8089_CHANNEL, tag, owner, clock),
 	m_write_sintr(*this),
 	m_iop(nullptr),
 	m_icount(0),
@@ -65,7 +68,7 @@ i8089_channel::i8089_channel(const machine_config &mconfig, const char *tag, dev
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void i8089_channel::device_start()
+void i8089_channel_device::device_start()
 {
 	// get parent device
 	m_iop = downcast<i8089_device *>(owner());
@@ -91,7 +94,7 @@ void i8089_channel::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void i8089_channel::device_reset()
+void i8089_channel_device::device_reset()
 {
 	m_xfer_pending = false;
 
@@ -102,6 +105,8 @@ void i8089_channel::device_reset()
 		elem.t = 0;
 	}
 	m_prio = PRIO_IDLE;
+	m_load_hi = false;
+	m_store_hi = false;
 }
 
 
@@ -109,7 +114,7 @@ void i8089_channel::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-void i8089_channel::set_reg(int reg, uint32_t value, int tag)
+void i8089_channel_device::set_reg(int reg, uint32_t value, int tag)
 {
 	if((reg == BC) || (reg == IX) || (reg == CC) || (reg == MC))
 	{
@@ -134,14 +139,14 @@ void i8089_channel::set_reg(int reg, uint32_t value, int tag)
 }
 
 // channel status
-bool i8089_channel::executing()    { return BIT(m_r[PSW].w, 2); }
-bool i8089_channel::transferring() { return BIT(m_r[PSW].w, 6); }
-bool i8089_channel::priority()     { return BIT(m_r[PSW].w, 7); }
-int  i8089_channel::chan_prio()    { return m_prio; }
-bool i8089_channel::chained()      { return CC_CHAIN; }
-bool i8089_channel::lock()         { return CC_LOCK; }
+bool i8089_channel_device::executing()    { return BIT(m_r[PSW].w, 2); }
+bool i8089_channel_device::transferring() { return BIT(m_r[PSW].w, 6); }
+bool i8089_channel_device::priority()     { return BIT(m_r[PSW].w, 7); }
+int  i8089_channel_device::chan_prio()    { return m_prio; }
+bool i8089_channel_device::chained()      { return CC_CHAIN; }
+bool i8089_channel_device::lock()         { return CC_LOCK; }
 
-int16_t i8089_channel::displacement(int wb)
+int16_t i8089_channel_device::displacement(int wb)
 {
 	int16_t displacement = 0;
 
@@ -159,7 +164,7 @@ int16_t i8089_channel::displacement(int wb)
 	return displacement;
 }
 
-uint32_t i8089_channel::offset(int aa, int mm, int w)
+uint32_t i8089_channel_device::offset(int aa, int mm, int w)
 {
 	uint32_t offset = 0;
 	switch(aa)
@@ -182,14 +187,14 @@ uint32_t i8089_channel::offset(int aa, int mm, int w)
 	return offset & 0xfffff;
 }
 
-int8_t i8089_channel::imm8()
+int8_t i8089_channel_device::imm8()
 {
 	int8_t imm8 = (int8_t)m_iop->read_byte(m_r[TP].t, m_r[TP].w);
 	set_reg(TP, m_r[TP].w + 1);
 	return imm8;
 }
 
-int16_t i8089_channel::imm16()
+int16_t i8089_channel_device::imm16()
 {
 	int16_t imm16 = (int16_t)m_iop->read_word(m_r[TP].t, m_r[TP].w);
 	set_reg(TP, m_r[TP].w + 2);
@@ -197,7 +202,7 @@ int16_t i8089_channel::imm16()
 }
 
 // adjust task pointer and continue execution
-void i8089_channel::terminate_dma(int offset)
+void i8089_channel_device::terminate_dma(int offset)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): terminating dma transfer\n", shortname(), tag());
@@ -208,7 +213,7 @@ void i8089_channel::terminate_dma(int offset)
 	m_dma_state = DMA_IDLE;
 }
 
-int i8089_channel::execute_run()
+int i8089_channel_device::execute_run()
 {
 	m_icount = 0;
 
@@ -227,6 +232,8 @@ int i8089_channel::execute_run()
 			// we are no longer executing task blocks
 			m_r[PSW].w &= ~(1 << 2);
 			m_xfer_pending = false;
+			m_load_hi = false;
+			m_store_hi = false;
 
 			if (VERBOSE)
 			{
@@ -266,21 +273,23 @@ int i8089_channel::execute_run()
 					m_r[GA + CC_SOURCE].w += 2;
 				m_r[BC].w -= 2;
 			}
-			// destination is 16-bit, byte count is even
-			else if (BIT(m_r[PSW].w, 0) && !(m_r[BC].w & 1))
+			// destination is 16-bit, low byte
+			else if (BIT(m_r[PSW].w, 0) && !m_load_hi)
 			{
 				m_dma_value = m_iop->read_byte(m_r[GA + CC_SOURCE].t, m_r[GA + CC_SOURCE].w);
 				if(CC_FUNC & 1)
 					m_r[GA + CC_SOURCE].w++;
-				m_r[BC].w--;
+				if(--m_r[BC].w)
+					m_load_hi = true;
 			}
-			// destination is 16-bit, byte count is odd
-			else if (BIT(m_r[PSW].w, 0) && (m_r[BC].w & 1))
+			// destination is 16-bit, high byte
+			else if (BIT(m_r[PSW].w, 0) && m_load_hi)
 			{
 				m_dma_value |= m_iop->read_byte(m_r[GA + CC_SOURCE].t, m_r[GA + CC_SOURCE].w) << 8;
 				if(CC_FUNC & 1)
 					m_r[GA + CC_SOURCE].w++;
 				m_r[BC].w--;
+				m_load_hi = false;
 			}
 			// 8-bit transfer
 			else
@@ -297,7 +306,7 @@ int i8089_channel::execute_run()
 			if (VERBOSE_DMA)
 				logerror("[ %04x ]\n", m_dma_value);
 
-			if (BIT(m_r[PSW].w, 0) && (m_r[BC].w & 1))
+			if (BIT(m_r[PSW].w, 0) && m_load_hi)
 				m_dma_state = DMA_FETCH;
 			else if (CC_TRANS)
 				m_dma_state = DMA_TRANSLATE;
@@ -313,7 +322,12 @@ int i8089_channel::execute_run()
 
 		case DMA_WAIT_FOR_DEST_DRQ:
 			if (m_drq)
-				m_dma_state = DMA_STORE;
+			{
+				if(m_store_hi)
+					m_dma_state = DMA_STORE_BYTE_HIGH;
+				else
+					m_dma_state = DMA_STORE;
+			}
 			break;
 
 		case DMA_STORE:
@@ -357,8 +371,20 @@ int i8089_channel::execute_run()
 			if (VERBOSE_DMA)
 				logerror("%s('%s'): entering state: DMA_TERMINATE\n", shortname(), tag());
 
+			// do we need to read another byte?
+			if (BIT(m_r[PSW].w, 1) && !BIT(m_r[PSW].w, 0) && !m_store_hi)
+			{
+				if (CC_SYNC == 0x02)
+				{
+					m_store_hi = true;
+					m_dma_state = DMA_WAIT_FOR_DEST_DRQ;
+				}
+				else
+					m_dma_state = DMA_STORE_BYTE_HIGH;
+			}
+
 			// terminate on masked compare?
-			if (CC_TMC & 0x03)
+			else if (CC_TMC & 0x03)
 				fatalerror("%s('%s'): terminate on masked compare not supported\n", shortname(), tag());
 
 			// terminate on byte count?
@@ -369,18 +395,11 @@ int i8089_channel::execute_run()
 			else if (CC_TS)
 				fatalerror("%s('%s'): terminate on single transfer not supported\n", shortname(), tag());
 
-			// not terminated, continue transfer
 			else
-				// do we need to read another byte?
-				if (BIT(m_r[PSW].w, 1) && !BIT(m_r[PSW].w, 0))
-					if (CC_SYNC == 0x02)
-						m_dma_state = DMA_WAIT_FOR_DEST_DRQ;
-					else
-						m_dma_state = DMA_STORE_BYTE_HIGH;
-
-				// transfer done
-				else
-					m_dma_state = DMA_IDLE;
+			{
+				m_store_hi = false;
+				m_dma_state = DMA_IDLE;
+			}
 
 			break;
 
@@ -388,8 +407,9 @@ int i8089_channel::execute_run()
 			if (VERBOSE_DMA)
 				logerror("%s('%s'): entering state: DMA_STORE_BYTE_HIGH[ %02x ]\n", shortname(), tag(), (m_dma_value >> 8) & 0xff);
 
-			m_iop->write_byte(m_r[GA - CC_SOURCE].t, m_r[GB - CC_SOURCE].w, (m_dma_value >> 8) & 0xff);
-			m_r[GB - CC_SOURCE].w++;
+			m_iop->write_byte(m_r[GB - CC_SOURCE].t, m_r[GB - CC_SOURCE].w, (m_dma_value >> 8) & 0xff);
+			if(CC_FUNC & 2)
+				m_r[GB - CC_SOURCE].w++;
 			m_dma_state = DMA_TERMINATE;
 
 			break;
@@ -676,29 +696,29 @@ int i8089_channel::execute_run()
 	return m_icount;
 }
 
-void i8089_channel::examine_ccw(uint8_t ccw)
+void i8089_channel_device::examine_ccw(uint8_t ccw)
 {
 	// priority and bus load limit, bit 7 and 5
 	m_r[PSW].w = (m_r[PSW].w & 0x5f) | (ccw & 0xa0);
 
 	// acknowledge interrupt
-	if (BIT(ccw, 4))
+	if (BIT(ccw, 3))
 	{
 		m_write_sintr(0);
 		m_r[PSW].w &= ~(1 << 5);
 	}
 
 	// interrupt enable
-	if (BIT(ccw, 5))
+	if (BIT(ccw, 4))
 	{
-		if (BIT(ccw, 4))
+		if (BIT(ccw, 3))
 			m_r[PSW].w &= ~(1 << 4);
 		else
 			m_r[PSW].w |= 1 << 4;
 	}
 }
 
-void i8089_channel::attention()
+void i8089_channel_device::attention()
 {
 	// examine control byte
 	uint8_t ccw = m_iop->read_byte(m_r[CP].t, m_r[CP].w);
@@ -826,22 +846,23 @@ void i8089_channel::attention()
 	}
 }
 
-void i8089_channel::ca()
+void i8089_channel_device::ca()
 {
 	m_prio = PRIO_CHAN_ATTN;
 }
 
-WRITE_LINE_MEMBER( i8089_channel::ext_w )
+WRITE_LINE_MEMBER( i8089_channel_device::ext_w )
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ext_w: %d\n", shortname(), tag(), state);
-	if(transferring() && state)
+
+	if (transferring() && state)
 		terminate_dma((CC_TX - 1) * 4);
 }
 
-WRITE_LINE_MEMBER( i8089_channel::drq_w )
+WRITE_LINE_MEMBER( i8089_channel_device::drq_w )
 {
-	if (VERBOSE)
+	if (VERBOSE_DMA)
 		logerror("%s('%s'): drq_w: %d\n", shortname(), tag(), state);
 
 	m_drq = state;

@@ -11,9 +11,10 @@
 #ifndef _PSION_H_
 #define _PSION_H_
 
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "machine/nvram.h"
 #include "machine/psion_pack.h"
+#include "machine/timer.h"
 #include "video/hd44780.h"
 #include "sound/beep.h"
 
@@ -82,6 +83,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 
 	HD44780_PIXEL_UPDATE(lz_pixel_update);
+	void psion_2lines(machine_config &config);
+	void psion_4lines(machine_config &config);
+	void psionlam(machine_config &config);
+	void psioncm(machine_config &config);
+	void psionlz(machine_config &config);
+	void psionla(machine_config &config);
+	void psionp350(machine_config &config);
 };
 
 
@@ -99,6 +107,7 @@ public:
 	DECLARE_READ8_MEMBER( switchoff_r );
 
 	HD44780_PIXEL_UPDATE(psion1_pixel_update);
+	void psion1(machine_config &config);
 };
 
 #endif  // _PSION_H_

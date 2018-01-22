@@ -24,6 +24,7 @@
 
 /* Win32 thread management routines for SDL */
 
+#include "SDL_hints.h"
 #include "SDL_thread.h"
 #include "../SDL_thread_c.h"
 #include "../SDL_systhread.h"
@@ -32,6 +33,10 @@
 #ifndef SDL_PASSED_BEGINTHREAD_ENDTHREAD
 /* We'll use the C library from this DLL */
 #include <process.h>
+
+#ifndef STACK_SIZE_PARAM_IS_A_RESERVATION
+#define STACK_SIZE_PARAM_IS_A_RESERVATION 0x00010000
+#endif
 
 /* Cygwin gcc-3 ... MingW64 (even with a i386 host) does this like MSVC. */
 #if (defined(__MINGW32__) && (__GNUC__ < 4))
@@ -121,6 +126,7 @@ SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
 #endif /* SDL_PASSED_BEGINTHREAD_ENDTHREAD */
     pThreadStartParms pThreadParms =
         (pThreadStartParms) SDL_malloc(sizeof(tThreadStartParms));
+    const DWORD flags = thread->stacksize ? STACK_SIZE_PARAM_IS_A_RESERVATION : 0;
     if (!pThreadParms) {
         return SDL_OutOfMemory();
     }
@@ -129,15 +135,18 @@ SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
     /* Also save the real parameters we have to pass to thread function */
     pThreadParms->args = args;
 
+    /* thread->stacksize == 0 means "system default", same as win32 expects */
     if (pfnBeginThread) {
         unsigned threadid = 0;
         thread->handle = (SYS_ThreadHandle)
-            ((size_t) pfnBeginThread(NULL, 0, RunThreadViaBeginThreadEx,
-                                     pThreadParms, 0, &threadid));
+            ((size_t) pfnBeginThread(NULL, (unsigned int) thread->stacksize,
+                                     RunThreadViaBeginThreadEx,
+                                     pThreadParms, flags, &threadid));
     } else {
         DWORD threadid = 0;
-        thread->handle = CreateThread(NULL, 0, RunThreadViaCreateThread,
-                                      pThreadParms, 0, &threadid);
+        thread->handle = CreateThread(NULL, thread->stacksize,
+                                      RunThreadViaCreateThread,
+                                      pThreadParms, flags, &threadid);
     }
     if (thread->handle == NULL) {
         return SDL_SetError("Not enough resources to create thread");
@@ -145,9 +154,6 @@ SDL_SYS_CreateThread(SDL_Thread * thread, void *args)
     return 0;
 }
 
-#if 0  /* !!! FIXME: revisit this later. See https://bugzilla.libsdl.org/show_bug.cgi?id=2089 */
-#ifdef _MSC_VER
-#pragma warning(disable : 4733)
 #pragma pack(push,8)
 typedef struct tagTHREADNAME_INFO
 {
@@ -158,48 +164,26 @@ typedef struct tagTHREADNAME_INFO
 } THREADNAME_INFO;
 #pragma pack(pop)
 
-static EXCEPTION_DISPOSITION
-ignore_exception(void *a, void *b, void *c, void *d)
-{
-    return ExceptionContinueExecution;
-}
-#endif
-#endif
-
 void
 SDL_SYS_SetupThread(const char *name)
 {
-    if (name != NULL) {
-        #if 0 /* !!! FIXME: revisit this later. See https://bugzilla.libsdl.org/show_bug.cgi?id=2089 */
-        #if (defined(_MSC_VER) && defined(_M_IX86))
-        /* This magic tells the debugger to name a thread if it's listening.
-            The inline asm sets up SEH (__try/__except) without C runtime
-            support. See Microsoft Systems Journal, January 1997:
-            http://www.microsoft.com/msj/0197/exception/exception.aspx */
-        INT_PTR handler = (INT_PTR) ignore_exception;
+    if ((name != NULL) && IsDebuggerPresent()) {
         THREADNAME_INFO inf;
 
+        /* C# and friends will try to catch this Exception, let's avoid it. */
+        if (SDL_GetHintBoolean(SDL_HINT_WINDOWS_DISABLE_THREAD_NAMING, SDL_FALSE)) {
+            return;
+        }
+
+        /* This magic tells the debugger to name a thread if it's listening. */
+        SDL_zero(inf);
         inf.dwType = 0x1000;
         inf.szName = name;
         inf.dwThreadID = (DWORD) -1;
         inf.dwFlags = 0;
 
-        __asm {   /* set up SEH */
-            push handler
-            push fs:[0]
-            mov fs:[0],esp
-        }
-
-        /* The program itself should ignore this bogus exception. */
-        RaiseException(0x406D1388, 0, sizeof(inf)/sizeof(DWORD), (DWORD*)&inf);
-
-        __asm {  /* tear down SEH. */
-            mov eax,[esp]
-            mov fs:[0], eax
-            add esp, 8
-        }
-        #endif
-        #endif
+        /* The debugger catches this, renames the thread, continues on. */
+        RaiseException(0x406D1388, 0, sizeof(inf) / sizeof(ULONG), (const ULONG_PTR*) &inf);
     }
 }
 
@@ -230,11 +214,7 @@ SDL_SYS_SetThreadPriority(SDL_ThreadPriority priority)
 void
 SDL_SYS_WaitThread(SDL_Thread * thread)
 {
-#if __WINRT__
     WaitForSingleObjectEx(thread->handle, INFINITE, FALSE);
-#else
-    WaitForSingleObject(thread->handle, INFINITE);
-#endif
     CloseHandle(thread->handle);
 }
 

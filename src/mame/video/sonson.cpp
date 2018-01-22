@@ -114,9 +114,9 @@ WRITE8_MEMBER(sonson_state::sonson_scrollx_w)
 		m_bg_tilemap->set_scrollx(row, data);
 }
 
-WRITE8_MEMBER(sonson_state::sonson_flipscreen_w)
+WRITE_LINE_MEMBER(sonson_state::flipscreen_w)
 {
-	flip_screen_set(~data & 0x01);
+	flip_screen_set(!state);
 }
 
 TILE_GET_INFO_MEMBER(sonson_state::get_bg_tile_info)

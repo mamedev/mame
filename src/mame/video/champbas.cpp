@@ -114,7 +114,7 @@ PALETTE_INIT_MEMBER(champbas_state,exctsccr)
 	/* characters / sprites (3bpp) */
 	for (int i = 0; i < 0x100; i++)
 	{
-		int swapped_i = BITSWAP8(i, 2, 7, 6, 5, 4, 3, 1, 0);
+		int swapped_i = bitswap<8>(i, 2, 7, 6, 5, 4, 3, 1, 0);
 		uint8_t ctabentry = (color_prom[swapped_i] & 0x0f) | ((i & 0x80) >> 3);
 		palette.set_pen_indirect(i, ctabentry);
 	}
@@ -183,26 +183,21 @@ WRITE8_MEMBER(champbas_state::tilemap_w)
 	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER(champbas_state::gfxbank_w)
+WRITE_LINE_MEMBER(champbas_state::gfxbank_w)
 {
-	data &= 1;
-
-	if (m_gfx_bank != data)
-	{
-		m_gfx_bank = data;
-		m_bg_tilemap->mark_all_dirty();
-	}
+	m_gfx_bank = state;
+	m_bg_tilemap->mark_all_dirty();
 }
 
-WRITE8_MEMBER(champbas_state::palette_bank_w)
+WRITE_LINE_MEMBER(champbas_state::palette_bank_w)
 {
-	m_palette_bank = data & 1;
+	m_palette_bank = state;
 	m_bg_tilemap->set_palette_offset(m_palette_bank << 8);
 }
 
-WRITE8_MEMBER(champbas_state::flipscreen_w)
+WRITE_LINE_MEMBER(champbas_state::flipscreen_w)
 {
-	flip_screen_set(~data & 1);
+	flip_screen_set(!state);
 }
 
 

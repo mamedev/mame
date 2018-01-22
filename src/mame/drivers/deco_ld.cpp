@@ -114,6 +114,7 @@ Sound processor - 6502
 #include "machine/ldp1000.h"
 #include "machine/gen_latch.h"
 #include "machine/6850acia.h"
+#include "speaker.h"
 
 
 class deco_ld_state : public driver_device
@@ -162,6 +163,7 @@ public:
 	uint32_t screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
+	void rblaster(machine_config &config);
 };
 
 void deco_ld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank )
@@ -273,11 +275,10 @@ static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("IN1")
 	AM_RANGE(0x1004, 0x1004) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(decold_sound_cmd_w)
 	AM_RANGE(0x1005, 0x1005) AM_READ(sound_status_r)
-	//AM_RANGE(0x1006, 0x1006) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	//AM_RANGE(0x1007, 0x1007) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	//AM_RANGE(0x1006, 0x1007) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0x1006, 0x1006) AM_READ(acia_status_hack_r)
 	AM_RANGE(0x1007, 0x1007) AM_DEVREADWRITE("laserdisc", sony_ldp1000_device, status_r, command_w)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("vram0")
 	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("attr0")
@@ -455,7 +456,7 @@ void deco_ld_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( rblaster, deco_ld_state )
+MACHINE_CONFIG_START(deco_ld_state::rblaster)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502,8000000/2)
@@ -658,9 +659,9 @@ ROM_END
 
 
 
-GAME( 1983, begas,  0,       rblaster,  begas, driver_device,  0, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
-GAME( 1983, begas1, begas,   rblaster,  begas, driver_device,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobra,  0,       rblaster,  cobra, driver_device,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
-GAME( 1984, cobraa, cobra,   rblaster,  cobra, driver_device,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
+GAME( 1983, begas,  0,       rblaster,  begas,    deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 3)", MACHINE_NOT_WORKING )
+GAME( 1983, begas1, begas,   rblaster,  begas,    deco_ld_state,  0, ROT0, "Data East", "Bega's Battle (Revision 1)", MACHINE_NOT_WORKING )
+GAME( 1984, cobra,  0,       rblaster,  cobra,    deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 1)", MACHINE_NOT_WORKING )
+GAME( 1984, cobraa, cobra,   rblaster,  cobra,    deco_ld_state,  0, ROT0, "Data East", "Cobra Command (Data East LD, set 2)", MACHINE_NOT_WORKING ) // might be a prototype
 // Thunder Storm (Cobra Command Japanese version)
-GAME( 1985, rblaster,  0,    rblaster,  rblaster, driver_device,  0, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )
+GAME( 1985, rblaster,  0,    rblaster,  rblaster, deco_ld_state,  0, ROT0, "Data East", "Road Blaster (Data East LD)", MACHINE_NOT_WORKING )

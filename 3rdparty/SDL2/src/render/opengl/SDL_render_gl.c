@@ -390,7 +390,6 @@ GL_CreateRenderer(SDL_Window * window, Uint32 flags)
 {
     SDL_Renderer *renderer;
     GL_RenderData *data;
-    const char *hint;
     GLint value;
     Uint32 window_flags;
     int profile_mask = 0, major = 0, minor = 0;
@@ -450,7 +449,7 @@ GL_CreateRenderer(SDL_Window * window, Uint32 flags)
     renderer->GL_BindTexture = GL_BindTexture;
     renderer->GL_UnbindTexture = GL_UnbindTexture;
     renderer->info = GL_RenderDriver.info;
-    renderer->info.flags = (SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+    renderer->info.flags = SDL_RENDERER_ACCELERATED;
     renderer->driverdata = data;
     renderer->window = window;
 
@@ -528,8 +527,7 @@ GL_CreateRenderer(SDL_Window * window, Uint32 flags)
     }
 
     /* Check for shader support */
-    hint = SDL_GetHint(SDL_HINT_RENDER_OPENGL_SHADERS);
-    if (!hint || *hint != '0') {
+    if (SDL_GetHintBoolean(SDL_HINT_RENDER_OPENGL_SHADERS, SDL_TRUE)) {
         data->shaders = GL_CreateShaderContext();
     }
     SDL_LogInfo(SDL_LOG_CATEGORY_RENDER, "OpenGL shaders: %s",
@@ -594,7 +592,6 @@ static int
 GL_GetOutputSize(SDL_Renderer * renderer, int *w, int *h)
 {
     SDL_GL_GetDrawableSize(renderer->window, w, h);
-
     return 0;
 }
 
@@ -663,6 +660,11 @@ GL_CreateTexture(SDL_Renderer * renderer, SDL_Texture * texture)
     GLenum scaleMode;
 
     GL_ActivateRenderer(renderer);
+
+    if (texture->access == SDL_TEXTUREACCESS_TARGET &&
+        !renderdata->GL_EXT_framebuffer_object_supported) {
+        return SDL_SetError("Render targets not supported by OpenGL");
+    }
 
     if (!convert_format(renderdata, texture->format, &internalFormat,
                         &format, &type)) {
@@ -980,6 +982,10 @@ GL_SetRenderTarget(SDL_Renderer * renderer, SDL_Texture * texture)
 
     GL_ActivateRenderer(renderer);
 
+    if (!data->GL_EXT_framebuffer_object_supported) {
+        return SDL_SetError("Render targets not supported by OpenGL");
+    }
+
     if (texture == NULL) {
         data->glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         return 0;
@@ -1013,7 +1019,7 @@ GL_UpdateViewport(SDL_Renderer * renderer)
     } else {
         int w, h;
 
-        SDL_GetRendererOutputSize(renderer, &w, &h);
+        SDL_GL_GetDrawableSize(renderer->window, &w, &h);
         data->glViewport(renderer->viewport.x, (h - renderer->viewport.y - renderer->viewport.h),
                          renderer->viewport.w, renderer->viewport.h);
     }
@@ -1051,7 +1057,7 @@ GL_UpdateClipRect(SDL_Renderer * renderer)
         } else {
             int w, h;
 
-            SDL_GetRendererOutputSize(renderer, &w, &h);
+            SDL_GL_GetDrawableSize(renderer->window, &w, &h);
             data->glScissor(renderer->viewport.x + rect->x, h - renderer->viewport.y - rect->y - rect->h, rect->w, rect->h);
         }
     } else {
@@ -1089,21 +1095,17 @@ GL_SetBlendMode(GL_RenderData * data, int blendMode)
     if (blendMode != data->current.blendMode) {
         switch (blendMode) {
         case SDL_BLENDMODE_NONE:
-            data->glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
             data->glDisable(GL_BLEND);
             break;
         case SDL_BLENDMODE_BLEND:
-            data->glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
             data->glEnable(GL_BLEND);
             data->glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
             break;
         case SDL_BLENDMODE_ADD:
-            data->glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
             data->glEnable(GL_BLEND);
             data->glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ZERO, GL_ONE);
             break;
         case SDL_BLENDMODE_MOD:
-            data->glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
             data->glEnable(GL_BLEND);
             data->glBlendFuncSeparate(GL_ZERO, GL_SRC_COLOR, GL_ZERO, GL_ONE);
             break;
@@ -1141,7 +1143,15 @@ GL_RenderClear(SDL_Renderer * renderer)
                        (GLfloat) renderer->b * inv255f,
                        (GLfloat) renderer->a * inv255f);
 
+    if (renderer->clipping_enabled) {
+        data->glDisable(GL_SCISSOR_TEST);
+    }
+
     data->glClear(GL_COLOR_BUFFER_BIT);
+
+    if (renderer->clipping_enabled) {
+        data->glEnable(GL_SCISSOR_TEST);
+    }
 
     return 0;
 }
@@ -1409,7 +1419,7 @@ GL_RenderReadPixels(SDL_Renderer * renderer, const SDL_Rect * rect,
                     Uint32 pixel_format, void * pixels, int pitch)
 {
     GL_RenderData *data = (GL_RenderData *) renderer->driverdata;
-    Uint32 temp_format = SDL_PIXELFORMAT_ARGB8888;
+    Uint32 temp_format = renderer->target ? renderer->target->format : SDL_PIXELFORMAT_ARGB8888;
     void *temp_pixels;
     int temp_pitch;
     GLint internalFormat;
@@ -1426,7 +1436,11 @@ GL_RenderReadPixels(SDL_Renderer * renderer, const SDL_Rect * rect,
         return SDL_OutOfMemory();
     }
 
-    convert_format(data, temp_format, &internalFormat, &format, &type);
+    if (!convert_format(data, temp_format, &internalFormat, &format, &type)) {
+        SDL_free(temp_pixels);
+        return SDL_SetError("Texture format %s not supported by OpenGL",
+                            SDL_GetPixelFormatName(temp_format));
+    }
 
     SDL_GetRendererOutputSize(renderer, &w, &h);
 
@@ -1434,28 +1448,30 @@ GL_RenderReadPixels(SDL_Renderer * renderer, const SDL_Rect * rect,
     data->glPixelStorei(GL_PACK_ROW_LENGTH,
                         (temp_pitch / SDL_BYTESPERPIXEL(temp_format)));
 
-    data->glReadPixels(rect->x, (h-rect->y)-rect->h, rect->w, rect->h,
-                       format, type, temp_pixels);
+    data->glReadPixels(rect->x, renderer->target ? rect->y : (h-rect->y)-rect->h,
+                       rect->w, rect->h, format, type, temp_pixels);
 
     if (GL_CheckError("glReadPixels()", renderer) < 0) {
         SDL_free(temp_pixels);
         return -1;
     }
 
-    /* Flip the rows to be top-down */
-    length = rect->w * SDL_BYTESPERPIXEL(temp_format);
-    src = (Uint8*)temp_pixels + (rect->h-1)*temp_pitch;
-    dst = (Uint8*)temp_pixels;
-    tmp = SDL_stack_alloc(Uint8, length);
-    rows = rect->h / 2;
-    while (rows--) {
-        SDL_memcpy(tmp, dst, length);
-        SDL_memcpy(dst, src, length);
-        SDL_memcpy(src, tmp, length);
-        dst += temp_pitch;
-        src -= temp_pitch;
+    /* Flip the rows to be top-down if necessary */
+    if (!renderer->target) {
+        length = rect->w * SDL_BYTESPERPIXEL(temp_format);
+        src = (Uint8*)temp_pixels + (rect->h-1)*temp_pitch;
+        dst = (Uint8*)temp_pixels;
+        tmp = SDL_stack_alloc(Uint8, length);
+        rows = rect->h / 2;
+        while (rows--) {
+            SDL_memcpy(tmp, dst, length);
+            SDL_memcpy(dst, src, length);
+            SDL_memcpy(src, tmp, length);
+            dst += temp_pitch;
+            src -= temp_pitch;
+        }
+        SDL_stack_free(tmp);
     }
-    SDL_stack_free(tmp);
 
     status = SDL_ConvertPixels(rect->w, rect->h,
                                temp_format, temp_pixels, temp_pitch,

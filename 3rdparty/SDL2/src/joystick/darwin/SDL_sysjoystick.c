@@ -34,9 +34,6 @@
 #include "SDL_sysjoystick_c.h"
 #include "SDL_events.h"
 #include "../../haptic/darwin/SDL_syshaptic_c.h"    /* For haptic hot plugging */
-#if !SDL_EVENTS_DISABLED
-#include "../../events/SDL_events_c.h"
-#endif
 
 #define SDL_JOYSTICK_RUNLOOP_MODE CFSTR("SDLJoystick")
 
@@ -154,21 +151,7 @@ JoystickDeviceWasRemovedCallback(void *ctx, IOReturn result, void *sender)
     MacHaptic_MaybeRemoveDevice(device->ffservice);
 #endif
 
-/* !!! FIXME: why isn't there an SDL_PrivateJoyDeviceRemoved()? */
-#if !SDL_EVENTS_DISABLED
-    {
-        SDL_Event event;
-        event.type = SDL_JOYDEVICEREMOVED;
-
-        if (SDL_GetEventState(event.type) == SDL_ENABLE) {
-            event.jdevice.which = device->instance_id;
-            if ((SDL_EventOK == NULL)
-                || (*SDL_EventOK) (SDL_EventOKParam, &event)) {
-                SDL_PushEvent(&event);
-            }
-        }
-    }
-#endif /* !SDL_EVENTS_DISABLED */
+    SDL_PrivateJoystickRemoved(device->instance_id);
 }
 
 
@@ -249,6 +232,7 @@ AddHIDElement(const void *value, void *parameter)
                             case kHIDUsage_GD_DPadLeft:
                             case kHIDUsage_GD_Start:
                             case kHIDUsage_GD_Select:
+                            case kHIDUsage_GD_SystemMainMenu:
                                 if (!ElementAlreadyAdded(cookie, pDevice->firstButton)) {
                                     element = (recElement *) SDL_calloc(1, sizeof (recElement));
                                     if (element) {
@@ -422,6 +406,7 @@ JoystickDeviceWasAddedCallback(void *ctx, IOReturn res, void *sender, IOHIDDevic
 {
     recDevice *device;
     int device_index = 0;
+    io_service_t ioservice;
 
     if (res != kIOReturnSuccess) {
         return;
@@ -451,20 +436,11 @@ JoystickDeviceWasAddedCallback(void *ctx, IOReturn res, void *sender, IOHIDDevic
     device->instance_id = ++s_joystick_instance_id;
 
     /* We have to do some storage of the io_service_t for SDL_HapticOpenFromJoystick */
-
-#if MAC_OS_X_VERSION_MIN_REQUIRED < 1060
-    if (IOHIDDeviceGetService != NULL) {  /* weak reference: available in 10.6 and later. */
-#endif
-
-        const io_service_t ioservice = IOHIDDeviceGetService(ioHIDDeviceObject);
+    ioservice = IOHIDDeviceGetService(ioHIDDeviceObject);
 #if SDL_HAPTIC_IOKIT
-        if ((ioservice) && (FFIsForceFeedback(ioservice) == FF_OK)) {
-            device->ffservice = ioservice;
-            MacHaptic_MaybeAddDevice(ioservice);
-        }
-#endif
-
-#if MAC_OS_X_VERSION_MIN_REQUIRED < 1060
+    if ((ioservice) && (FFIsForceFeedback(ioservice) == FF_OK)) {
+        device->ffservice = ioservice;
+        MacHaptic_MaybeAddDevice(ioservice);
     }
 #endif
 
@@ -483,21 +459,7 @@ JoystickDeviceWasAddedCallback(void *ctx, IOReturn res, void *sender, IOHIDDevic
         ++device_index;  /* bump by one since we counted by pNext. */
     }
 
-/* !!! FIXME: why isn't there an SDL_PrivateJoyDeviceAdded()? */
-#if !SDL_EVENTS_DISABLED
-    {
-        SDL_Event event;
-        event.type = SDL_JOYDEVICEADDED;
-
-        if (SDL_GetEventState(event.type) == SDL_ENABLE) {
-            event.jdevice.which = device_index;
-            if ((SDL_EventOK == NULL)
-                || (*SDL_EventOK) (SDL_EventOKParam, &event)) {
-                SDL_PushEvent(&event);
-            }
-        }
-    }
-#endif /* !SDL_EVENTS_DISABLED */
+    SDL_PrivateJoystickAdded(device_index);
 }
 
 static SDL_bool

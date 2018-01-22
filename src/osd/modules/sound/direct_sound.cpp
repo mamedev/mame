@@ -12,7 +12,6 @@
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <mmsystem.h>
 
@@ -20,8 +19,6 @@
 #undef WINNT
 #include <dsound.h>
 #undef interface
-#undef min
-#undef max
 
 // MAME headers
 #include "emu.h"
@@ -407,10 +404,10 @@ HRESULT sound_direct_sound::dsound_init()
 #ifdef SDLMAME_WIN32
 		SDL_SysWMinfo wminfo;
 		SDL_VERSION(&wminfo.version);
-		SDL_GetWindowWMInfo(osd_common_t::s_window_list.front()->platform_window<SDL_Window*>(), &wminfo);
+		SDL_GetWindowWMInfo(std::dynamic_pointer_cast<sdl_window_info>(osd_common_t::s_window_list.front())->platform_window(), &wminfo);
 		HWND const window = wminfo.info.win.window;
 #else // SDLMAME_WIN32
-		HWND const window = osd_common_t::s_window_list.front()->platform_window<HWND>();
+		HWND const window = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
 #endif // SDLMAME_WIN32
 		result = m_dsound->SetCooperativeLevel(window, DSSCL_PRIORITY);
 	}

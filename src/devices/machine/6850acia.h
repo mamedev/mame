@@ -8,12 +8,11 @@
 
 *********************************************************************/
 
+#ifndef MAME_MACHINE_6850ACIA_H
+#define MAME_MACHINE_6850ACIA_H
+
 #pragma once
 
-#ifndef __ACIA6850_H__
-#define __ACIA6850_H__
-
-#include "emu.h"
 
 #define MCFG_ACIA6850_TXD_HANDLER(_devcb) \
 	devcb = &acia6850_device::set_txd_handler(*device, DEVCB_##_devcb);
@@ -31,14 +30,16 @@ public:
 	acia6850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_txd_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_rts_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_rts_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<acia6850_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<acia6850_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rts_handler(device_t &device, Object &&cb) { return downcast<acia6850_device &>(device).m_rts_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<acia6850_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( control_w );
 	DECLARE_READ8_MEMBER( status_r );
 	DECLARE_WRITE8_MEMBER( data_w );
 	DECLARE_READ8_MEMBER( data_r );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
 
 	DECLARE_WRITE_LINE_MEMBER( write_cts );
 	DECLARE_WRITE_LINE_MEMBER( write_dcd );
@@ -47,7 +48,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_txc );
 
 protected:
-	acia6850_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	acia6850_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -141,6 +142,6 @@ private:
 };
 
 // device type definition
-extern const device_type ACIA6850;
+DECLARE_DEVICE_TYPE(ACIA6850, acia6850_device)
 
-#endif /* __ACIA6850_H__ */
+#endif // MAME_MACHINE_6850ACIA_H

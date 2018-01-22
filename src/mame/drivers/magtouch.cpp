@@ -102,6 +102,8 @@ public:
 	DECLARE_WRITE8_MEMBER(magtouch_io_w);
 	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
 	virtual void machine_start() override;
+	static void magtouch_sb_conf(device_t *device);
+	void magtouch(machine_config &config);
 };
 
 /*************************************
@@ -177,12 +179,13 @@ static DEVICE_INPUT_DEFAULTS_START( magtouch_sb_def )
 	DEVICE_INPUT_DEFAULTS("CONFIG", 0x03, 0x01)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_FRAGMENT( magtouch_sb_conf )
-	MCFG_DEVICE_MODIFY("pc_joy")
+void magtouch_state::magtouch_sb_conf(device_t *device)
+{
+	device = device->subdevice("pc_joy");
 	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( magtouch, magtouch_state )
+MACHINE_CONFIG_START(magtouch_state::magtouch)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, 14318180*2)   /* I386 ?? Mhz */
 	MCFG_CPU_PROGRAM_MAP(magtouch_map)
@@ -243,4 +246,4 @@ ROM_START(magtouch)
 	ROM_FILL(0x511ba, 1, 0xeb) // skip csum
 ROM_END
 
-GAME( 1995, magtouch,   0,         magtouch,  magtouch, driver_device, 0, ROT0, "Micro Manufacturing",     "Magical Touch", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1995, magtouch,   0,         magtouch,  magtouch, magtouch_state, 0, ROT0, "Micro Manufacturing",     "Magical Touch", MACHINE_UNEMULATED_PROTECTION )

@@ -8,7 +8,8 @@
 
 #include "cpu/z80/z80.h"
 #include "video/bufsprite.h"
-
+#include "machine/taito68705interface.h"
+#include "screen.h"
 
 class slapfght_state : public driver_device
 {
@@ -17,7 +18,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, "mcu"),
+		m_bmcu(*this, "bmcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -31,7 +32,7 @@ public:
 	// devices, memory pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -46,8 +47,8 @@ public:
 	enum getstar_id
 	{
 		GETSTUNK = 0, /* unknown for inclusion of possible new sets */
-		GETSTAR,
-		GETSTARJ,
+		//GETSTAR,
+		//GETSTARJ,
 		GETSTARB1,    /* "good" bootleg with same behaviour as 'getstarj' */
 		GETSTARB2     /* "lame" bootleg with lots of ingame bugs */
 	} m_getstar_id;
@@ -61,20 +62,6 @@ public:
 	bool m_main_irq_enabled;
 	bool m_sound_nmi_enabled;
 
-	bool m_mcu_sent;
-	bool m_main_sent;
-	uint8_t m_from_main;
-	uint8_t m_from_mcu;
-	uint8_t m_portA_in;
-	uint8_t m_portA_out;
-	uint8_t m_ddrA;
-	uint8_t m_portB_in;
-	uint8_t m_portB_out;
-	uint8_t m_ddrB;
-	uint8_t m_portC_in;
-	uint8_t m_portC_out;
-	uint8_t m_ddrC;
-
 	int m_getstar_status;
 	int m_getstar_sequence_index;
 	int m_getstar_status_state;
@@ -84,9 +71,9 @@ public:
 	uint8_t m_gs_e;
 	uint8_t m_tigerhb_cmd;
 
-	DECLARE_WRITE8_MEMBER(sound_reset_w);
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(prg_bank_w);
+	DECLARE_READ8_MEMBER(tigerh_mcu_status_r);
+	DECLARE_WRITE_LINE_MEMBER(sound_reset_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
 	DECLARE_READ8_MEMBER(vblank_r);
 	DECLARE_WRITE8_MEMBER(sound_nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -96,31 +83,10 @@ public:
 	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
 	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
 	DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(palette_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
 
-	DECLARE_WRITE8_MEMBER(tigerh_mcu_w);
-	DECLARE_READ8_MEMBER(tigerh_mcu_r);
-	DECLARE_READ8_MEMBER(tigerh_mcu_status_r);
-	DECLARE_READ8_MEMBER(tigerh_68705_portA_r);
-	DECLARE_WRITE8_MEMBER(tigerh_68705_portA_w);
-	DECLARE_WRITE8_MEMBER(tigerh_68705_ddrA_w);
-	DECLARE_READ8_MEMBER(tigerh_68705_portB_r);
-	DECLARE_WRITE8_MEMBER(tigerh_68705_portB_w);
-	DECLARE_WRITE8_MEMBER(tigerh_68705_ddrB_w);
-	DECLARE_READ8_MEMBER(tigerh_68705_portC_r);
-	DECLARE_WRITE8_MEMBER(tigerh_68705_portC_w);
-	DECLARE_WRITE8_MEMBER(tigerh_68705_ddrC_w);
-
-	DECLARE_READ8_MEMBER(slapfight_68705_portA_r);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_portA_w);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrA_w);
-	DECLARE_READ8_MEMBER(slapfight_68705_portB_r);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_portB_w);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrB_w);
-	DECLARE_READ8_MEMBER(slapfight_68705_portC_r);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_portC_w);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrC_w);
+	DECLARE_WRITE8_MEMBER(scroll_from_mcu_w);
 
 	DECLARE_READ8_MEMBER(getstar_mcusim_r);
 	DECLARE_WRITE8_MEMBER(getstar_mcusim_w);
@@ -131,11 +97,8 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_MACHINE_RESET(getstar);
 
 	void init_banks();
-	DECLARE_DRIVER_INIT(getstarj);
-	DECLARE_DRIVER_INIT(getstar);
 	DECLARE_DRIVER_INIT(getstarb1);
 	DECLARE_DRIVER_INIT(slapfigh);
 	DECLARE_DRIVER_INIT(getstarb2);
@@ -153,4 +116,13 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_nmi);
+	void tigerhb2(machine_config &config);
+	void tigerhb1(machine_config &config);
+	void tigerh(machine_config &config);
+	void getstarb2(machine_config &config);
+	void slapfighb2(machine_config &config);
+	void getstarb1(machine_config &config);
+	void perfrman(machine_config &config);
+	void slapfigh(machine_config &config);
+	void slapfighb1(machine_config &config);
 };

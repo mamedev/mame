@@ -239,8 +239,8 @@ void bosco_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 		int set_a, set_b;
 
 		/* two sets of stars controlled by these bits */
-		set_a = (m_bosco_starblink[0] & 1);
-		set_b = (m_bosco_starblink[1] & 1) | 2;
+		set_a = m_videolatch->q4_r();
+		set_b = m_videolatch->q5_r() | 2;
 
 		for (star_cntr = 0;star_cntr < MAX_STARS;star_cntr++)
 		{
@@ -301,7 +301,7 @@ uint32_t bosco_state::screen_update_bosco(screen_device &screen, bitmap_ind16 &b
 }
 
 
-void bosco_state::screen_eof_bosco(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(bosco_state::screen_vblank_bosco)
 {
 	// falling edge
 	if (!state)

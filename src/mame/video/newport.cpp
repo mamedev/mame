@@ -80,24 +80,14 @@ static inline void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_l
 #define XMAP1_MODETBLIDX    m_XMAP1.nRegister[0x07]
 
 
-const device_type NEWPORT_VIDEO = &device_creator<newport_video_device>;
+DEFINE_DEVICE_TYPE(NEWPORT_VIDEO, newport_video_device, "newport_video", "SGI Newport graphics board")
 
 
 newport_video_device::newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-				: device_t(mconfig, NEWPORT_VIDEO, "SGI Newport graphics board", tag, owner, clock, "newport_video", __FILE__)
+	: device_t(mconfig, NEWPORT_VIDEO, tag, owner, clock)
 {
 }
 
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void newport_video_device::device_config_complete()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup

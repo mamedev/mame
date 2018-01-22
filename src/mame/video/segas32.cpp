@@ -213,6 +213,9 @@ void segas32_state::common_start(int multi32)
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
+	m_vblank_end_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas32_state::end_of_vblank_int), this));
+	m_update_sprites_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas32_state::update_sprites), this));
+
 	int tmap;
 
 	/* remember whether or not we are multi32 */
@@ -296,7 +299,7 @@ void segas32_state::system32_set_vblank(int state)
 {
 	/* at the end of VBLANK is when automatic sprite rendering happens */
 	if (!state)
-		machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(segas32_state::update_sprites),this), 1);
+		m_update_sprites_timer->adjust(attotime::from_usec(50), 1);
 }
 
 

@@ -154,15 +154,26 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "bus/vme/vme.h"
+#include "bus/vme/vme_mvme350.h"
 #include "machine/z80scc.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 #include "machine/timekpr.h"
 
-#define VERBOSE 1
+#define LOG_GENERAL 0x01
+#define LOG_SETUP   0x02
+#define LOG_PRINTF  0x04
 
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-#if VERBOSE >= 2
+#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+
+#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
+#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+
+#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
+#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
+
+#if VERBOSE & LOG_PRINTF
 #define logerror printf
 #endif
 
@@ -204,12 +215,13 @@ mvme147_state(const machine_config &mconfig, device_type type, const char *tag)
 	//DECLARE_WRITE16_MEMBER (vme_a16_w);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
+	void mvme147(machine_config &config);
 protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<scc85C30_device> m_sccterm;
-	required_device<scc85C30_device> m_sccterm2;
+	required_device<scc85c30_device> m_sccterm;
+	required_device<scc85c30_device> m_sccterm2;
 
 	// Pointer to System ROMs needed by bootvect_r and masking RAM buffer for post reset accesses
 	uint32_t  *m_sysrom;
@@ -238,8 +250,8 @@ static ADDRESS_MAP_START (mvme147_mem, AS_PROGRAM, 32, mvme147_state)
 	AM_RANGE (0xfffe1018, 0xfffe102f) AM_READWRITE8(pcc8_r,   pcc8_w,  0xffffffff) /* PCC 8 bits registers */
 	AM_RANGE (0xfffe2000, 0xfffe201b) AM_READWRITE8(vmechip_r, vmechip_w, 0x00ff00ff) /* VMEchip 8 bits registers on odd adresses */
 
-	AM_RANGE (0xfffe3000, 0xfffe3003) AM_DEVREADWRITE8("scc",  scc85C30_device, ba_cd_inv_r, ba_cd_inv_w, 0xffffffff) /* Port 1&2 - Dual serial port Z80-SCC */
-	AM_RANGE (0xfffe3800, 0xfffe3803) AM_DEVREADWRITE8("scc2", scc85C30_device, ba_cd_inv_r, ba_cd_inv_w, 0xffffffff) /* Port 3&4 - Dual serial port Z80-SCC */
+	AM_RANGE (0xfffe3000, 0xfffe3003) AM_DEVREADWRITE8("scc",  scc85c30_device, ba_cd_inv_r, ba_cd_inv_w, 0xffffffff) /* Port 1&2 - Dual serial port Z80-SCC */
+	AM_RANGE (0xfffe3800, 0xfffe3803) AM_DEVREADWRITE8("scc2", scc85c30_device, ba_cd_inv_r, ba_cd_inv_w, 0xffffffff) /* Port 3&4 - Dual serial port Z80-SCC */
 
 	//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
 	//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
@@ -252,7 +264,7 @@ INPUT_PORTS_END
 /* Start it up */
 void mvme147_state::machine_start ()
 {
-	LOG(("--->%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
 	m_sysrom = (uint32_t*)(memregion ("roms")->base () + 0x800000);
@@ -262,7 +274,7 @@ void mvme147_state::machine_start ()
 
 void mvme147_state::machine_reset ()
 {
-	LOG(("--->%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 
 	/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
 	if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
@@ -276,9 +288,9 @@ READ32_MEMBER (mvme147_state::bootvect_r){
 }
 
 WRITE32_MEMBER (mvme147_state::bootvect_w){
-	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
-	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
+	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
 /****
@@ -286,21 +298,21 @@ WRITE32_MEMBER (mvme147_state::bootvect_w){
  */
 #if 0 /* Doesn't compile atm */
 READ32_MEMBER (mvme147_state::pcc32_r){
-	LOG(("--->%s[%04x]", FUNCNAME, offset));
+	LOG("%s[%04x]", FUNCNAME, offset);
 	switch(offset)
 	{
 	default:
-		LOG(("unsupported register\n"));
+		LOG(" - unsupported register\n");
 	}
 	return 0x00;
 }
 
 WRITE32_MEMBER (mvme147_state::pcc32_w){
-	LOG(("--->%s[%04x]= %08lx", FUNCNAME, offset, data));
+	LOG("%s[%04x]= %08lx", FUNCNAME, offset, data);
 	switch(offset)
 	{
 	default:
-		LOG(("unsupported register\n"));
+		LOG("- unsupported register\n");
 	}
 }
 #endif
@@ -314,29 +326,29 @@ WRITE32_MEMBER (mvme147_state::pcc32_w){
 READ16_MEMBER (mvme147_state::pcc16_r){
 	uint16_t ret = 0;
 
-	LOG(("Call to %s[%04x]", FUNCNAME, offset));
+	LOG("Call to %s[%04x]", FUNCNAME, offset);
 	switch(offset)
 	{
-	case  P16_TIMER1_PRELOAD - P16BASE   : LOG((" -> %02x Timer 1 preload - not implemented\n", ret)); break;
-	case  P16_TIMER1_COUNT   - P16BASE   : LOG((" -> %02x Timer 1 count - not implemented\n", ret)); break;
-	case  P16_TIMER2_PRELOAD - P16BASE   : LOG((" -> %02x Timer 2 preload - not implemented\n", ret)); break;
-	case  P16_TIMER2_COUNT   - P16BASE   : LOG((" -> %02x Timer 2 count - not implemented\n", ret)); break;
+	case  P16_TIMER1_PRELOAD - P16BASE   : LOG(" -> %02x Timer 1 preload - not implemented\n", ret); break;
+	case  P16_TIMER1_COUNT   - P16BASE   : LOG(" -> %02x Timer 1 count - not implemented\n", ret); break;
+	case  P16_TIMER2_PRELOAD - P16BASE   : LOG(" -> %02x Timer 2 preload - not implemented\n", ret); break;
+	case  P16_TIMER2_COUNT   - P16BASE   : LOG(" -> %02x Timer 2 count - not implemented\n", ret); break;
 	default:
-		LOG((" -> %02x unsupported register\n", ret));
+		LOG(" -> %02x unsupported register\n", ret);
 	}
 	return ret;
 }
 
 WRITE16_MEMBER (mvme147_state::pcc16_w){
-	LOG(("Call to %s[%04x] <- %04x - ", FUNCNAME, offset, data));
+	LOG("Call to %s[%04x] <- %04x - ", FUNCNAME, offset, data);
 	switch(offset)
 	{
-	case    P16_TIMER1_PRELOAD - P16BASE   : LOG(("Timer 1 preload - not implemented\n")); break;
-	case    P16_TIMER1_COUNT   - P16BASE   : LOG(("Timer 1 count - not implemented\n")); break;
-	case    P16_TIMER2_PRELOAD - P16BASE   : LOG(("Timer 2 preload - not implemented\n")); break;
-	case    P16_TIMER2_COUNT   - P16BASE   : LOG(("Timer 2 count - not implemented\n")); break;
+	case    P16_TIMER1_PRELOAD - P16BASE   : LOG("Timer 1 preload - not implemented\n"); break;
+	case    P16_TIMER1_COUNT   - P16BASE   : LOG("Timer 1 count - not implemented\n"); break;
+	case    P16_TIMER2_PRELOAD - P16BASE   : LOG("Timer 2 preload - not implemented\n"); break;
+	case    P16_TIMER2_COUNT   - P16BASE   : LOG("Timer 2 count - not implemented\n"); break;
 	default:
-	LOG(("unsupported register\n"));
+	LOG("unsupported register\n");
 	}
 }
 
@@ -371,22 +383,22 @@ WRITE16_MEMBER (mvme147_state::pcc16_w){
 READ8_MEMBER (mvme147_state::pcc8_r){
 	uint8_t ret = 0;
 
-	LOG(("Call to %s[%04x]      ", FUNCNAME, offset));
+	LOG("Call to %s[%04x]      ", FUNCNAME, offset);
 	switch(offset + P8BASE)
 	{
-	case P8_TIMER1_INT_CNTL  : LOG((" -> %02x    - Timer 1 Interrupt Control  - not implemented\n", ret)); break;
-	case P8_TIMER1_CNTL  : LOG((" -> %02x    - Timer 1 Control - not implemented\n", ret)); break;
-	case P8_TIMER2_INT_CNTL  : LOG((" -> %02x    - Timer 2 Interrupt Control - not implemented\n", ret)); break;
-	case P8_TIMER2_CNTL  : LOG((" -> %02x    - Timer 2 Control - not implemented\n", ret)); break;
-	case P8_ACFAIL_INT_CNTL  : LOG((" -> %02x    - AC Fail Interrupt Control Register - not implemented\n", ret)); break;
-	case P8_WDOG_TIMER_CNTL  : LOG((" -> %02x    - Watchdog Timer Control Register - not implemented\n", ret)); break;
-	case P8_PRINTER_INT_CNTL : LOG((" -> %02x    - Printer Interrupt Control Register - not implemented\n", ret)); break;
-	case P8_PRINTER_CNTL     : LOG((" -> %02x    - Printer Control Register - not implemented\n", ret)); break;
-	case P8_DMA_INT_CNTL     : LOG((" -> %02x    - DMA Interrupt Control Register - not implemented\n", ret)); break;
-	case P8_DMA_CNTL_STAT    : LOG((" -> %02x    - DMA Control and Status Register - not implemented\n", ret)); break;
-	case P8_BUSERR_CNTL  : LOG((" -> %02x    - Bus Error Interrupt Control Register - not implemented\n", ret)); break;
-	case P8_DMA_STATUS   : LOG((" -> %02x    - DMA Status Register - not implemented\n", ret)); break;
-	case P8_ABORT_INT_CNTL   : LOG((" -> %02x    - Abort Interrupt Control Register - not fully implemented\n", ret));
+	case P8_TIMER1_INT_CNTL     : LOG(" -> %02x    - Timer 1 Interrupt Control  - not implemented\n", ret); break;
+	case P8_TIMER1_CNTL         : LOG(" -> %02x    - Timer 1 Control - not implemented\n", ret); break;
+	case P8_TIMER2_INT_CNTL     : LOG(" -> %02x    - Timer 2 Interrupt Control - not implemented\n", ret); break;
+	case P8_TIMER2_CNTL         : LOG(" -> %02x    - Timer 2 Control - not implemented\n", ret); break;
+	case P8_ACFAIL_INT_CNTL     : LOG(" -> %02x    - AC Fail Interrupt Control Register - not implemented\n", ret); break;
+	case P8_WDOG_TIMER_CNTL     : LOG(" -> %02x    - Watchdog Timer Control Register - not implemented\n", ret); break;
+	case P8_PRINTER_INT_CNTL    : LOG(" -> %02x    - Printer Interrupt Control Register - not implemented\n", ret); break;
+	case P8_PRINTER_CNTL        : LOG(" -> %02x    - Printer Control Register - not implemented\n", ret); break;
+	case P8_DMA_INT_CNTL        : LOG(" -> %02x    - DMA Interrupt Control Register - not implemented\n", ret); break;
+	case P8_DMA_CNTL_STAT       : LOG(" -> %02x    - DMA Control and Status Register - not implemented\n", ret); break;
+	case P8_BUSERR_CNTL         : LOG(" -> %02x    - Bus Error Interrupt Control Register - not implemented\n", ret); break;
+	case P8_DMA_STATUS          : LOG(" -> %02x    - DMA Status Register - not implemented\n", ret); break;
+	case P8_ABORT_INT_CNTL      : LOG(" -> %02x    - Abort Interrupt Control Register - not fully implemented\n", ret);
 		/* Bit 3 When this bit is high, the interrupt is enabled. The interrupt is disabled when this bit is low. This bit is cleared by reset.
 		 Bit 6 This bit indicates the current state of the ABORT switch. When this bit is low, the ABORT switch is not pressed. When this bit is
 		   high, the ABORT switch is pressed.
@@ -395,46 +407,46 @@ READ8_MEMBER (mvme147_state::pcc8_r){
 		   it remains cleared until the next leading edge of interrupt enable and abort. This bit is cleared by reset. */
 		ret = 0; /* Always return reset values for now */
 		break;
-	case P8_TABADD_FC_CNTL   : LOG((" -> %02x    - Table Address Function Code Register - not implemented\n", ret)); break;
-	case P8_SERIAL_INT_CNTL  : LOG((" -> %02x    - Serial Port Interrupt Control Register - not implemented\n", ret)); break;
-	case P8_GEN_PURP_CNTL    : LOG((" -> %02x    - General Purpose Control Register - not implemented\n", ret)); break;
-	case P8_LAN_INT_CNTL     : LOG((" -> %02x    - LAN Interrupt Control Register - not implemented\n", ret)); break;
-	case P8_GEN_PURP_STAT    : LOG((" -> %02x    - General Purpose Status Register\n", ret));
+	case P8_TABADD_FC_CNTL   : LOG(" -> %02x    - Table Address Function Code Register - not implemented\n", ret); break;
+	case P8_SERIAL_INT_CNTL  : LOG(" -> %02x    - Serial Port Interrupt Control Register - not implemented\n", ret); break;
+	case P8_GEN_PURP_CNTL    : LOG(" -> %02x    - General Purpose Control Register - not implemented\n", ret); break;
+	case P8_LAN_INT_CNTL     : LOG(" -> %02x    - LAN Interrupt Control Register - not implemented\n", ret); break;
+	case P8_GEN_PURP_STAT    : LOG(" -> %02x    - General Purpose Status Register\n", ret);
 		ret = m_genpurp_stat;
 		break;
-	case P8_SCSI_INT_CNTL    : LOG((" -> %02x    - SCSI Port Interrupt Control Register - not implemented\n", ret)); break;
-	case P8_SLAVE_BASE_ADDR  : LOG((" -> %02x    - Slave Base Address Register - not implemented\n", ret)); break;
-	case P8_SWI_1_CNTL   : LOG((" -> %02x    - Software Interrupt 1 Control Register - not implemented\n", ret)); break;
-	case P8_INT_VECT_BASE    : LOG((" -> %02x    - Interrupt Vector Base - not implemented\n", ret)); break;
-	case P8_SWI_2_CNTL   : LOG((" -> %02x    - Software Interrupt 2 Control Register - not implemented\n", ret)); break;
-	case P8_REVISION_LEVEL   : LOG((" -> %02x    - PCC Revision Level Register - not implemented\n", ret)); break;
-	case P8_PRINTER_STATUS   : LOG((" -> %02x    - Printer Status Register - not implemented\n", ret)); break;
+	case P8_SCSI_INT_CNTL   : LOG(" -> %02x    - SCSI Port Interrupt Control Register - not implemented\n", ret); break;
+	case P8_SLAVE_BASE_ADDR : LOG(" -> %02x    - Slave Base Address Register - not implemented\n", ret); break;
+	case P8_SWI_1_CNTL      : LOG(" -> %02x    - Software Interrupt 1 Control Register - not implemented\n", ret); break;
+	case P8_INT_VECT_BASE   : LOG(" -> %02x    - Interrupt Vector Base - not implemented\n", ret); break;
+	case P8_SWI_2_CNTL      : LOG(" -> %02x    - Software Interrupt 2 Control Register - not implemented\n", ret); break;
+	case P8_REVISION_LEVEL  : LOG(" -> %02x    - PCC Revision Level Register - not implemented\n", ret); break;
+	case P8_PRINTER_STATUS  : LOG(" -> %02x    - Printer Status Register - not implemented\n", ret); break;
 	default:
-		LOG((" -> %02x    - unsupported register\n", ret));
+		LOG(" -> %02x    - unsupported register\n", ret);
 	}
 	return ret;
 }
 
 WRITE8_MEMBER (mvme147_state::pcc8_w){
-	LOG(("Call to %s[%04x] <- %02x    - ", FUNCNAME, offset, data));
+	LOG("Call to %s[%04x] <- %02x    - ", FUNCNAME, offset, data);
 	switch(offset + P8BASE)
 	{
-	case P8_TIMER1_INT_CNTL  : LOG(("Timer 1 Interrupt Control - not implemented\n")); break;
-	case P8_TIMER1_CNTL  : LOG(("Timer 1 Control - not implemented\n")); break;
-	case P8_TIMER2_INT_CNTL  : LOG(("Timer 2 Interrupt Control - not implemented\n")); break;
-	case P8_TIMER2_CNTL  : LOG(("Timer 2 Control - not implemented\n")); break;
-	case P8_ACFAIL_INT_CNTL  : LOG(("AC Fail Interrupt Control Register - not implemented\n")); break;
-	case P8_WDOG_TIMER_CNTL  : LOG(("Watchdog Timer Control Register - not implemented\n")); break;
-	case P8_PRINTER_INT_CNTL : LOG(("Printer Interrupt Control Register - not implemented\n")); break;
-	case P8_PRINTER_CNTL     : LOG(("Printer Control Register - not implemented\n")); break;
-	case P8_DMA_INT_CNTL     : LOG(("DMA Interrupt Control Register - not implemented\n")); break;
-	case P8_DMA_CNTL_STAT    : LOG(("DMA Control and Status Register - not implemented\n")); break;
-	case P8_BUSERR_CNTL  : LOG(("Bus Error Interrupt Control Register - not implemented\n")); break;
-	case P8_DMA_STATUS   : LOG(("DMA Status Register - not implemented\n")); break;
-	case P8_ABORT_INT_CNTL   : LOG(("Abort Interrupt Control Register - not implemented\n")); break;
-	case P8_TABADD_FC_CNTL   : LOG(("Table Address Function Code Register - not implemented\n")); break;
-	case P8_SERIAL_INT_CNTL  : LOG(("Serial Port Interrupt Control Register - not implemented\n")); break;
-	case P8_GEN_PURP_CNTL    : LOG(("General Purpose Control Register - not implemented\n"));
+	case P8_TIMER1_INT_CNTL : LOG("Timer 1 Interrupt Control - not implemented\n"); break;
+	case P8_TIMER1_CNTL     : LOG("Timer 1 Control - not implemented\n"); break;
+	case P8_TIMER2_INT_CNTL : LOG("Timer 2 Interrupt Control - not implemented\n"); break;
+	case P8_TIMER2_CNTL     : LOG("Timer 2 Control - not implemented\n"); break;
+	case P8_ACFAIL_INT_CNTL : LOG("AC Fail Interrupt Control Register - not implemented\n"); break;
+	case P8_WDOG_TIMER_CNTL : LOG("Watchdog Timer Control Register - not implemented\n"); break;
+	case P8_PRINTER_INT_CNTL: LOG("Printer Interrupt Control Register - not implemented\n"); break;
+	case P8_PRINTER_CNTL    : LOG("Printer Control Register - not implemented\n"); break;
+	case P8_DMA_INT_CNTL    : LOG("DMA Interrupt Control Register - not implemented\n"); break;
+	case P8_DMA_CNTL_STAT   : LOG("DMA Control and Status Register - not implemented\n"); break;
+	case P8_BUSERR_CNTL     : LOG("Bus Error Interrupt Control Register - not implemented\n"); break;
+	case P8_DMA_STATUS      : LOG("DMA Status Register - not implemented\n"); break;
+	case P8_ABORT_INT_CNTL  : LOG("Abort Interrupt Control Register - not implemented\n"); break;
+	case P8_TABADD_FC_CNTL  : LOG("Table Address Function Code Register - not implemented\n"); break;
+	case P8_SERIAL_INT_CNTL : LOG("Serial Port Interrupt Control Register - not implemented\n"); break;
+	case P8_GEN_PURP_CNTL   : LOG("General Purpose Control Register - not implemented\n");
 		/*Bits 0-1 These bits control local RAM parity checking. These bits should not be enabled on the MVME147-010.
 		     These bits are cleared by reset. x0 = parity disabled, x1 = parity enabled
 		Bit  2   This bit is used to test the parity generating and checking logic. When this bit is low, correct parity is written to the DRAM;
@@ -449,8 +461,8 @@ WRITE8_MEMBER (mvme147_state::pcc8_w){
 		 TODO: Bit 4-7 needs to be implemented
 		*/
 		break;
-	case P8_LAN_INT_CNTL     : LOG(("LAN Interrupt Control Register - not implemented\n")); break;
-	case P8_GEN_PURP_STAT    : LOG(("General Purpose Status Register\n"));
+	case P8_LAN_INT_CNTL     : LOG("LAN Interrupt Control Register - not implemented\n"); break;
+	case P8_GEN_PURP_STAT    : LOG("General Purpose Status Register\n");
 		/* Bit 0 This bit is set when a parity error occurs while the local processor is accessing RAM. This bit is cleared by writing a 1 to it.
 		   This bit is cleared by reset.
 		 Bit 1 This bit is set when a power-up reset occurs. It is cleared by writing a 1 to it.
@@ -459,15 +471,15 @@ WRITE8_MEMBER (mvme147_state::pcc8_w){
 		m_genpurp_stat &= ((data & 1) ? ~1 : 0xff); // Check if parity error bit needs to be cleared
 		m_genpurp_stat &= ((data & 2) ? ~2 : 0xff); // Check if power up reset bit needs to be cleared
 		break;
-	case P8_SCSI_INT_CNTL    : LOG(("SCSI Port Interrupt Control Register - not implemented\n")); break;
-	case P8_SLAVE_BASE_ADDR  : LOG(("Slave Base Address Register - not implemented\n")); break;
-	case P8_SWI_1_CNTL   : LOG(("Software Interrupt 1 Control Register - not implemented\n")); break;
-	case P8_INT_VECT_BASE    : LOG(("Interrupt Vector Base - not implemented\n")); break;
-	case P8_SWI_2_CNTL   : LOG(("Software Interrupt 2 Control Register - not implemented\n")); break;
-	case P8_REVISION_LEVEL   : LOG(("PCC Revision Level Register - not implemented\n")); break;
-	case P8_PRINTER_DATA     : LOG(("Printer Data Register - not implemented\n")); break;
+	case P8_SCSI_INT_CNTL   : LOG("SCSI Port Interrupt Control Register - not implemented\n"); break;
+	case P8_SLAVE_BASE_ADDR : LOG("Slave Base Address Register - not implemented\n"); break;
+	case P8_SWI_1_CNTL      : LOG("Software Interrupt 1 Control Register - not implemented\n"); break;
+	case P8_INT_VECT_BASE   : LOG("Interrupt Vector Base - not implemented\n"); break;
+	case P8_SWI_2_CNTL      : LOG("Software Interrupt 2 Control Register - not implemented\n"); break;
+	case P8_REVISION_LEVEL  : LOG("PCC Revision Level Register - not implemented\n"); break;
+	case P8_PRINTER_DATA    : LOG("Printer Data Register - not implemented\n"); break;
 	default:
-		LOG(("unsupported register\n"));
+		LOG("unsupported register\n");
 	}
 }
 
@@ -494,11 +506,11 @@ WRITE8_MEMBER (mvme147_state::pcc8_w){
 READ8_MEMBER (mvme147_state::vmechip_r){
 	uint8_t ret = 0;
 
-	LOG(("Call to %s[%04x]      ", FUNCNAME, offset));
+	LOG("Call to %s[%04x]      ", FUNCNAME, offset);
 	switch(offset * 2 + VCBASE)
 	{
 	case VC_SYS_CNTL_CONF    :
-		LOG((" -> %02x - System Controller Configuration Register - not implemented\n", ret));
+		LOG(" -> %02x - System Controller Configuration Register - not implemented\n", ret);
 		ret = m_vc_cntl_conf;
 		break;
 	case VC_VMEBUS_REQ_CONF  :
@@ -531,11 +543,11 @@ READ8_MEMBER (mvme147_state::vmechip_r){
 		   This bit is cleared by any reset.
 	*/
 		ret = 1 << 6; /* Let BUG147 think we are bus master. TODO: Implement proper VME bus signalling */
-		LOG((" -> %02x - VMEbus Requester Configuration Register - not implemented\n", ret));
+		LOG(" -> %02x - VMEbus Requester Configuration Register - not implemented\n", ret);
 		break;
-	case VC_MASTER_CONF  : LOG((" -> %02x - Master Configuration Register - not implemented\n", ret)); break;
-	case VC_SLAVE_CONF   : LOG((" -> %02x - Slave Configuration Register - not implemented\n", ret)); break;
-	case VC_TIMER_CONF   : LOG((" -> %02x - Timer Configuration Register - not implemented\n", ret));
+	case VC_MASTER_CONF  : LOG(" -> %02x - Master Configuration Register - not implemented\n", ret); break;
+	case VC_SLAVE_CONF   : LOG(" -> %02x - Slave Configuration Register - not implemented\n", ret); break;
+	case VC_TIMER_CONF   : LOG(" -> %02x - Timer Configuration Register - not implemented\n", ret);
 	/*Bits 0-1 These two bits configure the local time-out period. They are set to 1 by any reset.
 	       LBTO1 LBTO0 Time-Out Period
 	    0     0    102 microseconds
@@ -563,44 +575,44 @@ READ8_MEMBER (mvme147_state::vmechip_r){
 	       This causes the arbiter to arbitrate any pending requests for the bus. This bit is set to 1 by SYSRESET.
 	*/
 		break;
-	case VC_SLAVE_ADR_MOD    : LOG((" -> %02x - Slave Address Modifier Register - not implemented\n", ret)); break;
-	case VC_MASTER_ADR_MOD   : LOG((" -> %02x - Master Address Modifier Register - not implemented\n", ret)); break;
-	case VC_INT_HNDL_MASK    : LOG((" -> %02x - Interrupt Handler Mask Register - not implemented\n", ret)); break;
-	case VC_UTIL_INT_MASK    : LOG((" -> %02x - Utility Interrupt Mask Register - not implemented\n", ret)); break;
-	case VC_UTIL_INT_VECT    : LOG((" -> %02x - Utility Interrupt Vector Register - not implemented\n", ret)); break;
-	case VC_INT_REQUEST  : LOG((" -> %02x - Interrupt Request Register - not implemented\n", ret)); break;
-	case VC_VMEBUS_STAT_ID   : LOG((" -> %02x - VMEbus Status/ID Register - not implemented\n", ret)); break;
-	case VC_BUS_ERR_STATUS   : LOG((" -> %02x - Bus Error Status Register - not implemented\n", ret)); break;
-	case VC_GCSR_BASE_ADR    : LOG((" -> %02x - GCSR Base Address Configuration Register - not implemented\n", ret)); break;
+	case VC_SLAVE_ADR_MOD   : LOG(" -> %02x - Slave Address Modifier Register - not implemented\n", ret); break;
+	case VC_MASTER_ADR_MOD  : LOG(" -> %02x - Master Address Modifier Register - not implemented\n", ret); break;
+	case VC_INT_HNDL_MASK   : LOG(" -> %02x - Interrupt Handler Mask Register - not implemented\n", ret); break;
+	case VC_UTIL_INT_MASK   : LOG(" -> %02x - Utility Interrupt Mask Register - not implemented\n", ret); break;
+	case VC_UTIL_INT_VECT   : LOG(" -> %02x - Utility Interrupt Vector Register - not implemented\n", ret); break;
+	case VC_INT_REQUEST     : LOG(" -> %02x - Interrupt Request Register - not implemented\n", ret); break;
+	case VC_VMEBUS_STAT_ID  : LOG(" -> %02x - VMEbus Status/ID Register - not implemented\n", ret); break;
+	case VC_BUS_ERR_STATUS  : LOG(" -> %02x - Bus Error Status Register - not implemented\n", ret); break;
+	case VC_GCSR_BASE_ADR   : LOG(" -> %02x - GCSR Base Address Configuration Register - not implemented\n", ret); break;
 	default:
-		LOG(("unsupported register"));
+		LOG("unsupported register");
 	}
 	return ret;
 }
 
 WRITE8_MEMBER (mvme147_state::vmechip_w){
-	LOG(("Call to %s[%04x] <- %02x - ", FUNCNAME, offset, data));
+	LOG("Call to %s[%04x] <- %02x - ", FUNCNAME, offset, data);
 	switch(offset * 2 + VCBASE)
 	{
 	case VC_SYS_CNTL_CONF    :
-		LOG(("System Controller Configuration Register - not implemented\n"));
+		LOG("System Controller Configuration Register - not implemented\n");
 		m_vc_cntl_conf = data & 0xff;
 		break;
-	case VC_VMEBUS_REQ_CONF  : LOG(("VMEbus Requester Configuration Register - not implemented\n")); break;
-	case VC_MASTER_CONF  : LOG(("Master Configuration Register - not implemented\n")); break;
-	case VC_SLAVE_CONF   : LOG(("Slave Configuration Register - not implemented\n")); break;
-	case VC_TIMER_CONF   : LOG(("Timer Configuration Register - not implemented\n")); break;
-	case VC_SLAVE_ADR_MOD    : LOG(("Slave Address Modifier Register - not implemented\n")); break;
-	case VC_MASTER_ADR_MOD   : LOG(("Master Address Modifier Register - not implemented\n")); break;
-	case VC_INT_HNDL_MASK    : LOG(("Interrupt Handler Mask Register - not implemented\n")); break;
-	case VC_UTIL_INT_MASK    : LOG(("Utility Interrupt Mask Register - not implemented\n")); break;
-	case VC_UTIL_INT_VECT    : LOG(("Utility Interrupt Vector Register - not implemented\n")); break;
-	case VC_INT_REQUEST  : LOG(("Interrupt Request Register - not implemented\n")); break;
-	case VC_VMEBUS_STAT_ID   : LOG(("VMEbus Status/ID Register - not implemented\n")); break;
-	case VC_BUS_ERR_STATUS   : LOG(("Bus Error Status Register - not implemented\n")); break;
-	case VC_GCSR_BASE_ADR    : LOG(("GCSR Base Address Configuration Register - not implemented\n")); break;
+	case VC_VMEBUS_REQ_CONF : LOG("VMEbus Requester Configuration Register - not implemented\n"); break;
+	case VC_MASTER_CONF     : LOG("Master Configuration Register - not implemented\n"); break;
+	case VC_SLAVE_CONF      : LOG("Slave Configuration Register - not implemented\n"); break;
+	case VC_TIMER_CONF      : LOG("Timer Configuration Register - not implemented\n"); break;
+	case VC_SLAVE_ADR_MOD   : LOG("Slave Address Modifier Register - not implemented\n"); break;
+	case VC_MASTER_ADR_MOD  : LOG("Master Address Modifier Register - not implemented\n"); break;
+	case VC_INT_HNDL_MASK   : LOG("Interrupt Handler Mask Register - not implemented\n"); break;
+	case VC_UTIL_INT_MASK   : LOG("Utility Interrupt Mask Register - not implemented\n"); break;
+	case VC_UTIL_INT_VECT   : LOG("Utility Interrupt Vector Register - not implemented\n"); break;
+	case VC_INT_REQUEST     : LOG("Interrupt Request Register - not implemented\n"); break;
+	case VC_VMEBUS_STAT_ID  : LOG("VMEbus Status/ID Register - not implemented\n"); break;
+	case VC_BUS_ERR_STATUS  : LOG("Bus Error Status Register - not implemented\n"); break;
+	case VC_GCSR_BASE_ADR   : LOG("GCSR Base Address Configuration Register - not implemented\n"); break;
 	default:
-		LOG(("unsupported register\n"));
+		LOG("unsupported register\n");
 	}
 }
 
@@ -608,31 +620,37 @@ WRITE8_MEMBER (mvme147_state::vmechip_w){
 #if 0
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (mvme147_state::vme_a24_r){
-	LOG (logerror ("vme_a24_r\n"));
+	LOG("%s\n", FUNCNAME);
 	return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (mvme147_state::vme_a24_w){
-	LOG (logerror ("vme_a24_w\n"));
+	LOG("%s\n", FUNCNAME);
 }
 
 READ16_MEMBER (mvme147_state::vme_a16_r){
-	LOG (logerror ("vme_16_r\n"));
+	LOG("%s\n", FUNCNAME);
 	return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (mvme147_state::vme_a16_w){
-	LOG (logerror ("vme_a16_w\n"));
+	LOG("%s\n", FUNCNAME);
 }
 #endif
+
+static SLOT_INTERFACE_START(mvme147_vme_cards)
+	SLOT_INTERFACE("mvme350", VME_MVME350)
+SLOT_INTERFACE_END
 
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (mvme147, mvme147_state)
+MACHINE_CONFIG_START(mvme147_state::mvme147)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68030, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP (mvme147_mem)
+	MCFG_VME_DEVICE_ADD("vme")
+	MCFG_VME_SLOT_ADD ("vme", 1, mvme147_vme_cards, nullptr)
 
 	MCFG_M48T02_ADD("m48t18") /* t08 differs only in accepted voltage levels compared to t18 */
 
@@ -643,8 +661,8 @@ static MACHINE_CONFIG_START (mvme147, mvme147_state)
 	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
 
 	MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc85C30_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc85C30_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc85c30_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc85c30_device, ctsa_w))
 
 	MCFG_SCC85C30_ADD("scc2", SCC_CLOCK, 0, 0, 0, 0 )
 MACHINE_CONFIG_END
@@ -652,8 +670,9 @@ MACHINE_CONFIG_END
 /* ROM definitions */
 ROM_START (mvme147)
 	ROM_REGION32_BE(0xf00000, "roms", 0)
+	ROM_DEFAULT_BIOS("147bug-v2.44")
 
-	ROM_SYSTEM_BIOS(0, "147bug v2.44", "MVME147 147bug v2.44")
+	ROM_SYSTEM_BIOS(0, "147bug-v2.44", "MVME147 147bug v2.44")
 	ROMX_LOAD("147bug-2.44-U22.BIN", 0x800000, 0x20000, CRC (da09ce8a) SHA1 (3eaa8fa802187d9b08f453ff1ba64f5113a195a9), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("147bug-2.44-U30.BIN", 0x800001, 0x20000, CRC (f883e17d) SHA1 (01fe43e5ddfd3cf8aabb5a5959c80a8b5ec5d895), ROM_SKIP(1) | ROM_BIOS(1))
 /*
@@ -680,7 +699,7 @@ ROM_START (mvme147)
  * channel B is identical but resets Channel B of course, SCC2 is also identical except using interrupt vector 71
  */
 
-	ROM_SYSTEM_BIOS(1, "147bug v2.43", "MVME147 147bug v2.43")
+	ROM_SYSTEM_BIOS(1, "147bug-v2.43", "MVME147 147bug v2.43")
 	ROMX_LOAD("5741B42E.BIN", 0x800000, 0x20000, CRC (2ba98f97) SHA1 (5f18c6dd6a7b03067890f0164ef3d37ced907d7f), ROM_SKIP(1) | ROM_BIOS(2))
 	ROMX_LOAD("5741B41E.BIN", 0x800001, 0x20000, CRC (dfa014f2) SHA1 (ff9db90a05c295819ce7ca7c1a6ac67b04003728), ROM_SKIP(1) | ROM_BIOS(2))
 /*
@@ -693,5 +712,5 @@ ROM_START (mvme147)
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT COMPANY                  FULLNAME          FLAGS */
-COMP (1989, mvme147,      0,      0,       mvme147,        mvme147, driver_device, 0,   "Motorola",   "MVME-147", MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+//    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT    CLASS          INIT COMPANY       FULLNAME    FLAGS
+COMP (1989, mvme147,      0,      0,       mvme147,        mvme147, mvme147_state, 0,   "Motorola",   "MVME-147", MACHINE_NO_SOUND_HW )

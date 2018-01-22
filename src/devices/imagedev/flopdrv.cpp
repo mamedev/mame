@@ -498,7 +498,7 @@ legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,i
 	int cnt = 0;
 	for (i=0;i<4;i++) {
 		legacy_floppy_image_device *disk = floppy_get_device(machine,i);
-		if (disk->floppy_get_drive_type()==ftype) {
+		if (disk && disk->floppy_get_drive_type()==ftype) {
 			if (cnt==drive) {
 				return disk;
 			}
@@ -508,9 +508,9 @@ legacy_floppy_image_device *floppy_get_device_by_type(running_machine &machine,i
 	return nullptr;
 }
 
-int floppy_get_drive(device_t *image)
+static int floppy_get_drive(device_t *image)
 {
-	int drive =0;
+	int drive = -1;
 	if (strcmp(image->tag(), ":" FLOPPY_0) == 0) drive = 0;
 	if (strcmp(image->tag(), ":" FLOPPY_1) == 0) drive = 1;
 	if (strcmp(image->tag(), ":" FLOPPY_2) == 0) drive = 2;
@@ -523,14 +523,14 @@ int floppy_get_drive_by_type(legacy_floppy_image_device *image,int ftype)
 	int i,drive =0;
 	for (i=0;i<4;i++) {
 		legacy_floppy_image_device *disk = floppy_get_device(image->machine(),i);
-		if (disk->floppy_get_drive_type()==ftype) {
+		if (disk && disk->floppy_get_drive_type()==ftype) {
 			if (image==disk) {
 				return drive;
 			}
 			drive++;
 		}
 	}
-	return drive;
+	return -1;
 }
 
 int floppy_get_count(running_machine &machine)
@@ -641,6 +641,10 @@ WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_stp_w )
 
 		/* update track 0 line with new status */
 		//m_out_tk00_func(m_tk00);
+
+		/* inform disk image of step operation so it can cache information */
+		if (exists())
+			m_track = m_current_track;
 	}
 
 	m_stp = state;
@@ -690,48 +694,19 @@ READ_LINE_MEMBER( legacy_floppy_image_device::floppy_ready_r )
 }
 
 // device type definition
-const device_type LEGACY_FLOPPY = &device_creator<legacy_floppy_image_device>;
+DEFINE_DEVICE_TYPE(LEGACY_FLOPPY, legacy_floppy_image_device, "legacy_floppy_image", "Floppy Disk")
 
 //-------------------------------------------------
 //  legacy_floppy_image_device - constructor
 //-------------------------------------------------
 
 legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, LEGACY_FLOPPY, "Floppy Disk", tag, owner, clock, "legacy_floppy_image", __FILE__),
-		device_image_interface(mconfig, *this),
-		m_out_idx_func(*this),
-		m_drtn(0),
-		m_stp(0),
-		m_wtg(0),
-		m_mon(0),
-		m_idx(0),
-		m_tk00(0),
-		m_wpt(0),
-		m_rdy(0),
-		m_dskchg(0),
-		m_drive_id(0),
-		m_active(0),
-		m_config(nullptr),
-		m_flags(0),
-		m_max_track(0),
-		m_num_sides(0),
-		m_current_track(0),
-		m_index_timer(nullptr),
-		m_index_pulse_callback(nullptr),
-		m_rpm(0.0f),
-		m_id_index(0),
-		m_controller(nullptr),
-		m_floppy(nullptr),
-		m_track(0),
-		m_load_proc(nullptr),
-		m_unload_proc(nullptr),
-		m_floppy_drive_type(0)
+	: legacy_floppy_image_device(mconfig, LEGACY_FLOPPY, tag, owner, clock)
 {
-	memset(&m_extension_list,0,sizeof(m_extension_list));
 }
 
-legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		m_out_idx_func(*this),
 		m_drtn(0),
@@ -743,7 +718,7 @@ legacy_floppy_image_device::legacy_floppy_image_device(const machine_config &mco
 		m_wpt(0),
 		m_rdy(0),
 		m_dskchg(0),
-		m_drive_id(0),
+		m_drive_id(-1),
 		m_active(0),
 		m_config(nullptr),
 		m_flags(0),
@@ -817,19 +792,19 @@ void legacy_floppy_image_device::device_start()
 void legacy_floppy_image_device::device_config_complete()
 {
 	m_extension_list[0] = '\0';
-	const struct FloppyFormat *floppy_options = m_config->formats;
-	for (int i = 0; floppy_options[i].construct; i++)
+	if (m_config)
 	{
-		// only add if creatable
-		if (floppy_options[i].param_guidelines) {
-			// allocate a new format and append it to the list
-			add_format(floppy_options[i].name, floppy_options[i].description, floppy_options[i].extensions, floppy_options[i].param_guidelines);
+		const struct FloppyFormat *floppy_options = m_config->formats;
+		for (int i = 0; floppy_options && floppy_options[i].construct; i++)
+		{
+			// only add if creatable
+			if (floppy_options[i].param_guidelines) {
+				// allocate a new format and append it to the list
+				add_format(floppy_options[i].name, floppy_options[i].description, floppy_options[i].extensions, floppy_options[i].param_guidelines);
+			}
+			image_specify_extension(m_extension_list, 256, floppy_options[i].extensions);
 		}
-		image_specify_extension( m_extension_list, 256, floppy_options[i].extensions );
 	}
-
-	// set brief and instance name
-	update_names();
 }
 
 image_init_result legacy_floppy_image_device::call_create(int format_type, util::option_resolution *format_options)

@@ -2867,7 +2867,7 @@ avi_file::error avi_file_impl::chunk_overwrite(std::uint32_t type, const void *d
 
 
 /*-------------------------------------------------
-    write_initial_headers - write out the inital
+    write_initial_headers - write out the initial
     set of AVI and stream headers
 -------------------------------------------------*/
 

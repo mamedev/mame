@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "i82439tx.h"
 
-const device_type I82439TX_NEW = &device_creator<i82439tx_host_device>;
+DEFINE_DEVICE_TYPE(I82439TX_NEW, i82439tx_host_device, "i82439tx_new", "Intel 82439TX northbridge")
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, i82439tx_host_device)
 	AM_RANGE(0x50, 0x53) AM_READWRITE8(pcon_r,   pcon_w,   0x000000ff)
@@ -10,8 +11,7 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i82439tx_host_device)
 	AM_RANGE(0x54, 0x57) AM_READWRITE8(dramec_r, dramec_w, 0x00ff0000)
 	AM_RANGE(0x54, 0x57) AM_READWRITE8(dramc_r,  dramc_w,  0xff000000)
 	AM_RANGE(0x58, 0x5b) AM_READWRITE8(dramt_r,  dramt_w,  0x000000ff)
-	AM_RANGE(0x58, 0x5b) AM_READWRITE8(pam0_r,   pam0_w,   0xffffff00)
-	AM_RANGE(0x5c, 0x5f) AM_READWRITE8(pam3_r,   pam3_w,   0xffffffff)
+	AM_RANGE(0x58, 0x5f) AM_READWRITE8(pam_r,    pam_w,    0xffffffff)
 	AM_RANGE(0x60, 0x67) AM_READWRITE8(drb_r,    drb_w,    0xffffffff)
 	AM_RANGE(0x68, 0x6b) AM_READWRITE8(drt_r,    drt_w,    0x000000ff)
 	AM_RANGE(0x68, 0x6b) AM_READWRITE8(drat_r,   drat_w,   0x0000ff00)
@@ -25,7 +25,7 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i82439tx_host_device)
 ADDRESS_MAP_END
 
 i82439tx_host_device::i82439tx_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_host_device(mconfig, I82439TX_NEW, "i82439tx northbridge", tag, owner, clock, "i82439tx", __FILE__)
+	: pci_host_device(mconfig, I82439TX_NEW, tag, owner, clock)
 {
 }
 
@@ -211,27 +211,15 @@ WRITE8_MEMBER(i82439tx_host_device::dramt_w)
 	logerror("dramt = %02x\n", dramt);
 }
 
-READ8_MEMBER (i82439tx_host_device::pam0_r)
+READ8_MEMBER (i82439tx_host_device::pam_r)
 {
-	return pam[offset];
+	return pam[offset - 1];
 }
 
-WRITE8_MEMBER(i82439tx_host_device::pam0_w)
+WRITE8_MEMBER(i82439tx_host_device::pam_w)
 {
-	pam[offset] = data;
-	logerror("pam[%d] = %02x\n", offset, pam[offset]);
-	remap_cb();
-}
-
-READ8_MEMBER (i82439tx_host_device::pam3_r)
-{
-	return pam[3+offset];
-}
-
-WRITE8_MEMBER(i82439tx_host_device::pam3_w)
-{
-	pam[3+offset] = data;
-	logerror("pam[%d] = %02x\n", 3+offset, pam[3+offset]);
+	pam[offset - 1] = data;
+	logerror("pam[%d] = %02x\n", offset - 1, pam[offset - 1]);
 	remap_cb();
 }
 

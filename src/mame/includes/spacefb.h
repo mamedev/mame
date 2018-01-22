@@ -6,6 +6,7 @@
 
 ****************************************************************************/
 #include "sound/samples.h"
+#include "screen.h"
 /*
  *  SPACEFB_PIXEL_CLOCK clocks the star generator circuit.  The rest of
  *  the graphics use a clock half of SPACEFB_PIXEL_CLOCK, thus creating
@@ -57,8 +58,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port_1_w);
 	DECLARE_WRITE8_MEMBER(port_2_w);
 	DECLARE_READ8_MEMBER(audio_p2_r);
-	DECLARE_READ8_MEMBER(audio_t0_r);
-	DECLARE_READ8_MEMBER(audio_t1_r);
+	DECLARE_READ_LINE_MEMBER(audio_t0_r);
+	DECLARE_READ_LINE_MEMBER(audio_t1_r);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -76,6 +77,8 @@ public:
 	void draw_sprite(offs_t offs, pen_t *pens, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flip);
 	void draw_objects(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void spacefb(machine_config &config);
+	void spacefb_audio(machine_config &config);
 protected:
 
 	enum
@@ -85,6 +88,3 @@ protected:
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
-
-/*----------- defined in audio/spacefb.c -----------*/
-MACHINE_CONFIG_EXTERN( spacefb_audio );

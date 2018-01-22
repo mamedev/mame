@@ -99,6 +99,8 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class dreamwld_state : public driver_device
@@ -149,11 +151,13 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_dreamwld(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_dreamwld);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void baryon(machine_config &config);
+	void dreamwld(machine_config &config);
 };
 
 
@@ -279,7 +283,7 @@ void dreamwld_state::video_start()
 
 }
 
-void dreamwld_state::screen_eof_dreamwld(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(dreamwld_state::screen_vblank_dreamwld)
 {
 	// rising edge
 	if (state)
@@ -423,12 +427,12 @@ READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 	return dat << 24;
 }
 
-static ADDRESS_MAP_START( oki1_map, AS_0, 8, dreamwld_state )
+static ADDRESS_MAP_START( oki1_map, 0, 8, dreamwld_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki1bank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki2_map, AS_0, 8, dreamwld_state )
+static ADDRESS_MAP_START( oki2_map, 0, 8, dreamwld_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki2bank")
 ADDRESS_MAP_END
@@ -454,7 +458,7 @@ static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32, dreamwld_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM  AM_WRITENOP
 
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_SHARE("bg_videoram")
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_SHARE("bg2_videoram")
 	AM_RANGE(0x804000, 0x8043ff) AM_READWRITE16(lineram16_r, lineram16_w, 0xffffffff)  // linescroll
@@ -790,7 +794,7 @@ void dreamwld_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( baryon, dreamwld_state )
+MACHINE_CONFIG_START(dreamwld_state::baryon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* 16MHz verified */
@@ -804,7 +808,7 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 	MCFG_SCREEN_SIZE(512,256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 308-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dreamwld_state, screen_update_dreamwld)
-	MCFG_SCREEN_VBLANK_DRIVER(dreamwld_state, screen_eof_dreamwld)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(dreamwld_state, screen_vblank_dreamwld))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
@@ -814,24 +818,24 @@ static MACHINE_CONFIG_START( baryon, dreamwld_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/32, OKIM6295_PIN7_LOW) /* 1MHz verified */
+	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/32, PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dreamwld, baryon )
+MACHINE_CONFIG_DERIVED(dreamwld_state::dreamwld, baryon)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dreamwld_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz/32, OKIM6295_PIN7_LOW) /* 1MHz verified */
+	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz/32, PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 
 MACHINE_CONFIG_END
 
@@ -1283,10 +1287,10 @@ ROM_START( gaialast )
 	ROM_LOAD( "9", 0x000000, 0x10000, CRC(0da8db45) SHA1(7d5bd71c5b0b28ff74c732edd7c662f46f2ab25b) )
 ROM_END
 
-GAME( 1997, baryon,   0,        baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, baryona,  baryon,   baryon,   baryon,   driver_device, 0, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, cutefght, 0,        dreamwld, cutefght, driver_device, 0, ROT0,   "SemiCom",                        "Cute Fighter", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rolcrush, 0,        baryon,   rolcrush, driver_device, 0, ROT0,   "SemiCom / Exit (Trust license)", "Rolling Crush (version 1.07.E - 1999/02/11, Trust license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, rolcrusha,rolcrush, baryon,   rolcrush, driver_device, 0, ROT0,   "SemiCom / Exit",                 "Rolling Crush (version 1.03.E - 1999/01/29)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, gaialast, 0,        baryon,   gaialast, driver_device, 0, ROT0,   "SemiCom / XESS",                 "Gaia - The Last Choice of Earth", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, dreamwld, 0,        dreamwld, dreamwld, driver_device, 0, ROT0,   "SemiCom",                        "Dream World", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, baryon,   0,        baryon,   baryon,   dreamwld_state, 0, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 1)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1997, baryona,  baryon,   baryon,   baryon,   dreamwld_state, 0, ROT270, "SemiCom / Tirano",               "Baryon - Future Assault (set 2)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1998, cutefght, 0,        dreamwld, cutefght, dreamwld_state, 0, ROT0,   "SemiCom",                        "Cute Fighter",                                               MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rolcrush, 0,        baryon,   rolcrush, dreamwld_state, 0, ROT0,   "SemiCom / Exit (Trust license)", "Rolling Crush (version 1.07.E - 1999/02/11, Trust license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, rolcrusha,rolcrush, baryon,   rolcrush, dreamwld_state, 0, ROT0,   "SemiCom / Exit",                 "Rolling Crush (version 1.03.E - 1999/01/29)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1999, gaialast, 0,        baryon,   gaialast, dreamwld_state, 0, ROT0,   "SemiCom / XESS",                 "Gaia - The Last Choice of Earth",                            MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dreamwld, 0,        dreamwld, dreamwld, dreamwld_state, 0, ROT0,   "SemiCom",                        "Dream World",                                                MACHINE_SUPPORTS_SAVE )

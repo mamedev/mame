@@ -11,14 +11,8 @@
 #include "emu.h"
 #include "machine/eeprom.h"
 
-
-
-//**************************************************************************
-//  DEBUGGING
-//**************************************************************************
-
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -29,8 +23,8 @@
 //  eeprom_base_device - constructor
 //-------------------------------------------------
 
-eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file)
-	: device_t(mconfig, devtype, name, tag, owner, 0, shortname, file),
+eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner)
+	: device_t(mconfig, devtype, tag, owner, 0),
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_cells(0),
@@ -81,7 +75,7 @@ void eeprom_base_device::static_set_default_data(device_t &device, const uint8_t
 {
 	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
 	assert(eeprom.m_data_bits == 8);
-	eeprom.m_default_data.u8 = const_cast<uint8_t *>(data);
+	eeprom.m_default_data = data;
 	eeprom.m_default_data_size = size;
 }
 
@@ -89,7 +83,7 @@ void eeprom_base_device::static_set_default_data(device_t &device, const uint16_
 {
 	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
 	assert(eeprom.m_data_bits == 16);
-	eeprom.m_default_data.u16 = const_cast<uint16_t *>(data);
+	eeprom.m_default_data = data;
 	eeprom.m_default_data_size = size / 2;
 }
 
@@ -245,15 +239,15 @@ void eeprom_base_device::nvram_default()
 		internal_write(offs, default_value);
 
 	// handle hard-coded data from the driver
-	if (m_default_data.u8 != nullptr)
+	if (m_default_data != nullptr)
 	{
 		osd_printf_verbose("Warning: Driver-specific EEPROM defaults are going away soon.\n");
 		for (offs_t offs = 0; offs < m_default_data_size; offs++)
 		{
 			if (m_data_bits == 8)
-				internal_write(offs, m_default_data.u8[offs]);
+				internal_write(offs, static_cast<const u8 *>(m_default_data)[offs]);
 			else
-				internal_write(offs, m_default_data.u16[offs]);
+				internal_write(offs, static_cast<const u16 *>(m_default_data)[offs]);
 		}
 	}
 
@@ -264,8 +258,8 @@ void eeprom_base_device::nvram_default()
 			fatalerror("eeprom region '%s' wrong size (expected size = 0x%X)\n", tag(), eeprom_bytes);
 		if (m_data_bits == 8 && m_region->bytewidth() != 1)
 			fatalerror("eeprom region '%s' needs to be an 8-bit region\n", tag());
-		if (m_data_bits == 16 && (m_region->bytewidth() != 2 || m_region->endianness() != ENDIANNESS_BIG))
-			fatalerror("eeprom region '%s' needs to be a 16-bit big-endian region\n", tag());
+		if (m_data_bits == 16 && m_region->bytewidth() != 2)
+			fatalerror("eeprom region '%s' needs to be a 16-bit region\n", tag());
 		osd_printf_verbose("Loading data from EEPROM region '%s'\n", tag());
 
 		memcpy(&m_data[0], m_region->base(), eeprom_bytes);
@@ -323,8 +317,8 @@ void eeprom_base_device::internal_write(offs_t address, uint32_t data)
 {
 	if (m_data_bits == 16)
 	{
-		m_data[address*2] = data;
-		m_data[address*2+1] = data >> 8;
+		m_data[address * 2] = data;
+		m_data[address * 2 + 1] = data >> 8;
 	} else
 		m_data[address] = data;
 }

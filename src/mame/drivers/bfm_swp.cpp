@@ -104,6 +104,8 @@ TEST.TXT - suggests the content of a prototype version, which was expanded to ma
 #include "emu.h"
 #include "machine/68340.h"
 #include "sound/ymz280b.h"
+#include "screen.h"
+#include "speaker.h"
 
 class bfm_swp_state : public driver_device
 {
@@ -125,17 +127,18 @@ public:
 		return 0;
 	}
 
+	void bfm_swp(machine_config &config);
 protected:
 
 	// devices
-	required_device<m68340cpu_device> m_maincpu;
+	required_device<m68340_cpu_device> m_maincpu;
 
 	virtual void machine_start() override;
 };
 
 READ32_MEMBER(bfm_swp_state::bfm_swp_mem_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
@@ -157,7 +160,7 @@ READ32_MEMBER(bfm_swp_state::bfm_swp_mem_r)
 
 WRITE32_MEMBER(bfm_swp_state::bfm_swp_mem_w)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
@@ -196,7 +199,7 @@ void bfm_swp_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( bfm_swp, bfm_swp_state )
+MACHINE_CONFIG_START(bfm_swp_state::bfm_swp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
@@ -299,7 +302,7 @@ ROM_END
 
 
 
-GAME( 199?, c3_rtime        , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "Radio Times (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
-GAME( 199?, c3_telly        , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "Telly Addicts (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
-GAME( 199?, c3_totp         , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "Top of the Pops (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )
-GAME( 199?, c3_ppays        , 0         , bfm_swp, bfm_swp, driver_device, 0, ROT0, "BFM", "The Phrase That Pays (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_rtime        , 0         , bfm_swp, bfm_swp, bfm_swp_state, 0, ROT0, "BFM", "Radio Times (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_telly        , 0         , bfm_swp, bfm_swp, bfm_swp_state, 0, ROT0, "BFM", "Telly Addicts (Bellfruit) (Cobra 3)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_totp         , 0         , bfm_swp, bfm_swp, bfm_swp_state, 0, ROT0, "BFM", "Top of the Pops (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )
+GAME( 199?, c3_ppays        , 0         , bfm_swp, bfm_swp, bfm_swp_state, 0, ROT0, "BFM", "The Phrase That Pays (Bellfruit) (Cobra 3?)", MACHINE_IS_SKELETON )

@@ -46,10 +46,14 @@ To Do:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/mc6845.h"
-#include "sound/saa1099.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
+#include "sound/saa1099.h"
+#include "video/mc6845.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class blitz68k_state : public driver_device
 {
@@ -180,6 +184,15 @@ public:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	void hermit(machine_config &config);
+	void bankrob(machine_config &config);
+	void cjffruit(machine_config &config);
+	void steaser(machine_config &config);
+	void deucesw2(machine_config &config);
+	void ilpag(machine_config &config);
+	void maxidbl(machine_config &config);
+	void dualgame(machine_config &config);
+	void bankroba(machine_config &config);
 };
 
 /*************************************************************************************************************
@@ -1666,11 +1679,11 @@ MC6845_ON_UPDATE_ADDR_CHANGED(blitz68k_state::crtc_addr)
 {
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, blitz68k_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, blitz68k_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( ilpag, blitz68k_state )
+MACHINE_CONFIG_START(blitz68k_state::ilpag)
 	MCFG_CPU_ADD("maincpu", M68000, 11059200 )  // ?
 	MCFG_CPU_PROGRAM_MAP(ilpag_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state, irq4_line_hold) //3 & 6 used, mcu comms?
@@ -1729,7 +1742,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(blitz68k_state::steaser_mcu_sim)
 }
 
 
-static MACHINE_CONFIG_DERIVED( steaser, ilpag )
+MACHINE_CONFIG_DERIVED(blitz68k_state::steaser, ilpag)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(steaser_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state, irq5_line_hold) //3, 4 & 6 used, mcu comms?
@@ -1737,7 +1750,7 @@ static MACHINE_CONFIG_DERIVED( steaser, ilpag )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", blitz68k_state, steaser_mcu_sim, attotime::from_hz(10000))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cjffruit, blitz68k_state )
+MACHINE_CONFIG_START(blitz68k_state::cjffruit)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22_1184MHz/2)
 	MCFG_CPU_PROGRAM_MAP(cjffruit_map)
 
@@ -1765,7 +1778,7 @@ static MACHINE_CONFIG_START( cjffruit, blitz68k_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bankrob, blitz68k_state )
+MACHINE_CONFIG_START(blitz68k_state::bankrob)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(bankrob_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
@@ -1797,7 +1810,7 @@ static MACHINE_CONFIG_START( bankrob, blitz68k_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bankroba, blitz68k_state )
+MACHINE_CONFIG_START(blitz68k_state::bankroba)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz )
 	MCFG_CPU_PROGRAM_MAP(bankroba_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq5_line_hold)   // protection prevents correct irq frequency by crtc
@@ -1827,7 +1840,7 @@ static MACHINE_CONFIG_START( bankroba, blitz68k_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( deucesw2, blitz68k_state )
+MACHINE_CONFIG_START(blitz68k_state::deucesw2)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22_1184MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(deucesw2_map)
 	// irq 2 reads from MCUs
@@ -1856,7 +1869,7 @@ static MACHINE_CONFIG_START( deucesw2, blitz68k_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dualgame, blitz68k_state )
+MACHINE_CONFIG_START(blitz68k_state::dualgame)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz )
 	MCFG_CPU_PROGRAM_MAP(dualgame_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq2_line_hold) // lev 2 = MCUs, lev 3 = vblank
@@ -1887,7 +1900,7 @@ static MACHINE_CONFIG_START( dualgame, blitz68k_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hermit, blitz68k_state )
+MACHINE_CONFIG_START(blitz68k_state::hermit)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_22_1184MHz/2 )
 	MCFG_CPU_PROGRAM_MAP(hermit_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq1_line_hold)   // protection prevents correct irq frequency by crtc
@@ -1916,7 +1929,7 @@ static MACHINE_CONFIG_START( hermit, blitz68k_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( maxidbl, blitz68k_state )
+MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(maxidbl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
@@ -2866,16 +2879,16 @@ DRIVER_INIT_MEMBER(blitz68k_state,megadble)
 
 
 
-GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl, blitz68k_state,  maxidbl,  ROT0,  "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS )
-GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl, blitz68k_state,  megadblj, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // JUNE 28TH, 1993
-GAME( 1990,  megadble, 0,       maxidbl,  maxidbl, blitz68k_state,  megadble, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS ) // NOVEMBER 1994
-GAME( 1993,  steaser,  0,       steaser,  steaser, driver_device,  0,        ROT0,  "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
-GAME( 1993,  bankrob,  0,       bankrob,  bankrob, blitz68k_state,  bankrob,  ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
-GAME( 1993,  bankroba, bankrob, bankroba, bankrob, blitz68k_state,  bankroba, ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993
-GAME( 1993?, poker52,  0,       maxidbl,  maxidbl, driver_device,  0,        ROT0,  "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                  // MARCH 10TH, 1994
+GAME( 1992,  maxidbl,  0,       maxidbl,  maxidbl,  blitz68k_state, maxidbl,  ROT0,  "Blitz Systems Inc.",             "Maxi Double Poker (Ver. 1.10)",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS )
+GAME( 1990,  megadblj, 0,       maxidbl,  maxidbl,  blitz68k_state, megadblj, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker Jackpot (Ver. 1.26)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // JUNE 28TH, 1993
+GAME( 1990,  megadble, 0,       maxidbl,  maxidbl,  blitz68k_state, megadble, ROT0,  "Blitz Systems Inc.",             "Mega Double Poker (Ver. 1.63 Espagnol)",         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS ) // NOVEMBER 1994
+GAME( 1993,  steaser,  0,       steaser,  steaser,  blitz68k_state, 0,        ROT0,  "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
+GAME( 1993,  bankrob,  0,       bankrob,  bankrob,  blitz68k_state, bankrob,  ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
+GAME( 1993,  bankroba, bankrob, bankroba, bankrob,  blitz68k_state, bankroba, ROT0,  "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993
+GAME( 1993?, poker52,  0,       maxidbl,  maxidbl,  blitz68k_state, 0,        ROT0,  "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                  // MARCH 10TH, 1994
 GAME( 1995,  dualgame, 0,       dualgame, dualgame, blitz68k_state, dualgame, ROT0,  "Labtronix Technologies",         "Dual Games (prototype)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // SEPTEMBER 5TH, 1995
-GAME( 1995,  hermit,   0,       hermit,   hermit, blitz68k_state,   hermit,   ROT0,  "Dugamex",                        "The Hermit (Ver. 1.14)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 1995
+GAME( 1995,  hermit,   0,       hermit,   hermit,   blitz68k_state, hermit,   ROT0,  "Dugamex",                        "The Hermit (Ver. 1.14)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 1995
 GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, deucesw2, ROT0,  "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 10TH, 1997
 GAME( 1998,  cj3play,  0,       cjffruit, cjffruit, blitz68k_state, cj3play,  ROT0,  "Cadillac Jack",                  "Triple Play (Ver. 1.10)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // FEBRUARY 24TH, 1999
 GAME( 1998,  cjffruit, 0,       cjffruit, cjffruit, blitz68k_state, cjffruit, ROT0,  "Cadillac Jack",                  "Funny Fruit (Ver. 1.13)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 21ST, 1999
-GAME( 199?,  ilpag,    0,       ilpag,    ilpag, driver_device,    0,        ROT0,  "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
+GAME( 199?,  ilpag,    0,       ilpag,    ilpag,    blitz68k_state, 0,        ROT0,  "<unknown>",                      "Il Pagliaccio (Italy, Ver. 2.7C)",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )

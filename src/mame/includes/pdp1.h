@@ -268,7 +268,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(pdp1);
 	uint32_t screen_update_pdp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_pdp1(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pdp1);
 	INTERRUPT_GEN_MEMBER(pdp1_interrupt);
 	TIMER_CALLBACK_MEMBER(reader_callback);
 	TIMER_CALLBACK_MEMBER(puncher_callback);
@@ -302,6 +302,7 @@ public:
 	void pdp1_lightpen();
 	int read_spacewar() { return m_spacewar->read(); }
 
+	void pdp1(machine_config &config);
 private:
 	pdp1_reset_param_t m_reset_param;
 	int m_old_typewriter_keys[4];

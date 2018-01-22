@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2017 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
 
@@ -36,14 +36,23 @@ function overridefiles(_srcPath, _dstPath, _files)
 end
 
 function bgfxProject(_name, _kind, _defines)
-
 	project ("bgfx" .. _name)
 		uuid (os.uuid("bgfx" .. _name))
+		bgfxProjectBase(_kind, _defines)
+		copyLib()
+end
+
+function bgfxProjectBase(_kind, _defines)
 		kind (_kind)
 
 		if _kind == "SharedLib" then
 			defines {
 				"BGFX_SHARED_LIB_BUILD=1",
+			}
+
+			links {
+				"bimg",
+				"bx",
 			}
 
 			configuration { "vs20* or mingw*" }
@@ -69,10 +78,15 @@ function bgfxProject(_name, _kind, _defines)
 			path.join(BGFX_DIR, "3rdparty"),
 			path.join(BGFX_DIR, "3rdparty/dxsdk/include"),
 			path.join(BX_DIR,   "include"),
+			path.join(BIMG_DIR, "include"),
 		}
 
 		defines {
 			_defines,
+		}
+
+		links {
+			"bx",
 		}
 
 		if _OPTIONS["with-glfw"] then
@@ -133,10 +147,11 @@ function bgfxProject(_name, _kind, _defines)
 				"-weak_framework MetalKit",
 			}
 
-		configuration { "not nacl", "not linux-steamlink" }
+		configuration { "not nacl", "not linux-steamlink", "not NX32", "not NX64" }
 			includedirs {
 				--nacl has GLES2 headers modified...
 				--steamlink has EGL headers modified...
+				--NX has EGL headers modified...
 				path.join(BGFX_DIR, "3rdparty/khronos"),
 			}
 
@@ -160,11 +175,6 @@ function bgfxProject(_name, _kind, _defines)
 		removefiles {
 			path.join(BGFX_DIR, "src/**.bin.h"),
 		}
-
-		overridefiles(BGFX_DIR, path.join(BGFX_DIR, "../bgfx-ext"), {
-			path.join(BGFX_DIR, "src/renderer_vk.cpp"),
-			path.join(BGFX_DIR, "src/renderer_vk.h"),
-		})
 
 		overridefiles(BGFX_DIR, path.join(BGFX_DIR, "../bgfx-ext"), {
 			path.join(BGFX_DIR, "src/renderer_gnm.cpp"),
@@ -217,6 +227,4 @@ function bgfxProject(_name, _kind, _defines)
 		end
 
 		configuration {}
-
-		copyLib()
 end

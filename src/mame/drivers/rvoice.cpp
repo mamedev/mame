@@ -11,7 +11,7 @@
 
 /* Core includes */
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "machine/mos6551.h"
 //#include "dectalk.lh" //  hack to avoid screenless system crash
 #include "machine/terminal.h"
@@ -86,8 +86,9 @@ public:
 	DECLARE_WRITE8_MEMBER(main_hd63701_internal_registers_w);
 	DECLARE_DRIVER_INIT(rvoicepc);
 	virtual void machine_reset() override;
-	DECLARE_WRITE8_MEMBER(null_kbd_put);
+	void null_kbd_put(u8 data);
 	required_device<cpu_device> m_maincpu;
+	void rvoicepc(machine_config &config);
 };
 
 
@@ -139,7 +140,7 @@ void rvoice_state::machine_reset()
 READ8_MEMBER(rvoice_state::main_hd63701_internal_registers_r)
 {
 	uint8_t data = 0;
-	logerror("main hd637B01Y0: %04x: read from 0x%02X: ", space.device().safe_pc(), offset);
+	logerror("main hd637B01Y0: %04x: read from 0x%02X: ", m_maincpu->pc(), offset);
 	switch(offset)
 	{
 		case 0x00: // Port 1 DDR
@@ -221,7 +222,7 @@ READ8_MEMBER(rvoice_state::main_hd63701_internal_registers_r)
 
 WRITE8_MEMBER(rvoice_state::main_hd63701_internal_registers_w)
 {
-	logerror("main hd637B01Y0: %04x: write to 0x%02X: ", space.device().safe_pc(), offset);
+	logerror("main hd637B01Y0: %04x: write to 0x%02X: ", m_maincpu->pc(), offset);
 	switch(offset)
 	{
 		case 0x00: // Port 1 DDR
@@ -354,11 +355,11 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-WRITE8_MEMBER(rvoice_state::null_kbd_put)
+void rvoice_state::null_kbd_put(u8 data)
 {
 }
 
-static MACHINE_CONFIG_START( rvoicepc, rvoice_state )
+MACHINE_CONFIG_START(rvoice_state::rvoicepc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD63701, XTAL_7_3728MHz)
 	MCFG_CPU_PROGRAM_MAP(hd63701_main_mem)
@@ -377,7 +378,7 @@ static MACHINE_CONFIG_START( rvoicepc, rvoice_state )
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(rvoice_state, null_kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(rvoice_state, null_kbd_put))
 
 MACHINE_CONFIG_END
 
@@ -401,5 +402,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1988?, rvoicepc,   0,          0,      rvoicepc,   rvoicepc, rvoice_state, rvoicepc,      "Adaptive Communication Systems",        "Realvoice PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT  COMPAT  MACHINE   INPUT     STATE         INIT      COMPANY                           FULLNAME        FLAGS
+COMP( 1988?, rvoicepc, 0,      0,      rvoicepc, rvoicepc, rvoice_state, rvoicepc, "Adaptive Communication Systems", "Realvoice PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

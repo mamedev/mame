@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
+#ifndef MAME_VIDEO_DECOSPR_H
+#define MAME_VIDEO_DECOSPR_H
+
+#pragma once
 
 typedef device_delegate<uint16_t (uint16_t pri)> decospr_pri_cb_delegate;
 typedef device_delegate<uint16_t (uint16_t col)> decospr_col_cb_delegate;
@@ -10,8 +14,7 @@ typedef device_delegate<uint16_t (uint16_t col)> decospr_col_cb_delegate;
 #define DECOSPR_COLOUR_CB_MEMBER(_name)     uint16_t _name(uint16_t col)
 
 
-class decospr_device : public device_t,
-						public device_video_interface
+class decospr_device : public device_t, public device_video_interface
 {
 public:
 	decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -68,16 +71,16 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
-extern const device_type DECO_SPRITE;
+DECLARE_DEVICE_TYPE(DECO_SPRITE, decospr_device)
 
 #define MCFG_DECO_SPRITE_GFX_REGION(_region) \
 	decospr_device::set_gfx_region(*device, _region);
 
 #define MCFG_DECO_SPRITE_PRIORITY_CB(_class, _method) \
-	decospr_device::set_pri_callback(*device, decospr_pri_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	decospr_device::set_pri_callback(*device, decospr_pri_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_DECO_SPRITE_COLOUR_CB(_class, _method) \
-	decospr_device::set_col_callback(*device, decospr_col_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	decospr_device::set_col_callback(*device, decospr_col_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_DECO_SPRITE_ISBOOTLEG(_boot) \
 	decospr_device::set_is_bootleg(*device, _boot);
@@ -96,3 +99,5 @@ extern const device_type DECO_SPRITE;
 
 #define MCFG_DECO_SPRITE_GFXDECODE(_gfxtag) \
 	decospr_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
+
+#endif // MAME_VIDEO_DECOSPR_H

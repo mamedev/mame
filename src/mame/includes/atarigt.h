@@ -6,8 +6,9 @@
 
 *************************************************************************/
 
-#include "machine/atarigen.h"
 #include "audio/cage.h"
+#include "machine/atarigen.h"
+#include "video/atarirle.h"
 
 #define CRAM_ENTRIES        0x4000
 #define TRAM_ENTRIES        0x4000
@@ -86,6 +87,10 @@ public:
 	DECLARE_MACHINE_RESET(atarigt);
 	DECLARE_VIDEO_START(atarigt);
 	uint32_t screen_update_atarigt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void atarigt(machine_config &config);
+	void tmek(machine_config &config);
+	void primrage20(machine_config &config);
+	void primrage(machine_config &config);
 private:
 	void tmek_update_mode(offs_t offset);
 	void tmek_protection_w(address_space &space, offs_t offset, uint16_t data);

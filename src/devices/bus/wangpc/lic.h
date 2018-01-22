@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_WANGPC_LIC_H
+#define MAME_BUS_WANGPC_LIC_H
+
 #pragma once
 
-#ifndef __WANGPC_LIC__
-#define __WANGPC_LIC__
-
-#include "emu.h"
 #include "wangpc.h"
 
 
@@ -29,14 +28,12 @@ public:
 	// construction/destruction
 	wangpc_lic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_wangpcbus_card_interface overrides
 	virtual uint16_t wangpcbus_mrdc_r(address_space &space, offs_t offset, uint16_t mem_mask) override;
@@ -47,7 +44,6 @@ protected:
 
 
 // device type definition
-extern const device_type WANGPC_LIC;
+DECLARE_DEVICE_TYPE(WANGPC_LIC, wangpc_lic_device)
 
-
-#endif
+#endif // MAME_BUS_WANGPC_LIC_H

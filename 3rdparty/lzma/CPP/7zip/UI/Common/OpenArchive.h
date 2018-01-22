@@ -401,6 +401,14 @@ struct CArchiveLink
   HRESULT Open2(COpenOptions &options, IOpenCallbackUI *callbackUI);
   HRESULT Open3(COpenOptions &options, IOpenCallbackUI *callbackUI);
 
+  HRESULT Open_Strict(COpenOptions &options, IOpenCallbackUI *callbackUI)
+  {
+    HRESULT result = Open3(options, callbackUI);
+    if (result == S_OK && NonOpen_ErrorInfo.ErrorFormatIndex >= 0)
+      result = S_FALSE;
+    return result;
+  }
+
   HRESULT ReOpen(COpenOptions &options);
 };
 

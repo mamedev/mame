@@ -15,11 +15,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/pcktgal.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
-#include "includes/pcktgal.h"
 #include "machine/deco222.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /***************************************************************************/
 
@@ -217,7 +221,7 @@ void pcktgal_state::machine_start()
 	save_item(NAME(m_toggle));
 }
 
-static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
+MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)
@@ -260,18 +264,18 @@ static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(pcktgal_state, adpcm_int))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz            */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz            */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bootleg, pcktgal )
+MACHINE_CONFIG_DERIVED(pcktgal_state::bootleg, pcktgal)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bootleg)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pcktgal_state, screen_update_pcktgalb)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pcktgal2, pcktgal )
+MACHINE_CONFIG_DERIVED(pcktgal_state::pcktgal2, pcktgal)
 	MCFG_DEVICE_REMOVE("audiocpu")
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000) /* doesn't use the encrypted 222 */
 	MCFG_CPU_PROGRAM_MAP(pcktgal_sound_map)
@@ -445,7 +449,7 @@ DRIVER_INIT_MEMBER(pcktgal_state,pcktgal)
 /***************************************************************************/
 
 GAME( 1987, pcktgal,  0,       pcktgal, pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Pocket Gal (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, pcktgalb, pcktgal, bootleg, pcktgal, driver_device, 0,        ROT0, "bootleg", "Pocket Gal (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, pcktgalb, pcktgal, bootleg, pcktgal, pcktgal_state, 0,        ROT0, "bootleg", "Pocket Gal (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pcktgal2, pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Pocket Gal 2 (English)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pcktgal2j,pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Pocket Gal 2 (Japanese)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, spool3,   pcktgal, pcktgal2,pcktgal, pcktgal_state, pcktgal,  ROT0, "Data East Corporation", "Super Pool III (English)", MACHINE_SUPPORTS_SAVE )

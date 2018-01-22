@@ -44,9 +44,11 @@
 
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
-#include "sound/okim6295.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 class mjsenpu_state : public driver_device
 {
@@ -98,6 +100,7 @@ public:
 	uint32_t screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<palette_device> m_palette;
+	void mjsenpu(machine_config &config);
 };
 
 
@@ -156,7 +159,7 @@ WRITE8_MEMBER(mjsenpu_state::control_w)
 	// bits 0x08 is used in the alt payout / hopper mode (see dipswitches)
 
 	// 0x04 seem to be hopper/ticket related? different ones get used depending on the dips
-	m_hopper->write(space, 0, data & 0x04);
+	m_hopper->motor_w(data & 0x04);
 
 	// bit 0x02 could be coin counter?
 	machine().bookkeeping().coin_counter_w(0, data & 0x02 );
@@ -452,7 +455,7 @@ following clocks are on the PCB
 
 */
 
-static MACHINE_CONFIG_START( mjsenpu, mjsenpu_state )
+MACHINE_CONFIG_START(mjsenpu_state::mjsenpu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E132XT, 27000000*2) /* ?? Mhz */
@@ -478,7 +481,7 @@ static MACHINE_CONFIG_START( mjsenpu, mjsenpu_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) /* 1 Mhz? */
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) /* 1 Mhz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -502,7 +505,7 @@ READ32_MEMBER(mjsenpu_state::mjsenpu_speedup_r)
 
 	if (pc == 0xadb8)
 	{
-		space.device().execute().spin_until_interrupt();
+		m_maincpu->spin_until_interrupt();
 	}
 	else
 	{

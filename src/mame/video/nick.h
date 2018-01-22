@@ -6,14 +6,14 @@
 
 **********************************************************************/
 
+#ifndef MAME_VIDEO_NICK_H
+#define MAME_VIDEO_NICK_H
+
 #pragma once
 
-#ifndef __NICK__
-#define __NICK__
-
-#include "emu.h"
 #include "machine/rescap.h"
 #include "video/resnet.h"
+#include "screen.h"
 
 
 
@@ -89,7 +89,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	DECLARE_READ8_MEMBER( vram_r );
 	DECLARE_WRITE8_MEMBER( vram_w );
@@ -168,8 +168,6 @@ private:
 
 
 // device type definition
-extern const device_type NICK;
+DECLARE_DEVICE_TYPE(NICK, nick_device)
 
-
-
-#endif
+#endif // MAME_VIDEO_NICK_H

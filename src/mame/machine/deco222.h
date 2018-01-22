@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_MACHINE_DECO222
+#define MAME_MACHINE_DECO222
 
-#include "emu.h"
+#pragma once
+
+#include "cpu/m6502/m6502d.h"
 #include "cpu/m6502/m6502.h"
 
 class deco_222_device : public m6502_device {
@@ -17,12 +21,18 @@ protected:
 		virtual uint8_t read_sync(uint16_t adr) override;
 	};
 
+	class disassembler : public m6502_disassembler {
+	public:
+		disassembler() = default;
+		virtual ~disassembler() = default;
+		virtual u32 interface_flags() const override;
+		virtual u8 decrypt8(u8 value, offs_t pc, bool opcode) const override;
+	};
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
+	virtual util::disasm_interface *create_disassembler() override;
 };
-
-static const device_type DECO_222 = &device_creator<deco_222_device>;
 
 
 
@@ -39,9 +49,22 @@ protected:
 		virtual uint8_t read_sync(uint16_t adr) override;
 	};
 
+
+	class disassembler : public m6502_disassembler {
+	public:
+		disassembler() = default;
+		virtual ~disassembler() = default;
+		virtual u32 interface_flags() const override;
+		virtual u8 decrypt8(u8 value, offs_t pc, bool opcode) const override;
+	};
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
+	virtual util::disasm_interface *create_disassembler() override;
 };
 
-static const device_type DECO_C10707 = &device_creator<deco_c10707_device>;
+
+DECLARE_DEVICE_TYPE(DECO_222, deco_222_device)
+DECLARE_DEVICE_TYPE(DECO_C10707, deco_c10707_device)
+
+#endif // MAME_MACHINE_DECO222

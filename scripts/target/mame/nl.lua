@@ -17,10 +17,12 @@
 --------------------------------------------------
 
 CPUS["Z80"] = true
+CPUS["M6502"] = true
 CPUS["M6800"] = true
 CPUS["M6803"] = true
 CPUS["M6809"] = true
 CPUS["MCS48"] = true
+CPUS["I8085"] = true
 --CPUS["MCS51"] = true
 --CPUS["M6800"] = true
 --CPUS["M6809"] = true
@@ -39,7 +41,7 @@ SOUNDS["DISCRETE"] = true
 SOUNDS["AY8910"] = true
 SOUNDS["MSM5205"] = true
 --SOUNDS["ASTROCADE"] = true
---SOUNDS["TMS5220"] = true
+SOUNDS["TMS5220"] = true
 --SOUNDS["OKIM6295"] = true
 --SOUNDS["HC55516"] = true
 --SOUNDS["YM3812"] = true
@@ -60,7 +62,17 @@ VIDEOS["FIXFREQ"] = true
 MACHINES["NETLIST"] = true
 MACHINES["Z80DMA"] = true
 MACHINES["GEN_LATCH"] = true
---MACHINES["6821PIA"] = true
+MACHINES["AY31015"] = true
+MACHINES["KB3600"] = true
+MACHINES["COM8116"] = true
+
+MACHINES["TTL74145"] = true
+MACHINES["TTL74259"] = true
+MACHINES["6522VIA"] = true
+
+MACHINES["6821PIA"] = true
+MACHINES["I8255"] = true
+MACHINES["WATCHDOG"] = true
 --MACHINES["TTL74148"] = true
 --MACHINES["TTL74153"] = true
 --MACHINES["TTL7474"] = true
@@ -112,6 +124,18 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_pongd.h",
 	MAME_DIR .. "src/mame/machine/nl_breakout.cpp",
 	MAME_DIR .. "src/mame/machine/nl_breakout.h",
+	MAME_DIR .. "src/mame/machine/nl_hazelvid.cpp",
+	MAME_DIR .. "src/mame/machine/nl_hazelvid.h",
+
+	MAME_DIR .. "src/mame/drivers/atarittl.cpp",
+	MAME_DIR .. "src/mame/machine/nl_stuntcyc.cpp",
+	MAME_DIR .. "src/mame/machine/nl_stuntcyc.h",
+
+	MAME_DIR .. "src/mame/drivers/prodigy.cpp",
+	MAME_DIR .. "src/mame/machine/nl_prodigy.cpp",
+	MAME_DIR .. "src/mame/machine/nl_prodigy.h",
+
+	MAME_DIR .. "src/mame/drivers/hazeltin.cpp",
 
 	MAME_DIR .. "src/mame/drivers/1942.cpp",
 	MAME_DIR .. "src/mame/includes/1942.h",
@@ -121,10 +145,12 @@ files{
 	MAME_DIR .. "src/mame/includes/popeye.h",
 	MAME_DIR .. "src/mame/video/popeye.cpp",
 
-  MAME_DIR .. "src/mame/drivers/mario.cpp",
-  MAME_DIR .. "src/mame/includes/mario.h",
-  MAME_DIR .. "src/mame/video/mario.cpp",
-  MAME_DIR .. "src/mame/audio/mario.cpp",
+	MAME_DIR .. "src/mame/drivers/mario.cpp",
+	MAME_DIR .. "src/mame/includes/mario.h",
+  MAME_DIR .. "src/mame/audio/nl_mario.cpp",
+  MAME_DIR .. "src/mame/audio/nl_mario.h",
+	MAME_DIR .. "src/mame/video/mario.cpp",
+	MAME_DIR .. "src/mame/audio/mario.cpp",
 
 	MAME_DIR .. "src/mame/drivers/m62.cpp",
 	MAME_DIR .. "src/mame/includes/m62.h",
@@ -133,6 +159,23 @@ files{
 	MAME_DIR .. "src/mame/audio/irem.h",
 	MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
 	MAME_DIR .. "src/mame/audio/nl_kidniki.h",
+
+  MAME_DIR .. "src/mame/audio/cheekyms.cpp",
+  MAME_DIR .. "src/mame/audio/cheekyms.h",
+  MAME_DIR .. "src/mame/audio/nl_cheekyms.cpp",
+  MAME_DIR .. "src/mame/audio/nl_cheekyms.h",
+  MAME_DIR .. "src/mame/drivers/cheekyms.cpp",
+  MAME_DIR .. "src/mame/includes/cheekyms.h",
+  MAME_DIR .. "src/mame/video/cheekyms.cpp",
+
+  MAME_DIR .. "src/mame/audio/nl_zac1b11142.cpp",
+  MAME_DIR .. "src/mame/audio/nl_zacc1b11142.h",
+  MAME_DIR .. "src/mame/audio/zaccaria.cpp",
+  MAME_DIR .. "src/mame/audio/zaccaria.h",
+  MAME_DIR .. "src/mame/drivers/zaccaria.cpp",
+  MAME_DIR .. "src/mame/includes/zaccaria.h",
+  MAME_DIR .. "src/mame/video/zaccaria.cpp",
+
 }
 end
 

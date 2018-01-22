@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_SMS_EXP_GENDER_H
+#define MAME_BUS_SMS_EXP_GENDER_H
+
 #pragma once
 
-#ifndef __SMS_GENDER_ADAPTER__
-#define __SMS_GENDER_ADAPTER__
 
-
-#include "emu.h"
 #include "smsexp.h"
 #include "bus/sega8/sega8_slot.h"
 
@@ -43,7 +42,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	required_device<sega8_cart_slot_device> m_subslot;
@@ -51,7 +50,6 @@ private:
 
 
 // device type definition
-extern const device_type SMS_GENDER_ADAPTER;
+DECLARE_DEVICE_TYPE(SMS_GENDER_ADAPTER, sms_gender_adapter_device)
 
-
-#endif
+#endif // MAME_BUS_SMS_EXP_GENDER_H

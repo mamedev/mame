@@ -14,10 +14,13 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ohmygod.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
-#include "includes/ohmygod.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(ohmygod_state::ohmygod_ctrl_w)
@@ -45,7 +48,7 @@ static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16, ohmygod_state )
 	AM_RANGE(0x308000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(ohmygod_scrollx_w)
 	AM_RANGE(0x400002, 0x400003) AM_WRITE(ohmygod_scrolly_w)
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x704000, 0x707fff) AM_RAM
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM     /* Work RAM */
@@ -59,7 +62,7 @@ static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16, ohmygod_state )
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(ohmygod_spritebank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, ohmygod_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, ohmygod_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -315,7 +318,7 @@ void ohmygod_state::machine_reset()
 	m_scrolly = 0;
 }
 
-static MACHINE_CONFIG_START( ohmygod, ohmygod_state )
+MACHINE_CONFIG_START(ohmygod_state::ohmygod)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -343,8 +346,8 @@ static MACHINE_CONFIG_START( ohmygod, ohmygod_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 14000000/8, OKIM6295_PIN7_HIGH)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_OKIM6295_ADD("oki", 14000000/8, PIN7_HIGH)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -396,5 +399,5 @@ DRIVER_INIT_MEMBER(ohmygod_state,naname)
 }
 
 
-GAME( 1993, ohmygod, 0, ohmygod, ohmygod, ohmygod_state, ohmygod, ROT0, "Atlus", "Oh My God! (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, naname,  0, ohmygod, naname, ohmygod_state,  naname,  ROT0, "Atlus", "Naname de Magic! (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ohmygod, 0, ohmygod, ohmygod, ohmygod_state, ohmygod, ROT0, "Atlus", "Oh My God! (Japan)",       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, naname,  0, ohmygod, naname,  ohmygod_state, naname,  ROT0, "Atlus", "Naname de Magic! (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

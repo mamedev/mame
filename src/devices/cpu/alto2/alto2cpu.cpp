@@ -5,7 +5,9 @@
  *   Xerox AltoII CPU core
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
+#include "alto2dsm.h"
 #include "a2roms.h"
 
 #define DEBUG_UCODE_CONST_DATA  0   //!< define to 1 to dump decoded micro code and constants
@@ -15,7 +17,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ALTO2 = &device_creator<alto2_cpu_device>;
+DEFINE_DEVICE_TYPE(ALTO2, alto2_cpu_device, "alto2_cpu", "Xerox Alto-II")
 
 //**************************************************************************
 //  LOGGING AND DEBUGGING
@@ -121,7 +123,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 alto2_cpu_device::alto2_cpu_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
-	cpu_device(mconfig, ALTO2, "Xerox Alto-II", tag, owner, clock, "alto2_cpu", __FILE__),
+	cpu_device(mconfig, ALTO2, tag, owner, clock),
 	m_ucode_config("ucode", ENDIANNESS_BIG, 32, 12, -2 ),
 	m_const_config("const", ENDIANNESS_BIG, 16,  8, -1 ),
 	m_iomem_config("iomem", ENDIANNESS_BIG, 16, 17, -1 ),
@@ -793,15 +795,13 @@ static const prom_load_t pl_madr_a91 =
 // device_memory_interface overrides
 //-------------------------------------------------
 
-const address_space_config*alto2_cpu_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector alto2_cpu_device::memory_space_config() const
 {
-	if (AS_0 == spacenum)
-		return &m_ucode_config;
-	if (AS_1 == spacenum)
-		return &m_const_config;
-	if (AS_2 == spacenum)
-		return &m_iomem_config;
-	return nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_ucode_config),
+		std::make_pair(1, &m_const_config),
+		std::make_pair(2, &m_iomem_config)
+	};
 }
 
 //-------------------------------------------------
@@ -811,7 +811,7 @@ const address_space_config*alto2_cpu_device::memory_space_config(address_spacenu
 void alto2_cpu_device::device_start()
 {
 	// get a pointer to the IO address space
-	m_iomem = &space(AS_2);
+	m_iomem = &space(2);
 
 	// Decode 2 pages of micro code PROMs to CROM
 	// If m_cram_config == 1 or 3, only the first page will be used
@@ -2980,4 +2980,9 @@ void alto2_cpu_device::soft_reset()
 	m_display_time = 0;                 // reset the display state machine timing accu
 	m_unload_time = 0;              // reset the word unload timing accu
 	m_bitclk_time = 0;              // reset the bitclk timing accu
+}
+
+util::disasm_interface *alto2_cpu_device::create_disassembler()
+{
+	return new alto2_disassembler;
 }

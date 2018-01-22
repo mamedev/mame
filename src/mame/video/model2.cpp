@@ -2607,7 +2607,7 @@ uint32_t model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 
 	bitmap.fill(m_palette->pen(0), cliprect);
 	m_sys24_bitmap.fill(0, cliprect);
 
-	segas24_tile *tile = machine().device<segas24_tile>("tile");
+	segas24_tile_device *tile = machine().device<segas24_tile_device>("tile");
 	tile->draw(screen, m_sys24_bitmap, cliprect, 7, 0, 0);
 	tile->draw(screen, m_sys24_bitmap, cliprect, 6, 0, 0);
 	tile->draw(screen, m_sys24_bitmap, cliprect, 5, 0, 0);

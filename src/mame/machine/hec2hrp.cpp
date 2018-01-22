@@ -28,7 +28,7 @@
                 => add the port mapping for keyboard
         28/09/2010 add the DISK II support by yo_fr      (jj.stac @ aliceadsl.fr)
                 => Note that actually the DISK II boot (loading CPM : OK) but do not run (don't run the CPM...).
-        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
+        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M running! JJStacino
         11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino  (jj.stac @ aliceadsl.fr)
         19/02/2012 : few adjustment for the hrp and hr machine - JJStacino
 
@@ -40,16 +40,20 @@
 */
 
 #include "emu.h"
+#include "includes/hec2hrp.h"
+
+#include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
+#include "machine/upd765.h" /* for floppy disc controller */
 #include "sound/wave.h"      /* for K7 sound*/
 #include "sound/discrete.h"  /* for 1 Bit sound*/
-#include "machine/upd765.h" /* for floppy disc controller */
+
+#include "speaker.h"
 
 #include "formats/hect_tap.h"
-#include "includes/hec2hrp.h"
 #include "formats/hect_dsk.h"
-#include "cpu/z80/z80.h"
+
 
 #ifndef DEBUG_TRACE_COM_HECTOR
 //#define DEBUG_TRACE_COM_HECTOR  1
@@ -799,7 +803,7 @@ static DISCRETE_SOUND_START( hec2hrp )
 	DISCRETE_OUTPUT(NODE_01, 5000)
 DISCRETE_SOUND_END
 
-MACHINE_CONFIG_FRAGMENT( hector_audio )
+MACHINE_CONFIG_START(hec2hrp_state::hector_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)  /* Sound level for cassette, as it is in mono => output channel=0*/
@@ -832,7 +836,7 @@ MACHINE_CONFIG_END
     15/02/2010 : Start of the disc2 project! JJStacino
     26/09/2010 : first sending with bug2 (the first "dir" command finih with a crash of the Z80 disc II proc) JJStacino
     01/11/2010 : first time ending boot sequence, probleme on the CP/M lauch JJStacino
-    20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
+    20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M running! JJStacino
     28/11/2010 : Found at Bratislava that the disk writing with TRANS X: is NOT WORKING (the exchange Hector=>Disc2 ok)
 */
 

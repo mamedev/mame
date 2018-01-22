@@ -40,6 +40,7 @@ public:
 	required_ioport_array<8> m_keyboard;
 	required_device<dac_1bit_device> m_dac;
 
+	void galeb(machine_config &config);
 protected:
 	virtual void machine_start() override;
 

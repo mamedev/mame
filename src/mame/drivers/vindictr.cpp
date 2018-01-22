@@ -20,9 +20,12 @@
 
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/watchdog.h"
 #include "includes/vindictr.h"
+
+#include "cpu/m68000/m68000.h"
+#include "machine/eeprompar.h"
+#include "machine/watchdog.h"
+#include "speaker.h"
 
 
 
@@ -72,8 +75,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vindictr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
-	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ(port1_r)
 	AM_RANGE(0x260020, 0x26002f) AM_READ_PORT("260020")
@@ -84,9 +87,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vindictr_state )
 	AM_RANGE(0x360020, 0x360021) AM_DEVWRITE("jsa", atari_jsa_i_device, sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_DEVWRITE8("jsa", atari_jsa_i_device, main_command_w, 0x00ff)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(vindictr_paletteram_w) AM_SHARE("paletteram")
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x8000) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0x3f4000, 0x3f4f7f) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
+	AM_RANGE(0x3f4000, 0x3f4f7f) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
 	AM_RANGE(0x3f4f80, 0x3f4fff) AM_MIRROR(0x8000) AM_RAM AM_SHARE("mob:slip")
 	AM_RANGE(0x3f5000, 0x3f7fff) AM_MIRROR(0x8000) AM_RAM
 ADDRESS_MAP_END
@@ -179,7 +182,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( vindictr, vindictr_state )
+MACHINE_CONFIG_START(vindictr_state::vindictr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
@@ -187,7 +190,8 @@ static MACHINE_CONFIG_START( vindictr, vindictr_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(vindictr_state,vindictr)
 
-	MCFG_ATARI_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_2804_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 

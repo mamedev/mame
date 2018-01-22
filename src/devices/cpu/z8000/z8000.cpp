@@ -13,76 +13,68 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
-#include "debug/debugcon.h"
 #include "z8000.h"
-
-#define VERBOSE 0
-
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
-
-
-extern int z8k_segm;
-extern int z8k_segm_mode;
-
 #include "z8000cpu.h"
 
-const device_type Z8001 = &device_creator<z8001_device>;
-const device_type Z8002 = &device_creator<z8002_device>;
+#include "debugger.h"
+#include "debug/debugcon.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
+
+DEFINE_DEVICE_TYPE(Z8001, z8001_device, "z8001", "Zilog Z8001")
+DEFINE_DEVICE_TYPE(Z8002, z8002_device, "z8002", "Zilog Z8002")
 
 
 z8002_device::z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, Z8002, "Z8002", tag, owner, clock, "z8002", __FILE__)
-	, z80_daisy_chain_interface(mconfig, *this)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 16, 0)
-	, m_io_config("io", ENDIANNESS_BIG, 8, 16, 0)
-	, m_mo_out(*this), m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_program(nullptr), m_data(nullptr), m_direct(nullptr), m_io(nullptr), m_icount(0)
-		, m_vector_mult(1)
+	: z8002_device(mconfig, Z8002, tag, owner, clock, 16, 8, 1)
 {
 }
 
 
-z8002_device::z8002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, z80_daisy_chain_interface(mconfig, *this)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 20, 0)
-	, m_io_config("io", ENDIANNESS_BIG, 16, 16, 0)
-	, m_mo_out(*this), m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_program(nullptr), m_data(nullptr), m_direct(nullptr), m_io(nullptr), m_icount(0)
-	, m_vector_mult(2)
+z8002_device::z8002_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int addrbits, int iobits, int vecmult)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 16, addrbits, 0)
+	, m_io_config("io", ENDIANNESS_BIG, iobits, 16, 0)
+	, m_mo_out(*this)
+	, m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_program(nullptr), m_data(nullptr), m_direct(nullptr), m_io(nullptr), m_icount(0)
+	, m_vector_mult(vecmult)
 {
 }
 
 
 z8001_device::z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8002_device(mconfig, Z8001, "Zilog Z8001", tag, owner, clock, "z8001", __FILE__)
+	: z8002_device(mconfig, Z8001, tag, owner, clock, 20, 16, 2)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 20, 0)
 {
 }
 
 
-offs_t z8002_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+device_memory_interface::space_config_vector z8002_device::memory_space_config() const
 {
-	extern CPU_DISASSEMBLE( z8000 );
-	return CPU_DISASSEMBLE_NAME(z8000)(this, buffer, pc, oprom, opram, options);
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
-
-/* opcode execution table */
-Z8000_exec *z8000_exec = nullptr;
-
-/* zero, sign and parity flags for logical byte operations */
-static uint8_t z8000_zsp[256];
-
-
-int z8002_device::segmented_mode()
+device_memory_interface::space_config_vector z8001_device::memory_space_config() const
 {
-	return 0;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
-int z8001_device::segmented_mode()
+bool z8002_device::get_segmented_mode() const
 {
-	return (m_fcw & F_SEG) ? 1 : 0;
+	return false;
+}
+
+bool z8001_device::get_segmented_mode() const
+{
+	return (m_fcw & F_SEG) ? true : false;
 }
 
 uint32_t z8002_device::addr_add(uint32_t addr, uint32_t addend)
@@ -136,7 +128,7 @@ uint32_t z8002_device::get_addr_operand(int opnum)
 	{
 		uint32_t seg = m_program->read_word(m_pc);
 		m_pc += 2;
-		if (segmented_mode())
+		if (get_segmented_mode())
 		{
 			if (seg & 0x8000)
 			{
@@ -166,7 +158,7 @@ uint32_t z8002_device::get_raw_addr_operand(int opnum)
 	{
 		uint32_t seg = m_program->read_word(m_pc);
 		m_pc += 2;
-		if (segmented_mode())
+		if (get_segmented_mode())
 		{
 			if (seg & 0x8000)
 			{
@@ -200,7 +192,7 @@ uint32_t z8001_device::adjust_addr_for_nonseg_mode(uint32_t addr)
 	}
 }
 
-uint8_t z8002_device::RDMEM_B(address_spacenum spacenum, uint32_t addr)
+uint8_t z8002_device::RDMEM_B(int spacenum, uint32_t addr)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	if (spacenum == AS_PROGRAM)
@@ -209,7 +201,7 @@ uint8_t z8002_device::RDMEM_B(address_spacenum spacenum, uint32_t addr)
 		return m_data->read_byte(addr);
 }
 
-uint16_t z8002_device::RDMEM_W(address_spacenum spacenum, uint32_t addr)
+uint16_t z8002_device::RDMEM_W(int spacenum, uint32_t addr)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;
@@ -224,7 +216,7 @@ uint16_t z8002_device::RDMEM_W(address_spacenum spacenum, uint32_t addr)
 		return m_data->read_word(addr);
 }
 
-uint32_t z8002_device::RDMEM_L(address_spacenum spacenum, uint32_t addr)
+uint32_t z8002_device::RDMEM_L(int spacenum, uint32_t addr)
 {
 	uint32_t result;
 	addr = adjust_addr_for_nonseg_mode(addr);
@@ -241,7 +233,7 @@ uint32_t z8002_device::RDMEM_L(address_spacenum spacenum, uint32_t addr)
 	}
 }
 
-void z8002_device::WRMEM_B(address_spacenum spacenum, uint32_t addr, uint8_t value)
+void z8002_device::WRMEM_B(int spacenum, uint32_t addr, uint8_t value)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	if (spacenum == AS_PROGRAM)
@@ -250,7 +242,7 @@ void z8002_device::WRMEM_B(address_spacenum spacenum, uint32_t addr, uint8_t val
 		m_data->write_byte(addr, value);
 }
 
-void z8002_device::WRMEM_W(address_spacenum spacenum, uint32_t addr, uint16_t value)
+void z8002_device::WRMEM_W(int spacenum, uint32_t addr, uint16_t value)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;
@@ -260,7 +252,7 @@ void z8002_device::WRMEM_W(address_spacenum spacenum, uint32_t addr, uint16_t va
 		m_data->write_word(addr, value);
 }
 
-void z8002_device::WRMEM_L(address_spacenum spacenum, uint32_t addr, uint32_t value)
+void z8002_device::WRMEM_L(int spacenum, uint32_t addr, uint32_t value)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;
@@ -385,7 +377,7 @@ void z8002_device::set_irq(int type)
 			m_irq_req = type;
 			break;
 		case Z8000_SYSCALL >> 8:
-			LOG(("Z8K '%s' SYSCALL $%02x\n", tag(), type & 0xff));
+			LOG("Z8K SYSCALL $%02x\n", type & 0xff);
 			m_irq_req = type;
 			break;
 		default:
@@ -474,7 +466,7 @@ void z8002_device::Interrupt()
 		m_irq_req &= ~Z8000_EPU;
 		CHANGE_FCW(GET_FCW(EPU));
 		m_pc = GET_PC(EPU);
-		LOG(("Z8K '%s' ext instr trap $%04x\n", tag(), m_pc));
+		LOG("Z8K ext instr trap $%04x\n", m_pc);
 	}
 	else
 	if (m_irq_req & Z8000_TRAP)
@@ -486,7 +478,7 @@ void z8002_device::Interrupt()
 		m_irq_req &= ~Z8000_TRAP;
 		CHANGE_FCW(GET_FCW(TRAP));
 		m_pc = GET_PC(TRAP);
-		LOG(("Z8K '%s' priv instr trap $%04x\n", tag(), m_pc));
+		LOG("Z8K priv instr trap $%04x\n", m_pc);
 	}
 	else
 	if (m_irq_req & Z8000_SYSCALL)
@@ -498,7 +490,7 @@ void z8002_device::Interrupt()
 		m_irq_req &= ~Z8000_SYSCALL;
 		CHANGE_FCW(GET_FCW(SYSCALL));
 		m_pc = GET_PC(SYSCALL);
-		LOG(("Z8K '%s' syscall $%04x\n", tag(), m_pc));
+		LOG("Z8K syscall $%04x\n", m_pc);
 	}
 	else
 	if (m_irq_req & Z8000_SEGTRAP)
@@ -510,7 +502,7 @@ void z8002_device::Interrupt()
 		m_irq_req &= ~Z8000_SEGTRAP;
 		CHANGE_FCW(GET_FCW(SEGTRAP));
 		m_pc = GET_PC(SEGTRAP);
-		LOG(("Z8K '%s' segtrap $%04x\n", tag(), m_pc));
+		LOG("Z8K segtrap $%04x\n", m_pc);
 	}
 	else
 	if (m_irq_req & Z8000_NMI)
@@ -523,7 +515,7 @@ void z8002_device::Interrupt()
 		m_irq_req &= ~Z8000_NMI;
 		CHANGE_FCW(GET_FCW(NMI));
 		m_pc = GET_PC(NMI);
-		LOG(("Z8K '%s' NMI $%04x\n", tag(), m_pc));
+		LOG("Z8K NMI $%04x\n", m_pc);
 	}
 	else
 	if ((m_irq_req & Z8000_NVI) && (m_fcw & F_NVIE))
@@ -535,7 +527,7 @@ void z8002_device::Interrupt()
 		m_pc = GET_PC(NVI);
 		m_irq_req &= ~Z8000_NVI;
 		CHANGE_FCW(GET_FCW(NVI));
-		LOG(("Z8K '%s' NVI $%04x\n", tag(), m_pc));
+		LOG("Z8K NVI $%04x\n", m_pc);
 	}
 	else
 	if ((m_irq_req & Z8000_VI) && (m_fcw & F_VIE))
@@ -547,7 +539,7 @@ void z8002_device::Interrupt()
 		m_pc = read_irq_vector();
 		m_irq_req &= ~Z8000_VI;
 		CHANGE_FCW(GET_FCW(VI));
-		LOG(("Z8K '%s' VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", tag(), m_irq_vec, VEC00 + ( m_vector_mult * 2 ) * (m_irq_req & 0xff), m_fcw, m_pc));
+		LOG("Z8K VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", m_irq_vec, VEC00 + ( m_vector_mult * 2 ) * (m_irq_req & 0xff), m_fcw, m_pc);
 	}
 }
 
@@ -642,47 +634,22 @@ void z8002_device::state_string_export(const device_state_entry &entry, std::str
 	}
 }
 
-void z8001_device::z8k_disass_mode(int ref, int params, const char *param[])
+void z8002_device::init_tables()
 {
-	size_t len;
-	if (params == 1)
-	{
-		len = strlen(param[0]);
-		if (!core_strnicmp(param[0], "segmented", len) || !core_stricmp(param[0], "z8001")) {
-			z8k_segm = true;
-			z8k_segm_mode = Z8K_SEGM_MODE_SEG;
-			machine().debugger().console().printf("Disassembler mode set to Z8001/segmented\n");
-		}
-		else if (!core_strnicmp(param[0], "non-segmented", len) || !core_stricmp(param[0], "z8002"))
-		{
-			z8k_segm = false;
-			z8k_segm_mode = Z8K_SEGM_MODE_NONSEG;
-			machine().debugger().console().printf("Disassembler mode set to Z8002/non-segmented\n");
-		}
-		else if (!core_strnicmp(param[0], "automatic", len))
-		{
-			z8k_segm_mode = Z8K_SEGM_MODE_AUTO;
-			machine().debugger().console().printf("Disassembler mode set to automatic\n");
-		}
-		else
-			goto usage;
-	}
-	else if (params > 1)
-	{
-	usage:
-		machine().debugger().console().printf("Usage: z8k_disass_mode <mode>\n");
-		machine().debugger().console().printf("       set disassembler mode\n");
-		machine().debugger().console().printf("       mode: \"segmented\" or \"z8001\"     - Z8001 mode\n");
-		machine().debugger().console().printf("             \"non-segmented\" or \"z8002\" - Z8002 mode\n");
-		machine().debugger().console().printf("             \"automatic\"                  - automatic mode\n");
-	}
-	else
-	{
-		machine().debugger().console().printf("Current disassembler mode: ");
-		if (z8k_segm_mode == Z8K_SEGM_MODE_AUTO)
-			machine().debugger().console().printf("automatic, currently ");
-		machine().debugger().console().printf("%s\n", z8k_segm ? "Z8001/segmented" : "Z8002/non-segmented");
-	}
+	/* set up the zero, sign, parity lookup table */
+	for (int i = 0; i < 256; i++)
+		z8000_zsp[i] = ((i == 0) ? F_Z : 0) |
+						((i & 128) ? F_S : 0) |
+						((((i>>7)^(i>>6)^(i>>5)^(i>>4)^(i>>3)^(i>>2)^(i>>1)^i) & 1) ? 0 : F_PV);
+
+	for (const Z8000_init *opc = table; opc->size; opc++)
+		for (u32 val = opc->beg; val <= opc->end; val += opc->step)
+			z8000_exec[val] = opc - table;
+}
+
+util::disasm_interface *z8002_device::create_disassembler()
+{
+	return new z8000_disassembler(this);
 }
 
 void z8001_device::device_start()
@@ -696,20 +663,10 @@ void z8001_device::device_start()
 		m_data = &space(AS_DATA);
 	else
 		m_data = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
-	/* already initialized? */
-	if(z8000_exec == nullptr)
-		z8000_init_tables();
-
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-	{
-		using namespace std::placeholders;
-		machine().debugger().console().register_command("z8k_disass_mode", CMDFLAG_NONE, 0, 0, 1, std::bind(&z8001_device::z8k_disass_mode, this, _1, _2, _3));
-	}
-
-	z8k_segm = true;
+	init_tables();
 
 	register_debug_state();
 
@@ -729,14 +686,10 @@ void z8002_device::device_start()
 		m_data = &space(AS_DATA);
 	else
 		m_data = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
-	/* already initialized? */
-	if(z8000_exec == nullptr)
-		z8000_init_tables();
-
-	z8k_segm = false;
+	init_tables();
 
 	register_debug_state();
 
@@ -768,7 +721,6 @@ void z8002_device::device_reset()
 
 z8002_device::~z8002_device()
 {
-	z8000_deinit_tables();
 }
 
 void z8002_device::execute_run()
@@ -779,9 +731,6 @@ void z8002_device::execute_run()
 		if (m_irq_req)
 			Interrupt();
 
-		if (z8k_segm_mode == Z8K_SEGM_MODE_AUTO)
-			z8k_segm = (m_fcw & F_SEG_Z8001()) ? 1 : 0;
-
 		m_ppc = m_pc;
 		debugger_instruction_hook(this, m_pc);
 
@@ -791,14 +740,12 @@ void z8002_device::execute_run()
 		}
 		else
 		{
-			Z8000_exec *exec;
-
 			m_op[0] = RDOP();
 			m_op_valid = 1;
-			exec = &z8000_exec[m_op[0]];
+			const Z8000_init &exec = table[z8000_exec[m_op[0]]];
 
-			m_icount -= exec->cycles;
-			(this->*exec->opcode)();
+			m_icount -= exec.cycles;
+			(this->*exec.opcode)();
 			m_op_valid = 0;
 		}
 	} while (m_icount > 0);

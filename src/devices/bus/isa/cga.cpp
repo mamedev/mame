@@ -190,22 +190,22 @@ MC6845_UPDATE_ROW( isa8_cga_device::crtc_update_row )
 	switch (m_update_row_type)
 	{
 		case CGA_TEXT_INTEN:
-			cga_text_inten_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			cga_text<false, false, false, false, 8>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
 		case CGA_TEXT_INTEN_ALT:
-			cga_text_inten_alt_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			cga_text<false, false, false, true, 8>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
 		case CGA_TEXT_INTEN_CG:
-			cga_text_inten_comp_grey_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			cga_text<false, false, true, false, 8>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
 		case CGA_TEXT_BLINK:
-			cga_text_blink_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			cga_text<true, false, false, false, 8>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
 		case CGA_TEXT_BLINK_ALT:
-			cga_text_blink_alt_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			cga_text<true, false, false, true, 8>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
 		case CGA_TEXT_BLINK_SI:
-			cga_text_blink_update_row_si(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			cga_text<true, true, false, false, 8>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
 			break;
 		case CGA_GFX_1BPP:
 			cga_gfx_1bpp_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
@@ -244,7 +244,24 @@ MC6845_UPDATE_ROW( isa8_cga_pc1512_device::crtc_update_row )
 #define CGA_LCLK (XTAL_14_31818MHz/16)
 
 
-static MACHINE_CONFIG_FRAGMENT( cga )
+ROM_START( cga )
+	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+ROM_END
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(ISA8_CGA, isa8_cga_device, "cga", "IBM Color/Graphics Monitor Adapter")
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_START(isa8_cga_device::device_add_mconfig)
 	MCFG_SCREEN_ADD(CGA_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
 	MCFG_SCREEN_UPDATE_DEVICE( DEVICE_SELF, isa8_cga_device, screen_update )
@@ -260,30 +277,6 @@ static MACHINE_CONFIG_FRAGMENT( cga )
 	MCFG_MC6845_RECONFIGURE_CB(isa8_cga_device, reconfigure)
 	MCFG_VIDEO_SET_SCREEN(nullptr)
 MACHINE_CONFIG_END
-
-
-ROM_START( cga )
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
-ROM_END
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-const device_type ISA8_CGA = &device_creator<isa8_cga_device>;
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor isa8_cga_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cga );
-}
 
 ioport_constructor isa8_cga_device::device_input_ports() const
 {
@@ -305,29 +298,18 @@ const tiny_rom_entry *isa8_cga_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_cga_device::isa8_cga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA8_CGA, "IBM Color/Graphics Monitor Adapter", tag, owner, clock, "cga", __FILE__),
-		device_isa8_card_interface(mconfig, *this),
-		m_cga_config(*this, "cga_config"), m_framecnt(0), m_mode_control(0), m_color_select(0),
-		m_update_row_type(-1), m_y(0), m_chr_gen_base(nullptr), m_chr_gen(nullptr), m_vsync(0), m_hsync(0),
-		m_vram_size( 0x4000 ), m_plantronics(0),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen")
+	isa8_cga_device(mconfig, ISA8_CGA, tag, owner, clock)
 {
-	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x1800;
-	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x1000;
-	m_font_selection_mask = 0x01;
-	m_start_offset = 0;
-	m_superimpose = false;
 }
 
-isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_isa8_card_interface(mconfig, *this),
-		m_cga_config(*this, "cga_config"), m_framecnt(0), m_mode_control(0), m_color_select(0),
-		m_update_row_type(-1), m_y(0), m_chr_gen_base(nullptr), m_chr_gen(nullptr), m_vsync(0), m_hsync(0),
-		m_vram_size( 0x4000 ), m_plantronics(0),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen")
+isa8_cga_device::isa8_cga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_isa8_card_interface(mconfig, *this),
+	m_cga_config(*this, "cga_config"), m_framecnt(0), m_mode_control(0), m_color_select(0),
+	m_update_row_type(-1), m_y(0), m_chr_gen_base(nullptr), m_chr_gen(nullptr), m_vsync(0), m_hsync(0),
+	m_vram_size( 0x4000 ), m_plantronics(0),
+	m_palette(*this, "palette"),
+	m_screen(*this, "screen")
 {
 	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x1800;
 	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x1000;
@@ -439,14 +421,14 @@ uint32_t isa8_cga_device::screen_update(screen_device &screen, bitmap_rgb32 &bit
 }
 
 
-const device_type ISA8_CGA_POISK2 = &device_creator<isa8_cga_poisk2_device>;
+DEFINE_DEVICE_TYPE(ISA8_CGA_POISK2, isa8_cga_poisk2_device, "cga_poisk2", "ISA8_CGA_POISK2")
 
 //-------------------------------------------------
 //  isa8_cga_poisk2_device - constructor
 //-------------------------------------------------
 
 isa8_cga_poisk2_device::isa8_cga_poisk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_POISK2, "ISA8_CGA_POISK2", tag, owner, clock, "cga_poisk2", __FILE__)
+	isa8_cga_device(mconfig, ISA8_CGA_POISK2, tag, owner, clock)
 {
 	m_chr_gen_offset[0] = 0x0000;
 	m_chr_gen_offset[1] = 0x0800;
@@ -468,218 +450,58 @@ const tiny_rom_entry *isa8_cga_poisk2_device::device_rom_region() const
 
 
 /* for superimposing CGA over a different source video (i.e. tetriskr) */
-const device_type ISA8_CGA_SUPERIMPOSE = &device_creator<isa8_cga_superimpose_device>;
+DEFINE_DEVICE_TYPE(ISA8_CGA_SUPERIMPOSE, isa8_cga_superimpose_device, "cga_superimpose", "ISA8_CGA_SUPERIMPOSE")
 
 //-------------------------------------------------
 //  isa8_cga_superimpose_device - constructor
 //-------------------------------------------------
 
 isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_SUPERIMPOSE, "ISA8_CGA_SUPERIMPOSE", tag, owner, clock, "cga_superimpose", __FILE__)
+	isa8_cga_superimpose_device(mconfig, ISA8_CGA_SUPERIMPOSE, tag, owner, clock)
+{
+}
+
+isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	isa8_cga_device(mconfig, type, tag, owner, clock)
 {
 	m_superimpose = true;
 }
 
-isa8_cga_superimpose_device::isa8_cga_superimpose_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		isa8_cga_device( mconfig, type, name, tag, owner, clock, shortname, source)
-{
-	m_superimpose = true;
-}
-
-/***************************************************************************
-  Draw text mode with 40x25 characters (default) with high intensity bg.
-  The character cell size is 16x8
-***************************************************************************/
-
-MC6845_UPDATE_ROW( isa8_cga_device::cga_text_inten_update_row )
+template<bool blink, bool si, bool comp, bool alt, int width>
+MC6845_UPDATE_ROW( isa8_cga_device::cga_text )
 {
 	uint8_t *videoram = &m_vram[m_start_offset];
 	uint32_t  *p = &bitmap.pix32(y);
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int i;
 
-	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_update_row",("\n"));
+	if ( y == 0 ) CGA_LOG(1,"cga_text_8",("\n"));
 	for ( i = 0; i < x_count; i++ )
 	{
 		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
 		uint8_t chr = videoram[ offset ];
 		uint8_t attr = videoram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * 8 + ra ];
-		uint16_t fg = attr & 0x0F;
-		uint16_t bg = attr >> 4;
-
-		if ( i == cursor_x && ( m_framecnt & 0x08 ) )
-		{
-			data = 0xFF;
-		}
-
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
-	}
-}
-
-
-/***************************************************************************
-  Draw text mode with 40x25 characters (default) with high intensity bg.
-  The character cell size is 16x8. Composite monitor, greyscale.
-***************************************************************************/
-
-MC6845_UPDATE_ROW( isa8_cga_device::cga_text_inten_comp_grey_update_row )
-{
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
-
-	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_comp_grey_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ )
-	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		uint8_t chr = videoram[ offset ];
-		uint8_t attr = videoram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * 8 + ra ];
-		uint16_t fg = 0x10 + ( attr & 0x0F );
-		uint16_t bg = 0x10 + ( ( attr >> 4 ) & 0x07 );
-
-		if ( i == cursor_x && ( m_framecnt & 0x08 ) )
-		{
-			data = 0xFF;
-		}
-
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
-	}
-}
-
-/***************************************************************************
-  Draw text mode with 40x25 characters (default) with high intensity bg.
-  The character cell size is 16x8
-***************************************************************************/
-
-MC6845_UPDATE_ROW( isa8_cga_device::cga_text_inten_alt_update_row )
-{
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
-
-	if ( y == 0 ) CGA_LOG(1,"cga_text_inten_alt_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ )
-	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		uint8_t chr = videoram[ offset ];
-		uint8_t attr = videoram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * 8 + ra ];
-		uint16_t fg = attr & 0x0F;
-
-		if ( i == cursor_x && ( m_framecnt & 0x08 ) )
-		{
-			data = 0xFF;
-		}
-
-		*p = palette[( data & 0x80 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x40 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x20 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x10 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x08 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x04 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x02 ) ? fg : 0]; p++;
-		*p = palette[( data & 0x01 ) ? fg : 0]; p++;
-	}
-}
-
-
-/***************************************************************************
-  Draw text mode with 40x25 characters (default) and blinking colors.
-  The character cell size is 16x8
-***************************************************************************/
-
-MC6845_UPDATE_ROW( isa8_cga_device::cga_text_blink_update_row )
-{
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
-
-	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ )
-	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		uint8_t chr = videoram[ offset ];
-		uint8_t attr = videoram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * 8 + ra ];
-		uint16_t fg = attr & 0x0F;
-		uint16_t bg = (attr >> 4) & 0x07;
-
-		if ( i == cursor_x )
-		{
-			if ( m_framecnt & 0x08 )
-			{
-				data = 0xFF;
-			}
-		}
-		else
-		{
-			if ( ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
-			{
-				data = 0x00;
-			}
-		}
-
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
-	}
-}
-
-MC6845_UPDATE_ROW( isa8_cga_device::cga_text_blink_update_row_si )
-{
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
-
-	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_update_row_si",("\n"));
-	for ( i = 0; i < x_count; i++ )
-	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		uint8_t chr = videoram[ offset ];
-		uint8_t attr = videoram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * 8 + ra ];
-		uint16_t fg = attr & 0x0F;
-		uint16_t bg = (attr >> 4) & 0x07;
+		uint8_t data = m_chr_gen[ chr * width + ra ];
+		uint16_t fg, bg;
 		uint8_t xi;
 
-		if ( i == cursor_x )
+		if ( comp )
 		{
-			if ( m_framecnt & 0x08 )
-			{
-				data = 0xFF;
-			}
+			fg = 0x10 + ( attr & 0x0F );
+			bg = alt ? 0 : ( 0x10 + ( ( attr >> 4 ) & 0x07 ) );
 		}
 		else
 		{
-			if ( ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
-			{
-				data = 0x00;
-			}
+			fg = attr & 0x0F;
+			bg = alt ? 0 : ( ( attr >> 4 ) & ( blink ? 0x07 : 0x0f ) );
+		}
+
+		if ( ( i == cursor_x ) && ( m_framecnt & 0x08 ) )
+			data = 0xFF;
+		else if ( blink && ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
+		{
+			data = 0x00;
+			bg = ( attr >> 4 ) & 0x07;
 		}
 
 		for(xi=0;xi<8;xi++)
@@ -688,59 +510,10 @@ MC6845_UPDATE_ROW( isa8_cga_device::cga_text_blink_update_row_si )
 
 			dot = (data & (1 << (7-xi)));
 			pen_data = dot ? fg : bg;
-			if(pen_data || dot)
+			if(!si || (pen_data || dot))
 				*p = palette[pen_data];
 			p++;
 		}
-	}
-}
-
-/***************************************************************************
-  Draw text mode with 40x25 characters (default) and blinking colors.
-  The character cell size is 16x8
-***************************************************************************/
-
-MC6845_UPDATE_ROW( isa8_cga_device::cga_text_blink_alt_update_row )
-{
-	uint8_t *videoram = &m_vram[m_start_offset];
-	uint32_t  *p = &bitmap.pix32(y);
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	int i;
-
-	if ( y == 0 ) CGA_LOG(1,"cga_text_blink_alt_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ )
-	{
-		uint16_t offset = ( ( ma + i ) << 1 ) & 0x3fff;
-		uint8_t chr = videoram[ offset ];
-		uint8_t attr = videoram[ offset +1 ];
-		uint8_t data = m_chr_gen[ chr * 8 + ra ];
-		uint16_t fg = attr & 0x07;
-		uint16_t bg = 0;
-
-		if ( i == cursor_x )
-		{
-			if ( m_framecnt & 0x08 )
-			{
-				data = 0xFF;
-			}
-		}
-		else
-		{
-			if ( ( attr & 0x80 ) && ( m_framecnt & 0x10 ) )
-			{
-				data = 0x00;
-				bg = ( attr >> 4 ) & 0x07;
-			}
-		}
-
-		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
-		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
 	}
 }
 
@@ -1538,7 +1311,7 @@ WRITE8_MEMBER( isa8_cga_pc1512_device::vram_w )
 }
 
 
-const device_type ISA8_CGA_PC1512 = &device_creator<isa8_cga_pc1512_device>;
+DEFINE_DEVICE_TYPE(ISA8_CGA_PC1512, isa8_cga_pc1512_device, "cga_pc1512", "ISA8_CGA_PC1512")
 
 const offs_t isa8_cga_pc1512_device::vram_offset[4]= { 0x0000, 0x4000, 0x8000, 0xC000 };
 const uint8_t isa8_cga_pc1512_device::mc6845_writeonce_register[31] =
@@ -1551,7 +1324,7 @@ const uint8_t isa8_cga_pc1512_device::mc6845_writeonce_register[31] =
 //-------------------------------------------------
 
 isa8_cga_pc1512_device::isa8_cga_pc1512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_PC1512, "ISA8_CGA_PC1512", tag, owner, clock, "cga_pc1512", __FILE__), m_write(0), m_read(0), m_mc6845_address(0)
+	isa8_cga_device(mconfig, ISA8_CGA_PC1512, tag, owner, clock), m_write(0), m_read(0), m_mc6845_address(0)
 {
 	m_vram_size = 0x10000;
 	m_chr_gen_offset[0] = 0x0000;
@@ -1583,7 +1356,7 @@ void isa8_cga_pc1512_device::device_start()
 	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_cga_pc1512_device::io_read), this ), write8_delegate( FUNC(isa8_cga_pc1512_device::io_write), this ) );
 	m_isa->install_bank(0xb8000, 0xbbfff, "bank1", &m_vram[0]);
 
-	address_space &space = machine().firstcpu->space( AS_PROGRAM );
+	address_space &space = m_isa->memspace();
 
 	space.install_write_handler( 0xb8000, 0xbbfff, write8_delegate( FUNC(isa8_cga_pc1512_device::vram_w), this ) );
 	space.install_write_handler( 0xbc000, 0xbffff, write8_delegate( FUNC(isa8_cga_pc1512_device::vram_w), this ) );
@@ -1673,7 +1446,7 @@ READ8_MEMBER( isa8_wyse700_device::io_read )
 }
 
 
-const device_type ISA8_WYSE700 = &device_creator<isa8_wyse700_device>;
+DEFINE_DEVICE_TYPE(ISA8_WYSE700, isa8_wyse700_device, "wyse700", "Wyse 700")
 
 
 //-------------------------------------------------
@@ -1681,7 +1454,7 @@ const device_type ISA8_WYSE700 = &device_creator<isa8_wyse700_device>;
 //-------------------------------------------------
 
 isa8_wyse700_device::isa8_wyse700_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_cga_device( mconfig, ISA8_WYSE700, "Wyse 700", tag, owner, clock, "wyse700", __FILE__), m_bank_offset(0), m_bank_base(0), m_control(0)
+	isa8_cga_device(mconfig, ISA8_WYSE700, tag, owner, clock), m_bank_offset(0), m_bank_base(0), m_control(0)
 {
 	m_vram_size = 0x20000;
 	m_start_offset = 0x18000;
@@ -1762,14 +1535,14 @@ uint32_t isa8_wyse700_device::screen_update(screen_device &screen, bitmap_rgb32 
 }
 
 
-const device_type ISA8_EC1841_0002 = &device_creator<isa8_ec1841_0002_device>;
+DEFINE_DEVICE_TYPE(ISA8_EC1841_0002, isa8_ec1841_0002_device, "ec1841_0002", "EC 1841.0002 (CGA)")
 
 //-------------------------------------------------
 //  isa8_ec1841_0002_device - constructor
 //-------------------------------------------------
 
 isa8_ec1841_0002_device::isa8_ec1841_0002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_cga_device( mconfig, ISA8_EC1841_0002, "EC 1841.0002 (CGA)", tag, owner, clock, "ec1841_0002", __FILE__), m_p3df(0)
+	isa8_cga_device(mconfig, ISA8_EC1841_0002, tag, owner, clock), m_p3df(0)
 {
 }
 
@@ -1848,14 +1621,14 @@ READ8_MEMBER( isa8_ec1841_0002_device::io_read )
 	return data;
 }
 
-const device_type ISA8_CGA_MC1502 = &device_creator<isa8_cga_mc1502_device>;
+DEFINE_DEVICE_TYPE(ISA8_CGA_MC1502, isa8_cga_mc1502_device, "cga_mc1502", "MC1502 CGA")
 
 //-------------------------------------------------
 //  isa8_cga_mc1502_device - constructor
 //-------------------------------------------------
 
 isa8_cga_mc1502_device::isa8_cga_mc1502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_MC1502, "MC1502 CGA", tag, owner, clock, "cga_mc1502", __FILE__)
+	isa8_cga_device(mconfig, ISA8_CGA_MC1502, tag, owner, clock)
 {
 	m_vram_size = 0x8000;
 	m_chr_gen_offset[0] = 0x0000;
@@ -1877,14 +1650,14 @@ const tiny_rom_entry *isa8_cga_iskr1031_device::device_rom_region() const
 	return ROM_NAME( cga_iskr1031 );
 }
 
-const device_type ISA8_CGA_ISKR1031 = &device_creator<isa8_cga_iskr1031_device>;
+DEFINE_DEVICE_TYPE(ISA8_CGA_ISKR1031, isa8_cga_iskr1031_device, "cga_iskr1031", "Iskra-1031 CGA")
 
 //-------------------------------------------------
 //  isa8_cga_iskr1031_device - constructor
 //-------------------------------------------------
 
 isa8_cga_iskr1031_device::isa8_cga_iskr1031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_ISKR1031, "Iskra-1031 CGA", tag, owner, clock, "cga_iskr1031", __FILE__)
+	isa8_cga_device(mconfig, ISA8_CGA_ISKR1031, tag, owner, clock)
 {
 }
 
@@ -1902,14 +1675,14 @@ const tiny_rom_entry *isa8_cga_iskr1030m_device::device_rom_region() const
 	return ROM_NAME( cga_iskr1030m );
 }
 
-const device_type ISA8_CGA_ISKR1030M = &device_creator<isa8_cga_iskr1030m_device>;
+DEFINE_DEVICE_TYPE(ISA8_CGA_ISKR1030M, isa8_cga_iskr1030m_device, "cga_iskr1030m", "Iskra-1030M CGA")
 
 //-------------------------------------------------
 //  isa8_cga_iskr1030m_device - constructor
 //-------------------------------------------------
 
 isa8_cga_iskr1030m_device::isa8_cga_iskr1030m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_ISKR1030M, "Iskra-1030M CGA", tag, owner, clock, "cga_iskr1030m", __FILE__)
+	isa8_cga_device(mconfig, ISA8_CGA_ISKR1030M, tag, owner, clock)
 {
 }
 
@@ -1926,23 +1699,39 @@ const tiny_rom_entry *isa8_cga_mc1502_device::device_rom_region() const
 	return ROM_NAME( mc1502 );
 }
 
-const device_type ISA8_CGA_M24 = &device_creator<isa8_cga_m24_device>;
+DEFINE_DEVICE_TYPE(ISA8_CGA_M24, isa8_cga_m24_device, "cga_m24", "Olivetti M24 CGA")
 
-static MACHINE_CONFIG_DERIVED( m24, cga )
+MACHINE_CONFIG_START(isa8_cga_m24_device::device_add_mconfig)
+	isa8_cga_device::device_add_mconfig(config);
+
 	MCFG_DEVICE_MODIFY(CGA_SCREEN_NAME)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,462,0,400)
 	MCFG_DEVICE_MODIFY(CGA_MC6845_NAME)
 	MCFG_MC6845_RECONFIGURE_CB(isa8_cga_m24_device, reconfigure)
 MACHINE_CONFIG_END
 
-machine_config_constructor isa8_cga_m24_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( m24 );
-}
 isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		isa8_cga_device( mconfig, ISA8_CGA_M24, "Olivetti M24 CGA", tag, owner, clock, "cga_m24", __FILE__), m_mode2(0), m_index(0)
+	isa8_cga_m24_device(mconfig, ISA8_CGA_M24, tag, owner, clock)
+{
+}
+
+isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	isa8_cga_device(mconfig, type, tag, owner, clock), m_mode2(0), m_index(0)
 {
 	m_vram_size = 0x8000;
+}
+
+ROM_START(cga_m24)
+	ROM_REGION(0x2000, "gfx1", 0)
+	ROM_LOAD("m24 graphics board go380 258 pqbq.bin", 0x00000, 0x1000, CRC(04495786) SHA1(ea34ee527c5632d049ec11a7ae0fde9e6dee545f))
+
+	ROM_REGION(0x1000, "crtc_prom", 0)
+	ROM_LOAD("m24 graphics board go380 gi 9433-0088.bin", 0x00000, 0x1000, CRC(5725e660) SHA1(634c2d165d401883a955e144a0abfa2078a47013))
+ROM_END
+
+const tiny_rom_entry *isa8_cga_m24_device::device_rom_region() const
+{
+	return ROM_NAME(cga_m24);
 }
 
 void isa8_cga_m24_device::device_reset()
@@ -1950,6 +1739,8 @@ void isa8_cga_m24_device::device_reset()
 	isa8_cga_device::device_reset();
 	m_mode2 = 0;
 	m_start_offset = 0;
+	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x0000;
+	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x0000;
 }
 
 MC6845_RECONFIGURE( isa8_cga_m24_device::reconfigure )
@@ -2018,12 +1809,53 @@ READ8_MEMBER( isa8_cga_m24_device::io_read )
 	return data;
 }
 
-MC6845_UPDATE_ROW( isa8_cga_m24_device::crtc_update_row )
+
+MC6845_UPDATE_ROW(isa8_cga_m24_device::crtc_update_row)
 {
 	if(m_mode2 & 1)
+	{
 		m24_gfx_1bpp_m24_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
-	else
-		isa8_cga_device::crtc_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+		return;
+	}
+
+	if (m_update_row_type == -1)
+		return;
+
+	y = m_y;
+	if(m_y >= bitmap.height())
+		return;
+
+	switch (m_update_row_type)
+	{
+		case CGA_TEXT_INTEN:
+			cga_text<false, false, false, false, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_INTEN_ALT:
+			cga_text<false, false, false, true, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_INTEN_CG: // this hardware doesn't support composite
+			break;
+		case CGA_TEXT_BLINK:
+			cga_text<true, false, false, false, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_BLINK_ALT:
+			cga_text<true, false, false, true, 16>(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_TEXT_BLINK_SI:
+			break;
+		case CGA_GFX_1BPP:
+			cga_gfx_1bpp_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_2BPP:
+			cga_gfx_2bpp_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_4BPPL:
+			cga_gfx_4bppl_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+		case CGA_GFX_4BPPH:
+			cga_gfx_4bpph_update_row(bitmap, cliprect, ma, ra >> 1, y, x_count, cursor_x, de, hbp, vbp);
+			break;
+	}
 }
 
 MC6845_UPDATE_ROW( isa8_cga_m24_device::m24_gfx_1bpp_m24_update_row )
@@ -2061,3 +1893,71 @@ MC6845_UPDATE_ROW( isa8_cga_m24_device::m24_gfx_1bpp_m24_update_row )
 		*p = palette[( data & 0x01 ) ? fg : 0]; p++;
 	}
 }
+
+DEFINE_DEVICE_TYPE(ISA8_CGA_CPORTIII, isa8_cga_cportiii_device, "cga_cportiii", "Compaq Portable III CGA")
+
+MACHINE_CONFIG_START(isa8_cga_cportiii_device::device_add_mconfig)
+	isa8_cga_m24_device::device_add_mconfig(config);
+
+	MCFG_DEVICE_MODIFY(CGA_SCREEN_NAME)
+	MCFG_SCREEN_COLOR(rgb_t(255, 125, 0))
+MACHINE_CONFIG_END
+
+isa8_cga_cportiii_device::isa8_cga_cportiii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	isa8_cga_m24_device(mconfig, ISA8_CGA_CPORTIII, tag, owner, clock)
+{
+}
+
+ROM_START(cga_cportiii)
+	ROM_REGION(0x2000, "gfx1", 0)
+	ROM_FILL(0, 0x2000, 0)
+ROM_END
+
+const tiny_rom_entry *isa8_cga_cportiii_device::device_rom_region() const
+{
+	return ROM_NAME(cga_cportiii);
+}
+
+void isa8_cga_cportiii_device::device_reset()
+{
+	isa8_cga_m24_device::device_reset();
+	m_isa->install_device(0x13c6, 0x13c7, read8_delegate(FUNC(isa8_cga_cportiii_device::port_13c6_r), this), write8_delegate(FUNC(isa8_cga_cportiii_device::port_13c6_w), this));
+	m_isa->install_device(0x23c6, 0x23c7, read8_delegate(FUNC(isa8_cga_cportiii_device::port_23c6_r), this), write8_delegate(FUNC(isa8_cga_cportiii_device::port_23c6_w), this));
+	m_palette->set_pen_color(0, 100, 25, 0);
+	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x0000;
+	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x1000;
+}
+
+WRITE8_MEMBER(isa8_cga_cportiii_device::char_ram_write)
+{
+	m_chr_gen_base[offset] = data;
+}
+
+READ8_MEMBER(isa8_cga_cportiii_device::char_ram_read)
+{
+	return m_chr_gen_base[offset];
+}
+
+READ8_MEMBER(isa8_cga_cportiii_device::port_13c6_r)
+{
+	return 0x04;
+}
+
+WRITE8_MEMBER(isa8_cga_cportiii_device::port_13c6_w)
+{
+}
+
+READ8_MEMBER(isa8_cga_cportiii_device::port_23c6_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(isa8_cga_cportiii_device::port_23c6_w)
+{
+	m_mode2 = data & 1;
+	if(BIT(data, 3))
+		m_isa->install_memory(0xb8000, 0xb9fff, read8_delegate(FUNC(isa8_cga_cportiii_device::char_ram_read), this), write8_delegate(FUNC(isa8_cga_cportiii_device::char_ram_write), this));
+	else
+		m_isa->install_bank(0xb8000, 0xb8000 + 0x8000 - 1, "bank_cga", &m_vram[0]);
+}
+

@@ -18,9 +18,19 @@
 
 */
 
+#include "emu.h"
 #include "e0c6200.h"
+#include "e0c6200d.h"
 #include "debugger.h"
 
+
+// construction/destruction
+e0c6200_cpu_device::e0c6200_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor program, address_map_constructor data)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 16, 13, -1, program)
+	, m_data_config("data", ENDIANNESS_BIG, 8, 12, 0, data), m_program(nullptr), m_data(nullptr), m_op(0), m_prev_op(0), m_irq_vector(0), m_irq_id(0), m_possible_irq(false), m_halt(false),
+	m_sleep(false), m_icount(0), m_pc(0), m_prev_pc(0), m_npc(0), m_jpc(0), m_a(0), m_b(0), m_xp(0), m_xh(0), m_xl(0), m_yp(0), m_yh(0), m_yl(0), m_sp(0), m_f(0)
+{ }
 
 // disasm
 void e0c6200_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -40,10 +50,9 @@ void e0c6200_cpu_device::state_string_export(const device_state_entry &entry, st
 	}
 }
 
-offs_t e0c6200_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *e0c6200_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(e0c6200);
-	return CPU_DISASSEMBLE_NAME(e0c6200)(this, buffer, pc, oprom, opram, options);
+	return new e0c6200_disassembler;
 }
 
 
@@ -164,6 +173,14 @@ void e0c6200_cpu_device::do_interrupt()
 	standard_irq_callback(m_irq_id);
 }
 
+device_memory_interface::space_config_vector e0c6200_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
+
 void e0c6200_cpu_device::execute_run()
 {
 	while (m_icount > 0)
@@ -194,7 +211,7 @@ void e0c6200_cpu_device::execute_run()
 
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
-		m_op = m_program->read_word(m_pc << 1) & 0xfff;
+		m_op = m_program->read_word(m_pc) & 0xfff;
 		m_pc = (m_pc & 0x1000) | ((m_pc + 1) & 0x0fff);
 
 		// minimal opcode time is 5 clock cycles, opcodes take 5, 7, or 12 clock cycles

@@ -5,7 +5,6 @@
 #ifndef __VIP__
 #define __VIP__
 
-#include "emu.h"
 #include "bus/vip/byteio.h"
 #include "bus/vip/exp.h"
 #include "cpu/cosmac/cosmac.h"
@@ -124,6 +123,8 @@ public:
 
 	// expansion state
 	uint8_t m_byteio_data;
+	void vp111(machine_config &config);
+	void vip(machine_config &config);
 };
 
 #endif

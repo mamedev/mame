@@ -35,10 +35,10 @@ control registers
 #define VERBOSE 0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
-const device_type K007342 = &device_creator<k007342_device>;
+DEFINE_DEVICE_TYPE(K007342, k007342_device, "k007342", "K007342 Video Controller")
 
 k007342_device::k007342_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K007342, "K007342 Video Controller", tag, owner, clock, "k007342", __FILE__),
+	: device_t(mconfig, K007342, tag, owner, clock),
 	m_ram(nullptr),
 	m_scroll_ram(nullptr),
 	m_videoram_0(nullptr),
@@ -162,7 +162,7 @@ WRITE8_MEMBER( k007342_device::vreg_w )
 			break;
 		case 0x01:  /* used for banking in Rock'n'Rage */
 			if (data != m_regs[1])
-				space.machine().tilemap().mark_all_dirty();
+				machine().tilemap().mark_all_dirty();
 		case 0x02:
 			m_scrollx[0] = (m_scrollx[0] & 0xff) | ((data & 0x01) << 8);
 			m_scrollx[1] = (m_scrollx[1] & 0xff) | ((data & 0x02) << 7);

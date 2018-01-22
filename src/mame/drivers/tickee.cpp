@@ -23,12 +23,14 @@
 
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
+#include "machine/nvram.h"
 #include "machine/ticket.h"
-#include "video/tlc34076.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
-#include "machine/nvram.h"
-#include "machine/watchdog.h"
+#include "video/tlc34076.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class tickee_state : public driver_device
@@ -47,6 +49,7 @@ public:
 		m_oki(*this, "oki"),
 		m_screen(*this, "screen"),
 		m_tlc34076(*this, "tlc34076"),
+		m_ticket(*this, "ticket%u", 1),
 		m_vram(*this, "vram"),
 		m_control(*this, "control") { }
 
@@ -54,6 +57,7 @@ public:
 	optional_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<tlc34076_device> m_tlc34076;
+	optional_device_array<ticket_dispenser_device, 2> m_ticket;
 
 	required_shared_ptr<uint16_t> m_vram;
 	optional_shared_ptr<uint16_t> m_control;
@@ -87,6 +91,10 @@ public:
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(rapidfir_scanline_update);
 
+	void rapidfir(machine_config &config);
+	void ghoshunt(machine_config &config);
+	void tickee(machine_config &config);
+	void mouseatk(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -301,14 +309,14 @@ READ16_MEMBER(tickee_state::rapidfir_transparent_r)
 TMS340X0_TO_SHIFTREG_CB_MEMBER(tickee_state::rapidfir_to_shiftreg)
 {
 	if (address < 0x800000)
-		memcpy(shiftreg, &m_vram[TOWORD(address)], TOBYTE(0x2000));
+		memcpy(shiftreg, &m_vram[address >> 4], 0x400);
 }
 
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(tickee_state::rapidfir_from_shiftreg)
 {
 	if (address < 0x800000)
-		memcpy(&m_vram[TOWORD(address)], shiftreg, TOBYTE(0x2000));
+		memcpy(&m_vram[address >> 4], shiftreg, 0x400);
 }
 
 
@@ -334,12 +342,12 @@ WRITE16_MEMBER(tickee_state::tickee_control_w)
 
 	if (offset == 3)
 	{
-		machine().device<ticket_dispenser_device>("ticket1")->write(space, 0, (data & 8) << 4);
-		machine().device<ticket_dispenser_device>("ticket2")->write(space, 0, (data & 4) << 5);
+		m_ticket[0]->motor_w(BIT(data, 3));
+		m_ticket[1]->motor_w(BIT(data, 2));
 	}
 
 	if (olddata != m_control[offset])
-		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", space.device().safe_pc(), offset, m_control[offset], olddata);
+		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", m_maincpu->pc(), offset, m_control[offset], olddata);
 }
 
 
@@ -740,7 +748,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tickee, tickee_state )
+MACHINE_CONFIG_START(tickee_state::tickee)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
@@ -780,7 +788,7 @@ static MACHINE_CONFIG_START( tickee, tickee_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ghoshunt, tickee )
+MACHINE_CONFIG_DERIVED(tickee_state::ghoshunt, tickee)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -788,7 +796,7 @@ static MACHINE_CONFIG_DERIVED( ghoshunt, tickee )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rapidfir, tickee_state )
+MACHINE_CONFIG_START(tickee_state::rapidfir)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_50MHz)
@@ -817,12 +825,12 @@ static MACHINE_CONFIG_START( rapidfir, tickee_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mouseatk, tickee_state )
+MACHINE_CONFIG_START(tickee_state::mouseatk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
@@ -853,7 +861,7 @@ static MACHINE_CONFIG_START( mouseatk, tickee_state )
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -1149,11 +1157,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, tickee,    0,        tickee,   tickee, driver_device,   0, ROT0, "Raster Elite",  "Tickee Tickats", 0 )
-GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, driver_device, 0, ROT0, "Hanaho Games",  "Ghost Hunter", 0 )
-GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, driver_device, 0, ROT0, "Island Design", "Tut's Tomb", 0 )
-GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, driver_device, 0, ROT0, "ICE",           "Mouse Attack", 0 )
-GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 239)", 0 )
-GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 238)", 0 )
-GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.0 (Build 236)", 0 )
-GAME( 1999, maletmad,  0,        rapidfir, rapidfir, driver_device, 0, ROT0, "Hanaho Games",  "Mallet Madness v2.1", 0 )
+GAME( 1994, tickee,    0,        tickee,   tickee,   tickee_state, 0, ROT0, "Raster Elite",  "Tickee Tickats",              0 )
+GAME( 1996, ghoshunt,  0,        ghoshunt, ghoshunt, tickee_state, 0, ROT0, "Hanaho Games",  "Ghost Hunter",                0 )
+GAME( 1996, tutstomb,  0,        ghoshunt, ghoshunt, tickee_state, 0, ROT0, "Island Design", "Tut's Tomb",                  0 )
+GAME( 1996, mouseatk,  0,        mouseatk, mouseatk, tickee_state, 0, ROT0, "ICE",           "Mouse Attack",                0 )
+GAME( 1998, rapidfir,  0,        rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 239)", 0 )
+GAME( 1998, rapidfira, rapidfir, rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.1 (Build 238)", 0 )
+GAME( 1998, rapidfire, rapidfir, rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Rapid Fire v1.0 (Build 236)", 0 )
+GAME( 1999, maletmad,  0,        rapidfir, rapidfir, tickee_state, 0, ROT0, "Hanaho Games",  "Mallet Madness v2.1",         0 )

@@ -8,6 +8,7 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "a2midi.h"
 #include "machine/clock.h"
 #include "bus/midi/midi.h"
@@ -21,14 +22,18 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_MIDI = &device_creator<a2bus_midi_device>;
+DEFINE_DEVICE_TYPE(A2BUS_MIDI, a2bus_midi_device, "a2midi", "6850 MIDI card")
 
 #define MIDI_PTM_TAG     "midi_ptm"
 #define MIDI_ACIA_TAG    "midi_acia"
 
-MACHINE_CONFIG_FRAGMENT( midi )
-	MCFG_DEVICE_ADD(MIDI_PTM_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(1021800.0f)
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_START(a2bus_midi_device::device_add_mconfig)
+	MCFG_DEVICE_ADD(MIDI_PTM_TAG, PTM6840, 1021800)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(1021800.0f, 1021800.0f, 1021800.0f)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(a2bus_midi_device, ptm_irq_w))
 
@@ -45,31 +50,17 @@ MACHINE_CONFIG_FRAGMENT( midi )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(a2bus_midi_device, write_acia_clock))
 MACHINE_CONFIG_END
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor a2bus_midi_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( midi );
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, A2BUS_MIDI, "6850 MIDI card", tag, owner, clock, "a2midi", __FILE__),
-		device_a2bus_card_interface(mconfig, *this),
-		m_ptm(*this, MIDI_PTM_TAG),
-		m_acia(*this, MIDI_ACIA_TAG), m_acia_irq(false),
-		m_ptm_irq(false)
+		a2bus_midi_device(mconfig, A2BUS_MIDI, tag, owner, clock)
 {
 }
 
-a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, type, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
 		m_ptm(*this, MIDI_PTM_TAG),
 		m_acia(*this, MIDI_ACIA_TAG), m_acia_irq(false),
@@ -96,22 +87,17 @@ void a2bus_midi_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_midi_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_midi_device::read_c0nx(uint8_t offset)
 {
 	// PTM at C0n0-C0n7, ACIA at C0n8-C0n9, drum sync (?) at C0nA-C0nB
 
 	if (offset < 8)
 	{
-		return m_ptm->read(space, offset & 7);
+		return m_ptm->read(machine().dummy_space(), offset & 7);
 	}
-	else if (offset == 8)
+	else if (offset == 8 || offset == 9)
 	{
-		return m_acia->status_r(space, 0);
-	}
-	else if (offset == 9)
-	{
-		uint8_t ret = m_acia->data_r(space, 0);
-		return ret;
+		return m_acia->read(machine().dummy_space(), offset & 1);
 	}
 
 	return 0;
@@ -121,19 +107,15 @@ uint8_t a2bus_midi_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_midi_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_midi_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	if (offset < 8)
 	{
-		m_ptm->write(space, offset & 7, data);
+		m_ptm->write(machine().dummy_space(), offset & 7, data);
 	}
-	else if (offset == 8)
+	else if (offset == 8 || offset == 9)
 	{
-		m_acia->control_w(space, 0, data);
-	}
-	else if (offset == 9)
-	{
-		m_acia->data_w(space, 0, data);
+		m_acia->write(machine().dummy_space(), offset & 1, data);
 	}
 }
 

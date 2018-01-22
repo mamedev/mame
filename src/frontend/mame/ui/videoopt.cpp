@@ -38,7 +38,7 @@ menu_video_targets::menu_video_targets(mame_ui_manager &mui, render_container &c
 {
 }
 
-void menu_video_targets::populate()
+void menu_video_targets::populate(float &customtop, float &custombottom)
 {
 	int targetnum;
 
@@ -170,7 +170,7 @@ menu_video_options::menu_video_options(mame_ui_manager &mui, render_container &c
 	target = _target;
 }
 
-void menu_video_options::populate()
+void menu_video_options::populate(float &customtop, float &custombottom)
 {
 	const char *subtext = "";
 	std::string tempstring;

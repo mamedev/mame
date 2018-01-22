@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2017 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
 
@@ -44,6 +44,11 @@ newoption {
 }
 
 newoption {
+	trigger = "with-combined-examples",
+	description = "Enable building examples (combined as single executable).",
+}
+
+newoption {
 	trigger = "with-examples",
 	description = "Enable building examples.",
 }
@@ -73,6 +78,7 @@ solution "bgfx"
 MODULE_DIR = path.getabsolute("../")
 BGFX_DIR   = path.getabsolute("..")
 BX_DIR     = os.getenv("BX_DIR")
+BIMG_DIR   = os.getenv("BIMG_DIR")
 
 local BGFX_BUILD_DIR = path.join(BGFX_DIR, ".build")
 local BGFX_THIRD_PARTY_DIR = path.join(BGFX_DIR, "3rdparty")
@@ -80,15 +86,23 @@ if not BX_DIR then
 	BX_DIR = path.getabsolute(path.join(BGFX_DIR, "../bx"))
 end
 
-if not os.isdir(BX_DIR) then
-	print("bx not found at " .. BX_DIR)
+if not BIMG_DIR then
+	BIMG_DIR = path.getabsolute(path.join(BGFX_DIR, "../bimg"))
+end
+
+if not os.isdir(BX_DIR) or not os.isdir(BIMG_DIR) then
+
+	if not os.isdir(BX_DIR) then
+		print("bx not found at " .. BX_DIR)
+	end
+
+	if not os.isdir(BIMG_DIR) then
+		print("bimg not found at " .. BIMG_DIR)
+	end
+
 	print("For more info see: https://bkaradzic.github.io/bgfx/build.html")
 	os.exit()
 end
-
-defines {
-	"BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS=1"
-}
 
 dofile (path.join(BX_DIR, "scripts/toolchain.lua"))
 if not toolchain(BGFX_BUILD_DIR, BGFX_THIRD_PARTY_DIR) then
@@ -109,41 +123,33 @@ end
 if _OPTIONS["with-profiler"] then
 	defines {
 		"ENTRY_CONFIG_PROFILER=1",
-		"BGFX_CONFIG_PROFILER_REMOTERY=1",
-        "_WINSOCKAPI_"
+		"BGFX_CONFIG_PROFILER=1",
 	}
 end
 
-function exampleProject(_name)
-
-	project ("example-" .. _name)
-		uuid (os.uuid("example-" .. _name))
-		kind "WindowedApp"
-
-	configuration {}
+function exampleProjectDefaults()
 
 	debugdir (path.join(BGFX_DIR, "examples/runtime"))
 
 	includedirs {
 		path.join(BX_DIR,   "include"),
+		path.join(BIMG_DIR, "include"),
 		path.join(BGFX_DIR, "include"),
 		path.join(BGFX_DIR, "3rdparty"),
 		path.join(BGFX_DIR, "examples/common"),
 	}
 
-	files {
-		path.join(BGFX_DIR, "examples", _name, "**.c"),
-		path.join(BGFX_DIR, "examples", _name, "**.cpp"),
-		path.join(BGFX_DIR, "examples", _name, "**.h"),
-	}
-
-	removefiles {
-		path.join(BGFX_DIR, "examples", _name, "**.bin.h"),
+	flags {
+		"FatalWarnings",
 	}
 
 	links {
-		"bgfx",
 		"example-common",
+		"example-glue",
+		"bgfx",
+		"bimg_decode",
+		"bimg",
+		"bx",
 	}
 
 	if _OPTIONS["with-sdl"] then
@@ -307,8 +313,8 @@ function exampleProject(_name)
 	configuration { "rpi" }
 		links {
 			"X11",
-			"GLESv2",
-			"EGL",
+			"brcmGLESv2",
+			"brcmEGL",
 			"bcm_host",
 			"vcos",
 			"vchiq_arm",
@@ -346,6 +352,7 @@ function exampleProject(_name)
 			path.join(BGFX_DIR, "examples/runtime/tvOS-Info.plist"),
 		}
 
+
 	configuration { "qnx*" }
 		targetextension ""
 		links {
@@ -358,53 +365,127 @@ function exampleProject(_name)
 	strip()
 end
 
+function exampleProject(_combined, ...)
+
+	if _combined then
+
+		project ("examples")
+			uuid (os.uuid("examples"))
+			kind "WindowedApp"
+
+		for _, name in ipairs({...}) do
+
+			files {
+				path.join(BGFX_DIR, "examples", name, "**.c"),
+				path.join(BGFX_DIR, "examples", name, "**.cpp"),
+				path.join(BGFX_DIR, "examples", name, "**.h"),
+			}
+
+			removefiles {
+				path.join(BGFX_DIR, "examples", name, "**.bin.h"),
+			}
+
+		end
+
+		files {
+			path.join(BGFX_DIR, "examples/25-c99/helloworld.c"), -- hack for _main_
+		}
+
+		exampleProjectDefaults()
+
+	else
+
+		for _, name in ipairs({...}) do
+			project ("example-" .. name)
+				uuid (os.uuid("example-" .. name))
+				kind "WindowedApp"
+
+			files {
+				path.join(BGFX_DIR, "examples", name, "**.c"),
+				path.join(BGFX_DIR, "examples", name, "**.cpp"),
+				path.join(BGFX_DIR, "examples", name, "**.h"),
+			}
+
+			removefiles {
+				path.join(BGFX_DIR, "examples", name, "**.bin.h"),
+			}
+
+			defines {
+				"ENTRY_CONFIG_IMPLEMENT_MAIN=1",
+			}
+
+			exampleProjectDefaults()
+		end
+	end
+
+end
+
 dofile "bgfx.lua"
 
 group "libs"
 bgfxProject("", "StaticLib", {})
 
-if _OPTIONS["with-examples"] or _OPTIONS["with-tools"] then
+dofile(path.join(BX_DIR,   "scripts/bx.lua"))
+dofile(path.join(BIMG_DIR, "scripts/bimg.lua"))
+dofile(path.join(BIMG_DIR, "scripts/bimg_decode.lua"))
+
+if _OPTIONS["with-tools"] then
+	dofile(path.join(BIMG_DIR, "scripts/bimg_encode.lua"))
+end
+
+if _OPTIONS["with-examples"]
+or _OPTIONS["with-combined-examples"]
+or _OPTIONS["with-tools"] then
 	group "examples"
 	dofile "example-common.lua"
 end
 
-if _OPTIONS["with-examples"] then
+if _OPTIONS["with-examples"]
+or _OPTIONS["with-combined-examples"] then
 	group "examples"
-	exampleProject("00-helloworld")
-	exampleProject("01-cubes")
-	exampleProject("02-metaballs")
-	exampleProject("03-raymarch")
-	exampleProject("04-mesh")
-	exampleProject("05-instancing")
-	exampleProject("06-bump")
-	exampleProject("07-callback")
-	exampleProject("08-update")
-	exampleProject("09-hdr")
-	exampleProject("10-font")
-	exampleProject("11-fontsdf")
-	exampleProject("12-lod")
-	exampleProject("13-stencil")
-	exampleProject("14-shadowvolumes")
-	exampleProject("15-shadowmaps-simple")
-	exampleProject("16-shadowmaps")
-	exampleProject("17-drawstress")
-	exampleProject("18-ibl")
-	exampleProject("19-oit")
-	exampleProject("20-nanovg")
-	exampleProject("21-deferred")
-	exampleProject("22-windows")
-	exampleProject("23-vectordisplay")
-	exampleProject("24-nbody")
-	exampleProject("26-occlusion")
-	exampleProject("27-terrain")
-	exampleProject("28-wireframe")
-	exampleProject("29-debugdraw")
-	exampleProject("30-picking")
-	exampleProject("31-rsm")
+
+	exampleProject(_OPTIONS["with-combined-examples"]
+		, "00-helloworld"
+		, "01-cubes"
+		, "02-metaballs"
+		, "03-raymarch"
+		, "04-mesh"
+		, "05-instancing"
+		, "06-bump"
+		, "07-callback"
+		, "08-update"
+		, "09-hdr"
+		, "10-font"
+		, "11-fontsdf"
+		, "12-lod"
+		, "13-stencil"
+		, "14-shadowvolumes"
+		, "15-shadowmaps-simple"
+		, "16-shadowmaps"
+		, "17-drawstress"
+		, "18-ibl"
+		, "19-oit"
+		, "20-nanovg"
+		, "21-deferred"
+		, "22-windows"
+		, "23-vectordisplay"
+		, "24-nbody"
+		, "26-occlusion"
+		, "27-terrain"
+		, "28-wireframe"
+		, "29-debugdraw"
+		, "30-picking"
+		, "31-rsm"
+		, "32-particles"
+		, "33-pom"
+		, "34-mvs"
+		, "35-dynamic"
+		, "36-sky"
+		)
 
 	-- C99 source doesn't compile under WinRT settings
 	if not premake.vstudio.iswinrt() then
-		exampleProject("25-c99")
+		exampleProject(false, "25-c99")
 	end
 end
 

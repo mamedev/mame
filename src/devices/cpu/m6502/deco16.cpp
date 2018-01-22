@@ -10,45 +10,49 @@
 
 #include "emu.h"
 #include "deco16.h"
+#include "deco16d.h"
 
 #define DECO16_VERBOSE 1
 
-const device_type DECO16 = &device_creator<deco16_device>;
+DEFINE_DEVICE_TYPE(DECO16, deco16_device, "deco16", "DECO16")
 
 deco16_device::deco16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, DECO16, "DECO16", tag, owner, clock, "deco16", __FILE__),
+	m6502_device(mconfig, DECO16, tag, owner, clock),
 	io(nullptr),
 	io_config("io", ENDIANNESS_LITTLE, 8, 16)
 {
 }
 
-offs_t deco16_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *deco16_device::create_disassembler()
 {
-	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
+	return new deco16_disassembler;
 }
-
 
 void deco16_device::device_start()
 {
 	if(direct_disabled)
-		mintf = new mi_default_nd;
+		mintf = std::make_unique<mi_default_nd>();
 	else
-		mintf = new mi_default_normal;
+		mintf = std::make_unique<mi_default_normal>();
 
 	init();
 
 	io = &space(AS_IO);
 }
 
-const address_space_config *deco16_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector deco16_device::memory_space_config() const
 {
-	switch(spacenum)
-	{
-	case AS_PROGRAM:           return &program_config;
-	case AS_IO:                return &io_config;
-	case AS_DECRYPTED_OPCODES: return has_configured_map(AS_DECRYPTED_OPCODES) ? &sprogram_config : nullptr;
-	default:                   return nullptr;
-	}
+	if(has_configured_map(AS_OPCODES))
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &program_config),
+			std::make_pair(AS_OPCODES, &sprogram_config),
+			std::make_pair(AS_IO,      &io_config)
+		};
+	else
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &program_config),
+			std::make_pair(AS_IO,      &io_config)
+		};
 }
 
 #include "cpu/m6502/deco16.hxx"

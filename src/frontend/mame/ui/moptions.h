@@ -8,16 +8,16 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_FRONTEND_UI_MOPTIONS_H
+#define MAME_FRONTEND_UI_MOPTIONS_H
 
-#ifndef __UI_OPTS_H__
-#define __UI_OPTS_H__
+#pragma once
 
 #include "options.h"
 
 // core directory options
 #define OPTION_HISTORY_PATH           "historypath"
-#define OPTION_EXTRAINI_PATH          "extrainipath"
+#define OPTION_CATEGORYINI_PATH       "categorypath"
 #define OPTION_CABINETS_PATH          "cabinets_directory"
 #define OPTION_CPANELS_PATH           "cpanels_directory"
 #define OPTION_PCBS_PATH              "pcbs_directory"
@@ -45,6 +45,7 @@
 #define OPTION_SKIP_BIOS_MENU         "skip_biosmenu"
 #define OPTION_SKIP_PARTS_MENU        "skip_partsmenu"
 #define OPTION_LAST_USED_FILTER       "last_used_filter"
+#define OPTION_LAST_RIGHT_PANEL       "last_right_panel"
 #define OPTION_LAST_USED_MACHINE      "last_used_machine"
 #define OPTION_INFO_AUTO_AUDIT        "info_audit_enabled"
 #define OPTION_HIDE_ROMLESS           "hide_romless"
@@ -80,7 +81,7 @@ public:
 
 	// Search path options
 	const char *history_path() const { return value(OPTION_HISTORY_PATH); }
-	const char *extraini_path() const { return value(OPTION_EXTRAINI_PATH); }
+	const char *categoryini_path() const { return value(OPTION_CATEGORYINI_PATH); }
 	const char *cabinets_directory() const { return value(OPTION_CABINETS_PATH); }
 	const char *cpanels_directory() const { return value(OPTION_CPANELS_PATH); }
 	const char *pcbs_directory() const { return value(OPTION_PCBS_PATH); }
@@ -109,6 +110,7 @@ public:
 	bool skip_parts_menu() const { return bool_value(OPTION_SKIP_PARTS_MENU); }
 	const char *last_used_machine() const { return value(OPTION_LAST_USED_MACHINE); }
 	const char *last_used_filter() const { return value(OPTION_LAST_USED_FILTER); }
+	int last_right_panel() const { return int_value(OPTION_LAST_RIGHT_PANEL); }
 	bool info_audit() const { return bool_value(OPTION_INFO_AUTO_AUDIT); }
 	bool hide_romless() const { return bool_value(OPTION_HIDE_ROMLESS); }
 
@@ -137,4 +139,4 @@ private:
 	static const options_entry s_option_entries[];
 };
 
-#endif /* __UI_OPTS_H__ */
+#endif // MAME_FRONTEND_UI_MOPTIONS_H

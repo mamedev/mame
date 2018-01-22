@@ -85,7 +85,6 @@ Needed roms:
 - Head to Head Baseball      (ever finished/released?, by Nintendo, 1986)
 - Lionex                     (prototype by Sunsoft, 1987)
 - Madura no Tsubasa          (prototype by Sunsoft, 1987)
-- Predators                  (prototype by Williams, 1984)
 - Pro Yakyuu Family Stadium  (by Namco, 1986; Japan version of RBI Baseball)
 - Quest of Ki                (by Namco/Game Studio, 1988)
 - Super Chinese              (by Namco/Culture Brain, 1988)
@@ -140,11 +139,15 @@ Changes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/vsnes.h"
+
 #include "cpu/m6502/n2a03.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "rendlay.h"
-#include "includes/vsnes.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /******************************************************************************/
 
@@ -169,7 +172,7 @@ WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_w)
 		//"bnglngby" and "cluclu"
 	if( data & 0xfe )
 	{
-		logerror("vsnes_coin_counter_w: pc = 0x%04x - data = 0x%02x\n", space.device().safe_pc(), data);
+		logerror("vsnes_coin_counter_w: pc = 0x%04x - data = 0x%02x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -185,7 +188,7 @@ WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_1_w)
 	if( data & 0xfe ) //vsbball service mode
 	{
 	//do something?
-		logerror("vsnes_coin_counter_1_w: pc = 0x%04x - data = 0x%02x\n", space.device().safe_pc(), data);
+		logerror("vsnes_coin_counter_1_w: pc = 0x%04x - data = 0x%02x\n", m_subcpu->pc(), data);
 	}
 
 }
@@ -257,7 +260,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( vsnes_state::vsnes_bootleg_z80_latch_r )
 {
-	return 0x00;// rand();
+	return 0x00;
 }
 
 static ADDRESS_MAP_START( vsnes_bootleg_z80_map, AS_PROGRAM, 8, vsnes_state )
@@ -1695,10 +1698,10 @@ static INPUT_PORTS_START( supxevs )
 	PORT_DIPSETTING(    0xc0, "RP2C04-0004" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vsnes, vsnes_state )
+MACHINE_CONFIG_START(vsnes_state::vsnes)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03,N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_map)
 								/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
@@ -1726,7 +1729,7 @@ static MACHINE_CONFIG_START( vsnes, vsnes_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jajamaru, vsnes )
+MACHINE_CONFIG_DERIVED(vsnes_state::jajamaru, vsnes)
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_01_ADD("ppu1")
@@ -1735,7 +1738,7 @@ static MACHINE_CONFIG_DERIVED( jajamaru, vsnes )
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mightybj, vsnes )
+MACHINE_CONFIG_DERIVED(vsnes_state::mightybj, vsnes)
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_02_ADD("ppu1")
@@ -1744,7 +1747,7 @@ static MACHINE_CONFIG_DERIVED( mightybj, vsnes )
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vsgshoe, vsnes )
+MACHINE_CONFIG_DERIVED(vsnes_state::vsgshoe, vsnes)
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_03_ADD("ppu1")
@@ -1753,7 +1756,7 @@ static MACHINE_CONFIG_DERIVED( vsgshoe, vsnes )
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( topgun, vsnes )
+MACHINE_CONFIG_DERIVED(vsnes_state::topgun, vsnes)
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_04_ADD("ppu1")
@@ -1762,13 +1765,13 @@ static MACHINE_CONFIG_DERIVED( topgun, vsnes )
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vsdual, vsnes_state )
+MACHINE_CONFIG_START(vsnes_state::vsdual)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03,N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_map)
 								/* some carts also trigger IRQs */
-	MCFG_CPU_ADD("sub", N2A03,N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("sub", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vsnes_cpu2_map)
 								/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsdual)
@@ -1812,7 +1815,7 @@ static MACHINE_CONFIG_START( vsdual, vsnes_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vsdual_pi, vsdual )
+MACHINE_CONFIG_DERIVED(vsnes_state::vsdual_pi, vsdual)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	// need high level of interleave to keep screens in sync in Balloon Fight.
 	// however vsmahjng doesn't like perfect interleave? you end up needing to reset it to boot? maybe something in a bad default state? watchdog?
@@ -1820,7 +1823,7 @@ static MACHINE_CONFIG_DERIVED( vsdual_pi, vsdual )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vsnes_bootleg, vsnes_state )
+MACHINE_CONFIG_START(vsnes_state::vsnes_bootleg)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,XTAL_16MHz/4) // 4mhz? seems too high but flickers badly otherwise, issue elsewhere?
@@ -2796,63 +2799,63 @@ ROM_END
    Japan (C) Nintendo Co., Ltd.
 */
 
-/*    YEAR  NAME      PARENT    MACHINE  INPUT     INIT      MONITOR  */
-GAME( 1985, btlecity, 0,        vsnes,   btlecity, vsnes_state, vsnormal, ROT0, "Namco",                  "Vs. Battle City", 0 )
-GAME( 1985, starlstr, 0,        vsnes,   starlstr, vsnes_state, vsnormal, ROT0, "Namco",                  "Vs. Star Luster", 0 )
-GAME( 1987, cstlevna, 0,        vsnes,   cstlevna, vsnes_state, vsvram,   ROT0, "Konami",                 "Vs. Castlevania", 0 )
-GAME( 1984, cluclu,   0,        vsnes,   cluclu, vsnes_state,   vsnormal, ROT0, "Nintendo",               "Vs. Clu Clu Land", 0 )
-GAME( 1990, drmario,  0,        vsnes,   drmario, vsnes_state,  drmario,  ROT0, "Nintendo",               "Vs. Dr. Mario", 0 )
-GAME( 1984, excitebk, 0,        vsnes,   excitebk, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 E)", 0 )
-GAME( 1984, excitebko,excitebk, vsnes,   excitebk, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 ?)", 0 ) // older
-GAME( 1984, excitebkj,excitebk, vsnes,   excitebk, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-4 A)", 0 ) // likely Japan
-GAME( 1986, goonies,  0,        vsnes,   goonies, vsnes_state,  vskonami, ROT0, "Konami",                 "Vs. The Goonies (set E)", 0 )
-GAME( 1984, iceclimb, 0,        vsnes,   iceclmbj, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 B-1)", 0 )
-GAME( 1984, iceclimba,iceclimb, vsnes,   iceclimb, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 ?)", 0 )
-GAME( 1985, nvs_machrider, 0,        vsnes,   machridr, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Endurance Course Version)", MACHINE_IMPERFECT_GRAPHICS )
+/*    YEAR  NAME      PARENT     MACHINE        INPUT     STATE        INIT      MONITOR  */
+GAME( 1985, btlecity, 0,         vsnes,         btlecity, vsnes_state, vsnormal, ROT0, "Namco",                  "Vs. Battle City",                 0 )
+GAME( 1985, starlstr, 0,         vsnes,         starlstr, vsnes_state, vsnormal, ROT0, "Namco",                  "Vs. Star Luster",                 0 )
+GAME( 1987, cstlevna, 0,         vsnes,         cstlevna, vsnes_state, vsvram,   ROT0, "Konami",                 "Vs. Castlevania",                 0 )
+GAME( 1984, cluclu,   0,         vsnes,         cluclu,   vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Clu Clu Land",                0 )
+GAME( 1990, drmario,  0,         vsnes,         drmario,  vsnes_state, drmario,  ROT0, "Nintendo",               "Vs. Dr. Mario",                   0 )
+GAME( 1984, excitebk, 0,         vsnes,         excitebk, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 E)",    0 )
+GAME( 1984, excitebko,excitebk,  vsnes,         excitebk, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 ?)",    0 ) // older
+GAME( 1984, excitebkj,excitebk,  vsnes,         excitebk, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-4 A)",    0 ) // likely Japan
+GAME( 1986, goonies,  0,         vsnes,         goonies,  vsnes_state, vskonami, ROT0, "Konami",                 "Vs. The Goonies (set E)",         0 )
+GAME( 1984, iceclimb, 0,         vsnes,         iceclmbj, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 B-1)", 0 )
+GAME( 1984, iceclimba,iceclimb,  vsnes,         iceclimb, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 ?)",   0 )
+GAME( 1985, nvs_machrider, 0,    vsnes,         machridr, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Endurance Course Version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1985, nvs_machridera,nvs_machrider, vsnes,   machridj, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Fighting Course Version, set MR4-1 A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rbibb,    0,        vsnes,   rbibb, vsnes_state,    rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 1)", 0 )
-GAME( 1986, rbibba,   rbibb,    vsnes,   rbibb, vsnes_state,    rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 2)", 0 )
-GAME( 1986, suprmrio, 0,        vsnes,   suprmrio, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set SM4-4 E)", 0 )
-GAME( 1986, suprmrioa,suprmrio, vsnes,   suprmrio, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set ?, harder)", 0 )
-GAME( 1986, suprmriobl,suprmrio,vsnes_bootleg,suprmrio,vsnes_state,vsnormal, ROT0, "bootleg",             "Vs. Super Mario Bros. (bootleg with Z80, set 1)", MACHINE_NOT_WORKING ) // timer starts at 200(!)
-GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg,suprmrio,vsnes_state,vsnormal, ROT0, "bootleg",            "Vs. Super Mario Bros. (bootleg with Z80, set 2)", MACHINE_NOT_WORKING ) // timer starts at 300
-GAME( 1988, skatekds, suprmrio, vsnes,   suprmrio, vsnes_state, vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
-GAME( 1985, vsskykid, 0,        vsnes,   vsskykid, vsnes_state, MMC3,     ROT0, "Namco",                  "Vs. Super SkyKid" , 0 )
-GAME( 1987, tkoboxng, 0,        vsnes,   tkoboxng, vsnes_state, tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing", 0 )
-GAME( 1984, smgolf,   0,        vsnes,   golf4s, vsnes_state,   vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 F)", 0 )
-GAME( 1984, smgolfb,  smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)", 0 )
-GAME( 1984, smgolfj,  smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Stroke & Match Golf (Men Version) (Japan, set GF3 B)", 0 )
-GAME( 1984, ladygolfe,smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)", 0 )
-GAME( 1984, ladygolf, smgolf,   vsnes,   golf, vsnes_state,     vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 ?)", 0 )
-GAME( 1984, vspinbal, 0,        vsnes,   vspinbal, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Pinball (US, set PN4 E-1)", 0 )
-GAME( 1984, vspinbalj,vspinbal, vsnes,   vspinblj, vsnes_state, vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)", 0 )
-GAME( 1986, vsslalom, 0,        vsnes,   vsslalom, vsnes_state, vsnormal, ROT0, "Rare Coin-It Inc.",      "Vs. Slalom", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1985, vssoccer, 0,        vsnes,   vssoccer, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-2 A)", 0 )
-GAME( 1985, vssoccera,vssoccer, vsnes,   vssoccer, vsnes_state, bnglngby, ROT0, "Nintendo",               "Vs. Soccer (set SC4-3 ?)", 0 )
-GAME( 1986, vsgradus, 0,        vsnes,   vsgradus, vsnes_state, vskonami, ROT0, "Konami",                 "Vs. Gradius (US, set GR E)", 0 )
-GAME( 1987, nvs_platoon,  0,    vsnes,   platoon, vsnes_state,  platoon,  ROT0, "Ocean Software Limited", "Vs. Platoon", 0 )
-GAME( 1987, vstetris, 0,        vsnes,   vstetris, vsnes_state, vsnormal, ROT0, "Academysoft-Elorg",      "Vs. Tetris" , 0 )
-GAME( 1986, nvs_mightybj, 0,    mightybj,mightybj, vsnes_state, vsnormal, ROT0, "Tecmo",                  "Vs. Mighty Bomb Jack (Japan)", 0 )
-GAME( 1985, jajamaru, 0,        jajamaru,jajamaru, vsnes_state, vsnormal, ROT0, "Jaleco",                 "Vs. Ninja Jajamaru Kun (Japan)", 0 )
-GAME( 1987, topgun,   0,        topgun,  topgun, vsnes_state,   vsvram,   ROT0, "Konami",                 "Vs. Top Gun", 0)
-GAME( 1985, bnglngby, 0,        vsnes,   bnglngby, vsnes_state, bnglngby, ROT0, "Nintendo / Broderbund Software Inc.",  "Vs. Raid on Bungeling Bay (RD4-2 B)", 0 )
-GAME( 1986, supxevs,  0,        vsnes,   supxevs, vsnes_state,  supxevs,  ROT0, "Namco",                  "Vs. Super Xevious", 0 )
+GAME( 1986, rbibb,    0,         vsnes,         rbibb,    vsnes_state, rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 1)", 0 )
+GAME( 1986, rbibba,   rbibb,     vsnes,         rbibb,    vsnes_state, rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 2)", 0 )
+GAME( 1986, suprmrio, 0,         vsnes,         suprmrio, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set SM4-4 E)", 0 )
+GAME( 1986, suprmrioa,suprmrio,  vsnes,         suprmrio, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set ?, harder)", 0 )
+GAME( 1986, suprmriobl,suprmrio, vsnes_bootleg, suprmrio, vsnes_state, vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 1)", MACHINE_NOT_WORKING ) // timer starts at 200(!)
+GAME( 1986, suprmriobl2,suprmrio,vsnes_bootleg, suprmrio, vsnes_state, vsnormal, ROT0, "bootleg",                "Vs. Super Mario Bros. (bootleg with Z80, set 2)", MACHINE_NOT_WORKING ) // timer starts at 300
+GAME( 1988, skatekds, suprmrio,  vsnes,         suprmrio, vsnes_state, vsnormal, ROT0, "hack (Two-Bit Score)",   "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
+GAME( 1985, vsskykid, 0,         vsnes,         vsskykid, vsnes_state, MMC3,     ROT0, "Namco",                  "Vs. Super SkyKid", 0 )
+GAME( 1987, tkoboxng, 0,         vsnes,         tkoboxng, vsnes_state, tkoboxng, ROT0, "Namco / Data East USA",  "Vs. T.K.O. Boxing", 0 )
+GAME( 1984, smgolf,   0,         vsnes,         golf4s,   vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 F)",       0 )
+GAME( 1984, smgolfb,  smgolf,    vsnes,         golf,     vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Men Version, set GF4-2 ?)",       0 )
+GAME( 1984, smgolfj,  smgolf,    vsnes,         golf,     vsnes_state, vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Stroke & Match Golf (Men Version) (Japan, set GF3 B)", 0 )
+GAME( 1984, ladygolfe,smgolf,    vsnes,         golf,     vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 E)",      0 )
+GAME( 1984, ladygolf, smgolf,    vsnes,         golf,     vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Stroke & Match Golf (Ladies Version, set LG4 ?)",      0 )
+GAME( 1984, vspinbal, 0,         vsnes,         vspinbal, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Pinball (US, set PN4 E-1)",  0 )
+GAME( 1984, vspinbalj,vspinbal,  vsnes,         vspinblj, vsnes_state, vsnormal, ROT0, "Nintendo Co., Ltd.",     "Vs. Pinball (Japan, set PN3 B)", 0 )
+GAME( 1986, vsslalom, 0,         vsnes,         vsslalom, vsnes_state, vsnormal, ROT0, "Rare Coin-It Inc.",      "Vs. Slalom", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, vssoccer, 0,         vsnes,         vssoccer, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-2 A)", 0 )
+GAME( 1985, vssoccera,vssoccer,  vsnes,         vssoccer, vsnes_state, bnglngby, ROT0, "Nintendo",               "Vs. Soccer (set SC4-3 ?)", 0 )
+GAME( 1986, vsgradus, 0,         vsnes,         vsgradus, vsnes_state, vskonami, ROT0, "Konami",                 "Vs. Gradius (US, set GR E)", 0 )
+GAME( 1987, nvs_platoon,  0,     vsnes,         platoon,  vsnes_state, platoon,  ROT0, "Ocean Software Limited", "Vs. Platoon", 0 )
+GAME( 1987, vstetris, 0,         vsnes,         vstetris, vsnes_state, vsnormal, ROT0, "Academysoft-Elorg",      "Vs. Tetris" , 0 )
+GAME( 1986, nvs_mightybj, 0,     mightybj,      mightybj, vsnes_state, vsnormal, ROT0, "Tecmo",                  "Vs. Mighty Bomb Jack (Japan)", 0 )
+GAME( 1985, jajamaru, 0,         jajamaru,      jajamaru, vsnes_state, vsnormal, ROT0, "Jaleco",                 "Vs. Ninja Jajamaru Kun (Japan)", 0 )
+GAME( 1987, topgun,   0,         topgun,        topgun,   vsnes_state, vsvram,   ROT0, "Konami",                 "Vs. Top Gun", 0)
+GAME( 1985, bnglngby, 0,         vsnes,         bnglngby, vsnes_state, bnglngby, ROT0, "Nintendo / Broderbund Software Inc.",  "Vs. Raid on Bungeling Bay (RD4-2 B)", 0 )
+GAME( 1986, supxevs,  0,         vsnes,         supxevs,  vsnes_state, supxevs,  ROT0, "Namco",                  "Vs. Super Xevious", 0 )
 
 /* Light Gun games */
-GAME( 1985, duckhunt, 0,        vsnes,   duckhunt, vsnes_state, vsgun,    ROT0, "Nintendo",               "Vs. Duck Hunt (set DH3 E)", 0 )
-GAME( 1985, hogalley, 0,        vsnes,   hogalley, vsnes_state, vsgun,    ROT0, "Nintendo",               "Vs. Hogan's Alley (set HA4-1 E-1)", 0 )
-GAME( 1986, vsgshoe,  0,        vsgshoe, vsgshoe, vsnes_state,  vsgshoe,  ROT0, "Nintendo",               "Vs. Gumshoe (set GM5)", 0 )
-GAME( 1988, vsfdf,    0,        vsnes,   vsfdf, vsnes_state,    vsfdf,    ROT0, "Sunsoft",                "Vs. Freedom Force", 0 )
+GAME( 1985, duckhunt, 0,         vsnes,         duckhunt, vsnes_state, vsgun,    ROT0, "Nintendo",               "Vs. Duck Hunt (set DH3 E)",         0 )
+GAME( 1985, hogalley, 0,         vsnes,         hogalley, vsnes_state, vsgun,    ROT0, "Nintendo",               "Vs. Hogan's Alley (set HA4-1 E-1)", 0 )
+GAME( 1986, vsgshoe,  0,         vsgshoe,       vsgshoe,  vsnes_state, vsgshoe,  ROT0, "Nintendo",               "Vs. Gumshoe (set GM5)",             0 )
+GAME( 1988, vsfdf,    0,         vsnes,         vsfdf,    vsnes_state, vsfdf,    ROT0, "Sunsoft",                "Vs. Freedom Force",                 0 )
 
 /* Dual games */
-GAME( 1984, vstennis, 0,        vsdual_pi,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set TE A-3)" , 0 )
-GAME( 1984, vstennisa,vstennis, vsdual_pi,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 2)" , 0 )
-GAME( 1984, vstennisb,vstennis, vsdual_pi,  vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 3)" , MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, wrecking, 0,        vsdual_pi,  wrecking, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Wrecking Crew", 0 )
-GAME( 1984, balonfgt, 0,        vsdual_pi,  balonfgt, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Balloon Fight (set BF4 A-3)", 0 )
-GAME( 1984, vsmahjng, 0,        vsdual,     vsmahjng, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Mahjong (Japan)" , 0 )
-GAME( 1984, vsbball,  0,        vsdual_pi,  vsbball, vsnes_state,  vsdual,   ROT0, "Nintendo of America",    "Vs. BaseBall (US, set BA E-1)", 0 )
-GAME( 1984, vsbballj, vsbball,  vsdual_pi,  vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-3)", 0 )
-GAME( 1984, vsbballja,vsbball,  vsdual_pi,  vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-2)", 0 )
-GAME( 1984, vsbballjb,vsbball,  vsdual_pi,  vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-1)", 0 )
-GAME( 1984, iceclmrd, 0,        vsdual_pi,  iceclmrj, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Ice Climber Dual (set IC4-4 A-1)" , 0 )
+GAME( 1984, vstennis, 0,         vsdual_pi,     vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set TE A-3)" ,  0 )
+GAME( 1984, vstennisa,vstennis,  vsdual_pi,     vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 2)",        0 )
+GAME( 1984, vstennisb,vstennis,  vsdual_pi,     vstennis, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set 3)",        MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, wrecking, 0,         vsdual_pi,     wrecking, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Wrecking Crew",                    0 )
+GAME( 1984, balonfgt, 0,         vsdual_pi,     balonfgt, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Balloon Fight (set BF4 A-3)",      0 )
+GAME( 1984, vsmahjng, 0,         vsdual,        vsmahjng, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Mahjong (Japan)",                  0 )
+GAME( 1984, vsbball,  0,         vsdual_pi,     vsbball,  vsnes_state, vsdual,   ROT0, "Nintendo of America",    "Vs. BaseBall (US, set BA E-1)",        0 )
+GAME( 1984, vsbballj, vsbball,   vsdual_pi,     vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-3)",     0 )
+GAME( 1984, vsbballja,vsbball,   vsdual_pi,     vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-2)",     0 )
+GAME( 1984, vsbballjb,vsbball,   vsdual_pi,     vsbballj, vsnes_state, vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. BaseBall (Japan, set BA A-1)",     0 )
+GAME( 1984, iceclmrd, 0,         vsdual_pi,     iceclmrj, vsnes_state, vsdual,   ROT0, "Nintendo",               "Vs. Ice Climber Dual (set IC4-4 A-1)", 0 )

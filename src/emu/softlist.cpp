@@ -8,11 +8,13 @@
 
 ***************************************************************************/
 
-#include <regex>
-
 #include "softlist.h"
 #include "hash.h"
+
 #include "expat.h"
+
+#include <regex>
+
 
 
 //**************************************************************************
@@ -75,11 +77,14 @@ software_part::software_part(software_info &info, std::string &&name, std::strin
 const char *software_part::feature(const std::string &feature_name) const
 {
 	// scan the feature list for an entry matching feature_name and return the value
-	for (const feature_list_item &feature : m_featurelist)
-		if (feature.name() == feature_name)
-			return feature.value().c_str();
-	return nullptr;
+	auto iter = std::find_if(
+		m_featurelist.begin(),
+		m_featurelist.end(),
+		[&feature_name](const feature_list_item &feature) { return feature.name() == feature_name; });
 
+	return iter != m_featurelist.end()
+		? iter->value().c_str()
+		: nullptr;
 }
 
 
@@ -204,7 +209,7 @@ softlist_parser::softlist_parser(util::core_file &file, const std::string &filen
 	char buffer[1024];
 	while (!m_done)
 	{
-		uint32_t length = m_file.read(buffer, sizeof(buffer));
+		u32 length = m_file.read(buffer, sizeof(buffer));
 		m_done = m_file.eof();
 		if (XML_Parse(m_parser, buffer, length, m_done) == XML_STATUS_ERROR)
 		{
@@ -341,7 +346,7 @@ bool softlist_parser::parse_name_and_value(const char **attributes, std::string 
 //  current part's list
 //-------------------------------------------------
 
-void softlist_parser::add_rom_entry(std::string &&name, std::string &&hashdata, uint32_t offset, uint32_t length, uint32_t flags)
+void softlist_parser::add_rom_entry(std::string &&name, std::string &&hashdata, u32 offset, u32 length, u32 flags)
 {
 	// get the current part
 	if (m_current_part == nullptr)
@@ -597,7 +602,7 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 			// handle region attributes
 			const std::string &width = attrvalues[2];
 			const std::string &endianness = attrvalues[3];
-			uint32_t regionflags = ROMENTRYTYPE_REGION;
+			u32 regionflags = ROMENTRYTYPE_REGION;
 
 			if (!width.empty())
 			{
@@ -689,8 +694,8 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 		const std::string &loadflag = attrvalues[7];
 		if (!sizestr.empty() && !offsetstr.empty())
 		{
-			uint32_t length = strtol(sizestr.c_str(), nullptr, 0);
-			uint32_t offset = strtol(offsetstr.c_str(), nullptr, 0);
+			u32 length = strtol(sizestr.c_str(), nullptr, 0);
+			u32 offset = strtol(offsetstr.c_str(), nullptr, 0);
 
 			if (loadflag == "reload")
 				add_rom_entry("", "", offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS);
@@ -740,7 +745,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 		}
 		else if (!sizestr.empty() && !loadflag.empty() && loadflag == "ignore")
 		{
-			uint32_t length = strtol(sizestr.c_str(), nullptr, 0);
+			u32 length = strtol(sizestr.c_str(), nullptr, 0);
 			add_rom_entry("", "", 0, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
 		}
 		else
@@ -766,7 +771,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 
 			add_rom_entry(std::move(name), std::move(hashdata), 0, 0, ROMENTRYTYPE_ROM | (writeable ? DISK_READWRITE : DISK_READONLY));
 		}
-		else if (status.empty() || (status == "nodump")) // a no_dump chd is not an incomplete entry
+		else if (status != "nodump") // a no_dump chd is not an incomplete entry
 			parse_error("Incomplete disk definition");
 	}
 

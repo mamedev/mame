@@ -39,50 +39,53 @@ II Plus: RAM options reduced to 16/32/48 KB.
 ************************************************************************/
 
 #include "emu.h"
-#include "machine/bankdev.h"
-#include "machine/ram.h"
-#include "machine/kb3600.h"
-#include "sound/speaker.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/cassette.h"
-#include "formats/ap2_dsk.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/apple2.h"
 #include "video/apple2.h"
 
-#include "bus/a2bus/a2bus.h"
+#include "machine/74259.h"
+#include "machine/bankdev.h"
+#include "machine/timer.h"
+#include "imagedev/flopdrv.h"
+
+#include "bus/a2bus/a2alfam2.h"
+#include "bus/a2bus/a2applicard.h"
+#include "bus/a2bus/a2arcadebd.h"
+#include "bus/a2bus/a2cffa.h"
+#include "bus/a2bus/a2corvus.h"
 #include "bus/a2bus/a2diskii.h"
 #include "bus/a2bus/a2diskiing.h"
-#include "bus/a2bus/a2mockingboard.h"
-#include "bus/a2bus/a2cffa.h"
+#include "bus/a2bus/a2dx1.h"
+#include "bus/a2bus/a2echoii.h"
+#include "bus/a2bus/a2mcms.h"
 #include "bus/a2bus/a2memexp.h"
+#include "bus/a2bus/a2midi.h"
+#include "bus/a2bus/a2mockingboard.h"
+#include "bus/a2bus/a2pic.h"
+#include "bus/a2bus/a2sam.h"
 #include "bus/a2bus/a2scsi.h"
-#include "bus/a2bus/a2thunderclock.h"
 #include "bus/a2bus/a2softcard.h"
-#include "bus/a2bus/a2videoterm.h"
 #include "bus/a2bus/a2ssc.h"
 #include "bus/a2bus/a2swyft.h"
 #include "bus/a2bus/a2themill.h"
-#include "bus/a2bus/a2sam.h"
-#include "bus/a2bus/a2alfam2.h"
-#include "bus/a2bus/laser128.h"
-#include "bus/a2bus/a2echoii.h"
-#include "bus/a2bus/a2arcadebd.h"
-#include "bus/a2bus/a2midi.h"
-#include "bus/a2bus/a2zipdrive.h"
-#include "bus/a2bus/a2applicard.h"
+#include "bus/a2bus/a2thunderclock.h"
 #include "bus/a2bus/a2ultraterm.h"
-#include "bus/a2bus/a2pic.h"
-#include "bus/a2bus/a2corvus.h"
-#include "bus/a2bus/a2mcms.h"
-#include "bus/a2bus/a2dx1.h"
-#include "bus/a2bus/timemasterho.h"
-#include "bus/a2bus/mouse.h"
-#include "bus/a2bus/ramcard16k.h"
-#include "bus/a2bus/ramcard128k.h"
+#include "bus/a2bus/a2videoterm.h"
+#include "bus/a2bus/a2zipdrive.h"
 #include "bus/a2bus/ezcgi.h"
+#include "bus/a2bus/laser128.h"
+#include "bus/a2bus/mouse.h"
+#include "bus/a2bus/ramcard128k.h"
+#include "bus/a2bus/ramcard16k.h"
+#include "bus/a2bus/timemasterho.h"
+#include "bus/a2bus/ssprite.h"
+#include "bus/a2bus/ssbapple.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/ap2_dsk.h"
+
 
 #define A2_CPU_TAG "maincpu"
 #define A2_KBDC_TAG "ay3600"
@@ -113,7 +116,8 @@ public:
 		m_sysconfig(*this, "a2_config"),
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
-		m_upperbank(*this, A2_UPPERBANK_TAG)
+		m_upperbank(*this, A2_UPPERBANK_TAG),
+		m_softlatch(*this, "softlatch")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -129,6 +133,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
+	required_device<addressable_latch_device> m_softlatch;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
@@ -142,8 +147,27 @@ public:
 
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
-	DECLARE_READ8_MEMBER(c000_r);
-	DECLARE_WRITE8_MEMBER(c000_w);
+	DECLARE_READ8_MEMBER(keyb_data_r);
+	DECLARE_READ8_MEMBER(keyb_strobe_r);
+	DECLARE_WRITE8_MEMBER(keyb_strobe_w);
+	DECLARE_READ8_MEMBER(cassette_toggle_r);
+	DECLARE_WRITE8_MEMBER(cassette_toggle_w);
+	DECLARE_READ8_MEMBER(speaker_toggle_r);
+	DECLARE_WRITE8_MEMBER(speaker_toggle_w);
+	DECLARE_READ8_MEMBER(utility_strobe_r);
+	DECLARE_WRITE8_MEMBER(utility_strobe_w);
+	DECLARE_READ8_MEMBER(switches_r);
+	DECLARE_READ8_MEMBER(flags_r);
+	DECLARE_READ8_MEMBER(controller_strobe_r);
+	DECLARE_WRITE8_MEMBER(controller_strobe_w);
+	DECLARE_WRITE_LINE_MEMBER(txt_w);
+	DECLARE_WRITE_LINE_MEMBER(mix_w);
+	DECLARE_WRITE_LINE_MEMBER(scr_w);
+	DECLARE_WRITE_LINE_MEMBER(res_w);
+	DECLARE_WRITE_LINE_MEMBER(an0_w);
+	DECLARE_WRITE_LINE_MEMBER(an1_w);
+	DECLARE_WRITE_LINE_MEMBER(an2_w);
+	DECLARE_WRITE_LINE_MEMBER(an3_w);
 	DECLARE_READ8_MEMBER(c080_r);
 	DECLARE_WRITE8_MEMBER(c080_w);
 	DECLARE_READ8_MEMBER(c100_r);
@@ -160,6 +184,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
 
+	void apple2_common(machine_config &config);
+	void apple2jp(machine_config &config);
+	void apple2(machine_config &config);
+	void space84(machine_config &config);
+	void apple2p(machine_config &config);
 private:
 	int m_speaker_state;
 	int m_cassette_state;
@@ -188,7 +217,6 @@ private:
 
 	device_a2bus_card_interface *m_slotdevice[8];
 
-	void do_io(address_space &space, int offset);
 	uint8_t read_floatingbus();
 };
 
@@ -470,179 +498,183 @@ uint32_t napple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bi
 /***************************************************************************
     I/O
 ***************************************************************************/
-// most softswitches don't care about read vs write, so handle them here
-void napple2_state::do_io(address_space &space, int offset)
+
+WRITE_LINE_MEMBER(napple2_state::txt_w)
 {
-	if(space.debugger_access())
+	if (m_video->m_graphics == state) // avoid flickering from II+ refresh polling
 	{
-		return;
-	}
-
-	switch (offset)
-	{
-		case 0x20:
-			m_cassette_state ^= 1;
-			m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
-			break;
-
-		case 0x30:
-			m_speaker_state ^= 1;
-			m_speaker->level_w(m_speaker_state);
-			break;
-
-		case 0x50:  // graphics mode
-			machine().first_screen()->update_now();
-			m_video->m_graphics = true; break;
-
-		case 0x51:  // text mode
-			machine().first_screen()->update_now();
-			m_video->m_graphics = false; break;
-
-		case 0x52:  // no mix
-			machine().first_screen()->update_now();
-			m_video->m_mix = false; break;
-
-		case 0x53:  // mixed mode
-			machine().first_screen()->update_now();
-			m_video->m_mix = true; break;
-
-		case 0x54:  // set page 1
-			machine().first_screen()->update_now();
-			m_page2 = false;
-			m_video->m_page2 = false;
-			break;
-
-		case 0x55:  // set page 2
-			machine().first_screen()->update_now();
-			m_page2 = true;
-			m_video->m_page2 = true;
-			break;
-
-		case 0x56: // select lo-res
-			machine().first_screen()->update_now();
-			m_video->m_hires = false; break;
-
-		case 0x57: // select hi-res
-			machine().first_screen()->update_now();
-			m_video->m_hires = true; break;
-
-		case 0x58: // AN0 off
-			m_an0 = false; break;
-
-		case 0x59: // AN0 on
-			m_an0 = true; break;
-
-		case 0x5a: // AN1 off
-			m_an1 = false; break;
-
-		case 0x5b: // AN1 on
-			m_an1 = true; break;
-
-		case 0x5c: // AN2 off
-			m_an2 = false;
-			m_video->m_an2 = false;
-			break;
-
-		case 0x5d: // AN2 on
-			m_an2 = true;
-			m_video->m_an2 = true;
-			break;
-
-		case 0x5e: // AN3 off
-			m_an3 = false; break;
-
-		case 0x5f: // AN3 on
-			m_an3 = true; break;
-
-		case 0x68:  // IIgs STATE register, which ProDOS touches
-			break;
-
-		case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
-		case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-			m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
-			m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
-			m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_joy2x->read();
-			m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
-			break;
+		// select graphics or text mode
+		machine().first_screen()->update_now();
+		m_video->m_graphics = !state;
 	}
 }
 
-READ8_MEMBER(napple2_state::c000_r)
+WRITE_LINE_MEMBER(napple2_state::mix_w)
 {
-	switch (offset)
-	{
-		case 0x00:  // keyboard latch
-			return m_transchar | m_strobe;
+	// select mixed mode or nomix
+	machine().first_screen()->update_now();
+	m_video->m_mix = state;
+}
 
-		case 0x10:  // reads any key down, clears strobe
-			{
-				uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
-				m_strobe = 0;
-				return rv;
-			}
+WRITE_LINE_MEMBER(napple2_state::scr_w)
+{
+	// select primary or secondary page
+	machine().first_screen()->update_now();
+	m_page2 = state;
+	m_video->m_page2 = state;
+}
 
-		case 0x60: // cassette in
-		case 0x68:
-			return m_cassette->input() > 0.0 ? 0x80 : 0;
+WRITE_LINE_MEMBER(napple2_state::res_w)
+{
+	// select lo-res or hi-res
+	machine().first_screen()->update_now();
+	m_video->m_hires = state;
+}
 
-		case 0x61:  // button 0
-		case 0x69:
-			return (m_joybuttons->read() & 0x10) ? 0x80 : 0;
+WRITE_LINE_MEMBER(napple2_state::an0_w)
+{
+	m_an0 = state;
+}
 
-		case 0x62:  // button 1
-		case 0x6a:
-			return (m_joybuttons->read() & 0x20) ? 0x80 : 0;
+WRITE_LINE_MEMBER(napple2_state::an1_w)
+{
+	m_an1 = state;
+}
 
-		case 0x63:  // button 2
-		case 0x6b:
-			// check if SHIFT key mod configured
-			if (m_sysconfig->read() & 0x04)
-			{
-				return ((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0;
-			}
-			return (m_joybuttons->read() & 0x40) ? 0x80 : 0;
+WRITE_LINE_MEMBER(napple2_state::an2_w)
+{
+	m_an2 = state;
+	m_video->m_an2 = state;
+}
 
-		case 0x64:  // joy 1 X axis
-		case 0x6c:
-			return (space.machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+WRITE_LINE_MEMBER(napple2_state::an3_w)
+{
+	m_an3 = state;
+}
 
-		case 0x65:  // joy 1 Y axis
-		case 0x6d:
-			return (space.machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+READ8_MEMBER(napple2_state::keyb_data_r)
+{
+	// keyboard latch
+	return m_transchar | m_strobe;
+}
 
-		case 0x66: // joy 2 X axis
-		case 0x6e:
-			return (space.machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
+READ8_MEMBER(napple2_state::keyb_strobe_r)
+{
+	// reads any key down, clears strobe
+	uint8_t rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
+	if (!machine().side_effect_disabled())
+		m_strobe = 0;
+	return rv;
+}
 
-		case 0x67: // joy 2 Y axis
-		case 0x6f:
-			return (space.machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
+WRITE8_MEMBER(napple2_state::keyb_strobe_w)
+{
+	// clear keyboard latch
+	m_strobe = 0;
+}
 
-		default:
-			do_io(space, offset);
-			break;
-	}
-
+READ8_MEMBER(napple2_state::cassette_toggle_r)
+{
+	if (!machine().side_effect_disabled())
+		cassette_toggle_w(space, offset, 0);
 	return read_floatingbus();
 }
 
-WRITE8_MEMBER(napple2_state::c000_w)
+WRITE8_MEMBER(napple2_state::cassette_toggle_w)
 {
+	m_cassette_state ^= 1;
+	m_cassette->output(m_cassette_state ? 1.0f : -1.0f);
+}
+
+READ8_MEMBER(napple2_state::speaker_toggle_r)
+{
+	if (!machine().side_effect_disabled())
+		speaker_toggle_w(space, offset, 0);
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(napple2_state::speaker_toggle_w)
+{
+	m_speaker_state ^= 1;
+	m_speaker->level_w(m_speaker_state);
+}
+
+READ8_MEMBER(napple2_state::utility_strobe_r)
+{
+	if (!machine().side_effect_disabled())
+		utility_strobe_w(space, offset, 0);
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(napple2_state::utility_strobe_w)
+{
+	// pulses pin 5 of game I/O connector
+}
+
+READ8_MEMBER(napple2_state::switches_r)
+{
+	if (!machine().side_effect_disabled())
+		m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
+	return read_floatingbus();
+}
+
+READ8_MEMBER(napple2_state::flags_r)
+{
+	// Y output of 74LS251 at H14 read as D7
 	switch (offset)
 	{
-		case 0x10:  // clear keyboard latch
-			m_strobe = 0;
-			break;
+	case 0: // cassette in
+		return m_cassette->input() > 0.0 ? 0x80 : 0;
 
-		default:
-			do_io(space, offset);
-			break;
+	case 1:  // button 0
+		return (m_joybuttons->read() & 0x10) ? 0x80 : 0;
+
+	case 2:  // button 1
+		return (m_joybuttons->read() & 0x20) ? 0x80 : 0;
+
+	case 3:  // button 2
+		// check if SHIFT key mod configured
+		if (m_sysconfig->read() & 0x04)
+		{
+			return ((m_joybuttons->read() & 0x40) || (m_kbspecial->read() & 0x06)) ? 0x80 : 0;
+		}
+		return (m_joybuttons->read() & 0x40) ? 0x80 : 0;
+
+	case 4:  // joy 1 X axis
+		return (machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+
+	case 5:  // joy 1 Y axis
+		return (machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+
+	case 6: // joy 2 X axis
+		return (machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
+
+	case 7: // joy 2 Y axis
+		return (machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
 	}
+
+	// this is never reached
+	return 0;
+}
+
+READ8_MEMBER(napple2_state::controller_strobe_r)
+{
+	if (!machine().side_effect_disabled())
+		controller_strobe_w(space, offset, 0);
+	return read_floatingbus();
+}
+
+WRITE8_MEMBER(napple2_state::controller_strobe_w)
+{
+	m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
+	m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
+	m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_joy2x->read();
+	m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
 }
 
 READ8_MEMBER(napple2_state::c080_r)
 {
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		int slot;
 
@@ -651,7 +683,7 @@ READ8_MEMBER(napple2_state::c080_r)
 
 		if (m_slotdevice[slot] != nullptr)
 		{
-			return m_slotdevice[slot]->read_c0nx(space, offset % 0x10);
+			return m_slotdevice[slot]->read_c0nx(offset % 0x10);
 		}
 	}
 
@@ -667,7 +699,7 @@ WRITE8_MEMBER(napple2_state::c080_w)
 
 	if (m_slotdevice[slot] != nullptr)
 	{
-		m_slotdevice[slot]->write_c0nx(space, offset % 0x10, data);
+		m_slotdevice[slot]->write_c0nx(offset % 0x10, data);
 	}
 }
 
@@ -679,12 +711,12 @@ READ8_MEMBER(napple2_state::c100_r)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
+		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 		}
 
-		return m_slotdevice[slotnum]->read_cnxx(space, offset&0xff);
+		return m_slotdevice[slotnum]->read_cnxx(offset&0xff);
 	}
 
 	return read_floatingbus();
@@ -698,12 +730,12 @@ WRITE8_MEMBER(napple2_state::c100_w)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
+		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().side_effect_disabled()))
 		{
 			m_cnxx_slot = slotnum;
 		}
 
-		m_slotdevice[slotnum]->write_cnxx(space, offset&0xff, data);
+		m_slotdevice[slotnum]->write_cnxx(offset&0xff, data);
 	}
 }
 
@@ -711,7 +743,7 @@ READ8_MEMBER(napple2_state::c800_r)
 {
 	if (offset == 0x7ff)
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			m_cnxx_slot = -1;
 		}
@@ -721,7 +753,7 @@ READ8_MEMBER(napple2_state::c800_r)
 
 	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
-		return m_slotdevice[m_cnxx_slot]->read_c800(space, offset&0xfff);
+		return m_slotdevice[m_cnxx_slot]->read_c800(offset&0xfff);
 	}
 
 	return read_floatingbus();
@@ -731,7 +763,7 @@ WRITE8_MEMBER(napple2_state::c800_w)
 {
 	if (offset == 0x7ff)
 	{
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 		{
 			m_cnxx_slot = -1;
 		}
@@ -741,7 +773,7 @@ WRITE8_MEMBER(napple2_state::c800_w)
 
 	if ((m_cnxx_slot != -1) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
-		m_slotdevice[m_cnxx_slot]->write_c800(space, offset&0xfff, data);
+		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 }
 
@@ -749,7 +781,7 @@ READ8_MEMBER(napple2_state::inh_r)
 {
 	if (m_inh_slot != -1)
 	{
-		return m_slotdevice[m_inh_slot]->read_inh_rom(space, offset + 0xd000);
+		return m_slotdevice[m_inh_slot]->read_inh_rom(offset + 0xd000);
 	}
 
 	assert(0);  // hitting inh_r with invalid m_inh_slot should not be possible
@@ -760,7 +792,7 @@ WRITE8_MEMBER(napple2_state::inh_w)
 {
 	if (m_inh_slot != -1)
 	{
-		m_slotdevice[m_inh_slot]->write_inh_rom(space, offset + 0xd000, data);
+		m_slotdevice[m_inh_slot]->write_inh_rom(offset + 0xd000, data);
 	}
 }
 
@@ -918,7 +950,14 @@ WRITE8_MEMBER(napple2_state::ram_w)
 
 static ADDRESS_MAP_START( apple2_map, AS_PROGRAM, 8, napple2_state )
 	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(ram_r, ram_w)
-	AM_RANGE(0xc000, 0xc07f) AM_READWRITE(c000_r, c000_w)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0xf) AM_READ(keyb_data_r) AM_WRITENOP
+	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0xf) AM_READWRITE(keyb_strobe_r, keyb_strobe_w)
+	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0xf) AM_READWRITE(cassette_toggle_r, cassette_toggle_w)
+	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0xf) AM_READWRITE(speaker_toggle_r, speaker_toggle_w)
+	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0xf) AM_READWRITE(utility_strobe_r, utility_strobe_w)
+	AM_RANGE(0xc050, 0xc05f) AM_READ(switches_r) AM_DEVWRITE("softlatch", addressable_latch_device, write_a0)
+	AM_RANGE(0xc060, 0xc067) AM_MIRROR(0x8) AM_READ(flags_r) AM_WRITENOP // includes IIgs STATE register, which ProDOS touches
+	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0xf) AM_READWRITE(controller_strobe_r, controller_strobe_w)
 	AM_RANGE(0xc080, 0xc0ff) AM_READWRITE(c080_r, c080_w)
 	AM_RANGE(0xc100, 0xc7ff) AM_READWRITE(c100_r, c100_w)
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(c800_r, c800_w)
@@ -1303,7 +1342,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("aesms", A2BUS_AESMS)    /* Applied Engineering Super Music Synthesizer */
 	SLOT_INTERFACE("ultraterm", A2BUS_ULTRATERM)    /* Videx UltraTerm (original) */
 	SLOT_INTERFACE("ultratermenh", A2BUS_ULTRATERMENH)    /* Videx UltraTerm (enhanced //e) */
-	SLOT_INTERFACE("aevm80", A2BUS_VTC2)    /* Applied Engineering ViewMaster 80 */
+	SLOT_INTERFACE("aevm80", A2BUS_AEVIEWMASTER80)    /* Applied Engineering ViewMaster 80 */
 	SLOT_INTERFACE("parallel", A2BUS_PIC)   /* Apple Parallel Interface Card */
 	SLOT_INTERFACE("corvus", A2BUS_CORVUS)  /* Corvus flat-cable HDD interface (see notes in a2corvus.c) */
 	SLOT_INTERFACE("mcms1", A2BUS_MCMS1)  /* Mountain Computer Music System, card 1 of 2 */
@@ -1314,10 +1353,12 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("ezcgi", A2BUS_EZCGI)    /* E-Z Color Graphics Interface */
 	SLOT_INTERFACE("ezcgi9938", A2BUS_EZCGI_9938)   /* E-Z Color Graphics Interface (TMS9938) */
 	SLOT_INTERFACE("ezcgi9958", A2BUS_EZCGI_9958)   /* E-Z Color Graphics Interface (TMS9958) */
+	SLOT_INTERFACE("ssprite", A2BUS_SSPRITE)    /* Synetix SuperSprite Board */
+	SLOT_INTERFACE("ssbapple", A2BUS_SSBAPPLE)  /* SSB Apple speech board */
 //  SLOT_INTERFACE("magicmusician", A2BUS_MAGICMUSICIAN)    /* Magic Musician Card */
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apple2_common, napple2_state )
+MACHINE_CONFIG_START(napple2_state::apple2_common)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2_map)
@@ -1343,8 +1384,19 @@ static MACHINE_CONFIG_START( apple2_common, napple2_state )
 	MCFG_DEVICE_ADD(A2_UPPERBANK_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(inhbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x3000)
+
+	/* soft switches */
+	MCFG_DEVICE_ADD("softlatch", F9334, 0) // F14 (labeled 74LS259 on some boards and in the Apple ][ Reference Manual)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(napple2_state, txt_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(napple2_state, mix_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(napple2_state, scr_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(napple2_state, res_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(napple2_state, an0_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(napple2_state, an1_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(napple2_state, an2_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(napple2_state, an3_w))
 
 	/* keyboard controller */
 	MCFG_DEVICE_ADD(A2_KBDC_TAG, AY3600, 0)
@@ -1381,12 +1433,14 @@ static MACHINE_CONFIG_START( apple2_common, napple2_state )
 	MCFG_A2BUS_SLOT_ADD(A2_BUS_TAG, "sl7", apple2_cards, nullptr)
 
 	MCFG_SOFTWARE_LIST_ADD("flop525_list","apple2")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "apple2_cass")
 
 	MCFG_CASSETTE_ADD(A2_CASSETTE_TAG)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
+	MCFG_CASSETTE_INTERFACE("apple2_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
+MACHINE_CONFIG_DERIVED(napple2_state::apple2, apple2_common)
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
@@ -1394,7 +1448,7 @@ static MACHINE_CONFIG_DERIVED( apple2, apple2_common )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
+MACHINE_CONFIG_DERIVED(napple2_state::apple2p, apple2_common)
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K")
@@ -1402,10 +1456,10 @@ static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( space84, apple2p )
+MACHINE_CONFIG_DERIVED(napple2_state::space84, apple2p)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apple2jp, apple2p )
+MACHINE_CONFIG_DERIVED(napple2_state::apple2jp, apple2p)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(napple2_state, screen_update_jp)
 MACHINE_CONFIG_END
@@ -1494,6 +1548,17 @@ ROM_START(prav8m)
 	ROM_LOAD ( "pravetz8m.e8", 0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
 	ROM_LOAD ( "pravetz8m.f0", 0x3000, 0x0800, CRC(e26d9d35) SHA1(ce6e42e6c9a6c98e92522af7a6090cd04c56c778))
 	ROM_LOAD ( "pravetz8m.f8", 0x3800, 0x0800, CRC(5bab0a46) SHA1(f6c0817ce37d2e2c43f482c339acaede0a73359b))
+ROM_END
+
+ROM_START(craft2p)
+	ROM_REGION(0x1000,"gfx1",0)
+	ROM_LOAD( "gc.bin",       0x000000, 0x001000, CRC(93e4a754) SHA1(25f5f5fd1cbd763d43362e80de3acc5b34a25963) )
+
+	ROM_REGION(0x4000,"maincpu",0)
+	// the d0 and e0 ROMs match the Unitron English ones, only f0 differs
+	ROM_LOAD ( "unitron_en.d0", 0x1000, 0x1000, CRC(24d73c7b) SHA1(d17a15868dc875c67061c95ec53a6b2699d3a425))
+	ROM_LOAD ( "unitron.e0"   , 0x2000, 0x1000, CRC(0d494efd) SHA1(a2fd1223a3ca0cfee24a6afe66ea3c4c144dd98e))
+	ROM_LOAD ( "craftii-roms-f0-f7.bin", 0x3000, 0x1000, CRC(3f9dea08) SHA1(0e23bc884b8108675267d30b85b770066bdd94c9) )
 ROM_END
 
 ROM_START(uniap2pt)
@@ -1606,35 +1671,6 @@ ROM_START(am64)
 	ROM_LOAD( "tk10.bin",     0x0800, 0x0800, CRC(a06c5b78) SHA1(27c5160b913e0f62120f384026d24b9f1acb6970) )
 ROM_END
 
-ROM_START( agat7 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
-	ROMX_LOAD( "monitor7.rom", 0x3800, 0x0800, CRC(071fda0b) SHA1(6089d46b7addc4e2ae096b2cf81124681bd2b27a), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
-	ROMX_LOAD( "agat_pzu.bin", 0x3800, 0x0800, CRC(c605163d) SHA1(b30fd1b264a347a9de69bb9e3105483254994d06), ROM_BIOS(2))
-	// Floppy controllers
-	ROM_LOAD( "shugart7.rom", 0x4500, 0x0100, CRC(c6e4850c) SHA1(71626d3d2d4bbeeac2b77585b45a5566d20b8d34))
-	ROM_LOAD( "teac.rom",     0x4500, 0x0100, CRC(94266928) SHA1(5d369bad6cdd6a70b0bb16480eba69640de87a2e))
-	ROM_REGION(0x0800,"gfx1",0)
-	ROM_LOAD( "agathe7.fnt", 0x0000, 0x0800, CRC(fcffb490) SHA1(0bda26ae7ad75f74da835c0cf6d9928f9508844c))
-ROM_END
-
-ROM_START( agat9 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS( 0, "v1", "Version 1" )
-	ROMX_LOAD( "monitor9.rom", 0x3800, 0x0800, CRC(b90bb66a) SHA1(02217f0785913b41fc25eabcff70fa814799c69a), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "v2", "Version 2" )
-	ROMX_LOAD( "monitor91.rom", 0x3800, 0x0800, CRC(89b10fc1) SHA1(7fe1ede32b5525255f82597ca9c3c2034c5996fa), ROM_BIOS(2))
-	// Floppy controllers
-	ROM_LOAD( "shugart9.rom", 0x4500, 0x0100, CRC(964a0ce2) SHA1(bf955189ebffe874c20ef649a3db8177dc16af61))
-	ROM_LOAD( "teac.rom",     0x4500, 0x0100, CRC(94266928) SHA1(5d369bad6cdd6a70b0bb16480eba69640de87a2e))
-	// Printer card
-	ROM_LOAD( "cm6337.rom", 0x8000, 0x0100, CRC(73be16ec) SHA1(ead1abbef5b86f1def0b956147d5b267f0d544b5))
-	ROM_LOAD( "cm6337p.rom", 0x8100, 0x0800, CRC(9120f11f) SHA1(78107653491e88d5ea12e07367c4c028771a4aca))
-	ROM_REGION(0x0800,"gfx1",0)
-	ROM_LOAD( "agathe9.fnt", 0x0000, 0x0800, CRC(8c55c984) SHA1(5a5a202000576b88b4ae2e180dd2d1b9b337b594))
-ROM_END
-
 ROM_START(ivelultr)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "ultra.chr", 0x0000, 0x1000,CRC(fed62c85) SHA1(479fb3f38a3f7332cef2e8c4856871afe8dc6017))
@@ -1672,23 +1708,22 @@ ROM_START(laba2p) /* II Plus clone with on-board Disk II controller and Videx-co
 ROM_END
 #endif
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY            FULLNAME */
-COMP( 1977, apple2,   0,        0,        apple2,      apple2,  driver_device,  0,        "Apple Computer",    "Apple ][", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, apple2p,  apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Apple Computer",    "Apple ][+", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, apple2jp, apple2,   0,        apple2jp,    apple2p, driver_device,  0,        "Apple Computer",    "Apple ][ J-Plus", MACHINE_SUPPORTS_SAVE )
-COMP( 198?, elppa,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Victor do Brasil",  "Elppa II+", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, microeng, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Spectrum Eletronica (SCOPUS)", "Micro Engenho", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, maxxi,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Polymax",  "Maxxi", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, prav82,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 82", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, ace100,   apple2,   0,        apple2,      apple2p, driver_device,  0,        "Franklin Computer", "Franklin Ace 100", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, uniap2en, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletronica", "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, uniap2pt, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletronica", "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, uniap2ti, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Unitron Eletronica", "Unitron AP II+ (Teclado Inteligente)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, agat7,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-7", MACHINE_NOT_WORKING) // disk controller ROM JSRs to $FCA8 which is a delay on apple II, illegal instruction crash here :(
+//    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT    STATE           INIT      COMPANY                FULLNAME
+COMP( 1977, apple2,   0,        0,        apple2,      apple2,  napple2_state,  0,        "Apple Computer",      "Apple ][", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, apple2p,  apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Apple Computer",      "Apple ][+", MACHINE_SUPPORTS_SAVE )
+COMP( 1980, apple2jp, apple2,   0,        apple2jp,    apple2p, napple2_state,  0,        "Apple Computer",      "Apple ][ J-Plus", MACHINE_SUPPORTS_SAVE )
+COMP( 198?, elppa,    apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Victor do Brasil",    "Elppa II+", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, microeng, apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Spectrum Eletronica (SCOPUS)", "Micro Engenho", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, maxxi,    apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Polymax",             "Maxxi", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, prav82,   apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Pravetz",             "Pravetz 82", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, ace100,   apple2,   0,        apple2,      apple2p, napple2_state,  0,        "Franklin Computer",   "Franklin Ace 100", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, uniap2en, apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Unitron Eletronica",  "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, uniap2pt, apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Unitron Eletronica",  "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, uniap2ti, apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Unitron Eletronica",  "Unitron AP II+ (Teclado Inteligente)", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, craft2p,  apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Craft",               "Craft II+", MACHINE_SUPPORTS_SAVE )
 // reverse font direction -\/
-COMP( 1984, ivelultr, apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Ivasim",            "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, agat9,    apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Agat",              "Agat-9", MACHINE_NOT_WORKING)
-COMP( 1985, prav8m,   apple2,   0,        apple2p,     apple2p, driver_device,  0,        "Pravetz",           "Pravetz 8M", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, space84,  apple2,   0,        space84,     apple2p, driver_device,  0,        "ComputerTechnik/IBS",  "Space 84",   MACHINE_NOT_WORKING )
-COMP( 1985, am64,     apple2,   0,        space84,     apple2p, driver_device,  0,        "ASEM",              "AM 64", MACHINE_SUPPORTS_SAVE )
-//COMP( 19??, laba2p,   apple2,   0,        laba2p,      apple2p, driver_device,  0,        "<unknown>",         "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, ivelultr, apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Ivasim",              "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, prav8m,   apple2,   0,        apple2p,     apple2p, napple2_state,  0,        "Pravetz",             "Pravetz 8M", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, space84,  apple2,   0,        space84,     apple2p, napple2_state,  0,        "ComputerTechnik/IBS", "Space 84",   MACHINE_NOT_WORKING )
+COMP( 1985, am64,     apple2,   0,        space84,     apple2p, napple2_state,  0,        "ASEM",                "AM 64", MACHINE_SUPPORTS_SAVE )
+//COMP( 19??, laba2p,   apple2,   0,        laba2p,      apple2p, napple2_state,  0,        "<unknown>",           "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )

@@ -528,17 +528,23 @@ the keypad symbols seem to use a different matrix pattern from the rest?
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
+
 #include "cpu/i8085/i8085.h"
-#include "machine/ram.h"
+#include "cpu/i86/i86.h"
 #include "machine/i8251.h"
 #include "machine/i8257.h"
-#include "machine/upd765.h"
+#include "machine/i8087.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
 #include "machine/upd765.h"
 #include "video/mc6845.h"
+
+#include "screen.h"
+
 #include "formats/imd_dsk.h"
+
 
 #define MAINCPU_TAG "maincpu"
 #define SUBCPU_TAG  "subcpu"
@@ -630,6 +636,8 @@ public:
 	uint8_t m_vram[24576];
 	uint8_t m_video_ctrl;
 
+	void fanucspmgm(machine_config &config);
+	void fanucspmg(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	int32_t m_vram_bank;
@@ -949,12 +957,20 @@ FLOPPY_FORMATS_MEMBER( fanucspmg_state::floppy_formats )
 	FLOPPY_IMD_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
+MACHINE_CONFIG_START(fanucspmg_state::fanucspmg)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, I8086, XTAL_15MHz/3)
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem)
 	MCFG_CPU_IO_MAP(maincpu_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(PIC0_TAG, pic8259_device, inta_cb)
+	MCFG_I8086_ESC_OPCODE_HANDLER(DEVWRITE32("i8087", i8087_device, insn_w))
+	MCFG_I8086_ESC_DATA_HANDLER(DEVWRITE32("i8087", i8087_device, addr_w))
+
+	MCFG_DEVICE_ADD("i8087", I8087, XTAL_15MHz/3)
+	MCFG_DEVICE_PROGRAM_MAP(maincpu_mem)
+	MCFG_I8087_DATA_WIDTH(16)
+	//MCFG_I8087_INT_HANDLER(INPUTLINE("maincpu", INPUT_LINE_NMI))  // TODO: presumably this is connected to the pic
+	MCFG_I8087_BUSY_HANDLER(INPUTLINE("maincpu", INPUT_LINE_TEST))
 
 	MCFG_CPU_ADD(SUBCPU_TAG, I8085A, XTAL_16MHz/2/2)
 	MCFG_CPU_PROGRAM_MAP(subcpu_mem)
@@ -981,8 +997,14 @@ static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 	MCFG_I8257_IN_IOR_0_CB(READ8(fanucspmg_state, fdcdma_r))
 	MCFG_I8257_OUT_IOW_0_CB(WRITE8(fanucspmg_state, fdcdma_w))
 
-	MCFG_PIC8259_ADD(PIC0_TAG, INPUTLINE("maincpu", 0), VCC, READ8(fanucspmg_state, get_slave_ack))
-	MCFG_PIC8259_ADD(PIC1_TAG, DEVWRITELINE(PIC0_TAG, pic8259_device, ir7_w), GND, NOOP)
+	MCFG_DEVICE_ADD(PIC0_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(fanucspmg_state, get_slave_ack))
+
+	MCFG_DEVICE_ADD(PIC1_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE(PIC0_TAG, pic8259_device, ir7_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_UPD765A_ADD(FDC_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(PIC0_TAG, pic8259_device, ir3_w))
@@ -1001,7 +1023,7 @@ static MACHINE_CONFIG_START( fanucspmg, fanucspmg_state )
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(fanucspmg_state, vsync_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fanucspmgm, fanucspmg )
+MACHINE_CONFIG_DERIVED(fanucspmg_state::fanucspmgm, fanucspmg)
 	MCFG_DEVICE_REMOVE( CRTC_TAG )
 
 	MCFG_MC6845_ADD( CRTC_TAG, HD6845, SCREEN_TAG, XTAL_8MHz/2)
@@ -1037,6 +1059,6 @@ ROM_START( fanucspgm )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME       PARENT       COMPAT   MACHINE    INPUT      CLASS           INIT       COMPANY  FULLNAME            FLAGS */
-COMP( 1983, fanucspg,  0,             0,    fanucspmg,  fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1983, fanucspgm, fanucspg,      0,    fanucspmgm, fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G (monochrome)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT      CLASS            INIT       COMPANY  FULLNAME                         FLAGS
+COMP( 1983, fanucspg,  0,        0,      fanucspmg,  fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, fanucspgm, fanucspg, 0,      fanucspmgm, fanucspmg, fanucspmg_state, fanucspmg, "Fanuc", "System P Model G (monochrome)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

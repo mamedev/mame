@@ -14,7 +14,9 @@
 #include "sound/okim6295.h"
 #include "machine/gen_latch.h"
 #include "machine/timekpr.h"
+#include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
+#include "screen.h"
 
 // Video raw params
 // measured clocks:
@@ -183,7 +185,6 @@ public:
 	int          m_objram_bank;
 
 	/* misc */
-	int          m_dial[2];     // forgottn
 	int          m_readpaddle;  // pzloop2
 	int          m_cps2networkpresent;
 	int          m_cps2digitalvolumelevel;
@@ -246,10 +247,6 @@ public:
 	DECLARE_READ16_MEMBER(cps1_in1_r);
 	DECLARE_READ16_MEMBER(cps1_in2_r);
 	DECLARE_READ16_MEMBER(cps1_in3_r);
-	DECLARE_READ16_MEMBER(forgottn_dial_0_r);
-	DECLARE_READ16_MEMBER(forgottn_dial_1_r);
-	DECLARE_WRITE16_MEMBER(forgottn_dial_0_reset_w);
-	DECLARE_WRITE16_MEMBER(forgottn_dial_1_reset_w);
 	DECLARE_WRITE8_MEMBER(cps1_snd_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(cps1_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(cps1_soundlatch2_w);
@@ -286,7 +283,6 @@ public:
 	DECLARE_DRIVER_INIT(sf2rb2);
 	DECLARE_DRIVER_INIT(sf2thndr);
 	DECLARE_DRIVER_INIT(dinohunt);
-	DECLARE_DRIVER_INIT(forgottn);
 	DECLARE_DRIVER_INIT(sf2hack);
 	DECLARE_DRIVER_INIT(slammast);
 	DECLARE_DRIVER_INIT(pang3b);
@@ -326,9 +322,10 @@ public:
 	DECLARE_VIDEO_START(cps);
 	DECLARE_MACHINE_START(sf2m1);
 	uint32_t screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_cps1(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_cps1);
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
+	IRQ_CALLBACK_MEMBER(cps1_int_ack);
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
 	TIMER_CALLBACK_MEMBER(cps2_update_digital_volume);
 
@@ -413,11 +410,33 @@ public:
 	DECLARE_READ16_MEMBER(joy_or_paddle_ecofghtr_r);
 	DECLARE_WRITE_LINE_MEMBER(m5205_int1);
 	DECLARE_WRITE_LINE_MEMBER(m5205_int2);
+	void cps2(machine_config &config);
+	void gigaman2(machine_config &config);
+	void dead_cps2(machine_config &config);
+	void cawingbl(machine_config &config);
+	void sf2mdt(machine_config &config);
+	void sf2m1(machine_config &config);
+	void kodb(machine_config &config);
+	void varthb(machine_config &config);
+	void sgyxz(machine_config &config);
+	void punipic(machine_config &config);
+	void dinopic(machine_config &config);
+	void slampic(machine_config &config);
+	void sf2b(machine_config &config);
+	void knightsb(machine_config &config);
+	void fcrash(machine_config &config);
+	void sf2m10(machine_config &config);
+	void sf2m3(machine_config &config);
+	void forgottn(machine_config &config);
+	void ganbare(machine_config &config);
+	void qsound(machine_config &config);
+	void cps1_12MHz(machine_config &config);
+	void wofhfh(machine_config &config);
+	void cps1_10MHz(machine_config &config);
+	void pang3(machine_config &config);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/
-
-MACHINE_CONFIG_EXTERN(cps1_12MHz);
 
 ADDRESS_MAP_EXTERN( qsound_sub_map, 8 );
 

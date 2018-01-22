@@ -18,7 +18,10 @@
 
 */
 
+#include "emu.h"
 #include "mos6566.h"
+
+#include "screen.h"
 
 
 
@@ -212,21 +215,21 @@ static const rgb_t PALETTE_MOS[] =
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type MOS6566 = &device_creator<mos6566_device>;
-const device_type MOS6567 = &device_creator<mos6567_device>;
-const device_type MOS8562 = &device_creator<mos8562_device>;
-const device_type MOS8564 = &device_creator<mos8564_device>;
-const device_type MOS6569 = &device_creator<mos6569_device>;
-const device_type MOS8565 = &device_creator<mos8565_device>;
-const device_type MOS8566 = &device_creator<mos8566_device>;
+DEFINE_DEVICE_TYPE(MOS6566, mos6566_device, "mos6566", "MOS 6566 VIC-II")
+DEFINE_DEVICE_TYPE(MOS6567, mos6567_device, "mos6567", "MOS 6567 VIC-II")
+DEFINE_DEVICE_TYPE(MOS8562, mos8562_device, "mos8562", "MOS 8562 VIC-II")
+DEFINE_DEVICE_TYPE(MOS8564, mos8564_device, "mos8564", "MOS 8564 VIC-II")
+DEFINE_DEVICE_TYPE(MOS6569, mos6569_device, "mos6569", "MOS 6569 VIC-II")
+DEFINE_DEVICE_TYPE(MOS8565, mos8565_device, "mos8565", "MOS 8565 VIC-II")
+DEFINE_DEVICE_TYPE(MOS8566, mos8566_device, "mos8566", "MOS 8566 VIC-II")
 
 
 // default address maps
-static ADDRESS_MAP_START( mos6566_videoram_map, AS_0, 8, mos6566_device )
+static ADDRESS_MAP_START( mos6566_videoram_map, 0, 8, mos6566_device )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mos6566_colorram_map, AS_1, 8, mos6566_device )
+static ADDRESS_MAP_START( mos6566_colorram_map, 1, 8, mos6566_device )
 	AM_RANGE(0x000, 0x3ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -236,14 +239,12 @@ ADDRESS_MAP_END
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *mos6566_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector mos6566_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-		case AS_0: return &m_videoram_space_config;
-		case AS_1: return &m_colorram_space_config;
-		default: return nullptr;
-	}
+	return space_config_vector {
+		std::make_pair(0, &m_videoram_space_config),
+		std::make_pair(1, &m_colorram_space_config)
+	};
 }
 
 
@@ -280,14 +281,14 @@ inline void mos6566_device::clear_interrupt( int mask )
 inline uint8_t mos6566_device::read_videoram(offs_t offset)
 {
 	//logerror("cycle %u VRAM %04x BA %u AEC %u\n", m_cycle, offset & 0x3fff, m_ba, m_aec);
-	m_last_data = space(AS_0).read_byte(offset & 0x3fff);
+	m_last_data = space(0).read_byte(offset & 0x3fff);
 
 	return m_last_data;
 }
 
 inline uint8_t mos6566_device::read_colorram(offs_t offset)
 {
-	return space(AS_1).read_byte(offset & 0x3ff);
+	return space(1).read_byte(offset & 0x3ff);
 }
 
 // Idle access
@@ -573,12 +574,12 @@ inline void mos6566_device::draw_multi( uint16_t p, uint8_t c0, uint8_t c1, uint
 //-------------------------------------------------
 
 mos6566_device::mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mos6566_device(mconfig, MOS6566, "MOS6566", tag, owner, clock, TYPE_6566, "mos6566", __FILE__)
+	: mos6566_device(mconfig, MOS6566, tag, owner, clock, TYPE_6566)
 {
 }
 
-mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
 		device_execute_interface(mconfig, *this),
@@ -598,28 +599,44 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 }
 
 mos6567_device::mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:mos6566_device(mconfig, MOS6567, "MOS6567", tag, owner, clock, TYPE_6567, "mos6567", __FILE__) { }
+	: mos6567_device(mconfig, MOS6567, tag, owner, clock, TYPE_6567)
+{
+}
 
-mos6567_device::mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
-	:mos6566_device(mconfig, type, name, tag, owner, clock, variant, shortname, source) { }
+mos6567_device::mos6567_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: mos6566_device(mconfig, type, tag, owner, clock, variant)
+{
+}
 
 mos8562_device::mos8562_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:mos6567_device(mconfig, MOS8562, "MOS8562", tag, owner, clock, TYPE_8562, "mos8562", __FILE__) { }
+	: mos6567_device(mconfig, MOS8562, tag, owner, clock, TYPE_8562)
+{
+}
 
 mos8564_device::mos8564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:mos6567_device(mconfig, MOS8564, "MOS8564", tag, owner, clock, TYPE_8564, "mos8564", __FILE__) { }
+	: mos6567_device(mconfig, MOS8564, tag, owner, clock, TYPE_8564)
+{
+}
 
 mos6569_device::mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:mos6566_device(mconfig, MOS6566, "MOS6569", tag, owner, clock, TYPE_6569, "mos6569", __FILE__) { }
+	: mos6569_device(mconfig, MOS6569, tag, owner, clock, TYPE_6569)
+{
+}
 
-mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
-	:mos6566_device(mconfig, type, name, tag, owner, clock, variant, shortname, source) { }
+mos6569_device::mos6569_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant)
+	: mos6566_device(mconfig, type, tag, owner, clock, variant)
+{
+}
 
 mos8565_device::mos8565_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:mos6569_device(mconfig, MOS8565, "MOS8565", tag, owner, clock, TYPE_8565, "mos8565", __FILE__) { }
+	: mos6569_device(mconfig, MOS8565, tag, owner, clock, TYPE_8565)
+{
+}
 
 mos8566_device::mos8566_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:mos6569_device(mconfig, MOS8566, "MOS8566", tag, owner, clock, TYPE_8566, "mos8566", __FILE__) { }
+	: mos6569_device(mconfig, MOS8566, tag, owner, clock, TYPE_8566)
+{
+}
 
 
 //-------------------------------------------------
@@ -637,7 +654,7 @@ void mos6566_device::device_start()
 	m_write_aec.resolve_safe();
 	m_write_k.resolve_safe();
 
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	for (int i = 0; i < 256; i++)
 	{

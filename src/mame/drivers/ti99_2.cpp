@@ -30,7 +30,7 @@ general :
   - Unlike tms9900, CRU address range is full 0x0000-0xFFFE (A0 is not used as address).
     This is possible because tms9995 uses d0-d2 instead of the address MSBits to support external
     opcodes.
-  - quite more efficient than tms9900, and a few additionnal instructions and features
+  - quite more efficient than tms9900, and a few additional instructions and features
 * 24 or 32kb ROM (16kb plain (1kb of which used by vdp), 16kb split into 2 8kb pages)
 * 4kb 8-bit RAM, 256 bytes 16-bit RAM
 * custom vdp shares CPU RAM/ROM.  The display is quite alike to tms9928 graphics mode, except
@@ -82,6 +82,7 @@ would just have taken three extra tracks on the main board and a OR gate in an A
 #include "emu.h"
 #include "machine/tms9901.h"
 #include "cpu/tms9900/tms9995.h"
+#include "screen.h"
 
 class ti99_2_state : public driver_device
 {
@@ -89,6 +90,9 @@ public:
 	ti99_2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
+		m_ROM_paged(0),
+		m_irq_state(0),
+		m_keyRow(0),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
@@ -96,7 +100,7 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	int m_ROM_paged;
 	int m_irq_state;
-	int m_KeyRow;
+	int m_keyRow;
 	DECLARE_WRITE8_MEMBER(ti99_2_write_kbd);
 	DECLARE_WRITE8_MEMBER(ti99_2_write_misc_cru);
 	DECLARE_READ8_MEMBER(ti99_2_read_kbd);
@@ -109,6 +113,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void ti99_2(machine_config &config);
 };
 
 
@@ -139,7 +144,9 @@ void ti99_2_state::machine_reset()
 	// Configure CPU to insert 1 wait state for each external memory access
 	// by lowering the READY line on reset
 	// TODO: Check with specs
-	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(CLEAR_LINE);
+	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
+	cpu->ready_line(CLEAR_LINE);
+	cpu->reset_line(ASSERT_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(ti99_2_state::ti99_2_vblank_interrupt)
@@ -236,14 +243,14 @@ WRITE8_MEMBER(ti99_2_state::ti99_2_write_kbd)
 	{
 		/* this implementation is just a guess */
 		if (data)
-			m_KeyRow |= 1 << offset;
+			m_keyRow |= 1 << offset;
 		else
-			m_KeyRow &= ~ (1 << offset);
+			m_keyRow &= ~ (1 << offset);
 	}
 	/* now, we handle ROM paging */
 	if (m_ROM_paged)
 	{   /* if we have paged ROMs, page according to S0 keyboard interface line */
-		membank("bank1")->set_base((m_KeyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
+		membank("bank1")->set_base((m_keyRow == 0) ? TI99_2_32_ROMPAGE1 : TI99_2_32_ROMPAGE0);
 	}
 }
 
@@ -279,7 +286,7 @@ READ8_MEMBER(ti99_2_state::ti99_2_read_kbd)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	return ioport(keynames[m_KeyRow])->read();
+	return ioport(keynames[m_keyRow])->read();
 }
 
 READ8_MEMBER(ti99_2_state::ti99_2_read_misc_cru)
@@ -366,7 +373,7 @@ static INPUT_PORTS_START(ti99_2)
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
+MACHINE_CONFIG_START(ti99_2_state::ti99_2)
 	// basic machine hardware
 	// TMS9995, standard variant
 	// We have no lines connected yet
@@ -411,6 +418,6 @@ ROM_END
 /* Hex-bus disk controller: supports up to 4 floppy disk drives */
 /* None of these is supported (tape should be easy to emulate) */
 
-/*      YEAR    NAME        PARENT      COMPAT  MACHINE     INPUT   INIT        COMPANY                 FULLNAME */
-COMP(   1983,   ti99_224,   0,          0,  ti99_2, ti99_2, ti99_2_state,   ti99_2_24,          "Texas Instruments",    "TI-99/2 BASIC Computer (24kb ROMs)" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP(   1983,   ti99_232,   ti99_224,   0,  ti99_2, ti99_2, ti99_2_state,   ti99_2_32,          "Texas Instruments",    "TI-99/2 BASIC Computer (32kb ROMs)" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//      YEAR    NAME        PARENT     COMPAT  MACHINE  INPUT   STATE          INIT        COMPANY              FULLNAME                               FLAGS
+COMP(   1983,   ti99_224,   0,         0,      ti99_2,  ti99_2, ti99_2_state,  ti99_2_24,  "Texas Instruments", "TI-99/2 BASIC Computer (24kb ROMs)" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP(   1983,   ti99_232,   ti99_224,  0,      ti99_2,  ti99_2, ti99_2_state,  ti99_2_32,  "Texas Instruments", "TI-99/2 BASIC Computer (32kb ROMs)" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

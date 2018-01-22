@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mw18w_led_display_w);
 	DECLARE_WRITE8_MEMBER(mw18w_irq0_clear_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
+	void mw18w(machine_config &config);
 };
 
 
@@ -265,7 +266,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mw18w, mw18w_state )
+MACHINE_CONFIG_START(mw18w_state::mw18w)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_19_968MHz/8)
@@ -306,5 +307,5 @@ ROM_START( 18w2 )
 ROM_END
 
 
-GAMEL( 1979, 18w,  0,   mw18w, mw18w, driver_device, 0, ROT0, "Midway", "18 Wheeler (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_18w )
-GAMEL( 1979, 18w2, 18w, mw18w, mw18w, driver_device, 0, ROT0, "Midway", "18 Wheeler (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_18w )
+GAMEL( 1979, 18w,  0,   mw18w, mw18w, mw18w_state, 0, ROT0, "Midway", "18 Wheeler (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_18w )
+GAMEL( 1979, 18w2, 18w, mw18w, mw18w, mw18w_state, 0, ROT0, "Midway", "18 Wheeler (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_18w )

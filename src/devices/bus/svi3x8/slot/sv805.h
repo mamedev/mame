@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_SVI3X8_SLOT_SV805_H
+#define MAME_BUS_SVI3X8_SLOT_SV805_H
+
 #pragma once
 
-#ifndef __SVI3X8_SLOT_SV805_H__
-#define __SVI3X8_SLOT_SV805_H__
-
-#include "emu.h"
 #include "slot.h"
 #include "machine/ins8250.h"
 #include "bus/rs232/rs232.h"
@@ -32,18 +31,18 @@ public:
 	virtual DECLARE_READ8_MEMBER( iorq_r ) override;
 	virtual DECLARE_WRITE8_MEMBER( iorq_w ) override;
 
-	DECLARE_WRITE_LINE_MEMBER( uart_intr_w );
-
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 private:
+	DECLARE_WRITE_LINE_MEMBER( uart_intr_w );
+
 	required_device<ins8250_device> m_uart;
 	required_device<rs232_port_device> m_rs232;
 };
 
 // device type definition
-extern const device_type SV805;
+DECLARE_DEVICE_TYPE(SV805, sv805_device)
 
-#endif // __SVI3X8_SLOT_SV805_H__
+#endif // MAME_BUS_SVI3X8_SLOT_SV805_H

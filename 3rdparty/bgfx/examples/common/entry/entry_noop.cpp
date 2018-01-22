@@ -1,13 +1,11 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "entry_p.h"
 
 #if ENTRY_CONFIG_USE_NOOP
-
-#include <stdio.h>
 
 namespace entry
 {
@@ -71,7 +69,7 @@ namespace entry
 
 } // namespace entry
 
-int main(int _argc, char** _argv)
+int main(int _argc, const char* const* _argv)
 {
 	entry::main(_argc, _argv);
 }

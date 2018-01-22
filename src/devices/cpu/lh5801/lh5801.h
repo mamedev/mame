@@ -7,10 +7,10 @@
  *
  *
  *****************************************************************************/
-#pragma once
+#ifndef MAME_CPU_LH5801_LH5801_H
+#define MAME_CPU_LH5801_LH5801_H
 
-#ifndef __LH5801_H__
-#define __LH5801_H__
+#pragma once
 
 /*
 lh5801
@@ -28,7 +28,7 @@ a A
 
 0 0 0 H V Z IE C
 
-TM 9bit polynominal?
+TM 9bit polynomial?
 
 pu pv disp flipflops
 
@@ -61,7 +61,7 @@ enum
 
 
 #define MCFG_LH5801_IN(_devcb) \
-	lh5801_cpu_device::set_in_func(*device, DEVCB_##_devcb);
+	devcb = &lh5801_cpu_device::set_in_func(*device, DEVCB_##_devcb);
 
 
 class lh5801_cpu_device :  public cpu_device
@@ -71,7 +71,7 @@ public:
 	lh5801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_in_func(device_t &device, _Object object) { return downcast<lh5801_cpu_device &>(device).m_in_func.set_callback(object); }
+	template <class Object> static devcb_base &set_in_func(device_t &device, Object &&cb) { return downcast<lh5801_cpu_device &>(device).m_in_func.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides
@@ -87,15 +87,13 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 5; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -105,7 +103,7 @@ private:
 
 	address_space *m_program;         //ME0
 	address_space *m_io;              //ME1
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 
 	PAIR m_s;
 	PAIR m_p;
@@ -182,7 +180,7 @@ private:
 };
 
 
-extern const device_type LH5801;
+DECLARE_DEVICE_TYPE(LH5801, lh5801_cpu_device)
 
 
-#endif /* __LH5801_H__ */
+#endif // MAME_CPU_LH5801_LH5801_H

@@ -12,6 +12,7 @@
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/segaic16.h"
 #include "video/segaic16_road.h"
@@ -92,6 +93,13 @@ public:
 	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
 	TIMER_DEVICE_CALLBACK_MEMBER(bankmotor_update);
 
+	void shangon_fd1089b(machine_config &config);
+	void outrun_fd1094(machine_config &config);
+	void outrundx(machine_config &config);
+	void shangon(machine_config &config);
+	void outrun_fd1089a(machine_config &config);
+	void outrun(machine_config &config);
+	void outrun_base(machine_config &config);
 protected:
 	// timer IDs
 	enum
@@ -145,6 +153,7 @@ protected:
 
 	// internal state
 	emu_timer *         m_scanline_timer;
+	emu_timer *         m_irq2_gen_timer;
 	uint8_t               m_irq2_state;
 	uint8_t               m_adc_select;
 	uint8_t               m_vblank_irq_state;

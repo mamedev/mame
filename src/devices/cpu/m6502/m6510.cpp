@@ -10,20 +10,17 @@
 
 #include "emu.h"
 #include "m6510.h"
+#include "m6510d.h"
 
-const device_type M6510 = &device_creator<m6510_device>;
+DEFINE_DEVICE_TYPE(M6510, m6510_device, "m6510", "M6510")
 
 m6510_device::m6510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, M6510, "M6510", tag, owner, clock, "m6510", __FILE__),
-	read_port(*this),
-	write_port(*this), dir(0), port(0), drive(0)
+	m6510_device(mconfig, M6510, tag, owner, clock)
 {
-	pullup = 0x00;
-	floating = 0x00;
 }
 
-m6510_device::m6510_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	m6502_device(mconfig, type, name, tag, owner, clock, shortname, source),
+m6510_device::m6510_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	m6502_device(mconfig, type, tag, owner, clock),
 	read_port(*this),
 	write_port(*this), dir(0), port(0), drive(0)
 {
@@ -37,9 +34,9 @@ void m6510_device::set_pulls(uint8_t _pullup, uint8_t _floating)
 	floating = _floating;
 }
 
-offs_t m6510_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *m6510_device::create_disassembler()
 {
-	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
+	return new m6510_disassembler;
 }
 
 void m6510_device::device_start()
@@ -48,9 +45,9 @@ void m6510_device::device_start()
 	write_port.resolve_safe();
 
 	if(direct_disabled)
-		mintf = new mi_6510_nd(this);
+		mintf = std::make_unique<mi_6510_nd>(this);
 	else
-		mintf = new mi_6510_normal(this);
+		mintf = std::make_unique<mi_6510_normal>(this);
 
 	init();
 

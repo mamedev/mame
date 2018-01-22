@@ -82,8 +82,6 @@ void fromance_state::init_common(  )
 	save_item(NAME(m_flipscreen_old));
 	save_item(NAME(m_scrollx_ofs));
 	save_item(NAME(m_scrolly_ofs));
-	save_item(NAME(m_crtc_register));
-	save_item(NAME(m_crtc_data));
 	save_pointer(NAME(m_local_paletteram.get()), 0x800 * 2);
 }
 
@@ -217,6 +215,7 @@ WRITE8_MEMBER(fromance_state::fromance_scroll_w)
 	}
 	else
 	{
+
 		switch (offset)
 		{
 			case 0:
@@ -250,32 +249,52 @@ TIMER_CALLBACK_MEMBER(fromance_state::crtc_interrupt_gen)
 		m_crtc_timer->adjust(m_screen->frame_period() / param, 0, m_screen->frame_period() / param);
 }
 
-
-WRITE8_MEMBER(fromance_state::fromance_crtc_data_w)
+/*
+ 0  1  2  3  4  5
+57 63 69 71 1f 00 (all games)
+4f 62 69 71 1f 04 nekkyoku
+ 8  9  A  B
+7a 7b 7d 7f  (all games)
+79 7a 7d 7f  nekkyoku (gameplay/title screen)
+77 79 7d 7e  nekkyoku (gals display)
+ */
+// TODO: guesswork, looks fully programmable
+void fromance_state::crtc_refresh()
 {
-	m_crtc_data[m_crtc_register] = data;
+	if (m_gga->reg(0) == 0) // sanity check
+		return;
 
-	switch (m_crtc_register)
+	rectangle visarea;
+	attoseconds_t refresh;
+
+	visarea.min_x = 0;
+	visarea.min_y = 0;
+	visarea.max_x = ((m_gga->reg(0)+1)*4) - 1;
+	visarea.max_y = 240 - 1;
+
+	refresh = HZ_TO_ATTOSECONDS(60);
+
+	m_screen->configure(512, 256, visarea, refresh);
+}
+
+WRITE8_MEMBER(fromance_state::fromance_gga_data_w)
+{
+	switch (offset)
 	{
-		/* only register we know about.... */
+		case 0x00:
+			crtc_refresh();
+			break;
+
 		case 0x0b:
+			// TODO: actually is never > 0x80?
 			m_crtc_timer->adjust(m_screen->time_until_vblank_start(), (data > 0x80) ? 2 : 1);
 			break;
 
 		default:
-			logerror("CRTC register %02X = %02X\n", m_crtc_register, data & 0xff);
+			logerror("CRTC register %02X = %02X\n", offset, data);
 			break;
 	}
 }
-
-
-WRITE8_MEMBER(fromance_state::fromance_crtc_register_w)
-{
-	m_crtc_register = data;
-}
-
-
-
 
 
 /*************************************

@@ -11,43 +11,29 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "coreutil.h"
 #include "machine/mc146818.h"
 
-
-//**************************************************************************
-//  DEBUGGING
-//**************************************************************************
-
-#define LOG_MC146818        0
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 
 // device type definition
-const device_type MC146818 = &device_creator<mc146818_device>;
+DEFINE_DEVICE_TYPE(MC146818, mc146818_device, "mc146818", "MC146818 RTC")
 
 //-------------------------------------------------
 //  mc146818_device - constructor
 //-------------------------------------------------
 
 mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MC146818, "MC146818 RTC", tag, owner, clock, "mc146818", __FILE__),
-		device_nvram_interface(mconfig, *this),
-		m_region(*this, DEVICE_SELF),
-		m_index(0),
-		m_last_refresh(attotime::zero), m_clock_timer(nullptr), m_periodic_timer(nullptr),
-		m_write_irq(*this),
-		m_century_index(-1),
-		m_epoch(0),
-		m_use_utc(false),
-		m_binary(false),
-		m_hour(false),
-		m_binyear(false)
+	: mc146818_device(mconfig, MC146818, tag, owner, clock)
 {
 }
 
-mc146818_device::mc146818_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+mc146818_device::mc146818_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_index(0),
@@ -426,31 +412,7 @@ void mc146818_device::update_timer()
 {
 	int bypass;
 
-	switch (m_data[REG_A] & (REG_A_DV2 | REG_A_DV1 | REG_A_DV0))
-	{
-	case 0:
-		bypass = 0;
-		break;
-
-	case REG_A_DV0:
-		bypass = 2;
-		break;
-
-	case REG_A_DV1:
-		bypass = 7;
-		break;
-
-	case REG_A_DV2 | REG_A_DV1:
-	case REG_A_DV2 | REG_A_DV1 | REG_A_DV0:
-		bypass = 22;
-		break;
-
-	default:
-		// TODO: other combinations of divider bits are used for test purposes only
-		bypass = 22;
-		break;
-	}
-
+	bypass = get_timer_bypass();
 
 	attotime update_period = attotime::never;
 	attotime update_interval = attotime::never;
@@ -486,6 +448,41 @@ void mc146818_device::update_timer()
 	m_periodic_timer->adjust(periodic_period, 0, periodic_interval);
 }
 
+//---------------------------------------------------------------
+//  get_timer_bypass - get main clock divisor based on A register
+//---------------------------------------------------------------
+
+int mc146818_device::get_timer_bypass()
+{
+	int bypass;
+
+	switch (m_data[REG_A] & (REG_A_DV2 | REG_A_DV1 | REG_A_DV0))
+	{
+	case 0:
+		bypass = 0;
+		break;
+
+	case REG_A_DV0:
+		bypass = 2;
+		break;
+
+	case REG_A_DV1:
+		bypass = 7;
+		break;
+
+	case REG_A_DV2 | REG_A_DV1:
+	case REG_A_DV2 | REG_A_DV1 | REG_A_DV0:
+		bypass = 22;
+		break;
+
+	default:
+		// TODO: other combinations of divider bits are used for test purposes only
+		bypass = 22;
+		break;
+	}
+
+	return bypass;
+}
 
 //-------------------------------------------------
 //  update_irq - Update irq based on B & C register
@@ -503,7 +500,7 @@ void mc146818_device::update_irq()
 	}
 	else
 	{
-		m_data[REG_C] &= REG_C_IRQF;
+		m_data[REG_C] &= ~REG_C_IRQF;
 		m_write_irq(ASSERT_LINE);
 	}
 }
@@ -531,7 +528,7 @@ READ8_MEMBER( mc146818_device::read )
 			// Update In Progress (UIP) time for 32768 Hz is 244+1984usec
 			/// TODO: support other dividers
 			/// TODO: don't set this if update is stopped
-			if ((space.machine().time() - m_last_refresh) < attotime::from_usec(244+1984))
+			if ((machine().time() - m_last_refresh) < attotime::from_usec(244+1984))
 				data |= REG_A_UIP;
 			break;
 
@@ -555,8 +552,7 @@ READ8_MEMBER( mc146818_device::read )
 		break;
 	}
 
-	if (LOG_MC146818)
-		logerror("mc146818_port_r(): index=0x%02x data=0x%02x\n", m_index, data);
+	LOG("mc146818_port_r(): index=0x%02x data=0x%02x\n", m_index, data);
 
 	return data;
 }
@@ -568,8 +564,7 @@ READ8_MEMBER( mc146818_device::read )
 
 WRITE8_MEMBER( mc146818_device::write )
 {
-	if (LOG_MC146818)
-		logerror("mc146818_port_w(): index=0x%02x data=0x%02x\n", m_index, data);
+	LOG("mc146818_port_w(): index=0x%02x data=0x%02x\n", m_index, data);
 
 	switch (offset)
 	{

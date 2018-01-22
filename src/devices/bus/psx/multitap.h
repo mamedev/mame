@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef PSXMULTITAP_H_
-#define PSXMULTITAP_H_
+#ifndef MAME_BUS_PSX_MULTITAP_H
+#define MAME_BUS_PSX_MULTITAP_H
 
 #include "ctlrport.h"
 
@@ -12,14 +12,14 @@ class psx_multitap_device : public device_t,
 {
 public:
 	psx_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
 	virtual void device_start() override;
 	virtual void device_stop() override { device_psx_controller_interface::m_owner->disable_card(false); }
 	virtual void device_reset() override { device_psx_controller_interface::m_owner->disable_card(true); }
-	virtual void device_config_complete() override { m_shortname = "psx_multitap"; }
 	virtual void interface_pre_reset() override;
+
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	virtual bool get_pad(int count, uint8_t *odata, uint8_t idata) override;
@@ -40,4 +40,4 @@ private:
 
 extern const device_type PSX_MULTITAP;
 
-#endif /* PSXMULTITAP_H_ */
+#endif // MAME_BUS_PSX_MULTITAP_H

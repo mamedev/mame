@@ -63,16 +63,16 @@ TODO:
 #include "k053252.h"
 
 
-const device_type K053252 = &device_creator<k053252_device>;
+DEFINE_DEVICE_TYPE(K053252, k053252_device, "k053252", "K053252 Timing/Interrupt Controller")
 
 k053252_device::k053252_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K053252, "K053252 Timing/Interrupt", tag, owner, clock, "k053252", __FILE__)
+	: device_t(mconfig, K053252, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_int1_en_cb(*this)
 	, m_int2_en_cb(*this)
 	, m_int1_ack_cb(*this)
 	, m_int2_ack_cb(*this)
-	//, m_int_time_cb(*this)
+	, m_int_time_cb(*this)
 	, m_offsx(0)
 	, m_offsy(0)
 	, m_slave_screen(*this, finder_base::DUMMY_TAG) // ugly, needed to work with the rungun etc. video demux board
@@ -90,7 +90,7 @@ void k053252_device::device_start()
 	m_int2_en_cb.resolve_safe();
 	m_int1_ack_cb.resolve_safe();
 	m_int2_ack_cb.resolve_safe();
-	//m_int_time_cb.resolve_safe();
+	m_int_time_cb.resolve_safe();
 
 	save_item(NAME(m_regs));
 	save_item(NAME(m_hc));
@@ -143,9 +143,9 @@ READ8_MEMBER( k053252_device::read )
 		/* VCT read-back */
 		// TODO: correct?
 		case 0x0e:
-			return ((m_screen->vpos()-m_vc) >> 8) & 1;
+			return ((screen().vpos()-m_vc) >> 8) & 1;
 		case 0x0f:
-			return (m_screen->vpos()-m_vc) & 0xff;
+			return (screen().vpos()-m_vc) & 0xff;
 		default:
 			//popmessage("Warning: k053252 read %02x, contact MAMEdev",offset);
 			break;
@@ -171,7 +171,7 @@ void k053252_device::res_change()
 		visarea.max_x = m_offsx + m_hc - m_hfp - m_hbp - 8*(m_hsw) - 1;
 		visarea.max_y = m_offsy + m_vc - m_vfp - m_vbp - (m_vsw) - 1;
 
-		m_screen->configure(m_hc, m_vc, visarea, refresh);
+		screen().configure(m_hc, m_vc, visarea, refresh);
 
 		if (m_slave_screen.found())
 			m_slave_screen->configure(m_hc, m_vc, visarea, refresh);
@@ -244,7 +244,7 @@ WRITE8_MEMBER( k053252_device::write )
 			res_change();
 			break;
 
-		//case 0x0d: m_int_time(data); break;
+		case 0x0d: m_int_time_cb(data); break;
 		case 0x0e: m_int1_ack_cb(1); break;
 		case 0x0f: m_int2_ack_cb(1); break;
 	}

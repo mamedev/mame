@@ -7,7 +7,6 @@
 //============================================================
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <shlwapi.h>
 #include <tchar.h>
@@ -139,4 +138,4 @@ directory::ptr directory::open(std::string const &dirname)
 	return ptr(std::move(dir));
 }
 
-} // namesapce osd
+} // namespace osd

@@ -65,7 +65,7 @@ void cchasm_state::refresh ()
 			logerror("JUMP to %x\n", data);
 			break;
 		case COLOR:
-			color = VECTOR_COLOR444(data ^ 0xfff);
+			color = vector_device::color444(data ^ 0xfff);
 			break;
 		case SCALEY:
 			scaley = data << 5;

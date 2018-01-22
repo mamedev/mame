@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver,Sal and John Bugliarisi,Paul Priest
 #include "audio/pleiads.h"
+#include "screen.h"
 
 class naughtyb_state : public driver_device
 {
@@ -54,4 +55,6 @@ public:
 	DECLARE_PALETTE_INIT(naughtyb);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void popflame(machine_config &config);
+	void naughtyb(machine_config &config);
 };

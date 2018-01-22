@@ -124,25 +124,25 @@ PALETTE_DECODER_MEMBER( bionicc_state, RRRRGGGGBBBBIIII )
 
 ***************************************************************************/
 
-WRITE16_MEMBER(bionicc_state::bionicc_bgvideoram_w)
+WRITE16_MEMBER(bionicc_state::bgvideoram_w)
 {
 	COMBINE_DATA(&m_bgvideoram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(bionicc_state::bionicc_fgvideoram_w)
+WRITE16_MEMBER(bionicc_state::fgvideoram_w)
 {
 	COMBINE_DATA(&m_fgvideoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(bionicc_state::bionicc_txvideoram_w)
+WRITE16_MEMBER(bionicc_state::txvideoram_w)
 {
 	COMBINE_DATA(&m_txvideoram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE16_MEMBER(bionicc_state::bionicc_scroll_w)
+WRITE16_MEMBER(bionicc_state::scroll_w)
 {
 	data = COMBINE_DATA(&m_scroll[offset]);
 
@@ -163,7 +163,7 @@ WRITE16_MEMBER(bionicc_state::bionicc_scroll_w)
 	}
 }
 
-WRITE16_MEMBER(bionicc_state::bionicc_gfxctrl_w)
+WRITE16_MEMBER(bionicc_state::gfxctrl_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -187,7 +187,7 @@ WRITE16_MEMBER(bionicc_state::bionicc_gfxctrl_w)
 
 
 
-uint32_t bionicc_state::screen_update_bionicc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bionicc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);   /* nothing in FRONT */

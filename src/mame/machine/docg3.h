@@ -8,17 +8,18 @@
 
 */
 
-#ifndef __DOCG3_H__
-#define __DOCG3_H__
+#ifndef MAME_MACHINE_DOCG3_H
+#define MAME_MACHINE_DOCG3_H
+
+#pragma once
 
 #define MCFG_DISKONCHIP_G3_ADD(_tag, _size) \
 	MCFG_DEVICE_ADD(_tag, DISKONCHIP_G3, 0) \
-	static_cast<diskonchip_g3_device *>(device)->set_size(_size);
+	downcast<diskonchip_g3_device *>(device)->set_size(_size);
 
 // ======================> diskonchip_g3_device
 
-class diskonchip_g3_device : public device_t,
-								public device_nvram_interface
+class diskonchip_g3_device : public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
@@ -98,6 +99,6 @@ private:
 };
 
 // device type definition
-extern const device_type DISKONCHIP_G3;
+DECLARE_DEVICE_TYPE(DISKONCHIP_G3, diskonchip_g3_device)
 
-#endif /* __DOCG3_H__ */
+#endif // MAME_MACHINE_DOCG3_H

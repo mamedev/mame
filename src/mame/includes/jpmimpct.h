@@ -8,6 +8,7 @@
 #include "machine/meters.h"
 #include "machine/roc10937.h"
 #include "machine/steppers.h"
+#include "machine/timer.h"
 #include "cpu/tms34010/tms34010.h"
 #include "sound/upd7759.h"
 
@@ -96,7 +97,7 @@ public:
 	int m_slidesout;
 	int m_hopper[3];
 	int m_motor[3];
-	optional_device<s16lf01_t> m_vfd;
+	optional_device<s16lf01_device> m_vfd;
 	optional_shared_ptr<uint16_t> m_vram;
 	struct bt477_t m_bt477;
 	DECLARE_READ16_MEMBER(duart_1_r);
@@ -148,4 +149,6 @@ public:
 	optional_device<stepper_device> m_reel4;
 	optional_device<stepper_device> m_reel5;
 	required_device<meters_device> m_meters;
+	void impctawp(machine_config &config);
+	void jpmimpct(machine_config &config);
 };

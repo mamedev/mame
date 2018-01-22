@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ADAM_IDE_H
+#define MAME_BUS_ADAM_IDE_H
+
 #pragma once
 
-#ifndef __ADAM_IDE__
-#define __ADAM_IDE__
-
-#include "emu.h"
 #include "exp.h"
 #include "machine/ataintf.h"
 #include "machine/latch.h"
@@ -31,13 +30,13 @@ public:
 	// construction/destruction
 	powermate_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_adam_expansion_slot_card_interface overrides
 	virtual uint8_t adam_bd_r(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2) override;
@@ -52,8 +51,6 @@ private:
 
 
 // device type definition
-extern const device_type ADAM_IDE;
+DECLARE_DEVICE_TYPE(ADAM_IDE, powermate_ide_device)
 
-
-
-#endif
+#endif // MAME_BUS_ADAM_IDE_H

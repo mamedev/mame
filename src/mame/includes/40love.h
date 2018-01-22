@@ -1,9 +1,11 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
 
-#include "machine/buggychl.h"
+#include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5232.h"
+#include "sound/ay8910.h"
+#include "sound/ta7630.h"
 
 class fortyl_state : public driver_device
 {
@@ -18,9 +20,10 @@ public:
 		m_mcu_ram(*this, "mcu_ram"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
-		m_mcu(*this, "mcu"),
 		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm"),
+		m_ay(*this,"aysnd"),
+		m_ta7630(*this,"ta7630"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
@@ -52,14 +55,6 @@ public:
 	int         m_sound_nmi_enable;
 	int         m_pending_nmi;
 
-	/* fake mcu */
-	uint8_t       m_from_mcu;
-	int         m_mcu_sent;
-	int         m_main_sent;
-	uint8_t       m_mcu_in[2][16];
-	uint8_t       m_mcu_out[2][16];
-	int         m_mcu_cmd;
-
 	/* misc */
 	int         m_pix_color[4];
 	uint8_t       m_pix1;
@@ -75,9 +70,10 @@ public:
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_maincpu;
-	optional_device<cpu_device> m_mcu;
-	optional_device<buggychl_mcu_device> m_bmcu;
+	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
+	required_device<ay8910_device> m_ay;
+	required_device<ta7630_device> m_ta7630;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -89,12 +85,10 @@ public:
 	DECLARE_WRITE8_MEMBER(pix1_w);
 	DECLARE_WRITE8_MEMBER(pix2_w);
 	DECLARE_READ8_MEMBER(pix2_r);
-	DECLARE_WRITE8_MEMBER(undoukai_mcu_w);
-	DECLARE_READ8_MEMBER(undoukai_mcu_r);
-	DECLARE_READ8_MEMBER(undoukai_mcu_status_r);
 	DECLARE_READ8_MEMBER(from_snd_r);
 	DECLARE_READ8_MEMBER(snd_flag_r);
 	DECLARE_WRITE8_MEMBER(to_main_w);
+	DECLARE_READ8_MEMBER(fortyl_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(fortyl_pixram_sel_w);
 	DECLARE_READ8_MEMBER(fortyl_pixram_r);
 	DECLARE_WRITE8_MEMBER(fortyl_pixram_w);
@@ -111,13 +105,9 @@ public:
 	DECLARE_DRIVER_INIT(40love);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(fortyl);
 	DECLARE_MACHINE_START(40love);
 	DECLARE_MACHINE_RESET(40love);
-	DECLARE_MACHINE_START(undoukai);
-	DECLARE_MACHINE_RESET(undoukai);
 	DECLARE_MACHINE_RESET(common);
-	DECLARE_MACHINE_RESET(ta7630);
 	uint32_t screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void redraw_pixels();
 	void fortyl_set_scroll_x( int offset );
@@ -130,6 +120,8 @@ public:
 		TIMER_NMI_CALLBACK
 	};
 
+	void undoukai(machine_config &config);
+	void _40love(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

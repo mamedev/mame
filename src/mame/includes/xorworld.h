@@ -27,9 +27,6 @@ public:
 	DECLARE_WRITE16_MEMBER(irq2_ack_w);
 	DECLARE_WRITE16_MEMBER(irq6_ack_w);
 	DECLARE_WRITE16_MEMBER(videoram_w);
-	DECLARE_WRITE16_MEMBER(eeprom_chip_select_w);
-	DECLARE_WRITE16_MEMBER(eeprom_serial_clock_w);
-	DECLARE_WRITE16_MEMBER(eeprom_data_w);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
@@ -39,4 +36,5 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void xorworld(machine_config &config);
 };

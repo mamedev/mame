@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_CBM2_STD_H
+#define MAME_BUS_CBM2_STD_H
+
 #pragma once
 
-#ifndef __CBM2_STANDARD_CARTRIDGE__
-#define __CBM2_STANDARD_CARTRIDGE__
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -39,7 +38,7 @@ protected:
 
 
 // device type definition
-extern const device_type CBM2_STD;
+DECLARE_DEVICE_TYPE(CBM2_STD, cbm2_standard_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_CBM2_STD_H

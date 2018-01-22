@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #include "uimetrics.h"
 
 #include "strconv.h"

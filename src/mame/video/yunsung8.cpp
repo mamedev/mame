@@ -58,9 +58,9 @@ READ8_MEMBER(yunsung8_state::videoram_r)
 		bank = m_videobank & 1;
 
 	if (bank)
-		return m_videoram_0[offset];
+		return m_bg_vram[offset];
 	else
-		return m_videoram_1[offset];
+		return m_fg_vram[offset];
 }
 
 
@@ -73,9 +73,9 @@ WRITE8_MEMBER(yunsung8_state::videoram_w)
 		int color;
 
 		if (bank)
-			RAM = m_videoram_0;
+			RAM = m_bg_vram;
 		else
-			RAM = m_videoram_1;
+			RAM = m_fg_vram;
 
 		RAM[offset] = data;
 		color = RAM[offset & ~1] | (RAM[offset | 1] << 8);
@@ -95,13 +95,13 @@ WRITE8_MEMBER(yunsung8_state::videoram_w)
 
 		if (bank)
 		{
-			m_videoram_0[offset] = data;
-			m_tilemap_0->mark_tile_dirty(tile);
+			m_bg_vram[offset] = data;
+			m_bg_tilemap->mark_tile_dirty(tile);
 		}
 		else
 		{
-			m_videoram_1[offset] = data;
-			m_tilemap_1->mark_tile_dirty(tile);
+			m_fg_vram[offset] = data;
+			m_fg_tilemap->mark_tile_dirty(tile);
 		}
 	}
 }
@@ -132,10 +132,11 @@ WRITE8_MEMBER(yunsung8_state::flipscreen_w)
 #define DIM_NX_0            (0x40)
 #define DIM_NY_0            (0x20)
 
-TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_0)
+TILE_GET_INFO_MEMBER(yunsung8_state::get_bg_tile_info)
 {
-	int code  =  m_videoram_0[0x1000 + tile_index * 2 + 0] + m_videoram_0[0x1000 + tile_index * 2 + 1] * 256;
-	int color =  m_videoram_0[0x0800 + tile_index] & 0x07;
+	int code  =  m_bg_vram[0x1000 + tile_index * 2 + 0] + m_bg_vram[0x1000 + tile_index * 2 + 1] * 256;
+	int color =  m_bg_vram[0x0800 + tile_index] & 0x07;
+
 	SET_TILE_INFO_MEMBER(0,
 			code,
 			color,
@@ -147,10 +148,11 @@ TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_0)
 #define DIM_NX_1            (0x40)
 #define DIM_NY_1            (0x20)
 
-TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_1)
+TILE_GET_INFO_MEMBER(yunsung8_state::get_fg_tile_info)
 {
-	int code  =  m_videoram_1[0x1000 + tile_index * 2 + 0] + m_videoram_1[0x1000 + tile_index * 2 + 1] * 256;
-	int color =  m_videoram_1[0x0800 + tile_index] & 0x3f;
+	int code  =  m_fg_vram[0x1000 + tile_index * 2 + 0] + m_fg_vram[0x1000 + tile_index * 2 + 1] * 256;
+	int color =  m_fg_vram[0x0800 + tile_index] & 0x3f;
+
 	SET_TILE_INFO_MEMBER(1,
 			code,
 			color,
@@ -170,10 +172,10 @@ TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_1)
 
 void yunsung8_state::video_start()
 {
-	m_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsung8_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_0, DIM_NY_0 );
-	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsung8_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_1, DIM_NY_1 );
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsung8_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_0, DIM_NY_0 );
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsung8_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, DIM_NX_1, DIM_NY_1 );
 
-	m_tilemap_1->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 
@@ -201,12 +203,12 @@ if (machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	if (layers_ctrl & 1)
-		m_tilemap_0->draw(screen, bitmap, cliprect, 0, 0);
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(0, cliprect);
 
 	if (layers_ctrl & 2)
-		m_tilemap_1->draw(screen, bitmap, cliprect, 0, 0);
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }

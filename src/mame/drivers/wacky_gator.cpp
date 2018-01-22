@@ -21,8 +21,10 @@
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ticket.h"
-#include "sound/ym2413.h"
+#include "machine/timer.h"
 #include "sound/msm5205.h"
+#include "sound/ym2413.h"
+#include "speaker.h"
 
 #include "wackygtr.lh"
 
@@ -81,6 +83,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
 
+	void wackygtr(machine_config &config);
 private:
 	int     m_adpcm_sel;
 	uint16_t  m_adpcm_pos;
@@ -107,7 +110,7 @@ WRITE8_MEMBER(wackygtr_state::status_lamps_w)
 	set_lamps(0, data & 0x3f);
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 6));
-	m_ticket->write(space, 0, data & 0x80);
+	m_ticket->motor_w(BIT(data, 7));
 }
 
 WRITE8_MEMBER(wackygtr_state::sample_ctrl_w)
@@ -269,9 +272,9 @@ static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, wackygtr_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( wackygtr, wackygtr_state )
+MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_3_579545MHz)   // HD68B09P
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_3_579545MHz)   // HD68B09P
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(wackygtr_state, irq0_line_assert, 50)  // FIXME
 
@@ -284,7 +287,7 @@ static MACHINE_CONFIG_START( wackygtr, wackygtr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz )
 	MCFG_MSM5205_VCLK_CB(WRITELINE(wackygtr_state, adpcm_int))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 KHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz )

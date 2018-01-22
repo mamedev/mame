@@ -35,13 +35,19 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
-#include "video/mc6845.h"
-#include "sound/speaker.h"
-#include "formats/pyldin_dsk.h"
-#include "machine/upd765.h"
 #include "machine/ram.h"
+#include "machine/upd765.h"
+#include "sound/spkrdev.h"
+#include "video/mc6845.h"
+
 #include "softlist.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "formats/pyldin_dsk.h"
+
 
 class pyl601_state : public driver_device
 {
@@ -90,6 +96,8 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	void pyl601(machine_config &config);
+	void pyl601a(machine_config &config);
 };
 
 
@@ -523,7 +531,7 @@ static GFXDECODE_START( pyl601a )
 	GFXDECODE_ENTRY( "chargen", 0x0000, pyl601a_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pyl601, pyl601_state )
+MACHINE_CONFIG_START(pyl601_state::pyl601)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6800, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(pyl601_mem)
@@ -560,7 +568,7 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	MCFG_RAM_DEFAULT_SIZE("576K") // 64 + 512
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pyl601a, pyl601 )
+MACHINE_CONFIG_DERIVED(pyl601_state::pyl601a, pyl601)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK( XTAL_2MHz)
 
@@ -617,6 +625,6 @@ ROM_START( pyl601a )
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT    INIT        COMPANY           FULLNAME    FLAGS */
-COMP( 1989, pyl601,  0,       0,       pyl601,    pyl601, pyl601_state,  pyl601, "Mikroelektronika", "Pyldin-601", 0 )
+/*    YEAR  NAME     PARENT   COMPAT   MACHINE    INPUT   STATE          INIT    COMPANY             FULLNAME       FLAGS */
+COMP( 1989, pyl601,  0,       0,       pyl601,    pyl601, pyl601_state,  pyl601, "Mikroelektronika", "Pyldin-601",  0 )
 COMP( 1989, pyl601a, pyl601,  0,       pyl601a,   pyl601, pyl601_state,  pyl601, "Mikroelektronika", "Pyldin-601A", 0 )

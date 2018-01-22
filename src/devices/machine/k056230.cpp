@@ -15,14 +15,14 @@
 //**************************************************************************
 
 // device type definition
-const device_type K056230 = &device_creator<k056230_device>;
+DEFINE_DEVICE_TYPE(K056230, k056230_device, "k056230", "K056230 LANC")
 
 //-------------------------------------------------
 //  k056230_device - constructor
 //-------------------------------------------------
 
 k056230_device::k056230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K056230, "K056230 LANC", tag, owner, clock, "k056230", __FILE__)
+	: device_t(mconfig, K056230, tag, owner, clock)
 	, m_is_thunderh(0)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
@@ -49,7 +49,7 @@ READ8_MEMBER(k056230_device::read)
 		}
 	}
 
-//  osd_printf_debug("k056230_r: %d at %08X\n", offset, space.device().safe_pc());
+//  logerror("k056230_r: %d %s\n", offset, machine().describe_context());
 
 	return 0;
 }
@@ -91,17 +91,17 @@ WRITE8_MEMBER(k056230_device::write)
 			break;
 		}
 	}
-//  osd_printf_debug("k056230_w: %d, %02X at %08X\n", offset, data, space.device().safe_pc());
+//  logerror("k056230_w: %d, %02X at %08X\n", offset, data, machine().describe_context());
 }
 
 READ32_MEMBER(k056230_device::lanc_ram_r)
 {
-	//osd_printf_debug("LANC_RAM_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
+	//logerror("LANC_RAM_r: %08X, %08X %s\n", offset, mem_mask, machine().describe_context());
 	return m_ram[offset & 0x7ff];
 }
 
 WRITE32_MEMBER(k056230_device::lanc_ram_w)
 {
-	//osd_printf_debug("LANC_RAM_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+	//logerror("LANC_RAM_w: %08X, %08X, %08X %s\n", data, offset, mem_mask, machine().describe_context());
 	COMBINE_DATA(m_ram + (offset & 0x7ff));
 }

@@ -7,17 +7,18 @@
  *
  ******************************************************************************/
 
-#ifndef MZ700_H_
-#define MZ700_H_
+#ifndef MAME_INCLUDES_MZ700_H
+#define MAME_INCLUDES_MZ700_H
 
+#include "bus/centronics/ctronics.h"
+#include "imagedev/cassette.h"
+#include "machine/bankdev.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "machine/z80pio.h"
-#include "sound/speaker.h"
-#include "imagedev/cassette.h"
-#include "bus/centronics/ctronics.h"
-#include "machine/bankdev.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
+#include "machine/z80pio.h"
+#include "sound/spkrdev.h"
 
 class mz_state : public driver_device
 {
@@ -34,7 +35,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_banke(*this, "banke")
 		, m_bankf(*this, "bankf")
-		{ }
+	{ }
 
 	DECLARE_READ8_MEMBER(mz700_e008_r);
 	DECLARE_WRITE8_MEMBER(mz700_e008_w);
@@ -79,6 +80,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 
+	void mz800(machine_config &config);
+	void mz700(machine_config &config);
 private:
 	int m_mz700;                /* 1 if running on an mz700 */
 
@@ -124,4 +127,4 @@ private:
 	optional_device<address_map_bank_device> m_bankf;
 };
 
-#endif /* MZ700_H_ */
+#endif // MAME_INCLUDES_MZ700_H

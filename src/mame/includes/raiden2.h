@@ -4,6 +4,9 @@
 #include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
 
+ADDRESS_MAP_EXTERN(raiden2_sound_map, 8);
+ADDRESS_MAP_EXTERN(zeroteam_sound_map, 8);
+
 class raiden2_state : public driver_device
 {
 public:
@@ -80,9 +83,6 @@ public:
 	DECLARE_WRITE16_MEMBER( sprcpt_flags_1_w );
 	DECLARE_WRITE16_MEMBER( sprcpt_flags_2_w );
 
-	DECLARE_READ16_MEMBER( raiden2_sound_comms_r );
-	DECLARE_WRITE16_MEMBER( raiden2_sound_comms_w );
-
 	void common_reset();
 
 	static uint16_t const raiden_blended_colors[];
@@ -153,6 +153,10 @@ public:
 	bitmap_ind16 tile_buffer, sprite_buffer;
 	optional_device<raiden2cop_device> m_raiden2cop;
 
+	void raidendx(machine_config &config);
+	void xsedae(machine_config &config);
+	void zeroteam(machine_config &config);
+	void raiden2(machine_config &config);
 protected:
 	virtual void machine_start() override;
 };

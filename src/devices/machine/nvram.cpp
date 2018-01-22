@@ -16,14 +16,14 @@
 //**************************************************************************
 
 // device type definition
-const device_type NVRAM = &device_creator<nvram_device>;
+DEFINE_DEVICE_TYPE(NVRAM, nvram_device, "nvram", "NVRAM")
 
 //-------------------------------------------------
 //  nvram_device - constructor
 //-------------------------------------------------
 
 nvram_device::nvram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NVRAM, "NVRAM", tag, owner, clock, "nvram", __FILE__),
+	: device_t(mconfig, NVRAM, tag, owner, clock),
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
 		m_default_value(DEFAULT_ALL_1),
@@ -50,11 +50,11 @@ void nvram_device::static_set_default_value(device_t &device, default_value valu
 //  helper to set a custom callback
 //-------------------------------------------------
 
-void nvram_device::static_set_custom_handler(device_t &device, nvram_init_delegate handler)
+void nvram_device::static_set_custom_handler(device_t &device, init_delegate &&handler)
 {
 	nvram_device &nvram = downcast<nvram_device &>(device);
 	nvram.m_default_value = DEFAULT_CUSTOM;
-	nvram.m_custom_handler = handler;
+	nvram.m_custom_handler = std::move(handler);
 }
 
 
@@ -166,5 +166,5 @@ void nvram_device::determine_final_base()
 
 	// if we are region-backed for the default, find it now and make sure it's the right size
 	if (m_region.found() && m_region->bytes() != m_length)
-		throw emu_fatalerror("%s",string_format("NVRAM device '%s' has a default region, but it should be 0x%I64uX bytes", tag(), m_length).c_str());
+		throw emu_fatalerror("%s",string_format("NVRAM device '%s' has a default region, but it should be 0x%X bytes", tag(), m_length).c_str());
 }

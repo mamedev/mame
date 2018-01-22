@@ -8,12 +8,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_DS2404_H
+#define MAME_MACHINE_DS2404_H
+
 #pragma once
 
-#ifndef __DS2404_H__
-#define __DS2404_H__
-
-#include "emu.h"
 
 
 
@@ -22,7 +21,7 @@
 ***************************************************************************/
 
 #define MCFG_DS2404_ADD(_tag, _ref_year, _ref_month, _ref_day) \
-	MCFG_DEVICE_ADD(_tag, DS2404, 0) \
+	MCFG_DEVICE_ADD(_tag, DS2404, XTAL_32_768kHz) \
 	MCFG_DS2404_REF_YEAR(_ref_year) \
 	MCFG_DS2404_REF_MONTH(_ref_month) \
 	MCFG_DS2404_REF_DAY(_ref_day)
@@ -44,8 +43,7 @@
 
 // ======================> ds2404_device
 
-class ds2404_device :  public device_t,
-						public device_nvram_interface
+class ds2404_device : public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
@@ -81,7 +79,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-
 	void ds2404_rom_cmd(uint8_t cmd);
 	void ds2404_cmd(uint8_t cmd);
 
@@ -123,7 +120,6 @@ private:
 
 
 // device type definition
-extern const device_type DS2404;
+DECLARE_DEVICE_TYPE(DS2404, ds2404_device)
 
-
-#endif /* __DS2404_H__ */
+#endif // MAME_MACHINE_DS2404_H

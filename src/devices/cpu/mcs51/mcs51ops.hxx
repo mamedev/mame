@@ -305,7 +305,7 @@ OPHANDLER( dec_mem )
 OPHANDLER( dec_ir )
 {
 	uint8_t data = IRAM_IR(R_REG(r));
-	IRAM_W(R_REG(r),data-1);
+	IRAM_IW(R_REG(r),data-1);
 }
 
 //DEC R0 to R7                              /* 1: 0001 1rrr */
@@ -378,7 +378,7 @@ OPHANDLER( inc_mem )
 OPHANDLER( inc_ir )
 {
 	uint8_t data = IRAM_IR(R_REG(r));
-	IRAM_W(R_REG(r),data+1);
+	IRAM_IW(R_REG(r),data+1);
 }
 
 //INC R0 to R7                              /* 1: 0000 1rrr */
@@ -907,7 +907,7 @@ OPHANDLER( xch_a_ir )
 	uint8_t data = IRAM_IR(R_REG(r));         //Grab data pointed to by R0 or R1
 	uint8_t oldACC = ACC;                 //Hold value of ACC
 	SET_ACC(data);                      //Sets ACC to data
-	IRAM_W(R_REG(r),oldACC);                    //Sets data address to old value of ACC
+	IRAM_IW(R_REG(r),oldACC);                    //Sets data address to old value of ACC
 }
 
 //XCH A, RO to R7                           /* 1: 1100 1rrr */

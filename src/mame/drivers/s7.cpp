@@ -57,13 +57,17 @@ ToDo:
 *****************************************************************************************/
 
 #include "emu.h"
+#include "machine/genpin.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
-#include "machine/genpin.h"
 #include "sound/dac.h"
 #include "sound/hc55516.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "s7.lh"
+
 
 class s7_state : public genpin_class
 {
@@ -112,6 +116,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
 	DECLARE_MACHINE_RESET(s7);
 	DECLARE_DRIVER_INIT(s7);
+	void s7(machine_config &config);
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -418,7 +423,7 @@ DRIVER_INIT_MEMBER( s7_state, s7 )
 	m_irq_timer->adjust(attotime::from_ticks(980,3580000/4),1);
 }
 
-static MACHINE_CONFIG_START( s7, s7_state )
+MACHINE_CONFIG_START(s7_state::s7)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6808, 3580000)
 	MCFG_CPU_PROGRAM_MAP(s7_main_map)
@@ -481,7 +486,7 @@ static MACHINE_CONFIG_START( s7, s7_state )
 	MCFG_CPU_PROGRAM_MAP(s7_audio_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
@@ -861,29 +866,29 @@ ROM_END
 
 
 
-GAME( 1980, bk_l4,    0,        s7, s7, s7_state, s7, ROT0, "Williams", "Black Knight (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, bk_f4,    bk_l4,    s7, s7, s7_state, s7, ROT0, "Williams", "Black Knight (L-4, French speech)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, bk_l3,    bk_l4,    s7, s7, s7_state, s7, ROT0, "Williams", "Black Knight (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1980, csmic_l1, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Cosmic Gunfight (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1981, jngld_l2, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Jungle Lord (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1981, jngld_l1, jngld_l2, s7, s7, s7_state, s7, ROT0, "Williams", "Jungle Lord (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1981, pharo_l2, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Pharaoh (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1981, solar_l2, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Solar Fire (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1982, thund_p1, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Thunderball (P-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1982, thund_p2, thund_p1, s7, s7, s7_state, s7, ROT0, "Williams", "Thunderball (P-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1982, thund_p3, thund_p1, s7, s7, s7_state, s7, ROT0, "Williams", "Thunderball (P-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1981, hypbl_l4, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "HyperBall (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1981, hypbl_l3, hypbl_l4, s7, s7, s7_state, s7, ROT0, "Williams", "HyperBall (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1981, hypbl_l2, hypbl_l4, s7, s7, s7_state, s7, ROT0, "Williams", "HyperBall (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1981, barra_l1, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Barracora (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1982, vrkon_l1, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Varkon (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1982, tmfnt_l5, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Time Fantasy (L-5)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1982, wrlok_l3, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Warlok (L-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1982, dfndr_l4, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Defender (L-4)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1983, jst_l2,   0,        s7, s7, s7_state, s7, ROT0, "Williams", "Joust (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NOT_WORKING )
-GAME( 1983, jst_l1,   jst_l2,   s7, s7, s7_state, s7, ROT0, "Williams", "Joust (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NOT_WORKING )
-GAME( 1983, lsrcu_l2, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Laser Cue (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1983, fpwr2_l2, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Firepower II (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1984, strlt_l1, 0,        s7, s7, s7_state, s7, ROT0, "Williams", "Star Light (L-1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, bk_l4,    0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Black Knight (L-4)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, bk_f4,    bk_l4,    s7, s7, s7_state, s7, ROT0, "Williams",  "Black Knight (L-4, French speech)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, bk_l3,    bk_l4,    s7, s7, s7_state, s7, ROT0, "Williams",  "Black Knight (L-3)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1980, csmic_l1, 0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Cosmic Gunfight (L-1)",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1981, jngld_l2, 0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Jungle Lord (L-2)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1981, jngld_l1, jngld_l2, s7, s7, s7_state, s7, ROT0, "Williams",  "Jungle Lord (L-1)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1981, pharo_l2, 0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Pharaoh (L-2)",                     MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1981, solar_l2, 0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Solar Fire (L-2)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1982, thund_p1, 0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Thunderball (P-1)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, thund_p2, thund_p1, s7, s7, s7_state, s7, ROT0, "Williams",  "Thunderball (P-2)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1982, thund_p3, thund_p1, s7, s7, s7_state, s7, ROT0, "Williams",  "Thunderball (P-3)",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1981, hypbl_l4, 0,        s7, s7, s7_state, s7, ROT0, "Williams",  "HyperBall (L-4)",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1981, hypbl_l3, hypbl_l4, s7, s7, s7_state, s7, ROT0, "Williams",  "HyperBall (L-3)",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1981, hypbl_l2, hypbl_l4, s7, s7, s7_state, s7, ROT0, "Williams",  "HyperBall (L-2)",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1981, barra_l1, 0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Barracora (L-1)",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1982, vrkon_l1, 0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Varkon (L-1)",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1982, tmfnt_l5, 0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Time Fantasy (L-5)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1982, wrlok_l3, 0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Warlok (L-3)",                      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1982, dfndr_l4, 0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Defender (L-4)",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1983, jst_l2,   0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Joust (L-2)",                       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1983, jst_l1,   jst_l2,   s7, s7, s7_state, s7, ROT0, "Williams",  "Joust (L-1)",                       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1983, lsrcu_l2, 0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Laser Cue (L-2)",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1983, fpwr2_l2, 0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Firepower II (L-2)",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1984, strlt_l1, 0,        s7, s7, s7_state, s7, ROT0, "Williams",  "Star Light (L-1)",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 // same hardware, unknown manufacturer
-GAME( 1983, wldtexas, 0,        s7, s7, s7_state, s7, ROT0, "<unknown>", "Wild Texas", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1983, wldtexas, 0,        s7, s7, s7_state, s7, ROT0, "<unknown>", "Wild Texas",                        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

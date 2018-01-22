@@ -6,32 +6,19 @@
  *
  ****************************************************************************/
 
-#ifndef __GB_LCD_H__
-#define __GB_LCD_H__
+#ifndef MAME_VIDEO_GB_LCD_H
+#define MAME_VIDEO_GB_LCD_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpu/lr35902/lr35902.h"
 
-
-struct layer_struct {
-	uint8_t  enabled;
-	uint8_t  *bg_tiles;
-	uint8_t  *bg_map;
-	uint8_t  xindex;
-	uint8_t  xshift;
-	uint8_t  xstart;
-	uint8_t  xend;
-	/* GBC specific */
-	uint8_t  *gbc_map;
-	int16_t  bgline;
-};
 
 
 class dmg_ppu_device :  public device_t,
 						public device_video_interface
 {
 public:
-	dmg_ppu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint32_t vram_size);
 	dmg_ppu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void static_set_lr35902_tag(device_t &device, const char *tag) { downcast<dmg_ppu_device &>(device).m_lr35902.set_tag(tag); }
@@ -44,9 +31,6 @@ public:
 	DECLARE_WRITE8_MEMBER(oam_w);
 	virtual DECLARE_READ8_MEMBER(video_r);
 	virtual DECLARE_WRITE8_MEMBER(video_w);
-
-	// FIXME: remove it when proper sgb support is added
-	void set_sgb_hack(bool val) { m_sgb_border_hack = val ? 1 : 0; }
 
 	virtual void update_state();
 
@@ -66,12 +50,27 @@ protected:
 		LY_LYC_FLAG = 0x04
 	};
 
+	struct layer_struct {
+		uint8_t  enabled;
+		uint8_t  *bg_tiles;
+		uint8_t  *bg_map;
+		uint8_t  xindex;
+		uint8_t  xshift;
+		uint8_t  xstart;
+		uint8_t  xend;
+		/* GBC specific */
+		uint8_t  *gbc_map;
+		int16_t  bgline;
+	};
+
 	inline void plot_pixel(int x, int y, uint16_t color);
 
 	void select_sprites();
 	void calculate_window_cycles();
 	virtual void update_sprites();
 	virtual void update_scanline(uint32_t cycles_to_go);
+
+	dmg_ppu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -88,7 +87,7 @@ protected:
 	// state variables
 	bitmap_ind16 m_bitmap;
 
-	uint8_t m_sgb_atf_data[4050];       /* (SGB) Attributes files */
+	uint8_t m_sgb_atf_data[4096];       /* (SGB) Attributes files 4050 bytes, but it's in WRAM, because 4k is transferred */
 	uint32_t m_sgb_atf;
 	uint16_t m_sgb_pal_data[4096];
 	uint8_t m_sgb_pal_map[20][18];
@@ -96,9 +95,6 @@ protected:
 	std::unique_ptr<uint8_t[]> m_sgb_tile_data;
 	uint8_t m_sgb_tile_map[2048];
 	uint8_t m_sgb_window_mask;
-
-	// this is temporarily needed for a bunch of games which draw the border differently...
-	int m_sgb_border_hack;
 
 	int m_window_lines_drawn;
 
@@ -139,7 +135,7 @@ protected:
 		} sprite[10];
 		uint8_t sprite_delay_cycles;
 		// other internal data
-		bool starting;       // Inital fetches when (re)starting the rendering engine.
+		bool starting;       // Initial fetches when (re)starting the rendering engine.
 		uint8_t sequence_counter;
 		bool drawing;
 		bool start_drawing;
@@ -227,8 +223,8 @@ protected:
 	void check_start_of_window();
 
 private:
-	uint32_t m_oam_size;
-	uint32_t m_vram_size;
+	const uint32_t m_oam_size;
+	const uint32_t m_vram_size;
 };
 
 
@@ -260,6 +256,8 @@ protected:
 	virtual void update_sprites() override;
 	virtual void update_scanline(uint32_t cycles_to_go) override;
 	void refresh_border();
+
+	void sgb_vram_memcpy(uint8_t *dst, uint8_t start, size_t num_tiles);
 };
 
 
@@ -289,10 +287,10 @@ protected:
 };
 
 
-extern const device_type DMG_PPU;
-extern const device_type MGB_PPU;
-extern const device_type SGB_PPU;
-extern const device_type CGB_PPU;
+DECLARE_DEVICE_TYPE(DMG_PPU, dmg_ppu_device)
+DECLARE_DEVICE_TYPE(MGB_PPU, mgb_ppu_device)
+DECLARE_DEVICE_TYPE(SGB_PPU, sgb_ppu_device)
+DECLARE_DEVICE_TYPE(CGB_PPU, cgb_ppu_device)
 
 
 #define MCFG_DMG_PPU_ADD(_tag, _cpu_tag ) \
@@ -312,4 +310,4 @@ extern const device_type CGB_PPU;
 		dmg_ppu_device::static_set_lr35902_tag(*device, "^" _cpu_tag);
 
 
-#endif /* GB_LCD_H_ */
+#endif // MAME_VIDEO_GB_LCD_H

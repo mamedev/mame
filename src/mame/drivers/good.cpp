@@ -35,6 +35,8 @@ voice.rom - VOICE ROM
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class good_state : public driver_device
@@ -45,7 +47,9 @@ public:
 		m_fg_tilemapram(*this, "fg_tilemapram"),
 		m_bg_tilemapram(*this, "bg_tilemapram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{
+	}
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_fg_tilemapram;
@@ -63,6 +67,7 @@ public:
 	uint32_t screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void good(machine_config &config);
 };
 
 
@@ -118,7 +123,7 @@ static ADDRESS_MAP_START( good_map, AS_PROGRAM, 16, good_state )
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")
 	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("IN2")
 
-	AM_RANGE(0x800000, 0x8007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x800000, 0x8007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_SHARE("fg_tilemapram")
 	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_SHARE("bg_tilemapram")
@@ -280,7 +285,7 @@ static GFXDECODE_START( good )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( good, good_state )
+MACHINE_CONFIG_START(good_state::good)
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000 /2)
 	MCFG_CPU_PROGRAM_MAP(good_map)
@@ -302,7 +307,7 @@ static MACHINE_CONFIG_START( good, good_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -323,4 +328,4 @@ ROM_START( good )
 	ROM_LOAD16_BYTE( "grp-04", 0x40001, 0x20000, CRC(83dbbb52) SHA1(e597f3cbb54b5cdf2230ea6318f970319061e31b) )
 ROM_END
 
-GAME( 1998, good,   0,   good,   good, driver_device,   0,  ROT0,  "<unknown>", "Good (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1998, good,   0,   good,   good, good_state,   0,  ROT0,  "<unknown>", "Good (Korea)", MACHINE_SUPPORTS_SAVE )

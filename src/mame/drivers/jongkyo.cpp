@@ -28,8 +28,10 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "machine/segacrpt_device.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define JONGKYO_CLOCK 18432000
 
@@ -64,6 +66,7 @@ public:
 	DECLARE_PALETTE_INIT(jongkyo);
 	uint32_t screen_update_jongkyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void jongkyo(machine_config &config);
 };
 
 
@@ -244,7 +247,7 @@ static ADDRESS_MAP_START( jongkyo_memmap, AS_PROGRAM, 8, jongkyo_state )
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, jongkyo_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, jongkyo_state )
 	AM_RANGE(0x0000, 0x6bff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
@@ -488,7 +491,7 @@ void jongkyo_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
+MACHINE_CONFIG_START(jongkyo_state::jongkyo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SEGA_315_5084,JONGKYO_CLOCK/4)
@@ -562,7 +565,7 @@ DRIVER_INIT_MEMBER(jongkyo_state,jongkyo)
 	/* first of all, do a simple bitswap */
 	for (int i = 0x6000; i < 0x8c00; ++i)
 	{
-		rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0);
+		rom[i] = bitswap<8>(rom[i], 7,6,5,3,4,2,1,0);
 	}
 
 	uint8_t *opcodes = auto_alloc_array(machine(), uint8_t, 0x6c00+0x400*8);

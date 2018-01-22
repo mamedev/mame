@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
-#ifndef __DSP56_MEM_H__
-#define __DSP56_MEM_H__
+#ifndef MAME_CPU_DSP56K_DSP56MEM_H
+#define MAME_CPU_DSP56K_DSP56MEM_H
 
 #include "dsp56k.h"
 
-namespace DSP56K
-{
+namespace DSP56K {
+
 /***************************************************************************
     MEMORY
 ***************************************************************************/
@@ -238,4 +238,4 @@ void PCD_set(dsp56k_core* cpustate, uint16_t value);
 
 } // namespace DSP56K
 
-#endif
+#endif // MAME_CPU_DSP56K_DSP56MEM_H

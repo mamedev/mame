@@ -7,7 +7,9 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/msm5205.h"
+#include "screen.h"
 
 class spdodgeb_state : public driver_device
 {
@@ -60,7 +62,6 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_lastscroll;
 
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(spd_adpcm_w);
 	DECLARE_READ8_MEMBER(mcu63701_r);
 	DECLARE_WRITE8_MEMBER(mcu63701_w);
@@ -86,4 +87,5 @@ public:
 
 	void mcu63705_update_inputs();
 	void spd_adpcm_int(msm5205_device *device, int chip);
+	void spdodgeb(machine_config &config);
 };

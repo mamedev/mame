@@ -25,17 +25,23 @@
 ********************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
+#include "machine/am9517a.h"
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+//#include "machine/upd71071.h"
 #include "machine/upd765.h"
 #include "sound/2203intf.h"
-#include "formats/xdf_dsk.h"
-//#include "machine/upd71071.h"
-#include "machine/am9517a.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/xdf_dsk.h"
+
 
 /* Note: for the time being, just disable FDC CPU, it's for PC-8801 compatibility mode anyway ... */
 #define TEST_SUBFDC 0
@@ -170,7 +176,7 @@ DECLARE_WRITE8_MEMBER(dma_memw_cb);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y);
 	void draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void tsp_sprite_enable(uint32_t spr_offset, uint8_t sw_bit);
+	void tsp_sprite_enable(uint32_t spr_offset, uint16_t sw_bit);
 	void execute_sync_cmd();
 	void execute_dspon_cmd();
 	void execute_dspdef_cmd();
@@ -181,6 +187,7 @@ DECLARE_WRITE8_MEMBER(dma_memw_cb);
 	void execute_spron_cmd();
 	void execute_sprsw_cmd();
 
+	void pc88va(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -248,7 +255,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				{
 					for(x_s=0;x_s<16;x_s++)
 					{
-						pen = (BITSWAP16(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-x_s)) & 1;
+						pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8) >> (15-x_s)) & 1;
 
 						pen = pen & 1 ? fg_col : (bc) ? 8 : -1;
 
@@ -275,7 +282,7 @@ void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				{
 					for(x_s=0;x_s<2;x_s++)
 					{
-						pen = (BITSWAP16(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (16-(x_s*8)) & 0xf;
+						pen = (bitswap<16>(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (16-(x_s*8)) & 0xf;
 
 						//if(bc != -1) //transparent pen
 						bitmap.pix32(yp+y_i, xp+x_i+(x_s)) = m_palette->pen(pen);
@@ -749,11 +756,11 @@ WRITE8_MEMBER(pc88va_state::idp_command_w)
 
 		/* TODO: 0x89 shouldn't trigger, should be one of the above commands */
 		/* Update: actually 0x89 is mask command */
-		default:   m_cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",space.device().safe_pc(),data); break;
+		default:   m_cmd = 0x00; printf("PC=%05x: Unknown IDP %02x cmd set\n",m_maincpu->pc(),data); break;
 	}
 }
 
-void pc88va_state::tsp_sprite_enable(uint32_t spr_offset, uint8_t sw_bit)
+void pc88va_state::tsp_sprite_enable(uint32_t spr_offset, uint16_t sw_bit)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -1773,7 +1780,7 @@ printf("%08x %02x\n",offset,data);
 }
 
 
-static MACHINE_CONFIG_START( pc88va, pc88va_state )
+MACHINE_CONFIG_START(pc88va_state::pc88va)
 
 	MCFG_CPU_ADD("maincpu", V30, 8000000)        /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc88va_map)
@@ -1819,9 +1826,14 @@ static MACHINE_CONFIG_START( pc88va, pc88va_state )
 	MCFG_I8255_IN_PORTC_CB(READ8(pc88va_state, fdc_8255_c_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(pc88va_state, fdc_8255_c_w))
 
-	MCFG_PIC8259_ADD( "pic8259_master", INPUTLINE("maincpu", 0), VCC, READ8(pc88va_state,get_slave_ack) )
+	MCFG_DEVICE_ADD("pic8259_master", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(pc88va_state, get_slave_ack))
 
-	MCFG_PIC8259_ADD( "pic8259_slave", DEVWRITELINE("pic8259_master", pic8259_device, ir7_w), GND, NOOP)
+	MCFG_DEVICE_ADD("pic8259_slave", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir7_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("dmac", AM9517A, 8000000) /* ch2 is FDC, ch0/3 are "user". ch1 is unused */
 	MCFG_AM9517A_OUT_HREQ_CB(WRITELINE(pc88va_state, pc88va_hlda_w))
@@ -1912,6 +1924,6 @@ ROM_END
 
 
 
-COMP( 1987, pc88va,         0,      0,     pc88va,   pc88va, driver_device,  0,    "Nippon Electronic Company",  "PC-88VA", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1988, pc88va2,        pc88va, 0,     pc88va,   pc88va, driver_device,  0,    "Nippon Electronic Company",  "PC-88VA2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-//COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88va, driver_device,  0,    "Nippon Electronic Company",  "PC-88VA3", MACHINE_NOT_WORKING )
+COMP( 1987, pc88va,         0,      0,     pc88va,   pc88va, pc88va_state,  0,    "NEC",  "PC-88VA",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1988, pc88va2,        pc88va, 0,     pc88va,   pc88va, pc88va_state,  0,    "NEC",  "PC-88VA2", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88va, pc88va_state,  0,    "NEC",  "PC-88VA3", MACHINE_NOT_WORKING )

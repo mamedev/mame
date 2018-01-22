@@ -674,7 +674,7 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 		/* blend layer only when:
 		    1) m_vinmix != 0xff
 		    2) its internal mix code is set
-		    3) all mix code bits are internal(overriden until tile blending has been implemented)
+		    3) all mix code bits are internal(overridden until tile blending has been implemented)
 		    4) 0 > alpha < 255;
 		*/
 		if (temp1!=0xff && temp2 /*&& temp3==3*/)
@@ -1097,7 +1097,20 @@ void konamigx_state::common_init()
 		m_gx_tilebanks[i] = m_gx_oldbanks[i] = 0;
 	}
 
-	machine().save().save_item(NAME(m_gx_tilebanks));
+	save_pointer(NAME(m_gx_spriteram), 0x800);
+	save_item(NAME(m_gx_tilebanks));
+	save_item(NAME(m_k053247_vrcbk));
+	save_item(NAME(m_k053247_coreg));
+	save_item(NAME(m_k053247_coregshift));
+	save_item(NAME(m_k053247_opset));
+	save_item(NAME(m_opri));
+	save_item(NAME(m_oinprion));
+	save_item(NAME(m_vcblk));
+	save_item(NAME(m_ocblk));
+	save_item(NAME(m_vinmix));
+	save_item(NAME(m_vmixon));
+	save_item(NAME(m_osinmix));
+	save_item(NAME(m_osmixon));
 
 	m_gx_tilemode = 0;
 

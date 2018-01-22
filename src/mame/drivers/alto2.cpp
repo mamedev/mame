@@ -6,10 +6,11 @@
  ***************************************************************************/
 
 #include "emu.h"
-#include "rendlay.h"
-#include "sound/speaker.h"
 #include "cpu/alto2/alto2cpu.h"
 #include "machine/diablo_hd.h"
+#include "screen.h"
+#include "rendlay.h"
+#include "speaker.h"
 
 class alto2_state : public driver_device
 {
@@ -32,6 +33,7 @@ public:
 	DECLARE_DRIVER_INIT(alto2);
 	DECLARE_MACHINE_RESET(alto2);
 
+	void alto2(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
@@ -135,7 +137,7 @@ static INPUT_PORTS_START( alto2 )
 	PORT_KEY(A2_KEY_FL2,        KEYCODE_F2,         0,              0,            "FL2"          )  //!< ADL left function key 2
 
 	PORT_START("ROW5")
-	PORT_KEY(A2_KEY_FR4,        KEYCODE_F8,         0,              0,            "FR4"          )  //!< ADL right funtion key 4
+	PORT_KEY(A2_KEY_FR4,        KEYCODE_F8,         0,              0,            "FR4"          )  //!< ADL right function key 4
 	PORT_KEY(A2_KEY_BW,         KEYCODE_F10,        0,              0,            "BW"           )  //!< ADL BW (?)
 
 	PORT_START("ROW6")
@@ -259,19 +261,19 @@ ROM_END
 //  ADDRESS MAPS
 //**************************************************************************
 
-ADDRESS_MAP_START( alto2_ucode_map, AS_0, 32, alto2_state )
+ADDRESS_MAP_START( alto2_ucode_map, 0, 32, alto2_state )
 	AM_RANGE(0, 4*ALTO2_UCODE_PAGE_SIZE-1) AM_DEVICE32( "maincpu", alto2_cpu_device, ucode_map, 0xffffffffUL )
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( alto2_const_map, AS_1, 16, alto2_state )
+ADDRESS_MAP_START( alto2_const_map, 1, 16, alto2_state )
 	AM_RANGE(0, ALTO2_CONST_SIZE-1) AM_DEVICE16( "maincpu", alto2_cpu_device, const_map, 0xffffU )
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( alto2_iomem_map, AS_2, 16, alto2_state )
+ADDRESS_MAP_START( alto2_iomem_map, 2, 16, alto2_state )
 	AM_RANGE(0, 2*ALTO2_RAM_SIZE-1) AM_DEVICE16( "maincpu", alto2_cpu_device, iomem_map, 0xffffU )
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( alto2, alto2_state )
+MACHINE_CONFIG_START(alto2_state::alto2)
 	// Basic machine hardware
 	// SYSCLK is Display Control part A51 (tagged 29.4MHz) divided by 5(?)
 	// 5.8MHz according to de.wikipedia.org/wiki/Xerox_Alto

@@ -21,9 +21,10 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "pci9050.h"
 
-const device_type PCI9050 = &device_creator<pci9050_device>;
+DEFINE_DEVICE_TYPE(PCI9050, pci9050_device, "pci9050", "PLX PCI9050 PCI to Local Bus Bridge")
 
 DEVICE_ADDRESS_MAP_START(map, 32, pci9050_device)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(lasrr_r,   lasrr_w  )
@@ -41,7 +42,7 @@ DEVICE_ADDRESS_MAP_START(empty, 32, pci9050_device)
 ADDRESS_MAP_END
 
 pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, PCI9050, "PLX PCI9050 PCI to Local Bus Bridge", tag, owner, clock, "pci9050", __FILE__),
+	: pci_device(mconfig, PCI9050, tag, owner, clock),
 	m_user_input_handler(*this), m_user_output_handler(*this)
 {
 	for(int i=0; i<4; i++) {
@@ -50,41 +51,46 @@ pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, d
 	}
 }
 
-void pci9050_device::set_map(int id, address_map_constructor map, const char *name, device_t *device)
+void pci9050_device::set_map(int id, const address_map_delegate &map, device_t *device)
 {
 	m_maps[id] = map;
-	m_names[id] = name;
 	m_devices[id] = device;
 }
 
 void pci9050_device::device_start()
 {
-	typedef void (pci9050_device::*tramp_t)(address_map &);
-	static const tramp_t trampolines[4] = {
-		&pci9050_device::map_trampoline<0>,
-		&pci9050_device::map_trampoline<1>,
-		&pci9050_device::map_trampoline<2>,
-		&pci9050_device::map_trampoline<3>
-	};
-
 	pci_device::device_start();
 
 	add_map(0x80, M_MEM, FUNC(pci9050_device::map));           // map 0 is our config registers, mem space
 	add_map(0x80, M_IO,  FUNC(pci9050_device::map));           // map 1 is our config registers, i/o space
 
 	for(int i=0; i<4; i++)
-		if(m_names[i])
-			//          add_map(0, M_MEM | M_DISABLED, m_maps[i], m_names[i], m_devices[i]);
-			add_map(0, M_MEM | M_DISABLED, trampolines[i], m_names[i]);
+		if(!m_maps[i].isnull())
+			add_map(0, M_MEM | M_DISABLED, m_maps[i], m_devices[i]);
 		else
 			add_map(0, M_MEM | M_DISABLED, FUNC(pci9050_device::empty));
 
 	m_user_input_handler.resolve();
 	m_user_output_handler.resolve();
+	// Save states
+	save_item(NAME(m_lasrr));
+	save_item(NAME(m_lasba));
+	save_item(NAME(m_lasbrd));
+	save_item(NAME(m_csbase));
+	save_item(NAME(m_eromrr));
+	save_item(NAME(m_eromba));
+	save_item(NAME(m_erombrd));
+	save_item(NAME(m_intcsr));
+	save_item(NAME(m_cntrl));
+	machine().save().register_postload(save_prepost_delegate(FUNC(pci9050_device::postload), this));
+
 }
 
-void pci9050_device::device_config_complete()
+void pci9050_device::postload(void)
 {
+	remap_rom();
+	for (int id = 0; id < 4; id++)
+		remap_local(id);
 }
 
 void pci9050_device::device_reset()

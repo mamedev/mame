@@ -86,12 +86,16 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/jailbrek.h"
+#include "includes/konamipt.h"
 #include "machine/konami1.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
-#include "includes/konamipt.h"
-#include "includes/jailbrek.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(jailbrek_state::ctrl_w)
@@ -157,7 +161,7 @@ static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8, jailbrek_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vlm_map, AS_0, 8, jailbrek_state )
+static ADDRESS_MAP_START( vlm_map, 0, 8, jailbrek_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
@@ -255,7 +259,7 @@ void jailbrek_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
+MACHINE_CONFIG_START(jailbrek_state::jailbrek)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK/12)
@@ -284,7 +288,7 @@ static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
 
 	MCFG_SOUND_ADD("vlm", VLM5030, VOICE_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vlm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 MACHINE_CONFIG_END
 
 
@@ -417,6 +421,6 @@ ROM_START( jailbrekb )
 	ROM_LOAD( "k8.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16L8 */
 ROM_END
 
-GAME( 1986, jailbrek, 0,        jailbrek, jailbrek, driver_device, 0, ROT0, "Konami", "Jail Break", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, jailbrekb,jailbrek, jailbrek, jailbrek, driver_device, 0, ROT0, "bootleg","Jail Break (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, manhatan, jailbrek, jailbrek, jailbrek, driver_device, 0, ROT0, "Konami", "Manhattan 24 Bunsyo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jailbrek,  0,        jailbrek, jailbrek, jailbrek_state, 0, ROT0, "Konami",  "Jail Break",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, jailbrekb, jailbrek, jailbrek, jailbrek, jailbrek_state, 0, ROT0, "bootleg", "Jail Break (bootleg)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1986, manhatan,  jailbrek, jailbrek, jailbrek, jailbrek_state, 0, ROT0, "Konami",  "Manhattan 24 Bunsyo (Japan)", MACHINE_SUPPORTS_SAVE )

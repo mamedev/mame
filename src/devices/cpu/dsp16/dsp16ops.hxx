@@ -67,10 +67,10 @@ void dsp16_device::writeRegister(void* reg, const uint16_t &value)
 	else if (reg == &m_psw)
 	{
 		// Writes to the a0 & a1 guard bits too
-		m_a0 &= U64(0x0ffffffff);
-		m_a0 |= U64(m_psw & 0x000f) << 32;
-		m_a1 &= U64(0x0ffffffff);
-		m_a1 |= U64(m_psw & 0x01e0) << 27;
+		m_a0 &= 0x0ffffffffU;
+		m_a0 |= u64(m_psw & 0x000fU) << 32;
+		m_a1 &= 0x0ffffffffU;
+		m_a1 |= u64(m_psw & 0x01e0U) << 27;
 		m_psw = value;
 	}
 	else if (reg == &m_i)
@@ -293,12 +293,12 @@ void dsp16_device::executeF1Field(const uint8_t& F1, const uint8_t& D, const uin
 		{
 			// aS-y
 			int64_t aS = *sourceReg;
-			if (aS & U64(0x800000000))
-				aS |= U64(0xfffffff000000000);
+			if (aS & 0x800000000U)
+				aS |= 0xfffffff000000000U;
 
 			int64_t y  = (m_y & 0xffff0000) >> 16;
 			if (y & 0x8000)
-				y |= U64(0xffffffffffff0000);
+				y |= 0xffffffffffff0000U;
 
 			result = aS-y;
 			justATest = true;
@@ -314,12 +314,12 @@ void dsp16_device::executeF1Field(const uint8_t& F1, const uint8_t& D, const uin
 		{
 			// Ad = aS+y
 			int64_t aS = *sourceReg;
-			if (aS & U64(0x800000000))
-				aS |= U64(0xfffffff000000000);
+			if (aS & 0x800000000U)
+				aS |= 0xfffffff000000000U;
 
 			int64_t y  = (m_y & 0xffff0000) >> 16;
 			if (y & 0x8000)
-				y |= U64(0xffffffffffff0000);
+				y |= 0xffffffffffff0000U;
 
 			result = aS+y;
 			break;
@@ -334,12 +334,12 @@ void dsp16_device::executeF1Field(const uint8_t& F1, const uint8_t& D, const uin
 		{
 			// Ad = aS-y
 			int64_t aS = *sourceReg;
-			if (aS & U64(0x800000000))
-				aS |= U64(0xfffffff000000000);
+			if (aS & 0x800000000U)
+				aS |= 0xfffffff000000000U;
 
 			int64_t y  = (m_y & 0xffff0000) >> 16;
 			if (y & 0x8000)
-				y |= U64(0xffffffffffff0000);
+				y |= 0xffffffffffff0000U;
 
 			result = aS-y;
 			break;
@@ -348,13 +348,13 @@ void dsp16_device::executeF1Field(const uint8_t& F1, const uint8_t& D, const uin
 
 	// CPU Flags  (page 3-4)
 	// LMI (logical minus)
-	if (result & U64(0x800000000))
+	if (result & 0x800000000U)
 		m_psw |= 0x8000;
 	else
 		m_psw &= (~0x8000);
 
 	// LEQ (logical equal)
-	if (result == U64(0x000000000))
+	if (result == 0x000000000U)
 		m_psw |= 0x4000;
 	else
 		m_psw &= (~0x4000);
@@ -363,15 +363,15 @@ void dsp16_device::executeF1Field(const uint8_t& F1, const uint8_t& D, const uin
 	// TODO
 
 	// LMV (mathematical overflow)
-	if ((result & U64(0xf00000000)) != U64(0xf00000000) &&
-		(result & U64(0xf00000000)) != U64(0x000000000))
+	if ((result & 0xf00000000U) != 0xf00000000U &&
+		(result & 0xf00000000U) != 0x000000000U)
 		m_psw |= 0x1000;
 	else
 		m_psw &= (~0x1000);
 
 	// If it was a real operation, make sure the data goes where it should
 	if (!justATest)
-		*destinationReg = (uint64_t)result & U64(0x0000000fffffffff);
+		*destinationReg = (uint64_t)result & 0x0000000fffffffffU;
 }
 
 
@@ -471,11 +471,11 @@ void dsp16_device::execute_one(const uint16_t& op, uint8_t& cycles, uint8_t& pcA
 			uint16_t aRegValue = 0x0000;
 			if (op & 0xc000)
 			{
-				aRegValue = (m_a0 & U64(0x0ffff0000)) >> 16;
+				aRegValue = (m_a0 & 0x0ffff0000U) >> 16;
 			}
 			else
 			{
-				aRegValue = (m_a1 & U64(0x0ffff0000)) >> 16;
+				aRegValue = (m_a1 & 0x0ffff0000U) >> 16;
 			}
 			data_write(*destinationReg, aRegValue);
 			executeYFieldPost(Y);
@@ -614,7 +614,7 @@ void dsp16_device::execute_one(const uint16_t& op, uint8_t& cycles, uint8_t& pcA
 			}
 			uint16_t sourceAddress = *(registerFromYFieldUpper(Y));
 			int64_t sourceValueSigned = (int16_t)data_read(sourceAddress);
-			*destinationReg = sourceValueSigned & U64(0xffffffffff);
+			*destinationReg = sourceValueSigned & 0xffffffffffU;
 			executeYFieldPost(Y);
 			cycles = 1;
 			pcAdvance = 1;
@@ -771,7 +771,7 @@ void dsp16_device::execute_one(const uint16_t& op, uint8_t& cycles, uint8_t& pcA
 			const uint8_t S = (op & 0x1000) >> 12;
 			void* destinationReg = registerFromRTable(R);
 			uint64_t* sourceReg = (S) ? &m_a1 : &m_a0;
-			uint16_t sourceValue = (*sourceReg & U64(0x0ffff0000)) >> 16;
+			uint16_t sourceValue = (*sourceReg & 0x0ffff0000U) >> 16;
 			writeRegister(destinationReg, sourceValue);
 			cycles = 2;
 			pcAdvance = 1;
@@ -791,10 +791,10 @@ void dsp16_device::execute_one(const uint16_t& op, uint8_t& cycles, uint8_t& pcA
 				default: break;
 			}
 			void* sourceReg = registerFromRTable(R);
-			*destinationReg &= U64(0x00000ffff);
+			*destinationReg &= 0x00000ffffU;
 			*destinationReg |= (*(uint16_t*)sourceReg) << 16;     // TODO: Fix for all registers
 			if (*(uint16_t*)sourceReg & 0x8000)
-				*destinationReg |= U64(0xf00000000);
+				*destinationReg |= 0xf00000000U;
 			// TODO: Special function encoding
 			cycles = 2;
 			pcAdvance = 1;

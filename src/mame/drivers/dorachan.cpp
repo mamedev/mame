@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
 Dorachan (Dora-Chan ?) (c) 1980 Craul Denshi
@@ -12,6 +12,7 @@ Todo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class dorachan_state : public driver_device
@@ -44,6 +45,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void dorachan(machine_config &config);
 };
 
 
@@ -199,7 +201,7 @@ void dorachan_state::machine_reset()
 	m_flip_screen = 0;
 }
 
-static MACHINE_CONFIG_START( dorachan, dorachan_state )
+MACHINE_CONFIG_START(dorachan_state::dorachan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)
@@ -253,4 +255,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, dorachan, 0, dorachan, dorachan, driver_device, 0, ROT270, "Alpha Denshi Co. / Craul Denshi", "Dora-chan (Japan)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, dorachan, 0, dorachan, dorachan, dorachan_state, 0, ROT270, "Alpha Denshi Co. / Craul Denshi", "Dora-chan (Japan)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -140,7 +140,7 @@ Notes:
 
  Standard 6 pin Trackball connector
 
-  Pin  Wire  Funtion
+  Pin  Wire  Function
 ------------------------------
    1 | BLK | Ground
    2 | RED | +5 Volts DC
@@ -154,10 +154,12 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/x1_010.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "sound/x1_010.h"
 #include "video/seta001.h"
+#include "screen.h"
+#include "speaker.h"
 
 class champbwl_state : public driver_device
 {
@@ -167,7 +169,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_seta001(*this, "spritegen"),
 		m_palette(*this, "palette"),
-		m_x1(*this, "x1snd") { }
+		m_x1(*this, "x1snd"),
+		m_hopper(*this, "hopper"),
+		m_fakex(*this, "FAKEX"),
+		m_fakey(*this, "FAKEY") { }
 
 	int      m_screenflip;
 
@@ -175,8 +180,14 @@ public:
 	required_device<seta001_device> m_seta001;
 	required_device<palette_device> m_palette;
 	required_device<x1_010_device> m_x1;
+	optional_device<ticket_dispenser_device> m_hopper;
+
+	optional_ioport m_fakex;
+	optional_ioport m_fakey;
 	uint8_t    m_last_trackball_val[2];
+
 	DECLARE_READ8_MEMBER(trackball_r);
+	DECLARE_READ8_MEMBER(trackball_reset_r);
 	DECLARE_WRITE8_MEMBER(champbwl_misc_w);
 	DECLARE_WRITE8_MEMBER(doraemon_outputs_w);
 	DECLARE_MACHINE_START(champbwl);
@@ -185,8 +196,10 @@ public:
 	DECLARE_PALETTE_INIT(champbwl);
 	uint32_t screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_champbwl(screen_device &screen, bool state);
-	void screen_eof_doraemon(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_champbwl);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_doraemon);
+	void champbwl(machine_config &config);
+	void doraemon(machine_config &config);
 };
 
 PALETTE_INIT_MEMBER(champbwl_state,champbwl)
@@ -205,15 +218,22 @@ PALETTE_INIT_MEMBER(champbwl_state,champbwl)
 READ8_MEMBER(champbwl_state::trackball_r)
 {
 	uint8_t ret;
-	uint8_t port4 = ioport("FAKEX")->read();
-	uint8_t port5 = ioport("FAKEY")->read();
+	uint8_t port4 = m_fakex->read();
+	uint8_t port5 = m_fakey->read();
 
 	ret = (((port4 - m_last_trackball_val[0]) & 0x0f)<<4) | ((port5 - m_last_trackball_val[1]) & 0x0f);
 
-	m_last_trackball_val[0] = port4;
-	m_last_trackball_val[1] = port5;
-
 	return ret;
+}
+
+READ8_MEMBER(champbwl_state::trackball_reset_r)
+{
+	if (!machine().side_effect_disabled())
+	{
+		m_last_trackball_val[0] = m_fakex->read();
+		m_last_trackball_val[1] = m_fakey->read();
+	}
+	return 0xff;
 }
 
 WRITE8_MEMBER(champbwl_state::champbwl_misc_w)
@@ -240,7 +260,7 @@ static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8, champbwl_state )
 
 	AM_RANGE(0xf000, 0xf000) AM_READ(trackball_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0")
-	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("IN1")
+	AM_RANGE(0xf004, 0xf004) AM_READ(trackball_reset_r)
 	AM_RANGE(0xf006, 0xf006) AM_READ_PORT("IN2")
 	AM_RANGE(0xf007, 0xf007) AM_READ_PORT("IN3")
 
@@ -255,11 +275,11 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(champbwl_state::doraemon_outputs_w)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1); // coin in counter
-	machine().bookkeeping().coin_counter_w(1, data & 2); // gift out counter
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin in counter
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // gift out counter
 
-	machine().bookkeeping().coin_lockout_w(0, ~data & 8);    // coin lockout
-	machine().device<ticket_dispenser_device>("hopper")->write(space, 0, (data & 0x04) ? 0x00 : 0x80);  // gift out motor
+	machine().bookkeeping().coin_lockout_w(0, BIT(~data, 3));    // coin lockout
+	m_hopper->motor_w(BIT(~data, 2));  // gift out motor
 
 	membank("bank1")->set_entry((data & 0x30) >> 4);
 
@@ -295,32 +315,6 @@ static INPUT_PORTS_START( champbwl )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) // INT( 4M)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) // INT(16M)
-
-	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN2")
 	PORT_SERVICE_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
@@ -481,7 +475,7 @@ uint32_t champbwl_state::screen_update_champbwl(screen_device &screen, bitmap_in
 	return 0;
 }
 
-void champbwl_state::screen_eof_champbwl(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(champbwl_state::screen_vblank_champbwl)
 {
 	// rising edge
 	if (state)
@@ -489,7 +483,7 @@ void champbwl_state::screen_eof_champbwl(screen_device &screen, bool state)
 }
 
 
-static MACHINE_CONFIG_START( champbwl, champbwl_state )
+MACHINE_CONFIG_START(champbwl_state::champbwl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 16000000/4) /* 4MHz */
@@ -511,7 +505,7 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_champbwl)
-	MCFG_SCREEN_VBLANK_DRIVER(champbwl_state, screen_eof_champbwl)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(champbwl_state, screen_vblank_champbwl))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
@@ -541,7 +535,7 @@ uint32_t champbwl_state::screen_update_doraemon(screen_device &screen, bitmap_in
 	return 0;
 }
 
-void champbwl_state::screen_eof_doraemon(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(champbwl_state::screen_vblank_doraemon)
 {
 	// rising edge
 	if (state)
@@ -554,7 +548,7 @@ MACHINE_START_MEMBER(champbwl_state,doraemon)
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_CONFIG_START( doraemon, champbwl_state )
+MACHINE_CONFIG_START(champbwl_state::doraemon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/4)
@@ -575,7 +569,7 @@ static MACHINE_CONFIG_START( doraemon, champbwl_state )
 	MCFG_SCREEN_SIZE(320, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(champbwl_state, screen_update_doraemon)
-	MCFG_SCREEN_VBLANK_DRIVER(champbwl_state, screen_eof_doraemon)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(champbwl_state, screen_vblank_doraemon))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", champbwl)
@@ -711,5 +705,5 @@ ROM_START( doraemon )
 	ROM_LOAD( "u27-01.bin", 0x00200, 0x200, CRC(66245fc7) SHA1(c94d9dce7b557c21a3dc1f3f8a1b29594715c994) )
 ROM_END
 
-GAME( 1993?,doraemon, 0, doraemon, doraemon, driver_device, 0, ROT0,   "Sunsoft / Epoch", "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
-GAME( 1989, champbwl, 0, champbwl, champbwl, driver_device, 0, ROT270, "Seta / Romstar Inc.", "Championship Bowling", MACHINE_SUPPORTS_SAVE )
+GAME( 1993?,doraemon, 0, doraemon, doraemon, champbwl_state, 0, ROT0,   "Sunsoft / Epoch",     "Doraemon no Eawase Montage (prototype)", MACHINE_SUPPORTS_SAVE ) // year not shown, datecodes on pcb suggests late-1993
+GAME( 1989, champbwl, 0, champbwl, champbwl, champbwl_state, 0, ROT270, "Seta / Romstar Inc.", "Championship Bowling",                   MACHINE_SUPPORTS_SAVE )

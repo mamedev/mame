@@ -18,6 +18,8 @@ etc.
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class ltcasino_state : public driver_device
@@ -41,6 +43,7 @@ public:
 	uint32_t screen_update_ltcasino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void ltcasino(machine_config &config);
 };
 
 
@@ -649,7 +652,7 @@ uint32_t ltcasino_state::screen_update_ltcasino(screen_device &screen, bitmap_in
 }
 
 
-static MACHINE_CONFIG_START( ltcasino, ltcasino_state )
+MACHINE_CONFIG_START(ltcasino_state::ltcasino)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,2000000)       /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(ltcasino_map)
@@ -721,11 +724,11 @@ DRIVER_INIT_MEMBER(ltcasino_state,mv4in1)
 	int i;
 	uint8_t *rom = memregion("maincpu")->base();
 	for(i=0;i<0x10000;i++)
-		rom[i]=BITSWAP8(rom[i],7,6,5,4,3,1,2,0);
+		rom[i]=bitswap<8>(rom[i],7,6,5,4,3,1,2,0);
 }
 
 
 
-GAME( 1982, ltcasino, 0, ltcasino, ltcasino, driver_device, 0, ROT0, "Digital Controls Inc.", "Little Casino (older)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS  )
-GAME( 1983, mv4in1,  ltcasino,  ltcasino, mv4in1, ltcasino_state, mv4in1, ROT0, "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1984, ltcasinn, 0, ltcasino, ltcasinn, driver_device, 0, ROT0, "Digital Controls Inc.", "Little Casino (newer)", MACHINE_NOT_WORKING )
+GAME( 1982, ltcasino, 0,         ltcasino, ltcasino, ltcasino_state, 0,      ROT0, "Digital Controls Inc.",           "Little Casino (older)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, mv4in1,   ltcasino,  ltcasino, mv4in1,   ltcasino_state, mv4in1, ROT0, "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1",       MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, ltcasinn, 0,         ltcasino, ltcasinn, ltcasino_state, 0,      ROT0, "Digital Controls Inc.",           "Little Casino (newer)", MACHINE_NOT_WORKING )

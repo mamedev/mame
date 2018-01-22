@@ -1,15 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
-#ifndef __SB16__
-#define __SB16__
+#ifndef MAME_BUS_ISA_SB16_H
+#define MAME_BUS_ISA_SB16_H
 
-#include "emu.h"
 #include "isa.h"
-#include "sound/dac.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/262intf.h"
+#include "sound/dac.h"
 
 //*********************************************************************
 //   TYPE DEFINITIONS
@@ -17,21 +16,11 @@
 
 // ====================> sb16_device
 
-class sb16_lle_device : public device_t,
-					public device_isa16_card_interface
+class sb16_lle_device : public device_t, public device_isa16_card_interface
 {
 public:
 	// construction/destruction
 	sb16_lle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	required_device<dac_word_interface> m_ldac;
-	required_device<dac_word_interface> m_rdac;
-	required_device<pc_joy_device> m_joy;
-	required_device<cpu_device> m_cpu;
 
 	READ8_MEMBER( mpu401_r );
 	WRITE8_MEMBER( mpu401_w );
@@ -85,10 +74,21 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	uint8_t dack_r(int line) override;
 	void dack_w(int line, uint8_t data) override;
 	uint16_t dack16_r(int line) override;
 	void dack16_w(int line, uint16_t data) override;
+
+	required_device<dac_word_interface> m_ldac;
+	required_device<dac_word_interface> m_rdac;
+	required_device<pc_joy_device> m_joy;
+	required_device<cpu_device> m_cpu;
+
 private:
 	void control_timer(bool start);
 
@@ -117,4 +117,4 @@ private:
 
 extern const device_type ISA16_SB16;
 
-#endif
+#endif // MAME_BUS_ISA_SB16_H

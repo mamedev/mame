@@ -12,13 +12,17 @@ Bruce Tomlin (hardware info)
 
 #include "emu.h"
 #include "includes/vectrex.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/volt_reg.h"
 #include "video/vector.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 static ADDRESS_MAP_START(vectrex_map, AS_PROGRAM, 8, vectrex_state )
 	AM_RANGE(0x0000, 0x7fff) AM_NOP // cart area, handled at machine_start
@@ -91,9 +95,9 @@ static SLOT_INTERFACE_START(vectrex_cart)
 	SLOT_INTERFACE_INTERNAL("vec_sram",   VECTREX_ROM_SRAM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( vectrex, vectrex_state )
+MACHINE_CONFIG_START(vectrex_state::vectrex)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_6MHz / 4)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_6MHz) // 68A09
 	MCFG_CPU_PROGRAM_MAP(vectrex_map)
 
 	/* video hardware */
@@ -110,13 +114,13 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("ay8912", AY8912, 1500000)
+	MCFG_SOUND_ADD("ay8912", AY8912, XTAL_6MHz / 4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(vectrex_state, vectrex_psg_port_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL_6MHz / 4)
 	MCFG_VIA6522_READPA_HANDLER(READ8(vectrex_state, vectrex_via_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(vectrex_state, vectrex_via_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(vectrex_state, v_via_pa_w))
@@ -211,7 +215,7 @@ static INPUT_PORTS_START(raaspec)
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( raaspec, vectrex )
+MACHINE_CONFIG_DERIVED(vectrex_state::raaspec, vectrex)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(raaspec_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -237,7 +241,7 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT       COMPANY FULLNAME */
-CONS(1982, vectrex,  0,        0,      vectrex,  vectrex,  vectrex_state, vectrex,    "General Consumer Electronics",   "Vectrex" , ROT270)
+//   YEAR  NAME      PARENT    COMPAT   MACHINE   INPUT     STATE          INIT     MONITOR  COMPANY                         FULLNAME
+CONS(1982, vectrex,  0,        0,       vectrex,  vectrex,  vectrex_state, vectrex,          "General Consumer Electronics", "Vectrex" , ROT270)
 
-GAME(1984, raaspec,  0,        raaspec,  raaspec, vectrex_state,  vectrex, ROT270,    "Roy Abel & Associates",   "Spectrum I+", MACHINE_NOT_WORKING ) //TODO: button labels & timings, a mandatory artwork too?
+GAME(1984, raaspec,  0,                 raaspec, raaspec,   vectrex_state, vectrex, ROT270,  "Roy Abel & Associates",        "Spectrum I+", MACHINE_NOT_WORKING ) //TODO: button labels & timings, a mandatory artwork too?

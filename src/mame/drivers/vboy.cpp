@@ -27,12 +27,18 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/v810/v810.h"
 #include "audio/vboy.h"
+
+#include "cpu/v810/v810.h"
 #include "bus/vboy/slot.h"
 #include "bus/vboy/rom.h"
+#include "machine/timer.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 #include "vboy.lh"
+
 
 #define READ_BGMAP(bgoffs) m_bgmap[(bgoffs) & 0xffff]
 #define READ_WORLD(wldoffs)   READ_BGMAP((0x1d800 >> 1) + wldoffs)
@@ -56,7 +62,7 @@
 	m_font[((woffs) + 0x4000)] = dat;     /* normal */ \
 	m_font[((woffs) + 0x8000) ^ 7] = dat; /* flip y */ \
 	m_font[((woffs) + 0xc000) ^ 7] = dat; /* flip y */ \
-	dat = BITSWAP16(dat,1,0,3,2,5,4,7,6,9,8,11,10,13,12,15,14);  \
+	dat = bitswap<16>(dat,1,0,3,2,5,4,7,6,9,8,11,10,13,12,15,14);  \
 	m_font[((woffs) + 0x10000)] = dat;     /* flip x */ \
 	m_font[((woffs) + 0x14000)] = dat;     /* flip x */ \
 	m_font[((woffs) + 0x18000) ^ 7] = dat; /* flip x+y */ \
@@ -219,6 +225,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_main_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
+	void vboy(machine_config &config);
 };
 
 
@@ -1340,7 +1347,7 @@ static SLOT_INTERFACE_START(vboy_cart)
 	SLOT_INTERFACE_INTERNAL("vb_eeprom", VBOY_ROM_EEPROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( vboy, vboy_state )
+MACHINE_CONFIG_START(vboy_state::vboy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", V810, XTAL_20MHz )
@@ -1392,5 +1399,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-CONS( 1995, vboy,   0,      0,       vboy,      vboy, driver_device,    0,    "Nintendo", "Virtual Boy", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE       INIT  COMPANY     FULLNAME       FLAGS */
+CONS( 1995, vboy,   0,      0,       vboy,      vboy,  vboy_state, 0,    "Nintendo", "Virtual Boy", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

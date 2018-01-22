@@ -24,7 +24,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pia2c_pa_w);
 	DECLARE_WRITE8_MEMBER(pia2c_pb_w);
 	DECLARE_WRITE8_MEMBER(pia34_pa_w);
-	DECLARE_WRITE_LINE_MEMBER(pia40_ca2_w);
 
 	DECLARE_WRITE8_MEMBER(bg_speech_clock_w);
 	DECLARE_WRITE8_MEMBER(bg_speech_digit_w);
@@ -33,6 +32,7 @@ public:
 	DECLARE_DRIVER_INIT(s11b);
 	DECLARE_DRIVER_INIT(s11b_invert);
 
+	void s11b(machine_config &config);
 protected:
 	optional_device<hc55516_device> m_bg_hc55516;
 

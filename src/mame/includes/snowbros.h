@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood, Mike Coates
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h" // for the original pandora
 
@@ -36,16 +37,13 @@ public:
 	int m_sb3_music;
 	uint8_t m_semicom_prot_offset;
 
-	DECLARE_WRITE16_MEMBER(snowbros_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(snowbros_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(bootleg_flipscreen_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq4_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq3_ack_w);
 	DECLARE_WRITE16_MEMBER(snowbros_irq2_ack_w);
-	DECLARE_READ16_MEMBER(snowbros_68000_sound_r);
-	DECLARE_WRITE16_MEMBER(snowbros_68000_sound_w);
-	DECLARE_WRITE16_MEMBER(semicom_soundcmd_w);
 	DECLARE_READ8_MEMBER(prot_io_r);
 	DECLARE_WRITE8_MEMBER(prot_io_w);
-	DECLARE_WRITE16_MEMBER(twinadv_68000_sound_w);
 	DECLARE_READ16_MEMBER(sb3_sound_r);
 	DECLARE_READ16_MEMBER(_4in1_02_read);
 	DECLARE_READ16_MEMBER(_3in1_read);
@@ -71,11 +69,22 @@ public:
 	uint32_t screen_update_twinadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_snowbro3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_wintbob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_snowbros(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_snowbros);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(snowbros_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(snowbros3_irq);
 
 	void sb3_play_music(int data);
 	void sb3_play_sound(int data);
+	void _4in1(machine_config &config);
+	void semiprot(machine_config &config);
+	void semicom_mcu(machine_config &config);
+	void yutnori(machine_config &config);
+	void snowbros(machine_config &config);
+	void semicom(machine_config &config);
+	void twinadv(machine_config &config);
+	void wintbob(machine_config &config);
+	void honeydol(machine_config &config);
+	void snowbro3(machine_config &config);
+	void finalttr(machine_config &config);
 };

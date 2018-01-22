@@ -7,7 +7,7 @@
     uses NES emulation by Brad Olivier
 
     Hardware is based around Nintendo NES. After coin up, it allows to play one of
-    35 NES games (choosen from text menu). Manufacturer is unknown, code for title
+    35 NES games (chosen from text menu). Manufacturer is unknown, code for title
     screen and game selection contains string:
     "Programed by SANG  HO  ENG. K. B. KIM 1986/1/ 1"
 
@@ -109,6 +109,8 @@ Eproms are 27512,27010,274001
 #include "emu.h"
 #include "cpu/m6502/n2a03.h"
 #include "video/ppu2c0x.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class multigam_state : public driver_device
@@ -202,6 +204,10 @@ public:
 	void multigm3_decrypt(uint8_t* mem, int memsize, const uint8_t* decode_nibble);
 	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
 	void ppu_irq(int *ppu_regs);
+	void multigam(machine_config &config);
+	void supergm3(machine_config &config);
+	void multigmt(machine_config &config);
+	void multigm3(machine_config &config);
 };
 
 
@@ -581,11 +587,11 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 
 		case 0x6000: /* disable irqs */
 			machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-			m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate());
+			m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
 		break;
 
 		case 0x6001: /* enable irqs */
-			m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(multigam_state::multigam3_mmc3_scanline_cb),this));
+			m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(multigam_state::multigam3_mmc3_scanline_cb),this));
 		break;
 	}
 }
@@ -710,7 +716,7 @@ void multigam_state::multigam_init_mapper02(uint8_t* prg_base, int prg_size)
 
 	m_mapper02_prg_base = prg_base;
 	m_mapper02_prg_size = prg_size;
-	m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate());
+	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
 }
 
 /******************************************************
@@ -867,7 +873,7 @@ void multigam_state::multigam_init_mmc1(uint8_t *prg_base, int prg_size, int chr
 	m_mmc1_prg_size = prg_size;
 	m_mmc1_chr_bank_base = chr_bank_base;
 
-	m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate());
+	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
 }
 
 
@@ -930,7 +936,7 @@ void multigam_state::supergm3_set_bank()
 		// title screen
 		memcpy(mem + 0x8000, mem + 0x18000, 0x8000);
 		membank("bank10")->set_base(mem + 0x6000);
-		m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate());
+		m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
 	}
 	else if ((m_supergm3_prg_bank & 0x40) == 0)
 	{
@@ -1210,9 +1216,9 @@ MACHINE_START_MEMBER(multigam_state,supergm3)
 	m_multigmc_mmc3_6000_ram = std::make_unique<uint8_t[]>(0x2000);
 }
 
-static MACHINE_CONFIG_START( multigam, multigam_state )
+MACHINE_CONFIG_START(multigam_state::multigam)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
+	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(multigam_map)
 
 
@@ -1236,7 +1242,7 @@ static MACHINE_CONFIG_START( multigam, multigam_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( multigm3, multigam )
+MACHINE_CONFIG_DERIVED(multigam_state::multigm3, multigam)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(multigm3_map)
 
@@ -1244,12 +1250,12 @@ static MACHINE_CONFIG_DERIVED( multigm3, multigam )
 	MCFG_MACHINE_RESET_OVERRIDE(multigam_state, multigm3 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( multigmt, multigam )
+MACHINE_CONFIG_DERIVED(multigam_state::multigmt, multigam)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(multigmt_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( supergm3, multigam )
+MACHINE_CONFIG_DERIVED(multigam_state::supergm3, multigam)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(supergm3_map)
 
@@ -1431,7 +1437,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 	memcpy(&buf[0], rom, size);
 	for (i = 0; i < size; i++)
 	{
-		addr = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
+		addr = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
 		rom[i] = buf[addr];
 	}
 
@@ -1440,7 +1446,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 	memcpy(&buf[0], rom, size);
 	for (i = 0; i < size; i++)
 	{
-		addr = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
+		addr = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
 		rom[i] = buf[addr];
 	}
 	rom = memregion("gfx1")->base();
@@ -1448,8 +1454,8 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 	memcpy(&buf[0], rom, size);
 	for (i = 0; i < size; i++)
 	{
-		addr = BITSWAP24(i,23,22,21,20,19,18,17,15,16,11,10,12,13,14,8,9,1,3,5,7,6,4,2,0);
-		rom[i] = BITSWAP8(buf[addr], 4, 7, 3, 2, 5, 1, 6, 0);
+		addr = bitswap<24>(i,23,22,21,20,19,18,17,15,16,11,10,12,13,14,8,9,1,3,5,7,6,4,2,0);
+		rom[i] = bitswap<8>(buf[addr], 4, 7, 3, 2, 5, 1, 6, 0);
 	}
 
 	multigam_switch_prg_rom(space, 0x0, 0x01);
@@ -1460,5 +1466,5 @@ GAME( 1992, multigmb, multigam, multigam, multigam, multigam_state, multigam, RO
 GAME( 1992, multigm2, 0,        multigm3, multigm2, multigam_state, multigm3, ROT0, "Seo Jin",   "Multi Game 2", 0 )
 GAME( 1992, multigm3, 0,        multigm3, multigm3, multigam_state, multigm3, ROT0, "Seo Jin",   "Multi Game III", 0 )
 GAME( 1992, multigmt, 0,        multigmt, multigmt, multigam_state, multigmt, ROT0, "Tung Sheng Electronics", "Multi Game (Tung Sheng Electronics)", 0 )
-GAME( 1994, sgmt1,    0,        supergm3, sgmt1,    driver_device, 0,         ROT0, "<unknown>", "Super Game Mega Type 1", 0 )
-GAME( 1996, supergm3, 0,        supergm3, supergm3, driver_device, 0,         ROT0, "<unknown>", "Super Game III", 0 )
+GAME( 1994, sgmt1,    0,        supergm3, sgmt1,    multigam_state, 0,        ROT0, "<unknown>", "Super Game Mega Type 1", 0 )
+GAME( 1996, supergm3, 0,        supergm3, supergm3, multigam_state, 0,        ROT0, "<unknown>", "Super Game III", 0 )

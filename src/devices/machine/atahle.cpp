@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "atahle.h"
 
 #define VERBOSE                     0
@@ -39,10 +40,9 @@ enum
 #define DEVICE1_PDIAG_TIME                  (attotime::from_msec(2))
 #define DIAGNOSTIC_TIME                     (attotime::from_msec(2))
 
-ata_hle_device::ata_hle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock,const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	ata_device_interface(mconfig, *this),
-	device_slot_card_interface(mconfig, *this),
+ata_hle_device::ata_hle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
+	device_ata_interface(mconfig, *this),
 	m_buffer_offset(0),
 	m_buffer_size(0),
 	m_error(0),
@@ -584,7 +584,7 @@ uint16_t ata_hle_device::read_dma()
 	return result;
 }
 
-READ16_MEMBER( ata_hle_device::read_cs0 )
+uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
 {
 	/* logit */
 //  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
@@ -702,7 +702,8 @@ READ16_MEMBER( ata_hle_device::read_cs0 )
 	return result;
 }
 
-READ16_MEMBER( ata_hle_device::read_cs1 )
+
+uint16_t ata_hle_device::read_cs1(offs_t offset, uint16_t mem_mask)
 {
 	/* logit */
 //  if (offset != IDE_CS1_ALTERNATE_STATUS_R)
@@ -806,12 +807,11 @@ void ata_hle_device::write_dma( uint16_t data )
 	}
 }
 
-WRITE16_MEMBER( ata_hle_device::write_cs0 )
+void ata_hle_device::write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* logit */
 	if (offset != IDE_CS0_DATA_RW)
 		LOG(("%s:IDE cs0 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
-	//  fprintf(stderr, "ide write %03x %02x mem_mask=%d\n", offset, data, size);
 
 	if (m_dmack)
 	{
@@ -852,7 +852,7 @@ WRITE16_MEMBER( ata_hle_device::write_cs0 )
 
 			/* sector count */
 			case IDE_CS0_SECTOR_COUNT_RW:
-				m_sector_count = data ? data : 256;
+				m_sector_count = (data & 0xff) ? (data & 0xff) : 0x100;
 				break;
 
 			/* current sector */
@@ -915,7 +915,7 @@ WRITE16_MEMBER( ata_hle_device::write_cs0 )
 	}
 }
 
-WRITE16_MEMBER( ata_hle_device::write_cs1 )
+void ata_hle_device::write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	/* logit */
 	LOG(("%s:IDE cs1 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));

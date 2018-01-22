@@ -75,7 +75,7 @@ inline bool check_mem_load_mar_stall(uint8_t rsel) {
  * 2.  REQUIRED
  * 3.  SUSPEND
  * 4.  SUSPEND
- * 5.  whereever <-MD
+ * 5.  wherever <-MD
  *
  * @return false, if memory can be read without wait cycle
  */
@@ -109,7 +109,7 @@ DECLARE_WRITE16_MEMBER( mesr_w );       //!< memory error status register write 
 DECLARE_READ16_MEMBER ( mecr_r );       //!< memory error control register read
 DECLARE_WRITE16_MEMBER( mecr_w );       //!< memory error control register write
 
-//! Read or write a memory double-word and caluclate or compare its Hamming code.
+//! Read or write a memory double-word and calculate or compare its Hamming code.
 uint32_t hamming_code(bool write, uint32_t dw_addr, uint32_t dw_data);
 
 //! Load the memory address register with some value.

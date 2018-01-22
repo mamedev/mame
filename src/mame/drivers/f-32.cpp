@@ -32,6 +32,9 @@ f5
 #include "machine/eepromser.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class mosaicf2_state : public driver_device
 {
@@ -49,6 +52,8 @@ public:
 
 	DECLARE_READ32_MEMBER(f32_input_port_1_r);
 	uint32_t screen_update_mosaicf2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void mosaicf2(machine_config &config);
+	void royalpk2(machine_config &config);
 };
 
 
@@ -153,7 +158,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( mosaicf2, mosaicf2_state )
+MACHINE_CONFIG_START(mosaicf2_state::mosaicf2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E132XN, XTAL_20MHz*4) /* 4x internal multiplier */
@@ -183,7 +188,7 @@ static MACHINE_CONFIG_START( mosaicf2, mosaicf2_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_14_31818MHz/8, OKIM6295_PIN7_HIGH) /* 1.7897725 MHz */
+	MCFG_OKIM6295_ADD("oki", XTAL_14_31818MHz/8, PIN7_HIGH) /* 1.7897725 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -229,7 +234,7 @@ static ADDRESS_MAP_START( royalpk2_io, AS_IO, 32, mosaicf2_state )
 	AM_RANGE(0x6a00, 0x6a03) AM_WRITE_PORT("EEPROMOUT")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( royalpk2, mosaicf2_state )
+MACHINE_CONFIG_START(mosaicf2_state::royalpk2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL_50MHz)
@@ -259,7 +264,7 @@ static MACHINE_CONFIG_START( royalpk2, mosaicf2_state )
 //  MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 //  MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_14_31818MHz/8, OKIM6295_PIN7_HIGH) /* 1.7897725 MHz */
+	MCFG_OKIM6295_ADD("oki", XTAL_14_31818MHz/8, PIN7_HIGH) /* 1.7897725 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -272,10 +277,10 @@ MACHINE_CONFIG_END
 Mosaic (c) 1999 F2 System
 
    CPU: Hyperstone E1-32XN
- Video: QuickLogic QL2003-XPL84C
+ Video: QuickLogic QL2003-XPL84C FPGA
  Sound: OKI 6295, BS901 (YM2151) & BS902 (YM3012)
    OSC: 20MHz & 14.31818MHz
-EEPROM: 93C46
+EEPROM: 93C46 (controlled through FPGA)
 
 F-E1-32-009
 +------------------------------------------------------------------+
@@ -361,5 +366,5 @@ ROM_START( royalpk2 )
 ROM_END
 
 
-GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, driver_device, 0,        ROT0, "F2 System", "Mosaic (F2 System)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, royalpk2, 0, royalpk2, royalpk2, driver_device, 0,        ROT0, "F2 System", "Royal Poker 2 (Network version 3.12)", MACHINE_NOT_WORKING )
+GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, mosaicf2_state, 0,        ROT0, "F2 System", "Mosaic (F2 System)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, royalpk2, 0, royalpk2, royalpk2, mosaicf2_state, 0,        ROT0, "F2 System", "Royal Poker 2 (Network version 3.12)", MACHINE_NOT_WORKING )

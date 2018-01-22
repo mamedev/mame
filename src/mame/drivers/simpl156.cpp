@@ -91,12 +91,16 @@ Are the OKI M6295 clocks from Heavy Smash are correct at least for the Mitchell 
 */
 
 #include "emu.h"
+#include "includes/simpl156.h"
+
 #include "machine/decocrpt.h"
 #include "machine/deco156.h"
 #include "cpu/arm/arm.h"
-#include "includes/simpl156.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static INPUT_PORTS_START( simpl156 )
 	PORT_START("IN0")
@@ -126,6 +130,22 @@ static INPUT_PORTS_START( simpl156 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( magdrop )
+	PORT_INCLUDE(simpl156)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_OPTIONAL // not used in gameplay
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_OPTIONAL // not used in gameplay
 INPUT_PORTS_END
 
 
@@ -206,7 +226,7 @@ static ADDRESS_MAP_START( joemacr_map, AS_PROGRAM, 32, simpl156_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_SHARE("mainram") // main ram
 	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w)
-	AM_RANGE(0x120000, 0x120fff) AM_DEVREADWRITE16("palette", palette_device, read, write, 0x0000ffff) AM_SHARE("palette")
+	AM_RANGE(0x120000, 0x120fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0x130000, 0x130003) AM_READ_PORT("IN1") AM_WRITE(simpl156_eeprom_w)
 	AM_RANGE(0x140000, 0x14001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 	AM_RANGE(0x150000, 0x151fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
@@ -231,7 +251,7 @@ static ADDRESS_MAP_START( chainrec_map, AS_PROGRAM, 32, simpl156_state )
 	AM_RANGE(0x3c0000, 0x3c0003) AM_DEVREADWRITE8("okimusic", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x400000, 0x407fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_SHARE("mainram") // main ram?
 	AM_RANGE(0x410000, 0x411fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w)
-	AM_RANGE(0x420000, 0x420fff) AM_DEVREADWRITE16("palette", palette_device, read, write, 0x0000ffff) AM_SHARE("palette")
+	AM_RANGE(0x420000, 0x420fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0x430000, 0x430003) AM_READ_PORT("IN1") AM_WRITE(simpl156_eeprom_w)
 	AM_RANGE(0x440000, 0x44001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 	AM_RANGE(0x450000, 0x451fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
@@ -253,7 +273,7 @@ static ADDRESS_MAP_START( magdrop_map, AS_PROGRAM, 32, simpl156_state )
 	AM_RANGE(0x340000, 0x340003) AM_DEVREADWRITE8("okimusic", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x380000, 0x387fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_SHARE("mainram") // main ram?
 	AM_RANGE(0x390000, 0x391fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w)
-	AM_RANGE(0x3a0000, 0x3a0fff) AM_DEVREADWRITE16("palette", palette_device, read, write, 0x0000ffff) AM_SHARE("palette")
+	AM_RANGE(0x3a0000, 0x3a0fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0x3b0000, 0x3b0003) AM_READ_PORT("IN1") AM_WRITE(simpl156_eeprom_w)
 	AM_RANGE(0x3c0000, 0x3c001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 	AM_RANGE(0x3d0000, 0x3d1fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
@@ -275,7 +295,7 @@ static ADDRESS_MAP_START( magdropp_map, AS_PROGRAM, 32, simpl156_state )
 	AM_RANGE(0x4c0000, 0x4c0003) AM_DEVREADWRITE8("okimusic", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x680000, 0x687fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_SHARE("mainram") // main ram?
 	AM_RANGE(0x690000, 0x691fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w)
-	AM_RANGE(0x6a0000, 0x6a0fff) AM_DEVREADWRITE16("palette", palette_device, read, write, 0x0000ffff) AM_SHARE("palette")
+	AM_RANGE(0x6a0000, 0x6a0fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0x6b0000, 0x6b0003) AM_READ_PORT("IN1") AM_WRITE(simpl156_eeprom_w)
 	AM_RANGE(0x6c0000, 0x6c001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 	AM_RANGE(0x6d0000, 0x6d1fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
@@ -296,7 +316,7 @@ static ADDRESS_MAP_START( mitchell156_map, AS_PROGRAM, 32, simpl156_state )
 	AM_RANGE(0x140000, 0x140003) AM_DEVREADWRITE8("okimusic", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x180000, 0x187fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_SHARE("mainram") // main ram
 	AM_RANGE(0x190000, 0x191fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w)
-	AM_RANGE(0x1a0000, 0x1a0fff) AM_DEVREADWRITE16("palette", palette_device, read, write, 0x0000ffff) AM_SHARE("palette")
+	AM_RANGE(0x1a0000, 0x1a0fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0x1b0000, 0x1b0003) AM_READ_PORT("IN1") AM_WRITE(simpl156_eeprom_w)
 	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 	AM_RANGE(0x1d0000, 0x1d1fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
@@ -376,7 +396,7 @@ DECOSPR_PRIORITY_CB_MEMBER(simpl156_state::pri_callback)
 }
 
 
-static MACHINE_CONFIG_START( chainrec, simpl156_state )
+MACHINE_CONFIG_START(simpl156_state::chainrec)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000 /* /4 */) /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
@@ -422,43 +442,43 @@ static MACHINE_CONFIG_START( chainrec, simpl156_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("okisfx", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("okisfx", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
-	MCFG_OKIM6295_ADD("okimusic", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("okimusic", 32220000/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( magdrop, chainrec )
+MACHINE_CONFIG_DERIVED(simpl156_state::magdrop, chainrec)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(magdrop_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( magdropp, chainrec )
+MACHINE_CONFIG_DERIVED(simpl156_state::magdropp, chainrec)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(magdropp_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( joemacr, chainrec )
+MACHINE_CONFIG_DERIVED(simpl156_state::joemacr, chainrec)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(joemacr_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mitchell156, chainrec )
+MACHINE_CONFIG_DERIVED(simpl156_state::mitchell156, chainrec)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mitchell156_map)
 
-	MCFG_OKIM6295_REPLACE("okimusic", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_REPLACE("okimusic", 32220000/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
@@ -1028,7 +1048,7 @@ DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 	{
 		uint32_t addr;
 
-		addr = BITSWAP24 (x,23,22,21,0, 20,
+		addr = bitswap<24> (x,23,22,21,0, 20,
 							19,18,17,16,
 							15,14,13,12,
 							11,10,9, 8,
@@ -1047,8 +1067,8 @@ DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 /* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multipler? */
 READ32_MEMBER(simpl156_state::joemacr_speedup_r)
 {
-	if (space.device().safe_pc() == 0x284)
-		space.device().execute().spin_until_time(attotime::from_usec(400));
+	if (m_maincpu->pc() == 0x284)
+		m_maincpu->spin_until_time(attotime::from_usec(400));
 	return m_systemram[0x18/4];
 }
 
@@ -1061,8 +1081,8 @@ DRIVER_INIT_MEMBER(simpl156_state,joemacr)
 
 READ32_MEMBER(simpl156_state::chainrec_speedup_r)
 {
-	if (space.device().safe_pc() == 0x2d4)
-		space.device().execute().spin_until_time(attotime::from_usec(400));
+	if (m_maincpu->pc() == 0x2d4)
+		m_maincpu->spin_until_time(attotime::from_usec(400));
 	return m_systemram[0x18/4];
 }
 
@@ -1074,8 +1094,8 @@ DRIVER_INIT_MEMBER(simpl156_state,chainrec)
 
 READ32_MEMBER(simpl156_state::prtytime_speedup_r)
 {
-	if (space.device().safe_pc() == 0x4f0)
-		space.device().execute().spin_until_time(attotime::from_usec(400));
+	if (m_maincpu->pc() == 0x4f0)
+		m_maincpu->spin_until_time(attotime::from_usec(400));
 	return m_systemram[0xae0/4];
 }
 
@@ -1088,8 +1108,8 @@ DRIVER_INIT_MEMBER(simpl156_state,prtytime)
 
 READ32_MEMBER(simpl156_state::charlien_speedup_r)
 {
-	if (space.device().safe_pc() == 0xc8c8)
-		space.device().execute().spin_until_time(attotime::from_usec(400));
+	if (m_maincpu->pc() == 0xc8c8)
+		m_maincpu->spin_until_time(attotime::from_usec(400));
 	return m_systemram[0x10/4];
 }
 
@@ -1101,8 +1121,8 @@ DRIVER_INIT_MEMBER(simpl156_state,charlien)
 
 READ32_MEMBER(simpl156_state::osman_speedup_r)
 {
-	if (space.device().safe_pc() == 0x5974)
-		space.device().execute().spin_until_time(attotime::from_usec(400));
+	if (m_maincpu->pc() == 0x5974)
+		m_maincpu->spin_until_time(attotime::from_usec(400));
 	return m_systemram[0x10/4];
 }
 
@@ -1117,9 +1137,9 @@ DRIVER_INIT_MEMBER(simpl156_state,osman)
 GAME( 1994, joemacr,  0,        joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.1, 1994.05.27)", MACHINE_SUPPORTS_SAVE ) /* bootleg board with genuine DECO parts */
 GAME( 1994, joemacra, joemacr,  joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (World, Version 1.0, 1994.05.19)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, joemacrj, joemacr,  joemacr,     simpl156, simpl156_state, joemacr,  ROT0, "Data East", "Joe & Mac Returns (Japan, Version 1.2, 1994.06.06)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, chainrec, 0,        chainrec,    simpl156, simpl156_state, chainrec, ROT0, "Data East", "Chain Reaction (World, Version 2.2, 1995.09.25)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magdrop,  chainrec, magdrop,     simpl156, simpl156_state, chainrec, ROT0, "Data East", "Magical Drop (Japan, Version 1.1, 1995.06.21)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, magdropp, chainrec, magdropp,    simpl156, simpl156_state, chainrec, ROT0, "Data East", "Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, chainrec, 0,        chainrec,    magdrop,  simpl156_state, chainrec, ROT0, "Data East", "Chain Reaction (World, Version 2.2, 1995.09.25)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magdrop,  chainrec, magdrop,     magdrop,  simpl156_state, chainrec, ROT0, "Data East", "Magical Drop (Japan, Version 1.1, 1995.06.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, magdropp, chainrec, magdropp,    magdrop,  simpl156_state, chainrec, ROT0, "Data East", "Magical Drop Plus 1 (Japan, Version 2.1, 1995.09.12)", MACHINE_SUPPORTS_SAVE )
 
 /* Mitchell games running on the DEC-22VO / MT5601-0 PCB */
 GAME( 1995, charlien, 0,        mitchell156, simpl156, simpl156_state, charlien, ROT0,  "Mitchell", "Charlie Ninja" , MACHINE_SUPPORTS_SAVE ) /* language in service mode */

@@ -24,17 +24,13 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/spdodgeb.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/3812intf.h"
-#include "includes/spdodgeb.h"
+#include "speaker.h"
 
-
-WRITE8_MEMBER(spdodgeb_state::sound_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
-}
 
 WRITE8_MEMBER(spdodgeb_state::spd_adpcm_w)
 {
@@ -217,7 +213,7 @@ void spdodgeb_state::mcu63705_update_inputs()
 
 READ8_MEMBER(spdodgeb_state::mcu63701_r)
 {
-//  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",space.device().safe_pc(),offset);
+//  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",m_maincpu->pc(),offset);
 
 	if (m_mcu63701_command == 0) return 0x6a;
 	else switch (offset)
@@ -233,7 +229,7 @@ READ8_MEMBER(spdodgeb_state::mcu63701_r)
 
 WRITE8_MEMBER(spdodgeb_state::mcu63701_w)
 {
-//  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",space.device().safe_pc(),data);
+//  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",m_maincpu->pc(),data);
 	m_mcu63701_command = data;
 	mcu63705_update_inputs();
 }
@@ -246,7 +242,7 @@ static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8, spdodgeb_state )
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") //AM_WRITENOP
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW") //AM_WRITENOP
-	AM_RANGE(0x3002, 0x3002) AM_WRITE(sound_command_w)
+	AM_RANGE(0x3002, 0x3002) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 //  AM_RANGE(0x3003, 0x3003) AM_WRITENOP
 	AM_RANGE(0x3004, 0x3004) AM_WRITE(scrollx_lo_w)
 //  AM_RANGE(0x3005, 0x3005) AM_WRITENOP         /* mcu63701_output_w */
@@ -407,14 +403,14 @@ void spdodgeb_state::machine_reset()
 	m_last_dash[0] = m_last_dash[1] = 0;
 }
 
-static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
+MACHINE_CONFIG_START(spdodgeb_state::spdodgeb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/6)   /* 2MHz ? */
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", spdodgeb_state, interrupt, "screen", 0, 1) /* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/6)  /* 2MHz ? */
+	MCFG_CPU_ADD("audiocpu", MC6809, XTAL_12MHz/2) // HD68A09P (1.5MHz internally)
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_sound_map)
 
 	/* video hardware */
@@ -431,6 +427,7 @@ static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz/4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
@@ -439,13 +436,13 @@ static MACHINE_CONFIG_START( spdodgeb, spdodgeb_state )
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(spdodgeb_state, spd_adpcm_int_1))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz? */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(spdodgeb_state, spd_adpcm_int_2))  /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  /* 8kHz? */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 8kHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -574,6 +571,6 @@ ROM_END
 
 
 
-GAME( 1987, spdodgeb, 0,        spdodgeb, spdodgeb, driver_device, 0, ROT0, "Technos Japan", "Super Dodge Ball (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, nkdodge,  spdodgeb, spdodgeb, spdodgeb, driver_device, 0, ROT0, "Technos Japan", "Nekketsu Koukou Dodgeball Bu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, nkdodgeb, spdodgeb, spdodgeb, spdodgeb, driver_device, 0, ROT0, "bootleg", "Nekketsu Koukou Dodgeball Bu (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, spdodgeb, 0,        spdodgeb, spdodgeb, spdodgeb_state, 0, ROT0, "Technos Japan", "Super Dodge Ball (US)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, nkdodge,  spdodgeb, spdodgeb, spdodgeb, spdodgeb_state, 0, ROT0, "Technos Japan", "Nekketsu Koukou Dodgeball Bu (Japan)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1987, nkdodgeb, spdodgeb, spdodgeb, spdodgeb, spdodgeb_state, 0, ROT0, "bootleg",       "Nekketsu Koukou Dodgeball Bu (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )

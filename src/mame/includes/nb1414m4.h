@@ -1,11 +1,14 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese
-class nb1414m4_device : public device_t,
-									public device_video_interface
+#ifndef MAME_INCLUDES_NB1414M4_H
+#define MAME_INCLUDES_NB1414M4_H
+
+#pragma once
+
+class nb1414m4_device : public device_t, public device_video_interface
 {
 public:
 	nb1414m4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~nb1414m4_device() {}
 
 	void exec(uint16_t mcu_cmd, uint8_t *vram, uint16_t &scrollx, uint16_t &scrolly, tilemap_t *tilemap);
 
@@ -28,4 +31,6 @@ private:
 
 };
 
-extern const device_type NB1414M4;
+DECLARE_DEVICE_TYPE(NB1414M4, nb1414m4_device)
+
+#endif // MAME_INCLUDES_NB1414M4_H

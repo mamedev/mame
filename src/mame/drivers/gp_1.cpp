@@ -19,12 +19,17 @@ ToDo:
 
 ********************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
 #include "machine/z80ctc.h"
 #include "sound/sn76477.h"
+#include "speaker.h"
+
 #include "gp_1.lh"
 
 class gp_1_state : public genpin_class
@@ -52,6 +57,8 @@ public:
 	DECLARE_WRITE8_MEMBER(portc_w);
 	DECLARE_READ8_MEMBER(portb_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(zero_timer);
+	void gp_1(machine_config &config);
+	void gp_1s(machine_config &config);
 private:
 	uint8_t m_u14;
 	uint8_t m_digit;
@@ -416,7 +423,7 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( gp_1, gp_1_state )
+MACHINE_CONFIG_START(gp_1_state::gp_1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2457600)
 	MCFG_CPU_PROGRAM_MAP(gp_1_map)
@@ -442,7 +449,7 @@ static MACHINE_CONFIG_START( gp_1, gp_1_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("gp1", gp_1_state, zero_timer, attotime::from_hz(120)) // mains freq*2
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gp_1s, gp_1 )
+MACHINE_CONFIG_DERIVED(gp_1_state::gp_1s, gp_1)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("snsnd", SN76477, 0)
 	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                // noise + filter: N/C
@@ -528,13 +535,13 @@ ROM_START(vegasgp)
 	ROM_LOAD( "140b.13", 0x0800, 0x0800, CRC(cf26d67b) SHA1(05481e880e23a7bc1d1716b52ac1effc0db437f2))
 ROM_END
 
-GAME(1978, gp_110,   0,        gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Model 110",    MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
-GAME(1978, blvelvet, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Black Velvet", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, camlight, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Camel Lights", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, foxylady, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Foxy Lady",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, real,     gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Real",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, rio,      gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Rio",          MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1978, chucklck, gp_110,   gp_1,     gp_1,     driver_device, 0,   ROT0, "Game Plan", "Chuck-A-Luck", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1979, famlyfun, 0,        gp_1s,    gp_1,     driver_device, 0,   ROT0, "Game Plan", "Family Fun!",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1979, startrip, 0,        gp_1s,    gp_1,     driver_device, 0,   ROT0, "Game Plan", "Star Trip",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1979, vegasgp,  0,        gp_1s,    gp_1,     driver_device, 0,   ROT0, "Game Plan", "Vegas (Game Plan)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1978, gp_110,   0,        gp_1,     gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Model 110",         MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING)
+GAME(1978, blvelvet, gp_110,   gp_1,     gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Black Velvet",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1978, camlight, gp_110,   gp_1,     gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Camel Lights",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1978, foxylady, gp_110,   gp_1,     gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Foxy Lady",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1978, real,     gp_110,   gp_1,     gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Real",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1978, rio,      gp_110,   gp_1,     gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Rio",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1978, chucklck, gp_110,   gp_1,     gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Chuck-A-Luck",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1979, famlyfun, 0,        gp_1s,    gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Family Fun!",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1979, startrip, 0,        gp_1s,    gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Star Trip",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1979, vegasgp,  0,        gp_1s,    gp_1,     gp_1_state, 0,   ROT0, "Game Plan", "Vegas (Game Plan)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

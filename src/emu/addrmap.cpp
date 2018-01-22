@@ -41,23 +41,8 @@ address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t 
 		m_region(nullptr),
 		m_rgnoffs(0),
 		m_submap_bits(0),
-		m_memory(nullptr),
-		m_bytestart(0),
-		m_byteend(0),
-		m_bytemirror(0),
-		m_bytemask(0)
+		m_memory(nullptr)
 {
-	if (map.m_globalmask != 0 && (start & ~map.m_globalmask) != 0)
-	{
-		osd_printf_warning("AS_%d map entry start %08X lies outside global address mask %08X\n", map.m_spacenum, start, map.m_globalmask);
-		m_addrstart &= map.m_globalmask;
-	}
-
-	if (map.m_globalmask != 0 && (end & ~map.m_globalmask) != 0)
-	{
-		osd_printf_warning("AS_%d map entry end %08X lies outside global address mask %08X\n", map.m_spacenum, end, map.m_globalmask);
-		m_addrend &= map.m_globalmask;
-	}
 }
 
 
@@ -65,12 +50,12 @@ address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t 
 //  set_mask - set the mask value
 //-------------------------------------------------
 
-address_map_entry *address_map_entry::set_mask(offs_t _mask)
+address_map_entry &address_map_entry::mask(offs_t _mask)
 {
 	m_addrmask = _mask;
 	if (m_map.m_globalmask != 0)
 		m_addrmask &= m_map.m_globalmask;
-	return this;
+	return *this;
 }
 
 
@@ -79,7 +64,7 @@ address_map_entry *address_map_entry::set_mask(offs_t _mask)
 //  retrieve a submap from a device
 //-------------------------------------------------
 
-address_map_entry *address_map_entry::set_submap(const char *tag, address_map_delegate func, int bits, uint64_t mask)
+address_map_entry &address_map_entry::set_submap(const char *tag, address_map_delegate func, int bits, u64 mask)
 {
 	if(!bits)
 		bits = m_map.m_databits;
@@ -94,16 +79,16 @@ address_map_entry *address_map_entry::set_submap(const char *tag, address_map_de
 	m_write.m_mask = mask;
 	m_submap_delegate = func;
 	m_submap_bits = bits;
-	return this;
+	return *this;
 }
 
 
 //-------------------------------------------------
 //  set_handler - handler setters for
-//  8-bit read/write handlers
+//  8-bit read/write delegates
 //-------------------------------------------------
 
-address_map_entry *address_map_entry::set_handler(read8_delegate func, uint64_t unitmask)
+address_map_entry &address_map_entry::r(read8_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(8, unitmask, func.name()));
@@ -112,11 +97,11 @@ address_map_entry *address_map_entry::set_handler(read8_delegate func, uint64_t 
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
 	m_rproto8 = func;
-	return this;
+	return *this;
 }
 
 
-address_map_entry *address_map_entry::set_handler(write8_delegate func, uint64_t unitmask)
+address_map_entry &address_map_entry::w(write8_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(8, unitmask, func.name()));
@@ -125,24 +110,24 @@ address_map_entry *address_map_entry::set_handler(write8_delegate func, uint64_t
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
 	m_wproto8 = func;
-	return this;
+	return *this;
 }
 
 
-address_map_entry *address_map_entry::set_handler(read8_delegate rfunc, write8_delegate wfunc, uint64_t unitmask)
+address_map_entry &address_map_entry::rw(read8_delegate rfunc, write8_delegate wfunc, u64 unitmask)
 {
-	set_handler(rfunc, unitmask);
-	set_handler(wfunc, unitmask);
-	return this;
+	r(rfunc, unitmask);
+	w(wfunc, unitmask);
+	return *this;
 }
 
 
 //-------------------------------------------------
 //  set_handler - handler setters for
-//  16-bit read/write handlers
+//  16-bit read/write delegates
 //-------------------------------------------------
 
-address_map_entry *address_map_entry::set_handler(read16_delegate func, uint64_t unitmask)
+address_map_entry &address_map_entry::r(read16_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(16, unitmask, func.name()));
@@ -151,11 +136,11 @@ address_map_entry *address_map_entry::set_handler(read16_delegate func, uint64_t
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
 	m_rproto16 = func;
-	return this;
+	return *this;
 }
 
 
-address_map_entry *address_map_entry::set_handler(write16_delegate func, uint64_t unitmask)
+address_map_entry &address_map_entry::w(write16_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(16, unitmask, func.name()));
@@ -164,24 +149,24 @@ address_map_entry *address_map_entry::set_handler(write16_delegate func, uint64_
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
 	m_wproto16 = func;
-	return this;
+	return *this;
 }
 
 
-address_map_entry *address_map_entry::set_handler(read16_delegate rfunc, write16_delegate wfunc, uint64_t unitmask)
+address_map_entry &address_map_entry::rw(read16_delegate rfunc, write16_delegate wfunc, u64 unitmask)
 {
-	set_handler(rfunc, unitmask);
-	set_handler(wfunc, unitmask);
-	return this;
+	r(rfunc, unitmask);
+	w(wfunc, unitmask);
+	return *this;
 }
 
 
 //-------------------------------------------------
 //  set_handler - handler setters for
-//  32-bit read/write handlers
+//  32-bit read/write delegates
 //-------------------------------------------------
 
-address_map_entry *address_map_entry::set_handler(read32_delegate func, uint64_t unitmask)
+address_map_entry &address_map_entry::r(read32_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(32, unitmask, func.name()));
@@ -190,11 +175,11 @@ address_map_entry *address_map_entry::set_handler(read32_delegate func, uint64_t
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
 	m_rproto32 = func;
-	return this;
+	return *this;
 }
 
 
-address_map_entry *address_map_entry::set_handler(write32_delegate func, uint64_t unitmask)
+address_map_entry &address_map_entry::w(write32_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(32, unitmask, func.name()));
@@ -203,24 +188,24 @@ address_map_entry *address_map_entry::set_handler(write32_delegate func, uint64_
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
 	m_wproto32 = func;
-	return this;
+	return *this;
 }
 
 
-address_map_entry *address_map_entry::set_handler(read32_delegate rfunc, write32_delegate wfunc, uint64_t unitmask)
+address_map_entry &address_map_entry::rw(read32_delegate rfunc, write32_delegate wfunc, u64 unitmask)
 {
-	set_handler(rfunc, unitmask);
-	set_handler(wfunc, unitmask);
-	return this;
+	r(rfunc, unitmask);
+	w(wfunc, unitmask);
+	return *this;
 }
 
 
 //-------------------------------------------------
 //  set_handler - handler setters for
-//  64-bit read/write handlers
+//  64-bit read/write delegates
 //-------------------------------------------------
 
-address_map_entry *address_map_entry::set_handler(read64_delegate func, uint64_t unitmask)
+address_map_entry &address_map_entry::r(read64_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(64, unitmask, func.name()));
@@ -229,11 +214,11 @@ address_map_entry *address_map_entry::set_handler(read64_delegate func, uint64_t
 	m_read.m_mask = 0;
 	m_read.m_name = func.name();
 	m_rproto64 = func;
-	return this;
+	return *this;
 }
 
 
-address_map_entry *address_map_entry::set_handler(write64_delegate func, uint64_t unitmask)
+address_map_entry &address_map_entry::w(write64_delegate func, u64 unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(64, unitmask, func.name()));
@@ -242,15 +227,15 @@ address_map_entry *address_map_entry::set_handler(write64_delegate func, uint64_
 	m_write.m_mask = 0;
 	m_write.m_name = func.name();
 	m_wproto64 = func;
-	return this;
+	return *this;
 }
 
 
-address_map_entry *address_map_entry::set_handler(read64_delegate rfunc, write64_delegate wfunc, uint64_t unitmask)
+address_map_entry &address_map_entry::rw(read64_delegate rfunc, write64_delegate wfunc, u64 unitmask)
 {
-	set_handler(rfunc, unitmask);
-	set_handler(wfunc, unitmask);
-	return this;
+	r(rfunc, unitmask);
+	w(wfunc, unitmask);
+	return *this;
 }
 
 
@@ -258,7 +243,7 @@ address_map_entry *address_map_entry::set_handler(read64_delegate rfunc, write64
 //  set_handler - handler setter for setoffset
 //-------------------------------------------------
 
-address_map_entry *address_map_entry::set_handler(setoffset_delegate func)
+address_map_entry &address_map_entry::set_handler(setoffset_delegate func)
 {
 	assert(!func.isnull());
 	m_setoffsethd.m_type = AMH_DEVICE_DELEGATE;
@@ -266,7 +251,7 @@ address_map_entry *address_map_entry::set_handler(setoffset_delegate func)
 	m_setoffsethd.m_mask = 0;
 	m_setoffsethd.m_name = func.name();
 	m_soproto = func;
-	return this;
+	return *this;
 }
 
 //-------------------------------------------------
@@ -274,29 +259,66 @@ address_map_entry *address_map_entry::set_handler(setoffset_delegate func)
 //  provided unitmask is valid and expected
 //-------------------------------------------------
 
-bool address_map_entry::unitmask_is_appropriate(uint8_t width, uint64_t unitmask, const char *string)
+bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const char *string) const
 {
 	// if no mask, this must match the default width of the map
 	if (unitmask == 0)
 	{
 		if (m_map.m_databits != width)
-			throw emu_fatalerror("Handler %s is a %d-bit handler but was specified in a %d-bit address map", string, width, m_map.m_databits);
+		{
+			osd_printf_error("Handler %s is a %d-bit handler but was specified in a %d-bit address map\n", string, width, m_map.m_databits);
+			return false;
+		}
 		return true;
 	}
 
 	// if we have a mask, we must be smaller than the default width of the map
 	if (m_map.m_databits < width)
-		throw emu_fatalerror("Handler %s is a %d-bit handler and is too wide to be used in a %d-bit address map", string, width, m_map.m_databits);
+	{
+		osd_printf_error("Handler %s is a %d-bit handler and is too wide to be used in a %d-bit address map\n", string, width, m_map.m_databits);
+		return false;
+	}
+
+	// if map is narrower than 64 bits, check the mask width as well
+	if (m_map.m_databits < 64 && (unitmask >> m_map.m_databits) != 0)
+	{
+		osd_printf_error("Handler %s specified a mask of %08X%08X, too wide to be used in a %d-bit address map\n", string, (u32)(unitmask >> 32), (u32)unitmask, m_map.m_databits);
+		return false;
+	}
 
 	// the mask must represent whole units of width
-	uint32_t basemask = (width == 8) ? 0xff : (width == 16) ? 0xffff : 0xffffffff;
-	uint64_t singlemask = basemask;
+	u32 basemask = (width == 8) ? 0xff : (width == 16) ? 0xffff : 0xffffffff;
+	u64 singlemask = basemask;
+	int count = 0;
 	while (singlemask != 0)
 	{
-		if ((unitmask & singlemask) != 0 && (unitmask & singlemask) != singlemask)
-			throw emu_fatalerror("Handler %s specified a mask of %08X%08X; needs to be in even chunks of %X", string, (uint32_t)(unitmask >> 32), (uint32_t)unitmask, basemask);
+		if ((unitmask & singlemask) == singlemask)
+			count++;
+		else if ((unitmask & singlemask) != 0)
+		{
+			osd_printf_error("Handler %s specified a mask of %08X%08X; needs to be in even chunks of %X\n", string, (u32)(unitmask >> 32), (u32)unitmask, basemask);
+			return false;
+		}
 		singlemask <<= width;
 	}
+
+#if 0
+	// the mask must be symmetrical
+	u64 unitmask_bh = unitmask >> 8 & 0x00ff00ff00ff00ffU;
+	u64 unitmask_bl = unitmask & 0x00ff00ff00ff00ffU;
+	u64 unitmask_wh = unitmask >> 16 & 0x0000ffff0000ffffU;
+	u64 unitmask_wl = unitmask & 0x0000ffff0000ffffU;
+	u64 unitmask_dh = unitmask >> 32 & 0x00000000ffffffffU;
+	u64 unitmask_dl = unitmask & 0x00000000ffffffffU;
+	if ((unitmask_bh != 0 && unitmask_bl != 0 && unitmask_bh != unitmask_bl)
+		|| (unitmask_wh != 0 && unitmask_wl != 0 && unitmask_wh != unitmask_wl)
+		|| (unitmask_dh != 0 && unitmask_dl != 0 && unitmask_dh != unitmask_dl))
+	{
+		osd_printf_error("Handler %s specified an asymmetrical mask of %08X%08X\n", string, (u32)(unitmask >> 32), (u32)unitmask);
+		return false;
+	}
+#endif
+
 	return true;
 }
 
@@ -309,9 +331,9 @@ bool address_map_entry::unitmask_is_appropriate(uint8_t width, uint64_t unitmask
 //  address_map - constructor
 //-------------------------------------------------
 
-address_map::address_map(device_t &device, address_spacenum spacenum)
+address_map::address_map(device_t &device, int spacenum)
 	: m_spacenum(spacenum),
-	    m_device(&device),
+		m_device(&device),
 		m_databits(0xff),
 		m_unmapval(0),
 		m_globalmask(0)
@@ -357,7 +379,7 @@ address_map::address_map(device_t &device, address_spacenum spacenum)
 
 address_map::address_map(device_t &device, address_map_entry *entry)
 	: m_spacenum(AS_PROGRAM),
-	    m_device(&device),
+		m_device(&device),
 		m_databits(0xff),
 		m_unmapval(0),
 		m_globalmask(0)
@@ -373,14 +395,14 @@ address_map::address_map(device_t &device, address_map_entry *entry)
 //  address_map - constructor dynamic device mapping case
 //----------------------------------------------------------
 
-address_map::address_map(const address_space &space, offs_t start, offs_t end, int bits, uint64_t unitmask, device_t &device, address_map_delegate submap_delegate)
+address_map::address_map(const address_space &space, offs_t start, offs_t end, int bits, u64 unitmask, device_t &device, address_map_delegate submap_delegate)
 	: m_spacenum(space.spacenum()),
-	    m_device(&device),
+		m_device(&device),
 		m_databits(space.data_width()),
 		m_unmapval(space.unmap()),
-		m_globalmask(space.bytemask())
+		m_globalmask(space.addrmask())
 {
-	add(start, end)->set_submap(DEVICE_SELF, submap_delegate, bits, unitmask);
+	(*this)(start, end).set_submap(DEVICE_SELF, submap_delegate, bits, unitmask);
 }
 
 
@@ -399,13 +421,12 @@ address_map::~address_map()
 //  values
 //-------------------------------------------------
 
-void address_map::configure(address_spacenum spacenum, uint8_t databits)
+void address_map::configure(int, u8 databits)
 {
-	assert(m_spacenum == spacenum);
 	if (m_databits == 0xff)
 		m_databits = databits;
-	else
-		assert(m_databits == databits);
+	else if (databits != m_databits)
+		osd_printf_error("Space %d configured with %d data bits when %d expected\n", m_spacenum, databits, m_databits);
 }
 
 
@@ -414,7 +435,7 @@ void address_map::configure(address_spacenum spacenum, uint8_t databits)
 //  list
 //-------------------------------------------------
 
-void address_map::set_global_mask(offs_t mask)
+void address_map::global_mask(offs_t mask)
 {
 //  if (m_entrylist != nullptr)
 //      throw emu_fatalerror("AM_GLOBALMASK must be specified before any entries");
@@ -427,11 +448,11 @@ void address_map::set_global_mask(offs_t mask)
 //  add - add a new entry
 //-------------------------------------------------
 
-address_map_entry *address_map::add(offs_t start, offs_t end)
+address_map_entry &address_map::operator()(offs_t start, offs_t end)
 {
 	address_map_entry *ptr = global_alloc(address_map_entry(*m_device, *this, start, end));
 	m_entrylist.append(*ptr);
-	return ptr;
+	return *ptr;
 }
 
 
@@ -471,14 +492,14 @@ void address_map::uplift_submaps(running_machine &machine, device_t &owner, endi
 
 			offs_t mirror_address_mask = (databytes - 1) & ~(entry_bytes - 1);
 
-			uint64_t entry_mask = (2ULL << (entry_bits-1)) - 1;
+			u64 entry_mask = (2ULL << (entry_bits-1)) - 1;
 
 			int slot_offset[8];
 			int slot_count = 0;
 			int max_slot_count = m_databits / entry_bits;
 			int slot_xor_mask = endian == ENDIANNESS_LITTLE ? 0 : max_slot_count - 1;
 
-			uint64_t global_mask = entry->m_read.m_mask;
+			u64 global_mask = entry->m_read.m_mask;
 			// zero means all
 			if (!global_mask)
 				global_mask = ~global_mask;
@@ -547,10 +568,10 @@ void address_map::uplift_submaps(running_machine &machine, device_t &owner, endi
 					if (mdata.m_bits == 0 && entry_bits != m_databits)
 						mdata.m_bits = entry_bits;
 
-					uint64_t mask = 0;
+					u64 mask = 0;
 					if (mdata.m_bits != m_databits)
 					{
-						uint64_t unitmask = mdata.m_mask ? mdata.m_mask : entry_mask;
+						u64 unitmask = mdata.m_mask ? mdata.m_mask : entry_mask;
 						for (int slot = start_slot; slot <= end_slot; slot++)
 							mask |= unitmask << slot_offset[slot];
 					}
@@ -580,12 +601,12 @@ void address_map::uplift_submaps(running_machine &machine, device_t &owner, endi
 //  one of the device's address maps
 //-------------------------------------------------
 
-void address_map::map_validity_check(validity_checker &valid, address_spacenum spacenum) const
+void address_map::map_validity_check(validity_checker &valid, int spacenum) const
 {
 	// it's safe to assume here that the device has a memory interface and a config for this space
 	const address_space_config &spaceconfig = *m_device->memory().space_config(spacenum);
-	int datawidth = spaceconfig.m_databus_width;
-	int alignunit = datawidth / 8;
+	int datawidth = spaceconfig.m_data_width;
+	int alignunit = spaceconfig.alignment();
 
 	bool detected_overlap = DETECT_OVERLAPPING_MEMORY ? false : true;
 
@@ -599,12 +620,13 @@ void address_map::map_validity_check(validity_checker &valid, address_spacenum s
 	if (m_databits != datawidth)
 		osd_printf_error("Wrong memory handlers provided for %s space! (width = %d, memory = %08x)\n", spaceconfig.m_name, datawidth, m_databits);
 
+	offs_t globalmask = 0xffffffffUL >> (32 - spaceconfig.m_addr_width);
+	if (m_globalmask != 0)
+		globalmask = m_globalmask;
+
 	// loop over entries and look for errors
 	for (address_map_entry &entry : m_entrylist)
 	{
-		uint32_t bytestart = spaceconfig.addr2byte(entry.m_addrstart);
-		uint32_t byteend = spaceconfig.addr2byte_end(entry.m_addrend);
-
 		// look for overlapping entries
 		if (!detected_overlap)
 		{
@@ -624,11 +646,17 @@ void address_map::map_validity_check(validity_checker &valid, address_spacenum s
 		}
 
 		// look for inverted start/end pairs
-		if (byteend < bytestart)
+		if (entry.m_addrend < entry.m_addrstart)
 			osd_printf_error("Wrong %s memory read handler start = %08x > end = %08x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend);
 
+		// look for ranges outside the global mask
+		if (entry.m_addrstart & ~globalmask)
+			osd_printf_error("In %s memory range %x-%x, start address is outside of the global address mask %x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, globalmask);
+		if (entry.m_addrend & ~globalmask)
+			osd_printf_error("In %s memory range %x-%x, end address is outside of the global address mask %x\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, globalmask);
+
 		// look for misaligned entries
-		if ((bytestart & (alignunit - 1)) != 0 || (byteend & (alignunit - 1)) != (alignunit - 1))
+		if ((entry.m_addrstart & (alignunit - 1)) != 0 || (entry.m_addrend & (alignunit - 1)) != (alignunit - 1))
 			osd_printf_error("Wrong %s memory read handler start = %08x, end = %08x ALIGN = %d\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, alignunit);
 
 		// verify mask/mirror/select
@@ -663,23 +691,29 @@ void address_map::map_validity_check(validity_checker &valid, address_spacenum s
 		// if this entry references a memory region, validate it
 		if (entry.m_region != nullptr && entry.m_share == nullptr)
 		{
+			// address map entries that reference regions but are NOPs are pointless
+			if (entry.m_read.m_type == AMH_NONE && entry.m_write.m_type == AMH_NONE)
+				osd_printf_error("%s space references memory region %s, but is AM_NOP\n", spaceconfig.m_name, entry.m_region);
+
 			// make sure we can resolve the full path to the region
 			bool found = false;
 			std::string entry_region = entry.m_devbase.subtag(entry.m_region);
 
 			// look for the region
 			for (device_t &dev : device_iterator(m_device->mconfig().root_device()))
-				for (const rom_entry *romp = rom_first_region(dev); romp != nullptr && !found; romp = rom_next_region(romp))
+			{
+				for (romload::region const &region : romload::entries(dev.rom_region()).get_regions())
 				{
-					if (rom_region_name(dev, romp) == entry_region)
+					if (dev.subtag(region.get_tag()) == entry_region)
 					{
 						// verify the address range is within the region's bounds
-						offs_t length = ROMREGION_GETLENGTH(romp);
-						if (entry.m_rgnoffs + (byteend - bytestart + 1) > length)
+						offs_t const length = region.get_length();
+						if (entry.m_rgnoffs + spaceconfig.addr2byte(entry.m_addrend - entry.m_addrstart + 1) > length)
 							osd_printf_error("%s space memory map entry %X-%X extends beyond region '%s' size (%X)\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region, length);
 						found = true;
 					}
 				}
+			}
 
 			// error if not found
 			if (!found)
@@ -701,6 +735,9 @@ void address_map::map_validity_check(validity_checker &valid, address_spacenum s
 			if (entry.m_devbase.subdevice(devtag) == nullptr)
 				osd_printf_error("%s space memory map entry reads from nonexistent device '%s'\n", spaceconfig.m_name,
 					devtag != nullptr ? devtag : "<unspecified>");
+#ifndef MAME_DEBUG // assert will catch this earlier
+			(void)entry.unitmask_is_appropriate(entry.m_read.m_bits, entry.m_read.m_mask, entry.m_read.m_name);
+#endif
 		}
 		if (entry.m_write.m_type == AMH_DEVICE_DELEGATE)
 		{
@@ -716,6 +753,9 @@ void address_map::map_validity_check(validity_checker &valid, address_spacenum s
 			if (entry.m_devbase.subdevice(devtag) == nullptr)
 				osd_printf_error("%s space memory map entry writes to nonexistent device '%s'\n", spaceconfig.m_name,
 					devtag != nullptr ? devtag : "<unspecified>");
+#ifndef MAME_DEBUG // assert will catch this earlier
+			(void)entry.unitmask_is_appropriate(entry.m_write.m_bits, entry.m_write.m_mask, entry.m_write.m_name);
+#endif
 		}
 		if (entry.m_setoffsethd.m_type == AMH_DEVICE_DELEGATE)
 		{

@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Yochizo
+
+#include "machine/timer.h"
 #include "video/jalblend.h"
+#include "screen.h"
 
 class argus_state : public driver_device
 {
@@ -137,4 +140,7 @@ public:
 	// valtric specific
 	void valtric_draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void valtric_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void valtric(machine_config &config);
+	void argus(machine_config &config);
+	void butasan(machine_config &config);
 };

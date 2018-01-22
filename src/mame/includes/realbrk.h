@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
 #include "machine/tmp68301.h"
+#include "screen.h"
 
 class realbrk_state : public driver_device
 {
@@ -75,4 +76,8 @@ public:
 	void dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
+	void pkgnsh(machine_config &config);
+	void dai2kaku(machine_config &config);
+	void realbrk(machine_config &config);
+	void pkgnshdx(machine_config &config);
 };

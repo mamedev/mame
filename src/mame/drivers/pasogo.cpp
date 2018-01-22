@@ -108,6 +108,8 @@ TODO:
 #include "bus/generic/carts.h"
 #include "machine/bankdev.h"
 #include "machine/genpc.h"
+#include "machine/timer.h"
+#include "screen.h"
 #include "softlist.h"
 
 /*
@@ -172,6 +174,7 @@ public:
 	memory_region *m_cart_rom;
 	uint8_t m_ems_index;
 	uint16_t m_ems_bank[28];
+	void pasogo(machine_config &config);
 };
 
 
@@ -531,7 +534,7 @@ void pasogo_state::machine_reset()
 	contrast(*color->fields().first(), nullptr, 0, color->read());
 }
 
-static MACHINE_CONFIG_START( pasogo, pasogo_state )
+MACHINE_CONFIG_START(pasogo_state::pasogo)
 
 	MCFG_CPU_ADD("maincpu", V30, XTAL_32_22MHz/2)
 	MCFG_CPU_PROGRAM_MAP(pasogo_mem)
@@ -542,7 +545,7 @@ static MACHINE_CONFIG_START( pasogo, pasogo_state )
 	MCFG_DEVICE_ADD("ems", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(emsbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
@@ -573,5 +576,5 @@ ROM_START( pasogo )
 	ROM_REGION( 0x10000, "empty", ROMREGION_ERASEFF )
 ROM_END
 
-//    YEAR   NAME    PARENT  COMPAT    MACHINE   INPUT     INIT      COMPANY  FULLNAME          FLAGS
-CONS( 1996, pasogo,   0,      0,       pasogo,  pasogo, driver_device,    0,   "KOEI", "PasoGo", MACHINE_NO_SOUND|MACHINE_NOT_WORKING)
+//    YEAR   NAME    PARENT  COMPAT    MACHINE  INPUT   STATE         INIT  COMPANY  FULLNAME  FLAGS
+CONS( 1996, pasogo,   0,      0,       pasogo,  pasogo, pasogo_state, 0,    "KOEI",  "PasoGo", MACHINE_NO_SOUND|MACHINE_NOT_WORKING)

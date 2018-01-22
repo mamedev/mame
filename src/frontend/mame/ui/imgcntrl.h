@@ -65,7 +65,7 @@ private:
 	std::string                     m_software_info_name;
 
 	// methods
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	void test_create(bool &can_create, bool &need_confirm);
 	void load_software_part();
 };

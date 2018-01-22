@@ -7,14 +7,13 @@
  *
  **********************************************************************************************/
 
+#ifndef MAME_SOUND_DMADAC_H
+#define MAME_SOUND_DMADAC_H
+
 #pragma once
 
-#ifndef __DMADAC_H__
-#define __DMADAC_H__
 
-
-class dmadac_sound_device : public device_t,
-									public device_sound_interface
+class dmadac_sound_device : public device_t, public device_sound_interface
 {
 public:
 	dmadac_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -31,6 +30,7 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+
 private:
 	// internal state
 	/* sound stream and buffers */
@@ -45,7 +45,7 @@ private:
 	double          m_frequency;
 };
 
-extern const device_type DMADAC;
+DECLARE_DEVICE_TYPE(DMADAC, dmadac_sound_device)
 
 
 void dmadac_transfer(dmadac_sound_device **devlist, uint8_t num_channels, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, int16_t *data);
@@ -53,4 +53,4 @@ void dmadac_enable(dmadac_sound_device **devlist, uint8_t num_channels, uint8_t 
 void dmadac_set_frequency(dmadac_sound_device **devlist, uint8_t num_channels, double frequency);
 void dmadac_set_volume(dmadac_sound_device **devlist, uint8_t num_channels, uint16_t volume);
 
-#endif /* __DMADAC_H__ */
+#endif // MAME_SOUND_DMADAC_H

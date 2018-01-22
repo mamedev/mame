@@ -1,11 +1,11 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #include "test.h"
 #include <bx/handlealloc.h>
-#include <bx/string.h>
+#include <bx/hash.h>
 
 TEST_CASE("HandleListT", "")
 {
@@ -89,26 +89,26 @@ TEST_CASE("HandleHashTable", "")
 
 	bx::StringView sv0("test0");
 
-	bool ok = hm.insert(bx::hashMurmur2A(sv0), 0);
+	bool ok = hm.insert(bx::hash<bx::HashMurmur2A>(sv0), 0);
 	REQUIRE(ok);
 
-	ok = hm.insert(bx::hashMurmur2A(sv0), 0);
+	ok = hm.insert(bx::hash<bx::HashMurmur2A>(sv0), 0);
 	REQUIRE(!ok);
 	REQUIRE(1 == hm.getNumElements() );
 
 	bx::StringView sv1("test1");
 
-	ok = hm.insert(bx::hashMurmur2A(sv1), 0);
+	ok = hm.insert(bx::hash<bx::HashMurmur2A>(sv1), 0);
 	REQUIRE(ok);
 	REQUIRE(2 == hm.getNumElements() );
 
 	hm.removeByHandle(0);
 	REQUIRE(0 == hm.getNumElements() );
 
-	ok = hm.insert(bx::hashMurmur2A(sv0), 0);
+	ok = hm.insert(bx::hash<bx::HashMurmur2A>(sv0), 0);
 	REQUIRE(ok);
 
-	hm.removeByKey(bx::hashMurmur2A(sv0) );
+	hm.removeByKey(bx::hash<bx::HashMurmur2A>(sv0) );
 	REQUIRE(0 == hm.getNumElements() );
 
 	for (uint32_t ii = 0, num = hm.getMaxCapacity(); ii < num; ++ii)

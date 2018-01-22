@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Roberto Fresca
 /***************************************************************************
 
@@ -10,10 +10,11 @@
 
   Supported games:
 
-  4 En Raya (set 1),             1990, IDSA.
-  4 En Raya (set 2),             1990, IDSA.
-  unknown Pac-Man gambling game, 1990, Unknown.
-
+  4 En Raya (set 1),                              1990, IDSA.
+  4 En Raya (set 2),                              1990, IDSA.
+  unknown 'Pac-Man' gambling game,                1990, Unknown.
+  unknown 'Space Invaders' gambling game (set 1), 1990, Unknown (made in France).
+  unknown 'Space Invaders' gambling game (set 2), 199?, Unknown.
 
   TODO:
   - Video and IRQ timings;
@@ -116,12 +117,44 @@
   have evidence of the contrary.
 
 
+****************************************************************************
+
+  Hardware Notes: (unknown 'Space Invaders' gambling game)
+  ---------------
+
+  Based on chip manufacturing should be manufactured in 1998
+
+
+  Specs:
+  ------
+
+  1x Zilog Z0840004PSE (4MHz Z80 CPU).
+  1x GI AY-3-8910 (sound).
+  1x LM356N (Low Voltage Audio Power Amplifier).
+
+  ROMs: 2x 27C256 Program ROMs (I, II).
+        3x 27C256 GFX ROMs (R, V, B).
+
+  RAMs: 1x KM62256ALP-10 (near prg ROMs).
+        2x CY6264-70SNC (Near GFX ROMs).
+
+  1x oscillator 18.432 MHz.
+
+  1x 8 DIP Switches bank (near ay8910).
+  1x Volume Pot (betweeen the audio amp and ay8910).
+  1x Motorola MCT1413 (High Current Darlington Transistor Array, same as ULN2003).
+
+  1x 2x28 Edge connector (pins 1-2-27-28 from component side are GND).
+
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/4enraya.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
-#include "includes/4enraya.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK XTAL_8MHz
 
@@ -378,6 +411,19 @@ static INPUT_PORTS_START( unkpacg )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( unkfr )
+	PORT_INCLUDE( unkpacg )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )         PORT_NAME("Fire / Bet")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_NAME("Deal / Take")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_NAME("Left / Small")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Right / Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_NAME("Down / Double-Up")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start Non-Gambling game")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 /***********************************
 *     GFX Layouts & GFX decode     *
@@ -420,7 +466,7 @@ void _4enraya_state::machine_reset()
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
+MACHINE_CONFIG_START(_4enraya_state::_4enraya )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/2)
@@ -448,7 +494,7 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( unkpacg, 4enraya )
+MACHINE_CONFIG_DERIVED(_4enraya_state::unkpacg, _4enraya)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -497,6 +543,9 @@ ROM_START( 4enrayaa )
 ROM_END
 
 
+/*
+  Unknown 'Pac-Man' gambling game.
+*/
 ROM_START(unkpacg)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("1.u14",    0x0000, 0x2000, CRC(848c4143) SHA1(3cff26181c58e5f52f1ac81df7d5d43e644585a2))
@@ -506,6 +555,75 @@ ROM_START(unkpacg)
 	ROM_LOAD( "3.u20",   0x2000, 0x2000, CRC(d00b04ea) SHA1(e65901d8586507257d74ab103001207e28fa28af) )
 	ROM_LOAD( "4.u19",   0x4000, 0x2000, CRC(4a123a3d) SHA1(26300b8af0d0df0023a153a212699727311d1b74) )
 	ROM_LOAD( "5.u18",   0x0000, 0x2000, CRC(44f272d2) SHA1(b39cbc1f290d9fb2453396906e4da4a682c41ef4) )
+ROM_END
+
+/*
+  Unknown 'Space Invaders' gambling game.
+  All roms are 0x8000 but only the last 0x2000 of each is used.
+*/
+ROM_START( unksig )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "i.bin",  0x0000, 0x2000, CRC(902efc27) SHA1(5992cdc647acd622c73adefac1aa66e77b5ccc4f) )
+	ROM_CONTINUE(       0x0000, 0x2000)
+	ROM_CONTINUE(       0x0000, 0x2000)
+	ROM_CONTINUE(       0x0000, 0x2000) // only data here matters
+	ROM_LOAD( "ii.bin", 0x8000, 0x2000, CRC(855c1ea3) SHA1(80c89bfbdf3d0d69aed7333e9aa93db6aff7b704) )
+	ROM_CONTINUE(       0x8000, 0x2000)
+	ROM_CONTINUE(       0x8000, 0x2000)
+	ROM_CONTINUE(       0x8000, 0x2000) // only data here matters
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "r.bin", 0x0000, 0x2000, CRC(f8a358fe) SHA1(5c4051de156014a5c2400f4934e2136b38bfed8c) )
+	ROM_CONTINUE(      0x0000, 0x2000)
+	ROM_CONTINUE(      0x0000, 0x2000)
+	ROM_CONTINUE(      0x0000, 0x2000) // only data here matters
+	ROM_LOAD( "b.bin", 0x2000, 0x2000, CRC(56ac5874) SHA1(7ae63f930b07cb1b4989c8328fcc3627d8ff68f8) )
+	ROM_CONTINUE(      0x2000, 0x2000)
+	ROM_CONTINUE(      0x2000, 0x2000)
+	ROM_CONTINUE(      0x2000, 0x2000) // only data here matters
+	ROM_LOAD( "v.bin", 0x4000, 0x2000, CRC(4c5a7e43) SHA1(17e52ed73f9e8822b53bebc31c9320f5589ef70a) )
+	ROM_CONTINUE(      0x4000, 0x2000)
+	ROM_CONTINUE(      0x4000, 0x2000)
+	ROM_CONTINUE(      0x4000, 0x2000) // only data here matters
+ROM_END
+
+/*
+  Unknown 'Space Invaders' gambling game
+  All roms are 0x10000 but with a lot of addressing issues
+
+  1.bin    BADADDR    ---xxxxxxxxxxxxx
+  2.bin    BADADDR    ---xxxxxxxxxxxxx
+  b.bin    BADADDR    x-xxxxxxxxxxxxxx
+  r.bin    BADADDR    x-xxxxxxxxxxxxxx
+  v.bin    BADADDR    x-xxxxxxxxxxxxxx
+
+  The game has both (space invaders & pac-man) graphics sets.
+  Maybe a leftover?...
+
+*/
+ROM_START( unksiga )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",  0x0000, 0x2000, CRC(089a4a63) SHA1(d519f6289e72299e48ed1790fa4919cae14e2a0f) )  // 0x2000 of data repeated along the dump
+	ROM_IGNORE(                 0xe000)   /* Identical 0x2000 segments */
+	ROM_LOAD( "2.bin",  0x8000, 0x2000, CRC(970632fd) SHA1(2aa69fda1dce201856b237ecbedfdcde470a4bb3) )  // 0x2000 of data repeated along the dump
+	ROM_IGNORE(                 0xe000)   /* Identical 0x2000 segments */
+
+	ROM_REGION( 0xc000, "gfx1", 0 )
+/*  tileset 0000-03ff = Space Invaders GFX.
+    tileset 0400-07ff = Pac-Man GFX.
+*/
+	ROM_LOAD( "b.bin", 0x0000, 0x4000, CRC(dd257fb6) SHA1(b543225615f3cbef34dbecde04c7e937eede0988) )
+	ROM_CONTINUE(      0x0000, 0x4000)
+	ROM_CONTINUE(      0x0000, 0x4000) // data
+	ROM_IGNORE(                0x4000) // dupe
+	ROM_LOAD( "r.bin", 0x4000, 0x4000, CRC(38e9feba) SHA1(76811f05dabbb608e3863eeea0c53725c7cff618) )
+	ROM_CONTINUE(      0x4000, 0x4000)
+	ROM_CONTINUE(      0x4000, 0x4000) // data
+	ROM_IGNORE(                0x4000) // dupe
+	ROM_LOAD( "v.bin", 0x8000, 0x4000, CRC(cc597c7b) SHA1(5830fa9e8f9823eb4a910d6f80c3de15f7269619) )
+	ROM_CONTINUE(      0x8000, 0x4000)
+	ROM_CONTINUE(      0x8000, 0x4000) // data
+	ROM_IGNORE(                0x4000) // dupe
 ROM_END
 
 
@@ -518,7 +636,7 @@ DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
 	// descramble rom
 	uint8_t *rom = memregion("maincpu")->base();
 	for (int i = 0x8000; i < 0xa000; i++)
-		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
+		rom[i] = bitswap<8>(rom[i], 7,6,5,4,3,2,0,1);
 }
 
 
@@ -526,7 +644,9 @@ DRIVER_INIT_MEMBER(_4enraya_state, unkpacg)
 *           Game Drivers           *
 ***********************************/
 
-/*    YEAR  NAME      PARENT   MACHINE   INPUT    STATE           INIT     ROT    COMPANY      FULLNAME                        FLAGS  */
-GAME( 1990, 4enraya,  0,       4enraya,  4enraya, driver_device,  0,       ROT0, "IDSA",      "4 En Raya (set 1)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1990, 4enrayaa, 4enraya, 4enraya,  4enraya, driver_device,  0,       ROT0, "IDSA",      "4 En Raya (set 2)",             MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown Pac-Man gambling game", MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT   MACHINE   INPUT    STATE           INIT     ROT    COMPANY      FULLNAME                                         FLAGS  */
+GAME( 1990, 4enraya,  0,       _4enraya, 4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 4enrayaa, 4enraya, _4enraya, 4enraya, _4enraya_state, 0,       ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacg,  0,       unkpacg,  unkpacg, _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game",                MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksig,   0,       unkpacg,  unkfr,   _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksiga,  unksig,  unkpacg,  unkfr,   _4enraya_state, unkpacg, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (set 2)", MACHINE_SUPPORTS_SAVE )

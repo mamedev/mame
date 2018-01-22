@@ -20,9 +20,7 @@ public:
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
-	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void tra_callback() override;
 	virtual void send_key(uint8_t code) override;
@@ -38,6 +36,6 @@ private:
 	required_ioport m_rs232_stopbits;
 };
 
-extern const device_type SERIAL_TERMINAL;
+DECLARE_DEVICE_TYPE(SERIAL_TERMINAL, serial_terminal_device)
 
 #endif // MAME_BUS_RS232_TERMINAL_H

@@ -9,12 +9,14 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/centronics/ctronics.h"
 #include "cpu/z8/z8.h"
 #include "imagedev/cassette.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define SCREEN_TAG      "screen"
 #define UB8830D_TAG     "ub8830d"
@@ -51,6 +53,8 @@ public:
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void basic(machine_config &config);
+	void jtc(machine_config &config);
 };
 
 
@@ -60,6 +64,7 @@ public:
 	jtces88_state(const machine_config &mconfig, device_type type, const char *tag)
 		: jtc_state(mconfig, type, tag)
 	{ }
+	void jtces88(machine_config &config);
 };
 
 
@@ -72,6 +77,7 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void jtces23(machine_config &config);
 };
 
 
@@ -93,6 +99,7 @@ public:
 	std::unique_ptr<uint8_t[]> m_color_ram_r;
 	std::unique_ptr<uint8_t[]> m_color_ram_g;
 	std::unique_ptr<uint8_t[]> m_color_ram_b;
+	void jtces40(machine_config &config);
 };
 
 
@@ -256,7 +263,7 @@ static ADDRESS_MAP_START( jtc_es23_mem, AS_PROGRAM, 8, jtces23_state )
 	AM_RANGE(0x700d, 0x700d) AM_MIRROR(0x0ff0) AM_READ_PORT("Y13")
 	AM_RANGE(0x700e, 0x700e) AM_MIRROR(0x0ff0) AM_READ_PORT("Y14")
 	AM_RANGE(0x700f, 0x700f) AM_MIRROR(0x0ff0) AM_READ_PORT("Y15")
-	AM_RANGE(0xe000, 0xfdff) AM_RAM
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
@@ -278,14 +285,6 @@ static ADDRESS_MAP_START( jtc_es40_mem, AS_PROGRAM, 8, jtces40_state )
 	AM_RANGE(0x700b, 0x700b) AM_MIRROR(0x0ff0) AM_READ_PORT("Y11")
 	AM_RANGE(0x700c, 0x700c) AM_MIRROR(0x0ff0) AM_READ_PORT("Y12")
 	AM_RANGE(0x8000, 0xffff) AM_RAM//BANK(1)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( jtc_io, AS_IO, 8, jtc_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_NOP // A8-A15
-	AM_RANGE(0x01, 0x01) AM_NOP // AD0-AD7
-	AM_RANGE(0x02, 0x02) AM_WRITE(p2_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(p3_r, p3_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -718,11 +717,13 @@ static GFXDECODE_START( jtces40 )
 	GFXDECODE_ENTRY( UB8830D_TAG, 0x1000, jtces40_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( basic, jtc_state )
+MACHINE_CONFIG_START(jtc_state::basic)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(UB8830D_TAG, UB8830D, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(jtc_mem)
-	MCFG_CPU_IO_MAP(jtc_io)
+	MCFG_Z8_PORT_P2_WRITE_CB(WRITE8(jtc_state, p2_w))
+	MCFG_Z8_PORT_P3_READ_CB(READ8(jtc_state, p3_r))
+	MCFG_Z8_PORT_P3_WRITE_CB(WRITE8(jtc_state, p3_w))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -741,7 +742,7 @@ static MACHINE_CONFIG_START( basic, jtc_state )
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(jtc_state, write_centronics_busy))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jtc, basic )
+MACHINE_CONFIG_DERIVED(jtc_state::jtc, basic)
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -758,7 +759,7 @@ static MACHINE_CONFIG_DERIVED( jtc, basic )
 	MCFG_RAM_DEFAULT_SIZE("2K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( jtces88, jtc, jtces88_state )
+MACHINE_CONFIG_DERIVED(jtces88_state::jtces88, jtc)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(UB8830D_TAG)
 	MCFG_CPU_PROGRAM_MAP(jtc_es1988_mem)
@@ -768,7 +769,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( jtces88, jtc, jtces88_state )
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( jtces23, basic, jtces23_state )
+MACHINE_CONFIG_DERIVED(jtces23_state::jtces23, basic)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(UB8830D_TAG)
 	MCFG_CPU_PROGRAM_MAP(jtc_es23_mem)
@@ -790,7 +791,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( jtces23, basic, jtces23_state )
 	MCFG_RAM_DEFAULT_SIZE("4K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( jtces40, basic, jtces40_state )
+MACHINE_CONFIG_DERIVED(jtces40_state::jtces40, basic)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(UB8830D_TAG)
 	MCFG_CPU_PROGRAM_MAP(jtc_es40_mem)
@@ -844,8 +845,8 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY             FULLNAME                    FLAGS */
-COMP( 1987, jtc,        0,       0,     jtc,    jtc, driver_device,  0,     "Jugend+Technik",   "CompJU+TEr",               MACHINE_NOT_WORKING )
-COMP( 1988, jtces88,    jtc,     0,     jtces88,jtc, driver_device,  0,     "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)", MACHINE_NOT_WORKING )
-COMP( 1989, jtces23,    jtc,     0,     jtces23,jtces23, driver_device, 0,      "Jugend+Technik",   "CompJU+TEr (ES 2.3)",      MACHINE_NOT_WORKING )
-COMP( 1990, jtces40,    jtc,     0,     jtces40,jtces40, driver_device, 0,      "Jugend+Technik",   "CompJU+TEr (ES 4.0)",      MACHINE_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT    STATE          INIT  COMPANY             FULLNAME                    FLAGS */
+COMP( 1987, jtc,        0,       0,     jtc,    jtc,     jtc_state,     0,    "Jugend+Technik",   "CompJU+TEr",               MACHINE_NOT_WORKING )
+COMP( 1988, jtces88,    jtc,     0,     jtces88,jtc,     jtces88_state, 0,    "Jugend+Technik",   "CompJU+TEr (EMR-ES 1988)", MACHINE_NOT_WORKING )
+COMP( 1989, jtces23,    jtc,     0,     jtces23,jtces23, jtces23_state, 0,    "Jugend+Technik",   "CompJU+TEr (ES 2.3)",      MACHINE_NOT_WORKING )
+COMP( 1990, jtces40,    jtc,     0,     jtces40,jtces40, jtces40_state, 0,    "Jugend+Technik",   "CompJU+TEr (ES 4.0)",      MACHINE_NOT_WORKING )

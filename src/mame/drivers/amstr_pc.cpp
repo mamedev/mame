@@ -34,6 +34,7 @@ More information can be found at http://www.seasip.info/AmstradXT/1640tech/index
 #include "machine/genpc.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/pc_joy/pc_joy.h"
 
 #include "machine/pckeybrd.h"
 #include "machine/pc_lpt.h"
@@ -47,8 +48,10 @@ public:
 		m_mb(*this, "mb"),
 		m_keyboard(*this, "pc_keyboard"),
 		m_lpt1(*this, "lpt_1"),
-		m_lpt2(*this, "lpt_2")
-			{ m_mouse.x =0; m_mouse.y=0;}
+		m_lpt2(*this, "lpt_2"),
+		m_mouse{ 0, 0 }
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
@@ -82,6 +85,11 @@ public:
 	uint8_t m_port65;
 
 	int m_dipstate;
+	static void cfg_com(device_t *device);
+	void pc200(machine_config &config);
+	void pc2086(machine_config &config);
+	void ppc640(machine_config &config);
+	void ppc512(machine_config &config);
 };
 
 static ADDRESS_MAP_START( ppc640_map, AS_PROGRAM, 16, amstrad_pc_state )
@@ -461,12 +469,13 @@ INPUT_PORTS_END
 // GFXDECODE_END
 
 // has it's own mouse
-static MACHINE_CONFIG_FRAGMENT( cfg_com )
-	MCFG_DEVICE_MODIFY("serport0")
+void amstrad_pc_state::cfg_com(device_t *device)
+{
+	device = device->subdevice("serport0");
 	MCFG_SLOT_DEFAULT_OPTION(nullptr)
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
+MACHINE_CONFIG_START(amstrad_pc_state::pc200)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ppc640_map)
@@ -503,12 +512,12 @@ static MACHINE_CONFIG_START( pc200, amstrad_pc_state )
 	MCFG_RAM_EXTRA_OPTIONS("512K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc2086, pc200 )
+MACHINE_CONFIG_DERIVED(amstrad_pc_state::pc2086, pc200)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pc2086_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ppc640, pc200 )
+MACHINE_CONFIG_DERIVED(amstrad_pc_state::ppc640, pc200)
 	MCFG_CPU_REPLACE("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(ppc640_map)
 	MCFG_CPU_IO_MAP(ppc512_io)
@@ -520,7 +529,7 @@ static MACHINE_CONFIG_DERIVED( ppc640, pc200 )
 	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ppc512, ppc640 )
+MACHINE_CONFIG_DERIVED(amstrad_pc_state::ppc512, ppc640)
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("640K")
@@ -629,10 +638,10 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR     NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1987,    ppc512,     ibm5150,    0,  ppc512,     pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PPC512", MACHINE_NOT_WORKING)
-COMP(  1987,    ppc640,     ibm5150,    0,  ppc640,     pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PPC640", MACHINE_NOT_WORKING)
-COMP(  1988,    pc20,       ibm5150,    0,  pc200,      pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PC20" , MACHINE_NOT_WORKING)
-COMP(  1988,    pc200,      ibm5150,    0,  pc200,      pc200, driver_device,    0,  "Sinclair Research Ltd",  "PC200 Professional Series", MACHINE_NOT_WORKING)
-COMP(  1988,    pc2086,     ibm5150,    0,  pc2086,     pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PC2086", MACHINE_NOT_WORKING )
-COMP(  1990,    pc3086,     ibm5150,    0,  pc2086,     pc200, driver_device,    0,  "Amstrad plc",  "Amstrad PC3086", MACHINE_NOT_WORKING )
+/*     YEAR   NAME     PARENT    COMPAT  MACHINE  INPUT  STATE              INIT  COMPANY     FULLNAME */
+COMP(  1987,  ppc512,  ibm5150,  0,      ppc512,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PPC512", MACHINE_NOT_WORKING)
+COMP(  1987,  ppc640,  ibm5150,  0,      ppc640,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PPC640", MACHINE_NOT_WORKING)
+COMP(  1988,  pc20,    ibm5150,  0,      pc200,   pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PC20" , MACHINE_NOT_WORKING)
+COMP(  1988,  pc200,   ibm5150,  0,      pc200,   pc200, amstrad_pc_state,  0,    "Sinclair Research Ltd",  "PC200 Professional Series", MACHINE_NOT_WORKING)
+COMP(  1988,  pc2086,  ibm5150,  0,      pc2086,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PC2086", MACHINE_NOT_WORKING )
+COMP(  1990,  pc3086,  ibm5150,  0,      pc2086,  pc200, amstrad_pc_state,  0,    "Amstrad plc",  "Amstrad PC3086", MACHINE_NOT_WORKING )

@@ -17,10 +17,10 @@
 	*                                                                          *
 	\***************************************************************************/
 
-#pragma once
+#ifndef MAME_TMS32025_TMS32025_H
+#define MAME_TMS32025_TMS32025_H
 
-#ifndef __TMS32025_H__
-#define __TMS32025_H__
+#pragma once
 
 
 #define MCFG_TMS32025_BIO_IN_CB(_devcb) \
@@ -82,7 +82,6 @@ class tms32025_device : public cpu_device
 public:
 	// construction/destruction
 	tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms32025_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base & set_bio_in_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_bio_in.set_callback(object); }
@@ -92,7 +91,22 @@ public:
 	template<class _Object> static devcb_base & set_dr_in_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_dr_in.set_callback(object); }
 	template<class _Object> static devcb_base & set_dx_out_cb(device_t &device, _Object object) { return downcast<tms32025_device &>(device).m_dx_out.set_callback(object); }
 
+	DECLARE_READ16_MEMBER( drr_r);
+	DECLARE_WRITE16_MEMBER(drr_w);
+	DECLARE_READ16_MEMBER( dxr_r);
+	DECLARE_WRITE16_MEMBER(dxr_w);
+	DECLARE_READ16_MEMBER( tim_r);
+	DECLARE_WRITE16_MEMBER(tim_w);
+	DECLARE_READ16_MEMBER( prd_r);
+	DECLARE_WRITE16_MEMBER(prd_w);
+	DECLARE_READ16_MEMBER( imr_r);
+	DECLARE_WRITE16_MEMBER(imr_w);
+	DECLARE_READ16_MEMBER( greg_r);
+	DECLARE_WRITE16_MEMBER(greg_w);
+
 protected:
+	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor map);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -105,25 +119,29 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ) ); }
-	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value) override;
-	virtual bool memory_write(address_spacenum spacenum, offs_t offset, int size, uint64_t value) override;
-	virtual bool memory_readop(offs_t offset, int size, uint64_t &value) override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
-	virtual void state_import(const device_state_entry &entry) override;
-	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
-private:
+	void common_reset();
+
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
+
+	required_shared_ptr<uint16_t> m_b0;
+	required_shared_ptr<uint16_t> m_b1;
+	required_shared_ptr<uint16_t> m_b2;
+	optional_shared_ptr<uint16_t> m_b3;
+
+	address_space *m_program;
+	direct_read_data<-1> *m_direct;
+	address_space *m_data;
+	address_space *m_io;
 
 	typedef void ( tms32025_device::*opcode_func ) ();
 	struct tms32025_opcode
@@ -156,9 +174,10 @@ private:
 	uint16_t  m_AR[8];
 	uint16_t  m_STACK[8];
 	PAIR    m_ALU;
-protected:
-	uint16_t  m_intRAM[0x800];
-private:
+	uint16_t  m_drr, m_dxr, m_tim, m_prd, m_imr, m_greg;
+
+	uint16_t m_fixed_STR1;
+
 	uint8_t   m_timerover;
 
 	/********************** Status data ****************************/
@@ -176,18 +195,6 @@ private:
 	int     m_mHackIgnoreARP;          /* special handling for lst, lst1 instructions */
 	int     m_waiting_for_serial_frame;
 
-	address_space *m_program;
-	direct_read_data *m_direct;
-	address_space *m_data;
-	address_space *m_io;
-
-	uint16_t *m_pgmmap[0x200];
-protected:
-	uint16_t *m_datamap[0x200];
-
-private:
-	uint32_t m_debugger_temp;
-
 	inline void CLR0(uint16_t flag);
 	inline void SET0(uint16_t flag);
 	inline void CLR1(uint16_t flag);
@@ -195,10 +202,6 @@ private:
 	inline void MODIFY_DP(int data);
 	inline void MODIFY_PM(int data);
 	inline void MODIFY_ARP(int data);
-	inline uint16_t M_RDROM(offs_t addr);
-	inline void M_WRTROM(offs_t addr, uint16_t data);
-	inline uint16_t M_RDRAM(offs_t addr);
-	inline void M_WRTRAM(offs_t addr, uint16_t data);
 	uint16_t reverse_carry_add(uint16_t arg0, uint16_t arg1 );
 	inline void MODIFY_AR_ARP();
 	inline void CALCULATE_ADD_CARRY();
@@ -250,9 +253,9 @@ private:
 	void call();
 	void cmpl();
 	void cmpr();
-	void cnfd();
-	void cnfp();
-	void conf();
+	virtual void cnfd();
+	virtual void cnfp();
+	virtual void conf();
 	void dint();
 	void dmov();
 	void eint();
@@ -368,7 +371,6 @@ private:
 	void zals();
 	inline int process_IRQs();
 	inline void process_timer(int clocks);
-
 };
 
 
@@ -380,11 +382,13 @@ public:
 
 protected:
 	virtual void device_reset() override;
+	virtual void cnfd() override;
+	virtual void cnfp() override;
+	virtual void conf() override;
 };
 
 
-extern const device_type TMS32025;
-extern const device_type TMS32026;
+DECLARE_DEVICE_TYPE(TMS32025, tms32025_device)
+DECLARE_DEVICE_TYPE(TMS32026, tms32026_device)
 
-
-#endif  /* __TMS32025_H__ */
+#endif // MAME_TMS32025_TMS32025_H

@@ -25,11 +25,13 @@ GP1 HDD data contents:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/qdrmfgp.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/ataintf.h"
-#include "sound/k054539.h"
 #include "machine/nvram.h"
-#include "includes/qdrmfgp.h"
+#include "sound/k054539.h"
+#include "speaker.h"
 
 
 #define IDE_HACK    1
@@ -209,10 +211,10 @@ READ16_MEMBER(qdrmfgp_state::gp2_ide_std_r)
 {
 	if (offset == 0x07)
 	{
-		switch (space.device().safe_pcbase())
+		switch (m_maincpu->pcbase())
 		{
 			case 0xdb4c:
-				if ((m_workram[0x5fa4/2] - space.device().state().state_int(M68K_D0)) <= 0x10)
+				if ((m_workram[0x5fa4/2] - m_maincpu->state_int(M68K_D0)) <= 0x10)
 					m_gp2_irq_control = 1;
 				break;
 
@@ -222,7 +224,7 @@ READ16_MEMBER(qdrmfgp_state::gp2_ide_std_r)
 				break;
 		}
 	}
-	return m_ata->read_cs0(space, offset, mem_mask);
+	return m_ata->read_cs0(offset, mem_mask);
 }
 
 
@@ -303,7 +305,7 @@ static ADDRESS_MAP_START( qdrmfgp_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("workram")                                     /* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")   /* backup ram */
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k056832", k056832_device, word_w)                                      /* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0x00ff)                    /* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")                                         /* battery power & service sw */
@@ -326,7 +328,7 @@ static ADDRESS_MAP_START( qdrmfgp2_map, AS_PROGRAM, 16, qdrmfgp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x110fff) AM_RAM AM_SHARE("workram")                                     /* work ram */
 	AM_RANGE(0x180000, 0x183fff) AM_RAM AM_SHARE("nvram")   /* backup ram */
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30003f) AM_DEVWRITE("k056832", k056832_device, word_w)                                      /* video reg */
 	AM_RANGE(0x320000, 0x32001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0xff00)                    /* ccu */
 	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")                                         /* battery power & service */
@@ -552,7 +554,8 @@ MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp)
 MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp2)
 {
 	/* sound irq (CCU? 240Hz) */
-	machine().scheduler().timer_pulse(attotime::from_hz(XTAL_18_432MHz/76800), timer_expired_delegate(FUNC(qdrmfgp_state::gp2_timer_callback),this));
+	m_gp2_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(qdrmfgp_state::gp2_timer_callback), this));
+	m_gp2_timer->adjust(attotime::from_hz(XTAL_18_432MHz/76800), 0, attotime::from_hz(XTAL_18_432MHz/76800));
 
 	MACHINE_START_CALL_MEMBER( qdrmfgp );
 }
@@ -571,7 +574,7 @@ void qdrmfgp_state::machine_reset()
  *  Machine driver
  *
  *************************************/
-static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
+MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /*  16.000 MHz */
@@ -615,7 +618,7 @@ static MACHINE_CONFIG_START( qdrmfgp, qdrmfgp_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( qdrmfgp2, qdrmfgp_state )
+MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /*  16.000 MHz */
@@ -706,6 +709,6 @@ ROM_END
  *
  *************************************/
 
-/*     year  rom       clone     machine   inputs    init */
-GAME(  1994, qdrmfgp,  0,        qdrmfgp,  qdrmfgp, driver_device,  0,        ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix (Japan)", 0 )
-GAME(  1995, qdrmfgp2, 0,        qdrmfgp2, qdrmfgp2, driver_device, 0,        ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix 2 - Shin-Kyoku Nyuukadayo (Japan)", 0 )
+/*     year  rom       clone     machine   inputs    state          init */
+GAME(  1994, qdrmfgp,  0,        qdrmfgp,  qdrmfgp,  qdrmfgp_state, 0,        ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix (Japan)", 0 )
+GAME(  1995, qdrmfgp2, 0,        qdrmfgp2, qdrmfgp2, qdrmfgp_state, 0,        ROT0, "Konami", "Quiz Do Re Mi Fa Grand Prix 2 - Shin-Kyoku Nyuukadayo (Japan)", 0 )

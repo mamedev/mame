@@ -256,8 +256,9 @@ Logic:
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/cage.h"
 #include "includes/metalmx.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -433,7 +434,7 @@ READ32_MEMBER(metalmx_state::dsp32c_2_r)
 
 /*************************************
  *
- *  Host/TMS34020 accesors
+ *  Host/TMS34020 accessors
  *
  *************************************/
 
@@ -684,7 +685,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( metalmx, metalmx_state )
+MACHINE_CONFIG_START(metalmx_state::metalmx)
 
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_14_31818MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)

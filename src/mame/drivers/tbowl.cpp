@@ -15,10 +15,14 @@ Might be some priority glitches
 ***/
 
 #include "emu.h"
+#include "includes/tbowl.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
+
 #include "rendlay.h"
-#include "includes/tbowl.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(tbowl_state::coincounter_w)
@@ -41,17 +45,6 @@ WRITE8_MEMBER(tbowl_state::boardc_bankswitch_w)
 {
 	membank("subbank")->set_entry(data >> 3);
 }
-
-/*** Shared Ram Handlers
-
-***/
-
-WRITE8_MEMBER(tbowl_state::sound_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 
 /*** Memory Structures
 
@@ -87,7 +80,7 @@ static ADDRESS_MAP_START( 6206B_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0xfc09, 0xfc09) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfc0a, 0xfc0a) AM_READ_PORT("DSW3")
 //  AM_RANGE(0xfc0a, 0xfc0a) AM_WRITE(unknown_write) /* hardly used .. */
-	AM_RANGE(0xfc0d, 0xfc0d) AM_WRITE(sound_command_w) /* not sure, used quite a bit */
+	AM_RANGE(0xfc0d, 0xfc0d) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xfc10, 0xfc10) AM_WRITE(bg2xscroll_lo)
 	AM_RANGE(0xfc11, 0xfc11) AM_WRITE(bg2xscroll_hi)
 	AM_RANGE(0xfc12, 0xfc12) AM_WRITE(bg2yscroll_lo)
@@ -110,7 +103,7 @@ static ADDRESS_MAP_START( 6206C_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0xc000, 0xdfff) AM_READONLY
 	AM_RANGE(0xc000, 0xd7ff) AM_WRITEONLY
 	AM_RANGE(0xd800, 0xdfff) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // 2x palettes, one for each monitor?
+	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") // 2x palettes, one for each monitor?
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(boardc_bankswitch_w)
@@ -177,8 +170,8 @@ static ADDRESS_MAP_START( 6206A_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0xe000, 0xe001) AM_WRITE(adpcm_end_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITE(adpcm_start_w)
 	AM_RANGE(0xe004, 0xe005) AM_WRITE(adpcm_vol_w)
-	AM_RANGE(0xe006, 0xe006) AM_WRITENOP
-	AM_RANGE(0xe007, 0xe007) AM_WRITENOP    /* NMI acknowledge */
+	AM_RANGE(0xe006, 0xe006) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
+	AM_RANGE(0xe007, 0xe007) AM_WRITENOP // sound watchdog
 	AM_RANGE(0xe010, 0xe010) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
@@ -431,9 +424,10 @@ void tbowl_state::machine_reset()
 	m_adpcm_pos[0] = m_adpcm_pos[1] = 0;
 	m_adpcm_end[0] = m_adpcm_end[1] = 0;
 	m_adpcm_data[0] = m_adpcm_data[1] = -1;
+	m_soundlatch->acknowledge_w(machine().dummy_space(), 0, 0);
 }
 
-static MACHINE_CONFIG_START( tbowl, tbowl_state )
+MACHINE_CONFIG_START(tbowl_state::tbowl)
 
 	/* CPU on Board '6206B' */
 	MCFG_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
@@ -481,6 +475,8 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ym1", YM3812, 4000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -492,12 +488,12 @@ static MACHINE_CONFIG_START( tbowl, tbowl_state )
 	/* something for the samples? */
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(tbowl_state, adpcm_int_1))    /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(tbowl_state, adpcm_int_2))    /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -705,6 +701,6 @@ ROM_START( tbowlj )
 	ROM_LOAD( "6206a.2",    0x10000, 0x10000, CRC(1e9e5936) SHA1(60370d1de28b1c5ffeff7843702aaddb19ff1f58) )
 ROM_END
 
-GAME( 1987, tbowl,    0,        tbowl,    tbowl, driver_device,    0, ROT0,  "Tecmo", "Tecmo Bowl (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, tbowlp,   tbowl,    tbowl,    tbowl, driver_device,    0, ROT0,  "Tecmo", "Tecmo Bowl (World, prototype?)", MACHINE_SUPPORTS_SAVE ) // or early version, handwritten labels
-GAME( 1987, tbowlj,   tbowl,    tbowl,    tbowlj, driver_device,   0, ROT0,  "Tecmo", "Tecmo Bowl (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tbowl,    0,        tbowl,    tbowl,  tbowl_state,   0, ROT0,  "Tecmo", "Tecmo Bowl (World)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tbowlp,   tbowl,    tbowl,    tbowl,  tbowl_state,   0, ROT0,  "Tecmo", "Tecmo Bowl (World, prototype?)", MACHINE_SUPPORTS_SAVE ) // or early version, handwritten labels
+GAME( 1987, tbowlj,   tbowl,    tbowl,    tbowlj, tbowl_state,   0, ROT0,  "Tecmo", "Tecmo Bowl (Japan)",             MACHINE_SUPPORTS_SAVE )

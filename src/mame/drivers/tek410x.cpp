@@ -19,6 +19,8 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "screen.h"
+
 
 #define I80188_TAG "i80188"
 #define SCREEN_TAG "screen"
@@ -33,6 +35,8 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tek4109a(machine_config &config);
+	void tek4107a(machine_config &config);
 };
 
 /* Memory Maps */
@@ -84,7 +88,7 @@ void tek4107a_state::machine_start()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( tek4107a, tek4107a_state )
+MACHINE_CONFIG_START(tek4107a_state::tek4107a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I80188_TAG, I80188, 21000000)
 	MCFG_CPU_PROGRAM_MAP(tek4107a_mem)
@@ -102,7 +106,7 @@ static MACHINE_CONFIG_START( tek4107a, tek4107a_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tek4107a)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tek4109a, tek4107a )
+MACHINE_CONFIG_DERIVED(tek4107a_state::tek4109a, tek4107a)
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_ENTRIES(4096)
@@ -143,6 +147,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME            FLAGS */
-COMP( 1983, tek4107a,   0,          0,      tek4107a,   tek4107a, driver_device,   0,    "Tektronix", "Tektronix 4107A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1983, tek4109a,   tek4107a,   0,      tek4109a,   tek4107a, driver_device,   0,    "Tektronix", "Tektronix 4109A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     STATE           INIT  COMPANY      FULLNAME           FLAGS
+COMP( 1983, tek4107a,   0,          0,      tek4107a,   tek4107a, tek4107a_state, 0,    "Tektronix", "Tektronix 4107A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983, tek4109a,   tek4107a,   0,      tek4109a,   tek4107a, tek4107a_state, 0,    "Tektronix", "Tektronix 4109A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

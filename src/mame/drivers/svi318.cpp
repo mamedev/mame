@@ -8,20 +8,25 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/ram.h"
+#include "imagedev/cassette.h"
 #include "machine/bankdev.h"
 #include "machine/i8255.h"
-#include "video/tms9928a.h"
+#include "machine/ram.h"
 #include "sound/ay8910.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "sound/wave.h"
-#include "imagedev/cassette.h"
-#include "formats/svi_cas.h"
-#include "bus/generic/slot.h"
+#include "video/tms9928a.h"
+
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "bus/svi3x8/expander/expander.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/svi_cas.h"
 
 
 //**************************************************************************
@@ -86,6 +91,10 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
 
+	void svi328n(machine_config &config);
+	void svi318(machine_config &config);
+	void svi318n(machine_config &config);
+	void svi328(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -366,7 +375,7 @@ READ8_MEMBER( svi3x8_state::mreq_r )
 	uint8_t data = m_expander->mreq_r(space, offset);
 
 	if (ROMCS)
-		data = m_basic->u8(offset);
+		data = m_basic->as_u8(offset);
 
 	if (m_bk21 == 0 && IS_SVI328 && offset < 0x8000)
 		data = m_ram->read(offset);
@@ -513,7 +522,7 @@ DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( svi318, svi3x8_state )
+MACHINE_CONFIG_START(svi3x8_state::svi318)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(svi3x8_mem)
@@ -524,8 +533,8 @@ static MACHINE_CONFIG_START( svi318, svi3x8_state )
 
 	MCFG_DEVICE_ADD("io", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(svi3x8_io_bank)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(9)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(9)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
@@ -574,7 +583,7 @@ static MACHINE_CONFIG_START( svi318, svi3x8_state )
 	MCFG_SVI_EXPANDER_EXCSW_HANDLER(WRITE8(svi3x8_state, excs_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svi318n, svi318 )
+MACHINE_CONFIG_DERIVED(svi3x8_state::svi318n, svi318)
 	MCFG_DEVICE_REMOVE("vdp")
 	MCFG_DEVICE_REMOVE("screen")
 	MCFG_DEVICE_ADD("vdp", TMS9928A, XTAL_10_738635MHz / 2)
@@ -584,13 +593,13 @@ static MACHINE_CONFIG_DERIVED( svi318n, svi318 )
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svi328, svi318 )
+MACHINE_CONFIG_DERIVED(svi3x8_state::svi328, svi318)
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svi328n, svi318n )
+MACHINE_CONFIG_DERIVED(svi3x8_state::svi328n, svi318n)
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
@@ -621,8 +630,8 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT    COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY         FULLNAME   FLAGS
-COMP( 1983, svi318,  0,        0,      svi318,  svi318, driver_device, 0,    "Spectravideo", "SVI-318 (PAL)",  MACHINE_SUPPORTS_SAVE)
-COMP( 1983, svi318n, svi318,   0,      svi318n, svi318, driver_device, 0,    "Spectravideo", "SVI-318 (NTSC)", MACHINE_SUPPORTS_SAVE)
-COMP( 1983, svi328,  0,        0,      svi328,  svi328, driver_device, 0,    "Spectravideo", "SVI-328 (PAL)",  MACHINE_SUPPORTS_SAVE)
-COMP( 1983, svi328n, svi328,   0,      svi328n, svi328, driver_device, 0,    "Spectravideo", "SVI-328 (NTSC)", MACHINE_SUPPORTS_SAVE)
+//    YEAR  NAME     PARENT    COMPAT  MACHINE  INPUT   CLASS         INIT  COMPANY         FULLNAME          FLAGS
+COMP( 1983, svi318,  0,        0,      svi318,  svi318, svi3x8_state, 0,    "Spectravideo", "SVI-318 (PAL)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi318n, svi318,   0,      svi318n, svi318, svi3x8_state, 0,    "Spectravideo", "SVI-318 (NTSC)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi328,  0,        0,      svi328,  svi328, svi3x8_state, 0,    "Spectravideo", "SVI-328 (PAL)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, svi328n, svi328,   0,      svi328n, svi328, svi3x8_state, 0,    "Spectravideo", "SVI-328 (NTSC)", MACHINE_SUPPORTS_SAVE )

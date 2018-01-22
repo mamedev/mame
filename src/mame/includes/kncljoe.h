@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "screen.h"
 
 class kncljoe_state : public driver_device
 {
@@ -67,4 +68,5 @@ public:
 	uint32_t screen_update_kncljoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_nmi);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void kncljoe(machine_config &config);
 };

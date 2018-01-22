@@ -15,11 +15,16 @@ ToDo:
 
 ***********************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "hankin.lh"
 
 class hankin_state : public genpin_class
@@ -60,6 +65,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
+	void hankin(machine_config &config);
 private:
 	bool m_timer_x;
 	bool m_timer_sb;
@@ -278,7 +284,7 @@ WRITE8_MEMBER( hankin_state::ic10_a_w )
 			for (i = 0; i < 5; i++)
 			{
 				seg1 = patterns[m_segment[i]];
-				seg2 = BITSWAP16(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
+				seg2 = bitswap<16>(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
 				output().set_digit_value(i*10+m_digit, seg2);
 			}
 		}
@@ -486,7 +492,7 @@ WRITE_LINE_MEMBER( hankin_state::ic2_cb2_w )
 	m_ic2_cb2 = state;
 }
 
-static MACHINE_CONFIG_START( hankin, hankin_state )
+MACHINE_CONFIG_START(hankin_state::hankin)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, 3276800)
 	MCFG_CPU_PROGRAM_MAP(hankin_map)
@@ -598,8 +604,8 @@ ROM_START(empsback)
 ROM_END
 
 
-GAME(1978,  fjholden,  0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "FJ Holden", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978,  orbit1,    0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Orbit 1", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  shark,     0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Shark", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  howzat,    0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "Howzat!", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1981,  empsback,  0,  hankin,  hankin, driver_device, 0,  ROT0,  "Hankin", "The Empire Strike Back", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  fjholden,  0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "FJ Holden",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  orbit1,    0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "Orbit 1",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  shark,     0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "Shark",                  MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  howzat,    0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "Howzat!",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1981,  empsback,  0,  hankin,  hankin, hankin_state, 0,  ROT0,  "Hankin", "The Empire Strike Back", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

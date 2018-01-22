@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
 BMC Bowling (c) 1994.05 BMC, Ltd
@@ -109,6 +109,8 @@ Main board:
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define NVRAM_HACK
 
@@ -144,6 +146,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void init_stats(const uint8_t *table, int table_len, int address);
+	void bmcbowl(machine_config &config);
 };
 
 
@@ -209,17 +212,17 @@ READ16_MEMBER(bmcbowl_state::bmc_random_read)
 
 READ16_MEMBER(bmcbowl_state::bmc_protection_r)
 {
-	switch(space.device().safe_pcbase())
+	switch(m_maincpu->pcbase())
 	{
 		case 0xca68:
-			switch(space.device().state().state_int(M68K_D2))
+			switch(m_maincpu->state_int(M68K_D2))
 			{
 				case 0:          return 0x37<<8;
 				case 0x1013: return 0;
 				default:         return 0x46<<8;
 			}
 	}
-	logerror("Protection read @ %X\n",space.device().safe_pcbase());
+	logerror("Protection read @ %X\n",m_maincpu->pcbase());
 	return machine().rand();
 }
 
@@ -444,11 +447,11 @@ WRITE8_MEMBER(bmcbowl_state::input_mux_w)
 	m_bmc_input=data;
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, bmcbowl_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, bmcbowl_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
+MACHINE_CONFIG_START(bmcbowl_state::bmcbowl)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_21_4772MHz / 2 )
 	MCFG_CPU_PROGRAM_MAP(bmcbowl_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bmcbowl_state, irq2_line_hold)
@@ -478,7 +481,7 @@ static MACHINE_CONFIG_START( bmcbowl, bmcbowl_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 

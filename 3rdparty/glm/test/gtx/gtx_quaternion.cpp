@@ -91,7 +91,7 @@ int test_log()
 
 int main()
 {
-	int Error(0);
+	int Error = 0;
 
 	Error += test_log();
 	Error += test_rotation();

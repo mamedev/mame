@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 
+#ifndef MAME_BUS_NEOGEO_PROT_PVC_H
+#define MAME_BUS_NEOGEO_PROT_PVC_H
+
 #pragma once
 
-#ifndef __PVC_PROT__
-#define __PVC_PROT__
-
-extern const device_type PVC_PROT;
+DECLARE_DEVICE_TYPE(NG_PVC_PROT, pvc_prot_device)
 
 #define MCFG_PVC_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, PVC_PROT, 0)
+	MCFG_DEVICE_ADD(_tag, NG_PVC_PROT, 0)
 
 
 class pvc_prot_device :  public device_t
@@ -38,4 +38,4 @@ protected:
 	virtual void device_reset() override;
 };
 
-#endif
+#endif // MAME_BUS_NEOGEO_PROT_PVC_H

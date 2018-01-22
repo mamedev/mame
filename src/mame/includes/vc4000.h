@@ -10,7 +10,6 @@
 #ifndef VC4000_H_
 #define VC4000_H_
 
-#include "emu.h"
 #include "audio/vc4000.h"
 #include "cpu/s2650/s2650.h"
 #include "imagedev/snapquik.h"
@@ -19,6 +18,8 @@
 
 #include "bus/vc4000/slot.h"
 #include "bus/vc4000/rom.h"
+
+#include "screen.h"
 
 // define this to use digital inputs instead of the slow
 // autocentering analog mame joys
@@ -106,7 +107,7 @@ public:
 	DECLARE_READ8_MEMBER(vc4000_key_r);
 	DECLARE_READ8_MEMBER(vc4000_video_r);
 	DECLARE_WRITE8_MEMBER(vc4000_video_w);
-	DECLARE_READ8_MEMBER(vc4000_vsync_r);
+	DECLARE_READ_LINE_MEMBER(vc4000_vsync_r);
 	DECLARE_READ8_MEMBER(elektor_cass_r);
 	DECLARE_WRITE8_MEMBER(elektor_cass_w);
 	vc4000_video_t m_video;
@@ -126,6 +127,13 @@ public:
 	INTERRUPT_GEN_MEMBER(vc4000_video_line);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(vc4000);
 
+	void cx3000tc(machine_config &config);
+	void mpu1000(machine_config &config);
+	void vc4000(machine_config &config);
+	void database(machine_config &config);
+	void h21(machine_config &config);
+	void rwtrntcs(machine_config &config);
+	void elektor(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

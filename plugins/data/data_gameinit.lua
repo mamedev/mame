@@ -2,7 +2,7 @@ local dat = {}
 local ver, info
 
 local datread = require("data/load_dat")
-datread, ver = datread.open("gameinit.dat", "# GAMEINIT.DAT")
+datread, ver = datread.open("gameinit.dat", "# .-GAMEINIT.DAT")
 
 function dat.check(set, softlist)
 	if softlist or not datread then
@@ -13,7 +13,7 @@ function dat.check(set, softlist)
 	if not status or not info then
 		return nil
 	end
-	return "Gameinit"
+	return _("Gameinit")
 end
 
 function dat.get()

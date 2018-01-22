@@ -40,6 +40,8 @@ found/dumped yet. */
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class forte2_state : public driver_device
@@ -59,6 +61,7 @@ public:
 	DECLARE_DRIVER_INIT(pesadelo);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void pesadelo(machine_config &config);
 };
 
 
@@ -115,7 +118,7 @@ void forte2_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( pesadelo, forte2_state )
+MACHINE_CONFIG_START(forte2_state::pesadelo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
@@ -145,7 +148,7 @@ DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 	// data swap
 	for (int i = 0; i < memsize; i++)
 	{
-		mem[i] = BITSWAP8(mem[i],3,5,6,7,0,4,2,1);
+		mem[i] = bitswap<8>(mem[i],3,5,6,7,0,4,2,1);
 	}
 
 	// address line swap
@@ -153,7 +156,7 @@ DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 	memcpy(&buf[0], mem, memsize);
 	for (int i = 0; i < memsize; i++)
 	{
-		mem[BITSWAP16(i,11,9,8,13,14,15,12,7,6,5,4,3,2,1,0,10)] = buf[i];
+		mem[bitswap<16>(i,11,9,8,13,14,15,12,7,6,5,4,3,2,1,0,10)] = buf[i];
 	}
 }
 

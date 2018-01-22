@@ -2,10 +2,6 @@
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
 /* Sega Saturn VDP2 */
 
-#define DEBUG_MODE 0
-#define TEST_FUNCTIONS 0
-#define POPMESSAGE_DEBUG 0
-
 /*
 
 the dirty marking stuff and tile decoding will probably be removed in the end anyway as we'll need custom
@@ -38,7 +34,7 @@ Video emulation TODO:
  \-complete windows effects
  \-mosaic effect
  \-ODD bit/H/V Counter not yet emulated properly
- \-Reduction enable bits
+ \-Reduction enable bits (zooming limiters)
  \-Check if there are any remaining video registers that are yet to be macroized & added to the rumble.
 -batmanfr:
  \-If you reset the game after the character selection screen,when you get again to it there's garbage
@@ -48,10 +44,10 @@ Video emulation TODO:
 -hanagumi:
  \-ending screens have corrupt graphics. (*untested*)
 -kiwames:
- \-incorrect color emulation for the alpha blended flames on the title screen,it's caused by a schizoid
+ \-(fixed) incorrect color emulation for the alpha blended flames on the title screen,it's caused by a schizoid
    linescroll emulation quirk.
  \-the VDP1 sprites refresh is too slow,causing the "Draw by request" mode to
-   flicker.Moved back to default ATM.
+   flicker. Moved back to default ATM.
 -pblbeach:
  \-Sprites are offset, because it doesn't clear vdp1 local coordinates set by bios,
    I guess that they are cleared when some vdp1 register is written (kludged for now)
@@ -59,8 +55,16 @@ Video emulation TODO:
  \-Attract mode presentation has corrupted graphics in various places,probably caused by incomplete
    framebuffer data delete.
 -seabass:
- \-Player sprite is corrupt/missing during movements,caused by incomplete framebuffer switching.
-
+ \-(fixed) Player sprite is corrupt/missing during movements,caused by incomplete framebuffer switching.
+-shienryu:
+ \-level 2 background colors on statues, caused by special color calculation usage (per dot);
+(Saturn games)
+- scud the disposable assassin:
+ \- when zooming on melee attack background gets pink, color calculation issue?
+- virtual hydlide:
+ \- transparent pens usage on most vdp1 items should be black instead.
+ \- likewise "press start button" is the other way around, i.e. black pen where it should be transparent instead.
+ 
 Notes of Interest & Unclear features:
 
 -the test mode / bios is drawn with layer NBG3;
@@ -105,7 +109,15 @@ In other words,the first three types uses the offset and not the color allocated
 */
 
 #include "emu.h"
-#include "includes/saturn.h"
+#include "includes/saturn.h" // FIXME: this is a dependency from devices on MAME
+
+#include "screen.h"
+
+
+#define DEBUG_MODE 0
+#define TEST_FUNCTIONS 0
+#define POPMESSAGE_DEBUG 0
+
 
 enum
 {
@@ -195,7 +207,7 @@ enum
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    | EXLTFG   | EXSYFG   |
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
-       |    --    |    --    |    --    |    --    | VBLANK   | HBLANK   | ODD      | EVEN     |
+       |    --    |    --    |    --    |    --    | VBLANK   | HBLANK   | ODD      | PAL      |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
 /* 180006 - r/w - VRSIZE - VRAM Size
@@ -2145,7 +2157,7 @@ void saturn_state::stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter
 	stv_current_rotation_parameter_table.dkast= (m_vdp2_vram[address/4 + 22] & 0x03ffffc0) | ((m_vdp2_vram[address/4 + 22] & 0x02000000) ? 0xfc000000 : 0x00000000 );
 	stv_current_rotation_parameter_table.dkax = (m_vdp2_vram[address/4 + 23] & 0x03ffffc0) | ((m_vdp2_vram[address/4 + 23] & 0x02000000) ? 0xfc000000 : 0x00000000 );
 
-	// check rotation parameter read control, override if specific bits are disabled 
+	// check rotation parameter read control, override if specific bits are disabled
 	// (Batman Forever The Riddler stage relies on this)
 	switch(rot_parameter)
 	{
@@ -2155,7 +2167,7 @@ void saturn_state::stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter
 
 			if(!STV_VDP2_RAYSTRE)
 				stv_current_rotation_parameter_table.yst = 0;
-			
+
 			if(!STV_VDP2_RAKASTRE)
 				stv_current_rotation_parameter_table.dkax = 0;
 
@@ -2166,13 +2178,13 @@ void saturn_state::stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter
 
 			if(!STV_VDP2_RBYSTRE)
 				stv_current_rotation_parameter_table.yst = 0;
-			
+
 			if(!STV_VDP2_RBKASTRE)
 				stv_current_rotation_parameter_table.dkax = 0;
-		
+
 			break;
 	}
-		
+
 #define RP  stv_current_rotation_parameter_table
 
 	if(LOG_ROZ == 1) logerror( "Rotation parameter table (%d)\n", rot_parameter );
@@ -3752,8 +3764,8 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 		}
 	}
 
-	scalex = (int32_t)((int64_t)S64(0x100000000) / (int64_t)stv2_current_tilemap.incx);
-	scaley = (int32_t)((int64_t)S64(0x100000000) / (int64_t)stv2_current_tilemap.incy);
+	scalex = s32(s64(0x100000000U) / s64(stv2_current_tilemap.incx));
+	scaley = s32(s64(0x100000000U) / s64(stv2_current_tilemap.incy));
 	tilesizex = scalex * 8;
 	tilesizey = scaley * 8;
 	drawypos = drawxpos = 0;
@@ -4765,6 +4777,12 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 				y = ys >> 16;
 
 				if ( x & clipxmask || y & clipymask ) continue;
+				if ( stv2_current_tilemap.roz_mode3 == true )
+				{
+					if( stv_vdp2_roz_mode3_window(hcnt, vcnt, iRP-1) == false )
+						continue;
+				}
+
 				pix = roz_bitmap.pix32(y & planerenderedsizey, x & planerenderedsizex);
 				switch( stv2_current_tilemap.transparency )
 				{
@@ -4806,7 +4824,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 			}
 		}
 		else
-		{			
+		{
 			for (hcnt = cliprect.min_x; hcnt <= cliprect.max_x; hcnt++ )
 			{
 				switch( coeff_table_size )
@@ -4917,6 +4935,46 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 		}
 	}
 }
+
+bool saturn_state::stv_vdp2_roz_mode3_window(int x, int y, int rot_parameter)
+{
+	int s_x=0,e_x=0,s_y=0,e_y=0;
+	int w0_pix, w1_pix;
+	uint8_t logic = STV_VDP2_RPLOG;
+	uint8_t w0_enable = STV_VDP2_RPW0E;
+	uint8_t w1_enable = STV_VDP2_RPW1E;
+	uint8_t w0_area = STV_VDP2_RPW0A;
+	uint8_t w1_area = STV_VDP2_RPW1A;
+
+	if (w0_enable == 0 &&
+		w1_enable == 0)
+		return rot_parameter ^ 1;
+
+	stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
+	w0_pix = get_roz_mode3_window_pixel(s_x,e_x,s_y,e_y,x,y,w0_enable, w0_area);
+
+	stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y);
+	w1_pix = get_roz_mode3_window_pixel(s_x,e_x,s_y,e_y,x,y,w1_enable, w1_area);
+
+	return (logic & 1 ? (w0_pix | w1_pix) : (w0_pix & w1_pix)) ^ rot_parameter;
+}
+
+int saturn_state::get_roz_mode3_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,uint8_t winenable, uint8_t winarea)
+{
+	int res;
+
+	res = 1;
+	if(winenable)
+	{
+		if(winarea)
+			res = (y >= s_y && y <= e_y && x >= s_x && x <= e_x);
+		else
+			res = (y >= s_y && y <= e_y && x >= s_x && x <= e_x) ^ 1;
+	}
+
+	return res;
+}
+
 
 void saturn_state::stv_vdp2_draw_NBG0(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -5590,17 +5648,22 @@ void saturn_state::stv_vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cli
 	switch(STV_VDP2_RPMD)
 	{
 		case 0://Rotation Parameter A
+			stv2_current_tilemap.roz_mode3 = false;
 			stv_vdp2_draw_rotation_screen(bitmap, cliprect, 1 );
 			break;
 		case 1://Rotation Parameter B
 		//case 2:
+			stv2_current_tilemap.roz_mode3 = false;
 			stv_vdp2_draw_rotation_screen(bitmap, cliprect, 2 );
 			break;
 		case 2://Rotation Parameter A & B CKTE
+			stv2_current_tilemap.roz_mode3 = false;
 			stv_vdp2_draw_rotation_screen(bitmap, cliprect, 2 );
 			stv_vdp2_draw_rotation_screen(bitmap, cliprect, 1 );
 			break;
-		case 3://Rotation Parameter A & B Window (wrong)
+		case 3://Rotation Parameter A & B Window
+			stv2_current_tilemap.roz_mode3 = true;
+			stv_vdp2_draw_rotation_screen(bitmap, cliprect, 2 );
 			stv_vdp2_draw_rotation_screen(bitmap, cliprect, 1 );
 			break;
 	}
@@ -5717,7 +5780,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 			/* latch h/v signals through HV latch*/
 			if(!STV_VDP2_EXLTEN)
 			{
-				if(!space.debugger_access())
+				if(!machine().side_effect_disabled())
 				{
 					m_vdp2.h_count = get_hcounter();
 					m_vdp2.v_count = get_vcounter();
@@ -5744,7 +5807,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 				m_vdp2_regs[offset] |= 1 << 3;
 
 			/* HV latches clears if this register is read */
-			if(!space.debugger_access())
+			if(!machine().side_effect_disabled())
 			{
 				m_vdp2.exltfg &= ~1;
 				m_vdp2.exsyfg &= ~1;
@@ -5758,7 +5821,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 
 			/* Games basically r/w the entire VDP2 register area when this is tripped. (example: Silhouette Mirage)
 			   Disable log for the time being. */
-			//if(!space.debugger_access())
+			//if(!machine().side_effect_disabled())
 			//  printf("Warning: VDP2 version read\n");
 			break;
 		}
@@ -5778,7 +5841,7 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 		}
 
 		default:
-			//if(!space.debugger_access())
+			//if(!machine().side_effect_disabled())
 			//  printf("VDP2: read from register %08x %08x\n",offset*4,mem_mask);
 			break;
 	}
@@ -6001,15 +6064,18 @@ uint8_t saturn_state::get_odd_bit( void )
 	if(STV_VDP2_HRES & 4) //exclusive monitor mode makes this bit to be always 1
 		return 1;
 
-	if(STV_VDP2_LSMD == 0) // same for non-interlace mode
-		return 1;
-
-	return machine().first_screen()->frame_number() & 1;
+// TODO: seabass explicitly wants this bit to be 0 when screen is disabled from bios to game transition.
+//       But the documentation claims that "non-interlaced" mode is always 1.
+//       grdforce tests this bit to be 1 from title screen to gameplay, ditto for finlarch/sasissu/magzun.
+//       Assume documentation is wrong and actually always flip this bit.
+	return m_vdp2.odd;//machine().first_screen()->frame_number() & 1;
 }
 
 int saturn_state::get_vblank_start_position( void )
 {
-	/* TODO: test says that second setting happens at 241, might need further investigation ... */
+	// TODO: test says that second setting happens at 241, might need further investigation ...
+	//       also first one happens at 240, but needs mods in SMPC otherwise we get 2 credits at startup in shanhigw and sokyugrt
+	//       (i.e. make a special screen device that handles this for us)
 	const int d_vres[4] = { 224, 240, 256, 256 };
 	int vres_mask;
 	int vblank_line;
@@ -6194,6 +6260,8 @@ void saturn_state::stv_vdp2_dynamic_res_change( void )
 	int horz_res,vert_res;
 	int vres_mask;
 
+	// reset odd bit if a dynamic resolution change occurs, seabass ST-V cares!
+	m_vdp2.odd = 1;
 	vres_mask = (m_vdp2.pal << 1)|1; //PAL uses mask 3, NTSC uses mask 1
 	vert_res = d_vres[STV_VDP2_VRES & vres_mask];
 

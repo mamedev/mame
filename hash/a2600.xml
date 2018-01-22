@@ -5035,8 +5035,8 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="dodgeeme" cloneof="dodgeem">
-		<description>Dodge 'Em (PAL)</description>
+	<software name="dodgeeme2" cloneof="dodgeem">
+		<description>Dodge 'Em (PAL, Earlier)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5046,13 +5046,16 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="dodgeemef" cloneof="dodgeem">
-		<description>Dodge 'Em (PAL) (Fixed?)</description>
-		<year>1980</year>
+	<software name="dodgeeme" cloneof="dodgeem">
+		<description>Dodge 'Em (PAL, Later)</description>
+		<year>1987</year>
 		<publisher>Atari</publisher>
+		<info name="serial" value="CX2637" />
 		<part name="cart" interface="a2600_cart">
+			<feature name="pcb" value="C011885 REV F" />
+			<feature name="u1" value="" /> <!-- ROM -->
 			<dataarea name="rom" size="4096">
-				<rom name="dodge 'em (head on) (1980) (atari, carla meninsky) (cx2637, cx2637p) (pal) [fixed].bin" size="4096" crc="10cfc6c0" sha1="b26674d6e30d1a0bb2719b9bb1b3ccfa346260cf" offset="0" />
+				<rom name="AIP.u1" size="4096" crc="10cfc6c0" sha1="b26674d6e30d1a0bb2719b9bb1b3ccfa346260cf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -7275,12 +7278,15 @@ Info from Atariage and Atarimania
 	</software>
 
 	<software name="haunted">
-		<description>Haunted House</description>
-		<year>1982</year>
+		<description>Haunted House (NTSC)</description>
+		<year>1981</year>
 		<publisher>Atari</publisher>
+		<info name="serial" value="CX2654" />
 		<part name="cart" interface="a2600_cart">
+			<feature name="pcb" value="C011885 REV F" />
+			<feature name="u1" value="" /> <!-- ROM -->
 			<dataarea name="rom" size="4096">
-				<rom name="haunted house (mystery mansion, graves' manor, nightmare manor) (1982) (atari, james andreasen - sears) (cx2654 - 49-75141).bin" size="4096" crc="aa62d961" sha1="1476c869619075b551b20f2c7f95b11e0d16aec1" offset="0" />
+				<rom name="054.u1" size="4096" crc="aa62d961" sha1="1476c869619075b551b20f2c7f95b11e0d16aec1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -10655,11 +10661,14 @@ Info from Atariage and Atarimania
 
 	<software name="outlawe" cloneof="outlaw">
 		<description>Outlaw (PAL)</description>
-		<year>1978</year>
+		<year>1979</year>
 		<publisher>Atari</publisher>
+		<info name="serial" value="CX-2605-P" />
 		<part name="cart" interface="a2600_cart">
+			<feature name="pcb" value="C010789" />
+			<feature name="u1" value="" /> <!-- ROM -->
 			<dataarea name="rom" size="2048">
-				<rom name="outlaw (1978) (atari, david crane) (cx2605, cx2605p) (pal).bin" size="2048" crc="64f136d2" sha1="4a1514a7cf4279fded1b0db6f5b31818b9ff011c" offset="0" />
+				<rom name="B113.u1" size="2048" crc="64f136d2" sha1="4a1514a7cf4279fded1b0db6f5b31818b9ff011c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -16865,11 +16874,15 @@ Info from Atariage and Atarimania
 
 	<software name="tubybird">
 		<description>Tuby Bird (PAL)</description>
-		<year>19??</year>
-		<publisher>Suntek</publisher>
+		<year>1983?</year>
+		<publisher>Suntek, Quelle</publisher>
+		<info name="serial" value="SS-020 (Suntek), 465.302 8 (Quelle)" />
+		<info name="alt_title" value="Vogel Flieh (Quelle)"/>
 		<part name="cart" interface="a2600_cart">
+			<feature name="pcb" value="21003A" />
+			<feature name="u1" value="" /> <!-- Epoxy blob ROM -->
 			<dataarea name="rom" size="4096">
-				<rom name="tuby bird (aka dolphin) (rainbow vision - suntek) (ss-020) (pal).bin" size="4096" crc="1ca034ca" sha1="f4f941b779bcb7902df0eb7cf6b985f56e751183" offset="0" />
+				<rom name="u1" size="4096" crc="1ca034ca" sha1="f4f941b779bcb7902df0eb7cf6b985f56e751183" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -17539,9 +17552,12 @@ Info from Atariage and Atarimania
 		<description>Weltraumtunnel (PAL)</description>
 		<year>1983</year>
 		<publisher>Quelle</publisher>
+		<info name="alt_title" value="Laaser Voley"/>
 		<part name="cart" interface="a2600_cart">
+			<feature name="pcb" value="0019" />
+			<feature name="u1" value="" /> <!-- Epoxy blob ROM -->
 			<dataarea name="rom" size="4096">
-				<rom name="weltraumtunnel (aka laser gates) (1983) (quelle) (292.651 7) (pal).bin" size="4096" crc="dc1d3627" sha1="c513703d638c01b0c26922d5e3e7bfb65ea597da" offset="0" />
+				<rom name="u1" size="4096" crc="dc1d3627" sha1="c513703d638c01b0c26922d5e3e7bfb65ea597da" offset="0" />
 			</dataarea>
 		</part>
 	</software>

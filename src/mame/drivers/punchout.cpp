@@ -115,12 +115,16 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/punchout.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/n2a03.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "rendlay.h"
-#include "includes/punchout.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -131,29 +135,9 @@ DIP locations verified for:
 
 // Z80 (main)
 
-WRITE8_MEMBER(punchout_state::punchout_speech_reset_w)
+WRITE_LINE_MEMBER(punchout_state::nmi_mask_w)
 {
-	m_vlm->rst( data & 0x01 );
-}
-
-WRITE8_MEMBER(punchout_state::punchout_speech_st_w)
-{
-	m_vlm->st( data & 0x01 );
-}
-
-WRITE8_MEMBER(punchout_state::punchout_speech_vcu_w)
-{
-	m_vlm->vcu( data & 0x01 );
-}
-
-WRITE8_MEMBER(punchout_state::punchout_2a03_reset_w)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE8_MEMBER(punchout_state::nmi_mask_w)
-{
-	m_nmi_mask = data & 1;
+	m_nmi_mask = state;
 }
 
 static ADDRESS_MAP_START( punchout_map, AS_PROGRAM, 8, punchout_state )
@@ -194,18 +178,11 @@ static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("vlm", vlm5030_device, data_w)
 	AM_RANGE(0x05, 0x07) AM_WRITENOP // spunchout protection
-	AM_RANGE(0x08, 0x08) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x09, 0x09) AM_WRITENOP // watchdog reset, seldom used because 08 clears the watchdog as well
-	AM_RANGE(0x0a, 0x0a) AM_WRITENOP // ?
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(punchout_2a03_reset_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(punchout_speech_reset_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(punchout_speech_st_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(punchout_speech_vcu_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITENOP // enable NVRAM?
+	AM_RANGE(0x08, 0x0f) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( punchout_vlm_map, AS_0, 8, punchout_state )
+static ADDRESS_MAP_START( punchout_vlm_map, 0, 8, punchout_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
@@ -637,7 +614,7 @@ MACHINE_RESET_MEMBER(punchout_state, spnchout)
 }
 
 
-static MACHINE_CONFIG_START( punchout, punchout_state )
+MACHINE_CONFIG_START(punchout_state::punchout)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
@@ -645,11 +622,21 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_CPU_IO_MAP(punchout_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", N2A03, XTAL_21_4772MHz/12)
+	MCFG_CPU_ADD("audiocpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(punchout_sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 2B
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(punchout_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // watchdog reset, seldom used because 08 clears the watchdog as well
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // ?
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("vlm", vlm5030_device, rst))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("vlm", vlm5030_device, st))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("vlm", vlm5030_device, vcu))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // enable NVRAM?
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", punchout)
@@ -678,13 +665,13 @@ static MACHINE_CONFIG_START( punchout, punchout_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_21_4772MHz/6)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, punchout_vlm_map)
+	MCFG_SOUND_ADD("vlm", VLM5030, N2A03_NTSC_XTAL/6)
+	MCFG_DEVICE_ADDRESS_MAP(0, punchout_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spnchout, punchout )
+MACHINE_CONFIG_DERIVED(punchout_state::spnchout, punchout)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -698,7 +685,7 @@ static MACHINE_CONFIG_DERIVED( spnchout, punchout )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( armwrest, punchout )
+MACHINE_CONFIG_DERIVED(punchout_state::armwrest, punchout)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1339,11 +1326,11 @@ ROM_END
 
 
 
-GAME( 1984, punchout,  0,        punchout, punchout, driver_device, 0, ROT0, "Nintendo", "Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
-GAME( 1984, punchouta, punchout, punchout, punchout, driver_device, 0, ROT0, "Nintendo", "Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
-GAME( 1984, punchoutj, punchout, punchout, punchout, driver_device, 0, ROT0, "Nintendo", "Punch-Out!! (Japan)", 0 )
-GAME( 1984, punchita,  punchout, punchout, punchout, driver_device, 0, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
-GAME( 1984, spnchout,  0,        spnchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
-GAME( 1984, spnchouta, spnchout, spnchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
-GAME( 1984, spnchoutj, spnchout, spnchout, spnchout, driver_device, 0, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
-GAME( 1985, armwrest,  0,        armwrest, armwrest, driver_device, 0, ROT0, "Nintendo", "Arm Wrestling", 0 )
+GAME( 1984, punchout,  0,        punchout, punchout, punchout_state, 0, ROT0, "Nintendo", "Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
+GAME( 1984, punchouta, punchout, punchout, punchout, punchout_state, 0, ROT0, "Nintendo", "Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
+GAME( 1984, punchoutj, punchout, punchout, punchout, punchout_state, 0, ROT0, "Nintendo", "Punch-Out!! (Japan)", 0 )
+GAME( 1984, punchita,  punchout, punchout, punchout, punchout_state, 0, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
+GAME( 1984, spnchout,  0,        spnchout, spnchout, punchout_state, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev B)", 0 ) /* CHP1-02 boards */
+GAME( 1984, spnchouta, spnchout, spnchout, spnchout, punchout_state, 0, ROT0, "Nintendo", "Super Punch-Out!! (Rev A)", 0 ) /* CHP1-01 boards */
+GAME( 1984, spnchoutj, spnchout, spnchout, spnchout, punchout_state, 0, ROT0, "Nintendo", "Super Punch-Out!! (Japan)", 0 )
+GAME( 1985, armwrest,  0,        armwrest, armwrest, punchout_state, 0, ROT0, "Nintendo", "Arm Wrestling", 0 )

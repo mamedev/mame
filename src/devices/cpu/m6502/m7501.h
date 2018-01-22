@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef __M7501_H__
-#define __M7501_H__
+#ifndef MAME_CPU_M6502_M7501_H
+#define MAME_CPU_M6502_M7501_H
 
 #include "m6510.h"
 
@@ -31,4 +31,4 @@ enum {
 
 extern const device_type M7501;
 
-#endif
+#endif // MAME_CPU_M6502_M7501_H

@@ -28,6 +28,7 @@ Test Paste:
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/mos6530n.h"
+#include "machine/timer.h"
 #include "junior.lh"
 
 
@@ -35,12 +36,13 @@ class junior_state : public driver_device
 {
 public:
 	junior_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_riot(*this, "riot")
-	,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_riot(*this, "riot")
+		, m_maincpu(*this, "maincpu")
+	{
+	}
 
-	required_device<mos6532_t> m_riot;
+	required_device<mos6532_new_device> m_riot;
 	DECLARE_READ8_MEMBER(junior_riot_a_r);
 	DECLARE_READ8_MEMBER(junior_riot_b_r);
 	DECLARE_WRITE8_MEMBER(junior_riot_a_w);
@@ -53,6 +55,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(junior_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(junior_update_leds);
 	required_device<cpu_device> m_maincpu;
+	void junior(machine_config &config);
 };
 
 
@@ -62,8 +65,8 @@ static ADDRESS_MAP_START(junior_mem, AS_PROGRAM, 8, junior_state)
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFF)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM // 1K RAM
-	AM_RANGE(0x1a00, 0x1a7f) AM_DEVICE("riot", mos6532_t, ram_map)
-	AM_RANGE(0x1a80, 0x1a9f) AM_DEVICE("riot", mos6532_t, io_map)
+	AM_RANGE(0x1a00, 0x1a7f) AM_DEVICE("riot", mos6532_new_device, ram_map)
+	AM_RANGE(0x1a80, 0x1a9f) AM_DEVICE("riot", mos6532_new_device, io_map)
 	AM_RANGE(0x1c00, 0x1fff) AM_ROM // Monitor
 ADDRESS_MAP_END
 
@@ -211,7 +214,7 @@ void junior_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( junior, junior_state )
+MACHINE_CONFIG_START(junior_state::junior)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(junior_mem)
@@ -221,7 +224,7 @@ static MACHINE_CONFIG_START( junior, junior_state )
 	MCFG_DEFAULT_LAYOUT( layout_junior )
 
 	/* Devices */
-	MCFG_DEVICE_ADD("riot", MOS6532n, XTAL_1MHz)
+	MCFG_DEVICE_ADD("riot", MOS6532_NEW, XTAL_1MHz)
 	MCFG_MOS6530n_IN_PA_CB(READ8(junior_state, junior_riot_a_r))
 	MCFG_MOS6530n_OUT_PA_CB(WRITE8(junior_state, junior_riot_a_w))
 	MCFG_MOS6530n_IN_PB_CB(READ8(junior_state, junior_riot_b_r))
@@ -249,5 +252,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                     FULLNAME       FLAGS */
-COMP( 1980, junior, 0,      0,       junior,    junior, driver_device,   0,     "Elektor Electronics", "Junior Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE          INIT   COMPANY                FULLNAME           FLAGS */
+COMP( 1980, junior, 0,      0,       junior,    junior, junior_state,  0,     "Elektor Electronics", "Junior Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)

@@ -652,7 +652,7 @@ static const char *const dragonbas_functions[] =
 	"TIMER",    /* 0xff9e */
 	"PPOINT",   /* 0xff9f */
 	"STRING$",  /* 0xffa0 */
-	"USR"       /* 0xffa1 */
+	"USR",      /* 0xffa1 */
 	"CVN",      /* 0xffa2 */
 	"FREE",     /* 0xffa3 */
 	"LOC",      /* 0xffa4 */

@@ -76,11 +76,12 @@
 
 
 #include "emu.h"
+#include "includes/foodf.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
-#include "includes/foodf.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        12096000
@@ -212,7 +213,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, foodf_state )
 	AM_RANGE(0x014000, 0x014fff) AM_MIRROR(0x3e3000) AM_RAM
 	AM_RANGE(0x018000, 0x018fff) AM_MIRROR(0x3e3000) AM_RAM
 	AM_RANGE(0x01c000, 0x01c0ff) AM_MIRROR(0x3e3f00) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x800000, 0x8007ff) AM_MIRROR(0x03f800) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0x800000, 0x8007ff) AM_MIRROR(0x03f800) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
 	AM_RANGE(0x900000, 0x9001ff) AM_MIRROR(0x03fe00) AM_DEVREADWRITE8("nvram", x2212_device, read, write, 0x00ff)
 	AM_RANGE(0x940000, 0x940007) AM_MIRROR(0x023ff8) AM_READ(analog_r)
 	AM_RANGE(0x944000, 0x944007) AM_MIRROR(0x023ff8) AM_WRITE(analog_w)
@@ -334,7 +335,7 @@ READ8_MEMBER(foodf_state::pot_r)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( foodf, foodf_state )
+MACHINE_CONFIG_START(foodf_state::foodf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
@@ -504,7 +505,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, foodf,  0,     foodf, foodf, driver_device, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, foodf2, foodf, foodf, foodf, driver_device, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, foodf1, foodf, foodf, foodf, driver_device, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, foodfc, foodf, foodf, foodf, driver_device, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (cocktail)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, foodf,  0,     foodf, foodf, foodf_state, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, foodf2, foodf, foodf, foodf, foodf_state, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, foodf1, foodf, foodf, foodf, foodf_state, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, foodfc, foodf, foodf, foodf, foodf_state, 0, ROT0, "General Computer Corporation (Atari license)", "Food Fight (cocktail)", MACHINE_SUPPORTS_SAVE )

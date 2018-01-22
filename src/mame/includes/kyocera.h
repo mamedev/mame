@@ -1,29 +1,32 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#ifndef MAME_INCLUDES_KYOCERA_H
+#define MAME_INCLUDES_KYOCERA_H
+
 #pragma once
 
-#ifndef __KYOCERA__
-#define __KYOCERA__
 
-
-#include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
 #include "machine/buffer.h"
-#include "bus/centronics/ctronics.h"
 #include "machine/i8155.h"
 #include "machine/i8251.h"
 #include "machine/im6402.h"
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
+#include "machine/timer.h"
 #include "machine/upd1990a.h"
+#include "sound/spkrdev.h"
 #include "video/hd44102.h"
 #include "video/hd61830.h"
-#include "sound/speaker.h"
-#include "rendlay.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
+
+#include "rendlay.h"
+
 
 #define SCREEN_TAG      "screen"
 #define I8085_TAG       "m19"
@@ -139,6 +142,8 @@ public:
 	DECLARE_PALETTE_INIT(kc85);
 	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
 	DECLARE_READ_LINE_MEMBER(kc85_sid_r);
+	void kc85(machine_config &config);
+	void kc85_video(machine_config &config);
 };
 
 class trsm100_state : public kc85_state
@@ -148,6 +153,8 @@ public:
 		: kc85_state(mconfig, type, tag) { }
 
 	virtual void machine_start() override;
+	void trsm100(machine_config &config);
+	void tandy102(machine_config &config);
 };
 
 class pc8201_state : public kc85_state
@@ -178,6 +185,8 @@ public:
 
 	/* peripheral state */
 	int m_iosel;                /* serial interface select */
+	void pc8300(machine_config &config);
+	void pc8201(machine_config &config);
 };
 
 class tandy200_state : public driver_device
@@ -249,11 +258,8 @@ public:
 
 	int m_centronics_busy;
 	int m_centronics_select;
+	void tandy200(machine_config &config);
+	void tandy200_video(machine_config &config);
 };
 
-/* ---------- defined in video/kyocera.c ---------- */
-
-MACHINE_CONFIG_EXTERN( kc85_video );
-MACHINE_CONFIG_EXTERN( tandy200_video );
-
-#endif
+#endif // MAME_INCLUDES_KYOCERA_H

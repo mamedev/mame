@@ -8,13 +8,13 @@
 
 ***************************************************************************/
 
-#ifndef __MACHINE_ATARIGEN__
-#define __MACHINE_ATARIGEN__
+#ifndef MAME_MACHINE_ATARIGEN_H
+#define MAME_MACHINE_ATARIGEN_H
 
-#include "machine/eeprompar.h"
-#include "video/atarimo.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/slapstic.h"
+#include "cpu/m6502/m6502.h"
+#include "video/atarimo.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -80,14 +80,6 @@
 
 
 
-#define MCFG_ATARI_EEPROM_2804_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, ATARI_EEPROM_2804, 0)
-
-#define MCFG_ATARI_EEPROM_2816_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, ATARI_EEPROM_2816, 0)
-
-
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -102,9 +94,9 @@
 // ======================> atari_sound_comm_device
 
 // device type definition
-extern const device_type ATARI_SOUND_COMM;
+DECLARE_DEVICE_TYPE(ATARI_SOUND_COMM, atari_sound_comm_device)
 
-class atari_sound_comm_device :  public device_t
+class atari_sound_comm_device : public device_t
 {
 public:
 	// construction/destruction
@@ -174,7 +166,7 @@ private:
 // ======================> atari_vad_device
 
 // device type definition
-extern const device_type ATARI_VAD;
+DECLARE_DEVICE_TYPE(ATARI_VAD, atari_vad_device)
 
 class atari_vad_device :    public device_t,
 							public device_video_interface
@@ -250,67 +242,6 @@ private:
 
 	uint16_t              m_control[0x40/2];          // control data
 };
-
-
-// ======================> atari_eeprom_device
-
-// device type definition
-extern const device_type ATARI_EEPROM_2804;
-extern const device_type ATARI_EEPROM_2816;
-
-class atari_eeprom_device : public device_t
-{
-protected:
-	// construction/destruction
-	atari_eeprom_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file);
-
-public:
-	// unlock controls
-	DECLARE_READ8_MEMBER(unlock_read);
-	DECLARE_WRITE8_MEMBER(unlock_write);
-	DECLARE_READ16_MEMBER(unlock_read);
-	DECLARE_WRITE16_MEMBER(unlock_write);
-	DECLARE_READ32_MEMBER(unlock_read);
-	DECLARE_WRITE32_MEMBER(unlock_write);
-
-	// EEPROM read/write
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// internal state
-	required_device<eeprom_parallel_28xx_device> m_eeprom;
-
-	// live state
-	bool        m_unlocked;
-};
-
-class atari_eeprom_2804_device : public atari_eeprom_device
-{
-public:
-	// construction/destruction
-	atari_eeprom_2804_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-};
-
-class atari_eeprom_2816_device : public atari_eeprom_device
-{
-public:
-	// construction/destruction
-	atari_eeprom_2816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	// device-level overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-};
-
 
 
 /***************************************************************************
@@ -458,4 +389,4 @@ public:
 ***************************************************************************/
 
 
-#endif
+#endif // MAME_MACHINE_ATARIGEN_H

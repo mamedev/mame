@@ -29,9 +29,6 @@ namespace sol {
 		template<typename Func>
 		struct functor_function {
 			typedef meta::unwrapped_t<meta::unqualified_t<Func>> Function;
-			typedef decltype(&Function::operator()) function_type;
-			typedef meta::function_return_t<function_type> return_type;
-			typedef meta::function_args_t<function_type> args_lists;
 			Function fx;
 
 			template<typename... Args>
@@ -42,7 +39,7 @@ namespace sol {
 			}
 
 			int operator()(lua_State* L) {
-				auto f = [&](lua_State* L) -> int { return this->call(L); };
+				auto f = [&](lua_State*) -> int { return this->call(L); };
 				return detail::trampoline(L, f);
 			}
 		};
@@ -63,7 +60,7 @@ namespace sol {
 			}
 
 			int operator()(lua_State* L) {
-				auto f = [&](lua_State* L) -> int { return this->call(L); };
+				auto f = [&](lua_State*) -> int { return this->call(L); };
 				return detail::trampoline(L, f);
 			}
 		};
@@ -93,7 +90,7 @@ namespace sol {
 			}
 
 			int operator()(lua_State* L) {
-				auto f = [&](lua_State* L) -> int { return this->call(L); };
+				auto f = [&](lua_State*) -> int { return this->call(L); };
 				return detail::trampoline(L, f);
 			}
 		};

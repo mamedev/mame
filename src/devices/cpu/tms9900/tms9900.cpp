@@ -101,10 +101,16 @@
     - State save
     - HOLD state should be tested; I don't have test cases yet
 
+
+    Previous implementation with valuable info inside:
+    https://github.com/mamedev/mame/blob/677ec78eb50decdc40fad3d30daa3560feaff3cc/src/devices/cpu/tms9900/99xxcore.h
+
     Michael Zapf, June 2012
 */
 
+#include "emu.h"
 #include "tms9900.h"
+#include "9900dasm.h"
 
 #define NOPRG -1
 
@@ -170,9 +176,9 @@ enum
     twice their number. Accordingly, the TMS9900 has a CRU bitmask 0x0fff.
 ****************************************************************************/
 
-tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type,  const char *name, const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_program_config("program", ENDIANNESS_BIG, databus_width, prg_addr_bits),
+tms99xx_device::tms99xx_device(const machine_config &mconfig, device_type type, const char *tag, int data_width, int prg_addr_bits, int cru_addr_bits, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, type, tag, owner, clock),
+		m_program_config("program", ENDIANNESS_BIG, data_width, prg_addr_bits),
 		m_io_config("cru", ENDIANNESS_BIG, 8, cru_addr_bits),
 		m_prgspace(nullptr),
 		m_cru(nullptr),
@@ -199,7 +205,7 @@ tms99xx_device::~tms99xx_device()
 ****************************************************************************/
 
 tms9900_device::tms9900_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms99xx_device(mconfig, TMS9900, "TMS9900", tag, 16, 16, 12, owner, clock, "tms9900", __FILE__)
+	: tms99xx_device(mconfig, TMS9900, tag, 16, 16, 12, owner, clock)
 {
 }
 
@@ -415,9 +421,8 @@ void tms99xx_device::state_string_export(const device_state_entry &entry, std::s
 uint16_t tms99xx_device::read_workspace_register_debug(int reg)
 {
 	int temp = m_icount;
-	m_prgspace->set_debugger_access(true);
+	auto dis = machine().disable_side_effect();
 	uint16_t value = m_prgspace->read_word((WP+(reg<<1)) & m_prgaddr_mask & 0xfffe);
-	m_prgspace->set_debugger_access(false);
 	m_icount = temp;
 	return value;
 }
@@ -425,25 +430,17 @@ uint16_t tms99xx_device::read_workspace_register_debug(int reg)
 void tms99xx_device::write_workspace_register_debug(int reg, uint16_t data)
 {
 	int temp = m_icount;
-	m_prgspace->set_debugger_access(true);
+	auto dis = machine().disable_side_effect();
 	m_prgspace->write_word((WP+(reg<<1)) & m_prgaddr_mask & 0xfffe, data);
-	m_prgspace->set_debugger_access(false);
 	m_icount = temp;
 }
 
-const address_space_config *tms99xx_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector tms99xx_device::memory_space_config() const
 {
-	switch (spacenum)
-	{
-	case AS_PROGRAM:
-		return &m_program_config;
-
-	case AS_IO:
-		return &m_io_config;
-
-	default:
-		return nullptr;
-	}
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 /**************************************************************************
@@ -2755,21 +2752,11 @@ uint32_t tms99xx_device::execute_input_lines() const
 // execute_burn = nop
 
 // device_disasm_interface overrides
-uint32_t tms99xx_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
 
-uint32_t tms99xx_device::disasm_max_opcode_bytes() const
+util::disasm_interface *tms99xx_device::create_disassembler()
 {
-	return 6;
-}
-
-offs_t tms99xx_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	extern CPU_DISASSEMBLE( tms9900 );
-	return CPU_DISASSEMBLE_NAME(tms9900)(this, buffer, pc, oprom, opram, options);
+	return new tms9900_disassembler(TMS9900_ID);
 }
 
 
-const device_type TMS9900 = &device_creator<tms9900_device>;
+DEFINE_DEVICE_TYPE(TMS9900, tms9900_device, "tms9900", "TMS9900")

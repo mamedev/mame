@@ -7,15 +7,15 @@
     driver by Christopher Kirmse, Aaron Giles
 
     Games supported:
-        * Demolition Derby (Monoboard version) (Turbo Chip Squeak)
-        * Sarge (Turbo Chip Squeak)
-        * Max RPM (Turbo Chip Squeak)
+        * Demolition Derby (Monoboard version) (Turbo Cheap Squeak)
+        * Sarge (Turbo Cheap Squeak)
+        * Max RPM (Turbo Cheap Squeak)
         * Rampage (Sounds Good)
         * Power Drive (Sounds Good)
         * Star Guards (Sounds Good)
-        * Spy Hunter (Chip Squeak Deluxe)
+        * Spy Hunter (Cheap Squeak Deluxe)
         * Crater Raider
-        * Turbo Tag (prototype) (Chip Squeak Deluxe)
+        * Turbo Tag (prototype) (Cheap Squeak Deluxe)
 
     Known bugs:
         * Spy Hunter crashes at the end of the boat level
@@ -104,12 +104,12 @@
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
-#include "audio/midway.h"
-#include "machine/nvram.h"
 #include "includes/mcr.h"
 #include "includes/mcr3.h"
+
+#include "machine/nvram.h"
+
+#include "speaker.h"
 
 #include "spyhunt.lh"
 #include "turbotag.lh"
@@ -134,7 +134,7 @@ WRITE8_MEMBER(mcr3_state::mcrmono_control_port_w)
 	*/
 
 	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
-	mcr_cocktail_flip = (data >> 6) & 1;
+	m_mcr_cocktail_flip = (data >> 6) & 1;
 }
 
 
@@ -165,7 +165,7 @@ WRITE8_MEMBER(mcr3_state::demoderm_op6_w)
 	if (data & 0x40) m_input_mux = 1;
 
 	/* low 5 bits control the turbo CS */
-	m_turbo_chip_squeak->write(space, offset, data);
+	m_turbo_cheap_squeak->write(space, offset, data);
 }
 
 
@@ -229,8 +229,8 @@ READ8_MEMBER(mcr3_state::maxrpm_ip2_r)
 
 WRITE8_MEMBER(mcr3_state::maxrpm_op5_w)
 {
-	/* latch the low 4 bits as input to the ADC0844 */
-	m_maxrpm_adc_control = data & 0x0f;
+	/* latch bits 1-4 as input to the ADC0844 */
+	m_maxrpm_adc_control = (data >> 1) & 0x0f;
 
 	/* remaining bits go to standard connections */
 	mcrmono_control_port_w(space, offset, data);
@@ -239,12 +239,12 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op5_w)
 
 WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 {
-	static const char *const inputs[] = { "MONO.IP1", "MONO.IP1.ALT1", "MONO.IP1.ALT2", "MONO.IP1.ALT3" };
 	/*
 	    Reflective Sensor Control:
 	        4 bits of input from OP5 are routed to a transceiver at U2, and
 	        ultimately on to the low 4 I/O pins of the ADC0844. The /EN on
-	        the transceiver is directly connected to J2-2.
+	        the transceiver is directly connected to J2-2. Note that two bits
+	            get swapped in the process: OP53 = MA3 and OP54 = MA2.
 
 	        In order to perform a read or a write to the ADC0844, the /RD and
 	        /WR signals are directly controlled via J2-8 and J2-7 respectively.
@@ -260,16 +260,14 @@ WRITE8_MEMBER(mcr3_state::maxrpm_op6_w)
 
 	/* when the read is toggled is when the ADC value is latched */
 	if (!(data & 0x80))
-		m_latched_input = ioport(inputs[m_maxrpm_adc_select])->read();
+		m_latched_input = m_maxrpm_adc->read(space, 0);
 
 	/* when both the write and the enable are low, it's a write to the ADC0844 */
-	/* unfortunately the behavior below doesn't match up with the inputs on the */
-	/* schematics and wiring diagrams, so they must be wrong */
 	if (!(data & 0x40) && !(data & 0x20))
-		m_maxrpm_adc_select = (m_maxrpm_adc_control >> 1) & 3;
+		m_maxrpm_adc->write(space, 0, bitswap<4>(m_maxrpm_adc_control, 2, 3, 1, 0));
 
 	/* low 5 bits control the turbo CS */
-	m_turbo_chip_squeak->write(space, offset, data);
+	m_turbo_cheap_squeak->write(space, offset, data);
 }
 
 
@@ -392,7 +390,7 @@ WRITE8_MEMBER(mcr3_state::stargrds_op6_w)
 
 READ8_MEMBER(mcr3_state::spyhunt_ip1_r)
 {
-	return ioport("ssio:IP1")->read() | (m_chip_squeak_deluxe->read(space, 0) << 5);
+	return ioport("ssio:IP1")->read() | (m_cheap_squeak_deluxe->stat_r(space, 0) << 5);
 }
 
 
@@ -405,7 +403,7 @@ READ8_MEMBER(mcr3_state::spyhunt_ip2_r)
 
 WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 {
-	/* Spy Hunter uses port 4 for talking to the Chip Squeak Deluxe */
+	/* Spy Hunter uses port 4 for talking to the Cheap Squeak Deluxe */
 	/* (and for toggling the lamps and muxing the analog inputs) */
 
 	/* mux select is in bit 7 */
@@ -413,30 +411,34 @@ WRITE8_MEMBER(mcr3_state::spyhunt_op4_w)
 
 	/*
 	    Lamp Driver:
-	        A 3-to-8 latching demuxer is connected to the input bits.
+	        A 3-to-8 latching demuxer (MC14099) is connected to the input bits.
 	        Three of the inputs (J1-11,10,12) specify which output to write
 	        to, and the fourth input (J1-14) is the data value. A fifth input
 	        (J1-13) controls the strobe to latch the data value for the
-	        demuxer. The eight outputs directly control 8 lamps.
+	        demuxer. The eight outputs control 8 lamps through a pair of
+	        Darlington drivers (ULN2068B).
 	*/
 	/* bit 5 = STR1 (J1-13) */
 	if (((m_last_op4 ^ data) & 0x20) && !(data & 0x20))
 	{
-		static const char *const lampname[8] =
-		{
-			"lamp0", "lamp1", "lamp2", "lamp3",
-			"lamp4", "lamp5", "lamp6", "lamp7"
-		};
 		/* bit 3 -> J1-14 (DATA) */
 		/* bit 2 -> J1-11 (A2) */
 		/* bit 1 -> J1-10 (A1) */
 		/* bit 0 -> J1-12 (A0) */
-		output().set_value(lampname[data & 7], (data >> 3) & 1);
+		m_lamplatch->write_bit(data & 7, BIT(data, 3));
 	}
 	m_last_op4 = data;
 
-	/* low 5 bits go to control the Chip Squeak Deluxe */
-	m_chip_squeak_deluxe->write(space, offset, data);
+	/* low 5 bits go to control the Cheap Squeak Deluxe */
+	m_cheap_squeak_deluxe->sr_w(space, offset, data & 0x0f);
+	m_cheap_squeak_deluxe->sirq_w(BIT(data, 4));
+}
+
+
+template<int n>
+WRITE_LINE_MEMBER(mcr3_state::spyhunt_lamp_w)
+{
+	m_spyhunt_lamp[n] = state;
 }
 
 
@@ -464,7 +466,7 @@ READ8_MEMBER(mcr3_state::turbotag_kludge_r)
 	/* Unfortunately, the game refuses to start if any bad ROM is   */
 	/* found; to work around this, we catch the checksum byte read  */
 	/* and modify it to what we know we will be getting.            */
-	if (space.device().safe_pcbase() == 0xb29)
+	if (m_maincpu->pcbase() == 0xb29)
 		return 0x82;
 	else
 		return 0x92;
@@ -605,7 +607,7 @@ static INPUT_PORTS_START( demoderm )
 INPUT_PORTS_END
 
 
-/* inputs not verfied yet, DIP switches from manual */
+/* inputs not verified yet, DIP switches from manual */
 static INPUT_PORTS_START( sarge )
 	PORT_START("MONO.IP0")  /* J2 1-8 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1079,7 +1081,7 @@ GFXDECODE_END
  *************************************/
 
 /* Core MCR monoboard system with no sound */
-static MACHINE_CONFIG_START( mcrmono, mcr3_state )
+MACHINE_CONFIG_START(mcr3_state::mcrmono)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -1095,8 +1097,6 @@ static MACHINE_CONFIG_START( mcrmono, mcr3_state )
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
 
-	MCFG_MACHINE_START_OVERRIDE(mcr3_state,mcr)
-	MCFG_MACHINE_RESET_OVERRIDE(mcr3_state,mcr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	// sound hardware
@@ -1114,26 +1114,32 @@ static MACHINE_CONFIG_START( mcrmono, mcr3_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr3)
 	MCFG_PALETTE_ADD("palette", 64)
-
-	MCFG_VIDEO_START_OVERRIDE(mcr3_state,mcrmono)
 MACHINE_CONFIG_END
 
 
 /*************************************/
 
 
-/* Sarge/Demolition Derby Mono/Max RPM = MCR monoboard with Turbo Chip Squeak */
-static MACHINE_CONFIG_DERIVED( mono_tcs, mcrmono )
+/* Sarge/Demolition Derby Mono/Max RPM = MCR monoboard with Turbo Cheap Squeak */
+MACHINE_CONFIG_DERIVED(mcr3_state::mono_tcs, mcrmono)
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHIP_SQUEAK, 0)
+	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_DERIVED(mcr3_state::maxrpm, mono_tcs)
+	MCFG_ADC0844_ADD("adc")
+	MCFG_ADC0844_CH1_CB(IOPORT("MONO.IP1"))
+	MCFG_ADC0844_CH2_CB(IOPORT("MONO.IP1.ALT1"))
+	MCFG_ADC0844_CH3_CB(IOPORT("MONO.IP1.ALT2"))
+	MCFG_ADC0844_CH4_CB(IOPORT("MONO.IP1.ALT3"))
+MACHINE_CONFIG_END
+
 
 /* Rampage/Power Drive/Star Guards = MCR monoboard with Sounds Good */
-static MACHINE_CONFIG_DERIVED( mono_sg, mcrmono )
+MACHINE_CONFIG_DERIVED(mcr3_state::mono_sg, mcrmono)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
@@ -1146,7 +1152,7 @@ MACHINE_CONFIG_END
 
 
 /* Core scrolling system with SSIO sound */
-static MACHINE_CONFIG_DERIVED( mcrscroll, mcrmono )
+MACHINE_CONFIG_DERIVED(mcr3_state::mcrscroll, mcrmono)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("ssio", MIDWAY_SSIO, 0)
@@ -1171,13 +1177,23 @@ static MACHINE_CONFIG_DERIVED( mcrscroll, mcrmono )
 MACHINE_CONFIG_END
 
 
-/* Spy Hunter = scrolling system with an SSIO and a chip squeak deluxe */
-static MACHINE_CONFIG_DERIVED( mcrsc_csd, mcrscroll )
+/* Spy Hunter = scrolling system with an SSIO and a cheap squeak deluxe */
+MACHINE_CONFIG_DERIVED(mcr3_state::mcrsc_csd, mcrscroll)
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("csd", MIDWAY_CHIP_SQUEAK_DELUXE, 0)
+	MCFG_SOUND_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MCFG_DEVICE_ADD("lamplatch", CD4099, 0) // U1 on Lamp Driver Board
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<0>))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<1>))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<2>))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<3>))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<4>))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<5>))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<6>))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(mcr3_state, spyhunt_lamp_w<7>))
 MACHINE_CONFIG_END
 
 
@@ -1392,7 +1408,7 @@ ROM_START( spyhunt )
 	ROM_LOAD( "spy-hunter_snd_0_sd_11-18-83.a7",   0x0000, 0x1000, CRC(c95cf31e) SHA1(d1b0e299a27e306ddbc0654fd3a9d981c92afe8c) )
 	ROM_LOAD( "spy-hunter_snd_1_sd_11-18-83.a8",   0x1000, 0x1000, CRC(12aaa48e) SHA1(c6b835fc45e4484a4d52b682ce015caa242c8b4f) )
 
-	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Chip Squeak Deluxe */ // all dated 11-18-83
+	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Cheap Squeak Deluxe */ // all dated 11-18-83
 	ROM_LOAD16_BYTE( "spy-hunter_cs_deluxe_u7_a_11-18-83.u7",   0x00000, 0x2000, CRC(6e689fe7) SHA1(38ad2e9f12b9d389fb2568ebcb32c8bd1ac6879e) )
 	ROM_LOAD16_BYTE( "spy-hunter_cs_deluxe_u17_b_11-18-83.u17", 0x00001, 0x2000, CRC(0d9ddce6) SHA1(d955c0e67fc78b517cc229601ab4023cc5a644c2) )
 	ROM_LOAD16_BYTE( "spy-hunter_cs_deluxe_u8_c_11-18-83.u8",   0x04000, 0x2000, CRC(35563cd0) SHA1(5708d374dd56758194c95118f096ea51bf12bf64) )
@@ -1433,7 +1449,7 @@ ROM_START( spyhuntp )
 	ROM_LOAD( "spy-hunter_snd_0_sd_11-18-83.a7",   0x0000, 0x1000, CRC(c95cf31e) SHA1(d1b0e299a27e306ddbc0654fd3a9d981c92afe8c) )
 	ROM_LOAD( "spy-hunter_snd_1_sd_11-18-83.a8",   0x1000, 0x1000, CRC(12aaa48e) SHA1(c6b835fc45e4484a4d52b682ce015caa242c8b4f) )
 
-	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Chip Squeak Deluxe */
+	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Cheap Squeak Deluxe */
 	ROM_LOAD16_BYTE( "spy-hunter_cs_deluxe_u7_a_11-18-83.u7",   0x00000, 0x2000, CRC(6e689fe7) SHA1(38ad2e9f12b9d389fb2568ebcb32c8bd1ac6879e) )
 	ROM_LOAD16_BYTE( "spy-hunter_cs_deluxe_u17_b_11-18-83.u17", 0x00001, 0x2000, CRC(0d9ddce6) SHA1(d955c0e67fc78b517cc229601ab4023cc5a644c2) )
 	ROM_LOAD16_BYTE( "spy-hunter_cs_deluxe_u8_c_11-18-83.u8",   0x04000, 0x2000, CRC(35563cd0) SHA1(5708d374dd56758194c95118f096ea51bf12bf64) )
@@ -1509,7 +1525,7 @@ ROM_START( turbotag )
 
 	ROM_REGION( 0x10000, "ssio:cpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Chip Squeak Deluxe */
+	ROM_REGION( 0x8000, "csd:cpu", 0 )  /* 32k for the Cheap Squeak Deluxe */
 	ROM_LOAD16_BYTE( "ttu7.bin",  0x00000, 0x2000, CRC(8ebb3302) SHA1(c516abdae6eea524a6d2a039ed9bd7dff72ab986) )
 	ROM_LOAD16_BYTE( "ttu17.bin", 0x00001, 0x2000, CRC(605d6c74) SHA1(a6c2bc95cca372fa823ab256c9dd1f92b6ba45fd) )
 	ROM_LOAD16_BYTE( "ttu8.bin",  0x04000, 0x2000, CRC(6bfcb22a) SHA1(7b895e3ae1e99f195bb32b052f801b58c63a401c) )
@@ -1563,7 +1579,7 @@ DRIVER_INIT_MEMBER(mcr3_state,demoderm)
 DRIVER_INIT_MEMBER(mcr3_state,sarge)
 {
 	mcr_common_init();
-	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(midway_turbo_chip_squeak_device::write),m_turbo_chip_squeak.target()));
+	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(midway_turbo_cheap_squeak_device::write),m_turbo_cheap_squeak.target()));
 }
 
 
@@ -1576,7 +1592,6 @@ DRIVER_INIT_MEMBER(mcr3_state,maxrpm)
 	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::maxrpm_op6_w),this));
 
 	save_item(NAME(m_maxrpm_adc_control));
-	save_item(NAME(m_maxrpm_adc_select));
 	save_item(NAME(m_maxrpm_last_shift));
 	save_item(NAME(m_maxrpm_p1_shift));
 	save_item(NAME(m_maxrpm_p2_shift));
@@ -1612,9 +1627,11 @@ DRIVER_INIT_MEMBER(mcr3_state,stargrds)
 DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
 {
 	mcr_common_init();
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
+	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
+	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+
+	m_spyhunt_lamp.resolve();
 
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 16;
@@ -1634,9 +1651,11 @@ DRIVER_INIT_MEMBER(mcr3_state,crater)
 DRIVER_INIT_MEMBER(mcr3_state,turbotag)
 {
 	mcr_common_init();
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+	m_ssio->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
+	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),this));
+	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
+
+	m_spyhunt_lamp.resolve();
 
 	m_spyhunt_sprite_color_mask = 0x00;
 	m_spyhunt_scroll_offset = 88;
@@ -1659,7 +1678,7 @@ DRIVER_INIT_MEMBER(mcr3_state,turbotag)
 /* MCR monoboard games */
 GAME( 1984, demoderm, demoderb, mono_tcs,  demoderm, mcr3_state, demoderm, ROT0,  "Bally Midway", "Demolition Derby (MCR-3 Mono Board Version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sarge,    0,        mono_tcs,  sarge,    mcr3_state, sarge,    ROT0,  "Bally Midway", "Sarge", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, maxrpm,   0,        mono_tcs,  maxrpm,   mcr3_state, maxrpm,   ROT0,  "Bally Midway", "Max RPM (ver 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, maxrpm,   0,        maxrpm,    maxrpm,   mcr3_state, maxrpm,   ROT0,  "Bally Midway", "Max RPM (ver 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rampage,  0,        mono_sg,   rampage,  mcr3_state, rampage,  ROT0,  "Bally Midway", "Rampage (Rev 3, 8/27/86)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, rampage2, rampage,  mono_sg,   rampage,  mcr3_state, rampage,  ROT0,  "Bally Midway", "Rampage (Rev 2, 8/4/86)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, powerdrv, 0,        mono_sg,   powerdrv, mcr3_state, powerdrv, ROT0,  "Bally Midway", "Power Drive", MACHINE_SUPPORTS_SAVE )

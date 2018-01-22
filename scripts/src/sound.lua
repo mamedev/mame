@@ -22,7 +22,7 @@ files {
 -- DACs
 --@src/devices/sound/dac.h,SOUNDS["DAC"] = true
 --@src/devices/sound/dmadac.h,SOUNDS["DMADAC"] = true
---@src/devices/sound/speaker.h,SOUNDS["SPEAKER"] = true
+--@src/devices/sound/spkrdev.h,SOUNDS["SPEAKER"] = true
 --@src/devices/sound/beep.h,SOUNDS["BEEP"] = true
 ---------------------------------------------------
 
@@ -42,8 +42,8 @@ end
 
 if (SOUNDS["SPEAKER"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/sound/speaker.cpp",
-		MAME_DIR .. "src/devices/sound/speaker.h",
+		MAME_DIR .. "src/devices/sound/spkrdev.cpp",
+		MAME_DIR .. "src/devices/sound/spkrdev.h",
 	}
 end
 
@@ -154,13 +154,13 @@ end
 
 ---------------------------------------------------
 -- Amiga audio hardware
---@src/devices/sound/amiga.h,SOUNDS["AMIGA"] = true
+--@src/devices/machine/8364_paula.h,SOUNDS["PAULA_8364"] = true
 ---------------------------------------------------
 
-if (SOUNDS["AMIGA"]~=null) then
+if (SOUNDS["PAULA_8364"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/sound/amiga.cpp",
-		MAME_DIR .. "src/devices/sound/amiga.h",
+		MAME_DIR .. "src/devices/machine/8364_paula.cpp",
+		MAME_DIR .. "src/devices/machine/8364_paula.h",
 	}
 end
 
@@ -755,9 +755,6 @@ if (SOUNDS["QSOUND"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/qsound.cpp",
 		MAME_DIR .. "src/devices/sound/qsound.h",
-		MAME_DIR .. "src/devices/cpu/dsp16/dsp16.cpp",
-		MAME_DIR .. "src/devices/cpu/dsp16/dsp16.h",
-		MAME_DIR .. "src/devices/cpu/dsp16/dsp16dis.cpp",
 	}
 end
 
@@ -1399,5 +1396,64 @@ if (SOUNDS["VOLT_REG"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/sound/volt_reg.cpp",
 		MAME_DIR .. "src/devices/sound/volt_reg.h",
+	}
+end
+
+---------------------------------------------------
+-- DAC-76 COMDAC
+--@src/devices/sound/dac76.h,SOUNDS["DAC76"] = true
+---------------------------------------------------
+if (SOUNDS["DAC76"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/dac76.cpp",
+		MAME_DIR .. "src/devices/sound/dac76.h",
+	}
+end
+
+---------------------------------------------------
+-- MM5837 Noise Generator
+--@src/devices/sound/mm5837.h,MACHINES["MM5837"] = true
+---------------------------------------------------
+
+if (SOUNDS["MM5837"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/mm5837.cpp",
+		MAME_DIR .. "src/devices/sound/mm5837.h",
+	}
+end
+
+---------------------------------------------------
+-- Intelligent Designs DAVE
+--@src/devices/sound/dave.h,MACHINES["DAVE"] = true
+---------------------------------------------------
+
+if (SOUNDS["DAVE"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/dave.cpp",
+		MAME_DIR .. "src/devices/sound/dave.h",
+	}
+end
+
+---------------------------------------------------
+-- Toshiba TA7630
+--@src/devices/sound/ta7630.h,SOUNDS["TA7630"] = true
+---------------------------------------------------
+
+if (SOUNDS["TA7630"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/ta7630.cpp",
+		MAME_DIR .. "src/devices/sound/ta7630.h",
+	}
+end
+
+---------------------------------------------------
+-- Sanyo LC7535
+--@src/devices/sound/lc7535.h,SOUNDS["LC7535"] = true
+---------------------------------------------------
+
+if (SOUNDS["LC7535"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/lc7535.cpp",
+		MAME_DIR .. "src/devices/sound/lc7535.h",
 	}
 end

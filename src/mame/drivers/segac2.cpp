@@ -32,6 +32,7 @@
     1992  Tant-R (Korea)             Sega              ?                C2
     1992  Waku Waku Marine           Sega              317-0140         C2
     1993  SegaSonic Popcorn Shop     Sega              317-0140         C2
+    1993  Sega Sonic Cosmo Fighter   Sega              317-0140         C2
     1994  PotoPoto (Japan)           Sega              317-0218         C2
     1994  Stack Columns (Japan)      Sega              317-0219         C2
     1994  Stack Columns (World)      Sega              317-0223         C2
@@ -73,6 +74,9 @@
 
 
 #include "emu.h"
+#include "includes/megadriv.h"
+#include "includes/segaipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/315_5296.h"
@@ -80,9 +84,7 @@
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
-#include "includes/segaipt.h"
-
-#include "includes/megadriv.h"
+#include "speaker.h"
 
 
 #define XL1_CLOCK           XTAL_640kHz
@@ -152,6 +154,7 @@ public:
 	DECLARE_DRIVER_INIT(puyopuy2);
 	DECLARE_DRIVER_INIT(zunkyou);
 	DECLARE_DRIVER_INIT(pclub);
+	DECLARE_DRIVER_INIT(pclubj);
 	DECLARE_DRIVER_INIT(pclubjv2);
 	DECLARE_DRIVER_INIT(pclubjv4);
 	DECLARE_DRIVER_INIT(pclubjv5);
@@ -210,6 +213,16 @@ public:
 	int prot_func_pclubjv2(int in);
 	int prot_func_pclubjv4(int in);
 	int prot_func_pclubjv5(int in);
+	void segac2(machine_config &config);
+	void segac(machine_config &config);
+};
+
+
+class segac2_pc_state : public segac2_state
+{
+public:
+	using segac2_state::segac2_state;
+	static constexpr feature_type unemulated_features() { return feature::CAMERA | feature::PRINTER; }
 };
 
 
@@ -271,7 +284,7 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
     Sound handlers
 *******************************************************************************
 
-    These handlers are responsible for communicating with the (genenerally)
+    These handlers are responsible for communicating with the (generally)
     8-bit sound chips. All accesses are via the low byte.
 
     The Sega C/C2 system uses a YM3438 (compatible with the YM2612) for FM-
@@ -438,10 +451,10 @@ WRITE8_MEMBER(segac2_state::io_portd_w)
 	 D1 : To CN1 pin J. (Coin meter 2)
 	 D0 : To CN1 pin 8. (Coin meter 1)
 	*/
-	//space.machine().bookkeeping().coin_lockout_w(1, data & 0x08);
-	//space.machine().bookkeeping().coin_lockout_w(0, data & 0x04);
-	space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
-	space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
+	//machine().bookkeeping().coin_lockout_w(1, data & 0x08);
+	//machine().bookkeeping().coin_lockout_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 }
 
 WRITE8_MEMBER(segac2_state::io_porth_w)
@@ -486,7 +499,7 @@ WRITE8_MEMBER(segac2_state::control_w)
 	data &= 0x0f;
 
 	/* bit 0 controls display enable */
-	//segac2_enable_display(space.machine(), ~data & 1);
+	//segac2_enable_display(machine(), ~data & 1);
 	m_segac2_enable_display = ~data & 1;
 
 	/* bit 1 resets the protection */
@@ -515,7 +528,7 @@ WRITE8_MEMBER(segac2_state::control_w)
 /* protection chip reads */
 READ8_MEMBER(segac2_state::prot_r)
 {
-	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", space.device().safe_pcbase(), m_prot_read_buf);
+	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", m_maincpu->pcbase(), m_prot_read_buf);
 	return m_prot_read_buf | 0xf0;
 }
 
@@ -535,7 +548,7 @@ WRITE8_MEMBER(segac2_state::prot_w)
 
 	/* determine the value to return, should a read occur */
 	m_prot_read_buf = m_prot_func(table_index);
-	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", space.device().safe_pcbase(), data & 0x0f, m_prot_read_buf);
+	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", m_maincpu->pcbase(), data & 0x0f, m_prot_read_buf);
 
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != m_sp_palbase || new_bg_palbase != m_bg_palbase)
@@ -576,8 +589,8 @@ WRITE8_MEMBER(segac2_state::counter_timer_w)
 			break;
 
 		case 0x10:  /* coin counter */
-//          space.machine().bookkeeping().coin_counter_w(0,1);
-//          space.machine().bookkeeping().coin_counter_w(0,0);
+//          machine().bookkeeping().coin_counter_w(0,1);
+//          machine().bookkeeping().coin_counter_w(0,0);
 			break;
 
 		case 0x12:  /* set coinage info -- followed by two 4-bit values */
@@ -646,7 +659,7 @@ ADDRESS_MAP_END
     Input ports and 2 Dipswitch Ports, 1 of those Dipswitch Ports being used
     for coinage, the other for Game Options.
 
-    Most of the Games List the Dipswitchs and Inputs in the Test Menus, adding
+    Most of the Games List the Dipswitches and Inputs in the Test Menus, adding
     them is just a tedious task.  I think Columnns & Bloxeed are Exceptions
     and will need their Dipswitches working out by observation.  The Coin Part
     of the DSW's seems fairly common to all games.
@@ -1037,6 +1050,23 @@ static INPUT_PORTS_START( sonicpop )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( anpanman )
+	PORT_INCLUDE( sonicpop )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x02, 0x02, "Demo Voice" ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( ribbit )
 	PORT_INCLUDE( systemc_generic )
@@ -1505,7 +1535,7 @@ WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 }
 
 
-static MACHINE_CONFIG_START( segac, segac2_state )
+MACHINE_CONFIG_START(segac2_state::segac)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)
@@ -1542,7 +1572,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(segac2_state, screen_update_segac2_new)
-	MCFG_SCREEN_VBLANK_DRIVER(segac2_state, screen_eof_megadriv )
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(segac2_state, screen_vblank_megadriv))
 
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
@@ -1561,7 +1591,7 @@ static MACHINE_CONFIG_START( segac, segac2_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( segac2, segac )
+MACHINE_CONFIG_DERIVED(segac2_state::segac2, segac)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("io")
@@ -1761,6 +1791,17 @@ ROM_START( wwmarine ) /* Waku Waku Marine  (c)1992 Sega - 834-9082 WAKUWAKU MARI
 	ROM_LOAD( "epr-15095.ic4", 0x000000, 0x040000, CRC(df13755b) SHA1(177aac7aaadc36e14dbcdf12bd42dbe70b3edd49) )
 ROM_END
 
+ROM_START( anpanman ) /* Sega Soreike! Anpanman Popcorn Factory (Rev.B) (c)1993 Sega - 834-8795-01 (EMP5032 labeled 317-0140) */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "epr-14804b.ic32", 0x000000, 0x040000, CRC(7ce88c49) SHA1(959ee459a5b4a6324488a935fa6a48e38ce93464) ) // 27C020
+	ROM_LOAD16_BYTE( "epr-14803b.ic31", 0x000001, 0x040000, CRC(eb3ca1b9) SHA1(e4dd9d2bd2301f47f167d6516457386ba4e57df0) ) // 27C020
+	ROM_LOAD16_BYTE( "epr-14806.ic34", 0x100000, 0x040000, CRC(40f398db) SHA1(abaaf4404342232b58f02c7ea0571926b2417b45) ) // 27C020
+	ROM_LOAD16_BYTE( "epr-14805.ic33", 0x100001, 0x040000, CRC(f27229ed) SHA1(307182cdcd8954bbc56d4b412df452b406466d53) ) // 27C020
+
+	ROM_REGION( 0x040000, "upd", 0 )
+	ROM_LOAD( "epr-14807.ic4", 0x000000, 0x040000, CRC(9827549f) SHA1(66d195299085ec690498fc795a3088c05e6db820) ) // 27C020
+ROM_END
+
 
 ROM_START( sonicpop ) /* Sega Sonic Popcorn Shop (Rev.B) (c)1993 Sega - 834-9555-02 (EMP5032 labeled 317-0140) */
 	ROM_REGION( 0x200000, "maincpu", 0 )
@@ -1771,6 +1812,18 @@ ROM_START( sonicpop ) /* Sega Sonic Popcorn Shop (Rev.B) (c)1993 Sega - 834-9555
 
 	ROM_REGION( 0x040000, "upd", 0 )
 	ROM_LOAD( "epr-15495.ic4", 0x000000, 0x040000, CRC(d3ee4c68) SHA1(557c57b22521339d94d9a3e6fd2af68a67a153b6) )
+ROM_END
+
+
+ROM_START( sonicfgt ) /* Sega Sonic Cosmo Fighter (c)1993 Sega - 834-10082 930719-1755T (EMP5032 labeled 317-0140) */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "epr-16001.ic32", 0x000000, 0x040000, CRC(8ed1dc11) SHA1(cd1cb6066c2ff159bec88802bc4b7ca7fff2ed71) )
+	ROM_LOAD16_BYTE( "epr-16000.ic31", 0x000001, 0x040000, CRC(1440caec) SHA1(9e50c28544d6c42cdc7d3ae0f321670fed68fedb) )
+	ROM_LOAD16_BYTE( "epr-16003.ic34", 0x100000, 0x040000, CRC(8933e91c) SHA1(5dc7451874f97e0e5d0c666800c26907b9abf5f5) )
+	ROM_LOAD16_BYTE( "epr-16002.ic33", 0x100001, 0x040000, CRC(0ae979cd) SHA1(a4d4f096e976d4993123de0c2505382f878ea42a) )
+
+	ROM_REGION( 0x040000, "upd", 0 )
+	ROM_LOAD( "epr-16004.ic4", 0x000000, 0x040000, CRC(e87e8433) SHA1(b2b7945c7660ab2383049af5a2434768544a4ea8) )
 ROM_END
 
 
@@ -2029,6 +2082,16 @@ ROM_START( pclubjv5 ) /* Print Club vol.5 (c)1996 Atlus */
 	ROM_LOAD( "epr-18169.ic4", 0x000000, 0x080000, CRC(5c00ccfb) SHA1(d043ffa6528bb9b76774c96df4edf8222a1878a4) )
 ROM_END
 
+ROM_START( pclub ) /* english version based on v2 */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "epr-ic32.32", 0x000000, 0x080000, CRC(3fe9bda7) SHA1(2d3bf0f10c8b9a07a263365c5d81067c91974fe1) )
+	ROM_LOAD16_BYTE( "epr-ic31.31", 0x000001, 0x080000, CRC(90f994d0) SHA1(687d537481bfc05a5809161a8f1c686aa157cb8f) )
+	ROM_LOAD16_BYTE( "epr-ic34.34", 0x100000, 0x080000, CRC(4d1ebb55) SHA1(f403990ff41418d14bae645cffd5c042ce13312c) )
+	ROM_LOAD16_BYTE( "epr-ic33.33", 0x100001, 0x080000, CRC(bdfdc797) SHA1(aec561a591ca1387b7d38ffe48a2c179a39c1b06) )
+
+	ROM_REGION( 0x080000, "upd", 0 )
+	ROM_LOAD( "epr-ic4.4", 0x000000, 0x080000, CRC(84eed1c4) SHA1(271b199250f9a7f6ba5d3bf09e187417b7c2f88e) )
+ROM_END
 
 
 /******************************************************************************
@@ -2409,41 +2472,35 @@ DRIVER_INIT_MEMBER(segac2_state,zunkyou)
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_zunkyou),this));
 }
 
+DRIVER_INIT_MEMBER(segac2_state, pclub)
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
+}
 
-DRIVER_INIT_MEMBER(segac2_state,pclub)
+DRIVER_INIT_MEMBER(segac2_state,pclubj)
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclub),this));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
+	DRIVER_INIT_CALL(pclub);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv2)
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclubjv2),this));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
+	DRIVER_INIT_CALL(pclub);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv4)
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclubjv4),this));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
+	DRIVER_INIT_CALL(pclub);
 }
 
 DRIVER_INIT_MEMBER(segac2_state,pclubjv5)
 {
 	segac2_common_init(segac2_prot_delegate(FUNC(segac2_state::prot_func_pclubjv5),this));
-
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880120, 0x880121, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.1*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x880124, 0x880125, read16_delegate(FUNC(segac2_state::printer_r),this) );/*Print Club Vol.2*/
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x880124, 0x880125, write16_delegate(FUNC(segac2_state::print_club_camera_w),this));
+	DRIVER_INIT_CALL(pclub);
 }
 
 
@@ -2504,7 +2561,10 @@ GAME( 1994, tantrbl3,  tantr,    segac,  ichir, segac2_state,    tantr,    ROT0,
 GAME( 1992, wwmarine,   0,       segac2, wwmarine, segac2_state, bloxeedc, ROT0,   "Sega", "Waku Waku Marine", 0 )
 
 // not really sure how this should hook up, things like the 'sold out' flags could be mechanical sensors, or from another MCU / CPU board in the actual popcorn part of the machine?
+GAME( 1992, anpanman,   0,       segac2, anpanman, segac2_state, bloxeedc, ROT0,   "Sega", "Soreike! Anpanman Popcorn Factory (Rev B)", MACHINE_MECHANICAL ) // 'Mechanical' part isn't emulated
 GAME( 1993, sonicpop,   0,       segac2, sonicpop, segac2_state, bloxeedc, ROT0,   "Sega", "SegaSonic Popcorn Shop (Rev B)", MACHINE_MECHANICAL ) // region DSW for USA / Export / Japan, still speaks Japanese tho.  'Mechanical' part isn't emulated
+
+GAME( 1993, sonicfgt,  0,        segac2, systemc_generic, segac2_state, bloxeedc, ROT0,   "Sega", "Sega Sonic Cosmo Fighter", 0 )
 
 GAME( 1994, potopoto,  0,        segac2, potopoto, segac2_state, potopoto, ROT0,   "Sega", "Poto Poto (Japan, Rev A)", 0 )
 
@@ -2520,8 +2580,12 @@ GAME( 1994, puyopuy2,  0,        segac2, puyopuy2, segac2_state, puyopuy2, ROT0,
 
 GAME( 1994, zunkyou,   0,        segac2, zunkyou, segac2_state,  zunkyou,  ROT0,   "Sega", "Zunzunkyou No Yabou (Japan)", 0 )
 
-/* Atlus Print Club 'Games' (C-2 Hardware, might not be possible to support them because they use camera + printer, really just put here for reference) */
-GAME( 1995, pclubj,    0,        segac2, pclub, segac2_state,    pclub,    ROT0,   "Atlus", "Print Club (Japan Vol.1)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_CAMERA )
-GAME( 1995, pclubjv2,  pclubj,   segac2, pclubjv2, segac2_state, pclubjv2, ROT0,   "Atlus", "Print Club (Japan Vol.2)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_CAMERA )
-GAME( 1996, pclubjv4,  pclubj,   segac2, pclubjv2, segac2_state, pclubjv4, ROT0,   "Atlus", "Print Club (Japan Vol.4)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_CAMERA )
-GAME( 1996, pclubjv5,  pclubj,   segac2, pclubjv2, segac2_state, pclubjv5, ROT0,   "Atlus", "Print Club (Japan Vol.5)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_CAMERA )
+/* Atlus Print Club 'Games' (C-2 Hardware) requires printer and camera emulation */
+GAME( 1995, pclubj,    0,        segac2, pclub,    segac2_pc_state, pclubj,   ROT0, "Atlus", "Print Club (Japan Vol.1)", MACHINE_NOT_WORKING )
+
+GAME( 1995, pclubjv2,  0,        segac2, pclubjv2, segac2_pc_state, pclubjv2, ROT0, "Atlus", "Print Club (Japan Vol.2)", MACHINE_NOT_WORKING )
+GAME( 1995, pclub,     pclubjv2, segac2, pclubjv2, segac2_pc_state, pclubj,   ROT0, "Atlus", "Print Club (World)", MACHINE_NOT_WORKING ) // based on Japan Vol.2 but no Vol.2 subtitle
+
+GAME( 1996, pclubjv4,  0,        segac2, pclubjv2, segac2_pc_state, pclubjv4, ROT0, "Atlus", "Print Club (Japan Vol.4)", MACHINE_NOT_WORKING )
+
+GAME( 1996, pclubjv5,  0,        segac2, pclubjv2, segac2_pc_state, pclubjv5, ROT0, "Atlus", "Print Club (Japan Vol.5)", MACHINE_NOT_WORKING )

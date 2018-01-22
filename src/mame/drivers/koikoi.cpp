@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, David Haywood
 /***************************************************************************
 
@@ -42,6 +42,8 @@ to prevent disabling inputs.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define KOIKOI_CRYSTAL 15468000
 
@@ -80,6 +82,7 @@ public:
 	uint32_t screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void koikoi(machine_config &config);
 };
 
 
@@ -345,7 +348,7 @@ void koikoi_state::machine_reset()
 		m_ioram[i] = 0;
 }
 
-static MACHINE_CONFIG_START( koikoi, koikoi_state )
+MACHINE_CONFIG_START(koikoi_state::koikoi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)   /* ?? */
@@ -430,4 +433,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, koikoi,   0,      koikoi, koikoi, driver_device, 0, ROT270, "Kiwako", "Koi Koi Part 2", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, koikoi,   0,      koikoi, koikoi, koikoi_state, 0, ROT270, "Kiwako", "Koi Koi Part 2", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

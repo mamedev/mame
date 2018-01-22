@@ -2104,7 +2104,7 @@ void i386_device::i386_sub_r32_rm32()      // Opcode 0x2b
 		STORE_REG32(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		uint32_t ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ32(ea);
 		dst = LOAD_REG32(modrm);
 		dst = SUB32(dst, src);

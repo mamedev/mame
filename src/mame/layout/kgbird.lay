@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
-	<element name="collect">
+	<element name="COLLECT">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</rect>
@@ -13,7 +13,7 @@
 		</text>
 	</element>
 
-	<element name="bet1">
+	<element name="BET1">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -26,7 +26,7 @@
 		</text>
 	</element>
 
-	<element name="bet2">
+	<element name="BET2">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -39,7 +39,7 @@
 		</text>
 	</element>
 
-	<element name="bet3">
+	<element name="BET3">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -52,7 +52,7 @@
 		</text>
 	</element>
 
-	<element name="bet4">
+	<element name="BET4">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -65,7 +65,7 @@
 		</text>
 	</element>
 
-	<element name="bet5">
+	<element name="BET5">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -78,7 +78,7 @@
 		</text>
 	</element>
 
-	<element name="double up">
+	<element name="DOUBLEUP">
 		<rect state="1">
 			<color red="0.5" green="0.0" blue="0.7" />
 		</rect>
@@ -92,7 +92,7 @@
 		</text>
 	</element>
 
-	<element name="reserve">
+	<element name="RESERVE">
 		<rect state="1">
 			<color red="0.0" green="1.0" blue="0.0" />
 		</rect>
@@ -105,7 +105,7 @@
 		</text>
 	</element>
 
-	<element name="1 line">
+	<element name="1LINE">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -118,7 +118,7 @@
 		</text>
 	</element>
 
-	<element name="2 lines">
+	<element name="2LINES">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -131,7 +131,7 @@
 		</text>
 	</element>
 
-	<element name="3 lines">
+	<element name="3LINES">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -144,7 +144,7 @@
 		</text>
 	</element>
 
-	<element name="4 lines">
+	<element name="4LINES">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -157,7 +157,7 @@
 		</text>
 	</element>
 
-	<element name="5 lines">
+	<element name="5LINES">
 		<rect state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</rect>
@@ -170,7 +170,7 @@
 		</text>
 	</element>
 
-	<element name="take win">
+	<element name="TAKEWIN">
 		<rect state="1">
 			<color red="1.0" green="0.7" blue="0.0" />
 		</rect>
@@ -235,7 +235,6 @@
 		</text>
 	</element>
 
-
 	<element name="auditkey">
 		<rect state="1">
 			<color red="0.5" green="0.35" blue="0.0" />
@@ -266,86 +265,66 @@
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
-
-		<bezel name="lamp11" element="collect">
+		<bezel name="lamp11" element="COLLECT" inputtag="500d" inputmask="0x04">
 			<bounds x="0.67" y="3.02" width="0.31" height="0.24" />
 		</bezel>
-
-		<bezel name="lamp6" element="bet1">
+		<bezel name="lamp6" element="BET1" inputtag="500e" inputmask="0x01">
 			<bounds x="1.08" y="3.02" width="0.31" height="0.24" />
 		</bezel>
-
-		<bezel name="lamp5" element="bet2">
+		<bezel name="lamp5" element="BET2" inputtag="500e" inputmask="0x04">
 			<bounds x="1.49" y="3.02" width="0.31" height="0.24" />
 		</bezel>
-
-		<bezel name="lamp8" element="bet3">
+		<bezel name="lamp8" element="BET3" inputtag="500e" inputmask="0x10">
 			<bounds x="1.91" y="3.02" width="0.31" height="0.24" />
 		</bezel>
-
-		<bezel name="lamp12" element="bet4">
+		<bezel name="lamp12" element="BET4" inputtag="500d" inputmask="0x01">
 			<bounds x="2.31" y="3.02" width="0.31" height="0.24" />
 		</bezel>
-
-		<bezel name="lamp7" element="bet5">
+		<bezel name="lamp7" element="BET5" inputtag="500d" inputmask="0x02">
 			<bounds x="2.72" y="3.02" width="0.31" height="0.24" />
 		</bezel>
-
-		<bezel name="lamp18" element="double up">
+		<bezel name="lamp18" element="DOUBLEUP" inputtag="500d" inputmask="0x10">
 			<bounds x="3.13" y="3.02" width="0.31" height="0.24" />
 		</bezel>
 
-		<bezel name="lamp10" element="reserve">
+		<bezel name="lamp10" element="RESERVE" inputtag="500d" inputmask="0x08">
 			<bounds x="0.67" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-
-		<bezel name="lamp1" element="1 line">
+		<bezel name="lamp1" element="1LINE" inputtag="500e" inputmask="0x02">
 			<bounds x="1.08" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-
-		<bezel name="lamp2" element="2 lines">
+		<bezel name="lamp2" element="2LINES" inputtag="500e" inputmask="0x80">
 			<bounds x="1.49" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-
-		<bezel name="lamp3" element="3 lines">
+		<bezel name="lamp3" element="3LINES" inputtag="500e" inputmask="0x40">
 			<bounds x="1.91" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-
-		<bezel name="lamp9" element="4 lines">
+		<bezel name="lamp9" element="4LINES" inputtag="500e" inputmask="0x20">
 			<bounds x="2.31" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-
-		<bezel name="lamp4" element="5 lines">
+		<bezel name="lamp4" element="5LINES" inputtag="500e" inputmask="0x08">
 			<bounds x="2.72" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-
-		<bezel name="lamp13" element="take win">
+		<bezel name="lamp13" element="TAKEWIN" inputtag="500d" inputmask="0x20">
 			<bounds x="3.13" y="3.28" width="0.31" height="0.24" />
 		</bezel>
-
 		<bezel name="lamp14" element="light tower1">
 			<bounds x="3.70" y="3.28" width="0.10" height="0.10" />
 		</bezel>
-
 		<bezel name="lamp15" element="light tower2">
 			<bounds x="3.80" y="3.28" width="0.10" height="0.10" />
 		</bezel>
-
 		<bezel name="lamp16" element="light tower3">
 			<bounds x="3.70" y="3.38" width="0.10" height="0.10" />
 		</bezel>
-
 		<bezel name="lamp17" element="light tower4">
 			<bounds x="3.80" y="3.38" width="0.10" height="0.10" />
 		</bezel>
-
-		<bezel name="lamp19" element="auditkey">
+		<bezel name="lamp19" element="auditkey" inputtag="5002" inputmask="0x10">
 			<bounds x="0.26" y="3.09" width="0.31" height="0.12" />
 		</bezel>
-
-		<bezel name="lamp20" element="jackpotkey">
+		<bezel name="lamp20" element="jackpotkey" inputtag="5003" inputmask="0x04">
 			<bounds x="0.26" y="3.34" width="0.31" height="0.12" />
 		</bezel>
-
 	</view>
 </mamelayout>

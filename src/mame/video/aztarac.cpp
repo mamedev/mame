@@ -52,7 +52,7 @@ WRITE16_MEMBER(aztarac_state::ubr_w)
 				{
 					/* latch color only once */
 					intensity = (c >> 8);
-					color = VECTOR_COLOR222(c & 0x3f);
+					color = vector_device::color222(c & 0x3f);
 					while (ndefs--)
 					{
 						defaddr++;
@@ -70,7 +70,7 @@ WRITE16_MEMBER(aztarac_state::ubr_w)
 					{
 						defaddr++;
 						read_vectorram(m_vectorram, defaddr, &x, &y, &c);
-						color = VECTOR_COLOR222(c & 0x3f);
+						color = vector_device::color222(c & 0x3f);
 						AVECTOR (x + xoffset, y + yoffset, color, c >> 8);
 					}
 				}

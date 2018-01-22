@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "mn10200.h"
+#include "mn102dis.h"
 
 #define log_write(...)
 #define log_event(...)
@@ -36,7 +37,7 @@ enum mn10200_flag
 };
 
 
-const device_type MN1020012A = &device_creator<mn1020012a_device>;
+DEFINE_DEVICE_TYPE(MN1020012A, mn1020012a_device, "mn1020012a", "MN1020012A")
 
 // internal memory maps
 static ADDRESS_MAP_START( mn1020012a_internal_map, AS_PROGRAM, 16, mn10200_device )
@@ -44,10 +45,26 @@ static ADDRESS_MAP_START( mn1020012a_internal_map, AS_PROGRAM, 16, mn10200_devic
 ADDRESS_MAP_END
 
 
+mn10200_device::mn10200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, program), m_program(nullptr)
+	, m_read_port0(*this), m_read_port1(*this), m_read_port2(*this), m_read_port3(*this), m_read_port4(*this)
+	, m_write_port0(*this), m_write_port1(*this), m_write_port2(*this), m_write_port3(*this), m_write_port4(*this), m_cycles(0), m_pc(0), m_psw(0), m_mdr(0), m_nmicr(0), m_iagr(0),
+	m_extmdl(0), m_extmdh(0), m_possible_irq(false), m_pplul(0), m_ppluh(0), m_p3md(0), m_p4(0)
+{ }
+
 // device definitions
 mn1020012a_device::mn1020012a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mn10200_device(mconfig, MN1020012A, "MN1020012A", tag, owner, clock, ADDRESS_MAP_NAME(mn1020012a_internal_map), "mn1020012a", __FILE__)
+	: mn10200_device(mconfig, MN1020012A, tag, owner, clock, ADDRESS_MAP_NAME(mn1020012a_internal_map))
 { }
+
+
+device_memory_interface::space_config_vector mn10200_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 
 // disasm
@@ -72,10 +89,9 @@ void mn10200_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-offs_t mn10200_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mn10200_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( mn10200 );
-	return CPU_DISASSEMBLE_NAME(mn10200)(this, buffer, pc, oprom, opram, options);
+	return new mn10200_disassembler;
 }
 
 
@@ -192,10 +208,12 @@ void mn10200_device::device_start()
 		m_serial[i].ctrll = 0;
 		m_serial[i].ctrlh = 0;
 		m_serial[i].buf = 0;
+		m_serial[i].recv = 0;
 
 		save_item(NAME(m_serial[i].ctrll), i);
 		save_item(NAME(m_serial[i].ctrlh), i);
 		save_item(NAME(m_serial[i].buf), i);
+		save_item(NAME(m_serial[i].recv), i);
 	}
 
 	// ports
@@ -2137,13 +2155,13 @@ READ8_MEMBER(mn10200_device::io_control_r)
 		case 0x181: case 0x191:
 			return m_serial[(offset-0x180) >> 4].ctrlh;
 
-		case 0x182:
+		case 0x182: //case 0x192:
 		{
-			static int zz;
-			return zz++;
+			int ser = (offset-0x180) >> 4;
+			return m_serial[ser].recv++;
 		}
 
-		case 0x183:
+		case 0x183: //case 0x193:
 			return 0x10;
 
 		// 8-bit timers

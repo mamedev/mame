@@ -12,42 +12,13 @@
 
 ******************************************************************************/
 
+#ifndef MAME_CPU_H6280_H6280_H
+#define MAME_CPU_H6280_H6280_H
+
 #pragma once
 
-#ifndef __H6280_H__
-#define __H6280_H__
 
-#include "emu.h"
-
-#define LAZY_FLAGS  0
-
-/***************************************************************************
-    REGISTER ENUMERATION
-***************************************************************************/
-
-enum
-{
-	H6280_PC = 1,
-	H6280_S,
-	H6280_P,
-	H6280_A,
-	H6280_X,
-	H6280_Y,
-	H6280_IRQ_MASK,
-	H6280_TIMER_STATE,
-	H6280_NMI_STATE,
-	H6280_IRQ1_STATE,
-	H6280_IRQ2_STATE,
-	H6280_IRQT_STATE,
-	H6280_M1,
-	H6280_M2,
-	H6280_M3,
-	H6280_M4,
-	H6280_M5,
-	H6280_M6,
-	H6280_M7,
-	H6280_M8
-};
+#define H6280_LAZY_FLAGS  0
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -76,6 +47,31 @@ public:
 	void io_set_buffer(uint8_t);
 
 protected:
+	// register enumeration
+	enum
+	{
+		H6280_PC = 1,
+		H6280_S,
+		H6280_P,
+		H6280_A,
+		H6280_X,
+		H6280_Y,
+		H6280_IRQ_MASK,
+		H6280_TIMER_STATE,
+		H6280_NMI_STATE,
+		H6280_IRQ1_STATE,
+		H6280_IRQ2_STATE,
+		H6280_IRQT_STATE,
+		H6280_M1,
+		H6280_M2,
+		H6280_M3,
+		H6280_M4,
+		H6280_M5,
+		H6280_M6,
+		H6280_M7,
+		H6280_M8
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -89,13 +85,11 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
-	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address) override;
+	virtual space_config_vector memory_space_config() const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -352,7 +346,7 @@ protected:
 	uint8_t m_nmi_state;
 	uint8_t m_irq_state[3];
 	uint8_t m_irq_pending;
-#if LAZY_FLAGS
+#if H6280_LAZY_FLAGS
 	int32_t m_nz;         /* last value (lazy N and Z flag) */
 #endif
 	uint8_t m_io_buffer;  /* last value written to the PSG, timer, and interrupt pages */
@@ -363,7 +357,7 @@ protected:
 	// address spaces
 	address_space *m_program;
 	address_space *m_io;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 
 	typedef void (h6280_device::*ophandler)();
 
@@ -372,6 +366,6 @@ protected:
 	static const ophandler s_opcodetable[256];
 };
 
-extern const device_type H6280;
+DECLARE_DEVICE_TYPE(H6280, h6280_device)
 
-#endif /* __H6280_H__ */
+#endif // MAME_CPU_H6280_H6280_H

@@ -12,26 +12,16 @@
 /*                                                                         */
 /***************************************************************************/
 
-const device_type K001006 = &device_creator<k001006_device>;
+DEFINE_DEVICE_TYPE(K001006, k001006_device, "k001006", "K001006 Texel Unit")
 
 k001006_device::k001006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K001006, "K001006 Texel Unit", tag, owner, clock, "k001006", __FILE__),
+	: device_t(mconfig, K001006, tag, owner, clock),
 	m_pal_ram(nullptr),
 	m_unknown_ram(nullptr),
 	m_addr(0),
 	m_device_sel(0),
 	m_palette(nullptr), m_gfx_region(nullptr), m_gfxrom(nullptr),
 	m_tex_layout(0)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k001006_device::device_config_complete()
 {
 }
 
@@ -80,7 +70,7 @@ READ32_MEMBER( k001006_device::read )
 		{
 			case 0x0b:      // CG Board ROM read
 			{
-				uint16_t *rom = (uint16_t*)space.machine().root_device().memregion(m_gfx_region)->base();
+				uint16_t *rom = (uint16_t*)machine().root_device().memregion(m_gfx_region)->base();
 				return rom[m_addr / 2] << 16;
 			}
 			case 0x0d:      // Palette RAM read

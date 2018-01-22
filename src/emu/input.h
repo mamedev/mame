@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __INPUT_H__
-#define __INPUT_H__
+#ifndef MAME_EMU_INPUT_H
+#define MAME_EMU_INPUT_H
 
 
 //**************************************************************************
@@ -23,19 +23,19 @@
 //**************************************************************************
 
 // relative devices return ~512 units per onscreen pixel
-const int32_t INPUT_RELATIVE_PER_PIXEL = 512;
+constexpr s32 INPUT_RELATIVE_PER_PIXEL = 512;
 
 // absolute devices return values between -65536 and +65536
-const int32_t INPUT_ABSOLUTE_MIN = -65536;
-const int32_t INPUT_ABSOLUTE_MAX = 65536;
+constexpr s32 INPUT_ABSOLUTE_MIN = -65536;
+constexpr s32 INPUT_ABSOLUTE_MAX = 65536;
 
 // maximum number of axis/buttons/hats with ITEM_IDs for use by osd layer
-const int INPUT_MAX_AXIS = 8;
-const int INPUT_MAX_BUTTONS = 32;
-const int INPUT_MAX_HATS = 4;
-const int INPUT_MAX_ADD_SWITCH = 16;
-const int INPUT_MAX_ADD_ABSOLUTE = 16;
-const int INPUT_MAX_ADD_RELATIVE = 16;
+constexpr int INPUT_MAX_AXIS = 8;
+constexpr int INPUT_MAX_BUTTONS = 32;
+constexpr int INPUT_MAX_HATS = 4;
+constexpr int INPUT_MAX_ADD_SWITCH = 16;
+constexpr int INPUT_MAX_ADD_ABSOLUTE = 16;
+constexpr int INPUT_MAX_ADD_RELATIVE = 16;
 
 
 // device classes
@@ -51,11 +51,11 @@ enum input_device_class
 	DEVICE_CLASS_INTERNAL,
 	DEVICE_CLASS_MAXIMUM
 };
-DECLARE_ENUM_OPERATORS(input_device_class)
+DECLARE_ENUM_INCDEC_OPERATORS(input_device_class)
 
 
 // device index
-const int DEVICE_INDEX_MAXIMUM = 0xff;
+constexpr int DEVICE_INDEX_MAXIMUM = 0xff;
 
 
 // input item classes
@@ -338,19 +338,13 @@ enum input_item_id
 	// absolute maximum ID
 	ITEM_ID_ABSOLUTE_MAXIMUM = 0xfff
 };
-DECLARE_ENUM_OPERATORS(input_item_id)
+DECLARE_ENUM_INCDEC_OPERATORS(input_item_id)
 
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// forward declarations
-class input_device_item;
-class input_device;
-class input_class;
-
 
 // controller alias table typedef
 typedef std::map<std::string, std::string> devicemap_table_type;
@@ -395,7 +389,7 @@ public:
 
 private:
 	// internal state
-	uint32_t      m_internal;
+	u32 m_internal;
 };
 
 
@@ -459,7 +453,7 @@ public:
 	input_class &device_class(input_device_class devclass) { assert(devclass >= DEVICE_CLASS_FIRST_VALID && devclass <= DEVICE_CLASS_LAST_VALID); return *m_class[devclass]; }
 
 	// input code readers
-	int32_t code_value(input_code code);
+	s32 code_value(input_code code);
 	bool code_pressed(input_code code) { return code_value(code) != 0; }
 	bool code_pressed_once(input_code code);
 
@@ -480,7 +474,7 @@ public:
 
 	// input sequence readers
 	bool seq_pressed(const input_seq &seq);
-	int32_t seq_axis_value(const input_seq &seq, input_item_class &itemclass);
+	s32 seq_axis_value(const input_seq &seq, input_item_class &itemclass);
 
 	// input sequence polling
 	void seq_poll_start(input_item_class itemclass, const input_seq *startseq = nullptr);
@@ -836,12 +830,14 @@ private:
 #define JOYCODE_Z_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_ZAXIS)
 #define JOYCODE_U_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_RXAXIS)
 #define JOYCODE_V_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_RYAXIS)
+#define JOYCODE_W_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NONE, ITEM_ID_RZAXIS)
 
 #define JOYCODE_X JOYCODE_X_INDEXED(0)
 #define JOYCODE_Y JOYCODE_Y_INDEXED(0)
 #define JOYCODE_Z JOYCODE_Z_INDEXED(0)
 #define JOYCODE_U JOYCODE_U_INDEXED(0)
 #define JOYCODE_V JOYCODE_V_INDEXED(0)
+#define JOYCODE_W JOYCODE_W_INDEXED(0)
 
 // joystick axes as absolute half-axes
 #define JOYCODE_X_POS_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, ITEM_ID_XAXIS)
@@ -854,6 +850,8 @@ private:
 #define JOYCODE_U_NEG_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, ITEM_ID_RXAXIS)
 #define JOYCODE_V_POS_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, ITEM_ID_RYAXIS)
 #define JOYCODE_V_NEG_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, ITEM_ID_RYAXIS)
+#define JOYCODE_W_POS_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_POS, ITEM_ID_RZAXIS)
+#define JOYCODE_W_NEG_ABSOLUTE_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_ABSOLUTE, ITEM_MODIFIER_NEG, ITEM_ID_RZAXIS)
 
 #define JOYCODE_X_POS_ABSOLUTE JOYCODE_X_POS_ABSOLUTE_INDEXED(0)
 #define JOYCODE_X_NEG_ABSOLUTE JOYCODE_X_NEG_ABSOLUTE_INDEXED(0)
@@ -865,6 +863,8 @@ private:
 #define JOYCODE_U_NEG_ABSOLUTE JOYCODE_U_NEG_ABSOLUTE_INDEXED(0)
 #define JOYCODE_V_POS_ABSOLUTE JOYCODE_V_POS_ABSOLUTE_INDEXED(0)
 #define JOYCODE_V_NEG_ABSOLUTE JOYCODE_V_NEG_ABSOLUTE_INDEXED(0)
+#define JOYCODE_W_POS_ABSOLUTE JOYCODE_W_POS_ABSOLUTE_INDEXED(0)
+#define JOYCODE_W_NEG_ABSOLUTE JOYCODE_W_NEG_ABSOLUTE_INDEXED(0)
 
 // joystick axes as switches; X/Y are specially handled for left/right/up/down mapping
 #define JOYCODE_X_LEFT_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_LEFT, ITEM_ID_XAXIS)
@@ -877,6 +877,8 @@ private:
 #define JOYCODE_U_NEG_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, ITEM_ID_RXAXIS)
 #define JOYCODE_V_POS_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, ITEM_ID_RYAXIS)
 #define JOYCODE_V_NEG_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, ITEM_ID_RYAXIS)
+#define JOYCODE_W_POS_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_POS, ITEM_ID_RZAXIS)
+#define JOYCODE_W_NEG_SWITCH_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NEG, ITEM_ID_RZAXIS)
 
 #define JOYCODE_X_LEFT_SWITCH JOYCODE_X_LEFT_SWITCH_INDEXED(0)
 #define JOYCODE_X_RIGHT_SWITCH JOYCODE_X_RIGHT_SWITCH_INDEXED(0)
@@ -888,6 +890,8 @@ private:
 #define JOYCODE_U_NEG_SWITCH JOYCODE_U_NEG_SWITCH_INDEXED(0)
 #define JOYCODE_V_POS_SWITCH JOYCODE_V_POS_SWITCH_INDEXED(0)
 #define JOYCODE_V_NEG_SWITCH JOYCODE_V_NEG_SWITCH_INDEXED(0)
+#define JOYCODE_W_POS_SWITCH JOYCODE_W_POS_SWITCH_INDEXED(0)
+#define JOYCODE_W_NEG_SWITCH JOYCODE_W_NEG_SWITCH_INDEXED(0)
 
 // joystick buttons
 #define JOYCODE_BUTTON1_INDEXED(n) input_code(DEVICE_CLASS_JOYSTICK, n, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, ITEM_ID_BUTTON1)
@@ -962,4 +966,4 @@ private:
 
 
 
-#endif  // __INPUT_H__
+#endif  // MAME_EMU_INPUT_H

@@ -18,6 +18,7 @@
 #include "machine/ram.h"
 #include "video/hd44780.h"
 #include "rendlay.h"
+#include "screen.h"
 
 class alphasmart_state : public driver_device
 {
@@ -59,6 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port_d_w);
 	void update_lcdc(address_space &space, bool lcdc0, bool lcdc1);
 
+	void alphasmart(machine_config &config);
 protected:
 	uint8_t           m_matrix[2];
 	uint8_t           m_port_a;
@@ -81,6 +83,7 @@ public:
 	DECLARE_WRITE8_MEMBER(io_w);
 	virtual DECLARE_WRITE8_MEMBER(port_a_w) override;
 
+	void asma2k(machine_config &config);
 private:
 	uint8_t m_lcd_ctrl;
 };
@@ -417,7 +420,7 @@ void alphasmart_state::machine_reset()
 	m_port_d = 0;
 }
 
-static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
+MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC68HC11, XTAL_8MHz/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
 	MCFG_CPU_PROGRAM_MAP(alphasmart_mem)
@@ -448,7 +451,7 @@ static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( asma2k, alphasmart, asma2k_state )
+MACHINE_CONFIG_DERIVED(asma2k_state::asma2k, alphasmart)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(asma2k_mem)
 MACHINE_CONFIG_END
@@ -476,6 +479,6 @@ ROM_START( asma2k )
 ROM_END
 
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1995, asmapro,  0,       0,  alphasmart, alphasmart, driver_device,   0,   "Intelligent Peripheral Devices",   "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1997, asma2k ,  0,       0,  asma2k    , alphasmart, driver_device,   0,   "Intelligent Peripheral Devices",   "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT       STATE             INIT  COMPANY                           FULLNAME           FLAGS
+COMP( 1995, asmapro, 0,      0,      alphasmart, alphasmart, alphasmart_state, 0,    "Intelligent Peripheral Devices", "AlphaSmart Pro" , MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1997, asma2k,  0,      0,      asma2k,     alphasmart, asma2k_state,     0,    "Intelligent Peripheral Devices", "AlphaSmart 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

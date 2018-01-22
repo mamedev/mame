@@ -233,8 +233,14 @@ menu::menu(mame_ui_manager &mui, render_container &container)
 	, m_parent()
 	, m_event()
 	, m_pool(nullptr)
+	, m_customtop(0.0f)
+	, m_custombottom(0.0f)
 	, m_resetpos(0)
 	, m_resetref(nullptr)
+	, m_mouse_hit(false)
+	, m_mouse_button(false)
+	, m_mouse_x(-1.0f)
+	, m_mouse_y(-1.0f)
 {
 	assert(m_global_state); // not calling init is bad
 
@@ -255,7 +261,7 @@ menu::~menu()
 	{
 		pool *const ppool = m_pool;
 		m_pool = m_pool->next;
-		global_free(ppool);
+		global_free_array(ppool);
 	}
 }
 
@@ -400,6 +406,17 @@ void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags
 
 
 //-------------------------------------------------
+//  repopulate - repopulate menu items
+//-------------------------------------------------
+
+void menu::repopulate(reset_options options)
+{
+	reset(options);
+	populate(m_customtop, m_custombottom);
+}
+
+
+//-------------------------------------------------
 //  process - process a menu, drawing it
 //  and returning any interesting events
 //-------------------------------------------------
@@ -432,11 +449,14 @@ const menu::event *menu::process(uint32_t flags, float x0, float y0)
 	// update the selected item in the event
 	if ((m_event.iptkey != IPT_INVALID) && selection_valid())
 	{
-		m_event.itemref = item[selected].ref;
+		m_event.itemref = get_selection_ref();
 		m_event.type = item[selected].type;
 		return &m_event;
 	}
-	return nullptr;
+	else
+	{
+		return nullptr;
+	}
 }
 
 
@@ -541,7 +561,7 @@ void menu::draw(uint32_t flags)
 	}
 
 	// account for extra space at the top and bottom
-	float const visible_extra_menu_height = customtop + custombottom;
+	float const visible_extra_menu_height = m_customtop + m_custombottom;
 
 	// add a little bit of slop for rounding
 	visible_width += 0.01f;
@@ -560,7 +580,7 @@ void menu::draw(uint32_t flags)
 
 	// compute top/left of inner menu area by centering
 	float const visible_left = (1.0f - visible_width) * 0.5f;
-	float const visible_top = ((1.0f - visible_main_menu_height - visible_extra_menu_height) * 0.5f) + customtop;
+	float const visible_top = ((1.0f - visible_main_menu_height - visible_extra_menu_height) * 0.5f) + m_customtop;
 
 	// first add us a box
 	float const x1 = visible_left - UI_BOX_LR_BORDER;
@@ -574,7 +594,7 @@ void menu::draw(uint32_t flags)
 		top_line = 0;
 	if (selected >= (top_line + m_visible_lines))
 		top_line = selected - (m_visible_lines / 2);
-	if ((top_line > (item.size() - m_visible_lines)) || (selected == (item.size() - 1)))
+	if ((top_line > (item.size() - m_visible_lines)) || is_last_selected())
 		top_line = item.size() - m_visible_lines;
 
 	// if scrolling, show arrows
@@ -589,16 +609,10 @@ void menu::draw(uint32_t flags)
 	float const effective_left = visible_left + gutter_width;
 
 	// locate mouse
-	mouse_hit = false;
-	mouse_button = false;
 	if (!customonly && !noinput)
-	{
-		int32_t mouse_target_x, mouse_target_y;
-		render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
-		if (mouse_target != nullptr)
-			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, container(), mouse_x, mouse_y))
-				mouse_hit = true;
-	}
+		map_mouse();
+	else
+		ignore_mouse();
 
 	// loop over visible lines
 	hover = item.size() + 1;
@@ -620,11 +634,11 @@ void menu::draw(uint32_t flags)
 			float const line_y1 = line_y0 + line_height;
 
 			// set the hover if this is our item
-			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && is_selectable(pitem))
+			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1) && is_selectable(pitem))
 				hover = itemnum;
 
 			// if we're selected, draw with a different background
-			if (itemnum == selected)
+			if (is_selected(itemnum))
 			{
 				fgcolor = fgcolor2 = fgcolor3 = UI_SELECTED_COLOR;
 				bgcolor = UI_SELECTED_BG_COLOR;
@@ -695,33 +709,46 @@ void menu::draw(uint32_t flags)
 				ui().draw_text_full(container(), itemtext, effective_left, line_y0, effective_width,
 					ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, &item_width, nullptr);
 
-				// give 2 spaces worth of padding
-				item_width += 2.0f * gutter_width;
-
-				// if the subitem doesn't fit here, display dots
-				if (ui().get_string_width(subitem_text) > effective_width - item_width)
+				if (pitem.flags & FLAG_COLOR_BOX)
 				{
-					subitem_text = "...";
-					if (itemnum == selected)
-						selected_subitem_too_big = true;
+					rgb_t color = rgb_t((uint32_t)strtoul(subitem_text, nullptr, 16));
+
+					// give 2 spaces worth of padding
+					subitem_width = ui().get_string_width("FF00FF00");
+
+					ui().draw_outlined_box(container(), effective_left + effective_width - subitem_width, line_y0,
+						effective_left + effective_width, line_y1, color);
+				}
+				else
+				{
+					// give 2 spaces worth of padding
+					item_width += 2.0f * gutter_width;
+
+					// if the subitem doesn't fit here, display dots
+					if (ui().get_string_width(subitem_text) > effective_width - item_width)
+					{
+						subitem_text = "...";
+						if (is_selected(itemnum))
+							selected_subitem_too_big = true;
+					}
+
+					// customize subitem text color
+					if (!core_stricmp(subitem_text, _("On")))
+						fgcolor2 = rgb_t(0x00,0xff,0x00);
+
+					if (!core_stricmp(subitem_text, _("Off")))
+						fgcolor2 = rgb_t(0xff,0x00,0x00);
+
+					if (!core_stricmp(subitem_text, _("Auto")))
+						fgcolor2 = rgb_t(0xff,0xff,0x00);
+
+					// draw the subitem right-justified
+					ui().draw_text_full(container(), subitem_text, effective_left + item_width, line_y0, effective_width - item_width,
+								ui::text_layout::RIGHT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, nullptr);
 				}
 
-				// customize subitem text color
-				if (!core_stricmp(subitem_text, _("On")))
-					fgcolor2 = rgb_t(0x00,0xff,0x00);
-
-				if (!core_stricmp(subitem_text, _("Off")))
-					fgcolor2 = rgb_t(0xff,0x00,0x00);
-
-				if (!core_stricmp(subitem_text, _("Auto")))
-					fgcolor2 = rgb_t(0xff,0xff,0x00);
-
-				// draw the subitem right-justified
-				ui().draw_text_full(container(), subitem_text, effective_left + item_width, line_y0, effective_width - item_width,
-							ui::text_layout::RIGHT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, nullptr);
-
 				// apply arrows
-				if (itemnum == selected && (pitem.flags & FLAG_LEFT_ARROW))
+				if (is_selected(itemnum) && (pitem.flags & FLAG_LEFT_ARROW))
 				{
 					draw_arrow(
 								effective_left + effective_width - subitem_width - gutter_width,
@@ -731,7 +758,7 @@ void menu::draw(uint32_t flags)
 								fgcolor,
 								ROT90 ^ ORIENTATION_FLIP_X);
 				}
-				if (itemnum == selected && (pitem.flags & FLAG_RIGHT_ARROW))
+				if (is_selected(itemnum) && (pitem.flags & FLAG_RIGHT_ARROW))
 				{
 					draw_arrow(
 								effective_left + effective_width + gutter_width - lr_arrow_width,
@@ -748,7 +775,7 @@ void menu::draw(uint32_t flags)
 	// if the selected subitem is too big, display it in a separate offset box
 	if (selected_subitem_too_big)
 	{
-		menu_item const &pitem = item[selected];
+		menu_item const &pitem = selected_item();
 		bool const subitem_invert(pitem.flags & FLAG_INVERT);
 		auto const linenum = selected - top_line;
 		float const line_y = visible_top + (float)linenum * line_height;
@@ -776,7 +803,7 @@ void menu::draw(uint32_t flags)
 	}
 
 	// if there is something special to add, do it by calling the virtual method
-	custom_render(get_selection_ref(), customtop, custombottom, x1, y1, x2, y2);
+	custom_render(get_selection_ref(), m_customtop, m_custombottom, x1, y1, x2, y2);
 }
 
 void menu::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
@@ -849,6 +876,38 @@ void menu::draw_text_box()
 
 
 //-------------------------------------------------
+//  map_mouse - map mouse pointer location to menu
+//  coordinates
+//-------------------------------------------------
+
+void menu::map_mouse()
+{
+	ignore_mouse();
+	int32_t mouse_target_x, mouse_target_y;
+	render_target *const mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &m_mouse_button);
+	if (mouse_target)
+	{
+		if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, container(), m_mouse_x, m_mouse_y))
+			m_mouse_hit = true;
+	}
+}
+
+
+//-------------------------------------------------
+//  ignore_mouse - set members to ignore mouse
+//  input
+//-------------------------------------------------
+
+void menu::ignore_mouse()
+{
+	m_mouse_hit = false;
+	m_mouse_button = false;
+	m_mouse_x = -1.0f;
+	m_mouse_y = -1.0f;
+}
+
+
+//-------------------------------------------------
 //  handle_events - generically handle
 //  input events for a menu
 //-------------------------------------------------
@@ -864,7 +923,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 		switch (local_menu_event.event_type)
 		{
 			// if we are hovering over a valid item, select it with a single click
-			case UI_EVENT_MOUSE_DOWN:
+			case ui_event::MOUSE_DOWN:
 				if (custom_mouse_down())
 					return;
 
@@ -891,7 +950,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 							top_line += m_visible_lines - 2;
 							return;
 						}
-						selected += m_visible_lines - 2 + (selected == 0);
+						selected += m_visible_lines - 2 + is_first_selected();
 						if (selected > item.size() - 1)
 							selected = item.size() - 1;
 						top_line += m_visible_lines - 2;
@@ -900,7 +959,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 				break;
 
 			// if we are hovering over a valid item, fake a UI_SELECT with a double-click
-			case UI_EVENT_MOUSE_DOUBLE_CLICK:
+			case ui_event::MOUSE_DOUBLE_CLICK:
 				if (!(flags & PROCESS_ONLYCHAR) && hover >= 0 && hover < item.size())
 				{
 					selected = hover;
@@ -915,7 +974,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 				break;
 
 			// caught scroll event
-			case UI_EVENT_MOUSE_WHEEL:
+			case ui_event::MOUSE_WHEEL:
 				if (!(flags & PROCESS_ONLYCHAR))
 				{
 					if (local_menu_event.zdelta > 0)
@@ -948,7 +1007,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 				break;
 
 			// translate CHAR events into specials
-			case UI_EVENT_CHAR:
+			case ui_event::IME_CHAR:
 				ev.iptkey = IPT_SPECIAL;
 				ev.unichar = local_menu_event.ch;
 				stop = true;
@@ -1003,8 +1062,8 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	validate_selection(1);
 
 	// swallow left/right keys if they are not appropriate
-	bool ignoreleft = ((item[selected].flags & FLAG_LEFT_ARROW) == 0);
-	bool ignoreright = ((item[selected].flags & FLAG_RIGHT_ARROW) == 0);
+	bool ignoreleft = ((selected_item().flags & FLAG_LEFT_ARROW) == 0);
+	bool ignoreright = ((selected_item().flags & FLAG_RIGHT_ARROW) == 0);
 
 	if ((item[0].flags & FLAG_UI_DATS))
 		ignoreleft = ignoreright = false;
@@ -1058,7 +1117,7 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	// page down advances by m_visible_items
 	if (exclusive_input_pressed(iptkey, IPT_UI_PAGE_DOWN, 6))
 	{
-		selected += m_visible_lines - 2 + (selected == 0);
+		selected += m_visible_lines - 2 + is_first_selected();
 		top_line += m_visible_lines - 2;
 
 		if (selected > item.size() - 1)
@@ -1135,7 +1194,7 @@ void menu::validate_selection(int scandir)
 void menu::do_handle()
 {
 	if (item.size() < 2)
-		populate();
+		populate(m_customtop, m_custombottom);
 	handle();
 }
 
@@ -1259,8 +1318,8 @@ void menu::extra_text_position(float origx1, float origx2, float origy, float ys
 
 void menu::extra_text_render(float top, float bottom, float origx1, float origy1, float origx2, float origy2, const char *header, const char *footer)
 {
-	header = ((header != nullptr) && (header[0] != '\0')) ? header : nullptr;
-	footer = ((footer != nullptr) && (footer[0] != '\0')) ? footer : nullptr;
+	header = (header && *header) ? header : nullptr;
+	footer = (footer && *footer) ? footer : nullptr;
 
 	if (header != nullptr)
 		extra_text_draw_box(origx1, origx2, origy1, top, header, -1);

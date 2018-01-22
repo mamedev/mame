@@ -19,12 +19,16 @@ Others: When starting the game, hold down X, then release and hit Z, otherwise
 
 **********************************************************************************/
 
-
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/cosmac/cosmac.h"
 #include "machine/clock.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
 #include "play_1.lh"
+
 
 class play_1_state : public genpin_class
 {
@@ -50,6 +54,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(ef4_r);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
+	void chance(machine_config &config);
+	void play_1(machine_config &config);
 private:
 	uint16_t m_resetcnt;
 	uint16_t m_clockcnt;
@@ -453,7 +459,7 @@ WRITE_LINE_MEMBER( play_1_state::clock_w )
 	}
 }
 
-static MACHINE_CONFIG_START( play_1, play_1_state )
+MACHINE_CONFIG_START(play_1_state::play_1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CDP1802, 400000) // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
 	MCFG_CPU_PROGRAM_MAP(play_1_map)
@@ -481,7 +487,7 @@ static MACHINE_CONFIG_START( play_1, play_1_state )
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chance, play_1 )
+MACHINE_CONFIG_DERIVED(play_1_state::chance, play_1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(chance_map)
 MACHINE_CONFIG_END
@@ -534,8 +540,8 @@ ROM_END
 
 
 /* Big Town, Last Lap and Party all reportedly share the same roms with different playfield/machine artworks */
-GAME(1978, bigtown,  0,       play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Big Town",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978, lastlap,  bigtown, play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Last Lap",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979, party,    bigtown, play_1, play_1,   driver_device, 0, ROT0, "Playmatic", "Party",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978, spcgambl, 0,       play_1, spcgambl, driver_device, 0, ROT0, "Playmatic", "Space Gambler", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1978, chance,   0,       chance, chance,   driver_device, 0, ROT0, "Playmatic", "Chance",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, bigtown,  0,       play_1, play_1,   play_1_state, 0, ROT0, "Playmatic", "Big Town",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, lastlap,  bigtown, play_1, play_1,   play_1_state, 0, ROT0, "Playmatic", "Last Lap",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979, party,    bigtown, play_1, play_1,   play_1_state, 0, ROT0, "Playmatic", "Party",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, spcgambl, 0,       play_1, spcgambl, play_1_state, 0, ROT0, "Playmatic", "Space Gambler", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978, chance,   0,       chance, chance,   play_1_state, 0, ROT0, "Playmatic", "Chance",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

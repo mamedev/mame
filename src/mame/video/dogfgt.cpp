@@ -161,7 +161,7 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_1800_w)
 	flip_screen_set(data & 0x80);
 
 	/* other bits unused? */
-	logerror("PC %04x: 1800 = %02x\n", space.device().safe_pc(), data);
+	logerror("PC %04x: 1800 = %02x\n", m_maincpu->pc(), data);
 }
 
 

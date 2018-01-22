@@ -6,12 +6,15 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "deviceinfoviewer.h"
+
+#include "util/xmlfile.h"
 
 
 @interface MAMEDeviceInfoView : NSView
 {
-	CGFloat	minWidth;
+	CGFloat minWidth;
 }
 
 - (id)initWithFrame:(NSRect)frame;
@@ -135,8 +138,8 @@
 
 
 - (id)initWithDevice:(device_t &)d machine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	MAMEDeviceInfoView	*contentView;
-	NSScrollView		*contentScroll;
+	MAMEDeviceInfoView  *contentView;
+	NSScrollView        *contentScroll;
 
 	if (!(self = [super initWithMachine:m
 								  title:[NSString stringWithFormat:@"Device %s", d.tag()]
@@ -184,7 +187,7 @@
 	if (device->interface(memory))
 	{
 		NSBox *memoryBox = nil;
-		for (address_spacenum i = AS_0; i < ADDRESS_SPACES; i++)
+		for (int i = 0; i < memory->max_space_count(); i++)
 		{
 			if (memory->has_space(i))
 			{
@@ -218,6 +221,7 @@
 	[contentScroll setHasVerticalScroller:YES];
 	[contentScroll setAutohidesScrollers:YES];
 	[contentScroll setBorderType:NSNoBorder];
+	[contentScroll setDrawsBackground:NO];
 	[contentScroll setDocumentView:contentView];
 	[contentView release];
 	[[window contentView] addSubview:contentScroll];
@@ -228,6 +232,12 @@
 
 	// don't forget the result
 	return self;
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_DEVICE_INFO_VIEWER);
 }
 
 @end

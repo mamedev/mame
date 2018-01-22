@@ -2,7 +2,7 @@
 
 ## Table of Contents
 
-* Predefined Variables
+* Predefined variables
     * [_ACTION](#_action)
     * [_ARGS](#_args)
     * [_OPTIONS](#_options)
@@ -10,7 +10,7 @@
     * [_PREMAKE_VERSION](#_premake_version)
     * [_SCRIPT](#_script)
     * [_WORKING_DIR](#_working_dir)
-* Script Functions
+* Build script functions
     * [buildaction](#buildactionaction)
     * [buildoptions](#buildoptionsoptions)
     * [configuration](#configurationkeywords)
@@ -25,7 +25,7 @@
     * [files](#filesfiles)
     * [flags](#flagsflags)
     * [framework](#frameworkversion)
-    * [iif](#iifcondition-trueval-falseval)
+    * [group](#groupname)
     * [imageoptions](#imageoptionsoptions)
     * [imagepath](#imagepathpath)
     * [implibdir](#implibdir)
@@ -41,10 +41,39 @@
     * [linkoptions](#linkoptionsoptions)
     * [links](#linksreferences)
     * [location](#locationpath)
+    * [messageskip](#messageskipoptions)
     * [newaction](#newactiondescription)
     * [newoption](#newoptionsdescription)
     * [nopch](#nopch)
     * [objdir](#objdirpath)
+    * [pchheader](#pchheaderfile)
+    * [pchsource](#pchsourcefile)
+    * [platforms](#platformsidentifiers)
+    * [postbuildcommands](#postbuildcommandscommands)
+    * [postcompiletasks](#postcompiletaskstasks)
+    * [prebuildcommands](#prebuildcommandscommands)
+    * [prelinkcommands](#prelinkcommandscommands)
+    * [project](#projectname)
+    * [removefiles](#removefilesfiles)
+    * [removeflags](#removeflagsflags)
+    * [removelinks](#removelinkslinks)
+    * [removeplatforms](#removeplatformsplatforms)
+    * [resdefines](#resdefinessymbols)
+    * [resincludedirs](#resincludedirspaths)
+    * [resoptions](#resoptionsoptions)
+    * [solution](#solutionname)
+    * [startproject](#startprojectname)
+    * [targetdir](#targetdirpath)
+    * [targetextension](#targetextensionext)
+    * [targetname](#targetnamename)
+    * [targetprefix](#targetprefixprefix)
+    * [targetsubdir](#targetsubdirpath)
+    * [targetsuffix](#targetsuffixsuffix)
+    * [userincludedirs](#userincludedirspaths)
+    * [uuid](#uuidprojectuuid)
+    * [vpaths](#vpathsgroup--pattern)
+* Utility functions
+    * [iif](#iifcondition-trueval-falseval)
     * [os.chdir](#oschdirpath)
     * [os.copyfile](#oscopyfilesource-destination)
     * [os.findlib](#osfindliblibname)
@@ -62,7 +91,7 @@
     * [os.pathsearch](#ospathsearchfname-paths)
     * [os.rmdir](#osrmdirpath)
     * [os.stat](#osstatpath)
-    * [os.uuid](#osuuid)
+    * [os.uuid](#osuuidname)
     * [path.getabsolute](#pathgetabsolutepath)
     * [path.getbasename](#pathgetbasenamepath)
     * [path.getdirectory](#pathgetdirectorypath)
@@ -77,34 +106,14 @@
     * [path.join](#pathjoinleading-trailing)
     * [path.rebase](#pathrebasepath-oldbase-newbase)
     * [path.translate](#pathtranslatepath-newsep)
-    * [pchheader](#pchheaderfile)
-    * [pchsource](#pchsourcefile)
-    * [platforms](#platformsidentifiers)
-    * [postbuildcommands](#postbuildcommandscommands)
-    * [postcompiletasks](#postcompiletaskstasks)
-    * [prebuildcommands](#prebuildcommandscommands)
-    * [prelinkcommands](#prelinkcommandscommands)
     * [printf](#printfformat-args)
-    * [project](#projectname)
-    * [resdefines](#resdefinessymbols)
-    * [resincludedirs](#resincludedirspaths)
-    * [resoptions](#resoptionsoptions)
-    * [solution](#solutionname)
     * [string.endswith](#stringendswithhaystack-needle)
     * [string.explode](#stringexplodestr-pattern)
     * [string.findlast](#stringfindlaststr-pattern-plain)
     * [string.startswith](#stringstartswithhaystack-needle)
     * [table.contains](#tablecontainsarray-value)
     * [table.implode](#tableimplodearray-before-after-between)
-    * [targetdir](#targetdirpath)
-    * [targetextension](#targetextensionext)
-    * [targetname](#targetnamename)
-    * [targetprefix](#targetprefixprefix)
-    * [targetsuffix](#targetsuffixsuffix)
-    * [userincludedirs](#userincludedirspaths)
-    * [uuid](#uuidprojectuuid)
-    * [vpaths](#vpathsgroup--pattern)
-* Additional Information
+* Additional information
     * [Wildcards](#wildcards)
 
 ---
@@ -184,7 +193,7 @@ Current working directory.
 
 ---
 
-## Script Functions
+## Build script functions
 
 ### buildaction(_action_)
 Specifies what action should be performed on a set of files during compilation. Usually paired with a configuration filter to select a file set. If no build action is specified for a file, a default action will be used (chosen based on the file's extension).
@@ -213,6 +222,16 @@ configuration "**.png"
 Passes arguments direction to the compiler command line. Multiple calls in a project will be concatenated in order.
 
 **Scope:** solutions, projects, configurations
+
+You may also use one of these functions to configure buildoptions for each individual file extension:
+
+* `buildoptions_asm` for .asm files
+* `buildoptions_c` for .c files
+* `buildoptions_cpp` for .cpp files
+* `buildoptions_objc` for .m files
+* `buildoptions_objcpp` for .mm files
+* `buildoptions_swift` for .swift files
+* `buildoptions_vala` for .vala files
 
 #### Arguments
 _options_ - list of compiler flags
@@ -346,21 +365,20 @@ for rule listed commands are executed.
 **Scope:** solutions, projects, configurations
 
 #### Arguments
-_input_file_ - source file that should be "compiled" with custom task
-_output_file_ - generated file name
-_dependency_ - additional dependencies, that can be used as parameters to commands
-_command_ - command list, special functions in commands are :
-		$(<) - input file
-		$(@) - output file
-		$(1) - $(9) - additional dependencies
+_input_file_ - source file that should be "compiled" with custom task  
+_output_file_ - generated file name  
+_dependency_ - additional dependencies, that can be used as parameters to commands  
+_command_ - command list, special functions in commands are :  
+    $(<) - input file  
+    $(@) - output file  
+    $(1) - $(9) - additional dependencies
 
 #### Examples
 
 ```lua
 custombuildtask {
-		{ ROOT_DIR .. "version.txt" , GEN_DIR .. "src/version.inc",   { ROOT_DIR .. "version.py" }, {"@echo Generating version.inc file...", "python $(1) $(<) > $(@)" }},
-	}
-	
+        { ROOT_DIR .. "version.txt" , GEN_DIR .. "src/version.inc",   { ROOT_DIR .. "version.py" }, {"@echo Generating version.inc file...", "python $(1) $(<) > $(@)" }},
+    }
 ```
 
 [Back to top](#table-of-contents)
@@ -376,7 +394,7 @@ Specifies a list of arguments to pas to the application when run under the debug
 **Scope:** solutions, projects, configurations
 
 #### Arguments
-_args_ - list of arguments to pas to the executable while debugging
+_args_ - list of arguments to pass to the executable while debugging
 
 #### Examples
 ```lua
@@ -427,13 +445,13 @@ defines { "CALLSPEC=__dllexport" }
 [Back to top](#table-of-contents)
 
 ---
-### dependency({_main_file, _depending_of_}...)
+### dependency({_main_file_, _depending_of_}...)
 GMAKE specific adds dependency between source file and any other file.
 
 **Scope:** solutions, projects, configurations
 
 #### Arguments
-_main_file - name of source file that depends of other file
+_main_file_ - name of source file that depends of other file  
 _depending_of_ - name of dependency file
 
 #### Examples
@@ -458,7 +476,7 @@ _options_ - list of arguments
 
 ---
 ### excludes({_files_...})
-Removes files added with the [`files`](#files) function. Multiple calls are concatenated.
+Excludes files from the project. This is different from [removefiles](#removefilesfiles) in that it may keep them in the project (Visual Studio) while still excluding them from the build. Multiple calls are concatenated.
 
 **Note:** May be set on the solution, project, or configuration, but only project-level file lists are currently supported.
 
@@ -518,6 +536,7 @@ Specifies build flags to modify the compiling or linking process. Multiple calls
 #### Arguments
 _flags_ - List of flag names from list below. Names are case-insensitive and ignored if not supported on a platform.
 
+* _C7DebugInfo_ - Enables C7 compatible debug info for MSVC builds.
 * _EnableSSE, EnableSSE2, EnableAVX, EnableAVX2_ - Enable SSE/AVX instruction sets
 * _ExtraWarnings_ - Sets compiler's max warning level.
 * _FatalWarnings_ - Treat warnings as errors.
@@ -535,20 +554,25 @@ _flags_ - List of flag names from list below. Names are case-insensitive and ign
 * _NoIncrementalLink_ - Disable support for Visual Studio's incremental linking feature.
 * _NoImportLib_ - Prevent the generation of an import library for a Windows DLL.
 * _NoManifest_ - Prevent the generation of a manifest for Windows executables and shared libraries.
-* _NoMinimalRebuild_ - Disable Visual Studio's minimal rebuild feature.
+* _NoMultiProcessorCompilation_ - Disables Visual Studio's and FastBuild's multiprocessor compilation.
+* _EnableMinimalRebuild_ - Enable Visual Studio's minimal rebuild feature.
 * _NoPCH_ - Disable precompiled headers.
 * _NoRTTI_ - Disable C++ runtime type information.
 * _NoWinMD_ - Disables Generation of Windows Metadata.
 * _NoWinRT_ - Disables Windows RunTime Extension for project.
+* _ObjcARC_ - Enable automatic reference counting for Object-C and Objective-C++.
 * _Optimize_ - Perform a balanced set of optimizations.
 * _OptimizeSize_ - Optimize for the smallest file size.
 * _OptimizeSpeed_ - Optimize for the best performance.
+* _PedanticWarnings_ - Enables the pedantic warning flags.
 * _SEH_ - Enable structured exception handling.
+* _SingleOutputDir_ - Allow source files in the same project to have the same name.
 * _StaticRuntime_ - Perform a static link against the standard runtime libraries.
 * _Symbols_ - Generate debugging information.
 * _Unicode_ - Enable Unicode strings. If not specified, the default toolset behavior is used.
 * _Unsafe_ - Enable the use of unsafe code in .NET applications.
 * _UseFullPaths_ - Enable absolute paths for `__FILE__`. 
+* _UnsignedChar_ - Force `char`s to be `unsigned` by default.
 * _WinMain_ - Use WinMain() as the entry point for Windows applications, rather than main().
 
 **Note:** When not set, options will default to the tool default.
@@ -592,22 +616,25 @@ framework "3.0"
 [Back to top](#table-of-contents)
 
 ---
-### iif(_condition_, _trueval_, _falseval_)
-Implements an immediate `if` clause, returning one of two possible values.
+### group(_name_)
+Creates a solution folder for Visual Studio solutions.
+
+**Scope:** solutions
 
 #### Arguments
-_condition_ - logical condition to test
-_trueval_ - value to return if _condition_ evaluates to `true`
-_falseval_ - value to return if _condition_ evaluates to `false`
+_name_ - the name of the solution folder
 
 #### Examples
 ```lua
-result = iif(os.is("windows"), "is windows", "is not windows")
-```
-
-Note that all expressions are evaluated before the condition is checked. The following expression cannot be implemented with an `iif` because it may try to concatenate a string value.
-```lua
-result = iif(x -= nil, "x is " .. x, "x is nil")
+solution "MySolution"
+    group "MyGroup1"
+        project "Project1"
+        -- ...
+        project "Project2"
+        -- ...
+    group "MyGroup2"
+        project "Project3"
+        -- ...
 ```
 [Back to top](#table-of-contents)
 
@@ -758,8 +785,9 @@ _kind_ - project kind identifier. One of:
 
 * _ConsoleApp_ - console executable
 * _WindowedApp_ - application that runs in a desktop window. Does not apply on Linux.
-* _SharedLib_ - shared library or DLL
 * _StaticLib_ - static library
+* _SharedLib_ - shared library or DLL
+* _Bundle_ - Xcode: Cocoa Bundle, everywhere else: alias to _SharedLib_
 
 #### Examples
 ```lua
@@ -858,7 +886,7 @@ configuration "macosx"
 --- OS X frameworks need the extension to be handled properly
     links { "Cocoa.framework", "png" }
 ```
-In a solution with two projects, link the library into the executable. Note that the project name is used to specify the link. GENie will automatically figure out the correect library file name and directory and create a project dependency.
+In a solution with two projects, link the library into the executable. Note that the project name is used to specify the link. GENie will automatically figure out the correct library file name and directory and create a project dependency.
 ```lua
 solution "MySolution"
     configurations { "Debug", "Release" }
@@ -907,9 +935,24 @@ _path_ - directory into which files should be generated, relative to the current
 solution "MySolution"
     location "../build"
 ```
-If you plan to build with multiple tools from the same source tree, you might want to split up the project files by toolset. The _ACTION global variable contains the current toolset identifier, as specified on the command line. Note that Lua sytax requires parentheses around the function parameters in this case.
+If you plan to build with multiple tools from the same source tree, you might want to split up the project files by toolset. The _ACTION global variable contains the current toolset identifier, as specified on the command line. Note that Lua syntax requires parentheses around the function parameters in this case.
 ```lua
 location ("../build/" .. _ACTION)
+```
+[Back to top](#table-of-contents)
+
+---
+### messageskip(_options_)
+Skips certain messages in ninja and Makefile generated projects.
+
+**Scope:** solutions
+
+#### Arguments
+_options_ - one or several of "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage"
+
+#### Examples
+```lua
+messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 ```
 [Back to top](#table-of-contents)
 
@@ -1015,494 +1058,6 @@ configuration "Release"
 [Back to top](#table-of-contents)
 
 ---
-### os.chdir(_path_)
-Changes the working directory
-
-#### Arguments
-_path_ - path to the new working directory
-
-#### Return Value
-`true` if successful, otherwise `nil` and an error message
-
-[Back to top](#table-of-contents)
-
----
-### os.copyfile(_source_, _destination_)
-Copies a file from one location to another.
-
-#### Arguments
-_source_ - file system path to the file to be copied
-_destination_ - path to the copy location
-
-#### Return Value
-`true` if successful, otherwise `nil` and an error message
-
-[Back to top](#table-of-contents)
-
----
-### os.findlib(_libname_)
-Scans the well-known system locations looking for a binary file.
-
-#### Arguments
-_libname_ - name of the library to locate. May be specified with (libX11.so) or without (X11) system-specified decorations.
-
-#### Return Value
-The path containing the library file, if found. Otherwise, `nil`.
-
-[Back to top](#table-of-contents)
-
----
-### os.get()
-Identifies the currently-targeted operating system.
-
-#### Return Value
-One of "bsd", "linux", "macosx", "solaris", or "windows"
-
-**Note:** This function returns the OS being targeted, which is not necessarily the same as the OS on which GENie is being run.
-
-#### Example
-```lua
-if os.get() == "windows" then
-    -- do something windows-specific
-end
-```
-[Back to top](#table-of-contents)
-
----
-### os.getcwd()
-Gets the current working directory.
-
-#### Return Value
-The current working directory
-
-[Back to top](#table-of-contents)
-
----
-### os.getversion()
-Retrieves version information for the host operating system
-
-**Note:** Not implemented for all platforms. On unimplemented platforms, will return `0` for all version numbers, and the platform name as the description.
-
-#### Return Value
-Table containing the following key-value pairs:
-
-| Key          | Value                                        |
-| ------------ | -------------------------------------------- |
-| majorversion | major version number                         |
-| minorversion | minor version number                         |
-| revision     | bug fix release or service pack number       |
-| description  | human-readable description of the OS version |
-
-#### Examples
-```lua
-local ver = os.getversion()
-print(string.format(" %d.%d.%d (%s)",
-    ver.majorversion, ver.minorversion, ver.revision,
-    ver.description))
-
--- On Windows XP: "5.1.3 (Windows XP)"
--- On OSX: "10.6.6 (Mac OS X Snow Leopard)"
-```
-[Back to top](#table-of-contents)
-
----
-### os.is(_id_)
-Checks the current operating system identifier against a particular value
-
-#### Arguments
-_id_ - one of "bsd", "linux", "macosx", "solaris", or "windows"
-
-**Note:** This function returns the OS being targeted, which is not necessarily the same as the OS on which GENie is being run.
-
-#### Return Value
-`true` if the supplied _id_ matches the current operating system identifer, `false` otherwise.
-
-[Back to top](#table-of-contents)
-
----
-### os.is64bit()
-Determines if the host is using a 64-bit processor.
-
-#### Return Value
-`true` if the host system has a 64-bit processor
-`false` otherwise
-
-#### Examples
-```lua
-if os.is64bit() then
-    print("This is a 64-bit system")
-else
-    print("This is NOT a 64-bit system")
-end
-```
-[Back to top](#table-of-contents)
-
----
-### os.isdir(_path_)
-Checks for the existence of a directory.
-
-#### Arguments
-_path_ - the file system path to check
-
-#### Return Value
-`true` if a matching directory is found
-`false` if there is no such file system path, or if the path points to a file
-
-[Back to top](#table-of-contents)
-
----
-### os.isfile(_path_)
-Checks for the existence of a file.
-
-#### Arguments
-_path_ - the file system path to check
-
-#### Return Value
-`true` if a matching file is found
-`false` if there is no such file system path or if the path points to a directory instead of a file
-[Back to top](#table-of-contents)
-
----
-### os.matchdirs(_pattern_)
-Performs a wildcard match to locate one or more directories.
-
-#### Arguments
-_pattern_ - file system path to search. May [wildcard](#wildcard) patterns.
-
-#### Return Value
-List of directories which match the specified pattern. May be empty.
-
-#### Examples
-```lua
-matches = os.matchdirs("src/*")     -- non-recursive match
-matches = os.matchdirs("src/**")    -- recursive match
-matches = os.matchdirs("src/test*") -- may also match partial name
-```
-[Back to top](#table-of-contents)
-
----
-### os.matchfiles(_patterns_)
-Performs a wildcard match to locate one or more directories.
-
-#### Arguments
-_pattern_ - file system path to search. May contain [wildcard](#wildcard) patterns.
-
-#### Return Value
-List of files which match the specified pattern. May be empty.
-
-#### Examples
-```lua
-matches = os.matchfiles("src/*.c")  -- non-recursive match
-matches = os.matchfiles("src/**.c") -- recursive match
-```
-[Back to top](#table-of-contents)
-
----
-### os.mkdir(_path_)
-Creates a new directory.
-
-#### Arguments
-_path_ - path to be created
-
-#### Return Value
-`true` if successful
-`nil` and an error message otherwise
-
-[Back to top](#table-of-contents)
-
----
-### os.outputof(_command_)
-Runs a shell command and returns the output.
-
-#### Arguments
-_command_ - shell command to run
-
-#### Return Value
-The output of the command
-
-#### Examples
-```lua
--- Get the ID for the host processor architecture
-local proc = os.outputof("uname -p")
-```
-[Back to top](#table-of-contents)
-
----
-### os.pathsearch(_fname_, _paths..._)
-description
-
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-_fname_ - name of the file being searched, followed by one or more path sets to be searched
-
-_paths_ - the match format of the PATH environment variable: a colon-delimited list of path. On Windows, you may use a semicolon-delimited list if drive letters might be included
-
-#### Return Value
-Path to the directory which contains the file, if found
-`nil` otherwise
-
-#### Examples
-```lua
-local p = os.pathsearch("mysystem.config", "./config:/usr/local/etc:/etc")
-```
-[Back to top](#table-of-contents)
-
----
-### os.rmdir(_path_)
-Removes an existing directory as well as any files or subdirectories it contains.
-
-#### Arguments
-_path_ - file system path to be removed
-
-#### Return Value
-`true` if successful
-`nil` and an error message otherwise
-
-[Back to top](#table-of-contents)
-
----
-### os.stat(_path_)
-Retrieves information about a file.
-
-#### Arguments
-_path_ - path to file for which to retrieve information
-
-#### Return Value
-Table of values:
-
-| Key   | Value                   |
-| ----- | ----------------------- |
-| mtime | Last modified timestamp |
-| size  | File size in bytes      |
-
-[Back to top](#table-of-contents)
-
----
-### userincludedirs({_paths_...})
-Specifies the user include file search paths. Multiple calls are concatenated.
-
-For XCode, it maps to setting the USER INCLUDE SEARCH PATH. 
-
-For clang/gcc, it maps to setting the include directory using the iquote option.
-
-On the other build systems, it behaves like [includedirs](#includedirspaths).
-
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-_paths_ - list of user include file search directories, relative to the currently-executing script file.
-
-#### Examples
-Define two include file search paths
-```lua
-userincludedirs { "../lua/include", "../zlib" }
-```
-You can also use [wildcards](#wildcards) to match multiple directories.
-```lua
-userincludedirs { "../includes/**" }
-```
-[Back to top](#table-of-contents)
-
----
-### os.uuid()
-Returns a Universally Unique Identifier
-
-#### Return Value
-A new UUID, a string value with the format `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
-
-[Back to top](#table-of-contents)
-
----
-### path.getabsolute(_path_)
-Converts relative path to absolute path
-
-#### Arguments
-_path_ - the relative path to be converted
-
-#### Return Value
-new absolute path, calculated from the current working directory
-
-[Back to top](#table-of-contents)
-
----
-### path.getbasename(_path_)
-Extracts base file portion of a path, with the directory and extension removed.
-
-#### Arguments
-_path_ - path to be split
-
-#### Return Value
-Base name portion of the path
-
-[Back to top](#table-of-contents)
-
----
-### path.getdirectory(_path_)
-Extracts directory portion of a path, with file name removed
-
-#### Arguments
-_path_ - path to be split
-
-#### Return Value
-Directory portion of the path
-
-[Back to top](#table-of-contents)
-
----
-### path.getdrive(_path_)
-Returns drive letter portion of a path
-
-#### Arguments
-_path_ - path to be split
-
-#### Return Value
-Drive letter portion of the path, or `nil`
-
-[Back to top](#table-of-contents)
-
----
-### path.getextension(_path_)
-Returns file extension portion of a path
-
-#### Arguments
-_path_ - path to be split
-
-#### Return Value
-File extension portion of the path, or an empty string
-
-[Back to top](#table-of-contents)
-
----
-### path.getname(_path_)
-Returns file name and extension, removes directory information.
-
-#### Arguments
-_path_ - path to be split
-
-#### Return Value
-File name and extension without directory information
-
-[Back to top](#table-of-contents)
-
----
-### path.getrelative(_src_, _dest_)
-Computes relative path from one directory to another.
-
-#### Arguments
-_src_ - originating directory
-_dest_ - target directory
-
-#### Return Value
-Relative path from _src_ to _dest_
-
-[Back to top](#table-of-contents)
-
----
-### path.isabsolute(_path_)
-Returns whether or not a path is absolute.
-
-#### Arguments
-_path_ - path to check
-
-#### Return Value
-`true` if path is absolute
-`false` otherwise
-
-[Back to top](#table-of-contents)
-
----
-### path.iscfile(_path_)
-Determines whether file is a C source code file, based on extension.
-
-#### Arguments
-_path_ - path to check
-
-#### Return Value
-`true` if path uses a C file extension
-`false` otherwise
-
-[Back to top](#table-of-contents)
-
----
-### path.isSourceFile(_path_)
-Determines whether a file is a C++ source code file, based on extension.
-
-#### Arguments
-_path_ - path to check
-
-#### Return Value
-`true` if path uses a C++ file extension
-`false` otherwise
-
-[Back to top](#table-of-contents)
-
----
-### path.isresourcefile(_path_)
-Determines whether a path represends a Windows resource file, based on extension.
-
-#### Arguments
-_path_ - path to check
-
-#### Return Value
-`true` if path uses a well-known Windows resource file extension
-`false` otherwise
-
-[Back to top](#table-of-contents)
-
----
-### path.join(_leading_, _trailing_)
-Joins two path portions together into a single path.
-
-**Note:** if _trailing_ is an absolute path, then _leading_ is ignored and the absolute path is returned.
-
-#### Arguments
-_leading_ - beginning portion of the path
-_trailing_ - ending portion of the path
-
-#### Return Value
-Merged path
-
-#### Examples
-```lua
--- returns "MySolution/MyProject"
-p = path.join("MySolution", "MyProject")
-
--- returns "/usr/bin", because the trailing path is absolute
-p = path.join("MySolution", "/usr/bin")
-
--- tokens are assumed to be absolute. This returns `${ProjectDir}`
-p = path.join("MySolution", "$(ProjectDir)")
-```
-[Back to top](#table-of-contents)
-
----
-### path.rebase(_path_, _oldbase_, _newbase_)
-Takes a relative path and makes it relative to a different location.
-
-#### Arguments
-_path_ - path to be modified
-_oldbase_ - original base directory, from which _path_ is relative
-_newbase_ - the new base directory, from where the resulting path should be relative
-
-#### Return Value
-Rebased path
-
-[Back to top](#table-of-contents)
-
----
-### path.translate(_path_, _newsep_)
-Converts the separators in a path.
-
-#### Arguments
-_path_ - path to modify
-_newsep_ - new path separator. Defaults to current environment default.
-
-#### Return Value
-Modified path
-[Back to top](#table-of-contents)
-
----
 ### pchheader(_file_)
 Sets the main header file for precompiled header support.
 
@@ -1552,7 +1107,12 @@ _identifiers_ - list of hardware platform specifiers from this list:
 * _Universal32_ - like _Universal_ above, but targeting only 32-bit platforms
 * _Universal64_ - like _Universal_ above, but targeting only 64-bit platforms
 * _PS3_ - Playstation 3
+* _WiiDev_ - Wii
 * _Xbox360_ - Xbox 360 compiler and linker under Visual Studio
+* _PowerPC_ - PowerPC processors
+* _ARM_ - ARM-based processors
+* _Orbis_ - Playstation 4
+* _Durango_ - Xbox One
 
 #### Return Value
 Current list of target platforms for the active solution
@@ -1660,15 +1220,6 @@ configuration "not windows"
 ```
 [Back to top](#table-of-contents)
 
----
-### printf(_format_, _args_...)
-Prints a formatted string
-
-#### Arguments
-_format_ - formatting string, containing C `printf()` formatting codes
-_args_ - arguments to be substituted into the format string
-
-[Back to top](#table-of-contents)
 
 ---
 ### project(_name_)
@@ -1714,6 +1265,52 @@ for i, prj in ipairs(prjs) do
     print(prj.name)
 end
 ```
+[Back to top](#table-of-contents)
+
+---
+### removefiles({_files_...})
+Removes files from the project. This is different from [excludes](#excludesfiles) in that it completely removes them from the project, not only from the build. Multiple calls are concatenated.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_files_ - list of files to remove.
+
+[Back to top](#table-of-contents)
+
+---
+### removeflags({_flags_...})
+Removes flags from the flag list.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_flags_ - list of flags to remove from the flag list. They must be valid flags.
+
+[Back to top](#table-of-contents)
+
+---
+### removelinks({_references_...})
+
+Removes flags from the flag list.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_references_ - list of libraries and project names to remove from the links list.
+
+[Back to top](#table-of-contents)
+
+---
+### removeplatforms({_platforms_...})
+
+Removes platforms from the platform list.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_platforms_ - list of platforms to remove from the platforms list.
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1773,7 +1370,7 @@ configuration { "linux", "gmake" }
 
 ---
 ### solution(_name_)
-Creates a new solution and makes it active. Solutions are the top-level opjects in a GENie build script, and are synonymous with a Visual Studio solution. Each solution contains one or more projects, which in turn contain the settings to generate a single binary target.
+Creates a new solution and makes it active. Solutions are the top-level objects in a GENie build script, and are synonymous with a Visual Studio solution. Each solution contains one or more projects, which in turn contain the settings to generate a single binary target.
 
 #### Arguments
 _name_ - unique name for the solution. If a solution with the given name already exists, it is made active and returned. This value will be used as the file name of the generated solution file.
@@ -1812,87 +1409,26 @@ end
 [Back to top](#table-of-contents)
 
 ---
-### string.endswith(_haystack_, _needle_)
-Checks if the given _haystack_ string ends with _needle_.
+###  startproject(_name_)
+Sets the start (default) project for the solution. Works for VS, QBS and Xcode.
+
+**Scope:** solutions
 
 #### Arguments
-_haystack_ - string to search within
-_needle_   - string to check ending of _haystack_ against
+_name_ - name of the project to set as the start project.
 
-#### Return Value
-`true`  - _haystack_ ends with _needle_
-`false` - _haystack_ does not end with _needle_
+### Examples
+```lua
+solution "MySolution"
+    startproject "MyProjectFoo"
+    -- [...]
 
-[Back to top](#table-of-contents)
+project "MyProjectFoo"
+-- [...]
 
----
-### string.explode(_str_, _pattern_)
-Breaks a string into an array of strings, formed by splitting _str_ on _pattern_.
-
-#### Arguments
-_str_     - string to be split
-_pattern_ - separator pattern at which to split; may use Lua's pattern matching syntax
-
-#### Return Value
-List of substrings
-
-[Back to top](#table-of-contents)
-
----
-### string.findlast(_str_, _pattern_, _plain_)
-Finds the last instance of a pattern within a string.
-
-#### Arguments
-_str_     - string to be searched
-_pattern_ - pattern to search for; may use Lua's pattern matching syntax
-_plain_   - whether or not plain string comparison should be used (rather than pattern-matching)
-
-#### Return Value
-The matching pattern, if found, or `nil`
-
-[Back to top](#table-of-contents)
-
----
-### string.startswith(_haystack_, _needle_)
-Checks if the given _haystack_ starts with _needle_.
-
-#### Arguments
-_haystack_ - string to search within
-_needle_   - string to check start of _haystack_ against
-
-#### Return Value
-`true`  - _haystack_ starts with _needle_
-`false` - _haystack_ does not start with _needle_
-
-[Back to top](#table-of-contents)
-
----
-### table.contains(_array_, _value_)
-Determines if a _array_ contains _value_.
-
-#### Arguments
-_array_ - table to test for _value_
-_value_ - _value_ being tested for
-
-#### Return Value
-`true`  - _array_ contains _value_
-`false` - _array_ does not contain _value_
-
-[Back to top](#table-of-contents)
-
----
-### table.implode(_array_, _before_, _after_, _between_)
-Merges an array of items into a single formatted string.
-
-#### Arguments
-_array_   - table to be converted into a string
-_before_  - string to be inserted before each item
-_after_   - string to be inserted after each item
-_between_ - string to be inserted between each item
-
-#### Return Value
-Formatted string
-
+project "MyProjectBar"
+-- [...]
+```
 [Back to top](#table-of-contents)
 
 ---
@@ -1967,6 +1503,17 @@ targetprefix ""
 [Back to top](#table-of-contents)
 
 ---
+### targetsubdir(_path_)
+Sets a subdirectory inside the target directory for the compiled binary target.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_path_ - name of the subdirectory.
+
+[Back to top](#table-of-contents)
+
+---
 ### targetsuffix(_suffix_)
 Specifies a file name suffix for the compiled binary target.
 
@@ -2012,7 +1559,7 @@ Places files into groups for "virtual paths", rather than mirroring the filesyst
 #### Arguments
 Table of values, where keys (_groups_) are strings and values (_pattern_) are lists of file system patterns.
 
-_group_   - name for the new group
+_group_   - name for the new group  
 _pattern_ - file system pattern for matching file names
 
 #### Examples
@@ -2034,7 +1581,7 @@ It is also possible to include the file's path in the virtual group. Using this 
 vpaths { ["Headers/*"] = "**.h" }
 ```
 
-Any directory information explicitly provided in the pattern will be remvoed from the replacement. Using this rule, "src/lua/lua.h" will appear in the IDE as "Headers/lua/lua.h".
+Any directory information explicitly provided in the pattern will be removed from the replacement. Using this rule, "src/lua/lua.h" will appear in the IDE as "Headers/lua/lua.h".
 ```lua
 vpaths { ["Headers/*"] = "src/**.h" }
 ```
@@ -2055,8 +1602,616 @@ vpaths {
 [Back to top](#table-of-contents)
 
 ---
+## Utility functions
 
-## Additional Information
+### iif(_condition_, _trueval_, _falseval_)
+Implements an immediate `if` clause, returning one of two possible values.
+
+#### Arguments
+_condition_ - logical condition to test  
+_trueval_ - value to return if _condition_ evaluates to `true`  
+_falseval_ - value to return if _condition_ evaluates to `false`
+
+#### Examples
+```lua
+result = iif(os.is("windows"), "is windows", "is not windows")
+```
+
+Note that all expressions are evaluated before the condition is checked. The following expression cannot be implemented with an `iif` because it may try to concatenate a string value.
+```lua
+result = iif(x -= nil, "x is " .. x, "x is nil")
+```
+[Back to top](#table-of-contents)
+
+---
+### os.chdir(_path_)
+Changes the working directory
+
+#### Arguments
+_path_ - path to the new working directory
+
+#### Return Value
+`true` if successful, otherwise `nil` and an error message
+
+[Back to top](#table-of-contents)
+
+---
+### os.copyfile(_source_, _destination_)
+Copies a file from one location to another.
+
+#### Arguments
+_source_ - file system path to the file to be copied
+_destination_ - path to the copy location
+
+#### Return Value
+`true` if successful, otherwise `nil` and an error message
+
+[Back to top](#table-of-contents)
+
+---
+### os.findlib(_libname_)
+Scans the well-known system locations looking for a binary file.
+
+#### Arguments
+_libname_ - name of the library to locate. May be specified with (libX11.so) or without (X11) system-specified decorations.
+
+#### Return Value
+The path containing the library file, if found. Otherwise, `nil`.
+
+[Back to top](#table-of-contents)
+
+---
+### os.get()
+Identifies the currently-targeted operating system.
+
+#### Return Value
+One of "bsd", "linux", "macosx", "solaris", or "windows"
+
+**Note:** This function returns the OS being targeted, which is not necessarily the same as the OS on which GENie is being run.
+
+#### Example
+```lua
+if os.get() == "windows" then
+    -- do something windows-specific
+end
+```
+[Back to top](#table-of-contents)
+
+---
+### os.getcwd()
+Gets the current working directory.
+
+#### Return Value
+The current working directory
+
+[Back to top](#table-of-contents)
+
+---
+### os.getversion()
+Retrieves version information for the host operating system
+
+**Note:** Not implemented for all platforms. On unimplemented platforms, will return `0` for all version numbers, and the platform name as the description.
+
+#### Return Value
+Table containing the following key-value pairs:
+
+| Key          | Value                                        |
+| ------------ | -------------------------------------------- |
+| majorversion | major version number                         |
+| minorversion | minor version number                         |
+| revision     | bug fix release or service pack number       |
+| description  | human-readable description of the OS version |
+
+#### Examples
+```lua
+local ver = os.getversion()
+print(string.format(" %d.%d.%d (%s)",
+    ver.majorversion, ver.minorversion, ver.revision,
+    ver.description))
+
+-- On Windows XP: "5.1.3 (Windows XP)"
+-- On OSX: "10.6.6 (Mac OS X Snow Leopard)"
+```
+[Back to top](#table-of-contents)
+
+---
+### os.is(_id_)
+Checks the current operating system identifier against a particular value
+
+#### Arguments
+_id_ - one of "bsd", "linux", "macosx", "solaris", or "windows"
+
+**Note:** This function returns the OS being targeted, which is not necessarily the same as the OS on which GENie is being run.
+
+#### Return Value
+`true` if the supplied _id_ matches the current operating system identifier, `false` otherwise.
+
+[Back to top](#table-of-contents)
+
+---
+### os.is64bit()
+Determines if the host is using a 64-bit processor.
+
+#### Return Value
+`true` if the host system has a 64-bit processor
+`false` otherwise
+
+#### Examples
+```lua
+if os.is64bit() then
+    print("This is a 64-bit system")
+else
+    print("This is NOT a 64-bit system")
+end
+```
+[Back to top](#table-of-contents)
+
+---
+### os.isdir(_path_)
+Checks for the existence of a directory.
+
+#### Arguments
+_path_ - the file system path to check
+
+#### Return Value
+`true` if a matching directory is found  
+`false` if there is no such file system path, or if the path points to a file
+
+[Back to top](#table-of-contents)
+
+---
+### os.isfile(_path_)
+Checks for the existence of a file.
+
+#### Arguments
+_path_ - the file system path to check
+
+#### Return Value
+`true` if a matching file is found  
+`false` if there is no such file system path or if the path points to a directory instead of a file
+
+[Back to top](#table-of-contents)
+
+---
+### os.matchdirs(_pattern_)
+Performs a wildcard match to locate one or more directories.
+
+#### Arguments
+_pattern_ - file system path to search. May [wildcard](#wildcard) patterns.
+
+#### Return Value
+List of directories which match the specified pattern. May be empty.
+
+#### Examples
+```lua
+matches = os.matchdirs("src/*")     -- non-recursive match
+matches = os.matchdirs("src/**")    -- recursive match
+matches = os.matchdirs("src/test*") -- may also match partial name
+```
+[Back to top](#table-of-contents)
+
+---
+### os.matchfiles(_patterns_)
+Performs a wildcard match to locate one or more directories.
+
+#### Arguments
+_pattern_ - file system path to search. May contain [wildcard](#wildcard) patterns.
+
+#### Return Value
+List of files which match the specified pattern. May be empty.
+
+#### Examples
+```lua
+matches = os.matchfiles("src/*.c")  -- non-recursive match
+matches = os.matchfiles("src/**.c") -- recursive match
+```
+[Back to top](#table-of-contents)
+
+---
+### os.mkdir(_path_)
+Creates a new directory.
+
+#### Arguments
+_path_ - path to be created
+
+#### Return Value
+`true` if successful  
+`nil` and an error message otherwise
+
+[Back to top](#table-of-contents)
+
+---
+### os.outputof(_command_)
+Runs a shell command and returns the output.
+
+#### Arguments
+_command_ - shell command to run
+
+#### Return Value
+The output of the command
+
+#### Examples
+```lua
+-- Get the ID for the host processor architecture
+local proc = os.outputof("uname -p")
+```
+[Back to top](#table-of-contents)
+
+---
+### os.pathsearch(_fname_, _paths..._)
+description
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_fname_ - name of the file being searched, followed by one or more path sets to be searched  
+_paths_ - the match format of the PATH environment variable: a colon-delimited list of path. On Windows, you may use a semicolon-delimited list if drive letters might be included
+
+#### Return Value
+Path to the directory which contains the file, if found
+`nil` otherwise
+
+#### Examples
+```lua
+local p = os.pathsearch("mysystem.config", "./config:/usr/local/etc:/etc")
+```
+[Back to top](#table-of-contents)
+
+---
+### os.rmdir(_path_)
+Removes an existing directory as well as any files or subdirectories it contains.
+
+#### Arguments
+_path_ - file system path to be removed
+
+#### Return Value
+`true` if successful  
+`nil` and an error message otherwise
+
+[Back to top](#table-of-contents)
+
+---
+### os.stat(_path_)
+Retrieves information about a file.
+
+#### Arguments
+_path_ - path to file for which to retrieve information
+
+#### Return Value
+Table of values:
+
+| Key   | Value                   |
+| ----- | ----------------------- |
+| mtime | Last modified timestamp |
+| size  | File size in bytes      |
+
+[Back to top](#table-of-contents)
+
+---
+### userincludedirs({_paths_...})
+Specifies the user include file search paths. Multiple calls are concatenated.
+
+For XCode, it maps to setting the USER INCLUDE SEARCH PATH. 
+
+For clang/gcc, it maps to setting the include directory using the iquote option.
+
+On the other build systems, it behaves like [includedirs](#includedirspaths).
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_paths_ - list of user include file search directories, relative to the currently-executing script file.
+
+#### Examples
+Define two include file search paths
+```lua
+userincludedirs { "../lua/include", "../zlib" }
+```
+You can also use [wildcards](#wildcards) to match multiple directories.
+```lua
+userincludedirs { "../includes/**" }
+```
+[Back to top](#table-of-contents)
+
+---
+### os.uuid(_name_)
+Returns a Universally Unique Identifier
+
+#### Arguments
+_name_ - (optional) string to be hashed
+
+#### Return Value
+A new UUID, a string value with the format `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`, generated from _name_ if it is provided, otherwise generated from random data
+
+[Back to top](#table-of-contents)
+
+---
+### path.getabsolute(_path_)
+Converts relative path to absolute path
+
+#### Arguments
+_path_ - the relative path to be converted
+
+#### Return Value
+New absolute path, calculated from the current working directory
+
+[Back to top](#table-of-contents)
+
+---
+### path.getbasename(_path_)
+Extracts base file portion of a path, with the directory and extension removed.
+
+#### Arguments
+_path_ - path to be split
+
+#### Return Value
+Base name portion of the path
+
+[Back to top](#table-of-contents)
+
+---
+### path.getdirectory(_path_)
+Extracts directory portion of a path, with file name removed
+
+#### Arguments
+_path_ - path to be split
+
+#### Return Value
+Directory portion of the path
+
+[Back to top](#table-of-contents)
+
+---
+### path.getdrive(_path_)
+Returns drive letter portion of a path
+
+#### Arguments
+_path_ - path to be split
+
+#### Return Value
+Drive letter portion of the path, or `nil`
+
+[Back to top](#table-of-contents)
+
+---
+### path.getextension(_path_)
+Returns file extension portion of a path
+
+#### Arguments
+_path_ - path to be split
+
+#### Return Value
+File extension portion of the path, or an empty string
+
+[Back to top](#table-of-contents)
+
+---
+### path.getname(_path_)
+Returns file name and extension, removes directory information.
+
+#### Arguments
+_path_ - path to be split
+
+#### Return Value
+File name and extension without directory information
+
+[Back to top](#table-of-contents)
+
+---
+### path.getrelative(_src_, _dest_)
+Computes relative path from one directory to another.
+
+#### Arguments
+_src_ - originating directory  
+_dest_ - target directory
+
+#### Return Value
+Relative path from _src_ to _dest_
+
+[Back to top](#table-of-contents)
+
+---
+### path.isabsolute(_path_)
+Returns whether or not a path is absolute.
+
+#### Arguments
+_path_ - path to check
+
+#### Return Value
+`true` if path is absolute  
+`false` otherwise
+
+[Back to top](#table-of-contents)
+
+---
+### path.iscfile(_path_)
+Determines whether file is a C source code file, based on extension.
+
+#### Arguments
+_path_ - path to check
+
+#### Return Value
+`true` if path uses a C file extension  
+`false` otherwise
+
+[Back to top](#table-of-contents)
+
+---
+### path.isSourceFile(_path_)
+Determines whether a file is a C++ source code file, based on extension.
+
+#### Arguments
+_path_ - path to check
+
+#### Return Value
+`true` if path uses a C++ file extension  
+`false` otherwise
+
+[Back to top](#table-of-contents)
+
+---
+### path.isresourcefile(_path_)
+Determines whether a path represends a Windows resource file, based on extension.
+
+#### Arguments
+_path_ - path to check
+
+#### Return Value
+`true` if path uses a well-known Windows resource file extension  
+`false` otherwise
+
+[Back to top](#table-of-contents)
+
+---
+### path.join(_leading_, _trailing_)
+Joins two path portions together into a single path.
+
+**Note:** if _trailing_ is an absolute path, then _leading_ is ignored and the absolute path is returned.
+
+#### Arguments
+_leading_ - beginning portion of the path  
+_trailing_ - ending portion of the path
+
+#### Return Value
+Merged path
+
+#### Examples
+```lua
+-- returns "MySolution/MyProject"
+p = path.join("MySolution", "MyProject")
+
+-- returns "/usr/bin", because the trailing path is absolute
+p = path.join("MySolution", "/usr/bin")
+
+-- tokens are assumed to be absolute. This returns `${ProjectDir}`
+p = path.join("MySolution", "$(ProjectDir)")
+```
+[Back to top](#table-of-contents)
+
+---
+### path.rebase(_path_, _oldbase_, _newbase_)
+Takes a relative path and makes it relative to a different location.
+
+#### Arguments
+_path_ - path to be modified  
+_oldbase_ - original base directory, from which _path_ is relative  
+_newbase_ - the new base directory, from where the resulting path should be relative
+
+#### Return Value
+Rebased path
+
+[Back to top](#table-of-contents)
+
+---
+### path.translate(_path_, _newsep_)
+Converts the separators in a path.
+
+#### Arguments
+_path_ - path to modify  
+_newsep_ - new path separator. Defaults to current environment default.
+
+#### Return Value
+Modified path
+
+[Back to top](#table-of-contents)
+---
+
+### printf(_format_, _args_...)
+Prints a formatted string
+
+#### Arguments
+_format_ - formatting string, containing C `printf()` formatting codes  
+_args_ - arguments to be substituted into the format string
+
+[Back to top](#table-of-contents)
+
+---
+### string.endswith(_haystack_, _needle_)
+Checks if the given _haystack_ string ends with _needle_.
+
+#### Arguments
+_haystack_ - string to search within  
+_needle_   - string to check ending of _haystack_ against
+
+#### Return Value
+`true`  - _haystack_ ends with _needle_  
+`false` - _haystack_ does not end with _needle_
+
+[Back to top](#table-of-contents)
+
+---
+### string.explode(_str_, _pattern_)
+Breaks a string into an array of strings, formed by splitting _str_ on _pattern_.
+
+#### Arguments
+_str_     - string to be split  
+_pattern_ - separator pattern at which to split; may use Lua's pattern matching syntax
+
+#### Return Value
+List of substrings
+
+[Back to top](#table-of-contents)
+
+---
+### string.findlast(_str_, _pattern_, _plain_)
+Finds the last instance of a pattern within a string.
+
+#### Arguments
+_str_     - string to be searched  
+_pattern_ - pattern to search for; may use Lua's pattern matching syntax  
+_plain_   - whether or not plain string comparison should be used (rather than pattern-matching)
+
+#### Return Value
+The matching pattern, if found, or `nil`
+
+[Back to top](#table-of-contents)
+
+---
+### string.startswith(_haystack_, _needle_)
+Checks if the given _haystack_ starts with _needle_.
+
+#### Arguments
+_haystack_ - string to search within  
+_needle_   - string to check start of _haystack_ against
+
+#### Return Value
+`true`  - _haystack_ starts with _needle_  
+`false` - _haystack_ does not start with _needle_
+
+[Back to top](#table-of-contents)
+
+---
+### table.contains(_array_, _value_)
+Determines if a _array_ contains _value_.
+
+#### Arguments
+_array_ - table to test for _value_  
+_value_ - _value_ being tested for
+
+#### Return Value
+`true`  - _array_ contains _value_  
+`false` - _array_ does not contain _value_
+
+[Back to top](#table-of-contents)
+
+---
+### table.implode(_array_, _before_, _after_, _between_)
+Merges an array of items into a single formatted string.
+
+#### Arguments
+_array_   - table to be converted into a string  
+_before_  - string to be inserted before each item  
+_after_   - string to be inserted after each item  
+_between_ - string to be inserted between each item
+
+#### Return Value
+Formatted string
+
+[Back to top](#table-of-contents)
+
+---
+
+## Additional information
 
 ### Wildcards
 

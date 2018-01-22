@@ -26,7 +26,7 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
 
 2015-06-19: Added code for the centronics printer port
 
-2016-01-14: Casstte tape motor fixed for working perperly and ROM file changed for CP/M disk loading
+2016-01-14: Cassette tape motor fixed to work properly and ROM file changed for CP/M disk loading
 
 ****************************************************************************/
 /*
@@ -129,20 +129,24 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
  */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "video/mc6847.h"
-#include "imagedev/cassette.h"
-#include "formats/spc1000_cas.h"
-#include "bus/centronics/ctronics.h"
 
+#include "bus/centronics/ctronics.h"
 #include "bus/spc1000/exp.h"
 #include "bus/spc1000/fdd.h"
 #include "bus/spc1000/vdp.h"
 
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/spc1000_cas.h"
+
 
 class spc1000_state : public driver_device
 {
@@ -174,6 +178,7 @@ public:
 		return m_p_videoram[0x1000 + (ch & 0x7f) * 16 + line];
 	}
 
+	void spc1000(machine_config &config);
 private:
 	uint8_t m_IPLK;
 	uint8_t m_GMODE;
@@ -454,7 +459,7 @@ extern SLOT_INTERFACE_START(spc1000_exp)
 	SLOT_INTERFACE("vdp", SPC1000_VDP_EXP)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( spc1000, spc1000_state )
+MACHINE_CONFIG_START(spc1000_state::spc1000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(spc1000_mem)
@@ -467,7 +472,7 @@ static MACHINE_CONFIG_START( spc1000, spc1000_state )
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(spc1000_state, irq_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(spc1000_state, mc6847_videoram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(spc1000_state, get_char_rom)
-	MCFG_MC6847_FIXED_MODE(MC6847_MODE_GM2)
+	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2)
 	// other lines not connected
 
 	/* sound hardware */
@@ -516,5 +521,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY    FULLNAME       FLAGS */
-COMP( 1982, spc1000,  0,      0,       spc1000,   spc1000, driver_device,  0,   "Samsung", "SPC-1000", 0 )
+//    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS           INIT  COMPANY    FULLNAME    FLAGS
+COMP( 1982, spc1000,  0,      0,       spc1000,   spc1000, spc1000_state,  0,    "Samsung", "SPC-1000", 0 )

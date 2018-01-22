@@ -8,6 +8,7 @@
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 struct lordgun_gun_data
 {
@@ -105,6 +106,8 @@ public:
 	void lorddgun_calc_gun_scr(int i);
 	void lordgun_update_gun(int i);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void aliencha(machine_config &config);
+	void lordgun(machine_config &config);
 };
 
 /*----------- defined in video/lordgun.c -----------*/

@@ -107,9 +107,19 @@ int core_strwildcmp(const char *sp1, const char *sp2)
 	return core_stricmp(s1, s2);
 }
 
+bool core_iswildstr(const char *sp)
+{
+	for ( ; sp && *sp; sp++)
+	{
+		if (('?' == *sp) || ('*' == *sp))
+			return true;
+	}
+	return false;
+}
+
 
 /*-------------------------------------------------
-    core_strdup - string duplication via osd_malloc
+    core_strdup - string duplication via malloc
 -------------------------------------------------*/
 
 char *core_strdup(const char *str)
@@ -117,7 +127,7 @@ char *core_strdup(const char *str)
 	char *cpy = nullptr;
 	if (str != nullptr)
 	{
-		cpy = (char *)osd_malloc_array(strlen(str) + 1);
+		cpy = (char *)malloc(strlen(str) + 1);
 		if (cpy != nullptr)
 			strcpy(cpy, str);
 	}
@@ -161,44 +171,58 @@ void strreplacechr(std::string& str, char ch, char newch)
 	}
 }
 
-std::string strtrimspace(std::string& str)
+static std::string &internal_strtrimspace(std::string& str, bool right_only)
 {
-	int start = 0;
-	for (auto & elem : str)
+	// identify the start
+	std::string::iterator start = str.begin();
+	if (!right_only)
 	{
-		if (!isspace(uint8_t(elem)))  break;
-		start++;
+		start = std::find_if(
+			str.begin(),
+			str.end(),
+			[](char c) { return !isspace(uint8_t(c)); });
 	}
-	int end = str.length();
-	if (end > 0)
-	{
-		for (size_t i = str.length() - 1; i > 0; i--)
-		{
-			if (!isspace(uint8_t(str[i]))) break;
-			end--;
-		}
-	}
-	str = str.substr(start, end-start);
+
+	// identify the end
+	std::string::iterator end = std::find_if(
+		str.rbegin(),
+		std::string::reverse_iterator(start),
+		[](char c) { return !isspace(uint8_t(c)); }).base();
+
+	// extract the string
+	str = end > start
+		? str.substr(start - str.begin(), end - start)
+		: "";
 	return str;
 }
 
-std::string strmakeupper(std::string& str)
+std::string &strtrimspace(std::string& str)
+{
+	return internal_strtrimspace(str, false);
+}
+
+std::string &strtrimrightspace(std::string& str)
+{
+	return internal_strtrimspace(str, true);
+}
+
+std::string &strmakeupper(std::string& str)
 {
 	std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 	return str;
 }
 
 /**
- * @fn  std::string strmakelower(std::string& str)
+ * @fn  std::string &strmakelower(std::string& str)
  *
- * @brief   Strmakelowers the given string.
+ * @brief   Changes the given string to lower case.
  *
- * @param [in,out]  str The string.
+ * @param [in,out]  str The string to make lower case
  *
- * @return  A std::string.
+ * @return  A reference to the original std::string having been changed to lower case
  */
 
-std::string strmakelower(std::string& str)
+std::string &strmakelower(std::string& str)
 {
 	std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 	return str;

@@ -26,12 +26,7 @@ two 6809s and as the reset generator for the entire system.
 #include "machine/c117.h"
 
 
-static MACHINE_CONFIG_FRAGMENT( namco_c117 )
-	MCFG_WATCHDOG_ADD("watchdog")
-MACHINE_CONFIG_END
-
-
-const device_type NAMCO_C117 = &device_creator<namco_c117_device>;
+DEFINE_DEVICE_TYPE(NAMCO_C117, namco_c117_device, "namco_c117", "Namco C117 MMU")
 
 
 //-------------------------------------------------
@@ -39,7 +34,7 @@ const device_type NAMCO_C117 = &device_creator<namco_c117_device>;
 //-------------------------------------------------
 
 namco_c117_device::namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NAMCO_C117, "Namco C117 MMU", tag, owner, clock, "namco_c117", __FILE__),
+	: device_t(mconfig, NAMCO_C117, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_subres_cb(*this),
 	m_program_config("program", ENDIANNESS_BIG, 8, 23),
@@ -47,6 +42,13 @@ namco_c117_device::namco_c117_device(const machine_config &mconfig, const char *
 	m_subcpu_tag(nullptr),
 	m_watchdog(*this, "watchdog")
 {
+}
+
+device_memory_interface::space_config_vector namco_c117_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 //-------------------------------------------------
@@ -77,8 +79,8 @@ void namco_c117_device::device_start()
 
 	m_cpuexec[0] = maincpu;
 	m_cpuexec[1] = subcpu;
-	m_cpudirect[0] = &maincpu->space(AS_PROGRAM).direct();
-	m_cpudirect[1] = &subcpu->space(AS_PROGRAM).direct();
+	m_cpudirect[0] = maincpu->space(AS_PROGRAM).direct<0>();
+	m_cpudirect[1] = subcpu->space(AS_PROGRAM).direct<0>();
 
 	memset(&m_offsets, 0, sizeof(m_offsets));
 	m_subres = m_wdog = 0;
@@ -115,14 +117,12 @@ void namco_c117_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_mconfig_additions - return a pointer to
-//  the device's machine fragment
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor namco_c117_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( namco_c117 );
-}
+MACHINE_CONFIG_START(namco_c117_device::device_add_mconfig)
+	MCFG_WATCHDOG_ADD("watchdog")
+MACHINE_CONFIG_END
 
 
 READ8_MEMBER(namco_c117_device::main_r)

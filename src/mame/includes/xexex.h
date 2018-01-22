@@ -9,13 +9,15 @@
 #include "video/k053250.h"
 #include "sound/flt_vol.h"
 #include "sound/k054539.h"
-#include "machine/gen_latch.h"
 #include "machine/k053252.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k054338.h"
 #include "video/k053251.h"
 #include "video/konami_helper.h"
+#include "machine/k054321.h"
+#include "machine/timer.h"
+#include "screen.h"
 
 class xexex_state : public driver_device
 {
@@ -39,9 +41,7 @@ public:
 		m_k054338(*this, "k054338"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2"),
-		m_soundlatch3(*this, "soundlatch3") { }
+		m_k054321(*this, "k054321") { }
 
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_workram;
@@ -77,19 +77,14 @@ public:
 	required_device<k054338_device> m_k054338;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<generic_latch_8_device> m_soundlatch2;
-	required_device<generic_latch_8_device> m_soundlatch3;
+	required_device<k054321_device> m_k054321;
 
 	DECLARE_READ16_MEMBER(spriteram_mirror_r);
 	DECLARE_WRITE16_MEMBER(spriteram_mirror_w);
 	DECLARE_READ16_MEMBER(xexex_waitskip_r);
 	DECLARE_READ16_MEMBER(control2_r);
 	DECLARE_WRITE16_MEMBER(control2_w);
-	DECLARE_WRITE16_MEMBER(sound_cmd1_w);
-	DECLARE_WRITE16_MEMBER(sound_cmd2_w);
 	DECLARE_WRITE16_MEMBER(sound_irq_w);
-	DECLARE_READ16_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_DRIVER_INIT(xexex);
 	virtual void machine_start() override;
@@ -104,4 +99,5 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 	K054539_CB_MEMBER(ym_set_mixing);
+	void xexex(machine_config &config);
 };

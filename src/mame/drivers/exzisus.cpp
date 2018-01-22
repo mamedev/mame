@@ -20,7 +20,7 @@ System specs :
 ===============
    CPU       : Z80 x 4
    Sound     : YM2151
-   Chips     : TC0010VCU x 2 + TC0140SYT
+   Chips     : TC0010VCU x 2 + PC060HA
 
    There are two types of Exzisus PCB:
 
@@ -36,11 +36,14 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/exzisus.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/ym2151.h"
-#include "includes/exzisus.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -114,8 +117,8 @@ static ADDRESS_MAP_START( cpub_map, AS_PROGRAM, 8, exzisus_state )
 	AM_RANGE(0xc000, 0xc5ff) AM_RAM AM_SHARE("objectram0")
 	AM_RANGE(0xc600, 0xdfff) AM_RAM AM_SHARE("videoram0")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, master_port_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w)
+	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, master_port_w)
+	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("ciu", pc060ha_device, master_comm_r, master_comm_w)
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("P1")
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(cpub_bankswitch_w)
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("P2")
@@ -139,8 +142,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, exzisus_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 ADDRESS_MAP_END
 
 
@@ -222,7 +225,7 @@ GFXDECODE_END
 
 
 /* All clocks are unconfirmed */
-static MACHINE_CONFIG_START( exzisus, exzisus_state )
+MACHINE_CONFIG_START(exzisus_state::exzisus)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpua", Z80, 6000000)
@@ -252,7 +255,7 @@ static MACHINE_CONFIG_START( exzisus, exzisus_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", exzisus)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 1024)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 1024)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -262,9 +265,9 @@ static MACHINE_CONFIG_START( exzisus, exzisus_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("cpub")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("cpub")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -387,6 +390,6 @@ ROM_START( exzisust )
 	ROM_LOAD( "b23-05.16l", 0x00800, 0x00400, CRC(87f0f69a) SHA1(37df6fd56245fab9beaabfd86fd8f95d7c42c2a5) )
 ROM_END
 
-GAME( 1987, exzisus,  0,       exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation", "Exzisus (Japan, dedicated)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exzisusa, exzisus, exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation", "Exzisus (Japan, conversion)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, exzisust, exzisus, exzisus, exzisus, driver_device, 0, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisus,  0,       exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation",               "Exzisus (Japan, dedicated)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisusa, exzisus, exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation",               "Exzisus (Japan, conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, exzisust, exzisus, exzisus, exzisus, exzisus_state, 0, ROT0, "Taito Corporation (TAD license)", "Exzisus (TAD license)",       MACHINE_SUPPORTS_SAVE )

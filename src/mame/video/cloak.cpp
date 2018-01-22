@@ -146,9 +146,9 @@ WRITE8_MEMBER(cloak_state::cloak_videoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(cloak_state::cloak_flipscreen_w)
+WRITE_LINE_MEMBER(cloak_state::cocktail_w)
 {
-	flip_screen_set(data & 0x80);
+	flip_screen_set(state);
 }
 
 TILE_GET_INFO_MEMBER(cloak_state::get_bg_tile_info)

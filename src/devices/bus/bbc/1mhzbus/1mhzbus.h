@@ -14,7 +14,7 @@
              0V   7   8  NIRQ
              0V   9  10  NPGFC
              0V  11  12  NPGFD
-             0V  13  14  RST
+             0V  13  14  NRST
              0V  15  16  Analog In
              0V  17  18  D0
              D1  19  20  D2
@@ -72,12 +72,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_BBC_1MHZBUS_1MHZBUS_H
+#define MAME_BUS_BBC_1MHZBUS_1MHZBUS_H
+
 #pragma once
 
-#ifndef __BBC_1MHZBUS_SLOT__
-#define __BBC_1MHZBUS_SLOT__
-
-#include "emu.h"
 
 
 //**************************************************************************
@@ -123,12 +122,13 @@ public:
 	virtual ~bbc_1mhzbus_slot_device();
 
 	// callbacks
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object)
-		{ return downcast<bbc_1mhzbus_slot_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
+	{ return downcast<bbc_1mhzbus_slot_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_nmi_handler(device_t &device, _Object object)
-		{ return downcast<bbc_1mhzbus_slot_device &>(device).m_nmi_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
+	{ return downcast<bbc_1mhzbus_slot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
+	DECLARE_WRITE_LINE_MEMBER( rst_w );
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
 
@@ -151,19 +151,21 @@ class device_bbc_1mhzbus_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_bbc_1mhzbus_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_bbc_1mhzbus_interface();
 
+	virtual DECLARE_WRITE_LINE_MEMBER(rst_w) { }
+
 protected:
+	device_bbc_1mhzbus_interface(const machine_config &mconfig, device_t &device);
+
 	bbc_1mhzbus_slot_device *m_slot;
 };
 
 
 // device type definition
-extern const device_type BBC_1MHZBUS_SLOT;
+DECLARE_DEVICE_TYPE(BBC_1MHZBUS_SLOT, bbc_1mhzbus_slot_device)
 
-SLOT_INTERFACE_EXTERN( bbcb_1mhzbus_devices );
-SLOT_INTERFACE_EXTERN( bbcm_1mhzbus_devices );
+SLOT_INTERFACE_EXTERN( bbc_1mhzbus_devices );
 
 
-#endif
+#endif // MAME_BUS_BBC_1MHZBUS_1MHZBUS_H

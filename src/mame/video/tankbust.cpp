@@ -41,11 +41,11 @@ TILE_GET_INFO_MEMBER(tankbust_state::get_bg_tile_info)
 #if 0
 	if (attr&0x08)  //priority bg/sprites (1 = this bg tile on top of sprites)
 	{
-		color = ((int)rand()) & 0x0f;
+		color = ((int)machine().rand()) & 0x0f;
 	}
 	if (attr&0x80)  //all the roofs of all buildings have this bit set. What's this ???
 	{
-		color = ((int)rand()) & 0x0f;
+		color = ((int)machine().rand()) & 0x0f;
 	}
 #endif
 
@@ -191,7 +191,7 @@ void tankbust_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 #if 0
 		if ((m_spriteram[offs+2] & 0x02))
 		{
-			code = ((int)rand()) & 63;
+			code = ((int)machine().rand()) & 63;
 		}
 #endif
 

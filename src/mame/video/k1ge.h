@@ -6,8 +6,10 @@
 
 ******************************************************************************/
 
-#ifndef __K2GE_H_
-#define __K2GE_H_
+#ifndef MAME_VIDEO_K1GE_H
+#define MAME_VIDEO_K1GE_H
+
+#pragma once
 
 
 #define MCFG_K1GE_ADD(_tag, _clock, _screen, _vblank, _hblank ) \
@@ -23,30 +25,29 @@
 	devcb = &k1ge_device::static_set_hblank_callback( *device, DEVCB_##_hblank );
 
 
-class k1ge_device : public device_t,
-					public device_video_interface
+class k1ge_device : public device_t, public device_video_interface
 {
 public:
 	k1ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	k1ge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	DECLARE_PALETTE_INIT(k1ge);
-
 	void update( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	// Static methods
-	template<class _Object> static devcb_base &static_set_vblank_callback(device_t &device, _Object object) { return downcast<k1ge_device &>(device).m_vblank_pin_w.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_hblank_callback(device_t &device, _Object object) { return downcast<k1ge_device &>(device).m_hblank_pin_w.set_callback(object); }
+	template <class Object> static devcb_base &static_set_vblank_callback(device_t &device, Object &&cb) { return downcast<k1ge_device &>(device).m_vblank_pin_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_hblank_callback(device_t &device, Object &&cb) { return downcast<k1ge_device &>(device).m_hblank_pin_w.set_callback(std::forward<Object>(cb)); }
 
 	static const int K1GE_SCREEN_HEIGHT = 199;
+
 protected:
+	k1ge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	devcb_write_line m_vblank_pin_w;
 	devcb_write_line m_hblank_pin_w;
@@ -64,6 +65,8 @@ protected:
 	TIMER_CALLBACK_MEMBER( hblank_on_timer_callback );
 	TIMER_CALLBACK_MEMBER( timer_callback );
 
+private:
+	DECLARE_PALETTE_INIT(k1ge);
 };
 
 
@@ -72,9 +75,8 @@ class k2ge_device : public k1ge_device
 public:
 	k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(k2ge);
 protected:
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual void draw(int line) override;
 
@@ -83,10 +85,11 @@ protected:
 	void k1ge_draw_scroll_plane( uint16_t *p, uint16_t base, int line, int scroll_x, int scroll_y, uint16_t pal_lut_base, uint16_t k2ge_lut_base );
 	void k1ge_draw_sprite_plane( uint16_t *p, uint16_t priority, int line, int scroll_x, int scroll_y );
 
+private:
+	DECLARE_PALETTE_INIT(k2ge);
 };
 
-extern const device_type K1GE;
-extern const device_type K2GE;
+DECLARE_DEVICE_TYPE(K1GE, k1ge_device)
+DECLARE_DEVICE_TYPE(K2GE, k2ge_device)
 
-
-#endif
+#endif // MAME_VIDEO_K1GE_H

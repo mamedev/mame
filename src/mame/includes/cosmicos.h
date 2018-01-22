@@ -1,18 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#ifndef MAME_INCLUDES_COSMICOS_H
+#define MAME_INCLUDES_COSMICOS_H
+
 #pragma once
 
-#ifndef __COSMICOS__
-#define __COSMICOS__
-
-#include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
-#include "machine/ram.h"
 #include "imagedev/snapquik.h"
+#include "machine/ram.h"
 #include "machine/rescap.h"
+#include "machine/timer.h"
 #include "sound/cdp1864.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "video/dm9368.h"
 
 #define CDP1802_TAG     "ic19"
@@ -135,6 +135,7 @@ public:
 	DECLARE_DRIVER_INIT(cosmicos);
 	TIMER_DEVICE_CALLBACK_MEMBER(digit_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(int_tick);
+	void cosmicos(machine_config &config);
 };
 
-#endif
+#endif // MAME_INCLUDES_COSMICOS_H

@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli,Acho A. Tang, R. Belmont
+#ifndef MAME_VIDEO_K051960_H
+#define MAME_VIDEO_K051960_H
+
 #pragma once
-#ifndef __K051960_H__
-#define __K051960_H__
+
+#include "screen.h"
 
 enum
 {
@@ -16,7 +19,7 @@ typedef device_delegate<void (int *code, int *color, int *priority, int *shadow)
 #define K051960_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority, int *shadow)
 
 #define MCFG_K051960_CB(_class, _method) \
-	k051960_device::set_k051960_callback(*device, k051960_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	k051960_device::set_k051960_callback(*device, k051960_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K051960_PLANEORDER(_order) \
 	k051960_device::set_plane_order(*device, _order);
@@ -30,9 +33,11 @@ typedef device_delegate<void (int *code, int *color, int *priority, int *shadow)
 #define MCFG_K051960_NMI_HANDLER(_devcb) \
 	devcb = &k051960_device::set_nmi_handler(*device, DEVCB_##_devcb);
 
+#define MCFG_K051960_VREG_CONTRAST_HANDLER(_devcb) \
+	devcb = &k051960_device::set_vreg_contrast_handler(*device, DEVCB_##_devcb);
 
-class k051960_device : public device_t,
-							public device_gfx_interface
+
+class k051960_device : public device_t, public device_gfx_interface
 {
 	static const gfx_layout spritelayout;
 	static const gfx_layout spritelayout_reverse;
@@ -43,13 +48,16 @@ class k051960_device : public device_t,
 
 public:
 	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~k051960_device() {}
 
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object)
-		{ return downcast<k051960_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb)
+	{ return downcast<k051960_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_nmi_handler(device_t &device, _Object object)
-		{ return downcast<k051960_device &>(device).m_nmi_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
+	{ return downcast<k051960_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
+
+	template <class Object> static devcb_base &set_vreg_contrast_handler(device_t &device, Object &&cb)
+	{ return downcast<k051960_device &>(device).m_vreg_contrast_handler.set_callback(std::forward<Object>(cb)); }
+
 
 	// static configuration
 	static void set_k051960_callback(device_t &device, k051960_cb_delegate callback) { downcast<k051960_device &>(device).m_k051960_cb = callback; }
@@ -97,8 +105,10 @@ private:
 	k051960_cb_delegate m_k051960_cb;
 
 	devcb_write_line m_irq_handler;
+	// TODO: is this even used by anything?
 	devcb_write_line m_firq_handler;
 	devcb_write_line m_nmi_handler;
+	devcb_write_line m_vreg_contrast_handler;
 
 	uint8_t    m_spriterombank[3];
 	int      m_romoffset;
@@ -108,6 +118,6 @@ private:
 	int k051960_fetchromdata( int byte );
 };
 
-extern const device_type K051960;
+DECLARE_DEVICE_TYPE(K051960, k051960_device)
 
-#endif
+#endif // MAME_VIDEO_K051960_H

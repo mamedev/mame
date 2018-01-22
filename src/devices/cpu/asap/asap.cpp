@@ -12,27 +12,28 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "asap.h"
+#include "asapdasm.h"
+#include "debugger.h"
 
 
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
-const uint32_t PS_CFLAG           = 0x00000001;
-const uint32_t PS_VFLAG           = 0x00000002;
-const uint32_t PS_ZFLAG           = 0x00000004;
-const uint32_t PS_NFLAG           = 0x00000008;
-const uint32_t PS_IFLAG           = 0x00000010;
-const uint32_t PS_PFLAG           = 0x00000020;
+constexpr uint32_t PS_CFLAG           = 0x00000001;
+constexpr uint32_t PS_VFLAG           = 0x00000002;
+constexpr uint32_t PS_ZFLAG           = 0x00000004;
+constexpr uint32_t PS_NFLAG           = 0x00000008;
+constexpr uint32_t PS_IFLAG           = 0x00000010;
+constexpr uint32_t PS_PFLAG           = 0x00000020;
 
-//const int EXCEPTION_RESET       = 0;
-const int EXCEPTION_TRAP0       = 1;
-const int EXCEPTION_TRAPF       = 2;
-const int EXCEPTION_INTERRUPT   = 3;
+//constexpr int EXCEPTION_RESET       = 0;
+constexpr int EXCEPTION_TRAP0       = 1;
+constexpr int EXCEPTION_TRAPF       = 2;
+constexpr int EXCEPTION_INTERRUPT   = 3;
 
-const int REGBASE               = 0xffe0;
+constexpr int REGBASE               = 0xffe0;
 
 
 
@@ -130,14 +131,14 @@ const asap_device::ophandler asap_device::s_conditiontable[16] =
 //**************************************************************************
 
 // device type definition
-const device_type ASAP = &device_creator<asap_device>;
+DEFINE_DEVICE_TYPE(ASAP, asap_device, "asap", "ASAP")
 
 //-------------------------------------------------
 //  asap_device - constructor
 //-------------------------------------------------
 
 asap_device::asap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, ASAP, "ASAP", tag, owner, clock, "asap", __FILE__),
+	: cpu_device(mconfig, ASAP, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 32),
 		m_pc(0),
 		m_pflag(0),
@@ -183,7 +184,7 @@ void asap_device::device_start()
 {
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc).noshow();
@@ -235,9 +236,11 @@ void asap_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *asap_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector asap_device::memory_space_config() const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 
@@ -298,38 +301,14 @@ void asap_device::state_string_export(const device_state_entry &entry, std::stri
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t asap_device::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t asap_device::disasm_max_opcode_bytes() const
-{
-	return 12;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t asap_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *asap_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( asap );
-	return CPU_DISASSEMBLE_NAME(asap)(this, buffer, pc, oprom, opram, options);
+	return new asap_disassembler;
 }
-
 
 
 //**************************************************************************

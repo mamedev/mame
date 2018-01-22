@@ -26,7 +26,11 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "chsuper.lh"
+
 
 class chsuper_state : public driver_device
 {
@@ -51,6 +55,7 @@ public:
 	required_device<palette_device> m_palette;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void chsuper(machine_config &config);
 protected:
 	// driver_device overrides
 	//virtual void machine_start();
@@ -338,7 +343,7 @@ static GFXDECODE_START( chsuper )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 1 )
 GFXDECODE_END
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, chsuper_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, chsuper_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -347,7 +352,7 @@ ADDRESS_MAP_END
 *     Machine Drivers      *
 ***************************/
 
-static MACHINE_CONFIG_START( chsuper, chsuper_state )
+MACHINE_CONFIG_START(chsuper_state::chsuper)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 4)   /* HD64180RP8, 8 MHz? */
@@ -524,9 +529,9 @@ DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
 
 		j = i ^ (m_tilexor << 5);
 
-		j = BITSWAP24(j,23,22,21,20,19,18,17,13, 15,14,16,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
-		j = BITSWAP24(j,23,22,21,20,19,18,17,14, 15,16,13,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
-		j = BITSWAP24(j,23,22,21,20,19,18,17,15, 16,14,13,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
+		j = bitswap<24>(j,23,22,21,20,19,18,17,13, 15,14,16,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
+		j = bitswap<24>(j,23,22,21,20,19,18,17,14, 15,16,13,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
+		j = bitswap<24>(j,23,22,21,20,19,18,17,15, 16,14,13,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
 
 		buffer[j] = rom[i];
 	}

@@ -6,10 +6,10 @@
  *
  *****************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_XXX_H
+#define MAME_CPU_XXX_H
 
-#ifndef __XXX_H__
-#define __XXX_H__
+#pragma once
 
 enum
 {
@@ -24,7 +24,7 @@ class xxx_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	xxx_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	xxx_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -39,15 +39,14 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ); }
+	virtual const address_space_config *memory_space_config(int spacenum) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : (spacenum == AS_DATA) ? &m_data_config : nullptr; }
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual uint32_t opcode_alignment() const override { return 4; }
+	virtual offs_t disassemble(char *buffer, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;
@@ -63,9 +62,9 @@ private:
 };
 
 
-extern const device_type XXX;
+DECLARE_DEVICE_TYPE(XXX, xxx_cpu_device)
 
 
 CPU_DISASSEMBLE( xxx );
 
-#endif /* __XXX_H__ */
+#endif // MAME_CPU_XXX_H

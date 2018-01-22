@@ -6,12 +6,13 @@
  *
  ****************************************************************************/
 
-#ifndef P2000T_H_
-#define P2000T_H_
+#ifndef MAME_INCLUDES_P2000T_H
+#define MAME_INCLUDES_P2000T_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "video/saa5050.h"
 
 
@@ -54,6 +55,8 @@ public:
 	DECLARE_PALETTE_INIT(p2000m);
 	uint32_t screen_update_p2000m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(p2000_interrupt);
+	void p2000t(machine_config &config);
+	void p2000m(machine_config &config);
 };
 
-#endif /* P2000T_H_ */
+#endif // MAME_INCLUDES_P2000T_H

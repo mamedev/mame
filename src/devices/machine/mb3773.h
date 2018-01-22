@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_MB3773_H
+#define MAME_MACHINE_MB3773_H
 
-#ifndef __MB3773_H__
-#define __MB3773_H__
+#pragma once
 
 
 //**************************************************************************
@@ -24,8 +24,7 @@
 
 // ======================> mb3773_device
 
-class mb3773_device :
-	public device_t
+class mb3773_device : public device_t
 {
 public:
 	// construction/destruction
@@ -51,6 +50,6 @@ private:
 
 
 // device type definition
-extern const device_type MB3773;
+DECLARE_DEVICE_TYPE(MB3773, mb3773_device)
 
-#endif
+#endif // MAME_MACHINE_MB3773_H

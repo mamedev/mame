@@ -1,16 +1,5 @@
-local sql = require("lsqlite3")
 local datfile = {}
-local db = sql.open(mame_manager:ui():options().entries.historypath:value():match("([^;]+)") .. "/history.db")
-if db then
-	local found = false
-	db:exec("select * from sqllite_master where name = version", function() found = true return 0 end)
-	if not found then
-		db:exec([[
-			CREATE TABLE version (
-				version VARCHAR NOT NULL,
-				datfile VARCHAR UNIQUE NOT NULL)]])
-	end
-end
+local db = require("data/database")
 
 function datfile.open(file, vertag, fixupcb)
 	if not db then
@@ -18,10 +7,11 @@ function datfile.open(file, vertag, fixupcb)
 	end
 	local function read(tag1, tag2, set)
 		local data
-		local stmt = db:prepare("SELECT f.data FROM \"" .. file .. "_idx\" AS fi, \"" .. file .. [["
+		local stmt = db.prepare("SELECT f.data FROM \"" .. file .. "_idx\" AS fi, \"" .. file .. [["
 		 AS f WHERE fi.type = ? AND fi.val = ? AND fi.romset = ? AND f.rowid = fi.data]])
+		db.check("reading " .. tag1 .. " - " .. tag2 .. " - " .. set)
 		stmt:bind_values(tag1, tag2, set)
-		if stmt:step() == sql.ROW then
+		if stmt:step() == db.ROW then
 			data = stmt:get_value(0)
 		end
 		stmt:finalize()
@@ -38,31 +28,34 @@ function datfile.open(file, vertag, fixupcb)
 		if fh then
 			break
 		end
-		return
 	end
 	-- remove unsafe chars from file for use in sql statement
 	file = file:gsub("[^%w%._]", "")
 
-	local stmt = db:prepare("SELECT version FROM version WHERE datfile = ?")
+	local stmt = db.prepare("SELECT version FROM version WHERE datfile = ?")
+	db.check("reading version")
 	stmt:bind_values(file)
-	if stmt:step() == sql.ROW then
+	if stmt:step() == db.ROW then
 		dbver = stmt:get_value(0)
 	end
 	stmt:finalize()
-	
-	if not dbver then
-		db:exec("CREATE TABLE \"" .. file .. [[_idx" (
+
+	if not fh and dbver then
+		-- data in database but missing file, just use what we have
+		return read, dbver
+	elseif not fh then
+		return nil
+	elseif not dbver then
+		db.exec("CREATE TABLE \"" .. file .. [[_idx" (
 				type VARCHAR NOT NULL,
 				val VARCHAR NOT NULL,
 				romset VARCHAR NOT NULL,
 				data INTEGER NOT NULL)]])
-		db:exec("CREATE TABLE \"" .. file .. "\" (data CLOB NOT NULL)")
-		db:exec("CREATE INDEX typeval ON \"" .. file .. "_idx\"(type, val)")
-	elseif not fh then
-		-- data in database but missing file, just use what we have
-		return read, dbver
-	elseif not fh and not dbver then
-		return nil
+		db.check("creating index")
+		db.exec("CREATE TABLE \"" .. file .. "\" (data CLOB NOT NULL)")
+		db.check("creating table")
+		db.exec("CREATE INDEX \"typeval_" .. file .. "\" ON \"" .. file .. "_idx\"(type, val)")
+		db.check("creating typeval index")
 	end
 
 	if vertag then
@@ -73,20 +66,26 @@ function datfile.open(file, vertag, fixupcb)
 				break
 			end
 		end
-	else
+	end
+	if not ver then
 		-- use file ctime for version
 		ver = tostring(lfs.attributes(filepath, "change"))
 	end
 	if ver == dbver then
+		fh:close()
 		return read, dbver
 	end
 
 	if dbver then
-		db:exec("DELETE FROM \"" .. file .. "\"")
-		db:exec("DELETE FROM \"" .. file .. "_idx\"")
-		stmt = db:prepare("UPDATE version SET version = ? WHERE datfile = ?")
+		db.exec("DELETE FROM \"" .. file .. "\"")
+		db.check("deleting")
+		db.exec("DELETE FROM \"" .. file .. "_idx\"")
+		db.check("deleting index")
+		stmt = db.prepare("UPDATE version SET version = ? WHERE datfile = ?")
+		db.check("updating version")
 	else
-		stmt = db:prepare("INSERT INTO version VALUES (?, ?)")
+		stmt = db.prepare("INSERT INTO version VALUES (?, ?)")
+		db.check("inserting version")
 	end
 	stmt:bind_values(ver, file)
 	stmt:step()
@@ -96,13 +95,14 @@ function datfile.open(file, vertag, fixupcb)
 		local inblock = false
 		fh:seek("set")
 		local buffer = fh:read("a")
-		db:exec("BEGIN TRANSACTION")
+		db.exec("BEGIN TRANSACTION")
+		db.check("beginning transaction")
 		local function gmatchpos()
 			local pos = 1
 			local function iter()
 				local tag1, tag2, data, start, inblock = false
 				while not data do
-					local spos, epos, match = buffer:find("\n($[^\n]*)", pos)
+					local spos, epos, match = buffer:find("\n($[^\n\r]*)", pos)
 					if not spos then
 						return nil
 					end
@@ -133,10 +133,12 @@ function datfile.open(file, vertag, fixupcb)
 				set:gsub("([^,]+)", function(s) sets[#sets + 1] = s end)
 				if #tags > 0 and #sets > 0 then
 					local tag1 = info2:match("^$([^%s]*)")
+					data = data:gsub("\r", "") -- strip crs
 					if fixupcb then
 						data = fixupcb(data)
 					end
-					stmt = db:prepare("INSERT INTO \"" .. file .. "\" VALUES (?)")
+					stmt = db.prepare("INSERT INTO \"" .. file .. "\" VALUES (?)")
+					db.check("inserting values")
 					stmt:bind_values(data)
 					stmt:step()
 					local row = stmt:last_insert_rowid()
@@ -146,7 +148,8 @@ function datfile.open(file, vertag, fixupcb)
 							if fixupcb then
 								fixupcb(data)
 							end
-							stmt = db:prepare("INSERT INTO \"" .. file .. "_idx\" VALUES (?, ?, ?, ?)")
+							stmt = db.prepare("INSERT INTO \"" .. file .. "_idx\" VALUES (?, ?, ?, ?)")
+							db.check("inserting into index")
 							stmt:bind_values(tag1, tag2, set, row)
 							stmt:step()
 							stmt:finalize()
@@ -155,7 +158,8 @@ function datfile.open(file, vertag, fixupcb)
 				end
 			end
 		end
-		db:exec("END TRANSACTION")
+		db.exec("END TRANSACTION")
+		db.check("ending transaction")
 	end
 	fh:close()
 

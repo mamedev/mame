@@ -15,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VECTREX_CART_SLOT = &device_creator<vectrex_cart_slot_device>;
+DEFINE_DEVICE_TYPE(VECTREX_CART_SLOT, vectrex_cart_slot_device, "vectrex_cart_slot", "GCE Vectrex Cartridge Slot")
 
 //**************************************************************************
 //    Vectrex Cartridges Interface
@@ -63,11 +63,12 @@ void device_vectrex_cart_interface::rom_alloc(uint32_t size, const char *tag)
 //  vectrex_cart_slot_device - constructor
 //-------------------------------------------------
 vectrex_cart_slot_device::vectrex_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, VECTREX_CART_SLOT, "GCE Vectrex Cartridge Slot", tag, owner, clock, "vectrex_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this),
-						m_type(VECTREX_STD),
-						m_vec3d(VEC3D_NONE), m_cart(nullptr)
+	device_t(mconfig, VECTREX_CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_type(VECTREX_STD),
+	m_vec3d(VEC3D_NONE),
+	m_cart(nullptr)
 {
 }
 
@@ -87,18 +88,6 @@ vectrex_cart_slot_device::~vectrex_cart_slot_device()
 void vectrex_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_vectrex_cart_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void vectrex_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -152,7 +141,7 @@ image_init_result vectrex_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t size = !loaded_through_softlist() ? length() : get_software_region_length("rom");
 		uint8_t *ROM;
 
 		if (size > 0x10000)
@@ -164,7 +153,7 @@ image_init_result vectrex_cart_slot_device::call_load()
 		m_cart->rom_alloc((size < 0x1000) ? 0x1000 : size, tag());
 		ROM = m_cart->get_rom_base();
 
-		if (software_entry() == nullptr)
+		if (!loaded_through_softlist())
 			fread(ROM, size);
 		else
 			memcpy(ROM, get_software_region("rom"), size);
@@ -206,16 +195,16 @@ image_init_result vectrex_cart_slot_device::call_load()
  get default card software
  -------------------------------------------------*/
 
-std::string vectrex_cart_slot_device::get_default_card_software()
+std::string vectrex_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
-		uint32_t size = m_file->size();
+		uint32_t size = hook.image_file()->size();
 		std::vector<uint8_t> rom(size);
 		int type = VECTREX_STD;
 
-		m_file->read(&rom[0], size);
+		hook.image_file()->read(&rom[0], size);
 
 		if (!memcmp(&rom[0x06], "SRAM", 4))
 			type = VECTREX_SRAM;
@@ -225,7 +214,6 @@ std::string vectrex_cart_slot_device::get_default_card_software()
 		slot_string = vectrex_get_slot(type);
 
 		//printf("type: %s\n", slot_string);
-		clear();
 
 		return std::string(slot_string);
 	}

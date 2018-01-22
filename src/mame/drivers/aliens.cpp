@@ -10,12 +10,14 @@ Preliminary driver by:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/aliens.h"
+#include "includes/konamipt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
-#include "includes/konamipt.h"
-#include "includes/aliens.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(aliens_state::aliens_coin_counter_w)
@@ -100,7 +102,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bank0000_map, AS_PROGRAM, 8, aliens_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aliens_sound_map, AS_PROGRAM, 8, aliens_state )
@@ -189,7 +191,7 @@ WRITE8_MEMBER( aliens_state::banking_callback )
 	m_rombank->set_entry(data & 0x1f);
 }
 
-static MACHINE_CONFIG_START( aliens, aliens_state )
+MACHINE_CONFIG_START(aliens_state::aliens)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)       /* 052001 (verified on pcb) */
@@ -202,8 +204,8 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 	MCFG_DEVICE_ADD("bank0000", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank0000_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(11)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(11)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -477,10 +479,10 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1990, aliens,   0,      aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (World set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliens2,  aliens, aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (World set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliens3,  aliens, aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (World set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensu,  aliens, aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (US)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensj,  aliens, aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensj2, aliens, aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, aliensa,  aliens, aliens, aliens, driver_device, 0, ROT0, "Konami", "Aliens (Asia)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens,   0,      aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens2,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliens3,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (World set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensu,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (US)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensj,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensj2, aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, aliensa,  aliens, aliens, aliens, aliens_state, 0, ROT0, "Konami", "Aliens (Asia)",        MACHINE_SUPPORTS_SAVE )

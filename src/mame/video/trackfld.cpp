@@ -101,13 +101,10 @@ WRITE8_MEMBER(trackfld_state::trackfld_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(trackfld_state::trackfld_flipscreen_w)
+WRITE_LINE_MEMBER(trackfld_state::flipscreen_w)
 {
-	if (flip_screen() != data)
-	{
-		flip_screen_set(data);
-		machine().tilemap().mark_all_dirty();
-	}
+	flip_screen_set(state);
+	machine().tilemap().mark_all_dirty();
 }
 
 WRITE8_MEMBER(trackfld_state::atlantol_gfxbank_w)

@@ -108,13 +108,10 @@ WRITE8_MEMBER(mikie_state::mikie_palettebank_w)
 	}
 }
 
-WRITE8_MEMBER(mikie_state::mikie_flipscreen_w)
+WRITE_LINE_MEMBER(mikie_state::flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
-	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
-	}
+	flip_screen_set(state);
+	machine().tilemap().mark_all_dirty();
 }
 
 TILE_GET_INFO_MEMBER(mikie_state::get_bg_tile_info)

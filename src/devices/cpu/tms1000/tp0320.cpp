@@ -9,7 +9,9 @@
 
 */
 
+#include "emu.h"
 #include "tp0320.h"
+#include "tms1k_dasm.h"
 #include "debugger.h"
 
 // TP0320 is TI's first CMOS MCU with integrated LCD controller, the die is still very similar to TMS0980
@@ -21,12 +23,12 @@
 // - 64-term microinstructions PLA between the RAM and ROM, similar to TMS0980,
 //   plus separate lines for custom opcode handling like TMS0270, used for SETR and RSTR
 // - 24-term output PLA above LCD RAM
-const device_type TP0320 = &device_creator<tp0320_cpu_device>; // 28-pin SDIP, ..
+DEFINE_DEVICE_TYPE(TP0320, tp0320_cpu_device, "tp0320", "TP0320") // 28-pin SDIP, ..
 
 
 // internal memory maps
 static ADDRESS_MAP_START(program_11bit_9, AS_PROGRAM, 16, tms1k_base_device)
-	AM_RANGE(0x000, 0xfff) AM_ROM
+	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_192x4, AS_DATA, 8, tms1k_base_device)
@@ -36,46 +38,41 @@ ADDRESS_MAP_END
 
 
 // device definitions
-tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms0980_cpu_device(mconfig, TP0320, "TP0320", tag, owner, clock, 7 /* o pins */, 10 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 12 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_192x4), "tp0320", __FILE__)
-{ }
-
-
-// machine configs
-static MACHINE_CONFIG_FRAGMENT(tp0320)
-
-	// main opcodes PLA(partial), microinstructions PLA
-	MCFG_PLA_ADD("ipla", 9, 6, 8)
-	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
-	MCFG_PLA_ADD("mpla", 6, 22, 64)
-	MCFG_PLA_FILEFORMAT(PLA_FMT_BERKELEY)
-MACHINE_CONFIG_END
-
-machine_config_constructor tp0320_cpu_device::device_mconfig_additions() const
+tp0320_cpu_device::tp0320_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: tms0980_cpu_device(mconfig, TP0320, tag, owner, clock, 7 /* o pins */, 10 /* r pins */, 7 /* pc bits */, 9 /* byte width */, 4 /* x width */, 11 /* prg width */, ADDRESS_MAP_NAME(program_11bit_9), 8 /* data width */, ADDRESS_MAP_NAME(data_192x4))
 {
-	return MACHINE_CONFIG_NAME(tp0320);
 }
 
 
+// machine configs
+MACHINE_CONFIG_START(tp0320_cpu_device::device_add_mconfig)
+
+	// main opcodes PLA(partial), microinstructions PLA
+	MCFG_PLA_ADD("ipla", 9, 6, 8)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
+	MCFG_PLA_ADD("mpla", 6, 22, 64)
+	MCFG_PLA_FILEFORMAT(BERKELEY)
+MACHINE_CONFIG_END
+
+
 // disasm
-offs_t tp0320_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tp0320_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE(tp0320);
-	return CPU_DISASSEMBLE_NAME(tp0320)(this, buffer, pc, oprom, opram, options);
+	return new tp0320_disassembler;
 }
 
 
 // device_reset
-uint32_t tp0320_cpu_device::decode_micro(uint8_t sel)
+u32 tp0320_cpu_device::decode_micro(u8 sel)
 {
-	uint32_t decode = 0;
+	u32 decode = 0;
 
-	sel = BITSWAP8(sel,7,6,0,1,2,3,4,5); // lines are reversed
-	uint32_t mask = m_mpla->read(sel);
+	sel = bitswap<8>(sel,7,6,0,1,2,3,4,5); // lines are reversed
+	u32 mask = m_mpla->read(sel);
 	mask ^= 0x0bff0; // invert active-negative
 
-	//                                                    _____  _______  ______  _____  _____  ______  _____  _____  ______  _____         _____
-	const uint32_t md[22] = { M_AUTA, M_AUTY, M_SSS, M_STO, M_YTP, M_NDMTP, M_DMTP, M_MTP, M_CKP, M_15TN, M_CKN, M_MTN, M_NATN, M_ATN, M_CME, M_CIN, M_SSE, M_CKM, M_NE, M_C8, M_SETR, M_RSTR };
+	//                                                 _____  _______  ______  _____  _____  ______  _____  _____  ______  _____         _____
+	const u32 md[22] = { M_AUTA, M_AUTY, M_SSS, M_STO, M_YTP, M_NDMTP, M_DMTP, M_MTP, M_CKP, M_15TN, M_CKN, M_MTN, M_NATN, M_ATN, M_CME, M_CIN, M_SSE, M_CKM, M_NE, M_C8, M_SETR, M_RSTR };
 
 	for (int bit = 0; bit < 22 && bit < m_mpla->outputs(); bit++)
 		if (mask & (1 << bit))

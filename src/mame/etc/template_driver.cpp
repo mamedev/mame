@@ -10,6 +10,8 @@ Template for skeleton drivers
 #include "emu.h"
 #include "cpu/z80/z80.h"
 //#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK XTAL_8MHz
 
@@ -17,22 +19,26 @@ class xxx_state : public driver_device
 {
 public:
 	xxx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
-	{ }
-
-	// devices
-	required_device<cpu_device> m_maincpu;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{
+	}
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(xxx);
+
+	void xxx(machine_config &config);
+
 protected:
 	// driver_device overrides
-	virtual void machine_start();
-	virtual void machine_reset();
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
-	virtual void video_start();
+	virtual void video_start() override;
+
+	// devices
+	required_device<cpu_device> m_maincpu;
 };
 
 void xxx_state::video_start()
@@ -137,7 +143,7 @@ PALETTE_INIT_MEMBER(xxx_state, xxx)
 {
 }
 
-static MACHINE_CONFIG_START( xxx, xxx_state )
+MACHINE_CONFIG_START(xxx_state::xxx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/2)
@@ -152,7 +158,7 @@ static MACHINE_CONFIG_START( xxx, xxx_state )
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240)          /* generic NTSC video timing at 320x240 */
-	//MCFG_SCREEN_RAW_PARAMS(SYS_A_CPU_CLOCK/4, 442, 0, 256, 263, 16, 240)  /* generic NTSC video timing at 256x224 */
+	//MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 0, 256, 264, 16, 240)  /* generic NTSC video timing at 256x224 */
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xxx)
@@ -191,4 +197,4 @@ ROM_END
 // For a generic system:
 // SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)
 
-GAME( 198?, xxx,  0,   xxx,  xxx, driver_device,  0,       ROT0, "<template_manufacturer>",      "<template_machinename>", MACHINE_IS_SKELETON )
+GAME( 198?, xxx,  0,   xxx,  xxx, xxx_state,  0,       ROT0, "<template_manufacturer>",      "<template_machinename>", MACHINE_IS_SKELETON )

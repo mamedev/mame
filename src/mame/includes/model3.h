@@ -6,8 +6,12 @@
 #include "machine/53c810.h"
 #include "audio/dsbz80.h"
 #include "machine/eepromser.h"
+#include "machine/i8251.h"
 #include "sound/scsp.h"
 #include "machine/315-5881_crypt.h"
+#include "machine/msm6242.h"
+#include "machine/timer.h"
+#include "screen.h"
 
 typedef float MATRIX[4][4];
 typedef float VECTOR[4];
@@ -60,10 +64,12 @@ public:
 		m_scsp1(*this, "scsp1"),
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
+		m_rtc(*this, "rtc"),
 		m_adc_ports(*this, {"AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7"}),
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
 		m_dsbz80(*this, DSBZ80_TAG),
+		m_uart(*this, "uart"),
 		m_soundram(*this, "soundram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -79,12 +85,14 @@ public:
 	required_device<scsp_device> m_scsp1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;
+	required_device<rtc72421_device> m_rtc;
 
 	optional_ioport_array<8> m_adc_ports;
 
 	required_shared_ptr<uint64_t> m_work_ram;
 	required_shared_ptr<uint64_t> m_paletteram64;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
+	optional_device<i8251_device> m_uart;
 	required_shared_ptr<uint16_t> m_soundram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -332,4 +340,11 @@ public:
 	int first_read;
 	uint16_t crypt_read_callback(uint32_t addr);
 
+	void model3_21_5881(machine_config &config);
+	void model3_20_5881(machine_config &config);
+	void model3_15(machine_config &config);
+	void model3_10(machine_config &config);
+	void model3_20(machine_config &config);
+	void model3_21(machine_config &config);
+	void scud(machine_config &config);
 };

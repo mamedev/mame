@@ -22,8 +22,12 @@ TODO:
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/speedspn.h"
+
+#include "cpu/z80/z80.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /*** README INFO **************************************************************
 
@@ -91,7 +95,7 @@ WRITE8_MEMBER(speedspn_state::okibank_w)
 
 static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, speedspn_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* RAM COLOUR */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") /* RAM COLOUR */
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(attram_w) AM_SHARE("attram")
 	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(vidram_r, vidram_w)  /* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
@@ -122,7 +126,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, speedspn_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, speedspn_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, speedspn_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -273,7 +277,7 @@ void speedspn_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( speedspn, speedspn_state )
+MACHINE_CONFIG_START(speedspn_state::speedspn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,6000000)      /* 6 MHz */
@@ -302,9 +306,9 @@ static MACHINE_CONFIG_START( speedspn, speedspn_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
 /*** ROM LOADING *************************************************************/
@@ -335,4 +339,4 @@ ROM_END
 
 /*** GAME DRIVERS ************************************************************/
 
-GAME( 1994, speedspn, 0, speedspn, speedspn, driver_device, 0, ROT180, "TCH", "Speed Spin", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, speedspn, 0, speedspn, speedspn, speedspn_state, 0, ROT180, "TCH", "Speed Spin", MACHINE_SUPPORTS_SAVE )

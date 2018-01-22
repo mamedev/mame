@@ -1,15 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
+#ifndef MAME_MACHINE_K057714_H
+#define MAME_MACHINE_K057714_H
 
 #pragma once
-#ifndef __K057714_H__
-#define __K057714_H__
+
 
 class k057714_device : public device_t
 {
 public:
 	k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	template<class _Object> static devcb_base &static_set_irq_callback(device_t &device, _Object object) { return downcast<k057714_device &>(device).m_irq.set_callback(object); }
+	template <class Object> static devcb_base &static_set_irq_callback(device_t &device, Object &&cb) { return downcast<k057714_device &>(device).m_irq.set_callback(std::forward<Object>(cb)); }
 
 	int draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -60,10 +61,10 @@ private:
 	devcb_write_line m_irq;
 };
 
-extern const device_type K057714;
+DECLARE_DEVICE_TYPE(K057714, k057714_device)
 
 #define MCFG_K057714_IRQ_CALLBACK(_devcb) \
 	devcb = &k057714_device::static_set_irq_callback(*device, DEVCB_##_devcb);
 
 
-#endif
+#endif // MAME_MACHINE_K057714_H

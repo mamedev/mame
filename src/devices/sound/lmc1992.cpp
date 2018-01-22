@@ -20,16 +20,17 @@
 
 */
 
+#include "emu.h"
 #include "lmc1992.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
-
 
 #define MICROWIRE_DEVICE_ADDRESS    2
 
@@ -63,7 +64,7 @@ enum
 //**************************************************************************
 
 // devices
-const device_type LMC1992 = &device_creator<lmc1992_device>;
+DEFINE_DEVICE_TYPE(LMC1992, lmc1992_device, "lmc1992", "LMC1992")
 
 
 
@@ -82,47 +83,47 @@ inline void lmc1992_device::execute_command(int addr, int data)
 	case FUNCTION_INPUT_SELECT:
 		if (data == INPUT_SELECT_OPEN)
 		{
-			if (LOG) logerror("LMC1992 '%s' Input Select : OPEN\n", tag());
+			LOG("LMC1992 Input Select : OPEN\n");
 		}
 		else
 		{
-			if (LOG) logerror("LMC1992 '%s' Input Select : INPUT%u\n", tag(), data);
+			LOG("LMC1992 Input Select : INPUT%u\n", data);
 		}
 		m_input = data;
 		break;
 
 	case FUNCTION_BASS:
-		if (LOG) logerror("LMC1992 '%s' Bass : %i dB\n", tag(), -40 + (data * 2));
+		LOG("LMC1992 Bass : %i dB\n", -40 + (data * 2));
 		m_bass = data;
 		break;
 
 	case FUNCTION_TREBLE:
-		if (LOG) logerror("LMC1992 '%s' Treble : %i dB\n", tag(), -40 + (data * 2));
+		LOG("LMC1992 Treble : %i dB\n", -40 + (data * 2));
 		m_treble = data;
 		break;
 
 	case FUNCTION_VOLUME:
-		if (LOG) logerror("LMC1992 '%s' Volume : %i dB\n", tag(), -80 + (data * 2));
+		LOG("LMC1992 Volume : %i dB\n", -80 + (data * 2));
 		m_volume = data;
 		break;
 
 	case FUNCTION_RIGHT_FRONT_FADER:
-		if (LOG) logerror("LMC1992 '%s' Right Front Fader : %i dB\n", tag(), -40 + (data * 2));
+		LOG("LMC1992 Right Front Fader : %i dB\n", -40 + (data * 2));
 		m_fader_rf = data;
 		break;
 
 	case FUNCTION_LEFT_FRONT_FADER:
-		if (LOG) logerror("LMC1992 '%s' Left Front Fader : %i dB\n", tag(), -40 + (data * 2));
+		LOG("LMC1992 Left Front Fader : %i dB\n", -40 + (data * 2));
 		m_fader_lf = data;
 		break;
 
 	case FUNCTION_RIGHT_REAR_FADER:
-		if (LOG) logerror("LMC1992 '%s' Right Rear Fader : %i dB\n", tag(), -40 + (data * 2));
+		LOG("LMC1992 Right Rear Fader : %i dB\n", -40 + (data * 2));
 		m_fader_rr = data;
 		break;
 
 	case FUNCTION_LEFT_REAR_FADER:
-		if (LOG) logerror("LMC1992 '%s' Left Rear Fader : %i dB\n", tag(), -40 + (data * 2));
+		LOG("LMC1992 Left Rear Fader : %i dB\n", -40 + (data * 2));
 		m_fader_lr = data;
 		break;
 	}
@@ -139,8 +140,8 @@ inline void lmc1992_device::execute_command(int addr, int data)
 //-------------------------------------------------
 
 lmc1992_device::lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, LMC1992, "LMC1992", tag, owner, clock, "lmc1992", __FILE__),
-		device_sound_interface(mconfig, *this)
+	: device_t(mconfig, LMC1992, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 {
 }
 

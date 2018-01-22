@@ -12,14 +12,13 @@
 #if defined(OSD_WINDOWS)
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <tchar.h>
 #undef interface
-#undef min
-#undef max
 
 // MAME headers
 #include "emu.h"
+#include "strconv.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -81,13 +80,15 @@ public:
 		for (int keynum = 0; keynum < MAX_KEYS; keynum++)
 		{
 			input_item_id itemid = table.map_di_scancode_to_itemid(keynum);
-			char name[20];
+			TCHAR keyname[100];
 
-			// generate/fetch the name
-			_snprintf(name, ARRAY_LENGTH(name), "Scan%03d", keynum);
+			// generate the name
+			if (GetKeyNameText(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, ARRAY_LENGTH(keyname)) == 0)
+				_sntprintf(keyname, ARRAY_LENGTH(keyname), TEXT("Scan%03d"), keynum);
+			std::string name = osd::text::from_tstring(keyname);
 
 			// add the item to the device
-			devinfo->device()->add_item(name, itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
+			devinfo->device()->add_item(name.c_str(), itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
 		}
 	}
 
@@ -157,7 +158,7 @@ public:
 			mouse.lY = (cursor_info.ptScreenPos.y - win32_mouse.last_point.y) * INPUT_RELATIVE_PER_PIXEL;
 
 			RECT window_pos = {0};
-			GetWindowRect(osd_common_t::s_window_list.front()->platform_window<HWND>(), &window_pos);
+			GetWindowRect(std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window(), &window_pos);
 
 			// We reset the cursor position to the middle of the window each frame
 			win32_mouse.last_point.x = window_pos.left + (window_pos.right - window_pos.left) / 2;
@@ -291,8 +292,9 @@ public:
 			RECT client_rect;
 
 			// get the position relative to the window
-			GetClientRect(osd_common_t::s_window_list.front()->platform_window<HWND>(), &client_rect);
-			ScreenToClient(osd_common_t::s_window_list.front()->platform_window<HWND>(), &mousepos);
+			HWND hwnd = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
+			GetClientRect(hwnd, &client_rect);
+			ScreenToClient(hwnd, &mousepos);
 
 			// convert to absolute coordinates
 			xpos = normalize_absolute_axis(mousepos.x, client_rect.left, client_rect.right);
@@ -352,10 +354,11 @@ private:
 			POINT mousepos;
 
 			// get the position relative to the window
-			GetClientRect(osd_common_t::s_window_list.front()->platform_window<HWND>(), &client_rect);
+			HWND hwnd = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
+			GetClientRect(hwnd, &client_rect);
 			mousepos.x = args.xpos;
 			mousepos.y = args.ypos;
-			ScreenToClient(osd_common_t::s_window_list.front()->platform_window<HWND>(), &mousepos);
+			ScreenToClient(hwnd, &mousepos);
 
 			// convert to absolute coordinates
 			mouse.lX = normalize_absolute_axis(mousepos.x, client_rect.left, client_rect.right);

@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "bus/isa/isa_cards.h"
 #include "bus/lpci/pci.h"
 #include "bus/lpci/i82371ab.h"
 #include "bus/lpci/i82371sb.h"
@@ -19,12 +20,32 @@ public:
 		m_maincpu(*this, "maincpu") { }
 	required_device<cpu_device> m_maincpu;
 
+	DECLARE_WRITE8_MEMBER(boot_state_w);
+	void at586x3(machine_config &config);
+	void at586(machine_config &config);
+	void at_softlists(machine_config &config);
+
+	static void tx_config(device_t *device);
+	static void sb_config(device_t *device);
 };
 
-static MACHINE_CONFIG_FRAGMENT( tx_config )
+WRITE8_MEMBER(at586_state::boot_state_w)
+{
+	logerror("Boot state %02x\n", data);
+}
+
+void at586_state::tx_config(device_t *device)
+{
 	MCFG_I82439TX_CPU( "maincpu" )
 	MCFG_I82439TX_REGION( "isa" )
-MACHINE_CONFIG_END
+}
+
+void at586_state::sb_config(device_t *device)
+{
+	devcb_base *devcb = nullptr;
+	(void)devcb;
+	MCFG_I82371SB_BOOT_STATE_HOOK(DEVWRITE8(":", at586_state, boot_state_w))
+}
 
 static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE_INTERNAL("i82439tx", I82439TX)
@@ -44,7 +65,14 @@ static ADDRESS_MAP_START( at586_io, AS_IO, 32, at586_state )
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_device, read, write)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( at586, at586_state )
+MACHINE_CONFIG_START(at586_state::at_softlists)
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
+	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
+	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(at586_state::at586)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
 	MCFG_CPU_PROGRAM_MAP(at586_map)
 	MCFG_CPU_IO_MAP(at586_io)
@@ -69,7 +97,7 @@ static MACHINE_CONFIG_START( at586, at586_state )
 	MCFG_FRAGMENT_ADD( at_softlists )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( at586x3, at586_state )
+MACHINE_CONFIG_START(at586_state::at586x3)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
 	MCFG_CPU_PROGRAM_MAP(at586_map)
 	MCFG_CPU_IO_MAP(at586_io)
@@ -84,6 +112,7 @@ static MACHINE_CONFIG_START( at586x3, at586_state )
 	MCFG_SLOT_OPTION_MACHINE_CONFIG("i82439tx", tx_config)
 
 	MCFG_PCI_BUS_DEVICE("pcibus:1", pci_devices, "i82371sb", true)
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("i82371sb", sb_config)
 
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa1", pc_isa16_cards, "svga_et4k", false)
 	MCFG_ISA16_SLOT_ADD(":pcibus:1:i82371sb:isabus","isa2", pc_isa16_cards, nullptr, false)
@@ -109,9 +138,31 @@ ROM_START( at586 )
 	ROMX_LOAD("asus_txp4.bin",   0x20000, 0x20000, CRC(a1321bb1) SHA1(92e5f14d8505119f85b148a63510617ac12bcdf3), ROM_BIOS(5))
 ROM_END
 
-ROM_START( at586x3 )
+ROM_START(at586x3)
 	ROM_REGION32_LE(0x40000, "isa", 0)
-	ROM_LOAD("5hx29.bin",   0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68))
+	ROM_SYSTEM_BIOS(0, "5hx29", "5HX29")
+	ROMX_LOAD("5hx29.bin", 0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(1, "n7ns04", "Version 21/01/98, without integrated sound") // Micronics M7S-HI with SMSC FDC37C93X I/O
+	ROMX_LOAD("m7ns04.rom", 0x00000, 0x40000, CRC(9c1f656b) SHA1(f4a0a522d8c47b6ddb6c01fe9a34ddf5b1977f8d), ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(2, "n7s04", "Version 21/01/98, with integrated sound")
+	ROMX_LOAD("m7s04.rom", 0x00000, 0x40000, CRC(3689f5a9) SHA1(8daacdb0dc6783d2161680564ffe83ac2515f7ef), ROM_BIOS(3))
+
+	ROM_SYSTEM_BIOS(3, "m55ns04", "m55ns04") // Micronics M55HI-Plus with no sound
+	ROMX_LOAD("M55-04ns.rom", 0x20000, 0x20000, CRC(0116B2B0) SHA1(19b0203decfd4396695334517488d488aec3ccde), ROM_BIOS(4))
+
+	ROM_SYSTEM_BIOS(4, "m55s04", "m55n04") // with sound
+	ROMX_LOAD("M55-04s.rom", 0x20000, 0x20000, CRC(34A7422E) SHA1(68753fe373c97844beff83ea75c634c77cfedb8f), ROM_BIOS(5))
+
+	ROM_SYSTEM_BIOS(5, "m55ns03", "m55ns03") // Micronics M55HI-Plus with no sound
+	ROMX_LOAD("M55NS03.ROM", 0x20000, 0x20000, CRC(6a3deb49) SHA1(78bfc20e0f8699f4d153d241a757153afcde3efb), ROM_BIOS(6))
+
+	ROM_SYSTEM_BIOS(6, "m55hi03", "m55hi03") // with sound
+	ROMX_LOAD("M55HI03.ROM", 0x20000, 0x20000, CRC(bd476200) SHA1(7633ba27819ad45c6253abb728b1ef0c49229743), ROM_BIOS(7))
+
+	ROM_SYSTEM_BIOS(7, "m7shi03", "m7shi03") // Micronics M7S-Hi
+	ROMX_LOAD("M7SHI03.SND", 0x00000, 0x40000, CRC(3a35a939) SHA1(74af69eb5ca546b0960540e7c3ea62a532157f2a), ROM_BIOS(8))
 ROM_END
 
 /* FIC VT-503 (Intel TX chipset, ITE 8679 Super I/O) */
@@ -129,6 +180,6 @@ ROM_START( ficvt503 )
 	ROMX_LOAD("115gk140.awd", 0x20000, 0x20000, CRC(65e88956) SHA1(f94bb0732e00b5b0f18f4e349db24a289f8379c5), ROM_BIOS(5))
 ROM_END
 
-COMP ( 1990, at586,    ibm5170, 0,       at586,     0, driver_device,   0,  "<generic>",  "PC/AT 586 (PIIX4)", MACHINE_NOT_WORKING )
-COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   0, driver_device,   0,  "<generic>",  "PC/AT 586 (PIIX3)", MACHINE_NOT_WORKING )
-COMP ( 1997, ficvt503, ibm5170, 0,       at586,     0, driver_device,   0,  "FIC", "VT-503",                   MACHINE_NOT_WORKING )
+COMP ( 1990, at586,    ibm5170, 0,       at586,     0, at586_state,   0,  "<generic>",  "PC/AT 586 (PIIX4)", MACHINE_NOT_WORKING )
+COMP ( 1990, at586x3,  ibm5170, 0,       at586x3,   0, at586_state,   0,  "<generic>",  "PC/AT 586 (PIIX3)", MACHINE_NOT_WORKING )
+COMP ( 1997, ficvt503, ibm5170, 0,       at586,     0, at586_state,   0,  "FIC",        "VT-503",            MACHINE_NOT_WORKING )

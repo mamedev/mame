@@ -224,14 +224,8 @@ namespace bgfx { namespace mtl
 
 		id<MTLLibrary> newLibraryWithSource(const char* _source)
 		{
-			MTLCompileOptions* options = [MTLCompileOptions new];
-			//NOTE: turned of as 'When using the fast variants, math functions execute more quickly,
-			//      but operate over a **LIMITED RANGE** and their behavior when handling NaN values is not defined.'
-			if (BX_ENABLED(BX_PLATFORM_IOS))
-				options.fastMathEnabled = NO;
-
 			NSError* error;
-			id<MTLLibrary> lib = [m_obj newLibraryWithSource:@(_source) options:options error:&error];
+			id<MTLLibrary> lib = [m_obj newLibraryWithSource:@(_source) options:nil error:&error];
 			BX_WARN(NULL == error
 				, "Shader compilation failed: %s"
 				, [error.localizedDescription cStringUsingEncoding:NSASCIIStringEncoding]
@@ -332,6 +326,14 @@ namespace bgfx { namespace mtl
 
 	MTL_CLASS(Function)
 		NSArray* vertexAttributes() { return m_obj.vertexAttributes; }
+
+		void setLabel(const char* _label)
+		{
+			if ([m_obj respondsToSelector:@selector(setLabel:)])
+			{
+				[m_obj setLabel:@(_label)];
+			}
+		}
 	MTL_CLASS_END
 
 	MTL_CLASS(Library)
@@ -503,6 +505,11 @@ namespace bgfx { namespace mtl
 		MTLTextureType textureType() const
 		{
 			return m_obj.textureType;
+		}
+
+		void setLabel(const char* _label)
+		{
+			[m_obj setLabel:@(_label)];
 		}
 	MTL_CLASS_END
 
@@ -732,8 +739,7 @@ namespace bgfx { namespace mtl
 			, m_vshConstantBufferAlignmentMask(0)
 			, m_fshConstantBufferSize(0)
 			, m_fshConstantBufferAlignmentMask(0)
-			, m_usedVertexSamplerStages(0)
-			, m_usedFragmentSamplerStages(0)
+			, m_samplerCount(0)
 			, m_numPredefined(0)
 			, m_processedUniforms(false)
 		{
@@ -759,8 +765,16 @@ namespace bgfx { namespace mtl
 		uint32_t m_vshConstantBufferAlignmentMask;
 		uint32_t m_fshConstantBufferSize;
 		uint32_t m_fshConstantBufferAlignmentMask;
-		uint32_t m_usedVertexSamplerStages;
-		uint32_t m_usedFragmentSamplerStages;
+
+		struct SamplerInfo
+		{
+			uint32_t			m_index;
+			bgfx::UniformHandle m_uniform;
+			bool				m_fragment;
+		};
+		SamplerInfo m_samplers[BGFX_CONFIG_MAX_TEXTURE_SAMPLERS];
+		uint32_t	m_samplerCount;
+
 		PredefinedUniform m_predefined[PredefinedUniform::Count*2];
 		uint8_t m_numPredefined;
 		bool m_processedUniforms;
@@ -768,6 +782,13 @@ namespace bgfx { namespace mtl
 
 	struct TextureMtl
 	{
+		enum Enum
+		{
+			Texture2D,
+			Texture3D,
+			TextureCube,
+		};
+
 		TextureMtl()
 			: m_ptr(NULL)
 			, m_ptrMSAA(NULL)
@@ -795,11 +816,12 @@ namespace bgfx { namespace mtl
 		Texture m_ptrStencil; // for emulating packed depth/stencil formats - only for iOS8...
 		SamplerState m_sampler;
 		uint32_t m_flags;
-		uint8_t m_requestedFormat;
-		uint8_t m_textureFormat;
 		uint32_t m_width;
 		uint32_t m_height;
 		uint32_t m_depth;
+		uint8_t m_type;
+		uint8_t m_requestedFormat;
+		uint8_t m_textureFormat;
 		uint8_t m_numMips;
 	};
 
@@ -810,7 +832,7 @@ namespace bgfx { namespace mtl
 			, m_pixelFormatHash(0)
 			, m_num(0)
 		{
-			m_depthHandle.idx = invalidHandle;
+			m_depthHandle.idx = kInvalidHandle;
 		}
 
 		void create(uint8_t _num, const Attachment* _attachment);
@@ -828,6 +850,31 @@ namespace bgfx { namespace mtl
 		TextureHandle m_colorHandle[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
 		TextureHandle m_depthHandle;
 		uint8_t m_num; // number of color handles
+	};
+
+	struct CommandQueueMtl
+	{
+		CommandQueueMtl() : m_releaseWriteIndex(0), m_releaseReadIndex(0)
+		{
+		}
+
+		void init(Device _device);
+		void shutdown();
+		CommandBuffer alloc();
+		void kick(bool _endFrame, bool _waitForFinish = false);
+		void finish(bool _finishAll = false);
+		void release(NSObject* _ptr);
+		void consume();
+
+		bx::Semaphore m_framesSemaphore;
+
+		CommandQueue  m_commandQueue;
+		CommandBuffer m_activeCommandBuffer;
+
+		int m_releaseWriteIndex;
+		int m_releaseReadIndex;
+		typedef stl::vector<NSObject*> ResourceArray;
+		ResourceArray m_release[MTL_MAX_FRAMES_IN_FLIGHT];
 	};
 
 	struct TimerQueryMtl
@@ -863,6 +910,7 @@ namespace bgfx { namespace mtl
 		void begin(RenderCommandEncoder& _rce, Frame* _render, OcclusionQueryHandle _handle);
 		void end(RenderCommandEncoder& _rce);
 		void resolve(Frame* _render, bool _wait = false);
+		void invalidate(OcclusionQueryHandle _handle);
 
 		struct Query
 		{
@@ -870,7 +918,7 @@ namespace bgfx { namespace mtl
 		};
 
 		Buffer m_buffer;
-		Query m_query[BGFX_CONFIG_MAX_OCCUSION_QUERIES];
+		Query m_query[BGFX_CONFIG_MAX_OCCLUSION_QUERIES];
 		bx::RingBufferControl m_control;
 	};
 

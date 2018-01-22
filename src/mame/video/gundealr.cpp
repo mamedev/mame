@@ -111,8 +111,12 @@ WRITE8_MEMBER(gundealr_state::yamyam_fg_scroll_w)
 
 WRITE8_MEMBER(gundealr_state::gundealr_flipscreen_w)
 {
-	m_flipscreen = data;
-	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	machine().tilemap().set_flip_all(BIT(data, 0) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+}
+
+WRITE8_MEMBER(gundealr_state::yamyam_flipscreen_w)
+{
+	machine().tilemap().set_flip_all(BIT(data, 7) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
 

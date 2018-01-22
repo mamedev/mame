@@ -51,7 +51,7 @@ namespace sol {
 		struct field_getter<metatable_key_t, b, raw, C> {
 			void get(lua_State* L, metatable_key_t, int tableindex = -1) {
 				if (lua_getmetatable(L, tableindex) == 0)
-					push(L, nil);
+					push(L, lua_nil);
 			}
 		};
 

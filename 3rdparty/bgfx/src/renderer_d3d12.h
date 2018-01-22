@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -49,6 +49,7 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 #include "renderer.h"
 #include "renderer_d3d.h"
 #include "shader_dxbc.h"
+#include "debug_renderdoc.h"
 
 namespace bgfx { namespace d3d12
 {
@@ -230,14 +231,14 @@ namespace bgfx { namespace d3d12
 		{
 			BX_CHECK(NULL != _vsh->m_code, "Vertex shader doesn't exist.");
 			m_vsh = _vsh;
-			memcpy(&m_predefined[0], _vsh->m_predefined, _vsh->m_numPredefined*sizeof(PredefinedUniform));
+			bx::memCopy(&m_predefined[0], _vsh->m_predefined, _vsh->m_numPredefined*sizeof(PredefinedUniform));
 			m_numPredefined = _vsh->m_numPredefined;
 
 			if (NULL != _fsh)
 			{
 				BX_CHECK(NULL != _fsh->m_code, "Fragment shader doesn't exist.");
 				m_fsh = _fsh;
-				memcpy(&m_predefined[m_numPredefined], _fsh->m_predefined, _fsh->m_numPredefined*sizeof(PredefinedUniform));
+				bx::memCopy(&m_predefined[m_numPredefined], _fsh->m_predefined, _fsh->m_numPredefined*sizeof(PredefinedUniform));
 				m_numPredefined += _fsh->m_numPredefined;
 			}
 		}
@@ -270,8 +271,8 @@ namespace bgfx { namespace d3d12
 			, m_state(D3D12_RESOURCE_STATE_COMMON)
 			, m_numMips(0)
 		{
-			memset(&m_srvd, 0, sizeof(m_srvd) );
-			memset(&m_uavd, 0, sizeof(m_uavd) );
+			bx::memSet(&m_srvd, 0, sizeof(m_srvd) );
+			bx::memSet(&m_uavd, 0, sizeof(m_uavd) );
 		}
 
 		void create(const Memory* _mem, uint32_t _flags, uint8_t _skip);
@@ -305,7 +306,7 @@ namespace bgfx { namespace d3d12
 			, m_num(0)
 			, m_numTh(0)
 		{
-			m_depth.idx = bgfx::invalidHandle;
+			m_depth.idx = bgfx::kInvalidHandle;
 		}
 
 		void create(uint8_t _num, const Attachment* _attachment);
@@ -379,7 +380,7 @@ namespace bgfx { namespace d3d12
 			, m_minIndirect(0)
 			, m_flushPerBatch(0)
 		{
-			memset(m_num, 0, sizeof(m_num) );
+			bx::memSet(m_num, 0, sizeof(m_num) );
 		}
 
 		~BatchD3D12()
@@ -448,24 +449,45 @@ namespace bgfx { namespace d3d12
 	struct TimerQueryD3D12
 	{
 		TimerQueryD3D12()
-			: m_control(4)
+			: m_control(BX_COUNTOF(m_query) )
 		{
 		}
 
 		void init();
 		void shutdown();
-		void begin(ID3D12GraphicsCommandList* _commandList);
-		void end(ID3D12GraphicsCommandList* _commandList);
-		bool get();
+		uint32_t begin(uint32_t _resultIdx);
+		void end(uint32_t _idx);
+		bool update();
 
-		uint64_t m_begin;
-		uint64_t m_end;
-		uint64_t m_elapsed;
+		struct Query
+		{
+			uint32_t m_resultIdx;
+			bool     m_ready;
+			uint64_t m_fence;
+		};
+
+		struct Result
+		{
+			void reset()
+			{
+				m_begin     = 0;
+				m_end       = 0;
+				m_pending   = 0;
+			}
+
+			uint64_t m_begin;
+			uint64_t m_end;
+			uint32_t m_pending;
+		};
+
 		uint64_t m_frequency;
+
+		Result m_result[BGFX_CONFIG_MAX_VIEWS+1];
+		Query m_query[BGFX_CONFIG_MAX_VIEWS*4];
 
 		ID3D12Resource*  m_readback;
 		ID3D12QueryHeap* m_queryHeap;
-		uint64_t* m_result;
+		uint64_t* m_queryResult;
 		bx::RingBufferControl m_control;
 	};
 
@@ -480,10 +502,11 @@ namespace bgfx { namespace d3d12
 		void shutdown();
 		void begin(ID3D12GraphicsCommandList* _commandList, Frame* _render, OcclusionQueryHandle _handle);
 		void end(ID3D12GraphicsCommandList* _commandList);
+		void invalidate(OcclusionQueryHandle _handle);
 
 		ID3D12Resource*  m_readback;
 		ID3D12QueryHeap* m_queryHeap;
-		OcclusionQueryHandle m_handle[BGFX_CONFIG_MAX_OCCUSION_QUERIES];
+		OcclusionQueryHandle m_handle[BGFX_CONFIG_MAX_OCCLUSION_QUERIES];
 		uint64_t* m_result;
 		bx::RingBufferControl m_control;
 	};

@@ -13,11 +13,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/srumbler.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "includes/srumbler.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(srumbler_state::bankswitch_w)
@@ -93,7 +96,7 @@ static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8, srumbler_state )
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("6000") /* Banked ROM */
 	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP        /* Video RAM 2 ??? (not used) */
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("7000") /* Banked ROM */
-	AM_RANGE(0x7000, 0x73ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x7000, 0x73ff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("8000") /* Banked ROM */
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("9000") /* Banked ROM */
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("a000") /* Banked ROM */
@@ -240,10 +243,10 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( srumbler, srumbler_state )
+MACHINE_CONFIG_START(srumbler_state::srumbler)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz (?) */
+	MCFG_CPU_ADD("maincpu", MC6809, 6000000)        /* HD68B09P at 6 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(srumbler_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", srumbler_state, interrupt, "screen", 0, 1)
 
@@ -261,7 +264,7 @@ static MACHINE_CONFIG_START( srumbler, srumbler_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(10*8, (64-10)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(srumbler_state, screen_update)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", srumbler)
@@ -469,7 +472,7 @@ ROM_END
 
 
 
-GAME( 1986, srumbler,  0,        srumbler, srumbler, driver_device, 0, ROT270, "Capcom", "The Speed Rumbler (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, srumbler2, srumbler, srumbler, srumbler, driver_device, 0, ROT270, "Capcom", "The Speed Rumbler (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, srumbler3, srumbler, srumbler, srumbler, driver_device, 0, ROT270, "Capcom (Tecfri license)", "The Speed Rumbler (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rushcrsh,  srumbler, srumbler, srumbler, driver_device, 0, ROT270, "Capcom", "Rush & Crash (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, srumbler,  0,        srumbler, srumbler, srumbler_state, 0, ROT270, "Capcom", "The Speed Rumbler (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, srumbler2, srumbler, srumbler, srumbler, srumbler_state, 0, ROT270, "Capcom", "The Speed Rumbler (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, srumbler3, srumbler, srumbler, srumbler, srumbler_state, 0, ROT270, "Capcom (Tecfri license)", "The Speed Rumbler (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rushcrsh,  srumbler, srumbler, srumbler, srumbler_state, 0, ROT270, "Capcom", "Rush & Crash (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -173,7 +173,7 @@ void taitob_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 		if (color & 0x3fc0)
 		{
 			logerror("sprite color (taitob)=%4x ofs=%4x\n", color, offs);
-			color = rand() & 0x3f;
+			color = machine().rand() & 0x3f;
 		}
 #endif
 		color = (color & 0x3f) * 16;
@@ -377,10 +377,12 @@ uint32_t taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 
 
 	m_tc0180vcu->tilemap_draw(screen, bitmap, cliprect, 1, 0);
 
-	if (m_pixel_bitmap)  /* hitice only */
+	// TODO: only hiticej properly enables this up during attract mode,
+	//       hitice / hiticerb keeps this disabled, maybe a btanb fixed in later revision?
+	if (m_pixel_bitmap && (m_pixel_scroll[0] & 0x5800) == 0x5000)  /* hitice only */
 	{
-		int scrollx = -2 * m_pixel_scroll[0]; //+320;
-		int scrolly = - m_pixel_scroll[1]; //+240;
+		int scrollx = -2 * m_pixel_scroll[1]; //+320;
+		int scrolly = 16 - m_pixel_scroll[2]; //+240;
 		/* bit 15 of pixel_scroll[0] is probably flip screen */
 
 		copyscrollbitmap_trans(bitmap, *m_pixel_bitmap, 1, &scrollx, 1, &scrolly, cliprect, m_b_fg_color_base * 16);
@@ -481,7 +483,7 @@ uint32_t taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb3
 
 
 
-void taitob_state::screen_eof_taitob(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(taitob_state::screen_vblank_taitob)
 {
 	// rising edge
 	if (state)
@@ -491,7 +493,7 @@ void taitob_state::screen_eof_taitob(screen_device &screen, bool state)
 		uint8_t framebuffer_page = m_tc0180vcu->get_fb_page(space, 0);
 
 		if (~video_control & 0x01)
-			m_framebuffer[framebuffer_page]->fill(0, screen.visible_area());
+			m_framebuffer[framebuffer_page]->fill(0, m_screen->visible_area());
 
 		if (~video_control & 0x80)
 		{
@@ -499,6 +501,6 @@ void taitob_state::screen_eof_taitob(screen_device &screen, bool state)
 			m_tc0180vcu->set_fb_page(space, 0, framebuffer_page);
 		}
 
-		draw_sprites(*m_framebuffer[framebuffer_page], screen.visible_area());
+		draw_sprites(*m_framebuffer[framebuffer_page], m_screen->visible_area());
 	}
 }

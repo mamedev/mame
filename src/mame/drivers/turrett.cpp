@@ -9,9 +9,12 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/turrett.h"
+
 #include "cpu/mips/r3000.h"
 #include "machine/ataintf.h"
-#include "includes/turrett.h"
+#include "machine/idehd.h"
+#include "speaker.h"
 
 
 
@@ -98,7 +101,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, turrett_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( turrett_sound_map, AS_0, 16, turrett_state )
+static ADDRESS_MAP_START( turrett_sound_map, 0, 16, turrett_state )
 	AM_RANGE(0x0000000, 0x7ffffff) AM_RAM AM_SHARE("bank_a")
 	AM_RANGE(0x8000000, 0xfffffff) AM_RAM AM_SHARE("bank_b")
 ADDRESS_MAP_END
@@ -315,15 +318,13 @@ INTERRUPT_GEN_MEMBER( turrett_state::adc )
 /// HACK: The game expects a different LBA mapping to the standard HDD.
 /// The reason for this is unknown.
 
-#include "machine/idehd.h"
-
-extern const device_type TURRETT_HARDDISK;
+DECLARE_DEVICE_TYPE(TURRETT_HARDDISK, turrett_hdd)
 
 class turrett_hdd : public ide_hdd_device
 {
 public:
 	turrett_hdd(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: ide_hdd_device(mconfig, TURRETT_HARDDISK, "HDD Turrett Tower", tag, owner, clock, "turrett_hdd", __FILE__)
+		: ide_hdd_device(mconfig, TURRETT_HARDDISK, tag, owner, clock)
 	{
 	}
 
@@ -336,7 +337,7 @@ public:
 	}
 };
 
-const device_type TURRETT_HARDDISK = &device_creator<turrett_hdd>;
+DEFINE_DEVICE_TYPE(TURRETT_HARDDISK, turrett_hdd, "turrett_hdd", "Turret Tower HDD")
 
 SLOT_INTERFACE_START(turrett_devices)
 	SLOT_INTERFACE("hdd", TURRETT_HARDDISK)
@@ -348,7 +349,7 @@ SLOT_INTERFACE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( turrett, turrett_state )
+MACHINE_CONFIG_START(turrett_state::turrett)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R3041, R3041_CLOCK)
@@ -375,7 +376,7 @@ static MACHINE_CONFIG_START( turrett, turrett_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_DEVICE_ADD("ttsound", TURRETT, R3041_CLOCK) // ?
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, turrett_sound_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, turrett_sound_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -411,4 +412,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 2001, turrett, 0, turrett, turrett, driver_device, 0, ROT0, "Dell Electronics (Namco license)", "Turret Tower", 0 )
+GAME( 2001, turrett, 0, turrett, turrett, turrett_state, 0, ROT0, "Dell Electronics (Namco license)", "Turret Tower", 0 )

@@ -29,12 +29,13 @@ public:
 	optional_ioport m_in3;
 	optional_ioport m_in4;
 	optional_ioport m_dsw2;
+	void spacduel(machine_config &config);
+	void gravitar(machine_config &config);
+	void bwidowp(machine_config &config);
+	void bwidow(machine_config &config);
+	void lunarbat(machine_config &config);
+	void bwidow_audio(machine_config &config);
+	void gravitar_audio(machine_config &config);
 };
-
-
-/*----------- defined in audio/bwidow.c -----------*/
-
-MACHINE_CONFIG_EXTERN( bwidow_audio );
-MACHINE_CONFIG_EXTERN( gravitar_audio );
 
 #endif /* BWIDOW_H_ */

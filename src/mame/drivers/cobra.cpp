@@ -327,6 +327,7 @@
 #include "video/rgbutil.h"
 #include "sound/rf5c400.h"
 #include "sound/dmadac.h"
+#include "speaker.h"
 
 #define GFXFIFO_IN_VERBOSE          0
 #define GFXFIFO_OUT_VERBOSE         0
@@ -494,8 +495,10 @@ class cobra_jvs : public jvs_device
 public:
 	cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(coin_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_2_w);
+	//DECLARE_WRITE_LINE_MEMBER(coin_1_w);
+	//DECLARE_WRITE_LINE_MEMBER(coin_2_w);
+	static void static_set_main_board(device_t &device, bool enable);
+	void increase_coin_counter(uint8_t which);
 
 protected:
 	virtual bool switches(uint8_t *&buf, uint8_t count_players, uint8_t bytes_per_switch) override;
@@ -503,15 +506,16 @@ protected:
 	virtual void function_list(uint8_t *&buf) override;
 
 private:
+	bool is_main_board;
 	int m_coin_counter[2];
 	optional_ioport m_test_port;
 	optional_ioport_array<2> m_player_ports;
 };
 
-const device_type COBRA_JVS = &device_creator<cobra_jvs>;
+DEFINE_DEVICE_TYPE(COBRA_JVS, cobra_jvs, "cobra_jvs", "JVS (COBRA)")
 
 cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: jvs_device(mconfig, COBRA_JVS, "JVS (COBRA)", tag, owner, clock, "cobra_jvs", __FILE__),
+	: jvs_device(mconfig, COBRA_JVS, tag, owner, clock),
 		m_test_port(*this, ":TEST"),
 		m_player_ports(*this, {":P1", ":P2"})
 {
@@ -519,6 +523,13 @@ cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *o
 	m_coin_counter[1] = 0;
 }
 
+void cobra_jvs::static_set_main_board(device_t &device, bool enable)
+{
+	cobra_jvs &jvsdev = downcast<cobra_jvs &>(device);
+	jvsdev.is_main_board = enable;
+}
+
+#if 0
 WRITE_LINE_MEMBER(cobra_jvs::coin_1_w)
 {
 	if(state)
@@ -530,20 +541,42 @@ WRITE_LINE_MEMBER(cobra_jvs::coin_2_w)
 	if(state)
 		m_coin_counter[1]++;
 }
+#endif
 
+void cobra_jvs::increase_coin_counter(uint8_t which)
+{
+	m_coin_counter[which]++;
+}
+
+// TODO: this certainly isn't correct, all three JVS points to the same capabilities!
 void cobra_jvs::function_list(uint8_t *&buf)
 {
+	if(this->is_main_board == false)
+		return;
+
 	// SW input - 2 players, 13 bits
-	*buf++ = 0x01; *buf++ = 2; *buf++ = 13; *buf++ = 0;
+	*buf++ = 0x01;
+	*buf++ = 2;
+	*buf++ = 13;
+	*buf++ = 0;
 
 	// Coin input - 2 slots
-	*buf++ = 0x02; *buf++ = 2; *buf++ = 0; *buf++ = 0;
+	*buf++ = 0x02;
+	*buf++ = 2;
+	*buf++ = 0;
+	*buf++ = 0;
 
 	// Analog input - 8 channels
-	*buf++ = 0x03; *buf++ = 8; *buf++ = 16; *buf++ = 0;
+	*buf++ = 0x03;
+	*buf++ = 8;
+	*buf++ = 16;
+	*buf++ = 0;
 
 	// Driver out - 6 channels
-	*buf++ = 0x12; *buf++ = 6; *buf++ = 0; *buf++ = 0;
+	*buf++ = 0x12;
+	*buf++ = 6;
+	*buf++ = 0;
+	*buf++ = 0;
 }
 
 bool cobra_jvs::switches(uint8_t *&buf, uint8_t count_players, uint8_t bytes_per_switch)
@@ -551,6 +584,9 @@ bool cobra_jvs::switches(uint8_t *&buf, uint8_t count_players, uint8_t bytes_per
 #if LOG_JVS
 	printf("jvs switch read: num players %d, bytes %d\n", count_players, bytes_per_switch);
 #endif
+
+	if(this->is_main_board == false)
+		return false;
 
 	if (count_players > 2 || bytes_per_switch > 2)
 		return false;
@@ -573,6 +609,11 @@ bool cobra_jvs::coin_counters(uint8_t *&buf, uint8_t count)
 #if LOG_JVS
 	printf("jvs coin counter read: count %d\n", count);
 #endif
+
+	if(this->is_main_board == false)
+		return false;
+
+	//printf("recv %04x\n",m_coin_counter[0]);
 
 	if (count > 2)
 		return false;
@@ -599,10 +640,10 @@ private:
 	int m_send_ptr;
 };
 
-const device_type COBRA_JVS_HOST = &device_creator<cobra_jvs_host>;
+DEFINE_DEVICE_TYPE(COBRA_JVS_HOST, cobra_jvs_host, "cobra_jvs_host", "JVS-HOST (COBRA)")
 
 cobra_jvs_host::cobra_jvs_host(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: jvs_host(mconfig, COBRA_JVS_HOST, "JVS-HOST (COBRA)", tag, owner, clock, "cobra_jvs_host", __FILE__)
+	: jvs_host(mconfig, COBRA_JVS_HOST, tag, owner, clock)
 {
 	m_send_ptr = 0;
 }
@@ -655,6 +696,9 @@ public:
 		m_gfxcpu(*this, "gfxcpu"),
 		m_gfx_pagetable(*this, "pagetable"),
 		m_k001604(*this, "k001604"),
+		m_jvs1(*this, "cobra_jvs1"),
+		m_jvs2(*this, "cobra_jvs2"),
+		m_jvs3(*this, "cobra_jvs3"),
 		m_ata(*this, "ata"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -671,6 +715,9 @@ public:
 	required_device<ppc_device> m_gfxcpu;
 	required_shared_ptr<uint64_t> m_gfx_pagetable;
 	required_device<k001604_device> m_k001604;
+	required_device<cobra_jvs> m_jvs1;
+	required_device<cobra_jvs> m_jvs2;
+	required_device<cobra_jvs> m_jvs3;
 	required_device<ata_interface_device> m_ata;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -787,6 +834,7 @@ public:
 	DECLARE_DRIVER_INIT(racjamdx);
 	DECLARE_DRIVER_INIT(bujutsu);
 	DECLARE_DRIVER_INIT(cobra);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -794,6 +842,7 @@ public:
 	INTERRUPT_GEN_MEMBER(cobra_vblank);
 	void cobra_video_exit();
 	int decode_debug_state_value(int v);
+	void cobra(machine_config &config);
 };
 
 void cobra_renderer::render_color_scan(int32_t scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
@@ -1451,7 +1500,7 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 		// Sub-to-Main FIFO read data
 
 		uint64_t value;
-		m_s2mfifo->pop(&space.device(), &value);
+		m_s2mfifo->pop(m_maincpu.target(), &value);
 
 		r |= (uint64_t)(value & 0xff) << 40;
 	}
@@ -1484,7 +1533,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		// Register 0xffff0002:
 		// Main-to-Sub FIFO write data
 
-		m_m2sfifo->push(&space.device(), (uint8_t)(data >> 40));
+		m_m2sfifo->push(m_maincpu.target(), (uint8_t)(data >> 40));
 
 		if (!m_m2s_int_mode)
 			m_main_int_active &= ~MAIN_INT_M2S;
@@ -1622,7 +1671,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		if (m_main_debug_state == 0x6b)
 		{
 			// install HD patches for bujutsu
-			if (strcmp(space.machine().system().name, "bujutsu") == 0)
+			if (strcmp(machine().system().name, "bujutsu") == 0)
 			{
 				uint32_t *main_ram = (uint32_t*)(uint64_t*)m_main_ram;
 				uint32_t *sub_ram = (uint32_t*)m_sub_ram;
@@ -1637,7 +1686,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 				gfx_ram[(0x38632c^4) / 4] = 0x38600000;     // skip check_one_scene()
 			}
 			// racjamdx
-			else if (strcmp(space.machine().system().name, "racjamdx") == 0)
+			else if (strcmp(machine().system().name, "racjamdx") == 0)
 			{
 			}
 		}
@@ -1754,7 +1803,7 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 		// M2S FIFO read
 
 		uint64_t value = 0;
-		m_m2sfifo->pop(&space.device(), &value);
+		m_m2sfifo->pop(m_subcpu.target(), &value);
 
 		r |= (value & 0xff) << 24;
 	}
@@ -1798,7 +1847,7 @@ WRITE32_MEMBER(cobra_state::sub_mainbd_w)
 		// Register 0x7E380000
 		// Sub-to-Main FIFO data
 
-		m_s2mfifo->push(&space.device(), (uint8_t)(data >> 24));
+		m_s2mfifo->push(m_subcpu.target(), (uint8_t)(data >> 24));
 
 		m_main_int_active |= MAIN_INT_S2M;
 
@@ -1899,7 +1948,7 @@ READ16_MEMBER(cobra_state::sub_ata0_r)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
-	uint32_t data = m_ata->read_cs0(space, offset, mem_mask);
+	uint32_t data = m_ata->read_cs0(offset, mem_mask);
 	data = ( data << 8 ) | ( data >> 8 );
 
 	return data;
@@ -1910,14 +1959,14 @@ WRITE16_MEMBER(cobra_state::sub_ata0_w)
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 	data = ( data << 8 ) | ( data >> 8 );
 
-	m_ata->write_cs0(space, offset, data, mem_mask);
+	m_ata->write_cs0(offset, data, mem_mask);
 }
 
 READ16_MEMBER(cobra_state::sub_ata1_r)
 {
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 
-	uint32_t data = m_ata->read_cs1(space, offset, mem_mask);
+	uint32_t data = m_ata->read_cs1(offset, mem_mask);
 
 	return ( data << 8 ) | ( data >> 8 );
 }
@@ -1927,7 +1976,7 @@ WRITE16_MEMBER(cobra_state::sub_ata1_w)
 	mem_mask = ( mem_mask << 8 ) | ( mem_mask >> 8 );
 	data = ( data << 8 ) | ( data >> 8 );
 
-	m_ata->write_cs1(space, offset, data, mem_mask);
+	m_ata->write_cs1(offset, data, mem_mask);
 }
 
 READ32_MEMBER(cobra_state::sub_comram_r)
@@ -2921,7 +2970,7 @@ READ64_MEMBER(cobra_state::gfx_fifo_r)
 	if (ACCESSING_BITS_32_63)
 	{
 		uint64_t data = 0;
-		m_gfxfifo_out->pop(&space.device(), &data);
+		m_gfxfifo_out->pop(m_gfxcpu.target(), &data);
 
 		data &= 0xffffffff;
 
@@ -2930,7 +2979,7 @@ READ64_MEMBER(cobra_state::gfx_fifo_r)
 	if (ACCESSING_BITS_0_31)
 	{
 		uint64_t data = 0;
-		m_gfxfifo_out->pop(&space.device(), &data);
+		m_gfxfifo_out->pop(m_gfxcpu.target(), &data);
 
 		data &= 0xffffffff;
 
@@ -3012,12 +3061,12 @@ WRITE64_MEMBER(cobra_state::gfx_unk1_w)
 
 		if (value == 0xc0)
 		{
-			m_gfxfifo_in->pop(&space.device(), &in1);
-			m_gfxfifo_in->pop(&space.device(), &in2);
+			m_gfxfifo_in->pop(m_gfxcpu.target(), &in1);
+			m_gfxfifo_in->pop(m_gfxcpu.target(), &in2);
 			m_gfx_unknown_v1 = (uint32_t)(in1 >> 32);         // FIFO number is read back from this same register
 
-			m_gfxfifo_out->push(&space.device(), in1 & 0xffffffff);
-			m_gfxfifo_out->push(&space.device(), in2 & 0xffffffff);
+			m_gfxfifo_out->push(m_gfxcpu.target(), in1 & 0xffffffff);
+			m_gfxfifo_out->push(m_gfxcpu.target(), in2 & 0xffffffff);
 		}
 		else if (value == 0x80)
 		{
@@ -3040,11 +3089,11 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 
 	// teximage_load() / mbuslib_prc_read():    0x00A00001 0x10520800
 
-//  printf("prc_read %08X%08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), space.device().safe_pc());
+//  printf("prc_read %08X%08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), m_gfxcpu->pc());
 
 	m_renderer->gfx_fifo_exec();
 
-	if (data == U64(0x00a0000110500018))
+	if (data == 0x00a0000110500018U)
 	{
 		m_gfxfifo_out->flush();
 
@@ -3052,10 +3101,10 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 
 		uint64_t regdata = m_renderer->gfx_read_reg();
 
-		m_gfxfifo_out->push(&space.device(), (uint32_t)(regdata >> 32));
-		m_gfxfifo_out->push(&space.device(), (uint32_t)(regdata));
+		m_gfxfifo_out->push(m_gfxcpu.target(), (uint32_t)(regdata >> 32));
+		m_gfxfifo_out->push(m_gfxcpu.target(), (uint32_t)(regdata));
 	}
-	else if (data == U64(0x00a0000110520800))
+	else if (data == 0x00a0000110520800U)
 	{
 		// in teximage_load()
 		// some kind of busy flag for mbuslib_tex_ints()...
@@ -3063,15 +3112,15 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 		// mbuslib_tex_ints() waits for bit 0x400 to be set
 		// memcheck_teximage() wants 0x400 cleared
 
-		m_gfxfifo_out->push(&space.device(), m_gfx_unk_status);
+		m_gfxfifo_out->push(m_gfxcpu.target(), m_gfx_unk_status);
 
 		m_gfx_unk_status &= ~0x400;
 	}
-	else if (data != U64(0x00a0000110520200))       // mbuslib_regread()
+	else if (data != 0x00a0000110520200U)       // mbuslib_regread()
 	{
 		// prc_read always expects a value...
 
-		m_gfxfifo_out->push(&space.device(), 0);
+		m_gfxfifo_out->push(m_gfxcpu.target(), 0);
 	}
 }
 
@@ -3085,14 +3134,14 @@ WRITE32_MEMBER(cobra_state::gfx_cpu_dc_store)
 
 		uint32_t a = (offset / 8) & 0xff;
 
-		fifo_in->push(&space.device(), (uint32_t)(m_gfx_fifo_mem[a+0] >> 32) | i);
-		fifo_in->push(&space.device(), (uint32_t)(m_gfx_fifo_mem[a+0] >>  0) | i);
-		fifo_in->push(&space.device(), (uint32_t)(m_gfx_fifo_mem[a+1] >> 32) | i);
-		fifo_in->push(&space.device(), (uint32_t)(m_gfx_fifo_mem[a+1] >>  0) | i);
-		fifo_in->push(&space.device(), (uint32_t)(m_gfx_fifo_mem[a+2] >> 32) | i);
-		fifo_in->push(&space.device(), (uint32_t)(m_gfx_fifo_mem[a+2] >>  0) | i);
-		fifo_in->push(&space.device(), (uint32_t)(m_gfx_fifo_mem[a+3] >> 32) | i);
-		fifo_in->push(&space.device(), (uint32_t)(m_gfx_fifo_mem[a+3] >>  0) | i);
+		fifo_in->push(m_gfxcpu, (uint32_t)(m_gfx_fifo_mem[a+0] >> 32) | i);
+		fifo_in->push(m_gfxcpu, (uint32_t)(m_gfx_fifo_mem[a+0] >>  0) | i);
+		fifo_in->push(m_gfxcpu, (uint32_t)(m_gfx_fifo_mem[a+1] >> 32) | i);
+		fifo_in->push(m_gfxcpu, (uint32_t)(m_gfx_fifo_mem[a+1] >>  0) | i);
+		fifo_in->push(m_gfxcpu, (uint32_t)(m_gfx_fifo_mem[a+2] >> 32) | i);
+		fifo_in->push(m_gfxcpu, (uint32_t)(m_gfx_fifo_mem[a+2] >>  0) | i);
+		fifo_in->push(m_gfxcpu, (uint32_t)(m_gfx_fifo_mem[a+3] >> 32) | i);
+		fifo_in->push(m_gfxcpu, (uint32_t)(m_gfx_fifo_mem[a+3] >>  0) | i);
 
 		m_renderer->gfx_fifo_exec();
 	}
@@ -3151,6 +3200,17 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
+INPUT_CHANGED_MEMBER(cobra_state::coin_inserted)
+{
+	if(newval)
+	{
+		uint8_t coin_chute = (uint8_t)(uintptr_t)param & 1;
+		m_jvs1->increase_coin_counter(coin_chute);
+		m_jvs2->increase_coin_counter(coin_chute);
+		m_jvs3->increase_coin_counter(coin_chute);
+	}
+}
+
 INPUT_PORTS_START( cobra )
 	PORT_START("TEST")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_HIGH)            /* Test Button */
@@ -3164,43 +3224,43 @@ INPUT_PORTS_START( cobra )
 
 	PORT_START("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("P1 Service") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Punch")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Kick")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Guard")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("P2 Service") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE2 )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Punch")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Kick")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Guard")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COINS")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_WRITE_LINE_DEVICE_MEMBER("cobra_jvs1", cobra_jvs, coin_1_w)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_WRITE_LINE_DEVICE_MEMBER("cobra_jvs1", cobra_jvs, coin_2_w)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_CHANGED_MEMBER(DEVICE_SELF, cobra_state,coin_inserted, 0)//PORT_WRITE_LINE_DEVICE_MEMBER("cobra_jvs1", cobra_jvs, coin_1_w)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_CHANGED_MEMBER(DEVICE_SELF, cobra_state,coin_inserted, 1) //PORT_WRITE_LINE_DEVICE_MEMBER("cobra_jvs1", cobra_jvs, coin_2_w)
 INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(cobra_state::ide_interrupt)
@@ -3259,7 +3319,7 @@ void cobra_state::machine_reset()
 	dmadac_set_frequency(&m_dmadac[1], 1, 44100);
 }
 
-static MACHINE_CONFIG_START( cobra, cobra_state )
+MACHINE_CONFIG_START(cobra_state::cobra)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC603, 100000000)      /* 603EV, 100? MHz */
@@ -3315,9 +3375,11 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	MCFG_DEVICE_ADD("cobra_jvs_host", COBRA_JVS_HOST, 4000000)
 	MCFG_JVS_DEVICE_ADD("cobra_jvs1", COBRA_JVS, "cobra_jvs_host")
+	cobra_jvs::static_set_main_board(*device, true);
 	MCFG_JVS_DEVICE_ADD("cobra_jvs2", COBRA_JVS, "cobra_jvs_host")
+	cobra_jvs::static_set_main_board(*device, true);
 	MCFG_JVS_DEVICE_ADD("cobra_jvs3", COBRA_JVS, "cobra_jvs_host")
-
+	cobra_jvs::static_set_main_board(*device, true);
 MACHINE_CONFIG_END
 
 /*****************************************************************************/
@@ -3375,8 +3437,8 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 	m_sound_dma_buffer_r = std::make_unique<int16_t[]>(DMA_SOUND_BUFFER_SIZE);
 
 	// setup fake pagetable until we figure out what really maps there...
-	//m_gfx_pagetable[0x80 / 8] = U64(0x800001001e0001a8);
-	m_gfx_pagetable[0x80 / 8] = U64(0x80000100200001a8);        // should this map to 0x1e000000?
+	//m_gfx_pagetable[0x80 / 8] = 0x800001001e0001a8U;
+	m_gfx_pagetable[0x80 / 8] = 0x80000100200001a8U;        // should this map to 0x1e000000?
 }
 
 DRIVER_INIT_MEMBER(cobra_state,bujutsu)
@@ -3595,5 +3657,5 @@ ROM_END
 
 /*************************************************************************/
 
-GAME( 1997, bujutsu, 0, cobra, cobra, cobra_state, bujutsu, ROT0, "Konami", "Fighting Bujutsu", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1997, racjamdx, 0, cobra, cobra, cobra_state, racjamdx, ROT0, "Konami", "Racing Jam DX", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1997, bujutsu,  0, cobra, cobra, cobra_state, bujutsu,  ROT0, "Konami", "Fighting Bujutsu", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, racjamdx, 0, cobra, cobra, cobra_state, racjamdx, ROT0, "Konami", "Racing Jam DX",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

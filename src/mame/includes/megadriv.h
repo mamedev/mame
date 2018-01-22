@@ -28,12 +28,6 @@ INPUT_PORTS_EXTERN( megadri6 );
 INPUT_PORTS_EXTERN( ssf2mdb );
 INPUT_PORTS_EXTERN( mk3mdb );
 
-MACHINE_CONFIG_EXTERN( megadriv_timers );
-MACHINE_CONFIG_EXTERN( md_ntsc );
-MACHINE_CONFIG_EXTERN( md_pal );
-MACHINE_CONFIG_EXTERN( md_bootleg );    // for topshoot.c & hshavoc.c
-
-
 struct genesis_z80_vars
 {
 	int z80_is_reset;
@@ -133,9 +127,15 @@ public:
 	DECLARE_MACHINE_RESET( megadriv );
 	DECLARE_VIDEO_START( megadriv );
 	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_megadriv(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_megadriv);
 
 	DECLARE_WRITE8_MEMBER(megadriv_tas_callback);
+
+	void megadriv_timers(machine_config &config);
+	void md_ntsc(machine_config &config);
+	void md_pal(machine_config &config);
+	void md_bootleg(machine_config &config);
+	void dcat16_megadriv_base(machine_config &config);
 };
 
 class md_cons_state : public md_base_state
@@ -171,7 +171,7 @@ public:
 	DECLARE_MACHINE_START( ms_megacd );     // setup ioport_port + dma delay for cd
 	DECLARE_MACHINE_RESET( ms_megadriv );
 
-	void screen_eof_console(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_console);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( _32x_cart );
 
@@ -183,4 +183,18 @@ public:
 	void install_tmss();
 	DECLARE_READ16_MEMBER(tmss_r);
 	DECLARE_WRITE16_MEMBER(tmss_swap_w);
+	void genesis_32x_scd(machine_config &config);
+	void mdj_32x_scd(machine_config &config);
+	void ms_megadpal(machine_config &config);
+	void dcat16_megadriv_base(machine_config &config);
+	void dcat16_megadriv(machine_config &config);
+	void md_32x_scd(machine_config &config);
+	void mdj_32x(machine_config &config);
+	void ms_megadriv(machine_config &config);
+	void mdj_scd(machine_config &config);
+	void md_32x(machine_config &config);
+	void genesis_32x(machine_config &config);
+	void md_scd(machine_config &config);
+	void genesis_scd(machine_config &config);
+	void genesis_tmss(machine_config &config);
 };

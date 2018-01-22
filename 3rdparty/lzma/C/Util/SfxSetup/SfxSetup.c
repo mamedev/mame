@@ -1,5 +1,5 @@
 /* SfxSetup.c - 7z SFX Setup
-2015-11-08 : Igor Pavlov : Public domain */
+2016-05-16 : Igor Pavlov : Public domain */
 
 #include "Precomp.h"
 
@@ -20,6 +20,7 @@
 #include "../../7zCrc.h"
 #include "../../7zFile.h"
 #include "../../CpuArch.h"
+#include "../../DllSecur.h"
 
 #define k_EXE_ExtIndex 2
 
@@ -254,6 +255,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   Bool useShellExecute = True;
   DWORD exitCode = 0;
 
+  LoadSecurityDlls();
+
   #ifdef _CONSOLE
   SetConsoleCtrlHandler(HandlerRoutine, TRUE);
   #else
@@ -396,11 +399,9 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     {
       size_t offset = 0;
       size_t outSizeProcessed = 0;
-      size_t len;
       WCHAR *temp;
-      len = SzArEx_GetFileNameUtf16(&db, i, NULL);
-      
-      if (len >= MAX_PATH)
+
+      if (SzArEx_GetFileNameUtf16(&db, i, NULL) >= MAX_PATH)
       {
         res = SZ_ERROR_FAIL;
         break;

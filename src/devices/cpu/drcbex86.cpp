@@ -148,7 +148,7 @@ const uint32_t PTYPE_MF   = PTYPE_M | PTYPE_F;
 drcbe_x86::opcode_generate_func drcbe_x86::s_opcode_table[OP_MAX];
 
 // size-to-mask table
-//static const uint64_t size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, U64(0xffffffffffffffff) };
+//static const uint64_t size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, 0xffffffffffffffffU };
 
 // register mapping tables
 static const uint8_t int_register_map[REG_I_COUNT] =
@@ -5243,7 +5243,7 @@ void drcbe_x86::op_and(x86code *&dst, const instruction &inst)
 		}
 
 		// AND with immediate 0xffffffff00000000
-		else if (src2p.is_immediate_value(U64(0xffffffff00000000)) && inst.flags() == 0)
+		else if (src2p.is_immediate_value(0xffffffff00000000U) && inst.flags() == 0)
 		{
 			if (src1p != dstp)
 			{
@@ -6719,9 +6719,8 @@ int drcbe_x86::ddivu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t s
 	if (src2 == 0)
 		return FLAG_V;
 
-	// shortcut if no remainder
 	dstlo = src1 / src2;
-	if (dstlo != dsthi)
+	if (&dstlo != &dsthi)
 		dsthi = src1 % src2;
 	return ((dstlo == 0) << 2) | ((dstlo >> 60) & FLAG_S);
 }
@@ -6737,9 +6736,8 @@ int drcbe_x86::ddivs(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src
 	if (src2 == 0)
 		return FLAG_V;
 
-	// shortcut if no remainder
 	dstlo = src1 / src2;
-	if (dstlo != dsthi)
+	if (&dstlo != &dsthi)
 		dsthi = src1 % src2;
 	return ((dstlo == 0) << 2) | ((dstlo >> 60) & FLAG_S);
 }

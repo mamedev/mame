@@ -2,41 +2,45 @@
 // copyright-holders:Olivier Galibert
 /***************************************************************************
 
-    m4510.c
+    m4510.cpp
 
     65ce02 with a mmu and a cia integrated
+
+    differences between the standard 65ce02 and this CPU:
+    http://www.zimmers.net/anonftp/pub/cbm/c65/65ce02.txt
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "m4510.h"
+#include "m4510d.h"
 
-const device_type M4510 = &device_creator<m4510_device>;
+DEFINE_DEVICE_TYPE(M4510, m4510_device, "m4510", "M4510")
 
 m4510_device::m4510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m65ce02_device(mconfig, M4510, "M4510", tag, owner, clock, "m4510", __FILE__),
+	m65ce02_device(mconfig, M4510, tag, owner, clock),
 	map_enable(0),
 	nomap(false)
 {
-	program_config.m_addrbus_width = 20;
+	program_config.m_addr_width = 20;
 	program_config.m_logaddr_width = 16;
 	program_config.m_page_shift = 13;
-	sprogram_config.m_addrbus_width = 20;
+	sprogram_config.m_addr_width = 20;
 	sprogram_config.m_logaddr_width = 16;
 	sprogram_config.m_page_shift = 13;
 }
 
-offs_t m4510_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *m4510_device::create_disassembler()
 {
-	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
+	return new m4510_disassembler;
 }
 
 void m4510_device::device_start()
 {
 	if(direct_disabled)
-		mintf = new mi_4510_nd(this);
+		mintf = std::make_unique<mi_4510_nd>(this);
 	else
-		mintf = new mi_4510_normal(this);
+		mintf = std::make_unique<mi_4510_normal>(this);
 
 	m65ce02_device::init();
 
@@ -56,7 +60,7 @@ void m4510_device::device_reset()
 	m65ce02_device::device_reset();
 }
 
-bool m4510_device::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
+bool m4510_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	if (spacenum == AS_PROGRAM)
 	{

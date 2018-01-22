@@ -9,6 +9,9 @@
 //
 //============================================================
 
+#include <bx/readerwriter.h>
+#include <bx/file.h>
+
 #include "emu.h"
 #include "../frontend/mame/ui/slider.h"
 
@@ -18,10 +21,6 @@
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 
-#include <bx/readerwriter.h>
-#include <bx/crtimpl.h>
-#undef min
-#undef max
 #include "bgfxutil.h"
 
 #include "chainmanager.h"
@@ -62,7 +61,9 @@ void chain_manager::refresh_available_chains()
 	m_available_chains.clear();
 	m_available_chains.push_back(chain_desc("none", ""));
 
-	find_available_chains(std::string(m_options.bgfx_path()) + "/chains", "");
+	std::string chains_path;
+	osd_subst_env(chains_path, util::string_format("%s" PATH_SEPARATOR "chains", m_options.bgfx_path()));
+	find_available_chains(chains_path, "");
 
 	destroy_unloaded_chains();
 }
@@ -134,13 +135,15 @@ void chain_manager::find_available_chains(std::string root, std::string path)
 
 bgfx_chain* chain_manager::load_chain(std::string name, uint32_t screen_index)
 {
-	if (name.length() < 5 || (name.compare(name.length() - 5, 5, ".json")!= 0))
+	if (name.length() < 5 || (name.compare(name.length() - 5, 5, ".json") != 0))
 	{
 		name = name + ".json";
 	}
-	std::string path = std::string(m_options.bgfx_path()) + "/chains/" + name;
+	std::string path;
+	osd_subst_env(path, util::string_format("%s" PATH_SEPARATOR "chains" PATH_SEPARATOR, m_options.bgfx_path()));
+	path += name;
 
-	bx::CrtFileReader reader;
+	bx::FileReader reader;
 	if (!bx::open(&reader, path.c_str()))
 	{
 		printf("Unable to open chain file %s, falling back to no post processing\n", path.c_str());
@@ -391,9 +394,7 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 		return;
 	}
 
-	std::string description = "Window " + std::to_string(m_window_index) + ", Screen " + std::to_string(screen_index) + " Effect:";
-	size_t size = sizeof(slider_state) + description.length();
-	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(m_machine, uint8_t, size));
+	std::unique_ptr<slider_state> state = make_unique_clear<slider_state>();
 
 	state->minval = 0;
 	state->defval = m_current_chain[screen_index];
@@ -404,15 +405,16 @@ void chain_manager::create_selection_slider(uint32_t screen_index)
 	state->update = std::bind(&chain_manager::slider_changed, this, _1, _2, _3, _4, _5);
 	state->arg = this;
 	state->id = screen_index;
-	strcpy(state->description, description.c_str());
+	state->description = "Window " + std::to_string(m_window_index) + ", Screen " + std::to_string(screen_index) + " Effect:";
 
 	ui::menu_item item;
 	item.text = state->description;
 	item.subtext = "";
 	item.flags = 0;
-	item.ref = state;
+	item.ref = state.get();
 	item.type = ui::menu_item_type::SLIDER;
 	m_selection_sliders.push_back(item);
+	m_core_sliders.push_back(std::move(state));
 }
 
 uint32_t chain_manager::handle_screen_chains(uint32_t view, render_primitive *starting_prim, osd_window& window)

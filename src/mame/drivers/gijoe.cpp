@@ -105,12 +105,15 @@ Known Issues
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gijoe.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/k054539.h"
-#include "includes/konamipt.h"
-#include "includes/gijoe.h"
+#include "speaker.h"
+
 
 #define JOE_DEBUG 0
 #define JOE_DMADELAY (attotime::from_nsec(42700 + 341300))
@@ -189,23 +192,9 @@ INTERRUPT_GEN_MEMBER(gijoe_state::gijoe_interrupt)
 		device.execute().set_input_line(5, HOLD_LINE);
 }
 
-WRITE16_MEMBER(gijoe_state::sound_cmd_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		data &= 0xff;
-		m_soundlatch->write(space, 0, data);
-	}
-}
-
 WRITE16_MEMBER(gijoe_state::sound_irq_w)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
-READ16_MEMBER(gijoe_state::sound_status_r)
-{
-	return m_soundlatch2->read(space, 0);
 }
 
 static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
@@ -218,12 +207,10 @@ static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
 	AM_RANGE(0x160000, 0x160007) AM_DEVWRITE("k056832", k056832_device, b_word_w)                                    // VSCCS (board dependent)
 	AM_RANGE(0x170000, 0x170001) AM_WRITENOP                                                // Watchdog
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("workram")                 // Main RAM.  Spec. 180000-1803ff, 180400-187fff
-	AM_RANGE(0x190000, 0x190fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x190000, 0x190fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVWRITE("k056832", k056832_device, word_w)
-	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(sound_cmd_w)
-	AM_RANGE(0x1c0014, 0x1c0015) AM_READ(sound_status_r)
-	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM
+	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVICE8("k054321", k054321_device, main_map, 0x00ff)
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x1e0000, 0x1e0001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1e0002, 0x1e0003) AM_READ_PORT("P3_P4")
@@ -242,9 +229,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gijoe_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
-	AM_RANGE(0xfc02, 0xfc02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
+	AM_RANGE(0xfc00, 0xfc03) AM_DEVICE("k054321", k054321_device, sound_map)
+	AM_RANGE(0x0000, 0xefff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gijoe )
@@ -303,7 +289,7 @@ void gijoe_state::machine_reset()
 	m_cur_control2 = 0;
 }
 
-static MACHINE_CONFIG_START( gijoe, gijoe_state )
+MACHINE_CONFIG_START(gijoe_state::gijoe)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)   /* 16MHz Confirmed */
@@ -344,8 +330,7 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
@@ -387,7 +372,7 @@ ROM_END
 // If you factory default it you get the string 'EB8'
 // the roms had no proper labels
 // maybe it's some interim / test revision
-ROM_START( gijoea )
+ROM_START( gijoeea )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rom3.14e",   0x000000,  0x40000, CRC(0a11f63a) SHA1(06174682907e718017146665b8636be20843b119) )
 	ROM_LOAD16_BYTE( "rom2.18e",   0x000001,  0x40000, CRC(8313c559) SHA1(00ae945c65439d4092eaa1780a182dbe3753bb02) )
@@ -411,7 +396,7 @@ ROM_START( gijoea )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom
-	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(64f5c87b) SHA1(af81abc54eb59ef7d2250b5ab6cc9642fbd9bfb2) ) // sldh - No actual label so create a unique one for this set
+	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(64f5c87b) SHA1(af81abc54eb59ef7d2250b5ab6cc9642fbd9bfb2) ) // sldh
 ROM_END
 
 ROM_START( gijoeu )
@@ -438,7 +423,7 @@ ROM_START( gijoeu )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(ca966023) SHA1(6f07ece0f95213bc12387192986f468d23dfdfc8) ) // sldh - No actual label so create a unique one for this set
+	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(ca966023) SHA1(6f07ece0f95213bc12387192986f468d23dfdfc8) ) // sldh
 ROM_END
 
 ROM_START( gijoej )
@@ -465,11 +450,39 @@ ROM_START( gijoej )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
-	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(c914fcf2) SHA1(b4f0a0b5d6d4075b004b061336d162336ce1a754) ) // sldh - No actual label so create a unique one for this set
+	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(c914fcf2) SHA1(b4f0a0b5d6d4075b004b061336d162336ce1a754) ) // sldh
+ROM_END
+
+ROM_START( gijoea )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "069aa03.14e", 0x000000,  0x40000, CRC(74355c6e) SHA1(01d7b5994c5b9b6e87fb9a35ffed9cc540cfcd05) )
+	ROM_LOAD16_BYTE( "069aa02.18e", 0x000001,  0x40000, CRC(d3dd0397) SHA1(6caac73d259ff6707ded2457b4968d3d0a3c4eb3) )
+	ROM_LOAD16_BYTE( "069a12.13e",  0x080000,  0x40000, CRC(75a7585c) SHA1(443d6dee99edbe81ab1b7289e6cad403fe01cc0d) )
+	ROM_LOAD16_BYTE( "069a11.16e",  0x080001,  0x40000, CRC(3153e788) SHA1(fde4543eac707ef24b431e64011cf0f923d4d3ac) )
+
+	ROM_REGION( 0x010000, "audiocpu", 0 )
+	ROM_LOAD( "069a01.7c", 0x000000, 0x010000, CRC(74172b99) SHA1(f5e0e0d43317454fdacd3df7cd3035fcae4aef68) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD32_WORD( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
+	ROM_LOAD32_WORD( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD64_WORD( "069a08.6h", 0x000000, 0x100000, CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
+	ROM_LOAD64_WORD( "069a05.1h", 0x000002, 0x100000, CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
+	ROM_LOAD64_WORD( "069a07.4h", 0x000004, 0x100000, CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )
+	ROM_LOAD64_WORD( "069a06.2h", 0x000006, 0x100000, CRC(63eba8e1) SHA1(aa318d356c2580765452106ea0d2228273a90523) )
+
+	ROM_REGION( 0x200000, "k054539", 0 )
+	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom
+	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(6363513c) SHA1(181cbf2bd4960740d437c714dc70bb7e64c95348) ) // sldh
 ROM_END
 
 
-GAME( 1992, gijoe,  0,     gijoe, gijoe, driver_device, 0, ROT0, "Konami", "G.I. Joe (World, EAB, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoea, gijoe, gijoe, gijoe, driver_device, 0, ROT0, "Konami", "G.I. Joe (World, EB8, prototype?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoeu, gijoe, gijoe, gijoe, driver_device, 0, ROT0, "Konami", "G.I. Joe (US, UAB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoej, gijoe, gijoe, gijoe, driver_device, 0, ROT0, "Konami", "G.I. Joe (Japan, JAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoe,   0,     gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (World, EAB, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoeea, gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (World, EB8, prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoeu,  gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (US, UAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoej,  gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (Japan, JAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoea,  gijoe, gijoe, gijoe, gijoe_state, 0, ROT0, "Konami", "G.I. Joe (Asia, AA)", MACHINE_SUPPORTS_SAVE )

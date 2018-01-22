@@ -105,7 +105,7 @@ This will draw some useless art on the screen. However, when unpausing the game,
 
 ::
 
-    > emu.sethook(draw_hud, "frame")
+    > emu.register_frame_done(draw_hud, "frame")
 
 All colors are expected in ARGB format (32b unsigned), while screen origin (0,0) normally corresponds to the top-left corner.
 

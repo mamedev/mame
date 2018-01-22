@@ -8,31 +8,35 @@
 
 **********************************************************************/
 
-#ifndef _THOMSON_H_
-#define _THOMSON_H_
+#ifndef MAME_INCLUDES_THOMSON_H
+#define MAME_INCLUDES_THOMSON_H
 
-#include "emu.h"
-#include "bus/rs232/rs232.h"
+#pragma once
+
 #include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
-#include "machine/mc6846.h"
-#include "machine/6850acia.h"
-#include "machine/mos6551.h"
-#include "sound/dac.h"
-#include "sound/mea8000.h"
-#include "bus/centronics/ctronics.h"
-#include "imagedev/cassette.h"
-#include "machine/mc6843.h"
-#include "machine/mc6846.h"
-#include "machine/mc6854.h"
 #include "formats/thom_cas.h"
 #include "formats/thom_dsk.h"
-#include "machine/thomflop.h"
+#include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
+#include "machine/6821pia.h"
+#include "machine/6850acia.h"
+#include "machine/input_merger.h"
+#include "machine/mc6843.h"
+#include "machine/mc6846.h"
+#include "machine/mc6846.h"
+#include "machine/mc6854.h"
+#include "machine/mos6551.h"
 #include "machine/ram.h"
+#include "machine/thomflop.h"
+#include "sound/dac.h"
+#include "sound/mea8000.h"
 
+#include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/rs232/rs232.h"
+
+#include "screen.h"
 
 
 /* 6821 PIAs */
@@ -113,6 +117,8 @@ public:
 		m_mc6843(*this, "mc6843"),
 		m_acia6850(*this, "acia6850"),
 		m_screen(*this, "screen"),
+		m_mainirq(*this, "mainirq"),
+		m_mainfirq(*this, "mainfirq"),
 		m_io_game_port_directions(*this, "game_port_directions"),
 		m_io_game_port_buttons(*this, "game_port_buttons"),
 		m_io_mouse_x(*this, "mouse_x"),
@@ -149,8 +155,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( to7_set_cassette_motor );
 	DECLARE_WRITE_LINE_MEMBER( mo5_set_cassette_motor );
 	DECLARE_WRITE_LINE_MEMBER( thom_dev_irq_0 );
-	DECLARE_WRITE_LINE_MEMBER( thom_irq_1 );
-	DECLARE_WRITE_LINE_MEMBER( thom_firq_1 );
 	DECLARE_WRITE8_MEMBER( to7_cartridge_w );
 	DECLARE_READ8_MEMBER( to7_cartridge_r );
 	DECLARE_WRITE8_MEMBER( to7_timer_port_out );
@@ -312,7 +316,7 @@ public:
 	void overlay_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void overlayhalf_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void overlay3_scandraw_8( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
-	void thom_vblank( screen_device &screen, bool state );
+	DECLARE_WRITE_LINE_MEMBER(thom_vblank);
 	DECLARE_VIDEO_START( thom );
 
 	DECLARE_READ8_MEMBER( to7_5p14_r );
@@ -351,6 +355,19 @@ public:
 
 	MC6854_OUT_FRAME_CB(to7_network_got_frame);
 
+	void to9(machine_config &config);
+	void to7(machine_config &config);
+	void mo5e(machine_config &config);
+	void to770a(machine_config &config);
+	void t9000(machine_config &config);
+	void to8(machine_config &config);
+	void pro128(machine_config &config);
+	void mo6(machine_config &config);
+	void mo5(machine_config &config);
+	void to9p(machine_config &config);
+	void mo5nr(machine_config &config);
+	void to770(machine_config &config);
+	void to8d(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
@@ -366,6 +383,8 @@ protected:
 	optional_device<mc6843_device> m_mc6843;
 	optional_device<acia6850_device> m_acia6850;
 	required_device<screen_device> m_screen;
+	required_device<input_merger_device> m_mainirq;
+	required_device<input_merger_device> m_mainfirq;
 	required_ioport m_io_game_port_directions;
 	required_ioport m_io_game_port_buttons;
 	required_ioport m_io_mouse_x;
@@ -400,9 +419,6 @@ protected:
 	/* buffer storing demodulated bits, only for k7 and with speed hack */
 	uint32_t m_to7_k7_bitsize;
 	uint8_t* m_to7_k7_bits;
-	/* several devices on the same irqs */
-	uint8_t m_thom_irq;
-	uint8_t m_thom_firq;
 	/* ------------ cartridge ------------ */
 	uint8_t m_thom_cart_nb_banks; /* number of 16 KB banks (up to 4) */
 	uint8_t m_thom_cart_bank;     /* current bank */
@@ -423,8 +439,8 @@ protected:
 	uint8_t  m_to9_kbd_in;      /* data from keyboard */
 	uint8_t  m_to9_kbd_status;  /* status */
 	uint8_t  m_to9_kbd_overrun; /* character lost */
-	uint8_t  m_to9_kbd_periph;     /* peripherial mode */
-	uint8_t  m_to9_kbd_byte_count; /* byte-count in peripherial mode */
+	uint8_t  m_to9_kbd_periph;     /* peripheral mode */
+	uint8_t  m_to9_kbd_byte_count; /* byte-count in peripheral mode */
 	uint16_t m_to9_mouse_x;
 	uint16_t m_to9_mouse_y;
 	uint8_t  m_to9_kbd_last_key;  /* for key repetition */
@@ -454,7 +470,7 @@ protected:
 	/* We allow choosing dynamically:
 	   - the border size
 	   - whether we use 640 pixels or 320 pixels in an active row
-	   (now this is automatically choosen by default for each frame)
+	   (now this is automatically chosen by default for each frame)
 	*/
 	uint16_t m_thom_bwidth;
 	uint16_t m_thom_bheight;
@@ -474,7 +490,7 @@ protected:
 	/* lightpen callback function to call from timer */
 	void (thomson_state::*m_thom_lightpen_cb)(int step);
 	uint8_t* m_thom_vram; /* pointer to video memory */
-	emu_timer* m_thom_scanline_timer; /* scan-line udpate */
+	emu_timer* m_thom_scanline_timer; /* scan-line update */
 	uint16_t m_thom_last_pal[16];   /* palette at last scanline start */
 	uint16_t m_thom_pal[16];        /* current palette */
 	uint8_t  m_thom_pal_changed;    /* whether pal != old_pal */
@@ -510,14 +526,7 @@ protected:
 	int to7_get_cassette();
 	int mo5_get_cassette();
 	void mo5_set_cassette( int data );
-	void thom_set_irq( int line, int state );
-	void thom_set_firq( int line, int state );
 	void thom_irq_reset();
-	void thom_irq_init();
-	void thom_irq_0( int state );
-	void thom_irq_3( int state );
-	void thom_firq_2( int state );
-	void thom_irq_4( int state );
 	void thom_set_caps_led( int led );
 	void to7_update_cart_bank();
 	void to7_set_init( int init );
@@ -670,6 +679,20 @@ public:
 	// construction/destruction
 	to7_io_line_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
+private:
+	required_device<pia6821_device> m_pia_io;
+	required_device<rs232_port_device> m_rs232;
+	int m_last_low;
+	int m_centronics_busy;
+	int m_rxd;
+	int m_cts;
+	int m_dsr;
+
 	/* read data register */
 	DECLARE_READ8_MEMBER(porta_in);
 
@@ -680,25 +703,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_cts);
 	DECLARE_WRITE_LINE_MEMBER(write_dsr);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	machine_config_constructor device_mconfig_additions() const override;
-
-private:
-	required_device<pia6821_device> m_pia_io;
-	required_device<rs232_port_device> m_rs232;
-	int m_last_low;
-	int m_centronics_busy;
-	int m_rxd;
-	int m_cts;
-	int m_dsr;
 };
 
-extern const device_type TO7_IO_LINE;
+DECLARE_DEVICE_TYPE(TO7_IO_LINE, to7_io_line_device)
 
 #define MCFG_TO7_IO_LINE_ADD(_tag)  \
 	MCFG_DEVICE_ADD((_tag), TO7_IO_LINE, 0)
 
-#endif /* _THOMSON_H_ */
+#endif // MAME_INCLUDES_THOMSON_H

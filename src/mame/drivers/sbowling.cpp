@@ -42,9 +42,12 @@ PROMs : NEC B406 (1kx4) x2
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
-#include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class sbowling_state : public driver_device
@@ -84,6 +87,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void postload();
+	void sbowling(machine_config &config);
 };
 
 TILE_GET_INFO_MEMBER(sbowling_state::get_tile_info)
@@ -399,7 +403,7 @@ PALETTE_INIT_MEMBER(sbowling_state, sbowling)
 	}
 }
 
-static MACHINE_CONFIG_START( sbowling, sbowling_state )
+MACHINE_CONFIG_START(sbowling_state::sbowling)
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_19_968MHz/10)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
@@ -446,4 +450,4 @@ ROM_START( sbowling )
 	ROM_LOAD( "kb09.6m",        0x0400, 0x0400, CRC(e29191a6) SHA1(9a2c78a96ef6d118f4dacbea0b7d454b66a452ae))
 ROM_END
 
-GAME( 1982, sbowling, 0, sbowling, sbowling, driver_device, 0, ROT90, "Taito Corporation", "Strike Bowling", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, sbowling, 0, sbowling, sbowling, sbowling_state, 0, ROT90, "Taito Corporation", "Strike Bowling", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

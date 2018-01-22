@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/leland.h"
+#include "audio/leland.h"
 
 
 /* constants */
@@ -63,6 +64,18 @@ VIDEO_START_MEMBER(leland_state,leland)
 	/* scanline timer */
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::scanline_callback),this));
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
+
+	save_item(NAME(m_gfx_control));
+	save_pointer(NAME(m_video_ram.get()), VRAM_SIZE);
+	save_item(NAME(m_xscroll));
+	save_item(NAME(m_yscroll));
+	save_item(NAME(m_gfxbank));
+	save_item(NAME(m_last_scanline));
+	for (uint8_t i = 0; i < 2; i++)
+	{
+		save_item(NAME(m_vram_state[i].m_addr), i);
+		save_item(NAME(m_vram_state[i].m_latch), i);
+	}
 }
 
 VIDEO_START_MEMBER(leland_state,ataxx)
@@ -72,6 +85,16 @@ VIDEO_START_MEMBER(leland_state,ataxx)
 
 	/* allocate memory */
 	m_ataxx_qram = make_unique_clear<uint8_t[]>(QRAM_SIZE);
+
+	save_pointer(NAME(m_video_ram.get()), VRAM_SIZE);
+	save_pointer(NAME(m_ataxx_qram.get()), QRAM_SIZE);
+	save_item(NAME(m_xscroll));
+	save_item(NAME(m_yscroll));
+	for (uint8_t i = 0; i < 2; i++)
+	{
+		save_item(NAME(m_vram_state[i].m_addr), i);
+		save_item(NAME(m_vram_state[i].m_latch), i);
+	}
 }
 
 
@@ -175,14 +198,14 @@ int leland_state::leland_vram_port_r(address_space &space, int offset, int num)
 
 		default:
 			logerror("%s: Warning: Unknown video port %02x read (address=%04x)\n",
-						space.machine().describe_context(), offset, addr);
+						machine().describe_context(), offset, addr);
 			ret = 0;
 			break;
 	}
 	state->m_addr = addr;
 
 	if (LOG_COMM && addr >= 0xf000)
-		logerror("%s:%s comm read %04X = %02X\n", space.machine().describe_context(), num ? "slave" : "master", addr, ret);
+		logerror("%s:%s comm read %04X = %02X\n", machine().describe_context(), num ? "slave" : "master", addr, ret);
 
 	return ret;
 }
@@ -210,7 +233,7 @@ void leland_state::leland_vram_port_w(address_space &space, int offset, int data
 		m_screen->update_partial(scanline - 1);
 
 	if (LOG_COMM && addr >= 0xf000)
-		logerror("%s:%s comm write %04X = %02X\n", space.machine().describe_context(), num ? "slave" : "master", addr, data);
+		logerror("%s:%s comm write %04X = %02X\n", machine().describe_context(), num ? "slave" : "master", addr, data);
 
 	/* based on the low 3 bits of the offset, update the destination */
 	switch (offset & 7)
@@ -262,7 +285,7 @@ void leland_state::leland_vram_port_w(address_space &space, int offset, int data
 
 		default:
 			logerror("%s:Warning: Unknown video port write (address=%04x value=%02x)\n",
-						space.machine().describe_context(), offset, addr);
+						machine().describe_context(), offset, addr);
 			break;
 	}
 
@@ -507,7 +530,7 @@ uint32_t leland_state::screen_update_ataxx(screen_device &screen, bitmap_ind16 &
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( leland_video )
+MACHINE_CONFIG_START(leland_state::leland_video)
 
 	MCFG_VIDEO_START_OVERRIDE(leland_state,leland)
 
@@ -523,7 +546,7 @@ MACHINE_CONFIG_FRAGMENT( leland_video )
 	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( ataxx_video, leland_video )
+MACHINE_CONFIG_DERIVED(leland_state::ataxx_video, leland_video)
 	MCFG_VIDEO_START_OVERRIDE(leland_state,ataxx)
 
 	MCFG_SCREEN_MODIFY("screen")

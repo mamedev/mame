@@ -67,25 +67,15 @@ no PCB number but all look identical to each other.
 
 To Do:
 
--   Tilemaps/sprites offsets may be emulated understanding what appear to be CRT registers
-    at c78880 (sequence of 4 values), c78890 (sequence of 5 values) and c788a0 (start sequence).
--   Wrong color bars in service mode (e.g. balcube, toride2g).
-    They use solid color tiles (80xx), but the right palette is not at 00-ff.
-    Related to the unknown table in the RAM mapped just before the palette?
+-   For video related issues @see devices/video/imagetek_i4100.cpp
 -   Most games, in service mode, seem to require that you press start1&2 *exactly at once*
     in order to advance to the next screen (e.g. holding 1 then pressing 2 doesn't work).
 -   Coin lockout
--   Some gfx problems in ladykill, 3kokushi, puzzli, gakusai,
-    seem related to how we handle windows and wrapping
 -   Interrupt timing needs figuring out properly, having it incorrect
     causes scrolling glitches in some games.  Test cases Mouse Go Go
     title screen, GunMaster title screen.  Changing it can cause
     excessive slowdown in said games however.
--   Bang Bang Ball / Bubble Buster slow to a crawl when you press a
-    button between levels, on a real PCB it speeds up instead (related
-    to above?)
--   vmetal: ES8712 sound may not be quite right. Samples are currently looped, but
-    whether they should and how, is unknown. Where does the M6585 hook up to?
+-   vmetal: ES8712 actually controls a M6585 and an unknown logic selector chip.
 
 Notes:
 
@@ -95,21 +85,21 @@ Notes:
     to be the same on the original board
 -   vmetal: has Sega and Taito logos in the roms ?!
 
-
 driver modified by Hau
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/metro.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/upd7810/upd7810.h"
 #include "cpu/h8/h83006.h"
-#include "includes/metro.h"
 #include "machine/watchdog.h"
 #include "sound/ym2413.h"
 #include "sound/2610intf.h"
 #include "sound/ymf278b.h"
-
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -125,7 +115,11 @@ READ16_MEMBER(metro_state::metro_irq_cause_r)
 	/* interrupt cause, used by
 
 	int[0] vblank
-	int[1] ?            DAITORIDE, BALCUBE, KARATOUR, MOUJA
+	int[1] hblank (bangball for faster intermission skip,
+	               puzzli for gameplay water effect,
+	               blzntrnd title screen scroll (enabled all the time then?),
+	               unused/empty in balcube, daitoride, karatour,
+	               unchecked mouja & other i4300 games )
 	int[2] blitter
 	int[3] ?            KARATOUR
 	int[4] ?
@@ -185,7 +179,7 @@ IRQ_CALLBACK_MEMBER(metro_state::metro_irq_callback)
 
 WRITE16_MEMBER(metro_state::metro_irq_cause_w)
 {
-	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", space.device().safe_pc(), data);
+	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", m_maincpu->pc(), data);
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -209,9 +203,6 @@ void metro_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_requested_int[0] = 1;
 		update_irq_state();
 		break;
-	case TIMER_METRO_BLIT_DONE:
-		metro_blit_done(ptr, param);
-		break;
 	default:
 		assert_always(false, "Unknown id in metro_state::device_timer");
 	}
@@ -229,13 +220,32 @@ INTERRUPT_GEN_MEMBER(metro_state::metro_periodic_interrupt)
 	update_irq_state();
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(metro_state::bangball_scanline)
+{
+	int scanline = param;
+
+	// vblank irq
+	if(scanline == 224)
+	{
+		m_requested_int[m_vblank_bit] = 1;
+		m_requested_int[4] = 1; // ???
+		update_irq_state();
+	}
+	else if(scanline < 224 && (*m_irq_enable & 2) == 0)
+	{
+		// pretty likely hblank irq (pressing a button when clearing a stage)
+		m_requested_int[1] = 1;
+		update_irq_state();
+	}
+}
+
 /* lev 2-7 (lev 1 seems sound related) */
 INTERRUPT_GEN_MEMBER(metro_state::karatour_interrupt)
 {
 	m_requested_int[m_vblank_bit] = 1;
 
 	/* write to scroll registers, the duration is a guess */
-	timer_set(attotime::from_usec(2500), TIMER_KARATOUR_IRQ);
+	m_karatour_irq_timer->adjust(attotime::from_usec(2500));
 	m_requested_int[5] = 1;
 
 	update_irq_state();
@@ -281,7 +291,7 @@ WRITE16_MEMBER(metro_state::metro_soundlatch_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		space.device().execute().spin_until_interrupt();
+		m_maincpu->spin_until_interrupt();
 		m_busy_sndcpu = 1;
 	}
 }
@@ -443,249 +453,31 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 
 ***************************************************************************/
 
-/* IT DOESN'T WORK PROPERLY */
-
 WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      machine().bookkeeping().coin_lockout_w(0, data & 1);
-//      machine().bookkeeping().coin_lockout_w(1, data & 2);
+		machine().bookkeeping().coin_counter_w(0, data & 1);
+		machine().bookkeeping().coin_counter_w(1, data & 2);
 	}
-	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
+	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
 }
 
-
+// value written doesn't matter, also each counted coin gets reported after one full second.
+// TODO: maybe the counter also controls lockout?
 WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
 {
+	machine().bookkeeping().coin_counter_w((offset >> 1) & 1, offset & 1);
 //  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
-	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
+
+	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
 }
 
-
-
-
-/***************************************************************************
-
-
-                                Banked ROM access
-
-
-***************************************************************************/
-
-/*
-    The main CPU has access to the ROMs that hold the graphics through
-    a banked window of 64k. Those ROMs also usually store the tables for
-    the virtual tiles set. The tile codes to be written to the tilemap
-    memory to render the backgrounds are also stored here, in a format
-    that the blitter can readily use (which is a form of compression)
-*/
-
-READ16_MEMBER(metro_state::metro_bankedrom_r)
-{
-	uint8_t *ROM = memregion("gfx1")->base();
-	size_t len = memregion("gfx1")->bytes();
-
-	offset = offset * 2 + 0x10000 * (*m_rombank);
-
-	if (offset < len)
-		return ((ROM[offset + 0] << 8) + ROM[offset + 1]);
-	else
-		return 0xffff;
-}
-
-
-
-
-/***************************************************************************
-
-
-                                    Blitter
-
-    [ Registers ]
-
-        Offset:     Value:
-
-        0.l         Destination Tilemap      (1,2,3)
-        4.l         Blitter Data Address     (byte offset into the gfx ROMs)
-        8.l         Destination Address << 7 (byte offset into the tilemap)
-
-        The Blitter reads a byte and looks at the most significative
-        bits for the opcode, while the remaining bits define a value
-        (usually how many bytes to write). The opcode byte may be
-        followed by a number of other bytes:
-
-            76------            Opcode
-            --543210            N
-            (at most N+1 bytes follow)
-
-
-        The blitter is designed to write every other byte (e.g. it
-        writes a byte and skips the next). Hence 2 blits are needed
-        to fill a tilemap (first even, then odd addresses)
-
-    [ Opcodes ]
-
-            0       Copy the following N+1 bytes. If the whole byte
-                    is $00: stop and generate an IRQ
-
-            1       Fill N+1 bytes with a sequence, starting with
-                    the  value in the following byte
-
-            2       Fill N+1 bytes with the value in the following
-                    byte
-
-            3       Skip N+1 bytes. If the whole byte is $C0:
-                    skip to the next row of the tilemap (+0x200 bytes)
-                    but preserve the column passed at the start of the
-                    blit (destination address % 0x200)
-
-
-***************************************************************************/
-
-TIMER_CALLBACK_MEMBER(metro_state::metro_blit_done)
+WRITE_LINE_MEMBER(metro_state::vdp_blit_end_w)
 {
 	m_requested_int[m_blitter_bit] = 1;
 	update_irq_state();
 }
-
-inline int metro_state::blt_read( const uint8_t *ROM, const int offs )
-{
-	return ROM[offs];
-}
-
-void metro_state::blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask )
-{
-	switch(tmap)
-	{
-		case 1: metro_vram_0_w(space, offs, data, mask);    break;
-		case 2: metro_vram_1_w(space, offs, data, mask);    break;
-		case 3: metro_vram_2_w(space, offs, data, mask);    break;
-	}
-//  logerror("%s : Blitter %X] %04X <- %04X & %04X\n", space.machine().describe_context(), tmap, offs, data, mask);
-}
-
-
-WRITE16_MEMBER(metro_state::metro_blitter_w)
-{
-	COMBINE_DATA(&m_blitter_regs[offset]);
-
-	if (offset == 0x0c / 2)
-	{
-		uint8_t *src     = memregion("gfx1")->base();
-		size_t src_len = memregion("gfx1")->bytes();
-
-		uint32_t tmap     = (m_blitter_regs[0x00 / 2] << 16) + m_blitter_regs[0x02 / 2];
-		uint32_t src_offs = (m_blitter_regs[0x04 / 2] << 16) + m_blitter_regs[0x06 / 2];
-		uint32_t dst_offs = (m_blitter_regs[0x08 / 2] << 16) + m_blitter_regs[0x0a / 2];
-
-		int shift   = (dst_offs & 0x80) ? 0 : 8;
-		uint16_t mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
-
-//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", space.device().safe_pc(), tmap, src_offs, dst_offs);
-
-		dst_offs >>= 7 + 1;
-		switch (tmap)
-		{
-			case 1:
-			case 2:
-			case 3:
-				break;
-			default:
-				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", space.device().safe_pc(), tmap);
-				return;
-		}
-
-		while (1)
-		{
-			uint16_t b1, b2, count;
-
-			src_offs %= src_len;
-			b1 = blt_read(src, src_offs);
-//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", space.device().safe_pc(), b1, src_offs);
-			src_offs++;
-
-			count = ((~b1) & 0x3f) + 1;
-
-			switch ((b1 & 0xc0) >> 6)
-			{
-			case 0:
-				/* Stop and Generate an IRQ. We can't generate it now
-				       both because it's unlikely that the blitter is so
-				       fast and because some games (e.g. lastfort) need to
-				       complete the blitter irq service routine before doing
-				       another blit. */
-				if (b1 == 0)
-				{
-					timer_set(attotime::from_usec(500), TIMER_METRO_BLIT_DONE);
-					return;
-				}
-
-				/* Copy */
-				while (count--)
-				{
-					src_offs %= src_len;
-					b2 = blt_read(src, src_offs) << shift;
-					src_offs++;
-
-					dst_offs &= 0xffff;
-					blt_write(space, tmap, dst_offs, b2, mask);
-					dst_offs = ((dst_offs + 1) & (0x100 - 1)) | (dst_offs & (~(0x100 - 1)));
-				}
-				break;
-
-			case 1:
-				/* Fill with an increasing value */
-				src_offs %= src_len;
-				b2 = blt_read(src, src_offs);
-				src_offs++;
-
-				while (count--)
-				{
-					dst_offs &= 0xffff;
-					blt_write(space, tmap, dst_offs, b2 << shift, mask);
-					dst_offs = ((dst_offs + 1) & (0x100 - 1)) | (dst_offs & (~(0x100 - 1)));
-					b2++;
-				}
-				break;
-
-			case 2:
-				/* Fill with a fixed value */
-				src_offs %= src_len;
-				b2 = blt_read(src, src_offs) << shift;
-				src_offs++;
-
-				while (count--)
-				{
-					dst_offs &= 0xffff;
-					blt_write(space, tmap, dst_offs, b2, mask);
-					dst_offs = ((dst_offs + 1) & (0x100 - 1)) | (dst_offs & (~(0x100 - 1)));
-				}
-				break;
-
-			case 3:
-				/* Skip to the next line ?? */
-				if (b1 == 0xc0)
-				{
-					dst_offs +=   0x100;
-					dst_offs &= ~(0x100 - 1);
-					dst_offs |=  (0x100 - 1) & (m_blitter_regs[0x0a / 2] >> (7 + 1));
-				}
-				else
-				{
-					dst_offs += count;
-				}
-				break;
-
-			default:
-				logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",space.device().safe_pc(),b1,src_offs-1);
-				return;
-			}
-
-		}
-	}
-}
-
 
 /***************************************************************************
 
@@ -706,28 +498,12 @@ static ADDRESS_MAP_START( metro_sound_map, AS_PROGRAM, 8, metro_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM         /* External ROM */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")    /* External ROM (Banked) */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM         /* External RAM */
-	AM_RANGE(0xff00, 0xffff) AM_RAM         /* Internal RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( metro_sound_io_map, AS_IO, 8, metro_state )
-	AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READWRITE(metro_porta_r, metro_porta_w)
-	AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_WRITE(metro_portb_w)
-	AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_WRITE(metro_sound_rombank_w)
 ADDRESS_MAP_END
 
 /*****************/
 
 
-static ADDRESS_MAP_START( daitorid_sound_io_map, AS_IO, 8, metro_state )
-	AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READWRITE(metro_porta_r, metro_porta_w)
-	AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_WRITE(daitorid_portb_w)
-	AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_WRITE(daitorid_sound_rombank_w)
-ADDRESS_MAP_END
-
-/*****************/
-
-
-static ADDRESS_MAP_START( ymf278_map, AS_0, 8, metro_state )
+static ADDRESS_MAP_START( ymf278_map, 0, 8, metro_state )
 	AM_RANGE(0x000000, 0x27ffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -763,7 +539,7 @@ READ16_MEMBER(metro_state::balcube_dsw_r)
 		case 0x17FFE:   return BIT(dsw2, 6) ? 0x40 : 0;
 		case 0x0FFFE:   return BIT(dsw2, 7) ? 0x40 : 0;
 	}
-	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n", m_maincpu->pc(), offset);
 	return 0xffff;
 }
 
@@ -777,24 +553,9 @@ static ADDRESS_MAP_START( balcube_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("IN1")                                //
 	AM_RANGE(0x500006, 0x500007) AM_READNOP                                         //
 	AM_RANGE(0x500002, 0x500009) AM_WRITE(metro_coin_lockout_4words_w)              // Coin Lockout
-	AM_RANGE(0x600000, 0x61ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x620000, 0x63ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x640000, 0x65ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x660000, 0x66ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x670000, 0x671fff) AM_RAM                                             // ???
-	AM_RANGE(0x672000, 0x673fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x674000, 0x674fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x678000, 0x6787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x678840, 0x67884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x678860, 0x67886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x678870, 0x67887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
-	AM_RANGE(0x678880, 0x678881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0x678890, 0x678891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x600000, 0x67ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x6788a2, 0x6788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x6788a4, 0x6788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
-	AM_RANGE(0x6788aa, 0x6788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x6788ac, 0x6788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x679700, 0x679713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -806,24 +567,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( daitoa_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x160000, 0x16ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x170000, 0x171fff) AM_RAM                                             // ???
-	AM_RANGE(0x172000, 0x173fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x178870, 0x17887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
-	AM_RANGE(0x178880, 0x178881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0x178890, 0x178891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map )
 	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
-	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x1788ac, 0x1788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("IN0")                                // Inputs
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("IN1")                                //
 	AM_RANGE(0x200006, 0x200007) AM_READNOP                                         //
@@ -848,24 +594,9 @@ static ADDRESS_MAP_START( bangball_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("IN1")                                //
 	AM_RANGE(0xd00006, 0xd00007) AM_READNOP                                         //
 	AM_RANGE(0xd00002, 0xd00009) AM_WRITE(metro_coin_lockout_4words_w)              // Coin Lockout
-	AM_RANGE(0xe00000, 0xe1ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0xe20000, 0xe3ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0xe40000, 0xe5ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0xe60000, 0xe6ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0xe70000, 0xe71fff) AM_RAM                                             // ???
-	AM_RANGE(0xe72000, 0xe73fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xe74000, 0xe74fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0xe78000, 0xe787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0xe78840, 0xe7884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0xe78860, 0xe7886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0xe78870, 0xe7887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
-	AM_RANGE(0xe78880, 0xe78881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0xe78890, 0xe78891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0xe00000, 0xe7ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0xe788a2, 0xe788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0xe788a4, 0xe788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
-	AM_RANGE(0xe788aa, 0xe788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0xe788ac, 0xe788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0xe79700, 0xe79713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -876,24 +607,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( batlbubl_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                             // ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x160000, 0x16ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x170000, 0x171fff) AM_RAM                                             // ???
-	AM_RANGE(0x172000, 0x173fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x178870, 0x17887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
-	AM_RANGE(0x178880, 0x178881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0x178890, 0x178891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
-	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x1788ac, 0x1788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("IN1")                                // Inputs
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("DSW0")                               //
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("IN0")                                //
@@ -912,24 +628,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( msgogo_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x160000, 0x16ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x170000, 0x171fff) AM_RAM                                             // ???
-	AM_RANGE(0x172000, 0x173fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x178870, 0x17887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
-	AM_RANGE(0x178880, 0x178881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0x178890, 0x178891) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
+	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
+	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
-	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x1788ac, 0x1788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("COINS")                              // Inputs
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("JOYS")                               //
 	AM_RANGE(0x200006, 0x200007) AM_READNOP                                         //
@@ -946,25 +647,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( daitorid_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x460000, 0x46ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x470000, 0x471fff) AM_RAM                                             // ???
-	AM_RANGE(0x472000, 0x473fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x478860, 0x47886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x478870, 0x47887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
-	AM_RANGE(0x478880, 0x478881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0x478890, 0x478891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x400000, 0x47ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x4788a4, 0x4788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x4788a8, 0x4788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
-	AM_RANGE(0x4788aa, 0x4788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x4788ac, 0x4788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // To Sound CPU
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                                //
@@ -981,25 +667,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dharma_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x860000, 0x86ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x870000, 0x871fff) AM_RAM                                             // ???
-	AM_RANGE(0x872000, 0x873fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
-	AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0x878890, 0x878891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x800000, 0x87ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x8788a4, 0x8788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x8788a8, 0x8788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
-	AM_RANGE(0x8788aa, 0x8788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x8788ac, 0x8788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x879700, 0x879713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // To Sound CPU
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                                //
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")                               //
@@ -1012,20 +683,6 @@ ADDRESS_MAP_END
                                 Karate Tournament
 ***************************************************************************/
 
-/* This game uses almost only the blitter to write to the tilemaps.
-   The CPU can only access a "window" of 512x256 pixels in the upper
-   left corner of the big tilemap */
-
-#define KARATOUR_OFFS( _x_ ) ((_x_) & (0x3f)) + (((_x_) & ~(0x3f)) * (0x100 / 0x40))
-
-READ16_MEMBER(metro_state::karatour_vram_0_r){ return m_vram_0[KARATOUR_OFFS(offset)]; }
-READ16_MEMBER(metro_state::karatour_vram_1_r){ return m_vram_1[KARATOUR_OFFS(offset)]; }
-READ16_MEMBER(metro_state::karatour_vram_2_r){ return m_vram_2[KARATOUR_OFFS(offset)]; }
-
-WRITE16_MEMBER(metro_state::karatour_vram_0_w){ metro_vram_0_w(space, KARATOUR_OFFS(offset), data, mem_mask); }
-WRITE16_MEMBER(metro_state::karatour_vram_1_w){ metro_vram_1_w(space, KARATOUR_OFFS(offset), data, mem_mask); }
-WRITE16_MEMBER(metro_state::karatour_vram_2_w){ metro_vram_2_w(space, KARATOUR_OFFS(offset), data, mem_mask); }
-
 static ADDRESS_MAP_START( karatour_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x400001) AM_READWRITE(metro_soundstatus_r, metro_soundstatus_w) // From Sound CPU
@@ -1035,25 +692,10 @@ static ADDRESS_MAP_START( karatour_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x400006, 0x400007) AM_READ_PORT("DSW0")                               //
 	AM_RANGE(0x40000a, 0x40000b) AM_READ_PORT("DSW1")                               //
 	AM_RANGE(0x40000c, 0x40000d) AM_READ_PORT("IN2")                                //
-	AM_RANGE(0x860000, 0x86ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x870000, 0x871fff) AM_RAM                                             // ???
-	AM_RANGE(0x872000, 0x873fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x875000, 0x875fff) AM_READWRITE(karatour_vram_0_r, karatour_vram_0_w) // Layer 0 (Part of)
-	AM_RANGE(0x876000, 0x876fff) AM_READWRITE(karatour_vram_1_r, karatour_vram_1_w) // Layer 1 (Part of)
-	AM_RANGE(0x877000, 0x877fff) AM_READWRITE(karatour_vram_2_r, karatour_vram_2_w) // Layer 2 (Part of)
-	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x878800, 0x878813) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
-	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
-	AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0x878890, 0x878891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x800000, 0x87ffff) AM_DEVICE("vdp", imagetek_i4100_device, map)
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x8788a4, 0x8788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x8788a8, 0x8788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
-	AM_RANGE(0x8788aa, 0x8788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x8788ac, 0x8788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -1067,29 +709,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kokushi_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
-	AM_RANGE(0x860000, 0x86ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x870000, 0x871fff) AM_RAM                                             // ???
-	AM_RANGE(0x872000, 0x873fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x875000, 0x875fff) AM_READWRITE(karatour_vram_0_r, karatour_vram_0_w) // Layer 0 (Part of)
-	AM_RANGE(0x876000, 0x876fff) AM_READWRITE(karatour_vram_1_r, karatour_vram_1_w) // Layer 1 (Part of)
-	AM_RANGE(0x877000, 0x877fff) AM_READWRITE(karatour_vram_2_r, karatour_vram_2_w) // Layer 2 (Part of)
-	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs - WRONG
-//  AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0x878890, 0x878891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x800000, 0x87ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause /  IRQ Acknowledge
 	AM_RANGE(0x8788a4, 0x8788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x8788a8, 0x8788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
-	AM_RANGE(0x8788aa, 0x8788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x8788ac, 0x8788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x879700, 0x879713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // To Sound CPU
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                                // Inputs
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")                               //
-	AM_RANGE(0xc00002, 0xc00009) AM_WRITE(metro_coin_lockout_4words_w   )           // Coin Lockout
+	AM_RANGE(0xc00002, 0xc00009) AM_WRITE(metro_coin_lockout_4words_w)              // Coin Lockout
 ADDRESS_MAP_END
 
 
@@ -1100,25 +727,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lastfort_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x860000, 0x86ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x870000, 0x871fff) AM_RAM                                             // ???
-	AM_RANGE(0x872000, 0x873fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x878800, 0x878813) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
-	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
-	AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0x878890, 0x878891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x800000, 0x87ffff) AM_DEVICE("vdp", imagetek_i4100_device, map)
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x8788a4, 0x8788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x8788a8, 0x8788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
-	AM_RANGE(0x8788aa, 0x8788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x8788ac, 0x8788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
 	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(metro_soundstatus_r, metro_soundstatus_w) // From / To Sound CPU
 	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(metro_coin_lockout_1word_w)               // Coin Lockout
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("IN0")                                // Inputs
@@ -1141,25 +753,10 @@ static ADDRESS_MAP_START( lastforg_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x400006, 0x400007) AM_READ_PORT("DSW0")                               //
 	AM_RANGE(0x40000a, 0x40000b) AM_READ_PORT("DSW1")                               //
 	AM_RANGE(0x40000c, 0x40000d) AM_READ_PORT("IN2")                                //
-	AM_RANGE(0x880000, 0x89ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x8a0000, 0x8bffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x8c0000, 0x8dffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x8e0000, 0x8effff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x8f0000, 0x8f1fff) AM_RAM                                             // ???
-	AM_RANGE(0x8f2000, 0x8f3fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x8f4000, 0x8f4fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x8f8000, 0x8f87ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x8f8800, 0x8f8813) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
-	AM_RANGE(0x8f8840, 0x8f884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x8f8860, 0x8f886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x8f8870, 0x8f887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
-	AM_RANGE(0x8f8880, 0x8f8881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0x8f8890, 0x8f8891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x880000, 0x8fffff) AM_DEVICE("vdp", imagetek_i4100_device, map)
 	AM_RANGE(0x8f88a2, 0x8f88a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x8f88a4, 0x8f88a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x8f88a8, 0x8f88a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
-	AM_RANGE(0x8f88aa, 0x8f88ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x8f88ac, 0x8f88ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -1174,22 +771,16 @@ void metro_state::gakusai_oki_bank_set()
 	m_oki->set_rom_bank(bank);
 }
 
-WRITE16_MEMBER(metro_state::gakusai_oki_bank_hi_w)
+WRITE8_MEMBER(metro_state::gakusai_oki_bank_hi_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_gakusai_oki_bank_hi = data & 0xff;
-		gakusai_oki_bank_set();
-	}
+	m_gakusai_oki_bank_hi = data;
+	gakusai_oki_bank_set();
 }
 
-WRITE16_MEMBER(metro_state::gakusai_oki_bank_lo_w)
+WRITE8_MEMBER(metro_state::gakusai_oki_bank_lo_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_gakusai_oki_bank_lo = data & 0xff;
-		gakusai_oki_bank_set();
-	}
+	m_gakusai_oki_bank_lo = data;
+	gakusai_oki_bank_set();
 }
 
 
@@ -1205,56 +796,40 @@ READ16_MEMBER(metro_state::gakusai_input_r)
 	return 0xffff;
 }
 
-READ16_MEMBER(metro_state::gakusai_eeprom_r)
+READ8_MEMBER(metro_state::gakusai_eeprom_r)
 {
 	return m_eeprom->do_read() & 1;
 }
 
-WRITE16_MEMBER(metro_state::gakusai_eeprom_w)
+WRITE8_MEMBER(metro_state::gakusai_eeprom_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		// latch the bit
-		m_eeprom->di_write(BIT(data, 0));
+	// latch the bit
+	m_eeprom->di_write(BIT(data, 0));
 
-		// reset line asserted: reset.
-		m_eeprom->cs_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE );
+	// reset line asserted: reset.
+	m_eeprom->cs_write(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE );
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static ADDRESS_MAP_START( gakusai_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x220000, 0x23ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x240000, 0x25ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x260000, 0x26ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x270000, 0x271fff) AM_RAM                                             // ???
-	AM_RANGE(0x272000, 0x273fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x274000, 0x274fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x278000, 0x2787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x27880e, 0x27880f) AM_RAM AM_SHARE("screenctrl")                      // Screen Control
+	AM_RANGE(0x200000, 0x27ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map )
 	AM_RANGE(0x278810, 0x27881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
 	AM_RANGE(0x278820, 0x27882f) AM_WRITEONLY AM_SHARE("irq_vectors")               // IRQ Vectors
 	AM_RANGE(0x278830, 0x278831) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x278832, 0x278833) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
-	AM_RANGE(0x278836, 0x278837) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x278840, 0x27884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x278850, 0x27885b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
-	AM_RANGE(0x278860, 0x27886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x278870, 0x278871) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
+	AM_RANGE(0x278836, 0x278837) AM_READNOP AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r)                           // Inputs
 	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")                                //
 	AM_RANGE(0x278888, 0x278889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
-	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                                        // ? 5
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w)                    // Sound
+	AM_RANGE(0x500000, 0x500001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Sound
 	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
-	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(gakusai_eeprom_r, gakusai_eeprom_w)   // EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(gakusai_oki_bank_hi_w)
+	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE8(gakusai_eeprom_r, gakusai_eeprom_w, 0x00ff)      // EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE8(gakusai_oki_bank_hi_w, 0x00ff)
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -1265,35 +840,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gakusai2_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
-	AM_RANGE(0x600000, 0x61ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x620000, 0x63ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x640000, 0x65ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x660000, 0x66ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x670000, 0x671fff) AM_RAM                                             // ???
-	AM_RANGE(0x672000, 0x673fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x674000, 0x674fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x675000, 0x675fff) AM_RAM                                             // Sprites?
-	AM_RANGE(0x678000, 0x6787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x67880e, 0x67880f) AM_RAM AM_SHARE("screenctrl")                      // Screen Control
+	AM_RANGE(0x600000, 0x67ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map)
 	AM_RANGE(0x678810, 0x67881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
 	AM_RANGE(0x678820, 0x67882f) AM_WRITEONLY AM_SHARE("irq_vectors")               // IRQ Vectors
 	AM_RANGE(0x678830, 0x678831) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x678832, 0x678833) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
-	AM_RANGE(0x678836, 0x678837) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x678840, 0x67884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x678850, 0x67885b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
-	AM_RANGE(0x678860, 0x67886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x678870, 0x678871) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
+	AM_RANGE(0x678836, 0x678837) AM_READNOP AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x678880, 0x678881) AM_READ(gakusai_input_r)                           // Inputs
 	AM_RANGE(0x678882, 0x678883) AM_READ_PORT("IN0")                                //
 	AM_RANGE(0x678888, 0x678889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
-	AM_RANGE(0x679700, 0x679713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_WRITENOP                                        // ? 5
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(gakusai_oki_bank_lo_w)                    // Sound bank
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_hi_w)                    //
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Sound bank
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(gakusai_oki_bank_hi_w, 0x00ff)           //
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
-	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(gakusai_eeprom_r,gakusai_eeprom_w)    // EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE8(gakusai_eeprom_r, gakusai_eeprom_w, 0x00ff)      // EEPROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -1302,7 +863,7 @@ ADDRESS_MAP_END
                         Mahjong Doukyuusei Special
 ***************************************************************************/
 
-READ16_MEMBER(metro_state::dokyusp_eeprom_r)
+READ8_MEMBER(metro_state::dokyusp_eeprom_r)
 {
 	// clock line asserted: write latch or select next bit to read
 	m_eeprom->clk_write(CLEAR_LINE);
@@ -1311,58 +872,39 @@ READ16_MEMBER(metro_state::dokyusp_eeprom_r)
 	return m_eeprom->do_read() & 1;
 }
 
-WRITE16_MEMBER(metro_state::dokyusp_eeprom_bit_w)
+WRITE8_MEMBER(metro_state::dokyusp_eeprom_bit_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		// latch the bit
-		m_eeprom->di_write(BIT(data, 0));
+	// latch the bit
+	m_eeprom->di_write(BIT(data, 0));
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write(CLEAR_LINE);
-		m_eeprom->clk_write(ASSERT_LINE);
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write(CLEAR_LINE);
+	m_eeprom->clk_write(ASSERT_LINE);
 }
 
-WRITE16_MEMBER(metro_state::dokyusp_eeprom_reset_w)
+WRITE8_MEMBER(metro_state::dokyusp_eeprom_reset_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		// reset line asserted: reset.
-		m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
-	}
+	// reset line asserted: reset.
+	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( dokyusp_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x220000, 0x23ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x240000, 0x25ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x260000, 0x26ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x270000, 0x271fff) AM_RAM                                             // ???
-	AM_RANGE(0x272000, 0x273fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x274000, 0x274fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x278000, 0x2787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x27880e, 0x27880f) AM_RAM AM_SHARE("screenctrl")                      // Screen Control
+	AM_RANGE(0x200000, 0x27ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map)
 	AM_RANGE(0x278810, 0x27881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
 	AM_RANGE(0x278820, 0x27882f) AM_WRITEONLY AM_SHARE("irq_vectors")               // IRQ Vectors
 	AM_RANGE(0x278830, 0x278831) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x278832, 0x278833) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x278836, 0x278837) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x278840, 0x27884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x278850, 0x27885b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
-	AM_RANGE(0x278860, 0x27886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x278870, 0x278871) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r)                           // Inputs
 	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")                                //
 	AM_RANGE(0x278888, 0x278889) AM_WRITEONLY AM_SHARE("input_sel")                 //
-	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP                                        // ? 5
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w)                    // Sound
+	AM_RANGE(0x500000, 0x500001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Sound
 	AM_RANGE(0x600000, 0x600003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(dokyusp_eeprom_reset_w)                       // EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(dokyusp_eeprom_r, dokyusp_eeprom_bit_w)   // EEPROM
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE8(dokyusp_eeprom_reset_w, 0x00ff)                      // EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE8(dokyusp_eeprom_r, dokyusp_eeprom_bit_w, 0x00ff)  // EEPROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -1373,35 +915,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dokyusei_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x460000, 0x46ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x460000, 0x46ffff) AM_WRITENOP                                        // DSW Selection
-	AM_RANGE(0x470000, 0x471fff) AM_RAM                                             // ???
-	AM_RANGE(0x472000, 0x473fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x47880e, 0x47880f) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
+	AM_RANGE(0x400000, 0x47ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map)
 	AM_RANGE(0x478810, 0x47881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
 	AM_RANGE(0x478820, 0x47882f) AM_WRITEONLY AM_SHARE("irq_vectors")               // IRQ Vectors
 	AM_RANGE(0x478830, 0x478831) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 //  AM_RANGE(0x478832, 0x478833) AM_READ(metro_irq_cause_r)                         // IRQ Cause
 	AM_RANGE(0x478832, 0x478833) AM_WRITE(metro_irq_cause_w)                        // IRQ Acknowledge
 	AM_RANGE(0x478836, 0x478837) AM_WRITENOP                                        // ? watchdog ?
-	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x478850, 0x47885b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
-	AM_RANGE(0x478860, 0x47886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x478870, 0x478871) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
 	AM_RANGE(0x478880, 0x478881) AM_READ(gakusai_input_r)                           // Inputs
 	AM_RANGE(0x478882, 0x478883) AM_READ_PORT("IN0")                                //
 	AM_RANGE(0x478884, 0x478885) AM_READ_PORT("DSW0")                               // 2 x DSW
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("DSW1")                               //
 	AM_RANGE(0x478888, 0x478889) AM_WRITEONLY AM_SHARE("input_sel")                 // Inputs
-	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(gakusai_oki_bank_hi_w)                    // Samples Bank?
+	AM_RANGE(0x800000, 0x800001) AM_WRITE8(gakusai_oki_bank_hi_w, 0x00ff)           // Samples Bank?
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP                                        // ? 4
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_lo_w)                    // Samples Bank
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(gakusai_oki_bank_lo_w, 0x00ff)           // Samples Bank
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)     //
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
@@ -1414,25 +942,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pangpoms_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                             // ROM
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x460000, 0x46ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x470000, 0x471fff) AM_RAM                                             // ???
-	AM_RANGE(0x472000, 0x473fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x478800, 0x478813) AM_RAM AM_SHARE("videoregs")                       // Video Registers
-	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x478860, 0x47886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x478870, 0x47887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
-	AM_RANGE(0x478880, 0x478881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0x478890, 0x478891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x400000, 0x47ffff) AM_DEVICE("vdp", imagetek_i4100_device, map)
 	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x4788a4, 0x4788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x4788a8, 0x4788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
-	AM_RANGE(0x4788aa, 0x4788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x4788ac, 0x4788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
 	AM_RANGE(0x800000, 0x800001) AM_READWRITE(metro_soundstatus_r,metro_soundstatus_w)  // From / To Sound CPU
 	AM_RANGE(0x800002, 0x800003) AM_READNOP AM_WRITE(metro_coin_lockout_1word_w)    // Coin Lockout
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("IN0")                                // Inputs
@@ -1457,25 +970,10 @@ static ADDRESS_MAP_START( poitto_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW0")                               //
 	AM_RANGE(0x800006, 0x800007) AM_READ_PORT("IN2")                                //
 	AM_RANGE(0x800002, 0x800009) AM_WRITE(metro_coin_lockout_4words_w)              // Coin Lockout
-	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0xc20000, 0xc3ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0xc40000, 0xc5ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0xc60000, 0xc6ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0xc70000, 0xc71fff) AM_RAM                                             // ???
-	AM_RANGE(0xc72000, 0xc73fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xc74000, 0xc74fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0xc78000, 0xc787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0xc78800, 0xc78813) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
-	AM_RANGE(0xc78840, 0xc7884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0xc78860, 0xc7886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0xc78870, 0xc7887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
-	AM_RANGE(0xc78880, 0xc78881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0xc78890, 0xc78891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0xc00000, 0xc7ffff) AM_DEVICE("vdp", imagetek_i4100_device, map)
 	AM_RANGE(0xc788a2, 0xc788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0xc788a4, 0xc788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0xc788a8, 0xc788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
-	AM_RANGE(0xc788aa, 0xc788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0xc788ac, 0xc788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
 ADDRESS_MAP_END
 
 
@@ -1493,25 +991,10 @@ static ADDRESS_MAP_START( skyalert_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x40000a, 0x40000b) AM_READ_PORT("DSW0")                               //
 	AM_RANGE(0x40000c, 0x40000d) AM_READ_PORT("DSW1")                               //
 	AM_RANGE(0x40000e, 0x40000f) AM_READ_PORT("IN3")                                //
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x860000, 0x86ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x870000, 0x871fff) AM_RAM                                             // ???
-	AM_RANGE(0x872000, 0x873fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x878800, 0x878813) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
-	AM_RANGE(0x878840, 0x87884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x878860, 0x87886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x878870, 0x87887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
-	AM_RANGE(0x878880, 0x878881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0x878890, 0x878891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x800000, 0x87ffff) AM_DEVICE("vdp", imagetek_i4100_device, map)
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x8788a4, 0x8788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x8788a8, 0x8788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
-	AM_RANGE(0x8788aa, 0x8788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x8788ac, 0x8788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -1528,25 +1011,10 @@ static ADDRESS_MAP_START( pururun_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x400006, 0x400007) AM_READ_PORT("IN2")                                //
 	AM_RANGE(0x400002, 0x400009) AM_WRITE(metro_coin_lockout_4words_w)              // Coin Lockout
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0xc20000, 0xc3ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0xc40000, 0xc5ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0xc60000, 0xc6ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0xc70000, 0xc71fff) AM_RAM                                             // ???
-	AM_RANGE(0xc72000, 0xc73fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xc74000, 0xc74fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0xc78000, 0xc787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0xc78840, 0xc7884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0xc78860, 0xc7886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0xc78870, 0xc7887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
-	AM_RANGE(0xc78880, 0xc78881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0xc78890, 0xc78891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0xc00000, 0xc7ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0xc788a2, 0xc788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0xc788a4, 0xc788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0xc788a8, 0xc788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
-	AM_RANGE(0xc788aa, 0xc788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0xc788ac, 0xc788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0xc79700, 0xc79713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 ADDRESS_MAP_END
 
 
@@ -1562,25 +1030,10 @@ static ADDRESS_MAP_START( toride2g_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW0")                               //
 	AM_RANGE(0x800006, 0x800007) AM_READ_PORT("IN2")                                //
 	AM_RANGE(0x800002, 0x800009) AM_WRITE(metro_coin_lockout_4words_w)              // Coin Lockout
-	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0xc20000, 0xc3ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0xc40000, 0xc5ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0xc60000, 0xc6ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0xc70000, 0xc71fff) AM_RAM                                             // ???
-	AM_RANGE(0xc72000, 0xc73fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0xc74000, 0xc74fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0xc78000, 0xc787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0xc78840, 0xc7884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0xc78860, 0xc7886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0xc78870, 0xc7887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
-	AM_RANGE(0xc78880, 0xc78881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0xc78890, 0xc78891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0xc00000, 0xc7ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map )
 	AM_RANGE(0xc788a2, 0xc788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0xc788a4, 0xc788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0xc788a8, 0xc788a9) AM_WRITE(metro_soundlatch_w)                       // To Sound CPU
-	AM_RANGE(0xc788aa, 0xc788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0xc788ac, 0xc788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0xc79700, 0xc79713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 ADDRESS_MAP_END
 
 
@@ -1618,24 +1071,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blzntrnd_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                                             // ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x220000, 0x23ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x240000, 0x25ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x260000, 0x26ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x260000, 0x26ffff) AM_WRITENOP                                        // ??????
-	AM_RANGE(0x270000, 0x271fff) AM_RAM                                             // ???
-	AM_RANGE(0x272000, 0x273fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x274000, 0x274fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x278000, 0x2787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x278860, 0x27886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x278870, 0x27887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
-	AM_RANGE(0x278890, 0x278891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x200000, 0x27ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x2788a2, 0x2788a3) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x2788a4, 0x2788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
-	AM_RANGE(0x2788aa, 0x2788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x2788ac, 0x2788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
-//  AM_RANGE(0x300000, 0x300001) AM_READNOP                                         // Sound
 
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM_WRITE(metro_k053936_w) AM_SHARE("k053936_ram")  // 053936
 	AM_RANGE(0x500000, 0x500fff) AM_DEVWRITE("k053936", k053936_device, linectrl_w)      // 053936 line control
@@ -1661,41 +1099,24 @@ WRITE8_MEMBER(metro_state::mouja_sound_rombank_w)
 
 static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                             // ROM
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x470000, 0x471fff) AM_RAM                                             // ???
-	AM_RANGE(0x472000, 0x473fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x47880e, 0x47880f) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
+	AM_RANGE(0x400000, 0x47ffff) AM_DEVICE("vdp3", imagetek_i4300_device, v3_map)
 	AM_RANGE(0x478810, 0x47881f) AM_WRITEONLY AM_SHARE("irq_levels")                // IRQ Levels
 	AM_RANGE(0x478820, 0x47882f) AM_WRITEONLY AM_SHARE("irq_vectors")               // IRQ Vectors
 	AM_RANGE(0x478830, 0x478831) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
 	AM_RANGE(0x478832, 0x478833) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)  // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x478834, 0x478835) AM_WRITE(mouja_irq_timer_ctrl_w)                   // IRQ set timer count
 	AM_RANGE(0x478836, 0x478837) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x478850, 0x47885b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll Regs
-	AM_RANGE(0x478860, 0x47886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
 	AM_RANGE(0x478880, 0x478881) AM_READ_PORT("IN0")                                // Inputs
 	AM_RANGE(0x478882, 0x478883) AM_READ_PORT("IN1")                                //
 	AM_RANGE(0x478884, 0x478885) AM_READ_PORT("DSW0")                               //
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("IN2")                                //
-	AM_RANGE(0x478888, 0x478889) AM_WRITENOP                                        // ??
-	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x800000, 0x800001) AM_WRITE8(mouja_sound_rombank_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff)
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xffff)
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
-#if 0
-	AM_RANGE(0x460000, 0x46ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x47883a, 0x47883b) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x800002, 0x800009) AM_WRITE(metro_coin_lockout_4words_w)              // Coin Lockout
-#endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mouja_okimap, AS_0, 8, metro_state )
+static ADDRESS_MAP_START( mouja_okimap, 0, 8, metro_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -1718,7 +1139,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( clk_w );
 
-	template<class _Object> static devcb_base &set_data_cb(device_t &device, _Object object) { return downcast<puzzlet_io_device &>(device).data_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_data_cb(device_t &device, Object &&cb) { return downcast<puzzlet_io_device &>(device).data_cb.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	virtual void device_start() override;
@@ -1732,13 +1153,13 @@ private:
 	uint8_t value;
 };
 
-const device_type PUZZLET_IO = &device_creator<puzzlet_io_device>;
+DEFINE_DEVICE_TYPE(PUZZLET_IO, puzzlet_io_device, "puzzlet_io", "Puzzlet Coin/Start I/O")
 
 
 puzzlet_io_device::puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PUZZLET_IO, "Puzzlet Coin/Start I/O", tag, owner, clock, "puzzlet_io", __FILE__),
-		data_cb(*this),
-		port(*this, ":IN0")
+	: device_t(mconfig, PUZZLET_IO, tag, owner, clock)
+	, data_cb(*this)
+	, port(*this, ":IN0")
 {
 }
 
@@ -1790,34 +1211,6 @@ WRITE16_MEMBER(metro_state::puzzlet_irq_enable_w)
 		*m_irq_enable = data ^ 0xffff;
 }
 
-/* FIXME: algorithm not yet understood. */
-WRITE16_MEMBER(metro_state::vram_0_clr_w)
-{
-	static int i;
-
-//  printf("0 %04x %04x\n",offset,data);
-	for(i=0;i<0x20/2;i++)
-		m_vram_0[(offset*0x10+i)/2] = 0xffff;
-}
-
-WRITE16_MEMBER(metro_state::vram_1_clr_w)
-{
-	static int i;
-
-//  printf("0 %04x %04x\n",offset,data);
-	for(i=0;i<0x20/2;i++)
-		m_vram_1[(offset*0x10+i)/2] = 0xffff;
-}
-
-WRITE16_MEMBER(metro_state::vram_2_clr_w)
-{
-	static int i;
-
-//  printf("0 %04x %04x\n",offset,data);
-	for(i=0;i<0x20/2;i++)
-		m_vram_2[(offset*0x10+i)/2] = 0xffff;
-}
-
 
 // H8/3007 CPU
 static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
@@ -1828,26 +1221,10 @@ static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x580000, 0x580003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)
 
-	AM_RANGE(0x700000, 0x71ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x720000, 0x73ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x740000, 0x75ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x760000, 0x76ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x770000, 0x771fff) AM_RAM                                             // ???
-	AM_RANGE(0x772000, 0x773fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x774000, 0x774fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x775000, 0x775fff) AM_RAM_WRITE(vram_0_clr_w)
-	AM_RANGE(0x776000, 0x776fff) AM_RAM_WRITE(vram_1_clr_w)
-	AM_RANGE(0x777000, 0x777fff) AM_RAM_WRITE(vram_2_clr_w)
-	AM_RANGE(0x778000, 0x7787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x778800, 0x778813) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
-	AM_RANGE(0x778840, 0x77884f) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x778860, 0x77886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x778870, 0x77887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
-	AM_RANGE(0x778890, 0x778891) AM_WRITENOP                                        // ? CRT
+	// TODO: !!! i4300 !!!
 	AM_RANGE(0x7788a2, 0x7788a3) AM_WRITE(metro_irq_cause_w)                            // IRQ Cause
 	AM_RANGE(0x7788a4, 0x7788a5) AM_WRITE(puzzlet_irq_enable_w) AM_SHARE("irq_enable")  // IRQ Enable
-	AM_RANGE(0x7788aa, 0x7788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x7788ac, 0x7788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
+	AM_RANGE(0x700000, 0x77ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 
 	AM_RANGE(0x7f2000, 0x7f3fff) AM_RAM
 
@@ -1883,10 +1260,9 @@ WRITE8_MEMBER(metro_state::vmetal_control_w)
 //  machine().bookkeeping().coin_lockout_w(0, data & 0x01);  /* always on in game mode?? */
 	machine().bookkeeping().coin_lockout_w(1, data & 0x02);  /* never activated in game mode?? */
 
-	if ((data & 0x40) == 0)
-		m_essnd->reset();
-	else
-		m_essnd->play();
+	m_essnd_gate = BIT(data, 6);
+	if (!m_essnd_gate)
+		m_maincpu->set_input_line(3, CLEAR_LINE);
 
 	if (data & 0x10)
 		m_essnd->set_bank_base(0x100000);
@@ -1897,68 +1273,29 @@ WRITE8_MEMBER(metro_state::vmetal_control_w)
 		logerror("%s: Writing unknown bits %04x to $200000\n",machine().describe_context(),data);
 }
 
-WRITE8_MEMBER(metro_state::vmetal_es8712_w)
+WRITE8_MEMBER(metro_state::es8712_reset_w)
 {
-	/* Many samples in the ADPCM ROM are actually not used.
+	m_essnd->reset();
+}
 
-	Snd         Offset Writes                 Sample Range
-	     0000 0004 0002 0006 000a 0008 000c
-	--   ----------------------------------   -------------
-	00   006e 0001 00ab 003c 0002 003a 003a   01ab6e-023a3c
-	01   003d 0002 003a 001d 0002 007e 007e   023a3d-027e1d
-	02   00e2 0003 0005 002e 0003 00f3 00f3   0305e2-03f32e
-	03   000a 0005 001e 00f6 0005 00ec 00ec   051e0a-05ecf6
-	04   00f7 0005 00ec 008d 0006 0060 0060   05ecf7-06608d
-	05   0016 0008 002e 0014 0009 0019 0019   082e16-091914
-	06   0015 0009 0019 0094 000b 0015 0015   091915-0b1594
-	07   0010 000d 0012 00bf 000d 0035 0035   0d1210-0d35bf
-	08   00ce 000e 002f 0074 000f 0032 0032   0e2fce-0f3274
-	09   0000 0000 0000 003a 0000 007d 007d   000000-007d3a
-	0a   0077 0000 00fa 008d 0001 00b6 00b6   00fa77-01b68d
-	0b   008e 0001 00b6 00b3 0002 0021 0021   01b68e-0221b3
-	0c   0062 0002 00f7 0038 0003 00de 00de   02f762-03de38
-	0d   00b9 0005 00ab 00ef 0006 0016 0016   05abb9-0616ef
-	0e   00dd 0007 0058 00db 0008 001a 001a   0758dd-081adb
-	0f   00dc 0008 001a 002e 0008 008a 008a   081adc-088a2e
-	10   00db 0009 00d7 00ff 000a 0046 0046   09d7db-0a46ff
-	11   0077 000c 0003 006d 000c 0080 0080   0c0377-0c806d
-	12   006e 000c 0080 006c 000d 0002 0002   0c806e-0d026c
-	13   006d 000d 0002 002b 000d 0041 0041   0d026d-0d412b
-	14   002c 000d 0041 002a 000d 00be 00be   0d412c-0dbe2a
-	15   002b 000d 00be 0029 000e 0083 0083   0dbe2b-0e8329
-	16   002a 000e 0083 00ee 000f 0069 0069   0e832a-0f69ee
-	*/
-
-	m_essnd->es8712_w(space, offset, data);
-	logerror("%s: Writing %04x to ES8712 offset %02x\n", machine().describe_context(), data, offset);
+WRITE_LINE_MEMBER(metro_state::vmetal_es8712_irq)
+{
+	if (m_essnd_gate)
+		m_maincpu->set_input_line(3, state);
 }
 
 static ADDRESS_MAP_START( vmetal_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                             // ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(metro_vram_0_w) AM_SHARE("vram_0")    // Layer 0
-	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(metro_vram_1_w) AM_SHARE("vram_1")    // Layer 1
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(metro_vram_2_w) AM_SHARE("vram_2")    // Layer 2
-	AM_RANGE(0x160000, 0x16ffff) AM_READ(metro_bankedrom_r)                         // Banked ROM
-	AM_RANGE(0x170000, 0x171fff) AM_RAM                                             // ???
-	AM_RANGE(0x172000, 0x173fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
-	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_SHARE("spriteram")                       // Sprites
-	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_SHARE("tiletable")                       // Tiles Set
-	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_SHARE("blitter_regs") // Tiles Blitter
-	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_SHARE("window")        // Tilemap Window
-	AM_RANGE(0x178870, 0x17887b) AM_WRITEONLY AM_SHARE("scroll")                    // Scroll
-	AM_RANGE(0x178880, 0x178881) AM_WRITENOP                                        // ? CRT
-	AM_RANGE(0x178890, 0x178891) AM_WRITENOP                                        // ? CRT
+	AM_RANGE(0x100000, 0x17ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x1788a2, 0x1788a3) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w) // IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITEONLY AM_SHARE("irq_enable")                // IRQ Enable
-	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITEONLY AM_SHARE("rombank")                   // Rom Bank
-	AM_RANGE(0x1788ac, 0x1788ad) AM_WRITEONLY AM_SHARE("screenctrl")                // Screen Control
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_SHARE("videoregs")                 // Video Registers
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_WRITE8(vmetal_control_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r)                             // DSW x 3
 	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE(0x400002, 0x400003) AM_DEVWRITE8("oki", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x500000, 0x50000d) AM_WRITE8(vmetal_es8712_w, 0x00ff)
+	AM_RANGE(0x500000, 0x500001) AM_WRITE8(es8712_reset_w, 0xff00)
+	AM_RANGE(0x500000, 0x50000d) AM_DEVWRITE8("essnd", es8712_device, write, 0x00ff)
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM AM_MIRROR(0x0f0000)                         // RAM (mirrored)
 ADDRESS_MAP_END
 
@@ -2810,9 +2147,10 @@ static INPUT_PORTS_START( lastfort )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Tiles" )             PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(      0x0080, "Mahjong" )
+//  PORT_DIPNAME( 0x0080, 0x0080, "Tiles" )             PORT_DIPLOCATION("SW2:8")
+//  PORT_DIPSETTING(      0x0080, "Mahjong" )
 //  PORT_DIPSETTING(      0x0000, "Cards" )             // Not working - See notes
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )
 
 	PORT_START("IN3")   // $c0000e
 	PORT_BIT(  0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3146,50 +2484,130 @@ static INPUT_PORTS_START( puzzlet )
 	PORT_START("IN1")       // IN1 - 7f8880.w
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)   // Next
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)   // Next
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)   // Rotate CW
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)   // Rotate CW
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)   // Push
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)   // Push
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")       // IN2 - port 7
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW0")      // IN3 - dsw?
-	PORT_DIPUNKNOWN( 0x0001, 0x0001 )
-	PORT_DIPUNKNOWN( 0x0002, 0x0002 )
-	PORT_DIPUNKNOWN( 0x0004, 0x0004 )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x0002, 0x0002 ) // possibly Demo_Sounds? Verify when sound works.
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPUNKNOWN( 0x0008, 0x0008 )
-	PORT_DIPUNKNOWN( 0x0010, 0x0010 )
+	PORT_DIPNAME( 0x0010, 0x0010, "Nudity" )
+	PORT_DIPSETTING(      0x0010, "Topless" )
+	PORT_DIPSETTING(      0x0000, "Full" )
 	PORT_DIPUNKNOWN( 0x0020, 0x0020 )
-	PORT_DIPUNKNOWN( 0x0040, 0x0040 )
+	PORT_DIPUNKNOWN( 0x0040, 0x0040 ) // both 0x0040 and 0x0080 switch from 14 to 16 pieces to complete the puzzle. What's the difference between them?
 	PORT_DIPUNKNOWN( 0x0080, 0x0080 )
 
-	PORT_DIPUNKNOWN( 0x0100, 0x0100 )
-	PORT_DIPUNKNOWN( 0x0200, 0x0200 )
-	PORT_DIPUNKNOWN( 0x0400, 0x0400 )
-	PORT_DIPUNKNOWN( 0x0800, 0x0800 )
-	PORT_DIPUNKNOWN( 0x1000, 0x1000 )
-	PORT_DIPUNKNOWN( 0x2000, 0x2000 )
-	PORT_DIPUNKNOWN( 0x4000, 0x4000 )
-	PORT_DIPUNKNOWN( 0x8000, 0x8000 )
+	PORT_DIPNAME( 0xff00, 0xff00, DEF_STR( Coinage ) ) // all other settings redundant
+	PORT_DIPSETTING(      0xef00, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(      0xe700, "9 Coins/2 Credits" )
+	PORT_DIPSETTING(      0xeb00, "9 Coins/3 Credits" )
+	PORT_DIPSETTING(      0xe300, "9 Coins/4 Credits" )
+	PORT_DIPSETTING(      0xed00, "9 Coins/5 Credits" )
+	PORT_DIPSETTING(      0xe500, "9 Coins/6 Credits" )
+	PORT_DIPSETTING(      0xe900, "9 Coins/7 Credits" )
+	PORT_DIPSETTING(      0xe100, "9 Coins/8 Credits" )
+	PORT_DIPSETTING(      0xee00, "9 Coins/9 Credits" )
+	PORT_DIPSETTING(      0x1f00, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(      0x1700, "8 Coins/2 Credits" )
+	PORT_DIPSETTING(      0x1b00, "8 Coins/3 Credits" )
+	PORT_DIPSETTING(      0x1300, "8 Coins/4 Credits" )
+	PORT_DIPSETTING(      0x1d00, "8 Coins/5 Credits" )
+	PORT_DIPSETTING(      0x1500, "8 Coins/6 Credits" )
+	PORT_DIPSETTING(      0x1900, "8 Coins/7 Credits" )
+	PORT_DIPSETTING(      0x1100, "8 Coins/8 Credits" )
+	PORT_DIPSETTING(      0x1e00, "8 Coins/9 Credits" )
+	PORT_DIPSETTING(      0x9f00, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(      0x9700, "7 Coins/2 Credits" )
+	PORT_DIPSETTING(      0x9b00, "7 Coins/3 Credits" )
+	PORT_DIPSETTING(      0x9300, "7 Coins/4 Credits" )
+	PORT_DIPSETTING(      0x9d00, "7 Coins/5 Credits" )
+	PORT_DIPSETTING(      0x9500, "7 Coins/6 Credits" )
+	PORT_DIPSETTING(      0x9900, "7 Coins/7 Credits" )
+	PORT_DIPSETTING(      0x9100, "7 Coins/8 Credits" )
+	PORT_DIPSETTING(      0x9e00, "7 Coins/9 Credits" )
+	PORT_DIPSETTING(      0x5f00, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(      0x5700, "6 Coins/2 Credits" )
+	PORT_DIPSETTING(      0x5b00, "6 Coins/3 Credits" )
+	PORT_DIPSETTING(      0x5300, "6 Coins/4 Credits" )
+	PORT_DIPSETTING(      0x5d00, "6 Coins/5 Credits" )
+	PORT_DIPSETTING(      0x5500, "6 Coins/6 Credits" )
+	PORT_DIPSETTING(      0x5900, "6 Coins/7 Credits" )
+	PORT_DIPSETTING(      0x5100, "6 Coins/8 Credits" )
+	PORT_DIPSETTING(      0x5e00, "6 Coins/9 Credits" )
+	PORT_DIPSETTING(      0xdf00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0xd700, "5 Coins/2 Credits" )
+	PORT_DIPSETTING(      0xdb00, DEF_STR( 5C_3C ) )
+	PORT_DIPSETTING(      0xd300, "5 Coins/4 Credits" )
+	PORT_DIPSETTING(      0xdd00, "5 Coins/5 Credits" )
+	PORT_DIPSETTING(      0xd500, "5 Coins/6 Credits" )
+	PORT_DIPSETTING(      0xd900, "5 Coins/7 Credits" )
+	PORT_DIPSETTING(      0xd100, "5 Coins/8 Credits" )
+	PORT_DIPSETTING(      0xde00, "5 Coins/9 Credits" )
+	PORT_DIPSETTING(      0x3f00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x3700, DEF_STR( 4C_2C ) )
+	PORT_DIPSETTING(      0x3b00, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(      0x3300, DEF_STR( 4C_4C ) )
+	PORT_DIPSETTING(      0x3d00, DEF_STR( 4C_5C ) )
+	PORT_DIPSETTING(      0x3500, "4 Coins/6 Credits" )
+	PORT_DIPSETTING(      0x3900, DEF_STR( 4C_7C ) )
+	PORT_DIPSETTING(      0x3100, "4 Coins/8 Credits" )
+	PORT_DIPSETTING(      0x3e00, "4 Coins/9 Credits" )
+	PORT_DIPSETTING(      0xbf00, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0xb700, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0xbb00, DEF_STR( 3C_3C ) )
+	PORT_DIPSETTING(      0xb300, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(      0xbd00, "3 Coins/5 Credits" )
+	PORT_DIPSETTING(      0xb500, "3 Coins/6 Credits" )
+	PORT_DIPSETTING(      0xb900, "3 Coins/7 Credits" )
+	PORT_DIPSETTING(      0xb100, "3 Coins/8 Credits" )
+	PORT_DIPSETTING(      0xbe00, "3 Coins/9 Credits" )
+	PORT_DIPSETTING(      0x7f00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x7700, DEF_STR( 2C_2C ) )
+	PORT_DIPSETTING(      0x7b00, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x7300, DEF_STR( 2C_4C ) )
+	PORT_DIPSETTING(      0x7d00, DEF_STR( 2C_5C ) )
+	PORT_DIPSETTING(      0x7500, DEF_STR( 2C_6C ) )
+	PORT_DIPSETTING(      0x7900, DEF_STR( 2C_7C ) )
+	PORT_DIPSETTING(      0x7100, DEF_STR( 2C_8C ) )
+	PORT_DIPSETTING(      0x7e00, "2 Coins/9 Credits" )
+	PORT_DIPSETTING(      0xff00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0xf700, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0xfb00, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0xf300, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0xfd00, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0xf500, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0xf900, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(      0xf100, DEF_STR( 1C_8C ) )
+	PORT_DIPSETTING(      0xfe00, DEF_STR( 1C_9C ) )
 INPUT_PORTS_END
 
 
@@ -3617,13 +3035,99 @@ void metro_state::machine_start()
 	save_item(NAME(m_busy_sndcpu));
 	save_item(NAME(m_gakusai_oki_bank_lo));
 	save_item(NAME(m_gakusai_oki_bank_hi));
-	save_item(NAME(m_sprite_xoffs));
-	save_item(NAME(m_sprite_yoffs));
 }
 
+MACHINE_CONFIG_START(metro_state::i4100_config)
+	MCFG_DEVICE_ADD("vdp", I4100, XTAL_26_666MHz)
+	MCFG_I4100_GFXDECODE("gfxdecode")
+	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58.2328) // VSync 58.2328Hz, HSync 15.32kHz
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+	MCFG_SCREEN_UPDATE_DEVICE("vdp", imagetek_i4100_device, screen_update)
+	MCFG_SCREEN_PALETTE(":vdp:palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", ":vdp:palette", i4100)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(metro_state::i4220_config)
+	MCFG_DEVICE_ADD("vdp2", I4220, XTAL_26_666MHz)
+	MCFG_I4100_GFXDECODE("gfxdecode")
+	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58.2328) // VSync 58.2328Hz, HSync 15.32kHz
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE_DEVICE("vdp2", imagetek_i4100_device, screen_update)
+	MCFG_SCREEN_PALETTE(":vdp2:palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", ":vdp2:palette", i4220)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(metro_state::i4300_config)
+	MCFG_DEVICE_ADD("vdp3", I4300, XTAL_26_666MHz)
+	MCFG_I4100_GFXDECODE("gfxdecode")
+	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58.2328) // VSync 58.2328Hz, HSync 15.32kHz
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE_DEVICE("vdp3", imagetek_i4100_device, screen_update)
+	MCFG_SCREEN_PALETTE(":vdp3:palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", ":vdp3:palette", i4300)
+MACHINE_CONFIG_END
+
+// TODO: these comes from the CRTC inside the i4100
+MACHINE_CONFIG_START(metro_state::i4100_config_360x224)
+	MCFG_FRAGMENT_ADD( i4100_config )
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_SIZE(360, 224)
+	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(metro_state::i4220_config_320x240)
+	MCFG_FRAGMENT_ADD( i4220_config )
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(metro_state::i4220_config_304x224)
+	MCFG_FRAGMENT_ADD( i4220_config )
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(metro_state::i4300_config_384x224)
+	MCFG_FRAGMENT_ADD( i4300_config )
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_SIZE(384, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(metro_state::i4300_config_320x240)
+	MCFG_FRAGMENT_ADD( i4300_config )
+
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_SIZE(384, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( msgogo, metro_state )
+MACHINE_CONFIG_START(metro_state::msgogo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -3632,59 +3136,80 @@ static MACHINE_CONFIG_START( msgogo, metro_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD( i4220_config )
+	MCFG_DEVICE_MODIFY("vdp2")
+	MCFG_I4100_TILEMAP_XOFFSETS(-2,-2,-2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, ymf278_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, ymf278_map)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("maincpu", 2))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( balcube, msgogo )
+MACHINE_CONFIG_DERIVED(metro_state::balcube, msgogo)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(balcube_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( daitoa, msgogo )
+MACHINE_CONFIG_DERIVED(metro_state::daitoa, msgogo)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(daitoa_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bangball, msgogo )
+MACHINE_CONFIG_DERIVED(metro_state::bangball, msgogo)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bangball_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
+	MCFG_CPU_VBLANK_INT_REMOVE()
+	MCFG_CPU_PERIODIC_INT_REMOVE()
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metro_state, bangball_scanline, "screen", 0, 1)
+
+	// doesn't like 58.2 Hz
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( batlbubl, msgogo )
+MACHINE_CONFIG_DERIVED(metro_state::batlbubl, msgogo)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(batlbubl_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
+	MCFG_CPU_VBLANK_INT_REMOVE()
+	MCFG_CPU_PERIODIC_INT_REMOVE()
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metro_state, bangball_scanline, "screen", 0, 1)
+
+	// doesn't like 58.2 Hz
+	MCFG_DEVICE_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( daitorid, metro_state )
+MACHINE_CONFIG_START(metro_state::metro_upd7810_sound)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
+	MCFG_UPD7810_RXD(READLINE(metro_state, metro_rxd_r))
+	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
+	MCFG_UPD7810_PORTA_READ_CB(READ8(metro_state, metro_porta_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(metro_state, metro_porta_w))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(metro_state, metro_portb_w))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(metro_state, metro_sound_rombank_w))
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(metro_state::daitorid_upd7810_sound)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_12MHz)
+	MCFG_UPD7810_RXD(READLINE(metro_state, metro_rxd_r))
+	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
+	MCFG_UPD7810_PORTA_READ_CB(READ8(metro_state, metro_porta_r))
+	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(metro_state, metro_porta_w))
+	MCFG_UPD7810_PORTB_WRITE_CB(WRITE8(metro_state, daitorid_portb_w))
+	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(metro_state, daitorid_sound_rombank_w))
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_START(metro_state::daitorid)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -3692,42 +3217,28 @@ static MACHINE_CONFIG_START( daitorid, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_12MHz)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(daitorid_sound_io_map)
+	MCFG_FRAGMENT_ADD(daitorid_upd7810_sound)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_tmap)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD( i4220_config )
+	MCFG_DEVICE_MODIFY("vdp2")
+	MCFG_I4100_TILEMAP_XOFFSETS(-2,-2,-2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1200000, OKIM6295_PIN7_HIGH) // sample rate =  M6295 clock / 132
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_OKIM6295_ADD("oki", 1200000, PIN7_HIGH) // sample rate =  M6295 clock / 132
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dharma, metro_state )
+MACHINE_CONFIG_START(metro_state::dharma)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -3735,41 +3246,24 @@ static MACHINE_CONFIG_START( dharma, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD(i4220_config)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // sample rate =  M6295 clock / 132
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // sample rate =  M6295 clock / 132
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-
-static MACHINE_CONFIG_START( karatour, metro_state )
+MACHINE_CONFIG_START(metro_state::karatour)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -3777,41 +3271,25 @@ static MACHINE_CONFIG_START( karatour, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4100)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD(i4100_config)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( 3kokushi, metro_state )
+MACHINE_CONFIG_START(metro_state::_3kokushi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -3819,41 +3297,25 @@ static MACHINE_CONFIG_START( 3kokushi, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD( i4220_config_320x240 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( lastfort, metro_state )
+MACHINE_CONFIG_START(metro_state::lastfort)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -3861,40 +3323,24 @@ static MACHINE_CONFIG_START( lastfort, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(360, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4100)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD( i4100_config_360x224 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_LOW) // sample rate =  M6295 clock / 165
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_LOW) // sample rate =  M6295 clock / 165
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lastforg, metro_state )
+MACHINE_CONFIG_START(metro_state::lastforg)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -3902,40 +3348,23 @@ static MACHINE_CONFIG_START( lastforg, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(360, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4100)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD( i4100_config_360x224 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dokyusei, metro_state )
+MACHINE_CONFIG_START(metro_state::dokyusei)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -3944,32 +3373,19 @@ static MACHINE_CONFIG_START( dokyusei, metro_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4300)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD( i4300_config )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dokyusp, metro_state )
+MACHINE_CONFIG_START(metro_state::dokyusp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -3982,33 +3398,20 @@ static MACHINE_CONFIG_START( dokyusp, metro_state )
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(384, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4300)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD( i4300_config_384x224 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gakusai, metro_state )
+MACHINE_CONFIG_START(metro_state::gakusai)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
@@ -4021,33 +3424,20 @@ static MACHINE_CONFIG_START( gakusai, metro_state )
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4300)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD( i4300_config_320x240 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gakusai2, metro_state )
+MACHINE_CONFIG_START(metro_state::gakusai2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
@@ -4060,33 +3450,20 @@ static MACHINE_CONFIG_START( gakusai2, metro_state )
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4300)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD( i4300_config_320x240 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pangpoms, metro_state )
+MACHINE_CONFIG_START(metro_state::pangpoms)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -4094,41 +3471,25 @@ static MACHINE_CONFIG_START( pangpoms, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(360, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4100)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD( i4100_config_360x224 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( poitto, metro_state )
+MACHINE_CONFIG_START(metro_state::poitto)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -4136,41 +3497,25 @@ static MACHINE_CONFIG_START( poitto, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(360, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4100)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD( i4100_config_360x224 )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // was /128.. so pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pururun, metro_state )
+MACHINE_CONFIG_START(metro_state::pururun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)       /* Not confirmed */
@@ -4178,42 +3523,26 @@ static MACHINE_CONFIG_START( pururun, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)     /* Not confiremd */
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(daitorid_sound_io_map)
+	MCFG_FRAGMENT_ADD(daitorid_upd7810_sound)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD( i4220_config )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)  /* Confirmed match to reference video */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_3_579545MHz/3, OKIM6295_PIN7_HIGH) // sample rate =  M6295 clock / 132
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_OKIM6295_ADD("oki", XTAL_3_579545MHz/3, PIN7_HIGH) // sample rate =  M6295 clock / 132
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( skyalert, metro_state )
+MACHINE_CONFIG_START(metro_state::skyalert)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -4221,41 +3550,25 @@ static MACHINE_CONFIG_START( skyalert, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(360, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_FRAGMENT_ADD(i4100_config_360x224)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4100)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4100)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_LOW) // sample rate =  M6295 clock / 165
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_LOW) // sample rate =  M6295 clock / 165
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( toride2g, metro_state )
+MACHINE_CONFIG_START(metro_state::toride2g)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -4263,41 +3576,25 @@ static MACHINE_CONFIG_START( toride2g, metro_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
-	MCFG_UPD7810_RXD(READLINE(metro_state,metro_rxd_r))
-	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
-	MCFG_CPU_IO_MAP(metro_sound_io_map)
+	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD( i4220_config )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mouja, metro_state )
+MACHINE_CONFIG_START(metro_state::mouja)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -4308,33 +3605,20 @@ static MACHINE_CONFIG_START( mouja, metro_state )
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4300)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_FRAGMENT_ADD( i4300_config )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/1024*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, mouja_okimap)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/1024*132, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(0, mouja_okimap)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vmetal, metro_state )
+MACHINE_CONFIG_START(metro_state::vmetal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -4343,35 +3627,27 @@ static MACHINE_CONFIG_START( vmetal, metro_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58.2328) // VSync 58.2328Hz, HSync 15.32kHz
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_FRAGMENT_ADD( i4220_config_304x224 )
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4220)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4220_dx_sprite)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	MCFG_DEVICE_MODIFY("vdp2")
+	MCFG_I4100_TILEMAP_XOFFSETS(-16,-16,-16)
+	MCFG_I4100_TILEMAP_YOFFSETS(-16,-16,-16)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_ES8712_ADD("essnd", 12000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_ES8712_RESET_HANDLER(WRITELINE(metro_state, vmetal_es8712_irq))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// OKI M6585 not hooked up...
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( blzntrnd, metro_state )
+MACHINE_CONFIG_START(metro_state::blzntrnd)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -4384,45 +3660,50 @@ static MACHINE_CONFIG_START( blzntrnd, metro_state )
 	MCFG_CPU_IO_MAP(blzntrnd_sound_io_map)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(8, 320-8-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
+	MCFG_DEVICE_ADD("vdp2", I4220, XTAL_26_666MHz)
+	MCFG_I4100_GFXDECODE("gfxdecode")
+	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blzntrnd)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58.2328) // VSync 58.2328Hz, HSync 15.32kHz
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(320, 240)
+	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
+	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_psac_vdp2_mix)
+	MCFG_SCREEN_PALETTE(":vdp2:palette")
 	MCFG_VIDEO_START_OVERRIDE(metro_state,blzntrnd)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", ":vdp2:palette", blzntrnd)
+
 
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
-	MCFG_K053936_OFFSETS(-69, -21)
+	MCFG_K053936_OFFSETS(-77, -21)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gstrik2, blzntrnd )
+MACHINE_CONFIG_DERIVED(metro_state::gstrik2, blzntrnd)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gstrik2)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,gstrik2)
 
 	MCFG_DEVICE_MODIFY("k053936")
-	MCFG_K053936_OFFSETS(-69, -19)
+	MCFG_K053936_OFFSETS(-77, -19)
+
+	MCFG_DEVICE_MODIFY("vdp2")
+	MCFG_I4100_TILEMAP_XOFFSETS(0,-8,0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( puzzlet, metro_state )
+MACHINE_CONFIG_START(metro_state::puzzlet)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83007, XTAL_20MHz) // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
@@ -4438,29 +3719,17 @@ static MACHINE_CONFIG_START( puzzlet, metro_state )
 	MCFG_H8_SCI_CLK_CALLBACK(DEVWRITELINE(":coins", puzzlet_io_device, clk_w))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 224)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(metro_state, screen_update_metro)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", i4300)
-	MCFG_VIDEO_START_OVERRIDE(metro_state,metro_i4300)
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(GGGGGRRRRRBBBBBx)
+	// TODO: looks like game is running in i4220 compatibilty mode, $778000 seems to be an id for the chip?
+	MCFG_FRAGMENT_ADD( i4220_config )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_20MHz/5, OKIM6295_PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_OKIM6295_ADD("oki", XTAL_20MHz/5, PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_20MHz/5)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.90)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.90)
+	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
@@ -4504,7 +3773,7 @@ ROM_START( balcube )
 	ROM_LOAD16_BYTE( "bal-cube_06.6", 0x000000, 0x040000, CRC(c400f84d) SHA1(416eb82ec1201d24d9d964191a5a1792c9445923) ) /* Silkscreened 6 and U18 */
 	ROM_LOAD16_BYTE( "bal-cube_05.5", 0x000001, 0x040000, CRC(15313e3f) SHA1(10a8702016f223194dc91875b4736253fd47dbb8) ) /* Silkscreened 5 and U19 */
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* Gfx + Data (Addressable by CPU & Blitter) */
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* Gfx + Data (Addressable by CPU & Blitter) */
 	ROMX_LOAD( "bal-cube_02.2", 0x000000, 0x080000, CRC(492ca8f0) SHA1(478336a462a2bfc288cf91262314f5767f8c707d) , ROM_GROUPWORD | ROM_SKIP(6)) /* Silkscreened 2 and U30 */
 	ROMX_LOAD( "bal-cube_04.4", 0x000002, 0x080000, CRC(d1acda2c) SHA1(f58015302af6c864523d48bdf8f8a4383b69fa9d) , ROM_GROUPWORD | ROM_SKIP(6)) /* Silkscreened 4 and U29 */
 	ROMX_LOAD( "bal-cube_01.1", 0x000004, 0x080000, CRC(0ea3d161) SHA1(63ae430a19e777ce82b41ab02baef3bb224c7557) , ROM_GROUPWORD | ROM_SKIP(6)) /* Silkscreened 1 and U28 */
@@ -4567,7 +3836,7 @@ PCB -
  REV: LM2D-Y
  SEL: 00-200-004
 
-Same basic componets as those listed for Bang Bang Ball, except
+Same basic components as those listed for Bang Bang Ball, except
 PCB uses a Xlinix XC9536 istead of the Altera EMP7032LC44 PLD.
 
 Did Limenko license this or bootleg it?  The board doesn't look like a
@@ -6240,15 +5509,7 @@ DRIVER_INIT_MEMBER(metro_state,metro)
 
 DRIVER_INIT_MEMBER(metro_state,karatour)
 {
-	m_vram_0.allocate(0x20000/2);
-	m_vram_1.allocate(0x20000/2);
-	m_vram_2.allocate(0x20000/2);
-	for (int i = 0; i < 0x20000 / 2; i++)
-	{
-		m_vram_0[i] = machine().rand();
-		m_vram_1[i] = machine().rand();
-		m_vram_2[i] = machine().rand();
-	}
+	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
 
 	DRIVER_INIT_CALL(metro);
 }
@@ -6274,7 +5535,7 @@ DRIVER_INIT_MEMBER(metro_state,balcube)
 
 	for (unsigned i = 0; i < len; i+=2)
 	{
-		ROM[i]  = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i]  = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 	}
 
 	metro_common();
@@ -6291,11 +5552,11 @@ DRIVER_INIT_MEMBER(metro_state,dharmak)
 	{
 		uint8_t dat;
 		dat = src[i + 1];
-		dat = BITSWAP8(dat, 7,3,2,4, 5,6,1,0);
+		dat = bitswap<8>(dat, 7,3,2,4, 5,6,1,0);
 		src[i + 1] = dat;
 
 		dat = src[i + 3];
-		dat = BITSWAP8(dat, 7,2,5,4, 3,6,1,0);
+		dat = bitswap<8>(dat, 7,2,5,4, 3,6,1,0);
 		src[i + 3] = dat;
 	}
 
@@ -6306,6 +5567,16 @@ DRIVER_INIT_MEMBER(metro_state,blzntrnd)
 {
 	metro_common();
 	m_irq_line = 1;
+
+	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
+}
+
+DRIVER_INIT_MEMBER(metro_state,vmetal)
+{
+	metro_common();
+	m_irq_line = 1;
+	m_essnd_gate = false;
+	save_item(NAME(m_essnd_gate));
 }
 
 DRIVER_INIT_MEMBER(metro_state,mouja)
@@ -6333,6 +5604,12 @@ DRIVER_INIT_MEMBER(metro_state,puzzlet)
 	m_blitter_bit = 3;
 }
 
+DRIVER_INIT_MEMBER(metro_state,lastfortg)
+{
+	DRIVER_INIT_CALL(metro);
+	m_karatour_irq_timer = timer_alloc(TIMER_KARATOUR_IRQ);
+}
+
 /***************************************************************************
 
 
@@ -6349,15 +5626,15 @@ GAME( 1992, skyalert,  0,        skyalert, skyalert, metro_state, metro,    ROT2
 GAME( 1993, ladykill,  0,        karatour, ladykill, metro_state, karatour, ROT90,  "Yanyaka (Mitchell license)",                      "Lady Killer",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, moegonta,  ladykill, karatour, moegonta, metro_state, karatour, ROT90,  "Yanyaka",                                         "Moeyo Gonta!! (Japan)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, poitto,    0,        poitto,   poitto,   metro_state, metro,    ROT0,   "Metro / Able Corp.",                              "Poitto!",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1994, blzntrnd,  0,        blzntrnd, blzntrnd, metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Blazing Tornado",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, blzntrnd,  0,        blzntrnd, blzntrnd, metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Blazing Tornado",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1994, dharma,    0,        dharma,   dharma,   metro_state, dharmak,  ROT0,   "Metro",                                           "Dharma Doujou",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dharmaj,   dharma,   dharma,   dharma,   metro_state, metro,    ROT0,   "Metro",                                           "Dharma Doujou (Japan)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dharmak,   dharma,   dharma,   dharma,   metro_state, dharmak,  ROT0,   "Metro",                                           "Dharma Doujou (Korea)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfort,  0,        lastfort, lastfort, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastforte, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Erotic, Rev C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfortea,lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Erotic, Rev A)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfort,  0,        lastfort, lastfort, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Japan)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastforte, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev C)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfortea,lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev A)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, lastfortk, lastfort, lastfort, lastfero, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (Korea)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfortg, lastfort, lastforg, ladykill, metro_state, metro,    ROT0,   "Metro",                                           "Last Fortress - Toride (German)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfortg, lastfort, lastforg, ladykill, metro_state, lastfortg,ROT0,   "Metro",                                           "Last Fortress - Toride (Germany)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2g,  0,        toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2gg, toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden (German)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2gk, toride2g, toride2g, toride2g, metro_state, metro,    ROT0,   "Metro",                                           "Toride II Bok Su Oi Jeon Adauchi Gaiden (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
@@ -6370,15 +5647,15 @@ GAME( 1995, dokyusp,   0,        dokyusp,  gakusai,  metro_state, gakusai,  ROT0
 GAME( 1995, msgogo,    0,        msgogo,   msgogo,   metro_state, balcube,  ROT0,   "Metro",                                           "Mouse Shooter GoGo",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pururun,   0,        pururun,  pururun,  metro_state, daitorid, ROT0,   "Metro / Banpresto",                               "Pururun",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1995, puzzli,    0,        daitorid, puzzli,   metro_state, daitorid, ROT0,   "Metro / Banpresto",                               "Puzzli",                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, 3kokushi,  0,        3kokushi, 3kokushi, metro_state, karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, 3kokushi,  0,        _3kokushi,3kokushi, metro_state, karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, balcube,   0,        balcube,  balcube,  metro_state, balcube,  ROT0,   "Metro",                                           "Bal Cube",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bangball,  0,        bangball, bangball, metro_state, balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse",          "Bang Bang Ball (v1.05)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gstrik2,   0,        gstrik2,  gstrik2,  metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Europe and Oceania)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gstrik2j,  gstrik2,  gstrik2,  gstrik2,  metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Japan)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // priority between rounds
+GAME( 1996, gstrik2,   0,        gstrik2,  gstrik2,  metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Europe and Oceania)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, gstrik2j,  gstrik2,  gstrik2,  gstrik2,  metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Japan)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // priority between rounds
 GAME( 1999, batlbubl,  bangball, batlbubl, batlbubl, metro_state, balcube,  ROT0,   "Banpresto (Limenko license?)",                    "Battle Bubble (v2.00)",                  MACHINE_SUPPORTS_SAVE ) // or bootleg?
 GAME( 1996, mouja,     0,        mouja,    mouja,    metro_state, mouja,    ROT0,   "Etona",                                           "Mouja (Japan)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1997, gakusai,   0,        gakusai,  gakusai,  metro_state, gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, gakusai2,  0,        gakusai2, gakusai,  metro_state, gakusai,  ROT0,   "MakeSoft",                                        "Mahjong Gakuensai 2 (Japan)",            MACHINE_SUPPORTS_SAVE )
 GAME( 2000, puzzlet,   0,        puzzlet,  puzzlet,  metro_state, puzzlet,  ROT0,   "Unies Corporation",                               "Puzzlet (Japan)",                        MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, vmetal,    0,        vmetal,   vmetal,   metro_state, blzntrnd, ROT90,  "Excellent System",                                "Varia Metal",                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, vmetaln,   vmetal,   vmetal,   vmetal,   metro_state, blzntrnd, ROT90,  "Excellent System (New Ways Trading Co. license)", "Varia Metal (New Ways Trading Co.)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, vmetal,    0,        vmetal,   vmetal,   metro_state, vmetal,   ROT90,  "Excellent System",                                "Varia Metal",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1995, vmetaln,   vmetal,   vmetal,   vmetal,   metro_state, vmetal,   ROT90,  "Excellent System (New Ways Trading Co. license)", "Varia Metal (New Ways Trading Co.)",     MACHINE_SUPPORTS_SAVE )

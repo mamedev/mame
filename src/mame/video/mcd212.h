@@ -21,10 +21,11 @@ TODO:
 
 *******************************************************************************/
 
-#ifndef _VIDEO_MCD212_H_
-#define _VIDEO_MCD212_H_
+#ifndef MAME_VIDEO_MCD212_H
+#define MAME_VIDEO_MCD212_H
 
-#include "emu.h"
+#pragma once
+
 
 #define MCD212_CURCNT_COLOR         0x00000f    // Cursor color
 #define MCD212_CURCNT_CUW           0x008000    // Cursor width
@@ -248,6 +249,6 @@ private:
 };
 
 // device type definition
-extern const device_type MACHINE_MCD212;
+DECLARE_DEVICE_TYPE(MACHINE_MCD212, mcd212_device)
 
-#endif // _VIDEO_MCD212_H_
+#endif // MAME_VIDEO_MCD212_H

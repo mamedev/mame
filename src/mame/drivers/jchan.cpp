@@ -155,13 +155,16 @@ JC-301-00  W11 9510K7059    23C16000        U85
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
+#include "machine/watchdog.h"
 #include "sound/ymz280b.h"
 #include "video/sknsspr.h"
-#include "machine/eepromser.h"
-#include "machine/watchdog.h"
 #include "video/kaneko_tmap.h"
 #include "machine/kaneko_toybox.h"
+#include "screen.h"
+#include "speaker.h"
 
 class jchan_state : public driver_device
 {
@@ -180,7 +183,7 @@ public:
 		m_sprregs_2(*this, "sprregs_2"),
 		m_mainsub_shared_ram(*this, "mainsub_shared"),
 		m_ctrl(*this, "ctrl")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -219,6 +222,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank);
+	void jchan(machine_config &config);
 };
 
 
@@ -441,7 +445,7 @@ static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16, jchan_state )
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sknsspr_sprite32_1_w) AM_SHARE("spriteram_1")
 	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE(sknsspr_sprite32regs_1_w) AM_SHARE("sprregs_1")
 
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // palette for sprites?
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette for sprites?
 
 	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE(ctrl_r, ctrl_w) AM_SHARE("ctrl")
 
@@ -574,7 +578,7 @@ INPUT_PORTS_END
 
 /* machine driver */
 
-static MACHINE_CONFIG_START( jchan, jchan_state )
+MACHINE_CONFIG_START(jchan_state::jchan)
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(jchan_main)
@@ -711,5 +715,5 @@ DRIVER_INIT_MEMBER( jchan_state, jchan )
 
 
 /* game drivers */
-GAME( 1995, jchan,     0,        jchan,    jchan, jchan_state,    jchan,    ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, jchan2,    0,        jchan,    jchan2, jchan_state,   jchan,    ROT0, "Kaneko", "Jackie Chan in Fists of Fire", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan,     0,        jchan,    jchan,  jchan_state,   jchan,    ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, jchan2,    0,        jchan,    jchan2, jchan_state,   jchan,    ROT0, "Kaneko", "Jackie Chan in Fists of Fire",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

@@ -6,12 +6,10 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_UPD65031_H
+#define MAME_MACHINE_UPD65031_H
+
 #pragma once
-
-#ifndef __UPD65031__
-#define __UPD65031__
-
-#include "emu.h"
 
 
 
@@ -32,10 +30,10 @@
 	devcb = &upd65031_device::set_spkr_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_UPD65031_SCR_UPDATE_CB(_class, _method) \
-	upd65031_device::set_screen_update_callback(*device, upd65031_screen_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	upd65031_device::set_screen_update_callback(*device, upd65031_screen_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_UPD65031_MEM_UPDATE_CB(_class, _method) \
-	upd65031_device::set_memory_update_callback(*device, upd65031_memory_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	upd65031_device::set_memory_update_callback(*device, upd65031_memory_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 //**************************************************************************
@@ -115,7 +113,7 @@ private:
 
 
 // device type definition
-extern const device_type UPD65031;
+DECLARE_DEVICE_TYPE(UPD65031, upd65031_device)
 
 
-#endif
+#endif // MAME_MACHINE_UPD65031_H

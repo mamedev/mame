@@ -17,13 +17,15 @@
 
 ****************************************************************************/
 
-
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/ti89.h"
-#include "machine/nvram.h"
+
+#include "cpu/m68000/m68000.h"
 #include "machine/intelfsh.h"
+#include "machine/nvram.h"
 #include "rendlay.h"
+#include "screen.h"
+
 
 uint8_t ti68k_state::keypad_r()
 {
@@ -513,7 +515,7 @@ PALETTE_INIT_MEMBER(ti68k_state, ti68k)
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-static MACHINE_CONFIG_START( ti89, ti68k_state )
+MACHINE_CONFIG_START(ti68k_state::ti89)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(ti89_mem)
@@ -539,7 +541,7 @@ static MACHINE_CONFIG_START( ti89, ti68k_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ti92, ti89 )
+MACHINE_CONFIG_DERIVED(ti68k_state::ti92, ti89)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ti92_mem)
 
@@ -549,19 +551,19 @@ static MACHINE_CONFIG_DERIVED( ti92, ti89 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ti92p, ti92 )
+MACHINE_CONFIG_DERIVED(ti68k_state::ti92p, ti92)
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(ti92p_mem)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( v200, ti92 )
+MACHINE_CONFIG_DERIVED(ti68k_state::v200, ti92)
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(v200_mem)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ti89t, ti89 )
+MACHINE_CONFIG_DERIVED(ti68k_state::ti89t, ti89)
 	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(ti89t_mem)
 MACHINE_CONFIG_END
@@ -667,9 +669,9 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1998, ti89,  0,       0,      ti89,   ti8x, driver_device,     0,         "Texas Instruments",    "TI-89",         MACHINE_NO_SOUND)
-COMP( 1995, ti92,  0,       0,      ti92,   ti9x, driver_device,     0,         "Texas Instruments",    "TI-92",         MACHINE_NO_SOUND)
-COMP( 1999, ti92p, 0,       0,      ti92p,  ti9x, driver_device,     0,         "Texas Instruments",    "TI-92 Plus",    MACHINE_NO_SOUND)
-COMP( 2002, v200,  0,       0,      v200,   ti9x, driver_device,     0,         "Texas Instruments",    "Voyage 200 PLT",MACHINE_NO_SOUND)
-COMP( 2004, ti89t, 0,       0,      ti89t,  ti8x, driver_device,     0,         "Texas Instruments",    "TI-89 Titanium",MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT  STATE        INIT  COMPANY              FULLNAME          FLAGS
+COMP( 1998, ti89,  0,       0,      ti89,    ti8x,  ti68k_state, 0,    "Texas Instruments", "TI-89",          MACHINE_NO_SOUND )
+COMP( 1995, ti92,  0,       0,      ti92,    ti9x,  ti68k_state, 0,    "Texas Instruments", "TI-92",          MACHINE_NO_SOUND )
+COMP( 1999, ti92p, 0,       0,      ti92p,   ti9x,  ti68k_state, 0,    "Texas Instruments", "TI-92 Plus",     MACHINE_NO_SOUND )
+COMP( 2002, v200,  0,       0,      v200,    ti9x,  ti68k_state, 0,    "Texas Instruments", "Voyage 200 PLT", MACHINE_NO_SOUND )
+COMP( 2004, ti89t, 0,       0,      ti89t,   ti8x,  ti68k_state, 0,    "Texas Instruments", "TI-89 Titanium", MACHINE_NO_SOUND )

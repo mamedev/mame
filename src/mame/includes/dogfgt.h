@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#include "screen.h"
 
 #define PIXMAP_COLOR_BASE  (16 + 32)
 #define BITMAPRAM_SIZE      0x6000
@@ -64,4 +65,5 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void dogfgt(machine_config &config);
 };

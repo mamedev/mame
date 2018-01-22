@@ -23,7 +23,10 @@
 
 */
 
+#include "emu.h"
 #include "includes/pc8001.h"
+#include "screen.h"
+#include "speaker.h"
 
 /* Read/Write Handlers */
 
@@ -302,7 +305,7 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('\xA5') PORT_CHAR('|')
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(0xA5) PORT_CHAR('|')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)     PORT_CHAR('^')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')
@@ -473,7 +476,7 @@ void pc8001_state::machine_start()
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( pc8001, pc8001_state )
+MACHINE_CONFIG_START(pc8001_state::pc8001)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pc8001_mem)
@@ -523,7 +526,7 @@ static MACHINE_CONFIG_START( pc8001, pc8001_state )
 	MCFG_RAM_EXTRA_OPTIONS("32K,64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pc8001mk2, pc8001mk2_state )
+MACHINE_CONFIG_START(pc8001mk2_state::pc8001mk2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pc8001mk2_mem)
@@ -598,6 +601,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME            PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY FULLNAME        FLAGS */
-COMP( 1979, pc8001,         0,          0,          pc8001,     pc8001, driver_device,      0,          "Nippon Electronic Company",    "PC-8001",      MACHINE_NOT_WORKING )
-COMP( 1983, pc8001mk2,      pc8001,     0,          pc8001mk2,  pc8001, driver_device,      0,          "Nippon Electronic Company",    "PC-8001mkII",  MACHINE_NOT_WORKING )
+//    YEAR  NAME            PARENT      COMPAT      MACHINE     INPUT   STATE              INIT        COMPANY  FULLNAME        FLAGS
+COMP( 1979, pc8001,         0,          0,          pc8001,     pc8001, pc8001_state,      0,          "NEC",   "PC-8001",      MACHINE_NOT_WORKING )
+COMP( 1983, pc8001mk2,      pc8001,     0,          pc8001mk2,  pc8001, pc8001mk2_state,   0,          "NEC",   "PC-8001mkII",  MACHINE_NOT_WORKING )

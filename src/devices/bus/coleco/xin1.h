@@ -6,10 +6,10 @@
 
 **********************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_COLECO_XIN1_H
+#define MAME_BUS_COLECO_XIN1_H
 
-#ifndef __COLECOVISION_XIN1_CARTRIDGE__
-#define __COLECOVISION_XIN1_CARTRIDGE__
+#pragma once
 
 #include "exp.h"
 
@@ -42,7 +42,7 @@ private:
 
 
 // device type definition
-extern const device_type COLECOVISION_XIN1;
+DECLARE_DEVICE_TYPE(COLECOVISION_XIN1, colecovision_xin1_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_COLECO_XIN1_H

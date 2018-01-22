@@ -1,7 +1,9 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 
 #include "machine/st0016.h"
+#include "machine/timer.h"
+#include "screen.h"
 
 class st0016_state : public driver_device
 {
@@ -35,4 +37,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(st0016_int);
 	optional_device<cpu_device> m_subcpu;
 	required_device<screen_device> m_screen;
+	void st0016(machine_config &config);
+	void renju(machine_config &config);
+	void mayjinsn(machine_config &config);
 };

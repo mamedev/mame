@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#include "emu.h"
 #include "audio/zaccaria.h"
 
 class zaccaria_state : public driver_device
@@ -22,13 +21,12 @@ public:
 	DECLARE_READ8_MEMBER(dsw_r);
 	DECLARE_READ8_MEMBER(prot1_r);
 	DECLARE_READ8_MEMBER(prot2_r);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(attributes_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
-	DECLARE_WRITE8_MEMBER(ressound_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	DECLARE_WRITE8_MEMBER(dsw_sel_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void machine_start() override;
@@ -39,6 +37,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,uint8_t *spriteram,int color,int section);
 
+	void zaccaria(machine_config &config);
 protected:
 	required_device<cpu_device>                 m_maincpu;
 	required_device<gfxdecode_device>           m_gfxdecode;

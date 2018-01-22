@@ -126,20 +126,25 @@
 
 ***************************************************************************/
 
-#include <cstdio>
+#include "emu.h"
 
 #include "bus/midi/midi.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/es5506.h"
-#include "sound/esqpump.h"
-#include "machine/mc68681.h"
 #include "cpu/es5510/es5510.h"
-#include "machine/wd_fdc.h"
-#include "machine/hd63450.h"    // compatible with MC68450, which is what these really have
+#include "cpu/m68000/m68000.h"
 #include "formats/esq16_dsk.h"
-#include "machine/esqvfd.h"
 #include "machine/esqlcd.h"
 #include "machine/esqpanel.h"
+#include "machine/esqvfd.h"
+#include "machine/hd63450.h"    // compatible with MC68450, which is what these really have
+#include "machine/mc68681.h"
+#include "machine/wd_fdc.h"
+#include "sound/es5506.h"
+#include "sound/esqpump.h"
+
+#include "speaker.h"
+
+#include <cstdio>
+
 
 #define GENERIC (0)
 #define EPS     (1)
@@ -181,8 +186,8 @@ public:
 	required_device<mc68681_device> m_duart;
 	required_device<es5505_device> m_otis;
 	required_device<es5510_device> m_esp;
-	required_device<esq_5505_5510_pump> m_pump;
-	optional_device<wd1772_t> m_fdc;
+	required_device<esq_5505_5510_pump_device> m_pump;
+	optional_device<wd1772_device> m_fdc;
 	required_device<esqpanel_device> m_panel;
 	optional_device<hd63450_device> m_dmac;
 	required_device<midi_port_device> m_mdout;
@@ -213,6 +218,11 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	void sq1(machine_config &config);
+	void vfx(machine_config &config);
+	void vfxsd(machine_config &config);
+	void eps(machine_config &config);
+	void vfx32(machine_config &config);
 private:
 	uint16_t  *m_rom, *m_ram;
 	uint16_t m_analog_values[8];
@@ -336,7 +346,7 @@ READ16_MEMBER(esq5505_state::lower_r)
 		m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
 	}
 
-	if (!space.debugger_access() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
+	if (!machine().side_effect_disabled() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
 	{
 		return m_rom[offset];
 	}
@@ -352,7 +362,7 @@ WRITE16_MEMBER(esq5505_state::lower_w)
 
 	if (offset < 0x4000)
 	{
-		if (space.debugger_access() || m_maincpu->get_fc() != 0x6)  // if not supervisor mode, RAM
+		if (m_maincpu->get_fc() != 0x6)  // if not supervisor mode, RAM
 		{
 			COMBINE_DATA(&m_ram[offset]);
 		}
@@ -381,7 +391,7 @@ static ADDRESS_MAP_START( vfxsd_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0x260000, 0x2601ff) AM_DEVREADWRITE8("esp", es5510_device, host_r, host_w, 0x00ff)
-	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
+	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_device, read, write, 0x00ff)
 	AM_RANGE(0x330000, 0x3bffff) AM_RAM // sequencer memory?
 	AM_RANGE(0xc00000, 0xc3ffff) AM_ROM AM_REGION("osrom", 0)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
@@ -392,7 +402,7 @@ static ADDRESS_MAP_START( eps_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("otis", es5505_device, read, write)
 	AM_RANGE(0x240000, 0x2400ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)
 	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("duart", mc68681_device, read, write, 0x00ff)
-	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_t, read, write, 0x00ff)
+	AM_RANGE(0x2c0000, 0x2c0007) AM_DEVREADWRITE8("wd1772", wd1772_device, read, write, 0x00ff)
 	AM_RANGE(0x580000, 0x7fffff) AM_RAM         // sample RAM?
 	AM_RANGE(0xc00000, 0xc1ffff) AM_ROM AM_REGION("osrom", 0)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
@@ -599,7 +609,7 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 }
 #endif
 
-static MACHINE_CONFIG_START( vfx, esq5505_state )
+MACHINE_CONFIG_START(esq5505_state::vfx)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
@@ -607,11 +617,11 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_ESQPANEL2x40_ADD("panel")
+	MCFG_ESQPANEL2X40_VFX_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 
-	MCFG_MC68681_ADD("duart", 4000000)
+	MCFG_DEVICE_ADD("duart", MC68681, 4000000)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_a))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_b))
@@ -645,12 +655,12 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(eps, vfx)
+MACHINE_CONFIG_DERIVED(esq5505_state::eps, vfx)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(eps_map)
 
-	MCFG_ESQPANEL_2x40_REMOVE("panel")
-	MCFG_ESQPANEL1x22_ADD("panel")
+	MCFG_ESQPANEL2X40_VFX_REMOVE("panel")
+	MCFG_ESQPANEL1X22_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 
@@ -667,7 +677,7 @@ static MACHINE_CONFIG_DERIVED(eps, vfx)
 	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(esq5505_state, fdc_write_byte))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(vfxsd, vfx)
+MACHINE_CONFIG_DERIVED(esq5505_state::vfxsd, vfx)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 
@@ -676,7 +686,7 @@ static MACHINE_CONFIG_DERIVED(vfxsd, vfx)
 MACHINE_CONFIG_END
 
 // 32-voice machines with the VFX-SD type config
-static MACHINE_CONFIG_START(vfx32, esq5505_state)
+MACHINE_CONFIG_START(esq5505_state::vfx32)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_30_4761MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
@@ -684,11 +694,11 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_ESQPANEL2x40_ADD("panel")
+	MCFG_ESQPANEL2X40_VFX_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 
-	MCFG_MC68681_ADD("duart", 4000000)
+	MCFG_DEVICE_ADD("duart", MC68681, 4000000)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(esq5505_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_a))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq5505_state, duart_tx_b))
@@ -725,12 +735,12 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(sq1, vfx)
+MACHINE_CONFIG_DERIVED(esq5505_state::sq1, vfx)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(sq1_map)
 
-	MCFG_ESQPANEL_2x40_REMOVE("panel")
-	MCFG_ESQPANEL2x16_SQ1_ADD("panel")
+	MCFG_ESQPANEL2X40_VFX_REMOVE("panel")
+	MCFG_ESQPANEL2X16_SQ1_ADD("panel")
 	MCFG_ESQPANEL_TX_CALLBACK(DEVWRITELINE("duart", mc68681_device, rx_b_w))
 	MCFG_ESQPANEL_ANALOG_CALLBACK(WRITE16(esq5505_state, analog_w))
 MACHINE_CONFIG_END
@@ -846,8 +856,12 @@ ROM_END
 
 ROM_START( vfxsd )
 	ROM_REGION(0x40000, "osrom", 0)
-	ROM_LOAD16_BYTE( "vfxsd_200_lower.bin", 0x000000, 0x010000, CRC(7bd31aea) SHA1(812bf73c4861a5d963f128def14a4a98171c93ad) )
-	ROM_LOAD16_BYTE( "vfxsd_200_upper.bin", 0x000001, 0x010000, CRC(9a40efa2) SHA1(e38a2a4514519c1573361cb1526139bfcf94e45a) )
+	ROM_SYSTEM_BIOS( 0, "v200", "V200" )
+	ROMX_LOAD( "vfxsd_200_lower.bin", 0x000000, 0x010000, CRC(7bd31aea) SHA1(812bf73c4861a5d963f128def14a4a98171c93ad), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "vfxsd_200_upper.bin", 0x000001, 0x010000, CRC(9a40efa2) SHA1(e38a2a4514519c1573361cb1526139bfcf94e45a), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "v133", "V133" )
+	ROMX_LOAD( "vfxsd_133_lower.bin", 0x000000, 0x010000, CRC(65407fcf) SHA1(83952a19f6f9ae7886ac828d8bd5ea7fee8d0fe3), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "vfxsd_133_upper.bin", 0x000001, 0x010000, CRC(150fcd18) SHA1(e42cf08604b52fab248d15d761de7d835a076940), ROM_SKIP(1) | ROM_BIOS(2) )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
 	ROM_LOAD16_BYTE( "u57.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )
@@ -923,6 +937,22 @@ ROM_START( sqrack )
 	ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
 ROM_END
 
+ROM_START( sq2 )
+	ROM_REGION(0x40000, "osrom", 0)
+	ROM_LOAD16_BYTE( "sq232_2.03_9193_lower.u27", 0x000000, 0x010000, CRC(e37fbc2c) SHA1(4a74f3540756745073c8768b384905db03da47c0) )
+	ROM_LOAD16_BYTE( "sq232_2.03_cbcd_upper.u32", 0x000001, 0x020000, CRC(5a7dc228) SHA1(d25adecc0dbba93a094c49fae105dcc7aad317f1) )
+
+	ROM_REGION(0x200000, "waverom", 0)
+	ROM_LOAD16_BYTE( "sq1-u25.bin",  0x000001, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )
+	ROM_LOAD16_BYTE( "sq1-u26.bin",  0x100001, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )
+
+	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00) // BS=1 region (16-bit)
+	ROM_LOAD( "rom2.u39",     0x000000, 0x100000, CRC(8d1b5e91) SHA1(12991083a6c574133a1a799813fa4573a33d2297) )
+	ROM_LOAD( "rom3.u38",     0x100000, 0x100000, CRC(cb9875ce) SHA1(82021bdc34953e9be97d45746a813d7882250ae0) )
+
+	ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
+ROM_END
+
 ROM_START( eps )
 	ROM_REGION(0x20000, "osrom", 0)
 	ROM_LOAD16_BYTE( "eps-l.bin",    0x000000, 0x008000, CRC(382beac1) SHA1(110e31edb03fcf7bbde3e17423b21929e5b32db2) )
@@ -992,11 +1022,12 @@ DRIVER_INIT_MEMBER(esq5505_state,denib)
 	}
 }
 
-CONS( 1988, eps,   0, 0,   eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS", MACHINE_NOT_WORKING )   // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1989, vfx,   0, 0,   vfx,   vfx, esq5505_state, denib,  "Ensoniq", "VFX", MACHINE_NOT_WORKING )       // 2x40 VFD
-CONS( 1989, vfxsd, 0, 0,   vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "VFX-SD", MACHINE_NOT_WORKING )    // 2x40 VFD
-CONS( 1990, eps16p,eps, 0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS-16 Plus", MACHINE_NOT_WORKING )   // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1990, sd1,   0, 0,   vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1990, sq1,   0, 0,   sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-1", MACHINE_NOT_WORKING )      // 2x16 LCD
-CONS( 1990, sqrack,sq1, 0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-Rack", MACHINE_NOT_WORKING )   // 2x16 LCD
-CONS( 1991, sd132, sd1,0,  vfx32, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1988, eps,   0,   0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1989, vfx,   0,   0, vfx,   vfx, esq5505_state, denib,  "Ensoniq", "VFX",             MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1989, vfxsd, 0,   0, vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "VFX-SD",          MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1990, eps16p,eps, 0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1990, sd1,   0,   0, vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
+CONS( 1990, sq1,   0,   0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )  // 2x16 LCD
+CONS( 1990, sqrack,sq1, 0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )  // 2x16 LCD
+CONS( 1991, sq2,   0,   0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )  // 2x16 LCD
+CONS( 1991, sd132, sd1, 0, vfx32, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD

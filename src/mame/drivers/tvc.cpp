@@ -13,21 +13,25 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/ram.h"
 #include "audio/tvc.h"
-#include "bus/centronics/ctronics.h"
+
+#include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "formats/tvc_cas.h"
+#include "machine/ram.h"
+#include "video/mc6845.h"
 
-#include "bus/tvc/tvc.h"
-#include "bus/tvc/hbf.h"
+#include "bus/centronics/ctronics.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/tvc/tvc.h"
+#include "bus/tvc/hbf.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/tvc_cas.h"
 
 #define TVC_RAM_BANK    1
 #define TVC_ROM_BANK    2
@@ -104,6 +108,7 @@ public:
 	uint8_t       m_cassette_ff;
 	uint8_t       m_centronics_ff;
 	DECLARE_PALETTE_INIT(tvc);
+	void tvc(machine_config &config);
 };
 
 
@@ -756,7 +761,7 @@ extern SLOT_INTERFACE_START(tvc_exp)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( tvc, tvc_state )
+MACHINE_CONFIG_START(tvc_state::tvc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, 3125000)
 	MCFG_CPU_PROGRAM_MAP(tvc_mem)
@@ -872,7 +877,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT MACHINE    INPUT     INIT                     COMPANY       FULLNAME       FLAGS */
-COMP( 1985, tvc64,    0,      0,     tvc,       tvc,      driver_device,  0,       "Videoton",   "TVC 64",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1985, tvc64p,   tvc64,  0,     tvc,       tvc,      driver_device,  0,       "Videoton",   "TVC 64+",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1985, tvc64pru, tvc64,  0,     tvc,       tvc64pru, driver_device,  0,       "Videoton",   "TVC 64+ (Russian)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT MACHINE    INPUT     STATE       INIT  COMPANY       FULLNAME             FLAGS
+COMP( 1985, tvc64,    0,      0,     tvc,       tvc,      tvc_state,  0,    "Videoton",   "TVC 64",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1985, tvc64p,   tvc64,  0,     tvc,       tvc,      tvc_state,  0,    "Videoton",   "TVC 64+",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1985, tvc64pru, tvc64,  0,     tvc,       tvc64pru, tvc_state,  0,    "Videoton",   "TVC 64+ (Russian)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

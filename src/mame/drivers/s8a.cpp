@@ -21,12 +21,16 @@ ToDo:
 ************************************************************************************/
 
 #include "emu.h"
+#include "machine/genpin.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
-#include "machine/genpin.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "s8a.lh"
+
 
 class s8a_state : public genpin_class
 {
@@ -63,6 +67,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s8a);
 	DECLARE_DRIVER_INIT(s8a);
+	void s8a(machine_config &config);
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -272,7 +277,7 @@ DRIVER_INIT_MEMBER( s8a_state, s8a )
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
 }
 
-static MACHINE_CONFIG_START( s8a, s8a_state )
+MACHINE_CONFIG_START(s8a_state::s8a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s8a_main_map)
@@ -323,7 +328,7 @@ static MACHINE_CONFIG_START( s8a, s8a_state )
 	MCFG_CPU_PROGRAM_MAP(s8a_audio_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
@@ -347,4 +352,4 @@ ROM_START(scrzy_l1)
 	ROM_LOAD("ic49.bin", 0x0000, 0x4000, CRC(bcc8ccc4) SHA1(2312f9cc4f5a2dadfbfa61d13c31bb5838adf152) )
 ROM_END
 
-GAME(1984,scrzy_l1, 0, s8a, s8a, s8a_state, s8a, ROT0, "Williams", "Still Crazy", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1984, scrzy_l1, 0, s8a, s8a, s8a_state, s8a, ROT0, "Williams", "Still Crazy", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

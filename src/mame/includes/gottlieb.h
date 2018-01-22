@@ -6,12 +6,12 @@
 
 ***************************************************************************/
 
-#include "emu.h"
 #include "audio/gottlieb.h"
 #include "cpu/i86/i86.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/samples.h"
 #include "machine/ldpr8210.h"
+#include "screen.h"
 
 
 #define GOTTLIEB_VIDEO_HCOUNT   318
@@ -141,6 +141,17 @@ public:
 	void audio_handle_zero_crossing(const attotime &zerotime, bool logit);
 	void laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const int16_t *ch0, const int16_t *ch1);
 
+	void gottlieb_core(machine_config &config);
+	void cobram3(machine_config &config);
+	void screwloo(machine_config &config);
+	void gottlieb2(machine_config &config);
+	void reactor(machine_config &config);
+	void tylz(machine_config &config);
+	void g2laser(machine_config &config);
+	void qbert(machine_config &config);
+	void qbert_knocker(machine_config &config);
+	void gottlieb1(machine_config &config);
+	void gottlieb1_votrax(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

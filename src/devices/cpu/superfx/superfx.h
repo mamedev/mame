@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
-#ifndef __SUPERFX_H__
-#define __SUPERFX_H__
+#ifndef MAME_CPU_SUPERFX_SUPERFX_H
+#define MAME_CPU_SUPERFX_SUPERFX_H
 
+#pragma once
+
+#include "sfx_dasm.h"
 
 enum
 {
@@ -87,23 +90,25 @@ enum
 
 
 #define MCFG_SUPERFX_OUT_IRQ(_devcb) \
-	superfx_device::set_out_irq_func(*device, DEVCB_##_devcb);
+	devcb = &superfx_device::set_out_irq_func(*device, DEVCB_##_devcb);
 
 
-class superfx_device :  public cpu_device
+class superfx_device :  public cpu_device, public superfx_disassembler::config
 {
 public:
 	// construction/destruction
 	superfx_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_out_irq_func(device_t &device, _Object object) { return downcast<superfx_device &>(device).m_out_irq_func.set_callback(object); }
+	template <class Object> static devcb_base &set_out_irq_func(device_t &device, Object &&cb) { return downcast<superfx_device &>(device).m_out_irq_func.set_callback(std::forward<Object>(cb)); }
 
 	uint8_t mmio_read(uint32_t addr);
 	void mmio_write(uint32_t addr, uint8_t data);
 	void add_clocks(int32_t clocks);
 	int access_ram();
 	int access_rom();
+
+	virtual u16 get_alt() const override;
 
 protected:
 	// device-level overrides
@@ -117,16 +122,14 @@ protected:
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 3; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -209,13 +212,9 @@ private:
 	inline void superfx_add_clocks_internal(uint32_t clocks);
 	void superfx_timing_reset();
 	inline void superfx_dreg_sfr_sz_update();
-
-	offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options);
 };
 
 
-extern const device_type SUPERFX;
+DECLARE_DEVICE_TYPE(SUPERFX, superfx_device)
 
-offs_t superfx_dasm_one(std::ostream &stream, offs_t pc, uint8_t op, uint8_t param0, uint8_t param1, uint16_t alt);
-
-#endif /* __SUPERFX_H__ */
+#endif // MAME_CPU_SUPERFX_SUPERFX_H

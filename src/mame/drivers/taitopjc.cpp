@@ -160,6 +160,7 @@ public:
 	uint32_t m_video_address;
 
 	uint32_t m_dsp_rom_address;
+	void taitopjc(machine_config &config);
 };
 
 void taitopjc_state::video_exit()
@@ -237,7 +238,7 @@ void taitopjc_state::video_start()
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(1);
 
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, char_layout, (uint8_t*)m_screen_ram.get(), 0, m_palette->entries() / 256, 0));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, char_layout, (uint8_t*)m_screen_ram.get(), 0, m_palette->entries() / 256, 0));
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&taitopjc_state::video_exit, this));
 }
@@ -357,7 +358,7 @@ WRITE64_MEMBER(taitopjc_state::ppc_common_w)
 {
 	uint32_t address = offset * 2;
 
-//  logerror("ppc_common_w: %08X, %I64X, %I64X\n", offset, data, mem_mask);
+//  logerror("ppc_common_w: %08X, %X, %X\n", offset, data, mem_mask);
 
 	if (ACCESSING_BITS_48_63)
 	{
@@ -475,7 +476,7 @@ void taitopjc_state::print_display_list()
 
 WRITE64_MEMBER(taitopjc_state::dsp_w)
 {
-	//logerror("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask), space.device().safe_pc());
+	//logerror("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask), m_maincpu->pc());
 
 	if (offset == 0x7fe)
 	{
@@ -627,7 +628,7 @@ static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( mn10200_map, AS_PROGRAM, 16, driver_device )
+ADDRESS_MAP_START( mn10200_map, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mn10200", 0)
 ADDRESS_MAP_END
 
@@ -752,7 +753,7 @@ INTERRUPT_GEN_MEMBER(taitopjc_state::taitopjc_vbi)
 }
 
 
-static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
+MACHINE_CONFIG_START(taitopjc_state::taitopjc)
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
 	MCFG_PPC_BUS_FREQUENCY(XTAL_66_6667MHz)    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)
@@ -856,4 +857,4 @@ ROM_START( optiger )
 	// TODO: There are 6 PALs in total on the main PCB.
 ROM_END
 
-GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, optiger, ROT0, "Taito", "Operation Tiger", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, optiger, 0, taitopjc, taitopjc, taitopjc_state, optiger, ROT0, "Taito", "Operation Tiger (Ver 2.14 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

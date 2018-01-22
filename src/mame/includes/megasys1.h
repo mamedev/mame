@@ -9,8 +9,10 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "video/ms1_tmap.h"
+#include "screen.h"
 
 
 class megasys1_state : public driver_device
@@ -156,7 +158,7 @@ public:
 	DECLARE_MACHINE_RESET(megasys1_hachoo);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(megasys1D_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(megasys1A_iganinju_scanline);
@@ -170,4 +172,16 @@ public:
 	void rodland_gfx_unmangle(const char *region);
 	void jitsupro_gfx_unmangle(const char *region);
 	void stdragona_gfx_unmangle(const char *region);
+	void system_A_soldam(machine_config &config);
+	void system_B_monkelf(machine_config &config);
+	void system_A_iganinju(machine_config &config);
+	void system_A_hachoo(machine_config &config);
+	void kickoffb(machine_config &config);
+	void system_D(machine_config &config);
+	void system_C(machine_config &config);
+	void system_Bbl(machine_config &config);
+	void system_A(machine_config &config);
+	void system_B(machine_config &config);
+	void system_B_hayaosi1(machine_config &config);
+	void system_Z(machine_config &config);
 };

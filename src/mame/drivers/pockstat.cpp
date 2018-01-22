@@ -47,6 +47,8 @@ If you do nothing for about 20 secs, it turns itself off (screen goes white).
 #include "cpu/arm7/arm7core.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAX_PS_TIMERS   3
 
@@ -152,6 +154,7 @@ public:
 	uint32_t ps_intc_get_interrupt_line(uint32_t line);
 	void ps_intc_set_interrupt_line(uint32_t line, int state);
 	void ps_timer_start(int index);
+	void pockstat(machine_config &config);
 };
 
 
@@ -970,7 +973,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( pockstat, pockstat_state )
+MACHINE_CONFIG_START(pockstat_state::pockstat)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, DEFAULT_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pockstat_mem)
@@ -1006,5 +1009,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT     INIT  COMPANY                             FULLNAME       FLAGS */
-CONS( 1999, pockstat, 0,      0,      pockstat,  pockstat, driver_device, 0,    "Sony Computer Entertainment Inc", "Sony PocketStation", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE    INPUT     STATE           INIT  COMPANY                            FULLNAME              FLAGS
+CONS( 1999, pockstat, 0,      0,      pockstat,  pockstat, pockstat_state, 0,    "Sony Computer Entertainment Inc", "Sony PocketStation", MACHINE_SUPPORTS_SAVE )

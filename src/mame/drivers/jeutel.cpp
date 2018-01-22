@@ -15,12 +15,18 @@ ToDo:
 
 ********************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/tms5110.h"
+#include "speaker.h"
+
 #include "jeutel.lh"
+
 
 class jeutel_state : public genpin_class
 {
@@ -39,6 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi0b_w);
 	DECLARE_WRITE8_MEMBER(sndcmd_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	void jeutel(machine_config &config);
 private:
 	bool m_timer_a;
 	uint8_t m_sndcmd;
@@ -99,14 +106,13 @@ WRITE8_MEMBER( jeutel_state::porta_w )
 {
 	if ((data & 0xf0) == 0xf0)
 	{
-		m_tms->ctl_w(space, offset, TMS5110_CMD_RESET);
+		m_tms->ctl_w(space, offset, tms5110_device::CMD_RESET);
 		m_tms->pdc_w(1);
 		m_tms->pdc_w(0);
 	}
-	else
-	if ((data & 0xf0) == 0xd0)
+	else if ((data & 0xf0) == 0xd0)
 	{
-		m_tms->ctl_w(space, offset, TMS5110_CMD_SPEAK);
+		m_tms->ctl_w(space, offset, tms5110_device::CMD_SPEAK);
 		m_tms->pdc_w(1);
 		m_tms->pdc_w(0);
 	}
@@ -179,7 +185,7 @@ DRIVER_INIT_MEMBER( jeutel_state, jeutel )
 {
 }
 
-static MACHINE_CONFIG_START( jeutel, jeutel_state )
+MACHINE_CONFIG_START(jeutel_state::jeutel)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3300000)
 	MCFG_CPU_PROGRAM_MAP(jeutel_map)
@@ -263,5 +269,5 @@ ROM_START(olympic)
 ROM_END
 
 
-GAME(1983,  leking,   0,  jeutel,  jeutel, jeutel_state,  jeutel,  ROT0, "Jeutel", "Le King", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1983,  leking,   0,  jeutel,  jeutel, jeutel_state,  jeutel,  ROT0, "Jeutel", "Le King",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1984,  olympic,  0,  jeutel,  jeutel, jeutel_state,  jeutel,  ROT0, "Jeutel", "Olympic Games", MACHINE_IS_SKELETON_MECHANICAL)

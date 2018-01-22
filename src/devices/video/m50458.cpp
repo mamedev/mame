@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "video/m50458.h"
 
+#include "screen.h"
 
 
 //**************************************************************************
@@ -26,9 +27,9 @@
 //**************************************************************************
 
 // device type definition
-const device_type M50458 = &device_creator<m50458_device>;
+DEFINE_DEVICE_TYPE(M50458, m50458_device, "m50458", "Mitsubishi M50458 OSD")
 
-static ADDRESS_MAP_START( m50458_vram, AS_0, 16, m50458_device )
+static ADDRESS_MAP_START( m50458_vram, 0, 16, m50458_device )
 	AM_RANGE(0x0000, 0x023f) AM_RAM // vram
 	AM_RANGE(0x0240, 0x0241) AM_WRITE(vreg_120_w)
 	AM_RANGE(0x0242, 0x0243) AM_WRITE(vreg_121_w)
@@ -136,9 +137,11 @@ const tiny_rom_entry *m50458_device::device_rom_region() const
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *m50458_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector m50458_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 //**************************************************************************
@@ -173,10 +176,10 @@ inline void m50458_device::write_word(offs_t address, uint16_t data)
 //-------------------------------------------------
 
 m50458_device::m50458_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, M50458, "M50458 OSD", tag, owner, clock, "m50458", __FILE__),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, nullptr, *ADDRESS_MAP_NAME(m50458_vram))
+	: device_t(mconfig, M50458, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
+	, m_space_config("videoram", ENDIANNESS_LITTLE, 16, 16, 0, nullptr, *ADDRESS_MAP_NAME(m50458_vram))
 {
 }
 
@@ -367,7 +370,7 @@ uint32_t m50458_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 						pix |= ((m_shadow_gfx[offset+0] >> (7-(xi & 0x7))) & 1);
 
 					/* blinking, VERY preliminary */
-					if(tile & 0x800 && m_screen->frame_number() & m_blink)
+					if(tile & 0x800 && screen.frame_number() & m_blink)
 						pix = 0;
 
 					if(yi == 17 && tile & 0x1000) /* underline? */

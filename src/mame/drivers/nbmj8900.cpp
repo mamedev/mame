@@ -27,10 +27,12 @@ TODO:
 
 #include "emu.h"
 #include "includes/nbmj8900.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
@@ -47,7 +49,7 @@ DRIVER_INIT_MEMBER(nbmj8900_state,ohpaipee)
 
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
+		prot[i] = bitswap<8>(prot[i],2,7,3,5,0,6,4,1);
 	}
 #else
 	unsigned char *ROM = memregion("maincpu")->base();
@@ -75,7 +77,7 @@ DRIVER_INIT_MEMBER(nbmj8900_state,togenkyo)
 	   the checksum. */
 	for (i = 0;i < 0x20000;i++)
 	{
-		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
+		prot[i] = bitswap<8>(prot[i],2,7,3,5,0,6,4,1);
 	}
 #else
 	unsigned char *ROM = memregion("maincpu")->base();
@@ -299,7 +301,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( ohpaipee, nbmj8900_state )
+MACHINE_CONFIG_START(nbmj8900_state::ohpaipee)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */
@@ -333,7 +335,7 @@ static MACHINE_CONFIG_START( ohpaipee, nbmj8900_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( togenkyo, ohpaipee )
+MACHINE_CONFIG_DERIVED(nbmj8900_state::togenkyo, ohpaipee)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

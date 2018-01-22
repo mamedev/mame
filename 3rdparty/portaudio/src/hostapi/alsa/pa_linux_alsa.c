@@ -1,5 +1,5 @@
 /*
- * $Id: pa_linux_alsa.c 1911 2013-10-17 12:44:09Z gineera $
+ * $Id$
  * PortAudio Portable Real-Time Audio Library
  * Latest Version at: http://www.portaudio.com
  * ALSA implementation by Joshua Haberman and Arve Knudsen
@@ -1079,9 +1079,9 @@ static int IgnorePlugin( const char *pluginId )
 }
 
 /* Skip past parts at the beginning of a (pcm) info name that are already in the card name, to avoid duplication */
-static char *SkipCardDetailsInName( char *infoSkipName, char *cardRefName )
+static const char *SkipCardDetailsInName( const char *infoSkipName, const char *cardRefName )
 {
-    char *lastSpacePosn = infoSkipName;
+    const char *lastSpacePosn = infoSkipName;
 
     /* Skip matching chars; but only in chunks separated by ' ' (not part words etc), so track lastSpacePosn */
     while( *cardRefName )
@@ -1098,7 +1098,7 @@ static char *SkipCardDetailsInName( char *infoSkipName, char *cardRefName )
         while( *cardRefName && ( *cardRefName++ != ' ' ));
     }
     if( *infoSkipName == '\0' )
-        return (char*)"-"; /* The 2 names were identical; instead of a nul-string, return a marker string */
+        return "-"; /* The 2 names were identical; instead of a nul-string, return a marker string */
 
     /* Now want to move to the first char after any spaces */
     while( *lastSpacePosn && *lastSpacePosn == ' ' )
@@ -1292,7 +1292,8 @@ static PaError BuildDeviceList( PaAlsaHostApiRepresentation *alsaApi )
 
         while( alsa_snd_ctl_pcm_next_device( ctl, &devIdx ) == 0 && devIdx >= 0 )
         {
-            char *alsaDeviceName, *deviceName, *infoName;
+	    char *alsaDeviceName, *deviceName;
+	    const char *infoName;
             size_t len;
             int hasPlayback = 0, hasCapture = 0;
 
@@ -1319,7 +1320,7 @@ static PaError BuildDeviceList( PaAlsaHostApiRepresentation *alsaApi )
                 continue;
             }
 
-            infoName = SkipCardDetailsInName( (char *)alsa_snd_pcm_info_get_name( pcmInfo ), cardName );
+            infoName = SkipCardDetailsInName( alsa_snd_pcm_info_get_name( pcmInfo ), cardName );
 
             /* The length of the string written by snprintf plus terminating 0 */
             len = snprintf( NULL, 0, "%s: %s (%s)", cardName, infoName, buf ) + 1;
@@ -3697,7 +3698,7 @@ static PaError PaAlsaStream_GetAvailableFrames( PaAlsaStream *self, int queryCap
         *available, int *xrunOccurred )
 {
     PaError result = paNoError;
-    unsigned long captureFrames = 0, playbackFrames = 0;
+    unsigned long captureFrames, playbackFrames;
     *xrunOccurred = 0;
 
     assert( queryCapture || queryPlayback );
@@ -3805,7 +3806,22 @@ static PaError PaAlsaStream_WaitForFrames( PaAlsaStream *self, unsigned long *fr
             totalFds += self->playback.nfds;
         }
 
+#ifdef PTHREAD_CANCELED
+        if( self->callbackMode )
+        {
+            /* To allow 'Abort' to terminate the callback thread, enable cancelability just for poll() (& disable after) */
+            pthread_setcancelstate( PTHREAD_CANCEL_ENABLE, NULL );
+        }
+#endif
+
         pollResults = poll( self->pfds, totalFds, pollTimeout );
+
+#ifdef PTHREAD_CANCELED
+        if( self->callbackMode )
+        {
+            pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL );
+        }
+#endif
 
         if( pollResults < 0 )
         {
@@ -4175,12 +4191,18 @@ static void *CallbackThreadFunc( void *userData )
     int streamStarted = 0;
 
     assert( stream );
+    /* Not implemented */
+    assert( !stream->primeBuffers );
 
     /* Execute OnExit when exiting */
     pthread_cleanup_push( &OnExit, stream );
-
-    /* Not implemented */
-    assert( !stream->primeBuffers );
+#ifdef PTHREAD_CANCELED
+    /* 'Abort' will use thread cancellation to terminate the callback thread, but the Alsa-lib functions
+     * are NOT cancel-safe, (and can end up in an inconsistent state).  So, disable cancelability for
+     * the thread here, and just re-enable it for the poll() in PaAlsaStream_WaitForFrames(). */
+    pthread_testcancel();
+    pthread_setcancelstate( PTHREAD_CANCEL_DISABLE, NULL );
+#endif
 
     /* @concern StreamStart If the output is being primed the output pcm needs to be prepared, otherwise the
      * stream is started immediately. The latter involves signaling the waiting main thread.
@@ -4265,10 +4287,6 @@ static void *CallbackThreadFunc( void *userData )
         {
             xrun = 0;
 
-#ifdef PTHREAD_CANCELED
-           pthread_testcancel();
-#endif
-
             /** @concern Xruns Under/overflows are to be reported to the callback */
             if( stream->underrun > 0.0 )
             {
@@ -4299,11 +4317,12 @@ static void *CallbackThreadFunc( void *userData )
 #if 0
             CallbackUpdate( &stream->threading );
 #endif
+
             CalculateTimeInfo( stream, &timeInfo );
             PaUtil_BeginBufferProcessing( &stream->bufferProcessor, &timeInfo, cbFlags );
             cbFlags = 0;
 
-            /* CPU load measurement should include processing activivity external to the stream callback */
+            /* CPU load measurement should include processing activity external to the stream callback */
             PaUtil_BeginCpuLoadMeasurement( &stream->cpuLoadMeasurer );
 
             framesGot = framesAvail;
@@ -4334,7 +4353,6 @@ static void *CallbackThreadFunc( void *userData )
             {
                 /* Go back to polling for more frames */
                 break;
-
             }
 
             if( paContinue != callbackResult )
@@ -4579,7 +4597,7 @@ error:
 
 PaError PaAlsa_GetStreamInputCard( PaStream* s, int* card )
 {
-    PaAlsaStream *stream = NULL;
+    PaAlsaStream *stream;
     PaError result = paNoError;
     snd_pcm_info_t* pcmInfo;
 
@@ -4598,7 +4616,7 @@ error:
 
 PaError PaAlsa_GetStreamOutputCard( PaStream* s, int* card )
 {
-    PaAlsaStream *stream = NULL;
+    PaAlsaStream *stream;
     PaError result = paNoError;
     snd_pcm_info_t* pcmInfo;
 

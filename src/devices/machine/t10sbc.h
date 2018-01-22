@@ -6,8 +6,10 @@ t10sbc.h
 
 ***************************************************************************/
 
-#ifndef _T10SBC_H_
-#define _T10SBC_H_
+#ifndef MAME_MACHINE_T10SBC_H
+#define MAME_MACHINE_T10SBC_H
+
+#pragma once
 
 #include "t10spc.h"
 #include "imagedev/harddriv.h"
@@ -39,4 +41,4 @@ protected:
 	device_t *m_device;
 };
 
-#endif
+#endif // MAME_MACHINE_T10SBC_H

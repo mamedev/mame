@@ -8,8 +8,8 @@ Base class for HLE'd SCSI devices.
 
 */
 
-#ifndef _SCSIHLE_H_
-#define _SCSIHLE_H_
+#ifndef MAME_BUS_SCSI_SCSIHLE_H
+#define MAME_BUS_SCSI_SCSIHLE_H
 
 #include "scsi.h"
 #include "machine/t10spc.h"
@@ -21,9 +21,6 @@ class scsihle_device : public device_t,
 	public virtual t10spc
 {
 public:
-	// construction/destruction
-	scsihle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	virtual int GetDeviceID(); // hack for legacy_scsi_host_adapter::get_device
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_sel ) override;
@@ -39,6 +36,9 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) override { if (state) m_input_data |= 0x80; else m_input_data &= ~0x80; }
 
 protected:
+	// construction/destruction
+	scsihle_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual ioport_constructor device_input_ports() const override;
 	virtual void device_start() override;
@@ -89,4 +89,5 @@ extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_7)[];
 	MCFG_SLOT_OPTION_ADD( _option, _type ) \
 	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS( _option, _id ) \
 	MCFG_SLOT_DEFAULT_OPTION( _option )
-#endif
+
+#endif // MAME_BUS_SCSI_SCSIHLE_H

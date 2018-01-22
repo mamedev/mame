@@ -30,6 +30,7 @@ Other outs:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 
 class headonb_state : public driver_device
@@ -55,6 +56,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	void headonb(machine_config &config);
 };
 
 
@@ -156,7 +158,7 @@ static GFXDECODE_START( headonb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( headonb, headonb_state )
+MACHINE_CONFIG_START(headonb_state::headonb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080A, XTAL_20MHz / 10) // divider guessed
@@ -204,4 +206,4 @@ ROM_START( headonb )
 ROM_END
 
 
-GAME( 1979, headonb, headon, headonb, headonb, driver_device, 0, ROT0, "bootleg (EFG Sanremo)", "Head On (bootleg on dedicated hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headonb, headon, headonb, headonb, headonb_state, 0, ROT0, "bootleg (EFG Sanremo)", "Head On (bootleg on dedicated hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

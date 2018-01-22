@@ -26,11 +26,14 @@ Known issues:
 
 #include "emu.h"
 #include "includes/bwing.h"
+
 #include "cpu/m6502/deco16.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 //****************************************************************************
@@ -157,10 +160,10 @@ static ADDRESS_MAP_START( bwp3_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x0200) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(bwp3_nmiack_w)
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8912_device, data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8912_device, address_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8912_device, data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8912_device, address_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(bwp3_nmimask_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
@@ -355,7 +358,7 @@ void bwing_state::bwing_postload()
 }
 
 
-static MACHINE_CONFIG_START( bwing, bwing_state )
+MACHINE_CONFIG_START(bwing_state::bwing)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
@@ -374,8 +377,8 @@ static MACHINE_CONFIG_START( bwing, bwing_state )
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(15)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(15)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
 	// video hardware
@@ -397,13 +400,13 @@ static MACHINE_CONFIG_START( bwing, bwing_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay1", AY8912, XTAL_24MHz / 2 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay2", AY8912, XTAL_24MHz / 2 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_SOUND_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END

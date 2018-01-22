@@ -7,7 +7,6 @@
 //============================================================
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 // MAME headers
@@ -65,7 +64,7 @@ bool windows_osd_interface::video_init()
 	}
 
 	if (video_config.mode != VIDEO_MODE_NONE)
-		SetForegroundWindow(osd_common_t::s_window_list.front()->platform_window<HWND>());
+		SetForegroundWindow(std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window());
 
 	return true;
 }
@@ -97,7 +96,7 @@ void windows_osd_interface::update(bool skip_redraw)
 	}
 
 	// poll the joystick values here
-	winwindow_process_events(machine(), TRUE, FALSE);
+	winwindow_process_events(machine(), true, false);
 	poll_input(machine());
 	check_osd_inputs();
 	// if we're running, disable some parts of the debugger

@@ -5,10 +5,11 @@
     See tms9980a.c and tms9900.c for documentation
 */
 
-#ifndef __TMS9980A_H__
-#define __TMS9980A_H__
+#ifndef MAME_CPU_TMS9900_TMS9980A_H
+#define MAME_CPU_TMS9900_TMS9980A_H
 
-#include "emu.h"
+#pragma once
+
 #include "debugger.h"
 #include "tms9900.h"
 
@@ -43,14 +44,13 @@ protected:
 	uint32_t      execute_input_lines() const override;
 	void        execute_set_input(int irqline, int state) override;
 
-	uint32_t      disasm_min_opcode_bytes() const override;
-	uint32_t      disasm_max_opcode_bytes() const override;
-	offs_t      disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
+
 	address_space_config    m_program_config80;
 	address_space_config    m_io_config80;
 };
 
 // device type definition
-extern const device_type TMS9980A;
+DECLARE_DEVICE_TYPE(TMS9980A, tms9980a_device)
 
-#endif /* __TMS9980A_H__ */
+#endif // MAME_CPU_TMS9900_TMS9980A_H

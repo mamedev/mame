@@ -11,7 +11,7 @@
 
 
 #include "emu.h"
-#include "includes/phoenix.h"
+#include "audio/phoenix.h"
 
 /****************************************************************************
  * 4006
@@ -30,7 +30,7 @@
  * [This information is part of the GIICM]
  *
  * Pin 8 and 9 are connected to an EXOR gate and the inverted
- * output (EXNOR) is fed back to pin 1 (and the pseudo polynome output).
+ * output (EXNOR) is fed back to pin 1 (and the pseudo polynomial output).
  *
  *      1D5          1Q1  2D4       2Q0  3D4       3Q0  4D5      4Q1 4Q0
  *      +--+--+--+--+--+  +--+--+--+--+  +--+--+--+--+  +--+--+--+--+--+
@@ -48,21 +48,11 @@
 
 
 
-const device_type PHOENIX = &device_creator<phoenix_sound_device>;
+DEFINE_DEVICE_TYPE(PHOENIX, phoenix_sound_device, "phoenix_sound", "Phoenix Custom Sound")
 
 phoenix_sound_device::phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PHOENIX, "Phoenix Audio Custom", tag, owner, clock, "phoenix_sound", __FILE__),
-		device_sound_interface(mconfig, *this)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void phoenix_sound_device::device_config_complete()
+	: device_t(mconfig, PHOENIX, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 {
 }
 

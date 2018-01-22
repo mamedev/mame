@@ -29,8 +29,10 @@
 
 **********************************************************************/
 
-#ifndef __Z80STI__
-#define __Z80STI__
+#ifndef MAME_MACHINE_Z80STI_H
+#define MAME_MACHINE_Z80STI_H
+
+#pragma once
 
 #include "cpu/z80/z80daisy.h"
 
@@ -83,14 +85,14 @@ public:
 	// construction/destruction
 	z80sti_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_out_int_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_int_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_gpio_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_in_gpio_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_gpio_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_gpio_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_so_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_so_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_tao_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tao_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_tbo_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tbo_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_tco_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tco_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_tdo_callback(device_t &device, _Object object) { return downcast<z80sti_device &>(device).m_out_tdo_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_out_int_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_out_int_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_gpio_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_in_gpio_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_gpio_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_out_gpio_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_so_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_out_so_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_tao_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_out_tao_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_tbo_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_out_tbo_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_tco_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_out_tco_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_tdo_callback(device_t &device, Object &&cb) { return downcast<z80sti_device &>(device).m_out_tdo_cb.set_callback(std::forward<Object>(cb)); }
 
 	static void set_rx_clock(device_t &device, int clock) { downcast<z80sti_device &>(device).m_rx_clock = clock; }
 	static void set_tx_clock(device_t &device, int clock) { downcast<z80sti_device &>(device).m_tx_clock = clock; }
@@ -243,8 +245,6 @@ private:
 
 
 // device type definition
-extern const device_type Z80STI;
+DECLARE_DEVICE_TYPE(Z80STI, z80sti_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_Z80STI_H

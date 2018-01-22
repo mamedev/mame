@@ -25,12 +25,14 @@
   Datasheet: http://www.generalplus.com/doc/ds/GPL133AV10_spec.pdf
 */
 
-#include <stddef.h>
 #include "emu.h"
 #include "cpu/m6502/r65c02.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "screen.h"
 #include "softlist.h"
+
+#include <stddef.h>
 
 class gameking_state : public driver_device
 {
@@ -67,6 +69,9 @@ public:
 		uint8_t bank8000_cart; //34 bit 7; bits 0,1,.. a15,a16,..
 		uint8_t res2[0x4c];
 	};
+	void gameking(machine_config &config);
+	void gameking3(machine_config &config);
+	void gameking1(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
@@ -274,7 +279,7 @@ INTERRUPT_GEN_MEMBER(gameking_state::gameking_frame_int) // guess to get over bi
 }
 
 
-static MACHINE_CONFIG_START( gameking, gameking_state )
+MACHINE_CONFIG_START(gameking_state::gameking)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, 6000000)
 	MCFG_CPU_PROGRAM_MAP(gameking_mem)
@@ -297,11 +302,11 @@ static MACHINE_CONFIG_START( gameking, gameking_state )
 	MCFG_GENERIC_LOAD(gameking_state, gameking_cart)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gameking1, gameking )
+MACHINE_CONFIG_DERIVED(gameking_state::gameking1, gameking)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gameking3, gameking )
+MACHINE_CONFIG_DERIVED(gameking_state::gameking3, gameking)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "gameking")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_3", "gameking3")
 MACHINE_CONFIG_END
@@ -318,9 +323,9 @@ ROM_START(gamekin3)
 	ROM_LOAD("gm220.bin", 0x10000, 0x80000, CRC(1dc43bd5) SHA1(f9dcd3cb76bb7cb10565a1acb070ab375c082b4c) )
 ROM_END
 
-CONS(2003,  gameking,    0,  0,  gameking1,    gameking, gameking_state, gameking,    "TimeTop",   "GameKing GM-218", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2003,  gameking,    0,  0,  gameking1,    gameking, gameking_state, gameking,    "TimeTop",   "GameKing GM-218", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // the GameKing 2 (GM-219) is probably identical HW
 
-CONS(2003,  gamekin3,    0,  0,  gameking3,    gameking, gameking_state, gameking,    "TimeTop",   "GameKing 3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 2003,  gamekin3,    0,  0,  gameking3,    gameking, gameking_state, gameking,    "TimeTop",   "GameKing 3",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // gameking 3: similiar cartridges, accepts gameking cartridges, gameking3 cartridges not working on gameking (illegal cartridge scroller)
 // my gameking bios backup solution might work on it

@@ -26,6 +26,7 @@ Year + Game                 By      Board      Hardware
 
 #include "emu.h"
 #include "includes/suna16.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/3526intf.h"
@@ -33,6 +34,8 @@ Year + Game                 By      Board      Hardware
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2151.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 
@@ -48,7 +51,7 @@ WRITE16_MEMBER(suna16_state::soundlatch_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff );
 	}
-	if (data & ~0xff)   logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0xff)   logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -62,7 +65,7 @@ WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
 		output().set_led_value(3, data & 0x08);
 		machine().bookkeeping().coin_counter_w(0, data & 0x10);
 	}
-	if (data & ~0x1f)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0x1f)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -74,7 +77,7 @@ WRITE16_MEMBER(suna16_state::uballoon_leds_w)
 		output().set_led_value(0, data & 0x02);
 		output().set_led_value(1, data & 0x04);
 	}
-	if (data & ~0x07)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0x07)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -84,7 +87,7 @@ WRITE16_MEMBER(suna16_state::bestbest_coin_w)
 	{
 		machine().bookkeeping().coin_counter_w(0, data & 0x04);
 	}
-	if (data & ~0x04)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", space.device().safe_pc(), data);
+	if (data & ~0x04)   logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", m_maincpu->pc(), data);
 }
 
 
@@ -198,7 +201,7 @@ WRITE8_MEMBER(suna16_state::bestbest_prot_w)
 		case 0x00:  m_prot = m_prot ^ 0x0009;   break;
 		case 0x08:  m_prot = m_prot ^ 0x0002;   break;
 		case 0x0c:  m_prot = m_prot ^ 0x0003;   break;
-		//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", space.device().safe_pc(), data);
+		//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -307,14 +310,14 @@ MACHINE_START_MEMBER(suna16_state, bssoccer)
 WRITE8_MEMBER(suna16_state::bssoccer_pcm_1_bankswitch_w)
 {
 	const int bank = data & 7;
-	if (bank & ~7)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
+	if (bank & ~7)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", m_pcm1->pc(), data);
 	m_bank1->set_entry(bank);
 }
 
 WRITE8_MEMBER(suna16_state::bssoccer_pcm_2_bankswitch_w)
 {
 	const int bank = data & 7;
-	if (bank & ~7)  logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
+	if (bank & ~7)  logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", m_pcm2->pc(), data);
 	m_bank2->set_entry(bank);
 }
 
@@ -360,7 +363,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(suna16_state::uballoon_pcm_1_bankswitch_w)
 {
 	const int bank = data & 1;
-	if (bank & ~1)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", space.device().safe_pc(), data);
+	if (bank & ~1)  logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", m_pcm1->pc(), data);
 	m_bank1->set_entry(bank);
 }
 
@@ -793,7 +796,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(suna16_state::bssoccer_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE); // does RAM to sprite buffer copy here
 }
 
-static MACHINE_CONFIG_START( bssoccer, suna16_state )
+MACHINE_CONFIG_START(suna16_state::bssoccer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/4)    /* 8MHz */
@@ -856,7 +859,7 @@ MACHINE_CONFIG_END
                                 Ultra Balloon
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( uballoon, suna16_state )
+MACHINE_CONFIG_START(suna16_state::uballoon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/4)   /* 8MHz */
@@ -911,7 +914,7 @@ MACHINE_CONFIG_END
                             Suna Quiz 6000 Academy
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( sunaq, suna16_state )
+MACHINE_CONFIG_START(suna16_state::sunaq)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)   /* 6MHz */
@@ -972,7 +975,7 @@ WRITE8_MEMBER(suna16_state::bestbest_ay8910_port_a_w)
 	// ?
 }
 
-static MACHINE_CONFIG_START( bestbest, suna16_state )
+MACHINE_CONFIG_START(suna16_state::bestbest)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)   /* 6MHz */
@@ -1363,8 +1366,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1994, bestbest,  0,        bestbest, bestbest, driver_device, 0, ROT0, "SunA", "Best Of Best", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, sunaq,     0,        sunaq,    sunaq,    driver_device, 0, ROT0, "SunA", "SunA Quiz 6000 Academy (940620-6)", MACHINE_SUPPORTS_SAVE )   // Date/Version on-screen is 940620-6, but in the program rom it's  1994,6,30  K.H.T  V6.00
-GAME( 1996, bssoccer,  0,        bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0031 PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bssoccera, bssoccer, bssoccer, bssoccer, driver_device, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0032A PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, uballoon,  0,        uballoon, uballoon, driver_device, 0, ROT0, "SunA (Unico license)", "Ultra Balloon", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bestbest,  0,        bestbest, bestbest, suna16_state, 0, ROT0, "SunA",                 "Best Of Best",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1994, sunaq,     0,        sunaq,    sunaq,    suna16_state, 0, ROT0, "SunA",                 "SunA Quiz 6000 Academy (940620-6)",  MACHINE_SUPPORTS_SAVE )   // Date/Version on-screen is 940620-6, but in the program rom it's  1994,6,30  K.H.T  V6.00
+GAME( 1996, bssoccer,  0,        bssoccer, bssoccer, suna16_state, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0031 PCB)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bssoccera, bssoccer, bssoccer, bssoccer, suna16_state, 0, ROT0, "SunA (Unico license)", "Back Street Soccer (KRB-0032A PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, uballoon,  0,        uballoon, uballoon, suna16_state, 0, ROT0, "SunA (Unico license)", "Ultra Balloon",                      MACHINE_SUPPORTS_SAVE )

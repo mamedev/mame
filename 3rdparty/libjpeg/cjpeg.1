@@ -1,4 +1,4 @@
-.TH CJPEG 1 "14 November 2010"
+.TH CJPEG 1 "26 July 2015"
 .SH NAME
 cjpeg \- compress an image file to a JPEG file
 .SH SYNOPSIS
@@ -16,7 +16,7 @@ cjpeg \- compress an image file to a JPEG file
 compresses the named image file, or the standard input if no file is
 named, and produces a JPEG/JFIF file on the standard output.
 The currently supported input file formats are: PPM (PBMPLUS color
-format), PGM (PBMPLUS gray-scale format), BMP, Targa, and RLE (Utah Raster
+format), PGM (PBMPLUS grayscale format), BMP, Targa, and RLE (Utah Raster
 Toolkit format).  (RLE is supported only if the URT library is available.)
 .SH OPTIONS
 All switch names may be abbreviated; for example,
@@ -48,6 +48,17 @@ isn't bright enough to notice whether a BMP file uses only shades of gray.
 By saying
 .BR \-grayscale ,
 you'll get a smaller JPEG file that takes less time to process.
+.TP
+.B \-rgb
+Create RGB JPEG file.
+Using this switch suppresses the conversion from RGB
+colorspace input to the default YCbCr JPEG colorspace.
+You can use this switch in combination with the
+.BI \-block " N"
+switch (see below) for lossless JPEG coding.
+See also the
+.B \-rgb1
+switch below.
 .TP
 .B \-optimize
 Perform optimization of entropy encoding parameters.  Without this, default
@@ -155,6 +166,12 @@ about the same --- often a little smaller.
 .PP
 Switches for advanced users:
 .TP
+.B \-arithmetic
+Use arithmetic coding.
+.B Caution:
+arithmetic coded JPEG is not yet widely implemented, so many decoders will
+be unable to view an arithmetic coded JPEG file at all.
+.TP
 .BI \-block " N"
 Set DCT block size.  All N from 1 to 16 are possible.
 Default is 8 (baseline format).
@@ -162,9 +179,45 @@ Larger values produce higher compression,
 smaller values produce higher quality
 (exact DCT stage possible with 1 or 2; with the default quality of 75 and
 default Luminance qtable the DCT+Quantization stage is lossless for N=1).
-CAUTION: An implementation of the JPEG SmartScale extension is required for
-this feature.  SmartScale enabled JPEG is not yet widely implemented, so
-many decoders will be unable to view a SmartScale extended JPEG file at all.
+.B Caution:
+An implementation of the JPEG SmartScale extension is required for this
+feature.  SmartScale enabled JPEG is not yet widely implemented, so many
+decoders will be unable to view a SmartScale extended JPEG file at all.
+.TP
+.B \-rgb1
+Create RGB JPEG file with reversible color transform.
+Works like the
+.B \-rgb
+switch (see above) and inserts a simple reversible color transform
+into the processing which significantly improves the compression.
+Use this switch in combination with the
+.BI \-block " N"
+switch (see above) for lossless JPEG coding.
+.B Caution:
+A decoder with inverse color transform support is required for
+this feature.  Reversible color transform support is not yet
+widely implemented, so many decoders will be unable to view
+a reversible color transformed JPEG file at all.
+.TP
+.B \-bgycc
+Create big gamut YCC JPEG file.
+In this type of encoding the color difference components are quantized
+further by a factor of 2 compared to the normal Cb/Cr values, thus creating
+space to allow larger color values with higher saturation than the normal
+gamut limits to be encoded.  In order to compensate for the loss of color
+fidelity compared to a normal YCC encoded file, the color quantization
+tables can be adjusted accordingly.  For example,
+.B cjpeg \-bgycc \-quality
+80,90 will give similar results as
+.B cjpeg \-quality
+80.
+.B Caution:
+For correct decompression a decoder with big gamut YCC support (JFIF
+version 2) is required.  An old decoder may or may not display a big
+gamut YCC encoded JPEG file, depending on JFIF version check and
+corresponding warning/error configuration.  In case of a granted
+decompression the old decoder will display the image with half
+saturated colors.
 .TP
 .B \-dct int
 Use integer DCT method (default).
@@ -232,12 +285,6 @@ JPEG file and a better-looking image.  Too large a smoothing factor will
 visibly blur the image, however.
 .PP
 Switches for wizards:
-.TP
-.B \-arithmetic
-Use arithmetic coding.
-.B Caution:
-arithmetic coded JPEG is not yet widely implemented, so many decoders will be
-unable to view an arithmetic coded JPEG file at all.
 .TP
 .B \-baseline
 Force baseline-compatible quantization tables to be generated.  This clamps
@@ -328,7 +375,8 @@ Communications of the ACM, April 1991 (vol. 34, no. 4), pp. 30-44.
 .SH AUTHOR
 Independent JPEG Group
 .SH BUGS
-GIF input files are no longer supported, to avoid the Unisys LZW patent.
+GIF input files are no longer supported, to avoid the Unisys LZW patent
+(now expired).
 (Conversion of GIF files to JPEG is usually a bad idea anyway.)
 .PP
 Not all variants of BMP and Targa file formats are supported.

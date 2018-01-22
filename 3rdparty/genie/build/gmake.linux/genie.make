@@ -47,7 +47,7 @@ ifeq ($(config),release)
   TARGETDIR           = ../../bin/linux
   override TARGET              = $(TARGETDIR)/genie
   DEFINES            += -DNDEBUG -DLUA_COMPAT_MODULE -DLUA_USE_POSIX -DLUA_USE_DLOPEN
-  INCLUDES           += -I../../src/host/lua-5.3.0/src
+  INCLUDES           += -I"../../src/host/lua-5.3.0/src"
   INCLUDES           +=
   ALL_CPPFLAGS       += $(CPPFLAGS) -MMD -MP -MP $(DEFINES) $(INCLUDES)
   ALL_ASMFLAGS       += $(ASMFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os
@@ -108,6 +108,9 @@ ifeq ($(config),release)
 	$(OBJDIR)/src/host/os_stat.o \
 	$(OBJDIR)/src/host/os_ticks.o \
 	$(OBJDIR)/src/host/os_uuid.o \
+	$(OBJDIR)/src/host/path_getabsolute.o \
+	$(OBJDIR)/src/host/path_getrelative.o \
+	$(OBJDIR)/src/host/path_helpers.o \
 	$(OBJDIR)/src/host/path_isabsolute.o \
 	$(OBJDIR)/src/host/premake.o \
 	$(OBJDIR)/src/host/premake_main.o \
@@ -128,7 +131,7 @@ ifeq ($(config),debug)
   TARGETDIR           = ../../bin/linux
   override TARGET              = $(TARGETDIR)/genie
   DEFINES            += -D_DEBUG -DLUA_COMPAT_MODULE -DLUA_USE_POSIX -DLUA_USE_DLOPEN
-  INCLUDES           += -I../../src/host/lua-5.3.0/src
+  INCLUDES           += -I"../../src/host/lua-5.3.0/src"
   INCLUDES           +=
   ALL_CPPFLAGS       += $(CPPFLAGS) -MMD -MP -MP $(DEFINES) $(INCLUDES)
   ALL_ASMFLAGS       += $(ASMFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g
@@ -189,6 +192,9 @@ ifeq ($(config),debug)
 	$(OBJDIR)/src/host/os_stat.o \
 	$(OBJDIR)/src/host/os_ticks.o \
 	$(OBJDIR)/src/host/os_uuid.o \
+	$(OBJDIR)/src/host/path_getabsolute.o \
+	$(OBJDIR)/src/host/path_getrelative.o \
+	$(OBJDIR)/src/host/path_helpers.o \
 	$(OBJDIR)/src/host/path_isabsolute.o \
 	$(OBJDIR)/src/host/premake.o \
 	$(OBJDIR)/src/host/premake_main.o \
@@ -213,7 +219,7 @@ RESOURCES := \
 
 .PHONY: clean prebuild prelink
 
-all: $(OBJDIRS) prebuild prelink $(TARGET) | $(TARGETDIR)
+all: $(OBJDIRS) $(TARGETDIR) prebuild prelink $(TARGET)
 	@:
 
 $(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(EXTERNAL_LIBS) $(RESOURCES) | $(TARGETDIR) $(OBJDIRS)
@@ -436,6 +442,18 @@ $(OBJDIR)/src/host/os_ticks.o: ../../src/host/os_ticks.c $(GCH) $(MAKEFILE)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
 $(OBJDIR)/src/host/os_uuid.o: ../../src/host/os_uuid.c $(GCH) $(MAKEFILE)
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
+
+$(OBJDIR)/src/host/path_getabsolute.o: ../../src/host/path_getabsolute.c $(GCH) $(MAKEFILE)
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
+
+$(OBJDIR)/src/host/path_getrelative.o: ../../src/host/path_getrelative.c $(GCH) $(MAKEFILE)
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
+
+$(OBJDIR)/src/host/path_helpers.o: ../../src/host/path_helpers.c $(GCH) $(MAKEFILE)
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 

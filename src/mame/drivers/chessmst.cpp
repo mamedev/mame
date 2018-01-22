@@ -11,16 +11,20 @@
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/z80pio.h"
 #include "machine/clock.h"
-#include "sound/speaker.h"
+#include "machine/z80pio.h"
 #include "sound/beep.h"
-#include "chessmst.lh"
-#include "chessmstdm.lh"
+#include "sound/spkrdev.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "speaker.h"
+
+#include "chessmst.lh"
+#include "chessmstdm.lh"
 
 
 class chessmst_state : public driver_device
@@ -61,6 +65,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(view_monitor_button);
 	DECLARE_WRITE_LINE_MEMBER( timer_555_w );
 
+	void chessmst(machine_config &config);
+	void chessmsta(machine_config &config);
+	void chessmstdm(machine_config &config);
 private:
 	void update_display();
 };
@@ -249,7 +256,7 @@ void chessmst_state::update_display()
 	for(int i=0; i<4; i++)
 	{
 		if (BIT(m_digit_matrix, i))
-			output().set_indexed_value("digit", i, BITSWAP16(m_digit, 3,5,12,10,14,1,2,13,8,6,11,15,7,9,4,0) | (m_digit_dot << 16));
+			output().set_indexed_value("digit", i, bitswap<16>(m_digit, 3,5,12,10,14,1,2,13,8,6,11,15,7,9,4,0) | (m_digit_dot << 16));
 	}
 }
 
@@ -349,7 +356,7 @@ static const z80_daisy_config chessmstdm_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( chessmst, chessmst_state )
+MACHINE_CONFIG_START(chessmst_state::chessmst)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_9_8304MHz/4) // U880 Z80 clone
@@ -374,7 +381,7 @@ static MACHINE_CONFIG_START( chessmst, chessmst_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( chessmsta, chessmst_state )
+MACHINE_CONFIG_START(chessmst_state::chessmsta)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/4) // U880 Z80 clone
@@ -399,7 +406,7 @@ static MACHINE_CONFIG_START( chessmsta, chessmst_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( chessmstdm, chessmst_state )
+MACHINE_CONFIG_START(chessmst_state::chessmstdm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2) // U880 Z80 clone
@@ -461,7 +468,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT COMPAT MACHINE    INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1984, chessmst,  0,        0,  chessmst,  chessmst, driver_device, 0, "VEB Mikroelektronik Erfurt", "Chess-Master (set 1)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1984, chessmsta, chessmst, 0,  chessmsta, chessmst, driver_device, 0, "VEB Mikroelektronik Erfurt", "Chess-Master (set 2)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1987, chessmstdm,0,     0,  chessmstdm, chessmstdm, driver_device, 0, "VEB Mikroelektronik Erfurt", "Chess-Master Diamond", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       STATE           INIT  COMPANY                       FULLNAME                FLAGS
+COMP( 1984, chessmst,   0,        0,      chessmst,   chessmst,   chessmst_state, 0,    "VEB Mikroelektronik Erfurt", "Chess-Master (set 1)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1984, chessmsta,  chessmst, 0,      chessmsta,  chessmst,   chessmst_state, 0,    "VEB Mikroelektronik Erfurt", "Chess-Master (set 2)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+COMP( 1987, chessmstdm, 0,        0,      chessmstdm, chessmstdm, chessmst_state, 0,    "VEB Mikroelektronik Erfurt", "Chess-Master Diamond", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )

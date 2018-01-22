@@ -6,11 +6,12 @@
 */
 
 
-
 #include "emu.h"
 #include "toaplan_scu.h"
+#include "screen.h"
 
-const device_type TOAPLAN_SCU = &device_creator<toaplan_scu_device>;
+
+DEFINE_DEVICE_TYPE(TOAPLAN_SCU, toaplan_scu_device, "toaplan_scu", "Toaplan SCU")
 
 const gfx_layout toaplan_scu_device::spritelayout =
 {
@@ -29,8 +30,8 @@ GFXDECODE_END
 
 
 toaplan_scu_device::toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TOAPLAN_SCU, "Toaplan SCU", tag, owner, clock, "toaplan_scu", __FILE__),
-	device_gfx_interface(mconfig, *this, gfxinfo )
+	: device_t(mconfig, TOAPLAN_SCU, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, gfxinfo)
 {
 }
 

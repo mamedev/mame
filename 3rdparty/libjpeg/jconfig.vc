@@ -1,4 +1,5 @@
-/* jconfig.vc --- jconfig.h for Microsoft Visual C++ on Windows 95 or NT. */
+/* jconfig.vc --- jconfig.h for Microsoft Visual C++ on Windows 9x or NT. */
+/* This file also works for Borland C++ 32-bit (bcc32) on Windows 9x or NT. */
 /* see jconfig.txt for explanations */
 
 #define HAVE_PROTOTYPES
@@ -15,9 +16,15 @@
 #undef NEED_SHORT_EXTERNAL_NAMES
 #undef INCOMPLETE_TYPES_BROKEN
 
-/* Define "boolean" as unsigned char, not int, per Windows custom */
+/* Define "boolean" as unsigned char, not enum, per Windows custom */
 #ifndef __RPCNDR_H__		/* don't conflict if rpcndr.h already read */
 typedef unsigned char boolean;
+#endif
+#ifndef FALSE			/* in case these macros already exist */
+#define FALSE	0		/* values of boolean */
+#endif
+#ifndef TRUE
+#define TRUE	1
 #endif
 #define HAVE_BOOLEAN		/* prevent jmorecfg.h from redefining it */
 

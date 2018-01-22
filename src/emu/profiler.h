@@ -21,10 +21,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_EMU_PROFILER_H
+#define MAME_EMU_PROFILER_H
 
-#ifndef __PROFILER_H__
-#define __PROFILER_H__
+#pragma once
 
 #include "attotime.h"
 
@@ -71,7 +71,7 @@ enum profile_type
 	PROFILER_IDLE,
 	PROFILER_TOTAL
 };
-DECLARE_ENUM_OPERATORS(profile_type)
+DECLARE_ENUM_INCDEC_OPERATORS(profile_type)
 
 
 
@@ -212,4 +212,4 @@ typedef dummy_profiler_state profiler_state;
 extern profiler_state g_profiler;
 
 
-#endif  /* __PROFILER_H__ */
+#endif  /* MAME_EMU_PROFILER_H */

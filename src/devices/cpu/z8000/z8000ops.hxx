@@ -96,7 +96,7 @@ uint32_t z8002_device::segmented_addr(uint32_t addr)
 
 uint32_t z8002_device::addr_from_reg(int regno)
 {
-	if (segmented_mode())
+	if (get_segmented_mode())
 		return segmented_addr(RL(regno));
 	else
 		return RW(regno);
@@ -104,7 +104,7 @@ uint32_t z8002_device::addr_from_reg(int regno)
 
 void z8002_device::addr_to_reg(int regno, uint32_t addr)
 {
-	if (segmented_mode()) {
+	if (get_segmented_mode()) {
 		uint32_t segaddr = make_segmented_addr(addr);
 		RW(regno) = (RW(regno) & 0x80ff) | ((segaddr >> 16) & 0x7f00);
 		RW(regno | 1) = segaddr & 0xffff;
@@ -115,21 +115,21 @@ void z8002_device::addr_to_reg(int regno, uint32_t addr)
 
 void z8002_device::add_to_addr_reg(int regno, uint16_t addend)
 {
-	if (segmented_mode())
+	if (get_segmented_mode())
 		regno |= 1;
 	RW(regno) += addend;
 }
 
 void z8002_device::sub_from_addr_reg(int regno, uint16_t subtrahend)
 {
-	if (segmented_mode())
+	if (get_segmented_mode())
 		regno |= 1;
 	RW(regno) -= subtrahend;
 }
 
 void z8002_device::set_pc(uint32_t addr)
 {
-	if (segmented_mode())
+	if (get_segmented_mode())
 		m_pc = addr;
 	else
 		m_pc = (m_pc & 0xffff0000) | (addr & 0xffff);
@@ -137,7 +137,7 @@ void z8002_device::set_pc(uint32_t addr)
 
 void z8002_device::PUSHW(uint8_t dst, uint16_t value)
 {
-	if (segmented_mode())
+	if (get_segmented_mode())
 		RW(dst | 1) -= 2;
 	else
 		RW(dst) -= 2;
@@ -147,7 +147,7 @@ void z8002_device::PUSHW(uint8_t dst, uint16_t value)
 uint16_t z8002_device::POPW(uint8_t src)
 {
 	uint16_t result = RDMEM_W(AS_DATA, addr_from_reg(src));
-	if (segmented_mode())
+	if (get_segmented_mode())
 		RW(src | 1) += 2;
 	else
 		RW(src) += 2;
@@ -156,7 +156,7 @@ uint16_t z8002_device::POPW(uint8_t src)
 
 void z8002_device::PUSHL(uint8_t dst, uint32_t value)
 {
-	if (segmented_mode())
+	if (get_segmented_mode())
 		RW(dst | 1) -= 4;
 	else
 		RW(dst) -= 4;
@@ -166,7 +166,7 @@ void z8002_device::PUSHL(uint8_t dst, uint32_t value)
 uint32_t z8002_device::POPL(uint8_t src)
 {
 	uint32_t result = RDMEM_L(AS_DATA, addr_from_reg(src));
-	if (segmented_mode())
+	if (get_segmented_mode())
 		RW(src | 1) += 4;
 	else
 		RW(src) += 4;
@@ -1639,7 +1639,7 @@ void z8002_device::Z0E_imm8()
 {
 	CHECK_EXT_INSTR();
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: ext0e  $%02x\n", tag(), m_pc, imm8));
+	LOG("Z8K %04x: ext0e  $%02x\n", m_pc, imm8);
 	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -1654,7 +1654,7 @@ void z8002_device::Z0F_imm8()
 {
 	CHECK_EXT_INSTR();
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: ext0f  $%02x\n", tag(), m_pc, imm8));
+	LOG("Z8K %04x: ext0f  $%02x\n", m_pc, imm8);
 	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -1971,7 +1971,7 @@ void z8002_device::Z1E_ddN0_cccc()
 void z8002_device::Z1F_ddN0_0000()
 {
 	GET_DST(OP0,NIB2);
-	if (segmented_mode())
+	if (get_segmented_mode())
 		PUSHL(SP, make_segmented_addr(m_pc));
 	else
 		PUSHW(SP, m_pc);
@@ -2361,7 +2361,7 @@ void z8002_device::Z34_ssN0_dddd_imm16()
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_IDX16(OP1);
-	if (segmented_mode()) {
+	if (get_segmented_mode()) {
 		RL(dst) = RL(src);
 	}
 	else {
@@ -2411,7 +2411,7 @@ void z8002_device::Z36_0000_0000()
 void z8002_device::Z36_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvd36 $%02x\n", tag(), m_pc, imm8));
+	LOG("Z8K %04x: rsvd36 $%02x\n", m_pc, imm8);
 	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -2449,7 +2449,7 @@ void z8002_device::Z37_ddN0_ssss_imm16()
 void z8002_device::Z38_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvd38 $%02x\n", tag(), m_pc, imm8));
+	LOG("Z8K %04x: rsvd38 $%02x\n", m_pc, imm8);
 	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -2465,7 +2465,7 @@ void z8002_device::Z39_ssN0_0000()
 	CHECK_PRIVILEGED_INSTR();
 	GET_SRC(OP0,NIB2);
 	uint16_t fcw;
-	if (segmented_mode()) {
+	if (get_segmented_mode()) {
 		uint32_t addr = addr_from_reg(src);
 		fcw = RDMEM_W(AS_DATA, addr + 2);
 		set_pc(segmented_addr(RDMEM_L(AS_DATA, addr + 4)));
@@ -3995,7 +3995,7 @@ void z8002_device::Z5E_ddN0_cccc_addr()
 void z8002_device::Z5F_0000_0000_addr()
 {
 	GET_ADDR(OP1);
-	if (segmented_mode())
+	if (get_segmented_mode())
 		PUSHL(SP, make_segmented_addr(m_pc));
 	else
 		PUSHW(SP, m_pc);
@@ -4010,7 +4010,7 @@ void z8002_device::Z5F_ddN0_0000_addr()
 {
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
-	if (segmented_mode())
+	if (get_segmented_mode())
 		PUSHL(SP, make_segmented_addr(m_pc));
 	else
 		PUSHW(SP, m_pc);
@@ -4469,7 +4469,7 @@ void z8002_device::Z74_ssN0_dddd_0000_xxxx_0000_0000()
 	GET_DST(OP0,NIB3);
 	GET_SRC(OP0,NIB2);
 	GET_IDX(OP1,NIB1);
-	if (segmented_mode()) {
+	if (get_segmented_mode()) {
 		RL(dst) = RL(src);
 	}
 	else {
@@ -4498,7 +4498,7 @@ void z8002_device::Z76_0000_dddd_addr()
 {
 	GET_DST(OP0,NIB3);
 	GET_ADDR_RAW(OP1);
-	if (segmented_mode()) {
+	if (get_segmented_mode()) {
 		RL(dst) = addr;
 	}
 	else {
@@ -4516,7 +4516,7 @@ void z8002_device::Z76_ssN0_dddd_addr()
 	GET_SRC(OP0,NIB2);
 	GET_ADDR_RAW(OP1);
 	uint16_t temp = RW(src);  // store src in case dst == src
-	if (segmented_mode()) {
+	if (get_segmented_mode()) {
 		RL(dst) = addr;
 	}
 	else {
@@ -4544,7 +4544,7 @@ void z8002_device::Z77_ddN0_ssss_0000_xxxx_0000_0000()
 void z8002_device::Z78_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvd78 $%02x\n", tag(), m_pc, imm8));
+	LOG("Z8K %04x: rsvd78 $%02x\n", m_pc, imm8);
 	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -4560,7 +4560,7 @@ void z8002_device::Z79_0000_0000_addr()
 	CHECK_PRIVILEGED_INSTR();
 	GET_ADDR(OP1);
 	uint16_t fcw;
-	if (segmented_mode()) {
+	if (get_segmented_mode()) {
 		fcw = RDMEM_W(AS_DATA,  addr + 2);
 		set_pc(segmented_addr(RDMEM_L(AS_DATA, addr + 4)));
 	}
@@ -4582,7 +4582,7 @@ void z8002_device::Z79_ssN0_0000_addr()
 	GET_ADDR(OP1);
 	uint16_t fcw;
 	addr = addr_add(addr, RW(src));
-	if (segmented_mode()) {
+	if (get_segmented_mode()) {
 		fcw = RDMEM_W(AS_DATA,  addr + 2);
 		set_pc(segmented_addr(RDMEM_L(AS_DATA, addr + 4)));
 	}
@@ -4615,12 +4615,12 @@ void z8002_device::Z7B_0000_0000()
 	CHECK_PRIVILEGED_INSTR();
 	tag = POPW(SP);   /* get type tag */
 	fcw = POPW(SP);   /* get m_fcw  */
-	if (segmented_mode())
+	if (get_segmented_mode())
 		set_pc(segmented_addr(POPL(SP)));
 	else
 		m_pc    = POPW(SP);   /* get m_pc   */
 	CHANGE_FCW(fcw);       /* check for user/system mode change */
-	LOG(("Z8K '%s' IRET tag $%04x, fcw $%04x, pc $%04x\n", this->tag(), tag, fcw, m_pc));
+	LOG("Z8K IRET tag $%04x, fcw $%04x, pc $%04x\n", tag, fcw, m_pc);
 }
 
 /******************************************
@@ -4736,7 +4736,7 @@ void z8002_device::Z7D_dddd_0ccc()
 			RW(dst) = m_nspoff;
 			break;
 		default:
-			LOG(("Z8K '%s' LDCTL R%d,%d\n", tag(), dst, imm3));
+			LOG("Z8K LDCTL R%d,%d\n", dst, imm3);
 	}
 }
 
@@ -4773,7 +4773,7 @@ void z8002_device::Z7D_ssss_1ccc()
 			m_nspoff = RW(src);
 			break;
 		default:
-			LOG(("Z8K '%s' LDCTL %d,R%d\n", tag(), imm3, src));
+			LOG("Z8K LDCTL %d,R%d\n", imm3, src);
 	}
 }
 
@@ -4784,7 +4784,7 @@ void z8002_device::Z7D_ssss_1ccc()
 void z8002_device::Z7E_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvd7e $%02x\n", tag(), m_pc, imm8));
+	LOG("Z8K %04x: rsvd7e $%02x\n", m_pc, imm8);
 	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -5102,7 +5102,7 @@ void z8002_device::Z8E_imm8()
 {
 	CHECK_EXT_INSTR();
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: ext8e  $%02x\n", tag(), m_pc, imm8));
+	LOG("Z8K %04x: ext8e  $%02x\n", m_pc, imm8);
 	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -5117,7 +5117,7 @@ void z8002_device::Z8F_imm8()
 {
 	CHECK_EXT_INSTR();
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: ext8f  $%02x\n", tag(), m_pc, imm8));
+	LOG("Z8K %04x: ext8f  $%02x\n", m_pc, imm8);
 	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -5275,7 +5275,7 @@ void z8002_device::Z9C_dddd_1000()
 void z8002_device::Z9D_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvd9d $%02x\n", tag(), m_pc, imm8));
+	LOG("Z8K %04x: rsvd9d $%02x\n", m_pc, imm8);
 	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -5289,7 +5289,7 @@ void z8002_device::Z9D_imm8()
 void z8002_device::Z9E_0000_cccc()
 {
 	GET_CCC(OP0,NIB3);
-	if (segmented_mode())
+	if (get_segmented_mode())
 		switch (cc) {
 			case  0: if (CC0) set_pc(segmented_addr(POPL(SP))); break;
 			case  1: if (CC1) set_pc(segmented_addr(POPL(SP))); break;
@@ -5336,7 +5336,7 @@ void z8002_device::Z9E_0000_cccc()
 void z8002_device::Z9F_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvd9f $%02x\n", tag(), m_pc, imm8));
+	LOG("Z8K %04x: rsvd9f $%02x\n", m_pc, imm8);
 	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -6051,7 +6051,7 @@ void z8002_device::ZB8_ddN0_1100_0000_rrrr_ssN0_0000()
 void z8002_device::ZB9_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvdb9 $%02x\n", tag(), m_pc, imm8));
+	LOG("Z8K %04x: rsvdb9 $%02x\n", m_pc, imm8);
 	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -6709,7 +6709,7 @@ void z8002_device::ZBE_aaaa_bbbb()
 void z8002_device::ZBF_imm8()
 {
 	GET_IMM8(0);
-	LOG(("Z8K '%s' %04x: rsvdbf $%02x\n", tag(), m_pc, imm8));
+	LOG("Z8K %04x: rsvdbf $%02x\n", m_pc, imm8);
 	if (m_fcw & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -6746,7 +6746,7 @@ void z8002_device::ZC_dddd_imm8()
 void z8002_device::ZD_dsp12()
 {
 	int16_t dsp12 = m_op[0] & 0xfff;
-	if (segmented_mode())
+	if (get_segmented_mode())
 		PUSHL(SP, make_segmented_addr(m_pc));
 	else
 		PUSHW(SP, m_pc);

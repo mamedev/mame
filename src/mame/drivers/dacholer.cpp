@@ -38,6 +38,8 @@
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 class dacholer_state : public driver_device
 {
@@ -87,7 +89,6 @@ public:
 	DECLARE_WRITE8_MEMBER(foreground_w);
 	DECLARE_WRITE8_MEMBER(bg_bank_w);
 	DECLARE_WRITE8_MEMBER(coins_w);
-	DECLARE_WRITE8_MEMBER(snd_w);
 	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
 	DECLARE_WRITE8_MEMBER(snd_ack_w);
@@ -104,6 +105,8 @@ public:
 	INTERRUPT_GEN_MEMBER(sound_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void itaten(machine_config &config);
+	void dacholer(machine_config &config);
 };
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
@@ -217,12 +220,6 @@ WRITE8_MEMBER(dacholer_state::coins_w)
 	output().set_led_value(1, data & 8);
 }
 
-WRITE8_MEMBER(dacholer_state::snd_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 WRITE8_MEMBER(dacholer_state::main_irq_ack_w)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -256,7 +253,7 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, dacholer_state )
 	AM_RANGE(0x22, 0x22) AM_WRITE(bg_scroll_x_w)
 	AM_RANGE(0x23, 0x23) AM_WRITE(bg_scroll_y_w)
 	AM_RANGE(0x24, 0x24) AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x27, 0x27) AM_WRITE(snd_w)
+	AM_RANGE(0x27, 0x27) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
@@ -300,7 +297,7 @@ WRITE8_MEMBER(dacholer_state::music_irq_w)
 
 static ADDRESS_MAP_START( snd_io_map, AS_IO, 8, dacholer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(music_irq_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(snd_irq_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(snd_ack_w)
@@ -312,7 +309,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itaten_snd_io_map, AS_IO, 8, dacholer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
 	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay3", ay8910_device, data_address_w)
@@ -646,7 +643,7 @@ PALETTE_INIT_MEMBER(dacholer_state, dacholer)
 }
 
 /* note: clocks are taken from itaten sound reference recording */
-static MACHINE_CONFIG_START( dacholer, dacholer_state )
+MACHINE_CONFIG_START(dacholer_state::dacholer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)  /* ? */
@@ -678,6 +675,7 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_19_968MHz/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
@@ -690,11 +688,11 @@ static MACHINE_CONFIG_START( dacholer, dacholer_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dacholer_state, adpcm_int))          /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)  /* 1 / 96 = 3906.25Hz playback  - guess */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 = 3906.25Hz playback  - guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( itaten, dacholer )
+MACHINE_CONFIG_DERIVED(dacholer_state::itaten, dacholer)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(itaten_main_map)
 
@@ -845,6 +843,6 @@ ROM_START( itaten )
 ROM_END
 
 
-GAME( 1983, dacholer, 0, dacholer, dacholer, driver_device, 0, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, kickboy,  0, dacholer, kickboy, driver_device,  0, ROT0, "Nichibutsu",         "Kick Boy",               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, itaten,   0, itaten,   itaten, driver_device,   0, ROT0, "Nichibutsu / Alice", "Itazura Tenshi (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dacholer, 0, dacholer, dacholer, dacholer_state, 0, ROT0, "Nichibutsu",         "Dacholer",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, kickboy,  0, dacholer, kickboy,  dacholer_state, 0, ROT0, "Nichibutsu",         "Kick Boy",               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, itaten,   0, itaten,   itaten,   dacholer_state, 0, ROT0, "Nichibutsu / Alice", "Itazura Tenshi (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -133,9 +133,9 @@ WRITE8_MEMBER(pandoras_state::pandoras_scrolly_w)
 	m_layer0->set_scrolly(0, data);
 }
 
-WRITE8_MEMBER(pandoras_state::pandoras_flipscreen_w)
+WRITE_LINE_MEMBER(pandoras_state::flipscreen_w)
 {
-	m_flipscreen = data;
+	m_flipscreen = state;
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 

@@ -460,7 +460,7 @@ void ninjakd2_state::update_sprites()
 
 uint32_t ninjakd2_state::screen_update_ninjakd2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// updating sprites here instead than in screen_eof avoids a palette glitch
+	// updating sprites here instead than in screen_vblank avoids a palette glitch
 	// at the end of the "rainbow sky" screens.
 	update_sprites();
 	m_sprites_updated = 1;
@@ -507,7 +507,7 @@ uint32_t ninjakd2_state::screen_update_omegaf(screen_device &screen, bitmap_ind1
 }
 
 
-void ninjakd2_state::screen_eof_ninjakd2(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(ninjakd2_state::screen_vblank_ninjakd2)
 {
 	// rising edge
 	if (state)

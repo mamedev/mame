@@ -222,12 +222,15 @@ Stephh's notes (based on the games M68000 code and some tests) :
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "sound/okim6295.h"
 #include "video/decospr.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class nmg5_state : public driver_device
 {
@@ -291,6 +294,11 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bitmap( bitmap_ind16 &bitmap );
+	void nmg5(machine_config &config);
+	void pclubys(machine_config &config);
+	void garogun(machine_config &config);
+	void searchp2(machine_config &config);
+	void _7ordi(machine_config &config);
 };
 
 
@@ -357,7 +365,7 @@ WRITE8_MEMBER(nmg5_state::oki_banking_w)
 static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x180000, 0x180001) AM_WRITE(nmg5_soundlatch_w)
 	AM_RANGE(0x180002, 0x180003) AM_WRITENOP
@@ -377,7 +385,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pclubys_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x440000, 0x4407ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x460000, 0x4607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x480000, 0x480001) AM_WRITE(nmg5_soundlatch_w)
 	AM_RANGE(0x480002, 0x480003) AM_WRITENOP
@@ -971,7 +979,7 @@ void nmg5_state::machine_reset()
 	m_input_data = 0;
 }
 
-static MACHINE_CONFIG_START( nmg5, nmg5_state )
+MACHINE_CONFIG_START(nmg5_state::nmg5)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -1013,11 +1021,11 @@ static MACHINE_CONFIG_START( nmg5, nmg5_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1000000 , OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( garogun, nmg5 )
+MACHINE_CONFIG_DERIVED(nmg5_state::garogun, nmg5)
 
 	/* basic machine hardware */
 
@@ -1029,7 +1037,7 @@ static MACHINE_CONFIG_DERIVED( garogun, nmg5 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pclubys, nmg5 )
+MACHINE_CONFIG_DERIVED(nmg5_state::pclubys, nmg5)
 
 	/* basic machine hardware */
 
@@ -1042,7 +1050,7 @@ static MACHINE_CONFIG_DERIVED( pclubys, nmg5 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( searchp2, nmg5 )
+MACHINE_CONFIG_DERIVED(nmg5_state::searchp2, nmg5)
 
 	/* basic machine hardware */
 
@@ -1052,7 +1060,7 @@ static MACHINE_CONFIG_DERIVED( searchp2, nmg5 )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pclubys)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( 7ordi, nmg5 )
+MACHINE_CONFIG_DERIVED(nmg5_state::_7ordi, nmg5)
 
 	/* basic machine hardware */
 
@@ -1445,7 +1453,7 @@ ROM_START( wondstcka )
 	ROM_LOAD( "3.u80", 0x380000, 0x80000, CRC(553c5781) SHA1(d5f694f6a50f51c80845a15e58d263fa629c3522) )
 
 	ROM_REGION( 0x280000, "gfx2", 0 )   /* 16x16x5 */
-	ROM_LOAD( "8.u83 ",  0x000000, 0x80000, CRC(f51cf9c6) SHA1(6d0fc749bab918ff6a9d7fae8be7c65823349283) )
+	ROM_LOAD( "8.u83",   0x000000, 0x80000, CRC(f51cf9c6) SHA1(6d0fc749bab918ff6a9d7fae8be7c65823349283) )
 //  ROM_LOAD( "9.u82",   0x080000, 0x80000, CRC(8c6cff4d) SHA1(5a217ff60f10bf5c58091c189b3509d1361a16b3) ) // bad dump
 	ROM_LOAD( "9.u82",   0x080000, 0x80000, CRC(ddd3c60c) SHA1(19b68a44c877d0bf630d07b18541ef9636f5adac) )
 	ROM_LOAD( "7.u105",  0x100000, 0x80000, CRC(a7fc624d) SHA1(b336ab6e16555db30f9366bf5b797b5ba3ea767c) )
@@ -1587,6 +1595,6 @@ GAME( 1999, searchp2,  0,        searchp2, searchp2,  nmg5_state, prot_val_10, R
 GAME( 2000, pclubys,   0,        pclubys,  pclubys,   nmg5_state, prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, pclubysa,  pclubys,  pclubys,  pclubys,   nmg5_state, prot_val_10, ROT0, "Yun Sung", "Puzzle Club (Yun Sung, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, garogun,   0,        garogun,  garogun,   nmg5_state, prot_val_40, ROT0, "Yun Sung", "Garogun Seroyang (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, 7ordi,     0,        7ordi,    7ordi,     nmg5_state, prot_val_20, ROT0, "Yun Sung", "7 Ordi (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2002, 7ordi,     0,        _7ordi,   7ordi,     nmg5_state, prot_val_20, ROT0, "Yun Sung", "7 Ordi (Korea)", MACHINE_SUPPORTS_SAVE )
 GAME( ????, wondstck,  0,        nmg5,     wondstck,  nmg5_state, prot_val_00, ROT0, "Yun Sung", "Wonder Stick (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( ????, wondstcka, wondstck, nmg5,     wondstck,  nmg5_state, prot_val_00, ROT0, "Yun Sung", "Wonder Stick (set 2, censored)", MACHINE_SUPPORTS_SAVE )

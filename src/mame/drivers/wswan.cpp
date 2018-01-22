@@ -33,8 +33,13 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/wswan.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 #include "wswan.lh"
 
 static ADDRESS_MAP_START (wswan_mem, AS_PROGRAM, 8, wswan_state)
@@ -103,9 +108,9 @@ static SLOT_INTERFACE_START(wswan_cart)
 	SLOT_INTERFACE_INTERNAL("ws_eeprom",  WS_ROM_EEPROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( wswan, wswan_state )
+MACHINE_CONFIG_START(wswan_state::wswan)
 	/* Basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30MZ, 3072000)
+	MCFG_CPU_ADD("maincpu", V30MZ, XTAL_3_072MHz)
 	MCFG_CPU_PROGRAM_MAP(wswan_mem)
 	MCFG_CPU_IO_MAP(wswan_io)
 
@@ -115,11 +120,12 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 	MCFG_WSWAN_VIDEO_DMASND_CB(wswan_state, dma_sound_cb)
 
 	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(75)
-	MCFG_SCREEN_VBLANK_TIME(0)
+//  MCFG_SCREEN_REFRESH_RATE(75)
+//  MCFG_SCREEN_VBLANK_TIME(0)
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", wswan_video_device, screen_update)
-	MCFG_SCREEN_SIZE(WSWAN_X_PIXELS, WSWAN_Y_PIXELS)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, WSWAN_X_PIXELS - 1, 0, WSWAN_Y_PIXELS - 1)
+//  MCFG_SCREEN_SIZE(WSWAN_X_PIXELS, WSWAN_Y_PIXELS)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, WSWAN_X_PIXELS - 1, 0, WSWAN_Y_PIXELS - 1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_3_072MHz,256,0,WSWAN_X_PIXELS,159,0,WSWAN_Y_PIXELS)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_wswan)
@@ -146,10 +152,9 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("wsc_list","wscolor")
 
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc2_list","pockchalv2")
-
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wscolor, wswan )
+MACHINE_CONFIG_DERIVED(wswan_state::wscolor, wswan)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(wscolor_mem)
 	MCFG_MACHINE_START_OVERRIDE(wswan_state, wscolor)
@@ -166,8 +171,6 @@ static MACHINE_CONFIG_DERIVED( wscolor, wswan )
 	MCFG_DEVICE_REMOVE("wsc_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list","wscolor")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ws_list","wswan")
-
-
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -186,6 +189,6 @@ ROM_START( wscolor )
 //  ROM_LOAD_OPTIONAL( "wsc_bios.bin", 0x0000, 0x0001, NO_DUMP )
 ROM_END
 
-/*     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT COMPANY   FULLNAME*/
-CONS( 1999, wswan,   0,      0,      wswan,   wswan, driver_device, 0,    "Bandai", "WonderSwan",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, driver_device, 0,    "Bandai", "WonderSwan Color", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY   FULLNAME*/
+CONS( 1999, wswan,   0,      0,      wswan,   wswan, wswan_state, 0,    "Bandai",  "WonderSwan",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, wswan_state, 0,    "Bandai",  "WonderSwan Color", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

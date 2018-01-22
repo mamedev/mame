@@ -6,10 +6,10 @@
     Written by Ryan Holtz
 */
 
-#pragma once
+#ifndef MAME_CPU_SSEM_SSEM_H
+#define MAME_CPU_SSEM_SSEM_H
 
-#ifndef __SSEM_H__
-#define __SSEM_H__
+#pragma once
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -24,6 +24,7 @@ public:
 	// construction/destruction
 	ssem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -37,12 +38,10 @@ public:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -68,7 +67,7 @@ public:
 };
 
 // device type definition
-extern const device_type SSEMCPU;
+DECLARE_DEVICE_TYPE(SSEMCPU, ssem_device)
 
 /***************************************************************************
     REGISTER ENUMERATION
@@ -81,6 +80,4 @@ enum
 	SSEM_HALT
 };
 
-CPU_DISASSEMBLE( ssem );
-
-#endif /* __SSEM_H__ */
+#endif // MAME_CPU_SSEM_SSEM_H

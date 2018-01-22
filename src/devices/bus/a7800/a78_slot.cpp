@@ -33,7 +33,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A78_CART_SLOT = &device_creator<a78_cart_slot_device>;
+DEFINE_DEVICE_TYPE(A78_CART_SLOT, a78_cart_slot_device, "a78_cart_slot", "Atari 7800 Cartridge Slot")
 
 
 //-------------------------------------------------
@@ -112,10 +112,12 @@ void device_a78_cart_interface::nvram_alloc(uint32_t size)
 //-------------------------------------------------
 //  a78_cart_slot_device - constructor
 //-------------------------------------------------
-a78_cart_slot_device::a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						device_t(mconfig, A78_CART_SLOT, "Atari 7800 Cartridge Slot", tag, owner, clock, "a78_cart_slot", __FILE__),
-						device_image_interface(mconfig, *this),
-						device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)
+a78_cart_slot_device::a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, A78_CART_SLOT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
+	, device_slot_interface(mconfig, *this)
+	, m_cart(nullptr)
+	, m_type(0)
 {
 }
 
@@ -137,25 +139,13 @@ void a78_cart_slot_device::device_start()
 	m_cart = dynamic_cast<device_a78_cart_interface  *>(get_card_device());
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void a78_cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
 
 
 /*-------------------------------------------------
  call load
  -------------------------------------------------*/
 
-int a78_cart_slot_device::validate_header(int head, bool log)
+int a78_cart_slot_device::validate_header(int head, bool log) const
 {
 	switch (head & 0x3d)
 	{
@@ -306,6 +296,7 @@ static const a78_slot slot_list[] =
 	{ A78_TYPE3,      "a78_sg_pokey" },
 	{ A78_TYPE6,      "a78_sg_ram" },
 	{ A78_TYPEA,      "a78_sg9" },
+	{ A78_TYPE8,      "a78_mram" },
 	{ A78_ABSOLUTE,   "a78_abs" },
 	{ A78_ACTIVISION, "a78_act" },
 	{ A78_HSC,        "a78_hsc" },
@@ -348,7 +339,7 @@ image_init_result a78_cart_slot_device::call_load()
 	{
 		uint32_t len;
 
-		if (software_entry() != nullptr)
+		if (loaded_through_softlist())
 		{
 			const char *pcb_name;
 			bool has_ram = get_software_region("ram") ? true : false;
@@ -429,6 +420,10 @@ image_init_result a78_cart_slot_device::call_load()
 				m_type = A78_ACTIVISION;
 			else if ((mapper & 0xff00) == 0x0200)
 				m_type = A78_ABSOLUTE;
+			// (for now) mirror ram implies no bankswitch format is used
+			else if ((mapper & 0x0080) == 0x0080)
+				m_type = A78_TYPE8;
+
 
 			logerror("Cart type: 0x%x\n", m_type);
 
@@ -454,7 +449,7 @@ image_init_result a78_cart_slot_device::call_load()
 			m_cart->rom_alloc(len, tag());
 			fread(m_cart->get_rom_base(), len);
 
-			if (m_type == A78_TYPE6)
+			if (m_type == A78_TYPE6 || m_type == A78_TYPE8)
 				m_cart->ram_alloc(0x4000);
 			if (m_type == A78_MEGACART || (m_type >= A78_VERSABOARD && m_type <= A78_VERSA_POK450))
 				m_cart->ram_alloc(0x8000);
@@ -470,15 +465,6 @@ image_init_result a78_cart_slot_device::call_load()
 		//printf("Type: %s\n", a78_get_slot(m_type));
 	}
 	return image_init_result::PASS;
-}
-
-
-void a78_partialhash(util::hash_collection &dest, const unsigned char *data,
-						unsigned long length, const char *functions)
-{
-	if (length <= 128)
-		return;
-	dest.compute(&data[128], length - 128, functions);
 }
 
 
@@ -518,16 +504,16 @@ image_verify_result a78_cart_slot_device::verify_header(char *header)
  get default card software
  -------------------------------------------------*/
 
-std::string a78_cart_slot_device::get_default_card_software()
+std::string a78_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
-	if (open_image_file(mconfig().options()))
+	if (hook.image_file())
 	{
 		const char *slot_string;
 		std::vector<uint8_t> head(128);
 		int type = A78_TYPE0, mapper;
 
 		// Load and check the header
-		m_file->read(&head[0], 128);
+		hook.image_file()->read(&head[0], 128);
 
 		// let's try to auto-fix some common errors in the header
 		mapper = validate_header((head[53] << 8) | head[54], false);
@@ -548,7 +534,7 @@ std::string a78_cart_slot_device::get_default_card_software()
 				break;
 			case 0x0022:
 			case 0x0026:
-				if (m_file->size() > 0x40000)
+				if (hook.image_file()->size() > 0x40000)
 					type = A78_MEGACART;
 				else
 					type = A78_VERSABOARD;
@@ -570,11 +556,11 @@ std::string a78_cart_slot_device::get_default_card_software()
 			type = A78_ACTIVISION;
 		else if ((mapper & 0xff00) == 0x0200)
 			type = A78_ABSOLUTE;
+		else if ((mapper & 0x0080) == 0x0080)
+			type = A78_TYPE8;
 
 		logerror("Cart type: %x\n", type);
 		slot_string = a78_get_slot(type);
-
-		clear();
 
 		return std::string(slot_string);
 	}
@@ -706,7 +692,7 @@ WRITE8_MEMBER(a78_cart_slot_device::write_40xx)
  bit 4 [0x10] - bank 6 at $4000
  bit 5 [0x20] - banked RAM at $4000
  bit 6 [0x40] - POKEY at $0450
- bit 7 [0x80] - currently unused
+ bit 7 [0x80] - Mirror RAM at $4000
 
  (byte 53)
  bit0 set = Absolute mapper (F18 Hornet)
@@ -750,6 +736,9 @@ void a78_cart_slot_device::internal_header_logging(uint8_t *header, uint32_t len
 			break;
 		case 0x0020:
 			cart_mapper.assign("SuperCart Bankswitch + 32K RAM");
+			break;
+		case 0x0080:
+			cart_mapper.assign("No Bankswitch + Mirror RAM");
 			break;
 		case 0x0100:
 			cart_mapper.assign("Activision Bankswitch");
@@ -809,6 +798,7 @@ void a78_cart_slot_device::internal_header_logging(uint8_t *header, uint32_t len
 	logerror( "\t\tbank6 at $4000:  %s\n", BIT(head_mapper, 4) ? "Yes" : "No");
 	logerror( "\t\tbanked RAM:      %s\n", BIT(head_mapper, 5) ? "Yes" : "No");
 	logerror( "\t\tPOKEY at $450:   %s\n", BIT(head_mapper, 6) ? "Yes" : "No");
+	logerror( "\t\tmRAM at $4000:   %s\n", BIT(head_mapper, 7) ? "Yes" : "No");
 	logerror( "\t\tSpecial:         %s ", (head_mapper & 0xff00) ? "Yes" : "No");
 	if (head_mapper & 0xff00)
 	{

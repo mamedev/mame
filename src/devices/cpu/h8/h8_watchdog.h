@@ -37,8 +37,10 @@
 
 ***************************************************************************/
 
-#ifndef __H8_WATCHDOG_H__
-#define __H8_WATCHDOG_H__
+#ifndef MAME_CPU_H8_H8_WATCHDOG_H
+#define MAME_CPU_H8_H8_WATCHDOG_H
+
+#pragma once
 
 #include "h8.h"
 #include "h8_intc.h"
@@ -94,6 +96,6 @@ private:
 	void tcnt_update(uint64_t current_time = 0);
 };
 
-extern const device_type H8_WATCHDOG;
+DECLARE_DEVICE_TYPE(H8_WATCHDOG, h8_watchdog_device)
 
-#endif
+#endif // MAME_CPU_H8_H8_WATCHDOG_H

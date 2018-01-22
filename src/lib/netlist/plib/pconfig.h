@@ -8,28 +8,56 @@
 #ifndef PCONFIG_H_
 #define PCONFIG_H_
 
-#include <cstdint>
-#include <thread>
-#include <chrono>
-
 /*
  * Define this for more accurate measurements if you processor supports
  * RDTSCP.
  */
+#ifndef PHAS_RDTSCP
 #define PHAS_RDTSCP (1)
+#endif
 
 /*
  * Define this to use accurate timing measurements. Only works
  * if PHAS_RDTSCP == 1
  */
+#ifndef PUSE_ACCURATE_STATS
 #define PUSE_ACCURATE_STATS (1)
+#endif
 
 /*
  * Set this to one if you want to use 128 bit int for ptime.
  * This is for tests only.
  */
 
+#ifndef PHAS_INT128
 #define PHAS_INT128 (0)
+#endif
+
+/*============================================================
+ *  Check for CPP Version
+ *
+ *   C++11:     __cplusplus is 201103L.
+ *   C++14:     __cplusplus is 201402L.
+ *   c++17/c++1z__cplusplus is 201703L.
+ *
+ *   VS2015 returns 199711L here. This is the bug filed in
+ *   2012 which obviously never was picked up by MS:
+ *   https://connect.microsoft.com/VisualStudio/feedback/details/763051/a-value-of-predefined-macro-cplusplus-is-still-199711l
+ *
+ *
+ *============================================================*/
+
+#if __cplusplus == 201103L
+#define C14CONSTEXPR
+#elif __cplusplus == 201402L
+#define C14CONSTEXPR constexpr
+#elif __cplusplus == 201703L
+#define C14CONSTEXPR constexpr
+#elif defined(_MSC_VER)
+#define C14CONSTEXPR
+#else
+#error "C++ version not supported"
+#endif
 
 #ifndef PHAS_INT128
 #define PHAS_INT128 (0)
@@ -41,6 +69,9 @@ typedef __int128_t INT128;
 #endif
 
 #if defined(__GNUC__)
+#ifdef RESTRICT
+#undef RESTRICT
+#endif
 #define RESTRICT                __restrict__
 #define ATTR_UNUSED             __attribute__((__unused__))
 #else
@@ -52,15 +83,16 @@ typedef __int128_t INT128;
 //  Standard defines
 //============================================================
 
-// prevent implicit copying
-#define P_PREVENT_COPYING(name)               \
-	private:                                  \
-		name(const name &);                   \
-		name &operator=(const name &);
+//============================================================
+//  Pointer to Member Function
+//============================================================
 
-//============================================================
-//  cut down delegate implementation
-//============================================================
+// This will be autodetected
+//#define PPMF_TYPE 0
+
+#define PPMF_TYPE_PMF             0
+#define PPMF_TYPE_GNUC_PMF_CONV   1
+#define PPMF_TYPE_INTERNAL        2
 
 #if defined(__GNUC__)
 	/* does not work in versions over 4.7.x of 32bit MINGW  */
@@ -71,13 +103,13 @@ typedef __int128_t INT128;
 		#define MEMBER_ABI _thiscall
 	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
 		#define PHAS_PMF_INTERNAL 0
-	#elif defined(EMSCRIPTEN)
-		#define PHAS_PMF_INTERNAL 0
-	#elif defined(__arm__) || defined(__ARMEL__)
-		#define PHAS_PMF_INTERNAL 0
+	#elif defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__) || defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64) || defined(EMSCRIPTEN)
+		#define PHAS_PMF_INTERNAL 2
 	#else
 		#define PHAS_PMF_INTERNAL 1
 	#endif
+#elif defined(_MSC_VER) && defined (_M_X64)
+	#define PHAS_PMF_INTERNAL 3
 #else
 	#define PHAS_PMF_INTERNAL 0
 #endif
@@ -86,66 +118,17 @@ typedef __int128_t INT128;
 	#define MEMBER_ABI
 #endif
 
-namespace plib {
-/*
- * The following class was derived from the MAME delegate.h code.
- * It derives a pointer to a member function.
- */
-
-#if (PHAS_PMF_INTERNAL)
-	class mfp
-	{
-	public:
-		// construct from any member function pointer
-		class generic_class;
-		using generic_function = void (*)();
-
-		template<typename MemberFunctionType>
-		mfp(MemberFunctionType mftp)
-		: m_function(0), m_this_delta(0)
-		{
-			*reinterpret_cast<MemberFunctionType *>(this) = mftp;
-		}
-
-		// binding helper
-		template<typename FunctionType, typename ObjectType>
-		FunctionType update_after_bind(ObjectType *object)
-		{
-			return reinterpret_cast<FunctionType>(
-					convert_to_generic(reinterpret_cast<generic_class *>(object)));
-		}
-		template<typename FunctionType, typename MemberFunctionType, typename ObjectType>
-		static FunctionType get_mfp(MemberFunctionType mftp, ObjectType *object)
-		{
-			mfp mfpo(mftp);
-			return mfpo.update_after_bind<FunctionType>(object);
-		}
-
-	private:
-		// extract the generic function and adjust the object pointer
-		generic_function convert_to_generic(generic_class * object) const
-		{
-			// apply the "this" delta to the object first
-			generic_class * o_p_delta = reinterpret_cast<generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
-
-			// if the low bit of the vtable index is clear, then it is just a raw function pointer
-			if (!(m_function & 1))
-				return reinterpret_cast<generic_function>(m_function);
-
-			// otherwise, it is the byte index into the vtable where the actual function lives
-			std::uint8_t *vtable_base = *reinterpret_cast<std::uint8_t **>(o_p_delta);
-			return *reinterpret_cast<generic_function *>(vtable_base + m_function - 1);
-		}
-
-		// actual state
-		uintptr_t               m_function;         // first item can be one of two things:
-													//    if even, it's a pointer to the function
-													//    if odd, it's the byte offset into the vtable
-		int                     m_this_delta;       // delta to apply to the 'this' pointer
-	};
-
+#ifndef PPMF_TYPE
+	#if (PHAS_PMF_INTERNAL > 0)
+		#define PPMF_TYPE PPMF_TYPE_INTERNAL
+	#else
+		#define PPMF_TYPE PPMF_TYPE_PMF
+	#endif
+#else
+	#undef PHAS_PMF_INTERNAL
+	#define PHAS_PMF_INTERNAL 0
+	#undef MEMBER_ABI
+	#define MEMBER_ABI
 #endif
-
-}
 
 #endif /* PCONFIG_H_ */

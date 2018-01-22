@@ -57,7 +57,7 @@ namespace sol {
 		basic_table_iterator(reference_type x) : ref(std::move(x)) {
 			ref.push();
 			tableidx = lua_gettop(ref.lua_state());
-			stack::push(ref.lua_state(), nil);
+			stack::push(ref.lua_state(), lua_nil);
 			this->operator++();
 			if (idx == -1) {
 				return;

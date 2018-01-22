@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
-#pragma once
+#ifndef MAME_SOUND_NILE_H
+#define MAME_SOUND_NILE_H
 
-#ifndef __NILE_H__
-#define __NILE_H__
+#pragma once
 
 
 //**************************************************************************
@@ -20,8 +20,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-#define NILE_VOICES 8
-
 // ======================> nile_device
 
 class nile_device : public device_t,
@@ -29,7 +27,6 @@ class nile_device : public device_t,
 {
 public:
 	nile_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~nile_device() { }
 
 protected:
 	// device-level overrides
@@ -45,6 +42,8 @@ public:
 	DECLARE_READ16_MEMBER( nile_sndctrl_r );
 
 private:
+	static constexpr unsigned NILE_VOICES = 8;
+
 	sound_stream *m_stream;
 	required_region_ptr<uint8_t> m_sound_ram;
 	uint16_t m_sound_regs[0x80];
@@ -54,7 +53,6 @@ private:
 	uint16_t m_ctrl;
 };
 
-extern const device_type NILE;
+DECLARE_DEVICE_TYPE(NILE, nile_device)
 
-
-#endif /* __NILE_H__ */
+#endif // MAME_SOUND_NILE_H

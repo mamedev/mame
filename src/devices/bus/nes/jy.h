@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __NES_JY_H
-#define __NES_JY_H
+#ifndef MAME_BUS_NES_JY_H
+#define MAME_BUS_NES_JY_H
+
+#pragma once
 
 #include "nxrom.h"
 
@@ -12,12 +14,8 @@ class nes_jy_typea_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_jy_typea_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	nes_jy_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual DECLARE_READ8_MEMBER(read_l) override;
 	virtual DECLARE_READ8_MEMBER(read_m) override;
 	virtual DECLARE_WRITE8_MEMBER(write_l) override;
@@ -30,6 +28,12 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
+	nes_jy_typea_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
 	void irq_clock(int blanked, int mode);
 	void update_banks(int reg);
 	void update_prg();
@@ -69,10 +73,11 @@ class nes_jy_typeb_device : public nes_jy_typea_device
 {
 public:
 	// construction/destruction
-	nes_jy_typeb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	nes_jy_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	nes_jy_typeb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	void update_mirror_typeb();
 	virtual void update_mirror() override { update_mirror_typeb(); }
 };
@@ -93,12 +98,9 @@ protected:
 };
 
 
-
-
-
 // device type definition
-extern const device_type NES_JY_TYPEA;
-extern const device_type NES_JY_TYPEB;
-extern const device_type NES_JY_TYPEC;
+DECLARE_DEVICE_TYPE(NES_JY_TYPEA, nes_jy_typea_device)
+DECLARE_DEVICE_TYPE(NES_JY_TYPEB, nes_jy_typeb_device)
+DECLARE_DEVICE_TYPE(NES_JY_TYPEC, nes_jy_typec_device)
 
-#endif
+#endif // MAME_BUS_NES_JY_H

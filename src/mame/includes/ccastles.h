@@ -8,6 +8,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "machine/x2212.h"
+#include "screen.h"
 
 class ccastles_state : public driver_device
 {
@@ -81,4 +82,5 @@ public:
 	inline void ccastles_write_vram( uint16_t addr, uint8_t data, uint8_t bitmd, uint8_t pixba );
 	inline void bitmode_autoinc(  );
 	inline void schedule_next_irq( int curscanline );
+	void ccastles(machine_config &config);
 };

@@ -38,6 +38,8 @@
 #include "corestr.h"
 #include "bitmap.h"
 
+#include "emufwd.h"
+
 
 //**************************************************************************
 //  COMPILER-SPECIFIC NASTINESS
@@ -55,17 +57,24 @@
 //  FUNDAMENTAL TYPES
 //**************************************************************************
 
+// explicitly sized integers
+using osd::u8;
+using osd::u16;
+using osd::u32;
+using osd::u64;
+using osd::s8;
+using osd::s16;
+using osd::s32;
+using osd::s64;
+
 // genf is a generic function pointer; cast function pointers to this instead of void *
 typedef void genf(void);
 
 // pen_t is used to represent pixel values in bitmaps
-typedef uint32_t pen_t;
+typedef u32 pen_t;
 
 // stream_sample_t is used to represent a single sample in a sound stream
-typedef int32_t stream_sample_t;
-
-// running_machine is core to pretty much everything
-class running_machine;
+typedef s32 stream_sample_t;
 
 
 
@@ -73,38 +82,22 @@ class running_machine;
 //  USEFUL COMPOSITE TYPES
 //**************************************************************************
 
-// generic_ptr is a union of pointers to various sizes
-union generic_ptr
-{
-	generic_ptr(void *value) { v = value; }
-	void *      v;
-	int8_t *      i8;
-	uint8_t *     u8;
-	int16_t *     i16;
-	uint16_t *    u16;
-	int32_t *     i32;
-	uint32_t *    u32;
-	int64_t *     i64;
-	uint64_t *    u64;
-};
-
-
 // PAIR is an endian-safe union useful for representing 32-bit CPU registers
 union PAIR
 {
 #ifdef LSB_FIRST
-	struct { uint8_t l,h,h2,h3; } b;
-	struct { uint16_t l,h; } w;
-	struct { int8_t l,h,h2,h3; } sb;
-	struct { int16_t l,h; } sw;
+	struct { u8 l,h,h2,h3; } b;
+	struct { u16 l,h; } w;
+	struct { s8 l,h,h2,h3; } sb;
+	struct { s16 l,h; } sw;
 #else
-	struct { uint8_t h3,h2,h,l; } b;
-	struct { int8_t h3,h2,h,l; } sb;
-	struct { uint16_t h,l; } w;
-	struct { int16_t h,l; } sw;
+	struct { u8 h3,h2,h,l; } b;
+	struct { s8 h3,h2,h,l; } sb;
+	struct { u16 h,l; } w;
+	struct { s16 h,l; } sw;
 #endif
-	uint32_t d;
-	int32_t sd;
+	u32 d;
+	s32 sd;
 };
 
 
@@ -112,14 +105,14 @@ union PAIR
 union PAIR16
 {
 #ifdef LSB_FIRST
-	struct { uint8_t l,h; } b;
-	struct { int8_t l,h; } sb;
+	struct { u8 l,h; } b;
+	struct { s8 l,h; } sb;
 #else
-	struct { uint8_t h,l; } b;
-	struct { int8_t h,l; } sb;
+	struct { u8 h,l; } b;
+	struct { s8 h,l; } sb;
 #endif
-	uint16_t w;
-	int16_t sw;
+	u16 w;
+	s16 sw;
 };
 
 
@@ -127,22 +120,22 @@ union PAIR16
 union PAIR64
 {
 #ifdef LSB_FIRST
-	struct { uint8_t l,h,h2,h3,h4,h5,h6,h7; } b;
-	struct { uint16_t l,h,h2,h3; } w;
-	struct { uint32_t l,h; } d;
-	struct { int8_t l,h,h2,h3,h4,h5,h6,h7; } sb;
-	struct { int16_t l,h,h2,h3; } sw;
-	struct { int32_t l,h; } sd;
+	struct { u8 l,h,h2,h3,h4,h5,h6,h7; } b;
+	struct { u16 l,h,h2,h3; } w;
+	struct { u32 l,h; } d;
+	struct { s8 l,h,h2,h3,h4,h5,h6,h7; } sb;
+	struct { s16 l,h,h2,h3; } sw;
+	struct { s32 l,h; } sd;
 #else
-	struct { uint8_t h7,h6,h5,h4,h3,h2,h,l; } b;
-	struct { uint16_t h3,h2,h,l; } w;
-	struct { uint32_t h,l; } d;
-	struct { int8_t h7,h6,h5,h4,h3,h2,h,l; } sb;
-	struct { int16_t h3,h2,h,l; } sw;
-	struct { int32_t h,l; } sd;
+	struct { u8 h7,h6,h5,h4,h3,h2,h,l; } b;
+	struct { u16 h3,h2,h,l; } w;
+	struct { u32 h,l; } d;
+	struct { s8 h7,h6,h5,h4,h3,h2,h,l; } sb;
+	struct { s16 h3,h2,h,l; } sw;
+	struct { s32 h,l; } sd;
 #endif
-	uint64_t q;
-	int64_t sq;
+	u64 q;
+	s64 sq;
 };
 
 
@@ -175,14 +168,14 @@ const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 
 
 // orientation of bitmaps
-#define ORIENTATION_FLIP_X              0x0001  /* mirror everything in the X direction */
-#define ORIENTATION_FLIP_Y              0x0002  /* mirror everything in the Y direction */
-#define ORIENTATION_SWAP_XY             0x0004  /* mirror along the top-left/bottom-right diagonal */
+constexpr int ORIENTATION_FLIP_X   = 0x0001;  // mirror everything in the X direction
+constexpr int ORIENTATION_FLIP_Y   = 0x0002;  // mirror everything in the Y direction
+constexpr int ORIENTATION_SWAP_XY  = 0x0004;  // mirror along the top-left/bottom-right diagonal
 
-#define ROT0                            0
-#define ROT90                           (ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X)  /* rotate clockwise 90 degrees */
-#define ROT180                          (ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y)   /* rotate 180 degrees */
-#define ROT270                          (ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y)  /* rotate counter-clockwise 90 degrees */
+constexpr int ROT0                 = 0;
+constexpr int ROT90                = ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X;  // rotate clockwise 90 degrees
+constexpr int ROT180               = ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y;   // rotate 180 degrees
+constexpr int ROT270               = ORIENTATION_SWAP_XY | ORIENTATION_FLIP_Y;  // rotate counter-clockwise 90 degrees
 
 
 
@@ -195,12 +188,20 @@ const endianness_t ENDIANNESS_NATIVE = ENDIANNESS_BIG;
 	TYPE(const TYPE &) = delete; \
 	TYPE &operator=(const TYPE &) = delete
 
-// macro for declaring enumerator operators that increment/decrement like plain old C
-#define DECLARE_ENUM_OPERATORS(TYPE) \
+// macro for declaring enumeration operators that increment/decrement like plain old C
+#define DECLARE_ENUM_INCDEC_OPERATORS(TYPE) \
 inline TYPE &operator++(TYPE &value) { return value = TYPE(std::underlying_type_t<TYPE>(value) + 1); } \
-inline TYPE operator++(TYPE &value, int) { TYPE const old(value); ++value; return old; } \
 inline TYPE &operator--(TYPE &value) { return value = TYPE(std::underlying_type_t<TYPE>(value) - 1); } \
+inline TYPE operator++(TYPE &value, int) { TYPE const old(value); ++value; return old; } \
 inline TYPE operator--(TYPE &value, int) { TYPE const old(value); --value; return old; }
+
+// macro for declaring bitwise operators for an enumerated type
+#define DECLARE_ENUM_BITWISE_OPERATORS(TYPE) \
+constexpr TYPE operator~(TYPE value) { return TYPE(~std::underlying_type_t<TYPE>(value)); } \
+constexpr TYPE operator&(TYPE a, TYPE b) { return TYPE(std::underlying_type_t<TYPE>(a) & std::underlying_type_t<TYPE>(b)); } \
+constexpr TYPE operator|(TYPE a, TYPE b) { return TYPE(std::underlying_type_t<TYPE>(a) | std::underlying_type_t<TYPE>(b)); } \
+inline TYPE &operator&=(TYPE &a, TYPE b) { return a = a & b; } \
+inline TYPE &operator|=(TYPE &a, TYPE b) { return a = a | b; }
 
 
 // this macro passes an item followed by a string version of itself as two consecutive parameters
@@ -254,15 +255,13 @@ template <typename T, typename U, typename... V> constexpr T bitswap(T val, U b,
 	return (BIT(val, b) << sizeof...(c)) | bitswap(val, c...);
 }
 
-// explicit versions that check number of bit position arguments
-template <typename T, typename... U> constexpr T BITSWAP8(T val, U... b) { static_assert(sizeof...(b) == 8U, "wrong number of bits"); return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP16(T val, U... b) { static_assert(sizeof...(b) == 16U, "wrong number of bits"); return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP24(T val, U... b) { static_assert(sizeof...(b) == 24U, "wrong number of bits"); return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP32(T val, U... b) { static_assert(sizeof...(b) == 32U, "wrong number of bits"); return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP40(T val, U... b) { static_assert(sizeof...(b) == 40U, "wrong number of bits"); return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP48(T val, U... b) { static_assert(sizeof...(b) == 48U, "wrong number of bits"); return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP56(T val, U... b) { static_assert(sizeof...(b) == 56U, "wrong number of bits"); return bitswap(val, b...); }
-template <typename T, typename... U> constexpr T BITSWAP64(T val, U... b) { static_assert(sizeof...(b) == 64U, "wrong number of bits"); return bitswap(val, b...); }
+// explicit version that checks number of bit position arguments
+template <unsigned B, typename T, typename... U> T bitswap(T val, U... b)
+{
+	static_assert(sizeof...(b) == B, "wrong number of bits");
+	static_assert((sizeof(std::remove_reference_t<T>) * 8) >= B, "return type too small for result");
+	return bitswap(val, b...);
+}
 
 
 
@@ -303,8 +302,6 @@ private:
 //**************************************************************************
 //  CASTING TEMPLATES
 //**************************************************************************
-
-class device_t;
 
 void report_bad_cast(const std::type_info &src_type, const std::type_info &dst_type);
 void report_bad_device_cast(const device_t *dev, const std::type_info &src_type, const std::type_info &dst_type);
@@ -378,25 +375,12 @@ enum_value(T value) noexcept
 //  INLINE FUNCTIONS
 //**************************************************************************
 
-// population count
-#if !defined(__NetBSD__)
-inline int popcount(uint32_t val)
-{
-	int count;
-
-	for (count = 0; val != 0; count++)
-		val &= val - 1;
-	return count;
-}
-#endif
-
-
 // convert a series of 32 bits into a float
-inline float u2f(uint32_t v)
+inline float u2f(u32 v)
 {
 	union {
 		float ff;
-		uint32_t vv;
+		u32 vv;
 	} u;
 	u.vv = v;
 	return u.ff;
@@ -404,11 +388,11 @@ inline float u2f(uint32_t v)
 
 
 // convert a float into a series of 32 bits
-inline uint32_t f2u(float f)
+inline u32 f2u(float f)
 {
 	union {
 		float ff;
-		uint32_t vv;
+		u32 vv;
 	} u;
 	u.ff = f;
 	return u.vv;
@@ -416,11 +400,11 @@ inline uint32_t f2u(float f)
 
 
 // convert a series of 64 bits into a double
-inline double u2d(uint64_t v)
+inline double u2d(u64 v)
 {
 	union {
 		double dd;
-		uint64_t vv;
+		u64 vv;
 	} u;
 	u.vv = v;
 	return u.dd;
@@ -428,14 +412,22 @@ inline double u2d(uint64_t v)
 
 
 // convert a double into a series of 64 bits
-inline uint64_t d2u(double d)
+inline u64 d2u(double d)
 {
 	union {
 		double dd;
-		uint64_t vv;
+		u64 vv;
 	} u;
 	u.dd = d;
 	return u.vv;
+}
+
+
+// constexpr absolute value of an integer
+template <typename T>
+constexpr std::enable_if_t<std::is_signed<T>::value, T> iabs(T v)
+{
+	return (v < T(0)) ? -v : v;
 }
 
 #endif  /* MAME_EMU_EMUCORE_H */

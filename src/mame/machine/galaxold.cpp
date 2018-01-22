@@ -57,7 +57,7 @@ void galaxold_state::machine_reset_common(int line)
 {
 	m_irq_line = line;
 
-	/* initalize main CPU interrupt generator flip-flops */
+	/* initialize main CPU interrupt generator flip-flops */
 	m_7474_9m_2->preset_w(1);
 	m_7474_9m_2->clear_w (1);
 
@@ -114,23 +114,23 @@ WRITE8_MEMBER(galaxold_state::galaxold_leds_w)
 
 READ8_MEMBER(galaxold_state::scramblb_protection_1_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 	case 0x01da: return 0x80;
 	case 0x01e4: return 0x00;
 	default:
-		logerror("%04x: read protection 1\n",space.device().safe_pc());
+		logerror("%04x: read protection 1\n",m_maincpu->pc());
 		return 0;
 	}
 }
 
 READ8_MEMBER(galaxold_state::scramblb_protection_2_r)
 {
-	switch (space.device().safe_pc())
+	switch (m_maincpu->pc())
 	{
 	case 0x01ca: return 0x90;
 	default:
-		logerror("%04x: read protection 2\n",space.device().safe_pc());
+		logerror("%04x: read protection 2\n",m_maincpu->pc());
 		return 0;
 	}
 }
@@ -171,13 +171,7 @@ DRIVER_INIT_MEMBER(galaxold_state,4in1)
 
 INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
 {
-	generic_pulse_irq_line_and_vector(device.execute(),0,0x03,1);
-}
-
-DRIVER_INIT_MEMBER(galaxold_state,ladybugg)
-{
-	/* Doesn't actually use the bank, but it mustn't have a coin lock! */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6002, 0x6002, write8_delegate(FUNC(galaxold_state::galaxold_gfxbank_w),this));
+	device.execute().pulse_input_line_and_vector(0, 0x03, device.execute().minimum_quantum_time());
 }
 
 DRIVER_INIT_MEMBER(galaxold_state,bullsdrtg)

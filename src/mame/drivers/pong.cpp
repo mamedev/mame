@@ -47,14 +47,25 @@ TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifica
 #include "emu.h"
 
 #include "machine/netlist.h"
-#include "netlist/devices/net_lib.h"
+
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+
 #include "video/fixfreq.h"
+
+#include "netlist/devices/net_lib.h"
+
 #include "machine/nl_breakout.h"
 #include "machine/nl_pong.h"
 #include "machine/nl_pongd.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "breakout.lh"
+
+#include <cmath>
+
 
 /*
  * H count width to 512
@@ -81,8 +92,8 @@ TODO: Superpong is believed to use the Pong (Rev E) PCB with some minor modifica
  */
 
 #define MASTER_CLOCK    7159000
-#define V_TOTAL_PONG         (0x105+1)       // 262
-#define H_TOTAL_PONG         (0x1C6+1)       // 454
+#define V_TOTAL_PONG    (0x105+1)       // 262
+#define H_TOTAL_PONG    (0x1C6+1)       // 454
 
 /*
  * Breakout's H1 signal:
@@ -133,7 +144,7 @@ public:
 	}
 
 	// devices
-	required_device<netlist_mame_device_t> m_maincpu;
+	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 	required_device<dac_word_interface> m_dac; /* just to have a sound device */
 
@@ -165,11 +176,14 @@ public:
 	}
 
 	// sub devices
-	required_device<netlist_mame_logic_input_t> m_sw1a;
-	required_device<netlist_mame_logic_input_t> m_sw1b;
+	required_device<netlist_mame_logic_input_device> m_sw1a;
+	required_device<netlist_mame_logic_input_device> m_sw1b;
 
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
+	void pongd(machine_config &config);
+	void pong(machine_config &config);
+	void pongf(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -196,15 +210,15 @@ public:
 		m_sw1_4(*this, "maincpu:sw1_4")
 	{
 	}
-	required_device<netlist_mame_analog_output_t> m_led_serve;
-	required_device<netlist_mame_analog_output_t> m_lamp_credit1;
-	required_device<netlist_mame_analog_output_t> m_lamp_credit2;
-	required_device<netlist_mame_analog_output_t> m_coin_counter;
+	required_device<netlist_mame_analog_output_device> m_led_serve;
+	required_device<netlist_mame_analog_output_device> m_lamp_credit1;
+	required_device<netlist_mame_analog_output_device> m_lamp_credit2;
+	required_device<netlist_mame_analog_output_device> m_coin_counter;
 
-	required_device<netlist_mame_logic_input_t> m_sw1_1;
-	required_device<netlist_mame_logic_input_t> m_sw1_2;
-	required_device<netlist_mame_logic_input_t> m_sw1_3;
-	required_device<netlist_mame_logic_input_t> m_sw1_4;
+	required_device<netlist_mame_logic_input_device> m_sw1_1;
+	required_device<netlist_mame_logic_input_device> m_sw1_2;
+	required_device<netlist_mame_logic_input_device> m_sw1_3;
+	required_device<netlist_mame_logic_input_device> m_sw1_4;
 
 	NETDEV_ANALOG_CALLBACK_MEMBER(serve_cb)
 	{
@@ -234,6 +248,7 @@ public:
 		m_sw1_4->write((newval>>3) & 1);
 	}
 
+	void breakout(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -255,7 +270,7 @@ NETLIST_END()
 
 INPUT_CHANGED_MEMBER(pong_state::input_changed)
 {
-	int numpad = (uintptr_t) (param);
+	int numpad = uintptr_t(param);
 
 	switch (numpad)
 	{
@@ -360,7 +375,7 @@ static INPUT_PORTS_START( breakout )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pong, pong_state )
+MACHINE_CONFIG_START(pong_state::pong)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
@@ -395,7 +410,7 @@ static MACHINE_CONFIG_START( pong, pong_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( breakout, breakout_state )
+MACHINE_CONFIG_START(breakout_state::breakout)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
@@ -448,7 +463,7 @@ static MACHINE_CONFIG_START( breakout, breakout_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pongf, pong )
+MACHINE_CONFIG_DERIVED(pong_state::pongf, pong)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("maincpu")
@@ -456,7 +471,7 @@ static MACHINE_CONFIG_DERIVED( pongf, pong )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pongd, pong_state )
+MACHINE_CONFIG_START(pong_state::pongd)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
@@ -554,10 +569,10 @@ ROM_START( consolet ) // dummy to satisfy game entry
 ROM_END
 */
 
-GAME( 1972, pong,      0, pong,     pong,      driver_device,  0, ROT0,  "Atari", "Pong (Rev E) external [TTL]", MACHINE_SUPPORTS_SAVE)
-GAME( 1972, pongf,     0, pongf,    pong,      driver_device,  0, ROT0,  "Atari", "Pong (Rev E) [TTL]", MACHINE_SUPPORTS_SAVE)
-GAME( 1973, pongd,     0, pongd,    pongd,     driver_device,  0, ROT0,  "Atari", "Pong Doubles [TTL]", MACHINE_SUPPORTS_SAVE)
-GAMEL( 1976, breakout,  0, breakout, breakout,  driver_device,  0, ROT90, "Atari", "Breakout [TTL]", MACHINE_SUPPORTS_SAVE, layout_breakout)
+GAME( 1972, pong,       0, pong,     pong,      pong_state,      0, ROT0,  "Atari", "Pong (Rev E) external [TTL]", MACHINE_SUPPORTS_SAVE)
+GAME( 1972, pongf,      0, pongf,    pong,      pong_state,      0, ROT0,  "Atari", "Pong (Rev E) [TTL]", MACHINE_SUPPORTS_SAVE)
+GAME( 1973, pongd,      0, pongd,    pongd,     pong_state,      0, ROT0,  "Atari", "Pong Doubles [TTL]", MACHINE_SUPPORTS_SAVE)
+GAMEL( 1976, breakout,  0, breakout, breakout,  breakout_state,  0, ROT90, "Atari", "Breakout [TTL]", MACHINE_SUPPORTS_SAVE, layout_breakout)
 
 // 100% TTL
 //GAME( 1973, coupedav,   pongd,    pongd,    pongd,     driver_device,  0, ROT0,  "Atari France", "Coupe Davis [TTL]", MACHINE_SUPPORTS_SAVE)

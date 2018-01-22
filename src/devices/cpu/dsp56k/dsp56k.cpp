@@ -31,15 +31,15 @@
     - 1-21 Vectored exception requests on the Host Interface!
 ***************************************************************************/
 
+#include "emu.h"
+#include "dsp56k.h"
+#include "dsp56dsm.h"
+
 #include "opcode.h"
 
-#include "emu.h"
 #include "debugger.h"
-#include "dsp56k.h"
 
 #include "dsp56def.h"
-
-using namespace DSP56K;
 
 /***************************************************************************
     COMPONENT FUNCTIONALITY
@@ -59,6 +59,11 @@ using namespace DSP56K;
 /* 4-8 Memory handlers for on-chip peripheral memory. */
 #include "dsp56mem.h"
 
+
+DEFINE_DEVICE_TYPE_NS(DSP56156, DSP56K, dsp56k_device, "dsp56156", "DSP56156")
+
+
+namespace DSP56K {
 
 enum
 {
@@ -101,9 +106,6 @@ enum
 };
 
 
-const device_type DSP56156 = &device_creator<dsp56k_device>;
-
-
 /****************************************************************************
  *  Internal Memory Maps
  ****************************************************************************/
@@ -119,11 +121,19 @@ ADDRESS_MAP_END
 
 
 dsp56k_device::dsp56k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, DSP56156, "DSP56156", tag, owner, clock, "dsp56156", __FILE__)
+	: cpu_device(mconfig, DSP56156, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(dsp56156_program_map))
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(dsp56156_x_data_map))
 	, m_program_ram(*this, "dsk56k_program_ram")
 {
+}
+
+device_memory_interface::space_config_vector dsp56k_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
 }
 
 /***************************************************************************
@@ -280,7 +290,7 @@ void dsp56k_device::device_start()
 	save_item(NAME(m_dsp56k_core.peripheral_ram));
 
 	m_dsp56k_core.program = &space(AS_PROGRAM);
-	m_dsp56k_core.direct = &m_dsp56k_core.program->direct();
+	m_dsp56k_core.direct = m_dsp56k_core.program->direct<-1>();
 	m_dsp56k_core.data = &space(AS_DATA);
 
 	state_add(DSP56K_PC,     "PC", m_dsp56k_core.PCU.pc).formatstr("%04X");
@@ -293,8 +303,8 @@ void dsp56k_device::device_start()
 	state_add(DSP56K_X,      "X", m_dsp56k_core.ALU.x.d).mask(0xffffffff).formatstr("%9s");
 	state_add(DSP56K_Y,      "Y", m_dsp56k_core.ALU.y.d).mask(0xffffffff).formatstr("%9s");
 
-	state_add(DSP56K_A,      "A", m_dsp56k_core.ALU.a.q).mask((uint64_t)U64(0xffffffffffffffff)).formatstr("%12s"); /* could benefit from a better mask? */
-	state_add(DSP56K_B,      "B", m_dsp56k_core.ALU.b.q).mask((uint64_t)U64(0xffffffffffffffff)).formatstr("%12s"); /* could benefit from a better mask? */
+	state_add(DSP56K_A,      "A", m_dsp56k_core.ALU.a.q).mask(u64(0xffffffffffffffffU)).formatstr("%12s"); /* could benefit from a better mask? */
+	state_add(DSP56K_B,      "B", m_dsp56k_core.ALU.b.q).mask(u64(0xffffffffffffffffU)).formatstr("%12s"); /* could benefit from a better mask? */
 
 	state_add(DSP56K_R0,     "R0", m_dsp56k_core.AGU.r0).formatstr("%04X");
 	state_add(DSP56K_R1,     "R1", m_dsp56k_core.AGU.r1).formatstr("%04X");
@@ -454,9 +464,9 @@ static size_t execute_one_new(dsp56k_core* cpustate)
 	cpustate->ppc = PC;
 	debugger_instruction_hook(cpustate->device, PC);
 
-	cpustate->op = ROPCODE(ADDRESS(PC));
-	uint16_t w0 = ROPCODE(ADDRESS(PC));
-	uint16_t w1 = ROPCODE(ADDRESS(PC) + ADDRESS(1));
+	cpustate->op = ROPCODE(PC);
+	uint16_t w0 = ROPCODE(PC);
+	uint16_t w1 = ROPCODE(PC + 1);
 
 	Opcode op(w0, w1);
 	op.evaluate(cpustate);
@@ -494,8 +504,9 @@ void dsp56k_device::execute_run()
 }
 
 
-offs_t dsp56k_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *dsp56k_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( dsp56k );
-	return CPU_DISASSEMBLE_NAME(dsp56k)(this, buffer, pc, oprom, opram, options);
+	return new dsp56k_disassembler;
 }
+
+} // namespace DSP56K

@@ -33,11 +33,12 @@ Todo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/tms9928a.h"
-#include "sound/ay8910.h"
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/tms9928a.h"
+#include "speaker.h"
 
 
 class kingpin_state : public driver_device
@@ -55,6 +56,7 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(sound_nmi_w);
+	void kingpin(machine_config &config);
 };
 
 
@@ -126,7 +128,7 @@ static INPUT_PORTS_START( kingpin )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( kingpin, kingpin_state )
+MACHINE_CONFIG_START(kingpin_state::kingpin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
@@ -209,5 +211,5 @@ ROM_START( maxideal )
 ROM_END
 
 
-GAME( 1983, kingpin,  0, kingpin, kingpin, driver_device, 0, 0, "ACL Manufacturing", "Kingpin", 0)
-GAME( 1983, maxideal, 0, kingpin, kingpin, driver_device, 0, 0, "ACL Manufacturing", "Maxi-Dealer", 0)
+GAME( 1983, kingpin,  0, kingpin, kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "Kingpin",     0 )
+GAME( 1983, maxideal, 0, kingpin, kingpin, kingpin_state, 0, 0, "ACL Manufacturing", "Maxi-Dealer", 0 )

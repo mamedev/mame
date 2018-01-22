@@ -62,20 +62,22 @@
 */
 
 #include "emu.h"
-#include "cpu/i86/i186.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/i386/i386.h"
-#include "video/mc6845.h"
-#include "machine/i8251.h"
+#include "cpu/i86/i186.h"
+#include "imagedev/harddriv.h"
 #include "machine/am9517a.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/ngen_kb.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/z80dart.h"
-#include "machine/wd_fdc.h"
 #include "machine/wd2010.h"
-#include "bus/rs232/rs232.h"
-#include "machine/ngen_kb.h"
-#include "machine/clock.h"
-#include "imagedev/harddriv.h"
+#include "machine/wd_fdc.h"
+#include "machine/z80dart.h"
+#include "video/mc6845.h"
+#include "screen.h"
+
 
 class ngen_state : public driver_device
 {
@@ -143,6 +145,7 @@ public:
 	DECLARE_WRITE16_MEMBER(b38_keyboard_w);
 	DECLARE_READ16_MEMBER(b38_crtc_r);
 	DECLARE_WRITE16_MEMBER(b38_crtc_w);
+	void ngen(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -159,7 +162,7 @@ private:
 	optional_memory_region m_disk_rom;
 	memory_array m_vram;
 	memory_array m_fontram;
-	optional_device<wd2797_t> m_fdc;
+	optional_device<wd2797_device> m_fdc;
 	optional_device<floppy_connector> m_fd0;
 	optional_device<pit8253_device> m_fdc_timer;
 	optional_device<wd2010_device> m_hdc;
@@ -189,6 +192,8 @@ public:
 	ngen386_state(const machine_config &mconfig, device_type type, const char *tag)
 		: ngen_state(mconfig, type, tag)
 		{}
+		void ngen386(machine_config &config);
+		void _386i(machine_config &config);
 private:
 };
 
@@ -909,7 +914,7 @@ static SLOT_INTERFACE_START( ngen_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ngen, ngen_state )
+MACHINE_CONFIG_START(ngen_state::ngen)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ngen_mem)
@@ -918,7 +923,8 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_80186_TMROUT0_HANDLER(WRITELINE(ngen_state, cpu_timer_w))
 	MCFG_80186_IRQ_SLAVE_ACK(READ8(ngen_state, irq_cb))
 
-	MCFG_PIC8259_ADD( "pic", DEVWRITELINE("maincpu",i80186_cpu_device,int0_w), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(78120/4)  // 19.53kHz, /4 of the CPU timer output?
@@ -947,7 +953,7 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 	MCFG_I8237_OUT_IOW_3_CB(WRITE8(ngen_state, dma_3_dack_w))
 
 	// I/O board
-	MCFG_UPD7201_ADD("iouart",0,0,0,0,0) // clocked by PIT channel 2?
+	MCFG_DEVICE_ADD("iouart", UPD7201, 0) // clocked by PIT channel 2?
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
@@ -1022,13 +1028,14 @@ static MACHINE_CONFIG_START( ngen, ngen_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ngen386, ngen386_state )
+MACHINE_CONFIG_START(ngen386_state::ngen386)
 	MCFG_CPU_ADD("i386cpu", I386, XTAL_50MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(ngen386_mem)
 	MCFG_CPU_IO_MAP(ngen386_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
 
-	MCFG_PIC8259_ADD( "pic", INPUTLINE("i386cpu",0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("i386cpu", 0))
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
 	MCFG_PIT8253_CLK0(78120/4)  // 19.53kHz, /4 of the CPU timer output?
@@ -1057,7 +1064,7 @@ static MACHINE_CONFIG_START( ngen386, ngen386_state )
 	MCFG_I8237_OUT_IOW_3_CB(WRITE8(ngen_state, dma_3_dack_w))
 
 	// I/O board
-	MCFG_UPD7201_ADD("iouart",0,0,0,0,0) // clocked by PIT channel 2?
+	MCFG_DEVICE_ADD("iouart", UPD7201, 0) // clocked by PIT channel 2?
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("rs232_b", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_dtr))
@@ -1131,7 +1138,7 @@ static MACHINE_CONFIG_START( ngen386, ngen386_state )
 	MCFG_HARDDISK_ADD("hard0")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( 386i, ngen386 )
+MACHINE_CONFIG_DERIVED(ngen386_state::_386i, ngen386)
 	MCFG_CPU_MODIFY("i386cpu")
 	MCFG_CPU_PROGRAM_MAP(ngen386i_mem)
 MACHINE_CONFIG_END
@@ -1174,6 +1181,6 @@ ROM_START( 386i )
 ROM_END
 
 
-COMP( 1983, ngen,    0,      0,      ngen,           ngen, driver_device, 0,      "Convergent Technologies",  "NGEN CP-001", MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1991, ngenb38, ngen,   0,      ngen386,        ngen, driver_device, 0,      "Financial Products Corp.", "B28/38",      MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, 386i,    ngen,   0,      386i,           ngen, driver_device, 0,      "Convergent Technologies",  "386i",        MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983, ngen,    0,      0,      ngen,           ngen, ngen_state,    0,      "Convergent Technologies",  "NGEN CP-001", MACHINE_IS_SKELETON )
+COMP( 1991, ngenb38, ngen,   0,      ngen386,        ngen, ngen386_state, 0,      "Financial Products Corp.", "B28/38",      MACHINE_IS_SKELETON )
+COMP( 1990, 386i,    ngen,   0,      _386i,          ngen, ngen386_state, 0,      "Convergent Technologies",  "386i",        MACHINE_IS_SKELETON )

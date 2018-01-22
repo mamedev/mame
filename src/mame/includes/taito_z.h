@@ -36,6 +36,7 @@ public:
 		m_tc0150rod(*this, "tc0150rod"),
 		m_tc0100scn(*this, "tc0100scn"),
 		m_tc0110pcr(*this, "tc0110pcr"),
+		m_tc0040ioc(*this, "tc0040ioc"),
 		m_tc0220ioc(*this, "tc0220ioc"),
 		m_tc0510nio(*this, "tc0510nio"),
 		m_tc0140syt(*this, "tc0140syt"),
@@ -64,6 +65,7 @@ public:
 	optional_device<tc0150rod_device> m_tc0150rod;
 	optional_device<tc0100scn_device> m_tc0100scn;
 	optional_device<tc0110pcr_device> m_tc0110pcr;
+	optional_device<tc0040ioc_device> m_tc0040ioc;
 	optional_device<tc0220ioc_device> m_tc0220ioc;
 	optional_device<tc0510nio_device> m_tc0510nio;
 	optional_device<tc0140syt_device> m_tc0140syt;  // bshark & spacegun miss the CPUs which shall use TC0140
@@ -74,14 +76,13 @@ public:
 	DECLARE_WRITE16_MEMBER(bshark_cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(chasehq_cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(dblaxle_cpua_ctrl_w);
-	DECLARE_WRITE16_MEMBER(spacegun_output_bypass_w);
+	DECLARE_WRITE8_MEMBER(spacegun_eeprom_w);
 	DECLARE_READ8_MEMBER(contcirc_input_bypass_r);
 	DECLARE_READ8_MEMBER(chasehq_input_bypass_r);
 	DECLARE_READ16_MEMBER(bshark_stick_r);
 	DECLARE_READ16_MEMBER(nightstr_stick_r);
 	DECLARE_WRITE16_MEMBER(bshark_stick_w);
 	DECLARE_READ16_MEMBER(sci_steer_input_r);
-	DECLARE_READ16_MEMBER(spacegun_input_bypass_r);
 	DECLARE_READ16_MEMBER(spacegun_lightgun_r);
 	DECLARE_WRITE16_MEMBER(spacegun_lightgun_w);
 	DECLARE_WRITE16_MEMBER(spacegun_gun_output_w);
@@ -89,6 +90,7 @@ public:
 	DECLARE_READ16_MEMBER(chasehq_motor_r);
 	DECLARE_WRITE16_MEMBER(chasehq_motor_w);
 	DECLARE_WRITE16_MEMBER(nightstr_motor_w);
+	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_READ16_MEMBER(aquajack_unknown_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(taitoz_sound_w);
@@ -121,6 +123,17 @@ public:
 	void spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
 	void parse_cpu_control();
 
+	void sci(machine_config &config);
+	void spacegun(machine_config &config);
+	void chasehq(machine_config &config);
+	void dblaxle(machine_config &config);
+	void bshark(machine_config &config);
+	void aquajack(machine_config &config);
+	void nightstr(machine_config &config);
+	void contcirc(machine_config &config);
+	void racingb(machine_config &config);
+	void bsharkjjs(machine_config &config);
+	void enforce(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

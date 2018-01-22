@@ -30,10 +30,10 @@
 ** Ishmair - for the datasheet and motivation.
 */
 
-#pragma once
+#ifndef MAME_SOUND_YM2151_H
+#define MAME_SOUND_YM2151_H
 
-#ifndef __YM2151_H__
-#define __YM2151_H__
+#pragma once
 
 
 //**************************************************************************
@@ -64,16 +64,18 @@ public:
 	ym2151_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ym2151_device &>(device).m_irqhandler.set_callback(object); }
-	template<class _Object> static devcb_base &set_port_write_handler(device_t &device, _Object object) { return downcast<ym2151_device &>(device).m_portwritehandler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ym2151_device &>(device).m_irqhandler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port_write_handler(device_t &device, Object &&cb) { return downcast<ym2151_device &>(device).m_portwritehandler.set_callback(std::forward<Object>(cb)); }
 
 	// read/write
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
 
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( register_w );
-	DECLARE_WRITE8_MEMBER( data_w );
+	DECLARE_READ8_MEMBER(status_r);
+	DECLARE_WRITE8_MEMBER(register_w);
+	DECLARE_WRITE8_MEMBER(data_w);
+
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 protected:
 	// device-level overrides
@@ -81,6 +83,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void device_post_load() override;
+	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
@@ -187,7 +190,7 @@ private:
 	uint32_t      eg_cnt;                 /* global envelope generator counter */
 	uint32_t      eg_timer;               /* global envelope generator counter works at frequency = chipclock/64/3 */
 	uint32_t      eg_timer_add;           /* step of eg_timer */
-	uint32_t      eg_timer_overflow;      /* envelope generator timer overlfows every 3 samples (on real chip) */
+	uint32_t      eg_timer_overflow;      /* envelope generator timer overflows every 3 samples (on real chip) */
 
 	uint32_t      lfo_phase;              /* accumulated LFO phase (0 to 255) */
 	uint32_t      lfo_timer;              /* LFO timer                        */
@@ -257,8 +260,10 @@ private:
 	uint8_t                  m_lastreg;
 	devcb_write_line       m_irqhandler;
 	devcb_write8           m_portwritehandler;
+	bool                   m_reset_active;
 
 	void init_tables();
+	void calculate_timers();
 	void envelope_KONKOFF(YM2151Operator * op, int v);
 	void set_connect(YM2151Operator *om1, int cha, int v);
 	void advance();
@@ -273,7 +278,7 @@ private:
 
 
 // device type definition
-extern const device_type YM2151;
+DECLARE_DEVICE_TYPE(YM2151, ym2151_device)
 
 
-#endif /* __2151INTF_H__ */
+#endif // MAME_SOUND_YM2151_H

@@ -6,12 +6,12 @@
 //
 //====================================================================
 
+#include "emu.h"
 #include "diagnostics_module.h"
 
 #if defined(OSD_WINDOWS) || defined(SDLMAME_WIN32)
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
@@ -22,8 +22,6 @@
 
 #include <memory>
 #include <vector>
-#undef min
-#undef max
 #include <utility>
 
 #include "modules/lib/osdlib.h"

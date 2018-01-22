@@ -82,13 +82,16 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "machine/upd765.h"
-#include "machine/keyboard.h"
-#include "machine/pit8253.h"
-#include "machine/i8255.h"
 #include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/pit8253.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
+#include "machine/upd765.h"
 #include "sound/beep.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class amust_state : public driver_device
@@ -103,6 +106,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 		, m_beep(*this, "beeper")
 		, m_fdc (*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
@@ -111,8 +116,6 @@ public:
 
 	DECLARE_DRIVER_INIT(amust);
 	DECLARE_MACHINE_RESET(amust);
-	DECLARE_READ8_MEMBER(port00_r);
-	DECLARE_READ8_MEMBER(port01_r);
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_WRITE8_MEMBER(port04_w);
 	DECLARE_READ8_MEMBER(port05_r);
@@ -124,20 +127,22 @@ public:
 	DECLARE_READ8_MEMBER(port0a_r);
 	DECLARE_WRITE8_MEMBER(port0a_w);
 	DECLARE_WRITE8_MEMBER(port0d_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	INTERRUPT_GEN_MEMBER(irq_vs);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	uint8_t *m_p_videoram;
-	const uint8_t *m_p_chargen;
-	required_device<palette_device> m_palette;
+
+	void amust(machine_config &config);
 private:
-	uint8_t m_port04;
-	uint8_t m_port06;
-	uint8_t m_port08;
-	uint8_t m_port0a;
-	uint8_t m_term_data;
+	u8 m_port04;
+	u8 m_port06;
+	u8 m_port08;
+	u8 m_port0a;
+	u8 m_term_data;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<beep_device> m_beep;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -167,19 +172,17 @@ void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 //      floppy->ss_w(BIT(data, 4));
 //}
 
-static ADDRESS_MAP_START(amust_mem, AS_PROGRAM, 8, amust_state)
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, amust_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(amust_io, AS_IO, 8, amust_state)
+static ADDRESS_MAP_START( io_map, AS_IO, 8, amust_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	//AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
-	//AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
-	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
-	AM_RANGE(0x01, 0x01) AM_READ(port01_r)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
 	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
@@ -192,8 +195,7 @@ static ADDRESS_MAP_START(amust_io, AS_IO, 8, amust_state)
 ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START( amust_floppies )
-	SLOT_INTERFACE( "drive0", FLOPPY_525_QD )
-	SLOT_INTERFACE( "drive1", FLOPPY_525_QD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
 /* Input ports */
@@ -210,18 +212,6 @@ static INPUT_PORTS_START( amust )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 INPUT_PORTS_END
-
-READ8_MEMBER( amust_state::port00_r )
-{
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ8_MEMBER( amust_state::port01_r )
-{
-	return 0xff;
-}
 
 // bodgy
 INTERRUPT_GEN_MEMBER( amust_state::irq_vs )
@@ -278,7 +268,7 @@ d7 -
 */
 READ8_MEMBER( amust_state::port09_r )
 {
-	printf("%s\n",machine().describe_context());
+	logerror("%s\n",machine().describe_context());
 	return ioport("P9")->read();
 }
 
@@ -311,11 +301,6 @@ WRITE8_MEMBER( amust_state::port0d_w )
 	m_p_videoram[video_address] = data;
 }
 
-WRITE8_MEMBER( amust_state::kbd_put )
-{
-	m_term_data = data;
-}
-
 /* F4 Character Displayer */
 static const gfx_layout amust_charlayout =
 {
@@ -337,9 +322,9 @@ GFXDECODE_END
 MC6845_UPDATE_ROW( amust_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	uint8_t chr,gfx,inv;
-	uint16_t mem,x;
-	uint32_t *p = &bitmap.pix32(y);
+	u8 chr,gfx,inv;
+	u16 mem,x;
+	u32 *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -365,8 +350,6 @@ MC6845_UPDATE_ROW( amust_state::crtc_update_row )
 
 MACHINE_RESET_MEMBER( amust_state, amust )
 {
-	m_p_chargen = memregion("chargen")->base();
-	m_p_videoram = memregion("videoram")->base();
 	membank("bankr0")->set_entry(0); // point at rom
 	membank("bankw0")->set_entry(0); // always write to ram
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -381,18 +364,18 @@ MACHINE_RESET_MEMBER( amust_state, amust )
 
 DRIVER_INIT_MEMBER( amust_state, amust )
 {
-	uint8_t *main = memregion("maincpu")->base();
+	u8 *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0xf800]);
 	membank("bankr0")->configure_entry(0, &main[0x10800]);
 	membank("bankw0")->configure_entry(0, &main[0xf800]);
 }
 
-static MACHINE_CONFIG_START( amust, amust_state )
+MACHINE_CONFIG_START(amust_state::amust)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(amust_mem)
-	MCFG_CPU_IO_MAP(amust_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", amust_state, irq_vs)
 	MCFG_MACHINE_RESET_OVERRIDE(amust_state, amust)
 
@@ -417,28 +400,30 @@ static MACHINE_CONFIG_START( amust, amust_state )
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(amust_state, crtc_update_row)
 
-	MCFG_DEVICE_ADD("keybd", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(amust_state, kbd_put))
 	MCFG_UPD765A_ADD("fdc", false, true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amust_floppies, "drive0", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", amust_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amust_floppies, "drive1", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", amust_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
-	//MCFG_DEVICE_ADD("uart1", I8251, 0)
-	//MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
-	//MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
-	//MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
+
+	MCFG_DEVICE_ADD("uart1", I8251, 0)
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1", i8251_device, write_rxd))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1", i8251_device, write_dsr))
 
 	MCFG_DEVICE_ADD("uart2", I8251, 0)
 	//MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	//MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	//MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
-
-	//MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	//MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_rxd))
-	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_cts))
-	//MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_dsr))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 
@@ -473,5 +458,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY       FULLNAME       FLAGS */
-COMP( 1983, amust,  0,      0,       amust,     amust,   amust_state,   amust,  "Amust", "Amust Executive 816", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY  FULLNAME               FLAGS
+COMP( 1983, amust,  0,      0,       amust,     amust,   amust_state,   amust,  "Amust",  "Amust Executive 816", MACHINE_NOT_WORKING )

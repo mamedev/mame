@@ -9,10 +9,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_DATMENU_H
 #define MAME_FRONTEND_UI_DATMENU_H
+
+#pragma once
 
 #include "ui/menu.h"
 
@@ -23,6 +23,7 @@
 struct ui_software_info;
 
 namespace ui {
+
 //-------------------------------------------------
 //  class dats menu
 //-------------------------------------------------
@@ -30,7 +31,7 @@ namespace ui {
 class menu_dats_view : public menu
 {
 public:
-	menu_dats_view(mame_ui_manager &mui, render_container &container, ui_software_info *swinfo, const game_driver *driver = nullptr);
+	menu_dats_view(mame_ui_manager &mui, render_container &container, const ui_software_info *swinfo, const game_driver *driver = nullptr);
 	menu_dats_view(mame_ui_manager &mui, render_container &container, const game_driver *driver = nullptr);
 	virtual ~menu_dats_view() override;
 
@@ -41,13 +42,12 @@ private:
 	// draw dats menu
 	virtual void draw(uint32_t flags) override;
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
-	int visible_items;
 	int m_actual;
 	const game_driver  *m_driver;
-	ui_software_info *m_swinfo;
+	const ui_software_info *m_swinfo;
 	std::string m_list, m_short, m_long, m_parent;
 	void get_data();
 	void get_data_sw();

@@ -17,43 +17,41 @@
 
 *****************************************************************************/
 
+#include "emu.h"
 #include "tms7000.h"
+#include "7000dasm.h"
 
 // TMS7000 is the most basic one, 128 bytes internal RAM and no internal ROM.
 // TMS7020 and TMS7040 are same, but with 2KB and 4KB internal ROM respectively.
-const device_type TMS7000 = &device_creator<tms7000_device>;
-const device_type TMS7020 = &device_creator<tms7020_device>;
-const device_type TMS7040 = &device_creator<tms7040_device>;
+DEFINE_DEVICE_TYPE(TMS7000, tms7000_device, "tms7000", "TMS7000")
+DEFINE_DEVICE_TYPE(TMS7020, tms7020_device, "tms7020", "TMS7020")
+DEFINE_DEVICE_TYPE(TMS7040, tms7040_device, "tms7040", "TMS7040")
 
 // Exelvision (spinoff of TI) TMS7020 added one custom opcode.
-const device_type TMS7020_EXL = &device_creator<tms7020_exl_device>;
+DEFINE_DEVICE_TYPE(TMS7020_EXL, tms7020_exl_device, "tms7020_exl", "TMS7020 (Exelvision)")
 
 // CMOS devices biggest difference in a 'real world' setting is that the power
 // requirements are much lower. This obviously has no use in software emulation.
-const device_type TMS70C00 = &device_creator<tms70c00_device>;
-const device_type TMS70C20 = &device_creator<tms70c20_device>;
-const device_type TMS70C40 = &device_creator<tms70c40_device>;
+DEFINE_DEVICE_TYPE(TMS70C00, tms70c00_device, "tms70c00", "TMS70C00")
+DEFINE_DEVICE_TYPE(TMS70C20, tms70c20_device, "tms70c20", "TMS70C20")
+DEFINE_DEVICE_TYPE(TMS70C40, tms70c40_device, "tms70c40", "TMS70C40")
 
 // TMS70x1 features more peripheral I/O, the main addition being a serial port.
 // TMS70x2 is the same, just with twice more RAM (256 bytes)
-const device_type TMS7001 = &device_creator<tms7001_device>;
-const device_type TMS7041 = &device_creator<tms7041_device>;
-const device_type TMS7002 = &device_creator<tms7002_device>;
-const device_type TMS7042 = &device_creator<tms7042_device>;
+DEFINE_DEVICE_TYPE(TMS7001, tms7001_device, "tms7001", "TMS7001")
+DEFINE_DEVICE_TYPE(TMS7041, tms7041_device, "tms7041", "TMS7041")
+DEFINE_DEVICE_TYPE(TMS7002, tms7002_device, "tms7002", "TMS7002")
+DEFINE_DEVICE_TYPE(TMS7042, tms7042_device, "tms7042", "TMS7042")
 
 // TMS70C46 is literally a shell around a TMS70C40, with support for external
 // memory bus, auto external clock divider on slow memory, and wake-up on keypress.
-const device_type TMS70C46 = &device_creator<tms70c46_device>;
+DEFINE_DEVICE_TYPE(TMS70C46, tms70c46_device, "tms70c46", "TMC70C46")
 
 // TMS70Cx2 is an update to TMS70x2 with some extra features. Due to some changes
 // in peripheral file I/O, it is not backward compatible to TMS70x2.
 
 
 // internal memory maps
-static ADDRESS_MAP_START(tms7000_io, AS_IO, 8, tms7000_device)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_READNOP
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START(tms7000_mem, AS_PROGRAM, 8, tms7000_device )
 	AM_RANGE(0x0000, 0x007f) AM_RAM // 128 bytes internal RAM
 	AM_RANGE(0x0080, 0x00ff) AM_READWRITE(tms7000_unmapped_rf_r, tms7000_unmapped_rf_w)
@@ -75,22 +73,22 @@ static ADDRESS_MAP_START(tms7002_mem, AS_PROGRAM, 8, tms7000_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf000, 0xffff) AM_ROM // 2kB internal ROM
+	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0) // 2kB internal ROM
 	AM_IMPORT_FROM( tms7000_mem )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms7040_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf000, 0xffff) AM_ROM // 4kB internal ROM
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0) // 4kB internal ROM
 	AM_IMPORT_FROM( tms7000_mem )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms7041_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf000, 0xffff) AM_ROM
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0)
 	AM_IMPORT_FROM( tms7001_mem )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms7042_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf000, 0xffff) AM_ROM
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0)
 	AM_IMPORT_FROM( tms7002_mem )
 ADDRESS_MAP_END
 
@@ -106,74 +104,79 @@ ADDRESS_MAP_END
 
 // device definitions
 tms7000_device::tms7000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, TMS7000, "TMS7000", tag, owner, clock, "tms7000", __FILE__),
-	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, ADDRESS_MAP_NAME(tms7000_mem)),
-	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms7000_io)),
-	m_info_flags(0)
+	: tms7000_device(mconfig, TMS7000, tag, owner, clock, ADDRESS_MAP_NAME(tms7000_mem), 0)
 {
 }
 
-tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, uint32_t info_flags, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+tms7000_device::tms7000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal, uint32_t info_flags)
+	: cpu_device(mconfig, type, tag, owner, clock),
 	m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, internal),
-	m_io_config("io", ENDIANNESS_BIG, 8, 8, 0, ADDRESS_MAP_NAME(tms7000_io)),
+	m_port_in_cb{{*this}, {*this}, {*this}, {*this}, {*this}},
+	m_port_out_cb{{*this}, {*this}, {*this}, {*this}, {*this}},
 	m_info_flags(info_flags)
 {
 }
 
 tms7020_device::tms7020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7020, "TMS7020", tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), 0, "tms7020", __FILE__)
+	: tms7000_device(mconfig, TMS7020, tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), 0)
 {
 }
 
 tms7020_exl_device::tms7020_exl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7020_EXL, "TMS7020 (Exelvision)", tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), 0, "tms7020_exl", __FILE__)
+	: tms7000_device(mconfig, TMS7020_EXL, tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), 0)
 {
 }
 
 tms7040_device::tms7040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7040, "TMS7040", tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), 0, "tms7040", __FILE__)
+	: tms7000_device(mconfig, TMS7040, tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), 0)
 {
 }
 
 tms70c00_device::tms70c00_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C00, "TMS70C00", tag, owner, clock, ADDRESS_MAP_NAME(tms7000_mem), TMS7000_CHIP_IS_CMOS, "tms70c00", __FILE__)
+	: tms7000_device(mconfig, TMS70C00, tag, owner, clock, ADDRESS_MAP_NAME(tms7000_mem), CHIP_IS_CMOS)
 {
 }
 
 tms70c20_device::tms70c20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C20, "TMS70C20", tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), TMS7000_CHIP_IS_CMOS, "tms70c20", __FILE__)
+	: tms7000_device(mconfig, TMS70C20, tag, owner, clock, ADDRESS_MAP_NAME(tms7020_mem), CHIP_IS_CMOS)
 {
 }
 
 tms70c40_device::tms70c40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C40, "TMS70C40", tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), TMS7000_CHIP_IS_CMOS, "tms70c40", __FILE__)
+	: tms7000_device(mconfig, TMS70C40, tag, owner, clock, ADDRESS_MAP_NAME(tms7040_mem), CHIP_IS_CMOS)
 {
 }
 
 tms7001_device::tms7001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7001, "TMS7001", tag, owner, clock, ADDRESS_MAP_NAME(tms7001_mem), TMS7000_CHIP_FAMILY_70X2, "tms7001", __FILE__)
+	: tms7000_device(mconfig, TMS7001, tag, owner, clock, ADDRESS_MAP_NAME(tms7001_mem), CHIP_FAMILY_70X2)
 {
 }
 
 tms7041_device::tms7041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7041, "TMS7041", tag, owner, clock, ADDRESS_MAP_NAME(tms7041_mem), TMS7000_CHIP_FAMILY_70X2, "tms7041", __FILE__)
+	: tms7000_device(mconfig, TMS7041, tag, owner, clock, ADDRESS_MAP_NAME(tms7041_mem), CHIP_FAMILY_70X2)
 {
 }
 
 tms7002_device::tms7002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7002, "TMS7002", tag, owner, clock, ADDRESS_MAP_NAME(tms7002_mem), TMS7000_CHIP_FAMILY_70X2, "tms7002", __FILE__)
+	: tms7000_device(mconfig, TMS7002, tag, owner, clock, ADDRESS_MAP_NAME(tms7002_mem), CHIP_FAMILY_70X2)
 {
 }
 
 tms7042_device::tms7042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS7042, "TMS7042", tag, owner, clock, ADDRESS_MAP_NAME(tms7042_mem), TMS7000_CHIP_FAMILY_70X2, "tms7042", __FILE__)
+	: tms7000_device(mconfig, TMS7042, tag, owner, clock, ADDRESS_MAP_NAME(tms7042_mem), CHIP_FAMILY_70X2)
 {
 }
 
 tms70c46_device::tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms7000_device(mconfig, TMS70C46, "TMS70C46", tag, owner, clock, ADDRESS_MAP_NAME(tms70c46_mem), TMS7000_CHIP_IS_CMOS, "tms70c46", __FILE__)
+	: tms7000_device(mconfig, TMS70C46, tag, owner, clock, ADDRESS_MAP_NAME(tms70c46_mem), CHIP_IS_CMOS)
 {
+}
+
+device_memory_interface::space_config_vector tms7000_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 
@@ -185,13 +188,17 @@ void tms7000_device::device_start()
 {
 	// init/zerofill
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
-	m_io = &space(AS_IO);
+	m_direct = m_program->direct<0>();
 
 	m_icountptr = &m_icount;
 
 	m_irq_state[TMS7000_INT1_LINE] = false;
 	m_irq_state[TMS7000_INT3_LINE] = false;
+
+	for (auto &cb : m_port_in_cb)
+		cb.resolve_safe(0xff);
+	for (auto &cb : m_port_out_cb)
+		cb.resolve_safe();
 
 	m_idle_state = false;
 	m_idle_halt = false;
@@ -267,10 +274,9 @@ void tms7000_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-offs_t tms7000_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tms7000_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tms7000 );
-	return CPU_DISASSEMBLE_NAME(tms7000)(this, buffer, pc, oprom, opram, options);
+	return new tms7000_disassembler;
 }
 
 
@@ -505,8 +511,8 @@ READ8_MEMBER(tms7000_device::tms7000_pf_r)
 		{
 			// note: port B is write-only, reading it returns the output value as if ddr is 0xff
 			int port = offset / 2 - 2;
-			if (!space.debugger_access())
-				return (m_io->read_byte(port) & ~m_port_ddr[port]) | (m_port_latch[port] & m_port_ddr[port]);
+			if (!machine().side_effect_disabled())
+				return (m_port_in_cb[port]() & ~m_port_ddr[port]) | (m_port_latch[port] & m_port_ddr[port]);
 			break;
 		}
 
@@ -515,7 +521,7 @@ READ8_MEMBER(tms7000_device::tms7000_pf_r)
 			return m_port_ddr[offset / 2 - 2];
 
 		default:
-			if (!space.debugger_access())
+			if (!machine().side_effect_disabled())
 				logerror("'%s' (%04X): tms7000_pf_r @ $%04x\n", tag(), m_pc, offset);
 			break;
 	}
@@ -588,7 +594,7 @@ WRITE8_MEMBER(tms7000_device::tms7000_pf_w)
 			// note: in memory expansion modes, some port output pins are used for memory strobes.
 			// this is currently ignored, since port writes will always be visible externally on peripheral expansion anyway.
 			int port = offset / 2 - 2;
-			m_io->write_byte(port, data & m_port_ddr[port]);
+			m_port_out_cb[port](data & m_port_ddr[port]);
 			m_port_latch[port] = data;
 			break;
 		}
@@ -882,7 +888,9 @@ void tms70c46_device::device_start()
 void tms70c46_device::device_reset()
 {
 	m_control = 0;
-	m_io->write_byte(TMS7000_PORTE, 0xff);
+
+	// reset port E
+	m_port_out_cb[4](0xff);
 
 	tms7000_device::device_reset();
 }
@@ -896,13 +904,13 @@ WRITE8_MEMBER(tms70c46_device::control_w)
 {
 	// d5: enable external databus
 	if (~m_control & data & 0x20)
-		m_io->write_byte(TMS7000_PORTE, 0xff); // go into high impedance
+		m_port_out_cb[4](0xff); // put port E into high impedance
 
 	// d4: enable clock divider when accessing slow memory (not emulated)
 	// known fast memory areas: internal ROM/RAM, system RAM
 	// known slow memory areas: system ROM, cartridge ROM/RAM
 
-	// d0-d3(all bits?): clock divider when d4 is set and addressbus is in slow memory area
+	// d0-d3(all bits?): clock divider when d4 is set and address bus is in slow memory area
 	// needs to be measured, i just know that $30 is full speed, and $38 is about 4 times slower
 	m_control = data;
 }

@@ -54,19 +54,19 @@ liquidk  TC0220IOC TC0360PRI TC0260DAR
 quizhq   TMP82C265 TC0110PCR TC0070RGB
 ssi      TC0510NIO           TC0260DAR
 gunfront TC0510NIO TC0360PRI TC0260DAR
-growl    TMP82C265 TC0360PRI TC0260DAR                         TC0190FMC(4 players input?sprite banking?)
+growl    TMP82C265 TC0360PRI TC0260DAR                         TC0190FMC(sprite banking?)
 mjnquest           TC0110PCR TC0070RGB
-footchmp TE7750    TC0360PRI TC0260DAR TC0480SCP(tilemaps)     TC0190FMC(4 players input?sprite banking?)
+footchmp TE7750    TC0360PRI TC0260DAR TC0480SCP(tilemaps)     TC0190FMC(sprite banking?)
 koshien  TC0510NIO TC0360PRI TC0260DAR
 yuyugogo TC0510NIO           TC0260DAR
-ninjak   TE7750    TC0360PRI TC0260DAR                         TC0190FMC(4 players input?sprite banking?)
-solfigtr ?         TC0360PRI TC0260DAR ?
+ninjak   TE7750    TC0360PRI TC0260DAR                         TC0190FMC(sprite banking?)
+solfigtr TMP82C265 TC0360PRI TC0260DAR                         TC0190FMC(sprite banking?)
 qzquest  TC0510NIO           TC0260DAR
 pulirula TC0510NIO TC0360PRI TC0260DAR TC0430GRW(zoom/rot)
 metalb   TC0510NIO TC0360PRI TC0260DAR TC0480SCP(tilemaps)
 qzchikyu TC0510NIO           TC0260DAR
-yesnoj   TMP82C265           TC0260DAR                         TC8521AP(RTC?)
-deadconx           TC0360PRI TC0260DAR TC0480SCP(tilemaps)     TC0190FMC(4 players input?sprite banking?)
+yesnoj   TMP82C265           TC0260DAR                         TC8521AP(RTC)
+deadconx TE7750    TC0360PRI TC0260DAR TC0480SCP(tilemaps)     TC0190FMC(sprite banking?)
 dinorex  TC0510NIO TC0360PRI TC0260DAR
 qjinsei  TC0510NIO TC0360PRI TC0260DAR
 qcrayon  TC0510NIO TC0360PRI TC0260DAR
@@ -207,8 +207,6 @@ input. With the value currently returned, it sounds an alarm and says
 Update (2008.10.09) Printer shall now be correct but it's still not clear
 how the inputs are physically connected and what the are supposed to do.
 
-The timer stays at 00:00. Missing RTC emulation?
-
 [Coin lockout/ctr?]
 
 Calendar / Time in "test mode" always reset to default settings.
@@ -265,20 +263,33 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "includes/taitoipt.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/watchdog.h"
-#include "audio/taitosnd.h"
 #include "includes/taito_f2.h"
+#include "includes/taitoipt.h"
+#include "audio/taitosnd.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/rp5c01.h"
+#include "machine/te7750.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /**********************************************************
                         GAME INPUTS
 **********************************************************/
+
+WRITE8_MEMBER(taitof2_state::coin_nibble_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0,  data & 0x04);
+	machine().bookkeeping().coin_counter_w(1,  data & 0x08);
+}
 
 WRITE16_MEMBER(taitof2_state::growl_coin_word_w)/* what about coins 3&4 ?? */
 {
@@ -291,68 +302,16 @@ WRITE16_MEMBER(taitof2_state::growl_coin_word_w)/* what about coins 3&4 ?? */
 	}
 }
 
-WRITE16_MEMBER(taitof2_state::taitof2_4p_coin_word_w)
+WRITE8_MEMBER(taitof2_state::taitof2_4p_coin_word_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
-		machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
-		machine().bookkeeping().coin_lockout_w(2, ~data & 0x04);
-		machine().bookkeeping().coin_lockout_w(3, ~data & 0x08);
-		machine().bookkeeping().coin_counter_w(0,  data & 0x10);
-		machine().bookkeeping().coin_counter_w(1,  data & 0x20);
-		machine().bookkeeping().coin_counter_w(2,  data & 0x40);
-		machine().bookkeeping().coin_counter_w(3,  data & 0x80);
-	}
-}
-
-WRITE16_MEMBER(taitof2_state::ninjak_coin_word_w)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		machine().bookkeeping().coin_lockout_w(0, ~data & 0x0100);
-		machine().bookkeeping().coin_lockout_w(1, ~data & 0x0200);
-		machine().bookkeeping().coin_lockout_w(2, ~data & 0x0400);
-		machine().bookkeeping().coin_lockout_w(3, ~data & 0x0800);
-		machine().bookkeeping().coin_counter_w(0,  data & 0x1000);
-		machine().bookkeeping().coin_counter_w(1,  data & 0x2000);
-		machine().bookkeeping().coin_counter_w(2,  data & 0x4000);
-		machine().bookkeeping().coin_counter_w(3,  data & 0x8000);
-	}
-}
-
-READ16_MEMBER(taitof2_state::ninjak_input_r)
-{
-	switch (offset)
-	{
-		case 0x00:
-			return (ioport("DSWA")->read() << 8);
-
-		case 0x01:
-			return (ioport("DSWB")->read() << 8);
-
-		case 0x02:
-			return (ioport("IN0")->read() << 8);
-
-		case 0x03:
-			return (ioport("IN1")->read() << 8);
-
-		case 0x04:
-			return (ioport("IN3")->read() << 8);
-
-		case 0x05:
-			return (ioport("IN4")->read() << 8);
-
-		case 0x06:
-			return (ioport("IN2")->read() << 8);
-
-//      case 0x07:
-//          return (coin_word & mem_mask);
-	}
-
-	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", space.device().safe_pc(), offset);
-
-	return 0xff;
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_lockout_w(2, ~data & 0x04);
+	machine().bookkeeping().coin_lockout_w(3, ~data & 0x08);
+	machine().bookkeeping().coin_counter_w(0,  data & 0x10);
+	machine().bookkeeping().coin_counter_w(1,  data & 0x20);
+	machine().bookkeeping().coin_counter_w(2,  data & 0x40);
+	machine().bookkeeping().coin_counter_w(3,  data & 0x80);
 }
 
 READ16_MEMBER(taitof2_state::cameltry_paddle_r)
@@ -374,7 +333,7 @@ READ16_MEMBER(taitof2_state::cameltry_paddle_r)
 			return res;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n", m_maincpu->pc(), offset);
 
 	return 0;
 }
@@ -394,7 +353,7 @@ READ16_MEMBER(taitof2_state::mjnquest_dsw_r)
 		}
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", m_maincpu->pc(), offset);
 
 	return 0xff;
 }
@@ -420,7 +379,7 @@ READ16_MEMBER(taitof2_state::mjnquest_input_r)
 
 	}
 
-	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", space.device().safe_pc(), m_mjnquest_input);
+	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", m_maincpu->pc(), m_mjnquest_input);
 
 	return 0xff;
 }
@@ -655,34 +614,6 @@ WRITE16_MEMBER(taitof2_state::driveout_sound_command_w)
 	}
 }
 
-/***************************************************************************
-
-    Mega Blast cchip emulation
-
-    C-Chip simply used as RAM, the game doesn't even bother to change banks.
-    It does read the chip id though. The dump is confirmed to be from an
-    original board.
-
-***************************************************************************/
-
-WRITE16_MEMBER(taitof2_state::cchip2_word_w)
-{
-	logerror("cchip2_w pc: %06x offset %04x: %02x\n", space.device().safe_pc(), offset, data);
-
-	COMBINE_DATA(&m_cchip2_ram[offset]);
-}
-
-READ16_MEMBER(taitof2_state::cchip2_word_r)
-{
-	/* C-Chip ID */
-	if (offset == 0x401)
-		return 0x01;
-
-	logerror("cchip2_r offset: %04x\n", offset);
-
-	return m_cchip2_ram[offset];
-}
-
 
 /***********************************************************
                      MEMORY STRUCTURES
@@ -705,7 +636,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dondokod_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -722,9 +653,10 @@ static ADDRESS_MAP_START( megab_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x120000, 0x12000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
-	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(cchip2_word_r, cchip2_word_w) AM_SHARE("cchip2_ram")
+	AM_RANGE(0x180000, 0x1807ff) AM_DEVREADWRITE8("cchip", taito_cchip_device, mem_r, mem_w, 0x00ff)
+	AM_RANGE(0x180800, 0x180fff) AM_DEVREADWRITE8("cchip", taito_cchip_device, asic_r, asic_w, 0x00ff)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x400000, 0x40001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* ?? */
 	AM_RANGE(0x600000, 0x60ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM   /* unused? */
@@ -734,7 +666,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thundfox_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x220000, 0x220001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x220002, 0x220003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -750,11 +682,27 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cameltry_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x300018, 0x30001f) AM_READ(cameltry_paddle_r)
 	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
+	AM_RANGE(0x800000, 0x813fff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
+	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("tc0280grd", tc0280grd_device, tc0280grd_word_r, tc0280grd_word_w)    /* ROZ tilemap */
+	AM_RANGE(0xa02000, 0xa0200f) AM_DEVWRITE("tc0280grd", tc0280grd_device, tc0280grd_ctrl_word_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* ?? */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( cameltrya_map, AS_PROGRAM, 16, taitof2_state )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
+	AM_RANGE(0x300018, 0x30001f) AM_READ(cameltry_paddle_r)
+	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0xff00)
+	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x813fff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
@@ -779,7 +727,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( liquidk_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
@@ -814,7 +762,7 @@ static ADDRESS_MAP_START( ssi_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* ?? */
@@ -826,7 +774,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gunfront_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_wordswap_r, halfword_wordswap_w)
 	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -840,7 +788,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( growl_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300004, 0x300005) AM_WRITE(growl_coin_word_w)
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("DSWB")
@@ -886,16 +834,9 @@ static ADDRESS_MAP_START( footchmp_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x400000, 0x40ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)     /* tilemaps */
 	AM_RANGE(0x430000, 0x43002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x500000, 0x50001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* 500002 written like a watchdog?! */
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x700006, 0x700007) AM_WRITE(taitof2_4p_coin_word_w)
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSWA")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSWB")
-	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("IN2")
-	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("IN0")
-	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("IN1")
-	AM_RANGE(0x70000e, 0x70000f) AM_READ_PORT("IN3")
-	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("IN4")
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* ??? */
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x70001f) AM_DEVREADWRITE8("te7750", te7750_device, read, write, 0x00ff)
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)   /* ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 ADDRESS_MAP_END
@@ -903,7 +844,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( koshien_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -922,7 +863,7 @@ static ADDRESS_MAP_START( yuyugogo_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xb00000, 0xb10fff) AM_RAM   /* deliberate writes to $b10xxx, I think */
 	AM_RANGE(0xc00000, 0xc01fff) AM_WRITE(taitof2_sprite_extension_w) AM_SHARE("sprite_ext")
 	AM_RANGE(0xd00000, 0xdfffff) AM_ROM AM_REGION("extra", 0)
@@ -931,9 +872,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ninjak_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x300000, 0x30000f) AM_READ(ninjak_input_r)
-	AM_RANGE(0x30000e, 0x30000f) AM_WRITE(ninjak_coin_word_w)
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("te7750", te7750_device, read, write, 0xff00)
 	AM_RANGE(0x380000, 0x380001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* ??? */
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -947,7 +887,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( solfigtr_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300004, 0x300005) AM_WRITE(growl_coin_word_w)    /* NOT VERIFIED */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("DSWB")
@@ -970,7 +910,7 @@ static ADDRESS_MAP_START( qzquest_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
@@ -986,7 +926,7 @@ static ADDRESS_MAP_START( pulirula_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x402000, 0x40200f) AM_DEVWRITE("tc0430grw", tc0280grd_device, tc0430grw_ctrl_word_w)
 //  AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* ??? */
 	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_SHARE("sprite_ext")
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
@@ -1002,7 +942,7 @@ static ADDRESS_MAP_START( metalb_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)     /* tilemaps */
 	AM_RANGE(0x530000, 0x53002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x600000, 0x60001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_wordswap_r, halfword_wordswap_w)
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x900002, 0x900003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -1014,7 +954,7 @@ static ADDRESS_MAP_START( qzchikyu_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
@@ -1027,8 +967,8 @@ static ADDRESS_MAP_START( yesnoj_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-//  AM_RANGE(0x700000, 0x70000b) AM_READ(yesnoj_unknown_r)   /* what's this? */
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x70001f) AM_DEVREADWRITE8("rtc", tc8521_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x900002, 0x900003) AM_WRITENOP   /* lots of similar writes */
@@ -1049,13 +989,8 @@ static ADDRESS_MAP_START( deadconx_map, AS_PROGRAM, 16, taitof2_state )
 //    AM_RANGE(0x42000c, 0x42000f) AM_WRITENOP   /* zeroed */
 	AM_RANGE(0x430000, 0x43002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x500000, 0x50001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* uses 500002 like a watchdog !? */
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSWA")
-	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSWB")
-	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("IN2")
-	AM_RANGE(0x700006, 0x700007) AM_WRITE(taitof2_4p_coin_word_w)
-	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("IN0")
-	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("IN1")
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x70001f) AM_DEVREADWRITE8("te7750", te7750_device, read, write, 0x00ff)
 	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -1065,7 +1000,7 @@ static ADDRESS_MAP_START( dinorex_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_r, halfword_w)
 	AM_RANGE(0x400000, 0x400fff) AM_WRITE(taitof2_sprite_extension_w) AM_SHARE("sprite_ext")
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM
 	AM_RANGE(0x700000, 0x70001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0x00ff)  /* ?? */
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram")
@@ -1083,7 +1018,7 @@ static ADDRESS_MAP_START( qjinsei_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP   /* watchdog ? */
 	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_SHARE("sprite_ext")
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
@@ -1099,7 +1034,7 @@ static ADDRESS_MAP_START( qcrayon_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x500002, 0x500003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x600000, 0x603fff) AM_WRITE(taitof2_sprite_extension_w) AM_SHARE("sprite_ext")
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
@@ -1110,7 +1045,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( qcrayon2_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x500000, 0x50ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x520000, 0x52000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
@@ -1129,7 +1064,7 @@ static ADDRESS_MAP_START( driftout_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE("tc0430grw", tc0280grd_device, tc0430grw_word_r, tc0430grw_word_w)    /* ROZ tilemap */
 	AM_RANGE(0x402000, 0x40200f) AM_DEVWRITE("tc0430grw", tc0280grd_device, tc0430grw_ctrl_word_w)
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
@@ -1146,7 +1081,7 @@ static ADDRESS_MAP_START( driveout_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE("tc0430grw", tc0280grd_device, tc0430grw_word_r, tc0430grw_word_w)    /* ROZ tilemap */
 	AM_RANGE(0x402000, 0x40200f) AM_DEVWRITE("tc0430grw", tc0280grd_device, tc0430grw_ctrl_word_w)
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x820000, 0x82000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("spriteram")
@@ -1180,8 +1115,8 @@ static ADDRESS_MAP_START( cameltrya_sound_map, AS_PROGRAM, 8, taitof2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM     // I can't see a bank control, but there ARE some bytes past 0x8000
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 //  AM_RANGE(0xb000, 0xb000) AM_WRITE(unknown_w)    // probably controlling sample player?
 	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
@@ -2057,9 +1992,9 @@ static INPUT_PORTS_START( gunfront )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )      PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
-	PORT_DIPSETTING(    0x80, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
+	PORT_DIPNAME( 0x80, 0x80, "Upright Controls" )      PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Dual ) )
 
 	PORT_START("IN0")
 	TAITO_JOY_UDLR_2_BUTTONS_START( 1 )
@@ -2099,13 +2034,13 @@ static INPUT_PORTS_START( metalb )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Upright Controls" )      PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
-	PORT_DIPSETTING(    0x80, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
+	PORT_DIPNAME( 0x80, 0x80, "Upright Controls" )      PORT_DIPLOCATION("SW2:8") /* ie single or two players at once */
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Dual ) )
 
 	PORT_START("IN0")
 	TAITO_JOY_UDLR_3_BUTTONS_START( 1 )
@@ -2139,10 +2074,32 @@ static INPUT_PORTS_START( deadconx )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_OPTIONAL // input test only
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_OPTIONAL // input test only
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service A") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service B") PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service C") PORT_CODE(KEYCODE_MINUS)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
+
+	PORT_START("IN3") // all input test only
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3) PORT_OPTIONAL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3) PORT_OPTIONAL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3) PORT_OPTIONAL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3) PORT_OPTIONAL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_OPTIONAL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_OPTIONAL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 ) PORT_OPTIONAL
+
+	PORT_START("IN4") // all input test only
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4) PORT_OPTIONAL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4) PORT_OPTIONAL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4) PORT_OPTIONAL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4) PORT_OPTIONAL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_OPTIONAL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_OPTIONAL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 ) PORT_OPTIONAL
 
 	PORT_START("DSWA")
 	TAITO_MACHINE_NO_COCKTAIL_LOC(SW1)
@@ -2667,7 +2624,7 @@ static INPUT_PORTS_START( yesnoj )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME( "P2 Yes" )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME( "P2 No" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )                 /* printer : paper time-out ? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -2847,7 +2804,7 @@ MACHINE_START_MEMBER(taitof2_state,f2)
 	membank("bank2")->configure_entries(0, 8, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
-static MACHINE_CONFIG_START( taito_f2, taitof2_state )
+MACHINE_CONFIG_START(taitof2_state::taito_f2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 24000000/2) /* 12 MHz */
@@ -2867,7 +2824,7 @@ static MACHINE_CONFIG_START( taito_f2, taitof2_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2)
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_no_buffer)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", taitof2)
@@ -2891,7 +2848,7 @@ static MACHINE_CONFIG_START( taito_f2, taitof2_state )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( taito_f2_tc0220ioc, taito_f2 )
+MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_tc0220ioc, taito_f2 )
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("watchdog")
@@ -2900,10 +2857,11 @@ static MACHINE_CONFIG_DERIVED( taito_f2_tc0220ioc, taito_f2 )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitof2_state, coin_nibble_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( taito_f2_tc0510nio, taito_f2 )
+MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_tc0510nio, taito_f2 )
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("watchdog")
@@ -2912,13 +2870,26 @@ static MACHINE_CONFIG_DERIVED( taito_f2_tc0510nio, taito_f2 )
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(taitof2_state, coin_nibble_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_DERIVED(taitof2_state::taito_f2_te7750, taito_f2 )
+	MCFG_DEVICE_ADD("te7750", TE7750, 0)
+	MCFG_TE7750_IN_PORT1_CB(IOPORT("DSWA"))
+	MCFG_TE7750_IN_PORT2_CB(IOPORT("DSWB"))
+	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN2"))
+	MCFG_TE7750_OUT_PORT4_CB(WRITE8(taitof2_state, taitof2_4p_coin_word_w))
+	MCFG_TE7750_IN_PORT6_CB(IOPORT("IN0"))
+	MCFG_TE7750_IN_PORT7_CB(IOPORT("IN1"))
+	MCFG_TE7750_IN_PORT8_CB(IOPORT("IN3"))
+	MCFG_TE7750_IN_PORT9_CB(IOPORT("IN4"))
+MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( finalb, taito_f2_tc0220ioc )
+
+MACHINE_CONFIG_DERIVED(taitof2_state::finalb, taito_f2_tc0220ioc)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2928,7 +2899,7 @@ static MACHINE_CONFIG_DERIVED( finalb, taito_f2_tc0220ioc )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", finalb)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_finalb)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_partial_buffer_delayed))
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -2942,7 +2913,7 @@ static MACHINE_CONFIG_DERIVED( finalb, taito_f2_tc0220ioc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dondokod, taito_f2_tc0220ioc )
+MACHINE_CONFIG_DERIVED(taitof2_state::dondokod, taito_f2_tc0220ioc)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2952,7 +2923,7 @@ static MACHINE_CONFIG_DERIVED( dondokod, taito_f2_tc0220ioc )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pivot)
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_dondokod)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_partial_buffer_delayed))
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
@@ -2970,11 +2941,13 @@ static MACHINE_CONFIG_DERIVED( dondokod, taito_f2_tc0220ioc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( megab, taito_f2_tc0220ioc )
+MACHINE_CONFIG_DERIVED(taitof2_state::megab, taito_f2_tc0220ioc)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(megab_map)
+
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_megab)
@@ -2992,7 +2965,7 @@ static MACHINE_CONFIG_DERIVED( megab, taito_f2_tc0220ioc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( thundfox, taito_f2_tc0220ioc )
+MACHINE_CONFIG_DERIVED(taitof2_state::thundfox, taito_f2_tc0220ioc)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3003,7 +2976,7 @@ static MACHINE_CONFIG_DERIVED( thundfox, taito_f2_tc0220ioc )
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_thundfox)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_thundfox)
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed_thundfox)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_partial_buffer_delayed_thundfox))
 
 	MCFG_DEVICE_ADD("tc0100scn_1", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3020,7 +2993,7 @@ static MACHINE_CONFIG_DERIVED( thundfox, taito_f2_tc0220ioc )
 	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_OFFSETS_FLIP(5, 0)
 	MCFG_TC0100SCN_OFFSETS_FLIPTX(4, 1)
-	MCFG_TC0100SCN_MULTISCR_XOFFS(TC0100SCN_SINGLE_VDU)
+	MCFG_TC0100SCN_MULTISCR_XOFFS(tc0100scn_device::SINGLE_VDU)
 	MCFG_TC0100SCN_MULTISCR_HACK(1)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
@@ -3029,7 +3002,7 @@ static MACHINE_CONFIG_DERIVED( thundfox, taito_f2_tc0220ioc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cameltry, taito_f2_tc0220ioc )
+MACHINE_CONFIG_DERIVED(taitof2_state::cameltry, taito_f2_tc0220ioc)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3056,7 +3029,7 @@ static MACHINE_CONFIG_DERIVED( cameltry, taito_f2_tc0220ioc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( qtorimon, taito_f2_tc0220ioc )
+MACHINE_CONFIG_DERIVED(taitof2_state::qtorimon, taito_f2_tc0220ioc)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3065,7 +3038,7 @@ static MACHINE_CONFIG_DERIVED( qtorimon, taito_f2_tc0220ioc )
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", yuyugogo)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_partial_buffer_delayed))
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3078,7 +3051,7 @@ static MACHINE_CONFIG_DERIVED( qtorimon, taito_f2_tc0220ioc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( liquidk, taito_f2_tc0220ioc )
+MACHINE_CONFIG_DERIVED(taitof2_state::liquidk, taito_f2_tc0220ioc)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3088,7 +3061,7 @@ static MACHINE_CONFIG_DERIVED( liquidk, taito_f2_tc0220ioc )
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_megab)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_partial_buffer_delayed))
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3101,7 +3074,7 @@ static MACHINE_CONFIG_DERIVED( liquidk, taito_f2_tc0220ioc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( quizhq, taito_f2 )
+MACHINE_CONFIG_DERIVED(taitof2_state::quizhq, taito_f2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3110,7 +3083,7 @@ static MACHINE_CONFIG_DERIVED( quizhq, taito_f2 )
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", yuyugogo)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_partial_buffer_delayed))
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3123,7 +3096,7 @@ static MACHINE_CONFIG_DERIVED( quizhq, taito_f2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ssi, taito_f2_tc0510nio )
+MACHINE_CONFIG_DERIVED(taitof2_state::ssi, taito_f2_tc0510nio)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3136,7 +3109,7 @@ static MACHINE_CONFIG_DERIVED( ssi, taito_f2_tc0510nio )
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_ssi)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_ssi)
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed_thundfox)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_partial_buffer_delayed_thundfox))
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3147,7 +3120,7 @@ static MACHINE_CONFIG_DERIVED( ssi, taito_f2_tc0510nio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gunfront, taito_f2_tc0510nio )
+MACHINE_CONFIG_DERIVED(taitof2_state::gunfront, taito_f2_tc0510nio)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3160,7 +3133,7 @@ static MACHINE_CONFIG_DERIVED( gunfront, taito_f2_tc0510nio )
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_gunfront)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri)
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_partial_buffer_delayed))
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3173,7 +3146,7 @@ static MACHINE_CONFIG_DERIVED( gunfront, taito_f2_tc0510nio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( growl, taito_f2 )
+MACHINE_CONFIG_DERIVED(taitof2_state::growl, taito_f2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3195,7 +3168,7 @@ static MACHINE_CONFIG_DERIVED( growl, taito_f2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mjnquest, taito_f2 )
+MACHINE_CONFIG_DERIVED(taitof2_state::mjnquest, taito_f2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3215,7 +3188,7 @@ static MACHINE_CONFIG_DERIVED( mjnquest, taito_f2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( footchmp, taito_f2 )
+MACHINE_CONFIG_DERIVED(taitof2_state::footchmp, taito_f2_te7750)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3226,7 +3199,7 @@ static MACHINE_CONFIG_DERIVED( footchmp, taito_f2 )
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_footchmp)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_full_buffer_delayed)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_full_buffer_delayed))
 
 	MCFG_DEVICE_ADD("tc0480scp", TC0480SCP, 0)
 	MCFG_TC0480SCP_GFX_REGION(1)
@@ -3239,14 +3212,14 @@ static MACHINE_CONFIG_DERIVED( footchmp, taito_f2 )
 	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( footchmpbl, footchmp )
+MACHINE_CONFIG_DERIVED(taitof2_state::footchmpbl, footchmp)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", footchmpbl)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hthero, taito_f2 )
+MACHINE_CONFIG_DERIVED(taitof2_state::hthero, taito_f2_te7750)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3257,7 +3230,7 @@ static MACHINE_CONFIG_DERIVED( hthero, taito_f2 )
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_hthero)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_deadconx)
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_full_buffer_delayed)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_full_buffer_delayed))
 
 	MCFG_TC0360PRI_ADD("tc0360pri")
 
@@ -3271,7 +3244,7 @@ static MACHINE_CONFIG_DERIVED( hthero, taito_f2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( koshien, taito_f2_tc0510nio )
+MACHINE_CONFIG_DERIVED(taitof2_state::koshien, taito_f2_tc0510nio)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3296,7 +3269,7 @@ static MACHINE_CONFIG_DERIVED( koshien, taito_f2_tc0510nio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yuyugogo, taito_f2_tc0510nio )
+MACHINE_CONFIG_DERIVED(taitof2_state::yuyugogo, taito_f2_tc0510nio)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3320,11 +3293,21 @@ static MACHINE_CONFIG_DERIVED( yuyugogo, taito_f2_tc0510nio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ninjak, taito_f2 )
+MACHINE_CONFIG_DERIVED(taitof2_state::ninjak, taito_f2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ninjak_map)
+
+	MCFG_DEVICE_ADD("te7750", TE7750, 0)
+	MCFG_TE7750_IN_PORT1_CB(IOPORT("DSWA"))
+	MCFG_TE7750_IN_PORT2_CB(IOPORT("DSWB"))
+	MCFG_TE7750_IN_PORT3_CB(IOPORT("IN0"))
+	MCFG_TE7750_IN_PORT4_CB(IOPORT("IN1"))
+	MCFG_TE7750_IN_PORT5_CB(IOPORT("IN3"))
+	MCFG_TE7750_IN_PORT6_CB(IOPORT("IN4"))
+	MCFG_TE7750_IN_PORT7_CB(IOPORT("IN2"))
+	MCFG_TE7750_OUT_PORT8_CB(WRITE8(taitof2_state, taitof2_4p_coin_word_w))
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_ninjak)
@@ -3342,7 +3325,7 @@ static MACHINE_CONFIG_DERIVED( ninjak, taito_f2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( solfigtr, taito_f2 )
+MACHINE_CONFIG_DERIVED(taitof2_state::solfigtr, taito_f2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3366,7 +3349,7 @@ static MACHINE_CONFIG_DERIVED( solfigtr, taito_f2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( qzquest, taito_f2_tc0510nio )
+MACHINE_CONFIG_DERIVED(taitof2_state::qzquest, taito_f2_tc0510nio)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3374,7 +3357,7 @@ static MACHINE_CONFIG_DERIVED( qzquest, taito_f2_tc0510nio )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_partial_buffer_delayed))
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3384,7 +3367,7 @@ static MACHINE_CONFIG_DERIVED( qzquest, taito_f2_tc0510nio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pulirula, taito_f2_tc0510nio )
+MACHINE_CONFIG_DERIVED(taitof2_state::pulirula, taito_f2_tc0510nio)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3411,7 +3394,7 @@ static MACHINE_CONFIG_DERIVED( pulirula, taito_f2_tc0510nio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( metalb, taito_f2_tc0510nio )
+MACHINE_CONFIG_DERIVED(taitof2_state::metalb, taito_f2_tc0510nio)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3439,7 +3422,7 @@ static MACHINE_CONFIG_DERIVED( metalb, taito_f2_tc0510nio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( qzchikyu, taito_f2_tc0510nio )
+MACHINE_CONFIG_DERIVED(taitof2_state::qzchikyu, taito_f2_tc0510nio)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3448,7 +3431,7 @@ static MACHINE_CONFIG_DERIVED( qzchikyu, taito_f2_tc0510nio )
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(taitof2_state,taitof2_qzchikyu)
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_partial_buffer_delayed_qzchikyu)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_partial_buffer_delayed_qzchikyu))
 
 	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
 	MCFG_TC0100SCN_GFX_REGION(1)
@@ -3461,7 +3444,7 @@ static MACHINE_CONFIG_DERIVED( qzchikyu, taito_f2_tc0510nio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yesnoj, taito_f2 )
+MACHINE_CONFIG_DERIVED(taitof2_state::yesnoj, taito_f2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3479,10 +3462,12 @@ static MACHINE_CONFIG_DERIVED( yesnoj, taito_f2 )
 	MCFG_TC0100SCN_OFFSETS(3, 0)
 	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
 	MCFG_TC0100SCN_PALETTE("palette")
+
+	MCFG_DEVICE_ADD("rtc", TC8521, XTAL_32_768kHz)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( deadconx, taito_f2 )
+MACHINE_CONFIG_DERIVED(taitof2_state::deadconx, taito_f2_te7750)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3506,7 +3491,7 @@ static MACHINE_CONFIG_DERIVED( deadconx, taito_f2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( deadconxj, taito_f2 )
+MACHINE_CONFIG_DERIVED(taitof2_state::deadconxj, taito_f2_te7750)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3530,7 +3515,7 @@ static MACHINE_CONFIG_DERIVED( deadconxj, taito_f2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dinorex, taito_f2_tc0510nio )
+MACHINE_CONFIG_DERIVED(taitof2_state::dinorex, taito_f2_tc0510nio)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3555,7 +3540,7 @@ static MACHINE_CONFIG_DERIVED( dinorex, taito_f2_tc0510nio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( qjinsei, taito_f2_tc0510nio )
+MACHINE_CONFIG_DERIVED(taitof2_state::qjinsei, taito_f2_tc0510nio)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3580,7 +3565,7 @@ static MACHINE_CONFIG_DERIVED( qjinsei, taito_f2_tc0510nio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( qcrayon, taito_f2_tc0510nio )
+MACHINE_CONFIG_DERIVED(taitof2_state::qcrayon, taito_f2_tc0510nio)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3605,7 +3590,7 @@ static MACHINE_CONFIG_DERIVED( qcrayon, taito_f2_tc0510nio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( qcrayon2, taito_f2_tc0510nio )
+MACHINE_CONFIG_DERIVED(taitof2_state::qcrayon2, taito_f2_tc0510nio)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3630,7 +3615,7 @@ static MACHINE_CONFIG_DERIVED( qcrayon2, taito_f2_tc0510nio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( driftout, taito_f2_tc0510nio )
+MACHINE_CONFIG_DERIVED(taitof2_state::driftout, taito_f2_tc0510nio)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3657,11 +3642,11 @@ static MACHINE_CONFIG_DERIVED( driftout, taito_f2_tc0510nio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cameltrya, taitof2_state )
+MACHINE_CONFIG_START(taitof2_state::cameltrya)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)  /* verified on pcb  */
-	MCFG_CPU_PROGRAM_MAP(cameltry_map)
+	MCFG_CPU_PROGRAM_MAP(cameltrya_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitof2_state,  taitof2_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80,24000000/4)    /* verifed on pcb */
@@ -3674,6 +3659,7 @@ static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitof2_state, coin_nibble_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -3683,7 +3669,7 @@ static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_no_buffer)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pivot)
@@ -3716,16 +3702,16 @@ static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4_224MHz/4, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_4_224MHz/4, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("maincpu")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( driveout, taitof2_state )
+MACHINE_CONFIG_START(taitof2_state::driveout)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)  /* 12 MHz */
@@ -3742,6 +3728,7 @@ static MACHINE_CONFIG_START( driveout, taitof2_state )
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0510NIO_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0510NIO_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0510NIO_WRITE_4_CB(WRITE8(taitof2_state, coin_nibble_w))
 	MCFG_TC0510NIO_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -3751,7 +3738,7 @@ static MACHINE_CONFIG_START( driveout, taitof2_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(taitof2_state, screen_update_taitof2_pri_roz)
-	MCFG_SCREEN_VBLANK_DRIVER(taitof2_state, screen_eof_taitof2_no_buffer)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(taitof2_state, screen_vblank_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pivot)
@@ -3776,7 +3763,7 @@ static MACHINE_CONFIG_START( driveout, taitof2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")   /* does it ? */
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -3990,6 +3977,9 @@ ROM_START( megablst )
 	ROM_LOAD16_BYTE( "c11-06.54",  0x40000, 0x20000, CRC(7c249894) SHA1(88dff86b446bcbc4e8ab14cfc3c57b40d25cfa97) )
 	ROM_LOAD16_BYTE( "c11-11.38",  0x40001, 0x20000, CRC(263ecbf9) SHA1(b49c59058d6d11ea0d9f9b041789e381e5742905) )
 
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_c11", 0x0000, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c11-05.58", 0x00000, 0x80000, CRC(733e6d8e) SHA1(47f3360f7c41b7e4a42e8198fc1bcce4e819181f) )
 
@@ -4023,6 +4013,9 @@ ROM_START( megablstu )
 	ROM_LOAD16_BYTE( "c11-06.54",  0x40000, 0x20000, CRC(7c249894) SHA1(88dff86b446bcbc4e8ab14cfc3c57b40d25cfa97) )
 	ROM_LOAD16_BYTE( "c11-10.38",  0x40001, 0x20000, CRC(bf379a43) SHA1(2a0294e55c2ce514caa2885b728e6387311ed482) )
 
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_c11", 0x0000, 0x2000, NO_DUMP )
+
 	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c11-05.58", 0x00000, 0x80000, CRC(733e6d8e) SHA1(47f3360f7c41b7e4a42e8198fc1bcce4e819181f) )
 
@@ -4047,6 +4040,9 @@ ROM_START( megablstj )
 	ROM_LOAD16_BYTE( "c11-08.39",  0x00001, 0x20000, CRC(a79d4dca) SHA1(72a97577981a303230374c5f5e201066f71d9cc5) ) // c11-08.19
 	ROM_LOAD16_BYTE( "c11-06.54",  0x40000, 0x20000, CRC(7c249894) SHA1(88dff86b446bcbc4e8ab14cfc3c57b40d25cfa97) ) // c11-06.16
 	ROM_LOAD16_BYTE( "c11-09.38",  0x40001, 0x20000, CRC(c830aad5) SHA1(967ad3e052572300f5f49375e5f8348f2d595680) ) // c11-09.18
+
+	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
+	ROM_LOAD( "cchip_c11", 0x0000, 0x2000, NO_DUMP )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD( "c11-05.58", 0x00000, 0x80000, CRC(733e6d8e) SHA1(47f3360f7c41b7e4a42e8198fc1bcce4e819181f) )
@@ -4780,7 +4776,7 @@ ROM_START( footchmp )
 	ROM_LOAD16_BYTE( "c80-11.6", 0x00000, 0x20000, CRC(f78630fb) SHA1(37da34401f664caaf5113a9abad78e447f4f4651) )
 	ROM_LOAD16_BYTE( "c80-10.4", 0x00001, 0x20000, CRC(32c109cb) SHA1(46a116127bcea18cc15ddf297e5e0d5cdcac9842) )
 	ROM_LOAD16_BYTE( "c80-12.7", 0x40000, 0x20000, CRC(80d46fef) SHA1(cc81c8ba19321e8bae9054021bfb61cb11c2aba5) )
-	ROM_LOAD16_BYTE( "c80-14.5", 0x40001, 0x20000, CRC(40ac4828) SHA1(9a2112b0ccd573a3e94d9817b78bb02909b972e1) )
+	ROM_LOAD16_BYTE( "c80-14.5", 0x40001, 0x20000, CRC(40ac4828) SHA1(9a2112b0ccd573a3e94d9817b78bb02909b972e1) ) // identical rom also found with c80-13 sticker, is this correct?
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   /* SCR */
 	ROM_LOAD16_BYTE( "c80-04.1", 0x00000, 0x80000, CRC(9a17fe8c) SHA1(d2ea72743151f0f7bf78f33dba526214afb07389) )
@@ -5571,93 +5567,94 @@ DRIVER_INIT_MEMBER(taitof2_state,driveout)
 }
 
 
-GAME( 1988, finalb,     0,        finalb,    finalb, taitof2_state,    finalb,   ROT0,   "Taito Corporation Japan",   "Final Blow (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, finalbu,    finalb,   finalb,    finalbu, taitof2_state,   finalb,   ROT0,   "Taito America Corporation", "Final Blow (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, finalbj,    finalb,   finalb,    finalbj, taitof2_state,   finalb,   ROT0,   "Taito Corporation",         "Final Blow (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, finalb,     0,        finalb,    finalb,     taitof2_state, finalb,   ROT0,   "Taito Corporation Japan",   "Final Blow (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, finalbu,    finalb,   finalb,    finalbu,    taitof2_state, finalb,   ROT0,   "Taito America Corporation", "Final Blow (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, finalbj,    finalb,   finalb,    finalbj,    taitof2_state, finalb,   ROT0,   "Taito Corporation",         "Final Blow (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dondokod,   0,        dondokod,  dondokod, driver_device,  0,        ROT0,   "Taito Corporation Japan",   "Don Doko Don (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dondokodu,  dondokod, dondokod,  dondokodu, driver_device, 0,        ROT0,   "Taito America Corporation", "Don Doko Don (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dondokodj,  dondokod, dondokod,  dondokodj, driver_device, 0,        ROT0,   "Taito Corporation",         "Don Doko Don (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dondokod,   0,        dondokod,  dondokod,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Don Doko Don (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dondokodu,  dondokod, dondokod,  dondokodu,  taitof2_state, 0,        ROT0,   "Taito America Corporation", "Don Doko Don (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dondokodj,  dondokod, dondokod,  dondokodj,  taitof2_state, 0,        ROT0,   "Taito Corporation",         "Don Doko Don (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, megablst,   0,        megab,     megab, driver_device,     0,        ROT0,   "Taito Corporation Japan",   "Mega Blast (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, megablstu,  megablst, megab,     megabu, driver_device,    0,        ROT0,   "Taito America Corporation", "Mega Blast (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, megablstj,  megablst, megab,     megabj, driver_device,    0,        ROT0,   "Taito Corporation",         "Mega Blast (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, megablst,   0,        megab,     megab,      taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Mega Blast (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, megablstu,  megablst, megab,     megabu,     taitof2_state, 0,        ROT0,   "Taito America Corporation", "Mega Blast (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, megablstj,  megablst, megab,     megabj,     taitof2_state, 0,        ROT0,   "Taito Corporation",         "Mega Blast (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, thundfox,   0,        thundfox,  thundfox, driver_device,  0,        ROT0,   "Taito Corporation Japan",   "Thunder Fox (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, thundfoxu,  thundfox, thundfox,  thundfoxu, driver_device, 0,        ROT0,   "Taito America Corporation", "Thunder Fox (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj, driver_device, 0,        ROT0,   "Taito Corporation",         "Thunder Fox (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, thundfox,   0,        thundfox,  thundfox,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Thunder Fox (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, thundfoxu,  thundfox, thundfox,  thundfoxu,  taitof2_state, 0,        ROT0,   "Taito America Corporation", "Thunder Fox (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj,  taitof2_state, 0,        ROT0,   "Taito Corporation",         "Thunder Fox (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, cameltry,   0,        cameltry,  cameltry, taitof2_state,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cameltryj,  cameltry, cameltry,  cameltryj, taitof2_state, cameltry, ROT0,   "Taito Corporation",         "Cameltry (Japan, YM2610)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cameltrya,  cameltry, cameltrya, cameltry, taitof2_state,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (World, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cameltryau, cameltry, cameltrya, cameltry, taitof2_state,  cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cameltry,   0,        cameltry,  cameltry,   taitof2_state, cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cameltryj,  cameltry, cameltry,  cameltryj,  taitof2_state, cameltry, ROT0,   "Taito Corporation",         "Cameltry (Japan, YM2610)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cameltrya,  cameltry, cameltrya, cameltry,   taitof2_state, cameltry, ROT0,   "Taito America Corporation", "Cameltry (World, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cameltryau, cameltry, cameltrya, cameltry,   taitof2_state, cameltry, ROT0,   "Taito America Corporation", "Cameltry (US, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, qtorimon,   0,        qtorimon,  qtorimon, driver_device,  0,        ROT0,   "Taito Corporation",         "Quiz Torimonochou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, qtorimon,   0,        qtorimon,  qtorimon,   taitof2_state, 0,        ROT0,   "Taito Corporation",         "Quiz Torimonochou (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, liquidk,    0,        liquidk,   liquidk, driver_device,   0,        ROT0,   "Taito Corporation Japan",   "Liquid Kids (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, liquidku,   liquidk,  liquidk,   liquidku, driver_device,  0,        ROT0,   "Taito America Corporation", "Liquid Kids (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mizubaku,   liquidk,  liquidk,   mizubaku, driver_device,  0,        ROT0,   "Taito Corporation",         "Mizubaku Daibouken (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, liquidk,    0,        liquidk,   liquidk,    taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Liquid Kids (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, liquidku,   liquidk,  liquidk,   liquidku,   taitof2_state, 0,        ROT0,   "Taito America Corporation", "Liquid Kids (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mizubaku,   liquidk,  liquidk,   mizubaku,   taitof2_state, 0,        ROT0,   "Taito Corporation",         "Mizubaku Daibouken (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, quizhq,     0,        quizhq,    quizhq, driver_device,    0,        ROT0,   "Taito Corporation",         "Quiz H.Q. (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, quizhq,     0,        quizhq,    quizhq,     taitof2_state, 0,        ROT0,   "Taito Corporation",         "Quiz H.Q. (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, ssi,        0,        ssi,       ssi, driver_device,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ssia,       ssi,      ssi,       ssi, driver_device,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, majest12u,  ssi,      ssi,       majest12u, driver_device, 0,        ROT270, "Taito America Corporation", "Majestic Twelve - The Space Invaders Part IV (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, majest12j,  ssi,      ssi,       majest12j, driver_device, 0,        ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ssi,        0,        ssi,       ssi,        taitof2_state, 0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ssia,       ssi,      ssi,       ssi,        taitof2_state, 0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majest12u,  ssi,      ssi,       majest12u,  taitof2_state, 0,        ROT270, "Taito America Corporation", "Majestic Twelve - The Space Invaders Part IV (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majest12j,  ssi,      ssi,       majest12j,  taitof2_state, 0,        ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, gunfront,   0,        gunfront,  gunfront, driver_device,  0,        ROT270, "Taito Corporation Japan",   "Gun & Frontier (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj, driver_device, 0,        ROT270, "Taito Corporation",         "Gun Frontier (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gunfront,   0,        gunfront,  gunfront,   taitof2_state, 0,        ROT270, "Taito Corporation Japan",   "Gun & Frontier (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj,  taitof2_state, 0,        ROT270, "Taito Corporation",         "Gun Frontier (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, growl,      0,        growl,     growl, driver_device,     0,        ROT0,   "Taito Corporation Japan",   "Growl (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, growla,     growl,    growl,     growl, driver_device,     0,        ROT0,   "Taito Corporation Japan",   "Growl (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, growlu,     growl,    growl,     growlu, driver_device,    0,        ROT0,   "Taito America Corporation", "Growl (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, runark,     growl,    growl,     runark, driver_device,    0,        ROT0,   "Taito Corporation",         "Runark (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, growlp,     growl,    growl,     growl, driver_device,     0,        ROT0,   "Taito Corporation Japan",   "Growl (World, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, growl,      0,        growl,     growl,      taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Growl (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, growla,     growl,    growl,     growl,      taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Growl (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, growlu,     growl,    growl,     growlu,     taitof2_state, 0,        ROT0,   "Taito America Corporation", "Growl (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, runark,     growl,    growl,     runark,     taitof2_state, 0,        ROT0,   "Taito Corporation",         "Runark (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, growlp,     growl,    growl,     growl,      taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Growl (World, prototype)", MACHINE_SUPPORTS_SAVE )
 
 
-GAME( 1990, mjnquest,   0,        mjnquest,  mjnquest, taitof2_state,  mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjnquestb,  mjnquest, mjnquest,  mjnquest, taitof2_state,  mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (No Nudity)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjnquest,   0,        mjnquest,  mjnquest,   taitof2_state, mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjnquestb,  mjnquest, mjnquest,  mjnquest,   taitof2_state, mjnquest, ROT0,   "Taito Corporation",         "Mahjong Quest (No Nudity)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, footchmp,   0,        footchmp,  footchmp, driver_device,  0,        ROT0,   "Taito Corporation Japan",   "Football Champ (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hthero,     footchmp, hthero,    hthero, driver_device,    0,        ROT0,   "Taito Corporation",         "Hat Trick Hero (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, euroch92,   footchmp, footchmp,  footchmp, driver_device,  0,        ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, footchmpbl, footchmp, footchmpbl,footchmpbl, driver_device,0,        ROT0,   "bootleg",                   "Football Champ (World) (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // very different hw register etc.
+GAME( 1990, footchmp,   0,        footchmp,  footchmp,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Football Champ / Euro Football Champ (World)", MACHINE_SUPPORTS_SAVE ) // title depends on dipswitch
+GAME( 1990, hthero,     footchmp, hthero,    hthero,     taitof2_state, 0,        ROT0,   "Taito Corporation",         "Hat Trick Hero (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, footchmpbl, footchmp, footchmpbl,footchmpbl, taitof2_state, 0,        ROT0,   "bootleg",                   "Football Champ / Euro Football Champ (World) (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // very different hw register etc.
 
-GAME( 1990, koshien,    0,        koshien,   koshien, driver_device,   0,        ROT0,   "Taito Corporation",         "Ah Eikou no Koshien (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, euroch92,   0,        footchmp,  footchmp,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Euro Champ '92 (World)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, yuyugogo,   0,        yuyugogo,  yuyugogo, driver_device,  0,        ROT0,   "Taito Corporation",         "Yuuyu no Quiz de GO!GO! (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, koshien,    0,        koshien,   koshien,    taitof2_state, 0,        ROT0,   "Taito Corporation",         "Ah Eikou no Koshien (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, ninjak,     0,        ninjak,    ninjak, driver_device,    0,        ROT0,   "Taito Corporation Japan",   "The Ninja Kids (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ninjaku,    ninjak,   ninjak,    ninjaku, driver_device,   0,        ROT0,   "Taito America Corporation", "The Ninja Kids (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ninjakj,    ninjak,   ninjak,    ninjakj, driver_device,   0,        ROT0,   "Taito Corporation",         "The Ninja Kids (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, yuyugogo,   0,        yuyugogo,  yuyugogo,   taitof2_state, 0,        ROT0,   "Taito Corporation",         "Yuuyu no Quiz de GO!GO! (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, solfigtr,   0,        solfigtr,  solfigtr, driver_device,  0,        ROT0,   "Taito Corporation Japan",   "Solitary Fighter (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ninjak,     0,        ninjak,    ninjak,     taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "The Ninja Kids (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ninjaku,    ninjak,   ninjak,    ninjaku,    taitof2_state, 0,        ROT0,   "Taito America Corporation", "The Ninja Kids (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ninjakj,    ninjak,   ninjak,    ninjakj,    taitof2_state, 0,        ROT0,   "Taito Corporation",         "The Ninja Kids (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, qzquest,    0,        qzquest ,  qzquest, driver_device,   0,        ROT0,   "Taito Corporation",         "Quiz Quest - Hime to Yuusha no Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, solfigtr,   0,        solfigtr,  solfigtr,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Solitary Fighter (World)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, pulirula,   0,        pulirula,  pulirula, driver_device,  0,        ROT0,   "Taito Corporation Japan",   "PuLiRuLa (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, pulirulaj,  pulirula, pulirula,  pulirulaj, driver_device, 0,        ROT0,   "Taito Corporation",         "PuLiRuLa (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, qzquest,    0,        qzquest ,  qzquest,    taitof2_state, 0,        ROT0,   "Taito Corporation",         "Quiz Quest - Hime to Yuusha no Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, metalb,     0,        metalb,    metalb, driver_device,    0,        ROT0,   "Taito Corporation Japan",   "Metal Black (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, metalbj,    metalb,   metalb,    metalbj, driver_device,   0,        ROT0,   "Taito Corporation",         "Metal Black (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pulirula,   0,        pulirula,  pulirula,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "PuLiRuLa (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, pulirulaj,  pulirula, pulirula,  pulirulaj,  taitof2_state, 0,        ROT0,   "Taito Corporation",         "PuLiRuLa (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, qzchikyu,   0,        qzchikyu,  qzchikyu, driver_device,  0,        ROT0,   "Taito Corporation",         "Quiz Chikyu Bouei Gun (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, metalb,     0,        metalb,    metalb,     taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Metal Black (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, metalbj,    metalb,   metalb,    metalbj,    taitof2_state, 0,        ROT0,   "Taito Corporation",         "Metal Black (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, yesnoj,     0,        yesnoj,    yesnoj, driver_device,    0,        ROT0,   "Taito Corporation",         "Yes/No Sinri Tokimeki Chart", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, qzchikyu,   0,        qzchikyu,  qzchikyu,   taitof2_state, 0,        ROT0,   "Taito Corporation",         "Quiz Chikyu Bouei Gun (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, deadconx,   0,        deadconx,  deadconx, driver_device,  0,        ROT0,   "Taito Corporation Japan",   "Dead Connection (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, deadconxj,  deadconx, deadconxj, deadconxj, driver_device, 0,        ROT0,   "Taito Corporation",         "Dead Connection (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, yesnoj,     0,        yesnoj,    yesnoj,     taitof2_state, 0,        ROT0,   "Taito Corporation",         "Yes/No Sinri Tokimeki Chart", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_PRINTER )
 
-GAME( 1992, dinorex,    0,        dinorex,   dinorex, driver_device,   0,        ROT0,   "Taito Corporation Japan",   "Dino Rex (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dinorexu,   dinorex,  dinorex,   dinorexu, driver_device,  0,        ROT0,   "Taito America Corporation", "Dino Rex (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, dinorexj,   dinorex,  dinorex,   dinorexj, driver_device,  0,        ROT0,   "Taito Corporation",         "Dino Rex (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, deadconx,   0,        deadconx,  deadconx,   taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Dead Connection (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, deadconxj,  deadconx, deadconxj, deadconxj,  taitof2_state, 0,        ROT0,   "Taito Corporation",         "Dead Connection (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, qjinsei,    0,        qjinsei,   qjinsei, driver_device,   0,        ROT0,   "Taito Corporation",         "Quiz Jinsei Gekijoh (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dinorex,    0,        dinorex,   dinorex,    taitof2_state, 0,        ROT0,   "Taito Corporation Japan",   "Dino Rex (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dinorexu,   dinorex,  dinorex,   dinorexu,   taitof2_state, 0,        ROT0,   "Taito America Corporation", "Dino Rex (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, dinorexj,   dinorex,  dinorex,   dinorexj,   taitof2_state, 0,        ROT0,   "Taito Corporation",         "Dino Rex (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, qcrayon,    0,        qcrayon,   qcrayon, driver_device,   0,        ROT0,   "Taito Corporation",         "Quiz Crayon Shinchan (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, qjinsei,    0,        qjinsei,   qjinsei,    taitof2_state, 0,        ROT0,   "Taito Corporation",         "Quiz Jinsei Gekijoh (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, qcrayon2,   0,        qcrayon2,  qcrayon2, driver_device,  0,        ROT0,   "Taito Corporation",         "Crayon Shinchan Orato Asobo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, qcrayon,    0,        qcrayon,   qcrayon,    taitof2_state, 0,        ROT0,   "Taito Corporation",         "Quiz Crayon Shinchan (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, driftout,   0,        driftout,  driftout, driver_device,  0,        ROT270, "Visco",                     "Drift Out (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, driftoutj,  driftout, driftout,  driftout, driver_device,  0,        ROT270, "Visco",                     "Drift Out (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, driveout,   driftout, driveout,  driftout, taitof2_state,  driveout, ROT270, "bootleg",                   "Drive Out (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, qcrayon2,   0,        qcrayon2,  qcrayon2,   taitof2_state, 0,        ROT0,   "Taito Corporation",         "Crayon Shinchan Orato Asobo (Japan)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1991, driftout,   0,        driftout,  driftout,   taitof2_state, 0,        ROT270, "Visco",                     "Drift Out (Europe)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, driftoutj,  driftout, driftout,  driftout,   taitof2_state, 0,        ROT270, "Visco",                     "Drift Out (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, driveout,   driftout, driveout,  driftout,   taitof2_state, driveout, ROT270, "bootleg",                   "Drive Out (bootleg)", MACHINE_SUPPORTS_SAVE )

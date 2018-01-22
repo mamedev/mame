@@ -169,8 +169,6 @@ TODO:
 - bassline imperfect. This is just the square wave output of the 5232 at the moment.
   It should go through analog stages.
 
-- properly emulate the 8155 on the sound board.
-
 - implement low-pass filters on the DAC output
 
 - the purpose of the sound PROM is unclear. From the schematics, it seems it
@@ -362,13 +360,17 @@ D                                                                               
 
 #include "emu.h"
 #include "includes/equites.h"
+
 #include "cpu/alph8201/alph8201.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/74259.h"
+#include "machine/i8155.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 #define FRQ_ADJUSTER_TAG    "FRQ"
 
@@ -385,9 +387,10 @@ D                                                                               
 /******************************************************************************/
 // Sound
 
-TIMER_CALLBACK_MEMBER(equites_state::equites_nmi_callback)
+WRITE_LINE_MEMBER(equites_state::equites_8155_timer_pulse)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (!state) // active low
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(equites_state::equites_frq_adjuster_callback)
@@ -413,7 +416,7 @@ WRITE8_MEMBER(equites_state::equites_c0f8_w)
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
 			// Note: solder pad CP3 on the pcb would allow to disable this
-			generic_pulse_irq_line(*m_audiocpu, I8085_RST75_LINE, 1);
+			m_audiocpu->pulse_input_line(I8085_RST75_LINE, m_audiocpu->minimum_quantum_time());
 			break;
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
@@ -518,10 +521,33 @@ WRITE8_MEMBER(equites_state::equites_dac_latch_w)
 	equites_update_dac();
 }
 
+WRITE8_MEMBER(equites_state::equites_8155_porta_w)
+{
+	m_eq8155_port_a = data;
+	m_msm->set_output_gain(0, (data >> 4) / 15.0);  /* group1 from msm5232 */
+	m_msm->set_output_gain(1, (data >> 4) / 15.0);  /* group1 from msm5232 */
+	m_msm->set_output_gain(2, (data >> 4) / 15.0);  /* group1 from msm5232 */
+	m_msm->set_output_gain(3, (data >> 4) / 15.0);  /* group1 from msm5232 */
+	m_msm->set_output_gain(4, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
+	m_msm->set_output_gain(5, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
+	m_msm->set_output_gain(6, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
+	m_msm->set_output_gain(7, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
+}
+
 WRITE8_MEMBER(equites_state::equites_8155_portb_w)
 {
 	m_eq8155_port_b = data;
 	equites_update_dac();
+}
+
+WRITE8_MEMBER(equites_state::equites_8155_portc_w)
+{
+	m_eq8155_port_c = data;
+	m_msm->set_output_gain(8, (data & 0x0f) / 15.0);    /* SOLO  8' from msm5232 */
+	if (data & 0x20)
+		m_msm->set_output_gain(9, (data & 0x0f) / 15.0);    /* SOLO 16' from msm5232 */
+	else
+		m_msm->set_output_gain(9, 0);   /* SOLO 16' from msm5232 */
 }
 
 WRITE_LINE_MEMBER(equites_state::equites_msm5232_gate)
@@ -555,47 +581,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(equites_state::splndrbt_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-WRITE8_MEMBER(equites_state::equites_8155_w)
-{
-	// FIXME proper 8155 emulation must be implemented
-	switch( offset )
-	{
-		case 0: //logerror( "8155 Command register write %x, timer command = %x, interrupt enable = %x, ports = %x\n", data, (data >> 6) & 3, (data >> 4) & 3, data & 0xf );
-			if (((data >> 6) & 3) == 3)
-				m_nmi_timer->adjust(attotime::from_hz(XTAL_6_144MHz/2 / m_timer_count), 0, attotime::from_hz(XTAL_6_144MHz/2 / m_timer_count));
-			break;
-		case 1: //logerror( "8155 I/O Port A write %x\n", data );
-			m_eq8155_port_a = data;
-			m_msm->set_output_gain(0, (data >> 4) / 15.0);  /* group1 from msm5232 */
-			m_msm->set_output_gain(1, (data >> 4) / 15.0);  /* group1 from msm5232 */
-			m_msm->set_output_gain(2, (data >> 4) / 15.0);  /* group1 from msm5232 */
-			m_msm->set_output_gain(3, (data >> 4) / 15.0);  /* group1 from msm5232 */
-			m_msm->set_output_gain(4, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
-			m_msm->set_output_gain(5, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
-			m_msm->set_output_gain(6, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
-			m_msm->set_output_gain(7, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
-			break;
-		case 2: //logerror( "8155 I/O Port B write %x\n", data );
-			equites_8155_portb_w(space, 0, data);
-			break;
-		case 3: //logerror( "8155 I/O Port C (or control) write %x\n", data );
-			m_eq8155_port_c = data;
-			m_msm->set_output_gain(8, (data & 0x0f) / 15.0);    /* SOLO  8' from msm5232 */
-			if (data & 0x20)
-				m_msm->set_output_gain(9, (data & 0x0f) / 15.0);    /* SOLO 16' from msm5232 */
-			else
-				m_msm->set_output_gain(9, 0);   /* SOLO 16' from msm5232 */
-
-			break;
-		case 4: //logerror( "8155 Timer low 8 bits write %x\n", data );
-			m_timer_count = (m_timer_count & 0xff00) | data;
-			break;
-		case 5: //logerror( "8155 Timer high 6 bits write %x, timer mode %x\n", data & 0x3f, (data >> 6) & 3);
-			m_timer_count = (m_timer_count & 0x00ff) | ((data & 0x3f) << 8);
-			break;
-	}
-}
-
 
 
 /******************************************************************************/
@@ -608,7 +593,7 @@ CUSTOM_INPUT_MEMBER(equites_state::gekisou_unknown_bit_r)
 
 WRITE16_MEMBER(equites_state::gekisou_unknown_bit_w)
 {
-	// data bit is A16 (offset)
+	// data bit is A17 (offset)
 	m_gekisou_unknown_bit = (offset == 0) ? 0 : 1;;
 }
 
@@ -637,20 +622,18 @@ WRITE8_MEMBER(equites_state::mcu_ram_w)
 		m_mcuram[offset] = data;
 }
 
-WRITE16_MEMBER(equites_state::mcu_start_w)
+WRITE_LINE_MEMBER(equites_state::mcu_start_w)
 {
-	// data bit is A16 (offset)
 	if (m_fakemcu == nullptr)
-		m_alpha_8201->mcu_start_w(offset != 0);
+		m_alpha_8201->mcu_start_w(state != 0);
 	else
-		m_fakemcu->set_input_line(INPUT_LINE_HALT, (offset != 0) ? ASSERT_LINE : CLEAR_LINE);
+		m_fakemcu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE16_MEMBER(equites_state::mcu_switch_w)
+WRITE_LINE_MEMBER(equites_state::mcu_switch_w)
 {
-	// data bit is A16 (offset)
 	if (m_fakemcu == nullptr)
-		m_alpha_8201->bus_dir_w(offset == 0);
+		m_alpha_8201->bus_dir_w(state == 0);
 }
 
 
@@ -669,9 +652,7 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE8(mcu_ram_r, mcu_ram_w, 0x00ff)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x184000, 0x184001) AM_SELECT(0x020000) AM_WRITE(equites_flipw_w)
-	AM_RANGE(0x188000, 0x188001) AM_SELECT(0x020000) AM_WRITE(mcu_start_w)
-	AM_RANGE(0x18c000, 0x18c001) AM_SELECT(0x020000) AM_WRITE(mcu_switch_w)
+	AM_RANGE(0x180000, 0x180001) AM_SELECT(0x03c000) AM_DEVWRITE8_MOD("mainlatch", ls259_device, write_a3, rshift<13>, 0xff00)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("IN0") AM_WRITE(equites_scrollreg_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE8(equites_bgcolor_w, 0xff00)
 	AM_RANGE(0x780000, 0x780001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
@@ -690,11 +671,8 @@ static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x020000) AM_WRITE8(equites_bgcolor_w, 0xff00) // note: addressmask does not apply here
-	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x020000) AM_WRITE8(equites_flipb_w, 0x00ff)
-	AM_RANGE(0x0c4000, 0x0c4001) AM_SELECT(0x020000) AM_WRITE(mcu_start_w)
-	AM_RANGE(0x0c8000, 0x0c8001) AM_SELECT(0x020000) AM_WRITE(mcu_switch_w)
-	AM_RANGE(0x0cc000, 0x0cc001) AM_SELECT(0x020000) AM_WRITE(splndrbt_selchar_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x020000) AM_WRITE8(equites_bgcolor_w, 0xff00)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_SELECT(0x03c000) AM_DEVWRITE8_MOD("mainlatch", ls259_device, write_a3, rshift<13>, 0x00ff)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(splndrbt_bg_scrollx_w)
 	AM_RANGE(0x140000, 0x140001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(splndrbt_bg_scrolly_w)
@@ -717,11 +695,11 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, equites_state )
 	AM_RANGE(0xc0d0, 0xc0d0) AM_WRITE(equites_dac_latch_w)  // followed by 1 (and usually 0) on 8155 port B
 	AM_RANGE(0xc0e0, 0xc0e0) AM_WRITE(equites_dac_latch_w)  // followed by 2 (and usually 0) on 8155 port B
 	AM_RANGE(0xc0f8, 0xc0ff) AM_WRITE(equites_c0f8_w)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM
+	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("audio8155", i8155_device, memory_r, memory_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, equites_state )
-	AM_RANGE(0x00e0, 0x00e5) AM_WRITE(equites_8155_w)
+	AM_RANGE(0x00e0, 0x00e7) AM_DEVREADWRITE("audio8155", i8155_device, io_r, io_w)
 ADDRESS_MAP_END
 
 
@@ -799,7 +777,7 @@ static INPUT_PORTS_START( gekisou )
 	PORT_START("IN1")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Settings") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SERVICE ) // settings
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1050,11 +1028,18 @@ static const char *const alphamc07_sample_names[] =
 #define MSM5232_BASE_VOLUME 1.0
 
 // the sound board is the same in all games
-static MACHINE_CONFIG_FRAGMENT( common_sound )
+MACHINE_CONFIG_START(equites_state::common_sound)
 
 	MCFG_CPU_ADD("audiocpu", I8085A, XTAL_6_144MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
+	MCFG_I8085A_CLK_OUT_DEVICE("audio8155")
+
+	MCFG_DEVICE_ADD("audio8155", I8155, 0)
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(equites_state, equites_8155_porta_w))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(equites_state, equites_8155_portb_w))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(equites_state, equites_8155_portc_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(equites_state, equites_8155_timer_pulse))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -1133,24 +1118,26 @@ void equites_state::machine_start()
 	save_item(NAME(m_timer_count));
 	save_item(NAME(m_gekisou_unknown_bit));
 
-	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_nmi_callback), this));
-
 	m_adjuster_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_frq_adjuster_callback), this));
 	m_adjuster_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 
 void equites_state::machine_reset()
 {
-	flip_screen_set(0);
 }
 
 
-static MACHINE_CONFIG_START( equites, equites_state )
+MACHINE_CONFIG_START(equites_state::equites)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(equites_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, equites_scanline, "screen", 0, 1)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(equites_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(equites_state, mcu_start_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(equites_state, mcu_switch_w))
 
 	MCFG_FRAGMENT_ADD(common_sound)
 
@@ -1175,7 +1162,7 @@ static MACHINE_CONFIG_START( equites, equites_state )
 	MCFG_VIDEO_START_OVERRIDE(equites_state,equites)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gekisou, equites )
+MACHINE_CONFIG_DERIVED(equites_state::gekisou, equites)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1190,12 +1177,18 @@ static MACHINE_CONFIG_DERIVED( gekisou, equites )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( splndrbt, equites_state )
+MACHINE_CONFIG_START(equites_state::splndrbt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(splndrbt_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, splndrbt_scanline, "screen", 0, 1)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(equites_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(equites_state, mcu_start_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(equites_state, mcu_switch_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(equites_state, splndrbt_selchar_w))
 
 	MCFG_FRAGMENT_ADD(common_sound)
 
@@ -1218,7 +1211,7 @@ static MACHINE_CONFIG_START( splndrbt, equites_state )
 	MCFG_VIDEO_START_OVERRIDE(equites_state,splndrbt)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hvoltage, splndrbt )
+MACHINE_CONFIG_DERIVED(equites_state::hvoltage, splndrbt)
 
 	// mcu not dumped, so add simulated mcu
 	MCFG_CPU_ADD("mcu", ALPHA8301L, 4000000/8)

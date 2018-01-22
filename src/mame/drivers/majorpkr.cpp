@@ -449,18 +449,24 @@
 
 **********************************************************************************/
 
+#include "emu.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
+#include "machine/nvram.h"
+#include "sound/okim6295.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "majorpkr.lh"
+
+
 #define MASTER_CLOCK    XTAL_12MHz
 #define CPU_CLOCK       (MASTER_CLOCK / 2)   // 6 MHz, measured.
 #define OKI_CLOCK       (MASTER_CLOCK / 8)   // 1.5 MHz, measured.
 #define CRTC_CLOCK      (MASTER_CLOCK / 16)  // 750 kHz, measured.
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/mc6845.h"
-#include "sound/okim6295.h"
-#include "machine/bankdev.h"
-#include "machine/nvram.h"
-#include "majorpkr.lh"
 
 
 class majorpkr_state : public driver_device
@@ -505,6 +511,7 @@ public:
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
 	virtual void video_start() override;
 	uint32_t screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void majorpkr(machine_config &config);
 };
 
 
@@ -740,7 +747,7 @@ static ADDRESS_MAP_START( map, AS_PROGRAM, 8, majorpkr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( palettebanks, AS_PROGRAM, 8, majorpkr_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vrambanks, AS_PROGRAM, 8, majorpkr_state )
@@ -979,7 +986,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
+MACHINE_CONFIG_START(majorpkr_state::majorpkr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)  // 6 MHz.
 	MCFG_CPU_PROGRAM_MAP(map)
@@ -989,15 +996,15 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 	MCFG_DEVICE_ADD("palette_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(palettebanks)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(13)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
 
 	MCFG_DEVICE_ADD("vram_bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vrambanks)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(13)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1020,7 +1027,7 @@ static MACHINE_CONFIG_START( majorpkr, majorpkr_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)  // clock frequency & pin 7 verified.
+	MCFG_OKIM6295_ADD("oki", OKI_CLOCK, PIN7_HIGH)  // clock frequency & pin 7 verified.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

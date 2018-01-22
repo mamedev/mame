@@ -5,8 +5,10 @@
  *
  */
 
-#ifndef TRIDENT_H_
-#define TRIDENT_H_
+#ifndef MAME_BUS_ISA_TRIDENT_H
+#define MAME_BUS_ISA_TRIDENT_H
+
+#pragma once
 
 #include "video/pc_vga.h"
 
@@ -15,9 +17,6 @@
 class trident_vga_device :  public svga_device
 {
 public:
-	// construction/destruction
-	trident_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	virtual READ8_MEMBER(port_03c0_r) override;
 	virtual WRITE8_MEMBER(port_03c0_w) override;
 	virtual READ8_MEMBER(port_03d0_r) override;
@@ -38,6 +37,9 @@ public:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 protected:
+	// construction/destruction
+	trident_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -160,7 +162,7 @@ public:
 };
 
 // device type definition
-extern const device_type TRIDENT_VGA;
-extern const device_type TVGA9000_VGA;
+DECLARE_DEVICE_TYPE(TRIDENT_VGA,  tgui9860_device)
+DECLARE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device)
 
-#endif /* TRIDENT_H_ */
+#endif // MAME_BUS_ISA_TRIDENT_H

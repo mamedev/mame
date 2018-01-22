@@ -11,12 +11,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/gen_latch.h"
-#include "machine/watchdog.h"
-#include "audio/timeplt.h"
 #include "includes/pooyan.h"
 #include "includes/konamipt.h"
+#include "audio/timeplt.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/74259.h"
+#include "machine/gen_latch.h"
+#include "machine/watchdog.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        XTAL_18_432MHz
@@ -35,11 +39,23 @@ INTERRUPT_GEN_MEMBER(pooyan_state::interrupt)
 }
 
 
-WRITE8_MEMBER(pooyan_state::irq_enable_w)
+WRITE_LINE_MEMBER(pooyan_state::irq_enable_w)
 {
-	m_irq_enable = data & 1;
+	m_irq_enable = state;
 	if (!m_irq_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+
+WRITE_LINE_MEMBER(pooyan_state::coin_counter_1_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+
+WRITE_LINE_MEMBER(pooyan_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 
@@ -63,10 +79,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pooyan_state )
 	AM_RANGE(0xa0e0, 0xa0e0) AM_MIRROR(0x5e1f) AM_READ_PORT("DSW0")
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x5e7f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x5e7f) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xa180, 0xa180) AM_MIRROR(0x5e78) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa181, 0xa181) AM_MIRROR(0x5e78) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)
-	AM_RANGE(0xa183, 0xa183) AM_MIRROR(0x5e78) AM_WRITENOP // ???
-	AM_RANGE(0xa187, 0xa187) AM_MIRROR(0x5e78) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xa180, 0xa187) AM_MIRROR(0x5e78) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -179,19 +192,32 @@ void pooyan_state::machine_start()
 	save_item(NAME(m_irq_enable));
 }
 
+static ADDRESS_MAP_START( timeplt_sound_map, AS_PROGRAM, 8, timeplt_audio_device )
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x8000, 0xffff) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, filter_w)
+ADDRESS_MAP_END
 
-void pooyan_state::machine_reset()
-{
-	m_irq_enable = 0;
-}
 
-
-static MACHINE_CONFIG_START( pooyan, pooyan_state )
+MACHINE_CONFIG_START(pooyan_state::pooyan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pooyan_state,  interrupt)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B2
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(pooyan_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(pooyan_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(pooyan_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // PAY OUT - not used
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pooyan_state, flipscreen_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -212,7 +238,40 @@ static MACHINE_CONFIG_START( pooyan, pooyan_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_FRAGMENT_ADD(timeplt_sound)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("tpsound",Z80,MASTER_CLOCK/8)
+	MCFG_CPU_PROGRAM_MAP(timeplt_sound_map)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
+
+	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/8)
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("timeplt_audio", timeplt_audio_device, portB_r))
+	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.60)
+	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.60)
+	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.60)
+
+	MCFG_SOUND_ADD("ay2", AY8910, MASTER_CLOCK/8)
+	MCFG_SOUND_ROUTE(0, "filter.1.0", 0.60)
+	MCFG_SOUND_ROUTE(1, "filter.1.1", 0.60)
+	MCFG_SOUND_ROUTE(2, "filter.1.2", 0.60)
+
+	MCFG_FILTER_RC_ADD("filter.0.0", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.0.1", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.0.2", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_FILTER_RC_ADD("filter.1.0", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.1.1", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.1.2", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -306,6 +365,6 @@ ROM_END
  *************************************/
 
 //    YEAR, NAME,    PARENT, MACHINE,INPUT,  INIT,MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1982, pooyan,  0,      pooyan, pooyan, driver_device, 0,   ROT90,  "Konami", "Pooyan", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pooyans, pooyan, pooyan, pooyan, driver_device, 0,   ROT90,  "Konami (Stern Electronics license)", "Pooyan (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, pootan,  pooyan, pooyan, pooyan, driver_device, 0,   ROT90,  "bootleg", "Pootan", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pooyan,  0,      pooyan, pooyan, pooyan_state, 0,   ROT90,  "Konami", "Pooyan", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pooyans, pooyan, pooyan, pooyan, pooyan_state, 0,   ROT90,  "Konami (Stern Electronics license)", "Pooyan (Stern Electronics)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, pootan,  pooyan, pooyan, pooyan, pooyan_state, 0,   ROT90,  "bootleg", "Pootan", MACHINE_SUPPORTS_SAVE )

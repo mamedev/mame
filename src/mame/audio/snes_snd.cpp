@@ -152,22 +152,15 @@ static const int ENVCNT[0x20]
 #define LEtoME16( x ) little_endianize_int16(x)
 #define MEtoLE16( x ) little_endianize_int16(x)
 
+ALLOW_SAVE_TYPE(snes_sound_device::env_state_t32);
 
-const device_type SNES = &device_creator<snes_sound_device>;
+
+
+DEFINE_DEVICE_TYPE(SNES, snes_sound_device, "snes_sound", "SNES Custom DSP (SPC700)")
 
 snes_sound_device::snes_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-						: device_t(mconfig, SNES, "SNES Custom DSP (SPC700)", tag, owner, clock, "snes_sound", __FILE__),
-							device_sound_interface(mconfig, *this)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void snes_sound_device::device_config_complete()
+	: device_t(mconfig, SNES, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
 {
 }
 
@@ -184,17 +177,8 @@ void snes_sound_device::device_start()
 	/* put IPL image at the top of RAM */
 	memcpy(m_ipl_region, machine().root_device().memregion("sound_ipl")->base(), 64);
 
-	/* Initialize the timers */
-	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
-	m_timer[0]->adjust(attotime::from_hz(8000),  0, attotime::from_hz(8000));
-	m_timer[0]->enable(false);
-	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
-	m_timer[1]->adjust(attotime::from_hz(8000),  1, attotime::from_hz(8000));
-	m_timer[1]->enable(false);
-	m_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(snes_sound_device::spc_timer),this));
-	m_timer[2]->adjust(attotime::from_hz(64000), 2, attotime::from_hz(64000));
-	m_timer[2]->enable(false);
-
+	m_tick_timer = timer_alloc(TIMER_TICK_ID);
+	
 	state_register();
 	save_pointer(NAME(m_ram.get()), SNES_SPCRAM_SIZE);
 }
@@ -205,19 +189,63 @@ void snes_sound_device::device_start()
 
 void snes_sound_device::device_reset()
 {
+	int i;
 	/* default to ROM visible */
 	m_ram[0xf1] = 0x80;
 
 	/* Sort out the ports */
-	for (int i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++)
 	{
 		m_port_in[i] = 0;
 		m_port_out[i] = 0;
 	}
 
+	for(i=0; i<3; i++)
+	{
+		m_timer_enabled[i] = false;
+		m_TnDIV[i] = 256;
+		m_counter[i] = 0;
+		m_subcounter[i] = 0;
+	}
+	
+	attotime period = attotime::from_hz(64000);
+	m_tick_timer->adjust(period, 0, period);
+	
 	dsp_reset();
 }
 
+inline void snes_sound_device::update_timer_tick(uint8_t which)
+{
+	if(m_timer_enabled[which] == false)
+		return;
+	
+	m_subcounter[which]++;
+	
+	// if timer channel is 0 or 1 we update at 64000/8
+	if(m_subcounter[which] >= 8 || which == 2)
+	{
+		m_subcounter[which] = 0;
+		m_counter[which]++;
+		if (m_counter[which] >= m_TnDIV[which] ) // minus =
+		{
+			m_counter[which] = 0;
+			m_ram[0xfd + which]++;
+			m_ram[0xfd + which] &= 0x0f;
+		}
+	}
+}
+
+void snes_sound_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if(id != TIMER_TICK_ID)
+	{
+		assert_always(false, "Unknown id in snes_sound_device::device_timer");
+		return;
+	}
+	
+	for(int ch=0;ch<3;ch++)
+		update_timer_tick(ch);
+}
 
 
 /*****************************************************************************
@@ -358,7 +386,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 			unable to find any pattern.  I doubt it will matter though, so
 			we'll go ahead and do the full time for now. */
 			vp->envcnt   = CNT_INIT;
-			vp->envstate = ATTACK;
+			vp->envstate = env_state_t32::ATTACK;
 		}
 
 		if (m_dsp_regs[0x4c] & m & ~m_dsp_regs[0x5c])
@@ -375,7 +403,7 @@ void snes_sound_device::dsp_update( short *sound_ptr )
 		if (m_keys & m_dsp_regs[0x5c] & m)
 		{
 			/* Voice was keyed off */
-			vp->envstate = RELEASE;
+			vp->envstate = env_state_t32::RELEASE;
 			vp->on_cnt   = 0;
 
 #ifdef DBG_KEY
@@ -757,7 +785,7 @@ int snes_sound_device::advance_envelope( int v )
 
 	envx = m_voice_state[v].envx;
 
-	if (m_voice_state[v].envstate == RELEASE)
+	if (m_voice_state[v].envstate == env_state_t32::RELEASE)
 	{
 		/* Docs: "When in the state of "key off". the "click" sound is prevented
 		by the addition of the fixed value 1/256"  WTF???  Alright, I'm going
@@ -790,7 +818,7 @@ int snes_sound_device::advance_envelope( int v )
 	{
 		switch (m_voice_state[v].envstate)
 		{
-		case ATTACK:
+		case env_state_t32::ATTACK:
 			/* Docs are very confusing.  "AR is multiplied by the fixed value
 			1/64..."  I believe it means to add 1/64th to ENVX once every
 			time ATTACK is updated, and that's what I'm going to implement. */
@@ -818,7 +846,7 @@ int snes_sound_device::advance_envelope( int v )
 			if (envx > 0x7ff)
 			{
 				envx = 0x7ff;
-				m_voice_state[v].envstate = DECAY;
+				m_voice_state[v].envstate = env_state_t32::DECAY;
 			}
 
 #ifdef DBG_ENV
@@ -828,7 +856,7 @@ int snes_sound_device::advance_envelope( int v )
 			m_voice_state[v].envx = envx;
 			break;
 
-		case DECAY:
+		case env_state_t32::DECAY:
 			/* Docs: "DR... [is multiplied] by the fixed value 1-1/256."
 			Well, at least that makes some sense.  Multiplying ENVX by
 			255/256 every time DECAY is updated. */
@@ -842,7 +870,7 @@ int snes_sound_device::advance_envelope( int v )
 			}
 
 			if (envx <= 0x100 * (SL(v) + 1))
-				m_voice_state[v].envstate = SUSTAIN;
+				m_voice_state[v].envstate = env_state_t32::SUSTAIN;
 
 #ifdef DBG_ENV
 			logerror("ENV voice %d: envx=%03X, state=DECAY\n", v, envx);
@@ -850,7 +878,7 @@ int snes_sound_device::advance_envelope( int v )
 
 			break;
 
-		case SUSTAIN:
+		case env_state_t32::SUSTAIN:
 			/* Docs: "SR [is multiplied] by the fixed value 1-1/256."
 			Multiplying ENVX by 255/256 every time SUSTAIN is updated. */
 #ifdef DBG_ENV
@@ -874,7 +902,7 @@ int snes_sound_device::advance_envelope( int v )
 			/* Note: no way out of this state except by explicit KEY OFF (or switch to GAIN). */
 			break;
 
-		case RELEASE:   /* Handled earlier to prevent GAIN mode from stopping KEY OFF events */
+		case env_state_t32::RELEASE:   /* Handled earlier to prevent GAIN mode from stopping KEY OFF events */
 			break;
 		}
 	}
@@ -994,20 +1022,6 @@ int snes_sound_device::advance_envelope( int v )
 	return envx;
 }
 
-
-TIMER_CALLBACK_MEMBER( snes_sound_device::spc_timer )
-{
-	int which = param;
-
-	m_counter[which]++;
-	if (m_counter[which] >= m_ram[0xfa + which] ) // minus =
-	{
-		m_counter[which] = 0;
-		m_ram[0xfd + which]++;
-		m_ram[0xfd + which] &= 0x0f;
-	}
-}
-
 /*-------------------------------------------------
     spc700_set_volume - sets SPC700 volume level
     for both speakers, used for fade in/out effects
@@ -1073,7 +1087,7 @@ READ8_MEMBER( snes_sound_device::spc_io_r )
 		case 0x5:       /* Port 1 */
 		case 0x6:       /* Port 2 */
 		case 0x7:       /* Port 3 */
-			// osd_printf_debug("SPC: rd %02x @ %d, PC=%x\n", m_port_in[offset - 4], offset - 4, space.device().safe_pc());
+			// osd_printf_debug("SPC: rd %02x @ %d, %s\n", m_port_in[offset - 4], offset - 4, machine().describe_context());
 			return m_port_in[offset - 4];
 		case 0x8: //normal RAM, can be read even if the ram disabled flag ($f0 bit 1) is active
 		case 0x9:
@@ -1105,14 +1119,15 @@ WRITE8_MEMBER( snes_sound_device::spc_io_w )
 		case 0x1:       /* Control */
 			for (int i = 0; i < 3; i++)
 			{
-				if (BIT(data, i) && !m_enabled[i])
+				if (BIT(data, i) && m_timer_enabled[i] == false)
 				{
+					m_subcounter[i] = 0;
 					m_counter[i] = 0;
 					m_ram[0xfd + i] = 0;
 				}
 
-				m_enabled[i] = BIT(data, i);
-				m_timer[i]->enable(m_enabled[i]);
+				m_timer_enabled[i] = BIT(data, i);
+				//m_timer[i]->enable(m_timer_enabled[i]);
 			}
 
 			if (BIT(data, 4))
@@ -1139,15 +1154,19 @@ WRITE8_MEMBER( snes_sound_device::spc_io_w )
 		case 0x5:       /* Port 1 */
 		case 0x6:       /* Port 2 */
 		case 0x7:       /* Port 3 */
-			// osd_printf_debug("SPC: %02x to APU @ %d (PC=%x)\n", data, offset & 3, space.device().safe_pc());
+			// osd_printf_debug("SPC: %02x to APU @ %d %s\n", data, offset & 3, machine().describe_context());
 			m_port_out[offset - 4] = data;
-			space.machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
+			// Unneeded, we already run at perfect_interleave
+			// machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 			break;
 		case 0xa:       /* Timer 0 */
 		case 0xb:       /* Timer 1 */
 		case 0xc:       /* Timer 2 */
-			if (data == 0)
-				data = 255;
+			// if 0 then TnDiv is divided by 256, otherwise it's divided by 1 to 255
+			if(data == 0)
+				m_TnDIV[offset - 0xa] = 256;
+			else
+				m_TnDIV[offset - 0xa] = data;
 			break;
 		case 0xd:       /* Counter 0 */
 		case 0xe:       /* Counter 1 */
@@ -1210,7 +1229,8 @@ void snes_sound_device::state_register()
 	save_item(NAME(m_echo_ptr));
 #endif
 
-	save_item(NAME(m_enabled));
+	save_item(NAME(m_timer_enabled));
+	save_item(NAME(m_subcounter));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_port_in));
 	save_item(NAME(m_port_out));

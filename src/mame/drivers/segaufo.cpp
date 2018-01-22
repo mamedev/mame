@@ -45,8 +45,10 @@
 #include "cpu/z80/z80.h"
 #include "machine/pit8253.h"
 #include "machine/315_5296.h"
+#include "machine/timer.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
+#include "speaker.h"
 
 // the layouts are very similar to eachother
 #include "newufo.lh"
@@ -125,6 +127,10 @@ public:
 	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(simulate_xyz);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_info);
+	void ufomini(machine_config &config);
+	void ufo21(machine_config &config);
+	void newufo(machine_config &config);
+	void ufo800(machine_config &config);
 };
 
 
@@ -373,7 +379,7 @@ WRITE8_MEMBER(ufo_state::ex_stepper_w)
 {
 	// stepper motor sequence is: 6 c 9 3 6 c 9 3..
 	// which means d0 and d3 are swapped when compared with UFO board hardware
-	stepper_w(space, offset, BITSWAP8(data,4,6,5,7,0,2,1,3));
+	stepper_w(space, offset, bitswap<8>(data,4,6,5,7,0,2,1,3));
 }
 
 WRITE8_MEMBER(ufo_state::ex_cp_lamps_w)
@@ -746,7 +752,7 @@ void ufo_state::machine_start()
 	save_item(NAME(m_stepper));
 }
 
-static MACHINE_CONFIG_START( newufo, ufo_state )
+MACHINE_CONFIG_START(ufo_state::newufo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)
@@ -794,7 +800,7 @@ static MACHINE_CONFIG_START( newufo, ufo_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ufomini, newufo )
+MACHINE_CONFIG_DERIVED(ufo_state::ufomini, newufo)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("io1")
@@ -804,7 +810,7 @@ static MACHINE_CONFIG_DERIVED( ufomini, newufo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ufo21, newufo )
+MACHINE_CONFIG_DERIVED(ufo_state::ufo21, newufo)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -827,7 +833,7 @@ static MACHINE_CONFIG_DERIVED( ufo21, newufo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ufo800, newufo )
+MACHINE_CONFIG_DERIVED(ufo_state::ufo800, newufo)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -898,10 +904,10 @@ ROM_START( ufo800 )
 ROM_END
 
 
-GAMEL( 1991, newufo,       0,      newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (standard)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, newufo_sonic, newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Sonic The Hedgehog)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, newufo_nfl,   newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Team NFL)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, newufo_xmas,  newufo, newufo,  newufo,  driver_device, 0, ROT0, "Sega", "New UFO Catcher (Christmas season ROM kit)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
-GAMEL( 1991, ufomini,      0,      ufomini, ufomini, driver_device, 0, ROT0, "Sega", "UFO Catcher Mini", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufomini )
-GAMEL( 1996, ufo21,        0,      ufo21,   ufo21,   driver_device, 0, ROT0, "Sega", "UFO Catcher 21", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo21 )
-GAMEL( 1998, ufo800,       0,      ufo800,  ufo800,  driver_device, 0, ROT0, "Sega", "UFO Catcher 800", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo800 )
+GAMEL( 1991, newufo,       0,      newufo,  newufo,  ufo_state, 0, ROT0, "Sega", "New UFO Catcher (standard)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, newufo_sonic, newufo, newufo,  newufo,  ufo_state, 0, ROT0, "Sega", "New UFO Catcher (Sonic The Hedgehog)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, newufo_nfl,   newufo, newufo,  newufo,  ufo_state, 0, ROT0, "Sega", "New UFO Catcher (Team NFL)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, newufo_xmas,  newufo, newufo,  newufo,  ufo_state, 0, ROT0, "Sega", "New UFO Catcher (Christmas season ROM kit)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_newufo )
+GAMEL( 1991, ufomini,      0,      ufomini, ufomini, ufo_state, 0, ROT0, "Sega", "UFO Catcher Mini", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufomini )
+GAMEL( 1996, ufo21,        0,      ufo21,   ufo21,   ufo_state, 0, ROT0, "Sega", "UFO Catcher 21", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo21 )
+GAMEL( 1998, ufo800,       0,      ufo800,  ufo800,  ufo_state, 0, ROT0, "Sega", "UFO Catcher 800", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_ufo800 )

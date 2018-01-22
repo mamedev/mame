@@ -1,14 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:Raphael Nabet
 #include "emu.h"
-#include "cpu/pdp1/tx0.h"
+#include "tx0dasm.h"
 
-static offs_t internal_disasm_tx0_64kw(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+u32 tx0_64kw_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t tx0_64kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	int md;
 	int x;
 
-	md = oprom[0] << 24 | oprom[1] << 16 | oprom[2] << 8 | oprom[3];
+	md = opcodes.r32(pc);
 
 	x = md & 0177777;
 	switch (md >> 16)
@@ -29,21 +34,17 @@ static offs_t internal_disasm_tx0_64kw(cpu_device *device, std::ostream &stream,
 	return 1;
 }
 
-CPU_DISASSEMBLE(tx0_64kw)
+u32 tx0_8kw_disassembler::opcode_alignment() const
 {
-	std::ostringstream stream;
-	offs_t result = internal_disasm_tx0_64kw(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	return 1;
 }
 
-static offs_t internal_disasm_tx0_8kw(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+offs_t tx0_8kw_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	int md;
 	int x;
 
-	md = oprom[0] << 24 | oprom[1] << 16 | oprom[2] << 8 | oprom[3];
+	md = opcodes.r32(pc);
 
 	x = md & 0017777;
 	switch (md >> 13)
@@ -129,13 +130,4 @@ static offs_t internal_disasm_tx0_8kw(cpu_device *device, std::ostream &stream, 
 		break;
 	}
 	return 1;
-}
-
-CPU_DISASSEMBLE(tx0_8kw)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_tx0_8kw(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

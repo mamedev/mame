@@ -13,6 +13,10 @@ driver by
 Main CPU : z80 (with encryption, external to z80)
 Sound CPU: custom T5182 cpu (like seibu sound system but with internal code)
 
+The SEI8608B sound board, which features the T5182 "CPU CUSTOM" and YM2151, also
+has unpopulated locations for a 76489AN, 2x MSM5205, 2x 27512 EPROM (presumably
+for ADPCM samples), and additional TTL chips to support all these.
+
 $e000 - coins (two bytes)
 $e2b7 - player 1 energy
 
@@ -25,8 +29,9 @@ TODO:
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/darkmist.h"
+#include "cpu/z80/z80.h"
+#include "speaker.h"
 
 void darkmist_state::machine_start()
 {
@@ -63,7 +68,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, darkmist_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, darkmist_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, darkmist_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -232,7 +237,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
 
 
 
-static MACHINE_CONFIG_START( darkmist, darkmist_state )
+MACHINE_CONFIG_START(darkmist_state::darkmist)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(memmap)
@@ -331,7 +336,7 @@ void darkmist_state::decrypt_fgbgtiles(uint8_t* rom, int size)
 
 		w1 = (rom[i + 0*size/2] << 8) + rom[i + 1*size/2];
 
-		w1 = BITSWAP16(w1, 9,14,7,2, 6,8,3,15,  10,13,5,12,  0,11,4,1);
+		w1 = bitswap<16>(w1, 9,14,7,2, 6,8,3,15,  10,13,5,12,  0,11,4,1);
 
 		buf[i + 0*size/2] = w1 >> 8;
 		buf[i + 1*size/2] = w1 & 0xff;
@@ -340,7 +345,7 @@ void darkmist_state::decrypt_fgbgtiles(uint8_t* rom, int size)
 	/* address lines */
 	for (int i = 0;i < size;i++)
 	{
-		rom[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13, 5,4,3,2, 12,11,10,9,8, 1,0, 7,6)];
+		rom[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13, 5,4,3,2, 12,11,10,9,8, 1,0, 7,6)];
 	}
 }
 
@@ -363,7 +368,7 @@ void darkmist_state::decrypt_gfx()
 
 		w1 = (rom[i + 0*size/2] << 8) + rom[i + 1*size/2];
 
-		w1 = BITSWAP16(w1, 9,14,7,2, 6,8,3,15,  10,13,5,12,  0,11,4,1);
+		w1 = bitswap<16>(w1, 9,14,7,2, 6,8,3,15,  10,13,5,12,  0,11,4,1);
 
 		buf[i + 0*size/2] = w1 >> 8;
 		buf[i + 1*size/2] = w1 & 0xff;
@@ -372,7 +377,7 @@ void darkmist_state::decrypt_gfx()
 	/* address lines */
 	for (i = 0;i < size;i++)
 	{
-		rom[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,12, 3,2,1, 11,10,9,8, 0, 7,6,5,4)];
+		rom[i] = buf[bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,12, 3,2,1, 11,10,9,8, 0, 7,6,5,4)];
 	}
 
 	decrypt_fgbgtiles(memregion("bg_gfx")->base(), memregion("bg_gfx")->bytes());
@@ -389,7 +394,7 @@ void darkmist_state::decrypt_gfx()
 
 		w1 = (rom[i + 0*size/2] << 8) + rom[i + 1*size/2];
 
-		w1 = BITSWAP16(w1, 9,14,7,2, 6,8,3,15,  10,13,5,12,  0,11,4,1);
+		w1 = bitswap<16>(w1, 9,14,7,2, 6,8,3,15,  10,13,5,12,  0,11,4,1);
 
 		buf[i + 0*size/2] = w1 >> 8;
 		buf[i + 1*size/2] = w1 & 0xff;
@@ -398,7 +403,7 @@ void darkmist_state::decrypt_gfx()
 	/* address lines */
 	for (i = 0;i < size;i++)
 	{
-		rom[i] = buf[BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14, 12,11,10,9,8, 5,4,3, 13, 7,6, 1,0, 2)];
+		rom[i] = buf[bitswap<24>(i, 23,22,21,20,19,18,17,16,15,14, 12,11,10,9,8, 5,4,3, 13, 7,6, 1,0, 2)];
 	}
 }
 
@@ -407,7 +412,7 @@ void darkmist_state::decrypt_snd()
 	uint8_t *ROM = memregion("t5182_z80")->base();
 
 	for (int i = 0x0000; i < 0x8000; i++)
-		ROM[i] = BITSWAP8(ROM[i], 7, 1, 2, 3, 4, 5, 6, 0);
+		ROM[i] = bitswap<8>(ROM[i], 7, 1, 2, 3, 4, 5, 6, 0);
 }
 
 DRIVER_INIT_MEMBER(darkmist_state,darkmist)
@@ -436,8 +441,8 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 
 		if((i & 0x220) != 0x200)
 		{
-			p = BITSWAP8(p, 7,6,5,2,3,4,1,0);
-			d = BITSWAP8(d, 7,6,5,2,3,4,1,0);
+			p = bitswap<8>(p, 7,6,5,2,3,4,1,0);
+			d = bitswap<8>(d, 7,6,5,2,3,4,1,0);
 		}
 
 		ROM[i] = d;
@@ -453,7 +458,7 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 
 	for(i=0;i<len;i++)
 	{
-		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,7,6,5,4,3,15,14,13,12,9,8,2,1,11,10, 0)];
+		ROM[i]=buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,7,6,5,4,3,15,14,13,12,9,8,2,1,11,10, 0)];
 	}
 
 
@@ -462,7 +467,7 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 	memcpy( &buffer[0], ROM, len );
 	for(i=0;i<len;i++)
 	{
-		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15 ,6,5,4,3,12,11,10,9,14,13,2,1,8,7 ,0  )];
+		ROM[i]=buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,15 ,6,5,4,3,12,11,10,9,14,13,2,1,8,7 ,0  )];
 	}
 
 }

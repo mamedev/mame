@@ -8,6 +8,7 @@
 
 #include "sound/samples.h"
 #include "machine/74123.h"
+#include "screen.h"
 
 #define IREMM10_MASTER_CLOCK        (12500000)
 
@@ -74,6 +75,7 @@ public:
 
 	/* misc */
 	int                 m_last;
+	emu_timer *m_interrupt_timer;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -109,10 +111,14 @@ public:
 	uint32_t screen_update_m15(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m15_interrupt);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
-	DECLARE_WRITE8_MEMBER(ic8j1_output_changed);
-	DECLARE_WRITE8_MEMBER(ic8j2_output_changed);
+	DECLARE_WRITE_LINE_MEMBER(ic8j1_output_changed);
+	DECLARE_WRITE_LINE_MEMBER(ic8j2_output_changed);
 	inline void plot_pixel_m10( bitmap_ind16 &bm, int x, int y, int col );
 
+	void m15(machine_config &config);
+	void headoni(machine_config &config);
+	void m10(machine_config &config);
+	void m11(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

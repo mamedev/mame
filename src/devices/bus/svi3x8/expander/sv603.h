@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_SVI3X8_EXPANDER_SV603_H
+#define MAME_BUS_SVI3X8_EXPANDER_SV603_H
+
 #pragma once
 
-#ifndef __SVI3X8_EXPANDER_SV603_H__
-#define __SVI3X8_EXPANDER_SV603_H__
-
-#include "emu.h"
 #include "expander.h"
 #include "sound/sn76496.h"
 #include "bus/generic/slot.h"
@@ -40,7 +39,7 @@ public:
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -51,6 +50,6 @@ private:
 };
 
 // device type definition
-extern const device_type SV603;
+DECLARE_DEVICE_TYPE(SV603, sv603_device)
 
-#endif // __SVI3X8_EXPANDER_SV603_H__
+#endif // MAME_BUS_SVI3X8_EXPANDER_SV603_H

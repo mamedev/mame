@@ -166,13 +166,22 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Bugs in test mode :
       * when lives are set to "2", it displays "1".
 
+Many interrupt-related gates, flip-flops and connections are crossed out
+on the schematics. Coins were once supposed to trigger IRQs on the main
+CPU, and the YM3526 was intended to drive the 6502 IRQ line directly, with
+the MSM5205-derived interrupt assigned to the NMI line instead.
+
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/firetrap.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/3526intf.h"
-#include "includes/firetrap.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define FIRETRAP_XTAL XTAL_12MHz
 
@@ -195,7 +204,7 @@ READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
 	uint8_t coin = 0;
 	uint8_t port = ioport("IN2")->read() & 0x70;
 
-	if (space.device().safe_pc() == 0x1188)
+	if (m_maincpu->pc() == 0x1188)
 		return ~m_coin_command_pending;
 
 	if (port != 0x70)
@@ -215,7 +224,7 @@ READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
 
 READ8_MEMBER(firetrap_state::firetrap_8751_r)
 {
-	//logerror("PC:%04x read from 8751\n",space.device().safe_pc());
+	//logerror("PC:%04x read from 8751\n",m_maincpu->pc());
 	return m_i8751_return;
 }
 
@@ -294,7 +303,7 @@ WRITE8_MEMBER(firetrap_state::firetrap_8751_w)
 	else
 	{
 		m_i8751_return = 0xff;
-		logerror("%04x: Unknown i8751 command %02x!\n",space.device().safe_pc(),data);
+		logerror("%04x: Unknown i8751 command %02x!\n",m_maincpu->pc(),data);
 	}
 
 	/* Signal main cpu task is complete */
@@ -302,36 +311,35 @@ WRITE8_MEMBER(firetrap_state::firetrap_8751_w)
 	m_i8751_current_command=data;
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_sound_command_w)
+WRITE8_MEMBER(firetrap_state::sound_flip_flop_w)
 {
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_msm->reset_w(!BIT(data, 0));
+	m_sound_irq_enable = BIT(data, 1);
+	if (!m_sound_irq_enable)
+		m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_sound_2400_w)
-{
-	m_msm->reset_w(~data & 0x01);
-	m_sound_irq_enable = data & 0x02;
-}
-
-WRITE8_MEMBER(firetrap_state::firetrap_sound_bankselect_w)
+WRITE8_MEMBER(firetrap_state::sound_bankselect_w)
 {
 	membank("bank2")->set_entry(data & 0x01);
 }
 
 WRITE_LINE_MEMBER(firetrap_state::firetrap_adpcm_int)
 {
-	m_msm->data_w(m_msm5205next >> 4);
-	m_msm5205next <<= 4;
+	if (state)
+	{
+		m_adpcm_toggle ^= 1;
+		m_adpcm_select->select_w(m_adpcm_toggle);
 
-	m_adpcm_toggle ^= 1;
-	if (m_sound_irq_enable && m_adpcm_toggle)
-		m_audiocpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+		if (m_sound_irq_enable && m_adpcm_toggle)
+			m_audiocpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	}
 }
 
-WRITE8_MEMBER(firetrap_state::firetrap_adpcm_data_w)
+WRITE8_MEMBER(firetrap_state::adpcm_data_w)
 {
-	m_msm5205next = data;
+	m_audiocpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	m_adpcm_select->ba_w(data);
 }
 
 WRITE8_MEMBER(firetrap_state::flip_screen_w)
@@ -339,8 +347,7 @@ WRITE8_MEMBER(firetrap_state::flip_screen_w)
 	flip_screen_set(data);
 }
 
-
-static ADDRESS_MAP_START( firetrap_map, AS_PROGRAM, 8, firetrap_state )
+static ADDRESS_MAP_START( firetrap_base_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -349,7 +356,7 @@ static ADDRESS_MAP_START( firetrap_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(firetrap_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xe800, 0xe97f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP    /* IRQ acknowledge */
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(firetrap_sound_command_w)
+	AM_RANGE(0xf001, 0xf001) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(firetrap_bankselect_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE(firetrap_nmi_disable_w)
@@ -363,32 +370,15 @@ static ADDRESS_MAP_START( firetrap_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0xf012, 0xf012) AM_READ_PORT("IN2")
 	AM_RANGE(0xf013, 0xf013) AM_READ_PORT("DSW0")
 	AM_RANGE(0xf014, 0xf014) AM_READ_PORT("DSW1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( firetrap_map, AS_PROGRAM, 8, firetrap_state )
+	AM_IMPORT_FROM( firetrap_base_map )
 	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( firetrap_bootleg_map, AS_PROGRAM, 8, firetrap_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(firetrap_bg1videoram_w) AM_SHARE("bg1videoram")
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(firetrap_bg2videoram_w) AM_SHARE("bg2videoram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(firetrap_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0xe800, 0xe97f) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf000, 0xf000) AM_WRITENOP    /* IRQ acknowledge */
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(firetrap_sound_command_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(firetrap_bankselect_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(firetrap_nmi_disable_w)
-	AM_RANGE(0xf005, 0xf005) AM_WRITENOP
-	AM_RANGE(0xf008, 0xf009) AM_WRITE(firetrap_bg1_scrollx_w)
-	AM_RANGE(0xf00a, 0xf00b) AM_WRITE(firetrap_bg1_scrolly_w)
-	AM_RANGE(0xf00c, 0xf00d) AM_WRITE(firetrap_bg2_scrollx_w)
-	AM_RANGE(0xf00e, 0xf00f) AM_WRITE(firetrap_bg2_scrolly_w)
-	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
-	AM_RANGE(0xf011, 0xf011) AM_READ_PORT("IN1")
-	AM_RANGE(0xf012, 0xf012) AM_READ_PORT("IN2")
-	AM_RANGE(0xf013, 0xf013) AM_READ_PORT("DSW0")
-	AM_RANGE(0xf014, 0xf014) AM_READ_PORT("DSW1")
+	AM_IMPORT_FROM( firetrap_base_map )
 	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_bootleg_r)
 	AM_RANGE(0xf800, 0xf8ff) AM_ROM /* extra ROM in the bootleg with unprotection code */
 ADDRESS_MAP_END
@@ -396,9 +386,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ymsnd", ym3526_device, write)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(firetrap_adpcm_data_w)    /* ADPCM data for the MSM5205 chip */
-	AM_RANGE(0x2400, 0x2400) AM_WRITE(firetrap_sound_2400_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(firetrap_sound_bankselect_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_data_w)
+	AM_RANGE(0x2400, 0x2400) AM_WRITE(sound_flip_flop_w)
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(sound_bankselect_w)
 	AM_RANGE(0x3400, 0x3400) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -592,7 +582,6 @@ void firetrap_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_i8751_return));
 	save_item(NAME(m_i8751_init_ptr));
-	save_item(NAME(m_msm5205next));
 	save_item(NAME(m_adpcm_toggle));
 	save_item(NAME(m_coin_command_pending));
 	save_item(NAME(m_scroll1_x));
@@ -618,12 +607,11 @@ void firetrap_state::machine_reset()
 	m_nmi_enable = 0;
 	m_i8751_return = 0;
 	m_i8751_init_ptr = 0;
-	m_msm5205next = 0xff;
 	m_adpcm_toggle = 0;
 	m_coin_command_pending = 0;
 }
 
-static MACHINE_CONFIG_START( firetrap, firetrap_state )
+MACHINE_CONFIG_START(firetrap_state::firetrap)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)       // 6 MHz
@@ -635,13 +623,17 @@ static MACHINE_CONFIG_START( firetrap, firetrap_state )
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 
+	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.4034) // PCB measurement
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(57.4034) // PCB measurement
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	// DECO video CRTC, unverified
+	MCFG_SCREEN_RAW_PARAMS(FIRETRAP_XTAL/2,384,0,256,272,8,248)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -653,17 +645,21 @@ static MACHINE_CONFIG_START( firetrap, firetrap_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)    // 3 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
+	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+
 	MCFG_SOUND_ADD("msm", MSM5205, FIRETRAP_XTAL/32)    // 375 kHz
-	MCFG_MSM5205_VCLK_CB(WRITELINE(firetrap_state, firetrap_adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 7.8125kHz          */
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(firetrap_state, firetrap_adpcm_int))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 7.8125kHz          */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( firetrapbl, firetrap_state )
+MACHINE_CONFIG_START(firetrap_state::firetrapbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)       // 6 MHz
@@ -675,13 +671,14 @@ static MACHINE_CONFIG_START( firetrapbl, firetrap_state )
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.4034)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(57.4034)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	// DECO video CRTC, unverified
+	MCFG_SCREEN_RAW_PARAMS(FIRETRAP_XTAL/2,384,0,256,272,8,248)
 	MCFG_SCREEN_UPDATE_DRIVER(firetrap_state, screen_update_firetrap)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -693,13 +690,17 @@ static MACHINE_CONFIG_START( firetrapbl, firetrap_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)    // 3 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
+	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+
 	MCFG_SOUND_ADD("msm", MSM5205, FIRETRAP_XTAL/32)    // 375 kHz
-	MCFG_MSM5205_VCLK_CB(WRITELINE(firetrap_state, firetrap_adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 7.8125kHz          */
+	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(firetrap_state, firetrap_adpcm_int))
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 7.8125kHz          */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -967,7 +968,7 @@ ROM_END
 
 
 
-GAME( 1986, firetrap,   0,        firetrap,   firetrap, driver_device,   0, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapa,  firetrap, firetrap,   firetrap, driver_device,   0, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapj,  firetrap, firetrap,   firetrapj, driver_device,  0, ROT90, "Wood Place Inc.", "Fire Trap (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapbl, firetrap, firetrapbl, firetrapbl, driver_device, 0, ROT90, "bootleg", "Fire Trap (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrap,   0,        firetrap,   firetrap,   firetrap_state, 0, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapa,  firetrap, firetrap,   firetrap,   firetrap_state, 0, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapj,  firetrap, firetrap,   firetrapj,  firetrap_state, 0, ROT90, "Wood Place Inc.", "Fire Trap (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapbl, firetrap, firetrapbl, firetrapbl, firetrap_state, 0, ROT90, "bootleg", "Fire Trap (Japan bootleg)", MACHINE_SUPPORTS_SAVE )

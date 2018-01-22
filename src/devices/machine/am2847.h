@@ -4,16 +4,16 @@
 
     AMD Am2847/Am2896 Quad 80/96-Bit Static Shift Registers
 
-	Pin-compatible with:
-	* 2532B
-	* TMS3120
-	* TMS3409
-	* MK1007
-	* 3347
+    Pin-compatible with:
+    * 2532B
+    * TMS3120
+    * TMS3409
+    * MK1007
+    * 3347
 
 ***********************************************************************
 
-	Connection Diagram:
+    Connection Diagram:
               ___ ___
     OUT A  1 |*  u   | 16  Vss
      RC A  2 |       | 15  IN D
@@ -24,28 +24,27 @@
     OUT C  7 |       | 10  IN C
       Vdd  8 |_______| 9   RC C
 
-	Logic Symbol:
+    Logic Symbol:
 
-	            2      5      9      14
-	            |      |      |      |
-	       _____|______|______|______|_____
-	      |   RC A   RC B   RC C   RC D    |
-	 3 ---| IN A                     OUT A |--- 1
-	 6 ---| IN A                     OUT B |--- 4
-	10 ---| IN A                     OUT C |--- 7
-	15 ---| IN A                     OUT D |--- 13
-	11 ---| CP                             |
-	      |________________________________|
+                2      5      9      14
+                |      |      |      |
+           _____|______|______|______|_____
+          |   RC A   RC B   RC C   RC D    |
+     3 ---| IN A                     OUT A |--- 1
+     6 ---| IN A                     OUT B |--- 4
+    10 ---| IN A                     OUT C |--- 7
+    15 ---| IN A                     OUT D |--- 13
+    11 ---| CP                             |
+          |________________________________|
 
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_AM2847_H
+#define MAME_MACHINE_AM2847_H
+
 #pragma once
 
-#ifndef AM2847_H
-#define AM2847_H
-
-#include "emu.h"
 
 #define MCFG_AM2847_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AM2847, 0)
@@ -59,8 +58,6 @@
 class am2847_base_device : public device_t
 {
 public:
-	am2847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, size_t size);
-
 	DECLARE_WRITE_LINE_MEMBER( in_a_w );
 	DECLARE_WRITE_LINE_MEMBER( in_b_w );
 	DECLARE_WRITE_LINE_MEMBER( in_c_w );
@@ -78,6 +75,8 @@ public:
 	uint8_t out_r() const { return m_out; }
 
 protected:
+	am2847_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, size_t size);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -127,8 +126,8 @@ public:
 };
 
 // device type definition
-extern const device_type AM2847;
-extern const device_type AM2849;
-extern const device_type TMS3409;
+DECLARE_DEVICE_TYPE(AM2847,  am2847_device)
+DECLARE_DEVICE_TYPE(AM2849,  am2849_device)
+DECLARE_DEVICE_TYPE(TMS3409, tms3409_device)
 
-#endif // AM2847_H
+#endif // MAME_MACHINE_AM2847_H

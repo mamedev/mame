@@ -35,6 +35,7 @@ X - Test off-board memory banks
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -48,35 +49,33 @@ X - Test off-board memory banks
 class pulsar_state : public driver_device
 {
 public:
-	pulsar_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_dart(*this, "z80dart"),
-		m_brg(*this, "brg"),
-		m_fdc (*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_rtc(*this, "rtc")
-	{
-	}
+	pulsar_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_brg(*this, "brg")
+		, m_fdc (*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+		, m_rtc(*this, "rtc")
+		{ }
 
 	DECLARE_DRIVER_INIT(pulsar);
 	DECLARE_MACHINE_RESET(pulsar);
 	TIMER_CALLBACK_MEMBER(pulsar_reset);
 	DECLARE_WRITE8_MEMBER(baud_w);
-	DECLARE_WRITE_LINE_MEMBER(fr_w);
-	DECLARE_WRITE_LINE_MEMBER(ft_w);
 	DECLARE_WRITE8_MEMBER(ppi_pa_w);
 	DECLARE_WRITE8_MEMBER(ppi_pb_w);
 	DECLARE_WRITE8_MEMBER(ppi_pc_w);
 	DECLARE_READ8_MEMBER(ppi_pc_r);
 
+	void pulsar(machine_config &config);
 private:
 	floppy_image_device *m_floppy;
 	required_device<cpu_device> m_maincpu;
-	required_device<z80dart_device> m_dart;
 	required_device<com8116_device> m_brg;
-	required_device<fd1797_t> m_fdc;
+	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	required_device<msm5832_device> m_rtc;
 };
 
@@ -90,25 +89,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pulsar_io, AS_IO, 8, pulsar_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x0c) AM_DEVREADWRITE("z80dart", z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_DEVREADWRITE("fdc", fd1797_t, read, write)
+	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x0c) AM_DEVREADWRITE("dart", z80dart_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0xd0, 0xd3) AM_MIRROR(0x0c) AM_DEVREADWRITE("fdc", fd1797_device, read, write)
 	AM_RANGE(0xe0, 0xe3) AM_MIRROR(0x0c) AM_DEVREADWRITE("ppi", i8255_device, read, write)
 	AM_RANGE(0xf0, 0xff) AM_WRITE(baud_w)
 ADDRESS_MAP_END
 
-// Schematic has the labels for FT and FR the wrong way around,
-//  the pin numbers are correct.
-WRITE_LINE_MEMBER( pulsar_state::fr_w )
-{
-	m_dart->rxca_w(state);
-	m_dart->txca_w(state);
-}
-
-WRITE_LINE_MEMBER( pulsar_state::ft_w )
-{
-	m_dart->rxcb_w(state);
-	m_dart->txcb_w(state);
-}
 
 WRITE8_MEMBER( pulsar_state::baud_w )
 {
@@ -124,7 +110,7 @@ TIMER_CALLBACK_MEMBER( pulsar_state::pulsar_reset)
 
 static const z80_daisy_config daisy_chain_intf[] =
 {
-	{ "z80dart" },
+	{ "dart" },
 	{ nullptr }
 };
 
@@ -138,41 +124,46 @@ d7     XMEMEX line (for external memory, not emulated)
 WRITE8_MEMBER( pulsar_state::ppi_pa_w )
 {
 	m_floppy = nullptr;
-	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
+	if (BIT(data, 0))
+		m_floppy = m_floppy0->get_device();
+	else
+	if (BIT(data, 1))
+		m_floppy = m_floppy1->get_device();
 	m_fdc->set_floppy(m_floppy);
 	m_fdc->dden_w(BIT(data, 5));
+	if (m_floppy)
+		m_floppy->mon_w(0);
 }
 
 /*
 d0..d3 RTC address
-d4     RTC read line (inverted in emulation)
-d5     RTC write line (inverted in emulation)
+d4     RTC read line
+d5     RTC write line
 d6     RTC hold line
 d7     Allow 64k of ram
 */
 WRITE8_MEMBER( pulsar_state::ppi_pb_w )
 {
 	m_rtc->address_w(data & 0x0f);
-	m_rtc->read_w(!BIT(data, 4));
-	m_rtc->write_w(!BIT(data, 5));
+	m_rtc->read_w(BIT(data, 4));
+	m_rtc->write_w(BIT(data, 5));
 	m_rtc->hold_w(BIT(data, 6));
 	membank("bankr1")->set_entry(BIT(data, 7));
 }
 
-/*
-d0..d3 Data lines to rtc
-d7     /2 SIDES (assumed to be side select)
-*/
+// d0..d3 Data lines to rtc
 WRITE8_MEMBER( pulsar_state::ppi_pc_w )
 {
 	m_rtc->data_w(space, 0, data & 15);
-	if (m_floppy)
-		m_floppy->ss_w(BIT(data, 7));
 }
 
+// d7     /2 SIDES
 READ8_MEMBER( pulsar_state::ppi_pc_r )
 {
-	return m_rtc->data_r(space, 0);
+	uint8_t data = 0;
+	if (m_floppy)
+		data = m_floppy->twosid_r() << 7;
+	return m_rtc->data_r(space, 0) | data;
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -185,7 +176,7 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 static SLOT_INTERFACE_START( pulsar_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525hd", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
 /* Input ports */
@@ -215,7 +206,7 @@ DRIVER_INIT_MEMBER( pulsar_state, pulsar )
 	membank("bankw1")->configure_entry(0, &main[0xf800]);
 }
 
-static MACHINE_CONFIG_START( pulsar, pulsar_state )
+MACHINE_CONFIG_START(pulsar_state::pulsar)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(pulsar_mem)
@@ -232,23 +223,29 @@ static MACHINE_CONFIG_START( pulsar, pulsar_state )
 
 	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
 
-	MCFG_Z80DART_ADD("z80dart", XTAL_4MHz, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD("dart", Z80DART, XTAL_4MHz)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("z80dart", z80dart_device, rxa_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("z80dart", z80dart_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("dart", z80dart_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("dart", z80dart_device, ctsa_w))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	MCFG_DEVICE_ADD("brg", COM8116, XTAL_5_0688MHz)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(pulsar_state, fr_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(pulsar_state, ft_w))
+	// Schematic has the labels for FT and FR the wrong way around, but the pin numbers are correct.
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("dart", z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxca_w))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("dart", z80dart_device, txcb_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxcb_w))
 
 	MCFG_FD1797_ADD("fdc", XTAL_4MHz / 2)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -262,5 +259,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT     COMPANY       FULLNAME       FLAGS */
-COMP( 1981, pulsarlb, 0,      0,       pulsar,    pulsar,  pulsar_state,  pulsar,  "Pulsar", "Little Big Board", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT     COMPANY   FULLNAME            FLAGS
+COMP( 1981, pulsarlb, 0,      0,      pulsar,  pulsar,  pulsar_state,  pulsar,  "Pulsar", "Little Big Board", MACHINE_NO_SOUND_HW )

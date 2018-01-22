@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "abcbus.h"
 
 
@@ -14,7 +15,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ABCBUS_SLOT = &device_creator<abcbus_slot_t>;
+DEFINE_DEVICE_TYPE(ABCBUS_SLOT, abcbus_slot_device, "abcbus_slot", "ABCBUS slot")
 
 
 
@@ -29,16 +30,16 @@ const device_type ABCBUS_SLOT = &device_creator<abcbus_slot_t>;
 device_abcbus_card_interface::device_abcbus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
 {
-	m_slot = dynamic_cast<abcbus_slot_t *>(device.owner());
+	m_slot = dynamic_cast<abcbus_slot_device *>(device.owner());
 }
 
 
 //-------------------------------------------------
-//  abcbus_slot_t - constructor
+//  abcbus_slot_device - constructor
 //-------------------------------------------------
 
-abcbus_slot_t::abcbus_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ABCBUS_SLOT, "ABCBUS slot", tag, owner, clock, "abcbus_slot", __FILE__),
+abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ABCBUS_SLOT, tag, owner, clock),
 	device_slot_interface(mconfig, *this),
 	m_write_irq(*this),
 	m_write_nmi(*this),
@@ -59,7 +60,7 @@ abcbus_slot_t::abcbus_slot_t(const machine_config &mconfig, const char *tag, dev
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void abcbus_slot_t::device_start()
+void abcbus_slot_device::device_start()
 {
 	m_card = dynamic_cast<device_abcbus_card_interface *>(get_card_device());
 
@@ -79,6 +80,7 @@ void abcbus_slot_t::device_start()
 
 // slot devices
 #include "abc890.h"
+#include "db411223.h"
 #include "fd2.h"
 #include "hdc.h"
 #include "lux10828.h"
@@ -89,8 +91,8 @@ void abcbus_slot_t::device_start()
 #include "ram.h"
 #include "sio.h"
 #include "slutprov.h"
-#include "turbo.h"
 #include "uni800.h"
+#include "unidisk.h"
 
 
 
@@ -105,6 +107,8 @@ SLOT_INTERFACE_START( abc80_cards )
 	SLOT_INTERFACE("16k", ABC80_16KB_RAM_CARD)
 	SLOT_INTERFACE("slow", LUXOR_55_10828)
 	SLOT_INTERFACE("abc830", ABC830)
+	SLOT_INTERFACE("db411223", DATABOARD_4112_23)
+	SLOT_INTERFACE("unidisk", UNIDISK)
 SLOT_INTERFACE_END
 
 
@@ -123,12 +127,13 @@ SLOT_INTERFACE_START( abcbus_cards )
 	SLOT_INTERFACE("abc856", ABC856)
 	SLOT_INTERFACE("abc890", ABC890)
 	SLOT_INTERFACE("abc894", ABC894)
+	SLOT_INTERFACE("db411223", DATABOARD_4112_23)
 	SLOT_INTERFACE("hdc", ABC_HDC)
 	SLOT_INTERFACE("sio", ABC_SIO)
 	SLOT_INTERFACE("slow", LUXOR_55_10828)
 	SLOT_INTERFACE("uni800", ABC_UNI800)
+	SLOT_INTERFACE("unidisk", UNIDISK)
 	SLOT_INTERFACE("slutprov", ABC_SLUTPROV)
-	SLOT_INTERFACE("turbo", TURBO_KONTROLLER)
 	SLOT_INTERFACE("xebec", LUXOR_55_21056)
 SLOT_INTERFACE_END
 

@@ -28,6 +28,8 @@ All clock timing comes from crystal 1
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
 #include "video/tigeroad_spr.h"
+#include "screen.h"
+#include "speaker.h"
 
 class supduck_state : public driver_device
 {
@@ -79,6 +81,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(okibank_w);
 
+	void supduck(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -254,7 +257,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, supduck_state )
 	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(text_videoram_w) AM_SHARE("textvideoram")
 	AM_RANGE(0xff0000, 0xff3fff) AM_RAM_WRITE(back_videoram_w) AM_SHARE("backvideoram")
 	AM_RANGE(0xff4000, 0xff7fff) AM_RAM_WRITE(fore_videoram_w) AM_SHARE("forevideoram")
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
@@ -266,7 +269,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, supduck_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, supduck_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, supduck_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -281,18 +284,18 @@ WRITE8_MEMBER(supduck_state::okibank_w)
 
 static INPUT_PORTS_START( supduck )
 	PORT_START("P1_P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
@@ -431,7 +434,7 @@ void supduck_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( supduck, supduck_state )
+MACHINE_CONFIG_START(supduck_state::supduck)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* Verified on PCB */
@@ -449,7 +452,7 @@ static MACHINE_CONFIG_START( supduck, supduck_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
@@ -465,9 +468,9 @@ static MACHINE_CONFIG_START( supduck, supduck_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz/8, OKIM6295_PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_8MHz/8, PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
 MACHINE_CONFIG_END
 
@@ -515,4 +518,4 @@ ROM_START( supduck )
 	ROM_LOAD( "1.su13",   0x00000, 0x80000, CRC(7fb1ed42) SHA1(77ec86a6454398e329066aa060e9b6a39085ce71) ) // banked sample data
 ROM_END
 
-GAME( 1992, supduck, 0, supduck, supduck, driver_device, 0, ROT0, "Comad", "Super Duck", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, supduck, 0, supduck, supduck, supduck_state, 0, ROT0, "Comad", "Super Duck", MACHINE_SUPPORTS_SAVE )

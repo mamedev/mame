@@ -16,11 +16,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "machine/nvram.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "saiyukip.lh"
 
 
@@ -76,6 +81,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void umipoker(machine_config &config);
 };
 
 TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_0)
@@ -310,7 +316,7 @@ static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16, umipoker_state )
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(umipoker_vram_0_w) AM_SHARE("vra0")
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(umipoker_vram_1_w) AM_SHARE("vra1")
 	AM_RANGE(0x804000, 0x805fff) AM_RAM_WRITE(umipoker_vram_2_w) AM_SHARE("vra2")
@@ -652,7 +658,7 @@ void umipoker_state::machine_reset()
 }
 
 // TODO: clocks
-static MACHINE_CONFIG_START( umipoker, umipoker_state )
+MACHINE_CONFIG_START(umipoker_state::umipoker)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,16000000) // TMP68HC000-16
@@ -688,7 +694,7 @@ static MACHINE_CONFIG_START( umipoker, umipoker_state )
 	MCFG_SOUND_ADD("ym", YM3812, 4000000 / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 4000000 / 2, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 4000000 / 2, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -758,6 +764,6 @@ DRIVER_INIT_MEMBER(umipoker_state,saiyukip)
 *              Game Drivers               *
 ******************************************/
 
-/*     YEAR  NAME       PARENT    MACHINE    INPUT      INIT      ROT    COMPANY                  FULLNAME                                 FLAGS   LAYOUT      */
+//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE            INIT      ROT   COMPANY                  FULLNAME                                  FLAGS   LAYOUT
 GAME(  1997, umipoker,  0,        umipoker,  umipoker, umipoker_state,  umipoker, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan)", 0 )                      // title screen is toggleable thru a dsw
 GAMEL( 1998, saiyukip,  0,        umipoker,  saiyukip, umipoker_state,  saiyukip, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",             0,      layout_saiyukip )

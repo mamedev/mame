@@ -7,11 +7,13 @@
     Natural keyboard input support.
 
 ***************************************************************************/
+#ifndef MAME_EMU_NATKEYBOARD_H
+#define MAME_EMU_NATKEYBOARD_H
 
 #pragma once
 
-#ifndef EMU_NATKEYBOARD_H
-#define EMU_NATKEYBOARD_H
+#include <iosfwd>
+#include <unordered_map>
 
 
 //**************************************************************************
@@ -54,15 +56,23 @@ public:
 	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
 
 	// debugging
-	std::string dump();
+	void dump(std::ostream &str) const;
+	std::string dump() const;
 
 private:
+	enum
+	{
+		SHIFT_COUNT = UCHAR_SHIFT_END - UCHAR_SHIFT_BEGIN + 1,
+		SHIFT_STATES = 1 << SHIFT_COUNT
+	};
+
 	// internal keyboard code information
 	struct keycode_map_entry
 	{
-		char32_t    ch;
-		ioport_field *  field[UCHAR_SHIFT_END + 1 - UCHAR_SHIFT_BEGIN];
+		ioport_field *  field[SHIFT_COUNT + 1];
+		unsigned        shift;
 	};
+	typedef std::unordered_map<char32_t, keycode_map_entry> keycode_map;
 
 	// internal helpers
 	void build_codes(ioport_manager &manager);
@@ -71,23 +81,27 @@ private:
 	attotime choose_delay(char32_t ch);
 	void internal_post(char32_t ch);
 	void timer(void *ptr, int param);
-	std::string unicode_to_string(char32_t ch);
+	std::string unicode_to_string(char32_t ch) const;
 	const keycode_map_entry *find_code(char32_t ch) const;
 
 	// internal state
-	running_machine &       m_machine;              // reference to our machine
-	bool                    m_in_use;               // is natural keyboard in use?
-	uint32_t                  m_bufbegin;             // index of starting character
-	uint32_t                  m_bufend;               // index of ending character
-	std::vector<char32_t> m_buffer;           // actual buffer
-	bool                    m_status_keydown;       // current keydown status
-	bool                    m_last_cr;              // was the last char a CR?
-	emu_timer *             m_timer;                // timer for posting characters
-	attotime                m_current_rate;         // current rate for posting
-	ioport_queue_chars_delegate m_queue_chars;      // queue characters callback
-	ioport_accept_char_delegate m_accept_char;      // accept character callback
-	ioport_charqueue_empty_delegate m_charqueue_empty; // character queue empty callback
-	std::vector<keycode_map_entry> m_keycode_map; // keycode map
+	running_machine &               m_machine;          // reference to our machine
+	bool                            m_in_use;           // is natural keyboard in use?
+	u32                             m_bufbegin;         // index of starting character
+	u32                             m_bufend;           // index of ending character
+	std::vector<char32_t>           m_buffer;           // actual buffer
+	unsigned                        m_fieldnum;         // current step in multi-key sequence
+	bool                            m_status_keydown;   // current keydown status
+	bool                            m_last_cr;          // was the last char a CR?
+	emu_timer *                     m_timer;            // timer for posting characters
+	attotime                        m_current_rate;     // current rate for posting
+	ioport_queue_chars_delegate     m_queue_chars;      // queue characters callback
+	ioport_accept_char_delegate     m_accept_char;      // accept character callback
+	ioport_charqueue_empty_delegate m_charqueue_empty;  // character queue empty callback
+	keycode_map                     m_keycode_map;      // keycode map
 };
 
-#endif
+
+inline std::ostream &operator<<(std::ostream &str, natural_keyboard const &kbd) { kbd.dump(str); return str; }
+
+#endif // MAME_EMU_NATKEYBOARD_H

@@ -26,15 +26,17 @@ $c088-$c095 player tiles
 *******************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/hc55516.h"
 #include "sound/msm5205.h"
-#include "video/resnet.h"
 #include "video/jangou_blitter.h"
-#include "machine/nvram.h"
+#include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK    XTAL_19_968MHz
 
@@ -42,15 +44,17 @@ class jangou_state : public driver_device
 {
 public:
 	jangou_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_cpu_0(*this, "cpu0"),
-		m_cpu_1(*this, "cpu1"),
-		m_nsc(*this, "nsc"),
-		m_msm(*this, "msm"),
-		m_cvsd(*this, "cvsd"),
-		m_palette(*this, "palette"),
-		m_blitter(*this, "blitter"),
-		m_soundlatch(*this, "soundlatch") { }
+		: driver_device(mconfig, type, tag)
+		, m_cpu_0(*this, "cpu0")
+		, m_cpu_1(*this, "cpu1")
+		, m_nsc(*this, "nsc")
+		, m_msm(*this, "msm")
+		, m_cvsd(*this, "cvsd")
+		, m_palette(*this, "palette")
+		, m_blitter(*this, "blitter")
+		, m_soundlatch(*this, "soundlatch")
+	{
+	}
 
 	/* sound-related */
 	// Jangou CVSD Sound
@@ -105,6 +109,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(jngolady_vclk_cb);
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
+	void jngolady(machine_config &config);
+	void roylcrdn(machine_config &config);
+	void cntrygrl(machine_config &config);
+	void jangou(machine_config &config);
 };
 
 
@@ -166,7 +174,7 @@ uint32_t jangou_state::screen_update_jangou(screen_device &screen, bitmap_ind16 
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		uint8_t *src = &m_blitter->m_blit_buffer[y * 256 + cliprect.min_x];
+		const uint8_t *src = &m_blitter->blit_buffer(y, cliprect.min_x);
 		uint16_t *dst = &m_tmp_bitmap->pix16(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x += 2)
@@ -329,7 +337,7 @@ static ADDRESS_MAP_START( cpu0_io, AS_IO, 8, jangou_state )
 	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") AM_WRITE(output_w) //dsw + blitter busy flag
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, process_w)
+	AM_RANGE(0x12,0x17) AM_DEVICE("blitter",jangou_blitter_device, blit_v1_regs)
 	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continuously
 	AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
@@ -400,7 +408,7 @@ static ADDRESS_MAP_START( cntrygrl_cpu0_io, AS_IO, 8, jangou_state )
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
 	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, process_w)
+	AM_RANGE(0x12,0x17) AM_DEVICE("blitter",jangou_blitter_device, blit_v1_regs)
 	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continuously
 //  AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
@@ -425,7 +433,7 @@ static ADDRESS_MAP_START( roylcrdn_cpu0_io, AS_IO, 8, jangou_state )
 	AM_RANGE(0x10,0x10) AM_WRITENOP                 /* Writes continuosly 0's in attract mode, and 1's in game */
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
 	AM_RANGE(0x13,0x13) AM_READNOP                  /* Often reads bit7 with unknown purposes */
-	AM_RANGE(0x12,0x17) AM_DEVWRITE("blitter",jangou_blitter_device, process_w)
+	AM_RANGE(0x12,0x17) AM_DEVICE("blitter",jangou_blitter_device, blit_v1_regs)
 	AM_RANGE(0x20,0x2f) AM_DEVWRITE("blitter",jangou_blitter_device, vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP                 /* Seems to write 0x10 on each sound event */
 ADDRESS_MAP_END
@@ -763,7 +771,7 @@ static INPUT_PORTS_START( roylcrdn )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )                                      PORT_NAME("Note In")        /* Note In */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE  PORT_CODE(KEYCODE_9)                         /* Memory Reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE  PORT_CODE(KEYCODE_0)  PORT_NAME("Analyzer")       /* Analyzer */
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW ) 						      											/* Test Mode */
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                                                                         /* Test Mode */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )                                      PORT_NAME("Coin In")        /* Coin In */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                              PORT_NAME("Credit Clear")   /* Credit Clear */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                                                                 /* Spare 1 */
@@ -834,7 +842,7 @@ MACHINE_RESET_MEMBER(jangou_state,jngolady)
 }
 
 /* Note: All frequencies and dividers are unverified */
-static MACHINE_CONFIG_START( jangou, jangou_state )
+MACHINE_CONFIG_START(jangou_state::jangou)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu0", Z80, MASTER_CLOCK / 8)
@@ -871,7 +879,7 @@ static MACHINE_CONFIG_START( jangou, jangou_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jngolady, jangou )
+MACHINE_CONFIG_DERIVED(jangou_state::jngolady, jangou)
 
 	/* basic machine hardware */
 
@@ -893,11 +901,11 @@ static MACHINE_CONFIG_DERIVED( jngolady, jangou )
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(jangou_state, jngolady_vclk_cb))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cntrygrl, jangou )
+MACHINE_CONFIG_DERIVED(jangou_state::cntrygrl, jangou)
 
 	/* basic machine hardware */
 
@@ -915,7 +923,7 @@ static MACHINE_CONFIG_DERIVED( cntrygrl, jangou )
 	MCFG_DEVICE_REMOVE("soundlatch")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( roylcrdn, jangou )
+MACHINE_CONFIG_DERIVED(jangou_state::roylcrdn, jangou)
 
 	/* basic machine hardware */
 
@@ -1263,13 +1271,13 @@ DRIVER_INIT_MEMBER(jangou_state,luckygrl)
  *
  *************************************/
 
-GAME( 1983,  jangou,     0,        jangou,   jangou, driver_device,    0,        ROT0, "Nichibutsu",     "Jangou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983,  macha,      0,        jangou,   macha,  driver_device,     0,        ROT0, "Logitec",        "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  jangou,     0,        jangou,   jangou,   jangou_state,  0,        ROT0, "Nichibutsu",     "Jangou [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983,  macha,      0,        jangou,   macha,    jangou_state,  0,        ROT0, "Logitec",        "Monoshiri Quiz Osyaberi Macha (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984,  jngolady,   0,        jngolady, jngolady, jangou_state,  jngolady, ROT0, "Nichibutsu",     "Jangou Lady (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrl,   0,        cntrygrl, cntrygrl, driver_device,  0,        ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  cntrygrla,  cntrygrl, cntrygrl, cntrygrl, driver_device,  0,        ROT0, "Nichibutsu",     "Country Girl (Japan set 2)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1984,  fruitbun,   cntrygrl, cntrygrl, cntrygrl, driver_device,  0,        ROT0, "Nichibutsu",     "Fruits & Bunny (World?)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985,  roylcrdn,   0,        roylcrdn, roylcrdn, driver_device,  0,        ROT0, "Nichibutsu",     "Royal Card (Nichibutsu)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrl,   0,        cntrygrl, cntrygrl, jangou_state,  0,        ROT0, "Royal Denshi",   "Country Girl (Japan set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  cntrygrla,  cntrygrl, cntrygrl, cntrygrl, jangou_state,  0,        ROT0, "Nichibutsu",     "Country Girl (Japan set 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1984,  fruitbun,   cntrygrl, cntrygrl, cntrygrl, jangou_state,  0,        ROT0, "Nichibutsu",     "Fruits & Bunny (World?)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985,  roylcrdn,   0,        roylcrdn, roylcrdn, jangou_state,  0,        ROT0, "Nichibutsu",     "Royal Card (Nichibutsu)", MACHINE_SUPPORTS_SAVE )
 
 /* The following might not run there... */
 GAME( 1984?, luckygrl,   0,        cntrygrl, cntrygrl, jangou_state,  luckygrl, ROT0, "Wing Co., Ltd.", "Lucky Girl? (Wing)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

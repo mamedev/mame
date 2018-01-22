@@ -152,12 +152,6 @@ WRITE8_MEMBER(suprloco_state::control_w)
 }
 
 
-READ8_MEMBER(suprloco_state::control_r)
-{
-	return m_control;
-}
-
-
 
 inline void suprloco_state::draw_pixel(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip)
 {

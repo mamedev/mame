@@ -6,7 +6,6 @@
 #define __TMC2000E__
 
 
-#include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
@@ -67,6 +66,7 @@ public:
 	/* keyboard state */
 	int m_keylatch;         /* key latch */
 	int m_reset;            /* reset activated */
+	void tmc2000e(machine_config &config);
 };
 
 #endif

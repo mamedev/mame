@@ -9,8 +9,10 @@ Ernesto Corvi & Mariusz Wojcieszek
 
 ***************************************************************************/
 
-#ifndef __AMIGA_H__
-#define __AMIGA_H__
+#ifndef MAME_INCLUDES_AMIGA_H
+#define MAME_INCLUDES_AMIGA_H
+
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 #include "machine/bankdev.h"
@@ -21,27 +23,10 @@ Ernesto Corvi & Mariusz Wojcieszek
 #include "machine/msm6242.h"
 #include "machine/akiko.h"
 #include "machine/i2cmem.h"
-#include "sound/amiga.h"
+#include "machine/8364_paula.h"
 #include "video/amigaaga.h"
+#include "screen.h"
 
-
-/*************************************
- *
- *  Debugging
- *
- *************************************/
-
-#define LOG_COPPER          0
-#define GUESS_COPPER_OFFSET 0
-#define LOG_SPRITE_DMA      0
-
-/* A bit of a trick here: some registers are 32-bit. In order to efficiently */
-/* read them on both big-endian and little-endian systems, we store the custom */
-/* registers in 32-bit natural order. This means we need to XOR the register */
-/* address with 1 on little-endian systems. */
-#define CUSTOM_REG(x)           (state->m_custom_regs[BYTE_XOR_BE(x)])
-#define CUSTOM_REG_SIGNED(x)    ((int16_t)CUSTOM_REG(x))
-#define CUSTOM_REG_LONG(x)      (*(uint32_t *)&state->m_custom_regs[x])
 
 /*
     A = Angus
@@ -318,12 +303,6 @@ Ernesto Corvi & Mariusz Wojcieszek
 #define MAX_PLANES 6 /* 0 to 6, inclusive ( but we count from 0 to 5 ) */
 
 
-// chipset
-#define IS_OCS(state)   (state->m_denise_id == 0xff)
-#define IS_ECS(state)   (state->m_denise_id == 0xfc)
-#define IS_AGA(state)   (state->m_denise_id == 0xf8)
-
-
 class amiga_state : public driver_device
 {
 public:
@@ -336,7 +315,7 @@ public:
 	m_cia_1(*this, "cia_1"),
 	m_rs232(*this, "rs232"),
 	m_centronics(*this, "centronics"),
-	m_sound(*this, "amiga"),
+	m_paula(*this, "amiga"),
 	m_fdc(*this, "fdc"),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
@@ -378,10 +357,22 @@ public:
 	{
 		return EXPECTED(byteoffs < m_chip_ram.bytes()) ? m_chip_ram.read(byteoffs >> 1) : 0xffff;
 	}
+
 	void chip_ram_w(offs_t byteoffs, uint16_t data)
 	{
 		if (EXPECTED(byteoffs < m_chip_ram.bytes()))
 			m_chip_ram.write(byteoffs >> 1, data);
+	}
+
+	DECLARE_READ16_MEMBER(chip_ram_r)
+	{
+		return chip_ram_r(offset & ~1) & mem_mask;
+	}
+
+	DECLARE_WRITE16_MEMBER(chip_ram_w)
+	{
+		uint16_t val = chip_ram_r(offset & ~1) & ~mem_mask;
+		chip_ram_w(offset & ~1, val | data);
 	}
 
 	/* sprite states */
@@ -400,9 +391,7 @@ public:
 	uint16_t m_copper_waitmask;
 	uint16_t m_copper_pending_offset;
 	uint16_t m_copper_pending_data;
-#if GUESS_COPPER_OFFSET
 	int m_wait_offset;
-#endif
 
 	/* playfield states */
 	int m_last_scanline;
@@ -427,8 +416,6 @@ public:
 	DECLARE_VIDEO_START( amiga_aga );
 	DECLARE_PALETTE_INIT( amiga );
 
-	void render_scanline(bitmap_ind16 &bitmap, int scanline);
-	void aga_render_scanline(bitmap_rgb32 &bitmap, int scanline);
 	uint32_t screen_update_amiga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_screenmode();
@@ -467,8 +454,13 @@ public:
 	DECLARE_READ16_MEMBER( custom_chip_r );
 	DECLARE_WRITE16_MEMBER( custom_chip_w );
 
+	DECLARE_WRITE_LINE_MEMBER( paula_int_w );
+
 	DECLARE_READ16_MEMBER( rom_mirror_r );
 	DECLARE_READ32_MEMBER( rom_mirror32_r );
+
+	DECLARE_WRITE_LINE_MEMBER(fdc_dskblk_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_dsksyn_w);
 
 	// standard clocks
 	static const int CLK_28M_PAL = XTAL_28_37516MHz;
@@ -497,14 +489,25 @@ public:
 	uint16_t m_agnus_id;
 	uint16_t m_denise_id;
 
-	uint16_t m_custom_regs[256];
-
 	void custom_chip_w(uint16_t offset, uint16_t data, uint16_t mem_mask = 0xffff)
 	{
 		custom_chip_w(m_maincpu->space(AS_PROGRAM), offset, data, mem_mask);
 	}
 
+	void blitter_setup();
+
+	void amiga_base(machine_config &config);
+	void pal_video(machine_config &config);
+	void ntsc_video(machine_config &config);
 protected:
+	// A bit of a trick here: some registers are 32-bit. In order to efficiently
+	// read them on both big-endian and little-endian systems, we store the custom
+	// registers in 32-bit natural order. This means we need to XOR the register
+	// address with 1 on little-endian systems.
+	uint16_t &CUSTOM_REG(offs_t x) { return m_custom_regs[BYTE_XOR_BE(x)]; }
+	int16_t &CUSTOM_REG_SIGNED(offs_t x) { return (int16_t &)CUSTOM_REG(x); }
+	uint32_t &CUSTOM_REG_LONG(offs_t x) { return *(uint32_t *)&m_custom_regs[x]; }
+
 	// agnus/alice chip id
 	enum
 	{
@@ -527,6 +530,11 @@ protected:
 		DENISE_HR = 0x00fc,
 		LISA      = 0x00f8
 	};
+
+	// chipset
+	bool IS_OCS() const { return m_denise_id == 0xff; }
+	bool IS_ECS() const { return m_denise_id == 0xfc; }
+	bool IS_AGA() const { return m_denise_id == 0xf8; }
 
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -561,8 +569,8 @@ protected:
 	required_device<mos8520_device> m_cia_1;
 	optional_device<rs232_port_device> m_rs232;
 	optional_device<centronics_device> m_centronics;
-	required_device<amiga_sound_device> m_sound;
-	optional_device<amiga_fdc> m_fdc;
+	required_device<paula_8364_device> m_paula;
+	optional_device<amiga_fdc_device> m_fdc;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_overlay;
@@ -588,7 +596,45 @@ protected:
 	int m_cia_0_irq;
 	int m_cia_1_irq;
 
+	uint16_t m_custom_regs[256];
+	static const char *const s_custom_reg_names[0x100];
+
 private:
+	// blitter helpers
+	uint32_t blit_ascending();
+	uint32_t blit_descending();
+	uint32_t blit_line();
+
+	// video helpers
+protected:
+	void set_genlock_color(uint16_t color);
+private:
+	void copper_setpc(uint32_t pc);
+	int copper_execute_next(int xpos);
+	void sprite_dma_reset(int which);
+	void sprite_enable_comparitor(int which, int enable);
+	void fetch_sprite_data(int scanline, int sprite);
+	void update_sprite_dma(int scanline);
+	uint32_t interleave_sprite_data(uint16_t lobits, uint16_t hibits);
+	int get_sprite_pixel(int x);
+	uint8_t assemble_odd_bitplanes(int planes, int ebitoffs);
+	uint8_t assemble_even_bitplanes(int planes, int ebitoffs);
+	void fetch_bitplane_data(int plane);
+	int update_ham(int newpix);
+	void update_display_window();
+	void render_scanline(bitmap_ind16 &bitmap, int scanline);
+
+	// AGA video helpers
+	void aga_palette_write(int color_reg, uint16_t data);
+	void aga_fetch_sprite_data(int scanline, int sprite);
+	void aga_render_scanline(bitmap_rgb32 &bitmap, int scanline);
+	void aga_update_sprite_dma(int scanline);
+	int aga_get_sprite_pixel(int x);
+	uint8_t aga_assemble_odd_bitplanes(int planes, int obitoffs);
+	uint8_t aga_assemble_even_bitplanes(int planes, int ebitoffs);
+	void aga_fetch_bitplane_data(int plane);
+	rgb_t aga_update_ham(int newpix);
+
 	enum
 	{
 		TIMER_SCANLINE,
@@ -622,6 +668,8 @@ private:
 		SERPER_LONG = 0x8000    // 9-bit mode
 	};
 
+	static const uint16_t s_expand_byte[256];
+
 	// pot counters
 	int m_pot0x, m_pot1x, m_pot0y, m_pot1y;
 
@@ -634,13 +682,13 @@ private:
 
 	emu_timer *m_irq_timer;
 	emu_timer *m_serial_timer;
+	emu_timer *m_scanline_timer;
 
 	bool m_gayle_reset;
 
 	// display window
 	rectangle m_diw;
 	bool m_diwhigh_valid;
-	void update_display_window();
 
 	bool m_previous_lof;
 	bitmap_ind16 m_flickerfixer;
@@ -660,29 +708,9 @@ private:
 
 	void serial_adjust();
 	void serial_shift();
-	void rx_write(amiga_state *state, int level);
+	void rx_write(int level);
 
 	uint32_t amiga_gethvpos();
 };
 
-
-/*----------- defined in machine/amiga.c -----------*/
-
-extern const char *const amiga_custom_names[0x100];
-
-
-/*----------- defined in video/amiga.c -----------*/
-
-extern const uint16_t amiga_expand_byte[256];
-
-void amiga_copper_setpc(running_machine &machine, uint32_t pc);
-int amiga_copper_execute_next(running_machine &machine, int xpos);
-
-void amiga_set_genlock_color(running_machine &machine, uint16_t color);
-void amiga_sprite_dma_reset(running_machine &machine, int which);
-void amiga_sprite_enable_comparitor(running_machine &machine, int which, int enable);
-
-MACHINE_CONFIG_EXTERN( pal_video );
-MACHINE_CONFIG_EXTERN( ntsc_video );
-
-#endif /* __AMIGA_H__ */
+#endif // MAME_INCLUDES_AMIGA_H

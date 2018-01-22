@@ -5,8 +5,15 @@
     Atari Orbit hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_ORBIT_H
+#define MAME_INCLUDES_ORBIT_H
 
+#pragma once
+
+#include "machine/74259.h"
+#include "machine/timer.h"
 #include "sound/discrete.h"
+#include "screen.h"
 
 /* Discrete Sound Input Nodes */
 #define ORBIT_NOTE_FREQ       NODE_01
@@ -20,15 +27,42 @@
 class orbit_state : public driver_device
 {
 public:
-	orbit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	orbit_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_sprite_ram(*this, "sprite_ram"),
 		m_discrete(*this, "discrete"),
+		m_bg_tilemap(nullptr),
+		m_flip_screen(0),
+		m_latch(*this, "latch"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
+
+	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(heat_rst_led_w);
+	DECLARE_WRITE_LINE_MEMBER(hyper_led_w);
+	DECLARE_WRITE8_MEMBER(orbit_playfield_w);
+	TILE_GET_INFO_MEMBER(get_tile_info);
+	uint32_t screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(orbit_interrupt);
+	TIMER_CALLBACK_MEMBER(irq_off);
+	TIMER_DEVICE_CALLBACK_MEMBER(nmi_32v);
+	DECLARE_WRITE8_MEMBER(orbit_note_w);
+	DECLARE_WRITE8_MEMBER(orbit_note_amp_w);
+	DECLARE_WRITE8_MEMBER(orbit_noise_amp_w);
+	DECLARE_WRITE8_MEMBER(orbit_noise_rst_w);
+
+	void orbit(machine_config &config);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void update_misc_flags(address_space &space, uint8_t val);
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_playfield_ram;
@@ -40,32 +74,15 @@ public:
 	tilemap_t  *m_bg_tilemap;
 	int        m_flip_screen;
 
-	/* misc */
-	uint8_t      m_misc_flags;
-
 	/* devices */
+	required_device<f9334_device> m_latch;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-
-	DECLARE_WRITE8_MEMBER(orbit_misc_w);
-	DECLARE_WRITE8_MEMBER(orbit_playfield_w);
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(orbit_interrupt);
-	TIMER_CALLBACK_MEMBER(irq_off);
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_32v);
-	DECLARE_WRITE8_MEMBER(orbit_note_w);
-	DECLARE_WRITE8_MEMBER(orbit_note_amp_w);
-	DECLARE_WRITE8_MEMBER(orbit_noise_amp_w);
-	DECLARE_WRITE8_MEMBER(orbit_noise_rst_w);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void update_misc_flags(address_space &space, uint8_t val);
 };
 /*----------- defined in audio/orbit.c -----------*/
 
 DISCRETE_SOUND_EXTERN( orbit );
+
+#endif // MAME_INCLUDES_ORBIT_H

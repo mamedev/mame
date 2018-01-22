@@ -8,22 +8,26 @@
 
 ***************************************************************************/
 
-#ifndef APPLE2_H_
-#define APPLE2_H_
+#ifndef MAME_INCLUDES_APPLE2_H
+#define MAME_INCLUDES_APPLE2_H
 
-#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6502/m65c02.h"
+
+#include "imagedev/cassette.h"
+
+#include "machine/applefdc.h"
+#include "machine/kb3600.h"
+#include "machine/mos6551.h"
+#include "machine/ram.h"
+#include "machine/timer.h"
+
+#include "sound/spkrdev.h"
+
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/a2eauxslot.h"
-#include "machine/applefdc.h"
-#include "machine/ram.h"
-#include "imagedev/cassette.h"
-#include "machine/kb3600.h"
-#include "sound/speaker.h"
-#include "machine/ram.h"
 #include "bus/rs232/rs232.h"
-#include "machine/mos6551.h"
+
 
 #define AUXSLOT_TAG "auxbus"
 
@@ -286,6 +290,7 @@ public:
 
 	void apple2_refresh_delegates();
 	int apple2_pressed_specialkey(uint8_t key);
+	void langcard_touch(offs_t offset);
 
 	read8_delegate read_delegates_master[4];
 	write8_delegate write_delegates_master[3];
@@ -364,7 +369,7 @@ public:
 	void apple2_iwm_setdiskreg(uint8_t data);
 	void apple2_init_common();
 	void apple2eplus_init_common(void *apple2cp_ce00_ram);
-	int8_t apple2_slotram_r(address_space &space, int slotnum, int offset);
+	int8_t apple2_slotram_r(int slotnum, int offset);
 	int a2_no_ctrl_reset();
 
 private:
@@ -380,4 +385,4 @@ INPUT_PORTS_EXTERN( apple2ep );
 /*----------- defined in machine/apple2.c -----------*/
 extern const applefdc_interface apple2_fdc_interface;
 
-#endif /* APPLE2_H_ */
+#endif // MAME_INCLUDES_APPLE2_H

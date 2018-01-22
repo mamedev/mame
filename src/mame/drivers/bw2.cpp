@@ -24,8 +24,10 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/bw2.h"
 #include "bus/rs232/rs232.h"
+#include "screen.h"
 #include "softlist.h"
 
 
@@ -220,7 +222,7 @@ static ADDRESS_MAP_START( bw2_io, AS_IO, 8, bw2_state )
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE(I8251_TAG, i8251_device, data_r, data_w)
 	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE(I8251_TAG, i8251_device, status_r, control_w)
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE("cent_data_out", output_latch_device, write)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(WD2797_TAG, wd2797_t, read, write)
+	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(WD2797_TAG, wd2797_device, read, write)
 	AM_RANGE(0x70, 0x7f) AM_DEVREADWRITE(BW2_EXPANSION_SLOT_TAG, bw2_expansion_slot_device, modsel_r, modsel_w)
 ADDRESS_MAP_END
 
@@ -229,7 +231,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( lcdc_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( lcdc_map, AS_0, 8, bw2_state )
+static ADDRESS_MAP_START( lcdc_map, 0, 8, bw2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
@@ -494,12 +496,6 @@ READ8_MEMBER( bw2_state::ppi_pc_r )
 //  pit8253_config pit_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( bw2_state::pit_out0_w )
-{
-	m_uart->write_txc(state);
-	m_uart->write_rxc(state);
-}
-
 WRITE_LINE_MEMBER( bw2_state::mtron_w )
 {
 	m_mtron = state;
@@ -573,7 +569,7 @@ void bw2_state::machine_start()
 //  MACHINE_CONFIG( bw2 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( bw2, bw2_state )
+MACHINE_CONFIG_START(bw2_state::bw2)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(bw2_mem)
@@ -593,7 +589,8 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	// devices
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_16MHz/4) // 8251 USART TXC, RXC
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(bw2_state, pit_out0_w))
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(I8251_TAG, i8251_device, write_rxc))
 	MCFG_PIT8253_CLK1(11000) // LCD controller
 	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE(I8253_TAG, pit8253_device, write_clk2))
 	MCFG_PIT8253_CLK2(0) // Floppy /MTRON
@@ -606,7 +603,7 @@ static MACHINE_CONFIG_START( bw2, bw2_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(bw2_state, ppi_pc_w))
 
 	MCFG_DEVICE_ADD(MSM6255_TAG, MSM6255, XTAL_16MHz)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, lcdc_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, lcdc_map)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
@@ -665,5 +662,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY             FULLNAME            FLAGS
-COMP( 1985, bw2,    0,      0,      bw2,        bw2,    driver_device,      0,      "Bondwell Holding", "Bondwell Model 2", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE       INIT    COMPANY             FULLNAME            FLAGS
+COMP( 1985, bw2,    0,      0,      bw2,        bw2,    bw2_state,  0,      "Bondwell Holding", "Bondwell Model 2", MACHINE_NO_SOUND_HW )

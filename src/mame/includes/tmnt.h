@@ -162,7 +162,7 @@ public:
 	uint32_t screen_update_glfgreat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_blswhstl(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_blswhstl);
 	INTERRUPT_GEN_MEMBER(tmnt_interrupt);
 	INTERRUPT_GEN_MEMBER(punkshot_interrupt);
 	INTERRUPT_GEN_MEMBER(lgtnfght_interrupt);
@@ -183,6 +183,18 @@ public:
 	K052109_CB_MEMBER(blswhstl_tile_callback);
 	SAMPLES_START_CB_MEMBER(tmnt_decode_sample);
 
+	void cuebrick(machine_config &config);
+	void blswhstl(machine_config &config);
+	void ssriders(machine_config &config);
+	void tmnt2(machine_config &config);
+	void lgtnfght(machine_config &config);
+	void thndrx2(machine_config &config);
+	void prmrsocr(machine_config &config);
+	void sunsetbl(machine_config &config);
+	void glfgreat(machine_config &config);
+	void tmnt(machine_config &config);
+	void mia(machine_config &config);
+	void punkshot(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

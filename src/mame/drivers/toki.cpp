@@ -71,7 +71,7 @@ Notes:
            8 - 8kx8 EPROM (i.e. 27C64)
      BK1/BK2 - 512kx8 DIP40 mask ROM
    OBJ1/OBJ2 - 512kx8 DIP40 mask ROM
-      82S129 - Philips 82S129 1k-bit (256x4) Biploar PROM at location J3
+      82S129 - Philips 82S129 1k-bit (256x4) Bipolar PROM at location J3
       82S135 - Philips 82S135 2k-bit (256x8) Bipolar PROM at location B6
       LA4460 - Sanyo LA4460 12W Power AMP
    SEI0100BU - Custom chip marked 'SEI0100BU YM3931' (SDIP64)
@@ -93,12 +93,15 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/toki.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/3812intf.h"
-#include "sound/3812intf.h"
-#include "includes/toki.h"
+#include "sound/okim6295.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(toki_state::tokib_soundcommand_w)
 {
@@ -143,11 +146,11 @@ static ADDRESS_MAP_START( toki_map, AS_PROGRAM, 16, toki_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06d7ff) AM_RAM
 	AM_RANGE(0x06d800, 0x06dfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(background1_videoram_w) AM_SHARE("bg1_vram")
 	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(background2_videoram_w) AM_SHARE("bg2_vram")
 	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(foreground_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x080000, 0x08000d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
+	AM_RANGE(0x080000, 0x08000d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a005f) AM_WRITE(toki_control_w) AM_SHARE("scrollram")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("INPUTS")
@@ -158,7 +161,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tokib_map, AS_PROGRAM, 16, toki_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06dfff) AM_RAM
-	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(background1_videoram_w) AM_SHARE("bg1_vram")
 	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(background2_videoram_w) AM_SHARE("bg2_vram")
 	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(foreground_videoram_w) AM_SHARE("videoram")
@@ -178,6 +181,57 @@ static ADDRESS_MAP_START( tokib_map, AS_PROGRAM, 16, toki_state )
 ADDRESS_MAP_END
 
 /*****************************************************************************/
+
+static ADDRESS_MAP_START( toki_audio_map, AS_PROGRAM, 8, toki_state )
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( toki_audio_opcodes_map, AS_OPCODES, 8, toki_state )
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jujuba_audio_map, AS_PROGRAM, 8, toki_state )
+	AM_RANGE(0x0000, 0x1fff) AM_READ(jujuba_z80_data_decrypt)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jujuba_audio_opcodes_map, AS_OPCODES, 8, toki_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("audiocpu", 0)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+ADDRESS_MAP_END
+
+READ8_MEMBER(toki_state::jujuba_z80_data_decrypt)
+{
+	return m_audiocpu_rom[offset] ^ 0x55;
+}
 
 static ADDRESS_MAP_START( tokib_audio_map, AS_PROGRAM, 8, toki_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -431,14 +485,19 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu */
+MACHINE_CONFIG_START(toki_state::toki) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz /2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(toki_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toki_state,  irq1_line_hold)/* VBL */
 
-	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)  /* verifed on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4) // verified on pcb
+	MCFG_CPU_PROGRAM_MAP(toki_audio_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(toki_audio_opcodes_map)
+
+	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
+	MCFG_DEVICE_ROM("audiocpu")
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -448,7 +507,7 @@ static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu *
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* verified */
 	MCFG_SCREEN_UPDATE_DRIVER(toki_state, screen_update_toki)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", toki)
@@ -456,18 +515,31 @@ static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu *
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12) /* verifed on pcb */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_14_31818MHz/4)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, PIN7_HIGH) // verified on pcb
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tokie, toki )
-	SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()
+MACHINE_CONFIG_DERIVED(toki_state::jujuba, toki)
+	MCFG_DEVICE_REMOVE("sei80bu")
+
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(jujuba_audio_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(jujuba_audio_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tokic, toki )
-	SEIBU_SOUND_SYSTEM_ENCRYPTED_CUSTOM()
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( tokib, toki_state )
+MACHINE_CONFIG_START(toki_state::tokib)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10MHz causes bad slowdowns with monkey machine rd1, but is correct, 20Mhz XTAL */
@@ -487,7 +559,7 @@ static MACHINE_CONFIG_START( tokib, toki_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)  /* verified */
 	MCFG_SCREEN_UPDATE_DRIVER(toki_state, screen_update_tokib)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tokib)
@@ -504,7 +576,7 @@ static MACHINE_CONFIG_START( tokib, toki_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(toki_state, tokib_adpcm_int)) /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)  /* 4KHz               */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 4KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -543,6 +615,10 @@ ROM_START( toki )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 
@@ -585,6 +661,10 @@ ROM_START( tokip )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9 1-M",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) ) //
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 ROM_START( tokia )
@@ -614,6 +694,10 @@ ROM_START( tokia )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 ROM_START( tokiua )
@@ -643,6 +727,10 @@ ROM_START( tokiua )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 
@@ -673,6 +761,10 @@ ROM_START( tokiu )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 ROM_START( juju )
@@ -702,6 +794,10 @@ ROM_START( juju )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
 	ROM_LOAD( "9.m1",   0x00000, 0x20000, CRC(ae7a6b8b) SHA1(1d410f91354ffd1774896b2e64f20a2043607805) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* video-related */
+	ROM_LOAD( "PROM26.B6",      0x0000, 0x0100, CRC(ea6312c6) SHA1(44e2ae948cb79884a3acd8d7d3ff1c9e31562e3e) )
+	ROM_LOAD( "PROM27.J3",      0x0100, 0x0100, CRC(e616ae85) SHA1(49614f87615f1a608eeb90bc68d5fc6d9109a565) )
 ROM_END
 
 ROM_START( jujuba )
@@ -863,7 +959,7 @@ DRIVER_INIT_MEMBER(toki_state,toki)
 	memcpy(&buffer[0],ROM,0x20000);
 	for( i = 0; i < 0x20000; i++ )
 	{
-		ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
+		ROM[i] = buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 	}
 }
 
@@ -918,24 +1014,10 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 
 		for (i = 0; i < 0x60000/2; i++)
 		{
-			prgrom[i] = BITSWAP16(prgrom[i],15,12,13,14,
+			prgrom[i] = bitswap<16>(prgrom[i],15,12,13,14,
 											11,10, 9, 8,
 											7, 6,  5, 3,
 											4, 2,  1, 0);
-		}
-	}
-
-	/* Decrypt data for z80 program */
-	{
-		uint8_t *decrypt = m_seibu_sound->get_custom_decrypt();
-		uint8_t *rom = memregion("audiocpu")->base();
-
-		memcpy(decrypt,rom,0x20000);
-
-		for (int i = 0;i < 0x2000;i++)
-		{
-			uint8_t src = decrypt[i];
-			rom[i] = src^0x55;
 		}
 	}
 
@@ -947,25 +1029,25 @@ DRIVER_INIT_MEMBER(toki_state,jujuba)
 		memcpy(&buffer[0],ROM,0x20000);
 		for( i = 0; i < 0x20000; i++ )
 		{
-			ROM[i] = buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
+			ROM[i] = buffer[bitswap<24>(i,23,22,21,20,19,18,17,16,13,14,15,12,11,10,9,8,7,6,5,4,3,2,1,0)];
 		}
 	}
 }
 
 
 // these 2 are both unique revisions
-GAME( 1989, toki,  0,    tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tokiu, toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, toki,  0,    toki,   toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tokiu, toki, toki,   toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 1)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, tokip, toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, prototype?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tokip, toki, toki,   toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, prototype?)", MACHINE_SUPPORTS_SAVE )
 
 
 // these 3 are all the same revision, only the region byte differs
-GAME( 1989, tokia, toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tokiua,toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, juju,  toki, tokie,  toki, toki_state,  toki,  ROT0, "TAD Corporation", "JuJu Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tokia, toki, toki,   toki, toki_state,  toki,  ROT0, "TAD Corporation", "Toki (World, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tokiua,toki, toki,   toki, toki_state,  toki,  ROT0, "TAD Corporation (Fabtek license)", "Toki (US, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, juju,  toki, toki,   toki, toki_state,  toki,  ROT0, "TAD Corporation", "JuJu Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, tokib,  toki, tokib, tokib, toki_state, tokib, ROT0, "bootleg (Datsu)", "Toki (Datsu bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, jujub,  toki, tokib, tokib, toki_state, tokib, ROT0, "bootleg (Playmark)", "JuJu Densetsu (Playmark bootleg)", MACHINE_SUPPORTS_SAVE )
 /* Sound hardware seems to have been slightly modified, the coins are handled ok, but there is no music and bad sfx.  Program roms have a slight bitswap, Flipscreen also seems to be ignored */
-GAME( 1989, jujuba, toki, tokic, toki, toki_state,  jujuba, ROT180, "bootleg", "JuJu Densetsu (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg of tokia/juju revison
+GAME( 1989, jujuba, toki, jujuba, toki, toki_state, jujuba, ROT180, "bootleg", "JuJu Densetsu (Japan, bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // bootleg of tokia/juju revison

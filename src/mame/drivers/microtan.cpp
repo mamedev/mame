@@ -39,17 +39,20 @@
 
 /* Core includes */
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/microtan.h"
 
 /* Components */
-#include "sound/ay8910.h"
-#include "sound/wave.h"
+#include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/mos6551.h"
+#include "sound/ay8910.h"
+#include "sound/wave.h"
 
 /* Devices */
 #include "imagedev/cassette.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( microtan_map, AS_PROGRAM, 8, microtan_state )
@@ -206,9 +209,9 @@ static GFXDECODE_START( microtan )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( microtan, microtan_state )
+MACHINE_CONFIG_START(microtan_state::microtan)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 750000)  // 750 kHz
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_6MHz / 8)  // 750 kHz
 	MCFG_CPU_PROGRAM_MAP(microtan_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", microtan_state,  microtan_interrupt)
 
@@ -247,7 +250,7 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL_6MHz / 8)
 	MCFG_VIA6522_READPA_HANDLER(READ8(microtan_state, via_0_in_a))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(microtan_state, via_0_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(microtan_state, via_0_out_b))
@@ -255,7 +258,7 @@ static MACHINE_CONFIG_START( microtan, microtan_state )
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(microtan_state, via_0_out_cb2))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(microtan_state, via_0_irq))
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_6MHz / 8)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(microtan_state, via_1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(microtan_state, via_1_out_b))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(microtan_state, via_1_out_ca2))
@@ -281,5 +284,5 @@ ROM_START( microtan )
 ROM_END
 
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      COMPANY      FULLNAME
-COMP( 1979, microtan, 0,        0,      microtan, microtan, microtan_state, microtan, "Tangerine", "Microtan 65" , 0)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT      COMPANY      FULLNAME        FLAGS
+COMP( 1979, microtan, 0,        0,      microtan, microtan, microtan_state, microtan, "Tangerine", "Microtan 65" , 0 )

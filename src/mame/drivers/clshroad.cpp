@@ -16,22 +16,35 @@ Sound Chips :   Custom (NAMCO)
 
 XTAL        :   18.432 MHz
 
-Notes:
-
-- firebatl video (https://tmblr.co/ZgJvzv2E2C_z-) shows transparency for the
-  text layer is not correctly emulated.
+TODO:
+- few unused video registers (2 and 3);
+- clshroad: erratic gameplay speed;
+- firebatl: video (https://tmblr.co/ZgJvzv2E2C_z-) shows transparency for the
+  text layer is not correctly emulated, fixed by initializing VRAM to 0xf0? (that layer seems unused by this game);
+- firebatl: bad sprite colors;
+- firebatl: remove ROM patch;
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "audio/wiping.h"
 #include "includes/clshroad.h"
+#include "audio/wiping.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/74259.h"
+#include "screen.h"
+#include "speaker.h"
+
+/* unknown divider, assume /5 */
+#define MAIN_CLOCK XTAL_18_432MHz/5
 
 void clshroad_state::machine_reset()
 {
 	flip_screen_set(0);
 	m_main_irq_mask = m_sound_irq_mask = 0;
+	// not initialized by HW, matches grey background on first title screen
+	for(int i = 0;i<0x800;i++)
+		m_vram_0[i] = 0xf0;
 }
 
 
@@ -46,19 +59,14 @@ READ8_MEMBER(clshroad_state::input_r)
 
 // irq/reset controls like in wiping.cpp
 
-WRITE8_MEMBER(clshroad_state::subcpu_reset_w)
+WRITE_LINE_MEMBER(clshroad_state::main_irq_mask_w)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	m_main_irq_mask = state;
 }
 
-WRITE8_MEMBER(clshroad_state::main_irq_mask_w)
+WRITE_LINE_MEMBER(clshroad_state::sound_irq_mask_w)
 {
-	m_main_irq_mask = data & 1;
-}
-
-WRITE8_MEMBER(clshroad_state::sound_irq_mask_w)
-{
-	m_sound_irq_mask = data & 1;
+	m_sound_irq_mask = state;
 }
 
 
@@ -68,9 +76,7 @@ static ADDRESS_MAP_START( clshroad_map, AS_PROGRAM, 8, clshroad_state )
 	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x9800, 0x9dff) AM_RAM
 	AM_RANGE(0x9e00, 0x9fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(subcpu_reset_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(main_irq_mask_w)
-	AM_RANGE(0xa004, 0xa004) AM_WRITE(flipscreen_w)
+	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xa100, 0xa107) AM_READ(input_r)
 	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1") // Layer 1
 	AM_RANGE(0xb000, 0xb003) AM_WRITEONLY AM_SHARE("vregs") // Scroll
@@ -81,7 +87,7 @@ static ADDRESS_MAP_START( clshroad_sound_map, AS_PROGRAM, 8, clshroad_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE("custom", wiping_sound_device, sound_w)
 	AM_RANGE(0x9600, 0x97ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(sound_irq_mask_w)
+	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -264,16 +270,22 @@ INTERRUPT_GEN_MEMBER(clshroad_state::sound_timer_irq)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( firebatl, clshroad_state )
+MACHINE_CONFIG_START(clshroad_state::firebatl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 3000000)   /* ? */
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(clshroad_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3000000)  /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 120)    /* periodic interrupt, don't know about the frequency */
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(INPUTLINE("audiocpu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(clshroad_state, main_irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(clshroad_state, sound_irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(clshroad_state, flipscreen_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -294,21 +306,27 @@ static MACHINE_CONFIG_START( firebatl, clshroad_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("custom", WIPING, 0)
+	MCFG_SOUND_ADD("custom", WIPING_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( clshroad, clshroad_state )
+MACHINE_CONFIG_START(clshroad_state::clshroad)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/4)  /* ? real speed unknown. 3MHz is too low and causes problems */
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)  /* ? real speed unknown. 3MHz is too low and causes problems */
 	MCFG_CPU_PROGRAM_MAP(clshroad_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6) /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, MAIN_CLOCK) /* ? */
 	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
+	//MCFG_CPU_VBLANK_INT_DRIVER("screen", clshroad_state,  irq0_line_hold)   /* IRQ, no NMI */
+	MCFG_CPU_PERIODIC_INT_DRIVER(clshroad_state, sound_timer_irq, 60)    /* periodic interrupt, don't know about the frequency */
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // never writes here?
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(clshroad_state, main_irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(clshroad_state, sound_irq_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(clshroad_state, flipscreen_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -328,7 +346,7 @@ static MACHINE_CONFIG_START( clshroad, clshroad_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("custom", WIPING, 0)
+	MCFG_SOUND_ADD("custom", WIPING_CUSTOM, 96000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -372,7 +390,7 @@ MACHINE_CONFIG_END
 
  *  2 x NEC D780C
  ** 18.??? MHz clock
- 
+
 ***************************************************************************/
 
 ROM_START( firebatl )
@@ -542,15 +560,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(clshroad_state,firebatl)
 {
-/*
-Pugsy> firebatl:0:05C6:C3:100:Fix the Game:It's a hack but seems to make it work!
-Pugsy> firebatl:0:05C7:8D:600:Fix the Game (2/3)
-Pugsy> firebatl:0:05C8:23:600:Fix the Game (3/3)
-
-without this the death sequence never ends so the game is unplayable after you
-die once, it would be nice to avoid the hack however
-
-*/
+	// applying HACK to fix the game
+	// without this the death sequence never ends so the game is unplayable after you
+	// die once, it would be nice to avoid the hack however
 	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x05C6] = 0xc3;
@@ -559,6 +571,6 @@ die once, it would be nice to avoid the hack however
 }
 
 GAME( 1984, firebatl, 0,        firebatl, firebatl, clshroad_state, firebatl, ROT90, "Wood Place Inc. (Taito license)",             "Fire Battle",                    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, clshroad, 0,        clshroad, clshroad, driver_device, 0,         ROT0,  "Wood Place Inc.",                             "Clash-Road",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1986, clshroads,clshroad, clshroad, clshroad, driver_device, 0,         ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1986, clshroadd,clshroad, clshroad, clshroad, driver_device, 0,         ROT0,  "Wood Place Inc. (Data East license)",         "Clash-Road (Data East license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, clshroad, 0,        clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc.",                             "Clash-Road",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, clshroads,clshroad, clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc. (Status Game Corp. license)", "Clash-Road (Status license)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, clshroadd,clshroad, clshroad, clshroad, clshroad_state, 0,        ROT0,  "Wood Place Inc. (Data East license)",         "Clash-Road (Data East license)", MACHINE_SUPPORTS_SAVE )

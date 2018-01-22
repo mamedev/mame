@@ -67,7 +67,7 @@ STATUS:
           - posirq handling broken
 
     Driver's Eyes
-        crashes
+        Left and Right screen
 
 TODO:   (*) Extract DSP BIOS
 
@@ -519,17 +519,23 @@ Filter Board
 
 */
 #include "emu.h"
+#include "includes/namcos21.h"
+#include "machine/namcoic.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/tms32025/tms32025.h"
-#include "includes/namcoic.h"
 #include "sound/ym2151.h"
-#include "sound/c140.h"
-#include "includes/namcos21.h"
 #include "machine/nvram.h"
+#include "sound/c140.h"
+#include "speaker.h"
+
 
 #define PTRAM_SIZE 0x20000
+// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
+#define MCFG_SCREEN_RAW_PARAMS_NAMCO480I \
+	MCFG_SCREEN_RAW_PARAMS(12288000*2, 768, 0, 496, 264*2,0,480)
 
 #define ENABLE_LOGGING      0
 
@@ -564,20 +570,20 @@ READ16_MEMBER(namcos21_state::dspcuskey_r)
 	uint16_t result = 0;
 	if( m_gametype == NAMCOS21_SOLVALOU )
 	{
-		switch( space.device().safe_pc() )
+		switch( m_dspmaster->pc() )
 		{
 		case 0x805e: result = 0x0000; break;
 		case 0x805f: result = 0xfeba; break;
 		case 0x8067: result = 0xffff; break;
 		case 0x806e: result = 0x0145; break;
 		default:
-			logerror( "unk cuskey_r; pc=0x%x\n", space.device().safe_pc() );
+			logerror( "unk cuskey_r; pc=0x%x\n", m_dspmaster->pc() );
 			break;
 		}
 	}
 	else if( m_gametype == NAMCOS21_CYBERSLED )
 	{
-		switch( space.device().safe_pc() )
+		switch( m_dspmaster->pc() )
 		{
 		case 0x8061: result = 0xfe95; break;
 		case 0x8069: result = 0xffff; break;
@@ -588,7 +594,7 @@ READ16_MEMBER(namcos21_state::dspcuskey_r)
 	}
 	else if( m_gametype == NAMCOS21_AIRCOMBAT )
 	{
-		switch( space.device().safe_pc() )
+		switch( m_dspmaster->pc() )
 		{
 		case 0x8062: result = 0xfeb9; break;
 		case 0x806a: result = 0xffff; break;
@@ -777,7 +783,7 @@ READ16_MEMBER(namcos21_state::dspram16_r)
 	return m_dspram16[offset];
 }
 
-WRITE16_MEMBER(namcos21_state::dspram16_w)
+template<bool maincpu> WRITE16_MEMBER(namcos21_state::dspram16_w)
 {
 	COMBINE_DATA( &m_dspram16[offset] );
 
@@ -791,9 +797,9 @@ WRITE16_MEMBER(namcos21_state::dspram16_w)
 		}
 		else if (m_gametype == NAMCOS21_SOLVALOU &&
 					offset == 0x103 &&
-					&space.device() == m_maincpu)
+					maincpu)
 		{ /* hack; synchronization for solvalou */
-			space.device().execute().yield();
+			m_maincpu->yield();
 		}
 	}
 }
@@ -802,6 +808,7 @@ WRITE16_MEMBER(namcos21_state::dspram16_w)
 
 int namcos21_state::init_dsp()
 {
+	// TODO: what actually tests this?
 	uint16_t *pMem = (uint16_t *)memregion("dspmaster")->base();
 	/**
 	 * DSP BIOS tests "CPU ID" on startup
@@ -978,7 +985,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_dsp_data, AS_DATA, 16, namcos21_state )
 	AM_RANGE(0x2000, 0x200f) AM_READWRITE(dspcuskey_r,dspcuskey_w)
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(dspram16_r,dspram16_w) /* 0x8000 words */
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE(dspram16_r,dspram16_w<false>) /* 0x8000 words */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_dsp_io, AS_IO, 16, namcos21_state )
@@ -1086,7 +1093,7 @@ WRITE16_MEMBER(namcos21_state::slave_port3_w)
 
 WRITE16_MEMBER(namcos21_state::slave_XF_output_w)
 {
-	if (ENABLE_LOGGING) logerror( "0x%x:slaveXF(%d)\n", space.device().safe_pc(), data );
+	if (ENABLE_LOGGING) logerror( "%s :slaveXF(%d)\n", machine().describe_context(), data );
 }
 
 READ16_MEMBER(namcos21_state::slave_portf_r)
@@ -1223,48 +1230,45 @@ WRITE8_MEMBER(namcos21_state::namcos2_dualportram_byte_w)
 }
 
 /******************************************************************************/
-WRITE16_MEMBER(namcos21_state::NAMCO_C139_SCI_buffer_w){}
-READ16_MEMBER(namcos21_state::NAMCO_C139_SCI_buffer_r){ return 0; }
-
-WRITE16_MEMBER(namcos21_state::NAMCO_C139_SCI_register_w){}
-READ16_MEMBER(namcos21_state::NAMCO_C139_SCI_register_r){ return 0; }
-/******************************************************************************/
 
 /*************************************************************/
 /* MASTER 68000 CPU Memory declarations                      */
 /*************************************************************/
 
-#define NAMCO21_68K_COMMON \
-	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE(dspram16_r,dspram16_w) AM_SHARE("dspram16") \
-	AM_RANGE(0x280000, 0x280001) AM_WRITENOP /* written once on startup */ \
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(pointram_control_w) \
-	AM_RANGE(0x440000, 0x440001) AM_READWRITE(pointram_data_r,pointram_data_w) \
-	AM_RANGE(0x440002, 0x47ffff) AM_WRITENOP /* (?) Air Combat */ \
-	AM_RANGE(0x480000, 0x4807ff) AM_READWRITE(namcos21_depthcue_r,namcos21_depthcue_w) /* Air Combat */ \
-	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w) \
-	AM_RANGE(0x720000, 0x720007) AM_READWRITE(c355_obj_position_r,c355_obj_position_w) \
-	AM_RANGE(0x740000, 0x74ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") \
-	AM_RANGE(0x750000, 0x75ffff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext") \
-	AM_RANGE(0x760000, 0x760001) AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w) \
-	AM_RANGE(0x800000, 0x8fffff) AM_ROM AM_REGION("data", 0) \
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram") \
-	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w) \
-	AM_RANGE(0xb00000, 0xb03fff) AM_READWRITE(NAMCO_C139_SCI_buffer_r,NAMCO_C139_SCI_buffer_w) \
-	AM_RANGE(0xb80000, 0xb8000f) AM_READWRITE(NAMCO_C139_SCI_register_r,NAMCO_C139_SCI_register_w) \
+static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, namcos21_state )
+	AM_RANGE(0x280000, 0x280001) AM_WRITENOP /* written once on startup */
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(pointram_control_w)
+	AM_RANGE(0x440000, 0x440001) AM_READWRITE(pointram_data_r,pointram_data_w)
+	AM_RANGE(0x440002, 0x47ffff) AM_WRITENOP /* (?) Air Combat */
+	AM_RANGE(0x480000, 0x4807ff) AM_READWRITE(namcos21_depthcue_r,namcos21_depthcue_w) /* Air Combat */
+	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w)
+	AM_RANGE(0x720000, 0x720007) AM_READWRITE(c355_obj_position_r,c355_obj_position_w)
+	AM_RANGE(0x740000, 0x74ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0x750000, 0x75ffff) AM_RAM_DEVWRITE("palette", palette_device, write16_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x760000, 0x760001) AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
+	AM_RANGE(0x800000, 0x8fffff) AM_ROM AM_REGION("data", 0)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
+	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)
+	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 	AM_RANGE(0xc00000, 0xcfffff) AM_ROM AM_MIRROR(0x100000) AM_REGION("edata", 0)
-static ADDRESS_MAP_START( namcos21_68k_master, AS_PROGRAM, 16, namcos21_state )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* private work RAM */
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE8(namcos2_68k_eeprom_r,namcos2_68k_eeprom_w,0x00ff)
-	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE(namcos2_68k_master_C148_r,namcos2_68k_master_C148_w)
-	NAMCO21_68K_COMMON
+	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("master_intc", namco_c148_device, map)
+	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE(dspram16_r,dspram16_w<true>) AM_SHARE("dspram16")
+	AM_IMPORT_FROM( common_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( namcos21_68k_slave, AS_PROGRAM, 16, namcos21_state )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM /* private work RAM */
-	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE(namcos2_68k_slave_C148_r,namcos2_68k_slave_C148_w)
-	NAMCO21_68K_COMMON
+	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("slave_intc", namco_c148_device, map)
+	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE(dspram16_r,dspram16_w<false>) AM_SHARE("dspram16")
+	AM_IMPORT_FROM( common_map )
 ADDRESS_MAP_END
 
 
@@ -1286,7 +1290,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dspcomram_w)
 
 READ16_MEMBER(namcos21_state::winrun_cuskey_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_dsp->pc();
 	switch( pc )
 	{
 	case 0x0064: /* winrun91 */
@@ -1460,11 +1464,11 @@ WRITE16_MEMBER(namcos21_state::winrun_dspcomram_control_w)
 	COMBINE_DATA( &m_winrun_dspcomram_control[offset] );
 }
 
-static ADDRESS_MAP_START( am_master_winrun, AS_PROGRAM, 16, namcos21_state )
+static ADDRESS_MAP_START( winrun_master_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* work RAM */
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE8(namcos2_68k_eeprom_r,namcos2_68k_eeprom_w,0x00ff)
-	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE(namcos2_68k_master_C148_r,namcos2_68k_master_C148_w)
+	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("master_intc", namco_c148_device, map)
 	AM_RANGE(0x250000, 0x25ffff) AM_RAM AM_SHARE("winrun_polydata")
 	AM_RANGE(0x260000, 0x26ffff) AM_RAM /* unused? */
 	AM_RANGE(0x280000, 0x281fff) AM_WRITE(winrun_dspbios_w) AM_SHARE("winrun_dspbios")
@@ -1476,34 +1480,35 @@ static ADDRESS_MAP_START( am_master_winrun, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x800000, 0x87ffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_READWRITE(NAMCO_C139_SCI_buffer_r,NAMCO_C139_SCI_buffer_w)
-	AM_RANGE(0xb80000, 0xb8000f) AM_READWRITE(NAMCO_C139_SCI_register_r,NAMCO_C139_SCI_register_w)
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)
+	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( am_slave_winrun, AS_PROGRAM, 16, namcos21_state )
+static ADDRESS_MAP_START( winrun_slave_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
-	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE(namcos2_68k_slave_C148_r,namcos2_68k_slave_C148_w)
+	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("slave_intc", namco_c148_device, map)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("gpu_comram")
 	AM_RANGE(0x800000, 0x87ffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_READWRITE(NAMCO_C139_SCI_buffer_r,NAMCO_C139_SCI_buffer_w)
-	AM_RANGE(0xb80000, 0xb8000f) AM_READWRITE(NAMCO_C139_SCI_register_r,NAMCO_C139_SCI_register_w)
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)
+	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( am_gpu_winrun, AS_PROGRAM, 16, namcos21_state )
+
+static ADDRESS_MAP_START( winrun_gpu_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READWRITE(winrun_gpu_color_r,winrun_gpu_color_w) /* ? */
 	AM_RANGE(0x180000, 0x19ffff) AM_RAM /* work RAM */
-	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE(namcos21_68k_gpu_C148_r,namcos21_68k_gpu_C148_w)
+	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("gpu_intc", namco_c148_device, map)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gpu_comram")
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x410000, 0x41ffff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0x410000, 0x41ffff) AM_RAM_DEVWRITE("palette", palette_device, write16_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x600000, 0x6fffff) AM_ROM AM_REGION("gdata", 0)
 	AM_RANGE(0xc00000, 0xcfffff) AM_READWRITE(winrun_gpu_videoram_r,winrun_gpu_videoram_w)
 	AM_RANGE(0xd00000, 0xd0000f) AM_READWRITE(winrun_gpu_register_r,winrun_gpu_register_w)
-//  AM_RANGE(0xe0000c, 0xe0000d) POSIRQ
+	AM_RANGE(0xe0000c, 0xe0000d) AM_DEVREADWRITE8("gpu_intc", namco_c148_device, ext_posirq_line_r,ext_posirq_line_w,0x00ff)
 ADDRESS_MAP_END
 
 
@@ -1511,7 +1516,7 @@ ADDRESS_MAP_END
 /* SOUND 6809 CPU Memory declarations                        */
 /*************************************************************/
 
-static ADDRESS_MAP_START( am_sound_winrun, AS_PROGRAM, 8, namcos21_state )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos21_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank6") /* banked */
 	AM_RANGE(0x3000, 0x3003) AM_WRITENOP /* ? */
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
@@ -1531,7 +1536,7 @@ ADDRESS_MAP_END
 /* I/O HD63705 MCU Memory declarations                       */
 /*************************************************************/
 
-static ADDRESS_MAP_START( am_mcu_winrun, AS_PROGRAM, 8, namcos21_state )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, namcos21_state )
 	AM_RANGE(0x0000, 0x0000) AM_READNOP
 	AM_RANGE(0x0001, 0x0001) AM_READ_PORT("PORTB")          /* p1,p2 start */
 	AM_RANGE(0x0002, 0x0002) AM_READ_PORT("PORTC")          /* coins */
@@ -1553,43 +1558,264 @@ static ADDRESS_MAP_START( am_mcu_winrun, AS_PROGRAM, 8, namcos21_state )
 ADDRESS_MAP_END
 
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+/*************************************************************/
+/* Driver's Eyes Memory declarations overrides               */
+/*************************************************************/
 
-#define DRIVEYES_68K_COMMON \
-	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w) \
-	AM_RANGE(0x720000, 0x720007) AM_READWRITE(c355_obj_position_r,c355_obj_position_w) \
-	AM_RANGE(0x740000, 0x74ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") \
-	AM_RANGE(0x750000, 0x75ffff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext") \
-	AM_RANGE(0x760000, 0x760001) AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w) \
-	AM_RANGE(0x800000, 0x8fffff) AM_ROM AM_REGION("data", 0) \
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram") \
-	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w) \
-	AM_RANGE(0xb00000, 0xb03fff) AM_READWRITE(NAMCO_C139_SCI_buffer_r,NAMCO_C139_SCI_buffer_w) \
-	AM_RANGE(0xb80000, 0xb8000f) AM_READWRITE(NAMCO_C139_SCI_register_r,NAMCO_C139_SCI_register_w)
 
-static ADDRESS_MAP_START( driveyes_68k_master, AS_PROGRAM, 16, namcos21_state )
+static ADDRESS_MAP_START( driveyes_common_map, AS_PROGRAM, 16, namcos21_state )
+	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE(c355_obj_ram_r,c355_obj_ram_w)
+	AM_RANGE(0x720000, 0x720007) AM_READWRITE(c355_obj_position_r,c355_obj_position_w)
+	AM_RANGE(0x740000, 0x74ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0x750000, 0x75ffff) AM_RAM_DEVWRITE("palette", palette_device, write16_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x760000, 0x760001) AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
+	AM_RANGE(0x800000, 0x8fffff) AM_ROM AM_REGION("data", 0)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
+	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("sci", namco_c139_device, ram_r, ram_w)
+	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( driveyes_master_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* private work RAM */
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE8(namcos2_68k_eeprom_r,namcos2_68k_eeprom_w,0x00ff)
-	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE(namcos2_68k_master_C148_r,namcos2_68k_master_C148_w)
+	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("master_intc", namco_c148_device, map)
 	AM_RANGE(0x250000, 0x25ffff) AM_RAM AM_SHARE("winrun_polydata")
 	AM_RANGE(0x280000, 0x281fff) AM_WRITE(winrun_dspbios_w) AM_SHARE("winrun_dspbios")
 	AM_RANGE(0x380000, 0x38000f) AM_READWRITE(winrun_dspcomram_control_r,winrun_dspcomram_control_w)
 	AM_RANGE(0x3c0000, 0x3c1fff) AM_READWRITE(winrun_68k_dspcomram_r,winrun_68k_dspcomram_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(pointram_control_w)
 	AM_RANGE(0x440000, 0x440001) AM_READWRITE(pointram_data_r,pointram_data_w)
-	DRIVEYES_68K_COMMON
+	AM_IMPORT_FROM( driveyes_common_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( driveyes_68k_slave, AS_PROGRAM, 16, namcos21_state )
+static ADDRESS_MAP_START( driveyes_slave_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* private work RAM */
-	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE(namcos2_68k_slave_C148_r,namcos2_68k_slave_C148_w)
-	DRIVEYES_68K_COMMON
+	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("slave_intc", namco_c148_device, map)
+	AM_IMPORT_FROM( driveyes_common_map )
 ADDRESS_MAP_END
+
+/*************************************************************/
+/*                                                           */
+/*  NAMCO SYSTEM 21 INPUT PORTS                              */
+/*                                                           */
+/*************************************************************/
+
+static INPUT_PORTS_START( s21default )
+	PORT_START("PORTB")     /* 63B05Z0 - PORT B */
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("PORTC")     /* 63B05Z0 - PORT C & SCI */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_0) PORT_TOGGLE // alt test mode switch
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
+
+	PORT_START("AN0")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("AN1")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x60,0x9f) PORT_SENSITIVITY(15) PORT_KEYDELTA(10)
+	PORT_START("AN2")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x60,0x9f) PORT_SENSITIVITY(20) PORT_KEYDELTA(10)
+	PORT_START("AN3")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("AN4")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("AN5")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("AN6")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 6 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("AN7")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("PORTH")     /* 63B05Z0 - PORT H */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW")       /* 63B05Z0 - $2000 DIP SW */
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x02, 0x02, "DSW2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "DSW3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "DSW4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "DSW5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "PCM ROM")
+	PORT_DIPSETTING(    0x20, "2M" )
+	PORT_DIPSETTING(    0x00, "4M" )
+	PORT_DIPNAME( 0x40, 0x40, "DSW7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Screen Stop")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DIAL0")     /* 63B05Z0 - $3000 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("DIAL1")     /* 63B05Z0 - $3001 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("DIAL2")     /* 63B05Z0 - $3002 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("DIAL3")     /* 63B05Z0 - $3003 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+/* "SCI - ? */
+static INPUT_PORTS_START( winrun )
+	PORT_INCLUDE(s21default)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20, 0x20, "PCM ROM")
+	PORT_DIPSETTING(    0x20, "2M" )
+	PORT_DIPSETTING(    0x00, "4M" )
+
+	PORT_MODIFY("PORTB")        /* 63B05Z0 - PORT B */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 ) /* ? */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) /* ? */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* ? */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) /* ? */
+
+	PORT_MODIFY("AN0")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("AN1")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
+	PORT_BIT( 0xff, 0x80, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+	PORT_MODIFY("AN2")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+	PORT_MODIFY("AN3")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
+	PORT_BIT( 0xff, 0x80, IPT_PEDAL2 ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+	PORT_MODIFY("AN4")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("AN5")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("AN6")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 6 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("AN7")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTH")        /* 63B05Z0 - PORT H */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Down")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Shift Up")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( winrungp )
+	PORT_INCLUDE(winrun)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20, 0x00, "PCM ROM")
+	PORT_DIPSETTING(    0x20, "2M" )
+	PORT_DIPSETTING(    0x00, "4M" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( driveyes )
+	PORT_INCLUDE(winrungp)
+
+	PORT_MODIFY("PORTB")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("gearbox", namcoio_gearbox_device, clutch_r )
+	PORT_BIT( 0x37, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("DIAL0")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("gearbox", namcoio_gearbox_device, in_r, nullptr )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTH")        /* 63B05Z0 - PORT H */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Red Button")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Green Button")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+// the default inc/dec analog keys have been chosen to map 'tank' style inputs found on Assault.
+// this makes the game easier to use with the keyboard, providing a familiar left/right stick mapping
+// ports are limited to 10/ef because otherwise, even when calibrated, the game will act as if the
+// inputs wrap around when they hit the maximum, causing undesired movement
+static INPUT_PORTS_START( cybsled )
+	PORT_INCLUDE(s21default)
+
+	PORT_MODIFY("AN0")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xef) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* right joystick: vertical */
+	PORT_MODIFY("AN1")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xef) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_E) PORT_CODE_INC(KEYCODE_D) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) /* left joystick: vertical */
+	PORT_MODIFY("AN2")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xef) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_J) PORT_CODE_INC(KEYCODE_L) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* right joystick: horizontal */
+	PORT_MODIFY("AN3")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xef) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_S) PORT_CODE_INC(KEYCODE_F) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) /* left joystick: horizontal */
+	PORT_MODIFY("AN4")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("AN5")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("AN6")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 6 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("AN7")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PORTH")        /* 63B05Z0 - PORT H */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Viewport Change Button")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Missile Button")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Gun Button")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( aircomb )
+	PORT_INCLUDE(s21default)
+
+	PORT_MODIFY("AN0")      /* IN#2: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("AN1")      /* IN#3: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+	PORT_MODIFY("AN2")      /* IN#4: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+	PORT_MODIFY("AN3")      /* IN#5: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
+	PORT_MODIFY("AN4")      /* IN#6: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("AN5")      /* IN#7: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("AN6")      /* IN#8: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 6 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("AN7")      /* IN#9: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("DSW")      /* 63B05Z0 - $2000 DIP SW */
+	PORT_DIPNAME( 0x01, 0x01, "DSW1") // not test mode on this game
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("PORTH")        /* IN#10: 63B05Z0 - PORT H */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) ///???
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) // prev color
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) // ???next color
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
 
 
 static const gfx_layout tile_layout =
@@ -1625,23 +1851,52 @@ MACHINE_START_MEMBER(namcos21_state,namcos21)
 	namcos2_kickstart = namcos21_kickstart;
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
+{
+	int scanline = param;
+//  int cur_posirq = get_posirq_scanline()*2;
 
-static MACHINE_CONFIG_START( namcos21, namcos21_state )
+	if(scanline == 240*2)
+	{
+		m_master_intc->vblank_irq_trigger();
+		m_slave_intc->vblank_irq_trigger();
+		if(m_gpu_intc)
+			m_gpu_intc->vblank_irq_trigger();
+	}
+
+	if(m_gpu_intc != nullptr)
+	{
+		if(scanline == (0xff-m_gpu_intc->get_posirq_line())*2)
+			m_gpu_intc->pos_irq_trigger();
+	}
+}
+
+MACHINE_CONFIG_START(namcos21_state::configure_c148_standard)
+	MCFG_NAMCO_C148_ADD("master_intc","maincpu",true)
+	namco_c148_device::link_c148_device(*device,"slave_intc");
+	MCFG_NAMCO_C148_EXT1_CB(WRITE8(namcos21_state, sound_reset_w))
+	MCFG_NAMCO_C148_EXT2_CB(WRITE8(namcos21_state, system_reset_w))
+
+	MCFG_NAMCO_C148_ADD("slave_intc","slave",false)
+	namco_c148_device::link_c148_device(*device,"master_intc");
+
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
-	MCFG_CPU_PROGRAM_MAP(namcos21_68k_master)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_master_vblank)
+	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
-	MCFG_CPU_PROGRAM_MAP(namcos21_68k_slave)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_slave_vblank)
+	MCFG_CPU_PROGRAM_MAP(slave_map)
 
-	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
-	MCFG_CPU_PROGRAM_MAP(am_sound_winrun)
+	MCFG_CPU_ADD("audiocpu", MC6809E, 3072000) /* Sound */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
 	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_CPU_PROGRAM_MAP(am_mcu_winrun)
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("dspmaster", TMS32025,24000000) /* 24 MHz? overclocked */
@@ -1668,12 +1923,12 @@ static MACHINE_CONFIG_START( namcos21, namcos21_state )
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(NAMCOS21_POLY_FRAME_WIDTH,NAMCOS21_POLY_FRAME_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0,495,0,479)
+	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_namcos21)
 	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos21)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
@@ -1684,7 +1939,7 @@ static MACHINE_CONFIG_START( namcos21, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)
+	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -1694,22 +1949,21 @@ static MACHINE_CONFIG_START( namcos21, namcos21_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( driveyes, namcos21_state )
+MACHINE_CONFIG_START(namcos21_state::driveyes)
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
-	MCFG_CPU_PROGRAM_MAP(driveyes_68k_master)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_master_vblank)
+	MCFG_CPU_PROGRAM_MAP(driveyes_master_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
-	MCFG_CPU_PROGRAM_MAP(driveyes_68k_slave)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_slave_vblank)
+	MCFG_CPU_PROGRAM_MAP(driveyes_slave_map)
 
-	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
-	MCFG_CPU_PROGRAM_MAP(am_sound_winrun)
+	MCFG_CPU_ADD("audiocpu", MC6809E, 3072000) /* Sound */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
 	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_CPU_PROGRAM_MAP(am_mcu_winrun)
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("dsp", TMS32025,24000000*2) /* 24 MHz? overclocked */
@@ -1727,13 +1981,14 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
+	MCFG_DEVICE_ADD("gearbox", NAMCOIO_GEARBOX, 0)
+
+	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(NAMCOS21_POLY_FRAME_WIDTH,NAMCOS21_POLY_FRAME_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0,495,0,479)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_namcos21)
+	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
+	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_driveyes)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos21)
@@ -1745,7 +2000,7 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)
+	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -1754,23 +2009,21 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-
-static MACHINE_CONFIG_START( winrun, namcos21_state )
+MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
-	MCFG_CPU_PROGRAM_MAP(am_master_winrun)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_master_vblank)
+	MCFG_CPU_PROGRAM_MAP(winrun_master_map)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, screen_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("slave", M68000,12288000) /* Slave */
-	MCFG_CPU_PROGRAM_MAP(am_slave_winrun)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_slave_vblank)
+	MCFG_CPU_PROGRAM_MAP(winrun_slave_map)
 
-	MCFG_CPU_ADD("audiocpu", M6809,3072000) /* Sound */
-	MCFG_CPU_PROGRAM_MAP(am_sound_winrun)
+	MCFG_CPU_ADD("audiocpu", MC6809E, 3072000) /* Sound */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq0_line_hold, 2*60)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos21_state, irq1_line_hold, 120)
 
 	MCFG_CPU_ADD("mcu", HD63705,2048000) /* IO */
-	MCFG_CPU_PROGRAM_MAP(am_mcu_winrun)
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("dsp", TMS32025,24000000) /* 24 MHz? overclocked */
@@ -1783,8 +2036,11 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_TMS32025_XF_OUT_CB(NOOP)
 
 	MCFG_CPU_ADD("gpu", M68000,12288000) /* graphics coprocessor */
-	MCFG_CPU_PROGRAM_MAP(am_gpu_winrun)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_gpu_vblank)
+	MCFG_CPU_PROGRAM_MAP(winrun_gpu_map)
+
+	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	MCFG_NAMCO_C148_ADD("gpu_intc","gpu",false)
+	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
@@ -1792,13 +2048,9 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(NAMCOS21_POLY_FRAME_WIDTH,NAMCOS21_POLY_FRAME_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0,495,0,479)
-	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_namcos21)
+	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
+	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_winrun)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
@@ -1811,7 +2063,7 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_C140_BANK_TYPE(C140_TYPE_SYSTEM21)
+	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -2507,214 +2759,15 @@ DRIVER_INIT_MEMBER(namcos21_state,driveyes)
 	m_mbNeedsKickstart = 0;
 }
 
-/*************************************************************/
-/*                                                           */
-/*  NAMCO SYSTEM 21 INPUT PORTS                              */
-/*                                                           */
-/*************************************************************/
-
-static INPUT_PORTS_START( s21default )
-	PORT_START("PORTB")     /* 63B05Z0 - PORT B */
-	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("PORTC")     /* 63B05Z0 - PORT C & SCI */
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_0) PORT_TOGGLE // alt test mode switch
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
-
-	PORT_START("AN0")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN1")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x60,0x9f) PORT_SENSITIVITY(15) PORT_KEYDELTA(10)
-	PORT_START("AN2")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x60,0x9f) PORT_SENSITIVITY(20) PORT_KEYDELTA(10)
-	PORT_START("AN3")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN4")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN5")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN6")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 6 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("AN7")       /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("PORTH")     /* 63B05Z0 - PORT H */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW")       /* 63B05Z0 - $2000 DIP SW */
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x02, 0x02, "DSW2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DSW3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DSW4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DSW5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "PCM ROM")
-	PORT_DIPSETTING(    0x20, "2M" )
-	PORT_DIPSETTING(    0x00, "4M" )
-	PORT_DIPNAME( 0x40, 0x40, "DSW7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Screen Stop")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DIAL0")     /* 63B05Z0 - $3000 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("DIAL1")     /* 63B05Z0 - $3001 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("DIAL2")     /* 63B05Z0 - $3002 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_START("DIAL3")     /* 63B05Z0 - $3003 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-/* "SCI - ? */
-static INPUT_PORTS_START( winrun )
-	PORT_INCLUDE(s21default)
-
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x20, 0x20, "PCM ROM")
-	PORT_DIPSETTING(    0x20, "2M" )
-	PORT_DIPSETTING(    0x00, "4M" )
-
-	PORT_MODIFY("PORTB")        /* 63B05Z0 - PORT B */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 ) /* ? */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) /* ? */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) /* ? */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) /* ? */
-
-	PORT_MODIFY("AN0")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN1")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) /* gas */
-	PORT_MODIFY("AN2")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) /* steering */
-	PORT_MODIFY("AN3")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(15) PORT_KEYDELTA(10) /* brake */
-	PORT_MODIFY("AN4")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN5")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN6")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 6 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN7")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("PORTH")        /* 63B05Z0 - PORT H */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* shift down */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* shift up */
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( winrungp )
-	PORT_INCLUDE(winrun)
-
-	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x20, 0x00, "PCM ROM")
-	PORT_DIPSETTING(    0x20, "2M" )
-	PORT_DIPSETTING(    0x00, "4M" )
-INPUT_PORTS_END
-
-// the default inc/dec analog keys have been chosen to map 'tank' style inputs found on Assault.
-// this makes the game easier to use with the keyboard, providing a familiar left/right stick mapping
-// ports are limited to 10/ef because otherwise, even when calibrated, the game will act as if the
-// inputs wrap around when they hit the maximum, causing undesired movement
-static INPUT_PORTS_START( cybsled )
-	PORT_INCLUDE(s21default)
-
-	PORT_MODIFY("AN0")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xef) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* right joystick: vertical */
-	PORT_MODIFY("AN1")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xef) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_E) PORT_CODE_INC(KEYCODE_D) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) /* left joystick: vertical */
-	PORT_MODIFY("AN2")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xef) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_J) PORT_CODE_INC(KEYCODE_L) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2) /* right joystick: horizontal */
-	PORT_MODIFY("AN3")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
-	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xef) /* using 0x00 / 0xff causes controls to malfunction */ PORT_CODE_DEC(KEYCODE_S) PORT_CODE_INC(KEYCODE_F) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1) /* left joystick: horizontal */
-	PORT_MODIFY("AN4")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN5")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN6")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 6 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN7")      /* 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("PORTH")        /* 63B05Z0 - PORT H */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( aircomb )
-	PORT_INCLUDE(s21default)
-
-	PORT_MODIFY("AN0")      /* IN#2: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 0 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN1")      /* IN#3: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 1 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
-	PORT_MODIFY("AN2")      /* IN#4: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 2 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
-	PORT_MODIFY("AN3")      /* IN#5: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 3 */
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Z ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
-	PORT_MODIFY("AN4")      /* IN#6: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 4 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN5")      /* IN#7: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 5 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN6")      /* IN#8: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 6 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_MODIFY("AN7")      /* IN#9: 63B05Z0 - 8 CHANNEL ANALOG - CHANNEL 7 */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("DSW")      /* 63B05Z0 - $2000 DIP SW */
-	PORT_DIPNAME( 0x01, 0x01, "DSW1") // not test mode on this game
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_MODIFY("PORTH")        /* IN#10: 63B05Z0 - PORT H */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) ///???
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) // prev color
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) // ???next color
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
 /*    YEAR, NAME,      PARENT,   MACHINE,  INPUT,                      INIT,     MONITOR, COMPANY, FULLNAME,                                FLAGS */
 GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, winrun,   ROT0,    "Namco", "Winning Run",                           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, driveyes,  0,        driveyes, winrungp,   namcos21_state, driveyes, ROT0,    "Namco", "Driver's Eyes (Japan)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1991, driveyes,  0,        driveyes, driveyes,   namcos21_state, driveyes, ROT0,    "Namco", "Driver's Eyes (Japan)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN)
 GAME( 1991, solvalou,  0,        namcos21, s21default, namcos21_state, solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, starblad,  0,        namcos21, s21default, namcos21_state, starblad, ROT0,    "Namco", "Starblade (World)",                     MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, starbladj, starblad, namcos21, s21default, namcos21_state, starblad, ROT0,    "Namco", "Starblade (Japan)",                     MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, aircomb,   0,        namcos21, aircomb,    namcos21_state, aircomb,  ROT0,    "Namco", "Air Combat (US)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, aircomb,   0,        namcos21, aircomb,    namcos21_state, aircomb,  ROT0,    "Namco", "Air Combat (US)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // There's code for a SCI, is it even possible to play multiplayer?
 GAME( 1992, aircombj,  aircomb,  namcos21, aircomb,    namcos21_state, aircomb,  ROT0,    "Namco", "Air Combat (Japan)",                    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, cybsled,   0,        namcos21, cybsled,    namcos21_state, cybsled,  ROT0,    "Namco", "Cyber Sled (World)",                    MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, cybsledj,  cybsled,  namcos21, cybsled,    namcos21_state, cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",                    MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, cybsled,   0,        namcos21, cybsled,    namcos21_state, cybsled,  ROT0,    "Namco", "Cyber Sled (World)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1993, cybsledj,  cybsled,  namcos21, cybsled,    namcos21_state, cybsled,  ROT0,    "Namco", "Cyber Sled (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )

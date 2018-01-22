@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef LPC_ACPI_H
-#define LPC_ACPI_H
+#ifndef MAME_MACHINE_LPC_ACPI_H
+#define MAME_MACHINE_LPC_ACPI_H
+
+#pragma once
 
 #include "lpc.h"
 
@@ -83,6 +85,6 @@ private:
 	DECLARE_ADDRESS_MAP(map, 32);
 };
 
-extern const device_type LPC_ACPI;
+DECLARE_DEVICE_TYPE(LPC_ACPI, lpc_acpi_device)
 
-#endif
+#endif // MAME_MACHINE_LPC_ACPI_H

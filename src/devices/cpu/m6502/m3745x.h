@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#pragma once
+#ifndef MAME_CPU_M6502_M3745X_H
+#define MAME_CPU_M6502_M3745X_H
 
-#ifndef __M3745X_H__
-#define __M3745X_H__
+#pragma once
 
 #include "m740.h"
 
@@ -59,9 +59,6 @@ public:
 
 		M3745X_SET_OVERFLOW = M740_SET_OVERFLOW
 	};
-
-	// construction/destruction
-	m3745x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map, const char *shortname, const char *source);
 
 	const address_space_config m_program_config;
 
@@ -120,12 +117,15 @@ public:
 	bool are_port_bits_output(uint8_t port, uint8_t mask) { return ((m_ddrs[port] & mask) == mask) ? true : false; }
 
 protected:
+	// construction/destruction
+	m3745x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void execute_set_input(int inputnum, int state) override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual space_config_vector memory_space_config() const override;
 
 	void send_port(address_space &space, uint8_t offset, uint8_t data);
 	uint8_t read_port(uint8_t offset);
@@ -145,9 +145,11 @@ class m37450_device : public m3745x_device
 {
 public:
 	m37450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	m37450_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+
+protected:
+	m37450_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type M37450;
+DECLARE_DEVICE_TYPE(M37450, m37450_device)
 
-#endif
+#endif // MAME_CPU_M6502_M3745X_H

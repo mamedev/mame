@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "machine/timer.h"
 #include "machine/x2212.h"
 
 class foodf_state : public atarigen_state
@@ -42,4 +43,5 @@ public:
 	DECLARE_VIDEO_START(foodf);
 	uint32_t screen_update_foodf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update_timer);
+	void foodf(machine_config &config);
 };

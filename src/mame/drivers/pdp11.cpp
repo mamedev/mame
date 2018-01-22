@@ -109,13 +109,16 @@ public:
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ16_MEMBER( teletype_ctrl_r );
 	DECLARE_WRITE16_MEMBER( teletype_ctrl_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
+	void kbd_put(u8 data);
 	uint8_t m_teletype_data;
 	uint16_t m_teletype_status;
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_RESET(pdp11ub2);
 	DECLARE_MACHINE_RESET(pdp11qb);
 	void load9312prom(uint8_t *desc, uint8_t *src, int size);
+	void pdp11ub2(machine_config &config);
+	void pdp11(machine_config &config);
+	void pdp11qb(machine_config &config);
 };
 
 READ16_MEMBER(pdp11_state::teletype_ctrl_r)
@@ -340,13 +343,13 @@ MACHINE_RESET_MEMBER(pdp11_state,pdp11qb)
 }
 
 
-WRITE8_MEMBER( pdp11_state::kbd_put )
+void pdp11_state::kbd_put(u8 data)
 {
 	m_teletype_data = data;
 	m_teletype_status |= 0x80;
 }
 
-static MACHINE_CONFIG_START( pdp11, pdp11_state )
+MACHINE_CONFIG_START(pdp11_state::pdp11)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
 	MCFG_T11_INITIAL_MODE(6 << 13)
@@ -355,16 +358,16 @@ static MACHINE_CONFIG_START( pdp11, pdp11_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(pdp11_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(pdp11_state, kbd_put))
 
 	MCFG_RX01_ADD("rx01")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pdp11ub2, pdp11 )
+MACHINE_CONFIG_DERIVED(pdp11_state::pdp11ub2, pdp11)
 	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11ub2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pdp11qb, pdp11 )
+MACHINE_CONFIG_DERIVED(pdp11_state::pdp11qb, pdp11)
 	MCFG_MACHINE_RESET_OVERRIDE(pdp11_state,pdp11qb)
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -463,8 +466,8 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, pdp11ub,  0,       0,   pdp11,    pdp11, driver_device,  0,   "Digital Equipment Corporation",   "PDP-11 [Unibus](M9301-YA)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( ????, pdp11ub2, pdp11ub, 0,   pdp11ub2, pdp11, driver_device,  0,   "Digital Equipment Corporation",   "PDP-11 [Unibus](M9312)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( ????, pdp11qb,  pdp11ub, 0,   pdp11qb,  pdp11, driver_device,  0,   "Digital Equipment Corporation",   "PDP-11 [Q-BUS] (M7195 - MXV11)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1987, sms1000,  pdp11ub, 0,   pdp11qb,  pdp11, driver_device,  0,   "Scientific Micro Systems",   "SMS-1000",      MACHINE_IS_SKELETON )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  STATE         INIT  COMPANY                          FULLNAME                          FLAGS */
+COMP( ????, pdp11ub,  0,       0,      pdp11,    pdp11, pdp11_state,  0,    "Digital Equipment Corporation", "PDP-11 [Unibus](M9301-YA)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( ????, pdp11ub2, pdp11ub, 0,      pdp11ub2, pdp11, pdp11_state,  0,    "Digital Equipment Corporation", "PDP-11 [Unibus](M9312)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( ????, pdp11qb,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state,  0,    "Digital Equipment Corporation", "PDP-11 [Q-BUS] (M7195 - MXV11)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1987, sms1000,  pdp11ub, 0,      pdp11qb,  pdp11, pdp11_state,  0,    "Scientific Micro Systems",      "SMS-1000",                       MACHINE_IS_SKELETON )

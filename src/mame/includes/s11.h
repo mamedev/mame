@@ -80,6 +80,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s11);
 	DECLARE_DRIVER_INIT(s11);
+	void s11(machine_config &config);
 protected:
 	// devices
 	required_device<cpu_device> m_maincpu;

@@ -40,12 +40,14 @@ Notes:
 *************************************************************************************************************/
 
 #include "emu.h"
+#include "includes/lordgun.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "sound/3812intf.h"
 #include "sound/ymf278b.h"
-#include "includes/lordgun.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -335,7 +337,7 @@ static ADDRESS_MAP_START( aliencha_map, AS_PROGRAM, 16, lordgun_state )
 	AM_RANGE(0x50b900, 0x50b9ff) AM_READWRITE(aliencha_protection_r, aliencha_protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ymf278_map, AS_0, 8, lordgun_state)
+static ADDRESS_MAP_START( ymf278_map, 0, 8, lordgun_state)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -630,7 +632,7 @@ void lordgun_state::machine_start()
 	save_item(NAME(m_whitescreen));
 }
 
-static MACHINE_CONFIG_START( lordgun, lordgun_state )
+MACHINE_CONFIG_START(lordgun_state::lordgun)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(lordgun_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
@@ -677,12 +679,12 @@ static MACHINE_CONFIG_START( lordgun, lordgun_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)   // ? 5MHz can't be right!
+	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, PIN7_HIGH)   // ? 5MHz can't be right!
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( aliencha, lordgun_state )
+MACHINE_CONFIG_START(lordgun_state::aliencha)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(aliencha_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
@@ -726,14 +728,14 @@ static MACHINE_CONFIG_START( aliencha, lordgun_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ymf", YMF278B, 26000000)            // ? 26MHz matches video (decrease for faster music tempo)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, ymf278_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, ymf278_map)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)   // ? 5MHz can't be right
+	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, PIN7_HIGH)   // ? 5MHz can't be right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)  // ? 5MHz can't be right
+	MCFG_OKIM6295_ADD("oki2", XTAL_20MHz / 20, PIN7_HIGH)  // ? 5MHz can't be right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1078,6 +1080,6 @@ DRIVER_INIT_MEMBER(lordgun_state, aliencha)
 
 ***************************************************************************/
 
-GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, lordgun,  ROT0, "IGS", "Lord of Gun (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, aliencha,  0,        aliencha, aliencha, driver_device, 0,        ROT0, "IGS", "Alien Challenge (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, alienchac, aliencha, aliencha, aliencha, driver_device, 0,        ROT0, "IGS", "Alien Challenge (China)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lordgun,   0,        lordgun,  lordgun,  lordgun_state, lordgun,  ROT0, "IGS", "Lord of Gun (USA)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, aliencha,  0,        aliencha, aliencha, lordgun_state, 0,        ROT0, "IGS", "Alien Challenge (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, alienchac, aliencha, aliencha, aliencha, lordgun_state, 0,        ROT0, "IGS", "Alien Challenge (China)", MACHINE_SUPPORTS_SAVE )

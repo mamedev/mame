@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef __MSX_SLOT_RAM_H
-#define __MSX_SLOT_RAM_H
+#ifndef MAME_BUS_MSX_SLOT_RAM_H
+#define MAME_BUS_MSX_SLOT_RAM_H
 
 #include "slot.h"
 
@@ -20,17 +20,18 @@ public:
 
 	static void force_start_address(device_t &device, uint16_t start) { downcast<msx_slot_ram_device &>(device).m_start_address = start; }
 
-	virtual void device_start() override;
-
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
+
+protected:
+	virtual void device_start() override;
 
 private:
 	std::vector<uint8_t> m_ram;
 };
 
 
-extern const device_type MSX_SLOT_RAM;
+DECLARE_DEVICE_TYPE(MSX_SLOT_RAM, msx_slot_ram_device)
 
 
-#endif
+#endif // MAME_BUS_MSX_SLOT_RAM_H

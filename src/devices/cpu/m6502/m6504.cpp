@@ -11,21 +11,21 @@
 #include "emu.h"
 #include "m6504.h"
 
-const device_type M6504 = &device_creator<m6504_device>;
+DEFINE_DEVICE_TYPE(M6504, m6504_device, "m6504", "M6504")
 
 m6504_device::m6504_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, M6504, "M6504", tag, owner, clock, "m6504", __FILE__)
+	m6502_device(mconfig, M6504, tag, owner, clock)
 {
-	program_config.m_addrbus_width = 13;
-	sprogram_config.m_addrbus_width = 13;
+	program_config.m_addr_width = 13;
+	sprogram_config.m_addr_width = 13;
 }
 
 void m6504_device::device_start()
 {
 	if(direct_disabled)
-		mintf = new mi_6504_nd;
+		mintf = std::make_unique<mi_6504_nd>();
 	else
-		mintf = new mi_6504_normal;
+		mintf = std::make_unique<mi_6504_normal>();
 
 	init();
 }

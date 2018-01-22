@@ -48,6 +48,7 @@ public:
 	/* misc */
 	int        m_priority;
 	uint8_t      m_1f98_latch;
+	emu_timer *m_thunderx_firq_timer;
 
 	DECLARE_WRITE8_MEMBER(scontra_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(thunderx_videobank_w);
@@ -65,6 +66,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	DECLARE_DRIVER_INIT(thunderx);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_interrupt);
@@ -76,6 +78,9 @@ public:
 	K051960_CB_MEMBER(sprite_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
 
+	void scontra(machine_config &config);
+	void gbusters(machine_config &config);
+	void thunderx(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

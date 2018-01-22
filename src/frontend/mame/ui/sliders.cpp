@@ -135,7 +135,7 @@ void menu_sliders::handle()
 //  menu
 //-------------------------------------------------
 
-void menu_sliders::populate()
+void menu_sliders::populate(float &customtop, float &custombottom)
 {
 	std::string tempstring;
 

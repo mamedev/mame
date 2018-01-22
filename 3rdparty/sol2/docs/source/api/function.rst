@@ -82,12 +82,16 @@ This makes it much easier to work with multiple return values. Using ``std::tie`
 
 Calls the function. The second ``operator()`` lets you specify the templated return types using the ``my_func(sol::types<int, std::string>, ...)`` syntax. Function assumes there are no runtime errors, and thusly will call the ``atpanic`` function if an error does occur.
 
+
+.. _function-argument-handling:
+
+functions and argument passing
+------------------------------
+
 .. note::
 
 	All arguments are forwarded. Unlike :doc:`get/set/operator[] on sol::state<state>` or :doc:`sol::table<table>`, value semantics are not used here. It is forwarding reference semantics, which do not copy/move unless it is specifically done by the receiving functions / specifically done by the user.
 
-
-.. _function-argument-handling:
 
 .. note::
 

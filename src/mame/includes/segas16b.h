@@ -9,9 +9,11 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/cxd1095.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
+#include "machine/upd4701.h"
 #include "sound/ym2151.h"
 #include "sound/ym2413.h"
 #include "sound/upd7759.h"
@@ -41,9 +43,11 @@ public:
 			m_sprites(*this, "sprites"),
 			m_segaic16vid(*this, "segaic16vid"),
 			m_soundlatch(*this, "soundlatch"),
+			m_cxdio(*this, "cxdio"),
+			m_upd4701a(*this, {"upd4701a1", "upd4701a2"}),
 			m_workram(*this, "workram"),
 			m_romboard(ROM_BOARD_INVALID),
-			m_tilemap_type(SEGAIC16_TILEMAP_16B),
+			m_tilemap_type(segaic16_video_device::TILEMAP_16B),
 			m_disable_screen_blanking(false),
 			m_i8751_initial_config(nullptr),
 			m_atomicp_sound_divisor(0),
@@ -89,6 +93,7 @@ public:
 	// other callbacks
 	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+	DECLARE_WRITE8_MEMBER(spin_68k_w);
 
 	// ROM board-specific driver init
 	DECLARE_DRIVER_INIT(generic_5521);
@@ -106,14 +111,13 @@ public:
 	DECLARE_DRIVER_INIT(hwchamp_5521);
 	DECLARE_DRIVER_INIT(altbeas5_5521);
 	DECLARE_DRIVER_INIT(sdi_5358_small);
+	DECLARE_DRIVER_INIT(fpointbla);
 	DECLARE_DRIVER_INIT(altbeasj_5521);
 	DECLARE_DRIVER_INIT(ddux_5704);
 	DECLARE_DRIVER_INIT(snapper);
 	DECLARE_DRIVER_INIT(shinobi4_5521);
-	DECLARE_DRIVER_INIT(goldnaxe_5704);
 	DECLARE_DRIVER_INIT(defense_5358_small);
 	DECLARE_DRIVER_INIT(sjryuko_5358_small);
-	DECLARE_DRIVER_INIT(altbeast_5521);
 	DECLARE_DRIVER_INIT(exctleag_5358);
 	DECLARE_DRIVER_INIT(tetrbx);
 	DECLARE_DRIVER_INIT(aceattac_5358);
@@ -123,7 +127,6 @@ public:
 	DECLARE_DRIVER_INIT(dunkshot_5358_small);
 	DECLARE_DRIVER_INIT(timescan_5358_small);
 	DECLARE_DRIVER_INIT(shinobi3_5358);
-	DECLARE_DRIVER_INIT(goldnaxe_5797);
 	DECLARE_DRIVER_INIT(altbeas4_5521);
 	DECLARE_DRIVER_INIT(aliensyn7_5358_small);
 
@@ -136,6 +139,23 @@ public:
 	// bootleg stuff
 	void tilemap_16b_fpointbl_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram);
 
+	void rom_5797_fragment(machine_config &config);
+	void system16b_fd1094_5797(machine_config &config);
+	void fpointbla(machine_config &config);
+	void atomicp(machine_config &config);
+	void aceattacb_fd1094(machine_config &config);
+	void system16b_i8751(machine_config &config);
+	void system16c(machine_config &config);
+	void system16b_mc8123(machine_config &config);
+	void system16b_i8751_5797(machine_config &config);
+	void system16b_fd1089a(machine_config &config);
+	void system16b_5797(machine_config &config);
+	void system16b_split(machine_config &config);
+	void system16b_fd1089b(machine_config &config);
+	void system16b(machine_config &config);
+	void system16b_fd1094(machine_config &config);
+	void fpointbl(machine_config &config);
+	void lockonph(machine_config &config);
 protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
@@ -168,17 +188,16 @@ protected:
 	void init_generic(segas16b_rom_board rom_board);
 
 	// i8751 simulations
-	void altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs);
+	void altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs, int alt_bank);
 	void altbeasj_i8751_sim();
 	void altbeas5_i8751_sim();
-	void altbeast_i8751_sim();
 	void ddux_i8751_sim();
-	void goldnaxe_i8751_sim();
 	void tturf_i8751_sim();
 	void wb3_i8751_sim();
 
 	// custom I/O handlers
 	DECLARE_READ16_MEMBER( aceattac_custom_io_r );
+	DECLARE_WRITE16_MEMBER( aceattac_custom_io_w );
 	DECLARE_READ16_MEMBER( dunkshot_custom_io_r );
 	DECLARE_READ16_MEMBER( hwchamp_custom_io_r );
 	DECLARE_WRITE16_MEMBER( hwchamp_custom_io_w );
@@ -203,6 +222,8 @@ protected:
 	optional_device<sega_sys16b_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	optional_device<generic_latch_8_device> m_soundlatch; // not for atomicp
+	optional_device<cxd1095_device> m_cxdio; // for aceattac
+	optional_device_array<upd4701_device, 2> m_upd4701a; // for aceattac
 
 	// memory pointers
 	required_shared_ptr<uint16_t> m_workram;
@@ -235,6 +256,25 @@ protected:
 	optional_shared_ptr<uint16_t> m_bootleg_page;
 
 
+};
+
+class afighter_16b_analog_state : public segas16b_state
+{
+public:
+	// construction/destruction
+	afighter_16b_analog_state(const machine_config &mconfig, device_type type, const char *tag)
+		: segas16b_state(mconfig, type, tag),
+			m_accel(*this, "ACCEL"),
+			m_steer(*this, "STEER")
+	{ }
+
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_accel_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_left_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(afighter_handl_right_r);
+
+	protected:
+	required_ioport     m_accel;
+	required_ioport     m_steer;
 };
 
 
@@ -307,4 +347,5 @@ public:
 	uint8_t           m_rle_control_byte;
 	bool            m_rle_latched;
 	uint8_t           m_rle_byte;
+	void isgsm(machine_config &config);
 };

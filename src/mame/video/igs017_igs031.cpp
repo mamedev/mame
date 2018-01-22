@@ -73,10 +73,10 @@ GFXDECODE_MEMBER( igs017_igs031_device::gfxinfo )
 GFXDECODE_END
 
 
-const device_type IGS017_IGS031 = &device_creator<igs017_igs031_device>;
+DEFINE_DEVICE_TYPE(IGS017_IGS031, igs017_igs031_device, "igs017_031", "IGS017_IGS031")
 
 igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, IGS017_IGS031, "IGS017_IGS031", tag, owner, clock, "igs017_igs031", __FILE__),
+	: device_t(mconfig, IGS017_IGS031, tag, owner, clock),
 		device_gfx_interface(mconfig, *this, gfxinfo),
 		device_video_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
@@ -92,9 +92,11 @@ igs017_igs031_device::igs017_igs031_device(const machine_config &mconfig, const 
 	m_revbits = 0;
 }
 
-const address_space_config *igs017_igs031_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector igs017_igs031_device::memory_space_config() const
 {
-	return (spacenum == 0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 uint16_t igs017_igs031_device::palette_callback_straight(uint16_t bgr)
@@ -143,8 +145,8 @@ void igs017_igs031_device::video_start()
 
 		for (i = 0; i < size ; i++)
 		{
-			rom[i] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
-//          rom[i^1] = BITSWAP8(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
+			rom[i] = bitswap<8>(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
+//          rom[i^1] = bitswap<8>(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
 		}
 	}
 }
@@ -296,7 +298,7 @@ void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cli
 	if ( addr + dimx * dimy >= m_sprites_gfx_size )
 		return;
 
-	gfx_element gfx(*m_palette, m_sprites_gfx.get() + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
+	gfx_element gfx(m_palette, m_sprites_gfx.get() + addr, dimx, dimy, dimx, m_palette->entries(), 0x100, 32);
 
 	gfx.transpen(bitmap,cliprect,
 				0, color,

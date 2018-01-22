@@ -44,8 +44,12 @@ ToDo:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "glasgow.lh"
+#include "machine/timer.h"
 #include "sound/beep.h"
+#include "speaker.h"
+
+#include "glasgow.lh"
+
 
 class glasgow_state : public driver_device
 {
@@ -84,6 +88,9 @@ public:
 	DECLARE_MACHINE_START(glasgow);
 	DECLARE_MACHINE_RESET(glasgow);
 
+	void glasgow(machine_config &config);
+	void dallas32(machine_config &config);
+	void amsterd(machine_config &config);
 private:
 	uint8_t m_lcd_shift_counter;
 	uint8_t m_led7;
@@ -701,7 +708,7 @@ static INPUT_PORTS_START( old_keyboard )   //Glasgow,Dallas
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( glasgow, glasgow_state )
+MACHINE_CONFIG_START(glasgow_state::glasgow)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(glasgow_mem)
@@ -718,13 +725,13 @@ static MACHINE_CONFIG_START( glasgow, glasgow_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", glasgow_state, update_nmi, attotime::from_hz(50))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( amsterd, glasgow )
+MACHINE_CONFIG_DERIVED(glasgow_state::amsterd, glasgow)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(amsterd_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dallas32, glasgow )
+MACHINE_CONFIG_DERIVED(glasgow_state::dallas32, glasgow)
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68020, 14000000)
 	MCFG_CPU_PROGRAM_MAP(dallas32_mem)
@@ -792,10 +799,10 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR, NAME,     PARENT,   COMPAT, MACHINE,     INPUT,          CLASS,         INIT, COMPANY,                      FULLNAME,                 FLAGS */
-CONS(  1984, glasgow,  0,        0,      glasgow,     old_keyboard,   driver_device, 0,    "Hegener & Glaser Muenchen",  "Mephisto III S Glasgow", 0)
-CONS(  1984, amsterd,  0,        0,      amsterd,     new_keyboard,   driver_device, 0,    "Hegener & Glaser Muenchen",  "Mephisto Amsterdam",     MACHINE_NOT_WORKING)
-CONS(  1984, dallas,   glasgow,  0,      glasgow,     old_keyboard,   driver_device, 0,    "Hegener & Glaser Muenchen",  "Mephisto Dallas",        MACHINE_NOT_WORKING)
-CONS(  1984, roma,     amsterd,  0,      glasgow,     new_keyboard,   driver_device, 0,    "Hegener & Glaser Muenchen",  "Mephisto Roma",          MACHINE_NOT_WORKING)
-CONS(  1984, dallas32, amsterd,  0,      dallas32,    new_keyboard,   driver_device, 0,    "Hegener & Glaser Muenchen",  "Mephisto Dallas 32 Bit", MACHINE_NOT_WORKING)
-CONS(  1984, roma32,   amsterd,  0,      dallas32,    new_keyboard,   driver_device, 0,    "Hegener & Glaser Muenchen",  "Mephisto Roma 32 Bit",   MACHINE_NOT_WORKING)
-CONS(  1984, dallas16, amsterd,  0,      amsterd,     new_keyboard,   driver_device, 0,    "Hegener & Glaser Muenchen",  "Mephisto Dallas 16 Bit", MACHINE_NOT_WORKING)
+CONS(  1984, glasgow,  0,        0,      glasgow,     old_keyboard,   glasgow_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto III S Glasgow", 0)
+CONS(  1984, amsterd,  0,        0,      amsterd,     new_keyboard,   glasgow_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Amsterdam",     MACHINE_NOT_WORKING)
+CONS(  1984, dallas,   glasgow,  0,      glasgow,     old_keyboard,   glasgow_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Dallas",        MACHINE_NOT_WORKING)
+CONS(  1984, roma,     amsterd,  0,      glasgow,     new_keyboard,   glasgow_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Roma",          MACHINE_NOT_WORKING)
+CONS(  1984, dallas32, amsterd,  0,      dallas32,    new_keyboard,   glasgow_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Dallas 32 Bit", MACHINE_NOT_WORKING)
+CONS(  1984, roma32,   amsterd,  0,      dallas32,    new_keyboard,   glasgow_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Roma 32 Bit",   MACHINE_NOT_WORKING)
+CONS(  1984, dallas16, amsterd,  0,      amsterd,     new_keyboard,   glasgow_state, 0,    "Hegener & Glaser Muenchen",  "Mephisto Dallas 16 Bit", MACHINE_NOT_WORKING)

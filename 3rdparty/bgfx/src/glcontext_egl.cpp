@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -195,6 +195,9 @@ EGL_IMPORT
 			BX_TRACE("Supported EGL extensions:");
 			dumpExtensions(extensions);
 
+			// https://www.khronos.org/registry/EGL/extensions/ANDROID/EGL_ANDROID_recordable.txt
+			const bool hasEglAndroidRecordable = !!bx::findIdentifierMatch(extensions, "EGL_ANDROID_recordable");
+
 			EGLint attrs[] =
 			{
 				EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
@@ -205,6 +208,10 @@ EGL_IMPORT
 				EGL_DEPTH_SIZE, 24,
 #	endif // BX_PLATFORM_
 				EGL_STENCIL_SIZE, 8,
+
+				// Android Recordable surface
+				hasEglAndroidRecordable ? 0x3142 : EGL_NONE,
+				hasEglAndroidRecordable ? 1      : EGL_NONE,
 
 				EGL_NONE
 			};
@@ -262,7 +269,7 @@ EGL_IMPORT
 
 #	if BX_PLATFORM_RPI
 				BX_UNUSED(hasEglKhrCreateContext, hasEglKhrNoError);
-#else
+#	else
 				if (hasEglKhrCreateContext)
 				{
 					bx::write(&writer, EGLint(EGL_CONTEXT_MAJOR_VERSION_KHR) );

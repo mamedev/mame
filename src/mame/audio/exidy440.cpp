@@ -10,17 +10,20 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
 #include "audio/exidy440.h"
+#include "includes/exidy440.h"
+
+#include "cpu/m6809/m6809.h"
+#include "speaker.h"
 
 
 #define SOUND_LOG       0
 #define FADE_TO_ZERO    1
 
 
-#define EXIDY440_AUDIO_CLOCK    (XTAL_12_9792MHz / 16)
-#define EXIDY440_MC3418_CLOCK   (EXIDY440_AUDIO_CLOCK / 16)
-#define EXIDY440_MC3417_CLOCK   (EXIDY440_AUDIO_CLOCK / 32)
+#define EXIDY440_AUDIO_CLOCK    (XTAL_12_9792MHz / 4)
+#define EXIDY440_MC3418_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 16)
+#define EXIDY440_MC3417_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 32)
 
 
 /* internal caching */
@@ -46,10 +49,10 @@ static const int channel_bits[4] =
 };
 
 
-const device_type EXIDY440 = &device_creator<exidy440_sound_device>;
+DEFINE_DEVICE_TYPE(EXIDY440, exidy440_sound_device, "exidy440_sound", "Exidy 440 CVSD")
 
 exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, EXIDY440, "Exidy 440 CVSD", tag, owner, clock, "exidy440_sound", __FILE__),
+	: device_t(mconfig, EXIDY440, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_sound_command(0),
 		m_sound_command_ack(0),
@@ -71,16 +74,6 @@ exidy440_sound_device::exidy440_sound_device(const machine_config &mconfig, cons
 		elem.offset = 0;
 		elem.remaining = 0;
 	}
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void exidy440_sound_device::device_config_complete()
-{
 }
 
 //-------------------------------------------------
@@ -225,7 +218,7 @@ void exidy440_sound_device::mix_to_16(int length, stream_sample_t *dest_left, st
 READ8_MEMBER( exidy440_sound_device::sound_command_r )
 {
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
-	space.machine().device("audiocpu")->execute().set_input_line(1, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(1, CLEAR_LINE);
 	m_sound_command_ack = 1;
 
 	return m_sound_command;
@@ -280,7 +273,7 @@ WRITE8_MEMBER( exidy440_sound_device::sound_volume_w )
 
 WRITE8_MEMBER( exidy440_sound_device::sound_interrupt_clear_w )
 {
-	space.machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("audiocpu")->execute().set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -859,7 +852,7 @@ void exidy440_sound_device::sound_stream_update(sound_stream &stream, stream_sam
  *
  *************************************/
 
-static ADDRESS_MAP_START( exidy440_audio_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( exidy440_audio_map, AS_PROGRAM, 8, exidy440_sound_device )
 	AM_RANGE(0x0000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x801f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("custom", exidy440_sound_device, m6844_r, m6844_w)
 	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_DEVREADWRITE("custom", exidy440_sound_device, sound_volume_r, sound_volume_w)
@@ -881,15 +874,15 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_FRAGMENT( exidy440_audio )
+MACHINE_CONFIG_START(exidy440_state::exidy440_audio)
 
-	MCFG_CPU_ADD("audiocpu", M6809, EXIDY440_AUDIO_CLOCK)
+	MCFG_CPU_ADD("audiocpu", MC6809, EXIDY440_AUDIO_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(exidy440_audio_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", driver_device, irq0_line_assert)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("custom", EXIDY440, EXIDY440_AUDIO_CLOCK/16)
+	MCFG_SOUND_ADD("custom", EXIDY440, EXIDY440_MC3418_CLOCK)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

@@ -173,6 +173,5 @@
 		<bezel name="13.8" element="plate"><bounds x="13" y="8" width="0.4" height="0.8" /></bezel>
 		<bezel name="13.9" element="plate"><bounds x="13" y="9" width="0.4" height="0.8" /></bezel>
 
-
 	</view>
 </mamelayout>

@@ -26,6 +26,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 
 
 /***************************************************************************
@@ -685,59 +686,6 @@ void osd_work_item_release(osd_work_item *item);
 ***************************************************************************/
 
 /*-----------------------------------------------------------------------------
-    osd_malloc: allocate memory
-
-    Parameters:
-
-        size - the number of bytes to allocate
-
-    Return value:
-
-        a pointer to the allocated memory
-
-    Notes:
-
-        This is just a hook to do OS-specific allocation trickery.
-        It can be safely written as a wrapper to malloc().
------------------------------------------------------------------------------*/
-void *osd_malloc(size_t size);
-
-
-/*-----------------------------------------------------------------------------
-    osd_malloc_array: allocate memory, hinting tha this memory contains an
-    array
-
-    Parameters:
-
-        size - the number of bytes to allocate
-
-    Return value:
-
-        a pointer to the allocated memory
-
-    Notes:
-
-        This is just a hook to do OS-specific allocation trickery.
-        It can be safely written as a wrapper to malloc().
------------------------------------------------------------------------------*/
-void *osd_malloc_array(size_t size);
-
-
-/*-----------------------------------------------------------------------------
-    osd_free: free memory allocated by osd_malloc
-
-    Parameters:
-
-        ptr - the pointer returned from osd_mallo
-
-    Return value:
-
-        None
------------------------------------------------------------------------------*/
-void osd_free(void *ptr);
-
-
-/*-----------------------------------------------------------------------------
     osd_alloc_executable: allocate memory that can contain executable code
 
     Parameters:
@@ -935,6 +883,9 @@ void CLIB_DECL osd_printf_warning(const char *format, ...) ATTR_PRINTF(1,2);
 void CLIB_DECL osd_printf_info(const char *format, ...) ATTR_PRINTF(1,2);
 void CLIB_DECL osd_printf_verbose(const char *format, ...) ATTR_PRINTF(1,2);
 void CLIB_DECL osd_printf_debug(const char *format, ...) ATTR_PRINTF(1,2);
+
+// returns command line arguments as an std::vector<std::string> in UTF-8
+std::vector<std::string> osd_get_command_line(int argc, char *argv[]);
 
 /* discourage the use of printf directly */
 /* sadly, can't do this because of the ATTR_PRINTF under GCC */

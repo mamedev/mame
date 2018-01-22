@@ -10,14 +10,17 @@
 */
 
 #include "emu.h"
+#include "includes/n64.h"
+
 #include "cpu/rsp/rsp.h"
 #include "cpu/mips/mips3.h"
 #include "sound/dmadac.h"
-#include "includes/n64.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "imagedev/harddriv.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 class n64_mess_state : public n64_state
 {
@@ -35,6 +38,8 @@ public:
 	void disk_unload(device_image_interface &image);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( n64dd );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( n64dd );
+	void n64(machine_config &config);
+	void n64dd(machine_config &config);
 };
 
 READ32_MEMBER(n64_mess_state::dd_null_r)
@@ -298,7 +303,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 	n64_periphs *periphs = machine().device<n64_periphs>("rcp");
 	uint8_t *cart = memregion("user2")->base();
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		length = image.fread(cart, 0x4000000);
 	}
@@ -338,7 +343,7 @@ DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 		}
 	}
 
-	periphs->m_nvram_image = image;
+	periphs->m_nvram_image = &image.device();
 
 	logerror("cart length = %d\n", length);
 
@@ -415,7 +420,7 @@ INTERRUPT_GEN_MEMBER(n64_mess_state::n64_reset_poll)
 	periphs->poll_reset_button((ioport("RESET")->read() & 1) ? true : false);
 }
 
-static MACHINE_CONFIG_START( n64, n64_mess_state )
+MACHINE_CONFIG_START(n64_mess_state::n64)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, 93750000)
@@ -447,7 +452,7 @@ static MACHINE_CONFIG_START( n64, n64_mess_state )
 	//MCFG_SCREEN_SIZE(640, 525)
 	//MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 	MCFG_SCREEN_UPDATE_DRIVER(n64_state, screen_update_n64)
-	MCFG_SCREEN_VBLANK_DRIVER(n64_state, screen_eof_n64)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(n64_state, screen_vblank_n64))
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 
@@ -470,7 +475,7 @@ static MACHINE_CONFIG_START( n64, n64_mess_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "n64")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( n64dd, n64 )
+MACHINE_CONFIG_DERIVED(n64_mess_state::n64dd, n64)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(n64dd_map)
 
@@ -524,5 +529,5 @@ ROM_START( n64dd )
 	ROM_LOAD( "normslp.rom", 0x00, 0x80, CRC(4f2ae525) SHA1(eab43f8cc52c8551d9cff6fced18ef80eaba6f05) )
 ROM_END
 
-CONS(1996, n64,     0,      0,      n64,    n64, driver_device, 0,  "Nintendo", "Nintendo 64", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-CONS(1996, n64dd,   n64,    0,      n64dd,  n64, driver_device, 0,  "Nintendo", "Nintendo 64DD", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS(1996, n64,     0,      0,      n64,    n64, n64_mess_state, 0,  "Nintendo", "Nintendo 64",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS(1996, n64dd,   n64,    0,      n64dd,  n64, n64_mess_state, 0,  "Nintendo", "Nintendo 64DD", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

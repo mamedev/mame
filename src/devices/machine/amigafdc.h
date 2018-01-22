@@ -1,19 +1,36 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef AMIGAFDC_H
-#define AMIGAFDC_H
+#ifndef MAME_MACHINE_AMIGAFDC_H
+#define MAME_MACHINE_AMIGAFDC_H
 
-#include "emu.h"
+#pragma once
+
 #include "imagedev/floppy.h"
 
 #define MCFG_AMIGA_FDC_INDEX_CALLBACK(_write) \
-	devcb = &amiga_fdc::set_index_wr_callback(*device, DEVCB_##_write);
+	devcb = &amiga_fdc_device::set_index_wr_callback(*device, DEVCB_##_write);
 
-class amiga_fdc : public device_t {
+#define MCFG_AMIGA_FDC_READ_DMA_CALLBACK(_read) \
+	devcb = &amiga_fdc_device::set_dma_rd_callback(*device, DEVCB_##_read);
+
+#define MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(_write) \
+	devcb = &amiga_fdc_device::set_dma_wr_callback(*device, DEVCB_##_write);
+
+#define MCFG_AMIGA_FDC_DSKBLK_CALLBACK(_write) \
+	devcb = &amiga_fdc_device::set_dskblk_wr_callback(*device, DEVCB_##_write);
+
+#define MCFG_AMIGA_FDC_DSKSYN_CALLBACK(_write) \
+	devcb = &amiga_fdc_device::set_dsksyn_wr_callback(*device, DEVCB_##_write);
+
+class amiga_fdc_device : public device_t {
 public:
-	amiga_fdc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	amiga_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_index_wr_callback(device_t &device, _Object object) { return downcast<amiga_fdc &>(device).m_write_index.set_callback(object); }
+	template <class Object> static devcb_base &set_index_wr_callback(device_t &device, Object &&cb) { return downcast<amiga_fdc_device &>(device).m_write_index.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dma_rd_callback(device_t &device, Object &&cb) { return downcast<amiga_fdc_device &>(device).m_read_dma.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dma_wr_callback(device_t &device, Object &&cb) { return downcast<amiga_fdc_device &>(device).m_write_dma.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dskblk_wr_callback(device_t &device, Object &&cb) { return downcast<amiga_fdc_device &>(device).m_write_dskblk.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_dsksyn_wr_callback(device_t &device, Object &&cb) { return downcast<amiga_fdc_device &>(device).m_write_dsksyn.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER(ciaaprb_w);
 
@@ -86,6 +103,10 @@ private:
 	};
 
 	devcb_write_line m_write_index;
+	devcb_read16 m_read_dma;
+	devcb_write16 m_write_dma;
+	devcb_write_line m_write_dskblk;
+	devcb_write_line m_write_dsksyn;
 
 	floppy_image_device *floppy;
 	floppy_image_device *floppy_devices[4];
@@ -116,6 +137,6 @@ private:
 	void live_run(const attotime &limit = attotime::never);
 };
 
-extern const device_type AMIGA_FDC;
+DECLARE_DEVICE_TYPE(AMIGA_FDC, amiga_fdc_device)
 
-#endif /* AMIGAFDC_H */
+#endif // MAME_MACHINE_AMIGAFDC_H

@@ -11,7 +11,9 @@
 
 */
 
+#include "emu.h"
 #include "bus/rs232/rs232.h"
+//#include "bus/s100/s100.h"
 #include "includes/super6.h"
 #include "softlist.h"
 
@@ -288,7 +290,7 @@ static ADDRESS_MAP_START( super6_io, AS_IO, 8, super6_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(WD2793_TAG, wd2793_t, read, write)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(WD2793_TAG, wd2793_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
 	AM_RANGE(0x14, 0x14) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x15, 0x15) AM_READ_PORT("J7") AM_WRITE(s100_w)
@@ -386,18 +388,6 @@ WRITE8_MEMBER(super6_state::io_write_byte)
 	prog_space.write_byte(offset, data);
 }
 
-//-------------------------------------------------
-//  COM8116_INTERFACE( brg_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( super6_state::fr_w )
-{
-	m_dart->rxca_w(state);
-	m_dart->txca_w(state);
-
-	m_ctc->trg1(state);
-}
-
 
 //-------------------------------------------------
 //  floppy_format_type floppy_formats
@@ -485,7 +475,7 @@ void super6_state::machine_reset()
 //  MACHINE_CONFIG( super6 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( super6, super6_state )
+MACHINE_CONFIG_START(super6_state::super6)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_24MHz/4)
 	MCFG_CPU_PROGRAM_MAP(super6_mem)
@@ -514,9 +504,9 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(super6_state, fdc_drq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":0", super6_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", super6_floppies, nullptr,    floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD2793_TAG":1", super6_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_24MHz/4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL_24MHz/4)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -533,7 +523,9 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxb_w))
 
 	MCFG_DEVICE_ADD(BR1945_TAG, COM8116, XTAL_5_0688MHz)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(super6_state, fr_w))
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(Z80CTC_TAG, z80ctc_device, trg1))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(Z80DART_TAG, z80dart_device, rxtxcb_w))
 
 	// internal ram
@@ -573,5 +565,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1983, super6,  0,      0,      super6,  super6, driver_device,  0,      "Advanced Digital Corporation",   "Super Six",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   STATE         INIT    COMPANY                         FULLNAME     FLAGS
+COMP( 1983, super6,  0,      0,      super6,  super6, super6_state, 0,      "Advanced Digital Corporation", "Super Six", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

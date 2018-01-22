@@ -1,23 +1,26 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Sean Riddle, Kevin Horton
+// copyright-holders:hap
 /*
 
   TMS1000 MCU series tabletops/handhelds or other simple devices.
 
 */
 
-#ifndef _HH_TMS1K_H_
-#define _HH_TMS1K_H_
+#ifndef MAME_INCLUDES_HH_TMS1K_H
+#define MAME_INCLUDES_HH_TMS1K_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpu/tms1000/tms1000.h"
+#include "cpu/tms1000/tms1000c.h"
 #include "cpu/tms1000/tms1100.h"
 #include "cpu/tms1000/tms1400.h"
 #include "cpu/tms1000/tms0970.h"
 #include "cpu/tms1000/tms0980.h"
 #include "cpu/tms1000/tms0270.h"
 #include "cpu/tms1000/tp0320.h"
-#include "sound/speaker.h"
+#include "machine/timer.h"
+#include "sound/spkrdev.h"
 
 
 class hh_tms1k_state : public driver_device
@@ -27,6 +30,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_inp_matrix(*this, "IN.%u", 0),
+		m_out_x(*this, "%u.%u", 0U, 0U),
+		m_out_a(*this, "%u.a", 0U),
+		m_out_digit(*this, "digit%u", 0U),
 		m_speaker(*this, "speaker"),
 		m_display_wait(33),
 		m_display_maxy(1),
@@ -36,38 +42,41 @@ public:
 	// devices
 	required_device<tms1k_base_device> m_maincpu;
 	optional_ioport_array<18> m_inp_matrix; // max 18
+	output_finder<0x20, 0x20> m_out_x;
+	output_finder<0x20> m_out_a;
+	output_finder<0x20> m_out_digit;
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
-	uint16_t m_r;                         // MCU R-pins data
-	uint16_t m_o;                         // MCU O-pins data
-	uint32_t m_inp_mux;                   // multiplexed inputs mask
+	u16 m_r;                        // MCU R-pins data
+	u16 m_o;                        // MCU O-pins data
+	u32 m_inp_mux;                  // multiplexed inputs mask
 	bool m_power_on;
 	bool m_power_led;
 
-	uint8_t read_inputs(int columns);
-	uint8_t read_rotated_inputs(int columns, uint8_t rowmask = 0xf);
+	u8 read_inputs(int columns);
+	u8 read_rotated_inputs(int columns, u8 rowmask = 0xf);
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
 	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
+	virtual void power_off();
 
 	// display common
-	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
-	int m_display_maxy;                 // display matrix number of rows
-	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
+	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
+	int m_display_maxy;             // display matrix number of rows
+	int m_display_maxx;             // display matrix number of columns (max 31 for now)
 
-	uint32_t m_grid;                      // VFD/LED current row data
-	uint32_t m_plate;                     // VFD/LED current column data
+	u32 m_grid;                     // VFD/LED current row data
+	u32 m_plate;                    // VFD/LED current column data
 
-	uint32_t m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
-	uint16_t m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
-	uint32_t m_display_cache[0x20];       // (internal use)
-	uint8_t m_display_decay[0x20][0x20];  // (internal use)
+	u32 m_display_state[0x20];      // display matrix rows data (last bit is used for always-on)
+	u16 m_display_segmask[0x20];    // if not 0, display matrix row is a digit, mask indicates connected segments
+	u8 m_display_decay[0x20][0x20]; // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void set_display_segmask(uint32_t digits, uint32_t mask);
-	void display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update = true);
+	void set_display_segmask(u32 digits, u32 mask);
+	void display_matrix(int maxx, int maxy, u32 setx, u32 sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;
@@ -88,5 +97,4 @@ enum
 	lDP = 0x80
 };
 
-
-#endif /* _HH_TMS1K_H_ */
+#endif // MAME_INCLUDES_HH_TMS1K_H

@@ -52,31 +52,32 @@ ToDo:
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
-#include "machine/clock.h"
-#include "video/mc6845.h"
 #include "machine/6850acia.h"
-#include "machine/mm58274c.h"
+#include "machine/clock.h"
 #include "machine/keyboard.h"
-#include "sound/speaker.h"
+#include "machine/mm58274c.h"
 #include "machine/wd_fdc.h"
+#include "sound/spkrdev.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
-#define KEYBOARD_TAG "keyboard"
 
 class v6809_state : public driver_device
 {
 public:
 	v6809_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_video_address(0),
-		m_pia0(*this, "pia0"),
-		m_maincpu(*this, "maincpu"),
-		m_crtc(*this, "crtc"),
-		m_fdc(*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_speaker(*this, "speaker"),
-		m_acia0(*this, "acia0"),
-		m_acia1(*this, "acia1"),
-		m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_video_address(0)
+		, m_pia0(*this, "pia0")
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "crtc")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_speaker(*this, "speaker")
+		, m_palette(*this, "palette")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
 	{
 	}
 
@@ -87,17 +88,14 @@ public:
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(v6809_address_w);
 	DECLARE_WRITE8_MEMBER(v6809_register_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void kbd_put(u8 data);
 	DECLARE_MACHINE_RESET(v6809);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	uint8_t *m_p_videoram;
-	const uint8_t *m_p_chargen;
-	uint16_t m_video_address;
-
+	void v6809(machine_config &config);
 private:
+	uint16_t m_video_address;
 	bool m_speaker_en;
 	uint8_t m_video_index;
 	uint8_t m_term_data;
@@ -105,13 +103,12 @@ private:
 	required_device<pia6821_device> m_pia0;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
-	required_device<mb8876_t> m_fdc;
+	required_device<mb8876_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<acia6850_device> m_acia0;
-	required_device<acia6850_device> m_acia1;
-public:
 	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
 
@@ -121,20 +118,14 @@ static ADDRESS_MAP_START(v6809_mem, AS_PROGRAM, 8, v6809_state)
 	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0xfe) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(v6809_address_w)
 	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0xfe) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(v6809_register_w)
 	AM_RANGE(0xf200, 0xf200) AM_MIRROR(0xff) AM_WRITE(videoram_w)
-	AM_RANGE(0xf500, 0xf500) AM_MIRROR(0x36) AM_DEVREADWRITE("acia0", acia6850_device, status_r, control_w) // modem
-	AM_RANGE(0xf501, 0xf501) AM_MIRROR(0x36) AM_DEVREADWRITE("acia0", acia6850_device, data_r, data_w)
-	AM_RANGE(0xf508, 0xf508) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w) // printer
-	AM_RANGE(0xf509, 0xf509) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
-	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x3c) AM_DEVREADWRITE("fdc", mb8876_t, read, write)
+	AM_RANGE(0xf500, 0xf501) AM_MIRROR(0x36) AM_DEVREADWRITE("acia0", acia6850_device, read, write) // modem
+	AM_RANGE(0xf508, 0xf509) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, read, write) // printer
+	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x3c) AM_DEVREADWRITE("fdc", mb8876_device, read, write)
 	AM_RANGE(0xf640, 0xf64f) AM_MIRROR(0x30) AM_DEVREADWRITE("rtc", mm58274c_device, read, write)
 	AM_RANGE(0xf680, 0xf683) AM_MIRROR(0x3c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0xf6c0, 0xf6c7) AM_MIRROR(0x08) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
 	AM_RANGE(0xf6d0, 0xf6d3) AM_MIRROR(0x0c) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(v6809_io, AS_PROGRAM, 8, v6809_state)
-	AM_RANGE(0x0064, 0x0064) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -144,8 +135,6 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER( v6809_state, v6809)
 {
-	m_p_chargen = memregion("chargen")->base();
-	m_p_videoram = memregion("videoram")->base();
 	m_term_data = 0;
 	m_pia0->cb1_w(1);
 }
@@ -232,19 +221,11 @@ WRITE8_MEMBER( v6809_state::v6809_register_w )
 
 // **** Keyboard ****
 
-WRITE8_MEMBER( v6809_state::kbd_put )
+void v6809_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 	m_pia0->cb1_w(0);
 	m_pia0->cb1_w(1);
-}
-
-WRITE_LINE_MEMBER( v6809_state::write_acia_clock )
-{
-	m_acia0->write_txc(state);
-	m_acia0->write_rxc(state);
-	m_acia1->write_txc(state);
-	m_acia1->write_rxc(state);
 }
 
 READ8_MEMBER( v6809_state::pb_r )
@@ -294,11 +275,10 @@ SLOT_INTERFACE_END
 
 // *** Machine ****
 
-static MACHINE_CONFIG_START( v6809, v6809_state )
+MACHINE_CONFIG_START(v6809_state::v6809)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_16MHz / 4) // divided by 4 again internally
 	MCFG_CPU_PROGRAM_MAP(v6809_mem)
-	MCFG_CPU_IO_MAP(v6809_io)
 	MCFG_MACHINE_RESET_OVERRIDE(v6809_state, v6809)
 
 	/* video hardware */
@@ -323,8 +303,8 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_MC6845_UPDATE_ROW_CB(v6809_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(v6809_state, crtc_update_addr)
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(v6809_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(v6809_state, kbd_put))
 
 // port A = drive select and 2 control lines ; port B = keyboard
 // CB2 connects to the interrupt pin of the RTC (the rtc code doesn't support it)
@@ -339,8 +319,7 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL_16MHz / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(4000000/14, 4000000/14, 4000000/14/8)
 	MCFG_PTM6840_OUT1_CB(WRITELINE(v6809_state, speaker_w))
 	MCFG_PTM6840_OUT2_CB(WRITELINE(v6809_state, speaker_en_w))
@@ -350,8 +329,11 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 
 	MCFG_DEVICE_ADD("acia1", ACIA6850, 0)
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, 10)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(v6809_state, write_acia_clock))
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia0", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_rxc))
 
 	MCFG_DEVICE_ADD("rtc", MM58274C, 0)
 // this is all guess
@@ -378,5 +360,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS           INIT     COMPANY      FULLNAME       FLAGS */
-COMP( 1982, v6809,  0,      0,       v6809,     v6809, driver_device,   0,     "Microkit", "Vegas 6809", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  CLASS          INIT   COMPANY     FULLNAME      FLAGS
+COMP( 1982, v6809,  0,      0,       v6809,     v6809, v6809_state,   0,     "Microkit", "Vegas 6809", MACHINE_NOT_WORKING )

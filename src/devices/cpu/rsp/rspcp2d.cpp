@@ -10,16 +10,20 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "rsp.h"
-#include "rspcp2.h"
 #include "rspcp2d.h"
+
+#include "rsp.h"
+#include "rsp_dasm.h"
+#include "rspcp2.h"
+
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
 
-using namespace uml;
+#include "rspdefs.h"
 
-extern offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op);
+
+using namespace uml;
 
 /***************************************************************************
     Helpful Defines
@@ -135,9 +139,11 @@ void rsp_cop2_drc::cfunc_unimplemented_opcode()
 	const uint32_t ppc = m_rsp.m_ppc;
 	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		char string[200];
-		rsp_dasm_one(string, ppc, m_rspcop2_state->op);
-		osd_printf_debug("%08X: %s\n", ppc, string);
+		rsp_disassembler rspd;
+		std::ostringstream stream;
+		rspd.dasm_one(stream, ppc, m_rspcop2_state->op);
+		const std::string stream_string = stream.str();
+		osd_printf_debug("%08X: %s\n", ppc, stream_string.c_str());
 	}
 	fatalerror("RSP: unknown opcode %02X (%08X) at %08X\n", m_rspcop2_state->op >> 26, m_rspcop2_state->op, ppc);
 }
@@ -302,7 +308,7 @@ void rsp_cop2_drc::lsv()
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
-	int index = (op >> 7) & 0xe;
+	int index = (op >> 7) & 0xf;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{
@@ -339,7 +345,7 @@ void rsp_cop2_drc::llv()
 	uint32_t ea;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
-	int index = (op >> 7) & 0xc;
+	int index = (op >> 7) & 0xf;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{
@@ -378,7 +384,7 @@ void rsp_cop2_drc::ldv()
 	uint32_t ea;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
-	int index = (op >> 7) & 0x8;
+	int index = (op >> 7) & 0xf;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{
@@ -907,7 +913,7 @@ void rsp_cop2_drc::sdv()
 	uint32_t op = m_rspcop2_state->op;
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
-	int index = (op >> 7) & 0x8;
+	int index = (op >> 7) & 0xf;
 	int offset = (op & 0x7f);
 	if (offset & 0x40)
 	{
@@ -1365,7 +1371,7 @@ void rsp_cop2_drc::vmulf()
 		if (s1 == -32768 && s2 == -32768)
 		{
 			// overflow
-			ACCUM(i) = S64(0x0000800080000000);
+			ACCUM(i) = s64(0x0000800080000000U);
 			m_vres[i] = 0x7fff;
 		}
 		else

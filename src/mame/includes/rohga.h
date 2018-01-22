@@ -70,6 +70,7 @@ public:
 	DECLARE_DRIVER_INIT(wizdfire);
 	DECLARE_DRIVER_INIT(nitrobal);
 	DECLARE_DRIVER_INIT(schmeisr);
+	DECLARE_DRIVER_INIT(hangzo);
 	DECLARE_DRIVER_INIT(rohga);
 	DECLARE_VIDEO_START(wizdfire);
 	uint32_t screen_update_rohga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -85,4 +86,9 @@ public:
 	WRITE16_MEMBER( nb_protection_region_0_146_w );
 	READ16_MEMBER( wf_protection_region_0_104_r );
 	WRITE16_MEMBER( wf_protection_region_0_104_w );
+	void wizdfire(machine_config &config);
+	void nitrobal(machine_config &config);
+	void hangzo(machine_config &config);
+	void schmeisr(machine_config &config);
+	void rohga(machine_config &config);
 };

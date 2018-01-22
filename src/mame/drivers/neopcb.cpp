@@ -29,7 +29,7 @@ void neopcb_state::neopcb_postload()
 	set_outputs();
 }
 
-static MACHINE_CONFIG_DERIVED_CLASS( neopcb, neogeo_arcade, neopcb_state )
+MACHINE_CONFIG_DERIVED(neopcb_state::neopcb, neogeo_arcade)
 	MCFG_CMC_PROT_ADD("cmc50")
 	MCFG_PCM2_PROT_ADD("pcm2")
 	MCFG_PVC_PROT_ADD("pvc")
@@ -138,12 +138,12 @@ ROM_START( svcpcb ) /* Encrypted Set, JAMMA PCB */
 	ROM_REGION( 0x1000000, "ymsnd", 0 )
 	/* Encrypted */
 	ROM_LOAD( "269-v1.v1", 0x000000, 0x800000, CRC(c659b34c) SHA1(1931e8111ef43946f68699f8707334c96f753a1e) )
-	ROM_LOAD( "269-v2.v1", 0x800000, 0x800000, CRC(dd903835) SHA1(e58d38950a7a8697bb22a1cc7a371ae6664ae8f9) )
+	ROM_LOAD( "269-v2.v2", 0x800000, 0x800000, CRC(dd903835) SHA1(e58d38950a7a8697bb22a1cc7a371ae6664ae8f9) )
 
 	ROM_REGION( 0x4000000, "sprites", 0 )
 	/* Encrypted */
 	ROM_LOAD( "269-c1.c1", 0x0000000, 0x2000000, CRC(1b608f9c) SHA1(4e70ad182da2ca18815bd3936efb04a06ebce01e) ) /* Plane 0,1 */
-	ROM_LOAD( "269-c2.c1", 0x2000000, 0x2000000, CRC(5a95f294) SHA1(6123cc7b20b494076185d27c2ffea910e124b195) ) /* Plane 0,1 */
+	ROM_LOAD( "269-c2.c2", 0x2000000, 0x2000000, CRC(5a95f294) SHA1(6123cc7b20b494076185d27c2ffea910e124b195) ) /* Plane 0,1 */
 ROM_END
 
 /****************************************
@@ -156,7 +156,7 @@ ROM_START( svcpcba ) /* Encrypted Set, JAMMA PCB */
 	/* alt PCB version, this one has the same program roms as the MVS set, and different GFX / Sound rom arrangements */
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	ROM_LOAD32_WORD_SWAP( "269-p1a.p1", 0x000000, 0x400000, CRC(38e2005e) SHA1(1b902905916a30969282f1399a756e32ff069097)  )
-	ROM_LOAD32_WORD_SWAP( "269-p2a.p1", 0x000002, 0x400000, CRC(6d13797c) SHA1(3cb71a95cea6b006b44cac0f547df88aec0007b7)  )
+	ROM_LOAD32_WORD_SWAP( "269-p2a.p2", 0x000002, 0x400000, CRC(6d13797c) SHA1(3cb71a95cea6b006b44cac0f547df88aec0007b7)  )
 
 	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
 	ROM_FILL( 0x000000, 0x80000, 0x000000 )
@@ -250,7 +250,7 @@ void neopcb_state::svcpcb_gfx_decrypt()
 	for (int i = 0; i < rom_size; i += 4)
 	{
 		uint32_t rom32 = rom[i] | rom[i+1]<<8 | rom[i+2]<<16 | rom[i+3]<<24;
-		rom32 = BITSWAP32(rom32, 0x09, 0x0d, 0x13, 0x00, 0x17, 0x0f, 0x03, 0x05, 0x04, 0x0c, 0x11, 0x1e, 0x12, 0x15, 0x0b, 0x06, 0x1b, 0x0a, 0x1a, 0x1c, 0x14, 0x02, 0x0e, 0x1d, 0x18, 0x08, 0x01, 0x10, 0x19, 0x1f, 0x07, 0x16);
+		rom32 = bitswap<32>(rom32, 0x09, 0x0d, 0x13, 0x00, 0x17, 0x0f, 0x03, 0x05, 0x04, 0x0c, 0x11, 0x1e, 0x12, 0x15, 0x0b, 0x06, 0x1b, 0x0a, 0x1a, 0x1c, 0x14, 0x02, 0x0e, 0x1d, 0x18, 0x08, 0x01, 0x10, 0x19, 0x1f, 0x07, 0x16);
 		buf[i]   = rom32       & 0xff;
 		buf[i+1] = (rom32>>8)  & 0xff;
 		buf[i+2] = (rom32>>16) & 0xff;
@@ -259,7 +259,7 @@ void neopcb_state::svcpcb_gfx_decrypt()
 
 	for (int i = 0; i < rom_size / 4; i++)
 	{
-		int ofst =  BITSWAP24((i & 0x1fffff), 0x17, 0x16, 0x15, 0x04, 0x0b, 0x0e, 0x08, 0x0c, 0x10, 0x00, 0x0a, 0x13, 0x03, 0x06, 0x02, 0x07, 0x0d, 0x01, 0x11, 0x09, 0x14, 0x0f, 0x12, 0x05);
+		int ofst =  bitswap<24>((i & 0x1fffff), 0x17, 0x16, 0x15, 0x04, 0x0b, 0x0e, 0x08, 0x0c, 0x10, 0x00, 0x0a, 0x13, 0x03, 0x06, 0x02, 0x07, 0x0d, 0x01, 0x11, 0x09, 0x14, 0x0f, 0x12, 0x05);
 		ofst ^= 0x0c8923;
 		ofst += (i & 0xffe00000);
 		memcpy(&rom[i * 4], &buf[ofst * 4], 0x04);
@@ -274,7 +274,7 @@ void neopcb_state::svcpcb_s1data_decrypt()
 	size_t s1_size = memregion("fixed")->bytes();
 
 	for (int i = 0; i < s1_size; i++) // Decrypt S
-		s1[i] = BITSWAP8(s1[i] ^ 0xd2, 4, 0, 7, 2, 5, 1, 6, 3);
+		s1[i] = bitswap<8>(s1[i] ^ 0xd2, 4, 0, 7, 2, 5, 1, 6, 3);
 
 }
 
@@ -294,7 +294,7 @@ void neopcb_state::kf2k3pcb_gfx_decrypt()
 	for (int i = 0; i < rom_size; i +=4)
 	{
 		uint32_t rom32 = rom[i] | rom[i+1]<<8 | rom[i+2]<<16 | rom[i+3]<<24;
-		rom32 = BITSWAP32(rom32, 0x09, 0x0d, 0x13, 0x00, 0x17, 0x0f, 0x03, 0x05, 0x04, 0x0c, 0x11, 0x1e, 0x12, 0x15, 0x0b, 0x06, 0x1b, 0x0a, 0x1a, 0x1c, 0x14, 0x02, 0x0e, 0x1d, 0x18, 0x08, 0x01, 0x10, 0x19, 0x1f, 0x07, 0x16);
+		rom32 = bitswap<32>(rom32, 0x09, 0x0d, 0x13, 0x00, 0x17, 0x0f, 0x03, 0x05, 0x04, 0x0c, 0x11, 0x1e, 0x12, 0x15, 0x0b, 0x06, 0x1b, 0x0a, 0x1a, 0x1c, 0x14, 0x02, 0x0e, 0x1d, 0x18, 0x08, 0x01, 0x10, 0x19, 0x1f, 0x07, 0x16);
 		buf[i]   =  rom32      & 0xff;
 		buf[i+1] = (rom32>>8)  & 0xff;
 		buf[i+2] = (rom32>>16) & 0xff;
@@ -303,7 +303,7 @@ void neopcb_state::kf2k3pcb_gfx_decrypt()
 
 	for (int i = 0; i < rom_size; i+=4)
 	{
-		int ofst = BITSWAP24((i & 0x7fffff), 0x17, 0x15, 0x0a, 0x14, 0x13, 0x16, 0x12, 0x11, 0x10, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00);
+		int ofst = bitswap<24>((i & 0x7fffff), 0x17, 0x15, 0x0a, 0x14, 0x13, 0x16, 0x12, 0x11, 0x10, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00);
 		ofst ^= 0x000000;
 		ofst += (i & 0xff800000);
 		memcpy(&rom[ofst], &buf[i], 0x04);
@@ -333,7 +333,7 @@ void neopcb_state::kf2k3pcb_decrypt_s1data()
 	dst = memregion("fixed")->base();
 
 	for (int i = 0; i < tx_size; i++)
-		dst[i] = BITSWAP8(dst[i] ^ 0xd2, 4, 0, 7, 2, 5, 1, 6, 3);
+		dst[i] = bitswap<8>(dst[i] ^ 0xd2, 4, 0, 7, 2, 5, 1, 6, 3);
 }
 
 
@@ -498,7 +498,7 @@ DRIVER_INIT_MEMBER(neopcb_state, kf2k3pcb)
 	// incorrect
 	uint8_t* rom = memregion("audiocpu")->base();
 	for (int i = 0; i < 0x90000; i++)
-		rom[i] = BITSWAP8(rom[i], 5, 6, 1, 4, 3, 0, 7, 2);
+		rom[i] = bitswap<8>(rom[i], 5, 6, 1, 4, 3, 0, 7, 2);
 
 	kf2k3pcb_gfx_decrypt();
 	m_cmc_prot->cmc50_gfx_decrypt(spr_region, spr_region_size, KOF2003_GFX_KEY);

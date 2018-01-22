@@ -33,6 +33,15 @@
 #endif 
 #endif // Unreal Engine 4 Bullshit
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wconversion"
+#elif defined _MSC_VER
+#pragma warning( push )
+#pragma warning( disable : 4324 ) // structure was padded due to alignment specifier
+#endif // g++
+
 #include "sol/state.hpp"
 #include "sol/object.hpp"
 #include "sol/function.hpp"
@@ -40,6 +49,12 @@
 #include "sol/state.hpp"
 #include "sol/coroutine.hpp"
 #include "sol/variadic_args.hpp"
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#elif defined _MSC_VER
+#pragma warning( push )
+#endif // g++
 
 #ifdef SOL_INSIDE_UNREAL
 #ifdef SOL_INSIDE_UNREAL_REMOVED_CHECK

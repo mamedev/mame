@@ -1,35 +1,31 @@
 // license:BSD-3-Clause
 // copyright-holders:Sergey Svishchev
-#ifndef __IE15_H__
-#define __IE15_H__
+#ifndef MAME_CPU_IE15_IE15_H
+#define MAME_CPU_IE15_IE15_H
 
-//**************************************************************************
-//  ENUMERATIONS
-//**************************************************************************
-
-enum
-{
-	IE15_PC,
-	IE15_A,
-	IE15_R0, IE15_R1, IE15_R2, IE15_R3, IE15_R4, IE15_R5, IE15_R6, IE15_R7,
-	IE15_R8, IE15_R9, IE15_R10, IE15_R11, IE15_R12, IE15_R13, IE15_R14, IE15_R15,
-	IE15_R16, IE15_R17, IE15_R18, IE15_R19, IE15_R20, IE15_R21, IE15_R22, IE15_R23,
-	IE15_R24, IE15_R25, IE15_R26, IE15_R27, IE15_R28, IE15_R29, IE15_R30, IE15_R31
-};
+#pragma once
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class ie15_device;
-
-class ie15_device : public cpu_device
+class ie15_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ie15_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	enum
+	{
+		IE15_PC,
+		IE15_A,
+		IE15_R0, IE15_R1, IE15_R2, IE15_R3, IE15_R4, IE15_R5, IE15_R6, IE15_R7,
+		IE15_R8, IE15_R9, IE15_R10, IE15_R11, IE15_R12, IE15_R13, IE15_R14, IE15_R15,
+		IE15_R16, IE15_R17, IE15_R18, IE15_R19, IE15_R20, IE15_R21, IE15_R22, IE15_R23,
+		IE15_R24, IE15_R25, IE15_R26, IE15_R27, IE15_R28, IE15_R29, IE15_R30, IE15_R31
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -40,7 +36,7 @@ protected:
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -48,9 +44,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	virtual void execute_one(int opcode);
 
@@ -80,10 +74,10 @@ protected:
 
 	address_space *m_program;
 	address_space *m_io;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 };
 
 // device type definition
-extern const device_type IE15;
+DECLARE_DEVICE_TYPE(IE15_CPU, ie15_cpu_device)
 
-#endif
+#endif // MAME_CPU_IE15_IE15_H

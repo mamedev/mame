@@ -55,12 +55,11 @@ char *SDLTest_TimestampToString(const time_t timestamp)
     time_t copy;
     static char buffer[64];
     struct tm *local;
-    const char *fmt = "%x %X";
 
     SDL_memset(buffer, 0, sizeof(buffer));
     copy = timestamp;
     local = localtime(&copy);
-    strftime(buffer, sizeof(buffer), fmt, local);
+    strftime(buffer, sizeof(buffer), "%x %X", local);
 
     return buffer;
 }

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
 #include "emu.h"
-#include "dsp16.h"
+#include "dsp16dis.h"
 
-std::string disasmF1Field(const uint8_t& F1, const uint8_t& D, const uint8_t& S)
+std::string dsp16a_disassembler::disasmF1Field(const uint8_t& F1, const uint8_t& D, const uint8_t& S)
 {
 	switch (F1)
 	{
@@ -28,7 +28,7 @@ std::string disasmF1Field(const uint8_t& F1, const uint8_t& D, const uint8_t& S)
 	}
 }
 
-std::string disasmYField(const uint8_t& Y)
+std::string dsp16a_disassembler::disasmYField(const uint8_t& Y)
 {
 	switch (Y)
 	{
@@ -58,7 +58,7 @@ std::string disasmYField(const uint8_t& Y)
 	//return "";
 }
 
-std::string disasmZField(const uint8_t& Z)
+std::string dsp16a_disassembler::disasmZField(const uint8_t& Z)
 {
 	switch (Z)
 	{
@@ -88,7 +88,7 @@ std::string disasmZField(const uint8_t& Z)
 	//return "";
 }
 
-std::string disasmF2Field(const uint8_t& F2, const uint8_t& D, const uint8_t& S)
+std::string dsp16a_disassembler::disasmF2Field(const uint8_t& F2, const uint8_t& D, const uint8_t& S)
 {
 	std::string ret = "";
 	switch (F2)
@@ -116,7 +116,7 @@ std::string disasmF2Field(const uint8_t& F2, const uint8_t& D, const uint8_t& S)
 	return ret;
 }
 
-std::string disasmCONField(const uint8_t& CON)
+std::string dsp16a_disassembler::disasmCONField(const uint8_t& CON)
 {
 	switch (CON)
 	{
@@ -145,7 +145,7 @@ std::string disasmCONField(const uint8_t& CON)
 	//return "";
 }
 
-std::string disasmBField(const uint8_t& B)
+std::string dsp16a_disassembler::disasmBField(const uint8_t& B)
 {
 	switch (B)
 	{
@@ -164,7 +164,7 @@ std::string disasmBField(const uint8_t& B)
 	//return "";
 }
 
-std::string disasmRImmediateField(const uint8_t& R)
+std::string dsp16a_disassembler::disasmRImmediateField(const uint8_t& R)
 {
 	switch (R)
 	{
@@ -183,7 +183,7 @@ std::string disasmRImmediateField(const uint8_t& R)
 	//return "";
 }
 
-std::string disasmRField(const uint8_t& R)
+std::string dsp16a_disassembler::disasmRField(const uint8_t& R)
 {
 	switch (R)
 	{
@@ -222,7 +222,7 @@ std::string disasmRField(const uint8_t& R)
 	//return "";
 }
 
-std::string disasmIField(const uint8_t& I)
+std::string dsp16a_disassembler::disasmIField(const uint8_t& I)
 {
 	switch (I)
 	{
@@ -237,7 +237,7 @@ std::string disasmIField(const uint8_t& I)
 	//return "";
 }
 
-bool disasmSIField(const uint8_t& SI)
+bool dsp16a_disassembler::disasmSIField(const uint8_t& SI)
 {
 	switch (SI)
 	{
@@ -248,12 +248,17 @@ bool disasmSIField(const uint8_t& SI)
 }
 
 
-CPU_DISASSEMBLE( dsp16a )
+u32 dsp16a_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t dsp16a_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint8_t opSize = 1;
 	uint32_t dasmflags = 0;
-	uint16_t op  = oprom[0] | (oprom[1] << 8);
-	uint16_t op2 = oprom[2] | (oprom[3] << 8);
+	uint16_t op  = opcodes.r16(pc);
+	uint16_t op2 = opcodes.r16(pc+1);
 
 	// TODO: Test for previous "if CON" instruction and tab the next instruction in?
 
@@ -270,7 +275,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const uint8_t F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
 			std::string fString = disasmF1Field(F1, D, S);
-			sprintf(buffer, "%s, %s", fString.c_str(), yString.c_str());
+			util::stream_format(stream, "%s, %s", fString, yString);
 			break;
 		}
 		case 0x04: case 0x1c:
@@ -285,7 +290,7 @@ CPU_DISASSEMBLE( dsp16a )
 			std::string fString = disasmF1Field(F1, D, S);
 			std::string aString = (opcode == 0x1c) ? "a0" : "a1";
 			std::string xString = (X) ? "" : "l";
-			sprintf(buffer, "%s = %s%s, %s", yString.c_str(), aString.c_str(), xString.c_str(), fString.c_str());
+			util::stream_format(stream, "%s = %s%s, %s", yString, aString, xString, fString);
 			break;
 		}
 		case 0x16:
@@ -297,7 +302,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const uint8_t F1 = (op & 0x01e0) >> 5;
 			std::string yString = disasmYField(Y);
 			std::string fString = disasmF1Field(F1, D, S);
-			sprintf(buffer, "%s, x = %s", fString.c_str(), yString.c_str());
+			util::stream_format(stream, "%s, x = %s", fString, yString);
 			break;
 		}
 		case 0x17:
@@ -311,7 +316,7 @@ CPU_DISASSEMBLE( dsp16a )
 			std::string yString = disasmYField(Y);
 			std::string fString = disasmF1Field(F1, D, S);
 			std::string xString = (X ? "y" : "y1");
-			sprintf(buffer, "%s, %s = %s", fString.c_str(), xString.c_str(), yString.c_str());
+			util::stream_format(stream, "%s, %s = %s", fString, xString, yString);
 			break;
 		}
 		case 0x1f:
@@ -325,7 +330,7 @@ CPU_DISASSEMBLE( dsp16a )
 			std::string yString = disasmYField(Y);
 			std::string fString = disasmF1Field(F1, D, S);
 			std::string xString = (X ? "*pt++i" : "*pt++");
-			sprintf(buffer, "%s, y = %s, x = %s", fString.c_str(), yString.c_str(), xString.c_str());
+			util::stream_format(stream, "%s, y = %s, x = %s", fString, yString, xString);
 			break;
 		}
 		case 0x19: case 0x1b:
@@ -339,8 +344,11 @@ CPU_DISASSEMBLE( dsp16a )
 			std::string fString = disasmF1Field(F1, D, S);
 			std::string xString = (X ? "*pt++i" : "*pt++");
 			std::string aString = (opcode == 0x19) ? "a0" : "a1";
-			sprintf(buffer, "%s, y = %s, x = %s", fString.c_str(), aString.c_str(), xString.c_str());
-			if (Y != 0x00) sprintf(buffer, "UNKNOWN");
+
+			if (Y != 0x00)
+				util::stream_format(stream, "UNKNOWN");
+			else
+				util::stream_format(stream, "%s, y = %s, x = %s", fString, aString, xString);
 			break;
 		}
 		case 0x14:
@@ -354,7 +362,7 @@ CPU_DISASSEMBLE( dsp16a )
 			std::string yString = disasmYField(Y);
 			std::string xString = (X ? "y" : "y1");
 			std::string fString = disasmF1Field(F1, D, S);
-			sprintf(buffer, "%s, %s = %s", fString.c_str(), yString.c_str(), xString.c_str());
+			util::stream_format(stream, "%s, %s = %s", fString, yString, xString);
 			break;
 		}
 
@@ -369,7 +377,7 @@ CPU_DISASSEMBLE( dsp16a )
 			std::string yString = disasmYField(Y);
 			std::string atString = (aT ? "a0" : "a1");
 			std::string fString = disasmF1Field(F1, aT, S);
-			sprintf(buffer, "%s, %s = %s", fString.c_str(), atString.c_str(), yString.c_str());
+			util::stream_format(stream, "%s, %s = %s", fString, atString, yString);
 			break;
 		}
 
@@ -385,7 +393,7 @@ CPU_DISASSEMBLE( dsp16a )
 			std::string zString = disasmZField(Z);
 			std::string xString = (X ? "y" : "y1");
 			std::string fString = disasmF1Field(F1, D, S);
-			sprintf(buffer, "%s, %s <=> %s", fString.c_str(), xString.c_str(), zString.c_str());
+			util::stream_format(stream, "%s, %s <=> %s", fString, xString, zString);
 			break;
 		}
 		case 0x1d:
@@ -399,7 +407,7 @@ CPU_DISASSEMBLE( dsp16a )
 			std::string zString = disasmZField(Z);
 			std::string xString = (X ? "*pt++i" : "*pt++");
 			std::string fString = disasmF1Field(F1, D, S);
-			sprintf(buffer, "%s, %s <=> y, x = %s", fString.c_str(), zString.c_str(), xString.c_str());
+			util::stream_format(stream, "%s, %s <=> y, x = %s", fString, zString, xString);
 			break;
 		}
 
@@ -416,7 +424,7 @@ CPU_DISASSEMBLE( dsp16a )
 			std::string atString = (aT ? "a0" : "a1");
 			atString += X ? "" : "1";   // TODO: Figure out unclear wording.
 			std::string fString = disasmF1Field(F1, aT, S);
-			sprintf(buffer, "%s, %s <=> %s", fString.c_str(), zString.c_str(), atString.c_str());
+			util::stream_format(stream, "%s, %s <=> %s", fString, zString, atString);
 			break;
 		}
 
@@ -431,8 +439,8 @@ CPU_DISASSEMBLE( dsp16a )
 			const uint8_t F2 = (op & 0x01e0) >> 5;
 			std::string fString = disasmF2Field(F2, D, S);
 			std::string conString = disasmCONField(CON);
-			if (op & 0x0800) sprintf(buffer,  "if %s : %s", conString.c_str(), fString.c_str());
-			else             sprintf(buffer, "ifc %s : %s", conString.c_str(), fString.c_str());
+			if (op & 0x0800) util::stream_format(stream,  "if %s : %s", conString, fString);
+			else             util::stream_format(stream, "ifc %s : %s", conString, fString);
 			break;
 		}
 
@@ -441,14 +449,14 @@ CPU_DISASSEMBLE( dsp16a )
 		{
 			// goto JA
 			const uint16_t JA = (op & 0x0fff) | (pc & 0xf000);
-			sprintf(buffer, "goto 0x%04x", JA);
+			util::stream_format(stream, "goto 0x%04x", JA);
 			break;
 		}
 		case 0x10: case 0x11:
 		{
 			// call JA
 			const uint16_t JA = (op & 0x0fff) | (pc & 0xf000);
-			sprintf(buffer, "call 0x%04x", JA);
+			util::stream_format(stream, "call 0x%04x", JA);
 			break;
 		}
 
@@ -458,7 +466,7 @@ CPU_DISASSEMBLE( dsp16a )
 			// goto B
 			const uint8_t B = (op & 0x0700) >> 8;
 			std::string bString = disasmBField(B);
-			sprintf(buffer, "%s", bString.c_str());
+			util::stream_format(stream, "%s", bString);
 			break;
 		}
 
@@ -468,10 +476,10 @@ CPU_DISASSEMBLE( dsp16a )
 			// if CON [goto/call/return]
 			const uint8_t CON = (op & 0x001f);
 			std::string conString = disasmCONField(CON);
-			sprintf(buffer, "if %s:", conString.c_str());
+			util::stream_format(stream, "if %s:", conString);
 			// TODO: Test for invalid ops
 			// icall
-			if (op == 0xd40e) sprintf(buffer, "icall");
+			if (op == 0xd40e) util::stream_format(stream, "icall");
 			break;
 		}
 
@@ -482,7 +490,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const uint8_t R = (op & 0x03f0) >> 4;
 			const uint8_t S = (op & 0x1000) >> 12;
 			std::string rString = disasmRField(R);
-			sprintf(buffer, "%s = %s", rString.c_str(), (S ? "a1" : "a0"));
+			util::stream_format(stream, "%s = %s", rString, (S ? "a1" : "a0"));
 			break;
 		}
 		case 0x08:
@@ -491,7 +499,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const uint8_t R  = (op & 0x03f0) >> 4;
 			const uint8_t aT = (op & 0x0400) >> 10;
 			std::string rString = disasmRField(R);
-			sprintf(buffer, "%s = %s", (aT ? "a0" : "a1"), rString.c_str());
+			util::stream_format(stream, "%s = %s", (aT ? "a0" : "a1"), rString);
 			break;
 		}
 		case 0x0f:
@@ -501,7 +509,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const uint8_t R = (op & 0x03f0) >> 4;
 			std::string yString = disasmYField(Y);
 			std::string rString = disasmRField(R);
-			sprintf(buffer, "%s = %s", rString.c_str(), yString.c_str());
+			util::stream_format(stream, "%s = %s", rString, yString);
 			// TODO: Special case the R == [y, y1, or x] case
 			break;
 		}
@@ -513,7 +521,7 @@ CPU_DISASSEMBLE( dsp16a )
 			std::string yString = disasmYField(Y);
 			std::string rString = disasmRField(R);
 			// TODO: page 3-31 "special function encoding"
-			sprintf(buffer, "%s = %s", yString.c_str(), rString.c_str());
+			util::stream_format(stream, "%s = %s", yString, rString);
 			break;
 		}
 		case 0x0d:
@@ -523,7 +531,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const uint8_t R = (op & 0x03f0) >> 4;
 			std::string zString = disasmZField(Z);
 			std::string rString = disasmRField(R);
-			sprintf(buffer, "%s <=> %s", zString.c_str(), rString.c_str());
+			util::stream_format(stream, "%s <=> %s", zString, rString);
 			break;
 		}
 
@@ -533,7 +541,7 @@ CPU_DISASSEMBLE( dsp16a )
 			// R = N
 			const uint8_t R = (op & 0x03f0) >> 4;
 			std::string rString = disasmRField(R);
-			sprintf(buffer, "%s = 0x%04x", rString.c_str(), op2);
+			util::stream_format(stream, "%s = 0x%04x", rString, op2);
 			opSize = 2;
 			break;
 		}
@@ -545,7 +553,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const uint16_t M = (op & 0x01ff);
 			const uint8_t  R = (op & 0x0e00) >> 9;
 			std::string rString = disasmRImmediateField(R);
-			sprintf(buffer, "%s = 0x%04x", rString.c_str(), M);
+			util::stream_format(stream, "%s = 0x%04x", rString, M);
 			break;
 		}
 
@@ -555,27 +563,29 @@ CPU_DISASSEMBLE( dsp16a )
 			// do|redo K
 			const uint8_t K = (op & 0x007f);
 			const uint8_t NI = (op & 0x0780) >> 7;
-			sprintf(buffer, "do (next %d inst) %d times", NI, K);
+
 			// TODO: Limits on K & NI
 			if (NI == 0x00)
-				sprintf(buffer, "redo %d", K);
+				util::stream_format(stream, "redo %d", K);
+			else
+				util::stream_format(stream, "do (next %d inst) %d times", NI, K);
 			break;
 		}
 
 		// RESERVED
 		case 0x1e:
 		{
-			sprintf(buffer, "RESERVED");
+			util::stream_format(stream, "RESERVED");
 			break;
 		}
 
 		// UNKNOWN
 		default:
 		{
-			sprintf(buffer, "UNKNOWN");
+			util::stream_format(stream, "UNKNOWN");
 			break;
 		}
 	}
 
-	return opSize | dasmflags | DASMFLAG_SUPPORTED;
+	return opSize | dasmflags | SUPPORTED;
 }

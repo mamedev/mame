@@ -103,6 +103,15 @@ public:
 	void armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 						uint32_t code,uint32_t color, uint32_t clut,int flipx,int flipy,int offsx,int offsy,
 						int transparent_color);
+	void terraf_sound(machine_config &config);
+	void terrafb(machine_config &config);
+	void legion(machine_config &config);
+	void terraf(machine_config &config);
+	void legionjb(machine_config &config);
+	void cclimbr2(machine_config &config);
+	void terrafjb(machine_config &config);
+	void armedf(machine_config &config);
+	void kozure(machine_config &config);
 };
 
 class bigfghtr_state : public armedf_state
@@ -110,19 +119,16 @@ class bigfghtr_state : public armedf_state
 public:
 	bigfghtr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: armedf_state(mconfig, type, tag),
-		m_sharedram(*this, "sharedram") { }
+		m_mcu(*this, "mcu"),
+		m_sharedram(*this, "sharedram")
+		{ }
 
-	required_shared_ptr<uint16_t> m_sharedram;
-
-	/* misc */
-	int           m_read_latch;
-	uint8_t         m_mcu_input_snippet;
-	uint8_t         m_mcu_jsr_snippet;
+	required_device<cpu_device> m_mcu;
+	required_shared_ptr<uint8_t> m_sharedram;
 
 	DECLARE_READ16_MEMBER(latch_r);
-	DECLARE_WRITE16_MEMBER(sharedram_w);
-	DECLARE_READ16_MEMBER(sharedram_r);
-	DECLARE_DRIVER_INIT(bigfghtr);
-	DECLARE_MACHINE_START(bigfghtr);
-	DECLARE_MACHINE_RESET(bigfghtr);
+	DECLARE_WRITE8_MEMBER(main_sharedram_w);
+	DECLARE_READ8_MEMBER(main_sharedram_r);
+	DECLARE_WRITE8_MEMBER(mcu_spritelist_w);
+	void bigfghtr(machine_config &config);
 };

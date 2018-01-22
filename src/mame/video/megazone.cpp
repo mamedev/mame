@@ -96,9 +96,9 @@ PALETTE_INIT_MEMBER(megazone_state, megazone)
 	}
 }
 
-WRITE8_MEMBER(megazone_state::megazone_flipscreen_w)
+WRITE_LINE_MEMBER(megazone_state::flipscreen_w)
 {
-	m_flipscreen = data & 1;
+	m_flipscreen = state;
 }
 
 void megazone_state::video_start()

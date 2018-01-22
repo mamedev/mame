@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /***************************************************************************
 
@@ -14,6 +14,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "sound/mos6560.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -31,6 +32,7 @@ public:
 	DECLARE_READ8_MEMBER( vic_videoram_r );
 	DECLARE_READ8_MEMBER( vic_colorram_r );
 
+	void attckufo(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -49,11 +51,11 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, attckufo_state )
 	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vic_videoram_map, AS_0, 8, attckufo_state )
+static ADDRESS_MAP_START( vic_videoram_map, 0, 8, attckufo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vic_colorram_map, AS_1, 8, attckufo_state )
+static ADDRESS_MAP_START( vic_colorram_map, 1, 8, attckufo_state )
 	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 
@@ -109,7 +111,7 @@ READ8_MEMBER(attckufo_state::vic_colorram_r)
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( attckufo, attckufo_state )
+MACHINE_CONFIG_START(attckufo_state::attckufo)
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_14_31818MHz / 14)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 
@@ -144,5 +146,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS          INIT  ROTATION  COMPANY               FULLNAME      FLAGS
-GAME( 1980, attckufo, 0,      attckufo, attckufo, driver_device, 0,    ROT270,   "Ryoto Electric Co.", "Attack UFO", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     CLASS           INIT  ROTATION  COMPANY               FULLNAME      FLAGS
+GAME( 1980, attckufo, 0,      attckufo, attckufo, attckufo_state, 0,    ROT270,   "Ryoto Electric Co.", "Attack UFO", MACHINE_SUPPORTS_SAVE )

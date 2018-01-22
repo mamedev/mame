@@ -16,14 +16,14 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-const device_type MIDIIN = &device_creator<midiin_device>;
+DEFINE_DEVICE_TYPE(MIDIIN, midiin_device, "midiin", "MIDI In image device")
 
 /*-------------------------------------------------
     ctor
 -------------------------------------------------*/
 
 midiin_device::midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MIDIIN, "MIDI In image device", tag, owner, clock, "midiin", __FILE__),
+	: device_t(mconfig, MIDIIN, tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		device_serial_interface(mconfig, *this),
 		m_midi(nullptr),
@@ -59,41 +59,29 @@ void midiin_device::device_reset()
 }
 
 /*-------------------------------------------------
-    device_config_complete
--------------------------------------------------*/
-
-void midiin_device::device_config_complete(void)
-{
-	update_names();
-}
-
-/*-------------------------------------------------
     device_timer
 -------------------------------------------------*/
 
 void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (id) {
-		device_serial_interface::device_timer(timer, id, param, ptr);
-		return;
-	}
+	if (!id) {
+		uint8_t buf[8192*4];
+		int bytesRead;
 
-	uint8_t buf[8192*4];
-	int bytesRead;
+		if (m_midi == nullptr) {
+			return;
+		}
 
-	if (m_midi == nullptr) {
-		return;
-	}
-
-	while (m_midi->poll())
-	{
-		bytesRead = m_midi->read(buf);
-
-		if (bytesRead > 0)
+		while (m_midi->poll())
 		{
-			for (int i = 0; i < bytesRead; i++)
+			bytesRead = m_midi->read(buf);
+
+			if (bytesRead > 0)
 			{
-				xmit_char(buf[i]);
+				for (int i = 0; i < bytesRead; i++)
+				{
+					xmit_char(buf[i]);
+				}
 			}
 		}
 	}

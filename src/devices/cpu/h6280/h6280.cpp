@@ -7,7 +7,7 @@
     Copyright Bryan McPhail, mish@tendril.co.uk
 
     This source code is based (with permission!) on the 6502 emulator by
-    Juergen Buchmueller.  It is released as part of the Mame emulator project.
+    Juergen Buchmueller.  It is released as part of the MAME emulator project.
     Let me know if you intend to use this code in any other project.
 
 
@@ -110,7 +110,9 @@
 
 ******************************************************************************/
 
+#include "emu.h"
 #include "h6280.h"
+#include "6280dasm.h"
 #include "debugger.h"
 
 /* 6280 flags */
@@ -152,22 +154,29 @@ enum
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type H6280 = &device_creator<h6280_device>;
+DEFINE_DEVICE_TYPE(H6280, h6280_device, "h6280", "HuC6280")
 
 //-------------------------------------------------
 //  h6280_device - constructor
 //-------------------------------------------------
 
 h6280_device::h6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, H6280, "H6280", tag, owner, clock, "h6280", __FILE__),
-	m_program_config("program", ENDIANNESS_LITTLE, 8, 21),
-	m_io_config("io", ENDIANNESS_LITTLE, 8, 2)
+	: cpu_device(mconfig, H6280, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 21)
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 2)
 {
 	// build the opcode table
 	for (int op = 0; op < 256; op++)
 		m_opcode[op] = s_opcodetable[op];
 }
 
+device_memory_interface::space_config_vector h6280_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 const h6280_device::ophandler h6280_device::s_opcodetable[256] =
 {
@@ -254,7 +263,7 @@ void h6280_device::device_start()
 	save_item(NAME(m_irq_state[2]));
 	save_item(NAME(m_irq_pending));
 
-#if LAZY_FLAGS
+#if H6280_LAZY_FLAGS
 	save_item(NAME(m_nz));
 #endif
 	save_item(NAME(m_io_buffer));
@@ -286,13 +295,13 @@ void h6280_device::device_reset()
 	m_irq_mask = 0;
 	m_timer_ack = 0;
 	m_timer_value = 0;
-#if LAZY_FLAGS
+#if H6280_LAZY_FLAGS
 	m_nz = 0;
 #endif
 	m_io_buffer = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	/* set I and B flags */
@@ -332,7 +341,7 @@ inline void h6280_device::h6280_cycles(int cyc)
 	m_timer_value -= ((cyc) * m_clocks_per_cycle);
 }
 
-#if LAZY_FLAGS
+#if H6280_LAZY_FLAGS
 
 #define NZ  m_NZ
 inline void h6280_device::set_nz(uint8_t n)
@@ -708,7 +717,7 @@ inline void h6280_device::wb_eaz(uint8_t tmp)
  * including N and Z and set any
  * SET and clear any CLR bits also
  ***************************************************************/
-#if LAZY_FLAGS
+#if H6280_LAZY_FLAGS
 
 inline void h6280_device::compose_p(uint8_t SET, uint8_t CLR)
 {
@@ -879,7 +888,7 @@ inline void h6280_device::bcs()
  ***************************************************************/
 inline void h6280_device::beq()
 {
-#if LAZY_FLAGS
+#if H6280_LAZY_FLAGS
 	bra(!(NZ & 0xff));
 #else
 	bra(P & _fZ);
@@ -902,7 +911,7 @@ inline void h6280_device::bit(uint8_t tmp)
  ***************************************************************/
 inline void h6280_device::bmi()
 {
-#if LAZY_FLAGS
+#if H6280_LAZY_FLAGS
 	bra(NZ & 0x8000);
 #else
 	bra(P & _fN);
@@ -914,7 +923,7 @@ inline void h6280_device::bmi()
  ***************************************************************/
 inline void h6280_device::bne()
 {
-#if LAZY_FLAGS
+#if H6280_LAZY_FLAGS
 	bra(NZ & 0xff);
 #else
 	bra(!(P & _fZ));
@@ -926,7 +935,7 @@ inline void h6280_device::bne()
  ***************************************************************/
 inline void h6280_device::bpl()
 {
-#if LAZY_FLAGS
+#if H6280_LAZY_FLAGS
 	bra(!(NZ & 0x8000));
 #else
 	bra(!(P & _fN));
@@ -940,7 +949,7 @@ inline void h6280_device::bpl()
  ***************************************************************/
 inline void h6280_device::brk()
 {
-	logerror("BRK %04xn",PCW);
+	logerror("BRK %04x\n",PCW);
 	clear_t();
 	PCW++;
 	push(PCH);
@@ -1318,7 +1327,7 @@ inline void h6280_device::pla()
  ***************************************************************/
 inline void h6280_device::plp()
 {
-#if LAZY_FLAGS
+#if H6280_LAZY_FLAGS
 	pull(P);
 	P |= _fB;
 	NZ = ((P & _fN) << 8) |
@@ -1395,7 +1404,7 @@ inline uint8_t h6280_device::ror(uint8_t tmp)
  ***************************************************************/
 inline void h6280_device::rti()
 {
-#if LAZY_FLAGS
+#if H6280_LAZY_FLAGS
 	pull(P);
 	P |= _fB;
 	NZ = ((P & _fN) << 8) |
@@ -2212,36 +2221,13 @@ void h6280_device::state_string_export(const device_state_entry &entry, std::str
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t h6280_device::disasm_min_opcode_bytes() const
-{
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t h6280_device::disasm_max_opcode_bytes() const
-{
-	return 7;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t h6280_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *h6280_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( h6280 );
-	return CPU_DISASSEMBLE_NAME(h6280)(this, buffer, pc, oprom, opram, options);
+	return new h6280_disassembler;
 }
 
 
@@ -2563,7 +2549,7 @@ WRITE8_MEMBER( h6280_device::timer_w )
 	}
 }
 
-bool h6280_device::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
+bool h6280_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	if (spacenum == AS_PROGRAM)
 		address = translated(address);

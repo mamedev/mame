@@ -273,10 +273,12 @@ Notes:
 
 #include "emu.h"
 #include "includes/segaorun.h"
+#include "includes/segaipt.h"
+
 #include "machine/fd1089.h"
 #include "sound/ym2151.h"
 #include "sound/segapcm.h"
-#include "includes/segaipt.h"
+#include "speaker.h"
 
 #include "outrun.lh"
 
@@ -506,7 +508,7 @@ READ16_MEMBER( segaorun_state::misc_io_r )
 	if (!m_custom_io_r.isnull())
 		return m_custom_io_r(space, offset, mem_mask);
 
-	logerror("%06X:misc_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
+	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return open_bus_r(space, 0, mem_mask);
 }
 
@@ -523,7 +525,7 @@ WRITE16_MEMBER( segaorun_state::misc_io_w )
 		return;
 	}
 
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -608,7 +610,7 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 				case 65:
 				case 129:
 				case 193:
-					timer_set(m_screen->time_until_pos(scanline, m_screen->visible_area().max_x + 1), TID_IRQ2_GEN);
+					m_irq2_gen_timer->adjust(m_screen->time_until_pos(scanline, m_screen->visible_area().max_x + 1));
 					next_scanline = scanline + 1;
 					break;
 
@@ -703,7 +705,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 			break;
 	}
 
-	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
+	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return open_bus_r(space, 0, mem_mask);
 }
 
@@ -755,7 +757,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 			break;
 	}
 
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -786,7 +788,7 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 			break;
 	}
 
-	logerror("%06X:misc_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
+	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return open_bus_r(space,0,mem_mask);
 }
 
@@ -838,7 +840,7 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 			break;
 	}
 
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -894,7 +896,7 @@ static ADDRESS_MAP_START( outrun_map, AS_PROGRAM, 16, segaorun_state )
 	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 16, segaorun_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segaorun_state )
 	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -1008,6 +1010,20 @@ static INPUT_PORTS_START( outrun )
 	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( outruneh )
+	PORT_INCLUDE( outrun_generic )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1,2")
+	PORT_DIPSETTING(    0x03, "Moving" )
+	PORT_DIPSETTING(    0x02, "Up Cockpit" )
+	PORT_DIPSETTING(    0x01, "Mini Up" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x08, 0x08, "Speed Indicator" )  PORT_DIPLOCATION("SWB:4")
+	PORT_DIPSETTING(    0x08, "km/h" )
+	PORT_DIPSETTING(    0x00, "MPH" )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( outrundx )
 	PORT_INCLUDE( outrun_generic )
@@ -1020,6 +1036,22 @@ static INPUT_PORTS_START( outrundx )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SWB:3" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( outrundxeh )
+	PORT_INCLUDE( outrun_generic )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:1")
+	PORT_DIPSETTING(    0x00, "Not Moving" )
+	PORT_DIPSETTING(    0x01, "Moving" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SWB:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SWB:3" )
+	PORT_DIPNAME( 0x08, 0x08, "Speed Indicator" )  PORT_DIPLOCATION("SWB:4")
+	PORT_DIPSETTING(    0x08, "km/h" )
+	PORT_DIPSETTING(    0x00, "MPH" )
 INPUT_PORTS_END
 
 
@@ -1151,7 +1183,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( outrun_base, segaorun_state )
+MACHINE_CONFIG_START(segaorun_state::outrun_base)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -1212,7 +1244,7 @@ MACHINE_CONFIG_END
 //  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_DERIVED( outrundx, outrun_base )
+MACHINE_CONFIG_DERIVED(segaorun_state::outrundx, outrun_base)
 
 	// basic machine hardware
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bankmotor", segaorun_state, bankmotor_update, attotime::from_msec(10))
@@ -1221,13 +1253,13 @@ static MACHINE_CONFIG_DERIVED( outrundx, outrun_base )
 	MCFG_SEGA_OUTRUN_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( outrun, outrundx )
+MACHINE_CONFIG_DERIVED(segaorun_state::outrun, outrundx)
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( outrun_fd1094, outrun )
+MACHINE_CONFIG_DERIVED(segaorun_state::outrun_fd1094, outrun)
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
@@ -1235,7 +1267,7 @@ static MACHINE_CONFIG_DERIVED( outrun_fd1094, outrun )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( outrun_fd1089a, outrun )
+MACHINE_CONFIG_DERIVED(segaorun_state::outrun_fd1089a, outrun)
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1089A, MASTER_CLOCK/4)
@@ -1243,7 +1275,7 @@ static MACHINE_CONFIG_DERIVED( outrun_fd1089a, outrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( shangon, outrun_base )
+MACHINE_CONFIG_DERIVED(segaorun_state::shangon, outrun_base)
 
 	// basic machine hardware
 	MCFG_DEVICE_REMOVE("i8255")
@@ -1265,7 +1297,7 @@ static MACHINE_CONFIG_DERIVED( shangon, outrun_base )
 	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shangon_fd1089b, shangon )
+MACHINE_CONFIG_DERIVED(segaorun_state::shangon_fd1089b, shangon)
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1089B, MASTER_CLOCK/4)
@@ -2893,6 +2925,8 @@ DRIVER_INIT_MEMBER(segaorun_state,generic)
 	// allocate a scanline timer
 	m_scanline_timer = timer_alloc(TID_SCANLINE);
 
+	m_irq2_gen_timer = timer_alloc(TID_IRQ2_GEN);
+
 	// configure the NVRAM to point to our workram
 	if (m_nvram != nullptr)
 		m_nvram->set_base(m_workram, m_workram.bytes());
@@ -2930,13 +2964,13 @@ DRIVER_INIT_MEMBER(segaorun_state,outrunb)
 	uint16_t *word = (uint16_t *)memregion("maincpu")->base();
 	uint32_t length = memregion("maincpu")->bytes() / 2;
 	for (uint32_t i = 0; i < length; i++)
-		word[i] = BITSWAP16(word[i], 15,14,11,12,13,10,9,8,6,7,5,4,3,2,1,0);
+		word[i] = bitswap<16>(word[i], 15,14,11,12,13,10,9,8,6,7,5,4,3,2,1,0);
 
 	// sub CPU: swap bits 14,15 and 2,3
 	word = (uint16_t *)memregion("subcpu")->base();
 	length = memregion("subcpu")->bytes() / 2;
 	for (uint32_t i = 0; i < length; i++)
-		word[i] = BITSWAP16(word[i], 14,15,13,12,11,10,9,8,7,6,5,4,2,3,1,0);
+		word[i] = bitswap<16>(word[i], 14,15,13,12,11,10,9,8,7,6,5,4,2,3,1,0);
 
 	// road gfx
 	// rom a-2.bin: swap bits 6,7
@@ -2945,15 +2979,15 @@ DRIVER_INIT_MEMBER(segaorun_state,outrunb)
 	length = memregion("gfx3")->bytes() / 2;
 	for (uint32_t i = 0; i < length; i++)
 	{
-		byte[i]        = BITSWAP8(byte[i],        6,7,5,4,3,2,1,0);
-		byte[i+length] = BITSWAP8(byte[i+length], 7,5,6,4,3,2,1,0);
+		byte[i]        = bitswap<8>(byte[i],        6,7,5,4,3,2,1,0);
+		byte[i+length] = bitswap<8>(byte[i+length], 7,5,6,4,3,2,1,0);
 	}
 
 	// Z80 code: swap bits 5,6
 	byte = memregion("soundcpu")->base();
 	length = memregion("soundcpu")->bytes();
 	for (uint32_t i = 0; i < length; i++)
-		byte[i] = BITSWAP8(byte[i], 7,5,6,4,3,2,1,0);
+		byte[i] = bitswap<8>(byte[i], 7,5,6,4,3,2,1,0);
 }
 
 DRIVER_INIT_MEMBER(segaorun_state,shangon)
@@ -3003,5 +3037,5 @@ GAME( 1987, shangon3d, shangon, shangon,  shangon,  segaorun_state,shangon, ROT0
 
 // aftermarket modifications, these fix various issues in the game, including making the attract mode work correctly when set to Free Play.
 // see http://reassembler.blogspot.co.uk/2011/08/outrun-enhanced-edition.html
-GAMEL(2013, outrundxeh,  outrun,  outrun,          outrundx, segaorun_state,outrun,  ROT0,   "hack (Chris White)",    "Out Run (deluxe sitdown) (Enhanced Edition v1.0.3)", 0,                                layout_outrun ) // Jan 2013
-GAMEL(2014, outruneh,    outrun,  outrun,          outrun,   segaorun_state,outrun,  ROT0,   "hack (Chris White)",    "Out Run (sitdown/upright, Rev B) (Enhanced Edition v1.1.0)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings - July 2014
+GAMEL(2013, outrundxeh,  outrun,  outrun,        outrundxeh, segaorun_state,outrun,  ROT0,   "hack (Chris White)",    "Out Run (deluxe sitdown) (Enhanced Edition v1.0.3)", 0,                                layout_outrun ) // Jan 2013
+GAMEL(2014, outruneh,    outrun,  outrun,        outruneh,   segaorun_state,outrun,  ROT0,   "hack (Chris White)",    "Out Run (sitdown/upright, Rev B) (Enhanced Edition v1.1.0)", 0,                        layout_outrun ) // Upright/Sitdown determined by dipswitch settings - July 2014

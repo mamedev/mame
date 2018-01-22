@@ -33,7 +33,7 @@ private:
 		INPUT_SPECIFIC,
 	};
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	bool m_menuless_mode;

@@ -122,7 +122,7 @@
   - Tile matrix and color data (video & color RAM) are totally encrypted/scrambled.
 
   You can see the following table, where 'Normal tile #' is the tile number called
-  to be drawn, and 'Scrambled tile #' is the phisical tile position in the matrix:
+  to be drawn, and 'Scrambled tile #' is the physical tile position in the matrix:
 
   Normal | Scrambled
   tile # |  tile #
@@ -209,7 +209,7 @@
                                                                digit #3
                                                                +-------+ swapped digits 1 & 2
                                                                |       |  +-------+------+
-    tile_offset = BITSWAP16((tile_offset & 0xfff),15,14,13,12, 8,9,10,11, 0,1,2,3, 4,5,6,7)
+    tile_offset = bitswap<16>((tile_offset & 0xfff),15,14,13,12, 8,9,10,11, 0,1,2,3, 4,5,6,7)
                                                                | | |  |   | | | | || | | |
                                                                inverted   inverted|inverted
                                                                bitorder   bitorder|bitorder
@@ -243,7 +243,7 @@
                                       1st nibble
                                   inverted bitorder
                                        | | | |
-    color_index = BITSWAP8(color_index,4,5,6,7,2,3,0,1)
+    color_index = bitswap<8>(color_index,4,5,6,7,2,3,0,1)
                                                <-> <->
                                               2nd nibble
                                             swappeed pairs
@@ -258,7 +258,7 @@
   - Tile matrix and color data (video & color RAM) are totally encrypted/scrambled.
 
   You can see the following table, where 'Normal tile #' is the tile number called
-  to be drawn, and 'Scrambled tile #' is the phisical tile position in the matrix:
+  to be drawn, and 'Scrambled tile #' is the physical tile position in the matrix:
 
   Normal | Scrambled
   tile # |  tile #
@@ -437,7 +437,7 @@
 
   So, the algorithm to properly decrypt the color codes is the following one:
 
-    color_index = BITSWAP8(color_index,7,5,6,4,3,2,1,0)
+    color_index = bitswap<8>(color_index,7,5,6,4,3,2,1,0)
                                          | |
                                        swapped
 
@@ -614,15 +614,19 @@
 ***********************************************************************************/
 
 
-#define MASTER_CLOCK    XTAL_16MHz
-
 #include "emu.h"
-#include "cpu/m6502/m65sc02.h"
-#include "sound/okim6295.h"
-#include "snookr10.lh"
 #include "includes/snookr10.h"
-#include "machine/nvram.h"
 
+#include "cpu/m6502/m65sc02.h"
+#include "machine/nvram.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "snookr10.lh"
+
+
+#define MASTER_CLOCK    XTAL_16MHz
 
 /**********************
 * Read/Write Handlers *
@@ -1033,7 +1037,7 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( snookr10, snookr10_state )
+MACHINE_CONFIG_START(snookr10_state::snookr10)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)    /* 2 MHz (1.999 MHz measured) */
@@ -1058,12 +1062,12 @@ static MACHINE_CONFIG_START( snookr10, snookr10_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, OKIM6295_PIN7_HIGH)   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
+	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, PIN7_HIGH)   /* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.8)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( apple10, snookr10 )
+MACHINE_CONFIG_DERIVED(snookr10_state::apple10, snookr10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1075,7 +1079,7 @@ static MACHINE_CONFIG_DERIVED( apple10, snookr10 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tenballs, snookr10 )
+MACHINE_CONFIG_DERIVED(snookr10_state::tenballs, snookr10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1083,7 +1087,7 @@ static MACHINE_CONFIG_DERIVED( tenballs, snookr10 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( crystalc, snookr10 )
+MACHINE_CONFIG_DERIVED(snookr10_state::crystalc, snookr10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1216,9 +1220,9 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME       PARENT    MACHINE   INPUT      STATE          INIT ROT    COMPANY      FULLNAME                      FLAGS   LAYOUT */
-GAMEL( 1998, snookr10,  0,        snookr10, snookr10,  driver_device, 0,   ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",       0,      layout_snookr10 )
-GAMEL( 1998, apple10,   0,        apple10,  apple10,   driver_device, 0,   ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",         0,      layout_snookr10 )
-GAMEL( 1997, tenballs,  snookr10, tenballs, tenballs,  driver_device, 0,   ROT0, "<unknown>", "Ten Balls (Ver 1.05)",        0,      layout_snookr10 )
-GAMEL( 1998, crystalc,  0,        crystalc, crystalc,  driver_device, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.02)", 0,      layout_snookr10 )
-GAMEL( 1998, crystalca, crystalc, crystalc, crystalca, driver_device, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.01)", 0,      layout_snookr10 )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT      STATE           INIT ROT   COMPANY      FULLNAME                       FLAGS   LAYOUT */
+GAMEL( 1998, snookr10,  0,        snookr10, snookr10,  snookr10_state, 0,   ROT0, "Sandii'",   "Snooker 10 (Ver 1.11)",       0,      layout_snookr10 )
+GAMEL( 1998, apple10,   0,        apple10,  apple10,   snookr10_state, 0,   ROT0, "Sandii'",   "Apple 10 (Ver 1.21)",         0,      layout_snookr10 )
+GAMEL( 1997, tenballs,  snookr10, tenballs, tenballs,  snookr10_state, 0,   ROT0, "<unknown>", "Ten Balls (Ver 1.05)",        0,      layout_snookr10 )
+GAMEL( 1998, crystalc,  0,        crystalc, crystalc,  snookr10_state, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.02)", 0,      layout_snookr10 )
+GAMEL( 1998, crystalca, crystalc, crystalc, crystalca, snookr10_state, 0,   ROT0, "JCD srl",   "Crystals Colours (Ver 1.01)", 0,      layout_snookr10 )

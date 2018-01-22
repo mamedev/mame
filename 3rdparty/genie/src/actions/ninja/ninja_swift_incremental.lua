@@ -93,7 +93,7 @@ function swift.generate_config(prj, cfg)
 	local docfiles = {}
 
 	for _, file in ipairs(cfg.files) do
-		if path.isSourceFile(file) then
+		if path.issourcefile(file) then
 			table.insert(objfiles, swift.objectname(cfg, file))
 			table.insert(modfiles, swift.modulename(cfg, file))
 			table.insert(docfiles, swift.docname(cfg, file))
@@ -123,7 +123,7 @@ function swift.file_rules(cfg, flags)
 	local sfiles = Set(cfg.files)
 
 	for _, file in ipairs(cfg.files) do
-		if path.isSourceFile(file) then
+		if path.issourcefile(file) then
 			if path.isswiftfile(file) then
 				local objn = swift.objectname(cfg, file)
 				local modn = swift.modulename(cfg, file)

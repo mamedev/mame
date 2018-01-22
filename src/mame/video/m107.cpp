@@ -113,6 +113,7 @@ WRITE16_MEMBER(m107_state::control_w)
 
 		case 0x1e:
 			m_raster_irq_position = m_control[offset] - 128;
+			m_upd71059c->ir2_w(0);
 			break;
 	}
 }
@@ -381,7 +382,7 @@ WRITE16_MEMBER(m107_state::spritebuffer_w)
 		/*
 		TODO: this register looks a lot more complex than how the game uses it. All of them seems to test various bit combinations during POST.
 		*/
-//      logerror("%04x: buffered spriteram\n",space.device().safe_pc());
+//      logerror("%s: buffered spriteram\n",m_maincpu->pc());
 		m_sprite_display    = (!(data & 0x1000));
 
 		memcpy(m_buffered_spriteram.get(), m_spriteram, 0x1000);

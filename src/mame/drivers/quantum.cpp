@@ -56,6 +56,8 @@ NOTE: The Atari 136002-125 PROM in the sets below wasn't dumped from an actual
 #include "sound/discrete.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class quantum_state : public driver_device
@@ -72,6 +74,7 @@ public:
 	DECLARE_READ8_MEMBER(input_2_r);
 	required_device<cpu_device> m_maincpu;
 	required_device<avg_quantum_device> m_avg;
+	void quantum(machine_config &config);
 };
 
 
@@ -262,7 +265,7 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( quantum, quantum_state )
+MACHINE_CONFIG_START(quantum_state::quantum)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
@@ -395,6 +398,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, quantum,  0,       quantum, quantum, driver_device, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, quantum1, quantum, quantum, quantum, driver_device, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, quantump, quantum, quantum, quantum, driver_device, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantum,  0,       quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantum1, quantum, quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (rev 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, quantump, quantum, quantum, quantum, quantum_state, 0, ROT270, "General Computer Corporation (Atari license)", "Quantum (prototype)", MACHINE_SUPPORTS_SAVE )

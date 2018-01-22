@@ -209,7 +209,7 @@ void balsente_state::poly17_init()
 inline void balsente_state::noise_gen_chip(int chip, int count, short *buffer)
 {
 	/* noise generator runs at 100kHz */
-	uint32_t step = (100000 << 14) / CEM3394_SAMPLE_RATE;
+	uint32_t step = (100000 << 14) / cem3394_device::SAMPLE_RATE;
 	uint32_t noise_counter = m_noise_position[chip];
 
 	while (count--)
@@ -301,21 +301,44 @@ WRITE8_MEMBER(balsente_state::balsente_rombank2_select_w)
  *
  *************************************/
 
-WRITE8_MEMBER(balsente_state::balsente_misc_output_w)
+WRITE_LINE_MEMBER(balsente_state::out0_w)
 {
-	offset = (offset / 4) % 8;
-	data >>= 7;
+//      output().set_led_value(0, state);
+}
 
-	/* these are generally used to control the various lamps */
-	/* special case is offset 7, which recalls the NVRAM data */
-	if (offset == 7)
-	{
-		logerror("nvrecall_w=%d\n", data);
-	}
-	else
-	{
-//      output().set_led_value(offset, data);
-	}
+WRITE_LINE_MEMBER(balsente_state::out1_w)
+{
+//      output().set_led_value(1, state);
+}
+
+WRITE_LINE_MEMBER(balsente_state::out2_w)
+{
+//      output().set_led_value(2, state);
+}
+
+WRITE_LINE_MEMBER(balsente_state::out3_w)
+{
+//      output().set_led_value(3, state);
+}
+
+WRITE_LINE_MEMBER(balsente_state::out4_w)
+{
+//      output().set_led_value(4, state);
+}
+
+WRITE_LINE_MEMBER(balsente_state::out5_w)
+{
+//      output().set_led_value(5, state);
+}
+
+WRITE_LINE_MEMBER(balsente_state::out6_w)
+{
+//      output().set_led_value(6, state);
+}
+
+WRITE_LINE_MEMBER(balsente_state::nvrecall_w)
+{
+	logerror("nvrecall_w=%d\n", state);
 }
 
 
@@ -895,17 +918,17 @@ void balsente_state::update_counter_0_timer()
 	/* find the counter with the maximum frequency */
 	/* this is used to calibrate the timers at startup */
 	for (i = 0; i < 6; i++)
-		if (m_cem_device[i]->get_parameter(CEM3394_FINAL_GAIN) < 10.0)
+		if (m_cem_device[i]->get_parameter(cem3394_device::FINAL_GAIN) < 10.0)
 		{
 			double tempfreq;
 
 			/* if the filter resonance is high, then they're calibrating the filter frequency */
-			if (m_cem_device[i]->get_parameter(CEM3394_FILTER_RESONANCE) > 0.9)
-				tempfreq = m_cem_device[i]->get_parameter(CEM3394_FILTER_FREQENCY);
+			if (m_cem_device[i]->get_parameter(cem3394_device::FILTER_RESONANCE) > 0.9)
+				tempfreq = m_cem_device[i]->get_parameter(cem3394_device::FILTER_FREQENCY);
 
 			/* otherwise, they're calibrating the VCO frequency */
 			else
-				tempfreq = m_cem_device[i]->get_parameter(CEM3394_VCO_FREQUENCY);
+				tempfreq = m_cem_device[i]->get_parameter(cem3394_device::VCO_FREQUENCY);
 
 			if (tempfreq > maxfreq) maxfreq = tempfreq;
 		}
@@ -987,16 +1010,16 @@ WRITE8_MEMBER(balsente_state::balsente_counter_control_w)
 
 WRITE8_MEMBER(balsente_state::balsente_chip_select_w)
 {
-	static const uint8_t register_map[8] =
+	static constexpr uint8_t register_map[8] =
 	{
-		CEM3394_VCO_FREQUENCY,
-		CEM3394_FINAL_GAIN,
-		CEM3394_FILTER_RESONANCE,
-		CEM3394_FILTER_FREQENCY,
-		CEM3394_MIXER_BALANCE,
-		CEM3394_MODULATION_AMOUNT,
-		CEM3394_PULSE_WIDTH,
-		CEM3394_WAVE_SELECT
+		cem3394_device::VCO_FREQUENCY,
+		cem3394_device::FINAL_GAIN,
+		cem3394_device::FILTER_RESONANCE,
+		cem3394_device::FILTER_FREQENCY,
+		cem3394_device::MIXER_BALANCE,
+		cem3394_device::MODULATION_AMOUNT,
+		cem3394_device::PULSE_WIDTH,
+		cem3394_device::WAVE_SELECT
 	};
 
 	double voltage = (double)m_dac_value * (8.0 / 4096.0) - 4.0;
@@ -1036,7 +1059,7 @@ WRITE8_MEMBER(balsente_state::balsente_chip_select_w)
 					"PULSE_WIDTH",
 					"WAVE_SELECT"
 				};
-				logerror("s%04X:   CEM#%d:%s=%f\n", space.device().safe_pcbase(), i, names[m_dac_register], voltage);
+				logerror("s%04X:   CEM#%d:%s=%f\n", m_audiocpu->pcbase(), i, names[m_dac_register], voltage);
 			}
 #endif
 		}

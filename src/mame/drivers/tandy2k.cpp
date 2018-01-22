@@ -22,9 +22,14 @@
 
 */
 
+#include "emu.h"
 #include "includes/tandy2k.h"
+
 #include "machine/pckeybrd.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 #define LOG 1
 
@@ -338,7 +343,7 @@ static ADDRESS_MAP_START( tandy2k_hd_io, AS_IO, 16, tandy2k_state )
 //  AM_RANGE(0x0026e, 0x0027f) AM_DEVREADWRITE8(WD1010_TAG, wd1010_device, wd1010_r, wd1010_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vpac_mem, AS_0, 8, tandy2k_state )
+static ADDRESS_MAP_START( vpac_mem, 0, 8, tandy2k_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(videoram_r)
 ADDRESS_MAP_END
 
@@ -759,7 +764,7 @@ void tandy2k_state::device_reset_after_children()
 
 // Machine Driver
 
-static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
+MACHINE_CONFIG_START(tandy2k_state::tandy2k)
 	// basic machine hardware
 	MCFG_CPU_ADD(I80186_TAG, I80186, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(tandy2k_mem)
@@ -772,18 +777,18 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
 	MCFG_SCREEN_SIZE(640, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	//MCFG_SCREEN_UPDATE_DEVICE(CRT9021B_TAG, crt9021_t, screen_update)
+	//MCFG_SCREEN_UPDATE_DEVICE(CRT9021B_TAG, crt9021_device, screen_update)
 	MCFG_SCREEN_UPDATE_DRIVER(tandy2k_state, screen_update)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD(CRT9007_TAG, CRT9007, XTAL_16MHz*28/20/8)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, vpac_mem)
+	MCFG_DEVICE_ADDRESS_MAP(0, vpac_mem)
 	MCFG_CRT9007_CHARACTER_WIDTH(8)
 	MCFG_CRT9007_INT_CALLBACK(DEVWRITELINE(I8259A_1_TAG, pic8259_device, ir1_w))
-	MCFG_CRT9007_VS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, vsync_w))
+	MCFG_CRT9007_VS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_device, vsync_w))
 	MCFG_CRT9007_VLT_CALLBACK(WRITELINE(tandy2k_state, vpac_vlt_w))
-	MCFG_CRT9007_CURS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_t, cursor_w))
+	MCFG_CRT9007_CURS_CALLBACK(DEVWRITELINE(CRT9021B_TAG, crt9021_device, cursor_w))
 	MCFG_CRT9007_DRB_CALLBACK(WRITELINE(tandy2k_state, vpac_drb_w))
 	MCFG_CRT9007_WBEN_CALLBACK(WRITELINE(tandy2k_state, vpac_wben_w))
 	MCFG_CRT9007_CBLANK_CALLBACK(WRITELINE(tandy2k_state, vpac_cblank_w))
@@ -836,9 +841,11 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	//MCFG_PIT8253_CLK2(XTAL_16MHz/8)
 	//MCFG_PIT8253_OUT2_HANDLER(WRITELINE(tandy2k_state, rfrqpulse_w))
 
-	MCFG_PIC8259_ADD(I8259A_0_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w), VCC, NOOP)
+	MCFG_DEVICE_ADD(I8259A_0_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE(I80186_TAG, i80186_cpu_device, int0_w))
 
-	MCFG_PIC8259_ADD(I8259A_1_TAG, DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w), VCC, NOOP)
+	MCFG_DEVICE_ADD(I8259A_1_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE(I80186_TAG, i80186_cpu_device, int1_w))
 
 	MCFG_I8272A_ADD(I8272A_TAG, true)
 	downcast<i8272a_device *>(device)->set_select_lines_connected(true);
@@ -874,7 +881,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_RAM_EXTRA_OPTIONS("256K,384K,512K,640K,768K,896K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tandy2k_hd, tandy2k )
+MACHINE_CONFIG_DERIVED(tandy2k_state::tandy2k_hd, tandy2k)
 	// basic machine hardware
 	MCFG_CPU_MODIFY(I80186_TAG)
 	MCFG_CPU_IO_MAP(tandy2k_hd_io)
@@ -907,6 +914,6 @@ ROM_END
 
 // System Drivers
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME        FLAGS
-COMP( 1983, tandy2k,    0,          0,      tandy2k,    tandy2k, driver_device, 0,      "Tandy Radio Shack",    "Tandy 2000",   MACHINE_NOT_WORKING )
-COMP( 1983, tandy2khd,  tandy2k,    0,      tandy2k_hd, tandy2k, driver_device, 0,      "Tandy Radio Shack",    "Tandy 2000HD", MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT    STATE          INIT  COMPANY              FULLNAME        FLAGS
+COMP( 1983, tandy2k,    0,          0,      tandy2k,    tandy2k, tandy2k_state, 0,    "Tandy Radio Shack", "Tandy 2000",   MACHINE_NOT_WORKING )
+COMP( 1983, tandy2khd,  tandy2k,    0,      tandy2k_hd, tandy2k, tandy2k_state, 0,    "Tandy Radio Shack", "Tandy 2000HD", MACHINE_NOT_WORKING )

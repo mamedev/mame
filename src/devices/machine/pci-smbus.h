@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef PCI_SMBUS_H
-#define PCI_SMBUS_H
+#ifndef MAME_MACHINE_PCI_SMBUS_H
+#define MAME_MACHINE_PCI_SMBUS_H
 
 #include "pci.h"
 
@@ -62,6 +62,6 @@ private:
 	uint8_t smlink_pin_ctl, smbus_pin_ctl, slv_sts, slv_cmd, notify_daddr, notify_dlow, notify_dhigh;
 };
 
-extern const device_type SMBUS;
+DECLARE_DEVICE_TYPE(SMBUS, smbus_device)
 
-#endif
+#endif // MAME_MACHINE_PCI_SMBUS_H

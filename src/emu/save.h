@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __SAVE_H__
-#define __SAVE_H__
+#ifndef MAME_EMU_SAVE_H
+#define MAME_EMU_SAVE_H
 
 
 
@@ -26,10 +26,12 @@
 enum save_error
 {
 	STATERR_NONE,
+	STATERR_NOT_FOUND,
 	STATERR_ILLEGAL_REGISTRATIONS,
 	STATERR_INVALID_HEADER,
 	STATERR_READ_ERROR,
-	STATERR_WRITE_ERROR
+	STATERR_WRITE_ERROR,
+	STATERR_DISABLED
 };
 
 
@@ -62,22 +64,25 @@ class state_entry
 {
 public:
 	// construction/destruction
-	state_entry(void *data, const char *name, device_t *device, const char *module, const char *tag, int index, uint8_t size, uint32_t count);
+	state_entry(void *data, const char *name, device_t *device, const char *module, const char *tag, int index, u8 size, u32 count);
 
 	// helpers
 	void flip_data();
 
 	// state
-	void *              m_data;                 // pointer to the memory to save/restore
-	std::string         m_name;                 // full name
-	device_t *          m_device;               // associated device, nullptr if none
-	std::string         m_module;               // module name
-	std::string         m_tag;                  // tag name
-	int                 m_index;                // index
-	uint8_t               m_typesize;             // size of the raw data type
-	uint32_t              m_typecount;            // number of items
-	uint32_t              m_offset;               // offset within the final structure
+	void *          m_data;                 // pointer to the memory to save/restore
+	std::string     m_name;                 // full name
+	device_t *      m_device;               // associated device, nullptr if none
+	std::string     m_module;               // module name
+	std::string     m_tag;                  // tag name
+	int             m_index;                // index
+	u8              m_typesize;             // size of the raw data type
+	u32             m_typecount;            // number of items
+	u32             m_offset;               // offset within the final structure
 };
+
+class ram_state;
+class rewinder;
 
 class save_manager
 {
@@ -85,18 +90,22 @@ class save_manager
 	template<typename _ItemType> struct type_checker { static const bool is_atom = false; static const bool is_pointer = false; };
 	template<typename _ItemType> struct type_checker<_ItemType*> { static const bool is_atom = false; static const bool is_pointer = true; };
 
+	friend class ram_state;
+	friend class rewinder;
+
 public:
 	// construction/destruction
 	save_manager(running_machine &machine);
 
 	// getters
 	running_machine &machine() const { return m_machine; }
+	rewinder *rewind() { return m_rewind.get(); }
 	int registration_count() const { return m_entry_list.size(); }
 	bool registration_allowed() const { return m_reg_allowed; }
 
 	// registration control
 	void allow_registration(bool allowed = true);
-	const char *indexed_item(int index, void *&base, uint32_t &valsize, uint32_t &valcount) const;
+	const char *indexed_item(int index, void *&base, u32 &valsize, u32 &valcount) const;
 
 	// function registration
 	void register_presave(save_prepost_delegate func);
@@ -107,7 +116,7 @@ public:
 	void dispatch_postload();
 
 	// generic memory registration
-	void save_memory(device_t *device, const char *module, const char *tag, uint32_t index, const char *name, void *val, uint32_t valsize, uint32_t valcount = 1);
+	void save_memory(device_t *device, const char *module, const char *tag, u32 index, const char *name, void *val, u32 valsize, u32 valcount = 1);
 
 	// templatized wrapper for general objects
 	template<typename _ItemType>
@@ -136,7 +145,7 @@ public:
 
 	// templatized wrapper for pointers
 	template<typename _ItemType>
-	void save_pointer(device_t *device, const char *module, const char *tag, int index, _ItemType *value, const char *valname, uint32_t count)
+	void save_pointer(device_t *device, const char *module, const char *tag, int index, _ItemType *value, const char *valname, u32 count)
 	{
 		if (!type_checker<_ItemType>::is_atom) throw emu_fatalerror("Called save_item on a non-fundamental type!");
 		save_memory(device, module, tag, index, valname, value, sizeof(*value), count);
@@ -146,7 +155,7 @@ public:
 	template<typename _ItemType>
 	void save_item(_ItemType &value, const char *valname, int index = 0) { save_item(nullptr, "global", nullptr, index, value, valname); }
 	template<typename _ItemType>
-	void save_pointer(_ItemType *value, const char *valname, uint32_t count, int index = 0) { save_pointer(nullptr, "global", nullptr, index, value, valname, count); }
+	void save_pointer(_ItemType *value, const char *valname, u32 count, int index = 0) { save_pointer(nullptr, "global", nullptr, index, value, valname, count); }
 
 	// file processing
 	static save_error check_file(running_machine &machine, emu_file &file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...));
@@ -155,9 +164,9 @@ public:
 
 private:
 	// internal helpers
-	uint32_t signature() const;
+	u32 signature() const;
 	void dump_registry() const;
-	static save_error validate_header(const uint8_t *header, const char *gamename, uint32_t signature, void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix);
+	static save_error validate_header(const u8 *header, const char *gamename, u32 signature, void (CLIB_DECL *errormsg)(const char *fmt, ...), const char *error_prefix);
 
 	// state callback item
 	class state_callback
@@ -166,31 +175,85 @@ private:
 		// construction/destruction
 		state_callback(save_prepost_delegate callback);
 
-		save_prepost_delegate m_func;               // delegate
+		save_prepost_delegate m_func;                 // delegate
 	};
 
 	// internal state
-	running_machine &       m_machine;              // reference to our machine
-	bool                    m_reg_allowed;          // are registrations allowed?
-	int                     m_illegal_regs;         // number of illegal registrations
+	running_machine &         m_machine;              // reference to our machine
+	std::unique_ptr<rewinder> m_rewind;               // rewinder
+	bool                      m_reg_allowed;          // are registrations allowed?
+	s32                       m_illegal_regs;         // number of illegal registrations
 
-	std::vector<std::unique_ptr<state_entry>> m_entry_list;          // list of reigstered entries
+	std::vector<std::unique_ptr<state_entry>>    m_entry_list;       // list of registered entries
+	std::vector<std::unique_ptr<ram_state>>      m_ramstate_list;    // list of ram states
 	std::vector<std::unique_ptr<state_callback>> m_presave_list;     // list of pre-save functions
 	std::vector<std::unique_ptr<state_callback>> m_postload_list;    // list of post-load functions
+};
+
+class ram_state
+{
+	save_manager &     m_save;                        // reference to save_manager
+	util::vectorstream m_data;                        // save data buffer
+
+public:
+	bool               m_valid;                       // can we load this state?
+	attotime           m_time;                        // machine timestamp
+
+	ram_state(save_manager &save);
+	static size_t get_size(save_manager &save);
+	save_error save();
+	save_error load();
+};
+
+class rewinder
+{
+	save_manager & m_save;                            // reference to save_manager
+	bool           m_enabled;                         // enable rewind savestates
+	size_t         m_capacity;                        // total memory rewind states can occupy (MB, limited to 1-2048 in options)
+	s32            m_current_index;                   // where we are in time
+	s32            m_first_invalid_index;             // all states before this one are guarateed to be valid
+	bool           m_first_time_warning;              // keep track of warnings we report
+	bool           m_first_time_note;                 // keep track of notes
+	std::vector<std::unique_ptr<ram_state>> m_state_list; // rewinder's own ram states
+
+	// load/save management
+	enum class rewind_operation
+	{
+		SAVE,
+		LOAD
+	};
+
+	enum
+	{
+		REWIND_INDEX_NONE = -1,
+		REWIND_INDEX_FIRST
+	};
+
+	bool check_size();
+	bool current_index_is_last() { return m_current_index == m_state_list.size() - 1; }
+	void report_error(save_error type, rewind_operation operation);
+
+public:
+	rewinder(save_manager &save);
+	bool enabled() { return m_enabled; }
+	void clamp_capacity();
+	void invalidate();
+	bool capture();
+	bool step();
 };
 
 
 // template specializations to enumerate the fundamental atomic types you are allowed to save
 ALLOW_SAVE_TYPE_AND_ARRAY(char)
 ALLOW_SAVE_TYPE          (bool); // std::vector<bool> may be packed internally
-ALLOW_SAVE_TYPE_AND_ARRAY(int8_t)
-ALLOW_SAVE_TYPE_AND_ARRAY(uint8_t)
-ALLOW_SAVE_TYPE_AND_ARRAY(int16_t)
-ALLOW_SAVE_TYPE_AND_ARRAY(uint16_t)
-ALLOW_SAVE_TYPE_AND_ARRAY(int32_t)
-ALLOW_SAVE_TYPE_AND_ARRAY(uint32_t)
-ALLOW_SAVE_TYPE_AND_ARRAY(int64_t)
-ALLOW_SAVE_TYPE_AND_ARRAY(uint64_t)
+ALLOW_SAVE_TYPE_AND_ARRAY(s8)
+ALLOW_SAVE_TYPE_AND_ARRAY(u8)
+ALLOW_SAVE_TYPE_AND_ARRAY(s16)
+ALLOW_SAVE_TYPE_AND_ARRAY(u16)
+ALLOW_SAVE_TYPE_AND_ARRAY(s32)
+ALLOW_SAVE_TYPE_AND_ARRAY(u32)
+ALLOW_SAVE_TYPE_AND_ARRAY(s64)
+ALLOW_SAVE_TYPE_AND_ARRAY(u64)
 ALLOW_SAVE_TYPE_AND_ARRAY(PAIR)
 ALLOW_SAVE_TYPE_AND_ARRAY(PAIR64)
 ALLOW_SAVE_TYPE_AND_ARRAY(float)
@@ -247,4 +310,4 @@ inline void save_manager::save_item(device_t *device, const char *module, const 
 }
 
 
-#endif  /* __SAVE_H__ */
+#endif  /* MAME_EMU_SAVE_H */

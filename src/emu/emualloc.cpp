@@ -23,7 +23,7 @@
 //  GLOBALS
 //**************************************************************************
 
-uint64_t resource_pool::s_id = 0;
+osd::u64 resource_pool::s_id = 0;
 
 
 
@@ -75,7 +75,7 @@ void resource_pool::add(resource_pool_item &item, size_t size, const char *type)
 	// before, so if we don't find it, check 4 bytes ahead
 	item.m_id = ++s_id;
 	if (LOG_ALLOCS)
-		fprintf(stderr, "#%06d, add %s, %d bytes\n", (uint32_t)item.m_id, type, uint32_t(size));
+		fprintf(stderr, "#%06d, add %s, %d bytes\n", u32(item.m_id), type, u32(size));
 
 	// find the entry to insert after
 	resource_pool_item *insert_after;
@@ -143,7 +143,7 @@ void resource_pool::remove(void *ptr)
 
 			// delete the object and break
 			if (LOG_ALLOCS)
-				fprintf(stderr, "#%06d, delete %d bytes\n", (uint32_t)deleteme->m_id, static_cast<uint32_t>(deleteme->m_size));
+				fprintf(stderr, "#%06d, delete %d bytes\n", u32(deleteme->m_id), u32(deleteme->m_size));
 			global_free(deleteme);
 			break;
 		}
@@ -177,8 +177,8 @@ resource_pool_item *resource_pool::find(void *ptr)
 
 bool resource_pool::contains(void *_ptrstart, void *_ptrend)
 {
-	uint8_t *ptrstart = reinterpret_cast<uint8_t *>(_ptrstart);
-	uint8_t *ptrend = reinterpret_cast<uint8_t *>(_ptrend);
+	u8 *ptrstart = reinterpret_cast<u8 *>(_ptrstart);
+	u8 *ptrend = reinterpret_cast<u8 *>(_ptrend);
 
 	// search for the item
 	std::lock_guard<std::mutex> lock(m_listlock);
@@ -186,8 +186,8 @@ bool resource_pool::contains(void *_ptrstart, void *_ptrend)
 	resource_pool_item *item = nullptr;
 	for (item = m_ordered_head; item != nullptr; item = item->m_ordered_next)
 	{
-		uint8_t *objstart = reinterpret_cast<uint8_t *>(item->m_ptr);
-		uint8_t *objend = objstart + item->m_size;
+		u8 *objstart = reinterpret_cast<u8 *>(item->m_ptr);
+		u8 *objend = objstart + item->m_size;
 		if (ptrstart >= objstart && ptrend <= objend)
 			return true;
 	}

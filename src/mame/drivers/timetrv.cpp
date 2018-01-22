@@ -27,6 +27,8 @@ CPU is an Intel 80188
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
+#include "machine/i8255.h"
+#include "screen.h"
 
 
 class timetrv_state : public driver_device
@@ -49,6 +51,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(ld_irq);
 	required_device<cpu_device> m_maincpu;
+	void timetrv(machine_config &config);
 };
 
 
@@ -93,10 +96,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( timetrv_io, AS_IO, 8, timetrv_state )
 	AM_RANGE(0x0122, 0x0123) AM_WRITENOP //eeprom write bits
-	AM_RANGE(0x1000, 0x1000) AM_READ(test1_r) //inputs
-	AM_RANGE(0x1001, 0x1001) AM_READ(test2_r) //eeprom read bit + inputs
-
-	AM_RANGE(0x1080, 0x1082) AM_READ(in_r) //dsw
+	AM_RANGE(0x1000, 0x1003) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
+	AM_RANGE(0x1080, 0x1083) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
 	AM_RANGE(0x1100, 0x1105) AM_WRITENOP //laserdisc write area
 	AM_RANGE(0x1100, 0x1105) AM_READ(ld_r) //5 -> laserdisc read status
 	AM_RANGE(0x1180, 0x1187) AM_RAM AM_SHARE("led_vralo")//led string,part 1
@@ -149,7 +150,7 @@ INTERRUPT_GEN_MEMBER(timetrv_state::ld_irq)
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x48/4); //ld irq
 }
 
-static MACHINE_CONFIG_START( timetrv, timetrv_state )
+MACHINE_CONFIG_START(timetrv_state::timetrv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I80188,20000000) //???
@@ -157,6 +158,15 @@ static MACHINE_CONFIG_START( timetrv, timetrv_state )
 	MCFG_CPU_IO_MAP(timetrv_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", timetrv_state, vblank_irq)
 	MCFG_CPU_PERIODIC_INT_DRIVER(timetrv_state, ld_irq, 60) //remove from here
+
+	MCFG_DEVICE_ADD("ppi1", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(timetrv_state, test1_r)) //inputs
+	MCFG_I8255_IN_PORTB_CB(READ8(timetrv_state, test2_r)) //eeprom read bit + inputs
+
+	MCFG_DEVICE_ADD("ppi2", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(timetrv_state, in_r)) //dsw
+	MCFG_I8255_IN_PORTB_CB(READ8(timetrv_state, in_r)) //dsw
+	MCFG_I8255_IN_PORTC_CB(READ8(timetrv_state, in_r)) //dsw
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -185,4 +195,13 @@ ROM_START( timetrv )
 	DISK_IMAGE_READONLY( "timetrv", 0, NO_DUMP )
 ROM_END
 
-GAME( 1991, timetrv,  0,       timetrv,  timetrv, driver_device,  0, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+ROM_START( timetrv2 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "epr-72491.u9",   0xc0000, 0x40000, CRC(c7998e2f) SHA1(26060653b2368f52c304e6433b4f447f99a36839) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "timetrv", 0, NO_DUMP )
+ROM_END
+
+GAME( 1991, timetrv,  0,       timetrv,  timetrv, timetrv_state,  0, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, timetrv2, timetrv, timetrv,  timetrv, timetrv_state,  0, ROT0, "Virtual Image Productions (Sega license)", "Time Traveler (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // Europe?

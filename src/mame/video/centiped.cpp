@@ -150,9 +150,9 @@ WRITE8_MEMBER(centiped_state::centiped_videoram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(centiped_state::centiped_flip_screen_w)
+WRITE_LINE_MEMBER(centiped_state::flip_screen_w)
 {
-	m_flipscreen = data >> 7;
+	m_flipscreen = state;
 }
 
 

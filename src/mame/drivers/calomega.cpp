@@ -639,20 +639,24 @@
 
 ***********************************************************************************/
 
+#include "emu.h"
+#include "includes/calomega.h"
+
+#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m65c02.h"
+#include "machine/6821pia.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/mc6845.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK    XTAL_10MHz
 #define CPU_CLOCK   (MASTER_CLOCK/16)
 #define UART_CLOCK  (MASTER_CLOCK/16)
 #define SND_CLOCK   (MASTER_CLOCK/8)
-
-#include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "cpu/m6502/m65c02.h"
-#include "video/mc6845.h"
-#include "machine/6821pia.h"
-#include "machine/nvram.h"
-#include "sound/ay8910.h"
-#include "includes/calomega.h"
 
 
 /**************************************************
@@ -826,8 +830,7 @@ static ADDRESS_MAP_START( sys903_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x08d0, 0x08d0) AM_DEVREADWRITE("acia6850_0", acia6850_device, status_r, control_w)
-	AM_RANGE(0x08d1, 0x08d1) AM_DEVREADWRITE("acia6850_0", acia6850_device, data_r, data_w)
+	AM_RANGE(0x08d0, 0x08d1) AM_DEVREADWRITE("acia6850_0", acia6850_device, read, write)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x1800, 0x3fff) AM_ROM
@@ -2564,7 +2567,7 @@ WRITE_LINE_MEMBER(calomega_state::write_acia_clock)
 *                Machine Drivers                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( sys903, calomega_state )
+MACHINE_CONFIG_START(calomega_state::sys903)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* confirmed */
 	MCFG_CPU_PROGRAM_MAP(sys903_map)
@@ -2613,7 +2616,7 @@ static MACHINE_CONFIG_START( sys903, calomega_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( s903mod, sys903 )
+MACHINE_CONFIG_DERIVED(calomega_state::s903mod, sys903)
 
 	/* basic machine hardware */
 
@@ -2630,7 +2633,7 @@ static MACHINE_CONFIG_DERIVED( s903mod, sys903 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sys905, sys903 )
+MACHINE_CONFIG_DERIVED(calomega_state::sys905, sys903)
 
 	/* basic machine hardware */
 
@@ -2654,7 +2657,7 @@ static MACHINE_CONFIG_DERIVED( sys905, sys903 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sys906, sys903 )
+MACHINE_CONFIG_DERIVED(calomega_state::sys906, sys903)
 
 	/* basic machine hardware */
 
@@ -3681,11 +3684,11 @@ DRIVER_INIT_MEMBER(calomega_state,comg080)
 *                  Game Drivers                  *
 *************************************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY                                  FULLNAME                                                    FLAGS   */
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT     ROT    COMPANY                                  FULLNAME                                                    FLAGS   */
 GAME( 1981, comg074,  0,        sys903,   comg074,  calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.4 (Gaming Poker, W.Export)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, comg076,  0,        sys903,   comg076,  calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.6 (Arcade Poker)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1981, comg079,  0,        sys903,   comg076,  calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.9 (Arcade Poker)",                       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
-GAME( 1981, comg080,  0,        sys903,   arcadebj, calomega_state, comg080, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 8.0 (Arcade Black Jack)",                  MACHINE_SUPPORTS_SAVE )                       /* bad dump */
+GAME( 1981, comg080,  0,        sys903,   arcadebj, calomega_state, comg080, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 8.0 (Arcade Black Jack)",                  MACHINE_SUPPORTS_SAVE )                          /* bad dump */
 GAME( 1981, comg094,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 9.4 (Keno)",                               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg107,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 10.7c (Big Game)",                         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, comg123,  0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 12.3 (Ticket Poker)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )    /* bad dump */
@@ -3716,7 +3719,7 @@ GAME( 1985, comg240,  0,        sys903,   gdrwpkrh, calomega_state, sys903,  ROT
 GAME( 1985, comg246,  0,        sys905,   stand905, calomega_state, sys905,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 24.6 (Hotline)",                           MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, comg272a, 0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, amusement)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, comg272b, 0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, gaming)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 198?, comg5108, 0,        sys906,   stand906, driver_device,  0,       ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 51.08 (CEI Video Poker, Jacks or Better)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 198?, comg5108, 0,        sys906,   stand906, calomega_state, 0,       ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 51.08 (CEI Video Poker, Jacks or Better)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 /************ Diagnostic PROMs ************/
 GAME( 198?, comg903d, 0,        sys903,   stand903, calomega_state, sys903,  ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

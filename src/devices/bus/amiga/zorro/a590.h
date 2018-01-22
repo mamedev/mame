@@ -8,12 +8,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_AMIGA_ZORRO_A590_H
+#define MAME_BUS_AMIGA_ZORRO_A590_H
+
 #pragma once
 
-#ifndef __A590_H__
-#define __A590_H__
-
-#include "emu.h"
 #include "zorro.h"
 #include "machine/dmac.h"
 #include "machine/wd33c93.h"
@@ -27,25 +26,17 @@
 
 class dmac_hdc_device : public device_t
 {
-public:
-	// construction/destruction
-	dmac_hdc_device(const machine_config &mconfig, device_type type, const char *tag,
-		device_t *owner, uint32_t clock, const char *name, const char *shortname);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	DECLARE_READ8_MEMBER( dmac_scsi_r );
-	DECLARE_WRITE8_MEMBER( dmac_scsi_w );
-	DECLARE_WRITE_LINE_MEMBER( dmac_int_w );
-	DECLARE_WRITE_LINE_MEMBER( dmac_cfgout_w ) { cfgout_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( scsi_irq_w );
-
 protected:
+	// construction/destruction
+	dmac_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// to slot
 	virtual void cfgout_w(int state) = 0;
@@ -59,10 +50,17 @@ protected:
 	bool m_int6;
 
 	// sub-devices
-	required_device<dmac_device> m_dmac;
+	required_device<amiga_dmac_device> m_dmac;
 	required_device<wd33c93_device> m_wdc;
 
 	std::vector<uint8_t> m_ram;
+
+private:
+	DECLARE_READ8_MEMBER( dmac_scsi_r );
+	DECLARE_WRITE8_MEMBER( dmac_scsi_w );
+	DECLARE_WRITE_LINE_MEMBER( dmac_int_w );
+	DECLARE_WRITE_LINE_MEMBER( dmac_cfgout_w ) { cfgout_w(state); }
+	DECLARE_WRITE_LINE_MEMBER( scsi_irq_w );
 };
 
 // ======================> a590_device
@@ -128,7 +126,7 @@ private:
 };
 
 // device type definition
-extern const device_type A590;
-extern const device_type A2091;
+DECLARE_DEVICE_TYPE(A590,  a590_device)
+DECLARE_DEVICE_TYPE(A2091, a2091_device)
 
-#endif
+#endif // MAME_BUS_AMIGA_ZORRO_A590_H

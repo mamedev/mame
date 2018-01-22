@@ -21,8 +21,12 @@
 
 */
 
+#include "emu.h"
 #include "includes/trs80m2.h"
+
+#include "screen.h"
 #include "softlist.h"
+
 
 #define KEYBOARD_TAG "keyboard"
 
@@ -486,7 +490,7 @@ WRITE_LINE_MEMBER( trs80m2_state::kb_clock_w )
 	m_kbclk = state;
 }
 
-WRITE8_MEMBER( trs80m2_state::kbd_w )
+void trs80m2_state::kbd_w(u8 data)
 {
 	// latch key data
 	m_key_data = data;
@@ -698,7 +702,7 @@ void trs80m2_state::machine_reset()
 //  MACHINE_CONFIG( trs80m2 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
+MACHINE_CONFIG_START(trs80m2_state::trs80m2)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
@@ -754,7 +758,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(trs80m2_state, strobe_w))
 
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL_8MHz/2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
@@ -767,7 +771,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0)
 	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(trs80m2_state, kb_clock_w))
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(trs80m2_state, kbd_w))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
 
 	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)
@@ -783,7 +787,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( trs80m16 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
+MACHINE_CONFIG_START(trs80m16_state::trs80m16)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
@@ -844,10 +848,11 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(trs80m2_state, strobe_w))
 
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL_8MHz/2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_PIC8259_ADD(AM9519A_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_5), VCC, NOOP)
+	MCFG_DEVICE_ADD(AM9519A_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(M68000_TAG, M68K_IRQ_5))
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))
@@ -859,7 +864,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_DEVICE_ADD(TRS80M2_KEYBOARD_TAG, TRS80M2_KEYBOARD, 0)
 	MCFG_TRS80M2_KEYBOARD_CLOCK_CALLBACK(WRITELINE(trs80m2_state, kb_clock_w))
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(trs80m2_state, kbd_w))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(trs80m2_state, kbd_w))
 
 	// internal RAM
 	MCFG_RAM_ADD(RAM_TAG)
@@ -946,9 +951,9 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1979, trs80m2,    0,          0,      trs80m2,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model II",  MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
-COMP( 1982, trs80m16,   trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
-//COMP( 1983, trs80m12, trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 12",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
-//COMP( 1984, trs80m16b,trs80m2,    0,      trs80m16,   trs80m2, driver_device,     0,      "Tandy Radio Shack",    "TRS-80 Model 16B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
-//COMP( 1985, tandy6k,  trs80m2,    0,      tandy6k,    trs80m2, driver_device,     0,      "Tandy Radio Shack",    "Tandy 6000 HD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_KEYBOARD )
+//    YEAR  NAME        PARENT   COMPAT  MACHINE     INPUT    STATE           INIT  COMPANY              FULLNAME            FLAGS
+COMP( 1979, trs80m2,    0,       0,      trs80m2,    trs80m2, trs80m2_state,  0,    "Tandy Radio Shack", "TRS-80 Model II",  MACHINE_NO_SOUND_HW )
+COMP( 1982, trs80m16,   trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 16",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//COMP( 1983, trs80m12, trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 12",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//COMP( 1984, trs80m16b,trs80m2, 0,      trs80m16,   trs80m2, trs80m16_state, 0,    "Tandy Radio Shack", "TRS-80 Model 16B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//COMP( 1985, tandy6k,  trs80m2, 0,      tandy6k,    trs80m2, tandy6k_state,  0,    "Tandy Radio Shack", "Tandy 6000 HD",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

@@ -24,10 +24,13 @@
 #include "video/konami_helper.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/k053252.h"
+#include "machine/timer.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k055555.h"
 #include "machine/eepromser.h"
+#include "speaker.h"
+
 
 #define CUSTOM_DRAW 1
 
@@ -77,6 +80,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
+	void kongambl(machine_config &config);
 };
 
 
@@ -183,13 +187,13 @@ WRITE8_MEMBER(kongambl_state::eeprom_w)
 
 READ32_MEMBER(kongambl_state::test_r)
 {
-	return -1;//space.machine().rand();
+	return -1;//machine().rand();
 }
 
 /*
  READ32_MEMBER(kongambl_state::rng_r)
 {
-    return space.machine().rand();
+    return machine().rand();
 }
 */
 
@@ -225,7 +229,7 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	AM_RANGE(0x440000, 0x443fff) AM_RAM // OBJ RAM
 
-	AM_RANGE(0x460000, 0x47ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x460000, 0x47ffff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 
 	AM_RANGE(0x4b0000, 0x4b001f) AM_DEVREADWRITE8("k053252", k053252_device, read, write, 0xff00ff00)
 
@@ -631,7 +635,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 
 }
 
-static MACHINE_CONFIG_START( kongambl, kongambl_state )
+MACHINE_CONFIG_START(kongambl_state::kongambl)
 	MCFG_CPU_ADD("maincpu", M68EC020, 25000000)
 	MCFG_CPU_PROGRAM_MAP(kongambl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", kongambl_state, kongambl_vblank, "screen", 0, 1)
@@ -814,8 +818,8 @@ DRIVER_INIT_MEMBER(kongambl_state,kingtut)
 	//rom[0x55e40/4] = (rom[0x55e40/4] & 0xffff0000) | 0x4e71; // goes away from the POST
 }
 
-GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state,    kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, moneybnk,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, dragsphr,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Dragon Sphere", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Ivory Tusk", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 199?, vikingt,    0,        kongambl,    kongambl, driver_device,    0, ROT0,  "Konami", "Viking Treasure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, kingtut,    0,        kongambl,    kongambl, kongambl_state,  kingtut, ROT0,  "Konami", "King Tut (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, moneybnk,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Money In The Bank (NSW, Australia)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, dragsphr,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Dragon Sphere", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, ivorytsk,   0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Ivory Tusk", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, vikingt,    0,        kongambl,    kongambl, kongambl_state,  0,       ROT0,  "Konami", "Viking Treasure", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

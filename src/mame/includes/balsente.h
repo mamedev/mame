@@ -8,7 +8,9 @@
 
 ***************************************************************************/
 
+#include "machine/timer.h"
 #include "sound/cem3394.h"
+#include "screen.h"
 
 #define BALSENTE_MASTER_CLOCK   (20000000)
 #define BALSENTE_CPU_CLOCK      (BALSENTE_MASTER_CLOCK / 16)
@@ -143,7 +145,14 @@ public:
 	DECLARE_READ8_MEMBER(balsente_random_num_r);
 	DECLARE_WRITE8_MEMBER(balsente_rombank_select_w);
 	DECLARE_WRITE8_MEMBER(balsente_rombank2_select_w);
-	DECLARE_WRITE8_MEMBER(balsente_misc_output_w);
+	DECLARE_WRITE_LINE_MEMBER(out0_w);
+	DECLARE_WRITE_LINE_MEMBER(out1_w);
+	DECLARE_WRITE_LINE_MEMBER(out2_w);
+	DECLARE_WRITE_LINE_MEMBER(out3_w);
+	DECLARE_WRITE_LINE_MEMBER(out4_w);
+	DECLARE_WRITE_LINE_MEMBER(out5_w);
+	DECLARE_WRITE_LINE_MEMBER(out6_w);
+	DECLARE_WRITE_LINE_MEMBER(nvrecall_w);
 	DECLARE_READ8_MEMBER(balsente_m6850_r);
 	DECLARE_WRITE8_MEMBER(balsente_m6850_w);
 	DECLARE_READ8_MEMBER(balsente_m6850_sound_r);
@@ -234,6 +243,8 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
+	void shrike(machine_config &config);
+	void balsente(machine_config &config);
 };
 
 

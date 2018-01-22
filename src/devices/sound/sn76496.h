@@ -1,34 +1,31 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_SOUND_SN76496_H
+#define MAME_SOUND_SN76496_H
+
 #pragma once
 
-#ifndef __SN76496_H__
-#define __SN76496_H__
+
+DECLARE_DEVICE_TYPE(SN76496,  sn76496_device)
+DECLARE_DEVICE_TYPE(U8106,    u8106_device)
+DECLARE_DEVICE_TYPE(Y2404,    y2404_device)
+DECLARE_DEVICE_TYPE(SN76489,  sn76489_device)
+DECLARE_DEVICE_TYPE(SN76489A, sn76489a_device)
+DECLARE_DEVICE_TYPE(SN76494,  sn76494_device)
+DECLARE_DEVICE_TYPE(SN94624,  sn94624_device)
+DECLARE_DEVICE_TYPE(NCR7496,  ncr7496_device)
+DECLARE_DEVICE_TYPE(GAMEGEAR, gamegear_device)
+DECLARE_DEVICE_TYPE(SEGAPSG,  segapsg_device)
 
 
-extern const device_type SN76496;
-extern const device_type U8106;
-extern const device_type Y2404;
-extern const device_type SN76489;
-extern const device_type SN76489A;
-extern const device_type SN76494;
-extern const device_type SN94624;
-extern const device_type NCR7496;
-extern const device_type GAMEGEAR;
-extern const device_type SEGAPSG;
-
-#define MCFG_SN76496_READY_HANDLER(_devcb) \
-	devcb = &sn76496_base_device::set_ready_handler(*device, DEVCB_##_devcb);
+#define MCFG_SN76496_READY_HANDLER(cb) \
+		devcb = &sn76496_base_device::set_ready_handler(*device, (DEVCB_##cb));
 
 class sn76496_base_device : public device_t, public device_sound_interface
 {
 public:
-	sn76496_base_device(const machine_config &mconfig, device_type type,  const char *name, const char *tag,
-		int feedbackmask, int noisetap1, int noisetap2, bool negate, bool stereo, int clockdivider, int sega,
-		device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_ready_handler(device_t &device, _Object object) { return downcast<sn76496_base_device &>(device).m_ready_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_ready_handler(device_t &device, Object &&cb) { return downcast<sn76496_base_device &>(device).m_ready_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( stereo_w );
 	void write(uint8_t data);
@@ -36,6 +33,20 @@ public:
 	DECLARE_READ_LINE_MEMBER( ready_r ) { return m_ready_state ? 1 : 0; }
 
 protected:
+	sn76496_base_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			int feedbackmask,
+			int noisetap1,
+			int noisetap2,
+			bool negate,
+			bool stereo,
+			int clockdivider,
+			bool sega,
+			device_t *owner,
+			uint32_t clock);
+
 	virtual void    device_start() override;
 	virtual void    sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
@@ -141,4 +152,4 @@ public:
 	segapsg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-#endif /* __SN76496_H__ */
+#endif // MAME_SOUND_SN76496_H

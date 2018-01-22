@@ -2,6 +2,8 @@
 // copyright-holders:Paul Hampson
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
+#include "screen.h"
 
 class vball_state : public driver_device
 {
@@ -42,7 +44,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(irq_ack_w);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
-	DECLARE_WRITE8_MEMBER(cpu_sound_command_w);
 	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
 	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -60,4 +61,5 @@ public:
 	void spprombank_w(int bank);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline int scanline_to_vcount(int scanline);
+	void vball(machine_config &config);
 };

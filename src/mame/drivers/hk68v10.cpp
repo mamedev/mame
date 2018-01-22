@@ -6,7 +6,7 @@
  *
  *  21/08/2015
  *
- * I baught this board from http://www.retrotechnology.com without documentation.
+ * I bought this board from http://www.retrotechnology.com without documentation.
  * It has a Motorola 68010 CPU @ 10MHz and two 2764 EPROMS with HBUG firmware
  * The board is very populated and suitable to run a real server OS supported by
  * FPU,MMU and DMA controller chips. The firmware supports SCSI, Centronics/FPI
@@ -73,7 +73,7 @@
  *---------------------
  * The company was founded 1972 as cellar company. Heurikon was aquired
  * 1989 by Computer Products, 1990 by Artesyn and finally in 2005 by Emerson
- * Electric who consilidated it fully by 2009 and closed the office.
+ * Electric who consolidated it fully by 2009 and closed the office.
  *
  * Misc links about Heurikon and this board:
  * http://www.heurikon.com/
@@ -166,7 +166,9 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "bus/vme/vme.h"
 #include "machine/z80scc.h"
+#include "machine/z8536.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 
@@ -207,6 +209,7 @@ DECLARE_WRITE16_MEMBER (bootvect_w);
 virtual void machine_start () override;
 virtual void machine_reset () override;
 
+void hk68v10(machine_config &config);
 protected:
 
 private:
@@ -225,7 +228,7 @@ AM_RANGE (0x000000, 0x000007) AM_RAM AM_WRITE (bootvect_w)       /* After first 
 AM_RANGE (0x000008, 0x1fffff) AM_RAM /* 2 Mb RAM */
 AM_RANGE (0xFC0000, 0xFC3fff) AM_ROM /* System EPROM Area 16Kb HBUG */
 AM_RANGE (0xFC4000, 0xFDffff) AM_ROM /* System EPROM Area an additional 112Kb for System ROM */
-AM_RANGE (0xFE9000, 0xFE9009) AM_RAM //AM_DEVREADWRITE8("scc", scc8530_device, ba_cd_r, ba_cd_w, 0xffff) /* Z80-PIO? */
+AM_RANGE (0xFE9000, 0xFE9007) AM_DEVREADWRITE8("cio", z8536_device, read, write, 0xff00)
 AM_RANGE (0xFEA000, 0xFEA001) AM_DEVREADWRITE8("scc", scc8530_device, ca_r, ca_w, 0xff00) /* Dual serial port Z80-SCC */
 AM_RANGE (0xFEA002, 0xFEA003) AM_DEVREADWRITE8("scc", scc8530_device, cb_r, cb_w, 0xff00) /* Dual serial port Z80-SCC */
 AM_RANGE (0xFEA004, 0xFEA005) AM_DEVREADWRITE8("scc", scc8530_device, da_r, da_w, 0xff00) /* Dual serial port Z80-SCC */
@@ -276,9 +279,9 @@ READ16_MEMBER (hk68v10_state::bootvect_r){
 
 WRITE16_MEMBER (hk68v10_state::bootvect_w){
 	LOG (("%s offset %08x, mask %08x, data %04x\n", FUNCNAME, offset, mem_mask, data));
-	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
-	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
+	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
 #if 0
@@ -325,24 +328,31 @@ WRITE16_MEMBER (hk68v10_state::vme_a16_w){
  * Original HBUG configuration word: 0x003D = 0000 0000 0011 1101
  */
 
+static SLOT_INTERFACE_START(hk68_vme_cards)
+SLOT_INTERFACE_END
+
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (hk68v10, hk68v10_state)
-/* basic machine hardware */
-MCFG_CPU_ADD ("maincpu", M68010, XTAL_10MHz)
-MCFG_CPU_PROGRAM_MAP (hk68v10_mem)
+MACHINE_CONFIG_START(hk68v10_state::hk68v10)
+	/* basic machine hardware */
+	MCFG_CPU_ADD ("maincpu", M68010, XTAL_10MHz)
+	MCFG_CPU_PROGRAM_MAP (hk68v10_mem)
 
-/* Terminal Port config */
-MCFG_SCC8530_ADD("scc", SCC_CLOCK, 0, 0, 0, 0 )
-MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_txd))
-MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_dtr))
-MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
+	MCFG_DEVICE_ADD("cio", Z8536, SCC_CLOCK)
 
-MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
-MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc8530_device, rxa_w))
-MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc8530_device, ctsa_w))
+	/* Terminal Port config */
+	MCFG_SCC8530_ADD("scc", SCC_CLOCK, 0, 0, 0, 0 )
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_dtr))
+	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
 
+	MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("scc", scc8530_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("scc", scc8530_device, ctsa_w))
+
+	MCFG_VME_DEVICE_ADD("vme")
+	MCFG_VME_SLOT_ADD ("vme", 1, hk68_vme_cards, nullptr)
 MACHINE_CONFIG_END
 
 /* ROM definitions */
@@ -383,5 +393,5 @@ ROM_LOAD16_BYTE ("hk68kv10U12.bin", 0xFC0000, 0x2000, CRC (f2d688e9) SHA1 (e6869
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT COMPANY                  FULLNAME          FLAGS */
-COMP (1985, hk68v10,      0,      0,       hk68v10,        hk68v10, driver_device, 0,   "Heurikon Corporation",   "HK68/V10", MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )
+/*    YEAR  NAME          PARENT  COMPAT   MACHINE  INPUT    CLASS          INIT  COMPANY                  FULLNAME    FLAGS */
+COMP (1985, hk68v10,      0,      0,       hk68v10, hk68v10, hk68v10_state, 0,    "Heurikon Corporation",  "HK68/V10", MACHINE_NO_SOUND_HW )

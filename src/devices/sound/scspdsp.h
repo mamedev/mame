@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:ElSemi, R. Belmont
-#pragma once
+#ifndef MAME_SOUND_SCSPDSP_H
+#define MAME_SOUND_SCSPDSP_H
 
-#ifndef __SCSPDSP_H__
-#define __SCSPDSP_H__
+#pragma once
 
 //the DSP Context
 struct SCSPDSP
@@ -32,11 +32,11 @@ struct SCSPDSP
 
 	int Stopped;
 	int LastStep;
+
+	void Init();
+	void SetSample(int32_t sample, int32_t SEL, int32_t MXL);
+	void Step();
+	void Start();
 };
 
-void SCSPDSP_Init(SCSPDSP *DSP);
-void SCSPDSP_SetSample(SCSPDSP *DSP, int32_t sample, int32_t SEL, int32_t MXL);
-void SCSPDSP_Step(SCSPDSP *DSP);
-void SCSPDSP_Start(SCSPDSP *DSP);
-
-#endif /* __SCSPDSP_H__ */
+#endif // MAME_SOUND_SCSPDSP_H

@@ -8,12 +8,17 @@
 
 *********************************************************************/
 
-#ifndef __SOFTLIST_H_
-#define __SOFTLIST_H_
+#ifndef MAME_EMU_SOFTLIST_H
+#define MAME_EMU_SOFTLIST_H
 
-#include <list>
+#pragma once
+
+
+#include "emucore.h"
 #include "romentry.h"
 #include "corefile.h"
+
+#include <list>
 
 
 //**************************************************************************
@@ -28,9 +33,6 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-struct XML_ParserStruct;
-class software_info;
 
 // ======================> feature_list_item
 
@@ -120,7 +122,7 @@ public:
 	const std::string &publisher() const { return m_publisher; }
 	const std::list<feature_list_item> &other_info() const { return m_other_info; }
 	const std::list<feature_list_item> &shared_info() const { return m_shared_info; }
-	uint32_t supported() const { return m_supported; }
+	u32 supported() const { return m_supported; }
 	const std::list<software_part> &parts() const { return m_partdata; }
 
 	// additional operations
@@ -129,7 +131,7 @@ public:
 
 private:
 	// internal state
-	uint32_t                  m_supported;
+	u32                     m_supported;
 	std::string             m_shortname;
 	std::string             m_longname;
 	std::string             m_parentname;
@@ -174,7 +176,7 @@ private:
 	// internal helpers
 	template <typename T> std::vector<std::string> parse_attributes(const char **attributes, const T &attrlist);
 	bool parse_name_and_value(const char **attributes, std::string &name, std::string &value);
-	void add_rom_entry(std::string &&name, std::string &&hashdata, uint32_t offset, uint32_t length, uint32_t flags);
+	void add_rom_entry(std::string &&name, std::string &&hashdata, u32 offset, u32 length, u32 flags);
 
 	// expat callbacks
 	static void start_handler(void *data, const char *tagname, const char **attributes);
@@ -207,7 +209,7 @@ private:
 
 // ----- Helpers -----
 
-// parses a software identifier (e.g. - 'apple2e:agentusa:flop1') into its consituent parts (returns false if cannot parse)
+// parses a software identifier (e.g. - 'apple2e:agentusa:flop1') into its constituent parts (returns false if cannot parse)
 bool software_name_parse(const std::string &identifier, std::string *list_name = nullptr, std::string *software_name = nullptr, std::string *part_name = nullptr);
 
-#endif // __SOFTLIST_H_
+#endif // MAME_EMU_SOFTLIST_H

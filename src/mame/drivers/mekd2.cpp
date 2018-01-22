@@ -74,12 +74,15 @@ TODO
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
+#include "machine/timer.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "mekd2.lh"
 
 #define XTAL_MEKD2 1228800
@@ -93,12 +96,12 @@ public:
 	};
 
 	mekd2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pia_s(*this, "pia_s"),
-		m_pia_u(*this, "pia_u"),
-		m_acia(*this, "acia"),
-		m_cass(*this, "cassette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pia_s(*this, "pia_s")
+		, m_pia_u(*this, "pia_u")
+		, m_acia(*this, "acia")
+		, m_cass(*this, "cassette")
 	{ }
 
 	DECLARE_READ_LINE_MEMBER(mekd2_key40_r);
@@ -111,10 +114,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
 
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
+	void mekd2(machine_config &config);
 private:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_cass_data[4];
 	uint8_t m_segment;
 	uint8_t m_digit;
@@ -139,8 +141,7 @@ private:
 static ADDRESS_MAP_START( mekd2_mem , AS_PROGRAM, 8, mekd2_state)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // user ram
 	AM_RANGE(0x8004, 0x8007) AM_DEVREADWRITE("pia_u", pia6821_device, read, write)
-	AM_RANGE(0x8008, 0x8008) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0x8009, 0x8009) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0x8020, 0x8023) AM_DEVREADWRITE("pia_s", pia6821_device, read, write)
 	AM_RANGE(0xa000, 0xa07f) AM_RAM // system ram
 	AM_RANGE(0xe000, 0xe3ff) AM_ROM AM_MIRROR(0x1c00)   /* JBUG ROM */
@@ -362,7 +363,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
 
 ************************************************************/
 
-static MACHINE_CONFIG_START( mekd2, mekd2_state )
+MACHINE_CONFIG_START(mekd2_state::mekd2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_MEKD2 / 2)        /* 614.4 kHz */
 	MCFG_CPU_PROGRAM_MAP(mekd2_mem)
@@ -422,5 +423,5 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT    COMPANY     FULLNAME   FLAGS */
-COMP( 1977, mekd2,  0,      0,      mekd2,    mekd2, driver_device, 0,  "Motorola", "MEK6800D2" , 0 )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT  COMPANY     FULLNAME      FLAGS
+COMP( 1977, mekd2,  0,      0,      mekd2,    mekd2, mekd2_state, 0,    "Motorola", "MEK6800D2" , 0 )

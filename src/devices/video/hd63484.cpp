@@ -12,6 +12,9 @@
 #include "emu.h"
 #include "hd63484.h"
 
+#include "screen.h"
+
+
 #define LOG 0
 #define FIFO_LOG 0
 #define CMD_LOG 0
@@ -22,7 +25,7 @@
 //-------------------------------------------------
 
 hd63484_device::hd63484_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HD63484, "HD63484 CRTC", tag, owner, clock, "hd63484", __FILE__),
+	: device_t(mconfig, HD63484, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
 	m_auto_configure_screen(true),
@@ -328,7 +331,7 @@ enum
 -------------------------------------------------*/
 
 // devices
-const device_type HD63484 = &device_creator<hd63484_device>;
+DEFINE_DEVICE_TYPE(HD63484, hd63484_device, "hd63484", "Hitachi HD63484 ACRTC")
 
 
 ROM_START( hd63484 )
@@ -341,9 +344,11 @@ ROM_END
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *hd63484_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector hd63484_device::memory_space_config() const
 {
-	return (spacenum == AS_0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 
@@ -362,7 +367,7 @@ const tiny_rom_entry *hd63484_device::device_rom_region() const
 
 inline uint16_t hd63484_device::readword(offs_t address)
 {
-	return space().read_word(address << 1);
+	return space().read_word(address);
 }
 
 
@@ -372,7 +377,7 @@ inline uint16_t hd63484_device::readword(offs_t address)
 
 inline void hd63484_device::writeword(offs_t address, uint16_t data)
 {
-	space().write_word(address << 1, data);
+	space().write_word(address, data);
 }
 
 
@@ -523,10 +528,10 @@ inline void hd63484_device::recompute_parameters()
 	if (BIT(m_dcr, 13)) vbstart += m_sp[0];
 	if (BIT(m_dcr, 11)) vbstart += m_sp[2];
 
-	rectangle visarea = m_screen->visible_area();
+	rectangle visarea = screen().visible_area();
 	visarea.set((m_hsw + m_hds) * ppmc, (m_hsw + m_hds + m_hdw) * ppmc - 1, m_vds, vbstart - 1);
-	attoseconds_t frame_period = m_screen->frame_period().attoseconds(); // TODO: use clock() to calculate the frame_period
-	m_screen->configure(m_hc * ppmc, m_vc, visarea, frame_period);
+	attoseconds_t frame_period = screen().frame_period().attoseconds(); // TODO: use clock() to calculate the frame_period
+	screen().configure(m_hc * ppmc, m_vc, visarea, frame_period);
 }
 
 
@@ -1780,7 +1785,7 @@ uint16_t hd63484_device::video_registers_r(int offset)
 			break;
 
 		case 0x80:
-			res = m_screen->vpos() & 0xfff; // Raster Count
+			res = screen().vpos() & 0xfff; // Raster Count
 			break;
 
 		default:
@@ -1905,13 +1910,13 @@ void hd63484_device::video_registers_w(int offset)
 	}
 }
 
-READ16_MEMBER( hd63484_device::status_r )
+READ16_MEMBER( hd63484_device::status16_r )
 {
 	// kothello is coded so that upper byte of this should be 0xff (tests with jc opcode). Maybe it's just unconnected?
 	return m_sr | 0xff00;
 }
 
-READ16_MEMBER( hd63484_device::data_r )
+READ16_MEMBER( hd63484_device::data16_r )
 {
 	uint16_t res;
 
@@ -1932,13 +1937,13 @@ READ16_MEMBER( hd63484_device::data_r )
 	return res;
 }
 
-WRITE16_MEMBER( hd63484_device::address_w )
+WRITE16_MEMBER( hd63484_device::address16_w )
 {
 	if(ACCESSING_BITS_0_7)
 		m_ar = data & 0xfe;
 }
 
-WRITE16_MEMBER( hd63484_device::data_w )
+WRITE16_MEMBER( hd63484_device::data16_w )
 {
 	if(ACCESSING_BITS_8_15)
 		m_vreg[m_ar] = (data & 0xff00) >> 8;
@@ -1951,17 +1956,17 @@ WRITE16_MEMBER( hd63484_device::data_w )
 	inc_ar(2);
 }
 
-READ8_MEMBER( hd63484_device::status_r )
+READ8_MEMBER( hd63484_device::status8_r )
 {
 	return m_sr;
 }
 
-WRITE8_MEMBER( hd63484_device::address_w )
+WRITE8_MEMBER( hd63484_device::address8_w )
 {
 	m_ar = data;
 }
 
-READ8_MEMBER( hd63484_device::data_r )
+READ8_MEMBER( hd63484_device::data8_r )
 {
 	uint8_t res = 0xff;
 
@@ -1975,7 +1980,7 @@ READ8_MEMBER( hd63484_device::data_r )
 	return res;
 }
 
-WRITE8_MEMBER( hd63484_device::data_w )
+WRITE8_MEMBER( hd63484_device::data8_w )
 {
 	m_vreg[m_ar] = data;
 

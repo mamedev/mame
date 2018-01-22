@@ -255,19 +255,21 @@
 
 
 #include "emu.h"
+#include "bus/centronics/ctronics.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "bus/centronics/ctronics.h"
-#include "machine/i8255.h"
-#include "machine/upd1990a.h"
-#include "machine/upd765.h"
 #include "machine/i8214.h"
 #include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/timer.h"
+#include "machine/upd1990a.h"
+#include "machine/upd765.h"
 #include "sound/2203intf.h"
 #include "sound/2608intf.h"
 #include "sound/beep.h"
+#include "screen.h"
 #include "softlist.h"
-//#include "includes/pc8801.h"
+#include "speaker.h"
 
 //#define USE_PROPER_I8214
 
@@ -470,6 +472,10 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(pc8801);
+	void pc8801mc(machine_config &config);
+	void pc8801fh(machine_config &config);
+	void pc8801(machine_config &config);
+	void pc8801ma(machine_config &config);
 protected:
 
 	virtual void video_start() override;
@@ -1065,7 +1071,7 @@ READ8_MEMBER(pc8801_state::pc8801_mem_r)
 
 		if(m_misc_ctrl & 0x40)
 		{
-			if(!space.debugger_access())
+			if(!machine().side_effect_disabled())
 				m_vram_sel = 3;
 
 			if(m_alu_ctrl2 & 0x80)
@@ -1127,7 +1133,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_mem_w)
 	{
 		if(m_misc_ctrl & 0x40)
 		{
-			if(!space.debugger_access())
+			if(!machine().side_effect_disabled())
 				m_vram_sel = 3;
 
 			if(m_alu_ctrl2 & 0x80)
@@ -1990,7 +1996,7 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_BIT (0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)           PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT (0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)           PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT (0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)  PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2)  PORT_CHAR('\xA5') PORT_CHAR('|')
+	PORT_BIT (0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2)  PORT_CHAR(0xA5) PORT_CHAR('|')
 	PORT_BIT (0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)   PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT (0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS)      PORT_CHAR('^')
 	PORT_BIT (0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)       PORT_CHAR('-') PORT_CHAR('=')
@@ -2564,7 +2570,7 @@ WRITE_LINE_MEMBER( pc8801_state::rxrdy_w )
 	// ...
 }
 
-static MACHINE_CONFIG_START( pc8801, pc8801_state )
+MACHINE_CONFIG_START(pc8801_state::pc8801)
 	/* main CPU */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(pc8801_mem)
@@ -2645,15 +2651,15 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("rtc_timer", pc8801_state, pc8801_rtc_irq, attotime::from_hz(600))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc8801fh, pc8801 )
+MACHINE_CONFIG_DERIVED(pc8801_state::pc8801fh, pc8801)
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_clock_speed )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc8801ma, pc8801 )
+MACHINE_CONFIG_DERIVED(pc8801_state::pc8801ma, pc8801)
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_dic )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc8801mc, pc8801 )
+MACHINE_CONFIG_DERIVED(pc8801_state::pc8801mc, pc8801)
 	MCFG_MACHINE_RESET_OVERRIDE(pc8801_state, pc8801_cdrom )
 MACHINE_CONFIG_END
 
@@ -2945,21 +2951,21 @@ ROM_END
 
 /*    YEAR  NAME            PARENT  COMPAT  MACHINE   INPUT   INIT  COMPANY FULLNAME */
 
-COMP( 1981, pc8801,         0,      0,     pc8801,      pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-8801", MACHINE_NOT_WORKING )
-COMP( 1983, pc8801mk2,      pc8801, 0,     pc8801,      pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-8801mkII", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2sr,    pc8801, 0,     pc8801,      pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-8801mkIISR", MACHINE_NOT_WORKING )
-//COMP( 1985, pc8801mk2tr,  pc8801, 0,     pc8801,      pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-8801mkIITR", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2fr,    pc8801, 0,     pc8801,      pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-8801mkIIFR", MACHINE_NOT_WORKING )
-COMP( 1985, pc8801mk2mr,    pc8801, 0,     pc8801,      pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-8801mkIIMR", MACHINE_NOT_WORKING )
+COMP( 1981, pc8801,         0,      0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801", MACHINE_NOT_WORKING )
+COMP( 1983, pc8801mk2,      pc8801, 0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801mkII", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2sr,    pc8801, 0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801mkIISR", MACHINE_NOT_WORKING )
+//COMP( 1985, pc8801mk2tr,  pc8801, 0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801mkIITR", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2fr,    pc8801, 0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801mkIIFR", MACHINE_NOT_WORKING )
+COMP( 1985, pc8801mk2mr,    pc8801, 0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801mkIIMR", MACHINE_NOT_WORKING )
 
-//COMP( 1986, pc8801fh,     0,      0,     pc8801,      pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-8801FH", MACHINE_NOT_WORKING )
-COMP( 1986, pc8801mh,       pc8801, 0,     pc8801fh,    pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-8801MH", MACHINE_NOT_WORKING )
-COMP( 1987, pc8801fa,       pc8801, 0,     pc8801fh,    pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-8801FA", MACHINE_NOT_WORKING )
-COMP( 1987, pc8801ma,       pc8801, 0,     pc8801ma,    pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-8801MA", MACHINE_NOT_WORKING )
-//COMP( 1988, pc8801fe,     pc8801, 0,     pc8801,      pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-8801FE", MACHINE_NOT_WORKING )
-COMP( 1988, pc8801ma2,      pc8801, 0,     pc8801ma,    pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-8801MA2", MACHINE_NOT_WORKING )
-//COMP( 1989, pc8801fe2,    pc8801, 0,     pc8801,      pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-8801FE2", MACHINE_NOT_WORKING )
-COMP( 1989, pc8801mc,       pc8801, 0,     pc8801mc,    pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-8801MC", MACHINE_NOT_WORKING )
+//COMP( 1986, pc8801fh,     0,      0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801FH", MACHINE_NOT_WORKING )
+COMP( 1986, pc8801mh,       pc8801, 0,     pc8801fh,    pc88sr, pc8801_state,  0,    "NEC",  "PC-8801MH", MACHINE_NOT_WORKING )
+COMP( 1987, pc8801fa,       pc8801, 0,     pc8801fh,    pc88sr, pc8801_state,  0,    "NEC",  "PC-8801FA", MACHINE_NOT_WORKING )
+COMP( 1987, pc8801ma,       pc8801, 0,     pc8801ma,    pc88sr, pc8801_state,  0,    "NEC",  "PC-8801MA", MACHINE_NOT_WORKING )
+//COMP( 1988, pc8801fe,     pc8801, 0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801FE", MACHINE_NOT_WORKING )
+COMP( 1988, pc8801ma2,      pc8801, 0,     pc8801ma,    pc88sr, pc8801_state,  0,    "NEC",  "PC-8801MA2", MACHINE_NOT_WORKING )
+//COMP( 1989, pc8801fe2,    pc8801, 0,     pc8801,      pc88sr, pc8801_state,  0,    "NEC",  "PC-8801FE2", MACHINE_NOT_WORKING )
+COMP( 1989, pc8801mc,       pc8801, 0,     pc8801mc,    pc88sr, pc8801_state,  0,    "NEC",  "PC-8801MC", MACHINE_NOT_WORKING )
 
-//COMP( 1989, pc98do,       0,      0,     pc88va,   pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-98DO", MACHINE_NOT_WORKING )
-//COMP( 1990, pc98dop,      0,      0,     pc88va,   pc88sr, driver_device,  0,    "Nippon Electronic Company",  "PC-98DO+", MACHINE_NOT_WORKING )
+//COMP( 1989, pc98do,       0,      0,     pc88va,   pc88sr, pc8801_state,  0,    "NEC",  "PC-98DO", MACHINE_NOT_WORKING )
+//COMP( 1990, pc98dop,      0,      0,     pc88va,   pc88sr, pc8801_state,  0,    "NEC",  "PC-98DO+", MACHINE_NOT_WORKING )

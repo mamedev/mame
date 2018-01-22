@@ -2,7 +2,7 @@
 // copyright-holders:Nicola Salmoria
 /***************************************************************************
 
-  video.c
+  mrdo.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -166,11 +166,6 @@ void mrdo_state::video_start()
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_transparent_pen(0);
-
-	m_bg_tilemap->set_scrolldx(0, 56);
-	m_fg_tilemap->set_scrolldx(0, 56);
-	m_bg_tilemap->set_scrolldy(0, 6);
-	m_fg_tilemap->set_scrolldy(0, 6);
 
 	m_flipscreen = 0;
 

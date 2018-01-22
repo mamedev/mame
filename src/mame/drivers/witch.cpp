@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
 
@@ -111,7 +111,6 @@ Sound
     Mapped @0x8010-0x8016
     Had to patch es8712.c to start playing on 0x8016 write and to prevent continuous looping.
     There's a test on bit1 at offset 0 (0x8010), so this may be a "read status" kind of port.
-    For now reading at 8010 always reports ready.
 
 
 Ports
@@ -220,20 +219,25 @@ TODO :
     - Hook up the OKI M5202
 */
 
+#include "emu.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
+#include "sound/2203intf.h"
+#include "sound/es8712.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+
 #define MAIN_CLOCK        XTAL_12MHz
 #define CPU_CLOCK         MAIN_CLOCK / 4
 #define YM2203_CLOCK      MAIN_CLOCK / 4
 #define ES8712_CLOCK      8000              // 8Khz, it's the only clock for sure (pin13) it come from pin14 of M5205.
 
 #define HOPPER_PULSE      50          // time between hopper pulses in milliseconds (not right for attendant pay)
-
-#include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/es8712.h"
-#include "sound/2203intf.h"
-#include "machine/i8255.h"
-#include "machine/nvram.h"
-#include "machine/ticket.h"
 
 
 class witch_state : public driver_device
@@ -284,9 +288,9 @@ public:
 	DECLARE_READ8_MEMBER(read_a000);
 	DECLARE_WRITE8_MEMBER(write_a002);
 	DECLARE_WRITE8_MEMBER(write_a006);
-	DECLARE_WRITE8_MEMBER(write_a008);
+	DECLARE_WRITE8_MEMBER(main_write_a008);
+	DECLARE_WRITE8_MEMBER(sub_write_a008);
 	DECLARE_READ8_MEMBER(prot_read_700x);
-	DECLARE_READ8_MEMBER(read_8010);
 	DECLARE_WRITE8_MEMBER(xscroll_w);
 	DECLARE_WRITE8_MEMBER(yscroll_w);
 	DECLARE_DRIVER_INIT(witch);
@@ -297,6 +301,7 @@ public:
 	uint32_t screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override;
+	void witch(machine_config &config);
 };
 
 
@@ -430,9 +435,14 @@ WRITE8_MEMBER(witch_state::write_a006)
 	machine().bookkeeping().coin_counter_w(0, !BIT(data, 6)); // coin in counter
 }
 
-WRITE8_MEMBER(witch_state::write_a008)
+WRITE8_MEMBER(witch_state::main_write_a008)
 {
-	space.device().execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(witch_state::sub_write_a008)
+{
+	m_subcpu->set_input_line(0, CLEAR_LINE);
 }
 
 READ8_MEMBER(witch_state::prot_read_700x)
@@ -447,7 +457,7 @@ READ8_MEMBER(witch_state::prot_read_700x)
     Otherwise later in game some I/O (controls) reads are skipped.
 */
 
-	switch(space.device().safe_pc())
+	switch(m_subcpu->pc())
 	{
 	case 0x23f:
 	case 0x246:
@@ -459,12 +469,6 @@ READ8_MEMBER(witch_state::prot_read_700x)
 	}
 	return memregion("sub")->base()[0x7000+offset];
 }
-
-/*
- * Status from ES8712?
- * BIT1 is zero when no sample is playing?
- */
-READ8_MEMBER(witch_state::read_8010){   return 0x00; }
 
 WRITE8_MEMBER(witch_state::xscroll_w)
 {
@@ -482,7 +486,7 @@ static ADDRESS_MAP_START( map_main, AS_PROGRAM, 8, witch_state )
 	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
 	AM_RANGE(0xa004, 0xa007) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
-	AM_RANGE(0xa008, 0xa008) AM_WRITE(write_a008)
+	AM_RANGE(0xa008, 0xa008) AM_WRITE(main_write_a008)
 	AM_RANGE(0xa00c, 0xa00c) AM_READ_PORT("SERVICE")    // stats / reset
 	AM_RANGE(0xa00e, 0xa00e) AM_READ_PORT("COINS")      // coins/attendant keys
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_WRITE(gfx0_vram_w) AM_SHARE("gfx0_vram")
@@ -490,8 +494,8 @@ static ADDRESS_MAP_START( map_main, AS_PROGRAM, 8, witch_state )
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(gfx1_vram_r, gfx1_vram_w) AM_SHARE("gfx1_vram")
 	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(gfx1_cram_r, gfx1_cram_w) AM_SHARE("gfx1_cram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("sprite_ram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf100, 0xf1ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf200, 0xffff) AM_RAM AM_SHARE("share2")
@@ -502,10 +506,10 @@ static ADDRESS_MAP_START( map_sub, AS_PROGRAM, 8, witch_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0x8010, 0x8016) AM_READ(read_8010) AM_DEVWRITE("essnd", es8712_device, es8712_w)
+	AM_RANGE(0x8010, 0x8016) AM_DEVREADWRITE("essnd", es8712_device, read, write)
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
 	AM_RANGE(0xa004, 0xa007) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
-	AM_RANGE(0xa008, 0xa008) AM_WRITE(write_a008)
+	AM_RANGE(0xa008, 0xa008) AM_WRITE(sub_write_a008)
 	AM_RANGE(0xa00c, 0xa00c) AM_READ_PORT("SERVICE")    // stats / reset
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf200, 0xffff) AM_RAM AM_SHARE("share2")
@@ -764,7 +768,7 @@ void witch_state::machine_reset()
 	m_motor_active = (ioport("YM_PortB")->read() & 0x08) ? 0 : 1;
 }
 
-static MACHINE_CONFIG_START( witch, witch_state )
+MACHINE_CONFIG_START(witch_state::witch)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)    /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(map_main)

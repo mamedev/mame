@@ -19,7 +19,9 @@
 #include "machine/ram.h"
 #include "includes/b2m.h"
 #include "formats/smx_dsk.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /* Address maps */
 static ADDRESS_MAP_START(b2m_mem, AS_PROGRAM, 8, b2m_state )
@@ -40,7 +42,7 @@ static ADDRESS_MAP_START( b2m_io, AS_IO, 8, b2m_state )
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE("pic8259", pic8259_device, read, write )
 	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("fd1793", fd1793_t, read, write)
+	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("fd1793", fd1793_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( b2m_rom_io, AS_IO, 8, b2m_state )
@@ -183,7 +185,7 @@ SLOT_INTERFACE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( b2m, b2m_state )
+MACHINE_CONFIG_START(b2m_state::b2m)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(b2m_mem)
@@ -225,7 +227,8 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(b2m_state, b2m_romdisk_portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(b2m_state, b2m_romdisk_portc_w))
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	/* sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -248,7 +251,7 @@ static MACHINE_CONFIG_START( b2m, b2m_state )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( b2mrom, b2m )
+MACHINE_CONFIG_DERIVED(b2m_state::b2mrom, b2m)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(b2m_rom_io)
 MACHINE_CONFIG_END
@@ -269,6 +272,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT               INIT     COMPANY   FULLNAME   FLAGS */
-COMP( 1989, b2m,    0,      0,      b2m,        b2m,   b2m_state,   b2m,     "BNPO",   "Bashkiria-2M",   MACHINE_SUPPORTS_SAVE)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT  STATE        INIT     COMPANY   FULLNAME                  FLAGS */
+COMP( 1989, b2m,    0,      0,      b2m,        b2m,   b2m_state,   b2m,     "BNPO",   "Bashkiria-2M",           MACHINE_SUPPORTS_SAVE)
 COMP( 1989, b2mrom, b2m,    0,      b2mrom,     b2m,   b2m_state,   b2m,     "BNPO",   "Bashkiria-2M ROM-disk",  MACHINE_SUPPORTS_SAVE)

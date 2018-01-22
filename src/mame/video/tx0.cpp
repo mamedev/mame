@@ -39,7 +39,7 @@ void tx0_state::video_start()
 }
 
 
-void tx0_state::screen_eof_tx0(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(tx0_state::screen_vblank_tx0)
 {
 	// rising edge
 	if (state)

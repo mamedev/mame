@@ -138,6 +138,8 @@ something wrong in the disk geometry reported by calchase.chd (20,255,63) since 
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/pc_vga.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class calchase_state : public pcat_base_state
@@ -168,6 +170,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
+	void calchase(machine_config &config);
+	void hostinv(machine_config &config);
 };
 
 // Intel 82439TX System Controller (MTXC)
@@ -637,7 +641,7 @@ void calchase_state::machine_reset()
 	membank("bios_ext")->set_base(memregion("bios")->base() + 0);
 }
 
-static MACHINE_CONFIG_START( calchase, calchase_state )
+MACHINE_CONFIG_START(calchase_state::calchase)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
 	MCFG_CPU_PROGRAM_MAP(calchase_map)
 	MCFG_CPU_IO_MAP(calchase_io)
@@ -669,7 +673,7 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hostinv, calchase_state )
+MACHINE_CONFIG_START(calchase_state::hostinv)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Cyrix 686MX-PR200 CPU
 	MCFG_CPU_PROGRAM_MAP(calchase_map)
 	MCFG_CPU_IO_MAP(calchase_io)
@@ -699,7 +703,7 @@ MACHINE_CONFIG_END
 
 READ32_MEMBER(calchase_state::calchase_idle_skip_r)
 {
-	if(space.device().safe_pc()==0x1406f48)
+	if(m_maincpu->pc()==0x1406f48)
 		m_maincpu->spin_until_interrupt();
 
 	return m_idle_skip_ram;
@@ -771,6 +775,6 @@ ROM_START( eggsplc )
 	DISK_IMAGE_READONLY( "eggsplc", 0, SHA1(fa38dd6b0d25cde644f68cf639768f137c607eb5) )
 ROM_END
 
-GAME( 1998, hostinv,   0,    hostinv,  calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Host Invaders", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, calchase,  0,    calchase, calchase, calchase_state,  calchase, ROT0, "The Game Room", "California Chase", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, hostinv,   0,    hostinv,  calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Host Invaders",        MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, calchase,  0,    calchase, calchase, calchase_state,  calchase, ROT0, "The Game Room", "California Chase",     MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2002, eggsplc,   0,    calchase, calchase, calchase_state,  hostinv,  ROT0, "The Game Room", "Eggs Playing Chicken", 0 )

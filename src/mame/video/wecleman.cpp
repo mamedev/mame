@@ -23,21 +23,6 @@
 #define SPRITE_FLIPY    0x02
 #define NUM_SPRITES     256
 
-struct sprite
-{
-	uint8_t *pen_data;    /* points to top left corner of tile data */
-	int line_offset;
-
-	const pen_t *pal_data;
-	rgb_t pal_base;
-
-	int x_offset, y_offset;
-	int tile_width, tile_height;
-	int total_width, total_height;  /* in screen coordinates */
-	int x, y;
-	int shadow_mode, flags;
-};
-
 
 /***************************************************************************
 
@@ -82,12 +67,12 @@ void wecleman_state::get_sprite_info()
 
 	uint16_t *source = m_spriteram;
 
-	struct sprite *sprite = m_sprite_list;
-	struct sprite *finish = m_sprite_list + NUM_SPRITES;
+	sprite_t *sprite = m_sprite_list.get();
+	sprite_t *const finish = sprite + NUM_SPRITES;
 
 	int bank, code, gfx, zoom;
 
-	for (m_spr_count=0; sprite<finish; source+=0x10/2, sprite++)
+	for (m_spr_count = 0; sprite < finish; source += 0x10/2, sprite++)
 	{
 		if (source[0x00/2] == 0xffff) break;
 
@@ -170,7 +155,7 @@ void wecleman_state::sortsprite(int *idx_array, int *key_array, int size)
 
 // draws a 8bpp palette sprites on a 16bpp direct RGB target (sub-par implementation)
 template<class _BitmapClass>
-void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &cliprect, struct sprite *sprite)
+void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &cliprect, const sprite_t &sprite)
 {
 #define PRECISION_X 20
 #define PRECISION_Y 20
@@ -181,10 +166,10 @@ void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &clipr
 	int x1, x2, y1, y2, dx, dy, sx, sy;
 	int xcount0=0, ycount0=0;
 
-	if (sprite->flags & SPRITE_FLIPX)
+	if (sprite.flags & SPRITE_FLIPX)
 	{
-		x2 = sprite->x;
-		x1 = x2 + sprite->total_width;
+		x2 = sprite.x;
+		x1 = x2 + sprite.total_width;
 		dx = -1;
 		if (x2 < cliprect.min_x) x2 = cliprect.min_x;
 		if (x1 > cliprect.max_x )
@@ -197,8 +182,8 @@ void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &clipr
 	}
 	else
 	{
-		x1 = sprite->x;
-		x2 = x1 + sprite->total_width;
+		x1 = sprite.x;
+		x2 = x1 + sprite.total_width;
 		dx = 1;
 		if (x1 < cliprect.min_x )
 		{
@@ -209,10 +194,10 @@ void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &clipr
 		if (x1 >= x2) return;
 	}
 
-	if (sprite->flags & SPRITE_FLIPY)
+	if (sprite.flags & SPRITE_FLIPY)
 	{
-		y2 = sprite->y;
-		y1 = y2 + sprite->total_height;
+		y2 = sprite.y;
+		y1 = y2 + sprite.total_height;
 		dy = -1;
 		if (y2 < cliprect.min_y ) y2 = cliprect.min_y;
 		if (y1 > cliprect.max_y )
@@ -225,8 +210,8 @@ void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &clipr
 	}
 	else
 	{
-		y1 = sprite->y;
-		y2 = y1 + sprite->total_height;
+		y1 = sprite.y;
+		y2 = y1 + sprite.total_height;
 		dy = 1;
 		if (y1 < cliprect.min_y )
 		{
@@ -238,14 +223,14 @@ void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &clipr
 	}
 
 	// calculate entry point decimals
-	src_fdy = (sprite->tile_height<<PRECISION_Y) / sprite->total_height;
+	src_fdy = (sprite.tile_height<<PRECISION_Y) / sprite.total_height;
 	src_f0y = src_fdy * ycount0 + FPY_HALF;
 
-	src_fdx = (sprite->tile_width<<PRECISION_X) / sprite->total_width;
+	src_fdx = (sprite.tile_width<<PRECISION_X) / sprite.total_width;
 	src_f0x = src_fdx * xcount0;
 
 	// pre-loop assignments and adjustments
-	pal_base = sprite->pal_data;
+	pal_base = sprite.pal_data;
 
 	if (x1 > cliprect.min_x)
 	{
@@ -255,13 +240,13 @@ void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &clipr
 
 	for (sy = y1; sy != y2; sy += dy)
 	{
-		uint8_t *row_base = sprite->pen_data + (src_f0y>>PRECISION_Y) * sprite->line_offset;
+		uint8_t *row_base = sprite.pen_data + (src_f0y>>PRECISION_Y) * sprite.line_offset;
 		src_fpx = src_f0x;
 		typename _BitmapClass::pixel_t *dst_ptr = &bitmap.pix(sy);
 
 		if (bitmap.format() == BITMAP_FORMAT_RGB32) // Wec Le Mans
 		{
-			if (!sprite->shadow_mode)
+			if (!sprite.shadow_mode)
 			{
 				for (sx = x1; sx != x2; sx += dx)
 				{
@@ -291,9 +276,9 @@ void wecleman_state::do_blit_zoom32(_BitmapClass &bitmap, const rectangle &clipr
 		}
 		else    // Hot Chase
 		{
-			pen_t base = sprite->pal_base;
+			pen_t base = sprite.pal_base;
 
-			if (!sprite->shadow_mode)
+			if (!sprite.shadow_mode)
 			{
 				for (sx = x1; sx != x2; sx += dx)
 				{
@@ -338,11 +323,11 @@ void wecleman_state::sprite_draw(_BitmapClass &bitmap, const rectangle &cliprect
 	{
 		sortsprite(m_spr_idx_list, m_spr_pri_list, m_spr_count);
 
-		for (i=0; i<m_spr_count; i++) do_blit_zoom32(bitmap, cliprect, m_spr_ptr_list[m_spr_idx_list[i]]);
+		for (i=0; i<m_spr_count; i++) do_blit_zoom32(bitmap, cliprect, *m_spr_ptr_list[m_spr_idx_list[i]]);
 	}
 	else    // Hot Chase
 	{
-		for (i=0; i<m_spr_count; i++) do_blit_zoom32(bitmap, cliprect, m_spr_ptr_list[i]);
+		for (i=0; i<m_spr_count; i++) do_blit_zoom32(bitmap, cliprect, *m_spr_ptr_list[i]);
 	}
 }
 
@@ -904,11 +889,11 @@ VIDEO_START_MEMBER(wecleman_state,wecleman)
 	m_cloud_visible = 0;
 	m_black_pen = m_palette->black_pen();
 
-	m_rgb_half     =          (uint16_t*)(buffer + 0x00000);
-	m_t32x32pm     =             (int*)(buffer + 0x10020);
-	m_spr_ptr_list = (struct sprite **)(buffer + 0x12000);
-	m_spr_idx_list =            (int *)(buffer + 0x12400);
-	m_spr_pri_list =            (int *)(buffer + 0x12800);
+	m_rgb_half     =   (uint16_t*)(buffer + 0x00000);
+	m_t32x32pm     =        (int*)(buffer + 0x10020);
+	m_spr_ptr_list = (sprite_t **)(buffer + 0x12000);
+	m_spr_idx_list =       (int *)(buffer + 0x12400);
+	m_spr_pri_list =       (int *)(buffer + 0x12800);
 
 	for (i=0; i<0x8000; i++)
 	{
@@ -924,7 +909,7 @@ VIDEO_START_MEMBER(wecleman_state,wecleman)
 		}
 	}
 
-	m_sprite_list = auto_alloc_array_clear(machine(), struct sprite, NUM_SPRITES);
+	m_sprite_list = std::make_unique<sprite_t []>(NUM_SPRITES);
 
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_bg_tile_info),this),
 								TILEMAP_SCAN_ROWS,
@@ -1001,9 +986,9 @@ VIDEO_START_MEMBER(wecleman_state,hotchase)
 	m_spr_offsy = 0;
 	m_black_pen = m_palette->black_pen();
 
-	m_spr_ptr_list = (struct sprite **)buffer;
+	m_spr_ptr_list = (sprite_t **)buffer;
 
-	m_sprite_list = auto_alloc_array_clear(machine(), struct sprite, NUM_SPRITES);
+	m_sprite_list = std::make_unique<sprite_t []>(NUM_SPRITES);
 }
 
 

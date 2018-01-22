@@ -6,6 +6,7 @@
 //
 //============================================================
 
+#include "emu.h"
 #import "debugconsole.h"
 
 #import "debugcommandhistory.h"
@@ -24,15 +25,16 @@
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
+#include "util/xmlfile.h"
+
 
 @implementation MAMEDebugConsole
 
 - (id)initWithMachine:(running_machine &)m {
-	NSSplitView		*regSplit, *dasmSplit;
-	NSScrollView	*regScroll, *dasmScroll, *consoleScroll;
-	NSView			*consoleContainer;
-	NSPopUpButton	*actionButton;
-	NSRect			rct;
+	NSScrollView    *regScroll, *dasmScroll, *consoleScroll;
+	NSView          *consoleContainer;
+	NSPopUpButton   *actionButton;
+	NSRect          rct;
 
 	// initialise superclass
 	if (!(self = [super initWithMachine:m title:@"Debug"]))
@@ -48,6 +50,7 @@
 	[regScroll setHasVerticalScroller:YES];
 	[regScroll setAutohidesScrollers:YES];
 	[regScroll setBorderType:NSBezelBorder];
+	[regScroll setDrawsBackground:NO];
 	[regScroll setDocumentView:regView];
 	[regView release];
 
@@ -59,6 +62,7 @@
 	[dasmScroll setHasVerticalScroller:YES];
 	[dasmScroll setAutohidesScrollers:YES];
 	[dasmScroll setBorderType:NSBezelBorder];
+	[dasmScroll setDrawsBackground:NO];
 	[dasmScroll setDocumentView:dasmView];
 	[dasmView release];
 
@@ -70,6 +74,7 @@
 	[consoleScroll setHasVerticalScroller:YES];
 	[consoleScroll setAutohidesScrollers:YES];
 	[consoleScroll setBorderType:NSBezelBorder];
+	[consoleScroll setDrawsBackground:NO];
 	[consoleScroll setDocumentView:consoleView];
 	[consoleView release];
 
@@ -133,24 +138,24 @@
 	[window makeFirstResponder:commandField];
 
 	// calculate the optimal size for everything
-	NSRect const	available = [[NSScreen mainScreen] visibleFrame];
-	NSSize const	regCurrent = [regScroll frame].size;
-	NSSize const	regSize = [NSScrollView frameSizeForContentSize:[regView maximumFrameSize]
+	NSRect const    available = [[NSScreen mainScreen] visibleFrame];
+	NSSize const    regCurrent = [regScroll frame].size;
+	NSSize const    regSize = [NSScrollView frameSizeForContentSize:[regView maximumFrameSize]
 											  hasHorizontalScroller:YES
 												hasVerticalScroller:YES
 														 borderType:[regScroll borderType]];
-	NSSize const	dasmCurrent = [dasmScroll frame].size;
-	NSSize const	dasmSize = [NSScrollView frameSizeForContentSize:[dasmView maximumFrameSize]
+	NSSize const    dasmCurrent = [dasmScroll frame].size;
+	NSSize const    dasmSize = [NSScrollView frameSizeForContentSize:[dasmView maximumFrameSize]
 											  hasHorizontalScroller:YES
 												hasVerticalScroller:YES
 														 borderType:[dasmScroll borderType]];
-	NSSize const	consoleCurrent = [consoleContainer frame].size;
-	NSSize			consoleSize = [NSScrollView frameSizeForContentSize:[consoleView maximumFrameSize]
+	NSSize const    consoleCurrent = [consoleContainer frame].size;
+	NSSize          consoleSize = [NSScrollView frameSizeForContentSize:[consoleView maximumFrameSize]
 												  hasHorizontalScroller:YES
 													hasVerticalScroller:YES
 															 borderType:[consoleScroll borderType]];
-	NSRect			windowFrame = [window frame];
-	NSSize			adjustment;
+	NSRect          windowFrame = [window frame];
+	NSSize          adjustment;
 
 	consoleSize.width += consoleCurrent.width - [consoleScroll frame].size.width;
 	consoleSize.height += consoleCurrent.height - [consoleScroll frame].size.height;
@@ -160,7 +165,7 @@
 
 	windowFrame.size.width += adjustment.width;
 	windowFrame.size.height += adjustment.height; // not used - better to go for fixed height
-	windowFrame.size.height = std::min(512.0, available.size.height);
+	windowFrame.size.height = std::min(CGFloat(512.0), available.size.height);
 	windowFrame.size.width = std::min(windowFrame.size.width, available.size.width);
 	windowFrame.origin.x = available.origin.x + available.size.width - windowFrame.size.width;
 	windowFrame.origin.y = available.origin.y;
@@ -176,7 +181,7 @@
 	[dasmSplit setFrame:rhsFrame];
 
 	// select the current processor
-	[self setCPU:machine->firstcpu];
+	[self setCPU:machine->debugger().cpu().get_visible_cpu()];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(auxiliaryWindowWillClose:)
@@ -374,6 +379,83 @@
 }
 
 
+- (void)loadConfiguration:(util::xml::data_node const *)parentnode {
+	util::xml::data_node const *node = nullptr;
+	for (node = parentnode->get_child("window"); node; node = node->get_next_sibling("window"))
+	{
+		MAMEDebugWindowHandler *win = nil;
+		switch (node->get_attribute_int("type", -1))
+		{
+		case MAME_DEBUGGER_WINDOW_TYPE_CONSOLE:
+			[self restoreConfigurationFromNode:node];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_MEMORY_VIEWER:
+			win = [[MAMEMemoryViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_DISASSEMBLY_VIEWER:
+			win = [[MAMEDisassemblyViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_ERROR_LOG_VIEWER:
+			win = [[MAMEErrorLogViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_POINTS_VIEWER:
+			win = [[MAMEPointsViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_DEVICES_VIEWER:
+			win = [[MAMEDevicesViewer alloc] initWithMachine:*machine console:self];
+			break;
+		case MAME_DEBUGGER_WINDOW_TYPE_DEVICE_INFO_VIEWER:
+			// FIXME: needs device info on init, make another variant
+			//win = [[MAMEDeviceInfoViewer alloc] initWithMachine:*machine console:self];
+			break;
+		default:
+			break;
+		}
+		if (win)
+		{
+			[auxiliaryWindows addObject:win];
+			[win restoreConfigurationFromNode:node];
+			[win release];
+			[win activate];
+		}
+	}
+}
+
+
+- (void)saveConfigurationToNode:(util::xml::data_node *)node {
+	[super saveConfigurationToNode:node];
+	node->set_attribute_int("type", MAME_DEBUGGER_WINDOW_TYPE_CONSOLE);
+	util::xml::data_node *const splits = node->add_child("splits", nullptr);
+	if (splits)
+	{
+		splits->set_attribute_float("state",
+									[regSplit isSubviewCollapsed:[[regSplit subviews] objectAtIndex:0]]
+								  ? 0.0
+								  : NSMaxX([[[regSplit subviews] objectAtIndex:0] frame]));
+		splits->set_attribute_float("disassembly",
+									[dasmSplit isSubviewCollapsed:[[dasmSplit subviews] objectAtIndex:0]]
+								  ? 0.0
+								  : NSMaxY([[[dasmSplit subviews] objectAtIndex:0] frame]));
+	}
+	[dasmView saveConfigurationToNode:node];
+}
+
+
+- (void)restoreConfigurationFromNode:(util::xml::data_node const *)node {
+	[super restoreConfigurationFromNode:node];
+	util::xml::data_node const *const splits = node->get_child("splits");
+	if (splits)
+	{
+		[regSplit setPosition:splits->get_attribute_float("state", NSMaxX([[[regSplit subviews] objectAtIndex:0] frame]))
+			 ofDividerAtIndex:0];
+		[dasmSplit setPosition:splits->get_attribute_float("disassembly", NSMaxY([[[dasmSplit subviews] objectAtIndex:0] frame]))
+			  ofDividerAtIndex:0];
+	}
+	[dasmView restoreConfigurationFromNode:node];
+}
+
+
+
 - (BOOL)control:(NSControl *)control textShouldBeginEditing:(NSText *)fieldEditor {
 	if (control == commandField)
 		[history edit];
@@ -405,7 +487,7 @@
 			}
 			return YES;
 		}
-    }
+	}
 	return NO;
 }
 
@@ -430,8 +512,8 @@
 
 
 - (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)max ofSubviewAt:(NSInteger)offs {
-	NSSize	sz = [sender bounds].size;
-	CGFloat	allowed = ([sender isVertical] ? sz.width : sz.height) - 100 - [sender dividerThickness];
+	NSSize  sz = [sender bounds].size;
+	CGFloat allowed = ([sender isVertical] ? sz.width : sz.height) - 100 - [sender dividerThickness];
 	return (max > allowed) ? allowed : max;
 }
 

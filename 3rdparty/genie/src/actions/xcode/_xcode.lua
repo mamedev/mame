@@ -39,7 +39,7 @@
 		description     = "Generate Apple Xcode 3 project files (experimental)",
 		os              = "macosx",
 
-		valid_kinds     = { "ConsoleApp", "WindowedApp", "SharedLib", "StaticLib" },
+		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle" },
 
 		valid_languages = { "C", "C++" },
 
@@ -81,7 +81,7 @@
 		description     = "Generate Apple Xcode 4 project files (experimental)",
 		os              = "macosx",
 
-		valid_kinds     = { "ConsoleApp", "WindowedApp", "SharedLib", "StaticLib" },
+		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle" },
 
 		valid_languages = { "C", "C++" },
 

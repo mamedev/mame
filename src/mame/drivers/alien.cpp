@@ -6,18 +6,27 @@
 
     skeleton driver
 
-    - sh-4 clocked with 200MHz
-    - 2 x Panasonic MN677511DE chips (MPEG2 decoders)
+   Main board:
+    - Hitachi SH-4 HD6417750S at 200MHz
+    - 2 x Fujitsu MB86292 Graphics Controller
     - Altera ACEX 1K PLD
     - M48T35Y timekeeper device
-    - CF interface
     - YMZ770B-F
+   Upper board (game specific):
+    - CF interface
+    - 2 x Panasonic MN677511DE MPEG2 decoders (optional)
+
+   Known undumped games:
+    - Donkey Kong: Jungle Fever (c) 2005 Capcom / Nintendo / Namco
+    - Donkey Kong: Banana Kingdom (c) 2006 Capcom / Nintendo / Namco
 
 ***********************************************************************************/
 
 
 #include "emu.h"
-#include "cpu/sh4/sh4.h"
+#include "cpu/sh/sh4.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK    XTAL_200MHz
 
@@ -33,6 +42,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void alien(machine_config &config);
 protected:
 
 	// devices
@@ -78,10 +88,11 @@ void alien_state::machine_reset()
 	//m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( alien, alien_state )
+MACHINE_CONFIG_START(alien_state::alien)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, MASTER_CLOCK)    /* 200MHz */
 	MCFG_CPU_PROGRAM_MAP(alien_map)
+	MCFG_CPU_FORCE_NO_DRC()
 
 	/* video hardware */
 
@@ -109,7 +120,7 @@ ROM_START( alien )
 	ROM_LOAD32_WORD( "aln_s04.4.ic30", 0x000000, 0x400000, CRC(11777d3f) SHA1(8cc9fcae7911e6be273b4532d89b44a309687ead) )
 	ROM_LOAD32_WORD( "aln_s05.5.ic33", 0x000002, 0x400000, CRC(71d2f22c) SHA1(16b25aa34f8b0d988565e7ab7cecc4df62ee8cf3) )
 
-	ROM_REGION( 0x800100, "unk", 0 ) //sound samples flash rom
+	ROM_REGION( 0x800100, "ymz770b", 0 ) //sound samples flash rom
 	ROM_LOAD( "s29jl064hxxtfi00.u35", 0x000000, 0x800100, CRC(01890c61) SHA1(4fad321f42eab835351c6d5f73539bdbed80affe) )
 
 	ROM_REGION( 0x8000, "nvram", ROMREGION_ERASEFF) //timekeeper device
@@ -119,5 +130,19 @@ ROM_START( alien )
 	DISK_IMAGE( "alien", 0, SHA1(0328f12765db41a9ef5c8bfb88d4983345093072) )
 ROM_END
 
+// ROM board only dumped, main board is missing, presumable similar to Alien: The Arcade medal hardware
+ROM_START( pingu )
+	ROM_REGION( 0x800000, "maincpu", 0 ) // BIOS code
+	ROM_LOAD32_WORD( "ic30", 0x000000, 0x400000, NO_DUMP )
+	ROM_LOAD32_WORD( "ic33", 0x000002, 0x400000, NO_DUMP )
 
-GAME( 2005, alien,  0,      alien, alien, driver_device, 0, ROT0, "Capcom", "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+	ROM_REGION( 0x800100, "ymz770b", 0 ) //sound samples flash rom
+	ROM_LOAD( "ic10", 0x000000, 0x800100, CRC(04cf9722) SHA1(854e056a03d6f7ac9b438ba9ce8a0499a79bdec8) )
+
+	DISK_REGION( "card" ) //compact flash
+	DISK_IMAGE( "pingu", 0, SHA1(9163fb1d4dd96ef4417cad458f2270bf7bd58f01) )
+ROM_END
+
+
+GAME( 2005, alien,  0,      alien, alien, alien_state, 0, ROT0, "Capcom", "Alien: The Arcade Medal Edition", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, pingu,  0,      alien, alien, alien_state, 0, ROT0, "Pygos Group / Capcom", "Pingu's Ice Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

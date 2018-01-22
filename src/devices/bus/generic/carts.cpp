@@ -7,7 +7,11 @@
  **********************************************************************/
 
 
+#include "emu.h"
 #include "carts.h"
+#include "rom.h"
+#include "ram.h"
+
 
 SLOT_INTERFACE_START(generic_plain_slot)
 	SLOT_INTERFACE_INTERNAL("rom", GENERIC_ROM_PLAIN)

@@ -15,8 +15,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/crbaloon.h"
+
+#include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 /*************************************
@@ -60,7 +62,7 @@ WRITE8_MEMBER(crbaloon_state::pc3092_w)
 {
 	m_pc3092_data[offset] = data & 0x0f;
 
-	if (LOG_PC3092) logerror("%04X:  write PC3092 #%d = 0x%02x\n", space.device().safe_pc(), offset, m_pc3092_data[offset]);
+	if (LOG_PC3092) logerror("%04X:  write PC3092 #%d = 0x%02x\n", m_maincpu->pc(), offset, m_pc3092_data[offset]);
 
 	pc3092_update();
 }
@@ -140,7 +142,7 @@ READ8_MEMBER(crbaloon_state::pc3259_r)
 		break;
 	}
 
-	if (LOG_PC3259) logerror("%04X:  read PC3259 #%d = 0x%02x\n", space.device().safe_pc(), reg, ret);
+	if (LOG_PC3259) logerror("%04X:  read PC3259 #%d = 0x%02x\n", m_maincpu->pc(), reg, ret);
 
 	return ret | (ioport("DSW1")->read() & 0xf0);
 }
@@ -357,7 +359,7 @@ INTERRUPT_GEN_MEMBER(crbaloon_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( crbaloon, crbaloon_state )
+MACHINE_CONFIG_START(crbaloon_state::crbaloon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CRBALOON_MASTER_XTAL / 3)
@@ -434,5 +436,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, crbaloon, 0,        crbaloon, crbaloon, driver_device, 0, ROT90, "Taito Corporation", "Crazy Balloon (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, crbaloon2,crbaloon, crbaloon, crbaloon, driver_device, 0, ROT90, "Taito Corporation", "Crazy Balloon (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, crbaloon, 0,        crbaloon, crbaloon, crbaloon_state, 0, ROT90, "Taito Corporation", "Crazy Balloon (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, crbaloon2,crbaloon, crbaloon, crbaloon, crbaloon_state, 0, ROT90, "Taito Corporation", "Crazy Balloon (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

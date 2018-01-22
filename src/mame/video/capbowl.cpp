@@ -71,7 +71,7 @@ WRITE8_MEMBER(capbowl_state::bowlrama_blitter_w)
 			break;
 
 		default:
-			logerror("PC=%04X Write to unsupported blitter address %02X Data=%02X\n", space.device().safe_pc(), offset, data);
+			logerror("PC=%04X Write to unsupported blitter address %02X Data=%02X\n", m_maincpu->pc(), offset, data);
 			break;
 	}
 }
@@ -102,7 +102,7 @@ READ8_MEMBER(capbowl_state::bowlrama_blitter_r)
 			break;
 
 		default:
-			logerror("PC=%04X Read from unsupported blitter address %02X\n", space.device().safe_pc(), offset);
+			logerror("PC=%04X Read from unsupported blitter address %02X\n", m_maincpu->pc(), offset);
 			break;
 	}
 
@@ -117,7 +117,7 @@ READ8_MEMBER(capbowl_state::bowlrama_blitter_r)
  *
  *************************************/
 
-inline rgb_t capbowl_state::pen_for_pixel( uint8_t *src, uint8_t pix )
+inline rgb_t capbowl_state::pen_for_pixel( uint8_t const *src, uint8_t pix )
 {
 	return rgb_t(pal4bit(src[(pix << 1) + 0] >> 0),
 					pal4bit(src[(pix << 1) + 1] >> 4),
@@ -131,7 +131,7 @@ uint32_t capbowl_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	m_tms34061->get_display_state();
 
 	/* if we're blanked, just fill with black */
-	if (m_tms34061->m_display.blanked)
+	if (m_tms34061->blanked())
 	{
 		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
@@ -140,7 +140,7 @@ uint32_t capbowl_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	/* now regenerate the bitmap */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		uint8_t *src = &m_tms34061->m_display.vram[256 * y];
+		uint8_t const *src = &m_tms34061->vram(y);
 		uint32_t *dest = &bitmap.pix32(y);
 
 		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)

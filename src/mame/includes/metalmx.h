@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Philip Bennett
+#include "audio/cage.h"
+
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
@@ -54,4 +56,5 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_metalmx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void metalmx(machine_config &config);
 };

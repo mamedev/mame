@@ -21,6 +21,8 @@
 // Typedefs for dynamically loaded functions
 typedef HRESULT (WINAPI *d3dx_create_effect_from_file_fn)(LPDIRECT3DDEVICE9, LPCTSTR, const D3DXMACRO *, LPD3DXINCLUDE, DWORD, LPD3DXEFFECTPOOL, LPD3DXEFFECT *, LPD3DXBUFFER *);
 
+struct slider_state;
+
 class effect;
 class shaders;
 
@@ -309,7 +311,7 @@ public:
 
 	// slider-related functions
 	virtual int32_t slider_changed(running_machine &machine, void *arg, int /*id*/, std::string *str, int32_t newval) override;
-	slider_state* slider_alloc(running_machine &machine, int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg);
+	std::unique_ptr<slider_state> slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg);
 	void init_slider_list();
 	std::vector<ui::menu_item> get_slider_list() { return m_sliders; }
 	void *get_slider_option(int id, int index = 0);
@@ -319,7 +321,8 @@ private:
 	void                    enumerate_screens();
 
 	void                    render_snapshot(IDirect3DSurface9 *surface);
-
+	// Time since last call, only updates once per render of all screens
+	double                  delta_time() { return delta_t; }
 	d3d_render_target*      find_render_target(int source_width, int source_height, uint32_t screen_index);
 
 	rgb_t                   apply_color_convolution(rgb_t color);
@@ -349,6 +352,8 @@ private:
 	bool                    oversampling_enable;        // oversampling enable flag
 	int                     num_screens;                // number of emulated physical screens
 	int                     curr_screen;                // current screen for render target operations
+	double                  acc_t;                      // accumulated machine time
+	double                  delta_t;                    // data for delta_time
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
 	hlsl_options *          options;                    // current options
@@ -393,6 +398,7 @@ private:
 
 	std::vector<slider*>    internal_sliders;
 	std::vector<ui::menu_item> m_sliders;
+	std::vector<std::unique_ptr<slider_state>> m_core_sliders;
 
 	static slider_desc      s_sliders[];
 	static hlsl_options     last_options;               // last used options

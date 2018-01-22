@@ -88,7 +88,6 @@
 	<element name="text_d3"><text string="HIT"><color red="0.94" green="0.94" blue="0.74" /></text></element>
 
 
-
 <!-- build screen -->
 
 	<view name="Internal Layout">
@@ -132,7 +131,7 @@
 		<bezel element="button1">
 			<bounds x="3" y="9" width="10" height="12" />
 		</bezel>
-		<bezel name="lamp0" element="mask1">
+		<bezel name="0.0" element="mask1">
 			<bounds x="3" y="9" width="10" height="12" />
 			<color alpha="0.4" />
 		</bezel>
@@ -150,7 +149,7 @@
 		<bezel element="button2">
 			<bounds x="16" y="9" width="10" height="12" />
 		</bezel>
-		<bezel name="lamp1" element="mask1">
+		<bezel name="0.1" element="mask1">
 			<bounds x="16" y="9" width="10" height="12" />
 			<color alpha="0.4" />
 		</bezel>
@@ -168,7 +167,7 @@
 		<bezel element="button3">
 			<bounds x="29" y="9" width="10" height="12" />
 		</bezel>
-		<bezel name="lamp2" element="mask1">
+		<bezel name="0.2" element="mask1">
 			<bounds x="29" y="9" width="10" height="12" />
 			<color alpha="0.4" />
 		</bezel>
@@ -188,7 +187,7 @@
 		<bezel element="button8">
 			<bounds x="3" y="24" width="10" height="12" />
 		</bezel>
-		<bezel name="lamp7" element="mask1">
+		<bezel name="0.7" element="mask1">
 			<bounds x="3" y="24" width="10" height="12" />
 			<color alpha="0.4" />
 		</bezel>
@@ -206,7 +205,7 @@
 		<bezel element="button9">
 			<bounds x="16" y="24" width="10" height="12" />
 		</bezel>
-		<bezel name="lamp8" element="mask1">
+		<bezel name="0.8" element="mask1">
 			<bounds x="16" y="24" width="10" height="12" />
 			<color alpha="0.4" />
 		</bezel>
@@ -224,7 +223,7 @@
 		<bezel element="button4">
 			<bounds x="29" y="24" width="10" height="12" />
 		</bezel>
-		<bezel name="lamp3" element="mask1">
+		<bezel name="0.3" element="mask1">
 			<bounds x="29" y="24" width="10" height="12" />
 			<color alpha="0.4" />
 		</bezel>
@@ -244,7 +243,7 @@
 		<bezel element="button7">
 			<bounds x="3" y="39" width="10" height="12" />
 		</bezel>
-		<bezel name="lamp6" element="mask1">
+		<bezel name="0.6" element="mask1">
 			<bounds x="3" y="39" width="10" height="12" />
 			<color alpha="0.4" />
 		</bezel>
@@ -262,7 +261,7 @@
 		<bezel element="button6">
 			<bounds x="16" y="39" width="10" height="12" />
 		</bezel>
-		<bezel name="lamp5" element="mask1">
+		<bezel name="0.5" element="mask1">
 			<bounds x="16" y="39" width="10" height="12" />
 			<color alpha="0.4" />
 		</bezel>
@@ -280,7 +279,7 @@
 		<bezel element="button5">
 			<bounds x="29" y="39" width="10" height="12" />
 		</bezel>
-		<bezel name="lamp4" element="mask1">
+		<bezel name="0.4" element="mask1">
 			<bounds x="29" y="39" width="10" height="12" />
 			<color alpha="0.4" />
 		</bezel>
@@ -308,7 +307,6 @@
 		<bezel element="text_7"><bounds x="3" y="51.4" width="9" height="2" /></bezel>
 		<bezel element="text_6"><bounds x="16" y="51.4" width="9" height="2" /></bezel>
 		<bezel element="text_5"><bounds x="29" y="51.4" width="9" height="2" /></bezel>
-
 
 	</view>
 </mamelayout>

@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/alpha8201.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 
 
@@ -47,9 +48,9 @@ public:
 	uint8_t m_palette_bank;
 
 	// handlers
-	DECLARE_WRITE8_MEMBER(irq_enable_w);
-	DECLARE_WRITE8_MEMBER(mcu_switch_w);
-	DECLARE_WRITE8_MEMBER(mcu_start_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(mcu_switch_w);
+	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);
 	DECLARE_READ8_MEMBER(champbja_protection_r);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(watchdog_bit2);
@@ -58,9 +59,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_sound_irq);
 
 	DECLARE_WRITE8_MEMBER(tilemap_w);
-	DECLARE_WRITE8_MEMBER(gfxbank_w);
-	DECLARE_WRITE8_MEMBER(palette_bank_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(gfxbank_w);
+	DECLARE_WRITE_LINE_MEMBER(palette_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 
 	DECLARE_DRIVER_INIT(exctsccr);
 	DECLARE_DRIVER_INIT(champbas);
@@ -79,4 +80,13 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void champbas(machine_config &config);
+	void champbb2(machine_config &config);
+	void exctsccr(machine_config &config);
+	void talbot(machine_config &config);
+	void tbasebal(machine_config &config);
+	void champbasjb(machine_config &config);
+	void champbasj(machine_config &config);
+	void exctsccrb(machine_config &config);
+	void champbasja(machine_config &config);
 };

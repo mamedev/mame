@@ -192,8 +192,12 @@ static floperr_t dsk_get_indexed_sector_info(floppy_image_legacy *floppy, int he
 	if (sector_length) {
 		*sector_length = 1 << (sector_info[pos + 3] + 7);
 	}
-	if (flags)
-		*flags = (sector_info[pos + 5] & 0x40) ? ID_FLAG_DELETED_DATA : 0;
+	if (flags) {
+		*flags = 0;
+		if (sector_info[pos + 4] & 0x20) *flags |= ID_FLAG_CRC_ERROR_IN_ID_FIELD;
+		if (sector_info[pos + 5] & 0x20) *flags |= ID_FLAG_CRC_ERROR_IN_DATA_FIELD;
+		if (sector_info[pos + 5] & 0x40) *flags |= ID_FLAG_DELETED_DATA;
+	}
 	return retVal;
 }
 
@@ -394,6 +398,11 @@ bool dsk_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				continue;
 			track_header tr;
 			io_generic_read(io, &tr,track_offsets[(track<<1)+side],sizeof(tr));
+
+			// skip if there are no sectors in this track
+			if (tr.number_of_sector == 0)
+				continue;
+
 			desc_pc_sector sects[256];
 			uint8_t sect_data[65536];
 			int sdatapos = 0;

@@ -52,11 +52,14 @@
 *************************************************************************************************************/
 
 #include "emu.h"
+#include "includes/neogeo.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/ymz280b.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
-#include "includes/neogeo.h"
+#include "speaker.h"
+
 
 class midas_state : public driver_device
 {
@@ -69,8 +72,10 @@ public:
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
 		m_screen(*this, "screen"),
+		m_prize(*this, "prize%u", 1),
+		m_ticket(*this, "ticket"),
 		m_zoomram(*this, "zoomtable")
-		{ }
+	{ }
 
 	DECLARE_READ16_MEMBER(ret_ffff);
 	DECLARE_WRITE16_MEMBER(midas_gfxregs_w);
@@ -93,10 +98,14 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<neosprite_midas_device> m_sprgen;
 	required_device<screen_device> m_screen;
+	optional_device_array<ticket_dispenser_device, 2> m_prize;
+	optional_device<ticket_dispenser_device> m_ticket;
 	required_shared_ptr<uint16_t> m_zoomram;
 
-	void screen_eof_midas(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_midas);
 
+	void hammer(machine_config &config);
+	void livequiz(machine_config &config);
 };
 
 
@@ -200,7 +209,7 @@ static ADDRESS_MAP_START( livequiz_map, AS_PROGRAM, 16, midas_state )
 	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w )
 	AM_RANGE(0x9c000c, 0x9c000d) AM_WRITENOP    // IRQ Ack, temporary
 
-	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READ(ret_ffff )
@@ -234,8 +243,8 @@ WRITE16_MEMBER(midas_state::hammer_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
-		machine().bookkeeping().coin_counter_w(1, data & 0x0002);
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 	}
 #ifdef MAME_DEBUG
 //  popmessage("coin %04X", data);
@@ -246,9 +255,9 @@ WRITE16_MEMBER(midas_state::hammer_motor_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().device<ticket_dispenser_device>("prize1")->write(space, 0, (data & 0x0001) << 7);
-		machine().device<ticket_dispenser_device>("prize2")->write(space, 0, (data & 0x0002) << 6);
-		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x0010) << 3);
+		m_prize[0]->motor_w(BIT(data, 0));
+		m_prize[1]->motor_w(BIT(data, 1));
+		m_ticket->motor_w(BIT(data, 4));
 		// data & 0x0080 ?
 	}
 #ifdef MAME_DEBUG
@@ -271,7 +280,7 @@ static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16, midas_state )
 	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w )
 	AM_RANGE(0x9c000c, 0x9c000d) AM_WRITENOP    // IRQ Ack, temporary
 
-	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READ(ret_ffff )
@@ -608,14 +617,14 @@ void midas_state::machine_reset()
 {
 }
 
-void midas_state::screen_eof_midas(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(midas_state::screen_vblank_midas)
 {
 	if (state) m_sprgen->buffer_vram();
 }
 
 
 
-static MACHINE_CONFIG_START( livequiz, midas_state )
+MACHINE_CONFIG_START(midas_state::livequiz)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
@@ -628,7 +637,7 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
-	MCFG_SCREEN_VBLANK_DRIVER(midas_state, screen_eof_midas)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(midas_state, screen_vblank_midas))
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
@@ -643,7 +652,7 @@ static MACHINE_CONFIG_START( livequiz, midas_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hammer, midas_state )
+MACHINE_CONFIG_START(midas_state::hammer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
@@ -660,7 +669,7 @@ static MACHINE_CONFIG_START( hammer, midas_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
-	MCFG_SCREEN_VBLANK_DRIVER(midas_state, screen_eof_midas)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(midas_state, screen_vblank_midas))
 
 	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
 
@@ -885,4 +894,4 @@ ROM_START( hammer )
 ROM_END
 
 GAME( 1999, livequiz, 0, livequiz, livequiz, midas_state, livequiz, ROT0, "Andamiro", "Live Quiz Show", 0 )
-GAME( 2000, hammer,   0, hammer,   hammer, driver_device,   0,        ROT0, "Andamiro", "Hammer",         0 )
+GAME( 2000, hammer,   0, hammer,   hammer,   midas_state, 0,        ROT0, "Andamiro", "Hammer",         0 )

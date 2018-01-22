@@ -23,7 +23,16 @@
 
 TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha_tile_info)
 {
-	uint16_t data = tilemap.basemem_read(tile_index);
+	uint16_t data = m_alpha_tilemap->basemem_read(tile_index);
+	int code = data & 0xfff;
+	int color = (data >> 12) & 0x07;
+	SET_TILE_INFO_MEMBER(2, code, color, (data >> 15) & 1);
+}
+
+
+TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha2_tile_info)
+{
+	uint16_t data = m_alpha2_tilemap->basemem_read(tile_index);
 	int code = data & 0xfff;
 	int color = (data >> 12) & 0x07;
 	SET_TILE_INFO_MEMBER(2, code, color, (data >> 15) & 1);
@@ -32,11 +41,21 @@ TILE_GET_INFO_MEMBER(cyberbal_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield_tile_info)
 {
-	uint16_t data = tilemap.basemem_read(tile_index);
+	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = data & 0x1fff;
 	int color = (data >> 11) & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
 }
+
+
+TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield2_tile_info)
+{
+	uint16_t data = m_playfield2_tilemap->basemem_read(tile_index);
+	int code = data & 0x1fff;
+	int color = (data >> 11) & 0x0f;
+	SET_TILE_INFO_MEMBER(0, code, color, (data >> 15) & 1);
+}
+
 
 
 

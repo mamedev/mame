@@ -21,9 +21,10 @@
 
 
 #include "emu.h"
-#include "machine/watchdog.h"
-#include "video/atarirle.h"
 #include "includes/atarig1.h"
+#include "machine/eeprompar.h"
+#include "machine/watchdog.h"
+#include "speaker.h"
 
 
 
@@ -195,7 +196,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0x040000, 0x077fff) AM_ROM
 	AM_RANGE(0x078000, 0x07ffff) AM_ROM /* hydra slapstic goes here */
 	AM_RANGE(0xf80000, 0xf80001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0xf88000, 0xf8ffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
+	AM_RANGE(0xf88000, 0xf8ffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0xf90000, 0xf90001) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0xff00)
 	AM_RANGE(0xf98000, 0xf98001) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
 	AM_RANGE(0xfa0000, 0xfa0001) AM_DEVWRITE8("rle", atari_rle_objects_device, control_write, 0x00ff)
@@ -203,13 +204,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(special_port0_r)
 	AM_RANGE(0xfc8000, 0xfc8007) AM_READWRITE(a2d_data_r, a2d_select_w)
 	AM_RANGE(0xfd0000, 0xfd0001) AM_DEVREAD8("jsa", atari_jsa_ii_device, main_response_r, 0xff00)
-	AM_RANGE(0xfd8000, 0xfdffff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0x00ff)
+	AM_RANGE(0xfd8000, 0xfdffff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 /*  AM_RANGE(0xfe0000, 0xfe7fff) AM_READ(from_r)*/
-	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xfe8000, 0xfe89ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xff0fff) AM_RAM AM_SHARE("rle")
 	AM_RANGE(0xff2000, 0xff2001) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
-	AM_RANGE(0xff4000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
-	AM_RANGE(0xff6000, 0xff6fff) AM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
+	AM_RANGE(0xff4000, 0xff5fff) AM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
+	AM_RANGE(0xff6000, 0xff6fff) AM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -423,7 +424,7 @@ static const atari_rle_objects_config modesc_pitfight =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarig1, atarig1_state )
+MACHINE_CONFIG_START(atarig1_state::atarig1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
@@ -433,7 +434,8 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 	MCFG_MACHINE_START_OVERRIDE(atarig1_state,atarig1)
 	MCFG_MACHINE_RESET_OVERRIDE(atarig1_state,atarig1)
 
-	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -464,42 +466,42 @@ static MACHINE_CONFIG_START( atarig1, atarig1_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hydra, atarig1 )
+MACHINE_CONFIG_DERIVED(atarig1_state::hydra, atarig1)
 	MCFG_ATARIRLE_ADD("rle", modesc_hydra)
 	MCFG_SLAPSTIC_ADD("slapstic", 116)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hydrap, hydra )
+MACHINE_CONFIG_DERIVED(atarig1_state::hydrap, hydra)
 	MCFG_DEVICE_REMOVE("slapstic")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pitfight9, atarig1 )
+MACHINE_CONFIG_DERIVED(atarig1_state::pitfight9, atarig1)
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 114)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pitfight7, atarig1 )
+MACHINE_CONFIG_DERIVED(atarig1_state::pitfight7, atarig1)
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 112)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pitfight, atarig1 )
+MACHINE_CONFIG_DERIVED(atarig1_state::pitfight, atarig1)
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 111)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pitfightj, atarig1 )
+MACHINE_CONFIG_DERIVED(atarig1_state::pitfightj, atarig1)
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 	MCFG_SLAPSTIC_ADD("slapstic", 113)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pitfightb, atarig1 )
+MACHINE_CONFIG_DERIVED(atarig1_state::pitfightb, atarig1)
 	MCFG_ATARIRLE_ADD("rle", modesc_pitfight)
 MACHINE_CONFIG_END
 
@@ -1315,9 +1317,9 @@ DRIVER_INIT_MEMBER(atarig1_state,pitfightb)
  *
  *************************************/
 
-GAME( 1990, hydra,    0,        hydra,  hydra, atarig1_state,    hydra,    ROT0, "Atari Games", "Hydra", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hydrap,   hydra,    hydrap, hydra, atarig1_state,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/14/90)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, hydrap2,  hydra,    hydrap, hydra, atarig1_state,    hydrap,   ROT0, "Atari Games", "Hydra (prototype 5/25/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydra,     0,        hydra,     hydra,     atarig1_state, hydra,     ROT0, "Atari Games", "Hydra", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydrap,    hydra,    hydrap,    hydra,     atarig1_state, hydrap,    ROT0, "Atari Games", "Hydra (prototype 5/14/90)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hydrap2,   hydra,    hydrap,    hydra,     atarig1_state, hydrap,    ROT0, "Atari Games", "Hydra (prototype 5/25/90)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, pitfight,  0,        pitfight9, pitfight,  atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 9)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, pitfight7, pitfight, pitfight7, pitfight,  atarig1_state, pitfight,  ROT0, "Atari Games", "Pit Fighter (rev 7)", MACHINE_SUPPORTS_SAVE )

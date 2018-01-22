@@ -113,10 +113,12 @@ Notes (couriersud)
 
 ***************************************************************************/
 #include "emu.h"
+#include "includes/m10.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
 #include "sound/samples.h"
-#include "includes/m10.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -129,18 +131,18 @@ Notes (couriersud)
 
 #define LOG(x) do { if (M10_DEBUG) printf x; } while (0)
 
-WRITE8_MEMBER(m10_state::ic8j1_output_changed)
+WRITE_LINE_MEMBER(m10_state::ic8j1_output_changed)
 {
-	LOG(("ic8j1: %d %d\n", data, m_screen->vpos()));
-	m_maincpu->set_input_line(0, !data ? CLEAR_LINE : ASSERT_LINE);
+	LOG(("ic8j1: %d %d\n", state, m_screen->vpos()));
+	m_maincpu->set_input_line(0, !state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_MEMBER(m10_state::ic8j2_output_changed)
+WRITE_LINE_MEMBER(m10_state::ic8j2_output_changed)
 {
 	/* written from /Q to A with slight delight */
-	LOG(("ic8j2: %d\n", data));
-	m_ic8j2->a_w(space, 0, data);
-	m_ic8j1->a_w(space, 0, data);
+	LOG(("ic8j2: %d\n", state));
+	m_ic8j2->a_w(state);
+	m_ic8j1->a_w(state);
 }
 
 /*************************************
@@ -168,6 +170,8 @@ PALETTE_INIT_MEMBER(m10_state,m10)
 
 MACHINE_START_MEMBER(m10_state,m10)
 {
+	m_interrupt_timer = timer_alloc(TIMER_INTERRUPT);
+
 	save_item(NAME(m_bottomline));
 	save_item(NAME(m_flip));
 	save_item(NAME(m_last));
@@ -440,8 +444,8 @@ READ8_MEMBER(m10_state::m10_a700_r)
 {
 	//LOG(("rd:%d\n",m_screen->vpos()));
 	LOG(("clear\n"));
-	m_ic8j1->clear_w(space, 0, 0);
-	m_ic8j1->clear_w(space, 0, 1);
+	m_ic8j1->clear_w(0);
+	m_ic8j1->clear_w(1);
 	return 0x00;
 }
 
@@ -450,8 +454,8 @@ READ8_MEMBER(m10_state::m11_a700_r)
 	//LOG(("rd:%d\n",m_screen->vpos()));
 	//m_maincpu->set_input_line(0, CLEAR_LINE);
 	LOG(("clear\n"));
-	m_ic8j1->clear_w(space, 0, 0);
-	m_ic8j1->clear_w(space, 0, 1);
+	m_ic8j1->clear_w(0);
+	m_ic8j1->clear_w(1);
 	return 0x00;
 }
 
@@ -473,12 +477,12 @@ TIMER_CALLBACK_MEMBER(m10_state::interrupt_callback)
 	if (param == 0)
 	{
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-		timer_set(m_screen->time_until_pos(IREMM10_VBSTART + 16), TIMER_INTERRUPT, 1);
+		m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBSTART + 16), 1);
 	}
 	if (param == 1)
 	{
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-		timer_set(m_screen->time_until_pos(IREMM10_VBSTART + 24), TIMER_INTERRUPT, 2);
+		m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBSTART + 24), 2);
 	}
 	if (param == -1)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -500,7 +504,7 @@ void m10_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 INTERRUPT_GEN_MEMBER(m10_state::m11_interrupt)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	//timer_set(m_screen->time_until_pos(IREMM10_VBEND), TIMER_INTERRUPT, -1);
+	//m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBEND), -1);
 }
 
 INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
@@ -512,7 +516,7 @@ INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
 INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
-	timer_set(m_screen->time_until_pos(IREMM10_VBSTART + 1, 80), TIMER_INTERRUPT, -1);
+	m_interrupt_timer->adjust(m_screen->time_until_pos(IREMM10_VBSTART + 1, 80), -1);
 }
 
 /*************************************
@@ -805,7 +809,7 @@ static const char *const m10_sample_names[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( m10, m10_state )
+MACHINE_CONFIG_START(m10_state::m10)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,IREMM10_CPU_CLOCK)
@@ -837,7 +841,7 @@ static MACHINE_CONFIG_START( m10, m10_state )
 	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(m10_state, ic8j1_output_changed))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(m10_state, ic8j1_output_changed))
 	MCFG_DEVICE_ADD("ic8j2", TTL74123, 0)
 	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_NOT_GROUNDED_DIODE)    /* the hook up type */
 	/* 10k + 20k variable resistor */
@@ -846,7 +850,7 @@ static MACHINE_CONFIG_START( m10, m10_state )
 	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
 	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
 	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITE8(m10_state, ic8j2_output_changed))
+	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(m10_state, ic8j2_output_changed))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -858,7 +862,7 @@ static MACHINE_CONFIG_START( m10, m10_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( m11, m10 )
+MACHINE_CONFIG_DERIVED(m10_state::m11, m10)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -868,7 +872,7 @@ static MACHINE_CONFIG_DERIVED( m11, m10 )
 	/* sound hardware */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( m15, m10_state )
+MACHINE_CONFIG_START(m10_state::m15)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,IREMM15_CPU_CLOCK)
@@ -902,7 +906,7 @@ static MACHINE_CONFIG_START( m15, m10_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( headoni, m15 )
+MACHINE_CONFIG_DERIVED(m10_state::headoni, m15)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(11730000/16)
 MACHINE_CONFIG_END
@@ -1041,10 +1045,10 @@ ROM_START( greenber )
 	ROM_LOAD( "gb9", 0x3000, 0x0400, CRC(c27b9ba3) SHA1(a2f4f0c4b61eb03bba13ae5d25dc01009a4f86ee) ) // ok ?
 ROM_END
 
-GAME( 1979, andromed,  0,        m11,     skychut, m10_state,  andromed, ROT270, "IPM",  "Andromeda (Japan?)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad,  0,        m10,     ipminvad, driver_device, 0,        ROT270, "IPM",  "IPM Invader", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, andromed,  0,        m11,     skychut,  m10_state, andromed, ROT270, "IPM",  "Andromeda (Japan?)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad,  0,        m10,     ipminvad, m10_state, 0,        ROT270, "IPM",  "IPM Invader",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, ipminvad1, ipminvad, m10,     ipminvad, m10_state, ipminva1, ROT270, "IPM",  "IPM Invader (Incomplete Dump)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, skychut,   0,        m11,     skychut, driver_device,  0,        ROT270, "Irem", "Sky Chuter", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacbeam,  0,        m15,     spacbeam, driver_device, 0,        ROT270, "Irem", "Space Beam", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
-GAME( 1979, headoni,   0,        headoni, headoni, driver_device,  0,        ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, greenber,  0,        m15,     spacbeam, driver_device, 0,        ROT270, "Irem", "Green Beret (Irem)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, skychut,   0,        m11,     skychut,  m10_state, 0,        ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacbeam,  0,        m15,     spacbeam, m10_state, 0,        ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
+GAME( 1979, headoni,   0,        headoni, headoni,  m10_state, 0,        ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, greenber,  0,        m15,     spacbeam, m10_state, 0,        ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -127,16 +127,19 @@
 
 ==================================================================================*/
 
-#define MASTER_CLOCK    XTAL_14MHz
-#define CPU_CLOCK      (MASTER_CLOCK/4)
-#define SND_CLOCK      (MASTER_CLOCK/8)
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_14MHz
+#define CPU_CLOCK      (MASTER_CLOCK/4)
+#define SND_CLOCK      (MASTER_CLOCK/8)
 
 
 class coinmstr_state : public driver_device
@@ -172,6 +175,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void coinmstr(machine_config &config);
+	void pokeroul(machine_config &config);
+	void supnudg2(machine_config &config);
+	void jpcoin(machine_config &config);
+	void quizmstr(machine_config &config);
+	void trailblz(machine_config &config);
 };
 
 
@@ -1231,7 +1240,7 @@ uint32_t coinmstr_state::screen_update_coinmstr(screen_device &screen, bitmap_in
 }
 
 
-static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
+MACHINE_CONFIG_START(coinmstr_state::coinmstr)
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 7 MHz.
 	MCFG_CPU_PROGRAM_MAP(coinmstr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", coinmstr_state,  irq0_line_hold)
@@ -1272,27 +1281,27 @@ static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizmstr, coinmstr )
+MACHINE_CONFIG_DERIVED(coinmstr_state::quizmstr, coinmstr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(quizmstr_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( trailblz, coinmstr )
+MACHINE_CONFIG_DERIVED(coinmstr_state::trailblz, coinmstr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(trailblz_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( supnudg2, coinmstr )
+MACHINE_CONFIG_DERIVED(coinmstr_state::supnudg2, coinmstr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(supnudg2_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pokeroul, coinmstr )
+MACHINE_CONFIG_DERIVED(coinmstr_state::pokeroul, coinmstr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(pokeroul_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jpcoin, coinmstr )
+MACHINE_CONFIG_DERIVED(coinmstr_state::jpcoin, coinmstr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jpcoin_map)
 	MCFG_CPU_IO_MAP(jpcoin_io_map)
@@ -1537,8 +1546,8 @@ DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 
 	for(i = 0; i < length; i++)
 	{
-		int adr = BITSWAP24(i, 23,22,21,20,19,18,17,16,15, 14,8,7,2,5,12,10,9,11,13,3,6,0,1,4);
-		rom[i] = BITSWAP8(buf[adr],3,2,4,1,5,0,6,7);
+		int adr = bitswap<24>(i, 23,22,21,20,19,18,17,16,15, 14,8,7,2,5,12,10,9,11,13,3,6,0,1,4);
+		rom[i] = bitswap<8>(buf[adr],3,2,4,1,5,0,6,7);
 	}
 }
 
@@ -1547,10 +1556,10 @@ DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT    COMPANY                  FULLNAME                                   FLAGS   */
+//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT      ROT   COMPANY                  FULLNAME                                    FLAGS
 GAME( 1985, quizmstr, 0,        quizmstr, quizmstr, coinmstr_state, coinmstr, ROT0, "Loewen Spielautomaten", "Quizmaster (German)",                      MACHINE_UNEMULATED_PROTECTION )
 GAME( 1987, trailblz, 0,        trailblz, trailblz, coinmstr_state, coinmstr, ROT0, "Coinmaster",            "Trail Blazer",                             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // or Trail Blazer 2 ?
 GAME( 1989, supnudg2, 0,        supnudg2, supnudg2, coinmstr_state, coinmstr, ROT0, "Coinmaster",            "Super Nudger II - P173 (Version 5.21)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1990, pokeroul, 0,        pokeroul, pokeroul, driver_device,  0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",            MACHINE_NOT_WORKING )
-GAME( 1985, jpcoin,   0,        jpcoin,   jpcoin,   driver_device,  0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster set 1)", 0 )
-GAME( 1990, jpcoin2,  0,        jpcoin,   jpcoin,   driver_device,  0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster, Amusement Only)", 0 )
+GAME( 1990, pokeroul, 0,        pokeroul, pokeroul, coinmstr_state, 0,        ROT0, "Coinmaster",            "Poker Roulette (Version 8.22)",            MACHINE_NOT_WORKING )
+GAME( 1985, jpcoin,   0,        jpcoin,   jpcoin,   coinmstr_state, 0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster set 1)",           0 )
+GAME( 1990, jpcoin2,  0,        jpcoin,   jpcoin,   coinmstr_state, 0,        ROT0, "Coinmaster",            "Joker Poker (Coinmaster, Amusement Only)", 0 )

@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VIDBRAIN_MONEY_MINDER_H
+#define MAME_BUS_VIDBRAIN_MONEY_MINDER_H
+
 #pragma once
 
-#ifndef __VIDEOBRAIN_MONEY_MINDER_CARTRIDGE__
-#define __VIDEOBRAIN_MONEY_MINDER_CARTRIDGE__
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -40,7 +39,6 @@ protected:
 
 
 // device type definition
-extern const device_type VB_MONEY_MINDER;
+DECLARE_DEVICE_TYPE(VB_MONEY_MINDER, videobrain_money_minder_cartridge_device)
 
-
-#endif
+#endif // MAME_BUS_VIDBRAIN_MONEY_MINDER_H

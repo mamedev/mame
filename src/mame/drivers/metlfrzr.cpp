@@ -21,9 +21,13 @@
 **************************************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-
 #include "audio/t5182.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/timer.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class metlfrzr_state : public driver_device
 {
@@ -37,7 +41,7 @@ public:
 		m_video_regs(*this, "vregs"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode")
-		{ }
+	{ }
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -59,6 +63,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	uint8_t m_fg_tilebank;
 	bool m_rowscroll_enable;
+	void metlfrzr(machine_config &config);
 };
 
 
@@ -199,7 +204,7 @@ static ADDRESS_MAP_START( metlfrzr_map, AS_PROGRAM, 8, metlfrzr_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("wram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, metlfrzr_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, metlfrzr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("wram") // executes code at 0xf5d5
@@ -353,7 +358,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0x08); /* RST 08h */
 }
 
-static MACHINE_CONFIG_START(metlfrzr, metlfrzr_state)
+MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
@@ -445,14 +450,14 @@ DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
 			m_decrypted_opcodes[A] ^= 0x02;
 
 		if (BIT(A,9) || !BIT(A,5) || BIT(A,3))
-			m_decrypted_opcodes[A] = BITSWAP8(m_decrypted_opcodes[A],7,6,1,4,3,2,5,0);
+			m_decrypted_opcodes[A] = bitswap<8>(m_decrypted_opcodes[A],7,6,1,4,3,2,5,0);
 
 		/* decode the data */
 		if (BIT(A,5))
 			rom[A] ^= 0x40;
 
 		if (BIT(A,9) || !BIT(A,5))
-			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
+			rom[A] = bitswap<8>(rom[A],7,6,1,4,3,2,5,0);
 	}
 }
 

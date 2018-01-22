@@ -6,17 +6,21 @@
  *
  ****************************************************************************/
 
-#ifndef __SPECTRUM_H__
-#define __SPECTRUM_H__
+#ifndef MAME_INCLUDES_SPECTRUM_H
+#define MAME_INCLUDES_SPECTRUM_H
 
-#include "machine/upd765.h"
-#include "sound/speaker.h"
-#include "machine/ram.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#pragma once
+
 #include "machine/spec_snqk.h"
+
+#include "bus/spectrum/exp.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "sound/spkrdev.h"
 
 /* Spectrum crystals */
 
@@ -42,7 +46,7 @@
 #define SPEC_LEFT_BORDER_CYCLES   24   /* Cycles to display left hand border */
 #define SPEC_DISPLAY_XSIZE_CYCLES 128  /* Horizontal screen resolution */
 #define SPEC_RIGHT_BORDER_CYCLES  24   /* Cycles to display right hand border */
-#define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizonal retrace */
+#define SPEC_RETRACE_CYCLES       48   /* Cycles taken for horizontal retrace */
 #define SPEC_CYCLES_PER_LINE      224  /* Number of cycles to display a single line */
 
 struct EVENT_LIST_ITEM
@@ -66,7 +70,7 @@ public:
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
 		m_speaker(*this, "speaker"),
-		m_cart(*this, "cartslot"),
+		m_exp(*this, "exp"),
 		m_dock(*this, "dockslot"),
 		m_upd765(*this, "upd765"),
 		m_upd765_0(*this, "upd765:0"),
@@ -81,15 +85,13 @@ public:
 		m_io_line7(*this, "LINE7"),
 		m_io_nmi(*this, "NMI"),
 		m_io_config(*this, "CONFIG"),
-		m_io_joy_intf(*this, "JOY_INTF"),
-		m_io_kempston(*this, "KEMPSTON"),
-		m_io_fuller(*this, "FULLER"),
-		m_io_mikrogen(*this, "MIKROGEN"),
 		m_io_plus0(*this, "PLUS0"),
 		m_io_plus1(*this, "PLUS1"),
 		m_io_plus2(*this, "PLUS2"),
 		m_io_plus3(*this, "PLUS3"),
-		m_io_plus4(*this, "PLUS4") { }
+		m_io_plus4(*this, "PLUS4"),
+		m_io_joy1(*this, "JOY1"),
+		m_io_joy2(*this, "JOY2") { }
 
 	int m_port_fe_data;
 	int m_port_7ffd_data;
@@ -118,16 +120,19 @@ public:
 
 	uint8_t *m_ram_0000;
 	uint8_t m_ram_disabled_by_beta;
+	DECLARE_WRITE8_MEMBER(spectrum_rom_w);
+	DECLARE_READ8_MEMBER(spectrum_rom_r);
 	DECLARE_WRITE8_MEMBER(spectrum_port_fe_w);
 	DECLARE_READ8_MEMBER(spectrum_port_fe_r);
-	DECLARE_READ8_MEMBER(spectrum_port_1f_r);
-	DECLARE_READ8_MEMBER(spectrum_port_7f_r);
-	DECLARE_READ8_MEMBER(spectrum_port_df_r);
 	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
 
+	DECLARE_WRITE8_MEMBER(spectrum_128_bank1_w);
+	DECLARE_READ8_MEMBER(spectrum_128_bank1_r);
 	DECLARE_WRITE8_MEMBER(spectrum_128_port_7ffd_w);
 	DECLARE_READ8_MEMBER(spectrum_128_ula_r);
 
+	DECLARE_WRITE8_MEMBER(spectrum_plus3_bank1_w);
+	DECLARE_READ8_MEMBER(spectrum_plus3_bank1_r);
 	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_3ffd_w);
 	DECLARE_READ8_MEMBER(spectrum_plus3_port_3ffd_r);
 	DECLARE_READ8_MEMBER(spectrum_plus3_port_2ffd_r);
@@ -155,10 +160,9 @@ public:
 	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tc2048(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_spectrum(screen_device &screen, bool state);
-	void screen_eof_timex(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_spectrum);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_timex);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( spectrum_cart );
 
 	// for timex cart only
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( timex_cart );
@@ -180,11 +184,18 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
+	void spectrum_common(machine_config &config);
+	void spectrum(machine_config &config);
+	void ts2068(machine_config &config);
+	void uk2086(machine_config &config);
+	void tc2048(machine_config &config);
+	void spectrum_plus3(machine_config &config);
+	void spectrum_128(machine_config &config);
 protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<speaker_sound_device> m_speaker;
-	optional_device<generic_slot_device> m_cart;
+	optional_device<spectrum_expansion_slot_device> m_exp;
 	optional_device<generic_slot_device> m_dock;
 	optional_device<upd765a_device> m_upd765;
 	optional_device<floppy_connector> m_upd765_0;
@@ -201,16 +212,17 @@ protected:
 	optional_ioport m_io_line7;
 	optional_ioport m_io_nmi;
 	optional_ioport m_io_config;
-	optional_ioport m_io_joy_intf;
-	optional_ioport m_io_kempston;
-	optional_ioport m_io_fuller;
-	optional_ioport m_io_mikrogen;
+
 	// Plus ports
 	optional_ioport m_io_plus0;
 	optional_ioport m_io_plus1;
 	optional_ioport m_io_plus2;
 	optional_ioport m_io_plus3;
 	optional_ioport m_io_plus4;
+
+	// Joystick ports
+	optional_ioport m_io_joy1;
+	optional_ioport m_io_joy2;
 
 	void spectrum_UpdateBorderBitmap();
 	void spectrum_UpdateScreenBitmap(bool eof = false);
@@ -250,8 +262,7 @@ protected:
 /*----------- defined in drivers/spectrum.c -----------*/
 
 INPUT_PORTS_EXTERN( spectrum );
+INPUT_PORTS_EXTERN( spec128 );
 INPUT_PORTS_EXTERN( spec_plus );
 
-MACHINE_CONFIG_EXTERN( spectrum );
-
-#endif /* __SPECTRUM_H__ */
+#endif // MAME_INCLUDES_SPECTRUM_H

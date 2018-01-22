@@ -270,6 +270,9 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> m_maincpu;
+	void ibm5160(machine_config &config);
+	void ibm5150(machine_config &config);
+	void ibm5140(machine_config &config);
 };
 
 static ADDRESS_MAP_START( pc8_map, AS_PROGRAM, 8, ibmpc_state )
@@ -286,7 +289,7 @@ static DEVICE_INPUT_DEFAULTS_START(cga)
 	DEVICE_INPUT_DEFAULTS("DSW0",0x30, 0x20)
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( ibm5150, ibmpc_state )
+MACHINE_CONFIG_START(ibmpc_state::ibm5150)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
@@ -316,14 +319,14 @@ static MACHINE_CONFIG_START( ibm5150, ibmpc_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ibm5140, ibm5150 )
+MACHINE_CONFIG_DERIVED(ibmpc_state::ibm5140, ibm5150)
 	/* software lists */
 	MCFG_DEVICE_REMOVE( "disk_list" )
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5140")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ibm5160, ibmpc_state )
+MACHINE_CONFIG_START(ibmpc_state::ibm5160)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
@@ -352,7 +355,6 @@ static MACHINE_CONFIG_START( ibm5160, ibmpc_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
-	MCFG_SOFTWARE_LIST_ADD("xt_disk_list","ibm5160_flop")
 MACHINE_CONFIG_END
 
 
@@ -556,8 +558,8 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1981,    ibm5150,    0,          0,      ibm5150,    0,       driver_device, 0,    "International Business Machines",  "IBM PC 5150" , 0)
-COMP(  1982,    ibm5155,    ibm5150,    0,      ibm5150,    0,       driver_device, 0,    "International Business Machines",  "IBM PC 5155" , 0)
-COMP(  1985,    ibm5140,    ibm5150,    0,      ibm5140,    0,       driver_device, 0,    "International Business Machines",  "IBM PC 5140 Convertible" , MACHINE_NOT_WORKING)
-COMP(  1982,    ibm5160,    ibm5150,    0,      ibm5160,    0,       driver_device, 0,    "International Business Machines",  "IBM XT 5160" , 0)
+//    YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT    STATE        INIT  COMPANY                             FULLNAME                    FLAGS
+COMP( 1981,    ibm5150,    0,          0,      ibm5150,    0,       ibmpc_state, 0,    "International Business Machines",  "IBM PC 5150",              0 )
+COMP( 1982,    ibm5155,    ibm5150,    0,      ibm5150,    0,       ibmpc_state, 0,    "International Business Machines",  "IBM PC 5155",              0 )
+COMP( 1985,    ibm5140,    ibm5150,    0,      ibm5140,    0,       ibmpc_state, 0,    "International Business Machines",  "IBM PC 5140 Convertible",  MACHINE_NOT_WORKING )
+COMP( 1982,    ibm5160,    ibm5150,    0,      ibm5160,    0,       ibmpc_state, 0,    "International Business Machines",  "IBM XT 5160",              0 )

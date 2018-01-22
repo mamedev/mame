@@ -41,12 +41,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_MOS8726_H
+#define MAME_MACHINE_MOS8726_H
+
 #pragma once
 
-#ifndef __MOS8726__
-#define __MOS8726__
-
-#include "emu.h"
 
 
 
@@ -54,8 +53,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MOS8726_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MOS8726, 1000000) // dummy clock
+#define MCFG_MOS8726_ADD(tag) \
+		MCFG_DEVICE_ADD((tag), MOS8726, 1000000) // dummy clock
 
 
 
@@ -91,8 +90,6 @@ protected:
 
 
 // device type definition
-extern const device_type MOS8726;
+DECLARE_DEVICE_TYPE(MOS8726, mos8726_device)
 
-
-
-#endif
+#endif // MAME_MACHINE_MOS8726_H

@@ -63,8 +63,11 @@
 
 */
 
+#include "emu.h"
 #include "includes/coleco.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /* Read/Write Handlers */
 
@@ -219,7 +222,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
 
 			// change pulse intervals relative to spinner/trackball speed
 			m_joy_pulse_reload[port] = freq;
-			m_joy_pulse_timer[port]->adjust(min(freq, m_joy_pulse_timer[port]->remaining()), port);
+			m_joy_pulse_timer[port]->adjust(std::min(freq, m_joy_pulse_timer[port]->remaining()), port);
 		}
 	}
 }
@@ -368,7 +371,7 @@ void coleco_state::machine_reset()
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( coleco, coleco_state )
+MACHINE_CONFIG_START(coleco_state::coleco)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2) // 3.579545 MHz
@@ -396,7 +399,7 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("paddle_timer", coleco_state, paddle_update_callback, attotime::from_msec(20))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( colecop, coleco )
+MACHINE_CONFIG_DERIVED(coleco_state::colecop, coleco)
 
 	/* video hardware */
 	MCFG_DEVICE_REMOVE("tms9928a")
@@ -409,14 +412,14 @@ static MACHINE_CONFIG_DERIVED( colecop, coleco )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( czz50, coleco )
+MACHINE_CONFIG_DERIVED(coleco_state::czz50, coleco)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") // note: cpu speed unverified, assume it's the same as ColecoVision
 	MCFG_CPU_PROGRAM_MAP(czz50_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dina, czz50 )
+MACHINE_CONFIG_DERIVED(coleco_state::dina, czz50)
 
 	/* video hardware */
 	MCFG_DEVICE_REMOVE("tms9928a")
@@ -484,10 +487,10 @@ ROM_END
 
 /* System Drivers */
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   INIT              COMPANY             FULLNAME                            FLAGS
-CONS( 1982, coleco,   0,        0,      coleco,   coleco, driver_device, 0, "Coleco",           "ColecoVision (NTSC)",              0 )
-CONS( 1982, onyx,     coleco,   0,      coleco,   coleco, driver_device, 0, "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
-CONS( 1983, colecop,  coleco,   0,      colecop,  coleco, driver_device, 0, "Coleco",           "ColecoVision (PAL)",               0 )
-CONS( 1986, czz50,    0,        coleco, czz50,    czz50,  driver_device, 0, "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
-CONS( 1988, dina,     czz50,    0,      dina,     czz50,  driver_device, 0, "Telegames",        "Dina",                             0 )
-CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50,  driver_device, 0, "Telegames",        "Personal Arcade",                  0 )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   STATE         INIT  COMPANY             FULLNAME                            FLAGS
+CONS( 1982, coleco,   0,        0,      coleco,   coleco, coleco_state, 0,    "Coleco",           "ColecoVision (NTSC)",              0 )
+CONS( 1982, onyx,     coleco,   0,      coleco,   coleco, coleco_state, 0,    "Microdigital",     "Onyx (Brazil/Prototype)",          0 )
+CONS( 1983, colecop,  coleco,   0,      colecop,  coleco, coleco_state, 0,    "Coleco",           "ColecoVision (PAL)",               0 )
+CONS( 1986, czz50,    0,        coleco, czz50,    czz50,  coleco_state, 0,    "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
+CONS( 1988, dina,     czz50,    0,      dina,     czz50,  coleco_state, 0,    "Telegames",        "Dina",                             0 )
+CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50,  coleco_state, 0,    "Telegames",        "Personal Arcade",                  0 )

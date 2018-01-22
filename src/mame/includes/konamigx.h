@@ -1,15 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Acho A. Tang, Phil Stroffolino, Olivier Galibert
+#ifndef MAME_INCLUDES_KONAMIGX_H
+#define MAME_INCLUDES_KONAMIGX_H
+
 #include "sound/k056800.h"
 #include "sound/k054539.h"
 #include "cpu/tms57002/tms57002.h"
 #include "machine/adc083x.h"
 #include "machine/k053252.h"
+#include "machine/timer.h"
 #include "video/k054156_k054157_k056832.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k055555.h"
 #include "video/k054338.h"
 #include "video/k053936.h"
+#include "screen.h"
 
 class konamigx_state : public driver_device
 {
@@ -257,6 +262,22 @@ public:
 
 	DECLARE_DRIVER_INIT(posthack);
 	int m_use_68020_post_clock_hack;
+	void konamigx_6bpp(machine_config &config);
+	void gxtype4(machine_config &config);
+	void gxtype4_vsn(machine_config &config);
+	void racinfrc(machine_config &config);
+	void gxtype4sd2(machine_config &config);
+	void konamigx_bios(machine_config &config);
+	void gxtype3(machine_config &config);
+	void opengolf(machine_config &config);
+	void winspike(machine_config &config);
+	void le2(machine_config &config);
+	void konamigx(machine_config &config);
+	void dragoonj(machine_config &config);
+	void salmndr2(machine_config &config);
+	void tbyahhoo(machine_config &config);
+	void gokuparo(machine_config &config);
+	void sexyparo(machine_config &config);
 };
 
 // Sprite Callbacks
@@ -300,3 +321,5 @@ public:
 #define GXSUB_4BPP      0x04    //  16 colors
 #define GXSUB_5BPP      0x05    //  32 colors
 #define GXSUB_8BPP      0x08    // 256 colors
+
+#endif // MAME_INCLUDES_KONAMIGX_H

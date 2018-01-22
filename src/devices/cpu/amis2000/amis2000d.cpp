@@ -7,21 +7,9 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
-#include "amis2000.h"
+#include "amis2000d.h"
 
-
-enum e_mnemonics
-{
-	mLAB = 0, mLAE, mLAI, mLBE, mLBEP, mLBF, mLBZ, mXAB, mXABU, mXAE,
-	mLAM, mXC, mXCI, mXCD, mSTM, mRSM,
-	mADD, mADCS, mADIS, mAND, mXOR, mCMA, mSTC, mRSC, mSF1, mRF1, mSF2, mRF2,
-	mSAM, mSZM, mSBE, mSZC, mSOS, mSZK, mSZI, mTF1, mTF2,
-	mPP, mJMP, mJMS, mRT, mRTS, mNOP, mHALT,
-	mINP, mOUT, mDISB, mDISN, mMVS, mPSH, mPSL, mEUR
-};
-
-static const char *const s_mnemonics[] =
+const char *const amis2000_disassembler::s_mnemonics[] =
 {
 	"LAB", "LAE", "LAI", "LBE", "LBEP", "LBF", "LBZ", "XAB", "XABU", "XAE",
 	"LAM", "XC", "XCI", "XCD", "STM", "RSM",
@@ -32,7 +20,7 @@ static const char *const s_mnemonics[] =
 };
 
 // number of bits per opcode parameter, negative indicates complement
-static const int8_t s_bits[] =
+const s8 amis2000_disassembler::s_bits[] =
 {
 	0, 0, 4, 2, 2, 2, 2, 0, 0, 0,
 	-2, -2, -2, -2, 2, 2,
@@ -42,21 +30,18 @@ static const int8_t s_bits[] =
 	0, 0, 0, 0, 0, 0, 0, 0
 };
 
-#define _OVER DASMFLAG_STEP_OVER
-#define _OUT  DASMFLAG_STEP_OUT
-
-static const uint32_t s_flags[] =
+const u32 amis2000_disassembler::s_flags[] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, _OVER, _OUT, _OUT, 0, 0,
+	0, 0, STEP_OVER, STEP_OUT, STEP_OUT, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0
 };
 
 
-static const uint8_t s2000_mnemonic[0x100] =
+const u8 amis2000_disassembler::s2000_mnemonic[0x100] =
 {
 	/* 0x00 */
 	mNOP, mHALT, mRT, mRTS, mPSH, mPSL, mAND, mSOS,
@@ -98,13 +83,10 @@ static const uint8_t s2000_mnemonic[0x100] =
 	mJMP, mJMP, mJMP, mJMP, mJMP, mJMP, mJMP, mJMP
 };
 
-
-
-static offs_t internal_disasm_amis2000(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+offs_t amis2000_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	int pos = 0;
-	uint8_t op = oprom[pos++];
-	uint8_t instr = s2000_mnemonic[op];
+	u8 op = opcodes.r8(pc);
+	u8 instr = s2000_mnemonic[op];
 
 	util::stream_format(stream, "%-5s ", s_mnemonics[instr]);
 
@@ -117,7 +99,7 @@ static offs_t internal_disasm_amis2000(cpu_device *device, std::ostream &stream,
 
 	if (mask != 0)
 	{
-		uint8_t param = op;
+		u8 param = op;
 		if (complement)
 			param = ~param;
 		param &= mask;
@@ -128,15 +110,10 @@ static offs_t internal_disasm_amis2000(cpu_device *device, std::ostream &stream,
 			util::stream_format(stream, "$%02X", param);
 	}
 
-	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
+	return 1 | s_flags[instr] | SUPPORTED;
 }
 
-
-CPU_DISASSEMBLE(amis2000)
+u32 amis2000_disassembler::opcode_alignment() const
 {
-	std::ostringstream stream;
-	offs_t result = internal_disasm_amis2000(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	return 1;
 }

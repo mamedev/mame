@@ -14,6 +14,7 @@
 #include "cpu/esrip/esrip.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
+#include "screen.h"
 
 /* TODO */
 #define ESRIPSYS_PIXEL_CLOCK    (XTAL_25MHz / 2)
@@ -125,6 +126,7 @@ public:
 	required_device<dac_word_interface> m_dac;
 	required_device<screen_device> m_screen;
 	ESRIP_DRAW(esripsys_draw);
+	void esripsys(machine_config &config);
 };
 
 #endif // _ESRIPSYS_H_

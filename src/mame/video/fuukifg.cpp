@@ -5,11 +5,12 @@
 
 #include "emu.h"
 #include "fuukifg.h"
+#include "screen.h"
 
-const device_type FUUKI_VIDEO = &device_creator<fuukivid_device>;
+DEFINE_DEVICE_TYPE(FUUKI_VIDEO, fuukivid_device, "fuukivid", "Fuuki Video")
 
 fuukivid_device::fuukivid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, FUUKI_VIDEO, "Fuuki Video", tag, owner, clock, "fuukivid", __FILE__)
+	: device_t(mconfig, FUUKI_VIDEO, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
@@ -78,22 +79,21 @@ void fuukivid_device::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap,
 {
 	// as we're likely framebuffered (sprites are delayed by 2-3 frames, at least on FG3, and doing rasters on sprites causes glitches) we
 	// only draw the sprites when MAME wants to draw the final screen line.  Ideally we should framebuffer them instead.
-	if (cliprect.max_y != m_screen->visible_area().max_y)
+	if (cliprect.max_y != screen.visible_area().max_y)
 		return;
 
-	rectangle spriteclip = m_screen->visible_area();
+	rectangle spriteclip = screen.visible_area();
 
 	int offs;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	bitmap_ind8 &priority_bitmap = screen.priority();
-	const rectangle &visarea = screen.visible_area();
 
 	uint16_t *spriteram16 = m_sprram.get();
 
 	if (tilebank) spriteram16 = m_sprram_old2.get(); // so that FG3 uses the buffered RAM
 
-	int max_x = visarea.max_x + 1;
-	int max_y = visarea.max_y + 1;
+	int max_x = spriteclip.max_x + 1;
+	int max_y = spriteclip.max_y + 1;
 
 	/* Draw them backwards, for pdrawgfx */
 	for ( offs = (0x2000 - 8) / 2; offs >=0; offs -= 8 / 2 )

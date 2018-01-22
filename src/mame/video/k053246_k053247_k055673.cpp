@@ -39,7 +39,7 @@ The sprite RAM format is very similar to the 053245.
 #include "konami_helper.h"
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
 
 /*****************************************************************************
@@ -133,9 +133,9 @@ WRITE8_MEMBER( k053247_device::k053247_w )
 // FIXME: rearrange ROM loading so this can be merged with the 4/6/8bpp version
 READ16_MEMBER( k053247_device::k055673_5bpp_rom_word_r ) // 5bpp
 {
-	uint8_t *ROM8 = (uint8_t *)space.machine().root_device().memregion(m_memory_region)->base();
-	uint16_t *ROM = (uint16_t *)space.machine().root_device().memregion(m_memory_region)->base();
-	int size4 = (space.machine().root_device().memregion(m_memory_region)->bytes() / (1024 * 1024)) / 5;
+	uint8_t *ROM8 = (uint8_t *)machine().root_device().memregion(m_memory_region)->base();
+	uint16_t *ROM = (uint16_t *)machine().root_device().memregion(m_memory_region)->base();
+	int size4 = (machine().root_device().memregion(m_memory_region)->bytes() / (1024 * 1024)) / 5;
 	int romofs;
 
 	size4 *= 4 * 1024 * 1024;   // get offset to 5th bit
@@ -162,7 +162,7 @@ READ16_MEMBER( k053247_device::k055673_5bpp_rom_word_r ) // 5bpp
 			romofs /= 2;
 			return ROM8[romofs];
 		default:
-			LOG(("55673_rom_word_r: Unknown read offset %x\n", offset));
+			LOG("55673_rom_word_r: Unknown read offset %x\n", offset);
 			break;
 	}
 
@@ -174,7 +174,7 @@ READ16_MEMBER( k053247_device::k055673_rom_word_r )
 	if (m_bpp == 5)
 		return k055673_5bpp_rom_word_r(space, offset, mem_mask);
 
-	uint16_t *ROM = (uint16_t *)space.machine().root_device().memregion(m_memory_region)->base();
+	uint16_t *ROM = (uint16_t *)machine().root_device().memregion(m_memory_region)->base();
 	int romofs;
 
 	romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
@@ -186,6 +186,20 @@ READ16_MEMBER( k053247_device::k055673_rom_word_r )
 	return ROM[romofs + (offset & 0x3)];
 }
 
+READ16_MEMBER( k053247_device::k055673_ps_rom_word_r )
+{
+	uint8_t *ROM = (uint8_t *)machine().root_device().memregion(m_memory_region)->base();
+	int romofs;
+	int magic = (offset & 1);
+
+	romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
+	offset = ((offset & 4) >> 1);
+
+	int finoffs = (romofs * 2) + (offset * 2) + magic;
+
+	return ROM[finoffs+2] | (ROM[finoffs]<<8);
+}
+
 READ8_MEMBER( k053247_device::k053246_r )
 {
 	if (m_objcha_line == ASSERT_LINE)
@@ -193,14 +207,11 @@ READ8_MEMBER( k053247_device::k053246_r )
 		int addr;
 
 		addr = (m_kx46_regs[6] << 17) | (m_kx46_regs[7] << 9) | (m_kx46_regs[4] << 1) | ((offset & 1) ^ 1);
-		addr &= space.machine().root_device().memregion(m_memory_region)->bytes() - 1;
-//      if (VERBOSE)
-//          popmessage("%04x: offset %02x addr %06x", space.device().safe_pc(), offset, addr);
-		return space.machine().root_device().memregion(m_memory_region)->base()[addr];
+		addr &= machine().root_device().memregion(m_memory_region)->bytes() - 1;
+		return machine().root_device().memregion(m_memory_region)->base()[addr];
 	}
 	else
 	{
-//      LOG(("%04x: read from unknown 053246 address %x\n", space.device().safe_pc(), offset));
 		return 0;
 	}
 }
@@ -900,10 +911,10 @@ void k053247_device::zdrawgfxzoom32GP(
 
 
 
-const device_type K055673 = &device_creator<k055673_device>;
+DEFINE_DEVICE_TYPE(K055673, k055673_device, "k055673", "K055673 Sprite Generator")
 
 k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: k053247_device(mconfig, K055673, "K053246 & K055673 Sprite Generator", tag, owner, clock, "k055673", __FILE__)
+	: k053247_device(mconfig, K055673, tag, owner, clock)
 {
 }
 
@@ -914,6 +925,9 @@ k055673_device::k055673_device(const machine_config &mconfig, const char *tag, d
 
 void k055673_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	int gfx_index = 0;
 	uint32_t total;
 
@@ -960,6 +974,16 @@ void k055673_device::device_start()
 			12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
 		16*16*6
 	};
+	static const gfx_layout spritelayout5 = /* Pirate Ship layout */
+	{
+		16,16,
+		0,
+		4,
+		{ 24, 8, 16, 0 },
+		{ 0, 1, 2, 3, 4, 5, 6, 7, 32, 33, 34, 35, 36, 37, 38, 39 },
+		{ 0, 64, 128, 192, 256, 320, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960 },
+		16*16*4
+	};
 	uint8_t *s1, *s2, *d;
 	long i;
 	uint16_t *alt_k055673_rom;
@@ -997,6 +1021,11 @@ void k055673_device::device_start()
 			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout2, 4);
 			break;
 
+		case K055673_LAYOUT_PS:
+			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16/2);
+			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout5, 4);
+			break;
+
 		case K055673_LAYOUT_LE2:
 			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16);
 			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout3, 8);
@@ -1023,10 +1052,10 @@ void k055673_device::device_start()
 	memset(m_kx46_regs, 0, 8);
 	memset(m_kx47_regs, 0, 32);
 
-	machine().save().save_pointer(NAME(m_ram.get()), 0x800);
-	machine().save().save_item(NAME(m_kx46_regs));
-	machine().save().save_item(NAME(m_kx47_regs));
-	machine().save().save_item(NAME(m_objcha_line));
+	save_pointer(NAME(m_ram.get()), 0x800);
+	save_item(NAME(m_kx46_regs));
+	save_item(NAME(m_kx47_regs));
+	save_item(NAME(m_objcha_line));
 }
 
 //-------------------------------------------------
@@ -1035,19 +1064,16 @@ void k055673_device::device_start()
 
 
 
-const device_type K053246 = &device_creator<k053247_device>;
+DEFINE_DEVICE_TYPE(K053247, k053247_device, "k053247", "K053246/K053247 Sprite Generator")
+device_type const K053246 = K053247;
 
 k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K053246, "K053246 & K053247 Sprite Generator", tag, owner, clock, "k053247", __FILE__),
-		device_video_interface(mconfig, *this),
-		device_gfx_interface(mconfig, *this),
-		m_gfx_num(0)
+	: k053247_device(mconfig, K053247, tag, owner, clock)
 {
-	clear_all();
 }
 
-k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		device_gfx_interface(mconfig, *this, nullptr),
 		m_gfx_num(0)
@@ -1061,6 +1087,9 @@ k053247_device::k053247_device(const machine_config &mconfig, device_type type, 
 
 void k053247_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	uint32_t total;
 	static const gfx_layout spritelayout =
 	{
@@ -1089,7 +1118,7 @@ void k053247_device::device_start()
 
 	if (VERBOSE)
 	{
-		if (m_screen->format() == BITMAP_FORMAT_RGB32)
+		if (screen().format() == BITMAP_FORMAT_RGB32)
 		{
 			if (!palette().shadows_enabled() || !palette().hilights_enabled())
 				popmessage("driver missing SHADOWS or HIGHLIGHTS flag");

@@ -5,6 +5,8 @@
 
 #pragma once
 
+#pragma once
+
 #include "rs232.h"
 #include "machine/keyboard.h"
 
@@ -15,7 +17,6 @@ class serial_keyboard_device
 {
 public:
 	serial_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	serial_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -24,9 +25,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
 
 protected:
-	virtual void device_start() override;
+	serial_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void tra_callback() override;
 	virtual void send_key(uint8_t code) override;
 
@@ -40,6 +41,6 @@ private:
 	required_ioport m_rs232_stopbits;
 };
 
-extern const device_type SERIAL_KEYBOARD;
+DECLARE_DEVICE_TYPE(SERIAL_KEYBOARD, serial_keyboard_device)
 
 #endif // MAME_BUS_RS232_KEYBOARD_H

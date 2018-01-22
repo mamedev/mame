@@ -10,13 +10,12 @@
 
 #pragma once
 
-#ifndef __COCO3__
-#define __COCO3__
+#ifndef MAME_INCLUDES_COCO3_H
+#define MAME_INCLUDES_COCO3_H
 
 
 #include "includes/coco12.h"
 #include "video/gime.h"
-
 
 
 //**************************************************************************
@@ -38,10 +37,8 @@ class coco3_state : public coco_state
 {
 public:
 	coco3_state(const machine_config &mconfig, device_type type, const char *tag)
-	: coco_state(mconfig, type, tag),
-		m_gime(*this, GIME_TAG) { }
-
-	required_device<gime_base_device> m_gime;
+		: coco_state(mconfig, type, tag)
+		, m_gime(*this, GIME_TAG) { }
 
 	virtual DECLARE_WRITE8_MEMBER( ff20_write ) override;
 	virtual DECLARE_READ8_MEMBER( ff40_read ) override;
@@ -52,16 +49,23 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void coco3p(machine_config &config);
+	void coco3h(machine_config &config);
+	void coco3dw1(machine_config &config);
+	void coco3(machine_config &config);
 protected:
 	virtual void update_cart_base(uint8_t *cart_base) override;
 
-	/* interrupts */
+	// interrupts
 	virtual bool firq_get_line(void) override;
 	virtual bool irq_get_line(void) override;
 
-	/* miscellaneous */
+	// miscellaneous
 	virtual void update_keyboard_input(uint8_t value, uint8_t z) override;
 	virtual void cart_w(bool line) override;
+
+private:
+	required_device<gime_device> m_gime;
 };
 
-#endif // __COCO3__
+#endif // MAME_INCLUDES_COCO3_H

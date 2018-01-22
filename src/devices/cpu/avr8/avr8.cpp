@@ -58,29 +58,26 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "avr8.h"
+#include "avr8dasm.h"
+#include "debugger.h"
 
 #define VERBOSE_LEVEL   (0)
 
 #define ENABLE_VERBOSE_LOG (0)
 
-#if ENABLE_VERBOSE_LOG
-static inline void ATTR_PRINTF(3,4) verboselog(uint16_t pc, int n_level, const char *s_fmt, ...)
+static inline void ATTR_PRINTF(3, 4) verboselogout(device_t &dev, uint16_t pc, const char *s_fmt, ...)
 {
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
-		logerror( "%05x: %s", pc << 1, buf );
-	}
+	va_list v;
+	char buf[ 32768 ];
+	va_start( v, s_fmt );
+	vsprintf( buf, s_fmt, v );
+	va_end( v );
+	dev.logerror( "%05x: %s", pc << 1, buf );
 }
-#else
-#define verboselog(x,y,z, ...)
-#endif
+
+#define verboselog(x,y,...) do { if (ENABLE_VERBOSE_LOG && (VERBOSE_LEVEL >= y)) verboselogout(*this, x, __VA_ARGS__); } while (false)
+
 
 //**************************************************************************
 //  ENUMS AND MACROS
@@ -171,7 +168,7 @@ enum
 	WGM5_FAST_PWM_OCR
 };
 
-//static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
+static const char avr8_reg_name[4] = { 'A', 'B', 'C', 'D' };
 
 #define SREG_R(b) ((m_r[AVR8_REGIDX_SREG] & (1 << (b))) >> (b))
 #define SREG_W(b,v) m_r[AVR8_REGIDX_SREG] = (m_r[AVR8_REGIDX_SREG] & ~(1 << (b))) | ((v) << (b))
@@ -567,10 +564,10 @@ enum
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type ATMEGA88 = &device_creator<atmega88_device>;
-const device_type ATMEGA644 = &device_creator<atmega644_device>;
-const device_type ATMEGA1280 = &device_creator<atmega1280_device>;
-const device_type ATMEGA2560 = &device_creator<atmega2560_device>;
+DEFINE_DEVICE_TYPE(ATMEGA88,   atmega88_device,   "atmega88",   "ATmega88")
+DEFINE_DEVICE_TYPE(ATMEGA644,  atmega644_device,  "atmega644",  "ATmega644")
+DEFINE_DEVICE_TYPE(ATMEGA1280, atmega1280_device, "atmega1280", "ATmega1280")
+DEFINE_DEVICE_TYPE(ATMEGA2560, atmega2560_device, "atmega2560", "ATmega2560")
 
 //**************************************************************************
 //  INTERNAL ADDRESS MAP
@@ -597,7 +594,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, "ATMEGA88", tag, owner, clock, ATMEGA88, 0x0fff, ADDRESS_MAP_NAME(atmega88_internal_map), CPU_TYPE_ATMEGA88, "atmega88", __FILE__)
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA88, 0x0fff, ADDRESS_MAP_NAME(atmega88_internal_map), CPU_TYPE_ATMEGA88)
 {
 }
 
@@ -606,7 +603,7 @@ atmega88_device::atmega88_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 atmega644_device::atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, "ATMEGA644", tag, owner, clock, ATMEGA644, 0xffff, ADDRESS_MAP_NAME(atmega644_internal_map), CPU_TYPE_ATMEGA644, "atmega644", __FILE__)
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA644, 0xffff, ADDRESS_MAP_NAME(atmega644_internal_map), CPU_TYPE_ATMEGA644)
 {
 }
 
@@ -615,7 +612,7 @@ atmega644_device::atmega644_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, "ATMEGA1280", tag, owner, clock, ATMEGA1280, 0x1ffff, ADDRESS_MAP_NAME(atmega1280_internal_map), CPU_TYPE_ATMEGA1280, "atmega1280", __FILE__)
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA1280, 0x1ffff, ADDRESS_MAP_NAME(atmega1280_internal_map), CPU_TYPE_ATMEGA1280)
 {
 }
 
@@ -624,7 +621,7 @@ atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device(mconfig, "ATMEGA2560", tag, owner, clock, ATMEGA2560, 0x1ffff, ADDRESS_MAP_NAME(atmega2560_internal_map), CPU_TYPE_ATMEGA2560, "atmega2560", __FILE__)
+	: avr8_device(mconfig, tag, owner, clock, ATMEGA2560, 0x1ffff, ADDRESS_MAP_NAME(atmega2560_internal_map), CPU_TYPE_ATMEGA2560)
 {
 }
 
@@ -632,8 +629,8 @@ atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *
 //  avr8_device - constructor
 //-------------------------------------------------
 
-avr8_device::avr8_device(const machine_config &mconfig, const char *name, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t addr_mask, address_map_constructor internal_map, uint8_t cpu_type, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+avr8_device::avr8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, uint32_t addr_mask, address_map_constructor internal_map, uint8_t cpu_type)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_shifted_pc(0)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 22)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, 16, 0, internal_map)
@@ -880,21 +877,13 @@ void avr8_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *avr8_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector avr8_device::memory_space_config() const
 {
-	if (spacenum == AS_PROGRAM)
-	{
-		return &m_program_config;
-	}
-	else if (spacenum == AS_DATA)
-	{
-		return &m_data_config;
-	}
-	else if (spacenum == AS_IO)
-	{
-		return &m_io_config;
-	}
-	return nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 
@@ -923,36 +912,13 @@ void avr8_device::state_string_export(const device_state_entry &entry, std::stri
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t avr8_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t avr8_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t avr8_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *avr8_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( avr8 );
-	return CPU_DISASSEMBLE_NAME(avr8)(this, buffer, pc, oprom, opram, options);
+	return new avr8_disassembler;
 }
 
 
@@ -1774,7 +1740,7 @@ void avr8_device::timer4_tick()
 			break;
 
 		default:
-			verboselog(m_pc, 0, "update_timer4_compare_mode: Unknown waveform generation mode: %02x\n", wgm4);
+			verboselog(m_pc, 0, "update_timer4_compare_mode: Unknown waveform generation mode: %02x\n", AVR8_WGM4);
 			break;
 	}
 

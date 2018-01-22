@@ -17,12 +17,7 @@
 
 /* Components */
 #include "cpu/z80/z80.h"
-#include "bus/cbmiec/cbmiec.h"
-#include "sound/speaker.h"
-
-/* Devices */
-#include "imagedev/cassette.h"
-#include "imagedev/snapquik.h"
+#include "screen.h"
 
 
 

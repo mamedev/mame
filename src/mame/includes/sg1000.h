@@ -3,7 +3,6 @@
 #ifndef __SG1000__
 #define __SG1000__
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "formats/sf7000_dsk.h"
 #include "imagedev/printer.h"
@@ -68,6 +67,8 @@ public:
 
 	DECLARE_READ8_MEMBER( omv_r );
 	DECLARE_WRITE8_MEMBER( omv_w );
+	void sg1000(machine_config &config);
+	void omv(machine_config &config);
 };
 
 class sc3000_state : public sg1000_state
@@ -78,6 +79,7 @@ public:
 	{ }
 
 	virtual void machine_start() override;
+	void sc3000(machine_config &config);
 };
 
 class sf7000_state : public sc3000_state
@@ -103,6 +105,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	void sf7000(machine_config &config);
 };
 
 #endif

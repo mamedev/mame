@@ -15,10 +15,10 @@
 #define K001604_NUM_TILES_LAYER0        16384
 #define K001604_NUM_TILES_LAYER1        4096
 
-const device_type K001604 = &device_creator<k001604_device>;
+DEFINE_DEVICE_TYPE(K001604, k001604_device, "k001604_device", "K001604 2D tilemaps + 2x ROZ")
 
 k001604_device::k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K001604, "K001604 2D tilemaps + 2x ROZ", tag, owner, clock, "k001604", __FILE__),
+	: device_t(mconfig, K001604, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, nullptr),
 	m_layer_size(0),
 	m_roz_size(0),
@@ -37,6 +37,9 @@ k001604_device::k001604_device(const machine_config &mconfig, const char *tag, d
 
 void k001604_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	static const gfx_layout k001604_char_layout_layer_8x8 =
 	{
 		8, 8,
@@ -86,8 +89,8 @@ void k001604_device::device_start()
 	m_layer_8x8[0]->set_transparent_pen(0);
 	m_layer_8x8[1]->set_transparent_pen(0);
 
-	set_gfx(0, std::make_unique<gfx_element>(palette(), k001604_char_layout_layer_8x8, (uint8_t*)&m_char_ram[0], 0, palette().entries() / 16, 0));
-	set_gfx(1, std::make_unique<gfx_element>(palette(), k001604_char_layout_layer_16x16, (uint8_t*)&m_char_ram[0], 0, palette().entries() / 16, 0));
+	set_gfx(0, std::make_unique<gfx_element>(&palette(), k001604_char_layout_layer_8x8, (uint8_t*)&m_char_ram[0], 0, palette().entries() / 16, 0));
+	set_gfx(1, std::make_unique<gfx_element>(&palette(), k001604_char_layout_layer_16x16, (uint8_t*)&m_char_ram[0], 0, palette().entries() / 16, 0));
 
 	save_pointer(NAME(m_reg.get()), 0x400 / 4);
 	save_pointer(NAME(m_char_ram.get()), 0x200000 / 4);
@@ -271,14 +274,72 @@ void k001604_device::draw_back_layer( bitmap_rgb32 &bitmap, const rectangle &cli
 
 void k001604_device::draw_front_layer( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	m_layer_8x8[0]->set_scrollx(-cliprect.min_x);
-	m_layer_8x8[0]->set_scrolly(-cliprect.min_y);
+	int32_t x = (int16_t)((m_reg[0x00] >> 16) & 0xffff);
+	int32_t y = (int16_t)((m_reg[0x00] >> 0) & 0xffff);
+	int32_t yy = (int16_t)((m_reg[0x01] >> 0) & 0xffff);
+	int32_t xy = (int16_t)((m_reg[0x01] >> 16) & 0xffff);
+	int32_t yx = (int16_t)((m_reg[0x02] >> 0) & 0xffff);
+	int32_t xx = (int16_t)((m_reg[0x02] >> 16) & 0xffff);
 
-	m_layer_8x8[1]->set_scrollx(-cliprect.min_x);
-	m_layer_8x8[1]->set_scrolly(-cliprect.min_y);
+	int pivotx = (int16_t)(0xfec0);
+	int pivoty = (int16_t)(0xff28);
+	
+	int startx = ((x - pivotx) * 256) * 32;
+	int starty = ((y - pivoty) * 256) * 32;
+	int incxx = (xx) * 32;
+	int incxy = (-xy) * 32;
+	int incyx = (-yx) * 32;
+	int incyy = (yy) * 32;
 
-	//m_layer_8x8[1]->draw(bitmap, cliprect, 0,0);
-	m_layer_8x8[0]->draw(screen, bitmap, cliprect, 0,0);
+	bitmap_ind16& pixmap = m_layer_8x8[0]->pixmap();
+
+	// extract start/end points
+	int sx = cliprect.min_x;
+	int sy = cliprect.min_y;
+	int ex = cliprect.max_x;
+	int ey = cliprect.max_y;
+
+	const rgb_t *clut = palette().palette()->entry_list_raw();
+
+	int window_x, window_y, window_xmask, window_ymask;
+	
+	window_x = 0;
+	window_y = 0;
+	window_xmask = pixmap.width() - 1;
+	window_ymask = pixmap.height() - 1;
+
+
+	// loop over rows
+	while (sy <= ey)
+	{
+		// initialize X counters
+		int x = sx;
+		uint32_t cx = startx;
+		uint32_t cy = starty;
+
+		uint32_t *dest = &bitmap.pix(sy, sx);
+
+		// loop over columns
+		while (x <= ex)
+		{
+			uint16_t pix = pixmap.pix16(((cy >> 16) & window_ymask) + window_y, ((cx >> 16) & window_xmask) + window_x);
+			if ((pix & 0xff) != 0)
+			{
+				*dest = clut[pix];
+			}
+
+			// advance in X
+			cx += incxx;
+			cy += incxy;
+			x++;
+			dest++;
+		}
+
+		// advance in Y
+		startx += incyx;
+		starty += incyy;
+		sy++;
+	}
 }
 
 READ32_MEMBER( k001604_device::tile_r )
@@ -307,8 +368,8 @@ READ32_MEMBER( k001604_device::reg_r )
 {
 	switch (offset)
 	{
-		case 0x54/4:    return space.machine().rand() << 16;
-		case 0x5c/4:    return space.machine().rand() << 16 | space.machine().rand();
+		case 0x54/4:    return machine().rand() << 16;
+		case 0x5c/4:    return machine().rand() << 16 | machine().rand();
 	}
 
 	return m_reg[offset];
@@ -395,6 +456,6 @@ WRITE32_MEMBER( k001604_device::reg_w )
 
 	if (offset != 0x08 && offset != 0x09 && offset != 0x0a /*&& offset != 0x17 && offset != 0x18*/)
 	{
-		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %08X\n", chip, offset, data, mem_mask, space.device().safe_pc());
+		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %s\n", chip, offset, data, mem_mask, m_maincpu->pc());
 	}
 }

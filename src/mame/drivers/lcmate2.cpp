@@ -31,11 +31,13 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/rp5c15.h"
 #include "machine/nvram.h"
+#include "machine/rp5c15.h"
+#include "sound/spkrdev.h"
 #include "video/hd44780.h"
-#include "sound/speaker.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class lcmate2_state : public driver_device
@@ -60,6 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER( speaker_w );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
 	DECLARE_PALETTE_INIT(lcmate2);
+	void lcmate2(machine_config &config);
 };
 
 WRITE8_MEMBER( lcmate2_state::speaker_w )
@@ -221,7 +224,7 @@ static GFXDECODE_START( lcmate2 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
+MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // confirmed
 	MCFG_CPU_PROGRAM_MAP(lcmate2_mem)
@@ -264,5 +267,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1984, lcmate2,  0,       0,   lcmate2,    lcmate2, driver_device,  0,   "Vtech",   "Laser Compumate 2", MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY  FULLNAME             FLAGS
+COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, 0,    "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING )

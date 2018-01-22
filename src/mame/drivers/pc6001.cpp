@@ -125,17 +125,22 @@ irq vector 0x26:                                                                
 *******************************************************************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
-#include "machine/i8255.h"
+#include "imagedev/cassette.h"
 #include "machine/i8251.h"
-#include "video/mc6847.h"
+#include "machine/i8255.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/upd7752.h"
 #include "sound/wave.h"
+#include "video/mc6847.h"
 
-#include "imagedev/cassette.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "speaker.h"
+
 #include "formats/p6001_cas.h"
 
 
@@ -266,6 +271,10 @@ public:
 	DECLARE_WRITE8_MEMBER(pc6001_8255_portc_w);
 	DECLARE_READ8_MEMBER(pc6001_8255_portc_r);
 	IRQ_CALLBACK_MEMBER(pc6001_irq_callback);
+	void pc6001sr(machine_config &config);
+	void pc6001m2(machine_config &config);
+	void pc6601(machine_config &config);
+	void pc6001(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cassette_image_device> m_cassette;
@@ -2266,7 +2275,7 @@ GFXDECODE_END
 
 #define PC6001_MAIN_CLOCK 7987200
 
-static MACHINE_CONFIG_START( pc6001, pc6001_state )
+MACHINE_CONFIG_START(pc6001_state::pc6001)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, PC6001_MAIN_CLOCK / 2) // ~4 Mhz
 	MCFG_CPU_PROGRAM_MAP(pc6001_map)
@@ -2322,7 +2331,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( pc6001m2, pc6001 )
+MACHINE_CONFIG_DERIVED(pc6001_state::pc6001m2, pc6001)
 
 	MCFG_MACHINE_RESET_OVERRIDE(pc6001_state,pc6001m2)
 
@@ -2345,7 +2354,7 @@ static MACHINE_CONFIG_DERIVED( pc6001m2, pc6001 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc6601, pc6001m2 )
+MACHINE_CONFIG_DERIVED(pc6001_state::pc6601, pc6001m2)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", Z80, PC6001_MAIN_CLOCK / 2)
@@ -2355,7 +2364,7 @@ static MACHINE_CONFIG_DERIVED( pc6601, pc6001m2 )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pc6001_state,pc6001_irq_callback)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pc6001sr, pc6001m2 )
+MACHINE_CONFIG_DERIVED(pc6001_state::pc6001sr, pc6001m2)
 
 	MCFG_MACHINE_RESET_OVERRIDE(pc6001_state,pc6001sr)
 
@@ -2460,9 +2469,9 @@ ROM_START( pc6001sr )
 	ROM_COPY( "maincpu", 0x28000, 0x00000, 0x8000 )
 ROM_END
 
-/*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    COMPANY  FULLNAME          FLAGS */
-COMP( 1981, pc6001,   0,       0,     pc6001,   pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001 (Japan)",    MACHINE_NOT_WORKING )
-COMP( 1981, pc6001a,  pc6001,  0,     pc6001,   pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001A (US)",      MACHINE_NOT_WORKING ) // This version is also known as the NEC Trek
-COMP( 1983, pc6001mk2,pc6001,  0,     pc6001m2, pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001mkII (Japan)",   MACHINE_NOT_WORKING )
-COMP( 1983, pc6601,   pc6001,  0,     pc6601,   pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6601 (Japan)",       MACHINE_NOT_WORKING )
-COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr, pc6001, driver_device,   0,      "Nippon Electronic Company",   "PC-6001mkIISR (Japan)", MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT   STATE           INIT    COMPANY  FULLNAME                 FLAGS
+COMP( 1981, pc6001,   0,       0,     pc6001,   pc6001, pc6001_state,   0,      "NEC",   "PC-6001 (Japan)",       MACHINE_NOT_WORKING )
+COMP( 1981, pc6001a,  pc6001,  0,     pc6001,   pc6001, pc6001_state,   0,      "NEC",   "PC-6001A (US)",         MACHINE_NOT_WORKING ) // This version is also known as the NEC Trek
+COMP( 1983, pc6001mk2,pc6001,  0,     pc6001m2, pc6001, pc6001_state,   0,      "NEC",   "PC-6001mkII (Japan)",   MACHINE_NOT_WORKING )
+COMP( 1983, pc6601,   pc6001,  0,     pc6601,   pc6001, pc6001_state,   0,      "NEC",   "PC-6601 (Japan)",       MACHINE_NOT_WORKING )
+COMP( 1984, pc6001sr, pc6001,  0,     pc6001sr, pc6001, pc6001_state,   0,      "NEC",   "PC-6001mkIISR (Japan)", MACHINE_NOT_WORKING )

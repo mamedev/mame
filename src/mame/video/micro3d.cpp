@@ -11,8 +11,10 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/am29000/am29000.h"
 #include "includes/micro3d.h"
+#include "audio/micro3d.h"
+
+#include "cpu/am29000/am29000.h"
 
 
 /*************************************

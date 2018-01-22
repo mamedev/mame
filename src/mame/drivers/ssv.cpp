@@ -162,11 +162,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ssv.h"
+
 #include "cpu/v810/v810.h"
 #include "cpu/v60/v60.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/ssv.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 
@@ -397,7 +400,7 @@ READ16_MEMBER(ssv_state::fake_r){   return ssv_scroll[offset];  }
 #define SSV_MAP( _ROM  )                                                                                            \
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("mainram")                                     /*  RAM     */  \
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_SHARE("spriteram")                                       /*  Sprites */  \
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* Palette */\
+	AM_RANGE(0x140000, 0x15ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") /* Palette */\
 	AM_RANGE(0x160000, 0x17ffff) AM_RAM                                                             /*          */  \
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(vblank_r           )                                   /*  Vblank? */  \
 /**/AM_RANGE(0x1c0002, 0x1c007f) AM_READONLY                                    /*  Scroll  */  \
@@ -481,9 +484,9 @@ static ADDRESS_MAP_START( gdfs_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gdfs_eeprom_w)
 	AM_RANGE(0x540000, 0x540001) AM_READ(gdfs_eeprom_r)
 	AM_RANGE(0x600000, 0x600fff) AM_RAM
-	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w );
-	AM_RANGE(0x8c0000, 0x8c00ff) AM_DEVREADWRITE( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w );
-	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, st0020_gfxram_r, st0020_gfxram_w );
+	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, sprram_r, sprram_w );
+	AM_RANGE(0x8c0000, 0x8c00ff) AM_DEVREADWRITE( "st0020_spr", st0020_device, regs_r,   regs_w   );
+	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE( "st0020_spr", st0020_device, gfxram_r, gfxram_w );
 	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
 
@@ -508,7 +511,7 @@ READ16_MEMBER(ssv_state::hypreact_input_r)
 	if (input_sel & 0x0002) return m_io_key1->read();
 	if (input_sel & 0x0004) return m_io_key2->read();
 	if (input_sel & 0x0008) return m_io_key3->read();
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",space.device().safe_pc(),input_sel);
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",m_maincpu->pc(),input_sel);
 	return 0xffff;
 }
 
@@ -631,7 +634,7 @@ READ16_MEMBER(ssv_state::srmp4_input_r)
 	if (input_sel & 0x0004) return m_io_key1->read();
 	if (input_sel & 0x0008) return m_io_key2->read();
 	if (input_sel & 0x0010) return m_io_key3->read();
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",space.device().safe_pc(),input_sel);
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",m_maincpu->pc(),input_sel);
 	return 0xffff;
 }
 
@@ -678,7 +681,7 @@ READ16_MEMBER(ssv_state::srmp7_input_r)
 	if (input_sel & 0x0004) return m_io_key1->read();
 	if (input_sel & 0x0008) return m_io_key2->read();
 	if (input_sel & 0x0010) return m_io_key3->read();
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",space.device().safe_pc(),input_sel);
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",m_maincpu->pc(),input_sel);
 	return 0xffff;
 }
 
@@ -847,33 +850,19 @@ ADDRESS_MAP_END
   Eagle Shot Golf
 ***************************************************************************/
 
-WRITE16_MEMBER(ssv_state::eaglshot_gfxrom_bank_w)
+WRITE8_MEMBER(ssv_state::eaglshot_gfxrom_bank_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		membank("gfxrom")->set_entry(data < 6 ? data : 6);
-	}
+	membank("gfxrom")->set_entry(data < 6 ? data : 6);
 }
 
-READ16_MEMBER(ssv_state::eaglshot_trackball_r)
+WRITE8_MEMBER(ssv_state::eaglshot_trackball_w)
 {
-	switch(m_trackball_select)
-	{
-		case 0x60:  return (m_io_trackx->read() >> 8) & 0xff;
-		case 0x40:  return (m_io_trackx->read() >> 0) & 0xff;
-
-		case 0x70:  return (m_io_tracky->read() >> 8) & 0xff;
-		case 0x50:  return (m_io_tracky->read() >> 0) & 0xff;
-	}
-	return 0;
-}
-
-WRITE16_MEMBER(ssv_state::eaglshot_trackball_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_trackball_select = data;
-	}
+	// All these get toggled during trackball reads; the precise arrangement is uncertain
+	m_upd4701->cs_w(!BIT(data, 6));
+	m_upd4701->ul_w(BIT(data, 5));
+	m_upd4701->xy_w(BIT(data, 4));
+	m_upd4701->resetx_w(BIT(data, 3));
+	m_upd4701->resety_w(BIT(data, 2));
 }
 
 
@@ -897,11 +886,11 @@ static ADDRESS_MAP_START( eaglshot_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READNOP /*AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)*/                 // Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 0,4 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                            // Inverted lockout lines
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(eaglshot_gfxrom_bank_w)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(eaglshot_trackball_w)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE8(eaglshot_gfxrom_bank_w, 0x00ff)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(eaglshot_trackball_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xbfffff) AM_ROMBANK("gfxrom")
 	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_SHARE("nvram")   // NVRAM
-	AM_RANGE(0xd00000, 0xd00001) AM_READ(eaglshot_trackball_r)
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD8("upd4701", upd4701_device, d_r, 0x00ff)
 	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
 
@@ -2564,7 +2553,7 @@ DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init(0); save_item(NAME(m_latche
 #define SSV_VBEND 0
 #define SSV_VBSTART 0xf0
 
-static MACHINE_CONFIG_START( ssv, ssv_state )
+MACHINE_CONFIG_START(ssv_state::ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V60, SSV_MASTER_CLOCK) /* Based on STA-0001 & STA-0001B System boards */
@@ -2596,7 +2585,7 @@ static MACHINE_CONFIG_START( ssv, ssv_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( drifto94, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::drifto94, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2616,7 +2605,7 @@ static MACHINE_CONFIG_DERIVED( drifto94, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gdfs, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::gdfs, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2639,7 +2628,7 @@ static MACHINE_CONFIG_DERIVED( gdfs, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hypreact, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::hypreact, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2653,7 +2642,7 @@ static MACHINE_CONFIG_DERIVED( hypreact, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hypreac2, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::hypreac2, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2667,7 +2656,7 @@ static MACHINE_CONFIG_DERIVED( hypreac2, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( janjans1, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::janjans1, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2679,7 +2668,7 @@ static MACHINE_CONFIG_DERIVED( janjans1, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( keithlcy, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::keithlcy, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2691,7 +2680,7 @@ static MACHINE_CONFIG_DERIVED( keithlcy, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( meosism, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::meosism, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2707,7 +2696,7 @@ static MACHINE_CONFIG_DERIVED( meosism, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mslider, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::mslider, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2719,7 +2708,7 @@ static MACHINE_CONFIG_DERIVED( mslider, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ryorioh, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::ryorioh, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2732,7 +2721,7 @@ static MACHINE_CONFIG_DERIVED( ryorioh, ssv )
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb-0x23)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vasara, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::vasara, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2745,7 +2734,7 @@ static MACHINE_CONFIG_DERIVED( vasara, ssv )
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcc-0x24)*2-1, 0,(0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( srmp4, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::srmp4, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2759,7 +2748,7 @@ static MACHINE_CONFIG_DERIVED( srmp4, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( srmp7, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::srmp7, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2773,7 +2762,7 @@ static MACHINE_CONFIG_DERIVED( srmp7, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stmblade, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::stmblade, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2793,7 +2782,7 @@ static MACHINE_CONFIG_DERIVED( stmblade, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( survarts, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::survarts, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2807,7 +2796,7 @@ static MACHINE_CONFIG_DERIVED( survarts, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dynagear, survarts )
+MACHINE_CONFIG_DERIVED(ssv_state::dynagear, survarts)
 
 	/* basic machine hardware */
 	/* video hardware */
@@ -2816,13 +2805,17 @@ static MACHINE_CONFIG_DERIVED( dynagear, survarts )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( eaglshot, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::eaglshot, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(eaglshot_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0)
+	MCFG_UPD4701_PORTX("TRACKX")
+	MCFG_UPD4701_PORTY("TRACKY")
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -2836,7 +2829,7 @@ static MACHINE_CONFIG_DERIVED( eaglshot, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sxyreact, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::sxyreact, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2851,7 +2844,7 @@ static MACHINE_CONFIG_DERIVED( sxyreact, ssv )
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sxyreac2, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::sxyreac2, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2866,7 +2859,7 @@ static MACHINE_CONFIG_DERIVED( sxyreac2, ssv )
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x23)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cairblad, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::cairblad, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2881,7 +2874,7 @@ static MACHINE_CONFIG_DERIVED( cairblad, ssv )
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( twineag2, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::twineag2, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2901,7 +2894,7 @@ static MACHINE_CONFIG_DERIVED( twineag2, ssv )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ultrax, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::ultrax, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2914,7 +2907,7 @@ static MACHINE_CONFIG_DERIVED( ultrax, ssv )
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xd4 - 0x2c)*2-1, 0, (0x102 - 0x12)-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jsk, ssv )
+MACHINE_CONFIG_DERIVED(ssv_state::jsk, ssv)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

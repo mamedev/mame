@@ -17,7 +17,7 @@
 void segaybd_state::video_start()
 {
 	// initialize the rotation layer
-	m_segaic16vid->rotate_init(0, SEGAIC16_ROTATE_YBOARD, 0x000);
+	m_segaic16vid->rotate_init(0, segaic16_video_device::ROTATE_YBOARD, 0x000);
 	m_ysprites->set_rotate_ptr(m_segaic16vid->m_rotate);
 }
 

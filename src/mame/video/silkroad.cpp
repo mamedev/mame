@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood, R. Belmont
 #include "emu.h"
 #include "includes/silkroad.h"
+#include "screen.h"
 
 /* Sprites probably need to be delayed */
 /* Some scroll layers may need to be offset slightly? */

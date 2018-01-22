@@ -15,6 +15,7 @@ I've not had a chance to wire up the board yet, but it might be possible to writ
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 class intrscti_state : public driver_device
@@ -38,6 +39,7 @@ public:
 	DECLARE_DRIVER_INIT(intrscti);
 	virtual void video_start() override;
 	uint32_t screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void intrscti(machine_config &config);
 };
 
 void intrscti_state::video_start()
@@ -175,7 +177,7 @@ static GFXDECODE_START( intrscti )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( intrscti, intrscti_state )
+MACHINE_CONFIG_START(intrscti_state::intrscti)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* ? MHz */

@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 
 /*************************************************************************
@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER(latch_w);
 	DECLARE_READ8_MEMBER(sound_status_r);
 	DECLARE_WRITE8_MEMBER(tomaincpu_w);
+	DECLARE_READ8_MEMBER(int_ack_r);
 	DECLARE_WRITE8_MEMBER(ksayakyu_videoram_w);
 	DECLARE_WRITE8_MEMBER(ksayakyu_videoctrl_w);
 	DECLARE_WRITE8_MEMBER(dummy1_w);
@@ -54,4 +55,5 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void ksayakyu(machine_config &config);
 };

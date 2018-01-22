@@ -14,6 +14,7 @@
 #include "machine/clock.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 
 #include "bus/generic/slot.h"
@@ -93,6 +94,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nc_pcmcia_card );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nc_pcmcia_card );
 
+	void nc200(machine_config &config);
+	void nc100(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

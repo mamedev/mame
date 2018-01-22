@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -7,7 +7,7 @@
 #define COMMON_H_HEADER_GUARD
 
 #include <bx/timer.h>
-#include <bx/fpumath.h>
+#include <bx/math.h>
 
 #include "entry/entry.h"
 

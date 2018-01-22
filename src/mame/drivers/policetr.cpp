@@ -87,10 +87,12 @@ PC5380-9651            5380-JY3306A           5380-N1045503A
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/policetr.h"
+
 #include "cpu/mips/r3000.h"
 #include "machine/eepromser.h"
-#include "includes/policetr.h"
 #include "sound/bsmt2000.h"
+#include "speaker.h"
 
 
 /* constants */
@@ -119,7 +121,7 @@ void policetr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 INTERRUPT_GEN_MEMBER(policetr_state::irq4_gen)
 {
 	device.execute().set_input_line(R3000_IRQ4, ASSERT_LINE);
-	timer_set(m_screen->time_until_pos(0), TIMER_IRQ5_GEN);
+	m_irq5_gen_timer->adjust(m_screen->time_until_pos(0));
 }
 
 
@@ -160,7 +162,7 @@ WRITE32_MEMBER(policetr_state::control_w)
 
 	/* log any unknown bits */
 	if (data & 0x4f1fffff)
-		logerror("%08X: control_w = %08X & %08X\n", space.device().safe_pcbase(), data, mem_mask);
+		logerror("%08X: control_w = %08X & %08X\n", m_maincpu->pcbase(), data, mem_mask);
 }
 
 
@@ -211,7 +213,7 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 	COMBINE_DATA(m_speedup_data);
 
 	/* see if the PC matches */
-	if ((space.device().safe_pcbase() & 0x1fffffff) == m_speedup_pc)
+	if ((m_maincpu->pcbase() & 0x1fffffff) == m_speedup_pc)
 	{
 		uint64_t curr_cycles = m_maincpu->total_cycles();
 
@@ -222,7 +224,7 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 
 			/* more than 2 in a row and we spin */
 			if (m_loop_count > 2)
-				space.device().execute().spin_until_interrupt();
+				m_maincpu->spin_until_interrupt();
 		}
 		else
 			m_loop_count = 0;
@@ -384,6 +386,10 @@ static INPUT_PORTS_START( sshoot11 )
 INPUT_PORTS_END
 
 
+void policetr_state::machine_start()
+{
+	m_irq5_gen_timer = timer_alloc(TIMER_IRQ5_GEN);
+}
 
 /*************************************
  *
@@ -391,7 +397,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( policetr, policetr_state )
+MACHINE_CONFIG_START(policetr_state::policetr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R3041, MASTER_CLOCK/2)
@@ -422,7 +428,7 @@ static MACHINE_CONFIG_START( policetr, policetr_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sshooter, policetr )
+MACHINE_CONFIG_DERIVED(policetr_state::sshooter, policetr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -713,14 +719,14 @@ DRIVER_INIT_MEMBER(policetr_state,sshoot12)
  *
  *************************************/
 
-GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)", 0 )
-GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)", 0 )
-GAME( 1996, policetr10,  policetr, policetr, polict10, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)", 0 )
+GAME( 1996, policetr,    0,        policetr, policetr, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3)",        0 )
+GAME( 1996, policetr11,  policetr, policetr, polict10, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.1)",        0 )
+GAME( 1996, policetr10,  policetr, policetr, polict10, policetr_state, policetr, ROT0, "P&P Marketing", "Police Trainer (Rev 1.0)",        0 )
 
 GAME( 1996, policetr13a, policetr, sshooter, policetr, policetr_state, plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B Newer)", 0 )
-GAME( 1996, policetr13b, policetr, sshooter, policetr, policetr_state, plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)", 0 )
+GAME( 1996, policetr13b, policetr, sshooter, policetr, policetr_state, plctr13b, ROT0, "P&P Marketing", "Police Trainer (Rev 1.3B)",       0 )
 
-GAME( 1998, sshooter,    0,        sshooter, policetr, policetr_state, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)", 0 )
-GAME( 1998, sshooter17,  sshooter, sshooter, policetr, policetr_state, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)", 0 )
-GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, policetr_state, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)", 0 )
-GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, policetr_state, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)", 0 )
+GAME( 1998, sshooter,    0,        sshooter, policetr, policetr_state, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.9)",          0 )
+GAME( 1998, sshooter17,  sshooter, sshooter, policetr, policetr_state, sshooter, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.7)",          0 )
+GAME( 1998, sshooter12,  sshooter, sshooter, sshoot11, policetr_state, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.2)",          0 )
+GAME( 1998, sshooter11,  sshooter, sshooter, sshoot11, policetr_state, sshoot12, ROT0, "P&P Marketing", "Sharpshooter (Rev 1.1)",          0 )

@@ -52,9 +52,13 @@ it as ASCII text.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "sound/ay8910.h"
 #include "includes/btime.h"
+
+#include "cpu/m6502/m6502.h"
+#include "machine/timer.h"
+#include "sound/ay8910.h"
+#include "speaker.h"
+
 
 class scregg_state : public btime_state
 {
@@ -69,6 +73,8 @@ public:
 	DECLARE_MACHINE_START(scregg);
 	DECLARE_MACHINE_RESET(scregg);
 	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
+	void scregg(machine_config &config);
+	void dommy(machine_config &config);
 };
 
 
@@ -254,7 +260,7 @@ MACHINE_RESET_MEMBER(scregg_state,scregg)
 	m_btime_tilemap[3] = 0;
 }
 
-static MACHINE_CONFIG_START( dommy, scregg_state )
+MACHINE_CONFIG_START(scregg_state::dommy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
@@ -286,7 +292,7 @@ static MACHINE_CONFIG_START( dommy, scregg_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( scregg, scregg_state )
+MACHINE_CONFIG_START(scregg_state::scregg)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
@@ -415,13 +421,13 @@ DRIVER_INIT_MEMBER(scregg_state,rockduck)
 
 	for (x = 0x2000; x < 0x6000; x++)
 	{
-		src[x] = BITSWAP8(src[x],2,0,3,6,1,4,7,5);
+		src[x] = bitswap<8>(src[x],2,0,3,6,1,4,7,5);
 
 	}
 }
 
 
-GAME( 1983, dommy,    0,        dommy,  scregg,   driver_device, 0,        ROT270, "Technos Japan", "Dommy", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, scregg,   0,        scregg, scregg,   driver_device, 0,        ROT270, "Technos Japan", "Scrambled Egg", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, eggs,     scregg,   scregg, scregg,   driver_device, 0,        ROT270, "Technos Japan (Universal USA license)", "Eggs (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, dommy,    0,        dommy,  scregg,   scregg_state,  0,        ROT270, "Technos Japan", "Dommy", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, scregg,   0,        scregg, scregg,   scregg_state,  0,        ROT270, "Technos Japan", "Scrambled Egg", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, eggs,     scregg,   scregg, scregg,   scregg_state,  0,        ROT270, "Technos Japan (Universal USA license)", "Eggs (USA)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, rockduck, 0,        scregg, rockduck, scregg_state,  rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )

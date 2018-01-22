@@ -25,7 +25,9 @@
 
 #include "emu.h"
 #include "cpu/amis2000/amis2000.h"
-#include "sound/speaker.h"
+#include "machine/timer.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
 
 #include "wildfire.lh" // this is a test layout, use external artwork
 
@@ -48,14 +50,14 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<timer_device> m_a12_decay_timer;
 
-	uint8_t m_d;
-	uint16_t m_a;
-	uint8_t m_q2;
-	uint8_t m_q3;
+	u8 m_d;
+	u16 m_a;
+	u8 m_q2;
+	u8 m_q3;
 
-	uint16_t m_display_state[0x10];
-	uint16_t m_display_cache[0x10];
-	uint8_t m_display_decay[0x100];
+	u16 m_display_state[0x10];
+	u16 m_display_cache[0x10];
+	u8 m_display_decay[0x100];
 
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE16_MEMBER(write_a);
@@ -70,6 +72,7 @@ public:
 	void sound_update();
 
 	virtual void machine_start() override;
+	void wildfire(machine_config &config);
 };
 
 
@@ -110,7 +113,7 @@ inline bool wildfire_state::index_is_7segled(int index)
 
 void wildfire_state::display_update()
 {
-	uint16_t active_state[0x10];
+	u16 active_state[0x10];
 
 	for (int i = 0; i < 0x10; i++)
 	{
@@ -138,7 +141,7 @@ void wildfire_state::display_update()
 		if (m_display_cache[i] != active_state[i])
 		{
 			if (index_is_7segled(i))
-				output().set_digit_value(i, BITSWAP8(active_state[i],7,0,1,2,3,4,5,6) & 0x7f);
+				output().set_digit_value(i, bitswap<8>(active_state[i],7,0,1,2,3,4,5,6) & 0x7f);
 
 			for (int j = 0; j < 8; j++)
 				output().set_lamp_value(i*10 + j, active_state[i] >> j & 1);
@@ -292,7 +295,7 @@ enum
 	lG = 0x01
 };
 
-static const uint8_t wildfire_7seg_table[0x10] =
+static const u8 wildfire_7seg_table[0x10] =
 {
 	0x7e, 0x30, 0x6d, 0x79, 0x33, 0x5b, 0x5f, 0x70, 0x7f, 0x7b, // 0-9 unaltered
 	0x77,           // A -> unused?
@@ -304,7 +307,7 @@ static const uint8_t wildfire_7seg_table[0x10] =
 };
 
 
-static MACHINE_CONFIG_START( wildfire, wildfire_state )
+MACHINE_CONFIG_START(wildfire_state::wildfire)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", AMI_S2152, MASTER_CLOCK)
@@ -337,9 +340,10 @@ MACHINE_CONFIG_END
 
 ROM_START( wildfire )
 	ROM_REGION( 0x0800, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "us4341385", 0x0000, 0x0400, CRC(84ac0f1f) SHA1(1e00ddd402acfc2cc267c34eed4b89d863e2144f) ) // from patent US4334679, data should be correct (it included checksums)
+	ROM_LOAD( "us4341385", 0x0000, 0x0400, CRC(84ac0f1f) SHA1(1e00ddd402acfc2cc267c34eed4b89d863e2144f) ) // from patent US4334679, data should be correct (it included checksums). 1st half was dumped/verfied too.
 	ROM_CONTINUE(          0x0600, 0x0200 )
 ROM_END
 
 
-CONS( 1979, wildfire, 0, 0, wildfire, wildfire, driver_device, 0, "Parker Brothers", "Wildfire (patent)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: pretty sure that it matches the commercial release
+//    YEAR  NAME      PARENT CMP MACHINE   INPUT     STATE        INIT  COMPANY, FULLNAME, FLAGS
+CONS( 1979, wildfire, 0,      0, wildfire, wildfire, wildfire_state, 0, "Parker Brothers", "Wildfire (patent)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK ) // note: pretty sure that it matches the commercial release

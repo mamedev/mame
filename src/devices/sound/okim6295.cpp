@@ -35,6 +35,11 @@
         ???? abcd = one bit per voice, set to 0 if nothing is playing, or
                     1 if it is active
 
+    OKI Semiconductor produced this chip in two package variants. The
+    44-pin QFP version, MSM6295GS, is the original one and by far the more
+    common of the two. The 42-pin DIP version, MSM6295VRS, omits A17 and
+    RD, which limits its ROM addressing to one megabit instead of two.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -46,7 +51,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type OKIM6295 = &device_creator<okim6295_device>;
+DEFINE_DEVICE_TYPE(OKIM6295, okim6295_device, "okim6295", "OKI MSM6295 ADPCM")
 
 // volume lookup table. The manual lists only 9 steps, ~3dB per step. Given the dB values,
 // that seems to map to a 5-bit volume control. Any volume parameter beyond the 9th index
@@ -81,7 +86,7 @@ const uint8_t okim6295_device::s_volume_table[16] =
 //-------------------------------------------------
 
 okim6295_device::okim6295_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, OKIM6295, "OKI6295", tag, owner, clock, "okim6295", __FILE__),
+	: device_t(mconfig, OKIM6295, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 18),
 		m_region(*this, DEVICE_SELF),
@@ -284,12 +289,12 @@ void okim6295_device::write_command(uint8_t command)
 					// invalid samples go here
 					else
 					{
-						logerror("OKIM6295:'%s' requested to play invalid sample %02x\n",tag(),m_command);
+						logerror("Requested to play invalid sample %02x\n", m_command);
 					}
 				}
 				else
 				{
-					logerror("OKIM6295:'%s' requested to play sample %02x on non-stopped voice\n",tag(),m_command);
+					logerror("Requested to play sample %02x on non-stopped voice\n", m_command);
 				}
 			}
 

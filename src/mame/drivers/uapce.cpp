@@ -93,13 +93,17 @@ Alien Crush & Pac_Land: dumps made from PC-Engine dumps of JP versions
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "machine/pcecommn.h"
+
 #include "cpu/h6280/h6280.h"
+#include "cpu/z80/z80.h"
 #include "video/huc6260.h"
 #include "video/huc6270.h"
 #include "sound/c6280.h"
-#include "machine/pcecommn.h"
 #include "sound/discrete.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 class uapce_state : public pce_common_state
@@ -116,6 +120,7 @@ public:
 	virtual uint8_t joy_read() override;
 	virtual void machine_reset() override;
 	required_device<discrete_device> m_discrete;
+	void uapce(machine_config &config);
 };
 
 #define UAPCE_SOUND_EN  NODE_10
@@ -246,15 +251,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( uapce )
-	PORT_START( "JOY" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* button I */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* button II */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* select */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) /* run */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PCE_STANDARD_INPUT_PORT_P1
 
 	PORT_START( "DSW" )
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
@@ -302,7 +299,7 @@ static ADDRESS_MAP_START( pce_io , AS_IO, 8, uapce_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( uapce, uapce_state )
+MACHINE_CONFIG_START(uapce_state::uapce)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)
@@ -315,7 +312,7 @@ static MACHINE_CONFIG_START( uapce, uapce_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242)
 	MCFG_SCREEN_UPDATE_DRIVER( pce_common_state, screen_update )
 	MCFG_SCREEN_PALETTE("huc6260:palette")
 
@@ -374,7 +371,7 @@ ROM_START(paclandp)
 	ROM_LOAD( "u1.bin", 0x0000, 0x800, CRC(f5e538a9) SHA1(19ac9525c9ad6bea1789cc9e63cdb7fe949867d9) )
 ROM_END
 
-GAME( 1989, blazlaz, 0, uapce, uapce, pce_common_state, pce_common, ROT0, "Hudson Soft", "Blazing Lazers", MACHINE_IMPERFECT_SOUND )
-GAME( 1989, keith,   0, uapce, uapce, pce_common_state, pce_common, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones", MACHINE_IMPERFECT_SOUND )
-GAME( 1989, aliencr, 0, uapce, uapce, pce_common_state, pce_common, ROT0, "Hudson Soft", "Alien Crush", MACHINE_IMPERFECT_SOUND )
-GAME( 1989, paclandp,0, uapce, uapce, pce_common_state, pce_common, ROT0, "Namco", "Pac-Land (United Amusements PC Engine)", MACHINE_IMPERFECT_SOUND )
+GAME( 1989, blazlaz, 0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Blazing Lazers (United Amusements PC Engine)",                         MACHINE_IMPERFECT_SOUND )
+GAME( 1989, keith,   0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Keith Courage In Alpha Zones (United Amusements PC Engine)",           MACHINE_IMPERFECT_SOUND )
+GAME( 1989, aliencr, 0, uapce, uapce, uapce_state, pce_common, ROT0, "Hudson Soft", "Alien Crush (United Amusements PC Engine)",                            MACHINE_IMPERFECT_SOUND )
+GAME( 1989, paclandp,0, uapce, uapce, uapce_state, pce_common, ROT0, "Namco",       "Pac-Land (United Amusements PC Engine)",                               MACHINE_IMPERFECT_SOUND )

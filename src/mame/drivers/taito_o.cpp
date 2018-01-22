@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /***************************************************************
 
@@ -31,10 +31,14 @@ TODO:
 *****************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/2203intf.h"
 #include "includes/taito_o.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 static const int clear_hack = 1;
 
@@ -56,7 +60,7 @@ READ16_MEMBER(taitoo_state::io_r)
 	{
 		case 0: retval = ioport("IN0")->read() & (clear_hack ? 0xf7ff : 0xffff); break;
 		case 1: retval = ioport("IN1")->read() & (clear_hack ? 0xfff7 : 0xffff); break;
-		default: logerror("IO R %x %x = %x @ %x\n", offset, mem_mask, retval, space.device().safe_pc());
+		default: logerror("IO R %x %x = %x @ %x\n", offset, mem_mask, retval, m_maincpu->pc());
 	}
 	return retval;
 }
@@ -67,7 +71,7 @@ static ADDRESS_MAP_START( parentj_map, AS_PROGRAM, 16, taitoo_state )
 	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(io_r, io_w) /* TC0220IOC ? */
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymsnd", ym2203_device, read, write, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
-	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( parentj )
@@ -228,7 +232,7 @@ void taitoo_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( parentj, taitoo_state )
+MACHINE_CONFIG_START(taitoo_state::parentj)
 
 	MCFG_CPU_ADD("maincpu", M68000,12000000 )       /*?? MHz */
 	MCFG_CPU_PROGRAM_MAP(parentj_map)
@@ -285,4 +289,4 @@ ROM_START( parentj )
 	ROM_LOAD( "ampal22v10a-0233.c42", 0x000, 0x2dd, CRC(0c030a81) SHA1(0f8198df2cb046683d2db9ac8e609cdff53083ed) )
 ROM_END
 
-GAME( 1989, parentj,  0,        parentj,  parentj, driver_device,  0,        ROT0,    "Taito", "Parent Jack", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, parentj,  0,        parentj,  parentj, taitoo_state,  0,        ROT0,    "Taito", "Parent Jack", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

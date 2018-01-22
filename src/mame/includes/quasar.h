@@ -25,11 +25,12 @@ public:
 	DECLARE_WRITE8_MEMBER(quasar_bullet_w);
 	DECLARE_WRITE8_MEMBER(quasar_sh_command_w);
 	DECLARE_READ8_MEMBER(quasar_sh_command_r);
-	DECLARE_READ8_MEMBER(audio_t1_r);
+	DECLARE_READ_LINE_MEMBER(audio_t1_r);
 	DECLARE_MACHINE_START(quasar);
 	DECLARE_MACHINE_RESET(quasar);
 	DECLARE_VIDEO_START(quasar);
 	DECLARE_PALETTE_INIT(quasar);
 	uint32_t screen_update_quasar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(quasar_interrupt);
+	void quasar(machine_config &config);
 };

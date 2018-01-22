@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Farfetch'd, R. Belmont
-#pragma once
+#ifndef MAME_CPU_I960_I960_H
+#define MAME_CPU_I960_I960_H
 
-#ifndef __I960_H__
-#define __I960_H__
+#pragma once
 
 
 enum
@@ -63,9 +63,6 @@ enum
 };
 
 
-enum { I960_RCACHE_SIZE = 4 };
-
-
 class i960_cpu_device :  public cpu_device
 {
 public:
@@ -79,6 +76,8 @@ public:
 	void i960_stall() { m_IP = m_PIP; }
 
 protected:
+	enum { I960_RCACHE_SIZE = 4 };
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -92,15 +91,13 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -128,7 +125,7 @@ private:
 	int  m_immediate_pri;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 
 	int m_icount;
 
@@ -161,6 +158,7 @@ private:
 	void cmp_d(double v1, double v2);
 	void bxx(uint32_t opcode, int mask);
 	void bxx_s(uint32_t opcode, int mask);
+	void fxx(uint32_t opcode, int mask);
 	void test(uint32_t opcode, int mask);
 	void execute_op(uint32_t opcode);
 	void take_interrupt(int vector, int lvl);
@@ -171,7 +169,6 @@ private:
 };
 
 
-extern const device_type I960;
+DECLARE_DEVICE_TYPE(I960, i960_cpu_device)
 
-
-#endif /* __I960_H__ */
+#endif // MAME_CPU_I960_I960_H

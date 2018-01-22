@@ -12,6 +12,7 @@
 #include "video/mc6845.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/keyboard.h"
+#include "screen.h"
 
 class peoplepc_state : public driver_device
 {
@@ -61,6 +62,7 @@ public:
 	void floppy_unload(floppy_image_device *dev);
 
 	uint8_t m_dma0pg;
+	void olypeopl(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -176,7 +178,7 @@ void peoplepc_state::machine_reset()
 
 void peoplepc_state::machine_start()
 {
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, peoplepc_charlayout, &m_charram[0], 0, 1, 0));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, peoplepc_charlayout, &m_charram[0], 0, 1, 0));
 	m_dma0pg = 0;
 
 	// FIXME: cheat as there no docs about how or obvious ports that set to control the motor
@@ -232,7 +234,7 @@ static DEVICE_INPUT_DEFAULTS_START(keyboard)
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( olypeopl, peoplepc_state)
+MACHINE_CONFIG_START(peoplepc_state::olypeopl)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_14_7456MHz/3)
 	MCFG_CPU_PROGRAM_MAP(peoplepc_map)
@@ -247,8 +249,14 @@ static MACHINE_CONFIG_START( olypeopl, peoplepc_state)
 	MCFG_PIT8253_CLK2(XTAL_14_7456MHz/6)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pic8259_0", pic8259_device, ir0_w))
 
-	MCFG_PIC8259_ADD("pic8259_0", INPUTLINE("maincpu", 0), VCC, READ8(peoplepc_state, get_slave_ack))
-	MCFG_PIC8259_ADD("pic8259_1", DEVWRITELINE("pic8259_0", pic8259_device, ir7_w), GND, NOOP)
+	MCFG_DEVICE_ADD("pic8259_0", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(peoplepc_state, get_slave_ack))
+
+	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_0", pic8259_device, ir7_w))
+	MCFG_PIC8259_IN_SP_CB(GND)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
@@ -299,4 +307,4 @@ ROM_START( olypeopl )
 	ROMX_LOAD( "u01277g3.bin", 0x00001, 0x1000, CRC(3295691c) SHA1(7d7ade62117d11656b8dd86cf0703127616d55bc), ROM_SKIP(1)|ROM_BIOS(2))
 ROM_END
 
-COMP( 198?, olypeopl,   0,    0,         olypeopl,      0, driver_device,      0,      "Olympia", "People PC", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+COMP( 198?, olypeopl,   0,    0,         olypeopl,      0, peoplepc_state,      0,      "Olympia", "People PC", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

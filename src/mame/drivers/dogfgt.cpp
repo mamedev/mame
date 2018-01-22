@@ -10,9 +10,11 @@ driver by Nicola Salmoria
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "includes/dogfgt.h"
+
+#include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(dogfgt_state::sharedram_r)
@@ -72,7 +74,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dogfgt_state )
 	AM_RANGE(0x1830, 0x1830) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1830, 0x1830) AM_WRITE(dogfgt_soundlatch_w)
 	AM_RANGE(0x1840, 0x1840) AM_WRITE(dogfgt_soundcontrol_w)
-	AM_RANGE(0x1870, 0x187f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1870, 0x187f) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(dogfgt_bitmapram_r, dogfgt_bitmapram_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -235,7 +237,7 @@ void dogfgt_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( dogfgt, dogfgt_state )
+MACHINE_CONFIG_START(dogfgt_state::dogfgt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1500000) /* 1.5 MHz ???? */
@@ -377,6 +379,6 @@ ROM_END
 
 
 
-GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, driver_device, 0, ROT0, "Technos Japan", "Acrobatic Dog-Fight", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, dogfgtu, dogfgt, dogfgt, dogfgt, driver_device, 0, ROT0, "Technos Japan (Data East USA, Inc. license)", "Acrobatic Dog-Fight (USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, driver_device, 0, ROT0, "Technos Japan", "Dog-Fight (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dogfgt,  0,      dogfgt, dogfgt, dogfgt_state, 0, ROT0, "Technos Japan",                               "Acrobatic Dog-Fight",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, dogfgtu, dogfgt, dogfgt, dogfgt, dogfgt_state, 0, ROT0, "Technos Japan (Data East USA, Inc. license)", "Acrobatic Dog-Fight (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dogfgtj, dogfgt, dogfgt, dogfgt, dogfgt_state, 0, ROT0, "Technos Japan",                               "Dog-Fight (Japan)",         MACHINE_SUPPORTS_SAVE )

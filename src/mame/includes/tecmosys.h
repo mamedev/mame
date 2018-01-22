@@ -8,7 +8,9 @@
 
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "machine/input_merger.h"
 #include "machine/watchdog.h"
+#include "screen.h"
 
 class tecmosys_state : public driver_device
 {
@@ -23,7 +25,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2"),
+		m_soundnmi(*this, "soundnmi"),
 		m_spriteram(*this, "spriteram"),
 		m_tilemap_paletteram16(*this, "tmap_palette"),
 		m_bg2tilemap_ram(*this, "bg2tilemap_ram"),
@@ -47,7 +49,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<generic_latch_8_device> m_soundlatch2;
+	required_device<input_merger_device> m_soundnmi;
 
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_tilemap_paletteram16;
@@ -77,8 +79,8 @@ public:
 	const struct prot_data* m_device_data;
 	uint8_t m_device_value;
 
-	DECLARE_READ16_MEMBER(sound_r);
-	DECLARE_WRITE16_MEMBER(sound_w);
+	DECLARE_READ8_MEMBER(sound_command_pending_r);
+	DECLARE_WRITE8_MEMBER(sound_nmi_disable_w);
 	DECLARE_WRITE16_MEMBER(unk880000_w);
 	DECLARE_READ16_MEMBER(unk880000_r);
 	DECLARE_WRITE8_MEMBER(z80_bank_w);
@@ -117,4 +119,5 @@ public:
 	void tilemap_copy_to_compose(uint16_t pri);
 	void do_final_mix(bitmap_rgb32 &bitmap);
 	void descramble();
+	void deroon(machine_config &config);
 };

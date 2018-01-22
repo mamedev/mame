@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*************************************************************************
 
@@ -77,4 +77,6 @@ public:
 	uint32_t screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void toucheme(machine_config &config);
+	void ladyfrog(machine_config &config);
 };

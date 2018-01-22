@@ -8,10 +8,11 @@
     See tms9900.c for documentation
 */
 
-#ifndef __TMS9900_H__
-#define __TMS9900_H__
+#ifndef MAME_CPU_TMS9900_TMS9900_H
+#define MAME_CPU_TMS9900_TMS9900_H
 
-#include "emu.h"
+#pragma once
+
 #include "debugger.h"
 #include "tms99com.h"
 
@@ -42,10 +43,6 @@ static const char opname[][5] =
 class tms99xx_device : public cpu_device
 {
 public:
-	tms99xx_device(const machine_config &mconfig, device_type type,  const char *name,
-				const char *tag, int databus_width, int prg_addr_bits, int cru_addr_bits,
-				device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	~tms99xx_device();
 
 	// READY input line. When asserted (high), the memory is ready for data exchange.
@@ -66,6 +63,10 @@ public:
 	template<class _Object> static devcb_base &static_set_dbin_callback(device_t &device, _Object object) { return downcast<tms99xx_device &>(device).m_dbin_line.set_callback(object); }
 
 protected:
+	tms99xx_device(const machine_config &mconfig, device_type type,
+				const char *tag, int data_width, int prg_addr_bits, int cru_addr_bits,
+				device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void        device_start() override;
 	virtual void        device_stop() override;
@@ -81,11 +82,9 @@ protected:
 	virtual void        execute_run() override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t      disasm_min_opcode_bytes() const override;
-	virtual uint32_t      disasm_max_opcode_bytes() const override;
-	virtual offs_t      disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
-	const address_space_config* memory_space_config(address_spacenum spacenum) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// Let these methods be overloaded by the TMS9980.
 	virtual void        mem_read(void);
@@ -197,7 +196,7 @@ protected:
 	// full range 0000-fffe for its CRU operations.
 	//
 	// We could realize this via the CRU access as well, but the data bus access
-	// is not that simple to emulate. For the sake of homogenity between the
+	// is not that simple to emulate. For the sake of homogeneity between the
 	// chip emulations we use a dedicated callback.
 	devcb_write8   m_external_operation;
 
@@ -392,6 +391,6 @@ public:
 
 
 // device type definition
-extern const device_type TMS9900;
+DECLARE_DEVICE_TYPE(TMS9900, tms9900_device)
 
-#endif /* __TMS9900_H__ */
+#endif // MAME_CPU_TMS9900_TMS9900_H

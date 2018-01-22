@@ -6,8 +6,9 @@
 
 *************************************************************************/
 
-#include "machine/atarigen.h"
 #include "audio/atarijsa.h"
+#include "machine/atarigen.h"
+#include "video/atarirle.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/asic65.h"
 
@@ -72,4 +73,7 @@ public:
 	DECLARE_MACHINE_RESET(atarig42);
 	DECLARE_VIDEO_START(atarig42);
 	uint32_t screen_update_atarig42(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void atarig42(machine_config &config);
+	void atarig42_0x200(machine_config &config);
+	void atarig42_0x400(machine_config &config);
 };

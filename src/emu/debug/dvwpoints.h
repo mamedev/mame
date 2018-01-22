@@ -8,16 +8,13 @@
 
 ***************************************************************************/
 
-#ifndef __DVWPOINTS_H__
-#define __DVWPOINTS_H__
+#ifndef MAME_EMU_DEBUG_DVWPOINTS_H
+#define MAME_EMU_DEBUG_DVWPOINTS_H
+
+#pragma once
 
 #include "debugvw.h"
 #include "debugcpu.h"
-
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
 
 
 //**************************************************************************
@@ -27,7 +24,6 @@
 // debug view for watchpoints
 class debug_view_watchpoints : public debug_view
 {
-	friend resource_pool_object<debug_view_watchpoints>::~resource_pool_object();
 	friend class debug_view_manager;
 
 	// construction/destruction
@@ -51,5 +47,4 @@ private:
 	std::vector<device_debug::watchpoint *> m_buffer;
 };
 
-
-#endif
+#endif // MAME_EMU_DEBUG_DVWPOINTS_H

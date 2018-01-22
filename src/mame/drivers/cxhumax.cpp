@@ -15,6 +15,9 @@
 #include "emu.h"
 #include "includes/cxhumax.h"
 
+#include "screen.h"
+
+
 #define VERBOSE_LEVEL ( 0 )
 
 static inline void ATTR_PRINTF(3,4) verboselog( device_t &device, int n_level, const char *s_fmt, ...)
@@ -1050,7 +1053,7 @@ void cxhumax_state::machine_reset()
 	memset(m_gxa_cmd_regs,0,sizeof(m_gxa_cmd_regs));
 }
 
-static MACHINE_CONFIG_START( cxhumax, cxhumax_state )
+MACHINE_CONFIG_START(cxhumax_state::cxhumax)
 	MCFG_CPU_ADD("maincpu", ARM920T, 180000000) // CX24175 (RevC up?)
 	MCFG_CPU_PROGRAM_MAP(cxhumax_map)
 
@@ -1074,12 +1077,12 @@ MACHINE_CONFIG_END
 
 ROM_START( hxhdci2k )
 	ROM_REGION( 0x400000, "flash", 0 )
-	ROM_SYSTEM_BIOS( 0, "FW10005", "HDCI REV 1.0 RHDXSCI 1.00.05" ) /* 19 AUG 2008 */
+	ROM_SYSTEM_BIOS( 0, "fw10005", "HDCI REV 1.0 RHDXSCI 1.00.05" ) /* 19 AUG 2008 */
 	ROM_LOAD16_WORD_SWAP( "28f320j3d.bin", 0x000000, 0x400000, BAD_DUMP CRC(63d98942) SHA1(c5b8d701677a3edc25f203854f44953b19c9158d) )
 
 	ROM_REGION( 0x2000, "eeprom", 0 )
 	ROM_LOAD( "24lc64.bin", 0x0000, 0x2000, NO_DUMP)
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-SYST( 2008, hxhdci2k, 0,       0,   cxhumax,    cxhumax, driver_device,  0,   "HUMAX",   "HUMAX HDCI-2000",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY   FULLNAME           FLAGS
+SYST( 2008, hxhdci2k, 0,      0,      cxhumax, cxhumax, cxhumax_state, 0,    "HUMAX",  "HUMAX HDCI-2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

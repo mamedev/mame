@@ -14,47 +14,48 @@
 
 
 namespace util {
-namespace {
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
 
-util::ntfs_duration calculate_ntfs_offset();
+static std::chrono::system_clock::duration calculate_system_clock_adjustment();
 
 
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
 
-util::ntfs_duration f_ntfs_offset(calculate_ntfs_offset());
+std::chrono::system_clock::duration system_clock_adjustment(calculate_system_clock_adjustment());
 
 
 /***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
-util::ntfs_duration calculate_ntfs_offset()
+static std::chrono::system_clock::duration calculate_system_clock_adjustment()
 {
 	constexpr auto days_in_year(365);
 	constexpr auto days_in_four_years((days_in_year * 4) + 1);
 	constexpr auto days_in_century((days_in_four_years * 25) - 1);
 	constexpr auto days_in_four_centuries((days_in_century * 4) + 1);
 
-	constexpr ntfs_duration day(std::chrono::hours(24));
-	constexpr ntfs_duration year(day * days_in_year);
-	constexpr ntfs_duration four_years(day * days_in_four_years);
-	constexpr ntfs_duration century(day * days_in_century);
-	constexpr ntfs_duration four_centuries(day * days_in_four_centuries);
+	// can't use std::chrono::system_clock::duration here, out of fear of integer overflow
+	typedef std::chrono::duration<std::int64_t, std::ratio<1, 1> > int64_second_duration;
+	constexpr int64_second_duration day(std::chrono::hours(24));
+	constexpr int64_second_duration year(day * days_in_year);
+	constexpr int64_second_duration four_years(day * days_in_four_years);
+	constexpr int64_second_duration century(day * days_in_century);
+	constexpr int64_second_duration four_centuries(day * days_in_four_centuries);
 
 	std::time_t const zero(0);
 	std::tm const epoch(*std::gmtime(&zero));
 
-	ntfs_duration result(day * epoch.tm_yday);
+	std::chrono::system_clock::duration result(day * epoch.tm_yday);
 	result += std::chrono::hours(epoch.tm_hour);
 	result += std::chrono::minutes(epoch.tm_min);
 	result += std::chrono::seconds(epoch.tm_sec);
 
-	int years(1900 - 1601 + epoch.tm_year);
+	int years(1900 - 1970 + epoch.tm_year);
 	result += four_centuries * (years / 400);
 	years %= 400;
 	result += century * (years / 100);
@@ -63,10 +64,8 @@ util::ntfs_duration calculate_ntfs_offset()
 	years %= 4;
 	result += year * years;
 
-	return result;
+	return result - std::chrono::system_clock::from_time_t(0).time_since_epoch();
 }
-
-} // anonymous namespace
 
 
 
@@ -76,7 +75,9 @@ util::ntfs_duration calculate_ntfs_offset()
 
 std::chrono::system_clock::time_point system_clock_time_point_from_ntfs_duration(ntfs_duration d)
 {
-	return std::chrono::system_clock::from_time_t(0) + std::chrono::duration_cast<std::chrono::system_clock::duration>(d - f_ntfs_offset);
+	typedef arbitrary_clock<std::uint64_t, 1601, 1, 1, 0, 0, 0, std::ratio<1, 10000000 > > ntfs_clock;
+	const std::chrono::time_point<ntfs_clock> tp(d);
+	return ntfs_clock::to_system_clock(tp);
 }
 
 } // namespace util

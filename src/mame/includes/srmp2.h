@@ -53,13 +53,12 @@ public:
 	DECLARE_WRITE8_MEMBER(srmp2_irq2_ack_w);
 	DECLARE_WRITE8_MEMBER(srmp2_irq4_ack_w);
 	DECLARE_WRITE16_MEMBER(srmp2_flags_w);
-	DECLARE_WRITE16_MEMBER(srmp2_adpcm_code_w);
+	DECLARE_WRITE8_MEMBER(adpcm_code_w);
 
 	// srmp3
 	DECLARE_WRITE8_MEMBER(srmp3_rombank_w);
 	DECLARE_WRITE8_MEMBER(srmp3_flags_w);
 	DECLARE_WRITE8_MEMBER(srmp3_irq_ack_w);
-	DECLARE_WRITE8_MEMBER(srmp3_adpcm_code_w);
 
 	virtual void machine_start() override;
 	DECLARE_MACHINE_START(srmp2);
@@ -75,4 +74,8 @@ public:
 	SETA001_SPRITE_GFXBANK_CB_MEMBER(srmp3_gfxbank_callback);
 
 	uint8_t iox_key_matrix_calc(uint8_t p_side);
+	void mjyuugi(machine_config &config);
+	void srmp2(machine_config &config);
+	void rmgoldyh(machine_config &config);
+	void srmp3(machine_config &config);
 };

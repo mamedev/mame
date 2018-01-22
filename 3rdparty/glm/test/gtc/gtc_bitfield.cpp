@@ -341,7 +341,7 @@ namespace bitfieldInterleave
 		return REG1 | (REG2 << 1);
 	}
 */
-#if(GLM_ARCH != GLM_ARCH_PURE)
+#if GLM_ARCH & GLM_ARCH_SSE2_BIT
 	inline glm::uint64 sseBitfieldInterleave(glm::uint32 x, glm::uint32 y)
 	{
 		GLM_ALIGN(16) glm::uint32 const Array[4] = {x, 0, y, 0};
@@ -457,7 +457,7 @@ namespace bitfieldInterleave
 
 		return Result[0];
 	}
-#endif//(GLM_ARCH != GLM_ARCH_PURE)
+#endif//GLM_ARCH & GLM_ARCH_SSE2_BIT
 
 	int test()
 	{
@@ -563,7 +563,7 @@ namespace bitfieldInterleave
 			std::printf("interleaveBitfieldInterleave Time %d clocks\n", static_cast<unsigned int>(Time));
 		}
 
-#		if(GLM_ARCH != GLM_ARCH_PURE)
+#		if GLM_ARCH & GLM_ARCH_SSE2_BIT
 		{
 			std::clock_t LastTime = std::clock();
 
@@ -585,7 +585,7 @@ namespace bitfieldInterleave
 
 			std::printf("sseUnalignedBitfieldInterleave Time %d clocks\n", static_cast<unsigned int>(Time));
 		}
-#		endif//(GLM_ARCH != GLM_ARCH_PURE)
+#		endif//GLM_ARCH & GLM_ARCH_SSE2_BIT
 
 		{
 			std::clock_t LastTime = std::clock();

@@ -172,61 +172,35 @@ WRITE8_MEMBER( digdug_state::digdug_videoram_w )
 	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_MEMBER( digdug_state::digdug_PORT_w )
+WRITE8_MEMBER(digdug_state::bg_select_w)
 {
-	switch (offset)
+	// select background picture
+	if (m_bg_select != (data & 0x03))
 	{
-		case 0: /* select background picture */
-		case 1:
-			{
-				int shift = offset;
-				int mask = 1 << shift;
-
-				if ((m_bg_select & mask) != ((data & 1) << shift))
-				{
-					m_bg_select = (m_bg_select & ~mask) | ((data & 1) << shift);
-					m_bg_tilemap->mark_all_dirty();
-				}
-			}
-			break;
-
-		case 2: /* select alpha layer color mode (see tx_get_tile_info) */
-			if (m_tx_color_mode != (data & 1))
-			{
-				m_tx_color_mode = data & 1;
-				m_fg_tilemap->mark_all_dirty();
-			}
-			break;
-
-		case 3: /* "disable" background (see bg_get_tile_info) */
-			if (m_bg_disable != (data & 1))
-			{
-				m_bg_disable = data & 1;
-				m_bg_tilemap->mark_all_dirty();
-			}
-			break;
-
-		case 4: /* background color bank */
-		case 5:
-			{
-				int shift = offset;
-				int mask = 1 << shift;
-
-				if ((m_bg_color_bank & mask) != ((data & 1) << shift))
-				{
-					m_bg_color_bank = (m_bg_color_bank & ~mask) | ((data & 1) << shift);
-					m_bg_tilemap->mark_all_dirty();
-				}
-			}
-			break;
-
-		case 6: /* n.c. */
-			break;
-
-		case 7: /* FLIP */
-			flip_screen_set(data & 1);
-			break;
+		m_bg_select = data & 0x03;
+		m_bg_tilemap->mark_all_dirty();
 	}
+
+	// background color bank
+	if (m_bg_color_bank != (data & 0x30))
+	{
+		m_bg_color_bank = data & 0x30;
+		m_bg_tilemap->mark_all_dirty();
+	}
+}
+
+WRITE_LINE_MEMBER(digdug_state::tx_color_mode_w)
+{
+	// select alpha layer color mode (see tx_get_tile_info)
+	m_tx_color_mode = state;
+	m_fg_tilemap->mark_all_dirty();
+}
+
+WRITE_LINE_MEMBER(digdug_state::bg_disable_w)
+{
+	// "disable" background (see bg_get_tile_info)
+	m_bg_disable = state;
+	m_bg_tilemap->mark_all_dirty();
 }
 
 

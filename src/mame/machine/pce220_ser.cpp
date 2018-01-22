@@ -37,15 +37,15 @@ enum
 };
 
 // device type definition
-const device_type PCE220SERIAL = &device_creator<pce220_serial_device>;
+DEFINE_DEVICE_TYPE(PCE220SERIAL, pce220_serial_device, "pce220_serial", "Sharp PC-E220 serial")
 
 //-------------------------------------------------
 //  pce220_serial_device - constructor
 //-------------------------------------------------
 
 pce220_serial_device::pce220_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PCE220SERIAL, "Sharp PC-E220 serial", tag, owner, clock, "pce220_serial", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, PCE220SERIAL, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
 }
 
@@ -81,19 +81,6 @@ void pce220_serial_device::device_reset()
 	m_bytes_count = 0;
 	m_dout = m_busy = m_xout = 0;
 	m_din = m_xin = m_ack = 0;
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pce220_serial_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 

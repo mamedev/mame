@@ -12,9 +12,10 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "tmpz84c015.h"
 
-const device_type TMPZ84C015 = &device_creator<tmpz84c015_device>;
+DEFINE_DEVICE_TYPE(TMPZ84C015, tmpz84c015_device, "tmpz84c015", "TMPZ84C015")
 
 static ADDRESS_MAP_START( tmpz84c015_internal_io_map, AS_IO, 8, tmpz84c015_device )
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_DEVREADWRITE("tmpz84c015_ctc", z80ctc_device, read, write)
@@ -25,7 +26,7 @@ ADDRESS_MAP_END
 
 
 tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80_device(mconfig, TMPZ84C015, "TMPZ84C015", tag, owner, clock, "tmpz84c015", __FILE__),
+	: z80_device(mconfig, TMPZ84C015, tag, owner, clock),
 	m_io_space_config( "io", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME( tmpz84c015_internal_io_map ) ),
 	m_ctc(*this, "tmpz84c015_ctc"),
 	m_sio(*this, "tmpz84c015_sio"),
@@ -61,6 +62,13 @@ tmpz84c015_device::tmpz84c015_device(const machine_config &mconfig, const char *
 	m_out_pb_cb(*this),
 	m_out_brdy_cb(*this)
 {
+}
+
+device_memory_interface::space_config_vector tmpz84c015_device::memory_space_config() const
+{
+	auto r = z80_device::memory_space_config();
+	r.back().second = &m_io_space_config;
+	return r;
 }
 
 
@@ -171,10 +179,10 @@ WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
 	}
 }
 
-static MACHINE_CONFIG_FRAGMENT( tmpz84c015 )
+MACHINE_CONFIG_START(tmpz84c015_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_Z80SIO0_ADD("tmpz84c015_sio", DERIVED_CLOCK(1,1), 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("tmpz84c015_sio", Z80SIO0, DERIVED_CLOCK(1,1))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(DEVICE_SELF, INPUT_LINE_IRQ0))
 
 	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(tmpz84c015_device, out_txda_cb_trampoline_w))
@@ -212,8 +220,3 @@ static MACHINE_CONFIG_FRAGMENT( tmpz84c015 )
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(tmpz84c015_device, out_pb_cb_trampoline_w))
 	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE(tmpz84c015_device, out_brdy_cb_trampoline_w))
 MACHINE_CONFIG_END
-
-machine_config_constructor tmpz84c015_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( tmpz84c015 );
-}

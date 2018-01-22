@@ -21,7 +21,7 @@
         * Timber
         * Discs of Tron (Squawk n' Talk)
         * NFL Football (Squawk n' Talk + laserdisk)
-        * Demolition Derby (Turbo Chip Squeak)
+        * Demolition Derby (Turbo Cheap Squeak)
 
 ****************************************************************************
 
@@ -207,11 +207,11 @@
     91658 = Lamp Sequencer (DOTron)
     91659 = Flashing Fluorescent Assembly (DOTron)
     91660 = Squawk & Talk (DOTron, NFLFoot)
-    91671 = Chip Squeak Deluxe (SpyHunt)
+    91671 = Cheap Squeak Deluxe (SpyHunt)
     91673 = Lamp Driver (SpyHunt)
     91695 = IPU laserdisk controller (NFLFoot)
     91794 = Optical Encoder Deluxe (DemoDerb)
-    91799 = Turbo Chip Squeak (DemoDerb)
+    91799 = Turbo Cheap Squeak (DemoDerb)
 
 ****************************************************************************
 
@@ -284,20 +284,13 @@
 
 
 #include "emu.h"
-#include "audio/midway.h"
-#include "sound/samples.h"
-#include "machine/nvram.h"
 #include "includes/mcr.h"
 
+#include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "dpoker.lh"
-
-
-static uint8_t input_mux;
-static uint8_t last_op4;
-
-static uint8_t dpoker_coin_status;
-static uint8_t dpoker_output;
-
 
 
 WRITE8_MEMBER(mcr_state::mcr_control_port_w)
@@ -317,7 +310,7 @@ WRITE8_MEMBER(mcr_state::mcr_control_port_w)
 	machine().bookkeeping().coin_counter_w(0, (data >> 0) & 1);
 	machine().bookkeeping().coin_counter_w(1, (data >> 1) & 1);
 	machine().bookkeeping().coin_counter_w(2, (data >> 2) & 1);
-	mcr_cocktail_flip = (data >> 6) & 1;
+	m_mcr_cocktail_flip = (data >> 6) & 1;
 }
 
 
@@ -334,7 +327,7 @@ READ8_MEMBER(mcr_state::solarfox_ip0_r)
 	/* mode, they will respond. However, if you try it in a 2-player   */
 	/* game in cocktail mode, they don't work at all. So we fake-mux   */
 	/* the controls through player 1's ports */
-	if (mcr_cocktail_flip)
+	if (m_mcr_cocktail_flip)
 		return ioport("ssio:IP0")->read() | 0x08;
 	else
 		return ((ioport("ssio:IP0")->read() & ~0x14) | 0x08) | ((ioport("ssio:IP0")->read() & 0x08) >> 1) | ((ioport("ssio:IP2")->read() & 0x01) << 4);
@@ -344,7 +337,7 @@ READ8_MEMBER(mcr_state::solarfox_ip0_r)
 READ8_MEMBER(mcr_state::solarfox_ip1_r)
 {
 	/*  same deal as above */
-	if (mcr_cocktail_flip)
+	if (m_mcr_cocktail_flip)
 		return ioport("ssio:IP1")->read() | 0xf0;
 	else
 		return (ioport("ssio:IP1")->read() >> 4) | 0xf0;
@@ -371,39 +364,39 @@ READ8_MEMBER(mcr_state::kick_ip1_r)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::dpoker_hopper_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(mcr_dpoker_state::hopper_callback)
 {
-	if (dpoker_output & 0x40)
+	if (m_output & 0x40)
 	{
 		// hopper timing is a guesstimate
-		dpoker_coin_status ^= 8;
-		m_dpoker_hopper_timer->adjust(attotime::from_msec((dpoker_coin_status & 8) ? 100 : 250));
+		m_coin_status ^= 8;
+		m_hopper_timer->adjust(attotime::from_msec((m_coin_status & 8) ? 100 : 250));
 	}
 	else
 	{
-		dpoker_coin_status &= ~8;
+		m_coin_status &= ~8;
 	}
 
-	machine().bookkeeping().coin_counter_w(3, dpoker_coin_status & 8);
+	machine().bookkeeping().coin_counter_w(3, m_coin_status & 8);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::dpoker_coin_in_callback)
+TIMER_DEVICE_CALLBACK_MEMBER(mcr_dpoker_state::coin_in_callback)
 {
-	dpoker_coin_status &= ~2;
+	m_coin_status &= ~2;
 }
 
-INPUT_CHANGED_MEMBER(mcr_state::dpoker_coin_in_hit)
+INPUT_CHANGED_MEMBER(mcr_dpoker_state::coin_in_hit)
 {
 	if (newval)
 	{
 		// The game waits for coin release before it accepts another.
 		// It probably does this to prevent tampering, good old coin-on-a-string won't work here.
-		dpoker_coin_status |= 2;
-		m_dpoker_coin_in_timer->adjust(attotime::from_msec(100));
+		m_coin_status |= 2;
+		m_coin_in_timer->adjust(attotime::from_msec(100));
 	}
 }
 
-READ8_MEMBER(mcr_state::dpoker_ip0_r)
+READ8_MEMBER(mcr_dpoker_state::ip0_r)
 {
 	// d0: Coin-in Hit
 	// d1: Coin-in Release
@@ -412,13 +405,13 @@ READ8_MEMBER(mcr_state::dpoker_ip0_r)
 	// d6: Coin-drop Hit
 	// d7: Coin-drop Release
 	uint8_t p0 = ioport("ssio:IP0")->read();
-	p0 |= (dpoker_coin_status >> 1 & 1);
-	p0 ^= (p0 << 1 & 0x80) | dpoker_coin_status;
+	p0 |= (m_coin_status >> 1 & 1);
+	p0 ^= (p0 << 1 & 0x80) | m_coin_status;
 	return p0;
 }
 
 
-WRITE8_MEMBER(mcr_state::dpoker_lamps1_w)
+WRITE8_MEMBER(mcr_dpoker_state::lamps1_w)
 {
 	// cpanel button lamps (white)
 	output().set_lamp_value(0, data >> 0 & 1); // hold 1
@@ -431,7 +424,7 @@ WRITE8_MEMBER(mcr_state::dpoker_lamps1_w)
 	output().set_lamp_value(7, data >> 3 & 1); // stand
 }
 
-WRITE8_MEMBER(mcr_state::dpoker_lamps2_w)
+WRITE8_MEMBER(mcr_dpoker_state::lamps2_w)
 {
 	// d5: button lamp: service or change
 	output().set_lamp_value(8, data >> 5 & 1);
@@ -443,7 +436,7 @@ WRITE8_MEMBER(mcr_state::dpoker_lamps2_w)
 	// d6, d7: unused?
 }
 
-WRITE8_MEMBER(mcr_state::dpoker_output_w)
+WRITE8_MEMBER(mcr_dpoker_state::output_w)
 {
 	// d0: ? coin return
 	// d1: ? divertor (active low)
@@ -451,15 +444,15 @@ WRITE8_MEMBER(mcr_state::dpoker_output_w)
 
 	// d6: assume hopper coin flow
 	// d7: assume hopper motor
-	if (data & 0x40 & ~dpoker_output)
-		m_dpoker_hopper_timer->adjust(attotime::from_msec(500));
+	if (data & 0x40 & ~m_output)
+		m_hopper_timer->adjust(attotime::from_msec(500));
 
 	// other bits: unused?
 
-	dpoker_output = data;
+	m_output = data;
 }
 
-WRITE8_MEMBER(mcr_state::dpoker_meters_w)
+WRITE8_MEMBER(mcr_dpoker_state::meters_w)
 {
 	// meters?
 }
@@ -474,13 +467,13 @@ WRITE8_MEMBER(mcr_state::dpoker_meters_w)
 
 WRITE8_MEMBER(mcr_state::wacko_op4_w)
 {
-	input_mux = data & 1;
+	m_input_mux = data & 1;
 }
 
 
 READ8_MEMBER(mcr_state::wacko_ip1_r)
 {
-	if (!input_mux)
+	if (!m_input_mux)
 		return ioport("ssio:IP1")->read();
 	else
 		return ioport("ssio:IP1.ALT")->read();
@@ -489,7 +482,7 @@ READ8_MEMBER(mcr_state::wacko_ip1_r)
 
 READ8_MEMBER(mcr_state::wacko_ip2_r)
 {
-	if (!input_mux)
+	if (!m_input_mux)
 		return ioport("ssio:IP2")->read();
 	else
 		return ioport("ssio:IP2.ALT")->read();
@@ -617,14 +610,14 @@ WRITE8_MEMBER(mcr_state::dotron_op4_w)
 
 	*/
 	/* bit 5 = SEL1 (J1-1) on the Lamp Sequencer board */
-	if (((last_op4 ^ data) & 0x20) && (data & 0x20))
+	if (((m_last_op4 ^ data) & 0x20) && (data & 0x20))
 	{
 		/* bit 2 -> J1-4 = enable */
 		/* bit 1 -> J1-5 = sequence select */
 		/* bit 0 -> J1-6 = speed (0=slow, 1=fast) */
 		logerror("Lamp: en=%d seq=%d speed=%d\n", (data >> 2) & 1, (data >> 1) & 1, data & 1);
 	}
-	last_op4 = data;
+	m_last_op4 = data;
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
@@ -635,30 +628,25 @@ WRITE8_MEMBER(mcr_state::dotron_op4_w)
 
 /*************************************
  *
- *  NFL Football Tron I/O ports
+ *  NFL Football I/O ports
  *
  *************************************/
 
-READ8_MEMBER(mcr_state::nflfoot_ip2_r)
+READ8_MEMBER(mcr_nflfoot_state::ip2_r)
 {
 	/* bit 7 = J3-2 on IPU board = TXDA on SIO */
-	uint8_t val = m_sio_txda << 7;
-
-	if (space.device().safe_pc() != 0x107)
-		logerror("%04X:ip2_r = %02X\n", space.device().safe_pc(), val);
+	uint8_t val = m_ipu_sio_txda << 7;
 	return val;
 }
 
 
-WRITE8_MEMBER(mcr_state::nflfoot_op4_w)
+WRITE8_MEMBER(mcr_nflfoot_state::op4_w)
 {
-	logerror("%04X:op4_w(%d%d%d)\n", space.device().safe_pc(), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);
-
 	/* bit 7 = J3-7 on IPU board = /RXDA on SIO */
-	m_sio->rxa_w(!((data >> 7) & 1));
+	m_ipu_sio->rxa_w(!((data >> 7) & 1));
 
 	/* bit 6 = J3-3 on IPU board = CTSA on SIO */
-	m_sio->ctsa_w((data >> 6) & 1);
+	m_ipu_sio->ctsa_w((data >> 6) & 1);
 
 	/* bit 4 = SEL0 (J1-8) on squawk n talk board */
 	/* bits 3-0 = MD3-0 connected to squawk n talk (J1-4,3,2,1) */
@@ -676,22 +664,22 @@ WRITE8_MEMBER(mcr_state::nflfoot_op4_w)
 READ8_MEMBER(mcr_state::demoderb_ip1_r)
 {
 	return ioport("ssio:IP1")->read() |
-		(ioport(input_mux ? "ssio:IP1.ALT2" : "ssio:IP1.ALT1")->read() << 2);
+		(ioport(m_input_mux ? "ssio:IP1.ALT2" : "ssio:IP1.ALT1")->read() << 2);
 }
 
 
 READ8_MEMBER(mcr_state::demoderb_ip2_r)
 {
 	return ioport("ssio:IP2")->read() |
-		(ioport(input_mux ? "ssio:IP2.ALT2" : "ssio:IP2.ALT1")->read() << 2);
+		(ioport(m_input_mux ? "ssio:IP2.ALT2" : "ssio:IP2.ALT1")->read() << 2);
 }
 
 
 WRITE8_MEMBER(mcr_state::demoderb_op4_w)
 {
-	if (data & 0x40) input_mux = 1;
-	if (data & 0x80) input_mux = 0;
-	m_turbo_chip_squeak->write(space, offset, data);
+	if (data & 0x40) m_input_mux = 1;
+	if (data & 0x80) m_input_mux = 0;
+	m_turbo_cheap_squeak->write(space, offset, data);
 }
 
 
@@ -708,8 +696,8 @@ static ADDRESS_MAP_START( cpu_90009_map, AS_PROGRAM, 8, mcr_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xf1ff) AM_MIRROR(0x0200) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xf400, 0xf41f) AM_MIRROR(0x03e0) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xf800, 0xf81f) AM_MIRROR(0x03e0) AM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xf400, 0xf41f) AM_MIRROR(0x03e0) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xf81f) AM_MIRROR(0x03e0) AM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(mcr_90009_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
@@ -787,22 +775,22 @@ ADDRESS_MAP_END
  *************************************/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( ipu_91695_map, AS_PROGRAM, 8, mcr_state )
+static ADDRESS_MAP_START( ipu_91695_map, AS_PROGRAM, 8, mcr_nflfoot_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 /* I/O verified from schematics */
-static ADDRESS_MAP_START( ipu_91695_portmap, AS_IO, 8, mcr_state )
+static ADDRESS_MAP_START( ipu_91695_portmap, AS_IO, 8, mcr_nflfoot_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_pio0", z80pio_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_sio", z80dart_device, cd_ba_r, cd_ba_w)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_ctc", z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_MIRROR(0xe0) AM_DEVREADWRITE("ipu_pio1", z80pio_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0xe0) AM_WRITE(mcr_ipu_laserdisk_w)
-	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xe0) AM_READWRITE(mcr_ipu_watchdog_r, mcr_ipu_watchdog_w)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0xe0) AM_WRITE(ipu_laserdisk_w)
+	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xe0) AM_READWRITE(ipu_watchdog_r, ipu_watchdog_w)
 ADDRESS_MAP_END
 
 
@@ -941,8 +929,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dpoker )
 	PORT_START("ssio:IP0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, mcr_state, dpoker_coin_in_hit, nullptr)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) // see dpoker_ip0_r
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, mcr_dpoker_state, coin_in_hit, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) // see ip0_r
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) // "
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) // "
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
@@ -1753,7 +1741,7 @@ static const char *const twotiger_sample_names[] =
  *************************************/
 
 /* 90009 CPU board plus 90908/90913/91483 sound board */
-static MACHINE_CONFIG_START( mcr_90009, mcr_state )
+MACHINE_CONFIG_START(mcr_state::mcr_90009)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)
@@ -1769,8 +1757,6 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 16)
 
-	MCFG_MACHINE_START_OVERRIDE(mcr_state,mcr)
-	MCFG_MACHINE_RESET_OVERRIDE(mcr_state,mcr)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
@@ -1787,8 +1773,6 @@ static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_FORMAT(xxxxRRRRBBBBGGGG)
 
-	MCFG_VIDEO_START_OVERRIDE(mcr_state,mcr)
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ssio", MIDWAY_SSIO, 0)
@@ -1798,16 +1782,16 @@ MACHINE_CONFIG_END
 
 
 /* as above, but in a casino cabinet */
-static MACHINE_CONFIG_DERIVED( mcr_90009_dp, mcr_90009 )
+MACHINE_CONFIG_DERIVED(mcr_dpoker_state::mcr_90009_dp, mcr_90009)
 
 	/* basic machine hardware */
-	MCFG_TIMER_DRIVER_ADD("dp_coinin", mcr_state, dpoker_coin_in_callback)
-	MCFG_TIMER_DRIVER_ADD("dp_hopper", mcr_state, dpoker_hopper_callback)
+	MCFG_TIMER_DRIVER_ADD("coinin", mcr_dpoker_state, coin_in_callback)
+	MCFG_TIMER_DRIVER_ADD("hopper", mcr_dpoker_state, hopper_callback)
 MACHINE_CONFIG_END
 
 
 /* 90010 CPU board plus 90908/90913/91483 sound board */
-static MACHINE_CONFIG_DERIVED( mcr_90010, mcr_90009 )
+MACHINE_CONFIG_DERIVED(mcr_state::mcr_90010, mcr_90009)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1822,7 +1806,7 @@ MACHINE_CONFIG_END
 
 
 /* as above, plus 8-track tape */
-static MACHINE_CONFIG_DERIVED( mcr_90010_tt, mcr_90010 )
+MACHINE_CONFIG_DERIVED(mcr_state::mcr_90010_tt, mcr_90010)
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
@@ -1834,7 +1818,7 @@ MACHINE_CONFIG_END
 
 
 /* 91475 CPU board plus 90908/90913/91483 sound board plus cassette interface */
-static MACHINE_CONFIG_DERIVED( mcr_91475, mcr_90010 )
+MACHINE_CONFIG_DERIVED(mcr_state::mcr_91475, mcr_90010)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1851,7 +1835,7 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board */
-static MACHINE_CONFIG_DERIVED( mcr_91490, mcr_90010 )
+MACHINE_CONFIG_DERIVED(mcr_state::mcr_91490, mcr_90010)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1865,7 +1849,7 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board */
-static MACHINE_CONFIG_DERIVED( mcr_91490_snt, mcr_91490 )
+MACHINE_CONFIG_DERIVED(mcr_state::mcr_91490_snt, mcr_91490)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("snt", MIDWAY_SQUAWK_N_TALK, 0)
@@ -1875,17 +1859,15 @@ MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board plus IPU */
-static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
+MACHINE_CONFIG_DERIVED(mcr_nflfoot_state::mcr_91490_ipu, mcr_91490_snt)
 
 	/* basic machine hardware */
-	MCFG_MACHINE_START_OVERRIDE(mcr_state,nflfoot)
-
 	MCFG_CPU_ADD("ipu", Z80, 7372800/2)
 	MCFG_Z80_DAISY_CHAIN(mcr_ipu_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(ipu_91695_map)
 	MCFG_CPU_IO_MAP(ipu_91695_portmap)
 	MCFG_TIMER_MODIFY("scantimer")
-	MCFG_TIMER_DRIVER_CALLBACK(mcr_state, mcr_ipu_interrupt)
+	MCFG_TIMER_DRIVER_CALLBACK(mcr_nflfoot_state, ipu_interrupt)
 
 	MCFG_DEVICE_ADD("ipu_ctc", Z80CTC, 7372800/2 /* same as "ipu" */)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
@@ -1896,18 +1878,18 @@ static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
 	MCFG_DEVICE_ADD("ipu_pio1", Z80PIO, 7372800/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO0_ADD("ipu_sio", 7372800/2, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("ipu_sio", Z80SIO0, 7372800/2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("ipu", INPUT_LINE_IRQ0))
-	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(mcr_state, sio_txda_w))
-	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(mcr_state, sio_txdb_w))
+	MCFG_Z80DART_OUT_TXDA_CB(WRITELINE(mcr_nflfoot_state, sio_txda_w))
+	MCFG_Z80DART_OUT_TXDB_CB(WRITELINE(mcr_nflfoot_state, sio_txdb_w))
 MACHINE_CONFIG_END
 
 
-/* 91490 CPU board plus 90908/90913/91483 sound board plus Turbo Chip Squeak sound board */
-static MACHINE_CONFIG_DERIVED( mcr_91490_tcs, mcr_91490 )
+/* 91490 CPU board plus 90908/90913/91483 sound board plus Turbo Cheap Squeak sound board */
+MACHINE_CONFIG_DERIVED(mcr_state::mcr_91490_tcs, mcr_91490)
 
 	/* basic machine hardware */
-	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHIP_SQUEAK, 0)
+	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHEAP_SQUEAK, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2769,19 +2751,18 @@ ROM_END
 
 void mcr_state::mcr_init(int cpuboard, int vidboard, int ssioboard)
 {
-	mcr_cpu_board = cpuboard;
-	mcr_sprite_board = vidboard;
+	m_mcr_cpu_board = cpuboard;
+	m_mcr_sprite_board = vidboard;
 
-	mcr12_sprite_xoffs = 0;
-	mcr12_sprite_xoffs_flip = 0;
+	m_mcr12_sprite_xoffs = 0;
+	m_mcr12_sprite_xoffs_flip = 0;
 
-	save_item(NAME(input_mux));
-	save_item(NAME(last_op4));
+	save_item(NAME(m_input_mux));
+	save_item(NAME(m_last_op4));
 
-	midway_ssio_device *ssio = machine().device<midway_ssio_device>("ssio");
-	if (ssio != nullptr)
+	if (m_ssio.found())
 	{
-		ssio->set_custom_output(0, 0xff, write8_delegate(FUNC(mcr_state::mcr_control_port_w), this));
+		m_ssio->set_custom_output(0, 0xff, write8_delegate(FUNC(mcr_state::mcr_control_port_w), this));
 	}
 }
 
@@ -2789,28 +2770,28 @@ void mcr_state::mcr_init(int cpuboard, int vidboard, int ssioboard)
 DRIVER_INIT_MEMBER(mcr_state,solarfox)
 {
 	mcr_init(90009, 91399, 90908);
-	mcr12_sprite_xoffs = 16;
+	m_mcr12_sprite_xoffs = 16;
 
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(0, 0x1c, read8_delegate(FUNC(mcr_state::solarfox_ip0_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::solarfox_ip1_r),this));
+	m_ssio->set_custom_input(0, 0x1c, read8_delegate(FUNC(mcr_state::solarfox_ip0_r), this));
+	m_ssio->set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::solarfox_ip1_r), this));
 }
 
 
 DRIVER_INIT_MEMBER(mcr_state,kick)
 {
 	mcr_init(90009, 91399, 90908);
-	mcr12_sprite_xoffs_flip = 16;
+	m_mcr12_sprite_xoffs_flip = 16;
 
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0xf0, read8_delegate(FUNC(mcr_state::kick_ip1_r),this));
+	m_ssio->set_custom_input(1, 0xf0, read8_delegate(FUNC(mcr_state::kick_ip1_r), this));
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,dpoker)
+DRIVER_INIT_MEMBER(mcr_dpoker_state,dpoker)
 {
 	mcr_init(90009, 91399, 90908);
-	mcr12_sprite_xoffs_flip = 16;
+	m_mcr12_sprite_xoffs_flip = 16;
 
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(0, 0x8e, read8_delegate(FUNC(mcr_state::dpoker_ip0_r),this));
+	m_ssio->set_custom_input(0, 0x8e, read8_delegate(FUNC(mcr_dpoker_state::ip0_r),this));
 
 	// meter ram, is it battery backed?
 	m_maincpu->space(AS_PROGRAM).install_ram(0x8000, 0x81ff);
@@ -2820,16 +2801,16 @@ DRIVER_INIT_MEMBER(mcr_state,dpoker)
 	m_maincpu->space(AS_IO).install_read_port(0x28, 0x28, "P28");
 	m_maincpu->space(AS_IO).install_read_port(0x2c, 0x2c, "P2C");
 
-	m_maincpu->space(AS_IO).install_write_handler(0x2c, 0x2c, write8_delegate(FUNC(mcr_state::dpoker_lamps1_w),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x30, 0x30, write8_delegate(FUNC(mcr_state::dpoker_lamps2_w),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x34, 0x34, write8_delegate(FUNC(mcr_state::dpoker_output_w),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(mcr_state::dpoker_meters_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x2c, 0x2c, write8_delegate(FUNC(mcr_dpoker_state::lamps1_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x30, 0x30, write8_delegate(FUNC(mcr_dpoker_state::lamps2_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x34, 0x34, write8_delegate(FUNC(mcr_dpoker_state::output_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(mcr_dpoker_state::meters_w),this));
 
-	dpoker_coin_status = 0;
-	dpoker_output = 0;
+	m_coin_status = 0;
+	m_output = 0;
 
-	save_item(NAME(dpoker_coin_status));
-	save_item(NAME(dpoker_output));
+	save_item(NAME(m_coin_status));
+	save_item(NAME(m_output));
 }
 
 
@@ -2843,9 +2824,9 @@ DRIVER_INIT_MEMBER(mcr_state,wacko)
 {
 	mcr_init(90010, 91399, 90913);
 
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip1_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip2_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::wacko_op4_w),this));
+	m_ssio->set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip1_r),this));
+	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip2_r),this));
+	m_ssio->set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::wacko_op4_w),this));
 }
 
 
@@ -2853,7 +2834,7 @@ DRIVER_INIT_MEMBER(mcr_state,twotiger)
 {
 	mcr_init(90010, 91399, 90913);
 
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::twotiger_op4_w),this));
+	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::twotiger_op4_w),this));
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe800, 0xefff, 0, 0x1000, 0, read8_delegate(FUNC(mcr_state::twotiger_videoram_r),this), write8_delegate(FUNC(mcr_state::twotiger_videoram_w),this));
 }
 
@@ -2862,8 +2843,8 @@ DRIVER_INIT_MEMBER(mcr_state,kroozr)
 {
 	mcr_init(90010, 91399, 91483);
 
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x47, read8_delegate(FUNC(mcr_state::kroozr_ip1_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0x34, write8_delegate(FUNC(mcr_state::kroozr_op4_w),this));
+	m_ssio->set_custom_input(1, 0x47, read8_delegate(FUNC(mcr_state::kroozr_ip1_r),this));
+	m_ssio->set_custom_output(4, 0x34, write8_delegate(FUNC(mcr_state::kroozr_op4_w),this));
 }
 
 
@@ -2871,7 +2852,7 @@ DRIVER_INIT_MEMBER(mcr_state,journey)
 {
 	mcr_init(91475, 91464, 90913);
 
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::journey_op4_w),this));
+	m_ssio->set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::journey_op4_w),this));
 }
 
 
@@ -2885,19 +2866,19 @@ DRIVER_INIT_MEMBER(mcr_state,dotrone)
 {
 	mcr_init(91490, 91464, 91657);
 
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::dotron_op4_w),this));
+	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::dotron_op4_w),this));
 }
 
 
-DRIVER_INIT_MEMBER(mcr_state,nflfoot)
+DRIVER_INIT_MEMBER(mcr_nflfoot_state,nflfoot)
 {
 	mcr_init(91490, 91464, 91657);
 
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0x80, read8_delegate(FUNC(mcr_state::nflfoot_ip2_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::nflfoot_op4_w),this));
+	m_ssio->set_custom_input(2, 0x80, read8_delegate(FUNC(mcr_nflfoot_state::ip2_r),this));
+	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_nflfoot_state::op4_w),this));
 
-	save_item(NAME(m_sio_txda));
-	save_item(NAME(m_sio_txdb));
+	save_item(NAME(m_ipu_sio_txda));
+	save_item(NAME(m_ipu_sio_txdb));
 }
 
 
@@ -2905,9 +2886,9 @@ DRIVER_INIT_MEMBER(mcr_state,demoderb)
 {
 	mcr_init(91490, 91464, 90913);
 
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip1_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip2_r),this));
-	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::demoderb_op4_w),this));
+	m_ssio->set_custom_input(1, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip1_r),this));
+	m_ssio->set_custom_input(2, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip2_r),this));
+	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::demoderb_op4_w),this));
 
 	/* the SSIO Z80 doesn't have any program to execute */
 	machine().device<cpu_device>("ssio:cpu")->suspend(SUSPEND_REASON_DISABLE, 1);
@@ -2922,11 +2903,11 @@ DRIVER_INIT_MEMBER(mcr_state,demoderb)
  *************************************/
 
 /* 90009 CPU board + 91399 video gen + 90908 sound I/O */
-GAME( 1981, solarfox, 0,        mcr_90009,     solarfox, mcr_state, solarfox,  ROT90 ^ ORIENTATION_FLIP_Y, "Bally Midway", "Solar Fox (upright)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, kick,     0,        mcr_90009,     kick, mcr_state,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kick (upright)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, kickman,  kick,     mcr_90009,     kick, mcr_state,     kick,      ORIENTATION_SWAP_XY,        "Midway", "Kickman (upright)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, kickc,    kick,     mcr_90009,     kickc, mcr_state,    kick,      ROT90,                      "Midway", "Kick (cocktail)", MACHINE_SUPPORTS_SAVE )
-GAMEL(1985, dpoker,   0,        mcr_90009_dp,  dpoker, mcr_state,   dpoker,    ROT0,                       "Bally",  "Draw Poker (Bally, 03-20)", MACHINE_SUPPORTS_SAVE, layout_dpoker )
+GAME( 1981, solarfox, 0,        mcr_90009,     solarfox, mcr_state,          solarfox,  ROT90 ^ ORIENTATION_FLIP_Y, "Bally Midway", "Solar Fox (upright)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, kick,     0,        mcr_90009,     kick,     mcr_state,          kick,      ORIENTATION_SWAP_XY,        "Midway", "Kick (upright)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, kickman,  kick,     mcr_90009,     kick,     mcr_state,          kick,      ORIENTATION_SWAP_XY,        "Midway", "Kickman (upright)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, kickc,    kick,     mcr_90009,     kickc,    mcr_state,          kick,      ROT90,                      "Midway", "Kick (cocktail)", MACHINE_SUPPORTS_SAVE )
+GAMEL(1985, dpoker,   0,        mcr_90009_dp,  dpoker,   mcr_dpoker_state,   dpoker,    ROT0,                       "Bally",  "Draw Poker (Bally, 03-20)", MACHINE_SUPPORTS_SAVE, layout_dpoker )
 
 /* 90010 CPU board + 91399 video gen + 90913 sound I/O */
 GAME( 1981, shollow,  0,        mcr_90010,     shollow, mcr_state,  mcr_90010, ROT90, "Bally Midway", "Satan's Hollow (set 1)", MACHINE_SUPPORTS_SAVE )
@@ -2962,8 +2943,8 @@ GAME( 1983, dotrona,  dotron,   mcr_91490,     dotron, mcr_state,   mcr_91490, O
 GAME( 1983, dotrone,  dotron,   mcr_91490_snt, dotrone, mcr_state,  dotrone,   ORIENTATION_FLIP_X, "Bally Midway", "Discs of Tron (Environmental)", MACHINE_SUPPORTS_SAVE )
 
 /* 91490 CPU board + 91464 video gen + 91657 sound I/O + Squawk n' Talk + IPU laserdisk interface */
-GAME( 1983, nflfoot,  0,        mcr_91490_ipu, nflfoot, mcr_state,  nflfoot,   ROT0,  "Bally Midway", "NFL Football", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, nflfoot,  0,        mcr_91490_ipu, nflfoot, mcr_nflfoot_state,  nflfoot,   ROT0,  "Bally Midway", "NFL Football", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-/* 91490 CPU board + 91464 video gen + 90913 sound I/O + Turbo Chip Squeak */
+/* 91490 CPU board + 91464 video gen + 90913 sound I/O + Turbo Cheap Squeak */
 GAME( 1984, demoderb, 0,        mcr_91490_tcs, demoderb, mcr_state, demoderb,  ROT0,  "Bally Midway", "Demolition Derby", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, demoderbc,demoderb, mcr_91490_tcs, demoderbc,mcr_state, demoderb,  ROT0,  "Bally Midway", "Demolition Derby (cocktail)", MACHINE_SUPPORTS_SAVE )

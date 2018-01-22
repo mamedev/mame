@@ -283,7 +283,7 @@ HRESULT CHashCallbackConsole::SetOperationResult(UInt64 fileSize, const CHashBun
   return CheckBreak2();
 }
 
-static const char *k_DigestTitles[] =
+static const char * const k_DigestTitles[] =
 {
     " : "
   , " for data:              "

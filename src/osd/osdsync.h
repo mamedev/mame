@@ -22,7 +22,7 @@
 
 #define OSD_EVENT_WAIT_INFINITE (~(osd_ticks_t)0)
 
-/* osd_event is an opaque type which represents a setable/resetable event */
+/* osd_event is an opaque type which represents a setable/resettable event */
 
 class osd_event
 {

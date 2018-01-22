@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 
 class _1942_state : public driver_device
 {
@@ -48,7 +49,6 @@ public:
 	DECLARE_WRITE8_MEMBER(c1942_scroll_w);
 	DECLARE_WRITE8_MEMBER(c1942_c804_w);
 	DECLARE_WRITE8_MEMBER(c1942p_f600_w);
-	DECLARE_WRITE8_MEMBER(c1942p_soundlatch_w);
 	DECLARE_DRIVER_INIT(1942);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -65,4 +65,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void _1942p(machine_config &config);
+	void _1942(machine_config &config);
 };

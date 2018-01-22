@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+#ifndef MAME_BUS_IQ151_GRAFIK_H
+#define MAME_BUS_IQ151_GRAFIK_H
+
 #pragma once
 
-#ifndef __IQ151_GRAFIK_H__
-#define __IQ151_GRAFIK_H__
-
-#include "emu.h"
 #include "iq151.h"
 #include "machine/i8255.h"
 
@@ -23,18 +22,13 @@ public:
 	// construction/destruction
 	iq151_grafik_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
-	// ppi8255 callback
-	DECLARE_WRITE8_MEMBER(x_write);
-	DECLARE_WRITE8_MEMBER(y_write);
-	DECLARE_WRITE8_MEMBER(control_w);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// iq151cart_interface overrides
 	virtual void io_read(offs_t offset, uint8_t &data) override;
@@ -42,6 +36,10 @@ protected:
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 
 private:
+	// ppi8255 callback
+	DECLARE_WRITE8_MEMBER(x_write);
+	DECLARE_WRITE8_MEMBER(y_write);
+	DECLARE_WRITE8_MEMBER(control_w);
 
 	required_device<i8255_device> m_ppi8255;
 
@@ -59,5 +57,6 @@ private:
 
 // device type definition
 extern const device_type IQ151_GRAFIK;
+DECLARE_DEVICE_TYPE(IQ151_GRAFIK, iq151_grafik_device)
 
-#endif  /* __IQ151_GRAFIK_H__ */
+#endif // MAME_BUS_IQ151_GRAFIK_H

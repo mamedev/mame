@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VIP_VP700_H
+#define MAME_BUS_VIP_VP700_H
+
 #pragma once
 
-#ifndef __VP700__
-#define __VP700__
-
-#include "emu.h"
 #include "exp.h"
 #include "sound/cdp1863.h"
 
@@ -46,7 +45,6 @@ private:
 
 
 // device type definition
-extern const device_type VP700;
+DECLARE_DEVICE_TYPE(VP700, vp700_device)
 
-
-#endif
+#endif // MAME_BUS_VIP_VP700_H

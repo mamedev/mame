@@ -127,7 +127,7 @@ void mac_fdc_set_enable_lines(device_t *device, int enable_mask)
 {
 	mac_state *mac = device->machine().driver_data<mac_state>();
 
-	if (mac->m_model != MODEL_MAC_SE)
+	if (mac->m_model != mac_state::MODEL_MAC_SE)
 	{
 		sony_set_enable_lines(device, enable_mask);
 	}
@@ -440,7 +440,7 @@ void mac_state::set_memory_overlay(int overlay)
 				mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 			}
 		}
-		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIVX) || (m_model == MODEL_MAC_IIFX))
+		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIFX))
 		{
 			address_space& space = m_maincpu->space(AS_PROGRAM);
 			space.unmap_write(0x000000, 0x9fffff);
@@ -452,11 +452,11 @@ void mac_state::set_memory_overlay(int overlay)
 			space.unmap_write(0x000000, 0xffffff);
 			mac_install_memory(0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
-		else if ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30))
+		else if ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30) && (m_model != MODEL_MAC_IIVX) && (m_model != MODEL_MAC_IIVI))
 		{
 			mac_install_memory(0x00000000, 0x3fffffff, memory_size, memory_data, is_rom, "bank1");
 		}
-		else if ((m_model == MODEL_MAC_LC_III) || (m_model == MODEL_MAC_LC_III_PLUS) || (m_model >= MODEL_MAC_LC_475 && m_model <= MODEL_MAC_LC_580))   // up to 36 MB
+		else if ((m_model == MODEL_MAC_IIVX) || (m_model == MODEL_MAC_IIVI) || (m_model == MODEL_MAC_LC_III) || (m_model == MODEL_MAC_LC_III_PLUS) || (m_model >= MODEL_MAC_LC_475 && m_model <= MODEL_MAC_LC_580))   // up to 36 MB
 		{
 			mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 
@@ -498,7 +498,7 @@ READ32_MEMBER(mac_state::rom_switch_r)
 		set_memory_overlay(0);
 	}
 
-//  printf("rom_switch_r: offset %08x ROM_size -1 = %08x, masked = %08x\n", offset, ROM_size-1, offset & ((ROM_size - 1)>>2));
+	//printf("rom_switch_r: offset %08x ROM_size -1 = %08x, masked = %08x\n", offset, ROM_size-1, offset & ((ROM_size - 1)>>2));
 
 	return ROM_data[offset & ((ROM_size - 1)>>2)];
 }
@@ -1021,7 +1021,7 @@ WRITE16_MEMBER ( mac_state::macii_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
 
-//  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, m_maincpu->pc());
 
 	if ((reg == 0) && (offset == 0x100))
 	{
@@ -1166,7 +1166,7 @@ void mac_state::scc_mouse_irq(int x, int y)
 
 READ16_MEMBER ( mac_state::mac_scc_r )
 {
-	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
+	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	uint16_t result;
 
 	result = scc->reg_r(space, offset);
@@ -1177,13 +1177,13 @@ READ16_MEMBER ( mac_state::mac_scc_r )
 
 WRITE16_MEMBER ( mac_state::mac_scc_w )
 {
-	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
+	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	scc->reg_w(space, offset, data);
 }
 
 WRITE16_MEMBER ( mac_state::mac_scc_2_w )
 {
-	scc8530_t *scc = space.machine().device<scc8530_t>("scc");
+	scc8530_t *scc = machine().device<scc8530_t>("scc");
 	scc->reg_w(space, offset, data >> 8);
 }
 
@@ -1202,22 +1202,22 @@ READ16_MEMBER ( mac_state::mac_iwm_r )
 	 */
 
 	uint16_t result = 0;
-	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
+	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	result = fdc->read(offset >> 8);
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, space.device().safe_pc());
+		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, m_maincpu->pc());
 
 	return (result << 8) | result;
 }
 
 WRITE16_MEMBER ( mac_state::mac_iwm_w )
 {
-	applefdc_base_device *fdc = space.machine().device<applefdc_base_device>("fdc");
+	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, space.device().safe_pc());
+		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
 		fdc->write((offset >> 8), data & 0xff);
@@ -1238,10 +1238,15 @@ WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
 	}
 	else
 	{
+		m_adb_command <<= 1;
 		if (state)
+		{
 			m_adb_command |= 1;
+		}
 		else
+		{
 			m_adb_command &= ~1;
+		}
 	}
 }
 
@@ -1530,10 +1535,10 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
 
 WRITE8_MEMBER(mac_state::mac_via_out_b_egadb)
 {
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->pc());
 
 	#if LOG_ADB
-	printf("68K: New Egret state: SS %d VF %d (PC %x)\n", (data>>5)&1, (data>>4)&1, space.device().safe_pc());
+	printf("68K: New Egret state: SS %d VF %d (PC %x)\n", (data>>5)&1, (data>>4)&1, m_maincpu->pc());
 	#endif
 	m_egret->set_via_full((data&0x10) ? 1 : 0);
 	m_egret->set_sys_session((data&0x20) ? 1 : 0);
@@ -1541,10 +1546,10 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_egadb)
 
 WRITE8_MEMBER(mac_state::mac_via_out_b_cdadb)
 {
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->safe_pc());
+//  printf("VIA1 OUT B: %02x (PC %x)\n", data, m_maincpu->pc());
 
 	#if LOG_ADB
-	printf("68K: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, space.device().safe_pc());
+	printf("68K: New Cuda state: TIP %d BYTEACK %d (PC %x)\n", (data>>5)&1, (data>>4)&1, m_maincpu->pc());
 	#endif
 	m_cuda->set_byteack((data&0x10) ? 1 : 0);
 	m_cuda->set_tip((data&0x20) ? 1 : 0);
@@ -1677,7 +1682,7 @@ READ16_MEMBER ( mac_state::mac_via2_r )
 	data = m_via2->read(space, offset);
 
 	if (LOG_VIA)
-		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, space.device().safe_pc());
+		logerror("mac_via2_r: offset=0x%02x = %02x (PC=%x)\n", offset*2, data, m_maincpu->pc());
 
 	return (data & 0xff) | (data << 8);
 }
@@ -1688,7 +1693,7 @@ WRITE16_MEMBER ( mac_state::mac_via2_w )
 	offset &= 0x0f;
 
 	if (LOG_VIA)
-		logerror("mac_via2_w: offset=%x data=0x%08x mask=%x (PC=%x)\n", offset, data, mem_mask, space.device().safe_pc());
+		logerror("mac_via2_w: offset=%x data=0x%08x mask=%x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
 		m_via2->write(space, offset, data & 0xff);
@@ -1963,6 +1968,10 @@ void mac_state::machine_reset()
 			m_overlay_timeout->adjust(attotime::never);
 		}
 		else if (((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_COLOR_CLASSIC) && ((m_model != MODEL_MAC_LC_III) && (m_model != MODEL_MAC_LC_III_PLUS))) || (m_model == MODEL_MAC_CLASSIC_II))
+		{
+			m_overlay_timeout->adjust(attotime::never);
+		}
+		else if ((m_model >= MODEL_MAC_IIVX) && (m_model <= MODEL_MAC_IIVI))
 		{
 			m_overlay_timeout->adjust(attotime::never);
 		}
@@ -3181,20 +3190,20 @@ const char *lookup_trap(uint16_t opcode)
 
 
 
-offs_t mac_state::mac_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+offs_t mac_state::mac_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params)
 {
 	uint16_t opcode;
 	unsigned result = 0;
 	const char *trap;
 
-	opcode = oprom[0]<<8 | oprom[1];
+	opcode = opcodes.r16(pc);
 	if ((opcode & 0xF000) == 0xA000)
 	{
 		trap = lookup_trap(opcode);
 		if (trap != nullptr)
 		{
 			stream << trap;
-			result = 2;
+			result = 2 | util::disasm_interface::SUPPORTED;
 		}
 	}
 	return result;

@@ -65,7 +65,7 @@
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )\
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-/**************************** Coinage & Dip Swicthes ****************************/
+/**************************** Coinage & Dip Switches ****************************/
 
 #define COINAGE_WORLD\
 	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW1:5,6")\

@@ -1394,7 +1394,7 @@ void lynx_state::lynx_timer_signal_irq(int which)
 {
 	if ((m_timer[which].cntrl1 & 0x80) && (which != 4)) // if interrupts are enabled and timer != 4
 	{
-		m_mikey.data[0x81] |= (1 << which); // set interupt poll register
+		m_mikey.data[0x81] |= (1 << which); // set interrupt poll register
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		m_maincpu->set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
 	}
@@ -1718,7 +1718,7 @@ READ8_MEMBER(lynx_state::mikey_read)
 
 	case 0x80:
 	case 0x81:
-		value = m_mikey.data[0x81]; // both registers access the same interupt status byte
+		value = m_mikey.data[0x81]; // both registers access the same interrupt status byte
 		// logerror( "mikey read %.2x %.2x\n", offset, value );
 		break;
 
@@ -1790,14 +1790,14 @@ WRITE8_MEMBER(lynx_state::mikey_write)
 			m_maincpu->set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
 		break;
 
-	/* Is this correct? */ // Notes say writing to register will result in interupt being triggered.
+	/* Is this correct? */ // Notes say writing to register will result in interrupt being triggered.
 	case 0x81:
 		m_mikey.data[0x81] |= data;
 		if (data)
 		{
 			m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_maincpu->set_input_line(M65SC02_IRQ_LINE, ASSERT_LINE);
-			logerror("direct write to interupt register\n");
+			logerror("direct write to interrupt register\n");
 		}
 		break;
 
@@ -2066,7 +2066,7 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 	uint32_t size = m_cart->common_get_size("rom");
 	uint16_t gran = 0;
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		// check for lnx header
 		if (image.is_filetype("lnx"))
@@ -2098,7 +2098,7 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
 	// set-up granularity
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		if (image.is_filetype("lnx"))     // from header
 			m_granularity = gran;
@@ -2124,7 +2124,7 @@ DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 	}
 
 	// set-up rotation from softlist
-	if (image.software_entry() != nullptr)
+	if (image.loaded_through_softlist())
 	{
 		const char *rotate = image.get_feature("rotation");
 		m_rotate = 0;

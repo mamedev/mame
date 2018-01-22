@@ -8,6 +8,7 @@
 
 #include "video/k007121.h"
 #include "video/k051733.h"
+#include "screen.h"
 
 class labyrunr_state : public driver_device
 {
@@ -55,4 +56,5 @@ public:
 	uint32_t screen_update_labyrunr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(labyrunr_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(labyrunr_timer_interrupt);
+	void labyrunr(machine_config &config);
 };

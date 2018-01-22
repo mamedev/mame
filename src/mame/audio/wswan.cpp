@@ -13,11 +13,12 @@ The noise taps and behavior are the same as the Virtual Boy.
 
 **************************************************************************************/
 
+#include "emu.h"
 #include "wswan.h"
 
 
 // device type definition
-const device_type WSWAN_SND = &device_creator<wswan_sound_device>;
+DEFINE_DEVICE_TYPE(WSWAN_SND, wswan_sound_device, "wswan_sound", "WonderSwan Custom Sound")
 
 
 //**************************************************************************
@@ -29,7 +30,7 @@ const device_type WSWAN_SND = &device_creator<wswan_sound_device>;
 //-------------------------------------------------
 
 wswan_sound_device::wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, WSWAN_SND, "WonderSwan Audio Custom", tag, owner, clock, "wswan_sound", __FILE__),
+	: device_t(mconfig, WSWAN_SND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
 		m_sweep_step(0),
@@ -325,7 +326,7 @@ WRITE8_MEMBER( wswan_sound_device::port_w )
 			break;
 
 		case 0x8D:              /* Sweep time */
-			m_sweep_time = space.machine().sample_rate() / ( 3072000 / ( 8192 * (data + 1) ) );
+			m_sweep_time = machine().sample_rate() / ( 3072000 / ( 8192 * (data + 1) ) );
 			break;
 
 		case 0x8E:              /* Noise control */

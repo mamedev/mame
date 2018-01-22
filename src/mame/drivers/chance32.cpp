@@ -22,6 +22,8 @@
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "chance32.lh"
 
@@ -67,6 +69,7 @@ public:
 	uint32_t screen_update_chance32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void chance32(machine_config &config);
 };
 
 
@@ -197,7 +200,7 @@ WRITE8_MEMBER(chance32_state::muxout_w)
 static ADDRESS_MAP_START( chance32_map, AS_PROGRAM, 8, chance32_state )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe000, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(chance32_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(chance32_bgram_w) AM_SHARE("bgram")
 ADDRESS_MAP_END
@@ -442,7 +445,7 @@ void chance32_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( chance32, chance32_state )
+MACHINE_CONFIG_START(chance32_state::chance32)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/2)
@@ -472,7 +475,7 @@ static MACHINE_CONFIG_START( chance32, chance32_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* clock at 1050 kHz match the 8000 Hz samples stored inside the ROM */
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -515,5 +518,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                FULLNAME            FLAGS  LAYOUT */
-GAMEL( 19??, chance32, 0,      chance32, chance32, driver_device, 0,    ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     layout_chance32 )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT   COMPANY                FULLNAME             FLAGS  LAYOUT */
+GAMEL( 19??, chance32, 0,      chance32, chance32, chance32_state, 0,    ROT0, "PAL System Co, Ltd.", "Chance Thirty Two", 0,     layout_chance32 )

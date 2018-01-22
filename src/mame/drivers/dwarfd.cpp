@@ -301,6 +301,8 @@ uPC1352C @ N3
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
 #include "video/i8275.h"
+#include "screen.h"
+#include "speaker.h"
 
 class dwarfd_state : public driver_device
 {
@@ -312,7 +314,7 @@ public:
 		m_crtc(*this, "i8275"),
 		m_charmap(*this, "gfx1"),
 		m_dsw2(*this, "DSW2")
-		{ }
+	{ }
 
 	/* video-related */
 	int m_crt_access;
@@ -342,6 +344,9 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(pesp_display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(qc_display_pixels);
+	void dwarfd(machine_config &config);
+	void pokeresp(machine_config &config);
+	void qc(machine_config &config);
 };
 
 
@@ -788,7 +793,7 @@ void dwarfd_state::machine_reset()
 	m_back_color = false;
 }
 
-static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
+MACHINE_CONFIG_START(dwarfd_state::dwarfd)
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
@@ -821,7 +826,7 @@ static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pokeresp, dwarfd )
+MACHINE_CONFIG_DERIVED(dwarfd_state::pokeresp, dwarfd)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pokeresp_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -830,7 +835,7 @@ static MACHINE_CONFIG_DERIVED( pokeresp, dwarfd )
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(dwarfd_state, pesp_display_pixels)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( qc, dwarfd )
+MACHINE_CONFIG_DERIVED(dwarfd_state::qc, dwarfd)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(qc_map)
@@ -1105,11 +1110,11 @@ DRIVER_INIT_MEMBER(dwarfd_state,qc)
 
 }
 
-/*    YEAR  NAME      PARENT     MACHINE INPUT   INIT    ORENTATION,         COMPANY           FULLNAME            FLAGS */
-GAME( 1979, pokeresp, 0,         pokeresp, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Poker (Electro-Sport)",                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dwarfd,   0,         dwarfd, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Dwarf Gfx)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, dwarfda,   dwarfd,   dwarfd, dwarfd, dwarfd_state, dwarfd, 0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Card Gfx)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, quarterh, 0,         dwarfd, quarterh, dwarfd_state, dwarfd, 0, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1983, quarterha, quarterh, dwarfd, quarterh, dwarfd_state, dwarfd, 0, "Electro-Sport", "Quarter Horse (set 2, Pioneer PR-8210)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1983, quarterhb, quarterh, dwarfd, quarterh, dwarfd_state, dwarfd, 0, "Electro-Sport", "Quarter Horse (set 3, Pioneer LD-V2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1995, qc,       0,         qc,     quarterh, dwarfd_state, qc,     0, "ArJay Exports/Prestige Games", "Quarter Horse Classic", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT     MACHINE   INPUT     STATE         INIT    ORENTATION,         COMPANY           FULLNAME            FLAGS
+GAME( 1979, pokeresp, 0,         pokeresp, dwarfd,   dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Poker (Electro-Sport)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dwarfd,   0,         dwarfd,   dwarfd,   dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Dwarf Gfx)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, dwarfda,   dwarfd,   dwarfd,   dwarfd,   dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Draw Poker III / Dwarfs Den (Card Gfx)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, quarterh, 0,         dwarfd,   quarterh, dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Quarter Horse (set 1, Pioneer PR-8210)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1983, quarterha, quarterh, dwarfd,   quarterh, dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Quarter Horse (set 2, Pioneer PR-8210)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1983, quarterhb, quarterh, dwarfd,   quarterh, dwarfd_state, dwarfd, ROT0, "Electro-Sport", "Quarter Horse (set 3, Pioneer LD-V2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1995, qc,       0,         qc,       quarterh, dwarfd_state, qc,     ROT0, "ArJay Exports/Prestige Games", "Quarter Horse Classic",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

@@ -25,13 +25,6 @@
 #include "emu.h"
 #include "f3853.h"
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-#define INTERRUPT_VECTOR(external) ( external ? m_low | ( m_high << 8 ) | 0x80 \
-: ( m_low | ( m_high << 8 ) ) & ~0x80 )
-
 
 
 /***************************************************************************
@@ -43,14 +36,14 @@
 //**************************************************************************
 
 // device type definition
-const device_type F3853 = &device_creator<f3853_device>;
+DEFINE_DEVICE_TYPE(F3853, f3853_device, "f3853_device", "F3853")
 
 //-------------------------------------------------
 //  f3853_device - constructor
 //-------------------------------------------------
 
 f3853_device::f3853_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, F3853, "F3853", tag, owner, clock, "f3853", __FILE__)
+	: device_t(mconfig, F3853, tag, owner, clock)
 {
 }
 
@@ -60,19 +53,11 @@ f3853_device::f3853_device(const machine_config &mconfig, const char *tag, devic
 
 void f3853_device::device_start()
 {
-	uint8_t reg = 0xfe;
-	for(int32_t i=254 /* Known to get 0xfe after 255 cycles */; i >= 0; i--)
+	uint8_t reg = 0xfe; // Known to get 0xfe after 255 cycles
+	for(int i = reg; i >= 0; i--)
 	{
-		int32_t o7 = (reg & 0x80) ? true : false;
-		int32_t o5 = (reg & 0x20) ? true : false;
-		int32_t o4 = (reg & 0x10) ? true : false;
-		int32_t o3 = (reg & 0x08) ? true : false;
 		m_value_to_cycle[reg] = i;
-		reg <<= 1;
-		if (!((o7 != o5) != (o4 != o3)))
-		{
-			reg |= 1;
-		}
+		reg = reg << 1 | (BIT(reg,7) ^ BIT(reg,5) ^ BIT(reg,4) ^ BIT(reg,3) ^ 1);
 	}
 
 	m_interrupt_req_cb.bind_relative_to(*owner());
@@ -113,9 +98,9 @@ void f3853_device::set_interrupt_request_line()
 		return;
 
 	if (m_external_enable && !m_priority_line)
-		m_interrupt_req_cb(INTERRUPT_VECTOR(true), true);
+		m_interrupt_req_cb(external_interrupt_vector(), true);
 	else if (m_timer_enable && !m_priority_line && m_request_flipflop)
-		m_interrupt_req_cb(INTERRUPT_VECTOR(false), true);
+		m_interrupt_req_cb(timer_interrupt_vector(), true);
 	else
 		m_interrupt_req_cb(0, false);
 }

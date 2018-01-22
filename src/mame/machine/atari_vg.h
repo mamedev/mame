@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef __ATARIVGEAROM_H__
-#define __ATARIVGEAROM_H__
+#ifndef MAME_MACHINE_ATARI_VG_H
+#define MAME_MACHINE_ATARI_VG_H
+
+#pragma once
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -27,6 +29,11 @@ class atari_vg_earom_device :   public device_t,
 public:
 	// construction/destruction
 	atari_vg_earom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_WRITE8_MEMBER( ctrl_w );
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -36,10 +43,7 @@ protected:
 	virtual void nvram_default() override;
 	virtual void nvram_read(emu_file &file) override;
 	virtual void nvram_write(emu_file &file) override;
-public:
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
+
 private:
 	int m_old_ctrl;
 	int m_state;
@@ -50,6 +54,6 @@ private:
 };
 
 // device type definition
-extern const device_type ATARIVGEAROM;
+DECLARE_DEVICE_TYPE(ATARIVGEAROM, atari_vg_earom_device)
 
-#endif
+#endif // MAME_MACHINE_ATARI_VG_H

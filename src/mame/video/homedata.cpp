@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino, Nicola Salmoria
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
 #include "includes/homedata.h"
+
+#include "cpu/m6809/m6809.h"
+#include "screen.h"
+
 
 /*
     video control registers:
@@ -701,7 +704,7 @@ WRITE8_MEMBER(homedata_state::reikaids_videoram_w)
 
 WRITE8_MEMBER(homedata_state::reikaids_gfx_bank_w)
 {
-//logerror( "%04x: [setbank %02x]\n",space.device().safe_pc(),data);
+//logerror( "%04x: [setbank %02x]\n",m_maincpu->pc(),data);
 
 	if (m_gfx_bank[m_reikaids_which] != data)
 	{
@@ -714,7 +717,7 @@ WRITE8_MEMBER(homedata_state::reikaids_gfx_bank_w)
 
 WRITE8_MEMBER(homedata_state::pteacher_gfx_bank_w)
 {
-//  logerror("%04x: gfxbank:=%02x\n", space.device().safe_pc(), data);
+//  logerror("%s: gfxbank:=%02x\n", m_maincpu->pc(), data);
 	if (m_gfx_bank[0] != data)
 	{
 		m_gfx_bank[0] = data;
@@ -724,7 +727,7 @@ WRITE8_MEMBER(homedata_state::pteacher_gfx_bank_w)
 
 WRITE8_MEMBER(homedata_state::homedata_blitter_param_w)
 {
-//logerror("%04x: blitter_param_w %02x\n", space.device().safe_pc(), data);
+//logerror("%s: blitter_param_w %02x\n", m_maincpu->pc(), data);
 	m_blitter_param[m_blitter_param_count] = data;
 	m_blitter_param_count++;
 	m_blitter_param_count &= 3;
@@ -1019,7 +1022,7 @@ uint32_t homedata_state::screen_update_mirderby(screen_device &screen, bitmap_in
 }
 
 
-void homedata_state::screen_eof_homedata(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(homedata_state::screen_vblank_homedata)
 {
 	// rising edge
 	if (state)

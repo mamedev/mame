@@ -13,6 +13,7 @@
 #include "machine/latch8.h"
 #include "machine/z80dma.h"
 #include "machine/i8257.h"
+#include "screen.h"
 
 
 /*
@@ -265,10 +266,11 @@ public:
 	DECLARE_MACHINE_RESET(strtheat);
 	DECLARE_MACHINE_RESET(drakton);
 	DECLARE_WRITE8_MEMBER(M58817_command_w);
-	DECLARE_READ8_MEMBER(M58817_status_r);
 	DECLARE_READ8_MEMBER(dkong_voice_status_r);
 	DECLARE_READ8_MEMBER(dkong_tune_r);
 	DECLARE_WRITE8_MEMBER(dkong_p1_w);
+	DECLARE_READ8_MEMBER(sound_t0_r);
+	DECLARE_READ8_MEMBER(sound_t1_r);
 	uint32_t screen_update_dkong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pestplce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spclforc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -283,6 +285,26 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	double CD4049(double x);
 
+	void dkong_base(machine_config &config);
+	void braze(machine_config &config);
+	void strtheat(machine_config &config);
+	void spclforc(machine_config &config);
+	void s2650(machine_config &config);
+	void dkongjr(machine_config &config);
+	void radarscp1(machine_config &config);
+	void drktnjr(machine_config &config);
+	void dkong2b(machine_config &config);
+	void drakton(machine_config &config);
+	void radarscp(machine_config &config);
+	void pestplce(machine_config &config);
+	void herbiedk(machine_config &config);
+	void dkong3(machine_config &config);
+	void dkong3b(machine_config &config);
+	void radarscp_audio(machine_config &config);
+	void dkong2b_audio(machine_config &config);
+	void dkongjr_audio(machine_config &config);
+	void dkong3_audio(machine_config &config);
+	void radarscp1_audio(machine_config &config);
 private:
 	// video/dkong.c
 	void radarscp_step(int line_cnt);
@@ -292,11 +314,3 @@ private:
 	void radarscp_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 };
-
-/*----------- defined in audio/dkong.c -----------*/
-
-MACHINE_CONFIG_EXTERN( radarscp_audio );
-MACHINE_CONFIG_EXTERN( dkong2b_audio );
-MACHINE_CONFIG_EXTERN( dkongjr_audio );
-MACHINE_CONFIG_EXTERN( dkong3_audio );
-MACHINE_CONFIG_EXTERN( radarscp1_audio );

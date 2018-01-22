@@ -15,12 +15,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/madmotor.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/2203intf.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/madmotor.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /******************************************************************************/
@@ -56,7 +59,7 @@ static ADDRESS_MAP_START( madmotor_map, AS_PROGRAM, 16, madmotor_state )
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_DEVREADWRITE("tilegen3", deco_bac06_device, pf_data_r, pf_data_w)
 	AM_RANGE(0x3e0000, 0x3e3fff) AM_RAM
 	AM_RANGE(0x3e8000, 0x3e87ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3f0000, 0x3f07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x3f0000, 0x3f07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x3f8002, 0x3f8003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3f8004, 0x3f8005) AM_READ_PORT("DSW")
 	AM_RANGE(0x3f8006, 0x3f8007) AM_READ_PORT("SYSTEM")
@@ -229,7 +232,7 @@ void madmotor_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( madmotor, madmotor_state )
+MACHINE_CONFIG_START(madmotor_state::madmotor)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
@@ -283,10 +286,10 @@ static MACHINE_CONFIG_START( madmotor, madmotor_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki1", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", 1023924, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", 2047848, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", 2047848, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

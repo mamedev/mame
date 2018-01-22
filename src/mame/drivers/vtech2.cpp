@@ -66,13 +66,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
 #include "includes/vtech2.h"
-#include "imagedev/cassette.h"
+
+#include "cpu/z80/z80.h"
 #include "imagedev/flopdrv.h"
+#include "sound/wave.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/vt_cas.h"
+
 
 static ADDRESS_MAP_START(vtech2_mem, AS_PROGRAM, 8, vtech2_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -212,7 +216,7 @@ static INPUT_PORTS_START( laser500 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH2)   PORT_CHAR('\\') PORT_CHAR('|')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE)   PORT_CHAR(']') PORT_CHAR('}')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)    PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mu  \xC2\xA3") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('\xA3')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mu  \xC2\xA3") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(0xA3)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Del") PORT_CODE(KEYCODE_DEL)             PORT_CHAR(UCHAR_MAMEKEY(DEL))
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ins") PORT_CODE(KEYCODE_INSERT)          PORT_CHAR(UCHAR_MAMEKEY(INSERT))
 INPUT_PORTS_END
@@ -409,7 +413,7 @@ static const floppy_interface vtech2_floppy_interface =
 	nullptr
 };
 
-static MACHINE_CONFIG_START( laser350, vtech2_state )
+MACHINE_CONFIG_START(vtech2_state::laser350)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3694700)        /* 3.694700 MHz */
 	MCFG_CPU_PROGRAM_MAP(vtech2_mem)
@@ -451,12 +455,12 @@ static MACHINE_CONFIG_START( laser350, vtech2_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( laser500, laser350 )
+MACHINE_CONFIG_DERIVED(vtech2_state::laser500, laser350)
 	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser500 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( laser700, laser350 )
+MACHINE_CONFIG_DERIVED(vtech2_state::laser700, laser350)
 	MCFG_MACHINE_RESET_OVERRIDE(vtech2_state, laser700 )
 
 	/* Second 5.25" floppy drive */
@@ -500,7 +504,7 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR   NAME      PARENT    COMPAT MACHINE   INPUT     INIT      COMPANY              FULLNAME */
-COMP( 1984?, laser350, 0,        0,     laser350, laser350, vtech2_state, laser,    "Video Technology",  "Laser 350" , 0)
-COMP( 1984?, laser500, laser350, 0,     laser500, laser500, vtech2_state, laser,    "Video Technology",  "Laser 500" , 0)
-COMP( 1984?, laser700, laser350, 0,     laser700, laser500, vtech2_state, laser,    "Video Technology",  "Laser 700" , 0)
+//    YEAR   NAME      PARENT    COMPAT  MACHINE   INPUT     STATE         INIT   COMPANY             FULLNAME      FLAGS
+COMP( 1984?, laser350, 0,        0,      laser350, laser350, vtech2_state, laser, "Video Technology", "Laser 350" , 0)
+COMP( 1984?, laser500, laser350, 0,      laser500, laser500, vtech2_state, laser, "Video Technology", "Laser 500" , 0)
+COMP( 1984?, laser700, laser350, 0,      laser700, laser500, vtech2_state, laser, "Video Technology", "Laser 700" , 0)

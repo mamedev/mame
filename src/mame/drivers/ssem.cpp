@@ -6,10 +6,11 @@
     Driver by Ryan Holtz
 */
 
-
 #include "emu.h"
 #include "cpu/ssem/ssem.h"
 #include "imagedev/snapquik.h"
+#include "screen.h"
+
 
 class ssem_state : public driver_device
 {
@@ -30,6 +31,7 @@ public:
 	inline uint32_t reverse(uint32_t v);
 	void strlower(char *buf);
 
+	void ssem(machine_config &config);
 private:
 	template <typename Format, typename... Params>
 	void glyph_print(bitmap_rgb32 &bitmap, int32_t x, int32_t y, Format &&fmt, Params &&...args);
@@ -624,7 +626,7 @@ void ssem_state::machine_reset()
 	m_store_line = 0;
 }
 
-static MACHINE_CONFIG_START( ssem, ssem_state )
+MACHINE_CONFIG_START(ssem_state::ssem)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SSEMCPU, 700)
 	MCFG_CPU_PROGRAM_MAP(ssem_map)
@@ -648,5 +650,5 @@ ROM_START( ssem )
 ROM_END
 
 
-/*   YEAR  NAME     PARENT    COMPAT   MACHINE  INPUT  INIT        COMPANY                       FULLNAME */
-COMP(1948, ssem,    0,        0,       ssem,    ssem, driver_device,  0,   "Manchester University", "Small-Scale Experimental Machine (SSEM), 'Baby'", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+//   YEAR  NAME     PARENT    COMPAT   MACHINE  INPUT  STATE        INIT  COMPANY                  FULLNAME
+COMP(1948, ssem,    0,        0,       ssem,    ssem,  ssem_state,  0,    "Manchester University", "Small-Scale Experimental Machine (SSEM), 'Baby'", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE)

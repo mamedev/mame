@@ -30,17 +30,19 @@ System specs :
    CPU       : 68000 (8MHz)
    Sound     : AY8910 + MSM5205
    Chips     : X1-001, X1-002A, X1-003, X1-004x2, X0-005 x2
-           X1-001, X1-002A  : Sprites
-           X1-003           : Video output
-           X1-004           : ???
-           X1-005           : ???
+           X1-001, X1-002A (64 pins) : Sprites
+           X1-003          (?? pins) : Video output
+           X1-004          (52 pins) : Inputs
+           X0-005          (40 pins) : Interface
 
 
 Known issues :
 ===============
  - IOX might be either a shared component between PCBs or every game have its own configuration.
    For now I've opted for the latter solution, until an HW test will be done ...
-   Could also be that's a MCU of some sort.
+ - X0-005 is a probable MCU, most likely a 8741/8742 UPI type like the "M-Chip" in tnzs.cpp.
+   One X0-005 handles the inputs; the other drives the MSM5205 with the aid of a 8243 expander.
+   Are both of these functions really performed by the same (undumped) internal program?
  - AY-3-8910 sound may be wrong.
  - CPU clock of srmp3 does not match the real machine.
  - MSM5205 clock frequency in srmp3 is wrong.
@@ -58,12 +60,16 @@ Note:
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/srmp2.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-#include "includes/srmp2.h"
-#include "machine/nvram.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 
@@ -196,7 +202,7 @@ WRITE16_MEMBER(srmp2_state::mjyuugi_adpcm_bank_w)
 }
 
 
-WRITE16_MEMBER(srmp2_state::srmp2_adpcm_code_w)
+WRITE8_MEMBER(srmp2_state::adpcm_code_w)
 {
 /*
     - Received data may be playing ADPCM number.
@@ -214,28 +220,7 @@ WRITE16_MEMBER(srmp2_state::srmp2_adpcm_code_w)
 	m_adpcm_sptr += (m_adpcm_bank * 0x10000);
 	m_adpcm_eptr += (m_adpcm_bank * 0x10000);
 
-	m_msm->reset_w(0);
-	m_adpcm_data = -1;
-}
-
-
-WRITE8_MEMBER(srmp2_state::srmp3_adpcm_code_w)
-{
-/*
-    - Received data may be playing ADPCM number.
-    - 0x000000 - 0x0000ff and 0x010000 - 0x0100ff are offset table.
-    - When the hardware receives the ADPCM number, it refers the offset
-      table and plays the ADPCM for itself.
-*/
-
-	uint8_t *ROM = memregion("adpcm")->base();
-
-	m_adpcm_sptr = (ROM[((m_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
-	m_adpcm_eptr = (ROM[((m_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
-	m_adpcm_eptr  = (m_adpcm_eptr - 1) & 0x0ffff;
-
-	m_adpcm_sptr += (m_adpcm_bank * 0x10000);
-	m_adpcm_eptr += (m_adpcm_bank * 0x10000);
+	//printf("%02x %08x %08x %08x\n",data,m_adpcm_sptr,m_adpcm_eptr,((m_adpcm_bank * 0x10000) + (data << 2) + 0));
 
 	m_msm->reset_w(0);
 	m_adpcm_data = -1;
@@ -419,7 +404,7 @@ static ADDRESS_MAP_START( srmp2_map, AS_PROGRAM, 16, srmp2_state )
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP                        /* ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff) /* key matrix | I/O */
 	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
-	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(srmp2_adpcm_code_w)   /* ADPCM number */
+	AM_RANGE(0xb00000, 0xb00001) AM_WRITE8(adpcm_code_w,0x00ff)   /* ADPCM number */
 	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)      /* ADPCM voice status */
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE8(srmp2_irq2_ack_w,0x00ff)         /* irq ack lv 2 */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE8(srmp2_irq4_ack_w,0x00ff)         /* irq ack lv 4 */
@@ -450,11 +435,11 @@ static ADDRESS_MAP_START( mjyuugi_map, AS_PROGRAM, 16, srmp2_state )
 	AM_RANGE(0x300000, 0x300001) AM_READ8(mjyuugi_irq4_ack_r,0x00ff) /* irq ack lv 4? */
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW3-1")             /* DSW 3-1 */
 	AM_RANGE(0x500010, 0x500011) AM_READ_PORT("DSW3-2")             /* DSW 3-2 */
-	AM_RANGE(0x700000, 0x7003ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x7003ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x800001) AM_READNOP             /* ??? */
 	AM_RANGE(0x900000, 0x900001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff) /* key matrix | I/O */
 	AM_RANGE(0x900002, 0x900003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(srmp2_adpcm_code_w)           /* ADPCM number */
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(adpcm_code_w,0x00ff)           /* ADPCM number */
 	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)      /* ADPCM voice status */
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
@@ -503,7 +488,7 @@ static ADDRESS_MAP_START( srmp3_io_map, AS_IO, 8, srmp2_state )
 	AM_RANGE(0x20, 0x20) AM_WRITE(srmp3_irq_ack_w)                              /* interrupt acknowledge */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM") AM_WRITE(srmp3_flags_w)         /* coin, service | GFX bank, counter, lockout */
 	AM_RANGE(0x60, 0x60) AM_WRITE(srmp3_rombank_w)                              /* ROM bank select */
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(srmp3_adpcm_code_w)                   /* ADPCM number */
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(adpcm_code_w)                   /* ADPCM number */
 	AM_RANGE(0xa1, 0xa1) AM_READ(vox_status_r)                                  /* ADPCM voice status */
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE(iox_mux_r, iox_command_w)                 /* key matrix | I/O */
 	AM_RANGE(0xc1, 0xc1) AM_READWRITE(iox_status_r,iox_data_w)
@@ -811,107 +796,102 @@ static INPUT_PORTS_START( rmgoldyh )
 
 	PORT_INCLUDE( seta_mjctrl )
 
+	// dip sheets available at MameTesters (MT05599)
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "DSW1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x00, "Distribution list" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "32:24:16:12:8:4:2:1" )
+	PORT_DIPSETTING(    0x02, "200:100:50:10:5:3:2:1" )
+	PORT_DIPSETTING(    0x01, "100:50:25:10:5:3:2:1" )
+	PORT_DIPSETTING(    0x00, "50:30:15:8:5:3:2:1" )
+	PORT_DIPNAME( 0x0c, 0x04, "Max Bet" ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPSETTING(    0x04, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0xf0, 0x40, "Payout percentage" ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0x00, "96%" )
+	PORT_DIPSETTING(    0x10, "93%" )
+	PORT_DIPSETTING(    0x20, "90%" )
+	PORT_DIPSETTING(    0x30, "87%" )
+	PORT_DIPSETTING(    0x40, "84%" )
+	PORT_DIPSETTING(    0x50, "81%" )
+	PORT_DIPSETTING(    0x60, "78%" )
+	PORT_DIPSETTING(    0x70, "75%" )
+	PORT_DIPSETTING(    0x80, "71%" )
+	PORT_DIPSETTING(    0x90, "68%" )
+	PORT_DIPSETTING(    0xa0, "65%" )
+	PORT_DIPSETTING(    0xb0, "62%" )
+	PORT_DIPSETTING(    0xc0, "59%" )
+	PORT_DIPSETTING(    0xd0, "56%" )
+	PORT_DIPSETTING(    0xe0, "53%" )
+	PORT_DIPSETTING(    0xf0, "50%" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "DSW2" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Min Rate To Play" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPNAME( 0x80, 0x80, "Credits Per Note" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, "5" )
+	PORT_DIPSETTING(    0x00, "10" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "DSW3" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x01, "Coin Out Logic" ) PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, "Positive" )
+	PORT_DIPSETTING(    0x00, "Negative" )
+	PORT_DIPNAME( 0x02, 0x02, "Magic Switch" ) PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, "A SW" )
+	PORT_DIPSETTING(    0x00, "F/F SW" )
+	PORT_DIPNAME( 0x04, 0x04, "Service Count" ) PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x10, 0x10, "Yakuman Bonus Times" ) PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, "Twice" )
+	PORT_DIPSETTING(    0x00, "Once" )
+	PORT_DIPNAME( 0xe0, 0xa0, "Yakuman Bonus Frequency" ) PORT_DIPLOCATION("SW3:6,7,8")
+	PORT_DIPSETTING(    0xe0, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x60, "Only Once" )
+	PORT_DIPSETTING(    0xa0, "Every 300 Coins" )
+	PORT_DIPSETTING(    0x00, "Every 500 Coins" )
+	PORT_DIPSETTING(    0xc0, "Every 700 Coins" )
+	PORT_DIPSETTING(    0x40, "Every 1000 Coins" )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x01, "DSW4" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Game Title" )
+	PORT_DIPNAME( 0x07, 0x01, "Payout Method" ) PORT_DIPLOCATION("SW4:1,2,3")
+	PORT_DIPSETTING(    0x06, "Direct Pay" )
+	PORT_DIPSETTING(    0x02, "Pool Out" )
+	PORT_DIPSETTING(    0x01, "Pay Off" )
+	PORT_DIPNAME( 0x08, 0x08, "Game Title" ) PORT_DIPLOCATION("SW4:4") // Marked as unused on dip sheet
 	PORT_DIPSETTING(    0x08, "Real Mahjong Gold Yumehai" )
 	PORT_DIPSETTING(    0x00, "Super Real Mahjong GOLD part.2" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x00, "Double Bet" ) PORT_DIPLOCATION("SW4:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x00, "Auto Tsumo" ) PORT_DIPLOCATION("SW4:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x00, "Renchan Rate" ) PORT_DIPLOCATION("SW4:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Last Chance Charge" ) PORT_DIPLOCATION("SW4:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1155,7 +1135,7 @@ static GFXDECODE_START( srmp3 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( srmp2, srmp2_state )
+MACHINE_CONFIG_START(srmp2_state::srmp2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
@@ -1194,12 +1174,12 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)              /* 8 KHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( srmp3, srmp2_state )
+MACHINE_CONFIG_START(srmp2_state::srmp3)
 
 	/* basic machine hardware */
 
@@ -1241,11 +1221,11 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)              /* 8 KHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rmgoldyh, srmp3 )
+MACHINE_CONFIG_DERIVED(srmp2_state::rmgoldyh, srmp3)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rmgoldyh_map)
@@ -1254,7 +1234,7 @@ static MACHINE_CONFIG_DERIVED( rmgoldyh, srmp3 )
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,rmgoldyh)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
+MACHINE_CONFIG_START(srmp2_state::mjyuugi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
@@ -1293,7 +1273,7 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(srmp2_state, adpcm_int))            /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)              /* 8 KHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
@@ -1567,11 +1547,11 @@ ROM_END
 
 
 
-GAME( 1987, srmp1,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 1 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, srmp2,     0,        srmp2,    srmp2, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, srmp3,     0,        srmp3,    srmp3, driver_device,    0,       ROT0, "Seta",              "Super Real Mahjong Part 3 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, driver_device, 0,       ROT0, "Seta (Alba license)",   "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi, driver_device,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi, driver_device,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ponchin,   0,        mjyuugi,  ponchin, driver_device,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin, driver_device,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srmp1,     0,        srmp2,    srmp2,    srmp2_state,  0,       ROT0, "Seta",              "Super Real Mahjong Part 1 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, srmp2,     0,        srmp2,    srmp2,    srmp2_state,  0,       ROT0, "Seta",              "Super Real Mahjong Part 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, srmp3,     0,        srmp3,    srmp3,    srmp2_state,  0,       ROT0, "Seta",              "Super Real Mahjong Part 3 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, rmgoldyh,  srmp3,    rmgoldyh, rmgoldyh, srmp2_state,  0,       ROT0, "Seta (Alba license)",   "Real Mahjong Gold Yumehai / Super Real Mahjong GOLD part.2 [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  srmp2_state,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  srmp2_state,  0,       ROT0, "Visco",             "Mahjong Yuugi (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  srmp2_state,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin,  srmp2_state,  0,       ROT0, "Visco",             "Mahjong Pon Chin Kan (Japan set 2)", MACHINE_SUPPORTS_SAVE )

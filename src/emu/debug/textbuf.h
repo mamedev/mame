@@ -8,9 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef __TEXTBUF_H__
-#define __TEXTBUF_H__
+#ifndef MAME_EMU_DEBUG_TEXTBUF_H
+#define MAME_EMU_DEBUG_TEXTBUF_H
 
+#include "emucore.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -25,7 +26,7 @@ struct text_buffer;
 ***************************************************************************/
 
 /* allocate a new text buffer */
-text_buffer *text_buffer_alloc(uint32_t bytes, uint32_t lines);
+text_buffer *text_buffer_alloc(u32 bytes, u32 lines);
 
 /* free a text buffer */
 void text_buffer_free(text_buffer *text);
@@ -40,16 +41,16 @@ void text_buffer_print(text_buffer *text, const char *data);
 void text_buffer_print_wrap(text_buffer *text, const char *data, int wrapcol);
 
 /* get the maximum width of lines seen so far */
-uint32_t text_buffer_max_width(text_buffer *text);
+u32 text_buffer_max_width(text_buffer *text);
 
 /* get the current number of lines in the buffer */
-uint32_t text_buffer_num_lines(text_buffer *text);
+u32 text_buffer_num_lines(text_buffer *text);
 
 /* get an absolute sequence number for a given line */
-uint32_t text_buffer_line_index_to_seqnum(text_buffer *text, uint32_t index);
+u32 text_buffer_line_index_to_seqnum(text_buffer *text, u32 index);
 
 /* get a sequenced line from the text buffer */
-const char *text_buffer_get_seqnum_line(text_buffer *text, uint32_t seqnum);
+const char *text_buffer_get_seqnum_line(text_buffer *text, u32 seqnum);
 
 
-#endif  /* __TEXTBUF_H__ */
+#endif  /* MAME_EMU_DEBUG_TEXTBUF_H */

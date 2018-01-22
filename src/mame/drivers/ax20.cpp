@@ -17,8 +17,9 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
 #include "bus/isa/fdc.h"
+#include "cpu/i86/i86.h"
+#include "screen.h"
 
 class ax20_state : public driver_device
 {
@@ -43,6 +44,7 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(tc_w);
 	DECLARE_WRITE8_MEMBER(ctl_w);
+	void ax20(machine_config &config);
 };
 
 READ8_MEMBER(ax20_state::unk_r)
@@ -120,7 +122,7 @@ static SLOT_INTERFACE_START( ax20_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ax20, ax20_state )
+MACHINE_CONFIG_START(ax20_state::ax20)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
 	MCFG_CPU_PROGRAM_MAP(ax20_map)
@@ -155,5 +157,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1982, ax20,  0,      0,       ax20,     ax20, driver_device,    0,     "Axel",   "AX-20", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT   MACHINE   INPUT STATE       INIT   COMPANY   FULLNAME  FLAGS
+COMP( 1982, ax20,  0,      0,       ax20,     ax20, ax20_state, 0,     "Axel",   "AX-20",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

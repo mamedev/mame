@@ -21,12 +21,11 @@ TODO:
 
 *******************************************************************************/
 
+#ifndef MAME_MACHINE_CDICDIC_H
+#define MAME_MACHINE_CDICDIC_H
+
 #pragma once
 
-#ifndef __CDICDIC_H__
-#define __CDICDIC_H__
-
-#include "emu.h"
 #include "cdrom.h"
 #include "sound/cdda.h"
 
@@ -116,6 +115,6 @@ private:
 };
 
 // device type definition
-extern const device_type MACHINE_CDICDIC;
+DECLARE_DEVICE_TYPE(MACHINE_CDICDIC, cdicdic_device)
 
-#endif // __CDICDIC_H__
+#endif // MAME_MACHINE_CDICDIC_H

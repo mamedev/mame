@@ -7,11 +7,16 @@
 */
 
 #include "emu.h"
+#include "pdp8dasm.h"
 
-static char *output;
-
-offs_t pdp8_dasm_one(char *buffer, offs_t pc, uint16_t op)
+u32 pdp8_disassembler::opcode_alignment() const
 {
+	return 2;
+}
+
+offs_t pdp8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	uint16_t op = opcodes.r16(pc);
 	uint8_t opcode = (op >> 011) & 07;
 	uint16_t current_page = pc & 07600;
 	uint16_t zero_addr = op & 0177;
@@ -19,30 +24,28 @@ offs_t pdp8_dasm_one(char *buffer, offs_t pc, uint16_t op)
 	bool indirect = (op & 0400) ? true : false;
 	bool zero_page = (op & 0200) ? false : true;
 
-	output = buffer;
-
 	switch (opcode)
 	{
 		case 0:
-			output += sprintf(buffer, "AND %c %05o", indirect ? 'I' : ' ', zero_page ? zero_addr : current_addr);
+			util::stream_format(stream, "AND %c %05o", indirect ? 'I' : ' ', zero_page ? zero_addr : current_addr);
 			break;
 		case 1:
-			output += sprintf(buffer, "TAD %c %05o", indirect ? 'I' : ' ', zero_page ? zero_addr : current_addr);
+			util::stream_format(stream, "TAD %c %05o", indirect ? 'I' : ' ', zero_page ? zero_addr : current_addr);
 			break;
 		case 2:
-			output += sprintf(buffer, "ISZ %c %05o", indirect ? 'I' : ' ', zero_page ? zero_addr : current_addr);
+			util::stream_format(stream, "ISZ %c %05o", indirect ? 'I' : ' ', zero_page ? zero_addr : current_addr);
 			break;
 		case 3:
-			output += sprintf(buffer, "DCA %c %05o", indirect ? 'I' : ' ', zero_page ? zero_addr : current_addr);
+			util::stream_format(stream, "DCA %c %05o", indirect ? 'I' : ' ', zero_page ? zero_addr : current_addr);
 			break;
 		case 4:
-			output += sprintf(buffer, "JMS %c %05o", indirect ? 'I' : ' ', zero_page ? zero_addr : current_addr);
+			util::stream_format(stream, "JMS %c %05o", indirect ? 'I' : ' ', zero_page ? zero_addr : current_addr);
 			break;
 		case 5:
-			output += sprintf(buffer, "JMP %c %05o", indirect ? 'I' : ' ', zero_page ? zero_addr : current_addr);
+			util::stream_format(stream, "JMP %c %05o", indirect ? 'I' : ' ', zero_page ? zero_addr : current_addr);
 			break;
 		case 6:
-			output += sprintf(buffer, "IOT %03o %01o", (op >> 03) & 077, op & 07);
+			util::stream_format(stream, "IOT %03o %01o", (op >> 03) & 077, op & 07);
 			break;
 		case 7:
 		{
@@ -51,50 +54,50 @@ offs_t pdp8_dasm_one(char *buffer, offs_t pc, uint16_t op)
 			{
 				if (!(op & 0377))
 				{
-					output += sprintf(buffer, "NOP ");
+					util::stream_format(stream, "NOP ");
 				}
 				else
 				{
 					if (op & 0200)
 					{
-						output += sprintf(buffer, "CLA ");
+						util::stream_format(stream, "CLA ");
 					}
 					if (op & 0100)
 					{
-						output += sprintf(buffer, "CLL ");
+						util::stream_format(stream, "CLL ");
 					}
 					if (op & 040)
 					{
-						output += sprintf(buffer, "CMA ");
+						util::stream_format(stream, "CMA ");
 					}
 					if (op & 020)
 					{
-						output += sprintf(buffer, "CML ");
+						util::stream_format(stream, "CML ");
 					}
 					if (op & 01)
 					{
-						output += sprintf(buffer, "IAC ");
+						util::stream_format(stream, "IAC ");
 					}
 					if (op & 010)
 					{
 						if (op & 02)
 						{
-							output += sprintf(buffer, "RTR ");
+							util::stream_format(stream, "RTR ");
 						}
 						else
 						{
-							output += sprintf(buffer, "RAR ");
+							util::stream_format(stream, "RAR ");
 						}
 					}
 					if (op & 04)
 					{
 						if (op & 02)
 						{
-							output += sprintf(buffer, "RTL ");
+							util::stream_format(stream, "RTL ");
 						}
 						else
 						{
-							output += sprintf(buffer, "RAL ");
+							util::stream_format(stream, "RAL ");
 						}
 					}
 				}
@@ -103,7 +106,7 @@ offs_t pdp8_dasm_one(char *buffer, offs_t pc, uint16_t op)
 			{
 				if (!(op & 0377))
 				{
-					output += sprintf(buffer, "NOP ");
+					util::stream_format(stream, "NOP ");
 				}
 				else
 				{
@@ -111,21 +114,21 @@ offs_t pdp8_dasm_one(char *buffer, offs_t pc, uint16_t op)
 					{
 						if (!(op & 0160))
 						{
-							output += sprintf(buffer, "SKP ");
+							util::stream_format(stream, "SKP ");
 						}
 						else
 						{
 							if (op & 0100)
 							{
-								output += sprintf(buffer, "SPA ");
+								util::stream_format(stream, "SPA ");
 							}
 							if (op & 040)
 							{
-								output += sprintf(buffer, "SNA ");
+								util::stream_format(stream, "SNA ");
 							}
 							if (op & 020)
 							{
-								output += sprintf(buffer, "SZL ");
+								util::stream_format(stream, "SZL ");
 							}
 						}
 					}
@@ -133,42 +136,33 @@ offs_t pdp8_dasm_one(char *buffer, offs_t pc, uint16_t op)
 					{
 						if (op & 0100)
 						{
-							output += sprintf(buffer, "SMA ");
+							util::stream_format(stream, "SMA ");
 						}
 						if (op & 040)
 						{
-							output += sprintf(buffer, "SZA ");
+							util::stream_format(stream, "SZA ");
 						}
 						if (op & 020)
 						{
-							output += sprintf(buffer, "SNL ");
+							util::stream_format(stream, "SNL ");
 						}
 					}
 					if (op & 0200)
 					{
-						output += sprintf(buffer, "CLA ");
+						util::stream_format(stream, "CLA ");
 					}
 					if (op & 04)
 					{
-						output += sprintf(buffer, "OSR ");
+						util::stream_format(stream, "OSR ");
 					}
 					if (op & 02)
 					{
-						output += sprintf(buffer, "HLT ");
+						util::stream_format(stream, "HLT ");
 					}
 				}
 			}
 		}
 	}
 
-	return 2 | DASMFLAG_SUPPORTED;
-}
-
-/*****************************************************************************/
-
-CPU_DISASSEMBLE( pdp8 )
-{
-	uint16_t op = (*(uint8_t *)(opram + 0) << 8) |
-				(*(uint8_t *)(opram + 1) << 0);
-	return pdp8_dasm_one(buffer, pc, op);
+	return 2 | SUPPORTED;
 }

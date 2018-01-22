@@ -27,13 +27,13 @@
 
     R-Type Leo                         Irem    D8000021A1 019 9242NK700
     Fire Barrel                        Irem    D8000010A1 019 9243NK700
-    Air Assault                        sam as Gun Force
+    Air Assault                        same as Gun Force
     In The Hunt                        Irem    D8000011A1 020
     Risky Challenge/Gussun Oyoyo       Irem    D8000019A1 022 9331NK700
     Match It II/Shisensho II           Irem    D8000020A1 023 9320NK700
     Ninja Baseball Batman              Irem    D8000021A1 024 9335NK700
     World PK Soccer/Kick for the Goal  Irem    D8000021A1 024 9335NK701
-    Superior Soldiers/Perfect Soldiers Irem    D8000022A1
+    Superior Soldiers/Perfect Soldiers Irem    D8000022A1 025 9342NK002
     Dream Soccer '94                   Irem    D8000023A1 026 9433NK700
 
     Please let me know if you can fill in any of the blanks.

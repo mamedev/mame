@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "keyboard.h"
 
 namespace {
@@ -15,12 +16,12 @@ INPUT_PORTS_END
 } // anonymous namespace
 
 serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: serial_keyboard_device(mconfig, SERIAL_KEYBOARD, "Serial Keyboard", tag, owner, clock, "serial_keyboard", __FILE__)
+	: serial_keyboard_device(mconfig, SERIAL_KEYBOARD, tag, owner, clock)
 {
 }
 
-serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: generic_keyboard_device(mconfig, type, name, tag, owner, clock, shortname, source)
+serial_keyboard_device::serial_keyboard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: generic_keyboard_device(mconfig, type, tag, owner, clock)
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_rs232_port_interface(mconfig, *this)
 	, m_rs232_txbaud(*this, "RS232_TXBAUD")
@@ -44,12 +45,6 @@ WRITE_LINE_MEMBER( serial_keyboard_device::input_txd )
 WRITE_LINE_MEMBER( serial_keyboard_device::update_serial )
 {
 	reset();
-}
-
-void serial_keyboard_device::device_start()
-{
-	generic_keyboard_device::device_start();
-	device_buffered_serial_interface::register_save_state(machine().save(), this);
 }
 
 void serial_keyboard_device::device_reset()
@@ -78,13 +73,6 @@ void serial_keyboard_device::device_reset()
 	transmit_register_reset();
 }
 
-void serial_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	// give both bases a chance to handle it
-	device_buffered_serial_interface::device_timer(timer, id, param, ptr);
-	generic_keyboard_device::device_timer(timer, id, param, ptr);
-}
-
 void serial_keyboard_device::tra_callback()
 {
 	output_rxd(transmit_register_get_data_bit());
@@ -99,4 +87,4 @@ void serial_keyboard_device::received_byte(uint8_t byte)
 {
 }
 
-const device_type SERIAL_KEYBOARD = &device_creator<serial_keyboard_device>;
+DEFINE_DEVICE_TYPE(SERIAL_KEYBOARD, serial_keyboard_device, "serial_keyboard", "Serial Keyboard")

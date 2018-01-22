@@ -36,9 +36,10 @@ backup of playfield rom and picture/description of its board
 */
 
 #include "emu.h"
-
 #include "includes/ssystem3.h"
+
 #include "cpu/m6502/m6502.h"
+#include "screen.h"
 
 
 // in my opinion own cpu to display lcd field and to handle own buttons
@@ -285,7 +286,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( ssystem3, ssystem3_state )
+MACHINE_CONFIG_START(ssystem3_state::ssystem3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1000000)
 	MCFG_CPU_PROGRAM_MAP(ssystem3_map)
@@ -304,7 +305,7 @@ static MACHINE_CONFIG_START( ssystem3, ssystem3_state )
 	MCFG_PALETTE_INIT_OWNER(ssystem3_state, ssystem3)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
 	MCFG_VIA6522_READPA_HANDLER(READ8(ssystem3_state,ssystem3_via_read_a))
 	MCFG_VIA6522_READPB_HANDLER(READ8(ssystem3_state,ssystem3_via_read_b))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(ssystem3_state,ssystem3_via_write_a))
@@ -326,6 +327,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT        COMPANY     FULLNAME */
-CONS( 1979, ssystem3, 0,        0,      ssystem3, ssystem3, ssystem3_state, ssystem3,   "NOVAG Industries Ltd",  "Chess Champion Super System III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY            FULLNAME                            FLAGS
+CONS( 1979, ssystem3, 0,        0,      ssystem3, ssystem3, ssystem3_state, ssystem3,   "SciSys / Novag",  "Chess Champion: Super System III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 //chess champion MK III in germany

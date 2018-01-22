@@ -13,7 +13,7 @@ Supported project generators:
  * GNU Makefile
  * Ninja (experimental)
  * Qbs / QtCreator (experimental)
- * Visual Studio 2008, 2010, 2012, 2013, 2015, 15
+ * Visual Studio 2008, 2010, 2012, 2013, 2015, 2017
  * XCode
 
 Download (stable)
@@ -21,7 +21,7 @@ Download (stable)
 
 [![Build Status](https://travis-ci.org/bkaradzic/GENie.svg?branch=master)](https://travis-ci.org/bkaradzic/GENie)
 
-	version 699 (commit a785b1bbb570485da7eb73d52f59c7d6e3f24bf4)
+	version 849 (commit f3788f8531e75ddde92df41ecc1ccdb34f1d75ff)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -48,8 +48,8 @@ Documentation
 History
 -------
 
-Initial version of **GENie** is fork of Premake 4.4 beta 5, and there is no
-intention to keep it compatible with it.
+Initial version of **GENie** is [fork](https://github.com/bkaradzic/GENie/blob/c7e7da4aafe4210aa014a8ae8f6b01ce1d6802f0/README.md#why-fork)
+of Premake 4.4 beta 5, and there is no intention to keep it compatible with it.
 
 ## Changelog (since fork)
 
@@ -92,7 +92,6 @@ intention to keep it compatible with it.
  - Added Green Hills Software compiler support.
  - Added edit & continue support for 64-bit builds in VS2013 upwards.
  - Added `windowstargetplatformversion` to specify VS Windows target version.
- - Added vs15 support.
  - Added `NoWinRT` flag to disable WinRT CX builds.
  - Added `NoBufferSecurityCheck` flag to disable security checks in VS.
  - Added `nopch` file list to exclude files from using PCH.
@@ -113,6 +112,11 @@ intention to keep it compatible with it.
  - Added .natvis file type support for Visual Studio.
  - Added Swift language support for make and ninja build generators.
  - Removed CodeBlocks and CodeLite support.
+ - Added vs2017 support.
+ - Removed vs2008 support.
+ - Added `removeplatforms` that removes VS build target platforms.
+ - Added `PedanticWarnings` flag.
+ - Added `ObjcARC` flag to enable automatic reference counting for Objective-C(++).
 
 Debugging GENie scripts
 -----------------------
@@ -179,7 +183,7 @@ PS3.
 	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers, Bill Freist,
 	Terry Hendrix II, Ryan Juckett, Andrew Johnson, Johan Sköld,
 	Alastair Murray, Patrick Munns, Jan-Eric Duden, Phil Stevens, Stuart Carnie,
-	Nikolay Aleksiev.
+	Nikolay Aleksiev, Jon Olson, Mike Fitzgerald.
 	All rights reserved.
 
 	https://github.com/bkaradzic/genie

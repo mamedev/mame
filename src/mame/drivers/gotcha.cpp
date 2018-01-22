@@ -60,31 +60,36 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/gen_latch.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
 #include "includes/gotcha.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "sound/okim6295.h"
+#include "sound/ym2151.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "gotcha.lh"
+
 
 WRITE16_MEMBER(gotcha_state::gotcha_lamps_w)
 {
-#if 0
-	popmessage("%c%c%c%c %c%c%c%c %c%c%c%c",
-			(data & 0x001) ? 'R' : '-',
-			(data & 0x002) ? 'G' : '-',
-			(data & 0x004) ? 'B' : '-',
-			(data & 0x008) ? 'S' : '-',
-			(data & 0x010) ? 'R' : '-',
-			(data & 0x020) ? 'G' : '-',
-			(data & 0x040) ? 'B' : '-',
-			(data & 0x080) ? 'S' : '-',
-			(data & 0x100) ? 'R' : '-',
-			(data & 0x200) ? 'G' : '-',
-			(data & 0x400) ? 'B' : '-',
-			(data & 0x800) ? 'S' : '-'
-			);
-#endif
+	machine().output().set_value("lamp_p1_r", BIT(data,  0));
+	machine().output().set_value("lamp_p1_g", BIT(data,  1));
+	machine().output().set_value("lamp_p1_b", BIT(data,  2));
+	machine().output().set_value("lamp_p1_s", BIT(data,  3));
+
+	machine().output().set_value("lamp_p2_r", BIT(data,  4));
+	machine().output().set_value("lamp_p2_g", BIT(data,  5));
+	machine().output().set_value("lamp_p2_b", BIT(data,  6));
+	machine().output().set_value("lamp_p2_s", BIT(data,  7));
+
+	machine().output().set_value("lamp_p3_r", BIT(data,  8));
+	machine().output().set_value("lamp_p3_g", BIT(data,  9));
+	machine().output().set_value("lamp_p3_b", BIT(data, 10));
+	machine().output().set_value("lamp_p3_s", BIT(data, 11));
 }
 
 WRITE16_MEMBER(gotcha_state::gotcha_oki_bank_w)
@@ -102,7 +107,7 @@ static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16, gotcha_state )
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(gotcha_lamps_w)
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(gotcha_oki_bank_w)
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1405ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1405ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("SYSTEM")
@@ -257,7 +262,7 @@ void gotcha_state::machine_reset()
 	m_banksel = 0;
 }
 
-static MACHINE_CONFIG_START( gotcha, gotcha_state )
+MACHINE_CONFIG_START(gotcha_state::gotcha)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,14318180)    /* 14.31818 MHz */
@@ -299,7 +304,7 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.80)
 	MCFG_SOUND_ROUTE(1, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -383,5 +388,5 @@ ROM_START( ppchamp )
 	ROM_LOAD( "uz11", 0x00000, 0x80000, CRC(3d96274c) SHA1(c7a670af86194c370bf8fb30afbe027ab78a0227) )
 ROM_END
 
-GAME( 1997, gotcha,  0,      gotcha, gotcha, driver_device, 0, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, ppchamp, gotcha, gotcha, gotcha, driver_device, 0, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1997, gotcha,  0,      gotcha, gotcha, gotcha_state, 0, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival",                   MACHINE_SUPPORTS_SAVE, layout_gotcha )
+GAMEL( 1997, ppchamp, gotcha, gotcha, gotcha, gotcha_state, 0, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", MACHINE_SUPPORTS_SAVE, layout_gotcha )

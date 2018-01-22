@@ -34,16 +34,17 @@ public:
 	int m_question_rom;
 	int m_remap_address[16];
 
-	DECLARE_WRITE8_MEMBER(sound_enable_w);
-	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_x_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_y_w);
 	DECLARE_READ8_MEMBER(input_port_0_r);
 
 	DECLARE_READ8_MEMBER(intrepid_colorram_mirror_r);
-	DECLARE_WRITE8_MEMBER(intrepid_graphics_bank_w);
+	DECLARE_WRITE_LINE_MEMBER(intrepid_graphics_bank_w);
 
 	DECLARE_READ8_MEMBER(rtriv_question_r);
 
@@ -61,4 +62,9 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_draw);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void suprmous(machine_config &config);
+	void desertdn(machine_config &config);
+	void intrepid(machine_config &config);
+	void thepit(machine_config &config);
+	void fitter(machine_config &config);
 };

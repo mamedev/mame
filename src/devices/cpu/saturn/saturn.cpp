@@ -10,9 +10,10 @@
  *****************************************************************************/
 
 #include "emu.h"
+#include "saturn.h"
+
 #include "debugger.h"
 
-#include "saturn.h"
 
 #define R0 0
 #define R1 1
@@ -26,9 +27,8 @@
 #define I 9 // invalid
 
 
-#define VERBOSE 0
-
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 // Hardware status bits
@@ -39,11 +39,11 @@
 
 
 
-const device_type SATURN = &device_creator<saturn_device>;
+DEFINE_DEVICE_TYPE(SATURN, saturn_device, "saturn_cpu", "HP Saturn")
 
 
 saturn_device::saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SATURN, "HP Saturn", tag, owner, clock, "saturn_cpu", __FILE__)
+	: cpu_device(mconfig, SATURN, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_out_func(*this)
 	, m_in_func(*this)
@@ -57,11 +57,23 @@ saturn_device::saturn_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-
-offs_t saturn_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+device_memory_interface::space_config_vector saturn_device::memory_space_config() const
 {
-	extern CPU_DISASSEMBLE( saturn );
-	return CPU_DISASSEMBLE_NAME(saturn)(this, buffer, pc, oprom, opram, options);
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+bool saturn_device::get_nonstandard_mnemonics_mode() const
+{
+	// Needs to become configurable live
+	return false;
+}
+
+
+util::disasm_interface *saturn_device::create_disassembler()
+{
+	return new saturn_disassembler(this);
 }
 
 
@@ -81,7 +93,7 @@ offs_t saturn_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t 
 void saturn_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	m_out_func.resolve_safe();
 	m_in_func.resolve_safe(0);
@@ -326,7 +338,7 @@ void saturn_device::saturn_take_irq()
 	saturn_push(m_pc);
 	m_pc=IRQ_ADDRESS;
 
-	LOG(("Saturn '%s' takes IRQ ($%04x)\n", tag(), m_pc));
+	LOG("SATURN takes IRQ ($%04x)\n", m_pc);
 
 	standard_irq_callback(SATURN_IRQ_LINE);
 }
@@ -367,7 +379,7 @@ void saturn_device::execute_set_input(int inputnum, int state)
 			m_nmi_state = state;
 			if ( state != CLEAR_LINE )
 			{
-				LOG(( "SATURN '%s' set_nmi_line(ASSERT)\n", tag()));
+				LOG("SATURN set_nmi_line(ASSERT)\n");
 				m_pending_irq = 1;
 			}
 			break;
@@ -377,7 +389,7 @@ void saturn_device::execute_set_input(int inputnum, int state)
 			m_irq_state = state;
 			if ( state != CLEAR_LINE && m_irq_enable )
 			{
-				LOG(( "SATURN '%s' set_irq_line(ASSERT)\n", tag()));
+				LOG("SATURN set_irq_line(ASSERT)\n");
 				m_pending_irq = 1;
 			}
 			break;
@@ -385,7 +397,7 @@ void saturn_device::execute_set_input(int inputnum, int state)
 		case SATURN_WAKEUP_LINE:
 			if (m_sleeping && state==1)
 			{
-				LOG(( "SATURN '%s' set_wakeup_line(ASSERT)\n", tag()));
+				LOG("SATURN set_wakeup_line(ASSERT)\n");
 				standard_irq_callback(SATURN_WAKEUP_LINE);
 				m_sleeping = 0;
 			}

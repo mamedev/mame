@@ -57,4 +57,7 @@ public:
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void vigilant_postload();
+	void vigilant(machine_config &config);
+	void kikcubic(machine_config &config);
+	void buccanrs(machine_config &config);
 };

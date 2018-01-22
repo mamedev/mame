@@ -6,7 +6,6 @@
 
 *************************************************************************/
 
-#include "emu.h"
 #include "machine/gen_latch.h"
 #include "cpu/z80/z80.h"
 
@@ -46,6 +45,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void zerozone(machine_config &config);
 protected:
 
 	// driver_device overrides

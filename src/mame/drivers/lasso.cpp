@@ -32,11 +32,14 @@ DIP locations verified for:
 
 #include "emu.h"
 #include "includes/lasso.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
@@ -61,7 +64,7 @@ READ8_MEMBER(lasso_state::sound_status_r)
 
 WRITE8_MEMBER(lasso_state::sound_select_w)
 {
-	uint8_t to_write = BITSWAP8(*m_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
+	uint8_t to_write = bitswap<8>(*m_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	if (~data & 0x01)   /* chip #0 */
 		m_sn_1->write(space, 0, to_write);
@@ -478,7 +481,7 @@ MACHINE_RESET_MEMBER(lasso_state,wwjgtin)
 	m_track_enable = 0;
 }
 
-static MACHINE_CONFIG_START( base, lasso_state )
+MACHINE_CONFIG_START(lasso_state::base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 11289000/16) /* guess */
@@ -513,7 +516,7 @@ static MACHINE_CONFIG_START( base, lasso_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lasso, base )
+MACHINE_CONFIG_DERIVED(lasso_state::lasso, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("blitter", M6502, 11289000/16) /* guess */
@@ -523,7 +526,7 @@ static MACHINE_CONFIG_DERIVED( lasso, base )
 	MCFG_PALETTE_INIT_OWNER(lasso_state, lasso)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chameleo, base )
+MACHINE_CONFIG_DERIVED(lasso_state::chameleo, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -540,7 +543,7 @@ static MACHINE_CONFIG_DERIVED( chameleo, base )
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_chameleo)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wwjgtin, base )
+MACHINE_CONFIG_DERIVED(lasso_state::wwjgtin, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -569,7 +572,7 @@ static MACHINE_CONFIG_DERIVED( wwjgtin, base )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pinbo, base )
+MACHINE_CONFIG_DERIVED(lasso_state::pinbo, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, XTAL_18MHz/24)
@@ -583,7 +586,7 @@ static MACHINE_CONFIG_DERIVED( pinbo, base )
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pinbo)
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 	MCFG_VIDEO_START_OVERRIDE(lasso_state,pinbo)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(lasso_state, screen_update_chameleo)
@@ -867,10 +870,10 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1982, lasso,    0,       lasso,    lasso,    driver_device,  0, ROT90, "SNK",              "Lasso", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, chameleo, 0,       chameleo, chameleo, driver_device,  0, ROT0,  "Jaleco",           "Chameleon", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, wwjgtin,  0,       wwjgtin,  wwjgtin,  driver_device,  0, ROT0,  "Jaleco / Casio",   "Wai Wai Jockey Gate-In!", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, photof,   wwjgtin, wwjgtin,  wwjgtin,  driver_device,  0, ROT0,  "Jaleco / Casio",   "Photo Finish (bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, pinbo,    0,       pinbo,    pinbo,    driver_device,  0, ROT90, "Jaleco",           "Pinbo (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, pinboa,   pinbo,   pinbo,    pinboa,   driver_device,  0, ROT90, "Jaleco",           "Pinbo (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pinbos,   pinbo,   pinbo,    pinboa,   driver_device,  0, ROT90, "bootleg (Strike)", "Pinbo (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, lasso,    0,       lasso,    lasso,    lasso_state,  0, ROT90, "SNK",              "Lasso",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, chameleo, 0,       chameleo, chameleo, lasso_state,  0, ROT0,  "Jaleco",           "Chameleon",               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, wwjgtin,  0,       wwjgtin,  wwjgtin,  lasso_state,  0, ROT0,  "Jaleco / Casio",   "Wai Wai Jockey Gate-In!", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, photof,   wwjgtin, wwjgtin,  wwjgtin,  lasso_state,  0, ROT0,  "Jaleco / Casio",   "Photo Finish (bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pinbo,    0,       pinbo,    pinbo,    lasso_state,  0, ROT90, "Jaleco",           "Pinbo (set 1)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1984, pinboa,   pinbo,   pinbo,    pinboa,   lasso_state,  0, ROT90, "Jaleco",           "Pinbo (set 2)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pinbos,   pinbo,   pinbo,    pinboa,   lasso_state,  0, ROT90, "bootleg (Strike)", "Pinbo (bootleg)",         MACHINE_SUPPORTS_SAVE )

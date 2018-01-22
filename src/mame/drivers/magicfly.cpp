@@ -440,15 +440,17 @@
 
 *******************************************************************************/
 
-
-#define MASTER_CLOCK    XTAL_10MHz
-
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
+
+#define MASTER_CLOCK    XTAL_10MHz
 
 
 class magicfly_state : public driver_device
@@ -480,6 +482,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void bchance(machine_config &config);
+	void magicfly(machine_config &config);
+	void _7mezzo(machine_config &config);
 };
 
 
@@ -731,7 +736,7 @@ static INPUT_PORTS_START( magicfly )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW0")    /* Only 4 phisical DIP switches (valid bits = 4, 6, 7) */
+	PORT_START("DSW0")    /* Only 4 physical DIP switches (valid bits = 4, 6, 7) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -794,7 +799,7 @@ static INPUT_PORTS_START( 7mezzo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW0")    /* Only 4 phisical DIP switches (valid bits = 4, 6, 7) */
+	PORT_START("DSW0")    /* Only 4 physical DIP switches (valid bits = 4, 6, 7) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -869,7 +874,7 @@ static INPUT_PORTS_START( bchance )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW0")
-/*  Only 4 phisical DIP switches
+/*  Only 4 physical DIP switches
     (valid bits = 4, 6, 7)
 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -930,7 +935,7 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_CONFIG_START( magicfly, magicfly_state )
+MACHINE_CONFIG_START(magicfly_state::magicfly)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
@@ -964,7 +969,7 @@ static MACHINE_CONFIG_START( magicfly, magicfly_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( 7mezzo, magicfly )
+MACHINE_CONFIG_DERIVED(magicfly_state::_7mezzo, magicfly)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(magicfly_state, 7mezzo)
@@ -972,7 +977,7 @@ static MACHINE_CONFIG_DERIVED( 7mezzo, magicfly )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bchance, magicfly )
+MACHINE_CONFIG_DERIVED(magicfly_state::bchance, magicfly)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1054,7 +1059,7 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT   ROT    COMPANY      FULLNAME                         FLAGS... */
-GAME( 198?, magicfly, 0,      magicfly, magicfly, driver_device, 0,     ROT0, "P&A Games", "Magic Fly",                      0 )
-GAME( 198?, 7mezzo,   0,      7mezzo,   7mezzo,   driver_device, 0,     ROT0, "<unknown>", "7 e Mezzo",                      0 )
-GAME( 198?, bchance,  0,      bchance,  bchance,  driver_device, 0,     ROT0, "<unknown>", "Bonne Chance! (French/English)", MACHINE_IMPERFECT_GRAPHICS )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT   ROT   COMPANY      FULLNAME                          FLAGS
+GAME( 198?, magicfly, 0,      magicfly, magicfly, magicfly_state, 0,     ROT0, "P&A Games", "Magic Fly",                      0 )
+GAME( 198?, 7mezzo,   0,      _7mezzo,  7mezzo,   magicfly_state, 0,     ROT0, "<unknown>", "7 e Mezzo",                      0 )
+GAME( 198?, bchance,  0,      bchance,  bchance,  magicfly_state, 0,     ROT0, "<unknown>", "Bonne Chance! (French/English)", MACHINE_IMPERFECT_GRAPHICS )

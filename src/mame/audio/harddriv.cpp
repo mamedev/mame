@@ -8,9 +8,11 @@
 
 #include "emu.h"
 #include "includes/harddriv.h"
-#include "cpu/tms32010/tms32010.h"
 #include "machine/atarigen.h"
+
+#include "cpu/tms32010/tms32010.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 #define BIO_FREQUENCY       (1000000 / 50)
@@ -25,11 +27,12 @@
 //  harddriv_sound_board_device - constructor
 //-------------------------------------------------
 
-const device_type HARDDRIV_SOUND_BOARD_DEVICE = &device_creator<harddriv_sound_board_device>;
+DEFINE_DEVICE_TYPE(HARDDRIV_SOUND_BOARD, harddriv_sound_board_device, "harddriv_sound", "Hard Drivin' Sound Board")
 
 harddriv_sound_board_device::harddriv_sound_board_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, HARDDRIV_SOUND_BOARD_DEVICE, "Hard Drivin' Sound Board", tag, owner, clock, "harddriv_sound", __FILE__),
+	device_t(mconfig, HARDDRIV_SOUND_BOARD, tag, owner, clock),
 	m_soundcpu(*this, "soundcpu"),
+	m_latch(*this, "latch"),
 	m_dac(*this, "dac"),
 	m_sounddsp(*this, "sounddsp"),
 	m_sounddsp_ram(*this, "sounddsp_ram"),
@@ -190,41 +193,42 @@ READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_status_r)
 
 WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_latches_w)
 {
-	/* bit 3 selects the value; data is ignored */
-	data = (offset >> 3) & 1;
+	// bit 3 selects the value; data is ignored
+	// low 3 bits select the function
+	m_latch->write_bit(offset & 7, (offset >> 3) & 1);
+}
 
-	/* low 3 bits select the function */
-	offset &= 7;
-	switch (offset)
-	{
-		case 0: /* SPWR - 5220 write strobe */
-			/* data == 0 means high, 1 means low */
-			logerror("%06X:SPWR=%d\n", space.device().safe_pcbase(), data);
-			break;
 
-		case 1: /* SPRES - 5220 hard reset */
-			/* data == 0 means low, 1 means high */
-			logerror("%06X:SPRES=%d\n", space.device().safe_pcbase(), data);
-			break;
+WRITE_LINE_MEMBER(harddriv_sound_board_device::speech_write_w)
+{
+	// data == 0 means high, 1 means low
+	logerror("%06X:SPWR=%d\n", m_soundcpu->pcbase(), state);
+}
 
-		case 2: /* SPRATE */
-			/* data == 0 means 8kHz, 1 means 10kHz */
-			logerror("%06X:SPRATE=%d\n", space.device().safe_pcbase(), data);
-			break;
 
-		case 3: /* CRAMEN */
-			/* data == 0 means disable 68k access to COM320, 1 means enable */
-			m_cramen = data;
-			break;
+WRITE_LINE_MEMBER(harddriv_sound_board_device::speech_reset_w)
+{
+	// data == 0 means low, 1 means high
+	logerror("%06X:SPRES=%d\n", m_soundcpu->pcbase(), state);
+}
 
-		case 4: /* RES320 */
-			logerror("%06X:RES320=%d\n", space.device().safe_pcbase(), data);
-			m_sounddsp->set_input_line(INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
-			break;
 
-		case 7: /* LED */
-			break;
-	}
+WRITE_LINE_MEMBER(harddriv_sound_board_device::speech_rate_w)
+{
+	// data == 0 means 8kHz, 1 means 10kHz
+	logerror("%06X:SPRATE=%d\n", m_soundcpu->pcbase(), state);
+}
+
+
+WRITE_LINE_MEMBER(harddriv_sound_board_device::cram_enable_w)
+{
+	// data == 0 means disable 68k access to COM320, 1 means enable
+	m_cramen = state;
+}
+
+
+WRITE_LINE_MEMBER(harddriv_sound_board_device::led_w)
+{
 }
 
 
@@ -262,13 +266,13 @@ WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_320ram_w)
 
 READ16_MEMBER(harddriv_sound_board_device::hdsnd68k_320ports_r)
 {
-	return m_sounddsp->space(AS_IO).read_word((offset & 7) << 1);
+	return m_sounddsp->space(AS_IO).read_word(offset & 7);
 }
 
 
 WRITE16_MEMBER(harddriv_sound_board_device::hdsnd68k_320ports_w)
 {
-	m_sounddsp->space(AS_IO).write_word((offset & 7) << 1, data);
+	m_sounddsp->space(AS_IO).write_word(offset & 7, data);
 }
 
 
@@ -421,11 +425,23 @@ static ADDRESS_MAP_START( driversnd_dsp_io_map, AS_IO, 16, harddriv_sound_board_
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_FRAGMENT( harddriv_snd )
+//-------------------------------------------------
+// device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_START(harddriv_sound_board_device::device_add_mconfig)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("soundcpu", M68000, XTAL_16MHz/2)
 	MCFG_CPU_PROGRAM_MAP(driversnd_68k_map)
+
+	MCFG_DEVICE_ADD("latch", LS259, 0) // 80R
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(harddriv_sound_board_device, speech_write_w)) // SPWR - 5220 write strobe
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(harddriv_sound_board_device, speech_reset_w)) // SPRES - 5220 hard reset
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(harddriv_sound_board_device, speech_rate_w)) // SPRATE
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(harddriv_sound_board_device, cram_enable_w)) // CRAMEN
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sounddsp", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT // RES320
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(harddriv_sound_board_device, led_w))
 
 	MCFG_CPU_ADD("sounddsp", TMS32010, XTAL_20MHz)
 	MCFG_CPU_PROGRAM_MAP(driversnd_dsp_program_map)
@@ -440,13 +456,3 @@ static MACHINE_CONFIG_FRAGMENT( harddriv_snd )
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor harddriv_sound_board_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( harddriv_snd );
-}

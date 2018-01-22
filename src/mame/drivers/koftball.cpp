@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
 King Of Football (c)1995 BMC
@@ -28,14 +28,17 @@ ft5_v6_c4.u58 /
 
 */
 
-#define NVRAM_HACK 1
-
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
+
+#define NVRAM_HACK 1
 
 class koftball_state : public driver_device
 {
@@ -70,6 +73,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_koftball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bmc_interrupt);
+	void koftball(machine_config &config);
 };
 
 
@@ -122,7 +126,7 @@ READ16_MEMBER(koftball_state::prot_r)
 		case 0x8000: return 0x0f0f;
 	}
 
-	logerror("unk prot r %x %x\n",m_prot_data,  space.device().safe_pcbase());
+	logerror("unk prot r %x %x\n",m_prot_data,  m_maincpu->pcbase());
 	return machine().rand();
 }
 
@@ -170,7 +174,7 @@ static ADDRESS_MAP_START( koftball_mem, AS_PROGRAM, 16, koftball_state )
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(prot_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, koftball_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, koftball_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
@@ -226,7 +230,7 @@ static GFXDECODE_START( koftball )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( koftball, koftball_state )
+MACHINE_CONFIG_START(koftball_state::koftball)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_21_4772MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(koftball_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", koftball_state, bmc_interrupt, "screen", 0, 1)
@@ -250,7 +254,7 @@ static MACHINE_CONFIG_START( koftball, koftball_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_LOW) /* clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", 1122000, PIN7_LOW) /* clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

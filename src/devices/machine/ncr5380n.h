@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef NCR5380N_H
-#define NCR5380N_H
+#ifndef MAME_MACHINE_NCR5380N_H
+#define MAME_MACHINE_NCR5380N_H
+
+#pragma once
 
 #include "machine/nscsi_bus.h"
 
@@ -25,8 +27,8 @@ public:
 	ncr5380n_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ncr5380n_device &>(device).m_irq_handler.set_callback(object); }
-	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object) { return downcast<ncr5380n_device &>(device).m_drq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ncr5380n_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_drq_handler(device_t &device, Object &&cb) { return downcast<ncr5380n_device &>(device).m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
@@ -222,6 +224,6 @@ private:
 	devcb_write_line m_drq_handler;
 };
 
-extern const device_type NCR5380N;
+DECLARE_DEVICE_TYPE(NCR5380N, ncr5380n_device)
 
-#endif
+#endif // MAME_MACHINE_NCR5380N_H

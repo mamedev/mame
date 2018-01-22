@@ -46,15 +46,16 @@ Known Issues:
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
-#include "machine/gen_latch.h"
-#include "machine/nvram.h"
-#include "machine/watchdog.h"
 #include "includes/twin16.h"
 #include "includes/konamipt.h"
 
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/nvram.h"
+#include "machine/watchdog.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
 
 
 #define CPUA_IRQ_ENABLE (m_CPUA_register & 0x20)
@@ -180,7 +181,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x081000, 0x081fff) AM_WRITENOP
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(CPUA_register_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
@@ -219,7 +220,7 @@ static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16, fround_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("comram")
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(fround_CPU_register_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
@@ -660,7 +661,7 @@ void twin16_state::machine_start()
 	save_item(NAME(m_CPUB_register));
 }
 
-static MACHINE_CONFIG_START( twin16, twin16_state )
+MACHINE_CONFIG_START(twin16_state::twin16)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -683,7 +684,7 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 0, 40*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(twin16_state, screen_update_twin16)
-	MCFG_SCREEN_VBLANK_DRIVER(twin16_state, screen_eof_twin16)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(twin16_state, screen_vblank_twin16))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", twin16)
@@ -714,11 +715,11 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( devilw, twin16 )
+MACHINE_CONFIG_DERIVED(twin16_state::devilw, twin16)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) // watchdog reset otherwise
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fround, fround_state )
+MACHINE_CONFIG_START(fround_state::fround)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
 	MCFG_CPU_PROGRAM_MAP(fround_map)
@@ -737,7 +738,7 @@ static MACHINE_CONFIG_START( fround, fround_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 0, 40*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(twin16_state, screen_update_twin16)
-	MCFG_SCREEN_VBLANK_DRIVER(twin16_state, screen_eof_twin16)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(twin16_state, screen_vblank_twin16))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fround)
@@ -768,12 +769,12 @@ static MACHINE_CONFIG_START( fround, fround_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( miaj, twin16 )
+MACHINE_CONFIG_DERIVED(twin16_state::miaj, twin16)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( cuebrickj, twin16, cuebrickj_state )
+MACHINE_CONFIG_DERIVED(cuebrickj_state::cuebrickj, twin16)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/2, 576, 1*8, 39*8, 264, 2*8, 30*8)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -1278,19 +1279,19 @@ DRIVER_INIT_MEMBER(cuebrickj_state,cuebrickj)
 
 /* Game Drivers */
 
-//    YEAR, NAME,      PARENT,   MACHINE,   INPUT,     INIT,      MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, devilw,    0,        devilw,    devilw, twin16_state,    twin16,    ROT0,   "Konami", "Devil World", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, majuu,     devilw,   devilw,    devilw, twin16_state,    twin16,    ROT0,   "Konami", "Majuu no Ohkoku", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, darkadv,   devilw,   devilw,    darkadv, twin16_state,   twin16,    ROT0,   "Konami", "Dark Adventure", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vulcan,    0,        twin16,    vulcan, twin16_state,    twin16,    ROT0,   "Konami", "Vulcan Venture (New)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vulcana,   vulcan,   twin16,    vulcan, twin16_state,    twin16,    ROT0,   "Konami", "Vulcan Venture (Old)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vulcanb,   vulcan,   twin16,    vulcan, twin16_state,    twin16,    ROT0,   "Konami", "Vulcan Venture (Oldest)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gradius2,  vulcan,   twin16,    gradius2, twin16_state,  twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan New Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gradius2a, vulcan,   twin16,    vulcan, twin16_state,    twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan Old Ver.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gradius2b, vulcan,   twin16,    vulcan, twin16_state,    twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan Older Ver.)", MACHINE_SUPPORTS_SAVE )
+//    YEAR, NAME,      PARENT,   MACHINE,   INPUT,     STATE,           INIT,      MONITOR,COMPANY,  FULLNAME,FLAGS
+GAME( 1987, devilw,    0,        devilw,    devilw,    twin16_state,    twin16,    ROT0,   "Konami", "Devil World", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, majuu,     devilw,   devilw,    devilw,    twin16_state,    twin16,    ROT0,   "Konami", "Majuu no Ohkoku", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, darkadv,   devilw,   devilw,    darkadv,   twin16_state,    twin16,    ROT0,   "Konami", "Dark Adventure", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vulcan,    0,        twin16,    vulcan,    twin16_state,    twin16,    ROT0,   "Konami", "Vulcan Venture (New)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vulcana,   vulcan,   twin16,    vulcan,    twin16_state,    twin16,    ROT0,   "Konami", "Vulcan Venture (Old)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vulcanb,   vulcan,   twin16,    vulcan,    twin16_state,    twin16,    ROT0,   "Konami", "Vulcan Venture (Oldest)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gradius2,  vulcan,   twin16,    gradius2,  twin16_state,    twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan New Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gradius2a, vulcan,   twin16,    vulcan,    twin16_state,    twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan Old Ver.)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gradius2b, vulcan,   twin16,    vulcan,    twin16_state,    twin16,    ROT0,   "Konami", "Gradius II - GOFER no Yabou (Japan Older Ver.)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, fround,    0,        fround,    fround, fround_state,    fround,    ROT0,   "Konami", "The Final Round (version M)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, froundl,   fround,   fround,    fround, fround_state,    fround,    ROT0,   "Konami", "The Final Round (version L)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hpuncher,  fround,   twin16,    fround, twin16_state,    twin16,    ROT0,   "Konami", "Hard Puncher (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, miaj,      mia,      miaj,      miaj,   twin16_state,    twin16,    ROT0,   "Konami", "M.I.A. - Missing in Action (version R) (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cuebrickj, cuebrick, cuebrickj, cuebrickj, cuebrickj_state, cuebrickj, ROT0, "Konami", "Cue Brick (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, fround,    0,        fround,    fround,    fround_state,    fround,    ROT0,   "Konami", "The Final Round (version M)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, froundl,   fround,   fround,    fround,    fround_state,    fround,    ROT0,   "Konami", "The Final Round (version L)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hpuncher,  fround,   twin16,    fround,    twin16_state,    twin16,    ROT0,   "Konami", "Hard Puncher (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, miaj,      mia,      miaj,      miaj,      twin16_state,    twin16,    ROT0,   "Konami", "M.I.A. - Missing in Action (version R) (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cuebrickj, cuebrick, cuebrickj, cuebrickj, cuebrickj_state, cuebrickj, ROT0,   "Konami", "Cue Brick (Japan)", MACHINE_SUPPORTS_SAVE )

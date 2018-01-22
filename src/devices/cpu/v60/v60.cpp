@@ -74,55 +74,51 @@ Package: 132-pin PGA, 200-pin QFP
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "v60.h"
+#include "v60d.h"
+#include "debugger.h"
 
-const device_type V60 = &device_creator<v60_device>;
-const device_type V70 = &device_creator<v70_device>;
+DEFINE_DEVICE_TYPE(V60, v60_device, "v60", "V60")
+DEFINE_DEVICE_TYPE(V70, v70_device, "v70", "V70")
 
 
+// Set m_PIR (Processor ID) for NEC m_ LSB is reserved to NEC,
+// so I don't know what it contains.
 v60_device::v60_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, V60, "V60", tag, owner, clock, "v60", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
-	, m_io_config("io", ENDIANNESS_LITTLE, 16, 24, 0)
-	, m_fetch_xor(BYTE_XOR_LE(0))
-	, m_start_pc(0xfffff0)
+	: v60_device(mconfig, V60, tag, owner, clock, 16, 24, 0x00006000)
 {
-	// Set m_PIR (Processor ID) for NEC m_ LSB is reserved to NEC,
-	// so I don't know what it contains.
-	m_reg[45] = 0x00006000;
 }
 
 
-v60_device::v60_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
+v60_device::v60_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int databits, int addrbits, uint32_t pir)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, databits, addrbits, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_fetch_xor(BYTE4_XOR_LE(0))
 	, m_start_pc(0xfffffff0)
 {
-	// Set m_PIR (Processor ID) for NEC v70. LSB is reserved to NEC,
-	// so I don't know what it contains.
-	m_reg[45] = 0x00007000;
+	m_reg[45] = pir;
 }
 
+// Set m_PIR (Processor ID) for NEC v70. LSB is reserved to NEC,
+// so I don't know what it contains.
 v70_device::v70_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: v60_device(mconfig, V70, "V70", tag, owner, clock, "v70", __FILE__)
+	: v60_device(mconfig, V70, tag, owner, clock, 32, 32, 0x00007000)
 {
 }
 
-
-offs_t v60_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+device_memory_interface::space_config_vector v60_device::memory_space_config() const
 {
-	extern CPU_DISASSEMBLE( v60 );
-	return CPU_DISASSEMBLE_NAME(v60)(this, buffer, pc, oprom, opram, options);
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 
-offs_t v70_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *v60_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( v70 );
-	return CPU_DISASSEMBLE_NAME(v70)(this, buffer, pc, oprom, opram, options);
+	return new v60_disassembler;
 }
 
 
@@ -425,7 +421,7 @@ void v60_device::device_start()
 	m_moddim = 0;
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_fetch_xor));

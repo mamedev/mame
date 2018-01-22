@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#include "machine/timer.h"
+
 class finalizr_state : public driver_device
 {
 public:
@@ -54,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(finalizr_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(finalizr_i8039_irq_w);
 	DECLARE_WRITE8_MEMBER(i8039_irqen_w);
-	DECLARE_READ8_MEMBER(i8039_T1_r);
+	DECLARE_READ_LINE_MEMBER(i8039_T1_r);
 	DECLARE_WRITE8_MEMBER(i8039_T0_w);
 	DECLARE_WRITE8_MEMBER(finalizr_videoctrl_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -66,4 +68,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_finalizr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(finalizr_scanline);
+	void finalizr(machine_config &config);
 };

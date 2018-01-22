@@ -120,10 +120,12 @@ Known issues :
 
 
 #include "emu.h"
+#include "includes/argus.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "includes/argus.h"
+#include "speaker.h"
 
 
 void argus_state::machine_start()
@@ -528,7 +530,7 @@ static GFXDECODE_START( butasan )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( argus, argus_state )
+MACHINE_CONFIG_START(argus_state::argus)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 4 MHz */
@@ -576,7 +578,7 @@ static MACHINE_CONFIG_START( argus, argus_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( valtric, argus_state )
+MACHINE_CONFIG_START(argus_state::valtric)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
@@ -624,7 +626,7 @@ static MACHINE_CONFIG_START( valtric, argus_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( butasan, argus_state )
+MACHINE_CONFIG_START(argus_state::butasan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)           /* 5 MHz */
@@ -735,6 +737,9 @@ ROM_START( valtric )
 
 	ROM_REGION( 0x08000, "gfx3", 0 )    /* Text */
 	ROM_LOAD( "vt_07.bin",    0x00000, 0x08000, CRC(d5f9bfb9) SHA1(6b3f11f9b8f76c0144a109f1506d8cbb01876237) )
+
+	ROM_REGION (0x100, "proms", 0)
+	ROM_LOAD( "82s129", 0x000, 0x100, NO_DUMP ) // located on the top board
 ROM_END
 
 ROM_START( butasan ) /* English "subtitle" of Butasan for Japanese region.  Original Jaleco PCB */
@@ -806,8 +811,8 @@ ROM_START( butasanj )
 ROM_END
 
 
-/*  ( YEAR   NAME     PARENT  MACHINE   INPUT     INIT  MONITOR  COMPANY                  FULLNAME ) */
-GAME( 1986, argus,    0,      argus,    argus, driver_device,    0,    ROT270,  "NMK (Jaleco license)", "Argus",                                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, valtric,  0,      valtric,  valtric, driver_device,  0,    ROT270,  "NMK (Jaleco license)", "Valtric",                                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, butasan,  0,      butasan,  butasan, driver_device,  0,    ROT0,    "NMK (Jaleco license)", "Butasan - Pig's & Bomber's (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1987, butasanj, butasan,butasan,  butasan, driver_device,  0,    ROT0,    "NMK (Jaleco license)", "Butasan (Japan, Japanese)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+/*  ( YEAR   NAME     PARENT  MACHINE   INPUT    STATE         INIT  MONITOR  COMPANY                 FULLNAME ) */
+GAME( 1986, argus,    0,      argus,    argus,   argus_state,  0,    ROT270,  "NMK (Jaleco license)", "Argus",                                       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, valtric,  0,      valtric,  valtric, argus_state,  0,    ROT270,  "NMK (Jaleco license)", "Valtric",                                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, butasan,  0,      butasan,  butasan, argus_state,  0,    ROT0,    "NMK (Jaleco license)", "Butasan - Pig's & Bomber's (Japan, English)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, butasanj, butasan,butasan,  butasan, argus_state,  0,    ROT0,    "NMK (Jaleco license)", "Butasan (Japan, Japanese)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

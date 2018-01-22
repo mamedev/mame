@@ -50,19 +50,6 @@ SAMPLER2D(decal, 0);
   #define SMOOTH_TIPS
 #endif
 
-const vec4 Ao = vec4( 1.0, -1.0, -1.0, 1.0 );
-const vec4 Bo = vec4( 1.0,  1.0, -1.0,-1.0 );
-const vec4 Co = vec4( 1.5,  0.5, -0.5, 0.5 );
-const vec4 Ax = vec4( 1.0, -1.0, -1.0, 1.0 );
-const vec4 Bx = vec4( 0.5,  2.0, -0.5,-2.0 );
-const vec4 Cx = vec4( 1.0,  1.0, -0.5, 0.0 );
-const vec4 Ay = vec4( 1.0, -1.0, -1.0, 1.0 );
-const vec4 By = vec4( 2.0,  0.5, -2.0,-0.5 );
-const vec4 Cy = vec4( 2.0,  0.0, -1.0, 0.5 );
-const vec4 Ci = vec4(0.25, 0.25, 0.25, 0.25);
-
-const vec4 Y  = vec4(0.2126, 0.7152, 0.0722, 0.0);
-
 vec4 df(vec4 A, vec4 B)
 {
 	return abs(A - B);
@@ -70,43 +57,17 @@ vec4 df(vec4 A, vec4 B)
 
 float c_df(vec3 c1, vec3 c2)
 {
-	vec3 df = abs(c1 - c2);
-	return df.r + df.g + df.b;
-}
-
-vec4 ge(vec4 A, vec4 B)
-{
-	return vec4(greaterThanEqual(A, B));
-}
-
-vec4 le(vec4 A, vec4 B)
-{
-	return vec4(lessThanEqual(A, B));
-}
-
-vec4 lt(vec4 A, vec4 B)
-{
-	return vec4(lessThan(A, B));
+	return dot(abs(c1 - c2), vec3(1.0, 1.0, 1.0));
 }
 
 vec4 eq(vec4 A, vec4 B)
 {
-	return vec4(equal(A, B));
+	return vec4(lessThan(df(A, B), XBR_EQ_THRESHOLD.xxxx));
 }
 
-vec4 ne(vec4 A, vec4 B)
+vec4 neq(vec4 A, vec4 B)
 {
-	return vec4(notEqual(A, B));
-}
-
-vec4 abslt(vec4 A, vec4 B)
-{
-	return lt(df(A, B), XBR_EQ_THRESHOLD.xxxx);
-}
-
-vec4 absge(vec4 A, vec4 B)
-{
-	return ge(df(A, B), XBR_EQ_THRESHOLD.xxxx);
+	return vec4(greaterThanEqual(df(A, B), XBR_EQ_THRESHOLD.xxxx));
 }
 
 vec4 weighted_distance(vec4 a, vec4 b, vec4 c, vec4 d, vec4 e, vec4 f, vec4 g, vec4 h)
@@ -117,6 +78,8 @@ vec4 weighted_distance(vec4 a, vec4 b, vec4 c, vec4 d, vec4 e, vec4 f, vec4 g, v
 
 void main()
 {
+	vec4 Y  = vec4(0.2126, 0.7152, 0.0722, 0.0);
+
 	vec4 delta  = 1.0 / XBR_SCALE.xxxx;
 	vec4 deltaL = vec4(0.5, 1.0, 0.5, 1.0) / XBR_SCALE.xxxx;
 	vec4 deltaU = deltaL.yxwz;
@@ -135,9 +98,10 @@ void main()
 	vec4 H  = texture2D(decal, v_texcoord3.yw);
 	vec4 I  = texture2D(decal, v_texcoord3.zw);
 
-	vec4 b = mul(mat4(B, D, H, F), XBR_Y_WEIGHT.xxxx * Y);
-	vec4 c = mul(mat4(C, A, G, I), XBR_Y_WEIGHT.xxxx * Y);
-	vec4 e = mul(mat4(E, E, E, E), XBR_Y_WEIGHT.xxxx * Y);
+	vec4 weightVec = XBR_Y_WEIGHT.xxxx * Y;
+	vec4 b = instMul(weightVec, mat4(B, D, H, F));
+	vec4 c = instMul(weightVec, mat4(C, A, G, I));
+	vec4 e = instMul(weightVec, mat4(E, E, E, E));
 	vec4 a = c.yzwx;
 	vec4 d = b.yzwx;
 	vec4 f = b.wxyz;
@@ -145,20 +109,31 @@ void main()
 	vec4 h = b.zwxy;
 	vec4 i = c.wxyz;
 
+	vec4 Ao = vec4( 1.0, -1.0, -1.0, 1.0 );
+	vec4 Bo = vec4( 1.0,  1.0, -1.0,-1.0 );
+	vec4 Co = vec4( 1.5,  0.5, -0.5, 0.5 );
+	vec4 Ax = vec4( 1.0, -1.0, -1.0, 1.0 );
+	vec4 Bx = vec4( 0.5,  2.0, -0.5,-2.0 );
+	vec4 Cx = vec4( 1.0,  1.0, -0.5, 0.0 );
+	vec4 Ay = vec4( 1.0, -1.0, -1.0, 1.0 );
+	vec4 By = vec4( 2.0,  0.5, -2.0,-0.5 );
+	vec4 Cy = vec4( 2.0,  0.0, -1.0, 0.5 );
+	vec4 Ci = vec4(0.25, 0.25, 0.25, 0.25);
+
 	// These inequations define the line below which interpolation occurs.
 	vec4 fx      = (Ao*fp.y+Bo*fp.x); 
 	vec4 fx_left = (Ax*fp.y+Bx*fp.x);
 	vec4 fx_up   = (Ay*fp.y+By*fp.x);
 
-	vec4 interp_restriction_lv0 = (ne(e,f) * ne(e,h));
-    vec4 interp_restriction_lv1 = interp_restriction_lv0;
+	vec4 interp_restriction_lv0 = vec4(notEqual(e,f)) * vec4(notEqual(e,h));
+	vec4 interp_restriction_lv1 = interp_restriction_lv0;
 
 #ifndef CORNER_A
-	interp_restriction_lv1 = clamp(interp_restriction_lv0 * (ge(f,b) * ge(f,c) + ge(h,d) * ge(h,g) + lt(e,g) + lt(e,c)), 0.0, 1.0);
+	interp_restriction_lv1 = clamp(interp_restriction_lv0 * (neq(f,b) * neq(f,c) + neq(h,d) * neq(h,g) + eq(e,g) + eq(e,c)), 0.0, 1.0);
 #endif
 
-	vec4 interp_restriction_lv2_left = (ne(e,g) * ne(d,g));
-	vec4 interp_restriction_lv2_up   = (ne(e,c) * ne(b,c));
+	vec4 interp_restriction_lv2_left = vec4(notEqual(e,g)) * vec4(notEqual(d,g));
+	vec4 interp_restriction_lv2_up   = vec4(notEqual(e,c)) * vec4(notEqual(b,c));
 
 	vec4 fx45i = saturate((fx      + delta  -Co - Ci) / (2.0 * delta ));
 	vec4 fx45  = saturate((fx      + delta  -Co     ) / (2.0 * delta ));
@@ -168,17 +143,19 @@ void main()
 	vec4 wd1 = weighted_distance( d, b, g, e, e, c, h, f);
 	vec4 wd2 = weighted_distance( a, e, b, f, d, h, e, i);
 
-    vec4 edri     = le(wd1, wd2) * interp_restriction_lv0;
-	vec4 edr      = lt(wd1, wd2) * interp_restriction_lv1;
-	vec4 edr_left = le(XBR_LV2_COEFFICIENT.xxxx * df(f,g), df(h,c)) * interp_restriction_lv2_left * edr;
-	vec4 edr_up   = ge(df(f,g), XBR_LV2_COEFFICIENT.xxxx * df(h,c)) * interp_restriction_lv2_up * edr;
+	vec4 edri     = vec4(lessThanEqual(wd1, wd2)) * interp_restriction_lv0;
+	vec4 edr      = vec4(lessThan(wd1, wd2)) * interp_restriction_lv1;
+	vec4 hcDiff   = df(h,c);
+	vec4 fgDiff   = df(f,g);
+	vec4 edr_left = vec4(lessThanEqual(XBR_LV2_COEFFICIENT.xxxx * fgDiff, hcDiff)) * interp_restriction_lv2_left * edr;
+	vec4 edr_up   = vec4(greaterThanEqual(fgDiff, XBR_LV2_COEFFICIENT.xxxx * hcDiff)) * interp_restriction_lv2_up * edr;
 
 	fx45  = edr * fx45;
 	fx30  = edr_left * fx30;
 	fx60  = edr_up * fx60;
 	fx45i = edri * fx45i;
 
-	vec4 px = le(df(e,f), df(e,h));
+	vec4 px = vec4(lessThanEqual(df(e,f), df(e,h)));
 
 #ifdef SMOOTH_TIPS
 	vec4 maximos = max(max(fx30, fx60), max(fx45, fx45i));

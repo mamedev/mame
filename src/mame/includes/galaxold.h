@@ -16,6 +16,8 @@
 #define __GALAXOLD_H__
 
 #include "machine/7474.h"
+#include "machine/timer.h"
+#include "screen.h"
 
 /* star circuit */
 #define STAR_COUNT  252
@@ -186,12 +188,12 @@ public:
 	DECLARE_VIDEO_START(galaxold);
 	DECLARE_VIDEO_START(drivfrcg);
 	DECLARE_VIDEO_START(racknrol);
-	DECLARE_VIDEO_START(batman2);
 	DECLARE_VIDEO_START(mooncrst);
 	DECLARE_VIDEO_START(scrambold);
 	DECLARE_VIDEO_START(newsin7);
 	DECLARE_VIDEO_START(pisces);
 	DECLARE_VIDEO_START(dkongjrm);
+	DECLARE_VIDEO_START(dkongjrmc);
 	DECLARE_VIDEO_START(rockclim);
 	DECLARE_VIDEO_START(galaxold_plain);
 	DECLARE_VIDEO_START(ozon1);
@@ -222,7 +224,6 @@ public:
 	void video_start_common();
 	void pisces_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void mooncrst_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void batman2_modify_charcode(uint16_t *code, uint8_t x);
 	void rockclim_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void rockclim_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void harem_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
@@ -235,6 +236,7 @@ public:
 	void mimonkey_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void batman2_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void dkongjrm_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
+	void dkongjrmc_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void ad2083_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void dambustr_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void drivfrcg_modify_color(uint8_t *color);
@@ -265,6 +267,33 @@ public:
 	void bagmanmc_modify_charcode(uint16_t *code, uint8_t x);
 	void bagmanmc_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void machine_reset_common(int line);
+	void galaxian(machine_config &config);
+	void galaxold_base(machine_config &config);
+	void ckongg(machine_config &config);
+	void _4in1(machine_config &config);
+	void bongo(machine_config &config);
+	void racknrol(machine_config &config);
+	void hunchbkg(machine_config &config);
+	void videotron(machine_config &config);
+	void hexpoola(machine_config &config);
+	void dkongjrm(machine_config &config);
+	void tazzmang(machine_config &config);
+	void scrambler(machine_config &config);
+	void spcwarp(machine_config &config);
+	void dkongjrmc(machine_config &config);
+	void bagmanmc(machine_config &config);
+	void bullsdrtg(machine_config &config);
+	void drivfrcg(machine_config &config);
+	void rockclim(machine_config &config);
+	void scramblb(machine_config &config);
+	void porter(machine_config &config);
+	void scramb2(machine_config &config);
+	void ozon1(machine_config &config);
+	void mooncrst(machine_config &config);
+	void guttang(machine_config &config);
+	void ckongmc(machine_config &config);
+	void galaxian_audio(machine_config &config);
+	void mooncrst_audio(machine_config &config);
 };
 
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w

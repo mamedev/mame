@@ -11,8 +11,10 @@
 
 ***************************************************************************/
 
-#ifndef __H83006_H__
-#define __H83006_H__
+#ifndef MAME_CPU_H8_H83006_H
+#define MAME_CPU_H8_H83006_H
+
+#pragma once
 
 #include "h8h.h"
 #include "h8_adc.h"
@@ -25,13 +27,14 @@
 
 class h83006_device : public h8h_device {
 public:
-	h83006_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	h83006_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);
 
 protected:
+	h83006_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t start);
+
 	required_device<h8h_intc_device> intc;
 	required_device<h8_adc_device> adc;
 	required_device<h8_port_device> port4;
@@ -62,7 +65,7 @@ protected:
 	virtual int trapa_setup() override;
 	virtual void irq_setup() override;
 	virtual void internal_update(uint64_t current_time) override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	DECLARE_ADDRESS_MAP(map, 16);
 
 	virtual void device_start() override;
@@ -76,7 +79,7 @@ public:
 	h83007_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-extern const device_type H83006;
-extern const device_type H83007;
+DECLARE_DEVICE_TYPE(H83006, h83006_device)
+DECLARE_DEVICE_TYPE(H83007, h83007_device)
 
-#endif
+#endif // MAME_CPU_H8_H83006_H

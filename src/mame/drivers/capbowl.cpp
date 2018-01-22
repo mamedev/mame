@@ -88,12 +88,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/capbowl.h"
+
 #include "machine/ticket.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/capbowl.h"
 #include "sound/2203intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK        XTAL_8MHz
 
@@ -311,17 +313,17 @@ void capbowl_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( capbowl, capbowl_state )
+MACHINE_CONFIG_START(capbowl_state::capbowl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, MASTER_CLOCK)
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
 	MCFG_CPU_PROGRAM_MAP(capbowl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", capbowl_state,  interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // ~0.3s
 
-	MCFG_CPU_ADD("audiocpu", M6809E, MASTER_CLOCK)
+	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK / 4) // MC68B09EP
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 //  MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_ASTABLE(100000.0, 100000.0, 0.1e-6) * 15.5) // TODO
 
@@ -346,22 +348,22 @@ static MACHINE_CONFIG_START( capbowl, capbowl_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK/2)
+	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 2)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("ticket", ticket_dispenser_device, read))
-	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("ticket", ticket_dispenser_device, write))  /* Also a status LED. See memory map above */
+	MCFG_AY8910_PORT_A_READ_CB(DEVREADLINE("ticket", ticket_dispenser_device, line_r)) MCFG_DEVCB_BIT(7)
+	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITELINE("ticket", ticket_dispenser_device, motor_w)) MCFG_DEVCB_BIT(7)  /* Also a status LED. See memory map above */
 	MCFG_SOUND_ROUTE(0, "speaker", 0.07)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.07)
 	MCFG_SOUND_ROUTE(2, "speaker", 0.07)
 	MCFG_SOUND_ROUTE(3, "speaker", 0.75)
 
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac", DAC0832, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bowlrama, capbowl )
+MACHINE_CONFIG_DERIVED(capbowl_state::bowlrama, capbowl)
 
 	/* basic machine hardware */
 
@@ -480,4 +482,4 @@ GAME( 1988, capbowl2, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT27
 GAME( 1988, capbowl3, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, capbowl4, capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Capcom Bowling (set 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, clbowl,   capbowl, capbowl,  capbowl, capbowl_state, capbowl,  ROT270, "Incredible Technologies / Capcom", "Coors Light Bowling",    MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bowlrama, 0,       bowlrama, capbowl, driver_device, 0,        ROT270, "P&P Marketing",                    "Bowl-O-Rama Rev 1.0",    MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bowlrama, 0,       bowlrama, capbowl, capbowl_state, 0,        ROT270, "P&P Marketing",                    "Bowl-O-Rama Rev 1.0",    MACHINE_SUPPORTS_SAVE )

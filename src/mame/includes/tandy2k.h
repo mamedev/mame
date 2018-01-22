@@ -1,9 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#ifndef __TANDY2K__
-#define __TANDY2K__
+#ifndef MAME_INCLUDES_TANDY2K_H
+#define MAME_INCLUDES_TANDY2K_H
 
-#include "emu.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i186.h"
@@ -16,8 +15,9 @@
 #include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "machine/tandy2kb.h"
+#include "machine/timer.h"
 #include "machine/upd765.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 #include "video/crt9007.h"
 #include "video/crt9021.h"
 #include "video/crt9212.h"
@@ -109,10 +109,10 @@ public:
 	required_device<i8272a_device> m_fdc;
 	required_device<pic8259_device> m_pic0;
 	required_device<pic8259_device> m_pic1;
-	required_device<crt9007_t> m_vpac;
-	required_device<crt9212_t> m_drb0;
-	required_device<crt9212_t> m_drb1;
-	required_device<crt9021_t> m_vac;
+	required_device<crt9007_device> m_vpac;
+	required_device<crt9212_device> m_drb0;
+	required_device<crt9212_device> m_drb1;
+	required_device<crt9021_device> m_vac;
 	required_device<palette_device> m_palette;
 	required_device<timer_device> m_timer_vidldsh;
 	required_device<centronics_device> m_centronics;
@@ -224,6 +224,8 @@ public:
 	int m_centronics_select;
 	int m_centronics_perror;
 	int m_centronics_busy;
+	void tandy2k_hd(machine_config &config);
+	void tandy2k(machine_config &config);
 };
 
-#endif
+#endif // MAME_INCLUDES_TANDY2K_H

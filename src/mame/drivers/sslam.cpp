@@ -83,9 +83,12 @@ Notes:
 
 
 #include "emu.h"
+#include "includes/sslam.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
-#include "includes/sslam.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define oki_time_base 0x08
@@ -379,7 +382,7 @@ static ADDRESS_MAP_START( sslam_program_map, AS_PROGRAM, 16, sslam_state )
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM_WRITE(sslam_tx_tileram_w) AM_SHARE("tx_tileram")
 	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_SHARE("regs")
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
@@ -402,7 +405,7 @@ static ADDRESS_MAP_START( powerbls_map, AS_PROGRAM, 16, sslam_state )
 	AM_RANGE(0x110000, 0x11000d) AM_RAM AM_SHARE("regs")
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x280000, 0x2803ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x2803ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("IN0")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("IN1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("IN2")
@@ -691,7 +694,7 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( sslam, sslam_state )
+MACHINE_CONFIG_START(sslam_state::sslam)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -719,11 +722,11 @@ static MACHINE_CONFIG_START( sslam, sslam_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( powerbls, sslam_state )
+MACHINE_CONFIG_START(sslam_state::powerbls)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -753,7 +756,7 @@ static MACHINE_CONFIG_START( powerbls, sslam_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)   /* verified on original PCB */
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)   /* verified on original PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -933,7 +936,7 @@ DRIVER_INIT_MEMBER(sslam_state,powerbls)
 }
 
 
-GAME( 1993, sslam,    0,        sslam,    sslam, sslam_state,    sslam,    ROT0, "Playmark", "Super Slam (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sslama,   sslam,    sslam,    sslam, sslam_state,    sslam,    ROT0, "Playmark", "Super Slam (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sslamb,   sslam,    sslam,    sslam, sslam_state,    sslam,    ROT0, "Playmark", "Super Slam (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sslam,    0,        sslam,    sslam,    sslam_state, sslam,    ROT0, "Playmark", "Super Slam (set 1)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sslama,   sslam,    sslam,    sslam,    sslam_state, sslam,    ROT0, "Playmark", "Super Slam (set 2)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sslamb,   sslam,    sslam,    sslam,    sslam_state, sslam,    ROT0, "Playmark", "Super Slam (set 3)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1994, powerbals,powerbal, powerbls, powerbls, sslam_state, powerbls, ROT0, "Playmark", "Power Balls (Super Slam conversion)", MACHINE_SUPPORTS_SAVE )

@@ -26,7 +26,10 @@ namespace glm
 
 		// -- Data --
 
-#		if GLM_HAS_ALIGNED_TYPE
+#		if GLM_HAS_ONLY_XYZW
+			T x, y, z;
+
+#		elif GLM_HAS_ALIGNED_TYPE
 #			if GLM_COMPILER & GLM_COMPILER_GCC
 #				pragma GCC diagnostic push
 #				pragma GCC diagnostic ignored "-Wpedantic"
@@ -76,53 +79,53 @@ namespace glm
 
 		/// Return the count of components of the vector
 		typedef length_t length_type;
-		GLM_FUNC_DECL GLM_CONSTEXPR length_type length() const;
+		GLM_FUNC_DECL static length_type length(){return 3;}
 
 		GLM_FUNC_DECL T & operator[](length_type i);
 		GLM_FUNC_DECL T const & operator[](length_type i) const;
 
 		// -- Implicit basic constructors --
 
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec3() GLM_DEFAULT_CTOR;
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec3(tvec3<T, P> const & v) GLM_DEFAULT;
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec3() GLM_DEFAULT_CTOR;
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec3(tvec3<T, P> const & v) GLM_DEFAULT;
 		template <precision Q>
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec3(tvec3<T, Q> const & v);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec3(tvec3<T, Q> const & v);
 
 		// -- Explicit basic constructors --
 
 		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR explicit tvec3(ctor);
-		GLM_FUNC_DECL GLM_CONSTEXPR explicit tvec3(T scalar);
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec3(T a, T b, T c);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR explicit tvec3(T scalar);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec3(T a, T b, T c);
 
 		// -- Conversion scalar constructors --
 
-		/// Explicit converions (From section 5.4.1 Conversion and scalar constructors of GLSL 1.30.08 specification)
+		/// Explicit conversions (From section 5.4.1 Conversion and scalar constructors of GLSL 1.30.08 specification)
 		template <typename A, typename B, typename C>
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec3(A a, B b, C c);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec3(A a, B b, C c);
 		template <typename A, typename B, typename C>
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec3(tvec1<A, P> const & a, tvec1<B, P> const & b, tvec1<C, P> const & c);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec3(tvec1<A, P> const & a, tvec1<B, P> const & b, tvec1<C, P> const & c);
 
 		// -- Conversion vector constructors --
 
 		/// Explicit conversions (From section 5.4.1 Conversion and scalar constructors of GLSL 1.30.08 specification)
 		template <typename A, typename B, precision Q>
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec3(tvec2<A, Q> const & a, B b);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec3(tvec2<A, Q> const & a, B b);
 		/// Explicit conversions (From section 5.4.1 Conversion and scalar constructors of GLSL 1.30.08 specification)
 		template <typename A, typename B, precision Q>
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec3(tvec2<A, Q> const & a, tvec1<B, Q> const & b);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec3(tvec2<A, Q> const & a, tvec1<B, Q> const & b);
 		/// Explicit conversions (From section 5.4.1 Conversion and scalar constructors of GLSL 1.30.08 specification)
 		template <typename A, typename B, precision Q>
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec3(A a, tvec2<B, Q> const & b);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec3(A a, tvec2<B, Q> const & b);
 		/// Explicit conversions (From section 5.4.1 Conversion and scalar constructors of GLSL 1.30.08 specification)
 		template <typename A, typename B, precision Q>
-		GLM_FUNC_DECL GLM_CONSTEXPR tvec3(tvec1<A, Q> const & a, tvec2<B, Q> const & b);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR tvec3(tvec1<A, Q> const & a, tvec2<B, Q> const & b);
 		/// Explicit conversions (From section 5.4.1 Conversion and scalar constructors of GLSL 1.30.08 specification)
 		template <typename U, precision Q>
-		GLM_FUNC_DECL GLM_CONSTEXPR GLM_EXPLICIT tvec3(tvec4<U, Q> const & v);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR GLM_EXPLICIT tvec3(tvec4<U, Q> const & v);
 
 		/// Explicit conversions (From section 5.4.1 Conversion and scalar constructors of GLSL 1.30.08 specification)
 		template <typename U, precision Q>
-		GLM_FUNC_DECL GLM_CONSTEXPR GLM_EXPLICIT tvec3(tvec3<U, Q> const & v);
+		GLM_FUNC_DECL GLM_CONSTEXPR_CTOR GLM_EXPLICIT tvec3(tvec3<U, Q> const & v);
 
 		// -- Swizzle constructors --
 #		if GLM_HAS_UNRESTRICTED_UNIONS && (GLM_SWIZZLE == GLM_SWIZZLE_ENABLED)

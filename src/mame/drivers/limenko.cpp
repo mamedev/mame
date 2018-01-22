@@ -28,8 +28,10 @@
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
-#include "sound/qs1000.h"
 #include "sound/okim6295.h"
+#include "sound/qs1000.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class limenko_state : public driver_device
@@ -112,6 +114,8 @@ public:
 	void draw_single_sprite(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,uint32_t code,uint32_t color,int flipx,int flipy,int sx,int sy,int priority);
 	void draw_sprites(uint32_t *sprites, const rectangle &cliprect, int count);
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
+	void limenko(machine_config &config);
+	void spotty(machine_config &config);
 };
 
 /*****************************************************************************************************
@@ -228,7 +232,7 @@ static ADDRESS_MAP_START( limenko_map, AS_PROGRAM, 32, limenko_state )
 	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
 	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_SHARE("videoreg")
 	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
@@ -255,7 +259,7 @@ static ADDRESS_MAP_START( spotty_map, AS_PROGRAM, 32, limenko_state )
 	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
 	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_SHARE("videoreg")
 	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
@@ -462,7 +466,7 @@ void limenko_state::draw_sprites(uint32_t *sprites, const rectangle &cliprect, i
 			continue;
 
 		/* prepare GfxElement on the fly */
-		gfx_element gfx(*m_palette, gfxdata, width, height, width, m_palette->entries(), 0, 256);
+		gfx_element gfx(m_palette, gfxdata, width, height, width, m_palette->entries(), 0, 256);
 
 		draw_single_sprite(m_sprites_bitmap,cliprect,&gfx,0,color,flipx,flipy,x,y,pri);
 
@@ -728,7 +732,7 @@ GFXDECODE_END
 *****************************************************************************************************/
 
 
-static MACHINE_CONFIG_START( limenko, limenko_state )
+MACHINE_CONFIG_START(limenko_state::limenko)
 	MCFG_CPU_ADD("maincpu", E132XN, 20000000*4) /* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(limenko_map)
 	MCFG_CPU_IO_MAP(limenko_io_map)
@@ -764,7 +768,7 @@ static MACHINE_CONFIG_START( limenko, limenko_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( spotty, limenko_state )
+MACHINE_CONFIG_START(limenko_state::spotty)
 	MCFG_CPU_ADD("maincpu", GMS30C2232, 20000000)   /* 20 MHz, no internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(spotty_map)
 	MCFG_CPU_IO_MAP(spotty_io_map)
@@ -794,7 +798,7 @@ static MACHINE_CONFIG_START( spotty, limenko_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", 4000000 / 4 , OKIM6295_PIN7_HIGH) //?
+	MCFG_OKIM6295_ADD("oki", 4000000 / 4 , PIN7_HIGH) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1159,10 +1163,10 @@ DRIVER_INIT_MEMBER(limenko_state,spotty)
 	save_item(NAME(m_spotty_sound_cmd));
 }
 
-GAME( 2000, dynabomb, 0,      limenko, sb2003, limenko_state,   dynabomb, ROT0, "Limenko", "Dynamite Bomber (Korea, Rev 1.5)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, legendoh, 0,      limenko, legendoh, limenko_state, legendoh, ROT0, "Limenko", "Legend of Heroes",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, sb2003,   0,      limenko, sb2003, limenko_state,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (World, Ver 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2003, sb2003a,  sb2003, limenko, sb2003, limenko_state,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (Asia, Ver 1.0)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, dynabomb, 0,      limenko, sb2003,   limenko_state, dynabomb, ROT0, "Limenko",    "Dynamite Bomber (Korea, Rev 1.5)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, legendoh, 0,      limenko, legendoh, limenko_state, legendoh, ROT0, "Limenko",    "Legend of Heroes",                   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, sb2003,   0,      limenko, sb2003,   limenko_state, sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (World, Ver 1.0)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   limenko_state, sb2003,   ROT0, "Limenko",    "Super Bubble 2003 (Asia, Ver 1.0)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // this game only uses the same graphics chip used in Limenko's system
-GAME( 2001, spotty,   0,      spotty,  spotty, limenko_state,   spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",             MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2001, spotty,   0,      spotty,  spotty,   limenko_state, spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",                MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

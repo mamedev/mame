@@ -4,14 +4,15 @@
 #include "emu.h"
 #include "prot_mslugx.h"
 
-extern const device_type MSLUGX_PROT = &device_creator<mslugx_prot_device>;
+DEFINE_DEVICE_TYPE(NG_MSLUGX_PROT, mslugx_prot_device, "ng_mslugx_prot", "Neo Geo Metal Slug X Protection")
 
 
 mslugx_prot_device::mslugx_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MSLUGX_PROT, "Neo Geo Metal Slug X Protection", tag, owner, clock, "mslugx_prot", __FILE__),
+	device_t(mconfig, NG_MSLUGX_PROT, tag, owner, clock),
 	m_counter(0),
 	m_command(0)
-{}
+{
+}
 
 
 void mslugx_prot_device::device_start()
@@ -53,7 +54,7 @@ WRITE16_MEMBER( mslugx_prot_device::protection_w )
 		break;
 
 		default:
-			logerror("unknown protection write at pc %06x, offset %08x, data %02x\n", space.device().safe_pc(), offset << 1, data);
+			logerror("unknown protection write at %s, offset %08x, data %02x\n", machine().describe_context(), offset << 1, data);
 		break;
 	}
 }
@@ -78,7 +79,7 @@ READ16_MEMBER( mslugx_prot_device::protection_r )
 		break;
 
 		default:
-			logerror("unknown protection read at pc %06x, offset %08x\n", space.device().safe_pc(), offset << 1);
+			logerror("unknown protection read at %s, offset %08x\n", machine().describe_context(), offset << 1);
 		break;
 	}
 

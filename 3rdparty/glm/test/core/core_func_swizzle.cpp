@@ -2,6 +2,8 @@
 #define GLM_FORCE_SWIZZLE
 #include <glm/glm.hpp>
 
+#if !GLM_HAS_ONLY_XYZW
+
 int test_ivec2_swizzle()
 {
 	int Error = 0;
@@ -60,16 +62,19 @@ int test_vec4_swizzle()
 
 	return Error;
 }
+#endif//!GLM_HAS_ONLY_XYZW
 
 int main()
 {
 	int Error = 0;
 
-	Error += test_ivec2_swizzle();
-	Error += test_ivec3_swizzle();
-	Error += test_ivec4_swizzle();
+#	if !GLM_HAS_ONLY_XYZW
+		Error += test_ivec2_swizzle();
+		Error += test_ivec3_swizzle();
+		Error += test_ivec4_swizzle();
 
-	Error += test_vec4_swizzle();
+		Error += test_vec4_swizzle();
+#	endif//!GLM_HAS_ONLY_XYZW
 
 	return Error;
 }

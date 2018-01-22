@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef __MSX_SYSTEMFLAGS_H
-#define __MSX_SYSTEMFLAGS_H
+#ifndef MAME_MACHINE_MSX_SYSTEMFLAGS_H
+#define MAME_MACHINE_MSX_SYSTEMFLAGS_H
 
 /*
 Some MSX2+ and TurboR machines have a 'system flags' I/O port ($F4).
@@ -9,7 +9,7 @@ The value in this register is cleared on power up, but it keeps it's
 value during a reset of the system.
 */
 
-extern const device_type MSX_SYSTEMFLAGS;
+DECLARE_DEVICE_TYPE(MSX_SYSTEMFLAGS, msx_systemflags_device)
 
 
 #define MCFG_MSX_SYSTEMFLAGS_ADD(_tag, _initial_value) \
@@ -36,4 +36,4 @@ private:
 	uint8_t m_system_flags;
 };
 
-#endif
+#endif // MAME_MACHINE_MSX_SYSTEMFLAGS_H

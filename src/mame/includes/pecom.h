@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Miodrag Milanovic
-#ifndef __PECOM__
-#define __PECOM__
+#ifndef MAME_INCLUDES_PECOM_H
+#define MAME_INCLUDES_PECOM_H
 
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
 #include "machine/ram.h"
+#include "sound/cdp1869.h"
 
 #define SCREEN_TAG  "screen"
 #define CDP1802_TAG "cdp1802"
@@ -58,6 +59,8 @@ public:
 	CDP1869_CHAR_RAM_READ_MEMBER(pecom_char_ram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(pecom_char_ram_w);
 	CDP1869_PCB_READ_MEMBER(pecom_pcb_r);
+	void pecom64(machine_config &config);
+	void pecom_video(machine_config &config);
 protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
@@ -69,8 +72,4 @@ protected:
 	ioport_port *m_io_ports[26];
 };
 
-/* ---------- defined in video/pecom.c ---------- */
-
-MACHINE_CONFIG_EXTERN( pecom_video );
-
-#endif
+#endif // MAME_INCLUDES_PECOM_H

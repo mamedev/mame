@@ -1,10 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Farfetch'd, R. Belmont
 #include "emu.h"
-#include "debugger.h"
 #include "i960.h"
-
-CPU_DISASSEMBLE( i960  );
+#include "i960dis.h"
+#include "debugger.h"
 
 #ifdef _MSC_VER
 /* logb prototype is different for MS Visual C */
@@ -13,14 +12,23 @@ CPU_DISASSEMBLE( i960  );
 #endif
 
 
-const device_type I960 = &device_creator<i960_cpu_device>;
+DEFINE_DEVICE_TYPE(I960, i960_cpu_device, "i960kb", "i960KB")
 
 
 i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, I960, "i960kb", tag, owner, clock, "i960kb", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0), m_rcache_pos(0), m_SAT(0), m_PRCB(0), m_PC(0), m_AC(0), m_IP(0), m_PIP(0), m_ICR(0), m_bursting(0), m_immediate_irq(0),
-	m_immediate_vector(0), m_immediate_pri(0), m_program(nullptr), m_direct(nullptr), m_icount(0)
+	: cpu_device(mconfig, I960, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_rcache_pos(0), m_SAT(0), m_PRCB(0), m_PC(0), m_AC(0), m_IP(0), m_PIP(0), m_ICR(0), m_bursting(0), m_immediate_irq(0)
+	, m_immediate_vector(0), m_immediate_pri(0), m_program(nullptr), m_direct(nullptr), m_icount(0)
 {
+}
+
+
+device_memory_interface::space_config_vector i960_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 
@@ -105,6 +113,13 @@ uint32_t i960_cpu_device::get_ea(uint32_t opcode)
 		switch(mode) {
 		case 0x4:
 			return m_r[abase];
+
+		case 0x5:   // address of this instruction + the offset dword + 8
+			// which in reality is "address of next instruction + the offset dword"
+			ret = m_direct->read_dword(m_IP);
+			m_IP += 4;
+			ret += m_IP;
+			return ret;
 
 		case 0x7:
 			return m_r[abase] + (m_r[index] << scale);
@@ -357,6 +372,14 @@ void i960_cpu_device::bxx(uint32_t opcode, int mask)
 {
 	if(m_AC & mask) {
 		m_IP += get_disp(opcode);
+		m_IP &= ~3;
+	}
+}
+
+void i960_cpu_device::fxx(uint32_t opcode, int mask)
+{
+	if(m_AC & mask) {
+		fatalerror("Taking the fault on a FAULT insn not yet supported\n");
 	}
 }
 
@@ -364,6 +387,7 @@ void i960_cpu_device::bxx_s(uint32_t opcode, int mask)
 {
 	if(m_AC & mask) {
 		m_IP += get_disp_s(opcode);
+		m_IP &= ~3;
 	}
 }
 
@@ -640,6 +664,48 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 		case 0x17: // bo
 			m_icount--;
 			bxx(opcode, 7);
+			break;
+
+		case 0x18: // faultno
+			m_icount--;
+			if(!(m_AC & 7)) {
+				m_IP += get_disp(opcode);
+			}
+			break;
+
+		case 0x19: // faultg
+			m_icount--;
+			fxx(opcode, 1);
+			break;
+
+		case 0x1a: // faulte
+			m_icount--;
+			fxx(opcode, 2);
+			break;
+
+		case 0x1b: // faultge
+			m_icount--;
+			fxx(opcode, 3);
+			break;
+
+		case 0x1c: // faultl
+			m_icount--;
+			fxx(opcode, 4);
+			break;
+
+		case 0x1d: // faultne
+			m_icount--;
+			fxx(opcode, 5);
+			break;
+
+		case 0x1e: // faultle
+			m_icount--;
+			fxx(opcode, 6);
+			break;
+
+		case 0x1f: // faulto
+			m_icount--;
+			fxx(opcode, 7);
 			break;
 
 		case 0x20: // testno
@@ -1069,6 +1135,20 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				set_ri(opcode, t2-1);
 				break;
 
+			case 0xc: // scanbyte
+				m_icount -= 2;
+				m_AC &= ~7;     // clear CC
+				t1 = get_1_ri(opcode);
+				t2 = get_2_ri(opcode);
+				if ((t1 & 0xff000000) == (t2 & 0xff000000) ||
+					(t1 & 0x00ff0000) == (t2 & 0x00ff0000) ||
+					(t1 & 0x0000ff00) == (t2 & 0x0000ff00) ||
+					(t1 & 0x000000ff) == (t2 & 0x000000ff))
+				{
+					m_AC |= 2;
+				}
+				break;
+
 			case 0xe: // chkbit
 				m_icount -= 2;
 				t1 = get_1_ri(opcode) & 0x1f;
@@ -1305,6 +1385,17 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 
 		case 0x66:
 			switch((opcode >> 7) & 0xf) {
+			case 0x0: // calls
+				t1 = get_1_ri(opcode);
+				t2 = m_program->read_dword(m_SAT + 152);    // get pointer to system procedure table
+				t2 = m_program->read_dword(t2 + 48 + (t1 * 4));
+				if ((t2 & 3) != 0)
+				{
+					fatalerror("I960: system calls that jump into supervisor mode aren't yet supported\n");
+				}
+				do_call(t2, 0, m_r[I960_SP]);
+				break;
+
 			case 0xd: // flushreg
 				if (m_rcache_pos > 4)
 				{
@@ -2012,7 +2103,7 @@ void i960_cpu_device::execute_set_input(int irqline, int state)
 void i960_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	save_item(NAME(m_IP));
 	save_item(NAME(m_PIP));
@@ -2029,6 +2120,7 @@ void i960_cpu_device::device_start()
 	save_item(NAME(m_immediate_irq));
 	save_item(NAME(m_immediate_vector));
 	save_item(NAME(m_immediate_pri));
+	save_item(NAME(m_bursting));
 
 	state_add( I960_SAT,  "sat", m_SAT).formatstr("%08X");
 	state_add( I960_PRCB, "prcb", m_PRCB).formatstr("%08X");
@@ -2116,9 +2208,7 @@ void i960_cpu_device::device_reset()
 	m_rcache_pos = 0;
 }
 
-
-offs_t i960_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i960_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i960 );
-	return CPU_DISASSEMBLE_NAME(i960)(this, buffer, pc, oprom, opram, options);
+	return new i960_disassembler;
 }

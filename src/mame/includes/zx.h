@@ -2,20 +2,25 @@
 // copyright-holders:Juergen Buchmueller, Krzysztof Strzecha, Robbbert
 /*****************************************************************************
  *
- * includes/zx.h
+ * ZX-80/ZX-81 and derivatives
  *
  ****************************************************************************/
 
-#ifndef ZX_H_
-#define ZX_H_
+#ifndef MAME_INCLUDES_ZX_H
+#define MAME_INCLUDES_ZX_H
 
-#include "emu.h"
+#pragma once
+
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
 #include "imagedev/cassette.h"
-#include "formats/zx81_p.h"
 #include "machine/ram.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+
+#include "screen.h"
+
+#include "formats/tzx_cas.h"
+#include "formats/zx81_p.h"
 
 
 class zx_state : public driver_device
@@ -38,7 +43,8 @@ public:
 		m_io_row6(*this, "ROW6"),
 		m_io_row7(*this, "ROW7"),
 		m_io_config(*this, "CONFIG"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen")
+	{ }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -55,10 +61,16 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(zx);
-	DECLARE_PALETTE_INIT(ts1000);
 	void zx_tape_input();
 	void zx_ula_hsync();
 
+	void zx81(machine_config &config);
+	void zx81_spk(machine_config &config);
+	void ts1000(machine_config &config);
+	void pc8300(machine_config &config);
+	void pow3000(machine_config &config);
+	void ts1500(machine_config &config);
+	void zx80(machine_config &config);
 protected:
 	enum
 	{
@@ -105,4 +117,4 @@ protected:
 	void recalc_hsync();
 };
 
-#endif /* ZX_H_ */
+#endif // MAME_INCLUDES_ZX_H

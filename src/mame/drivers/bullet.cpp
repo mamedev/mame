@@ -58,7 +58,9 @@ Notes:
 
 */
 
+#include "emu.h"
 #include "includes/bullet.h"
+
 #include "bus/rs232/rs232.h"
 #include "bus/scsi/scsihd.h"
 #include "softlist.h"
@@ -620,7 +622,7 @@ static ADDRESS_MAP_START( bullet_io, AS_IO, 8, bullet_state )
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x03) AM_READWRITE(win_r, wstrobe_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(MB8877_TAG, mb8877_t, read, write)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(MB8877_TAG, mb8877_device, read, write)
 	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_device, read, write)
 	AM_RANGE(0x15, 0x15) AM_READWRITE(brom_r, brom_w)
 	AM_RANGE(0x16, 0x16) AM_WRITE(exdsk_w)
@@ -649,7 +651,7 @@ static ADDRESS_MAP_START( bulletf_io, AS_IO, 8, bulletf_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(MB8877_TAG, mb8877_t, read, write)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(MB8877_TAG, mb8877_device, read, write)
 	AM_RANGE(0x14, 0x14) AM_WRITE(xdma0_w)
 	AM_RANGE(0x16, 0x16) AM_WRITE(xfdc_w)
 	AM_RANGE(0x17, 0x17) AM_WRITE(mbank_w)
@@ -1097,7 +1099,7 @@ void bulletf_state::machine_reset()
 //  MACHINE_CONFIG( bullet )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( bullet, bullet_state )
+MACHINE_CONFIG_START(bullet_state::bullet)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(bullet_mem)
@@ -1113,7 +1115,7 @@ static MACHINE_CONFIG_START( bullet, bullet_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(XTAL_4_9152MHz/4))
 
-	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL_16MHz/4)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -1177,7 +1179,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( bulletf )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( bulletf, bulletf_state )
+MACHINE_CONFIG_START(bulletf_state::bulletf)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(bulletf_mem)
@@ -1193,7 +1195,7 @@ static MACHINE_CONFIG_START( bulletf, bulletf_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc", bullet_state, ctc_tick, attotime::from_hz(XTAL_4_9152MHz/4))
 
-	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_16MHz/4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL_16MHz/4)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -1291,7 +1293,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME                FLAGS
+//    YEAR  NAME       PARENT    COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY      FULLNAME               FLAGS
 // the setname 'bullet' is used by Sega's Bullet in MAME.
-COMP( 1982, wmbullet,       0,          0,      bullet,     bullet, driver_device,  0,      "Wave Mate",    "Bullet",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1984, wmbulletf,  wmbullet,       0,      bulletf,    bulletf, driver_device, 0,      "Wave Mate",    "Bullet (Revision F)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1982, wmbullet,  0,        0,      bullet,  bullet,  bullet_state,  0,    "Wave Mate", "Bullet",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1984, wmbulletf, wmbullet, 0,      bulletf, bulletf, bulletf_state, 0,    "Wave Mate", "Bullet (Revision F)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

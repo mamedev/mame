@@ -7,14 +7,14 @@
  *  Based on original info found in Ron Fries' Pokey emulator,
  *  with additions by Brad Oliver, Eric Smith and Juergen Buchmueller,
  *  paddle (a/d conversion) details from the Atari 400/800 Hardware Manual.
- *  Polynome algorithms according to info supplied by Perry McFarlane.
+ *  Polynomial algorithms according to info supplied by Perry McFarlane.
  *
  *  4.6:
  *    [1] http://ploguechipsounds.blogspot.de/2009/10/how-i-recorded-and-decoded-pokeys.html
  *  - changed audio emulation to emulate borrow 3 clock delay and
  *    proper channel reset. New frequency only becomes effective
  *    after the counter hits 0. Emulation also treats counters
- *    as 8 bit counters which are linked now instead of monolytic
+ *    as 8 bit counters which are linked now instead of monolithic
  *    16 bit counters.
  *
  *  4.51:
@@ -28,7 +28,7 @@
  *    new RNG give this expected result now, bits #0-7 of the 9 bit poly.
  *  - reading the RNG returns the shift register contents ^ 0xff.
  *    That way resetting the Pokey with SKCTL (which resets the
- *    polynome shifters to 0) returns the expected 0xff value.
+ *    polynomial shifters to 0) returns the expected 0xff value.
  *  4.4:
  *  - reversed sample values to make OFF channels produce a zero signal.
  *    actually de-reversed them; don't remember that I reversed them ;-/
@@ -167,7 +167,7 @@ static const int clock_divisors[3] = {1, DIV_64, DIV_15};
 
 
 // device type definition
-const device_type POKEY = &device_creator<pokey_device>;
+DEFINE_DEVICE_TYPE(POKEY, pokey_device, "pokey", "Atari C012294 POKEY")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -178,21 +178,14 @@ const device_type POKEY = &device_creator<pokey_device>;
 //-------------------------------------------------
 
 pokey_device::pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, POKEY, "POKEY", tag, owner, clock, "pokey", __FILE__),
+	: device_t(mconfig, POKEY, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_execute_interface(mconfig, *this),
 		device_state_interface(mconfig, *this),
 		m_output_type(LEGACY_LINEAR),
 		m_icount(0),
 		m_stream(nullptr),
-		m_pot0_r_cb(*this),
-		m_pot1_r_cb(*this),
-		m_pot2_r_cb(*this),
-		m_pot3_r_cb(*this),
-		m_pot4_r_cb(*this),
-		m_pot5_r_cb(*this),
-		m_pot6_r_cb(*this),
-		m_pot7_r_cb(*this),
+		m_pot_r_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
 		m_allpot_r_cb(*this),
 		m_serin_r_cb(*this),
 		m_serout_w_cb(*this)
@@ -275,14 +268,8 @@ void pokey_device::device_start()
 		m_POTx[i] = 0;
 	}
 
-	m_pot0_r_cb.resolve();
-	m_pot1_r_cb.resolve();
-	m_pot2_r_cb.resolve();
-	m_pot3_r_cb.resolve();
-	m_pot4_r_cb.resolve();
-	m_pot5_r_cb.resolve();
-	m_pot6_r_cb.resolve();
-	m_pot7_r_cb.resolve();
+	for (devcb_read8 &cb : m_pot_r_cb)
+		cb.resolve();
 	m_allpot_r_cb.resolve();
 	m_serin_r_cb.resolve();
 	m_serout_w_cb.resolve_safe();
@@ -1113,184 +1100,25 @@ void pokey_device::pokey_potgo(void)
 	for( pot = 0; pot < 8; pot++ )
 	{
 		m_POTx[pot] = 228;
-		switch (pot)
+		if( !m_pot_r_cb[pot].isnull() )
 		{
-			case 0:
-				if( !m_pot0_r_cb.isnull() )
-				{
-					int r = m_pot0_r_cb(pot);
+			int r = m_pot_r_cb[pot](pot);
 
-					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
-					if (r >= 228)
-					{
-						r = 228;
-					}
-					if (r == 0)
-					{
-						/* immediately set the ready - bit of m_ALLPOT
-						 * In this case, most likely no capacitor is connected
-						 */
-						m_ALLPOT |= (1<<pot);
-					}
+			LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
+			if (r >= 228)
+			{
+				r = 228;
+			}
+			if (r == 0)
+			{
+				/* immediately set the ready - bit of m_ALLPOT
+				 * In this case, most likely no capacitor is connected
+				 */
+				m_ALLPOT |= (1<<pot);
+			}
 
-					/* final value */
-					m_POTx[pot] = r;
-				}
-				break;
-			case 1:
-				if( !m_pot1_r_cb.isnull() )
-				{
-					int r = m_pot1_r_cb(pot);
-
-					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
-					if (r >= 228)
-					{
-						r = 228;
-					}
-					if (r == 0)
-					{
-						/* immediately set the ready - bit of m_ALLPOT
-						 * In this case, most likely no capacitor is connected
-						 */
-						m_ALLPOT |= (1<<pot);
-					}
-
-					/* final value */
-					m_POTx[pot] = r;
-				}
-				break;
-			case 2:
-				if( !m_pot2_r_cb.isnull() )
-				{
-					int r = m_pot2_r_cb(pot);
-
-					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
-					if (r >= 228)
-					{
-						r = 228;
-					}
-					if (r == 0)
-					{
-						/* immediately set the ready - bit of m_ALLPOT
-						 * In this case, most likely no capacitor is connected
-						 */
-						m_ALLPOT |= (1<<pot);
-					}
-
-					/* final value */
-					m_POTx[pot] = r;
-				}
-				break;
-			case 3:
-				if( !m_pot3_r_cb.isnull() )
-				{
-					int r = m_pot3_r_cb(pot);
-
-					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
-					if (r >= 228)
-					{
-						r = 228;
-					}
-					if (r == 0)
-					{
-						/* immediately set the ready - bit of m_ALLPOT
-						 * In this case, most likely no capacitor is connected
-						 */
-						m_ALLPOT |= (1<<pot);
-					}
-
-					/* final value */
-					m_POTx[pot] = r;
-				}
-				break;
-			case 4:
-				if( !m_pot4_r_cb.isnull() )
-				{
-					int r = m_pot4_r_cb(pot);
-
-					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
-					if (r >= 228)
-					{
-						r = 228;
-					}
-					if (r == 0)
-					{
-						/* immediately set the ready - bit of m_ALLPOT
-						 * In this case, most likely no capacitor is connected
-						 */
-						m_ALLPOT |= (1<<pot);
-					}
-
-					/* final value */
-					m_POTx[pot] = r;
-				}
-				break;
-			case 5:
-				if( !m_pot5_r_cb.isnull() )
-				{
-					int r = m_pot5_r_cb(pot);
-
-					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
-					if (r >= 228)
-					{
-						r = 228;
-					}
-					if (r == 0)
-					{
-						/* immediately set the ready - bit of m_ALLPOT
-						 * In this case, most likely no capacitor is connected
-						 */
-						m_ALLPOT |= (1<<pot);
-					}
-
-					/* final value */
-					m_POTx[pot] = r;
-				}
-				break;
-			case 6:
-				if( !m_pot6_r_cb.isnull() )
-				{
-					int r = m_pot6_r_cb(pot);
-
-					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
-					if (r >= 228)
-					{
-						r = 228;
-					}
-					if (r == 0)
-					{
-						/* immediately set the ready - bit of m_ALLPOT
-						 * In this case, most likely no capacitor is connected
-						 */
-						m_ALLPOT |= (1<<pot);
-					}
-
-					/* final value */
-					m_POTx[pot] = r;
-				}
-				break;
-			case 7:
-				if( !m_pot7_r_cb.isnull() )
-				{
-					int r = m_pot7_r_cb(pot);
-
-					LOG(("POKEY %s pot_r(%d) returned $%02x\n", tag(), pot, r));
-					if (r >= 228)
-					{
-						r = 228;
-					}
-					if (r == 0)
-					{
-						/* immediately set the ready - bit of m_ALLPOT
-						 * In this case, most likely no capacitor is connected
-						 */
-						m_ALLPOT |= (1<<pot);
-					}
-
-					/* final value */
-					m_POTx[pot] = r;
-				}
-				break;
+			/* final value */
+			m_POTx[pot] = r;
 		}
 	}
 }

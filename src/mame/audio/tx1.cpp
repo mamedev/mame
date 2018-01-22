@@ -7,9 +7,10 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/tx1.h"
+
 #include "sound/ay8910.h"
 #include "video/resnet.h"
-#include "includes/tx1.h"
 
 
 /*************************************
@@ -51,16 +52,15 @@ static const double tx1_engine_gains[16] =
 };
 
 
-const device_type TX1 = &device_creator<tx1_sound_device>;
+DEFINE_DEVICE_TYPE(TX1, tx1_sound_device, "tx1_sound", "TX-1 Custom Sound")
 
 tx1_sound_device::tx1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TX1, "TX-1 Audio Custom", tag, owner, clock, "tx1_sound", __FILE__),
-		device_sound_interface(mconfig, *this)
+	: tx1_sound_device(mconfig, TX1, tag, owner, clock)
 {
 }
 
-tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
 		m_freq_to_step(0),
@@ -80,15 +80,6 @@ tx1_sound_device::tx1_sound_device(const machine_config &mconfig, device_type ty
 		m_ym1_outputa(0),
 		m_ym2_outputa(0),
 		m_ym2_outputb(0)
-{
-}
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tx1_sound_device::device_config_complete()
 {
 }
 
@@ -344,20 +335,10 @@ static const double bb_engine_gains[16] =
 	-1.0/(1.0/(BUGGYBOY_R1S + BUGGYBOY_R2S + BUGGYBOY_R3S + BUGGYBOY_R4S) + 1.0/100e3)/100e3,
 };
 
-const device_type BUGGYBOY = &device_creator<buggyboy_sound_device>;
+DEFINE_DEVICE_TYPE(BUGGYBOY, buggyboy_sound_device, "buggyboy_sound", "Buggy Boy Custom Sound")
 
 buggyboy_sound_device::buggyboy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tx1_sound_device(mconfig, BUGGYBOY, "Buggy Boy Audio Custom", tag, owner, clock, "buggyboy_sound", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void buggyboy_sound_device::device_config_complete()
+	: tx1_sound_device(mconfig, BUGGYBOY, tag, owner, clock)
 {
 }
 
@@ -454,18 +435,18 @@ WRITE8_MEMBER( buggyboy_sound_device::ym2_a_w )
 
 WRITE8_MEMBER( buggyboy_sound_device::ym2_b_w )
 {
-	device_t *ym1 = space.machine().device("ym1");
-	device_t *ym2 = space.machine().device("ym2");
+	device_t *ym1 = machine().device("ym1");
+	device_t *ym2 = machine().device("ym2");
 	double gain;
 
 	m_stream->update();
 
 	m_ym2_outputb = data ^ 0xff;
 
-	if (!strcmp(space.machine().system().name, "buggyboyjr"))
+	if (!strcmp(machine().system().name, "buggyboyjr"))
 	{
-		space.machine().bookkeeping().coin_counter_w(0, data & 0x01);
-		space.machine().bookkeeping().coin_counter_w(1, data & 0x02);
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
 	}
 
 	/*

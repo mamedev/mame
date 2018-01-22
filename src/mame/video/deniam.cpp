@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria
 #include "emu.h"
 #include "includes/deniam.h"
+#include "screen.h"
 
 
 void deniam_state::deniam_common_init(  )

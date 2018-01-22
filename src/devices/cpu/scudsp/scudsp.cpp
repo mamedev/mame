@@ -91,11 +91,13 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "scudsp.h"
+#include "scudspdasm.h"
+
+#include "debugger.h"
 
 
-const device_type SCUDSP = &device_creator<scudsp_cpu_device>;
+DEFINE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device, "scudsp", "Sega SCUDSP")
 
 /* FLAGS */
 #define PRF m_flags & 0x04000000
@@ -123,10 +125,10 @@ const device_type SCUDSP = &device_creator<scudsp_cpu_device>;
 #define FLAGS_MASK 0x06ff8000
 #define INSTA_DMA 1
 
-#define scudsp_readop(A) m_program->read_dword(A << 2)
-#define scudsp_writeop(A, B) m_program->write_dword(A << 2, B)
-#define scudsp_readmem(A,MD) m_data->read_dword((A | (MD << 6)) << 2)
-#define scudsp_writemem(A,MD,B) m_data->write_dword((A | (MD << 6)) << 2, B)
+#define scudsp_readop(A) m_program->read_dword(A)
+#define scudsp_writeop(A, B) m_program->write_dword(A, B)
+#define scudsp_readmem(A,MD) m_data->read_dword(A | (MD << 6))
+#define scudsp_writemem(A,MD,B) m_data->write_dword(A | (MD << 6), B)
 
 uint32_t scudsp_cpu_device::scudsp_get_source_mem_reg_value( uint32_t mode )
 {
@@ -139,9 +141,9 @@ uint32_t scudsp_cpu_device::scudsp_get_source_mem_reg_value( uint32_t mode )
 		switch( mode )
 		{
 			case 0x9:
-				return (uint32_t)((m_alu & U64(0x00000000ffffffff)) >> 0);
+				return u32((m_alu & 0x00000000ffffffffU) >> 0);
 			case 0xA:
-				return (uint32_t)((m_alu & U64(0x0000ffffffff0000)) >> 16);
+				return u32((m_alu & 0x0000ffffffff0000U) >> 16);
 		}
 	}
 	return 0;
@@ -436,17 +438,17 @@ void scudsp_cpu_device::scudsp_operation(uint32_t opcode)
 			i3 = m_acl.si + m_pl.si;
 			m_alu = (uint64_t)(uint32_t)i3;
 			//SET_Z(i3 == 0);
-			SET_Z( (i3 & S64(0xffffffffffff)) == 0 );
+			SET_Z( (i3 & s64(0xffffffffffffU)) == 0 );
 			//SET_S(i3 < 0);
-			SET_S( i3 & S64(0x1000000000000));
-			SET_C(i3 & S64(0x100000000));
+			SET_S( i3 & s64(0x1000000000000U));
+			SET_C(i3 & s64(0x100000000U));
 			SET_V(((i3) ^ (m_acl.si)) & ((i3) ^ (m_pl.si)) & 0x80000000);
 			break;
 		case 0x5:   /* SUB */
 			i3 = m_acl.si - m_pl.si;
 			m_alu = (uint64_t)(uint32_t)i3;
 			SET_Z(i3 == 0);
-			SET_C(i3 & S64(0x100000000));
+			SET_C(i3 & s64(0x100000000U));
 			SET_S(i3 < 0);
 			SET_V(((m_pl.si) ^ (m_acl.si)) & ((m_pl.si) ^ (i3)) & 0x80000000);
 			break;
@@ -454,10 +456,10 @@ void scudsp_cpu_device::scudsp_operation(uint32_t opcode)
 			i1 = concat_64((int32_t)m_ph.si,m_pl.si);
 			i2 = concat_64((int32_t)m_ach.si,m_acl.si);
 			m_alu = i1 + i2;
-			SET_Z((m_alu & S64(0xffffffffffff)) == 0);
-			SET_S((m_alu & S64(0x800000000000)) > 0);
-			SET_C((m_alu) & S64(0x1000000000000));
-			SET_V(((m_alu) ^ (i1)) & ((m_alu) ^ (i2)) & S64(0x800000000000));
+			SET_Z((m_alu & s64(0xffffffffffffU)) == 0);
+			SET_S((m_alu & s64(0x800000000000U)) > 0);
+			SET_C((m_alu) & s64(0x1000000000000U));
+			SET_V(((m_alu) ^ (i1)) & ((m_alu) ^ (i2)) & s64(0x800000000000U));
 			break;
 		case 0x7:   /* ??? */
 			/* Unrecognized opcode */
@@ -523,8 +525,8 @@ void scudsp_cpu_device::scudsp_operation(uint32_t opcode)
 		case 0x1:   /* NOP ? */
 			break;
 		case 0x2:   /* MOV MUL,P */
-			m_ph.ui = (uint16_t)((m_mul & U64(0x0000ffff00000000)) >> 32);
-			m_pl.ui = (uint32_t)((m_mul & U64(0x00000000ffffffff)) >> 0);
+			m_ph.ui = u16((m_mul & 0x0000ffff00000000U) >> 32);
+			m_pl.ui = u32((m_mul & 0x00000000ffffffffU) >> 0);
 			break;
 		case 0x3:   /* MOV [s],P */
 			dsp_mem = (opcode & 0x700000) >> 20;
@@ -560,8 +562,8 @@ void scudsp_cpu_device::scudsp_operation(uint32_t opcode)
 			m_ach.ui = 0;
 			break;
 		case 0x2:   /* MOV ALU,A */
-			m_ach.ui = (uint16_t)((m_alu & U64(0x0000ffff00000000)) >> 32);
-			m_acl.ui = (uint32_t)((m_alu & U64(0x00000000ffffffff)) >> 0);
+			m_ach.ui = u16((m_alu & 0x0000ffff00000000U) >> 32);
+			m_acl.ui = u32((m_alu & 0x00000000ffffffffU) >> 0);
 			break;
 		case 0x3:   /* MOV [s], A */
 			dsp_mem = (opcode & 0x1C000 ) >> 14;
@@ -896,6 +898,14 @@ void scudsp_cpu_device::execute_run()
 	} while( m_icount > 0 );
 }
 
+device_memory_interface::space_config_vector scudsp_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
+
 void scudsp_cpu_device::device_start()
 {
 	m_pc = 0;
@@ -960,14 +970,14 @@ void scudsp_cpu_device::device_start()
 	state_add( SCUDSP_DELAY, "DELAY", m_delay ).formatstr("%02X").noshow();
 	state_add( SCUDSP_TOP, "TOP", m_top).formatstr("%02X");
 	state_add( SCUDSP_LOP, "LOP", m_lop).formatstr("%03X");
-	state_add( SCUDSP_RX, "RX", m_rx).formatstr("%08X");
+	state_add( SCUDSP_RX, "RX", m_rx.ui).formatstr("%08X");
 	state_add( SCUDSP_MUL, "MUL", m_mul).formatstr("%012X");
-	state_add( SCUDSP_RY, "RY", m_ry).formatstr("%08X");
+	state_add( SCUDSP_RY, "RY", m_ry.ui).formatstr("%08X");
 	state_add( SCUDSP_ALU, "ALU", m_alu).formatstr("%012X");
-	state_add( SCUDSP_PH, "PH", m_ph).formatstr("%04X");
-	state_add( SCUDSP_PL, "PL", m_pl).formatstr("%08X");
-	state_add( SCUDSP_ACH, "ACH", m_ach).formatstr("%04X");
-	state_add( SCUDSP_ACL, "ACL", m_acl).formatstr("%08X");
+	state_add( SCUDSP_PH, "PH", m_ph.ui).formatstr("%04X");
+	state_add( SCUDSP_PL, "PL", m_pl.ui).formatstr("%08X");
+	state_add( SCUDSP_ACH, "ACH", m_ach.ui).formatstr("%04X");
+	state_add( SCUDSP_ACL, "ACL", m_acl.ui).formatstr("%08X");
 	state_add( SCUDSP_RA0, "RA0", m_ra0).formatstr("%08X");
 	state_add( SCUDSP_WA0, "WA0", m_wa0).formatstr("%08X");
 	state_add( SCUDSP_RA, "RA", m_ra ).formatstr("%02X");
@@ -1000,13 +1010,21 @@ void scudsp_cpu_device::execute_set_input(int irqline, int state)
 	}
 }
 
+static ADDRESS_MAP_START( program_map, AS_PROGRAM, 32, scudsp_cpu_device )
+	AM_RANGE(0x00, 0xff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( data_map, AS_DATA, 32, scudsp_cpu_device )
+	AM_RANGE(0x00, 0xff) AM_RAM
+ADDRESS_MAP_END
+
 scudsp_cpu_device::scudsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SCUDSP, "SCUDSP", tag, owner, clock, "scudsp", __FILE__)
+	: cpu_device(mconfig, SCUDSP, tag, owner, clock)
 	, m_out_irq_cb(*this)
 	, m_in_dma_cb(*this)
 	, m_out_dma_cb(*this)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 8, -2)
-	, m_data_config("data", ENDIANNESS_BIG, 32, 8, -2)
+	, m_program_config("program", ENDIANNESS_BIG, 32, 8, -2, ADDRESS_MAP_NAME(program_map))
+	, m_data_config("data", ENDIANNESS_BIG, 32, 8, -2, ADDRESS_MAP_NAME(data_map))
 {
 }
 
@@ -1033,8 +1051,7 @@ void scudsp_cpu_device::state_string_export(const device_state_entry &entry, std
 }
 
 
-offs_t scudsp_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *scudsp_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( scudsp );
-	return CPU_DISASSEMBLE_NAME(scudsp)(this, buffer, pc, oprom, opram, options);
+	return new scudsp_disassembler;
 }

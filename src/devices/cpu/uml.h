@@ -73,20 +73,20 @@ namespace uml
 		COND_NV,                    // requires V
 		COND_U,                     // requires U
 		COND_NU,                    // requires U
-		COND_A,                     // requires CZ
-		COND_BE,                    // requires CZ
-		COND_G,                     // requires SVZ
-		COND_LE,                    // requires SVZ
-		COND_L,                     // requires SV
-		COND_GE,                    // requires SV
+		COND_A,                     // requires CZ, unsigned
+		COND_BE,                    // requires CZ, unsigned
+		COND_G,                     // requires SVZ, signed
+		COND_LE,                    // requires SVZ, signed
+		COND_L,                     // requires SV, signed
+		COND_GE,                    // requires SV, signed
 
 		COND_MAX,
 
 		// basic condition code aliases
 		COND_E = COND_Z,
 		COND_NE = COND_NZ,
-		COND_B = COND_C,
-		COND_AE = COND_NC
+		COND_B = COND_C, // unsigned
+		COND_AE = COND_NC // unsigned
 	};
 
 	// floating point rounding modes
@@ -225,7 +225,7 @@ namespace uml
 		OP_MAX
 	};
 
-	// C function callback deinition
+	// C function callback definition
 	typedef void (*c_function)(void *ptr);
 
 	// class describing a global code handle
@@ -274,7 +274,7 @@ namespace uml
 		uint32_t m_label;
 	};
 
-	// a parameter for a UML instructon is encoded like this
+	// a parameter for a UML instruction is encoded like this
 	class parameter
 	{
 	public:
@@ -392,7 +392,7 @@ namespace uml
 		parameter_info      param[4];           // information about parameters
 	};
 
-	// a single UML instructon is encoded like this
+	// a single UML instruction is encoded like this
 	class instruction
 	{
 	public:

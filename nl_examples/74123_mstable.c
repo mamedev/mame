@@ -40,8 +40,8 @@ NETLIST_START(74123_mstable)
     NET_C(mf.B,    V5)
     NET_C(mf.A, clk.Q)
 
-    LOG(logC, C.2)
-    LOG(logQ, mf.Q)
-    LOG(logX, clk.Q)
+    LOG(log_C, C.2)
+    LOG(log_Q, mf.Q)
+    LOG(log_X, clk.Q)
 
 NETLIST_END()

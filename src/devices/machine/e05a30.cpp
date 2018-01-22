@@ -8,22 +8,18 @@
 #include "emu.h"
 #include "e05a30.h"
 
-//#define E05A30DEBUG
-#ifdef E05A30DEBUG
-#define LOG(...) fprintf(stderr, __VA_ARGS__)
-#else
-#define LOG(...)
-#endif
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 /*****************************************************************************
     DEVICE INTERFACE
 *****************************************************************************/
 
-const device_type E05A30 = &device_creator<e05a30_device>;
+DEFINE_DEVICE_TYPE(E05A30, e05a30_device, "e05a30", "Epson E05A30 Gate Array")
 
 e05a30_device::e05a30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, E05A30, "E05A30", tag, owner, clock, "e05a30", __FILE__),
+	: device_t(mconfig, E05A30, tag, owner, clock),
 	m_write_printhead(*this),
 	m_write_pf_stepper(*this),
 	m_write_cr_stepper(*this),
@@ -168,7 +164,7 @@ WRITE_LINE_MEMBER( e05a30_device::centronics_input_strobe )
 
 WRITE8_MEMBER( e05a30_device::write )
 {
-	LOG("%s: e05a30_w([0xC0%02x]): %02x\n", space.machine().describe_context(), offset, data);
+	LOG("%s: e05a30_w([0xC0%02x]): %02x\n", machine().describe_context(), offset, data);
 
 	switch (offset) {
 	case 0x04:
@@ -198,7 +194,7 @@ READ8_MEMBER( e05a30_device::read )
 {
 	uint8_t result = 0;
 
-	LOG("%s: e05a30_r([0xC0%02x]): ", space.machine().describe_context(), offset);
+	LOG("%s: e05a30_r([0xC0%02x]): ", machine().describe_context(), offset);
 
 	switch (offset) {
 	case 0x02:

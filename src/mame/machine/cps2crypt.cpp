@@ -557,8 +557,8 @@ static uint16_t feistel(uint16_t val, const int *bitsA, const int *bitsB,
 		const struct optimised_sbox* boxes1, const struct optimised_sbox* boxes2, const struct optimised_sbox* boxes3, const struct optimised_sbox* boxes4,
 		uint32_t key1, uint32_t key2, uint32_t key3, uint32_t key4)
 {
-	uint8_t l = BITSWAP8(val, bitsB[7],bitsB[6],bitsB[5],bitsB[4],bitsB[3],bitsB[2],bitsB[1],bitsB[0]);
-	uint8_t r = BITSWAP8(val, bitsA[7],bitsA[6],bitsA[5],bitsA[4],bitsA[3],bitsA[2],bitsA[1],bitsA[0]);
+	uint8_t l = bitswap<8>(val, bitsB[7],bitsB[6],bitsB[5],bitsB[4],bitsB[3],bitsB[2],bitsB[1],bitsB[0]);
+	uint8_t r = bitswap<8>(val, bitsA[7],bitsA[6],bitsA[5],bitsA[4],bitsA[3],bitsA[2],bitsA[1],bitsA[0]);
 
 	l ^= fn(r, boxes1, key1);
 	r ^= fn(l, boxes2, key2);
@@ -765,7 +765,7 @@ DRIVER_INIT_MEMBER(cps_state,cps2crypt)
 
 		key[0] = (decoded[0] << 16) | decoded[1];
 		key[1] = (decoded[2] << 16) | decoded[3];
- 		// decoded[4] == watchdog instruction third word
+		// decoded[4] == watchdog instruction third word
 		// decoded[5] == watchdog instruction second word
 		// decoded[6] == watchdog instruction first word
 		// decoded[7] == 0x4000 (bits 8 to 23 of CPS2 object output address)

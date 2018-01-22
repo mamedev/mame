@@ -77,7 +77,9 @@
 
 *********************************************************************/
 
+#include "emu.h"
 #include "pc_xporter.h"
+#include "speaker.h"
 
 /***************************************************************************
     PARAMETERS
@@ -87,7 +89,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type A2BUS_PCXPORTER = &device_creator<a2bus_pcxporter_device>;
+DEFINE_DEVICE_TYPE(A2BUS_PCXPORTER, a2bus_pcxporter_device, "a2pcxport", "Applied Engineering PC Transporter")
 
 static ADDRESS_MAP_START( pc_map, AS_PROGRAM, 16, a2bus_pcxporter_device )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -103,22 +105,30 @@ static ADDRESS_MAP_START(pc_io, AS_IO, 16, a2bus_pcxporter_device )
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8(nmi_enable_w, 0xffff)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( pcxporter )
-	MCFG_CPU_ADD("v30", V30, XTAL_14_31818MHz/2)    // 7.16 MHz as per manual
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_START(a2bus_pcxporter_device::device_add_mconfig)
+	MCFG_CPU_ADD("v30", V30, A2BUS_7M_CLOCK)    // 7.16 MHz as per manual
 	MCFG_CPU_PROGRAM_MAP(pc_map)
 	MCFG_CPU_IO_MAP(pc_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12) /* heartbeat IRQ */
+	MCFG_PIT8253_CLK0(A2BUS_7M_CLOCK / 6.0) // heartbeat IRQ
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12) /* dram refresh */
+	MCFG_PIT8253_CLK1(A2BUS_7M_CLOCK / 6.0) // dram refresh
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(a2bus_pcxporter_device, pc_pit8253_out1_changed))
-	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_CLK2(A2BUS_7M_CLOCK / 6.0) // pio port c pin 4, and speaker polling enough
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(a2bus_pcxporter_device, pc_pit8253_out2_changed))
 
-	MCFG_DEVICE_ADD( "dma8237", PCXPORT_DMAC, XTAL_14_31818MHz/2 )
+	MCFG_DEVICE_ADD("dma8237", PCXPORT_DMAC, A2BUS_7M_CLOCK / 2)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(a2bus_pcxporter_device, pc_dma_hrq_changed))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(a2bus_pcxporter_device, pc_dma8237_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(a2bus_pcxporter_device, pc_dma_read_byte))
@@ -135,7 +145,8 @@ MACHINE_CONFIG_FRAGMENT( pcxporter )
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(a2bus_pcxporter_device, pc_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(a2bus_pcxporter_device, pc_dack3_w))
 
-	MCFG_PIC8259_ADD( "pic8259", INPUTLINE("v30", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("v30", 0))
 
 	MCFG_DEVICE_ADD("isa", ISA8, 0)
 	MCFG_ISA8_CPU("^v30")
@@ -163,26 +174,12 @@ MACHINE_CONFIG_FRAGMENT( pcxporter )
 	MCFG_ISA8_SLOT_ADD("isa", "isa2", pc_isa8_cards, "fdc_xt", true)
 MACHINE_CONFIG_END
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor a2bus_pcxporter_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pcxporter );
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_v30(*this, "v30"),
 	m_pic8259(*this, "pic8259"),
@@ -195,15 +192,7 @@ a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, de
 }
 
 a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, A2BUS_PCXPORTER, "Applied Engineering PC Transporter", tag, owner, clock, "a2pcxport", __FILE__),
-	device_a2bus_card_interface(mconfig, *this),
-	m_v30(*this, "v30"),
-	m_pic8259(*this, "pic8259"),
-	m_dma8237(*this, "dma8237"),
-	m_pit8253(*this, "pit8253"),
-	m_speaker(*this, "speaker"),
-	m_isabus(*this, "isa"),
-	m_pc_kbdc(*this, "pc_kbdc")
+	a2bus_pcxporter_device(mconfig, A2BUS_PCXPORTER, tag, owner, clock)
 {
 }
 
@@ -243,12 +232,12 @@ void a2bus_pcxporter_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_pcxporter_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_pcxporter_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
 		default:
-			printf("Read c0n%x (PC=%x)\n", offset, space.device().safe_pc());
+			logerror("Read c0n%x (%s)\n", offset, machine().describe_context());
 			break;
 	}
 
@@ -260,12 +249,12 @@ uint8_t a2bus_pcxporter_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_pcxporter_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_pcxporter_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 		default:
-			printf("Write %02x to c0n%x (PC=%x)\n", data, offset, space.device().safe_pc());
+			logerror("Write %02x to c0n%x (%s)\n", data, offset, machine().describe_context());
 			break;
 	}
 }
@@ -274,24 +263,24 @@ void a2bus_pcxporter_device::write_c0nx(address_space &space, uint8_t offset, ui
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_pcxporter_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_pcxporter_device::read_cnxx(uint8_t offset)
 {
 	// read only to trigger C800?
 	return 0xff;
 }
 
-void a2bus_pcxporter_device::write_cnxx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_pcxporter_device::write_cnxx(uint8_t offset, uint8_t data)
 {
-	printf("Write %02x to cn%02x (PC=%x)\n", data, offset, space.device().safe_pc());
+	logerror("Write %02x to cn%02x (%s)\n", data, offset, machine().describe_context());
 }
 
 /*-------------------------------------------------
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-uint8_t a2bus_pcxporter_device::read_c800(address_space &space, uint16_t offset)
+uint8_t a2bus_pcxporter_device::read_c800(uint16_t offset)
 {
-//  printf("Read C800 at %x\n", offset + 0xc800);
+//  logerror("Read C800 at %x\n", offset + 0xc800);
 
 	if (offset < 0x400)
 	{
@@ -315,7 +304,7 @@ uint8_t a2bus_pcxporter_device::read_c800(address_space &space, uint16_t offset)
 			case 0x703: // read with increment
 				rv = m_ram[m_offset];
 				// don't increment if the debugger's reading
-				if (!space.debugger_access())
+				if (!machine().side_effect_disabled())
 				{
 					m_offset++;
 				}
@@ -326,18 +315,18 @@ uint8_t a2bus_pcxporter_device::read_c800(address_space &space, uint16_t offset)
 				return rv;
 
 			default:
-				//printf("Read $C800 at %x\n", offset + 0xc800);
+				//logerror("Read $C800 at %x\n", offset + 0xc800);
 				break;
 		}
 
-		return m_regs[offset];
+		return m_regs[offset & 0x3ff];
 	}
 }
 
 /*-------------------------------------------------
     write_c800 - called for writes to this card's c800 space
 -------------------------------------------------*/
-void a2bus_pcxporter_device::write_c800(address_space &space, uint16_t offset, uint8_t data)
+void a2bus_pcxporter_device::write_c800(uint16_t offset, uint8_t data)
 {
 	if (offset < 0x400)
 	{
@@ -350,19 +339,19 @@ void a2bus_pcxporter_device::write_c800(address_space &space, uint16_t offset, u
 			case 0x700:
 				m_offset &= ~0xff;
 				m_offset |= data;
-//              printf("offset now %x (PC=%x)\n", m_offset, space.device().safe_pc());
+//              logerror("offset now %x (%s)\n", m_offset, machine().describe_context());
 				break;
 
 			case 0x701:
 				m_offset &= ~0xff00;
 				m_offset |= (data<<8);
-//              printf("offset now %x (PC=%x)\n", m_offset, space.device().safe_pc());
+//              logerror("offset now %x (%s)\n", m_offset, machine().describe_context());
 				break;
 
 			case 0x702:
 				m_offset &= ~0xff0000;
 				m_offset |= (data<<16);
-//              printf("offset now %x (PC=%x)\n", m_offset, space.device().safe_pc());
+//              logerror("offset now %x (%s)\n", m_offset, machine().describe_context());
 				break;
 
 			case 0x703: // write w/increment
@@ -446,8 +435,8 @@ void a2bus_pcxporter_device::write_c800(address_space &space, uint16_t offset, u
 				break;
 
 			default:
-//              printf("%02x to C800 at %x\n", data, offset + 0xc800);
-				m_regs[offset] = data;
+//              logerror("%02x to C800 at %x\n", data, offset + 0xc800);
+				m_regs[offset & 0x3ff] = data;
 				break;
 		}
 	}

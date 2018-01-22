@@ -253,6 +253,17 @@ ToDo:
 
 ****************************************************************************/
 
+// Includes
+#include "emu.h"
+#include "bus/centronics/ctronics.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/6522via.h"
+#include "machine/6850acia.h"
+#include "machine/clock.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+
+
 // Defines
 
 #undef DEBUG_GA2OPR_W
@@ -283,15 +294,6 @@ ToDo:
 #define DEBUG_SWYFT_VIA0 1
 #define DEBUG_SWYFT_VIA1 1
 
-
-// Includes
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/clock.h"
-#include "machine/6850acia.h"
-#include "machine/6522via.h"
-#include "sound/speaker.h"
-#include "bus/centronics/ctronics.h"
 
 class swyft_state : public driver_device
 {
@@ -377,6 +379,7 @@ public:
 	uint8_t m_keyboard_line;
 	uint8_t m_floppy_control;
 
+	void swyft(machine_config &config);
 //protected:
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
@@ -391,7 +394,7 @@ static INPUT_PORTS_START( swyft )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('\xa2')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR(0xA2)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 
 	PORT_START("Y1")
@@ -439,7 +442,7 @@ static INPUT_PORTS_START( swyft )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('\xbd') PORT_CHAR('\xbc') //PORT_CHAR('}') PORT_CHAR('{')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0xBD) PORT_CHAR(0xBC) //PORT_CHAR('}') PORT_CHAR('{')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
@@ -462,7 +465,7 @@ static INPUT_PORTS_START( swyft )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Erase") PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // totally unused
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("UNDO") PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('\xb1') PORT_CHAR('\xb0') // PORT_CHAR('\\') PORT_CHAR('~')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR(0xB1) PORT_CHAR(0xB0) // PORT_CHAR('\\') PORT_CHAR('~')
 INPUT_PORTS_END
 
 
@@ -766,7 +769,7 @@ WRITE_LINE_MEMBER( swyft_state::write_acia_clock )
 	m_acia6850->write_rxc(state);
 }
 
-static MACHINE_CONFIG_START( swyft, swyft_state )
+MACHINE_CONFIG_START(swyft_state::swyft)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68008, XTAL_15_8976MHz/2) //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
@@ -890,5 +893,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT    DEVICE         INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1985, swyft,0,      0,       swyft,     swyft,   driver_device, 0,       "Information Applicance Inc", "Swyft", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT    DEVICE       INIT  COMPANY                       FULLNAME  FLAGS
+COMP( 1985, swyft, 0,      0,       swyft,     swyft,   swyft_state, 0,    "Information Applicance Inc", "Swyft",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

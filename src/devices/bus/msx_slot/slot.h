@@ -10,8 +10,10 @@ pages; and multiple pieces of rom/ram/components can occur in a single slot.
 
 ***********************************************************************************************************/
 
-#ifndef __MSX_SLOT_SLOT_H
-#define __MSX_SLOT_SLOT_H
+#ifndef MAME_BUS_MSX_SLOT_SLOT_H
+#define MAME_BUS_MSX_SLOT_SLOT_H
+
+#pragma once
 
 #define MCFG_MSX_INTERNAL_SLOT_ADD(_tag, _type, _startpage, _numpages) \
 	MCFG_DEVICE_ADD(_tag, _type, 0) \
@@ -37,4 +39,4 @@ protected:
 	uint32_t m_end_address;
 };
 
-#endif
+#endif // MAME_BUS_MSX_SLOT_SLOT_H

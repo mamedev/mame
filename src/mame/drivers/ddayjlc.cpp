@@ -57,6 +57,8 @@ $842f = lives
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class ddayjlc_state : public driver_device
@@ -121,6 +123,7 @@ public:
 	uint32_t screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ddayjlc_interrupt);
 	INTERRUPT_GEN_MEMBER(ddayjlc_snd_interrupt);
+	void ddayjlc(machine_config &config);
 };
 
 
@@ -508,7 +511,7 @@ PALETTE_INIT_MEMBER(ddayjlc_state, ddayjlc)
 	}
 }
 
-static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
+MACHINE_CONFIG_START(ddayjlc_state::ddayjlc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/3)

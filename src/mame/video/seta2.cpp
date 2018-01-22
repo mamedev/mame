@@ -70,7 +70,7 @@
                 ---- ---8 7654 3210     "Tilemap" scroll Y
 
 
-    Shadows (same principle as ssv.c):
+    Shadows (same principle as ssv.cpp):
 
     The low bits of the pens from a "shadowing" tile (regardless of color code)
     substitute the top bits of the color index (0-7fff) in the frame buffer.
@@ -131,25 +131,25 @@ WRITE16_MEMBER(seta2_state::vregs_w)
 
 	COMBINE_DATA(&m_vregs[offset]);
 	if ( m_vregs[offset] != olddata )
-		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n",space.device().safe_pc(),offset*2,data);
+		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n",m_maincpu->pc(),offset*2,data);
 
 	switch( offset*2 )
 	{
 	case 0x1c:  // FLIP SCREEN (myangel)    <- this is actually zoom
 		flip_screen_set(data & 1 );
-		if (data & ~1)  logerror("CPU #0 PC %06X: flip screen unknown bits %04X\n",space.device().safe_pc(),data);
+		if (data & ~1)  logerror("CPU #0 PC %06X: flip screen unknown bits %04X\n",m_maincpu->pc(),data);
 		break;
 	case 0x2a:  // FLIP X (pzlbowl)
 		flip_screen_x_set(data & 1 );
-		if (data & ~1)  logerror("CPU #0 PC %06X: flipx unknown bits %04X\n",space.device().safe_pc(),data);
+		if (data & ~1)  logerror("CPU #0 PC %06X: flipx unknown bits %04X\n",m_maincpu->pc(),data);
 		break;
 	case 0x2c:  // FLIP Y (pzlbowl)
 		flip_screen_y_set(data & 1 );
-		if (data & ~1)  logerror("CPU #0 PC %06X: flipy unknown bits %04X\n",space.device().safe_pc(),data);
+		if (data & ~1)  logerror("CPU #0 PC %06X: flipy unknown bits %04X\n",m_maincpu->pc(),data);
 		break;
 
 	case 0x30:  // BLANK SCREEN (pzlbowl, myangel)
-		if (data & ~1)  logerror("CPU #0 PC %06X: blank unknown bits %04X\n",space.device().safe_pc(),data);
+		if (data & ~1)  logerror("CPU #0 PC %06X: blank unknown bits %04X\n",m_maincpu->pc(),data);
 		break;
 	}
 }
@@ -464,6 +464,13 @@ VIDEO_START_MEMBER(seta2_state,xoffset)
 	m_xoffset = 0x200;
 }
 
+VIDEO_START_MEMBER(seta2_state,xoffset1)
+{
+	video_start();
+
+	m_xoffset = 0x1;
+}
+
 VIDEO_START_MEMBER(seta2_state,yoffset)
 {
 	video_start();
@@ -476,13 +483,20 @@ uint32_t seta2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	// Black or pen 0?
 	bitmap.fill(m_palette->pen(0), cliprect);
 
-	if ( (m_vregs[0x30/2] & 1) == 0 )   // 1 = BLANK SCREEN
+	if (m_vregs.found())
+	{
+		if ( (m_vregs[0x30/2] & 1) == 0 )   // 1 = BLANK SCREEN
+			draw_sprites(bitmap, cliprect);
+	}
+	else // ablastb doesn't seem to have the same vregs
+	{
 		draw_sprites(bitmap, cliprect);
+	}
 
 	return 0;
 }
 
-void seta2_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(seta2_state::screen_vblank)
 {
 	// rising edge
 	if (state)
@@ -493,9 +507,9 @@ void seta2_state::screen_eof(screen_device &screen, bool state)
 }
 
 // staraudi
-void seta2_state::draw_rgbram(bitmap_ind16 &bitmap)
+void staraudi_state::draw_rgbram(bitmap_ind16 &bitmap)
 {
-	if (!m_rgbram || !(m_cam & 0x0008))
+	if (!(m_cam & 0x0008))
 		return;
 
 	for (int y = 0x100; y < 0x200; ++y)
@@ -508,10 +522,11 @@ void seta2_state::draw_rgbram(bitmap_ind16 &bitmap)
 		}
 	}
 }
-uint32_t seta2_state::staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t staraudi_state::staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_update(screen, bitmap, cliprect);
-//  draw_rgbram(bitmap);
+	if (false)
+		draw_rgbram(bitmap);
 
 	return 0;
 }

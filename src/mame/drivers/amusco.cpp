@@ -39,11 +39,10 @@
   CPU socket. Some of the other chips on this board were replaced with clones (e.g.
   AMD P8253, SY6545-1).
 
-  The program code reads from and writes to what must be a line printer and a RTC
+  The program code reads from and writes to a 40-column line printer and a RTC
   (probably a MSM5832), though neither is present on the main board. The I/O write
   patterns also suggest that each or both of these devices are accessed through an
-  Intel 8155 or compatible interface chip. The printer appears to use non-Epson
-  control codes: ETB, DLE, DC4, DC2, SO, EM, DC1 and STX.
+  Intel 8155 or compatible interface chip. The printer uses NCR-style control codes.
 
 *****************************************************************************************
 
@@ -66,9 +65,25 @@
   - Make the 6845 transparent videoram addressing actually transparent.
     (IRQ1 changes the 6845 address twice but neither reads nor writes data?)
   - Add NVRAM in a way that won't trigger POST error message (needs NMI on shutdown?)
-  - Identify outputs from first PPI (these include button lamps?)
+  - Identify remaining outputs from first PPI (button lamps are identified and implemented)
+  - Draw 88 Poker fails POST memory test for some weird reason (IRQ interference?)
 
 *******************************************************************************/
+
+#include "emu.h"
+#include "cpu/i86/i86.h"
+#include "machine/i8155.h"
+#include "machine/i8255.h"
+#include "machine/msm5832.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ticket.h"
+#include "sound/sn76496.h"
+#include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
+#include "amusco.lh"
 
 
 #define MASTER_CLOCK        XTAL_22_1184MHz     /* confirmed */
@@ -77,16 +92,10 @@
 #define CPU_CLOCK           MASTER_CLOCK / 4    /* guess */
 #define CRTC_CLOCK          SECOND_CLOCK / 8    /* guess */
 #define SND_CLOCK           SECOND_CLOCK / 8    /* guess */
+#define PIT_CLOCK0          SECOND_CLOCK / 8    /* guess */
+#define PIT_CLOCK1          SECOND_CLOCK / 8    /* guess */
 
-#include "emu.h"
-#include "cpu/i86/i86.h"
-#include "video/mc6845.h"
-#include "machine/i8155.h"
-#include "machine/i8255.h"
-#include "sound/sn76496.h"
-#include "machine/pic8259.h"
-#include "machine/pit8253.h"
-#include "machine/msm5832.h"
+#define COIN_IMPULSE        3
 
 
 class amusco_state : public driver_device
@@ -94,23 +103,18 @@ class amusco_state : public driver_device
 public:
 	amusco_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_pit(*this, "pit8253"),
 		m_pic(*this, "pic8259"),
 		m_rtc(*this, "rtc"),
 		m_crtc(*this, "crtc"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_hopper(*this, "hopper")
 		{ }
 
-	required_shared_ptr<uint8_t> m_videoram;
-	tilemap_t *m_bg_tilemap;
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
-	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER(hack_coin1_r);
-	DECLARE_READ8_MEMBER(hack_coin2_r);
-	DECLARE_READ8_MEMBER(hack_908_r);
+	DECLARE_WRITE_LINE_MEMBER(coin_irq);
 	DECLARE_READ8_MEMBER(mc6845_r);
 	DECLARE_WRITE8_MEMBER(mc6845_w);
 	DECLARE_WRITE8_MEMBER(output_a_w);
@@ -120,19 +124,30 @@ public:
 	DECLARE_READ8_MEMBER(lpt_status_r);
 	DECLARE_WRITE8_MEMBER(lpt_data_w);
 	DECLARE_WRITE8_MEMBER(rtc_control_w);
-	DECLARE_WRITE8_MEMBER(rtc_data_w);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(update_row);
+	DECLARE_PALETTE_INIT(amusco);
+	void amusco(machine_config &config);
+	void draw88pkr(machine_config &config);
+protected:
+	virtual void video_start() override;
+	virtual void machine_start() override;
+private:
+	std::unique_ptr<uint8_t []> m_videoram;
+	tilemap_t *m_bg_tilemap;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<pit8253_device> m_pit;
 	required_device<pic8259_device> m_pic;
 	required_device<msm5832_device> m_rtc;
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
+	required_device<ticket_dispenser_device> m_hopper;
 	uint8_t m_mc6845_address;
 	uint16_t m_video_update_address;
-	uint8_t m_rtc_data;
+	bool m_blink_state;
+	static constexpr uint32_t videoram_size = 0x10000;
 };
 
 
@@ -151,8 +166,7 @@ TILE_GET_INFO_MEMBER(amusco_state::get_bg_tile_info)
 	int code = m_videoram[tile_index * 2] | (m_videoram[tile_index * 2 + 1] << 8);
 	int color = (code & 0x7000) >> 12;
 
-	// 6845 cursor is only used for its blink state
-	if (BIT(code, 15) && !m_crtc->cursor_state_r())
+	if (BIT(code, 15) && !m_blink_state)
 		code = 0;
 
 	SET_TILE_INFO_MEMBER(
@@ -166,46 +180,25 @@ TILE_GET_INFO_MEMBER(amusco_state::get_bg_tile_info)
 void amusco_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(amusco_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 10, 74, 24);
+	m_blink_state = false;
+
+	m_videoram = std::make_unique<uint8_t []>(videoram_size);
+	std::fill_n(m_videoram.get(), videoram_size, 0);
+
+	save_pointer(NAME(m_videoram.get()), videoram_size);
 }
 
 void amusco_state::machine_start()
 {
-	m_rtc_data = 0;
 }
 
-
-/**************************
-*  Read / Write Handlers  *
-**************************/
-
-READ8_MEMBER(amusco_state::hack_coin1_r)
-{
-	// actually set by IRQ4
-	return BIT(ioport("IN2")->read(), 1) ? 1 : 0;
-}
-
-READ8_MEMBER(amusco_state::hack_coin2_r)
-{
-	// actually set by IRQ4
-	return BIT(ioport("IN2")->read(), 2) ? 1 : 0;
-}
-
-READ8_MEMBER(amusco_state::hack_908_r)
-{
-	// IRQ4 and other routines wait for bits of this to be set by IRQ2
-	return 0xff;
-}
 
 /*************************
 * Memory Map Information *
 *************************/
 
 static ADDRESS_MAP_START( amusco_mem_map, AS_PROGRAM, 8, amusco_state )
-	AM_RANGE(0x006a6, 0x006a6) AM_READ(hack_coin1_r)
-	AM_RANGE(0x006a8, 0x006a8) AM_READ(hack_coin2_r)
-	AM_RANGE(0x00908, 0x00908) AM_READ(hack_908_r)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0xec000, 0xecfff) AM_RAM AM_SHARE("videoram")  // placeholder
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -236,17 +229,69 @@ WRITE8_MEMBER( amusco_state::mc6845_w)
 
 WRITE8_MEMBER(amusco_state::output_a_w)
 {
-	//logerror("Writing %02Xh to PPI output A\n", data);
+/* Lamps from port A
+
+  7654 3210
+  ---- ---x  Bet lamp.
+  ---- --x-  Hold/Discard 5 lamp.
+  ---- -x--  Hold/Discard 3 lamp.
+  ---- x---  Hold/Discard 1 lamp.
+  ---x ----  Hold/Discard 2 lamp.
+  --x- ----  Hold/Discard 4 lamp.
+  xx-- ----  Unknown.
+
+*/
+	output().set_lamp_value(0, (data) & 1);         // Lamp 0 (Bet)
+	output().set_lamp_value(1, (data >> 1) & 1);    // Lamp 1 (Hold/Disc 5)
+	output().set_lamp_value(2, (data >> 2) & 1);    // Lamp 2 (Hold/Disc 3)
+	output().set_lamp_value(3, (data >> 3) & 1);    // Lamp 3 (Hold/Disc 1)
+	output().set_lamp_value(4, (data >> 4) & 1);    // Lamp 4 (Hold/Disc 2)
+	output().set_lamp_value(5, (data >> 5) & 1);    // Lamp 5 (Hold/Disc 4)
+
+//  logerror("Writing %02Xh to PPI output A\n", data);
 }
 
 WRITE8_MEMBER(amusco_state::output_b_w)
 {
-	//logerror("Writing %02Xh to PPI output B\n", data);
+/* Lamps and counters from port B
+
+  7654 3210
+  ---- --x-  Unknown lamp (lits when all holds/disc are ON. Could be a Cancel lamp in an inverted Hold system).
+  ---- -x--  Start/Draw lamp.
+  ---- x--x  Unknown.
+  ---x ----  Special: low when sound data queued.
+  --x- ----  Special: set by NMI routine (trigger shutdown?)
+  -x-- ----  Special: cleared in NMI routine (safe to shutdown?)
+  x--- ----  Special: NMI enable (cleared and set along with CPU interrupt flag).
+
+*/
+	output().set_lamp_value(6, (data >> 2) & 1);    // Lamp 6 (Start/Draw)
+	output().set_lamp_value(7, (data >> 1) & 1);    // Lamp 7 (Unknown)
+
+	m_pit->write_gate0(!BIT(data, 4));
+
+//  logerror("Writing %02Xh to PPI output B\n", data);
 }
 
 WRITE8_MEMBER(amusco_state::output_c_w)
 {
-	//logerror("Writing %02Xh to PPI output C\n", data);
+/* Lamps and counters from port C
+
+  7654 3210
+  ---- ---x  Unknown (used by Draw 88 Poker only?)
+  ---- --x-  Coin counter (bills not included).
+  ---- -x--  Unknown counter (points won?)
+  ---- x---  Unknown counter (points played?)
+  ---x ----  Coin out pulse.
+  xxx- ----  Unused.
+*/
+	if (!data)
+		return;
+
+	machine().bookkeeping().coin_counter_w(0, !BIT(data, 1));
+	m_hopper->motor_w(BIT(data, 4));
+
+//  logerror("Writing %02Xh to PPI output C\n", data);
 }
 
 WRITE8_MEMBER(amusco_state::vram_w)
@@ -267,7 +312,39 @@ READ8_MEMBER(amusco_state::lpt_status_r)
 
 WRITE8_MEMBER(amusco_state::lpt_data_w)
 {
-	logerror("Writing %02Xh to printer\n", data);
+	switch (data)
+	{
+		case 0x10: // NCR: Clear all printer and interface functions
+			logerror("Writing DLE to printer\n");
+			break;
+
+		case 0x11:
+			logerror("Writing DC1 to printer\n");
+			break;
+
+		case 0x12: // NCR: Select double-wide characters for one line
+			logerror("Writing DC2 to printer\n");
+			break;
+
+		case 0x14: // NCR: Feed n print lines (where n is following byte)
+			logerror("Writing DC4 to printer\n");
+			break;
+
+		case 0x17: // NCR: Print buffer contents; advance one line
+			logerror("Writing ETB to printer\n");
+			break;
+
+		case 0x19: // NCR: Perform full knife cut
+			logerror("Writing EM to printer\n");
+			break;
+
+		default:
+			if (data >= 0x20 && data < 0x7f)
+				logerror("Writing '%c' to printer\n", data);
+			else
+				logerror("Writing %02Xh to printer\n", data);
+			break;
+	}
 }
 
 WRITE8_MEMBER(amusco_state::rtc_control_w)
@@ -277,16 +354,6 @@ WRITE8_MEMBER(amusco_state::rtc_control_w)
 	m_rtc->hold_w(BIT(data, 6));
 	m_rtc->write_w(BIT(data, 5));
 	m_rtc->read_w(BIT(data, 4));
-
-	// TO DO: MSM5832 WR emulation is inaccurate
- 	if (BIT(data, 5))
-		m_rtc->data_w(space, 0, m_rtc_data);
-}
-
-WRITE8_MEMBER(amusco_state::rtc_data_w)
-{
-	// TO DO: MSM5832 should be able to latch this value itself
-	m_rtc_data = data;
 }
 
 static ADDRESS_MAP_START( amusco_io_map, AS_IO, 8, amusco_state )
@@ -339,10 +406,25 @@ static INPUT_PORTS_START( amusco )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) // move up in service mode
 
 	PORT_START("IN2")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) //PORT_WRITE_LINE_DEVICE_MEMBER("pic8259", pic8259_device, ir4_w)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) //PORT_WRITE_LINE_DEVICE_MEMBER("pic8259", pic8259_device, ir4_w)
-	PORT_BIT( 0xf9, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(COIN_IMPULSE) PORT_WRITE_LINE_DEVICE_MEMBER(":", amusco_state, coin_irq)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(COIN_IMPULSE) PORT_WRITE_LINE_DEVICE_MEMBER(":", amusco_state, coin_irq)
+	PORT_BIT( 0xf9, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( draw88pkr )
+	PORT_INCLUDE( amusco )
+
+	PORT_MODIFY("IN1") // Doors probably still exist, though code does nothing with them
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BILL1 ) PORT_IMPULSE(COIN_IMPULSE) PORT_WRITE_LINE_DEVICE_MEMBER(":", amusco_state, coin_irq)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+WRITE_LINE_MEMBER(amusco_state::coin_irq)
+{
+	m_pic->ir4_w(state ? CLEAR_LINE : HOLD_LINE);
+}
+
 
 
 /*************************
@@ -366,7 +448,7 @@ static const gfx_layout charlayout =
 ******************************/
 
 static GFXDECODE_START( amusco )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, /*8*/ 1 ) // current palette has only 8 colors...
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 8 ) // current palette has only 8 colors...
 GFXDECODE_END
 
 
@@ -381,16 +463,66 @@ MC6845_ON_UPDATE_ADDR_CHANGED(amusco_state::crtc_addr)
 
 MC6845_UPDATE_ROW(amusco_state::update_row)
 {
+	// Latch blink state at start of first line, where cursor is always positioned
+	if (y == 0 && ma == 0 && m_blink_state != (cursor_x == 0))
+	{
+		m_blink_state = (cursor_x == 0);
+		m_bg_tilemap->mark_all_dirty();
+	}
+
 	const rectangle rowrect(0, 8 * x_count - 1, y, y);
-	m_bg_tilemap->mark_all_dirty();
 	m_bg_tilemap->draw(*m_screen, bitmap, rowrect, 0, 0);
+}
+
+PALETTE_INIT_MEMBER(amusco_state,amusco)
+{
+	// add some templates first
+	for (int i = 0; i < 8; i++)
+	{
+		for(int j=0;j<8;j++)
+			palette.set_pen_color(i*8+j, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+	}
+
+	// override colors
+/**/palette.set_pen_color(0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(1, pal1bit(1), pal1bit(1), pal1bit(1));
+
+/**/palette.set_pen_color(1*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(1*8+1, pal1bit(1), pal1bit(0), pal1bit(0));
+
+/**/palette.set_pen_color(2*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(2*8+1, pal1bit(0), pal1bit(0), pal1bit(1));
+
+/**/palette.set_pen_color(3*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(3*8+1, pal1bit(0), pal1bit(1), pal1bit(0));
+
+
+	palette.set_pen_color(5*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(5*8+1, pal2bit(0), pal2bit(0), pal2bit(1));
+/**/palette.set_pen_color(5*8+2, pal1bit(1), pal1bit(1), pal1bit(0));
+	palette.set_pen_color(5*8+3, pal1bit(0), pal1bit(0), pal1bit(0));
+	palette.set_pen_color(5*8+4, pal1bit(1), pal1bit(1), pal1bit(1));
+	palette.set_pen_color(5*8+5, pal2bit(2), pal2bit(1), pal2bit(0));
+/**/palette.set_pen_color(5*8+6, pal1bit(0), pal1bit(0), pal1bit(1));
+/**/palette.set_pen_color(5*8+7, pal1bit(1), pal1bit(1), pal1bit(1));
+
+	palette.set_pen_color(6*8+0, pal1bit(0), pal1bit(0), pal1bit(0));
+/**/palette.set_pen_color(6*8+1, pal2bit(1), pal2bit(0), pal2bit(0));
+/**/palette.set_pen_color(6*8+2, pal1bit(1), pal1bit(1), pal1bit(0));
+	palette.set_pen_color(6*8+3, pal1bit(0), pal1bit(0), pal1bit(0));
+	palette.set_pen_color(6*8+4, pal1bit(1), pal1bit(1), pal1bit(1));
+	palette.set_pen_color(6*8+5, pal2bit(2), pal2bit(1), pal2bit(0));
+/**/palette.set_pen_color(6*8+6, pal1bit(0), pal1bit(0), pal1bit(1));
+/**/palette.set_pen_color(6*8+7, pal1bit(1), pal1bit(1), pal1bit(1));
+
+
 }
 
 /*************************
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( amusco, amusco_state )
+MACHINE_CONFIG_START(amusco_state::amusco)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, CPU_CLOCK)        // 5 MHz ?
@@ -398,13 +530,14 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_CPU_IO_MAP(amusco_io_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
-	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	//MCFG_PIT8253_CLK0(nnn)
-	//MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
-	//MCFG_PIT8253_CLK1(nnn)
-	//MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
+	MCFG_PIT8253_CLK0(PIT_CLOCK0)
+	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
+	MCFG_PIT8253_CLK1(PIT_CLOCK1)
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
 
 	MCFG_DEVICE_ADD("ppi_outputs", I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(amusco_state, output_a_w))
@@ -426,7 +559,9 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_DEVICE_ADD("rtc_interface", I8155, 0)
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(amusco_state, rtc_control_w))
 	MCFG_I8155_IN_PORTC_CB(DEVREAD8("rtc", msm5832_device, data_r))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(amusco_state, rtc_data_w))
+	MCFG_I8155_OUT_PORTC_CB(DEVWRITE8("rtc", msm5832_device, data_w))
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -438,20 +573,24 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", amusco)
 
-	MCFG_PALETTE_ADD_3BIT_GBR("palette")
+	MCFG_PALETTE_ADD("palette",8*8)
+	MCFG_PALETTE_INIT_OWNER(amusco_state, amusco)
 
 	MCFG_MC6845_ADD("crtc", R6545_1, "screen", CRTC_CLOCK) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_ADDR_CHANGED_CB(amusco_state, crtc_addr)
 	MCFG_MC6845_OUT_DE_CB(DEVWRITELINE("pic8259", pic8259_device, ir1_w)) // IRQ1 sets 0x918 bit 3
-	MCFG_MC6845_OUT_VSYNC_CB(DEVWRITELINE("pic8259", pic8259_device, ir0_w)) // IRQ0 sets 0x665 to 0xff
 	MCFG_MC6845_UPDATE_ROW_CB(amusco_state, update_row)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("sn", SN76489A, SND_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_DERIVED(amusco_state::draw88pkr, amusco)
+	//MCFG_DEVICE_MODIFY("ppi_outputs") // Some bits are definitely different
 MACHINE_CONFIG_END
 
 
@@ -478,10 +617,30 @@ ROM_START( amusco )
 	ROM_LOAD( "pal16l8a.u50", 0x0600, 0x0104, CRC(f5d80001) SHA1(ba0e55ebb45eceec256d432aee6d4123365a0af2) )
 ROM_END
 
+/*
+  Draw 88 Poker (V2.0) ??
+
+  U35 - TMS 27C128
+  U36 - TMS 27C128
+  U37 - TMS 27C128
+  U42 - TMS 27C256
+
+*/
+ROM_START( draw88pkr )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "u42.bin",  0xf8000, 0x08000, CRC(e98a7cfd) SHA1(8dc581c3e0cfd78bd33fbbbafd40307cf66f154d) )
+
+	ROM_REGION( 0xc000, "gfx1", 0 )
+	ROM_LOAD( "u35.bin",  0x0000, 0x4000, CRC(f608019a) SHA1(f0c5e10a03f39976d9bc6e8bc9f78e30ffefa03e) )
+	ROM_LOAD( "u36.bin",  0x4000, 0x4000, CRC(57d42a97) SHA1(b53b6419a48ecd111faf87fd6e480d82861fe512) )
+	ROM_LOAD( "u37.bin",  0x8000, 0x4000, CRC(6e23b9f2) SHA1(6916828d84d1ecb44dc454e6786f97801a8550c7) )
+ROM_END
+
 
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY   FULLNAME                      FLAGS */
-GAME( 1987, amusco,   0,      amusco,   amusco,   driver_device, 0,    ROT0, "Amusco", "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER ) // runs much too fast; palette totally wrong
+/*     YEAR  NAME        PARENT  MACHINE   INPUT      STATE         INIT  ROT   COMPANY      FULLNAME                       FLAGS                                                LAYOUT    */
+GAMEL( 1987, amusco,     0,      amusco,   amusco,    amusco_state, 0,    ROT0, "Amusco",    "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
+GAMEL( 1988, draw88pkr,  0,      draw88pkr,draw88pkr, amusco_state, 0,    ROT0, "BTE, Inc.", "Draw 88 Poker (V2.0)",        MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong

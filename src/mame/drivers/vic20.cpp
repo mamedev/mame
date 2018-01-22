@@ -10,7 +10,9 @@
 */
 
 #include "emu.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/pet/cass.h"
 #include "bus/vcs_ctrl/ctrl.h"
@@ -144,6 +146,9 @@ public:
 		IO2 = 6,
 		IO3 = 7
 	};
+	void ntsc(machine_config &config);
+	void pal(machine_config &config);
+	void vic20(machine_config &config);
 };
 
 
@@ -360,7 +365,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_videoram_map, AS_0, 8, vic20_state )
+static ADDRESS_MAP_START( vic_videoram_map, 0, 8, vic20_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
@@ -369,7 +374,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_colorram_map, AS_1, 8, vic20_state )
+static ADDRESS_MAP_START( vic_colorram_map, 1, 8, vic20_state )
 	AM_RANGE(0x000, 0x3ff) AM_RAM AM_SHARE("color_ram")
 ADDRESS_MAP_END
 
@@ -386,7 +391,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( vic20 )
 	PORT_START( "ROW0" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Del  Inst") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)     PORT_CHAR('\xA3')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)     PORT_CHAR(0xA3)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)          PORT_CHAR('+')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9)              PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7)              PORT_CHAR('7') PORT_CHAR('\'')
@@ -481,7 +486,7 @@ static INPUT_PORTS_START( vic1001 )
 	PORT_INCLUDE( vic20 )
 
 	PORT_MODIFY( "ROW0" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('\xA5')
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR(0xA5)
 INPUT_PORTS_END
 
 
@@ -785,25 +790,8 @@ WRITE_LINE_MEMBER(vic20_state::write_user_cassette_switch)
 //  MACHINE_CONFIG( vic20_common )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( vic20, vic20_state )
+MACHINE_CONFIG_START(vic20_state::vic20)
 	// devices
-	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, 0)
-	MCFG_VIA6522_READPA_HANDLER(READ8(vic20_state, via1_pa_r))
-	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(vic20_state, via1_pa_w))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic20_state, via1_pb_w))
-	MCFG_VIA6522_CB1_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
-	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w))
-	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_m))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_NMI_LINE))
-
-	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, 0)
-	MCFG_VIA6522_READPA_HANDLER(READ8(vic20_state, via2_pa_r))
-	MCFG_VIA6522_READPB_HANDLER(READ8(vic20_state, via2_pb_r))
-	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic20_state, via2_pb_w))
-	MCFG_VIA6522_CA2_HANDLER(WRITELINE(vic20_state, via2_ca2_w))
-	MCFG_VIA6522_CB2_HANDLER(WRITELINE(vic20_state, via2_cb2_w))
-	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
-
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", DEVWRITELINE(M6522_2_TAG, via6522_device, write_ca1))
 	MCFG_CBM_IEC_ADD("c1541")
 	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(DEVWRITELINE(M6522_2_TAG, via6522_device, write_cb1))
@@ -846,11 +834,28 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( ntsc, vic20 )
+MACHINE_CONFIG_DERIVED(vic20_state::ntsc, vic20)
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)
 	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, MOS6560_CLOCK)
+	MCFG_VIA6522_READPA_HANDLER(READ8(vic20_state, via1_pa_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(vic20_state, via1_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic20_state, via1_pb_w))
+	MCFG_VIA6522_CB1_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w))
+	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_m))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_NMI_LINE))
+
+	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, MOS6560_CLOCK)
+	MCFG_VIA6522_READPA_HANDLER(READ8(vic20_state, via2_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(vic20_state, via2_pb_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic20_state, via2_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(vic20_state, via2_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(vic20_state, via2_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	// video/sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -876,11 +881,28 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pal, vic20 )
+MACHINE_CONFIG_DERIVED(vic20_state::pal, vic20)
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)
 	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
+
+	MCFG_DEVICE_ADD(M6522_1_TAG, VIA6522, MOS6561_CLOCK)
+	MCFG_VIA6522_READPA_HANDLER(READ8(vic20_state, via1_pa_r))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(vic20_state, via1_pa_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic20_state, via1_pb_w))
+	MCFG_VIA6522_CB1_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_b))
+	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w))
+	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE(PET_USER_PORT_TAG, pet_user_port_device, write_m))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_NMI_LINE))
+
+	MCFG_DEVICE_ADD(M6522_2_TAG, VIA6522, MOS6561_CLOCK)
+	MCFG_VIA6522_READPA_HANDLER(READ8(vic20_state, via2_pa_r))
+	MCFG_VIA6522_READPB_HANDLER(READ8(vic20_state, via2_pb_r))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(vic20_state, via2_pb_w))
+	MCFG_VIA6522_CA2_HANDLER(WRITELINE(vic20_state, via2_ca2_w))
+	MCFG_VIA6522_CB2_HANDLER(WRITELINE(vic20_state, via2_cb2_w))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(M6502_TAG, M6502_IRQ_LINE))
 
 	// video/sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -982,8 +1004,8 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE      INPUT      INIT                        COMPANY                             FULLNAME                    FLAGS
-COMP( 1980, vic1001,    0,          0,      ntsc,       vic1001,    driver_device,  0,          "Commodore Business Machines",      "VIC-1001 (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20,      vic1001,    0,      ntsc,       vic20,      driver_device,  0,          "Commodore Business Machines",      "VIC-20 (NTSC)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20p,     vic1001,    0,      pal,        vic20,      driver_device,  0,          "Commodore Business Machines",      "VIC-20 / VC-20 (PAL)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, vic20_se,   vic1001,    0,      pal,        vic20s,     driver_device,  0,          "Commodore Business Machines",      "VIC-20 (Sweden/Finland)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       STATE         INIT        COMPANY                             FULLNAME                    FLAGS
+COMP( 1980, vic1001,    0,          0,      ntsc,       vic1001,    vic20_state,  0,          "Commodore Business Machines",      "VIC-1001 (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20,      vic1001,    0,      ntsc,       vic20,      vic20_state,  0,          "Commodore Business Machines",      "VIC-20 (NTSC)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20p,     vic1001,    0,      pal,        vic20,      vic20_state,  0,          "Commodore Business Machines",      "VIC-20 / VC-20 (PAL)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, vic20_se,   vic1001,    0,      pal,        vic20s,     vic20_state,  0,          "Commodore Business Machines",      "VIC-20 (Sweden/Finland)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

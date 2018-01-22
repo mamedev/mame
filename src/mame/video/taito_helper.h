@@ -2,7 +2,6 @@
 // copyright-holders:Nicola Salmoria
 #pragma once
 
-#include "emu.h"
 
 #ifndef __TAITO_HELPER_H__
 #define __TAITO_HELPER_H__

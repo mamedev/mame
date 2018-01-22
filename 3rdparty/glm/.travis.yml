@@ -1,0 +1,84 @@
+language: cpp
+
+os:
+  - linux
+  - osx
+
+matrix:
+  include:
+    - compiler: gcc
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env: COMPILER=g++-4.9
+    - compiler: clang
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.8
+          packages:
+            - clang-3.8
+      env: COMPILER=clang++-3.8
+
+compiler:
+  - clang
+
+before_script: 
+
+script:
+- mkdir ./build_pure_11
+- cd ./build_pure_11
+- cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release -DGLM_TEST_ENABLE=ON -DGLM_TEST_ENABLE_CXX_11=ON -DGLM_TEST_FORCE_PURE=ON ..
+- cmake --build .
+- ctest
+- cd ..
+- mkdir ./build_pure_98
+- cd ./build_pure_98
+- cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release -DGLM_TEST_ENABLE=ON -DGLM_TEST_ENABLE_CXX_98=ON -DGLM_TEST_FORCE_PURE=ON ..
+- cmake --build .
+- ctest
+- cd ..
+- mkdir ./build_pure_11_debug
+- cd ./build_pure_11_debug
+- cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Debug -DGLM_TEST_ENABLE=ON -DGLM_TEST_ENABLE_CXX_11=ON -DGLM_TEST_FORCE_PURE=ON ..
+- cmake --build .
+- ctest
+- cd ..
+- mkdir ./build_pure_98_debug
+- cd ./build_pure_98_debug
+- cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Debug -DGLM_TEST_ENABLE=ON -DGLM_TEST_ENABLE_CXX_98=ON -DGLM_TEST_FORCE_PURE=ON ..
+- cmake --build .
+- ctest
+- cd ..
+- mkdir ./build_simd_11
+- cd ./build_simd_11
+- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release -DGLM_TEST_ENABLE=ON -DGLM_TEST_ENABLE_CXX_11=ON -DGLM_TEST_ENABLE_SIMD_SSE3=ON ..; else cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release -DGLM_TEST_ENABLE=ON -DGLM_TEST_ENABLE_CXX_11=ON -DGLM_TEST_ENABLE_SIMD_AVX=ON ..; fi
+- cmake --build .
+- ctest
+- cd ..
+- mkdir ./build_simd_98
+- cd ./build_simd_98
+- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release -DGLM_TEST_ENABLE=ON -DGLM_TEST_ENABLE_CXX_98=ON -DGLM_TEST_ENABLE_SIMD_SSE3=ON ..; else cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Release -DGLM_TEST_ENABLE=ON -DGLM_TEST_ENABLE_CXX_98=ON -DGLM_TEST_ENABLE_SIMD_AVX=ON ..; fi
+- cmake --build .
+- ctest
+- cd ..
+- mkdir ./build_simd_11_debug
+- cd ./build_simd_11_debug
+- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Debug -DGLM_TEST_ENABLE=ON -DGLM_TEST_ENABLE_CXX_11=ON -DGLM_TEST_ENABLE_SIMD_SSE3=ON ..; else cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Debug -DGLM_TEST_ENABLE=ON -DGLM_TEST_ENABLE_CXX_11=ON -DGLM_TEST_ENABLE_SIMD_AVX=ON ..; fi
+- cmake --build .
+- ctest
+- cd ..
+- mkdir ./build_simd_98_debug
+- cd ./build_simd_98_debug
+- if [[ $TRAVIS_OS_NAME == 'osx' ]]; then cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Debug -DGLM_TEST_ENABLE=ON -DGLM_TEST_ENABLE_CXX_98=ON -DGLM_TEST_ENABLE_SIMD_SSE3=ON ..; else cmake -DCMAKE_CXX_COMPILER=$COMPILER -DCMAKE_BUILD_TYPE=Debug -DGLM_TEST_ENABLE=ON -DGLM_TEST_ENABLE_CXX_98=ON -DGLM_TEST_ENABLE_SIMD_AVX=ON ..; fi
+- cmake --build .
+- ctest
+- cd ..
+
+
+
+

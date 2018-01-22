@@ -1,10 +1,10 @@
 --
--- Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2017 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
 
 project "geometryc"
-	uuid "8794dc3a-2d57-11e2-ba18-368d09e48fda"
+	uuid (os.uuid("geometryc"))
 	kind "ConsoleApp"
 
 	includedirs {
@@ -25,12 +25,24 @@ project "geometryc"
 		path.join(BGFX_DIR, "examples/common/bounds.**"),
 	}
 
+	links {
+		"bx",
+	}
+
 	configuration { "mingw-*" }
 		targetextension ".exe"
+		links {
+			"psapi",
+		}
 
 	configuration { "osx" }
 		links {
 			"Cocoa.framework",
+		}
+
+	configuration { "vs20*" }
+		links {
+			"psapi",
 		}
 
 	configuration {}

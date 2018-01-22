@@ -3,12 +3,17 @@
 /**********************************************************************************
 
 PINBALL
-Playmatic MPU 2
+Playmatic MPU-C
 
-4 different sound boards were used.
-- Those without sound roms use a CDP1863
-- Zira uses a COP402 and a AY-3-8910
-- Cerberus uses a 90435 (appears to be a CDP1802) and a 90503 (unknown)
+The IOS board common to all games provides sound effects through the CDP1863.
+4 different add-on sound boards were also used:
+- Black Fever has the Speaking System board, which produces analog signals for
+  controlling an 8-track tape player.
+- Zira uses the Sound-2 board with a COP402 and AY-3-8910. The latter device is
+  also supposedly used to control lights through a separate connector.
+- Cerberus uses the Sound-3 board with a 90435 processor, which is most likely a
+  CDP1802 by another name. The 90503 "synthesizer" is the only sound IC on this
+  board; it has a TI logo and seems at least pin-compatible with TMS52xx.
 - Mad Race uses a Sound Board IV (same as MPU-3 and later), but I/O ports
   that talk to it are unknown.
 
@@ -26,14 +31,19 @@ Notes:
 ***********************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
-#include "cpu/cosmac/cosmac.h"
+
 #include "cpu/cop400/cop400.h"
-#include "machine/clock.h"
+#include "cpu/cosmac/cosmac.h"
 #include "machine/7474.h"
+#include "machine/clock.h"
 #include "sound/ay8910.h"
 #include "sound/cdp1863.h"
+#include "speaker.h"
+
 #include "play_2.lh"
+
 
 class play_2_state : public genpin_class
 {
@@ -69,6 +79,8 @@ public:
 	DECLARE_READ8_MEMBER(sound_in_r);
 	DECLARE_DRIVER_INIT(zira);
 
+	void play_2(machine_config &config);
+	void zira(machine_config &config);
 private:
 	uint16_t m_clockcnt;
 	uint16_t m_resetcnt;
@@ -341,9 +353,9 @@ WRITE8_MEMBER( play_2_state::psg_w )
 }
 
 // **************** Machine *****************************
-static MACHINE_CONFIG_START( play_2, play_2_state )
+MACHINE_CONFIG_START(play_2_state::play_2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CDP1802, 2950000)
+	MCFG_CPU_ADD("maincpu", CDP1802, XTAL_2_95MHz)
 	MCFG_CPU_PROGRAM_MAP(play_2_map)
 	MCFG_CPU_IO_MAP(play_2_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -357,7 +369,7 @@ static MACHINE_CONFIG_START( play_2, play_2_state )
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_play_2)
 
-	MCFG_DEVICE_ADD("tpb_clock", CLOCK, 2950000 / 8) // TPB line from CPU
+	MCFG_DEVICE_ADD("tpb_clock", CLOCK, XTAL_2_95MHz / 8) // TPB line from CPU
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(play_2_state, clock_w))
 
 	MCFG_DEVICE_ADD("xpoint", CLOCK, 60) // crossing-point detector
@@ -376,11 +388,11 @@ static MACHINE_CONFIG_START( play_2, play_2_state )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_CDP1863_ADD("1863", 0, 2950000 / 8)
+	MCFG_CDP1863_ADD("1863", 0, XTAL_2_95MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( zira, play_2 )
+MACHINE_CONFIG_DERIVED(play_2_state::zira, play_2)
 	MCFG_CPU_ADD("cop402", COP402, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(zira_sound_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
@@ -464,8 +476,8 @@ ROM_START(zira)
 	ROM_LOAD("zira_u8.bin",  0x0000, 0x0800, CRC(53f8bf17) SHA1(5eb74f27bc65374a85dd44bbc8f6142488c226a2))
 	ROM_LOAD("zira_u9.bin",  0x0800, 0x0800, CRC(d50a2419) SHA1(81b157f579a433389506817b1b6e02afaa2cf0d5))
 
-	ROM_REGION(0x800, "cop402", 0) // according to the schematic this is a 2716 with a size of 0x800
-	ROM_LOAD("zira.snd",     0x0000, 0x0400, CRC(c8a54854) SHA1(6c0367dcb2a11f0478c44b4e2115c1cb1e8052f3))
+	ROM_REGION(0x800, "cop402", 0) // according to the schematic this is a 2716 with a size of 0x800; according to PinMAME it contains the same code twice
+	ROM_LOAD("zira.snd",     0x0000, 0x0800, CRC(008cb743) SHA1(8e9677f08189638d669b265bb6943275a08ec8b4))
 ROM_END
 
 /*-------------------------------------------------------------------
@@ -496,11 +508,11 @@ ROM_START(madrace)
 ROM_END
 
 
-GAME(1979,  antar,     0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Antar (set 1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1979,  antar2,    antar, play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Antar (set 2)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  evlfight,  0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Evil Fight",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  attack,    0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Attack",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1980,  blkfever,  0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Black Fever",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1982,  cerberup,  0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Cerberus (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1985,  madrace,   0,     play_2, play_2, driver_device, 0,    ROT0, "Playmatic", "Mad Race",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1980,  zira,      0,     zira,   play_2, play_2_state,  zira, ROT0, "Playmatic", "Zira",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1979,  antar,     0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Antar (set 1)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  antar2,    antar, play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Antar (set 2)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  evlfight,  0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Evil Fight",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  attack,    0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Attack",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1980,  blkfever,  0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Black Fever",        MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1982,  cerberup,  0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Cerberus (Pinball)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1985,  madrace,   0,     play_2, play_2, play_2_state, 0,    ROT0, "Playmatic", "Mad Race",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1980,  zira,      0,     zira,   play_2, play_2_state, zira, ROT0, "Playmatic", "Zira",               MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -186,24 +186,19 @@ enum creation_policy_t
 
 
 
-static time_t prodos_crack_time(uint32_t prodos_time)
+static imgtool::datetime prodos_crack_time(uint32_t prodos_time)
 {
-	struct tm t;
-	time_t now;
+	util::arbitrary_datetime dt;
+	dt.second       = 0;
+	dt.minute       = ((prodos_time >> 16) & 0x3F);
+	dt.hour         = ((prodos_time >> 24) & 0x1F);
+	dt.day_of_month = ((prodos_time >> 0) & 0x1F);
+	dt.month        = ((prodos_time >> 5) & 0x0F) + 1;
+	dt.year         = ((prodos_time >> 9) & 0x7F) + 1900;
+	if (dt.year <= 1949)
+		dt.year += 100;
 
-	time(&now);
-	t = *localtime(&now);
-
-	t.tm_sec    = 0;
-	t.tm_min    = (prodos_time >> 16) & 0x3F;
-	t.tm_hour   = (prodos_time >> 24) & 0x1F;
-	t.tm_mday   = (prodos_time >>  0) & 0x1F;
-	t.tm_mon    = (prodos_time >>  5) & 0x0F;
-	t.tm_year   = (prodos_time >>  9) & 0x7F;
-
-	if (t.tm_year <= 49)
-		t.tm_year += 100;
-	return mktime(&t);
+	return imgtool::datetime(imgtool::datetime::datetime_type::LOCAL, dt);
 }
 
 
@@ -1813,13 +1808,12 @@ static imgtoolerr_t prodos_diskimage_deletefile(imgtool::partition &partition, c
 
 
 
-static imgtoolerr_t prodos_diskimage_listforks(imgtool::partition &partition, const char *path, imgtool_forkent *ents, size_t len)
+static imgtoolerr_t prodos_diskimage_listforks(imgtool::partition &partition, const char *path, std::vector<imgtool::fork_entry> &forks)
 {
 	imgtoolerr_t err;
 	imgtool::image &image(partition.image());
 	prodos_dirent ent;
 	prodos_direnum direnum;
-	int fork_num = 0;
 
 	err = prodos_lookup_path(image, path, CREATE_NONE, &direnum, &ent);
 	if (err)
@@ -1828,22 +1822,15 @@ static imgtoolerr_t prodos_diskimage_listforks(imgtool::partition &partition, co
 	if (is_dir_storagetype(ent.storage_type))
 		return IMGTOOLERR_FILENOTFOUND;
 
-	/* specify data fork */
-	ents[fork_num].type = FORK_DATA;
-	ents[fork_num].forkname[0] = '\0';
-	ents[fork_num].size = ent.filesize[0];
-	fork_num++;
+	// specify data fork
+	forks.emplace_back(ent.filesize[0], imgtool::fork_entry::type_t::DATA);
 
 	if (is_extendedfile_storagetype(ent.storage_type))
 	{
-		/* specify the resource fork */
-		ents[fork_num].type = FORK_RESOURCE;
-		strcpy(ents[fork_num].forkname, "RESOURCE_FORK");
-		ents[fork_num].size = ent.filesize[1];
-		fork_num++;
+		// specify the resource fork
+		forks.emplace_back(ent.filesize[1], imgtool::fork_entry::type_t::RESOURCE);
 	}
 
-	ents[fork_num].type = FORK_END;
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -2047,10 +2034,10 @@ static imgtoolerr_t prodos_diskimage_getattrs(imgtool::partition &partition, con
 				break;
 
 			case IMGTOOLATTR_TIME_CREATED:
-				values[i].t = prodos_crack_time(ent.creation_time);
+				values[i].t = prodos_crack_time(ent.creation_time).to_time_t();
 				break;
 			case IMGTOOLATTR_TIME_LASTMODIFIED:
-				values[i].t = prodos_crack_time(ent.lastmodified_time);
+				values[i].t = prodos_crack_time(ent.lastmodified_time).to_time_t();
 				break;
 		}
 	}

@@ -33,7 +33,7 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 
@@ -57,10 +57,10 @@ private:
 		REMOVE,
 	};
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
-	std::string              m_tempbuf, m_searchpath;
+	std::string              m_heading[1], m_searchpath;
 	std::vector<std::string> m_folders;
 	int                      m_ref;
 };
@@ -79,7 +79,7 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	std::string  m_searchpath;
@@ -100,10 +100,10 @@ public:
 protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
-	virtual bool menu_has_search_active() override { return (m_search[0] != 0); }
+	virtual bool menu_has_search_active() override { return !m_search.empty(); }
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	int          m_ref;
@@ -113,6 +113,6 @@ private:
 	std::vector<std::string> m_folders;
 };
 
-} // namesapce ui
+} // namespace ui
 
 #endif /* MAME_FRONTEND_UI_DIRMENU_H */

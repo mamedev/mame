@@ -38,12 +38,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/68340.h"
-#include "sound/es5506.h"
-#include "cpu/es5510/es5510.h"
-#include "machine/upd765.h"
 
+#include "cpu/es5510/es5510.h"
+#include "machine/68340.h"
 #include "machine/esqvfd.h"
+#include "machine/upd765.h"
+#include "sound/es5506.h"
+
+#include "speaker.h"
+
 
 class esqasr_state : public driver_device
 {
@@ -57,13 +60,15 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<es5510_device> m_esp;
-	required_device<esq2x40_sq1_t> m_sq1vfd;
+	required_device<esq2x40_sq1_device> m_sq1vfd;
 
 	virtual void machine_reset() override;
 
 	DECLARE_DRIVER_INIT(asr);
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
+	void asrx(machine_config &config);
+	void asr(machine_config &config);
 };
 
 void esqasr_state::machine_reset()
@@ -90,14 +95,14 @@ READ16_MEMBER(esqasr_state::esq5506_read_adc)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( asr, esqasr_state )
+MACHINE_CONFIG_START(esqasr_state::asr)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // actually MC68302
 	MCFG_CPU_PROGRAM_MAP(asr_map)
 
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_ESQ2x40_SQ1_ADD("sq1vfd")
+	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL_16MHz)
@@ -112,14 +117,14 @@ static MACHINE_CONFIG_START( asr, esqasr_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( asrx, esqasr_state )
+MACHINE_CONFIG_START(esqasr_state::asrx)
 	MCFG_CPU_ADD("maincpu", M68020, XTAL_16MHz) // unknown, possibly 68340?
 	MCFG_CPU_PROGRAM_MAP(asrx_map)
 
 	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_ESQ2x40_SQ1_ADD("sq1vfd")
+	MCFG_ESQ2X40_SQ1_ADD("sq1vfd")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL_16MHz)

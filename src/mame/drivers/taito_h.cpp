@@ -15,8 +15,9 @@ Yasuhiro Ogawa. Thank you, Yasu.
 
 Supported games :
 ==================
- Syvalion                           (C) 1988 Taito
  Record Breaker / Go For The Gold   (C) 1988 Taito
+ Syvalion                           (C) 1988 Taito
+ Tetris                             (C) 1988 Taito
  Dynamite League                    (C) 1990 Taito
 
 
@@ -143,12 +144,15 @@ some kind of zoom table?
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
+#include "includes/taito_h.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
+
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
 #include "sound/2610intf.h"
-#include "includes/taito_h.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -164,9 +168,9 @@ some kind of zoom table?
 
 READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 {
-	/* Bypass TC0220IOC controller for analog input */
+	/* Bypass TC0040IOC controller for analog input */
 
-	uint8_t   port = m_tc0220ioc->port_r(space, 0); /* read port number */
+	uint8_t   port = m_tc0040ioc->port_r(space, 0); /* read port number */
 
 	switch( port )
 	{
@@ -207,13 +211,21 @@ READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 				return 0x00;
 
 		default:
-			return m_tc0220ioc->portreg_r(space, offset);
+			return m_tc0040ioc->portreg_r(space, offset);
 	}
 }
 
 WRITE8_MEMBER(taitoh_state::sound_bankswitch_w)
 {
 	membank("z80bank")->set_entry(data & 3);
+}
+
+WRITE8_MEMBER(taitoh_state::coin_control_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
 
@@ -226,23 +238,22 @@ WRITE8_MEMBER(taitoh_state::sound_bankswitch_w)
 static ADDRESS_MAP_START( syvalion_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
-	AM_RANGE(0x200000, 0x200001) AM_READ8(syvalion_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_device, portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_READ8(syvalion_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0040ioc", tc0040ioc_device, portreg_w, 0x00ff)
+	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, port_r, port_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
-	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( recordbr_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
-	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
-	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
-	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tetristh_map, AS_PROGRAM, 16, taitoh_state )
@@ -250,10 +261,9 @@ static ADDRESS_MAP_START( tetristh_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_SHARE("m68000_mainram")
 	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, portreg_r, portreg_w, 0x00ff)
-	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, port_r, port_w, 0x00ff)
+	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
-	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dleague_map, AS_PROGRAM, 16, taitoh_state )
@@ -263,7 +273,7 @@ static ADDRESS_MAP_START( dleague_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_device, word_r, word_w)
-	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500800, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP    /* ?? writes zero once per frame */
 ADDRESS_MAP_END
 
@@ -625,7 +635,7 @@ void taitoh_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( syvalion, taitoh_state )
+MACHINE_CONFIG_START(taitoh_state::syvalion)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */
@@ -638,12 +648,13 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitoh_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -680,7 +691,7 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( recordbr, taitoh_state )
+MACHINE_CONFIG_START(taitoh_state::recordbr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */
@@ -693,12 +704,13 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
-	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
-	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
-	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
-	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
-	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
-	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+	MCFG_DEVICE_ADD("tc0040ioc", TC0040IOC, 0)
+	MCFG_TC0040IOC_READ_0_CB(IOPORT("DSWA"))
+	MCFG_TC0040IOC_READ_1_CB(IOPORT("DSWB"))
+	MCFG_TC0040IOC_READ_2_CB(IOPORT("IN0"))
+	MCFG_TC0040IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0040IOC_WRITE_4_CB(WRITE8(taitoh_state, coin_control_w))
+	MCFG_TC0040IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -735,7 +747,7 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tetristh, recordbr )
+MACHINE_CONFIG_DERIVED(taitoh_state::tetristh, recordbr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -743,7 +755,7 @@ static MACHINE_CONFIG_DERIVED( tetristh, recordbr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dleague, taitoh_state )
+MACHINE_CONFIG_START(taitoh_state::dleague)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)     /* 12 MHz */
@@ -761,6 +773,7 @@ static MACHINE_CONFIG_START( dleague, taitoh_state )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoh_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
 
 	/* video hardware */
@@ -839,7 +852,75 @@ ROM_START( syvalion )
 	ROM_LOAD( "b51-17.bin", 0x00000, 0x80000, CRC(d85096aa) SHA1(dac39ed182e9eda06575f1667c4c1ff9a4a56599) )
 ROM_END
 
+ROM_START( syvalionu )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* main cpu */
+	ROM_LOAD16_BYTE( "eng-20.bin", 0x00000, 0x20000, CRC(6c1db526) SHA1(663560d52aa85cd589eeecc58f9ce521f4a2f58e) )
+	ROM_LOAD16_BYTE( "eng-22.bin", 0x00001, 0x20000, CRC(d386b5dd) SHA1(b4b2ad65d972bee7cc47dd071fe76eb43f4f2fb4) )
+	ROM_LOAD16_BYTE( "eng-19.bin", 0x40000, 0x20000, CRC(57fa3905) SHA1(2738f15b78cf630448a100e21a9eba69e1152c01) )
+	ROM_LOAD16_BYTE( "usa-21.bin", 0x40001, 0x20000, CRC(ed27edf7) SHA1(9dc2a0b88c492d18ef78cd57bd273318ca76aaa3) )
 
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
+	ROM_LOAD( "b51-23.bin", 0x00000, 0x10000, CRC(734662de) SHA1(0058d6de68f26cd58b9eb8859e15f3ced6bd3489) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "b51-16.bin", 0x000000, 0x20000, CRC(c0fcf7a5) SHA1(4550ba6d822ba12ad39576bcbed09b5fa54279e8) )
+	ROM_LOAD16_BYTE( "b51-12.bin", 0x000001, 0x20000, CRC(6b36d358) SHA1(4101c110e99fe2ac1a989c84857f6438439b79a1) )
+	ROM_LOAD16_BYTE( "b51-15.bin", 0x040000, 0x20000, CRC(30b2ee02) SHA1(eacd179c8760ce9ba01e234dfd3f159773e4f2ab) )
+	ROM_LOAD16_BYTE( "b51-11.bin", 0x040001, 0x20000, CRC(ae9a9ac5) SHA1(f1f5216e51fea3173f5317e0dda404a29b2c45fe) )
+	ROM_LOAD16_BYTE( "b51-08.bin", 0x100000, 0x20000, CRC(9f6a535c) SHA1(40d52d3f572dd87b41d89707a2ec189760d806b0) )
+	ROM_LOAD16_BYTE( "b51-04.bin", 0x100001, 0x20000, CRC(03aea658) SHA1(439f08948e57c9a0f450d1319e3bc99c6fd4f82d) )
+	ROM_LOAD16_BYTE( "b51-07.bin", 0x140000, 0x20000, CRC(764d4dc8) SHA1(700de70134ade3901dad51d4bf14d91f92bc5381) )
+	ROM_LOAD16_BYTE( "b51-03.bin", 0x140001, 0x20000, CRC(8fd9b299) SHA1(3dc2a66678dfa13f2264bb4f5ca8a31477cc59ff) )
+	ROM_LOAD16_BYTE( "b51-14.bin", 0x200000, 0x20000, CRC(dea7216e) SHA1(b97d08b24a3dd9b061ef118fd6d8b3edfa3a3008) )
+	ROM_LOAD16_BYTE( "b51-10.bin", 0x200001, 0x20000, CRC(6aa97fbc) SHA1(d546dd5a276cce36e879bb7bfabbdd63d36c0f72) )
+	ROM_LOAD16_BYTE( "b51-13.bin", 0x240000, 0x20000, CRC(dab28958) SHA1(da7e7fdd1d1e5a4d72b5e7df235fc304f77fa2c9) )
+	ROM_LOAD16_BYTE( "b51-09.bin", 0x240001, 0x20000, CRC(cbb4f33d) SHA1(6c6560603f7fd5578a866b11031d8480bc4a9eee) )
+	ROM_LOAD16_BYTE( "b51-06.bin", 0x300000, 0x20000, CRC(81bef4f0) SHA1(83b3a762b6df6f6ca193e639116345a20f874636) )
+	ROM_LOAD16_BYTE( "b51-02.bin", 0x300001, 0x20000, CRC(906ba440) SHA1(9a1a147caf7eac534e739b8ad60f0c71514a64c7) )
+	ROM_LOAD16_BYTE( "b51-05.bin", 0x340000, 0x20000, CRC(47976ae9) SHA1(a2b19a39d8968b886412a85c082806917e02d9fd) )
+	ROM_LOAD16_BYTE( "b51-01.bin", 0x340001, 0x20000, CRC(8dab004a) SHA1(1772cdcb9d0ca5ebf429f371c041b9ae12fafcd0) )
+
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* samples */
+	ROM_LOAD( "b51-18.bin", 0x00000, 0x80000, CRC(8b23ac83) SHA1(340b9e7f09c1809a332b41d3fb579f5f8cd6367f) )
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
+	ROM_LOAD( "b51-17.bin", 0x00000, 0x80000, CRC(d85096aa) SHA1(dac39ed182e9eda06575f1667c4c1ff9a4a56599) )
+ROM_END
+
+ROM_START( syvalionw )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* main cpu */
+	ROM_LOAD16_BYTE( "eng-20.bin", 0x00000, 0x20000, CRC(6c1db526) SHA1(663560d52aa85cd589eeecc58f9ce521f4a2f58e) )
+	ROM_LOAD16_BYTE( "eng-22.bin", 0x00001, 0x20000, CRC(d386b5dd) SHA1(b4b2ad65d972bee7cc47dd071fe76eb43f4f2fb4) )
+	ROM_LOAD16_BYTE( "eng-19.bin", 0x40000, 0x20000, CRC(57fa3905) SHA1(2738f15b78cf630448a100e21a9eba69e1152c01) )
+	ROM_LOAD16_BYTE( "eur-21.bin", 0x40001, 0x20000, CRC(742ebc4d) SHA1(4c2a968febe0473dd47ac2b9d7eb2c049e743254) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* sound cpu */
+	ROM_LOAD( "b51-23.bin", 0x00000, 0x10000, CRC(734662de) SHA1(0058d6de68f26cd58b9eb8859e15f3ced6bd3489) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "b51-16.bin", 0x000000, 0x20000, CRC(c0fcf7a5) SHA1(4550ba6d822ba12ad39576bcbed09b5fa54279e8) )
+	ROM_LOAD16_BYTE( "b51-12.bin", 0x000001, 0x20000, CRC(6b36d358) SHA1(4101c110e99fe2ac1a989c84857f6438439b79a1) )
+	ROM_LOAD16_BYTE( "b51-15.bin", 0x040000, 0x20000, CRC(30b2ee02) SHA1(eacd179c8760ce9ba01e234dfd3f159773e4f2ab) )
+	ROM_LOAD16_BYTE( "b51-11.bin", 0x040001, 0x20000, CRC(ae9a9ac5) SHA1(f1f5216e51fea3173f5317e0dda404a29b2c45fe) )
+	ROM_LOAD16_BYTE( "b51-08.bin", 0x100000, 0x20000, CRC(9f6a535c) SHA1(40d52d3f572dd87b41d89707a2ec189760d806b0) )
+	ROM_LOAD16_BYTE( "b51-04.bin", 0x100001, 0x20000, CRC(03aea658) SHA1(439f08948e57c9a0f450d1319e3bc99c6fd4f82d) )
+	ROM_LOAD16_BYTE( "b51-07.bin", 0x140000, 0x20000, CRC(764d4dc8) SHA1(700de70134ade3901dad51d4bf14d91f92bc5381) )
+	ROM_LOAD16_BYTE( "b51-03.bin", 0x140001, 0x20000, CRC(8fd9b299) SHA1(3dc2a66678dfa13f2264bb4f5ca8a31477cc59ff) )
+	ROM_LOAD16_BYTE( "b51-14.bin", 0x200000, 0x20000, CRC(dea7216e) SHA1(b97d08b24a3dd9b061ef118fd6d8b3edfa3a3008) )
+	ROM_LOAD16_BYTE( "b51-10.bin", 0x200001, 0x20000, CRC(6aa97fbc) SHA1(d546dd5a276cce36e879bb7bfabbdd63d36c0f72) )
+	ROM_LOAD16_BYTE( "b51-13.bin", 0x240000, 0x20000, CRC(dab28958) SHA1(da7e7fdd1d1e5a4d72b5e7df235fc304f77fa2c9) )
+	ROM_LOAD16_BYTE( "b51-09.bin", 0x240001, 0x20000, CRC(cbb4f33d) SHA1(6c6560603f7fd5578a866b11031d8480bc4a9eee) )
+	ROM_LOAD16_BYTE( "b51-06.bin", 0x300000, 0x20000, CRC(81bef4f0) SHA1(83b3a762b6df6f6ca193e639116345a20f874636) )
+	ROM_LOAD16_BYTE( "b51-02.bin", 0x300001, 0x20000, CRC(906ba440) SHA1(9a1a147caf7eac534e739b8ad60f0c71514a64c7) )
+	ROM_LOAD16_BYTE( "b51-05.bin", 0x340000, 0x20000, CRC(47976ae9) SHA1(a2b19a39d8968b886412a85c082806917e02d9fd) )
+	ROM_LOAD16_BYTE( "b51-01.bin", 0x340001, 0x20000, CRC(8dab004a) SHA1(1772cdcb9d0ca5ebf429f371c041b9ae12fafcd0) )
+
+	ROM_REGION( 0x80000, "ymsnd.deltat", 0 )    /* samples */
+	ROM_LOAD( "b51-18.bin", 0x00000, 0x80000, CRC(8b23ac83) SHA1(340b9e7f09c1809a332b41d3fb579f5f8cd6367f) )
+
+	ROM_REGION( 0x80000, "ymsnd", 0 )   /* samples */
+	ROM_LOAD( "b51-17.bin", 0x00000, 0x80000, CRC(d85096aa) SHA1(dac39ed182e9eda06575f1667c4c1ff9a4a56599) )
+ROM_END
 
 ROM_START( syvalionp )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* main cpu */
@@ -885,7 +966,6 @@ ROM_START( syvalionp )
 	ROM_LOAD( "cpu1-pal20l10a.ic38.bin", 0x00000, 0xcc, CRC(2e7b5e3f) SHA1(79bd46842ee9330e8545980b94d49f8f728279c1) )
 	ROM_LOAD( "cpu2-pal20l8a.ic39.bin",  0x00000, 0x144, CRC(c0abf131) SHA1(58de646f26652f0e2abc3470612c230f4a365699) )
 ROM_END
-
 
 
 ROM_START( recordbr )
@@ -948,7 +1028,10 @@ ROM_START( gogold )
 	ROM_LOAD( "b56-18.bin", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
 ROM_END
 
-// Sega Tetris on a Taito H-System board, with some roms from ?Go For The Gold? still on the board.
+
+// Sega Tetris on a Taito H-System board, with some roms from Go For The Gold left in place on the board.
+//  These are required to produce proper sounds and music.  This was also done for the Tetris conversion
+//  of Nastar / Nastar Warrior / Rastan Saga 2 on Taito's B-System plaform (see taito_b.cpp)
 ROM_START( tetristh )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* main cpu */
 	ROM_LOAD16_BYTE( "c26-12-1.ic36", 0x00000, 0x20000, CRC(77e80c82) SHA1(840dc5a54a865b8cd2e0d03001a493987d66c23b) )
@@ -976,6 +1059,7 @@ ROM_START( tetristh )
 	ROM_REGION( 0x02000, "user1", 0 ) /* zoom table / mixing? */
 	ROM_LOAD( "b56-18.bin", 0x00000, 0x02000, CRC(c88f0bbe) SHA1(18c87c744fbeca35d13033e50f62e5383eb4ec2c) )
 ROM_END
+
 
 ROM_START( dleague )
 	ROM_REGION( 0x60000, "maincpu", 0 )
@@ -1040,11 +1124,13 @@ ROM_START( dleaguej )
 ROM_END
 
 
-/*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT              MONITOR  COMPANY                      FULLNAME */
-GAME( 1988, syvalion, 0,        syvalion, syvalion, driver_device, 0, ROT0,    "Taito Corporation",         "Syvalion (Japan)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1988, syvalionp, syvalion,syvalion, syvalionp,driver_device, 0, ROT0,    "Taito Corporation",         "Syvalion (World, prototype)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1988, recordbr, 0,        recordbr, recordbr, driver_device, 0, ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, gogold,   recordbr, recordbr, gogold,   driver_device, 0, ROT0,    "Taito Corporation",         "Go For The Gold (Japan)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tetristh, tetris,   tetristh, tetristh, driver_device, 0, ROT0,    "Sega",                      "Tetris (Japan, Taito H-System)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dleague,  0,        dleague,  dleague,  driver_device, 0, ROT0,    "Taito America Corporation", "Dynamite League (US)",     MACHINE_SUPPORTS_SAVE )
-GAME( 1990, dleaguej, dleague,  dleague,  dleaguej, driver_device, 0, ROT0,    "Taito Corporation",         "Dynamite League (Japan)",  MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE   INPUT      STATE         INIT  MONITOR  COMPANY                      FULLNAME                                 FLAGS
+GAME( 1988, syvalion,  0,        syvalion, syvalion,  taitoh_state, 0,    ROT0,    "Taito Corporation",         "Syvalion (Japan)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1988, syvalionp, syvalion, syvalion, syvalionp, taitoh_state, 0,    ROT0,    "Taito Corporation",         "Syvalion (World, prototype)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1988, syvalionu, syvalion, syvalion, syvalion,  taitoh_state, 0,    ROT0,    "Taito America Corporation", "Syvalion (US, PS2 Taito Legends 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, syvalionw, syvalion, syvalion, syvalion,  taitoh_state, 0,    ROT0,    "Taito Corporation Japan",   "Syvalion (World, PS2 Taito Legends 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, recordbr,  0,        recordbr, recordbr,  taitoh_state, 0,    ROT0,    "Taito Corporation Japan",   "Recordbreaker (World)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1988, gogold,    recordbr, recordbr, gogold,    taitoh_state, 0,    ROT0,    "Taito Corporation",         "Go For The Gold (Japan)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tetristh,  tetris,   tetristh, tetristh,  taitoh_state, 0,    ROT0,    "Sega",                      "Tetris (Japan, Taito H-System)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dleague,   0,        dleague,  dleague,   taitoh_state, 0,    ROT0,    "Taito America Corporation", "Dynamite League (US)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, dleaguej,  dleague,  dleague,  dleaguej,  taitoh_state, 0,    ROT0,    "Taito Corporation",         "Dynamite League (Japan)",               MACHINE_SUPPORTS_SAVE )

@@ -11,7 +11,7 @@
     - A/L bit (alternate loop)
     - EN and EXT Out bits
     - Src B and Src NOTE bits
-    - statusreg Busy and End bits
+    - statusreg Busy flag
     - timer register 0x11
     - ch2/ch3 (4 speakers)
     - PFM (FM using external PCM waveform)
@@ -245,6 +245,28 @@ inline bool ymf271_device::check_envelope_end(YMF271Slot *slot)
 	return false;
 }
 
+// calculate status end disable/enable (Desert War shots relies on this)
+inline void ymf271_device::calculate_status_end(int slotnum, bool state)
+{
+	// guess: don't enable/disable if slot isn't a multiple of 4
+	if(slotnum & 3)
+		return;
+
+   /*
+    bit scheme is kinda twisted
+    status1 Busy  End36 End24 End12 End0  ----  TimB  TimA
+    status2 End44 End32 End20 End8  End40 End28 End16 End4
+    */
+	uint8_t subbit = slotnum / 12;
+	uint8_t bankbit = ((slotnum % 12) >> 2);
+
+	if(state == false)
+		m_end_status &= ~(1 << (subbit+bankbit*4));
+	else
+		m_end_status |= (1 << (subbit+bankbit*4));
+
+}
+
 void ymf271_device::update_envelope(YMF271Slot *slot)
 {
 	switch (slot->env_state)
@@ -450,6 +472,7 @@ void ymf271_device::update_pcm(int slotnum, int32_t *mixp, int length)
 		if ((slot->stepptr>>16) > slot->endaddr)
 		{
 			slot->stepptr = slot->stepptr - ((uint64_t)slot->endaddr<<16) + ((uint64_t)slot->loopaddr<<16);
+			calculate_status_end(slotnum,true);
 			if ((slot->stepptr>>16) > slot->endaddr)
 			{
 				// overflow
@@ -1003,6 +1026,7 @@ void ymf271_device::write_register(int slotnum, int reg, uint8_t data)
 				slot->active = 1;
 
 				calculate_step(slot);
+				calculate_status_end(slotnum,false);
 				init_envelope(slot);
 				init_lfo(slot);
 				slot->feedback_modulation0 = 0;
@@ -1276,7 +1300,7 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			}
 
 			// reload timer
-			m_timA->adjust(attotime::from_hz(m_clock) * (384 * 4 * (256 - m_timerA)), 0);
+			m_timA->adjust(clocks_to_attotime(384 * 4 * (256 - m_timerA)), 0);
 			break;
 
 		case 1:
@@ -1292,7 +1316,7 @@ void ymf271_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			}
 
 			// reload timer
-			m_timB->adjust(attotime::from_hz(m_clock) * (384 * 16 * (256 - m_timerB)), 0);
+			m_timB->adjust(clocks_to_attotime(384 * 16 * (256 - m_timerB)), 0);
 			break;
 
 		default:
@@ -1357,14 +1381,14 @@ void ymf271_device::ymf271_write_timer(uint8_t address, uint8_t data)
 				// timer A load
 				if (~m_enable & data & 1)
 				{
-					attotime period = attotime::from_hz(m_clock) * (384 * 4 * (256 - m_timerA));
+					attotime period = clocks_to_attotime(384 * 4 * (256 - m_timerA));
 					m_timA->adjust((data & 1) ? period : attotime::never, 0);
 				}
 
 				// timer B load
 				if (~m_enable & data & 2)
 				{
-					attotime period = attotime::from_hz(m_clock) * (384 * 16 * (256 - m_timerB));
+					attotime period = clocks_to_attotime(384 * 16 * (256 - m_timerB));
 					m_timB->adjust((data & 2) ? period : attotime::never, 0);
 				}
 
@@ -1476,11 +1500,11 @@ READ8_MEMBER( ymf271_device::read )
 	switch (offset & 0xf)
 	{
 		case 0x0:
-			return m_status;
+			return m_status | ((m_end_status & 0xf) << 3);
 
 		case 0x1:
 			// statusreg 2
-			return 0;
+			return m_end_status >> 4;
 
 		case 0x2:
 		{
@@ -1603,20 +1627,23 @@ void ymf271_device::init_tables()
 		double db = 0.75 * (double)i;
 		m_lut_total_level[i] = (int)(65536.0 / pow(10.0, db / 20.0));
 	}
+}
 
+void ymf271_device::calculate_clock_correction()
+{
 	// timing may use a non-standard XTAL
-	double clock_correction = (double)(STD_CLOCK) / (double)(m_clock);
-	for (i = 0; i < 256; i++)
+	double clock_correction = (clock() != 0) ? (double)(STD_CLOCK) / (double)clock() : 0.0;
+	for (int i = 0; i < 256; i++)
 	{
 		m_lut_lfo[i] = LFO_frequency_table[i] * clock_correction;
 	}
 
-	for (i = 0; i < 64; i++)
+	for (int i = 0; i < 64; i++)
 	{
 		// attack/release rate in number of samples
 		m_lut_ar[i] = (ARTime[i] * clock_correction * 44100.0) / 1000.0;
 	}
-	for (i = 0; i < 64; i++)
+	for (int i = 0; i < 64; i++)
 	{
 		// decay rate in number of samples
 		m_lut_dc[i] = (DCTime[i] * clock_correction * 44100.0) / 1000.0;
@@ -1689,6 +1716,7 @@ void ymf271_device::init_state()
 	save_item(NAME(m_timerB));
 	save_item(NAME(m_irqstate));
 	save_item(NAME(m_status));
+	save_item(NAME(m_end_status));
 	save_item(NAME(m_enable));
 	save_item(NAME(m_ext_address));
 	save_item(NAME(m_ext_rw));
@@ -1701,8 +1729,6 @@ void ymf271_device::init_state()
 
 void ymf271_device::device_start()
 {
-	m_clock = clock();
-
 	m_timA = timer_alloc(0);
 	m_timB = timer_alloc(1);
 
@@ -1744,10 +1770,21 @@ void ymf271_device::device_reset()
 		m_irq_handler(0);
 }
 
-const device_type YMF271 = &device_creator<ymf271_device>;
+//-------------------------------------------------
+//  device_clock_changed - called whenever the
+//  clock is updated
+//-------------------------------------------------
+
+void ymf271_device::device_clock_changed()
+{
+	m_stream->set_sample_rate(clock() / 384);
+	calculate_clock_correction();
+}
+
+DEFINE_DEVICE_TYPE(YMF271, ymf271_device, "ymf271", "Yamaha YMF271 OPX")
 
 ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, YMF271, "YMF271", tag, owner, clock, "ymf271", __FILE__)
+	: device_t(mconfig, YMF271, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_timerA(0)
 	, m_timerB(0)
@@ -1759,7 +1796,6 @@ ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, dev
 	, m_ext_readlatch(0)
 	, m_mem_base(*this, DEVICE_SELF)
 	, m_mem_size(0)
-	, m_clock(0)
 	, m_timA(nullptr)
 	, m_timB(nullptr)
 	, m_stream(nullptr)
@@ -1771,14 +1807,4 @@ ymf271_device::ymf271_device(const machine_config &mconfig, const char *tag, dev
 	memset(m_slots, 0, sizeof(m_slots));
 	memset(m_groups, 0, sizeof(m_groups));
 	memset(m_regs_main, 0, sizeof(m_regs_main));
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ymf271_device::device_config_complete()
-{
 }

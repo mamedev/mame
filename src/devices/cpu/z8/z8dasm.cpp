@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+
 #include "emu.h"
-#include "debugger.h"
-#include "z8.h"
+#include "z8dasm.h"
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-static const char *const REGISTER_NAME[256] =
+const char *const z8_disassembler::REGISTER_NAME[256] =
 {
 	"P0", "P1", "P2", "P3", "", "", "", "", "", "", "", "", "", "", "", "",
 	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
@@ -28,7 +28,7 @@ static const char *const REGISTER_NAME[256] =
 	"SIO", "TMR", "T1", "PRE1", "T0", "PRE0", "P2M", "P3M", "P01M", "IPR", "IRQ", "IMR", "FLAGS", "RP", "SPH", "SPL"
 };
 
-static const char *const CONDITION_CODE[16] =
+const char *const z8_disassembler::CONDITION_CODE[16] =
 {
 	"F", "LT", "LE", "ULE", "OV", "MI", "Z", "C",
 	"", "GE", "GT", "UGT", "NOV", "PL", "NZ", "NC"
@@ -50,8 +50,8 @@ static const char *const CONDITION_CODE[16] =
 #define DA      "%04Xh"
 #define RA      "%04Xh"
 
-#define B0      oprom[0]
-#define B1      oprom[1]
+#define B0      opcodes.r8(pos)
+#define B1      opcodes.r8(pos+1)
 #define B0H     (B0 >> 4)
 #define B0L     (B0 & 0x0f)
 #define OPH     (opcode >> 4)
@@ -74,19 +74,24 @@ static const char *const CONDITION_CODE[16] =
 
 #define illegal                     util::stream_format(stream, "Illegal")
 #define mnemonic(_mnemonic)         util::stream_format(stream, "%-5s", _mnemonic)
-#define bytes(_count)               oprom += (_count - 1)
-#define step_over                   flags = DASMFLAG_STEP_OVER
-#define step_out                    flags = DASMFLAG_STEP_OUT
+#define bytes(_count)               pos += (_count - 1)
+#define step_over                   flags = STEP_OVER
+#define step_out                    flags = STEP_OUT
 
 /***************************************************************************
     DISASSEMBLER
 ***************************************************************************/
 
-static offs_t internal_disasm_z8(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+u32 z8_disassembler::opcode_alignment() const
 {
-	const uint8_t *startrom = oprom;
+	return 1;
+}
+
+offs_t z8_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	offs_t pos = pc;
 	uint32_t flags = 0;
-	uint8_t opcode = *oprom++;
+	uint8_t opcode = opcodes.r8(pos++);
 	int argc = 0;
 
 	switch (pc)
@@ -97,7 +102,7 @@ static offs_t internal_disasm_z8(cpu_device *device, std::ostream &stream, offs_
 	case 0x0006:
 	case 0x0008:
 	case 0x000a:
-		util::stream_format(stream, "IRQ%u Vector %04Xh", pc / 2, opcode << 8 | *oprom++); break;
+		util::stream_format(stream, "IRQ%u Vector %04Xh", pc / 2, opcode << 8 | opcodes.r8(pos++)); break;
 	default:
 		switch (opcode)
 		{
@@ -153,7 +158,7 @@ static offs_t internal_disasm_z8(cpu_device *device, std::ostream &stream, offs_
 			case 0x2f:      illegal;                                                break;
 
 			case 0x30:      mnemonic("JP"); arg_IRR(B0); bytes(2);                  break;
-			case 0x31:      mnemonic("SRP"); arg_IM(*oprom++);                      break;
+			case 0x31:      mnemonic("SRP"); arg_IM(B0); bytes(2);                 break;
 			case 0x32:      mnemonic("SBC"); arg_r(B0H); arg_r(B0L); bytes(2);      break;
 			case 0x33:      mnemonic("SBC"); arg_r(B0H); arg_Ir(B0L); bytes(2);     break;
 			case 0x34:      mnemonic("SBC"); arg_R(B1); arg_R(B0); bytes(3);        break;
@@ -237,7 +242,7 @@ static offs_t internal_disasm_z8(cpu_device *device, std::ostream &stream, offs_
 			case 0x7e:      mnemonic("INC"); arg_r(OPH);                            break;
 			case 0x7f:      illegal; /* mnemonic("HALT"); */                        break;
 
-			case 0x80:      mnemonic("DECW"); arg_RR(*oprom++);                     break;
+			case 0x80:      mnemonic("DECW"); arg_RR(B0); bytes(2);                 break;
 			case 0x81:      mnemonic("DECW"); arg_IR(B0); bytes(2);                 break;
 			case 0x82:      mnemonic("LDE"); arg_r(B0H); arg_Irr(B0L); bytes(2);    break;
 			case 0x83:      mnemonic("LDEI"); arg_Ir(B0H); arg_Irr(B0L); bytes(2);  break;
@@ -256,8 +261,8 @@ static offs_t internal_disasm_z8(cpu_device *device, std::ostream &stream, offs_
 
 			case 0x90:      mnemonic("RL"); arg_R(B0); bytes(2);                    break;
 			case 0x91:      mnemonic("RL"); arg_IR(B0); bytes(2);                   break;
-			case 0x92:      mnemonic("LDE"); arg_r(B0L); arg_Irr(B0H); bytes(2);    break;
-			case 0x93:      mnemonic("LDEI"); arg_Ir(B0L); arg_Irr(B0H); bytes(2);  break;
+			case 0x92:      mnemonic("LDE"); arg_Irr(B0L); arg_r(B0H); bytes(2);    break;
+			case 0x93:      mnemonic("LDEI"); arg_Irr(B0L); arg_Ir(B0H); bytes(2);  break;
 			case 0x94:      illegal;                                                break;
 			case 0x95:      illegal;                                                break;
 			case 0x96:      illegal;                                                break;
@@ -375,15 +380,5 @@ static offs_t internal_disasm_z8(cpu_device *device, std::ostream &stream, offs_
 		}
 	}
 
-	return (oprom - startrom) | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(z8)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_z8(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	return (pos - pc) | flags | SUPPORTED;
 }

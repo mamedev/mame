@@ -45,15 +45,11 @@ public:
 		FLAG_DISABLE        = (1 << 5),
 		FLAG_UI_DATS        = (1 << 6),
 		FLAG_UI_FAVORITE    = (1 << 7),
-		FLAG_UI_HEADING     = (1 << 8)
+		FLAG_UI_HEADING     = (1 << 8),
+		FLAG_COLOR_BOX      = (1 << 9)
 	};
 
 	virtual ~menu();
-
-	int                     hover;        // which item is being hovered over
-	float                   customtop;    // amount of extra height to add at the top
-	float                   custombottom; // amount of extra height to add at the bottom
-	std::vector<menu_item>  item;         // array of items
 
 	// append a new item to the end of the menu
 	void item_append(const std::string &text, const std::string &subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
@@ -99,13 +95,6 @@ private:
 	virtual void draw(uint32_t flags);
 	void draw_text_box();
 
-public:
-	// mouse handling
-	bool mouse_hit, mouse_button;
-	render_target *mouse_target;
-	int32_t mouse_target_x, mouse_target_y;
-	float mouse_x, mouse_y;
-
 protected:
 	using cleanup_callback = std::function<void(running_machine &)>;
 	using bitmap_ptr = widgets_manager::bitmap_ptr;
@@ -136,13 +125,14 @@ protected:
 		void                *itemref;   // reference for the selected item
 		menu_item_type      type;       // item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
 		int                 iptkey;     // one of the IPT_* values from inptport.h
-		char32_t        unichar;    // unicode character if iptkey == IPT_SPECIAL
+		char32_t            unichar;    // unicode character if iptkey == IPT_SPECIAL
 		render_bounds       mouse;      // mouse position if iptkey == IPT_CUSTOM
 	};
 
+	int                     hover;        // which item is being hovered over
+	std::vector<menu_item>  item;         // array of items
+
 	int top_line;           // main box top line
-	int l_sw_hover;
-	int l_hover;
 	int skip_main_items;
 	int selected;           // which item is selected
 
@@ -170,13 +160,21 @@ protected:
 
 	void add_cleanup_callback(cleanup_callback &&callback) { m_global_state->add_cleanup_callback(std::move(callback)); }
 
+	// repopulate the menu items
+	void repopulate(reset_options options);
+
 	// process a menu, drawing it and returning any interesting events
 	const event *process(uint32_t flags, float x0 = 0.0f, float y0 = 0.0f);
 	void process_parent() { m_parent->process(PROCESS_NOINPUT); }
 
 	// retrieves the ref of the currently selected menu item or nullptr
 	void *get_selection_ref() const { return selection_valid() ? item[selected].ref : nullptr; }
+
+	menu_item &selected_item() { return item[selected]; }
+	menu_item const &selected_item() const { return item[selected]; }
+	int selected_index() const { return selected; }
 	bool selection_valid() const { return (0 <= selected) && (item.size() > selected); }
+	bool is_selected(int index) const { return selection_valid() && (selected == index); }
 	bool is_first_selected() const { return 0 == selected; }
 	bool is_last_selected() const { return (item.size() - 1) == selected; }
 
@@ -188,6 +186,10 @@ protected:
 
 	// test if the given key is pressed and we haven't already reported a key
 	bool exclusive_input_pressed(int &iptkey, int key, int repeat);
+
+	// layout
+	float get_customtop() const { return m_customtop; }
+	float get_custombottom() const { return m_custombottom; }
 
 	// highlight
 	void highlight(float x0, float y0, float x1, float y1, rgb_t bgcolor);
@@ -201,10 +203,77 @@ protected:
 	void extra_text_position(float origx1, float origx2, float origy, float yspan, text_layout &layout,
 		int direction, float &x1, float &y1, float &x2, float &y2);
 
+	// draw a box of text - used for the custom boxes above/below menus
+	template <typename Iter>
+	float draw_text_box(
+			Iter begin, Iter end,
+			float origx1, float origx2, float y1, float y2,
+			ui::text_layout::text_justify justify, ui::text_layout::word_wrapping wrap, bool scale,
+			rgb_t fgcolor, rgb_t bgcolor, float text_size)
+	{
+		// size up the text
+		float maxwidth(origx2 - origx1);
+		for (Iter it = begin; it != end; ++it)
+		{
+			float width;
+			ui().draw_text_full(
+					container(), get_c_str(*it),
+					0.0f, 0.0f, 1.0f, justify, wrap,
+					mame_ui_manager::NONE, rgb_t::black(), rgb_t::white(),
+					&width, nullptr, text_size);
+			width += 2.0f * UI_BOX_LR_BORDER;
+			maxwidth = (std::max)(maxwidth, width);
+		}
+		if (scale && ((origx2 - origx1) < maxwidth))
+		{
+			text_size *= ((origx2 - origx1) / maxwidth);
+			maxwidth = origx2 - origx1;
+		}
+
+		// draw containing box
+		float x1(0.5f * (1.0f - maxwidth));
+		float x2(x1 + maxwidth);
+		ui().draw_outlined_box(container(), x1, y1, x2, y2, bgcolor);
+
+		// inset box and draw content
+		x1 += UI_BOX_LR_BORDER;
+		x2 -= UI_BOX_LR_BORDER;
+		y1 += UI_BOX_TB_BORDER;
+		y2 -= UI_BOX_TB_BORDER;
+		for (Iter it = begin; it != end; ++it)
+		{
+			ui().draw_text_full(
+					container(), get_c_str(*it),
+					x1, y1, x2 - x1, justify, wrap,
+					mame_ui_manager::NORMAL, fgcolor, UI_TEXT_BG_COLOR,
+					nullptr, nullptr, text_size);
+			y1 += ui().get_line_height();
+		}
+
+		// in case you want another box of similar width
+		return maxwidth;
+	}
+
 	void draw_background();
 
-	// configure the menu for custom rendering
+	// draw additional menu content
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
+
+	// map mouse to menu coordinates
+	void map_mouse();
+
+	// clear the mouse position
+	void ignore_mouse();
+
+	bool is_mouse_hit() const { return m_mouse_hit; }   // is mouse pointer inside menu's render container?
+	float get_mouse_x() const { return m_mouse_x; }     // mouse x location in menu coordinates
+	float get_mouse_y() const { return m_mouse_y; }     // mouse y location in menu coordinates
+
+	// mouse hit test - checks whether mouse_x is in [x0, x1) and mouse_y is in [y0, y1)
+	bool mouse_in_rect(float x0, float y0, float x1, float y1) const
+	{
+		return m_mouse_hit && (m_mouse_x >= x0) && (m_mouse_x < x1) && (m_mouse_y >= y0) && (m_mouse_y < y1);
+	}
 
 	// overridable event handling
 	virtual void handle_events(uint32_t flags, event &ev);
@@ -221,12 +290,10 @@ protected:
 
 	// get arrows status
 	template <typename T>
-	uint32_t get_arrow_flags(T min, T max, T actual)
+	static uint32_t get_arrow_flags(T min, T max, T actual)
 	{
 		return ((actual > min) ? FLAG_LEFT_ARROW : 0) | ((actual < max) ? FLAG_RIGHT_ARROW : 0);
 	}
-
-	int right_visible_lines;  // right box lines
 
 private:
 	class global_state : public widgets_manager
@@ -270,9 +337,9 @@ private:
 
 	struct pool
 	{
-		pool   *next;    // chain to next one
-		uint8_t  *top;     // top of the pool
-		uint8_t  *end;     // end of the pool
+		pool       *next;    // chain to next one
+		uint8_t    *top;     // top of the pool
+		uint8_t    *end;     // end of the pool
 	};
 
 	// request the specific handling of the game selection main menu
@@ -280,7 +347,7 @@ private:
 	void set_special_main_menu(bool disable);
 
 	// To be reimplemented in the menu subclass
-	virtual void populate() = 0;
+	virtual void populate(float &customtop, float &custombottom) = 0;
 
 	// To be reimplemented in the menu subclass
 	virtual void handle() = 0;
@@ -296,6 +363,9 @@ private:
 	static void exit(running_machine &machine);
 	static global_state_ptr get_global_state(running_machine &machine);
 
+	static char const *get_c_str(std::string const &str) { return str.c_str(); }
+	static char const *get_c_str(char const *str) { return str; }
+
 	global_state_ptr const  m_global_state;
 	bool                    m_special_main_menu;
 	mame_ui_manager         &m_ui;              // UI we are attached to
@@ -304,8 +374,16 @@ private:
 	event                   m_event;            // the UI event that occurred
 	pool                    *m_pool;            // list of memory pools
 
+	float                   m_customtop;        // amount of extra height to add at the top
+	float                   m_custombottom;     // amount of extra height to add at the bottom
+
 	int                     m_resetpos;         // reset position
 	void                    *m_resetref;        // reset reference
+
+	bool                    m_mouse_hit;
+	bool                    m_mouse_button;
+	float                   m_mouse_x;
+	float                   m_mouse_y;
 
 	static std::mutex       s_global_state_guard;
 	static global_state_map s_global_states;

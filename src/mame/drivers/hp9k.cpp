@@ -14,7 +14,7 @@ Driver started on 10/01/2012
 Memory map:
 
 000000-00ffff - system rom
-428000-428fff - keyboard
+428000-428fff - keyboard 8042 host status / data ports (8042 undumped)
 510000-51ffff - videoram
 530000-53ffff - graphic memory
 5f0000-5f3fff - system PROM
@@ -42,6 +42,7 @@ TODO: boot tests fail
 #include "video/mc6845.h"
 #include "machine/terminal.h"
 //#include "machine/ins8250.h"
+#include "screen.h"
 
 #define HP9816_CHDIMX 8
 #define HP9816_CHDIMY 16
@@ -72,7 +73,7 @@ static uint8_t prom16a[256] = {
 	0xff,
 	0xff,
 	0xff,
-	0xff,0xfe,0x00,0x00,            // bottom minimun address for ram size
+	0xff,0xfe,0x00,0x00,            // bottom minimum address for ram size
 	0xff,0xff,                      // 16 required IO cards here not used
 	0xff,0xff,
 	0xff,0xff,
@@ -165,6 +166,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	void hp9k(machine_config &config);
 };
 
 //
@@ -391,7 +393,7 @@ WRITE8_MEMBER( hp9k_state::kbd_put )
 }
 
 
-static MACHINE_CONFIG_START( hp9k, hp9k_state )
+MACHINE_CONFIG_START(hp9k_state::hp9k)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(hp9k_mem)
@@ -428,5 +430,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, hp9816, 0,      0,      hp9k,   hp9k, hp9k_state,       hp9k,   "Hewlett Packard",  "HP 9816" ,  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT    COMPANY            FULLNAME     FLAGS */
+COMP( 1982, hp9816, 0,      0,      hp9k,    hp9k,  hp9k_state, hp9k,  "Hewlett Packard",  "HP 9816" ,  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

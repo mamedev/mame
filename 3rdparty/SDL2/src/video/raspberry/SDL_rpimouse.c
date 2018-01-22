@@ -24,6 +24,7 @@
 
 #include "SDL_assert.h"
 #include "SDL_surface.h"
+#include "SDL_hints.h"
 
 #include "SDL_rpivideo.h"
 #include "SDL_rpimouse.h"
@@ -70,7 +71,16 @@ RPI_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
     SDL_assert(surface->pitch == surface->w * 4);
     
     cursor = (SDL_Cursor *) SDL_calloc(1, sizeof(*cursor));
+    if (cursor == NULL) {
+        SDL_OutOfMemory();
+        return NULL;
+    }
     curdata = (RPI_CursorData *) SDL_calloc(1, sizeof(*curdata));
+    if (curdata == NULL) {
+        SDL_OutOfMemory();
+        SDL_free(cursor);
+        return NULL;
+    }
 
     curdata->hot_x = hot_x;
     curdata->hot_y = hot_y;
@@ -78,17 +88,17 @@ RPI_CreateCursor(SDL_Surface * surface, int hot_x, int hot_y)
     curdata->h = surface->h;
     
     /* This usage is inspired by Wayland/Weston RPI code, how they figured this out is anyone's guess */
-    curdata->resource = vc_dispmanx_resource_create( VC_IMAGE_ARGB8888, surface->w | (surface->pitch << 16), surface->h | (surface->h << 16), &dummy );
+    curdata->resource = vc_dispmanx_resource_create(VC_IMAGE_ARGB8888, surface->w | (surface->pitch << 16), surface->h | (surface->h << 16), &dummy);
     SDL_assert(curdata->resource);
-    vc_dispmanx_rect_set( &dst_rect, 0, 0, curdata->w, curdata->h);
+    vc_dispmanx_rect_set(&dst_rect, 0, 0, curdata->w, curdata->h);
     /* A note from Weston: 
      * vc_dispmanx_resource_write_data() ignores ifmt,
      * rect.x, rect.width, and uses stride only for computing
      * the size of the transfer as rect.height * stride.
      * Therefore we can only write rows starting at x=0.
      */
-    ret = vc_dispmanx_resource_write_data( curdata->resource, VC_IMAGE_ARGB8888, surface->pitch, surface->pixels, &dst_rect );
-    SDL_assert ( ret == DISPMANX_SUCCESS );
+    ret = vc_dispmanx_resource_write_data(curdata->resource, VC_IMAGE_ARGB8888, surface->pitch, surface->pixels, &dst_rect);
+    SDL_assert (ret == DISPMANX_SUCCESS);
     
     cursor->driverdata = curdata;
     
@@ -108,7 +118,9 @@ RPI_ShowCursor(SDL_Cursor * cursor)
     SDL_VideoDisplay *display;
     SDL_DisplayData *data;
     VC_DISPMANX_ALPHA_T alpha = {  DISPMANX_FLAGS_ALPHA_FROM_SOURCE /* flags */ , 255 /*opacity 0->255*/,  0 /* mask */ };
-    
+    uint32_t layer = SDL_RPI_MOUSELAYER;
+    const char *env;
+
     mouse = SDL_GetMouse();
     if (mouse == NULL) {
         return -1;
@@ -117,15 +129,15 @@ RPI_ShowCursor(SDL_Cursor * cursor)
     if (cursor == NULL) {
         /* FIXME: We hide the current mouse's cursor, what we actually need is *_HideCursor */
 
-        if ( mouse->cur_cursor != NULL && mouse->cur_cursor->driverdata != NULL) {
+        if (mouse->cur_cursor != NULL && mouse->cur_cursor->driverdata != NULL) {
             curdata = (RPI_CursorData *) mouse->cur_cursor->driverdata;
             if (curdata->element > DISPMANX_NO_HANDLE) {
-                update = vc_dispmanx_update_start( 10 );
-                SDL_assert( update );
-                ret = vc_dispmanx_element_remove( update, curdata->element );
-                SDL_assert( ret == DISPMANX_SUCCESS );
-                ret = vc_dispmanx_update_submit_sync( update );
-                SDL_assert( ret == DISPMANX_SUCCESS );
+                update = vc_dispmanx_update_start(10);
+                SDL_assert(update);
+                ret = vc_dispmanx_element_remove(update, curdata->element);
+                SDL_assert(ret == DISPMANX_SUCCESS);
+                ret = vc_dispmanx_update_submit_sync(update);
+                SDL_assert(ret == DISPMANX_SUCCESS);
                 curdata->element = DISPMANX_NO_HANDLE;
             }
         }
@@ -152,25 +164,30 @@ RPI_ShowCursor(SDL_Cursor * cursor)
     }
     
     if (curdata->element == DISPMANX_NO_HANDLE) {
-        vc_dispmanx_rect_set( &src_rect, 0, 0, curdata->w << 16, curdata->h << 16 );
-        vc_dispmanx_rect_set( &dst_rect, 0, 0, curdata->w, curdata->h);
+        vc_dispmanx_rect_set(&src_rect, 0, 0, curdata->w << 16, curdata->h << 16);
+        vc_dispmanx_rect_set(&dst_rect, 0, 0, curdata->w, curdata->h);
         
-        update = vc_dispmanx_update_start( 10 );
-        SDL_assert( update );
+        update = vc_dispmanx_update_start(10);
+        SDL_assert(update);
 
-        curdata->element = vc_dispmanx_element_add( update,
+        env = SDL_GetHint(SDL_HINT_RPI_VIDEO_LAYER);
+        if (env) {
+            layer = SDL_atoi(env) + 1;
+        }
+
+        curdata->element = vc_dispmanx_element_add(update,
                                                     data->dispman_display,
-                                                    SDL_RPI_MOUSELAYER, // layer
+                                                    layer,
                                                     &dst_rect,
                                                     curdata->resource,
                                                     &src_rect,
                                                     DISPMANX_PROTECTION_NONE,
                                                     &alpha,
                                                     DISPMANX_NO_HANDLE, // clamp
-                                                    VC_IMAGE_ROT0 );
-        SDL_assert( curdata->element > DISPMANX_NO_HANDLE);
-        ret = vc_dispmanx_update_submit_sync( update );
-        SDL_assert( ret == DISPMANX_SUCCESS );
+                                                    VC_IMAGE_ROT0);
+        SDL_assert(curdata->element > DISPMANX_NO_HANDLE);
+        ret = vc_dispmanx_update_submit_sync(update);
+        SDL_assert(ret == DISPMANX_SUCCESS);
     }
     
     return 0;
@@ -189,17 +206,17 @@ RPI_FreeCursor(SDL_Cursor * cursor)
         
         if (curdata != NULL) {
             if (curdata->element != DISPMANX_NO_HANDLE) {
-                update = vc_dispmanx_update_start( 10 );
-                SDL_assert( update );
-                ret = vc_dispmanx_element_remove( update, curdata->element );
-                SDL_assert( ret == DISPMANX_SUCCESS );
-                ret = vc_dispmanx_update_submit_sync( update );
-                SDL_assert( ret == DISPMANX_SUCCESS );
+                update = vc_dispmanx_update_start(10);
+                SDL_assert(update);
+                ret = vc_dispmanx_element_remove(update, curdata->element);
+                SDL_assert(ret == DISPMANX_SUCCESS);
+                ret = vc_dispmanx_update_submit_sync(update);
+                SDL_assert(ret == DISPMANX_SUCCESS);
             }
             
             if (curdata->resource != DISPMANX_NO_HANDLE) {
-                ret = vc_dispmanx_resource_delete( curdata->resource );
-                SDL_assert( ret == DISPMANX_SUCCESS );
+                ret = vc_dispmanx_resource_delete(curdata->resource);
+                SDL_assert(ret == DISPMANX_SUCCESS);
             }
         
             SDL_free(cursor->driverdata);
@@ -221,35 +238,54 @@ RPI_WarpMouseGlobal(int x, int y)
 {
     RPI_CursorData *curdata;
     DISPMANX_UPDATE_HANDLE_T update;
+    int ret;
     VC_RECT_T dst_rect;
+    VC_RECT_T src_rect;
     SDL_Mouse *mouse = SDL_GetMouse();
     
-    if (mouse != NULL && mouse->cur_cursor != NULL && mouse->cur_cursor->driverdata != NULL) {
-        curdata = (RPI_CursorData *) mouse->cur_cursor->driverdata;
-        if (curdata->element != DISPMANX_NO_HANDLE) {
-            int ret;
-            update = vc_dispmanx_update_start( 10 );
-            SDL_assert( update );
-            vc_dispmanx_rect_set( &dst_rect, x, y, curdata->w, curdata->h);
-            ret = vc_dispmanx_element_change_attributes(
-                update,
-                curdata->element,
-                ELEMENT_CHANGE_DEST_RECT,
-                0,
-                0,
-                &dst_rect,
-                NULL,
-                DISPMANX_NO_HANDLE,
-                DISPMANX_NO_ROTATE);
-            SDL_assert( ret == DISPMANX_SUCCESS );
-            /* Submit asynchronously, otherwise the peformance suffers a lot */
-            ret = vc_dispmanx_update_submit( update, 0, NULL );
-            SDL_assert( ret == DISPMANX_SUCCESS );
-            return (ret == DISPMANX_SUCCESS) ? 0 : -1;
-        }
-    }    
+    if (mouse == NULL || mouse->cur_cursor == NULL || mouse->cur_cursor->driverdata == NULL) {
+        return 0;
+    }
 
-    return -1;  /* !!! FIXME: this should SDL_SetError() somewhere. */
+    curdata = (RPI_CursorData *) mouse->cur_cursor->driverdata;
+    if (curdata->element == DISPMANX_NO_HANDLE) {
+        return 0;
+    }
+
+    update = vc_dispmanx_update_start(10);
+    if (!update) {
+        return 0;
+    }
+
+    src_rect.x = 0;
+    src_rect.y = 0;
+    src_rect.width  = curdata->w << 16;
+    src_rect.height = curdata->h << 16;
+    dst_rect.x = x;
+    dst_rect.y = y;
+    dst_rect.width  = curdata->w;
+    dst_rect.height = curdata->h;
+
+    ret = vc_dispmanx_element_change_attributes(
+        update,
+        curdata->element,
+        0,
+        0,
+        0,
+        &dst_rect,
+        &src_rect,
+        DISPMANX_NO_HANDLE,
+        DISPMANX_NO_ROTATE);
+    if (ret != DISPMANX_SUCCESS) {
+        return SDL_SetError("vc_dispmanx_element_change_attributes() failed");
+    }
+
+    /* Submit asynchronously, otherwise the peformance suffers a lot */
+    ret = vc_dispmanx_update_submit(update, 0, NULL);
+    if (ret != DISPMANX_SUCCESS) {
+        return SDL_SetError("vc_dispmanx_update_submit() failed");
+    }
+    return 0;
 }
 
 void

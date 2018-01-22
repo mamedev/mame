@@ -33,12 +33,15 @@ ToDo:
 *********************************************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/scmp/scmp.h"
 #include "imagedev/cassette.h"
 #include "machine/ins8154.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "sound/wave.h"
+#include "speaker.h"
+
 #include "mk14.lh"
 
 
@@ -58,6 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port_a_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_READ_LINE_MEMBER(cass_r);
+	void mk14(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -102,7 +106,7 @@ WRITE8_MEMBER( mk14_state::display_w )
 	}
 }
 
-static ADDRESS_MAP_START(mk14_mem, AS_PROGRAM, 8, mk14_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, mk14_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
 	AM_RANGE(0x000, 0x1ff) AM_MIRROR(0x600) AM_ROM // ROM
@@ -185,12 +189,12 @@ void mk14_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( mk14, mk14_state )
+MACHINE_CONFIG_START(mk14_state::mk14)
 	/* basic machine hardware */
 	// IC1 1SP-8A/600 (8060) SC/MP Microprocessor
 	MCFG_CPU_ADD("maincpu", INS8060, XTAL_4_433619MHz)
 	MCFG_SCMP_CONFIG(WRITELINE(mk14_state, cass_w), NOOP, READLINE(mk14_state, cass_r), NOOP, READLINE(mk14_state, cass_r), NOOP)
-	MCFG_CPU_PROGRAM_MAP(mk14_mem)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mk14)
@@ -222,5 +226,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT  CLASS        INIT    COMPANY             FULLNAME  FLAGS */
-COMP( 1977, mk14,  0,       0,      mk14,      mk14, driver_device, 0, "Science of Cambridge", "MK-14", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE    INPUT  CLASS       INIT  COMPANY                 FULLNAME  FLAGS
+COMP( 1977, mk14,  0,      0,      mk14,      mk14,  mk14_state, 0,    "Science of Cambridge", "MK-14",  0 )

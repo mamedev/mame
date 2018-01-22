@@ -6,11 +6,11 @@
 #include "prot_pcm2.h"
 
 
-extern const device_type PCM2_PROT = &device_creator<pcm2_prot_device>;
+DEFINE_DEVICE_TYPE(NG_PCM2_PROT, pcm2_prot_device, "ng_pcm2_prot", "Neo Geo NEOPCM2 Protection")
 
 
 pcm2_prot_device::pcm2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PCM2_PROT, "Neo Geo NEOPCM2 Protection", tag, owner, clock, "pcm2_prot", __FILE__)
+	: device_t(mconfig, NG_PCM2_PROT, tag, owner, clock)
 {
 }
 
@@ -82,7 +82,7 @@ void pcm2_prot_device::swap(uint8_t* ymrom, uint32_t ymsize, int value)
 
 	for (int i = 0; i < 0x1000000; i++)
 	{
-		j = BITSWAP24(i,23,22,21,20,19,18,17,0,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,16);
+		j = bitswap<24>(i,23,22,21,20,19,18,17,0,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,16);
 		j ^= addrs[value][1];
 		d = ((i + addrs[value][0]) & 0xffffff);
 		src[j] = buf[d] ^ xordata[value][j & 0x7];

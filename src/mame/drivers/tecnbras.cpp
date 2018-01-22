@@ -37,6 +37,7 @@ public:
 //  DECLARE_WRITE8_MEMBER(tecnbras_io_w);
 //  DECLARE_READ8_MEMBER(tecnbras_io_r);
 	DECLARE_DRIVER_INIT(tecnbras);
+void tecnbras(machine_config &config);
 private:
 	int m_xcoord;
 	char m_digit[14][7];
@@ -99,7 +100,7 @@ void tecnbras_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( tecnbras, tecnbras_state )
+MACHINE_CONFIG_START(tecnbras_state::tecnbras)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL_12MHz) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
@@ -129,5 +130,5 @@ ROM_START( tecnbras )
 	ROM_LOAD( "tecnbras.u2",  0x0000, 0x8000, CRC(1a1e18fc) SHA1(8907e72f0356a2e2e1097dabac6d6b0b3d717f85) )
 ROM_END
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT     CLASS         INIT    COMPANY  FULLNAME                       FLAGS */
-COMP( 200?, tecnbras,   0,      0,      tecnbras,     0,   tecnbras_state, tecnbras, "Tecnbras", "Dot Matrix Display (70x7 pixels)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS           INIT      COMPANY     FULLNAME                            FLAGS
+COMP( 200?, tecnbras, 0,      0,      tecnbras, 0,     tecnbras_state, tecnbras, "Tecnbras", "Dot Matrix Display (70x7 pixels)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

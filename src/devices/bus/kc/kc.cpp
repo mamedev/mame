@@ -118,8 +118,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type KCEXP_SLOT  = &device_creator<kcexp_slot_device>;
-const device_type KCCART_SLOT = &device_creator<kccart_slot_device>;
+DEFINE_DEVICE_TYPE(KCEXP_SLOT,  kcexp_slot_device,  "kcexp_slot",  "KC85 Expansion Slot")
+DEFINE_DEVICE_TYPE(KCCART_SLOT, kccart_slot_device, "kccart_slot", "KC85 Cartridge Slot")
 
 
 //**************************************************************************
@@ -153,20 +153,17 @@ device_kcexp_interface::~device_kcexp_interface()
 //  kcexp_slot_device - constructor
 //-------------------------------------------------
 kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, KCEXP_SLOT, "KC85 Expansion Slot", tag, owner, clock, "kcexp_slot", __FILE__),
-		device_slot_interface(mconfig, *this),
-		m_out_irq_cb(*this),
-		m_out_nmi_cb(*this),
-		m_out_halt_cb(*this), m_cart(nullptr), m_next_slot_tag(nullptr), m_next_slot(nullptr)
+	kcexp_slot_device(mconfig, KCEXP_SLOT, tag, owner, clock)
 {
 }
 
-kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_slot_interface(mconfig, *this),
-		m_out_irq_cb(*this),
-		m_out_nmi_cb(*this),
-		m_out_halt_cb(*this), m_cart(nullptr), m_next_slot_tag(nullptr), m_next_slot(nullptr)
+kcexp_slot_device::kcexp_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_slot_interface(mconfig, *this),
+	m_out_irq_cb(*this),
+	m_out_nmi_cb(*this),
+	m_out_halt_cb(*this),
+	m_cart(nullptr), m_next_slot_tag(nullptr), m_next_slot(nullptr)
 {
 }
 
@@ -299,8 +296,8 @@ WRITE_LINE_MEMBER( kcexp_slot_device::meo_w )
 //  kccart_slot_device - constructor
 //-------------------------------------------------
 kccart_slot_device::kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		kcexp_slot_device(mconfig, KCCART_SLOT, "KC85 Cartridge Slot", tag, owner, clock, "kccart_slot", __FILE__),
-		device_image_interface(mconfig, *this)
+	kcexp_slot_device(mconfig, KCCART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this)
 {
 }
 
@@ -310,18 +307,6 @@ kccart_slot_device::kccart_slot_device(const machine_config &mconfig, const char
 
 kccart_slot_device::~kccart_slot_device()
 {
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void kccart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 /*-------------------------------------------------
@@ -337,7 +322,7 @@ image_init_result kccart_slot_device::call_load()
 
 		if (cart_base != nullptr)
 		{
-			if (software_entry() == nullptr)
+			if (!loaded_through_softlist())
 			{
 				read_length = length();
 				fread(m_cart->get_cart_base(), read_length);
@@ -359,7 +344,7 @@ image_init_result kccart_slot_device::call_load()
     get default card software
 -------------------------------------------------*/
 
-std::string kccart_slot_device::get_default_card_software()
+std::string kccart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("standard");
 }

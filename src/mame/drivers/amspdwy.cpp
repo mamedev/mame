@@ -16,8 +16,10 @@ Sound:  YM2151
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/amspdwy.h"
+#include "cpu/z80/z80.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 
@@ -69,15 +71,9 @@ READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 	return (m_ym2151->status_r(space, 0) & ~0x30) | ioport("IN0")->read();
 }
 
-WRITE8_MEMBER(amspdwy_state::amspdwy_sound_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8, amspdwy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x801f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x8000, 0x801f) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM // unused?
@@ -87,7 +83,7 @@ static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8, amspdwy_state )
 	AM_RANGE(0xa800, 0xa800) AM_READ(amspdwy_wheel_0_r)
 	AM_RANGE(0xac00, 0xac00) AM_READ(amspdwy_wheel_1_r)
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP // irq ack?
-	AM_RANGE(0xb400, 0xb400) AM_READWRITE(amspdwy_sound_r, amspdwy_sound_w)
+	AM_RANGE(0xb400, 0xb400) AM_READ(amspdwy_sound_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
@@ -248,7 +244,7 @@ void amspdwy_state::machine_reset()
 	m_wheel_return[1] = 0;
 }
 
-static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
+MACHINE_CONFIG_START(amspdwy_state::amspdwy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3000000)
@@ -278,6 +274,7 @@ static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", 3000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -381,5 +378,5 @@ ROM_END
 
 /* (C) 1987 ETI 8402 MAGNOLIA ST. #C SANTEE, CA 92071 */
 
-GAME( 1987, amspdwy,  0,       amspdwy, amspdwy, driver_device,  0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, driver_device, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, amspdwy,  0,       amspdwy, amspdwy,  amspdwy_state, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, amspdwya, amspdwy, amspdwy, amspdwya, amspdwy_state, 0, ROT0, "Enerdyne Technologies Inc.", "American Speedway (set 2)", MACHINE_SUPPORTS_SAVE )

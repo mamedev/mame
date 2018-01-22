@@ -182,6 +182,7 @@ Nearly everything.
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "screen.h"
 
 
 class comebaby_state : public driver_device
@@ -194,6 +195,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void comebaby(machine_config &config);
 protected:
 
 	// devices
@@ -221,7 +223,7 @@ static INPUT_PORTS_START( comebaby )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( comebaby, comebaby_state )
+MACHINE_CONFIG_START(comebaby_state::comebaby)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Probably a Pentium .. ?? Mhz*/
 	MCFG_CPU_PROGRAM_MAP(comebaby_map)
@@ -248,4 +250,4 @@ ROM_START(comebaby)
 ROM_END
 
 
-GAME( 2000, comebaby,  0,   comebaby,  comebaby, driver_device,  0,  ROT0,  "ExPotato",    "Come On Baby",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2000, comebaby,  0,   comebaby,  comebaby, comebaby_state,  0,  ROT0,  "ExPotato",    "Come On Baby",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )

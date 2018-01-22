@@ -46,6 +46,8 @@ http://blogs.yahoo.co.jp/nadegatayosoyuki/59285865.html
 #include "emu.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "sound/okim6295.h"
+#include "speaker.h"
+
 #include "30test.lh"
 
 #define MAIN_CLOCK XTAL_16MHz
@@ -72,6 +74,7 @@ public:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
+	void _30test(machine_config &config);
 };
 
 
@@ -235,7 +238,7 @@ void namco_30test_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( 30test, namco_30test_state )
+MACHINE_CONFIG_START(namco_30test_state::_30test)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC68HC11,MAIN_CLOCK/4)
@@ -249,7 +252,7 @@ static MACHINE_CONFIG_START( 30test, namco_30test_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -267,4 +270,4 @@ ROM_START( 30test )
 	ROM_LOAD( "tt1-voi0.7p",   0x0000, 0x80000, CRC(b4fc5921) SHA1(92a88d5adb50dae48715847f12e88a35e37ef78c) )
 ROM_END
 
-GAMEL( 1997, 30test,  0,   30test,  30test, driver_device,  0, ROT0, "Namco", "30 Test (Remake)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_30test )
+GAMEL( 1997, 30test,  0,   _30test,  30test, namco_30test_state,  0, ROT0, "Namco", "30 Test (Remake)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK, layout_30test )

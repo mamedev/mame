@@ -104,6 +104,9 @@ ifeq ($(config),release)
 	$(OBJDIR)/src/host/os_stat.o \
 	$(OBJDIR)/src/host/os_ticks.o \
 	$(OBJDIR)/src/host/os_uuid.o \
+	$(OBJDIR)/src/host/path_getabsolute.o \
+	$(OBJDIR)/src/host/path_getrelative.o \
+	$(OBJDIR)/src/host/path_helpers.o \
 	$(OBJDIR)/src/host/path_isabsolute.o \
 	$(OBJDIR)/src/host/premake.o \
 	$(OBJDIR)/src/host/premake_main.o \
@@ -183,6 +186,9 @@ ifeq ($(config),debug)
 	$(OBJDIR)/src/host/os_stat.o \
 	$(OBJDIR)/src/host/os_ticks.o \
 	$(OBJDIR)/src/host/os_uuid.o \
+	$(OBJDIR)/src/host/path_getabsolute.o \
+	$(OBJDIR)/src/host/path_getrelative.o \
+	$(OBJDIR)/src/host/path_helpers.o \
 	$(OBJDIR)/src/host/path_isabsolute.o \
 	$(OBJDIR)/src/host/premake.o \
 	$(OBJDIR)/src/host/premake_main.o \
@@ -426,6 +432,18 @@ $(OBJDIR)/src/host/os_ticks.o: ../../src/host/os_ticks.c $(GCH) genie.make
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
 $(OBJDIR)/src/host/os_uuid.o: ../../src/host/os_uuid.c $(GCH) genie.make
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
+
+$(OBJDIR)/src/host/path_getabsolute.o: ../../src/host/path_getabsolute.c $(GCH) genie.make
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
+
+$(OBJDIR)/src/host/path_getrelative.o: ../../src/host/path_getrelative.c $(GCH) genie.make
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
+
+$(OBJDIR)/src/host/path_helpers.o: ../../src/host/path_helpers.c $(GCH) genie.make
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 

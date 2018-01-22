@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef __PC080SN_H__
-#define __PC080SN_H__
+#ifndef MAME_VIDEO_PC080SN_H
+#define MAME_VIDEO_PC080SN_H
+
+#pragma once
 
 class pc080sn_device : public device_t
 {
 public:
 	pc080sn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~pc080sn_device() {}
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -69,7 +70,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
-extern const device_type PC080SN;
+DECLARE_DEVICE_TYPE(PC080SN, pc080sn_device)
 
 
 #define MCFG_PC080SN_GFX_REGION(_region) \
@@ -87,4 +88,4 @@ extern const device_type PC080SN;
 #define MCFG_PC080SN_GFXDECODE(_gfxtag) \
 	pc080sn_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
-#endif
+#endif // MAME_VIDEO_PC080SN_H

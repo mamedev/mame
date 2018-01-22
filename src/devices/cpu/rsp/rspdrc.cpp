@@ -19,19 +19,21 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "rsp.h"
+#include "rsp_dasm.h"
+
 #include "rspfe.h"
 #include "rspcp2.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
 
+#include "debugger.h"
+
+#include "rspdefs.h"
+
+
 using namespace uml;
-
-CPU_DISASSEMBLE( rsp );
-
-extern offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op);
 
 /***************************************************************************
     CONSTANTS
@@ -673,7 +675,7 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 
 			if (seqhead->delay.first() != nullptr && seqhead->physpc != seqhead->delay.first()->physpc)
 			{
-				base = m_direct->read_ptr(seqhead->delay.first()->physpc | 0x1000);
+				base = m_direct->read_ptr((seqhead->delay.first()->physpc & 0x00000fff) | 0x1000);
 				assert(base != nullptr);
 				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i1,base,dword
 				UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
@@ -704,7 +706,7 @@ void rsp_device::generate_checksum_block(drcuml_block *block, compiler_state *co
 
 				if (curdesc->delay.first() != nullptr && (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
-					base = m_direct->read_ptr(curdesc->delay.first()->physpc | 0x1000);
+					base = m_direct->read_ptr((curdesc->delay.first()->physpc & 0x00000fff) | 0x1000);
 					assert(base != nullptr);
 					UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i1,base,dword
 					UML_ADD(block, I0, I0, I1);                     // add     i0,i0,i1
@@ -815,7 +817,7 @@ void rsp_device::generate_delay_slot_and_branch(drcuml_block *block, compiler_st
 	/* set the link if needed -- before the delay slot */
 	if (linkreg != 0)
 	{
-		UML_MOV(block, R32(linkreg), (int32_t)(desc->pc + 8));                    // mov    <linkreg>,desc->pc + 8
+		UML_MOV(block, R32(linkreg), (int32_t)((desc->pc + 8) & 0x0000fff));                    // mov    <linkreg>,desc->pc + 8
 	}
 
 	/* compile the delay slot using temporary compiler state */
@@ -1285,8 +1287,9 @@ void rsp_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32
 {
 	if (m_drcuml->logging())
 	{
-		char buffer[100];
-		rsp_dasm_one(buffer, pc, op);
-		block->append_comment("%08X: %s", pc, buffer);                                  // comment
+		rsp_disassembler rspd;
+		std::ostringstream buffer;
+		rspd.dasm_one(buffer, pc, op);
+		block->append_comment("%08X: %s", pc, buffer.str());                                  // comment
 	}
 }

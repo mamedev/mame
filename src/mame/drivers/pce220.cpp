@@ -26,14 +26,17 @@
 
 ****************************************************************************/
 
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/ram.h"
-#include "sound/beep.h"
-#include "machine/pce220_ser.h"
 #include "machine/nvram.h"
+#include "machine/pce220_ser.h"
+#include "machine/ram.h"
+#include "machine/timer.h"
+#include "sound/beep.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 // Interrupt flags
 #define IRQ_FLAG_KEY        0x01
@@ -100,6 +103,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(on_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(pce220_timer_callback);
+	void pce220(machine_config &config);
 };
 
 class pcg850v_state : public pce220_state
@@ -123,6 +127,8 @@ public:
 	DECLARE_WRITE8_MEMBER( g850v_lcd_control_w );
 	DECLARE_READ8_MEMBER( g850v_lcd_data_r );
 	DECLARE_WRITE8_MEMBER( g850v_lcd_data_w );
+	void pcg850v(machine_config &config);
+	void pcg815(machine_config &config);
 };
 
 uint32_t pce220_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -923,7 +929,7 @@ PALETTE_INIT_MEMBER(pce220_state,pce220)
 }
 
 
-static MACHINE_CONFIG_START( pce220, pce220_state )
+MACHINE_CONFIG_START(pce220_state::pce220)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, 3072000 ) // CMOS-SC7852
 	MCFG_CPU_PROGRAM_MAP(pce220_mem)
@@ -959,7 +965,7 @@ static MACHINE_CONFIG_START( pce220, pce220_state )
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pcg815, pcg850v_state )
+MACHINE_CONFIG_START(pcg850v_state::pcg815)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz ) // 3.54MHz
 	MCFG_CPU_PROGRAM_MAP(pce220_mem)
@@ -995,7 +1001,7 @@ static MACHINE_CONFIG_START( pcg815, pcg850v_state )
 	MCFG_PCE220_SERIAL_ADD(PCE220SERIAL_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pcg850v, pcg850v_state )
+MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz ) // CMOS-SC7852
 	MCFG_CPU_PROGRAM_MAP(pce220_mem)
@@ -1102,7 +1108,7 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT COMPANY      FULLNAME       FLAGS */
-COMP( 1991, pce220,  0,       0,    pce220,     pce220,  driver_device,  0,   "Sharp",   "PC-E220",      MACHINE_NOT_WORKING )
-COMP( 1992, pcg815,  0,       0,    pcg815,     pcg850v, driver_device,  0,   "Sharp",   "PC-G815",      MACHINE_NOT_WORKING )
-COMP( 2001, pcg850v, 0,       0,    pcg850v,    pcg850v, driver_device,  0,   "Sharp",   "PC-G850V",     MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT  COMPANY    FULLNAME        FLAGS
+COMP( 1991, pce220,  0,      0,      pce220,   pce220,  pce220_state,  0,    "Sharp",   "PC-E220",      MACHINE_NOT_WORKING )
+COMP( 1992, pcg815,  0,      0,      pcg815,   pcg850v, pcg850v_state, 0,    "Sharp",   "PC-G815",      MACHINE_NOT_WORKING )
+COMP( 2001, pcg850v, 0,      0,      pcg850v,  pcg850v, pcg850v_state, 0,    "Sharp",   "PC-G850V",     MACHINE_NOT_WORKING )

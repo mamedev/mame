@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_MACHINE_I2CMEM_H
+#define MAME_MACHINE_I2CMEM_H
 
-#ifndef __I2CMEM_H__
-#define __I2CMEM_H__
+#pragma once
 
 
 /***************************************************************************
@@ -148,6 +148,6 @@ protected:
 
 
 // device type definition
-extern const device_type I2CMEM;
+DECLARE_DEVICE_TYPE(I2CMEM, i2cmem_device)
 
-#endif  /* __I2CMEM_H__ */
+#endif // MAME_MACHINE_I2CMEM_H

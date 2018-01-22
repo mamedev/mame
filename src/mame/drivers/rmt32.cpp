@@ -161,9 +161,11 @@ Notes: (All IC's listed for completeness)
 */
 
 #include "emu.h"
-#include "machine/ram.h"
-#include "video/sed1200.h"
 #include "cpu/mcs96/i8x9x.h"
+#include "machine/ram.h"
+#include "machine/timer.h"
+#include "video/sed1200.h"
+#include "screen.h"
 
 static INPUT_PORTS_START( mt32 )
 	PORT_START("SC0")
@@ -214,6 +216,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 
+	void mt32(machine_config &config);
 private:
 	uint8_t lcd_data_buffer[256];
 	int lcd_data_buffer_pos;
@@ -347,7 +350,7 @@ static ADDRESS_MAP_START( mt32_io, AS_IO, 16, mt32_state )
 	AM_RANGE(i8x9x_device::P0,     i8x9x_device::P0)     AM_READ(port0_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mt32, mt32_state )
+MACHINE_CONFIG_START(mt32_state::mt32)
 	MCFG_CPU_ADD( "maincpu", P8098, XTAL_12MHz )
 	MCFG_CPU_PROGRAM_MAP( mt32_map )
 	MCFG_CPU_IO_MAP( mt32_io )
@@ -434,5 +437,5 @@ ROM_START( cm32l )
 	ROM_LOAD(        "r15179917.ic19.bin",           0,   0x8000, CRC(236c87a6) SHA1(e1c03905c46e962d1deb15eeed92eb61b42bba4a) )
 ROM_END
 
-CONS( 1987, mt32,  0, 0, mt32, mt32, driver_device, 0, "Roland", "MT32",  MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-CONS( 1989, cm32l, 0, 0, mt32, mt32, driver_device, 0, "Roland", "CM32L", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+CONS( 1987, mt32,  0, 0, mt32, mt32, mt32_state, 0, "Roland", "MT32",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1989, cm32l, 0, 0, mt32, mt32, mt32_state, 0, "Roland", "CM32L", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -8,8 +8,10 @@
 
 *********************************************************************/
 
-#ifndef __KCEXP_H__
-#define __KCEXP_H__
+#ifndef MAME_BUS_KC_KC_H
+#define MAME_BUS_KC_KC_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -23,7 +25,6 @@ class device_kcexp_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_kcexp_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_kcexp_interface();
 
 	// reading and writing
@@ -34,7 +35,10 @@ public:
 	virtual void io_read(offs_t offset, uint8_t &data) { }
 	virtual void io_write(offs_t offset, uint8_t data) { }
 	virtual uint8_t* get_cart_base() { return nullptr; }
-	virtual DECLARE_WRITE_LINE_MEMBER( mei_w ) { };
+	virtual DECLARE_WRITE_LINE_MEMBER( mei_w ) { }
+
+protected:
+	device_kcexp_interface(const machine_config &mconfig, device_t &device);
 };
 
 // ======================> kcexp_slot_device
@@ -45,15 +49,11 @@ class kcexp_slot_device : public device_t,
 public:
 	// construction/destruction
 	kcexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	kcexp_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual ~kcexp_slot_device();
 
-	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<kcexp_slot_device &>(device).m_out_irq_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_nmi_callback(device_t &device, _Object object) { return downcast<kcexp_slot_device &>(device).m_out_nmi_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_halt_callback(device_t &device, _Object object) { return downcast<kcexp_slot_device &>(device).m_out_halt_cb.set_callback(object); }
-
-	// device-level overrides
-	virtual void device_start() override;
+	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<kcexp_slot_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_nmi_callback(device_t &device, Object &&cb) { return downcast<kcexp_slot_device &>(device).m_out_nmi_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_halt_callback(device_t &device, Object &&cb) { return downcast<kcexp_slot_device &>(device).m_out_halt_cb.set_callback(std::forward<Object>(cb)); }
 
 	// inline configuration
 	static void static_set_next_slot(device_t &device, const char *next_module_tag);
@@ -72,6 +72,12 @@ public:
 	devcb_write_line                m_out_nmi_cb;
 	devcb_write_line                m_out_halt_cb;
 
+protected:
+	kcexp_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+
 	device_kcexp_interface*     m_cart;
 
 	const char*                 m_next_slot_tag;
@@ -88,9 +94,6 @@ public:
 	kccart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~kccart_slot_device();
 
-	// device-level overrides
-	virtual void device_config_complete() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
@@ -105,12 +108,12 @@ public:
 	virtual const char *file_extensions() const override { return "bin"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 };
 
 // device type definition
-extern const device_type KCEXP_SLOT;
-extern const device_type KCCART_SLOT;
+DECLARE_DEVICE_TYPE(KCEXP_SLOT,  kcexp_slot_device)
+DECLARE_DEVICE_TYPE(KCCART_SLOT, kccart_slot_device)
 
 
 /***************************************************************************
@@ -150,4 +153,4 @@ extern const device_type KCCART_SLOT;
 //  MCFG_DEVICE_ADD(_tag, KCCART_SLOT, 0)
 //  MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
-#endif /* __KCEXP_H__ */
+#endif // MAME_BUS_KC_KC_H

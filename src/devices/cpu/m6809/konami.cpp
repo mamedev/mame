@@ -58,6 +58,7 @@ March 2013 NPW:
 #include "debugger.h"
 #include "konami.h"
 #include "m6809inl.h"
+#include "6x09dasm.h"
 
 
 //**************************************************************************
@@ -77,7 +78,7 @@ March 2013 NPW:
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type KONAMI = &device_creator<konami_cpu_device>;
+DEFINE_DEVICE_TYPE(KONAMI, konami_cpu_device, "konami_cpu", "KONAMI CPU")
 
 
 //-------------------------------------------------
@@ -85,8 +86,8 @@ const device_type KONAMI = &device_creator<konami_cpu_device>;
 //-------------------------------------------------
 
 konami_cpu_device::konami_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: m6809_base_device(mconfig, "KONAMI CPU", tag, owner, clock, KONAMI, 1, "konami_cpu", __FILE__),
-			m_set_lines(*this)
+	: m6809_base_device(mconfig, tag, owner, clock, KONAMI, 1)
+	, m_set_lines(*this)
 {
 }
 
@@ -105,14 +106,13 @@ void konami_cpu_device::device_start()
 
 
 //-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t konami_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *konami_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( konami );
-	return CPU_DISASSEMBLE_NAME(konami)(this, buffer, pc, oprom, opram, options);
+	return new konami_disassembler;
 }
 
 

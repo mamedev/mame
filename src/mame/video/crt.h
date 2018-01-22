@@ -8,8 +8,10 @@
 
 *************************************************************************/
 
-#ifndef __CRT_H__
-#define __CRT_H__
+#ifndef MAME_VIDEO_CRT_H
+#define MAME_VIDEO_CRT_H
+
+#pragma once
 
 
 //**************************************************************************
@@ -30,24 +32,12 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-struct crt_point
-{
-	crt_point() :
-		intensity(0),
-		next(0) {}
-
-	int intensity;      /* current intensity of the pixel */
-						/* a node is not in the list when (intensity == -1) */
-	int next;           /* index of next pixel in list */
-};
-
 // ======================> crt_device
 
 class crt_device : public device_t
 {
 public:
 	crt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~crt_device() { }
 
 	static void set_num_levels(device_t &device, int levels) { downcast<crt_device &>(device).m_num_intensity_levels = levels; }
 	static void set_offsets(device_t &device, int x_offset, int y_offset)
@@ -72,6 +62,15 @@ protected:
 	virtual void device_start() override;
 
 private:
+	struct crt_point
+	{
+		crt_point() { }
+
+		int intensity = 0;  /* current intensity of the pixel */
+							/* a node is not in the list when (intensity == -1) */
+		int next = 0;       /* index of next pixel in list */
+	};
+
 	crt_point *m_list; /* array of (crt_window_width*crt_window_height) point */
 	std::unique_ptr<int[]> m_list_head;  /* head of the list of lit pixels (index in the array) */
 						/* keep a separate list for each display line (makes the video code slightly faster) */
@@ -86,8 +85,8 @@ private:
 	int m_window_height;
 };
 
-extern const device_type CRT;
+DECLARE_DEVICE_TYPE(CRT, crt_device)
 
 
 
-#endif /* CRT_H_ */
+#endif // MAME_VIDEO_CRT_H

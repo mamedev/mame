@@ -2,58 +2,45 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        Robotron K8915
+Robotron K8915
 
-        30/08/2010 Skeleton driver
+2010-08-30
 
-        When it says DIAGNOSTIC RAZ P, press enter.
+When it says DIAGNOSTIC RAZ P, press enter.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/keyboard.h"
-
-#define KEYBOARD_TAG "keyboard"
+#include "machine/z80ctc.h"
+#include "machine/z80sio.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
+#include "screen.h"
 
 class k8915_state : public driver_device
 {
 public:
 	k8915_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_p_videoram(*this, "p_videoram")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
-	DECLARE_READ8_MEMBER( k8915_52_r );
-	DECLARE_READ8_MEMBER( k8915_53_r );
-	DECLARE_WRITE8_MEMBER( k8915_a8_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
-	required_shared_ptr<uint8_t> m_p_videoram;
-	uint8_t *m_p_chargen;
-	uint8_t m_framecnt;
-	uint8_t m_term_data;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE8_MEMBER(k8915_a8_w);
 	DECLARE_DRIVER_INIT(k8915);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void k8915(machine_config &config);
+private:
+	uint8_t m_framecnt;
+	virtual void machine_reset() override;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 };
 
-READ8_MEMBER( k8915_state::k8915_52_r )
-{
-// get data from ascii keyboard
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ8_MEMBER( k8915_state::k8915_53_r )
-{
-// keyboard status
-	return m_term_data ? 1 : 0;
-}
 
 WRITE8_MEMBER( k8915_state::k8915_a8_w )
 {
@@ -64,17 +51,17 @@ WRITE8_MEMBER( k8915_state::k8915_a8_w )
 		membank("boot")->set_entry(1); // rom at 0000
 }
 
-static ADDRESS_MAP_START(k8915_mem, AS_PROGRAM, 8, k8915_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, k8915_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(k8915_io, AS_IO, 8, k8915_state)
+static ADDRESS_MAP_START(io_map, AS_IO, 8, k8915_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x52, 0x52) AM_READ(k8915_52_r)
-	AM_RANGE(0x53, 0x53) AM_READ(k8915_53_r)
+	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x58, 0x5b) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0xa8, 0xa8) AM_WRITE(k8915_a8_w)
 ADDRESS_MAP_END
 
@@ -91,11 +78,6 @@ DRIVER_INIT_MEMBER(k8915_state,k8915)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
-}
-
-void k8915_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
 }
 
 uint32_t k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -144,16 +126,12 @@ uint32_t k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-WRITE8_MEMBER( k8915_state::kbd_put )
-{
-	m_term_data = data;
-}
 
-static MACHINE_CONFIG_START( k8915, k8915_state )
+MACHINE_CONFIG_START(k8915_state::k8915)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(k8915_mem)
-	MCFG_CPU_IO_MAP(k8915_io)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_4_9152MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -166,8 +144,21 @@ static MACHINE_CONFIG_START( k8915, k8915_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(k8915_state, kbd_put))
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_4_9152MHz / 2)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg2))
+
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4_9152MHz / 2)
+	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
+
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_4_9152MHz / 2)
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcdb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w))
 MACHINE_CONFIG_END
 
 
@@ -183,5 +174,5 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1982, k8915,  0,       0,     k8915,  k8915, k8915_state,  k8915, "Robotron",   "K8915", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY     FULLNAME  FLAGS
+COMP( 1982, k8915,  0,      0,      k8915,   k8915, k8915_state, k8915, "Robotron", "K8915",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

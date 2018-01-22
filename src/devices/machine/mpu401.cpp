@@ -38,6 +38,7 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "machine/mpu401.h"
 #include "bus/midi/midi.h"
 
@@ -69,7 +70,22 @@ static ADDRESS_MAP_START( mpu401_io_map, AS_IO, 8, mpu401_device )
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READWRITE(port2_r, port2_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_FRAGMENT( mpu401 )
+ROM_START( mpu401 )
+	ROM_REGION(0x1000, ROM_TAG, 0)
+	ROM_LOAD( "roland__6801v0b55p__15179222.bin", 0x000000, 0x001000, CRC(65d3a151) SHA1(00efbfb96aeb997b69bb16981c6751d3c784bb87) ) /* Mask MCU; Label: "Roland // 6801V0B55P // 5A1 JAPAN // 15179222"; This is the final version (1.5A) of the mpu401 firmware; version is located at offsets 0x649 (0x15) and 0x64f (0x01) */
+ROM_END
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(MPU401, mpu401_device, "mpu401", "Roland MPU-401 I/O box")
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+MACHINE_CONFIG_START(mpu401_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6801_TAG, M6801, 4000000) /* 4 MHz as per schematics */
 	MCFG_CPU_PROGRAM_MAP(mpu401_map)
 	MCFG_CPU_IO_MAP(mpu401_io_map)
@@ -80,27 +96,6 @@ MACHINE_CONFIG_FRAGMENT( mpu401 )
 
 	MCFG_MIDI_PORT_ADD(MIDIOUT_TAG, midiout_slot, "midiout")
 MACHINE_CONFIG_END
-
-ROM_START( mpu401 )
-	ROM_REGION(0x1000, ROM_TAG, 0)
-	ROM_LOAD( "roland_6801v0b55p.bin", 0x000000, 0x001000, CRC(65d3a151) SHA1(00efbfb96aeb997b69bb16981c6751d3c784bb87) )
-ROM_END
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-const device_type MPU401 = &device_creator<mpu401_device>;
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor mpu401_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( mpu401 );
-}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -120,7 +115,7 @@ const tiny_rom_entry *mpu401_device::device_rom_region() const
 //-------------------------------------------------
 
 mpu401_device::mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MPU401, "Roland MPU-401 I/O box", tag, owner, clock, "mpu401", __FILE__),
+	device_t(mconfig, MPU401, tag, owner, clock),
 	m_ourcpu(*this, M6801_TAG),
 	write_irq(*this)
 {
@@ -168,7 +163,7 @@ READ8_MEMBER(mpu401_device::regs_mode2_r)
 		case 6:
 		case 7:
 		case 0xf:
-//          printf("MPU401: read @ unk %x (PC=%x)\n", offset, space.device().safe_pc());
+//          logerror("MPU401: read @ unk %x %s\n", offset, machine().describe_context());
 			break;
 
 		default:
@@ -187,7 +182,7 @@ WRITE8_MEMBER(mpu401_device::regs_mode2_w)
 		case 6:
 		case 7:
 		case 0xf:
-//          printf("MPU401: %02x @ unk %x (PC=%x)\n", data, offset, space.device().safe_pc());
+//          logerror("MPU401: %02x @ unk %x %s\n", data, offset, machine().describe_context());
 			break;
 
 		default:
@@ -207,7 +202,7 @@ WRITE8_MEMBER(mpu401_device::port1_w)
 
 READ8_MEMBER(mpu401_device::port2_r)
 {
-//  printf("Read P2 (PC=%x)\n", space.device().safe_pc());
+//  printf("Read P2 %s\n", machine().describe_context());
 	return m_port2;
 }
 

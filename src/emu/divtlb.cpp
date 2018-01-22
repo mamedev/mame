@@ -29,7 +29,7 @@
 //  device_vtlb_interface - constructor
 //-------------------------------------------------
 
-device_vtlb_interface::device_vtlb_interface(const machine_config &mconfig, device_t &device, address_spacenum space)
+device_vtlb_interface::device_vtlb_interface(const machine_config &mconfig, device_t &device, int space)
 	: device_interface(device, "vtlb"),
 		m_space(space),
 		m_dynamic(0),
@@ -250,7 +250,7 @@ void device_vtlb_interface::vtlb_load(int entrynum, int numpages, offs_t address
 //  vtlb_dynload - load a dynamic VTLB entry
 //-------------------------------------------------
 
-void device_vtlb_interface::vtlb_dynload(uint32_t index, offs_t address, vtlb_entry value)
+void device_vtlb_interface::vtlb_dynload(u32 index, offs_t address, vtlb_entry value)
 {
 	vtlb_entry entry = m_table[index];
 

@@ -20,8 +20,6 @@
 #include "drawd3d.h"
 #include "modules/render/d3d/d3dhlsl.h"
 #include "modules/monitor/monitor_module.h"
-#undef min
-#undef max
 #include <utility>
 
 //============================================================
@@ -179,7 +177,7 @@ render_primitive_list *renderer_d3d9::get_primitives()
 	if (win == nullptr)
 		return nullptr;
 
-	GetClientRectExceptMenu(win->platform_window<HWND>(), &client, win->fullscreen());
+	GetClientRectExceptMenu(std::static_pointer_cast<win_window_info>(win)->platform_window(), &client, win->fullscreen());
 	if (rect_width(&client) > 0 && rect_height(&client) > 0)
 	{
 		win->target()->set_bounds(rect_width(&client), rect_height(&client), win->pixel_aspect());
@@ -526,7 +524,7 @@ int renderer_d3d9::initialize()
 
 	// create the device immediately for the full screen case (defer for window mode in update_window_size())
 	auto win = assert_window();
-	if (win->fullscreen() && device_create(win->main_window()->platform_window<HWND>()))
+	if (win->fullscreen() && device_create(std::static_pointer_cast<win_window_info>(win->main_window())->platform_window()))
 	{
 		return false;
 	}
@@ -747,7 +745,7 @@ void renderer_d3d9::update_presentation_parameters()
 	m_presentation.BackBufferCount = video_config.triplebuf ? 2 : 1;
 	m_presentation.MultiSampleType = D3DMULTISAMPLE_NONE;
 	m_presentation.SwapEffect = D3DSWAPEFFECT_DISCARD;
-	m_presentation.hDeviceWindow = win->platform_window<HWND>();
+	m_presentation.hDeviceWindow = std::static_pointer_cast<win_window_info>(win)->platform_window();
 	m_presentation.Windowed = !win->fullscreen() || win->win_has_menu();
 	m_presentation.EnableAutoDepthStencil = FALSE;
 	m_presentation.AutoDepthStencilFormat = D3DFMT_D16;
@@ -764,15 +762,12 @@ void renderer_d3d9::update_presentation_parameters()
 
 void renderer_d3d9::update_gamma_ramp()
 {
-	if (m_gamma_supported)
+	if (!m_gamma_supported)
 	{
 		return;
 	}
 
 	auto win = assert_window();
-
-	// create a standard ramp
-	D3DGAMMARAMP ramp;
 
 	// set the gamma if we need to
 	if (win->fullscreen())
@@ -784,14 +779,16 @@ void renderer_d3d9::update_gamma_ramp()
 		float gamma = options.full_screen_gamma();
 		if (brightness != 1.0f || contrast != 1.0f || gamma != 1.0f)
 		{
+			D3DGAMMARAMP ramp;
+
 			for (int i = 0; i < 256; i++)
 			{
 				ramp.red[i] = ramp.green[i] = ramp.blue[i] = apply_brightness_contrast_gamma(i, brightness, contrast, gamma) << 8;
 			}
+
+			m_device->SetGammaRamp(0, 0, &ramp);
 		}
 	}
-
-	m_device->SetGammaRamp(0, 0, &ramp);
 }
 
 
@@ -1214,7 +1211,7 @@ int renderer_d3d9::config_adapter_mode()
 		RECT client;
 
 		// bounds are from the window client rect
-		GetClientRectExceptMenu(win->platform_window<HWND>(), &client, win->fullscreen());
+		GetClientRectExceptMenu(std::static_pointer_cast<win_window_info>(win)->platform_window(), &client, win->fullscreen());
 		m_width = client.right - client.left;
 		m_height = client.bottom - client.top;
 
@@ -1384,7 +1381,7 @@ bool renderer_d3d9::update_window_size()
 
 	// get the current window bounds
 	RECT client;
-	GetClientRectExceptMenu(win->platform_window<HWND>(), &client, win->fullscreen());
+	GetClientRectExceptMenu(std::static_pointer_cast<win_window_info>(win)->platform_window(), &client, win->fullscreen());
 
 	// if we have a device and matching width/height, nothing to do
 	if (m_device != nullptr && rect_width(&client) == m_width && rect_height(&client) == m_height)
@@ -1402,7 +1399,7 @@ bool renderer_d3d9::update_window_size()
 	// set the new bounds and create the device again
 	m_width = rect_width(&client);
 	m_height = rect_height(&client);
-	if (device_create(win->main_window()->platform_window<HWND>()))
+	if (device_create(std::static_pointer_cast<win_window_info>(win->main_window())->platform_window()))
 		return false;
 
 	// reset the resize state to normal, and indicate we made a change
@@ -2156,7 +2153,7 @@ void texture_info::compute_size(int texwidth, int texheight)
 	m_xborderpix = 0;
 	m_yborderpix = 0;
 
- 	bool shaders_enabled = m_renderer->get_shaders()->enabled();
+	bool shaders_enabled = m_renderer->get_shaders()->enabled();
 	bool wrap_texture = (m_flags & PRIMFLAG_TEXWRAP_MASK) == PRIMFLAG_TEXWRAP_MASK;
 
 	// skip border when shaders are enabled

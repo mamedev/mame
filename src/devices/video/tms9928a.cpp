@@ -27,14 +27,14 @@
 #include "tms9928a.h"
 
 
-const device_type TMS9928A = &device_creator<tms9928a_device>;
-const device_type TMS9918  = &device_creator<tms9918_device>;
-const device_type TMS9918A = &device_creator<tms9918a_device>;
-const device_type TMS9118  = &device_creator<tms9118_device>;
-const device_type TMS9128  = &device_creator<tms9128_device>;
-const device_type TMS9929  = &device_creator<tms9929_device>;
-const device_type TMS9929A = &device_creator<tms9929a_device>;
-const device_type TMS9129  = &device_creator<tms9129_device>;
+DEFINE_DEVICE_TYPE(TMS9928A, tms9928a_device, "tms9928a", "TMS9928A VDP")
+DEFINE_DEVICE_TYPE(TMS9918,  tms9918_device,  "tms9918",  "TMS9918 VDP")
+DEFINE_DEVICE_TYPE(TMS9918A, tms9918a_device, "tms9918a", "TMS9918A VDP")
+DEFINE_DEVICE_TYPE(TMS9118,  tms9118_device,  "tms9118",  "TMS9118 VDP")
+DEFINE_DEVICE_TYPE(TMS9128,  tms9128_device,  "tms9128",  "TMS9128 VDP")
+DEFINE_DEVICE_TYPE(TMS9929,  tms9929_device,  "tms9929",  "TMS9929 VDP")
+DEFINE_DEVICE_TYPE(TMS9929A, tms9929a_device, "tms9929a", "TMS9929A VDP")
+DEFINE_DEVICE_TYPE(TMS9129,  tms9129_device,  "tms9129",  "TMS9129 VDP")
 
 // ======= Debugging =========
 
@@ -54,63 +54,68 @@ static ADDRESS_MAP_START(memmap, AS_DATA, 8, tms9928a_device)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-tms9928a_device::tms9928a_device( const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, bool is_50hz, bool is_reva, bool is_99, const char *shortname, const char *source)
-	: device_t( mconfig, type, name, tag, owner, clock, shortname, source),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_out_int_line_cb(*this),
-		m_out_gromclk_cb(*this),
-		m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(memmap))
+tms9928a_device::tms9928a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_50hz, bool is_reva, bool is_99)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
+	, m_vram_size(0)
+	, m_out_int_line_cb(*this)
+	, m_out_gromclk_cb(*this)
+	, m_50hz(is_50hz)
+	, m_reva(is_reva)
+	, m_99(is_99)
+	, m_space_config("vram", ENDIANNESS_BIG, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(memmap))
 {
-	m_50hz = is_50hz;
-	m_reva = is_reva;
-	m_99 = is_99;
 //  static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
 
 tms9928a_device::tms9928a_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
-	: device_t( mconfig, TMS9928A, "TMS9928A VDP", tag, owner, clock, "tms9928a", __FILE__),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_vram_size(0),
-		m_out_int_line_cb(*this),
-		m_out_gromclk_cb(*this),
-		m_space_config("vram",ENDIANNESS_BIG, 8, 14, 0, nullptr, *ADDRESS_MAP_NAME(memmap))
+	: tms9928a_device(mconfig, TMS9928A, tag, owner, clock, false, true, true)
 {
-	m_50hz = false;
-	m_reva = true;
-	m_99 = true;
-//  static_set_addrmap(*this, AS_DATA, ADDRESS_MAP_NAME(memmap));
 }
 
 tms9129_device::tms9129_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms9928a_device( mconfig, TMS9129, "TMS9129", tag, owner, clock, true, true, false, "tms9129", __FILE__)
-{ }
+	: tms9928a_device(mconfig, TMS9129, tag, owner, clock, true, true, false)
+{
+}
 
 tms9918_device::tms9918_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms9928a_device( mconfig, TMS9918, "TMS9918", tag, owner, clock, false, false, true, "tms9918", __FILE__)
-{ }
+	: tms9928a_device(mconfig, TMS9918, tag, owner, clock, false, false, true)
+{
+}
 
 tms9918a_device::tms9918a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms9928a_device( mconfig, TMS9918A, "TMS9918A", tag, owner, clock, false, true, true, "tms9918a", __FILE__)
-{ }
+	: tms9928a_device(mconfig, TMS9918A, tag, owner, clock, false, true, true)
+{
+}
 
 tms9118_device::tms9118_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms9928a_device( mconfig, TMS9118, "TMS9118 VDP", tag, owner, clock, false, true, false, "tms9118", __FILE__)
-{ }
+	: tms9928a_device(mconfig, TMS9118, tag, owner, clock, false, true, false)
+{
+}
 
 tms9128_device::tms9128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms9928a_device( mconfig, TMS9128, "TMS9128 VDP", tag, owner, clock, false, true, false, "tms9128", __FILE__)
-{ }
+	: tms9928a_device(mconfig, TMS9128, tag, owner, clock, false, true, false)
+{
+}
 
 tms9929_device::tms9929_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms9928a_device( mconfig, TMS9929, "TMS9929", tag, owner, clock, true, false, true, "tms9929", __FILE__)
-{ }
+	: tms9928a_device(mconfig, TMS9929, tag, owner, clock, true, false, true)
+{
+}
 
 tms9929a_device::tms9929a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms9928a_device( mconfig, TMS9929A, "TMS9929A", tag, owner, clock, true, true, true, "tms9929a", __FILE__)
-{ }
+	: tms9928a_device(mconfig, TMS9929A, tag, owner, clock, true, true, true)
+{
+}
+
+device_memory_interface::space_config_vector tms9928a_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_DATA, &m_space_config)
+	};
+}
 
 READ8_MEMBER( tms9928a_device::read )
 {
@@ -132,10 +137,10 @@ WRITE8_MEMBER( tms9928a_device::write )
 		register_write(space, 0, data);
 }
 
-READ8_MEMBER( tms9928a_device::vram_read )
+u8 tms9928a_device::vram_read()
 {
 	// prevent debugger from changing the address base
-	if (space.debugger_access()) return 0;
+	if (machine().side_effect_disabled()) return 0;
 
 	uint8_t data = m_ReadAhead;
 
@@ -146,11 +151,15 @@ READ8_MEMBER( tms9928a_device::vram_read )
 	return data;
 }
 
+READ8_MEMBER( tms9928a_device::vram_read )
+{
+	return vram_read();
+}
 
-WRITE8_MEMBER( tms9928a_device::vram_write )
+void tms9928a_device::vram_write(u8 data)
 {
 	// prevent debugger from changing the address base
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	m_vram_space->write_byte(m_Addr, data);
 	m_Addr = (m_Addr + 1) & (m_vram_size - 1);
@@ -158,11 +167,15 @@ WRITE8_MEMBER( tms9928a_device::vram_write )
 	m_latch = 0;
 }
 
+WRITE8_MEMBER( tms9928a_device::vram_write )
+{
+	vram_write(data);
+}
 
-READ8_MEMBER( tms9928a_device::register_read )
+u8 tms9928a_device::register_read()
 {
 	// prevent debugger from changing the internal state
-	if (space.debugger_access()) return 0;
+	if (machine().side_effect_disabled()) return 0;
 
 	uint8_t data = m_StatusReg;
 
@@ -173,6 +186,10 @@ READ8_MEMBER( tms9928a_device::register_read )
 	return data;
 }
 
+READ8_MEMBER( tms9928a_device::register_read )
+{
+	return register_read();
+}
 
 void tms9928a_device::check_interrupt()
 {
@@ -287,10 +304,10 @@ void tms9928a_device::change_register(uint8_t reg, uint8_t val)
 }
 
 
-WRITE8_MEMBER( tms9928a_device::register_write )
+void tms9928a_device::register_write(u8 data)
 {
 	// prevent debugger from changing the internal state
-	if (space.debugger_access()) return;
+	if (machine().side_effect_disabled()) return;
 
 	if (m_latch)
 	{
@@ -307,7 +324,7 @@ WRITE8_MEMBER( tms9928a_device::register_write )
 			if ( !(data & 0x40) )
 			{
 				/* read ahead */
-				vram_read(space, 0);
+				vram_read();
 			}
 		}
 		m_latch = 0;
@@ -320,6 +337,10 @@ WRITE8_MEMBER( tms9928a_device::register_write )
 	}
 }
 
+WRITE8_MEMBER( tms9928a_device::register_write )
+{
+	register_write(data);
+}
 
 void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
@@ -332,8 +353,8 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		return;
 	}
 
-	int raw_vpos = m_screen->vpos();
-	int vpos = raw_vpos * m_vertical_size / m_screen->height();
+	int raw_vpos = screen().vpos();
+	int vpos = raw_vpos * m_vertical_size / screen().height();
 	uint16_t BackColour = m_Regs[7] & 15;
 	uint32_t *p = &m_tmpbmp.pix32(vpos);
 
@@ -342,7 +363,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	if ( y < 0 || y >= 192 || ! (m_Regs[1] & 0x40) )
 	{
 		/* Draw backdrop colour */
-		for ( int i = 0; i < TMS9928A_TOTAL_HORZ; i++ )
+		for ( int i = 0; i < TOTAL_HORZ; i++ )
 			p[i] = m_palette[BackColour];
 
 		/* vblank is set at the last cycle of the first inactive line */
@@ -357,7 +378,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		/* Draw regular line */
 
 		/* Left border */
-		for ( int i = 0; i < TMS9928A_HORZ_DISPLAY_START; i++ )
+		for ( int i = 0; i < HORZ_DISPLAY_START; i++ )
 			p[i] = m_palette[BackColour];
 
 		/* Active display */
@@ -369,7 +390,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			{
 				uint16_t addr = m_nametbl + ( ( y & 0xF8 ) << 2 );
 
-				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 256; x+= 8, addr++ )
+				for ( int x = HORZ_DISPLAY_START; x < HORZ_DISPLAY_START + 256; x+= 8, addr++ )
 				{
 					uint8_t charcode = m_vram_space->read_byte( addr );
 					uint8_t pattern =  m_vram_space->read_byte( m_pattern + ( charcode << 3 ) + ( y & 7 ) );
@@ -391,10 +412,10 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				rgb_t bg = m_palette[BackColour];
 
 				/* Extra 6 pixels left border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
+				for ( int x = HORZ_DISPLAY_START; x < HORZ_DISPLAY_START + 6; x++ )
 					p[x] = bg;
 
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 6; x < TMS9928A_HORZ_DISPLAY_START + 246; x+= 6, addr++ )
+				for ( int x = HORZ_DISPLAY_START + 6; x < HORZ_DISPLAY_START + 246; x+= 6, addr++ )
 				{
 					uint16_t charcode =  m_vram_space->read_byte( addr );
 					uint8_t pattern =  m_vram_space->read_byte( m_pattern + ( charcode << 3 ) + ( y & 7 ) );
@@ -404,7 +425,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				}
 
 				/* Extra 10 pixels right border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 246; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
+				for ( int x = HORZ_DISPLAY_START + 246; x < HORZ_DISPLAY_START + 256; x++ )
 					p[x] = bg;
 			}
 			break;
@@ -414,7 +435,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			{
 				uint16_t addr = m_nametbl + ( ( y >> 3 ) * 32 );
 
-				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 256; x+= 8, addr++ )
+				for ( int x = HORZ_DISPLAY_START; x < HORZ_DISPLAY_START + 256; x+= 8, addr++ )
 				{
 					uint16_t charcode =  m_vram_space->read_byte( addr ) + ( ( y >> 6 ) << 8 );
 					uint8_t pattern =  m_vram_space->read_byte( m_pattern + ( ( charcode & m_patternmask ) << 3 ) + ( y & 7 ) );
@@ -436,10 +457,10 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				rgb_t bg = m_palette[BackColour];
 
 				/* Extra 6 pixels left border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
+				for ( int x = HORZ_DISPLAY_START; x < HORZ_DISPLAY_START + 6; x++ )
 					p[x] = bg;
 
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 6; x < TMS9928A_HORZ_DISPLAY_START + 246; x+= 6, addr++ )
+				for ( int x = HORZ_DISPLAY_START + 6; x < HORZ_DISPLAY_START + 246; x+= 6, addr++ )
 				{
 					uint16_t charcode = (  m_vram_space->read_byte( addr ) + ( ( y >> 6 ) << 8 ) ) & m_patternmask;
 					uint8_t pattern = m_vram_space->read_byte( m_pattern + ( charcode << 3 ) + ( y & 7 ) );
@@ -449,7 +470,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				}
 
 				/* Extra 10 pixels right border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 246; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
+				for ( int x = HORZ_DISPLAY_START + 246; x < HORZ_DISPLAY_START + 256; x++ )
 					p[x] = bg;
 			}
 			break;
@@ -459,7 +480,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			{
 				uint16_t addr = m_nametbl + ( ( y >> 3 ) * 32 );
 
-				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 256; x+= 8, addr++ )
+				for ( int x = HORZ_DISPLAY_START; x < HORZ_DISPLAY_START + 256; x+= 8, addr++ )
 				{
 					uint8_t charcode =  m_vram_space->read_byte( addr );
 					uint8_t colour =  m_vram_space->read_byte( m_pattern + ( charcode << 3 ) + ( ( y >> 2 ) & 7 ) );
@@ -479,17 +500,17 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 				rgb_t bg = m_palette[BackColour];
 
 				/* Extra 6 pixels left border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 6; x++ )
+				for ( int x = HORZ_DISPLAY_START; x < HORZ_DISPLAY_START + 6; x++ )
 					p[x] = bg;
 
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 6; x < TMS9928A_HORZ_DISPLAY_START + 246; x+= 6 )
+				for ( int x = HORZ_DISPLAY_START + 6; x < HORZ_DISPLAY_START + 246; x+= 6 )
 				{
 					p[x+0] = p[x+1] = p[x+2] = p[x+3] = fg;
 					p[x+4] = p[x+5] = bg;
 				}
 
 				/* Extra 10 pixels right border */
-				for ( int x = TMS9928A_HORZ_DISPLAY_START + 246; x < TMS9928A_HORZ_DISPLAY_START + 256; x++ )
+				for ( int x = HORZ_DISPLAY_START + 246; x < HORZ_DISPLAY_START + 256; x++ )
 					p[x] = bg;
 			}
 			break;
@@ -499,7 +520,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			{
 				uint16_t addr = m_nametbl + ( ( y >> 3 ) * 32 );
 
-				for ( int x = TMS9928A_HORZ_DISPLAY_START; x < TMS9928A_HORZ_DISPLAY_START + 256; x+= 8, addr++ )
+				for ( int x = HORZ_DISPLAY_START; x < HORZ_DISPLAY_START + 256; x+= 8, addr++ )
 				{
 					uint8_t charcode =  m_vram_space->read_byte( addr );
 					uint8_t colour =  m_vram_space->read_byte( m_pattern + ( ( ( charcode + ( ( y >> 2 ) & 7 ) + ( ( y >> 6 ) << 8 ) ) & m_patternmask ) << 3 ) );
@@ -597,7 +618,7 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 											if ( ! ( spr_drawn[ colission_index ] & 0x02 ) )
 											{
 												spr_drawn[ colission_index ] |= 0x02;
-												p[ TMS9928A_HORZ_DISPLAY_START + colission_index - 32 ] = m_palette[sprcol];
+												p[ HORZ_DISPLAY_START + colission_index - 32 ] = m_palette[sprcol];
 											}
 										}
 									}
@@ -621,12 +642,12 @@ void tms9928a_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		}
 
 		/* Right border */
-		for ( int i = TMS9928A_HORZ_DISPLAY_START + 256; i < TMS9928A_TOTAL_HORZ; i++ )
+		for ( int i = HORZ_DISPLAY_START + 256; i < TOTAL_HORZ; i++ )
 			p[i] = m_palette[BackColour];
 	}
 
 	/* Schedule next callback */
-	m_line_timer->adjust( m_screen->time_until_pos( ( raw_vpos + 1 ) % m_screen->height() , TMS9928A_HORZ_DISPLAY_START ) );
+	m_line_timer->adjust( screen().time_until_pos( ( raw_vpos + 1 ) % screen().height() , HORZ_DISPLAY_START ) );
 }
 
 
@@ -666,7 +687,7 @@ void tms9928a_device::set_palette()
 	E Gray          0.80    0.47    0.47    0.80    0.80    0.80    204 204 204
 	F White         1.00    0.47    0.47    1.00    1.00    1.00    255 255 255
 	*/
-	static const rgb_t tms9928a_palette[TMS9928A_PALETTE_SIZE] =
+	static const rgb_t tms9928a_palette[PALETTE_SIZE] =
 	{
 		rgb_t::black(),
 		rgb_t::black(),
@@ -687,7 +708,7 @@ void tms9928a_device::set_palette()
 	};
 
 	/* copy default palette into working palette */
-	for (int i = 0; i < TMS9928A_PALETTE_SIZE; i++)
+	for (int i = 0; i < PALETTE_SIZE; i++)
 	{
 		m_palette[i] = tms9928a_palette[i];
 	}
@@ -695,8 +716,8 @@ void tms9928a_device::set_palette()
 
 void tms9928a_device::device_start()
 {
-	m_top_border = m_50hz ? TMS9928A_VERT_DISPLAY_START_PAL : TMS9928A_VERT_DISPLAY_START_NTSC;
-	m_vertical_size = m_50hz ? TMS9928A_TOTAL_VERT_PAL : TMS9928A_TOTAL_VERT_NTSC;
+	m_top_border = m_50hz ? VERT_DISPLAY_START_PAL : VERT_DISPLAY_START_NTSC;
+	m_vertical_size = m_50hz ? TOTAL_VERT_PAL : TOTAL_VERT_NTSC;
 
 	m_out_int_line_cb.resolve();
 	m_out_gromclk_cb.resolve();
@@ -705,7 +726,7 @@ void tms9928a_device::device_start()
 	m_vram_space = &space(AS_DATA);
 
 	/* back bitmap */
-	m_tmpbmp.allocate(TMS9928A_TOTAL_HORZ, TMS9928A_TOTAL_VERT_PAL);
+	m_tmpbmp.allocate(TOTAL_HORZ, TOTAL_VERT_PAL);
 
 	m_line_timer = timer_alloc(TIMER_LINE);
 	m_gromclk_timer = timer_alloc(GROMCLK);
@@ -759,7 +780,7 @@ void tms9928a_device::device_reset()
 	m_latch = 0;
 	m_mode = 0;
 
-	m_line_timer->adjust( m_screen->time_until_pos( 0, TMS9928A_HORZ_DISPLAY_START ) );
+	m_line_timer->adjust( screen().time_until_pos( 0, HORZ_DISPLAY_START ) );
 
 	// TODO: Check clock freq settings in all drivers
 	if (!m_out_gromclk_cb.isnull() && m_99) m_gromclk_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()/12));

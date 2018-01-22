@@ -22,9 +22,15 @@
 #ifndef SOL_VERSION_HPP
 #define SOL_VERSION_HPP
 
+#ifdef SOL_USING_CXX_LUA
+#include <lua.h>
+#include <lualib.h>
+#include <lauxlib.h>
+#else
 #include <lua.hpp>
+#endif // C++-compiler Lua
 
-#if defined(_WIN32) || defined(_MSC_VER)  || defined(__MINGW32__)
+#if defined(_WIN32) || defined(_MSC_VER)
 #ifndef SOL_CODECVT_SUPPORT
 #define SOL_CODECVT_SUPPORT 1
 #endif // sol codecvt support
@@ -33,7 +39,7 @@
 #ifndef SOL_CODECVT_SUPPORT
 #define SOL_CODECVT_SUPPORT 1
 #endif // codecvt support
-#endif // g++ 5.x.x
+#endif // g++ 5.x.x (MinGW too)
 #else
 // Clang sucks and doesn't really utilize codecvt support,
 // not without checking the library versions explicitly (and we're not gonna do that, so fuck you)

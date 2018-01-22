@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /**********************************************************************************************************
 
@@ -62,10 +62,10 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
         When you continue, only the balls aren't reset, while score, time and level (GASP !) are.
         If you want to continue in a 2 players game, BOTH players will have to continue, which means that
         you must have at least 2 credits ("REPLAY") and that you can't continue player 2 without player 1.
-      * If you manage to get a score, use BUTTON1 to cycle through avaiable symbols (letters A-Z and '.'),
+      * If you manage to get a score, use BUTTON1 to cycle through available symbols (letters A-Z and '.'),
         and pull the plunger to at least 63% (the code expects a value >= 0xa0) to go to next initial.
         Be aware that again there is a timer to do so, but that again the timer is not displayed.
-  - Usefull addresses :
+  - Useful addresses :
       * 0xe001.b : level (0x00-0x04 : 0x01 = level 1 - 0x02 = level 2 - 0x00 = level 3 - 0x3 = bonus - 0x04 = level 4)
       * 0xe00f.b : player (0x00 = P1 - 0x01 = P2)
       * 0xe016.w : P1 balls (MSB first)
@@ -81,9 +81,10 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
 
 #include "emu.h"
 #include "cpu/tms9900/tms9995.h"
-#include "video/tms9928a.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
+#include "video/tms9928a.h"
+#include "speaker.h"
 
 #define USE_MSM 0
 #define NUM_PLUNGER_REPEATS    50
@@ -112,6 +113,7 @@ public:
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(pachifev_vblank_irq);
 	required_device<cpu_device> m_maincpu;
+	void pachifev(machine_config &config);
 };
 
 WRITE8_MEMBER(pachifev_state::controls_w)
@@ -282,9 +284,11 @@ WRITE_LINE_MEMBER(pachifev_state::pf_adpcm_int)
 
 void pachifev_state::machine_reset()
 {
+	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
 	// Pulling down the line on RESET configures the CPU to insert one wait
 	// state on external memory accesses
-	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(CLEAR_LINE);
+	cpu->ready_line(CLEAR_LINE);
+	cpu->reset_line(ASSERT_LINE);
 
 	m_power=0;
 	m_max_power=0;
@@ -338,7 +342,7 @@ void pachifev_state::machine_start()
 	save_item(NAME(m_cnt));
 }
 
-static MACHINE_CONFIG_START( pachifev, pachifev_state )
+MACHINE_CONFIG_START(pachifev_state::pachifev)
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_12MHz, pachifev_map, pachifev_cru)
@@ -379,4 +383,4 @@ ROM_START( pachifev )
 
 ROM_END
 
-GAME( 1983, pachifev,  0,       pachifev,  pachifev, driver_device,  0, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )
+GAME( 1983, pachifev,  0,       pachifev,  pachifev, pachifev_state,  0, ROT270, "Sanki Denshi Kogyo", "Pachifever", MACHINE_IMPERFECT_SOUND )

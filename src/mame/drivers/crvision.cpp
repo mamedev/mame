@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol, Curt Coder
 /*
-    This 1980s computer was manufactured by Vtech of Hong Kong.
+    This 1980s computer was manufactured by VTech of Hong Kong.
     known as: CreatiVision, Dick Smith Wizzard, Funvision, Rameses, VZ 2000 and possibly others.
 
     There is also a CreatiVision Mk 2, possibly also known as the Laser 500. This was a hardware variant,
@@ -127,8 +127,12 @@ CN1     - main board connector (17x2 pin header)
 
 */
 
+#include "emu.h"
 #include "includes/crvision.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 /***************************************************************************
     MEMORY MAPS
@@ -727,10 +731,10 @@ static SLOT_INTERFACE_START(crvision_cart)
 SLOT_INTERFACE_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( creativision, crvision_state )
+    MACHINE_CONFIG_START( creativision )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( creativision, crvision_state )
+MACHINE_CONFIG_START(crvision_state::creativision)
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(crvision_map)
@@ -780,7 +784,7 @@ MACHINE_CONFIG_END
     MACHINE_CONFIG_DERIVED( ntsc, creativision )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_DERIVED( ntsc, creativision )
+MACHINE_CONFIG_DERIVED(crvision_state::ntsc, creativision)
 	// video hardware
 	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9918, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -793,7 +797,7 @@ MACHINE_CONFIG_END
     MACHINE_CONFIG_DERIVED( pal, creativision )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_DERIVED_CLASS( pal, creativision, crvision_pal_state )
+MACHINE_CONFIG_DERIVED(crvision_pal_state::pal, creativision)
 	// video hardware
 	MCFG_DEVICE_ADD( TMS9929_TAG, TMS9929, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -803,10 +807,10 @@ static MACHINE_CONFIG_DERIVED_CLASS( pal, creativision, crvision_pal_state )
 MACHINE_CONFIG_END
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( lasr2001, laser2001_state )
+    MACHINE_CONFIG_START( lasr2001 )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( lasr2001, laser2001_state )
+MACHINE_CONFIG_START(laser2001_state::lasr2001)
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_17_73447MHz/9)
 	MCFG_CPU_PROGRAM_MAP(lasr2001_map)
@@ -856,6 +860,7 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list","crvision")
+	MCFG_SOFTWARE_LIST_ADD("cart_list2","laser2001_cart")
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -878,27 +883,29 @@ ROM_END
 #define rom_rameses rom_fnvision
 #define rom_vz2000 rom_fnvision
 
+ROM_START( lasr2001 )
+	ROM_REGION( 0x10000, M6502_TAG, 0 )
+	ROM_LOAD( "laser2001.rom", 0x0000, 0x4000, CRC(4dc35c39) SHA1(c12e098c14ac0724869053df2b63277a3e413802) )
+ROM_END
+
 ROM_START( manager )
 	ROM_REGION( 0x10000, M6502_TAG, 0 )
 	ROM_LOAD( "01", 0x0000, 0x2000, CRC(702f4cf5) SHA1(cd14ee74e787d24b76c166de484dae24206e219b) )
 	ROM_LOAD( "23", 0x2000, 0x2000, CRC(46489d88) SHA1(467f5bcd62d0b4117c443e13373df8f3c45df7b2) )
-
-	ROM_REGION( 0x1000, "disk", 0 )
-	ROM_LOAD( "floppy interface cartridge", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 /***************************************************************************
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                   FULLNAME */
-CONS( 1982, crvision,   0,          0,      pal,        crvision, driver_device,    0,      "Video Technology",         "CreatiVision", 0 )
-CONS( 1982, fnvision,   crvision,   0,      pal,        crvision, driver_device,    0,      "Video Technology",         "FunVision", 0 )
-CONS( 1982, crvisioj,   crvision,   0,      ntsc,       crvision, driver_device,    0,      "Cheryco",                  "CreatiVision (Japan)", 0 )
-CONS( 1982, wizzard,    crvision,   0,      pal,        crvision, driver_device,    0,      "Dick Smith Electronics",   "Wizzard (Oceania)", 0 )
-CONS( 1982, rameses,    crvision,   0,      pal,        crvision, driver_device,    0,      "Hanimex",                  "Rameses (Oceania)", 0 )
-CONS( 1983, vz2000,     crvision,   0,      pal,        crvision, driver_device,    0,      "Dick Smith Electronics",   "VZ 2000 (Oceania)", 0 )
-CONS( 1983, crvisio2,   crvision,   0,      pal,        crvision, driver_device,    0,      "Video Technology",         "CreatiVision MK-II (Europe)", 0 )
-//COMP( 1983, lasr2001,   0,          0,      lasr2001,   lasr2001, driver_device,   0,      "Video Technology",         "Laser 2001", MACHINE_NOT_WORKING )
-//COMP( 1983, vz2001,     lasr2001,   0,      lasr2001,   lasr2001, driver_device,   0,      "Dick Smith Electronics",   "VZ 2001 (Oceania)", MACHINE_NOT_WORKING )
-COMP( 1983, manager,    0,          0,      lasr2001,   manager, driver_device, 0,      "Salora",                   "Manager (Finland)", 0 )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE   INPUT     STATE               INIT  COMPANY                   FULLNAME                       FLAGS
+CONS( 1982, crvision,   0,          0,      pal,      crvision, crvision_pal_state, 0,    "Video Technology",       "CreatiVision",                0 )
+CONS( 1982, fnvision,   crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Video Technology",       "FunVision",                   0 )
+CONS( 1982, crvisioj,   crvision,   0,      ntsc,     crvision, crvision_state,     0,    "Cheryco",                "CreatiVision (Japan)",        0 )
+CONS( 1982, wizzard,    crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Dick Smith Electronics", "Wizzard (Oceania)",           0 )
+CONS( 1982, rameses,    crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Hanimex",                "Rameses (Oceania)",           0 )
+CONS( 1983, vz2000,     crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Dick Smith Electronics", "VZ 2000 (Oceania)",           0 )
+CONS( 1983, crvisio2,   crvision,   0,      pal,      crvision, crvision_pal_state, 0,    "Video Technology",       "CreatiVision MK-II (Europe)", 0 )
+COMP( 1983, lasr2001,   0,          0,      lasr2001, manager,  laser2001_state,    0,    "Video Technology",       "Laser 2001",                  0 )
+//COMP( 1983, vz2001,     lasr2001,   0,      lasr2001, lasr2001, laser2001_state,    0,    "Dick Smith Electronics", "VZ 2001 (Oceania)",           0 )
+COMP( 1983, manager,    0,          0,      lasr2001, manager, laser2001_state,     0,     "Salora",                "Manager (Finland)",           0 )

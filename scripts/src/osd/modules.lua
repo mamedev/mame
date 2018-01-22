@@ -80,6 +80,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/midi/none.cpp",
 		MAME_DIR .. "src/osd/modules/sound/js_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/direct_sound.cpp",
+		MAME_DIR .. "src/osd/modules/sound/pa_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/coreaudio_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/xaudio2_sound.cpp",
@@ -101,6 +102,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_xinput.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_xinput.h",
 		MAME_DIR .. "src/osd/modules/input/input_winhybrid.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_uwp.cpp",
 		MAME_DIR .. "src/osd/modules/output/output_module.h",
 		MAME_DIR .. "src/osd/modules/output/none.cpp",
 		MAME_DIR .. "src/osd/modules/output/console.cpp",
@@ -121,6 +123,7 @@ function osdmodulesbuild()
 		includedirs {
 			MAME_DIR .. "3rdparty/winpcap/Include",
 			MAME_DIR .. "3rdparty/compat/mingw",
+			MAME_DIR .. "3rdparty/portaudio/include",
 		}
 
 		includedirs {
@@ -204,6 +207,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/bgfx/uniformreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/valueuniform.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/valueuniformreader.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/view.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/writereader.cpp",
 	}
 	includedirs {
@@ -213,6 +217,16 @@ function osdmodulesbuild()
 		MAME_DIR .. "3rdparty/bx/include",
 		MAME_DIR .. "3rdparty/rapidjson/include",
 	}
+
+	if _OPTIONS["NO_USE_PORTAUDIO"]=="1" then
+		defines {
+			"NO_USE_PORTAUDIO",
+		}
+	else
+		includedirs {
+			ext_includedir("portaudio"),
+		}
+	end
 
 	if _OPTIONS["NO_USE_MIDI"]=="1" then
 		defines {
@@ -317,15 +331,15 @@ function qtdebuggerbuild()
 
 
 		custombuildtask {
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.h",             GEN_DIR .. "osd/modules/debugger/qt/debuggerview.moc.cpp", { },         { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.h",                 GEN_DIR .. "osd/modules/debugger/qt/windowqt.moc.cpp", { },                 { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/logwindow.h",                GEN_DIR .. "osd/modules/debugger/qt/logwindow.moc.cpp", { },                { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/dasmwindow.h",               GEN_DIR .. "osd/modules/debugger/qt/dasmwindow.moc.cpp", { },           { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/mainwindow.h",               GEN_DIR .. "osd/modules/debugger/qt/mainwindow.moc.cpp", { },           { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/memorywindow.h",             GEN_DIR .. "osd/modules/debugger/qt/memorywindow.moc.cpp", { },             { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.h",        GEN_DIR .. "osd/modules/debugger/qt/breakpointswindow.moc.cpp", { },        { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.h",            GEN_DIR .. "osd/modules/debugger/qt/deviceswindow.moc.cpp", { },            { MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
-			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.h",  GEN_DIR .. "osd/modules/debugger/qt/deviceinformationwindow.moc.cpp", { },{ MOC .. "$(MOCINCPATH) $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/debuggerview.h",             GEN_DIR .. "osd/modules/debugger/qt/debuggerview.moc.cpp", { },         { MOC .. "$(MOCINCPATH) -b emu.h $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/windowqt.h",                 GEN_DIR .. "osd/modules/debugger/qt/windowqt.moc.cpp", { },                 { MOC .. "$(MOCINCPATH) -b emu.h $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/logwindow.h",                GEN_DIR .. "osd/modules/debugger/qt/logwindow.moc.cpp", { },                { MOC .. "$(MOCINCPATH) -b emu.h $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/dasmwindow.h",               GEN_DIR .. "osd/modules/debugger/qt/dasmwindow.moc.cpp", { },           { MOC .. "$(MOCINCPATH) -b emu.h $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/mainwindow.h",               GEN_DIR .. "osd/modules/debugger/qt/mainwindow.moc.cpp", { },           { MOC .. "$(MOCINCPATH) -b emu.h $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/memorywindow.h",             GEN_DIR .. "osd/modules/debugger/qt/memorywindow.moc.cpp", { },             { MOC .. "$(MOCINCPATH) -b emu.h $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/breakpointswindow.h",        GEN_DIR .. "osd/modules/debugger/qt/breakpointswindow.moc.cpp", { },        { MOC .. "$(MOCINCPATH) -b emu.h $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceswindow.h",            GEN_DIR .. "osd/modules/debugger/qt/deviceswindow.moc.cpp", { },            { MOC .. "$(MOCINCPATH) -b emu.h $(<) -o $(@)" }},
+			{ MAME_DIR .. "src/osd/modules/debugger/qt/deviceinformationwindow.h",  GEN_DIR .. "osd/modules/debugger/qt/deviceinformationwindow.moc.cpp", { },{ MOC .. "$(MOCINCPATH) -b emu.h $(<) -o $(@)" }},
 
 		}
 
@@ -397,7 +411,6 @@ function osdmodulestargetconf()
 				"-L$(shell qmake -query QT_INSTALL_LIBS)",
 			}
 			links {
-				"qtmain",
 				"Qt5Core.dll",
 				"Qt5Gui.dll",
 				"Qt5Widgets.dll",
@@ -489,6 +502,23 @@ if not _OPTIONS["NO_USE_MIDI"] then
 		_OPTIONS["NO_USE_MIDI"] = "1"
 	else
 		_OPTIONS["NO_USE_MIDI"] = "0"
+	end
+end
+
+newoption {
+	trigger = "NO_USE_PORTAUDIO",
+	description = "Disable PortAudio interface",
+	allowed = {
+		{ "0",  "Enable PortAudio"  },
+		{ "1",  "Disable PortAudio" },
+	},
+}
+
+if not _OPTIONS["NO_USE_PORTAUDIO"] then
+	if _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="macosx" then
+		_OPTIONS["NO_USE_PORTAUDIO"] = "0"
+	else
+		_OPTIONS["NO_USE_PORTAUDIO"] = "1"
 	end
 end
 

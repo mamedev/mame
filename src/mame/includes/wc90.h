@@ -64,7 +64,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(bankswitch1_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(bgvideoram_w);
 	DECLARE_WRITE8_MEMBER(fgvideoram_w);
 	DECLARE_WRITE8_MEMBER(txvideoram_w);
@@ -80,4 +79,7 @@ public:
 	DECLARE_VIDEO_START(wc90t);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void wc90t(machine_config &config);
+	void wc90(machine_config &config);
+	void pac90(machine_config &config);
 };

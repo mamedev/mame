@@ -4,6 +4,7 @@
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "video/fuukifg.h"
+#include "screen.h"
 
 class fuuki16_state : public driver_device
 {
@@ -56,7 +57,7 @@ public:
 	emu_timer   *m_raster_interrupt_timer;
 
 	DECLARE_WRITE16_MEMBER(vregs_w);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(sound_rombank_w);
 	DECLARE_WRITE16_MEMBER(vram_0_w);
 	DECLARE_WRITE16_MEMBER(vram_1_w);
@@ -78,6 +79,7 @@ public:
 	inline void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _N_);
 	void draw_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
 
+	void fuuki16(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

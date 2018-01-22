@@ -38,13 +38,16 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "machine/6821pia.h"
-#include "imagedev/cassette.h"
-#include "sound/wave.h"
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "cpu/m6809/m6809.h"
+#include "imagedev/cassette.h"
+#include "machine/6821pia.h"
+#include "machine/timer.h"
+#include "sound/wave.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 class pegasus_state : public driver_device
@@ -62,6 +65,8 @@ public:
 		, m_exp_0c(*this, "exp0c")
 		, m_exp_0d(*this, "exp0d")
 		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		, m_p_pcgram(*this, "pcg")
 		, m_io_keyboard(*this, "KEY.%u", 0)
 	{ }
 
@@ -84,15 +89,15 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp02_load) { return load_cart(image, m_exp_02, "2000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0c_load) { return load_cart(image, m_exp_0c, "c000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0d_load) { return load_cart(image, m_exp_0d, "d000"); }
+
+	void pegasusm(machine_config &config);
+	void pegasus(machine_config &config);
 private:
 	uint8_t m_kbd_row;
 	bool m_kbd_irq;
-	uint8_t *m_p_pcgram;
-	const uint8_t *m_p_chargen;
 	uint8_t m_control_bits;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	virtual void video_start() override;
 	void pegasus_decrypt_rom(uint8_t *ROM);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -104,6 +109,8 @@ private:
 	required_device<generic_slot_device> m_exp_0c;
 	required_device<generic_slot_device> m_exp_0d;
 	required_shared_ptr<uint8_t> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_p_pcgram;
 	required_ioport_array<8> m_io_keyboard;
 };
 
@@ -286,11 +293,6 @@ static INPUT_PORTS_START( pegasus )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("{ }") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('{') PORT_CHAR('}')
 INPUT_PORTS_END
 
-void pegasus_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
-
 static const uint8_t mcm6571a_shift[] =
 {
 	0,1,1,0,0,0,1,0,0,0,0,1,0,0,0,0,
@@ -405,8 +407,8 @@ void pegasus_state::pegasus_decrypt_rom(uint8_t *ROM)
 		for (int i = 0; i < 0x1000; i++)
 		{
 			b = ROM[i];
-			j = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7);
-			b = BITSWAP8(b, 3, 2, 1, 0, 7, 6, 5, 4);
+			j = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7);
+			b = bitswap<8>(b, 3, 2, 1, 0, 7, 6, 5, 4);
 			temp_copy[j & 0xfff] = b;
 		}
 		memcpy(ROM, &temp_copy[0], 0x1000);
@@ -424,7 +426,7 @@ image_init_result pegasus_state::load_cart(device_image_interface &image, generi
 		return image_init_result::FAIL;
 	}
 
-	if (image.software_entry() != nullptr && size == 0)
+	if (image.loaded_through_softlist() && size == 0)
 	{
 		// we might be loading a cart compatible with all sockets!
 		// so try to get region "rom"
@@ -452,8 +454,6 @@ image_init_result pegasus_state::load_cart(device_image_interface &image, generi
 
 void pegasus_state::machine_start()
 {
-	m_p_pcgram = memregion("pcg")->base();
-
 	if (m_exp_00->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_exp_00));
 	if (m_exp_01->exists())
@@ -480,9 +480,9 @@ DRIVER_INIT_MEMBER(pegasus_state, pegasus)
 	pegasus_decrypt_rom(base);
 }
 
-static MACHINE_CONFIG_START( pegasus, pegasus_state )
+MACHINE_CONFIG_START(pegasus_state::pegasus)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_4MHz)  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
 	MCFG_CPU_PROGRAM_MAP(pegasus_mem)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pegasus_firq", pegasus_state, pegasus_firq, attotime::from_hz(400))
@@ -541,7 +541,7 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "pegasus_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pegasusm, pegasus )
+MACHINE_CONFIG_DERIVED(pegasus_state::pegasusm, pegasus)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(pegasusm_mem)
 MACHINE_CONFIG_END
@@ -577,6 +577,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1981, pegasus,  0,       0,    pegasus,   pegasus, pegasus_state, pegasus, "Technosys",   "Aamber Pegasus", MACHINE_NO_SOUND_HW )
-COMP( 1981, pegasusm, pegasus, 0,    pegasusm,  pegasus, pegasus_state, pegasus, "Technosys",   "Aamber Pegasus with RAM expansion unit", MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT    STATE          INIT     COMPANY       FULLNAME                                  FLAGS
+COMP( 1981, pegasus,  0,       0,      pegasus,   pegasus, pegasus_state, pegasus, "Technosys",  "Aamber Pegasus",                         MACHINE_NO_SOUND_HW )
+COMP( 1981, pegasusm, pegasus, 0,      pegasusm,  pegasus, pegasus_state, pegasus, "Technosys",  "Aamber Pegasus with RAM expansion unit", MACHINE_NO_SOUND_HW )

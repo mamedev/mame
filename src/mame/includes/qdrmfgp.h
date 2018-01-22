@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Hau
+
 #include "machine/ataintf.h"
+#include "machine/timer.h"
 #include "sound/k054539.h"
 #include "machine/k053252.h"
 #include "video/konami_helper.h"
@@ -39,6 +41,7 @@ public:
 	uint16_t m_control;
 	int32_t m_gp2_irq_control;
 	int32_t m_pal;
+	emu_timer *m_gp2_timer;
 
 	DECLARE_WRITE16_MEMBER(gp_control_w);
 	DECLARE_WRITE16_MEMBER(gp2_control_w);
@@ -68,4 +71,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(k054539_irq1_gen);
 	K056832_CB_MEMBER(qdrmfgp_tile_callback);
 	K056832_CB_MEMBER(qdrmfgp2_tile_callback);
+	void qdrmfgp(machine_config &config);
+	void qdrmfgp2(machine_config &config);
 };

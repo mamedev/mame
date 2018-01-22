@@ -6,7 +6,6 @@
 #define __TDV2324__
 
 
-#include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/m6800/m6800.h"
 #include "imagedev/harddriv.h"
@@ -81,6 +80,7 @@ public:
 
 	// video state
 	required_shared_ptr<uint8_t> m_video_ram;
+	void tdv2324(machine_config &config);
 };
 
 

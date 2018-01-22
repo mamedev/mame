@@ -187,28 +187,16 @@ WRITE16_MEMBER(equites_state::equites_scrollreg_w)
 		m_bg_tilemap->set_scrollx(0, data >> 8);
 }
 
-WRITE16_MEMBER(equites_state::splndrbt_selchar_w)
+WRITE_LINE_MEMBER(equites_state::splndrbt_selchar_w)
 {
-	// data bit is A16 (offset)
-	data = (offset == 0) ? 0 : 1;
-
 	// select active char map
-	if (m_fg_char_bank != data)
-	{
-		m_fg_char_bank = data;
-		m_fg_tilemap->mark_all_dirty();
-	}
+	m_fg_char_bank = (state == 0) ? 0 : 1;
+	m_fg_tilemap->mark_all_dirty();
 }
 
-WRITE16_MEMBER(equites_state::equites_flipw_w)
+WRITE_LINE_MEMBER(equites_state::flip_screen_w)
 {
-	// data bit is A16 (offset)
-	flip_screen_set(offset != 0);
-}
-
-WRITE8_MEMBER(equites_state::equites_flipb_w)
-{
-	flip_screen_set(data);
+	flip_screen_set(state);
 }
 
 WRITE16_MEMBER(equites_state::splndrbt_bg_scrollx_w)

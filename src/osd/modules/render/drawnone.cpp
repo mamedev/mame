@@ -7,7 +7,6 @@
 //============================================================
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 // MAME headers
@@ -27,9 +26,9 @@ render_primitive_list *renderer_none::get_primitives()
 
 	RECT client;
 #if defined(OSD_WINDOWS)
-	GetClientRect(win->platform_window<HWND>(), &client);
+	GetClientRect(std::static_pointer_cast<win_window_info>(win)->platform_window(), &client);
 #elif defined(OSD_UWP)
-	auto bounds = win->m_window->Bounds;
+	auto bounds = std::static_pointer_cast<uwp_window_info>(win)->platform_window()->Bounds;
 	client.left = bounds.Left;
 	client.right = bounds.Right;
 	client.top = bounds.Top;

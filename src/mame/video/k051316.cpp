@@ -41,9 +41,10 @@ control registers
 
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
 
-const device_type K051316 = &device_creator<k051316_device>;
+
+DEFINE_DEVICE_TYPE(K051316, k051316_device, "k051316", "K051316 PSAC")
 
 
 const gfx_layout k051316_device::charlayout4 =
@@ -104,7 +105,7 @@ GFXDECODE_END
 
 
 k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K051316, "K051316 PSAC", tag, owner, clock, "k051316", __FILE__),
+	: device_t(mconfig, K051316, tag, owner, clock),
 		device_gfx_interface(mconfig, *this, gfxinfo),
 		m_zoom_rom(*this, DEVICE_SELF),
 		m_dx(0),
@@ -150,6 +151,9 @@ void k051316_device::set_bpp(device_t &device, int bpp)
 
 void k051316_device::device_start()
 {
+	if (!palette().device().started())
+		throw device_missing_dependencies();
+
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
@@ -209,13 +213,13 @@ READ8_MEMBER( k051316_device::rom_r )
 		addr /= m_pixels_per_byte;
 		addr &= m_zoom_rom.mask();
 
-		//  popmessage("%s: offset %04x addr %04x", space.machine().describe_context(), offset, addr);
+		//  popmessage("%s: offset %04x addr %04x", machine().describe_context(), offset, addr);
 
 		return m_zoom_rom[addr];
 	}
 	else
 	{
-		//logerror("%s: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n", space.machine().describe_context(), offset);
+		//logerror("%s: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n", machine().describe_context(), offset);
 		return 0;
 	}
 }
@@ -223,7 +227,7 @@ READ8_MEMBER( k051316_device::rom_r )
 WRITE8_MEMBER( k051316_device::ctrl_w )
 {
 	m_ctrlram[offset] = data;
-	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", space.machine().describe_context(), data, offset);
+	//if (offset >= 0x0c) logerror("%s: write %02x to 051316 reg %x\n", machine().describe_context(), data, offset);
 }
 
 // some games (ajax, rollerg, ultraman, etc.) have external logic that can enable or disable wraparound dynamically

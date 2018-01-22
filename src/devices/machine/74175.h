@@ -2,52 +2,51 @@
 // copyright-holders:Ryan Holtz
 /**********************************************************************
 
-	5/74174/5 Hex/Quad D Flip-Flops with Clear
+    5/74174/5 Hex/Quad D Flip-Flops with Clear
 
 ***********************************************************************
 
-	Connection Diagram:
-	          ___ ___           	          ___ ___
-	CLEAR  1 |*  u   | 16  Vcc		CLEAR  1 |*  u   | 16  Vcc
-	   Q1  2 |       | 15  Q6		   Q1  2 |       | 15  Q4
-	   D1  3 |       | 14  D6		  /Q1  3 |       | 14  /Q4
-	   D2  4 |       | 13  D5		   D1  4 |       | 13  D4
-	   Q2  5 |       | 12  Q5		   D2  5 |       | 12  D3
-	   D3  6 |       | 11  D4		  /Q2  6 |       | 11  /Q3
-	   Q3  7 |       | 10  Q4		   Q2  7 |       | 10  Q3
-	  GND  8 |_______| 9   CLOCK	  GND  8 |_______| 9   CLOCK
+    Connection Diagram:
+              ___ ___                         ___ ___
+    CLEAR  1 |*  u   | 16  Vcc      CLEAR  1 |*  u   | 16  Vcc
+       Q1  2 |       | 15  Q6          Q1  2 |       | 15  Q4
+       D1  3 |       | 14  D6         /Q1  3 |       | 14  /Q4
+       D2  4 |       | 13  D5          D1  4 |       | 13  D4
+       Q2  5 |       | 12  Q5          D2  5 |       | 12  D3
+       D3  6 |       | 11  D4         /Q2  6 |       | 11  /Q3
+       Q3  7 |       | 10  Q4          Q2  7 |       | 10  Q3
+      GND  8 |_______| 9   CLOCK      GND  8 |_______| 9   CLOCK
 
-			  5/74174                         5/74175
+              5/74174                         5/74175
 
 ***********************************************************************
 
-	Function Table:
-	 _________________________________
-	|       Inputs        |  Outputs* |
-	|---------------------|-----------|
-	| Clear | Clock |  D  |  Q  | /Q  |
-	|-------|-------|-----|-----|-----|
-	|   L   |   X   |  X  |  L  |  H  |
-	|   H   |   ^   |  H  |  H  |  L  |
-	|   H   |   ^   |  L  |  L  |  H  |
-	|   H   |   L   |  X  |  Q0 |  Q0 |
-	|_______|_______|_____|_____|_____|
+    Function Table:
+     _________________________________
+    |       Inputs        |  Outputs* |
+    |---------------------|-----------|
+    | Clear | Clock |  D  |  Q  | /Q  |
+    |-------|-------|-----|-----|-----|
+    |   L   |   X   |  X  |  L  |  H  |
+    |   H   |   ^   |  H  |  H  |  L  |
+    |   H   |   ^   |  L  |  L  |  H  |
+    |   H   |   L   |  X  |  Q0 |  Q0 |
+    |_______|_______|_____|_____|_____|
 
-	H = High Level (steady state)
-	L = Low Level (steady state)
-	X = Don't Care
-	^ = Transition from low to high level
-	Q0 = The level of Q before the indicated steady-state input conditions were established.
-	* = 175 only
+    H = High Level (steady state)
+    L = Low Level (steady state)
+    X = Don't Care
+    ^ = Transition from low to high level
+    Q0 = The level of Q before the indicated steady-state input conditions were established.
+    * = 175 only
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_74175_H
+#define MAME_MACHINE_74175_H
+
 #pragma once
 
-#ifndef TTL74175_H
-#define TTL74175_H
-
-#include "emu.h"
 
 #define MCFG_74174_Q1_CB(_devcb) \
 	devcb = &ttl741745_device::set_q1_cb(*device, DEVCB_##_devcb);
@@ -100,12 +99,10 @@
 class ttl741745_device : public device_t
 {
 public:
-	ttl741745_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
-
-	template<class _Object> static devcb_base &set_q1_cb(device_t &device, _Object object) { return downcast<ttl741745_device &>(device).m_q1_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_q2_cb(device_t &device, _Object object) { return downcast<ttl741745_device &>(device).m_q2_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_q3_cb(device_t &device, _Object object) { return downcast<ttl741745_device &>(device).m_q3_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_q4_cb(device_t &device, _Object object) { return downcast<ttl741745_device &>(device).m_q4_func.set_callback(object); }
+	template <class Object> static devcb_base &set_q1_cb(device_t &device, Object &&cb) { return downcast<ttl741745_device &>(device).m_q1_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_q2_cb(device_t &device, Object &&cb) { return downcast<ttl741745_device &>(device).m_q2_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_q3_cb(device_t &device, Object &&cb) { return downcast<ttl741745_device &>(device).m_q3_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_q4_cb(device_t &device, Object &&cb) { return downcast<ttl741745_device &>(device).m_q4_func.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( clear_w );
 	DECLARE_WRITE_LINE_MEMBER( d1_w );
@@ -117,6 +114,8 @@ public:
 	uint8_t q_w();
 
 protected:
+	ttl741745_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -147,8 +146,8 @@ class ttl74174_device : public ttl741745_device
 public:
 	ttl74174_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_q5_cb(device_t &device, _Object object) { return downcast<ttl74174_device &>(device).m_q5_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_q6_cb(device_t &device, _Object object) { return downcast<ttl74174_device &>(device).m_q6_func.set_callback(object); }
+	template <class Object> static devcb_base &set_q5_cb(device_t &device, Object &&cb) { return downcast<ttl74174_device &>(device).m_q5_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_q6_cb(device_t &device, Object &&cb) { return downcast<ttl74174_device &>(device).m_q6_func.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE_LINE_MEMBER( d5_w );
 	DECLARE_WRITE_LINE_MEMBER( d6_w );
@@ -175,10 +174,10 @@ class ttl74175_device : public ttl741745_device
 public:
 	ttl74175_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_not_q1_cb(device_t &device, _Object object) { return downcast<ttl74175_device &>(device).m_not_q1_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_not_q2_cb(device_t &device, _Object object) { return downcast<ttl74175_device &>(device).m_not_q2_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_not_q3_cb(device_t &device, _Object object) { return downcast<ttl74175_device &>(device).m_not_q3_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_not_q4_cb(device_t &device, _Object object) { return downcast<ttl74175_device &>(device).m_not_q4_func.set_callback(object); }
+	template <class Object> static devcb_base &set_not_q1_cb(device_t &device, Object &&cb) { return downcast<ttl74175_device &>(device).m_not_q1_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_not_q2_cb(device_t &device, Object &&cb) { return downcast<ttl74175_device &>(device).m_not_q2_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_not_q3_cb(device_t &device, Object &&cb) { return downcast<ttl74175_device &>(device).m_not_q3_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_not_q4_cb(device_t &device, Object &&cb) { return downcast<ttl74175_device &>(device).m_not_q4_func.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	virtual void device_start() override;
@@ -198,8 +197,7 @@ private:
 };
 
 // device type definition
-extern const device_type TTL74174;
-extern const device_type TTL74175;
+DECLARE_DEVICE_TYPE(TTL74174, ttl74174_device)
+DECLARE_DEVICE_TYPE(TTL74175, ttl74175_device)
 
-
-#endif /* TTL74175_H */
+#endif // MAME_MACHINE_74175_H

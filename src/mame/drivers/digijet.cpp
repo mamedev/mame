@@ -37,6 +37,7 @@ public:
 
 	virtual void machine_start() override { }
 	virtual void machine_reset() override { }
+	void digijet(machine_config &config);
 };
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, digijet_state )
@@ -45,7 +46,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( digijet )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( digijet, digijet_state )
+MACHINE_CONFIG_START(digijet_state::digijet)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(I8049_TAG, I8049, XTAL_11MHz)
 	MCFG_CPU_IO_MAP(io_map)
@@ -56,5 +57,5 @@ ROM_START( digijet )
 	ROM_LOAD( "vanagon_85_usa_ca.bin", 0x000, 0x800, CRC(2ed7c4c5) SHA1(ae48d8892b44fe76b48bcefd293c15cd47af3fba) ) // Volkswagen Vanagon, 1985, USA, California
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT               COMPANY       FULLNAME            FLAGS */
-CONS( 1985, digijet,  0,        0,        digijet,  digijet,  driver_device,  0, "Volkswagen", "Digijet", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     STATE        INIT  COMPANY       FULLNAME   FLAGS
+CONS( 1985, digijet,  0,        0,        digijet,  digijet,  digijet_state,  0, "Volkswagen", "Digijet", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

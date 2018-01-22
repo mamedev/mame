@@ -45,12 +45,16 @@ ToDo:
 ************************************************************************************/
 
 #include "emu.h"
+#include "machine/genpin.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/6821pia.h"
-#include "machine/genpin.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 #include "s8.lh"
+
 
 class s8_state : public genpin_class
 {
@@ -87,6 +91,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_MACHINE_RESET(s8);
 	DECLARE_DRIVER_INIT(s8);
+	void s8(machine_config &config);
 private:
 	uint8_t m_sound_data;
 	uint8_t m_strobe;
@@ -300,7 +305,7 @@ DRIVER_INIT_MEMBER( s8_state, s8 )
 	m_irq_timer->adjust(attotime::from_ticks(980,1e6),1);
 }
 
-static MACHINE_CONFIG_START( s8, s8_state )
+MACHINE_CONFIG_START(s8_state::s8)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(s8_main_map)
@@ -351,7 +356,7 @@ static MACHINE_CONFIG_START( s8, s8_state )
 	MCFG_CPU_PROGRAM_MAP(s8_audio_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
@@ -384,5 +389,5 @@ ROM_START(pfevr_p3)
 ROM_END
 
 
-GAME(1984,pfevr_l2, 0,        s8, s8, s8_state, s8, ROT0, "Williams", "Pennant Fever (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME(1984,pfevr_p3, pfevr_l2, s8, s8, s8_state, s8, ROT0, "Williams", "Pennant Fever (P-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1984, pfevr_l2, 0,        s8, s8, s8_state, s8, ROT0, "Williams", "Pennant Fever (L-2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1984, pfevr_p3, pfevr_l2, s8, s8, s8_state, s8, ROT0, "Williams", "Pennant Fever (P-3)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

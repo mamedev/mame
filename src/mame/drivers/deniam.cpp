@@ -44,21 +44,15 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/deniam.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
-#include "includes/deniam.h"
+#include "screen.h"
+#include "speaker.h"
 
-
-WRITE16_MEMBER(deniam_state::sound_command_w)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		m_soundlatch->write(space,offset, (data >> 8) & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
 
 WRITE8_MEMBER(deniam_state::deniam16b_oki_rom_bank_w)
 {
@@ -85,7 +79,7 @@ static ADDRESS_MAP_START( deniam16b_map, AS_PROGRAM, 16, deniam_state )
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_SHARE("textram")
 	AM_RANGE(0x440000, 0x4407ff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_SHARE("paletteram")
-	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_w)
+	AM_RANGE(0xc40000, 0xc40001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0xff00)
 	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
 	AM_RANGE(0xc40004, 0xc40005) AM_WRITE(deniam_irq_ack_w)
 	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
@@ -252,7 +246,7 @@ void deniam_state::machine_reset()
 	m_oki->set_rom_bank(0);
 }
 
-static MACHINE_CONFIG_START( deniam16b, deniam_state )
+MACHINE_CONFIG_START(deniam_state::deniam16b)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)    /* 12.5Mhz verified */
@@ -282,16 +276,17 @@ static MACHINE_CONFIG_START( deniam16b, deniam_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_25MHz/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_25MHz/24, OKIM6295_PIN7_HIGH) /* 1.041620 measured, = 1.0416666Mhz verified */
+	MCFG_OKIM6295_ADD("oki", XTAL_25MHz/24, PIN7_HIGH) /* 1.041620 measured, = 1.0416666Mhz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( deniam16c, deniam_state )
+MACHINE_CONFIG_START(deniam_state::deniam16c)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)    /* 12.5Mhz verified */
@@ -319,7 +314,7 @@ static MACHINE_CONFIG_START( deniam16c, deniam_state )
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_25MHz/6) /* "SM64" ym3812 clone; 4.166470 measured, = 4.166666Mhz verified) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_25MHz/24, OKIM6295_PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */
+	MCFG_OKIM6295_ADD("oki", XTAL_25MHz/24, PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -417,7 +412,7 @@ ROM_END
 
 
 
-GAME( 1996, logicpro, 0,        deniam16b, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Croquis (Germany)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, karianx,  0,        deniam16b, karianx, deniam_state,  karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, logicpro, 0,        deniam16b, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro (Japan)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Croquis (Germany)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, karianx,  0,        deniam16b, karianx,  deniam_state, karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)",     MACHINE_SUPPORTS_SAVE )

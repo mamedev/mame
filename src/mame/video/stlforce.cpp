@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* video/stlforce.c - see main driver for other notes */
+/* video/stlforce.cpp - see main driver for other notes */
 
 #include "emu.h"
 #include "includes/stlforce.h"
 
 /* background, appears to be the bottom layer */
 
-TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_bg_tile_info)
+TILE_GET_INFO_MEMBER(stlforce_state::get_bg_tile_info)
 {
 	int tileno,colour;
 
@@ -17,7 +17,7 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
 }
 
-WRITE16_MEMBER(stlforce_state::stlforce_bg_videoram_w)
+WRITE16_MEMBER(stlforce_state::bg_videoram_w)
 {
 	m_bg_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -25,7 +25,7 @@ WRITE16_MEMBER(stlforce_state::stlforce_bg_videoram_w)
 
 /* middle layer, low */
 
-TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mlow_tile_info)
+TILE_GET_INFO_MEMBER(stlforce_state::get_mlow_tile_info)
 {
 	int tileno,colour;
 
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mlow_tile_info)
 	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
 }
 
-WRITE16_MEMBER(stlforce_state::stlforce_mlow_videoram_w)
+WRITE16_MEMBER(stlforce_state::mlow_videoram_w)
 {
 	m_mlow_videoram[offset] = data;
 	m_mlow_tilemap->mark_tile_dirty(offset);
@@ -46,7 +46,7 @@ WRITE16_MEMBER(stlforce_state::stlforce_mlow_videoram_w)
 
 /* middle layer, high */
 
-TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mhigh_tile_info)
+TILE_GET_INFO_MEMBER(stlforce_state::get_mhigh_tile_info)
 {
 	int tileno,colour;
 
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mhigh_tile_info)
 	SET_TILE_INFO_MEMBER(0,tileno,colour,0);
 }
 
-WRITE16_MEMBER(stlforce_state::stlforce_mhigh_videoram_w)
+WRITE16_MEMBER(stlforce_state::mhigh_videoram_w)
 {
 	m_mhigh_videoram[offset] = data;
 	m_mhigh_tilemap->mark_tile_dirty(offset);
@@ -67,7 +67,7 @@ WRITE16_MEMBER(stlforce_state::stlforce_mhigh_videoram_w)
 
 /* text layer, appears to be the top layer */
 
-TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_tx_tile_info)
+TILE_GET_INFO_MEMBER(stlforce_state::get_tx_tile_info)
 {
 	int tileno,colour;
 
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_tx_tile_info)
 	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
 }
 
-WRITE16_MEMBER(stlforce_state::stlforce_tx_videoram_w)
+WRITE16_MEMBER(stlforce_state::tx_videoram_w)
 {
 	m_tx_videoram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset);
@@ -120,7 +120,7 @@ void stlforce_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-uint32_t stlforce_state::screen_update_stlforce(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t stlforce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -167,17 +167,17 @@ uint32_t stlforce_state::screen_update_stlforce(screen_device &screen, bitmap_in
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_mlow_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	m_mhigh_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	draw_sprites(bitmap,cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
 void stlforce_state::video_start()
 {
-	m_bg_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_bg_tile_info),this),   TILEMAP_SCAN_COLS,      16,16,64,16);
-	m_mlow_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_mlow_tile_info),this), TILEMAP_SCAN_COLS, 16,16,64,16);
-	m_mhigh_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_mhigh_tile_info),this),TILEMAP_SCAN_COLS, 16,16,64,16);
-	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_stlforce_tx_tile_info),this),   TILEMAP_SCAN_ROWS,  8, 8,64,32);
+	m_bg_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_bg_tile_info),this),   TILEMAP_SCAN_COLS, 16,16,64,16);
+	m_mlow_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_mlow_tile_info),this), TILEMAP_SCAN_COLS, 16,16,64,16);
+	m_mhigh_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_mhigh_tile_info),this),TILEMAP_SCAN_COLS, 16,16,64,16);
+	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stlforce_state::get_tx_tile_info),this),   TILEMAP_SCAN_ROWS,  8, 8,64,32);
 
 	m_mlow_tilemap->set_transparent_pen(0);
 	m_mhigh_tilemap->set_transparent_pen(0);

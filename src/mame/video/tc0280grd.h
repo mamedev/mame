@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef __TC0280GRD_H__
-#define __TC0280GRD_H__
+#ifndef MAME_VIDEO_TC0280GRD_H
+#define MAME_VIDEO_TC0280GRD_H
+
+#pragma once
 
 class tc0280grd_device : public device_t
 {
 public:
 	tc0280grd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~tc0280grd_device() {}
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -45,7 +46,7 @@ private:
 	void zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, uint32_t priority, int xmultiply );
 };
 
-extern const device_type TC0280GRD;
+DECLARE_DEVICE_TYPE(TC0280GRD, tc0280grd_device)
 
 #define TC0430GRW TC0280GRD
 
@@ -60,4 +61,5 @@ extern const device_type TC0280GRD;
 
 #define MCFG_TC0430GRW_GFXDECODE(_gfxtag) \
 	tc0280grd_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-#endif
+
+#endif // MAME_VIDEO_TC0280GRD_H

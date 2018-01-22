@@ -34,12 +34,14 @@
 
 **************************************************************************/
 
-#define CPU_CLOCK       (XTAL_6MHz)         /* main cpu clock */
-
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "barata.lh"
 #include "rendlay.h"
+#include "speaker.h"
+
+#include "barata.lh"
+
+#define CPU_CLOCK       (XTAL_6MHz)         /* main cpu clock */
 
 class barata_state : public driver_device
 {
@@ -54,6 +56,7 @@ public:
 	void fpga_send(unsigned char cmd);
 
 	required_device<cpu_device> m_maincpu;
+	void barata(machine_config &config);
 private:
 	unsigned char row_selection;
 };
@@ -302,7 +305,7 @@ ADDRESS_MAP_END
 *    Machine Drivers    *
 ************************/
 
-static MACHINE_CONFIG_START( barata, barata_state )
+MACHINE_CONFIG_START(barata_state::barata)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, CPU_CLOCK)
 	MCFG_CPU_IO_MAP(i8051_io_port)
@@ -327,4 +330,4 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
-GAME( 2002, barata,     0,        barata,   barata,    driver_device, 0,        ROT0,  "Eletro Matic Equipamentos Eletromec??nicos", "Dona Barata (early prototype)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, barata,     0,        barata,   barata,    barata_state, 0,        ROT0,  "Eletro Matic Equipamentos Eletromec??nicos", "Dona Barata (early prototype)", MACHINE_IMPERFECT_GRAPHICS )

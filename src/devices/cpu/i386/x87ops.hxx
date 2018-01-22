@@ -16,6 +16,12 @@
      - Remove redundant operand checks
      - Exceptions
 
+   Corrections and Additions [8-December-2017 Andrey Merkulov)
+     FXAM, FPREM - fixed
+     FINCSTP, FDECSTP - tags and exceptions corrected
+     Interrupt handling for 8087 added
+     FENI, FDISI opcodes added
+
 ***************************************************************************/
 
 #include <math.h>
@@ -49,6 +55,7 @@
 #define X87_CW_OM               0x0008
 #define X87_CW_UM               0x0010
 #define X87_CW_PM               0x0020
+#define X87_CW_IEM              0x0080
 #define X87_CW_PC_SHIFT         8
 #define X87_CW_PC_MASK          3
 #define X87_CW_PC_SINGLE        0
@@ -91,11 +98,11 @@
  *
  *************************************/
 
-static const floatx80 fx80_zero =   { 0x0000, U64(0x0000000000000000) };
-static const floatx80 fx80_one =    { 0x3fff, U64(0x8000000000000000) };
+static const floatx80 fx80_zero =   { 0x0000, 0x0000000000000000U };
+static const floatx80 fx80_one =    { 0x3fff, 0x8000000000000000U };
 
-static const floatx80 fx80_ninf =   { 0xffff, U64(0x8000000000000000) };
-static const floatx80 fx80_inan =   { 0xffff, U64(0xc000000000000000) };
+static const floatx80 fx80_ninf =   { 0xffff, 0x8000000000000000U };
+static const floatx80 fx80_inan =   { 0xffff, 0xc000000000000000U };
 
 /* Maps x87 round modes to SoftFloat round modes */
 static const int x87_to_sf_rc[4] =
@@ -141,7 +148,7 @@ static inline int floatx80_is_inf(floatx80 fx)
 static inline int floatx80_is_denormal(floatx80 fx)
 {
 	return (((fx.high & 0x7fff) == 0) &&
-			((fx.low & U64(0x8000000000000000)) == 0) &&
+			((fx.low & 0x8000000000000000U) == 0) &&
 			((fx.low << 1) != 0));
 }
 
@@ -309,6 +316,9 @@ int i386_device::x87_check_exceptions()
 	{
 		// m_device->execute().set_input_line(INPUT_LINE_FERR, RAISE_LINE);
 		logerror("Unmasked x87 exception (CW:%.4x, SW:%.4x)\n", m_x87_cw, m_x87_sw);
+		// interrupt handler
+		if (!(m_x87_cw & X87_CW_IEM)) { m_x87_sw |= X87_SW_ES; m_ferr_handler(1); }
+
 		if (m_cr[0] & 0x20) // FIXME: 486 and up only
 		{
 			m_ext = 1;
@@ -339,6 +349,8 @@ void i386_device::x87_reset()
 	m_x87_data_ptr = 0;
 	m_x87_inst_ptr = 0;
 	m_x87_opcode = 0;
+
+	m_ferr_handler(0);
 }
 
 
@@ -2173,7 +2185,7 @@ void i386_device::x87_fcmovnu_sti(uint8_t modrm)
  * Miscellaneous arithmetic
  *
  *************************************/
-
+/* D9 F8 */
 void i386_device::x87_fprem(uint8_t modrm)
 {
 	floatx80 result;
@@ -2185,19 +2197,22 @@ void i386_device::x87_fprem(uint8_t modrm)
 	}
 	else
 	{
-		floatx80 a0 = ST(0);
-		floatx80 b1 = ST(1);
+		floatx80 a0 = ST(0);   // dividend
+		floatx80 b1 = ST(1);   // divider
 
+		floatx80 a0_abs = packFloatx80(0, (a0.high & 0x7FFF), a0.low);
+		floatx80 b1_abs = packFloatx80(0, (b1.high & 0x7FFF), b1.low);
 		m_x87_sw &= ~X87_SW_C2;
 
 		//int d=extractFloatx80Exp(a0)-extractFloatx80Exp(b1);
 		int d = (a0.high & 0x7FFF) - (b1.high & 0x7FFF);
 		if (d < 64) {
-			floatx80 t=floatx80_div(a0, b1);
+			floatx80 t=floatx80_div(a0_abs, b1_abs);
 			int64 q = floatx80_to_int64_round_to_zero(t);
 			floatx80 qf = int64_to_floatx80(q);
-			floatx80 tt = floatx80_mul(b1, qf);
-			result = floatx80_sub(a0, tt);
+			floatx80 tt = floatx80_mul(b1_abs, qf);
+			result = floatx80_sub(a0_abs, tt);
+			result.high |= a0.high & 0x8000;
 			// C2 already 0
 			m_x87_sw &= ~(X87_SW_C0|X87_SW_C3|X87_SW_C1);
 			if (q & 1)
@@ -2381,7 +2396,7 @@ void i386_device::x87_fyl2xp1(uint8_t modrm)
 
 	CYCLES(313);
 }
-
+/* D9 F2 if 8087   0 < angle < pi/4 */
 void i386_device::x87_fptan(uint8_t modrm)
 {
 	floatx80 result1, result2;
@@ -2403,7 +2418,7 @@ void i386_device::x87_fptan(uint8_t modrm)
 		result1 = ST(0);
 		result2 = fx80_one;
 
-#if 0 // TODO: Function produces bad values
+#if 1 // TODO: Function produces bad values
 		if (floatx80_ftan(result1) != -1)
 			m_x87_sw &= ~X87_SW_C2;
 		else
@@ -2426,7 +2441,7 @@ void i386_device::x87_fptan(uint8_t modrm)
 
 	CYCLES(244);
 }
-
+/* D9 F3 */
 void i386_device::x87_fpatan(uint8_t modrm)
 {
 	floatx80 result;
@@ -2451,7 +2466,7 @@ void i386_device::x87_fpatan(uint8_t modrm)
 
 	CYCLES(289);
 }
-
+/* D9 FE  387 only */
 void i386_device::x87_fsin(uint8_t modrm)
 {
 	floatx80 result;
@@ -2465,7 +2480,8 @@ void i386_device::x87_fsin(uint8_t modrm)
 	{
 		result = ST(0);
 
-#if 0 // TODO: Function produces bad values
+
+#if 1 // TODO: Function produces bad values    Result checked
 		if (floatx80_fsin(result) != -1)
 			m_x87_sw &= ~X87_SW_C2;
 		else
@@ -2484,7 +2500,7 @@ void i386_device::x87_fsin(uint8_t modrm)
 
 	CYCLES(241);
 }
-
+/* D9 FF 387 only */
 void i386_device::x87_fcos(uint8_t modrm)
 {
 	floatx80 result;
@@ -2498,7 +2514,7 @@ void i386_device::x87_fcos(uint8_t modrm)
 	{
 		result = ST(0);
 
-#if 0 // TODO: Function produces bad values
+#if 1 // TODO: Function produces bad values   to check!
 		if (floatx80_fcos(result) != -1)
 			m_x87_sw &= ~X87_SW_C2;
 		else
@@ -2517,7 +2533,7 @@ void i386_device::x87_fcos(uint8_t modrm)
 
 	CYCLES(241);
 }
-
+/* D9 FB  387 only */
 void i386_device::x87_fsincos(uint8_t modrm)
 {
 	floatx80 s_result, c_result;
@@ -3104,21 +3120,21 @@ void i386_device::x87_fistp_m64int(uint8_t modrm)
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
-		m64int = U64(0x8000000000000000);
+		m64int = 0x8000000000000000U;
 	}
 	else
 	{
 		floatx80 fx80 = floatx80_round_to_int(ST(0));
 
-		floatx80 lowerLim = int64_to_floatx80(U64(0x8000000000000000));
-		floatx80 upperLim = int64_to_floatx80(U64(0x7fffffffffffffff));
+		floatx80 lowerLim = int64_to_floatx80(0x8000000000000000U);
+		floatx80 upperLim = int64_to_floatx80(0x7fffffffffffffffU);
 
 		m_x87_sw &= ~X87_SW_C1;
 
 		if (!floatx80_lt(fx80, lowerLim) && floatx80_le(fx80, upperLim))
 			m64int = floatx80_to_int64(fx80);
 		else
-			m64int = U64(0x8000000000000000);
+			m64int = 0x8000000000000000U;
 	}
 
 	uint32_t ea = GetEA(modrm, 1);
@@ -3210,9 +3226,9 @@ void i386_device::x87_fldl2t(uint8_t modrm)
 		value.high = 0x4000;
 
 		if (X87_RC == X87_CW_RC_UP)
-			value.low =  U64(0xd49a784bcd1b8aff);
+			value.low =  0xd49a784bcd1b8affU;
 		else
-			value.low = U64(0xd49a784bcd1b8afe);
+			value.low = 0xd49a784bcd1b8afeU;
 
 		m_x87_sw &= ~X87_SW_C1;
 	}
@@ -3243,9 +3259,9 @@ void i386_device::x87_fldl2e(uint8_t modrm)
 		value.high = 0x3fff;
 
 		if (rc == X87_CW_RC_UP || rc == X87_CW_RC_NEAREST)
-			value.low = U64(0xb8aa3b295c17f0bc);
+			value.low = 0xb8aa3b295c17f0bcU;
 		else
-			value.low = U64(0xb8aa3b295c17f0bb);
+			value.low = 0xb8aa3b295c17f0bbU;
 
 		m_x87_sw &= ~X87_SW_C1;
 	}
@@ -3276,9 +3292,9 @@ void i386_device::x87_fldpi(uint8_t modrm)
 		value.high = 0x4000;
 
 		if (rc == X87_CW_RC_UP || rc == X87_CW_RC_NEAREST)
-			value.low = U64(0xc90fdaa22168c235);
+			value.low = 0xc90fdaa22168c235U;
 		else
-			value.low = U64(0xc90fdaa22168c234);
+			value.low = 0xc90fdaa22168c234U;
 
 		m_x87_sw &= ~X87_SW_C1;
 	}
@@ -3309,9 +3325,9 @@ void i386_device::x87_fldlg2(uint8_t modrm)
 		value.high = 0x3ffd;
 
 		if (rc == X87_CW_RC_UP || rc == X87_CW_RC_NEAREST)
-			value.low = U64(0x9a209a84fbcff799);
+			value.low = 0x9a209a84fbcff799U;
 		else
-			value.low = U64(0x9a209a84fbcff798);
+			value.low = 0x9a209a84fbcff798U;
 
 		m_x87_sw &= ~X87_SW_C1;
 	}
@@ -3342,9 +3358,9 @@ void i386_device::x87_fldln2(uint8_t modrm)
 		value.high = 0x3ffe;
 
 		if (rc == X87_CW_RC_UP || rc == X87_CW_RC_NEAREST)
-			value.low = U64(0xb17217f7d1cf79ac);
+			value.low = 0xb17217f7d1cf79acU;
 		else
-			value.low = U64(0xb17217f7d1cf79ab);
+			value.low = 0xb17217f7d1cf79abU;
 
 		m_x87_sw &= ~X87_SW_C1;
 	}
@@ -3609,7 +3625,7 @@ void i386_device::x87_fxam(uint8_t modrm)
 	{
 		m_x87_sw |= X87_SW_C3;
 	}
-	if (floatx80_is_nan(value))
+	else if (floatx80_is_nan(value))
 	{
 		m_x87_sw |= X87_SW_C0;
 	}
@@ -4365,8 +4381,7 @@ void i386_device::x87_fdecstp(uint8_t modrm)
 {
 	m_x87_sw &= ~X87_SW_C1;
 
-	x87_dec_stack();
-	x87_check_exceptions();
+	x87_set_stack_top(ST_TO_PHYS(7));
 
 	CYCLES(3);
 }
@@ -4375,8 +4390,7 @@ void i386_device::x87_fincstp(uint8_t modrm)
 {
 	m_x87_sw &= ~X87_SW_C1;
 
-	x87_inc_stack();
-	x87_check_exceptions();
+	x87_set_stack_top(ST_TO_PHYS(1));
 
 	CYCLES(3);
 }
@@ -4384,7 +4398,7 @@ void i386_device::x87_fincstp(uint8_t modrm)
 void i386_device::x87_fclex(uint8_t modrm)
 {
 	m_x87_sw &= ~0x80ff;
-
+	m_ferr_handler(0);
 	CYCLES(7);
 }
 
@@ -4393,6 +4407,21 @@ void i386_device::x87_ffree(uint8_t modrm)
 	x87_set_tag(ST_TO_PHYS(modrm & 7), X87_TW_EMPTY);
 
 	CYCLES(3);
+}
+
+void i386_device::x87_feni(uint8_t modrm)
+{
+	m_x87_cw &= ~X87_CW_IEM;
+	x87_check_exceptions();
+
+	CYCLES(5);
+}
+
+void i386_device::x87_fdisi(uint8_t modrm)
+{
+	m_x87_cw |= X87_CW_IEM;
+
+	CYCLES(5);
 }
 
 void i386_device::x87_finit(uint8_t modrm)
@@ -4492,6 +4521,7 @@ void i386_device::x87_fstenv(uint8_t modrm)
 //          WRITE32(ea + 24, m_fpu_inst_ptr);
 			break;
 	}
+	m_x87_cw |= 0x3f;   // set all masks
 
 	CYCLES((m_cr[0] & 1) ? 56 : 67);
 }
@@ -4931,8 +4961,8 @@ void i386_device::build_x87_opcode_table_db()
 				case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: ptr = &i386_device::x87_fcmovne_sti;  break;
 				case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7: ptr = &i386_device::x87_fcmovnbe_sti; break;
 				case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf: ptr = &i386_device::x87_fcmovnu_sti;  break;
-				case 0xe0: ptr = &i386_device::x87_fnop;          break; /* FENI */
-				case 0xe1: ptr = &i386_device::x87_fnop;          break; /* FDISI */
+				case 0xe0: ptr = &i386_device::x87_feni;          break; /* FENI */
+				case 0xe1: ptr = &i386_device::x87_fdisi;          break; /* FDISI */
 				case 0xe2: ptr = &i386_device::x87_fclex;         break;
 				case 0xe3: ptr = &i386_device::x87_finit;         break;
 				case 0xe4: ptr = &i386_device::x87_fnop;          break; /* FSETPM */
@@ -5111,3 +5141,5 @@ void i386_device::build_x87_opcode_table()
 	build_x87_opcode_table_de();
 	build_x87_opcode_table_df();
 }
+
+

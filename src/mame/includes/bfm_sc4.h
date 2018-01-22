@@ -2,6 +2,10 @@
 // copyright-holders:David Haywood
 /* Scorpion 4 + 5 driver related includes */
 /* mainly used for stuff which is currently shared between sc4 / 5 sets to avoid duplication */
+#ifndef MAME_INCLUDES_BFP_SC4_H
+#define MAME_INCLUDES_BFP_SC4_H
+
+#pragma once
 
 #include "machine/sec.h"
 #include "machine/steppers.h" // stepper motor
@@ -95,8 +99,8 @@ public:
 public:
 
 	required_device<mc68681_device> m_duart;
-	optional_device<bfm_bda_t> m_vfd0;
-	optional_device<bfmdm01_device> m_dm01;
+	optional_device<bfm_bda_device> m_vfd0;
+	optional_device<bfm_dm01_device> m_dm01;
 	required_device<ymz280b_device> m_ymz;
 
 	// serial vfd
@@ -139,7 +143,7 @@ public:
 		m_dochk41 = false;
 	}
 
-	required_device<m68307cpu_device> m_maincpu;
+	required_device<m68307_cpu_device> m_maincpu;
 	required_memory_region m_cpuregion;
 	// devices
 	required_device<nvram_device> m_nvram;
@@ -618,6 +622,30 @@ public:
 	void find_mbus(uint16_t* rom);
 
 
+	void sc4_common(machine_config &config);
+	void sc4(machine_config &config);
+	void sc4_200_4r(machine_config &config);
+	void sc4_200_4ra(machine_config &config);
+	void sc4_200_4rb(machine_config &config);
+	void sc4_200_5r(machine_config &config);
+	void sc4_200_5ra(machine_config &config);
+	void sc4_200_5rb(machine_config &config);
+	void sc4_200_5rc(machine_config &config);
+	void sc4_200_alt(machine_config &config);
+	void sc4_200_alta(machine_config &config);
+	void sc4_200_altb(machine_config &config);
+	void sc4_200_std(machine_config &config);
+	void sc4_3reel(machine_config &config);
+	void sc4_3reel_200(machine_config &config);
+	void sc4_3reel_200_48(machine_config &config);
+	void sc4_4reel(machine_config &config);
+	void sc4_4reel_200(machine_config &config);
+	void sc4_4reel_alt(machine_config &config);
+	void sc4_5reel(machine_config &config);
+	void sc4_5reel_alt(machine_config &config);
+	void sc4_adder4(machine_config &config);
+	void sc4_no_reels(machine_config &config);
+	void sc4dmd(machine_config &config);
 protected:
 	optional_ioport_array<16> m_io_ports;
 };
@@ -638,34 +666,11 @@ public:
 	DECLARE_MACHINE_START(adder4);
 
 	// devices
-	required_device<m68340cpu_device> m_adder4cpu;
+	required_device<m68340_cpu_device> m_adder4cpu;
+	void sc4_adder4(machine_config &config);
 };
 
 
-MACHINE_CONFIG_EXTERN( sc4 );
-MACHINE_CONFIG_EXTERN( sc4_adder4 );
-MACHINE_CONFIG_EXTERN( sc4dmd );
-MACHINE_CONFIG_EXTERN(sc4_3reel);
-MACHINE_CONFIG_EXTERN(sc4_4reel);
-MACHINE_CONFIG_EXTERN(sc4_4reel_alt);
-MACHINE_CONFIG_EXTERN(sc4_5reel);
-MACHINE_CONFIG_EXTERN(sc4_5reel_alt);
-MACHINE_CONFIG_EXTERN(sc4_200_std);
-MACHINE_CONFIG_EXTERN(sc4_200_alt);
-MACHINE_CONFIG_EXTERN(sc4_200_alta);
-MACHINE_CONFIG_EXTERN(sc4_200_altb);
-MACHINE_CONFIG_EXTERN(sc4_200_5r);
-MACHINE_CONFIG_EXTERN(sc4_200_5ra);
-MACHINE_CONFIG_EXTERN(sc4_200_5rb);
-MACHINE_CONFIG_EXTERN(sc4_200_5rc);
-MACHINE_CONFIG_EXTERN(sc4_200_5rc);
-MACHINE_CONFIG_EXTERN(sc4_200_4r);
-MACHINE_CONFIG_EXTERN(sc4_200_4ra);
-MACHINE_CONFIG_EXTERN(sc4_200_4rb);
-MACHINE_CONFIG_EXTERN(sc4_4reel_200);
-MACHINE_CONFIG_EXTERN(sc4_3reel_200);
-MACHINE_CONFIG_EXTERN(sc4_3reel_200_48);
-MACHINE_CONFIG_EXTERN(sc4_no_reels);
 
 
 INPUT_PORTS_EXTERN( sc4_base );
@@ -3373,3 +3378,5 @@ INPUT_PORTS_EXTERN( sc4_raw );
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	/* not for either of these games? */ \
 	ROM_LOAD( "casroysnd.bin", 0x00000, 0x80000, CRC(cf1d4b59) SHA1(1b2bc74c6fcc43197a6f295bc34554da01f7b517) )
+
+#endif // MAME_INCLUDES_BFP_SC4_H

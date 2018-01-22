@@ -21,10 +21,14 @@ and an unpopulated position for a YM2413 or UM3567
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "fts2in1.lh"
 
 
@@ -90,6 +94,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void funtech(machine_config &config);
 };
 
 
@@ -238,8 +243,8 @@ INTERRUPT_GEN_MEMBER(fun_tech_corp_state::funtech_vblank_interrupt)
 static ADDRESS_MAP_START( funtech_map, AS_PROGRAM, 8, fun_tech_corp_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE(0xd000, 0xd7ff) AM_ROM // maybe
 
@@ -276,7 +281,7 @@ WRITE8_MEMBER(fun_tech_corp_state::funtech_coins_w)
 	if (data & 0x01) printf("funtech_coins_w %02x\n", data);
 
 	// 80 = hopper motor?
-	m_hopper->write(space, 0, data & 0x80);
+	m_hopper->motor_w(BIT(data, 7));
 
 	// 40 = ? sometimes
 
@@ -480,7 +485,7 @@ void fun_tech_corp_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( funtech, fun_tech_corp_state )
+MACHINE_CONFIG_START(fun_tech_corp_state::funtech)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
@@ -526,4 +531,4 @@ ROM_START( fts2in1 )
 	ROM_LOAD16_BYTE( "u30.bin", 0x00001, 0x20000, CRC(d572bddc) SHA1(06499aeb47085a02af9eb4987ed987f9a3a397f7) )
 ROM_END
 
-GAMEL( 1993, fts2in1,  0,    funtech, funtech, driver_device,  0, ROT0, "Fun Tech Corporation", "Super Two In One", 0, layout_fts2in1 )
+GAMEL( 1993, fts2in1,  0,    funtech, funtech, fun_tech_corp_state,  0, ROT0, "Fun Tech Corporation", "Super Two In One", 0, layout_fts2in1 )

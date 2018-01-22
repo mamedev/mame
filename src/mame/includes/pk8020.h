@@ -6,18 +6,18 @@
  *
  ****************************************************************************/
 
-#ifndef PK8020_H_
-#define PK8020_H_
+#ifndef MAME_INCLUDES_PK8020_H
+#define MAME_INCLUDES_PK8020_H
 
-#include "machine/i8255.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/i8251.h"
-#include "machine/wd_fdc.h"
 #include "imagedev/cassette.h"
-#include "sound/speaker.h"
-#include "sound/wave.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/wd_fdc.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
 
 
 class pk8020_state : public driver_device
@@ -80,6 +80,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out1);
 
+	void pk8020(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi8255_1;
@@ -88,7 +89,7 @@ protected:
 	required_device<i8251_device> m_rs232;
 	required_device<i8251_device> m_lan;
 	required_device<ram_device> m_ram;
-	required_device<fd1793_t> m_wd1793;
+	required_device<fd1793_device> m_wd1793;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
@@ -103,4 +104,4 @@ protected:
 	void pk8020_set_bank(uint8_t data);
 };
 
-#endif /* pk8020_H_ */
+#endif // MAME_INCLUDES_PK8020_H

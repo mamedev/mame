@@ -10,12 +10,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_NES_CTRL_CTRL_H
+#define MAME_BUS_NES_CTRL_CTRL_H
+
 #pragma once
 
-#ifndef __NES_CONTROL_PORT__
-#define __NES_CONTROL_PORT__
-
-#include "emu.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -29,15 +28,16 @@ class device_nes_control_port_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_nes_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_nes_control_port_interface();
 
-	virtual uint8_t read_bit0() { return 0; };
-	virtual uint8_t read_bit34() { return 0; };
-	virtual uint8_t read_exp(offs_t offset) { return 0; };
-	virtual void write(uint8_t data) { };
+	virtual uint8_t read_bit0() { return 0; }
+	virtual uint8_t read_bit34() { return 0; }
+	virtual uint8_t read_exp(offs_t offset) { return 0; }
+	virtual void write(uint8_t data) { }
 
 protected:
+	device_nes_control_port_interface(const machine_config &mconfig, device_t &device);
+
 	nes_control_port_device *m_port;
 };
 
@@ -73,7 +73,7 @@ protected:
 
 
 // device type definition
-extern const device_type NES_CONTROL_PORT;
+DECLARE_DEVICE_TYPE(NES_CONTROL_PORT, nes_control_port_device)
 
 
 //**************************************************************************
@@ -90,7 +90,7 @@ extern const device_type NES_CONTROL_PORT;
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_NESCTRL_BRIGHTPIXEL_CB(_class, _method) \
-	nes_control_port_device::set_brightpixel_callback(*device, nesctrl_brightpixel_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	nes_control_port_device::set_brightpixel_callback(*device, nesctrl_brightpixel_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 SLOT_INTERFACE_EXTERN( nes_control_port1_devices );
@@ -100,4 +100,4 @@ SLOT_INTERFACE_EXTERN( fc_control_port2_devices );
 SLOT_INTERFACE_EXTERN( fc_expansion_devices );
 
 
-#endif
+#endif // MAME_BUS_NES_CTRL_CTRL_H

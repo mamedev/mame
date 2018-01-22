@@ -66,6 +66,7 @@ shuuz       1   1   1   0   0   0   0   8   0   0   0x000   0x100   0   00ff,0,0
 
 #include "emu.h"
 #include "atarimo.h"
+#include "screen.h"
 
 
 //**************************************************************************
@@ -117,14 +118,14 @@ inline int atari_motion_objects_device::round_to_powerof2(int value)
 //**************************************************************************
 
 // device type definition
-const device_type ATARI_MOTION_OBJECTS = &device_creator<atari_motion_objects_device>;
+DEFINE_DEVICE_TYPE(ATARI_MOTION_OBJECTS, atari_motion_objects_device, "atarimo", "Atari Motion Objects")
 
 //-------------------------------------------------
 //  atari_motion_objects_device - constructor
 //-------------------------------------------------
 
 atari_motion_objects_device::atari_motion_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sprite16_device_ind16(mconfig, ATARI_MOTION_OBJECTS, "Atari Motion Objects", tag, owner, "atarimo", __FILE__)
+	: sprite16_device_ind16(mconfig, ATARI_MOTION_OBJECTS, tag, owner)
 	, device_video_interface(mconfig, *this)
 	, m_tilewidth(0)
 	, m_tileheight(0)
@@ -342,7 +343,7 @@ void atari_motion_objects_device::device_start()
 
 	// allocate a timer to periodically force update
 	m_force_update_timer = timer_alloc(TID_FORCE_UPDATE);
-	m_force_update_timer->adjust(m_screen->time_until_pos(0));
+	m_force_update_timer->adjust(screen().time_until_pos(0));
 
 	// register for save states
 	save_item(NAME(m_bank));
@@ -377,11 +378,11 @@ void atari_motion_objects_device::device_timer(emu_timer &timer, device_timer_id
 	{
 		case TID_FORCE_UPDATE:
 			if (param > 0)
-				m_screen->update_partial(param - 1);
+				screen().update_partial(param - 1);
 			param += 64;
-			if (param >= m_screen->visible_area().max_y)
+			if (param >= screen().visible_area().max_y)
 				param = 0;
-			timer.adjust(m_screen->time_until_pos(param), param);
+			timer.adjust(screen().time_until_pos(param), param);
 			break;
 	}
 }

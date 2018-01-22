@@ -82,7 +82,10 @@ www.andys-arcade.com
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "imolagp.lh"
 
@@ -129,6 +132,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(imolagp);
 	uint32_t screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void imolagp(machine_config &config);
 };
 
 
@@ -482,7 +486,7 @@ void imolagp_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( imolagp, imolagp_state )
+MACHINE_CONFIG_START(imolagp_state::imolagp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3000000) // ? (assume slower than slave)
@@ -501,8 +505,8 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	// mode $91 - ports A & C-lower as input, ports B & C-upper as output
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(LOGGER("PPI8255 - unmapped read port B", 0))
-	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B", 0))
+	MCFG_I8255_IN_PORTB_CB(LOGGER("PPI8255 - unmapped read port B"))
+	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
 
 	/* video hardware */
@@ -570,6 +574,6 @@ ROM_START( imolagpo )
 ROM_END
 
 
-/*    YEAR,  NAME,     PARENT,  MACHINE, INPUT,    INIT,              MONITOR, COMPANY, FULLNAME, FLAGS */
-GAMEL(1983?, imolagp,  0,       imolagp, imolagp,  driver_device, 0,  ROT90,   "RB Bologna", "Imola Grand Prix (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // made by Alberici? year not shown, PCB labels suggests it's from 1983
-GAMEL(1983?, imolagpo, imolagp, imolagp, imolagpo, driver_device, 0,  ROT90,   "RB Bologna", "Imola Grand Prix (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // "
+//    YEAR,  NAME,     PARENT,  MACHINE, INPUT,    STATE,         INIT, MONITOR, COMPANY,       FULLNAME,                  FLAGS
+GAMEL(1983?, imolagp,  0,       imolagp, imolagp,  imolagp_state, 0,    ROT90,   "RB Bologna", "Imola Grand Prix (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // made by Alberici? year not shown, PCB labels suggests it's from 1983
+GAMEL(1983?, imolagpo, imolagp, imolagp, imolagpo, imolagp_state, 0,    ROT90,   "RB Bologna", "Imola Grand Prix (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE, layout_imolagp ) // "

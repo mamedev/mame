@@ -4,25 +4,21 @@
 /*    Konami PCM controller                              */
 /*********************************************************/
 
+#ifndef MAME_SOUND_K007232_H
+#define MAME_SOUND_K007232_H
+
 #pragma once
-
-#ifndef __K007232_H__
-#define __K007232_H__
-
-#define  KDAC_A_PCM_MAX    (2)      /* Channels per chip */
 
 #define MCFG_K007232_PORT_WRITE_HANDLER(_devcb) \
 	devcb = &k007232_device::set_port_write_handler(*device, DEVCB_##_devcb);
 
 
-class k007232_device : public device_t,
-									public device_sound_interface
+class k007232_device : public device_t, public device_sound_interface
 {
 public:
 	k007232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~k007232_device() {}
 
-	template<class _Object> static devcb_base &set_port_write_handler(device_t &device, _Object object) { return downcast<k007232_device &>(device).m_port_write_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_port_write_handler(device_t &device, Object &&cb) { return downcast<k007232_device &>(device).m_port_write_handler.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
@@ -49,6 +45,8 @@ protected:
 	void KDAC_A_make_fncode();
 
 private:
+	static constexpr unsigned KDAC_A_PCM_MAX = 2;      /* Channels per chip */
+
 	// internal state
 	required_region_ptr<uint8_t> m_rom;
 
@@ -68,7 +66,6 @@ private:
 	devcb_write8 m_port_write_handler;
 };
 
-extern const device_type K007232;
+DECLARE_DEVICE_TYPE(K007232, k007232_device)
 
-
-#endif /* __K007232_H__ */
+#endif // MAME_SOUND_K007232_H

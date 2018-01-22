@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef _NAOMIGD_H_
-#define _NAOMIGD_H_
+#ifndef MAME_MACHINE_NAOMIGD_H
+#define MAME_MACHINE_NAOMIGD_H
+
+#pragma once
 
 #include "machine/naomibd.h"
 
@@ -17,6 +19,8 @@ public:
 	static void static_set_tags(device_t &device, const char *_image_tag, const char *_pic_tag);
 
 	uint8_t *memory(uint32_t &size) { size = dimm_data_size; return dimm_data; }
+
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
 	virtual void device_start() override;
@@ -61,5 +65,6 @@ private:
 };
 
 extern const device_type NAOMI_GDROM_BOARD;
+DECLARE_DEVICE_TYPE(NAOMI_GDROM_BOARD, naomi_gdrom_board)
 
-#endif
+#endif // MAME_MACHINE_NAOMIGD_H

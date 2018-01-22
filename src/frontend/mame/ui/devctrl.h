@@ -44,7 +44,7 @@ protected:
 
 private:
 	// device iterator
-	typedef device_type_iterator<&device_creator<DeviceType>, DeviceType> iterator;
+	typedef device_type_iterator<DeviceType> iterator;
 
 	DeviceType *    m_device;
 	int             m_count;

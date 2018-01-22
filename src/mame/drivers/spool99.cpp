@@ -93,8 +93,11 @@ Note
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/okim6295.h"
 #include "machine/eepromser.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class spool99_state : public driver_device
 {
@@ -133,6 +136,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	void vcarn(machine_config &config);
+	void spool99(machine_config &config);
 };
 
 TILE_GET_INFO_MEMBER(spool99_state::get_tile_info)
@@ -231,7 +236,7 @@ static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8, spool99_state )
 	AM_RANGE(0xafef, 0xafef) AM_WRITE(eeprom_dataline_w )
 	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0xb800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
@@ -277,7 +282,7 @@ static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8, spool99_state )
 	AM_RANGE(0xa747, 0xa747) AM_WRITE(eeprom_dataline_w )
 	AM_RANGE(0xa780, 0xa780) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE(0xa800, 0xabff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa800, 0xabff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0xb000, 0xdfff) AM_RAM
 //  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_SHARE("vcarn_io")
@@ -352,7 +357,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( spool99, spool99_state )
+MACHINE_CONFIG_START(spool99_state::spool99)
 
 	MCFG_CPU_ADD("maincpu", Z80, 24000000/8)
 	MCFG_CPU_PROGRAM_MAP(spool99_map)
@@ -376,12 +381,12 @@ static MACHINE_CONFIG_START( spool99, spool99_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vcarn, spool99 )
+MACHINE_CONFIG_DERIVED(spool99_state::vcarn, spool99)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(vcarn_map)
 

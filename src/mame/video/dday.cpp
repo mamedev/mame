@@ -37,7 +37,7 @@ void dday_state::start_countdown_timer()
 {
 	m_timer_value = 0;
 
-	machine().scheduler().timer_pulse(attotime::from_seconds(1), timer_expired_delegate(FUNC(dday_state::countdown_timer_callback),this));
+	m_countdown_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
 }
 
 
@@ -215,6 +215,8 @@ void dday_state::video_start()
 	m_bg_tilemap->set_transmask(0, 0x00f0, 0xff0f); /* pens 0-3 have priority over the foreground layer */
 	m_fg_tilemap->set_transparent_pen(0);
 	m_text_tilemap->set_transparent_pen(0);
+
+	m_countdown_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(dday_state::countdown_timer_callback), this));
 
 	start_countdown_timer();
 }

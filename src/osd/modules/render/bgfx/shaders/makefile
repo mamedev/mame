@@ -32,5 +32,5 @@ endif
 	@make -s --no-print-directory TARGET=3 clean all
 	@make -s --no-print-directory TARGET=4 clean all
 	@make -s --no-print-directory TARGET=5 clean all
-	
+
 .PHONY: main rebuild $(SUBDIRS)

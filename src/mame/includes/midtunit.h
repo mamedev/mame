@@ -7,8 +7,11 @@
 
 **************************************************************************/
 
-#include "audio/williams.h"
 #include "audio/dcs.h"
+#include "audio/williams.h"
+
+#include "cpu/tms34010/tms34010.h"
+
 
 class midtunit_state : public driver_device
 {
@@ -89,6 +92,8 @@ public:
 	void init_tunit_generic(int sound);
 	void init_nbajam_common(int te_protection);
 
+	emu_timer *m_dma_timer;
+
 	/* CMOS-related variables */
 	uint8_t    m_cmos_write_enable;
 
@@ -110,6 +115,9 @@ public:
 
 	uint8_t m_gfx_rom_large;
 
+	void tunit_core(machine_config &config);
+	void tunit_adpcm(machine_config &config);
+	void tunit_dcs(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

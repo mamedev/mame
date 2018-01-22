@@ -14,11 +14,11 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "cp1610.h"
+#include "debugger.h"
+#include "1610dasm.h"
 
-
-const device_type CP1610 = &device_creator<cp1610_cpu_device>;
+DEFINE_DEVICE_TYPE(CP1610, cp1610_cpu_device, "cp1610", "GI CP1610")
 
 
 #define S  0x80
@@ -27,9 +27,9 @@ const device_type CP1610 = &device_creator<cp1610_cpu_device>;
 #define C  0x10
 
 
-#define cp1610_readop(A) m_program->read_word((A)<<1)
-#define cp1610_readmem16(A) m_program->read_word((A)<<1)
-#define cp1610_writemem16(A,B) m_program->write_word((A)<<1,B)
+#define cp1610_readop(A) m_program->read_word(A)
+#define cp1610_readmem16(A) m_program->read_word(A)
+#define cp1610_writemem16(A,B) m_program->write_word(A,B)
 
 /* clear all flags */
 #define CLR_SZOC                \
@@ -3395,12 +3395,18 @@ void cp1610_cpu_device::execute_set_input(int irqline, int state)
 
 
 cp1610_cpu_device::cp1610_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, CP1610, "CP1610", tag, owner, clock, "cp1610", __FILE__)
+	: cpu_device(mconfig, CP1610, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, -1)
 	, m_read_bext(*this)
 {
 }
 
+device_memory_interface::space_config_vector cp1610_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 void cp1610_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
@@ -3416,9 +3422,7 @@ void cp1610_cpu_device::state_string_export(const device_state_entry &entry, std
 	}
 }
 
-
-offs_t cp1610_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *cp1610_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( cp1610 );
-	return CPU_DISASSEMBLE_NAME(cp1610)(this, buffer, pc, oprom, opram, options);
+	return new cp1610_disassembler;
 }

@@ -270,7 +270,7 @@ enum {
  * H[1]' -      4
  *
  * The display_state_machine() is called by the CPU at a rate of pixelclock/24,
- * which happens to be very close to every 7th CPU micrcocycle.
+ * which happens to be very close to every 7th CPU microcycle.
  * </PRE>
  */
 uint8_t* m_disp_a63;

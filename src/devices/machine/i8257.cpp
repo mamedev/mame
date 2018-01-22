@@ -6,24 +6,38 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "i8257.h"
 
+//#define LOG_GENERAL (1U << 0) //defined in logmacro.h already
+#define LOG_SETUP     (1U << 1)
+#define LOG_TFR       (1U << 2)
 
+//#define VERBOSE (LOG_GENERAL | LOG_SETUP | LOG_TFR)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
+#define LOGTFR(...)   LOGMASKED(LOG_TFR, __VA_ARGS__)
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type I8257 = &device_creator<i8257_device>;
+DEFINE_DEVICE_TYPE(I8257, i8257_device, "i8257", "Intel 8257 DMA Controller")
 
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
-
-#define LOG 0
-
 
 enum
 {
@@ -68,16 +82,13 @@ enum
 
 inline void i8257_device::dma_request(int channel, int state)
 {
-	if (LOG) logerror("I8257 '%s' Channel %u DMA Request: %u\n", tag(), channel, state);
+	LOG("I8257 Channel %u DMA Request: %u\n", channel, state);
 
 	if (state)
-	{
 		m_request |= 1 << channel;
-	}
 	else
-	{
-			m_request &= ~(1 << channel);
-	}
+		m_request &= ~(1 << channel);
+
 	trigger(1);
 }
 
@@ -86,9 +97,10 @@ inline void i8257_device::dma_request(int channel, int state)
 //  is_request_active -
 //-------------------------------------------------
 
-inline bool i8257_device::is_request_active(int channel)
+inline bool i8257_device::is_request_active(int channel) const
 {
-	return (BIT(m_request, channel) && MODE_CHAN_ENABLE(channel)) ? true : false;
+	LOG("%s Channel %d: %02x && MODE_CHAN_ENABLE:%02x\n", FUNCNAME, channel, m_request, MODE_CHAN_ENABLE(channel));
+	return BIT(m_request, channel) && MODE_CHAN_ENABLE(channel);
 }
 
 //-------------------------------------------------
@@ -97,6 +109,7 @@ inline bool i8257_device::is_request_active(int channel)
 
 inline void i8257_device::set_hreq(int state)
 {
+	LOG("%s\n", FUNCNAME);
 	if (m_hreq != state)
 	{
 		m_out_hrq_cb(state);
@@ -111,6 +124,7 @@ inline void i8257_device::set_hreq(int state)
 
 inline void i8257_device::set_tc(int state)
 {
+	LOG("%s: %d\n", FUNCNAME, state);
 	if (m_tc != state)
 	{
 		m_out_tc_cb(state);
@@ -126,6 +140,7 @@ inline void i8257_device::set_tc(int state)
 
 inline void i8257_device::set_dack()
 {
+	LOG("%s\n", FUNCNAME);
 	m_out_dack_0_cb(m_current_channel != 0);
 	m_out_dack_1_cb(m_current_channel != 1);
 	m_out_dack_2_cb(m_current_channel != 2);
@@ -139,12 +154,14 @@ inline void i8257_device::set_dack()
 
 inline void i8257_device::dma_read()
 {
+	LOG("%s\n", FUNCNAME);
 	offs_t offset = m_channel[m_current_channel].m_address;
 
 	switch (MODE_TRANSFER_MASK)
 	{
 	case MODE_TRANSFER_VERIFY:
 	case MODE_TRANSFER_WRITE:
+		LOGTFR(" - MODE TRANSFER VERIFY/WRITE");
 		switch(m_current_channel)
 		{
 			case 0:
@@ -163,10 +180,11 @@ inline void i8257_device::dma_read()
 		break;
 
 	case MODE_TRANSFER_READ:
+		LOGTFR(" - MODE TRANSFER READ");
 		m_temp = m_in_memr_cb(offset);
 		break;
 	}
-
+	LOGTFR(" channel %d Offset %04x: %02x\n", m_current_channel, offset, m_temp);
 }
 
 
@@ -176,22 +194,26 @@ inline void i8257_device::dma_read()
 
 inline void i8257_device::dma_write()
 {
+	LOG("%s\n", FUNCNAME);
 	offs_t offset = m_channel[m_current_channel].m_address;
 
 	switch (MODE_TRANSFER_MASK)
 	{
 	case MODE_TRANSFER_VERIFY: {
+		LOGTFR(" - MODE TRANSFER VERIFY");
 		uint8_t v1 = m_in_memr_cb(offset);
 		if(0 && m_temp != v1)
-			logerror("%s: verify error %02x vs. %02x\n", tag(), m_temp, v1);
+			logerror("verify error %02x vs. %02x\n", m_temp, v1);
 		break;
 	}
 
 	case MODE_TRANSFER_WRITE:
+		LOGTFR(" - MODE TRANSFER WRITE");
 		m_out_memw_cb(offset, m_temp);
 		break;
 
 	case MODE_TRANSFER_READ:
+		LOGTFR(" - MODE TRANSFER READ");
 		switch(m_current_channel)
 		{
 			case 0:
@@ -209,6 +231,7 @@ inline void i8257_device::dma_write()
 		}
 		break;
 	}
+	LOGTFR(" channel %d Offset %04x: %02x\n", m_channel, offset, m_temp);
 }
 
 
@@ -218,6 +241,7 @@ inline void i8257_device::dma_write()
 
 inline void i8257_device::advance()
 {
+	LOG("%s\n", FUNCNAME);
 	bool tc = (m_channel[m_current_channel].m_count == 0);
 	bool al = (MODE_AUTOLOAD && (m_current_channel == 2));
 
@@ -258,7 +282,7 @@ inline void i8257_device::advance()
 //-------------------------------------------------
 
 i8257_device::i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, I8257, "Intel 8257", tag, owner, clock, "i8257", __FILE__),
+	: device_t(mconfig, I8257, tag, owner, clock),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_reverse_rw(0),
@@ -300,6 +324,7 @@ i8257_device::i8257_device(const machine_config &mconfig, const char *tag, devic
 
 void i8257_device::device_start()
 {
+	LOG("%s\n", FUNCNAME);
 	// set our instruction counter
 	m_icountptr = &m_icount;
 
@@ -354,6 +379,7 @@ void i8257_device::device_start()
 
 void i8257_device::device_reset()
 {
+	LOG("%s\n", FUNCNAME);
 	m_state = STATE_SI;
 	m_transfer_mode = 0;
 	m_status = 0;
@@ -376,6 +402,7 @@ void i8257_device::device_reset()
 
 bool i8257_device::next_channel()
 {
+	LOG("%s\n", FUNCNAME);
 	int priority[] = { 0, 1, 2, 3 };
 
 	if (MODE_ROTATING_PRIORITY)
@@ -408,6 +435,7 @@ bool i8257_device::next_channel()
 
 void i8257_device::execute_run()
 {
+	LOG("%s\n", FUNCNAME);
 	do
 	{
 		switch (m_state)
@@ -491,6 +519,7 @@ void i8257_device::execute_run()
 
 READ8_MEMBER( i8257_device::read )
 {
+	LOG("%s\n", FUNCNAME);
 	uint8_t data = 0;
 
 	if (!BIT(offset, 3))
@@ -546,6 +575,7 @@ READ8_MEMBER( i8257_device::read )
 
 WRITE8_MEMBER( i8257_device::write )
 {
+	LOG("%s \n", FUNCNAME);
 	if (!BIT(offset, 3))
 	{
 		int channel = (offset >> 1) & 0x03;
@@ -553,6 +583,7 @@ WRITE8_MEMBER( i8257_device::write )
 		switch (offset & 0x01)
 		{
 		case REGISTER_ADDRESS:
+			LOGSETUP(" * Register Address <- %02x\n", data);
 			if (m_msb)
 			{
 				m_channel[channel].m_address = (data << 8) | (m_channel[channel].m_address & 0xff);
@@ -568,6 +599,7 @@ WRITE8_MEMBER( i8257_device::write )
 			break;
 
 		case REGISTER_WORD_COUNT:
+			LOGSETUP(" * Register Word Count <- %02x\n", data);
 			if (m_msb)
 			{
 				m_channel[channel].m_count = ((data & 0x3f) << 8) | (m_channel[channel].m_count & 0xff);
@@ -597,7 +629,7 @@ WRITE8_MEMBER( i8257_device::write )
 	{
 		m_transfer_mode = data;
 
-		if (LOG) logerror("I8257 '%s' Command Register: %02x\n", tag(), m_transfer_mode);
+		LOGSETUP("I8257 Command Register: %02x\n", m_transfer_mode);
 	}
 	trigger(1);
 }
@@ -609,7 +641,7 @@ WRITE8_MEMBER( i8257_device::write )
 
 WRITE_LINE_MEMBER( i8257_device::hlda_w )
 {
-	if (LOG) logerror("I8257 '%s' Hold Acknowledge: %u\n", tag(), state);
+	LOG("I8257 Hold Acknowledge: %u\n", state);
 
 	m_hack = state;
 	trigger(1);
@@ -622,7 +654,7 @@ WRITE_LINE_MEMBER( i8257_device::hlda_w )
 
 WRITE_LINE_MEMBER( i8257_device::ready_w )
 {
-	if (LOG) logerror("I8257 '%s' Ready: %u\n", tag(), state);
+	LOG("I8257 Ready: %u\n", state);
 
 	m_ready = state;
 }
@@ -634,6 +666,7 @@ WRITE_LINE_MEMBER( i8257_device::ready_w )
 
 WRITE_LINE_MEMBER( i8257_device::dreq0_w )
 {
+	LOG("%s\n", FUNCNAME);
 	dma_request(0, state);
 }
 
@@ -644,6 +677,7 @@ WRITE_LINE_MEMBER( i8257_device::dreq0_w )
 
 WRITE_LINE_MEMBER( i8257_device::dreq1_w )
 {
+	LOG("%s\n", FUNCNAME);
 	dma_request(1, state);
 }
 
@@ -654,6 +688,7 @@ WRITE_LINE_MEMBER( i8257_device::dreq1_w )
 
 WRITE_LINE_MEMBER( i8257_device::dreq2_w )
 {
+	LOG("%s\n", FUNCNAME);
 	dma_request(2, state);
 }
 
@@ -664,5 +699,6 @@ WRITE_LINE_MEMBER( i8257_device::dreq2_w )
 
 WRITE_LINE_MEMBER( i8257_device::dreq3_w )
 {
+	LOG("%s\n", FUNCNAME);
 	dma_request(3, state);
 }

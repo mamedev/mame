@@ -39,8 +39,10 @@ Tomasz Slanina 20050225
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
-#include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class vroulet_state : public driver_device
@@ -79,6 +81,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vroulet(machine_config &config);
 };
 
 
@@ -269,7 +272,7 @@ WRITE8_MEMBER(vroulet_state::ppi8255_c_w){}
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( vroulet, vroulet_state )
+MACHINE_CONFIG_START(vroulet_state::vroulet)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   //???
 	MCFG_CPU_PROGRAM_MAP(vroulet_map)
@@ -324,4 +327,4 @@ ROM_END
 
 /* Game Driver */
 
-GAME( 1989, vroulet, 0, vroulet, vroulet, driver_device, 0, ROT90, "World Game", "Vegas Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vroulet, 0, vroulet, vroulet, vroulet_state, 0, ROT90, "World Game", "Vegas Roulette", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

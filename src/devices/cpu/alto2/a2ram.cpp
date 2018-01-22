@@ -5,6 +5,7 @@
  *   Xerox AltoII RAM related functions
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 
 #define DEBUG_WRTRAM        0       //!< define to 1 to print CRAM writes
@@ -98,7 +99,7 @@ void alto2_cpu_device::rdram()
 #if DEBUG_RDRAM
 	char buffer[256];
 	uint8_t* oprom = m_ucode_cram.get() + 4 * wordaddr;
-	disasm_disassemble(buffer, wordaddr, oprom, oprom, 0);
+	disassemble(buffer, wordaddr, oprom, oprom, 0);
 	printf("RD CRAM_BANKSEL=%d RAM%d [%04o] upper:%06o lower:%06o value:%011o '%s'\n",
 			GET_CRAM_BANKSEL(m_cram_addr), bank, wordaddr, m_myl, m_alu,
 			value, buffer);
@@ -143,7 +144,7 @@ void alto2_cpu_device::wrtram()
 #if DEBUG_WRTRAM
 	char buffer[256];
 	uint8_t* oprom = m_ucode_cram.get() + 4 * wordaddr;
-	disasm_disassemble(buffer, wordaddr, oprom, oprom, 0);
+	disassemble(buffer, wordaddr, oprom, oprom, 0);
 	printf("WR CRAM_BANKSEL=%d RAM%d [%04o] upper:%06o lower:%06o value:%011o '%s'\n",
 			GET_CRAM_BANKSEL(m_cram_addr), bank, wordaddr, m_myl, m_alu,
 			value, buffer);

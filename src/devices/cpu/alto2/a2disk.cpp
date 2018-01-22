@@ -5,6 +5,7 @@
  *   Xerox AltoII disk interface
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 
 #define GET_KADDR_SECTOR(kaddr)         X_RDBITS(kaddr,16, 0, 3)            //!< get sector number from address register

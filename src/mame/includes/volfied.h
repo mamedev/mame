@@ -5,8 +5,14 @@
     Volfied
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_VOLFIED_H
+#define MAME_INCLUDES_VOLFIED_H
 
+#pragma once
+
+#include "machine/taitocchip.h"
 #include "video/pc090oj.h"
+#include "screen.h"
 
 class volfied_state : public driver_device
 {
@@ -20,6 +26,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_cchip(*this, "cchip"),
 		m_pc090oj(*this, "pc090oj"),
 		m_screen(*this, "screen") { }
 
@@ -36,33 +43,38 @@ public:
 	uint8_t       m_current_flag;
 	uint8_t       m_cc_port;
 	uint8_t       m_current_cmd;
+	emu_timer     *m_cchip_timer;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<taito_cchip_device> m_cchip;
 	required_device<pc090oj_device> m_pc090oj;
 	required_device<screen_device> m_screen;
 
-	DECLARE_WRITE16_MEMBER(volfied_cchip_ctrl_w);
-	DECLARE_WRITE16_MEMBER(volfied_cchip_bank_w);
-	DECLARE_WRITE16_MEMBER(volfied_cchip_ram_w);
-	DECLARE_READ16_MEMBER(volfied_cchip_ctrl_r);
-	DECLARE_READ16_MEMBER(volfied_cchip_ram_r);
-	DECLARE_READ16_MEMBER(volfied_video_ram_r);
-	DECLARE_WRITE16_MEMBER(volfied_video_ram_w);
-	DECLARE_WRITE16_MEMBER(volfied_video_ctrl_w);
-	DECLARE_READ16_MEMBER(volfied_video_ctrl_r);
-	DECLARE_WRITE16_MEMBER(volfied_video_mask_w);
-	DECLARE_WRITE16_MEMBER(volfied_sprite_ctrl_w);
+	DECLARE_WRITE16_MEMBER(cchip_ctrl_w);
+	DECLARE_WRITE16_MEMBER(cchip_bank_w);
+	DECLARE_WRITE16_MEMBER(cchip_ram_w);
+	DECLARE_READ16_MEMBER(cchip_ctrl_r);
+	DECLARE_READ16_MEMBER(cchip_ram_r);
+	DECLARE_READ16_MEMBER(video_ram_r);
+	DECLARE_WRITE16_MEMBER(video_ram_w);
+	DECLARE_WRITE16_MEMBER(video_ctrl_w);
+	DECLARE_READ16_MEMBER(video_ctrl_r);
+	DECLARE_WRITE16_MEMBER(video_mask_w);
+	DECLARE_WRITE16_MEMBER(sprite_ctrl_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_volfied(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(volfied_timer_callback);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_CALLBACK_MEMBER(timer_callback);
 	void refresh_pixel_layer( bitmap_ind16 &bitmap );
-	void volfied_cchip_init();
-	void volfied_cchip_reset();
+	void cchip_init();
+	void cchip_reset();
 
+	void volfied(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_VOLFIED_H

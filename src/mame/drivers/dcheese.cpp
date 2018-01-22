@@ -31,12 +31,14 @@
 
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
+#include "includes/dcheese.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/m6809/m6809.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
-#include "includes/dcheese.h"
+#include "speaker.h"
 
 
 #define MAIN_OSC    14318180
@@ -92,7 +94,6 @@ INTERRUPT_GEN_MEMBER(dcheese_state::dcheese_vblank)
 void dcheese_state::machine_start()
 {
 	save_item(NAME(m_irq_state));
-	save_item(NAME(m_soundlatch_full));
 	save_item(NAME(m_sound_control));
 	save_item(NAME(m_sound_msb_latch));
 }
@@ -107,7 +108,7 @@ void dcheese_state::machine_start()
 
 CUSTOM_INPUT_MEMBER(dcheese_state::sound_latch_state_r)
 {
-	return m_soundlatch_full;
+	return m_soundlatch->pending_r();
 }
 
 
@@ -118,19 +119,6 @@ WRITE16_MEMBER(dcheese_state::eeprom_control_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		ioport("EEPROMOUT")->write(data, 0xff);
-		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 1) << 7);
-	}
-}
-
-
-WRITE16_MEMBER(dcheese_state::sound_command_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		/* write the latch and set the IRQ */
-		m_soundlatch_full = 1;
-		m_audiocpu->set_input_line(0, ASSERT_LINE);
-		m_soundlatch->write(space, 0, data & 0xff);
 	}
 }
 
@@ -141,15 +129,6 @@ WRITE16_MEMBER(dcheese_state::sound_command_w)
  *  Sound CPU handlers
  *
  *************************************/
-
-READ8_MEMBER(dcheese_state::sound_command_r)
-{
-	/* read the latch and clear the IRQ */
-	m_soundlatch_full = 0;
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
-}
-
 
 READ8_MEMBER(dcheese_state::sound_status_r)
 {
@@ -168,7 +147,7 @@ WRITE8_MEMBER(dcheese_state::sound_control_w)
 	if ((diff & 0x40) && (data & 0x40))
 		m_bsmt->reset();
 	if (data != 0x40 && data != 0x60)
-		logerror("%04X:sound_control_w = %02X\n", space.device().safe_pc(), data);
+		logerror("%04X:sound_control_w = %02X\n", m_audiocpu->pc(), data);
 }
 
 
@@ -202,7 +181,7 @@ static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 16, dcheese_state )
 	AM_RANGE(0x260000, 0x26001f) AM_WRITE(madmax_blitter_xparam_w)
 	AM_RANGE(0x280000, 0x28001f) AM_WRITE(madmax_blitter_yparam_w)
 	AM_RANGE(0x2a0000, 0x2a003f) AM_READWRITE(madmax_blitter_vidparam_r, madmax_blitter_vidparam_w)
-	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(sound_command_w)
+	AM_RANGE(0x2e0000, 0x2e0001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(madmax_blitter_unknown_w)
 ADDRESS_MAP_END
 
@@ -217,7 +196,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, dcheese_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sound_status_r, sound_control_w)
-	AM_RANGE(0x0800, 0x0fff) AM_READ(sound_command_r)
+	AM_RANGE(0x0800, 0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x0700) AM_WRITE(bsmt_data_w)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0xffff) AM_ROM
@@ -277,6 +256,7 @@ static INPUT_PORTS_START( dcheese )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, motor_w)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
@@ -325,6 +305,7 @@ static INPUT_PORTS_START( lottof2 )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, motor_w)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
@@ -375,6 +356,7 @@ static INPUT_PORTS_START( fredmem )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START( "EEPROMOUT" )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, motor_w)
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, di_write)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, clk_write)
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, cs_write)
@@ -388,7 +370,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( dcheese, dcheese_state )
+MACHINE_CONFIG_START(dcheese_state::dcheese)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_OSC)
@@ -421,6 +403,7 @@ static MACHINE_CONFIG_START( dcheese, dcheese_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_BSMT2000_ADD("bsmt", SOUND_OSC)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.2)
@@ -428,7 +411,7 @@ static MACHINE_CONFIG_START( dcheese, dcheese_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fredmem, dcheese )
+MACHINE_CONFIG_DERIVED(dcheese_state::fredmem, dcheese)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 359, 0, 239)
 MACHINE_CONFIG_END
@@ -787,12 +770,12 @@ ROM_END
  *
  *************************************/
 
-GAME( 1993, dcheese,   0,       dcheese, dcheese, driver_device, 0, ROT90, "HAR", "Double Cheese", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, lottof2,   0,       dcheese, lottof2, driver_device, 0, ROT0,  "HAR", "Lotto Fun 2", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, cecmatch,  0,       fredmem, fredmem, driver_device, 0, ROT0,  "Coastal Amusements", "ChuckECheese's Match Game", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmem,   0,       fredmem, fredmem, driver_device, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (World?, Ticket version, 3/17/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmemus, fredmem, fredmem, fredmem, driver_device, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (US, High Score version, 3/10/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmemuk, fredmem, fredmem, fredmem, driver_device, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (UK, 3/17/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmemj,  fredmem, fredmem, fredmem, driver_device, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Japan, High Score version, 3/20/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmemc,  fredmem, fredmem, fredmem, driver_device, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Mandarin Chinese, 3/17/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fredmesp,  fredmem, fredmem, fredmem, driver_device, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Spanish, 3/17/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, dcheese,   0,       dcheese, dcheese, dcheese_state, 0, ROT90, "HAR",                "Double Cheese",                                                       MACHINE_SUPPORTS_SAVE )
+GAME( 1993, lottof2,   0,       dcheese, lottof2, dcheese_state, 0, ROT0,  "HAR",                "Lotto Fun 2",                                                         MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cecmatch,  0,       fredmem, fredmem, dcheese_state, 0, ROT0,  "Coastal Amusements", "ChuckECheese's Match Game",                                           MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmem,   0,       fredmem, fredmem, dcheese_state, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (World?, Ticket version, 3/17/95)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmemus, fredmem, fredmem, fredmem, dcheese_state, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (US, High Score version, 3/10/95)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmemuk, fredmem, fredmem, fredmem, dcheese_state, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (UK, 3/17/95)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmemj,  fredmem, fredmem, fredmem, dcheese_state, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Japan, High Score version, 3/20/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmemc,  fredmem, fredmem, fredmem, dcheese_state, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Mandarin Chinese, 3/17/95)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fredmesp,  fredmem, fredmem, fredmem, dcheese_state, 0, ROT0,  "Coastal Amusements", "Fred Flintstones' Memory Match (Spanish, 3/17/95)",                   MACHINE_SUPPORTS_SAVE )

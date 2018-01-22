@@ -82,9 +82,19 @@ PALETTE_INIT_MEMBER(bagman_state,bagman)
 	}
 }
 
-WRITE8_MEMBER(bagman_state::flipscreen_w)
+WRITE_LINE_MEMBER(bagman_state::flipscreen_x_w)
 {
-	flip_screen_set(data & 0x01);
+	flip_screen_x_set(state);
+}
+
+WRITE_LINE_MEMBER(bagman_state::flipscreen_y_w)
+{
+	flip_screen_y_set(state);
+}
+
+WRITE_LINE_MEMBER(bagman_state::video_enable_w)
+{
+	m_video_enable = state;
 }
 
 TILE_GET_INFO_MEMBER(bagman_state::get_bg_tile_info)
@@ -134,7 +144,7 @@ void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 uint32_t bagman_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	if (*m_video_enable == 0)
+	if (!m_video_enable)
 		return 0;
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

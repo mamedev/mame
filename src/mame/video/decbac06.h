@@ -1,6 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
-/* BAC06 */
+#ifndef MAME_VIDEO_DECOBAC06_H
+#define MAME_VIDEO_DECOBAC06_H
+
+#pragma once
+
+#include <memory>
 
 #define MCFG_BAC06_BOOTLEG_DISABLE_8x8 \
 	deco_bac06_device::disable_8x8(*device);
@@ -148,10 +153,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
-extern const device_type DECO_BAC06;
+DECLARE_DEVICE_TYPE(DECO_BAC06, deco_bac06_device)
 
 #define MCFG_DECO_BAC06_GFXDECODE(_gfxtag) \
 	deco_bac06_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #define MCFG_DECO_BAC06_GFX_REGION_WIDE(_8x8, _16x16, _wide) \
 	deco_bac06_device::set_gfx_region_wide(*device, _8x8, _16x16, _wide);
+
+#endif // MAME_VIDEO_DECOBAC06_H

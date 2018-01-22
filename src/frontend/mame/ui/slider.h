@@ -16,7 +16,6 @@
 
 #include <functional>
 
-#include "emu.h"
 #include "sliderchangednotifier.h"
 
 #define SLIDER_NOCHANGE     0x12345678
@@ -25,7 +24,6 @@ typedef std::function<int32_t(running_machine&, void*, int, std::string*, int32_
 
 struct slider_state
 {
-	slider_state *  next;               /* pointer to next slider */
 	slider_update   update;             /* callback */
 	void *          arg;                /* argument */
 	int32_t           minval;             /* minimum value */
@@ -33,7 +31,7 @@ struct slider_state
 	int32_t           maxval;             /* maximum value */
 	int32_t           incval;             /* increment value */
 	int             id;
-	char            description[1];     /* textual description */
+	std::string     description;        /* textual description */
 };
 
 #endif // __UI_SLIDER__

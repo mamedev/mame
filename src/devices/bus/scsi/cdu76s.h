@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_BUS_SCSI_CDU76S_H
+#define MAME_BUS_SCSI_CDU76S_H
 
-#ifndef __CDU76S_H__
-#define __CDU76S_H__
+#pragma once
 
 #include "scsicd.h"
 #include "machine/t10mmc.h"
@@ -26,6 +26,6 @@ public:
 };
 
 // device type definition
-extern const device_type CDU76S;
+DECLARE_DEVICE_TYPE(CDU76S, sony_cdu76s_device)
 
-#endif
+#endif // MAME_BUS_SCSI_CDU76S_H

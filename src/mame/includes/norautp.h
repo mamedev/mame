@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Roberto Fresca
+#include "machine/i8255.h"
 #include "sound/discrete.h"
+#include "screen.h"
 
 
 /* Discrete Sound Input Nodes */
@@ -14,16 +16,15 @@ public:
 	norautp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
 		m_maincpu(*this, "maincpu"),
+		m_ppi8255(*this, "ppi8255_%u", 0),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette")  { }
 
 	std::unique_ptr<uint16_t[]> m_np_vram;
-	uint16_t m_np_addr;
-	DECLARE_READ8_MEMBER(test_r);
-	DECLARE_READ8_MEMBER(vram_data_r);
-	DECLARE_WRITE8_MEMBER(vram_data_w);
-	DECLARE_WRITE8_MEMBER(vram_addr_w);
+	DECLARE_WRITE_LINE_MEMBER(ppi2_obf_w);
+	TIMER_CALLBACK_MEMBER(ppi2_ack);
 	DECLARE_READ8_MEMBER(test2_r);
 	DECLARE_WRITE8_MEMBER(mainlamps_w);
 	DECLARE_WRITE8_MEMBER(soundlamps_w);
@@ -35,9 +36,25 @@ public:
 	DECLARE_PALETTE_INIT(norautp);
 	uint32_t screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_device_array<i8255_device, 3> m_ppi8255;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void noraut_base(machine_config &config);
+	void kimble(machine_config &config);
+	void kimbldhl(machine_config &config);
+	void norautp(machine_config &config);
+	void norautx4(machine_config &config);
+	void norautpl(machine_config &config);
+	void newhilop(machine_config &config);
+	void dphltest(machine_config &config);
+	void nortest1(machine_config &config);
+	void ssjkrpkr(machine_config &config);
+	void dphl(machine_config &config);
+	void dphla(machine_config &config);
+	void drhl(machine_config &config);
+	void norautxp(machine_config &config);
 };
 
 /*----------- defined in audio/norautp.c -----------*/

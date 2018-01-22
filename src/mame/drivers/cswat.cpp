@@ -22,9 +22,11 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
+#include "audio/namco52.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/mb88xx/mb88xx.h"
-#include "audio/namco52.h"
+#include "screen.h"
 
 
 class cswat_state : public driver_device
@@ -60,6 +62,7 @@ public:
 	virtual void video_start() override;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
+	void cswat(machine_config &config);
 };
 
 
@@ -130,7 +133,7 @@ READ8_MEMBER(cswat_state::dipswitch_r)
 READ8_MEMBER(cswat_state::sensors_r)
 {
 	// ?
-	return rand();
+	return machine().rand();
 }
 
 static ADDRESS_MAP_START( cswat_map, AS_PROGRAM, 8, cswat_state )
@@ -251,10 +254,10 @@ void cswat_state::machine_start()
 	save_item(NAME(m_nmi_enabled));
 }
 
-static MACHINE_CONFIG_START( cswat, cswat_state )
+MACHINE_CONFIG_START(cswat_state::cswat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_18_432MHz/3/4) // HD68A09EP, 1.5MHz?
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_18_432MHz/3/4) // HD68A09EP, 1.5MHz?
 	MCFG_CPU_PROGRAM_MAP(cswat_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cswat_state, irq0_line_assert)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cswat_state, nmi_handler, 300) // ?
@@ -302,4 +305,4 @@ ROM_START( cswat )
 ROM_END
 
 
-GAME( 1984, cswat, 0, cswat, cswat, driver_device, 0, ROT0, "Namco", "Cosmoswat", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, cswat, 0, cswat, cswat, cswat_state, 0, ROT0, "Namco", "Cosmoswat", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS )

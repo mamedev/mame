@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_C64_WESTERMANN_H
+#define MAME_BUS_C64_WESTERMANN_H
+
 #pragma once
 
-#ifndef __WESTERMANN__
-#define __WESTERMANN__
 
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -41,7 +40,7 @@ protected:
 
 
 // device type definition
-extern const device_type C64_WESTERMANN;
+DECLARE_DEVICE_TYPE(C64_WESTERMANN, c64_westermann_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_WESTERMANN_H

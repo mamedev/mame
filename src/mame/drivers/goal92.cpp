@@ -10,11 +10,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/goal92.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "includes/goal92.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 WRITE16_MEMBER(goal92_state::goal92_sound_command_w)
 {
@@ -41,7 +45,7 @@ READ16_MEMBER(goal92_state::goal92_inputs_r)
 			return ioport("DSW2")->read();
 
 		default:
-			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n", offset, mem_mask,space.device().safe_pc());
+			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n", offset, mem_mask,m_maincpu->pc());
 	}
 
 	return 0;
@@ -54,7 +58,7 @@ static ADDRESS_MAP_START( goal92_map, AS_PROGRAM, 16, goal92_state )
 	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(goal92_foreground_w) AM_SHARE("fg_data")
 	AM_RANGE(0x101800, 0x101fff) AM_RAM // it has tiles for clouds, but they aren't used
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(goal92_text_w) AM_SHARE("tx_data")
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x104000, 0x13ffff) AM_RAM
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140800, 0x140801) AM_WRITENOP
@@ -290,7 +294,7 @@ void goal92_state::machine_reset()
 	m_adpcm_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( goal92, goal92_state )
+MACHINE_CONFIG_START(goal92_state::goal92)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)
@@ -309,7 +313,7 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1) // black border at bottom is a game bug...
 	MCFG_SCREEN_UPDATE_DRIVER(goal92_state, screen_update_goal92)
-	MCFG_SCREEN_VBLANK_DRIVER(goal92_state, screen_eof_goal92)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(goal92_state, screen_vblank_goal92))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", goal92)
@@ -330,7 +334,7 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(goal92_state, goal92_adpcm_int))   /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)      /* 4KHz 4-bit */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -386,7 +390,7 @@ ROM_START( goal92 )
 	ROM_LOAD( "6.bin",        0x000000, 0x040000, CRC(83cadc8f) SHA1(1d3309750347c5d6d661f5cf452235e5a83a7483) )
 	ROM_LOAD( "7.bin",        0x040000, 0x040000, CRC(067e10fc) SHA1(9831b8dc9b8efa6f7797b2946ee5be03fb36de7b) )
 	ROM_LOAD( "5.bin",        0x080000, 0x040000, CRC(9a390af2) SHA1(8bc46f8cc7823b8caf381866bea016ebfad9d5d3) )
-	ROM_LOAD( "4.bin",        0x0c0000, 0x040000, CRC(69b118d5) SHA1(80ab6f03e1254ba47c27299ce11559b244a024ad) )
+	ROM_LOAD( "4.bin",        0x0c0000, 0x040000, CRC(69b118d5) SHA1(80ab6f03e1254ba47c27299ce11559b244a024ad) )  // sldh
 
 	ROM_REGION( 0x200000, "gfx2", 0 )
 	ROM_LOAD( "11.bin",       0x000000, 0x080000, CRC(5701e626) SHA1(e6915714e9ca90be8fa8ab1bf7fd1f23a83fb82c) )
@@ -397,4 +401,4 @@ ROM_END
 
 
 
-GAME( 1992, goal92,   cupsoc, goal92,   goal92, driver_device, 0, ROT0, "bootleg", "Goal! '92", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, goal92,   cupsoc, goal92,   goal92, goal92_state, 0, ROT0, "bootleg", "Goal! '92", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -13,7 +13,6 @@
 
 #ifdef OSD_WINDOWS
 
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <tchar.h>
 #include <mmsystem.h>
@@ -78,7 +77,7 @@ public:
 	void                    update_presentation_parameters();
 	void                    update_gamma_ramp();
 
-	bool					device_verify_caps();
+	bool                    device_verify_caps();
 	int                     device_test_cooperative();
 
 	int                     config_adapter_mode();

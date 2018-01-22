@@ -55,14 +55,14 @@ static int32_t UNPACK(uint16_t val)
 	return uval;
 }
 
-void aica_dsp_init(AICADSP *DSP)
+void AICADSP::init()
 {
-	memset(DSP,0,sizeof(AICADSP));
-	DSP->RBL=0x8000;
-	DSP->Stopped=1;
+	memset(this,0,sizeof(*this));
+	RBL=0x8000;
+	Stopped=1;
 }
 
-void aica_dsp_step(AICADSP *DSP)
+void AICADSP::step()
 {
 	int32_t ACC=0;    //26 bit
 	int32_t SHIFTED=0;    //24 bit
@@ -77,19 +77,19 @@ void aica_dsp_step(AICADSP *DSP)
 	uint32_t ADRS_REG=0;  //13 bit
 	int step;
 
-	if(DSP->Stopped)
+	if(Stopped)
 		return;
 
-	memset(DSP->EFREG,0,2*16);
+	memset(EFREG,0,2*16);
 #if 0
 	int dump=0;
 	FILE *f=nullptr;
 	if(dump)
 		f=fopen("dsp.txt","wt");
 #endif
-	for(step=0;step</*128*/DSP->LastStep;++step)
+	for(step=0;step</*128*/LastStep;++step)
 	{
-		uint16_t *IPtr=DSP->MPRO+step*8;
+		uint16_t *IPtr=MPRO+step*8;
 
 //      if(IPtr[0]==0 && IPtr[1]==0 && IPtr[2]==0 && IPtr[3]==0)
 //          break;
@@ -157,9 +157,9 @@ void aica_dsp_step(AICADSP *DSP)
 		//INPUTS RW
 		assert(IRA<0x32);
 		if(IRA<=0x1f)
-			INPUTS=DSP->MEMS[IRA];
+			INPUTS=MEMS[IRA];
 		else if(IRA<=0x2F)
-			INPUTS=DSP->MIXS[IRA-0x20]<<4;  //MIXS is 20 bit
+			INPUTS=MIXS[IRA-0x20]<<4;  //MIXS is 20 bit
 		else if(IRA<=0x31)
 			INPUTS=0;
 
@@ -170,7 +170,7 @@ void aica_dsp_step(AICADSP *DSP)
 
 		if(IWT)
 		{
-			DSP->MEMS[IWA]=MEMVAL;  //MEMVAL was selected in previous MRD
+			MEMS[IWA]=MEMVAL;  //MEMVAL was selected in previous MRD
 			if(IRA==IWA)
 				INPUTS=MEMVAL;
 		}
@@ -183,7 +183,7 @@ void aica_dsp_step(AICADSP *DSP)
 				B=ACC;
 			else
 			{
-				B=DSP->TEMP[(TRA+DSP->DEC)&0x7F];
+				B=TEMP[(TRA+DEC)&0x7F];
 				B<<=8;
 				B>>=8;
 				//if(B&0x00800000)
@@ -200,7 +200,7 @@ void aica_dsp_step(AICADSP *DSP)
 			X=INPUTS;
 		else
 		{
-			X=DSP->TEMP[(TRA+DSP->DEC)&0x7F];
+			X=TEMP[(TRA+DEC)&0x7F];
 			X<<=8;
 			X>>=8;
 			//if(X&0x00800000)
@@ -211,7 +211,7 @@ void aica_dsp_step(AICADSP *DSP)
 		if(YSEL==0)
 			Y=FRC_REG;
 		else if(YSEL==1)
-			Y=DSP->COEF[COEF<<1]>>3;    //COEF is 16 bits
+			Y=this->COEF[COEF<<1]>>3;    //COEF is 16 bits
 		else if(YSEL==2)
 			Y=(Y_REG>>11)&0x1FFF;
 		else if(YSEL==3)
@@ -266,7 +266,7 @@ void aica_dsp_step(AICADSP *DSP)
 		ACC=(int) v+B;
 
 		if(TWT)
-			DSP->TEMP[(TWA+DSP->DEC)&0x7F]=SHIFTED;
+			TEMP[(TWA+DEC)&0x7F]=SHIFTED;
 
 		if(FRCL)
 		{
@@ -279,34 +279,34 @@ void aica_dsp_step(AICADSP *DSP)
 		if(MRD || MWT)
 		//if(0)
 		{
-			ADDR=DSP->MADRS[MASA<<1];
+			ADDR=MADRS[MASA<<1];
 			if(!TABLE)
-				ADDR+=DSP->DEC;
+				ADDR+=DEC;
 			if(ADREB)
 				ADDR+=ADRS_REG&0x0FFF;
 			if(NXADR)
 				ADDR++;
 			if(!TABLE)
-				ADDR&=DSP->RBL-1;
+				ADDR&=RBL-1;
 			else
 				ADDR&=0xFFFF;
 			//ADDR<<=1;
-			//ADDR+=DSP->RBP<<13;
-			//MEMVAL=DSP->AICARAM[ADDR>>1];
-			ADDR+=DSP->RBP<<10;
+			//ADDR+=RBP<<13;
+			//MEMVAL=AICARAM[ADDR>>1];
+			ADDR+=RBP<<10;
 			if(MRD && (step&1)) //memory only allowed on odd? DoA inserts NOPs on even
 			{
 				if(NOFL)
-					MEMVAL=DSP->AICARAM[ADDR]<<8;
+					MEMVAL=AICARAM[ADDR]<<8;
 				else
-					MEMVAL=UNPACK(DSP->AICARAM[ADDR]);
+					MEMVAL=UNPACK(AICARAM[ADDR]);
 			}
 			if(MWT && (step&1))
 			{
 				if(NOFL)
-					DSP->AICARAM[ADDR]=SHIFTED>>8;
+					AICARAM[ADDR]=SHIFTED>>8;
 				else
-					DSP->AICARAM[ADDR]=PACK(SHIFTED);
+					AICARAM[ADDR]=PACK(SHIFTED);
 			}
 		}
 
@@ -319,34 +319,33 @@ void aica_dsp_step(AICADSP *DSP)
 		}
 
 		if(EWT)
-			DSP->EFREG[EWA]+=SHIFTED>>8;
+			EFREG[EWA]+=SHIFTED>>8;
 
 	}
-	--DSP->DEC;
-	memset(DSP->MIXS,0,4*16);
+	--DEC;
+	memset(MIXS,0,4*16);
 //  if(f)
 //      fclose(f);
 }
 
-void aica_dsp_setsample(AICADSP *DSP,int32_t sample,int SEL,int MXL)
+void AICADSP::setsample(int32_t sample,int SEL,int MXL)
 {
-	//DSP->MIXS[SEL]+=sample<<(MXL+1)/*7*/;
-	DSP->MIXS[SEL]+=sample;
+	//MIXS[SEL]+=sample<<(MXL+1)/*7*/;
+	MIXS[SEL]+=sample;
 //  if(MXL)
 //      int a=1;
 }
 
-void aica_dsp_start(AICADSP *DSP)
+void AICADSP::start()
 {
 	int i;
-	DSP->Stopped=0;
+	Stopped=0;
 	for(i=127;i>=0;--i)
 	{
-		uint16_t *IPtr=DSP->MPRO+i*8;
+		uint16_t *IPtr=MPRO+i*8;
 
 		if(IPtr[0]!=0 || IPtr[2]!=0 || IPtr[4]!=0 || IPtr[6]!=0)
 			break;
 	}
-	DSP->LastStep=i+1;
-
+	LastStep=i+1;
 }

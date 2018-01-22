@@ -15,13 +15,15 @@
  *****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
-
 #include "lh5801.h"
+#include "5801dasm.h"
+
+#include "debugger.h"
 
 #define VERBOSE 0
 
-#define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
+
 
 enum
 {
@@ -62,17 +64,24 @@ enum
 #define H 0x10
 
 
-const device_type LH5801 = &device_creator<lh5801_cpu_device>;
+DEFINE_DEVICE_TYPE(LH5801, lh5801_cpu_device, "lh5801", "LH5801")
 
 
 lh5801_cpu_device::lh5801_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, LH5801, "LH5801", tag, owner, clock, "lh5801", __FILE__)
+	: cpu_device(mconfig, LH5801, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_in_func(*this)
 {
 }
 
+device_memory_interface::space_config_vector lh5801_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 /***************************************************************
  * include the opcode macros, functions and tables
@@ -83,7 +92,7 @@ void lh5801_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	m_in_func.resolve_safe(0);
 
@@ -248,8 +257,7 @@ void lh5801_cpu_device::execute_set_input(int irqline, int state)
 	}
 }
 
-offs_t lh5801_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *lh5801_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( lh5801 );
-	return CPU_DISASSEMBLE_NAME(lh5801)(this, buffer, pc, oprom, opram, options);
+	return new lh5801_disassembler;
 }

@@ -11,9 +11,13 @@
 
 *****************************************************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
 #include "audio/gottlieb.h"
 #include "cpu/i86/i86.h"
+#include "screen.h"
+#include "speaker.h"
+
 #include "gts80a.lh"
 #include "gts80a_caveman.lh"
 
@@ -35,6 +39,9 @@ public:
 	DECLARE_WRITE8_MEMBER(port2b_w);
 	DECLARE_WRITE8_MEMBER(port3a_w);
 	DECLARE_WRITE8_MEMBER(port3b_w);
+	void gts80a(machine_config &config);
+	void gts80a_s(machine_config &config);
+	void gts80a_ss(machine_config &config);
 private:
 	uint8_t m_port2;
 	uint8_t m_segment;
@@ -282,7 +289,7 @@ WRITE8_MEMBER( gts80a_state::port2a_w )
 	m_port2 = data;
 	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
 	uint16_t seg1 = (uint16_t)patterns[m_segment & 15];
-	uint16_t seg2 = BITSWAP16(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
+	uint16_t seg2 = bitswap<16>(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
 	switch (data & 0x70)
 	{
 		case 0x10: // player 1&2
@@ -331,7 +338,7 @@ DRIVER_INIT_MEMBER( gts80a_state, gts80a )
 }
 
 /* with Sound Board */
-static MACHINE_CONFIG_START( gts80a, gts80a_state )
+MACHINE_CONFIG_START(gts80a_state::gts80a)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_579545MHz/4)
 	MCFG_CPU_PROGRAM_MAP(gts80a_map)
@@ -366,12 +373,12 @@ static MACHINE_CONFIG_START( gts80a, gts80a_state )
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gts80a_s, gts80a )
+MACHINE_CONFIG_DERIVED(gts80a_state::gts80a_s, gts80a)
 	MCFG_SOUND_ADD("r0sound", GOTTLIEB_SOUND_REV0, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gts80a_ss, gts80a )
+MACHINE_CONFIG_DERIVED(gts80a_state::gts80a_ss, gts80a)
 	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
 	//MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)  // votrax crashes
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
@@ -392,6 +399,7 @@ public:
 
 	uint32_t screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void caveman(machine_config &config);
 private:
 	required_device<cpu_device> m_videocpu;
 	required_shared_ptr<uint8_t> m_vram;
@@ -437,7 +445,7 @@ static ADDRESS_MAP_START( video_io_map, AS_IO, 8, caveman_state )
 
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( caveman, gts80a_ss, caveman_state )
+MACHINE_CONFIG_DERIVED(caveman_state::caveman, gts80a_ss)
 	MCFG_CPU_ADD("video_cpu", I8088, 5000000)
 	MCFG_CPU_PROGRAM_MAP(video_map)
 	MCFG_CPU_IO_MAP(video_io_map)
@@ -705,6 +713,17 @@ ROM_START(rocky)
 	ROM_LOAD("672-s2.snd", 0x7800, 0x0800, CRC(5e77117a) SHA1(7836b1ee0b2afe621ae414d5710111b550db0e63))
 ROM_END
 
+ROM_START(rockyf)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("u2_80a.bin", 0x2000, 0x1000, CRC(241de1d4) SHA1(9d5942704cbdec6565d6335e33e9f7e4c60a41ac))
+	ROM_LOAD("u3_80a.bin", 0x3000, 0x1000, CRC(2d77ccdc) SHA1(47241ccd365e8d74d5aa5b775acf6445cc95b8a8))
+	ROM_LOAD("672-2x.cpu", 0x1000, 0x0800, CRC(8e2f0d39) SHA1(eb0982d2bfa910b3c95d6d55c04dc58395789411))
+
+	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
+	ROM_LOAD("f672-s1.snd", 0x7000, 0x0800, CRC(57a0ce22) SHA1(cdc167b5eb72e8c3235d3ffd9143faf8e6c0a2ef))
+	ROM_LOAD("f672-s2.snd", 0x7800, 0x0800, CRC(87a0474f) SHA1(62fe995f3bc7fe23422d75b043d508c2f84f745a))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Royal Flush Deluxe (#681)
 /-------------------------------------------------------------------*/
@@ -789,28 +808,29 @@ ROM_START(touchdn)
 ROM_END
 
 
-/* cust  */GAME(1981,   dvlsdre,    0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Devil's Dare",         MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1981,   dvlsdre2,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Devil's Dare (Sound Only)",    MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1982,   rocky,      0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Rocky",                MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1982,   spirit,     0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Spirit",               MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1982,   punk,       0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Punk!",                MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1982,   striker,    0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Striker",              MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1983,   krullp,     0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Krull (Pinball)",              MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,   qbquest,    0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Q*Bert's Quest",           MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,   sorbit,     0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Super Orbit",          MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,   rflshdlx,   0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Royal Flush Deluxe",       MACHINE_IS_SKELETON_MECHANICAL)
-/* cust  */GAME(1983,   goinnuts,   0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Goin' Nuts",           MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,   amazonh,    0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Amazon Hunt",          MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,   amazonha,   amazonh,gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Amazon Hunt (alternate set)", MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,   rackempp,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Rack 'em Up! (Pinball)",           MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1983,   raimfire,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Ready...Aim...Fire!",      MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1984,   jack2opn,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Jacks to Open",            MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1984,   touchdn,    0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Touchdown",            MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1984,   alienstr,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Alien Star",           MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1984,   thegames,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "The Games",            MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1984,   eldorado,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "El Dorado City of Gold",   MACHINE_IS_SKELETON_MECHANICAL)
-/* disp3 */GAME(1985,   icefever,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Ice Fever",            MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME(1981,   dvlsdre,    0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Devil's Dare",                MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME(1981,   dvlsdre2,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Devil's Dare (Sound Only)",   MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME(1982,   rocky,      0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Rocky",                       MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME(1982,   rockyf,     rocky,   gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Rocky (French speech)",       MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME(1982,   spirit,     0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Spirit",                      MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1982,   punk,       0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Punk!",                       MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME(1982,   striker,    0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Striker",                     MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME(1983,   krullp,     0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Krull (Pinball)",             MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1983,   qbquest,    0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Q*Bert's Quest",              MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1983,   sorbit,     0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Super Orbit",                 MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1983,   rflshdlx,   0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Royal Flush Deluxe",          MACHINE_IS_SKELETON_MECHANICAL)
+/* cust  */GAME(1983,   goinnuts,   0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Goin' Nuts",                  MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1983,   amazonh,    0,       gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Amazon Hunt",                 MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1983,   amazonha,   amazonh, gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Amazon Hunt (alternate set)", MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1983,   rackempp,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Rack 'em Up! (Pinball)",      MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1983,   raimfire,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Ready...Aim...Fire!",         MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1984,   jack2opn,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Jacks to Open",               MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1984,   touchdn,    0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Touchdown",                   MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1984,   alienstr,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Alien Star",                  MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1984,   thegames,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "The Games",                   MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1984,   eldorado,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "El Dorado City of Gold",      MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1985,   icefever,   0,       gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Ice Fever",                   MACHINE_IS_SKELETON_MECHANICAL)
 
 /* custom (+video) */
-GAME(1981,  caveman,    0,          caveman,    caveman, gts80a_state,  gts80a, ROT0,   "Gottlieb",     "Caveman (Pinball/Video Combo, set 1)", MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1981,  cavemana,   caveman,    caveman,    caveman, gts80a_state,  gts80a, ROT0,   "Gottlieb",     "Caveman (Pinball/Video Combo, set 2)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  caveman,    0,          caveman, caveman, caveman_state,  gts80a, ROT0,   "Gottlieb",     "Caveman (Pinball/Video Combo, set 1)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1981,  cavemana,   caveman,    caveman, caveman, caveman_state,  gts80a, ROT0,   "Gottlieb",     "Caveman (Pinball/Video Combo, set 2)", MACHINE_IS_SKELETON_MECHANICAL)

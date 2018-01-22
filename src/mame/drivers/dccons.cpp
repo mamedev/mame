@@ -261,33 +261,36 @@
 */
 
 #include "emu.h"
-#include "cpu/arm7/arm7.h"
-#include "cpu/sh4/sh4.h"
-#include "cpu/arm7/arm7core.h"
-#include "sound/aica.h"
-#include "machine/aicartc.h"
-#include "includes/dc.h"
 #include "includes/dccons.h"
+
+#include "cpu/arm7/arm7.h"
+#include "cpu/arm7/arm7core.h"
+#include "cpu/sh/sh4.h"
 #include "imagedev/chd_cd.h"
+#include "machine/aicartc.h"
 #include "machine/dc-ctrl.h"
 #include "machine/gdrom.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 #define CPU_CLOCK (200000000)
 
 READ64_MEMBER(dc_cons_state::dcus_idle_skip_r )
 {
-	//if (space.device().safe_pc()==0xc0ba52a)
-	//  space.device().execute().spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(&space.device());
+	//if (m_maincpu->pc()==0xc0ba52a)
+	//  m_maincpu->spin_until_time(attotime::from_usec(2500));
+	//  device_spinuntil_int(m_maincpu);
 
 	return dc_ram[0x2303b0/8];
 }
 
 READ64_MEMBER(dc_cons_state::dcjp_idle_skip_r )
 {
-	//if (space.device().safe_pc()==0xc0bac62)
-	//  space.device().execute().spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(&space.device());
+	//if (m_maincpu->pc()==0xc0bac62)
+	//  m_maincpu->spin_until_time(attotime::from_usec(2500));
+	//  device_spinuntil_int(m_maincpu);
 
 	return dc_ram[0x2302f8/8];
 }
@@ -347,16 +350,6 @@ WRITE64_MEMBER(dc_cons_state::dc_pdtra_w )
 	PDTRA = (data & 0xffff);
 }
 
-READ64_MEMBER(dc_cons_state::dc_arm_r )
-{
-	return *((uint64_t *)dc_sound_ram.target()+offset);
-}
-
-WRITE64_MEMBER(dc_cons_state::dc_arm_w )
-{
-	COMBINE_DATA((uint64_t *)dc_sound_ram.target() + offset);
-}
-
 #if 0
 READ8_MEMBER(dc_cons_state::dc_flash_r)
 {
@@ -371,19 +364,19 @@ WRITE8_MEMBER(dc_cons_state::dc_flash_w)
 
 static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP             // BIOS
-	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("dcflash",0)//AM_READWRITE8(dc_flash_r,dc_flash_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("dcflash",0)//AM_READWRITE8(dc_flash_r,dc_flash_w, 0xffffffffffffffffU)
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
-	AM_RANGE(0x005f6c00, 0x005f6cff) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
-	AM_RANGE(0x005f7000, 0x005f701f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, U64(0x0000ffff0000ffff) )
-	AM_RANGE(0x005f7080, 0x005f709f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, U64(0x0000ffff0000ffff) )
-	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE32(dc_mess_g1_ctrl_r, dc_mess_g1_ctrl_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0x005f6c00, 0x005f6cff) AM_DEVICE32( "maple_dc", maple_dc_device, amap, 0xffffffffffffffffU )
+	AM_RANGE(0x005f7000, 0x005f701f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0x0000ffff0000ffffU )
+	AM_RANGE(0x005f7080, 0x005f709f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0x0000ffff0000ffffU )
+	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE32(dc_mess_g1_ctrl_r, dc_mess_g1_ctrl_w, 0xffffffffffffffffU )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, U64(0xffffffffffffffff))
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_DEVICE32("powervr2", powervr2_device, ta_map, U64(0xffffffffffffffff))
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, 0xffffffffffffffffU)
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_DEVICE32("powervr2", powervr2_device, ta_map, 0xffffffffffffffffU)
 	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE(dc_modem_r, dc_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16("aicartc", aicartc_device, read, write, U64(0x0000ffff0000ffff) )
-	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE(dc_arm_r, dc_arm_w )
+	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, 0xffffffffffffffffU)
+	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16("aicartc", aicartc_device, read, write, 0x0000ffff0000ffffU )
+	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE(sh4_soundram_r, sh4_soundram_w )
 //  AM_RANGE(0x01000000, 0x01ffffff) G2 Ext Device #1
 //  AM_RANGE(0x02700000, 0x02707fff) AICA reg mirror
 //  AM_RANGE(0x02800000, 0x02ffffff) AICA wave mem mirror
@@ -402,11 +395,11 @@ static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_cons_state )
 
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
-	AM_RANGE(0x10800000, 0x10ffffff) AM_DEVWRITE8("powervr2", powervr2_device, ta_fifo_yuv_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x10800000, 0x10ffffff) AM_DEVWRITE8("powervr2", powervr2_device, ta_fifo_yuv_w, 0xffffffffffffffffU)
 	AM_RANGE(0x11000000, 0x117fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath0_w) AM_MIRROR(0x00800000)  // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
 
 	AM_RANGE(0x12000000, 0x127fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
-	AM_RANGE(0x12800000, 0x12ffffff) AM_DEVWRITE8("powervr2", powervr2_device, ta_fifo_yuv_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x12800000, 0x12ffffff) AM_DEVWRITE8("powervr2", powervr2_device, ta_fifo_yuv_w, 0xffffffffffffffffU)
 	AM_RANGE(0x13000000, 0x137fffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath1_w) AM_MIRROR(0x00800000) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
 //  AM_RANGE(0x14000000, 0x17ffffff) G2 Ext Device #3
@@ -564,9 +557,9 @@ static INPUT_PORTS_START( dc )
 	//A4 - A5, second analog stick, unused on DC
 
 	PORT_START("MAMEDEBUG")
-	PORT_DIPNAME( 0x01, 0x00, "Bilinear Filtering" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFNAME( 0x01, 0x00, "Bilinear Filtering" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_START("SCREEN_TYPE")
 	PORT_CONFNAME( 0x03, 0x03, "Screen Connection Type" )
@@ -575,34 +568,14 @@ static INPUT_PORTS_START( dc )
 	PORT_CONFSETTING(    0x03, "S-Video" )
 INPUT_PORTS_END
 
-MACHINE_RESET_MEMBER(dc_cons_state,dc_console)
+void dc_cons_state::gdrom_config(device_t *device)
 {
-	dc_state::machine_reset();
-	m_aica->set_ram_base(dc_sound_ram, 2*1024*1024);
-}
-
-WRITE_LINE_MEMBER(dc_cons_state::aica_irq)
-{
-	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-WRITE_LINE_MEMBER(dc_cons_state::sh4_aica_irq)
-{
-	if(state)
-		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_AICA;
-	else
-		dc_sysctrl_regs[SB_ISTEXT] &= ~IST_EXT_AICA;
-
-	dc_update_interrupt_status();
-}
-
-static MACHINE_CONFIG_FRAGMENT( gdrom_config )
-	MCFG_DEVICE_MODIFY("cdda")
+	device = device->subdevice("cdda");
 	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( dc, dc_cons_state )
+MACHINE_CONFIG_START(dc_cons_state::dc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
 	MCFG_SH4_MD0(1)
@@ -617,6 +590,8 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 	MCFG_SH4_CLOCK(CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(dc_map)
 	MCFG_CPU_IO_MAP(dc_port)
+	MCFG_CPU_FORCE_NO_DRC()
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
@@ -642,8 +617,8 @@ static MACHINE_CONFIG_START( dc, dc_cons_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("aica", AICA, 0)
 	MCFG_AICA_MASTER
-	MCFG_AICA_IRQ_CB(WRITELINE(dc_cons_state, aica_irq))
-	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(dc_cons_state, sh4_aica_irq))
+	MCFG_AICA_IRQ_CB(WRITELINE(dc_state, aica_irq))
+	MCFG_AICA_MAIN_IRQ_CB(WRITELINE(dc_state, sh4_aica_irq))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 
@@ -682,18 +657,57 @@ MACHINE_CONFIG_END
 	ROM_LOAD_BIOS(3, "dc101d_ch.bin",   0x000000, 0x200000, CRC(a2564fad) SHA1(edc5d3d70a93c935703d26119b37731fd317d2bf) )
 // ^^^ dc101d_eu.bin ^^^ is selfmade chinese translation, doesn't work on real hardware, does it must be here at all ?
 
+/* note: Dreamcast Flash ROMs actually 256KB MBM29F002TC (VA0) or MBM29LV002TC (VA1) devices, only 2nd 128KB half is used, A17 pin tied to VCC
+   sector SA5 (1A000 - 1BFFF) is read-only, contain information written during manufacture or repair, fully generated by software tool (except predefined list of creators)
+struct factory_sector
+{
+    struct factory_record {
+        // everything 'char' below is decimal numbers in ASCII, unless noted else
+        char machine_code1; // '0' - Dreamcast, 0xFF - dev.box
+        char machine_code2; // '0' - Dreamcast, 0xFF - dev.box
+        char country_code;  // 0 - Japan, 1 - America, 2 - Europe
+        char language;      // 0 - Japanese, 1 - English, etc
+        char broadcast_format;  // 0 - NTSC, 1 - PAL, 2 - PAL-M, 3 - PAL-N
+        char machine_name[32];  // ASCII text 'Dreamcast', trail is 0x20 filled
+        char tool_number[4];    // software tool #
+        char tool_version[2];   // software tool version
+        char tool_type[2];  // software tool type: 0 - for MP(mass production?), 1 - for Repair, 2 - for PP
+        char year[4];
+        char month[2];
+        char day[2];
+        char hour[2];
+        char min[2];
+        char serial_number[8];
+        char factory_code[4];
+        char total_number[16];
+        uint8_t sum;        // byte sum of above
+        uint8_t machine_id[8];  // 64bit UID
+        uint8_t machine_type;   // FF - Dreamcast
+        uint8_t machine_version;// FF - VA0, FE - VA1, FD - VA2, NOTE: present in 1st factory record only, in 2nd always FF
+        uint8_t unused[0x40]    // FF filled
+    } factory_records[2];       // 2 copies
+    uint8_t unused_0[0x36];     // FF filled
+    uint8_t unk_version;        // not clear if hardware or bios version, A0 - VA0, 9F - VA1, 9E - VA2
+    uint8_t unused_1[9];        // FF filled
+    char staff_roll[0xca0];     // list of creators
+    uint8_t unused_2[0x420];    // FF filled
+    uint8_t random[0xdc0];      // output of RNG {static u32 seed; seed=(seed*0x83d+0x2439)&0x7fff; return (u16)(seed+0xc000);}, where initial seed value is serial_number[7] & 0xf
+};
+*/
+
 ROM_START(dc)
 	DREAMCAST_COMMON_BIOS
 
 	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, BAD_DUMP CRC(e6862dd0) SHA1(24875ce85c011600e73b1c3fd2b341824cbf8544) )  // dumped from VA2.4 mobo with 1.022 BIOS
+	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, CRC(4136c25b) SHA1(1efa00ab9d8357a9f91e5be931a3efd6236f2b79) )  // dumped from VA2.4 mobo with 1.022 BIOS
 ROM_END
 
 ROM_START( dceu )
 	DREAMCAST_COMMON_BIOS
 
 	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "dceu_pal.bin", 0x000000, 0x020000, BAD_DUMP CRC(b7e5aeeb) SHA1(11e02433e13b793ec7ffe0ae2356750bb8a575b4) )
+	ROM_LOAD( "dceu_pal.bin",  0x000000, 0x020000, CRC(7a102d05) SHA1(13e444e613dffe0a8bce073a01efa9a1d4626ba7) ) // VA1
+	ROM_LOAD( "dceu_pala.bin", 0x000000, 0x020000, CRC(2e8dfa07) SHA1(ca5fd977bbf8f48c28c1027a023b038123d57d39) ) // from VA1 with 1.01d BIOS
 ROM_END
 
 ROM_START( dcjp )
@@ -702,9 +716,17 @@ ROM_START( dcjp )
 	ROM_LOAD_BIOS(4, "mpr-21068.ic501", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )
 
 	ROM_REGION(0x020000, "dcflash", 0)
-	/* ROM_LOAD( "dcjp_ntsc.bad", 0x000000, 0x020000, BAD_DUMP CRC(307a7035) SHA1(1411423a9d071340ea52c56e19c1aafc4e1309ee) )      // Hacked Flash */
-	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, BAD_DUMP CRC(5f92bf76) SHA1(be78b834f512ab2cf3d67b96e377c9f3093ff82a) )         // hacked PAL flash
-	ROM_FILL( 0x1a004, 1, 0x30 ) // patch broadcast back to NTSC
+	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(306023ab) SHA1(5fb66adb6d1b54a552fe9c2bb736e4c6960e447d) ) // from refurbished VA0 with 1.004 BIOS
+ROM_END
+
+// unauthorised portable modification
+ROM_START( dctream )
+	ROM_REGION(0x200000, "maincpu", 0)
+	// multi-region hack of mpr-21931/1.01d BIOS, hardware checksum protection passes OK due to algorithm weakness
+	ROM_LOAD( "dc_bios.bin", 0x000000, 0x200000, CRC(cff88d0d) SHA1(e3f84705b183ffded0a349ac7f2ab00be2ab74ee) ) // dumped in software way, ROM label unknown
+
+	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_LOAD( "dc_flash.bin", 0x000000, 0x020000, CRC(9d5515c4) SHA1(78a86fd4e8b58fc9d3535eef6591178f1b97ecf9) ) // VA1 NTSC-US
 ROM_END
 
 // normally, with DIP switch 4 off, HKT-100/110/120 AKA "Katana Set 5.xx", will be booted from flash ROM IC507 (first 2 dumps below)
@@ -724,11 +746,12 @@ ROM_START( dcdev )
 	ROM_LOAD_BIOS(2, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
 
 	ROM_REGION(0x020000, "dcflash", 0)
-	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784c304) SHA1(31ef57f550d8cd13e40263cbc657253089e53034) )
+	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784c304) SHA1(31ef57f550d8cd13e40263cbc657253089e53034) ) // Dev.Boxes have empty (FF filled) flash ROM
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT      COMPANY FULLNAME */
-CONS( 1999, dc,     dcjp,   0,      dc,     dc, dc_cons_state,     dcus,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1998, dcjp,   0,      0,      dc,     dc, dc_cons_state,     dcjp,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
-CONS( 1999, dceu,   dcjp,   0,      dc,     dc, dc_cons_state,     dcus,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
-CONS( 1998, dcdev,  0,      0,      dc,     dc, dc_cons_state,     dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT STATE            INIT    COMPANY FULLNAME */
+CONS( 1999, dc,     dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1998, dcjp,   0,      0,      dc,     dc,   dc_cons_state,   dcjp,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
+CONS( 1999, dceu,   dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 200?, dctream,dcjp,   0,      dc,     dc,   dc_cons_state,   dcus,   "<unknown>", "Treamcast", MACHINE_NOT_WORKING )
+CONS( 1998, dcdev,  0,      0,      dc,     dc,   dc_cons_state,   dc,     "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )

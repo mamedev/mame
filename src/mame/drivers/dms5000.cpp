@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "screen.h"
 
 
 class dms5000_state : public driver_device
@@ -23,6 +24,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_dms5000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void dms5000(machine_config &config);
 };
 
 
@@ -54,7 +56,7 @@ uint32_t dms5000_state::screen_update_dms5000(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-static MACHINE_CONFIG_START( dms5000, dms5000_state )
+MACHINE_CONFIG_START(dms5000_state::dms5000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8086, XTAL_9_8304MHz)
 	MCFG_CPU_PROGRAM_MAP(dms5000_mem)
@@ -82,5 +84,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY             FULLNAME       FLAGS */
-COMP( 1982, dms5000,  0,      0,       dms5000,   dms5000, driver_device, 0,  "Digital Microsystems", "DMS-5000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY                 FULLNAME    FLAGS */
+COMP( 1982, dms5000,  0,      0,       dms5000,   dms5000, dms5000_state, 0,    "Digital Microsystems", "DMS-5000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

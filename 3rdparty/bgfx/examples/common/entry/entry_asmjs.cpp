@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -29,7 +29,7 @@ namespace entry
 			, m_my(0)
 			, m_scroll(0)
 		{
-			memset(s_translateKey, 0, sizeof(s_translateKey));
+			bx::memSet(s_translateKey, 0, sizeof(s_translateKey));
 			s_translateKey[27]             = Key::Esc;
 			s_translateKey[uint8_t('\n')]  =
 			s_translateKey[uint8_t('\r')]  = Key::Return;
@@ -86,7 +86,7 @@ namespace entry
 			}
 		}
 
-		int32_t run(int _argc, char** _argv)
+		int32_t run(int _argc, const char* const* _argv)
 		{
 			emscripten_set_mousedown_callback("#canvas", this, true, mouseCb);
 			emscripten_set_mouseup_callback("#canvas", this, true, mouseCb);
@@ -397,7 +397,7 @@ namespace entry
 	}
 }
 
-int main(int _argc, char** _argv)
+int main(int _argc, const char* const* _argv)
 {
 	using namespace entry;
 	return s_ctx.run(_argc, _argv);

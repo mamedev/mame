@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -601,7 +601,7 @@ namespace bgfx
 		bool hasType;
 		bool hasResult;
 
-		SpvOperand operand[8];
+		SpvOperand operand[10];
 	};
 
 	int32_t read(bx::ReaderI* _reader, SpvInstruction& _instruction, bx::Error* _err);

@@ -12,36 +12,50 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/z80ctc.h"
+#include "machine/z80sio.h"
+#include "machine/clock.h"
+#include "bus/rs232/rs232.h"
+#include "screen.h"
+
 
 class m79152pc_state : public driver_device
 {
 public:
 	m79152pc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "p_videoram"),
-		m_p_attributes(*this, "p_attributes"),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_p_attributes(*this, "attributes")
+		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
+		, m_uart(*this, "uart")
+	{ }
 
-	uint8_t *m_p_chargen;
+	uint32_t screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void m79152pc(machine_config &config);
+private:
+	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_shared_ptr<uint8_t> m_p_attributes;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
+	required_device<z80sio_device> m_uart;
 };
 
-static ADDRESS_MAP_START(m79152pc_mem, AS_PROGRAM, 8, m79152pc_state)
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, m79152pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("p_videoram")
-	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_SHARE("p_attributes")
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_SHARE("attributes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m79152pc_io, AS_IO, 8, m79152pc_state)
+static ADDRESS_MAP_START( io_map, AS_IO, 8, m79152pc_state )
 	//ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("uart", z80sio_device, cd_ba_r, cd_ba_w)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -51,11 +65,7 @@ INPUT_PORTS_END
 
 void m79152pc_state::machine_reset()
 {
-}
-
-void m79152pc_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base()+4;
+	m_uart->ctsb_w(1); // this is checked before writing to port 47.
 }
 
 uint32_t m79152pc_state::screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -74,7 +84,7 @@ uint32_t m79152pc_state::screen_update_m79152pc(screen_device &screen, bitmap_in
 			{
 				chr = m_p_videoram[x];
 				//attr = m_p_attributes[x];
-				gfx = m_p_chargen[(chr<<4) | ra ];
+				gfx = m_p_chargen[((chr<<4) | ra) + 4 ];
 
 				/* Display a scanline of a character */
 				*p++ = BIT(gfx, 7);
@@ -110,12 +120,11 @@ static GFXDECODE_START( m79152pc )
 	GFXDECODE_ENTRY( "chargen", 0x0000, m79152pc_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( m79152pc, m79152pc_state )
+MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(m79152pc_mem)
-	MCFG_CPU_IO_MAP(m79152pc_io)
-
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -127,6 +136,29 @@ static MACHINE_CONFIG_START( m79152pc, m79152pc_state )
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", m79152pc)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
+
+	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", z80sio_device, txca_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", z80sio_device, rxca_w))
+
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
+	//MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+
+	MCFG_DEVICE_ADD("uart", Z80SIO, XTAL_4MHz)
+	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
+	//MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	//MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
+	//MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", z80sio_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", z80sio_device, ctsa_w))
+	//MCFG_RS232_PORT_ADD("rs232a", default_rs232_devices, "terminal")
+	//MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart", z80sio_device, rxb_w))
+	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", z80sio_device, ctsb_w))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -141,5 +173,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     INIT    COMPANY     FULLNAME       FLAGS */
-COMP( ????, m79152pc,  0,       0,       m79152pc,  m79152pc, driver_device, 0,   "Mera-Elzab", "MERA 79152 PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     STATE           INIT  COMPANY       FULLNAME         FLAGS
+COMP( ????, m79152pc,  0,       0,       m79152pc,  m79152pc, m79152pc_state, 0,    "Mera-Elzab", "MERA 79152 PC", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

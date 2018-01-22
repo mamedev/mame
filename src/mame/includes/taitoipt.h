@@ -57,7 +57,7 @@
 	TAITO_DSWA_BITS_1_TO_3
 
 
-/**************************** Coinage Dip Swicthes ****************************/
+/**************************** Coinage Dip Switches ****************************/
 
 /* with location */
 #define TAITO_COINAGE_JAPAN_OLD_COIN_A_LOC(DIPBANK) \

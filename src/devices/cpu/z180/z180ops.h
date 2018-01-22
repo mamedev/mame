@@ -22,20 +22,30 @@
 /***************************************************************
  * Input a byte from given I/O port
  ***************************************************************/
-#define IN(port)                                                \
-	(((port ^ IO_IOCR) & 0xffc0) == 0) ?                        \
-		z180_readcontrol(port) : m_iospace->read_byte(port)
+inline u8 z180_device::IN(u16 port)
+{
+	if(((port ^ IO_IOCR) & 0xffc0) == 0)
+		return z180_readcontrol(port);
+	m_extra_cycles += ((IO_DCNTL & (Z180_DCNTL_IWI1 | Z180_DCNTL_IWI0)) >> 4) + 1; // external I/O wait states
+	return m_iospace->read_byte(port);
+}
 
 /***************************************************************
  * Output a byte to given I/O port
  ***************************************************************/
-#define OUT(port,value)                                         \
-	if (((port ^ IO_IOCR) & 0xffc0) == 0)                       \
-		z180_writecontrol(port,value);                          \
-	else m_iospace->write_byte(port,value)
+inline void z180_device::OUT(u16 port, u8 value)
+{
+	if (((port ^ IO_IOCR) & 0xffc0) == 0) {
+		z180_writecontrol(port,value);
+	} else
+	{
+		m_extra_cycles += ((IO_DCNTL & (Z180_DCNTL_IWI1 | Z180_DCNTL_IWI0)) >> 4) + 1; // external I/O wait states
+		m_iospace->write_byte(port, value);
+	}
+}
 
 /***************************************************************
- * MMU calculate the memory managemant lookup table
+ * MMU calculate the memory management lookup table
  * bb and cb specify a 4K page
  * If the 4 most significant bits of an 16 bit address are
  * greater or equal to the bank base, the bank base register
@@ -68,12 +78,16 @@ void z180_device::z180_mmu()
 /***************************************************************
  * Read a byte from given memory location
  ***************************************************************/
-#define RM(addr) m_program->read_byte(MMU_REMAP_ADDR(addr))
+inline u8 z180_device::RM(offs_t addr)
+{
+	m_extra_cycles += IO_DCNTL >> 6; // memory wait states
+	return m_program->read_byte(MMU_REMAP_ADDR(addr));
+}
 
 /***************************************************************
  * Write a byte to given memory location
  ***************************************************************/
-#define WM(addr,value) m_program->write_byte(MMU_REMAP_ADDR(addr),value)
+#define WM(addr,value) m_extra_cycles += IO_DCNTL >> 6; /* memory wait states */ m_program->write_byte(MMU_REMAP_ADDR(addr),value)
 
 /***************************************************************
  * Read a word from given memory location
@@ -102,6 +116,7 @@ uint8_t z180_device::ROP()
 {
 	offs_t addr = _PCD;
 	_PC++;
+	m_extra_cycles += IO_DCNTL >> 6; // memory wait states
 	return m_odirect->read_byte(MMU_REMAP_ADDR(addr));
 }
 
@@ -115,6 +130,7 @@ uint8_t z180_device::ARG()
 {
 	offs_t addr = _PCD;
 	_PC++;
+	m_extra_cycles += IO_DCNTL >> 6; // memory wait states
 	return m_direct->read_byte(MMU_REMAP_ADDR(addr));
 }
 
@@ -122,11 +138,12 @@ uint32_t z180_device::ARG16()
 {
 	offs_t addr = _PCD;
 	_PC += 2;
+	m_extra_cycles += (IO_DCNTL >> 6) * 2; // memory wait states
 	return m_direct->read_byte(MMU_REMAP_ADDR(addr)) | (m_direct->read_byte(MMU_REMAP_ADDR(addr+1)) << 8);
 }
 
 /***************************************************************
- * Calculate the effective addess m_ea of an opcode using
+ * Calculate the effective address m_ea of an opcode using
  * IX+offset resp. IY+offset addressing.
  ***************************************************************/
 #define EAX() m_ea = (uint32_t)(uint16_t)(_IX + (int8_t)ARG())
@@ -213,7 +230,7 @@ uint32_t z180_device::ARG16()
 #define RET_COND(cond,opcode)                                   \
 	if( cond )                                                  \
 	{                                                           \
-		POP(PC);                                              \
+		POP(PC);                                                \
 		CC(ex,opcode);                                          \
 	}
 
@@ -221,19 +238,19 @@ uint32_t z180_device::ARG16()
  * RETN
  ***************************************************************/
 #define RETN    {                                               \
-	LOG(("Z180 '%s' RETN IFF1:%d IFF2:%d\n", tag(), m_IFF1, m_IFF2)); \
-	POP(PC);                                                  \
-	m_IFF1 = m_IFF2;                                                \
+	LOG("Z180 RETN IFF1:%d IFF2:%d\n", m_IFF1, m_IFF2);         \
+	POP(PC);                                                    \
+	m_IFF1 = m_IFF2;                                            \
 }
 
 /***************************************************************
  * RETI
  ***************************************************************/
 #define RETI    {                                               \
-	POP(PC);                                                  \
+	POP(PC);                                                    \
 /* according to http://www.msxnet.org/tech/Z80/z80undoc.txt */  \
-/*  m_IFF1 = m_IFF2;  */                                            \
-	daisy_call_reti_device();                 \
+/*  m_IFF1 = m_IFF2;  */                                        \
+	daisy_call_reti_device();                                   \
 }
 
 /***************************************************************

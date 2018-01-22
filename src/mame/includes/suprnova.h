@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Sylvain Glaize, Paul Priest, Olivier Galibert
 
-#include "cpu/sh2/sh2.h"
+#include "machine/timer.h"
+#include "video/sknsspr.h"
+
+#include "cpu/sh/sh2.h"
 
 
 struct hit_t
@@ -161,4 +164,10 @@ public:
 	void hit_recalc();
 	void init_drc();
 	void set_drc_pcflush(uint32_t addr);
+	void sknsk(machine_config &config);
+	void sknsu(machine_config &config);
+	void sknsa(machine_config &config);
+	void sknsj(machine_config &config);
+	void sknse(machine_config &config);
+	void skns(machine_config &config);
 };

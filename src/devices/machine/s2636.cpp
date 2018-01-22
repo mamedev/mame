@@ -90,7 +90,7 @@
     FC2   |       |C1 |C2 |C3 |C1 |C2 |C3 | W |
           |       |  color 3  |  color 4  |   |
           |                               |   |
-    FC3   |                       |frm|pos| W | scroe format and position
+    FC3   |                       |frm|pos| W | score format and position
           |                               |   |
     FC4   |                               | - |
     FC5   |                               | - |
@@ -120,6 +120,8 @@
 
 #include "emu.h"
 #include "machine/s2636.h"
+
+#include "screen.h"
 
 
 int const s2636_device::OFFS_OBJ[s2636_device::OBJ_COUNT] = { 0x000, 0x010, 0x020, 0x040 };
@@ -153,10 +155,10 @@ uint16_t const s2636_device::SCORE_FONT[16][5] =
  *
  *************************************/
 
-const device_type S2636 = &device_creator<s2636_device>;
+DEFINE_DEVICE_TYPE(S2636, s2636_device, "s2636", "Signetics 2636 PVI")
 
 s2636_device::s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, S2636, "Signetics 2636", tag, owner, clock, "s2636", __FILE__)
+	: device_t(mconfig, S2636, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_sound_interface(mconfig, *this)
 	, m_divider(1)
@@ -184,7 +186,7 @@ s2636_device::s2636_device(const machine_config &mconfig, const char *tag, devic
 
 void s2636_device::device_start()
 {
-	m_bitmap.resize(m_screen->width(), m_screen->height());
+	m_bitmap.resize(screen().width(), screen().height());
 
 	save_item(NAME(m_bitmap));
 
@@ -216,8 +218,8 @@ void s2636_device::device_start()
 bitmap_ind16 const &s2636_device::update(const rectangle &cliprect)
 {
 	m_vrst = true;
-	m_screen_line = m_screen->visible_area().min_y;
-	while (m_screen_line <= m_screen->visible_area().max_y)
+	m_screen_line = screen().visible_area().min_y;
+	while (m_screen_line <= screen().visible_area().max_y)
 		render_next_line();
 
 	return m_bitmap;
@@ -244,7 +246,7 @@ void s2636_device::render_next_line()
 	assert(m_screen_line < m_bitmap.height());
 
 	// pre-clear the line for convenience
-	rectangle const &vis_area = m_screen->visible_area();
+	rectangle const &vis_area = screen().visible_area();
 	uint16_t *const   row = &m_bitmap.pix16(m_screen_line);
 	m_bitmap.plot_box(0, m_screen_line, m_bitmap.width(), 1, 0);
 
@@ -414,7 +416,7 @@ READ8_MEMBER( s2636_device::read_data )
 	{
 	case REG_COL_BG_CMPL:
 	case REG_VBL_COL_OBJ:
-		if (!space.debugger_access())
+		if (!machine().side_effect_disabled())
 			m_registers[offset] = 0x00; // collision/completion/VRESET flags reset on read
 		break;
 	}
@@ -457,7 +459,7 @@ void s2636_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 		{
 			if (m_registers[REG_SND_PERIOD])
 			{
-				m_sample_cnt = (machine().sample_rate() * (m_registers[REG_SND_PERIOD] + 1) * m_screen->scan_period()).seconds();
+				m_sample_cnt = (machine().sample_rate() * (m_registers[REG_SND_PERIOD] + 1) * screen().scan_period()).seconds();
 				m_sound_lvl = !m_sound_lvl;
 			}
 			else

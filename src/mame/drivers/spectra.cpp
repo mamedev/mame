@@ -33,10 +33,15 @@
 *******************************************************************************************/
 
 
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/6532riot.h"
+#include "machine/timer.h"
 #include "sound/sn76477.h"
+#include "speaker.h"
+
 #include "spectra.lh"
 
 
@@ -57,6 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(portb_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmitimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(outtimer);
+	void spectra(machine_config &config);
 private:
 	uint8_t m_porta;
 	uint8_t m_portb;
@@ -216,7 +222,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( spectra_state::outtimer)
 }
 
 
-static MACHINE_CONFIG_START( spectra, spectra_state )
+MACHINE_CONFIG_START(spectra_state::spectra)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_579545MHz/4)  // actually a M6503
 	MCFG_CPU_PROGRAM_MAP(spectra_map)
@@ -268,4 +274,4 @@ ROM_START(spectra)
 ROM_END
 
 
-GAME(1979,  spectra,  0,  spectra,  spectra, driver_device, 0,  ROT0,  "Valley", "Spectra IV", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  spectra,  0,  spectra,  spectra, spectra_state, 0,  ROT0,  "Valley", "Spectra IV", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

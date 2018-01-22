@@ -7,8 +7,10 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/kan_pand.h"
+#include "screen.h"
 
 class airbustr_state : public driver_device
 {
@@ -49,10 +51,6 @@ public:
 	int        m_fg_scrolly;
 	int        m_highbits;
 
-	/* misc */
-	int        m_soundlatch_status;
-	int        m_soundlatch2_status;
-
 	/* devices */
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
@@ -71,10 +69,6 @@ public:
 	DECLARE_WRITE8_MEMBER(slave_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_READ8_MEMBER(soundcommand_status_r);
-	DECLARE_READ8_MEMBER(soundcommand_r);
-	DECLARE_READ8_MEMBER(soundcommand2_r);
-	DECLARE_WRITE8_MEMBER(soundcommand_w);
-	DECLARE_WRITE8_MEMBER(soundcommand2_w);
 	DECLARE_WRITE8_MEMBER(coin_counter_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(colorram_w);
@@ -88,7 +82,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	INTERRUPT_GEN_MEMBER(slave_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(airbustr_scanline);
+	void airbustr(machine_config &config);
+	void airbustrb(machine_config &config);
 };

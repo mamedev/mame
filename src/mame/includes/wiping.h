@@ -28,10 +28,9 @@ public:
 	uint8_t m_sound_irq_mask;
 
 	DECLARE_READ8_MEMBER(ports_r);
-	DECLARE_WRITE8_MEMBER(subcpu_reset_w);
-	DECLARE_WRITE8_MEMBER(main_irq_mask_w);
-	DECLARE_WRITE8_MEMBER(sound_irq_mask_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(main_irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 
 	DECLARE_PALETTE_INIT(wiping);
 	virtual void machine_start() override;
@@ -40,4 +39,5 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	void wiping(machine_config &config);
 };

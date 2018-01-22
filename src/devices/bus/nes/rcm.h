@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __NES_RCM_H
-#define __NES_RCM_H
+#ifndef MAME_BUS_NES_RCM_H
+#define MAME_BUS_NES_RCM_H
+
+#pragma once
 
 #include "nxrom.h"
 
@@ -14,13 +16,15 @@ public:
 	// construction/destruction
 	nes_gs2015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_l) override { return read_m(space, offset, mem_mask); }
 	virtual DECLARE_READ8_MEMBER(read_m) override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 
@@ -32,11 +36,13 @@ public:
 	// construction/destruction
 	nes_gs2004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 
@@ -48,11 +54,13 @@ public:
 	// construction/destruction
 	nes_gs2013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 
@@ -64,11 +72,13 @@ public:
 	// construction/destruction
 	nes_tf9_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 };
 
 
@@ -80,12 +90,14 @@ public:
 	// construction/destruction
 	nes_3dblock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 private:
 	uint8_t m_reg[4];
@@ -93,13 +105,11 @@ private:
 };
 
 
-
-
 // device type definition
-extern const device_type NES_GS2015;
-extern const device_type NES_GS2004;
-extern const device_type NES_GS2013;
-extern const device_type NES_TF9IN1;
-extern const device_type NES_3DBLOCK;
+DECLARE_DEVICE_TYPE(NES_GS2015,  nes_gs2015_device)
+DECLARE_DEVICE_TYPE(NES_GS2004,  nes_gs2004_device)
+DECLARE_DEVICE_TYPE(NES_GS2013,  nes_gs2013_device)
+DECLARE_DEVICE_TYPE(NES_TF9IN1,  nes_tf9_device)
+DECLARE_DEVICE_TYPE(NES_3DBLOCK, nes_3dblock_device)
 
-#endif
+#endif // MAME_BUS_NES_RCM_H

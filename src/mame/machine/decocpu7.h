@@ -1,7 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_MACHINE_DECOCPU7_H
+#define MAME_MACHINE_DECOCPU7_H
 
-#include "emu.h"
+#pragma once
+
+#include "cpu/m6502/m6502d.h"
 #include "cpu/m6502/m6502.h"
 
 class deco_cpu7_device : public m6502_device {
@@ -18,9 +22,21 @@ protected:
 		virtual void write(uint16_t adr, uint8_t val) override;
 	};
 
+	class disassembler : public m6502_disassembler {
+	public:
+		mi_decrypt *mintf;
+
+		disassembler(mi_decrypt *m);
+		virtual ~disassembler() = default;
+		virtual u32 interface_flags() const override;
+		virtual u8 decrypt8(u8 value, offs_t pc, bool opcode) const override;
+	};
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
+	virtual util::disasm_interface *create_disassembler() override;
 };
 
-static const device_type DECO_CPU7 = &device_creator<deco_cpu7_device>;
+DECLARE_DEVICE_TYPE(DECO_CPU7, deco_cpu7_device)
+
+#endif // MAME_MACHINE_DECOCPU7_H

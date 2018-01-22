@@ -38,4 +38,5 @@ public:
 	void rampart_bitmap_render(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;
+	void rampart(machine_config &config);
 };

@@ -11,42 +11,45 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/i8085/i8085.h"
+//#include "bus/s100/s100.h"
+#include "machine/i8251.h"
 #include "machine/terminal.h"
 
-#define TERMINAL_TAG "terminal"
 
 class dual68_state : public driver_device
 {
 public:
 	dual68_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_terminal(*this, TERMINAL_TAG),
-		m_p_ram(*this, "p_ram")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, "terminal")
+		, m_p_ram(*this, "ram")
+	{ }
 
+	void kbd_put(u8 data);
+	DECLARE_WRITE16_MEMBER(terminal_w);
+
+	void dual68(machine_config &config);
+private:
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
-	DECLARE_WRITE8_MEMBER( kbd_put );
-	DECLARE_WRITE16_MEMBER( dual68_terminal_w );
-	//uint8_t m_term_data;
 	required_shared_ptr<uint16_t> m_p_ram;
-	virtual void machine_reset() override;
+	//uint8_t m_term_data;
 };
 
 
 
-WRITE16_MEMBER( dual68_state::dual68_terminal_w )
+WRITE16_MEMBER( dual68_state::terminal_w )
 {
 	m_terminal->write(space, 0, data >> 8);
 }
 
 static ADDRESS_MAP_START(dual68_mem, AS_PROGRAM, 16, dual68_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_SHARE("p_ram")
+	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x00080000, 0x00081fff) AM_ROM AM_REGION("user1",0)
-	AM_RANGE(0x007f0000, 0x007f0001) AM_WRITE(dual68_terminal_w)
+	AM_RANGE(0x007f0000, 0x007f0001) AM_WRITE(terminal_w)
 	AM_RANGE(0x00800000, 0x00801fff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -58,6 +61,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sio4_io, AS_IO, 8, dual68_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x22, 0x22) AM_DEVREADWRITE("uart1", i8251_device, status_r, control_w)
+	AM_RANGE(0x23, 0x23) AM_DEVREADWRITE("uart1", i8251_device, data_r, data_w)
+	AM_RANGE(0x2a, 0x2a) AM_DEVREADWRITE("uart2", i8251_device, status_r, control_w)
+	AM_RANGE(0x2b, 0x2b) AM_DEVREADWRITE("uart2", i8251_device, data_r, data_w)
+	AM_RANGE(0x32, 0x32) AM_DEVREADWRITE("uart3", i8251_device, status_r, control_w)
+	AM_RANGE(0x33, 0x33) AM_DEVREADWRITE("uart3", i8251_device, data_r, data_w)
+	AM_RANGE(0x3a, 0x3a) AM_DEVREADWRITE("uart4", i8251_device, status_r, control_w)
+	AM_RANGE(0x3b, 0x3b) AM_DEVREADWRITE("uart4", i8251_device, data_r, data_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -74,12 +85,12 @@ void dual68_state::machine_reset()
 	m_maincpu->reset();
 }
 
-WRITE8_MEMBER( dual68_state::kbd_put )
+void dual68_state::kbd_put(u8 data)
 {
 	//m_term_data = data;
 }
 
-static MACHINE_CONFIG_START( dual68, dual68_state )
+MACHINE_CONFIG_START(dual68_state::dual68)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(dual68_mem)
@@ -88,10 +99,14 @@ static MACHINE_CONFIG_START( dual68, dual68_state )
 	MCFG_CPU_PROGRAM_MAP(sio4_mem)
 	MCFG_CPU_IO_MAP(sio4_io)
 
-
 	/* video hardware */
-	MCFG_DEVICE_ADD(TERMINAL_TAG, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(dual68_state, kbd_put))
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dual68_state, kbd_put))
+
+	MCFG_DEVICE_ADD("uart1", I8251, 0)
+	MCFG_DEVICE_ADD("uart2", I8251, 0)
+	MCFG_DEVICE_ADD("uart3", I8251, 0)
+	MCFG_DEVICE_ADD("uart4", I8251, 0)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -111,5 +126,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                        FULLNAME       FLAGS */
-COMP( 1981, dual68,  0,     0,       dual68,    dual68, driver_device,   0,  "Dual Systems Corporation", "Dual Systems 68000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   STATE         INIT  COMPANY                     FULLNAME              FLAGS
+COMP( 1981, dual68,  0,     0,       dual68,    dual68, dual68_state, 0,    "Dual Systems Corporation", "Dual Systems 68000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

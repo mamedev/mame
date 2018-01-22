@@ -9,7 +9,6 @@
 #ifndef CHANNELF_H_
 #define CHANNELF_H_
 
-#include "emu.h"
 #include "cpu/f8/f8.h"
 #include "audio/channelf.h"
 
@@ -49,6 +48,11 @@ public:
 	required_device<channelf_sound_device> m_custom;
 	required_device<channelf_cart_slot_device> m_cart;
 	int recalc_palette_offset(int reg1, int reg2);
+	void channelf_cart(machine_config &config);
+	void channelf(machine_config &config);
+	void sabavpl2(machine_config &config);
+	void sabavdpl(machine_config &config);
+	void channlf2(machine_config &config);
 };
 
 #endif /* CHANNELF_H_ */

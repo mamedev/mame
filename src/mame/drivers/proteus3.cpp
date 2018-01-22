@@ -45,14 +45,21 @@
 ******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
+#include "imagedev/cassette.h"
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
+#include "machine/mc14411.h"
 #include "machine/clock.h"
 #include "machine/keyboard.h"
-#include "imagedev/cassette.h"
+#include "machine/timer.h"
 #include "sound/wave.h"
+
 #include "bus/rs232/rs232.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 class proteus3_state : public driver_device
@@ -61,38 +68,64 @@ public:
 	proteus3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_p_videoram(*this, "vram")
+		, m_p_chargen(*this, "chargen")
 		, m_pia(*this, "pia")
+		, m_brg(*this, "brg")
 		, m_acia1(*this, "acia1")
 		, m_acia2(*this, "acia2")
 		, m_cass(*this, "cassette")
+		, m_serial(*this, "SERIAL")
 	{ }
 
 	DECLARE_WRITE_LINE_MEMBER(ca2_w);
 	DECLARE_WRITE8_MEMBER(video_w);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_WRITE_LINE_MEMBER(acia1_txdata_w);
 	DECLARE_WRITE_LINE_MEMBER(acia1_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(acia2_clock_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 	uint32_t screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	// Clocks
+	void write_acia_clocks(int id, int state);
+	DECLARE_WRITE_LINE_MEMBER (write_f1_clock){ write_acia_clocks(mc14411_device::TIMER_F1, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f2_clock){ write_acia_clocks(mc14411_device::TIMER_F2, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f3_clock){ write_acia_clocks(mc14411_device::TIMER_F3, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f4_clock){ write_acia_clocks(mc14411_device::TIMER_F4, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f5_clock){ write_acia_clocks(mc14411_device::TIMER_F5, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f6_clock){ write_acia_clocks(mc14411_device::TIMER_F6, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f7_clock){ write_acia_clocks(mc14411_device::TIMER_F7, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f8_clock){ write_acia_clocks(mc14411_device::TIMER_F8, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f9_clock){ write_acia_clocks(mc14411_device::TIMER_F9, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f10_clock){ write_acia_clocks(mc14411_device::TIMER_F10, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f11_clock){ write_acia_clocks(mc14411_device::TIMER_F11, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f12_clock){ write_acia_clocks(mc14411_device::TIMER_F12, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f13_clock){ write_acia_clocks(mc14411_device::TIMER_F13, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f14_clock){ write_acia_clocks(mc14411_device::TIMER_F14, state); }
+	DECLARE_WRITE_LINE_MEMBER (write_f15_clock){ write_acia_clocks(mc14411_device::TIMER_F15, state); }
+
+	void proteus3(machine_config &config);
 private:
 	uint8_t m_video_data;
 	uint8_t m_flashcnt;
 	uint16_t m_curs_pos;
-	uint8_t *m_p_chargen;
-	uint8_t *m_p_videoram;
 	uint8_t m_cass_data[4];
 	bool m_cass_state;
 	bool m_cassold;
 	uint8_t m_clockcnt;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_videoram;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<pia6821_device> m_pia;
+	required_device<mc14411_device> m_brg;
 	required_device<acia6850_device> m_acia1; // cassette uart
 	required_device<acia6850_device> m_acia2; // tty keyboard uart
 	required_device<cassette_image_device> m_cass;
+
+	// hardware configuration and things that need rewiring
+	required_ioport             m_serial;
 };
 
 
@@ -106,10 +139,8 @@ static ADDRESS_MAP_START(proteus3_mem, AS_PROGRAM, 8, proteus3_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8004, 0x8007) AM_DEVREADWRITE("pia", pia6821_device, read, write)
-	AM_RANGE(0x8008, 0x8008) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w) // cassette
-	AM_RANGE(0x8009, 0x8009) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
-	AM_RANGE(0x8010, 0x8010) AM_DEVREADWRITE("acia2", acia6850_device, status_r, control_w) // serial keyboard
-	AM_RANGE(0x8011, 0x8011) AM_DEVREADWRITE("acia2", acia6850_device, data_r, data_w) // never writes data
+	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("acia1", acia6850_device, read, write) // cassette
+	AM_RANGE(0x8010, 0x8011) AM_DEVREADWRITE("acia2", acia6850_device, read, write) // serial keyboard (never writes data)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -119,9 +150,27 @@ ADDRESS_MAP_END
 ******************************************************************************/
 
 static INPUT_PORTS_START(proteus3)
+	PORT_START("SERIAL")
+	PORT_CONFNAME(0x0F , 0x00 , "Serial Baud Rate") // F1-F16 pins on MC14411 in X16
+	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "153600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F2,  "115200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "76800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F4,  "57600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "38400")
+	PORT_CONFSETTING(mc14411_device::TIMER_F6,  "28800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "19200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "9600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "4800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F10, "3200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F11, "2400")
+	PORT_CONFSETTING(mc14411_device::TIMER_F12, "2153.3")
+	PORT_CONFSETTING(mc14411_device::TIMER_F13, "1758.8")
+	PORT_CONFSETTING(mc14411_device::TIMER_F14, "1200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F15, "921.6")
+	PORT_CONFSETTING(mc14411_device::TIMER_F16, "1.8432")
 INPUT_PORTS_END
 
-WRITE8_MEMBER( proteus3_state::kbd_put )
+void proteus3_state::kbd_put(u8 data)
 {
 	if (data == 0x08)
 		data = 0x0f; // take care of backspace (bios 1 and 2)
@@ -130,10 +179,17 @@ WRITE8_MEMBER( proteus3_state::kbd_put )
 	m_pia->cb1_w(0);
 }
 
-WRITE_LINE_MEMBER( proteus3_state::acia2_clock_w )
+void proteus3_state::write_acia_clocks(int id, int state)
 {
-	m_acia2->write_txc(state);
-	m_acia2->write_rxc(state);
+	if (id == m_serial->read()) // Configurable serial port
+	{
+		m_acia2->write_txc(state);
+		m_acia2->write_rxc(state);
+	}
+	if (id == mc14411_device::TIMER_F8) // Fixed bitrate for the cassette interface
+	{
+		acia1_clock_w(state);
+	}
 }
 
 /******************************************************************************
@@ -298,13 +354,20 @@ GFXDECODE_END
 
 void proteus3_state::machine_reset()
 {
-	m_p_chargen = memregion("chargen")->base();
-	m_p_videoram = memregion("vram")->base();
 	m_curs_pos = 0;
 	m_cass_data[0] = m_cass_data[1] = m_cass_data[2] = m_cass_data[3] = 0;
 	m_cass_state = 1;
 	m_cassold = 1;
 	m_acia1->write_rxd(1);
+
+	// Set up the BRG divider. RSA is a jumper setting and RSB is always set High
+	m_brg->rsa_w( CLEAR_LINE );
+	m_brg->rsb_w( ASSERT_LINE );
+
+	// Disable all configured timers, only enabling the used ones
+	m_brg->timer_disable_all();
+	m_brg->timer_enable((mc14411_device::timer_id) m_serial->read(), true); // Serial port
+	m_brg->timer_enable( mc14411_device::TIMER_F8, true); // Cassette interface
 }
 
 
@@ -312,7 +375,7 @@ void proteus3_state::machine_reset()
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( proteus3, proteus3_state )
+MACHINE_CONFIG_START(proteus3_state::proteus3)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz)  /* Divided by 4 internally */
 	MCFG_CPU_PROGRAM_MAP(proteus3_mem)
@@ -334,13 +397,11 @@ static MACHINE_CONFIG_START( proteus3, proteus3_state )
 	MCFG_PIA_CA2_HANDLER(WRITELINE(proteus3_state, ca2_w))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6800_IRQ_LINE))
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(proteus3_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(proteus3_state, kbd_put))
 
 	/* cassette */
 	MCFG_DEVICE_ADD ("acia1", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(proteus3_state, acia1_txdata_w))
-	MCFG_DEVICE_ADD("acia1_clock", CLOCK, 9600) // this controls cassette baud rate
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(proteus3_state, acia1_clock_w))
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -356,8 +417,24 @@ static MACHINE_CONFIG_START( proteus3, proteus3_state )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_cts))
-	MCFG_DEVICE_ADD("acia2_clock", CLOCK, 153600/8)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(proteus3_state, acia2_clock_w))
+
+	/* Bit Rate Generator */
+	MCFG_MC14411_ADD ("brg", XTAL_1_8432MHz) // crystal needs verification but is the likely one
+	MCFG_MC14411_F1_CB(WRITELINE (proteus3_state, write_f1_clock))
+	MCFG_MC14411_F2_CB(WRITELINE (proteus3_state, write_f2_clock))
+	MCFG_MC14411_F3_CB(WRITELINE (proteus3_state, write_f3_clock))
+	MCFG_MC14411_F4_CB(WRITELINE (proteus3_state, write_f4_clock))
+	MCFG_MC14411_F5_CB(WRITELINE (proteus3_state, write_f5_clock))
+	MCFG_MC14411_F6_CB(WRITELINE (proteus3_state, write_f6_clock))
+	MCFG_MC14411_F7_CB(WRITELINE (proteus3_state, write_f7_clock))
+	MCFG_MC14411_F8_CB(WRITELINE (proteus3_state, write_f8_clock))
+	MCFG_MC14411_F9_CB(WRITELINE (proteus3_state, write_f9_clock))
+	MCFG_MC14411_F10_CB(WRITELINE (proteus3_state, write_f10_clock))
+	MCFG_MC14411_F11_CB(WRITELINE (proteus3_state, write_f11_clock))
+	MCFG_MC14411_F12_CB(WRITELINE (proteus3_state, write_f12_clock))
+	MCFG_MC14411_F13_CB(WRITELINE (proteus3_state, write_f13_clock))
+	MCFG_MC14411_F14_CB(WRITELINE (proteus3_state, write_f14_clock))
+	MCFG_MC14411_F15_CB(WRITELINE (proteus3_state, write_f15_clock))
 MACHINE_CONFIG_END
 
 
@@ -404,5 +481,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     CLASS          INIT      COMPANY                     FULLNAME        FLAGS */
-COMP( 1978, proteus3,   0,          0,      proteus3,   proteus3, driver_device,   0,     "Proteus International", "Proteus III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT  COMPANY                  FULLNAME       FLAGS
+COMP( 1978, proteus3, 0,      0,      proteus3, proteus3, proteus3_state, 0,    "Proteus International", "Proteus III", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

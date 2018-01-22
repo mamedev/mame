@@ -9,13 +9,17 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/rocnrope.h"
+#include "includes/konamipt.h"
+#include "audio/timeplt.h"
+
 #include "cpu/m6809/m6809.h"
+#include "machine/74259.h"
 #include "machine/konami1.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "audio/timeplt.h"
-#include "includes/konamipt.h"
-#include "includes/rocnrope.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK          XTAL_18_432MHz
 
@@ -34,11 +38,21 @@ WRITE8_MEMBER(rocnrope_state::rocnrope_interrupt_vector_w)
 	RAM[0xfff2 + offset] = data;
 }
 
-WRITE8_MEMBER(rocnrope_state::irq_mask_w)
+WRITE_LINE_MEMBER(rocnrope_state::irq_mask_w)
 {
-	m_irq_mask = data & 1;
+	m_irq_mask = state;
 	if (!m_irq_mask)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(rocnrope_state::coin_counter_1_w)
+{
+	machine().bookkeeping().coin_counter_w(0, state);
+}
+
+WRITE_LINE_MEMBER(rocnrope_state::coin_counter_2_w)
+{
+	machine().bookkeeping().coin_counter_w(1, state);
 }
 
 /*************************************
@@ -61,12 +75,7 @@ static ADDRESS_MAP_START( rocnrope_map, AS_PROGRAM, 8, rocnrope_state )
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM_WRITE(rocnrope_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x8080, 0x8080) AM_WRITE(rocnrope_flipscreen_w)
-	AM_RANGE(0x8081, 0x8081) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)  /* cause interrupt on audio CPU */
-	AM_RANGE(0x8082, 0x8082) AM_WRITENOP    /* ??? */
-	AM_RANGE(0x8083, 0x8083) AM_WRITENOP    /* Coin counter 1 */
-	AM_RANGE(0x8084, 0x8084) AM_WRITENOP    /* Coin counter 2 */
-	AM_RANGE(0x8087, 0x8087) AM_WRITE(irq_mask_w)
+	AM_RANGE(0x8080, 0x8087) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8182, 0x818d) AM_WRITE(rocnrope_interrupt_vector_w)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
@@ -197,13 +206,30 @@ INTERRUPT_GEN_MEMBER(rocnrope_state::vblank_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
+static ADDRESS_MAP_START( timeplt_sound_map, AS_PROGRAM, 8, timeplt_audio_device )
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x8000, 0xffff) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, filter_w)
+ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( rocnrope, rocnrope_state )
+MACHINE_CONFIG_START(rocnrope_state::rocnrope)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
 	MCFG_CPU_PROGRAM_MAP(rocnrope_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rocnrope_state,  vblank_irq)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // B2
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(rocnrope_state, flip_screen_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(rocnrope_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(rocnrope_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(rocnrope_state, irq_mask_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -225,7 +251,40 @@ static MACHINE_CONFIG_START( rocnrope, rocnrope_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_FRAGMENT_ADD(timeplt_sound)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("tpsound",Z80,MASTER_CLOCK/8)
+	MCFG_CPU_PROGRAM_MAP(timeplt_sound_map)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
+
+	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/8)
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("timeplt_audio", timeplt_audio_device, portB_r))
+	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.60)
+	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.60)
+	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.60)
+
+	MCFG_SOUND_ADD("ay2", AY8910, MASTER_CLOCK/8)
+	MCFG_SOUND_ROUTE(0, "filter.1.0", 0.60)
+	MCFG_SOUND_ROUTE(1, "filter.1.1", 0.60)
+	MCFG_SOUND_ROUTE(2, "filter.1.2", 0.60)
+
+	MCFG_FILTER_RC_ADD("filter.0.0", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.0.1", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.0.2", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_FILTER_RC_ADD("filter.1.0", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.1.1", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.1.2", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -375,5 +434,5 @@ DRIVER_INIT_MEMBER(rocnrope_state,rocnrope)
  *************************************/
 
 GAME( 1983, rocnrope,  0,        rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "Konami", "Roc'n Rope", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, rocnropek, rocnrope, rocnrope, rocnrope, driver_device,  0,        ROT270, "Konami (Kosuka license)", "Roc'n Rope (Kosuka)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, rocnropek, rocnrope, rocnrope, rocnrope, rocnrope_state, 0,        ROT270, "Konami (Kosuka license)", "Roc'n Rope (Kosuka)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, ropeman,   rocnrope, rocnrope, rocnrope, rocnrope_state, rocnrope, ROT270, "bootleg", "Ropeman (bootleg of Roc'n Rope)", MACHINE_SUPPORTS_SAVE )

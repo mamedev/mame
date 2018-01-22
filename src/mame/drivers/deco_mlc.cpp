@@ -100,22 +100,16 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/deco_mlc.h"
+
 #include "machine/deco156.h"
 #include "machine/eepromser.h"
 #include "cpu/arm/arm.h"
-#include "cpu/sh2/sh2.h"
-#include "includes/deco_mlc.h"
+#include "cpu/sh/sh2.h"
+#include "speaker.h"
 
 
 /***************************************************************************/
-
-READ32_MEMBER(deco_mlc_state::test2_r)
-{
-//  if (offset==0)
-//      return ioport("IN0")->read(); //0xffffffff;
-//   logerror("%08x:  Test2_r %d\n",space.device().safe_pc(),offset);
-	return machine().rand(); //0xffffffff;
-}
 
 READ32_MEMBER(deco_mlc_state::mlc_440008_r)
 {
@@ -130,7 +124,7 @@ READ32_MEMBER(deco_mlc_state::mlc_44001c_r)
 */
 //if (offset==0)
 //  return machine().rand()|(machine().rand()<<16);
-//  logerror("%08x:  Test3_r %d\n",space.device().safe_pc(),offset);
+//  logerror("%08x:  Test3_r %d\n",m_maincpu->pc(),offset);
 //  return 0x00100000;
 	return 0xffffffff;
 }
@@ -142,7 +136,7 @@ WRITE32_MEMBER(deco_mlc_state::mlc_44001c_w)
 READ32_MEMBER(deco_mlc_state::mlc_200070_r)
 {
 	m_vbl_i ^=0xffffffff;
-//logerror("vbl r %08x\n", space.device().safe_pc());
+//logerror("vbl r %08x\n", m_maincpu->pc());
 	// Todo: Vblank probably in $10
 	return m_vbl_i;
 }
@@ -271,7 +265,7 @@ WRITE32_MEMBER( deco_mlc_state::mlc_spriteram_w )
 READ16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_r )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
@@ -280,7 +274,7 @@ READ16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_r )
 WRITE16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_w )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
@@ -500,7 +494,7 @@ MACHINE_RESET_MEMBER(deco_mlc_state,mlc)
 	m_raster_irq_timer = machine().device<timer_device>("int_timer");
 }
 
-static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
+MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
@@ -517,7 +511,7 @@ static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update_mlc)
-	MCFG_SCREEN_VBLANK_DRIVER(deco_mlc_state, screen_eof_mlc)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deco_mlc)
@@ -533,7 +527,7 @@ static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mlc, deco_mlc_state )
+MACHINE_CONFIG_START(deco_mlc_state::mlc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
@@ -550,7 +544,7 @@ static MACHINE_CONFIG_START( mlc, deco_mlc_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(deco_mlc_state, screen_update_mlc)
-	MCFG_SCREEN_VBLANK_DRIVER(deco_mlc_state, screen_eof_mlc)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(deco_mlc_state, screen_vblank_mlc))
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", deco_mlc)
@@ -569,12 +563,17 @@ static MACHINE_CONFIG_START( mlc, deco_mlc_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mlc_6bpp, mlc )
+MACHINE_CONFIG_DERIVED(deco_mlc_state::mlc_6bpp, mlc)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 6bpp)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mlc_5bpp, mlc )
+MACHINE_CONFIG_DERIVED(deco_mlc_state::mlc_5bpp, mlc)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 5bpp)
+
+	// TODO: mono? ch.0 doesn't output any sound in-game
+	MCFG_SOUND_MODIFY("ymz")
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************/
@@ -841,6 +840,30 @@ ROM_START( skullfngj )
 	ROM_LOAD( "skullfng.eeprom",  0x00, 0x80, CRC(240d882e) SHA1(3c1a15ccac91d95b02a8c54b051aa64ff28ce2ab) )
 ROM_END
 
+ROM_START( skullfnga )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD32_WORD( "sx00-0.2a", 0x000000, 0x80000, CRC(749c0972) SHA1(8a5f170f2f8d800ad2d47ecf2e5b8978a1f14f50) )
+	ROM_LOAD32_WORD( "sx01-0.2b", 0x000002, 0x80000, CRC(61ae7dc3) SHA1(185448fb3d9fe887db0202b195c97674e3dd5f65) )
+
+	ROM_REGION( 0xc00000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "mch-00.2e", 0x000001, 0x200000, CRC(d5cc4238) SHA1(f1bd86386e44a3f600475aeab310f7ea632998df) )
+	ROM_LOAD16_BYTE( "mch-01.8m", 0x000000, 0x200000, CRC(d37cf0cd) SHA1(c2fe7062a123ca2df65217c6dced857b803d8a8d) )
+	ROM_LOAD16_BYTE( "mch-02.4e", 0x400001, 0x200000, CRC(4046314d) SHA1(32e3b7ddbe20ffa6ba6ebe9bd55a32e3b3a120f6) )
+	ROM_LOAD16_BYTE( "mch-03.10m",0x400000, 0x200000, CRC(1dea8f6c) SHA1(c2ad59592385a00e323aac9057906c9384b67078) )
+	ROM_LOAD16_BYTE( "mch-04.6e", 0x800001, 0x200000, CRC(4869dfe8) SHA1(296df6274ecb3eed485de24258cf462e3942f1fa) )
+	ROM_LOAD16_BYTE( "mch-05.11m",0x800000, 0x200000, CRC(ef0b54ba) SHA1(3be56c064ac81686096be5f31ad2aad948ba6701) )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "sx02-0.6h", 0x000000, 0x80000, CRC(0d3ae757) SHA1(480fc3855d330380b75a47a271f3571a59aee10c) )
+
+	ROM_REGION( 0x800000, "ymz", ROMREGION_ERASE00 )
+	ROM_LOAD( "mch-06.6a",  0x200000, 0x200000, CRC(b2efe4ae) SHA1(5a9dab74c2ba73a65e8f1419b897467804734fa2) )
+	ROM_LOAD( "mch-07.11j", 0x400000, 0x200000, CRC(bc1a50a1) SHA1(3de191fbc92d2ae84e54263f1c70afec6ff7cc3c) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 )
+	ROM_LOAD( "skullfng.eeprom",  0x00, 0x80, CRC(240d882e) SHA1(3c1a15ccac91d95b02a8c54b051aa64ff28ce2ab) )
+ROM_END
+
 /***************************************************************************/
 
 void deco_mlc_state::descramble_sound(  )
@@ -856,7 +879,7 @@ void deco_mlc_state::descramble_sound(  )
 	{
 		uint32_t addr;
 
-		addr = BITSWAP24 (x,23,22,21,0, 20,
+		addr = bitswap<24> (x,23,22,21,0, 20,
 							19,18,17,16,
 							15,14,13,12,
 							11,10,9, 8,
@@ -872,9 +895,9 @@ void deco_mlc_state::descramble_sound(  )
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 {
 	uint32_t a=m_mlc_ram[0x89a0/4];
-	uint32_t p=space.device().safe_pc();
+	uint32_t p=m_maincpu->pc();
 
-	if ((p==0x3234 || p==0x32dc) && (a&1)) space.device().execute().spin_until_interrupt();
+	if ((p==0x3234 || p==0x32dc) && (a&1)) m_maincpu->spin_until_interrupt();
 
 	return a;
 }
@@ -918,6 +941,7 @@ GAME( 1996, stadhr96u,stadhr96, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT0,  
 GAME( 1996, stadhr96j,stadhr96, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Stadium Hero '96 (Japan, EAD)", MACHINE_IMPERFECT_GRAPHICS ) // Rom labels are EAD (this isn't a Konami region code!)
 GAME( 1996, skullfng, 0,        mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT270, "Data East Corporation", "Skull Fang (World)", 0 ) /* Version 1.13, Europe, Master 96.02.19 */
 GAME( 1996, skullfngj,skullfng, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT270, "Data East Corporation", "Skull Fang (Japan)", 0 ) /* Version 1.09, Japan, Master 96.02.08 */
+GAME( 1996, skullfnga,skullfng, mlc_6bpp, mlc, deco_mlc_state, mlc,      ROT270, "Data East Corporation", "Skull Fang (Asia)", 0 ) /* Version 1.13, Asia, Master 96.02.19 */
 GAME( 1996, hoops96,  0,        mlc_5bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Hoops '96 (Europe/Asia 2.0)", 0 )
 GAME( 1995, ddream95, hoops96,  mlc_5bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Dunk Dream '95 (Japan 1.4, EAM)", 0 )
 GAME( 1995, hoops95,  hoops96,  mlc_5bpp, mlc, deco_mlc_state, mlc,      ROT0,   "Data East Corporation", "Hoops (Europe/Asia 1.7)", 0 )

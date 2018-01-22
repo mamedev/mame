@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __NES_SOMARI_H
-#define __NES_SOMARI_H
+#ifndef MAME_BUS_NES_SOMARI_H
+#define MAME_BUS_NES_SOMARI_H
+
+#pragma once
 
 #include "mmc3.h"
 
@@ -14,8 +16,6 @@ public:
 	// construction/destruction
 	nes_somari_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_WRITE8_MEMBER(write_l) override { write_m(space, offset + 0x100, data, mem_mask); }
 	virtual DECLARE_WRITE8_MEMBER(write_m) override;
 	virtual DECLARE_WRITE8_MEMBER(mmc1_w);
@@ -24,6 +24,11 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_h) override;
 
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 private:
 	void update_prg();
 	void update_chr();
@@ -47,8 +52,7 @@ private:
 };
 
 
-
 // device type definition
-extern const device_type NES_SOMARI;
+DECLARE_DEVICE_TYPE(NES_SOMARI, nes_somari_device)
 
-#endif
+#endif // MAME_BUS_NES_SOMARI_H

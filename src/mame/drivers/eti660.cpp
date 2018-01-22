@@ -36,7 +36,10 @@
 
 **************************************************************************************************/
 
+#include "emu.h"
 #include "includes/eti660.h"
+#include "speaker.h"
+
 
 /* Read/Write Handlers */
 
@@ -77,7 +80,7 @@ WRITE8_MEMBER( eti660_state::colorram_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( eti660_map, AS_PROGRAM, 8, eti660_state )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, eti660_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0x047f) AM_RAM
@@ -85,7 +88,7 @@ static ADDRESS_MAP_START( eti660_map, AS_PROGRAM, 8, eti660_state )
 	AM_RANGE(0x0600, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eti660_io_map, AS_IO, 8, eti660_state )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, eti660_state )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(pia_r, pia_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(colorram_w)
@@ -252,8 +255,8 @@ void eti660_state::machine_reset()
 	m_resetcnt = 0;
 	m_color_on = 0;
 	// fix for F3 soft reboot
-	m_maincpu->set_state_int(COSMAC_R0, 0); // set R0 to start of rom
-	m_maincpu->set_state_int(COSMAC_P, 0); // set R0 as the PC register
+	m_maincpu->set_state_int(cosmac_device::COSMAC_R0, 0); // set R0 to start of rom
+	m_maincpu->set_state_int(cosmac_device::COSMAC_P, 0); // set R0 as the PC register
 }
 
 void eti660_state::machine_start()
@@ -299,11 +302,11 @@ QUICKLOAD_LOAD_MEMBER( eti660_state, eti660 )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( eti660, eti660_state )
+MACHINE_CONFIG_START(eti660_state::eti660)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_8_867238MHz/5)
-	MCFG_CPU_PROGRAM_MAP(eti660_map)
-	MCFG_CPU_IO_MAP(eti660_io_map)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
 	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(eti660_state, clear_r))
 	MCFG_COSMAC_EF2_CALLBACK(READLINE(eti660_state, ef2_r))
@@ -346,5 +349,5 @@ ROM_START( eti660 )
 	ROM_LOAD( "eti660.bin", 0x0000, 0x0400, CRC(811dfa62) SHA1(c0c4951e02f873f15560bdc3f35cdf3f99653922) )
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   CLASS            INIT   COMPANY                             FULLNAME                FLAGS */
-COMP( 1981, eti660,     0,      0,      eti660,     eti660, driver_device,    0,    "Electronics Today International",  "ETI-660",  0 )
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   CLASS            INIT  COMPANY                             FULLNAME    FLAGS
+COMP( 1981, eti660,     0,      0,      eti660,     eti660, eti660_state,    0,    "Electronics Today International",  "ETI-660",  0 )

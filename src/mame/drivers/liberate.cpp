@@ -17,11 +17,15 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/liberate.h"
+
 #include "cpu/m6502/deco16.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
-#include "includes/liberate.h"
 #include "machine/deco222.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /*************************************
  *
@@ -46,13 +50,13 @@ READ8_MEMBER(liberate_state::deco16_bank_r)
 		return m_spriteram[offset - 0x800];
 	if (offset < 0x2200)
 	{
-		logerror("%04x: Unmapped bank read %04x\n", space.device().safe_pc(), offset);
+		logerror("%s: Unmapped bank read %04x\n", machine().describe_context(), offset);
 		return 0;
 	}
 	if (offset < 0x2800)
 		return m_scratchram[offset - 0x2200];
 
-	logerror("%04x: Unmapped bank read %04x\n", space.device().safe_pc(), offset);
+	logerror("%s: Unmapped bank read %04x\n", machine().describe_context(), offset);
 	return 0;
 }
 
@@ -64,7 +68,7 @@ READ8_MEMBER(liberate_state::deco16_io_r)
 	if (offset == 3) return ioport("DSW1")->read(); /* Dip 1 */
 	if (offset == 4) return ioport("DSW2")->read(); /* Dip 2 */
 
-	logerror("%04x:  Read input %d\n", space.device().safe_pc(), offset);
+	logerror("%04x:  Read input %d\n", m_maincpu->pc(), offset);
 	return 0xff;
 }
 
@@ -97,13 +101,13 @@ READ8_MEMBER(liberate_state::prosoccr_bank_r)
 		return m_spriteram[offset - 0xc00];
 	if (offset < 0x2200)
 	{
-		logerror("%04x: Unmapped bank read %04x\n", space.device().safe_pc(), offset);
+		logerror("%04x: Unmapped bank read %04x\n", m_maincpu->pc(), offset);
 		return 0;
 	}
 	if (offset < 0x2800)
 		return m_scratchram[offset - 0x2200];
 
-	logerror("%04x: Unmapped bank read %04x\n", space.device().safe_pc(), offset);
+	logerror("%04x: Unmapped bank read %04x\n", m_maincpu->pc(), offset);
 	return 0;
 }
 
@@ -237,7 +241,7 @@ WRITE8_MEMBER(liberate_state::prosport_charram_w)
  *************************************/
 
 static ADDRESS_MAP_START( prosport_map, AS_PROGRAM, 8, liberate_state )
-	AM_RANGE(0x0200, 0x021f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0200, 0x021f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(prosport_bg_vram_w) AM_SHARE("bg_vram")
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(prosport_charram_r,prosport_charram_w) //0x1e00-0x1fff isn't charram!
@@ -263,7 +267,7 @@ static ADDRESS_MAP_START( liberate_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, liberate_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, liberate_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -316,10 +320,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prosoccr_sound_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8912_device, data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8912_device, address_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8912_device, data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8912_device, address_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xc000) AM_WRITENOP //irq ack
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -328,10 +332,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( liberate_sound_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("ay1", ay8910_device, data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("ay1", ay8912_device, data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8912_device, address_w)
+	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("ay2", ay8912_device, data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8912_device, address_w)
 	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -724,7 +728,7 @@ MACHINE_RESET_MEMBER(liberate_state,liberate)
 	m_bank = 0;
 }
 
-static MACHINE_CONFIG_START( liberate_base, liberate_state )
+MACHINE_CONFIG_START(liberate_state::liberate_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",DECO16, 2000000)
@@ -761,19 +765,19 @@ static MACHINE_CONFIG_START( liberate_base, liberate_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay2", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( liberate, liberate_base )
+MACHINE_CONFIG_DERIVED(liberate_state::liberate, liberate_base)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( liberatb, liberate_base )
+MACHINE_CONFIG_DERIVED(liberate_state::liberatb, liberate_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M6502, 2000000)
@@ -781,14 +785,14 @@ static MACHINE_CONFIG_DERIVED( liberatb, liberate_base )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", liberate_state,  deco16_interrupt)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( boomrang, liberate_base )
+MACHINE_CONFIG_DERIVED(liberate_state::boomrang, liberate_base)
 
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,boomrang)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(liberate_state, screen_update_boomrang)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( prosoccr, liberate_base )
+MACHINE_CONFIG_DERIVED(liberate_state::prosoccr, liberate_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -811,7 +815,7 @@ static MACHINE_CONFIG_DERIVED( prosoccr, liberate_base )
 	MCFG_VIDEO_START_OVERRIDE(liberate_state,prosoccr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( prosport, liberate_state )
+MACHINE_CONFIG_START(liberate_state::prosport)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO16, 2000000)
@@ -848,10 +852,10 @@ static MACHINE_CONFIG_START( prosport, liberate_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay1", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ADD("ay2", AY8912, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

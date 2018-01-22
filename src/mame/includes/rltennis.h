@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 #include "sound/dac.h"
 
@@ -48,4 +48,5 @@ public:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(sample_player);
+	void rltennis(machine_config &config);
 };

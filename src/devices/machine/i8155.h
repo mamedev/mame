@@ -2,8 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Intel 8155/8156 - 2048-Bit Static MOS RAM with I/O Ports and Timer emulation
-    8156 is the same as 8155, except that chip enable is active high instead of low
+    Intel 8155/8156 - 2048-Bit Static MOS RAM with I/O Ports and Timer
 
 **********************************************************************
                             _____   _____
@@ -30,12 +29,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_I8155_H
+#define MAME_MACHINE_I8155_H
+
 #pragma once
 
-#ifndef __I8155__
-#define __I8155__
-
-#include "emu.h"
 
 
 //**************************************************************************
@@ -77,13 +75,13 @@ public:
 	// construction/destruction
 	i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_in_pa_callback(device_t &device, _Object object)  { return downcast<i8155_device &>(device).m_in_pa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pb_callback(device_t &device, _Object object)  { return downcast<i8155_device &>(device).m_in_pb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_pc_callback(device_t &device, _Object object)  { return downcast<i8155_device &>(device).m_in_pc_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pa_callback(device_t &device, _Object object) { return downcast<i8155_device &>(device).m_out_pa_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pb_callback(device_t &device, _Object object) { return downcast<i8155_device &>(device).m_out_pb_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_pc_callback(device_t &device, _Object object) { return downcast<i8155_device &>(device).m_out_pc_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_to_callback(device_t &device, _Object object) { return downcast<i8155_device &>(device).m_out_to_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_in_pa_callback(device_t &device, Object &&cb)  { return downcast<i8155_device &>(device).m_in_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_pb_callback(device_t &device, Object &&cb)  { return downcast<i8155_device &>(device).m_in_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_pc_callback(device_t &device, Object &&cb)  { return downcast<i8155_device &>(device).m_in_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_pa_callback(device_t &device, Object &&cb) { return downcast<i8155_device &>(device).m_out_pa_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_pb_callback(device_t &device, Object &&cb) { return downcast<i8155_device &>(device).m_out_pb_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_pc_callback(device_t &device, Object &&cb) { return downcast<i8155_device &>(device).m_out_pc_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_out_to_callback(device_t &device, Object &&cb) { return downcast<i8155_device &>(device).m_out_to_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
@@ -96,16 +94,19 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
+	i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	inline uint8_t get_timer_mode();
-	inline void timer_output();
-	inline void pulse_timer_output();
+	inline void timer_output(int to);
+	inline void timer_stop_count();
+	inline void timer_reload_count();
 	inline int get_port_mode(int port);
 	inline uint8_t read_port(int port);
 	inline void write_port(int port, uint8_t data);
@@ -126,16 +127,18 @@ private:
 
 	// CPU interface
 	int m_io_m;                 // I/O or memory select
-	uint8_t m_ad;                 // address
+	uint8_t m_ad;               // address
 
 	// registers
-	uint8_t m_command;            // command register
-	uint8_t m_status;             // status register
-	uint8_t m_output[3];          // output latches
+	uint8_t m_command;          // command register
+	uint8_t m_status;           // status register
+	uint8_t m_output[3];        // output latches
 
 	// counter
-	uint16_t m_count_length;      // count length register
-	uint16_t m_counter;           // counter register
+	uint16_t m_count_length;    // count length register (assigned)
+	uint16_t m_count_loaded;    // count length register (loaded)
+	uint16_t m_counter;         // counter register
+	bool m_count_extra;         // extra cycle when count is odd
 	int m_to;                   // timer output
 
 	// timers
@@ -145,9 +148,16 @@ private:
 };
 
 
+class i8156_device : public i8155_device
+{
+public:
+	// construction/destruction
+	i8156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 // device type definition
-extern const device_type I8155;
-extern const device_type I8156;
+DECLARE_DEVICE_TYPE(I8155, i8155_device)
+DECLARE_DEVICE_TYPE(I8156, i8156_device)
 
 
 #endif

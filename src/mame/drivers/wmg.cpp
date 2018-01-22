@@ -70,10 +70,13 @@ of save-state is also needed.
 
 #include "emu.h"
 #include "includes/williams.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK        (XTAL_12MHz)
 #define SOUND_CLOCK         (XTAL_3_579545MHz)
@@ -101,6 +104,7 @@ public:
 	DECLARE_WRITE8_MEMBER(wmg_vram_select_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
 
+	void wmg(machine_config &config);
 private:
 
 	uint8_t m_wmg_c400;
@@ -477,7 +481,7 @@ DRIVER_INIT_MEMBER( wmg_state, wmg )
 	membank("bank5")->configure_entries(0, 8, &cpu[0x2d000], 0x10000);  // Code
 	membank("bank6")->configure_entries(0, 8, &snd[0x10000], 0x1000);   // Sound
 	membank("bank7")->configure_entries(1, 4, &cpu[0x78000], 0x1000);   // Defender roms
-	m_blitter_config = WILLIAMS_BLITTER_SC01;
+	m_blitter_config = WILLIAMS_BLITTER_SC1;
 	m_blitter_clip_address = 0xc000;
 }
 
@@ -486,10 +490,10 @@ DRIVER_INIT_MEMBER( wmg_state, wmg )
  *  Machine Driver
  *
  *************************************/
-static MACHINE_CONFIG_START( wmg, wmg_state )
+MACHINE_CONFIG_START(wmg_state::wmg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
 	MCFG_CPU_PROGRAM_MAP(wmg_cpu1)
 
 	MCFG_CPU_ADD("soundcpu", M6808, SOUND_CLOCK)

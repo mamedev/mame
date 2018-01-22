@@ -154,11 +154,14 @@ Notes:
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/wwfsstar.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/wwfsstar.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK    XTAL_20MHz
 #define CPU_CLOCK       MASTER_CLOCK / 2
@@ -176,7 +179,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfsstar_state )
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(fg0_videoram_w) AM_SHARE("fg0_videoram") /* FG0 Ram */
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(bg0_videoram_w) AM_SHARE("bg0_videoram") /* BG0 Ram */
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM AM_SHARE("spriteram")       /* SPR Ram */
-	AM_RANGE(0x140000, 0x140fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x140fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x180003) AM_WRITE(irqack_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW2")
@@ -184,7 +187,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfsstar_state )
 	AM_RANGE(0x180004, 0x180007) AM_WRITE(scroll_w)
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("P2")
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x180008, 0x180009) AM_WRITE(sound_w)
+	AM_RANGE(0x180008, 0x180009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x18000a, 0x18000b) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM                             /* Work Ram */
 ADDRESS_MAP_END
@@ -215,12 +218,6 @@ WRITE16_MEMBER(wwfsstar_state::scroll_w)
 			m_scrolly = data;
 			break;
 	}
-}
-
-WRITE16_MEMBER(wwfsstar_state::sound_w)
-{
-	m_soundlatch->write(space, 1, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 }
 
 WRITE16_MEMBER(wwfsstar_state::flipscreen_w)
@@ -414,7 +411,7 @@ GFXDECODE_END
  Machine Driver(s)
 *******************************************************************************/
 
-static MACHINE_CONFIG_START( wwfsstar, wwfsstar_state )
+MACHINE_CONFIG_START(wwfsstar_state::wwfsstar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
@@ -438,13 +435,14 @@ static MACHINE_CONFIG_START( wwfsstar, wwfsstar_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -481,7 +479,7 @@ ROM_START( wwfsstar )
 	ROM_LOAD( "24j6-0.112", 0x40000, 0x40000, CRC(77932ef8) SHA1(a6ee3fc05ca0001d5181b69f2b754170ba7a814a) )
 ROM_END
 
-ROM_START( wwfsstaru )
+ROM_START( wwfsstaru7 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "24ac-06.34", 0x00000, 0x20000, CRC(924a50e4) SHA1(e163ffc6bada5db0d979523dde77355acedcd456) )
 	ROM_LOAD16_BYTE( "24ad-07.35", 0x00001, 0x20000, CRC(9a76a50e) SHA1(adde96956a7602ae1ece797732e8295dc176b071) )
@@ -509,7 +507,35 @@ ROM_START( wwfsstaru )
 	ROM_LOAD( "24j6-0.112", 0x40000, 0x40000, CRC(77932ef8) SHA1(a6ee3fc05ca0001d5181b69f2b754170ba7a814a) )
 ROM_END
 
-ROM_START( wwfsstarua )
+ROM_START( wwfsstaru6 )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU  (68000) */
+	ROM_LOAD16_BYTE( "24ac-06.34", 0x00000, 0x20000, CRC(924a50e4) SHA1(e163ffc6bada5db0d979523dde77355acedcd456) )
+	ROM_LOAD16_BYTE( "24ad-06.35", 0x00001, 0x20000, CRC(d32eee6d) SHA1(f5b75039118998c0cc60c0d45cb66be23b5f371e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
+	ROM_LOAD( "24ab-0.12", 0x00000, 0x08000, CRC(1e44f8aa) SHA1(e03857d6954e9b9b6073b211e2d6570032af8807) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "24a9-0.46", 0x00000, 0x20000, CRC(703ff08f) SHA1(08c4d33208eb4c76c751a1a0fe16a817bdc30820) )
+	ROM_LOAD( "24j8-0.45", 0x20000, 0x20000, CRC(61138487) SHA1(6d5e3b12acdefb6923aa8ae0704f6c328f4747b3) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
+	ROM_LOAD( "24aa-0.58", 0x00000, 0x20000, CRC(cb12ba40) SHA1(2d39f778d9daf0d3606b63975bd6cfc45847a265) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* SPR Tiles (16x16) */
+	ROM_LOAD( "c951.114",   0x000000, 0x80000, CRC(fa76d1f0) SHA1(f69f8e6d1c5f27b054133e0faa49a8e1a9c391b2) )
+	ROM_LOAD( "24j4-0.115", 0x080000, 0x40000, CRC(c4a589a3) SHA1(5511e77c8b381419d7c63971023783c26ef6d94b) )
+	ROM_LOAD( "24j5-0.116", 0x0c0000, 0x40000, CRC(d6bca436) SHA1(25857a840b93f7f106a3a5c7dde8e0a732f45013) )
+	ROM_LOAD( "c950.117",   0x100000, 0x80000, CRC(cca5703d) SHA1(d10ef7ef1789a4f1a732a7c08ab163ec0d347da1) )
+	ROM_LOAD( "24j2-0.118", 0x180000, 0x40000, CRC(dc1b7600) SHA1(bd80d7d4063f2b739ac9420132859c23473d9968) )
+	ROM_LOAD( "24j3-0.119", 0x1c0000, 0x40000, CRC(3ba12d43) SHA1(f60d5ff54fdef5a31fe1ee7041dda325ef6649c8) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 ) /* BG0 Tiles (16x16) */
+	ROM_LOAD( "24j7-0.113", 0x00000, 0x40000, CRC(e0a1909e) SHA1(6ec0db2e0297256d1c6d003a0e5b29236048bd88) )
+	ROM_LOAD( "24j6-0.112", 0x40000, 0x40000, CRC(77932ef8) SHA1(a6ee3fc05ca0001d5181b69f2b754170ba7a814a) )
+ROM_END
+
+ROM_START( wwfsstaru4 )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "24ac-04.34", 0x00000, 0x20000, CRC(ee9b850e) SHA1(6b634ad98b6104b9e860d05e73f3a139c2a19a78) )
 	ROM_LOAD16_BYTE( "24ad-04.35", 0x00001, 0x20000, CRC(057c2eef) SHA1(6eb5f60fa51b3e7f17fc6a81182a01ea406febea) )
@@ -630,10 +656,12 @@ ROM_START( wwfsstarb )
 	ROM_LOAD( "wwfs44.bin", 0x70000, 0x10000, CRC(4f965fa9) SHA1(4312838e216d2a90fe413d027f46d77c74a0aa07) )
 ROM_END
 
+// There is only 1 ROM difference between US revision 6 & 7.  Rev 7 has a patch to the way the 2nd coin slot works
 
 
-GAME( 1989, wwfsstar,   0,        wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (Europe)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstaru,  wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (US, Newer)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstarua, wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstarj,  wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wwfsstarb,  wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "bootleg",       "WWF Superstars (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstar,   0,        wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (Europe)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstaru7, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (US revision 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstaru6, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (US revision 6)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstaru4, wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (US revision 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarj,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "Technos Japan", "WWF Superstars (Japan)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wwfsstarb,  wwfsstar, wwfsstar, wwfsstar, wwfsstar_state, 0, ROT0, "bootleg",       "WWF Superstars (bootleg)",   MACHINE_SUPPORTS_SAVE )

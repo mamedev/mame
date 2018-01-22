@@ -1,6 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:David Graves, Bryan McPhail, Brad Oliver, Andrew Prime, Brian Troha, Nicola Salmoria
+#ifndef MAME_INCLUDES_TAITO_F2_H
+#define MAME_INCLUDES_TAITO_F2_H
+
+#pragma once
+
+
+#include "machine/taitocchip.h"
 #include "machine/taitoio.h"
+
 #include "sound/okim6295.h"
 #include "video/tc0100scn.h"
 #include "video/tc0110pcr.h"
@@ -8,14 +16,6 @@
 #include "video/tc0360pri.h"
 #include "video/tc0480scp.h"
 
-struct f2_tempsprite
-{
-	int code, color;
-	int flipx, flipy;
-	int x, y;
-	int zoomx, zoomy;
-	int primask;
-};
 
 class taitof2_state : public driver_device
 {
@@ -25,13 +25,22 @@ public:
 		TIMER_TAITOF2_INTERRUPT6
 	};
 
+	struct f2_tempsprite
+	{
+		int code, color;
+		int flipx, flipy;
+		int x, y;
+		int zoomx, zoomy;
+		int primask;
+	};
+
 	taitof2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_sprite_extension(*this, "sprite_ext"),
 			m_spriteram(*this, "spriteram"),
-			m_cchip2_ram(*this, "cchip2_ram"),
 			m_maincpu(*this, "maincpu"),
 			m_audiocpu(*this, "audiocpu"),
+			m_cchip(*this, "cchip"),
 			m_oki(*this, "oki"),
 			m_tc0100scn(*this, "tc0100scn"),
 			m_tc0100scn_1(*this, "tc0100scn_1"),
@@ -52,7 +61,6 @@ public:
 	required_shared_ptr<uint16_t> m_spriteram;
 	std::unique_ptr<uint16_t[]>        m_spriteram_buffered;
 	std::unique_ptr<uint16_t[]>        m_spriteram_delayed;
-	optional_shared_ptr<uint16_t> m_cchip2_ram;           // for megablst only
 
 	/* video-related */
 	std::unique_ptr<struct f2_tempsprite[]> m_spritelist;
@@ -99,6 +107,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<taito_cchip_device> m_cchip;
 	optional_device<okim6295_device> m_oki;
 	optional_device<tc0100scn_device> m_tc0100scn;
 	optional_device<tc0100scn_device> m_tc0100scn_1;
@@ -113,10 +122,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
+	DECLARE_WRITE8_MEMBER(coin_nibble_w);
 	DECLARE_WRITE16_MEMBER(growl_coin_word_w);
-	DECLARE_WRITE16_MEMBER(taitof2_4p_coin_word_w);
-	DECLARE_WRITE16_MEMBER(ninjak_coin_word_w);
-	DECLARE_READ16_MEMBER(ninjak_input_r);
+	DECLARE_WRITE8_MEMBER(taitof2_4p_coin_word_w);
 	DECLARE_READ16_MEMBER(cameltry_paddle_r);
 	DECLARE_READ16_MEMBER(mjnquest_dsw_r);
 	DECLARE_READ16_MEMBER(mjnquest_input_r);
@@ -125,8 +133,6 @@ public:
 	DECLARE_READ8_MEMBER(driveout_sound_command_r);
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
 	DECLARE_WRITE16_MEMBER(driveout_sound_command_w);
-	DECLARE_WRITE16_MEMBER(cchip2_word_w);
-	DECLARE_READ16_MEMBER(cchip2_word_r);
 	DECLARE_WRITE16_MEMBER(taitof2_sprite_extension_w);
 	DECLARE_WRITE16_MEMBER(taitof2_spritebank_w);
 	DECLARE_WRITE16_MEMBER(koshien_spritebank_w);
@@ -169,11 +175,11 @@ public:
 	uint32_t screen_update_taitof2_deadconx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_taitof2_yesnoj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_taitof2_metalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_taitof2_no_buffer(screen_device &screen, bool state);
-	void screen_eof_taitof2_partial_buffer_delayed(screen_device &screen, bool state);
-	void screen_eof_taitof2_partial_buffer_delayed_thundfox(screen_device &screen, bool state);
-	void screen_eof_taitof2_full_buffer_delayed(screen_device &screen, bool state);
-	void screen_eof_taitof2_partial_buffer_delayed_qzchikyu(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_no_buffer);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed_thundfox);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_full_buffer_delayed);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_partial_buffer_delayed_qzchikyu);
 	INTERRUPT_GEN_MEMBER(taitof2_interrupt);
 	void reset_driveout_sound_region();
 	void taitof2_core_vh_start (int sprite_type, int hide, int flip_hide );
@@ -185,6 +191,45 @@ public:
 	void taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
 	uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley );
 
+	void taito_f2_tc0220ioc(machine_config &config);
+	void taito_f2_tc0510nio(machine_config &config);
+	void taito_f2_te7750(machine_config &config);
+	void taito_f2(machine_config &config);
+	void thundfox(machine_config &config);
+	void dinorex(machine_config &config);
+	void mjnquest(machine_config &config);
+	void cameltrya(machine_config &config);
+	void koshien(machine_config &config);
+	void qzchikyu(machine_config &config);
+	void metalb(machine_config &config);
+	void yesnoj(machine_config &config);
+	void quizhq(machine_config &config);
+	void dondokod(machine_config &config);
+	void qcrayon2(machine_config &config);
+	void qtorimon(machine_config &config);
+	void driftout(machine_config &config);
+	void solfigtr(machine_config &config);
+	void qzquest(machine_config &config);
+	void liquidk(machine_config &config);
+	void deadconx(machine_config &config);
+	void ssi(machine_config &config);
+	void pulirula(machine_config &config);
+	void growl(machine_config &config);
+	void ninjak(machine_config &config);
+	void footchmp(machine_config &config);
+	void cameltry(machine_config &config);
+	void finalb(machine_config &config);
+	void hthero(machine_config &config);
+	void driveout(machine_config &config);
+	void gunfront(machine_config &config);
+	void qcrayon(machine_config &config);
+	void megab(machine_config &config);
+	void qjinsei(machine_config &config);
+	void deadconxj(machine_config &config);
+	void footchmpbl(machine_config &config);
+	void yuyugogo(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+#endif // MAME_INCLUDES_TAITO_F2_H

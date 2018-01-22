@@ -34,6 +34,7 @@ medium transfer rate is approx. 307 bps (38 bytes/sec) for files that contain
 #include <assert.h>
 
 #include "zx81_p.h"
+#include "tzx_cas.h"
 
 
 #define WAVEENTRY_LOW   -32768
@@ -197,13 +198,13 @@ static int zx81_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 
 static const struct CassetteLegacyWaveFiller zx81_legacy_fill_wave =
 {
-	zx81_cassette_fill_wave,            /* fill_wave */
-	-1,                     /* chunk_size */
-	0,                      /* chunk_samples */
+	zx81_cassette_fill_wave,                    /* fill_wave */
+	-1,                                         /* chunk_size */
+	0,                                          /* chunk_samples */
 	zx81_cassette_calculate_size_in_samples,    /* chunk_sample_calc */
-	ZX81_WAV_FREQUENCY,             /* sample_frequency */
-	0,                      /* header_samples */
-	0                       /* trailer_samples */
+	ZX81_WAV_FREQUENCY,                         /* sample_frequency */
+	0,                                          /* header_samples */
+	0                                           /* trailer_samples */
 };
 
 static cassette_image::error zx81_p_identify(cassette_image *cassette, struct CassetteOptions *opts)
@@ -231,6 +232,11 @@ static const struct CassetteFormat zx81_p_image_format =
 
 CASSETTE_FORMATLIST_START(zx81_p_format)
 	CASSETTE_FORMAT(zx81_p_image_format)
+CASSETTE_FORMATLIST_END
+
+CASSETTE_FORMATLIST_START(zx81_cassette_formats)
+	CASSETTE_FORMAT(zx81_p_image_format)
+	CASSETTE_FORMAT(tzx_cassette_format)
 CASSETTE_FORMATLIST_END
 
 /* ZX-80 functions */
@@ -265,11 +271,11 @@ static int zx80_cassette_fill_wave(int16_t *buffer, int length, uint8_t *bytes)
 
 static const struct CassetteLegacyWaveFiller zx80_legacy_fill_wave =
 {
-	zx80_cassette_fill_wave,            /* fill_wave */
+	zx80_cassette_fill_wave,                    /* fill_wave */
 	-1,                                         /* chunk_size */
 	0,                                          /* chunk_samples */
 	zx80_cassette_calculate_size_in_samples,    /* chunk_sample_calc */
-	ZX81_WAV_FREQUENCY,                                     /* sample_frequency */
+	ZX81_WAV_FREQUENCY,                         /* sample_frequency */
 	0,                                          /* header_samples */
 	0                                           /* trailer_samples */
 };

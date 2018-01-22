@@ -12,8 +12,10 @@
 
 ***************************************************************************/
 
-#ifndef __FD1089_H__
-#define __FD1089_H__
+#ifndef MAME_MACHINE_FD1089_H
+#define MAME_MACHINE_FD1089_H
+
+#pragma once
 
 #include "cpu/m68000/m68000.h"
 
@@ -23,8 +25,8 @@
 //**************************************************************************
 
 // device type definition
-extern const device_type FD1089A;
-extern const device_type FD1089B;
+DECLARE_DEVICE_TYPE(FD1089A, fd1089a_device)
+DECLARE_DEVICE_TYPE(FD1089B, fd1089b_device)
 
 
 
@@ -38,13 +40,13 @@ extern const device_type FD1089B;
 class fd1089_base_device : public m68000_device
 {
 public:
-	// construction/destruction
-	fd1089_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	// explicit decryption helpers
 	void decrypt(offs_t baseaddr, uint32_t size, offs_t regionoffs, uint16_t *opcodesptr, uint16_t *dataptr) { decrypt(baseaddr, size, &m_plaintext[regionoffs/2], opcodesptr, dataptr); }
 
 protected:
+	// construction/destruction
+	fd1089_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device overrides
 	virtual void device_start() override;
 
@@ -102,4 +104,4 @@ protected:
 };
 
 
-#endif
+#endif // MAME_MACHINE_FD1089_H

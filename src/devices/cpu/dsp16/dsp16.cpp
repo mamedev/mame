@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "dsp16.h"
+#include "dsp16dis.h"
 
 //
 // TODO:
@@ -27,7 +28,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type DSP16 = &device_creator<dsp16_device>;
+DEFINE_DEVICE_TYPE(DSP16, dsp16_device, "dsp16", "DSP16")
 
 
 //-------------------------------------------------
@@ -35,7 +36,7 @@ const device_type DSP16 = &device_creator<dsp16_device>;
 //-------------------------------------------------
 
 dsp16_device::dsp16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, DSP16, "DSP16", tag, owner, clock, "dsp16", __FILE__),
+	: cpu_device(mconfig, DSP16, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1),
 		m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1),
 		m_i(0),
@@ -108,8 +109,8 @@ void dsp16_device::device_start()
 	state_add(DSP16_X,        "X",         m_x);
 	state_add(DSP16_Y,        "Y",         m_y);
 	state_add(DSP16_P,        "P",         m_p);
-	state_add(DSP16_A0,       "A0",        m_a0).mask(U64(0xfffffffff));
-	state_add(DSP16_A1,       "A1",        m_a1).mask(U64(0xfffffffff));
+	state_add(DSP16_A0,       "A0",        m_a0).mask(0xfffffffffU);
+	state_add(DSP16_A1,       "A1",        m_a1).mask(0xfffffffffU);
 	state_add(DSP16_AUC,      "AUC",       m_auc).formatstr("%8s");
 	state_add(DSP16_PSW,      "PSW",       m_psw).formatstr("%16s");
 	state_add(DSP16_C0,       "C0",        m_c0);
@@ -161,7 +162,7 @@ void dsp16_device::device_start()
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-1>();
 
 	// set our instruction counter
 	m_icountptr = &m_icount;
@@ -201,11 +202,12 @@ void dsp16_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *dsp16_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector dsp16_device::memory_space_config() const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_config :
-			(spacenum == AS_DATA) ? &m_data_config :
-			nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
 }
 
 
@@ -320,40 +322,15 @@ void dsp16_device::state_string_export(const device_state_entry &entry, std::str
 	}
 }
 
-
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t dsp16_device::disasm_min_opcode_bytes() const
-{
-	return 2;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t dsp16_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t dsp16_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *dsp16_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( dsp16a );
-	return CPU_DISASSEMBLE_NAME(dsp16a)(this, buffer, pc, oprom, opram, options);
+	return new dsp16a_disassembler;
 }
-
 
 
 /***************************************************************************
@@ -362,18 +339,18 @@ offs_t dsp16_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *
 
 inline uint32_t dsp16_device::data_read(const uint16_t& addr)
 {
-	return m_data->read_word(addr << 1);
+	return m_data->read_word(addr);
 }
 
 inline void dsp16_device::data_write(const uint16_t& addr, const uint16_t& data)
 {
-	m_data->write_word(addr << 1, data & 0xffff);
+	m_data->write_word(addr, data & 0xffff);
 }
 
 inline uint32_t dsp16_device::opcode_read(const uint8_t pcOffset)
 {
 	const uint16_t readPC = m_pc + pcOffset;
-	return m_direct->read_dword(readPC << 1);
+	return m_direct->read_dword(readPC);
 }
 
 

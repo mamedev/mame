@@ -26,9 +26,12 @@ Check game speed, it depends on a bit we toggle..
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/blmbycar.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-#include "includes/blmbycar.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -106,7 +109,7 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x108000, 0x10bfff) AM_WRITEONLY                                               // ???
 	AM_RANGE(0x10c000, 0x10c003) AM_WRITEONLY AM_SHARE("scroll_1")              // Scroll 1
 	AM_RANGE(0x10c004, 0x10c007) AM_WRITEONLY AM_SHARE("scroll_0")              // Scroll 0
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") AM_MIRROR(0x4000) // Palette
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") AM_MIRROR(0x4000) // Palette
 	AM_RANGE(0x200600, 0x203fff) AM_RAM AM_MIRROR(0x4000)
 	AM_RANGE(0x440000, 0x441fff) AM_RAM
 	AM_RANGE(0x444000, 0x445fff) AM_WRITEONLY AM_SHARE("spriteram")// Sprites (size?)
@@ -141,7 +144,7 @@ static ADDRESS_MAP_START( watrball_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x70000a, 0x70000b) AM_WRITEONLY                                               // ?? busy
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blmbycar_oki_map, AS_0, 8, blmbycar_state )
+static ADDRESS_MAP_START( blmbycar_oki_map, 0, 8, blmbycar_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -340,7 +343,7 @@ MACHINE_RESET_MEMBER(blmbycar_state,blmbycar)
 }
 
 
-static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
+MACHINE_CONFIG_START(blmbycar_state::blmbycar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12MHz */
@@ -367,8 +370,8 @@ static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, blmbycar_oki_map)
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(0, blmbycar_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -386,7 +389,7 @@ MACHINE_RESET_MEMBER(blmbycar_state,watrball)
 	m_retvalue = 0;
 }
 
-static MACHINE_CONFIG_DERIVED( watrball, blmbycar )
+MACHINE_CONFIG_DERIVED(blmbycar_state::watrball, blmbycar)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -511,5 +514,5 @@ DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
 ***************************************************************************/
 
 GAME( 1994, blmbycar,  0,        blmbycar, blmbycar, blmbycar_state, blmbycar, ROT0, "ABM & Gecas", "Blomby Car", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, blmbycaru, blmbycar, blmbycar, blmbycar, driver_device,  0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, watrball,  0,        watrball, watrball, driver_device,  0,        ROT0, "ABM",         "Water Balls", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, blmbycaru, blmbycar, blmbycar, blmbycar, blmbycar_state, 0,        ROT0, "ABM & Gecas", "Blomby Car (not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, watrball,  0,        watrball, watrball, blmbycar_state, 0,        ROT0, "ABM",         "Water Balls", MACHINE_SUPPORTS_SAVE )

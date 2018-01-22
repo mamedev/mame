@@ -6,11 +6,11 @@
 
 
 
-extern const device_type FATFURY2_PROT = &device_creator<fatfury2_prot_device>;
+DEFINE_DEVICE_TYPE(NG_FATFURY2_PROT, fatfury2_prot_device, "ng_fatfury_prot", "Neo Geo Fatal Fury 2 Protection")
 
 
 fatfury2_prot_device::fatfury2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, FATFURY2_PROT, "Neo Geo Fatal Fury 2 Protection", tag, owner, clock, "fatfury2_prot", __FILE__),
+	device_t(mconfig, NG_FATFURY2_PROT, tag, owner, clock),
 	m_prot_data(0)
 {
 }
@@ -50,7 +50,7 @@ READ16_MEMBER( fatfury2_prot_device::protection_r )
 			return ((res & 0xf0) >> 4) | ((res & 0x0f) << 4);
 
 		default:
-			logerror("unknown protection read at pc %06x, offset %08x\n", space.device().safe_pc(), offset << 1);
+			logerror("unknown protection read at %s, offset %08x\n", machine().describe_context(), offset << 1);
 			return 0;
 	}
 }
@@ -95,7 +95,7 @@ WRITE16_MEMBER( fatfury2_prot_device::protection_w )
 			break;
 
 		default:
-			logerror("unknown protection write at pc %06x, offset %08x, data %02x\n", space.device().safe_pc(), offset, data);
+			logerror("unknown protection write at %s, offset %08x, data %02x\n", machine().describe_context(), offset, data);
 			break;
 	}
 }

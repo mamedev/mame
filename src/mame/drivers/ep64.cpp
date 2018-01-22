@@ -150,17 +150,21 @@ Notes: (All IC's shown)
 */
 
 #include "emu.h"
-#include "softlist.h"
-#include "audio/dave.h"
-#include "bus/rs232/rs232.h"
+
+#include "bus/centronics/ctronics.h"
 #include "bus/ep64/exp.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
-#include "bus/centronics/ctronics.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 #include "machine/ram.h"
+#include "sound/dave.h"
 #include "video/nick.h"
+
+#include "softlist.h"
+#include "speaker.h"
+
 
 #define Z80_TAG         "u1"
 #define DAVE_TAG        "u3"
@@ -213,6 +217,8 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
+	void ep128(machine_config &config);
+	void ep64(machine_config &config);
 };
 
 
@@ -552,7 +558,7 @@ void ep64_state::machine_reset()
 //  MACHINE_CONFIG( ep64 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ep64, ep64_state )
+MACHINE_CONFIG_START(ep64_state::ep64)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(ep64_mem)
@@ -607,7 +613,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ep128 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( ep128, ep64 )
+MACHINE_CONFIG_DERIVED(ep64_state::ep128, ep64)
 	MCFG_DEVICE_MODIFY(DAVE_TAG)
 	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, dave_128k_mem)
 
@@ -649,7 +655,7 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1985, ep64,  0,      0,      ep64,    ep64, driver_device, 0,     "Enterprise Computers", "Enterprise Sixty Four",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-COMP( 1985, phc64, ep64,   0,      ep64,    ep64, driver_device, 0,     "Hegener & Glaser",     "Mephisto PHC 64 (Germany)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-COMP( 1986, ep128, ep64,   0,      ep128,   ep64, driver_device, 0,     "Enterprise Computers", "Enterprise One Two Eight",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE       INIT   COMPANY                 FULLNAME                     FLAGS
+COMP( 1985, ep64,  0,      0,      ep64,    ep64,  ep64_state, 0,     "Enterprise Computers", "Enterprise Sixty Four",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+COMP( 1985, phc64, ep64,   0,      ep64,    ep64,  ep64_state, 0,     "Hegener & Glaser",     "Mephisto PHC 64 (Germany)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+COMP( 1986, ep128, ep64,   0,      ep128,   ep64,  ep64_state, 0,     "Enterprise Computers", "Enterprise One Two Eight",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

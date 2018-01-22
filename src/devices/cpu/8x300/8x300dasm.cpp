@@ -8,7 +8,7 @@
  */
 
 #include "emu.h"
-#include "8x300.h"
+#include "8x300dasm.h"
 
 #define SRC    ((opcode & 0x1f00) >> 8)
 #define DST    (opcode & 0x001f)
@@ -16,7 +16,7 @@
 #define IMM8   (opcode & 0x00ff)
 #define IMM5   (opcode & 0x001f)
 
-static const char *reg_names[32] =
+const char *const n8x300_disassembler::reg_names[32] =
 {
 	"AUX", "R1", "R2", "R3", "R4", "R5", "R6", "IVL", "OVF", "R11",
 	"Unused12", "Unused13", "Unused14", "Unused15", "Unused16", "IVR",
@@ -25,7 +25,7 @@ static const char *reg_names[32] =
 };
 
 // determines if right rotate or I/O field length is to be used
-static inline bool is_rot(uint16_t opcode)
+bool n8x300_disassembler::is_rot(uint16_t opcode)
 {
 	if((opcode & 0x1000) || (opcode & 0x0010))
 		return false;
@@ -33,7 +33,7 @@ static inline bool is_rot(uint16_t opcode)
 		return true;
 }
 
-static inline bool is_src_rot(uint16_t opcode)
+bool n8x300_disassembler::is_src_rot(uint16_t opcode)
 {
 	if((opcode & 0x1000))
 		return false;
@@ -41,11 +41,15 @@ static inline bool is_src_rot(uint16_t opcode)
 		return true;
 }
 
-CPU_DISASSEMBLE( n8x300 )
+u32 n8x300_disassembler::opcode_alignment() const
 {
-	char tmp[16];
+	return 2;
+}
+
+offs_t n8x300_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
 	unsigned startpc = pc;
-	uint16_t opcode = (oprom[pc - startpc] << 8) | oprom[pc+1 - startpc];
+	uint16_t opcode = opcodes.r16(pc);
 	uint8_t inst = opcode >> 13;
 	pc+=2;
 
@@ -53,96 +57,77 @@ CPU_DISASSEMBLE( n8x300 )
 	switch (inst)
 	{
 	case 0x00:
-		sprintf(buffer,"MOVE ");
-		strcat(buffer,reg_names[SRC]);
+		stream << "MOVE " << reg_names[SRC];
 		if(is_rot(opcode))
-			sprintf(tmp,"(%i),",ROTLEN);
+			util::stream_format(stream, "(%i),", ROTLEN);
 		else
-			sprintf(tmp,",%i,",ROTLEN);
-		strcat(buffer,tmp);
-		strcat(buffer,reg_names[DST]);
+			util::stream_format(stream, ",%i,", ROTLEN);
+		stream << reg_names[DST];
 		break;
 	case 0x01:
-		sprintf(buffer,"ADD  ");
-		strcat(buffer,reg_names[SRC]);
+		stream << "ADD  " << reg_names[SRC];
 		if(is_rot(opcode))
-			sprintf(tmp,"(%i),",ROTLEN);
+			util::stream_format(stream, "(%i),", ROTLEN);
 		else
-			sprintf(tmp,",%i,",ROTLEN);
-		strcat(buffer,tmp);
-		strcat(buffer,reg_names[DST]);
+			util::stream_format(stream, ",%i,", ROTLEN);
+		stream << reg_names[DST];
 		break;
 	case 0x02:
-		sprintf(buffer,"AND  ");
-		strcat(buffer,reg_names[SRC]);
+		stream << "AND  " << reg_names[SRC];
 		if(is_rot(opcode))
-			sprintf(tmp,"(%i),",ROTLEN);
+			util::stream_format(stream, "(%i),", ROTLEN);
 		else
-			sprintf(tmp,",%i,",ROTLEN);
-		strcat(buffer,tmp);
-		strcat(buffer,reg_names[DST]);
+			util::stream_format(stream, ",%i,", ROTLEN);
+		stream << reg_names[DST];
 		break;
 	case 0x03:
-		sprintf(buffer,"XOR  ");
-		strcat(buffer,reg_names[SRC]);
+		stream << "XOR  " << reg_names[SRC];
 		if(is_rot(opcode))
-			sprintf(tmp,"(%i),",ROTLEN);
+			util::stream_format(stream, "(%i),", ROTLEN);
 		else
-			sprintf(tmp,",%i,",ROTLEN);
-		strcat(buffer,tmp);
-		strcat(buffer,reg_names[DST]);
+			util::stream_format(stream, ",%i,", ROTLEN);
+		stream << reg_names[DST];
 		break;
 	case 0x04:
-		sprintf(buffer,"XEC  ");
-		strcat(buffer,reg_names[SRC]);
+		stream << "XEC  " << reg_names[SRC];
 		if(is_src_rot(opcode))
 		{
-			sprintf(tmp,",%02XH",IMM8);
-			strcat(buffer,tmp);
+			util::stream_format(stream, ",%02XH", IMM8);
 		}
 		else
 		{
-			sprintf(tmp,",%i",ROTLEN);
-			strcat(buffer,tmp);
-			sprintf(tmp,",%02XH",IMM5);
-			strcat(buffer,tmp);
+			util::stream_format(stream, ",%i", ROTLEN);
+			util::stream_format(stream, ",%02XH", IMM5);
 		}
 		break;
 	case 0x05:
-		sprintf(buffer,"NZT  ");
-		strcat(buffer,reg_names[SRC]);
+		stream << "NZT  " << reg_names[SRC];
 		if(is_src_rot(opcode))
 		{
-			sprintf(tmp,",%02XH",IMM8);
-			strcat(buffer,tmp);
+			util::stream_format(stream, ",%02XH", IMM8);
 		}
 		else
 		{
-			sprintf(tmp,",%i",ROTLEN);
-			strcat(buffer,tmp);
-			sprintf(tmp,",%02XH",IMM5);
-			strcat(buffer,tmp);
+			util::stream_format(stream, ",%i", ROTLEN);
+			util::stream_format(stream, ",%02XH", IMM5);
 		}
 		break;
 	case 0x06:
-		sprintf(buffer,"XMIT ");
+		stream << "XMIT ";
 		if(is_src_rot(opcode))
 		{
-			sprintf(tmp,"%02XH,",IMM8);
-			strcat(buffer,tmp);
-			strcat(buffer,reg_names[SRC]);
+			util::stream_format(stream, "%02XH,", IMM8);
+			stream << reg_names[SRC];
 		}
 		else
 		{
-			sprintf(tmp,"%02XH,",IMM5);
-			strcat(buffer,tmp);
-			strcat(buffer,reg_names[SRC]);
-			sprintf(tmp,",%i",ROTLEN);
-			strcat(buffer,tmp);
+			util::stream_format(stream, "%02XH,", IMM5);
+			stream << reg_names[SRC];
+			util::stream_format(stream, ",%i", ROTLEN);
 		}
 		break;
 	case 0x07:
-		sprintf(buffer,"JMP  %04XH",opcode & 0x1fff);
+		util::stream_format(stream, "JMP  %04XH", (opcode & 0x1fff) << 1);
 		break;
 	}
 

@@ -14,6 +14,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
+#include "screen.h"
+
 
 class a51xx_state : public driver_device
 {
@@ -29,6 +31,8 @@ public:
 	uint32_t screen_update_a5120(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_a5130(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void a5130(machine_config &config);
+	void a5120(machine_config &config);
 };
 
 
@@ -110,7 +114,7 @@ static GFXDECODE_START( a51xx )
 	GFXDECODE_ENTRY( "chargen", 0x0000, a51xx_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( a5120, a51xx_state )
+MACHINE_CONFIG_START(a51xx_state::a5120)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(a5120_mem)
@@ -132,7 +136,7 @@ static MACHINE_CONFIG_START( a5120, a51xx_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( a5130, a5120 )
+MACHINE_CONFIG_DERIVED(a51xx_state::a5130, a5120)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(a5130_mem)
@@ -172,6 +176,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE     INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1982, a5120,  0,      0,       a5120,      a5120, driver_device,   0,      "VEB Robotron",   "A5120", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1983, a5130,  a5120,  0,       a5130,      a5130, driver_device,   0,      "VEB Robotron",   "A5130", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME    PARENT  COMPAT   MACHINE     INPUT  STATE         INIT    COMPANY           FULLNAME  FLAGS
+COMP( 1982, a5120,  0,      0,       a5120,      a5120, a51xx_state,  0,      "VEB Robotron",   "A5120",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1983, a5130,  a5120,  0,       a5130,      a5130, a51xx_state,  0,      "VEB Robotron",   "A5130",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

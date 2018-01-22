@@ -12,10 +12,13 @@
 
 ***************************************************************************/
 
-#ifndef __DAC_H__
-#define __DAC_H__
+#ifndef MAME_SOUND_DAC_H
+#define MAME_SOUND_DAC_H
 
-#include "emu.h"
+#pragma once
+
+#include <type_traits>
+
 
 #define DAC_VREF_POS_INPUT (0)
 #define DAC_VREF_NEG_INPUT (1)
@@ -41,16 +44,13 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write) = 0;
 };
 
-template <int bits>
-stream_sample_t dac_multiply(const double vref, const stream_sample_t code)
+template <unsigned bits>
+constexpr stream_sample_t dac_multiply(const double vref, const stream_sample_t code)
 {
-	if (bits > 1)
-		return (vref * code) / (1 << (bits));
-
-	return vref * code;
+	return (bits > 1) ? ((vref * code) / (1 << (bits))) : (vref * code);
 }
 
-template <int bits>
+template <unsigned bits>
 class dac_code
 {
 protected:
@@ -67,7 +67,7 @@ protected:
 
 	inline void setCode(stream_sample_t code)
 	{
-		code &= ~(~0U << bits);
+		code &= ~(~std::make_unsigned_t<stream_sample_t>(0) << bits);
 		if (m_code != code)
 		{
 			m_stream->update();
@@ -78,34 +78,29 @@ protected:
 	virtual void sound_stream_update_tag(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) = 0;
 };
 
-template <int bits>
-class dac_code_binary :
-	protected dac_code<bits>
+template <unsigned bits>
+class dac_code_binary : protected dac_code<bits>
 {
 protected:
-	dac_code_binary(double gain) :
-		dac_code<bits>(gain)
-	{
-	}
+	using dac_code<bits>::dac_code;
 
 	virtual void sound_stream_update_tag(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override
 	{
 		for (int samp = 0; samp < samples; samp++)
 		{
-			double vref_pos = inputs[DAC_VREF_POS_INPUT][samp] * this->m_gain;
-			double vref_neg = inputs[DAC_VREF_NEG_INPUT][samp] * this->m_gain;
-			stream_sample_t vout = vref_neg + dac_multiply<bits>(vref_pos - vref_neg, this->m_code);
+			double const vref_pos = inputs[DAC_VREF_POS_INPUT][samp] * this->m_gain;
+			double const vref_neg = inputs[DAC_VREF_NEG_INPUT][samp] * this->m_gain;
+			stream_sample_t const vout = vref_neg + dac_multiply<bits>(vref_pos - vref_neg, this->m_code);
 			outputs[0][samp] = vout;
 		}
 	}
 };
 
-template <int bits>
-class dac_code_ones_complement :
-	protected dac_code<bits>
+template <unsigned bits>
+class dac_code_ones_complement : protected dac_code<bits>
 {
 protected:
-	dac_code_ones_complement(double gain) : dac_code<bits>(gain) {}
+	using dac_code<bits>::dac_code;
 
 	virtual void sound_stream_update_tag(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override
 	{
@@ -113,8 +108,8 @@ protected:
 		{
 			for (int samp = 0; samp < samples; samp++)
 			{
-				double vref_neg = inputs[DAC_VREF_NEG_INPUT][samp] * this->m_gain;
-				stream_sample_t vout = dac_multiply<bits - 1>(vref_neg, this->m_code ^ ~(~0U << bits));
+				double const vref_neg = inputs[DAC_VREF_NEG_INPUT][samp] * this->m_gain;
+				stream_sample_t const vout = dac_multiply<bits - 1>(vref_neg, this->m_code ^ ~(~0U << bits));
 				outputs[0][samp] = vout;
 			}
 		}
@@ -122,45 +117,37 @@ protected:
 		{
 			for (int samp = 0; samp < samples; samp++)
 			{
-				double vref_pos = inputs[DAC_VREF_POS_INPUT][samp] * this->m_gain;
-				stream_sample_t vout = dac_multiply<bits - 1>(vref_pos, this->m_code);
+				double const vref_pos = inputs[DAC_VREF_POS_INPUT][samp] * this->m_gain;
+				stream_sample_t const vout = dac_multiply<bits - 1>(vref_pos, this->m_code);
 				outputs[0][samp] = vout;
 			}
 		}
 	}
 };
 
-template <int bits>
-class dac_code_twos_complement :
-	protected dac_code<bits>
+template <unsigned bits>
+class dac_code_twos_complement : protected dac_code<bits>
 {
 protected:
-	dac_code_twos_complement(double gain) :
-		dac_code<bits>(gain)
-	{
-	}
+	using dac_code<bits>::dac_code;
 
 	virtual void sound_stream_update_tag(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override
 	{
 		for (int samp = 0; samp < samples; samp++)
 		{
-			double vref_pos = inputs[DAC_VREF_POS_INPUT][samp] * this->m_gain;
-			double vref_neg = inputs[DAC_VREF_NEG_INPUT][samp] * this->m_gain;
-			stream_sample_t vout = vref_neg + dac_multiply<bits>(vref_pos - vref_neg, this->m_code ^ (1 << (bits - 1)));
+			double const vref_pos = inputs[DAC_VREF_POS_INPUT][samp] * this->m_gain;
+			double const vref_neg = inputs[DAC_VREF_NEG_INPUT][samp] * this->m_gain;
+			stream_sample_t const vout = vref_neg + dac_multiply<bits>(vref_pos - vref_neg, this->m_code ^ (1 << (bits - 1)));
 			outputs[0][samp] = vout;
 		}
 	}
 };
 
-template <int bits>
-class dac_code_sign_magntitude :
-	protected dac_code<bits>
+template <unsigned bits>
+class dac_code_sign_magntitude : protected dac_code<bits>
 {
 protected:
-	dac_code_sign_magntitude(double gain) :
-		dac_code<bits>(gain)
-	{
-	}
+	using dac_code<bits>::dac_code;
 
 	virtual void sound_stream_update_tag(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override
 	{
@@ -168,8 +155,8 @@ protected:
 		{
 			for (int samp = 0; samp < samples; samp++)
 			{
-				double vref_neg = inputs[DAC_VREF_NEG_INPUT][samp] * this->m_gain;
-				stream_sample_t vout = dac_multiply<bits - 1>(vref_neg, this->m_code ^ (1 << (bits - 1)));
+				double const vref_neg = inputs[DAC_VREF_NEG_INPUT][samp] * this->m_gain;
+				stream_sample_t const vout = dac_multiply<bits - 1>(vref_neg, this->m_code ^ (1 << (bits - 1)));
 				outputs[0][samp] = vout;
 			}
 		}
@@ -177,8 +164,8 @@ protected:
 		{
 			for (int samp = 0; samp < samples; samp++)
 			{
-				double vref_pos = inputs[DAC_VREF_POS_INPUT][samp] * this->m_gain;
-				stream_sample_t vout = dac_multiply<bits - 1>(vref_pos, this->m_code);
+				double const vref_pos = inputs[DAC_VREF_POS_INPUT][samp] * this->m_gain;
+				stream_sample_t const vout = dac_multiply<bits - 1>(vref_pos, this->m_code);
 				outputs[0][samp] = vout;
 			}
 		}
@@ -192,8 +179,8 @@ class dac_device : public device_t,
 	protected _dac_code
 {
 protected:
-	dac_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, double gain)
-		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	dac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, double gain) :
+		device_t(mconfig, type, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		_dac_code(gain)
 	{
@@ -220,8 +207,8 @@ class dac_generator<dac_bit_interface, _dac_code> :
 	public dac_device<_dac_code>
 {
 public:
-	dac_generator(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, double gain) :
-		dac_device<_dac_code>(mconfig, type, name, tag, owner, clock, shortname, source, gain)
+	dac_generator(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, double gain) :
+		dac_device<_dac_code>(mconfig, type, tag, owner, clock, gain)
 	{
 	}
 
@@ -235,8 +222,8 @@ class dac_generator<dac_byte_interface, _dac_code> :
 	public dac_device<_dac_code>
 {
 public:
-	dac_generator(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, double gain) :
-		dac_device<_dac_code>(mconfig, type, name, tag, owner, clock, shortname, source, gain)
+	dac_generator(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, double gain) :
+		dac_device<_dac_code>(mconfig, type, tag, owner, clock, gain)
 	{
 	}
 
@@ -250,8 +237,8 @@ class dac_generator<dac_word_interface, _dac_code> :
 	public dac_device<_dac_code>
 {
 public:
-	dac_generator(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, double gain) :
-		dac_device<_dac_code>(mconfig, type, name, tag, owner, clock, shortname, source, gain)
+	dac_generator(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, double gain) :
+		dac_device<_dac_code>(mconfig, type, tag, owner, clock, gain)
 	{
 	}
 
@@ -259,31 +246,36 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write) override { this->setCode(data); }
 };
 
-const double dac_gain_r2r = 1.0;
-const double dac_gain_binary_weighted = 2.0;
+constexpr double dac_gain_r2r = 1.0;
+constexpr double dac_gain_binary_weighted = 2.0;
 
 #ifndef DAC_GENERATOR_EPILOG
-#define DAC_GENERATOR_EPILOG(_dac_type, _dac_class) //
+#define DAC_GENERATOR_EPILOG(_dac_type, _dac_class, _dac_description, _dac_shortname)
 #endif
 
 #define DAC_GENERATOR(_dac_type, _dac_class, _dac_interface, _dac_coding, _dac_gain, _dac_description, _dac_shortname) \
-extern const device_type _dac_type; \
+DECLARE_DEVICE_TYPE(_dac_type, _dac_class) \
 class _dac_class : public dac_generator<_dac_interface, _dac_coding> \
 {\
 public: \
 	_dac_class(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : \
-		dac_generator(mconfig, _dac_type, _dac_description, tag, owner, clock, _dac_shortname, __FILE__, _dac_gain) {} \
+		dac_generator(mconfig, _dac_type, tag, owner, clock, _dac_gain) {} \
 }; \
-DAC_GENERATOR_EPILOG(_dac_type, _dac_class)
+DAC_GENERATOR_EPILOG(_dac_type, _dac_class, _dac_description, _dac_shortname)
 
 // DAC chips
+DAC_GENERATOR(AD557, ad557_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD557", "ad557")
+DAC_GENERATOR(AD7224, ad7224_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD7224", "ad7224")
 DAC_GENERATOR(AD7521, ad7521_device, dac_word_interface, dac_code_binary<12>, dac_gain_r2r, "AD7521", "ad7521")
+DAC_GENERATOR(AD7523, ad7523_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD7523", "ad7523")
 DAC_GENERATOR(AD7524, ad7524_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD7524", "ad7524")
 DAC_GENERATOR(AD7528, ad7528_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "AD7528", "ad7528") /// 2 x vin + 2 x vout
 DAC_GENERATOR(AD7533, ad7533_device, dac_word_interface, dac_code_binary<10>, dac_gain_r2r, "AD7533", "ad7533")
 DAC_GENERATOR(AD7541, ad7541_device, dac_word_interface, dac_code_binary<12>, dac_gain_r2r, "AD7541", "ad7541")
 DAC_GENERATOR(AM6012, am6012_device, dac_word_interface, dac_code_binary<12>, dac_gain_r2r, "AM6012", "am6012")
+DAC_GENERATOR(DAC08, dac08_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "DAC08", "dac08")
 DAC_GENERATOR(DAC0800, dac0800_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "DAC0800", "dac0800")
+DAC_GENERATOR(DAC0832, dac0832_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "DAC0832", "dac0832") // should be double-buffered?
 DAC_GENERATOR(DAC1200, dac1200_device, dac_word_interface, dac_code_binary<12>, dac_gain_r2r, "DAC1200", "dac1200")
 DAC_GENERATOR(MC1408, mc1408_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "MC1408", "mc1408")
 DAC_GENERATOR(MC3408, mc3408_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "MC3408", "mc3408")
@@ -291,6 +283,7 @@ DAC_GENERATOR(MC3410, mc3410_device, dac_word_interface, dac_code_binary<10>, da
 DAC_GENERATOR(PCM54HP, pcm54hp_device, dac_word_interface, dac_code_binary<16>, dac_gain_r2r, "PCM54HP", "pcm54hp")
 DAC_GENERATOR(UDA1341TS, uda1341ts_device, dac_word_interface, dac_code_twos_complement<16>, dac_gain_r2r, "UDA1341TS", "uda1341ts") // I2C stereo audio codec
 DAC_GENERATOR(ZN425E, zn425e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN425E", "zn425e")
+DAC_GENERATOR(ZN429E, zn429e_device, dac_byte_interface, dac_code_binary<8>, dac_gain_r2r, "ZN429E-8", "zn429e")
 
 // DAC circuits/unidentified chips
 DAC_GENERATOR(DAC_1BIT, dac_1bit_device, dac_bit_interface, dac_code_binary<1>, 1.0, "1-Bit DAC", "dac")
@@ -316,4 +309,4 @@ DAC_GENERATOR(DAC_16BIT_R2R_TWOS_COMPLEMENT, dac_16bit_r2r_twos_complement_devic
 #undef DAC_GENERATOR
 #undef DAC_GENERATOR_EPILOG
 
-#endif /* __DAC_H__ */
+#endif // MAME_SOUND_DAC_H

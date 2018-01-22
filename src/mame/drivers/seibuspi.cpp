@@ -581,6 +581,34 @@ Raiden Fighters Jet    (All Mask ROMs stamped 'RAIDEN-FJET')
 
 
 
+Mahjong Adapter Layout
+----------------------
+
+(C)SXX2C MAHJANG IF SEIBU KAIHATSU INC.
+|------------|  |---------------------------------------------|  |------------|
+|            |--|                  J A M M A                  |--|            |
+|   E  E                                                               E  E   |
+|   X  X                                                               X  X   |
+|   C  C     74LS393   16.9344MHz    jumpers        74LS174  74LS174   C  C   |
+|   N  N                                                               N  N   |
+|   4  3     74LS393       *                        74LS174  74LS174   2  1   |
+|                                                                             |
+|   74LS138   74LS04       **           ***         74LS174  74LS174          |
+|                                                                             |
+|   74LS161   SN7406            resistor package     ****    74LS148          |
+|                                                                             |
+|          |---|                   5 6 P M J                    |---|         |
+|----------|   |------------------------------------------------|   |---------|
+Notes:
+*     : Unpopulated location for ULN2003
+**    : Unpopulated location for 16V8-25 GAL
+***   : Unpopulated location for 74LS161
+****  : Unpopulated location for 74LS148
+
+This board is used by E Jong High School to encode the mahjong inputs onto the
+SPI motherboard's JAMMA connector.
+
+
 There were some single PCBs made that run just one game. These are shown below.
 
 
@@ -846,18 +874,23 @@ Notes:
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/seibuspi.h"
+
 #include "cpu/i386/i386.h"
+#include "cpu/z80/z80.h"
+#include "machine/7200fifo.h"
 #include "machine/ds2404.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
-#include "machine/7200fifo.h"
+#include "machine/seibuspi.h"
 #include "sound/okim6295.h"
 #include "sound/ymf271.h"
 #include "sound/ymz280b.h"
-#include "machine/seibuspi.h"
 #include "video/seibu_crtc.h"
-#include "includes/seibuspi.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 // default values written to CRTC (note: SYS386F does not have this chip)
 #define PIXEL_CLOCK  (XTAL_28_63636MHz/4)
@@ -1771,7 +1804,7 @@ static const gfx_layout sys386f_spritelayout =
 	16*32
 };
 
-static GFXDECODE_START( sys386f)
+static GFXDECODE_START( sys386f )
 	GFXDECODE_ENTRY( "gfx1", 0, spi_charlayout,          5632, 16 ) // Not used
 	GFXDECODE_ENTRY( "gfx2", 0, spi_tilelayout,          4096, 24 ) // Not used
 	GFXDECODE_ENTRY( "gfx3", 0, sys386f_spritelayout,       0, 96 )
@@ -1830,7 +1863,7 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 	m_z80_prg_transfer_pos = 0;
 }
 
-static MACHINE_CONFIG_START( spi, seibuspi_state )
+MACHINE_CONFIG_START(seibuspi_state::spi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // AMD or Intel 386DX, 25MHz
@@ -1880,13 +1913,13 @@ static MACHINE_CONFIG_START( spi, seibuspi_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ejanhs, spi )
+MACHINE_CONFIG_DERIVED(seibuspi_state::ejanhs, spi)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, ejanhs)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rdft2, spi )
+MACHINE_CONFIG_DERIVED(seibuspi_state::rdft2, spi)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rdft2_map)
 MACHINE_CONFIG_END
@@ -1901,7 +1934,7 @@ MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
 	m_sb_coin_latch = 0;
 }
 
-static MACHINE_CONFIG_DERIVED( sxx2e, spi )
+MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2e, spi)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1925,7 +1958,7 @@ static MACHINE_CONFIG_DERIVED( sxx2e, spi )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sxx2f, sxx2e )
+MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2f, sxx2e)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1939,7 +1972,7 @@ static MACHINE_CONFIG_DERIVED( sxx2f, sxx2e )
 	// clock is unknown, possibly slower than 7.159MHz
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sxx2g, sxx2f ) // clocks differ, but otherwise same hw as sxx2f
+MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2g, sxx2f) // clocks differ, but otherwise same hw as sxx2f
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") // AMD AM386DX/DX-40, 28.63636MHz
@@ -1959,7 +1992,7 @@ MACHINE_CONFIG_END
 
 /* SYS386I */
 
-static MACHINE_CONFIG_START( sys386i, seibuspi_state )
+MACHINE_CONFIG_START(seibuspi_state::sys386i)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_40MHz) // AMD 386DX, 40MHz
@@ -1987,10 +2020,10 @@ static MACHINE_CONFIG_START( sys386i, seibuspi_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/20, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/20, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/20, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/20, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -2016,7 +2049,7 @@ DRIVER_INIT_MEMBER(seibuspi_state,sys386f)
 	}
 }
 
-static MACHINE_CONFIG_START( sys386f, seibuspi_state )
+MACHINE_CONFIG_START(seibuspi_state::sys386f)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // Intel i386DX, 25MHz
@@ -2117,27 +2150,27 @@ DRIVER_INIT_MEMBER(seibuspi_state,rfjet)
 
 READ32_MEMBER(seibuspi_state::senkyu_speedup_r)
 {
-	if (space.device().safe_pc()==0x00305bb2) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x00305bb2) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018cb4/4];
 }
 
 READ32_MEMBER(seibuspi_state::senkyua_speedup_r)
 {
-	if (space.device().safe_pc()== 0x30582e) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()== 0x30582e) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018c9c/4];
 }
 
 READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 {
-//  printf("space.device().safe_pc() %06x\n", space.device().safe_pc());
+//  printf("m_maincpu->pc() %06x\n", m_maincpu->pc());
 
 	/* batlbalu */
-	if (space.device().safe_pc()==0x00305996) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x00305996) m_maincpu->spin_until_interrupt(); // idle
 
 	/* batlball */
-	if (space.device().safe_pc()==0x003058aa) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x003058aa) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018db4/4];
 }
@@ -2145,15 +2178,15 @@ READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 {
 	/* viprp1 */
-	if (space.device().safe_pc()==0x0202769) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0202769) m_maincpu->spin_until_interrupt(); // idle
 
 	/* viprp1s */
-	if (space.device().safe_pc()==0x02027e9) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x02027e9) m_maincpu->spin_until_interrupt(); // idle
 
 	/* viprp1ot */
-	if (space.device().safe_pc()==0x02026bd) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x02026bd) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 
 	return m_mainram[0x001e2e0/4];
 }
@@ -2161,8 +2194,8 @@ READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 {
 	/* viperp1o */
-	if (space.device().safe_pc()==0x0201f99) space.device().execute().spin_until_interrupt(); // idle
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+	if (m_maincpu->pc()==0x0201f99) m_maincpu->spin_until_interrupt(); // idle
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 	return m_mainram[0x001d49c/4];
 }
 
@@ -2170,8 +2203,8 @@ READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 // causes input problems?
 READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 {
-// osd_printf_debug("%08x\n",space.device().safe_pc());
-	if (space.device().safe_pc()==0x03032c7) space.device().execute().spin_until_interrupt(); // idle
+// osd_printf_debug("%08x\n",m_maincpu->pc());
+	if (m_maincpu->pc()==0x03032c7) m_maincpu->spin_until_interrupt(); // idle
 	return m_mainram[0x002d224/4];
 }
 #endif
@@ -2179,27 +2212,27 @@ READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 {
 	/* rdft */
-	if (space.device().safe_pc()==0x0203f06) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f06) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftj? */
-	if (space.device().safe_pc()==0x0203f0a) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f0a) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftau */
-	if (space.device().safe_pc()==0x0203f16) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f16) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftja? */
-	if (space.device().safe_pc()==0x0203f22) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f22) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdfta, rdftadi, rdftam, rdftit */
-	if (space.device().safe_pc()==0x0203f46) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f46) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftu */
-	if (space.device().safe_pc()==0x0203f3a) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f3a) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftauge */
-	if (space.device().safe_pc()==0x0203f6e) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f6e) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 
 	return m_mainram[0x00298d0/4];
 }
@@ -2207,18 +2240,18 @@ READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 {
 	/* rdft22kc */
-	if (space.device().safe_pc()==0x0203926) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203926) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdft2, rdft2j */
-	if (space.device().safe_pc()==0x0204372) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0204372) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdft2us */
-	if (space.device().safe_pc()==0x020420e) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x020420e) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdft2a */
-	if (space.device().safe_pc()==0x0204366) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0204366) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 
 	return m_mainram[0x0282ac/4];
 }
@@ -2226,22 +2259,22 @@ READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
 {
 	/* rfjet, rfjetu, rfjeta */
-	if (space.device().safe_pc()==0x0206082) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0206082) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rfjetus */
-	if (space.device().safe_pc()==0x0205b39)
+	if (m_maincpu->pc()==0x0205b39)
 	{
 		uint32_t r;
-		space.device().execute().spin_until_interrupt(); // idle
+		m_maincpu->spin_until_interrupt(); // idle
 		// Hack to enter test mode
 		r = m_mainram[0x002894c/4] & (~0x400);
 		return r | (((ioport("SYSTEM")->read() ^ 0xff)<<8) & 0x400);
 	}
 
 	/* rfjetj */
-	if (space.device().safe_pc()==0x0205f2e) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0205f2e) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 
 	return m_mainram[0x002894c/4];
 }
@@ -3979,7 +4012,7 @@ GAME( 1995, viprp1ot,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1, 
 GAME( 1995, viprp1oj,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1o,  ROT270, "Seibu Kaihatsu",                         "Viper Phase 1 (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, viprp1hk,   viprp1,   spi,     spi_3button, seibuspi_state, viprp1,   ROT270, "Seibu Kaihatsu (Metrotainment license)", "Viper Phase 1 (Hong Kong)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) /* "=HONG KONG=" seems part of title */
 
-GAME( 1996, ejanhs,     0,        ejanhs,  spi_ejanhs,  seibuspi_state, ejanhs,   ROT0,   "Seibu Kaihatsu",                         "E-Jan High School (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, ejanhs,     0,        ejanhs,  spi_ejanhs,  seibuspi_state, ejanhs,   ROT0,   "Seibu Kaihatsu",                         "E Jong High School (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
 GAME( 1996, rdft,       0,        spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden Fighters (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, rdftj,      rdft,     spi,     spi_3button, seibuspi_state, rdft,     ROT270, "Seibu Kaihatsu",                         "Raiden Fighters (Japan set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

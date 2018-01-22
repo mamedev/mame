@@ -8,8 +8,10 @@
 //
 //============================================================
 
-#ifndef __EIVCX86__
-#define __EIVCX86__
+#ifndef MAME_OSD_EIVCX86_H
+#define MAME_OSD_EIVCX86_H
+
+#pragma once
 
 #ifdef PTR64
 #include <emmintrin.h>
@@ -393,71 +395,12 @@ static inline uint32_t _modu_64x32(uint64_t a, uint32_t b)
 #define recip_approx _recip_approx
 static inline float _recip_approx(float z)
 {
-	__m128 mz = _mm_set_ss(z);
-	__m128 mooz = _mm_rcp_ss(mz);
+	__m128 const mz = _mm_set_ss(z);
+	__m128 const mooz = _mm_rcp_ss(mz);
 	float ooz;
 	_mm_store_ss(&ooz, mooz);
 	return ooz;
 }
 #endif
 
-
-
-/***************************************************************************
-    INLINE BIT MANIPULATION FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    count_leading_zeros - return the number of
-    leading zero bits in a 32-bit value
--------------------------------------------------*/
-
-#ifndef PTR64
-#define count_leading_zeros _count_leading_zeros
-static inline uint8_t _count_leading_zeros(uint32_t value)
-{
-	int32_t result;
-
-	__asm
-	{
-		bsr   eax,value
-		jnz   skip
-		mov   eax,63
-	skip:
-		xor   eax,31
-		mov   result,eax
-	}
-
-	return result;
-}
-#endif
-
-
-/*-------------------------------------------------
-    count_leading_ones - return the number of
-    leading one bits in a 32-bit value
--------------------------------------------------*/
-
-#ifndef PTR64
-#define count_leading_ones _count_leading_ones
-static inline uint8_t _count_leading_ones(uint32_t value)
-{
-	int32_t result;
-
-	__asm
-	{
-		mov   eax,value
-		not   eax
-		bsr   eax,eax
-		jnz   skip
-		mov   eax,63
-	skip:
-		xor   eax,31
-		mov   result,eax
-	}
-
-	return result;
-}
-#endif
-
-#endif /* __EIVCX86__ */
+#endif // MAME_OSD_EIVCX86_H

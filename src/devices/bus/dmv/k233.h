@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+#ifndef MAME_BUS_DMV_K233_H
+#define MAME_BUS_DMV_K233_H
+
 #pragma once
 
-#ifndef __DMV_K233_H__
-#define __DMV_K233_H__
-
-#include "emu.h"
 #include "dmvbus.h"
 
 //**************************************************************************
@@ -39,6 +38,6 @@ private:
 
 
 // device type definition
-extern const device_type DMV_K233;
+DECLARE_DEVICE_TYPE(DMV_K233, dmv_k233_device)
 
-#endif  /* __DMV_K233_H__ */
+#endif // MAME_BUS_DMV_K233_H

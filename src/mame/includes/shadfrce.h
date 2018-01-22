@@ -2,7 +2,9 @@
 // copyright-holders:David Haywood
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/okim6295.h"
+#include "screen.h"
 
 class shadfrce_state : public driver_device
 {
@@ -64,7 +66,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER(flip_screen);
 	DECLARE_READ16_MEMBER(input_ports_r);
-	DECLARE_WRITE16_MEMBER(sound_brt_w);
+	DECLARE_WRITE8_MEMBER(screen_brt_w);
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_WRITE16_MEMBER(irq_w);
 	DECLARE_WRITE16_MEMBER(scanline_w);
@@ -86,6 +88,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void shadfrce(machine_config &config);
 };

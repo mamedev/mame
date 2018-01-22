@@ -29,8 +29,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "dsp32.h"
+#include "dsp32dis.h"
+#include "debugger.h"
 
 
 //**************************************************************************
@@ -136,14 +137,14 @@
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type DSP32C = &device_creator<dsp32c_device>;
+DEFINE_DEVICE_TYPE(DSP32C, dsp32c_device, "dsp32c", "DSP32C")
 
 //-------------------------------------------------
 //  dsp32c_device - constructor
 //-------------------------------------------------
 
 dsp32c_device::dsp32c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, DSP32C, "DSP32C", tag, owner, clock, "dsp32c", __FILE__),
+	: cpu_device(mconfig, DSP32C, tag, owner, clock),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 24),
 		m_pin(0),
 		m_pout(0),
@@ -191,7 +192,7 @@ void dsp32c_device::device_start()
 
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_r[15]).noshow();
@@ -305,9 +306,11 @@ void dsp32c_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *dsp32c_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector dsp32c_device::memory_space_config() const
 {
-	return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 
@@ -395,38 +398,14 @@ void dsp32c_device::state_string_export(const device_state_entry &entry, std::st
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t dsp32c_device::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t dsp32c_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t dsp32c_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *dsp32c_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( dsp32c );
-	return CPU_DISASSEMBLE_NAME(dsp32c)(this, buffer, pc, oprom, opram, options);
+	return new dsp32c_disassembler;
 }
-
 
 
 

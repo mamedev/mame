@@ -21,15 +21,18 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "video/hd61830.h"
-#include "machine/mm58274c.h"
-#include "rendlay.h"
-#include "sound/speaker.h"
-#include "machine/nsc810.h"
 #include "bus/rs232/rs232.h"
-#include "machine/nvram.h"
+#include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
+#include "machine/mm58274c.h"
+#include "machine/nsc810.h"
+#include "machine/nvram.h"
+#include "sound/spkrdev.h"
+#include "video/hd61830.h"
+#include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class hunter2_state : public driver_device
 {
@@ -66,6 +69,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cts_w);
 	DECLARE_WRITE_LINE_MEMBER(rxd_w);
 
+	void hunter2(machine_config &config);
 private:
 	uint8_t m_keydata;
 	uint8_t m_irq_mask;
@@ -362,7 +366,7 @@ WRITE_LINE_MEMBER(hunter2_state::rxd_w)
 		m_maincpu->set_input_line(NSC800_RSTB, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( hunter2, hunter2_state )
+MACHINE_CONFIG_START(hunter2_state::hunter2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NSC800, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(hunter2_mem)
@@ -410,19 +414,19 @@ static MACHINE_CONFIG_START( hunter2, hunter2_state )
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("bank2", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_DEVICE_ADD("bank3", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(hunter2_banked_mem)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 MACHINE_CONFIG_END
@@ -439,5 +443,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE           INIT      COMPANY   FULLNAME       FLAGS */
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE           INIT      COMPANY   FULLNAME   FLAGS
 COMP( 1981, hunter2, 0,      0,       hunter2,   hunter2, hunter2_state,  hunter2,  "Husky", "Hunter 2", MACHINE_NOT_WORKING )

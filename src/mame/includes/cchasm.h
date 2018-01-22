@@ -11,6 +11,7 @@
 #include "machine/z80ctc.h"
 #include "sound/dac.h"
 #include "video/vector.h"
+#include "screen.h"
 
 class cchasm_state : public driver_device
 {
@@ -74,6 +75,7 @@ public:
 
 	void refresh();
 
+	void cchasm(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

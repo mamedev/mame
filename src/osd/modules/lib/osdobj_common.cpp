@@ -91,7 +91,7 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD ACCELERATED VIDEO OPTIONS" },
 	{ OSDOPTION_FILTER ";glfilter;flt",       "1",              OPTION_BOOLEAN,   "enable bilinear filtering on screen output" },
-	{ OSDOPTION_PRESCALE,                     "1",              OPTION_INTEGER,   "scale screen rendering by this amount in software" },
+	{ OSDOPTION_PRESCALE "(1-3)",             "1",              OPTION_INTEGER,   "scale screen rendering by this amount in software" },
 
 #if USE_OPENGL
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OpenGL-SPECIFIC OPTIONS" },
@@ -100,7 +100,7 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_GL_VBO,                       "1",              OPTION_BOOLEAN,   "enable OpenGL VBO,  if available (default on)" },
 	{ OSDOPTION_GL_PBO,                       "1",              OPTION_BOOLEAN,   "enable OpenGL PBO,  if available (default on)" },
 	{ OSDOPTION_GL_GLSL,                      "0",              OPTION_BOOLEAN,   "enable OpenGL GLSL, if available (default off)" },
-	{ OSDOPTION_GLSL_FILTER,                  "1",              OPTION_STRING,    "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default)" },
+	{ OSDOPTION_GLSL_FILTER,                  "1",              OPTION_STRING,    "enable OpenGL GLSL filtering instead of FF filtering 0-plain, 1-bilinear (default), 2-bicubic" },
 	{ OSDOPTION_SHADER_MAME "0",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 0" },
 	{ OSDOPTION_SHADER_MAME "1",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 1" },
 	{ OSDOPTION_SHADER_MAME "2",              OSDOPTVAL_NONE,   OPTION_STRING,    "custom OpenGL GLSL shader set mame bitmap 2" },
@@ -126,6 +126,13 @@ const options_entry osd_options::s_option_entries[] =
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD SOUND OPTIONS" },
 	{ OSDOPTION_SOUND,                        OSDOPTVAL_AUTO,   OPTION_STRING,    "sound output method: " },
 	{ OSDOPTION_AUDIO_LATENCY "(1-5)",        "2",              OPTION_INTEGER,   "set audio latency (increase to reduce glitches, decrease for responsiveness)" },
+
+#ifndef NO_USE_PORTAUDIO
+	{ nullptr,                                nullptr,          OPTION_HEADER,    "PORTAUDIO OPTIONS" },
+	{ OSDOPTION_PA_API,                       OSDOPTVAL_NONE,   OPTION_STRING,    "PortAudio API" },
+	{ OSDOPTION_PA_DEVICE,                    OSDOPTVAL_NONE,   OPTION_STRING,    "PortAudio device" },
+	{ OSDOPTION_PA_LATENCY "(0-0.25)",        "0",              OPTION_FLOAT,     "suggested latency in seconds, 0 for default" },
+#endif
 
 #ifdef SDLMAME_MACOSX
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "CoreAudio-SPECIFIC OPTIONS" },
@@ -193,7 +200,7 @@ osd_common_t::osd_common_t(osd_options &options)
 osd_common_t::~osd_common_t()
 {
 	for(unsigned int i= 0; i < m_video_names.size(); ++i)
-		osd_free(const_cast<char*>(m_video_names[i]));
+		free(const_cast<char*>(m_video_names[i]));
 	//m_video_options,reset();
 	osd_output::pop(this);
 }
@@ -213,6 +220,9 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, SOUND_COREAUDIO);
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
+#ifndef NO_USE_PORTAUDIO
+	REGISTER_MODULE(m_mod_man, SOUND_PORTAUDIO);
+#endif
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
 
 	REGISTER_MODULE(m_mod_man, MONITOR_SDL);
@@ -242,6 +252,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_WIN32);
+	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_UWP);
 	REGISTER_MODULE(m_mod_man, KEYBOARD_NONE);
 
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_SDL);
@@ -259,6 +270,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_WINHYBRID);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_XINPUT);
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_UWP);
 	REGISTER_MODULE(m_mod_man, JOYSTICK_NONE);
 
 	REGISTER_MODULE(m_mod_man, OUTPUT_NONE);
@@ -342,7 +354,7 @@ void osd_common_t::register_options()
 	update_option(OSDOPTION_VIDEO, m_video_names);
 }
 
-void osd_common_t::update_option(const char * key, std::vector<const char *> &values)
+void osd_common_t::update_option(const char * key, std::vector<const char *> &values) const
 {
 	std::string current_value(m_options.description(key));
 	std::string new_option_value("");
@@ -625,8 +637,7 @@ bool osd_common_t::execute_command(const char *command)
 
 static void output_notifier_callback(const char *outname, int32_t value, void *param)
 {
-	osd_common_t *osd = (osd_common_t*)param;
-	osd->notify(outname, value);
+	static_cast<osd_common_t*>(param)->notify(outname, value);
 }
 
 void osd_common_t::init_subsystems()

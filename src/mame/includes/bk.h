@@ -26,6 +26,7 @@ public:
 	uint16_t m_key_pressed;
 	uint16_t m_key_irq_vector;
 	uint16_t m_drive;
+	emu_timer *m_kbd_timer;
 	DECLARE_READ16_MEMBER(bk_key_state_r);
 	DECLARE_READ16_MEMBER(bk_key_code_r);
 	DECLARE_READ16_MEMBER(bk_vid_scrool_r);
@@ -45,6 +46,8 @@ public:
 	IRQ_CALLBACK_MEMBER(bk0010_irq_callback);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	void bk0010(machine_config &config);
+	void bk0010fd(machine_config &config);
 };
 
 #endif /* BK_H_ */

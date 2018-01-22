@@ -7,8 +7,9 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "tms32051.h"
+#include "dis32051.h"
+#include "debugger.h"
 
 enum
 {
@@ -46,8 +47,8 @@ enum
 };
 
 
-const device_type TMS32051 = &device_creator<tms32051_device>;
-const device_type TMS32053 = &device_creator<tms32053_device>;
+DEFINE_DEVICE_TYPE(TMS32051, tms32051_device, "tms32051", "TMS32051")
+DEFINE_DEVICE_TYPE(TMS32053, tms32053_device, "tms32053", "TMS32053")
 
 
 /**************************************************************************
@@ -69,22 +70,27 @@ static ADDRESS_MAP_START( tms32051_internal_data, AS_DATA, 16, tms32051_device )
 ADDRESS_MAP_END
 
 
+tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_pgm, address_map_constructor internal_data)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, internal_pgm)
+	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, internal_data)
+	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, -1)
+{
+}
+
 tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, TMS32051, "TMS32051", tag, owner, clock, "tms32051", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32051_internal_pgm))
-	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32051_internal_data))
-	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, -1)
+	: tms32051_device(mconfig, TMS32051, tag, owner, clock, ADDRESS_MAP_NAME(tms32051_internal_pgm), ADDRESS_MAP_NAME(tms32051_internal_data))
 {
 }
 
-tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char* shortname, const char* source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1)
-	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1)
-	, m_io_config("io", ENDIANNESS_LITTLE, 16, 16, -1)
+device_memory_interface::space_config_vector tms32051_device::memory_space_config() const
 {
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
-
 
 
 /**************************************************************************
@@ -107,21 +113,20 @@ ADDRESS_MAP_END
 
 
 tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32051_device(mconfig, TMS32053, "TMS32053", tag, owner, clock, "tms32053", __FILE__)
+	: tms32051_device(mconfig, TMS32053, tag, owner, clock, ADDRESS_MAP_NAME(tms32053_internal_pgm), ADDRESS_MAP_NAME(tms32053_internal_data))
 {
 }
 
 
-offs_t tms32051_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tms32051_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tms32051 );
-	return CPU_DISASSEMBLE_NAME(tms32051)(this, buffer, pc, oprom, opram, options);
+	return new tms32051_disassembler;
 }
 
 
 #define CYCLES(x)       (m_icount -= x)
 
-#define ROPCODE()       m_direct->read_word((m_pc++) << 1)
+#define ROPCODE()       m_direct->read_word(m_pc++)
 
 void tms32051_device::CHANGE_PC(uint16_t new_pc)
 {
@@ -130,22 +135,22 @@ void tms32051_device::CHANGE_PC(uint16_t new_pc)
 
 uint16_t tms32051_device::PM_READ16(uint16_t address)
 {
-	return m_program->read_word(address << 1);
+	return m_program->read_word(address);
 }
 
 void tms32051_device::PM_WRITE16(uint16_t address, uint16_t data)
 {
-	m_program->write_word(address << 1, data);
+	m_program->write_word(address, data);
 }
 
 uint16_t tms32051_device::DM_READ16(uint16_t address)
 {
-	return m_data->read_word(address << 1);
+	return m_data->read_word(address);
 }
 
 void tms32051_device::DM_WRITE16(uint16_t address, uint16_t data)
 {
-	m_data->write_word(address << 1, data);
+	m_data->write_word(address, data);
 }
 
 #include "32051ops.hxx"
@@ -178,7 +183,7 @@ void tms32051_device::delay_slot(uint16_t startpc)
 void tms32051_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-1>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
 
@@ -510,10 +515,10 @@ READ16_MEMBER( tms32051_device::cpuregs_r )
 		case 0x5d:
 		case 0x5e:
 		case 0x5f:
-			return m_io->read_word(offset << 1);
+			return m_io->read_word(offset);
 
 		default:
-			if (!space.debugger_access())
+			if (!machine().side_effect_disabled())
 				fatalerror("32051: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, m_pc-1);
 	}
 
@@ -621,34 +626,14 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 		case 0x5d:
 		case 0x5e:
 		case 0x5f:
-			m_io->write_word(offset << 1, data);
+			m_io->write_word(offset, data);
 			break;
 
 		default:
-			if (!space.debugger_access())
+			if (!machine().side_effect_disabled())
 				fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, m_pc-1);
 	}
 }
-
-
-bool tms32051_device::memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value)
-{
-	/* TODO: alignment if offset is odd */
-	if (spacenum == AS_PROGRAM)
-	{
-		value = (PM_READ16(offset>>1));
-	}
-	else if (spacenum == AS_DATA)
-	{
-		value = (DM_READ16(offset>>1));
-	}
-	else if (spacenum == AS_IO)
-	{
-		value = m_io->read_word(offset);
-	}
-	return 1;
-}
-
 
 
 void tms32053_device::device_reset()
@@ -677,10 +662,4 @@ void tms32053_device::device_reset()
 	m_idle = false;
 
 	CHANGE_PC(0);
-}
-
-void tms32053_device::device_config_complete()
-{
-	m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32053_internal_pgm));
-	m_data_config = address_space_config("data", ENDIANNESS_LITTLE, 16, 16, -1, ADDRESS_MAP_NAME(tms32053_internal_data));
 }

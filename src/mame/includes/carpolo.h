@@ -50,9 +50,11 @@ public:
 	uint8_t m_car_border_collision_cause;
 	uint8_t m_priority_0_extension;
 	uint8_t m_last_wheel_value[4];
+	int m_ls153_za;
+	int m_ls153_zb;
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74148_device> m_ttl74148_3s;
-	required_device<ttl74153_device> m_ttl74153_1k;
+	required_device<ttl153_device> m_ttl74153_1k;
 	required_device<ttl7474_device> m_ttl7474_2s_1;
 	required_device<ttl7474_device> m_ttl7474_2s_2;
 	required_device<ttl7474_device> m_ttl7474_2u_1;
@@ -93,7 +95,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(carpolo);
 	uint32_t screen_update_carpolo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_carpolo(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_carpolo);
 	INTERRUPT_GEN_MEMBER(carpolo_timer_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(coin1_interrupt_clear_w);
 	DECLARE_WRITE_LINE_MEMBER(coin2_interrupt_clear_w);
@@ -108,6 +110,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2s_2_q_cb);
 	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2u_1_q_cb);
 	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2u_2_q_cb);
+	DECLARE_WRITE_LINE_MEMBER(ls153_za_w);
+	DECLARE_WRITE_LINE_MEMBER(ls153_zb_w);
 
 	TTL74148_OUTPUT_CB(ttl74148_3s_cb);
 
@@ -126,4 +130,5 @@ public:
 	int check_sprite_sprite_collision(int x1, int y1, int code1, int flipy1,
 										int x2, int y2, int code2, int flipy2,
 										int *col_x, int *col_y);
+										void carpolo(machine_config &config);
 };

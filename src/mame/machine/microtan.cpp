@@ -131,19 +131,15 @@ static const char keyboard[8][9][8] = {
 
 uint8_t microtan_state::read_dsw()
 {
-	uint8_t result;
 	switch(machine().phase())
 	{
-		case MACHINE_PHASE_RESET:
-		case MACHINE_PHASE_RUNNING:
-			result = ioport("DSW")->read();
-			break;
+	case machine_phase::RESET:
+	case machine_phase::RUNNING:
+		return ioport("DSW")->read();
 
-		default:
-			result = 0x00;
-			break;
+	default:
+		return 0x00;
 	}
-	return result;
 }
 
 void microtan_state::microtan_set_irq_line()

@@ -4,7 +4,8 @@
  *   Xerox AltoII disassembler
  *
  **********************************************************/
-#include "alto2cpu.h"
+#include "emu.h"
+#include "alto2dsm.h"
 
 #define loc_DASTART     0000420 // display list header
 #define loc_DVIBITS     0000421 // display vertical field interrupt bitword
@@ -67,7 +68,7 @@
 /**
  * @brief short names for the 16 tasks
  */
-static const char *taskname[16] = {
+const char *const alto2_disassembler::taskname[16] = {
 	"EMU",      // emulator task
 	"T01",
 	"T02",
@@ -89,7 +90,7 @@ static const char *taskname[16] = {
 /**
  * @brief names for the 32 R registers
  */
-static const char *regname[32] = {
+const char *const alto2_disassembler::regname[32] = {
 	"AC(3)",    // emulator accu 3
 	"AC(2)",    // emulator accu 2
 	"AC(1)",    // emulator accu 1
@@ -125,7 +126,7 @@ static const char *regname[32] = {
 };
 
 //! for ALUF which is the value loaded into T, if t flags is set
-static const char* t_bus_alu[16] = {
+const char *const alto2_disassembler::t_bus_alu[16] = {
 	"ALU",
 	"BUS",
 	"ALU",
@@ -147,7 +148,7 @@ static const char* t_bus_alu[16] = {
 /**
  * @brief copy of the constant PROM, which this disassembler may not have access to
  */
-static uint16_t const_prom[PROM_SIZE] = {
+uint16_t alto2_disassembler::const_prom[PROM_SIZE] = {
 	/* 0000 */  0x0000, 0x0001, 0x0002, 0xfffe, 0xffff, 0xffff, 0x000f, 0xffff,
 	/* 0008 */  0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0xfff8, 0xfff8,
 	/* 0010 */  0x0010, 0x001f, 0x0020, 0x003f, 0x0040, 0x007f, 0x0080, 0x0007,
@@ -186,34 +187,22 @@ static uint16_t const_prom[PROM_SIZE] = {
  * @brief print a symbolic name for an mpc address
  *
  * @param a microcode address (mpc)
- * @return pointer to const string with the address or symbolic name
+ * @return string with the address or symbolic name
  */
-static const char *addrname(int a)
+std::string alto2_disassembler::addrname(int a) const
 {
-	static char buffer[4][32];
-	static int which = 0;
-	char *dst;
-
-	which = (which + 1) % 4;
-	dst = buffer[which];
-
-	if (a < 020) {
+	if (a < 020)
 		// start value for mpc per task is the task number
-		snprintf(dst, sizeof(buffer[0]), "*%s", taskname[a]);
-	} else {
-		snprintf(dst, sizeof(buffer[0]), "%04o", a);
-	}
-	return dst;
+		return util::string_format("*%s", taskname[a]);
+	else
+		return util::string_format("%04o", a);
 }
 
-offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t alto2_disassembler::disassemble(std::ostream &main_stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	size_t len = 128;
+	std::ostringstream stream;
 
-	uint32_t mir = (static_cast<uint32_t>(oprom[0]) << 24) |
-			(static_cast<uint32_t>(oprom[1]) << 16) |
-			(static_cast<uint32_t>(oprom[2]) << 8) |
-			(static_cast<uint32_t>(oprom[3]) << 0);
+	uint32_t mir = opcodes.r32(pc);
 	int rsel = (mir >> 27) & 31;
 	int aluf = (mir >> 23) & 15;
 	int bs = (mir >> 20) & 7;
@@ -222,101 +211,96 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8
 	int t = (mir >> 11) & 1;
 	int l = (mir >> 10) & 1;
 	offs_t next = mir & 1023;
-	const uint8_t* src = oprom - 4 * pc + 4 * next;
-	uint32_t next2 =  (static_cast<uint32_t>(src[0]) << 24) |
-			(static_cast<uint32_t>(src[1]) << 16) |
-			(static_cast<uint32_t>(src[2]) << 8) |
-			(static_cast<uint32_t>(src[3]) << 0);
+	uint32_t next2 =  opcodes.r32(next);
 	uint16_t prefetch = next2 & 1023;
-	char *dst = buffer;
-	offs_t result = 1 | DASMFLAG_SUPPORTED;
+	offs_t result = 1 | SUPPORTED;
 	uint8_t pa;
 
 	if (next != pc + 1)
-		result |= DASMFLAG_STEP_OUT;
+		result |= STEP_OUT;
 
 	if (t)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "T<-%s ", t_bus_alu[aluf]);
+		util::stream_format(stream, "T<-%s ", t_bus_alu[aluf]);
 	if (l)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "L<- ");
+		util::stream_format(stream, "L<- ");
 	if (bs == 1)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "%s<- ", regname[rsel]);
+		util::stream_format(stream, "%s<- ", regname[rsel]);
 	switch (aluf) {
 	case  0: // T?: BUS
 		// this is somehow redundant and just wasting space
-		// dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS) ");
+		// util::stream_format(stream, "ALUF(BUS) ");
 		break;
 	case  1: //   : T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "T ");
+		util::stream_format(stream, "T ");
 		break;
 	case  2: // T?: BUS OR T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS|T ");
+		util::stream_format(stream, "BUS|T ");
 		break;
 	case  3: //   : BUS AND T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS&T ");
+		util::stream_format(stream, "BUS&T ");
 		break;
 	case  4: //   : BUS XOR T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS^T ");
+		util::stream_format(stream, "BUS^T ");
 		break;
 	case  5: // T?: BUS + 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS+1 ");
+		util::stream_format(stream, "BUS+1 ");
 		break;
 	case  6: // T?: BUS - 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS-1 ");
+		util::stream_format(stream, "BUS-1 ");
 		break;
 	case  7: //   : BUS + T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS+T ");
+		util::stream_format(stream, "BUS+T ");
 		break;
 	case  8: //   : BUS - T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS-T ");
+		util::stream_format(stream, "BUS-T ");
 		break;
 	case  9: //   : BUS - T - 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS-T-1 ");
+		util::stream_format(stream, "BUS-T-1 ");
 		break;
 	case 10: // T?: BUS + T + 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS+T+1 ");
+		util::stream_format(stream, "BUS+T+1 ");
 		break;
 	case 11: // T?: BUS + SKIP
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS+SKIP ");
+		util::stream_format(stream, "BUS+SKIP ");
 		break;
 	case 12: // T?: BUS, T (AND)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS,T ");
+		util::stream_format(stream, "BUS,T ");
 		break;
 	case 13: //   : BUS AND NOT T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS&~T ");
+		util::stream_format(stream, "BUS&~T ");
 		break;
 	case 14: //   : undefined
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "*BUS ");
+		util::stream_format(stream, "*BUS ");
 		break;
 	case 15: //   : undefined
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "*BUS ");
+		util::stream_format(stream, "*BUS ");
 		break;
 	}
 
 	switch (bs) {
 	case 0: // read R
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-%s ", regname[rsel]);
+		util::stream_format(stream, "BUS<-%s ", regname[rsel]);
 		break;
 	case 1: // load R from shifter output
-		// dst += snprintf(dst, len - (size_t)(dst - buffer), "; %s<-", regname[rsel]);
+		// util::stream_format(stream, "; %s<-", regname[rsel]);
 		break;
 	case 2: // enables no source to the BUS, leaving it all ones
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-177777 ");
+		util::stream_format(stream, "BUS<-177777 ");
 		break;
 	case 3: // performs different functions in different tasks
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-BS3 ");
+		util::stream_format(stream, "BUS<-BS3 ");
 		break;
 	case 4: // performs different functions in different tasks
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-BS4 ");
+		util::stream_format(stream, "BUS<-BS4 ");
 		break;
 	case 5: // memory data
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-MD ");
+		util::stream_format(stream, "BUS<-MD ");
 		break;
 	case 6: // BUS[3-0] <- MOUSE; BUS[15-4] <- -1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-MOUSE ");
+		util::stream_format(stream, "BUS<-MOUSE ");
 		break;
 	case 7: // IR[7-0], possibly sign extended
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-DISP ");
+		util::stream_format(stream, "BUS<-DISP ");
 		break;
 	}
 
@@ -325,29 +309,29 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8
 	case 0: // no operation
 		break;
 	case 1: // load MAR from ALU output; start main memory reference
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "MAR<-ALU ");
+		util::stream_format(stream, "MAR<-ALU ");
 		break;
 	case 2: // switch tasks if higher priority wakeup is pending
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "TASK ");
+		util::stream_format(stream, "TASK ");
 		break;
 	case 3: // disable the current task until re-enabled by a hardware-generated condition
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BLOCK ");
+		util::stream_format(stream, "BLOCK ");
 		break;
 	case 4: // SHIFTER output will be L shifted left one place
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "SHIFTER<-L(LSH1) ");
+		util::stream_format(stream, "SHIFTER<-L(LSH1) ");
 		break;
 	case 5: // SHIFTER output will be L shifted right one place
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "SHIFTER<-L(RSH1) ");
+		util::stream_format(stream, "SHIFTER<-L(RSH1) ");
 		break;
 	case 6: // SHIFTER output will be L rotated left 8 places
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "SHIFTER<-L(LCY8) ");
+		util::stream_format(stream, "SHIFTER<-L(LCY8) ");
 		break;
 	case 7: // put the constant from PROM (RSELECT,BS) on the bus
 		pa = (rsel << 3) | bs;
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-%05o ", const_prom[pa]);
+		util::stream_format(stream, "BUS<-%05o ", const_prom[pa]);
 		break;
 	default:
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "F1_%02o ", f1);
+		util::stream_format(stream, "F1_%02o ", f1);
 		break;
 	}
 
@@ -355,39 +339,49 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8
 	case 0: // no operation
 		break;
 	case 1: // NEXT <- NEXT OR (BUS==0 ? 1 : 0)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[BUS==0 ? %s:%s] ",
+		util::stream_format(stream, "[BUS==0 ? %s:%s] ",
 			addrname((prefetch | 1) & MCODE_MASK), addrname(prefetch & MCODE_MASK));
 		break;
 	case 2: // NEXT <- NEXT OR (SHIFTER==0 ? 1 : 0)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[SH==0 ? %s:%s] ",
+		util::stream_format(stream, "[SH==0 ? %s:%s] ",
 			addrname((prefetch | 1) & MCODE_MASK), addrname(prefetch & MCODE_MASK));
 		break;
 	case 3: // NEXT <- NEXT OR (SHIFTER<0 ? 1 : 0)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[SH<0 ? %s:%s] ",
+		util::stream_format(stream, "[SH<0 ? %s:%s] ",
 			addrname((prefetch | 1) & MCODE_MASK), addrname(prefetch & MCODE_MASK));
 		break;
 	case 4: // NEXT <- NEXT OR BUS
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "NEXT<-BUS ");
+		util::stream_format(stream, "NEXT<-BUS ");
 		break;
 	case 5: // NEXT <- NEXT OR ALUC0. ALUC0 is the carry produced by last L loading microinstruction.
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[ALUC0 ? %s:%s] ",
+		util::stream_format(stream, "[ALUC0 ? %s:%s] ",
 			addrname((prefetch | 1) & MCODE_MASK), addrname(prefetch & MCODE_MASK));
 		break;
 	case 6: // write BUS data to memory
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "MD<-BUS ");
+		util::stream_format(stream, "MD<-BUS ");
 		break;
 	case 7: // put the constant from PROM (RSELECT,BS) on the bus
 		if (f1 != 7) {
 			pa = 8 * rsel + bs;
-			dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-%05o", const_prom[pa]);
+			util::stream_format(stream, "BUS<-%05o", const_prom[pa]);
 		}
 		break;
 	default:
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-F2_%02o ", f2);
+		util::stream_format(stream, "BUS<-F2_%02o ", f2);
 		break;
 	}
-	if (dst > buffer && dst[-1] == ' ')
-		*--dst = '\0';
+
+	// need to trim last space
+	std::string output = stream.str();
+	if (output.length() > 0 && output[output.length() - 1] == ' ')
+		output.resize(output.length() - 1);
+	main_stream << output;
 
 	return result;
+}
+
+
+u32 alto2_disassembler::opcode_alignment() const
+{
+	return 1;
 }

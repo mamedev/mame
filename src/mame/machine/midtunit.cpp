@@ -60,7 +60,7 @@ WRITE16_MEMBER(midtunit_state::midtunit_cmos_w)
 	}
 	else
 	{
-		logerror("%08X:Unexpected CMOS W @ %05X\n", space.device().safe_pc(), offset);
+		logerror("%08X:Unexpected CMOS W @ %05X\n", m_maincpu->pc(), offset);
 		popmessage("Bad CMOS write");
 	}
 }
@@ -298,35 +298,35 @@ WRITE16_MEMBER(midtunit_state::jdredd_prot_w)
 
 	switch (offset)
 	{
-		case TOWORD(0x10740):
+		case 0x1074:
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_10740;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_10740);
 			logerror("-- reset prot table 10740\n");
 			break;
 
-		case TOWORD(0x13240):
+		case 0x1324:
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_13240;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_13240);
 			logerror("-- reset prot table 13240\n");
 			break;
 
-		case TOWORD(0x76540):
+		case 0x7654:
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_76540;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_76540);
 			logerror("-- reset prot table 76540\n");
 			break;
 
-		case TOWORD(0x77760):
+		case 0x7776:
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_77760;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_77760);
 			logerror("-- reset prot table 77760\n");
 			break;
 
-		case TOWORD(0x80020):
+		case 0x8002:
 			m_jdredd_prot_index = 0;
 			m_jdredd_prot_table = jdredd_prot_values_80020;
 			m_jdredd_prot_max = sizeof(jdredd_prot_values_80020);
@@ -526,7 +526,7 @@ READ16_MEMBER(midtunit_state::midtunit_sound_state_r)
 
 READ16_MEMBER(midtunit_state::midtunit_sound_r)
 {
-	logerror("%08X:Sound data read\n", space.device().safe_pc());
+	logerror("%08X:Sound data read\n", m_maincpu->pc());
 
 	if (m_chip_type == SOUND_DCS)
 		return m_dcs->data_r() & 0xff;
@@ -539,7 +539,7 @@ WRITE16_MEMBER(midtunit_state::midtunit_sound_w)
 	/* check for out-of-bounds accesses */
 	if (!offset)
 	{
-		logerror("%08X:Unexpected write to sound (lo) = %04X\n", space.device().safe_pc(), data);
+		logerror("%08X:Unexpected write to sound (lo) = %04X\n", m_maincpu->pc(), data);
 		return;
 	}
 
@@ -557,7 +557,7 @@ WRITE16_MEMBER(midtunit_state::midtunit_sound_w)
 				break;
 
 			case SOUND_DCS:
-				logerror("%08X:Sound write = %04X\n", space.device().safe_pc(), data);
+				logerror("%08X:Sound write = %04X\n", m_maincpu->pc(), data);
 				m_dcs->reset_w(~data & 0x100);
 				m_dcs->data_w(data & 0xff);
 				/* the games seem to check for $82 loops, so this should be just barely enough */

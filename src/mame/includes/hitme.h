@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "sound/discrete.h"
+#include "screen.h"
 
 /* Discrete Sound Input Nodes */
 #define HITME_DOWNCOUNT_VAL      NODE_01
@@ -53,6 +54,8 @@ public:
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
+	void hitme(machine_config &config);
+	void barricad(machine_config &config);
 };
 
 

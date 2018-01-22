@@ -93,7 +93,7 @@ READ16_MEMBER(rmnimbus_state::nimbus_video_io_r)
 	}
 
 	if(DEBUG_SET(DEBUG_TEXT))
-		logerror("Nimbus video IOR at %05X from %04X mask=%04X, data=%04X\n",space.device().safe_pc(),(offset*2),mem_mask,result);
+		logerror("Nimbus video IOR at %05X from %04X mask=%04X, data=%04X\n",m_maincpu->pc(),(offset*2),mem_mask,result);
 
 	return result;
 }
@@ -208,7 +208,7 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_video_io_w)
 	if(offset < 0x14)
 	{
 		if(DEBUG_SET(DEBUG_TEXT))
-			logerror("Nimbus video IOW at %05X write of %04X to %04X mask=%04X\n",space.device().safe_pc(),data,(offset*2),mem_mask);
+			logerror("Nimbus video IOW at %05X write of %04X to %04X mask=%04X\n",m_maincpu->pc(),data,(offset*2),mem_mask);
 
 		if(DEBUG_SET(DEBUG_DB))
 			logerror("dw %05X,%05X\n",(offset*2),data);
@@ -470,12 +470,12 @@ void rmnimbus_state::change_palette(uint8_t bank, uint16_t colours)
 	}
 }
 
-void rmnimbus_state::video_debug(int ref, int params, const char *param[])
+void rmnimbus_state::video_debug(int ref, const std::vector<std::string> &params)
 {
-	if (params > 0)
+	if (params.size() > 0)
 	{
 		int temp;
-		sscanf(param[0],"%d",&temp);
+		sscanf(params[0].c_str(), "%d", &temp);
 		m_debug_video = temp;
 	}
 	else
@@ -494,7 +494,7 @@ void rmnimbus_state::video_start()
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
 		using namespace std::placeholders;
-		machine().debugger().console().register_command("nimbus_vid_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&rmnimbus_state::video_debug, this, _1, _2, _3));
+		machine().debugger().console().register_command("nimbus_vid_debug", CMDFLAG_NONE, 0, 0, 1, std::bind(&rmnimbus_state::video_debug, this, _1, _2));
 	}
 }
 

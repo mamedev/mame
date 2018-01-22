@@ -41,6 +41,8 @@
 #include "machine/ticket.h"
 #include "sound/bsmt2000.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -104,6 +106,8 @@ public:
 
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
+	void tapatune(machine_config &config);
+	void tapatune_base(machine_config &config);
 };
 
 
@@ -507,7 +511,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tapatune_base, tapatune_state )
+MACHINE_CONFIG_START(tapatune_state::tapatune_base)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
@@ -526,7 +530,7 @@ static MACHINE_CONFIG_START( tapatune_base, tapatune_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tapatune, tapatune_base )
+MACHINE_CONFIG_DERIVED(tapatune_state::tapatune, tapatune_base)
 	MCFG_CPU_ADD("videocpu", M68000, XTAL_24MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(video_map)
 
@@ -626,8 +630,8 @@ ROM_END
  *
  *************************************/
 
-GAME(1994, tapatune, 0, tapatune,      tapatune, driver_device, 0, ROT0, "Moloney Manufacturing Inc. / Creative Electronics and Software", "Tap a Tune", MACHINE_SUPPORTS_SAVE )
+GAME(1994, tapatune, 0, tapatune,      tapatune, tapatune_state, 0, ROT0, "Moloney Manufacturing Inc. / Creative Electronics and Software", "Tap a Tune", MACHINE_SUPPORTS_SAVE )
 
 // below appear to be mechanical games with the same Z80 board as the above
-GAME(1994, srockbwl, 0, tapatune_base, tapatune, driver_device, 0, ROT0, "Bromley",                                                        "Super Rock and Bowl (V1.1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
-GAME(199?, smartoss, 0, tapatune_base, tapatune, driver_device, 0, ROT0, "Smart Industries / Creative Electronics and Software",           "Smart Toss 'em / Smartball (Ver 2.0)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(1994, srockbwl, 0, tapatune_base, tapatune, tapatune_state, 0, ROT0, "Bromley",                                                        "Super Rock and Bowl (V1.1)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )
+GAME(199?, smartoss, 0, tapatune_base, tapatune, tapatune_state, 0, ROT0, "Smart Industries / Creative Electronics and Software",           "Smart Toss 'em / Smartball (Ver 2.0)", MACHINE_IS_SKELETON_MECHANICAL | MACHINE_SUPPORTS_SAVE )

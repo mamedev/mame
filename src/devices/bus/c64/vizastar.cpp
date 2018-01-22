@@ -26,6 +26,7 @@
 
 */
 
+#include "emu.h"
 #include "vizastar.h"
 
 
@@ -35,10 +36,10 @@
 //**************************************************************************
 
 #define UNSCRAMBLE_ADDRESS(_offset) \
-	BITSWAP16(_offset,15,14,13,12,5,0,7,10,11,9,8,6,4,3,2,1)
+	bitswap<16>(_offset,15,14,13,12,5,0,7,10,11,9,8,6,4,3,2,1)
 
 #define UNSCRAMBLE_DATA(_data) \
-	BITSWAP8(_data,7,6,0,5,1,4,2,3)
+	bitswap<8>(_data,7,6,0,5,1,4,2,3)
 
 
 
@@ -46,7 +47,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_VIZASTAR = &device_creator<c64_vizastar_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_VIZASTAR, c64_vizastar_cartridge_device, "c64_vizastar", "VizaStar 64 XL4")
 
 
 
@@ -59,7 +60,7 @@ const device_type C64_VIZASTAR = &device_creator<c64_vizastar_cartridge_device>;
 //-------------------------------------------------
 
 c64_vizastar_cartridge_device::c64_vizastar_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_VIZASTAR, "VizaStar 64 XL4", tag, owner, clock, "c64_vizastar", __FILE__),
+	device_t(mconfig, C64_VIZASTAR, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {
 }

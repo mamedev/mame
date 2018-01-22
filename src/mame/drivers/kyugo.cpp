@@ -24,10 +24,14 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/kyugo.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "includes/kyugo.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -38,14 +42,14 @@
 
 static ADDRESS_MAP_START( kyugo_main_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(kyugo_bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(kyugo_bgattribram_w) AM_SHARE("bgattribram")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(kyugo_fgvideoram_w) AM_SHARE("fgvideoram")
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_READ(kyugo_spriteram_2_r) AM_SHARE("spriteram_2")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(bgattribram_w) AM_SHARE("bgattribram")
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x9800, 0x9fff) AM_RAM_READ(spriteram_2_r) AM_SHARE("spriteram_2")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("spriteram_1")
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(kyugo_scroll_x_lo_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(kyugo_gfxctrl_w)
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(kyugo_scroll_y_w)
+	AM_RANGE(0xa800, 0xa800) AM_WRITE(scroll_x_lo_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(gfxctrl_w)
+	AM_RANGE(0xb800, 0xb800) AM_WRITE(scroll_y_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
@@ -62,21 +66,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-WRITE8_MEMBER(kyugo_state::kyugo_nmi_mask_w)
+WRITE_LINE_MEMBER(kyugo_state::nmi_mask_w)
 {
-	m_nmi_mask = data & 1;
-}
-
-WRITE8_MEMBER(kyugo_state::kyugo_sub_cpu_control_w)
-{
-	m_subcpu->set_input_line(INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+	m_nmi_mask = state;
 }
 
 static ADDRESS_MAP_START( kyugo_main_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x00) AM_WRITE(kyugo_nmi_mask_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(kyugo_flipscreen_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(kyugo_sub_cpu_control_w)
+	AM_RANGE(0x00, 0x07) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
@@ -140,7 +137,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-WRITE8_MEMBER(kyugo_state::kyugo_coin_counter_w)
+WRITE8_MEMBER(kyugo_state::coin_counter_w)
 {
 	machine().bookkeeping().coin_counter_w(offset, data & 1);
 }
@@ -158,7 +155,7 @@ static ADDRESS_MAP_START( repulse_sub_portmap, AS_IO, 8, kyugo_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(kyugo_coin_counter_w)
+	AM_RANGE(0xc0, 0xc1) AM_WRITE(coin_counter_w)
 ADDRESS_MAP_END
 
 
@@ -167,7 +164,7 @@ static ADDRESS_MAP_START( flashgala_sub_portmap, AS_IO, 8, kyugo_state )
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x42, 0x42) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(kyugo_coin_counter_w)
+	AM_RANGE(0xc0, 0xc1) AM_WRITE(coin_counter_w)
 ADDRESS_MAP_END
 
 
@@ -176,7 +173,7 @@ static ADDRESS_MAP_START( srdmissn_sub_portmap, AS_IO, 8, kyugo_state )
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x82, 0x82) AM_DEVREAD("ay1", ay8910_device, data_r)
 	AM_RANGE(0x84, 0x85) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
-	AM_RANGE(0x90, 0x91) AM_WRITE(kyugo_coin_counter_w)
+	AM_RANGE(0x90, 0x91) AM_WRITE(coin_counter_w)
 ADDRESS_MAP_END
 
 
@@ -496,11 +493,6 @@ void kyugo_state::machine_start()
 
 void kyugo_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	// must start with interrupts and sub CPU disabled
-	m_nmi_mask = 0;
-	kyugo_sub_cpu_control_w(space, 0, 0);
-
 	m_scroll_x_lo = 0;
 	m_scroll_x_hi = 0;
 	m_scroll_y = 0;
@@ -515,7 +507,7 @@ INTERRUPT_GEN_MEMBER(kyugo_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( kyugo_base, kyugo_state )
+MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)  /* verified on pcb */
@@ -530,6 +522,10 @@ static MACHINE_CONFIG_START( kyugo_base, kyugo_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(kyugo_state, nmi_mask_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(kyugo_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -537,11 +533,11 @@ static MACHINE_CONFIG_START( kyugo_base, kyugo_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(kyugo_state, screen_update_kyugo)
+	MCFG_SCREEN_UPDATE_DRIVER(kyugo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", kyugo)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -555,14 +551,14 @@ static MACHINE_CONFIG_START( kyugo_base, kyugo_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gyrodine, kyugo_base )
+MACHINE_CONFIG_DERIVED(kyugo_state::gyrodine, kyugo_base)
 	/* add watchdog */
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(gyrodine_main_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( repulse, kyugo_base )
+MACHINE_CONFIG_DERIVED(kyugo_state::repulse, kyugo_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -570,7 +566,7 @@ static MACHINE_CONFIG_DERIVED( repulse, kyugo_base )
 	MCFG_CPU_IO_MAP(repulse_sub_portmap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( srdmissn, kyugo_base )
+MACHINE_CONFIG_DERIVED(kyugo_state::srdmissn, kyugo_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -578,7 +574,7 @@ static MACHINE_CONFIG_DERIVED( srdmissn, kyugo_base )
 	MCFG_CPU_IO_MAP(srdmissn_sub_portmap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( flashgala, kyugo_base )
+MACHINE_CONFIG_DERIVED(kyugo_state::flashgala, kyugo_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -586,7 +582,7 @@ static MACHINE_CONFIG_DERIVED( flashgala, kyugo_base )
 	MCFG_CPU_IO_MAP(flashgala_sub_portmap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( legend, kyugo_base )
+MACHINE_CONFIG_DERIVED(kyugo_state::legend, kyugo_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("sub")
@@ -868,6 +864,42 @@ ROM_START( 99lstwark )
 	ROM_LOAD( "1999-00.rom",  0x0000, 0x0800, CRC(0c0c449f) SHA1(efa4a8ac4c341ca5cdc3b5d2803eda43daf1bc93) ) /* unknown */
 ROM_END
 
+ROM_START( 99lstwarb ) // copyright blanked, seems based on 99lstwara, given it has a second shot type instead of the shields.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "15.2764",      0x0000, 0x2000, CRC(f9367b9d) SHA1(08157add7a72208b273faec1dbb8cb2ef21f2438) )
+	ROM_LOAD( "16.2764",      0x2000, 0x2000, CRC(04c3316a) SHA1(2db4ab98c8ac6c3eea1930c9dbbe6dd15b8e8a74) )
+	ROM_LOAD( "17.2764",      0x4000, 0x2000, CRC(02aa4de5) SHA1(bab79e314764f4a1e05516e22bd1077476e53f5b) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "11.2764",      0x0000, 0x2000, CRC(aa3e0996) SHA1(8e92edfc933be0b9e23991dbad686fb0c0286321) )
+	ROM_LOAD( "12.2764",      0x2000, 0x2000, CRC(a59d3d1b) SHA1(6f0eee9d89cbe667f02a787b0ce16563c3b48e3f) )
+	ROM_LOAD( "13.2764",      0x4000, 0x2000, CRC(fe31975e) SHA1(904d3fb8bf3b31152c18095234b5f62589c5b18c) )
+	ROM_LOAD( "14.2764",      0x6000, 0x2000, CRC(683481a5) SHA1(56d52194a4df3712fd9b16b2c0029d565e8c8bee) )
+
+	ROM_REGION( 0x01000, "gfx1", 0 )
+	ROM_LOAD( "1.2732",      0x00000, 0x1000, CRC(8ed6855b) SHA1(9f3737162e63ba0e05e5b71b32802166ec39bf02) ) /* chars */
+
+	ROM_REGION( 0x06000, "gfx2", 0 )
+	ROM_LOAD( "8.2764",       0x00000, 0x2000, CRC(b161c853) SHA1(26913524001415c7426c0d439e078335761d9e7a) ) /* tiles - plane 0 */
+	ROM_LOAD( "9.2764",       0x02000, 0x2000, CRC(44fd4c31) SHA1(8f5da66eba4c8a1e3d00be201244b8039d8a5b76) ) /* tiles - plane 1 */
+	ROM_LOAD( "10.2764",      0x04000, 0x2000, CRC(b3dbc16b) SHA1(df57836695aadf5c82df22ddeef65e60e025848a) ) /* tiles - plane 2 */
+
+	ROM_REGION( 0x18000, "gfx3", 0 )
+	ROM_LOAD( "2.27128",      0x00000, 0x4000, CRC(34dba8f9) SHA1(7abd909856729f5dadcf8143505016a454ae6217) ) /* sprites - plane 0 */
+	ROM_LOAD( "3.27128",      0x04000, 0x4000, CRC(8bd7d5b6) SHA1(73cf9828dbcb34e63c7cc70792f3dbab90bd7447) ) /* sprites - plane 0 */
+	ROM_LOAD( "4.27128",      0x08000, 0x4000, CRC(64036ea0) SHA1(929794a0105fc5c064f95c75cfcc6ca25a3724ce) ) /* sprites - plane 1 */
+	ROM_LOAD( "5.27128",      0x0c000, 0x4000, CRC(2f7352e4) SHA1(3e77c1a315fe082628cf69fede4063743a229055) ) /* sprites - plane 1 */
+	ROM_LOAD( "6.27128",      0x10000, 0x4000, CRC(7d9e1e7e) SHA1(81dd8e933a1195e5f119a2b957828a4bf22bea35) ) /* sprites - plane 2 */
+	ROM_LOAD( "7.27128",      0x14000, 0x4000, CRC(8b6fa1c4) SHA1(061ae1849e685dd838f61ea1d6e72a579f38ecc6) ) /* sprites - plane 2 */
+
+	ROM_REGION( 0x0340, "proms", 0 ) // not dumped for this PCB
+	ROM_LOAD( "b.1j",         0x0000, 0x0100, CRC(3ea35431) SHA1(b45318ce898f03a338435a3f6109483d246ff914) ) /* blue */
+	ROM_LOAD( "g.1h",         0x0100, 0x0100, CRC(acd7a69e) SHA1(b18eab8f669f0a8105a4bbffa346c4b19491c451) ) /* green */
+	ROM_LOAD( "r.1f",         0x0200, 0x0100, CRC(b7f48b41) SHA1(2d84dc29c0ab43729014129e6392207db0f56e9e) ) /* red */
+	/* 0x0300-0x031f empty - looks like there isn't a lookup table PROM */
+	ROM_LOAD( "m1.2c",        0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
+ROM_END
+
 ROM_START( sonofphx )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "5.f4",   0x0000, 0x2000, CRC(e0d2c6cf) SHA1(87befaefa3e4f07523e9c4db19f13ff9309a7dcc) )
@@ -919,6 +951,43 @@ ROM_START( flashgal )
 
 	ROM_REGION( 0x01000, "gfx1", 0 )
 	ROM_LOAD( "epr-7177.4a",  0x00000, 0x1000, CRC(dca9052f) SHA1(cbeb997db01b875a73a67e08c0b94ab74de77b7b) ) /* chars */
+
+	ROM_REGION( 0x06000, "gfx2", 0 )
+	ROM_LOAD( "epr-7178.9h",  0x00000, 0x2000, CRC(2f5b62c0) SHA1(8be09e4ef1c3e2b1494431d4f07570a109e93dfd) ) /* tiles - plane 0 */
+	ROM_LOAD( "epr-7179.10h", 0x02000, 0x2000, CRC(8fbb49b5) SHA1(111f0c42cee6ab2766a5322dd90e1516ffbbc35c) ) /* tiles - plane 1 */
+	ROM_LOAD( "epr-7180.11h", 0x04000, 0x2000, CRC(26a8e5c3) SHA1(9a2bc4de87e16bbb777b39564c08d99fd3ccd4ff) ) /* tiles - plane 2 */
+
+	ROM_REGION( 0x18000, "gfx3", 0 )
+	ROM_LOAD( "epr-7171.6a",  0x00000, 0x4000, CRC(62caf2a1) SHA1(6fb2c1882630b32af27638d2e9b306d4fc028d62) ) /* sprites - plane 0 */
+	ROM_LOAD( "epr-7172.7a",  0x04000, 0x4000, CRC(10f78a10) SHA1(8745da857bdb873d5ffebf753dd66321e1fabc59) ) /* sprites - plane 0 */
+	ROM_LOAD( "epr-7173.8a",  0x08000, 0x4000, CRC(36ea1d59) SHA1(cba9117de745049c06c703dc1782b83376523ce3) ) /* sprites - plane 1 */
+	ROM_LOAD( "epr-7174.9a",  0x0c000, 0x4000, CRC(f527d837) SHA1(a674e1e71c98d263670962d60a9ac6e205df1204) ) /* sprites - plane 1 */
+	ROM_LOAD( "epr-7175.10a", 0x10000, 0x4000, CRC(ba76e4c1) SHA1(e521fbf6a6a8f0e9866c143a576b9dbbc19c4ffd) ) /* sprites - plane 2 */
+	ROM_LOAD( "epr-7176.11a", 0x14000, 0x4000, CRC(f095d619) SHA1(7f278c124141ae03f1d8a03b4ea06c81391f16eb) ) /* sprites - plane 2 */
+
+	ROM_REGION( 0x0340, "proms", 0 )
+	ROM_LOAD( "7161.1j",      0x0000, 0x0100, CRC(02c4043f) SHA1(bc2af8e054d71a3d0835c795b0f2263c32f2bc42) ) /* red */
+	ROM_LOAD( "7160.1h",      0x0100, 0x0100, CRC(225938d1) SHA1(22bf02832b9f08e4811f9d74a6007bf0ff030eef) ) /* green */
+	ROM_LOAD( "7159.1f",      0x0200, 0x0100, CRC(1e0a1cd3) SHA1(cc120d8fba3e4fb5e18d789981ece77e589ee5a2) ) /* blue */
+	ROM_LOAD( "7162.5j",      0x0300, 0x0020, CRC(cce2e29f) SHA1(787c65b7d69bcd224b45138fdbbf3fdae296dda6) ) /* char lookup table */
+	ROM_LOAD( "bpr.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? (not used) */
+ROM_END
+
+ROM_START( flashgalk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-7167.4f",  0x0000, 0x2000, CRC(cf5ad733) SHA1(24561db9a3d72c7a69a7ce5a85aaa78254788675) )
+	ROM_LOAD( "epr-7168.4h",  0x2000, 0x2000, CRC(00c4851f) SHA1(f29ef123702bb3506ac3740b2779ae2757d884c2) )
+	ROM_LOAD( "epr-7169.4j",  0x4000, 0x2000, CRC(1ef0b8f7) SHA1(9c3ded1f985f4fb6b38843e0ca90ec458633d145) )
+	ROM_LOAD( "epr-7170.4k",  0x6000, 0x2000, CRC(885d53de) SHA1(14c8d4d07574e2dc3fba9fc92483a810649e100a) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "epr-7163.2f",  0x0000, 0x2000, CRC(eee2134d) SHA1(4d67a969ff033576988de73942717c84068a291d) )
+	ROM_LOAD( "epr-7164.2h",  0x2000, 0x2000, CRC(e5e0cd22) SHA1(ad17f5a207a6d74cf0bd1cfebb061c8f65309563) )
+	ROM_LOAD( "epr-7165.2j",  0x4000, 0x2000, CRC(4cd3fe5e) SHA1(a69e02acbcad825101f96dcabfada667ae25799c) )
+	ROM_LOAD( "epr-7166.2k",  0x6000, 0x2000, CRC(552ca339) SHA1(2313c6aaec47957bce00d0d04f89012eafc014fd) )
+
+	ROM_REGION( 0x01000, "gfx1", 0 )
+	ROM_LOAD( "4a.bin",  0x00000, 0x1000, CRC(83a30785) SHA1(685e833bbeaff5b4513627eebdee4cde114e8588) ) /* chars, only different rom from the Sega set above */
 
 	ROM_REGION( 0x06000, "gfx2", 0 )
 	ROM_LOAD( "epr-7178.9h",  0x00000, 0x2000, CRC(2f5b62c0) SHA1(8be09e4ef1c3e2b1494431d4f07570a109e93dfd) ) /* tiles - plane 0 */
@@ -1374,22 +1443,24 @@ DRIVER_INIT_MEMBER(kyugo_state,srdmissn)
  *
  *************************************/
 
-GAME( 1984, gyrodine,  0,        gyrodine,  gyrodine, driver_device, 0,        ROT90, "Crux", "Gyrodine", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gyrodinet, gyrodine, gyrodine,  gyrodine, driver_device, 0,        ROT90, "Crux (Taito Corporation license)", "Gyrodine (Taito Corporation license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, buzzard,   gyrodine, gyrodine,  gyrodine, driver_device, 0,        ROT90, "Crux", "Buzzard", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, repulse,   0,        repulse,   repulse,  driver_device, 0,        ROT90, "Crux / Sega", "Repulse", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, 99lstwar,  repulse,  repulse,   repulse,  driver_device, 0,        ROT90, "Crux / Proma", "'99: The Last War (set 1)", MACHINE_SUPPORTS_SAVE ) // Crux went bankrupt during Repulse development,
-GAME( 1985, 99lstwara, repulse,  repulse,   repulse,  driver_device, 0,        ROT90, "Crux / Proma", "'99: The Last War (set 2)", MACHINE_SUPPORTS_SAVE ) // some of their staff later worked on the newer games on this hardware,
-GAME( 1985, 99lstwark, repulse,  repulse,   repulse,  driver_device, 0,        ROT90, "Crux / Kyugo", "'99: The Last War (Kyugo)", MACHINE_SUPPORTS_SAVE ) // directly for Kyugo? (Flashgal, Legend, SRD Mission, Airwolf, Planet Probe)
-GAME( 1985, sonofphx,  repulse,  repulse,   repulse,  driver_device, 0,        ROT90, "bootleg (Associated Overseas MFR, Inc.)", "Son of Phoenix (bootleg of Repulse)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, flashgal,  0,        repulse,   flashgal, driver_device, 0,        ROT0,  "Kyugo / Sega", "Flashgal (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, flashgala, flashgal, flashgala, flashgal, driver_device, 0,        ROT0,  "Kyugo / Sega", "Flashgal (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, srdmissn,  0,        srdmissn,  srdmissn, kyugo_state,   srdmissn, ROT90, "Kyugo / Taito Corporation", "S.R.D. Mission", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, fx,        srdmissn, srdmissn,  srdmissn, kyugo_state,   srdmissn, ROT90, "bootleg", "F-X (bootleg of S.R.D. Mission)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, legend,    0,        legend,    legend,   kyugo_state,   srdmissn, ROT0,  "Kyugo / Sega", "Legend", MACHINE_SUPPORTS_SAVE ) // no copyright (maybe also a bootleg?)
-GAME( 1986, legendb,   legend,   legend,    legend,   kyugo_state,   srdmissn, ROT0,  "bootleg", "Legion (bootleg of Legend)", MACHINE_SUPPORTS_SAVE ) // no copyright
-GAME( 1987, airwolf,   0,        srdmissn,  airwolf,  kyugo_state,   srdmissn, ROT0,  "Kyugo", "Airwolf", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, airwolfa,  airwolf,  srdmissn,  airwolf,  kyugo_state,   srdmissn, ROT0,  "Kyugo (United Amusements license)", "Airwolf (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, skywolf,   airwolf,  srdmissn,  skywolf,  kyugo_state,   srdmissn, ROT0,  "bootleg", "Sky Wolf (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, skywolf2,  airwolf,  srdmissn,  airwolf,  kyugo_state,   srdmissn, ROT0,  "bootleg", "Sky Wolf (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, skywolf3,  airwolf,  srdmissn,  airwolf,  kyugo_state,   srdmissn, ROT0,  "bootleg", "Sky Wolf (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gyrodine,  0,        gyrodine,  gyrodine, kyugo_state, 0,        ROT90, "Crux",                                    "Gyrodine",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gyrodinet, gyrodine, gyrodine,  gyrodine, kyugo_state, 0,        ROT90, "Crux (Taito Corporation license)",        "Gyrodine (Taito Corporation license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, buzzard,   gyrodine, gyrodine,  gyrodine, kyugo_state, 0,        ROT90, "Crux",                                    "Buzzard",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, repulse,   0,        repulse,   repulse,  kyugo_state, 0,        ROT90, "Crux / Sega",                             "Repulse",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, 99lstwar,  repulse,  repulse,   repulse,  kyugo_state, 0,        ROT90, "Crux / Proma",                            "'99: The Last War (set 1)",            MACHINE_SUPPORTS_SAVE ) // Crux went bankrupt during Repulse development,
+GAME( 1985, 99lstwara, repulse,  repulse,   repulse,  kyugo_state, 0,        ROT90, "Crux / Proma",                            "'99: The Last War (set 2)",            MACHINE_SUPPORTS_SAVE ) // some of their staff later worked on the newer games on this hardware,
+GAME( 1985, 99lstwark, repulse,  repulse,   repulse,  kyugo_state, 0,        ROT90, "Crux / Kyugo",                            "'99: The Last War (Kyugo)",            MACHINE_SUPPORTS_SAVE ) // directly for Kyugo? (Flashgal, Legend, SRD Mission, Airwolf, Planet Probe)
+GAME( 1985, 99lstwarb, repulse,  repulse,   repulse,  kyugo_state, 0,        ROT90, "bootleg",                                 "'99: The Last War (bootleg)",          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // bg_tilemap is wrong in some levels
+GAME( 1985, sonofphx,  repulse,  repulse,   repulse,  kyugo_state, 0,        ROT90, "bootleg (Associated Overseas MFR, Inc.)", "Son of Phoenix (bootleg of Repulse)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, flashgal,  0,        repulse,   flashgal, kyugo_state, 0,        ROT0,  "Kyugo / Sega",                            "Flashgal (set 1)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1985, flashgalk, flashgal, repulse,   flashgal, kyugo_state, 0,        ROT0,  "Kyugo / Sega",                            "Flashgal (set 1, Kyugo logo)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1985, flashgala, flashgal, flashgala, flashgal, kyugo_state, 0,        ROT0,  "Kyugo / Sega",                            "Flashgal (set 2)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, srdmissn,  0,        srdmissn,  srdmissn, kyugo_state, srdmissn, ROT90, "Kyugo / Taito Corporation",               "S.R.D. Mission",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, fx,        srdmissn, srdmissn,  srdmissn, kyugo_state, srdmissn, ROT90, "bootleg",                                 "F-X (bootleg of S.R.D. Mission)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1986, legend,    0,        legend,    legend,   kyugo_state, srdmissn, ROT0,  "Kyugo / Sega",                            "Legend",                               MACHINE_SUPPORTS_SAVE ) // no copyright (maybe also a bootleg?)
+GAME( 1986, legendb,   legend,   legend,    legend,   kyugo_state, srdmissn, ROT0,  "bootleg",                                 "Legion (bootleg of Legend)",           MACHINE_SUPPORTS_SAVE ) // no copyright
+GAME( 1987, airwolf,   0,        srdmissn,  airwolf,  kyugo_state, srdmissn, ROT0,  "Kyugo",                                   "Airwolf",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1987, airwolfa,  airwolf,  srdmissn,  airwolf,  kyugo_state, srdmissn, ROT0,  "Kyugo (United Amusements license)",       "Airwolf (US)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, skywolf,   airwolf,  srdmissn,  skywolf,  kyugo_state, srdmissn, ROT0,  "bootleg",                                 "Sky Wolf (set 1)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, skywolf2,  airwolf,  srdmissn,  airwolf,  kyugo_state, srdmissn, ROT0,  "bootleg",                                 "Sky Wolf (set 2)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1987, skywolf3,  airwolf,  srdmissn,  airwolf,  kyugo_state, srdmissn, ROT0,  "bootleg",                                 "Sky Wolf (set 3)",                     MACHINE_SUPPORTS_SAVE )

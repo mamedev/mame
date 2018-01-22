@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "midi_maplin.h"
 #include "machine/clock.h"
 #include "bus/midi/midi.h"
@@ -24,7 +25,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type C64_MIDI_MAPLIN = &device_creator<c64_maplin_midi_cartridge_device>;
+DEFINE_DEVICE_TYPE(C64_MIDI_MAPLIN, c64_maplin_midi_cartridge_device, "c64_midimap", "C64 Maplin MIDI")
 
 
 WRITE_LINE_MEMBER( c64_maplin_midi_cartridge_device::acia_irq_w )
@@ -40,10 +41,10 @@ WRITE_LINE_MEMBER( c64_maplin_midi_cartridge_device::write_acia_clock )
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_FRAGMENT( c64_maplin_midi )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( c64_maplin_midi )
+MACHINE_CONFIG_START(c64_maplin_midi_cartridge_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(MC6850_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(c64_maplin_midi_cartridge_device, acia_irq_w))
@@ -58,17 +59,6 @@ static MACHINE_CONFIG_FRAGMENT( c64_maplin_midi )
 MACHINE_CONFIG_END
 
 
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor c64_maplin_midi_cartridge_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( c64_maplin_midi );
-}
-
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -79,7 +69,7 @@ machine_config_constructor c64_maplin_midi_cartridge_device::device_mconfig_addi
 //-------------------------------------------------
 
 c64_maplin_midi_cartridge_device::c64_maplin_midi_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, C64_MIDI_MAPLIN, "C64 Maplin MIDI", tag, owner, clock, "c64_midimap", __FILE__),
+	device_t(mconfig, C64_MIDI_MAPLIN, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_acia(*this, MC6850_TAG)
 {
@@ -117,11 +107,8 @@ uint8_t c64_maplin_midi_cartridge_device::c64_cd_r(address_space &space, offs_t 
 		switch (offset & 0xff)
 		{
 		case 0:
-			data = m_acia->status_r(space, 0);
-			break;
-
 		case 1:
-			data = m_acia->data_r(space, 0);
+			data = m_acia->read(space, offset & 1);
 			break;
 		}
 	}
@@ -141,11 +128,8 @@ void c64_maplin_midi_cartridge_device::c64_cd_w(address_space &space, offs_t off
 		switch (offset & 0xff)
 		{
 		case 0:
-			m_acia->control_w(space, 0, data);
-			break;
-
 		case 1:
-			m_acia->data_w(space, 0, data);
+			m_acia->write(space, offset & 1, data);
 			break;
 		}
 	}

@@ -22,6 +22,8 @@
 #include "sound/ymz280b.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
+#include "screen.h"
+#include "speaker.h"
 
 class deco156_state : public driver_device
 {
@@ -33,8 +35,7 @@ public:
 			m_oki1(*this, "oki1"),
 			m_oki2(*this, "oki2"),
 			m_sprgen(*this, "spritegen"),
-			m_palette(*this, "palette"),
-			m_generic_paletteram_32(*this, "paletteram")
+			m_palette(*this, "palette")
 	{ }
 
 	/* devices */
@@ -44,7 +45,6 @@ public:
 	optional_device<okim6295_device> m_oki2;
 	optional_device<decospr_device> m_sprgen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 
 	/* memory */
 	uint16_t   m_pf1_rowscroll[0x800/2];
@@ -68,6 +68,8 @@ public:
 	void descramble_sound( const char *tag );
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
+	void hvysmsh(machine_config &config);
+	void wcvol95(machine_config &config);
 };
 
 
@@ -114,26 +116,6 @@ WRITE32_MEMBER(deco156_state::hvysmsh_oki_0_bank_w)
 	m_oki1->set_rom_bank(data & 1);
 }
 
-WRITE32_MEMBER(deco156_state::wcvol95_nonbuffered_palette_w)
-{
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	m_palette->set_pen_color(offset,pal5bit(m_generic_paletteram_32[offset] >> 0),pal5bit(m_generic_paletteram_32[offset] >> 5),pal5bit(m_generic_paletteram_32[offset] >> 10));
-}
-
-/* This is the same as deco32_nonbuffered_palette_w in video/deco32.c */
-WRITE32_MEMBER(deco156_state::deco156_nonbuffered_palette_w)
-{
-	int r,g,b;
-
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-
-	b = (m_generic_paletteram_32[offset] >>16) & 0xff;
-	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
-	r = (m_generic_paletteram_32[offset] >> 0) & 0xff;
-
-	m_palette->set_pen_color(offset,rgb_t(r,g,b));
-}
-
 READ32_MEMBER(deco156_state::wcvol95_pf1_rowscroll_r){ return m_pf1_rowscroll[offset] ^ 0xffff0000; }
 READ32_MEMBER(deco156_state::wcvol95_pf2_rowscroll_r){ return m_pf2_rowscroll[offset] ^ 0xffff0000; }
 READ32_MEMBER(deco156_state::wcvol95_spriteram_r){ return m_spriteram[offset] ^ 0xffff0000; }
@@ -157,7 +139,7 @@ static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE(wcvol95_pf1_rowscroll_r, wcvol95_pf1_rowscroll_w)
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_READWRITE(wcvol95_pf2_rowscroll_r, wcvol95_pf2_rowscroll_w)
-	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_WRITE(deco156_nonbuffered_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x1d0010, 0x1d002f) AM_READNOP // Check for DMA complete?
 	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE(wcvol95_spriteram_r, wcvol95_spriteram_w)
 ADDRESS_MAP_END
@@ -174,7 +156,7 @@ static ADDRESS_MAP_START( wcvol95_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x150000, 0x150003) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x160000, 0x161fff) AM_READWRITE(wcvol95_spriteram_r, wcvol95_spriteram_w)
 	AM_RANGE(0x170000, 0x170003) AM_NOP // Irq ack?
-	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(wcvol95_nonbuffered_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x180000, 0x180fff) AM_READONLY AM_DEVWRITE16("palette", palette_device, write16, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x000000ff)
 ADDRESS_MAP_END
 
@@ -337,7 +319,7 @@ DECOSPR_PRIORITY_CB_MEMBER(deco156_state::pri_callback)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( hvysmsh, deco156_state )
+MACHINE_CONFIG_START(deco156_state::hvysmsh)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
@@ -355,6 +337,7 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(XBGR)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -379,16 +362,16 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", 28000000/28, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 28000000/28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", 28000000/14, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 28000000/14, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( wcvol95, deco156_state )
+MACHINE_CONFIG_START(deco156_state::wcvol95)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
@@ -406,6 +389,7 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -665,7 +649,7 @@ void deco156_state::descramble_sound( const char *tag )
 	{
 		uint32_t addr;
 
-		addr = BITSWAP24 (x,23,22,21,0, 20,
+		addr = bitswap<24> (x,23,22,21,0, 20,
 							19,18,17,16,
 							15,14,13,12,
 							11,10,9, 8,

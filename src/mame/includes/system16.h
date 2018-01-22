@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria, Phil Stroffolino, Mirko Buffoni
 
 #include "video/sega16sp.h"
+#include "machine/74157.h"
 #include "machine/gen_latch.h"
 #include "machine/segaic16.h"
 #include "sound/msm5205.h"
@@ -18,6 +19,7 @@ public:
 		m_tileram(*this, "tileram"),
 		m_goldnaxeb2_bgpage(*this, "gab2_bgpage"),
 		m_goldnaxeb2_fgpage(*this, "gab2_fgpage"),
+		m_soundbank(*this, "soundbank"),
 		m_sprites(*this, "sprites"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
@@ -25,6 +27,7 @@ public:
 		m_upd7759(*this, "7759"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch"),
+		m_adpcm_select(*this, "adpcm_select"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_shared_ptr<uint16_t> m_textram;
@@ -34,7 +37,9 @@ public:
 	optional_shared_ptr<uint16_t> m_goldnaxeb2_bgpage;
 	optional_shared_ptr<uint16_t> m_goldnaxeb2_fgpage;
 
-	required_device<sega_16bit_sprite_device> m_sprites;
+	optional_memory_bank m_soundbank;
+
+	optional_device<sega_16bit_sprite_device> m_sprites;
 
 	uint16_t m_coinctrl;
 
@@ -123,10 +128,13 @@ public:
 	optional_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<ls157_device> m_adpcm_select;
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);
 	DECLARE_WRITE16_MEMBER(sound_command_irq_w);
+	DECLARE_READ8_MEMBER(sound_command_irq_r);
+	DECLARE_WRITE8_MEMBER(soundbank_msm_w);
 	DECLARE_WRITE16_MEMBER(sys16_coinctrl_w);
 	DECLARE_READ16_MEMBER(passht4b_service_r);
 	DECLARE_READ16_MEMBER(passht4b_io1_r);
@@ -164,6 +172,7 @@ public:
 	DECLARE_WRITE8_MEMBER(shdancbl_msm5205_data_w);
 	DECLARE_READ8_MEMBER(shdancbl_soundbank_r);
 	DECLARE_WRITE8_MEMBER(shdancbl_bankctrl_w);
+	DECLARE_WRITE8_MEMBER(sys18bl_okibank_w);
 	DECLARE_WRITE16_MEMBER(sys16_tileram_w);
 	DECLARE_WRITE16_MEMBER(sys16_textram_w);
 	DECLARE_WRITE16_MEMBER(s16a_bootleg_bgscrolly_w);
@@ -177,13 +186,14 @@ public:
 	DECLARE_DRIVER_INIT(fpointbl);
 	DECLARE_DRIVER_INIT(eswatbl);
 	DECLARE_DRIVER_INIT(astormbl);
+	DECLARE_DRIVER_INIT(sys18bl_oki);
+	DECLARE_DRIVER_INIT(astormb2);
 	DECLARE_DRIVER_INIT(shdancbl);
 	DECLARE_DRIVER_INIT(dduxbl);
 	DECLARE_DRIVER_INIT(altbeastbl);
 	DECLARE_DRIVER_INIT(goldnaxeb2);
 	DECLARE_DRIVER_INIT(bayrouteb1);
 	DECLARE_DRIVER_INIT(beautyb);
-	DECLARE_DRIVER_INIT(mwalkbl);
 	DECLARE_DRIVER_INIT(bayrouteb2);
 	DECLARE_DRIVER_INIT(shinobl);
 	DECLARE_DRIVER_INIT(tturfbl);
@@ -218,6 +228,35 @@ public:
 	void set_bg_page( int data );
 	void datsu_set_pages(  );
 	DECLARE_WRITE_LINE_MEMBER(tturfbl_msm5205_callback);
+	DECLARE_WRITE_LINE_MEMBER(datsu_msm5205_callback);
 	DECLARE_WRITE_LINE_MEMBER(shdancbl_msm5205_callback);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_nmi);
+	void z80_ym2151(machine_config &config);
+	void z80_ym2151_upd7759(machine_config &config);
+	void datsu_ym2151_msm5205(machine_config &config);
+	void datsu_2x_ym2203_msm5205(machine_config &config);
+	void system16_base(machine_config &config);
+	void goldnaxeb_base(machine_config &config);
+	void passshtb(machine_config &config);
+	void goldnaxeb2(machine_config &config);
+	void beautyb(machine_config &config);
+	void goldnaxeb1(machine_config &config);
+	void mwalkbl(machine_config &config);
+	void eswatbl2(machine_config &config);
+	void ddcrewbl(machine_config &config);
+	void shdancbla(machine_config &config);
+	void astormbl(machine_config &config);
+	void astormb2(machine_config &config);
+	void passsht4b(machine_config &config);
+	void wb3bb(machine_config &config);
+	void shdancbl(machine_config &config);
+	void shinobi_datsu(machine_config &config);
+	void bayrouteb1(machine_config &config);
+	void tetrisbl(machine_config &config);
+	void eswatbl(machine_config &config);
+	void dduxbl(machine_config &config);
+	void bayrouteb2(machine_config &config);
+	void tturfbl(machine_config &config);
+	void altbeastbl(machine_config &config);
+	void system18(machine_config &config);
 };

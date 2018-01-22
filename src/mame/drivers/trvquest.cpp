@@ -37,11 +37,14 @@ Notes:
 */
 
 #include "emu.h"
+#include "includes/gameplan.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
-#include "sound/ay8910.h"
-#include "includes/gameplan.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "speaker.h"
+
 
 READ8_MEMBER(gameplan_state::trvquest_question_r)
 {
@@ -174,7 +177,7 @@ INTERRUPT_GEN_MEMBER(gameplan_state::trvquest_interrupt)
 	m_via_2->write_ca1(0);
 }
 
-static MACHINE_CONFIG_START( trvquest, gameplan_state )
+MACHINE_CONFIG_START(gameplan_state::trvquest)
 
 	MCFG_CPU_ADD("maincpu", M6809,XTAL_6MHz/4)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
@@ -197,17 +200,17 @@ static MACHINE_CONFIG_START( trvquest, gameplan_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL_6MHz/4)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(gameplan_state, video_data_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(gameplan_state, gameplan_video_command_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, video_command_trigger_w))
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_6MHz/4)
 	MCFG_VIA6522_READPA_HANDLER(IOPORT("IN0"))
 	MCFG_VIA6522_READPB_HANDLER(IOPORT("IN1"))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, trvquest_coin_w))
 
-	MCFG_DEVICE_ADD("via6522_2", VIA6522, 0)
+	MCFG_DEVICE_ADD("via6522_2", VIA6522, XTAL_6MHz/4)
 	MCFG_VIA6522_READPA_HANDLER(IOPORT("UNK"))
 	MCFG_VIA6522_READPB_HANDLER(IOPORT("DSW"))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(gameplan_state, trvquest_misc_w))
@@ -235,4 +238,4 @@ ROM_START( trvquest )
 	ROM_LOAD( "roma", 0x16000, 0x2000, CRC(b4bcaf33) SHA1(c6b08fb8d55b2834d0c6c5baff9f544c795e4c15) )
 ROM_END
 
-GAME( 1984, trvquest, 0, trvquest, trvquest, driver_device, 0, ROT90, "Sunn / Techstar", "Trivia Quest", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trvquest, 0, trvquest, trvquest, gameplan_state, 0, ROT90, "Sunn / Techstar", "Trivia Quest", MACHINE_SUPPORTS_SAVE )

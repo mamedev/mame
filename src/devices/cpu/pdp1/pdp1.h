@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Raphael Nabet
-#pragma once
+#ifndef MAME_CPU_PDP1_PDP1_H
+#define MAME_CPU_PDP1_PDP1_H
 
-#ifndef __PDP1_H__
-#define __PDP1_H__
+#pragma once
 
 
 
@@ -45,39 +45,41 @@ struct pdp1_reset_param_t
 #define IOT_NO_COMPLETION_PULSE -1
 
 
-#define AND 001
-#define IOR 002
-#define XOR 003
-#define XCT 004
-#define CALJDA 007
-#define LAC 010
-#define LIO 011
-#define DAC 012
-#define DAP 013
-#define DIP 014
-#define DIO 015
-#define DZM 016
-#define ADD 020
-#define SUB 021
-#define IDX 022
-#define ISP 023
-#define SAD 024
-#define SAS 025
-#define MUS_MUL 026
-#define DIS_DIV 027
-#define JMP 030
-#define JSP 031
-#define SKP 032
-#define SFT 033
-#define LAW 034
-#define IOT 035
-#define OPR 037
-
-
 class pdp1_device : public cpu_device
 					, public pdp1_reset_param_t
 {
 public:
+	enum opcode
+	{
+		AND = 001,
+		IOR = 002,
+		XOR = 003,
+		XCT = 004,
+		CALJDA = 007,
+		LAC = 010,
+		LIO = 011,
+		DAC = 012,
+		DAP = 013,
+		DIP = 014,
+		DIO = 015,
+		DZM = 016,
+		ADD = 020,
+		SUB = 021,
+		IDX = 022,
+		ISP = 023,
+		SAD = 024,
+		SAS = 025,
+		MUS_MUL = 026,
+		DIS_DIV = 027,
+		JMP = 030,
+		JSP = 031,
+		SKP = 032,
+		SFT = 033,
+		LAW = 034,
+		IOT = 035,
+		OPR = 037
+	};
+
 	// construction/destruction
 	pdp1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -104,7 +106,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -112,9 +114,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -196,11 +196,11 @@ private:
 };
 
 
-extern const device_type PDP1;
+DECLARE_DEVICE_TYPE(PDP1, pdp1_device)
 
 
 #define MCFG_PDP1_RESET_PARAM(_param) \
 	pdp1_device::static_set_reset_param(*device, &(_param));
 
 
-#endif /* __PDP1_H__ */
+#endif // MAME_CPU_PDP1_PDP1_H

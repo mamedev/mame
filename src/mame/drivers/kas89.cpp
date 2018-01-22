@@ -6,7 +6,7 @@
   /\/\<< Kasino '89 >>/\/\
 
   6-players electronic roulette.
-  Video field + phisical LEDs roulette.
+  Video field + physical LEDs roulette.
 
   Driver by Roberto Fresca.
 
@@ -189,17 +189,20 @@
 *************************************************************************************/
 
 
-#define MASTER_CLOCK        XTAL_21_4772MHz
-#define VDP_MEM             0x40000
-
-
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "video/v9938.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
+#include "sound/ay8910.h"
+#include "video/v9938.h"
+#include "speaker.h"
+
 #include "kas89.lh"
+
+
+#define MASTER_CLOCK        XTAL_21_4772MHz
+#define VDP_MEM             0x40000
 
 
 class kas89_state : public driver_device
@@ -255,6 +258,7 @@ public:
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
+	void kas89(machine_config &config);
 };
 
 
@@ -750,7 +754,7 @@ INPUT_PORTS_END
 *           Machine Driver            *
 **************************************/
 
-static MACHINE_CONFIG_START( kas89, kas89_state )
+MACHINE_CONFIG_START(kas89_state::kas89)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)    /* Confirmed */
@@ -838,7 +842,7 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 	/* Unscrambling data lines */
 	for ( i = 0; i < memsize; i++ )
 	{
-		mem[i] = BITSWAP8(mem[i], 3, 1, 0, 5, 6, 4, 7, 2);
+		mem[i] = bitswap<8>(mem[i], 3, 1, 0, 5, 6, 4, 7, 2);
 	}
 
 	/* Unscrambling address lines */
@@ -846,7 +850,7 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 	memcpy(&buf[0], mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{
-		mem[BITSWAP16(i, 15, 14, 5, 6, 3, 0, 12, 1, 9, 13, 4, 7, 10, 8, 2, 11)] = buf[i];
+		mem[bitswap<16>(i, 15, 14, 5, 6, 3, 0, 12, 1, 9, 13, 4, 7, 10, 8, 2, 11)] = buf[i];
 	}
 }
 
@@ -855,5 +859,5 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 *           Game Driver(s)            *
 **************************************/
 
-/*     YEAR  NAME    PARENT  MACHINE  INPUT  STATE        INIT   ROT     COMPANY       FULLNAME     FLAGS                 LAYOUT */
+//     YEAR  NAME    PARENT  MACHINE  INPUT  STATE        INIT   ROT    COMPANY       FULLNAME      FLAGS                    LAYOUT
 GAMEL( 1989, kas89,  0,      kas89,   kas89, kas89_state, kas89, ROT90, "SFC S.R.L.", "Kasino '89", MACHINE_IMPERFECT_SOUND, layout_kas89 )

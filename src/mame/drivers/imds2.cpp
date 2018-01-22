@@ -87,7 +87,10 @@
 // prompt should appear. A command that could be tried is "DIR" that lists
 // the content of floppy disk.
 
+#include "emu.h"
 #include "includes/imds2.h"
+#include "screen.h"
+#include "speaker.h"
 
 // CPU oscillator of IPC board: 8 MHz
 #define IPC_XTAL_Y2     XTAL_8MHz
@@ -150,18 +153,6 @@ static ADDRESS_MAP_START(ioc_io_map , AS_IO , 8 , imds2_state)
 // DMA controller range doesn't extend to 0xff because register 0xfd needs to be read as 0xff
 // This register is used by IOC firmware to detect DMA controller model (either 8237 or 8257)
 	AM_RANGE(0xf0 , 0xf8) AM_DEVREADWRITE("iocdma" , i8257_device , read , write)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(pio_io_map , AS_IO , 8 , imds2_state)
-	AM_RANGE(MCS48_PORT_P1 , MCS48_PORT_P1) AM_READWRITE(imds2_pio_port_p1_r , imds2_pio_port_p1_w)
-	AM_RANGE(MCS48_PORT_P2 , MCS48_PORT_P2) AM_READWRITE(imds2_pio_port_p2_r , imds2_pio_port_p2_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(kb_io_map , AS_IO , 8 , imds2_state)
-	AM_RANGE(MCS48_PORT_P1 , MCS48_PORT_P1) AM_WRITE(imds2_kb_port_p1_w)
-	AM_RANGE(MCS48_PORT_P2 , MCS48_PORT_P2) AM_READ(imds2_kb_port_p2_r)
-	AM_RANGE(MCS48_PORT_T0 , MCS48_PORT_T0) AM_READ(imds2_kb_port_t0_r)
-	AM_RANGE(MCS48_PORT_T1 , MCS48_PORT_T1) AM_READ(imds2_kb_port_t1_r)
 ADDRESS_MAP_END
 
 imds2_state::imds2_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -363,14 +354,14 @@ WRITE8_MEMBER(imds2_state::imds2_kb_port_p1_w)
 	m_kb_p1 = data;
 }
 
-READ8_MEMBER(imds2_state::imds2_kb_port_t0_r)
+READ_LINE_MEMBER(imds2_state::imds2_kb_port_t0_r)
 {
 	// T0 tied low
 	// It appears to be some kind of strapping option on kb hw
 	return 0;
 }
 
-READ8_MEMBER(imds2_state::imds2_kb_port_t1_r)
+READ_LINE_MEMBER(imds2_state::imds2_kb_port_t1_r)
 {
 	// T1 tied low
 	// It appears to be some kind of strapping option on kb hw
@@ -762,15 +753,20 @@ static SLOT_INTERFACE_START( imds2_floppies )
 	SLOT_INTERFACE( "8sssd", FLOPPY_8_SSSD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(imds2 , imds2_state)
+MACHINE_CONFIG_START(imds2_state::imds2)
 		MCFG_CPU_ADD("ipccpu" , I8085A , IPC_XTAL_Y2 / 2)  // 4 MHz
 		MCFG_CPU_PROGRAM_MAP(ipc_mem_map)
 		MCFG_CPU_IO_MAP(ipc_io_map)
 		MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("ipcsyspic" , pic8259_device , inta_cb)
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
-		MCFG_PIC8259_ADD("ipcsyspic" , WRITELINE(imds2_state , imds2_ipc_intr) , VCC, NOOP)
-		MCFG_PIC8259_ADD("ipclocpic" , DEVWRITELINE("ipcsyspic" , pic8259_device , ir7_w) , VCC, NOOP)
+		MCFG_DEVICE_ADD("ipcsyspic", PIC8259, 0)
+		MCFG_PIC8259_OUT_INT_CB(WRITELINE(imds2_state, imds2_ipc_intr))
+		MCFG_PIC8259_IN_SP_CB(VCC)
+
+		MCFG_DEVICE_ADD("ipclocpic", PIC8259, 0)
+		MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("ipcsyspic", pic8259_device, ir7_w))
+		MCFG_PIC8259_IN_SP_CB(VCC) // ???
 
 		MCFG_DEVICE_ADD("ipctimer" , PIT8253 , 0)
 		MCFG_PIT8253_CLK0(IPC_XTAL_Y1 / 16)
@@ -866,11 +862,17 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_SLOT_FIXED(true)
 
 		MCFG_CPU_ADD("iocpio" , I8041 , IOC_XTAL_Y3)
-		MCFG_CPU_IO_MAP(pio_io_map)
+		MCFG_MCS48_PORT_P1_IN_CB(READ8(imds2_state, imds2_pio_port_p1_r))
+		MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(imds2_state, imds2_pio_port_p1_w))
+		MCFG_MCS48_PORT_P2_IN_CB(READ8(imds2_state, imds2_pio_port_p2_r))
+		MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(imds2_state, imds2_pio_port_p2_w))
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
 		MCFG_CPU_ADD("kbcpu", I8741, XTAL_3_579545MHz)         /* 3.579545 MHz */
-		MCFG_CPU_IO_MAP(kb_io_map)
+		MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(imds2_state, imds2_kb_port_p1_w))
+		MCFG_MCS48_PORT_P2_IN_CB(READ8(imds2_state, imds2_kb_port_p2_r))
+		MCFG_MCS48_PORT_T0_IN_CB(READLINE(imds2_state, imds2_kb_port_t0_r))
+		MCFG_MCS48_PORT_T1_IN_CB(READLINE(imds2_state, imds2_kb_port_t1_r))
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
 		MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
@@ -906,7 +908,7 @@ ROM_START(imds2)
 		// For the time being a specially developed PIO firmware is used until a dump of the original PIO is
 		// available.
 		ROM_REGION(0x400 , "iocpio" , 0)
-		ROM_LOAD("pio_a72.bin" , 0 , 0x400 , BAD_DUMP CRC(8c8e740b))
+		ROM_LOAD("pio_a72.bin" , 0 , 0x400 , BAD_DUMP CRC(8c8e740b) SHA1(9b9333a9dc9585aa8f630721d13e551a5c87defc))
 
 		// ROM definition of keyboard controller (8741)
 		ROM_REGION(0x400 , "kbcpu" , 0)
@@ -916,5 +918,5 @@ ROM_START(imds2)
 		ROM_LOAD ("ioc_a19.bin" , 0x0000 , 0x0400 , CRC(47487d0f) SHA1(0ed98f9f06622949ee3cc2ffc572fb9702db0f81))
 ROM_END
 
-/*    YEAR  NAME       PARENT    COMPAT MACHINE INPUT     INIT              COMPANY       FULLNAME */
-COMP( 1979, imds2,     0,        0,     imds2,  imds2,    driver_device, 0, "Intel",      "Intellec MDS-II" , 0)
+/*    YEAR  NAME       PARENT    COMPAT MACHINE INPUT   STATE        INIT  COMPANY       FULLNAME */
+COMP( 1979, imds2,     0,        0,     imds2,  imds2,  imds2_state, 0,    "Intel",      "Intellec MDS-II" , 0)

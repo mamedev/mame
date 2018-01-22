@@ -27,15 +27,19 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "audio/snes_snd.h"
-#include "cpu/spc700/spc700.h"
 #include "includes/snes.h"
+#include "audio/snes_snd.h"
+
+#include "cpu/spc700/spc700.h"
 #include "machine/snescx4.h"
 
 #include "bus/snes/snes_slot.h"
 #include "bus/snes/snes_carts.h"
 #include "bus/snes_ctrl/ctrl.h"
+
 #include "softlist.h"
+#include "speaker.h"
+
 
 class snes_console_state : public snes_state
 {
@@ -102,6 +106,8 @@ public:
 	required_device<snes_control_port_device> m_ctrl1;
 	required_device<snes_control_port_device> m_ctrl2;
 	optional_device<sns_cart_slot_device> m_cartslot;
+	void snespal(machine_config &config);
+	void snes(machine_config &config);
 };
 
 
@@ -206,7 +212,7 @@ WRITE8_MEMBER( snes_console_state::snes20_hi_w )
 	{ m_cartslot->chip_write(space, offset, data); return; }
 	else if (m_cartslot->get_type() == SNES_CX4
 				&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))    // hack until we emulate the real CPU
-	{ CX4_write(space.machine(), (offset & 0xffff) - 0x6000, data); return; }
+	{ CX4_write(machine(), (offset & 0xffff) - 0x6000, data); return; }
 	else if (m_type == SNES_SUFAMITURBO
 				&& address >= 0x8000 && ((offset >= 0x600000 && offset < 0x640000) || (offset >= 0x700000 && offset < 0x740000)))
 	{ m_cartslot->write_h(space, offset, data); return; }
@@ -1163,8 +1169,8 @@ SNESCTRL_GUNLATCH_CB(snes_console_state::gun_latch_cb)
 
 	if (y < 0)
 		y = 0;
-	if (y > (m_ppu->m_beam.last_visible_line - 1))
-		y = m_ppu->m_beam.last_visible_line - 1;
+	if (y > (m_ppu->last_visible_line() - 1))
+		y = m_ppu->last_visible_line() - 1;
 
 //  m_ppu->set_latch_hv(x, y);  // it would be more accurate to write twice to WRIO register, first with bit7 = 0 and then with bit7 = 1
 	m_ppu->set_latch_hv(m_ppu->current_x(), m_ppu->current_y());
@@ -1174,7 +1180,7 @@ SNESCTRL_ONSCREEN_CB(snes_console_state::onscreen_cb)
 {
 	// these are the theoretical boundaries, but we currently are always onscreen due to the
 	// way IPT_LIGHTGUNs work... investigate more on this!
-	if (x < 0 || x >= SNES_SCR_WIDTH || y < 0 || y >= m_ppu->m_beam.last_visible_line)
+	if (x < 0 || x >= SNES_SCR_WIDTH || y < 0 || y >= m_ppu->last_visible_line())
 		return false;
 	else
 		return true;
@@ -1321,13 +1327,14 @@ void snes_console_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( snes, snes_console_state )
+MACHINE_CONFIG_START(snes_console_state::snes)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68 MHz, also 3.58 MHz */
 	MCFG_CPU_PROGRAM_MAP(snes_map)
 
-	MCFG_CPU_ADD("soundcpu", SPC700, 1024000)   /* 1.024 MHz */
+	// runs at 24.576 MHz / 12 = 2.048 MHz
+	MCFG_CPU_ADD("soundcpu", SPC700, XTAL_24_576MHz / 12)
 	MCFG_CPU_PROGRAM_MAP(spc_map)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(48000))
@@ -1360,7 +1367,7 @@ static MACHINE_CONFIG_START( snes, snes_console_state )
 	MCFG_SOFTWARE_LIST_ADD("st_list","snes_strom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( snespal, snes )
+MACHINE_CONFIG_DERIVED(snes_console_state::snespal, snes)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_CLOCK( MCLK_PAL )
 
@@ -1391,6 +1398,6 @@ ROM_END
  *
  *************************************/
 
-/*    YEAR  NAME       PARENT  COMPAT MACHINE    INPUT                 INIT  COMPANY     FULLNAME                                      FLAGS */
-CONS( 1989, snes,      0,      0,     snes,      snes, driver_device,  0,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-CONS( 1991, snespal,   snes,   0,     snespal,   snes, driver_device,  0,    "Nintendo", "Super Nintendo Entertainment System (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME       PARENT  COMPAT MACHINE    INPUT STATE                INIT  COMPANY     FULLNAME                                      FLAGS */
+CONS( 1989, snes,      0,      0,     snes,      snes, snes_console_state,  0,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+CONS( 1991, snespal,   snes,   0,     snespal,   snes, snes_console_state,  0,    "Nintendo", "Super Nintendo Entertainment System (PAL)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

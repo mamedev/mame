@@ -25,12 +25,17 @@
 ****************************************************************************/
 
 
+#include "emu.h"
 #include "includes/next.h"
-#include "formats/pc_dsk.h"
-#include "formats/mfi_dsk.h"
+
 #include "machine/nscsi_cd.h"
 #include "machine/nscsi_hd.h"
+#include "screen.h"
 #include "softlist.h"
+
+#include "formats/mfi_dsk.h"
+#include "formats/pc_dsk.h"
+
 
 uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -76,36 +81,18 @@ uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
-/* Dummy catcher for any unknown r/w */
-READ8_MEMBER( next_state::io_r )
-{
-	if(!space.debugger_access())
-		printf("io_r %08x (%08x)\n",offset+0x02000000, space.device().safe_pc());
-
-	if(offset == 0xc0)
-		return 0;
-
-	return 0xff;
-}
-
-WRITE8_MEMBER( next_state::io_w )
-{
-	if(!space.debugger_access())
-		printf("io_w %08x, %02x (%08x)\n",offset+0x02000000,data, space.device().safe_pc());
-}
-
 /* map ROM at 0x01000000-0x0101ffff? */
 READ32_MEMBER( next_state::rom_map_r )
 {
-	if(0 && !space.debugger_access())
-		printf("%08x ROM MAP?\n",space.device().safe_pc());
+	if(0 && !machine().side_effect_disabled())
+		printf("%08x ROM MAP?\n",maincpu->pc());
 	return 0x01000000;
 }
 
 READ32_MEMBER( next_state::scr2_r )
 {
-	if(0 && !space.debugger_access())
-		printf("%08x\n",space.device().safe_pc());
+	if(0 && !machine().side_effect_disabled())
+		printf("%08x\n",maincpu->pc());
 	/*
 	x--- ---- ---- ---- ---- ---- ---- ---- dsp reset
 	-x-- ---- ---- ---- ---- ---- ---- ---- dsp block end
@@ -141,8 +128,8 @@ READ32_MEMBER( next_state::scr2_r )
 
 WRITE32_MEMBER( next_state::scr2_w )
 {
-	if(0 && !space.debugger_access())
-		printf("scr2_w %08x (%08x)\n", data, space.device().safe_pc());
+	if(0 && !machine().side_effect_disabled())
+		printf("scr2_w %08x (%08x)\n", data, maincpu->pc());
 	COMBINE_DATA(&scr2);
 
 	rtc->ce_w(BIT(scr2, 8));
@@ -470,7 +457,7 @@ READ32_MEMBER( next_state::dma_regs_r)
 	}
 
 	const char *name = dma_name(slot);
-	logerror("dma_regs_r %s:%d %08x (%08x)\n", name, reg, res, space.device().safe_pc());
+	logerror("dma_regs_r %s:%d %08x (%08x)\n", name, reg, res, maincpu->pc());
 
 	return res;
 }
@@ -482,7 +469,7 @@ WRITE32_MEMBER( next_state::dma_regs_w)
 
 	const char *name = dma_name(slot);
 
-	logerror("dma_regs_w %s:%d %08x (%08x)\n", name, reg, data, space.device().safe_pc());
+	logerror("dma_regs_w %s:%d %08x (%08x)\n", name, reg, data, maincpu->pc());
 	switch(reg) {
 	case 0:
 		dma_slots[slot].start = data;
@@ -507,8 +494,8 @@ READ32_MEMBER( next_state::dma_ctrl_r)
 
 	const char *name = dma_name(slot);
 
-	if(space.device().safe_pc() != 0x409bb4e)
-		logerror("dma_ctrl_r %s:%d %02x (%08x)\n", name, reg, dma_slots[slot].state, space.device().safe_pc());
+	if(maincpu->pc() != 0x409bb4e)
+		logerror("dma_ctrl_r %s:%d %02x (%08x)\n", name, reg, dma_slots[slot].state, maincpu->pc());
 
 	return reg ? 0 : dma_slots[slot].state << 24;
 }
@@ -518,7 +505,7 @@ WRITE32_MEMBER( next_state::dma_ctrl_w)
 	int slot = offset >> 2;
 	int reg = offset & 3;
 	const char *name = dma_name(slot);
-	logerror("dma_ctrl_w %s:%d %08x @ %08x (%08x)\n", name, reg, data, mem_mask, space.device().safe_pc());
+	logerror("dma_ctrl_w %s:%d %08x @ %08x (%08x)\n", name, reg, data, mem_mask, maincpu->pc());
 	if(!reg) {
 		if(ACCESSING_BITS_16_23)
 			dma_do_ctrl_w(slot, data >> 16);
@@ -575,7 +562,7 @@ const int next_state::scsi_clocks[4] = { 10000000, 12000000, 20000000, 16000000 
 READ32_MEMBER( next_state::scsictrl_r )
 {
 	uint32_t res = (scsictrl << 24) | (scsistat << 16);
-	logerror("scsictrl_read %08x @ %08x (%08x)\n", res, mem_mask, space.device().safe_pc());
+	logerror("scsictrl_read %08x @ %08x (%08x)\n", res, mem_mask, maincpu->pc());
 	return res;
 }
 
@@ -595,11 +582,11 @@ WRITE32_MEMBER( next_state::scsictrl_w )
 				scsictrl & 0x04 ? " flush" : "",
 				scsictrl & 0x02 ? " reset" : "",
 				scsictrl & 0x01 ? "wd3392" : "ncr5390",
-				space.device().safe_pc());
+				maincpu->pc());
 	}
 	if(ACCESSING_BITS_16_23) {
 		scsistat = data >> 16;
-		logerror("SCSIstat %02x (%08x)\n", data, space.device().safe_pc());
+		logerror("SCSIstat %02x (%08x)\n", data, maincpu->pc());
 	}
 }
 
@@ -622,7 +609,7 @@ READ32_MEMBER( next_state::dsp_r)
 
 WRITE32_MEMBER( next_state::fdc_control_w )
 {
-	logerror("FDC write %02x (%08x)\n", data >> 24, space.device().safe_pc());
+	logerror("FDC write %02x (%08x)\n", data >> 24, maincpu->pc());
 }
 
 READ32_MEMBER( next_state::fdc_control_r )
@@ -661,14 +648,14 @@ READ32_MEMBER( next_state::fdc_control_r )
 
 READ32_MEMBER( next_state::phy_r )
 {
-	logerror("phy_r %d %08x (%08x)\n", offset, phy[offset], space.device().safe_pc());
+	logerror("phy_r %d %08x (%08x)\n", offset, phy[offset], maincpu->pc());
 	return phy[offset] | (0 << 24);
 }
 
 WRITE32_MEMBER( next_state::phy_w )
 {
 	COMBINE_DATA(phy+offset);
-	logerror("phy_w %d %08x (%08x)\n", offset, phy[offset], space.device().safe_pc());
+	logerror("phy_w %d %08x (%08x)\n", offset, phy[offset], maincpu->pc());
 }
 
 void next_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -895,13 +882,13 @@ void next_state::machine_reset()
 	dma_drq_w(4, true); // soundout
 }
 
-void next_state::vblank_w(screen_device &screen, bool vblank_state)
+WRITE_LINE_MEMBER(next_state::vblank_w)
 {
 	if(vbl_enabled) {
 		if(screen_color)
-			irq_set(13, vblank_state);
+			irq_set(13, state);
 		else
-			irq_set(5, vblank_state);
+			irq_set(5, state);
 	}
 }
 
@@ -1003,13 +990,16 @@ static SLOT_INTERFACE_START( next_scsi_devices )
 	SLOT_INTERFACE_INTERNAL("ncr5390", NCR5390)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( ncr5390 )
+void next_state::ncr5390(device_t *device)
+{
+	devcb_base *devcb;
+	(void)devcb;
 	MCFG_DEVICE_CLOCK(10000000)
 	MCFG_NCR5390_IRQ_HANDLER(DEVWRITELINE(":", next_state, scsi_irq))
 	MCFG_NCR5390_DRQ_HANDLER(DEVWRITELINE(":", next_state, scsi_drq))
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( next_base, next_state )
+MACHINE_CONFIG_START(next_state::next_base)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1018,7 +1008,7 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_SCREEN_UPDATE_DRIVER(next_state, screen_update)
 	MCFG_SCREEN_SIZE(1120, 900)
 	MCFG_SCREEN_VISIBLE_AREA(0, 1120-1, 0, 832-1)
-	MCFG_SCREEN_VBLANK_DRIVER(next_state, vblank_w)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(next_state, vblank_w))
 
 	// devices
 	MCFG_NSCSI_BUS_ADD("scsibus")
@@ -1050,12 +1040,12 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_NEXTMO_DRQ_CALLBACK(WRITELINE(next_state, mo_drq))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( next, next_base )
+MACHINE_CONFIG_DERIVED(next_state::next, next_base)
 	MCFG_CPU_ADD("maincpu", M68030, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(next_0b_m_nofdc_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( next_fdc_base, next_base )
+MACHINE_CONFIG_DERIVED(next_state::next_fdc_base, next_base)
 	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(next_state, fdc_irq))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(next_state, fdc_drq))
@@ -1065,39 +1055,39 @@ static MACHINE_CONFIG_DERIVED( next_fdc_base, next_base )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nexts, next_fdc_base )
+MACHINE_CONFIG_DERIVED(next_state::nexts, next_fdc_base)
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(next_0b_m_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nexts2, next_fdc_base )
+MACHINE_CONFIG_DERIVED(next_state::nexts2, next_fdc_base)
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(next_0b_m_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nextsc, next_fdc_base )
+MACHINE_CONFIG_DERIVED(next_state::nextsc, next_fdc_base)
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(next_2c_c_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nextst, next_fdc_base )
+MACHINE_CONFIG_DERIVED(next_state::nextst, next_fdc_base)
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_33MHz)
 	MCFG_CPU_PROGRAM_MAP(next_0b_m_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nextstc, next_fdc_base )
+MACHINE_CONFIG_DERIVED(next_state::nextstc, next_fdc_base)
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_33MHz)
 	MCFG_CPU_PROGRAM_MAP(next_0c_c_mem)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 624-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nextct, next_fdc_base )
+MACHINE_CONFIG_DERIVED(next_state::nextct, next_fdc_base)
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_33MHz)
 	MCFG_CPU_PROGRAM_MAP(next_0c_m_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nextctc, next_fdc_base )
+MACHINE_CONFIG_DERIVED(next_state::nextctc, next_fdc_base)
 	MCFG_CPU_ADD("maincpu", M68040, XTAL_33MHz)
 	MCFG_CPU_PROGRAM_MAP(next_0c_c_mem)
 	MCFG_SCREEN_MODIFY("screen")
@@ -1211,12 +1201,12 @@ DRIVER_INIT_MEMBER(next_state,nextctc)
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                 FULLNAME                      FLAGS */
-COMP( 1987, next,    0,      0,       next,      next, next_state,    next,    "Next Software Inc",   "NeXT Cube",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nexts,   0,      0,       nexts,     next, next_state,    nexts,   "Next Software Inc",   "NeXTstation",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nexts2,  nexts,  0,       nexts2,    next, next_state,    nexts2,  "Next Software Inc",   "NeXTstation (X15 variant)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nextsc,  nexts,  0,       nextsc,    next, next_state,    nextsc,  "Next Software Inc",   "NeXTstation color",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nextst,  0,      0,       nextst,    next, next_state,    nextst,  "Next Software Inc",   "NeXTstation turbo",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1990, nextstc, nextst, 0,       nextstc,   next, next_state,    nextstc, "Next Software Inc",   "NeXTstation turbo color",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( ????, nextct,  nextst, 0,       nextct,    next, next_state,    nextct,  "Next Software Inc",   "NeXT Cube turbo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( ????, nextctc, nextst, 0,       nextctc,   next, next_state,    nextctc, "Next Software Inc",   "NeXT Cube turbo color",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+//    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT STATE         INIT     COMPANY                FULLNAME                      FLAGS
+COMP( 1987, next,    0,      0,       next,      next, next_state,   next,    "Next Software Inc",   "NeXT Cube",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nexts,   0,      0,       nexts,     next, next_state,   nexts,   "Next Software Inc",   "NeXTstation",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nexts2,  nexts,  0,       nexts2,    next, next_state,   nexts2,  "Next Software Inc",   "NeXTstation (X15 variant)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextsc,  nexts,  0,       nextsc,    next, next_state,   nextsc,  "Next Software Inc",   "NeXTstation color",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextst,  0,      0,       nextst,    next, next_state,   nextst,  "Next Software Inc",   "NeXTstation turbo",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1990, nextstc, nextst, 0,       nextstc,   next, next_state,   nextstc, "Next Software Inc",   "NeXTstation turbo color",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( ????, nextct,  nextst, 0,       nextct,    next, next_state,   nextct,  "Next Software Inc",   "NeXT Cube turbo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( ????, nextctc, nextst, 0,       nextctc,   next, next_state,   nextctc, "Next Software Inc",   "NeXT Cube turbo color",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -15,11 +15,14 @@
 
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/seicop.h"
 #include "sound/okim6295.h"
-#include "machine/gen_latch.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MAIN_CLOCK XTAL_8MHz
 
@@ -61,7 +64,6 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(okim_rombank_w);
-	DECLARE_WRITE8_MEMBER(sound_cmd_w);
 	DECLARE_WRITE16_MEMBER(vram_sc0_w);
 	DECLARE_WRITE16_MEMBER(vram_sc1_w);
 	DECLARE_WRITE16_MEMBER(vram_sc2_w);
@@ -71,6 +73,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_sc2_tileinfo);
 	TILE_GET_INFO_MEMBER(get_sc3_tileinfo);
 
+	void cupsocbl(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -292,12 +295,6 @@ uint32_t seicupbl_state::screen_update( screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-WRITE8_MEMBER(seicupbl_state::sound_cmd_w)
-{
-	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
-}
-
 WRITE16_MEMBER(seicupbl_state::vram_sc0_w)
 {
 	COMBINE_DATA(&m_back_data[offset]);
@@ -332,12 +329,12 @@ static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, seicupbl_state )
 	AM_RANGE(0x100708, 0x100709) AM_READ_PORT("PLAYERS34")
 	AM_RANGE(0x10070c, 0x10070d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x10071c, 0x10071d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100740, 0x100741) AM_WRITE8(sound_cmd_w,0x00ff)
+	AM_RANGE(0x100740, 0x100741) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(vram_sc0_w) AM_SHARE("back_data")
 	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(vram_sc2_w) AM_SHARE("fore_data")
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(vram_sc1_w) AM_SHARE("mid_data")
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(vram_sc3_w) AM_SHARE("textram")
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x104000, 0x106fff) AM_RAM
 	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x107800, 0x107fff) AM_RAM
@@ -536,7 +533,7 @@ static GFXDECODE_START( seicupbl_csb )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( cupsocbl, seicupbl_state )
+MACHINE_CONFIG_START(seicupbl_state::cupsocbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)
@@ -546,7 +543,6 @@ static MACHINE_CONFIG_START( cupsocbl, seicupbl_state )
 	MCFG_DEVICE_SEIBUCOP_BOOTLEG_ADD("seibucop_boot")
 
 	/*Different Sound hardware*/
-	//SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)
 	MCFG_CPU_PROGRAM_MAP(cupsocbl_sound_mem)
 	//MCFG_PERIODIC_INT("screen", nmi_line_pulse)
@@ -576,8 +572,9 @@ static MACHINE_CONFIG_START( cupsocbl, seicupbl_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1000000, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -684,8 +681,8 @@ ROM_END
 /* slight changes in the program roms compared to above set, all remaining roms were the same */
 ROM_START( cupsocsb2 )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "4", 0x00001, 0x80000, CRC(83db76f8) SHA1(ffcd0a728de58871b945c15cc27da374b587e170) )
-	ROM_LOAD16_BYTE( "5", 0x00000, 0x80000, CRC(c01e88c6) SHA1(8f90261792343c92ddd877ab8a2480b5aac82961) )
+	ROM_LOAD16_BYTE( "4", 0x00001, 0x80000, CRC(83db76f8) SHA1(ffcd0a728de58871b945c15cc27da374b587e170) ) // sldh
+	ROM_LOAD16_BYTE( "5", 0x00000, 0x80000, CRC(c01e88c6) SHA1(8f90261792343c92ddd877ab8a2480b5aac82961) ) // sldh
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code */
 	ROM_LOAD( "sc_01.bin",    0x000000, 0x08000, CRC(cea39d6d) SHA1(f0b79c03ffafdd1e57673d6d4836becbe415110b) )
@@ -806,6 +803,6 @@ ROM_START( cupsocsb3 )
 ROM_END
 
 
-GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc, driver_device,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocsb2,cupsoc,   cupsocbl, cupsoc, driver_device,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1992, cupsocsb3,cupsoc,   cupsocbl, cupsoc, driver_device,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc, seicupbl_state,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb2,cupsoc,   cupsocbl, cupsoc, seicupbl_state,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1992, cupsocsb3,cupsoc,   cupsocbl, cupsoc, seicupbl_state,  0,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

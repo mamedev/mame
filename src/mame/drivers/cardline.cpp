@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 
 /************************************
@@ -25,8 +25,11 @@
 #include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "cardline.lh"
+
 
 #define MASTER_CLOCK XTAL_12MHz
 
@@ -72,6 +75,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	void cardline(machine_config &config);
 };
 
 void cardline_state::machine_start()
@@ -310,7 +314,7 @@ PALETTE_INIT_MEMBER(cardline_state, cardline)
 	}
 }
 
-static MACHINE_CONFIG_START( cardline, cardline_state )
+MACHINE_CONFIG_START(cardline_state::cardline)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C32, MASTER_CLOCK)
@@ -346,7 +350,7 @@ static MACHINE_CONFIG_START( cardline, cardline_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -374,4 +378,4 @@ ROM_START( cardline )
 
 ROM_END
 
-GAME( 199?, cardline,  0,       cardline,  cardline, driver_device,  0, ROT0, "Veltmeijer", "Card Line" , MACHINE_SUPPORTS_SAVE)
+GAME( 199?, cardline,  0,       cardline,  cardline, cardline_state,  0, ROT0, "Veltmeijer", "Card Line" , MACHINE_SUPPORTS_SAVE)

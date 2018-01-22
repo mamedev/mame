@@ -127,15 +127,19 @@ Find lamps/reels after UPD changes.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "video/awpvid.h"
+
+#include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
-#include "machine/i8279.h"
 #include "machine/6821pia.h"
+#include "machine/i8279.h"
 #include "machine/mc68681.h"
-#include "sound/ym2413.h"
-#include "sound/upd7759.h"
 #include "machine/nvram.h"
+#include "sound/upd7759.h"
+#include "sound/ym2413.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -246,12 +250,13 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_maygayv1(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_maygayv1);
 	INTERRUPT_GEN_MEMBER(vsync_interrupt);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txa);
+	void maygayv1(machine_config &config);
 };
 
 
@@ -433,7 +438,7 @@ uint32_t maygayv1_state::screen_update_maygayv1(screen_device &screen, bitmap_in
 	return 0;
 }
 
-void maygayv1_state::screen_eof_maygayv1(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(maygayv1_state::screen_vblank_maygayv1)
 {
 	// rising edge
 	if (state)
@@ -860,7 +865,7 @@ INTERRUPT_GEN_MEMBER(maygayv1_state::vsync_interrupt)
 }
 
 
-static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
+MACHINE_CONFIG_START(maygayv1_state::maygayv1)
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", maygayv1_state,  vsync_interrupt)
@@ -888,12 +893,12 @@ static MACHINE_CONFIG_START( maygayv1, maygayv1_state )
 	MCFG_SCREEN_SIZE(640, 300)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 300 - 1)
 	MCFG_SCREEN_UPDATE_DRIVER(maygayv1_state, screen_update_maygayv1)
-	MCFG_SCREEN_VBLANK_DRIVER(maygayv1_state, screen_eof_maygayv1)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(maygayv1_state, screen_vblank_maygayv1))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 
-	MCFG_MC68681_ADD("duart68681", DUART_CLOCK)
+	MCFG_DEVICE_ADD("duart68681", MC68681, DUART_CLOCK)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(maygayv1_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(maygayv1_state, duart_txa))
 

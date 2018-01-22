@@ -72,6 +72,12 @@
 			scope = "config",
 		},
 
+		buildoptions_vala =
+		{
+			kind  = "list",
+			scope = "config",
+		},
+
 		clrreferences =
 		{
 			kind = "list",
@@ -127,6 +133,12 @@
 			scope = "config",
 		},
 
+		deploymode =
+		{
+			kind = "string",
+			scope = "config",
+		},
+
 		excludes =
 		{
 			kind  = "filelist",
@@ -176,6 +188,7 @@
 					EnableSSE2 = 1,
 					EnableAVX = 1,
 					EnableAVX2 = 1,
+					PedanticWarnings = 1,
 					ExtraWarnings = 1,
 					FatalWarnings = 1,
 					FloatFast = 1,
@@ -201,6 +214,7 @@
 					FastCall = 1,
 					StdCall = 1,
 					SingleOutputDir = 1,
+					ObjcARC = 1,
 					Optimize = 1,
 					OptimizeSize = 1,
 					OptimizeSpeed = 1,
@@ -329,6 +343,13 @@
 			usagecopy = true,
 		},
 
+		usingdirs =
+		{
+			kind  = "dirlist",
+			scope = "config",
+			usagecopy = true,
+		},
+
 		kind =
 		{
 			kind  = "string",
@@ -337,7 +358,8 @@
 				"ConsoleApp",
 				"WindowedApp",
 				"StaticLib",
-				"SharedLib"
+				"SharedLib",
+				"Bundle",
 			}
 		},
 
@@ -379,6 +401,7 @@
 				return value
 			end,
 			linkagecopy = true,
+			mergecopiestotail = true,
 		},
 
 		location =
@@ -526,6 +549,18 @@
 			scope = "config",
 		},
 
+		propertysheets =
+		{
+			kind  = "dirlist",
+			scope = "config",
+		},
+
+		pullmappingfile =
+		{
+			kind  = "path",
+			scope = "config",
+		},
+
 		resdefines =
 		{
 			kind  = "list",
@@ -539,6 +574,12 @@
 		},
 
 		resoptions =
+		{
+			kind  = "list",
+			scope = "config",
+		},
+
+		sdkreferences =
 		{
 			kind  = "list",
 			scope = "config",
@@ -617,6 +658,12 @@
 		uses =
 		{
 			kind  = "list",
+			scope = "config",
+		},
+
+		vapidirs =
+		{
+			kind  = "dirlist",
 			scope = "config",
 		},
 
@@ -1045,10 +1092,17 @@
 		table.insert(sln.groups, group)
 		sln.groups[inpath] = group
 
+		-- add to the parent's child list
+		if parent ~= nil then
+			table.insert(parent.groups, group)
+		end
+
 		group.solution = sln
 		group.name = name
 		group.uuid = os.uuid(curpath)
 		group.parent = parent
+		group.projects = { }
+		group.groups = { }
 		return group
 	end
 
@@ -1117,6 +1171,9 @@
 
 		local group = creategroupsfrompath(premake.CurrentGroup, sln)
 
+		if group ~= nil then
+			table.insert(group.projects, prj)
+		end
 
 		prj.solution       = sln
 		prj.name           = name

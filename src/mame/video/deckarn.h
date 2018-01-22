@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail,David Haywood
+#ifndef MAME_VIDEO_DECKARN_H
+#define MAME_VIDEO_DECKARN_H
+
+#pragma once
 
 
 class deco_karnovsprites_device : public device_t
@@ -22,10 +26,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
-extern const device_type DECO_KARNOVSPRITES;
+DECLARE_DEVICE_TYPE(DECO_KARNOVSPRITES, deco_karnovsprites_device)
 
 #define MCFG_DECO_KARNOVSPRITES_GFXDECODE(_gfxtag) \
 	deco_karnovsprites_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
 #define MCFG_DECO_KARNOVSPRITES_GFX_REGION(_region) \
 	deco_karnovsprites_device::set_gfx_region(*device, _region);
+
+#endif // MAME_VIDEO_DECKARN_H

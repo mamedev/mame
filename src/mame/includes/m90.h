@@ -35,7 +35,6 @@ public:
 	uint8_t m_last_pf2;
 	DECLARE_WRITE16_MEMBER(m90_coincounter_w);
 	DECLARE_WRITE16_MEMBER(quizf1_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(dynablsb_sound_command_w);
 	DECLARE_WRITE16_MEMBER(m90_video_control_w);
 	DECLARE_WRITE16_MEMBER(m90_video_w);
 	DECLARE_DRIVER_INIT(bomblord);
@@ -71,4 +70,14 @@ public:
 	void bomblord_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void dynablsb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void markdirty(tilemap_t *tmap,int page,offs_t offset);
+	void m90(machine_config &config);
+	void bbmanw(machine_config &config);
+	void hasamu(machine_config &config);
+	void bombrman(machine_config &config);
+	void riskchal(machine_config &config);
+	void bomblord(machine_config &config);
+	void bbmanwj(machine_config &config);
+	void dynablsb(machine_config &config);
+	void matchit2(machine_config &config);
+	void quizf1(machine_config &config);
 };

@@ -28,6 +28,7 @@
 #include "includes/neogeo.h"
 #include "machine/nvram.h"
 #include "imagedev/chd_cd.h"
+#include "machine/74259.h"
 #include "machine/megacdcd.h"
 #include "softlist.h"
 
@@ -132,6 +133,7 @@ public:
 	IRQ_CALLBACK_MEMBER(neocd_int_callback);
 
 	std::unique_ptr<uint8_t[]> m_meminternal_data;
+	void neocd(machine_config &config);
 protected:
 
 	int32_t SekIdle(int32_t nCycles);
@@ -281,7 +283,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 		case 0x0126:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD Z80 BUSREQ -> 1 (PC: 0x%06X)\n"), SekGetPC(-1));
 			m_has_z80_bus = false;
-			space.machine().scheduler().synchronize();
+			machine().scheduler().synchronize();
 			m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 			break;
 		case 0x0128:
@@ -300,7 +302,7 @@ WRITE16_MEMBER(ngcd_state::neocd_control_w)
 		case 0x0146:
 //          bprintf(PRINT_NORMAL, _T("  - NGCD Z80 BUSREQ -> 0 (PC: 0x%06X)\n"), SekGetPC(-1));
 			m_has_z80_bus = true;
-			space.machine().scheduler().synchronize();
+			machine().scheduler().synchronize();
 			m_audiocpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			break;
 		case 0x0148:
@@ -895,7 +897,7 @@ static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ngcd_state )
 	AM_RANGE(0x360000, 0x37ffff) AM_READ(unmapped_r)
 	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ(aes_in2_r)
 	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE8(io_control_w, 0x00ff)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(unmapped_r) AM_WRITE8(system_control_w, 0x00ff)
+	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(unmapped_r) AM_DEVWRITE8("systemlatch", hc259_device, write_a3, 0x00ff)
 	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ(video_register_r)
 	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE(video_register_w)
 	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(unmapped_r)
@@ -1036,7 +1038,7 @@ uint32_t ngcd_state::screen_update_neocd(screen_device &screen, bitmap_rgb32 &bi
 }
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( neocd, neogeo_base, ngcd_state )
+MACHINE_CONFIG_DERIVED(ngcd_state::neocd, neogeo_base)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_main_map)
@@ -1045,6 +1047,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( neocd, neogeo_base, ngcd_state )
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(neocd_audio_map)
 	MCFG_CPU_IO_MAP(neocd_audio_io_map)
+
+	MCFG_DEVICE_MODIFY("systemlatch")
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(LOGGER("NeoCD: write to regular vector change address?")) // what IS going on with "neocdz doubledr" and why do games write here if it's hooked up to nothing?
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(ngcd_state, screen_update_neocd)
@@ -1073,16 +1078,18 @@ MACHINE_CONFIG_END
 
 /*************************************
  *
- *  Driver initalization
+ *  Driver initialization
  *
  *************************************/
 
 ROM_START( neocd )
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
-	ROM_SYSTEM_BIOS( 0, "top",   "Top loading NeoGeo CD" )
+	ROM_SYSTEM_BIOS( 0, "top",   "Top loading Neo-Geo CD" )
 	ROMX_LOAD( "top-sp1.bin",    0x00000, 0x80000, CRC(c36a47c0) SHA1(235f4d1d74364415910f73c10ae5482d90b4274f), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "front",   "Front loading NeoGeo CD" )
+	ROM_SYSTEM_BIOS( 1, "front",   "Front loading Neo-Geo CD" )
 	ROMX_LOAD( "front-sp1.bin",    0x00000, 0x80000, CRC(cac62307) SHA1(53bc1f283cdf00fa2efbb79f2e36d4c8038d743a), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
+	ROM_SYSTEM_BIOS( 2, "unibios32", "Universe Bios (Hack, Ver. 3.2)" )
+	ROMX_LOAD( "uni-bioscd.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(3))
 
 	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF )
 	/* 1MB of Sound RAM */
@@ -1105,7 +1112,10 @@ ROM_END
 
 ROM_START( neocdz )
 	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
-	ROM_LOAD16_WORD_SWAP( "neocd.bin",    0x00000, 0x80000, CRC(df9de490) SHA1(7bb26d1e5d1e930515219cb18bcde5b7b23e2eda) )
+	ROM_SYSTEM_BIOS( 0, "official",   "Official BIOS" )
+	ROMX_LOAD( "neocd.bin",    0x00000, 0x80000, CRC(df9de490) SHA1(7bb26d1e5d1e930515219cb18bcde5b7b23e2eda), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "unibios32", "Universe Bios (Hack, Ver. 3.2)" )
+	ROMX_LOAD( "uni-bioscd.rom",    0x00000, 0x80000, CRC(0ffb3127) SHA1(5158b728e62b391fb69493743dcf7abbc62abc82), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2))
 
 	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF )
 	/* 1MB of Sound RAM */
@@ -1139,9 +1149,8 @@ DRIVER_INIT_MEMBER(ngcd_state,neocdzj)
 }
 
 
-/*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */
-CONS( 1996, neocdz,  0,      0,   neocd, neocd, ngcd_state,  neocdz,  "SNK", "Neo-Geo CDZ (US)", 0 ) // the CDZ is the newer model
-CONS( 1996, neocdzj, neocdz, 0,   neocd, neocd, ngcd_state,  neocdzj,  "SNK", "Neo-Geo CDZ (Japan)", 0 )
+//    YEAR  NAME     PARENT  COMPAT MACHINE INPUT  STATE       INIT     COMPANY FULLNAME               FLAGS */
+CONS( 1996, neocdz,  0,      0,     neocd,  neocd, ngcd_state, neocdz,  "SNK",  "Neo-Geo CDZ (US)",    0 ) // the CDZ is the newer model
+CONS( 1996, neocdzj, neocdz, 0,     neocd,  neocd, ngcd_state, neocdzj, "SNK",  "Neo-Geo CDZ (Japan)", 0 )
 
-
-CONS( 1994, neocd,   neocdz, 0,   neocd, neocd, driver_device,  0,  "SNK", "Neo-Geo CD", MACHINE_NOT_WORKING ) // older  model, ignores disc protections?
+CONS( 1994, neocd,   neocdz, 0,     neocd,  neocd, ngcd_state, 0,       "SNK",  "Neo-Geo CD",          MACHINE_NOT_WORKING ) // older  model, ignores disc protections?

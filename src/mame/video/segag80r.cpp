@@ -39,7 +39,7 @@ void segag80r_state::vblank_latch_set()
 	/* set a timer to mimic the 555 timer that drives the EDGINT signal */
 	/* the 555 is run in monostable mode with R=56000 and C=1000pF */
 	m_vblank_latch = 1;
-	timer_set(PERIOD_OF_555_MONOSTABLE(CAP_P(1000), RES_K(56)), TIMER_VBLANK_LATCH_CLEAR);
+	m_vblank_latch_clear_timer->adjust(PERIOD_OF_555_MONOSTABLE(CAP_P(1000), RES_K(56)));
 
 	/* latch the current flip state at the same time */
 	m_video_flip = m_video_control & 1;
@@ -52,7 +52,14 @@ INTERRUPT_GEN_MEMBER(segag80r_state::segag80r_vblank_start)
 
 	/* if interrupts are enabled, clock one */
 	if (m_video_control & 0x04)
-		irq0_line_hold(device);
+		device.execute().set_input_line(0, ASSERT_LINE);
+}
+
+
+IRQ_CALLBACK_MEMBER(segag80r_state::segag80r_irq_ack)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return 0xff;
 }
 
 
@@ -63,7 +70,7 @@ INTERRUPT_GEN_MEMBER(segag80r_state::sindbadm_vblank_start)
 	/* interrupts appear to always be enabled, but they have a manual */
 	/* acknowledge rather than an automatic ack; they are also not masked */
 	/* by bit 2 of video_control like a standard G80 */
-	irq0_line_assert(device);
+	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
@@ -287,7 +294,7 @@ READ8_MEMBER(segag80r_state::segag80r_video_port_r)
 {
 	if (offset == 0)
 	{
-		logerror("%04X:segag80r_video_port_r(%d)\n", space.device().safe_pc(), offset);
+		logerror("%04X:segag80r_video_port_r(%d)\n", m_maincpu->pc(), offset);
 		return 0xff;
 	}
 	else
@@ -307,7 +314,7 @@ WRITE8_MEMBER(segag80r_state::segag80r_video_port_w)
 {
 	if (offset == 0)
 	{
-		logerror("%04X:segag80r_video_port_w(%d) = %02X\n", space.device().safe_pc(), offset, data);
+		logerror("%04X:segag80r_video_port_w(%d) = %02X\n", m_maincpu->pc(), offset, data);
 	}
 	else
 	{

@@ -41,6 +41,7 @@
 
 #include "emu.h"
 #include "includes/lkage.h"
+#include "screen.h"
 
 
 WRITE8_MEMBER(lkage_state::lkage_videoram_w)

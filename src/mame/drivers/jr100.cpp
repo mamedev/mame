@@ -15,12 +15,15 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "machine/6522via.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
-#include "sound/speaker.h"
-#include "sound/beep.h"
 #include "imagedev/snapquik.h"
+#include "machine/6522via.h"
+#include "machine/timer.h"
+#include "sound/beep.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class jr100_state : public driver_device
@@ -69,6 +72,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER(jr100);
 
 
+	void jr100(machine_config &config);
 protected:
 	required_device<via6522_device> m_via;
 	required_device<cassette_image_device> m_cassette;
@@ -362,7 +366,7 @@ QUICKLOAD_LOAD_MEMBER( jr100_state,jr100)
 	return image_init_result::PASS;
 }
 
-static MACHINE_CONFIG_START( jr100, jr100_state )
+MACHINE_CONFIG_START(jr100_state::jr100)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6802, XTAL_14_31818MHz / 4) // clock devided internaly by 4
@@ -418,6 +422,6 @@ ROM_END
 
 /* Driver */
 
-/*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1981, jr100,  0,        0,    jr100,  jr100, driver_device,    0,       "National",   "JR-100",       0)
-COMP( 1981, jr100u, jr100,    0,    jr100,  jr100, driver_device,    0,       "Panasonic",   "JR-100U",     0)
+//    YEAR  NAME    PARENT    COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY      FULLNAME   FLAGS
+COMP( 1981, jr100,  0,        0,      jr100,   jr100, jr100_state, 0,     "National",  "JR-100",  0 )
+COMP( 1981, jr100u, jr100,    0,      jr100,   jr100, jr100_state, 0,     "Panasonic", "JR-100U", 0 )

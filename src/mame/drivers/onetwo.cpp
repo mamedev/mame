@@ -45,8 +45,10 @@ Note: this is quite clearly a 'Korean bootleg' of Shisensho - Joshiryo-Hen / Mat
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK        XTAL_4MHz
 
@@ -84,7 +86,6 @@ public:
 	DECLARE_WRITE8_MEMBER(onetwo_fgram_w);
 	DECLARE_WRITE8_MEMBER(onetwo_cpubank_w);
 	DECLARE_WRITE8_MEMBER(onetwo_coin_counters_w);
-	DECLARE_WRITE8_MEMBER(onetwo_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(palette1_w);
 	DECLARE_WRITE8_MEMBER(palette2_w);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -92,6 +93,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_color(int offset);
+	void onetwo(machine_config &config);
 };
 
 
@@ -147,12 +149,6 @@ WRITE8_MEMBER(onetwo_state::onetwo_coin_counters_w)
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));
 }
 
-WRITE8_MEMBER(onetwo_state::onetwo_soundlatch_w)
-{
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 void onetwo_state::set_color(int offset)
 {
 	int r, g, b;
@@ -193,7 +189,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_cpu_io, AS_IO, 8, onetwo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(onetwo_coin_counters_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2") AM_WRITE(onetwo_soundlatch_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1") AM_WRITE(onetwo_cpubank_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("SYSTEM")
@@ -210,7 +206,7 @@ static ADDRESS_MAP_START( sound_cpu_io, AS_IO, 8, onetwo_state )
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -353,7 +349,7 @@ void onetwo_state::machine_start()
 
 }
 
-static MACHINE_CONFIG_START( onetwo, onetwo_state )
+MACHINE_CONFIG_START(onetwo_state::onetwo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK)   /* 4 MHz */
@@ -384,12 +380,14 @@ static MACHINE_CONFIG_START( onetwo, onetwo_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, MASTER_CLOCK)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1056000*2, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000*2, PIN7_LOW) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -437,5 +435,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1997, onetwo,       0, onetwo, onetwo, driver_device, 0, ROT0, "Barko", "One + Two", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, onetwoe, onetwo, onetwo, onetwo, driver_device, 0, ROT0, "Barko", "One + Two (earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, onetwo,       0, onetwo, onetwo, onetwo_state, 0, ROT0, "Barko", "One + Two", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, onetwoe, onetwo, onetwo, onetwo, onetwo_state, 0, ROT0, "Barko", "One + Two (earlier)", MACHINE_SUPPORTS_SAVE )

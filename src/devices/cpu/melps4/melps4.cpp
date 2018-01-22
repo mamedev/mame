@@ -37,9 +37,36 @@
 
 */
 
+#include "emu.h"
 #include "melps4.h"
+#include "melps4d.h"
 #include "debugger.h"
 
+
+melps4_cpu_device::melps4_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, int d_pins, uint8_t sm_page, uint8_t int_page)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 16, prgwidth, -1, program)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, datawidth, 0, data)
+	, m_prgwidth(prgwidth)
+	, m_datawidth(datawidth)
+	, m_d_pins(d_pins)
+	, m_sm_page(sm_page)
+	, m_int_page(int_page)
+	, m_xami_mask(0xf)
+	, m_sp_mask(0x7<<4)
+	, m_ba_op(0x01)
+	, m_stack_levels(3)
+	, m_read_k(*this)
+	, m_read_d(*this)
+	, m_read_s(*this)
+	, m_read_f(*this)
+	, m_write_d(*this)
+	, m_write_s(*this)
+	, m_write_f(*this)
+	, m_write_g(*this)
+	, m_write_u(*this)
+	, m_write_t(*this)
+{ }
 
 // disasm
 void melps4_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -208,7 +235,13 @@ void melps4_cpu_device::device_start()
 	m_icountptr = &m_icount;
 }
 
-
+device_memory_interface::space_config_vector melps4_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -421,7 +454,7 @@ void melps4_cpu_device::execute_run()
 		// fetch next opcode
 		debugger_instruction_hook(this, m_pc);
 		m_icount--;
-		m_op = m_program->read_word(m_pc << 1) & 0x1ff;
+		m_op = m_program->read_word(m_pc) & 0x1ff;
 		m_bitmask = 1 << (m_op & 3);
 		m_pc = (m_pc & ~0x7f) | ((m_pc + 1) & 0x7f); // stays in the same page
 
@@ -438,4 +471,9 @@ void melps4_cpu_device::execute_run()
 		else
 			execute_one();
 	}
+}
+
+util::disasm_interface *melps4_cpu_device::create_disassembler()
+{
+	return new melps4_disassembler;
 }

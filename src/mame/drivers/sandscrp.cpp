@@ -83,6 +83,8 @@ Is there another alt program rom set labeled 9 & 10?
 #include "video/kan_pand.h"
 #include "machine/kaneko_hit.h"
 #include "video/kaneko_tmap.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class sandscrp_state : public driver_device
@@ -126,10 +128,11 @@ public:
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	void update_irq_state();
+	void sandscrp(machine_config &config);
 };
 
 
@@ -186,7 +189,7 @@ INTERRUPT_GEN_MEMBER(sandscrp_state::interrupt)
 }
 
 
-void sandscrp_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(sandscrp_state::screen_vblank)
 {
 	// rising edge
 	if (state)
@@ -266,7 +269,7 @@ WRITE16_MEMBER(sandscrp_state::soundlatch_word_w)
 		m_latch1_full = 1;
 		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		space.device().execute().spin_until_time(attotime::from_usec(100)); // Allow the other cpu to reply
+		m_maincpu->spin_until_time(attotime::from_usec(100)); // Allow the other cpu to reply
 	}
 }
 
@@ -279,7 +282,7 @@ static ADDRESS_MAP_START( sandscrp, AS_PROGRAM, 16, sandscrp_state )
 	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
 	AM_RANGE(0x400000, 0x403fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE("pandora", kaneko_pandora_device, spriteram_LSB_r, spriteram_LSB_w ) // sprites
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(coincounter_w)  // Coin Counters (Lockout unused)
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
@@ -468,7 +471,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
+MACHINE_CONFIG_START(sandscrp_state::sandscrp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,12000000)    /* TMP68HC000N-12 */
@@ -489,7 +492,7 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sandscrp_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(sandscrp_state, screen_eof)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(sandscrp_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", sandscrp)
@@ -513,7 +516,7 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_OKIM6295_ADD("oki", 12000000/6, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 12000000/6, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	/* YM3014B + YM2203C */
@@ -592,6 +595,6 @@ ROM_START( sandscrpb ) /* Different rev PCB */
 ROM_END
 
 
-GAME( 1992, sandscrp,  0,        sandscrp, sandscrp, driver_device, 0,          ROT90, "Face",   "Sand Scorpion", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sandscrpa, sandscrp, sandscrp, sandscrp, driver_device, 0,          ROT90, "Face",   "Sand Scorpion (Earlier)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, driver_device, 0,          ROT90, "Face",   "Sand Scorpion (Chinese Title Screen, Revised Hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sandscrp,  0,        sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sandscrpa, sandscrp, sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion (Earlier)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion (Chinese Title Screen, Revised Hardware)", MACHINE_SUPPORTS_SAVE )

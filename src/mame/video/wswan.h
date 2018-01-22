@@ -11,10 +11,11 @@
 
 **********************************************************************/
 
-#ifndef __WSWAN_VIDEO__
-#define __WSWAN_VIDEO__
+#ifndef MAME_VIDEO_WSWAN_H
+#define MAME_VIDEO_WSWAN_H
 
-#include "emu.h"
+#pragma once
+
 
 enum
 {
@@ -34,10 +35,10 @@ typedef device_delegate<void (void)> wswan_video_dmasnd_cb_delegate;
 #define WSWAN_VIDEO_DMASND_CB_MEMBER(_name)   void _name(void)
 
 #define MCFG_WSWAN_VIDEO_IRQ_CB(_class, _method) \
-	wswan_video_device::set_irq_callback(*device, wswan_video_irq_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	wswan_video_device::set_irq_callback(*device, wswan_video_irq_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_WSWAN_VIDEO_DMASND_CB(_class, _method) \
-	wswan_video_device::set_dmasnd_callback(*device, wswan_video_dmasnd_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	wswan_video_device::set_dmasnd_callback(*device, wswan_video_dmasnd_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_WSWAN_VIDEO_TYPE( _type) \
 	wswan_video_device::set_vdp_type(*device, _type);
@@ -143,7 +144,7 @@ protected:
 	static const uint8_t WSWAN_VIDEO_IFLAG_HBLTMR = 0x80;
 };
 
-extern const device_type WSWAN_VIDEO;
+DECLARE_DEVICE_TYPE(WSWAN_VIDEO, wswan_video_device)
 
 
-#endif
+#endif // MAME_VIDEO_WSWAN_H

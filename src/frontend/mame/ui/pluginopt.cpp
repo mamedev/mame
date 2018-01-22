@@ -34,7 +34,7 @@ menu_plugin::menu_plugin(mame_ui_manager &mui, render_container &container) :
 {
 }
 
-void menu_plugin::populate()
+void menu_plugin::populate(float &customtop, float &custombottom)
 {
 	for (auto &curplugin : m_plugins)
 		item_append(curplugin, "", 0, (void *)curplugin.c_str());
@@ -104,7 +104,7 @@ void menu_plugin_opt::handle()
 	}
 }
 
-void menu_plugin_opt::populate()
+void menu_plugin_opt::populate(float &customtop, float &custombottom)
 {
 	std::vector<std::tuple<std::string, std::string, std::string>> menu_list;
 	mame_machine_manager::instance()->lua()->menu_populate(m_menu, menu_list);

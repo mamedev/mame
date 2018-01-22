@@ -8,11 +8,11 @@
 void konami_decode_gfx(device_gfx_interface &gfxdecode, int gfx_index, uint8_t *data, uint32_t total, const gfx_layout *layout, int bpp)
 {
 	gfx_layout gl;
-	palette_device &palette = gfxdecode.palette();
+	device_palette_interface &palette = gfxdecode.palette();
 
 	memcpy(&gl, layout, sizeof(gl));
 	gl.total = total;
-	gfxdecode.set_gfx(gfx_index, std::make_unique<gfx_element>(palette, gl, data, 0, palette.entries() >> bpp, 0));
+	gfxdecode.set_gfx(gfx_index, std::make_unique<gfx_element>(&palette, gl, data, 0, palette.entries() >> bpp, 0));
 }
 
 

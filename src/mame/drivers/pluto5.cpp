@@ -179,6 +179,7 @@
 
 #include "emu.h"
 #include "machine/68340.h"
+#include "speaker.h"
 
 class pluto5_state : public driver_device
 {
@@ -194,10 +195,11 @@ public:
 	DECLARE_READ32_MEMBER(pluto5_mem_r);
 	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
 
+	void pluto5(machine_config &config);
 protected:
 
 	// devices
-	required_device<m68340cpu_device> m_maincpu;
+	required_device<m68340_cpu_device> m_maincpu;
 public:
 	DECLARE_DRIVER_INIT(hb);
 	virtual void machine_start() override;
@@ -205,7 +207,7 @@ public:
 
 READ32_MEMBER(pluto5_state::pluto5_mem_r)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
@@ -223,7 +225,7 @@ READ32_MEMBER(pluto5_state::pluto5_mem_r)
 
 WRITE32_MEMBER(pluto5_state::pluto5_mem_w)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
@@ -250,7 +252,7 @@ void pluto5_state::machine_start()
 
 }
 
-static MACHINE_CONFIG_START( pluto5, pluto5_state )
+MACHINE_CONFIG_START(pluto5_state::pluto5)
 	MCFG_CPU_ADD("maincpu", M68340, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pluto5_map)
 

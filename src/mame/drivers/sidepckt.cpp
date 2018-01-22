@@ -15,7 +15,7 @@ i8751 protection simulation and other fixes by Bryan McPhail, 15/10/00.
 
 
 ToDo:
- support screen flipping for sprites
+- sidepcktj: Intermission screen's background for player 2 is completely screwed (Maybe wrong/missing I8751 simulation for "cocktail mode" ?)
 
 
 Stephh's notes (based on the games M6809 code and some tests) :
@@ -123,14 +123,24 @@ Stephh's notes (based on the games M6809 code and some tests) :
       * Lives settings (table at 0x4696) : 06 03 02 instead of 06 03 09
       * Timer settings (table at 0x9d99) : 30 20 18 instead of 40 30 20, so the timer is faster
 
+Additional notes:
+----------------
+- sidepckt and sidepcktb don't have cocktail mode at all, while sidepcktj has a 'cooperative' cocktail mode; when it's the p2 turn,
+  the screen scrolls and a 'flipped score area' is shown on the other side, so the 2nd player just continues the same game.
+  Note that the screen never flips in any case.
+
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/sidepckt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
-#include "includes/sidepckt.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 // protection tables
 static const uint8_t sidepckt_prot_table_1[0x10]={0x05,0x03,0x02,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
@@ -141,12 +151,6 @@ static const uint8_t sidepcktj_prot_table_1[0x10]={0x05,0x03,0x00,0xff,0xff,0xff
 static const uint8_t sidepcktj_prot_table_2[0x10]={0x8e,0x42,0xb2,0x58,0xec,0x85,0xdd,0x4c,0xad,0x9f,0x00,0x4c,0x7e,0x42,0xa7,0xff};
 static const uint8_t sidepcktj_prot_table_3[0x10]={0xbd,0x71,0xc8,0xbd,0x71,0xef,0xbd,0x72,0x28,0x7e,0x70,0x9e,0xff,0xff,0xff,0xff};
 
-
-WRITE8_MEMBER(sidepckt_state::sound_cpu_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
 
 READ8_MEMBER(sidepckt_state::i8751_r)
 {
@@ -195,18 +199,16 @@ WRITE8_MEMBER(sidepckt_state::i8751_w)
 
 static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8, sidepckt_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM // ???
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM // ???
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x400) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x400) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2100, 0x24ff) AM_RAM // ???
+	AM_RANGE(0x2100, 0x24ff) AM_WRITENOP // ??? (Unused spriteram? The game writes some values at boot, but never read)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("P1")
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3004, 0x3004) AM_WRITE(sound_cpu_command_w)
-	AM_RANGE(0x300c, 0x300c) AM_READNOP AM_WRITE(flipscreen_w)
+	AM_RANGE(0x3004, 0x3004) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x300c, 0x300c) AM_READWRITE(scroll_y_r, scroll_y_w)
 	AM_RANGE(0x3014, 0x3014) AM_READ(i8751_r)
 	AM_RANGE(0x3018, 0x3018) AM_WRITE(i8751_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -356,14 +358,15 @@ GFXDECODE_END
 
 void sidepckt_state::machine_reset()
 {
-	m_i8751_return = 0;
-	m_current_ptr = 0;
+	m_i8751_return  = 0;
+	m_current_ptr   = 0;
 	m_current_table = 0;
-	m_in_math = 0;
-	m_math_param = 0;
+	m_in_math       = 0;
+	m_math_param    = 0;
+	m_scroll_y      = 0;
 }
 
-static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
+MACHINE_CONFIG_START(sidepckt_state::sidepckt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000) /* 2 MHz */
@@ -390,6 +393,7 @@ static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -399,7 +403,7 @@ static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sidepcktb, sidepckt )
+MACHINE_CONFIG_DERIVED(sidepckt_state::sidepcktb, sidepckt)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -498,6 +502,7 @@ DRIVER_INIT_MEMBER(sidepckt_state,sidepckt)
 	save_item(NAME(m_current_table));
 	save_item(NAME(m_in_math));
 	save_item(NAME(m_math_param));
+	save_item(NAME(m_scroll_y));
 }
 
 DRIVER_INIT_MEMBER(sidepckt_state,sidepcktj)
@@ -511,9 +516,10 @@ DRIVER_INIT_MEMBER(sidepckt_state,sidepcktj)
 	save_item(NAME(m_current_table));
 	save_item(NAME(m_in_math));
 	save_item(NAME(m_math_param));
+	save_item(NAME(m_scroll_y));
 }
 
 
-GAME( 1986, sidepckt,  0,        sidepckt,  sidepckt,  sidepckt_state, sidepckt,  ROT0, "Data East Corporation", "Side Pocket (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidepcktj, sidepckt, sidepckt,  sidepcktj, sidepckt_state, sidepcktj, ROT0, "Data East Corporation", "Side Pocket (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, driver_device,  0,         ROT0, "bootleg", "Side Pocket (bootleg)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepckt,  0,        sidepckt,  sidepckt,  sidepckt_state, sidepckt,  ROT0, "Data East Corporation", "Side Pocket (World)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepcktj, sidepckt, sidepckt,  sidepcktj, sidepckt_state, sidepcktj, ROT0, "Data East Corporation", "Side Pocket (Japan)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sidepcktb, sidepckt, sidepcktb, sidepcktb, sidepckt_state, 0,         ROT0, "bootleg",               "Side Pocket (bootleg)", MACHINE_SUPPORTS_SAVE )

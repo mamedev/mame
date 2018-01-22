@@ -20,19 +20,27 @@
 #include "emu.h"
 #include "rf5c400.h"
 
-static int volume_table[256];
-static double pan_table[0x64];
+namespace {
 
-/* envelope parameter (experimental) */
-#define ENV_AR_SPEED        0.1
-#define ENV_MIN_AR          0x02
-#define ENV_MAX_AR          0x80
-#define ENV_DR_SPEED        2.0
-#define ENV_MIN_DR          0x20
-#define ENV_MAX_DR          0x73
-#define ENV_RR_SPEED        0.7
-#define ENV_MIN_RR          0x20
-#define ENV_MAX_RR          0x54
+int volume_table[256];
+double pan_table[0x64];
+
+void init_static_tables()
+{
+	// init volume/pan tables
+	double max = 255.0;
+	for (int i = 0; i < 256; i++) {
+		volume_table[i] = uint16_t(max);
+		max /= pow(10.0, double((4.5 / (256.0 / 16.0)) / 20));
+	}
+	for (int i = 0; i < 0x48; i++) {
+		pan_table[i] = sqrt(double(0x47 - i)) / sqrt(double(0x47));
+	}
+	for (int i = 0x48; i < 0x64; i++) {
+		pan_table[i] = 0.0;
+	}
+}
+
 
 /* PCM type */
 enum
@@ -52,9 +60,62 @@ enum
 	PHASE_RELEASE
 };
 
+} // anonymous namespace
+
 
 // device type definition
-const device_type RF5C400 = &device_creator<rf5c400_device>;
+DEFINE_DEVICE_TYPE(RF5C400, rf5c400_device, "rf5c400", "Ricoh RF5C400")
+
+
+rf5c400_device::envelope_tables::envelope_tables()
+{
+	std::fill(std::begin(m_ar), std::end(m_ar), 0.0);
+	std::fill(std::begin(m_dr), std::end(m_dr), 0.0);
+	std::fill(std::begin(m_rr), std::end(m_rr), 0.0);
+}
+
+void rf5c400_device::envelope_tables::init(uint32_t clock)
+{
+	/* envelope parameter (experimental) */
+	static constexpr double ENV_AR_SPEED    = 0.1;
+	static constexpr int    ENV_MIN_AR      = 0x02;
+	static constexpr int    ENV_MAX_AR      = 0x80;
+	static constexpr double ENV_DR_SPEED    = 2.0;
+	static constexpr int    ENV_MIN_DR      = 0x20;
+	static constexpr int    ENV_MAX_DR      = 0x73;
+	static constexpr double ENV_RR_SPEED    = 0.7;
+	static constexpr int    ENV_MIN_RR      = 0x20;
+	static constexpr int    ENV_MAX_RR      = 0x54;
+
+	double r;
+
+	// attack
+	r = 1.0 / (ENV_AR_SPEED * (clock / 384));
+	for (int i = 0; i < ENV_MIN_AR; i++)
+		m_ar[i] = 1.0;
+	for (int i = ENV_MIN_AR; i < ENV_MAX_AR; i++)
+		m_ar[i] = r * (ENV_MAX_AR - i) / (ENV_MAX_AR - ENV_MIN_AR);
+	for (int i = ENV_MAX_AR; i < 0x9f; i++)
+		m_ar[i] = 0.0;
+
+	// decay
+	r = -5.0 / (ENV_DR_SPEED * (clock / 384));
+	for (int i = 0; i < ENV_MIN_DR; i++)
+		m_dr[i] = r;
+	for (int i = ENV_MIN_DR; i < ENV_MAX_DR; i++)
+		m_dr[i] = r * (ENV_MAX_DR - i) / (ENV_MAX_DR - ENV_MIN_DR);
+	for (int i = ENV_MAX_DR; i < 0x9f; i++)
+		m_dr[i] = 0.0;
+
+	// release
+	r = -5.0 / (ENV_RR_SPEED * (clock / 384));
+	for (int i = 0; i < ENV_MIN_RR; i++)
+		m_rr[i] = r;
+	for (int i = ENV_MIN_RR; i < ENV_MAX_RR; i++)
+		m_rr[i] = r * (ENV_MAX_RR - i) / (ENV_MAX_RR - ENV_MIN_RR);
+	for (int i = ENV_MAX_RR; i < 0x9f; i++)
+		m_rr[i] = 0.0;
+}
 
 
 //**************************************************************************
@@ -66,14 +127,12 @@ const device_type RF5C400 = &device_creator<rf5c400_device>;
 //-------------------------------------------------
 
 rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RF5C400, "RF5C400", tag, owner, clock, "rf5c400", __FILE__),
-		device_sound_interface(mconfig, *this),
-		m_rom(*this, DEVICE_SELF),
-		m_stream(nullptr)
+	: device_t(mconfig, RF5C400, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 25, ENDIANNESS_LITTLE, 16)
+	, m_stream(nullptr)
+	, m_env_tables()
 {
-	memset(m_env_ar_table, 0, sizeof(double)*0x9f);
-	memset(m_env_dr_table, 0, sizeof(double)*0x9f);
-	memset(m_env_rr_table, 0, sizeof(double)*0x9f);
 }
 
 
@@ -84,7 +143,47 @@ rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, d
 
 void rf5c400_device::device_start()
 {
-	rf5c400_init_chip();
+	init_static_tables();
+	m_env_tables.init(clock());
+
+	// init channel info
+	for (rf5c400_channel &chan : m_channels)
+	{
+		chan.env_phase = PHASE_NONE;
+		chan.env_level = 0.0;
+		chan.env_step = 0.0;
+		chan.env_scale = 1.0;
+	}
+
+	save_item(NAME(m_rf5c400_status));
+	save_item(NAME(m_ext_mem_address));
+	save_item(NAME(m_ext_mem_data));
+
+	for (int i = 0; i < ARRAY_LENGTH(m_channels); i++)
+	{
+		save_item(NAME(m_channels[i].startH), i);
+		save_item(NAME(m_channels[i].startL), i);
+		save_item(NAME(m_channels[i].freq), i);
+		save_item(NAME(m_channels[i].endL), i);
+		save_item(NAME(m_channels[i].endHloopH), i);
+		save_item(NAME(m_channels[i].loopL), i);
+		save_item(NAME(m_channels[i].pan), i);
+		save_item(NAME(m_channels[i].effect), i);
+		save_item(NAME(m_channels[i].volume), i);
+		save_item(NAME(m_channels[i].attack), i);
+		save_item(NAME(m_channels[i].decay), i);
+		save_item(NAME(m_channels[i].release), i);
+		save_item(NAME(m_channels[i].cutoff), i);
+		save_item(NAME(m_channels[i].pos), i);
+		save_item(NAME(m_channels[i].step), i);
+		save_item(NAME(m_channels[i].keyon), i);
+		save_item(NAME(m_channels[i].env_phase), i);
+		save_item(NAME(m_channels[i].env_level), i);
+		save_item(NAME(m_channels[i].env_step), i);
+		save_item(NAME(m_channels[i].env_scale), i);
+	}
+
+	m_stream = stream_alloc(0, 2, clock() / 384);
 }
 
 //-------------------------------------------------
@@ -94,7 +193,6 @@ void rf5c400_device::device_start()
 void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	int i, ch;
-	int16_t *rom = m_rom;
 	uint32_t end, loop;
 	uint64_t pos;
 	uint8_t vol, lvol, rvol, type;
@@ -131,7 +229,7 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 			if (env_phase == PHASE_NONE) break;
 
-			tmp = rom[(pos>>16) & m_rommask];
+			tmp = read_word((pos>>16)<<1);
 			switch ( type )
 			{
 				case TYPE_16:
@@ -161,14 +259,13 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				{
 					env_phase = PHASE_DECAY;
 					env_level = 1.0;
-					if (channel->decay & 0x0080)
+					if ((channel->decay & 0x0080) || (channel->decay == 0x100))
 					{
 						env_step = 0.0;
 					}
 					else
 					{
-						env_step =
-							m_env_dr_table[decode80(channel->decay >> 8)];
+						env_step = m_env_tables.dr(*channel);
 					}
 					env_rstep = env_step * channel->env_scale;
 				}
@@ -199,10 +296,10 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			*buf1++ += sample * pan_table[rvol];
 
 			pos += channel->step;
-			if ( (pos>>16) > m_rom.length() || (pos>>16) > end)
+			if ((pos>>16) > end)
 			{
 				pos -= loop<<16;
-				pos &= U64(0xFFFFFF0000);
+				pos &= 0xFFFFFF0000U;
 			}
 
 		}
@@ -214,154 +311,57 @@ void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	}
 }
 
+void rf5c400_device::rom_bank_updated()
+{
+	m_stream->update();
+}
 
 /*****************************************************************************/
 
-uint8_t rf5c400_device::decode80(uint8_t val)
-{
-	if (val & 0x80)
-	{
-		val = (val & 0x7f) + 0x1f;
-	}
-
-	return val;
-}
-
-void rf5c400_device::rf5c400_init_chip()
-{
-	int i;
-
-	// init volume table
-	{
-		double max=255.0;
-		for (i = 0; i < 256; i++) {
-			volume_table[i]=(uint16_t)max;
-			max /= pow(10.0,(double)((4.5/(256.0/16.0))/20));
-		}
-		for(i = 0; i < 0x48; i++) {
-			pan_table[i] = sqrt( (double)(0x47 - i) ) / sqrt( (double)0x47 );
-		}
-		for(i = 0x48; i < 0x64; i++) {
-			pan_table[i] = 0.0;
-		}
-	}
-
-	// init envelope table
-	{
-		double r;
-
-		// attack
-		r = 1.0 / (ENV_AR_SPEED * (clock() / 384));
-		for (i = 0; i < ENV_MIN_AR; i++)
-		{
-			m_env_ar_table[i] = 1.0;
-		}
-		for (i = ENV_MIN_AR; i < ENV_MAX_AR; i++)
-		{
-			m_env_ar_table[i] =
-				r * (ENV_MAX_AR - i) / (ENV_MAX_AR - ENV_MIN_AR);
-		}
-		for (i = ENV_MAX_AR; i < 0x9f; i++)
-		{
-			m_env_ar_table[i] = 0.0;
-		}
-
-		// decay
-		r = -5.0 / (ENV_DR_SPEED * (clock() / 384));
-		for (i = 0; i < ENV_MIN_DR; i++)
-		{
-			m_env_dr_table[i] = r;
-		}
-		for (i = ENV_MIN_DR; i < ENV_MAX_DR; i++)
-		{
-			m_env_dr_table[i] =
-				r * (ENV_MAX_DR - i) / (ENV_MAX_DR - ENV_MIN_DR);
-		}
-		for (i = ENV_MAX_DR; i < 0x9f; i++)
-		{
-			m_env_dr_table[i] = 0.0;
-		}
-
-		// release
-		r = -5.0 / (ENV_RR_SPEED * (clock() / 384));
-		for (i = 0; i < ENV_MIN_RR; i++)
-		{
-			m_env_rr_table[i] = r;
-		}
-		for (i = ENV_MIN_RR; i < ENV_MAX_RR; i++)
-		{
-			m_env_rr_table[i] =
-				r * (ENV_MAX_RR - i) / (ENV_MAX_RR - ENV_MIN_RR);
-		}
-		for (i = ENV_MAX_RR; i < 0x9f; i++)
-		{
-			m_env_rr_table[i] = 0.0;
-		}
-	}
-
-	// init channel info
-	for (i = 0; i < 32; i++)
-	{
-		m_channels[i].env_phase = PHASE_NONE;
-		m_channels[i].env_level = 0.0;
-		m_channels[i].env_step  = 0.0;
-		m_channels[i].env_scale  = 1.0;
-	}
-
-	for (i = 0; i < ARRAY_LENGTH(m_channels); i++)
-	{
-		save_item(NAME(m_channels[i].startH), i);
-		save_item(NAME(m_channels[i].startL), i);
-		save_item(NAME(m_channels[i].freq), i);
-		save_item(NAME(m_channels[i].endL), i);
-		save_item(NAME(m_channels[i].endHloopH), i);
-		save_item(NAME(m_channels[i].loopL), i);
-		save_item(NAME(m_channels[i].pan), i);
-		save_item(NAME(m_channels[i].effect), i);
-		save_item(NAME(m_channels[i].volume), i);
-		save_item(NAME(m_channels[i].attack), i);
-		save_item(NAME(m_channels[i].decay), i);
-		save_item(NAME(m_channels[i].release), i);
-		save_item(NAME(m_channels[i].cutoff), i);
-		save_item(NAME(m_channels[i].pos), i);
-		save_item(NAME(m_channels[i].step), i);
-		save_item(NAME(m_channels[i].keyon), i);
-		save_item(NAME(m_channels[i].env_phase), i);
-		save_item(NAME(m_channels[i].env_level), i);
-		save_item(NAME(m_channels[i].env_step), i);
-		save_item(NAME(m_channels[i].env_scale), i);
-	}
-
-	m_stream = stream_alloc(0, 2, clock()/384);
-
-	m_rommask = m_rom.length() - 1;
-}
-
-
-/*****************************************************************************/
-
-static uint16_t rf5c400_status = 0;
 READ16_MEMBER( rf5c400_device::rf5c400_r )
 {
-	switch(offset)
+	if (offset < 0x400)
 	{
-		case 0x00:
-		{
-			return rf5c400_status;
-		}
+		//osd_printf_debug("%s:rf5c400_r: %08X, %08X\n", machine().describe_context().c_str(), offset, mem_mask);
 
-		case 0x04:
+		switch(offset)
 		{
-			return 0;
-		}
+			case 0x00:
+			{
+				return m_rf5c400_status;
+			}
 
-		case 0x13:      // memory read
-		{
-			return m_rom[m_ext_mem_address];
+			case 0x04:      // unknown read
+			{
+				return 0;
+			}
+
+			case 0x13:      // memory read
+			{
+				return read_word(m_ext_mem_address<<1);
+			}
+
+			default:
+			{
+				//osd_printf_debug("%s:rf5c400_r: %08X, %08X\n", machine().describe_context().c_str(), offset, mem_mask);
+				return 0;
+			}
 		}
 	}
+	else
+	{
+		//int ch = (offset >> 5) & 0x1f;
+		int reg = (offset & 0x1f);
 
-	return 0;
+		switch (reg)
+		{
+		case 0x0F:      // unknown read
+			return 0;
+
+		default:
+			return 0;
+		}
+	}
 }
 
 WRITE16_MEMBER( rf5c400_device::rf5c400_w )
@@ -372,7 +372,7 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 		{
 			case 0x00:
 			{
-				rf5c400_status = data;
+				m_rf5c400_status = data;
 				break;
 			}
 
@@ -388,8 +388,7 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 
 						m_channels[ch].env_phase = PHASE_ATTACK;
 						m_channels[ch].env_level = 0.0;
-						m_channels[ch].env_step  =
-							m_env_ar_table[decode80(m_channels[ch].attack >> 8)];
+						m_channels[ch].env_step  = m_env_tables.ar(m_channels[ch]);
 						break;
 					case 0x40:
 						if (m_channels[ch].env_phase != PHASE_NONE)
@@ -401,8 +400,7 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 							}
 							else
 							{
-								m_channels[ch].env_step =
-									m_env_rr_table[decode80(m_channels[ch].release >> 8)];
+								m_channels[ch].env_step = m_env_tables.rr(m_channels[ch]);
 							}
 						}
 						break;
@@ -440,7 +438,7 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 			{
 				if ((data & 0x3) == 3)
 				{
-					m_rom[m_ext_mem_address] = m_ext_mem_data;
+					this->space().write_word(m_ext_mem_address << 1, m_ext_mem_data);
 				}
 				break;
 			}
@@ -460,11 +458,11 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 
 			default:
 			{
-				//osd_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", machine().describe_context(), data, offset, mem_mask);
+				//osd_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", machine().describe_context().c_str(), data, offset, mem_mask);
 				break;
 			}
 		}
-		//osd_printf_debug("%s:rf5c400_w: %08X, %08X, %08X at %08X\n", machine().describe_context(), data, offset, mem_mask);
+		//osd_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", machine().describe_context().c_str(), data, offset, mem_mask);
 	}
 	else
 	{
@@ -533,12 +531,12 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 			}
 			case 0x0A:      // relative to env attack ?
 			{
-				// always 0x0100
+				// always 0x0100/0x140
 				break;
 			}
 			case 0x0B:      // relative to env decay ?
 			{
-				// always 0x0100
+				// always 0x0100/0x140/0x180
 				break;
 			}
 			case 0x0C:      // env decay
@@ -550,13 +548,18 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 			}
 			case 0x0D:      // relative to env release ?
 			{
-				// always 0x0100
+				// always 0x0100/0x140
 				break;
 			}
 			case 0x0E:      // env release
 			{
 				// 0xXX70: XX = release-0x1f (encoded) (0x01 if release <= 0x20)
 				channel->release = data;
+				break;
+			}
+			case 0x0F:      // unknown write
+			{
+				// always 0x0000
 				break;
 			}
 			case 0x10:      // resonance, cutoff freq.

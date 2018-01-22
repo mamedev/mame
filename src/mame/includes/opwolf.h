@@ -5,9 +5,18 @@
     Operation Wolf
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_OPWOLF_H
+#define MAME_INCLUDES_OPWOLF_H
+
+#pragma once
+
+
+#include "machine/taitocchip.h"
+
 #include "sound/msm5205.h"
 #include "video/pc080sn.h"
 #include "video/pc090oj.h"
+
 
 class opwolf_state : public driver_device
 {
@@ -23,6 +32,7 @@ public:
 		m_cchip_ram(*this, "cchip_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_cchip(*this, "cchip"),
 		m_pc080sn(*this, "pc080sn"),
 		m_pc090oj(*this, "pc090oj"),
 		m_msm1(*this, "msm1"),
@@ -44,6 +54,8 @@ public:
 
 	int          m_opwolf_gun_xoffs;
 	int          m_opwolf_gun_yoffs;
+
+	emu_timer   *m_opwolf_timer;
 
 	/* c-chip */
 	emu_timer   *m_cchip_timer;
@@ -76,6 +88,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	optional_device<taito_cchip_device> m_cchip;
 	required_device<pc080sn_device> m_pc080sn;
 	required_device<pc090oj_device> m_pc090oj;
 	required_device<msm5205_device> m_msm1;
@@ -118,6 +131,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(opwolf_msm5205_vck_1);
 	DECLARE_WRITE_LINE_MEMBER(opwolf_msm5205_vck_2);
 
+	void opwolfb(machine_config &config);
+	void opwolfp(machine_config &config);
+	void opwolf(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
+
+
+#endif // MAME_INCLUDES_OPWOLF_H

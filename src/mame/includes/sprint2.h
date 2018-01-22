@@ -6,8 +6,10 @@
 
 *************************************************************************/
 
+#include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
+#include "screen.h"
 
 /* Discrete Sound Input Nodes */
 #define SPRINT2_SKIDSND1_EN        NODE_01
@@ -32,12 +34,12 @@ public:
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
+		m_outlatch(*this, "outlatch"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	int m_attract;
 	int m_steering[2];
 	int m_gear[2];
 	int m_game;
@@ -56,19 +58,17 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint2_steering_reset1_w);
 	DECLARE_WRITE8_MEMBER(sprint2_steering_reset2_w);
 	DECLARE_WRITE8_MEMBER(sprint2_wram_w);
-	DECLARE_WRITE8_MEMBER(sprint2_lamp1_w);
-	DECLARE_WRITE8_MEMBER(sprint2_lamp2_w);
-	DECLARE_WRITE8_MEMBER(dominos4_lamp3_w);
-	DECLARE_WRITE8_MEMBER(dominos4_lamp4_w);
+	DECLARE_WRITE8_MEMBER(output_latch_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp1_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp2_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp3_w);
+	DECLARE_WRITE_LINE_MEMBER(lamp4_w);
 	DECLARE_READ8_MEMBER(sprint2_collision1_r);
 	DECLARE_READ8_MEMBER(sprint2_collision2_r);
 	DECLARE_WRITE8_MEMBER(sprint2_collision_reset1_w);
 	DECLARE_WRITE8_MEMBER(sprint2_collision_reset2_w);
 	DECLARE_WRITE8_MEMBER(sprint2_video_ram_w);
-	DECLARE_WRITE8_MEMBER(sprint2_attract_w);
 	DECLARE_WRITE8_MEMBER(sprint2_noise_reset_w);
-	DECLARE_WRITE8_MEMBER(sprint2_skid1_w);
-	DECLARE_WRITE8_MEMBER(sprint2_skid2_w);
 	DECLARE_DRIVER_INIT(sprint1);
 	DECLARE_DRIVER_INIT(sprint2);
 	DECLARE_DRIVER_INIT(dominos);
@@ -77,7 +77,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sprint2);
 	uint32_t screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_sprint2(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sprint2);
 	INTERRUPT_GEN_MEMBER(sprint2);
 	uint8_t collision_check(rectangle& rect);
 	inline int get_sprite_code(uint8_t *video_ram, int n);
@@ -86,10 +86,15 @@ public:
 	int service_mode();
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
+	required_device<f9334_device> m_outlatch;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void sprint1(machine_config &config);
+	void sprint2(machine_config &config);
+	void dominos4(machine_config &config);
+	void dominos(machine_config &config);
 };
 
 /*----------- defined in audio/sprint2.c -----------*/

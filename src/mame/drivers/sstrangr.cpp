@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 #include "sstrangr.lh"
 
@@ -34,6 +35,8 @@ public:
 
 	uint32_t screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void sstrngr2(machine_config &config);
+	void sstrangr(machine_config &config);
 };
 
 
@@ -183,7 +186,7 @@ static INPUT_PORTS_START( sstrangr )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sstrangr, sstrangr_state )
+MACHINE_CONFIG_START(sstrangr_state::sstrangr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080,1996800)   /* clock is a guess, taken from mw8080bw */
@@ -253,7 +256,7 @@ static INPUT_PORTS_START( sstrngr2 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( sstrngr2, sstrangr )
+MACHINE_CONFIG_DERIVED(sstrangr_state::sstrngr2, sstrangr)
 
 	/* basic machine hardware */
 
@@ -288,5 +291,5 @@ ROM_START( sstrangr2 )
 ROM_END
 
 
-GAMEL( 1978, sstrangr, 0,        sstrangr, sstrangr, driver_device, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_sstrangr )
-GAME( 1979, sstrangr2,sstrangr, sstrngr2, sstrngr2, driver_device, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAMEL( 1978, sstrangr,  0,        sstrangr, sstrangr, sstrangr_state, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger",   MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_sstrangr )
+GAME(  1979, sstrangr2, sstrangr, sstrngr2, sstrngr2, sstrangr_state, 0, ROT270, "Yachiyo Electronics, Ltd.", "Space Stranger 2", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

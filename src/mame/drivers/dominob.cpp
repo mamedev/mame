@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, David Haywood
 /***************************************************************************
 
@@ -65,6 +65,8 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 class dominob_state : public driver_device
 {
@@ -94,6 +96,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void dominob(machine_config &config);
 };
 
 void dominob_state::video_start()
@@ -190,7 +193,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dominob_state )
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_SHARE("bgram")
 	AM_RANGE(0xf080, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -287,7 +290,7 @@ static GFXDECODE_START( dominob )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( dominob, dominob_state )
+MACHINE_CONFIG_START(dominob_state::dominob)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)
@@ -359,5 +362,5 @@ ROM_START( dominobv2 )
 	ROM_LOAD( "u114v2",   0xc0000, 0x40000, CRC(df17ee65) SHA1(1cb434719a8c406726d2c966392be03a2dc1d758) )
 ROM_END
 
-GAME( 1996, dominob,  0,       dominob,  dominob, driver_device,  0, ROT0, "Wonwoo Systems", "Domino Block", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, dominobv2,dominob, dominob,  dominob, driver_device,  0, ROT0, "Wonwoo Systems", "Domino Block ver.2", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, dominob,  0,       dominob,  dominob, dominob_state,  0, ROT0, "Wonwoo Systems", "Domino Block",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, dominobv2,dominob, dominob,  dominob, dominob_state,  0, ROT0, "Wonwoo Systems", "Domino Block ver.2", MACHINE_SUPPORTS_SAVE )

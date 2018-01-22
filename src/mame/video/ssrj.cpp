@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 #include "emu.h"
 #include "includes/ssrj.h"
@@ -284,7 +284,7 @@ uint32_t ssrj_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-void ssrj_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(ssrj_state::screen_vblank)
 {
 	// rising edge
 	if (state)

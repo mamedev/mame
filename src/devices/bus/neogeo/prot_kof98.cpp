@@ -5,13 +5,14 @@
 #include "emu.h"
 #include "prot_kof98.h"
 
-extern const device_type KOF98_PROT = &device_creator<kof98_prot_device>;
+DEFINE_DEVICE_TYPE(NG_KOF98_PROT, kof98_prot_device, "ng_kof98_prot", "Neo Geo KoF 98 Protection")
 
 
 kof98_prot_device::kof98_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, KOF98_PROT, "Neo Geo KOF 98 Protection", tag, owner, clock, "kof98_prot", __FILE__),
+	device_t(mconfig, NG_KOF98_PROT, tag, owner, clock),
 	m_prot_state(0)
-{}
+{
+}
 
 
 void kof98_prot_device::device_start()
@@ -111,17 +112,17 @@ WRITE16_MEMBER( kof98_prot_device::protection_w )
 	switch (data)
 	{
 	case 0x0090:
-		logerror ("%06x kof98 - protection 0x0090x\n", space.device().safe_pc());
+		logerror ("%s kof98 - protection 0x0090x\n", machine().describe_context());
 		m_prot_state = 1;
 		break;
 
 	case 0x00f0:
-		logerror ("%06x kof98 - protection 0x00f0x\n", space.device().safe_pc());
+		logerror ("%s kof98 - protection 0x00f0x\n", machine().describe_context());
 		m_prot_state = 2;
 		break;
 
 	default: // 00aa is written, but not needed?
-		logerror ("%06x kof98 - unknown protection write %04x\n", space.device().safe_pc(), data);
+		logerror ("%s kof98 - unknown protection write %04x\n", machine().describe_context(), data);
 		break;
 	}
 }

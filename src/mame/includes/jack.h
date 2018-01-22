@@ -49,7 +49,7 @@ public:
 	int m_question_rom;
 	int m_remap_address[16];
 
-	DECLARE_WRITE8_MEMBER(jack_sh_command_w);
+	IRQ_CALLBACK_MEMBER(jack_sh_irq_ack);
 	DECLARE_WRITE8_MEMBER(joinem_control_w);
 	DECLARE_WRITE8_MEMBER(joinem_scroll_w);
 	DECLARE_READ8_MEMBER(striv_question_r);
@@ -87,4 +87,9 @@ public:
 	void jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void treahunt_decode(  );
+	void joinem(machine_config &config);
+	void treahunt(machine_config &config);
+	void unclepoo(machine_config &config);
+	void striv(machine_config &config);
+	void jack(machine_config &config);
 };

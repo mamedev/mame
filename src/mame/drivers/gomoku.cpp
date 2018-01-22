@@ -24,8 +24,12 @@ todo:
 ******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/gomoku.h"
+#include "audio/gomoku.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/74259.h"
+#include "speaker.h"
 
 
 /* input ports are rotated 90 degrees */
@@ -49,10 +53,7 @@ static ADDRESS_MAP_START( gomoku_map, AS_PROGRAM, 8, gomoku_state )
 	AM_RANGE(0x5800, 0x58ff) AM_RAM_WRITE(gomoku_bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0x6000, 0x601f) AM_DEVWRITE("gomoku", gomoku_sound_device, sound1_w)
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("gomoku", gomoku_sound_device, sound2_w)
-	AM_RANGE(0x7000, 0x7000) AM_WRITENOP
-	AM_RANGE(0x7001, 0x7001) AM_WRITE(gomoku_flipscreen_w)
-	AM_RANGE(0x7002, 0x7002) AM_WRITE(gomoku_bg_dispsw_w)
-	AM_RANGE(0x7003, 0x7007) AM_WRITENOP
+	AM_RANGE(0x7000, 0x7007) AM_DEVWRITE("latch", ls259_device, write_d1)
 	AM_RANGE(0x7800, 0x7807) AM_READ(input_port_r)
 	AM_RANGE(0x7800, 0x7800) AM_WRITENOP
 ADDRESS_MAP_END
@@ -120,11 +121,16 @@ static GFXDECODE_START( gomoku )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gomoku, gomoku_state )
+MACHINE_CONFIG_START(gomoku_state::gomoku)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/12)      /* 1.536 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(gomoku_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gomoku_state,  irq0_line_hold)
+
+	MCFG_DEVICE_ADD("latch", LS259, 0) // 7J
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gomoku_state, flipscreen_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(gomoku_state, bg_dispsw_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // start LED?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -179,5 +185,5 @@ ROM_START( gomoku )
 ROM_END
 
 
-//    YEAR,     NAME,   PARENT,  MACHINE,    INPUT,     INIT,    MONITOR,      COMPANY, FULLNAME
-GAME( 1981,   gomoku,        0,   gomoku,   gomoku, driver_device,        0,      ROT90, "Nichibutsu", "Gomoku Narabe Renju", 0 )
+//    YEAR,   NAME,   PARENT,  MACHINE,  INPUT,  STATE         INIT,   MONITOR, COMPANY,      FULLNAME,              FLAGS
+GAME( 1981,   gomoku, 0,       gomoku,   gomoku, gomoku_state, 0,      ROT90,   "Nichibutsu", "Gomoku Narabe Renju", 0 )

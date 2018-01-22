@@ -12,7 +12,7 @@
 #include <float.h>  // FLT_EPSILON
 #include <alloca.h> // alloca
 
-#include <bx/fpumath.h>
+#include <bx/math.h>
 
 #include "vectordisplay.h"
 #include "bgfx_utils.h"
@@ -47,16 +47,23 @@ bgfx::VertexDecl PosColorUvVertex::ms_decl;
 
 inline float normalizef(float _a)
 {
-	return bx::fwrap(_a, 2.0f * bx::pi);
+	return bx::fwrap(_a, 2.0f * bx::kPi);
 }
 
-VectorDisplay::VectorDisplay(bool _originBottomLeft, float _texelHalf)
-	: m_originBottomLeft(_originBottomLeft)
-	, m_texelHalf(_texelHalf)
+VectorDisplay::VectorDisplay()
+	: m_originBottomLeft(false)
+	, m_texelHalf(false)
 {
 }
 
-void VectorDisplay::setup(uint16_t _width, uint16_t _height, int _view)
+void VectorDisplay::init(bool _originBottomLeft, float _texelHalf)
+{
+	m_originBottomLeft = _originBottomLeft;
+	m_texelHalf = _texelHalf;
+}
+
+
+void VectorDisplay::setup(uint16_t _width, uint16_t _height, uint8_t _view)
 {
 	PosColorUvVertex::init();
 
@@ -110,19 +117,19 @@ void VectorDisplay::teardown()
 {
 	for (size_t i = 0; i < m_vertexBuffers.size(); ++i)
 	{
-		bgfx::destroyDynamicVertexBuffer(m_vertexBuffers[i]);
+		bgfx::destroy(m_vertexBuffers[i]);
 	}
 
 	teardownResDependent();
 
-	bgfx::destroyProgram(m_drawToScreenShader);
-	bgfx::destroyProgram(m_blurShader);
-	bgfx::destroyProgram(m_blitShader);
+	bgfx::destroy(m_drawToScreenShader);
+	bgfx::destroy(m_blurShader);
+	bgfx::destroy(m_blitShader);
 
-	bgfx::destroyUniform(u_params);
-	bgfx::destroyUniform(s_texColor);
+	bgfx::destroy(u_params);
+	bgfx::destroy(s_texColor);
 
-	bgfx::destroyTexture(m_lineTexId);
+	bgfx::destroy(m_lineTexId);
 }
 
 void VectorDisplay::beginFrame()
@@ -132,11 +139,23 @@ void VectorDisplay::beginFrame()
 
 void VectorDisplay::endFrame()
 {
+	const bgfx::Caps* caps = bgfx::getCaps();
+
 	float proj[16];
-	bx::mtxOrtho(proj, 0.0f, (float)m_screenWidth, (float)m_screenHeight, 0.0f, 0.0f, 1000.0f);
+	bx::mtxOrtho(
+		  proj
+		, 0.0f
+		, (float)m_screenWidth
+		, (float)m_screenHeight
+		, 0.0f
+		, 0.0f
+		, 1000.0f
+		, 0.0f
+		, caps->homogeneousDepth
+		);
 
 	bgfx::setViewRect(m_view, 0, 0, m_screenWidth, m_screenHeight);
-	bgfx::setViewFrameBuffer(m_view, m_sceneFrameBuffer);              //render all geometry to this framebuffer
+	bgfx::setViewFrameBuffer(m_view, m_sceneFrameBuffer);
 	bgfx::setViewTransform(m_view, NULL, proj);
 
 	// advance step
@@ -155,7 +174,7 @@ void VectorDisplay::endFrame()
 		int stepi = m_numberDecaySteps - loopvar - 1;
 		int i = (m_currentDrawStep + m_numberDecaySteps - stepi) % m_numberDecaySteps;
 
-		if (m_vertexBuffersSize[i] != 0)                  //only draw if something is in the buffer
+		if (m_vertexBuffersSize[i] != 0)
 		{
 			float alpha;
 			if (stepi == 0)
@@ -168,7 +187,7 @@ void VectorDisplay::endFrame()
 			}
 			else
 			{
-				alpha = powf(m_decayValue, stepi - 1.0f) * m_initialDecay;
+				alpha = bx::fpow(m_decayValue, stepi - 1.0f) * m_initialDecay;
 			}
 
 			float params[4] = { 0.0f, 0.0f, 0.0f, alpha };
@@ -176,7 +195,7 @@ void VectorDisplay::endFrame()
 
 			bgfx::setTexture(0, s_texColor, m_lineTexId);
 
-			bgfx::setVertexBuffer(m_vertexBuffers[i], 0, m_vertexBuffersSize[i]); // explicitly feed vertex number!
+			bgfx::setVertexBuffer(0, m_vertexBuffers[i], 0, m_vertexBuffersSize[i]); // explicitly feed vertex number!
 
 			bgfx::setState(0
 				| BGFX_STATE_RGB_WRITE
@@ -190,9 +209,9 @@ void VectorDisplay::endFrame()
 		}
 	}
 
-	int viewCounter = m_view + 1;
+	uint8_t viewCounter = m_view + 1;
 
-	bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f);
+	bx::mtxOrtho(proj, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 100.0f, 0.0f, caps->homogeneousDepth);
 
 	float glow_iter_mult = 1.05f + ( (m_brightness - 1.0f) / 5.0f);
 	float glow_fin_mult  = 1.25f + ( (m_brightness - 1.0f) / 2.0f);
@@ -200,14 +219,14 @@ void VectorDisplay::endFrame()
 
 	if (m_brightness > 0)
 	{
-		bgfx::setTexture(0, s_texColor, m_sceneFrameBuffer);
+		bgfx::setTexture(0, s_texColor, bgfx::getTexture(m_sceneFrameBuffer) );
 
 		int npasses = (int)(m_brightness * 4);
 		for (int pass = 0; pass < npasses; pass++)
 		{
 			// render the glow1 texture to the glow0 buffer with horizontal blur
 
-			bgfx::setViewFrameBuffer(viewCounter, m_glow0FrameBuffer);            //first glow pass
+			bgfx::setViewFrameBuffer(viewCounter, m_glow0FrameBuffer);
 			bgfx::setViewRect(viewCounter, 0, 0, m_glowWidth, m_glowHeight);
 			bgfx::setState(0
 				| BGFX_STATE_RGB_WRITE
@@ -224,9 +243,9 @@ void VectorDisplay::endFrame()
 
 			viewCounter++;
 
-			bgfx::setViewFrameBuffer(viewCounter, m_glow1FrameBuffer);            //second glow pass
+			bgfx::setViewFrameBuffer(viewCounter, m_glow1FrameBuffer);
 			bgfx::setViewRect(viewCounter, 0, 0, m_glowWidth, m_glowHeight);
-			bgfx::setTexture(0, s_texColor, m_glow0FrameBuffer);
+			bgfx::setTexture(0, s_texColor, bgfx::getTexture(m_glow0FrameBuffer) );
 
 			bgfx::setViewTransform(viewCounter, NULL, proj);
 			screenSpaceQuad(m_glowWidth, m_glowHeight);
@@ -248,7 +267,7 @@ void VectorDisplay::endFrame()
 			viewCounter++;
 
 			//set for next iteration
-			bgfx::setTexture(0, s_texColor, m_glow1FrameBuffer);
+			bgfx::setTexture(0, s_texColor, bgfx::getTexture(m_glow1FrameBuffer) );
 		}
 	}
 
@@ -257,7 +276,7 @@ void VectorDisplay::endFrame()
 	//now do last pass, combination of blur and normal buffer to screen
 	bgfx::setViewTransform(viewCounter, NULL, proj);
 	bgfx::setViewRect(viewCounter, 0, 0, m_screenWidth, m_screenHeight);
-	bgfx::setTexture(0, s_texColor, m_sceneFrameBuffer);
+	bgfx::setTexture(0, s_texColor, bgfx::getTexture(m_sceneFrameBuffer) );
 	bgfx::setState(0
 		| BGFX_STATE_RGB_WRITE
 		| BGFX_STATE_ALPHA_WRITE
@@ -277,7 +296,7 @@ void VectorDisplay::endFrame()
 		// blend in the glow
 		bgfx::setViewTransform(viewCounter, NULL, proj);
 		bgfx::setViewRect(viewCounter, 0, 0, m_screenWidth, m_screenHeight);
-		bgfx::setTexture(0, s_texColor, m_glow1FrameBuffer);
+		bgfx::setTexture(0, s_texColor, bgfx::getTexture(m_glow1FrameBuffer) );
 		bgfx::setState(0
 			| BGFX_STATE_RGB_WRITE
 			| BGFX_STATE_ALPHA_WRITE
@@ -324,8 +343,8 @@ void VectorDisplay::endDraw()
 	Line* lines = (Line*)alloca(nlines * sizeof(Line) );
 
 	float t = effectiveThickness();
-	int first_last_same = bx::fabsolute(m_pendingPoints[0].x - m_pendingPoints[m_pendingPoints.size() - 1].x) < 0.1
-	                      && bx::fabsolute(m_pendingPoints[0].y - m_pendingPoints[m_pendingPoints.size() - 1].y) < 0.1;
+	int first_last_same = bx::fabs(m_pendingPoints[0].x - m_pendingPoints[m_pendingPoints.size() - 1].x) < 0.1
+	                      && bx::fabs(m_pendingPoints[0].y - m_pendingPoints[m_pendingPoints.size() - 1].y) < 0.1;
 
 	// compute basics
 	for (size_t i = 1; i < m_pendingPoints.size(); i++)
@@ -339,10 +358,10 @@ void VectorDisplay::endDraw()
 		line->y0 = m_pendingPoints[i - 1].y;
 		line->x1 = m_pendingPoints[i].x;
 		line->y1 = m_pendingPoints[i].y;
-		line->a = atan2f(line->y1 - line->y0, line->x1 - line->x0); // angle from positive x axis, increasing ccw, [-pi, pi]
-		line->sin_a = sinf(line->a);
-		line->cos_a = cosf(line->a);
-		line->len = sqrtf( (line->x1 - line->x0) * (line->x1 - line->x0) + (line->y1 - line->y0) * (line->y1 - line->y0) );
+		line->a = bx::fatan2(line->y1 - line->y0, line->x1 - line->x0); // angle from positive x axis, increasing ccw, [-pi, pi]
+		line->sin_a = bx::fsin(line->a);
+		line->cos_a = bx::fcos(line->a);
+		line->len = bx::fsqrt( (line->x1 - line->x0) * (line->x1 - line->x0) + (line->y1 - line->y0) * (line->y1 - line->y0) );
 
 		// figure out what connections we have
 		line->has_prev = (!line->is_first
@@ -368,16 +387,16 @@ void VectorDisplay::endDraw()
 			float a2pa = normalizef(line->a - pline->a);
 			float maxshorten = bx::fmin(line->len, pline->len) / 2.0f;
 
-			if (bx::fmin(a2pa, pa2a) <= (bx::pi / 2.0f + FLT_EPSILON) )
+			if (bx::fmin(a2pa, pa2a) <= (bx::kPi / 2.0f + FLT_EPSILON) )
 			{
 				if (a2pa < pa2a)
 				{
-					float shorten = t * sinf(a2pa / 2) / cosf(a2pa / 2);
-					float a = (bx::pi - a2pa) / 2.0f;
+					float shorten = t * bx::fsin(a2pa / 2.0f) / bx::fcos(a2pa / 2.0f);
+					float a = (bx::kPi - a2pa) / 2.0f;
 					if (shorten > maxshorten)
 					{
 						line->s0 = pline->s1 = maxshorten;
-						line->tr0 = pline->tr1 = maxshorten * sinf(a) / cosf(a);
+						line->tr0 = pline->tr1 = maxshorten * bx::fsin(a) / bx::fcos(a);
 					}
 					else
 					{
@@ -388,12 +407,12 @@ void VectorDisplay::endDraw()
 				}
 				else
 				{
-					float shorten = t * sinf(pa2a / 2.0f) / cosf(pa2a / 2.0f);
-					float a = (bx::pi - pa2a) / 2.0f;
+					float shorten = t * bx::fsin(pa2a / 2.0f) / bx::fcos(pa2a / 2.0f);
+					float a = (bx::kPi - pa2a) / 2.0f;
 					if (shorten > maxshorten)
 					{
 						line->s0 = pline->s1 = maxshorten;
-						line->tl0 = pline->tl1 = maxshorten * sinf(a) / cosf(a);
+						line->tl0 = pline->tl1 = maxshorten * bx::fsin(a) / bx::fcos(a);
 					}
 					else
 					{
@@ -474,14 +493,14 @@ void VectorDisplay::drawCircle(float _x, float _y, float _radius, float _steps)
 	float edgeangle = 0.0f;
 	float angadjust = 0.0f;
 
-	float step = bx::pi * 2.0f / _steps;
+	float step = bx::kPi * 2.0f / _steps;
 
-	beginDraw(_x + _radius * sinf(edgeangle + angadjust),
-	          _y - _radius * cosf(edgeangle + angadjust) );
-	for (edgeangle = 0; edgeangle < 2.0f * bx::pi - 0.001; edgeangle += step)
+	beginDraw(_x + _radius * bx::fsin(edgeangle + angadjust),
+	          _y - _radius * bx::fcos(edgeangle + angadjust) );
+	for (edgeangle = 0; edgeangle < 2.0f * bx::kPi - 0.001; edgeangle += step)
 	{
-		drawTo(_x + _radius * sinf(edgeangle + step - angadjust),
-		       _y - _radius * cosf(edgeangle + step - angadjust) );
+		drawTo(_x + _radius * bx::fsin(edgeangle + step - angadjust),
+		       _y - _radius * bx::fcos(edgeangle + step - angadjust) );
 	}
 
 	endDraw();
@@ -491,32 +510,32 @@ void VectorDisplay::drawWheel(float _angle, float _x, float _y, float _radius)
 {
 	float spokeradius = _radius - 2.0f;
 	// draw spokes
-	drawLine(_x + spokeradius * sinf(_angle),
-	         _y - spokeradius * cosf(_angle),
-	         _x - spokeradius * sinf(_angle),
-	         _y + spokeradius * cosf(_angle) );
-	drawLine(_x + spokeradius * sinf(_angle + bx::pi / 4.0f),
-	         _y - spokeradius * cosf(_angle + bx::pi / 4.0f),
-	         _x - spokeradius * sinf(_angle + bx::pi / 4.0f),
-	         _y + spokeradius * cosf(_angle + bx::pi / 4.0f) );
-	drawLine(_x + spokeradius * sinf(_angle + bx::pi / 2.0f),
-	         _y - spokeradius * cosf(_angle + bx::pi / 2.0f),
-	         _x - spokeradius * sinf(_angle + bx::pi / 2.0f),
-	         _y + spokeradius * cosf(_angle + bx::pi / 2.0f) );
-	drawLine(_x + spokeradius * sinf(_angle + 3.0f * bx::pi / 4.0f),
-	         _y - spokeradius * cosf(_angle + 3.0f * bx::pi / 4.0f),
-	         _x - spokeradius * sinf(_angle + 3.0f * bx::pi / 4.0f),
-	         _y + spokeradius * cosf(_angle + 3.0f * bx::pi / 4.0f) );
+	drawLine(_x + spokeradius * bx::fsin(_angle),
+	         _y - spokeradius * bx::fcos(_angle),
+	         _x - spokeradius * bx::fsin(_angle),
+	         _y + spokeradius * bx::fcos(_angle) );
+	drawLine(_x + spokeradius * bx::fsin(_angle + bx::kPi / 4.0f),
+	         _y - spokeradius * bx::fcos(_angle + bx::kPi / 4.0f),
+	         _x - spokeradius * bx::fsin(_angle + bx::kPi / 4.0f),
+	         _y + spokeradius * bx::fcos(_angle + bx::kPi / 4.0f) );
+	drawLine(_x + spokeradius * bx::fsin(_angle + bx::kPi / 2.0f),
+	         _y - spokeradius * bx::fcos(_angle + bx::kPi / 2.0f),
+	         _x - spokeradius * bx::fsin(_angle + bx::kPi / 2.0f),
+	         _y + spokeradius * bx::fcos(_angle + bx::kPi / 2.0f) );
+	drawLine(_x + spokeradius * bx::fsin(_angle + 3.0f * bx::kPi / 4.0f),
+	         _y - spokeradius * bx::fcos(_angle + 3.0f * bx::kPi / 4.0f),
+	         _x - spokeradius * bx::fsin(_angle + 3.0f * bx::kPi / 4.0f),
+	         _y + spokeradius * bx::fcos(_angle + 3.0f * bx::kPi / 4.0f) );
 
 	float edgeangle = 0.0f;
 	float angadjust = 0.0f;
 
-	beginDraw(_x + _radius * sinf(_angle + edgeangle + angadjust),
-	          _y - _radius * cosf(_angle + edgeangle + angadjust) );
-	for (edgeangle = 0; edgeangle < 2.0f * bx::pi - 0.001f; edgeangle += bx::pi / 4.0f)
+	beginDraw(_x + _radius * bx::fsin(_angle + edgeangle + angadjust),
+	          _y - _radius * bx::fcos(_angle + edgeangle + angadjust) );
+	for (edgeangle = 0; edgeangle < 2.0f * bx::kPi - 0.001f; edgeangle += bx::kPi / 4.0f)
 	{
-		drawTo(_x + _radius * sinf(_angle + edgeangle + bx::pi / 4.0f - angadjust),
-		       _y - _radius * cosf(_angle + edgeangle + bx::pi / 4.0f - angadjust) );
+		drawTo(_x + _radius * bx::fsin(_angle + edgeangle + bx::kPi / 4.0f - angadjust),
+		       _y - _radius * bx::fcos(_angle + edgeangle + bx::kPi / 4.0f - angadjust) );
 	}
 
 	endDraw();
@@ -603,7 +622,7 @@ void VectorDisplay::drawFan(float _cx, float _cy, float _pa, float _a, float _t,
 	if (a2pa < pa2a)
 	{
 		_t = -_t;
-		nsteps = (int)bx::fmax(1, bx::fround(a2pa / (bx::pi / 8.0f) ) );
+		nsteps = (int)bx::fmax(1, bx::fround(a2pa / (bx::kPi / 8.0f) ) );
 		angles = (float*)alloca(sizeof(float) * (nsteps + 1) );
 		for (i = 0; i <= nsteps; i++)
 		{
@@ -612,7 +631,7 @@ void VectorDisplay::drawFan(float _cx, float _cy, float _pa, float _a, float _t,
 	}
 	else
 	{
-		nsteps = (int)bx::fmax(1, bx::fround(pa2a / (bx::pi / 8.0f) ) );
+		nsteps = (int)bx::fmax(1, bx::fround(pa2a / (bx::kPi / 8.0f) ) );
 		angles = (float*)alloca(sizeof(float) * (nsteps + 1) );
 		for (i = 0; i <= nsteps; i++)
 		{
@@ -622,9 +641,9 @@ void VectorDisplay::drawFan(float _cx, float _cy, float _pa, float _a, float _t,
 
 	for (i = 1; i <= nsteps; i++)
 	{
-		appendTexpoint(_cx + _t * sinf(angles[i - 1]), _cy - _t * cosf(angles[i - 1]), _e, (float)HALF_TEXTURE_SIZE);
+		appendTexpoint(_cx + _t * bx::fsin(angles[i - 1]), _cy - _t * bx::fcos(angles[i - 1]), _e, (float)HALF_TEXTURE_SIZE);
 		appendTexpoint(_cx, _cy, _s, (float)HALF_TEXTURE_SIZE);
-		appendTexpoint(_cx + _t * sinf(angles[i]), _cy - _t * cosf(angles[i]), _e, (float)HALF_TEXTURE_SIZE);
+		appendTexpoint(_cx + _t * bx::fsin(angles[i]), _cy - _t * bx::fcos(angles[i]), _e, (float)HALF_TEXTURE_SIZE);
 	}
 }
 
@@ -700,7 +719,7 @@ bool VectorDisplay::setDecaySteps(int _steps)
 	{
 		for (size_t i = 0; i < m_vertexBuffers.size(); ++i)
 		{
-			bgfx::destroyDynamicVertexBuffer(m_vertexBuffers[i]);
+			bgfx::destroy(m_vertexBuffers[i]);
 		}
 
 		m_vertexBuffers.clear();
@@ -741,7 +760,7 @@ void VectorDisplay::getSize(float* _outWidth, float* _outHeight)
 
 void VectorDisplay::screenSpaceQuad(float _textureWidth, float _textureHeight, float _width, float _height)
 {
-	if (bgfx::checkAvailTransientVertexBuffer(3, PosColorUvVertex::ms_decl) )
+	if (3 == getAvailTransientVertexBuffer(3, PosColorUvVertex::ms_decl) )
 	{
 		bgfx::TransientVertexBuffer vb;
 		bgfx::allocTransientVertexBuffer(&vb, 3, PosColorUvVertex::ms_decl);
@@ -793,7 +812,7 @@ void VectorDisplay::screenSpaceQuad(float _textureWidth, float _textureHeight, f
 		vertex[2].m_u = maxu;
 		vertex[2].m_v = maxv;
 
-		bgfx::setVertexBuffer(&vb);
+		bgfx::setVertexBuffer(0, &vb);
 	}
 }
 
@@ -818,9 +837,9 @@ void VectorDisplay::setupResDependent()
 
 void VectorDisplay::teardownResDependent()
 {
-	bgfx::destroyFrameBuffer(m_sceneFrameBuffer);
-	bgfx::destroyFrameBuffer(m_glow0FrameBuffer);
-	bgfx::destroyFrameBuffer(m_glow1FrameBuffer);
+	bgfx::destroy(m_sceneFrameBuffer);
+	bgfx::destroy(m_glow0FrameBuffer);
+	bgfx::destroy(m_glow1FrameBuffer);
 }
 
 void VectorDisplay::genLinetex()                                    // generate the texture
@@ -828,7 +847,7 @@ void VectorDisplay::genLinetex()                                    // generate 
 	const bgfx::Memory* mem = bgfx::alloc(TEXTURE_SIZE * TEXTURE_SIZE * 4);
 	unsigned char* texbuf = (unsigned char*)mem->data;
 
-	memset(texbuf, 0xff, mem->size);
+	bx::memSet(texbuf, 0xff, mem->size);
 	int x, y;
 	for (x = 0; x < TEXTURE_SIZE; x++)
 	{
@@ -838,8 +857,8 @@ void VectorDisplay::genLinetex()                                    // generate 
 				, bx::fsqrt( (float)( (x - HALF_TEXTURE_SIZE) * (x - HALF_TEXTURE_SIZE) + (y - HALF_TEXTURE_SIZE) * (y - HALF_TEXTURE_SIZE) ) ) / (float)HALF_TEXTURE_SIZE
 				);
 
-			float line = powf(16.0f, -2.0f * distance);
-			float glow = powf( 2.0f, -4.0f * distance) / 10.0f;
+			float line = bx::fpow(16.0f, -2.0f * distance);
+			float glow = bx::fpow( 2.0f, -4.0f * distance) / 10.0f;
 			glow = 0;
 			float val = bx::fsaturate(line + glow);
 

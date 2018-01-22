@@ -12,6 +12,8 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
+#include "sound/ym2151.h"
+#include "screen.h"
 
 class cyberbal_state : public atarigen_state
 {
@@ -25,6 +27,7 @@ public:
 			m_rdac(*this, "rdac"),
 			m_ldac(*this, "ldac"),
 			m_soundcomm(*this, "soundcomm"),
+			m_ymsnd(*this, "ymsnd"),
 			m_jsa(*this, "jsa"),
 			m_playfield_tilemap(*this, "playfield"),
 			m_alpha_tilemap(*this, "alpha"),
@@ -42,6 +45,7 @@ public:
 	optional_device<dac_word_interface> m_rdac;
 	optional_device<dac_word_interface> m_ldac;
 	optional_device<atari_sound_comm_device> m_soundcomm;
+	optional_device<ym2151_device> m_ymsnd;
 	optional_device<atari_jsa_ii_device> m_jsa;
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
@@ -78,7 +82,9 @@ public:
 	DECLARE_WRITE16_MEMBER(sound_68k_dac_w);
 	DECLARE_DRIVER_INIT(cyberbalt);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
+	TILE_GET_INFO_MEMBER(get_alpha2_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	TILE_GET_INFO_MEMBER(get_playfield2_tile_info);
 	DECLARE_MACHINE_START(cyberbal);
 	DECLARE_MACHINE_START(cyberbal2p);
 	DECLARE_MACHINE_RESET(cyberbal);
@@ -92,6 +98,9 @@ public:
 
 	static const atari_motion_objects_config s_mob_config;
 
+	void cyberbalt(machine_config &config);
+	void cyberbal2p(machine_config &config);
+	void cyberbal(machine_config &config);
 private:
 	void video_start_common(int screens);
 	void cyberbal_sound_reset();

@@ -1,11 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /* Tecmo Mixer */
+#ifndef MAME_VIDEO_TECMO_MIX_H
+#define MAME_VIDEO_TECMO_MIX_H
+
+#pragma once
 
 
-
-class tecmo_mix_device : public device_t,
-						public device_video_interface
+class tecmo_mix_device : public device_t, public device_video_interface
 {
 public:
 	tecmo_mix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -46,12 +48,10 @@ protected:
 	int m_bgpen;
 
 private:
-
-
-
+	uint32_t sum_colors(const pen_t *pal, int c1_idx, int c2_idx);
 };
 
-extern const device_type TECMO_MIXER;
+DECLARE_DEVICE_TYPE(TECMO_MIXER, tecmo_mix_device)
 
 
 
@@ -64,7 +64,7 @@ extern const device_type TECMO_MIXER;
 #define MCFG_TECMO_MIXER_REGULARCOLS(_bgregular_comp, _fgregular_comp, _txregular_comp, _spregular_comp) \
 	tecmo_mix_device::set_regularcols(*device, _bgregular_comp, _fgregular_comp, _txregular_comp, _spregular_comp);
 
-#define MCFG_TECMO_MIXER_BLENDSOUCE(_spblend_source, _fgblend_source) \
+#define MCFG_TECMO_MIXER_BLENDSOURCE(_spblend_source, _fgblend_source) \
 	tecmo_mix_device::set_blendsource(*device, _spblend_source, _fgblend_source);
 
 #define MCFG_TECMO_MIXER_REVSPRITETILE \
@@ -72,3 +72,5 @@ extern const device_type TECMO_MIXER;
 
 #define MCFG_TECMO_MIXER_BGPEN(_bgpen) \
 	tecmo_mix_device::set_bgpen(*device, _bgpen);
+
+#endif // MAME_VIDEO_TECMO_MIX_H

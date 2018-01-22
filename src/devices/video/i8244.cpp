@@ -12,10 +12,13 @@
 #include "emu.h"
 #include "i8244.h"
 
+#include "screen.h"
+
+
 
 // device type definition
-const device_type I8244 = &device_creator<i8244_device>;
-const device_type I8245 = &device_creator<i8245_device>;
+DEFINE_DEVICE_TYPE(I8244, i8244_device, "i8244", "Intel 8244")
+DEFINE_DEVICE_TYPE(I8245, i8245_device, "i8245", "Intel 8245")
 
 
 // Kevtris verified that the data below matches a dump
@@ -102,20 +105,13 @@ static const uint8_t bgr2rgb[8] =
 //-------------------------------------------------
 
 i8244_device::i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, I8244, "I8244", tag, owner, clock, "i8244", __FILE__)
-	, device_sound_interface(mconfig, *this)
-	, device_video_interface(mconfig, *this)
-	, m_irq_func(*this)
-	, m_postprocess_func(*this)
-	, m_start_vpos(START_Y)
-	, m_start_vblank(START_Y + SCREEN_HEIGHT)
-	, m_screen_lines(LINES)
+	: i8244_device(mconfig, I8244, tag, owner, clock, i8244_device::LINES)
 {
 }
 
 
-i8244_device::i8244_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int lines, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+i8244_device::i8244_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int lines)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, m_irq_func(*this)
@@ -128,7 +124,7 @@ i8244_device::i8244_device(const machine_config &mconfig, device_type type, cons
 
 
 i8245_device::i8245_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8244_device(mconfig, I8245, "I8245", tag, owner, clock, i8245_device::LINES, "i8245", __FILE__)
+	: i8244_device(mconfig, I8245, tag, owner, clock, i8245_device::LINES)
 {
 }
 
@@ -140,13 +136,13 @@ i8245_device::i8245_device(const machine_config &mconfig, const char *tag, devic
 void i8244_device::device_start()
 {
 	// Let the screen create our temporary bitmap with the screen's dimensions
-	m_screen->register_screen_bitmap(m_tmp_bitmap);
+	screen().register_screen_bitmap(m_tmp_bitmap);
 
 	m_line_timer = timer_alloc(TIMER_LINE);
-	m_line_timer->adjust( m_screen->time_until_pos(1, START_ACTIVE_SCAN ), 0,  m_screen->scan_period() );
+	m_line_timer->adjust( screen().time_until_pos(1, START_ACTIVE_SCAN ), 0,  screen().scan_period() );
 
 	m_hblank_timer = timer_alloc(TIMER_HBLANK);
-	m_hblank_timer->adjust( m_screen->time_until_pos(1, END_ACTIVE_SCAN + 18 ), 0, m_screen->scan_period() );
+	m_hblank_timer->adjust( screen().time_until_pos(1, END_ACTIVE_SCAN + 18 ), 0, screen().scan_period() );
 
 	m_irq_func.resolve_safe();
 	m_postprocess_func.resolve_safe();
@@ -213,7 +209,7 @@ PALETTE_INIT_MEMBER(i8244_device, i8244)
 
 void i8244_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int vpos = m_screen->vpos();
+	int vpos = screen().vpos();
 
 	switch ( id )
 	{
@@ -240,10 +236,10 @@ void i8244_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 int i8244_device::get_y_beam()
 {
-	int y = m_screen->vpos() - m_start_vpos;
+	int y = screen().vpos() - m_start_vpos;
 
 	// The Y register becomes 0 only when the VBlank signal is turned off!
-	if ( y < 0 || ( y == 0 && m_screen->hpos() < 366+42 ) )
+	if ( y < 0 || ( y == 0 && screen().hpos() < 366+42 ) )
 	{
 		y += m_screen_lines;
 	}
@@ -254,7 +250,7 @@ int i8244_device::get_y_beam()
 
 int i8244_device::get_x_beam()
 {
-	int x = m_screen->hpos() - START_ACTIVE_SCAN;
+	int x = screen().hpos() - START_ACTIVE_SCAN;
 
 	if ( x < 0 )
 	{
@@ -360,7 +356,7 @@ WRITE8_MEMBER(i8244_device::write)
 
 READ_LINE_MEMBER(i8244_device::vblank)
 {
-	if ( m_screen->vpos() > m_start_vpos && m_screen->vpos() < m_start_vblank )
+	if ( screen().vpos() > m_start_vpos && screen().vpos() < m_start_vblank )
 	{
 		return 0;
 	}
@@ -370,8 +366,8 @@ READ_LINE_MEMBER(i8244_device::vblank)
 
 READ_LINE_MEMBER(i8244_device::hblank)
 {
-	int hpos = m_screen->hpos();
-	int vpos = m_screen->vpos();
+	int hpos = screen().hpos();
+	int vpos = screen().vpos();
 
 	if ( hpos >= START_ACTIVE_SCAN && hpos < END_ACTIVE_SCAN )
 	{

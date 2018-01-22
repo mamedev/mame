@@ -20,11 +20,14 @@
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/lpci.h"
-#include "machine/pcshare.h"
-#include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
+#include "machine/lpci.h"
+#include "machine/pckeybrd.h"
+#include "machine/pcshare.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class pinball2k_state : public pcat_base_state
 {
@@ -94,6 +97,7 @@ public:
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void init_mediagx();
+	void mediagx(machine_config &config);
 };
 
 // Display controller registers
@@ -584,11 +588,11 @@ void pinball2k_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, pinball2k_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, pinball2k_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mediagx, pinball2k_state )
+MACHINE_CONFIG_START(pinball2k_state::mediagx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MEDIAGX, 166000000)

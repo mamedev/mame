@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __NES_NANJING_H
-#define __NES_NANJING_H
+#ifndef MAME_BUS_NES_NANJING_H
+#define MAME_BUS_NES_NANJING_H
+
+#pragma once
 
 #include "nxrom.h"
 
@@ -14,13 +16,15 @@ public:
 	// construction/destruction
 	nes_nanjing_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
 	virtual DECLARE_READ8_MEMBER(read_l) override;
 	virtual DECLARE_WRITE8_MEMBER(write_l) override;
 
 	virtual void hblank_irq(int scanline, int vblank, int blanked) override;
 	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 private:
 	uint8_t m_count;
@@ -29,10 +33,7 @@ private:
 };
 
 
-
-
-
 // device type definition
-extern const device_type NES_NANJING;
+DECLARE_DEVICE_TYPE(NES_NANJING, nes_nanjing_device)
 
-#endif
+#endif // MAME_BUS_NES_NANJING_H

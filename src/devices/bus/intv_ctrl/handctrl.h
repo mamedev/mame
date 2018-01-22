@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_INTV_CTRL_HANDCTRL_H
+#define MAME_BUS_INTV_CTRL_HANDCTRL_H
+
 #pragma once
 
-#ifndef __INTV_HANDCTRL__
-#define __INTV_HANDCTRL__
 
-
-#include "emu.h"
 #include "ctrl.h"
 
 //**************************************************************************
@@ -49,7 +48,7 @@ private:
 
 
 // device type definition
-extern const device_type INTV_HANDCTRL;
+DECLARE_DEVICE_TYPE(INTV_HANDCTRL, intv_handctrl_device)
 
 
-#endif
+#endif // MAME_BUS_INTV_CTRL_HANDCTRL_H

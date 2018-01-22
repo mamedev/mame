@@ -23,7 +23,7 @@ namespace detail
 	{
 		GLM_FUNC_QUALIFIER static tvec4<T, P> call(tvec4<T, P> const& ColorRGB, T GammaCorrection)
 		{
-			return tvec4<T, P>(compute_rgbToSrgb<T, P, tvec3>::call(tvec3<T, P>(ColorRGB), GammaCorrection), ColorRGB.a);
+			return tvec4<T, P>(compute_rgbToSrgb<T, P, tvec3>::call(tvec3<T, P>(ColorRGB), GammaCorrection), ColorRGB.w);
 		}
 	};
 
@@ -44,7 +44,7 @@ namespace detail
 	{
 		GLM_FUNC_QUALIFIER static tvec4<T, P> call(tvec4<T, P> const& ColorSRGB, T Gamma)
 		{
-			return tvec4<T, P>(compute_srgbToRgb<T, P, tvec3>::call(tvec3<T, P>(ColorSRGB), Gamma), ColorSRGB.a);
+			return tvec4<T, P>(compute_srgbToRgb<T, P, tvec3>::call(tvec3<T, P>(ColorSRGB), Gamma), ColorSRGB.w);
 		}
 	};
 }//namespace detail

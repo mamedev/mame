@@ -16,6 +16,7 @@ public:
 	{
 	}
 
+	virtual ~netdev_none() { }
 	virtual int init(const osd_options &options) override { return 0; }
 };
 

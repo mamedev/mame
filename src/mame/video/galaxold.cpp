@@ -540,6 +540,14 @@ VIDEO_START_MEMBER(galaxold_state,dkongjrm)
 	m_spriteram2_present= 1;
 }
 
+VIDEO_START_MEMBER(galaxold_state,dkongjrmc)
+{
+	VIDEO_START_CALL_MEMBER(galaxold_plain);
+
+	m_modify_charcode   = &galaxold_state::pisces_modify_charcode;
+	m_modify_spritecode = &galaxold_state::dkongjrmc_modify_spritecode;
+}
+
 VIDEO_START_MEMBER(galaxold_state,scorpion)
 {
 	VIDEO_START_CALL_MEMBER(scrambold);
@@ -599,24 +607,6 @@ VIDEO_START_MEMBER(galaxold_state,mooncrst)
 	m_modify_charcode   = &galaxold_state::mooncrst_modify_charcode;
 	m_modify_spritecode = &galaxold_state::mooncrst_modify_spritecode;
 }
-
-void galaxold_state::batman2_modify_charcode(uint16_t *code, uint8_t x)
-{
-	if (*code & 0x80)
-	{
-		*code |= (m_gfxbank[0] << 8);
-	}
-}
-
-VIDEO_START_MEMBER(galaxold_state,batman2)
-{
-	VIDEO_START_CALL_MEMBER(galaxold);
-
-	m_modify_charcode   = &galaxold_state::batman2_modify_charcode;
-	m_modify_spritecode = &galaxold_state::batman2_modify_spritecode;
-}
-
-
 
 void galaxold_state::rockclim_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -1057,6 +1047,11 @@ void galaxold_state::dkongjrm_modify_spritecode(uint8_t *spriteram, int *code, i
 	*flipx = 0;
 }
 
+void galaxold_state::dkongjrmc_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs)
+{
+	*code = (spriteram[offs + 1] & 0x7f) | 0x80; // bit 6 is also X flip
+}
+
 void galaxold_state::ad2083_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
 	/* No x flip */
@@ -1076,6 +1071,7 @@ void galaxold_state::drivfrcg_modify_color(uint8_t *color)
 {
 	*color = ((*color & 0x40) >> 3) | (*color & 7);
 }
+
 
 /* y position mapping functions */
 

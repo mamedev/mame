@@ -124,13 +124,15 @@ Dumped by Chackn
 
 
 #include "emu.h"
+#include "includes/angelkds.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
 #include "machine/segacrp2_device.h"
 #include "sound/2203intf.h"
-#include "includes/angelkds.h"
-#include "machine/i8255.h"
 
-
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -171,8 +173,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, angelkds_state )
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(angelkds_bgbotvideoram_w) AM_SHARE("bgbotvideoram") /* Bottom Half of Screen */
 	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(angelkds_txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xec00, 0xecff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xed00, 0xedff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xee00, 0xeeff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xed00, 0xedff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xee00, 0xeeff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xef00, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(angelkds_bgtopbank_write)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(angelkds_bgtopscroll_write)
@@ -182,7 +184,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, angelkds_state )
 	AM_RANGE(0xf005, 0xf005) AM_WRITE(angelkds_layer_ctrl_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, angelkds_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, angelkds_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
@@ -509,7 +511,7 @@ void angelkds_state::machine_reset()
 	m_bgtopbank = 0;
 }
 
-static MACHINE_CONFIG_START( angelkds, angelkds_state )
+MACHINE_CONFIG_START(angelkds_state::angelkds)
 
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -563,7 +565,7 @@ static MACHINE_CONFIG_START( angelkds, angelkds_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.45)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( spcpostn, angelkds )
+MACHINE_CONFIG_DERIVED(angelkds_state::spcpostn, angelkds)
 	/* encryption */
 	MCFG_CPU_REPLACE("maincpu", SEGA_317_0005, XTAL_6MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)

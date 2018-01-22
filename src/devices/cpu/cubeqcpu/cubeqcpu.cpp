@@ -16,6 +16,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "cubeqcpu.h"
+#include "cubedasm.h"
 
 
 /***************************************************************************
@@ -70,29 +71,35 @@ enum alu_dst
 ***************************************************************************/
 
 
-const device_type CQUESTSND = &device_creator<cquestsnd_cpu_device>;
-const device_type CQUESTROT = &device_creator<cquestrot_cpu_device>;
-const device_type CQUESTLIN = &device_creator<cquestlin_cpu_device>;
+DEFINE_DEVICE_TYPE(CQUESTSND, cquestsnd_cpu_device, "cquestsnd", "Cube Quest Sound CPU")
+DEFINE_DEVICE_TYPE(CQUESTROT, cquestrot_cpu_device, "cquestrot", "Cube Quest Rotate CPU")
+DEFINE_DEVICE_TYPE(CQUESTLIN, cquestlin_cpu_device, "cquestlin", "Cube Quest Line CPU")
 
 
 cquestsnd_cpu_device::cquestsnd_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, CQUESTSND, "Cube Quest Sound CPU", tag, owner, clock, "cquestsnd", __FILE__)
+	: cpu_device(mconfig, CQUESTSND, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 64, 8, -3)
 	, m_dac_w(*this)
 	, m_sound_region_tag(nullptr)
 {
 }
 
-
-offs_t cquestsnd_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+device_memory_interface::space_config_vector cquestsnd_cpu_device::memory_space_config() const
 {
-	extern CPU_DISASSEMBLE( cquestsnd );
-	return CPU_DISASSEMBLE_NAME(cquestsnd)(this, buffer, pc, oprom, opram, options);
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+
+util::disasm_interface *cquestsnd_cpu_device::create_disassembler()
+{
+	return new cquestsnd_disassembler;
 }
 
 
 cquestrot_cpu_device::cquestrot_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, CQUESTROT, "Cube Quest Rotate CPU", tag, owner, clock, "cquestrot", __FILE__)
+	: cpu_device(mconfig, CQUESTROT, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 64, 9, -3)
 	, m_linedata_w(*this)
 {
@@ -105,15 +112,14 @@ READ16_MEMBER( cquestrot_cpu_device::linedata_r )
 }
 
 
-offs_t cquestrot_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *cquestrot_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( cquestrot );
-	return CPU_DISASSEMBLE_NAME(cquestrot)(this, buffer, pc, oprom, opram, options);
+	return new cquestsnd_disassembler;
 }
 
 
 cquestlin_cpu_device::cquestlin_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, CQUESTLIN, "Cube Quest Line CPU", tag, owner, clock, "cquestlin", __FILE__)
+	: cpu_device(mconfig, CQUESTLIN, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 64, 8, -3)
 	, m_linedata_r(*this)
 	, m_flags(0)
@@ -121,11 +127,16 @@ cquestlin_cpu_device::cquestlin_cpu_device(const machine_config &mconfig, const 
 {
 }
 
-
-offs_t cquestlin_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+device_memory_interface::space_config_vector cquestlin_cpu_device::memory_space_config() const
 {
-	extern CPU_DISASSEMBLE( cquestlin );
-	return CPU_DISASSEMBLE_NAME(cquestlin)(this, buffer, pc, oprom, opram, options);
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+util::disasm_interface *cquestlin_cpu_device::create_disassembler()
+{
+	return new cquestlin_disassembler;
 }
 
 
@@ -172,7 +183,7 @@ void cquestsnd_cpu_device::device_start()
 	m_sound_data = (uint16_t*)machine().root_device().memregion(m_sound_region_tag)->base();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-3>();
 
 	memset(m_ram, 0, sizeof(m_ram));
 	m_q = 0;
@@ -251,7 +262,7 @@ void cquestrot_cpu_device::device_start()
 	m_linedata_w.resolve_safe();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-3>();
 
 	memset(m_ram, 0, sizeof(m_ram));
 	m_q = 0;
@@ -362,6 +373,12 @@ void cquestrot_cpu_device::state_string_export(const device_state_entry &entry, 
 	}
 }
 
+device_memory_interface::space_config_vector cquestrot_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 /***************************************************************************
     LINE DRAWER INITIALIZATION AND SHUTDOWN
@@ -376,7 +393,7 @@ void cquestlin_cpu_device::device_start()
 	m_linedata_r.resolve_safe(0);
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-3>();
 
 	memset(m_ram, 0, sizeof(m_ram));
 	m_q = 0;
@@ -525,7 +542,7 @@ void cquestsnd_cpu_device::execute_run()
 	do
 	{
 		/* Decode the instruction */
-		uint64_t inst = m_direct->read_qword(SND_PC << 3);
+		uint64_t inst = m_direct->read_qword(SND_PC);
 		uint32_t inslow = inst & 0xffffffff;
 		uint32_t inshig = inst >> 32;
 
@@ -781,7 +798,7 @@ void cquestrot_cpu_device::execute_run()
 	do
 	{
 		/* Decode the instruction */
-		uint64_t inst = m_direct->read_qword(ROT_PC << 3);
+		uint64_t inst = m_direct->read_qword(ROT_PC);
 
 		uint32_t inslow = inst & 0xffffffff;
 		uint32_t inshig = inst >> 32;
@@ -1201,7 +1218,7 @@ void cquestlin_cpu_device::execute_run()
 		int prog = (m_clkcnt & 3) ? BACKGROUND : FOREGROUND;
 
 		m_curpc = LINE_PC;
-		uint64_t inst = m_direct->read_qword(LINE_PC << 3);
+		uint64_t inst = m_direct->read_qword(LINE_PC);
 
 		uint32_t inslow = inst & 0xffffffff;
 		uint32_t inshig = inst >> 32;

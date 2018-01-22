@@ -48,16 +48,33 @@ The hardware is cloned from 'snk68' with some extra capabilities
 the drivers can probably be merged.
 
 
-Bugs:
+Bugs (all of these looks BTANBs):
 
-Sometimes if you attack an enemy when you're at the top of the screen they'll
-end up landing in an even higher position, and appear over the backgrounds!
-I think this is just a game bug..
+- Sometimes if you attack an enemy when you're at the top of the screen they'll
+  end up landing in an even higher position, and appear over the backgrounds!
 
-The timer doesn't work (PIC?, RAM Mirror?)
+- The timer doesn't work
+  Each frame calls:
+ 00E8CC: 0C39 0000 00C0 16AF        cmpi.b  #$0, $c016af.l
+ 00E8D4: 6600 0026                  bne     $e8fc
+ 00E8D8: 0C39 000F 00C0 002E        cmpi.b  #$f, $c0002e.l
+ 00E8E0: 6700 001A                  beq     $e8fc
+ 00E8E4: 0C39 000F 00C0 008E        cmpi.b  #$f, $c0008e.l
+ 00E8EC: 6700 000E                  beq     $e8fc
+ 00E8F0: 33FC 2000 00C0 1982        move.w  #$2000, $c01982.l   // timer inited again???
+ 00E8F8: 6100 0118                  bsr     $ea12
+ 00E8FC: 4E75                       rts
+---
+ 00EA12: 48A7 FCF0                  movem.w D0-D5/A0-A3, -(A7)
+ 00EA16: 3039 00C0 1982             move.w  $c01982.l, D0
+// then calls setup data and drawing for the timer which is always 20 for whatever reason.
 
-There are some unmapped writes past the end of text ram too
+- There are some unmapped writes scattered across different areas (text ram, spriteram, 0xe0000 area etc.)
 
+- flip screen doesn't work properly,
+  game code explicitly sets flip screen off & the correlated work RAM buffer at 0xee2 no matter the dip setting
+
+- some service mode items are buggy or not functioning properly (font, color, inputs, sound, 2nd item);
 
 */
 
@@ -66,6 +83,8 @@ There are some unmapped writes past the end of text ram too
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "video/snk68_spr.h"
+#include "speaker.h"
+
 
 class blackt96_state : public driver_device
 {
@@ -76,39 +95,80 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_sprites(*this, "sprites")
+		m_sprites(*this, "sprites"),
+		m_oki(*this, "oki%u", 1U),
+		m_oki1bank(*this, "oki1bank")
 		{ }
 
-	required_shared_ptr<uint16_t> m_tilemapram;
-	DECLARE_WRITE16_MEMBER(blackt96_c0000_w);
-	DECLARE_WRITE16_MEMBER(blackt96_80000_w);
-	DECLARE_READ_LINE_MEMBER(PIC16C5X_T0_clk_r);
-	DECLARE_WRITE8_MEMBER(blackt96_soundio_port00_w);
-	DECLARE_READ8_MEMBER(blackt96_soundio_port01_r);
-	DECLARE_WRITE8_MEMBER(blackt96_soundio_port01_w);
-	DECLARE_READ8_MEMBER(blackt96_soundio_port02_r);
-	DECLARE_WRITE8_MEMBER(blackt96_soundio_port02_w);
+	// read/write handlers
+	DECLARE_WRITE8_MEMBER(output_w);
+	DECLARE_WRITE8_MEMBER(sound_cmd_w);
+	DECLARE_WRITE16_MEMBER(tx_vram_w);
 
-	void tile_callback(int &tile, int& fx, int& fy, int& region);
+	DECLARE_WRITE8_MEMBER(blackt96_soundio_port_a_w);
+	DECLARE_READ8_MEMBER(blackt96_soundio_port_b_r);
+	DECLARE_WRITE8_MEMBER(blackt96_soundio_port_b_w);
+	DECLARE_READ8_MEMBER(blackt96_soundio_port_c_r);
+	DECLARE_WRITE8_MEMBER(blackt96_soundio_port_c_w);
 
-	DECLARE_READ16_MEMBER( random_r )
+	DECLARE_READ16_MEMBER( random_r ) // todo, get rid of this once we work out where reads are from
 	{
 		return machine().rand();
 	}
 
+	// video
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	uint32_t screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void tile_callback(int &tile, int& fx, int& fy, int& region);
+
+	void blackt96(machine_config &config);
+protected:
+	// overrides
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;	
+
+private:
+	// driver variables
+	uint8_t m_soundcmd;
+	uint8_t m_soundcmd_ready;
+	uint8_t m_port_c_data;
+	uint8_t m_port_b_latch;
+	uint8_t m_oki_selected;
 	uint8_t m_txt_bank;
 
-	virtual void video_start() override;
-	uint32_t screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	// video
+	tilemap_t  *m_tx_tilemap;
+
+	// devices
+	required_shared_ptr<uint16_t> m_tilemapram;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<snk68_spr_device> m_sprites;
-
+	required_device_array<okim6295_device, 2> m_oki;
+	required_memory_bank m_oki1bank;
 };
+
+TILE_GET_INFO_MEMBER(blackt96_state::get_tx_tile_info)
+{
+	uint16_t tile = m_tilemapram[tile_index*2] & 0xff;
+	// following is guessed, game just uses either color 0 or 1 anyway (which is identical palette wise)
+	uint8_t color = m_tilemapram[tile_index*2+1] & 0x0f;
+	tile += m_txt_bank * 0x100;
+
+	SET_TILE_INFO_MEMBER(2,
+			tile,
+			color,
+			0);
+}
+
 
 void blackt96_state::video_start()
 {
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(blackt96_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+
+	m_tx_tilemap->set_transparent_pen(0);
 }
 
 
@@ -117,64 +177,88 @@ uint32_t blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_in
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	m_sprites->draw_sprites_all(bitmap, cliprect);
-
-	/* Text Layer */
-	int count = 0;
-	int x,y;
-	gfx_element *gfx = m_gfxdecode->gfx(2);
-
-	for (x=0;x<64;x++)
-	{
-		for (y=0;y<32;y++)
-		{
-			uint16_t tile = (m_tilemapram[count*2]&0xff);
-			tile += m_txt_bank * 0x100;
-			gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,y*8,0);
-			count++;
-		}
-	}
+	m_tx_tilemap->draw(screen,bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
 
-WRITE16_MEMBER(blackt96_state::blackt96_80000_w)
+WRITE8_MEMBER(blackt96_state::sound_cmd_w)
 {
-	// TO sound MCU?
-	//printf("blackt96_80000_w %04x %04x\n",data,mem_mask);
+	//logerror("sound_cmd_w %02x\n", data);
+	m_soundcmd = data;
+	m_soundcmd_ready = 1;
+}
+
+void blackt96_state::machine_start()
+{
+	m_oki1bank->configure_entries(0, 8, memregion("oki1")->base(), 0x10000);
+	m_oki1bank->set_entry(0);
+
+	save_item(NAME(m_soundcmd));
+	save_item(NAME(m_soundcmd_ready));
+	save_item(NAME(m_port_c_data));
+	save_item(NAME(m_port_b_latch));
+	save_item(NAME(m_oki_selected));
+	save_item(NAME(m_txt_bank));
 }
 
 
-WRITE16_MEMBER(blackt96_state::blackt96_c0000_w)
+
+void blackt96_state::machine_reset()
 {
-	// unknown, also sound mcu?
-	// -bbb --21
+	m_soundcmd = 0;
+	m_soundcmd_ready = 0;
+	m_port_c_data = 0;
+	m_port_b_latch = 0;
+	m_oki_selected = 0;
+	m_txt_bank = 0;
+}
+
+WRITE8_MEMBER(blackt96_state::output_w)
+{
+	// -bbb 8-21
 	// 1 - coin counter 1
 	// 2 - coin counter 2
-	// b = text tile bank?
+	// 8 - flip screen
+	// b = text tile bank
 
-	m_txt_bank = (data & 0xf0)>>4;
+	m_txt_bank = (data & 0x70)>>4;
+	flip_screen_set(data & 0x08);
+	m_sprites->set_flip(data & 0x08);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 
-	printf("blackt96_c0000_w %04x %04x\n",data & 0xfc,mem_mask);
+//  printf("blackt96_c0000_w %04x %04x\n",data & 0xfc,mem_mask);
 }
 
+WRITE16_MEMBER(blackt96_state::tx_vram_w)
+{
+	m_tilemapram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset/2);
+}
 
 static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1_P2") AM_WRITE(blackt96_80000_w)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE(blackt96_c0000_w) // COIN INPUT
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READ( random_r ) // AM_READ_PORT("IN2")  // unk, from sound?
-	AM_RANGE(0x0e8000, 0x0e8001) AM_READ( random_r ) // AM_READ_PORT("IN3")  // unk, from sound?
+	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1_P2") AM_WRITE8(sound_cmd_w,0xff00) // soundlatch
+	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE8(output_w,0x00ff) // COIN INPUT
+	AM_RANGE(0x0e0000, 0x0e0001) AM_READ( random_r ) // unk, from sound? - called in tandem with result discarded, watchdog?
+	AM_RANGE(0x0e8000, 0x0e8001) AM_READ( random_r ) // unk, from sound? /
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
+	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2") AM_WRITENOP // service mode, left-over?
 
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("tilemapram") // text tilemap
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(tx_vram_w) AM_SHARE("tilemapram") // text tilemap
 	AM_RANGE(0x200000, 0x207fff) AM_DEVREADWRITE("sprites", snk68_spr_device, spriteram_r, spriteram_w) AM_SHARE("spriteram")   // only partially populated
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // main ram
-
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( oki1_map, 0, 8, blackt96_state )
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("oki1bank")
+ADDRESS_MAP_END
+
 
 
 
@@ -199,10 +283,10 @@ static INPUT_PORTS_START( blackt96 )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) // Test mode lists this as Service 1, but it appears to be Coin 1 (uses Coin 1 coinage etc.)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 ) // acts as a serive mode mirror
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 ) // acts as a service mode mirror
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // Test mode lists this as Coin 1, but it doesn't work
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Test mode lists this as Coin 1, but it doesn't work
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -229,9 +313,9 @@ static INPUT_PORTS_START( blackt96 )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:!2")    // ?
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:!1")
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Yes ) ) // buggy, applies to attract mode only.
 
 	/* Dipswitch Port B */
 	PORT_START("DSW2")
@@ -249,7 +333,7 @@ static INPUT_PORTS_START( blackt96 )
 	PORT_DIPSETTING(      0x1000, "Never Finish" )
 	PORT_DIPSETTING(      0x2000, "Demo Sound Off" )
 	PORT_DIPSETTING(      0x3000, "Stop Video" )
-	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:!1,!2") // 'Level'
+	PORT_DIPNAME( 0xc000, 0x0000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:!1,!2") // 'Level'
 	PORT_DIPSETTING(      0x8000, "1" )
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x4000, "3" )
@@ -294,37 +378,79 @@ static const gfx_layout blackt96_text_layout =
 };
 
 static GFXDECODE_START( blackt96 )
-	GFXDECODE_ENTRY( "gfx1", 0, blackt96_layout,    0x0, 0x10  )
-	GFXDECODE_ENTRY( "gfx2", 0, blackt962_layout,   0x0, 0x80  )
-	GFXDECODE_ENTRY( "gfx3", 0, blackt96_text_layout,   0x0, 0x80  )
+	GFXDECODE_ENTRY( "gfx1", 0, blackt96_layout,      0, 8  )
+	GFXDECODE_ENTRY( "gfx2", 0, blackt962_layout,     0, 128 )
+	GFXDECODE_ENTRY( "gfx3", 0, blackt96_text_layout, 0, 16 )
 GFXDECODE_END
 
 
-READ_LINE_MEMBER(blackt96_state::PIC16C5X_T0_clk_r)
+WRITE8_MEMBER(blackt96_state::blackt96_soundio_port_a_w)
 {
-	return 0;
+	// soundbank
+	logerror("%s: blackt96_soundio_port_a_w (set soundbank %02x)\n", machine().describe_context().c_str(), data);
+	m_oki1bank->set_entry(data & 0x07);
 }
 
-WRITE8_MEMBER(blackt96_state::blackt96_soundio_port00_w)
+READ8_MEMBER(blackt96_state::blackt96_soundio_port_b_r)
 {
+	//logerror("%s: blackt96_soundio_port_b_r (data read is %02x)\n", machine().describe_context().c_str(), m_port_b_latch);
+	return m_port_b_latch;
 }
 
-READ8_MEMBER(blackt96_state::blackt96_soundio_port01_r)
+WRITE8_MEMBER(blackt96_state::blackt96_soundio_port_b_w)
 {
-	return machine().rand();
+	m_port_b_latch = data;
+	//logerror("%s: blackt96_soundio_port_b_w (set latch to %02x)\n", machine().describe_context().c_str(), m_port_b_latch);
 }
 
-WRITE8_MEMBER(blackt96_state::blackt96_soundio_port01_w)
+READ8_MEMBER(blackt96_state::blackt96_soundio_port_c_r)
 {
+	// bit 0x40 = sound command ready?
+	if (m_soundcmd_ready) return 0x40;
+	return 0x00;
 }
 
-READ8_MEMBER(blackt96_state::blackt96_soundio_port02_r)
+WRITE8_MEMBER(blackt96_state::blackt96_soundio_port_c_w)
 {
-	return machine().rand();
-}
+//	logerror("%s: blackt96_soundio_port_c_w (PREV DATA %02x CURR DATA %02x)\n", machine().describe_context().c_str(), m_port_c_data, data);
+	// data & 0x80 unuused?
+	// data & 0x40 is read - see above
 
-WRITE8_MEMBER(blackt96_state::blackt96_soundio_port02_w)
-{
+	if (((data & 0x20) == 0x00) && ((m_port_c_data & 0x20) == 0x20)) // high -> low on bit 0x20 after processing command
+	{
+		m_soundcmd_ready = 0;
+	}
+
+	if (((data & 0x10) == 0x00) && ((m_port_c_data & 0x10) == 0x10)) // high -> low on bit 0x10 latches sound command
+	{
+		m_port_b_latch = m_soundcmd;
+		//logerror("%s: blackt96_soundio_port_c_w (latch sound command %02x)\n", machine().describe_context().c_str(), m_port_b_latch);
+	}
+
+	if (((data & 0x08) == 0x00) && ((m_port_c_data & 0x08) == 0x08)) // high -> low on bit 0x08 selects second oki?
+	{
+		m_oki_selected = 1;
+	}
+
+	if (((data & 0x04) == 0x00) && ((m_port_c_data & 0x04) == 0x04)) // high -> low on bit 0x04 selects first oki?
+	{
+		m_oki_selected = 0;
+	}
+
+	if (((data & 0x02) == 0x00) && ((m_port_c_data & 0x02) == 0x02)) // high -> low on bit 0x02 writes to selected OKI
+	{
+		//logerror("%s: blackt96_soundio_port_c_w (write to OKI %02x) (oki selected is %02x)\n", machine().describe_context().c_str(), m_port_b_latch, m_oki_selected);
+		if (m_oki_selected == 0) m_oki[0]->write(space, 0, m_port_b_latch);
+		else if (m_oki_selected == 1) m_oki[1]->write(space, 0, m_port_b_latch);			
+	}
+
+	if (((data & 0x01) == 0x00) && ((m_port_c_data & 0x01) == 0x01)) // high -> low on bit 0x01 reads to selected OKI
+	{
+		if (m_oki_selected == 0) m_port_b_latch = m_oki[0]->read(space, 0);
+		else if (m_oki_selected == 1) m_port_b_latch = m_oki[1]->read(space, 0);
+	}
+
+	m_port_c_data = data;
 }
 
 void blackt96_state::tile_callback(int &tile, int& fx, int& fy, int& region)
@@ -344,18 +470,17 @@ void blackt96_state::tile_callback(int &tile, int& fx, int& fy, int& region)
 }
 
 
-static MACHINE_CONFIG_START( blackt96, blackt96_state )
+MACHINE_CONFIG_START(blackt96_state::blackt96)
 	MCFG_CPU_ADD("maincpu", M68000, 18000000 /2)
 	MCFG_CPU_PROGRAM_MAP(blackt96_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blackt96_state,  irq1_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, 8000000) /* ? */
-	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(blackt96_state, blackt96_soundio_port00_w))
-	MCFG_PIC16C5x_READ_B_CB(READ8(blackt96_state, blackt96_soundio_port01_r))
-	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(blackt96_state, blackt96_soundio_port01_w))
-	MCFG_PIC16C5x_READ_C_CB(READ8(blackt96_state, blackt96_soundio_port02_r))
-	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(blackt96_state, blackt96_soundio_port02_w))
-	MCFG_PIC16C5x_T0_CB(READLINE(blackt96_state, PIC16C5X_T0_clk_r))
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(blackt96_state, blackt96_soundio_port_a_w))
+	MCFG_PIC16C5x_READ_B_CB(READ8(blackt96_state, blackt96_soundio_port_b_r))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(blackt96_state, blackt96_soundio_port_b_w))
+	MCFG_PIC16C5x_READ_C_CB(READ8(blackt96_state, blackt96_soundio_port_c_r))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(blackt96_state, blackt96_soundio_port_c_w))
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blackt96)
 
@@ -378,11 +503,12 @@ static MACHINE_CONFIG_START( blackt96, blackt96_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", 8000000/8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 8000000/8, PIN7_HIGH) // music
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 
-	MCFG_OKIM6295_ADD("oki2", 8000000/8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 8000000/8, PIN7_HIGH) // sfx
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
@@ -421,4 +547,5 @@ ROM_START( blackt96 )
 	ROM_CONTINUE(          0x00001, 0x08000 ) // first half is empty
 ROM_END
 
-GAME( 1996, blackt96,    0,        blackt96,    blackt96, driver_device,    0, ROT0,  "D.G.R.M.", "Black Touch '96", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// I'm not really sure this needs MACHINE_IS_INCOMPLETE just because there are some original game bugs, it's quite typical of this type of Korean release
+GAME( 1996, blackt96,    0,        blackt96,    blackt96, blackt96_state,    0, ROT0,  "D.G.R.M.", "Black Touch '96", MACHINE_IS_INCOMPLETE )

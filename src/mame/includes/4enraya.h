@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Roberto Fresca
 /*************************************************************************
 
@@ -52,4 +52,6 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	void unkpacg(machine_config &config);
+	void _4enraya(machine_config &config);
 };

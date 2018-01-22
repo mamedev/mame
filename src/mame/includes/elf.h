@@ -6,7 +6,6 @@
 #define __INCLUDES_ELF__
 
 
-#include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
@@ -65,6 +64,7 @@ public:
 	DECLARE_QUICKLOAD_LOAD_MEMBER( elf );
 	// display state
 	uint8_t m_data;
+	void elf2(machine_config &config);
 };
 
 #endif

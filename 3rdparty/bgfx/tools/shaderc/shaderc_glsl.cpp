@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -8,9 +8,9 @@
 
 namespace bgfx { namespace glsl
 {
-	static bool compile(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
+	static bool compile(const Options& _options, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
 	{
-		char ch = char(tolower(_cmdLine.findOption('\0', "type")[0]) );
+		char ch = _options.shaderType;
 		const glslopt_shader_type type = ch == 'f'
 			? kGlslOptShaderFragment
 			: (ch == 'c' ? kGlslOptShaderCompute : kGlslOptShaderVertex);
@@ -50,6 +50,7 @@ namespace bgfx { namespace glsl
 
 			bool found = false
 				|| 3 == sscanf(log, "%u:%u(%u):", &source, &line, &column)
+				|| 2 == sscanf(log, "(%u,%u):", &line, &column)
 				;
 
 			if (found
@@ -73,24 +74,34 @@ namespace bgfx { namespace glsl
 			optimizedShader = bx::strnl(optimizedShader);
 		}
 
-		if (0 != _version)
 		{
 			char* code = const_cast<char*>(optimizedShader);
 			strReplace(code, "gl_FragDepthEXT", "gl_FragDepth");
 
+			strReplace(code, "texture2DLodARB", "texture2DLod");
 			strReplace(code, "texture2DLodEXT", "texture2DLod");
-			strReplace(code, "texture2DProjLodEXT", "texture2DProjLod");
-			strReplace(code, "textureCubeLodEXT", "textureCubeLod");
+			strReplace(code, "texture2DGradARB", "texture2DGrad");
 			strReplace(code, "texture2DGradEXT", "texture2DGrad");
-			strReplace(code, "texture2DProjGradEXT", "texture2DProjGrad");
+
+			strReplace(code, "textureCubeLodARB", "textureCubeLod");
+			strReplace(code, "textureCubeLodEXT", "textureCubeLod");
+			strReplace(code, "textureCubeGradARB", "textureCubeGrad");
 			strReplace(code, "textureCubeGradEXT", "textureCubeGrad");
 
+			strReplace(code, "texture2DProjLodARB", "texture2DProjLod");
+			strReplace(code, "texture2DProjLodEXT", "texture2DProjLod");
+			strReplace(code, "texture2DProjGradARB", "texture2DProjGrad");
+			strReplace(code, "texture2DProjGradEXT", "texture2DProjGrad");
+
+			strReplace(code, "shadow2DARB", "shadow2D");
 			strReplace(code, "shadow2DEXT", "shadow2D");
+			strReplace(code, "shadow2DProjARB", "shadow2DProj");
 			strReplace(code, "shadow2DProjEXT", "shadow2DProj");
 		}
 
 		UniformArray uniforms;
 
+		if (target != kGlslTargetMetal)
 		{
 			const char* parse = optimizedShader;
 
@@ -98,21 +109,31 @@ namespace bgfx { namespace glsl
 				&&  *parse != '\0')
 			{
 				parse = bx::strws(parse);
-				const char* eol = strchr(parse, ';');
+				const char* eol = bx::strFind(parse, ';');
 				if (NULL != eol)
 				{
 					const char* qualifier = parse;
 					parse = bx::strws(bx::strword(parse) );
 
-					if (0 == strncmp(qualifier, "attribute", 9)
-					||  0 == strncmp(qualifier, "varying", 7) )
+					if (0 == bx::strCmp(qualifier, "attribute", 9)
+					||  0 == bx::strCmp(qualifier, "varying",   7)
+					||  0 == bx::strCmp(qualifier, "in",        2)
+					||  0 == bx::strCmp(qualifier, "out",       3)
+					   )
 					{
 						// skip attributes and varyings.
 						parse = eol + 1;
 						continue;
 					}
 
-					if (0 != strncmp(qualifier, "uniform", 7) )
+					if (0 == bx::strCmp(parse, "tmpvar", 6) )
+					{
+						// skip temporaries
+						parse = eol + 1;
+						continue;
+					}
+
+					if (0 != bx::strCmp(qualifier, "uniform", 7) )
 					{
 						// end if there is no uniform keyword.
 						parse = NULL;
@@ -122,9 +143,9 @@ namespace bgfx { namespace glsl
 					const char* precision = NULL;
 					const char* typen = parse;
 
-					if (0 == strncmp(typen, "lowp", 4)
-					||  0 == strncmp(typen, "mediump", 7)
-					||  0 == strncmp(typen, "highp", 5) )
+					if (0 == bx::strCmp(typen, "lowp", 4)
+					||  0 == bx::strCmp(typen, "mediump", 7)
+					||  0 == bx::strCmp(typen, "highp", 5) )
 					{
 						precision = typen;
 						typen = parse = bx::strws(bx::strword(parse) );
@@ -135,32 +156,91 @@ namespace bgfx { namespace glsl
 					char uniformType[256];
 					parse = bx::strword(parse);
 
-					if (0 == strncmp(typen, "sampler", 7) )
+					if (0 == bx::strCmp(typen, "sampler", 7) )
 					{
-						strcpy(uniformType, "int");
+						bx::strCopy(uniformType, BX_COUNTOF(uniformType), "int");
 					}
 					else
 					{
-						bx::strlcpy(uniformType, typen, parse-typen+1);
+						bx::strCopy(uniformType, int32_t(parse-typen+1), typen);
 					}
 
 					const char* name = parse = bx::strws(parse);
 
 					char uniformName[256];
 					uint8_t num = 1;
-					const char* array = bx::strnstr(name, "[", eol-parse);
+					const char* array = bx::strFind(bx::StringView(name, int32_t(eol-parse) ), "[");
 					if (NULL != array)
 					{
-						bx::strlcpy(uniformName, name, array-name+1);
+						bx::strCopy(uniformName, int32_t(array-name+1), name);
 
 						char arraySize[32];
-						const char* end = bx::strnstr(array, "]", eol-array);
-						bx::strlcpy(arraySize, array+1, end-array);
+						const char* end = bx::strFind(bx::StringView(array, int32_t(eol-array) ), "]");
+						bx::strCopy(arraySize, int32_t(end-array), array+1);
 						num = uint8_t(atoi(arraySize) );
 					}
 					else
 					{
-						bx::strlcpy(uniformName, name, eol-name+1);
+						bx::strCopy(uniformName, int32_t(eol-name+1), name);
+					}
+
+					Uniform un;
+					un.type = nameToUniformTypeEnum(uniformType);
+
+					if (UniformType::Count != un.type)
+					{
+						BX_TRACE("name: %s (type %d, num %d)", uniformName, un.type, num);
+
+						un.name = uniformName;
+						un.num = num;
+						un.regIndex = 0;
+						un.regCount = num;
+						uniforms.push_back(un);
+					}
+
+					parse = eol + 1;
+				}
+			}
+		}
+		else
+		{
+			const char* parse = bx::strFind(optimizedShader, "struct xlatMtlShaderUniform {");
+			const char* end   = parse;
+			if (NULL != parse)
+			{
+				parse += bx::strLen("struct xlatMtlShaderUniform {");
+				end   =  bx::strFind(parse, "};");
+			}
+
+			while ( parse < end
+			&&     *parse != '\0')
+			{
+				parse = bx::strws(parse);
+				const char* eol = bx::strFind(parse, ';');
+				if (NULL != eol)
+				{
+					const char* typen = parse;
+
+					char uniformType[256];
+					parse = bx::strword(parse);
+					bx::strCopy(uniformType, int32_t(parse-typen+1), typen);
+					const char* name = parse = bx::strws(parse);
+
+					char uniformName[256];
+					uint8_t num = 1;
+					const char* array = bx::strFind(bx::StringView(name, int32_t(eol-parse) ), "[");
+					if (NULL != array)
+					{
+						bx::strCopy(uniformName, int32_t(array-name+1), name);
+
+						char arraySize[32];
+						const char* arrayEnd = bx::strFind(bx::StringView(array, int32_t(eol-array) ), "]");
+						bx::strCopy(arraySize, int32_t(arrayEnd-array), array+1);
+						num = uint8_t(atoi(arraySize) );
+					}
+					else
+					{
+						bx::strCopy(uniformName, int32_t(eol-name+1), name);
 					}
 
 					Uniform un;
@@ -191,7 +271,7 @@ namespace bgfx { namespace glsl
 			uint8_t nameSize = (uint8_t)un.name.size();
 			bx::write(_writer, nameSize);
 			bx::write(_writer, un.name.c_str(), nameSize);
-			uint8_t uniformType = un.type;
+			uint8_t uniformType = uint8_t(un.type);
 			bx::write(_writer, uniformType);
 			bx::write(_writer, un.num);
 			bx::write(_writer, un.regIndex);
@@ -206,16 +286,15 @@ namespace bgfx { namespace glsl
 				);
 		}
 
-		uint32_t shaderSize = (uint32_t)strlen(optimizedShader);
+		uint32_t shaderSize = (uint32_t)bx::strLen(optimizedShader);
 		bx::write(_writer, shaderSize);
 		bx::write(_writer, optimizedShader, shaderSize);
 		uint8_t nul = 0;
 		bx::write(_writer, nul);
 
-		if (_cmdLine.hasArg('\0', "disasm") )
+		if (_options.disasm )
 		{
-			std::string disasmfp = _cmdLine.findOption('o');
-			disasmfp += ".disasm";
+			std::string disasmfp = _options.outputFilePath + ".disasm";
 			writeFile(disasmfp.c_str(), optimizedShader, shaderSize);
 		}
 
@@ -226,9 +305,9 @@ namespace bgfx { namespace glsl
 
 } // namespace glsl
 
-	bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
+	bool compileGLSLShader(const Options& _options, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
 	{
-		return glsl::compile(_cmdLine, _version, _code, _writer);
+		return glsl::compile(_options, _version, _code, _writer);
 	}
 
 } // namespace bgfx

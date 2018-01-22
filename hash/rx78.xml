@@ -11,4 +11,18 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="chlgolf">
+		<description>Challenge Golf</description>
+		<year>1983</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="rx78_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="ChallengeGolf.bin" size="0x2000" crc="e4edf5c3" sha1="25322dbf6b8f80604aebe87cc375e5a63b98b6d6" offset="0x2000" />
+				<rom size="0x2000" offset="0x0000" loadflag="continue" />
+			</dataarea>
+		</part>
+	</software>
+
+
 </softwarelist>

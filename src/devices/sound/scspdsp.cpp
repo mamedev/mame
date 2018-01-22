@@ -3,15 +3,17 @@
 #include "emu.h"
 #include "scspdsp.h"
 
-static uint16_t PACK(int32_t val)
-{
-	uint32_t temp;
-	int sign,exponent,k;
+#include <cstring>
 
-	sign = (val >> 23) & 0x1;
-	temp = (val ^ (val << 1)) & 0xFFFFFF;
-	exponent = 0;
-	for (k=0; k<12; k++)
+
+namespace {
+
+uint16_t PACK(int32_t val)
+{
+	int const sign = BIT(val, 23);
+	uint32_t temp = (val ^ (val << 1)) & 0xFFFFFF;
+	int exponent = 0;
+	for (int k = 0; k < 12; k++)
 	{
 		if (temp & 0x800000)
 			break;
@@ -27,25 +29,24 @@ static uint16_t PACK(int32_t val)
 	val |= sign << 15;
 	val |= exponent << 11;
 
-	return (uint16_t)val;
+	return uint16_t(val);
 }
 
 static int32_t UNPACK(uint16_t val)
 {
-	int sign,exponent,mantissa;
-	int32_t uval;
-
-	sign = (val >> 15) & 0x1;
-	exponent = (val >> 11) & 0xF;
-	mantissa = val & 0x7FF;
-	uval = mantissa << 11;
+	int const sign = BIT(val, 15);
+	int exponent = (val >> 11) & 0xF;
+	int const mantissa = val & 0x7FF;
+	int32_t uval = mantissa << 11;
 	if (exponent > 11)
 	{
 		exponent = 11;
 		uval |= sign << 22;
 	}
 	else
+	{
 		uval |= (sign ^ 1) << 22;
+	}
 	uval |= sign << 23;
 	uval <<= 8;
 	uval >>= 8;
@@ -54,91 +55,88 @@ static int32_t UNPACK(uint16_t val)
 	return uval;
 }
 
-void SCSPDSP_Init(SCSPDSP *DSP)
+} // anonymous namespace
+
+
+void SCSPDSP::Init()
 {
-	memset(DSP,0,sizeof(SCSPDSP));
-	DSP->RBL=0x8000;
-	DSP->Stopped=1;
+	std::memset(this, 0, sizeof(*this));
+	RBL = 0x8000;
+	Stopped = 1;
 }
 
-void SCSPDSP_Step(SCSPDSP *DSP)
+void SCSPDSP::Step()
 {
-	int32_t ACC=0;    //26 bit
-	int32_t SHIFTED=0;    //24 bit
-	int32_t X;  //24 bit
-	int32_t Y=0;  //13 bit
-	int32_t B;  //26 bit
-	int32_t INPUTS; //24 bit
-	int32_t MEMVAL=0;
-	int32_t FRC_REG=0;    //13 bit
-	int32_t Y_REG=0;      //24 bit
-	uint32_t ADDR;
-	uint32_t ADRS_REG=0;  //13 bit
-	int step;
-
-	if(DSP->Stopped)
+	if (Stopped)
 		return;
 
-	memset(DSP->EFREG,0,2*16);
+	std::fill(std::begin(EFREG), std::end(EFREG), 0);
+
 #if 0
 	int dump=0;
 	FILE *f=nullptr;
 	if(dump)
 		f=fopen("dsp.txt","wt");
 #endif
-	for(step=0;step</*128*/DSP->LastStep;++step)
+
+	int32_t ACC = 0;    //26 bit
+	int32_t SHIFTED = 0;    //24 bit
+	int32_t Y = 0;  //13 bit
+	int32_t MEMVAL = 0;
+	int32_t FRC_REG = 0;    //13 bit
+	int32_t Y_REG = 0;      //24 bit
+	uint32_t ADRS_REG = 0;  //13 bit
+
+	for (int step = 0; step < /*128*/LastStep; ++step)
 	{
-		uint16_t *IPtr=DSP->MPRO+step*4;
+		uint16_t *const IPtr = MPRO + (step * 4);
 
-//      if(IPtr[0]==0 && IPtr[1]==0 && IPtr[2]==0 && IPtr[3]==0)
-//          break;
+		//if (!IPtr[0] && !IPtr[1] && !IPtr[2] && !IPtr[3])
+			//break;
 
-		uint32_t TRA=(IPtr[0]>>8)&0x7F;
-		uint32_t TWT=(IPtr[0]>>7)&0x01;
-		uint32_t TWA=(IPtr[0]>>0)&0x7F;
+		uint32_t const TRA   = (IPtr[0] >>  8) & 0x7F;
+		uint32_t const TWT   = (IPtr[0] >>  7) & 0x01;
+		uint32_t const TWA   = (IPtr[0] >>  0) & 0x7F;
 
-		uint32_t XSEL=(IPtr[1]>>15)&0x01;
-		uint32_t YSEL=(IPtr[1]>>13)&0x03;
-		uint32_t IRA=(IPtr[1]>>6)&0x3F;
-		uint32_t IWT=(IPtr[1]>>5)&0x01;
-		uint32_t IWA=(IPtr[1]>>0)&0x1F;
+		uint32_t const XSEL  = (IPtr[1] >> 15) & 0x01;
+		uint32_t const YSEL  = (IPtr[1] >> 13) & 0x03;
+		uint32_t const IRA   = (IPtr[1] >>  6) & 0x3F;
+		uint32_t const IWT   = (IPtr[1] >>  5) & 0x01;
+		uint32_t const IWA   = (IPtr[1] >>  0) & 0x1F;
 
-		uint32_t TABLE=(IPtr[2]>>15)&0x01;
-		uint32_t MWT=(IPtr[2]>>14)&0x01;
-		uint32_t MRD=(IPtr[2]>>13)&0x01;
-		uint32_t EWT=(IPtr[2]>>12)&0x01;
-		uint32_t EWA=(IPtr[2]>>8)&0x0F;
-		uint32_t ADRL=(IPtr[2]>>7)&0x01;
-		uint32_t FRCL=(IPtr[2]>>6)&0x01;
-		uint32_t SHIFT=(IPtr[2]>>4)&0x03;
-		uint32_t YRL=(IPtr[2]>>3)&0x01;
-		uint32_t NEGB=(IPtr[2]>>2)&0x01;
-		uint32_t ZERO=(IPtr[2]>>1)&0x01;
-		uint32_t BSEL=(IPtr[2]>>0)&0x01;
+		uint32_t const TABLE = (IPtr[2] >> 15) & 0x01;
+		uint32_t const MWT   = (IPtr[2] >> 14) & 0x01;
+		uint32_t const MRD   = (IPtr[2] >> 13) & 0x01;
+		uint32_t const EWT   = (IPtr[2] >> 12) & 0x01;
+		uint32_t const EWA   = (IPtr[2] >>  8) & 0x0F;
+		uint32_t const ADRL  = (IPtr[2] >>  7) & 0x01;
+		uint32_t const FRCL  = (IPtr[2] >>  6) & 0x01;
+		uint32_t const SHIFT = (IPtr[2] >>  4) & 0x03;
+		uint32_t const YRL   = (IPtr[2] >>  3) & 0x01;
+		uint32_t const NEGB  = (IPtr[2] >>  2) & 0x01;
+		uint32_t const ZERO  = (IPtr[2] >>  1) & 0x01;
+		uint32_t const BSEL  = (IPtr[2] >>  0) & 0x01;
 
-		uint32_t NOFL=(IPtr[3]>>15)&1;        //????
-		uint32_t COEF=(IPtr[3]>>9)&0x3f;
+		uint32_t const NOFL  = (IPtr[3] >> 15) & 0x01;  //????
+		uint32_t const COEF  = (IPtr[3] >>  9) & 0x3f;
 
-		uint32_t MASA=(IPtr[3]>>2)&0x1f;  //???
-		uint32_t ADREB=(IPtr[3]>>1)&0x1;
-		uint32_t NXADR=(IPtr[3]>>0)&0x1;
-
-		int64_t v;
+		uint32_t const MASA  = (IPtr[3] >>  2) & 0x1f;  //???
+		uint32_t const ADREB = (IPtr[3] >>  1) & 0x01;
+		uint32_t const NXADR = (IPtr[3] >>  0) & 0x01;
 
 		//operations are done at 24 bit precision
 #if 0
-		if(MASA)
+		if (MASA)
 			int a=1;
-		if(NOFL)
+		if (NOFL)
 			int a=1;
 
-//      int dump=0;
+		//int dump=0;
 
-		if(f)
+		if (f)
 		{
-#define DUMP(v) fprintf(f," " #v ": %04X",v);
-
-			fprintf(f,"%d: ",step);
+#define DUMP(v) fprintf(f, " " #v ": %04X", v);
+			fprintf(f, "%d: ", step);
 			DUMP(ACC);
 			DUMP(SHIFTED);
 			DUMP(X);
@@ -150,206 +148,193 @@ void SCSPDSP_Step(SCSPDSP *DSP)
 			DUMP(Y_REG);
 			DUMP(ADDR);
 			DUMP(ADRS_REG);
-			fprintf(f,"\n");
+			fprintf(f, "\n");
+#undef DUMP
 		}
 #endif
+
 		//INPUTS RW
-// colmns97 hits this
-//      assert(IRA<0x32);
-		if(IRA<=0x1f)
-			INPUTS=DSP->MEMS[IRA];
-		else if(IRA<=0x2F)
-			INPUTS=DSP->MIXS[IRA-0x20]<<4;  //MIXS is 20 bit
-		else if(IRA<=0x31)
-			INPUTS=0;
+		// colmns97 hits this
+		//assert(IRA < 0x32);
+		int32_t INPUTS; // 24-bit
+		if (IRA <= 0x1f)
+			INPUTS = MEMS[IRA];
+		else if (IRA <= 0x2F)
+			INPUTS = MIXS[IRA - 0x20] << 4;  //MIXS is 20 bit
+		else if (IRA <= 0x31)
+			INPUTS = 0;
 		else
 			return;
 
-		INPUTS<<=8;
-		INPUTS>>=8;
-		//if(INPUTS&0x00800000)
-		//  INPUTS|=0xFF000000;
+		INPUTS <<= 8;
+		INPUTS >>= 8;
+		//if(INPUTS & 0x00800000)
+			//INPUTS |= 0xFF000000;
 
-		if(IWT)
+		if (IWT)
 		{
-			DSP->MEMS[IWA]=MEMVAL;  //MEMVAL was selected in previous MRD
-			if(IRA==IWA)
-				INPUTS=MEMVAL;
+			MEMS[IWA] = MEMVAL;  // MEMVAL was selected in previous MRD
+			if (IRA == IWA)
+				INPUTS = MEMVAL;
 		}
 
 		//Operand sel
-		//B
-		if(!ZERO)
+		int32_t B; // 26-bit
+		if (!ZERO)
 		{
-			if(BSEL)
-				B=ACC;
+			if (BSEL)
+				B = ACC;
 			else
 			{
-				B=DSP->TEMP[(TRA+DSP->DEC)&0x7F];
-				B<<=8;
-				B>>=8;
-				//if(B&0x00800000)
-				//  B|=0xFF000000;  //Sign extend
+				B = TEMP[(TRA + DEC) & 0x7F];
+				B <<= 8;
+				B >>= 8;
+				//if (B & 0x00800000)
+					//B |= 0xFF000000;  //Sign extend
 			}
-			if(NEGB)
-				B=0-B;
+			if (NEGB)
+				B = 0 - B;
 		}
 		else
-			B=0;
+			B = 0;
 
-		//X
-		if(XSEL)
-			X=INPUTS;
+		int32_t X; // 24-bit
+		if (XSEL)
+			X = INPUTS;
 		else
 		{
-			X=DSP->TEMP[(TRA+DSP->DEC)&0x7F];
-			X<<=8;
-			X>>=8;
-			//if(X&0x00800000)
-			//  X|=0xFF000000;
+			X = TEMP[(TRA + DEC) & 0x7F];
+			X <<= 8;
+			X >>= 8;
+			//if (X & 0x00800000)
+				//X |= 0xFF000000;
 		}
 
-		//Y
-		if(YSEL==0)
-			Y=FRC_REG;
-		else if(YSEL==1)
-			Y=DSP->COEF[COEF]>>3;   //COEF is 16 bits
-		else if(YSEL==2)
-			Y=(Y_REG>>11)&0x1FFF;
-		else if(YSEL==3)
-			Y=(Y_REG>>4)&0x0FFF;
+		if (YSEL == 0)
+			Y = FRC_REG;
+		else if (YSEL == 1)
+			Y = this->COEF[COEF] >> 3;   //COEF is 16 bits
+		else if (YSEL == 2)
+			Y = (Y_REG >> 11) & 0x1FFF;
+		else if (YSEL == 3)
+			Y = (Y_REG >> 4) & 0x0FFF;
 
-		if(YRL)
-			Y_REG=INPUTS;
+		if (YRL)
+			Y_REG = INPUTS;
 
 		//Shifter
-		if(SHIFT==0)
+		if (SHIFT == 0)
+			SHIFTED = std::max<int32_t>(std::min<int32_t>(ACC, 0x007FFFFF), -0x00800000);
+		else if (SHIFT == 1)
+			SHIFTED = std::max<int32_t>(std::min<int32_t>(ACC * 2, 0x007FFFFF), -0x00800000);
+		else if (SHIFT == 2)
 		{
-			SHIFTED=ACC;
-			if(SHIFTED>0x007FFFFF)
-				SHIFTED=0x007FFFFF;
-			if(SHIFTED<(-0x00800000))
-				SHIFTED=-0x00800000;
-		}
-		else if(SHIFT==1)
-		{
-			SHIFTED=ACC*2;
-			if(SHIFTED>0x007FFFFF)
-				SHIFTED=0x007FFFFF;
-			if(SHIFTED<(-0x00800000))
-				SHIFTED=-0x00800000;
-		}
-		else if(SHIFT==2)
-		{
-			SHIFTED=ACC*2;
-			SHIFTED<<=8;
-			SHIFTED>>=8;
-			//SHIFTED&=0x00FFFFFF;
-			//if(SHIFTED&0x00800000)
-			//  SHIFTED|=0xFF000000;
+			SHIFTED = ACC * 2;
+			SHIFTED <<= 8;
+			SHIFTED >>= 8;
+			//SHIFTED &= 0x00FFFFFF;
+			//if (SHIFTED & 0x00800000)
+				//SHIFTED |= 0xFF000000;
 		}
 		else if(SHIFT==3)
 		{
-			SHIFTED=ACC;
-			SHIFTED<<=8;
-			SHIFTED>>=8;
-			//SHIFTED&=0x00FFFFFF;
-			//if(SHIFTED&0x00800000)
-			//  SHIFTED|=0xFF000000;
+			SHIFTED = ACC;
+			SHIFTED <<= 8;
+			SHIFTED >>= 8;
+			//SHIFTED &= 0x00FFFFFF;
+			//if (SHIFTED & 0x00800000)
+				//SHIFTED |= 0xFF000000;
 		}
 
 		//ACCUM
-		Y<<=19;
-		Y>>=19;
-		//if(Y&0x1000)
-		//  Y|=0xFFFFF000;
+		Y <<= 19;
+		Y >>= 19;
+		//if (Y & 0x1000)
+			//Y |= 0xFFFFF000;
 
-		v=(((int64_t) X*(int64_t) Y)>>12);
-		ACC=(int) v+B;
+		int64_t const v = (int64_t(X) * int64_t(Y)) >> 12;
+		ACC = int(v + B);
 
-		if(TWT)
-			DSP->TEMP[(TWA+DSP->DEC)&0x7F]=SHIFTED;
+		if (TWT)
+			TEMP[(TWA + DEC) & 0x7F] = SHIFTED;
 
-		if(FRCL)
+		if (FRCL)
 		{
-			if(SHIFT==3)
-				FRC_REG=SHIFTED&0x0FFF;
+			if (SHIFT == 3)
+				FRC_REG = SHIFTED & 0x0FFF;
 			else
-				FRC_REG=(SHIFTED>>11)&0x1FFF;
+				FRC_REG = (SHIFTED >> 11) & 0x1FFF;
 		}
 
-		if(MRD || MWT)
-		//if(0)
+		if (MRD || MWT)
+		//if (0)
 		{
-			ADDR=DSP->MADRS[MASA];
-			if(!TABLE)
-				ADDR+=DSP->DEC;
-			if(ADREB)
-				ADDR+=ADRS_REG&0x0FFF;
-			if(NXADR)
+			uint32_t ADDR = MADRS[MASA];
+			if (!TABLE)
+				ADDR += DEC;
+			if (ADREB)
+				ADDR += ADRS_REG & 0x0FFF;
+			if (NXADR)
 				ADDR++;
-			if(!TABLE)
-				ADDR&=DSP->RBL-1;
+			if (!TABLE)
+				ADDR &= RBL - 1;
 			else
-				ADDR&=0xFFFF;
-			//ADDR<<=1;
-			//ADDR+=DSP->RBP<<13;
-			//MEMVAL=DSP->SCSPRAM[ADDR>>1];
-			ADDR+=DSP->RBP<<12;
+				ADDR &= 0xFFFF;
+			//ADDR <<= 1;
+			//ADDR += RBP << 13;
+			//MEMVAL = SCSPRAM[ADDR >> 1];
+			ADDR += RBP << 12;
 			if (ADDR > 0x7ffff) ADDR = 0;
-			if(MRD && (step&1)) //memory only allowed on odd? DoA inserts NOPs on even
+			if (MRD && (step & 1)) //memory only allowed on odd? DoA inserts NOPs on even
 			{
-				if(NOFL)
-					MEMVAL=DSP->SCSPRAM[ADDR]<<8;
+				if (NOFL)
+					MEMVAL = SCSPRAM[ADDR] << 8;
 				else
-					MEMVAL=UNPACK(DSP->SCSPRAM[ADDR]);
+					MEMVAL = UNPACK(SCSPRAM[ADDR]);
 			}
-			if(MWT && (step&1))
+			if (MWT && (step & 1))
 			{
-				if(NOFL)
-						DSP->SCSPRAM[ADDR]=SHIFTED>>8;
+				if (NOFL)
+					SCSPRAM[ADDR] = SHIFTED >> 8;
 				else
-					DSP->SCSPRAM[ADDR]=PACK(SHIFTED);
+					SCSPRAM[ADDR] = PACK(SHIFTED);
 			}
 		}
 
-		if(ADRL)
+		if (ADRL)
 		{
-			if(SHIFT==3)
-				ADRS_REG=(SHIFTED>>12)&0xFFF;
+			if (SHIFT == 3)
+				ADRS_REG = (SHIFTED >> 12) & 0xFFF;
 			else
-				ADRS_REG=(INPUTS>>16);
+				ADRS_REG = INPUTS >> 16;
 		}
 
-		if(EWT)
-			DSP->EFREG[EWA]+=SHIFTED>>8;
-
+		if (EWT)
+			EFREG[EWA] += SHIFTED >> 8;
 	}
-	--DSP->DEC;
-	memset(DSP->MIXS,0,4*16);
-//  if(f)
-//      fclose(f);
+	--DEC;
+	std::fill(std::begin(MIXS), std::end(MIXS), 0);
+	//if (f)
+		//fclose(f);
 }
 
-void SCSPDSP_SetSample(SCSPDSP *DSP,int32_t sample,int SEL,int MXL)
+void SCSPDSP::SetSample(int32_t sample, int SEL, int MXL)
 {
-	//DSP->MIXS[SEL]+=sample<<(MXL+1)/*7*/;
-	DSP->MIXS[SEL]+=sample;
-//  if(MXL)
-//      int a=1;
+	//MIXS[SEL] += sample << (MXL + 1)/*7*/;
+	MIXS[SEL] += sample;
+	//if (MXL)
+		//int a = 1;
 }
 
-void SCSPDSP_Start(SCSPDSP *DSP)
+void SCSPDSP::Start()
 {
+	Stopped = 0;
 	int i;
-	DSP->Stopped=0;
-	for(i=127;i>=0;--i)
+	for (i = 127; i >= 0; --i)
 	{
-		uint16_t *IPtr=DSP->MPRO+i*4;
-
-		if(IPtr[0]!=0 || IPtr[1]!=0 || IPtr[2]!=0 || IPtr[3]!=0)
+		uint16_t const *const IPtr = MPRO + (i * 4);
+		if (IPtr[0] || IPtr[1] || IPtr[2] || IPtr[3])
 			break;
 	}
-	DSP->LastStep=i+1;
-
+	LastStep = i + 1;
 }

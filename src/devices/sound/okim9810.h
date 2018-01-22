@@ -12,10 +12,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_SOUND_OKIM9810_H
+#define MAME_SOUND_OKIM9810_H
 
-#ifndef __OKIM9810_H__
-#define __OKIM9810_H__
+#pragma once
 
 #include "okiadpcm.h"
 
@@ -23,29 +23,6 @@
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
-
-enum
-{
-	OKIM9810_ADPCM_PLAYBACK = 0,
-	OKIM9810_ADPCM2_PLAYBACK = 1,
-	OKIM9810_STRAIGHT8_PLAYBACK = 2,
-	OKIM9810_NONLINEAR8_PLAYBACK = 3
-};
-
-enum
-{
-	OKIM9810_SECONDARY_FILTER = 0,
-	OKIM9810_PRIMARY_FILTER = 1,
-	OKIM9810_NO_FILTER = 2,
-	OKIM9810_NO_FILTER2 = 3
-};
-
-enum
-{
-	OKIM9810_OUTPUT_TO_DIRECT_DAC = 0,
-	OKIM9810_OUTPUT_TO_VOLTAGE_FOLLOWER = 1
-};
-
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -75,14 +52,36 @@ public:
 	okim9810_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint8_t read_status();
-	void write_TMP_register(uint8_t command);
+	void write_tmp_register(uint8_t command);
 	void write_command(uint8_t command);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_WRITE8_MEMBER( write_TMP_register );
+	DECLARE_WRITE8_MEMBER( write_tmp_register );
 
 protected:
+	enum
+	{
+		ADPCM_PLAYBACK = 0,
+		ADPCM2_PLAYBACK = 1,
+		STRAIGHT8_PLAYBACK = 2,
+		NONLINEAR8_PLAYBACK = 3
+	};
+
+	enum
+	{
+		SECONDARY_FILTER = 0,
+		PRIMARY_FILTER = 1,
+		NO_FILTER = 2,
+		NO_FILTER2 = 3
+	};
+
+	enum
+	{
+		OUTPUT_TO_DIRECT_DAC = 0,
+		OUTPUT_TO_VOLTAGE_FOLLOWER = 1
+	};
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -146,7 +145,7 @@ protected:
 	uint8_t m_filter_type;        // interpolation filter type set with the OPT command
 	uint8_t m_output_level;       // flag stating if a voltage follower is connected
 
-	static const int OKIM9810_VOICES = 8;
+	static constexpr int OKIM9810_VOICES = 8;
 	okim_voice m_voice[OKIM9810_VOICES];
 
 	static const uint32_t s_sampling_freq_table[16];
@@ -154,8 +153,6 @@ protected:
 
 
 // device type definition
-extern const device_type OKIM9810;
+DECLARE_DEVICE_TYPE(OKIM9810, okim9810_device)
 
-
-
-#endif // __OKIM9810_H__
+#endif // MAME_SOUND_OKIM9810_H

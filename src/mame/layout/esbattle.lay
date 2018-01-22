@@ -26,7 +26,7 @@
 
 		<bezel element="static_white"><bounds x="476" y="-38" width="1258" height="2218" /></bezel>
 		<bezel element="static_black"><bounds x="486" y="-18" width="1238" height="2178" /></bezel>
-		
+
 		<bezel element="text_ship"><bounds x="566" y="2020" width="110" height="110" /></bezel>
 		<bezel element="text_ship"><bounds x="1534" y="12" width="110" height="110" /><orientation rotate="180" /></bezel>
 

@@ -6,6 +6,7 @@
  */
 
 #include "nld_82S16.h"
+#include "../nl_base.h"
 
 namespace netlist
 {
@@ -37,7 +38,7 @@ namespace netlist
 		logic_input_t m_DIN;
 		logic_output_t m_DOUTQ;
 
-		state_var<uint_fast64_t[4]> m_ram; // 256 bits
+		state_var<uint64_t[4]> m_ram; // 256 bits
 	};
 
 	NETLIB_OBJECT_DERIVED(82S16_dip, 82S16)
@@ -87,8 +88,8 @@ namespace netlist
 			if (!m_WEQ())
 			{
 				m_ram[adr >> 6] = (m_ram[adr >> 6]
-						& ~(static_cast<uint_fast64_t>(1) << (adr & 0x3f)))
-						| (static_cast<uint_fast64_t>(m_DIN()) << (adr & 0x3f));
+						& ~(static_cast<uint64_t>(1) << (adr & 0x3f)))
+						| (static_cast<uint64_t>(m_DIN()) << (adr & 0x3f));
 			}
 			m_DOUTQ.push(((m_ram[adr >> 6] >> (adr & 0x3f)) & 1) ^ 1, NLTIME_FROM_NS(20));
 		}

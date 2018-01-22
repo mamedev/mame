@@ -53,10 +53,12 @@ DD10 DD14  DD18     H5            DD21
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
 #include "video/resnet.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class dmndrby_state : public driver_device
@@ -96,6 +98,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void dderby(machine_config &config);
 };
 
 
@@ -521,7 +524,7 @@ INTERRUPT_GEN_MEMBER(dmndrby_state::dderby_timer_irq)
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); /* RST 08h */
 }
 
-static MACHINE_CONFIG_START( dderby, dmndrby_state )
+MACHINE_CONFIG_START(dmndrby_state::dderby)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(memmap)
@@ -656,6 +659,6 @@ ROM_START( dmndrbya )
 ROM_END
 
 
-/*    YEAR, NAME,    PARENT,   MACHINE, INPUT,   INIT,    MONITOR, COMPANY,   FULLNAME */
-GAME( 1994, dmndrby,  0,       dderby, dderby, driver_device,  0, ROT0, "Electrocoin", "Diamond Derby (Newer)",MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING ) // hack?
-GAME( 1986, dmndrbya, dmndrby, dderby, dderbya, driver_device, 0, ROT0, "Electrocoin", "Diamond Derby (Original)",MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING )
+//    YEAR, NAME,     PARENT,  MACHINE, INPUT,   STATE,         INIT, MONITOR, COMPANY,       FULLNAME                    FLAGS
+GAME( 1994, dmndrby,  0,       dderby,  dderby,  dmndrby_state, 0,    ROT0,    "Electrocoin", "Diamond Derby (Newer)",    MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING ) // hack?
+GAME( 1986, dmndrbya, dmndrby, dderby,  dderbya, dmndrby_state, 0,    ROT0,    "Electrocoin", "Diamond Derby (Original)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_COLORS|MACHINE_NOT_WORKING )

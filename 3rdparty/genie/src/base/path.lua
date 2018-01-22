@@ -6,43 +6,6 @@
 
 
 --
--- Get the absolute file path from a relative path. The requested
--- file path doesn't actually need to exist.
---
-
-	function path.getabsolute(p)
-		-- normalize the target path
-		p = path.translate(p, "/")
-		if (p == "") then p = "." end
-
-		-- if the directory is already absolute I don't need to do anything
-		local result = iif (path.isabsolute(p), nil, os.getcwd())
-
-		-- split up the supplied relative path and tackle it bit by bit
-		for n, part in ipairs(p:explode("/", true)) do
-			if (part == "" and n == 1) then
-				result = "/"
-			elseif (part == "..") then
-				result = path.getdirectory(result)
-			elseif (part ~= ".") then
-				-- Environment variables embedded in the path need to be treated
-				-- as relative paths; path.join() makes them absolute
-				if (part:startswith("$") and n > 1) then
-					result = result .. "/" .. part
-				else
-					result = path.join(result, part)
-				end
-			end
-		end
-
-		-- if I end up with a trailing slash remove it
-		result = iif(result:endswith("/"), result:sub(1, -2), result)
-
-		return result
-	end
-
-
---
 -- Retrieve the filename portion of a path, without any extension.
 --
 
@@ -128,68 +91,6 @@
 	end
 
 
---
--- Returns the relative path from src to dest.
---
-
-	function path.getrelative(src, dst)
-		-- normalize the two paths
-		src = path.getabsolute(src)
-		dst = path.getabsolute(dst)
-
-		-- same directory?
-		if (src == dst) then
-			return "."
-		end
-
-		-- dollar macro? Can't tell what the real path is; use absolute
-		-- This enables paths like $(SDK_ROOT)/include to work correctly.
-		if dst:startswith("$") then
-			return dst
-		end
-
-		src = src .. "/"
-		dst = dst .. "/"
-
-		-- find the common leading directories
-		local idx = 0
-		while (true) do
-			local tst = src:find("/", idx + 1, true)
-			if tst then
-				if src:sub(1,tst) == dst:sub(1,tst) then
-					idx = tst
-				else
-					break
-				end
-			else
-				break
-			end
-		end
-
-		-- if they have nothing in common return absolute path
-		local first = src:find("/", 0, true)
-		if idx <= first then
-			return dst:sub(1, -2)
-		end
-
-		-- trim off the common directories from the front
-		src = src:sub(idx + 1)
-		dst = dst:sub(idx + 1)
-
-		-- back up from dst to get to this common parent
-		local result = ""
-		idx = src:find("/")
-		while (idx) do
-			result = result .. "../"
-			idx = src:find("/", idx + 1)
-		end
-
-		-- tack on the path down to the dst from here
-		result = result .. dst
-
-		-- remove the trailing slash
-		return result:sub(1, -2)
-	end
 
 --
 -- Returns the common base directory of two paths.
@@ -279,21 +180,30 @@
 		return path.hasextension(fname, ".natvis")
 	end
 
-	function path.isSourceFile(fname)
-		return path.hasextension(fname, { ".cc", ".cpp", ".cxx", ".c", ".s", ".m", ".mm", ".vala", ".swift" })
-	end
-
-	function path.isSourceFileVS(fname)
-		return path.isSourceFile(fname)
-			or path.iscxfile(fname)
-	end
-
 	function path.isasmfile(fname)
-		return path.hasextension(fname, { ".asm", ".s" })
+		return path.hasextension(fname, { ".asm", ".s", ".S" })
+	end
+
+	function path.isvalafile(fname)
+		return path.hasextension(fname, ".vala")
 	end
 
 	function path.isswiftfile(fname)
 		return path.hasextension(fname, ".swift")
+	end
+
+	function path.issourcefile(fname)
+		return path.iscfile(fname)
+			or path.iscppfile(fname)
+			or path.iscxfile(fname)
+			or path.isasmfile(fname)
+			or path.isvalafile(fname)
+			or path.isswiftfile(fname)
+	end
+
+	function path.issourcefilevs(fname)
+		return path.hasextension(fname, { ".cc", ".cpp", ".cxx", ".c" })
+			or path.iscxfile(fname)
 	end
 
 --
@@ -305,6 +215,16 @@
 		return path.hasextension(fname, ".rc")
 	end
 
+
+--
+-- Returns true if the filename represents a Windows image file. 
+--
+
+	function path.isimagefile(fname)
+		local extensions = { ".png" }
+		local ext = path.getextension(fname):lower()
+		return table.contains(extensions, ext)
+	end
 
 --
 -- Join one or more pieces of a path together into a single path.

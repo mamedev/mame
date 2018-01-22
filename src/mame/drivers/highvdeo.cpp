@@ -97,12 +97,17 @@ Game is V30 based, with rom banking (2Mb)
 *************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/nec/nec.h"
+
 #include "cpu/i86/i186.h"
-#include "sound/okim6376.h"
+#include "cpu/nec/nec.h"
 #include "machine/nvram.h"
-#include "fashion.lh"
+#include "sound/okim6376.h"
 #include "video/ramdac.h"
+
+#include "screen.h"
+#include "speaker.h"
+
+#include "fashion.lh"
 
 
 class highvdeo_state : public driver_device
@@ -154,6 +159,15 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6376_device> m_okim6376;
 	required_device<palette_device> m_palette;
+	void grancapi(machine_config &config);
+	void tv_ncf(machine_config &config);
+	void ciclone(machine_config &config);
+	void nyjoker(machine_config &config);
+	void magicbom(machine_config &config);
+	void brasil(machine_config &config);
+	void newmcard(machine_config &config);
+	void tv_tcf(machine_config &config);
+	void tv_vcf(machine_config &config);
 };
 
 
@@ -422,7 +436,7 @@ static ADDRESS_MAP_START( tv_tcf_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
-	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
@@ -1114,12 +1128,12 @@ INTERRUPT_GEN_MEMBER(highvdeo_state::vblank_irq_80186)
 	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, highvdeo_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, highvdeo_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
+MACHINE_CONFIG_START(highvdeo_state::tv_vcf)
 	MCFG_CPU_ADD("maincpu", V30, XTAL_12MHz/2 ) // ?
 	MCFG_CPU_PROGRAM_MAP(tv_vcf_map)
 	MCFG_CPU_IO_MAP(tv_vcf_io)
@@ -1148,7 +1162,7 @@ static MACHINE_CONFIG_START( tv_vcf, highvdeo_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tv_ncf, tv_vcf )
+MACHINE_CONFIG_DERIVED(highvdeo_state::tv_ncf, tv_vcf)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tv_ncf_map)
@@ -1156,7 +1170,7 @@ static MACHINE_CONFIG_DERIVED( tv_ncf, tv_vcf )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nyjoker, tv_vcf )
+MACHINE_CONFIG_DERIVED(highvdeo_state::nyjoker, tv_vcf)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nyjoker_map)
@@ -1164,7 +1178,7 @@ static MACHINE_CONFIG_DERIVED( nyjoker, tv_vcf )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tv_tcf, tv_vcf )
+MACHINE_CONFIG_DERIVED(highvdeo_state::tv_tcf, tv_vcf)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tv_tcf_map)
@@ -1177,7 +1191,7 @@ static MACHINE_CONFIG_DERIVED( tv_tcf, tv_vcf )
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGGBBBBB)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( newmcard, tv_tcf )
+MACHINE_CONFIG_DERIVED(highvdeo_state::newmcard, tv_tcf)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(newmcard_map)
@@ -1187,7 +1201,7 @@ static MACHINE_CONFIG_DERIVED( newmcard, tv_tcf )
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ciclone, tv_tcf )
+MACHINE_CONFIG_DERIVED(highvdeo_state::ciclone, tv_tcf)
 
 	MCFG_DEVICE_REMOVE("maincpu")
 
@@ -1197,7 +1211,7 @@ static MACHINE_CONFIG_DERIVED( ciclone, tv_tcf )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", highvdeo_state,  vblank_irq_80186)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( brasil, highvdeo_state )
+MACHINE_CONFIG_START(highvdeo_state::brasil)
 	MCFG_CPU_ADD("maincpu", I80186, 20000000 )  // fashion doesn't like 20/2 Mhz
 	MCFG_CPU_PROGRAM_MAP(brasil_map)
 	MCFG_CPU_IO_MAP(brasil_io)
@@ -1223,7 +1237,7 @@ static MACHINE_CONFIG_START( brasil, highvdeo_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( grancapi, highvdeo_state )
+MACHINE_CONFIG_START(highvdeo_state::grancapi)
 	MCFG_CPU_ADD("maincpu", I80186, 20000000 )
 	MCFG_CPU_PROGRAM_MAP(brasil_map)
 	MCFG_CPU_IO_MAP(grancapi_io)
@@ -1249,7 +1263,7 @@ static MACHINE_CONFIG_START( grancapi, highvdeo_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( magicbom, highvdeo_state )
+MACHINE_CONFIG_START(highvdeo_state::magicbom)
 	MCFG_CPU_ADD("maincpu", I80186, 20000000 )
 	MCFG_CPU_PROGRAM_MAP(brasil_map)
 	MCFG_CPU_IO_MAP(magicbom_io)
@@ -1641,20 +1655,20 @@ DRIVER_INIT_MEMBER(highvdeo_state, record)
 }
 
 
-GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf,  driver_device,   0,       ROT0,  "High Video", "Tour 4000",         0, layout_fashion )
-GAMEL( 2000, cfever40,  0,      tv_vcf,   tv_vcf,  driver_device,   0,       ROT0,  "High Video", "Casino Fever 4.0",  0, layout_fashion )
-GAMEL( 2000, cfever50,  0,      tv_vcf,   tv_vcf,  driver_device,   0,       ROT0,  "High Video", "Casino Fever 5.0",  0, layout_fashion )
-GAMEL( 2000, tour4010,  0,      tv_ncf,   tv_ncf,  driver_device,   0,       ROT0,  "High Video", "Tour 4010",         0, layout_fashion )
-GAMEL( 2000, cfever51,  0,      tv_ncf,   tv_ncf,  driver_device,   0,       ROT0,  "High Video", "Casino Fever 5.1",  0, layout_fashion )
-GAMEL( 2000, cfever61,  0,      tv_ncf,   tv_ncf,  driver_device,   0,       ROT0,  "High Video", "Casino Fever 6.1",  0, layout_fashion )
-GAMEL( 2000, nyjoker,   0,      nyjoker,  nyjoker, driver_device,   0,       ROT0,  "High Video", "New York Joker",    0, layout_fashion )
-GAMEL( 2000, cfever1k,  0,      tv_tcf,   tv_tcf,  driver_device,   0,       ROT0,  "High Video", "Casino Fever 1k",   0, layout_fashion )
-GAMEL( 2000, girotutt,  0,      tv_tcf,   tv_tcf,  driver_device,   0,       ROT0,  "High Video", "GiroTutto",         0, layout_fashion )
-GAMEL( 2000, galeone,   0,      nyjoker,  nyjoker, driver_device,   0,       ROT0,  "San Remo Games", "Il Galeone",    0, layout_fashion )
-GAMEL( 2000, ciclone,   0,      ciclone,  tv_tcf,  highvdeo_state,  ciclone, ROT0,  "High Video", "Ciclone",           0, layout_fashion )
-GAMEL( 2000, newmcard,  0,      newmcard, tv_tcf,  driver_device,   0,       ROT0,  "High Video", "New Magic Card",    0, layout_fashion )
-GAMEL( 2000, brasil,    0,      brasil,   brasil,  driver_device,   0,       ROT0,  "High Video", "Bra$il (Version 3)",       0,                layout_fashion )
-GAMEL( 2000, fashion,   brasil, brasil,   fashion, highvdeo_state,  fashion, ROT0,  "High Video", "Fashion (Version 2.14)",   0,                layout_fashion )
-GAMEL( 2000, grancapi,  0,      grancapi, brasil,  driver_device,   0,       ROT0,  "High Video", "Gran Capitan (Version 3)", MACHINE_NOT_WORKING, layout_fashion )
-GAMEL( 2000, magicbom,  0,      magicbom, fashion, highvdeo_state,  fashion, ROT0,  "High Video", "Magic Bomb (Version 1)",   MACHINE_NOT_WORKING, layout_fashion )
-GAMEL( 2000, record,    0,      newmcard, tv_tcf,  highvdeo_state,  record,  ROT0,  "High Video", "Record (Version 1)",       0,                layout_fashion )
+GAMEL( 2000, tour4000,  0,      tv_vcf,   tv_vcf,  highvdeo_state,  0,       ROT0,  "High Video",     "Tour 4000",                0,                   layout_fashion )
+GAMEL( 2000, cfever40,  0,      tv_vcf,   tv_vcf,  highvdeo_state,  0,       ROT0,  "High Video",     "Casino Fever 4.0",         0,                   layout_fashion )
+GAMEL( 2000, cfever50,  0,      tv_vcf,   tv_vcf,  highvdeo_state,  0,       ROT0,  "High Video",     "Casino Fever 5.0",         0,                   layout_fashion )
+GAMEL( 2000, tour4010,  0,      tv_ncf,   tv_ncf,  highvdeo_state,  0,       ROT0,  "High Video",     "Tour 4010",                0,                   layout_fashion )
+GAMEL( 2000, cfever51,  0,      tv_ncf,   tv_ncf,  highvdeo_state,  0,       ROT0,  "High Video",     "Casino Fever 5.1",         0,                   layout_fashion )
+GAMEL( 2000, cfever61,  0,      tv_ncf,   tv_ncf,  highvdeo_state,  0,       ROT0,  "High Video",     "Casino Fever 6.1",         0,                   layout_fashion )
+GAMEL( 2000, nyjoker,   0,      nyjoker,  nyjoker, highvdeo_state,  0,       ROT0,  "High Video",     "New York Joker",           0,                   layout_fashion )
+GAMEL( 2000, cfever1k,  0,      tv_tcf,   tv_tcf,  highvdeo_state,  0,       ROT0,  "High Video",     "Casino Fever 1k",          0,                   layout_fashion )
+GAMEL( 2000, girotutt,  0,      tv_tcf,   tv_tcf,  highvdeo_state,  0,       ROT0,  "High Video",     "GiroTutto",                0,                   layout_fashion )
+GAMEL( 2000, galeone,   0,      nyjoker,  nyjoker, highvdeo_state,  0,       ROT0,  "San Remo Games", "Il Galeone",               0,                   layout_fashion )
+GAMEL( 2000, ciclone,   0,      ciclone,  tv_tcf,  highvdeo_state,  ciclone, ROT0,  "High Video",     "Ciclone",                  0,                   layout_fashion )
+GAMEL( 2000, newmcard,  0,      newmcard, tv_tcf,  highvdeo_state,  0,       ROT0,  "High Video",     "New Magic Card",           0,                   layout_fashion )
+GAMEL( 2000, brasil,    0,      brasil,   brasil,  highvdeo_state,  0,       ROT0,  "High Video",     "Bra$il (Version 3)",       0,                   layout_fashion )
+GAMEL( 2000, fashion,   brasil, brasil,   fashion, highvdeo_state,  fashion, ROT0,  "High Video",     "Fashion (Version 2.14)",   0,                   layout_fashion )
+GAMEL( 2000, grancapi,  0,      grancapi, brasil,  highvdeo_state,  0,       ROT0,  "High Video",     "Gran Capitan (Version 3)", MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 2000, magicbom,  0,      magicbom, fashion, highvdeo_state,  fashion, ROT0,  "High Video",     "Magic Bomb (Version 1)",   MACHINE_NOT_WORKING, layout_fashion )
+GAMEL( 2000, record,    0,      newmcard, tv_tcf,  highvdeo_state,  record,  ROT0,  "High Video",     "Record (Version 1)",       0,                   layout_fashion )

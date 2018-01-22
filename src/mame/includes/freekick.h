@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina,David Haywood
 
 
@@ -30,13 +30,16 @@ public:
 	int        m_spinner;
 	int        m_nmi_en;
 	int        m_ff_data;
-	DECLARE_WRITE8_MEMBER(flipscreen_xy_w);
-	DECLARE_WRITE8_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(coin_w);
-	DECLARE_WRITE8_MEMBER(spinner_select_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_x_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_y_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(coin1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_w);
+	DECLARE_WRITE_LINE_MEMBER(spinner_select_w);
+	DECLARE_WRITE8_MEMBER(gigas_spinner_select_w);
 	DECLARE_READ8_MEMBER(spinner_r);
 	DECLARE_WRITE8_MEMBER(pbillrd_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
 	DECLARE_WRITE8_MEMBER(oigas_5_w);
 	DECLARE_READ8_MEMBER(oigas_3_r);
 	DECLARE_READ8_MEMBER(oigas_2_r);
@@ -67,4 +70,12 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_memory_bank m_bank1, m_bank1d;
+	void base(machine_config &config);
+	void oigas(machine_config &config);
+	void pbillrd(machine_config &config);
+	void gigas(machine_config &config);
+	void gigasm(machine_config &config);
+	void pbillrdm(machine_config &config);
+	void omega(machine_config &config);
+	void freekick(machine_config &config);
 };

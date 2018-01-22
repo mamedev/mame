@@ -205,13 +205,18 @@ TODO:
 */
 
 #include "emu.h"
+#include "includes/galpnipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 #include "machine/kaneko_hit.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/kaneko_tmap.h"
 #include "video/kaneko_spr.h"
-#include "includes/galpnipt.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class expro02_state : public driver_device
 {
@@ -240,7 +245,7 @@ public:
 	required_device<kaneko16_sprite_device> m_kaneko_spr;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	DECLARE_WRITE16_MEMBER(expro02_6295_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(expro02_6295_bankswitch_w);
 
 	DECLARE_DRIVER_INIT(expro02);
 	virtual void machine_start() override;
@@ -254,7 +259,15 @@ public:
 	// comad
 	READ16_MEMBER(comad_timer_r);
 	READ8_MEMBER(comad_okim6295_r);
-	WRITE16_MEMBER(galpanica_6295_bankswitch_w);
+	void supmodel(machine_config &config);
+	void zipzap(machine_config &config);
+	void fantasia(machine_config &config);
+	void fantsia2(machine_config &config);
+	void comad(machine_config &config);
+	void comad_noview2(machine_config &config);
+	void smissw(machine_config &config);
+	void galhustl(machine_config &config);
+	void expro02(machine_config &config);
 };
 
 
@@ -617,18 +630,16 @@ static INPUT_PORTS_START( zipzap )
 	SYSTEM_NO_TILT
 INPUT_PORTS_END
 
+
 /*************************************
  *
  *  Sound handlers
  *
  *************************************/
 
-WRITE16_MEMBER(expro02_state::expro02_6295_bankswitch_w)
+WRITE8_MEMBER( expro02_state::expro02_6295_bankswitch_w )
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		membank("okibank")->set_entry((data >> 8) & 0x0f);
-	}
+	membank("okibank")->set_entry(data & 0x0f);
 }
 
 
@@ -643,7 +654,7 @@ static ADDRESS_MAP_START( expro02_video_base_map, AS_PROGRAM, 16, expro02_state 
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fg_ind8ram")
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_SHARE("bg_rgb555ram")
 	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // palette?
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette?
 	AM_RANGE(0x680000, 0x68001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")    // sprites? 0x72f words tested
 	AM_RANGE(0x780000, 0x78001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
@@ -655,7 +666,7 @@ static ADDRESS_MAP_START( expro02_video_base_map_noview2, AS_PROGRAM, 16, expro0
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_SHARE("fg_ind8ram")
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_SHARE("bg_rgb555ram")
 	AM_RANGE(0x580000, 0x583fff) AM_NOP // games still makes leftover accesses
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // palette?
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // palette?
 	AM_RANGE(0x680000, 0x68001f) AM_NOP // games still makes leftover accesses
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")    // sprites? 0x72f words tested
 	AM_RANGE(0x780000, 0x78001f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
@@ -672,7 +683,7 @@ static ADDRESS_MAP_START( expro02_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(expro02_6295_bankswitch_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP    /* ??? */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
 	AM_RANGE(0xe00000, 0xe00015) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
@@ -687,7 +698,7 @@ static ADDRESS_MAP_START( fantasia_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x800006, 0x800007) AM_NOP // ? used ?
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(expro02_6295_bankswitch_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP    /* ??? */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
 	AM_RANGE(0xf00000, 0xf00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
@@ -704,7 +715,7 @@ static ADDRESS_MAP_START( comad_map, AS_PROGRAM, 16, expro02_state )
 //  AM_RANGE(0x800006, 0x800007)    ??
 	AM_RANGE(0x80000a, 0x80000b) AM_READ(comad_timer_r) /* bits 8-a = timer? palette update code waits for them to be 111 */
 	AM_RANGE(0x80000c, 0x80000d) AM_READ(comad_timer_r) /* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)  /* not sure */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
 	AM_RANGE(0xf00000, 0xf00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
@@ -719,7 +730,7 @@ static ADDRESS_MAP_START( fantsia2_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 //  AM_RANGE(0x800006, 0x800007)    ??
 	AM_RANGE(0x800008, 0x800009) AM_READ(comad_timer_r) /* bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)  /* not sure */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP    /* coin counters, + ? */
 	AM_RANGE(0xc80000, 0xc80001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
 	AM_RANGE(0xf80000, 0xf8ffff) AM_RAM
@@ -735,7 +746,7 @@ static ADDRESS_MAP_START( galhustl_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP // ?
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_RAM
@@ -752,7 +763,7 @@ static ADDRESS_MAP_START( zipzap_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM     // main ram
 
@@ -770,7 +781,7 @@ static ADDRESS_MAP_START( supmodel_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x800006, 0x800007) AM_READ(comad_timer_r)
 	AM_RANGE(0x800008, 0x800009) AM_READ(comad_timer_r)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)  /* not sure */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP
@@ -788,7 +799,7 @@ static ADDRESS_MAP_START( smissw_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x800006, 0x800007) AM_READ(comad_timer_r)
 	AM_RANGE(0x80000e, 0x80000f) AM_READ(comad_timer_r)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)  /* not sure */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP
@@ -797,7 +808,7 @@ static ADDRESS_MAP_START( smissw_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0xf00000, 0xf00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, expro02_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, expro02_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
@@ -840,15 +851,6 @@ READ8_MEMBER(expro02_state::comad_okim6295_r)
 	return retvalue;
 }
 
-WRITE16_MEMBER(expro02_state::galpanica_6295_bankswitch_w)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		membank("okibank")->set_entry((data >> 8) & 0x0f);
-	}
-}
-
-
 
 
 /*************************************
@@ -884,7 +886,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( expro02, expro02_state )
+MACHINE_CONFIG_START(expro02_state::expro02)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -929,14 +931,14 @@ static MACHINE_CONFIG_START( expro02, expro02_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 12000000/6, OKIM6295_PIN7_LOW)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_OKIM6295_ADD("oki", 12000000/6, PIN7_LOW)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( comad, expro02 )
+MACHINE_CONFIG_DERIVED(expro02_state::comad, expro02)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fantasia_map)
@@ -952,54 +954,54 @@ static MACHINE_CONFIG_DERIVED( comad, expro02 )
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(0))  /* a guess, and certainly wrong */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( comad_noview2, comad )
+MACHINE_CONFIG_DERIVED(expro02_state::comad_noview2, comad)
 	MCFG_DEVICE_REMOVE("view2_0")
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", expro02_noview2)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fantasia, comad_noview2 )
+MACHINE_CONFIG_DERIVED(expro02_state::fantasia, comad_noview2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(10000000)
 	MCFG_CPU_PROGRAM_MAP(comad_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( supmodel, comad_noview2 )
+MACHINE_CONFIG_DERIVED(expro02_state::supmodel, comad_noview2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(supmodel_map)
-	MCFG_OKIM6295_REPLACE("oki", 1584000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_OKIM6295_REPLACE("oki", 1584000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( smissw, comad_noview2 ) // 951127 PCB, 12 & 16 clocks
+MACHINE_CONFIG_DERIVED(expro02_state::smissw, comad_noview2) // 951127 PCB, 12 & 16 clocks
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(smissw_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fantsia2, comad_noview2 )
+MACHINE_CONFIG_DERIVED(expro02_state::fantsia2, comad_noview2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(fantsia2_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( galhustl, comad_noview2 )
+MACHINE_CONFIG_DERIVED(expro02_state::galhustl, comad_noview2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(galhustl_map)
-	MCFG_OKIM6295_REPLACE("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_OKIM6295_REPLACE("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(expro02_state, screen_update_zipzap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( zipzap, comad_noview2 )
+MACHINE_CONFIG_DERIVED(expro02_state::zipzap, comad_noview2)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(zipzap_map)
-	MCFG_OKIM6295_REPLACE("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_OKIM6295_REPLACE("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SCREEN_MODIFY("screen") // doesn't work with original kaneko_spr implementation
@@ -1650,6 +1652,23 @@ ROM_START( wownfant)
 	ROM_LOAD( "ep-4001 42750001 u1.bin",    0x80000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
 ROM_END
 
+ROM_START( missw02)
+	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "8.u81",      0x000000, 0x80000,  CRC(316666d0) SHA1(0ebebc55b49c1d00adac2b04bcfe9cfb317e8e74) ) // stickered as Miss World 2002 Rev.A
+	ROM_LOAD16_BYTE( "7.u80",      0x000001, 0x80000,  CRC(d61f4d18) SHA1(caef5fb221cafc354875ef5b68e84419f91c0db7) )
+	ROM_LOAD16_WORD_SWAP( "3.bin", 0x100000, 0x200000, CRC(fdfe36ba) SHA1(128277e44e2368267e097bb3510c797cc690d1ff) )
+	ROM_LOAD16_WORD_SWAP( "4.bin", 0x300000, 0x200000, CRC(aa769a81) SHA1(2beb6da9327ddce7bec934bcf610061fc3b9ab09) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
+	ROM_LOAD( "6.u113", 0x00000, 0x80000, CRC(3e77ca1f) SHA1(f946e65a29bc02b89c02b2a869578d38cfe7e2d0) ) // same as wowfant
+	ROM_LOAD( "5.u112", 0x80000, 0x80000, CRC(ead3411d) SHA1(ee1b071e4a556b66ecdedcdc7e1ee60851c0ddb0) )
+
+	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "2.u4", 0x00000, 0x80000, CRC(06dc889e) SHA1(726561ff01bbde43669293a6ff7ee22b048b4118) ) // these 2 same as wowfant
+	ROM_LOAD( "1.u1", 0x80000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
+ROM_END
+
 ROM_START( galhustl ) // An original PCB has been seen with genuine AFEGA labels
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ue17.3", 0x00000, 0x80000, CRC(b2583dbb) SHA1(536f4aa2246ec816c4f270f9d42acc090718ee8b) ) // Also found as AFEGA 3
@@ -1787,7 +1806,7 @@ DRIVER_INIT_MEMBER(expro02_state,expro02)
 			offset = x;
 
 			// swap bits around to simplify further processing
-			offset = BITSWAP24(offset, 23, 22, 21, 20, 19, 18, 15, 9, 10, 8, 7, 12, 13, 16, 17, 6, 5, 4, 3, 14, 11, 2, 1, 0);
+			offset = bitswap<24>(offset, 23, 22, 21, 20, 19, 18, 15, 9, 10, 8, 7, 12, 13, 16, 17, 6, 5, 4, 3, 14, 11, 2, 1, 0);
 
 			// invert 8 bits
 			offset ^= 0x0528f;
@@ -1799,7 +1818,7 @@ DRIVER_INIT_MEMBER(expro02_state,expro02)
 			offset = (offset & ~0x1fe00) | ((offset - 0x09600) & 0x1fe00);
 
 			// reverse the initial bitswap
-			offset = BITSWAP24(offset, 23, 22, 21, 20, 19, 18, 9, 10, 17, 4, 11, 12, 3, 15, 16, 14, 13, 8, 7, 6, 5, 2, 1, 0);
+			offset = bitswap<24>(offset, 23, 22, 21, 20, 19, 18, 9, 10, 17, 4, 11, 12, 3, 15, 16, 14, 13, 8, 7, 6, 5, 2, 1, 0);
 
 			// swap nibbles to use the same gfxdecode
 			dst[x] = (src[offset] << 4 & 0xF0F0F0F0) | (src[offset] >> 4 & 0x0F0F0F0F);
@@ -1813,41 +1832,42 @@ DRIVER_INIT_MEMBER(expro02_state,expro02)
  *
  *************************************/
 
-GAME( 1990, galsnew,   0,        expro02,  expro02,  expro02_state, expro02, ROT90, "Kaneko",                  "Gals Panic (US, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galsnewa,  galsnew,  expro02,  galsnewa, expro02_state, expro02, ROT90, "Kaneko",                  "Gals Panic (Export, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galsnewj,  galsnew,  expro02,  galsnewj, expro02_state, expro02, ROT90, "Kaneko (Taito license)",  "Gals Panic (Japan, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, galsnewk,  galsnew,  expro02,  galsnewj, expro02_state, expro02, ROT90, "Kaneko (Inter license)",  "Gals Panic (Korea, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galsnew,   0,        expro02,  expro02,   expro02_state, expro02, ROT90, "Kaneko",                   "Gals Panic (US, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galsnewa,  galsnew,  expro02,  galsnewa,  expro02_state, expro02, ROT90, "Kaneko",                   "Gals Panic (Export, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galsnewj,  galsnew,  expro02,  galsnewj,  expro02_state, expro02, ROT90, "Kaneko (Taito license)",   "Gals Panic (Japan, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, galsnewk,  galsnew,  expro02,  galsnewj,  expro02_state, expro02, ROT90, "Kaneko (Inter license)",   "Gals Panic (Korea, EXPRO-02 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 /* the first version of Fantasia clones the EXPRO02 almost exactly, including the encrypted tiles*/
-GAME( 1994, fantasia,  0,        comad,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fantasiab, fantasia, comad,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, fantasiaa, fantasia, comad,    fantasia, expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940307 PCB)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fantasia,  0,        comad,    fantasia,  expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 1)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fantasiab, fantasia, comad,    fantasia,  expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940429 PCB, set 2)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fantasiaa, fantasia, comad,    fantasia,  expro02_state, expro02, ROT90, "Comad & New Japan System", "Fantasia (940307 PCB)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 /* subsequent releases remove the encrypted tile (View2 layer) but leave the unused writes to it in the program code */
-GAME( 1994, fantasian,fantasia, fantasia,  fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "Fantasia (940803 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, fantasian,fantasia,  fantasia, fantasiaa, expro02_state, 0,       ROT90, "Comad & New Japan System", "Fantasia (940803 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, supmodel, 0,        supmodel, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "Super Model",MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, supmodel, 0,         supmodel, fantasiaa, expro02_state, 0,       ROT90, "Comad & New Japan System", "Super Model",MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
 
-GAME( 1995, newfant,  0,        fantasia, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (1995 copyright)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the only difference between the two is the gfx rom containing the copyright
-GAME( 1994, newfanta, newfant,  fantasia, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (1994 copyright)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fantsy95, newfant,  fantasia, fantasiaa, driver_device, 0, ROT90, "Hi-max Technology Inc.",   "Fantasy '95", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, newfant,  0,         fantasia, fantasiaa, expro02_state, 0,       ROT90, "Comad & New Japan System", "New Fantasia (1995 copyright)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the only difference between the two is the gfx rom containing the copyright
+GAME( 1994, newfanta, newfant,   fantasia, fantasiaa, expro02_state, 0,       ROT90, "Comad & New Japan System", "New Fantasia (1994 copyright)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fantsy95, newfant,   fantasia, fantasiaa, expro02_state, 0,       ROT90, "Hi-max Technology Inc.",   "Fantasy '95", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
 
 // the PCB label (A/B) could be related to the 3 different levels of nudity Comad offered
-GAME( 1996, missw96,  0,        fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, missw96a, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, missw96b, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, missw96c, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000B PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, missw96,  0,         fantasia, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
+GAME( 1996, missw96a, missw96,   fantasia, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
+GAME( 1996, missw96b, missw96,   fantasia, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
+GAME( 1996, missw96c, missw96,   fantasia, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000B PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )        // "B" nudity level
 
-GAME( 1996, missmw96, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss Mister World '96 (Nude)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, missmw96, missw96,   fantasia, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Miss Mister World '96 (Nude)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, smissw,   0,        smissw,   missw96,   driver_device, 0, ROT0,  "Comad",                    "Super Miss World", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // 951127 PCB
+GAME( 1996, smissw,   0,         smissw,   missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Super Miss World", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // 951127 PCB
 
-GAME( 1997, fantsia2, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Less Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, fantsia2n,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (1998)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, fantsia2, 0,         fantsia2, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Fantasia II (Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // "A" nudity level
+GAME( 1997, fantsia2a,fantsia2,  fantsia2, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Fantasia II (Less Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
+GAME( 1998, fantsia2n,fantsia2,  fantsia2, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "Fantasia II (1998)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )          // "A" nudity level
 
-GAME( 2002, wownfant, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "WOW New Fantasia", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, wownfant, 0,         fantsia2, missw96,   expro02_state, 0,       ROT0,  "Comad",                    "WOW New Fantasia", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
+GAME( 2002, missw02,  0,         fantsia2, missw96,   expro02_state, 0,       ROT0,  "Daigom",                   "Miss World 2002", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )  // "A" nudity level
 
-GAME( 1996, pgalvip,  0,        galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International / Afega","Pocket Gals V.I.P (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
-GAME( 1997, pgalvipa, pgalvip,  galhustl, galhustl,  driver_device, 0, ROT0,  "<unknown>",                "Pocket Gals V.I.P (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, galhustl, pgalvip,  galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International",        "Gals Hustler", MACHINE_SUPPORTS_SAVE ) // hack of the above?
+GAME( 1996, pgalvip,  0,         galhustl, galhustl,  expro02_state, 0,       ROT0,  "ACE International / Afega","Pocket Gals V.I.P (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
+GAME( 1997, pgalvipa, pgalvip,   galhustl, galhustl,  expro02_state, 0,       ROT0,  "<unknown>",                "Pocket Gals V.I.P (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, galhustl, pgalvip,   galhustl, galhustl,  expro02_state, 0,       ROT0,  "ACE International",        "Gals Hustler", MACHINE_SUPPORTS_SAVE ) // hack of the above?
 
-GAME( 1995, zipzap,   0,        zipzap,   zipzap,    driver_device, 0, ROT90, "Barko Corp",               "Zip & Zap", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, zipzap,   0,         zipzap,   zipzap,    expro02_state, 0,       ROT90, "Barko Corp",               "Zip & Zap", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

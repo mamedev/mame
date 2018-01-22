@@ -12,6 +12,7 @@
 #include <cassert>
 #include "emu.h"
 #include "x86log.h"
+#include "cpu/i386/i386dasm.h"
 
 
 
@@ -20,7 +21,6 @@
 ***************************************************************************/
 
 static void reset_log(x86log_context *log) noexcept;
-extern int i386_dasm_one_ex(std::ostream &stream, uint64_t eip, const uint8_t *oprom, int mode);
 
 
 
@@ -96,6 +96,30 @@ void x86log_mark_as_data(x86log_context *log, x86code *base, x86code *end, int s
     of code and reset accumulated information
 -------------------------------------------------*/
 
+namespace {
+	class x86_buf : public util::disasm_interface::data_buffer {
+	public:
+		x86_buf(offs_t _base_pc, const u8 *_buf) : base_pc(_base_pc), buf(_buf) {}
+		~x86_buf() = default;
+
+		// We know we're on a x86, so we can go short
+		virtual u8  r8 (offs_t pc) const override { return *(u8  *)(buf + pc - base_pc); }
+		virtual u16 r16(offs_t pc) const override { return *(u16 *)(buf + pc - base_pc); }
+		virtual u32 r32(offs_t pc) const override { return *(u32 *)(buf + pc - base_pc); }
+		virtual u64 r64(offs_t pc) const override { return *(u64 *)(buf + pc - base_pc); }
+
+	private:
+		offs_t base_pc;
+		const u8 *buf;
+	};
+
+	class x86_config : public i386_disassembler::config {
+	public:
+		~x86_config() = default;
+		virtual int get_mode() const override { return sizeof(void *) * 8; };
+	};
+}
+
 void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *start, x86code *stop)
 {
 	const log_comment *lastcomment = &log->comment_list[log->comment_count];
@@ -147,7 +171,11 @@ void x86log_disasm_code_range(x86log_context *log, const char *label, x86code *s
 		else
 		{
 			std::stringstream strbuffer;
-			bytes = i386_dasm_one_ex(strbuffer, (uintptr_t)cur, cur, sizeof(void *) * 8) & DASMFLAG_LENGTHMASK;
+			offs_t pc = (uintptr_t)cur;
+			x86_buf buf(pc, cur);
+			x86_config conf;
+			i386_disassembler dis(&conf);
+			bytes = dis.disassemble(strbuffer, pc, buf, buf) & util::disasm_interface::LENGTHMASK;
 			buffer = strbuffer.str();
 		}
 

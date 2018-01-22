@@ -15,12 +15,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/cbasebal.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/kabuki.h"  // needed for decoding functions only
-#include "includes/cbasebal.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/ym2413.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -32,7 +35,7 @@
 WRITE8_MEMBER(cbasebal_state::cbasebal_bankswitch_w)
 {
 	/* bits 0-4 select ROM bank */
-	//logerror("%04x: bankswitch %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: bankswitch %02x\n", m_maincpu->pc(), data);
 	membank("bank1")->set_entry(data & 0x1f);
 	membank("bank1d")->set_entry(data & 0x1f);
 
@@ -68,7 +71,7 @@ WRITE8_MEMBER(cbasebal_state::bankedram_w)
 		break;
 	case 1:
 		if (offset < 0x800)
-			m_palette->write(space, offset, data);
+			m_palette->write8(space, offset, data);
 		break;
 	default:
 		cbasebal_scrollram_w(space, offset, data);
@@ -99,7 +102,7 @@ static ADDRESS_MAP_START( cbasebal_map, AS_PROGRAM, 8, cbasebal_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cbasebal_state )
+static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, cbasebal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 ADDRESS_MAP_END
@@ -255,7 +258,7 @@ void cbasebal_state::machine_reset()
 	m_scroll_y[1] = 0;
 }
 
-static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
+MACHINE_CONFIG_START(cbasebal_state::cbasebal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 6000000)   /* ??? */
@@ -284,7 +287,7 @@ static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)

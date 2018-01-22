@@ -52,7 +52,6 @@ public:
 	DECLARE_WRITE8_MEMBER(coincounter_w);
 	DECLARE_WRITE8_MEMBER(boardb_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(boardc_bankswitch_w);
-	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(trigger_nmi);
 	DECLARE_WRITE8_MEMBER(adpcm_start_w);
 	DECLARE_WRITE8_MEMBER(adpcm_end_w);
@@ -83,4 +82,5 @@ public:
 	void adpcm_int(msm5205_device *device, int chip);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_1);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int_2);
+	void tbowl(machine_config &config);
 };

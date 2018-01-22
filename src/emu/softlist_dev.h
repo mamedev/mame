@@ -8,8 +8,11 @@
 
 *********************************************************************/
 
-#ifndef __SOFTLIST_DEV_H_
-#define __SOFTLIST_DEV_H_
+#ifndef MAME_EMU_SOFTLIST_DEV_H
+#define MAME_EMU_SOFTLIST_DEV_H
+
+#pragma once
+
 
 #include "softlist.h"
 
@@ -71,16 +74,13 @@ enum software_compatibility
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class device_image_interface;
-class software_list_device;
-
 
 // ======================> software_list_loader
 
 class software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const = 0;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const = 0;
 };
 
 
@@ -89,7 +89,7 @@ public:
 class false_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:
@@ -102,7 +102,7 @@ private:
 class rom_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:
@@ -115,7 +115,7 @@ private:
 class image_software_list_loader : public software_list_loader
 {
 public:
-	virtual bool load_software(device_image_interface &device, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
+	virtual bool load_software(device_image_interface &image, software_list_device &swlist, const char *swname, const rom_entry *start_entry) const override;
 	static const software_list_loader &instance() { return s_instance; }
 
 private:
@@ -132,7 +132,7 @@ class software_list_device : public device_t
 
 public:
 	// construction/destruction
-	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// inline configuration helpers
 	static void static_set_type(device_t &device, const char *list, softlist_type list_type);
@@ -159,6 +159,7 @@ public:
 	// static helpers
 	static software_list_device *find_by_name(const machine_config &mconfig, const std::string &name);
 	static void display_matches(const machine_config &config, const char *interface, const std::string &name);
+	static device_image_interface *find_mountable_image(const machine_config &mconfig, const software_part &part, std::function<bool (const device_image_interface &)> filter);
 	static device_image_interface *find_mountable_image(const machine_config &mconfig, const software_part &part);
 
 protected:
@@ -186,10 +187,10 @@ private:
 
 
 // device type definition
-extern const device_type SOFTWARE_LIST;
+DECLARE_DEVICE_TYPE(SOFTWARE_LIST, software_list_device)
 
 // device type iterator
-typedef device_type_iterator<&device_creator<software_list_device>, software_list_device> software_list_device_iterator;
+typedef device_type_iterator<software_list_device> software_list_device_iterator;
 
 
-#endif // __SOFTLIST_DEV_H_
+#endif // MAME_EMU_SOFTLIST_DEV_H

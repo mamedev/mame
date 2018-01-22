@@ -6,10 +6,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_VIDEO_SPRITE_H
+#define MAME_VIDEO_SPRITE_H
 
-#ifndef __SPRITE_H__
-#define __SPRITE_H__
+#pragma once
 
 
 // ======================> sparse_dirty_rect
@@ -39,7 +39,7 @@ public:
 	sparse_dirty_bitmap(int granularity = 3);
 	sparse_dirty_bitmap(int width, int height, int granularity = 3);
 
-	// dirtying operations - partially interecting tiles are dirtied
+	// dirtying operations - partially intersecting tiles are dirtied
 	void dirty(const rectangle &rect) { dirty(rect.left(), rect.right(), rect.top(), rect.bottom()); }
 	void dirty(int32_t left, int32_t right, int32_t top, int32_t bottom);
 	void dirty_all() { dirty(0, m_width - 1, 0, m_height - 1); }
@@ -81,13 +81,13 @@ class sprite_device : public device_t
 
 protected:
 	// construction/destruction - only for subclasses
-	sprite_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, const char *shortname, const char *file, int dirty_granularity = 3)
-		: device_t(mconfig, type, name, tag, owner, 0, shortname, file),
-			m_xorigin(0),
-			m_yorigin(0),
-			m_spriteram(nullptr),
-			m_spriteram_bytes(0),
-			m_dirty(dirty_granularity)
+	sprite_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, int dirty_granularity = 3)
+		: device_t(mconfig, type, tag, owner, 0)
+		, m_xorigin(0)
+		, m_yorigin(0)
+		, m_spriteram(nullptr)
+		, m_spriteram_bytes(0)
+		, m_dirty(dirty_granularity)
 	{
 		force_clear();
 	}
@@ -207,4 +207,4 @@ typedef sprite_device<uint16_t, bitmap_ind32> sprite16_device_ind32;
 typedef sprite_device<uint32_t, bitmap_ind32> sprite32_device_ind32;
 
 
-#endif  // __SPRITE_H__
+#endif // MAME_VIDEO_SPRITE_H

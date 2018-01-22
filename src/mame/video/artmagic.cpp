@@ -24,7 +24,7 @@
 inline uint16_t *artmagic_state::address_to_vram(offs_t *address)
 {
 	offs_t original = *address;
-	*address = TOWORD(original & 0x001fffff);
+	*address = (original & 0x001fffff) >> 4;
 	if (original < 0x001fffff)
 		return m_vram0;
 	else if (original >= 0x00400000 && original < 0x005fffff)
@@ -63,7 +63,7 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(artmagic_state::to_shiftreg)
 {
 	uint16_t *vram = address_to_vram(&address);
 	if (vram)
-		memcpy(shiftreg, &vram[address], TOBYTE(0x2000));
+		memcpy(shiftreg, &vram[address], 0x400);
 }
 
 
@@ -71,7 +71,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(artmagic_state::from_shiftreg)
 {
 	uint16_t *vram = address_to_vram(&address);
 	if (vram)
-		memcpy(&vram[address], shiftreg, TOBYTE(0x2000));
+		memcpy(&vram[address], shiftreg, 0x400);
 }
 
 
@@ -194,7 +194,7 @@ void artmagic_state::execute_blit()
 		{
 			if (sy >= 0 && sy < 256)
 			{
-				int tsy = sy * TOWORD(0x2000);
+				int tsy = sy * 0x200;
 				sx = x;
 
 				/* The first pixel of every line doesn't have a previous pixel

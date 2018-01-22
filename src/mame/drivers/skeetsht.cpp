@@ -17,6 +17,8 @@
 #include "cpu/tms34010/tms34010.h"
 #include "sound/ay8910.h"
 #include "video/tlc34076.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -58,6 +60,7 @@ public:
 	required_device<cpu_device> m_68hc11;
 	required_device<ay8910_device> m_ay;
 	required_device<tms34010_device> m_tms;
+	void skeetsht(machine_config &config);
 };
 
 
@@ -225,7 +228,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( skeetsht, skeetsht_state )
+MACHINE_CONFIG_START(skeetsht_state::skeetsht)
 
 	MCFG_CPU_ADD("68hc11", MC68HC11, 4000000) // ?
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
@@ -293,5 +296,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, skeetsht, 0, skeetsht, skeetsht, driver_device, 0, ROT0, "Dynamo", "Skeet Shot", MACHINE_NOT_WORKING )
-GAME( 1991, popshot,  0, skeetsht, skeetsht, driver_device, 0, ROT0, "Dynamo", "Pop Shot (prototype)", MACHINE_NOT_WORKING )
+GAME( 1991, skeetsht, 0, skeetsht, skeetsht, skeetsht_state, 0, ROT0, "Dynamo", "Skeet Shot",           MACHINE_NOT_WORKING )
+GAME( 1991, popshot,  0, skeetsht, skeetsht, skeetsht_state, 0, ROT0, "Dynamo", "Pop Shot (prototype)", MACHINE_NOT_WORKING )

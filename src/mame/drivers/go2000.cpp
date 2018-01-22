@@ -37,6 +37,9 @@ Notes:
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class go2000_state : public driver_device
 {
@@ -69,6 +72,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_go2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void go2000(machine_config &config);
 };
 
 
@@ -83,7 +87,7 @@ static ADDRESS_MAP_START( go2000_map, AS_PROGRAM, 16, go2000_state )
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x610000, 0x61ffff) AM_RAM AM_SHARE("videoram2")
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW")
 	AM_RANGE(0x620002, 0x620003) AM_WRITE(sound_cmd_w)
@@ -330,7 +334,7 @@ void go2000_state::machine_start()
 
 }
 
-static MACHINE_CONFIG_START( go2000, go2000_state )
+MACHINE_CONFIG_START(go2000_state::go2000)
 
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
 	MCFG_CPU_PROGRAM_MAP(go2000_map)
@@ -377,4 +381,4 @@ ROM_START( go2000 )
 ROM_END
 
 
-GAME( 2000, go2000,    0, go2000,    go2000, driver_device,    0, ROT0,  "SunA?", "Go 2000", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, go2000,    0, go2000,    go2000, go2000_state,    0, ROT0,  "SunA?", "Go 2000", MACHINE_SUPPORTS_SAVE )

@@ -35,7 +35,6 @@
 
     Looking for ROMs for these:
         * Euro Stocker
-        * Team Hat Trick
 
     Known bugs:
         * CEM3394 emulation is not perfect
@@ -227,13 +226,16 @@ DIP locations verified for:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/balsente.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/balsente.h"
-#include "sound/cem3394.h"
+#include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
+#include "sound/cem3394.h"
+#include "speaker.h"
 
 #include "stocker.lh"
 
@@ -251,7 +253,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, balsente_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(balsente_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9000, 0x9007) AM_WRITE(balsente_adc_select_w)
 	AM_RANGE(0x9400, 0x9401) AM_READ(balsente_adc_data_r)
-	AM_RANGE(0x9800, 0x987f) AM_WRITE(balsente_misc_output_w)
+	AM_RANGE(0x9800, 0x981f) AM_MIRROR(0x0060) AM_DEVWRITE_MOD("outlatch", ls259_device, write_d7, rshift<2>)
 	AM_RANGE(0x9880, 0x989f) AM_WRITE(balsente_random_reset_w)
 	AM_RANGE(0x98a0, 0x98bf) AM_WRITE(balsente_rombank_select_w)
 	AM_RANGE(0x98c0, 0x98df) AM_WRITE(balsente_palette_select_w)
@@ -1139,9 +1141,9 @@ static INPUT_PORTS_START( grudge )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("H1:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Free_Play ) )    PORT_DIPLOCATION("H1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, "On (buggy)" )
 
 	PORT_MODIFY("SWG")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "G1:1" )
@@ -1177,6 +1179,15 @@ static INPUT_PORTS_START( grudge )
 
 	PORT_MODIFY("AN3")
 	UNUSED_ANALOG
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( grudgep )
+	PORT_INCLUDE( sentetst )
+
+	PORT_MODIFY("SWH")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("H1:8") // default to "ON" because Coin mode is buggy on this revision of the prototype
+	PORT_DIPSETTING(    0x00, "Off (buggy)" )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1275,10 +1286,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( balsente, balsente_state )
+MACHINE_CONFIG_START(balsente_state::balsente)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_20MHz/16) /* xtal verified but not speed */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_20MHz/16) /* xtal verified but not speed */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", balsente_state,  balsente_update_analog_inputs)
 
@@ -1296,6 +1307,18 @@ static MACHINE_CONFIG_START( balsente, balsente_state )
 	MCFG_TIMER_DRIVER_ADD("8253_0_timer", balsente_state, balsente_clock_counter_0_ff)
 	MCFG_TIMER_DRIVER_ADD("8253_1_timer", balsente_state, balsente_counter_callback)
 	MCFG_TIMER_DRIVER_ADD("8253_2_timer", balsente_state, balsente_counter_callback)
+
+	MCFG_DEVICE_ADD("outlatch", LS259, 0) // U9H
+	// these outputs are generally used to control the various lamps
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(balsente_state, out0_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(balsente_state, out1_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(balsente_state, out2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(balsente_state, out3_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(balsente_state, out4_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(balsente_state, out5_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(balsente_state, out6_w))
+	// special case is output 7, which recalls the NVRAM data
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(balsente_state, nvrecall_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1348,7 +1371,7 @@ static MACHINE_CONFIG_START( balsente, balsente_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( shrike, balsente )
+MACHINE_CONFIG_DERIVED(balsente_state::shrike, balsente)
 
 	/* basic machine hardware */
 
@@ -1389,7 +1412,7 @@ ROM_END
 
 ROM_START( cshift )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "cs-ab0.bin", 0x10000, 0x2000, CRC(d2069e75) SHA1(17d5719e6e1976cebb332932cf3e900a88136928) )
+	ROM_LOAD( "cs-ab0.bin", 0x10000, 0x2000, CRC(d2069e75) SHA1(17d5719e6e1976cebb332932cf3e900a88136928) ) /* Labeled as CHICKEN SHIFT, then name (like AB0) & dated 11/23/84 */
 	ROM_LOAD( "cs-ab1.bin", 0x12000, 0x2000, CRC(198f25a8) SHA1(5ca25fe57e94d8362896c903196e0080efd35ef5) )
 	ROM_LOAD( "cs-ab2.bin", 0x14000, 0x2000, CRC(2e2b2b82) SHA1(a540f3ff2a0a10b19aafe1528b7dcaeae9b7393d) )
 	ROM_LOAD( "cs-ab3.bin", 0x16000, 0x2000, CRC(b97fc520) SHA1(f45c5ec93eab1bfd1f9533df7ac624c2e99f6573) )
@@ -1438,8 +1461,8 @@ ROM_END
 
 ROM_START( hattrick )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "rom-ab0.u9a", 0x10000, 0x2000, CRC(f25c1b99) SHA1(43b2334be7cfb8091eea963e10547295362372d3) ) /* The Hat Trick cartridge does not have any PAL's */
-	ROM_LOAD( "rom-ab1.u8a", 0x12000, 0x2000, CRC(c1df3d1f) SHA1(754f537d12efe8891638fd11a2ee8a5b234fb079) )
+	ROM_LOAD( "rom-ab0.u9a", 0x10000, 0x2000, CRC(f25c1b99) SHA1(43b2334be7cfb8091eea963e10547295362372d3) ) /* Labeled as HAT TRK, then name (like AB0) & dated 11/12/84 */
+	ROM_LOAD( "rom-ab1.u8a", 0x12000, 0x2000, CRC(c1df3d1f) SHA1(754f537d12efe8891638fd11a2ee8a5b234fb079) ) /* The Hat Trick cartridge does not have any PAL's */
 	ROM_LOAD( "rom-ab2.u7a", 0x14000, 0x2000, CRC(f6c41257) SHA1(05f5e71d08241c559da3bfc286c76cbb22710586) )
 	ROM_LOAD( "rom-cd.u3a",  0x2c000, 0x2000, CRC(fc44f36c) SHA1(227d0c93c579d743b615b1fa6da56128e8202e51) )
 	ROM_LOAD( "rom-ef.u2a",  0x2e000, 0x2000, CRC(d8f910fb) SHA1(b74a305dd848c7bf574e4b0aa32147b8d5c89e9e) )
@@ -1665,7 +1688,7 @@ ROM_END
 
 ROM_START( triviag2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "ab01.bin",  0x10000, 0x4000, CRC(4fca20c5) SHA1(595b32ff035036cafbf49d75aa170f39e9f52b38) )
+	ROM_LOAD( "ab01.bin",  0x10000, 0x4000, CRC(4fca20c5) SHA1(595b32ff035036cafbf49d75aa170f39e9f52b38) ) /* Labeled as GENUS II, then name (like ROM AB01R) & dated 3/22/85 */
 	ROM_LOAD( "ab23.bin",  0x14000, 0x4000, CRC(6cf2ddeb) SHA1(0d6667babd9ab70820cf165900d90003f0893be7) )
 	ROM_LOAD( "ab45.bin",  0x18000, 0x4000, CRC(a7ff789c) SHA1(a3421ae46dadd6f514cfc514ff07dfcca2cb1478) )
 	ROM_LOAD( "ab67.bin",  0x1c000, 0x4000, CRC(cc5c68ef) SHA1(38713796e07f84c9a1b21d8c66f76e620132d77e) )
@@ -1769,7 +1792,7 @@ ROM_END
 
 ROM_START( gimeabrk )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(18cc53db) SHA1(3bb47c349b3ab7b81e3557e3b4877617fb549c9e) )
+	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(18cc53db) SHA1(3bb47c349b3ab7b81e3557e3b4877617fb549c9e) ) /* Labeled as GimmeABreak, then name (like AB01) & dated 7/7/85 */
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(6bd4190a) SHA1(b6562b3575dc8265c01719cfbcb554b69bc1b37f) )
 	ROM_LOAD( "ab45.u6a",  0x18000, 0x4000, CRC(5dca4f33) SHA1(aa45d5a960491c85f332f22cffe61999fe3db826) )
 	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(5e2b3510) SHA1(e3501b9bd73bc724aee0436700625bd2af94f72d) )
@@ -1786,6 +1809,39 @@ ROM_START( gimeabrk )
 	MOTHERBOARD_PALS
 ROM_END
 
+ROM_START( grudge )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_LOAD( "gm-3a.bin", 0x10000, 0x8000, CRC(eabeec2b) SHA1(92098512e3dbcda36f42e10fada01323fab4b08a) )
+	ROM_LOAD( "gm-4a.bin", 0x18000, 0x8000, CRC(72664f18) SHA1(98202d7a775792d2d1c44a26540ac35afaffa6b2) )
+	ROM_LOAD( "gm-1a.bin", 0x20000, 0x8000, CRC(ad168726) SHA1(c4d084e3752d6c4365d2460ca3146b148dcccc1d) )
+	ROM_LOAD( "gm-2a.bin", 0x28000, 0x8000, CRC(1de8dd2e) SHA1(6b538dcf35105bca1ae1bb5387a08b4d1d4f410c) )
+	ROM_LOAD( "gm-6b.bin", 0x2e000, 0x2000, CRC(513d8cdd) SHA1(563e5a2b7e71b4e1447bd41339174129a5884517) ) // mostly the same as 2a/5a except for a small table, corrupt text if we don't use this here..
+
+	ROM_LOAD( "gm-5a.bin", 0x38000, 0x8000, CRC(1de8dd2e) SHA1(6b538dcf35105bca1ae1bb5387a08b4d1d4f410c) ) // same as 2a, not being used, confirmed as identical on PCB
+
+	SOUNDBOARD_ROMS
+
+	ROM_REGION( 0x10000, "gfx1", 0 )     /* up to 64k of sprites */
+	ROM_LOAD( "gm-6a.bin", 0x00000, 0x8000, CRC(b9681f53) SHA1(bb0c516408f1769e018f0ec8707786d4d1e9ef7e) )
+
+	MOTHERBOARD_PALS
+ROM_END
+
+ROM_START( grudgep )
+	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
+	ROM_LOAD( "grudge.ab0", 0x10000, 0x8000, CRC(260965ca) SHA1(79eb5dc6605974ece3d5564f10c4598204907398) )
+	ROM_LOAD( "grudge.ab4", 0x18000, 0x8000, CRC(c6cd734d) SHA1(076546569e9c8ff40f96bd2cac014bcabc53099d) )
+	ROM_LOAD( "grudge.cd0", 0x20000, 0x8000, CRC(e51db1f2) SHA1(57fc0f1df358dd6ea982dcbe9c3f79b3f072be53) )
+	ROM_LOAD( "grudge.cd4", 0x28000, 0x8000, CRC(6b60e47e) SHA1(5a399942d4ef9b7349fffd07c07092b667cf6247) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* 64k for Z80 */
+	ROM_LOAD( "sentesnd",   0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )     /* up to 64k of sprites */
+	ROM_LOAD( "grudge.gr0", 0x00000, 0x8000, CRC(b9681f53) SHA1(bb0c516408f1769e018f0ec8707786d4d1e9ef7e) )
+
+	MOTHERBOARD_PALS
+ROM_END
 
 ROM_START( minigolf )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
@@ -1882,7 +1938,7 @@ ROM_END
 
 ROM_START( nametune2 )
 	ROM_REGION( 0x70000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "ab 01.u8a",   0x10000, 0x4000, CRC(4044891d) SHA1(4e1e7cb9846939e03b035b95ba04f62a78719bb2) )
+	ROM_LOAD( "ab 01.u8a",   0x10000, 0x4000, CRC(4044891d) SHA1(4e1e7cb9846939e03b035b95ba04f62a78719bb2) ) /* Labeled as NMETNEUR, then name (like AB 01) & dated 3/23/86 */
 	ROM_CONTINUE(                     0x40000, 0x4000 )
 	ROM_LOAD( "ab 23.u7a",   0x14000, 0x4000, CRC(df3454bc) SHA1(82faf87ca8974629e546b6854718908721b64ad0) )
 	ROM_CONTINUE(                     0x44000, 0x4000 )
@@ -1919,7 +1975,7 @@ ROM_END
 
 ROM_START( nstocker )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(a635f973) SHA1(edb12469818a3114fb97d21e11c63eb37678a07b) )
+	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(a635f973) SHA1(edb12469818a3114fb97d21e11c63eb37678a07b) ) /* Labeled as NIGHT STOCKER, then name (like AB 01) & dated 10/06/86 */
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(223acbb2) SHA1(195ebd349722cce323616c81cc4e86f0a9c6fa13) )
 	ROM_LOAD( "ab45.u6a",  0x18000, 0x4000, CRC(27a728b5) SHA1(c72634112a04d58a695fb43bf30f44e3f7ba7de2) )
 	ROM_LOAD( "ab67.u5a",  0x1c000, 0x4000, CRC(2999cdf2) SHA1(a64ae04f264ad286a87069cfb176e7511df08e78) )
@@ -1950,7 +2006,7 @@ ROM_END
 
 ROM_START( nstocker2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(a635f973) SHA1(edb12469818a3114fb97d21e11c63eb37678a07b) )
+	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(a635f973) SHA1(edb12469818a3114fb97d21e11c63eb37678a07b) ) /* Labeled as NIGHT STOCKER, then name (like AB 01) & dated 8/27/86 */
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(223acbb2) SHA1(195ebd349722cce323616c81cc4e86f0a9c6fa13) )
 	ROM_LOAD( "ab45.u6a",  0x18000, 0x4000, CRC(27a728b5) SHA1(c72634112a04d58a695fb43bf30f44e3f7ba7de2) )
 	ROM_LOAD( "ab67.u5a",  0x1c000, 0x4000, CRC(2999cdf2) SHA1(a64ae04f264ad286a87069cfb176e7511df08e78) )
@@ -1982,7 +2038,7 @@ ROM_END
 
 ROM_START( sfootbal )
 	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(2a69803f) SHA1(ca86c9d079fbebae4c93c889d98a8573facc05da) )
+	ROM_LOAD( "ab01.u8a",  0x10000, 0x4000, CRC(2a69803f) SHA1(ca86c9d079fbebae4c93c889d98a8573facc05da) ) /* Labeled as STREET FOOTBALL, then name (like AB 01) & dated 11/12/86 */
 	ROM_LOAD( "ab23.u7a",  0x14000, 0x4000, CRC(89f157c2) SHA1(59701b7770dce7ec01d0feb01d67450943e6cfbb) )
 	ROM_LOAD( "ab45.u6a",  0x18000, 0x4000, CRC(91ad42c5) SHA1(0b6fc3ed3a633c825809668d49f209c130f3e978) )
 	ROM_LOAD( "cd6ef.u1a", 0x2c000, 0x4000, CRC(bf80bb1a) SHA1(2b70b36d946c36e3f354c7edfd3e34784ffce406) )
@@ -2128,21 +2184,7 @@ ROM_START( rescraida )
 ROM_END
 
 
-ROM_START( grudge )
-	ROM_REGION( 0x40000, "maincpu", 0 )     /* 64k for code for the first CPU, plus 128k of banked ROMs */
-	ROM_LOAD( "grudge.ab0", 0x10000, 0x8000, CRC(260965ca) SHA1(79eb5dc6605974ece3d5564f10c4598204907398) )
-	ROM_LOAD( "grudge.ab4", 0x18000, 0x8000, CRC(c6cd734d) SHA1(076546569e9c8ff40f96bd2cac014bcabc53099d) )
-	ROM_LOAD( "grudge.cd0", 0x20000, 0x8000, CRC(e51db1f2) SHA1(57fc0f1df358dd6ea982dcbe9c3f79b3f072be53) )
-	ROM_LOAD( "grudge.cd4", 0x28000, 0x8000, CRC(6b60e47e) SHA1(5a399942d4ef9b7349fffd07c07092b667cf6247) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        /* 64k for Z80 */
-	ROM_LOAD( "sentesnd",   0x00000, 0x2000, CRC(4dd0a525) SHA1(f0c447adc5b67917851a9df978df851247e75c43) )
-
-	ROM_REGION( 0x8000, "gfx1", 0 )     /* up to 64k of sprites */
-	ROM_LOAD( "grudge.gr0", 0x00000, 0x8000, CRC(b9681f53) SHA1(bb0c516408f1769e018f0ec8707786d4d1e9ef7e) )
-
-	MOTHERBOARD_PALS
-ROM_END
 
 
 ROM_START( shrike )
@@ -2356,25 +2398,27 @@ DRIVER_INIT_MEMBER(balsente_state,shrike)
 
 /* Board: Unknown */
 GAME( 1984, sentetst, 0,        balsente, sentetst, balsente_state, sentetst, ROT0, "Bally/Sente",  "Sente Diagnostic Cartridge", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, cshift,   0,        balsente, cshift, balsente_state,   cshift,   ROT0, "Bally/Sente",  "Chicken Shift", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gghost,   0,        balsente, gghost, balsente_state,   gghost,   ROT0, "Bally/Sente",  "Goalie Ghost", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, cshift,   0,        balsente, cshift,   balsente_state, cshift,   ROT0, "Bally/Sente",  "Chicken Shift", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, gghost,   0,        balsente, gghost,   balsente_state, gghost,   ROT0, "Bally/Sente",  "Goalie Ghost", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8003-01-0D Rev D */
 GAME( 1984, hattrick, 0,        balsente, hattrick, balsente_state, hattrick, ROT0, "Bally/Sente",  "Hat Trick", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, trivia12, triviag1, balsente, triviag1, balsente_state, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (12/14/84)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown (From a picture on eBay Snacks'n Jaxson does not match any documented types here.) */
-GAME( 1984, otwalls,  0,        balsente, otwalls, balsente_state,  otwalls,  ROT0, "Bally/Sente",  "Off the Wall (Sente)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, otwalls,  0,        balsente, otwalls,  balsente_state, otwalls,  ROT0, "Bally/Sente",  "Off the Wall (Sente)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, snakepit, 0,        balsente, sentetst, balsente_state, snakepit, ROT0, "Bally/Sente",  "Snake Pit", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, snakepit2,snakepit, balsente, sentetst, balsente_state, snakepit, ROT0, "Sente Technologies Inc.", "Snake Pit (9/14/84)", MACHINE_SUPPORTS_SAVE ) // 1984, even though titlescreen says 1983
 GAME( 1984, snakjack, 0,        balsente, snakjack, balsente_state, snakjack, ROT0, "Bally/Sente",  "Snacks'n Jaxson", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8025-01-0B Rev B */
-GAMEL(1984, stocker,  0,        balsente, stocker, balsente_state,  stocker,  ROT0, "Bally/Sente",  "Stocker (3/19/85)", MACHINE_SUPPORTS_SAVE, layout_stocker ) // date from ROM chips
+GAMEL(1984, stocker,  0,        balsente, stocker,  balsente_state, stocker,  ROT0, "Bally/Sente",  "Stocker (3/19/85)", MACHINE_SUPPORTS_SAVE, layout_stocker ) // date from ROM chips
 GAME( 1985, gimeabrk, 0,        balsente, gimeabrk, balsente_state, gimeabrk, ROT0, "Bally/Sente",  "Gimme A Break (7/7/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, minigolf, 0,        balsente, minigolf, balsente_state, minigolf, ROT0, "Bally/Sente",  "Mini Golf (11/25/85)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, minigolf2,minigolf, balsente, minigolf2, balsente_state,minigolf2,ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, minigolf2,minigolf, balsente, minigolf2,balsente_state, minigolf2,ROT0, "Bally/Sente",  "Mini Golf (10/8/85)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, triviabb, 0,        balsente, triviag1, balsente_state, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Baby Boomer Edition) (3/20/85)", MACHINE_SUPPORTS_SAVE )
+GAME( 198?, grudge,   0,        balsente, grudge,   balsente_state, grudge,   ROT0, "Bally Midway", "Grudge Match (v00.90, Italy, location test?)", MACHINE_SUPPORTS_SAVE ) // newer than set below, had a complete cabinet + art
+GAME( 198?, grudgep,  grudge,   balsente, grudgep,  balsente_state, grudge,   ROT0, "Bally Midway", "Grudge Match (v00.80, prototype)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown  */
 GAME( 1984, triviag1, 0,        balsente, triviag1, balsente_state, triviag1, ROT0, "Bally/Sente",  "Trivial Pursuit (Think Tank - Genus Edition) (set 1)", MACHINE_SUPPORTS_SAVE )
@@ -2382,7 +2426,7 @@ GAME( 1984, triviag2, 0,        balsente, triviag1, balsente_state, triviag2, RO
 GAME( 1984, triviasp, 0,        balsente, triviag1, balsente_state, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (All Star Sports Edition)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, triviayp, 0,        balsente, triviag1, balsente_state, triviag2, ROT0, "Bally/Sente",  "Trivial Pursuit (Young Players Edition)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, triviaes, 0,        balsente, triviaes, balsente_state, triviaes, ROT0, "Bally/Sente",  "Trivial Pursuit (Spanish)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, toggle,   0,        balsente, toggle, balsente_state,   toggle,   ROT0, "Bally/Sente",  "Toggle (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, toggle,   0,        balsente, toggle,   balsente_state, toggle,   ROT0, "Bally/Sente",  "Toggle (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, nametune, 0,        balsente, nametune, balsente_state, nametune, ROT0, "Bally/Sente",  "Name That Tune (set 1)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: 006-8030-01-0A Rev A */
@@ -2392,16 +2436,15 @@ GAME( 1986, nametune2,nametune, balsente, nametune, balsente_state, nametune, RO
 GAME( 1986, nstocker, 0,        balsente, nstocker, balsente_state, nstocker, ROT0, "Bally/Sente",  "Night Stocker (10/6/86)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, nstocker2,nstocker, balsente, nstocker, balsente_state, nstocker, ROT0, "Bally/Sente",  "Night Stocker (8/27/86)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sfootbal, 0,        balsente, sfootbal, balsente_state, sfootbal, ROT0, "Bally/Sente",  "Street Football (11/12/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spiker,   0,        balsente, spiker, balsente_state,   spiker,   ROT0, "Bally/Sente",  "Spiker", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spiker2,  spiker,   balsente, spiker, balsente_state,   spiker,   ROT0, "Bally/Sente",  "Spiker (5/5/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, spiker3,  spiker,   balsente, spiker, balsente_state,   spiker,   ROT0, "Bally/Sente",  "Spiker (6/9/86)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stompin,  0,        balsente, stompin, balsente_state,  stompin,  ROT0, "Bally/Sente",  "Stompin' (4/4/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spiker,   0,        balsente, spiker,   balsente_state, spiker,   ROT0, "Bally/Sente",  "Spiker", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spiker2,  spiker,   balsente, spiker,   balsente_state, spiker,   ROT0, "Bally/Sente",  "Spiker (5/5/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, spiker3,  spiker,   balsente, spiker,   balsente_state, spiker,   ROT0, "Bally/Sente",  "Spiker (6/9/86)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stompin,  0,        balsente, stompin,  balsente_state, stompin,  ROT0, "Bally/Sente",  "Stompin' (4/4/86)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: A084-91889-A000 (Not a cartridge, but dedicated board) */
 GAME( 1987, rescraid, 0,        balsente, rescraid, balsente_state, rescraid, ROT0, "Bally Midway", "Rescue Raider (5/11/87) (non-cartridge)", MACHINE_SUPPORTS_SAVE )
 
 /* Board: Unknown */
-GAME( 1986, shrike,   0,        shrike,   shrike, balsente_state,   shrike,   ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, shrike,   0,        shrike,   shrike,   balsente_state, shrike,   ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, rescraida,rescraid, balsente, rescraid, balsente_state, rescraid, ROT0, "Bally Midway", "Rescue Raider (stand-alone)", MACHINE_SUPPORTS_SAVE )
-GAME( 198?, grudge,   0,        balsente, grudge, balsente_state,   grudge,   ROT0, "Bally Midway", "Grudge Match (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, teamht,   0,        balsente, teamht, balsente_state, teamht, ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, teamht,   0,        balsente, teamht,   balsente_state, teamht,   ROT0, "Bally/Sente",  "Team Hat Trick", MACHINE_SUPPORTS_SAVE )

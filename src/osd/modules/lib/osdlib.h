@@ -11,9 +11,6 @@
 //
 //    - osd_ticks
 //    - osd_sleep
-//    - osd_malloc
-//    - osd_malloc_array
-//    - osd_free
 //============================================================
 
 #ifndef __OSDLIB__
@@ -22,6 +19,7 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <memory>
 
 /*-----------------------------------------------------------------------------
     osd_process_kill: kill the current process
@@ -60,7 +58,7 @@ int osd_setenv(const char *name, const char *value, int overwrite);
 
     Return value:
 
-        the returned string needs to be osd_free()-ed!
+        the returned string needs to be free-ed!
 -----------------------------------------------------------------------------*/
 
 char *osd_get_clipboard_text(void);
@@ -100,5 +98,30 @@ protected:
 };
 
 } // namespace osd
+
+//=========================================================================================================
+// Dynamic API helpers. Useful in creating a class members that expose dynamically bound API functions.
+//
+// OSD_DYNAMIC_API(dxgi, "dxgi.dll")
+// DYNAMIC_API_FN(dxgi, DWORD, WINAPI, CreateDXGIFactory1, REFIID, void**)
+//
+// Calling then looks like: DYNAMIC_CALL(CreateDXGIFactory1, p1, p2, etc)
+//=========================================================================================================
+
+#if !defined(OSD_UWP)
+
+#define OSD_DYNAMIC_API(apiname, ...) osd::dynamic_module::ptr m_##apiname##module = osd::dynamic_module::open( { __VA_ARGS__ } )
+#define OSD_DYNAMIC_API_FN(apiname, ret, conv, fname, ...) ret(conv *m_##fname##_pfn)( __VA_ARGS__ ) = m_##apiname##module->bind<ret(conv *)( __VA_ARGS__ )>(#fname)
+#define OSD_DYNAMIC_CALL(fname, ...) (*m_##fname##_pfn) ( __VA_ARGS__ )
+#define OSD_DYNAMIC_API_TEST(fname) (m_##fname##_pfn != nullptr)
+
+#else
+
+#define OSD_DYNAMIC_API(apiname, ...)
+#define OSD_DYNAMIC_API_FN(apiname, ret, conv, fname, ...)
+#define OSD_DYNAMIC_CALL(fname, ...) fname( __VA_ARGS__ )
+#define OSD_DYNAMIC_API_TEST(fname) (true)
+
+#endif
 
 #endif  /* __OSDLIB__ */

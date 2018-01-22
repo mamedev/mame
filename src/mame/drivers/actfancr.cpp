@@ -25,12 +25,15 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/actfancr.h"
+
 #include "cpu/m6502/m6502.h"
 #include "cpu/h6280/h6280.h"
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-#include "includes/actfancr.h"
+#include "screen.h"
+#include "speaker.h"
 
 /******************************************************************************/
 
@@ -51,12 +54,6 @@ READ8_MEMBER(actfancr_state::triothep_control_r)
 	}
 
 	return 0xff;
-}
-
-WRITE8_MEMBER(actfancr_state::actfancr_sound_w)
-{
-	m_soundlatch->write(space, 0, data & 0xff);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************/
@@ -81,13 +78,13 @@ static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x072000, 0x0727ff) AM_DEVREADWRITE("tilegen2", deco_bac06_device, pf_data_8bit_swap_r, pf_data_8bit_swap_w)
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(actfancr_buffer_spriteram_w)
-	AM_RANGE(0x120000, 0x1205ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x120000, 0x1205ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x130000, 0x130000) AM_READ_PORT("P1")
 	AM_RANGE(0x130001, 0x130001) AM_READ_PORT("P2")
 	AM_RANGE(0x130002, 0x130002) AM_READ_PORT("DSW1")
 	AM_RANGE(0x130003, 0x130003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("SYSTEM") /* VBL */
-	AM_RANGE(0x150000, 0x150001) AM_WRITE(actfancr_sound_w)
+	AM_RANGE(0x150000, 0x150000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_SHARE("main_ram") /* Main ram */
 ADDRESS_MAP_END
 
@@ -101,10 +98,10 @@ static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x060010, 0x06001f) AM_DEVWRITE("tilegen1", deco_bac06_device, pf_control1_8bit_swap_w)
 	AM_RANGE(0x064000, 0x0647ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_data_8bit_swap_r, pf_data_8bit_swap_w)
 	AM_RANGE(0x066400, 0x0667ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_rowscroll_8bit_swap_r, pf_rowscroll_8bit_swap_w)
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(actfancr_sound_w)
+	AM_RANGE(0x100000, 0x100000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(actfancr_buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x130000, 0x1305ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x130000, 0x1305ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x140001) AM_READNOP /* Value doesn't matter */
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_SHARE("main_ram") /* Main ram */
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(triothep_control_r, triothep_control_select_w)
@@ -262,15 +259,15 @@ static const gfx_layout sprites =
 };
 
 static GFXDECODE_START( actfan )
-	GFXDECODE_ENTRY( "gfx1", 0, chars,       0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, sprites,   512, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles,     256, 16 )
+	GFXDECODE_ENTRY( "chars",   0, chars,       0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, sprites,   512, 16 )
+	GFXDECODE_ENTRY( "tiles",   0, tiles,     256, 16 )
 GFXDECODE_END
 
 static GFXDECODE_START( triothep )
-	GFXDECODE_ENTRY( "gfx1", 0, chars,       0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, sprites,   256, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles,     512, 16 )
+	GFXDECODE_ENTRY( "chars",   0, chars,       0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, sprites,   256, 16 )
+	GFXDECODE_ENTRY( "tiles",   0, tiles,     512, 16 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -287,7 +284,7 @@ MACHINE_RESET_MEMBER(actfancr_state,triothep)
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( actfancr, actfancr_state )
+MACHINE_CONFIG_START(actfancr_state::actfancr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, 21477200/3) /* Should be accurate */
@@ -326,6 +323,7 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
@@ -337,11 +335,11 @@ static MACHINE_CONFIG_START( actfancr, actfancr_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_OKIM6295_ADD("oki", 1024188, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1024188, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( triothep, actfancr_state )
+MACHINE_CONFIG_START(actfancr_state::triothep)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",H6280,XTAL_21_4772MHz/3) /* XIN=21.4772Mhz, verified on pcb */
@@ -383,6 +381,7 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
@@ -394,7 +393,7 @@ static MACHINE_CONFIG_START( triothep, actfancr_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
 
@@ -402,18 +401,18 @@ MACHINE_CONFIG_END
 
 ROM_START( actfancr )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* Need to allow full RAM allocation for now */
-	ROM_LOAD( "fe08-2.bin", 0x00000, 0x10000, CRC(0d36fbfa) SHA1(cef5cfd053beac5ca2ac52421024c316bdbfba42) )
-	ROM_LOAD( "fe09-2.bin", 0x10000, 0x10000, CRC(27ce2bb1) SHA1(52a423dfc2bba7b3330d1a10f4149ae6eeb9198c) )
-	ROM_LOAD( "10",   0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
+	ROM_LOAD( "fe08-3.bin", 0x00000, 0x10000, CRC(35f1999d) SHA1(03b61b6544a21350dbb7a31591db163a00cf7a64) )
+	ROM_LOAD( "fe09-3.bin", 0x10000, 0x10000, CRC(d21416ca) SHA1(2c863042fe7cf5e4d8cf8a1138089b539406bec3) )
+	ROM_LOAD( "fe10-3.bin", 0x20000, 0x10000, CRC(85535fcc) SHA1(c764032463a40c9110ab35c38642de070d528a60) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "17-1", 0x08000, 0x8000, CRC(289ad106) SHA1(cf1b32ac41d3d92860fab04d82a08efe57b6ecf3) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "chars", 0 )
 	ROM_LOAD( "15", 0x00000, 0x10000, CRC(a1baf21e) SHA1(b85cf9180efae6c95cc0310064b52a78e591826a) ) /* Chars */
 	ROM_LOAD( "16", 0x10000, 0x10000, CRC(22e64730) SHA1(f1376c6e2c9d021eca7ccee3daab00593ba724b6) )
 
-	ROM_REGION( 0x60000, "gfx2", 0 )
+	ROM_REGION( 0x60000, "sprites", 0 )
 	ROM_LOAD( "02", 0x00000, 0x10000, CRC(b1db0efc) SHA1(a7bd7748ea37f473499ba5bf8ab4995b9240ff48) ) /* Sprites */
 	ROM_LOAD( "03", 0x10000, 0x08000, CRC(f313e04f) SHA1(fe69758910d38f742971c1027fc8f498c88262b1) )
 	ROM_LOAD( "06", 0x18000, 0x10000, CRC(8cb6dd87) SHA1(fab4fe76d2426c906a9070cbf7ce81200ba27ff6) )
@@ -423,7 +422,40 @@ ROM_START( actfancr )
 	ROM_LOAD( "04", 0x48000, 0x10000, CRC(bcf41795) SHA1(1d18afc974ac43fe6194e2840bbb2e93cd2b6cff) )
 	ROM_LOAD( "05", 0x58000, 0x08000, CRC(d38b94aa) SHA1(773d01427744fda9104f673d2b4183a0f7471a39) )
 
-	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_REGION( 0x40000, "tiles", 0 )
+	ROM_LOAD( "14", 0x00000, 0x10000, CRC(d6457420) SHA1(d03d2e944e768b297ec0c3389320c42bc0259d00) ) /* Tiles */
+	ROM_LOAD( "12", 0x10000, 0x10000, CRC(08787b7a) SHA1(23b10b75c4cbff8effadf4c6ed15d90b87648ce9) )
+	ROM_LOAD( "13", 0x20000, 0x10000, CRC(c30c37dc) SHA1(0f7a325738eafa85239497e2b97aa51a6f2ffc4d) )
+	ROM_LOAD( "11", 0x30000, 0x10000, CRC(1f006d9f) SHA1(74bc2d4d022ad7c65be781f974919262cacb4b64) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM sounds */
+	ROM_LOAD( "18",   0x00000, 0x10000, CRC(5c55b242) SHA1(62ba60b2f02483875da12aefe849f7e2fd137ef1) )
+ROM_END
+
+ROM_START( actfancr2 )
+	ROM_REGION( 0x30000, "maincpu", 0 ) /* Need to allow full RAM allocation for now */
+	ROM_LOAD( "fe08-2.bin", 0x00000, 0x10000, CRC(0d36fbfa) SHA1(cef5cfd053beac5ca2ac52421024c316bdbfba42) )
+	ROM_LOAD( "fe09-2.bin", 0x10000, 0x10000, CRC(27ce2bb1) SHA1(52a423dfc2bba7b3330d1a10f4149ae6eeb9198c) )
+	ROM_LOAD( "10",   0x20000, 0x10000, CRC(cabad137) SHA1(41ca833649671a29e9395968cde2be8137a9ff0a) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
+	ROM_LOAD( "17-1", 0x08000, 0x8000, CRC(289ad106) SHA1(cf1b32ac41d3d92860fab04d82a08efe57b6ecf3) )
+
+	ROM_REGION( 0x20000, "chars", 0 )
+	ROM_LOAD( "15", 0x00000, 0x10000, CRC(a1baf21e) SHA1(b85cf9180efae6c95cc0310064b52a78e591826a) ) /* Chars */
+	ROM_LOAD( "16", 0x10000, 0x10000, CRC(22e64730) SHA1(f1376c6e2c9d021eca7ccee3daab00593ba724b6) )
+
+	ROM_REGION( 0x60000, "sprites", 0 )
+	ROM_LOAD( "02", 0x00000, 0x10000, CRC(b1db0efc) SHA1(a7bd7748ea37f473499ba5bf8ab4995b9240ff48) ) /* Sprites */
+	ROM_LOAD( "03", 0x10000, 0x08000, CRC(f313e04f) SHA1(fe69758910d38f742971c1027fc8f498c88262b1) )
+	ROM_LOAD( "06", 0x18000, 0x10000, CRC(8cb6dd87) SHA1(fab4fe76d2426c906a9070cbf7ce81200ba27ff6) )
+	ROM_LOAD( "07", 0x28000, 0x08000, CRC(dd345def) SHA1(44fbf9da636a4e18c421fdc0a1eadc3c7ba66068) )
+	ROM_LOAD( "00", 0x30000, 0x10000, CRC(d50a9550) SHA1(b366826e0df11ab6b97e2cb0e813432e95f9513d) )
+	ROM_LOAD( "01", 0x40000, 0x08000, CRC(34935e93) SHA1(8cd02a72659f6cb0536b54c1c8b34dae818fbfdc) )
+	ROM_LOAD( "04", 0x48000, 0x10000, CRC(bcf41795) SHA1(1d18afc974ac43fe6194e2840bbb2e93cd2b6cff) )
+	ROM_LOAD( "05", 0x58000, 0x08000, CRC(d38b94aa) SHA1(773d01427744fda9104f673d2b4183a0f7471a39) )
+
+	ROM_REGION( 0x40000, "tiles", 0 )
 	ROM_LOAD( "14", 0x00000, 0x10000, CRC(d6457420) SHA1(d03d2e944e768b297ec0c3389320c42bc0259d00) ) /* Tiles */
 	ROM_LOAD( "12", 0x10000, 0x10000, CRC(08787b7a) SHA1(23b10b75c4cbff8effadf4c6ed15d90b87648ce9) )
 	ROM_LOAD( "13", 0x20000, 0x10000, CRC(c30c37dc) SHA1(0f7a325738eafa85239497e2b97aa51a6f2ffc4d) )
@@ -442,11 +474,11 @@ ROM_START( actfancr1 )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "17-1", 0x08000, 0x8000, CRC(289ad106) SHA1(cf1b32ac41d3d92860fab04d82a08efe57b6ecf3) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "chars", 0 )
 	ROM_LOAD( "15", 0x00000, 0x10000, CRC(a1baf21e) SHA1(b85cf9180efae6c95cc0310064b52a78e591826a) ) /* Chars */
 	ROM_LOAD( "16", 0x10000, 0x10000, CRC(22e64730) SHA1(f1376c6e2c9d021eca7ccee3daab00593ba724b6) )
 
-	ROM_REGION( 0x60000, "gfx2", 0 )
+	ROM_REGION( 0x60000, "sprites", 0 )
 	ROM_LOAD( "02", 0x00000, 0x10000, CRC(b1db0efc) SHA1(a7bd7748ea37f473499ba5bf8ab4995b9240ff48) ) /* Sprites */
 	ROM_LOAD( "03", 0x10000, 0x08000, CRC(f313e04f) SHA1(fe69758910d38f742971c1027fc8f498c88262b1) )
 	ROM_LOAD( "06", 0x18000, 0x10000, CRC(8cb6dd87) SHA1(fab4fe76d2426c906a9070cbf7ce81200ba27ff6) )
@@ -456,7 +488,7 @@ ROM_START( actfancr1 )
 	ROM_LOAD( "04", 0x48000, 0x10000, CRC(bcf41795) SHA1(1d18afc974ac43fe6194e2840bbb2e93cd2b6cff) )
 	ROM_LOAD( "05", 0x58000, 0x08000, CRC(d38b94aa) SHA1(773d01427744fda9104f673d2b4183a0f7471a39) )
 
-	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_REGION( 0x40000, "tiles", 0 )
 	ROM_LOAD( "14", 0x00000, 0x10000, CRC(d6457420) SHA1(d03d2e944e768b297ec0c3389320c42bc0259d00) ) /* Tiles */
 	ROM_LOAD( "12", 0x10000, 0x10000, CRC(08787b7a) SHA1(23b10b75c4cbff8effadf4c6ed15d90b87648ce9) )
 	ROM_LOAD( "13", 0x20000, 0x10000, CRC(c30c37dc) SHA1(0f7a325738eafa85239497e2b97aa51a6f2ffc4d) )
@@ -475,11 +507,11 @@ ROM_START( actfancrj )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "17-1", 0x08000, 0x8000, CRC(289ad106) SHA1(cf1b32ac41d3d92860fab04d82a08efe57b6ecf3) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "chars", 0 )
 	ROM_LOAD( "15", 0x00000, 0x10000, CRC(a1baf21e) SHA1(b85cf9180efae6c95cc0310064b52a78e591826a) ) /* Chars */
 	ROM_LOAD( "16", 0x10000, 0x10000, CRC(22e64730) SHA1(f1376c6e2c9d021eca7ccee3daab00593ba724b6) )
 
-	ROM_REGION( 0x60000, "gfx2", 0 )
+	ROM_REGION( 0x60000, "sprites", 0 )
 	ROM_LOAD( "02", 0x00000, 0x10000, CRC(b1db0efc) SHA1(a7bd7748ea37f473499ba5bf8ab4995b9240ff48) ) /* Sprites */
 	ROM_LOAD( "03", 0x10000, 0x08000, CRC(f313e04f) SHA1(fe69758910d38f742971c1027fc8f498c88262b1) )
 	ROM_LOAD( "06", 0x18000, 0x10000, CRC(8cb6dd87) SHA1(fab4fe76d2426c906a9070cbf7ce81200ba27ff6) )
@@ -489,7 +521,7 @@ ROM_START( actfancrj )
 	ROM_LOAD( "04", 0x48000, 0x10000, CRC(bcf41795) SHA1(1d18afc974ac43fe6194e2840bbb2e93cd2b6cff) )
 	ROM_LOAD( "05", 0x58000, 0x08000, CRC(d38b94aa) SHA1(773d01427744fda9104f673d2b4183a0f7471a39) )
 
-	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_REGION( 0x40000, "tiles", 0 )
 	ROM_LOAD( "14", 0x00000, 0x10000, CRC(d6457420) SHA1(d03d2e944e768b297ec0c3389320c42bc0259d00) ) /* Tiles */
 	ROM_LOAD( "12", 0x10000, 0x10000, CRC(08787b7a) SHA1(23b10b75c4cbff8effadf4c6ed15d90b87648ce9) )
 	ROM_LOAD( "13", 0x20000, 0x10000, CRC(c30c37dc) SHA1(0f7a325738eafa85239497e2b97aa51a6f2ffc4d) )
@@ -508,11 +540,11 @@ ROM_START( triothep )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "fg-18.bin", 0x00000, 0x10000, CRC(9de9ee63) SHA1(c91b824b9a791cb90365d45c8e1b69e67f7d065f) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "chars", 0 )
 	ROM_LOAD( "fg-12.bin", 0x00000, 0x10000, CRC(15fb49f2) SHA1(a81ff1dbc813ab9b37edb832e01aab9a9a3ed5a1) ) /* Chars */
 	ROM_LOAD( "fg-13.bin", 0x10000, 0x10000, CRC(e20c9623) SHA1(b5a58599a016378f34217396212f81ede9272598) )
 
-	ROM_REGION( 0x60000, "gfx2", 0 )
+	ROM_REGION( 0x60000, "sprites", 0 )
 	ROM_LOAD( "fg-11.bin", 0x00000, 0x10000, CRC(1143ebd7) SHA1(0ef2cf40f852bf0842beeb9727508e28437ab54b) ) /* Sprites */
 	ROM_LOAD( "fg-10.bin", 0x10000, 0x08000, CRC(4b6b477a) SHA1(77486e0ff957cbfdae16d2b5977e95b7a7ced948) )
 	ROM_LOAD( "fg-09.bin", 0x18000, 0x10000, CRC(6bf6c803) SHA1(c16fd4b7e1e86db48c6e78a4b5dcd42e8269b465) )
@@ -522,7 +554,7 @@ ROM_START( triothep )
 	ROM_LOAD( "fg-01.bin", 0x48000, 0x10000, CRC(4987f7ac) SHA1(e8e81b15f6b6c8597d34eef3cabb89b90d3ae7f5) )
 	ROM_LOAD( "fg-00.bin", 0x58000, 0x08000, CRC(41232442) SHA1(1c10a4f5607e41d6239cb478ed7355963ad6b2d0) )
 
-	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_REGION( 0x40000, "tiles", 0 )
 	ROM_LOAD( "fg-04.bin", 0x00000, 0x10000, CRC(7cea3c87) SHA1(b58156140a75f88ee6ec97ca7cdc02619ec51726) ) /* Tiles */
 	ROM_LOAD( "fg-06.bin", 0x10000, 0x10000, CRC(5e7f3e8f) SHA1(c92ec281b3985b442957f7d9237eb38a6d621cd4) )
 	ROM_LOAD( "fg-05.bin", 0x20000, 0x10000, CRC(8bb13f05) SHA1(f524cb0a38d0025c93124fc329d913e000155e9b) )
@@ -542,11 +574,11 @@ ROM_START( triothepj )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 6502 Sound CPU */
 	ROM_LOAD( "ff-18.bin", 0x00000, 0x10000, CRC(9de9ee63) SHA1(c91b824b9a791cb90365d45c8e1b69e67f7d065f) )
 
-	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_REGION( 0x20000, "chars", 0 )
 	ROM_LOAD( "ff-12.bin", 0x00000, 0x10000, CRC(15fb49f2) SHA1(a81ff1dbc813ab9b37edb832e01aab9a9a3ed5a1) ) /* Chars */
 	ROM_LOAD( "ff-13.bin", 0x10000, 0x10000, CRC(e20c9623) SHA1(b5a58599a016378f34217396212f81ede9272598) )
 
-	ROM_REGION( 0x60000, "gfx2", 0 )
+	ROM_REGION( 0x60000, "sprites", 0 )
 	ROM_LOAD( "ff-11.bin", 0x00000, 0x10000, CRC(19e885c7) SHA1(694f0aa4c1c976320d985ee50bb59c1894b853ed) ) /* Sprites */
 	ROM_LOAD( "ff-10.bin", 0x10000, 0x08000, CRC(4b6b477a) SHA1(77486e0ff957cbfdae16d2b5977e95b7a7ced948) )
 	ROM_LOAD( "ff-09.bin", 0x18000, 0x10000, CRC(79c6bc0e) SHA1(d4bf195f6114103d2eb68f3aaf65d4044947f600) )
@@ -556,7 +588,7 @@ ROM_START( triothepj )
 	ROM_LOAD( "ff-01.bin", 0x48000, 0x10000, CRC(68d80a66) SHA1(526ed8c920915877f5ee0519c9c8eee7e5580c54) )
 	ROM_LOAD( "ff-00.bin", 0x58000, 0x08000, CRC(41232442) SHA1(1c10a4f5607e41d6239cb478ed7355963ad6b2d0) )
 
-	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_REGION( 0x40000, "tiles", 0 )
 	ROM_LOAD( "ff-04.bin", 0x00000, 0x10000, CRC(7cea3c87) SHA1(b58156140a75f88ee6ec97ca7cdc02619ec51726) ) /* Tiles */
 	ROM_LOAD( "ff-06.bin", 0x10000, 0x10000, CRC(5e7f3e8f) SHA1(c92ec281b3985b442957f7d9237eb38a6d621cd4) )
 	ROM_LOAD( "ff-05.bin", 0x20000, 0x10000, CRC(8bb13f05) SHA1(f524cb0a38d0025c93124fc329d913e000155e9b) )
@@ -568,8 +600,9 @@ ROM_END
 
 /******************************************************************************/
 
-GAME( 1989, actfancr, 0,        actfancr, actfancr, driver_device, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, actfancr1,actfancr, actfancr, actfancr, driver_device, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, actfancrj,actfancr, actfancr, actfancr, driver_device, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, triothep, 0,        triothep, triothep, driver_device, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, triothepj,triothep, triothep, triothep, driver_device, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancr,  0,        actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancr2, actfancr, actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancr1, actfancr, actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (World revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, actfancrj, actfancr, actfancr, actfancr, actfancr_state, 0, ROT0, "Data East Corporation", "Act-Fancer Cybernetick Hyper Weapon (Japan revision 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, triothep,  0,        triothep, triothep, actfancr_state, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, triothepj, triothep, triothep, triothep, actfancr_state, 0, ROT0, "Data East Corporation", "Trio The Punch - Never Forget Me... (Japan)", MACHINE_SUPPORTS_SAVE )

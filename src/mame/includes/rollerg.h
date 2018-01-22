@@ -29,6 +29,7 @@ public:
 
 	/* misc */
 	int        m_readzoomroms;
+	emu_timer *m_nmi_timer;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -49,6 +50,7 @@ public:
 	K051316_CB_MEMBER(zoom_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
 
+	void rollerg(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -2,19 +2,17 @@
 // copyright-holders:David Haywood
 /* Inder / Dinamic Video */
 
-/* Inder / Dinamic Sound Board */
-
-
 #include "emu.h"
 #include "machine/inder_vid.h"
 
+#include "screen.h"
 
 
-extern const device_type INDER_VIDEO = &device_creator<inder_vid_device>;
+DEFINE_DEVICE_TYPE(INDER_VIDEO, inder_vid_device, "indervd", "Inder / Dinamic TMS Video")
 
 
 inder_vid_device::inder_vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, INDER_VIDEO, "Inder / Dinamic TMS Video", tag, owner, clock, "indervd", __FILE__),
+	: device_t(mconfig, INDER_VIDEO, tag, owner, clock),
 /*  device_video_interface(mconfig, *this, false), */
 		m_vram(*this, "vram"),
 		m_palette(*this, "palette"),
@@ -59,18 +57,18 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(inder_vid_device::to_shiftreg)
 {
 	if (m_shiftfull == 0)
 	{
-		//printf("read to shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
+		//printf("read to shift regs address %08x\n", address);
 
-		memcpy(shiftreg, &m_vram[TOWORD(address) & ~TOWORD(0x1fff)], TOBYTE(0x2000)); // & ~TOWORD(0x1fff) is needed for round 6
+		memcpy(shiftreg, &m_vram[(address & ~0x1fff) >> 4], 0x400); // & ~0x1fff is needed for round 6
 		m_shiftfull = 1;
 	}
 }
 
 TMS340X0_FROM_SHIFTREG_CB_MEMBER(inder_vid_device::from_shiftreg)
 {
-//  printf("write from shift regs address %08x (%08x)\n", address, TOWORD(address) * 2);
+//  printf("write from shift regs address %08x\n", address);
 
-	memcpy(&m_vram[TOWORD(address) & ~TOWORD(0x1fff)], shiftreg, TOBYTE(0x2000));
+	memcpy(&m_vram[(address & ~0x1fff) >> 4], shiftreg, 0x400);
 
 	m_shiftfull = 0;
 }
@@ -83,11 +81,11 @@ WRITE_LINE_MEMBER(inder_vid_device::m68k_gen_int)
 }
 
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, inder_vid_device )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, inder_vid_device )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_FRAGMENT( inder_vid )
+MACHINE_CONFIG_START(inder_vid_device::device_add_mconfig)
 	MCFG_CPU_ADD("tms", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
@@ -102,7 +100,6 @@ static MACHINE_CONFIG_FRAGMENT( inder_vid )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/12, 424, 0, 338-1, 262, 0, 246-1)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
-
 	MCFG_PALETTE_ADD("palette", 256)
 
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
@@ -110,10 +107,6 @@ static MACHINE_CONFIG_FRAGMENT( inder_vid )
 
 MACHINE_CONFIG_END
 
-machine_config_constructor inder_vid_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( inder_vid );
-}
 
 void inder_vid_device::device_start()
 {

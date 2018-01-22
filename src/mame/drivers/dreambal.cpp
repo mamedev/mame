@@ -21,14 +21,16 @@ lamps?
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/deco104.h"
 #include "machine/decocrpt.h"
+#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
-#include "machine/eepromser.h"
-#include "machine/deco104.h"
+#include "screen.h"
+#include "speaker.h"
 
 class dreambal_state : public driver_device
 {
@@ -71,6 +73,7 @@ public:
 			m_eeprom->cs_write(data&0x4 ? ASSERT_LINE : CLEAR_LINE);
 		}
 	}
+	void dreambal(machine_config &config);
 };
 
 
@@ -94,7 +97,7 @@ uint32_t dreambal_state::screen_update_dreambal(screen_device &screen, bitmap_in
 READ16_MEMBER( dreambal_state::dreambal_protection_region_0_104_r )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
 	return data;
@@ -103,7 +106,7 @@ READ16_MEMBER( dreambal_state::dreambal_protection_region_0_104_r )
 WRITE16_MEMBER( dreambal_state::dreambal_protection_region_0_104_w )
 {
 	int real_address = 0 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
@@ -117,7 +120,7 @@ static ADDRESS_MAP_START( dreambal_map, AS_PROGRAM, 16, dreambal_state )
 	AM_RANGE(0x103000, 0x103fff) AM_RAM
 
 	AM_RANGE(0x120000, 0x123fff) AM_RAM
-	AM_RANGE(0x140000, 0x1403ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x1403ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x161000, 0x16100f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 
 	AM_RANGE(0x160000, 0x163fff) AM_READWRITE(dreambal_protection_region_0_104_r,dreambal_protection_region_0_104_w)AM_SHARE("prot16ram") /* Protection device */
@@ -302,7 +305,7 @@ void dreambal_state::machine_reset()
 }
 
 // xtals = 28.000, 9.8304
-static MACHINE_CONFIG_START( dreambal, dreambal_state )
+MACHINE_CONFIG_START(dreambal_state::dreambal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
@@ -325,6 +328,9 @@ static MACHINE_CONFIG_START( dreambal, dreambal_state )
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")  // 93lc46b
 
 	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
+	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -344,7 +350,7 @@ static MACHINE_CONFIG_START( dreambal, dreambal_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 9830400/8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 9830400/8, PIN7_HIGH)
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END

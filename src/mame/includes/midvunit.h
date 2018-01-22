@@ -9,7 +9,10 @@
 #include "video/poly.h"
 #include "audio/dcs.h"
 #include "machine/midwayic.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
+#include "machine/adc0844.h"
+#include "screen.h"
 
 #define MIDVUNIT_VIDEO_CLOCK    33000000
 
@@ -44,7 +47,6 @@ class midvunit_state : public driver_device
 public:
 	enum
 	{
-		TIMER_ADC_READY,
 		TIMER_SCANLINE
 	};
 
@@ -57,11 +59,11 @@ public:
 			m_midvplus_misc(*this, "midvplus_misc"),
 			m_videoram(*this, "videoram", 32),
 			m_textureram(*this, "textureram") ,
-		m_adc_ports(*this, {"WHEEL", "ACCEL", "BRAKE"}),
 		m_maincpu(*this, "maincpu"),
 		m_watchdog(*this, "watchdog"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
+		m_adc(*this, "adc"),
 		m_midway_serial_pic(*this, "serial_pic"),
 		m_midway_serial_pic2(*this, "serial_pic2"),
 		m_midway_ioasic(*this, "ioasic"),
@@ -76,11 +78,8 @@ public:
 	required_shared_ptr<uint16_t> m_videoram;
 	required_shared_ptr<uint32_t> m_textureram;
 
-	optional_ioport_array<3> m_adc_ports;
-
 	uint8_t m_cmos_protected;
 	uint16_t m_control_data;
-	uint8_t m_adc_data;
 	uint8_t m_adc_shift;
 	uint16_t m_last_port0;
 	uint8_t m_shifter_state;
@@ -101,8 +100,9 @@ public:
 	const char *m_galil_input;
 	uint8_t m_galil_output_index;
 	char m_galil_output[450];
-	uint32_t m_output;
-	uint8_t m_output_mode;
+	uint32_t m_wheel_board_output;
+	uint32_t m_wheel_board_last;
+	uint32_t m_wheel_board_u8_latch;
 	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
 	DECLARE_READ32_MEMBER(midvunit_dma_queue_entries_r);
 	DECLARE_READ32_MEMBER(midvunit_dma_trigger_r);
@@ -116,8 +116,8 @@ public:
 	DECLARE_WRITE32_MEMBER(midvunit_textureram_w);
 	DECLARE_READ32_MEMBER(midvunit_textureram_r);
 	DECLARE_READ32_MEMBER(port0_r);
-	DECLARE_READ32_MEMBER(midvunit_adc_r);
-	DECLARE_WRITE32_MEMBER(midvunit_adc_w);
+	DECLARE_READ32_MEMBER(adc_r);
+	DECLARE_WRITE32_MEMBER(adc_w);
 	DECLARE_WRITE32_MEMBER(midvunit_cmos_protect_w);
 	DECLARE_WRITE32_MEMBER(midvunit_cmos_w);
 	DECLARE_READ32_MEMBER(midvunit_cmos_r);
@@ -138,8 +138,8 @@ public:
 	DECLARE_WRITE32_MEMBER(midvplus_misc_w);
 	DECLARE_WRITE8_MEMBER(midvplus_xf1_w);
 	DECLARE_READ32_MEMBER(generic_speedup_r);
-	DECLARE_READ32_MEMBER(midvunit_output_r);
-	DECLARE_WRITE32_MEMBER(midvunit_output_w);
+	DECLARE_READ32_MEMBER(midvunit_wheel_board_r);
+	DECLARE_WRITE32_MEMBER(midvunit_wheel_board_w);
 	DECLARE_DRIVER_INIT(crusnu40);
 	DECLARE_DRIVER_INIT(crusnu21);
 	DECLARE_DRIVER_INIT(crusnwld);
@@ -159,6 +159,7 @@ public:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<adc0844_device> m_adc;
 	optional_device<midway_serial_pic_device> m_midway_serial_pic;
 	optional_device<midway_serial_pic2_device> m_midway_serial_pic2;
 	optional_device<midway_ioasic_device> m_midway_ioasic;
@@ -166,6 +167,11 @@ public:
 	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	void postload();
 
+	void midvcommon(machine_config &config);
+	void crusnwld(machine_config &config);
+	void midvplus(machine_config &config);
+	void offroadc(machine_config &config);
+	void midvunit(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

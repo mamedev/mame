@@ -6,19 +6,22 @@
  *
  ****************************************************************************/
 
-#ifndef AVIGO_H_
-#define AVIGO_H_
+#ifndef MAME_INCLUDES_AVIGO_H
+#define MAME_INCLUDES_AVIGO_H
+
+#pragma once
 
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "machine/rp5c01.h"
+#include "imagedev/snapquik.h"
+#include "machine/bankdev.h"
 #include "machine/ins8250.h"
 #include "machine/intelfsh.h"
-#include "machine/bankdev.h"
 #include "machine/nvram.h"
-#include "sound/speaker.h"
 #include "machine/ram.h"
-#include "imagedev/snapquik.h"
+#include "machine/rp5c01.h"
+#include "machine/timer.h"
+#include "sound/spkrdev.h"
 
 #define AVIGO_NUM_COLOURS 2
 
@@ -108,5 +111,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(avigo_1hz_timer);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( avigo);
+	void avigo(machine_config &config);
 };
-#endif /* AVIGO_H_ */
+
+#endif // MAME_INCLUDES_AVIGO_H

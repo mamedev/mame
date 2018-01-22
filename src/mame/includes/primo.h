@@ -6,14 +6,16 @@
  *
  ****************************************************************************/
 
-#ifndef PRIMO_H_
-#define PRIMO_H_
+#ifndef MAME_INCLUDES_PRIMO_H
+#define MAME_INCLUDES_PRIMO_H
+
+#pragma once
 
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
-#include "bus/cbmiec/cbmiec.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
+#include "bus/cbmiec/cbmiec.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
@@ -64,7 +66,14 @@ public:
 	void primo_setup_pp (uint8_t* quickload_data, uint32_t quickload_size);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( primo );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( primo );
+	void primob32(machine_config &config);
+	void primob64(machine_config &config);
+	void primoa32(machine_config &config);
+	void primob48(machine_config &config);
+	void primoa64(machine_config &config);
+	void primoc64(machine_config &config);
+	void primoa48(machine_config &config);
 };
 
 
-#endif /* PRIMO_H_ */
+#endif // MAME_INCLUDES_PRIMO_H

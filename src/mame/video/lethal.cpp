@@ -11,6 +11,8 @@
 
 #include "emu.h"
 #include "includes/lethal.h"
+#include "screen.h"
+
 
 K05324X_CB_MEMBER(lethal_state::sprite_callback)
 {

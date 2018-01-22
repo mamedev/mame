@@ -5,13 +5,15 @@
     M72 audio interface
 
 ****************************************************************************/
+#ifndef MAME_AUDIO_M72_H
+#define MAME_AUDIO_M72_H
 
-#include "emu.h"
+#pragma once
+
 #include "machine/gen_latch.h"
 #include "sound/dac.h"
 
-class m72_audio_device : public device_t,
-									public device_sound_interface
+class m72_audio_device : public device_t, public device_sound_interface
 {
 public:
 	m72_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -25,23 +27,21 @@ public:
 		Z80_CLEAR
 	};
 
-	WRITE_LINE_MEMBER( ym2151_irq_handler );
-	DECLARE_WRITE8_MEMBER( sound_command_byte_w );
-	DECLARE_WRITE16_MEMBER( sound_command_w );
-	DECLARE_WRITE8_MEMBER(sound_irq_ack_w );
-	DECLARE_READ8_MEMBER( sample_r );
-	DECLARE_WRITE8_MEMBER( sample_w );
+	WRITE_LINE_MEMBER(ym2151_irq_handler);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
+	DECLARE_READ8_MEMBER(sample_r);
+	DECLARE_WRITE8_MEMBER(sample_w);
 
 	/* the port goes to different address bits depending on the game */
-	void set_sample_start( int start );
-	DECLARE_WRITE8_MEMBER( vigilant_sample_addr_w );
-	DECLARE_WRITE8_MEMBER( shisen_sample_addr_w );
-	DECLARE_WRITE8_MEMBER( rtype2_sample_addr_w );
-	DECLARE_WRITE8_MEMBER( poundfor_sample_addr_w );
+	void set_sample_start(int start);
+	DECLARE_WRITE8_MEMBER(vigilant_sample_addr_w);
+	DECLARE_WRITE8_MEMBER(shisen_sample_addr_w);
+	DECLARE_WRITE8_MEMBER(rtype2_sample_addr_w);
+	DECLARE_WRITE8_MEMBER(poundfor_sample_addr_w);
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -61,4 +61,6 @@ private:
 	TIMER_CALLBACK_MEMBER( setvector_callback );
 };
 
-extern const device_type M72;
+DECLARE_DEVICE_TYPE(IREM_M72_AUDIO, m72_audio_device)
+
+#endif // MAME_AUDIO_M72_H

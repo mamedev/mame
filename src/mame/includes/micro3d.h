@@ -5,10 +5,15 @@
      Microprose Games 3D hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MICRO3D_H
+#define MAME_INCLUDES_MICRO3D_H
+
+#pragma once
 
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/upd7759.h"
+#include "machine/mc2661.h"
 #include "machine/mc68681.h"
 
 
@@ -32,13 +37,6 @@ enum planes
 		CLIP_Y_MAX
 };
 
-enum dac_registers {
-	VCF,
-	VCQ,
-	VCA,
-	PAN
-};
-
 class micro3d_sound_device;
 
 class micro3d_state : public driver_device
@@ -46,8 +44,7 @@ class micro3d_state : public driver_device
 public:
 	enum
 	{
-		TIMER_MAC_DONE,
-		TIMER_ADC_DONE
+		TIMER_MAC_DONE
 	};
 
 	micro3d_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -58,7 +55,7 @@ public:
 		m_drmath(*this, "drmath"),
 		m_vgb(*this, "vgb"),
 		m_palette(*this, "palette"),
-		m_duart68681(*this, "duart68681"),
+		m_duart(*this, "duart"),
 		m_noise_1(*this, "noise_1"),
 		m_noise_2(*this, "noise_2"),
 		m_vertex(*this, "vertex"),
@@ -66,10 +63,11 @@ public:
 		m_volume(*this, "VOLUME"),
 		m_joystick_x(*this, "JOYSTICK_X"),
 		m_joystick_y(*this, "JOYSTICK_Y"),
-		m_throttle(*this, "THROTTLE"),
 		m_shared_ram(*this, "shared_ram"),
 		m_mac_sram(*this, "mac_sram"),
-		m_sprite_vram(*this, "sprite_vram") { }
+		m_sprite_vram(*this, "sprite_vram"),
+		m_vgb_uart(*this, "uart")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8051_device> m_audiocpu;
@@ -77,7 +75,7 @@ public:
 	required_device<cpu_device> m_drmath;
 	required_device<tms34010_device> m_vgb;
 	required_device<palette_device> m_palette;
-	required_device<mc68681_device> m_duart68681;
+	required_device<mc68681_device> m_duart;
 	required_device<micro3d_sound_device> m_noise_1;
 	required_device<micro3d_sound_device> m_noise_2;
 	required_memory_region m_vertex;
@@ -86,22 +84,12 @@ public:
 	required_ioport m_volume;
 	optional_ioport m_joystick_x;
 	optional_ioport m_joystick_y;
-	optional_ioport m_throttle;
 
 	required_shared_ptr<uint16_t> m_shared_ram;
 	uint8_t               m_m68681_tx0;
 
 	/* Sound */
 	uint8_t               m_sound_port_latch[4];
-	uint8_t               m_dac_data;
-
-	/* TI UART */
-	uint8_t               m_ti_uart[9];
-	int                 m_ti_uart_mode_cycle;
-	int                 m_ti_uart_sync_cycle;
-
-	/* ADC */
-	uint8_t               m_adc_val;
 
 	/* Hardware version-check latch for BOTSS 1.1a */
 	uint8_t               m_botss_latch;
@@ -142,17 +130,14 @@ public:
 	int                 m_drawing_buffer;
 	int                 m_display_buffer;
 
-	DECLARE_WRITE16_MEMBER(micro3d_ti_uart_w);
-	DECLARE_READ16_MEMBER(micro3d_ti_uart_r);
-	DECLARE_WRITE32_MEMBER(micro3d_scc_w);
-	DECLARE_READ32_MEMBER(micro3d_scc_r);
+	DECLARE_WRITE8_MEMBER(vgb_uart_w);
+	DECLARE_READ8_MEMBER(vgb_uart_r);
 	DECLARE_WRITE32_MEMBER(micro3d_mac1_w);
 	DECLARE_READ32_MEMBER(micro3d_mac2_r);
 	DECLARE_WRITE32_MEMBER(micro3d_mac2_w);
 	DECLARE_READ16_MEMBER(micro3d_encoder_h_r);
 	DECLARE_READ16_MEMBER(micro3d_encoder_l_r);
-	DECLARE_READ16_MEMBER(micro3d_adc_r);
-	DECLARE_WRITE16_MEMBER(micro3d_adc_w);
+	DECLARE_READ8_MEMBER(adc_volume_r);
 	DECLARE_READ16_MEMBER(botss_140000_r);
 	DECLARE_READ16_MEMBER(botss_180000_r);
 	DECLARE_WRITE16_MEMBER(micro3d_reset_w);
@@ -178,7 +163,6 @@ public:
 	virtual void video_reset() override;
 	INTERRUPT_GEN_MEMBER(micro3d_vblank);
 	TIMER_CALLBACK_MEMBER(mac_done_callback);
-	TIMER_CALLBACK_MEMBER(adc_done_callback);
 	DECLARE_WRITE8_MEMBER(micro3d_upd7759_w);
 	DECLARE_WRITE8_MEMBER(data_from_i8031);
 	DECLARE_READ8_MEMBER(data_to_i8031);
@@ -199,71 +183,13 @@ public:
 	void draw_triangles(uint32_t attr);
 
 
+	void micro3d(machine_config &config);
+	void botss11(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-};
 
-/*----------- defined in audio/micro3d.c -----------*/
-
-struct biquad
-{
-	double a0, a1, a2;      /* Numerator coefficients */
-	double b0, b1, b2;      /* Denominator coefficients */
-};
-
-struct lp_filter
-{
-	std::unique_ptr<float[]> history;
-	std::unique_ptr<float[]> coef;
-	double fs;
-	biquad ProtoCoef[2];
-};
-
-struct m3d_filter_state
-{
-	double      capval;
-	double      exponent;
-};
-
-class micro3d_sound_device : public device_t,
-									public device_sound_interface
-{
-public:
-	micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~micro3d_sound_device() {}
-
-	void noise_sh_w(uint8_t data);
-
-protected:
-	// device-level overrides
-	virtual void device_config_complete() override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 private:
-	// internal state
-//  union
-//  {
-//      struct
-//      {
-//          uint8_t m_vcf;
-//          uint8_t m_vcq;
-//          uint8_t m_vca;
-//          uint8_t m_pan;
-//      };
-		uint8_t m_dac[4];
-//  };
-
-	float               m_gain;
-	uint32_t              m_noise_shift;
-	uint8_t               m_noise_value;
-	uint8_t               m_noise_subcount;
-
-	m3d_filter_state    m_noise_filters[4];
-	lp_filter           m_filter;
-	sound_stream        *m_stream;
+	required_device<mc2661_device> m_vgb_uart;
 };
 
-extern const device_type MICRO3D;
+#endif // MAME_INCLUDES_MICRO3D_H

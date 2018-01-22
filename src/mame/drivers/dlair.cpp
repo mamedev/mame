@@ -35,16 +35,19 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "render.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/ldv1000.h"
 #include "machine/ldstub.h"
 #include "machine/watchdog.h"
 #include "machine/z80ctc.h"
-#include "machine/z80dart.h"
+#include "machine/z80sio.h"
 #include "sound/ay8910.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "render.h"
+#include "speaker.h"
+
 #include "dlair.lh"
 
 
@@ -129,6 +132,10 @@ public:
 	DECLARE_PALETTE_INIT(dleuro);
 	uint32_t screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(write_speaker);
+	void dlair_base(machine_config &config);
+	void dlair_pr7820(machine_config &config);
+	void dleuro(machine_config &config);
+	void dlair_ldv1000(machine_config &config);
 };
 
 
@@ -405,7 +412,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dleuro_io_map, AS_IO, 8, dlair_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7c) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_DEVREADWRITE("sio", z80dart_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)
 ADDRESS_MAP_END
 
 
@@ -704,7 +711,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( dlair_base, dlair_state )
+MACHINE_CONFIG_START(dlair_state::dlair_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
@@ -724,7 +731,7 @@ static MACHINE_CONFIG_START( dlair_base, dlair_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dlair_pr7820, dlair_base )
+MACHINE_CONFIG_DERIVED(dlair_state::dlair_pr7820, dlair_base)
 	MCFG_LASERDISC_PR7820_ADD("ld_pr7820")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -732,7 +739,7 @@ static MACHINE_CONFIG_DERIVED( dlair_pr7820, dlair_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dlair_ldv1000, dlair_base )
+MACHINE_CONFIG_DERIVED(dlair_state::dlair_ldv1000, dlair_base)
 	MCFG_LASERDISC_LDV1000_ADD("ld_ldv1000")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -740,7 +747,7 @@ static MACHINE_CONFIG_DERIVED( dlair_ldv1000, dlair_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dleuro, dlair_state )
+MACHINE_CONFIG_START(dlair_state::dleuro)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
@@ -752,8 +759,8 @@ static MACHINE_CONFIG_START( dleuro, dlair_state )
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(dlair_state, write_speaker))
 
-	MCFG_Z80SIO0_ADD("sio", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, 0, 0, 0, 0)
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	MCFG_DEVICE_ADD("sio", Z80SIO, MASTER_CLOCK_EURO/4 /* same as "maincpu" */)
+	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	// TODO: hook up tx and rx callbacks
 
 	MCFG_WATCHDOG_ADD("watchdog")

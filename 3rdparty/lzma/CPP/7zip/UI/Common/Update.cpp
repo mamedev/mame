@@ -251,8 +251,6 @@ STDMETHODIMP COutMultiVolStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *n
 
 STDMETHODIMP COutMultiVolStream::SetSize(UInt64 newSize)
 {
-  if (newSize < 0)
-    return E_INVALIDARG;
   unsigned i = 0;
   while (i < Streams.Size())
   {
@@ -758,15 +756,15 @@ static HRESULT Compress(
       return errorInfo.SetFromLastError("cannot open SFX module", options.SfxModule);
 
     CMyComPtr<ISequentialOutStream> sfxOutStream;
-    COutFileStream *outStreamSpec = NULL;
+    COutFileStream *outStreamSpec2 = NULL;
     if (options.VolumesSizes.Size() == 0)
       sfxOutStream = outStream;
     else
     {
-      outStreamSpec = new COutFileStream;
-      sfxOutStream = outStreamSpec;
+      outStreamSpec2 = new COutFileStream;
+      sfxOutStream = outStreamSpec2;
       FString realPath = us2fs(archivePath.GetFinalPath());
-      if (!outStreamSpec->Create(realPath, false))
+      if (!outStreamSpec2->Create(realPath, false))
         return errorInfo.SetFromLastError("cannot open file", realPath);
     }
 
@@ -778,9 +776,9 @@ static HRESULT Compress(
 
     RINOK(NCompress::CopyStream(sfxStream, sfxOutStream, NULL));
     
-    if (outStreamSpec)
+    if (outStreamSpec2)
     {
-      RINOK(outStreamSpec->Close());
+      RINOK(outStreamSpec2->Close());
     }
   }
 
@@ -1060,7 +1058,7 @@ HRESULT UpdateArchive(
         !options.SetArcPath(codecs, cmdArcPath2))
       return E_NOTIMPL;
   }
-  UString arcPath = options.ArchivePath.GetFinalPath();
+  const UString arcPath = options.ArchivePath.GetFinalPath();
 
   if (cmdArcPath2.IsEmpty())
   {
@@ -1088,10 +1086,10 @@ HRESULT UpdateArchive(
         return E_NOTIMPL;
       if (options.VolumesSizes.Size() > 0)
         return E_NOTIMPL;
-      CObjectVector<COpenType> types;
+      CObjectVector<COpenType> types2;
       // change it.
       if (options.MethodMode.Type_Defined)
-        types.Add(options.MethodMode.Type);
+        types2.Add(options.MethodMode.Type);
       // We need to set Properties to open archive only in some cases (WIM archives).
 
       CIntVector excl;
@@ -1100,7 +1098,7 @@ HRESULT UpdateArchive(
       op.props = &options.MethodMode.Properties;
       #endif
       op.codecs = codecs;
-      op.types = &types;
+      op.types = &types2;
       op.excludedFormats = &excl;
       op.stdInMode = false;
       op.stream = NULL;
@@ -1108,14 +1106,11 @@ HRESULT UpdateArchive(
 
       RINOK(callback->StartOpenArchive(arcPath));
 
-      HRESULT result = arcLink.Open3(op, openCallback);
+      HRESULT result = arcLink.Open_Strict(op, openCallback);
 
       if (result == E_ABORT)
         return result;
       
-      if (result == S_OK && arcLink.NonOpen_ErrorInfo.ErrorFormatIndex >= 0)
-        result = S_FALSE;
-
       HRESULT res2 = callback->OpenResult(codecs, arcLink, arcPath, result);
       /*
       if (result == S_FALSE)
@@ -1289,10 +1284,11 @@ HRESULT UpdateArchive(
     }
   }
 
-  unsigned i;
-  for (i = 0; i < options.Commands.Size(); i++)
+  unsigned ci;
+
+  for (ci = 0; ci < options.Commands.Size(); ci++)
   {
-    CArchivePath &ap = options.Commands[i].ArchivePath;
+    CArchivePath &ap = options.Commands[ci].ArchivePath;
     if (usesTempDir)
     {
       // Check it
@@ -1301,7 +1297,7 @@ HRESULT UpdateArchive(
       // ap.TempPrefix = tempDirPrefix;
     }
     if (!options.StdOutMode &&
-        (i > 0 || !createTempFile))
+        (ci > 0 || !createTempFile))
     {
       const FString path = us2fs(ap.GetFinalPath());
       if (NFind::DoesFileOrDirExist(path))
@@ -1334,7 +1330,7 @@ HRESULT UpdateArchive(
   {
     unsigned num = dirItems.Items.Size();
     processedItems.Alloc(num);
-    for (i = 0; i < num; i++)
+    for (unsigned i = 0; i < num; i++)
       processedItems[i] = 0;
   }
 
@@ -1348,10 +1344,10 @@ HRESULT UpdateArchive(
   #endif
   */
 
-  for (i = 0; i < options.Commands.Size(); i++)
+  for (ci = 0; ci < options.Commands.Size(); ci++)
   {
     const CArc *arc = thereIsInArchive ? arcLink.GetArc() : NULL;
-    CUpdateArchiveCommand &command = options.Commands[i];
+    CUpdateArchiveCommand &command = options.Commands[ci];
     UString name;
     bool isUpdating;
     
@@ -1363,7 +1359,7 @@ HRESULT UpdateArchive(
     else
     {
       name = command.ArchivePath.GetFinalPath();
-      isUpdating = (i == 0 && options.UpdateArchiveItself && thereIsInArchive);
+      isUpdating = (ci == 0 && options.UpdateArchiveItself && thereIsInArchive);
     }
     
     RINOK(callback->StartArchive(name, isUpdating))
@@ -1455,19 +1451,19 @@ HRESULT UpdateArchive(
     {
       CArchivePath &ap = options.Commands[i].ArchivePath;
       FString finalPath = us2fs(ap.GetFinalPath());
-      FString arcPath;
-      if (!MyGetFullPathName(finalPath, arcPath))
+      FString arcPath2;
+      if (!MyGetFullPathName(finalPath, arcPath2))
         return errorInfo.SetFromLastError("GetFullPathName error", finalPath);
-      fullPaths.Add(arcPath);
+      fullPaths.Add(arcPath2);
     }
 
     CCurrentDirRestorer curDirRestorer;
     
     for (i = 0; i < fullPaths.Size(); i++)
     {
-      UString arcPath = fs2us(fullPaths[i]);
-      UString fileName = ExtractFileNameFromPath(arcPath);
-      AString path = GetAnsiString(arcPath);
+      UString arcPath2 = fs2us(fullPaths[i]);
+      UString fileName = ExtractFileNameFromPath(arcPath2);
+      AString path = GetAnsiString(arcPath2);
       AString name = GetAnsiString(fileName);
       // Warning!!! MAPISendDocuments function changes Current directory
       // fnSend(0, ";", (LPSTR)(LPCSTR)path, (LPSTR)(LPCSTR)name, 0);
@@ -1504,6 +1500,8 @@ HRESULT UpdateArchive(
   {
     CRecordVector<CRefSortPair> pairs;
     FStringVector foldersNames;
+
+    unsigned i;
 
     for (i = 0; i < dirItems.Items.Size(); i++)
     {

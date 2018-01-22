@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_COMX35_THERMAL_H
+#define MAME_BUS_COMX35_THERMAL_H
+
 #pragma once
 
-#ifndef __COMX_THM__
-#define __COMX_THM__
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -48,7 +47,7 @@ private:
 
 
 // device type definition
-extern const device_type COMX_THM;
+DECLARE_DEVICE_TYPE(COMX_THM, comx_thm_device)
 
 
-#endif
+#endif // MAME_BUS_COMX35_THERMAL_H

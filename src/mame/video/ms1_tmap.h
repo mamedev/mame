@@ -8,11 +8,11 @@
     and mahjong games from the same period.
 
 ***************************************************************************/
+#ifndef MAME_VIDEO_MS1_TMAP_H
+#define MAME_VIDEO_MS1_TMAP_H
 
 #pragma once
 
-#ifndef MAME_VIDEO_MEGASYS1_TILEMAP_DEVICE
-#define MAME_VIDEO_MEGASYS1_TILEMAP_DEVICE
 
 //**************************************************************************
 //  DEVICE CONFIGURATION MACROS
@@ -96,6 +96,6 @@ private:
 };
 
 // device type definition
-extern const device_type MEGASYS1_TILEMAP;
+DECLARE_DEVICE_TYPE(MEGASYS1_TILEMAP, megasys1_tilemap_device)
 
-#endif  /* MAME_VIDEO_MEGASYS1_TILEMAP_DEVICE */
+#endif  // MAME_VIDEO_MS1_TMAP_H

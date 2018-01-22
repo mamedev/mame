@@ -9,134 +9,100 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "ui/moptions.h"
 #include "ui/inifile.h"
-#include "softlist_dev.h"
-#include "drivenum.h"
 
-//-------------------------------------------------
-//  GLOBAL VARIABLES
-//-------------------------------------------------
-uint16_t inifile_manager::c_cat = 0;
-uint16_t inifile_manager::c_file = 0;
+#include "ui/moptions.h"
+
+#include "drivenum.h"
+#include "softlist_dev.h"
+
 
 //-------------------------------------------------
 //  ctor
 //-------------------------------------------------
 
 inifile_manager::inifile_manager(running_machine &machine, ui_options &moptions)
-	: m_machine(machine)
-	, m_options(moptions)
+	: m_options(moptions)
+	, m_ini_index()
 {
-	ini_index.clear();
-	directory_scan();
-}
-
-//-------------------------------------------------
-//  scan directories and create index
-//-------------------------------------------------
-
-void inifile_manager::directory_scan()
-{
-	file_enumerator path(m_options.extraini_path());
-	const osd::directory::entry *dir;
-
-	while ((dir = path.next()) != nullptr)
-		if (core_filename_ends_with(dir->name, ".ini") && parseopen(dir->name))
+	// scan directories and create index
+	file_enumerator path(m_options.categoryini_path());
+	for (osd::directory::entry const *dir = path.next(); dir; dir = path.next())
+	{
+		std::string name(dir->name);
+		if (core_filename_ends_with(name, ".ini"))
 		{
-			init_category(std::string(dir->name));
-			parseclose();
+			emu_file file(m_options.categoryini_path(), OPEN_FLAG_READ);
+			if (file.open(name) == osd_file::error::NONE)
+			{
+				init_category(std::move(name), file);
+				file.close();
+			}
 		}
-
-	// sort
-	std::stable_sort(ini_index.begin(), ini_index.end());
-}
-
-//-------------------------------------------------
-//  initialize category
-//-------------------------------------------------
-
-void inifile_manager::init_category(std::string filename)
-{
-	categoryindex index;
-	char rbuf[MAX_CHAR_INFO];
-	std::string readbuf;
-	while (fgets(rbuf, MAX_CHAR_INFO, fp) != nullptr)
-		if (rbuf[0] == '[')
-		{
-			readbuf = rbuf;
-			auto name = readbuf.substr(1, readbuf.find("]") - 1);
-			if (name == "FOLDER_SETTINGS") continue;
-			index.emplace_back(name, ftell(fp));
-		}
-
-	// sort
-	std::stable_sort(index.begin(), index.end());
-
-	if (!index.empty())
-		ini_index.emplace_back(strmakelower(filename), index);
+	}
+	std::stable_sort(m_ini_index.begin(), m_ini_index.end(), [] (auto const &x, auto const &y) { return 0 > core_stricmp(x.first.c_str(), y.first.c_str()); });
 }
 
 //-------------------------------------------------
 //  load and indexing ini files
 //-------------------------------------------------
 
-void inifile_manager::load_ini_category(std::vector<int> &temp_filter)
+void inifile_manager::load_ini_category(size_t file, size_t category, std::unordered_set<game_driver const *> &result) const
 {
-	if (ini_index.empty())
-		return;
-
-	auto search_clones = false;
-	std::string filename(ini_index[c_file].first);
-	auto offset = ini_index[c_file].second[c_cat].second;
-
-	if (filename == "category.ini" || filename == "alltime.ini")
-		search_clones = true;
-
-	if (parseopen(filename.c_str()))
+	std::string const &filename(m_ini_index[file].first);
+	emu_file fp(m_options.categoryini_path(), OPEN_FLAG_READ);
+	if (fp.open(filename) != osd_file::error::NONE)
 	{
-		fseek(fp, offset, SEEK_SET);
-		char rbuf[MAX_CHAR_INFO];
-		std::string readbuf;
-		while (fgets(rbuf, MAX_CHAR_INFO, fp) != nullptr)
-		{
-			readbuf = chartrimcarriage(rbuf);
-
-			if (readbuf.empty() || readbuf[0] == '[')
-				break;
-
-			auto dfind = driver_list::find(readbuf.c_str());
-			if (dfind != -1)
-			{
-				temp_filter.push_back(dfind);
-				if (search_clones && driver_list::non_bios_clone(dfind) == -1)
-					for (int x = 0; x < driver_list::total(); x++)
-						if (readbuf == driver_list::driver(x).parent && readbuf != driver_list::driver(x).name)
-							temp_filter.push_back(x);
-			}
-		}
-		parseclose();
+		osd_printf_error("Failed to open category file %s for reading\n", filename.c_str());
+		return;
 	}
+
+	int64_t const offset(m_ini_index[file].second[category].second);
+	if (fp.seek(offset, SEEK_SET) || (fp.tell() != offset))
+	{
+		fp.close();
+		osd_printf_error("Failed to seek to category offset in file %s\n", filename.c_str());
+		return;
+	}
+
+	char rbuf[MAX_CHAR_INFO];
+	while (fp.gets(rbuf, MAX_CHAR_INFO) && rbuf[0] && ('[' != rbuf[0]))
+	{
+		auto const tail(std::find_if(std::begin(rbuf), std::prev(std::end(rbuf)), [] (char ch) { return !ch || ('\r' == ch) || ('\n' == ch); }));
+		*tail = '\0';
+		int const dfind(driver_list::find(rbuf));
+		if (0 <= dfind)
+			result.emplace(&driver_list::driver(dfind));
+	}
+
+	fp.close();
 }
 
-//---------------------------------------------------------
-//  parseopen - Open up file for reading
-//---------------------------------------------------------
+//-------------------------------------------------
+//  initialize category
+//-------------------------------------------------
 
-bool inifile_manager::parseopen(const char *filename)
+void inifile_manager::init_category(std::string &&filename, emu_file &file)
 {
-	emu_file file(m_options.extraini_path(), OPEN_FLAG_READ);
-	if (file.open(filename) != osd_file::error::NONE)
-		return false;
-
-	m_fullpath = file.fullpath();
-	file.close();
-	fp = fopen(m_fullpath.c_str(), "r");
-
-	fgetc(fp);
-	fseek(fp, 0, SEEK_SET);
-	return true;
+	categoryindex index;
+	char rbuf[MAX_CHAR_INFO];
+	std::string name;
+	while (file.gets(rbuf, ARRAY_LENGTH(rbuf)))
+	{
+		if ('[' == rbuf[0])
+		{
+			auto const head(std::next(std::begin(rbuf)));
+			auto const tail(std::find_if(head, std::end(rbuf), [] (char ch) { return !ch || (']' == ch); }));
+			name.assign(head, tail);
+			if ("FOLDER_SETTINGS" != name)
+				index.emplace_back(std::move(name), file.tell());
+		}
+	}
+	std::stable_sort(index.begin(), index.end(), [] (auto const &x, auto const &y) { return 0 > core_stricmp(x.first.c_str(), y.first.c_str()); });
+	if (!index.empty())
+		m_ini_index.emplace_back(std::move(filename), std::move(index));
 }
+
 
 /**************************************************************************
     FAVORITE MANAGER
@@ -159,7 +125,7 @@ favorite_manager::favorite_manager(running_machine &machine, ui_options &moption
 
 void favorite_manager::add_favorite_game(const game_driver *driver)
 {
-	m_list.emplace(driver->description, ui_software_info{ driver->name, driver->description, "", "", "", 0, "", driver, "", "", "", 1, "", "", "", true });
+	m_list.emplace(driver->type.fullname(), *driver);
 	save_favorite_games();
 }
 
@@ -179,7 +145,7 @@ void favorite_manager::add_favorite_game(ui_software_info &swinfo)
 
 void favorite_manager::add_favorite_game()
 {
-	if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0)
+	if ((machine().system().flags & machine_flags::MASK_TYPE) == machine_flags::TYPE_ARCADE)
 	{
 		add_favorite_game(&machine().system());
 		return;
@@ -188,10 +154,10 @@ void favorite_manager::add_favorite_game()
 	auto software_avail = false;
 	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 	{
-		if (image.exists() && image.software_entry())
+		if (image.exists() && image.loaded_through_softlist())
 		{
-			auto swinfo = image.software_entry();
-			auto part = image.part_entry();
+			const software_info *swinfo = image.software_entry();
+			const software_part *part = image.part_entry();
 			ui_software_info tmpmatches;
 			tmpmatches.shortname = swinfo->shortname();
 			tmpmatches.longname = image.longname();
@@ -203,7 +169,7 @@ void favorite_manager::add_favorite_game()
 			tmpmatches.driver = &machine().system();
 			tmpmatches.listname = strensure(image.software_list_name());
 			tmpmatches.interface = part->interface();
-			tmpmatches.instance = strensure(image.instance_name());
+			tmpmatches.instance = image.instance_name();
 			tmpmatches.startempty = 0;
 			tmpmatches.parentlongname.clear();
 			if (!swinfo->parentname().empty())
@@ -241,7 +207,7 @@ void favorite_manager::add_favorite_game()
 //  remove a favorite from list
 //-------------------------------------------------
 
-void favorite_manager::remove_favorite_game(ui_software_info &swinfo)
+void favorite_manager::remove_favorite_game(ui_software_info const &swinfo)
 {
 	for (auto e = m_list.begin(); e != m_list.end(); ++e)
 		if (e->second == swinfo)
@@ -270,7 +236,7 @@ void favorite_manager::remove_favorite_game()
 
 bool favorite_manager::isgame_favorite()
 {
-	if ((machine().system().flags & MACHINE_TYPE_ARCADE) != 0)
+	if ((machine().system().flags & machine_flags::MASK_TYPE) == machine_flags::TYPE_ARCADE)
 		return isgame_favorite(&machine().system());
 
 	auto image_loaded = false;

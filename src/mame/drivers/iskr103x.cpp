@@ -31,10 +31,13 @@ class iskr103x_state : public driver_device
 {
 public:
 	iskr103x_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
+	void iskr1030m(machine_config &config);
+	void iskr1031(machine_config &config);
 };
 
 static ADDRESS_MAP_START( iskr1031_map, AS_PROGRAM, 16, iskr103x_state )
@@ -59,7 +62,7 @@ static DEVICE_INPUT_DEFAULTS_START(iskr1031)
 DEVICE_INPUT_DEFAULTS_END
 
 // XXX
-static MACHINE_CONFIG_START( iskr1030m, iskr103x_state )
+MACHINE_CONFIG_START(iskr103x_state::iskr1030m)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",  I8086, 4772720)
 	MCFG_CPU_PROGRAM_MAP(iskr1031_map)
@@ -84,7 +87,7 @@ static MACHINE_CONFIG_START( iskr1030m, iskr103x_state )
 	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( iskr1031, iskr1030m )
+MACHINE_CONFIG_DERIVED(iskr103x_state::iskr1031, iskr1030m)
 	MCFG_DEVICE_MODIFY("mb")
 	MCFG_DEVICE_INPUT_DEFAULTS(iskr1031)
 	MCFG_DEVICE_MODIFY("isa1")
@@ -113,6 +116,6 @@ ROM_END
 
 ***************************************************************************/
 
-/*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT                       INIT        COMPANY     FULLNAME */
-COMP ( 1989,    iskr1030m,  ibm5150,    0,      iskr1030m,  0,         driver_device,   0,          "Schetmash", "Iskra 1030M", MACHINE_NOT_WORKING)
-COMP ( 1989,    iskr1031,   ibm5150,    0,      iskr1031,   0,         driver_device,   0,          "<unknown>", "Iskra 1031", 0)
+//     YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT  STATE           INIT  COMPANY       FULLNAME      FLAGS
+COMP ( 1989, iskr1030m, ibm5150, 0,      iskr1030m,  0,     iskr103x_state, 0,    "Schetmash", "Iskra 1030M", MACHINE_NOT_WORKING )
+COMP ( 1989, iskr1031,  ibm5150, 0,      iskr1031,   0,     iskr103x_state, 0,    "<unknown>", "Iskra 1031",  0 )

@@ -8,23 +8,21 @@
 
 #include "uwpcompat.h"
 
-#include <errno.h>
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <errno.h>
+
 #undef interface
 
 #include "emu.h"
 
 extern "C" {
 
-	int __cdecl system(const char *command)
+	BOOL WINAPI GetVersionEx(
+		_Inout_ LPOSVERSIONINFO lpVersionInfo
+	)
 	{
-		return ENOENT;
-	}
-
-	const char *getenv(const char *varname)
-	{
-		return osd_getenv(varname);
+		lpVersionInfo->dwMajorVersion = 10;
+		return TRUE;
 	}
 
 	HANDLE
@@ -68,16 +66,14 @@ extern "C" {
 		return osd_ticks();
 	}
 
+	// This is only in here so callers get an error
 	HMODULE WINAPI LoadLibraryExA(
 		_In_ LPCSTR lpLibFileName,
 		_Reserved_ HANDLE hFile,
 		_In_ DWORD dwFlags
-		)
+	)
 	{
-		wchar_t libfile_wide[MAX_PATH + 1];
-		if (MultiByteToWideChar(CP_ACP, 0, lpLibFileName, strlen(lpLibFileName), libfile_wide, MAX_PATH))
-			return LoadPackagedLibrary(libfile_wide, 0);
-
+		SetLastError(ERROR_FILE_NOT_FOUND);
 		return nullptr;
 	}
 
@@ -85,9 +81,10 @@ extern "C" {
 		_In_ LPCWSTR lpLibFileName,
 		_Reserved_ HANDLE hFile,
 		_In_ DWORD dwFlags
-		)
+	)
 	{
-		return LoadPackagedLibrary(lpLibFileName, 0);
+		SetLastError(ERROR_FILE_NOT_FOUND);
+		return nullptr;
 	}
 
 	DWORD WINAPI GetFileSize(
@@ -95,6 +92,12 @@ extern "C" {
 		_Out_opt_ LPDWORD lpFileSizeHigh
 	)
 	{
-		return 0;
+		FILE_STANDARD_INFO file_info;
+		GetFileInformationByHandleEx(hFile, FileStandardInfo, &file_info, sizeof(file_info));
+		if(lpFileSizeHigh!=nullptr)
+		{
+			*lpFileSizeHigh = file_info.EndOfFile.HighPart;
+		}
+		return file_info.EndOfFile.LowPart;
 	}
 }

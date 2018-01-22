@@ -210,7 +210,6 @@ public:
 	bool global_inputs() const { return bool_value(WINOPTION_GLOBAL_INPUTS); }
 	bool dual_lightgun() const { return bool_value(WINOPTION_DUAL_LIGHTGUN); }
 
-private:
 	static const options_entry s_option_entries[];
 };
 
@@ -258,8 +257,10 @@ struct _EXCEPTION_POINTERS;
 
 class windows_osd_interface : public osd_common_t
 {
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	// Access to exception filter static method
 	friend int main(int argc, char *argv[]);
+#endif
 
 public:
 	// construction/destruction

@@ -52,6 +52,8 @@ modified by Hau
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
+#include "screen.h"
+#include "speaker.h"
 
 class safarir_state : public driver_device
 {
@@ -89,6 +91,8 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(safarir);
 	uint32_t screen_update_safarir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void safarir(machine_config &config);
+	void safarir_audio(machine_config &config);
 };
 
 
@@ -298,7 +302,7 @@ static const char *const safarir_sample_names[] =
 };
 
 
-static MACHINE_CONFIG_FRAGMENT( safarir_audio )
+MACHINE_CONFIG_START(safarir_state::safarir_audio)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(6)
@@ -397,7 +401,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( safarir, safarir_state )
+MACHINE_CONFIG_START(safarir_state::safarir)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz/12)  /* 1.5 MHz ? */
@@ -498,5 +502,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, safarir, 0,        safarir, safarir, driver_device, 0, ROT90, "SNK (Taito license)", "Safari Rally (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1979, safarirj, safarir, safarir, safarir, driver_device, 0, ROT90, "SNK", "Safari Rally (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, safarir, 0,        safarir, safarir, safarir_state, 0, ROT90, "SNK (Taito license)", "Safari Rally (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1979, safarirj, safarir, safarir, safarir, safarir_state, 0, ROT90, "SNK",                 "Safari Rally (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

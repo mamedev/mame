@@ -10,6 +10,7 @@
 #include "sound/upd7759.h"
 #include "sound/msm5205.h"
 #include "video/k007121.h"
+#include "screen.h"
 
 class combatsc_state : public driver_device
 {
@@ -21,7 +22,7 @@ public:
 		m_k007121_1(*this, "k007121_1"),
 		m_k007121_2(*this, "k007121_2"),
 		m_upd7759(*this, "upd"),
-		m_msm5205(*this, "msm5205"),
+		m_msm(*this, "msm"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -46,6 +47,7 @@ public:
 	int  m_vreg;
 	int  m_bank_select; /* 0x00..0x1f */
 	int  m_video_circuit; /* 0 or 1 */
+	bool m_textflip;
 	uint8_t *m_page[2];
 
 	/* misc */
@@ -62,7 +64,7 @@ public:
 	optional_device<k007121_device> m_k007121_1;
 	optional_device<k007121_device> m_k007121_2;
 	optional_device<upd7759_device> m_upd7759;
-	optional_device<msm5205_device> m_msm5205;
+	optional_device<msm5205_device> m_msm;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -71,7 +73,6 @@ public:
 	optional_ioport_array<4> m_track_ports;
 
 	DECLARE_WRITE8_MEMBER(combatsc_vreg_w);
-	DECLARE_WRITE8_MEMBER(combatscb_sh_irqtrigger_w);
 	DECLARE_READ8_MEMBER(combatscb_io_r);
 	DECLARE_WRITE8_MEMBER(combatscb_priority_w);
 	DECLARE_WRITE8_MEMBER(combatsc_bankselect_w);
@@ -93,7 +94,8 @@ public:
 	DECLARE_WRITE8_MEMBER(combatsc_play_w);
 	DECLARE_WRITE8_MEMBER(combatsc_voice_reset_w);
 	DECLARE_WRITE8_MEMBER(combatsc_portA_w);
-	DECLARE_WRITE8_MEMBER(combatscb_dac_w);
+	DECLARE_WRITE8_MEMBER(combatscb_msm_w);
+	DECLARE_WRITE8_MEMBER(combatscb_sound_irq_ack);
 	DECLARE_DRIVER_INIT(combatsc);
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
@@ -112,4 +114,6 @@ public:
 	uint32_t screen_update_combatscb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask );
 	void bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit );
+	void combatscb(machine_config &config);
+	void combatsc(machine_config &config);
 };

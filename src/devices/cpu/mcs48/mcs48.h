@@ -11,10 +11,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_MCS48_MCS48_H
+#define MAME_CPU_MCS48_MCS48_H
 
-#ifndef __MCS48_H__
-#define __MCS48_H__
+#pragma once
 
 
 
@@ -56,30 +56,6 @@ enum
 };
 
 
-/* special I/O space ports */
-enum
-{
-	MCS48_PORT_P0   = 0x100,    /* Not used */
-	MCS48_PORT_P1   = 0x101,
-	MCS48_PORT_P2   = 0x102,
-	MCS48_PORT_T0   = 0x110,
-	MCS48_PORT_T1   = 0x111,
-	MCS48_PORT_BUS  = 0x120,
-	MCS48_PORT_PROG = 0x121     /* PROG line to 8243 expander */
-};
-
-
-/* 8243 expander operations */
-enum
-{
-	MCS48_EXPANDER_OP_READ = 0,
-	MCS48_EXPANDER_OP_WRITE = 1,
-	MCS48_EXPANDER_OP_OR = 2,
-	MCS48_EXPANDER_OP_AND = 3
-};
-
-
-
 /***************************************************************************
     MACROS
 ***************************************************************************/
@@ -90,42 +66,99 @@ enum
 #define MCS48_ALE_CLOCK(_clock) \
 	attotime::from_hz(_clock/(3*5))
 
+
+#define MCFG_MCS48_PORT_P1_IN_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_port_in_cb(*device, 0, DEVCB_##_devcb);
+#define MCFG_MCS48_PORT_P1_OUT_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_port_out_cb(*device, 0, DEVCB_##_devcb);
+
+#define MCFG_MCS48_PORT_P2_IN_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_port_in_cb(*device, 1, DEVCB_##_devcb);
+#define MCFG_MCS48_PORT_P2_OUT_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_port_out_cb(*device, 1, DEVCB_##_devcb);
+
+#define MCFG_MCS48_PORT_T0_IN_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_test_in_cb(*device, 0, DEVCB_##_devcb);
+#define MCFG_MCS48_PORT_T0_CLK_DEVICE(_tag) \
+	mcs48_cpu_device::set_t0_clk_cb(*device, clock_update_delegate(FUNC(device_t::set_unscaled_clock), _tag, (device_t *)nullptr));
+#define MCFG_MCS48_PORT_T0_CLK_CUSTOM(_class, _func) \
+	mcs48_cpu_device::set_t0_clk_cb(*device, clock_update_delegate(&_class::_func, #_class "::" _func, owner));
+
+#define MCFG_MCS48_PORT_T1_IN_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_test_in_cb(*device, 1, DEVCB_##_devcb);
+
+#define MCFG_MCS48_PORT_BUS_IN_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_bus_in_cb(*device, DEVCB_##_devcb);
+#define MCFG_MCS48_PORT_BUS_OUT_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_bus_out_cb(*device, DEVCB_##_devcb);
+
+// PROG line to 8243 expander
+#define MCFG_MCS48_PORT_PROG_OUT_CB(_devcb) \
+	devcb = &mcs48_cpu_device::set_prog_out_cb(*device, DEVCB_##_devcb);
+
+
+/***************************************************************************
+    TYPES
+***************************************************************************/
+
 /* Official Intel MCS-48 parts */
-extern const device_type I8021;            /* 1k internal ROM,      64 bytes internal RAM */
-extern const device_type I8022;            /* 2k internal ROM,     128 bytes internal RAM */
-extern const device_type I8035;            /* external ROM,         64 bytes internal RAM */
-extern const device_type I8048;            /* 1k internal ROM,      64 bytes internal RAM */
-extern const device_type I8648;            /* 1k internal OTP ROM,  64 bytes internal RAM */
-extern const device_type I8748;            /* 1k internal EEPROM,   64 bytes internal RAM */
-extern const device_type I8039;            /* external ROM,        128 bytes internal RAM */
-extern const device_type I8049;            /* 2k internal ROM,     128 bytes internal RAM */
-extern const device_type I8749;            /* 2k internal EEPROM,  128 bytes internal RAM */
-extern const device_type I8040;            /* external ROM,        256 bytes internal RAM */
-extern const device_type I8050;            /* 4k internal ROM,     256 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8021, i8021_device)    /* 1k internal ROM,      64 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8022, i8022_device)    /* 2k internal ROM,     128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8035, i8035_device)    /* external ROM,         64 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8048, i8048_device)    /* 1k internal ROM,      64 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8648, i8648_device)    /* 1k internal OTP ROM,  64 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8748, i8748_device)    /* 1k internal EEPROM,   64 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8039, i8039_device)    /* external ROM,        128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8049, i8049_device)    /* 2k internal ROM,     128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8749, i8749_device)    /* 2k internal EEPROM,  128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8040, i8040_device)    /* external ROM,        256 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8050, i8050_device)    /* 4k internal ROM,     256 bytes internal RAM */
 
 /* Official Intel UPI-41 parts */
-extern const device_type I8041;            /* 1k internal ROM,     128 bytes internal RAM */
-extern const device_type I8741;            /* 1k internal EEPROM,  128 bytes internal RAM */
-extern const device_type I8042;            /* 2k internal ROM,     256 bytes internal RAM */
-extern const device_type I8242;            /* 2k internal ROM,     256 bytes internal RAM */
-extern const device_type I8742;            /* 2k internal EEPROM,  256 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8041, i8041_device)    /* 1k internal ROM,     128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8741, i8741_device)    /* 1k internal EEPROM,  128 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8042, i8042_device)    /* 2k internal ROM,     256 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8242, i8242_device)    /* 2k internal ROM,     256 bytes internal RAM */
+DECLARE_DEVICE_TYPE(I8742, i8742_device)    /* 2k internal EEPROM,  256 bytes internal RAM */
 
 /* Clones */
-extern const device_type MB8884;           /* 8035 clone */
-extern const device_type N7751;            /* 8048 clone */
-extern const device_type M58715;           /* 8049 clone */
+DECLARE_DEVICE_TYPE(MB8884, mb8884_device)  /* 8035 clone */
+DECLARE_DEVICE_TYPE(N7751, n7751_device)    /* 8048 clone */
+DECLARE_DEVICE_TYPE(M58715, m58715_device)  /* 8049 clone */
 
 
 
 class mcs48_cpu_device : public cpu_device
 {
 public:
-	// construction/destruction
-	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int rom_size, int ram_size, uint8_t feature_mask = 0);
+	// 8243 expander operations
+	enum expander_op
+	{
+		EXPANDER_OP_READ = 0,
+		EXPANDER_OP_WRITE = 1,
+		EXPANDER_OP_OR = 2,
+		EXPANDER_OP_AND = 3
+	};
+
+	// static configuration
+	template <class Object> static devcb_base &set_port_in_cb(device_t &device, int n, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_port_in_cb[n].set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_port_out_cb(device_t &device, int n, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_port_out_cb[n].set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_bus_in_cb(device_t &device, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_bus_in_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_bus_out_cb(device_t &device, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_bus_out_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_test_in_cb(device_t &device, int n, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_test_in_cb[n].set_callback(std::forward<Object>(cb)); }
+	static void set_t0_clk_cb(device_t &device, clock_update_delegate &&func) { downcast<mcs48_cpu_device &>(device).m_t0_clk_func = std::move(func); }
+	template <class Object> static devcb_base &set_prog_out_cb(device_t &device, Object &&cb) { return downcast<mcs48_cpu_device &>(device).m_prog_out_cb.set_callback(std::forward<Object>(cb)); }
+
+	DECLARE_READ8_MEMBER(p1_r);
+	DECLARE_READ8_MEMBER(p2_r);
 
 protected:
+	// construction/destruction
+	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask = 0);
+
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_config_complete() override;
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
@@ -139,10 +172,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
-	{
-		return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ) );
-	}
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -150,14 +180,21 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 protected:
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
+
+	devcb_read8   m_port_in_cb[2];
+	devcb_write8  m_port_out_cb[2];
+	devcb_read8   m_bus_in_cb;
+	devcb_write8  m_bus_out_cb;
+
+	devcb_read_line m_test_in_cb[2];
+	clock_update_delegate m_t0_clk_func;
+	devcb_write_line m_prog_out_cb;
 
 	uint16_t      m_prevpc;             /* 16-bit previous program counter */
 	uint16_t      m_pc;                 /* 16-bit program counter */
@@ -191,7 +228,7 @@ protected:
 
 	/* Memory spaces */
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_data;
 	address_space *m_io;
 
@@ -202,6 +239,23 @@ protected:
 
 	typedef int (mcs48_cpu_device::*mcs48_ophandler)();
 	static const mcs48_ophandler s_opcode_table[256];
+
+	/* ROM is mapped to AS_PROGRAM */
+	uint8_t program_r(offs_t a)         { return m_program->read_byte(a); }
+
+	/* RAM is mapped to AS_DATA */
+	uint8_t ram_r(offs_t a)             { return m_data->read_byte(a); }
+	void    ram_w(offs_t a, uint8_t v)  { m_data->write_byte(a, v); }
+
+	/* ports are mapped to AS_IO and callbacks */
+	uint8_t ext_r(offs_t a)             { return m_io->read_byte(a); }
+	void    ext_w(offs_t a, uint8_t v)  { m_io->write_byte(a, v); }
+	uint8_t port_r(offs_t a)            { return m_port_in_cb[a - 1](); }
+	void    port_w(offs_t a, uint8_t v) { m_port_out_cb[a - 1](v); }
+	int     test_r(offs_t a)            { return m_test_in_cb[a](); }
+	uint8_t bus_r()                     { return m_bus_in_cb(); }
+	void    bus_w(uint8_t v)            { m_bus_out_cb(v); }
+	void    prog_w(int v)               { m_prog_out_cb(v); }
 
 	uint8_t opcode_fetch();
 	uint8_t argument_fetch();
@@ -215,7 +269,7 @@ protected:
 	void execute_call(uint16_t address);
 	void execute_jcc(uint8_t result);
 	uint8_t p2_mask();
-	void expander_operation(uint8_t operation, uint8_t port);
+	void expander_operation(expander_op operation, uint8_t port);
 	int check_irqs();
 	void burn_cycles(int count);
 
@@ -586,15 +640,15 @@ public:
 class upi41_cpu_device : public mcs48_cpu_device
 {
 public:
-	// construction/destruction
-	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int rom_size, int ram_size);
-
 	/* functions for talking to the input/output buffers on the UPI41-class chips */
 	DECLARE_READ8_MEMBER(upi41_master_r);
 	DECLARE_WRITE8_MEMBER(upi41_master_w);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	// construction/destruction
+	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size);
+
+	virtual util::disasm_interface *create_disassembler() override;
 
 	TIMER_CALLBACK_MEMBER( master_callback );
 };
@@ -635,4 +689,4 @@ public:
 };
 
 
-#endif  /* __MCS48_H__ */
+#endif  // MAME_CPU_MCS48_MCS48_H

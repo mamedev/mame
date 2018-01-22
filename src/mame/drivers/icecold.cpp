@@ -10,8 +10,12 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/i8279.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
+
 #include "icecold.lh"
+
 
 class icecold_state : public driver_device
 {
@@ -59,6 +63,7 @@ public:
 	int     m_lmotor;           // left motor position (0-100)
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
+	void icecold(machine_config &config);
 };
 
 static ADDRESS_MAP_START( icecold_map, AS_PROGRAM, 8, icecold_state )
@@ -326,10 +331,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 	}
 }
 
-static MACHINE_CONFIG_START( icecold, icecold_state )
+MACHINE_CONFIG_START(icecold_state::icecold)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_6MHz/4)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_6MHz/4) // 68A09E
 	MCFG_CPU_PROGRAM_MAP(icecold_map)
 
 	MCFG_DEVICE_ADD( "pia0", PIA6821, 0)
@@ -396,5 +401,5 @@ ROM_START(zekepeak)
 ROM_END
 
 
-GAME(1983,  icecold,   0,        icecold,  icecold, driver_device,  0,  ROT0,  "Taito",    "Ice Cold Beer",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
-GAME(1983,  zekepeak,  icecold,  icecold,  icecold, driver_device,  0,  ROT0,  "Taito",    "Zeke's Peak",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME(1983,  icecold,   0,        icecold,  icecold, icecold_state,  0,  ROT0,  "Taito",    "Ice Cold Beer",      MACHINE_NOT_WORKING | MACHINE_MECHANICAL)
+GAME(1983,  zekepeak,  icecold,  icecold,  icecold, icecold_state,  0,  ROT0,  "Taito",    "Zeke's Peak",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL)

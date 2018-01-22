@@ -1,18 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi
+#ifndef MAME_INCLUDES_PGM_H
+#define MAME_INCLUDES_PGM_H
 
-#include "machine/v3021.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/arm7/arm7.h"
-#include "sound/ics2115.h"
-#include "cpu/arm7/arm7core.h"
-#include "machine/nvram.h"
-#include "machine/pgmcrypt.h"
-#include "machine/gen_latch.h"
 #include "machine/igs025.h"
 #include "machine/igs022.h"
 #include "machine/igs028.h"
+#include "machine/pgmcrypt.h"
+
+#include "cpu/arm7/arm7.h"
+#include "cpu/arm7/arm7core.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/nvram.h"
+#include "machine/timer.h"
+#include "machine/v3021.h"
+#include "sound/ics2115.h"
 
 #define PGMARM7LOGERROR 0
 
@@ -98,7 +102,7 @@ public:
 	DECLARE_MACHINE_START(pgm);
 	DECLARE_MACHINE_RESET(pgm);
 	uint32_t screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_pgm(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm);
 	TIMER_DEVICE_CALLBACK_MEMBER(pgm_interrupt);
 
 	inline void pgm_draw_pix( int xdrawpos, int pri, uint16_t* dest, uint8_t* destpri, uint16_t srcdat);
@@ -111,6 +115,8 @@ public:
 	void draw_sprites( bitmap_ind16& spritebitmap, uint16_t *sprite_source, bitmap_ind8& priority_bitmap );
 	void expand_colourdata();
 	void pgm_basic_init( bool set_bank = true);
+	void pgm(machine_config &config);
+	void pgmbase(machine_config &config);
 };
 
 
@@ -121,12 +127,11 @@ INPUT_PORTS_EXTERN( pgm );
 
 GFXDECODE_EXTERN( pgm );
 
-MACHINE_CONFIG_EXTERN( pgm );
-MACHINE_CONFIG_EXTERN( pgmbase );
-
 ADDRESS_MAP_EXTERN( pgm_z80_mem, 8 );
 ADDRESS_MAP_EXTERN( pgm_z80_io, 8 );
 
 ADDRESS_MAP_EXTERN( pgm_mem, 16 );
 ADDRESS_MAP_EXTERN( pgm_basic_mem, 16 );
 ADDRESS_MAP_EXTERN( pgm_base_mem, 16 );
+
+#endif // MAME_INCLUDES_PGM_H

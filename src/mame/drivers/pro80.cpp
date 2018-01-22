@@ -19,11 +19,17 @@ The cassette uses 2 bits for input, plus a D flipflop and a 74LS221 oneshot, wit
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/timer.h"
 #include "machine/z80pio.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
+
+#include "speaker.h"
+
 #include "pro80.lh"
+
 
 class pro80_state : public driver_device
 {
@@ -39,6 +45,7 @@ public:
 	DECLARE_READ8_MEMBER(kp_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 
+	void pro80(machine_config &config);
 private:
 	uint8_t m_digit_sel;
 	uint8_t m_cass_in;
@@ -159,7 +166,7 @@ void pro80_state::machine_reset()
 	m_cass_in = 0;
 }
 
-static MACHINE_CONFIG_START( pro80, pro80_state )
+MACHINE_CONFIG_START(pro80_state::pro80)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(pro80_mem)
@@ -188,5 +195,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1981, pro80,  0,      0,       pro80,     pro80, driver_device,   0,   "Protec",   "Pro-80", MACHINE_NOT_WORKING )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT  COMPANY   FULLNAME  FLAGS
+COMP( 1981, pro80,  0,      0,      pro80,    pro80, pro80_state, 0,    "Protec", "Pro-80", MACHINE_NOT_WORKING )

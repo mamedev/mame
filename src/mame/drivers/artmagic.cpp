@@ -25,13 +25,17 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/mcs51/mcs51.h"
-#include "video/tlc34076.h"
 #include "includes/artmagic.h"
-#include "sound/okim6295.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h"
+#include "cpu/tms34010/tms34010.h"
+#include "machine/mc68681.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK_40MHz      (XTAL_40MHz)
@@ -67,6 +71,8 @@ WRITE_LINE_MEMBER(artmagic_state::m68k_gen_int)
 
 void artmagic_state::machine_start()
 {
+	m_irq_off_timer = timer_alloc(TIMER_IRQ_OFF);
+
 	save_item(NAME(m_tms_irq));
 	save_item(NAME(m_hack_irq));
 	save_item(NAME(m_prot_input_index));
@@ -102,7 +108,7 @@ WRITE16_MEMBER(artmagic_state::control_w)
 		m_oki->set_rom_bank((data >> 4) & 1);
 	}
 
-	logerror("%06X:control_w(%d) = %04X\n", space.device().safe_pc(), offset, data);
+	logerror("%06X:control_w(%d) = %04X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -130,12 +136,12 @@ void artmagic_state::device_timer(emu_timer &timer, device_timer_id id, int para
 READ16_MEMBER(artmagic_state::ultennis_hack_r)
 {
 	/* IRQ5 points to: jsr (a5); rte */
-	uint32_t pc = space.device().safe_pc();
+	uint32_t pc = m_maincpu->pc();
 	if (pc == 0x18c2 || pc == 0x18e4)
 	{
 		m_hack_irq = 1;
 		update_irq_state();
-		timer_set(attotime::from_usec(1), TIMER_IRQ_OFF);
+		m_irq_off_timer->adjust(attotime::from_usec(1));
 	}
 	return ioport("300000")->read();
 }
@@ -438,37 +444,17 @@ static ADDRESS_MAP_START( stonebal_map, AS_PROGRAM, 16, artmagic_state )
 ADDRESS_MAP_END
 
 // TODO: jumps to undefined area at PC=33a0 -> 230000, presumably protection device provides a code snippet
-READ16_MEMBER(artmagic_state::shtstar_unk_r)
-{
-	// bits 7-4 should be 0
-	// bit 2 and 0 are status ready related.
-	return 4 | 1; //machine().rand();
-}
-
-READ16_MEMBER(artmagic_state::shtstar_unk_2_r)
-{
-	return 1;
-}
-
 static ADDRESS_MAP_START( shtstar_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM
 	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0x3c0000, 0x3c0001) AM_READ_PORT("3c0000")
-	AM_RANGE(0x3c0002, 0x3c0003) AM_READ_PORT("3c0002")
-	AM_RANGE(0x3c0004, 0x3c0005) AM_READ_PORT("3c0004")
-	AM_RANGE(0x3c0006, 0x3c0007) AM_READ_PORT("3c0006")
-	AM_RANGE(0x3c0008, 0x3c0009) AM_READ_PORT("3c0008")
-	AM_RANGE(0x3c000a, 0x3c000b) AM_READ_PORT("3c000a")
-
-	AM_RANGE(0x3c0012, 0x3c0013) AM_READ(shtstar_unk_r)
-	AM_RANGE(0x3c0016, 0x3c0017) AM_READ(shtstar_unk_2_r)
-
+	AM_RANGE(0x300000, 0x300001) AM_READNOP //AM_READ_PORT("300000")
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
-	AM_RANGE(0x3c0004, 0x3c0007) AM_WRITE(protection_bit_w)
+	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
 	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x380000, 0x380007) AM_DEVREADWRITE("tms", tms34010_device, host_r, host_w)
+	AM_RANGE(0x3c0000, 0x3c001f) AM_DEVREADWRITE8("mainduart", mc68681_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -507,6 +493,9 @@ ADDRESS_MAP_END
 /* see adp.c */
 static ADDRESS_MAP_START( shtstar_subcpu_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x800140, 0x800141) AM_DEVWRITE8("aysnd", ym2149_device, address_w, 0x00ff)
+	AM_RANGE(0x800142, 0x800143) AM_DEVREADWRITE8("aysnd", ym2149_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8("subduart", mc68681_device, read, write, 0x00ff)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -516,6 +505,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shtstar_guncpu_io_map, AS_IO, 8, artmagic_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP
 ADDRESS_MAP_END
 
 
@@ -809,7 +799,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( artmagic, artmagic_state )
+MACHINE_CONFIG_START(artmagic_state::artmagic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
@@ -839,12 +829,12 @@ static MACHINE_CONFIG_START( artmagic, artmagic_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK_40MHz/3/10, OKIM6295_PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK_40MHz/3/10, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cheesech, artmagic )
+MACHINE_CONFIG_DERIVED(artmagic_state::cheesech, artmagic)
 
 	MCFG_SOUND_MODIFY("oki")
 	MCFG_SOUND_ROUTES_RESET()
@@ -852,7 +842,7 @@ static MACHINE_CONFIG_DERIVED( cheesech, artmagic )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stonebal, artmagic )
+MACHINE_CONFIG_DERIVED(artmagic_state::stonebal, artmagic)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(stonebal_map)
@@ -865,14 +855,21 @@ static MACHINE_CONFIG_DERIVED( stonebal, artmagic )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shtstar, artmagic )
+MACHINE_CONFIG_DERIVED(artmagic_state::shtstar, artmagic)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(shtstar_map)
 
+	MCFG_DEVICE_ADD("mainduart", MC68681, 3686400)
+
 	/* sub cpu*/
 	MCFG_CPU_ADD("subcpu", M68000, MASTER_CLOCK_25MHz/2)
 	MCFG_CPU_PROGRAM_MAP(shtstar_subcpu_map)
+
+	MCFG_DEVICE_ADD("subduart", MC68681, 3686400)
+
+	MCFG_SOUND_ADD("aysnd", YM2149, 3686400/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/*gun board cpu*/
 	MCFG_CPU_ADD("guncpu", I80C31, 6000000)
@@ -971,7 +968,7 @@ u1601.bin     32M Mask       8642h  /  Gfx
 
 ROM_START( stonebal )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
-	ROM_LOAD16_BYTE( "u102",     0x00000, 0x40000, CRC(712feda1) SHA1(c5b385f425786566fa274fe166a7116615a8ce86) )
+	ROM_LOAD16_BYTE( "u102",     0x00000, 0x40000, CRC(712feda1) SHA1(c5b385f425786566fa274fe166a7116615a8ce86) ) /* 4 Players kit, v1-20 13/12/1994 */
 	ROM_LOAD16_BYTE( "u101",     0x00001, 0x40000, CRC(4f1656a9) SHA1(720717ae4166b3ec50bb572197a8c6c96b284648) )
 
 	ROM_REGION16_LE( 0x400000, "gfx1", 0 )
@@ -979,13 +976,13 @@ ROM_START( stonebal )
 	ROM_LOAD( "u1601.bin", 0x200000, 0x200000, CRC(dbe893f0) SHA1(71a8a022decc0ff7d4c65f7e6e0cbba9e0b5582c) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "u1801.bin", 0x00000, 0x80000, CRC(d98f7378) SHA1(700df7f29c039b96791c2704a67f01a722dc96dc) )
+	ROM_LOAD( "sb_snd_9-9-94.u1801", 0x00000, 0x80000, CRC(d98f7378) SHA1(700df7f29c039b96791c2704a67f01a722dc96dc) ) /* labeled  SB snd 9/9/94 */
 ROM_END
 
 
 ROM_START( stonebal2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
-	ROM_LOAD16_BYTE( "u102.bin", 0x00000, 0x40000, CRC(b3c4f64f) SHA1(6327e9f3cd9deb871a6910cf1f006c8ee143e859) )
+	ROM_LOAD16_BYTE( "u102.bin", 0x00000, 0x40000, CRC(b3c4f64f) SHA1(6327e9f3cd9deb871a6910cf1f006c8ee143e859) ) /* 2 Players kit, v1-20 7/11/1994 */
 	ROM_LOAD16_BYTE( "u101.bin", 0x00001, 0x40000, CRC(fe373f74) SHA1(bafac4bbd1aae4ccc4ae16205309483f1bbdd464) )
 
 	ROM_REGION16_LE( 0x400000, "gfx1", 0 )
@@ -993,7 +990,21 @@ ROM_START( stonebal2 )
 	ROM_LOAD( "u1601.bin", 0x200000, 0x200000, CRC(dbe893f0) SHA1(71a8a022decc0ff7d4c65f7e6e0cbba9e0b5582c) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "u1801.bin", 0x00000, 0x80000, CRC(d98f7378) SHA1(700df7f29c039b96791c2704a67f01a722dc96dc) )
+	ROM_LOAD( "sb_snd_9-9-94.u1801", 0x00000, 0x80000, CRC(d98f7378) SHA1(700df7f29c039b96791c2704a67f01a722dc96dc) ) /* labeled  SB snd 9/9/94 */
+ROM_END
+
+
+ROM_START( stonebal2o )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
+	ROM_LOAD16_BYTE( "sb_o_2p_24-10.u102", 0x00000, 0x40000, CRC(ab58c6b2) SHA1(6e29646d4b0802733d04e722909c03b87761c759) ) /* 2 Players kit, v1-20 21/10/1994 */
+	ROM_LOAD16_BYTE( "sb_e_2p_24-10.u101", 0x00001, 0x40000, CRC(ea967835) SHA1(12655f0dc44981f4a49ed45f271d5eb24f2cc5c6) ) /* Yes the Odd / Even labels are backwards & chips dated 24/10 */
+
+	ROM_REGION16_LE( 0x400000, "gfx1", 0 )
+	ROM_LOAD( "u1600.bin", 0x000000, 0x200000, CRC(d2ffe9ff) SHA1(1c5dcbd8208e45458da9db7621f6b8602bca0fae) )
+	ROM_LOAD( "u1601.bin", 0x200000, 0x200000, CRC(dbe893f0) SHA1(71a8a022decc0ff7d4c65f7e6e0cbba9e0b5582c) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "sb_snd_9-9-94.u1801", 0x00000, 0x80000, CRC(d98f7378) SHA1(700df7f29c039b96791c2704a67f01a722dc96dc) ) /* labeled  SB snd 9/9/94 */
 ROM_END
 
 /*
@@ -1177,9 +1188,10 @@ DRIVER_INIT_MEMBER(artmagic_state,shtstar)
  *
  *************************************/
 
-GAME( 1993, ultennis, 0,        artmagic, ultennis, artmagic_state, ultennis, ROT0, "Art & Magic", "Ultimate Tennis", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ultennisj,ultennis, artmagic, ultennis, artmagic_state, ultennis, ROT0, "Art & Magic (Banpresto license)", "Ultimate Tennis (v 1.4, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, cheesech, 0,        cheesech, cheesech, artmagic_state, cheesech, ROT0, "Art & Magic", "Cheese Chase", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stonebal, 0,        stonebal, stonebal, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stonebal2,stonebal, stonebal, stoneba2, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, shtstar, 0, shtstar, shtstar, artmagic_state, shtstar, ROT0, "Nova", "Shooting Star", MACHINE_NOT_WORKING )
+GAME( 1993, ultennis,   0,        artmagic, ultennis, artmagic_state, ultennis, ROT0, "Art & Magic", "Ultimate Tennis", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ultennisj,  ultennis, artmagic, ultennis, artmagic_state, ultennis, ROT0, "Art & Magic (Banpresto license)", "Ultimate Tennis (v 1.4, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, cheesech,   0,        cheesech, cheesech, artmagic_state, cheesech, ROT0, "Art & Magic", "Cheese Chase", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal,   0,        stonebal, stonebal, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players, v1-20 13/12/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal2,  stonebal, stonebal, stoneba2, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 7/11/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal2o, stonebal, stonebal, stoneba2, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 21/10/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, shtstar,    0,        shtstar,  shtstar,  artmagic_state, shtstar,  ROT0, "Nova", "Shooting Star", MACHINE_NOT_WORKING )

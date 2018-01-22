@@ -54,7 +54,7 @@ menu_tape_control::~menu_tape_control()
 //  populate - populates the main tape control menu
 //-------------------------------------------------
 
-void menu_tape_control::populate()
+void menu_tape_control::populate(float &customtop, float &custombottom)
 {
 	if (current_device())
 	{
@@ -117,8 +117,7 @@ void menu_tape_control::populate()
 void menu_tape_control::handle()
 {
 	// rebuild the menu (so to update the selected device, if the user has pressed L or R, and the tape counter)
-	reset(reset_options::REMEMBER_POSITION);
-	populate();
+	repopulate(reset_options::REMEMBER_POSITION);
 
 	// process the menu
 	const event *event = process(PROCESS_LR_REPEAT);
@@ -126,34 +125,34 @@ void menu_tape_control::handle()
 	{
 		switch(event->iptkey)
 		{
-			case IPT_UI_LEFT:
-				if (event->itemref == TAPECMD_SLIDER)
-					current_device()->seek(-1, SEEK_CUR);
-				else if (event->itemref == TAPECMD_SELECT)
-					previous();
-				break;
+		case IPT_UI_LEFT:
+			if (event->itemref == TAPECMD_SLIDER)
+				current_device()->seek(-1, SEEK_CUR);
+			else if (event->itemref == TAPECMD_SELECT)
+				previous();
+			break;
 
-			case IPT_UI_RIGHT:
-				if (event->itemref == TAPECMD_SLIDER)
-					current_device()->seek(+1, SEEK_CUR);
-				else if (event->itemref == TAPECMD_SELECT)
-					next();
-				break;
+		case IPT_UI_RIGHT:
+			if (event->itemref == TAPECMD_SLIDER)
+				current_device()->seek(+1, SEEK_CUR);
+			else if (event->itemref == TAPECMD_SELECT)
+				next();
+			break;
 
-			case IPT_UI_SELECT:
-				if (event->itemref == TAPECMD_STOP)
-					current_device()->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
-				else if (event->itemref == TAPECMD_PLAY)
-					current_device()->change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
-				else if (event->itemref == TAPECMD_RECORD)
-					current_device()->change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
-				else if (event->itemref == TAPECMD_REWIND)
-					current_device()->seek(-30, SEEK_CUR);
-				else if (event->itemref == TAPECMD_FAST_FORWARD)
-					current_device()->seek(30, SEEK_CUR);
-				else if (event->itemref == TAPECMD_SLIDER)
-					current_device()->seek(0, SEEK_SET);
-				break;
+		case IPT_UI_SELECT:
+			if (event->itemref == TAPECMD_STOP)
+				current_device()->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
+			else if (event->itemref == TAPECMD_PLAY)
+				current_device()->change_state(CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
+			else if (event->itemref == TAPECMD_RECORD)
+				current_device()->change_state(CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
+			else if (event->itemref == TAPECMD_REWIND)
+				current_device()->seek(-30, SEEK_CUR);
+			else if (event->itemref == TAPECMD_FAST_FORWARD)
+				current_device()->seek(30, SEEK_CUR);
+			else if (event->itemref == TAPECMD_SLIDER)
+				current_device()->seek(0, SEEK_SET);
+			break;
 		}
 	}
 }

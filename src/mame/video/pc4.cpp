@@ -144,7 +144,7 @@ WRITE8_MEMBER(pc4_state::lcd_control_w)
 
 READ8_MEMBER(pc4_state::lcd_control_r)
 {
-	return m_busy_flag<<7 || m_ac&0x7f;
+	return (m_busy_flag<<7) | (m_ac & 0x7f);
 }
 
 void pc4_state::update_ac(void)

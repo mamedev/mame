@@ -226,21 +226,21 @@
 
 		<bezel element="static_white"><bounds x="1" y="28" width="38" height="25" /></bezel>
 		<bezel name="card_pos" element="card1"><bounds x="1" y="38" width="38" height="5" /></bezel>
-		<bezel name="lamp3" element="mask">
+		<bezel name="0.3" element="mask">
 			<bounds x="1" y="28" width="38" height="25" />
 			<color alpha="0.8" />
 		</bezel>
 
 		<bezel element="static_white"><bounds x="1" y="56" width="38" height="25" /></bezel>
 		<bezel name="card_pos" element="card2"><bounds x="1" y="66" width="38" height="5" /></bezel>
-		<bezel name="lamp2" element="mask">
+		<bezel name="0.2" element="mask">
 			<bounds x="1" y="56" width="38" height="25" />
 			<color alpha="0.8" />
 		</bezel>
 
 		<bezel element="static_white"><bounds x="1" y="84" width="38" height="25" /></bezel>
 		<bezel name="card_pos" element="card3"><bounds x="1" y="94" width="38" height="5" /></bezel>
-		<bezel name="lamp1" element="mask">
+		<bezel name="0.1" element="mask">
 			<bounds x="1" y="84" width="38" height="25" />
 			<color alpha="0.8" />
 		</bezel>

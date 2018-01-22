@@ -183,34 +183,25 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/tecmosys.h"
+
 #include "cpu/m68000/m68000.h"
-#include "sound/okim6295.h"
+#include "cpu/z80/z80.h"
 #include "sound/262intf.h"
+#include "sound/okim6295.h"
 #include "sound/ymz280b.h"
+#include "speaker.h"
 
 
-// It looks like this needs a synch between z80 and 68k ??? See z80:006A-0091
-READ16_MEMBER(tecmosys_state::sound_r)
+READ8_MEMBER(tecmosys_state::sound_command_pending_r)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().scheduler().synchronize();
-		return m_soundlatch2->read(space, 0);
-	}
-
-	return 0;
+	return m_soundlatch->pending_r();
 }
 
-WRITE16_MEMBER(tecmosys_state::sound_w)
+WRITE8_MEMBER(tecmosys_state::sound_nmi_disable_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().scheduler().synchronize();
-		m_soundlatch->write(space, 0x00, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
+	// 00 and FF are the only values written here; the latter value is set during initialization and NMI processing
+	m_soundnmi->in_w<1>(data == 0);
 }
 
 /*
@@ -240,11 +231,11 @@ WRITE16_MEMBER(tecmosys_state::unk880000_w)
 
 		case 0x22/2:
 			m_watchdog->watchdog_reset();
-			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, space.device().safe_pc() );
+			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, m_maincpu->_pc() );
 			break;
 
 		default:
-			logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, space.device().safe_pc() );
+			logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, m_maincpu->pc() );
 			break;
 	}
 }
@@ -253,7 +244,7 @@ READ16_MEMBER(tecmosys_state::unk880000_r)
 {
 	//uint16_t ret = m_880000regs[offset];
 
-	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, space.device().safe_pc(), m_880000regs[offset] );
+	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, m_maincpu->pc(), m_880000regs[offset] );
 
 	/* this code allows scroll regs to be updated, but tkdensho at least resets perodically */
 
@@ -299,7 +290,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tecmosys_state )
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(fg_tilemap_w) AM_SHARE("fgtilemap_ram") // fix ram
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram") // obj ram
 	AM_RANGE(0x880000, 0x88000b) AM_READ(unk880000_r)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // AM_WRITEONLY // obj pal
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // AM_WRITEONLY // obj pal
 
 	//AM_RANGE(0x980000, 0x9807ff) AM_WRITEONLY // bg pal
 	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // fix pal
@@ -316,9 +307,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tecmosys_state )
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("P1")
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("P2")
 	AM_RANGE(0xd80000, 0xd80001) AM_READ(eeprom_r)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(sound_w )
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(prot_data_w)
-	AM_RANGE(0xf00000, 0xf00001) AM_READ(sound_r)
+	AM_RANGE(0xf00000, 0xf00001) AM_READ8(sound_command_pending_r, 0x00ff)
 	AM_RANGE(0xf80000, 0xf80001) AM_READ(prot_data_r)
 ADDRESS_MAP_END
 
@@ -351,7 +342,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, tecmosys_state )
 	AM_RANGE(0x20, 0x20) AM_WRITE(oki_bank_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(z80_bank_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x50, 0x50) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+	AM_RANGE(0x50, 0x50) AM_WRITE(sound_nmi_disable_w)
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
 ADDRESS_MAP_END
 
@@ -441,7 +432,7 @@ void tecmosys_state::machine_start()
 	save_item(NAME(m_device_value));
 }
 
-static MACHINE_CONFIG_START( deroon, tecmosys_state )
+MACHINE_CONFIG_START(tecmosys_state::deroon)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tecmosys_state,  irq1_line_hold)
@@ -475,7 +466,10 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<0>))
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ymf", YMF262, XTAL_14_31818MHz)
 	MCFG_YMF262_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -484,7 +478,7 @@ static MACHINE_CONFIG_START( deroon, tecmosys_state )
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(3, "rspeaker", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/8, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
@@ -663,6 +657,6 @@ DRIVER_INIT_MEMBER(tecmosys_state,tkdensha)
 	prot_init(2);
 }
 
-GAME( 1995, deroon,           0, deroon, deroon, tecmosys_state, deroon,     ROT0, "Tecmo", "Deroon DeroDero", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, deroon,           0, deroon, deroon, tecmosys_state, deroon,     ROT0, "Tecmo", "Deroon DeroDero",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1996, tkdensho,         0, deroon, deroon, tecmosys_state, tkdensho,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960614)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, tkdenshoa, tkdensho, deroon, deroon, tecmosys_state, tkdensha,   ROT0, "Tecmo", "Toukidenshou - Angel Eyes (VER. 960427)", MACHINE_SUPPORTS_SAVE )

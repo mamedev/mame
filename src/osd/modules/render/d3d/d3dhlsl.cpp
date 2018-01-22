@@ -25,8 +25,6 @@
 #include "strconv.h"
 #include "d3dhlsl.h"
 #include "../frontend/mame/ui/slider.h"
-#undef min
-#undef max
 #include <utility>
 
 //============================================================
@@ -164,14 +162,15 @@ private:
 
 shaders::shaders() :
 	d3dintf(nullptr), machine(nullptr), d3d(nullptr), post_fx_enable(false), oversampling_enable(false),
-	num_screens(0), curr_screen(0), shadow_texture(nullptr), options(nullptr), black_surface(nullptr),
-	black_texture(nullptr), recording_movie(false),render_snap(false), snap_copy_target(nullptr),
-	snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr), snap_width(0), snap_height(0),
-	initialized(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr),
-	prescale_effect(nullptr), post_effect(nullptr), distortion_effect(nullptr), focus_effect(nullptr),
-	phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr),
-	bloom_effect(nullptr), downsample_effect(nullptr), vector_effect(nullptr), curr_texture(nullptr),
-	curr_render_target(nullptr), curr_poly(nullptr)
+	num_screens(0), curr_screen(0), acc_t(0), delta_t(0), shadow_texture(nullptr), options(nullptr),
+	black_surface(nullptr), black_texture(nullptr), recording_movie(false), render_snap(false),
+	snap_copy_target(nullptr), snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr),
+	snap_width(0), snap_height(0), initialized(false), backbuffer(nullptr), curr_effect(nullptr),
+	default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr), distortion_effect(nullptr),
+	focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr),
+	ntsc_effect(nullptr), bloom_effect(nullptr), downsample_effect(nullptr), vector_effect(nullptr),
+	curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr),
+	d3dx_create_effect_from_file_ptr(nullptr)
 {
 }
 
@@ -324,18 +323,15 @@ void shaders::render_snapshot(IDirect3DSurface9 *surface)
 
 	// add two text entries describing the image
 	std::string text1 = std::string(emulator_info::get_appname()).append(" ").append(emulator_info::get_build_version());
-	std::string text2 = std::string(machine->system().manufacturer).append(" ").append(machine->system().description);
-	png_info pnginfo = { nullptr };
-	png_add_text(&pnginfo, "Software", text1.c_str());
-	png_add_text(&pnginfo, "System", text2.c_str());
+	std::string text2 = std::string(machine->system().manufacturer).append(" ").append(machine->system().type.fullname());
+	png_info pnginfo;
+	pnginfo.add_text("Software", text1.c_str());
+	pnginfo.add_text("System", text2.c_str());
 
 	// now do the actual work
 	png_error error = png_write_bitmap(file, &pnginfo, snapshot, 1 << 24, nullptr);
 	if (error != PNGERR_NONE)
 		osd_printf_error("Error generating PNG for HLSL snapshot: png_error = %d\n", error);
-
-	// free any data allocated
-	png_free(&pnginfo);
 
 	result = snap_copy_target->UnlockRect();
 	if (FAILED(result))
@@ -819,6 +815,8 @@ int shaders::create_resources()
 
 void shaders::begin_draw()
 {
+	double t;
+
 	if (!enabled())
 	{
 		return;
@@ -826,6 +824,10 @@ void shaders::begin_draw()
 
 	curr_screen = 0;
 	curr_effect = default_effect;
+	// Update for delta_time
+	t = machine->time().as_double();
+	delta_t = t - acc_t;
+	acc_t = t;
 
 	default_effect->set_technique("ScreenTechnique");
 	post_effect->set_technique("DefaultTechnique");
@@ -899,7 +901,6 @@ void shaders::blit(
 
 	curr_effect->end();
 }
-
 
 //============================================================
 //  shaders::find_render_target
@@ -1069,11 +1070,13 @@ int shaders::phosphor_pass(d3d_render_target *rt, int source_index, poly_info *p
 		return next_index;
 	}
 
+	// Shader needs time between last update
 	curr_effect = phosphor_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
 	curr_effect->set_texture("LastPass", rt->cache_texture);
 	curr_effect->set_bool("Passthrough", false);
+	curr_effect->set_float("DeltaTime", delta_time());
 
 	next_index = rt->next_index(next_index);
 	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
@@ -1804,10 +1807,9 @@ static void get_vector(const char *data, int count, float *out, bool report_erro
 //  be done in a more ideal way.
 //============================================================
 
-slider_state* shaders::slider_alloc(running_machine &machine, int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
+std::unique_ptr<slider_state> shaders::slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg)
 {
-	int size = sizeof(slider_state) + strlen(title);
-	slider_state *state = reinterpret_cast<slider_state *>(auto_alloc_array_clear(machine, uint8_t, size));
+	auto state = make_unique_clear<slider_state>();
 
 	state->minval = minval;
 	state->defval = defval;
@@ -1819,7 +1821,7 @@ slider_state* shaders::slider_alloc(running_machine &machine, int id, const char
 
 	state->arg = arg;
 	state->id = id;
-	strcpy(state->description, title);
+	state->description = title;
 
 	return state;
 }
@@ -2123,6 +2125,7 @@ void *shaders::get_slider_option(int id, int index)
 void shaders::init_slider_list()
 {
 	m_sliders.clear();
+	m_core_sliders.clear();
 
 	for (slider* slider : internal_sliders)
 	{
@@ -2181,15 +2184,16 @@ void shaders::init_slider_list()
 						break;
 				}
 
-				slider_state* core_slider = slider_alloc(*machine, desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
+				std::unique_ptr<slider_state> core_slider = slider_alloc(desc->id, name.c_str(), desc->minval, desc->defval, desc->maxval, desc->step, slider_arg);
 
 				ui::menu_item item;
 				item.text = core_slider->description;
 				item.subtext = "";
 				item.flags = 0;
-				item.ref = core_slider;
+				item.ref = core_slider.get();
 				item.type = ui::menu_item_type::SLIDER;
 				m_sliders.push_back(item);
+				m_core_sliders.push_back(std::move(core_slider));
 			}
 		}
 	}

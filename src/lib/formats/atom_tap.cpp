@@ -43,6 +43,7 @@
 #include <assert.h>
 
 #include "atom_tap.h"
+#include "csw_cas.h"
 #include "uef_cas.h"
 /***************************************************************************
     PARAMETERS
@@ -143,5 +144,6 @@ const struct CassetteFormat atom_tap_format =
 
 CASSETTE_FORMATLIST_START( atom_cassette_formats )
 	CASSETTE_FORMAT(atom_tap_format)
+	CASSETTE_FORMAT(csw_cassette_format)
 	CASSETTE_FORMAT(uef_cassette_format)
 CASSETTE_FORMATLIST_END

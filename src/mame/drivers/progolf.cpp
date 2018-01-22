@@ -58,6 +58,10 @@ Twenty four 8116 rams.
 #include "video/mc6845.h"
 #include "machine/deco222.h"
 #include "machine/decocpu6.h"
+#include "machine/gen_latch.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 class progolf_state : public driver_device
 {
@@ -85,15 +89,12 @@ public:
 	uint8_t m_scrollx_hi;
 	uint8_t m_scrollx_lo;
 	uint8_t m_gfx_switch;
-	uint8_t m_sound_cmd;
 
 	DECLARE_WRITE8_MEMBER(charram_w);
 	DECLARE_WRITE8_MEMBER(char_vregs_w);
 	DECLARE_WRITE8_MEMBER(scrollx_lo_w);
 	DECLARE_WRITE8_MEMBER(scrollx_hi_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
-	DECLARE_WRITE8_MEMBER(audio_command_w);
-	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_WRITE8_MEMBER(videoram_w);
 
@@ -104,12 +105,13 @@ public:
 	DECLARE_PALETTE_INIT(progolf);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void progolfa(machine_config &config);
+	void progolf(machine_config &config);
 };
 
 
 void progolf_state::machine_start()
 {
-	save_item(NAME(m_sound_cmd));
 }
 
 void progolf_state::video_start()
@@ -225,18 +227,6 @@ WRITE8_MEMBER(progolf_state::flip_screen_w)
 		printf("$9600 with data = %02x used\n",data);
 }
 
-WRITE8_MEMBER(progolf_state::audio_command_w)
-{
-	m_sound_cmd = data;
-	m_audiocpu->set_input_line(0, ASSERT_LINE);
-}
-
-READ8_MEMBER(progolf_state::audio_command_r)
-{
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_sound_cmd;
-}
-
 READ8_MEMBER(progolf_state::videoram_r)
 {
 	uint8_t *gfx_rom = memregion("gfx1")->base();
@@ -280,7 +270,7 @@ static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, progolf_state )
 	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("DSW1")
 	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x9801, 0x9801) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_WRITE(audio_command_w)
+	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 //  AM_RANGE(0x9e00, 0x9e00) AM_WRITENOP
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -291,7 +281,7 @@ static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, progolf_state )
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x6fff) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
 	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(audio_command_r) AM_WRITENOP //volume control?
+	AM_RANGE(0x8000, 0x8fff) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -421,7 +411,7 @@ PALETTE_INIT_MEMBER(progolf_state, progolf)
 	}
 }
 
-static MACHINE_CONFIG_START( progolf, progolf_state )
+MACHINE_CONFIG_START(progolf_state::progolf)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO_222, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)
@@ -430,6 +420,10 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -458,7 +452,7 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( progolfa, progolf )
+MACHINE_CONFIG_DERIVED(progolf_state::progolfa, progolf)
 	MCFG_DEVICE_REMOVE("maincpu") /* different encrypted cpu to progolf */
 	MCFG_CPU_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)
@@ -514,6 +508,6 @@ ROM_END
 
 
 // this uses DECO222 style encryption
-GAME( 1981, progolf,  0,       progolf, progolf, driver_device, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, progolf,  0,       progolf,  progolf, progolf_state, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 // this uses DECO CPU-6 as custom module CPU (the same as Zoar, are we sure? our Zoar has different encryption, CPU-7 style)
-GAME( 1981, progolfa, progolf, progolfa,progolf, driver_device, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, progolfa, progolf, progolfa, progolf, progolf_state, 0,       ROT270, "Data East Corporation", "18 Holes Pro Golf (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

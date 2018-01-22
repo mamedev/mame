@@ -44,7 +44,7 @@ enum
 {
 	/* US ASCII: 128 characters (32 symbols + 95 ASCII + 1 blank (delete character)) */
 	char_defs_US_base = 0,
-	/* additionnal katakana set (128 characters, including JIS set) */
+	/* additional katakana set (128 characters, including JIS set) */
 	char_defs_katakana_base = char_defs_US_base+128,
 	/* extra symbols for national character sets */
 	char_defs_pound = char_defs_katakana_base+128,  /* pound sign (UK 0x23, French WP 0x23) */
@@ -89,7 +89,7 @@ static const char_override_t UK_overrides[1] =
 	{   0x23,   char_defs_pound }
 };
 
-/* One Japan-specific character (see below for the 128 additionnal characters) */
+/* One Japan-specific character (see below for the 128 additional characters) */
 static const char_override_t japanese_overrides[1] =
 {
 	{   0x5C,   char_defs_yen   }

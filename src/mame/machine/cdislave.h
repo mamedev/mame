@@ -21,12 +21,11 @@ TODO:
 
 *******************************************************************************/
 
+#ifndef MAME_MACHINE_CDISLAVE_H
+#define MAME_MACHINE_CDISLAVE_H
+
 #pragma once
 
-#ifndef __CDISLAVE_H__
-#define __CDISLAVE_H__
-
-#include "emu.h"
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS

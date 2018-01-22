@@ -16,12 +16,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/blktiger.h"
+
+#include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "cpu/mcs51/mcs51.h"
-#include "includes/blktiger.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /**************************************************
@@ -76,8 +79,8 @@ static ADDRESS_MAP_START( blktiger_map, AS_PROGRAM, 8, blktiger_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(blktiger_bgvideoram_r, blktiger_bgvideoram_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(blktiger_txvideoram_w) AM_SHARE("txvideoram")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -292,7 +295,7 @@ void blktiger_state::machine_reset()
 	m_i8751_latch = 0;
 }
 
-static MACHINE_CONFIG_START( blktiger, blktiger_state )
+MACHINE_CONFIG_START(blktiger_state::blktiger)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)  /* verified on pcb */
@@ -317,7 +320,7 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blktiger_state, screen_update_blktiger)
-	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram8_device, vblank_copy_rising)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram8_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blktiger)
@@ -340,7 +343,7 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( blktigerbl, blktiger )
+MACHINE_CONFIG_DERIVED(blktiger_state::blktigerbl, blktiger)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(blktigerbl_io_map)
 
@@ -605,18 +608,18 @@ DRIVER_INIT_MEMBER(blktiger_state,blktigerb3)
 	{
 		int addr;
 
-		addr = BITSWAP16(i, 15,14,13,12,11,10,9,8, 3,4,5,6, 7,2,1,0);
+		addr = bitswap<16>(i, 15,14,13,12,11,10,9,8, 3,4,5,6, 7,2,1,0);
 		buffer[i] = src[addr];
 
 	}
 
 	memcpy(src, &buffer[0], len);
 }
-GAME( 1987, blktiger,   0,        blktiger,   blktiger, driver_device, 0, ROT0, "Capcom",  "Black Tiger",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blktigera,  blktiger, blktiger,   blktiger, driver_device, 0, ROT0, "Capcom",  "Black Tiger (older)",         MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blktigerb1, blktiger, blktigerbl, blktiger, driver_device, 0, ROT0, "bootleg", "Black Tiger (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blktigerb2, blktiger, blktigerbl, blktiger, driver_device, 0, ROT0, "bootleg", "Black Tiger (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blkdrgon,   blktiger, blktiger,   blktiger, driver_device, 0, ROT0, "Capcom",  "Black Dragon (Japan)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1987, blkdrgonb,  blktiger, blktigerbl, blktiger, driver_device, 0, ROT0, "bootleg", "Black Dragon (bootleg)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktiger,   0,        blktiger,   blktiger, blktiger_state, 0, ROT0, "Capcom",  "Black Tiger",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktigera,  blktiger, blktiger,   blktiger, blktiger_state, 0, ROT0, "Capcom",  "Black Tiger (older)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktigerb1, blktiger, blktigerbl, blktiger, blktiger_state, 0, ROT0, "bootleg", "Black Tiger (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blktigerb2, blktiger, blktigerbl, blktiger, blktiger_state, 0, ROT0, "bootleg", "Black Tiger (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blkdrgon,   blktiger, blktiger,   blktiger, blktiger_state, 0, ROT0, "Capcom",  "Black Dragon (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, blkdrgonb,  blktiger, blktigerbl, blktiger, blktiger_state, 0, ROT0, "bootleg", "Black Dragon (bootleg)",      MACHINE_SUPPORTS_SAVE )
 // this board has Capcom markings (boards 87118-A-X1 / 87118-B-X1, but no MCU, a mix of bootleg Black Tiger and Black Dragon roms, and an address swapped sound rom? is the latter an alternative security measure?
 GAME( 1987, blktigerb3, blktiger, blktigerbl, blktiger, blktiger_state, blktigerb3, ROT0, "bootleg", "Black Tiger / Black Dragon (mixed bootleg?)", MACHINE_SUPPORTS_SAVE )

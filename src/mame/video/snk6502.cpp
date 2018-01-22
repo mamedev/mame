@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/snk6502.h"
+#include "audio/snk6502.h"
 
 
 #define TOTAL_COLORS(gfxn) (m_gfxdecode->gfx(gfxn)->colors() * m_gfxdecode->gfx(gfxn)->granularity())
@@ -134,6 +135,12 @@ WRITE8_MEMBER(snk6502_state::flipscreen_w)
 		flip_screen_set(data & 0x80);
 		machine().tilemap().mark_all_dirty();
 	}
+}
+
+WRITE8_MEMBER(snk6502_state::fantasy_flipscreen_w)
+{
+	m_sound->fantasy_sound_w(space, offset | 0x03, data, mem_mask);
+	flipscreen_w(space, offset, data, mem_mask);
 }
 
 WRITE8_MEMBER(snk6502_state::scrollx_w)

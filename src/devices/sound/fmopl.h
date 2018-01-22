@@ -1,9 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski,Tatsuyuki Satoh
+#ifndef MAME_SOUND_FMOPL_H
+#define MAME_SOUND_FMOPL_H
+
 #pragma once
 
-#ifndef __FMOPL_H__
-#define __FMOPL_H__
+#include <stdint.h>
+
 
 /* --- select emulation chips --- */
 #define BUILD_YM3812 (1)
@@ -12,17 +15,6 @@
 
 /* select output bits size of output : 8 or 16 */
 #define OPL_SAMPLE_BITS 16
-
-/* compiler dependence */
-#ifndef __OSDCOMM_H__
-#define __OSDCOMM_H__
-typedef unsigned char   uint8_t;   /* unsigned  8bit */
-typedef unsigned short  uint16_t;  /* unsigned 16bit */
-typedef unsigned int    uint32_t;  /* unsigned 32bit */
-typedef signed char     int8_t;    /* signed  8bit   */
-typedef signed short    int16_t;   /* signed 16bit   */
-typedef signed int      int32_t;   /* signed 32bit   */
-#endif /* __OSDCOMM_H__ */
 
 typedef stream_sample_t OPLSAMPLE;
 /*
@@ -34,11 +26,11 @@ typedef int8_t OPLSAMPLE;
 #endif
 */
 
-typedef void (*OPL_TIMERHANDLER)(void *param,int timer,const attotime &period);
-typedef void (*OPL_IRQHANDLER)(void *param,int irq);
-typedef void (*OPL_UPDATEHANDLER)(void *param,int min_interval_us);
-typedef void (*OPL_PORTHANDLER_W)(void *param,unsigned char data);
-typedef unsigned char (*OPL_PORTHANDLER_R)(void *param);
+typedef void (*OPL_TIMERHANDLER)(device_t *device,int timer,const attotime &period);
+typedef void (*OPL_IRQHANDLER)(device_t *device,int irq);
+typedef void (*OPL_UPDATEHANDLER)(device_t *device,int min_interval_us);
+typedef void (*OPL_PORTHANDLER_W)(device_t *device,unsigned char data);
+typedef unsigned char (*OPL_PORTHANDLER_R)(device_t *device);
 
 
 #if BUILD_YM3812
@@ -52,9 +44,9 @@ unsigned char ym3812_read(void *chip, int a);
 int  ym3812_timer_over(void *chip, int c);
 void ym3812_update_one(void *chip, OPLSAMPLE *buffer, int length);
 
-void ym3812_set_timer_handler(void *chip, OPL_TIMERHANDLER TimerHandler, void *param);
-void ym3812_set_irq_handler(void *chip, OPL_IRQHANDLER IRQHandler, void *param);
-void ym3812_set_update_handler(void *chip, OPL_UPDATEHANDLER UpdateHandler, void *param);
+void ym3812_set_timer_handler(void *chip, OPL_TIMERHANDLER TimerHandler, device_t *device);
+void ym3812_set_irq_handler(void *chip, OPL_IRQHANDLER IRQHandler, device_t *device);
+void ym3812_set_update_handler(void *chip, OPL_UPDATEHANDLER UpdateHandler, device_t *device);
 
 #endif /* BUILD_YM3812 */
 
@@ -85,9 +77,9 @@ int  ym3526_timer_over(void *chip, int c);
 */
 void ym3526_update_one(void *chip, OPLSAMPLE *buffer, int length);
 
-void ym3526_set_timer_handler(void *chip, OPL_TIMERHANDLER TimerHandler, void *param);
-void ym3526_set_irq_handler(void *chip, OPL_IRQHANDLER IRQHandler, void *param);
-void ym3526_set_update_handler(void *chip, OPL_UPDATEHANDLER UpdateHandler, void *param);
+void ym3526_set_timer_handler(void *chip, OPL_TIMERHANDLER TimerHandler, device_t *device);
+void ym3526_set_irq_handler(void *chip, OPL_IRQHANDLER IRQHandler, device_t *device);
+void ym3526_set_update_handler(void *chip, OPL_UPDATEHANDLER UpdateHandler, device_t *device);
 
 #endif /* BUILD_YM3526 */
 
@@ -95,8 +87,8 @@ void ym3526_set_update_handler(void *chip, OPL_UPDATEHANDLER UpdateHandler, void
 #if BUILD_Y8950
 
 /* Y8950 port handlers */
-void y8950_set_port_handler(void *chip, OPL_PORTHANDLER_W PortHandler_w, OPL_PORTHANDLER_R PortHandler_r, void *param);
-void y8950_set_keyboard_handler(void *chip, OPL_PORTHANDLER_W KeyboardHandler_w, OPL_PORTHANDLER_R KeyboardHandler_r, void *param);
+void y8950_set_port_handler(void *chip, OPL_PORTHANDLER_W PortHandler_w, OPL_PORTHANDLER_R PortHandler_r, device_t *device);
+void y8950_set_keyboard_handler(void *chip, OPL_PORTHANDLER_W KeyboardHandler_w, OPL_PORTHANDLER_R KeyboardHandler_r, device_t *device);
 void y8950_set_delta_t_memory(void *chip, void * deltat_mem_ptr, int deltat_mem_size );
 
 void * y8950_init(device_t *device, uint32_t clock, uint32_t rate);
@@ -107,11 +99,11 @@ unsigned char y8950_read (void *chip, int a);
 int  y8950_timer_over(void *chip, int c);
 void y8950_update_one(void *chip, OPLSAMPLE *buffer, int length);
 
-void y8950_set_timer_handler(void *chip, OPL_TIMERHANDLER TimerHandler, void *param);
-void y8950_set_irq_handler(void *chip, OPL_IRQHANDLER IRQHandler, void *param);
-void y8950_set_update_handler(void *chip, OPL_UPDATEHANDLER UpdateHandler, void *param);
+void y8950_set_timer_handler(void *chip, OPL_TIMERHANDLER TimerHandler, device_t *device);
+void y8950_set_irq_handler(void *chip, OPL_IRQHANDLER IRQHandler, device_t *device);
+void y8950_set_update_handler(void *chip, OPL_UPDATEHANDLER UpdateHandler, device_t *device);
 
 #endif /* BUILD_Y8950 */
 
 
-#endif /* __FMOPL_H__ */
+#endif // MAME_SOUND_FMOPL_H

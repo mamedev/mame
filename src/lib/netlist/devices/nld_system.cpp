@@ -5,8 +5,8 @@
  *
  */
 
-#include <solver/nld_solver.h>
-#include <solver/nld_matrix_solver.h>
+#include "../solver/nld_solver.h"
+#include "../solver/nld_matrix_solver.h"
 #include "nlid_system.h"
 
 namespace netlist
@@ -46,8 +46,9 @@ namespace netlist
 	NETLIB_UPDATE(extclock)
 	{
 		m_Q.push((m_cnt & 1) ^ 1, m_inc[m_cnt] + m_off);
-		m_cnt = (m_cnt + 1) % m_size;
 		m_off = netlist_time::zero();
+		if (++m_cnt >= m_size)
+			m_cnt = 0;
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -86,43 +87,16 @@ namespace netlist
 	{
 	}
 
-	// ----------------------------------------------------------------------------------------
-	// nld_d_to_a_proxy
-	// ----------------------------------------------------------------------------------------
-
-	void nld_d_to_a_proxy::reset()
-	{
-		//m_Q.initial(0.0);
-		m_last_state = -1;
-		m_RV.do_reset();
-		m_is_timestep = m_RV.m_P.net().solver()->has_timestep_devices();
-		m_RV.set(NL_FCONST(1.0) / logic_family().m_R_low, logic_family().m_low_V, 0.0);
-	}
-
-	NETLIB_UPDATE(d_to_a_proxy)
-	{
-		const int state = static_cast<int>(m_I());
-		if (state != m_last_state)
-		{
-			m_last_state = state;
-			const nl_double R = state ? logic_family().m_R_high : logic_family().m_R_low;
-			const nl_double V = state ? logic_family().m_high_V : logic_family().m_low_V;
-
-			// We only need to update the net first if this is a time stepping net
-			if (m_is_timestep)
-			{
-				m_RV.update_dev();
-			}
-			m_RV.set(NL_FCONST(1.0) / R, V, 0.0);
-			m_RV.m_P.schedule_after(NLTIME_FROM_NS(1));
-		}
-	}
-
 
 	// -----------------------------------------------------------------------------
 	// nld_res_sw
 	// -----------------------------------------------------------------------------
 
+	NETLIB_RESET(res_sw)
+	{
+		m_last_state = 0;
+		m_R.set_R(m_ROFF());
+	}
 
 	NETLIB_UPDATE(res_sw)
 	{
@@ -137,12 +111,12 @@ namespace netlist
 			{
 				m_R.update_dev();
 				m_R.set_R(R);
-				m_R.m_P.schedule_after(NLTIME_FROM_NS(1));
+				m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 			}
 			else
 			{
 				m_R.set_R(R);
-				m_R.m_P.schedule_after(NLTIME_FROM_NS(1));
+				m_R.m_P.schedule_solve_after(NLTIME_FROM_NS(1));
 				//m_R->update_dev();
 			}
 		}
@@ -159,41 +133,11 @@ namespace netlist
 
 	NETLIB_UPDATE(function)
 	{
-		//nl_double val = INPANALOG(m_I[0]) * INPANALOG(m_I[1]) * 0.2;
-		//OUTANALOG(m_Q, val);
-		nl_double stack[20];
-		unsigned ptr = 0;
-		std::size_t e = m_precompiled.size();
-		for (std::size_t i = 0; i<e; i++)
+		for (std::size_t i=0; i < static_cast<unsigned>(m_N()); i++)
 		{
-			rpn_inst &rc = m_precompiled[i];
-			switch (rc.m_cmd)
-			{
-				case ADD:
-					ptr--;
-					stack[ptr-1] = stack[ptr] + stack[ptr-1];
-					break;
-				case MULT:
-					ptr--;
-					stack[ptr-1] = stack[ptr] * stack[ptr-1];
-					break;
-				case SUB:
-					ptr--;
-					stack[ptr-1] = stack[ptr-1] - stack[ptr];
-					break;
-				case DIV:
-					ptr--;
-					stack[ptr-1] = stack[ptr-1] / stack[ptr];
-					break;
-				case PUSH_INPUT:
-					stack[ptr++] = (*m_I[static_cast<unsigned>(rc.m_param)])();
-					break;
-				case PUSH_CONST:
-					stack[ptr++] = rc.m_param;
-					break;
-			}
+			m_vals[i] = (*m_I[i])();
 		}
-		m_Q.push(stack[ptr-1]);
+		m_Q.push(m_compiled.evaluate(m_vals));
 	}
 
 

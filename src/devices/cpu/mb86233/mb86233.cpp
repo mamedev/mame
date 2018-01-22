@@ -18,29 +18,38 @@
 #include "emu.h"
 #include "debugger.h"
 #include "mb86233.h"
+#include "mb86233d.h"
 
 
-const device_type MB86233 = &device_creator<mb86233_cpu_device>;
+DEFINE_DEVICE_TYPE(MB86233, mb86233_cpu_device, "mb86233", "MB86233")
 
 
 mb86233_cpu_device::mb86233_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, MB86233, "MB86233", tag, owner, clock, "mb86233", __FILE__)
+	: cpu_device(mconfig, MB86233, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, -2)
-	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, 0), m_pc(0), m_reps(0), m_pcsp(0), m_eb(0), m_shift(0), m_repcnt(0), m_sr(0),
-	m_fpucontrol(0), m_program(nullptr), m_direct(nullptr), m_icount(0), m_fifo_wait(0)
-		, m_fifo_read_cb(*this)
+	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_pc(0), m_reps(0), m_pcsp(0), m_eb(0), m_shift(0), m_repcnt(0), m_sr(0)
+	, m_fpucontrol(0), m_program(nullptr), m_direct(nullptr), m_icount(0), m_fifo_wait(0)
+	, m_fifo_read_cb(*this)
 	, m_fifo_read_ok_cb(*this)
 	, m_fifo_write_cb(*this)
 	, m_tablergn(nullptr), m_ARAM(nullptr), m_BRAM(nullptr)
-		, m_Tables(nullptr)
+	, m_Tables(nullptr)
 {
 }
 
-
-offs_t mb86233_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+device_memory_interface::space_config_vector mb86233_cpu_device::memory_space_config() const
 {
-	extern CPU_DISASSEMBLE( mb86233 );
-	return CPU_DISASSEMBLE_NAME(mb86233)(this, buffer, pc, oprom, opram, options);
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config)
+	};
+}
+
+
+util::disasm_interface *mb86233_cpu_device::create_disassembler()
+{
+	return new mb86233_disassembler;
 }
 
 
@@ -70,9 +79,9 @@ offs_t mb86233_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uin
 #define GETBRAM()           m_BRAM
 #define GETREPCNT()         m_repcnt
 
-#define ROPCODE(a)          m_direct->read_dword(a<<2)
-#define RDMEM(a)            m_program->read_dword((a<<2))
-#define WRMEM(a,v)          m_program->write_dword((a<<2), v)
+#define ROPCODE(a)          m_direct->read_dword(a)
+#define RDMEM(a)            m_program->read_dword(a)
+#define WRMEM(a,v)          m_program->write_dword((a), v)
 
 /***************************************************************************
     Initialization and Shutdown
@@ -101,7 +110,7 @@ void mb86233_cpu_device::device_start()
 	m_fifo_write_cb.resolve_safe();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<-2>();
 
 	if ( m_tablergn )
 	{

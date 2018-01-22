@@ -2,6 +2,7 @@
 // copyright-holders:Bryan McPhail, David Haywood
 #include "emu.h"
 #include "includes/deadang.h"
+#include "screen.h"
 
 
 /******************************************************************************/

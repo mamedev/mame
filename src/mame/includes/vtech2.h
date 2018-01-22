@@ -6,12 +6,13 @@
  *
  ****************************************************************************/
 
-#ifndef VTECH2_H_
-#define VTECH2_H_
-#include "sound/speaker.h"
-#include "imagedev/cassette.h"
-#include "bus/generic/slot.h"
+#ifndef MAME_INCLUDES_VTECH2_H
+#define MAME_INCLUDES_VTECH2_H
+
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "imagedev/cassette.h"
+#include "sound/spkrdev.h"
 
 #define TRKSIZE_FM  3172    /* size of a standard FM mode track */
 
@@ -90,7 +91,10 @@ public:
 	device_t *laser_file();
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void laser350(machine_config &config);
+	void laser700(machine_config &config);
+	void laser500(machine_config &config);
 };
 
 
-#endif /* VTECH2_H_ */
+#endif // MAME_INCLUDES_VTECH2_H

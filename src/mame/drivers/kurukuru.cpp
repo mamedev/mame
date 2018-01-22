@@ -113,6 +113,130 @@
   AB =  NEC C1663C 8926B.
 
 
+  Pinout:
+
+                   solder side |##| components
+            -------------------|--|-----------------
+                           gnd |01| gnd
+                           gnd |02| gnd
+                           +5v |03| +5v
+                           +5v |04| +5v
+                           -5v |05| -5v
+                          +12v |06| +12v
+                               |  |
+           hole (no connector) |07| hole (no connector)
+                               |  |
+            Coin B (10Y) meter |08| Coin A (100Y) meter
+                  hopper motor |09| unknown out (ULN2003, pin15)
+                     speaker - |10| speaker +
+ (ULN2003, pin13) unknown out |11| unknown out (ULN2003, pin12)
+                         green |12| red
+                          sync |13| blue
+  (ULN2003, pin13) unknown out |14| video gnd
+                               |  |
+                      medal in |15| management
+               coin B (10Y) in |16| reset
+              coin A (100Y) in |17| unknown in (active)
+             +5v |<|-- (diode) |18| (diode) --|>| +5v
+             +5v |<|-- (diode) |19| (diode) --|>| +5v
+                               |  |
+                Botechin (5th) |20| (1st) Boketa
+           (active) unknown in |21| (2nd) Kunio
+           (active) unknown in |22| (3rd) Pyon-Pyon
+                         start |23| (4th) Pyokorin
+                        payout |24| hopper in (opto in)
+                               |  |
+                      not used |25| not used
+                      not used |26| not used
+                           gnd |27| gnd
+                           gnd |28| gnd
+
+
+  Pyon Pyon Jump DIP switches:
+
+  .---------------------------------------------------------------------------------.
+  | DIP Switches bank #1                     1    2    3    4    5    6    7    8   |
+  +-------------------------------------+-------------------------------------------+
+  +-----------------+-------------------+-------------------------------------------+
+  | Coinage Coin A  | 1 coin / 11 medal |   off  off  off                           |
+  +-----------------+-------------------+-------------------------------------------+
+  | Coinage Coin A  | 1 coin / 10 medal |   off  off  on                            |
+  +-----------------+-------------------+-------------------------------------------+
+  | Coinage Coin A  | 1 coin / 6 medal  |   off  on   off                           |
+  +-----------------+-------------------+-------------------------------------------+
+  | Coinage Coin A  | 1 coin / 5 medal  |   off  on   on                            |
+  +-----------------+-------------------+-------------------------------------------+
+  | Coinage Coin A  | 1 coin / 4 medal  |   on   off  off                           |
+  +-----------------+-------------------+-------------------------------------------+
+  | Coinage Coin A  | 1 coin / 3 medal  |   on   off  on                            |
+  +-----------------+-------------------+-------------------------------------------+
+  | Coinage Coin A  | 1 coin / 2 medal  |   on   on   off                           |
+  +-----------------+-------------------+-------------------------------------------+
+  | Coinage Coin A  | 1 coin / 1 medal  |   on   on   on                            |
+  +-----------------+-------------------+-------------------------------------------+
+  | Coin A (100Y)   | Exchange          |                  off                      |
+  +-----------------+-------------------+-------------------------------------------+
+  | Coin A (100Y)   | Credit            |                  on                       |
+  +-----------------+-------------------+-------------------------------------------+
+  | Win             | Medal out         |                       off                 |
+  +-----------------+-------------------+-------------------------------------------+
+  | Win             | Credit            |                       on                  |
+  +-----------------+-------------------+-------------------------------------------+
+  | Coinage config  | Coin A: Payout    |                            off            |
+  +-----------------+-------------------+-------------------------------------------+
+  | Coinage config  | Coin A: Normal    |                            on             |
+  +-----------------+-------------------+-------------------------------------------+
+  | Payout Mode     | Manual            |                                 off       |
+  +-----------------+-------------------+-------------------------------------------+
+  | Payout Mode     | Automatic         |                                 on        |
+  +-----------------+-------------------+-------------------------------------------+
+  | Repeat last bet | No                |                                      off  |
+  +-----------------+-------------------+-------------------------------------------+
+  | Repeat last bet | Yes               |                                      on   |
+  '-----------------+-------------------+-------------------------------------------'
+
+  .---------------------------------------------------------------------------------.
+  | DIP Switches bank #2                     1    2    3    4    5    6    7    8   |
+  +-------------------------------------+-------------------------------------------+
+  +-----------------+-------------------+-------------------------------------------+
+  | Percentage      | 95%               |   on   on   on                            |
+  +-----------------+-------------------+-------------------------------------------+
+  | Percentage      | 90%               |   on   on   off                           |
+  +-----------------+-------------------+-------------------------------------------+
+  | Percentage      | 85%               |   on   off  on                            |
+  +-----------------+-------------------+-------------------------------------------+
+  | Percentage      | 80%               |   on   off  off                           |
+  +-----------------+-------------------+-------------------------------------------+
+  | Percentage      | 75%               |   off  on   on                            |
+  +-----------------+-------------------+-------------------------------------------+
+  | Percentage      | 70%               |   off  on   off                           |
+  +-----------------+-------------------+-------------------------------------------+
+  | Percentage      | 60%               |   off  off  on                            |
+  +-----------------+-------------------+-------------------------------------------+
+  | Percentage      | 50%               |   off  off  off                           |
+  +-----------------+-------------------+-------------------------------------------+
+  | Winwave         | Small             |                  off                      |
+  +-----------------+-------------------+-------------------------------------------+
+  | Winwave         | Big               |                  on                       |
+  +-----------------+-------------------+-------------------------------------------+
+  | M.Medal         | Off               |                       off                 |
+  +-----------------+-------------------+-------------------------------------------+
+  | M.Medal         | On                |                       on                  |
+  +-----------------+-------------------+-------------------------------------------+
+  | HG              | 20-1              |                            off  off       |
+  +-----------------+-------------------+-------------------------------------------+
+  | HG              | 50-1              |                            off  on        |
+  +-----------------+-------------------+-------------------------------------------+
+  | HG              | 100-1             |                            on   off       |
+  +-----------------+-------------------+-------------------------------------------+
+  | HG              | 200-1             |                            on   on        |
+  +-----------------+-------------------+-------------------------------------------+
+  | unknown                             |                                      off  |
+  +-------------------------------------+-------------------------------------------+
+  | unknown                             |                                      on   |
+  '-------------------------------------+-------------------------------------------'
+
+
 ************************************************************************************
 
   General Notes....
@@ -252,12 +376,13 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "video/v9938.h"
-#include "machine/ticket.h"
-#include "machine/nvram.h"
-#include "machine/gen_latch.h"
+#include "speaker.h"
 
 #define UNICODE_10YEN   "\xC2\xA5" "10"
 #define UNICODE_100YEN  "\xC2\xA5" "100"
@@ -301,6 +426,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
+	void ppj(machine_config &config);
+	void kurukuru(machine_config &config);
 };
 
 #define MAIN_CLOCK      XTAL_21_4772MHz
@@ -366,13 +493,13 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_out_latch_w)
     07 | Not connected      | unused
 
 */
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);      /* Coin Counter 1 */
-	machine().bookkeeping().coin_counter_w(1, data & 0x20);      /* Coin Counter 2 */
-	machine().bookkeeping().coin_lockout_global_w(data & 0x40);  /* Coin Lock */
-	m_hopper->write(space, 0, (data & 0x40) ? 0x80 : 0);         /* Hopper Motor */
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5));
+	//machine().bookkeeping().coin_lockout_global_w(BIT(data, 6));
+	m_hopper->motor_w(BIT(data, 6));
 
 	if (data & 0x9e)
-		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, space.device().safe_pc());
+		logerror("kurukuru_out_latch_w %02X @ %04X\n", data, m_maincpu->pc());
 }
 
 WRITE8_MEMBER(kurukuru_state::kurukuru_bankswitch_w)
@@ -479,7 +606,7 @@ WRITE8_MEMBER(kurukuru_state::kurukuru_adpcm_reset_w)
        bit 2 = S2
        bit 3 = S1
 */
-	m_adpcm->playmode_w(BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
+	m_adpcm->playmode_w(bitswap<8>((data>>1), 7,6,5,4,3,0,1,2));
 	m_adpcm->reset_w(data & 1);
 }
 
@@ -723,7 +850,7 @@ void kurukuru_state::machine_reset()
 *                 Machine Driver                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
+MACHINE_CONFIG_START(kurukuru_state::kurukuru)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
@@ -756,12 +883,12 @@ static MACHINE_CONFIG_START( kurukuru, kurukuru_state )
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, M5205_CLOCK)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(kurukuru_state, kurukuru_msm5205_vck))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* changed on the fly */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* changed on the fly */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ppj, kurukuru_state )
+MACHINE_CONFIG_START(kurukuru_state::ppj)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
@@ -794,7 +921,7 @@ static MACHINE_CONFIG_START( ppj, kurukuru_state )
 
 	MCFG_SOUND_ADD("adpcm", MSM5205, M5205_CLOCK)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(kurukuru_state, kurukuru_msm5205_vck))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)  // changed on the fly
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  // changed on the fly
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -829,7 +956,7 @@ ROM_END
 
 /*  Pyon Pyon Jump.
     Ver 1.40.
-    199?, Success / Taiyo Jidoki.
+    1991, Success / Taiyo Jidoki.
 */
 ROM_START( ppj )
 	ROM_REGION( 0x08000, "maincpu", 0 )
@@ -857,11 +984,11 @@ ROM_END
 *                              Game Drivers                                *
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY                   FULLNAME                        FLAGS  */
-GAME( 1990, kurukuru, 0,      kurukuru, kurukuru, driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
-GAME( 199?, ppj,      0,      ppj,      ppj,      driver_device, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT  ROT    COMPANY                   FULLNAME                        FLAGS
+GAME( 1990, kurukuru, 0,      kurukuru, kurukuru, kurukuru_state, 0,    ROT0, "Success / Taiyo Jidoki", "Kuru Kuru Pyon Pyon (Japan)",   0 )
+GAME( 1991, ppj,      0,      ppj,      ppj,      kurukuru_state, 0,    ROT0, "Success / Taiyo Jidoki", "Pyon Pyon Jump (V1.40, Japan)", 0 )
 
 // unemulated....
 
-//    199?, Success / Taiyo Jidoki, Pyon Pyon
-//    1990, Success / Taiyo Jidoki, Sui Sui Pyon Pyon
+//    1988, Success / Taiyo Jidoki, Pyon Pyon
+//    1992, Success / Taiyo Jidoki, Sui Sui Pyon Pyon

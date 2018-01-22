@@ -10,6 +10,7 @@
 
 #include "machine/gen_latch.h"
 #include "video/tecmo_spr.h"
+#include "screen.h"
 
 class galspnbl_state : public driver_device
 {
@@ -56,4 +57,5 @@ public:
 
 	void mix_sprite_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri);
 
+	void galspnbl(machine_config &config);
 };

@@ -15,73 +15,67 @@
 **********************************************************************/
 
 
+#include "emu.h"
 #include "plus3.h"
-#include "softlist.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ELECTRON_PLUS3 = &device_creator<electron_plus3_device>;
+DEFINE_DEVICE_TYPE(ELECTRON_PLUS3, electron_plus3_device, "electron_plus3", "Acorn Plus 3 Disc Expansion")
 
 
 //-------------------------------------------------
 //  MACHINE_DRIVER( plus3 )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(floppy_formats)
+FLOPPY_FORMATS_MEMBER(electron_plus3_device::floppy_formats)
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_ACORN_ADFS_OLD_FORMAT
 FLOPPY_FORMATS_END0
 
 SLOT_INTERFACE_START(electron_floppies)
-	SLOT_INTERFACE("35ssdd",  FLOPPY_35_SSDD)
 	SLOT_INTERFACE("35dd",    FLOPPY_35_DD)
-	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD)
-	SLOT_INTERFACE("525sd",   FLOPPY_525_SD)
-	SLOT_INTERFACE("525dd",   FLOPPY_525_DD)
 	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
 SLOT_INTERFACE_END
-
-
-MACHINE_CONFIG_FRAGMENT( plus3 )
-	/* fdc */
-	MCFG_WD1770_ADD("fdc", XTAL_16MHz / 2)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", electron_floppies, "35dd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", electron_floppies, nullptr, floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-
-	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_ls", "electron_flop")
-
-	// pass-through
-	MCFG_ELECTRON_PASSTHRU_EXPANSION_SLOT_ADD(nullptr)
-MACHINE_CONFIG_END
 
 
 ROM_START( plus3 )
 	// Bank 4 Disc
 	ROM_REGION(0x4000, "exp_rom", 0)
-	ROM_DEFAULT_BIOS("adfs")
-	ROM_SYSTEM_BIOS(0, "adfs", "Acorn ADFS")
+	ROM_DEFAULT_BIOS("adfs100")
+	// ADFS
+	ROM_SYSTEM_BIOS(0, "adfs100", "Acorn ADFS 1.00")
 	ROMX_LOAD("adfs.rom", 0x0000, 0x4000, CRC(3289bdc6) SHA1(e7c7a1094d50a3579751df2007269067c8ff6812), ROM_BIOS(1))
-
-	ROM_SYSTEM_BIOS(1, "dfs200", "Advanced 1770 DFS 2.00")
-	ROMX_LOAD("acp_dfs1770_200.rom", 0x0000, 0x4000, CRC(5a3a13c7) SHA1(d5dad7ab5a0237c44d0426cd85a8ec86545747e0), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(1, "adfs113", "PRES ADFS 1.13")
+	ROMX_LOAD("pres_adfs_113.rom", 0x0000, 0x4000, CRC(f06ca04a) SHA1(3c8221d63457c552aa2c9a502db632ce1dea66b4), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "adfs115", "PRES ADFS 1.15")
+	ROMX_LOAD("pres_adfs_115.rom", 0x0000, 0x4000, CRC(8f81edc3) SHA1(32007425058a7b0f8bd5c17b3c22552aa3a03eca), ROM_BIOS(3))
+	// DFS
+	ROM_SYSTEM_BIOS(3, "dfs200", "Advanced 1770 DFS 2.00")
+	ROMX_LOAD("acp_dfs1770_200.rom", 0x0000, 0x4000, CRC(5a3a13c7) SHA1(d5dad7ab5a0237c44d0426cd85a8ec86545747e0), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(4, "dfs210", "Advanced 1770 DFS 2.10")
+	ROMX_LOAD("acp_dfs1770_210.rom", 0x0000, 0x4000, CRC(b0661992) SHA1(c62f1290f689788dad6a2df30ace083eb827cffe), ROM_BIOS(5))
 ROM_END
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor electron_plus3_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( plus3 );
-}
+MACHINE_CONFIG_START(electron_plus3_device::device_add_mconfig)
+	/* fdc */
+	MCFG_WD1770_ADD("fdc", XTAL_16MHz / 2)
+	MCFG_FLOPPY_DRIVE_ADD_FIXED("fdc:0", electron_floppies, "35dd", floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", electron_floppies, nullptr, floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+
+
+	/* pass-through */
+	MCFG_ELECTRON_PASSTHRU_EXPANSION_SLOT_ADD(nullptr)
+MACHINE_CONFIG_END
 
 const tiny_rom_entry *electron_plus3_device::device_rom_region() const
 {
@@ -97,12 +91,14 @@ const tiny_rom_entry *electron_plus3_device::device_rom_region() const
 //-------------------------------------------------
 
 electron_plus3_device::electron_plus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELECTRON_PLUS3, "Acorn Plus 3 Disc Expansion", tag, owner, clock, "electron_plus3", __FILE__),
-		device_electron_expansion_interface(mconfig, *this),
-		m_exp_rom(*this, "exp_rom"),
-		m_fdc(*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1")
+	: device_t(mconfig, ELECTRON_PLUS3, tag, owner, clock)
+	, device_electron_expansion_interface(mconfig, *this)
+	, m_exp(*this, "exp")
+	, m_exp_rom(*this, "exp_rom")
+	, m_fdc(*this, "fdc")
+	, m_floppy0(*this, "fdc:0")
+	, m_floppy1(*this, "fdc:1")
+	, m_romsel(0)
 {
 }
 
@@ -112,20 +108,55 @@ electron_plus3_device::electron_plus3_device(const machine_config &mconfig, cons
 
 void electron_plus3_device::device_start()
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
-
-	space.install_write_handler(0xfcc0, 0xfcc3, WRITE8_DELEGATE(electron_plus3_device, wd1770_status_w));
-	space.install_readwrite_handler(0xfcc4, 0xfccf, READ8_DEVICE_DELEGATE(m_fdc, wd1770_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd1770_t, write));
 }
 
 //-------------------------------------------------
-//  device_reset - device-specific reset
+//  expbus_r - expansion data read
 //-------------------------------------------------
 
-void electron_plus3_device::device_reset()
+uint8_t electron_plus3_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
 {
-	machine().root_device().membank("bank2")->configure_entry(4, memregion("exp_rom")->base());
+	if (offset >= 0x8000 && offset < 0xc000)
+	{
+		if (m_romsel == 4)
+		{
+			data = memregion("exp_rom")->base()[offset & 0x3fff];
+		}
+	}
+	else if (offset == 0xfcc0)
+	{
+		data = 0xff;
+	}
+	else if (offset >= 0xfcc4 && offset < 0xfcc8)
+	{
+		data = m_fdc->read(space, offset & 0x03);
+	}
+
+	data &= m_exp->expbus_r(space, offset, data);
+
+	return data;
+}
+
+//-------------------------------------------------
+//  expbus_w - expansion data write
+//-------------------------------------------------
+
+void electron_plus3_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+{
+	m_exp->expbus_w(space, offset, data);
+
+	if (offset == 0xfcc0)
+	{
+		wd1770_status_w(space, offset, data);
+	}
+	else if (offset >= 0xfcc4 && offset < 0xfcc8)
+	{
+		m_fdc->write(space, offset & 0x03, data);
+	}
+	else if (offset == 0xfe05)
+	{
+		m_romsel = data & 0x0f;
+	}
 }
 
 
@@ -140,8 +171,8 @@ WRITE8_MEMBER(electron_plus3_device::wd1770_status_w)
 	m_drive_control = data;
 
 	// bit 0, 1: drive select
-	if (BIT(data, 0)) floppy = m_fdc->subdevice<floppy_connector>("0")->get_device();
-	if (BIT(data, 1)) floppy = m_fdc->subdevice<floppy_connector>("1")->get_device();
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
 	m_fdc->set_floppy(floppy);
 
 	// bit 2: side select
@@ -150,8 +181,6 @@ WRITE8_MEMBER(electron_plus3_device::wd1770_status_w)
 
 	// bit 3: density
 	m_fdc->dden_w(BIT(data, 3));
-
-	// bit 4: interrupt enable?
 
 	// bit 5: reset
 	if (!BIT(data, 5)) m_fdc->soft_reset();

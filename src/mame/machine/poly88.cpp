@@ -302,7 +302,7 @@ SNAPSHOT_LOAD_MEMBER( poly88_state, poly88 )
 					break;
 			case 3 :
 					/* 03 Auto Start @ Address */
-					m_maincpu->set_state_int(I8085_PC, address);
+					m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, address);
 					theend = 1;
 					break;
 			case 4 :

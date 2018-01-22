@@ -14,7 +14,6 @@
 
 #define INTERNAL_EEPROM_SIZE    1024
 
-#include "emu.h"
 #include "cpu/v30mz/v30mz.h"
 #include "machine/nvram.h"
 #include "audio/wswan.h"
@@ -70,6 +69,8 @@ public:
 	DECLARE_MACHINE_START(wscolor);
 	DECLARE_PALETTE_INIT(wscolor);
 
+	void wscolor(machine_config &config);
+	void wswan(machine_config &config);
 protected:
 	/* Interrupt flags */
 	static const uint8_t WSWAN_IFLAG_STX    = 0x01;

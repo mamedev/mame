@@ -5,18 +5,15 @@
 //  strconv.cpp - Win32 string conversion
 //
 //============================================================
-#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
-#define WIN32_LEAN_AND_MEAN
+#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS) || defined(OSD_UWP)
 #include <windows.h>
 #endif
-#undef min
-#undef max
 #include <algorithm>
 #include <assert.h>
 // MAMEOS headers
 #include "strconv.h"
 
-#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
+#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS) || defined(OSD_UWP)
 
 namespace
 {

@@ -6,7 +6,10 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "cdp1862.h"
+
+#include "screen.h"
 
 
 
@@ -14,7 +17,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-static const int CDP1862_BACKGROUND_COLOR_SEQUENCE[] = { 2, 0, 1, 4 };
+static constexpr int CDP1862_BACKGROUND_COLOR_SEQUENCE[] = { 2, 0, 1, 4 };
 
 
 
@@ -23,7 +26,7 @@ static const int CDP1862_BACKGROUND_COLOR_SEQUENCE[] = { 2, 0, 1, 4 };
 //**************************************************************************
 
 // device type definition
-const device_type CDP1862 = &device_creator<cdp1862_device>;
+DEFINE_DEVICE_TYPE(CDP1862, cdp1862_device, "cdp1862", "RCA CDP1862")
 
 
 
@@ -76,7 +79,7 @@ inline void cdp1862_device::initialize_palette()
 //-------------------------------------------------
 
 cdp1862_device::cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CDP1862, "CDP1862", tag, owner, clock, "cdp1862", __FILE__),
+	: device_t(mconfig, CDP1862, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		m_read_rd(*this),
 		m_read_bd(*this),
@@ -97,7 +100,7 @@ void cdp1862_device::device_start()
 	m_read_gd.resolve_safe(0);
 
 	// find devices
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	// init palette
 	initialize_palette();
@@ -126,8 +129,8 @@ void cdp1862_device::device_reset()
 WRITE8_MEMBER( cdp1862_device::dma_w )
 {
 	int rd = 1, bd = 1, gd = 1;
-	int sx = m_screen->hpos() + 4;
-	int y = m_screen->vpos();
+	int sx = screen().hpos() + 4;
+	int y = screen().vpos();
 	int x;
 
 	if (!m_con)

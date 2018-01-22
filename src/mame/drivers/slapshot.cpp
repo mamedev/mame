@@ -134,12 +134,15 @@ Region byte at offset 0x031:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "audio/taitosnd.h"
-#include "sound/2610intf.h"
-#include "machine/timekpr.h"
 #include "includes/slapshot.h"
+#include "audio/taitosnd.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/timekpr.h"
+#include "sound/2610intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /***********************************************************
@@ -216,6 +219,14 @@ WRITE16_MEMBER(slapshot_state::opwolf3_adc_req_w)
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
+WRITE8_MEMBER(slapshot_state::coin_control_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
+}
+
 /*****************************************************
                 SOUND
 *****************************************************/
@@ -258,7 +269,7 @@ static ADDRESS_MAP_START( slapshot_map, AS_PROGRAM, 16, slapshot_state )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteext")   /* debugging */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00) /* nvram (only low bytes used) */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0xff00)  /* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
@@ -273,7 +284,7 @@ static ADDRESS_MAP_START( opwolf3_map, AS_PROGRAM, 16, slapshot_state )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM AM_SHARE("spriteext")   /* debugging */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE8("mk48t08", timekeeper_device, read, write, 0xff00) /* nvram (only low bytes used) */
 	AM_RANGE(0xb00000, 0xb0001f) AM_DEVWRITE8("tc0360pri", tc0360pri_device, write, 0xff00)  /* priority chip */
 	AM_RANGE(0xc00000, 0xc0000f) AM_DEVREADWRITE("tc0640fio", tc0640fio_device, halfword_byteswap_r, halfword_byteswap_w)
@@ -458,7 +469,7 @@ void slapshot_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( slapshot, slapshot_state )
+MACHINE_CONFIG_START(slapshot_state::slapshot)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
@@ -474,6 +485,7 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("BUTTONS"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("SYSTEM"))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(slapshot_state, coin_control_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("JOY"))
 
 	/* video hardware */
@@ -483,7 +495,7 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(slapshot_state, screen_eof_taito_no_buffer)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(slapshot_state, screen_vblank_taito_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
@@ -518,7 +530,7 @@ static MACHINE_CONFIG_START( slapshot, slapshot_state )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( opwolf3, slapshot_state )
+MACHINE_CONFIG_START(slapshot_state::opwolf3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14346000)   /* 28.6860 MHz / 2 ??? */
@@ -534,6 +546,7 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 	MCFG_TC0640FIO_READ_1_CB(IOPORT("COINS"))
 	MCFG_TC0640FIO_READ_2_CB(IOPORT("BUTTONS"))
 	MCFG_TC0640FIO_READ_3_CB(IOPORT("SYSTEM"))
+	MCFG_TC0640FIO_WRITE_4_CB(WRITE8(slapshot_state, coin_control_w))
 	MCFG_TC0640FIO_READ_7_CB(IOPORT("JOY"))
 
 	/* video hardware */
@@ -543,7 +556,7 @@ static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(slapshot_state, screen_update)
-	MCFG_SCREEN_VBLANK_DRIVER(slapshot_state, screen_eof_taito_no_buffer)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(slapshot_state, screen_vblank_taito_no_buffer))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", slapshot)
@@ -694,6 +707,6 @@ DRIVER_INIT_MEMBER(slapshot_state,slapshot)
 	}
 }
 
-GAME( 1994, slapshot, 0,       slapshot, slapshot, slapshot_state, slapshot, ROT0, "Taito Corporation",         "Slap Shot (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, opwolf3,  0,       opwolf3,  opwolf3, slapshot_state,  slapshot, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, opwolf3u, opwolf3, opwolf3,  opwolf3, slapshot_state,  slapshot, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, slapshot, 0,       slapshot, slapshot, slapshot_state, slapshot, ROT0, "Taito Corporation",         "Slap Shot (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3,  0,       opwolf3,  opwolf3,  slapshot_state, slapshot, ROT0, "Taito Corporation Japan",   "Operation Wolf 3 (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, opwolf3u, opwolf3, opwolf3,  opwolf3,  slapshot_state, slapshot, ROT0, "Taito America Corporation", "Operation Wolf 3 (US)",    MACHINE_SUPPORTS_SAVE )

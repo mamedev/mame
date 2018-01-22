@@ -112,6 +112,9 @@ uint32_t vicdual_state::screen_update_color(screen_device &screen, bitmap_rgb32 
 			fore_pen = pens_from_color_prom[(color_prom[offs] >> 5) & 0x07];
 		}
 
+		// this does nothing by default, but is used to enable overrides
+		back_pen = choose_pen(x, y, back_pen);
+
 		/* plot the current pixel */
 		pen = (video_data & 0x80) ? fore_pen : back_pen;
 		bitmap.pix32(y, x) = pen;
@@ -146,4 +149,16 @@ uint32_t vicdual_state::screen_update_bw_or_color(screen_device &screen, bitmap_
 		screen_update_bw(screen, bitmap, cliprect);
 
 	return 0;
+}
+
+
+pen_t vicdual_state::choose_pen(uint8_t x, uint8_t y, pen_t back_pen)
+{
+	return back_pen;
+}
+
+
+pen_t nsub_state::choose_pen(uint8_t x, uint8_t y, pen_t back_pen)
+{
+	return m_s97269pb->choose_pen(x, y, back_pen);
 }

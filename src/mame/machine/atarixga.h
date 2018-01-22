@@ -8,25 +8,25 @@
 
 *************************************************************************/
 
-#ifndef __MACHINE_ATARIXGA__
-#define __MACHINE_ATARIXGA__
+#ifndef MAME_MACHINE_ATARIXGA_H
+#define MAME_MACHINE_ATARIXGA_H
 
-extern const device_type ATARI_136094_0072;
-extern const device_type ATARI_136095_0072;
+DECLARE_DEVICE_TYPE(ATARI_136094_0072, atari_136094_0072_device)
+DECLARE_DEVICE_TYPE(ATARI_136095_0072, atari_136095_0072_device)
 
 class atari_xga_device : public device_t
 {
 public:
-	// construction/destruction
-	atari_xga_device(const machine_config &mconfig, device_type type, const char *tag,
-					device_t *owner, uint32_t clock, const char *name, const char *shortname)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
-	{}
-
 	virtual DECLARE_WRITE32_MEMBER(write) = 0;
 	virtual DECLARE_READ32_MEMBER(read) = 0;
 
 protected:
+	// construction/destruction
+	atari_xga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, type, tag, owner, clock)
+	{
+	}
+
 	virtual void device_start() override = 0;
 	virtual void device_reset() override = 0;
 
@@ -40,14 +40,14 @@ public:
 
 	virtual DECLARE_WRITE32_MEMBER(write) override;
 	virtual DECLARE_READ32_MEMBER(read) override;
-	
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
 	static const size_t RAM_WORDS = 2048;
-	
+
 	uint16_t powers2(uint8_t k, uint16_t x);
 	uint16_t lfsr2(uint16_t x);
 	uint16_t lfsr1(uint16_t x);
@@ -59,10 +59,10 @@ private:
 		FPGA_SETKEY,
 		FPGA_DECIPHER
 	};
-	
+
 	fpga_mode m_mode;
 	uint16_t m_address;    // last written address
-	uint16_t m_ciphertext; // last written ciphertext	
+	uint16_t m_ciphertext; // last written ciphertext
 };
 
 class atari_136095_0072_device : public atari_xga_device
@@ -72,17 +72,17 @@ public:
 
 	DECLARE_WRITE32_MEMBER(polylsb_write);
 	DECLARE_READ32_MEMBER(polylsb_read);
-	
+
 	virtual DECLARE_WRITE32_MEMBER(write) override;
 	virtual DECLARE_READ32_MEMBER(read) override;
-	
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 private:
 	static const size_t RAM_WORDS = 4096;
-	
+
 	uint16_t powers2(uint8_t k, uint16_t x);
 	uint16_t lfsr2(uint16_t x);
 	uint16_t lfsr1(uint16_t x);
@@ -108,4 +108,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_MACHINE_ATARIXGA_H

@@ -8,14 +8,16 @@
 
 */
 
-#ifndef MN10200_H
-#define MN10200_H
+#ifndef MAME_CPU_MN10200_MN10200_H
+#define MAME_CPU_MN10200_MN10200_H
+
+#pragma once
 
 // port setup
 #define MCFG_MN10200_READ_PORT_CB(X, _devcb) \
-	mn10200_device::set_read_port##X##_callback(*device, DEVCB_##_devcb);
+	devcb = &mn10200_device::set_read_port##X##_callback(*device, DEVCB_##_devcb);
 #define MCFG_MN10200_WRITE_PORT_CB(X, _devcb) \
-	mn10200_device::set_write_port##X##_callback(*device, DEVCB_##_devcb);
+	devcb = &mn10200_device::set_write_port##X##_callback(*device, DEVCB_##_devcb);
 
 enum
 {
@@ -37,40 +39,34 @@ enum
 };
 
 
-#define MN10200_NUM_PRESCALERS (2)
-#define MN10200_NUM_TIMERS_8BIT (10)
-#define MN10200_NUM_IRQ_GROUPS (31)
-
-
 class mn10200_device : public cpu_device
 {
 public:
-	// construction/destruction
-	mn10200_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program, const char *shortname, const char *source)
-		: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
-		, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0, program), m_program(nullptr)
-			, m_read_port0(*this), m_read_port1(*this), m_read_port2(*this), m_read_port3(*this), m_read_port4(*this)
-		, m_write_port0(*this), m_write_port1(*this), m_write_port2(*this), m_write_port3(*this), m_write_port4(*this), m_cycles(0), m_pc(0), m_psw(0), m_mdr(0), m_nmicr(0), m_iagr(0),
-		m_extmdl(0), m_extmdh(0), m_possible_irq(false), m_pplul(0), m_ppluh(0), m_p3md(0), m_p4(0)
-	{ }
-
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_read_port0_callback(device_t &device, _Object object) { return downcast<mn10200_device &>(device).m_read_port0.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_port1_callback(device_t &device, _Object object) { return downcast<mn10200_device &>(device).m_read_port1.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_port2_callback(device_t &device, _Object object) { return downcast<mn10200_device &>(device).m_read_port2.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_port3_callback(device_t &device, _Object object) { return downcast<mn10200_device &>(device).m_read_port3.set_callback(object); }
-	template<class _Object> static devcb_base &set_read_port4_callback(device_t &device, _Object object) { return downcast<mn10200_device &>(device).m_read_port4.set_callback(object); }
+	template <class Object> static devcb_base &set_read_port0_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_port1_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_port2_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_port3_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_read_port4_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_read_port4.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_write_port0_callback(device_t &device, _Object object) { return downcast<mn10200_device &>(device).m_write_port0.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port1_callback(device_t &device, _Object object) { return downcast<mn10200_device &>(device).m_write_port1.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port2_callback(device_t &device, _Object object) { return downcast<mn10200_device &>(device).m_write_port2.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port3_callback(device_t &device, _Object object) { return downcast<mn10200_device &>(device).m_write_port3.set_callback(object); }
-	template<class _Object> static devcb_base &set_write_port4_callback(device_t &device, _Object object) { return downcast<mn10200_device &>(device).m_write_port4.set_callback(object); }
+	template <class Object> static devcb_base &set_write_port0_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port0.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_port1_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port1.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_port2_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port2.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_port3_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port3.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_write_port4_callback(device_t &device, Object &&cb) { return downcast<mn10200_device &>(device).m_write_port4.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(io_control_r);
 	DECLARE_WRITE8_MEMBER(io_control_w);
 
 protected:
+	static constexpr unsigned MN10200_NUM_PRESCALERS = 2;
+	static constexpr unsigned MN10200_NUM_TIMERS_8BIT = 10;
+	static constexpr unsigned MN10200_NUM_IRQ_GROUPS = 31;
+
+
+	// construction/destruction
+	mn10200_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor program);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -85,15 +81,13 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 7; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -166,6 +160,7 @@ private:
 		uint8_t ctrll;
 		uint8_t ctrlh;
 		uint8_t buf;
+		uint8_t recv;
 	} m_serial[2];
 
 	// ports
@@ -213,7 +208,7 @@ public:
 
 
 
-extern const device_type MN1020012A;
+DECLARE_DEVICE_TYPE(MN1020012A, mn1020012a_device)
 
 
-#endif // MN10200_H
+#endif // MAME_CPU_MN10200_MN10200_H

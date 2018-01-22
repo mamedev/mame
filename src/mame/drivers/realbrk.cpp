@@ -44,10 +44,12 @@ To Do:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/realbrk.h"
+
+#include "cpu/m68000/m68000.h"
 #include "sound/ym2413.h"
 #include "sound/ymz280b.h"
+#include "speaker.h"
 
 
 /* Read 4 ten bit dip switches */
@@ -64,7 +66,7 @@ READ16_MEMBER(realbrk_state::realbrk_dsw_r)
 							((ioport("SW3")->read() & 0x0300) << 4) |
 							((ioport("SW4")->read() & 0x0300) << 6) ;
 
-	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",space.device().safe_pc(),m_dsw_select[0]);
+	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",m_maincpu->pc(),m_dsw_select[0]);
 	return 0xffff;
 }
 
@@ -124,7 +126,7 @@ READ16_MEMBER(realbrk_state::backup_ram_r)
 {
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
 	        unemulated tmp68301 feature?*/
-	if(space.device().safe_pcbase() == 0x02c08e)
+	if(m_maincpu->pcbase() == 0x02c08e)
 		return 0xffff;
 	else
 		return m_backup_ram[offset];
@@ -135,7 +137,7 @@ READ16_MEMBER(realbrk_state::backup_ram_dx_r)
 {
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
 	        unemulated tmp68301 feature?*/
-	if(space.device().safe_pcbase() == 0x02f046)
+	if(m_maincpu->pcbase() == 0x02f046)
 		return 0xffff;
 	else
 		return m_backup_ram[offset];
@@ -156,7 +158,7 @@ WRITE16_MEMBER(realbrk_state::backup_ram_w)
 static ADDRESS_MAP_START( base_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                         // ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM                   AM_SHARE("spriteram") // Sprites
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")   // Palette
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")   // Palette
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0")  // Background   (0)
 	AM_RANGE(0x602000, 0x603fff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1")  // Background   (1)
 	AM_RANGE(0x604000, 0x604fff) AM_RAM_WRITE(vram_2_w) AM_SHARE("vram_2")  // Text         (2)
@@ -241,7 +243,7 @@ static INPUT_PORTS_START( realbrk )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // the vblank routine wants these 2 bits high
@@ -315,7 +317,7 @@ static INPUT_PORTS_START( pkgnsh )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // the vblank routine wants these 2 bits high
@@ -428,7 +430,7 @@ static INPUT_PORTS_START( pkgnshdx )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // the vblank routine wants these 2 bits high
@@ -613,7 +615,7 @@ static INPUT_PORTS_START( dai2kaku )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // the vblank routine wants these 2 bits high
@@ -752,7 +754,7 @@ INTERRUPT_GEN_MEMBER(realbrk_state::interrupt)
 	m_tmp68301->external_interrupt_1();
 }
 
-static MACHINE_CONFIG_START( realbrk, realbrk_state )
+MACHINE_CONFIG_START(realbrk_state::realbrk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_32MHz / 2)          /* !! TMP68301 !! */
@@ -761,6 +763,7 @@ static MACHINE_CONFIG_START( realbrk, realbrk_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_CPU("maincpu")
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(realbrk_state,realbrk_flipscreen_w))
 
 	/* video hardware */
@@ -788,7 +791,7 @@ static MACHINE_CONFIG_START( realbrk, realbrk_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pkgnsh, realbrk )
+MACHINE_CONFIG_DERIVED(realbrk_state::pkgnsh, realbrk)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pkgnsh_mem)
 
@@ -796,12 +799,12 @@ static MACHINE_CONFIG_DERIVED( pkgnsh, realbrk )
 	MCFG_TMP68301_OUT_PARALLEL_CB(NOOP)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pkgnshdx, pkgnsh )
+MACHINE_CONFIG_DERIVED(realbrk_state::pkgnshdx, pkgnsh)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pkgnshdx_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dai2kaku, realbrk )
+MACHINE_CONFIG_DERIVED(realbrk_state::dai2kaku, realbrk)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dai2kaku_mem)
 
@@ -1083,8 +1086,8 @@ ROM_END
 
 ROM_START( realbrko )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* TMP68301 Code */
-	ROM_LOAD16_BYTE( "52302.1r", 0x000000, 0x080000, CRC(76de5e26) SHA1(d05b48f024053198fb63b1c4e5454ecb8fe302a4) )
-	ROM_LOAD16_BYTE( "52301.2r", 0x000001, 0x080000, CRC(29e979df) SHA1(61b30b2f8f16bb92a3ec1cd7abd157930f1a3f29) )
+	ROM_LOAD16_BYTE( "52302.1r", 0x000000, 0x080000, CRC(76de5e26) SHA1(d05b48f024053198fb63b1c4e5454ecb8fe302a4) ) // sldh w/realbrkj
+	ROM_LOAD16_BYTE( "52301.2r", 0x000001, 0x080000, CRC(29e979df) SHA1(61b30b2f8f16bb92a3ec1cd7abd157930f1a3f29) ) // sldh w/realbrkj
 
 	// note, the numbering on all the roms is shifted by 1 due to the sample data being split across 2 roms
 	//  this is how the board is labeled, it is not a mistake.
@@ -1106,15 +1109,15 @@ ROM_START( realbrko )
 	ROM_LOAD( "52313.14f", 0x000000, 0x200000, CRC(2b5ba1ec) SHA1(d548ef8c96b7b868c866dedb314f56583726564d) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )    /* Samples */
-	ROM_LOAD( "52303.2e", 0x000000, 0x200000, CRC(8a8a7d42) SHA1(7108203cf5a6a1603bfcbc5bde40e71ac960fffc) )
+	ROM_LOAD( "52303.2e", 0x000000, 0x200000, CRC(8a8a7d42) SHA1(7108203cf5a6a1603bfcbc5bde40e71ac960fffc) ) // sldh w/realbrkj
 	ROM_LOAD( "52304.1e", 0x200000, 0x200000, CRC(c8c5ef57) SHA1(4f363b36191f9c647fa88f07286bf9d667005553) )
 ROM_END
 
 
 ROM_START( realbrkj )
 	ROM_REGION( 0x100000, "maincpu", 0 )        /* TMP68301 Code */
-	ROM_LOAD16_BYTE( "52302.1r", 0x000000, 0x080000, CRC(ab0379b0) SHA1(67af6670f2b37a7d4d6e03508f291f8ffe64d4cb) )
-	ROM_LOAD16_BYTE( "52301.2r", 0x000001, 0x080000, CRC(9cc1596e) SHA1(a598f18eaac1ed6943069e9500b07b77e263f0d0) )
+	ROM_LOAD16_BYTE( "52302.1r", 0x000000, 0x080000, CRC(ab0379b0) SHA1(67af6670f2b37a7d4d6e03508f291f8ffe64d4cb) ) // sldh w/realbrko
+	ROM_LOAD16_BYTE( "52301.2r", 0x000001, 0x080000, CRC(9cc1596e) SHA1(a598f18eaac1ed6943069e9500b07b77e263f0d0) ) // sldh w/realbrko
 
 	ROM_REGION( 0x800000, "gfx1", 0 )   /* Backgrounds */
 	ROM_LOAD32_WORD( "52310.9b", 0x0000000, 0x400000, CRC(07dfd9f5) SHA1(8722a98adc33f56df1e3b194ce923bc987e15cbe) )
@@ -1134,7 +1137,7 @@ ROM_START( realbrkj )
 	ROM_LOAD( "52312.14f", 0x000000, 0x200000, CRC(2203d7c5) SHA1(0403f02b8f2bfc6cf98ff598eb9c2e3facc7ac4c) )
 
 	ROM_REGION( 0x400000, "ymz", 0 )    /* Samples */
-	ROM_LOAD( "52303.2e", 0x000000, 0x400000, CRC(d3005b1e) SHA1(3afd10cdbc3aa7605083a9fcf3c4b8276937c2c4) )
+	ROM_LOAD( "52303.2e", 0x000000, 0x400000, CRC(d3005b1e) SHA1(3afd10cdbc3aa7605083a9fcf3c4b8276937c2c4) ) // sldh w/realbrko
 ROM_END
 
 ROM_START( realbrkk )
@@ -1275,13 +1278,13 @@ ROM_START( dai2kaku_alt_rom_size )
 ROM_END
 #endif
 
-GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh, driver_device,   0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, pkgnsh,   0,       pkgnsh,   pkgnsh,   realbrk_state, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu (Japan)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, driver_device, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, pkgnshdx, 0,       pkgnshdx, pkgnshdx, realbrk_state, 0, ROT0, "Nakanihon / Dynax", "Pachinko Gindama Shoubu DX (Japan)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1998, realbrk,  0,       realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, realbrko, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe, older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, realbrkj, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, realbrkk, realbrk, realbrk,  realbrk, driver_device,  0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Korea)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrk,  0,       realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrko, realbrk, realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Europe, older)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrkj, realbrk, realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, realbrkk, realbrk, realbrk,  realbrk,  realbrk_state, 0, ROT0, "Nakanihon",         "Billiard Academy Real Break (Korea)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2004, dai2kaku, 0,       dai2kaku, dai2kaku, driver_device, 0, ROT0, "SystemBit",         "Dai-Dai-Kakumei (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2004, dai2kaku, 0,       dai2kaku, dai2kaku, realbrk_state, 0, ROT0, "SystemBit",         "Dai-Dai-Kakumei (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

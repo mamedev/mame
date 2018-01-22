@@ -1,9 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef __MAPLE_DC_H__
-#define __MAPLE_DC_H__
+#ifndef MAME_MACHINE_MAPLE_DC_H
+#define MAME_MACHINE_MAPLE_DC_H
 
-#include "cpu/sh4/sh4.h"
+#pragma once
+
+#include "cpu/sh/sh4.h"
 
 #define MCFG_MAPLE_DC_ADD(_tag, _maincpu_tag, _irq_cb)  \
 	MCFG_DEVICE_ADD(_tag, MAPLE_DC, 0) \
@@ -72,6 +74,6 @@ private:
 	const char *maincpu_tag;
 };
 
-extern const device_type MAPLE_DC;
+DECLARE_DEVICE_TYPE(MAPLE_DC, maple_dc_device)
 
-#endif /* __MAPLE_DC_H__ */
+#endif // MAME_MACHINE_MAPLE_DC_H

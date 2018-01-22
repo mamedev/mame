@@ -46,11 +46,14 @@ Stephh's notes (based on the game Z80 code and some tests) :
 *****************************************************************************/
 
 #include "emu.h"
+#include "includes/momoko.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "includes/momoko.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(momoko_state::momoko_bg_read_bank_w)
@@ -69,7 +72,7 @@ static ADDRESS_MAP_START( momoko_map, AS_PROGRAM, 8, momoko_state )
 	AM_RANGE(0xd404, 0xd404) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd406, 0xd406) AM_READ_PORT("DSW0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd407, 0xd407) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(momoko_fg_scrolly_w)
 	AM_RANGE(0xdc01, 0xdc01) AM_WRITE(momoko_fg_scrollx_w)
 	AM_RANGE(0xdc02, 0xdc02) AM_WRITE(momoko_fg_select_w)
@@ -250,14 +253,14 @@ void momoko_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( momoko, momoko_state )
+MACHINE_CONFIG_START(momoko_state::momoko)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5000000)   /* 5.0MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/2)   /* 5.0MHz */
 	MCFG_CPU_PROGRAM_MAP(momoko_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", momoko_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 2500000)  /* 2.5MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_10MHz/4)  /* 2.5MHz */
 	MCFG_CPU_PROGRAM_MAP(momoko_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -281,13 +284,13 @@ static MACHINE_CONFIG_START( momoko, momoko_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, 1250000)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_10MHz/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, 1250000)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_10MHz/8)
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
@@ -299,43 +302,127 @@ MACHINE_CONFIG_END
 
 ROM_START( momoko )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main CPU */
-	ROM_LOAD( "momoko03.bin", 0x0000,  0x8000, CRC(386e26ed) SHA1(ad746ed1b87bafc5b4df9a28aade58cf894f4e7b) )
-	ROM_LOAD( "momoko02.bin", 0x8000,  0x4000, CRC(4255e351) SHA1(27a0e8d8aea223d2128139582e3b66106f3608ef) )
+	ROM_LOAD( "momoko03.m6", 0x0000,  0x8000, CRC(386e26ed) SHA1(ad746ed1b87bafc5b4df9a28aade58cf894f4e7b) ) // age progression text in Japanese
+	ROM_LOAD( "momoko02.m5", 0x8000,  0x4000, CRC(4255e351) SHA1(27a0e8d8aea223d2128139582e3b66106f3608ef) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound CPU */
-	ROM_LOAD( "momoko01.bin", 0x0000,  0x8000, CRC(e8a6673c) SHA1(f8984b063929305c9058801202405e6d45254b5b) )
+	ROM_LOAD( "momoko01.u4", 0x0000,  0x8000, CRC(e8a6673c) SHA1(f8984b063929305c9058801202405e6d45254b5b) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 ) /* text */
-	ROM_LOAD( "momoko13.bin", 0x0000,  0x2000, CRC(2745cf5a) SHA1(3db7c6319cac63df1620ef25508c5c45eaa4b141) )
+	ROM_LOAD( "momoko13.u4", 0x0000,  0x2000, CRC(2745cf5a) SHA1(3db7c6319cac63df1620ef25508c5c45eaa4b141) ) // On the FP-8631 PCB
 
 	ROM_REGION( 0x2000, "gfx3", 0 ) /* FG */
-	ROM_LOAD( "momoko14.bin", 0x0000,  0x2000, CRC(cfccca05) SHA1(4ecff488a37ac76ecb9ecf8980bea30dcc9c9951) )
+	ROM_LOAD( "momoko14.p2", 0x0000,  0x2000, CRC(cfccca05) SHA1(4ecff488a37ac76ecb9ecf8980bea30dcc9c9951) )
 
 	ROM_REGION( 0x10000, "gfx4", 0 ) /* sprite */
-	ROM_LOAD16_BYTE( "momoko16.bin", 0x0000,  0x8000, CRC(fc6876fc) SHA1(b2d06bc01ef9f4db9bf8902d67f31ccbb0fea61a) )
-	ROM_LOAD16_BYTE( "momoko17.bin", 0x0001,  0x8000, CRC(45dc0247) SHA1(1b2bd4197ab7d237966e037c249b5bd623646c0b) )
+	ROM_LOAD16_BYTE( "momoko16.e5", 0x0000,  0x8000, CRC(fc6876fc) SHA1(b2d06bc01ef9f4db9bf8902d67f31ccbb0fea61a) ) // On the FP-8631 PCB
+	ROM_LOAD16_BYTE( "momoko17.e6", 0x0001,  0x8000, CRC(45dc0247) SHA1(1b2bd4197ab7d237966e037c249b5bd623646c0b) ) // On the FP-8631 PCB
 
 	ROM_REGION( 0x20000, "gfx2", 0 ) /* BG */
-	ROM_LOAD16_BYTE( "momoko09.bin", 0x00000, 0x8000, CRC(9f5847c7) SHA1(6bc9a00622d8a23446294a8d5d467375c5719125) )
-	ROM_LOAD16_BYTE( "momoko11.bin", 0x00001, 0x8000, CRC(9c9fbd43) SHA1(7adfd7ea3dd6745c14e719883f1a86e0a3b3c0ff) )
-	ROM_LOAD16_BYTE( "momoko10.bin", 0x10000, 0x8000, CRC(ae17e74b) SHA1(f52657ea6b6ac518b70fd7b811d9699da27f67d9) )
-	ROM_LOAD16_BYTE( "momoko12.bin", 0x10001, 0x8000, CRC(1e29c9c4) SHA1(d78f102cefc9852b529dd317a76c7003ec2ad3d5) )
+	ROM_LOAD16_BYTE( "momoko09.e8", 0x00000, 0x8000, CRC(9f5847c7) SHA1(6bc9a00622d8a23446294a8d5d467375c5719125) )
+	ROM_LOAD16_BYTE( "momoko11.c8", 0x00001, 0x8000, CRC(9c9fbd43) SHA1(7adfd7ea3dd6745c14e719883f1a86e0a3b3c0ff) )
+	ROM_LOAD16_BYTE( "momoko10.d8", 0x10000, 0x8000, CRC(ae17e74b) SHA1(f52657ea6b6ac518b70fd7b811d9699da27f67d9) )
+	ROM_LOAD16_BYTE( "momoko12.a8", 0x10001, 0x8000, CRC(1e29c9c4) SHA1(d78f102cefc9852b529dd317a76c7003ec2ad3d5) )
 
 	ROM_REGION( 0x20000, "user1", 0 ) /* BG map */
-	ROM_LOAD( "momoko04.bin", 0x0000,  0x8000, CRC(3ab3c2c3) SHA1(d4a0d7f83bf64769e90a2c264c6114ac308cb8b5) )
-	ROM_LOAD( "momoko05.bin", 0x8000,  0x8000, CRC(757cdd2b) SHA1(3471b42dc6458a18894dbd0638f4fe43c86dd70d) )
-	ROM_LOAD( "momoko06.bin", 0x10000, 0x8000, CRC(20cacf8b) SHA1(e2b39abfc960e1c472e2bcf0cf06825c39941c03) )
-	ROM_LOAD( "momoko07.bin", 0x18000, 0x8000, CRC(b94b38db) SHA1(9c9e45bbeca7b6b8b0051b144fb31fceaf5d6906) )
+	ROM_LOAD( "momoko04.r8", 0x0000,  0x8000, CRC(3ab3c2c3) SHA1(d4a0d7f83bf64769e90a2c264c6114ac308cb8b5) )
+	ROM_LOAD( "momoko05.p8", 0x8000,  0x8000, CRC(757cdd2b) SHA1(3471b42dc6458a18894dbd0638f4fe43c86dd70d) )
+	ROM_LOAD( "momoko06.n8", 0x10000, 0x8000, CRC(20cacf8b) SHA1(e2b39abfc960e1c472e2bcf0cf06825c39941c03) )
+	ROM_LOAD( "momoko07.l8", 0x18000, 0x8000, CRC(b94b38db) SHA1(9c9e45bbeca7b6b8b0051b144fb31fceaf5d6906) )
 
 	ROM_REGION( 0x2000, "user2", 0 ) /* BG color/priority table */
-	ROM_LOAD( "momoko08.bin", 0x0000,  0x2000, CRC(69b41702) SHA1(21b33b243dd6eaec8d41d9fd4d9e7faf2bd7f4d2) )
+	ROM_LOAD( "momoko08.h8", 0x0000,  0x2000, CRC(69b41702) SHA1(21b33b243dd6eaec8d41d9fd4d9e7faf2bd7f4d2) )
 
 	ROM_REGION( 0x4000, "user3", 0 ) /* FG map */
-	ROM_LOAD( "momoko15.bin", 0x0000,  0x4000, CRC(8028f806) SHA1(c7450d48803082f64af67fe752b6f49b71b6ff48) )
+	ROM_LOAD( "momoko15.k2", 0x0000,  0x4000, CRC(8028f806) SHA1(c7450d48803082f64af67fe752b6f49b71b6ff48) ) // On the FP-8631 PCB
 
 	ROM_REGION( 0x0120, "proms", 0 ) /* TEXT color */
 	ROM_LOAD( "momoko-c.bin", 0x0000,  0x0100, CRC(f35ccae0) SHA1(60b99dd3c96637dacba7e96a143b1a2d6ffd28b9) )
 	ROM_LOAD( "momoko-b.bin", 0x0100,  0x0020, CRC(427b0e5c) SHA1(aa2797b899571527cc96013fd3420b841954ee67) )
 ROM_END
 
-GAME( 1986, momoko, 0, momoko, momoko, driver_device, 0, ROT0, "Jaleco", "Momoko 120%", MACHINE_SUPPORTS_SAVE )
+ROM_START( momokoe )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main CPU */
+	ROM_LOAD( "3.m6", 0x0000,  0x8000, CRC(84053a7d) SHA1(6e8fb22bb48954f4fed2530991ebe5b872c9c089) ) // age progression text in English
+	ROM_LOAD( "2.m5", 0x8000,  0x4000, CRC(98ad397b) SHA1(b7ae218d0d397b1e258ec6d1f836cb998f984092) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound CPU */
+	ROM_LOAD( "momoko01.u4", 0x0000,  0x8000, CRC(e8a6673c) SHA1(f8984b063929305c9058801202405e6d45254b5b) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* text */
+	ROM_LOAD( "momoko13.u4", 0x0000,  0x2000, CRC(2745cf5a) SHA1(3db7c6319cac63df1620ef25508c5c45eaa4b141) ) // On the FP-8631 PCB
+
+	ROM_REGION( 0x2000, "gfx3", 0 ) /* FG */
+	ROM_LOAD( "momoko14.p2", 0x0000,  0x2000, CRC(cfccca05) SHA1(4ecff488a37ac76ecb9ecf8980bea30dcc9c9951) )
+
+	ROM_REGION( 0x10000, "gfx4", 0 ) /* sprite */
+	ROM_LOAD16_BYTE( "momoko16.e5", 0x0000,  0x8000, CRC(fc6876fc) SHA1(b2d06bc01ef9f4db9bf8902d67f31ccbb0fea61a) ) // On the FP-8631 PCB
+	ROM_LOAD16_BYTE( "momoko17.e6", 0x0001,  0x8000, CRC(45dc0247) SHA1(1b2bd4197ab7d237966e037c249b5bd623646c0b) ) // On the FP-8631 PCB
+
+	ROM_REGION( 0x20000, "gfx2", 0 ) /* BG */
+	ROM_LOAD16_BYTE( "momoko09.e8", 0x00000, 0x8000, CRC(9f5847c7) SHA1(6bc9a00622d8a23446294a8d5d467375c5719125) )
+	ROM_LOAD16_BYTE( "momoko11.c8", 0x00001, 0x8000, CRC(9c9fbd43) SHA1(7adfd7ea3dd6745c14e719883f1a86e0a3b3c0ff) )
+	ROM_LOAD16_BYTE( "momoko10.d8", 0x10000, 0x8000, CRC(ae17e74b) SHA1(f52657ea6b6ac518b70fd7b811d9699da27f67d9) )
+	ROM_LOAD16_BYTE( "momoko12.a8", 0x10001, 0x8000, CRC(1e29c9c4) SHA1(d78f102cefc9852b529dd317a76c7003ec2ad3d5) )
+
+	ROM_REGION( 0x20000, "user1", 0 ) /* BG map */
+	ROM_LOAD( "momoko04.r8", 0x0000,  0x8000, CRC(3ab3c2c3) SHA1(d4a0d7f83bf64769e90a2c264c6114ac308cb8b5) )
+	ROM_LOAD( "momoko05.p8", 0x8000,  0x8000, CRC(757cdd2b) SHA1(3471b42dc6458a18894dbd0638f4fe43c86dd70d) )
+	ROM_LOAD( "momoko06.n8", 0x10000, 0x8000, CRC(20cacf8b) SHA1(e2b39abfc960e1c472e2bcf0cf06825c39941c03) )
+	ROM_LOAD( "momoko07.l8", 0x18000, 0x8000, CRC(b94b38db) SHA1(9c9e45bbeca7b6b8b0051b144fb31fceaf5d6906) )
+
+	ROM_REGION( 0x2000, "user2", 0 ) /* BG color/priority table */
+	ROM_LOAD( "momoko08.h8", 0x0000,  0x2000, CRC(69b41702) SHA1(21b33b243dd6eaec8d41d9fd4d9e7faf2bd7f4d2) )
+
+	ROM_REGION( 0x4000, "user3", 0 ) /* FG map */
+	ROM_LOAD( "momoko15.k2", 0x0000,  0x4000, CRC(8028f806) SHA1(c7450d48803082f64af67fe752b6f49b71b6ff48) ) // On the FP-8631 PCB
+
+	ROM_REGION( 0x0120, "proms", 0 ) /* TEXT color */
+	ROM_LOAD( "momoko-c.bin", 0x0000,  0x0100, CRC(f35ccae0) SHA1(60b99dd3c96637dacba7e96a143b1a2d6ffd28b9) )
+	ROM_LOAD( "momoko-b.bin", 0x0100,  0x0020, CRC(427b0e5c) SHA1(aa2797b899571527cc96013fd3420b841954ee67) )
+ROM_END
+
+ROM_START( momokob ) // bootleg board, almost exact copy of an original one
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* main CPU */
+	ROM_LOAD( "3.bin", 0x0000,  0x8000, CRC(a18d7e78) SHA1(5d2dd498be3e22b5e8fc5ffe17e1ef463c1e9a02) ) // age progression text in Engrish, title screen in English
+	ROM_LOAD( "2.bin", 0x8000,  0x4000, CRC(2dcf50ed) SHA1(6d02cb86fce031859bc0a5a26ecf7a8c8b89dea3) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* sound CPU */
+	ROM_LOAD( "momoko01.u4", 0x0000,  0x8000, CRC(e8a6673c) SHA1(f8984b063929305c9058801202405e6d45254b5b) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* text */
+	ROM_LOAD( "momoko13.u4", 0x0000,  0x2000, CRC(2745cf5a) SHA1(3db7c6319cac63df1620ef25508c5c45eaa4b141) )
+
+	ROM_REGION( 0x2000, "gfx3", 0 ) /* FG */
+	ROM_LOAD( "momoko14.p2", 0x0000,  0x2000, CRC(cfccca05) SHA1(4ecff488a37ac76ecb9ecf8980bea30dcc9c9951) )
+
+	ROM_REGION( 0x10000, "gfx4", 0 ) /* sprite */
+	ROM_LOAD16_BYTE( "16.bin", 0x0000,  0x8000, CRC(49de49a1) SHA1(b4954286cba50332d4366a8160e9fbfd574c60ed) )
+	ROM_LOAD16_BYTE( "17.bin", 0x0001,  0x8000, CRC(f06a3d1a) SHA1(f377ffad958fdc9cff2baee70ce4ba9080b5fe0d) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 ) /* BG */
+	ROM_LOAD16_BYTE( "momoko09.e8", 0x00000, 0x8000, CRC(9f5847c7) SHA1(6bc9a00622d8a23446294a8d5d467375c5719125) )
+	ROM_LOAD16_BYTE( "momoko11.c8", 0x00001, 0x8000, CRC(9c9fbd43) SHA1(7adfd7ea3dd6745c14e719883f1a86e0a3b3c0ff) )
+	ROM_LOAD16_BYTE( "10.bin",      0x10000, 0x8000, CRC(68b9156d) SHA1(e157434d7ee33837ba35e720d221bf1eb21b7020) )
+	ROM_LOAD16_BYTE( "12.bin",      0x10001, 0x8000, CRC(c32f5e19) SHA1(488da565e20bf002ff3dffca1efedbdf29e6e559) )
+
+	ROM_REGION( 0x20000, "user1", 0 ) /* BG map */
+	ROM_LOAD( "4.bin",       0x0000,  0x8000, CRC(1f0226d5) SHA1(6411e85c51e23dfe6c643692987dc7eeef37538f) )
+	ROM_LOAD( "momoko05.p8", 0x8000,  0x8000, CRC(757cdd2b) SHA1(3471b42dc6458a18894dbd0638f4fe43c86dd70d) )
+	ROM_LOAD( "momoko06.n8", 0x10000, 0x8000, CRC(20cacf8b) SHA1(e2b39abfc960e1c472e2bcf0cf06825c39941c03) )
+	ROM_LOAD( "momoko07.l8", 0x18000, 0x8000, CRC(b94b38db) SHA1(9c9e45bbeca7b6b8b0051b144fb31fceaf5d6906) )
+
+	ROM_REGION( 0x2000, "user2", 0 ) /* BG color/priority table */
+	ROM_LOAD( "momoko08.h8", 0x0000,  0x2000, CRC(69b41702) SHA1(21b33b243dd6eaec8d41d9fd4d9e7faf2bd7f4d2) )
+
+	ROM_REGION( 0x4000, "user3", 0 ) /* FG map */
+	ROM_LOAD( "momoko15.k2", 0x0000,  0x4000, CRC(8028f806) SHA1(c7450d48803082f64af67fe752b6f49b71b6ff48) )
+
+	ROM_REGION( 0x0120, "proms", 0 ) /* TEXT color */
+	ROM_LOAD( "momoko-c.bin", 0x0000,  0x0100, CRC(f35ccae0) SHA1(60b99dd3c96637dacba7e96a143b1a2d6ffd28b9) )
+	ROM_LOAD( "momoko-b.bin", 0x0100,  0x0020, CRC(427b0e5c) SHA1(aa2797b899571527cc96013fd3420b841954ee67) )
+ROM_END
+
+GAME( 1986, momoko,       0, momoko, momoko, momoko_state, 0, ROT0, "Jaleco",  "Momoko 120% (Japanese text)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, momokoe, momoko, momoko, momoko, momoko_state, 0, ROT0, "Jaleco",  "Momoko 120% (English text)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1986, momokob, momoko, momoko, momoko, momoko_state, 0, ROT0, "bootleg", "Momoko 120% (bootleg)",       MACHINE_SUPPORTS_SAVE )

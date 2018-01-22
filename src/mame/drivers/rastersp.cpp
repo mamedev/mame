@@ -22,8 +22,11 @@
 #include "machine/mc146818.h"
 #include "machine/nscsi_hd.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 /*************************************
  *
@@ -141,6 +144,8 @@ public:
 	void    update_irq(uint32_t which, uint32_t state);
 	void    upload_palette(uint32_t word1, uint32_t word2);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	static void ncr53c700(device_t *device);
+	void rastersp(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
@@ -642,11 +647,11 @@ WRITE32_MEMBER( rastersp_state::dsp_ctrl_w )
 WRITE32_MEMBER( rastersp_state::dsp_speedup_w )
 {
 	// 809e90  48fd, 48d5
-	if (space.device().safe_pc() == 0x809c23)
+	if (m_dsp->pc() == 0x809c23)
 	{
-		int32_t cycles_left = space.device().execute().cycles_remaining();
+		int32_t cycles_left = m_dsp->cycles_remaining();
 		data += cycles_left / 6;
-		space.device().execute().spin();
+		m_dsp->spin();
 	}
 
 	m_speedup_count = data;
@@ -826,12 +831,15 @@ WRITE32_MEMBER(rastersp_state::ncr53c700_write)
 	m_maincpu->space(AS_PROGRAM).write_dword(offset, data, mem_mask);
 }
 
-static MACHINE_CONFIG_FRAGMENT( ncr53c700 )
+void rastersp_state::ncr53c700(device_t *device)
+{
+	devcb_base *devcb;
+	(void)devcb;
 	MCFG_DEVICE_CLOCK(66000000)
 	MCFG_NCR53C7XX_IRQ_HANDLER(DEVWRITELINE(":", rastersp_state, scsi_irq))
 	MCFG_NCR53C7XX_HOST_READ(DEVREAD32(":", rastersp_state, ncr53c700_read))
 	MCFG_NCR53C7XX_HOST_WRITE(DEVWRITE32(":", rastersp_state, ncr53c700_write))
-MACHINE_CONFIG_END
+}
 
 static SLOT_INTERFACE_START( rastersp_scsi_devices )
 	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
@@ -845,7 +853,7 @@ SLOT_INTERFACE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( rastersp, rastersp_state )
+MACHINE_CONFIG_START(rastersp_state::rastersp)
 	MCFG_CPU_ADD("maincpu", I486, 33330000)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -952,5 +960,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, rotr, 0, rastersp, rotr, driver_device, 0, ROT0, "BFM/Mirage", "Rise of the Robots (prototype)", 0 )
-GAME( 1997, fbcrazy, 0, rastersp, rotr, driver_device, 0, ROT0, "BFM", "Football Crazy (Video Quiz)", MACHINE_NOT_WORKING )
+GAME( 1994, rotr,    0, rastersp, rotr, rastersp_state, 0, ROT0, "BFM/Mirage", "Rise of the Robots (prototype)", 0 )
+GAME( 1997, fbcrazy, 0, rastersp, rotr, rastersp_state, 0, ROT0, "BFM",        "Football Crazy (Video Quiz)",    MACHINE_NOT_WORKING )

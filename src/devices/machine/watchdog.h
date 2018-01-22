@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 
-#pragma once
+#ifndef MAME_MACHINE_WATCHDOG_H
+#define MAME_MACHINE_WATCHDOG_H
 
-#ifndef __WATCHDOG_H__
-#define __WATCHDOG_H__
+#pragma once
 
 
 //**************************************************************************
@@ -78,7 +78,7 @@ private:
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-extern const device_type WATCHDOG_TIMER;
+DECLARE_DEVICE_TYPE(WATCHDOG_TIMER, watchdog_timer_device)
 
 
-#endif
+#endif // MAME_MACHINE_WATCHDOG_H

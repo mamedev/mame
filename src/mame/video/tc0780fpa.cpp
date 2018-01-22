@@ -390,21 +390,11 @@ void tc0780fpa_renderer::render(uint16_t *polygon_fifo, int length)
 	}
 }
 
-const device_type TC0780FPA = &device_creator<tc0780fpa_device>;
+DEFINE_DEVICE_TYPE(TC0780FPA, tc0780fpa_device, "tc0780fpa", "TC0780FPA Polygon Renderer")
 
 tc0780fpa_device::tc0780fpa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TC0780FPA, "TC0780FPA Polygon Renderer", tag, owner, clock, "tc0780fpa", __FILE__),
-	device_video_interface(mconfig, *this)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tc0780fpa_device::device_config_complete()
+	: device_t(mconfig, TC0780FPA, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
 {
 }
 
@@ -417,7 +407,7 @@ void tc0780fpa_device::device_start()
 	m_texture = std::make_unique<uint8_t[]>(0x400000);
 	m_poly_fifo = std::make_unique<uint16_t[]>(POLY_FIFO_SIZE);
 
-	m_renderer = std::make_unique<tc0780fpa_renderer>(*this, *m_screen, m_texture.get());
+	m_renderer = std::make_unique<tc0780fpa_renderer>(*this, screen(), m_texture.get());
 
 	save_pointer(NAME(m_texture.get()), 0x400000);
 	save_pointer(NAME(m_poly_fifo.get()), POLY_FIFO_SIZE);

@@ -15,8 +15,9 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
-#include "video/mc6845.h"
 #include "machine/am9517a.h"
+#include "video/mc6845.h"
+#include "screen.h"
 
 
 
@@ -54,6 +55,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void b16(machine_config &config);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -268,7 +270,7 @@ WRITE8_MEMBER(b16_state::memory_write_byte)
 }
 
 
-static MACHINE_CONFIG_START( b16, b16_state )
+MACHINE_CONFIG_START(b16_state::b16)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8086, XTAL_14_31818MHz/2) //unknown xtal
 	MCFG_CPU_PROGRAM_MAP(b16_map)
@@ -308,5 +310,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE     INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1983, b16,  0,      0,       b16,      b16, driver_device,   0,      "Hitachi",   "B16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME  PARENT  COMPAT   MACHINE   INPUT  STATE      INIT  COMPANY    FULLNAME  FLAGS */
+COMP( 1983, b16,  0,      0,       b16,      b16,   b16_state, 0,    "Hitachi", "B16",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

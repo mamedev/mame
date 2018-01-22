@@ -56,8 +56,6 @@ public:
 	DECLARE_READ8_MEMBER(shift_r);
 	DECLARE_READ8_MEMBER(shift_rev_r);
 	DECLARE_WRITE8_MEMBER(madalien_output_w);
-	DECLARE_WRITE8_MEMBER(madalien_sound_command_w);
-	DECLARE_READ8_MEMBER(madalien_sound_command_r);
 	DECLARE_WRITE8_MEMBER(madalien_videoram_w);
 	DECLARE_WRITE8_MEMBER(madalien_charram_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
@@ -85,10 +83,9 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
+	void madalien(machine_config &config);
+	void madalien_video(machine_config &config);
 };
-/*----------- defined in video/madalien.c -----------*/
-
-MACHINE_CONFIG_EXTERN( madalien_video );
 
 /*----------- defined in audio/madalien.c -----------*/
 

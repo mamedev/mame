@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MB8795_H
-#define MB8795_H
+#ifndef MAME_MACHINE_MB8795_H
+#define MAME_MACHINE_MB8795_H
 
 #define MCFG_MB8795_ADD(_tag, _tx_irq, _rx_irq, _tx_drq, _rx_drq)    \
 	MCFG_DEVICE_ADD(_tag, MB8795, 0)                                 \
@@ -26,10 +26,10 @@ class mb8795_device :   public device_t,
 public:
 	mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_tx_irq_wr_callback(device_t &device, _Object object) { return downcast<mb8795_device &>(device).irq_tx_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_rx_irq_wr_callback(device_t &device, _Object object) { return downcast<mb8795_device &>(device).irq_rx_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_tx_drq_wr_callback(device_t &device, _Object object) { return downcast<mb8795_device &>(device).drq_tx_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_rx_drq_wr_callback(device_t &device, _Object object) { return downcast<mb8795_device &>(device).drq_rx_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_tx_irq_wr_callback(device_t &device, Object &&cb) { return downcast<mb8795_device &>(device).irq_tx_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rx_irq_wr_callback(device_t &device, Object &&cb) { return downcast<mb8795_device &>(device).irq_rx_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_tx_drq_wr_callback(device_t &device, Object &&cb) { return downcast<mb8795_device &>(device).drq_tx_cb.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rx_drq_wr_callback(device_t &device, Object &&cb) { return downcast<mb8795_device &>(device).drq_rx_cb.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_ADDRESS_MAP(map, 8);
 
@@ -120,5 +120,6 @@ private:
 };
 
 extern const device_type MB8795;
+DECLARE_DEVICE_TYPE(MB8795, mb8795_device)
 
-#endif
+#endif // MAME_MACHINE_MB8795_H

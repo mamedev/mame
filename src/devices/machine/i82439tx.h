@@ -2,8 +2,10 @@
 // copyright-holders:Olivier Galibert
 // Intel i82439hx northbridge (440hx)
 
-#ifndef I82439TX_H
-#define I82439TX_H
+#ifndef MAME_MACHINE_I82439TX_H
+#define MAME_MACHINE_I82439TX_H
+
+#pragma once
 
 #include "pci.h"
 
@@ -29,10 +31,8 @@ public:
 	DECLARE_WRITE8_MEMBER(dramc_w);
 	DECLARE_READ8_MEMBER (dramt_r);
 	DECLARE_WRITE8_MEMBER(dramt_w);
-	DECLARE_READ8_MEMBER (pam0_r);
-	DECLARE_WRITE8_MEMBER(pam0_w);
-	DECLARE_READ8_MEMBER (pam3_r);
-	DECLARE_WRITE8_MEMBER(pam3_w);
+	DECLARE_READ8_MEMBER (pam_r);
+	DECLARE_WRITE8_MEMBER(pam_w);
 	DECLARE_READ8_MEMBER (drb_r);
 	DECLARE_WRITE8_MEMBER(drb_w);
 	DECLARE_READ8_MEMBER (drt_r);
@@ -69,6 +69,6 @@ private:
 	uint8_t drt, drat, smram, errcmd, errsts, errsyn;
 };
 
-extern const device_type I82439TX_NEW;
+DECLARE_DEVICE_TYPE(I82439TX_NEW, i82439tx_host_device)
 
-#endif
+#endif // MAME_MACHINE_I82439TX_H

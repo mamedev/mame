@@ -6,14 +6,13 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_ADAMNET_KB_H
+#define MAME_BUS_ADAMNET_KB_H
+
 #pragma once
 
-#ifndef __ADAM_KB__
-#define __ADAM_KB__
-
-#include "emu.h"
 #include "adamnet.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 
 
 
@@ -30,11 +29,6 @@ public:
 	// construction/destruction
 	adam_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	// not really public
 	DECLARE_READ8_MEMBER( p1_r );
 	DECLARE_READ8_MEMBER( p2_r );
@@ -48,6 +42,11 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+
 	// device_adamnet_card_interface overrides
 	virtual void adamnet_reset_w(int state) override;
 
@@ -59,8 +58,8 @@ protected:
 
 
 // device type definition
-extern const device_type ADAM_KB;
+DECLARE_DEVICE_TYPE(ADAM_KB, adam_keyboard_device)
 
 
 
-#endif
+#endif // MAME_BUS_ADAMNET_KB_H

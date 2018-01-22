@@ -8,7 +8,12 @@
     Skeleton by R. Belmont
 
     TODO:
-    - currently asserts by selecting a s3 video bank above 1M (register 0x6a)
+    - currently asserts by selecting a s3 video bank above 1M (register 0x6a)z
+
+    - The version is labeled "SQ05" in the filesystem but has the 1999 release year.
+      Other components are labeled "v0.5", but the game doesn't boot far enough to see if
+      any graphics have version information. There appears to also be a "Savage Quest 2.1" which
+      is undumped.
 
     PCI list:
     Bus no. Device No. Func No. Vendor ID Device ID Device Class          IRQ
@@ -108,6 +113,7 @@ public:
 	DECLARE_READ8_MEMBER(smram_r);
 	DECLARE_WRITE8_MEMBER(smram_w);
 
+	void savquest(machine_config &config);
 protected:
 
 
@@ -797,7 +803,7 @@ SLOT_INTERFACE_START( savquest_isa16_cards )
 	SLOT_INTERFACE("sb16", ISA16_SOUND_BLASTER_16)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( savquest, savquest_state )
+MACHINE_CONFIG_START(savquest_state::savquest)
 	MCFG_CPU_ADD("maincpu", PENTIUM2, 450000000) // actually Pentium II 450
 	MCFG_CPU_PROGRAM_MAP(savquest_map)
 	MCFG_CPU_IO_MAP(savquest_io)
@@ -850,4 +856,4 @@ ROM_START( savquest )
 ROM_END
 
 
-GAME(1999, savquest, 0, savquest, savquest, driver_device, 0, ROT0, "Interactive Light", "Savage Quest", MACHINE_IS_SKELETON)
+GAME(1999, savquest, 0, savquest, savquest, savquest_state, 0, ROT0, "Interactive Light", "Savage Quest", MACHINE_IS_SKELETON)

@@ -8,18 +8,18 @@
  *
  ****************************************************************************/
 
-#ifndef LISA_H_
-#define LISA_H_
+#ifndef MAME_INCLUDES_LISA_H
+#define MAME_INCLUDES_LISA_H
 
-#include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/74259.h"
+#include "machine/6522via.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"
-#include "machine/6522via.h"
-#include "machine/nvram.h"
 #include "machine/applefdc.h"
+#include "machine/nvram.h"
 #include "machine/sonydriv.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
 
 #define COP421_TAG      "u9f"
 #define KB_COP421_TAG   "kbcop"
@@ -86,7 +86,7 @@ struct lisa_features_t
 										I simply don't understand : in one case the VIA is
 										connected to the 68k E clock, which is CPUCK/10, and in
 										another case, to a generated PH2 clock which is CPUCK/4,
-										with additionnal logic to keep it in phase with the 68k
+										with additional logic to keep it in phase with the 68k
 										memory cycle.  After hearing the beep when MacWorks XL
 										boots, I bet the correct values are .625 MHz and .5 MHz.
 										Maybe the schematics are wrong, and PH2 is CPUCK/8.
@@ -110,6 +110,7 @@ public:
 		m_scc(*this, "scc"),
 		m_speaker(*this, "speaker"),
 		m_nvram(*this, "nvram"),
+		m_latch(*this, "latch"),
 		m_fdc_rom(*this,"fdc_rom"),
 		m_fdc_ram(*this,"fdc_ram"),
 		m_io_line0(*this, "LINE0"),
@@ -132,6 +133,7 @@ public:
 	required_device<scc8530_t> m_scc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<nvram_device> m_nvram;
+	required_device<ls259_device> m_latch;
 
 	required_shared_ptr<uint8_t> m_fdc_rom;
 	required_shared_ptr<uint8_t> m_fdc_ram;
@@ -182,6 +184,7 @@ public:
 	int m_mouse_data_offset;
 	int m_COPS_force_unplug;
 	emu_timer *m_mouse_timer;
+	emu_timer *m_cops_ready_timer;
 	int m_hold_COPS_data;
 	int m_NMIcode;
 	clock_regs_t m_clock_regs;
@@ -196,6 +199,14 @@ public:
 	DECLARE_WRITE16_MEMBER(lisa_w);
 	DECLARE_READ16_MEMBER(lisa_IO_r);
 	DECLARE_WRITE16_MEMBER(lisa_IO_w);
+	DECLARE_WRITE_LINE_MEMBER(diag1_w);
+	DECLARE_WRITE_LINE_MEMBER(diag2_w);
+	DECLARE_WRITE_LINE_MEMBER(seg1_w);
+	DECLARE_WRITE_LINE_MEMBER(seg2_w);
+	DECLARE_WRITE_LINE_MEMBER(setup_w);
+	DECLARE_WRITE_LINE_MEMBER(vtmsk_w);
+	DECLARE_WRITE_LINE_MEMBER(sfmsk_w);
+	DECLARE_WRITE_LINE_MEMBER(hdmsk_w);
 
 	DECLARE_DRIVER_INIT(lisa210);
 	DECLARE_DRIVER_INIT(mac_xl);
@@ -227,6 +238,9 @@ public:
 	void scan_keyboard();
 	void unplug_keyboard();
 	void plug_keyboard();
+	void lisa(machine_config &config);
+	void lisa210(machine_config &config);
+	void macxl(machine_config &config);
 };
 
-#endif /* LISA_H_ */
+#endif // MAME_INCLUDES_LISA_H

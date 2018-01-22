@@ -97,7 +97,7 @@ namespace sol {
 				for (lua_Integer i = 0; ; i += lua_size<V>::value, lua_pop(L, lua_size<V>::value)) {
 					for (int vi = 0; vi < lua_size<V>::value; ++vi) {
 						type t = static_cast<type>(lua_geti(L, index, i + vi));
-						if (t == type::nil) {
+						if (t == type::lua_nil) {
 							if (i == 0) {
 								continue;
 							}
@@ -116,7 +116,7 @@ namespace sol {
 						lua_pushinteger(L, i);
 						lua_gettable(L, index);
 						type t = type_of(L, -1);
-						if (t == type::nil) {
+						if (t == type::lua_nil) {
 							if (i == 0) {
 								continue;
 							}
@@ -269,7 +269,7 @@ namespace sol {
 				if (len < 1)
 					return std::wstring();
 				if (sizeof(wchar_t) == 2) {
-					std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
+					static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
 					std::wstring r = convert.from_bytes(str, str + len);
 #ifdef __MINGW32__
 					// Fuck you, MinGW, and fuck you libstdc++ for introducing this absolutely asinine bug
@@ -282,7 +282,7 @@ namespace sol {
 #endif 
 					return r;
 				}
-				std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
+				static std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
 				std::wstring r = convert.from_bytes(str, str + len);
 				return r;
 			}
@@ -297,12 +297,12 @@ namespace sol {
 				if (len < 1)
 					return std::u16string();
 #ifdef _MSC_VER
-				std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
+				static std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
 				auto intd = convert.from_bytes(str, str + len);
 				std::u16string r(intd.size(), '\0');
 				std::memcpy(&r[0], intd.data(), intd.size() * sizeof(char16_t));
 #else
-				std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+				static std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
 				std::u16string r = convert.from_bytes(str, str + len);
 #endif // VC++ is a shit
 				return r;
@@ -318,12 +318,12 @@ namespace sol {
 				if (len < 1)
 					return std::u32string();
 #ifdef _MSC_VER
-				std::wstring_convert<std::codecvt_utf8<int32_t>, int32_t> convert;
+				static std::wstring_convert<std::codecvt_utf8<int32_t>, int32_t> convert;
 				auto intd = convert.from_bytes(str, str + len);
 				std::u32string r(intd.size(), '\0');
 				std::memcpy(&r[0], intd.data(), r.size() * sizeof(char32_t));
 #else
-				std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
+				static std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
 				std::u32string r = convert.from_bytes(str, str + len);
 #endif // VC++ is a shit
 				return r;
@@ -368,10 +368,10 @@ namespace sol {
 		};
 
 		template<>
-		struct getter<nil_t> {
-			static nil_t get(lua_State*, int, record& tracking) {
+		struct getter<lua_nil_t> {
+			static lua_nil_t get(lua_State*, int, record& tracking) {
 				tracking.use(1);
-				return nil;
+				return lua_nil;
 			}
 		};
 
@@ -438,14 +438,14 @@ namespace sol {
 
 		template<typename T>
 		struct getter<detail::as_value_tag<T>> {
-			static T* get_no_nil(lua_State* L, int index, record& tracking) {
+			static T* get_no_lua_nil(lua_State* L, int index, record& tracking) {
 				tracking.use(1);
 				void** pudata = static_cast<void**>(lua_touserdata(L, index));
 				void* udata = *pudata;
-				return get_no_nil_from(L, udata, index, tracking);
+				return get_no_lua_nil_from(L, udata, index, tracking);
 			}
 
-			static T* get_no_nil_from(lua_State* L, void* udata, int index, record&) {
+			static T* get_no_lua_nil_from(lua_State* L, void* udata, int index, record&) {
 				if (detail::has_derived<T>::value && luaL_getmetafield(L, index, &detail::base_class_cast_key()[0]) != 0) {
 					void* basecastdata = lua_touserdata(L, -1);
 					detail::inheritance_cast_function ic = (detail::inheritance_cast_function)basecastdata;
@@ -458,7 +458,7 @@ namespace sol {
 			}
 			
 			static T& get(lua_State* L, int index, record& tracking) {
-				return *get_no_nil(L, index, tracking);
+				return *get_no_lua_nil(L, index, tracking);
 			}
 		};
 
@@ -466,18 +466,18 @@ namespace sol {
 		struct getter<detail::as_pointer_tag<T>> {
 			static T* get(lua_State* L, int index, record& tracking) {
 				type t = type_of(L, index);
-				if (t == type::nil) {
+				if (t == type::lua_nil) {
 					tracking.use(1);
 					return nullptr;
 				}
-				return getter<detail::as_value_tag<T>>::get_no_nil(L, index, tracking);
+				return getter<detail::as_value_tag<T>>::get_no_lua_nil(L, index, tracking);
 			}
 		};
 
 		template<typename T>
 		struct getter<non_null<T*>> {
 			static T* get(lua_State* L, int index, record& tracking) {
-				return getter<detail::as_value_tag<T>>::get_no_nil(L, index, tracking);
+				return getter<detail::as_value_tag<T>>::get_no_lua_nil(L, index, tracking);
 			}
 		};
 

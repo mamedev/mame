@@ -161,7 +161,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 	bool single_step() const { return m_single_step; }
 	ui_options &options() { return m_ui_options; }
-	ui::machine_info &machine_info() const { assert(m_machine_info != nullptr); return *m_machine_info; }
+	ui::machine_info &machine_info() const { assert(m_machine_info); return *m_machine_info; }
 
 	// setters
 	void set_single_step(bool single_step) { m_single_step = single_step; }
@@ -243,9 +243,9 @@ private:
 	bool                    m_show_profiler;
 	osd_ticks_t             m_popup_text_end;
 	std::unique_ptr<uint8_t[]> m_non_char_keys_down;
+	bitmap_argb32           m_mouse_bitmap;
 	render_texture *        m_mouse_arrow_texture;
 	bool                    m_mouse_show;
-	bool                    m_load_save_hold;
 	ui_options              m_ui_options;
 
 	std::unique_ptr<ui::machine_info> m_machine_info;
@@ -267,7 +267,7 @@ private:
 
 	// private methods
 	void exit();
-	slider_state* slider_alloc(running_machine &machine, int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg);
+	std::unique_ptr<slider_state> slider_alloc(int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg);
 
 	// slider controls
 	virtual int32_t slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval) override;
@@ -297,6 +297,8 @@ private:
 	int32_t slider_crossscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
 	int32_t slider_crossoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
 	#endif
+
+	std::vector<std::unique_ptr<slider_state>> m_sliders;
 };
 
 

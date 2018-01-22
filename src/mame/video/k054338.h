@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_VIDEO_K054338_H
+#define MAME_VIDEO_K054338_H
+
 #pragma once
-#ifndef __K054338_H__
-#define __K054338_H__
 
 #include "k055555.h"
 
@@ -26,7 +27,6 @@ class k054338_device : public device_t,
 {
 public:
 	k054338_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~k054338_device() {}
 
 	// static configuration
 	static void set_mixer_tag(device_t &device, const char  *tag) { downcast<k054338_device &>(device).m_k055555_tag = tag; }
@@ -60,7 +60,7 @@ private:
 	k055555_device *m_k055555;  /* used to fill BG color */
 };
 
-extern const device_type K054338;
+DECLARE_DEVICE_TYPE(K054338, k054338_device)
 
 
 #define MCFG_K054338_MIXER(_tag) \
@@ -71,4 +71,4 @@ extern const device_type K054338;
 
 #define MCFG_K054338_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
-#endif
+#endif // MAME_VIDEO_K054338_H

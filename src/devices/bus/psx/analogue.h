@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
-#ifndef PSXANALOG_H_
-#define PSXANALOG_H_
+#ifndef MAME_BUS_PSX_ANALOGUE_H
+#define MAME_BUS_PSX_ANALOGUE_H
+
+#pragma once
 
 #include "ctlrport.h"
 
@@ -12,20 +14,21 @@ class psx_analog_controller_device :    public device_t,
 										public device_psx_controller_interface
 {
 public:
-	psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	virtual ioport_constructor device_input_ports() const override;
 	DECLARE_INPUT_CHANGED_MEMBER(change_mode);
 protected:
+	enum class model { JOYSTICK, DUALSHOCK };
+
+	psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, model mod);
+
+	virtual void device_start() override { }
 	virtual void device_reset() override;
-	virtual void device_start() override {}
-	enum {
-		JOYSTICK,
-		DUALSHOCK
-	} m_type;
+
 private:
 	virtual bool get_pad(int count, uint8_t *odata, uint8_t idata) override;
 	uint8_t pad_data(int count, bool analog);
+
+	const model m_model;
 
 	bool m_confmode;
 	bool m_analogmode;
@@ -54,4 +57,4 @@ public:
 	psx_analog_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-#endif /* PSXANALOG_H_ */
+#endif // MAME_BUS_PSX_ANALOGUE_H

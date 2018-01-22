@@ -1,32 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver,Aaron Giles,Bernd Wiebelt,Allard van der Bas
-#ifndef __VECTOR__
-#define __VECTOR__
+#ifndef MAME_VIDEO_VECTOR_H
+#define MAME_VIDEO_VECTOR_H
 
-#define VECTOR_COLOR111(c) \
-	rgb_t(pal1bit((c) >> 2), pal1bit((c) >> 1), pal1bit((c) >> 0))
+#pragma once
 
-#define VECTOR_COLOR222(c) \
-	rgb_t(pal2bit((c) >> 4), pal2bit((c) >> 2), pal2bit((c) >> 0))
-
-#define VECTOR_COLOR444(c) \
-	rgb_t(pal4bit((c) >> 8), pal4bit((c) >> 4), pal4bit((c) >> 0))
 
 class vector_device;
-
-/* The vertices are buffered here */
-struct point
-{
-	point() :
-		x(0),
-		y(0),
-		col(0),
-		intensity(0) {}
-
-	int x; int y;
-	rgb_t col;
-	int intensity;
-};
 
 class vector_options
 {
@@ -45,6 +25,10 @@ protected:
 class vector_device : public device_t, public device_video_interface
 {
 public:
+	template <typename T> static constexpr rgb_t color111(T c) { return rgb_t(pal1bit(c >> 2), pal1bit(c >> 1), pal1bit(c >> 0)); }
+	template <typename T> static constexpr rgb_t color222(T c) { return rgb_t(pal2bit(c >> 4), pal2bit(c >> 2), pal2bit(c >> 0)); }
+	template <typename T> static constexpr rgb_t color444(T c) { return rgb_t(pal4bit(c >> 8), pal4bit(c >> 4), pal4bit(c >> 0)); }
+
 	// construction/destruction
 	vector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -57,6 +41,16 @@ public:
 	virtual void device_start() override;
 
 private:
+	/* The vertices are buffered here */
+	struct point
+	{
+		point() : x(0), y(0), col(0), intensity(0) { }
+
+		int x; int y;
+		rgb_t col;
+		int intensity;
+	};
+
 	std::unique_ptr<point[]> m_vector_list;
 	int m_vector_index;
 	int m_min_intensity;
@@ -66,9 +60,9 @@ private:
 };
 
 // device type definition
-extern const device_type VECTOR;
+DECLARE_DEVICE_TYPE(VECTOR, vector_device)
 
 #define MCFG_VECTOR_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, VECTOR, 0)
 
-#endif
+#endif // MAME_VIDEO_VECTOR_H

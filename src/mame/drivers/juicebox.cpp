@@ -15,7 +15,10 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "rendlay.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 //#define JUICEBOX_ENTER_DEBUG_MENU
 //#define JUICEBOX_DISPLAY_ROM_ID
@@ -62,6 +65,7 @@ public:
 	DECLARE_READ32_MEMBER(s3c44b0_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c44b0_gpio_port_w);
 	DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
+	void juicebox(machine_config &config);
 };
 
 inline void juicebox_state::verboselog(int n_level, const char *s_fmt, ...)
@@ -198,7 +202,7 @@ READ32_MEMBER(juicebox_state::s3c44b0_gpio_port_r)
 		}
 		break;
 	}
-//  data = ((rand() & 0xFF) << 24) | ((rand() & 0xFF) << 16) | ((rand() & 0xFF) << 8) | ((rand() & 0xFF) << 0);
+//  data = ((machine().rand() & 0xFF) << 24) | ((machine().rand() & 0xFF) << 16) | ((machine().rand() & 0xFF) << 8) | ((machine().rand() & 0xFF) << 0);
 	return data;
 }
 
@@ -298,7 +302,7 @@ DRIVER_INIT_MEMBER(juicebox_state,juicebox)
 	// do nothing
 }
 
-static MACHINE_CONFIG_START( juicebox, juicebox_state )
+MACHINE_CONFIG_START(juicebox_state::juicebox)
 	MCFG_CPU_ADD("maincpu", ARM7, 66000000)
 	MCFG_CPU_PROGRAM_MAP(juicebox_map)
 

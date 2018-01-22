@@ -71,14 +71,14 @@
 
 #include "emu.h"
 #include "includes/route16.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 
-
-
-
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -89,7 +89,7 @@
 
 
 
-WRITE8_MEMBER(route16_state::route16_sharedram_w)
+template<bool cpu1> WRITE8_MEMBER(route16_state::route16_sharedram_w)
 {
 	m_sharedram[offset] = data;
 
@@ -97,7 +97,7 @@ WRITE8_MEMBER(route16_state::route16_sharedram_w)
 	if (offset >= 0x0313 && offset <= 0x0319 && data == 0xff)
 	{
 		// Let the other CPU run
-		space.device().execute().yield();
+		(cpu1 ? m_cpu1 : m_cpu2)->yield();
 	}
 }
 
@@ -147,7 +147,7 @@ WRITE8_MEMBER(route16_state::ttmahjng_input_port_matrix_w)
 }
 
 
-READ8_MEMBER(route16_state::ttmahjng_input_port_matrix_r)
+READ8_MEMBER(route16_state::ttmahjng_p1_matrix_r)
 {
 	uint8_t ret = 0;
 
@@ -163,6 +163,21 @@ READ8_MEMBER(route16_state::ttmahjng_input_port_matrix_r)
 	return ret;
 }
 
+READ8_MEMBER(route16_state::ttmahjng_p2_matrix_r)
+{
+	uint8_t ret = 0;
+
+	switch (m_ttmahjng_port_select)
+	{
+	case 1:  ret = ioport("KEY4")->read(); break;
+	case 2:  ret = ioport("KEY5")->read(); break;
+	case 4:  ret = ioport("KEY6")->read(); break;
+	case 8:  ret = ioport("KEY7")->read(); break;
+	default: break;
+	}
+
+	return ret;
+}
 
 
 /***************************************************************************
@@ -203,9 +218,9 @@ WRITE8_MEMBER(route16_state::speakres_out2_w)
  *************************************/
 
 static ADDRESS_MAP_START( route16_cpu1_map, AS_PROGRAM, 8, route16_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	/*AM_RANGE(0x3000, 0x3001) AM_NOP   protection device */
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w) AM_SHARE("sharedram")
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x3000, 0x3001) AM_READ(route16_prot_read)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<true>) AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
@@ -215,7 +230,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( routex_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w) AM_SHARE("sharedram")
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<true>) AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
@@ -249,8 +264,8 @@ static ADDRESS_MAP_START( ttmahjng_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
-	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0") AM_WRITE(out1_w)
-	AM_RANGE(0x5800, 0x5800) AM_READWRITE(ttmahjng_input_port_matrix_r, ttmahjng_input_port_matrix_w)
+	AM_RANGE(0x5000, 0x5000) AM_READ(ttmahjng_p2_matrix_r) AM_WRITE(out1_w)
+	AM_RANGE(0x5800, 0x5800) AM_READWRITE(ttmahjng_p1_matrix_r, ttmahjng_input_port_matrix_w)
 	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE("ay8910", ay8910_device, data_w)
 	AM_RANGE(0x6900, 0x6900) AM_DEVWRITE("ay8910", ay8910_device, address_w)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram1")
@@ -259,7 +274,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( route16_cpu2_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w) AM_SHARE("sharedram")
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<false>) AM_SHARE("sharedram")
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram2")
 ADDRESS_MAP_END
 
@@ -492,37 +507,27 @@ static INPUT_PORTS_START( ttmahjng )
 	PORT_DIPSETTING(    0x00, "00" )
 	PORT_DIPSETTING(    0x80, "80" )
 
-	PORT_START("IN0")       /* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_START("KEY0")      /* IN2 */
+	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )     // START2?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY1")      /* IN3 */
+	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )     // START1?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY2")      /* IN4 */
+	PORT_START("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
@@ -532,7 +537,7 @@ static INPUT_PORTS_START( ttmahjng )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY3")      /* IN5 */
+	PORT_START("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
@@ -541,6 +546,46 @@ static INPUT_PORTS_START( ttmahjng )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY6")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("KEY7")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
 MACHINE_START_MEMBER(route16_state, speakres)
@@ -553,8 +598,12 @@ MACHINE_START_MEMBER(route16_state, ttmahjng)
 	save_item(NAME(m_ttmahjng_port_select));
 }
 
+DRIVER_INIT_MEMBER(route16_state, route16)
+{
+	save_item(NAME(m_protection_data));
+}
 
-static MACHINE_CONFIG_START( route16, route16_state )
+MACHINE_CONFIG_START(route16_state::route16)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
@@ -582,7 +631,7 @@ static MACHINE_CONFIG_START( route16, route16_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( routex, route16 )
+MACHINE_CONFIG_DERIVED(route16_state::routex, route16)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -590,7 +639,7 @@ static MACHINE_CONFIG_DERIVED( routex, route16 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stratvox, route16 )
+MACHINE_CONFIG_DERIVED(route16_state::stratvox, route16)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -630,7 +679,7 @@ static MACHINE_CONFIG_DERIVED( stratvox, route16 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( speakres, stratvox )
+MACHINE_CONFIG_DERIVED(route16_state::speakres, stratvox)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -640,7 +689,7 @@ static MACHINE_CONFIG_DERIVED( speakres, stratvox )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spacecho, speakres )
+MACHINE_CONFIG_DERIVED(route16_state::spacecho, speakres)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -648,7 +697,7 @@ static MACHINE_CONFIG_DERIVED( spacecho, speakres )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ttmahjng, route16 )
+MACHINE_CONFIG_DERIVED(route16_state::ttmahjng, route16)
 	MCFG_CPU_MODIFY("cpu1")
 	MCFG_CPU_PROGRAM_MAP(ttmahjng_cpu1_map)
 	MCFG_CPU_IO_MAP(0)
@@ -937,6 +986,41 @@ ROM_START( spacecho2 )
 	ROM_LOAD( "mb7052.6m",    0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
 ROM_END
 
+/*
+Speak & Help
+
+Single layer re-engineered pcb, very tidy and working.
+
+All dumps are in label.location format, see the two
+included photos for one of the pcb with and without the
+speech? daughterboard plugged in for verification.
+
+Roms are all mitsubishi 2716, proms are fujitsu MB7052.
+
+https://youtu.be/YuWZ8hZ-MtY
+Unique speech, as detailed in video, seems will require additional work to emulate correctly.
+*/
+
+ROM_START( speakhlp )
+	ROM_REGION( 0x10000, "cpu1", 0 )
+	ROM_LOAD( "b1.56t",       0x0000, 0x0800, CRC(ce009d85) SHA1(d8683d358ff04ffa0eef574e42a8f3885f538ecc) )
+	ROM_LOAD( "b2.5t",        0x0800, 0x0800, CRC(935219f1) SHA1(83d41eb8af6dc5d44d578c01c123872e75fa927e) )
+	ROM_LOAD( "b3.45t",       0x1000, 0x0800, CRC(083c28de) SHA1(82e159f218f60e9c06ff78f2e52572f8f5a6c530) )
+	ROM_LOAD( "b4.4t",        0x1800, 0x0800, CRC(b0927e3b) SHA1(cc5f030dcbc93d5265dbf17a2425acdb921ab18b) )
+	ROM_LOAD( "b5.3t",        0x2000, 0x0800, CRC(ccd25c4e) SHA1(d6d5722d746dd22cecacfea407e798f4531eea99) )
+	ROM_LOAD( "b6.23t",       0x2800, 0x0800, CRC(a657dd4b) SHA1(4f6b85ccf5449d08f5c7f5dc6f59d0df276d9994) )
+
+	ROM_REGION( 0x10000, "cpu2", 0 )
+	ROM_LOAD( "b07.5b",       0x0000, 0x0800, CRC(c9317d91) SHA1(b509ce371d89ad39acaefea732eb955a11df1ed9) )
+	ROM_LOAD( "b09.4b",       0x1000, 0x0800, CRC(29310c32) SHA1(d5d5953111d81661ab98c950d94e5912fc907445) )
+	ROM_LOAD( "b010.3b",      0x1800, 0x0800, CRC(4d567bc9) SHA1(6bc05213042d9069a054b2ae044f04938a9bfe06) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* Intersil IM5623CPE proms compatible with 82s129 */
+	/* The upper 128 bytes are 0's, used by the hardware to blank the display */
+	ROM_LOAD( "prom.6k",      0x0000, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* top bitmap */
+	ROM_LOAD( "prom.6m",      0x0100, 0x0100, CRC(08793ef7) SHA1(bfc27aaf25d642cd57c0fbe73ab575853bd5f3ca) ) /* bottom bitmap */
+ROM_END
+
 ROM_START( ttmahjng )
 	ROM_REGION( 0x10000, "cpu1", 0 )
 	ROM_LOAD( "ju04",         0x0000, 0x1000, CRC(fe7c693a) SHA1(be0630557e0bcd9ec2e9542cc4a4d947889ec57a) )
@@ -965,11 +1049,16 @@ ROM_END
 
 READ8_MEMBER(route16_state::routex_prot_read)
 {
-	if (space.device().safe_pc() == 0x2f) return 0xfb;
+	if (m_cpu1->pc() == 0x2f) return 0xfb;
 
-	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", space.device().tag(), space.device().safe_pc());
+	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", m_cpu1->tag(), m_cpu1->pc());
 	return 0x00;
+}
 
+READ8_MEMBER(route16_state::route16_prot_read)
+{
+	m_protection_data++;
+	return (1 << ((m_protection_data >> 1) & 7));
 }
 
 
@@ -979,58 +1068,6 @@ READ8_MEMBER(route16_state::routex_prot_read)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(route16_state,route16)
-{
-	uint8_t *ROM = memregion("cpu1")->base();
-	/* TO DO : Replace these patches with simulation of the protection device */
-
-	/* patch the protection */
-	ROM[0x0105] = 0x00; /* jp nz,$4109 (nirvana) - NOP's in route16c */
-	ROM[0x0106] = 0x00;
-	ROM[0x0107] = 0x00;
-
-	ROM[0x072a] = 0x00; /* jp nz,$4238 (nirvana) */
-	ROM[0x072b] = 0x00;
-	ROM[0x072c] = 0x00;
-
-	DRIVER_INIT_CALL(route16c);
-}
-
-DRIVER_INIT_MEMBER(route16_state,route16c)
-{
-	uint8_t *ROM = memregion("cpu1")->base();
-	/* Is this actually a bootleg? some of the protection has
-	   been removed */
-
-	/* patch the protection */
-	ROM[0x00e9] = 0x3a;
-
-	ROM[0x0754] = 0xc3;
-	ROM[0x0755] = 0x63;
-	ROM[0x0756] = 0x07;
-}
-
-
-DRIVER_INIT_MEMBER(route16_state,route16a)
-{
-	uint8_t *ROM = memregion("cpu1")->base();
-	/* TO DO : Replace these patches with simulation of the protection device */
-
-	/* patch the protection */
-	ROM[0x00e9] = 0x3a;
-
-	ROM[0x0105] = 0x00; /* jp nz,$4109 (nirvana) - NOP's in route16c */
-	ROM[0x0106] = 0x00;
-	ROM[0x0107] = 0x00;
-
-	ROM[0x0731] = 0x00; /* jp nz,$4238 (nirvana) */
-	ROM[0x0732] = 0x00;
-	ROM[0x0733] = 0x00;
-
-	ROM[0x0747] = 0xc3;
-	ROM[0x0748] = 0x56;
-	ROM[0x0749] = 0x07;
-}
 
 
 
@@ -1042,18 +1079,19 @@ DRIVER_INIT_MEMBER(route16_state,route16a)
  *
  *************************************/
 
-GAME( 1981, route16,  0,        route16,  route16, route16_state,  route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16a, route16,  route16,  route16, route16_state,  route16a, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16c, route16,  route16,  route16, route16_state,  route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
-GAME( 1981, route16bl,route16,  route16,  route16, driver_device,  0,        ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, routex,   route16,  routex,   route16, driver_device,  0,        ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16,  0,        route16,  route16,  route16_state, route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16a, route16,  route16,  route16,  route16_state, route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16c, route16,  route16,  route16,  route16_state, route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
+GAME( 1981, route16bl,route16,  route16,  route16,  route16_state, 0,        ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, routex,   route16,  routex,   route16,  route16_state, 0,        ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, speakres, 0,        speakres, speakres, driver_device, 0,        ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, speakresb,speakres, speakres, speakres, driver_device, 0,        ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvox, speakres, stratvox, stratvox, driver_device, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxa,speakres, stratvox, stratvox, driver_device, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, stratvoxb,speakres, stratvox, stratvox, driver_device, 0,        ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho, speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacecho2,speakres, spacecho, spacecho, driver_device, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakres, 0,        speakres, speakres, route16_state, 0,        ROT270, "Sun Electronics",                 "Speak & Rescue", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakresb,speakres, speakres, speakres, route16_state, 0,        ROT270, "bootleg",                         "Speak & Rescue (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvox, speakres, stratvox, stratvox, route16_state, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxa,speakres, stratvox, stratvox, route16_state, 0,        ROT270, "Sun Electronics (Taito license)", "Stratovox (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, stratvoxb,speakres, stratvox, stratvox, route16_state, 0,        ROT270, "bootleg",                         "Stratovox (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho, speakres, spacecho, spacecho, route16_state, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacecho2,speakres, spacecho, spacecho, route16_state, 0,        ROT270, "bootleg (Gayton Games)",          "Space Echo (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, speakhlp, speakres, spacecho, spacecho, route16_state, 0,        ROT270, "bootleg",                         "Speak & Help", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, driver_device, 0,        ROT0,   "Taito", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ttmahjng, 0,        ttmahjng, ttmahjng, route16_state, 0,        ROT0,   "Taito", "T.T Mahjong", MACHINE_SUPPORTS_SAVE )

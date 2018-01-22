@@ -7,14 +7,19 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "rsp.h"
+
 #include "rspfe.h"
 #include "rspcp2.h"
 #include "rspcp2d.h"
 
+#include "debugger.h"
 
-const device_type RSP = &device_creator<rsp_device>;
+#include "rspdefs.h"
+
+#include "rsp_dasm.h"
+
+DEFINE_DEVICE_TYPE(RSP, rsp_device, "rsp", "RSP")
 
 
 #define LOG_INSTRUCTION_EXECUTION       0
@@ -31,8 +36,6 @@ const device_type RSP = &device_creator<rsp_device>;
 #define PRINT_ACCUM(x)     osd_printf_debug("A%d: %08X|%08X\n", (x), \
 							(uint32_t)( ( ACCUM(x) >> 32 ) & 0x00000000ffffffff ),    \
 							(uint32_t)(   ACCUM(x)         & 0x00000000ffffffff ))
-
-extern offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op);
 
 
 #define SIMM16      ((int32_t)(int16_t)(op))
@@ -99,7 +102,7 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op);
 
 
 rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, RSP, "RSP", tag, owner, clock, "rsp", __FILE__)
+	: cpu_device(mconfig, RSP, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
 	, m_cache(CACHE_SIZE + sizeof(internal_rsp_state))
 	, m_drcuml(nullptr)
@@ -141,10 +144,16 @@ rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
-offs_t rsp_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+device_memory_interface::space_config_vector rsp_device::memory_space_config() const
 {
-	extern CPU_DISASSEMBLE( rsp );
-	return CPU_DISASSEMBLE_NAME( rsp )(this, buffer, pc, oprom, opram, options);
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+util::disasm_interface *rsp_device::create_disassembler()
+{
+	return new rsp_disassembler;
 }
 
 void rsp_device::rsp_add_imem(uint32_t *base)
@@ -310,9 +319,10 @@ void rsp_device::unimplemented_opcode(uint32_t op)
 {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		char string[200];
-		rsp_dasm_one(string, m_ppc, op);
-		osd_printf_debug("%08X: %s\n", m_ppc, string);
+		std::ostringstream string;
+		rsp_disassembler rspd;
+		rspd.dasm_one(string, m_ppc, op);
+		osd_printf_debug("%08X: %s\n", m_ppc, string.str().c_str());
 	}
 
 #if SAVE_DISASM
@@ -368,7 +378,7 @@ void rsp_device::device_start()
 		m_exec_output = fopen("rsp_execute.txt", "wt");
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	resolve_cb();
 
 	if (m_isdrc)
@@ -493,7 +503,7 @@ void rsp_device::device_start()
 	state_add( RSP_V31,     "V31", m_debugger_temp).formatstr("%39s");
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callimport().callexport().noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_rsp_state->pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%1s").noshow();
 	state_add( STATE_GENSP, "GENSP", m_rsp_state->r[31]).noshow();
 
@@ -736,12 +746,14 @@ void rsp_device::execute_run()
 		{
 			int i, l;
 			static uint32_t prev_regs[32];
-			char string[200];
-			rsp_dasm_one(string, m_ppc, op);
 
-			fprintf(m_exec_output, "%08X: %s", m_ppc, string);
+			rsp_disassembler rspd;
+			std::ostringstream string;
+			rspd.dasm_one(string, m_ppc, op);
 
-			l = strlen(string);
+			fprintf(m_exec_output, "%08X: %s", m_ppc, string.str().c_str());
+
+			l = string.str().size();
 			if (l < 36)
 			{
 				for (i=l; i < 36; i++)

@@ -90,6 +90,8 @@ Technology = NMOS
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class trvmadns_state : public driver_device
@@ -122,6 +124,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
+	void trvmadns(machine_config &config);
 };
 
 
@@ -237,12 +240,12 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
 {
 	if(offset==0)
 	{
-		if(space.device().safe_pcbase()==0x29e9)// || space.device().safe_pcbase()==0x1b3f) //29f5
+		if(m_maincpu->pcbase()==0x29e9)// || m_maincpu->pcbase()==0x1b3f) //29f5
 		{
 			m_maincpu->set_input_line(0, HOLD_LINE);
 		}
 //      else
-//          logerror("%x \n", space.device().safe_pcbase());
+//          logerror("%x \n", m_maincpu->pcbase());
 
 	}
 
@@ -377,7 +380,7 @@ void trvmadns_state::machine_reset()
 	m_old_data = -1;
 }
 
-static MACHINE_CONFIG_START( trvmadns, trvmadns_state )
+MACHINE_CONFIG_START(trvmadns_state::trvmadns)
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4) // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -461,5 +464,5 @@ ROM_START( trvmadnsa )
 	// empty space, for 3 roms (each one max 0x8000 bytes long)
 ROM_END
 
-GAME( 1985, trvmadns,         0, trvmadns, trvmadns, driver_device, 0, ROT0, "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
-GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, driver_device, 0, ROT0, "Thunderhead Inc.", "Trivia Madness - Series B Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 1985, trvmadns,         0, trvmadns, trvmadns, trvmadns_state, 0, ROT0, "Thunderhead Inc.", "Trivia Madness - Series A Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 1985, trvmadnsa, trvmadns, trvmadns, trvmadns, trvmadns_state, 0, ROT0, "Thunderhead Inc.", "Trivia Madness - Series B Question set", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )

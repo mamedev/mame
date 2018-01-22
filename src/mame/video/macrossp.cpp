@@ -457,7 +457,7 @@ m_scrc_videoregs[2]);// 08 - 0b
 	return 0;
 }
 
-void macrossp_state::screen_eof_macrossp(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(macrossp_state::screen_vblank_macrossp)
 {
 	// rising edge
 	if (state)

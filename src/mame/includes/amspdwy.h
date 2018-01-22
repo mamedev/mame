@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/ym2151.h"
+#include "screen.h"
 
 class amspdwy_state : public driver_device
 {
@@ -50,7 +51,6 @@ public:
 
 	DECLARE_READ8_MEMBER(amspdwy_wheel_0_r);
 	DECLARE_READ8_MEMBER(amspdwy_wheel_1_r);
-	DECLARE_WRITE8_MEMBER(amspdwy_sound_w);
 	DECLARE_WRITE8_MEMBER(amspdwy_flipscreen_w);
 	DECLARE_WRITE8_MEMBER(amspdwy_videoram_w);
 	DECLARE_WRITE8_MEMBER(amspdwy_colorram_w);
@@ -65,4 +65,5 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
+	void amspdwy(machine_config &config);
 };

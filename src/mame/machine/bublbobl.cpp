@@ -10,19 +10,46 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/bublbobl.h"
 
+#include "cpu/z80/z80.h"
+
+
+void bublbobl_state::common_sreset(int state)
+{
+	if ((state != CLEAR_LINE) && !m_sreset_old)
+	{
+		if (m_ym2203 != nullptr) m_ym2203->reset(); // ym2203, if present, is reset
+		if (m_ym3526 != nullptr) m_ym3526->reset(); // ym3526, if present, is reset
+		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE); // if a sound irq is active, it is cleared. is this necessary? if the above two devices de-assert /IRQ on reset (as a device_line write) properly, it shouldn't be...
+		m_sound_to_main->acknowledge_w(m_audiocpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // sound->main semaphore is cleared
+		m_soundnmi->in_w<0>(0); // sound nmi enable is unset
+	}
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, state); // soundcpu is reset
+	m_sreset_old = (ASSERT_LINE == state);
+}
+
+/* bublbobl bankswitch reg
+   76543210
+   |||||\\\- Select ROM bank
+   ||||\---- N.C.
+   |||\----- /SBRES [SUBCPU /RESET]
+   ||\------ /SEQRES [MCU /RESET]
+   |\------- /BLACK [Video Enable]
+   \-------- VHINV [flip screen]
+// 44 74 74 76 or 76 36 76 once or more per frame...
+*/
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
 {
+	//logerror("bankswitch_w:  write of %02X\n", data);
 	/* bits 0-2 select ROM bank */
 	membank("bank1")->set_entry((data ^ 4) & 7);
 
 	/* bit 3 n.c. */
 
-	/* bit 4 resets second Z80 */
-	m_slave->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+	/* bit 4 resets subcpu Z80 */
+	m_subcpu->set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 5 resets mcu */
 	if (m_mcu != nullptr) // only if we have a MCU
@@ -35,54 +62,68 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_bankswitch_w)
 	flip_screen_set(data & 0x80);
 }
 
+/* tokio bankswitch reg
+   76543210
+   |||||\\\- Select ROM bank
+   ||||\---- ? used (idle high, /SEQRES?)
+   |||\----- not used?
+   ||\------ not used?
+   |\------- ? used (idle high, /BLACK?)
+   \-------- ? used (idle high, /SRESET?)
+// bublboblp: test and main: 00 C8 C9 C8 C9...; tokio: test 00 09 09 49 main 00 09 C8 CF
+*/
 WRITE8_MEMBER(bublbobl_state::tokio_bankswitch_w)
 {
 	/* bits 0-2 select ROM bank */
 	membank("bank1")->set_entry(data & 7);
 
-	/* bits 3-7 unknown */
+	/* bit 3 unknown */
+	/* GUESS: bit 3 resets mcu */
+	if (m_mcu != nullptr) // only if we have a MCU
+		m_mcu->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+
+	/* bit 4 and 5 unknown, not used? */
+
+	/* bit 6 is unknown */
+	/* GUESS: bit 6 is video enable "/BLACK" */
+	m_video_enable = data & 0x40; // guess
+
+	/* bit 7 is unknown but used */
 }
 
+/* tokio videoctrl reg
+   76543210
+   ||||\\\\- not used?
+   |||\----- OUT (coin lockout to pc030cm, active low)
+   ||\------ ? used (idle low, maybe 2WAY to pc030cm?)
+   |\------- ? used (idle high, /SBRES? or /SBINT?)
+   \-------- VHINV (flip screen)
+*/
 WRITE8_MEMBER(bublbobl_state::tokio_videoctrl_w)
 {
+	//logerror("tokio_videoctrl_w:  write of %02X\n", data);
+	/* bits 0-3 not used? */
+
+	/* bit 4 is the coin lockout */
+	machine().bookkeeping().coin_lockout_global_w(~data & 0x10);
+
+	/* bit 5 and 6 are unknown but used */
+
 	/* bit 7 flips screen */
 	flip_screen_set(data & 0x80);
-
-	/* other bits unknown */
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_nmitrigger_w)
 {
-	m_slave->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-
-static const uint8_t tokio_prot_data[] =
-{
-	0x6c,
-	0x7f,0x5f,0x7f,0x6f,0x5f,0x77,0x5f,0x7f,0x5f,0x7f,0x5f,0x7f,0x5b,0x7f,0x5f,0x7f,
-	0x5f,0x77,0x59,0x7f,0x5e,0x7e,0x5f,0x6d,0x57,0x7f,0x5d,0x7d,0x5f,0x7e,0x5f,0x7f,
-	0x5d,0x7d,0x5f,0x7e,0x5e,0x79,0x5f,0x7f,0x5f,0x7f,0x5d,0x7f,0x5f,0x7b,0x5d,0x7e,
-	0x5f,0x7f,0x5d,0x7d,0x5f,0x7e,0x5e,0x7e,0x5f,0x7d,0x5f,0x7f,0x5f,0x7e,0x7f,0x5f,
-	0x01,0x00,0x02,0x01,0x01,0x01,0x03,0x00,0x05,0x02,0x04,0x01,0x03,0x00,0x05,0x01,
-	0x02,0x03,0x00,0x04,0x04,0x01,0x02,0x00,0x05,0x03,0x02,0x01,0x04,0x05,0x00,0x03,
-	0x00,0x05,0x02,0x01,0x03,0x04,0x05,0x00,0x01,0x04,0x04,0x02,0x01,0x04,0x01,0x00,
-	0x03,0x01,0x02,0x05,0x00,0x03,0x00,0x01,0x02,0x00,0x03,0x04,0x00,0x00,0x00,0x00,
-	0x00,0x00,0x00,0x00,0x00,0x01,0x02,0x00,0x00,0x00,0x00,0x01,0x02,0x00,0x00,0x00,
-	0x01,0x02,0x01,0x00,0x00,0x00,0x02,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x01,0x01,
-	0x00,0x00,0x00,0x00,0x02,0x00,0x01,0x02,0x00,0x01,0x01,0x00,0x00,0x02,0x01,0x00,
-	0x00,0x00,0x00,0x00,0x02,0x00,0x00,0x01
-};
-
-READ8_MEMBER(bublbobl_state::tokio_mcu_r)
-{
-	m_tokio_prot_count %= sizeof(tokio_prot_data);
-	return tokio_prot_data[m_tokio_prot_count++];
+	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_MEMBER(bublbobl_state::tokiob_mcu_r)
 {
-	return 0xbf; /* ad-hoc value set to pass initial testing */
+	/* This return value is literally set by a resistor on the bootleg tokio pcb;
+	the MCU footprint is unpopulated but for a resistor tying what would be the
+	PA6 pin to ground. The remaining pins seem to float high. */
+	return 0xbf;
 }
 
 
@@ -90,12 +131,6 @@ void bublbobl_state::device_timer(emu_timer &timer, device_timer_id id, int para
 {
 	switch (id)
 	{
-	case TIMER_NMI:
-		if (m_sound_nmi_enable)
-			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		else
-			m_pending_nmi = 1;
-		break;
 	case TIMER_M68705_IRQ_ACK:
 		m_mcu->set_input_line(0, CLEAR_LINE);
 		break;
@@ -104,41 +139,18 @@ void bublbobl_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-
-WRITE8_MEMBER(bublbobl_state::bublbobl_sound_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	synchronize(TIMER_NMI, data);
-}
-
-WRITE8_MEMBER(bublbobl_state::bublbobl_sh_nmi_disable_w)
-{
-	m_sound_nmi_enable = 0;
-}
-
-WRITE8_MEMBER(bublbobl_state::bublbobl_sh_nmi_enable_w)
-{
-	m_sound_nmi_enable = 1;
-	if (m_pending_nmi)
-	{
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		m_pending_nmi = 0;
-	}
-}
-
 WRITE8_MEMBER(bublbobl_state::bublbobl_soundcpu_reset_w)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_RESET, data ? ASSERT_LINE : CLEAR_LINE);
+	//logerror("soundcpu_reset_w called with data of %d\n", data);
+	common_sreset(data ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(bublbobl_state::bublbobl_sound_status_r)
+READ8_MEMBER(bublbobl_state::common_sound_semaphores_r)
 {
-	return m_sound_status;
-}
-
-WRITE8_MEMBER(bublbobl_state::bublbobl_sound_status_w)
-{
-	m_sound_status = data;
+	uint8_t ret = 0xfc;
+	ret |= m_main_to_sound->pending_r() ? 0x2 : 0x0;
+	ret |= m_sound_to_main->pending_r() ? 0x1 : 0x0;
+	return ret;
 }
 
 
@@ -191,14 +203,14 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_ddr4_w)
 
 READ8_MEMBER(bublbobl_state::bublbobl_mcu_port1_r)
 {
-	//logerror("%04x: 6801U4 port 1 read\n", space.device().safe_pc());
+	//logerror("%04x: 6801U4 port 1 read\n", m_mcu->pc());
 	m_port1_in = ioport("IN0")->read();
 	return (m_port1_out & m_ddr1) | (m_port1_in & ~m_ddr1);
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
 {
-	//logerror("%04x: 6801U4 port 1 write %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: 6801U4 port 1 write %02x\n", m_mcu->pc(), data);
 
 	// bit 4: coin lockout
 	machine().bookkeeping().coin_lockout_global_w(~data & 0x10);
@@ -221,13 +233,13 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port1_w)
 
 READ8_MEMBER(bublbobl_state::bublbobl_mcu_port2_r)
 {
-	//logerror("%04x: 6801U4 port 2 read\n", space.device().safe_pc());
+	//logerror("%04x: 6801U4 port 2 read\n", m_mcu->pc());
 	return (m_port2_out & m_ddr2) | (m_port2_in & ~m_ddr2);
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port2_w)
 {
-	//logerror("%04x: 6801U4 port 2 write %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: 6801U4 port 2 write %02x\n", m_mcu->pc(), data);
 	static const char *const portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
 
 	// bits 0-3: bits 8-11 of shared RAM address
@@ -261,25 +273,25 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port2_w)
 
 READ8_MEMBER(bublbobl_state::bublbobl_mcu_port3_r)
 {
-	//logerror("%04x: 6801U4 port 3 read\n", space.device().safe_pc());
+	//logerror("%04x: 6801U4 port 3 read\n", m_mcu->pc());
 	return (m_port3_out & m_ddr3) | (m_port3_in & ~m_ddr3);
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port3_w)
 {
-	//logerror("%04x: 6801U4 port 3 write %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: 6801U4 port 3 write %02x\n", m_mcu->pc(), data);
 	m_port3_out = data;
 }
 
 READ8_MEMBER(bublbobl_state::bublbobl_mcu_port4_r)
 {
-	//logerror("%04x: 6801U4 port 4 read\n", space.device().safe_pc());
+	//logerror("%04x: 6801U4 port 4 read\n", m_mcu->pc());
 	return (m_port4_out & m_ddr4) | (m_port4_in & ~m_ddr4);
 }
 
 WRITE8_MEMBER(bublbobl_state::bublbobl_mcu_port4_w)
 {
-	//logerror("%04x: 6801U4 port 4 write %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: 6801U4 port 4 write %02x\n", m_mcu->pc(), data);
 
 	// bits 0-7 of shared RAM address
 
@@ -298,7 +310,7 @@ in boblbobl, so they don't matter. All checks are patched out in sboblbob.
 READ8_MEMBER(bublbobl_state::boblbobl_ic43_a_r)
 {
 	// if (offset >= 2)
-	//     logerror("%04x: ic43_a_r (offs %d) res = %02x\n", space.device().safe_pc(), offset, res);
+	//     logerror("%04x: ic43_a_r (offs %d) res = %02x\n", m_mcu->pc(), offset, res);
 
 	if (offset == 0)
 		return m_ic43_a << 4;
@@ -348,13 +360,13 @@ WRITE8_MEMBER(bublbobl_state::boblbobl_ic43_b_w)
 {
 	static const int xorval[4] = { 4, 1, 8, 2 };
 
-	//  logerror("%04x: ic43_b_w (offs %d) %02x\n", space.device().safe_pc(), offset, data);
+	//  logerror("%04x: ic43_b_w (offs %d) %02x\n", m_mcu->pc(), offset, data);
 	m_ic43_b = (data >> 4) ^ xorval[offset];
 }
 
 READ8_MEMBER(bublbobl_state::boblbobl_ic43_b_r)
 {
-	//  logerror("%04x: ic43_b_r (offs %d)\n", space.device().safe_pc(), offset);
+	//  logerror("%04x: ic43_b_r (offs %d)\n", m_mcu->pc(), offset);
 	if (offset == 0)
 		return m_ic43_b << 4;
 	else
@@ -373,28 +385,17 @@ READ8_MEMBER(bublbobl_state::boblbobl_ic43_b_r)
  The following is ENTIRELY GUESSWORK!!!
 
 ***************************************************************************/
-INTERRUPT_GEN_MEMBER(bublbobl_state::bublbobl_m68705_interrupt)
+INTERRUPT_GEN_MEMBER(bub68705_state::bublbobl_m68705_interrupt)
 {
-	device.execute().set_input_line(0, ASSERT_LINE);
+	device.execute().set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 	timer_set(attotime::from_msec(1000/60), TIMER_M68705_IRQ_ACK); /* TODO: understand how this is ack'ed */
 }
 
 
-READ8_MEMBER(bublbobl_state::bublbobl_68705_port_a_r)
+WRITE8_MEMBER(bub68705_state::port_a_w)
 {
-	//logerror("%04x: 68705 port A read %02x\n", space.device().safe_pc(), m_port_a_in);
-	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
-}
-
-WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_a_w)
-{
-	//logerror("%04x: 68705 port A write %02x\n", space.device().safe_pc(), data);
+	//logerror("%04x: 68705 port A write %02x\n", m_mcu->pc(), data);
 	m_port_a_out = data;
-}
-
-WRITE8_MEMBER(bublbobl_state::bublbobl_68705_ddr_a_w)
-{
-	m_ddr_a = data;
 }
 
 
@@ -418,58 +419,56 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_ddr_a_w)
  *  7   W  not used?
  */
 
-READ8_MEMBER(bublbobl_state::bublbobl_68705_port_b_r)
+WRITE8_MEMBER(bub68705_state::port_b_w)
 {
-	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
-}
+	//logerror("%04x: 68705 port B write %02x\n", m_mcu->pc(), data);
 
-WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
-{
-	//logerror("%04x: 68705 port B write %02x\n", space.device().safe_pc(), data);
-	static const char *const portnames[] = { "DSW0", "DSW1", "IN1", "IN2" };
+	if (BIT(mem_mask, 0) && !BIT(data, 0) && BIT(m_port_b_out, 0))
+		m_mcu->pa_w(space, 0, m_latch);
 
-	if ((m_ddr_b & 0x01) && (~data & 0x01) && (m_port_b_out & 0x01))
-	{
-		m_port_a_in = m_latch;
-	}
-	if ((m_ddr_b & 0x02) && (data & 0x02) && (~m_port_b_out & 0x02)) /* positive edge trigger */
+	if (BIT(mem_mask, 1) && BIT(data, 1) && !BIT(m_port_b_out, 1)) /* positive edge trigger */
 	{
 		m_address = (m_address & 0xff00) | m_port_a_out;
-		//logerror("%04x: 68705 address %02x\n", space.device().safe_pc(), m_port_a_out);
+		//logerror("%04x: 68705 address %02x\n", m_mcu->pc(), m_port_a_out);
 	}
-	if ((m_ddr_b & 0x04) && (data & 0x04) && (~m_port_b_out & 0x04)) /* positive edge trigger */
-	{
+
+	if (BIT(mem_mask, 2) && BIT(data, 2) && !BIT(m_port_b_out, 2)) /* positive edge trigger */
 		m_address = (m_address & 0x00ff) | ((m_port_a_out & 0x0f) << 8);
-	}
-	if ((m_ddr_b & 0x10) && (~data & 0x10) && (m_port_b_out & 0x10))
+
+	if (BIT(mem_mask, 4) && !BIT(data, 4) && BIT(m_port_b_out, 4))
 	{
-		if (data & 0x08)    /* read */
+		if (BIT(data, 3)) /* read */
 		{
 			if ((m_address & 0x0800) == 0x0000)
 			{
-				//logerror("%04x: 68705 read input port %02x\n", space.device().safe_pc(), m_address);
-				m_latch = ioport(portnames[m_address & 3])->read();
+				//logerror("%04x: 68705 read input port %02x\n", m_mcu->pc(), m_address);
+				m_latch = m_mux_ports[m_address & 3]->read();
 			}
 			else if ((m_address & 0x0c00) == 0x0c00)
 			{
-				//logerror("%04x: 68705 read %02x from address %04x\n", space.device().safe_pc(), m_mcu_sharedram[m_address], m_address);
+				//logerror("%04x: 68705 read %02x from address %04x\n", m_mcu->pc(), m_mcu_sharedram[m_address], m_address);
 				m_latch = m_mcu_sharedram[m_address & 0x03ff];
 			}
 			else
-				logerror("%04x: 68705 unknown read address %04x\n", space.device().safe_pc(), m_address);
+			{
+				logerror("%04x: 68705 unknown read address %04x\n", m_mcu->pc(), m_address);
+			}
 		}
-		else    /* write */
+		else /* write */
 		{
 			if ((m_address & 0x0c00) == 0x0c00)
 			{
-				//logerror("%04x: 68705 write %02x to address %04x\n", space.device().safe_pc(), m_port_a_out, m_address);
+				//logerror("%04x: 68705 write %02x to address %04x\n", m_mcu->pc(), m_port_a_out, m_address);
 				m_mcu_sharedram[m_address & 0x03ff] = m_port_a_out;
 			}
 			else
-				logerror("%04x: 68705 unknown write to address %04x\n", space.device().safe_pc(), m_address);
+			{
+				logerror("%04x: 68705 unknown write to address %04x\n", m_mcu->pc(), m_address);
+			}
 		}
 	}
-	if ((m_ddr_b & 0x20) && (~data & 0x20) && (m_port_b_out & 0x20))
+
+	if (BIT(mem_mask, 5) && !BIT(data, 5) && BIT(m_port_b_out, 5))
 	{
 		/* hack to get random EXTEND letters (who is supposed to do this? 68705? PAL?) */
 		m_mcu_sharedram[0x7c] = machine().rand() % 6;
@@ -477,19 +476,12 @@ WRITE8_MEMBER(bublbobl_state::bublbobl_68705_port_b_w)
 		m_maincpu->set_input_line_vector(0, m_mcu_sharedram[0]);
 		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
-	if ((m_ddr_b & 0x40) && (~data & 0x40) && (m_port_b_out & 0x40))
-	{
-		logerror("%04x: 68705 unknown port B bit %02x\n", space.device().safe_pc(), data);
-	}
-	if ((m_ddr_b & 0x80) && (~data & 0x80) && (m_port_b_out & 0x80))
-	{
-		logerror("%04x: 68705 unknown port B bit %02x\n", space.device().safe_pc(), data);
-	}
+
+	if (BIT(mem_mask, 6) && !BIT(data, 6) && BIT(m_port_b_out, 6))
+		logerror("%04x: 68705 unknown port B bit %02x\n", m_mcu->pc(), data);
+
+	if (BIT(mem_mask, 7) && !BIT(data, 7) && BIT(m_port_b_out, 7))
+		logerror("%04x: 68705 unknown port B bit %02x\n", m_mcu->pc(), data);
 
 	m_port_b_out = data;
-}
-
-WRITE8_MEMBER(bublbobl_state::bublbobl_68705_ddr_b_w)
-{
-	m_ddr_b = data;
 }

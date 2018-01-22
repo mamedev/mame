@@ -19,8 +19,7 @@ osd_module_manager::~osd_module_manager()
 {
 	for (int i = 0; m_modules[i] != nullptr; i++)
 	{
-		m_modules[i]->~osd_module();
-		osd_free(m_modules[i]);
+		global_free(m_modules[i]);
 	}
 }
 
@@ -41,8 +40,7 @@ void osd_module_manager::register_module(const module_type &mod_type)
 	else
 	{
 		osd_printf_verbose("===> not supported %s %s\n", module->name(), module->type());
-		module->~osd_module();
-		osd_free(module);
+		global_free(module);
 	}
 }
 

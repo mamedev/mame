@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -7,8 +7,8 @@
 #define ENTRY_H_HEADER_GUARD
 
 #include "dbg.h"
-#include <string.h> // memset
 #include <bx/bx.h>
+#include <bx/string.h>
 
 namespace bx { struct FileReaderI; struct FileWriterI; struct AllocatorI; }
 
@@ -18,12 +18,21 @@ extern "C" int _main_(int _argc, char** _argv);
 #define ENTRY_WINDOW_FLAG_ASPECT_RATIO UINT32_C(0x00000001)
 #define ENTRY_WINDOW_FLAG_FRAME        UINT32_C(0x00000002)
 
-#define ENTRY_IMPLEMENT_MAIN(_app) \
-			int _main_(int _argc, char** _argv) \
-			{ \
-				_app app; \
-				return entry::runApp(&app, _argc, _argv); \
-			}
+#ifndef ENTRY_CONFIG_IMPLEMENT_MAIN
+#	define ENTRY_CONFIG_IMPLEMENT_MAIN 0
+#endif // ENTRY_CONFIG_IMPLEMENT_MAIN
+
+#if ENTRY_CONFIG_IMPLEMENT_MAIN
+#define ENTRY_IMPLEMENT_MAIN(_app, _name, _description) \
+	int _main_(int _argc, char** _argv)                 \
+	{                                                   \
+			_app app(_name, _description);              \
+			return entry::runApp(&app, _argc, _argv);   \
+	}
+#else
+#define ENTRY_IMPLEMENT_MAIN(_app, _name, _description) \
+	_app s_ ## _app ## App(_name, _description)
+#endif // ENTRY_CONFIG_IMPLEMENT_MAIN
 
 namespace entry
 {
@@ -226,7 +235,7 @@ namespace entry
 	{
 		GamepadState()
 		{
-			memset(m_axis, 0, sizeof(m_axis) );
+			bx::memSet(m_axis, 0, sizeof(m_axis) );
 		}
 
 		int32_t m_axis[entry::GamepadAxis::Count];
@@ -246,6 +255,7 @@ namespace entry
 	void toggleWindowFrame(WindowHandle _handle);
 	void toggleFullscreen(WindowHandle _handle);
 	void setMouseLock(WindowHandle _handle, bool _lock);
+	void setCurrentDir(const char* _dir);
 
 	struct WindowState
 	{
@@ -266,19 +276,48 @@ namespace entry
 
 	bool processWindowEvents(WindowState& _state, uint32_t& _debug, uint32_t& _reset);
 
-	struct BX_NO_VTABLE AppI
+	class BX_NO_VTABLE AppI
 	{
+	public:
+		///
+		AppI(const char* _name, const char* _description);
+
+		///
 		virtual ~AppI() = 0;
-		virtual void init(int _argc, char** _argv) = 0;
+
+		///
+		virtual void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) = 0;
+
+		///
 		virtual int  shutdown() = 0;
+
+		///
 		virtual bool update() = 0;
+
+		///
+		const char* getName() const;
+
+		///
+		const char* getDescription() const;
+
+		///
+		AppI* getNext();
+
+		AppI* m_next;
+
+	private:
+		const char* m_name;
+		const char* m_description;
 	};
 
-	inline AppI::~AppI()
-	{
-	}
+	///
+	AppI* getFirstApp();
 
-	int runApp(AppI* _app, int _argc, char** _argv);
+	///
+	uint32_t getNumApps();
+
+	///
+	int runApp(AppI* _app, int _argc, const char* const* _argv);
 
 } // namespace entry
 

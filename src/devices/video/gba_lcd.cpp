@@ -11,9 +11,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "rendlay.h"
-
 #include "gba_lcd.h"
+
+#include "rendlay.h"
+#include "screen.h"
+
 
 /* LCD I/O Registers */
 #define DISPCNT     HWLO(0x000)  /* 0x4000000  2  R/W   LCD Control */
@@ -138,10 +140,10 @@ private:
 	uint16_t m_attr2;
 };
 
-const device_type GBA_LCD = &device_creator<gba_lcd_device>;
+DEFINE_DEVICE_TYPE(GBA_LCD, gba_lcd_device, "gba_lcd", "GBA LCD")
 
 gba_lcd_device::gba_lcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, GBA_LCD, "GBA LCD", tag, owner, clock, "gba_lcd", __FILE__)
+	: device_t(mconfig, GBA_LCD, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_int_hblank_cb(*this)
 	, m_int_vblank_cb(*this)
@@ -1618,34 +1620,6 @@ WRITE32_MEMBER(gba_lcd_device::video_w)
 	}
 }
 
-static inline uint32_t combine_data_32_16(uint32_t prev, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&prev);
-
-	switch (mem_mask)
-	{
-	case 0x000000ff:
-		prev &= 0xffff00ff;
-		prev |= data << 8;
-		break;
-	case 0x0000ff00:
-		prev &= 0xffffff00;
-		prev |= data >> 8;
-		break;
-	case 0x00ff0000:
-		prev &= 0x00ffffff;
-		prev |= data << 8;
-		break;
-	case 0xff000000:
-		prev &= 0xff00ffff;
-		prev |= data >> 8;
-		break;
-	default:
-		break;
-	}
-	return prev;
-}
-
 READ32_MEMBER(gba_lcd_device::gba_pram_r)
 {
 	return m_pram[offset];
@@ -1653,7 +1627,7 @@ READ32_MEMBER(gba_lcd_device::gba_pram_r)
 
 WRITE32_MEMBER(gba_lcd_device::gba_pram_w)
 {
-	m_pram[offset] = combine_data_32_16(m_pram[offset], data, mem_mask);
+	COMBINE_DATA(&m_pram[offset]);
 }
 
 READ32_MEMBER(gba_lcd_device::gba_vram_r)
@@ -1663,7 +1637,7 @@ READ32_MEMBER(gba_lcd_device::gba_vram_r)
 
 WRITE32_MEMBER(gba_lcd_device::gba_vram_w)
 {
-	m_vram[offset] = combine_data_32_16(m_vram[offset], data, mem_mask);
+	COMBINE_DATA(&m_vram[offset]);
 }
 
 READ32_MEMBER(gba_lcd_device::gba_oam_r)
@@ -1673,7 +1647,7 @@ READ32_MEMBER(gba_lcd_device::gba_oam_r)
 
 WRITE32_MEMBER(gba_lcd_device::gba_oam_w)
 {
-	m_oam[offset] = combine_data_32_16(m_oam[offset], data, mem_mask);
+	COMBINE_DATA(&m_oam[offset]);
 }
 
 TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_hbl)
@@ -1789,7 +1763,7 @@ void gba_lcd_device::device_start()
 	m_vram = make_unique_clear<uint32_t[]>(0x18000 / 4);
 	m_oam = make_unique_clear<uint32_t[]>(0x400 / 4);
 
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	/* create a timer to fire scanline functions */
 	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_lcd_device::perform_scan),this));
@@ -1830,7 +1804,7 @@ void gba_lcd_device::device_reset()
 	m_hbl_timer->adjust(attotime::never);
 }
 
-static MACHINE_CONFIG_FRAGMENT(gba_lcd)
+MACHINE_CONFIG_START(gba_lcd_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_16_777216MHz / 4, 308, 0, 240, 228, 0, 160)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, gba_lcd_device, screen_update)
@@ -1840,8 +1814,3 @@ static MACHINE_CONFIG_FRAGMENT(gba_lcd)
 	MCFG_PALETTE_ADD("palette", 32768)
 	MCFG_PALETTE_INIT_OWNER(gba_lcd_device, gba)
 MACHINE_CONFIG_END
-
-machine_config_constructor gba_lcd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(gba_lcd);
-}

@@ -4485,7 +4485,10 @@ end_of_list:
 
 	/* check free node count */
 	if (freeNodes != actualFreeNodes)
-		return IMGTOOLERR_CORRUPTIMAGE;
+	{
+		err = IMGTOOLERR_CORRUPTIMAGE;
+		goto bail;
+	}
 
 bail:
 	/* free buffers */
@@ -5741,13 +5744,12 @@ static imgtoolerr_t mac_image_writefile(imgtool::partition &partition, const cha
 
 
 
-static imgtoolerr_t mac_image_listforks(imgtool::partition &partition, const char *path, imgtool_forkent *ents, size_t len)
+static imgtoolerr_t mac_image_listforks(imgtool::partition &partition, const char *path, std::vector<imgtool::fork_entry> &forks)
 {
 	imgtoolerr_t err;
 	uint32_t parID;
 	mac_str255 filename;
 	mac_dirent cat_info;
-	int fork_num = 0;
 	imgtool::image &img(partition.image());
 	struct mac_l2_imgref *image = get_imgref(img);
 
@@ -5758,22 +5760,15 @@ static imgtoolerr_t mac_image_listforks(imgtool::partition &partition, const cha
 	if (cat_info.dataRecType != hcrt_File)
 		return IMGTOOLERR_FILENOTFOUND;
 
-	/* specify data fork */
-	ents[fork_num].type = FORK_DATA;
-	ents[fork_num].forkname[0] = '\0';
-	ents[fork_num].size = cat_info.dataLogicalSize;
-	fork_num++;
+	// specify data fork
+	forks.emplace_back(cat_info.dataLogicalSize, imgtool::fork_entry::type_t::DATA);
 
 	if (cat_info.rsrcLogicalSize > 0)
 	{
-		/* specify the resource fork */
-		ents[fork_num].type = FORK_RESOURCE;
-		strcpy(ents[fork_num].forkname, "RESOURCE_FORK");
-		ents[fork_num].size = cat_info.rsrcLogicalSize;
-		fork_num++;
+		// specify the resource fork
+		forks.emplace_back(cat_info.rsrcLogicalSize, imgtool::fork_entry::type_t::RESOURCE);
 	}
 
-	ents[fork_num].type = FORK_END;
 	return IMGTOOLERR_SUCCESS;
 }
 
@@ -5835,10 +5830,10 @@ static imgtoolerr_t mac_image_getattrs(imgtool::partition &partition, const char
 				break;
 
 			case IMGTOOLATTR_TIME_CREATED:
-				values[i].t = mac_crack_time(cat_info.createDate);
+				values[i].t = mac_crack_time(cat_info.createDate).to_time_t();
 				break;
 			case IMGTOOLATTR_TIME_LASTMODIFIED:
-				values[i].t = mac_crack_time(cat_info.modifyDate);
+				values[i].t = mac_crack_time(cat_info.modifyDate).to_time_t();
 				break;
 		}
 	}
@@ -6048,7 +6043,7 @@ static int bundle_discriminator(const void *resource, uint16_t id, uint32_t leng
 
 
 
-static int get_pixel(const uint8_t *src, int width, int height, int bpp,
+static uint8_t get_pixel(const uint8_t *src, int width, int height, int bpp,
 	int x, int y)
 {
 	uint8_t byte, mask;
@@ -6062,46 +6057,44 @@ static int get_pixel(const uint8_t *src, int width, int height, int bpp,
 
 
 
-static int load_icon(uint32_t *dest, const void *resource_fork, uint64_t resource_fork_length,
+static bool load_icon(uint32_t *dest, const void *resource_fork, uint64_t resource_fork_length,
 	uint32_t resource_type, uint16_t resource_id, int width, int height, int bpp,
-	const uint32_t *palette, int has_mask)
+	const uint32_t *palette, bool has_mask)
 {
-	int success = false;
-	int y, x, color, is_masked;
-	uint32_t pixel;
-	const uint8_t *src;
+	bool success = false;
+	uint32_t frame_length = width * height * bpp / 8;
+	uint32_t total_length = frame_length * (has_mask ? 2 : 1);
 	uint32_t resource_length;
-	uint32_t frame_length;
-	uint32_t total_length;
 
-	frame_length = width * height * bpp / 8;
-	total_length = frame_length * (has_mask ? 2 : 1);
-
-	/* attempt to fetch resource */
-	src = (const uint8_t*)mac_get_resource(resource_fork, resource_fork_length, resource_type,
+	// attempt to fetch resource
+	const uint8_t *src = (const uint8_t*)mac_get_resource(resource_fork, resource_fork_length, resource_type,
 		resource_id, &resource_length);
 	if (src && (resource_length == total_length))
 	{
-		for (y = 0; y < height; y++)
+		for (int y = 0; y < height; y++)
 		{
-			for (x = 0; x < width; x ++)
+			for (int x = 0; x < width; x ++)
 			{
-				/* first check mask bit */
-				if (has_mask)
-					is_masked = get_pixel(src + frame_length, width, height, bpp, x, y);
-				else
-					is_masked = dest[y * width + x] >= 0x80000000;
+				// check the color
+				uint8_t color = get_pixel(src, width, height, bpp, x, y);
 
-				if (is_masked)
+				// then check the mask
+				bool is_masked = has_mask
+					? get_pixel(src + frame_length, width, height, bpp, x, y) != 0
+					: dest[y * width + x] >= 0x80000000;
+
+				// is this actually masked?  (note there is a special case when bpp == 1; Mac B&W icons
+				// had a XOR effect, and this cannot be blocked by the mask)
+				uint32_t pixel;
+				if (is_masked || (color && bpp == 1))
 				{
-					/* mask is ok; check the actual icon */
-					color = get_pixel(src, width, height, bpp, x, y);
+					// mask is ok; check the actual icon
 					pixel = palette[color] | 0xFF000000;
 				}
 				else
 				{
-					/* masked out; nothing */
-					pixel = 0;
+					// masked out; nothing
+					pixel = 0x00000000;
 				}
 
 				dest[y * width + x] = pixel;
@@ -6343,6 +6336,35 @@ static imgtoolerr_t mac_image_suggesttransfer(imgtool::partition &partition, con
 
 
 /*************************************
+*
+*  MacOS Roman Conversion
+*
+*************************************/
+
+static const char32_t macos_roman_code_page[128] =
+{
+	// 0x80 - 0x8F
+	0x00C4, 0x00C5, 0x00C7, 0x00C9, 0x00D1, 0x00D6, 0x00DC, 0x00E1, 0x00E0, 0x00E2, 0x00E4, 0x00E3, 0x00E5, 0x00E7, 0x00E9, 0x00E8,
+	// 0x90 - 0x9F
+	0x00EA, 0x00EB, 0x00ED, 0x00EC, 0x00EE, 0x00EF, 0x00F1, 0x00F3, 0x00F2, 0x00F4, 0x00F6, 0x00F5, 0x00FA, 0x00F9, 0x00FB, 0x00FC,
+	// 0xA0 - 0xAF
+	0x2020, 0x00B0, 0x00A2, 0x00A3, 0x00A7, 0x2022, 0x00B6, 0x00DF, 0x00AE, 0x00A9, 0x2122, 0x00B4, 0x00A8, 0x2260, 0x00C6, 0x00D8,
+	// 0xB0 - 0xBF
+	0x221E, 0x00B1, 0x2264, 0x2265, 0x00A5, 0x00B5, 0x2202, 0x2211, 0x220F, 0x03C0, 0x222B, 0x00AA, 0x00BA, 0x03A9, 0x00E6, 0x00F8,
+	// 0xC0 - 0xCF
+	0x00BF, 0x00A1, 0x00AC, 0x221A, 0x0192, 0x2248, 0x2206, 0x00AB, 0x00BB, 0x2026, 0x00A0, 0x00C0, 0x00C3, 0x00D5, 0x0152, 0x0153,
+	// 0xD0 - 0xDF
+	0x2013, 0x2014, 0x201C, 0x201D, 0x2018, 0x2019, 0x00F7, 0x25CA, 0x00FF, 0x0178, 0x2044, 0x20AC, 0x2039, 0x203A, 0xFB01, 0xFB02,
+	// 0xE0 - 0xEF
+	0x2021, 0x00B7, 0x201A, 0x201E, 0x2030, 0x00C2, 0x00CA, 0x00C1, 0x00CB, 0x00C8, 0x00CD, 0x00CE, 0x00CF, 0x00CC, 0x00D3, 0x00D4,
+	// 0xF0 - 0xFF
+	0xF8FF, 0x00D2, 0x00DA, 0x00DB, 0x00D9, 0x0131, 0x02C6, 0x02DC, 0x00AF, 0x02D8, 0x02D9, 0x02DA, 0x00B8, 0x02DD, 0x02DB, 0x02C7
+};
+
+static imgtool::simple_charconverter charconverter_macos_roman(macos_roman_code_page);
+
+
+/*************************************
  *
  *  Module population
  *
@@ -6376,6 +6398,7 @@ static void generic_mac_get_info(const imgtool_class *imgclass, uint32_t state, 
 		case IMGTOOLINFO_PTR_GET_ICON_INFO:                 info->get_iconinfo = mac_image_geticoninfo; break;
 		case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:              info->suggest_transfer = mac_image_suggesttransfer; break;
 		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_apple35_mac; break;
+		case IMGTOOLINFO_PTR_CHARCONVERTER:                 info->charconverter = &charconverter_macos_roman; break;
 	}
 }
 

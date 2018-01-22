@@ -29,7 +29,7 @@
                 => add device MX80c and bank switching for the ROM
         03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
                 => add the port mapping for keyboard
-        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M runnig! JJStacino
+        20/11/2010 : synchronization between uPD765 and Z80 are now OK, CP/M running! JJStacino
         11/11/2011 : add the minidisque support -3 pouces 1/2 driver-  JJStacino  (jj.stac @ aliceadsl.fr)
 
             don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
@@ -38,6 +38,10 @@
     TODO :  Add the cartridge function,
             Adjust the one shot and A/D timing (sn76477)
 */
+#ifndef MAME_INCLUDES_HEC2HRP_H
+#define MAME_INCLUDES_HEC2HRP_H
+
+#pragma once
 
 #include "machine/upd765.h"
 #include "machine/wd_fdc.h"
@@ -99,7 +103,7 @@ public:
 	optional_shared_ptr<uint8_t> m_hector_videoram;
 	required_ioport_array<9> m_keyboard;
 
-	optional_device<fd1793_t> m_minidisc_fdc;
+	optional_device<fd1793_device> m_minidisc_fdc;
 	optional_device<floppy_connector> m_floppy0;
 
 	uint8_t m_hector_flag_hr;
@@ -194,6 +198,13 @@ public:
 	DECLARE_WRITE8_MEMBER( hector_disc2_io50_port_w);
 
 	void hector_disc2_reset();
+	void hec2mx80(machine_config &config);
+	void hec2hrp(machine_config &config);
+	void hec2hrx(machine_config &config);
+	void hec2mx40(machine_config &config);
+	void hec2mdhrx(machine_config &config);
+	void hec2hr(machine_config &config);
+	void hector_audio(machine_config &config);
 };
 
-MACHINE_CONFIG_EXTERN( hector_audio );
+#endif // MAME_INCLUDES_HEC2HRP_H

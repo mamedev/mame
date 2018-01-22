@@ -25,6 +25,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	uint8_t m_irq_mask;
+	emu_timer *m_dac_irq_timer;
+
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	DECLARE_WRITE8_MEMBER(trucocl_videoram_w);
 	DECLARE_WRITE8_MEMBER(trucocl_colorram_w);
@@ -39,6 +41,7 @@ public:
 	required_device<dac_byte_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 
+	void trucocl(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

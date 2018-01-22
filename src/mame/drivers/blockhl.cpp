@@ -18,15 +18,18 @@
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
+#include "sound/ym2151.h"
 #include "video/k052109.h"
 #include "video/k051960.h"
-#include "sound/ym2151.h"
-#include "includes/konamipt.h"
+
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -55,6 +58,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(banking_callback);
 
+	void blockhl(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -89,7 +93,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockhl_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bank5800_map, AS_PROGRAM, 8, blockhl_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -212,20 +216,20 @@ static INPUT_PORTS_START( blockhl )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED) // joy down, can be tested in service mode
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // button 2, can be tested in service mode
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED) // button 3, can be tested in service mode
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START1)
 
 	PORT_START("P2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED) // joy down, can be tested in service mode
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // button 2, can be tested in service mode
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNUSED) // button 3, can be tested in service mode
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START2)
 
 	PORT_START("DSW1")
@@ -267,7 +271,7 @@ INPUT_PORTS_END
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( blockhl, blockhl_state )
+MACHINE_CONFIG_START(blockhl_state::blockhl)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)     // Konami 052526
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -276,8 +280,8 @@ static MACHINE_CONFIG_START( blockhl, blockhl_state )
 	MCFG_DEVICE_ADD("bank5800", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank5800_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(12)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
@@ -375,5 +379,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT   MACHINE  INPUT    CLASS          INIT  ROT   COMPANY   FULLNAME          FLAGS
-GAME( 1989, blockhl, 0,       blockhl, blockhl, driver_device, 0,    ROT0, "Konami", "Block Hole",     MACHINE_SUPPORTS_SAVE )
-GAME( 1989, quarth,  blockhl, blockhl, blockhl, driver_device, 0,    ROT0, "Konami", "Quarth (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, blockhl, 0,       blockhl, blockhl, blockhl_state, 0,    ROT0, "Konami", "Block Hole",     MACHINE_SUPPORTS_SAVE )
+GAME( 1989, quarth,  blockhl, blockhl, blockhl, blockhl_state, 0,    ROT0, "Konami", "Quarth (Japan)", MACHINE_SUPPORTS_SAVE )

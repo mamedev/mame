@@ -168,26 +168,22 @@ Sega PC BD MODEL2 C-CRX COMMUNICATION 837-12839
 #include "emuopts.h"
 #include "machine/m2comm.h"
 
-//#define __M2COMM_VERBOSE__
+#define VERBOSE 0
+#include "logmacro.h"
 
-MACHINE_CONFIG_FRAGMENT( m2comm )
-MACHINE_CONFIG_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type M2COMM = &device_creator<m2comm_device>;
+DEFINE_DEVICE_TYPE(M2COMM, m2comm_device, "m2comm", "Model 2 Communication Board")
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor m2comm_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( m2comm );
-}
+MACHINE_CONFIG_START(m2comm_device::device_add_mconfig)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -198,7 +194,7 @@ machine_config_constructor m2comm_device::device_mconfig_additions() const
 //-------------------------------------------------
 
 m2comm_device::m2comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, M2COMM, "MODEL2 COMMUNICATION BD", tag, owner, clock, "m2comm", __FILE__),
+	device_t(mconfig, M2COMM, tag, owner, clock),
 	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
 	m_line_tx(OPEN_FLAG_READ)
 {
@@ -238,48 +234,40 @@ void m2comm_device::device_reset()
 
 READ8_MEMBER(m2comm_device::zfg_r)
 {
-	uint8_t result = m_zfg | 0xFE;
-#ifdef __M2COMM_VERBOSE__
-	osd_printf_verbose("m2comm-zfg_r: read register %02x for value %02x\n", offset, result);
-#endif
+	uint8_t result = m_zfg | (~m_fg << 7) | 0x7e;
+	LOG("m2comm-zfg_r: read register %02x for value %02x\n", offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(m2comm_device::zfg_w)
 {
-#ifdef __M2COMM_VERBOSE__
-	osd_printf_verbose("m2comm-zfg_w: %02x\n", data);
-#endif
+	LOG("m2comm-zfg_w: %02x\n", data);
 	m_zfg = data & 0x01;
 }
 
 READ8_MEMBER(m2comm_device::share_r)
 {
 	uint8_t result = m_shared[offset];
-#ifdef __M2COMM_VERBOSE__
-	osd_printf_verbose("m2comm-share_r: read shared memory %02x for value %02x\n", offset, result);
-#endif
+	LOG("m2comm-share_r: read shared memory %02x for value %02x\n", offset, result);
 	return result;
 }
 
 WRITE8_MEMBER(m2comm_device::share_w)
 {
-#ifdef __M2COMM_VERBOSE__
-	osd_printf_verbose("m2comm-share_w: %02x %02x\n", offset, data);
-#endif
+	LOG("m2comm-share_w: %02x %02x\n", offset, data);
 	m_shared[offset] = data;
 }
 
 READ8_MEMBER(m2comm_device::cn_r)
 {
-	return m_cn;
+	return m_cn | 0xfe;
 }
 
 WRITE8_MEMBER(m2comm_device::cn_w)
 {
 	m_cn = data & 0x01;
 
-#ifndef __M2COMM_SIMULATION__
+#ifndef M2COMM_SIMULATION
 	if (!m_cn)
 		device_reset();
 #else
@@ -288,6 +276,9 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 		// reset command
 		osd_printf_verbose("M2COMM: board disabled\n");
 		m_linkenable = 0x00;
+		m_zfg = 0;
+		m_cn = 0;
+		m_fg = 0;
 	}
 	else
 	{
@@ -297,9 +288,25 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 		m_linkid = 0x00;
 		m_linkalive = 0x00;
 		m_linkcount = 0x00;
-		m_linktimer = 0x00E8; // 58 fps * 4s
+		m_linktimer = 0x00e8; // 58 fps * 4s
 
-		comm_init();
+		// zero memory
+		for (int i = 0; i < 0x4000; i++)
+		{
+			m_shared[i] = 0x00;
+		}
+
+		// TODO - check EPR-16726 on Daytona USA and Sega Rally Championship
+		// EPR-18643(A) - these are accessed by VirtuaON and Sega Touring Car Championship
+
+		// frameSize - 0x0e00
+		m_shared[0x12] = 0x00;
+		m_shared[0x13] = 0x0e;
+
+		// frameOffset - 0x01c0
+		m_shared[0x14] = 0xc0;
+		m_shared[0x15] = 0x01;
+
 		comm_tick();
 	}
 #endif
@@ -307,7 +314,7 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 
 READ8_MEMBER(m2comm_device::fg_r)
 {
-	return m_fg | (~m_zfg << 7);
+	return m_fg | (~m_zfg << 7) | 0x7e;
 }
 
 WRITE8_MEMBER(m2comm_device::fg_w)
@@ -317,27 +324,13 @@ WRITE8_MEMBER(m2comm_device::fg_w)
 
 void m2comm_device::check_vint_irq()
 {
-#ifndef __M2COMM_SIMULATION__
+#ifndef M2COMM_SIMULATION
 #else
 	comm_tick();
 #endif
 }
 
-#ifdef __M2COMM_SIMULATION__
-void m2comm_device::comm_init()
-{
-	// TODO - check EPR-16726 on Daytona USA and Sega Rally Championship
-	// EPR-18643(A) - these are accessed by VirtuaON and Sega Touring Car Championship
-
-	// frameSize - 0xe00
-	m_shared[0x12] = 0x00;
-	m_shared[0x13] = 0x0e;
-
-	// frameOffset - 0x1c0
-	m_shared[0x14] = 0xc0;
-	m_shared[0x15] = 0x01;
-}
-
+#ifdef M2COMM_SIMULATION
 void m2comm_device::comm_tick()
 {
 	if (m_linkenable == 0x01)
@@ -465,6 +458,7 @@ void m2comm_device::comm_tick()
 						m_buffer[1] = 0x01;
 						m_buffer[2] = 0x00;
 						m_line_tx.write(m_buffer, dataSize);
+						m_linktimer = 0x00e8; // 58 fps * 4s
 					}
 
 					// send second packet

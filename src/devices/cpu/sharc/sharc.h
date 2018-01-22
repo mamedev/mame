@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-#pragma once
+#ifndef MAME_CPU_SHARC_SHARC_H
+#define MAME_CPU_SHARC_SHARC_H
 
-#ifndef __SHARC_H__
-#define __SHARC_H__
+#pragma once
 
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
@@ -12,65 +12,6 @@
 #define SHARC_INPUT_FLAG1       4
 #define SHARC_INPUT_FLAG2       5
 #define SHARC_INPUT_FLAG3       6
-
-
-enum SHARC_BOOT_MODE
-{
-	BOOT_MODE_EPROM,
-	BOOT_MODE_HOST,
-	BOOT_MODE_LINK,
-	BOOT_MODE_NOBOOT
-};
-
-
-struct alignas(16) SHARC_DAG
-{
-	uint32_t i[8];
-	uint32_t m[8];
-	uint32_t b[8];
-	uint32_t l[8];
-};
-
-union SHARC_REG
-{
-	int32_t r;
-	float f;
-};
-
-struct SHARC_DMA_REGS
-{
-	uint32_t control;
-	uint32_t int_index;
-	uint32_t int_modifier;
-	uint32_t int_count;
-	uint32_t chain_ptr;
-	uint32_t gen_purpose;
-	uint32_t ext_index;
-	uint32_t ext_modifier;
-	uint32_t ext_count;
-};
-
-struct SHARC_LADDR
-{
-	uint32_t addr;
-	uint32_t code;
-	uint32_t loop_type;
-};
-
-struct SHARC_DMA_OP
-{
-	uint32_t src;
-	uint32_t dst;
-	uint32_t chain_ptr;
-	int32_t src_modifier;
-	int32_t dst_modifier;
-	int32_t src_count;
-	int32_t dst_count;
-	int32_t pmode;
-	int32_t chained_direction;
-	emu_timer *timer;
-	bool active;
-};
 
 
 // STKY flags
@@ -133,7 +74,7 @@ struct SHARC_DMA_OP
 
 
 #define MCFG_SHARC_BOOT_MODE(boot_mode) \
-	adsp21062_device::set_boot_mode(*device, boot_mode);
+	adsp21062_device::set_boot_mode(*device, adsp21062_device::boot_mode);
 
 class sharc_frontend;
 
@@ -142,11 +83,20 @@ class adsp21062_device : public cpu_device
 	friend class sharc_frontend;
 
 public:
+	enum sharc_boot_mode
+	{
+		BOOT_MODE_EPROM,
+		BOOT_MODE_HOST,
+		BOOT_MODE_LINK,
+		BOOT_MODE_NOBOOT
+	};
+
+
 	// construction/destruction
 	adsp21062_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
 
 	// static configuration helpers
-	static void set_boot_mode(device_t &device, const SHARC_BOOT_MODE boot_mode) { downcast<adsp21062_device &>(device).m_boot_mode = boot_mode; }
+	static void set_boot_mode(device_t &device, const sharc_boot_mode boot_mode) { downcast<adsp21062_device &>(device).m_boot_mode = boot_mode; }
 
 	void set_flag_input(int flag_num, int state);
 	void external_iop_write(uint32_t address, uint32_t data);
@@ -170,6 +120,17 @@ public:
 	void sharc_cfunc_write_snoop();
 
 	void enable_recompiler();
+
+	DECLARE_READ64_MEMBER( pm0_r);
+	DECLARE_WRITE64_MEMBER(pm0_w);
+	DECLARE_READ64_MEMBER( pm1_r);
+	DECLARE_WRITE64_MEMBER(pm1_w);
+	DECLARE_READ32_MEMBER( dmw0_r);
+	DECLARE_WRITE32_MEMBER(dmw0_w);
+	DECLARE_READ32_MEMBER( dmw1_r);
+	DECLARE_WRITE32_MEMBER(dmw1_w);
+	DECLARE_READ32_MEMBER( iop_r);
+	DECLARE_WRITE32_MEMBER(iop_w);
 
 	enum ASTAT_FLAGS
 	{
@@ -256,18 +217,62 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ); }
-	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value) override;
-	virtual bool memory_readop(offs_t offset, int size, uint64_t &value) override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 6; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
-
-	direct_read_data *m_direct;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
+	struct alignas(16) SHARC_DAG
+	{
+		uint32_t i[8];
+		uint32_t m[8];
+		uint32_t b[8];
+		uint32_t l[8];
+	};
+
+	union SHARC_REG
+	{
+		int32_t r;
+		float f;
+	};
+
+	struct SHARC_DMA_REGS
+	{
+		uint32_t control;
+		uint32_t int_index;
+		uint32_t int_modifier;
+		uint32_t int_count;
+		uint32_t chain_ptr;
+		uint32_t gen_purpose;
+		uint32_t ext_index;
+		uint32_t ext_modifier;
+		uint32_t ext_count;
+	};
+
+	struct SHARC_LADDR
+	{
+		uint32_t addr;
+		uint32_t code;
+		uint32_t loop_type;
+	};
+
+	struct SHARC_DMA_OP
+	{
+		uint32_t src;
+		uint32_t dst;
+		uint32_t chain_ptr;
+		int32_t src_modifier;
+		int32_t dst_modifier;
+		int32_t src_count;
+		int32_t dst_count;
+		int32_t pmode;
+		int32_t chained_direction;
+		emu_timer *timer;
+		bool active;
+	};
+
+
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 
@@ -417,7 +422,7 @@ private:
 
 	sharc_internal_state* m_core;
 
-	SHARC_BOOT_MODE m_boot_mode;
+	sharc_boot_mode m_boot_mode;
 
 	// UML stuff
 	drc_cache m_cache;
@@ -448,21 +453,18 @@ private:
 	uml::code_handle *m_swap_r0_7;
 	uml::code_handle *m_swap_r8_15;
 
-	uint16_t *m_internal_ram_block0, *m_internal_ram_block1;
-
 	address_space *m_program;
 	address_space *m_data;
-	opcode_func m_sharc_op[512];
 
-	uint16_t m_internal_ram[2 * 0x10000]; // 2x 128KB
+	required_shared_ptr<uint32_t> m_block0, m_block1;
+
+	opcode_func m_sharc_op[512];
 
 	bool m_enable_drc;
 
 	inline void CHANGE_PC(uint32_t newpc);
 	inline void CHANGE_PC_DELAYED(uint32_t newpc);
 	void sharc_iop_delayed_w(uint32_t reg, uint32_t data, int cycles);
-	uint32_t sharc_iop_r(uint32_t address);
-	void sharc_iop_w(uint32_t address, uint32_t data);
 	uint32_t pm_read32(uint32_t address);
 	void pm_write32(uint32_t address, uint32_t data);
 	uint64_t pm_read48(uint32_t address);
@@ -647,7 +649,6 @@ private:
 };
 
 
-extern const device_type ADSP21062;
+DECLARE_DEVICE_TYPE(ADSP21062, adsp21062_device)
 
-
-#endif /* __SHARC_H__ */
+#endif // MAME_CPU_SHARC_SHARC_H

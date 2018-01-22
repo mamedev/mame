@@ -20,10 +20,9 @@ cpu/alph8201/ will be removed when the alpha 8304 has been dumped.
 ****************************************************************************/
 
 #include "emu.h"
+#include "8201dasm.h"
 
 #include <ctype.h>
-
-typedef unsigned char byte;
 
 #define FMT(a,b) a, b
 #define PTRS_PER_FORMAT 2
@@ -171,7 +170,7 @@ Notes:
 
 /****************************************************/
 
-static const char *const Formats[] = {
+const char *const alpha8201_disassembler::Formats[] = {
 	FMT("0000_0000", "NOP"),                // 00
 	FMT("0000_0001", "RRCA"),               // 01
 	FMT("0000_0010", "RLCA"),               // 02
@@ -270,24 +269,10 @@ static const char *const Formats[] = {
 	nullptr
 };
 
-#define MAX_OPS ((ARRAY_LENGTH(Formats) - 1) / PTRS_PER_FORMAT)
-
-struct AD8201Opcode {
-	byte mask;
-	byte bits;
-	byte type;
-	byte pmask;
-	byte pdown;
-	const char *fmt;
-};
-
-static AD8201Opcode Op[MAX_OPS+1];
-static int OpInizialized = 0;
-
-static void InitDasm8201(void)
+alpha8201_disassembler::alpha8201_disassembler()
 {
 	const char *p;
-	byte mask, bits;
+	u8 mask, bits;
 	int bit;
 	int i;
 	char chr , type;
@@ -334,7 +319,7 @@ static void InitDasm8201(void)
 		Op[i].type  = type;
 
 		/* 2 byte code ? */
-		while (isspace((uint8_t)*p)) p++;
+		while (isspace(u8(*p))) p++;
 		if( (*p) )
 			Op[i].type |= 0x10;
 		/* number of param */
@@ -345,11 +330,10 @@ static void InitDasm8201(void)
 				Op[i].type |= 0x02; /* double param */
 		}
 	}
-
-	OpInizialized = 1;
+	op_count = i;
 }
 
-static offs_t internal_disasm_alpha8201(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+offs_t alpha8201_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	offs_t dasmflags = 0;
 	int i;
@@ -357,11 +341,9 @@ static offs_t internal_disasm_alpha8201(cpu_device *device, std::ostream &stream
 	int cnt = 1;
 	int code , disp;
 
-	if (!OpInizialized) InitDasm8201();
-
-	code = oprom[0];
+	code = opcodes.r8(pc);
 	op = -1;    /* no matching opcode */
-	for ( i = 0; i < MAX_OPS; i++)
+	for ( i = 0; i < op_count; i++)
 	{
 		if( (code & Op[i].mask) == Op[i].bits )
 		{
@@ -382,7 +364,7 @@ static offs_t internal_disasm_alpha8201(cpu_device *device, std::ostream &stream
 
 	if (Op[op].type & 0x10)
 	{
-		disp = opram[1];
+		disp = params.r8(pc+1);
 		cnt++;
 	}
 	else
@@ -403,22 +385,18 @@ static offs_t internal_disasm_alpha8201(cpu_device *device, std::ostream &stream
 		case 0xcd:
 		case 0xce:
 		case 0xdf:
-			dasmflags = DASMFLAG_STEP_OVER;
+			dasmflags = STEP_OVER;
 			break;
 
 		case 0xff:
-			dasmflags = DASMFLAG_STEP_OUT;
+			dasmflags = STEP_OUT;
 			break;
 	}
 
-	return cnt | dasmflags | DASMFLAG_SUPPORTED;
+	return cnt | dasmflags | SUPPORTED;
 }
 
-CPU_DISASSEMBLE(alpha8201)
+u32 alpha8201_disassembler::opcode_alignment() const
 {
-	std::ostringstream stream;
-	offs_t result = internal_disasm_alpha8201(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	return 1;
 }

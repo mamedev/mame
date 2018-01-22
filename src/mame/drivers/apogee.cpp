@@ -10,15 +10,21 @@
 
 
 #include "emu.h"
+#include "includes/radio86.h"
+
 #include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
-#include "sound/speaker.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "imagedev/cassette.h"
-#include "formats/rk_cas.h"
-#include "includes/radio86.h"
+#include "sound/spkrdev.h"
+#include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/rk_cas.h"
+
 
 class apogee_state : public radio86_state
 {
@@ -36,6 +42,7 @@ public:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
 	required_device<speaker_sound_device> m_speaker;
+	void apogee(machine_config &config);
 };
 
 
@@ -78,7 +85,7 @@ static INPUT_PORTS_START( apogee )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('\"')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('\xA4')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR(0xA4)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
@@ -206,7 +213,7 @@ GFXDECODE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( apogee, apogee_state )
+MACHINE_CONFIG_START(apogee_state::apogee)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(apogee_mem)
@@ -276,5 +283,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1989, apogee, radio86,0,       apogee,    apogee, radio86_state,radio86, "Zavod BRA", "Apogee BK-01", 0)
+//    YEAR  NAME    PARENT   COMPAT  MACHINE    INPUT   STATE         INIT     COMPANY      FULLNAME        FLAGS
+COMP( 1989, apogee, radio86, 0,      apogee,    apogee, apogee_state, radio86, "Zavod BRA", "Apogee BK-01", 0 )

@@ -42,7 +42,7 @@
 #define RQ(n)   m_regs.Q[(n) >> 2]
 
 /* the register used as stack pointer */
-#define SP      (segmented_mode() ? 14 : 15)
+#define SP      (get_segmented_mode() ? 14 : 15)
 
 /* these vectors are based on m_psap */
 #define RST     (PSA_ADDR() + 0)  /* start up m_fcw and m_pc */
@@ -174,30 +174,3 @@
 #define GET_DSP16       uint32_t dsp16 = addr_add(m_pc, (int16_t)get_operand(1))
 #define GET_ADDR(o)     uint32_t addr = (uint32_t)get_addr_operand(o)
 #define GET_ADDR_RAW(o)     uint32_t addr = (uint32_t)get_raw_addr_operand(o)
-
-
-/* structure for the opcode definition table */
-typedef void (z8002_device::*opcode_func)();
-
-struct Z8000_init {
-	int     beg, end, step;
-	int     size, cycles;
-	opcode_func opcode;
-	const char  *dasm;
-	uint32_t dasmflags;
-};
-
-/* structure for the opcode execution table / disassembler */
-struct Z8000_exec {
-	opcode_func opcode;
-	int     cycles;
-	int     size;
-	const char    *dasm;
-	uint32_t dasmflags;
-};
-
-/* opcode execution table */
-extern Z8000_exec *z8000_exec;
-
-extern void z8000_init_tables(void);
-extern void z8000_deinit_tables(void);

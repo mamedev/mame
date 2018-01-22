@@ -120,7 +120,7 @@ namespace detail
 	///
 	/// @see <a href="http://www.opengl.org/sdk/docs/manglsl/xhtml/transpose.xml">GLSL transpose man page</a>
 	/// @see <a href="http://www.opengl.org/registry/doc/GLSLangSpec.4.20.8.pdf">GLSL 4.20.8 specification, section 8.6 Matrix Functions</a>
-#	if((GLM_COMPILER & GLM_COMPILER_VC) && (GLM_COMPILER >= GLM_COMPILER_VC2012))
+#	if((GLM_COMPILER & GLM_COMPILER_VC) && (GLM_COMPILER >= GLM_COMPILER_VC11))
 		template <typename T, precision P, template <typename, precision> class matType>
 		GLM_FUNC_DECL typename matType<T, P>::transpose_type transpose(matType<T, P> const & x);
 #	endif

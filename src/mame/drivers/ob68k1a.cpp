@@ -60,6 +60,7 @@ Notes:
 */
 
 
+#include "emu.h"
 #include "includes/ob68k1a.h"
 
 
@@ -120,11 +121,9 @@ static ADDRESS_MAP_START( ob68k1a_mem, AS_PROGRAM, 16, ob68k1a_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM
 	AM_RANGE(0xfe0000, 0xfeffff) AM_ROM AM_REGION(MC68000L10_TAG, 0)
-	AM_RANGE(0xffff00, 0xffff01) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xffff02, 0xffff03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xffff00, 0xffff03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, read, write, 0x00ff)
 	AM_RANGE(0xffff10, 0xffff11) AM_WRITE8(com8116_w, 0xff00)
-	AM_RANGE(0xffff20, 0xffff21) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0xffff22, 0xffff23) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xffff20, 0xffff23) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_device, read, write, 0x00ff)
 //  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_0_TAG, pia6821_device, read, write, 0x00ff)
 //  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_1_TAG, pia6821_device, read, write, 0xff00)
 	AM_RANGE(0xffff40, 0xffff47) AM_READWRITE8(pia_r, pia_w, 0xffff)
@@ -143,29 +142,6 @@ ADDRESS_MAP_END
 
 INPUT_PORTS_START( ob68k1a )
 INPUT_PORTS_END
-
-
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-
-//-------------------------------------------------
-//  COM8116_INTERFACE( dbrg_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( ob68k1a_state::rx_tx_0_w )
-{
-	m_acia0->write_txc(state);
-	m_acia0->write_rxc(state);
-}
-
-WRITE_LINE_MEMBER( ob68k1a_state::rx_tx_1_w )
-{
-	m_acia1->write_txc(state);
-	m_acia1->write_rxc(state);
-}
 
 
 
@@ -216,7 +192,7 @@ void ob68k1a_state::machine_reset()
 //  MACHINE_CONFIG( ob68k1a )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
+MACHINE_CONFIG_START(ob68k1a_state::ob68k1a)
 	// basic machine hardware
 	MCFG_CPU_ADD(MC68000L10_TAG, M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(ob68k1a_mem)
@@ -224,8 +200,7 @@ static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
 	// devices
 	MCFG_DEVICE_ADD(MC6821_0_TAG, PIA6821, 0)
 	MCFG_DEVICE_ADD(MC6821_1_TAG, PIA6821, 0)
-	MCFG_DEVICE_ADD(MC6840_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_10MHz/10)
+	MCFG_DEVICE_ADD(MC6840_TAG, PTM6840, XTAL_10MHz/10)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)
@@ -247,8 +222,10 @@ static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_cts))
 
 	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL_5_0688MHz)
-	MCFG_COM8116_FR_HANDLER(WRITELINE(ob68k1a_state, rx_tx_0_w))
-	MCFG_COM8116_FT_HANDLER(WRITELINE(ob68k1a_state, rx_tx_1_w))
+	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(MC6850_0_TAG, acia6850_device, write_rxc))
+	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(MC6850_1_TAG, acia6850_device, write_rxc))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -288,5 +265,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1982, ob68k1a,  0,       0,   ob68k1a,    ob68k1a, driver_device,  0,  "Omnibyte",   "OB68K1A",   MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE          INIT  COMPANY     FULLNAME     FLAGS
+COMP( 1982, ob68k1a,  0,       0,   ob68k1a,    ob68k1a, ob68k1a_state, 0,    "Omnibyte", "OB68K1A",   MACHINE_NO_SOUND_HW )

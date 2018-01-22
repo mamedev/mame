@@ -19,13 +19,15 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_terminal(*this, "terminal")
-	{}
+	{
+	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	DECLARE_WRITE16_MEMBER(term_w);
 	DECLARE_READ16_MEMBER(keyin_r);
 	DECLARE_READ16_MEMBER(status_r);
 
+	void lft(machine_config &config);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -67,7 +69,7 @@ READ16_MEMBER( lft_state::status_r )
 	return (m_term_data) ? 5 : 4;
 }
 
-WRITE8_MEMBER( lft_state::kbd_put )
+void lft_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -82,7 +84,7 @@ void lft_state::machine_reset()
 	m_term_data = 0;
 }
 
-static MACHINE_CONFIG_START( lft, lft_state )
+MACHINE_CONFIG_START(lft_state::lft)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80186, 4000000) // no idea
 	MCFG_CPU_PROGRAM_MAP(lft_mem)
@@ -90,7 +92,7 @@ static MACHINE_CONFIG_START( lft, lft_state )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(WRITE8(lft_state, kbd_put))
+	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(lft_state, kbd_put))
 MACHINE_CONFIG_END
 
 
@@ -112,6 +114,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE     INPUT    CLASS      INIT    COMPANY   FULLNAME     FLAGS */
-COMP( ????, lft1510,   0,       0,    lft,       lft, driver_device,  0,     "LFT",   "LFT 1510", MACHINE_IS_SKELETON)
-COMP( ????, lft1230, lft1510,   0,    lft,       lft, driver_device,  0,     "LFT",   "LFT 1230", MACHINE_IS_SKELETON)
+//    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT  CLASS      INIT   COMPANY  FULLNAME    FLAGS
+COMP( ????, lft1510, 0,       0,      lft,     lft,   lft_state, 0,     "LFT",   "LFT 1510", MACHINE_IS_SKELETON)
+COMP( ????, lft1230, lft1510, 0,      lft,     lft,   lft_state, 0,     "LFT",   "LFT 1230", MACHINE_IS_SKELETON)

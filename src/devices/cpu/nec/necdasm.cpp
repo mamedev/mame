@@ -8,81 +8,9 @@
 */
 
 #include "emu.h"
+#include "necdasm.h"
 
-static const uint8_t *Iconfig;
-
-enum
-{
-	PARAM_REG8 = 1,     /* 8-bit register */
-	PARAM_REG16,        /* 16-bit register */
-	PARAM_REG2_8,       /* 8-bit register */
-	PARAM_REG2_16,      /* 16-bit register */
-	PARAM_RM8,          /* 8-bit memory or register */
-	PARAM_RM16,         /* 16-bit memory or register */
-	PARAM_RMPTR8,       /* 8-bit memory or register */
-	PARAM_RMPTR16,      /* 16-bit memory or register */
-	PARAM_I3,           /* 3-bit immediate */
-	PARAM_I4,           /* 4-bit immediate */
-	PARAM_I8,           /* 8-bit signed immediate */
-	PARAM_I16,          /* 16-bit signed immediate */
-	PARAM_UI8,          /* 8-bit unsigned immediate */
-	PARAM_IMM,          /* 16-bit immediate */
-	PARAM_ADDR,         /* 16:16 address */
-	PARAM_REL8,         /* 8-bit PC-relative displacement */
-	PARAM_REL16,        /* 16-bit PC-relative displacement */
-	PARAM_MEM_OFFS,     /* 16-bit mem offset */
-	PARAM_SREG,         /* segment register */
-	PARAM_SFREG,        /* V25/V35 special function register */
-	PARAM_1,            /* used by shift/rotate instructions */
-	PARAM_AL,
-	PARAM_CL,
-	PARAM_DL,
-	PARAM_BL,
-	PARAM_AH,
-	PARAM_CH,
-	PARAM_DH,
-	PARAM_BH,
-	PARAM_AW,
-	PARAM_CW,
-	PARAM_DW,
-	PARAM_BW,
-	PARAM_SP,
-	PARAM_BP,
-	PARAM_IX,
-	PARAM_IY
-};
-
-enum
-{
-	MODRM = 1,
-	GROUP,
-	FPU,
-	TWO_BYTE,
-	PREFIX,
-	SEG_PS,
-	SEG_DS0,
-	SEG_DS1,
-	SEG_SS
-};
-
-struct NEC_I386_OPCODE {
-	char mnemonic[32];
-	uint32_t flags;
-	uint32_t param1;
-	uint32_t param2;
-	uint32_t param3;
-	offs_t dasm_flags;
-};
-
-struct NEC_GROUP_OP {
-	char mnemonic[32];
-	const NEC_I386_OPCODE *opcode;
-};
-
-static const uint8_t *opcode_ptr;
-static const uint8_t *opcode_ptr_base;
-
-static const NEC_I386_OPCODE necv_opcode_table1[256] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::necv_opcode_table1[256] =
 {
 	// 0x00
 	{"add",             MODRM,          PARAM_RM8,          PARAM_REG8,         0               },
@@ -190,7 +118,7 @@ static const NEC_I386_OPCODE necv_opcode_table1[256] =
 	{"push    r",       0,              0,                  0,                  0               },
 	{"pop     r",       0,              0,                  0,                  0               },
 	{"chkind",          MODRM,          PARAM_REG16,        PARAM_RM16,         0               },
-	{"brkn",            0,              PARAM_UI8,          0,                  0,              DASMFLAG_STEP_OVER},    /* V25S/V35S only */
+	{"brkn",            0,              PARAM_UI8,          0,                  0,              STEP_OVER},    /* V25S/V35S only */
 	{"repnc",           PREFIX,         0,                  0,                  0               },
 	{"repc",            PREFIX,         0,                  0,                  0               },
 	{"fpo2    0",       0,              0,                  0,                  0               },  /* for a coprocessor that was never made */
@@ -248,7 +176,7 @@ static const NEC_I386_OPCODE necv_opcode_table1[256] =
 	{"xch",             0,              PARAM_AW,           PARAM_IY,           0               },
 	{"cvtbw",           0,              0,                  0,                  0               },
 	{"cvtwl",           0,              0,                  0,                  0               },
-	{"call",            0,              PARAM_ADDR,         0,                  0,              DASMFLAG_STEP_OVER},
+	{"call",            0,              PARAM_ADDR,         0,                  0,              STEP_OVER},
 	{"poll",            0,              0,                  0,                  0               },
 	{"push    psw",     0,              0,                  0,                  0               },
 	{"pop     psw",     0,              0,                  0,                  0               },
@@ -291,20 +219,20 @@ static const NEC_I386_OPCODE necv_opcode_table1[256] =
 	// 0xc0
 	{"shiftbi",         GROUP,          0,                  0,                  0               },
 	{"shiftwi",         GROUP,          0,                  0,                  0               },
-	{"ret",             0,              PARAM_I16,          0,                  0,              DASMFLAG_STEP_OUT},
-	{"ret",             0,              0,                  0,                  0,              DASMFLAG_STEP_OUT},
+	{"ret",             0,              PARAM_I16,          0,                  0,              STEP_OUT},
+	{"ret",             0,              0,                  0,                  0,              STEP_OUT},
 	{"mov     ds1,",    MODRM,          PARAM_REG16,        PARAM_RM16,         0               },
 	{"mov     ds0,",    MODRM,          PARAM_REG16,        PARAM_RM16,         0               },
 	{"mov",             MODRM,          PARAM_RMPTR8,       PARAM_UI8,          0               },
 	{"mov",             MODRM,          PARAM_RMPTR16,      PARAM_IMM,          0               },
 	{"prepare",         0,              PARAM_I16,          PARAM_UI8,          0               },
 	{"dispose",         0,              0,                  0,                  0               },
-	{"retf",            0,              PARAM_I16,          0,                  0,              DASMFLAG_STEP_OUT},
-	{"retf",            0,              0,                  0,                  0,              DASMFLAG_STEP_OUT},
-	{"brk     3",       0,              0,                  0,                  0,              DASMFLAG_STEP_OVER},
-	{"brk",             0,              PARAM_UI8,          0,                  0,              DASMFLAG_STEP_OVER},
+	{"retf",            0,              PARAM_I16,          0,                  0,              STEP_OUT},
+	{"retf",            0,              0,                  0,                  0,              STEP_OUT},
+	{"brk     3",       0,              0,                  0,                  0,              STEP_OVER},
+	{"brk",             0,              PARAM_UI8,          0,                  0,              STEP_OVER},
 	{"brkv",            0,              0,                  0,                  0               },
-	{"reti",            0,              0,                  0,                  0,              DASMFLAG_STEP_OUT},
+	{"reti",            0,              0,                  0,                  0,              STEP_OUT},
 	// 0xd0
 	{"shiftb",          GROUP,          0,                  0,                  0               },
 	{"shiftw",          GROUP,          0,                  0,                  0               },
@@ -323,15 +251,15 @@ static const NEC_I386_OPCODE necv_opcode_table1[256] =
 	{"escape",          FPU,            0,                  0,                  0               },
 	{"escape",          FPU,            0,                  0,                  0               },
 	// 0xe0
-	{"dbnzne",          0,              PARAM_REL8,         0,                  0,              DASMFLAG_STEP_OVER},
-	{"dbnze",           0,              PARAM_REL8,         0,                  0,              DASMFLAG_STEP_OVER},
-	{"dbnz",            0,              PARAM_REL8,         0,                  0,              DASMFLAG_STEP_OVER},
+	{"dbnzne",          0,              PARAM_REL8,         0,                  0,              STEP_OVER},
+	{"dbnze",           0,              PARAM_REL8,         0,                  0,              STEP_OVER},
+	{"dbnz",            0,              PARAM_REL8,         0,                  0,              STEP_OVER},
 	{"bcwz",            0,              PARAM_REL8,         0,                  0               },
 	{"in",              0,              PARAM_AL,           PARAM_UI8,          0               },
 	{"in",              0,              PARAM_AW,           PARAM_UI8,          0               },
 	{"out",             0,              PARAM_UI8,          PARAM_AL,           0               },
 	{"out",             0,              PARAM_UI8,          PARAM_AW,           0               },
-	{"call",            0,              PARAM_REL16,        0,                  0,              DASMFLAG_STEP_OVER},
+	{"call",            0,              PARAM_REL16,        0,                  0,              STEP_OVER},
 	{"br",              0,              PARAM_REL16,        0,                  0               },
 	{"br",              0,              PARAM_ADDR,         0,                  0               },
 	{"br",              0,              PARAM_REL8,         0,                  0               },
@@ -341,7 +269,7 @@ static const NEC_I386_OPCODE necv_opcode_table1[256] =
 	{"out",             0,              PARAM_DW,           PARAM_AW,           0               },
 	// 0xf0
 	{"buslock",         PREFIX,         0,                  0,                  0               },
-	{"brks",            0,              PARAM_UI8,          0,                  0,              DASMFLAG_STEP_OVER},    /* V25S/V35S only */
+	{"brks",            0,              PARAM_UI8,          0,                  0,              STEP_OVER},    /* V25S/V35S only */
 	{"repne",           PREFIX,         0,                  0,                  0               },
 	{"rep",             PREFIX,         0,                  0,                  0               },
 	{"halt",            0,              0,                  0,                  0               },
@@ -358,7 +286,7 @@ static const NEC_I386_OPCODE necv_opcode_table1[256] =
 	{"group2w",         GROUP,          0,                  0,                  0               }
 };
 
-static const NEC_I386_OPCODE necv_opcode_table2[256] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::necv_opcode_table2[256] =
 {
 	// 0x00
 	{"???",             0,              0,                  0,                  0               },
@@ -408,7 +336,7 @@ static const NEC_I386_OPCODE necv_opcode_table2[256] =
 	{"ror4",            MODRM,          PARAM_RMPTR8,       0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
-	{"brkcs",           MODRM,          PARAM_REG2_16,      0,                  0,              DASMFLAG_STEP_OVER},    /* V25/V35 only */
+	{"brkcs",           MODRM,          PARAM_REG2_16,      0,                  0,              STEP_OVER},    /* V25/V35 only */
 	{"???",             0,              0,                  0,                  0               },
 	{"???",             0,              0,                  0,                  0               },
 	// 0x30
@@ -634,7 +562,7 @@ static const NEC_I386_OPCODE necv_opcode_table2[256] =
 	{"brkem",           0,              PARAM_UI8,          0,                  0               }   /* V20,30,40,50 only */
 };
 
-static const NEC_I386_OPCODE immb_table[8] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::immb_table[8] =
 {
 	{"add",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
 	{"or",              0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
@@ -646,7 +574,7 @@ static const NEC_I386_OPCODE immb_table[8] =
 	{"cmp",             0,              PARAM_RMPTR8,       PARAM_UI8,          0               }
 };
 
-static const NEC_I386_OPCODE immw_table[8] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::immw_table[8] =
 {
 	{"add",             0,              PARAM_RMPTR16,      PARAM_IMM,          0               },
 	{"or",              0,              PARAM_RMPTR16,      PARAM_IMM,          0               },
@@ -658,7 +586,7 @@ static const NEC_I386_OPCODE immw_table[8] =
 	{"cmp",             0,              PARAM_RMPTR16,      PARAM_IMM,          0               }
 };
 
-static const NEC_I386_OPCODE immws_table[8] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::immws_table[8] =
 {
 	{"add",             0,              PARAM_RMPTR16,      PARAM_I8,           0               },
 	{"or",              0,              PARAM_RMPTR16,      PARAM_I8,           0               },
@@ -670,7 +598,7 @@ static const NEC_I386_OPCODE immws_table[8] =
 	{"cmp",             0,              PARAM_RMPTR16,      PARAM_I8,           0               }
 };
 
-static const NEC_I386_OPCODE shiftbi_table[8] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::shiftbi_table[8] =
 {
 	{"rol",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
 	{"ror",             0,              PARAM_RMPTR8,       PARAM_I8,           0               },
@@ -682,7 +610,7 @@ static const NEC_I386_OPCODE shiftbi_table[8] =
 	{"shra",            0,              PARAM_RMPTR8,       PARAM_I8,           0               }
 };
 
-static const NEC_I386_OPCODE shiftwi_table[8] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::shiftwi_table[8] =
 {
 	{"rol",             0,              PARAM_RMPTR16,      PARAM_I8,           0               },
 	{"ror",             0,              PARAM_RMPTR16,      PARAM_I8,           0               },
@@ -694,7 +622,7 @@ static const NEC_I386_OPCODE shiftwi_table[8] =
 	{"shra",            0,              PARAM_RMPTR16,      PARAM_I8,           0               }
 };
 
-static const NEC_I386_OPCODE shiftb_table[8] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::shiftb_table[8] =
 {
 	{"rol",             0,              PARAM_RMPTR8,       PARAM_1,            0               },
 	{"ror",             0,              PARAM_RMPTR8,       PARAM_1,            0               },
@@ -706,7 +634,7 @@ static const NEC_I386_OPCODE shiftb_table[8] =
 	{"shra",            0,              PARAM_RMPTR8,       PARAM_1,            0               }
 };
 
-static const NEC_I386_OPCODE shiftw_table[8] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::shiftw_table[8] =
 {
 	{"rol",             0,              PARAM_RMPTR16,      PARAM_1,            0               },
 	{"ror",             0,              PARAM_RMPTR16,      PARAM_1,            0               },
@@ -718,7 +646,7 @@ static const NEC_I386_OPCODE shiftw_table[8] =
 	{"shra",            0,              PARAM_RMPTR16,      PARAM_1,            0               }
 };
 
-static const NEC_I386_OPCODE shiftbv_table[8] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::shiftbv_table[8] =
 {
 	{"rol",             0,              PARAM_RMPTR8,       PARAM_CL,           0               },
 	{"ror",             0,              PARAM_RMPTR8,       PARAM_CL,           0               },
@@ -730,7 +658,7 @@ static const NEC_I386_OPCODE shiftbv_table[8] =
 	{"shra",            0,              PARAM_RMPTR8,       PARAM_CL,           0               }
 };
 
-static const NEC_I386_OPCODE shiftwv_table[8] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::shiftwv_table[8] =
 {
 	{"rol",             0,              PARAM_RMPTR16,      PARAM_CL,           0               },
 	{"ror",             0,              PARAM_RMPTR16,      PARAM_CL,           0               },
@@ -742,7 +670,7 @@ static const NEC_I386_OPCODE shiftwv_table[8] =
 	{"shra",            0,              PARAM_RMPTR16,      PARAM_CL,           0               }
 };
 
-static const NEC_I386_OPCODE group1b_table[8] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::group1b_table[8] =
 {
 	{"test",            0,              PARAM_RMPTR8,       PARAM_UI8,          0               },
 	{"???",             0,              0,                  0,                  0               },
@@ -754,7 +682,7 @@ static const NEC_I386_OPCODE group1b_table[8] =
 	{"div",             0,              PARAM_RMPTR8,       0,                  0               }
 };
 
-static const NEC_I386_OPCODE group1w_table[8] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::group1w_table[8] =
 {
 	{"test",            0,              PARAM_RMPTR16,      PARAM_IMM,          0               },
 	{"???",             0,              0,                  0,                  0               },
@@ -766,7 +694,7 @@ static const NEC_I386_OPCODE group1w_table[8] =
 	{"div",             0,              PARAM_RMPTR16,      0,                  0               }
 };
 
-static const NEC_I386_OPCODE group2b_table[8] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::group2b_table[8] =
 {
 	{"inc",             0,              PARAM_RMPTR8,       0,                  0               },
 	{"dec",             0,              PARAM_RMPTR8,       0,                  0               },
@@ -778,19 +706,19 @@ static const NEC_I386_OPCODE group2b_table[8] =
 	{"???",             0,              0,                  0,                  0               }
 };
 
-static const NEC_I386_OPCODE group2w_table[8] =
+const nec_disassembler::NEC_I386_OPCODE nec_disassembler::group2w_table[8] =
 {
 	{"inc",             0,              PARAM_RMPTR16,      0,                  0               },
 	{"dec",             0,              PARAM_RMPTR16,      0,                  0               },
-	{"call",            0,              PARAM_RMPTR16,      0,                  0,              DASMFLAG_STEP_OVER},
-	{"call    far ptr ",0,              PARAM_RM16,         0,                  0,              DASMFLAG_STEP_OVER},
+	{"call",            0,              PARAM_RMPTR16,      0,                  0,              STEP_OVER},
+	{"call    far ptr ",0,              PARAM_RM16,         0,                  0,              STEP_OVER},
 	{"br",              0,              PARAM_RMPTR16,      0,                  0               },
 	{"br      far ptr ",0,              PARAM_RM16,         0,                  0               },
 	{"push",            0,              PARAM_RMPTR16,      0,                  0               },
 	{"???",             0,              0,                  0,                  0               }
 };
 
-static const NEC_GROUP_OP group_op_table[] =
+const nec_disassembler::NEC_GROUP_OP nec_disassembler::group_op_table[] =
 {
 	{ "immb",               immb_table              },
 	{ "immw",               immw_table              },
@@ -809,10 +737,10 @@ static const NEC_GROUP_OP group_op_table[] =
 
 
 
-static const char *const nec_reg[8] = { "aw",  "cw",  "dw",  "bw",  "sp",  "bp",  "ix",  "iy" };
-static const char *const nec_reg8[8] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
-static const char *const nec_sreg[8] = { "ds1", "ps", "ss", "ds0", "???", "???", "???", "???" };
-static const char *const nec_sfreg[256] =
+const char *const nec_disassembler::nec_reg[8] = { "aw",  "cw",  "dw",  "bw",  "sp",  "bp",  "ix",  "iy" };
+const char *const nec_disassembler::nec_reg8[8] = { "al", "cl", "dl", "bl", "ah", "ch", "dh", "bh" };
+const char *const nec_disassembler::nec_sreg[8] = { "ds1", "ps", "ss", "ds0", "???", "???", "???", "???" };
+const char *const nec_disassembler::nec_sfreg[256] =
 {
 	/* 0x00 */
 	"p0",   "pm0",  "pmc0", "???",  "???",  "???",  "???",  "???",
@@ -864,131 +792,88 @@ static const char *const nec_sfreg[256] =
 	"???",  "???",  "???",  "???",  "ispr", "???",  "???",  "idb"
 };
 
-static uint32_t pc;
-static uint8_t modrm;
-static uint32_t segment;
-static offs_t dasm_flags;
-static char modrm_string[256];
-
-#define MODRM_REG1  ((modrm >> 3) & 0x7)
-#define MODRM_REG2  (modrm & 0x7)
+#define MODRM_REG1  ((m_modrm >> 3) & 0x7)
+#define MODRM_REG2  (m_modrm & 0x7)
 
 #define MAX_LENGTH  8
 
-static inline uint8_t FETCH(void)
+uint8_t nec_disassembler::FETCH(offs_t pc_base, offs_t &pc, const data_buffer &opcodes)
 {
-	if ((opcode_ptr - opcode_ptr_base) + 1 > MAX_LENGTH)
+	if ((pc - pc_base) + 1 > MAX_LENGTH)
 		return 0xff;
+	u8 r = opcodes.r8(pc);
 	pc++;
-	return *opcode_ptr++;
+	return r;
 }
 
-#if 0
-static inline uint16_t FETCH16(void)
+uint16_t nec_disassembler::FETCH16(offs_t pc_base, offs_t &pc, const data_buffer &opcodes)
 {
-	uint16_t d;
-	if ((opcode_ptr - opcode_ptr_base) + 2 > MAX_LENGTH)
-		return 0xffff;
-	d = opcode_ptr[0] | (opcode_ptr[1] << 8);
-	opcode_ptr += 2;
-	pc += 2;
-	return d;
-}
-#endif
-
-static inline uint8_t FETCHD(void)
-{
-	if ((opcode_ptr - opcode_ptr_base) + 1 > MAX_LENGTH)
+	if ((pc - pc_base) + 1 > MAX_LENGTH)
 		return 0xff;
-	pc++;
-	return *opcode_ptr++;
-}
-
-static inline uint16_t FETCHD16(void)
-{
-	uint16_t d;
-	if ((opcode_ptr - opcode_ptr_base) + 2 > MAX_LENGTH)
-		return 0xffff;
-	d = opcode_ptr[0] | (opcode_ptr[1] << 8);
-	opcode_ptr += 2;
+	u16 r = opcodes.r16(pc);
 	pc += 2;
-	return d;
+	return r;
 }
 
-static char *hexstring(uint32_t value, int digits)
+std::string nec_disassembler::hexstring(uint32_t value, int digits)
 {
-	static char buffer[20];
-	buffer[0] = '0';
+	std::string buffer;
 	if (digits)
-		sprintf(&buffer[1], "%0*Xh", digits, value);
+		buffer = string_format("%0*Xh", digits, value);
 	else
-		sprintf(&buffer[1], "%Xh", value);
-	return (buffer[1] >= '0' && buffer[1] <= '9') ? &buffer[1] : &buffer[0];
+		buffer = string_format("%Xh", value);
+	return buffer[0] > '9' ? '0' + buffer : buffer;
 }
 
-static char *shexstring(uint32_t value, int digits, bool always)
+std::string nec_disassembler::shexstring(uint32_t value, int digits, bool always)
 {
-	static char buffer[20];
 	if (value >= 0x80000000)
-		sprintf(buffer, "-%s", hexstring(-value, digits));
+		return '-' + hexstring(-value, digits);
 	else if (always)
-		sprintf(buffer, "+%s", hexstring(value, digits));
+		return '+' + hexstring(value, digits);
 	else
 		return hexstring(value, digits);
-	return buffer;
 }
 
-static void handle_modrm(char* s)
+void nec_disassembler::handle_modrm(offs_t pc_base, offs_t &pc, const data_buffer &params)
 {
-	int8_t disp8;
-	int16_t disp16;
-	uint8_t mod, rm;
+	m_modrm_string = "";
 
-	modrm = FETCHD();
-	mod = (modrm >> 6) & 0x3;
-	rm = (modrm & 0x7);
+	m_modrm = FETCH(pc_base, pc, params);
+	u8 mod = (m_modrm >> 6) & 0x3;
+	u8 rm = (m_modrm & 0x7);
 
-	if( modrm >= 0xc0 )
+	if( m_modrm >= 0xc0 )
 		return;
 
-	switch(segment)
+	switch(m_segment)
 	{
-		case SEG_PS: s += sprintf( s, "ps:" ); break;
-		case SEG_DS0: s += sprintf( s, "ds0:" ); break;
-		case SEG_DS1: s += sprintf( s, "ds1:" ); break;
-		case SEG_SS: s += sprintf( s, "ss:" ); break;
+		case SEG_PS: m_modrm_string += "ps:"; break;
+		case SEG_DS0: m_modrm_string += "ds0:"; break;
+		case SEG_DS1: m_modrm_string += "ds1:"; break;
+		case SEG_SS: m_modrm_string += "ss:"; break;
 	}
 
-	s += sprintf( s, "[" );
+	m_modrm_string += '[';
 	switch( rm )
 	{
-		case 0: s += sprintf( s, "bw+ix" ); break;
-		case 1: s += sprintf( s, "bw+iy" ); break;
-		case 2: s += sprintf( s, "bp+ix" ); break;
-		case 3: s += sprintf( s, "bp+iy" ); break;
-		case 4: s += sprintf( s, "ix" ); break;
-		case 5: s += sprintf( s, "iy" ); break;
-		case 6:
-			if( mod == 0 ) {
-				disp16 = FETCHD16();
-				s += sprintf( s, "%s", hexstring((unsigned) (uint16_t) disp16, 0) );
-			} else {
-				s += sprintf( s, "bp" );
-			}
-			break;
-		case 7: s += sprintf( s, "bw" ); break;
+		case 0: m_modrm_string += "bw+ix"; break;
+		case 1: m_modrm_string += "bw+iy"; break;
+		case 2: m_modrm_string += "bp+ix"; break;
+		case 3: m_modrm_string += "bp+iy"; break;
+		case 4: m_modrm_string += "ix"; break;
+		case 5: m_modrm_string += "iy"; break;
+		case 6: m_modrm_string += mod == 0 ? hexstring(u16(FETCH16(pc_base, pc, params)), 0) : "bp"; break;
+		case 7: m_modrm_string += "bw"; break;
 	}
-	if( mod == 1 ) {
-		disp8 = FETCHD();
-		s += sprintf( s, "%s", shexstring((int32_t)disp8, 0, true) );
-	} else if( mod == 2 ) {
-		disp16 = FETCHD16();
-		s += sprintf( s, "%s", shexstring((int32_t)disp16, 0, true) );
-	}
-	s += sprintf( s, "]" );
+	if( mod == 1 )
+		m_modrm_string += shexstring(s8(FETCH(pc_base, pc, params)), 0, true);
+	else if( mod == 2 )
+		m_modrm_string += shexstring(s16(FETCH16(pc_base, pc, params)), 0, true);
+	m_modrm_string += ']';
 }
 
-static char* handle_param(char* s, uint32_t param)
+void nec_disassembler::handle_param(std::ostream &stream, uint32_t param, offs_t pc_base, offs_t &pc, const data_buffer &params)
 {
 	uint8_t i8;
 	uint16_t i16;
@@ -1000,139 +885,138 @@ static char* handle_param(char* s, uint32_t param)
 	switch(param)
 	{
 		case PARAM_REG8:
-			s += sprintf( s, "%s", nec_reg8[MODRM_REG1] );
+			util::stream_format( stream, "%s", nec_reg8[MODRM_REG1] );
 			break;
 
 		case PARAM_REG16:
-			s += sprintf( s, "%s", nec_reg[MODRM_REG1] );
+			util::stream_format( stream, "%s", nec_reg[MODRM_REG1] );
 			break;
 
 		case PARAM_REG2_8:
-			s += sprintf( s, "%s", nec_reg8[MODRM_REG2] );
+			util::stream_format( stream, "%s", nec_reg8[MODRM_REG2] );
 			break;
 
 		case PARAM_REG2_16:
-			s += sprintf( s, "%s", nec_reg[MODRM_REG2] );
+			util::stream_format( stream, "%s", nec_reg[MODRM_REG2] );
 			break;
 
 		case PARAM_RM8:
 		case PARAM_RMPTR8:
-			if( modrm >= 0xc0 ) {
-				s += sprintf( s, "%s", nec_reg8[MODRM_REG2] );
+			if( m_modrm >= 0xc0 ) {
+				util::stream_format( stream, "%s", nec_reg8[MODRM_REG2] );
 			} else {
 				if (param == PARAM_RMPTR8)
-					s += sprintf( s, "byte ptr " );
-				s += sprintf( s, "%s", modrm_string );
+					util::stream_format( stream, "byte ptr " );
+				util::stream_format( stream, "%s", m_modrm_string );
 			}
 			break;
 
 		case PARAM_RM16:
 		case PARAM_RMPTR16:
-			if( modrm >= 0xc0 ) {
-				s += sprintf( s, "%s", nec_reg[MODRM_REG2] );
+			if( m_modrm >= 0xc0 ) {
+				util::stream_format( stream, "%s", nec_reg[MODRM_REG2] );
 			} else {
 				if (param == PARAM_RMPTR16)
-					s += sprintf( s, "word ptr " );
-				s += sprintf( s, "%s", modrm_string );
+					util::stream_format( stream, "word ptr " );
+				util::stream_format( stream, "%s", m_modrm_string );
 			}
 			break;
 
 		case PARAM_I3:
-			i8 = FETCHD();
-			s += sprintf( s, "%d", i8 & 0x07 );
+			i8 = FETCH(pc_base, pc, params);
+			util::stream_format( stream, "%d", i8 & 0x07 );
 			break;
 
 		case PARAM_I4:
-			i8 = FETCHD();
-			s += sprintf( s, "%d", i8 & 0x0f );
+			i8 = FETCH(pc_base, pc, params);
+			util::stream_format( stream, "%d", i8 & 0x0f );
 			break;
 
 		case PARAM_I8:
-			i8 = FETCHD();
-			s += sprintf( s, "%s", shexstring((int8_t)i8, 0, false) );
+			i8 = FETCH(pc_base, pc, params);
+			util::stream_format( stream, "%s", shexstring((int8_t)i8, 0, false) );
 			break;
 
 		case PARAM_I16:
-			i16 = FETCHD16();
-			s += sprintf( s, "%s", shexstring((int16_t)i16, 0, false) );
+			i16 = FETCH16(pc_base, pc, params);
+			util::stream_format( stream, "%s", shexstring((int16_t)i16, 0, false) );
 			break;
 
 		case PARAM_UI8:
-			i8 = FETCHD();
-			s += sprintf( s, "%s", shexstring((uint8_t)i8, 0, false) );
+			i8 = FETCH(pc_base, pc, params);
+			util::stream_format( stream, "%s", shexstring((uint8_t)i8, 0, false) );
 			break;
 
 		case PARAM_IMM:
-			i16 = FETCHD16();
-			s += sprintf( s, "%s", hexstring(i16, 0) );
+			i16 = FETCH16(pc_base, pc, params);
+			util::stream_format( stream, "%s", hexstring(i16, 0) );
 			break;
 
 		case PARAM_ADDR:
-			addr = FETCHD16();
-			ptr = FETCHD16();
-			s += sprintf( s, "%s:", hexstring(ptr, 4) );
-			s += sprintf( s, "%s", hexstring(addr, 0) );
+			addr = FETCH16(pc_base, pc, params);
+			ptr = FETCH16(pc_base, pc, params);
+			util::stream_format( stream, "%s:", hexstring(ptr, 4) );
+			util::stream_format( stream, "%s", hexstring(addr, 0) );
 			break;
 
 		case PARAM_REL16:
 			/* make sure to keep the relative offset within the segment */
-			d16 = FETCHD16();
-			s += sprintf( s, "%s", hexstring((pc & 0xFFFF0000) | ((pc + d16) & 0x0000FFFF), 0) );
+			d16 = FETCH16(pc_base, pc, params);
+			util::stream_format( stream, "%s", hexstring((pc & 0xFFFF0000) | ((pc + d16) & 0x0000FFFF), 0) );
 			break;
 
 		case PARAM_REL8:
-			d8 = FETCHD();
-			s += sprintf( s, "%s", hexstring(pc + d8, 0) );
+			d8 = FETCH(pc_base, pc, params);
+			util::stream_format( stream, "%s", hexstring(pc + d8, 0) );
 			break;
 
 		case PARAM_MEM_OFFS:
-			switch(segment)
+			switch(m_segment)
 			{
-				case SEG_PS: s += sprintf( s, "ps:" ); break;
-				case SEG_DS0: s += sprintf( s, "ds0:" ); break;
-				case SEG_DS1: s += sprintf( s, "ds1:" ); break;
-				case SEG_SS: s += sprintf( s, "ss:" ); break;
+				case SEG_PS: util::stream_format( stream, "ps:" ); break;
+				case SEG_DS0: util::stream_format( stream, "ds0:" ); break;
+				case SEG_DS1: util::stream_format( stream, "ds1:" ); break;
+				case SEG_SS: util::stream_format( stream, "ss:" ); break;
 			}
 
-			i16 = FETCHD16();
-			s += sprintf( s, "[%s]", hexstring(i16, 0) );
+			i16 = FETCH16(pc_base, pc, params);
+			util::stream_format( stream, "[%s]", hexstring(i16, 0) );
 			break;
 
 		case PARAM_SREG:
-			s += sprintf( s, "%s", nec_sreg[MODRM_REG1] );
+			util::stream_format( stream, "%s", nec_sreg[MODRM_REG1] );
 			break;
 
 		case PARAM_SFREG:
-			i8 = FETCHD();
-			s += sprintf( s, "%s", nec_sfreg[i8] );
+			i8 = FETCH(pc_base, pc, params);
+			util::stream_format( stream, "%s", nec_sfreg[i8] );
 			break;
 
 		case PARAM_1:
-			s += sprintf( s, "1" );
+			util::stream_format( stream, "1" );
 			break;
 
-		case PARAM_AL: s += sprintf( s, "al" ); break;
-		case PARAM_CL: s += sprintf( s, "cl" ); break;
-		case PARAM_DL: s += sprintf( s, "dl" ); break;
-		case PARAM_BL: s += sprintf( s, "bl" ); break;
-		case PARAM_AH: s += sprintf( s, "ah" ); break;
-		case PARAM_CH: s += sprintf( s, "ch" ); break;
-		case PARAM_DH: s += sprintf( s, "dh" ); break;
-		case PARAM_BH: s += sprintf( s, "bh" ); break;
+		case PARAM_AL: util::stream_format( stream, "al" ); break;
+		case PARAM_CL: util::stream_format( stream, "cl" ); break;
+		case PARAM_DL: util::stream_format( stream, "dl" ); break;
+		case PARAM_BL: util::stream_format( stream, "bl" ); break;
+		case PARAM_AH: util::stream_format( stream, "ah" ); break;
+		case PARAM_CH: util::stream_format( stream, "ch" ); break;
+		case PARAM_DH: util::stream_format( stream, "dh" ); break;
+		case PARAM_BH: util::stream_format( stream, "bh" ); break;
 
-		case PARAM_AW: s += sprintf( s, "aw" ); break;
-		case PARAM_CW: s += sprintf( s, "cw" ); break;
-		case PARAM_DW: s += sprintf( s, "dw" ); break;
-		case PARAM_BW: s += sprintf( s, "bw" ); break;
-		case PARAM_SP: s += sprintf( s, "sp" ); break;
-		case PARAM_BP: s += sprintf( s, "bp" ); break;
-		case PARAM_IX: s += sprintf( s, "ix" ); break;
-		case PARAM_IY: s += sprintf( s, "iy" ); break;
+		case PARAM_AW: util::stream_format( stream, "aw" ); break;
+		case PARAM_CW: util::stream_format( stream, "cw" ); break;
+		case PARAM_DW: util::stream_format( stream, "dw" ); break;
+		case PARAM_BW: util::stream_format( stream, "bw" ); break;
+		case PARAM_SP: util::stream_format( stream, "sp" ); break;
+		case PARAM_BP: util::stream_format( stream, "bp" ); break;
+		case PARAM_IX: util::stream_format( stream, "ix" ); break;
+		case PARAM_IY: util::stream_format( stream, "iy" ); break;
 	}
-	return s;
 }
 
-static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
+void nec_disassembler::handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2, offs_t pc_base, offs_t &pc, const data_buffer &params)
 {
 	switch (op1 & 0x7)
 	{
@@ -1141,32 +1025,31 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm( pc_base, pc, params );
 				switch ((op2 >> 3) & 0x7)
 				{
-					case 0: sprintf(s, "fadd    dword ptr %s", modrm_string); break;
-					case 1: sprintf(s, "fmul    dword ptr %s", modrm_string); break;
-					case 2: sprintf(s, "fcom    dword ptr %s", modrm_string); break;
-					case 3: sprintf(s, "fcomp   dword ptr %s", modrm_string); break;
-					case 4: sprintf(s, "fsub    dword ptr %s", modrm_string); break;
-					case 5: sprintf(s, "fsubr   dword ptr %s", modrm_string); break;
-					case 6: sprintf(s, "fdiv    dword ptr %s", modrm_string); break;
-					case 7: sprintf(s, "fdivr   dword ptr %s", modrm_string); break;
+					case 0: util::stream_format(stream, "fadd    dword ptr %s", m_modrm_string); break;
+					case 1: util::stream_format(stream, "fmul    dword ptr %s", m_modrm_string); break;
+					case 2: util::stream_format(stream, "fcom    dword ptr %s", m_modrm_string); break;
+					case 3: util::stream_format(stream, "fcomp   dword ptr %s", m_modrm_string); break;
+					case 4: util::stream_format(stream, "fsub    dword ptr %s", m_modrm_string); break;
+					case 5: util::stream_format(stream, "fsubr   dword ptr %s", m_modrm_string); break;
+					case 6: util::stream_format(stream, "fdiv    dword ptr %s", m_modrm_string); break;
+					case 7: util::stream_format(stream, "fdivr   dword ptr %s", m_modrm_string); break;
 				}
 			}
 			else
 			{
 				switch ((op2 >> 3) & 0x7)
 				{
-					case 0: sprintf(s, "fadd    st(0),st(%d)", op2 & 0x7); break;
-					case 1: sprintf(s, "fcom    st(0),st(%d)", op2 & 0x7); break;
-					case 2: sprintf(s, "fsub    st(0),st(%d)", op2 & 0x7); break;
-					case 3: sprintf(s, "fdiv    st(0),st(%d)", op2 & 0x7); break;
-					case 4: sprintf(s, "fmul    st(0),st(%d)", op2 & 0x7); break;
-					case 5: sprintf(s, "fcomp   st(0),st(%d)", op2 & 0x7); break;
-					case 6: sprintf(s, "fsubr   st(0),st(%d)", op2 & 0x7); break;
-					case 7: sprintf(s, "fdivr   st(0),st(%d)", op2 & 0x7); break;
+					case 0: util::stream_format(stream, "fadd    st(0),st(%d)", op2 & 0x7); break;
+					case 1: util::stream_format(stream, "fcom    st(0),st(%d)", op2 & 0x7); break;
+					case 2: util::stream_format(stream, "fsub    st(0),st(%d)", op2 & 0x7); break;
+					case 3: util::stream_format(stream, "fdiv    st(0),st(%d)", op2 & 0x7); break;
+					case 4: util::stream_format(stream, "fmul    st(0),st(%d)", op2 & 0x7); break;
+					case 5: util::stream_format(stream, "fcomp   st(0),st(%d)", op2 & 0x7); break;
+					case 6: util::stream_format(stream, "fsubr   st(0),st(%d)", op2 & 0x7); break;
+					case 7: util::stream_format(stream, "fdivr   st(0),st(%d)", op2 & 0x7); break;
 				}
 			}
 			break;
@@ -1177,18 +1060,17 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm( pc_base, pc, params );
 				switch ((op2 >> 3) & 0x7)
 				{
-					case 0: sprintf(s, "fld     dword ptr %s", modrm_string); break;
-					case 1: sprintf(s, "??? (FPU)"); break;
-					case 2: sprintf(s, "fst     dword ptr %s", modrm_string); break;
-					case 3: sprintf(s, "fstp    dword ptr %s", modrm_string); break;
-					case 4: sprintf(s, "fldenv  word ptr %s", modrm_string); break;
-					case 5: sprintf(s, "fldcw   word ptr %s", modrm_string); break;
-					case 6: sprintf(s, "fstenv  word ptr %s", modrm_string); break;
-					case 7: sprintf(s, "fstcw   word ptr %s", modrm_string); break;
+					case 0: util::stream_format(stream, "fld     dword ptr %s", m_modrm_string); break;
+					case 1: util::stream_format(stream, "??? (FPU)"); break;
+					case 2: util::stream_format(stream, "fst     dword ptr %s", m_modrm_string); break;
+					case 3: util::stream_format(stream, "fstp    dword ptr %s", m_modrm_string); break;
+					case 4: util::stream_format(stream, "fldenv  word ptr %s", m_modrm_string); break;
+					case 5: util::stream_format(stream, "fldcw   word ptr %s", m_modrm_string); break;
+					case 6: util::stream_format(stream, "fstenv  word ptr %s", m_modrm_string); break;
+					case 7: util::stream_format(stream, "fstcw   word ptr %s", m_modrm_string); break;
 				}
 			}
 			else
@@ -1196,41 +1078,41 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 				switch (op2 & 0x3f)
 				{
 					case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
-						sprintf(s, "fld     st(0),st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fld     st(0),st(%d)", op2 & 0x7); break;
 
 					case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-						sprintf(s, "fxch    st(0),st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fxch    st(0),st(%d)", op2 & 0x7); break;
 
-					case 0x10: sprintf(s, "fnop"); break;
-					case 0x20: sprintf(s, "fchs"); break;
-					case 0x21: sprintf(s, "fabs"); break;
-					case 0x24: sprintf(s, "ftst"); break;
-					case 0x25: sprintf(s, "fxam"); break;
-					case 0x28: sprintf(s, "fld1"); break;
-					case 0x29: sprintf(s, "fldl2t"); break;
-					case 0x2a: sprintf(s, "fldl2e"); break;
-					case 0x2b: sprintf(s, "fldpi"); break;
-					case 0x2c: sprintf(s, "fldlg2"); break;
-					case 0x2d: sprintf(s, "fldln2"); break;
-					case 0x2e: sprintf(s, "fldz"); break;
-					case 0x30: sprintf(s, "f2xm1"); break;
-					case 0x31: sprintf(s, "fyl2x"); break;
-					case 0x32: sprintf(s, "fptan"); break;
-					case 0x33: sprintf(s, "fpatan"); break;
-					case 0x34: sprintf(s, "fxtract"); break;
-					case 0x35: sprintf(s, "fprem1"); break;
-					case 0x36: sprintf(s, "fdecstp"); break;
-					case 0x37: sprintf(s, "fincstp"); break;
-					case 0x38: sprintf(s, "fprem"); break;
-					case 0x39: sprintf(s, "fyl2xp1"); break;
-					case 0x3a: sprintf(s, "fsqrt"); break;
-					case 0x3b: sprintf(s, "fsincos"); break;
-					case 0x3c: sprintf(s, "frndint"); break;
-					case 0x3d: sprintf(s, "fscale"); break;
-					case 0x3e: sprintf(s, "fsin"); break;
-					case 0x3f: sprintf(s, "fcos"); break;
+					case 0x10: util::stream_format(stream, "fnop"); break;
+					case 0x20: util::stream_format(stream, "fchs"); break;
+					case 0x21: util::stream_format(stream, "fabs"); break;
+					case 0x24: util::stream_format(stream, "ftst"); break;
+					case 0x25: util::stream_format(stream, "fxam"); break;
+					case 0x28: util::stream_format(stream, "fld1"); break;
+					case 0x29: util::stream_format(stream, "fldl2t"); break;
+					case 0x2a: util::stream_format(stream, "fldl2e"); break;
+					case 0x2b: util::stream_format(stream, "fldpi"); break;
+					case 0x2c: util::stream_format(stream, "fldlg2"); break;
+					case 0x2d: util::stream_format(stream, "fldln2"); break;
+					case 0x2e: util::stream_format(stream, "fldz"); break;
+					case 0x30: util::stream_format(stream, "f2xm1"); break;
+					case 0x31: util::stream_format(stream, "fyl2x"); break;
+					case 0x32: util::stream_format(stream, "fptan"); break;
+					case 0x33: util::stream_format(stream, "fpatan"); break;
+					case 0x34: util::stream_format(stream, "fxtract"); break;
+					case 0x35: util::stream_format(stream, "fprem1"); break;
+					case 0x36: util::stream_format(stream, "fdecstp"); break;
+					case 0x37: util::stream_format(stream, "fincstp"); break;
+					case 0x38: util::stream_format(stream, "fprem"); break;
+					case 0x39: util::stream_format(stream, "fyl2xp1"); break;
+					case 0x3a: util::stream_format(stream, "fsqrt"); break;
+					case 0x3b: util::stream_format(stream, "fsincos"); break;
+					case 0x3c: util::stream_format(stream, "frndint"); break;
+					case 0x3d: util::stream_format(stream, "fscale"); break;
+					case 0x3e: util::stream_format(stream, "fsin"); break;
+					case 0x3f: util::stream_format(stream, "fcos"); break;
 
-					default: sprintf(s, "??? (FPU)"); break;
+					default: util::stream_format(stream, "??? (FPU)"); break;
 				}
 			}
 			break;
@@ -1241,18 +1123,17 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm( pc_base, pc, params );
 				switch ((op2 >> 3) & 0x7)
 				{
-					case 0: sprintf(s, "fiadd   dword ptr %s", modrm_string); break;
-					case 1: sprintf(s, "fimul   dword ptr %s", modrm_string); break;
-					case 2: sprintf(s, "ficom   dword ptr %s", modrm_string); break;
-					case 3: sprintf(s, "ficomp  dword ptr %s", modrm_string); break;
-					case 4: sprintf(s, "fisub   dword ptr %s", modrm_string); break;
-					case 5: sprintf(s, "fisubr  dword ptr %s", modrm_string); break;
-					case 6: sprintf(s, "fidiv   dword ptr %s", modrm_string); break;
-					case 7: sprintf(s, "fidivr  dword ptr %s", modrm_string); break;
+					case 0: util::stream_format(stream, "fiadd   dword ptr %s", m_modrm_string); break;
+					case 1: util::stream_format(stream, "fimul   dword ptr %s", m_modrm_string); break;
+					case 2: util::stream_format(stream, "ficom   dword ptr %s", m_modrm_string); break;
+					case 3: util::stream_format(stream, "ficomp  dword ptr %s", m_modrm_string); break;
+					case 4: util::stream_format(stream, "fisub   dword ptr %s", m_modrm_string); break;
+					case 5: util::stream_format(stream, "fisubr  dword ptr %s", m_modrm_string); break;
+					case 6: util::stream_format(stream, "fidiv   dword ptr %s", m_modrm_string); break;
+					case 7: util::stream_format(stream, "fidivr  dword ptr %s", m_modrm_string); break;
 				}
 			}
 			else
@@ -1260,18 +1141,18 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 				switch (op2 & 0x3f)
 				{
 					case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
-						sprintf(s, "fcmovb  st(0),st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fcmovb  st(0),st(%d)", op2 & 0x7); break;
 
 					case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-						sprintf(s, "fcmove  st(0),st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fcmove  st(0),st(%d)", op2 & 0x7); break;
 
 					case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
-						sprintf(s, "fcmovbe st(0),st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fcmovbe st(0),st(%d)", op2 & 0x7); break;
 
 					case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-						sprintf(s, "fcmovu  st(0),st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fcmovu  st(0),st(%d)", op2 & 0x7); break;
 
-					default: sprintf(s, "??? (FPU)"); break;
+					default: util::stream_format(stream, "??? (FPU)"); break;
 
 				}
 			}
@@ -1283,18 +1164,17 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm( pc_base, pc, params );
 				switch ((op2 >> 3) & 0x7)
 				{
-					case 0: sprintf(s, "fild    dword ptr %s", modrm_string); break;
-					case 1: sprintf(s, "??? (FPU)"); break;
-					case 2: sprintf(s, "fist    dword ptr %s", modrm_string); break;
-					case 3: sprintf(s, "fistp   dword ptr %s", modrm_string); break;
-					case 4: sprintf(s, "??? (FPU)"); break;
-					case 5: sprintf(s, "fld     tword ptr %s", modrm_string); break;
-					case 6: sprintf(s, "??? (FPU)"); break;
-					case 7: sprintf(s, "fstp    tword ptr %s", modrm_string); break;
+					case 0: util::stream_format(stream, "fild    dword ptr %s", m_modrm_string); break;
+					case 1: util::stream_format(stream, "??? (FPU)"); break;
+					case 2: util::stream_format(stream, "fist    dword ptr %s", m_modrm_string); break;
+					case 3: util::stream_format(stream, "fistp   dword ptr %s", m_modrm_string); break;
+					case 4: util::stream_format(stream, "??? (FPU)"); break;
+					case 5: util::stream_format(stream, "fld     tword ptr %s", m_modrm_string); break;
+					case 6: util::stream_format(stream, "??? (FPU)"); break;
+					case 7: util::stream_format(stream, "fstp    tword ptr %s", m_modrm_string); break;
 				}
 			}
 			else
@@ -1302,27 +1182,27 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 				switch (op2 & 0x3f)
 				{
 					case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
-						sprintf(s, "fcmovnb st(0),st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fcmovnb st(0),st(%d)", op2 & 0x7); break;
 
 					case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-						sprintf(s, "fcmovne st(0),st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fcmovne st(0),st(%d)", op2 & 0x7); break;
 
 					case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
-						sprintf(s, "fcmovnbe st(0),st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fcmovnbe st(0),st(%d)", op2 & 0x7); break;
 
 					case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-						sprintf(s, "fcmovnu st(0),st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fcmovnu st(0),st(%d)", op2 & 0x7); break;
 
-					case 0x22: sprintf(s, "fclex"); break;
-					case 0x23: sprintf(s, "finit"); break;
+					case 0x22: util::stream_format(stream, "fclex"); break;
+					case 0x23: util::stream_format(stream, "finit"); break;
 
 					case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-						sprintf(s, "fucomi  st(0),st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fucomi  st(0),st(%d)", op2 & 0x7); break;
 
 					case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
-						sprintf(s, "fcomi   st(0),st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fcomi   st(0),st(%d)", op2 & 0x7); break;
 
-					default: sprintf(s, "??? (FPU)"); break;
+					default: util::stream_format(stream, "??? (FPU)"); break;
 				}
 			}
 			break;
@@ -1333,18 +1213,17 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm( pc_base, pc, params );
 				switch ((op2 >> 3) & 0x7)
 				{
-					case 0: sprintf(s, "fadd    qword ptr %s", modrm_string); break;
-					case 1: sprintf(s, "fmul    qword ptr %s", modrm_string); break;
-					case 2: sprintf(s, "fcom    qword ptr %s", modrm_string); break;
-					case 3: sprintf(s, "fcomp   qword ptr %s", modrm_string); break;
-					case 4: sprintf(s, "fsub    qword ptr %s", modrm_string); break;
-					case 5: sprintf(s, "fsubr   qword ptr %s", modrm_string); break;
-					case 6: sprintf(s, "fdiv    qword ptr %s", modrm_string); break;
-					case 7: sprintf(s, "fdivr   qword ptr %s", modrm_string); break;
+					case 0: util::stream_format(stream, "fadd    qword ptr %s", m_modrm_string); break;
+					case 1: util::stream_format(stream, "fmul    qword ptr %s", m_modrm_string); break;
+					case 2: util::stream_format(stream, "fcom    qword ptr %s", m_modrm_string); break;
+					case 3: util::stream_format(stream, "fcomp   qword ptr %s", m_modrm_string); break;
+					case 4: util::stream_format(stream, "fsub    qword ptr %s", m_modrm_string); break;
+					case 5: util::stream_format(stream, "fsubr   qword ptr %s", m_modrm_string); break;
+					case 6: util::stream_format(stream, "fdiv    qword ptr %s", m_modrm_string); break;
+					case 7: util::stream_format(stream, "fdivr   qword ptr %s", m_modrm_string); break;
 				}
 			}
 			else
@@ -1352,24 +1231,24 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 				switch (op2 & 0x3f)
 				{
 					case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
-						sprintf(s, "fadd    st(%d),st(0)", op2 & 0x7); break;
+						util::stream_format(stream, "fadd    st(%d),st(0)", op2 & 0x7); break;
 
 					case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-						sprintf(s, "fmul    st(%d),st(0)", op2 & 0x7); break;
+						util::stream_format(stream, "fmul    st(%d),st(0)", op2 & 0x7); break;
 
 					case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
-						sprintf(s, "fsubr   st(%d),st(0)", op2 & 0x7); break;
+						util::stream_format(stream, "fsubr   st(%d),st(0)", op2 & 0x7); break;
 
 					case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-						sprintf(s, "fsub    st(%d),st(0)", op2 & 0x7); break;
+						util::stream_format(stream, "fsub    st(%d),st(0)", op2 & 0x7); break;
 
 					case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
-						sprintf(s, "fdivr   st(%d),st(0)", op2 & 0x7); break;
+						util::stream_format(stream, "fdivr   st(%d),st(0)", op2 & 0x7); break;
 
 					case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-						sprintf(s, "fdiv    st(%d),st(0)", op2 & 0x7); break;
+						util::stream_format(stream, "fdiv    st(%d),st(0)", op2 & 0x7); break;
 
-					default: sprintf(s, "??? (FPU)"); break;
+					default: util::stream_format(stream, "??? (FPU)"); break;
 				}
 			}
 			break;
@@ -1380,18 +1259,17 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm( pc_base, pc, params );
 				switch ((op2 >> 3) & 0x7)
 				{
-					case 0: sprintf(s, "fld     qword ptr %s", modrm_string); break;
-					case 1: sprintf(s, "??? (FPU)"); break;
-					case 2: sprintf(s, "fst     qword ptr %s", modrm_string); break;
-					case 3: sprintf(s, "fstp    qword ptr %s", modrm_string); break;
-					case 4: sprintf(s, "frstor  %s", modrm_string); break;
-					case 5: sprintf(s, "??? (FPU)"); break;
-					case 6: sprintf(s, "fsave   %s", modrm_string); break;
-					case 7: sprintf(s, "fstsw   word ptr %s", modrm_string); break;
+					case 0: util::stream_format(stream, "fld     qword ptr %s", m_modrm_string); break;
+					case 1: util::stream_format(stream, "??? (FPU)"); break;
+					case 2: util::stream_format(stream, "fst     qword ptr %s", m_modrm_string); break;
+					case 3: util::stream_format(stream, "fstp    qword ptr %s", m_modrm_string); break;
+					case 4: util::stream_format(stream, "frstor  %s", m_modrm_string); break;
+					case 5: util::stream_format(stream, "??? (FPU)"); break;
+					case 6: util::stream_format(stream, "fsave   %s", m_modrm_string); break;
+					case 7: util::stream_format(stream, "fstsw   word ptr %s", m_modrm_string); break;
 				}
 			}
 			else
@@ -1399,21 +1277,21 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 				switch (op2 & 0x3f)
 				{
 					case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
-						sprintf(s, "ffree   st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "ffree   st(%d)", op2 & 0x7); break;
 
 					case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
-						sprintf(s, "fst     st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fst     st(%d)", op2 & 0x7); break;
 
 					case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
-						sprintf(s, "fstp    st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fstp    st(%d)", op2 & 0x7); break;
 
 					case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
-						sprintf(s, "fucom   st(%d), st(0)", op2 & 0x7); break;
+						util::stream_format(stream, "fucom   st(%d), st(0)", op2 & 0x7); break;
 
 					case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-						sprintf(s, "fucomp  st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fucomp  st(%d)", op2 & 0x7); break;
 
-					default: sprintf(s, "??? (FPU)"); break;
+					default: util::stream_format(stream, "??? (FPU)"); break;
 				}
 			}
 			break;
@@ -1424,18 +1302,17 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm( pc_base, pc, params );
 				switch ((op2 >> 3) & 0x7)
 				{
-					case 0: sprintf(s, "fiadd   word ptr %s", modrm_string); break;
-					case 1: sprintf(s, "fimul   word ptr %s", modrm_string); break;
-					case 2: sprintf(s, "ficom   word ptr %s", modrm_string); break;
-					case 3: sprintf(s, "ficomp  word ptr %s", modrm_string); break;
-					case 4: sprintf(s, "fisub   word ptr %s", modrm_string); break;
-					case 5: sprintf(s, "fisubr  word ptr %s", modrm_string); break;
-					case 6: sprintf(s, "fidiv   word ptr %s", modrm_string); break;
-					case 7: sprintf(s, "fidivr  word ptr %s", modrm_string); break;
+					case 0: util::stream_format(stream, "fiadd   word ptr %s", m_modrm_string); break;
+					case 1: util::stream_format(stream, "fimul   word ptr %s", m_modrm_string); break;
+					case 2: util::stream_format(stream, "ficom   word ptr %s", m_modrm_string); break;
+					case 3: util::stream_format(stream, "ficomp  word ptr %s", m_modrm_string); break;
+					case 4: util::stream_format(stream, "fisub   word ptr %s", m_modrm_string); break;
+					case 5: util::stream_format(stream, "fisubr  word ptr %s", m_modrm_string); break;
+					case 6: util::stream_format(stream, "fidiv   word ptr %s", m_modrm_string); break;
+					case 7: util::stream_format(stream, "fidivr  word ptr %s", m_modrm_string); break;
 				}
 			}
 			else
@@ -1443,26 +1320,26 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 				switch (op2 & 0x3f)
 				{
 					case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07:
-						sprintf(s, "faddp   st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "faddp   st(%d)", op2 & 0x7); break;
 
 					case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: case 0x0e: case 0x0f:
-						sprintf(s, "fmulp   st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fmulp   st(%d)", op2 & 0x7); break;
 
-					case 0x19: sprintf(s, "fcompp"); break;
+					case 0x19: util::stream_format(stream, "fcompp"); break;
 
 					case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
-						sprintf(s, "fsubrp  st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fsubrp  st(%d)", op2 & 0x7); break;
 
 					case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-						sprintf(s, "fsubp   st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fsubp   st(%d)", op2 & 0x7); break;
 
 					case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
-						sprintf(s, "fdivrp  st(%d), st(0)", op2 & 0x7); break;
+						util::stream_format(stream, "fdivrp  st(%d), st(0)", op2 & 0x7); break;
 
 					case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-						sprintf(s, "fdivp   st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fdivp   st(%d)", op2 & 0x7); break;
 
-					default: sprintf(s, "??? (FPU)"); break;
+					default: util::stream_format(stream, "??? (FPU)"); break;
 				}
 			}
 			break;
@@ -1473,33 +1350,32 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 			if (op2 < 0xc0)
 			{
 				pc--;       // adjust fetch pointer, so modrm byte read again
-				opcode_ptr--;
-				handle_modrm( modrm_string );
+				handle_modrm( pc_base, pc, params );
 				switch ((op2 >> 3) & 0x7)
 				{
-					case 0: sprintf(s, "fild    word ptr %s", modrm_string); break;
-					case 1: sprintf(s, "??? (FPU)"); break;
-					case 2: sprintf(s, "fist    word ptr %s", modrm_string); break;
-					case 3: sprintf(s, "fistp   word ptr %s", modrm_string); break;
-					case 4: sprintf(s, "fbld    %s", modrm_string); break;
-					case 5: sprintf(s, "fild    qword ptr %s", modrm_string); break;
-					case 6: sprintf(s, "fbstp   %s", modrm_string); break;
-					case 7: sprintf(s, "fistp   qword ptr %s", modrm_string); break;
+					case 0: util::stream_format(stream, "fild    word ptr %s", m_modrm_string); break;
+					case 1: util::stream_format(stream, "??? (FPU)"); break;
+					case 2: util::stream_format(stream, "fist    word ptr %s", m_modrm_string); break;
+					case 3: util::stream_format(stream, "fistp   word ptr %s", m_modrm_string); break;
+					case 4: util::stream_format(stream, "fbld    %s", m_modrm_string); break;
+					case 5: util::stream_format(stream, "fild    qword ptr %s", m_modrm_string); break;
+					case 6: util::stream_format(stream, "fbstp   %s", m_modrm_string); break;
+					case 7: util::stream_format(stream, "fistp   qword ptr %s", m_modrm_string); break;
 				}
 			}
 			else
 			{
 				switch (op2 & 0x3f)
 				{
-					case 0x20: sprintf(s, "fstsw   aw"); break;
+					case 0x20: util::stream_format(stream, "fstsw   aw"); break;
 
 					case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-						sprintf(s, "fucomip st(%d)", op2 & 0x7); break;
+						util::stream_format(stream, "fucomip st(%d)", op2 & 0x7); break;
 
 					case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37:
-						sprintf(s, "fcomip  st(%d),st(0)", op2 & 0x7); break;
+						util::stream_format(stream, "fcomip  st(%d),st(0)", op2 & 0x7); break;
 
-					default: sprintf(s, "??? (FPU)"); break;
+					default: util::stream_format(stream, "??? (FPU)"); break;
 				}
 			}
 			break;
@@ -1507,7 +1383,7 @@ static void handle_fpu(char *s, uint8_t op1, uint8_t op2)
 	}
 }
 
-static void decode_opcode(char *s, const NEC_I386_OPCODE *op, uint8_t op1 )
+void nec_disassembler::decode_opcode(std::ostream &stream, const NEC_I386_OPCODE *op, uint8_t op1, offs_t pc_base, offs_t &pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	int i;
 	uint8_t op2;
@@ -1515,89 +1391,93 @@ static void decode_opcode(char *s, const NEC_I386_OPCODE *op, uint8_t op1 )
 	switch( op->flags )
 	{
 		case TWO_BYTE:
-			op2 = FETCHD();
-			decode_opcode( s, &necv_opcode_table2[op2], op1 );
+			op2 = FETCH(pc_base, pc, params);
+			decode_opcode( stream, &necv_opcode_table2[op2], op1, pc_base, pc, opcodes, params );
 			return;
 
 		case SEG_PS:
 		case SEG_DS0:
 		case SEG_DS1:
 		case SEG_SS:
-			segment = op->flags;
-			op2 = FETCH();
-			if (Iconfig) op2 = Iconfig[op2];
-			decode_opcode( s, &necv_opcode_table1[op2], op1 );
+			m_segment = op->flags;
+			op2 = FETCH(pc_base, pc, opcodes);
+			if (m_decryption_table) op2 = m_decryption_table[op2];
+			decode_opcode( stream, &necv_opcode_table1[op2], op1, pc_base, pc, opcodes, params );
 			return;
 
 		case PREFIX:
-			s += sprintf( s, "%-8s", op->mnemonic );
-			op2 = FETCH();
-			if (Iconfig) op2 = Iconfig[op2];
-			decode_opcode( s, &necv_opcode_table1[op2], op1 );
+			util::stream_format( stream, "%-8s", op->mnemonic );
+			op2 = FETCH(pc_base, pc, opcodes);
+			if (m_decryption_table) op2 = m_decryption_table[op2];
+			decode_opcode( stream, &necv_opcode_table1[op2], op1, pc_base, pc, opcodes, params );
 			return;
 
 		case GROUP:
-			handle_modrm( modrm_string );
+			handle_modrm( pc_base, pc, params );
 			for( i=0; i < ARRAY_LENGTH(group_op_table); i++ ) {
 				if( strcmp(op->mnemonic, group_op_table[i].mnemonic) == 0 )
 				{
-					decode_opcode( s, &group_op_table[i].opcode[MODRM_REG1], op1 );
+					decode_opcode( stream, &group_op_table[i].opcode[MODRM_REG1], op1, pc_base, pc, opcodes, params );
 					return;
 				}
 			}
 			goto handle_unknown;
 
 		case FPU:
-			op2 = FETCHD();
-			handle_fpu( s, op1, op2);
+			op2 = FETCH(pc_base, pc, params);
+			handle_fpu( stream, op1, op2, pc_base, pc, params);
 			return;
 
 		case MODRM:
-			handle_modrm( modrm_string );
+			handle_modrm( pc_base, pc, params );
 			break;
 	}
 
-	s += sprintf( s, "%-8s", op->mnemonic );
-	dasm_flags = op->dasm_flags;
+	util::stream_format( stream, "%-8s", op->mnemonic );
+	m_dasm_flags = op->dasm_flags;
 
 	if( op->param1 != 0 ) {
-		s = handle_param( s, op->param1 );
+		handle_param(stream, op->param1, pc_base, pc, params);
 	}
 
 	if( op->param2 != 0 ) {
-		s += sprintf( s, "," );
-		s = handle_param( s, op->param2 );
+		util::stream_format( stream, "," );
+		handle_param(stream, op->param2, pc_base, pc, params);
 	}
 
 	if( op->param3 != 0 ) {
-		s += sprintf( s, "," );
-		s = handle_param( s, op->param3 );
+		util::stream_format( stream, "," );
+		handle_param(stream, op->param3, pc_base, pc, params);
 	}
 	return;
 
 handle_unknown:
-	sprintf(s, "???");
+	util::stream_format(stream, "???");
 }
 
-int necv_dasm_one(char *buffer, uint32_t eip, const uint8_t *oprom, const uint8_t *decryption_table)
+offs_t nec_disassembler::disassemble(std::ostream &stream, offs_t eip, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint8_t op;
-	Iconfig = decryption_table;
 
-	opcode_ptr = opcode_ptr_base = oprom;
-	pc = eip;
-	dasm_flags = 0;
-	segment = 0;
+	offs_t pc = eip;
+	m_dasm_flags = 0;
+	m_segment = 0;
 
-	op = FETCH();
+	op = FETCH(eip, pc, opcodes);
 
-	if (Iconfig) op = Iconfig[op];
+	if (m_decryption_table)
+		op = m_decryption_table[op];
 
-	decode_opcode( buffer, &necv_opcode_table1[op], op );
-	return (pc-eip) | dasm_flags | DASMFLAG_SUPPORTED;
+	decode_opcode( stream, &necv_opcode_table1[op], op, eip, pc, opcodes, params );
+	return (pc-eip) | m_dasm_flags | SUPPORTED;
 }
 
-CPU_DISASSEMBLE( nec )
+nec_disassembler::nec_disassembler(const u8 *decryption_table) : m_decryption_table(decryption_table)
 {
-	return necv_dasm_one(buffer, pc, oprom, nullptr);
 }
+
+u32 nec_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+

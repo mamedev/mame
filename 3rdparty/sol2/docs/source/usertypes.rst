@@ -24,3 +24,6 @@ The examples folder also has a number of really great examples for you to see. T
 	- Work on a copy by taking or returning a copy by value.
 * The actual metatable associated with the usertype has a long name and is defined to be opaque by the Sol implementation.
 * Containers get pushed as special usertypes, but can be disabled if problems arising as detailed :doc:`here<api/containers>`.
+* You can use bitfields but it requires some finesse on your part. We have an example to help you get started `here that uses a few tricks`_.
+
+.. _here that uses a few tricks: https://github.com/ThePhD/sol2/blob/develop/examples/usertype_bitfields.cpp

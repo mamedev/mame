@@ -36,6 +36,7 @@
 @interface SDLApplication : NSApplication
 
 - (void)terminate:(id)sender;
+- (void)sendEvent:(NSEvent *)theEvent;
 
 @end
 
@@ -45,6 +46,48 @@
 - (void)terminate:(id)sender
 {
     SDL_SendQuit();
+}
+
+static SDL_bool s_bShouldHandleEventsInSDLApplication = SDL_FALSE;
+
+static void Cocoa_DispatchEvent(NSEvent *theEvent)
+{
+    SDL_VideoDevice *_this = SDL_GetVideoDevice();
+
+    switch ([theEvent type]) {
+        case NSLeftMouseDown:
+        case NSOtherMouseDown:
+        case NSRightMouseDown:
+        case NSLeftMouseUp:
+        case NSOtherMouseUp:
+        case NSRightMouseUp:
+        case NSLeftMouseDragged:
+        case NSRightMouseDragged:
+        case NSOtherMouseDragged: /* usually middle mouse dragged */
+        case NSMouseMoved:
+        case NSScrollWheel:
+            Cocoa_HandleMouseEvent(_this, theEvent);
+            break;
+        case NSKeyDown:
+        case NSKeyUp:
+        case NSFlagsChanged:
+            Cocoa_HandleKeyEvent(_this, theEvent);
+            break;
+        default:
+            break;
+    }
+}
+
+// Dispatch events here so that we can handle events caught by
+// nextEventMatchingMask in SDL, as well as events caught by other
+// processes (such as CEF) that are passed down to NSApp.
+- (void)sendEvent:(NSEvent *)theEvent
+{
+    if (s_bShouldHandleEventsInSDLApplication) {
+        Cocoa_DispatchEvent(theEvent);
+    }
+
+    [super sendEvent:theEvent];
 }
 
 @end // SDLApplication
@@ -114,28 +157,23 @@
      */
     for (NSWindow *window in [NSApp orderedWindows]) {
         if (window != win && [window canBecomeKeyWindow]) {
-            if ([window respondsToSelector:@selector(isOnActiveSpace)]) {
-                if (![window isOnActiveSpace]) {
-                    continue;
-                }
+            if (![window isOnActiveSpace]) {
+                continue;
             }
             [window makeKeyAndOrderFront:self];
             return;
         }
     }
 
-    /* If a window wasn't found above, iterate through all visible windows
-     * (including the 'About' window, if it's shown) and make the first one key.
-     * Note that +[NSWindow windowNumbersWithOptions:] was added in 10.6.
+    /* If a window wasn't found above, iterate through all visible windows in
+     * the active Space in z-order (including the 'About' window, if it's shown)
+     * and make the first one key.
      */
-    if ([NSWindow respondsToSelector:@selector(windowNumbersWithOptions:)]) {
-        /* Get all visible windows in the active Space, in z-order. */
-        for (NSNumber *num in [NSWindow windowNumbersWithOptions:0]) {
-            NSWindow *window = [NSApp windowWithWindowNumber:[num integerValue]];
-            if (window && window != win && [window canBecomeKeyWindow]) {
-                [window makeKeyAndOrderFront:self];
-                return;
-            }
+    for (NSNumber *num in [NSWindow windowNumbersWithOptions:0]) {
+        NSWindow *window = [NSApp windowWithWindowNumber:[num integerValue]];
+        if (window && window != win && [window canBecomeKeyWindow]) {
+            [window makeKeyAndOrderFront:self];
+            return;
         }
     }
 }
@@ -176,7 +214,7 @@
 
 - (BOOL)application:(NSApplication *)theApplication openFile:(NSString *)filename
 {
-    return (BOOL)SDL_SendDropFile([filename UTF8String]);
+    return (BOOL)SDL_SendDropFile(NULL, [filename UTF8String]) && SDL_SendDropComplete(NULL);
 }
 @end
 
@@ -291,7 +329,7 @@ CreateApplicationMenus(void)
 
 
     /* Add the fullscreen view toggle menu option, if supported */
-    if ([NSApp respondsToSelector:@selector(setPresentationOptions:)]) {
+    if (floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_6) {
         /* Create the view menu */
         viewMenu = [[NSMenu alloc] initWithTitle:@"View"];
 
@@ -319,18 +357,10 @@ Cocoa_RegisterApp(void)
         [SDLApplication sharedApplication];
         SDL_assert(NSApp != nil);
 
-        const char *hint = SDL_GetHint(SDL_HINT_MAC_BACKGROUND_APP);
-        if (!hint || *hint == '0') {
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_6
-			if ([NSApp respondsToSelector:@selector(setActivationPolicy:)]) {
-#endif
-				[NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_6
-			} else {
-				ProcessSerialNumber psn = {0, kCurrentProcess};
-				TransformProcessType(&psn, kProcessTransformToForegroundApplication);
-			}
-#endif
+        s_bShouldHandleEventsInSDLApplication = SDL_TRUE;
+
+        if (!SDL_GetHintBoolean(SDL_HINT_MAC_BACKGROUND_APP, SDL_FALSE)) {
+            [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
             [NSApp activateIgnoringOtherApps:YES];
 		}
 		
@@ -381,29 +411,11 @@ Cocoa_PumpEvents(_THIS)
             break;
         }
 
-        switch ([event type]) {
-        case NSLeftMouseDown:
-        case NSOtherMouseDown:
-        case NSRightMouseDown:
-        case NSLeftMouseUp:
-        case NSOtherMouseUp:
-        case NSRightMouseUp:
-        case NSLeftMouseDragged:
-        case NSRightMouseDragged:
-        case NSOtherMouseDragged: /* usually middle mouse dragged */
-        case NSMouseMoved:
-        case NSScrollWheel:
-            Cocoa_HandleMouseEvent(_this, event);
-            break;
-        case NSKeyDown:
-        case NSKeyUp:
-        case NSFlagsChanged:
-            Cocoa_HandleKeyEvent(_this, event);
-            break;
-        default:
-            break;
+        if (!s_bShouldHandleEventsInSDLApplication) {
+            Cocoa_DispatchEvent(event);
         }
-        /* Pass through to NSApp to make sure everything stays in sync */
+
+        // Pass events down to SDLApplication to be handled in sendEvent:
         [NSApp sendEvent:event];
     }
 }}

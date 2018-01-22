@@ -36,9 +36,14 @@ ToDo:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "machine/genpin.h"
+
 #include "cpu/m6809/m6809.h"
+#include "machine/timer.h"
 #include "sound/sn76496.h"
+#include "speaker.h"
+
 #include "wico.lh"
 
 
@@ -65,6 +70,7 @@ public:
 	DECLARE_READ8_MEMBER(gentmrcl_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_housekeeping);
 	TIMER_DEVICE_CALLBACK_MEMBER(firq_housekeeping);
+	void wico(machine_config &config);
 private:
 	bool m_zcen;
 	bool m_gten;
@@ -380,7 +386,7 @@ READ8_MEMBER( wico_state::lampst_r )
 			j = m_shared_ram[0x7f9 + i];
 		else
 			j = 0;
-		output().set_digit_value(i * 10 + (m_shared_ram[0x96] & 7), BITSWAP16(j, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0));
+		output().set_digit_value(i * 10 + (m_shared_ram[0x96] & 7), bitswap<16>(j, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0));
 	}
 	return 0xff;
 }
@@ -423,11 +429,11 @@ void wico_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( wico, wico_state )
+MACHINE_CONFIG_START(wico_state::wico)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("ccpu", M6809, 10000000 / 8)
+	MCFG_CPU_ADD("ccpu", MC6809E, XTAL_10MHz / 8) // MC68A09EP @ U51
 	MCFG_CPU_PROGRAM_MAP(ccpu_map)
-	MCFG_CPU_ADD("hcpu", M6809, 10000000 / 8)
+	MCFG_CPU_ADD("hcpu", MC6809E, XTAL_10MHz / 8) // MC68A09EP @ U24
 	MCFG_CPU_PROGRAM_MAP(hcpu_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", wico_state, irq_housekeeping, attotime::from_hz(120)) // zero crossing
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("firq", wico_state, firq_housekeeping, attotime::from_hz(750)) // time generator
@@ -439,7 +445,7 @@ static MACHINE_CONFIG_START( wico, wico_state )
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76494", SN76494, 10000000 / 64)
+	MCFG_SOUND_ADD("sn76494", SN76494, XTAL_10MHz / 64)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -459,4 +465,4 @@ ROM_END
 / Big Top  (1977)
 /-------------------------------------------------------------------*/
 
-GAME(1984,  aftor,  0,  wico,  wico, driver_device,  0,  ROT0,  "Wico", "Af-Tor", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAME(1984,  aftor,  0,  wico,  wico, wico_state,  0,  ROT0,  "Wico", "Af-Tor", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)

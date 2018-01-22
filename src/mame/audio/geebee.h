@@ -1,8 +1,11 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller
+#ifndef MAME_AUDIO_GEEBEE_H
+#define MAME_AUDIO_GEEBEE_H
 
-class geebee_sound_device : public device_t,
-									public device_sound_interface
+#pragma once
+
+class geebee_sound_device : public device_t, public device_sound_interface
 {
 public:
 	geebee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -35,4 +38,6 @@ private:
 	int m_vcount;
 };
 
-extern const device_type GEEBEE;
+DECLARE_DEVICE_TYPE(GEEBEE, geebee_sound_device)
+
+#endif // MAME_AUDIO_GEEBEE_H

@@ -1,8 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:ElSemi
 #include "emu.h"
-#include "debugger.h"
 #include "se3208.h"
+#include "se3208dis.h"
+
+#include "debugger.h"
+
 
 /*
     SE3208 CPU Emulator by ElSemi
@@ -42,13 +45,20 @@
 // are such accesses simply illegal, be handled in a different way, or simply not be happening in the first place?
 #define ALLOW_UNALIGNED_DWORD_ACCESS 0
 
-const device_type SE3208 = &device_creator<se3208_device>;
+DEFINE_DEVICE_TYPE(SE3208, se3208_device, "se3208", "SE3208")
 
 
 se3208_device::se3208_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SE3208, "SE3208", tag, owner, clock, "se3208", __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0), m_PC(0), m_SR(0), m_SP(0), m_ER(0), m_PPC(0), m_program(nullptr), m_direct(nullptr), m_IRQ(0), m_NMI(0), m_icount(0)
+	: cpu_device(mconfig, SE3208, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
+	, m_PC(0), m_SR(0), m_SP(0), m_ER(0), m_PPC(0), m_program(nullptr), m_direct(nullptr), m_IRQ(0), m_NMI(0), m_icount(0)
 {
+}
+device_memory_interface::space_config_vector se3208_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 
@@ -1438,7 +1448,7 @@ INST(MVFC)
 }
 
 
-se3208_device::_OP se3208_device::DecodeOp(uint16_t Opcode)
+se3208_device::OP se3208_device::DecodeOp(uint16_t Opcode)
 {
 	switch(EXTRACT(Opcode,14,15))
 	{
@@ -1711,7 +1721,7 @@ void se3208_device::device_reset()
 	m_ER = 0;
 	m_PPC = 0;
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_PC=SE3208_Read32(0);
 	m_SR=0;
 	m_IRQ=CLEAR_LINE;
@@ -1776,7 +1786,7 @@ void se3208_device::device_start()
 	BuildTable();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	save_item(NAME(m_R));
 	save_item(NAME(m_PC));
@@ -1838,8 +1848,7 @@ void se3208_device::execute_set_input( int line, int state )
 		m_IRQ=state;
 }
 
-offs_t se3208_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *se3208_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( se3208 );
-	return CPU_DISASSEMBLE_NAME(se3208)(this, buffer, pc, oprom, opram, options);
+	return new se3208_disassembler;
 }

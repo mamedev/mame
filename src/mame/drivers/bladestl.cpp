@@ -29,12 +29,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/bladestl.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
-#include "includes/konamipt.h"
-#include "includes/bladestl.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::bladestl_scanline)
@@ -96,13 +99,13 @@ WRITE8_MEMBER(bladestl_state::bladestl_port_B_w)
 	m_upd7759->set_bank_base(((data & 0x38) >> 3) * 0x20000);
 
 	// bit 2 = SSG-C rc filter enable
-	m_filter3->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
+	m_filter3->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
 
 	// bit 1 = SSG-B rc filter enable
-	m_filter2->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
+	m_filter2->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
 
 	// bit 0 = SSG-A rc filter enable
-	m_filter1->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
+	m_filter1->filter_rc_set_RC(filter_rc_device::LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
 }
 
 READ8_MEMBER(bladestl_state::bladestl_speech_busy_r)
@@ -296,14 +299,14 @@ void bladestl_state::machine_reset()
 		m_last_track[i] = 0;
 }
 
-static MACHINE_CONFIG_START( bladestl, bladestl_state )
+MACHINE_CONFIG_START(bladestl_state::bladestl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, 24000000/2)     /* 24MHz/2 (?) */
+	MCFG_CPU_ADD("maincpu", HD6309E, XTAL_24MHz / 8) // divider not verified (from 007342 custom)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bladestl_state, bladestl_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 2000000)
+	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL_24MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -344,10 +347,10 @@ static MACHINE_CONFIG_START( bladestl, bladestl_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ADD("upd", UPD7759, XTAL_640kHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz / 8)
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("upd", upd775x_device, port_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(bladestl_state, bladestl_port_B_w))
 	MCFG_SOUND_ROUTE(0, "filter1", 0.45)
@@ -440,6 +443,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bladestl,  0,        bladestl, bladestl, driver_device, 0, ROT90, "Konami", "Blades of Steel (version T)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bladestll, bladestl, bladestl, bladestle, driver_device,0, ROT90, "Konami", "Blades of Steel (version L)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, bladestle, bladestl, bladestl, bladestle, driver_device,0, ROT90, "Konami", "Blades of Steel (version E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestl,  0,        bladestl, bladestl,  bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version T)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestll, bladestl, bladestl, bladestle, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version L)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, bladestle, bladestl, bladestl, bladestle, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version E)", MACHINE_SUPPORTS_SAVE )

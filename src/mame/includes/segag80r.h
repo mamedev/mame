@@ -5,11 +5,17 @@
     Sega G-80 raster hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_SEGAG80R_H
+#define MAME_INCLUDES_SEGAG80R_H
+
+#pragma once
+
 #include "sound/samples.h"
 #include "machine/segag80.h"
 #include "sound/sn76496.h"
 #include "audio/segasnd.h"
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 
 class sega005_sound_device;
@@ -59,6 +65,8 @@ public:
 
 	std::vector<uint8_t> m_paletteram;
 
+	offs_t m_scrambled_write_pc;
+
 	uint8_t m_sound_state[2];
 	uint8_t m_sound_rate;
 	uint16_t m_sound_addr;
@@ -88,6 +96,8 @@ public:
 	uint16_t m_bg_scrollx;
 	uint16_t m_bg_scrolly;
 	uint8_t m_pignewt_bg_color_offset;
+
+	DECLARE_READ8_MEMBER(g80r_opcode_r);
 	DECLARE_WRITE8_MEMBER(mainram_w);
 	DECLARE_WRITE8_MEMBER(vidram_w);
 	DECLARE_WRITE8_MEMBER(monsterb_vidram_w);
@@ -113,7 +123,6 @@ public:
 	DECLARE_WRITE8_MEMBER(spaceod_sound_w);
 	DECLARE_READ8_MEMBER(n7751_rom_r);
 	DECLARE_READ8_MEMBER(n7751_command_r);
-	DECLARE_READ8_MEMBER(n7751_t1_r);
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 	DECLARE_WRITE8_MEMBER(usb_ram_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_soundport_w);
@@ -134,6 +143,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(segag80r_vblank_start);
+	IRQ_CALLBACK_MEMBER(segag80r_irq_ack);
 	INTERRUPT_GEN_MEMBER(sindbadm_vblank_start);
 	DECLARE_WRITE8_MEMBER(sega005_sound_a_w);
 	DECLARE_WRITE8_MEMBER(sega005_sound_b_w);
@@ -155,8 +165,22 @@ public:
 	inline uint8_t demangle(uint8_t d7d6, uint8_t d5d4, uint8_t d3d2, uint8_t d1d0);
 	void monsterb_expand_gfx(const char *region);
 
+	void g80r_base(machine_config &config);
+	void monsterb(machine_config &config);
+	void sindbadm(machine_config &config);
+	void astrob(machine_config &config);
+	void pignewt(machine_config &config);
+	void monster2(machine_config &config);
+	void sega005(machine_config &config);
+	void spaceod(machine_config &config);
+	void astrob_sound_board(machine_config &config);
+	void sega005_sound_board(machine_config &config);
+	void spaceod_sound_board(machine_config &config);
+	void monsterb_sound_board(machine_config &config);
+	void sega_speech_board(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	emu_timer *m_vblank_latch_clear_timer;
 };
 
 
@@ -174,7 +198,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 
 	// sound stream update overrides
@@ -185,13 +208,7 @@ private:
 	TIMER_CALLBACK_MEMBER( sega005_auto_timer );
 };
 
-extern const device_type SEGA005;
-
-
-MACHINE_CONFIG_EXTERN( astrob_sound_board );
-MACHINE_CONFIG_EXTERN( 005_sound_board );
-MACHINE_CONFIG_EXTERN( spaceod_sound_board );
-MACHINE_CONFIG_EXTERN( monsterb_sound_board );
+DECLARE_DEVICE_TYPE(SEGA005, sega005_sound_device)
 
 /*----------- defined in video/segag80r.c -----------*/
 
@@ -200,3 +217,5 @@ MACHINE_CONFIG_EXTERN( monsterb_sound_board );
 #define G80_BACKGROUND_MONSTERB     2
 #define G80_BACKGROUND_PIGNEWT      3
 #define G80_BACKGROUND_SINDBADM     4
+
+#endif // MAME_INCLUDES_SEGAG80R_H

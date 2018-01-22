@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_DSP16_DSP16_H
+#define MAME_CPU_DSP16_DSP16_H
 
-#ifndef __DSP16_H__
-#define __DSP16_H__
+#pragma once
 
 
 //**************************************************************************
@@ -29,6 +29,40 @@ public:
 	// public interfaces
 
 protected:
+	enum
+	{
+		DSP16_I,        // ROM Address Arithmetic Unit (XAAU)
+		DSP16_PC,
+		DSP16_PT,
+		DSP16_PR,
+		DSP16_PI,
+		DSP16_J,        // RAM Address Arithmetic Unit (YAAU)
+		DSP16_K,
+		DSP16_RB,
+		DSP16_RE,
+		DSP16_R0,
+		DSP16_R1,
+		DSP16_R2,
+		DSP16_R3,
+		DSP16_X,        // Data Arithmetic Unit (DAU)
+		DSP16_Y,
+		DSP16_P,
+		DSP16_A0,
+		DSP16_A1,
+		DSP16_AUC,
+		DSP16_PSW,
+		DSP16_C0,
+		DSP16_C1,
+		DSP16_C2,
+		DSP16_SIOC,
+		DSP16_SRTA,
+		DSP16_SDX,
+		DSP16_PIOC,
+		DSP16_PDX0,
+		DSP16_PDX1
+	};
+
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -43,15 +77,13 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// address spaces
 	const address_space_config m_program_config;
@@ -114,7 +146,7 @@ protected:
 	// address spaces
 	address_space* m_program;
 	address_space* m_data;
-	direct_read_data* m_direct;
+	direct_read_data<-1> *m_direct;
 
 	// other internal states
 	int m_icount;
@@ -147,45 +179,6 @@ protected:
 
 
 // device type definition
-extern const device_type DSP16;
+DECLARE_DEVICE_TYPE(DSP16, dsp16_device)
 
-
-/***************************************************************************
-    REGISTER ENUMERATION
-***************************************************************************/
-
-enum
-{
-	DSP16_I,        // ROM Address Arithmetic Unit (XAAU)
-	DSP16_PC,
-	DSP16_PT,
-	DSP16_PR,
-	DSP16_PI,
-	DSP16_J,        // RAM Address Arithmetic Unit (YAAU)
-	DSP16_K,
-	DSP16_RB,
-	DSP16_RE,
-	DSP16_R0,
-	DSP16_R1,
-	DSP16_R2,
-	DSP16_R3,
-	DSP16_X,        // Data Arithmetic Unit (DAU)
-	DSP16_Y,
-	DSP16_P,
-	DSP16_A0,
-	DSP16_A1,
-	DSP16_AUC,
-	DSP16_PSW,
-	DSP16_C0,
-	DSP16_C1,
-	DSP16_C2,
-	DSP16_SIOC,
-	DSP16_SRTA,
-	DSP16_SDX,
-	DSP16_PIOC,
-	DSP16_PDX0,
-	DSP16_PDX1
-};
-
-
-#endif /* __DSP16_H__ */
+#endif // MAME_CPU_DSP16_DSP16_H

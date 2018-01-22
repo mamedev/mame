@@ -7,8 +7,10 @@
 
 *****************************************************************************/
 
-#ifndef __MB87078_H__
-#define __MB87078_H__
+#ifndef MAME_MACHINE_MB87078_H
+#define MAME_MACHINE_MB87078_H
+
+#pragma once
 
 
 /***************************************************************************
@@ -26,19 +28,16 @@ class mb87078_device : public device_t
 {
 public:
 	mb87078_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~mb87078_device() {}
 
-	template<class _Object> static devcb_base &set_gain_changed_callback(device_t &device, _Object object) { return downcast<mb87078_device &>(device).m_gain_changed_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_gain_changed_callback(device_t &device, Object &&cb) { return downcast<mb87078_device &>(device).m_gain_changed_cb.set_callback(std::forward<Object>(cb)); }
 
 	void data_w(int data, int dsel);
 	void reset_comp_w(int level);
-
 
 	/* gain_decibel_r will return 'channel' gain on the device.
 	   Returned value represents channel gain expressed in decibels,
 	   Range from 0 to -32.0 (or -256.0 for -infinity) */
 	float gain_decibel_r(int channel);
-
 
 	/* gain_percent_r will return 'channel' gain on the device.
 	   Returned value represents channel gain expressed in percents of maximum volume.
@@ -63,6 +62,6 @@ private:
 	devcb_write8 m_gain_changed_cb;
 };
 
-extern const device_type MB87078;
+DECLARE_DEVICE_TYPE(MB87078, mb87078_device)
 
-#endif  /* __MB87078_H__ */
+#endif // MAME_MACHINE_MB87078_H

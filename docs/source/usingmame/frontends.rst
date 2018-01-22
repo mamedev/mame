@@ -9,12 +9,12 @@ This following list is not an endorsement of any of these frontends by the MAME 
 
 | QMC2 (multiple platforms)
 | Download: http://qmc2.batcom-it.net/
-| 
+|
 | IV/Play (Microsoft Windows)
 | Download: http://www.mameui.info/
-| 
+|
 | EmuLoader (Microsoft Windows)
 | Download: http://emuloader.mameworld.info/
-| 
+|
 
 The MAME team will not provide support for issues with frontends. For support, we suggest contacting the frontend author or trying any of the popular MAME-friendly forums on the internet.

@@ -116,6 +116,8 @@ void gyruss_state::video_start()
 	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gyruss_state::gyruss_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap->set_transmask(0, 0x00, 0);   /* opaque */
 	m_tilemap->set_transmask(1, 0x0f, 0);  /* transparent */
+
+	save_item(NAME(m_flipscreen));
 }
 
 
@@ -124,6 +126,12 @@ READ8_MEMBER(gyruss_state::gyruss_scanline_r)
 {
 	/* reads 1V - 128V */
 	return m_screen->vpos();
+}
+
+
+WRITE_LINE_MEMBER(gyruss_state::flipscreen_w)
+{
+	m_flipscreen = state;
 }
 
 
@@ -152,7 +160,7 @@ uint32_t gyruss_state::screen_update_gyruss(screen_device &screen, bitmap_ind16 
 	if (cliprect.min_y == screen.visible_area().min_y)
 	{
 		machine().tilemap().mark_all_dirty();
-		machine().tilemap().set_flip_all((*m_flipscreen & 0x01) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 	}
 
 	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);

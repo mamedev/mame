@@ -2,11 +2,11 @@
 // copyright-holders:Ryan Holtz
 /*****************************************************************************
 
-	7400 Quad 2-Input NAND Gate
+    7400 Quad 2-Input NAND Gate
 
 ***********************************************************************
 
-	Connection Diagram:
+    Connection Diagram:
               ___ ___
        1A  1 |*  u   | 14  Vcc
        1B  2 |       | 13  4B
@@ -16,24 +16,23 @@
        2Y  6 |       | 9   3A
       GND  7 |_______| 8   3Y
 
-	Truth Table:
-	    ___________
-	   | A | B | Y |
-	   |---|---|---|
-	   | 0 | 0 | 0 |
-	   | 0 | 1 | 0 |
-	   | 1 | 0 | 0 |
-	   | 1 | 1 | 1 |
-	   |___|___|___|
+    Truth Table:
+        ___________
+       | A | B | Y |
+       |---|---|---|
+       | 0 | 0 | 0 |
+       | 0 | 1 | 0 |
+       | 1 | 0 | 0 |
+       | 1 | 1 | 1 |
+       |___|___|___|
 
 **********************************************************************/
 
+#ifndef MAME_MACHINE_7400_H
+#define MAME_MACHINE_7400_H
+
 #pragma once
 
-#ifndef TTL7400_H
-#define TTL7400_H
-
-#include "emu.h"
 
 #define MCFG_7400_Y1_CB(_devcb) \
 	devcb = &ttl7400_device::set_y1_cb(*device, DEVCB_##_devcb);
@@ -57,10 +56,10 @@ public:
 	ttl7400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_y1_cb(device_t &device, _Object object) { return downcast<ttl7400_device &>(device).m_y1_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_y2_cb(device_t &device, _Object object) { return downcast<ttl7400_device &>(device).m_y2_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_y3_cb(device_t &device, _Object object) { return downcast<ttl7400_device &>(device).m_y3_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_y4_cb(device_t &device, _Object object) { return downcast<ttl7400_device &>(device).m_y4_func.set_callback(object); }
+	template <class Object> static devcb_base &set_y1_cb(device_t &device, Object &&cb) { return downcast<ttl7400_device &>(device).m_y1_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_y2_cb(device_t &device, Object &&cb) { return downcast<ttl7400_device &>(device).m_y2_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_y3_cb(device_t &device, Object &&cb) { return downcast<ttl7400_device &>(device).m_y3_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_y4_cb(device_t &device, Object &&cb) { return downcast<ttl7400_device &>(device).m_y4_func.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	DECLARE_WRITE_LINE_MEMBER( a1_w );
@@ -97,15 +96,14 @@ private:
 	devcb_write_line m_y4_func;
 
 	// inputs
-	uint8_t m_a;		// pins 1,4,9,12
-	uint8_t m_b;		// pins 2,5,10,13
+	uint8_t m_a;        // pins 1,4,9,12
+	uint8_t m_b;        // pins 2,5,10,13
 
 	// outputs
-	uint8_t m_y;		// pins 3,6,8,11
+	uint8_t m_y;        // pins 3,6,8,11
 };
 
 // device type definition
-extern const device_type TTL7400;
+DECLARE_DEVICE_TYPE(TTL7400, ttl7400_device)
 
-
-#endif /* TTL7400_H */
+#endif // MAME_MACHINE_7400_H

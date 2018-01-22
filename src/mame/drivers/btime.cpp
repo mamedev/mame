@@ -140,12 +140,14 @@ A few notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/btime.h"
+
 #include "cpu/m6502/m6502.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
-#include "includes/btime.h"
 #include "machine/decocpu7.h"
 #include "machine/deco222.h"
+#include "speaker.h"
 
 #define MASTER_CLOCK      XTAL_12MHz
 #define HCLK             (MASTER_CLOCK/2)
@@ -155,7 +157,6 @@ A few notes:
 
 enum
 {
-	AUDIO_ENABLE_NONE,
 	AUDIO_ENABLE_DIRECT,        /* via direct address in memory map */
 	AUDIO_ENABLE_AY8910         /* via ay-8910 port A */
 };
@@ -167,32 +168,25 @@ WRITE8_MEMBER(btime_state::audio_nmi_enable_w)
 	   lnc and disco use bit 0 of the first AY-8910's port A instead; many other
 	   games also write there in addition to this address */
 	if (m_audio_nmi_enable_type == AUDIO_ENABLE_DIRECT)
-	{
-		m_audio_nmi_enabled = data & 1;
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
-	}
+		m_audionmi->in_w<0>(BIT(data, 0));
 }
 
 WRITE8_MEMBER(btime_state::ay_audio_nmi_enable_w)
 {
 	/* port A bit 0, when 1, inhibits the NMI */
 	if (m_audio_nmi_enable_type == AUDIO_ENABLE_AY8910)
-	{
-		m_audio_nmi_enabled = ~data & 1;
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
-	}
+		m_audionmi->in_w<0>(BIT(~data, 0));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(btime_state::audio_nmi_gen)
 {
 	int scanline = param;
-	m_audio_nmi_state = scanline & 8;
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_audio_nmi_enabled && m_audio_nmi_state) ? ASSERT_LINE : CLEAR_LINE);
+	m_audionmi->in_w<1>((scanline & 8) >> 3);
 }
 
 static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
@@ -200,7 +194,7 @@ static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITENOP
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("P2")
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("SYSTEM") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_WRITE(audio_command_w)
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW2") AM_WRITE(bnj_scroll1_w)
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -218,7 +212,7 @@ static ADDRESS_MAP_START( cookrace_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW1") AM_WRITE(bnj_video_control_w)
 	AM_RANGE(0xe300, 0xe300) AM_READ_PORT("DSW1")   /* mirror address used on high score name entry */
 													/* screen */
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW2") AM_WRITE(audio_command_w)
+	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P1")
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("P2")
 	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("SYSTEM")
@@ -227,7 +221,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0c00, 0x0c0f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
@@ -235,7 +229,7 @@ static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITENOP
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("P2")
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("SYSTEM") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_WRITE(audio_command_w)
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW2") AM_WRITE(bnj_scroll1_w)
 	AM_RANGE(0x4005, 0x4005) AM_WRITE(bnj_scroll2_w)
 	AM_RANGE(0x9000, 0xffff) AM_ROM
@@ -255,7 +249,7 @@ static ADDRESS_MAP_START( zoar_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x9800, 0x9803) AM_WRITEONLY AM_SHARE("zoar_scrollram")
 	AM_RANGE(0x9804, 0x9804) AM_READ_PORT("SYSTEM") AM_WRITE(bnj_scroll2_w)
 	AM_RANGE(0x9805, 0x9805) AM_WRITE(bnj_scroll1_w)
-	AM_RANGE(0x9806, 0x9806) AM_WRITE(audio_command_w)
+	AM_RANGE(0x9806, 0x9806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -269,7 +263,7 @@ static ADDRESS_MAP_START( lnc_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_SHARE("lnc_charbank")
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("P1") AM_WRITENOP     /* IRQ ack??? */
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("P2")
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_WRITE(audio_command_w)
+	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xb000, 0xb1ff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -284,7 +278,7 @@ static ADDRESS_MAP_START( mmonkey_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_SHARE("lnc_charbank")
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("P1") AM_WRITENOP /* IRQ ack??? */
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("P2")
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_WRITE(audio_command_w)
+	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(mmonkey_protection_r, mmonkey_protection_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -293,7 +287,7 @@ static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("rambase")
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW2") AM_WRITE(bnj_video_control_w)
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P1") AM_WRITE(audio_command_w)
+	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P1") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("P2")
 	AM_RANGE(0x1004, 0x1004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
@@ -304,7 +298,7 @@ static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x5200, 0x53ff) AM_RAM
 	AM_RANGE(0x5400, 0x5400) AM_WRITE(bnj_scroll1_w)
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(bnj_scroll2_w)
-	AM_RANGE(0x5c00, 0x5c0f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x5c00, 0x5c0f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -318,7 +312,7 @@ static ADDRESS_MAP_START( disco_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("P1")
 	AM_RANGE(0x9400, 0x9400) AM_READ_PORT("P2")
 	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("DSW1")
-	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_WRITE(audio_command_w)
+	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x9c00, 0x9c00) AM_READ_PORT("VBLANK") AM_WRITE(disco_video_control_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -331,7 +325,7 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x7fff) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x8000, 0x9fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xa000, 0xbfff) AM_READ(audio_command_r)
+	AM_RANGE(0xa000, 0xbfff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(audio_nmi_enable_w)
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM
 ADDRESS_MAP_END
@@ -342,7 +336,7 @@ static ADDRESS_MAP_START( disco_audio_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0x8fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP /* ack ? */
+	AM_RANGE(0x8000, 0x8fff) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, acknowledge_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -364,18 +358,6 @@ INPUT_CHANGED_MEMBER(btime_state::coin_inserted_nmi_lo)
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-
-WRITE8_MEMBER(btime_state::audio_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(0, ASSERT_LINE);
-}
-
-READ8_MEMBER(btime_state::audio_command_r)
-{
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(space, offset);
-}
 
 READ8_MEMBER(btime_state::zoar_dsw1_read)
 {
@@ -1241,8 +1223,6 @@ MACHINE_START_MEMBER(btime_state,btime)
 	save_item(NAME(m_bnj_scroll1));
 	save_item(NAME(m_bnj_scroll2));
 	save_item(NAME(m_btime_tilemap));
-	save_item(NAME(m_audio_nmi_enabled));
-	save_item(NAME(m_audio_nmi_state));
 }
 
 MACHINE_START_MEMBER(btime_state,mmonkey)
@@ -1258,7 +1238,8 @@ MACHINE_START_MEMBER(btime_state,mmonkey)
 MACHINE_RESET_MEMBER(btime_state,btime)
 {
 	/* by default, the audio NMI is disabled, except for bootlegs which don't use the enable */
-	m_audio_nmi_enabled = (m_audio_nmi_enable_type == AUDIO_ENABLE_NONE);
+	if (m_audionmi.found())
+		m_audionmi->in_w<0>(0);
 
 	m_btime_palette = 0;
 	m_bnj_scroll1 = 0;
@@ -1267,7 +1248,6 @@ MACHINE_RESET_MEMBER(btime_state,btime)
 	m_btime_tilemap[1] = 0;
 	m_btime_tilemap[2] = 0;
 	m_btime_tilemap[3] = 0;
-	m_audio_nmi_state = 0;
 }
 
 MACHINE_RESET_MEMBER(btime_state,lnc)
@@ -1287,7 +1267,7 @@ MACHINE_RESET_MEMBER(btime_state,mmonkey)
 	m_protection_ret = 0;
 }
 
-static MACHINE_CONFIG_START( btime, btime_state )
+MACHINE_CONFIG_START(btime_state::btime)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO_CPU7, HCLK2)   /* seletable between H2/H4 via jumper */
@@ -1295,7 +1275,10 @@ static MACHINE_CONFIG_START( btime, btime_state )
 
 	MCFG_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("audionmi", btime_state, audio_nmi_gen, "screen", 0, 8)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("8vck", btime_state, audio_nmi_gen, "screen", 0, 8)
+
+	MCFG_INPUT_MERGER_ALL_HIGH("audionmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1316,6 +1299,7 @@ static MACHINE_CONFIG_START( btime, btime_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("ay1", AY8910, HCLK2)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
@@ -1338,7 +1322,7 @@ static MACHINE_CONFIG_START( btime, btime_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cookrace, btime )
+MACHINE_CONFIG_DERIVED(btime_state::cookrace, btime)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK2)
@@ -1355,7 +1339,7 @@ static MACHINE_CONFIG_DERIVED( cookrace, btime )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lnc, btime )
+MACHINE_CONFIG_DERIVED(btime_state::lnc, btime)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK2)
@@ -1375,7 +1359,7 @@ static MACHINE_CONFIG_DERIVED( lnc, btime )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wtennis, lnc )
+MACHINE_CONFIG_DERIVED(btime_state::wtennis, lnc)
 
 	/* basic machine hardware */
 
@@ -1385,7 +1369,7 @@ static MACHINE_CONFIG_DERIVED( wtennis, lnc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mmonkey, wtennis )
+MACHINE_CONFIG_DERIVED(btime_state::mmonkey, wtennis)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1395,7 +1379,7 @@ static MACHINE_CONFIG_DERIVED( mmonkey, wtennis )
 	MCFG_MACHINE_RESET_OVERRIDE(btime_state,mmonkey)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bnj, btime )
+MACHINE_CONFIG_DERIVED(btime_state::bnj, btime)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", DECO_C10707, HCLK4)
@@ -1413,7 +1397,7 @@ static MACHINE_CONFIG_DERIVED( bnj, btime )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sdtennis, bnj )
+MACHINE_CONFIG_DERIVED(btime_state::sdtennis, bnj)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("audiocpu", DECO_C10707, HCLK1/3/2)
@@ -1421,7 +1405,7 @@ static MACHINE_CONFIG_DERIVED( sdtennis, bnj )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( zoar, btime )
+MACHINE_CONFIG_DERIVED(btime_state::zoar, btime)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1449,7 +1433,7 @@ static MACHINE_CONFIG_DERIVED( zoar, btime )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( disco, btime )
+MACHINE_CONFIG_DERIVED(btime_state::disco, btime)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1458,6 +1442,9 @@ static MACHINE_CONFIG_DERIVED( disco, btime )
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(disco_audio_map)
+
+	MCFG_DEVICE_MODIFY("soundlatch")
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", disco)
@@ -1472,7 +1459,7 @@ static MACHINE_CONFIG_DERIVED( disco, btime )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tisland, btime )
+MACHINE_CONFIG_DERIVED(btime_state::tisland, btime)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2061,22 +2048,22 @@ DRIVER_INIT_MEMBER(btime_state,sdtennis)
 }
 
 
-GAME( 1982, btime,    0,       btime,    btime, btime_state,    btime,    ROT270, "Data East Corporation", "Burger Time (Data East set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, btime2,   btime,   btime,    btime, btime_state,    btime,    ROT270, "Data East Corporation", "Burger Time (Data East set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, btime3,   btime,   btime,    btime, btime_state,    btime,    ROT270, "Data East USA Inc.",    "Burger Time (Data East USA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, btimem,   btime,   btime,    btime, btime_state,    btime,    ROT270, "Data East (Bally Midway license)", "Burger Time (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, cookrace, btime,   cookrace, cookrace, btime_state, cookrace, ROT270, "bootleg", "Cook Race", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tisland,  0,       tisland,  btime, btime_state,    tisland,  ROT270, "Data East Corporation", "Treasure Island", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, lnc,      0,       lnc,      lnc, btime_state,      lnc,      ROT270, "Data East Corporation", "Lock'n'Chase", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, protennb, 0,       disco,    disco, btime_state,    protennb, ROT270, "bootleg", "Tennis (bootleg of Pro Tennis)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, wtennis,  0,       wtennis,  wtennis, btime_state,  wtennis,  ROT270, "bootleg", "World Tennis", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, mmonkey,  0,       mmonkey,  mmonkey, btime_state,  lnc,      ROT270, "Technos Japan / Roller Tron", "Minky Monkey", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, brubber,  0,       bnj,      bnj, btime_state,      bnj,      ROT270, "Data East", "Burnin' Rubber", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bnj,      brubber, bnj,      bnj, btime_state,      bnj,      ROT270, "Data East USA", "Bump 'n' Jump", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, bnjm,     brubber, bnj,      bnj, btime_state,      bnj,      ROT270, "Data East USA (Bally Midway license)", "Bump 'n' Jump (Midway)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, caractn,  brubber, bnj,      bnj, btime_state,      bnj,      ROT270, "bootleg", "Car Action (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, caractn2, brubber, bnj,      caractn2, btime_state, bnj,      ROT270, "bootleg", "Car Action (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zoar,     0,       zoar,     zoar, btime_state,     zoar,     ROT270, "Data East USA", "Zoar", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, disco,    0,       disco,    disco, btime_state,    disco,    ROT270, "Data East", "Disco No.1", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, discof,   disco,   disco,    disco, btime_state,    disco,    ROT270, "Data East", "Disco No.1 (Rev.F)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, sdtennis, 0,       sdtennis, sdtennis, btime_state, sdtennis, ROT270, "Data East Corporation", "Super Doubles Tennis", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, btime,    0,       btime,    btime,    btime_state, btime,    ROT270, "Data East Corporation", "Burger Time (Data East set 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, btime2,   btime,   btime,    btime,    btime_state, btime,    ROT270, "Data East Corporation", "Burger Time (Data East set 2)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, btime3,   btime,   btime,    btime,    btime_state, btime,    ROT270, "Data East USA Inc.",    "Burger Time (Data East USA)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1982, btimem,   btime,   btime,    btime,    btime_state, btime,    ROT270, "Data East (Bally Midway license)", "Burger Time (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, cookrace, btime,   cookrace, cookrace, btime_state, cookrace, ROT270, "bootleg",               "Cook Race",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tisland,  0,       tisland,  btime,    btime_state, tisland,  ROT270, "Data East Corporation", "Treasure Island",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, lnc,      0,       lnc,      lnc,      btime_state, lnc,      ROT270, "Data East Corporation", "Lock'n'Chase",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, protennb, 0,       disco,    disco,    btime_state, protennb, ROT270, "bootleg",               "Tennis (bootleg of Pro Tennis)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, wtennis,  0,       wtennis,  wtennis,  btime_state, wtennis,  ROT270, "bootleg",               "World Tennis",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mmonkey,  0,       mmonkey,  mmonkey,  btime_state, lnc,      ROT270, "Technos Japan / Roller Tron", "Minky Monkey", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, brubber,  0,       bnj,      bnj,      btime_state, bnj,      ROT270, "Data East",             "Burnin' Rubber",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bnj,      brubber, bnj,      bnj,      btime_state, bnj,      ROT270, "Data East USA",         "Bump 'n' Jump",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1982, bnjm,     brubber, bnj,      bnj,      btime_state, bnj,      ROT270, "Data East USA (Bally Midway license)", "Bump 'n' Jump (Midway)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, caractn,  brubber, bnj,      bnj,      btime_state, bnj,      ROT270, "bootleg",               "Car Action (set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, caractn2, brubber, bnj,      caractn2, btime_state, bnj,      ROT270, "bootleg",               "Car Action (set 2)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zoar,     0,       zoar,     zoar,     btime_state, zoar,     ROT270, "Data East USA",         "Zoar",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1982, disco,    0,       disco,    disco,    btime_state, disco,    ROT270, "Data East",             "Disco No.1",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1982, discof,   disco,   disco,    disco,    btime_state, disco,    ROT270, "Data East",             "Disco No.1 (Rev.F)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1983, sdtennis, 0,       sdtennis, sdtennis, btime_state, sdtennis, ROT270, "Data East Corporation", "Super Doubles Tennis",           MACHINE_SUPPORTS_SAVE )

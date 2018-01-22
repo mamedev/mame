@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VIC20_FE3_H
+#define MAME_BUS_VIC20_FE3_H
+
 #pragma once
 
-#ifndef __VIC20_FE3__
-#define __VIC20_FE3__
-
-#include "emu.h"
 #include "exp.h"
 #include "machine/intelfsh.h"
 
@@ -21,23 +20,23 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vic20_final_expansion_3_t
+// ======================> vic20_final_expansion_3_device
 
-class vic20_final_expansion_3_t :  public device_t,
+class vic20_final_expansion_3_device :  public device_t,
 									public device_vic20_expansion_card_interface
 {
 public:
 	// construction/destruction
-	vic20_final_expansion_3_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	vic20_final_expansion_3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_vic20_expansion_card_interface overrides
 	virtual uint8_t vic20_cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) override;
@@ -87,8 +86,6 @@ private:
 
 
 // device type definition
-extern const device_type VIC20_FE3;
+DECLARE_DEVICE_TYPE(VIC20_FE3, vic20_final_expansion_3_device)
 
-
-
-#endif
+#endif // MAME_BUS_VIC20_FE3_H

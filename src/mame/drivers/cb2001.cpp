@@ -44,8 +44,10 @@ this seems more like 8-bit hardware, maybe it should be v25, not v35...
 
 #include "emu.h"
 #include "cpu/nec/v25.h"
-#include "sound/ay8910.h"
 #include "machine/i8255.h"
+#include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class cb2001_state : public driver_device
@@ -78,9 +80,11 @@ public:
 	DECLARE_PALETTE_INIT(cb2001);
 	uint32_t screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	DECLARE_READ8_MEMBER(irq_ack_r);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void cb2001(machine_config &config);
 };
 
 
@@ -576,7 +580,7 @@ static ADDRESS_MAP_START( cb2001_io, AS_IO, 16, cb2001_state )
 	AM_RANGE(0x20, 0x21) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0xff00)
 	AM_RANGE(0x22, 0x23) AM_DEVWRITE8("aysnd", ay8910_device, data_address_w, 0xffff)
 
-	AM_RANGE(0x30, 0x31) AM_WRITE(cb2001_vidctrl_w)
+	AM_RANGE(0x30, 0x31) AM_READ8(irq_ack_r, 0x00ff) AM_WRITE(cb2001_vidctrl_w)
 	AM_RANGE(0x32, 0x33) AM_WRITE(cb2001_vidctrl2_w)
 ADDRESS_MAP_END
 
@@ -745,7 +749,13 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(cb2001_state::vblank_irq)
 {
-	generic_pulse_irq_line(device.execute(), NEC_INPUT_LINE_INTP0, 1);
+	m_maincpu->set_input_line(NEC_INPUT_LINE_INTP0, ASSERT_LINE);
+}
+
+READ8_MEMBER(cb2001_state::irq_ack_r)
+{
+	m_maincpu->set_input_line(NEC_INPUT_LINE_INTP0, CLEAR_LINE);
+	return 0xff;
 }
 
 static const gfx_layout cb2001_layout =
@@ -805,7 +815,7 @@ PALETTE_INIT_MEMBER(cb2001_state, cb2001)
 	}
 }
 
-static MACHINE_CONFIG_START( cb2001, cb2001_state )
+MACHINE_CONFIG_START(cb2001_state::cb2001)
 	MCFG_CPU_ADD("maincpu", V35, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
 	MCFG_V25_CONFIG(cb2001_decryption_table)
 	MCFG_CPU_PROGRAM_MAP(cb2001_map)
@@ -867,5 +877,5 @@ ROM_START( scherrym )
 	ROM_LOAD( "n82s135-2.bin", 0x200, 0x100, CRC(a19821db) SHA1(62dda90dd67dfbc0b96f161f1f2b7a46a5805eae) )
 ROM_END
 
-GAME( 2001, cb2001,    0,      cb2001,      cb2001, driver_device,   0, ROT0,  "Dyna", "Cherry Bonus 2001", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 2001, scherrym,  0,      cb2001,      cb2001, driver_device,   0, ROT0,  "Dyna", "Super Cherry Master", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)
+GAME( 2001, cb2001,    0,      cb2001,      cb2001, cb2001_state,   0, ROT0,  "Dyna", "Cherry Bonus 2001",   MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2001, scherrym,  0,      cb2001,      cb2001, cb2001_state,   0, ROT0,  "Dyna", "Super Cherry Master", MACHINE_NOT_WORKING|MACHINE_NO_SOUND ) // 2001 version? (we have bootlegs running on z80 hw of a 1996 version)

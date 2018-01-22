@@ -8,6 +8,8 @@
 
 #include "machine/gen_latch.h"
 #include "machine/pic8259.h"
+#include "machine/timer.h"
+#include "screen.h"
 
 struct pf_layer_info
 {
@@ -48,20 +50,14 @@ public:
 	// driver init
 	uint8_t m_spritesystem;
 
-	int m_sound_status;
 	uint8_t m_sprite_display;
 	uint16_t m_raster_irq_position;
 	pf_layer_info m_pf_layer[4];
 	uint16_t m_control[0x10];
 	std::unique_ptr<uint16_t[]> m_buffered_spriteram;
 
-	DECLARE_WRITE16_MEMBER(coincounter_w);
-	DECLARE_WRITE16_MEMBER(bankswitch_w);
-	DECLARE_WRITE16_MEMBER(soundlatch_w);
-	DECLARE_READ16_MEMBER(sound_status_r);
-	DECLARE_READ16_MEMBER(soundlatch_r);
-	DECLARE_WRITE16_MEMBER(sound_irq_ack_w);
-	DECLARE_WRITE16_MEMBER(sound_status_w);
+	DECLARE_WRITE8_MEMBER(coincounter_w);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE16_MEMBER(sound_reset_w);
 	DECLARE_WRITE16_MEMBER(wpksoc_output_w);
 	DECLARE_WRITE16_MEMBER(vram_w);
@@ -83,4 +79,8 @@ public:
 	void update_scroll_positions();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int laynum, int category,int opaque);
 	void screenrefresh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void airass(machine_config &config);
+	void wpksoc(machine_config &config);
+	void firebarr(machine_config &config);
+	void dsoccr94(machine_config &config);
 };

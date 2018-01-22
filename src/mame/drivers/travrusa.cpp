@@ -51,9 +51,11 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "audio/irem.h"
 #include "includes/travrusa.h"
+#include "audio/irem.h"
+
+#include "cpu/z80/z80.h"
+#include "screen.h"
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, travrusa_state )
@@ -301,7 +303,7 @@ void travrusa_state::machine_reset()
 	m_scrollx[1] = 0;
 }
 
-static MACHINE_CONFIG_START( travrusa, travrusa_state )
+MACHINE_CONFIG_START(travrusa_state::travrusa)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
@@ -332,7 +334,7 @@ static MACHINE_CONFIG_START( travrusa, travrusa_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shtrider, travrusa )
+MACHINE_CONFIG_DERIVED(travrusa_state::shtrider, travrusa)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)
@@ -340,7 +342,7 @@ static MACHINE_CONFIG_DERIVED( shtrider, travrusa )
 	MCFG_PALETTE_INIT_OWNER(travrusa_state,shtrider)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shtriderb, travrusa )
+MACHINE_CONFIG_DERIVED(travrusa_state::shtriderb, travrusa)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", shtrider)
@@ -585,8 +587,8 @@ DRIVER_INIT_MEMBER(travrusa_state,motorace)
 	/* The first CPU ROM has the address and data lines scrambled */
 	for (A = 0; A < 0x2000; A++)
 	{
-		j = BITSWAP16(A,15,14,13,9,7,5,3,1,12,10,8,6,4,2,0,11);
-		rom[j] = BITSWAP8(buffer[A],2,7,4,1,6,3,0,5);
+		j = bitswap<16>(A,15,14,13,9,7,5,3,1,12,10,8,6,4,2,0,11);
+		rom[j] = bitswap<8>(buffer[A],2,7,4,1,6,3,0,5);
 	}
 }
 
@@ -597,12 +599,12 @@ DRIVER_INIT_MEMBER(travrusa_state,shtridra)
 
 	/* D3/D4  and  D5/D6 swapped */
 	for (A = 0; A < 0x2000; A++)
-		rom[A] = BITSWAP8(rom[A],7,5,6,3,4,2,1,0);
+		rom[A] = bitswap<8>(rom[A],7,5,6,3,4,2,1,0);
 }
 
 READ8_MEMBER(travrusa_state::shtridrb_port11_r)
 {
-	printf("shtridrb_port11_r %04x\n", space.device().safe_pc());
+	printf("shtridrb_port11_r %04x\n", m_maincpu->pc());
 	// reads, masks with 0xa8, checks for 0x88, resets game if not happy with value?
 	return 0x88;
 }
@@ -614,11 +616,11 @@ DRIVER_INIT_MEMBER(travrusa_state, shtridrb)
 }
 
 
-GAME( 1983, travrusa, 0,        travrusa, travrusa, driver_device, 0,         ROT270, "Irem",                    "Traverse USA / Zippy Race", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, travrusab,travrusa, travrusa, travrusa, driver_device, 0,         ROT270, "bootleg (I.P.)",          "Traverse USA (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mototour, travrusa, travrusa, travrusa, driver_device, 0,         ROT270, "Irem (Tecfri license)",   "MotoTour / Zippy Race (Tecfri license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, motorace, travrusa, travrusa, motorace, travrusa_state, motorace, ROT270, "Irem (Williams license)", "MotoRace USA", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusa, 0,        travrusa, travrusa, travrusa_state, 0,        ROT270,                    "Irem",                           "Traverse USA / Zippy Race", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, travrusab,travrusa, travrusa, travrusa, travrusa_state, 0,        ROT270,                    "bootleg (I.P.)",                 "Traverse USA (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mototour, travrusa, travrusa, travrusa, travrusa_state, 0,        ROT270,                    "Irem (Tecfri license)",          "MotoTour / Zippy Race (Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, motorace, travrusa, travrusa, motorace, travrusa_state, motorace, ROT270,                    "Irem (Williams license)",        "MotoRace USA", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, shtrider, 0,        shtrider, shtrider, driver_device, 0,         ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider", MACHINE_SUPPORTS_SAVE ) // possible bootleg
+GAME( 1985, shtrider, 0,        shtrider, shtrider, travrusa_state, 0,        ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu",                 "Shot Rider", MACHINE_SUPPORTS_SAVE ) // possible bootleg
 GAME( 1984, shtridera,shtrider, shtrider, shtrider, travrusa_state, shtridra, ROT270|ORIENTATION_FLIP_X, "Seibu Kaihatsu (Sigma license)", "Shot Rider (Sigma license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, shtriderb,shtrider, shtriderb,shtrider, travrusa_state, shtridrb, ROT270|ORIENTATION_FLIP_X, "bootleg",                        "Shot Rider (bootleg)", MACHINE_SUPPORTS_SAVE ) // resets when you attempt to start a game?

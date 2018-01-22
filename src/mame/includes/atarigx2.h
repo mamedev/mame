@@ -6,23 +6,24 @@
 
 *************************************************************************/
 
+#include "audio/atarijsa.h"
 #include "machine/atarigen.h"
 #include "machine/atarixga.h"
-#include "audio/atarijsa.h"
+#include "video/atarirle.h"
 
 
 class atarigx2_state : public atarigen_state
 {
 public:
 	atarigx2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag),
-			m_jsa(*this, "jsa"),
-			m_xga(*this, "xga"),
-			m_mo_command(*this, "mo_command"),
-			m_playfield_tilemap(*this, "playfield"),
-			m_alpha_tilemap(*this, "alpha"),
-			m_rle(*this, "rle")
-			{ }
+		: atarigen_state(mconfig, type, tag)
+		, m_jsa(*this, "jsa")
+		, m_xga(*this, "xga")
+		, m_mo_command(*this, "mo_command")
+		, m_playfield_tilemap(*this, "playfield")
+		, m_alpha_tilemap(*this, "alpha")
+		, m_rle(*this, "rle")
+	{ }
 
 	uint16_t          m_playfield_base;
 
@@ -67,4 +68,7 @@ public:
 	DECLARE_VIDEO_START(atarigx2);
 	uint32_t screen_update_atarigx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE16_MEMBER( atarigx2_mo_control_w );
+	void atarigx2(machine_config &config);
+	void atarigx2_0x200(machine_config &config);
+	void atarigx2_0x400(machine_config &config);
 };

@@ -286,7 +286,7 @@ const uint32_t drcbe_c::s_condition_map[] =
 drcbe_c::drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
 	: drcbe_interface(drcuml, cache, device),
 		m_hash(cache, modes, addrbits, ignorebits),
-		m_map(cache, 0),
+		m_map(cache, 0xaaaaaaaa55555555),
 		m_labels(cache),
 		m_fixup_delegate(&drcbe_c::fixup_label, this)
 {
@@ -1747,7 +1747,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_ROL, 8, 0):       // DROL    dst,src,count[,f]
-				shift = DPARAM2 & 31;
+				shift = DPARAM2 & 63;
 				DPARAM0 = (DPARAM1 << shift) | (DPARAM1 >> ((64 - shift) & 63));
 				break;
 

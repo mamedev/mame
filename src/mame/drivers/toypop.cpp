@@ -4,7 +4,8 @@
 
     "Universal System 16" Hardware (c) 1983/1986 Namco
 
-    driver by Angelo Salese, based off "wiped off due of not anymore licenseable" driver by Edgardo E. Contini Salvan.
+    driver by Angelo Salese,
+    original "wiped off due of not anymore licenseable" driver by Edgardo E. Contini Salvan.
 
     TODO:
     - PAL is presumably inverted with address bit 11 (0x800) for 0x6000-0x7fff area
@@ -26,10 +27,15 @@
 ****************************************/
 
 #include "emu.h"
+#include "machine/namcoio.h"
+
 #include "cpu/m6809/m6809.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/namcoio.h"
+#include "machine/timer.h"
 #include "sound/namco.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK XTAL_6_144MHz
 
@@ -95,6 +101,8 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_halt_ctrl_w);
 	DECLARE_READ8_MEMBER(bg_rmw_r);
 	DECLARE_WRITE8_MEMBER(bg_rmw_w);
+	void toypop(machine_config &config);
+	void liblrabl(machine_config &config);
 protected:
 	// driver_device overrides
 //  virtual void machine_start() override;
@@ -646,8 +654,8 @@ INTERRUPT_GEN_MEMBER(namcos16_state::slave_vblank_irq)
 		device.execute().set_input_line(6,HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( liblrabl, namcos16_state )
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)
+MACHINE_CONFIG_START(namcos16_state::liblrabl)
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(master_liblrabl_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos16_state, master_scanline, "screen", 0, 1)
 
@@ -655,25 +663,25 @@ static MACHINE_CONFIG_START( liblrabl, namcos16_state )
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos16_state,  slave_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK/4)
+	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(namcos16_state,  irq0_line_hold, 60)
 
 
-	MCFG_DEVICE_ADD("58xx", NAMCO58XX, 0)
+	MCFG_DEVICE_ADD("58xx", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
 	MCFG_NAMCO58XX_IN_1_CB(IOPORT("P1_RIGHT"))
 	MCFG_NAMCO58XX_IN_2_CB(IOPORT("P2_RIGHT"))
 	MCFG_NAMCO58XX_IN_3_CB(IOPORT("BUTTONS"))
 
-	MCFG_DEVICE_ADD("56xx_1", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("56xx_1", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_0_CB(READ8(namcos16_state, dipA_h))
 	MCFG_NAMCO56XX_IN_1_CB(READ8(namcos16_state, dipB_l))
 	MCFG_NAMCO56XX_IN_2_CB(READ8(namcos16_state, dipB_h))
 	MCFG_NAMCO56XX_IN_3_CB(READ8(namcos16_state, dipA_l))
 	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(namcos16_state, flip))
 
-	MCFG_DEVICE_ADD("56xx_2", NAMCO56XX, 0)
+	MCFG_DEVICE_ADD("56xx_2", NAMCO_56XX, 0)
 	MCFG_NAMCO56XX_IN_1_CB(IOPORT("P1_LEFT"))
 	MCFG_NAMCO56XX_IN_2_CB(IOPORT("P2_LEFT"))
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("SERVICE"))
@@ -695,7 +703,7 @@ static MACHINE_CONFIG_START( liblrabl, namcos16_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( toypop, liblrabl )
+MACHINE_CONFIG_DERIVED(namcos16_state::toypop, liblrabl)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(master_toypop_map)
 MACHINE_CONFIG_END
@@ -759,5 +767,5 @@ ROM_START( toypop )
 	ROM_LOAD( "tp1-6.3d", 0x0000, 0x0100, CRC(16a9166a) SHA1(847cbaf7c88616576c410177e066ae1d792ac0ba) )
 ROM_END
 
-GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, driver_device, 0,   ROT0,   "Namco", "Libble Rabble", MACHINE_NO_COCKTAIL )
-GAME( 1986, toypop,   0,     toypop,   toypop,   driver_device, 0,   ROT0,   "Namco", "Toypop", MACHINE_NO_COCKTAIL )
+GAME( 1983, liblrabl, 0,     liblrabl, liblrabl, namcos16_state, 0,   ROT0,   "Namco", "Libble Rabble", MACHINE_NO_COCKTAIL )
+GAME( 1986, toypop,   0,     toypop,   toypop,   namcos16_state, 0,   ROT0,   "Namco", "Toypop",        MACHINE_NO_COCKTAIL )

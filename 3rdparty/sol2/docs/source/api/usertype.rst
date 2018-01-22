@@ -170,9 +170,10 @@ If you don't specify any constructor options at all and the type is `default_con
 * ``{anything}, {some_factory_function}``
 	- Essentially binds whatever the function is to name ``{anything}``
 	- When used WITH the ``sol::no_constructor`` option above (e.g. ``"new", sol::no_constructor`` and after that having ``"create", &my_creation_func``), one can remove typical constructor avenues and then only provide specific factory functions. Note that this combination is similar to using the ``sol::factories`` method mentioned earlier in this list. To control the destructor as well, see further below
-* ``sol::call_constructor, {valid function / constructor / initializer / factory}``
+* ``sol::call_constructor, {valid constructor / initializer / factory}``
 	- The purpose of this is to enable the syntax ``local v = my_class( 24 )`` and have that call a constructor; it has no other purpose
 	- This is compatible with luabind, kaguya and other Lua library syntaxes and looks similar to C++ syntax, but the general consensus in Programming with Lua and other places is to use a function named ``new``
+	- Note that with the ``sol::call_constructor`` key, a construct type above must be specified. A free function without it will pass in the metatable describing this object as the first argument without that distinction, which can cause strange runtime errors.
 
 usertype destructor options
 +++++++++++++++++++++++++++

@@ -12,6 +12,8 @@
 #include "cpu/avr8/avr8.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define VERBOSE_LEVEL   (0)
 
@@ -65,6 +67,7 @@ public:
 	uint32_t screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<dac_byte_interface> m_dac;
+	void craft(machine_config &config);
 };
 
 inline void craft_state::verboselog(int n_level, const char *s_fmt, ...)
@@ -235,7 +238,7 @@ void craft_state::machine_reset()
 	m_last_cycles = 0;
 }
 
-static MACHINE_CONFIG_START( craft, craft_state )
+MACHINE_CONFIG_START(craft_state::craft)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ATMEGA88, MASTER_CLOCK)
@@ -267,5 +270,5 @@ ROM_START( craft )
 	ROM_LOAD( "eeprom.raw", 0x0000, 0x0200, CRC(e18a2af9) SHA1(81fc6f2d391edfd3244870214fac37929af0ac0c) )
 ROM_END
 
-/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY          FULLNAME */
+/*   YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT  STATE           INIT      COMPANY          FULLNAME */
 CONS(2008, craft,    0,        0,        craft,    craft, craft_state,    craft,    "Linus Akesson", "Craft", MACHINE_NOT_WORKING)

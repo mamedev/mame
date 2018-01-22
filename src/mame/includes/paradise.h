@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
 #include "sound/okim6295.h"
+#include "screen.h"
 
 class paradise_state : public driver_device
 {
@@ -86,4 +87,10 @@ public:
 
 	void update_pix_palbank();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void penkyi(machine_config &config);
+	void tgtball(machine_config &config);
+	void paradise(machine_config &config);
+	void madball(machine_config &config);
+	void torus(machine_config &config);
+	void penky(machine_config &config);
 };

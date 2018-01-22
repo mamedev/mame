@@ -338,9 +338,11 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 }
 
 
-VIDEO_START_MEMBER(tubep_state,tubep)
+void tubep_state::video_start()
 {
 	m_spritemap = std::make_unique<uint8_t[]>(256*256*2);
+
+	m_sprite_timer = timer_alloc(TIMER_SPRITE);
 
 	/* Set up save state */
 	save_item(NAME(m_romD_addr));
@@ -367,7 +369,7 @@ VIDEO_START_MEMBER(tubep_state,tubep)
 }
 
 
-VIDEO_RESET_MEMBER(tubep_state,tubep)
+void tubep_state::video_reset()
 {
 	memset(m_spritemap.get(),0,256*256*2);
 
@@ -401,15 +403,23 @@ WRITE8_MEMBER(tubep_state::tubep_textram_w)
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_background_romselect_w)
+WRITE_LINE_MEMBER(tubep_state::screen_flip_w)
 {
-	m_background_romsel = data & 1;
+	// screen flip, active high
 }
 
 
-WRITE8_MEMBER(tubep_state::tubep_colorproms_A4_line_w)
+WRITE_LINE_MEMBER(tubep_state::background_romselect_w)
 {
-	m_color_A4 = (data & 1)<<4;
+	// 0->select roms: B1,B3,B5; 1->select roms: B2,B4,B6
+	m_background_romsel = state;
+}
+
+
+WRITE_LINE_MEMBER(tubep_state::colorproms_A4_line_w)
+{
+	// line A4 (color proms address) state
+	m_color_A4 = state << 4;
 }
 
 
@@ -553,7 +563,7 @@ WRITE8_MEMBER(tubep_state::tubep_sprite_control_w)
 			m_mcu->set_input_line(0, CLEAR_LINE);
 
 			/* 2.assert /SINT again after this time */
-			timer_set( attotime::from_hz(19968000/8) * ((m_XSize+1)*(m_YSize+1)), TIMER_SPRITE);
+			m_sprite_timer->adjust(attotime::from_hz(19968000/8) * ((m_XSize+1)*(m_YSize+1)));
 
 			/* 3.clear of /SINT starts sprite drawing circuit */
 			draw_sprite();

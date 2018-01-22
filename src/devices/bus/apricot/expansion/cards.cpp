@@ -6,7 +6,9 @@
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "cards.h"
+#include "ram.h"
 
 SLOT_INTERFACE_START( apricot_expansion_cards )
 	SLOT_INTERFACE("128k", APRICOT_128K_RAM)

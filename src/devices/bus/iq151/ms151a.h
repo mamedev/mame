@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+#ifndef MAME_BUS_IQ151_MS151A_H
+#define MAME_BUS_IQ151_MS151A_H
+
 #pragma once
 
-#ifndef __IQ151_MS151A_H__
-#define __IQ151_MS151A_H__
-
-#include "emu.h"
 #include "iq151.h"
 
 //**************************************************************************
@@ -51,6 +50,6 @@ private:
 
 
 // device type definition
-extern const device_type IQ151_MS151A;
+DECLARE_DEVICE_TYPE(IQ151_MS151A, iq151_ms151a_device)
 
-#endif  /* __IQ151_MS151A_H__ */
+#endif // MAME_BUS_IQ151_MS151A_H

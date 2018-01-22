@@ -145,41 +145,6 @@ WRITE8_MEMBER(bbc_state::bbc_memorybp1_w)
 }
 
 
-/* the next two function handle reads and write to the shadow video ram area
-   between 0x3000 and 0x7fff
-
-   when vdusel is set high the video display uses the shadow ram memory
-   the processor only reads and write to the shadow ram when vdusel is set
-   and when the instruction being executed is stored in a set range of memory
-   addresses known as the VDU driver instructions.
-*/
-
-
-DIRECT_UPDATE_MEMBER(bbc_state::bbcbp_direct_handler)
-{
-	uint8_t *RAM = m_region_maincpu->base();
-	if (m_vdusel == 0)
-	{
-		// not in shadow ram mode so just read normal ram
-		m_bank2->set_base(RAM + 0x3000);
-	}
-	else
-	{
-		if (vdudriverset())
-		{
-			// if VDUDriver set then read from shadow ram
-			m_bank2->set_base(RAM + 0xb000);
-		}
-		else
-		{
-			// else read from normal ram
-			m_bank2->set_base(RAM + 0x3000);
-		}
-	}
-	return address;
-}
-
-
 WRITE8_MEMBER(bbc_state::bbc_memorybp2_w)
 {
 	uint8_t *RAM = m_region_maincpu->base();
@@ -329,7 +294,7 @@ WRITE8_MEMBER(bbc_state::bbcm_ACCCON_write)
 
 	if (tempIRR!=m_ACCCON_IRR)
 	{
-		m_irqs->in3_w(m_ACCCON_IRR);
+		m_irqs->in_w<3>(m_ACCCON_IRR);
 	}
 
 	if (m_ACCCON_Y)
@@ -381,6 +346,9 @@ WRITE8_MEMBER(bbc_state::page_selectbm_w)
 	m_pagedRAM = (data & 0x80) >> 7;
 	m_rombank = data & 0x0f;
 
+	if (m_lk19_ic37_paged_rom && (m_rombank == 4 || m_rombank == 5)) m_pagedRAM = 0;
+	if (m_lk18_ic41_paged_rom && (m_rombank == 6 || m_rombank == 7)) m_pagedRAM = 0;
+
 	if (m_pagedRAM)
 	{
 		m_bank4->set_entry(0x10);
@@ -394,34 +362,10 @@ WRITE8_MEMBER(bbc_state::page_selectbm_w)
 }
 
 
-
 WRITE8_MEMBER(bbc_state::bbc_memorybm1_w)
 {
 	m_region_maincpu->base()[offset] = data;
 }
-
-
-DIRECT_UPDATE_MEMBER(bbc_state::bbcm_direct_handler)
-{
-	if (m_ACCCON_X)
-	{
-		m_bank2->set_base(m_region_maincpu->base() + 0xb000);
-	}
-	else
-	{
-		if (m_ACCCON_E && bbcm_vdudriverset())
-		{
-			m_bank2->set_base(m_region_maincpu->base() + 0xb000);
-		}
-		else
-		{
-			m_bank2->set_base(m_region_maincpu->base() + 0x3000);
-		}
-	}
-
-	return address;
-}
-
 
 
 WRITE8_MEMBER(bbc_state::bbc_memorybm2_w)
@@ -444,11 +388,6 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm2_w)
 	}
 }
 
-static const unsigned short bbc_master_sideways_ram_banks[16]=
-{
-	0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0
-};
-
 
 WRITE8_MEMBER(bbc_state::bbc_memorybm4_w)
 {
@@ -458,7 +397,7 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm4_w)
 	}
 	else
 	{
-		if (bbc_master_sideways_ram_banks[m_rombank])
+		if ((!m_lk18_ic41_paged_rom && (m_rombank == 6 || m_rombank == 7)) || (!m_lk19_ic37_paged_rom && (m_rombank == 4 || m_rombank == 5)))
 		{
 			m_region_opt->base()[offset+(m_rombank<<14)] = data;
 		}
@@ -468,9 +407,9 @@ WRITE8_MEMBER(bbc_state::bbc_memorybm4_w)
 
 WRITE8_MEMBER(bbc_state::bbc_memorybm5_w)
 {
-	if (bbc_master_sideways_ram_banks[m_rombank])
+	if ((!m_lk18_ic41_paged_rom && (m_rombank == 6 || m_rombank == 7)) || (!m_lk19_ic37_paged_rom && (m_rombank == 4 || m_rombank == 5)))
 	{
-		m_region_opt->base()[offset+(m_rombank<<14)+0x1000] = data;
+		m_region_opt->base()[offset+(m_rombank<<14) + 0x1000] = data;
 	}
 }
 
@@ -545,8 +484,7 @@ READ8_MEMBER(bbc_state::bbcm_r)
 		myo = offset-0x200;
 		if ((myo>=0x00) && (myo<=0x06) && (myo+0x01) & 1) return m_hd6845->status_r(space, myo-0x00);                     /* Video controller */
 		if ((myo>=0x01) && (myo<=0x07) && (myo & 1))      return m_hd6845->register_r(space, myo-0x01);
-		if ((myo>=0x08) && (myo<=0x0e) && (myo+0x01) & 1) return m_acia ? m_acia->status_r(space, myo-0x08) : 0xfe;       /* Serial controller */
-		if ((myo>=0x09) && (myo<=0x0f) && (myo & 1))      return m_acia ? m_acia->data_r(space, myo-0x09) : 0xfe;
+		if ((myo>=0x08) && (myo<=0x0f))                   return m_acia ? m_acia->read(space, myo & 0x01) : 0xfe;         /* Serial controller */
 		if ((myo>=0x10) && (myo<=0x17))                   return 0xfe;                                                    /* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f))                   return m_upd7002 ? m_upd7002->read(space, myo-0x18) : 0xfe;     /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23))                   return 0xfe;                                                    /* VideoULA */
@@ -562,7 +500,11 @@ READ8_MEMBER(bbc_state::bbcm_r)
 		if ((myo>=0x80) && (myo<=0x9f))                   return 0xfe;
 		if ((myo>=0xa0) && (myo<=0xbf))                   return m_adlc ? m_adlc->read(space, myo & 0x03) : 0xfe;
 		if ((myo>=0xc0) && (myo<=0xdf))                   return 0xff;
-		if ((myo>=0xe0) && (myo<=0xff))                   return 0xff;
+		if ((myo>=0xe0) && (myo<=0xff))
+		{
+			if (m_intube &&  m_ACCCON_ITU)                  return m_intube->host_r(space, myo-0xe0);                       /* Internal TUBE */
+			if (m_extube && !m_ACCCON_ITU)                  return m_extube->host_r(space, myo-0xe0);                       /* External TUBE */
+		}
 	}
 	return 0xfe;
 }
@@ -576,8 +518,7 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 		myo=offset-0x200;
 		if ((myo>=0x00) && (myo<=0x06) && (myo+0x01) & 1) m_hd6845->address_w(space, myo-0x00, data);                     /* Video Controller */
 		if ((myo>=0x01) && (myo<=0x07) && (myo & 1))      m_hd6845->register_w(space, myo-0x01, data);
-		if ((myo>=0x08) && (myo<=0x0e) && (myo+0x01) & 1) if (m_acia) m_acia->control_w(space, myo-0x08, data);           /* Serial controller */
-		if ((myo>=0x09) && (myo<=0x0f) && (myo & 1))      if (m_acia) m_acia->data_w(space, myo-0x09, data);
+		if ((myo>=0x08) && (myo<=0x0f))                   if (m_acia) m_acia->write(space, myo & 0x01, data);             /* Serial controller */
 		if ((myo>=0x10) && (myo<=0x17))                   bbc_SerialULA_w(space, myo-0x10, data);                         /* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f) && (m_upd7002))    m_upd7002->write(space, myo-0x18, data);                        /* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23))                   bbc_videoULA_w(space, myo-0x20, data);                          /* VideoULA */
@@ -593,7 +534,11 @@ WRITE8_MEMBER(bbc_state::bbcm_w)
 		//if ((myo>=0x80) && (myo<=0x9f))
 		if ((myo>=0xa0) && (myo<=0xbf) && (m_adlc))       m_adlc->write(space, myo & 0x03, data);
 		//if ((myo>=0xc0) && (myo<=0xdf))
-		//if ((myo>=0xe0) && (myo<=0xff))
+		if ((myo>=0xe0) && (myo<=0xff))
+		{
+			if (m_intube &&  m_ACCCON_ITU)                  m_intube->host_w(space, myo-0xe0, data);                        /* Internal TUBE */
+			if (m_extube && !m_ACCCON_ITU)                  m_extube->host_w(space, myo-0xe0, data);                        /* External TUBE */
+		}
 	}
 }
 
@@ -796,7 +741,7 @@ void bbc_state::bbcb_IC32_initialise(bbc_state *state)
 void bbc_state::MC146818_set(address_space &space)
 {
 	//logerror ("146181 WR=%d DS=%d AS=%d CE=%d \n",m_MC146818_WR,m_MC146818_DS,m_MC146818_AS,m_MC146818_CE);
-	//mc146818_device *rtc = space.machine().device<mc146818_device>("rtc");
+	//mc146818_device *rtc = machine().device<mc146818_device>("rtc");
 
 	// if chip enabled
 	if (m_MC146818_CE)
@@ -1499,6 +1444,8 @@ WRITE8_MEMBER(bbc_state::bbc_wd1770_status_w)
 	// bit 3: density
 	m_wd1770->dden_w(BIT(data, 3));
 
+	// bit 4: interrupt enable
+
 	// bit 5: reset
 	if (!BIT(data, 5)) m_wd1770->soft_reset();
 }
@@ -1595,7 +1542,7 @@ image_init_result bbc_state::bbc_load_rom(device_image_interface &image, generic
 
 image_init_result bbc_state::bbcm_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		uint32_t filesize = image.length();
 
@@ -1788,8 +1735,6 @@ MACHINE_START_MEMBER(bbc_state, bbcbp)
 	m_machinetype = BPLUS;
 	m_mc6850_clock = 0;
 
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&bbc_state::bbcbp_direct_handler, this));
-
 	bbc_setup_banks(m_bank4, 16, 0, 0x3000);
 	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x3000);   // additional bank for paged ram
 	bbc_setup_banks(m_bank6, 16, 0x3000, 0x1000);
@@ -1816,7 +1761,8 @@ MACHINE_START_MEMBER(bbc_state, bbcm)
 	m_machinetype = MASTER;
 	m_mc6850_clock = 0;
 
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&bbc_state::bbcm_direct_handler, this));
+	m_lk18_ic41_paged_rom = false; /* Link set for RAM in slots 6 and 7 */
+	m_lk19_ic37_paged_rom = false; /* Link set for RAM in slots 4 and 5 */
 
 	bbcm_setup_banks(m_bank4, 16, 0, 0x1000);
 	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x1000);   // additional bank for paged ram
@@ -1874,4 +1820,13 @@ MACHINE_RESET_MEMBER(bbc_state, ltmpm)
 	m_monitortype = monitor_type_t::GREEN;
 	m_Speech      = 0;
 	m_SWRAMtype   = 0;
+}
+
+
+MACHINE_START_MEMBER(bbc_state, cfa3000)
+{
+	MACHINE_START_CALL_MEMBER(bbcm);
+
+	m_lk18_ic41_paged_rom = true; /* Link set for ROM in slots 6 and 7 */
+	m_lk19_ic37_paged_rom = true; /* Link set for ROM in slots 4 and 5 */
 }

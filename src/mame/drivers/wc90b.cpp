@@ -85,9 +85,13 @@ Noted added by ClawGrip 28-Mar-2008:
 */
 
 #include "emu.h"
+#include "includes/wc90b.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "includes/wc90b.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define TEST_DIPS false /* enable to test unmapped dip switches */
 
@@ -163,7 +167,7 @@ static ADDRESS_MAP_START( wc90b_map2, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xe800, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
@@ -346,7 +350,7 @@ void wc90b_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( wc90b, wc90b_state )
+MACHINE_CONFIG_START(wc90b_state::wc90b)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
@@ -388,11 +392,11 @@ static MACHINE_CONFIG_START( wc90b, wc90b_state )
 
 	MCFG_SOUND_ADD("msm", MSM5205, MSM5205_CLOCK)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(wc90b_state, adpcm_int))      /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)  /* 4KHz 4-bit */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-ROM_START( wc90b1 )
+ROM_START( twcup90b1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "a02.bin",      0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )  /* c000-ffff is not used */
 	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )  /* banked at f000-f7ff */
@@ -434,7 +438,7 @@ ROM_START( wc90b1 )
 	ROM_LOAD( "el_ic143_gal16v8_4.bin", 0x0800, 0x0117, NO_DUMP SHA1(fbe632437eac2418da7a3c3e947cfd36f6211407) )
 ROM_END
 
-ROM_START( wc90b2 )
+ROM_START( twcup90b2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "a02",          0x00000, 0x10000, CRC(1e6e94c9) SHA1(1731e3e3b5d17ba676a7e42638d7206212a0080d) )  /* c000-ffff is not used */
 	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )  /* banked at f000-f7ff */
@@ -487,7 +491,7 @@ ROM_END
     00000590: 0F 0B
     00000591: FF FA
 */
-ROM_START( wc90ba )
+ROM_START( twcup90ba )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "a02.bin",      0x00000, 0x10000, CRC(192a03dd) SHA1(ab98d370bba5437f956631b0199b173be55f1c27) )  /* c000-ffff is not used */
 	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )  /* banked at f000-f7ff */
@@ -530,6 +534,6 @@ ROM_START( wc90ba )
 ROM_END
 
 
-GAME( 1989, wc90b1, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90b2, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Worldcup '90", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90ba, wc90, wc90b, wc90b, driver_device, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90 - alt version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90b1, twcup90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90)",               MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90b2, twcup90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Worldcup '90",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, twcup90ba, twcup90, wc90b, wc90b, wc90b_state, 0, ROT0, "bootleg", "Euro League (Italian hack of Tecmo World Cup '90 - alt version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

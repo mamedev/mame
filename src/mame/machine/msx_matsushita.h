@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#ifndef __MSX_MATSUSHITA_H
-#define __MSX_MATSUSHITA_H
+#ifndef MAME_MACHINE_MSX_MATSUSHITA_H
+#define MAME_MACHINE_MSX_MATSUSHITA_H
 
 
 #include "msx_switched.h"
 
 
-extern const device_type MSX_MATSUSHITA;
+DECLARE_DEVICE_TYPE(MSX_MATSUSHITA, msx_matsushita_device)
 
 
 #define MCFG_MSX_MATSUSHITA_ADD(_tag) \
@@ -24,7 +24,8 @@ class msx_matsushita_device : public device_t,
 public:
 	msx_matsushita_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_turbo_callback(device_t &device, _Object object) { return downcast<msx_matsushita_device &>(device).m_turbo_out_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_turbo_callback(device_t &device, Object &&cb)
+	{ return downcast<msx_matsushita_device &>(device).m_turbo_out_cb.set_callback(std::forward<Object>(cb)); }
 
 	virtual DECLARE_READ8_MEMBER(switched_read) override;
 	virtual DECLARE_WRITE8_MEMBER(switched_write) override;
@@ -50,4 +51,4 @@ private:
 	uint8_t m_pattern;
 };
 
-#endif
+#endif // MAME_MACHINE_MSX_MATSUSHITA_H

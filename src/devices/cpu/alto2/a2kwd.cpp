@@ -5,6 +5,7 @@
  *   Xerox AltoII disk word task
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 
 //! f1_kwd_block early: block the disk word task

@@ -28,15 +28,16 @@
 /* core includes */
 #include "emu.h"
 #include "includes/samcoupe.h"
-#
-/* components */
+
 #include "cpu/z80/z80.h"
 #include "sound/saa1099.h"
 
-/* devices */
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
+
 #include "formats/tzx_cas.h"
 #include "formats/coupedsk.h"
-#include "softlist.h"
 
 /***************************************************************************
     CONSTANTS
@@ -424,12 +425,12 @@ static INPUT_PORTS_START( samcoupe )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)          PORT_CHAR('u') PORT_CHAR('U')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)          PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('=') PORT_CHAR('_')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('"') PORT_CHAR('\xa9')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('"') PORT_CHAR(0xA9)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F0") PORT_CODE(KEYCODE_0_PAD) PORT_CHAR(UCHAR_MAMEKEY(F10))
 
 	PORT_START("keyboard_row_bf")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)     PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR('\xa3')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)     PORT_CHAR('l') PORT_CHAR('L') PORT_CHAR(0xA3)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)     PORT_CHAR('k') PORT_CHAR('K')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)     PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)     PORT_CHAR('h') PORT_CHAR('H') PORT_CHAR('^')
@@ -516,7 +517,7 @@ static SLOT_INTERFACE_START( samcoupe_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( samcoupe, samcoupe_state )
+MACHINE_CONFIG_START(samcoupe_state::samcoupe)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, SAMCOUPE_XTAL_X1 / 4) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(samcoupe_mem)
@@ -617,5 +618,5 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY                        FULLNAME     FLAGS */
-COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, driver_device, 0,    "Miles Gordon Technology plc", "SAM Coupe", 0 )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT  COMPANY                        FULLNAME     FLAGS
+COMP( 1989, samcoupe, 0,      0,      samcoupe, samcoupe, samcoupe_state, 0,    "Miles Gordon Technology plc", "SAM Coupe", 0 )

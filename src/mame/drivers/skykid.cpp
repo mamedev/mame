@@ -16,11 +16,14 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/skykid.h"
+
 #include "cpu/m6809/m6809.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "machine/watchdog.h"
 #include "sound/namco.h"
-#include "includes/skykid.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(skykid_state::inputport_select_w)
@@ -432,14 +435,14 @@ INTERRUPT_GEN_MEMBER(skykid_state::mcu_vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( skykid, skykid_state )
+MACHINE_CONFIG_START(skykid_state::skykid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809,49152000/32)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_49_152MHz/32)
 	MCFG_CPU_PROGRAM_MAP(skykid_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", skykid_state,  main_vblank_irq)
 
-	MCFG_CPU_ADD("mcu", HD63701,49152000/8) /* or compatible 6808 with extra instructions */
+	MCFG_CPU_ADD("mcu", HD63701, XTAL_49_152MHz/8) /* or compatible 6808 with extra instructions */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", skykid_state,  mcu_vblank_irq)
@@ -471,7 +474,7 @@ static MACHINE_CONFIG_START( skykid, skykid_state )
 MACHINE_CONFIG_END
 
 
-ROM_START( skykid )
+ROM_START( skykid ) // a PCB was found with ROM 4 and 6 labeled sk1, but hashes match the sk2 listed here and in other sets, while they differ from the sk1 ROMs in set skykidd?
 	ROM_REGION( 0x14000, "maincpu", 0 ) /* 6809 code */
 	ROM_LOAD( "sk2_2.6c",     0x08000, 0x4000, CRC(ea8a5822) SHA1(5b13133410bcb7d647e662b476dbfd2edab8aac0) )
 	ROM_LOAD( "sk1-1c.6b",    0x0c000, 0x4000, CRC(7abe6c6c) SHA1(7d2631cc6149fa3e02b1355cb899de5474ff5d0a) )

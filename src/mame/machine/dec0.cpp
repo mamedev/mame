@@ -10,7 +10,9 @@ Data East machine functions - Bryan McPhail, mish@tendril.co.uk
 
 #include "emu.h"
 #include "includes/dec0.h"
+
 #include "cpu/h6280/h6280.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
 
 
@@ -37,32 +39,14 @@ READ16_MEMBER(dec0_state::dec0_controls_r)
 			return ioport("DSW")->read();
 
 		case 8: /* Intel 8751 mc, Bad Dudes & Heavy Barrel only */
-			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", space.device().safe_pc(), 0x30c000+offset, m_i8751_return);
+			//logerror("CPU #0 PC %06x: warning - read i8751 %06x - %04x\n", m_maincpu->pc(), 0x30c000+offset, m_i8751_return);
 			return m_i8751_return;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", space.device().safe_pc(), 0x30c000+offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", m_maincpu->pc(), 0x30c000+offset);
 	return ~0;
 }
 
-/******************************************************************************/
-
-READ16_MEMBER(dec0_state::dec0_rotary_r)
-{
-	switch (offset<<1)
-	{
-		case 0: /* Player 1 rotary */
-			return ~(1 << ioport("AN0")->read());
-
-		case 8: /* Player 2 rotary */
-			return ~(1 << ioport("AN1")->read());
-
-		default:
-			logerror("Unknown rotary read at 300000 %02x\n", offset);
-	}
-
-	return 0;
-}
 
 /******************************************************************************/
 
@@ -77,19 +61,22 @@ READ16_MEMBER(dec0_state::midres_controls_r)
 			return ioport("DSW")->read();
 
 		case 4: /* Player 1 rotary */
-			return ~(1 << ioport("AN0")->read());
+			return ioport("AN0")->read();
 
 		case 6: /* Player 2 rotary */
-			return ~(1 << ioport("AN1")->read());
+			return ioport("AN1")->read();
 
 		case 8: /* Credits, start buttons */
 			return ioport("SYSTEM")->read();
 
-		case 12:
+		case 0xa: // clr.w
+			return 0;
+
+		case 0xc:
 			return 0;   /* ?? watchdog ?? */
 	}
 
-	logerror("PC %06x unknown control read at %02x\n", space.device().safe_pc(), 0x180000+offset);
+	logerror("PC %06x unknown control read at %02x\n", m_maincpu->pc(), 0x180000+(offset<<1));
 	return ~0;
 }
 
@@ -117,7 +104,7 @@ WRITE8_MEMBER(dec0_state::hippodrm_prot_w)
 
 READ16_MEMBER(dec0_state::hippodrm_68000_share_r)
 {
-	if (offset==0) space.device().execute().yield(); /* A wee helper */
+	if (offset==0) m_maincpu->yield(); /* A wee helper */
 	return m_hippodrm_shared_ram[offset]&0xff;
 }
 
@@ -165,39 +152,35 @@ WRITE16_MEMBER(dec0_state::hippodrm_68000_share_w)
 
 READ8_MEMBER(dec0_state::dec0_mcu_port_r)
 {
-	int latchEnable=m_i8751_ports[2]>>4;
+	uint8_t result = 0xff;
 
-	// P0 connected to 4 latches
-	if (offset==0)
+	// P0 connected to latches
+	if (offset == 0)
 	{
-		if ((latchEnable&1)==0)
-			return m_i8751_command>>8;
-		else if ((latchEnable&2)==0)
-			return m_i8751_command&0xff;
-		else if ((latchEnable&4)==0)
-			return m_i8751_return>>8;
-		else if ((latchEnable&8)==0)
-			return m_i8751_return&0xff;
+		if (!BIT(m_i8751_ports[2], 4))
+			result &= m_i8751_command >> 8;
+		if (!BIT(m_i8751_ports[2], 5))
+			result &= m_i8751_command & 0x00ff;
 	}
 
-	return 0xff;
+	return result;
 }
 
 WRITE8_MEMBER(dec0_state::dec0_mcu_port_w)
 {
-	m_i8751_ports[offset]=data;
-
-	if (offset==2)
+	if (offset == 2)
 	{
-		if ((data&0x4)==0)
-			m_maincpu->set_input_line(5, HOLD_LINE);
-		if ((data&0x8)==0)
+		if (!BIT(data, 2) && BIT(m_i8751_ports[2], 2))
+			m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
+		if (!BIT(data, 3))
 			m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
-		if ((data&0x40)==0)
-			m_i8751_return=(m_i8751_return&0xff00)|(m_i8751_ports[0]);
-		if ((data&0x80)==0)
-			m_i8751_return=(m_i8751_return&0xff)|(m_i8751_ports[0]<<8);
+		if (BIT(data, 6) && !BIT(m_i8751_ports[2], 6))
+			m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_ports[0];
+		if (BIT(data, 7) && !BIT(m_i8751_ports[2], 7))
+			m_i8751_return = (m_i8751_return & 0x00ff) | (m_i8751_ports[0] << 8);
 	}
+
+	m_i8751_ports[offset] = data;
 }
 
 void dec0_state::baddudes_i8751_write(int data)
@@ -300,12 +283,22 @@ void dec0_state::birdtry_i8751_write(int data)
 
 void dec0_state::dec0_i8751_write(int data)
 {
-	m_i8751_command=data;
+	m_i8751_command = data;
 
-	/* Writes to this address cause an IRQ to the i8751 microcontroller */
-	if (m_game == 1) m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
-	if (m_game == 2) baddudes_i8751_write(data);
-	if (m_game == 3) birdtry_i8751_write(data);
+	/* Writes to this address raise an IRQ on the i8751 microcontroller */
+	switch (m_game)
+	{
+	case mcu_type::EMULATED:
+		if (BIT(m_i8751_ports[2], 3))
+			m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
+		break;
+	case mcu_type::BADDUDES_SIM:
+		baddudes_i8751_write(data);
+		break;
+	case mcu_type::BIRDTRY_SIM:
+		birdtry_i8751_write(data);
+		break;
+	}
 
 	//logerror("%s: warning - write %02x to i8751\n",machine().describe_context(),data);
 }
@@ -326,14 +319,14 @@ WRITE16_MEMBER(dec0_state::sprite_mirror_w)
 
 READ16_MEMBER(dec0_state::robocop_68000_share_r)
 {
-//logerror("%08x: Share read %04x\n",space.device().safe_pc(),offset);
+//logerror("%08x: Share read %04x\n",m_maincpu->pc(),offset);
 
 	return m_robocop_shared_ram[offset];
 }
 
 WRITE16_MEMBER(dec0_state::robocop_68000_share_w)
 {
-//  logerror("%08x: Share write %04x %04x\n",space.device().safe_pc(),offset,data);
+//  logerror("%08x: Share write %04x %04x\n",m_maincpu->pc(),offset,data);
 
 	m_robocop_shared_ram[offset]=data&0xff;
 
@@ -373,14 +366,10 @@ DRIVER_INIT_MEMBER(dec0_state,hippodrm)
 
 DRIVER_INIT_MEMBER(dec0_state,slyspy)
 {
-	uint8_t *RAM = memregion("audiocpu")->base();
 	h6280_decrypt("audiocpu");
 
-	/* Slyspy sound cpu has some protection */
-	RAM[0xf2d] = 0xea;
-	RAM[0xf2e] = 0xea;
-
 	save_item(NAME(m_slyspy_state));
+	save_item(NAME(m_slyspy_sound_state));
 }
 
 DRIVER_INIT_MEMBER(dec0_state,robocop)
@@ -388,17 +377,17 @@ DRIVER_INIT_MEMBER(dec0_state,robocop)
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::robocop_68000_share_r),this), write16_delegate(FUNC(dec0_state::robocop_68000_share_w),this));
 }
 
-DRIVER_INIT_MEMBER(dec0_state,baddudes)
+DRIVER_INIT_MEMBER(dec0_state,drgninja)
 {
-	m_game = 2;
+	m_game = mcu_type::BADDUDES_SIM;
 }
 
 DRIVER_INIT_MEMBER(dec0_state,hbarrel)
 {
-	m_game = 1;
+	m_game = mcu_type::EMULATED;
 }
 
 DRIVER_INIT_MEMBER(dec0_state,birdtry)
 {
-	m_game=3;
+	m_game = mcu_type::BIRDTRY_SIM;
 }

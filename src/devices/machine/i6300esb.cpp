@@ -1,15 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "i6300esb.h"
 
-const device_type I6300ESB_WATCHDOG = &device_creator<i6300esb_watchdog_device>;
-const device_type I6300ESB_LPC      = &device_creator<i6300esb_lpc_device>;
+DEFINE_DEVICE_TYPE(I6300ESB_WATCHDOG, i6300esb_watchdog_device, "i6300esb_watchdog", "i6300ESB southbridge watchdog")
+DEFINE_DEVICE_TYPE(I6300ESB_LPC,      i6300esb_lpc_device,      "i6300esb_lpc",      "i6300ESB southbridge ISA/LPC bridge")
 
 DEVICE_ADDRESS_MAP_START(map, 32, i6300esb_watchdog_device)
 ADDRESS_MAP_END
 
 i6300esb_watchdog_device::i6300esb_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, I6300ESB_WATCHDOG, "i6300ESB southbridge watchdog", tag, owner, clock, "i6300esb_watchdog", __FILE__)
+	: pci_device(mconfig, I6300ESB_WATCHDOG, tag, owner, clock)
 {
 }
 
@@ -74,9 +75,11 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i6300esb_lpc_device)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i6300esb_lpc_device)
+	;
 	if(lpc_en & 0x2000) {
 		AM_RANGE(0x004c, 0x004f) AM_READWRITE8(siu_config_port_r, siu_config_port_w, 0x00ff0000)
 		AM_RANGE(0x004c, 0x004f) AM_READWRITE8(siu_data_port_r,   siu_data_port_w,   0xff000000)
+		;
 	}
 
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(    nmi_sc_r,          nmi_sc_w,          0x0000ff00)
@@ -87,7 +90,7 @@ ADDRESS_MAP_END
 
 
 i6300esb_lpc_device::i6300esb_lpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pci_device(mconfig, I6300ESB_LPC, "i6300ESB southbridge ISA/LPC bridge", tag, owner, clock, "i6300esb_lpc", __FILE__),
+	: pci_device(mconfig, I6300ESB_LPC, tag, owner, clock),
 		acpi(*this, "acpi"),
 		rtc (*this, "rtc"),
 		pit (*this, "pit"),

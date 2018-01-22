@@ -43,12 +43,12 @@ void xexex_state::video_start()
 
 uint32_t xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
+	static const int K053251_CI[4] = { k053251_device::CI1, k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
 	int layer[4];
 	int bg_colorbase, new_colorbase, plane, alpha;
 
-	m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI0);
-	bg_colorbase = m_k053251->get_palette_index(K053251_CI1);
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+	bg_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
 	m_layer_colorbase[0] = 0x70;
 
 	for (plane = 1; plane < 4; plane++)
@@ -62,13 +62,13 @@ uint32_t xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &b
 	}
 
 	layer[0] = 1;
-	m_layerpri[0] = m_k053251->get_priority(K053251_CI2);
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
 	layer[1] = 2;
-	m_layerpri[1] = m_k053251->get_priority(K053251_CI3);
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI3);
 	layer[2] = 3;
-	m_layerpri[2] = m_k053251->get_priority(K053251_CI4);
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI4);
 	layer[3] = -1;
-	m_layerpri[3] = m_k053251->get_priority(K053251_CI1);
+	m_layerpri[3] = m_k053251->get_priority(k053251_device::CI1);
 
 	konami_sortlayers4(layer, m_layerpri);
 

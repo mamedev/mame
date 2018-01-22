@@ -5,10 +5,17 @@
     Pole Position hardware
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_POLEPOS_H
+#define MAME_INCLUDES_POLEPOS_H
 
+#pragma once
+
+#include "machine/74259.h"
+#include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/namco.h"
-#include "sound/tms5220.h"
 #include "sound/discrete.h"
+#include "screen.h"
 
 struct filter2_context
 {
@@ -41,8 +48,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "sub"),
 		m_subcpu2(*this, "sub2"),
+		m_sound_z80(*this, "soundz80bl"),
+		m_soundlatch(*this, "soundlatch"),
 		m_namco_sound(*this, "namco"),
-		m_tms(*this, "tms"),
+		m_latch(*this, "latch"),
 		m_sprite16_memory(*this, "sprite16_memory"),
 		m_road16_memory(*this, "road16_memory"),
 		m_alpha16_memory(*this, "alpha16_memory"),
@@ -54,8 +63,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_subcpu2;
+	optional_device<cpu_device> m_sound_z80;
+	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<namco_device> m_namco_sound;
-	optional_device<tms5220_device> m_tms;
+	required_device<ls259_device> m_latch;
 	uint8_t m_steer_last;
 	uint8_t m_steer_delta;
 	int16_t m_steer_accum;
@@ -78,13 +89,16 @@ public:
 	tilemap_t *m_tx_tilemap;
 	int m_chacl;
 	uint16_t m_scroll;
-	uint8_t m_main_irq_mask;
 	uint8_t m_sub_irq_mask;
 	DECLARE_READ16_MEMBER(polepos2_ic25_r);
 	DECLARE_READ8_MEMBER(polepos_adc_r);
 	DECLARE_READ8_MEMBER(polepos_ready_r);
-	DECLARE_WRITE8_MEMBER(polepos_latch_w);
-	DECLARE_WRITE16_MEMBER(polepos_z8002_nvi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(iosel_w);
+	DECLARE_WRITE_LINE_MEMBER(clson_w);
+	DECLARE_WRITE_LINE_MEMBER(gasel_w);
+	DECLARE_WRITE_LINE_MEMBER(sb0_w);
+	DECLARE_WRITE_LINE_MEMBER(chacl_w);
+	template<bool sub1> DECLARE_WRITE16_MEMBER(polepos_z8002_nvi_enable_w);
 	DECLARE_READ16_MEMBER(polepos_sprite16_r);
 	DECLARE_WRITE16_MEMBER(polepos_sprite16_w);
 	DECLARE_READ8_MEMBER(polepos_sprite_r);
@@ -104,8 +118,6 @@ public:
 	DECLARE_WRITE16_MEMBER(polepos_alpha16_w);
 	DECLARE_READ8_MEMBER(polepos_alpha_r);
 	DECLARE_WRITE8_MEMBER(polepos_alpha_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(high_port_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(low_port_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(auto_start_r);
 	DECLARE_WRITE8_MEMBER(out_0);
 	DECLARE_WRITE8_MEMBER(out_1);
@@ -114,7 +126,7 @@ public:
 	DECLARE_READ8_MEMBER(namco_53xx_k_r);
 	DECLARE_READ8_MEMBER(steering_changed_r);
 	DECLARE_READ8_MEMBER(steering_delta_r);
-	DECLARE_DRIVER_INIT(topracern);
+	DECLARE_WRITE8_MEMBER(bootleg_soundlatch_w);
 	DECLARE_DRIVER_INIT(polepos2);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(tx_get_tile_info);
@@ -126,6 +138,9 @@ public:
 	void draw_road(bitmap_ind16 &bitmap);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void zoom_sprite(bitmap_ind16 &bitmap,int big,uint32_t code,uint32_t color,int flipx,int sx,int sy,int sizex,int sizey);
+	void polepos2bi(machine_config &config);
+	void topracern(machine_config &config);
+	void polepos(machine_config &config);
 };
 
 
@@ -159,6 +174,8 @@ private:
 	filter2_context m_filter_engine[3];
 };
 
-extern const device_type POLEPOS;
+DECLARE_DEVICE_TYPE(POLEPOS, polepos_sound_device)
 
 DISCRETE_SOUND_EXTERN( polepos );
+
+#endif // MAME_INCLUDES_POLEPOS_H

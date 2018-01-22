@@ -43,6 +43,7 @@
 #include "bus/centronics/digiblst.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "screen.h"
 
 
 /****************************
@@ -228,7 +229,7 @@ public:
 	DECLARE_MACHINE_RESET(aleste);
 	DECLARE_PALETTE_INIT(aleste);
 	uint32_t screen_update_amstrad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_amstrad(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_amstrad);
 	DECLARE_INPUT_CHANGED_MEMBER(cpc_monitor_changed);
 	TIMER_CALLBACK_MEMBER(amstrad_pc2_low);
 	TIMER_CALLBACK_MEMBER(amstrad_video_update_timer);
@@ -259,6 +260,15 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 
+	void cpcplus_cartslot(machine_config &config);
+	void amstrad_base(machine_config &config);
+	void cpc664(machine_config &config);
+	void cpcplus(machine_config &config);
+	void gx4000(machine_config &config);
+	void cpc6128(machine_config &config);
+	void aleste(machine_config &config);
+	void kccomp(machine_config &config);
+	void cpc464(machine_config &config);
 protected:
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_user1;

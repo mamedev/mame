@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef __NAMCOIO_H__
-#define __NAMCOIO_H__
+#ifndef MAME_MACHINE_NAMCOIO_H
+#define MAME_MACHINE_NAMCOIO_H
 
 
 /***************************************************************************
@@ -11,14 +11,8 @@
 class namcoio_device : public device_t
 {
 public:
-	namcoio_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
-
-	template<class _Object> static devcb_base &set_in_0_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_in_0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_1_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_in_1_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_2_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_in_2_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_3_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_in_3_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_0_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_out_0_cb.set_callback(object); }
-	template<class _Object> static devcb_base &set_out_1_callback(device_t &device, _Object object) { return downcast<namcoio_device &>(device).m_out_1_cb.set_callback(object); }
+	template <unsigned N, class Object> static devcb_base &set_in_callback(device_t &device, Object &&cb) { return downcast<namcoio_device &>(device).m_in_cb[N].set_callback(std::forward<Object>(cb)); }
+	template <unsigned N, class Object> static devcb_base &set_out_callback(device_t &device, Object &&cb) { return downcast<namcoio_device &>(device).m_out_cb[N].set_callback(std::forward<Object>(cb)); }
 
 
 	DECLARE_READ8_MEMBER( read );
@@ -27,12 +21,14 @@ public:
 	WRITE_LINE_MEMBER( set_reset_line );
 	READ_LINE_MEMBER( read_reset_line );
 
+	virtual void customio_run() = 0;
+
 protected:
+	namcoio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int device_type);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	int m_device_type;
 
 	enum {
 			TYPE_NAMCO56XX,
@@ -43,12 +39,8 @@ protected:
 	// internal state
 	uint8_t          m_ram[16];
 
-	devcb_read8 m_in_0_cb;
-	devcb_read8 m_in_1_cb;
-	devcb_read8 m_in_2_cb;
-	devcb_read8 m_in_3_cb;
-	devcb_write8 m_out_0_cb;
-	devcb_write8 m_out_1_cb;
+	devcb_read8 m_in_cb[4];
+	devcb_write8 m_out_cb[2];
 
 	int            m_reset;
 	int32_t          m_lastcoins, m_lastbuttons;
@@ -60,10 +52,8 @@ protected:
 
 	void handle_coins( int swap );
 
-	virtual void customio_run() {}
-
 private:
-
+	//int m_device_type;
 };
 
 class namco56xx_device : public namcoio_device
@@ -90,68 +80,68 @@ public:
 	virtual void customio_run() override;
 };
 
-extern const device_type NAMCO56XX;
-extern const device_type NAMCO58XX;
-extern const device_type NAMCO59XX;
+DECLARE_DEVICE_TYPE(NAMCO_56XX, namco56xx_device)
+DECLARE_DEVICE_TYPE(NAMCO_58XX, namco58xx_device)
+DECLARE_DEVICE_TYPE(NAMCO_59XX, namco59xx_device)
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
 #define MCFG_NAMCO56XX_IN_0_CB(_devcb) \
-	devcb = &namco56xx_device::set_in_0_callback(*device, DEVCB_##_devcb);
+	devcb = &namco56xx_device::set_in_callback<0>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO56XX_IN_1_CB(_devcb) \
-	devcb = &namco56xx_device::set_in_1_callback(*device, DEVCB_##_devcb);
+	devcb = &namco56xx_device::set_in_callback<1>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO56XX_IN_2_CB(_devcb) \
-	devcb = &namco56xx_device::set_in_2_callback(*device, DEVCB_##_devcb);
+	devcb = &namco56xx_device::set_in_callback<2>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO56XX_IN_3_CB(_devcb) \
-	devcb = &namco56xx_device::set_in_3_callback(*device, DEVCB_##_devcb);
+	devcb = &namco56xx_device::set_in_callback<3>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO56XX_OUT_0_CB(_devcb) \
-	devcb = &namco56xx_device::set_out_0_callback(*device, DEVCB_##_devcb);
+	devcb = &namco56xx_device::set_out_callback<0>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO56XX_OUT_1_CB(_devcb) \
-	devcb = &namco56xx_device::set_out_1_callback(*device, DEVCB_##_devcb);
+	devcb = &namco56xx_device::set_out_callback<1>(*device, DEVCB_##_devcb);
 
 
 #define MCFG_NAMCO58XX_IN_0_CB(_devcb) \
-	devcb = &namco58xx_device::set_in_0_callback(*device, DEVCB_##_devcb);
+	devcb = &namco58xx_device::set_in_callback<0>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO58XX_IN_1_CB(_devcb) \
-	devcb = &namco58xx_device::set_in_1_callback(*device, DEVCB_##_devcb);
+	devcb = &namco58xx_device::set_in_callback<1>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO58XX_IN_2_CB(_devcb) \
-	devcb = &namco58xx_device::set_in_2_callback(*device, DEVCB_##_devcb);
+	devcb = &namco58xx_device::set_in_callback<2>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO58XX_IN_3_CB(_devcb) \
-	devcb = &namco58xx_device::set_in_3_callback(*device, DEVCB_##_devcb);
+	devcb = &namco58xx_device::set_in_callback<3>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO58XX_OUT_0_CB(_devcb) \
-	devcb = &namco58xx_device::set_out_0_callback(*device, DEVCB_##_devcb);
+	devcb = &namco58xx_device::set_out_callback<0>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO58XX_OUT_1_CB(_devcb) \
-	devcb = &namco58xx_device::set_out_1_callback(*device, DEVCB_##_devcb);
+	devcb = &namco58xx_device::set_out_callback<1>(*device, DEVCB_##_devcb);
 
 
 #define MCFG_NAMCO59XX_IN_0_CB(_devcb) \
-	devcb = &namco59xx_device::set_in_0_callback(*device, DEVCB_##_devcb);
+	devcb = &namco59xx_device::set_in_callback<0>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO59XX_IN_1_CB(_devcb) \
-	devcb = &namco59xx_device::set_in_1_callback(*device, DEVCB_##_devcb);
+	devcb = &namco59xx_device::set_in_callback<1>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO59XX_IN_2_CB(_devcb) \
-	devcb = &namco59xx_device::set_in_2_callback(*device, DEVCB_##_devcb);
+	devcb = &namco59xx_device::set_in_callback<2>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO59XX_IN_3_CB(_devcb) \
-	devcb = &namco59xx_device::set_in_3_callback(*device, DEVCB_##_devcb);
+	devcb = &namco59xx_device::set_in_callback<3>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO59XX_OUT_0_CB(_devcb) \
-	devcb = &namco59xx_device::set_out_0_callback(*device, DEVCB_##_devcb);
+	devcb = &namco59xx_device::set_out_callback<0>(*device, DEVCB_##_devcb);
 
 #define MCFG_NAMCO59XX_OUT_1_CB(_devcb) \
-	devcb = &namco59xx_device::set_out_1_callback(*device, DEVCB_##_devcb);
+	devcb = &namco59xx_device::set_out_callback<1>(*device, DEVCB_##_devcb);
 
-#endif  /* __NAMCOIO_H__ */
+#endif // MAME_MACHINE_NAMCOIO_H

@@ -149,7 +149,7 @@ Second Earth Gratia (92047-01 version) (gratia)
 *Second Earth Gratia  (91022-10 version) (gratiaa) (redump needed)
 F-1 Super Battle (f1superb)
 
-Idol Janshi Su-Chi-Pi 2 (47pie2)
+Idol Janshi Su-Chi-Pi 2 (suchie2)
 Ryuusei Janshi Kirara Star (kirarast)
 Mahjong Angel Kiss
 Vs. Janshi Brand New Stars
@@ -169,11 +169,13 @@ Super Strong Warriors
 /********** BITS & PIECES **********/
 
 #include "emu.h"
+#include "includes/ms32.h"
+#include "machine/jalcrpt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/v60/v60.h"
 #include "sound/ymf271.h"
-#include "machine/jalcrpt.h"
-#include "includes/ms32.h"
+#include "speaker.h"
 
 
 /********** READ INPUTS **********/
@@ -225,7 +227,7 @@ WRITE32_MEMBER(ms32_state::ms32_sound_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
-	space.device().execute().spin_until_time(attotime::from_usec(40));
+	m_maincpu->spin_until_time(attotime::from_usec(40));
 }
 
 READ32_MEMBER(ms32_state::ms32_sound_r)
@@ -336,6 +338,13 @@ WRITE32_MEMBER(ms32_state::pip_w)
 		popmessage("fce00a7c = %02x",data);
 }
 
+WRITE32_MEMBER(ms32_state::coin_counter_w)
+{
+	// desertwr/p47aces sets 4 here
+	// f1superb sets 2
+	machine().bookkeeping().coin_counter_w(0, data & 0x10);
+	machine().bookkeeping().coin_counter_w(1, data & 0x20);
+}
 
 static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32, ms32_state )
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
@@ -372,7 +381,7 @@ static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32, ms32_state )
 /**/AM_RANGE(0xfce00a00, 0xfce00a17) AM_RAM AM_SHARE("tx_scroll")   /* tx layer scroll */
 /**/AM_RANGE(0xfce00a20, 0xfce00a37) AM_RAM AM_SHARE("bg_scroll")   /* bg layer scroll */
 	AM_RANGE(0xfce00a7c, 0xfce00a7f) AM_WRITE(pip_w)    // ??? layer related? seems to be always 0
-//  AM_RANGE(0xfce00e00, 0xfce00e03)    coin counters + something else
+	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(coin_counter_w) //   coin counters + something else
 	AM_RANGE(0xfd000000, 0xfd000003) AM_READ(ms32_sound_r)
 	AM_RANGE(0xfd1c0000, 0xfd1c0003) AM_WRITEONLY AM_SHARE("mahjong_select")
 ADDRESS_MAP_END
@@ -386,6 +395,7 @@ WRITE16_MEMBER(ms32_state::ms32_extra_w16)
 	COMBINE_DATA(&m_f1superb_extraram[offset]);
 	m_extra_tilemap->mark_tile_dirty(offset/2);
 }
+
 READ16_MEMBER(ms32_state::ms32_extra_r16)
 {
 	return m_f1superb_extraram[offset];
@@ -402,7 +412,8 @@ WRITE32_MEMBER(ms32_state::ms32_irq5_guess_w)
 }
 
 static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
-	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3)
+	AM_RANGE(0xfd0d0000, 0xfd0d0003) AM_READ_PORT("DSW2") // MB-93159
+	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3) AM_WRITENOP // writes 7-led seg at very least
 
 	AM_RANGE(0xfce00004, 0xfce00023) AM_RAM // regs?
 	AM_RANGE(0xfce00200, 0xfce0021f) AM_RAM // regs?
@@ -419,8 +430,8 @@ static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
 	AM_RANGE(0xfd140000, 0xfd143fff) AM_RAM // used when you start enabling fpu ints
 	AM_RANGE(0xfd144000, 0xfd145fff) AM_RAM // same data here
 
-	AM_RANGE(0xfdc00000, 0xfdc007ff) AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) AM_SHARE("f1sb_extraram") // definitely line ram
-	AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM // scroll info for lineram?
+	AM_RANGE(0xfdc00000, 0xfdc1ffff) AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) AM_SHARE("f1sb_extraram") // definitely line ram
+	AM_RANGE(0xfde00000, 0xfde1ffff) AM_RAM // scroll info for lineram?
 
 	AM_IMPORT_FROM(ms32_map)
 ADDRESS_MAP_END
@@ -1084,7 +1095,7 @@ static INPUT_PORTS_START( kirarast )    // player 1 inputs done? others?
 	PORT_DIPSETTING(          0x00000020, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( 47pie2 )  // player 1 inputs done? others?
+static INPUT_PORTS_START( suchie2 )  // player 1 inputs done? others?
 	PORT_INCLUDE( kirarast )
 
 	PORT_MODIFY("INPUTS")
@@ -1166,55 +1177,44 @@ static INPUT_PORTS_START( wpksocv2 )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( f1superb )    // Mostly wrong !
+static INPUT_PORTS_START( f1superb )
 	PORT_INCLUDE( ms32 )
 
 	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shift")
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Brake")
+	PORT_BIT( 0x0000fffc, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x00000001, 0x00000001, "SW2:8" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00000002, 0x00000002, "SW2:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00000004, 0x00000004, "SW2:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00000008, 0x00000008, "SW2:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00000010, 0x00000010, "SW2:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00000020, 0x00000020, "SW2:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00000040, 0x00000040, "SW2:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00000080, 0x00000080, "SW2:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x00000001, 0x00000001, "SW2:8" )
+	PORT_DIPUNUSED_DIPLOC( 0x00000002, 0x00000002, "SW2:7" )
+	PORT_DIPNAME( 0x00000004, 0x00000004, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(          0x00000004, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x00000008, 0x00000008, "SW2:5" )
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:4,3")
+	PORT_DIPSETTING(          0x0000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(          0x0030, DEF_STR( Normal ) )
+	PORT_DIPSETTING(          0x0010, DEF_STR( Hard ) )
+	PORT_DIPSETTING(          0x0020, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Region ) ) PORT_DIPLOCATION("SW2:2,1")
+	PORT_DIPSETTING(          0x0080, DEF_STR( USA ) )
+	PORT_DIPSETTING(          0x0000, DEF_STR( Europe ) )
+//  PORT_DIPSETTING(          0x0040, "Europe" )
+	PORT_DIPSETTING(          0x00c0, DEF_STR( Japan ) )
+	PORT_DIPUNUSED_DIPLOC( 0x00000100, 0x00000100, "SW1:8" )
+	PORT_DIPUNUSED_DIPLOC( 0x00000200, 0x00000200, "SW1:7" )
+	PORT_BIT( 0xffff0000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_DIPUNKNOWN_DIPLOC( 0x00010000, 0x00010000, "SW3:8" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00020000, 0x00020000, "SW3:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00040000, 0x00040000, "SW3:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00080000, 0x00080000, "SW3:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00100000, 0x00100000, "SW3:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00200000, 0x00200000, "SW3:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00400000, 0x00400000, "SW3:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x00800000, 0x00800000, "SW3:1" )
-
-	PORT_START("AN0")   // Acceleration (wrong?)
-	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_REVERSE PORT_PLAYER(1)
-
+	PORT_START("AN0")   // Acceleration
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0,0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START("AN1")   // Steering
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
 
 	PORT_START("AN2?")  // Shift + Brake
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Shift Brake" ) // ???
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
@@ -1238,6 +1238,21 @@ static INPUT_PORTS_START( f1superb )    // Mostly wrong !
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START( "DSW2" )
+	PORT_DIPNAME( 0x01, 0x00, "Communication Mode" )    PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x00, "Master" )
+	PORT_DIPSETTING(    0x01, "Slave" )
+	PORT_DIPNAME( 0x0e, 0x00, "Car ID" ) PORT_DIPLOCATION("SW3:2,3,4")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x06, "4" )
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPSETTING(    0x0a, "6" )
+	PORT_DIPSETTING(    0x0c, "7" )
+	PORT_DIPSETTING(    0x0e, "8" )
+	PORT_BIT( 0xffffff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 INPUT_PORTS_END
 
@@ -1384,7 +1399,7 @@ void ms32_state::machine_reset()
 
 /********** MACHINE DRIVER **********/
 
-static MACHINE_CONFIG_START( ms32, ms32_state )
+MACHINE_CONFIG_START(ms32_state::ms32)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V70, 20000000) // 20MHz
@@ -1421,7 +1436,7 @@ static MACHINE_CONFIG_START( ms32, ms32_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( f1superb, ms32 )
+MACHINE_CONFIG_DERIVED(ms32_state::f1superb, ms32)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(f1superb_map)
@@ -1437,44 +1452,44 @@ MACHINE_CONFIG_END
 
 ROM_START( bbbxing )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
-	ROM_LOAD32_BYTE( "bbbx25.bin", 0x000003, 0x80000, CRC(b526b41e) SHA1(44945931b159646468a954d5acdd2c6c61daf098) )
-	ROM_LOAD32_BYTE( "bbbx27.bin", 0x000002, 0x80000, CRC(45b27ad8) SHA1(0af415b17400aabecdcb6d1d069f28b64780017f) )
-	ROM_LOAD32_BYTE( "bbbx29.bin", 0x000001, 0x80000, CRC(85bbbe79) SHA1(bc5ebb96491762e6a0d202ddf7faeb57c66211b4) )
-	ROM_LOAD32_BYTE( "bbbx31.bin", 0x000000, 0x80000, CRC(e0c865ed) SHA1(f21e8dc174c50d7afdd3f82c1c66dfcc002bdd07) )
+	ROM_LOAD32_BYTE( "mb93138a_25_ver1.3.25", 0x000003, 0x80000, CRC(b526b41e) SHA1(44945931b159646468a954d5acdd2c6c61daf098) )
+	ROM_LOAD32_BYTE( "mb93138a_27_ver1.3.27", 0x000002, 0x80000, CRC(45b27ad8) SHA1(0af415b17400aabecdcb6d1d069f28b64780017f) )
+	ROM_LOAD32_BYTE( "mb93138a_29_ver1.3.29", 0x000001, 0x80000, CRC(85bbbe79) SHA1(bc5ebb96491762e6a0d202ddf7faeb57c66211b4) )
+	ROM_LOAD32_BYTE( "mb93138a_31_ver1.3.31", 0x000000, 0x80000, CRC(e0c865ed) SHA1(f21e8dc174c50d7afdd3f82c1c66dfcc002bdd07) )
 
 	ROM_REGION( 0x1100000, "gfx1", 0 ) /* sprites */
-	ROM_LOAD32_WORD( "bbbx1.bin",   0x0000002, 0x200000, CRC(c1c10c3b) SHA1(e1f739f38e148c4d7aff6b81b3e42131c5c6c3dd) )
-	ROM_LOAD32_WORD( "bbbx13.bin",  0x0000000, 0x200000, CRC(4b8c1574) SHA1(c389c70b532d54528a175f460ca3f329b34cf67c) )
-	ROM_LOAD32_WORD( "bbbx2.bin",   0x0400002, 0x200000, CRC(03b77c1e) SHA1(f156ae6a4f2a8ae99815eb5a7b28425d273c1c3e) )
-	ROM_LOAD32_WORD( "bbbx14.bin",  0x0400000, 0x200000, CRC(e9cfd83b) SHA1(8580c571a4144ea27c7fca7e86e3e4f5e4f5facb) )
-	ROM_LOAD32_WORD( "bbbx3.bin",   0x0800002, 0x200000, CRC(bba0d1a4) SHA1(15f8de7478182c36927a84ee8de8eb8ac3e65d7b) )
-	ROM_LOAD32_WORD( "bbbx15.bin",  0x0800000, 0x200000, CRC(6ab64a10) SHA1(4ee2cec6b9f8d729ff53851f7949c5cd3a8029d8) )
-	ROM_LOAD32_WORD( "bbbx4.bin",   0x0c00002, 0x200000, CRC(97f97e3a) SHA1(260603a10fe742986aa4f7fb90e4f141bdadae17) )
-	ROM_LOAD32_WORD( "bbbx16.bin",  0x0c00000, 0x200000, CRC(e001d6cb) SHA1(c887dbf192e6b46c86fd86bb5f58b44ab8fe8d73) )
-	ROM_LOAD32_WORD( "bbbx5.bin",   0x1000002, 0x080000, CRC(64989edf) SHA1(033eab0e8a53607b2bb420f6356804b2cfa1544c) )
-	ROM_LOAD32_WORD( "bbbx17.bin",  0x1000000, 0x080000, CRC(1d7ebaf0) SHA1(5aac7cb01013ce3be206318678aced5812bff9a9) )
+	ROM_LOAD32_WORD( "mr92042-07.1",          0x0000002, 0x200000, CRC(c1c10c3b) SHA1(e1f739f38e148c4d7aff6b81b3e42131c5c6c3dd) )
+	ROM_LOAD32_WORD( "mr92042-06.13",         0x0000000, 0x200000, CRC(4b8c1574) SHA1(c389c70b532d54528a175f460ca3f329b34cf67c) )
+	ROM_LOAD32_WORD( "mr92042-09.2",          0x0400002, 0x200000, CRC(03b77c1e) SHA1(f156ae6a4f2a8ae99815eb5a7b28425d273c1c3e) )
+	ROM_LOAD32_WORD( "mr92042-08.14",         0x0400000, 0x200000, CRC(e9cfd83b) SHA1(8580c571a4144ea27c7fca7e86e3e4f5e4f5facb) )
+	ROM_LOAD32_WORD( "mr92042-11.3",          0x0800002, 0x200000, CRC(bba0d1a4) SHA1(15f8de7478182c36927a84ee8de8eb8ac3e65d7b) )
+	ROM_LOAD32_WORD( "mr92042-10.15",         0x0800000, 0x200000, CRC(6ab64a10) SHA1(4ee2cec6b9f8d729ff53851f7949c5cd3a8029d8) )
+	ROM_LOAD32_WORD( "mr92042-13.4",          0x0c00002, 0x200000, CRC(97f97e3a) SHA1(260603a10fe742986aa4f7fb90e4f141bdadae17) )
+	ROM_LOAD32_WORD( "mr92042-12.16",         0x0c00000, 0x200000, CRC(e001d6cb) SHA1(c887dbf192e6b46c86fd86bb5f58b44ab8fe8d73) )
+	ROM_LOAD32_WORD( "mb93138a_5_ver1.0.5",   0x1000002, 0x080000, CRC(64989edf) SHA1(033eab0e8a53607b2bb420f6356804b2cfa1544c) )
+	ROM_LOAD32_WORD( "mb93138a_17_ver1.0.17", 0x1000000, 0x080000, CRC(1d7ebaf0) SHA1(5aac7cb01013ce3be206318678aced5812bff9a9) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* roz tiles */
-	ROM_LOAD( "bbbx9.bin",   0x000000, 0x200000, CRC(a41cb650) SHA1(1c55a4afe55c1250806f2d93c25842dc3fb7f987) )
+	ROM_LOAD( "mr92042-05.9",   0x000000, 0x200000, CRC(a41cb650) SHA1(1c55a4afe55c1250806f2d93c25842dc3fb7f987) )
 
 	ROM_REGION( 0x200000, "gfx3", 0 ) /* bg tiles */
-	ROM_LOAD( "bbbx11.bin",  0x000000, 0x200000, CRC(85238ca9) SHA1(1ce32d585fe66764d621c11882ef9d2abaea6256) )
+	ROM_LOAD( "mr92042-04.11",  0x000000, 0x200000, CRC(85238ca9) SHA1(1ce32d585fe66764d621c11882ef9d2abaea6256) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* tx tiles */
-	ROM_LOAD( "bbbx32-2.bin",0x000000, 0x080000, CRC(3ffdae75) SHA1(2b837d28f7ecdd49e8525bd5c249e83021d5fe9f) )
+	ROM_LOAD( "mr92042-01.32",0x000000, 0x080000, CRC(3ffdae75) SHA1(2b837d28f7ecdd49e8525bd5c249e83021d5fe9f) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 ) /* z80 program */
-	ROM_LOAD( "bbbx21.bin",  0x000000, 0x040000, CRC(5f3ea01f) SHA1(761f6a5852312d2b12de009f3cf0476f5b2e906c) )
+	ROM_LOAD( "mb93138a_21_ver1.0.21",  0x000000, 0x040000, CRC(5f3ea01f) SHA1(761f6a5852312d2b12de009f3cf0476f5b2e906c) )
 
 	ROM_REGION( 0x400000, "ymf", 0 ) /* samples */
-	ROM_LOAD( "bbbx22.bin",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
-	ROM_LOAD( "bbbx23.bin",  0x200000, 0x200000, CRC(b7875a23) SHA1(62bb4c1318f98ea68894658d92ce08e84d386d0c) )
+	ROM_LOAD( "mr92042-01.22",  0x000000, 0x200000, CRC(0fa26f65) SHA1(e92b14862fbce33ea4ab4567ec48199bfcbbdd84) ) // common samples
+	ROM_LOAD( "mr92042-02.23",  0x200000, 0x200000, CRC(b7875a23) SHA1(62bb4c1318f98ea68894658d92ce08e84d386d0c) )
 
 	ROM_REGION( 0x000001, "motherbrd_pals", 0) /* Motherboard PAL */
 	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
-ROM_START( 47pie2 )
+ROM_START( suchie2 )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
 	ROM_LOAD32_BYTE( "93166-26.v11", 0x000003, 0x80000, CRC(e4e62134) SHA1(224b3e8dba56009bf2af6eceb7495e60302a6360) )
 	ROM_LOAD32_BYTE( "93166-27.v11", 0x000002, 0x80000, CRC(7bd00919) SHA1(60565b5e1da5fee00ac4a7fb1202d7150dab49ee) )
@@ -1511,7 +1526,7 @@ ROM_START( 47pie2 )
 	ROM_LOAD( "91022-01.ic83", 0x00000, 0x00001, NO_DUMP ) /* AMI 18CV8-15. */
 ROM_END
 
-ROM_START( 47pie2o )
+ROM_START( suchie2o )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* V70 code */
 	ROM_LOAD32_BYTE( "93166-26.v10", 0x000003, 0x80000, CRC(21dc94dd) SHA1(faf2eea891cb061d5df47ef31d9538feb0c1233c) )
 	ROM_LOAD32_BYTE( "93166-27.v10", 0x000002, 0x80000, CRC(5bf18a7d) SHA1(70869dc37e6ad79ce4e85db71a03c5cccf9d732b) )
@@ -2218,7 +2233,7 @@ DRIVER_INIT_MEMBER(ms32_state,ss92047_01)
 	decrypt_ms32_bg(machine(), 0x24000,0x55, "gfx3");
 }
 
-/* SS92048-01: p47aces, 47pie2, 47pie2o */
+/* SS92048-01: p47aces, suchie2, suchie2o */
 DRIVER_INIT_MEMBER(ms32_state,ss92048_01)
 {
 	DRIVER_INIT_CALL(ms32_common);
@@ -2232,7 +2247,7 @@ DRIVER_INIT_MEMBER(ms32_state,kirarast)
 	DRIVER_INIT_CALL(ss92047_01);
 }
 
-DRIVER_INIT_MEMBER(ms32_state,47pie2)
+DRIVER_INIT_MEMBER(ms32_state,suchie2)
 {
 	DRIVER_INIT_CALL(ss92048_01);
 }
@@ -2257,19 +2272,19 @@ DRIVER_INIT_MEMBER(ms32_state,bnstars)
 
 GAME( 1994, hayaosi2, 0,        ms32, hayaosi2, ms32_state, ss92046_01, ROT0,   "Jaleco", "Hayaoshi Quiz Grand Champion Taikai", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1994, hayaosi3, 0,        ms32, hayaosi3, ms32_state, ss92046_01, ROT0,   "Jaleco", "Hayaoshi Quiz Nettou Namahousou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, bbbxing,  0,        ms32, bbbxing, ms32_state,  ss92046_01, ROT0,   "Jaleco", "Best Bout Boxing", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, 47pie2,   0,        ms32, 47pie2, ms32_state,   47pie2,     ROT0,   "Jaleco", "Idol Janshi Suchie-Pai II (v1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, 47pie2o,  47pie2,   ms32, 47pie2, ms32_state,   47pie2,     ROT0,   "Jaleco", "Idol Janshi Suchie-Pai II (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bbbxing,  0,        ms32, bbbxing,  ms32_state, ss92046_01, ROT0,   "Jaleco", "Best Bout Boxing", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, suchie2,   0,        ms32, suchie2,   ms32_state, suchie2,     ROT0,   "Jaleco", "Idol Janshi Suchie-Pai II (v1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, suchie2o,  suchie2,   ms32, suchie2,   ms32_state, suchie2,     ROT0,   "Jaleco", "Idol Janshi Suchie-Pai II (v1.0)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, desertwr, 0,        ms32, desertwr, ms32_state, ss91022_10, ROT270, "Jaleco", "Desert War / Wangan Sensou", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, gametngk, 0,        ms32, gametngk, ms32_state, ss91022_10, ROT270, "Jaleco", "The Game Paradise - Master of Shooting! / Game Tengoku - The Game Paradise", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, tetrisp,  0,        ms32, tetrisp, ms32_state,  ss92046_01, ROT0,   "Jaleco / BPS", "Tetris Plus", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, p47aces,  0,        ms32, p47aces, ms32_state,  ss92048_01, ROT0,   "Jaleco", "P-47 Aces", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, akiss,    0,        ms32, 47pie2, ms32_state,   kirarast,   ROT0,   "Jaleco", "Mahjong Angel Kiss", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratia,   0,        ms32, gratia, ms32_state,   ss92047_01, ROT0,   "Jaleco", "Gratia - Second Earth (92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, gratiaa,  gratia,   ms32, gratia, ms32_state,   ss91022_10, ROT0,   "Jaleco", "Gratia - Second Earth (91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, tetrisp,  0,        ms32, tetrisp,  ms32_state, ss92046_01, ROT0,   "Jaleco / BPS", "Tetris Plus", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, p47aces,  0,        ms32, p47aces,  ms32_state, ss92048_01, ROT0,   "Jaleco", "P-47 Aces", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, akiss,    0,        ms32, suchie2,   ms32_state, kirarast,   ROT0,   "Jaleco", "Mahjong Angel Kiss", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratia,   0,        ms32, gratia,   ms32_state, ss92047_01, ROT0,   "Jaleco", "Gratia - Second Earth (92047-01 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, gratiaa,  gratia,   ms32, gratia,   ms32_state, ss91022_10, ROT0,   "Jaleco", "Gratia - Second Earth (91022-10 version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, kirarast, 0,        ms32, kirarast, ms32_state, kirarast,   ROT0,   "Jaleco", "Ryuusei Janshi Kirara Star", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, tp2m32,   tetrisp2, ms32, tp2m32, ms32_state,   ss91022_10, ROT0,   "Jaleco", "Tetris Plus 2 (MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, bnstars,  bnstars1, ms32, 47pie2, ms32_state,   bnstars,    ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars (MegaSystem32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, tp2m32,   tetrisp2, ms32, tp2m32,   ms32_state, ss91022_10, ROT0,   "Jaleco", "Tetris Plus 2 (MegaSystem 32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, bnstars,  bnstars1, ms32, suchie2,   ms32_state, bnstars,    ROT0,   "Jaleco", "Vs. Janshi Brandnew Stars (MegaSystem32 Version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, wpksocv2, 0,        ms32, wpksocv2, ms32_state, ss92046_01, ROT0,   "Jaleco", "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 

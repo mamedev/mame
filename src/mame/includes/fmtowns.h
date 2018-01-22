@@ -1,25 +1,33 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
-#ifndef FMTOWNS_H_
-#define FMTOWNS_H_
+#ifndef MAME_INCLUDES_FMTOWNS_H
+#define MAME_INCLUDES_FMTOWNS_H
 
+#pragma once
 
-#include "emu.h"
 #include "cpu/i386/i386.h"
-#include "sound/2612intf.h"
-#include "sound/rf5c68.h"
-#include "sound/cdda.h"
-#include "sound/speaker.h"
 #include "imagedev/chd_cd.h"
-#include "machine/pit8253.h"
-#include "machine/pic8259.h"
-#include "machine/wd_fdc.h"
 #include "imagedev/floppy.h"
-#include "formats/fmtowns_dsk.h"
-#include "machine/upd71071.h"
-#include "machine/ram.h"
-#include "machine/nvram.h"
 #include "machine/fm_scsi.h"
+#include "machine/fmt_icmem.h"
+#include "machine/nvram.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/upd71071.h"
+#include "machine/wd_fdc.h"
+#include "machine/i8251.h"
+#include "sound/2612intf.h"
+#include "sound/cdda.h"
+#include "sound/rf5c68.h"
+#include "sound/spkrdev.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "bus/rs232/rs232.h"
+
+#include "formats/fmtowns_dsk.h"
+
 
 #define IRQ_LOG 0  // set to 1 to log IRQ line activity
 
@@ -87,11 +95,17 @@ class towns_state : public driver_device
 			m_pit(*this, "pit"),
 			m_dma_1(*this, "dma_1"),
 			m_dma_2(*this, "dma_2"),
-			m_palette(*this, "palette"),
+			m_palette(*this, "palette256"),
+			m_palette16_0(*this, "palette16_0"),
+			m_palette16_1(*this, "palette16_1"),
 			m_ram(*this, RAM_TAG),
 			m_fdc(*this, "fdc"),
 			m_flop0(*this, "fdc:0"),
 			m_flop1(*this, "fdc:1"),
+			m_icmemcard(*this, "icmemcard"),
+			m_i8251(*this, "i8251"),
+			m_rs232(*this, "rs232c"),
+			m_screen(*this, "screen"),
 			m_nvram(*this, "nvram"),
 			m_nvram16(*this, "nvram16"),
 			m_ctrltype(*this, "ctrltype"),
@@ -120,10 +134,16 @@ class towns_state : public driver_device
 	required_device<upd71071_device> m_dma_1;
 	required_device<upd71071_device> m_dma_2;
 	required_device<palette_device> m_palette;
+	required_device<palette_device> m_palette16_0;
+	required_device<palette_device> m_palette16_1;
 	required_device<ram_device> m_ram;
-	required_device<mb8877_t> m_fdc;
+	required_device<mb8877_device> m_fdc;
 	required_device<floppy_connector> m_flop0;
 	required_device<floppy_connector> m_flop1;
+	required_device<fmt_icmem_device> m_icmemcard;
+	required_device<i8251_device> m_i8251;
+	required_device<rs232_port_device> m_rs232;
+	required_device<screen_device> m_screen;
 	ram_device* m_messram;
 	cdrom_image_device* m_cdrom;
 	cdda_device* m_cdda;
@@ -183,6 +203,21 @@ class towns_state : public driver_device
 	uint8_t m_timer0;
 	uint8_t m_timer1;
 
+	uint8_t m_serial_irq_source;
+	uint8_t m_serial_irq_enable;  // RS232 interrupt control
+
+	enum
+	{
+		TXC_EXTERNAL      = 0x80,
+		RXC_EXTERNAL      = 0x40,
+		ER_CONTROL        = 0x20,
+		CI_IRQ_ENABLE     = 0x10,
+		CS_IRQ_ENABLE     = 0x08,
+		SYNDET_IRQ_ENABLE = 0x04,
+		RXRDY_IRQ_ENABLE  = 0x02,
+		TXRDY_IRQ_ENABLE  = 0x01
+	};
+
 	emu_timer* m_towns_wait_timer;
 	emu_timer* m_towns_status_timer;
 	emu_timer* m_towns_cdda_timer;
@@ -241,6 +276,7 @@ class towns_state : public driver_device
 	DECLARE_WRITE8_MEMBER(towns_rtc_select_w);
 	DECLARE_READ8_MEMBER(towns_volume_r);
 	DECLARE_WRITE8_MEMBER(towns_volume_w);
+	DECLARE_READ8_MEMBER(unksnd_r);
 	DECLARE_READ8_MEMBER(towns_41ff_r);
 
 	DECLARE_READ8_MEMBER(towns_gfx_high_r);
@@ -269,6 +305,13 @@ class towns_state : public driver_device
 	DECLARE_WRITE_LINE_MEMBER(mb8877a_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
 
+	DECLARE_WRITE_LINE_MEMBER(towns_serial_irq);
+	DECLARE_WRITE_LINE_MEMBER(towns_rxrdy_irq);
+	DECLARE_WRITE_LINE_MEMBER(towns_txrdy_irq);
+	DECLARE_WRITE_LINE_MEMBER(towns_syndet_irq);
+	DECLARE_READ8_MEMBER(towns_serial_r);
+	DECLARE_WRITE8_MEMBER(towns_serial_w);
+
 	RF5C68_SAMPLE_END_CB_MEMBER(towns_pcm_irq);
 
 	void towns_update_video_banks(address_space&);
@@ -295,6 +338,11 @@ class towns_state : public driver_device
 	required_memory_region m_user;
 	optional_memory_region m_serial;
 
+	void towns_base(machine_config &config);
+	void towns(machine_config &config);
+	void townsftv(machine_config &config);
+	void townshr(machine_config &config);
+	void townssj(machine_config &config);
 private:
 	static const device_timer_id TIMER_RTC = 0;
 	static const device_timer_id TIMER_FREERUN = 1;
@@ -325,17 +373,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
+	DECLARE_WRITE_LINE_MEMBER(pit2_out1_changed);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(towns_fm_irq);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	void towns_crtc_refresh_mode();
 	void towns_update_kanji_offset();
 	void towns_update_palette();
-	void render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x, uint16_t y, uint16_t xflip, uint16_t yflip, const rectangle* rect);
-	void render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, uint16_t xflip, uint16_t yflip, const rectangle* rect);
+	void render_sprite_4(uint32_t poffset, uint32_t coffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, bool rotation, const rectangle* rect);
+	void render_sprite_16(uint32_t poffset, uint16_t x, uint16_t y, bool xflip, bool yflip, bool xhalfsize, bool yhalfsize, bool rotation, const rectangle* rect);
 	void draw_sprites(const rectangle* rect);
 	void towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
-	void towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
+	void towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rectangle* rect,int line,int scanline);
 	void towns_crtc_draw_scan_layer_16(bitmap_rgb32 &bitmap,const rectangle* rect,int layer,int line,int scanline);
 	void towns_crtc_draw_layer(bitmap_rgb32 &bitmap,const rectangle* rect,int layer);
 	void render_text_char(uint8_t x, uint8_t y, uint8_t ascii, uint16_t jis, uint8_t attr);
@@ -360,6 +409,7 @@ class towns16_state : public towns_state
 	towns16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: towns_state(mconfig, type, tag)
 	{ }
+	void townsux(machine_config &config);
 };
 
 class marty_state : public towns_state
@@ -370,6 +420,7 @@ class marty_state : public towns_state
 	{ }
 
 	virtual void driver_start() override;
+	void marty(machine_config &config);
 };
 
-#endif /*FMTOWNS_H_*/
+#endif // MAME_INCLUDES_FMTOWNS_H

@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 
+#ifndef MAME_BUS_NEOGEO_PROT_KOF2K3BL_H
+#define MAME_BUS_NEOGEO_PROT_KOF2K3BL_H
+
 #pragma once
 
-#ifndef __KOF2K3BL_PROT__
-#define __KOF2K3BL_PROT__
-
-extern const device_type KOF2K3BL_PROT;
+DECLARE_DEVICE_TYPE(NG_KOF2K3BL_PROT, kof2k3bl_prot_device)
 
 #define MCFG_KOF2K3BL_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, KOF2K3BL_PROT, 0)
+	MCFG_DEVICE_ADD(_tag, NG_KOF2K3BL_PROT, 0)
 
 
 class kof2k3bl_prot_device :  public device_t
@@ -37,4 +37,4 @@ private:
 	uint16_t m_cartridge_ram[0x1000]; // bootlegs
 };
 
-#endif
+#endif // MAME_BUS_NEOGEO_PROT_KOF2K3BL_H

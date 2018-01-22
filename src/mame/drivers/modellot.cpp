@@ -2,56 +2,80 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /**********************************************************************************
 
-    General Processor Modello T
+General Processor Modello T
 
-    2012-12-10 Skeleton driver.
-    2013-09-27 Added keyboard and cursor.
+2012-12-10 Skeleton driver.
+2013-09-27 Added keyboard and cursor.
 
-    Made in Italy, a single board with numerous small daughter boards.
-    The 3 units (keyboard, disk drives, main unit) had wooden cabinets.
-    It had an inbuilt small green-screen CRT, like a Kaypro, and the RAM could
-    be 16, 32, or 48k. The FDC is a FD1791.
+Made in Italy, a single board with numerous small daughter boards.
+The 3 units (keyboard, disk drives, main unit) had wooden cabinets.
+It had an inbuilt small green-screen CRT, like a Kaypro, and the RAM could
+be 16, 32, or 48k. The FDC is a FD1791.
 
-    All the articles and doco (what there is of it) is all in Italian.
+All the articles and doco (what there is of it) is all in Italian.
+
+Doco found...
+
+Port 77 out (cassette control):
+- d0 = recording signal #1
+- d1 = relay #1 (0 = open)
+- d2 = recording signal #2
+- d3 = relay #2 (0 = open)
+
+Port 77 in:
+- d0 = free
+- d1 = playback signal
+- d2 = signal from the anti-glare circuit
+- d3 = same as d2
+
+Optional ports:
+- 3c to 3f (FDC)
+- 5c to 5f (PRT)
+- 6c to 6f (US2)
+- 78 to 7b (US1)
+It's not clear if these are meant to be 3881 PIOs connected to the devices, or for
+the devices themselves. An example shows a i8251 used as the US1 device.
 
 ***********************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/keyboard.h"
+#include "screen.h"
 
-#define KEYBOARD_TAG "keyboard"
 
 class modellot_state : public driver_device
 {
 public:
 	modellot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu")
-	{
-	}
+		: driver_device(mconfig, type, tag)
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
+	{ }
 
 	DECLARE_READ8_MEMBER(port77_r);
 	DECLARE_READ8_MEMBER(portff_r);
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	uint32_t screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<uint8_t> m_p_videoram;
+
+	void modellot(machine_config &config);
 private:
 	uint8_t m_term_data;
-	const uint8_t *m_p_chargen;
 	virtual void machine_reset() override;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 };
 
-static ADDRESS_MAP_START(modellot_mem, AS_PROGRAM, 8, modellot_state)
+static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 8, modellot_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xbfff) AM_RAM // 48k ram
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(modellot_io, AS_IO, 8, modellot_state)
+static ADDRESS_MAP_START(io_map, AS_IO, 8, modellot_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x77, 0x77) AM_READ(port77_r)
@@ -75,7 +99,7 @@ READ8_MEMBER( modellot_state::portff_r)
 	return data;
 }
 
-WRITE8_MEMBER( modellot_state::kbd_put )
+void modellot_state::kbd_put(u8 data)
 {
 	m_term_data = data;
 }
@@ -83,7 +107,6 @@ WRITE8_MEMBER( modellot_state::kbd_put )
 void modellot_state::machine_reset()
 {
 	m_term_data = 1;
-	m_p_chargen = memregion("chargen")->base();
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 
@@ -148,11 +171,11 @@ uint32_t modellot_state::screen_update_modellot(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static MACHINE_CONFIG_START( modellot, modellot_state )
+MACHINE_CONFIG_START(modellot_state::modellot)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(modellot_mem)
-	MCFG_CPU_IO_MAP(modellot_io)
+	MCFG_CPU_PROGRAM_MAP(mem_map)
+	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
@@ -167,8 +190,8 @@ static MACHINE_CONFIG_START( modellot, modellot_state )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(modellot_state, kbd_put))
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
+	MCFG_GENERIC_KEYBOARD_CB(PUT(modellot_state, kbd_put))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -186,4 +209,4 @@ ROM_START( modellot )
 ROM_END
 
 /* Driver */
-COMP( 1979, modellot, 0, 0, modellot, modellot, driver_device, 0, "General Processor", "Modello T", MACHINE_IS_SKELETON)
+COMP( 1979, modellot, 0, 0, modellot, modellot, modellot_state, 0, "General Processor", "Modello T", MACHINE_IS_SKELETON )

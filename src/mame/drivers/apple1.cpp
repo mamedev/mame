@@ -80,6 +80,7 @@
 #include "bus/a1bus/a1cassette.h"
 #include "bus/a1bus/a1cffa.h"
 
+#include "screen.h"
 #include "softlist.h"
 
 #define A1_CPU_TAG  "maincpu"
@@ -125,6 +126,7 @@ public:
 	TIMER_CALLBACK_MEMBER(ready_end_cb);
 	TIMER_CALLBACK_MEMBER(keyboard_strobe_cb);
 
+	void apple1(machine_config &config);
 private:
 	uint8_t *m_ram_ptr, *m_char_ptr;
 	int m_ram_size, m_char_size;
@@ -584,7 +586,7 @@ static SLOT_INTERFACE_START(apple1_cards)
 	SLOT_INTERFACE("cffa", A1BUS_CFFA)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apple1, apple1_state )
+MACHINE_CONFIG_START(apple1_state::apple1)
 	MCFG_CPU_ADD(A1_CPU_TAG, M6502, 960000)        // effective CPU speed
 	MCFG_CPU_PROGRAM_MAP(apple1_map)
 
@@ -622,5 +624,5 @@ ROM_START(apple1)
 	ROM_LOAD("s2513.d2", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee)) // apple1.vid
 ROM_END
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE         INIT     COMPANY            FULLNAME */
-COMP( 1976, apple1,  0,     0,      apple1,     apple1, driver_device,  0,        "Apple Computer",    "Apple I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   STATE          INIT  COMPANY            FULLNAME */
+COMP( 1976, apple1,  0,     0,      apple1,     apple1, apple1_state,  0,    "Apple Computer",  "Apple I", MACHINE_NO_SOUND_HW | MACHINE_SUPPORTS_SAVE )

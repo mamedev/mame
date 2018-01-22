@@ -51,11 +51,12 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 
 #include "emu.h"
+#include "includes/galaxold.h"
+#include "audio/galaxian.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
-#include "audio/galaxian.h"
-#include "includes/galaxold.h"
+#include "speaker.h"
 
 
 class dambustr_state : public galaxold_state
@@ -70,6 +71,7 @@ public:
 	int m_noise_data;
 	DECLARE_WRITE8_MEMBER(dambustr_noise_enable_w);
 	DECLARE_DRIVER_INIT(dambustr);
+	void dambustr(machine_config &config);
 };
 
 
@@ -219,7 +221,7 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 
 	// Bit swap addresses
 	for(i=0; i<4096*4; i++) {
-		rom[i] = usr[BITSWAP16(i,15,14,13,12, 4,10,9,8,7,6,5,3,11,2,1,0)];
+		rom[i] = usr[bitswap<16>(i,15,14,13,12, 4,10,9,8,7,6,5,3,11,2,1,0)];
 	};
 
 	// Swap program ROMs
@@ -232,9 +234,9 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 
 	// Bit swap in $1000-$1fff and $4000-$5fff
 	for(i=0; i<0x1000; i++) {
-		rom[0x1000+i] = BITSWAP8(rom[0x1000+i],7,6,5,1,3,2,4,0);
-		rom[0x4000+i] = BITSWAP8(rom[0x4000+i],7,6,5,1,3,2,4,0);
-		rom[0x5000+i] = BITSWAP8(rom[0x5000+i],7,6,5,1,3,2,4,0);
+		rom[0x1000+i] = bitswap<8>(rom[0x1000+i],7,6,5,1,3,2,4,0);
+		rom[0x4000+i] = bitswap<8>(rom[0x4000+i],7,6,5,1,3,2,4,0);
+		rom[0x5000+i] = bitswap<8>(rom[0x5000+i],7,6,5,1,3,2,4,0);
 	};
 
 	// Swap graphics ROMs
@@ -250,7 +252,7 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 
 
 
-static MACHINE_CONFIG_START( dambustr, dambustr_state )
+MACHINE_CONFIG_START(dambustr_state::dambustr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(dambustr_map)
@@ -369,6 +371,6 @@ ROM_START( dambustruk )
 ROM_END
 
 
-GAME( 1981, dambustr,   0,        dambustr, dambustr, dambustr_state,   dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )
-GAME( 1981, dambustra,  dambustr, dambustr, dambustr, dambustr_state,   dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", 0 )
-GAME( 1981, dambustruk, dambustr, dambustr, dambustruk, dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (UK)", 0 )
+GAME( 1981, dambustr,   0,        dambustr, dambustr,   dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (US, set 1)", 0 )
+GAME( 1981, dambustra,  dambustr, dambustr, dambustr,   dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (US, set 2)", 0 )
+GAME( 1981, dambustruk, dambustr, dambustr, dambustruk, dambustr_state, dambustr, ROT90, "South West Research", "Dambusters (UK)",        0 )

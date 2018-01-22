@@ -140,6 +140,11 @@ static imgtoolerr_t imgtool_floppy_open_internal(imgtool::image &image, imgtool:
 done:
 	if (f)
 		delete f;
+	if (err && fimg->floppy)
+	{
+		floppy_close(fimg->floppy);
+		fimg->floppy = nullptr;
+	}
 	return err;
 }
 
@@ -200,6 +205,11 @@ static imgtoolerr_t imgtool_floppy_create(imgtool::image &image, imgtool::stream
 done:
 	if (f)
 		delete f;
+	if (err && fimg->floppy)
+	{
+		floppy_close(fimg->floppy);
+		fimg->floppy = nullptr;
+	}
 	return err;
 }
 

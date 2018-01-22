@@ -8,19 +8,10 @@
 
 ***************************************************************************/
 
+#ifndef MAME_CPU_JAGUAR_JAGUAR_H
+#define MAME_CPU_JAGUAR_JAGUAR_H
+
 #pragma once
-
-#ifndef __JAGUAR_H__
-#define __JAGUAR_H__
-
-
-
-/***************************************************************************
-    GLOBAL CONSTANTS
-***************************************************************************/
-
-#define JAGUAR_VARIANT_GPU      0
-#define JAGUAR_VARIANT_DSP      1
 
 
 
@@ -94,25 +85,25 @@ enum
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-
-extern const device_type JAGUARGPU;
-extern const device_type JAGUARDSP;
+DECLARE_DEVICE_TYPE(JAGUARGPU, jaguargpu_cpu_device)
+DECLARE_DEVICE_TYPE(JAGUARDSP, jaguardsp_cpu_device)
 
 
 class jaguar_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
-	jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, bool isdsp);
 	~jaguar_cpu_device();
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_int_func(device_t &device, _Object object) { return downcast<jaguar_cpu_device &>(device).m_cpu_interrupt.set_callback(object); }
+	template <class Object> static devcb_base &set_int_func(device_t &device, Object &&cb) { return downcast<jaguar_cpu_device &>(device).m_cpu_interrupt.set_callback(std::forward<Object>(cb)); }
 
-	virtual DECLARE_WRITE32_MEMBER(ctrl_w) { assert(0); }
-	virtual DECLARE_READ32_MEMBER(ctrl_r) { assert(0); return 0; }
+	virtual DECLARE_WRITE32_MEMBER(ctrl_w) = 0;
+	virtual DECLARE_READ32_MEMBER(ctrl_r) = 0;
 
 protected:
+	jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool isdsp);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -124,14 +115,10 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
-
-	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
 
 	address_space_config m_program_config;
 
@@ -152,7 +139,7 @@ protected:
 	int         m_bankswitch_icount;
 	devcb_write_line m_cpu_interrupt;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 
 	uint32_t      m_internal_ram_start;
 	uint32_t      m_internal_ram_end;
@@ -258,7 +245,7 @@ public:
 
 protected:
 	virtual void execute_run() override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 };
 
 
@@ -275,8 +262,8 @@ protected:
 	virtual uint32_t execute_input_lines() const override { return 6; }
 	virtual void execute_run() override;
 
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 };
 
 
-#endif /* __JAGUAR_H__ */
+#endif // MAME_CPU_JAGUAR_JAGUAR_H

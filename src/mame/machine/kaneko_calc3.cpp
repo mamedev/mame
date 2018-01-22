@@ -27,10 +27,13 @@
 #include "kaneko_calc3.h"
 #include "machine/eepromser.h"
 
-const device_type KANEKO_CALC3 = &device_creator<kaneko_calc3_device>;
+#define VERBOSE_OUTPUT 0
+
+
+DEFINE_DEVICE_TYPE(KANEKO_CALC3, kaneko_calc3_device, "kaneko_calc3", "Kaneko CALC3 MCU")
 
 kaneko_calc3_device::kaneko_calc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, KANEKO_CALC3, "Kaneko CALC3 MCU", tag, owner, clock, "kaneko_calc3", __FILE__),
+	: device_t(mconfig, KANEKO_CALC3, tag, owner, clock),
 		m_mcuram(*this, ":mcuram"),
 		m_mcu_status(0),
 		m_mcu_command_offset(0),
@@ -1221,14 +1224,14 @@ uint8_t kaneko_calc3_device::shift_bits(uint8_t dat, int bits)
 {
 	bits &=0x7;
 
-	if (bits==0) return BITSWAP8(dat, 7,6,5,4,3,2,1,0);
-	if (bits==1) return BITSWAP8(dat, 6,5,4,3,2,1,0,7);
-	if (bits==2) return BITSWAP8(dat, 5,4,3,2,1,0,7,6);
-	if (bits==3) return BITSWAP8(dat, 4,3,2,1,0,7,6,5);
-	if (bits==4) return BITSWAP8(dat, 3,2,1,0,7,6,5,4);
-	if (bits==5) return BITSWAP8(dat, 2,1,0,7,6,5,4,3);
-	if (bits==6) return BITSWAP8(dat, 1,0,7,6,5,4,3,2);
-	if (bits==7) return BITSWAP8(dat, 0,7,6,5,4,3,2,1);
+	if (bits==0) return bitswap<8>(dat, 7,6,5,4,3,2,1,0);
+	if (bits==1) return bitswap<8>(dat, 6,5,4,3,2,1,0,7);
+	if (bits==2) return bitswap<8>(dat, 5,4,3,2,1,0,7,6);
+	if (bits==3) return bitswap<8>(dat, 4,3,2,1,0,7,6,5);
+	if (bits==4) return bitswap<8>(dat, 3,2,1,0,7,6,5,4);
+	if (bits==5) return bitswap<8>(dat, 2,1,0,7,6,5,4,3);
+	if (bits==6) return bitswap<8>(dat, 1,0,7,6,5,4,3,2);
+	if (bits==7) return bitswap<8>(dat, 0,7,6,5,4,3,2,1);
 
 	return dat;
 }
@@ -1336,7 +1339,7 @@ int kaneko_calc3_device::decompress_table(int tabnum, uint8_t* dstram, int dstof
 					//printf("save to eeprom\n");
 
 					{
-						eeprom_serial_93cxx_device *eeprom = space.machine().device<eeprom_serial_93cxx_device>(":eeprom");
+						eeprom_serial_93cxx_device *eeprom = machine().device<eeprom_serial_93cxx_device>(":eeprom");
 
 						for (i=0;i<0x40;i++)
 						{
@@ -1672,7 +1675,7 @@ void kaneko_calc3_device::mcu_run()
 			}
 #endif
 			{
-				eeprom_serial_93cxx_device *eeprom = space.machine().device<eeprom_serial_93cxx_device>(":eeprom");
+				eeprom_serial_93cxx_device *eeprom = machine().device<eeprom_serial_93cxx_device>(":eeprom");
 
 				for (i=0;i<0x40;i++)
 				{

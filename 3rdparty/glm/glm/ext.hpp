@@ -35,8 +35,10 @@
 #endif//GLM_MESSAGES
 
 #include "./gtc/bitfield.hpp"
+#include "./gtc/color_space.hpp"
 #include "./gtc/constants.hpp"
 #include "./gtc/epsilon.hpp"
+#include "./gtc/functions.hpp"
 #include "./gtc/integer.hpp"
 #include "./gtc/matrix_access.hpp"
 #include "./gtc/matrix_integer.hpp"
@@ -48,6 +50,7 @@
 #include "./gtc/random.hpp"
 #include "./gtc/reciprocal.hpp"
 #include "./gtc/round.hpp"
+//#include "./gtc/type_aligned.hpp"
 #include "./gtc/type_precision.hpp"
 #include "./gtc/type_ptr.hpp"
 #include "./gtc/ulp.hpp"

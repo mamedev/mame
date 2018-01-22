@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DEVCPU_H__
-#define __DEVCPU_H__
+#ifndef MAME_EMU_DEVCPU_H
+#define MAME_EMU_DEVCPU_H
 
 //**************************************************************************
 //  CPU DEVICE CONFIGURATION MACROS
@@ -50,15 +50,6 @@
 
 
 //**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define CPU_DISASSEMBLE_NAME(name)      cpu_disassemble_##name
-#define CPU_DISASSEMBLE(name)           offs_t CPU_DISASSEMBLE_NAME(name)(cpu_device *device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
-#define CPU_DISASSEMBLE_CALL(name)      CPU_DISASSEMBLE_NAME(name)(device, buffer, pc, oprom, opram, options)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -70,8 +61,6 @@ class cpu_device :  public device_t,
 					public device_state_interface,
 					public device_disasm_interface
 {
-	friend resource_pool_object<cpu_device>::~resource_pool_object();
-
 public:
 	// configuration helpers
 	static void static_set_force_no_drc(device_t &device, bool value);
@@ -79,7 +68,7 @@ public:
 
 protected:
 	// construction/destruction
-	cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 	virtual ~cpu_device();
 
 private:
@@ -88,7 +77,4 @@ private:
 };
 
 
-typedef offs_t (*cpu_disassemble_func)(cpu_device *device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
-
-
-#endif  /* __CPUINTRF_H__ */
+#endif  /* MAME_EMU_DEVCPU_H */

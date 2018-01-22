@@ -12,12 +12,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_AKIKO_H
+#define MAME_MACHINE_AKIKO_H
+
 #pragma once
 
-#ifndef __AKIKO_H__
-#define __AKIKO_H__
-
-#include "emu.h"
 #include "cdrom.h"
 #include "sound/cdda.h"
 
@@ -26,9 +25,17 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_AKIKO_ADD(_tag, _cputag) \
-	MCFG_DEVICE_ADD(_tag, AKIKO, 0) \
-	akiko_device::set_cputag(*device, _cputag);
+#define MCFG_AKIKO_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, AKIKO, 0)
+
+#define MCFG_AKIKO_MEM_READ_CB(_devcb) \
+	devcb = &akiko_device::set_mem_r_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_AKIKO_MEM_WRITE_CB(_devcb) \
+	devcb = &akiko_device::set_mem_w_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_AKIKO_INT_CB(_devcb) \
+	devcb = &akiko_device::set_int_w_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_AKIKO_SCL_HANDLER(_devcb) \
 	devcb = &akiko_device::set_scl_handler(*device, DEVCB_##_devcb);
@@ -50,37 +57,39 @@ class akiko_device : public device_t
 {
 public:
 	akiko_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~akiko_device() {}
 
 	// callbacks
-	template<class _Object> static devcb_base &set_scl_handler(device_t &device, _Object object)
-		{ return downcast<akiko_device &>(device).m_scl_w.set_callback(object); }
+	template <class Object> static devcb_base &set_mem_r_callback(device_t &device, Object &&cb)
+	{ return downcast<akiko_device &>(device).m_mem_r.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_sda_read_handler(device_t &device, _Object object)
-		{ return downcast<akiko_device &>(device).m_sda_r.set_callback(object); }
+	template <class Object> static devcb_base &set_mem_w_callback(device_t &device, Object &&cb)
+	{ return downcast<akiko_device &>(device).m_mem_w.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base &set_sda_write_handler(device_t &device, _Object object)
-		{ return downcast<akiko_device &>(device).m_sda_w.set_callback(object); }
+	template <class Object> static devcb_base &set_int_w_callback(device_t &device, Object &&cb)
+	{ return downcast<akiko_device &>(device).m_int_w.set_callback(std::forward<Object>(cb)); }
+
+	template <class Object> static devcb_base &set_scl_handler(device_t &device, Object &&cb)
+	{ return downcast<akiko_device &>(device).m_scl_w.set_callback(std::forward<Object>(cb)); }
+
+	template <class Object> static devcb_base &set_sda_read_handler(device_t &device, Object &&cb)
+	{ return downcast<akiko_device &>(device).m_sda_r.set_callback(std::forward<Object>(cb)); }
+
+	template <class Object> static devcb_base &set_sda_write_handler(device_t &device, Object &&cb)
+	{ return downcast<akiko_device &>(device).m_sda_w.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
-
-	// inline configuration
-	static void set_cputag(device_t &device, const char *tag);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_stop() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	// 1X CDROM sector time in msec (300KBps)
-	static const int CD_SECTOR_TIME = (1000/((150*1024)/2048));
-
-	// internal state
-	address_space *m_space;
+	static constexpr int CD_SECTOR_TIME = (1000/((150*1024)/2048));
 
 	// chunky to planar converter
 	uint32_t m_c2p_input_buffer[8];
@@ -123,6 +132,9 @@ private:
 	void nvram_write(uint32_t data);
 	uint32_t nvram_read();
 
+	uint8_t mem_r8(offs_t offset);
+	void mem_w8(offs_t offset, uint8_t data);
+
 	void c2p_write(uint32_t data);
 	uint32_t c2p_read();
 
@@ -141,15 +153,16 @@ private:
 	TIMER_CALLBACK_MEMBER( cd_delayed_cmd );
 	void update_cdrom();
 
-	// i2c interface
+	// interface
+	devcb_read16 m_mem_r;
+	devcb_write16 m_mem_w;
+	devcb_write_line m_int_w;
 	devcb_write_line m_scl_w;
 	devcb_read_line m_sda_r;
 	devcb_write_line m_sda_w;
-
-	const char *m_cputag;
 };
 
 // device type definition
-extern const device_type AKIKO;
+DECLARE_DEVICE_TYPE(AKIKO, akiko_device)
 
-#endif
+#endif // MAME_MACHINE_AKIKO_H

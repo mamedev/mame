@@ -35,8 +35,10 @@
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/kb3600.h"
-#include "sound/speaker.h"
 #include "sound/sn76496.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 enum
 {
@@ -109,6 +111,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 
+	void laser3k(machine_config &config);
 private:
 	uint8_t m_bank0val, m_bank1val, m_bank2val, m_bank3val;
 	int m_flash;
@@ -463,10 +466,10 @@ READ8_MEMBER( laser3k_state::io2_r )
 	switch (offset)
 	{
 		case 0xc2:  // h-blank status
-			return space.machine().first_screen()->hblank() ? 0x80 : 0x00;
+			return machine().first_screen()->hblank() ? 0x80 : 0x00;
 
 		case 0xc3:  // v-blank status
-			return space.machine().first_screen()->vblank() ? 0x80 : 0x00;
+			return machine().first_screen()->vblank() ? 0x80 : 0x00;
 
 		case 0xc5:  // CPU 1/2 MHz status?
 			return 0x00;
@@ -958,7 +961,7 @@ PALETTE_INIT_MEMBER(laser3k_state, laser3k)
 	palette.set_pen_colors(0, laser3k_palette, ARRAY_LENGTH(laser3k_palette));
 }
 
-static MACHINE_CONFIG_START( laser3k, laser3k_state )
+MACHINE_CONFIG_START(laser3k_state::laser3k)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1021800)
 	MCFG_CPU_PROGRAM_MAP(laser3k_map)
@@ -978,22 +981,22 @@ static MACHINE_CONFIG_START( laser3k, laser3k_state )
 	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(banks_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(banks_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 	MCFG_DEVICE_ADD("bank2", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(banks_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 	MCFG_DEVICE_ADD("bank3", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(banks_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_RAM_ADD("mainram")
@@ -1033,5 +1036,5 @@ ROM_START(las3000)
 	ROM_LOAD ( "l3kdisk.rom", 0x0000, 0x0100, CRC(2d4b1584) SHA1(989780b77e100598124df7b72663e5a31a3339c0))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY          FULLNAME */
-COMP( 1983, las3000,  0,        0,        laser3k,     laser3k, driver_device,  0,        "Video Technology",  "Laser 3000",    MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE           INIT  COMPANY             FULLNAME      FLAGS
+COMP( 1983, las3000, 0,      0,      laser3k, laser3k, laser3k_state,  0,    "Video Technology", "Laser 3000", MACHINE_NOT_WORKING )

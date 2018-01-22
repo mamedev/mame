@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Pierpaolo Prazzoli
-#pragma once
+#ifndef MAME_CPU_SSP1601_SSP1601_H
+#define MAME_CPU_SSP1601_SSP1601_H
 
-#ifndef __SSP1601_H__
-#define __SSP1601_H__
+#pragma once
 
 
 enum
@@ -37,34 +37,34 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_IO) ? &m_io_config : nullptr); }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
 	PAIR m_gr[8];     /* general regs, some are 16bit, some 32bit */
-	union {
-			unsigned char m_r[8];             /* pointer registers, 4 for earch bank */
-			struct {
-					unsigned char m_r0[4];
-					unsigned char m_r1[4];
-			} regs;
+	union
+	{
+		unsigned char m_r[8];             /* pointer registers, 4 for earch bank */
+		struct {
+			unsigned char m_r0[4];
+			unsigned char m_r1[4];
+		} regs;
 	};
-	union {
-			unsigned short m_RAM[256*2];      /* 2 256-word internal RAM banks */
-			struct {
-					unsigned short m_RAM0[256];
-					unsigned short m_RAM1[256];
-			} mem;
+	union
+	{
+		unsigned short m_RAM[256*2];      /* 2 256-word internal RAM banks */
+		struct {
+			unsigned short m_RAM0[256];
+			unsigned short m_RAM1[256];
+		} mem;
 	};
 	uint16_t m_stack[6]; /* 6-level hardware stack */
 	PAIR m_ppc;
@@ -72,7 +72,7 @@ private:
 	int m_g_cycles;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<-1> *m_direct;
 	address_space *m_io;
 
 	void update_P();
@@ -101,7 +101,6 @@ private:
 };
 
 
-extern const device_type SSP1601;
+DECLARE_DEVICE_TYPE(SSP1601, ssp1601_device)
 
-
-#endif /* __SSP1601_H__ */
+#endif // MAME_CPU_SSP1601_SSP1601_H

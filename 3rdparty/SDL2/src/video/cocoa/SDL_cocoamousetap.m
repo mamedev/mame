@@ -32,8 +32,8 @@
 #if SDL_MAC_NO_SANDBOX
 
 #include "SDL_keyboard.h"
-#include "SDL_thread.h"
 #include "SDL_cocoavideo.h"
+#include "../../thread/SDL_systhread.h"
 
 #include "../../events/SDL_mouse_c.h"
 
@@ -96,7 +96,7 @@ Cocoa_MouseTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event
     eventLocation = CGEventGetUnflippedLocation(event);
     windowRect = [nswindow contentRectForFrameRect:[nswindow frame]];
 
-    if (!NSPointInRect(NSPointFromCGPoint(eventLocation), windowRect)) {
+    if (!NSMouseInRect(NSPointFromCGPoint(eventLocation), windowRect, NO)) {
 
         /* This is in CGs global screenspace coordinate system, which has a
          * flipped Y.
@@ -109,15 +109,14 @@ Cocoa_MouseTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event
             newLocation.x = NSMaxX(windowRect) - 1.0;
         }
 
-        if (eventLocation.y < NSMinY(windowRect)) {
+        if (eventLocation.y <= NSMinY(windowRect)) {
             newLocation.y -= (NSMinY(windowRect) - eventLocation.y + 1);
-        } else if (eventLocation.y >= NSMaxY(windowRect)) {
-            newLocation.y += (eventLocation.y - NSMaxY(windowRect) + 1);
+        } else if (eventLocation.y > NSMaxY(windowRect)) {
+            newLocation.y += (eventLocation.y - NSMaxY(windowRect));
         }
 
-        CGSetLocalEventsSuppressionInterval(0);
         CGWarpMouseCursorPosition(newLocation);
-        CGSetLocalEventsSuppressionInterval(0.25);
+        CGAssociateMouseAndMouseCursorPosition(YES);
 
         if ((CGEventMaskBit(type) & movementEventsMask) == 0) {
             /* For click events, we just constrain the event to the window, so
@@ -203,7 +202,7 @@ Cocoa_InitMouseEventTap(SDL_MouseData* driverdata)
 
     tapdata->runloopStartedSemaphore = SDL_CreateSemaphore(0);
     if (tapdata->runloopStartedSemaphore) {
-        tapdata->thread = SDL_CreateThread(&Cocoa_MouseTapThread, "Event Tap Loop", tapdata);
+        tapdata->thread = SDL_CreateThreadInternal(&Cocoa_MouseTapThread, "Event Tap Loop", 512 * 1024, tapdata);
         if (!tapdata->thread) {
             SDL_DestroySemaphore(tapdata->runloopStartedSemaphore);
         }

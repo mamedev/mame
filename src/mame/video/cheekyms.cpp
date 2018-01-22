@@ -40,20 +40,21 @@ PALETTE_INIT_MEMBER(cheekyms_state, cheekyms)
 
 WRITE8_MEMBER(cheekyms_state::port_40_w)
 {
-	m_dac0->write(BIT(data, 7)); // tune
-	m_dac1->write(BIT(data, 6)); // mouse eating cheese
-	m_dac2->write(BIT(data, 5)); // hammer
-	m_dac3->write(BIT(data, 4)); // mouse died
-	m_dac4->write(BIT(data, 3)); // mystery died
-	m_dac5->write(BIT(data, 2)); // mouse appears
-	m_dac6->write(BIT(data, 1)); // mystery appears
-	m_dac7->write(BIT(data, 0));
+	m_sound_board->music_w(BIT(data, 7));
+	m_sound_board->cheese_w(BIT(data, 6));
+	m_sound_board->hammer_w(BIT(data, 5));
+	m_sound_board->mouse_dies_w(BIT(data, 4));
+	m_sound_board->pest_dies_w(BIT(data, 3));
+	m_sound_board->mouse_w(BIT(data, 2));
+	m_sound_board->pest_w(BIT(data, 1));
 }
 
 
 WRITE8_MEMBER(cheekyms_state::port_80_w)
 {
-	/* d0-d1 - sound enables, not sure which bit is which */
+	m_sound_board->coin_extra_w(BIT(data, 1));
+	m_sound_board->mute_w(BIT(data, 0));
+
 	/* d3-d5 - man scroll amount */
 	/* d6 - palette select (selects either 0 = PROM M9, 1 = PROM M8) */
 	/* d7 - screen flip */

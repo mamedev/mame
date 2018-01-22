@@ -5,7 +5,6 @@
 #ifndef __VIDBRAIN__
 #define __VIDBRAIN__
 
-#include "emu.h"
 #include "bus/vidbrain/exp.h"
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
@@ -98,10 +97,8 @@ public:
 
 	// timers
 	emu_timer *m_timer_ne555;
+	void vidbrain(machine_config &config);
+	void vidbrain_video(machine_config &config);
 };
-
-//----------- defined in video/vidbrain.c -----------
-
-MACHINE_CONFIG_EXTERN( vidbrain_video );
 
 #endif

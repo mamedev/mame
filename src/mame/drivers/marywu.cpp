@@ -18,8 +18,10 @@
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "sound/ay8910.h"
 #include "machine/i8279.h"
+#include "sound/ay8910.h"
+#include "speaker.h"
+
 #include "marywu.lh"
 
 class marywu_state : public driver_device
@@ -37,6 +39,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay2_port_b_w);
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_READ8_MEMBER(port_r);
+	void marywu(machine_config &config);
 private:
 	uint8_t m_selected_7seg_module;
 };
@@ -179,7 +182,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, marywu_state )
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(port_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( marywu , marywu_state )
+MACHINE_CONFIG_START(marywu_state::marywu)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL_10_738635MHz) //actual CPU is a Winbond w78c31b-24
 	MCFG_CPU_PROGRAM_MAP(program_map)
@@ -212,5 +215,5 @@ ROM_START( marywu )
 	ROM_LOAD( "marywu_sunkiss_chen.rom", 0x0000, 0x8000, CRC(11f67c7d) SHA1(9c1fd1a5cc6e2b0d675f0217aa8ff21c30609a0c) )
 ROM_END
 
-/*    YEAR  NAME       PARENT   MACHINE   INPUT     STATE          INIT   ROT    COMPANY       FULLNAME          FLAGS  */
-GAME( ????, marywu,    0,       marywu,   marywu,   driver_device, 0,     ROT0, "<unknown>", "<unknown> Labeled 'WU- MARY-1A' Music by: SunKiss Chen", MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT   MACHINE   INPUT     STATE         INIT   ROT   COMPANY      FULLNAME                                                FLAGS
+GAME( ????, marywu,    0,       marywu,   marywu,   marywu_state, 0,     ROT0, "<unknown>", "unknown Labeled 'WU- MARY-1A' Music by: SunKiss Chen", MACHINE_NOT_WORKING )

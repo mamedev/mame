@@ -172,16 +172,22 @@ I/O ports
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/i8085/i8085.h"
-#include "sound/wave.h"
-#include "imagedev/cassette.h"
 #include "includes/pmd85.h"
+
+#include "cpu/i8085/i8085.h"
+#include "imagedev/cassette.h"
+#include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "machine/i8251.h"
-#include "formats/pmd_cas.h"
 #include "machine/ram.h"
+#include "sound/wave.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "formats/pmd_cas.h"
+
 
 //**************************************************************************
 //  VIDEO EMULATION
@@ -566,7 +572,7 @@ static const struct CassetteOptions pmd85_cassette_options =
 };
 
 /* machine definition */
-static MACHINE_CONFIG_START( pmd85, pmd85_state )
+MACHINE_CONFIG_START(pmd85_state::pmd85)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)     /* 2.048MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(pmd85_mem)
@@ -634,7 +640,7 @@ static MACHINE_CONFIG_START( pmd85, pmd85_state )
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pmd851, pmd85 )
+MACHINE_CONFIG_DERIVED(pmd85_state::pmd851, pmd85)
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(pmd85_state, pmd85_ppi_0_porta_r))
@@ -669,17 +675,17 @@ static MACHINE_CONFIG_DERIVED( pmd851, pmd85 )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_3_portc_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pmd852a, pmd851 )
+MACHINE_CONFIG_DERIVED(pmd85_state::pmd852a, pmd851)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pmd852a_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pmd853, pmd851 )
+MACHINE_CONFIG_DERIVED(pmd85_state::pmd853, pmd851)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pmd853_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( alfa, pmd85 )
+MACHINE_CONFIG_DERIVED(pmd85_state::alfa, pmd85)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(alfa_mem)
 
@@ -708,7 +714,7 @@ static MACHINE_CONFIG_DERIVED( alfa, pmd85 )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(pmd85_state, pmd85_ppi_2_portc_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mato, pmd85 )
+MACHINE_CONFIG_DERIVED(pmd85_state::mato, pmd85)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mato_mem)
 	MCFG_CPU_IO_MAP(mato_io_map)
@@ -725,7 +731,7 @@ static MACHINE_CONFIG_DERIVED( mato, pmd85 )
 	MCFG_DEVICE_REMOVE("uart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c2717, pmd851 )
+MACHINE_CONFIG_DERIVED(pmd85_state::c2717, pmd851)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(c2717_mem)
 MACHINE_CONFIG_END
@@ -801,13 +807,13 @@ ROM_START(c2717pmd)
 ROM_END
 
 
-/*    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT  INIT      COMPANY  FULLNAME */
-COMP( 1985, pmd851,  0,      0,     pmd851,  pmd85, pmd85_state, pmd851,   "Tesla", "PMD-85.1" , 0)
-COMP( 1985, pmd852,  pmd851, 0,     pmd851,  pmd85, pmd85_state, pmd851,   "Tesla", "PMD-85.2" , 0)
-COMP( 1985, pmd852a, pmd851, 0,     pmd852a, pmd85, pmd85_state, pmd852a,  "Tesla", "PMD-85.2A" , 0)
-COMP( 1985, pmd852b, pmd851, 0,     pmd852a, pmd85, pmd85_state, pmd852a,  "Tesla", "PMD-85.2B" , 0)
-COMP( 1988, pmd853,  pmd851, 0,     pmd853,  pmd85, pmd85_state, pmd853,   "Tesla", "PMD-85.3" , 0)
-COMP( 1986, alfa,    pmd851, 0,     alfa,    alfa, pmd85_state,  alfa,     "Didaktik Skalica", "Didaktik Alfa" , 0)
-COMP( 1985, mato,    pmd851, 0,     mato,    mato, pmd85_state,  mato,     "Statny", "Mato" , 0)
-COMP( 1989, c2717,   pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno", "Consul 2717" , 0)
-COMP( 1989, c2717pmd,pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno", "Consul 2717 (with PMD-32)" , MACHINE_NOT_WORKING)
+//    YEAR  NAME     PARENT  COMPAT MACHINE  INPUT  STATE        INIT      COMPANY             FULLNAME                     FLAGS
+COMP( 1985, pmd851,  0,      0,     pmd851,  pmd85, pmd85_state, pmd851,   "Tesla",            "PMD-85.1",                  0 )
+COMP( 1985, pmd852,  pmd851, 0,     pmd851,  pmd85, pmd85_state, pmd851,   "Tesla",            "PMD-85.2",                  0 )
+COMP( 1985, pmd852a, pmd851, 0,     pmd852a, pmd85, pmd85_state, pmd852a,  "Tesla",            "PMD-85.2A",                 0 )
+COMP( 1985, pmd852b, pmd851, 0,     pmd852a, pmd85, pmd85_state, pmd852a,  "Tesla",            "PMD-85.2B",                 0 )
+COMP( 1988, pmd853,  pmd851, 0,     pmd853,  pmd85, pmd85_state, pmd853,   "Tesla",            "PMD-85.3",                  0 )
+COMP( 1986, alfa,    pmd851, 0,     alfa,    alfa,  pmd85_state, alfa,     "Didaktik Skalica", "Didaktik Alfa",             0 )
+COMP( 1985, mato,    pmd851, 0,     mato,    mato,  pmd85_state, mato,     "Statny",           "Mato",                      0 )
+COMP( 1989, c2717,   pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno",   "Consul 2717",               0 )
+COMP( 1989, c2717pmd,pmd851, 0,     c2717,   pmd85, pmd85_state, c2717,    "Zbrojovka Brno",   "Consul 2717 (with PMD-32)", MACHINE_NOT_WORKING )

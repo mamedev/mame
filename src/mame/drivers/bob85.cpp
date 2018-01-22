@@ -48,6 +48,7 @@ public:
 	uint8_t m_count_key;
 	virtual void machine_reset() override;
 
+	void bob85(machine_config &config);
 protected:
 	required_ioport m_line0;
 	required_ioport m_line1;
@@ -137,7 +138,7 @@ READ8_MEMBER(bob85_state::bob85_keyboard_r)
 
 WRITE8_MEMBER(bob85_state::bob85_7seg_w)
 {
-	output().set_digit_value(offset, BITSWAP8( data,3,2,1,0,7,6,5,4 ));
+	output().set_digit_value(offset, bitswap<8>( data,3,2,1,0,7,6,5,4 ));
 }
 
 static ADDRESS_MAP_START( bob85_mem, AS_PROGRAM, 8, bob85_state )
@@ -198,7 +199,7 @@ READ_LINE_MEMBER( bob85_state::sid_r )
 	return m_cass->input() > 0.0;
 }
 
-static MACHINE_CONFIG_START( bob85, bob85_state )
+MACHINE_CONFIG_START(bob85_state::bob85)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5MHz)
 	MCFG_CPU_PROGRAM_MAP(bob85_mem)
@@ -222,5 +223,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT COMPANY             FULLNAME       FLAGS */
-COMP( 1984, bob85,  0,       0,     bob85,   bob85, driver_device,    0, "Josef Kratochvil", "BOB-85", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT  COMPANY             FULLNAME  FLAGS
+COMP( 1984, bob85,  0,      0,      bob85,   bob85, bob85_state,  0,    "Josef Kratochvil", "BOB-85", MACHINE_NO_SOUND_HW)

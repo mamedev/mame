@@ -23,8 +23,11 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "hd61700.h"
+#include "hd61700d.h"
+
+#include "debugger.h"
+
 
 // internal ROM
 #define INT_ROM                 0x0c00
@@ -95,28 +98,34 @@ static const uint16_t irq_vector[] = {0x0032, 0x0042, 0x0052, 0x0062, 0x0072};
 //  HD61700 DEVICE
 //**************************************************************************
 
-const device_type HD61700 = &device_creator<hd61700_cpu_device>;
+DEFINE_DEVICE_TYPE(HD61700, hd61700_cpu_device, "hd61700", "HD61700")
 
 //-------------------------------------------------
 //  hd61700_cpu_device - constructor
 //-------------------------------------------------
 
 hd61700_cpu_device::hd61700_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, HD61700, "HD61700", tag, owner, clock, "hd61700", __FILE__),
-		m_program_config("program", ENDIANNESS_BIG, 16, 18, -1),
-		m_ppc(0x0000),
-		m_curpc(0x0000),
-		m_pc(0),
-		m_flags(0),
-		m_lcd_ctrl_cb(*this),
-		m_lcd_read_cb(*this),
-		m_lcd_write_cb(*this),
-		m_kb_read_cb(*this),
-		m_kb_write_cb(*this),
-		m_port_read_cb(*this),
-		m_port_write_cb(*this)
+	: cpu_device(mconfig, HD61700, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 16, 18, -1)
+	, m_ppc(0x0000)
+	, m_curpc(0x0000)
+	, m_pc(0)
+	, m_flags(0)
+	, m_lcd_ctrl_cb(*this)
+	, m_lcd_read_cb(*this)
+	, m_lcd_write_cb(*this)
+	, m_kb_read_cb(*this)
+	, m_kb_write_cb(*this)
+	, m_port_read_cb(*this)
+	, m_port_write_cb(*this)
 {
-	// ...
+}
+
+device_memory_interface::space_config_vector hd61700_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 
@@ -288,23 +297,20 @@ void hd61700_cpu_device::state_string_export(const device_state_entry &entry, st
 
 
 //-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t hd61700_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *hd61700_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( hd61700 );
-	return CPU_DISASSEMBLE_NAME(hd61700)(this, buffer, pc, oprom, opram, options);
+	return new hd61700_disassembler;
 }
-
-
 
 //-------------------------------------------------
 //  check_irqs - check if need interrupts
 //-------------------------------------------------
 
-bool hd61700_cpu_device::check_irqs(void)
+bool hd61700_cpu_device::check_irqs()
 {
 	for (int i=4; i>=0; i--)
 	{
@@ -2748,7 +2754,7 @@ inline uint8_t hd61700_cpu_device::read_op()
 
 	if (m_pc <= INT_ROM)
 	{
-		data = m_program->read_word(addr18<<1);
+		data = m_program->read_word(addr18);
 
 		if (!(m_fetch_addr&1))
 			data = (data>>8) ;
@@ -2756,9 +2762,9 @@ inline uint8_t hd61700_cpu_device::read_op()
 	else
 	{
 		if (m_fetch_addr&1)
-			data = m_program->read_word((addr18+1)<<1);
+			data = m_program->read_word(addr18 + 1);
 		else
-			data = m_program->read_word((addr18+0)<<1);
+			data = m_program->read_word(addr18 + 0);
 	}
 
 	m_fetch_addr += ((m_pc > INT_ROM) ? 2 : 1);
@@ -2774,12 +2780,12 @@ inline uint8_t hd61700_cpu_device::read_op()
 
 inline uint8_t hd61700_cpu_device::mem_readbyte(uint8_t segment, uint16_t offset)
 {
-	return m_program->read_word(make_18bit_addr(segment, offset)<<1) & 0xff;
+	return m_program->read_word(make_18bit_addr(segment, offset)) & 0xff;
 }
 
 inline void hd61700_cpu_device::mem_writebyte(uint8_t segment, uint16_t offset, uint8_t data)
 {
-	m_program->write_word(make_18bit_addr(segment, offset)<<1, data);
+	m_program->write_word(make_18bit_addr(segment, offset), data);
 }
 
 inline uint32_t hd61700_cpu_device::make_18bit_addr(uint8_t segment, uint16_t offset)

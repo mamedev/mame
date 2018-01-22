@@ -221,12 +221,14 @@ void hyhoo_state::hyhoo_gfxdraw()
 	}
 
 	m_nb1413m3->m_busyflag = 0;
-	timer_set(attotime::from_hz(400000) * m_nb1413m3->m_busyctr, TIMER_BLITTER);
+	m_blitter_timer->adjust(attotime::from_hz(400000) * m_nb1413m3->m_busyctr);
 }
 
 
 void hyhoo_state::video_start()
 {
+	m_blitter_timer = timer_alloc(TIMER_BLITTER);
+
 	m_screen->register_screen_bitmap(m_tmpbitmap);
 	save_item(NAME(m_blitter_destx));
 	save_item(NAME(m_blitter_desty));

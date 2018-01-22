@@ -7,13 +7,14 @@
 ****************************************************************************/
 
 
+#include "emu.h"
+#include "cage.h"
+#include "cpu/tms32031/tms32031.h"
+#include "speaker.h"
+
+
 #define LOG_COMM            (0)
 #define LOG_32031_IOPORTS   (0)
-
-
-#include "emu.h"
-#include "cpu/tms32031/tms32031.h"
-#include "cage.h"
 
 
 
@@ -105,7 +106,7 @@ static const char *const register_names[] =
  *
  *************************************/
 
-const device_type ATARI_CAGE = &device_creator<atari_cage_device>;
+DEFINE_DEVICE_TYPE(ATARI_CAGE, atari_cage_device, "atari_cage", "Atari CAGE")
 
 
 //-------------------------------------------------
@@ -113,15 +114,12 @@ const device_type ATARI_CAGE = &device_creator<atari_cage_device>;
 //-------------------------------------------------
 
 atari_cage_device::atari_cage_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ATARI_CAGE, "Atari CAGE", tag, owner, clock, "atari_cage", __FILE__),
-	m_cageram(*this, "cageram"),
-	m_soundlatch(*this, "soundlatch"),
-	m_irqhandler(*this)
+	atari_cage_device(mconfig, ATARI_CAGE, tag, owner, clock)
 {
 }
 
-atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+atari_cage_device::atari_cage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_cageram(*this, "cageram"),
 	m_soundlatch(*this, "soundlatch"),
 	m_irqhandler(*this)
@@ -239,7 +237,7 @@ void atari_cage_device::update_dma_state(address_space &space)
 		inc = (tms32031_io_regs[DMA_GLOBAL_CTL] >> 4) & 1;
 		for (i = 0; i < tms32031_io_regs[DMA_TRANSFER_COUNT]; i++)
 		{
-			sound_data[i % STACK_SOUND_BUFSIZE] = space.read_dword(addr * 4);
+			sound_data[i % STACK_SOUND_BUFSIZE] = space.read_dword(addr);
 			addr += inc;
 			if (i % STACK_SOUND_BUFSIZE == STACK_SOUND_BUFSIZE - 1)
 				dmadac_transfer(&m_dmadac[0], DAC_BUFFER_CHANNELS, 1, DAC_BUFFER_CHANNELS, STACK_SOUND_BUFSIZE / DAC_BUFFER_CHANNELS, sound_data);
@@ -372,7 +370,7 @@ READ32_MEMBER( atari_cage_device::tms32031_io_r )
 	}
 
 	if (LOG_32031_IOPORTS)
-		logerror("CAGE:%06X:%s read -> %08X\n", space.device().safe_pc(), register_names[offset & 0x7f], result);
+		logerror("%s CAGE:%s read -> %08X\n", machine().describe_context(), register_names[offset & 0x7f], result);
 	return result;
 }
 
@@ -384,7 +382,7 @@ WRITE32_MEMBER( atari_cage_device::tms32031_io_w )
 	COMBINE_DATA(&tms32031_io_regs[offset]);
 
 	if (LOG_32031_IOPORTS)
-		logerror("CAGE:%06X:%s write = %08X\n", space.device().safe_pc(), register_names[offset & 0x7f], tms32031_io_regs[offset]);
+		logerror("%s CAGE:%s write = %08X\n", machine().describe_context(), register_names[offset & 0x7f], tms32031_io_regs[offset]);
 
 	switch (offset)
 	{
@@ -461,7 +459,7 @@ void atari_cage_device::update_control_lines()
 READ32_MEMBER( atari_cage_device::cage_from_main_r )
 {
 	if (LOG_COMM)
-		logerror("%06X:CAGE read command = %04X\n", space.device().safe_pc(), m_from_main);
+		logerror("%s CAGE read command = %04X\n", machine().describe_context(), m_from_main);
 	m_cpu_to_cage_ready = 0;
 	update_control_lines();
 	m_cpu->set_input_line(TMS3203X_IRQ0, CLEAR_LINE);
@@ -473,7 +471,7 @@ WRITE32_MEMBER( atari_cage_device::cage_from_main_ack_w )
 {
 	if (LOG_COMM)
 	{
-			logerror("%06X:CAGE ack command = %04X\n", space.device().safe_pc(), m_from_main);
+			logerror("%s CAGE ack command = %04X\n", machine().describe_context(), m_from_main);
 	}
 }
 
@@ -481,7 +479,7 @@ WRITE32_MEMBER( atari_cage_device::cage_from_main_ack_w )
 WRITE32_MEMBER( atari_cage_device::cage_to_main_w )
 {
 	if (LOG_COMM)
-		logerror("%06X:Data from CAGE = %04X\n", space.device().safe_pc(), data);
+		logerror("%s Data from CAGE = %04X\n", machine().describe_context(), data);
 	m_soundlatch->write(space, 0, data, mem_mask);
 	m_cage_to_cpu_ready = 1;
 	update_control_lines();
@@ -501,12 +499,11 @@ READ32_MEMBER( atari_cage_device::cage_io_status_r )
 
 uint16_t atari_cage_device::main_r()
 {
-	driver_device *drvstate = machine().driver_data<driver_device>();
 	if (LOG_COMM)
-		logerror("%s:main read data = %04X\n", machine().describe_context(), m_soundlatch->read(drvstate->generic_space(), 0, 0));
+		logerror("%s:main read data = %04X\n", machine().describe_context(), m_soundlatch->read(machine().dummy_space(), 0, 0));
 	m_cage_to_cpu_ready = 0;
 	update_control_lines();
-	return m_soundlatch->read(drvstate->generic_space(), 0, 0xffff);
+	return m_soundlatch->read(machine().dummy_space(), 0, 0xffff);
 }
 
 
@@ -622,14 +619,11 @@ static ADDRESS_MAP_START( cage_map_seattle, AS_PROGRAM, 32, atari_cage_seattle_d
 ADDRESS_MAP_END
 
 
+//-------------------------------------------------
+//  machine_add_config - add device configuration
+//-------------------------------------------------
 
-/*************************************
- *
- *  CAGE machine driver
- *
- *************************************/
-
-MACHINE_CONFIG_FRAGMENT( cage )
+MACHINE_CONFIG_START(atari_cage_device::device_add_mconfig)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cage", TMS32031, 33868800)
@@ -667,24 +661,7 @@ MACHINE_CONFIG_FRAGMENT( cage )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED( cage_seattle, cage )
-
-	MCFG_CPU_MODIFY("cage")
-	MCFG_CPU_PROGRAM_MAP(cage_map_seattle)
-MACHINE_CONFIG_END
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor atari_cage_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cage );
-}
-
-
-const device_type ATARI_CAGE_SEATTLE = &device_creator<atari_cage_seattle_device>;
+DEFINE_DEVICE_TYPE(ATARI_CAGE_SEATTLE, atari_cage_seattle_device, "atari_cage_seattle", "Atari CAGE Seattle")
 
 
 //-------------------------------------------------
@@ -692,11 +669,20 @@ const device_type ATARI_CAGE_SEATTLE = &device_creator<atari_cage_seattle_device
 //-------------------------------------------------
 
 atari_cage_seattle_device::atari_cage_seattle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	atari_cage_device(mconfig, ATARI_CAGE_SEATTLE, "Atari CAGE Seattle", tag, owner, clock, "atari_cage_seattle", __FILE__)
+	atari_cage_device(mconfig, ATARI_CAGE_SEATTLE, tag, owner, clock)
 {
 }
 
-machine_config_constructor atari_cage_seattle_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( cage_seattle );
-}
+
+//-------------------------------------------------
+//  machine_add_config - add device configuration
+//-------------------------------------------------
+
+
+MACHINE_CONFIG_START(atari_cage_seattle_device::device_add_mconfig)
+
+	atari_cage_device::device_add_mconfig(config);
+
+	MCFG_CPU_MODIFY("cage")
+	MCFG_CPU_PROGRAM_MAP(cage_map_seattle)
+MACHINE_CONFIG_END

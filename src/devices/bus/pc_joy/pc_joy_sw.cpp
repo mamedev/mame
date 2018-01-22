@@ -2,12 +2,13 @@
 // copyright-holders:Carl
 //TODO: determine when to switch modes and add single bit mode
 
+#include "emu.h"
 #include "pc_joy_sw.h"
 
-const device_type PC_MSSW_PAD = &device_creator<pc_mssw_pad_device>;
+DEFINE_DEVICE_TYPE(PC_MSSW_PAD, pc_mssw_pad_device, "mssw_pad", "Microsoft Sidewinder Pad")
 
 pc_mssw_pad_device::pc_mssw_pad_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
-	device_t(mconfig, PC_MSSW_PAD, "Microsoft Sidewinder Pad", tag, owner, clock, "mssw_pad", __FILE__),
+	device_t(mconfig, PC_MSSW_PAD, tag, owner, clock),
 	device_pc_joy_interface(mconfig, *this),
 	m_btn1(*this, "btn1"),
 	m_btn2(*this, "btn2"),

@@ -4,8 +4,20 @@
 <mamelayout version="2">
 
 	<element name="a_led">
-		<disk>
+		<disk state="0">
 			<color red="0.0" green="0.75" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.0" green="0.15" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="b_led">
+		<disk state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.15" green="0.0" blue="0.0" />
 		</disk>
 	</element>
 
@@ -25,10 +37,10 @@
 	<view name="Default Layout">
 		<!-- Black background -->
 		<bezel element="background">
-			<bounds left="34" top="60" right="341" bottom="130" />
+			<bounds left="34" top="60" right="341" bottom="160" />
 		</bezel>
 		<bezel name="sod_led" element="a_led">
-			<bounds left="46" right="56" top="90" bottom="100" />
+			<bounds left="46" top="90" right="56" bottom="100" />
 		</bezel>
 
 		<!-- DL1414 left -->
@@ -57,6 +69,56 @@
 		</bezel>
 		<bezel name="digit4" element="a_digit">
 			<bounds left="306" top="70" right="331" bottom="120" />
+		</bezel>
+
+		<bezel name="pb7" element="b_led">
+			<bounds left="65" top="140" right="75" bottom="150" />
+		</bezel>
+		<bezel name="pb6" element="b_led">
+			<bounds left="80" top="140" right="90" bottom="150" />
+		</bezel>
+		<bezel name="pb5" element="b_led">
+			<bounds left="95" top="140" right="105" bottom="150" />
+		</bezel>
+		<bezel name="pb4" element="b_led">
+			<bounds left="110" top="140" right="120" bottom="150" />
+		</bezel>
+		<bezel name="pb3" element="b_led">
+			<bounds left="125" top="140" right="135" bottom="150" />
+		</bezel>
+		<bezel name="pb2" element="b_led">
+			<bounds left="140" top="140" right="150" bottom="150" />
+		</bezel>
+		<bezel name="pb1" element="b_led">
+			<bounds left="155" top="140" right="165" bottom="150" />
+		</bezel>
+		<bezel name="pb0" element="b_led">
+			<bounds left="170" top="140" right="180" bottom="150" />
+		</bezel>
+
+		<bezel name="pa7" element="b_led">
+			<bounds left="185" top="140" right="195" bottom="150" />
+		</bezel>
+		<bezel name="pa6" element="b_led">
+			<bounds left="200" top="140" right="210" bottom="150" />
+		</bezel>
+		<bezel name="pa5" element="b_led">
+			<bounds left="215" top="140" right="225" bottom="150" />
+		</bezel>
+		<bezel name="pa4" element="b_led">
+			<bounds left="230" top="140" right="240" bottom="150" />
+		</bezel>
+		<bezel name="pa3" element="b_led">
+			<bounds left="245" top="140" right="255" bottom="150" />
+		</bezel>
+		<bezel name="pa2" element="b_led">
+			<bounds left="260" top="140" right="270" bottom="150" />
+		</bezel>
+		<bezel name="pa1" element="b_led">
+			<bounds left="275" top="140" right="285" bottom="150" />
+		</bezel>
+		<bezel name="pa0" element="b_led">
+			<bounds left="290" top="140" right="300" bottom="150" />
 		</bezel>
 
 	</view>

@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_EMU_DIRTC_H
+#define MAME_EMU_DIRTC_H
 
-#ifndef __DIRTC_H__
-#define __DIRTC_H__
+#pragma once
 
 
 
@@ -53,8 +53,8 @@ public:
 	bool has_battery() const { return rtc_battery_backed(); }
 
 protected:
-	static uint8_t convert_to_bcd(int val);
-	static int bcd_to_integer(uint8_t val);
+	static u8 convert_to_bcd(int val);
+	static int bcd_to_integer(u8 val);
 
 	void set_clock_register(int register, int value);
 	int get_clock_register(int register);
@@ -78,4 +78,4 @@ protected:
 typedef device_interface_iterator<device_rtc_interface> rtc_interface_iterator;
 
 
-#endif  /* __DIRTC_H__ */
+#endif // MAME_EMU_DIRTC_H

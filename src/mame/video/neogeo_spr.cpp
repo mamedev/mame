@@ -5,22 +5,20 @@
 
 #include "emu.h"
 #include "neogeo_spr.h"
+#include "screen.h"
+
 
 // pure virtual functions
-//const device_type NEOGEO_SPRITE_BASE = &device_creator<neosprite_base_device>;
+//const device_type NEOGEO_SPRITE_BASE = device_creator<neosprite_base_device>;
 
-/*
-neosprite_base_device::neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-    : device_t(mconfig, NEOGEO_SPRITE_BASE, "NeoGeo Sprites", tag, owner, clock, "neospritebase", __FILE__),
-    m_bppshift(4)
-{
-
-}
-*/
-
-neosprite_base_device::neosprite_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type)
-	: device_t(mconfig, type, "Neogeo Sprites", tag, owner, clock, "neosprite", __FILE__),
-	m_bppshift(4)
+neosprite_base_device::neosprite_base_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_bppshift(4)
 {
 }
 
@@ -409,7 +407,7 @@ void neosprite_base_device::draw_sprites(bitmap_rgb32 &bitmap, int scanline)
 
 			attr_and_code_offs = (sprite_number << 6) | (tile << 1);
 			attr = m_videoram_drawsource[attr_and_code_offs + 1];
-			code = ((attr << 12) & 0x70000) | m_videoram_drawsource[attr_and_code_offs];
+			code = ((attr << 12) & 0xf0000) | m_videoram_drawsource[attr_and_code_offs];
 
 			/* substitute auto animation bits */
 			if (!m_auto_animation_disabled)
@@ -648,10 +646,10 @@ void neosprite_base_device::set_pens(const pen_t* pens)
 /* regions          (alternatively I could add an additional size check in the draw routine, but that would be slower)           */
 /*********************************************************************************************************************************/
 
-const device_type NEOGEO_SPRITE_REGULAR = &device_creator<neosprite_regular_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_SPRITE_REGULAR, neosprite_regular_device, "neosprite_reg", "Neo-Geo Sprites (regular)")
 
 neosprite_regular_device::neosprite_regular_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: neosprite_base_device(mconfig, tag, owner, clock, NEOGEO_SPRITE_REGULAR)
+	: neosprite_base_device(mconfig, NEOGEO_SPRITE_REGULAR, tag, owner, clock)
 {
 }
 
@@ -696,11 +694,11 @@ inline void neosprite_regular_device::draw_pixel(int romaddr, uint32_t* dst, con
 /* for additional speed                                                                                                          */
 /*********************************************************************************************************************************/
 
-const device_type NEOGEO_SPRITE_OPTIMZIED = &device_creator<neosprite_optimized_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_SPRITE_OPTIMZIED, neosprite_optimized_device, "neosprite_opt", "Neo-Geo Sprites (optimized)")
 
 neosprite_optimized_device::neosprite_optimized_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: neosprite_base_device(mconfig, tag, owner, clock, NEOGEO_SPRITE_OPTIMZIED),
-	m_spritegfx8(nullptr)
+	: neosprite_base_device(mconfig, NEOGEO_SPRITE_OPTIMZIED, tag, owner, clock)
+	, m_spritegfx8(nullptr)
 {
 }
 
@@ -772,11 +770,11 @@ inline void neosprite_optimized_device::draw_pixel(int romaddr, uint32_t* dst, c
 /* and uploads the zoom table.  The additional videoram buffering is a guess because 'hammer' is very glitchy without it         */
 /*********************************************************************************************************************************/
 
-const device_type NEOGEO_SPRITE_MIDAS = &device_creator<neosprite_midas_device>;
+DEFINE_DEVICE_TYPE(NEOGEO_SPRITE_MIDAS, neosprite_midas_device, "midassprite", "MIDAS Sprites")
 
 
 neosprite_midas_device::neosprite_midas_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: neosprite_base_device(mconfig, tag, owner, clock, NEOGEO_SPRITE_MIDAS)
+	: neosprite_base_device(mconfig, NEOGEO_SPRITE_MIDAS, tag, owner, clock)
 {
 	m_bppshift = 8;
 }

@@ -1,14 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-#pragma once
+#ifndef MAME_INCLUDES_VIXEN_H
+#define MAME_INCLUDES_VIXEN_H
 
-#ifndef __VIXEN__
-#define __VIXEN__
+#pragma once
 
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8155.h"
 #include "machine/i8251.h"
+#include "machine/timer.h"
 #include "bus/ieee488/ieee488.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
@@ -75,9 +76,10 @@ public:
 	DECLARE_READ8_MEMBER(oprom_r);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void vixen(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<fd1797_t> m_fdc;
+	required_device<fd1797_device> m_fdc;
 	required_device<i8155_device> m_io_i8155;
 	required_device<i8251_device> m_usart;
 	required_device<discrete_sound_device> m_discrete;
@@ -129,4 +131,4 @@ private:
 	bool m_256;
 };
 
-#endif
+#endif // MAME_INCLUDES_VIXEN_H

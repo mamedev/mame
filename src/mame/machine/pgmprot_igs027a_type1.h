@@ -1,13 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi, Xing Xing
+#include "includes/pgm.h"
 
 class pgm_arm_type1_state : public pgm_state
 {
 public:
 	pgm_arm_type1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag),
-			m_arm7_shareram(*this, "arm7_shareram"),
-			m_prot(*this, "prot") {
+		: pgm_state(mconfig, type, tag)
+		, m_arm7_shareram(*this, "arm7_shareram")
+		, m_prot(*this, "prot")
+	{
 		m_curslots = 0;
 		m_puzzli_54_trigger = 0;
 	}
@@ -124,11 +126,10 @@ public:
 
 
 	int puzzli2_take_leveldata_value(uint8_t datvalue);
+	void pgm_arm_type1_sim(machine_config &config);
+	void pgm_arm_type1_cave(machine_config &config);
+	void pgm_arm_type1(machine_config &config);
 };
-
-MACHINE_CONFIG_EXTERN( pgm_arm_type1 );
-MACHINE_CONFIG_EXTERN( pgm_arm_type1_sim );
-MACHINE_CONFIG_EXTERN( pgm_arm_type1_cave );
 
 INPUT_PORTS_EXTERN( sango );
 INPUT_PORTS_EXTERN( sango_ch );

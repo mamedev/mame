@@ -9,10 +9,9 @@
 #include "sound_module.h"
 #include "modules/osdmodule.h"
 
-#if defined(OSD_WINDOWS)
+#if defined(OSD_WINDOWS) || defined(OSD_UWP)
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #include <wrl/client.h>
@@ -21,8 +20,6 @@
 #include <xaudio2.h>
 
 #undef interface
-#undef min
-#undef max
 
 // stdlib includes
 #include <mutex>
@@ -123,9 +120,6 @@ public:
 typedef std::unique_ptr<IXAudio2MasteringVoice, xaudio2_custom_deleter> mastering_voice_ptr;
 typedef std::unique_ptr<IXAudio2SourceVoice, xaudio2_custom_deleter> src_voice_ptr;
 
-// Typedef for pointer to XAudio2Create
-typedef HRESULT (WINAPI *xaudio2_create_ptr)(IXAudio2 **, uint32_t, XAUDIO2_PROCESSOR);
-
 //============================================================
 //  Helper classes
 //============================================================
@@ -205,9 +199,9 @@ private:
 	uint32_t                           m_overflows;
 	uint32_t                           m_underflows;
 	BOOL                             m_in_underflow;
-	osd::dynamic_module::ptr         m_xaudio_dll;
-	xaudio2_create_ptr               XAudio2Create;
 	BOOL                             m_initialized;
+	OSD_DYNAMIC_API(xaudio2, "dwrite.dll");
+	OSD_DYNAMIC_API_FN(xaudio2, HRESULT, WINAPI, XAudio2Create, IXAudio2 **, uint32_t, XAUDIO2_PROCESSOR);
 
 public:
 	sound_xaudio2() :
@@ -228,10 +222,11 @@ public:
 		m_overflows(0),
 		m_underflows(0),
 		m_in_underflow(FALSE),
-		XAudio2Create(nullptr),
 		m_initialized(FALSE)
 	{
 	}
+
+	virtual ~sound_xaudio2() { }
 
 	bool probe() override;
 	int init(osd_options const &options) override;
@@ -266,13 +261,7 @@ private:
 
 bool sound_xaudio2::probe()
 {
-	m_xaudio_dll = osd::dynamic_module::open({ "XAudio2_9.dll", "XAudio2_8.dll" });
-	if (m_xaudio_dll == nullptr)
-		return false;
-
-	XAudio2Create = m_xaudio_dll->bind<xaudio2_create_ptr>("XAudio2Create");
-
-	return (XAudio2Create ? true : false);
+	return OSD_DYNAMIC_API_TEST(XAudio2Create);
 }
 
 //============================================================
@@ -289,14 +278,14 @@ int sound_xaudio2::init(osd_options const &options)
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
 	// Make sure our XAudio2Create entrypoint is bound
-	if (!XAudio2Create)
+	if (!OSD_DYNAMIC_API_TEST(XAudio2Create))
 	{
 		osd_printf_error("Could not find XAudio2. Please try to reinstall DirectX runtime package.\n");
 		return 1;
 	}
 
 	// Create the IXAudio2 object
-	HR_GOERR(this->XAudio2Create(m_xAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR));
+	HR_GOERR(OSD_DYNAMIC_CALL(XAudio2Create, m_xAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR));
 
 	// make a format description for what we want
 	format.wBitsPerSample = 16;

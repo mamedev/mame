@@ -199,30 +199,53 @@ GFX check (these don't explicitly fails):
 */
 #include "emu.h"
 #include "machine/mega32x.h"
+#include "machine/timer.h"
 #include "sound/volt_reg.h"
 
 
-const device_type SEGA_32X_NTSC = &device_creator<sega_32x_ntsc_device>;
-const device_type SEGA_32X_PAL = &device_creator<sega_32x_pal_device>;
+// Fifa96 needs the CPUs swapped for the gameplay to enter due to some race conditions
+// when using the DRC core.  Needs further investigation, the non-DRC core works either
+// way
+#define _32X_SWAP_MASTER_SLAVE_HACK
+#define _32X_COMMS_PORT_SYNC 0
+#define MAX_HPOSITION 480
+/* need to make some pwm stuff part of device */
+#define PWM_FIFO_SIZE m_pwm_tm_reg // guess, Marsch calls this register as FIFO width
+#define PWM_CLOCK m_32x_pal ? ((MASTER_CLOCK_PAL*3) / 7) : ((MASTER_CLOCK_NTSC*3) / 7)
 
-sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+
+
+#define SH2_VRES_IRQ_LEVEL 14
+#define SH2_VINT_IRQ_LEVEL 12
+#define SH2_HINT_IRQ_LEVEL 10
+#define SH2_CINT_IRQ_LEVEL 8
+#define SH2_PINT_IRQ_LEVEL 6
+
+#define MASTER_CLOCK_NTSC 53693175
+#define MASTER_CLOCK_PAL  53203424
+
+
+DEFINE_DEVICE_TYPE(SEGA_32X_NTSC, sega_32x_ntsc_device, "sega_32x_ntsc", "Sega 32X (NTSC)")
+DEFINE_DEVICE_TYPE(SEGA_32X_PAL,  sega_32x_pal_device,  "sega_32x_pal",  "Sega 32X (PAL)")
+
+sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_sh2_shared(*this, "sh2_shared")
 	, m_master_cpu(*this, "32x_master_sh2")
 	, m_slave_cpu(*this, "32x_slave_sh2")
 	, m_ldac(*this, "ldac")
 	, m_rdac(*this, "rdac")
-	, m_sh2_shared(*this, "sh2_shared")
 	, m_palette(*this, finder_base::DUMMY_TAG)
 {
 }
 
 sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sega_32x_device(mconfig, SEGA_32X_NTSC, "sega_32x_ntsc", tag, owner, clock, "sega_32x_ntsc", __FILE__)
+	: sega_32x_device(mconfig, SEGA_32X_NTSC, tag, owner, clock)
 {
 }
 
 sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sega_32x_device(mconfig, SEGA_32X_PAL, "sega_32x_pal", tag, owner, clock, "sega_32x_pal", __FILE__)
+	: sega_32x_device(mconfig, SEGA_32X_PAL, tag, owner, clock)
 {
 }
 
@@ -366,7 +389,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15106_w )
 		{
 			// install the game rom in the normal 0x000000-0x03fffff space used by the genesis - this allows VDP DMA operations to work as they have to be from this area or RAM
 			// it should also UNMAP the banked rom area...
-			space.install_rom(0x0000100, 0x03fffff, space.machine().root_device().memregion("gamecart")->base() + 0x100);
+			space.install_rom(0x0000100, 0x03fffff, machine().root_device().memregion("gamecart")->base() + 0x100);
 		}
 		else
 		{
@@ -374,7 +397,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15106_w )
 
 			// this is actually blank / nop area
 			// we should also map the banked area back (we don't currently unmap it tho)
-			space.install_rom(0x0000100, 0x03fffff, space.machine().root_device().memregion("maincpu")->base()+0x100);
+			space.install_rom(0x0000100, 0x03fffff, machine().root_device().memregion("maincpu")->base()+0x100);
 		}
 
 		if((m_a15106_reg & 4) == 0) // clears the FIFO state
@@ -407,7 +430,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15106_w )
 
 READ16_MEMBER( sega_32x_device::_32x_dreq_common_r )
 {
-	address_space& _68kspace = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& _68kspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (offset)
 	{
@@ -436,10 +459,10 @@ READ16_MEMBER( sega_32x_device::_32x_dreq_common_r )
 		//  printf("reading FIFO!\n");
 
 			if (m_current_fifo_readblock == m_fifo_block_a && !m_fifo_block_a_full)
-				printf("Fifo block a isn't filled!\n");
+				logerror("Fifo block a isn't filled!\n");
 
 			if (m_current_fifo_readblock == m_fifo_block_b && !m_fifo_block_b_full)
-				printf("%08x Fifo block b isn't filled!\n",space.device().safe_pc());
+				logerror("%s Fifo block b isn't filled!\n", machine().describe_context());
 
 
 			if (m_current_fifo_read_pos==4)
@@ -478,7 +501,7 @@ READ16_MEMBER( sega_32x_device::_32x_dreq_common_r )
 
 WRITE16_MEMBER( sega_32x_device::_32x_dreq_common_w )
 {
-	address_space& _68kspace = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& _68kspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	switch (offset)
 	{
@@ -666,12 +689,12 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15100_w )
 		if (data & 0x01)
 		{
 			m_32x_adapter_enabled = 1;
-			space.install_rom(0x0880000, 0x08fffff, space.machine().root_device().memregion("gamecart")->base()); // 'fixed' 512kb rom bank
+			space.install_rom(0x0880000, 0x08fffff, machine().root_device().memregion("gamecart")->base()); // 'fixed' 512kb rom bank
 
 			space.install_read_bank(0x0900000, 0x09fffff, "bank12"); // 'bankable' 1024kb rom bank
-			space.machine().root_device().membank("bank12")->set_base(space.machine().root_device().memregion("gamecart")->base()+((m_32x_68k_a15104_reg&0x3)*0x100000) );
+			machine().root_device().membank("bank12")->set_base(machine().root_device().memregion("gamecart")->base()+((m_32x_68k_a15104_reg&0x3)*0x100000) );
 
-			space.install_rom(0x0000000, 0x03fffff, space.machine().root_device().memregion("32x_68k_bios")->base());
+			space.install_rom(0x0000000, 0x03fffff, machine().root_device().memregion("32x_68k_bios")->base());
 
 			/* VDP area */
 			space.install_readwrite_handler(0x0a15180, 0x0a1518b, read16_delegate(FUNC(sega_32x_device::_32x_common_vdp_regs_r), this),     write16_delegate(FUNC(sega_32x_device::_32x_common_vdp_regs_w),this)); // common / shared VDP regs
@@ -681,14 +704,14 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15100_w )
 
 
 
-			space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_w),this)); // h interrupt vector
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_w),this)); // h interrupt vector
 		}
 		else
 		{
 			m_32x_adapter_enabled = 0;
 
-			space.install_rom(0x0000000, 0x03fffff, space.machine().root_device().memregion("gamecart")->base());
-			space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_w),this)); // h interrupt vector
+			space.install_rom(0x0000000, 0x03fffff, machine().root_device().memregion("gamecart")->base());
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x000070, 0x000073, read16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_r),this), write16_delegate(FUNC(sega_32x_device::_32x_68k_m_hint_vector_w),this)); // h interrupt vector
 		}
 	}
 
@@ -755,7 +778,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15104_w )
 		m_32x_68k_a15104_reg = (m_32x_68k_a15104_reg & 0x00ff) | (data & 0xff00);
 	}
 
-	space.machine().root_device().membank("bank12")->set_base(space.machine().root_device().memregion("gamecart")->base()+((m_32x_68k_a15104_reg&0x3)*0x100000) );
+	machine().root_device().membank("bank12")->set_base(machine().root_device().memregion("gamecart")->base()+((m_32x_68k_a15104_reg&0x3)*0x100000) );
 }
 
 /**********************************************************************************************/
@@ -770,7 +793,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_a15104_w )
 // reads
 READ16_MEMBER( sega_32x_device::_32x_68k_m_commsram_r )
 {
-	if (_32X_COMMS_PORT_SYNC) space.machine().scheduler().synchronize();
+	if (_32X_COMMS_PORT_SYNC) machine().scheduler().synchronize();
 	return m_commsram[offset];
 }
 
@@ -778,7 +801,7 @@ READ16_MEMBER( sega_32x_device::_32x_68k_m_commsram_r )
 WRITE16_MEMBER( sega_32x_device::_32x_68k_m_commsram_w )
 {
 	COMBINE_DATA(&m_commsram[offset]);
-	if (_32X_COMMS_PORT_SYNC) space.machine().scheduler().synchronize();
+	if (_32X_COMMS_PORT_SYNC) machine().scheduler().synchronize();
 }
 
 /**********************************************************************************************/
@@ -1046,7 +1069,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_common_vdp_regs_w )
 {
 	// what happens if the z80 accesses it, what authorization do we use? which address space do we get?? the z80 *can* write here and to the framebuffer via the window
 
-	address_space& _68kspace = space.machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& _68kspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (&space!= &_68kspace)
 	{
@@ -1749,7 +1772,7 @@ const rom_entry *sega_32x_device::device_rom_region() const
 #define _32X_INTERLEAVE_LEVEL \
 	MCFG_QUANTUM_TIME(attotime::from_hz(1800000))
 
-static MACHINE_CONFIG_FRAGMENT( _32x_ntsc )
+MACHINE_CONFIG_START(sega_32x_ntsc_device::device_add_mconfig)
 
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
 	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
@@ -1779,7 +1802,7 @@ static MACHINE_CONFIG_FRAGMENT( _32x_ntsc )
 	_32X_INTERLEAVE_LEVEL
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( _32x_pal )
+MACHINE_CONFIG_START(sega_32x_pal_device::device_add_mconfig)
 
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
 	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
@@ -1808,18 +1831,6 @@ static MACHINE_CONFIG_FRAGMENT( _32x_pal )
 
 	_32X_INTERLEAVE_LEVEL
 MACHINE_CONFIG_END
-
-
-
-machine_config_constructor sega_32x_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( _32x_ntsc );
-}
-
-machine_config_constructor sega_32x_pal_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( _32x_pal );
-}
 
 
 void sega_32x_device::device_start()
@@ -1856,7 +1867,7 @@ void sega_32x_device::device_reset()
 	// start in a reset state
 	m_sh2_are_running = 0;
 
-	m_32x_a1518a_reg = 0x00; // inital value
+	m_32x_a1518a_reg = 0x00; // initial value
 	m_32x_68k_a15104_reg = 0x00;
 
 	m_32x_autofill_length = 0;

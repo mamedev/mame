@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_CGENIE_PARALLEL_JOYSTICK_H
+#define MAME_BUS_CGENIE_PARALLEL_JOYSTICK_H
+
 #pragma once
 
-#ifndef __CGENIE_PARALLEL_JOYSTICK_H__
-#define __CGENIE_PARALLEL_JOYSTICK_H__
-
-#include "emu.h"
 #include "parallel.h"
 
 
@@ -21,7 +20,7 @@
 
 // ======================> cgenie_joystick_device
 
-class cgenie_joystick_device : public device_t, public device_parallel_interface
+class cgenie_joystick_device : public device_t, public device_cg_parallel_interface
 {
 public:
 	// construction/destruction
@@ -43,6 +42,6 @@ private:
 };
 
 // device type definition
-extern const device_type CGENIE_JOYSTICK;
+DECLARE_DEVICE_TYPE(CGENIE_JOYSTICK, cgenie_joystick_device)
 
-#endif // __CGENIE_PARALLEL_JOYSTICK_H__
+#endif // MAME_BUS_CGENIE_PARALLEL_JOYSTICK_H

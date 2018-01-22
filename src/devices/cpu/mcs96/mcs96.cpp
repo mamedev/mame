@@ -12,9 +12,10 @@
 #include "debugger.h"
 #include "mcs96.h"
 
-mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int data_width, const char *shortname, const char *source) :
-	cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	program_config("program", ENDIANNESS_LITTLE, data_width, 16), program(nullptr), direct(nullptr), icount(0), bcount(0), inst_state(0), cycles_scaling(0), pending_irq(0),
+mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_width) :
+	cpu_device(mconfig, type, tag, owner, clock),
+	program_config("program", ENDIANNESS_LITTLE, data_width, 16),
+	program(nullptr), direct(nullptr), icount(0), bcount(0), inst_state(0), cycles_scaling(0), pending_irq(0),
 	PC(0), PPC(0), PSW(0), OP1(0), OP2(0), OP3(0), OPI(0), TMP(0), irq_requested(false)
 {
 }
@@ -22,7 +23,7 @@ mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, cons
 void mcs96_device::device_start()
 {
 	program = &space(AS_PROGRAM);
-	direct = &program->direct();
+	direct = program->direct<0>();
 	m_icountptr = &icount;
 
 	state_add(STATE_GENPC,     "GENPC",     PC).noshow();
@@ -115,9 +116,11 @@ void mcs96_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-const address_space_config *mcs96_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector mcs96_device::memory_space_config() const
 {
-	return (spacenum == AS_PROGRAM) ? &program_config : nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &program_config)
+	};
 }
 
 void mcs96_device::state_import(const device_state_entry &entry)
@@ -151,276 +154,6 @@ void mcs96_device::state_string_export(const device_state_entry &entry, std::str
 						PSW & 0x01 ? '0' : '.');
 		break;
 	}
-}
-
-std::string mcs96_device::regname(uint8_t reg)
-{
-	char res[32];
-	switch(reg) {
-	case 0x18:
-		strcpy(res, "sp");
-		break;
-
-	case 0x19:
-		strcpy(res, "sph");
-		break;
-
-	default:
-		sprintf(res, "%02x", reg);
-		break;
-	}
-	return res;
-}
-
-offs_t mcs96_device::disasm_generic(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *entries)
-{
-	bool prefix_fe = false;
-	int off = 0;
-	if(oprom[0] == 0xfe && entries[oprom[1]].opcode_fe) {
-		prefix_fe = true;
-		pc++;
-		off++;
-		oprom++;
-	}
-	const disasm_entry &e = entries[oprom[0]];
-	uint32_t flags = e.flags | DASMFLAG_SUPPORTED;
-	util::stream_format(stream, "%s", prefix_fe ? e.opcode_fe : e.opcode);
-
-	switch(e.mode) {
-	case DASM_none:
-		flags |= 1;
-		break;
-
-	case DASM_nop_2:
-		util::stream_format(stream, " %02x", oprom[1]);
-		flags |= 2;
-		break;
-
-	case DASM_rel8: {
-		int delta = oprom[1];
-		if(delta & 0x80)
-			delta -= 0x100;
-		util::stream_format(stream, " %04x", (pc+2+delta) & 0xffff);
-		flags |= 2;
-		break;
-	}
-
-	case DASM_rel11: {
-		int delta = ((oprom[0] << 8) | oprom[1]) & 0x7ff;
-		if(delta & 0x400)
-			delta -= 0x800;
-		util::stream_format(stream, " %04x", (pc+2+delta) & 0xffff);
-		flags |= 2;
-		break;
-	}
-
-	case DASM_rel16: {
-		int delta = oprom[1] | (oprom[2] << 8);
-		util::stream_format(stream, " %04x", (pc+3+delta) & 0xffff);
-		flags |= 3;
-		break;
-	}
-
-	case DASM_rrel8: {
-		int delta = oprom[2];
-		if(delta & 0x80)
-			delta -= 0x100;
-		util::stream_format(stream, " %s, %04x", regname(oprom[1]), (pc+3+delta) & 0xffff);
-		flags |= 3;
-		break;
-	}
-
-	case DASM_brrel8: {
-		int delta = oprom[2];
-		if(delta & 0x80)
-			delta -= 0x100;
-		util::stream_format(stream, " %d, %s, %04x", oprom[0] & 7, regname(oprom[1]), (pc+3+delta) & 0xffff);
-		flags |= 3;
-		break;
-	}
-
-	case DASM_direct_1:
-		util::stream_format(stream, " %s", regname(oprom[1]));
-		flags |= 2;
-		break;
-
-	case DASM_direct_2:
-		util::stream_format(stream, " %s, %s", regname(oprom[2]), regname(oprom[1]));
-		flags |= 3;
-		break;
-
-	case DASM_direct_3:
-		util::stream_format(stream, " %s, %s, %s", regname(oprom[3]), regname(oprom[2]), regname(oprom[1]));
-		flags |= 4;
-		break;
-
-	case DASM_immed_1b:
-		util::stream_format(stream, " #%02x", oprom[1]);
-		flags |= 2;
-		break;
-
-	case DASM_immed_2b:
-		util::stream_format(stream, " %s, #%02x", regname(oprom[2]), oprom[1]);
-		flags |= 3;
-		break;
-
-	case DASM_immed_or_reg_2b:
-		if(oprom[1] >= 0x10)
-			util::stream_format(stream, " %s, %s", regname(oprom[2]), regname(oprom[1]));
-		else
-			util::stream_format(stream, " %s, #%02x", regname(oprom[2]), oprom[1]);
-		flags |= 3;
-		break;
-
-	case DASM_immed_3b:
-		util::stream_format(stream, " %s, %s, #%02x", regname(oprom[3]), regname(oprom[2]), oprom[1]);
-		flags |= 4;
-		break;
-
-	case DASM_immed_1w:
-		util::stream_format(stream, " #%02x%02x", oprom[2], oprom[1]);
-		flags |= 3;
-		break;
-
-	case DASM_immed_2w:
-		util::stream_format(stream, " %s, #%02x%02x", regname(oprom[3]), oprom[2], oprom[1]);
-		flags |= 4;
-		break;
-
-	case DASM_immed_3w:
-		util::stream_format(stream, " %s, %s, #%02x%02x", regname(oprom[4]), regname(oprom[3]), oprom[2], oprom[1]);
-		flags |= 5;
-		break;
-
-	case DASM_indirect_1n:
-		util::stream_format(stream, " [%s]", regname(oprom[1]));
-		flags |= 2;
-		break;
-
-	case DASM_indirect_1:
-		if(oprom[1] & 0x01) {
-			util::stream_format(stream, " [%s]+", regname(oprom[1]-1));
-			flags |= 2;
-		} else {
-			util::stream_format(stream, " [%s]", regname(oprom[1]));
-			flags |= 2;
-		}
-		break;
-
-	case DASM_indirect_2:
-		if(oprom[1] & 0x01) {
-			util::stream_format(stream, " %s, [%s]+", regname(oprom[2]), regname(oprom[1]-1));
-			flags |= 3;
-		} else {
-			util::stream_format(stream, " %s, [%s]", regname(oprom[2]), regname(oprom[1]));
-			flags |= 3;
-		}
-		break;
-
-	case DASM_indirect_3:
-		if(oprom[1] & 0x01) {
-			util::stream_format(stream, " %s, %s, [%s]+", regname(oprom[3]), regname(oprom[2]), regname(oprom[1]-1));
-			flags |= 4;
-		} else {
-			util::stream_format(stream, " %s, %s, [%s]", regname(oprom[3]), regname(oprom[2]), regname(oprom[1]));
-			flags |= 4;
-		}
-		break;
-
-	case DASM_indexed_1:
-		if(oprom[1] & 0x01) {
-			if(oprom[1] == 0x01)
-				util::stream_format(stream, " %02x%02x", oprom[3], oprom[2]);
-			else
-				util::stream_format(stream, " %02x%02x[%s]", oprom[3], oprom[2], regname(oprom[1]-1));
-			flags |= 4;
-		} else {
-			int delta = oprom[2];
-			if(delta & 0x80)
-				delta -= 0x100;
-			if(oprom[1] == 0x00) {
-				if(delta < 0)
-					util::stream_format(stream, " %04x", delta & 0xffff);
-				else
-					util::stream_format(stream, " %02x", delta);
-			} else {
-				if(delta < 0)
-					util::stream_format(stream, " -%02x[%s]", -delta, regname(oprom[1]));
-				else
-					util::stream_format(stream, " %02x[%s]", delta, regname(oprom[1]));
-			}
-			flags |= 3;
-		}
-		break;
-
-	case DASM_indexed_2:
-		if(oprom[1] & 0x01) {
-			if(oprom[1] == 0x01)
-				util::stream_format(stream, " %s, %02x%02x", regname(oprom[4]), oprom[3], oprom[2]);
-			else
-				util::stream_format(stream, " %s, %02x%02x[%s]", regname(oprom[4]), oprom[3], oprom[2], regname(oprom[1]-1));
-			flags |= 5;
-		} else {
-			int delta = oprom[2];
-			if(delta & 0x80)
-				delta -= 0x100;
-			if(oprom[1] == 0x00) {
-				if(delta < 0)
-					util::stream_format(stream, " %s, %04x", regname(oprom[3]), delta & 0xffff);
-				else
-					util::stream_format(stream, " %s, %02x", regname(oprom[3]), delta);
-			} else {
-				if(delta < 0)
-					util::stream_format(stream, " %s, -%02x[%s]", regname(oprom[3]), -delta, regname(oprom[1]));
-				else
-					util::stream_format(stream, " %s, %02x[%s]", regname(oprom[3]), delta, regname(oprom[1]));
-			}
-			flags |= 4;
-		}
-		break;
-
-	case DASM_indexed_3:
-		if(oprom[1] & 0x01) {
-			if(oprom[1] == 0x01)
-				util::stream_format(stream, " %s, %s, %02x%02x", regname(oprom[5]),  regname(oprom[4]), oprom[3], oprom[2]);
-			else
-				util::stream_format(stream, " %s, %s, %02x%02x[%s]", regname(oprom[5]), regname(oprom[4]), oprom[3], oprom[2], regname(oprom[1]-1));
-			flags |= 6;
-		} else {
-			int delta = oprom[2];
-			if(delta & 0x80)
-				delta -= 0x100;
-			if(oprom[1] == 0x00) {
-				if(delta < 0)
-					util::stream_format(stream, " %s, %s, %04x", regname(oprom[4]), regname(oprom[3]), delta & 0xffff);
-				else
-					util::stream_format(stream, " %s, %s, %02x", regname(oprom[4]), regname(oprom[3]), delta);
-			} else {
-				if(delta < 0)
-					util::stream_format(stream, " %s, %s, -%02x[%s]", regname(oprom[4]), regname(oprom[3]), -delta, regname(oprom[1]));
-				else
-					util::stream_format(stream, " %s, %s, %02x[%s]", regname(oprom[4]), regname(oprom[3]), delta, regname(oprom[1]));
-			}
-			flags |= 5;
-		}
-		break;
-
-	default:
-		fprintf(stderr, "Unhandled dasm mode %d\n", e.mode);
-		abort();
-	};
-
-	return flags+off;
-}
-
-uint32_t mcs96_device::disasm_min_opcode_bytes() const
-{
-	return 1;
-}
-
-uint32_t mcs96_device::disasm_max_opcode_bytes() const
-{
-	return 7;
 }
 
 void mcs96_device::io_w8(uint8_t adr, uint8_t data)

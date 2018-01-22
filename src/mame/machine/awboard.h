@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert,Andreas Naive
-#ifndef _AWBOARD_H_
-#define _AWBOARD_H_
+#ifndef MAME_MACHINE_AWBOARD_H
+#define MAME_MACHINE_AWBOARD_H
+
+#pragma once
 
 #include "naomig1.h"
 
@@ -57,12 +59,12 @@ private:
 	static const int permutation_table[4][16];
 	static const sbox_set sboxes_table[4];
 	static uint16_t decrypt(uint16_t cipherText, uint32_t address, const uint32_t key);
-	uint16_t decrypt16(uint32_t address) { return decrypt(m_region->u16(address), address, rombd_key); }
+	uint16_t decrypt16(uint32_t address) { return decrypt(m_region->as_u16(address), address, rombd_key); }
 
 	void set_key();
 	void recalc_dma_offset(int mode);
 };
 
-extern const device_type AW_ROM_BOARD;
+DECLARE_DEVICE_TYPE(AW_ROM_BOARD, aw_rom_board)
 
-#endif
+#endif // MAME_MACHINE_AWBOARD_H

@@ -90,12 +90,14 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/tmp68301.h"
-#include "machine/msm6242.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
-#include "sound/ym2413.h"
+#include "machine/msm6242.h"
+#include "machine/tmp68301.h"
 #include "sound/okim6295.h"
+#include "sound/ym2413.h"
+#include "screen.h"
+#include "speaker.h"
 
 class joystand_state : public driver_device
 {
@@ -201,6 +203,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(joystand_interrupt);
+	void joystand(machine_config &config);
 };
 
 const rgb_t joystand_state::BG15_TRANSPARENT = 0x99999999;
@@ -459,7 +462,7 @@ static ADDRESS_MAP_START( joystand_map, AS_PROGRAM, 16, joystand_state )
 	AM_RANGE(0x600000, 0x603fff) AM_RAM_WRITE(bg2_w) AM_SHARE("bg2_ram")
 	AM_RANGE(0x604000, 0x605fff) AM_RAM_WRITE(bg1_w) AM_SHARE("bg1_ram")
 	AM_RANGE(0x606000, 0x607fff) AM_RAM_WRITE(bg15_1_w) AM_SHARE("bg15_1_ram") // r5g5b5 200x200 tile-based
-	AM_RANGE(0x608000, 0x609fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x608000, 0x609fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x60c000, 0x60c003) AM_RAM AM_SHARE("scroll") // write
 	AM_RANGE(0x60c00c, 0x60c00d) AM_RAM AM_SHARE("enable") // write
 
@@ -577,7 +580,7 @@ INTERRUPT_GEN_MEMBER(joystand_state::joystand_interrupt)
 	m_tmp68301->external_interrupt_1();
 }
 
-static MACHINE_CONFIG_START( joystand, joystand_state )
+MACHINE_CONFIG_START(joystand_state::joystand)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // !! TMP68301 !!
@@ -586,6 +589,7 @@ static MACHINE_CONFIG_START( joystand, joystand_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_CPU("maincpu")
 	MCFG_TMP68301_IN_PARALLEL_CB(READ16(joystand_state, eeprom_r))
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(joystand_state, eeprom_w))
 
@@ -608,7 +612,7 @@ static MACHINE_CONFIG_START( joystand, joystand_state )
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, OKIM6295_PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// cart
@@ -684,4 +688,4 @@ ROM_START( joystand )
 	ROM_LOAD( "jsp-xct.ic5",   0x000, 0x117, NO_DUMP )
 ROM_END
 
-GAME( 1997, joystand, 0, joystand, joystand, driver_device, 0, ROT0, "Yuvo", "Joy Stand Private", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, joystand, 0, joystand, joystand, joystand_state, 0, ROT0, "Yuvo", "Joy Stand Private", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

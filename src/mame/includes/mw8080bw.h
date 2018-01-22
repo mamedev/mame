@@ -8,10 +8,12 @@
 ****************************************************************************/
 
 #include "machine/mb14241.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "sound/sn76477.h"
 #include "sound/samples.h"
+#include "screen.h"
 
 
 #define MW8080BW_MASTER_CLOCK             (19968000.0)
@@ -91,8 +93,9 @@ public:
 	std::unique_ptr<uint8_t[]> m_scattered_colorram;
 	std::unique_ptr<uint8_t[]> m_scattered_colorram2;
 
-	/* timer */
+	/* timers */
 	emu_timer   *m_interrupt_timer;
+	emu_timer   *m_maze_tone_timer;
 
 	/* other devices */
 	optional_device<samples_device> m_samples;
@@ -168,7 +171,7 @@ public:
 	uint32_t screen_update_spcenctr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_invaders(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void screen_eof_phantom2(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_phantom2);
 	TIMER_CALLBACK_MEMBER(maze_tone_timing_timer_callback);
 	TIMER_CALLBACK_MEMBER(mw8080bw_interrupt_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(spcenctr_strobe_timer_callback);
@@ -205,6 +208,50 @@ public:
 	void mw8080bw_start_interrupt_timer(  );
 	uint8_t tornbase_get_cabinet_type();
 	int invaders_is_cabinet_cocktail();
+	void blueshrk(machine_config &config);
+	void blueshrk_audio(machine_config &config);
+	void boothill(machine_config &config);
+	void boothill_audio(machine_config &config);
+	void bowler(machine_config &config);
+	void bowler_audio(machine_config &config);
+	void checkmat(machine_config &config);
+	void checkmat_audio(machine_config &config);
+	void clowns(machine_config &config);
+	void clowns_audio(machine_config &config);
+	void desertgu(machine_config &config);
+	void desertgu_audio(machine_config &config);
+	void dogpatch(machine_config &config);
+	void dogpatch_audio(machine_config &config);
+	void dplay(machine_config &config);
+	void dplay_audio(machine_config &config);
+	void gmissile(machine_config &config);
+	void gmissile_audio(machine_config &config);
+	void gunfight(machine_config &config);
+	void gunfight_audio(machine_config &config);
+	void invad2ct(machine_config &config);
+	void invad2ct_audio(machine_config &config);
+	void invaders(machine_config &config);
+	void invaders_audio(machine_config &config);
+	void invaders_samples_audio(machine_config &config);
+	void m4(machine_config &config);
+	void m4_audio(machine_config &config);
+	void maze(machine_config &config);
+	void maze_audio(machine_config &config);
+	void mw8080bw_root(machine_config &config);
+	void phantom2(machine_config &config);
+	void phantom2_audio(machine_config &config);
+	void seawolf(machine_config &config);
+	void seawolf_audio(machine_config &config);
+	void shuffle(machine_config &config);
+	void shuffle_audio(machine_config &config);
+	void spacwalk(machine_config &config);
+	void spacwalk_audio(machine_config &config);
+	void spcenctr(machine_config &config);
+	void spcenctr_audio(machine_config &config);
+	void tornbase(machine_config &config);
+	void tornbase_audio(machine_config &config);
+	void zzzap(machine_config &config);
+	void zzzap_audio(machine_config &config);
 };
 
 
@@ -248,52 +295,5 @@ public:
 
 /*----------- defined in drivers/mw8080bw.c -----------*/
 
-MACHINE_CONFIG_EXTERN( mw8080bw_root );
-MACHINE_CONFIG_EXTERN( invaders );
 extern const internal_layout layout_invaders;
 
-/*----------- defined in audio/mw8080bw.c -----------*/
-
-
-MACHINE_CONFIG_EXTERN( seawolf_audio );
-
-MACHINE_CONFIG_EXTERN( gunfight_audio );
-
-MACHINE_CONFIG_EXTERN( tornbase_audio );
-
-MACHINE_CONFIG_EXTERN( zzzap_audio );
-
-MACHINE_CONFIG_EXTERN( maze_audio );
-
-MACHINE_CONFIG_EXTERN( boothill_audio );
-
-MACHINE_CONFIG_EXTERN( checkmat_audio );
-
-MACHINE_CONFIG_EXTERN( desertgu_audio );
-
-MACHINE_CONFIG_EXTERN( dplay_audio );
-
-MACHINE_CONFIG_EXTERN( gmissile_audio );
-
-MACHINE_CONFIG_EXTERN( m4_audio );
-
-MACHINE_CONFIG_EXTERN( clowns_audio );
-
-MACHINE_CONFIG_EXTERN( spacwalk_audio );
-
-MACHINE_CONFIG_EXTERN( shuffle_audio );
-
-MACHINE_CONFIG_EXTERN( dogpatch_audio );
-
-MACHINE_CONFIG_EXTERN( spcenctr_audio );
-
-MACHINE_CONFIG_EXTERN( phantom2_audio );
-
-MACHINE_CONFIG_EXTERN( bowler_audio );
-
-MACHINE_CONFIG_EXTERN( invaders_samples_audio );
-MACHINE_CONFIG_EXTERN( invaders_audio );
-
-MACHINE_CONFIG_EXTERN( blueshrk_audio );
-
-MACHINE_CONFIG_EXTERN( invad2ct_audio );

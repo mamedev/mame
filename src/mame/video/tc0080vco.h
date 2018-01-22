@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef __TC0080VCO_H__
-#define __TC0080VCO_H__
+#ifndef MAME_VIDEO_TC0080VCO_H
+#define MAME_VIDEO_TC0080VCO_H
+
+#pragma once
 
 class tc0080vco_device : public device_t
 {
 public:
 	tc0080vco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~tc0080vco_device() {}
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -28,10 +29,10 @@ public:
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority);
 	void set_fg0_debug(bool debug) { m_has_fg0 = debug ? 0 : 1; }
 
-	DECLARE_READ16_MEMBER( cram_0_r );
-	DECLARE_READ16_MEMBER( cram_1_r );
-	DECLARE_READ16_MEMBER( sprram_r );
-	DECLARE_READ16_MEMBER( scrram_r );
+	uint16_t cram_0_r(int offset);
+	uint16_t cram_1_r(int offset);
+	uint16_t sprram_r(int offset);
+	uint16_t scrram_r(int offset);
 	DECLARE_WRITE16_MEMBER( scrollram_w );
 	READ_LINE_MEMBER( flipscreen_r );
 	void postload();
@@ -82,7 +83,7 @@ private:
 	void bg1_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority );
 };
 
-extern const device_type TC0080VCO;
+DECLARE_DEVICE_TYPE(TC0080VCO, tc0080vco_device)
 
 #define MCFG_TC0080VCO_GFX_REGION(_region) \
 	tc0080vco_device::set_gfx_region(*device, _region);
@@ -99,4 +100,4 @@ extern const device_type TC0080VCO;
 #define MCFG_TC0080VCO_GFXDECODE(_gfxtag) \
 	tc0080vco_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
 
-#endif
+#endif // MAME_VIDEO_TC0080VCO_H

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Juergen Buchmueller
-#pragma once
+#ifndef MAME_CPU_Z180_Z180_H
+#define MAME_CPU_Z180_Z180_H
 
-#ifndef __Z180_H__
-#define __Z180_H__
+#pragma once
 
 #include "cpu/z80/z80daisy.h"
 
@@ -116,16 +116,23 @@ enum
 	Z180_TABLE_ex    /* cycles counts for taken jr/jp/call and interrupt latency (rst opcodes) */
 };
 
-#define Z180_IRQ0       0           /* Execute IRQ1 */
-#define Z180_IRQ1       1           /* Execute IRQ1 */
-#define Z180_IRQ2       2           /* Execute IRQ2 */
-
+// input lines
+enum {
+	Z180_INPUT_LINE_IRQ0,           /* Execute IRQ1 */
+	Z180_INPUT_LINE_IRQ1,           /* Execute IRQ1 */
+	Z180_INPUT_LINE_IRQ2,           /* Execute IRQ2 */
+	Z180_INPUT_LINE_DREQ0,          /* Start DMA0 */
+	Z180_INPUT_LINE_DREQ1           /* Start DMA1 */
+};
 
 class z180_device : public cpu_device, public z80_daisy_chain_interface
 {
 public:
 	// construction/destruction
 	z180_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+
+	bool get_tend0();
+	bool get_tend1();
 
 protected:
 	// device-level overrides
@@ -135,15 +142,15 @@ protected:
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 16; }
-	virtual uint32_t execute_input_lines() const override { return 3; }
+	virtual uint32_t execute_input_lines() const override { return 5; }
 	virtual uint32_t execute_default_irq_vector() const override { return 0xff; }
 	virtual void execute_run() override;
 	virtual void execute_burn(int32_t cycles) override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
-	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address) override;
+	virtual space_config_vector memory_space_config() const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -151,9 +158,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -181,9 +186,9 @@ private:
 	uint8_t   m_dma0_cnt;                       /* dma0 counter / divide by 20 */
 	uint8_t   m_dma1_cnt;                       /* dma1 counter / divide by 20 */
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_oprogram;
-	direct_read_data *m_odirect;
+	direct_read_data<0> *m_odirect;
 	address_space *m_iospace;
 	uint8_t   m_rtemp;
 	uint32_t  m_ioltemp;
@@ -195,6 +200,9 @@ private:
 	static const opcode_func s_z180ops[6][0x100];
 
 	inline void z180_mmu();
+	inline u8 RM(offs_t addr);
+	inline u8 IN(u16 port);
+	inline void OUT(u16 port, u8 value);
 	inline void RM16( offs_t addr, PAIR *r );
 	inline void WM16( offs_t addr, PAIR *r );
 	inline uint8_t ROP();
@@ -1766,11 +1774,9 @@ private:
 	void xycb_fd();
 	void xycb_fe();
 	void xycb_ff();
-
 };
 
 
-extern const device_type Z180;
+DECLARE_DEVICE_TYPE(Z180, z180_device)
 
-
-#endif /* __Z180_H__ */
+#endif // MAME_CPU_Z180_Z180_H

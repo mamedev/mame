@@ -181,7 +181,7 @@ struct delegate_traits
 	using static_func_type = _ReturnType(*)(_ClassType *, Params...);
 	using static_ref_func_type = _ReturnType(*)(_ClassType &, Params...);
 	using member_func_type = _ReturnType(_ClassType::*)(Params...);
-	using const_member_func_type = _ReturnType(_ClassType::*)(Params...) const;	
+	using const_member_func_type = _ReturnType(_ClassType::*)(Params...) const;
 };
 
 
@@ -196,7 +196,7 @@ struct delegate_traits
 
 // delegate_mfp is a class that wraps a generic member function pointer
 // in a static buffer, and can effectively recast itself back for later use;
-// it hides some of the gross details involved in copying artibtrary member
+// it hides some of the gross details involved in copying arbitrary member
 // function pointers around
 class delegate_mfp
 {
@@ -507,7 +507,7 @@ public:
 		m_raw_function(nullptr),
 		m_std_func(funcptr)
 	{
-		
+
 	}
 
 	// copy operator
@@ -552,7 +552,7 @@ public:
 	bool is_mfp() const { return !m_raw_mfp.isnull(); }
 
 	// late binding
-	void late_bind(delegate_late_bind &object) { bind((*m_latebinder)(object)); }
+	void late_bind(delegate_late_bind &object) { if(m_latebinder) bind((*m_latebinder)(object)); }
 
 protected:
 	// return the actual object (not the one we use for calling)
@@ -588,7 +588,7 @@ protected:
 	late_bind_func              m_latebinder;       // late binding helper
 	generic_static_func         m_raw_function;     // raw static function pointer
 	delegate_mfp                m_raw_mfp;          // raw member function pointer
-	functional_type             m_std_func;			// std::function pointer
+	functional_type             m_std_func;         // std::function pointer
 };
 
 

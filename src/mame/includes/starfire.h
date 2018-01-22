@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "sound/samples.h"
+#include "screen.h"
 
 
 #define STARFIRE_MASTER_CLOCK   (XTAL_20MHz)
@@ -70,4 +71,6 @@ public:
 	void get_pens(pen_t *pens);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	void fireone(machine_config &config);
+	void starfire(machine_config &config);
 };

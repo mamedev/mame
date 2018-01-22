@@ -15,19 +15,13 @@
 
 #include "emu.h"
 #include "pds30_30hr.h"
+#include "screen.h"
 
 #define XCEED30HR_SCREEN_NAME "x30hr_screen"
 #define XCEED30HR_ROM_REGION  "x30hr_rom"
 
 #define VRAM_SIZE   (0x100000)  // 1 MB VRAM - max mode is 1024x768 @ 8bpp
 
-MACHINE_CONFIG_FRAGMENT( xceed30hr )
-	MCFG_SCREEN_ADD( XCEED30HR_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_xceed30hr_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-MACHINE_CONFIG_END
 
 ROM_START( xceed30hr )
 	ROM_REGION(0x8000, XCEED30HR_ROM_REGION, 0)
@@ -38,18 +32,20 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PDS030_XCEED30HR = &device_creator<nubus_xceed30hr_device>;
+DEFINE_DEVICE_TYPE(PDS030_XCEED30HR, nubus_xceed30hr_device, "pd3_30hr", "Micron/XCEED Technology Color 30HR")
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_xceed30hr_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( xceed30hr );
-}
+MACHINE_CONFIG_START(nubus_xceed30hr_device::device_add_mconfig)
+	MCFG_SCREEN_ADD( XCEED30HR_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_xceed30hr_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+	MCFG_SCREEN_SIZE(1024,768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -69,21 +65,18 @@ const tiny_rom_entry *nubus_xceed30hr_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_xceed30hr_device::nubus_xceed30hr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, PDS030_XCEED30HR, "Micron/XCEED Technology Color 30HR", tag, owner, clock, "pd3_30hr", __FILE__),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+	nubus_xceed30hr_device(mconfig, PDS030_XCEED30HR, tag, owner, clock)
 {
-	m_assembled_tag = std::string(tag).append(":").append(XCEED30HR_SCREEN_NAME);
-	m_screen_tag = m_assembled_tag.c_str();
 }
 
-nubus_xceed30hr_device::nubus_xceed30hr_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+nubus_xceed30hr_device::nubus_xceed30hr_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	device_nubus_card_interface(mconfig, *this),
+	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
+	m_assembled_tag(util::string_format("%s:%s", tag, XCEED30HR_SCREEN_NAME))
 {
-	m_assembled_tag = std::string(tag).append(":").append(XCEED30HR_SCREEN_NAME);
-	m_screen_tag = m_assembled_tag.c_str();
+	static_set_screen(*this, m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -109,7 +102,7 @@ void nubus_xceed30hr_device::device_start()
 	m_nubus->install_device(slotspace+0x800000, slotspace+0xefffff, read32_delegate(FUNC(nubus_xceed30hr_device::xceed30hr_r), this), write32_delegate(FUNC(nubus_xceed30hr_device::xceed30hr_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 //-------------------------------------------------
@@ -137,7 +130,7 @@ void nubus_xceed30hr_device::device_timer(emu_timer &timer, device_timer_id tid,
 		raise_slot_irq();
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 /***************************************************************************
@@ -256,18 +249,18 @@ WRITE32_MEMBER( nubus_xceed30hr_device::xceed30hr_w )
 			break;
 
 		case 0x100000:
-//            printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
+//            logerror("%08x to DAC control %s\n", data, machine().describe_context());
 			m_clutoffs = (data&0xff);
 			m_count = 0;
 			break;
 
 		case 0x100001:
-//            printf("%08x to DAC data (PC=%x)\n", data, space.device().safe_pc());
+//            logerror("%08x to DAC data %s\n", data, machine().describe_context());
 			m_colors[m_count++] = (data & 0xff);
 
 			if (m_count == 3)
 			{
-//                printf("RAMDAC: color %02x = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
+//                logerror("RAMDAC: color %02x = %02x %02x %02x %s\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], machine().describe_context());
 				m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 				m_clutoffs++;
 				if (m_clutoffs > 255)
@@ -291,14 +284,14 @@ WRITE32_MEMBER( nubus_xceed30hr_device::xceed30hr_w )
 			break;
 
 		default:
-//            printf("xceed30hr_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//            logerror("xceed30hr_w: %08x @ %x, mask %08x %s\n", data, offset, mem_mask, machine().describe_context());
 			break;
 	}
 }
 
 READ32_MEMBER( nubus_xceed30hr_device::xceed30hr_r )
 {
-//    printf("xceed30hr_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, machine().device("maincpu")->safe_pc());
+//    logerror("xceed30hr_r: @ %x, mask %08x %s\n", offset, mem_mask, machine().describe_context());
 	if (offset == 0x80008)
 	{
 		m_toggle ^= 0x80;

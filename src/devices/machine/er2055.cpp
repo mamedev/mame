@@ -17,7 +17,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type ER2055 = &device_creator<er2055_device>;
+DEFINE_DEVICE_TYPE(ER2055, er2055_device, "er2055", "ER2055 EAROM")
 
 static ADDRESS_MAP_START( er2055_map, AS_PROGRAM, 8, er2055_device )
 	AM_RANGE(0x0000, 0x003f) AM_RAM
@@ -34,7 +34,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 er2055_device::er2055_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ER2055, "ER2055 EAROM", tag, owner, clock, "er2055", __FILE__),
+	: device_t(mconfig, ER2055, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
 		m_region(*this, DEVICE_SELF),
@@ -65,9 +65,11 @@ void er2055_device::device_start()
 //  any address spaces owned by this device
 //-------------------------------------------------
 
-const address_space_config *er2055_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector er2055_device::memory_space_config() const
 {
-	return (spacenum == 0) ? &m_space_config : nullptr;
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
 }
 
 

@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+#ifndef MAME_BUS_Z88_FLASH_H
+#define MAME_BUS_Z88_FLASH_H
+
 #pragma once
 
-#ifndef __Z88_FLASH_H__
-#define __Z88_FLASH_H__
-
-#include "emu.h"
 #include "z88.h"
 #include "machine/intelfsh.h"
 
@@ -22,11 +21,9 @@ public:
 	// construction/destruction
 	z88_1024k_flash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-
 protected:
 	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;
 
 	// z88cart_interface overrides
@@ -40,7 +37,6 @@ private:
 };
 
 // device type definition
-extern const device_type Z88_1024K_FLASH;
+DECLARE_DEVICE_TYPE(Z88_1024K_FLASH, z88_1024k_flash_device)
 
-
-#endif  /* __Z88_FLASH_H__ */
+#endif // MAME_BUS_Z88_FLASH_H

@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<softwarelist name="apricot_flop" description="ACT Apricot PC/Xi floppy disks">
+
+	<!-- MS-DOS 2.00 BIOS VR1.4 -->
+	<software name="demopics">
+		<description>Demonstration Pictures</description>
+		<year>1984</year>
+		<publisher>ACT</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="307631">
+				<rom name="demopics.dsk" size="307631" crc="7db75019" sha1="2b8f002588304c5ef23c13c9be9c167a7ceed0c9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 20 Feb 85 -->
+	<software name="dos211_27">
+		<description>MS-DOS 2.11 BIOS VR2.7</description>
+		<year>1985</year>
+		<publisher>ACT</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 (Manager &amp; Tools)" />
+			<dataarea name="flop" size="322937">
+				<rom name="1pcxu04p.dsk" size="322937" crc="cfe455a9" sha1="4f8ccfbe1161404a47d309bd139d321fb0013a1a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 (Disk &amp; Editors)" />
+			<dataarea name="flop" size="321919">
+				<rom name="2pcxu04p.dsk" size="321919" crc="22a234ca" sha1="85a3a8d19f2d5357ac71ce8bbacf9512e93bed62" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 (SuperWriter)" />
+			<dataarea name="flop" size="277127">
+				<rom name="3pcxu04p.dsk" size="277127" crc="75f9f57d" sha1="40f083ab4a68d213635cc5c2ebb6cb8b202c6514" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4 (Async &amp; MS-Basic)" />
+			<dataarea name="flop" size="279672">
+				<rom name="4pcxu04p.dsk" size="279672" crc="e1c34b89" sha1="84765d86784742ff1efc8f8fe4101d08703ea291" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5 (SuperCalc &amp; SuperPlanner)" />
+			<dataarea name="flop" size="223173">
+				<rom name="5pcxu04p.dsk" size="223173" crc="ffc21ff2" sha1="0e332002f5be5e38b83f36789baac03b24289121" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 17 Oct 85 -->
+	<software name="dos211_31">
+		<description>MS-DOS 2.11 BIOS VR3.1</description>
+		<year>1985</year>
+		<publisher>ACT</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 (Activity &amp; Tutor)" />
+			<dataarea name="flop" size="326512">
+				<rom name="1pcxeu03p.dsk" size="326512" crc="a54c009f" sha1="85c6426042c5ac37a60e05eddcf499e71d051db6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 (Activity &amp; Editors)" />
+			<dataarea name="flop" size="326513">
+				<rom name="2pcxeu03p.dsk" size="326513" crc="339a564a" sha1="e86466629af63f102568e80ddc924ba291e0ca5d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 (Async &amp; Diary)" />
+			<dataarea name="flop" size="295460">
+				<rom name="3pcxeu03p.dsk" size="295460" crc="623b99e9" sha1="8c443772dcbbebb322abc5574605bdedac755266" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4 (GW-Basic &amp; Sketch)" />
+			<dataarea name="flop" size="267468">
+				<rom name="4pcxeu03p.dsk" size="267468" crc="010b8617" sha1="b17692f58ed9060e5af25268e84d39695b3bbd1e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- MS-DOS 2.11 BIOS VR2.4 -->
+	<software name="quest">
+		<description>QUEST - The Adventure</description>
+		<year>1984</year>
+		<publisher>Quest Automation Ltd</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="324909">
+				<rom name="quest.dsk" size="324909" crc="df11c592" sha1="989dc29d1dead78452b5b0afb9591356484c643d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

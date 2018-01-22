@@ -1,17 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
+/****************************************************************************
+
+    Olivetti M24 emulation
+
+****************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/i86/i86.h"
 #include "cpu/tms7000/tms7000.h"
+#include "imagedev/floppy.h"
 #include "machine/m24_kbd.h"
 #include "machine/m24_z8000.h"
 #include "machine/mm58274c.h"
 #include "machine/genpc.h"
+
 #include "formats/pc_dsk.h"
 #include "formats/naslite_dsk.h"
 #include "formats/m20_dsk.h"
+
 #include "softlist.h"
 
 class m24_state : public driver_device
@@ -47,6 +55,8 @@ public:
 
 	uint8_t m_sysctl, m_pa, m_kbcin, m_kbcout;
 	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
+	static void cfg_m20_format(device_t *device);
+	void olivetti(machine_config &config);
 };
 
 void m24_state::machine_reset()
@@ -58,7 +68,7 @@ void m24_state::machine_reset()
 	m_i86_halt = false;
 	m_i86_halt_perm = false;
 	if(m_z8000_apb)
-		m_z8000_apb->m_z8000->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_z8000_apb->halt_w(ASSERT_LINE);
 }
 
 READ8_MEMBER(m24_state::keyboard_r)
@@ -140,7 +150,7 @@ WRITE_LINE_MEMBER(m24_state::dma_hrq_w)
 	if(!m_i86_halt)
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	if(m_z8000_apb && !m_z8000_apb->halted())
-		m_z8000_apb->m_z8000->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+		m_z8000_apb->halt_w(state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	m_mb->m_dma8237->hack_w(state);
@@ -151,7 +161,7 @@ WRITE_LINE_MEMBER(m24_state::int_w)
 	if(!m_i86_halt)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 	if(m_z8000_apb && !m_z8000_apb->halted())
-		m_z8000_apb->m_z8000->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
+		m_z8000_apb->int_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(m24_state::halt_i86_w)
@@ -180,11 +190,6 @@ static ADDRESS_MAP_START(kbc_map, AS_PROGRAM, 8, m24_state)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(kbcdata_r)
 	AM_RANGE(0xa000, 0xafff) AM_WRITE(kbcdata_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION("kbc", 0)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(kbc_io, AS_IO, 8, m24_state)
-	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(pa_r)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(pb_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( m24 )
@@ -235,15 +240,13 @@ FLOPPY_FORMATS_MEMBER( m24_state::floppy_formats )
 	FLOPPY_M20_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_FRAGMENT( cfg_m20_format )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	static_cast<floppy_connector *>(device)->set_formats(m24_state::floppy_formats);
+void m24_state::cfg_m20_format(device_t *device)
+{
+	device->subdevice<floppy_connector>("fdc:0")->set_formats(m24_state::floppy_formats);
+	device->subdevice<floppy_connector>("fdc:1")->set_formats(m24_state::floppy_formats);
+}
 
-	MCFG_DEVICE_MODIFY("fdc:1")
-	static_cast<floppy_connector *>(device)->set_formats(m24_state::floppy_formats);
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( olivetti, m24_state )
+MACHINE_CONFIG_START(m24_state::olivetti)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(m24_map)
@@ -269,7 +272,8 @@ static MACHINE_CONFIG_START( olivetti, m24_state )
 
 	MCFG_CPU_ADD("kbc", TMS7000, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(kbc_map)
-	MCFG_CPU_IO_MAP(kbc_io)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(m24_state, pa_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(m24_state, pb_w))
 
 	MCFG_DEVICE_ADD("keyboard", M24_KEYBOARD, 0)
 	MCFG_M24_KEYBOARD_OUT_DATA_HANDLER(WRITELINE(m24_state, kbcin_w))
@@ -295,7 +299,7 @@ ROM_START( m24 )
 	ROMX_LOAD("olivetti_m24_version_1.43_low.bin", 0x4000, 0x2000, CRC(ff7e0f10) SHA1(13423011a9bae3f3193e8c199f98a496cab48c0f), ROM_SKIP(1))
 
 	ROM_REGION(0x800, "kbc", 0)
-	ROM_LOAD("pdbd.tms2516.keyboardmcureplacementdaughterboard_10u", 0x000, 0x800, CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
+	ROM_LOAD("pdbd.tms2516.kbdmcu_replacement_board.10u", 0x000, 0x800, CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
 ROM_END
 
 ROM_START( m240 )
@@ -305,8 +309,8 @@ ROM_START( m240 )
 
 	// is this one the same?
 	ROM_REGION(0x800, "kbc", 0)
-	ROM_LOAD("pdbd.tms2516.keyboardmcureplacementdaughterboard_10u", 0x000, 0x800, BAD_DUMP CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
+	ROM_LOAD("pdbd.tms2516.kbdmcu_replacement_board.10u", 0x000, 0x800, BAD_DUMP CRC(b8c4c18a) SHA1(25b4c24e19ff91924c53557c66513ab242d926c6))
 ROM_END
 
-COMP( 1983, m24,        ibm5150,    0,          olivetti,   m24, driver_device,      0,      "Olivetti", "M24", MACHINE_NOT_WORKING)
-COMP( 1987, m240,       ibm5150,    0,          olivetti,   m24, driver_device,      0,      "Olivetti", "M240", MACHINE_NOT_WORKING)
+COMP( 1983, m24,        ibm5150,    0,          olivetti,   m24, m24_state,      0,      "Olivetti", "M24",  MACHINE_NOT_WORKING )
+COMP( 1987, m240,       ibm5150,    0,          olivetti,   m24, m24_state,      0,      "Olivetti", "M240", MACHINE_NOT_WORKING )

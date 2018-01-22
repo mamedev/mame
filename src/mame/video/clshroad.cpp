@@ -36,9 +36,9 @@
 #include "includes/clshroad.h"
 
 
-WRITE8_MEMBER(clshroad_state::flipscreen_w)
+WRITE_LINE_MEMBER(clshroad_state::flipscreen_w)
 {
-	flip_screen_set(data & 1 );
+	flip_screen_set(state);
 }
 
 

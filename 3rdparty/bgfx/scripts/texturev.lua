@@ -6,12 +6,12 @@ project ("texturev")
 
 	includedirs {
 		path.join(BX_DIR,   "include"),
+		path.join(BIMG_DIR, "include"),
 		path.join(BGFX_DIR, "include"),
 		path.join(BGFX_DIR, "3rdparty"),
 		path.join(BGFX_DIR, "examples/common"),
 		path.join(MODULE_DIR, "include"),
 		path.join(MODULE_DIR, "3rdparty"),
-		path.join(MODULE_DIR, "src"),
 	}
 
 	files {
@@ -20,7 +20,10 @@ project ("texturev")
 
 	links {
 		"example-common",
+		"bimg_decode",
+		"bimg",
 		"bgfx",
+		"bx",
 	}
 
 	if _OPTIONS["with-sdl"] then

@@ -16,6 +16,7 @@
 
 #include "emu.h"
 #include "includes/cchasm.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "cpu/m68000/m68000.h"
@@ -24,6 +25,7 @@
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 #define CCHASM_68K_CLOCK (XTAL_8MHz)
 
@@ -142,7 +144,7 @@ static const z80_daisy_config daisy_chain[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cchasm, cchasm_state )
+MACHINE_CONFIG_START(cchasm_state::cchasm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CCHASM_68K_CLOCK)    /* 8 MHz (from schematics) */
@@ -189,8 +191,7 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(CCHASM_68K_CLOCK/10)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, CCHASM_68K_CLOCK/10)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, CCHASM_68K_CLOCK / 10, 0)
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 4))
 MACHINE_CONFIG_END
@@ -262,5 +263,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, cchasm,  0,      cchasm, cchasm, driver_device, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, cchasm1, cchasm, cchasm, cchasm, driver_device, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cchasm,  0,      cchasm, cchasm, cchasm_state, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, cchasm1, cchasm, cchasm, cchasm, cchasm_state, 0, ROT270, "Cinematronics / GCE", "Cosmic Chasm (set 2)", MACHINE_SUPPORTS_SAVE )

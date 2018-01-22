@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
+#ifndef MAME_INCLUDES_BW2_H
+#define MAME_INCLUDES_BW2_H
+
 #pragma once
 
-#ifndef __BW2__
-#define __BW2__
-
-#include "emu.h"
 #include "bus/bw2/exp.h"
 #include "cpu/z80/z80.h"
 #include "formats/bw2_dsk.h"
@@ -51,7 +50,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_uart;
-	required_device<wd2797_t> m_fdc;
+	required_device<wd2797_device> m_fdc;
 	required_device<msm6255_device> m_lcdc;
 	required_device<pit8253_device> m_pit;
 	required_device<centronics_device> m_centronics;
@@ -73,7 +72,6 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 	DECLARE_READ8_MEMBER( ppi_pc_r );
 
-	DECLARE_WRITE_LINE_MEMBER( pit_out0_w );
 	DECLARE_WRITE_LINE_MEMBER( mtron_w );
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
@@ -95,6 +93,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;
+	void bw2(machine_config &config);
 };
 
-#endif
+#endif // MAME_INCLUDES_BW2_H

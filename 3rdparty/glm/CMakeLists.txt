@@ -5,7 +5,7 @@ if (NOT CMAKE_VERSION VERSION_LESS "3.1")
 endif()
 
 project(glm)
-set(GLM_VERSION "0.9.9")
+set(GLM_VERSION "0.9.8")
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -107,38 +107,43 @@ if(GLM_TEST_FORCE_PURE)
 	if(CMAKE_COMPILER_IS_GNUCXX)
 		add_definitions(-mfpmath=387)
 	endif()
+	message(STATUS "GLM: No SIMD instruction set")
 elseif(GLM_TEST_ENABLE_SIMD_AVX2)
-	if(CMAKE_COMPILER_IS_GNUCXX)
+	if(CMAKE_COMPILER_IS_GNUCXX OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
 		add_definitions(-mavx2)
 	elseif(GLM_USE_INTEL)
 		add_definitions(/QxAVX2)
 	elseif(MSVC)
 		add_definitions(/arch:AVX2)
 	endif()
+	message(STATUS "GLM: AVX2 instruction set")
 elseif(GLM_TEST_ENABLE_SIMD_AVX)
-	if(CMAKE_COMPILER_IS_GNUCXX)
+	if(CMAKE_COMPILER_IS_GNUCXX OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
 		add_definitions(-mavx)
 	elseif(GLM_USE_INTEL)
 		add_definitions(/QxAVX)
 	elseif(MSVC)
 		add_definitions(/arch:AVX)
 	endif()
+	message(STATUS "GLM: AVX instruction set")
 elseif(GLM_TEST_ENABLE_SIMD_SSE3)
-	if(CMAKE_COMPILER_IS_GNUCXX)
+	if(CMAKE_COMPILER_IS_GNUCXX OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
 		add_definitions(-msse3)
 	elseif(GLM_USE_INTEL)
 		add_definitions(/QxSSE3)
 	elseif(MSVC AND NOT CMAKE_CL_64)
-		add_definitions(/arch:SSE2) # VC doesn't support /arch:SSE3	
+		add_definitions(/arch:SSE2) # VC doesn't support /arch:SSE3
 	endif()
+	message(STATUS "GLM: SSE3 instruction set")
 elseif(GLM_TEST_ENABLE_SIMD_SSE2)
-	if(CMAKE_COMPILER_IS_GNUCXX)
+	if(CMAKE_COMPILER_IS_GNUCXX OR ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
 		add_definitions(-msse2)
 	elseif(GLM_USE_INTEL)
 		add_definitions(/QxSSE2)
 	elseif(MSVC AND NOT CMAKE_CL_64)
 		add_definitions(/arch:SSE2)
 	endif()
+	message(STATUS "GLM: SSE2 instruction set")
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -164,7 +169,7 @@ set(GLM_INSTALL_CONFIGDIR "${CMAKE_INSTALL_LIBDIR}/cmake/glm")
 install(DIRECTORY glm DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/glmVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/glmConfigVersion.cmake"
     VERSION ${GLM_VERSION}
     COMPATIBILITY AnyNewerVersion
 )
@@ -188,7 +193,7 @@ configure_package_config_file(
 install(
     FILES 
         "${CMAKE_CURRENT_BINARY_DIR}/${GLM_INSTALL_CONFIGDIR}/glmConfig.cmake"
-        "${CMAKE_CURRENT_BINARY_DIR}/glmVersion.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/glmConfigVersion.cmake"
     DESTINATION ${GLM_INSTALL_CONFIGDIR}
 )
 

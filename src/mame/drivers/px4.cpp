@@ -9,19 +9,26 @@
 
 ***************************************************************************/
 
+#include "emu.h"
+
+#include "bus/centronics/ctronics.h"
+#include "bus/epson_sio/epson_sio.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
-#include "machine/ram.h"
-#include "bus/epson_sio/epson_sio.h"
-#include "bus/centronics/ctronics.h"
 #include "imagedev/cassette.h"
-#include "machine/ram.h"
 #include "machine/nvram.h"
-#include "sound/speaker.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-#include "coreutil.h"
+#include "machine/ram.h"
+#include "machine/timer.h"
+#include "sound/spkrdev.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+#include "coreutil.h"
+
 #include "px4.lh"
 
 
@@ -49,30 +56,30 @@ class px4_state : public driver_device, public device_serial_interface
 {
 public:
 	px4_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	device_serial_interface(mconfig, *this),
-	m_z80(*this, "maincpu"),
-	m_ram(*this, RAM_TAG),
-	m_nvram(*this, "nvram"),
-	m_centronics(*this, "centronics"),
-	m_ext_cas(*this, "extcas"),
-	m_ext_cas_timer(*this, "extcas_timer"),
-	m_speaker(*this, "speaker"),
-	m_sio(*this, "sio"),
-	m_rs232(*this, "rs232"),
-	m_caps1(*this, "capsule1"), m_caps2(*this, "capsule2"),
-	m_caps1_rom(nullptr), m_caps2_rom(nullptr),
-	m_ctrl1(0), m_icrb(0), m_bankr(0),
-	m_isr(0), m_ier(0), m_sior(0xbf),
-	m_frc_value(0), m_frc_latch(0),
-	m_vadr(0), m_yoff(0),
-	m_artdir(0xff), m_artdor(0xff), m_artsr(0), m_artcr(0),
-	m_one_sec_int_enabled(true),
-	m_key_status(0), m_interrupt_status(0),
-	m_time(), m_clock_state(0),
-	m_ear_last_state(0),
-	m_sio_pin(0), m_serial_rx(0), m_rs232_dcd(0), m_rs232_cts(0),
-	m_centronics_busy(0), m_centronics_perror(0)
+		driver_device(mconfig, type, tag),
+		device_serial_interface(mconfig, *this),
+		m_z80(*this, "maincpu"),
+		m_ram(*this, RAM_TAG),
+		m_nvram(*this, "nvram"),
+		m_centronics(*this, "centronics"),
+		m_ext_cas(*this, "extcas"),
+		m_ext_cas_timer(*this, "extcas_timer"),
+		m_speaker(*this, "speaker"),
+		m_sio(*this, "sio"),
+		m_rs232(*this, "rs232"),
+		m_caps1(*this, "capsule1"), m_caps2(*this, "capsule2"),
+		m_caps1_rom(nullptr), m_caps2_rom(nullptr),
+		m_ctrl1(0), m_icrb(0), m_bankr(0),
+		m_isr(0), m_ier(0), m_sior(0xbf),
+		m_frc_value(0), m_frc_latch(0),
+		m_vadr(0), m_yoff(0),
+		m_artdir(0xff), m_artdor(0xff), m_artsr(0), m_artcr(0),
+		m_one_sec_int_enabled(true), m_key_int_enabled(true),
+		m_key_status(0), m_interrupt_status(0),
+		m_time(), m_clock_state(0),
+		m_ear_last_state(0),
+		m_sio_pin(0), m_serial_rx(0), m_rs232_dcd(0), m_rs232_cts(0),
+		m_centronics_busy(0), m_centronics_perror(0)
 	{ }
 
 	DECLARE_DRIVER_INIT( px4 );
@@ -126,6 +133,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
 	DECLARE_WRITE_LINE_MEMBER( centronics_perror_w ) { m_centronics_perror = state; }
 
+	void px4(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -136,8 +144,6 @@ protected:
 	virtual void tra_complete() override;
 	virtual void rcv_callback() override;
 	virtual void rcv_complete() override;
-
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	// z80 interrupt sources
@@ -261,6 +267,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ramdisk_data_w );
 	DECLARE_READ8_MEMBER( ramdisk_control_r );
 
+	void px4p(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -589,16 +596,22 @@ WRITE8_MEMBER( px4_state::sior_w )
 		{
 		case 1:
 			{
-				int year = dec_2_bcd(m_time.local_time.year);
-				year = (year & 0xff0f) | ((data & 0xf) << 4);
-				t->tm_year = bcd_2_dec(year) - 1900;
+				if (data < 10)
+				{
+					int year = dec_2_bcd(m_time.local_time.year);
+					year = (year & 0xff0f) | ((data & 0xf) << 4);
+					t->tm_year = bcd_2_dec(year) - 1900;
+				}
 			}
 			break;
 		case 2:
 			{
-				int year = dec_2_bcd(m_time.local_time.year);
-				year = (year & 0xfff0) | (data & 0xf);
-				t->tm_year = bcd_2_dec(year) - 1900;
+				if (data < 10)
+				{
+					int year = dec_2_bcd(m_time.local_time.year);
+					year = (year & 0xfff0) | (data & 0xf);
+					t->tm_year = bcd_2_dec(year) - 1900;
+				}
 			}
 			break;
 		case 3: t->tm_mon = bcd_2_dec(data & 0x7f) - 1; break;
@@ -818,11 +831,6 @@ WRITE_LINE_MEMBER( px4_state::rs232_dsr_w )
 WRITE_LINE_MEMBER( px4_state::rs232_cts_w )
 {
 	m_rs232_cts = state;
-}
-
-void px4_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 void px4_state::tra_callback()
@@ -1466,7 +1474,7 @@ PALETTE_INIT_MEMBER( px4p_state, px4p )
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( px4, px4_state )
+MACHINE_CONFIG_START(px4_state::px4)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz / 2)    // uPD70008
 	MCFG_CPU_PROGRAM_MAP(px4_mem)
@@ -1532,7 +1540,7 @@ static MACHINE_CONFIG_START( px4, px4_state )
 	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( px4p, px4, px4p_state )
+MACHINE_CONFIG_DERIVED(px4p_state::px4p, px4)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(px4p_io)
 

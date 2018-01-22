@@ -19,14 +19,16 @@
 \*********************************************************************/
 
 #include "emu.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsicd.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
 #include "machine/8530scc.h"
-#include "machine/sgi.h"
 #include "machine/eepromser.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsicd.h"
+#include "machine/sgi.h"
 #include "machine/wd33c93.h"
+#include "screen.h"
+#include "speaker.h"
 
 class indigo_state : public driver_device
 {
@@ -56,6 +58,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	static void cdrom_config(device_t *device);
+	void indigo4k(machine_config &config);
+	void indigo3k(machine_config &config);
 private:
 	struct hpc_t
 	{
@@ -449,13 +454,13 @@ WRITE32_MEMBER(indigo_state::hpc_w)
 // INT/INT2/INT3 interrupt controllers
 READ32_MEMBER(indigo_state::int_r)
 {
-	osd_printf_info("INT: read @ ofs %x (mask %x) (PC=%x)\n", offset, mem_mask, space.device().safe_pc());
+	osd_printf_info("INT: read @ ofs %x (mask %x) (PC=%x)\n", offset, mem_mask, m_maincpu->pc());
 	return 0;
 }
 
 WRITE32_MEMBER(indigo_state::int_w)
 {
-	osd_printf_info("INT: write %x to ofs %x (mask %x) (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+	osd_printf_info("INT: write %x to ofs %x (mask %x) (PC=%x)\n", data, offset, mem_mask, m_maincpu->pc());
 }
 
 static ADDRESS_MAP_START( indigo_map, AS_PROGRAM, 32, indigo_state )
@@ -566,12 +571,13 @@ static INPUT_PORTS_START( indigo )
 	PORT_BIT ( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_FRAGMENT( cdrom_config )
-	MCFG_DEVICE_MODIFY( "cdda" )
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "^^^^mono", 1.0)
-MACHINE_CONFIG_END
+void indigo_state::cdrom_config(device_t *device)
+{
+	device = device->subdevice("cdda");
+	MCFG_SOUND_ROUTE(0, "^^^^mono", 1.0)
+}
 
-static MACHINE_CONFIG_START( indigo3k, indigo_state )
+MACHINE_CONFIG_START(indigo_state::indigo3k)
 	MCFG_CPU_ADD("maincpu", R3041, 33000000)
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_CPU_PROGRAM_MAP(indigo3k_map)
@@ -602,7 +608,7 @@ static MACHINE_CONFIG_START( indigo3k, indigo_state )
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( indigo4k, indigo3k )
+MACHINE_CONFIG_DERIVED(indigo_state::indigo4k, indigo3k)
 	MCFG_CPU_REPLACE("maincpu", R4600BE, 150000000) // Should be R4400
 	MCFG_MIPS3_ICACHE_SIZE(32768)
 	MCFG_MIPS3_DCACHE_SIZE(32768)
@@ -613,9 +619,9 @@ MACHINE_CONFIG_END
 
 ROM_START( indigo3k )
 	ROM_REGION( 0x40000, "user1", 0 )
-	ROM_SYSTEM_BIOS( 0, "401RevC", "SGI Version 4.0.1 Rev C LG1/GR2, Jul 9, 1992" ) // dumped over serial connection from boot monitor and swapped
+	ROM_SYSTEM_BIOS( 0, "401-rev-c", "SGI Version 4.0.1 Rev C LG1/GR2, Jul 9, 1992" ) // dumped over serial connection from boot monitor and swapped
 	ROMX_LOAD( "ip12prom.070-8088-xxx.u56", 0x000000, 0x040000, CRC(25ca912f) SHA1(94b3753d659bfe50b914445cef41290122f43880), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "401RevD", "SGI Version 4.0.1 Rev D LG1/GR2, Mar 24, 1992" ) // dumped with EPROM programmer
+	ROM_SYSTEM_BIOS( 1, "401-rev-d", "SGI Version 4.0.1 Rev D LG1/GR2, Mar 24, 1992" ) // dumped with EPROM programmer
 	ROMX_LOAD( "ip12prom.070-8088-002.u56", 0x000000, 0x040000, CRC(ea4329ef) SHA1(b7d67d0e30ae8836892f7170dd4757732a0a3fd6), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(2) )
 ROM_END
 
@@ -624,6 +630,6 @@ ROM_START( indigo4k )
 	ROM_LOAD( "ip20prom.070-8116-004.bin", 0x000000, 0x080000, CRC(940d960e) SHA1(596aba530b53a147985ff3f6f853471ce48c866c) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS         INIT    COMPANY   FULLNAME */
-COMP( 1991, indigo3k, 0,        0,        indigo3k, indigo,   driver_device, 0,     "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1993, indigo4k, 0,        0,        indigo4k, indigo,   driver_device, 0,         "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     CLASS         INIT   COMPANY                 FULLNAME                                          FLAGS
+COMP( 1991, indigo3k, 0,        0,        indigo3k, indigo,   indigo_state, 0,     "Silicon Graphics Inc", "IRIS Indigo (R3000, 33MHz)",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1993, indigo4k, 0,        0,        indigo4k, indigo,   indigo_state, 0,     "Silicon Graphics Inc", "IRIS Indigo (R4400, 150MHz, Ver. 4.0.5D Rev A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -6,7 +6,8 @@
 
 
 #define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "logmacro.h"
+
 
 /***************************************************************************/
 /*                                                                         */
@@ -52,20 +53,10 @@ Memory map:
 /*                                                                         */
 /***************************************************************************/
 
-const device_type K054000 = &device_creator<k054000_device>;
+DEFINE_DEVICE_TYPE(K054000, k054000_device, "k054000", "K054000 Protection")
 
 k054000_device::k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K054000, "K054000 Protection", tag, owner, clock, "k054000", __FILE__)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k054000_device::device_config_complete()
+	: device_t(mconfig, K054000, tag, owner, clock)
 {
 }
 
@@ -96,7 +87,7 @@ void k054000_device::device_reset()
 
 WRITE8_MEMBER( k054000_device::write )
 {
-	//logerror("%04x: write %02x to 054000 address %02x\n",space.device().safe_pc(),data,offset);
+	//logerror("%s: write %02x to 054000 address %02x\n",m_maincpu->pc(),data,offset);
 	m_regs[offset] = data;
 }
 
@@ -105,7 +96,7 @@ READ8_MEMBER( k054000_device::read )
 	int Acx, Acy, Aax, Aay;
 	int Bcx, Bcy, Bax, Bay;
 
-	//logerror("%04x: read 054000 address %02x\n", space.device().safe_pc(), offset);
+	//logerror("%s: read 054000 address %02x\n", m_maincpu->pc(), offset);
 
 	if (offset != 0x18)
 		return 0;

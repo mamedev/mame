@@ -15,7 +15,7 @@ as rom.  In the region/block cases, banking is automatically handled.
 2. Setup
 --------
 
-| **device_rom_interface**\ (const machine_config &mconfig, device_t &device, UINT8 addrwidth, endianness_t endian = ENDIANNESS_LITTLE, UINT8 datawidth = 8)
+| **device_rom_interface**\ (const machine_config &mconfig, device_t &device, u8 addrwidth, endianness_t endian = ENDIANNESS_LITTLE, u8 datawidth = 8)
 
 The constructor of the interface wants, in addition to the standard
 parameters, the address bus width of the dedicated bus.  In addition
@@ -28,14 +28,29 @@ Use that method at machine config time to provide an address map for
 the bus to connect to.  It has priority over a rom region if one is
 also present.
 
+| **MCFG_DEVICE_ROM**\ (tag)
+
+Used to select a rom region to use if a device address map is not
+given.  Defaults to DEVICE_SELF, e.g. the device tag.
+
 | **ROM_REGION**\ (length, tag, flags)
 
-If a rom region with a tag identical to the device tag is provided in
-the rom description for the system, it will be automatically picked up
-as the connected rom.  An address map has priority over the region if
+If a rom region with a tag as given with **MCFG_DEVICE_ROM** if
+present, or identical to the device tag otherwise, is provided in the
+rom description for the system, it will be automatically picked up as
+the connected rom.  An address map has priority over the region if
 present in the machine config.
 
-| void **set_rom**\ (const void \*base, UINT32 size);
+| void **set_rom_endianness**\ (endianness_t endian)
+| void **set_rom_data_width**\ (u8 width)
+| void **set_rom_addr_width**\ (u8 width)
+
+These methods, intended for generic devices with indefinite hardware
+specifications, override the endianness, data bus width and address 
+bus width assigned through the constructor. They must be called from
+within the device before **config_complete** time.
+
+| void **set_rom**\ (const void \*base, u32 size);
 
 At any time post- **interface_pre_start**, a memory block can be
 setup as the connected rom with that method.  It overrides any
@@ -45,10 +60,10 @@ times.
 3. Rom access
 -------------
 
-| UINT8 **read_byte**\ (offs_t byteaddress)
-| UINT16 **read_word**\ (offs_t byteaddress)
-| UINT32 **read_dword**\ (offs_t byteaddress)
-| UINT64 **read_qword**\ (offs_t byteaddress)
+| u8 **read_byte**\ (offs_t byteaddress)
+| u16 **read_word**\ (offs_t byteaddress)
+| u32 **read_dword**\ (offs_t byteaddress)
+| u64 **read_qword**\ (offs_t byteaddress)
 
 These methods provide read access to the connected rom.  Out-of-bounds
 access results in standard unmapped read logerror messages.
@@ -70,3 +85,8 @@ Using that interface makes the device derive from
 **device_memory_interface**. If the device wants to actually use the
 memory interface for itself, remember that AS_0/AS_PROGRAM is used by
 the rom interface, and don't forget to upcall **memory_space_config**.
+
+For devices which have outputs that can be used to address ROMs but
+only to forward the data to another device for processing, it may be
+helpful to disable the interface when it is not required. This can be
+done by overriding **memory_space_config** to return an empty vector.

@@ -44,11 +44,13 @@ ToDo:
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
-#include "machine/pic8259.h"
-#include "machine/i8255.h"
-#include "sound/speaker.h"
 #include "imagedev/cassette.h"
+#include "machine/i8255.h"
+#include "machine/pic8259.h"
+#include "machine/timer.h"
+#include "sound/spkrdev.h"
 
 // cartridge slot
 #include "bus/iq151/iq151.h"
@@ -61,7 +63,10 @@ ToDo:
 #include "bus/iq151/video32.h"
 #include "bus/iq151/video64.h"
 
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class iq151_state : public driver_device
 {
@@ -99,6 +104,7 @@ public:
 	INTERRUPT_GEN_MEMBER(iq151_vblank_interrupt);
 	DECLARE_INPUT_CHANGED_MEMBER(iq151_break);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_timer);
+	void iq151(machine_config &config);
 };
 
 READ8_MEMBER(iq151_state::keyboard_row_r)
@@ -376,7 +382,7 @@ static SLOT_INTERFACE_START(iq151_cart)
 	SLOT_INTERFACE("amos3"  , IQ151_AMOS3)              // AMOS cart 3
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( iq151, iq151_state )
+MACHINE_CONFIG_START(iq151_state::iq151)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
 	MCFG_CPU_PROGRAM_MAP(iq151_mem)
@@ -400,7 +406,8 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(iq151_state, keyboard_row_r))
@@ -472,5 +479,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 198?, iq151,  0,       0,      iq151,     iq151, iq151_state,   iq151, "ZPA Novy Bor", "IQ-151", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY         FULLNAME  FLAGS
+COMP( 198?, iq151, 0,      0,      iq151,   iq151, iq151_state, iq151, "ZPA Novy Bor", "IQ-151", 0 )

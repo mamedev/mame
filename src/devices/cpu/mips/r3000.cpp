@@ -9,8 +9,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "r3000.h"
+#include "r3kdasm.h"
+#include "debugger.h"
 
 
 #define ENABLE_OVERFLOWS    0
@@ -113,19 +114,19 @@
 //  DEVICE INTERFACE
 //**************************************************************************
 
-const device_type R3041 = &device_creator<r3041_device>;
-const device_type R3051 = &device_creator<r3051_device>;
-const device_type R3052 = &device_creator<r3052_device>;
-const device_type R3071 = &device_creator<r3071_device>;
-const device_type R3081 = &device_creator<r3081_device>;
+DEFINE_DEVICE_TYPE(R3041, r3041_device, "r3041", "R3041")
+DEFINE_DEVICE_TYPE(R3051, r3051_device, "r3051", "R3051")
+DEFINE_DEVICE_TYPE(R3052, r3052_device, "r3052", "R3052")
+DEFINE_DEVICE_TYPE(R3071, r3071_device, "r3071", "R3071")
+DEFINE_DEVICE_TYPE(R3081, r3081_device, "r3081", "R3081")
 
 
 //-------------------------------------------------
 //  r3000_device - constructor
 //-------------------------------------------------
 
-r3000_device::r3000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, chip_type chiptype, const char *shortname, const char *source)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+r3000_device::r3000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, chip_type chiptype)
+	: cpu_device(mconfig, type, tag, owner, clock),
 		m_program_config_be("program", ENDIANNESS_BIG, 32, 29),
 		m_program_config_le("program", ENDIANNESS_LITTLE, 32, 29),
 		m_program(nullptr),
@@ -170,7 +171,7 @@ r3000_device::~r3000_device()
 //-------------------------------------------------
 
 r3041_device::r3041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3041, "R3041", tag, owner, clock, CHIP_TYPE_R3041, "r3041", __FILE__) { }
+	: r3000_device(mconfig, R3041, tag, owner, clock, CHIP_TYPE_R3041) { }
 
 
 //-------------------------------------------------
@@ -178,7 +179,7 @@ r3041_device::r3041_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 r3051_device::r3051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3051, "R3051", tag, owner, clock, CHIP_TYPE_R3051, "r3051", __FILE__) { }
+	: r3000_device(mconfig, R3051, tag, owner, clock, CHIP_TYPE_R3051) { }
 
 
 //-------------------------------------------------
@@ -186,7 +187,7 @@ r3051_device::r3051_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 r3052_device::r3052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3052, "R3052", tag, owner, clock, CHIP_TYPE_R3052, "r3052", __FILE__) { }
+	: r3000_device(mconfig, R3052, tag, owner, clock, CHIP_TYPE_R3052) { }
 
 
 //-------------------------------------------------
@@ -194,7 +195,7 @@ r3052_device::r3052_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 r3071_device::r3071_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3071, "R3071", tag, owner, clock, CHIP_TYPE_R3071, "r3071", __FILE__) { }
+	: r3000_device(mconfig, R3071, tag, owner, clock, CHIP_TYPE_R3071) { }
 
 
 //-------------------------------------------------
@@ -202,7 +203,7 @@ r3071_device::r3071_device(const machine_config &mconfig, const char *tag, devic
 //-------------------------------------------------
 
 r3081_device::r3081_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: r3000_device(mconfig, R3081, "R3081", tag, owner, clock, CHIP_TYPE_R3081, "r3081", __FILE__) { }
+	: r3000_device(mconfig, R3081, tag, owner, clock, CHIP_TYPE_R3081) { }
 
 
 //-------------------------------------------------
@@ -213,7 +214,7 @@ void r3000_device::device_start()
 {
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	// determine the cache sizes
 	switch (m_chip_type)
@@ -394,12 +395,11 @@ void r3000_device::device_reset()
 //  the space doesn't exist
 //-------------------------------------------------
 
-const address_space_config *r3000_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector r3000_device::memory_space_config() const
 {
-	if (spacenum == AS_PROGRAM)
-		return (m_endianness == ENDIANNESS_BIG) ? &m_program_config_be : &m_program_config_le;
-	else
-		return nullptr;
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, (m_endianness == ENDIANNESS_BIG) ? &m_program_config_be : &m_program_config_le)
+	};
 }
 
 
@@ -454,41 +454,13 @@ void r3000_device::state_string_export(const device_state_entry &entry, std::str
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t r3000_device::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t r3000_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t r3000_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *r3000_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( r3000le );
-	extern CPU_DISASSEMBLE( r3000be );
-
-	if (m_endianness == ENDIANNESS_BIG)
-		return CPU_DISASSEMBLE_NAME(r3000be)(this, buffer, pc, oprom, opram, options);
-	else
-		return CPU_DISASSEMBLE_NAME(r3000le)(this, buffer, pc, oprom, opram, options);
+	return new r3000_disassembler;
 }
 
 

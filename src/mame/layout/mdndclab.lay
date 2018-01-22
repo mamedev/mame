@@ -14,7 +14,7 @@
 	local last_state = false
 
 	local function get_mouse()
-		local x, y, button, target = machine:input():find_mouse()
+		local x, y, button, target = machine:uiinput():find_mouse()
 		if not button then
 			last_state = false
 			return nil

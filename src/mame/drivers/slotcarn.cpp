@@ -18,9 +18,12 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "machine/i8255.h"
+#include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK            (XTAL_10MHz)
 #define CPU_CLOCK               (MASTER_CLOCK / 4)
@@ -56,6 +59,7 @@ public:
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	void slotcarn(machine_config &config);
 };
 
 
@@ -532,7 +536,7 @@ void slotcarn_state::machine_start()
 *          Machine Driver          *
 ***********************************/
 
-static MACHINE_CONFIG_START( slotcarn, slotcarn_state )
+MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?
@@ -696,8 +700,8 @@ ROM_END
 
 /*********************************************
 *                Game Drivers                *
-**********************************************
+**********************************************/
 
-      YEAR  NAME      PARENT   MACHINE   INPUT     INIT   ROT    COMPANY           FULLNAME               FLAGS  */
-GAME( 1985, slotcarn, 0,       slotcarn, slotcarn, driver_device, 0,     ROT0, "Wing Co., Ltd.", "Slot Carnival",        MACHINE_NOT_WORKING )
-GAME( 1985, spielbud, 0,       slotcarn, spielbud, driver_device, 0,     ROT0, "ADP",            "Spiel Bude (German)",  MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT   MACHINE   INPUT     STATE           INIT   ROT   COMPANY           FULLNAME                FLAGS
+GAME( 1985, slotcarn, 0,       slotcarn, slotcarn, slotcarn_state, 0,     ROT0, "Wing Co., Ltd.", "Slot Carnival",        MACHINE_NOT_WORKING )
+GAME( 1985, spielbud, 0,       slotcarn, spielbud, slotcarn_state, 0,     ROT0, "ADP",            "Spiel Bude (German)",  MACHINE_NOT_WORKING )

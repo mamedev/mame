@@ -83,7 +83,7 @@ static const gfx_layout objlayout_6bpp =
 
 TILE_GET_INFO_MEMBER(atarisy1_state::get_alpha_tile_info)
 {
-	uint16_t data = tilemap.basemem_read(tile_index);
+	uint16_t data = m_alpha_tilemap->basemem_read(tile_index);
 	int code = data & 0x3ff;
 	int color = (data >> 10) & 0x07;
 	int opaque = data & 0x2000;
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(atarisy1_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(atarisy1_state::get_playfield_tile_info)
 {
-	uint16_t data = tilemap.basemem_read(tile_index);
+	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	uint16_t lookup = m_playfield_lookup[((data >> 8) & 0x7f) | (m_playfield_tile_bank << 7)];
 	int gfxindex = (lookup >> 8) & 15;
 	int code = ((lookup & 0xff) << 8) | (data & 0xff);
@@ -150,7 +150,7 @@ VIDEO_START_MEMBER(atarisy1_state,atarisy1)
 	decode_gfx(m_playfield_lookup, motable);
 
 	/* modify the motion object code lookup */
-	std::vector<uint16_t> &codelookup = m_mob->code_lookup();
+	std::vector<uint32_t> &codelookup = m_mob->code_lookup();
 	for (unsigned int i = 0; i < codelookup.size(); i++)
 		codelookup[i] = (i & 0xff) | ((motable[i >> 8] & 0xff) << 8);
 
@@ -192,10 +192,11 @@ WRITE16_MEMBER( atarisy1_state::atarisy1_bankselect_w )
 	diff = oldselect ^ newselect;
 
 	/* sound CPU reset */
-	if (diff & 0x0080)
+	if (BIT(diff, 7))
 	{
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
-		if (!(newselect & 0x0080)) m_soundcomm->sound_cpu_reset();
+		m_outlatch->clear_w(BIT(newselect, 7));
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(newselect, 7) ? CLEAR_LINE : ASSERT_LINE);
+		if (!BIT(newselect, 7)) m_soundcomm->sound_cpu_reset();
 	}
 
 	/* if MO or playfield banks change, force a partial update */
@@ -511,8 +512,8 @@ uint32_t atarisy1_state::screen_update_atarisy1(screen_device &screen, bitmap_in
 
 void atarisy1_state::decode_gfx(uint16_t *pflookup, uint16_t *molookup)
 {
-	uint8_t *prom1 = &memregion("proms")->u8(0x000);
-	uint8_t *prom2 = &memregion("proms")->u8(0x200);
+	uint8_t *prom1 = &memregion("proms")->as_u8(0x000);
+	uint8_t *prom2 = &memregion("proms")->as_u8(0x200);
 	int obj, i;
 
 	/* reset the globals */
@@ -613,19 +614,19 @@ int atarisy1_state::get_bank(uint8_t prom1, uint8_t prom2, int bpp)
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* decode the graphics */
-	srcdata = &tiles->u8(0x80000 * (bank_index - 1));
+	srcdata = &tiles->as_u8(0x80000 * (bank_index - 1));
 	switch (bpp)
 	{
 	case 4:
-		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(*m_palette, objlayout_4bpp, srcdata, 0, 0x40, 256));
+		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(m_palette, objlayout_4bpp, srcdata, 0, 0x40, 256));
 		break;
 
 	case 5:
-		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(*m_palette, objlayout_5bpp, srcdata, 0, 0x40, 256));
+		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(m_palette, objlayout_5bpp, srcdata, 0, 0x40, 256));
 		break;
 
 	case 6:
-		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(*m_palette, objlayout_6bpp, srcdata, 0, 0x40, 256));
+		m_gfxdecode->set_gfx(gfx_index,std::make_unique<gfx_element>(m_palette, objlayout_6bpp, srcdata, 0, 0x40, 256));
 		break;
 
 	default:

@@ -52,10 +52,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/brkthru.h"
+
 #include "cpu/m6809/m6809.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
-#include "includes/brkthru.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define MASTER_CLOCK        XTAL_12MHz
@@ -91,12 +94,6 @@ WRITE8_MEMBER(brkthru_state::darwin_0803_w)
 	/* bit 1 = ? maybe IRQ acknowledge */
 }
 
-WRITE8_MEMBER(brkthru_state::brkthru_soundlatch_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
 INPUT_CHANGED_MEMBER(brkthru_state::coin_inserted)
 {
 	/* coin insertion causes an IRQ */
@@ -122,7 +119,7 @@ static ADDRESS_MAP_START( brkthru_map, AS_PROGRAM, 8, brkthru_state )
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW2/COIN")
 	AM_RANGE(0x1800, 0x1801) AM_WRITE(brkthru_1800_w)   /* bg scroll and color, ROM bank selection, flip screen */
-	AM_RANGE(0x1802, 0x1802) AM_WRITE(brkthru_soundlatch_w)
+	AM_RANGE(0x1802, 0x1802) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1803, 0x1803) AM_WRITE(brkthru_1803_w)   /* NMI enable, + ? */
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -140,7 +137,7 @@ static ADDRESS_MAP_START( darwin_map, AS_PROGRAM, 8, brkthru_state )
 	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0803, 0x0803) AM_READ_PORT("DSW2/COIN")
 	AM_RANGE(0x0800, 0x0801) AM_WRITE(brkthru_1800_w)     /* bg scroll and color, ROM bank selection, flip screen */
-	AM_RANGE(0x0802, 0x0802) AM_WRITE(brkthru_soundlatch_w)
+	AM_RANGE(0x0802, 0x0802) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x0803, 0x0803) AM_WRITE(darwin_0803_w)     /* NMI enable, + ? */
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -373,7 +370,7 @@ INTERRUPT_GEN_MEMBER(brkthru_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( brkthru, brkthru_state )
+MACHINE_CONFIG_START(brkthru_state::brkthru)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
@@ -400,6 +397,7 @@ static MACHINE_CONFIG_START( brkthru, brkthru_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
@@ -413,7 +411,7 @@ static MACHINE_CONFIG_START( brkthru, brkthru_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( darwin, brkthru_state )
+MACHINE_CONFIG_START(brkthru_state::darwin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
@@ -451,6 +449,7 @@ static MACHINE_CONFIG_START( darwin, brkthru_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_SOUND_ADD("ym1", YM2203, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.10)
@@ -651,7 +650,7 @@ DRIVER_INIT_MEMBER(brkthru_state,brkthru)
  *
  *************************************/
 
-GAME( 1986, brkthru,  0,       brkthru, brkthru, brkthru_state,  brkthru, ROT0,   "Data East USA",         "Break Thru (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthru,  0,       brkthru, brkthru,  brkthru_state, brkthru, ROT0,   "Data East USA",         "Break Thru (US)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1986, brkthruj, brkthru, brkthru, brkthruj, brkthru_state, brkthru, ROT0,   "Data East Corporation", "Kyohkoh-Toppa (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, forcebrk, brkthru, brkthru, brkthruj, brkthru_state, brkthru, ROT0,   "bootleg",               "Force Break (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, darwin,   0,       darwin,  darwin, brkthru_state,   brkthru, ROT270, "Data East Corporation", "Darwin 4078 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darwin,   0,       darwin,  darwin,   brkthru_state, brkthru, ROT270, "Data East Corporation", "Darwin 4078 (Japan)",   MACHINE_SUPPORTS_SAVE )

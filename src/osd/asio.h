@@ -32,3 +32,4 @@
 #define ASIO_ERROR_CATEGORY_NOEXCEPT noexcept(true)
 
 #include "asio/include/asio.hpp"
+#undef interface

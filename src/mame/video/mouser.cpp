@@ -47,14 +47,14 @@ PALETTE_INIT_MEMBER(mouser_state, mouser)
 	}
 }
 
-WRITE8_MEMBER(mouser_state::mouser_flip_screen_x_w)
+WRITE_LINE_MEMBER(mouser_state::flip_screen_x_w)
 {
-	flip_screen_x_set(~data & 1);
+	flip_screen_x_set(!state);
 }
 
-WRITE8_MEMBER(mouser_state::mouser_flip_screen_y_w)
+WRITE_LINE_MEMBER(mouser_state::flip_screen_y_w)
 {
-	flip_screen_y_set(~data & 1);
+	flip_screen_y_set(!state);
 }
 
 uint32_t mouser_state::screen_update_mouser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

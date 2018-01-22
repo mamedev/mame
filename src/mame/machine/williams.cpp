@@ -18,11 +18,10 @@
 
 TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_va11_callback)
 {
-	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
-	pia_1->cb1_w(scanline & 0x20);
+	m_pia_1->cb1_w(scanline & 0x20);
 
 	/* set a timer for the next update */
 	scanline += 0x20;
@@ -33,19 +32,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_va11_callback)
 
 TIMER_CALLBACK_MEMBER(williams_state::williams_count240_off_callback)
 {
-	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
-
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
-	pia_1->ca1_w(0);
+	m_pia_1->ca1_w(0);
 }
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_count240_callback)
 {
-	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
-
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
-	pia_1->ca1_w(1);
+	m_pia_1->ca1_w(1);
 
 	/* set a timer to turn it off once the scanline counter resets */
 	machine().scheduler().timer_set(m_screen->time_until_pos(0), timer_expired_delegate(FUNC(williams_state::williams_count240_off_callback),this));
@@ -57,8 +52,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams_count240_callback)
 
 WRITE_LINE_MEMBER(williams_state::williams_main_irq)
 {
-	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
-	int combined_state = pia_1->irq_a_state() | pia_1->irq_b_state();
+	int combined_state = m_pia_1->irq_a_state() | m_pia_1->irq_b_state();
 
 	/* IRQ to the main CPU */
 	m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -74,8 +68,7 @@ WRITE_LINE_MEMBER(williams_state::williams_main_firq)
 
 WRITE_LINE_MEMBER(williams_state::williams_snd_irq)
 {
-	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2");
-	int combined_state = pia_2->irq_a_state() | pia_2->irq_b_state();
+	int combined_state = m_pia_2->irq_a_state() | m_pia_2->irq_b_state();
 
 	/* IRQ to the sound CPU */
 	m_soundcpu->set_input_line(M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -83,8 +76,7 @@ WRITE_LINE_MEMBER(williams_state::williams_snd_irq)
 /* Same as above, but for second sound board */
 WRITE_LINE_MEMBER(blaster_state::williams_snd_irq_b)
 {
-	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2b");
-	int combined_state = pia_2->irq_a_state() | pia_2->irq_b_state();
+	int combined_state = m_pia_2b->irq_a_state() | m_pia_2b->irq_b_state();
 
 	/* IRQ to the sound CPU */
 	m_soundcpu_b->set_input_line(M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -100,9 +92,7 @@ WRITE_LINE_MEMBER(blaster_state::williams_snd_irq_b)
 
 WRITE_LINE_MEMBER(williams2_state::mysticm_main_irq)
 {
-	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
-	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
-	int combined_state = pia_0->irq_b_state() | pia_1->irq_a_state() | pia_1->irq_b_state();
+	int combined_state = m_pia_0->irq_b_state() | m_pia_1->irq_a_state() | m_pia_1->irq_b_state();
 
 	/* IRQ to the main CPU */
 	m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -111,9 +101,7 @@ WRITE_LINE_MEMBER(williams2_state::mysticm_main_irq)
 
 WRITE_LINE_MEMBER(williams2_state::tshoot_main_irq)
 {
-	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
-	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
-	int combined_state = pia_0->irq_a_state() | pia_0->irq_b_state() | pia_1->irq_a_state() | pia_1->irq_b_state();
+	int combined_state = m_pia_0->irq_a_state() | m_pia_0->irq_b_state() | m_pia_1->irq_a_state() | m_pia_1->irq_b_state();
 
 	/* IRQ to the main CPU */
 	m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
@@ -168,13 +156,11 @@ MACHINE_RESET_MEMBER(williams_state,williams)
 
 TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_va11_callback)
 {
-	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
-	pia6821_device *pia_1 = machine().device<pia6821_device>("pia_1");
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
-	pia_0->cb1_w(scanline & 0x20);
-	pia_1->ca1_w(scanline & 0x20);
+	m_pia_0->cb1_w(scanline & 0x20);
+	m_pia_1->ca1_w(scanline & 0x20);
 
 	/* set a timer for the next update */
 	scanline += 0x20;
@@ -185,19 +171,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_va11_callback)
 
 TIMER_CALLBACK_MEMBER(williams2_state::williams2_endscreen_off_callback)
 {
-	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
-
 	/* the /ENDSCREEN signal comes into CA1 */
-	pia_0->ca1_w(1);
+	m_pia_0->ca1_w(1);
 }
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(williams2_state::williams2_endscreen_callback)
 {
-	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
-
 	/* the /ENDSCREEN signal comes into CA1 */
-	pia_0->ca1_w(0);
+	m_pia_0->ca1_w(0);
 
 	/* set a timer to turn it off once the scanline counter resets */
 	machine().scheduler().timer_set(m_screen->time_until_pos(8), timer_expired_delegate(FUNC(williams2_state::williams2_endscreen_off_callback),this));
@@ -293,10 +275,8 @@ WRITE8_MEMBER(williams2_state::williams2_bank_select_w)
 
 TIMER_CALLBACK_MEMBER(williams_state::williams_deferred_snd_cmd_w)
 {
-	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2");
-
-	pia_2->portb_w(param);
-	pia_2->cb1_w((param == 0xff) ? 0 : 1);
+	m_pia_2->portb_w(param);
+	m_pia_2->cb1_w((param == 0xff) ? 0 : 1);
 }
 
 WRITE8_MEMBER(williams_state::williams_snd_cmd_w)
@@ -312,9 +292,7 @@ WRITE8_MEMBER(williams_state::playball_snd_cmd_w)
 
 TIMER_CALLBACK_MEMBER(williams2_state::williams2_deferred_snd_cmd_w)
 {
-	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2");
-
-	pia_2->porta_w(param);
+	m_pia_2->porta_w(param);
 }
 
 WRITE8_MEMBER(williams2_state::williams2_snd_cmd_w)
@@ -323,27 +301,6 @@ WRITE8_MEMBER(williams2_state::williams2_snd_cmd_w)
 }
 
 
-
-/*************************************
- *
- *  General input port handlers
- *
- *************************************/
-
-WRITE_LINE_MEMBER(williams_state::williams_port_select_w)
-{
-	m_port_select = state;
-}
-
-CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
-{
-	const char *tag = (const char *)param;
-
-	if (m_port_select != 0)
-		tag += strlen(tag) + 1;
-
-	return ioport(tag)->read();
-}
 
 /*
  *  Williams 49-way joystick
@@ -374,15 +331,6 @@ READ8_MEMBER(williams_state::williams_49way_port_0_r)
 {
 	static const uint8_t translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
 	return (translate49[ioport("49WAYX")->read() >> 4] << 4) | translate49[ioport("49WAYY")->read() >> 4];
-}
-
-
-READ8_MEMBER(williams_state::williams_input_port_49way_0_5_r)
-{
-	if (m_port_select)
-		return williams_49way_port_0_r(space, 0);
-	else
-		return ioport("IN3")->read();
 }
 
 
@@ -598,13 +546,11 @@ WRITE8_MEMBER(blaster_state::blaster_bank_select_w)
 
 TIMER_CALLBACK_MEMBER(blaster_state::blaster_deferred_snd_cmd_w)
 {
-	pia6821_device *pia_2l = machine().device<pia6821_device>("pia_2");
-	pia6821_device *pia_2r = machine().device<pia6821_device>("pia_2b");
 	uint8_t l_data = param | 0x80;
 	uint8_t r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
 
-	pia_2l->portb_w(l_data); pia_2l->cb1_w((l_data == 0xff) ? 0 : 1);
-	pia_2r->portb_w(r_data); pia_2r->cb1_w((r_data == 0xff) ? 0 : 1);
+	m_pia_2->portb_w(l_data); m_pia_2->cb1_w((l_data == 0xff) ? 0 : 1);
+	m_pia_2b->portb_w(r_data); m_pia_2b->cb1_w((r_data == 0xff) ? 0 : 1);
 }
 
 
@@ -634,23 +580,21 @@ WRITE_LINE_MEMBER(williams_state::lottofun_coin_lock_w)
  *
  *************************************/
 
-READ8_MEMBER(williams2_state::tshoot_input_port_0_3_r)
+CUSTOM_INPUT_MEMBER(tshoot_state::gun_r)
 {
-	/* merge in the gun inputs with the standard data */
-	int data = ioport("IN0")->read();
-	int gun = (data & 0x3f) ^ ((data & 0x3f) >> 1);
-	return (data & 0xc0) | gun;
+	int data = m_gun[(uintptr_t)param]->read();
+	return (data & 0x3f) ^ ((data & 0x3f) >> 1);
 }
 
 
-WRITE_LINE_MEMBER(williams2_state::tshoot_maxvol_w)
+WRITE_LINE_MEMBER(tshoot_state::maxvol_w)
 {
 	/* something to do with the sound volume */
 	logerror("tshoot maxvol = %d (%s)\n", state, machine().describe_context());
 }
 
 
-WRITE8_MEMBER(williams2_state::tshoot_lamp_w)
+WRITE8_MEMBER(tshoot_state::lamp_w)
 {
 	/* set the grenade lamp */
 	output().set_value("Grenade_lamp", (~data & 0x4)>>2 );
@@ -685,8 +629,7 @@ MACHINE_RESET_MEMBER(joust2_state,joust2)
 
 TIMER_CALLBACK_MEMBER(joust2_state::joust2_deferred_snd_cmd_w)
 {
-	pia6821_device *pia_2 = machine().device<pia6821_device>("pia_2");
-	pia_2->porta_w(param & 0xff);
+	m_pia_2->porta_w(param & 0xff);
 }
 
 

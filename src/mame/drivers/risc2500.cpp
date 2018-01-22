@@ -2,11 +2,11 @@
 // copyright-holders:Sandro Ronco
 /******************************************************************************
 
-	Saitek RISC 2500
+    Saitek RISC 2500
 
-	TODO:
-	 - Sound is too short and high pitch, better when you underclock the cpu.
-	   Is cpu cycle timing wrong? or waitstate on p1000_w?
+    TODO:
+     - Sound is too short and high pitch, better when you underclock the cpu.
+       Is cpu cycle timing wrong? or waitstate on p1000_w?
 
 ******************************************************************************/
 
@@ -17,6 +17,8 @@
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 #include "risc2500.lh"
 
@@ -43,7 +45,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(on_button);
 	void install_boot_rom();
+	void remove_boot_rom();
 
+	void risc2500(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -62,6 +66,11 @@ void risc2500_state::install_boot_rom()
 	m_maincpu->space(AS_PROGRAM).install_rom(0x00000000, 0x001ffff, memregion("maincpu")->base());
 }
 
+void risc2500_state::remove_boot_rom()
+{
+	m_maincpu->space(AS_PROGRAM).install_ram(0x00000000, m_ram->size() - 1, m_ram->pointer());
+}
+
 uint32_t risc2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for(int c=0; c<12; c++)
@@ -69,7 +78,7 @@ uint32_t risc2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		// 12 characters 5 x 7
 		for(int x=0; x<5; x++)
 		{
-			uint8_t gfx = BITSWAP8(m_vram[c*5 + x], 6,5,0,1,2,3,4,7);
+			uint8_t gfx = bitswap<8>(m_vram[c*5 + x], 6,5,0,1,2,3,4,7);
 
 			for(int y=0; y<7; y++)
 				bitmap.pix16(y, 71 - (c*6 + x)) = (gfx >> (y + 1)) & 1;
@@ -78,7 +87,7 @@ uint32_t risc2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		// LCD digits and symbols
 		int data_addr = 0x40 + c * 5;
 		uint16_t data = ((m_vram[data_addr + 1] & 0x3) << 5) | ((m_vram[data_addr + 2] & 0x7) << 2) | (m_vram[data_addr + 4] & 0x3);
-		data = BITSWAP8(data, 7,3,0,1,4,6,5,2) | ((m_vram[data_addr - 1] & 0x04) ? 0x80 : 0);
+		data = bitswap<8>(data, 7,3,0,1,4,6,5,2) | ((m_vram[data_addr - 1] & 0x04) ? 0x80 : 0);
 
 		output().set_digit_value(c, data);
 		output().set_indexed_value("sym", c, BIT(m_vram[data_addr + 1], 2));
@@ -227,7 +236,7 @@ WRITE32_MEMBER(risc2500_state::p1000_w)
 	{
 		if (!(data & 0x08000000))
 			m_vram[m_vram_addr++ & 0x7f] = data & 0xff;
-	}	
+	}
 	else if (data & 0x80000000)                     // Vertical LED
 	{
 		for(int i=0; i<8; i++)
@@ -242,9 +251,9 @@ WRITE32_MEMBER(risc2500_state::p1000_w)
 	{
 		memset(m_vram, 0, sizeof(m_vram));
 	}
-	
+
 	m_dac->write(data >> 28 & 3);                   // Speaker
-	
+
 	m_p1000 = data;
 }
 
@@ -256,7 +265,7 @@ READ32_MEMBER(risc2500_state::disable_boot_rom)
 
 TIMER_CALLBACK_MEMBER(risc2500_state::disable_boot_rom)
 {
-	m_maincpu->space(AS_PROGRAM).install_ram(0x00000000, m_ram->size() - 1, m_ram->pointer());
+	remove_boot_rom();
 }
 
 void risc2500_state::machine_start()
@@ -266,6 +275,8 @@ void risc2500_state::machine_start()
 	save_item(NAME(m_p1000));
 	save_item(NAME(m_vram_addr));
 	save_item(NAME(m_vram));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(risc2500_state::remove_boot_rom), this));
 }
 
 void risc2500_state::machine_reset()
@@ -284,10 +295,10 @@ static ADDRESS_MAP_START(risc2500_mem, AS_PROGRAM, 32, risc2500_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( risc2500, risc2500_state )
+MACHINE_CONFIG_START(risc2500_state::risc2500)
 	MCFG_CPU_ADD("maincpu", ARM, XTAL_28_322MHz / 2)      // VY86C010
 	MCFG_CPU_PROGRAM_MAP(risc2500_mem)
-	MCFG_ARM_COPRO(ARM_COPRO_TYPE_VL86C020)
+	MCFG_ARM_COPRO(VL86C020)
 	MCFG_CPU_PERIODIC_INT_DRIVER(risc2500_state, irq1_line_hold, 250)
 
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -333,6 +344,6 @@ ROM_START( montreux )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     INIT                COMPANY     FULLNAME     FLAGS */
-CONS( 1992, risc,     0,       0,      risc2500,  risc2500, driver_device,  0,  "Saitek"  , "RISC 2500", MACHINE_CLICKABLE_ARTWORK )
-CONS( 1995, montreux, 0,       0,      risc2500,  risc2500, driver_device,  0,  "Mephisto", "Montreux" , MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     STATE            INIT  COMPANY                      FULLNAME             FLAGS */
+CONS( 1992, risc,     0,       0,      risc2500,  risc2500, risc2500_state,  0,    "Saitek",                    "RISC 2500",         MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1995, montreux, 0,       0,      risc2500,  risc2500, risc2500_state,  0,    "Saitek / Hegener & Glaser", "Mephisto Montreux", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

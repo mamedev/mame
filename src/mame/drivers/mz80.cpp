@@ -28,7 +28,12 @@ MZ80B
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/mz80.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/mz_cas.h"
 
 
@@ -82,7 +87,7 @@ static INPUT_PORTS_START( mz80k )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\xA3')
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0xA3)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G12") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("G14") PORT_CODE(KEYCODE_F4)
 
@@ -244,7 +249,7 @@ static ADDRESS_MAP_START( mz80k_mem, AS_PROGRAM, 8, mz80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0xcfff) AM_RAM AM_SHARE("p_ram") // 48 KB of RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("p_videoram") // Video RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("videoram") // Video RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write) /* PPIA 8255 */
 	AM_RANGE(0xe004, 0xe007) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)  /* PIT 8253  */
 	AM_RANGE(0xe008, 0xe00b) AM_READWRITE( mz80k_strobe_r, mz80k_strobe_w)
@@ -269,7 +274,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mz80_state::ne555_tempo_callback)
 	m_mz80k_tempo_strobe ^= 1;
 }
 
-static MACHINE_CONFIG_START( mz80k, mz80_state )
+MACHINE_CONFIG_START(mz80_state::mz80k)
 	/* basic machine hardware */
 
 	/* main CPU */
@@ -317,13 +322,13 @@ static MACHINE_CONFIG_START( mz80k, mz80_state )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mz80kj, mz80k )
+MACHINE_CONFIG_DERIVED(mz80_state::mz80kj, mz80k)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80kj)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", mz80kj)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mz80a, mz80k )
+MACHINE_CONFIG_DERIVED(mz80_state::mz80a, mz80k)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mz80_state, screen_update_mz80a)
 MACHINE_CONFIG_END
@@ -366,7 +371,7 @@ ROM_START( mz80a )
 	ROM_LOAD( "mz80acg.rom", 0x0000, 0x0800, CRC(a87c2e2b) SHA1(e8aefbdb48a63e5f96692af868c353ca7e1bfcd2) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT   INIT   COMPANY    FULLNAME */
+//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT  STATE        INIT   COMPANY    FULLNAME             FLAGS
 COMP( 1979, mz80kj,   0,        0,      mz80kj,  mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80K (Japanese)", 0 )
-COMP( 1979, mz80k,    mz80kj,   0,      mz80k,   mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80K", 0 )
-COMP( 1982, mz80a,    0,        0,      mz80a,   mz80a, mz80_state,  mz80k, "Sharp",   "MZ-80A", 0 )
+COMP( 1979, mz80k,    mz80kj,   0,      mz80k,   mz80k, mz80_state,  mz80k, "Sharp",   "MZ-80K",            0 )
+COMP( 1982, mz80a,    0,        0,      mz80a,   mz80a, mz80_state,  mz80k, "Sharp",   "MZ-80A",            0 )

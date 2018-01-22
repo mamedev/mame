@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -381,6 +381,15 @@ vec3 fixCubeLookup(vec3 _v, float _lod, float _topLevelCubeSize)
 	if (ay != vmax) { _v.y *= scale; }
 	if (az != vmax) { _v.z *= scale; }
 	return _v;
+}
+
+vec2 texture2DBc5(sampler2D _sampler, vec2 _uv)
+{
+#if BGFX_SHADER_LANGUAGE_HLSL && BGFX_SHADER_LANGUAGE_HLSL <= 3
+	return texture2D(_sampler, _uv).yx;
+#else
+	return texture2D(_sampler, _uv).xy;
+#endif
 }
 
 #endif // __SHADERLIB_SH__

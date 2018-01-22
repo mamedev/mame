@@ -10,6 +10,7 @@
 #define SVISION_H_
 
 #include "cpu/m6502/m65c02.h"
+#include "machine/timer.h"
 #include "audio/svis_snd.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -74,6 +75,11 @@ public:
 	void svision_irq();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svision_cart);
 
+	void svisionp(machine_config &config);
+	void svisions(machine_config &config);
+	void tvlinkp(machine_config &config);
+	void svision(machine_config &config);
+	void svisionn(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<svision_sound_device> m_sound;

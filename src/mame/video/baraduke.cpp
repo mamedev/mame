@@ -325,7 +325,7 @@ uint32_t baraduke_state::screen_update_baraduke(screen_device &screen, bitmap_in
 }
 
 
-void baraduke_state::screen_eof_baraduke(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(baraduke_state::screen_vblank_baraduke)
 {
 	// rising edge
 	if (state)

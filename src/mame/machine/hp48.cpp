@@ -9,11 +9,12 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "cpu/saturn/saturn.h"
+#include "includes/hp48.h"
 
+#include "cpu/saturn/saturn.h"
 #include "machine/nvram.h"
 
-#include "includes/hp48.h"
+#include "screen.h"
 
 
 /***************************************************************************
@@ -281,7 +282,7 @@ void hp48_state::hp48_update_annunciators()
 WRITE8_MEMBER(hp48_state::hp48_io_w)
 {
 	LOG(( "%s %f hp48_io_w: off=%02x data=%x\n",
-			space.machine().describe_context(), space.machine().time().as_double(), offset, data ));
+			machine().describe_context(), machine().time().as_double(), offset, data ));
 
 	switch( offset )
 	{
@@ -323,13 +324,13 @@ WRITE8_MEMBER(hp48_state::hp48_io_w)
 
 	/* cards */
 	case 0x0e:
-		LOG(( "%s: card control write %02x\n", space.machine().describe_context(), data ));
+		LOG(( "%s: card control write %02x\n", machine().describe_context(), data ));
 
 		/* bit 0: software interrupt */
 		if ( data & 1 )
 		{
 			LOG(( "%f hp48_io_w: software interrupt requested\n",
-					space.machine().time().as_double() ));
+					machine().time().as_double() ));
 			hp48_pulse_irq( SATURN_IRQ_LINE );
 			data &= ~1;
 		}
@@ -342,7 +343,7 @@ WRITE8_MEMBER(hp48_state::hp48_io_w)
 		break;
 
 	case 0x0f:
-		LOG(( "%s: card info write %02x\n", space.machine().describe_context(), data ));
+		LOG(( "%s: card info write %02x\n", machine().describe_context(), data ));
 		m_io[0x0f] = data;
 		break;
 
@@ -426,7 +427,7 @@ READ8_MEMBER(hp48_state::hp48_io_r)
 	case 0x29:
 	{
 		int last_line = HP48_IO_8(0x28) & 0x3f; /* last line of main bitmap before menu */
-		int cur_line = space.machine().first_screen()->vpos();
+		int cur_line = machine().first_screen()->vpos();
 		if ( last_line <= 1 ) last_line = 0x3f;
 		data = ( cur_line >= 0 && cur_line <= last_line ) ? last_line - cur_line : 0;
 		if ( offset == 0x29 )
@@ -457,8 +458,8 @@ READ8_MEMBER(hp48_state::hp48_io_r)
 	{
 		/* second nibble of received data */
 
-		//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(space.machine().device("rs232_x"));
-		//device_image_interface *kermit = dynamic_cast<device_image_interface *>(space.machine().device("rs232_k"));
+		//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(machine().device("rs232_x"));
+		//device_image_interface *kermit = dynamic_cast<device_image_interface *>(machine().device("rs232_k"));
 
 		m_io[0x11] &= ~1;  /* clear byte received */
 		data = m_io[offset];
@@ -472,7 +473,7 @@ READ8_MEMBER(hp48_state::hp48_io_r)
 	/* cards */
 	case 0x0e: /* detection */
 		data = m_io[0x0e];
-		LOG(( "%s: card control read %02x\n", space.machine().describe_context(), data ));
+		LOG(( "%s: card control read %02x\n", machine().describe_context(), data ));
 		break;
 	case 0x0f: /* card info */
 		data = 0;
@@ -490,7 +491,7 @@ READ8_MEMBER(hp48_state::hp48_io_r)
 			if ( m_port_size[0] && m_port_write[0] ) data |= 4;
 			if ( m_port_size[1] && m_port_write[1] ) data |= 8;
 		}
-		LOG(( "%s: card info read %02x\n", space.machine().describe_context(), data ));
+		LOG(( "%s: card info read %02x\n", machine().describe_context(), data ));
 		break;
 
 
@@ -498,7 +499,7 @@ READ8_MEMBER(hp48_state::hp48_io_r)
 	}
 
 	LOG(( "%s %f hp48_io_r: off=%02x data=%x\n",
-			space.machine().describe_context(), space.machine().time().as_double(), offset, data ));
+			machine().describe_context(), machine().time().as_double(), offset, data ));
 	return data;
 }
 
@@ -521,7 +522,7 @@ READ8_MEMBER(hp48_state::hp48_bank_r)
 	offset &= 0x7e;
 	if ( m_bank_switch != offset )
 	{
-		LOG(( "%s %f hp48_bank_r: off=%03x\n", space.machine().describe_context(), space.machine().time().as_double(), offset ));
+		LOG(( "%s %f hp48_bank_r: off=%03x\n", machine().describe_context(), machine().time().as_double(), offset ));
 		m_bank_switch = offset;
 		hp48_apply_modules();
 	}
@@ -534,7 +535,7 @@ WRITE8_MEMBER(hp48_state::hp49_bank_w)
 	offset &= 0x7e;
 	if ( m_bank_switch != offset )
 	{
-		LOG(( "%05x %f hp49_bank_w: off=%03x\n", space.device().safe_pcbase(), space.machine().time().as_double(), offset ));
+		LOG(( "%05x %f hp49_bank_w: off=%03x\n", space.device().safe_pcbase(), machine().time().as_double(), offset ));
 		m_bank_switch = offset;
 		hp48_apply_modules();
 	}
@@ -913,7 +914,7 @@ void hp48_state::hp48_encode_nibble( uint8_t* dst, uint8_t* src, int size )
 
 
 /* ----- card images ------ */
-const device_type HP48_PORT = &device_creator<hp48_port_image_device>;
+DEFINE_DEVICE_TYPE(HP48_PORT, hp48_port_image_device, "hp48_port_image", "HP48 memory card")
 
 /* helper for load and create */
 void hp48_port_image_device::hp48_fill_port()
@@ -1010,14 +1011,9 @@ void hp48_port_image_device::device_start()
 }
 
 hp48_port_image_device::hp48_port_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HP48_PORT, "HP48 memory card", tag, owner, clock, "hp48_port_image", __FILE__),
-		device_image_interface(mconfig, *this)
+	: device_t(mconfig, HP48_PORT, tag, owner, clock)
+	, device_image_interface(mconfig, *this)
 {
-}
-
-void hp48_port_image_device::device_config_complete()
-{
-	update_names(HP48_PORT, "port", "p");
 }
 
 /***************************************************************************
@@ -1114,11 +1110,15 @@ void hp48_state::hp48_machine_start( hp48_models model )
 	}
 
 	/* timers */
-	machine().scheduler().timer_pulse(attotime::from_hz( 16 ), timer_expired_delegate(FUNC(hp48_state::hp48_timer1_cb),this));
-	machine().scheduler().timer_pulse(attotime::from_hz( 8192 ), timer_expired_delegate(FUNC(hp48_state::hp48_timer2_cb),this));
+	m_1st_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::hp48_timer1_cb), this));
+	m_1st_timer->adjust(attotime::from_hz( 16 ), 0, attotime::from_hz( 16 ));
+
+	m_2nd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::hp48_timer2_cb), this));
+	m_2nd_timer->adjust(attotime::from_hz( 8192 ), 0, attotime::from_hz( 8192 ));
 
 	/* 1ms keyboard polling */
-	machine().scheduler().timer_pulse(attotime::from_msec( 1 ), timer_expired_delegate(FUNC(hp48_state::hp48_kbd_cb),this));
+	m_kbd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hp48_state::hp48_kbd_cb), this));
+	m_kbd_timer->adjust(attotime::from_msec( 1 ), 0, attotime::from_msec( 1 ));
 
 	/* save state */
 	save_item(NAME(m_out) );

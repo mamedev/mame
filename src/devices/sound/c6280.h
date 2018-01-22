@@ -1,14 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Charles MacDonald
-#pragma once
+#ifndef MAME_SOUND_C6280_H
+#define MAME_SOUND_C6280_H
 
-#ifndef __C6280_H__
-#define __C6280_H__
+#pragma once
 
 #include "cpu/h6280/h6280.h"
 
-class c6280_device : public device_t,
-						public device_sound_interface
+class c6280_device : public device_t, public device_sound_interface
 {
 public:
 	c6280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -55,10 +54,9 @@ private:
 	uint32_t m_wave_freq_tab[4096];
 };
 
-extern const device_type C6280;
+DECLARE_DEVICE_TYPE(C6280, c6280_device)
 
-#define MCFG_C6280_CPU(_tag) \
-	c6280_device::set_devicecpu_tag(*device, "^" _tag);
+#define MCFG_C6280_CPU(tag) \
+		c6280_device::set_devicecpu_tag(*device, ("^" tag));
 
-
-#endif /* __C6280_H__ */
+#endif // MAME_SOUND_C6280_H

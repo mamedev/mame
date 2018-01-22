@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
  Meijinsen (snk/alpha)
@@ -64,8 +64,11 @@ SOFT  PSG & VOICE  BY M.C & S.H
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
 
 class meijinsn_state : public driver_device
 {
@@ -103,6 +106,7 @@ public:
 	DECLARE_PALETTE_INIT(meijinsn);
 	uint32_t screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(meijinsn_interrupt);
+	void meijinsn(machine_config &config);
 };
 
 
@@ -348,7 +352,7 @@ void meijinsn_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( meijinsn, meijinsn_state )
+MACHINE_CONFIG_START(meijinsn_state::meijinsn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 9000000 )
@@ -412,4 +416,4 @@ ROM_START( meijinsn )
 	ROM_LOAD( "clr", 0x00, 0x20, CRC(7b95b5a7) SHA1(c15be28bcd6f5ffdde659f2d352ae409f04b2557) )
 ROM_END
 
-GAME( 1986, meijinsn, 0, meijinsn, meijinsn, driver_device, 0, ROT0, "SNK", "Meijinsen", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, meijinsn, 0, meijinsn, meijinsn, meijinsn_state, 0, ROT0, "SNK", "Meijinsen", MACHINE_SUPPORTS_SAVE )

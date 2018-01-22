@@ -6,8 +6,10 @@
 #include "sound/okim6295.h"
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "video/ms1_tmap.h"
+#include "screen.h"
 
 class cischeat_state : public driver_device
 {
@@ -155,4 +157,12 @@ public:
 
 	DECLARE_DRIVER_INIT(captflag);
 	TIMER_DEVICE_CALLBACK_MEMBER(captflag_scanline);
+	void scudhamm(machine_config &config);
+	void armchmp2(machine_config &config);
+	void cischeat(machine_config &config);
+	void f1gpstr2(machine_config &config);
+	void f1gpstar(machine_config &config);
+	void captflag(machine_config &config);
+	void bigrun(machine_config &config);
+	void wildplt(machine_config &config);
 };

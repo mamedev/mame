@@ -379,7 +379,7 @@
 //**************************************************************************
 
 // device type definition
-const device_type FD1094 = &device_creator<fd1094_device>;
+DEFINE_DEVICE_TYPE(FD1094, fd1094_device, "fd1094", "Hitachi FD1094 Encrypted CPU")
 
 /*
 317-0162 CPU also needs to mask:
@@ -553,7 +553,7 @@ uint16_t *fd1094_decryption_cache::decrypted_opcodes(uint8_t state)
 
 
 fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m68000_device(mconfig, tag, owner, clock, "fd1094", __FILE__)
+	: m68000_device(mconfig, FD1094, tag, owner, clock)
 	, m_decrypted_opcodes_bank(*this, "^fd1094_decrypted_opcodes")
 	, m_state(0x00)
 	, m_irqmode(false)
@@ -562,11 +562,8 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 	, m_rom(*this, DEVICE_SELF)
 	, m_key(*this, "key")
 {
-	// override the name after the m68000 initializes
-	m_name.assign("FD1094");
-
 	// add the decrypted opcodes map
-//  m_address_map[AS_DECRYPTED_OPCODES] = ADDRESS_MAP_NAME(decrypted_opcodes_map);
+//  m_address_map[AS_OPCODES] = ADDRESS_MAP_NAME(decrypted_opcodes_map);
 
 	// create the initial masked opcode table
 	memset(m_masked_opcodes_lookup, 0, sizeof(m_masked_opcodes_lookup));
@@ -771,7 +768,7 @@ uint16_t fd1094_device::decrypt_one(offs_t address, uint16_t val, const uint8_t 
 	else                    key_F = BIT(mainkey,6);
 
 	// the CPU has been verified to produce different results when fetching opcodes
-	// from 0000-0006 than when fetching the inital SP and PC on reset.
+	// from 0000-0006 than when fetching the initial SP and PC on reset.
 	if (vector_fetch)
 	{
 		if (address <= 3) gkey3 = 0x00; // supposed to always be the case
@@ -818,7 +815,7 @@ uint16_t fd1094_device::decrypt_one(offs_t address, uint16_t val, const uint8_t 
 
 	if (val & 0x8000)           // block invariant: val & 0x8000 != 0
 	{
-		val = BITSWAP16(val, 15, 9,10,13, 3,12, 0,14, 6, 5, 2,11, 8, 1, 4, 7);
+		val = bitswap<16>(val, 15, 9,10,13, 3,12, 0,14, 6, 5, 2,11, 8, 1, 4, 7);
 
 		if (!global_xor1)   if (~val & 0x0800)  val ^= 0x3002;                                      // 1,12,13
 		if (true)           if (~val & 0x0020)  val ^= 0x0044;                                      // 2,6
@@ -826,12 +823,12 @@ uint16_t fd1094_device::decrypt_one(offs_t address, uint16_t val, const uint8_t 
 		if (!global_swap2)  if (!key_0c)        val ^= 0x0308;                                      // 3,8,9
 												val ^= 0x6561;
 
-		if (!key_2b)        val = BITSWAP16(val,15,10,13,12,11,14,9,8,7,6,0,4,3,2,1,5);             // 0-5, 10-14
+		if (!key_2b)        val = bitswap<16>(val,15,10,13,12,11,14,9,8,7,6,0,4,3,2,1,5);             // 0-5, 10-14
 	}
 
 	if (val & 0x4000)           // block invariant: val & 0x4000 != 0
 	{
-		val = BITSWAP16(val, 13,14, 7, 0, 8, 6, 4, 2, 1,15, 3,11,12,10, 5, 9);
+		val = bitswap<16>(val, 13,14, 7, 0, 8, 6, 4, 2, 1,15, 3,11,12,10, 5, 9);
 
 		if (!global_xor0)   if (val & 0x0010)   val ^= 0x0468;                                      // 3,5,6,10
 		if (!key_3a)        if (val & 0x0100)   val ^= 0x0081;                                      // 0,7
@@ -839,12 +836,12 @@ uint16_t fd1094_device::decrypt_one(offs_t address, uint16_t val, const uint8_t 
 		if (!key_5b)        if (!key_0b)        val ^= 0x3012;                                      // 1,4,12,13
 												val ^= 0x3523;
 
-		if (!global_swap0b) val = BITSWAP16(val, 2,14,13,12, 9,10,11, 8, 7, 6, 5, 4, 3,15, 1, 0);   // 2-15, 9-11
+		if (!global_swap0b) val = bitswap<16>(val, 2,14,13,12, 9,10,11, 8, 7, 6, 5, 4, 3,15, 1, 0);   // 2-15, 9-11
 	}
 
 	if (val & 0x2000)           // block invariant: val & 0x2000 != 0
 	{
-		val = BITSWAP16(val, 10, 2,13, 7, 8, 0, 3,14, 6,15, 1,11, 9, 4, 5,12);
+		val = bitswap<16>(val, 10, 2,13, 7, 8, 0, 3,14, 6,15, 1,11, 9, 4, 5,12);
 
 		if (!key_4a)        if (val & 0x0800)   val ^= 0x010c;                                      // 2,3,8
 		if (!key_1a)        if (val & 0x0080)   val ^= 0x1000;                                      // 12
@@ -853,27 +850,27 @@ uint16_t fd1094_device::decrypt_one(offs_t address, uint16_t val, const uint8_t 
 		if (!global_swap0a) if (!key_6b)        val ^= 0xc000;                                      // 14,15
 												val ^= 0x99a5;
 
-		if (!key_5b)        val = BITSWAP16(val,15,14,13,12,11, 1, 9, 8, 7,10, 5, 6, 3, 2, 4, 0);   // 1,4,6,10
+		if (!key_5b)        val = bitswap<16>(val,15,14,13,12,11, 1, 9, 8, 7,10, 5, 6, 3, 2, 4, 0);   // 1,4,6,10
 	}
 
 	if (val & 0xe000)           // block invariant: val & 0xe000 != 0
 	{
-		val = BITSWAP16(val,15,13,14, 5, 6, 0, 9,10, 4,11, 1, 2,12, 3, 7, 8);
+		val = bitswap<16>(val,15,13,14, 5, 6, 0, 9,10, 4,11, 1, 2,12, 3, 7, 8);
 
 		val ^= 0x17ff;
 
-		if (!global_swap4)  val = BITSWAP16(val, 15,14,13, 6,11,10, 9, 5, 7,12, 8, 4, 3, 2, 1, 0);  // 5-8, 6-12
-		if (!global_swap3)  val = BITSWAP16(val, 13,15,14,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 15-14-13
-		if (!global_swap2)  val = BITSWAP16(val, 15,14,13,12,11, 2, 9, 8,10, 6, 5, 4, 3, 0, 1, 7);  // 10-2-0-7
-		if (!key_3b)        val = BITSWAP16(val, 15,14,13,12,11,10, 4, 8, 7, 6, 5, 9, 1, 2, 3, 0);  // 9-4, 3-1
-		if (!key_2a)        val = BITSWAP16(val, 13,14,15,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 13-15
+		if (!global_swap4)  val = bitswap<16>(val, 15,14,13, 6,11,10, 9, 5, 7,12, 8, 4, 3, 2, 1, 0);  // 5-8, 6-12
+		if (!global_swap3)  val = bitswap<16>(val, 13,15,14,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 15-14-13
+		if (!global_swap2)  val = bitswap<16>(val, 15,14,13,12,11, 2, 9, 8,10, 6, 5, 4, 3, 0, 1, 7);  // 10-2-0-7
+		if (!key_3b)        val = bitswap<16>(val, 15,14,13,12,11,10, 4, 8, 7, 6, 5, 9, 1, 2, 3, 0);  // 9-4, 3-1
+		if (!key_2a)        val = bitswap<16>(val, 13,14,15,12,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);  // 13-15
 
-		if (!global_swap1)  val = BITSWAP16(val, 15,14,13,12, 9, 8,11,10, 7, 6, 5, 4, 3, 2, 1, 0);  // 11...8
-		if (!key_5a)        val = BITSWAP16(val, 15,14,13,12,11,10, 9, 8, 4, 5, 7, 6, 3, 2, 1, 0);  // 7...4
-		if (!global_swap0a) val = BITSWAP16(val, 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 0, 3, 2, 1);  // 3...0
+		if (!global_swap1)  val = bitswap<16>(val, 15,14,13,12, 9, 8,11,10, 7, 6, 5, 4, 3, 2, 1, 0);  // 11...8
+		if (!key_5a)        val = bitswap<16>(val, 15,14,13,12,11,10, 9, 8, 4, 5, 7, 6, 3, 2, 1, 0);  // 7...4
+		if (!global_swap0a) val = bitswap<16>(val, 15,14,13,12,11,10, 9, 8, 7, 6, 5, 4, 0, 3, 2, 1);  // 3...0
 	}
 
-	val = BITSWAP16(val, 12,15,14,13,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+	val = bitswap<16>(val, 12,15,14,13,11,10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 
 	if ((val & 0xb080) == 0x8000) val ^= 0x4000;
 	if ((val & 0xf000) == 0xc000) val ^= 0x0080;

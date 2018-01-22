@@ -54,27 +54,21 @@ f809      ????
 f80b      ????
 
 ***************************************************************************/
+
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/watchdog.h"
-#include "sound/3812intf.h"
 #include "includes/tecmo.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/watchdog.h"
+#include "sound/3526intf.h"
+#include "sound/3812intf.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(tecmo_state::bankswitch_w)
 {
 	membank("bank1")->set_entry(data >> 3);
-}
-
-WRITE8_MEMBER(tecmo_state::sound_command_w)
-{
-	m_soundlatch->write(space, offset, data);
-	m_soundcpu->set_input_line(INPUT_LINE_NMI,ASSERT_LINE);
-}
-
-WRITE8_MEMBER(tecmo_state::nmi_ack_w)
-{
-	m_soundcpu->set_input_line(INPUT_LINE_NMI,CLEAR_LINE);
 }
 
 WRITE8_MEMBER(tecmo_state::adpcm_start_w)
@@ -149,7 +143,7 @@ static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("JOY1")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("BUTTONS1")
@@ -164,7 +158,7 @@ static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(sound_command_w)
+	AM_RANGE(0xf806, 0xf806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf80b, 0xf80b) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
@@ -176,7 +170,7 @@ static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(bgvideoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("JOY1")
@@ -192,7 +186,7 @@ static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(sound_command_w)
+	AM_RANGE(0xf806, 0xf806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf80b, 0xf80b) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
@@ -205,7 +199,7 @@ static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("JOY1")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("BUTTONS1")
@@ -220,7 +214,7 @@ static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE(fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE(bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(sound_command_w)
+	AM_RANGE(0xf806, 0xf806) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf809, 0xf809) AM_WRITENOP    /* ? */
@@ -230,11 +224,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ymsnd", ym3812_device, write)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ymsnd", ym3526_device, write)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(adpcm_end_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(adpcm_vol_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(nmi_ack_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
@@ -246,7 +240,7 @@ static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_start_w)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(adpcm_end_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(adpcm_vol_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(nmi_ack_w)
+	AM_RANGE(0xcc00, 0xcc00) AM_DEVWRITE("soundlatch", generic_latch_8_device, acknowledge_w)
 ADDRESS_MAP_END
 
 
@@ -365,6 +359,18 @@ static INPUT_PORTS_START( gemini )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
+
+	PORT_MODIFY("BUTTONS1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	PORT_MODIFY("JOY2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+
+	PORT_MODIFY("BUTTONS2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:!1,!2,!3")
@@ -617,7 +623,7 @@ void tecmo_state::machine_reset()
 	m_adpcm_data = -1;
 }
 
-static MACHINE_CONFIG_START( rygar, tecmo_state )
+MACHINE_CONFIG_START(tecmo_state::rygar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* verified on pcb */
@@ -646,19 +652,21 @@ static MACHINE_CONFIG_START( rygar, tecmo_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("soundcpu", INPUT_LINE_NMI))
+	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_4MHz) /* verified on pcb */
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb, even if schematics shows a 384khz resonator */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(tecmo_state, adpcm_int))    /* interrupt function */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz               */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz               */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gemini, rygar )
+MACHINE_CONFIG_DERIVED(tecmo_state::gemini, rygar)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -668,15 +676,19 @@ static MACHINE_CONFIG_DERIVED( gemini, rygar )
 
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(tecmo_sound_map)
+
+	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL_4MHz)
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( geminib, gemini)
+MACHINE_CONFIG_DERIVED(tecmo_state::geminib, gemini)
 	// 24.18 MHz OSC / 59.62 Hz, bootleg only?
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(24180000/4, 384,0,256,264,16,240)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( silkworm, gemini )
+MACHINE_CONFIG_DERIVED(tecmo_state::silkworm, gemini)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -684,7 +696,7 @@ static MACHINE_CONFIG_DERIVED( silkworm, gemini )
 	MCFG_CPU_PROGRAM_MAP(silkworm_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( backfirt, gemini )
+MACHINE_CONFIG_DERIVED(tecmo_state::backfirt, gemini)
 
 	/* this pcb has no MSM5205 */
 	MCFG_DEVICE_REMOVE("msm")
@@ -982,6 +994,41 @@ ROM_START( silkwormj )
 	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
 	ROM_LOAD( "silkworm.1",   0x0000, 0x8000, CRC(5b553644) SHA1(5d39d2251094c17f7b732b4861401b3516fce9b1) )
 ROM_END
+// 6217A
+// SILKWORM H T737
+// board have Japanese label "ADONO"
+ROM_START( silkwormp )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "silkworm_pr4ma.4",  0x00000, 0x10000, CRC(5e2a39cc) SHA1(e2fb0fa2d4e3d439935b7814c8572224eddf271e) )  /* c000-ffff is not used */
+	ROM_LOAD( "silkworm.5",        0x10000, 0x10000, CRC(a6c7bb51) SHA1(75f6625459ab65f2d47a282c1295d4db38f5fe51) )  /* banked at f000-f7ff */
+
+	ROM_REGION( 0x20000, "soundcpu", 0 )
+	ROM_LOAD( "silkworm_sound.3",    0x0000, 0x8000, CRC(c67c5644) SHA1(0963eda467dbc18806a4f0a9525a093d2fcb82fb) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "sw.2",   0x00000, 0x08000, CRC(1acc54be) SHA1(b210e4c0753bc84171ca418f3fcf07f0e6965390) )  /* characters */
+
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "silkworm.6",   0x00000, 0x10000, CRC(1138d159) SHA1(3b938606d448c4effdfe414bbf495b50cc3bc1c1) )  /* sprites */
+	ROM_LOAD( "silkworm.7",   0x10000, 0x10000, CRC(d96214f7) SHA1(a5b2be3ae6a6eb8afef2c18c865a998fbf4adf93) )  /* sprites */
+	ROM_LOAD( "silkworm.8",   0x20000, 0x10000, CRC(0494b38e) SHA1(03255f153824056e430a0b8595103f3b58b1fd97) )  /* sprites */
+	ROM_LOAD( "silkworm.9",   0x30000, 0x10000, CRC(8ce3cdf5) SHA1(635248514c4e1e5aab7a2ed4d620a5b970d4a43a) )  /* sprites */
+
+	ROM_REGION( 0x40000, "gfx3", 0 )
+	ROM_LOAD( "silkworm.10",  0x00000, 0x10000, CRC(8c7138bb) SHA1(0cfd69fa77d5b546f7dad80537d8d2497ae758bc) )  /* tiles #1 */
+	ROM_LOAD( "silkworm.11",  0x10000, 0x10000, CRC(6c03c476) SHA1(79ad800a2f4ba6d44ba5a31210cbd8566bb357b6) )  /* tiles #1 */
+	ROM_LOAD( "silkworm.12",  0x20000, 0x10000, CRC(bb0f568f) SHA1(b66c6d0407ed0b068c6bf07987f1b923d4a6e4f8) )  /* tiles #1 */
+	ROM_LOAD( "silkworm.13",  0x30000, 0x10000, CRC(773ad0a4) SHA1(f7576e1ac8c779b33d7ec393555fd097a34257fa) )  /* tiles #1 */
+
+	ROM_REGION( 0x40000, "gfx4", 0 )
+	ROM_LOAD( "silkworm.14",  0x00000, 0x10000, CRC(409df64b) SHA1(cada970bf9cc8f6522e7a71e00fe873568852873) )  /* tiles #2 */
+	ROM_LOAD( "silkworm.15",  0x10000, 0x10000, CRC(6e4052c9) SHA1(e2e3d7221b75cb044449a25a076a93c3def1f11b) )  /* tiles #2 */
+	ROM_LOAD( "silkworm.16",  0x20000, 0x10000, CRC(9292ed63) SHA1(70aa46fcc187b8200c5d246870e2e2dc4b2985cb) )  /* tiles #2 */
+	ROM_LOAD( "silkworm.17",  0x30000, 0x10000, CRC(3fa4563d) SHA1(46e3cc41491d63efcdda43c84c7ac1385a1926d0) )  /* tiles #2 */
+
+	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
+	ROM_LOAD( "silkworm.1",   0x0000, 0x8000, CRC(5b553644) SHA1(5d39d2251094c17f7b732b4861401b3516fce9b1) ) // not dumped
+ROM_END
 
 /*
 
@@ -1154,12 +1201,13 @@ DRIVER_INIT_MEMBER(tecmo_state,backfirt)
 
 
 
-GAME( 1986, rygar,     0,        rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rygar2,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rygar3,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Rygar (US set 3 Old Version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, rygarj,    rygar,    rygar,    rygar, tecmo_state,    rygar,    ROT0,  "Tecmo", "Argus no Senshi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, gemini,    0,        gemini,   gemini, tecmo_state,   gemini,   ROT90, "Tecmo", "Gemini Wing (Japan)", MACHINE_SUPPORTS_SAVE ) /* Japan regional warning screen */
-GAME( 1987, geminib,   gemini,   geminib,  gemini, tecmo_state,   gemini,   ROT90, "bootleg", "Gemini Wing (bootleg)", MACHINE_SUPPORTS_SAVE ) /* Japan regional warning screen */
-GAME( 1988, silkworm,  0,        silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo", "Silk Worm (World)", MACHINE_SUPPORTS_SAVE )   /* No regional "Warning, if you are playing ..." screen */
-GAME( 1988, silkwormj, silkworm, silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo", "Silk Worm (Japan)", MACHINE_SUPPORTS_SAVE )   /* Japan regional warning screen */
-GAME( 1988, backfirt,  0,        backfirt, backfirt, tecmo_state, backfirt, ROT0,  "Tecmo", "Back Fire (Tecmo, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygar,     0,        rygar,    rygar,    tecmo_state, rygar,    ROT0,  "Tecmo",   "Rygar (US set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygar2,    rygar,    rygar,    rygar,    tecmo_state, rygar,    ROT0,  "Tecmo",   "Rygar (US set 2)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygar3,    rygar,    rygar,    rygar,    tecmo_state, rygar,    ROT0,  "Tecmo",   "Rygar (US set 3 Old Version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, rygarj,    rygar,    rygar,    rygar,    tecmo_state, rygar,    ROT0,  "Tecmo",   "Argus no Senshi (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1987, gemini,    0,        gemini,   gemini,   tecmo_state, gemini,   ROT90, "Tecmo",   "Gemini Wing (Japan)",          MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
+GAME( 1987, geminib,   gemini,   geminib,  gemini,   tecmo_state, gemini,   ROT90, "bootleg", "Gemini Wing (bootleg)",        MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
+GAME( 1988, silkworm,  0,        silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo",   "Silk Worm (World)",            MACHINE_SUPPORTS_SAVE ) // No regional "Warning, if you are playing ..." screen
+GAME( 1988, silkwormj, silkworm, silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo",   "Silk Worm (Japan)",            MACHINE_SUPPORTS_SAVE ) // Japan regional warning screen
+GAME( 1988, silkwormp, silkworm, silkworm, silkworm, tecmo_state, silkworm, ROT0,  "Tecmo",   "Silk Worm (prototype?)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1988, backfirt,  0,        backfirt, backfirt, tecmo_state, backfirt, ROT0,  "Tecmo",   "Back Fire (Tecmo, bootleg)",   MACHINE_SUPPORTS_SAVE )

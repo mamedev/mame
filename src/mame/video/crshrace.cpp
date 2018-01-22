@@ -140,9 +140,3 @@ uint32_t crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_in
 	}
 	return 0;
 }
-
-void crshrace_state::screen_eof_crshrace(screen_device &screen, bool state)
-{
-	m_spriteram->vblank_copy_rising(screen, state);
-	m_spriteram2->vblank_copy_rising(screen, state);
-}

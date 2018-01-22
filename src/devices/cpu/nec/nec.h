@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 /* ASG 971222 -- rewrote this interface */
-#ifndef __NEC_H_
-#define __NEC_H_
+#ifndef MAME_CPU_NEC_NEC_H
+#define MAME_CPU_NEC_NEC_H
+
+#pragma once
 
 
 #define NEC_INPUT_LINE_INTP0 10
@@ -21,11 +23,10 @@ enum
 
 class nec_common_device : public cpu_device
 {
-public:
-	// construction/destruction
-	nec_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
-
 protected:
+	// construction/destruction
+	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -39,7 +40,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr); }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -47,20 +48,18 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-/* NEC registers */
-union necbasicregs
-{                   /* eight general registers */
-	uint16_t w[8];    /* viewed as 16 bits registers */
-	uint8_t  b[16];   /* or as 8 bit registers */
-};
+	/* NEC registers */
+	union necbasicregs
+	{                   /* eight general registers */
+		uint16_t w[8];    /* viewed as 16 bits registers */
+		uint8_t  b[16];   /* or as 8 bit registers */
+	};
 
 	necbasicregs m_regs;
 	offs_t  m_fetch_xor;
@@ -89,7 +88,7 @@ union necbasicregs
 	uint8_t   m_halted;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_io;
 	int     m_icount;
 
@@ -423,11 +422,9 @@ public:
 };
 
 
-extern const device_type V20;
-extern const device_type V30;
-extern const device_type V33;
-extern const device_type V33A;
+DECLARE_DEVICE_TYPE(V20,  v20_device)
+DECLARE_DEVICE_TYPE(V30,  v30_device)
+DECLARE_DEVICE_TYPE(V33,  v33_device)
+DECLARE_DEVICE_TYPE(V33A, v33a_device)
 
-
-
-#endif
+#endif // MAME_CPU_NEC_NEC_H

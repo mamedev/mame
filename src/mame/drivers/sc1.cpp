@@ -38,8 +38,10 @@ Port 82 in - upper byte = 0 thru 7
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/speaker.h"
 #include "machine/z80pio.h"
+#include "sound/spkrdev.h"
+#include "speaker.h"
+
 #include "sc1.lh"
 
 
@@ -47,9 +49,9 @@ class sc1_state : public driver_device
 {
 public:
 	sc1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_speaker(*this, "speaker")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_speaker(*this, "speaker")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -60,6 +62,7 @@ public:
 	DECLARE_READ8_MEMBER( pio_port_b_r );
 
 	uint8_t m_matrix;
+	void sc1(machine_config &config);
 };
 
 /***************************************************************************
@@ -70,7 +73,7 @@ public:
 
 WRITE8_MEMBER( sc1_state::pio_port_a_w )
 {
-	uint8_t digit = BITSWAP8( data,3,4,6,0,1,2,7,5 );
+	uint8_t digit = bitswap<8>( data,3,4,6,0,1,2,7,5 );
 
 	if (m_matrix & 0x04)
 		output().set_digit_value(3, digit & 0x7f);
@@ -168,7 +171,7 @@ static INPUT_PORTS_START( sc1 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sc1, sc1_state )
+MACHINE_CONFIG_START(sc1_state::sc1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(sc1_mem)
@@ -196,5 +199,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                           FULLNAME       FLAGS */
-COMP( 1989, sc1,    0,      0,       sc1,       sc1, driver_device,     0,  "VEB Mikroelektronik Erfurt", "Schachcomputer SC1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME  PARENT  COMPAT   MACHINE  INPUT  STATE       INIT  COMPANY                       FULLNAME              FLAGS
+COMP( 1989, sc1,  0,      0,       sc1,     sc1,   sc1_state,  0,    "VEB Mikroelektronik Erfurt", "Schachcomputer SC1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

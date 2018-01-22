@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_C64_WARP_SPEED_H
+#define MAME_BUS_C64_WARP_SPEED_H
+
 #pragma once
 
-#ifndef __WARP_SPEED__
-#define __WARP_SPEED__
 
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -45,7 +44,7 @@ protected:
 
 
 // device type definition
-extern const device_type C64_WARP_SPEED;
+DECLARE_DEVICE_TYPE(C64_WARP_SPEED, c64_warp_speed_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_WARP_SPEED_H

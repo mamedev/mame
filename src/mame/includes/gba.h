@@ -62,10 +62,6 @@ public:
 	uint8_t m_fifo_a[20];
 	uint8_t m_fifo_b[20];
 
-	uint32_t m_bios_last_address;
-	int m_bios_protected;
-
-	DIRECT_UPDATE_MEMBER(gba_direct);
 	DECLARE_READ32_MEMBER(gba_io_r);
 	DECLARE_WRITE32_MEMBER(gba_io_w);
 	DECLARE_READ32_MEMBER(gba_bios_r);
@@ -82,6 +78,7 @@ public:
 	TIMER_CALLBACK_MEMBER(timer_expire);
 	TIMER_CALLBACK_MEMBER(handle_irq);
 
+	void gbadv(machine_config &config);
 protected:
 	required_region_ptr<uint32_t> m_region_maincpu;
 	required_ioport m_io_inputs;

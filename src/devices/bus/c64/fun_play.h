@@ -6,13 +6,12 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_C64_FUN_PLAY_H
+#define MAME_BUS_C64_FUN_PLAY_H
+
 #pragma once
 
-#ifndef __FUN_PLAY__
-#define __FUN_PLAY__
 
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -45,7 +44,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_FUN_PLAY;
+DECLARE_DEVICE_TYPE(C64_FUN_PLAY, c64_fun_play_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_FUN_PLAY_H

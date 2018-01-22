@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "vga.h"
 #include "video/pc_vga.h"
+#include "screen.h"
 
 ROM_START( ibm_vga )
 	ROM_REGION(0x8000,"ibm_vga", 0)
@@ -19,18 +20,21 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA8_VGA = &device_creator<isa8_vga_device>;
+DEFINE_DEVICE_TYPE(ISA8_VGA, isa8_vga_device, "ibm_vga", "IBM VGA Graphics Card")
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor isa8_vga_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( pcvideo_vga );
-}
+MACHINE_CONFIG_START(isa8_vga_device::device_add_mconfig)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
+
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", VGA, 0)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -50,15 +54,15 @@ const tiny_rom_entry *isa8_vga_device::device_rom_region() const
 //-------------------------------------------------
 
 isa8_vga_device::isa8_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, ISA8_VGA, "IBM VGA Graphics Card", tag, owner, clock, "ibm_vga", __FILE__),
-		device_isa8_card_interface(mconfig, *this), m_vga(nullptr)
+	device_t(mconfig, ISA8_VGA, tag, owner, clock),
+	device_isa8_card_interface(mconfig, *this), m_vga(nullptr)
 {
 }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-READ8_MEMBER( isa8_vga_device::input_port_0_r ) { return 0xff; } //return space.machine().root_device().ioport("IN0")->read(); }
+READ8_MEMBER( isa8_vga_device::input_port_0_r ) { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
 
 void isa8_vga_device::device_start()
 {

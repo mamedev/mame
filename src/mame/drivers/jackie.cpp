@@ -47,7 +47,11 @@ Note
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "machine/timer.h"
 #include "sound/ym2413.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class jackie_state : public driver_device
@@ -128,6 +132,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	void jackie(machine_config &config);
 };
 
 
@@ -376,7 +381,7 @@ READ8_MEMBER(jackie_state::expram_r)
 	uint8_t *rom = memregion("gfx3")->base();
 
 	offset += m_exp_bank * 0x8000;
-//  logerror("PC %06X: %04x = %02x\n",space.device().safe_pc(),offset,rom[offset]);
+//  logerror("PC %06X: %04x = %02x\n",m_maincpu->pc(),offset,rom[offset]);
 	return rom[offset];
 }
 
@@ -394,18 +399,15 @@ static ADDRESS_MAP_START( jackie_io_map, AS_IO, 8, jackie_state )
 	AM_RANGE(0x05a0, 0x05a4) AM_WRITE(unk_reg3_lo_w)
 	AM_RANGE(0x0da0, 0x0da4) AM_WRITE(unk_reg3_hi_w)
 	AM_RANGE(0x1000, 0x1107) AM_RAM AM_SHARE("bg_scroll2")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")           /* DSW2 */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")           /* DSW3 */
 	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")           /* DSW4 */
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")           /* DSW5 */
-	AM_RANGE(0x5080, 0x5080) AM_WRITE(nmi_and_coins_w)
-	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("COINS")
-	AM_RANGE(0x5090, 0x5090) AM_READ_PORT("BUTTONS1")
-	AM_RANGE(0x5091, 0x5091) AM_WRITE(lamps_w )
+	AM_RANGE(0x5080, 0x5083) AM_DEVREADWRITE("ppi1", i8255_device, read, write)
+	AM_RANGE(0x5090, 0x5093) AM_DEVREADWRITE("ppi2", i8255_device, read, write)
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
 	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE("ymsnd", ym2413_device, write)
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
@@ -595,7 +597,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jackie_state::irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( jackie, jackie_state )
+MACHINE_CONFIG_START(jackie_state::jackie)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
@@ -603,6 +605,14 @@ static MACHINE_CONFIG_START( jackie, jackie_state )
 	MCFG_CPU_IO_MAP(jackie_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jackie_state, irq, "screen", 0, 1)
 
+	MCFG_DEVICE_ADD("ppi1", I8255A, 0) // D8255AC
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(jackie_state, nmi_and_coins_w))
+	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
+	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
+
+	MCFG_DEVICE_ADD("ppi2", I8255A, 0) // D8255AC
+	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(jackie_state, lamps_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

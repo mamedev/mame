@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_C64_MACH5_H
+#define MAME_BUS_C64_MACH5_H
+
 #pragma once
 
-#ifndef __MACH5__
-#define __MACH5__
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -49,7 +48,7 @@ private:
 
 
 // device type definition
-extern const device_type C64_MACH5;
+DECLARE_DEVICE_TYPE(C64_MACH5, c64_mach5_cartridge_device)
 
 
-#endif
+#endif // MAME_BUS_C64_MACH5_H

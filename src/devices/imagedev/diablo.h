@@ -4,13 +4,15 @@
  *   DIABLO drive image to hard disk interface
  **********************************************************/
 
-#ifndef _IMAGEDEV_DIABLO_H_
-#define _IMAGEDEV_DIABLO_H_
+#ifndef MAME_DEVICES_IMAGEDEV_DIABLO_H
+#define MAME_DEVICES_IMAGEDEV_DIABLO_H
+
+#pragma once
 
 #include "harddisk.h"
 #include "softlist_dev.h"
 
-#define DIABLO_TAG(_id) "diablo"#_id
+#define DIABLO_TAG(id) "diablo"#id
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -18,8 +20,7 @@
 
 // ======================> diablo_image_device
 
-class diablo_image_device :   public device_t,
-								public device_image_interface
+class diablo_image_device : public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
@@ -70,7 +71,7 @@ protected:
 };
 
 // device type definition
-extern const device_type DIABLO;
+DECLARE_DEVICE_TYPE(DIABLO, diablo_image_device)
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
@@ -80,12 +81,12 @@ extern const device_type DIABLO;
 	MCFG_DEVICE_ADD(_tag, DIABLO, 0)
 
 #define MCFG_DIABLO_LOAD(_class,_method)                                \
-	diablo_image_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), downcast<_class *>(owner)));
+	diablo_image_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), this));
 
 #define MCFG_DIABLO_UNLOAD(_class,_method)                            \
-	diablo_image_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), downcast<_class *>(owner)));
+	diablo_image_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), this));
 
 #define MCFG_DIABLO_INTERFACE(_interface)                         \
 	diablo_image_device::static_set_interface(*device, _interface);
 
-#endif /* _IMAGEDEV_DIABLO_H_ */
+#endif // MAME_DEVICES_IMAGEDEV_DIABLO_H

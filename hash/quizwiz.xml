@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="quizwiz" description="Coleco Quiz Wiz cartridges">
+<!--
+
+Around 30 cartridges were released for Coleco Quiz Wiz, from 1980 to 1982.
+The cartridges connect pins together to pin 4(tied high) and pin 5(grounded),
+for example cartridge #3 connects 2+3+4+8, 1+5+6+7. Or in binary:
+
+87654321 (cartridge pins, pin #1 is at top when cartridge is sitting with connector on the left)
+10001110
+
+-->
+
+<!-- Coleco Quiz Wiz/Quiz Wiz Challenger -->
+
+	<software name="1">
+		<description>1: 1001 Questions</description>
+		<year>1980</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="quizwiz_cart">
+			<feature name="pinout" value="00001111" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+	<software name="2">
+		<description>2: The World of Sports</description>
+		<year>1980</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="quizwiz_cart">
+			<feature name="pinout" value="11001001" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+	<software name="3">
+		<description>3: Movies and TV</description>
+		<year>1980</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="quizwiz_cart">
+			<feature name="pinout" value="10001110" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+	<software name="4">
+		<description>4: People and Places</description>
+		<year>1980</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="quizwiz_cart">
+			<feature name="pinout" value="10001111" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+	<software name="5">
+		<description>5: Trivia</description>
+		<year>1980</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="quizwiz_cart">
+			<feature name="pinout" value="11001110" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+	<software name="6">
+		<description>6: Music and Books</description>
+		<year>1980</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="quizwiz_cart">
+			<feature name="pinout" value="01101011" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+	<software name="10">
+		<description>10: Super Heroes</description>
+		<year>1980</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="quizwiz_cart">
+			<feature name="pinout" value="10001111" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+
+<!-- Coleco Quiz Wiz Challenger -->
+
+	<!-- Quiz Wiz Challenger pack-in cartridge -->
+	<software name="genknow">
+		<description>General Knowledge</description>
+		<year>1981</year>
+		<publisher>Coleco</publisher>
+		<part name="cart" interface="quizwiz_cart">
+			<feature name="pinout" value="00001111" />
+			<dataarea name="nodata" size="0x10"></dataarea>
+		</part>
+	</software>
+
+
+<!-- Tiger Electronics Quiz Wiz (1990s): TODO, assume compatible? -->
+
+<!-- Tsukuda Ultra Quiz Machine: TODO, assume compatible? -->
+
+</softwarelist>

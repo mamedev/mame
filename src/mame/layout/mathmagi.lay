@@ -22,8 +22,8 @@
 		<text string="/" state="0"><color red="0.125490" green="0.035294" blue="0.0235294" /></text>
 	</element>
 	<element name="lamp_backslash" defstate="0">
-		<text string="\" state="1"><color red="1.0" green="0.3" blue="0.2" /></text>
-		<text string="\" state="0"><color red="0.125490" green="0.035294" blue="0.0235294" /></text>
+		<text string="&#x5c;" state="1"><color red="1.0" green="0.3" blue="0.2" /></text>
+		<text string="&#x5c;" state="0"><color red="0.125490" green="0.035294" blue="0.0235294" /></text>
 	</element>
 
 
@@ -83,7 +83,6 @@
 		<bezel name="10.1" element="lamp_dot"><bounds x="26" y="1" width="4" height="4" /></bezel>
 		<bezel name="10.3" element="lamp_dot"><bounds x="51" y="1" width="4" height="4" /></bezel>
 		<bezel name="10.6" element="lamp_dot"><bounds x="76" y="1" width="4" height="4" /></bezel>
-
 
 	</view>
 </mamelayout>

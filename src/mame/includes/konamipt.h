@@ -279,7 +279,7 @@ because they just need a few lines of code */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    \
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )    \
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-/**************************** Coinage Dip Swicthes ****************************/
+/**************************** Coinage Dip Switches ****************************/
 
 /* Konami games from 80s-90s basically use only two kind of coinage dips. The only
 difference is in the settings corresponding to 0x00, which could be either 4C_5C

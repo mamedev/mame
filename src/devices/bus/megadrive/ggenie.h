@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __MD_GGENIE_H
-#define __MD_GGENIE_H
+#ifndef MAME_BUS_MEGADRIVE_GGENIE_H
+#define MAME_BUS_MEGADRIVE_GGENIE_H
+
+#pragma once
 
 #include "md_slot.h"
 
@@ -15,10 +17,12 @@ public:
 	// construction/destruction
 	md_rom_ggenie_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+
+	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read) override;
@@ -35,6 +39,6 @@ private:
 
 
 // device type definition
-extern const device_type MD_ROM_GAMEGENIE;
+DECLARE_DEVICE_TYPE(MD_ROM_GAMEGENIE, md_rom_ggenie_device)
 
-#endif
+#endif // MAME_BUS_MEGADRIVE_GGENIE_H

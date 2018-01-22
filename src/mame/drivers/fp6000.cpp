@@ -21,6 +21,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
+#include "screen.h"
 
 
 class fp6000_state : public driver_device
@@ -61,6 +62,7 @@ public:
 	required_device<mc6845_device>m_crtc;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void fp6000(machine_config &config);
 };
 
 void fp6000_state::video_start()
@@ -288,7 +290,7 @@ void fp6000_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( fp6000, fp6000_state )
+MACHINE_CONFIG_START(fp6000_state::fp6000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 16000000/2)
 	MCFG_CPU_PROGRAM_MAP(fp6000_map)
@@ -326,5 +328,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1985, fp6000,  0,      0,       fp6000,     fp6000, driver_device,    0,     "Casio",   "FP-6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    STATE            INIT   COMPANY    FULLNAME   FLAGS */
+COMP( 1985, fp6000, 0,      0,       fp6000,    fp6000,  fp6000_state,    0,     "Casio",   "FP-6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

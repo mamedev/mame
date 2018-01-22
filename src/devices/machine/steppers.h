@@ -12,8 +12,10 @@
 ///////////////////////////////////////////////////////////////////////////
 
 
-#ifndef INC_STEPPERS
-#define INC_STEPPERS
+#ifndef MAME_MACHINE_STEPPERS_H
+#define MAME_MACHINE_STEPPERS_H
+
+#pragma once
 
 #define NOT_A_REEL              0
 #define STARPOINT_48STEP_REEL   1           /* STARPOINT RMXXX reel unit */
@@ -95,42 +97,43 @@
 #define MCFG_STEPPER_OPTIC_CALLBACK(_write) \
 	devcb = &stepper_device::set_optic_handler(*device, DEVCB_##_write);
 
-class stepper_device;
-extern const device_type STEPPER;
+DECLARE_DEVICE_TYPE(STEPPER, stepper_device)
 
 class stepper_device : public device_t
 {
 public:
 	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_optic_handler(device_t &device, _Object object) { return downcast<stepper_device &>(device).m_optic_cb.set_callback(object); }
+	template <class Object> static devcb_base &set_optic_handler(device_t &device, Object &&cb) { return downcast<stepper_device &>(device).m_optic_cb.set_callback(std::forward<Object>(cb)); }
 
 	static void set_reel_type(device_t &device, uint8_t type)
 	{
 		downcast<stepper_device &>(device).m_type = type;
 		switch ( type )
-		{   default:
-			case STARPOINT_48STEP_REEL:  /* STARPOINT RMxxx */
-			case BARCREST_48STEP_REEL :  /* Barcrest Reel unit */
-			case MPU3_48STEP_REEL :
-			case GAMESMAN_48STEP_REEL :  /* Gamesman GMxxxx */
-			case PROJECT_48STEP_REEL :
+		{
+		default:
+		case STARPOINT_48STEP_REEL:  /* STARPOINT RMxxx */
+		case BARCREST_48STEP_REEL :  /* Barcrest Reel unit */
+		case MPU3_48STEP_REEL :
+		case GAMESMAN_48STEP_REEL :  /* Gamesman GMxxxx */
+		case PROJECT_48STEP_REEL :
 			downcast<stepper_device &>(device).m_max_steps = (48*2);
 			break;
-			case GAMESMAN_100STEP_REEL :
+		case GAMESMAN_100STEP_REEL :
 			downcast<stepper_device &>(device).m_max_steps = (100*2);
 			break;
-			case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */
+		case STARPOINT_144STEP_DICE :/* STARPOINT 1DCU DICE mechanism */
 			//Dice reels are 48 step motors, but complete three full cycles between opto updates
 			downcast<stepper_device &>(device).m_max_steps = ((48*3)*2);
 			break;
-			case STARPOINT_200STEP_REEL :
-			case GAMESMAN_200STEP_REEL :
-			case ECOIN_200STEP_REEL :
+		case STARPOINT_200STEP_REEL :
+		case GAMESMAN_200STEP_REEL :
+		case ECOIN_200STEP_REEL :
 			downcast<stepper_device &>(device).m_max_steps = (200*2);
 			break;
 		}
 	}
+
 	static void set_max_steps(device_t &device, int16_t steps) { downcast<stepper_device &>(device).m_max_steps = steps; }
 	static void set_start_index(device_t &device, int16_t index) { downcast<stepper_device &>(device).m_index_start = index; }
 	static void set_end_index(device_t &device, int16_t index) { downcast<stepper_device &>(device).m_index_end = index; }
@@ -176,4 +179,4 @@ private:
 	devcb_write_line m_optic_cb;
 };
 
-#endif
+#endif // MAME_MACHINE_STEPPERS_H

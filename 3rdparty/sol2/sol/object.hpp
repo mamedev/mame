@@ -25,6 +25,7 @@
 #include "reference.hpp"
 #include "stack.hpp"
 #include "userdata.hpp"
+#include "as_args.hpp"
 #include "variadic_args.hpp"
 #include "optional.hpp"
 
@@ -86,28 +87,29 @@ namespace sol {
 		basic_object() noexcept = default;
 		template <typename T, meta::enable<meta::neg<std::is_same<meta::unqualified_t<T>, basic_object>>, meta::neg<std::is_same<base_t, stack_reference>>, std::is_base_of<base_t, meta::unqualified_t<T>>> = meta::enabler>
 		basic_object(T&& r) : base_t(std::forward<T>(r)) {}
-		basic_object(nil_t r) : base_t(r) {}
+		basic_object(lua_nil_t r) : base_t(r) {}
 		basic_object(const basic_object&) = default;
 		basic_object(basic_object&&) = default;
-		basic_object& operator=(const basic_object&) = default;
-		basic_object& operator=(basic_object&&) = default;
-		basic_object& operator=(const base_t& b) { base_t::operator=(b); return *this; }
-		basic_object& operator=(base_t&& b) { base_t::operator=(std::move(b)); return *this; }
 		basic_object(const stack_reference& r) noexcept : basic_object(r.lua_state(), r.stack_index()) {}
 		basic_object(stack_reference&& r) noexcept : basic_object(r.lua_state(), r.stack_index()) {}
 		template <typename Super>
 		basic_object(const proxy_base<Super>& r) noexcept : basic_object(r.operator basic_object()) {}
 		template <typename Super>
 		basic_object(proxy_base<Super>&& r) noexcept : basic_object(r.operator basic_object()) {}
-		template <typename Super>
-		basic_object& operator=(const proxy_base<Super>& r) { this->operator=(r.operator basic_object()); return *this; }
-		template <typename Super>
-		basic_object& operator=(proxy_base<Super>&& r) { this->operator=(r.operator basic_object()); return *this; }
 		basic_object(lua_State* L, int index = -1) noexcept : base_t(L, index) {}
+		basic_object(lua_State* L, ref_index index) noexcept : base_t(L, index) {}
 		template <typename T, typename... Args>
 		basic_object(lua_State* L, in_place_type_t<T>, Args&&... args) noexcept : basic_object(std::integral_constant<bool, !std::is_base_of<stack_reference, base_t>::value>(), L, -stack::push<T>(L, std::forward<Args>(args)...)) {}
 		template <typename T, typename... Args>
 		basic_object(lua_State* L, in_place_t, T&& arg, Args&&... args) noexcept : basic_object(L, in_place<T>, std::forward<T>(arg), std::forward<Args>(args)...) {}
+		basic_object& operator=(const basic_object&) = default;
+		basic_object& operator=(basic_object&&) = default;
+		basic_object& operator=(const base_t& b) { base_t::operator=(b); return *this; }
+		basic_object& operator=(base_t&& b) { base_t::operator=(std::move(b)); return *this; }
+		template <typename Super>
+		basic_object& operator=(const proxy_base<Super>& r) { this->operator=(r.operator basic_object()); return *this; }
+		template <typename Super>
+		basic_object& operator=(proxy_base<Super>&& r) { this->operator=(r.operator basic_object()); return *this; }
 
 		template<typename T>
 		decltype(auto) as() const {
@@ -132,19 +134,19 @@ namespace sol {
 		return make_reference<T, object, true>(L, std::forward<Args>(args)...);
 	}
 
-	inline bool operator==(const object& lhs, const nil_t&) {
+	inline bool operator==(const object& lhs, const lua_nil_t&) {
 		return !lhs.valid();
 	}
 
-	inline bool operator==(const nil_t&, const object& rhs) {
+	inline bool operator==(const lua_nil_t&, const object& rhs) {
 		return !rhs.valid();
 	}
 
-	inline bool operator!=(const object& lhs, const nil_t&) {
+	inline bool operator!=(const object& lhs, const lua_nil_t&) {
 		return lhs.valid();
 	}
 
-	inline bool operator!=(const nil_t&, const object& rhs) {
+	inline bool operator!=(const lua_nil_t&, const object& rhs) {
 		return rhs.valid();
 	}
 } // sol

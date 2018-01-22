@@ -202,7 +202,7 @@ No.  PCB Label  IC Markings               IC Package
 Notes:
        1. The game cart plugs into the main PCB on the TOP side into CONN9 & CONN10
        2. If the game cart is not plugged in, the hardware shows nothing on screen.
-
+       3. The IOCTR I/O MCU runs at 8 MHz.
 
 
 Hyper Neo Geo game cartridges
@@ -219,7 +219,7 @@ The actual carts are mostly only about 1/3rd to 1/2 populated.
 Some of the IC locations between DG1 and DG2 are different also. See the source code below
 for the exact number of ROMs used per game and ROM placements.
 
-Games that use the LVS-DG1 cart: Road's Edge
+Games that use the LVS-DG1 cart: Road's Edge, Samurai Shodown 64 / Samurai Spirits 64
 
 Games that use the LVS-DG2 cart: Fatal Fury: Wild Ambition, Buriki One, SS 64 II
 
@@ -435,13 +435,13 @@ or Fatal Fury for example).
 */
 
 
-
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/mips/mips3.h"
-#include "machine/nvram.h"
 #include "includes/hng64.h"
-#include "machine/hng64_net.h"
+
+#include "cpu/mips/mips3.h"
+#include "cpu/z80/z80.h"
+#include "machine/nvram.h"
+
 
 /* TODO: NOT measured! */
 #define PIXEL_CLOCK         ((HNG64_MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...
@@ -469,13 +469,13 @@ READ32_MEMBER(hng64_state::hng64_random_read)
 
 READ32_MEMBER(hng64_state::hng64_com_r)
 {
-	//logerror("com read  (PC=%08x): %08x %08x = %08x\n", space.device().safe_pc(), (offset*4)+0xc0000000, mem_mask, m_com_ram[offset]);
+	//logerror("com read  (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, m_com_ram[offset]);
 	return m_com_ram[offset];
 }
 
 WRITE32_MEMBER(hng64_state::hng64_com_w)
 {
-	//logerror("com write (PC=%08x): %08x %08x = %08x\n", space.device().safe_pc(), (offset*4)+0xc0000000, mem_mask, data);
+	//logerror("com write (PC=%08x): %08x %08x = %08x\n", m_maincpu->pc(), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&m_com_ram[offset]);
 }
 
@@ -509,7 +509,7 @@ READ32_MEMBER(hng64_state::hng64_sysregs_r)
 
 #if 0
 	if((offset*4) != 0x1084)
-		printf("HNG64 port read (PC=%08x) 0x%08x\n", space.device().safe_pc(), offset*4);
+		printf("HNG64 port read (PC=%08x) 0x%08x\n", m_maincpu->pc(), offset*4);
 #endif
 
 	rtc_addr = offset >> 1;
@@ -583,14 +583,14 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 
 #if 0
 	if(((offset*4) & 0xff00) == 0x1100)
-		printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], space.device().safe_pc());
+		printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
 #endif
 
 	switch(offset*4)
 	{
 		case 0x1084: //MIPS->MCU latch port
 			m_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
-			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], space.device().safe_pc());
+			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
 			break;
 		//0x110c global irq mask?
 		/* irq ack */
@@ -602,7 +602,7 @@ WRITE32_MEMBER(hng64_state::hng64_sysregs_w)
 			do_dma(space);
 			break;
 		//default:
-		//  printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], space.device().safe_pc());
+		//  printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, m_sysregs[offset], m_maincpu->pc());
 	}
 }
 
@@ -618,7 +618,7 @@ READ32_MEMBER(hng64_state::fight_io_r)
 	*/
 	if(ioport("SYSTEM")->read() & 0x00030000 && m_mcu_type == BURIKI_MCU)
 	{
-		space.write_byte(0xf3ce4, 1);
+		m_maincpu->space(AS_PROGRAM).write_byte(0xf3ce4, 1);
 	}
 
 	switch (offset*4)
@@ -744,7 +744,7 @@ READ32_MEMBER(hng64_state::racing_io_r)
 
 READ32_MEMBER(hng64_state::hng64_dualport_r)
 {
-	//printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], space.device().safe_pc());
+	//printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], m_maincpu->pc());
 
 	/*
 	command table:
@@ -782,7 +782,7 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 
 WRITE32_MEMBER(hng64_state::hng64_dualport_w)
 {
-	//printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], space.device().safe_pc());
+	//printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], m_maincpu->pc());
 	COMBINE_DATA (&m_dualport[offset]);
 }
 
@@ -848,45 +848,47 @@ READ32_MEMBER(hng64_state::unk_vreg_r)
 /* The following is guesswork, needs confirmation with a test on the real board. */
 WRITE32_MEMBER(hng64_state::hng64_sprite_clear_even_w)
 {
+	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t spr_offs;
 
 	spr_offs = (offset) * 0x10 * 4;
 
 	if(ACCESSING_BITS_16_31)
 	{
-		space.write_dword(0x20000000+0x00+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x08+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x10+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x18+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x00+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x08+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x10+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x18+0x00+spr_offs, 0x00000000);
 	}
 	if(ACCESSING_BITS_8_15)
 	{
-		space.write_dword(0x20000000+0x00+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x08+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x10+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x18+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x00+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x08+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x10+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x18+0x20+spr_offs, 0x00000000);
 	}
 }
 
 WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
 {
+	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t spr_offs;
 
 	spr_offs = (offset) * 0x10 * 4;
 
 	if(ACCESSING_BITS_16_31)
 	{
-		space.write_dword(0x20000000+0x04+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x0c+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x14+0x00+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x1c+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x04+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x0c+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x14+0x00+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x1c+0x00+spr_offs, 0x00000000);
 	}
 	if(ACCESSING_BITS_0_15)
 	{
-		space.write_dword(0x20000000+0x04+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x0c+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x14+0x20+spr_offs, 0x00000000);
-		space.write_dword(0x20000000+0x1c+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x04+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x0c+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x14+0x20+spr_offs, 0x00000000);
+		mspace.write_dword(0x20000000+0x1c+0x20+spr_offs, 0x00000000);
 	}
 }
 
@@ -969,7 +971,7 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_SHARE("spriteregs")
 	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_SHARE("videoram")    // Tilemap
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM_WRITE(hng64_vregs_w) AM_SHARE("videoregs")
-	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_SHARE("tcram")   // Transition Control
 	AM_RANGE(0x20300000, 0x203001ff) AM_WRITE16(dl_w,0xffffffff) // 3d Display List
 	AM_RANGE(0x20300200, 0x20300203) AM_WRITE(dl_upload_w)  // 3d Display List Upload
@@ -1515,6 +1517,8 @@ void hng64_state::machine_start()
 	{
 		m_videoregs[i] = 0xdeadbeef;
 	}
+
+	m_3dfifo_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(hng64_state::hng64_3dfifo_processed), this));
 }
 
 void hng64_state::machine_reset()
@@ -1527,9 +1531,7 @@ void hng64_state::machine_reset()
 	reset_sound();
 }
 
-MACHINE_CONFIG_EXTERN(hng64_audio);
-
-static MACHINE_CONFIG_START(hng64, hng64_state)
+MACHINE_CONFIG_START(hng64_state::hng64)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4300BE, HNG64_MASTER_CLOCK)     // actually R4300
 	MCFG_MIPS3_ICACHE_SIZE(16384)
@@ -1539,20 +1541,24 @@ static MACHINE_CONFIG_START(hng64, hng64_state)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RTC62423, XTAL_32_768kHz)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hng64)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 	MCFG_SCREEN_UPDATE_DRIVER(hng64_state, screen_update_hng64)
-	MCFG_SCREEN_VBLANK_DRIVER(hng64_state, screen_eof_hng64)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(hng64_state, screen_vblank_hng64))
 
 	MCFG_PALETTE_ADD("palette", 0x1000)
 	MCFG_PALETTE_FORMAT(XRGB)
 
 	MCFG_FRAGMENT_ADD( hng64_audio )
 	MCFG_FRAGMENT_ADD( hng64_network )
+
+	MCFG_CPU_ADD("iomcu", TMP87PH40AN, 8000000)
+	MCFG_DEVICE_DISABLE() // work in progress
+
 MACHINE_CONFIG_END
 
 
@@ -1573,7 +1579,11 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x0100000, "user2", 0 ) /* KL5C80 BIOS */ \
 	ROM_LOAD ( "from1.bin", 0x000000, 0x080000,  CRC(6b933005) SHA1(e992747f46c48b66e5509fe0adf19c91250b00c7) ) \
 	ROM_REGION( 0x0100000, "fpga", 0 ) /* FPGA data  */ \
-	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) )
+	ROM_LOAD ( "rom1.bin",  0x000000, 0x01ff32,  CRC(4a6832dc) SHA1(ae504f7733c2f40450157cd1d3b85bc83fac8569) ) \
+	ROM_REGION( 0x10000, "iomcu", 0 ) /* "64Bit I/O Controller Ver 1.0 1997.06.29(C)SNK" internal ID string */ \
+	/* this was dumped from a TMP87PH40AN type chip.  Some boards use a TMP87CH40N, in all cases they're stickered SNK-IOJ1.00A so likely the same content */ \
+	ROM_LOAD ( "tmp87ph40an.bin",  0x8000, 0x8000,  CRC(b70df21f) SHA1(5b742e8a0bbf4c0ae4f4398d34c7058fb24acc92) )
+
 
 ROM_START( hng64 )
 	/* BIOS */

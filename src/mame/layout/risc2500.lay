@@ -188,16 +188,16 @@
 	<element name="text_p5">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="&#x265e;" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="text_p6">      <rect><color red="0.63" green="0.63" blue="0.63" /></rect>    <text string="&#x265f;" > <color red="0.17" green="0.15" blue="0.15" /></text> </element>
 	<element name="sym_colon">    <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string=":"  state="1"> <color red="1.0" green="1.0" blue="1.0" /></text> </element>
-	<element name="sym_left">     <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x2190;" state="1">	<color red="1.0" green="1.0" blue="1.0" />	</text>	</element>
-	<element name="sym_right">    <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x2192;" state="1">	<color red="1.0" green="1.0" blue="1.0" />	</text>	</element>
-	<element name="sym_p1">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265a;" state="1">	<color red="1.0" green="1.0" blue="1.0" />	</text>	</element>
-	<element name="sym_p2">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265b;" state="1">	<color red="1.0" green="1.0" blue="1.0" />	</text>	</element>
-	<element name="sym_p3">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265c;" state="1">	<color red="1.0" green="1.0" blue="1.0" />	</text>	</element>
-	<element name="sym_p4">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265d;" state="1">	<color red="1.0" green="1.0" blue="1.0" />	</text>	</element>
-	<element name="sym_p5">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265e;" state="1">	<color red="1.0" green="1.0" blue="1.0" />	</text>	</element>
-	<element name="sym_p6">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265f;" state="1">	<color red="1.0" green="1.0" blue="1.0" />	</text>	</element>
-	<element name="sym_white">    <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x25cb;" state="1">	<color red="1.0" green="1.0" blue="1.0" />	</text>	</element>
-	<element name="sym_black">    <text string="&#x25cf;" state="1">	<color red="1.0" green="1.0" blue="1.0" />	</text>	</element>
+	<element name="sym_left">     <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x2190;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_right">    <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x2192;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_p1">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265a;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_p2">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265b;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_p3">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265c;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_p4">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265d;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_p5">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265e;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_p6">       <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x265f;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_white">    <rect><color red="0.00" green="0.00" blue="0.00" /></rect>    <text string="&#x25cb;" state="1">  <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
+	<element name="sym_black">    <text string="&#x25cf;" state="1">    <color red="1.0" green="1.0" blue="1.0" />  </text> </element>
 	<element name="white"><rect><color red="1" green="1" blue="1" /></rect></element>
 	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="background"><rect><color red="0.63" green="0.63" blue="0.63" /></rect></element>

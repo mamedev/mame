@@ -5,7 +5,7 @@
  * Object auto-discovery helpers
  * \defgroup devfind
  * \{
- * Object auto-disovery helpers
+ * Object auto-discovery helpers
  */
 
 #ifndef __EMU_H__
@@ -16,6 +16,10 @@
 #define MAME_EMU_DEVFIND_H
 
 #pragma once
+
+#include <iterator>
+#include <stdexcept>
+#include <type_traits>
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -65,6 +69,27 @@ private:
 	T m_array[Count];
 
 public:
+	/// \brief Element type for Container concept
+	typedef T value_type;
+
+	/// \brief Reference to element type for Container concept
+	typedef T &reference;
+
+	/// \brief Reference to constant element type for Container concept
+	typedef T const &const_reference;
+
+	/// \brief Iterator for Container concept
+	typedef T *iterator;
+
+	/// \brief Constant iterator for Container concept
+	typedef T const *const_iterator;
+
+	/// \brief Iterator difference type for Container concept
+	typedef typename std::iterator_traits<iterator>::difference_type difference_type;
+
+	/// \brief Size type for Container concept
+	typedef std::make_unsigned_t<difference_type> size_type;
+
 	/// \brief Construct with programmatically generated tags
 	///
 	/// Specify a format string and starting number.  A single unsigned
@@ -102,11 +127,72 @@ public:
 	{
 	}
 
+	/// \brief Get iterator to first element
+	///
+	/// Returns an iterator to the first element in the array.
+	/// \return Iterator to first element.
+	const_iterator begin() const { return m_array; }
+	iterator begin() { return m_array; }
+
+	/// \brief Get iterator beyond last element
+	///
+	/// Returns an iterator one past the last element in the array.
+	/// \return Iterator one past last element.
+	const_iterator end() const { return m_array + Count; }
+	iterator end() { return m_array + Count; }
+
+	/// \brief Get constant iterator to first element
+	///
+	/// Returns a constant iterator to the first element in the array.
+	/// \return Constant iterator to first element.
+	const_iterator cbegin() const { return m_array; }
+
+	/// \brief Get constant iterator beyond last element
+	///
+	/// Returns aconstant iterator one past the last element in the
+	/// array.
+	/// \return Constant iterator one past last element.
+	const_iterator cend() const { return m_array + Count; }
+
+	/// \brief Get array size
+	///
+	/// Returns number of elements in the array (compile-time constant).
+	/// \return The size of the array.
+	constexpr size_type size() const { return Count; }
+
+	/// \brief Get maximum array size
+	///
+	/// Returns maximum number of elements in the array (compile-time
+	/// constant, always equal to the size of the array).
+	/// \return The size of the array.
+	constexpr size_type max_size() const { return Count; }
+
+	/// \brief Does array have no elements
+	///
+	/// Returns whether the arary has no elements (compile-time
+	/// constant).
+	/// \return True if the array has no elements, false otherwise.
+	constexpr bool empty() const { return !Count; }
+
+	/// \brief Get first element
+	///
+	/// Returns a reference to the first element in the array.
+	/// \return Reference to first element.
+	T const &front() const { return m_array[0]; }
+	T &front() { return m_array[0]; }
+
+	/// \brief Get last element
+	///
+	/// Returns a reference to the last element in the array.
+	/// \return Reference to last element.
+	T const &back() const { return m_array[Count - 1]; }
+	T &back() { return m_array[Count - 1]; }
+
 	/// \brief Element accessor (const)
 	///
 	/// Returns a const reference to the element at the supplied index.
 	/// \param [in] index Index of desired element (zero-based).
-	/// \return Reference to element at specified index.
+	/// \return Constant reference to element at specified index.
 	T const &operator[](unsigned index) const { assert(index < Count); return m_array[index]; }
 
 	/// \brief Element accessor (non-const)
@@ -116,11 +202,16 @@ public:
 	/// \return Reference to element at specified index.
 	T &operator[](unsigned index) { assert(index < Count); return m_array[index]; }
 
-	/// \brief Get array size
+	/// \brief Checked element accesor
 	///
-	/// Returns number of objects in array (compile-time constant).
-	/// \return The size of the array.
-	constexpr unsigned size() const { return Count; }
+	/// Returns a reference to the element at the supplied index if less
+	/// than the size of the array, or throws std::out_of_range
+	/// otherwise.
+	/// \param [in] index Index of desired element (zero-based).
+	/// \return Reference to element at specified index.
+	/// \throw std::out_of_range
+	T const &at(unsigned index) const { if (Count > index) return m_array[index]; else throw std::out_of_range("Index out of range"); }
+	T &at(unsigned index) { if (Count > index) return m_array[index]; else throw std::out_of_range("Index out of range"); }
 };
 
 
@@ -134,14 +225,14 @@ class finder_base
 public:
 	/// \brief Destructor
 	///
-	/// Destruction via base class pointer and dynmaic type behaviour
+	/// Destruction via base class pointer and dynamic type behaviour
 	/// are allowed.
 	virtual ~finder_base();
 
 	/// \brief Get next registered object discovery helper
 	///
 	/// Implementation of basic single-linked list behaviour.
-	/// \return Pointer to the next registerd object discovery helper,
+	/// \return Pointer to the next registered object discovery helper,
 	///   or nullptr if this is the last.
 	finder_base *next() const { return m_next; }
 
@@ -203,9 +294,9 @@ protected:
 	/// \param [in] required Whether warning message should be printed
 	///   if a region with matching tag of incorrect width/length is
 	///   found.
-	/// \return Base pointer of the memeroy region if a matching region
+	/// \return Base pointer of the memory region if a matching region
 	///   is found, or nullptr otherwise.
-	void *find_memregion(uint8_t width, size_t &length, bool required) const;
+	void *find_memregion(u8 width, size_t &length, bool required) const;
 
 	/// \brief Check that memory region exists
 	///
@@ -240,7 +331,7 @@ protected:
 	///   found.
 	/// \return Pointer to base of memory share if a matching memory
 	///   share is found, or nullptr otherwise.
-	void *find_memshare(uint8_t width, size_t &bytes, bool required) const;
+	void *find_memshare(u8 width, size_t &bytes, bool required) const;
 
 	/// \brief Log if object was not found
 	///
@@ -343,7 +434,7 @@ protected:
 	/// \brief Pointer to target object
 	///
 	/// Pointer to target object, or nullptr if resolution has not been
-	/// attempted or the seach failed.  Concrete derived classes must
+	/// attempted or the search failed.  Concrete derived classes must
 	/// set this in their implementation of the findit member function.
 	ObjectClass *m_target;
 };
@@ -646,12 +737,12 @@ public:
 	/// \brief Get length in units of elements
 	/// \return Length in units of elements or zero if no matching
 	///   memory region has been found.
-	uint32_t length() const { return m_length; }
+	u32 length() const { return m_length; }
 
 	/// \brief Get length in units of bytes
 	/// \return Length in units of bytes or zero if no matching memory
 	///   region has been found.
-	uint32_t bytes() const { return m_length * sizeof(PointerType); }
+	u32 bytes() const { return m_length * sizeof(PointerType); }
 
 	/// \brief Get index mask
 	///
@@ -659,7 +750,7 @@ public:
 	/// used as a mask for index values if the length is a power of two.
 	/// Result is undefined if no matching memory region has been found.
 	/// \return Length in units of elements minus one.
-	uint32_t mask() const { return m_length - 1; }
+	u32 mask() const { return m_length - 1; }
 
 private:
 	/// \brief Find memory region base pointer
@@ -726,7 +817,7 @@ class shared_ptr_finder : public object_finder_base<PointerType, Required>
 {
 public:
 	// construction/destruction
-	shared_ptr_finder(device_t &base, char const *tag, uint8_t width = sizeof(PointerType) * 8)
+	shared_ptr_finder(device_t &base, char const *tag, u8 width = sizeof(PointerType) * 8)
 		: object_finder_base<PointerType, Required>(base, tag)
 		, m_width(width)
 		, m_bytes(0)
@@ -738,14 +829,14 @@ public:
 	PointerType &operator[](int index) const { return this->m_target[index]; }
 
 	// getter for explicit fetching
-	uint32_t bytes() const { return m_bytes; }
-	uint32_t mask() const { return m_bytes - 1; } // FIXME: wrong when sizeof(PointerType) != 1
+	u32 bytes() const { return m_bytes; }
+	u32 mask() const { return m_bytes - 1; } // FIXME: wrong when sizeof(PointerType) != 1
 
 	// setter for setting the object
 	void set_target(PointerType *target, size_t bytes) { this->m_target = target; m_bytes = bytes; }
 
 	// dynamic allocation of a shared pointer
-	void allocate(uint32_t entries)
+	void allocate(u32 entries)
 	{
 		assert(m_allocated.empty());
 		m_allocated.resize(entries);
@@ -764,7 +855,7 @@ private:
 	}
 
 	// internal state
-	uint8_t const m_width;
+	u8 const m_width;
 	size_t m_bytes;
 	std::vector<PointerType> m_allocated;
 };
@@ -788,23 +879,23 @@ extern template class object_finder_base<memory_bank, true>;
 extern template class object_finder_base<ioport_port, false>;
 extern template class object_finder_base<ioport_port, true>;
 
-extern template class object_finder_base<uint8_t, false>;
-extern template class object_finder_base<uint8_t, true>;
-extern template class object_finder_base<uint16_t, false>;
-extern template class object_finder_base<uint16_t, true>;
-extern template class object_finder_base<uint32_t, false>;
-extern template class object_finder_base<uint32_t, true>;
-extern template class object_finder_base<uint64_t, false>;
-extern template class object_finder_base<uint64_t, true>;
+extern template class object_finder_base<u8, false>;
+extern template class object_finder_base<u8, true>;
+extern template class object_finder_base<u16, false>;
+extern template class object_finder_base<u16, true>;
+extern template class object_finder_base<u32, false>;
+extern template class object_finder_base<u32, true>;
+extern template class object_finder_base<u64, false>;
+extern template class object_finder_base<u64, true>;
 
-extern template class object_finder_base<int8_t, false>;
-extern template class object_finder_base<int8_t, true>;
-extern template class object_finder_base<int16_t, false>;
-extern template class object_finder_base<int16_t, true>;
-extern template class object_finder_base<int32_t, false>;
-extern template class object_finder_base<int32_t, true>;
-extern template class object_finder_base<int64_t, false>;
-extern template class object_finder_base<int64_t, true>;
+extern template class object_finder_base<s8, false>;
+extern template class object_finder_base<s8, true>;
+extern template class object_finder_base<s16, false>;
+extern template class object_finder_base<s16, true>;
+extern template class object_finder_base<s32, false>;
+extern template class object_finder_base<s32, true>;
+extern template class object_finder_base<s64, false>;
+extern template class object_finder_base<s64, true>;
 
 extern template class memory_region_finder<false>;
 extern template class memory_region_finder<true>;
@@ -815,41 +906,41 @@ extern template class memory_bank_finder<true>;
 extern template class ioport_finder<false>;
 extern template class ioport_finder<true>;
 
-extern template class region_ptr_finder<uint8_t, false>;
-extern template class region_ptr_finder<uint8_t, true>;
-extern template class region_ptr_finder<uint16_t, false>;
-extern template class region_ptr_finder<uint16_t, true>;
-extern template class region_ptr_finder<uint32_t, false>;
-extern template class region_ptr_finder<uint32_t, true>;
-extern template class region_ptr_finder<uint64_t, false>;
-extern template class region_ptr_finder<uint64_t, true>;
+extern template class region_ptr_finder<u8, false>;
+extern template class region_ptr_finder<u8, true>;
+extern template class region_ptr_finder<u16, false>;
+extern template class region_ptr_finder<u16, true>;
+extern template class region_ptr_finder<u32, false>;
+extern template class region_ptr_finder<u32, true>;
+extern template class region_ptr_finder<u64, false>;
+extern template class region_ptr_finder<u64, true>;
 
-extern template class region_ptr_finder<int8_t, false>;
-extern template class region_ptr_finder<int8_t, true>;
-extern template class region_ptr_finder<int16_t, false>;
-extern template class region_ptr_finder<int16_t, true>;
-extern template class region_ptr_finder<int32_t, false>;
-extern template class region_ptr_finder<int32_t, true>;
-extern template class region_ptr_finder<int64_t, false>;
-extern template class region_ptr_finder<int64_t, true>;
+extern template class region_ptr_finder<s8, false>;
+extern template class region_ptr_finder<s8, true>;
+extern template class region_ptr_finder<s16, false>;
+extern template class region_ptr_finder<s16, true>;
+extern template class region_ptr_finder<s32, false>;
+extern template class region_ptr_finder<s32, true>;
+extern template class region_ptr_finder<s64, false>;
+extern template class region_ptr_finder<s64, true>;
 
-extern template class shared_ptr_finder<uint8_t, false>;
-extern template class shared_ptr_finder<uint8_t, true>;
-extern template class shared_ptr_finder<uint16_t, false>;
-extern template class shared_ptr_finder<uint16_t, true>;
-extern template class shared_ptr_finder<uint32_t, false>;
-extern template class shared_ptr_finder<uint32_t, true>;
-extern template class shared_ptr_finder<uint64_t, false>;
-extern template class shared_ptr_finder<uint64_t, true>;
+extern template class shared_ptr_finder<u8, false>;
+extern template class shared_ptr_finder<u8, true>;
+extern template class shared_ptr_finder<u16, false>;
+extern template class shared_ptr_finder<u16, true>;
+extern template class shared_ptr_finder<u32, false>;
+extern template class shared_ptr_finder<u32, true>;
+extern template class shared_ptr_finder<u64, false>;
+extern template class shared_ptr_finder<u64, true>;
 
-extern template class shared_ptr_finder<int8_t, false>;
-extern template class shared_ptr_finder<int8_t, true>;
-extern template class shared_ptr_finder<int16_t, false>;
-extern template class shared_ptr_finder<int16_t, true>;
-extern template class shared_ptr_finder<int32_t, false>;
-extern template class shared_ptr_finder<int32_t, true>;
-extern template class shared_ptr_finder<int64_t, false>;
-extern template class shared_ptr_finder<int64_t, true>;
+extern template class shared_ptr_finder<s8, false>;
+extern template class shared_ptr_finder<s8, true>;
+extern template class shared_ptr_finder<s16, false>;
+extern template class shared_ptr_finder<s16, true>;
+extern template class shared_ptr_finder<s32, false>;
+extern template class shared_ptr_finder<s32, true>;
+extern template class shared_ptr_finder<s64, false>;
+extern template class shared_ptr_finder<s64, true>;
 
 #endif // MAME_EMU_DEVFIND_H
 /** \} */

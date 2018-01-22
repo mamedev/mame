@@ -41,6 +41,7 @@
 
 */
 
+#include "emu.h"
 #include "includes/mpz80.h"
 #include "softlist.h"
 
@@ -164,6 +165,9 @@ inline offs_t mpz80_state::get_address(offs_t offset)
 
 READ8_MEMBER( mpz80_state::mmu_r )
 {
+	if (m_trap && offset >= m_trap_start && offset <= m_trap_start + 0xf)
+		return m_rom->base()[0x3f0 | (m_trap_reset << 10) | (offset - m_trap_start)];
+
 	m_addr = get_address(offset);
 	uint8_t data = 0;
 
@@ -544,7 +548,6 @@ static ADDRESS_MAP_START( mpz80_mem, AS_PROGRAM, 8, mpz80_state )
 */
 ADDRESS_MAP_END
 
-
 //-------------------------------------------------
 //  ADDRESS_MAP( mpz80_io )
 //-------------------------------------------------
@@ -706,31 +709,31 @@ void mpz80_state::machine_reset()
 //  MACHINE_CONFIG( mpz80 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( mpz80, mpz80_state )
+MACHINE_CONFIG_START(mpz80_state::mpz80)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mpz80_mem)
 	MCFG_CPU_IO_MAP(mpz80_io)
 
 	// S-100
-	MCFG_S100_BUS_ADD()
+	MCFG_DEVICE_ADD(S100_TAG, S100_BUS, XTAL_4MHz / 2)
 	MCFG_S100_IRQ_CALLBACK(WRITELINE(mpz80_state, s100_pint_w))
 	MCFG_S100_NMI_CALLBACK(WRITELINE(mpz80_state, s100_nmi_w))
 	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
-	MCFG_S100_SLOT_ADD("s100_1", mpz80_s100_cards, "mm65k16s")
-	MCFG_S100_SLOT_ADD("s100_2", mpz80_s100_cards, "wunderbus")
-	MCFG_S100_SLOT_ADD("s100_3", mpz80_s100_cards, "dj2db")
-	MCFG_S100_SLOT_ADD("s100_4", mpz80_s100_cards, nullptr)//"hdcdma")
-	MCFG_S100_SLOT_ADD("s100_5", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_6", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_7", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_8", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_9", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_10", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_11", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_12", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_13", mpz80_s100_cards, nullptr)
-	MCFG_S100_SLOT_ADD("s100_14", mpz80_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":1", mpz80_s100_cards, "mm65k16s")
+	MCFG_S100_SLOT_ADD(S100_TAG ":2", mpz80_s100_cards, "wunderbus")
+	MCFG_S100_SLOT_ADD(S100_TAG ":3", mpz80_s100_cards, "dj2db")
+	MCFG_S100_SLOT_ADD(S100_TAG ":4", mpz80_s100_cards, nullptr)//"hdcdma")
+	MCFG_S100_SLOT_ADD(S100_TAG ":5", mpz80_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":6", mpz80_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":7", mpz80_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":8", mpz80_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":9", mpz80_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":10", mpz80_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":11", mpz80_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":12", mpz80_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":13", mpz80_s100_cards, nullptr)
+	MCFG_S100_SLOT_ADD(S100_TAG ":14", mpz80_s100_cards, nullptr)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -771,37 +774,9 @@ ROM_START( mpz80 )
 ROM_END
 
 
-
-//**************************************************************************
-//  DRIVER INITIALIZATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  DRIVER_INIT( mpz80 )
-//-------------------------------------------------
-
-DIRECT_UPDATE_MEMBER(mpz80_state::mpz80_direct_update_handler)
-{
-	if (m_trap && address >= m_trap_start && address <= m_trap_start + 0xf)
-	{
-		direct.explicit_configure(m_trap_start, m_trap_start + 0xf, 0xf, m_rom->base() + ((m_trap_reset << 10) | 0x3f0));
-		return ~0;
-	}
-
-	return address;
-}
-
-DRIVER_INIT_MEMBER(mpz80_state,mpz80)
-{
-	address_space &program = machine().device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program.set_direct_update_handler(direct_update_delegate(&mpz80_state::mpz80_direct_update_handler, this));
-}
-
-
-
 //**************************************************************************
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1980, mpz80,  0,      0,      mpz80,  mpz80, mpz80_state,  mpz80,      "Morrow Designs",  "MPZ80",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE         INIT    COMPANY            FULLNAME    FLAGS
+COMP( 1980, mpz80,  0,      0,      mpz80,   mpz80, mpz80_state,  0,      "Morrow Designs",  "MPZ80",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

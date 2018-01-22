@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_K056230_H
+#define MAME_MACHINE_K056230_H
+
 #pragma once
 
-#ifndef __K056230_H__
-#define __K056230_H__
-
-#include "emu.h"
 
 
 
@@ -32,7 +31,7 @@
 
 // ======================> k056230_device
 
-class k056230_device :  public device_t
+class k056230_device : public device_t
 {
 public:
 	// construction/destruction
@@ -66,6 +65,6 @@ private:
 
 
 // device type definition
-extern const device_type K056230;
+DECLARE_DEVICE_TYPE(K056230, k056230_device)
 
-#endif  /* __K056230_H__ */
+#endif // MAME_MACHINE_K056230_H

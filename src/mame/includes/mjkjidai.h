@@ -36,7 +36,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(keyboard_r);
-	DECLARE_WRITE8_MEMBER(keyboard_select_w);
+	DECLARE_WRITE8_MEMBER(keyboard_select_lo_w);
+	DECLARE_WRITE8_MEMBER(keyboard_select_hi_w);
 	DECLARE_WRITE8_MEMBER(mjkjidai_videoram_w);
 	DECLARE_WRITE8_MEMBER(mjkjidai_ctrl_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
@@ -48,4 +49,5 @@ public:
 	uint32_t screen_update_mjkjidai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void mjkjidai(machine_config &config);
 };

@@ -1,28 +1,32 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
 #include "emu.h"
+
 #include "cpu/i86/i86.h"
-#include "sound/sn76496.h"
-#include "sound/speaker.h"
-#include "video/pc_t1t.h"
-#include "machine/ins8250.h"
+#include "imagedev/cassette.h"
 #include "machine/i8255.h"
+#include "machine/ins8250.h"
+#include "machine/pc_fdc.h"
+#include "machine/pc_lpt.h"
+#include "machine/pckeybrd.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/pckeybrd.h"
-#include "machine/pc_lpt.h"
-#include "machine/pc_fdc.h"
+#include "sound/sn76496.h"
+#include "sound/spkrdev.h"
+#include "video/pc_t1t.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "bus/isa/fdc.h"
+#include "bus/pc_joy/pc_joy.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/ser_mouse.h"
-#include "bus/pc_joy/pc_joy.h"
-#include "bus/isa/fdc.h"
-#include "imagedev/cassette.h"
 
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class pcjr_state : public driver_device
 {
@@ -102,6 +106,8 @@ public:
 
 	void machine_reset() override;
 	DECLARE_DRIVER_INIT(pcjr);
+	void ibmpcjx(machine_config &config);
+	void ibmpcjr(machine_config &config);
 };
 
 static INPUT_PORTS_START( ibmpcjr )
@@ -441,7 +447,7 @@ image_init_result pcjr_state::load_cart(device_image_interface &image, generic_s
 	uint32_t size = slot->common_get_size("rom");
 	bool imagic_hack = false;
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		int header_size = 0;
 
@@ -553,7 +559,7 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pcjr_state)
 	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("pc_joy", pc_joy_device, joy_port_r, joy_port_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0378, 0x037b) AM_DEVREADWRITE("lpt_0", pc_lpt_device, read, write)
-	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE("pcvideo_pcjr", pcvideo_pcjr_device, read, write)
+	AM_RANGE(0x03d0, 0x03df) AM_DEVREAD("pcvideo_pcjr", pcvideo_pcjr_device, read) AM_DEVWRITE("pcvideo_pcjr", pcvideo_pcjr_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibmpcjx_map, AS_PROGRAM, 8, pcjr_state )
@@ -571,7 +577,7 @@ static ADDRESS_MAP_START(ibmpcjx_io, AS_IO, 8, pcjr_state)
 	AM_IMPORT_FROM( ibmpcjr_io )
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
+MACHINE_CONFIG_START(pcjr_state::ibmpcjr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 4900000)
 	MCFG_CPU_PROGRAM_MAP(ibmpcjr_map)
@@ -590,7 +596,8 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pcjr_state, out2_changed))
 
-	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pcjr_state, pic8259_set_int_line), VCC, NOOP)
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(WRITELINE(pcjr_state, pic8259_set_int_line))
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(CONSTANT(0xff))
@@ -657,6 +664,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
 	MCFG_SOFTWARE_LIST_ADD("flop_list","ibmpcjr_flop")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("pc_list","ibm5150")
 MACHINE_CONFIG_END
 
 static GFXDECODE_START( ibmpcjx )
@@ -664,7 +672,7 @@ static GFXDECODE_START( ibmpcjx )
 	GFXDECODE_ENTRY( "kanji", 0x0000, kanji_layout, 3, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_DERIVED( ibmpcjx, ibmpcjr )
+MACHINE_CONFIG_DERIVED(pcjr_state::ibmpcjx, ibmpcjr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ibmpcjx_map)
 	MCFG_CPU_IO_MAP(ibmpcjx_io)
@@ -680,13 +688,16 @@ static MACHINE_CONFIG_DERIVED( ibmpcjx, ibmpcjr )
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("") // only boots with 512k currently
-	MACHINE_CONFIG_END
+MACHINE_CONFIG_END
 
 
 
 ROM_START( ibmpcjr )
 	ROM_REGION(0x10000,"bios", 0)
-	ROM_LOAD("bios.rom", 0x0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414))
+	ROM_SYSTEM_BIOS( 0, "default", "Default" )
+	ROMX_LOAD("bios.rom", 0x0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "quiksilver", "Quicksilver" ) // Alternate bios to boot up faster (Synectics)
+	ROMX_LOAD("quiksilv.rom", 0x0000, 0x10000, CRC(86aaa1c4) SHA1(b3d7e8ce5de17441891e0b71e5261ed01a169dc1), ROM_BIOS(2))
 
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card
@@ -708,7 +719,7 @@ ROM_START( ibmpcjx )
 	ROM_LOAD("kanji.rom",     0x00000, 0x38000, BAD_DUMP CRC(eaa6e3c3) SHA1(35554587d02d947fae8446964b1886fff5c9d67f)) // hand-made rom
 ROM_END
 
-/*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY            FULLNAME */
+//    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT    STATE          INIT        COMPANY                            FULLNAME     FLAGS
 // pcjr
 COMP( 1983, ibmpcjr,    ibm5150,    0,          ibmpcjr,    ibmpcjr, pcjr_state,    pcjr,       "International Business Machines", "IBM PC Jr", MACHINE_IMPERFECT_COLORS )
 COMP( 1985, ibmpcjx,    ibm5150,    0,          ibmpcjx,    ibmpcjr, pcjr_state,    pcjr,       "International Business Machines", "IBM PC JX", MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING)

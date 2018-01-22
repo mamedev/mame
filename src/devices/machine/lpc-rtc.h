@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef LPC_RTC_H
-#define LPC_RTC_H
+#ifndef MAME_MACHINE_LPC_RTC_H
+#define MAME_MACHINE_LPC_RTC_H
+
+#pragma once
 
 #include "lpc.h"
 
@@ -39,6 +41,6 @@ private:
 	uint8_t ram[256];
 };
 
-extern const device_type LPC_RTC;
+DECLARE_DEVICE_TYPE(LPC_RTC, lpc_rtc_device)
 
-#endif
+#endif // MAME_MACHINE_LPC_RTC_H

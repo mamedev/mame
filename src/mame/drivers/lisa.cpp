@@ -11,11 +11,13 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "includes/lisa.h"
 #include "cpu/m6502/m6504.h"
 #include "cpu/cop400/cop400.h"
-#include "includes/lisa.h"
 #include "formats/ap_dsk35.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 /***************************************************************************
     ADDRESS MAP
@@ -93,7 +95,7 @@ static const floppy_interface lisa_floppy_interface =
 ***************************************************************************/
 
 /* Lisa1 and Lisa 2 machine */
-static MACHINE_CONFIG_START( lisa, lisa_state )
+MACHINE_CONFIG_START(lisa_state::lisa)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 5093760)        /* 20.37504 MHz / 4 */
 	MCFG_CPU_PROGRAM_MAP(lisa_map)
@@ -109,6 +111,16 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 	MCFG_CPU_PROGRAM_MAP(lisa_fdc_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	MCFG_DEVICE_ADD("latch", LS259, 0) // U4E
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(lisa_state, diag1_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(lisa_state, diag2_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(lisa_state, seg1_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(lisa_state, seg2_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(lisa_state, setup_w))
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(lisa_state, sfmsk_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(lisa_state, vtmsk_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(lisa_state, hdmsk_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -151,7 +163,7 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lisa210, lisa )
+MACHINE_CONFIG_DERIVED(lisa_state::lisa210, lisa)
 	MCFG_CPU_MODIFY( "fdccpu" )
 	MCFG_CPU_PROGRAM_MAP(lisa210_fdc_map)
 
@@ -166,7 +178,7 @@ static MACHINE_CONFIG_DERIVED( lisa210, lisa )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( macxl, lisa210 )
+MACHINE_CONFIG_DERIVED(lisa_state::macxl, lisa210)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_SIZE(   768/* ???? */, 447/* ???? */)
 	MCFG_SCREEN_VISIBLE_AREA(0, 608-1, 0, 431-1)
@@ -477,8 +489,8 @@ ROM_END
     Lisa drivers boot MacWorks, but do not boot the Lisa OS, which is why we set
     the MACHINE_NOT_WORKING flag...
 */
-/*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  INIT   COMPANY  FULLNAME */
-COMP( 1983, lisa,     0,    0,  lisa,     lisa, lisa_state,  lisa2,         "Apple Computer",  "Lisa", MACHINE_NOT_WORKING )
-COMP( 1984, lisa2,    0,    0,  lisa,     lisa, lisa_state,  lisa2,         "Apple Computer",  "Lisa2", MACHINE_NOT_WORKING )
-COMP( 1984, lisa210,  lisa2,    0,  lisa210,  lisa, lisa_state,  lisa210,   "Apple Computer",  "Lisa2/10", MACHINE_NOT_WORKING )
-COMP( 1985, macxl,    lisa2,    0,  macxl,    lisa, lisa_state,  mac_xl,    "Apple Computer",  "Macintosh XL", /*MACHINE_NOT_WORKING*/0 )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  STATE        INIT     COMPANY            FULLNAME */
+COMP( 1983, lisa,     0,       0,      lisa,     lisa,  lisa_state,  lisa2,   "Apple Computer",  "Lisa",         MACHINE_NOT_WORKING )
+COMP( 1984, lisa2,    0,       0,      lisa,     lisa,  lisa_state,  lisa2,   "Apple Computer",  "Lisa2",        MACHINE_NOT_WORKING )
+COMP( 1984, lisa210,  lisa2,   0,      lisa210,  lisa,  lisa_state,  lisa210, "Apple Computer",  "Lisa2/10",     MACHINE_NOT_WORKING )
+COMP( 1985, macxl,    lisa2,   0,      macxl,    lisa,  lisa_state,  mac_xl,  "Apple Computer",  "Macintosh XL", /*MACHINE_NOT_WORKING*/0 )

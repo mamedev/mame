@@ -48,10 +48,10 @@
   the 2114 find the 74148 or 74ls148, all 9980 cpu's use one, pin3 will generate a reset.
   The 5517 ram is compatible with 6116 or 2018.
 
-  The 9980 has 3 interupt inputs, but they are binary.
-  The ls148 encodes the interupts to the cpu - the highest interupt is reset.
+  The 9980 has 3 interrupt inputs, but they are binary.
+  The ls148 encodes the interrupts to the cpu - the highest interrupt is reset.
 
-  I tried pulling pin 3 of the 74ls148 low and yes, this sets up the reset interupt
+  I tried pulling pin 3 of the 74ls148 low and yes, this sets up the reset interrupt
   on pins 23, 24 and 25. The TC5517 checks out ok as a 6116.
 
   The crystal seems ok and this clock makes it throught to pin 34 of the MPU.
@@ -193,14 +193,15 @@
 
 ****************************************************************************************/
 
+#include "emu.h"
+#include "cpu/tms9900/tms9980a.h"
+#include "machine/nvram.h"
+#include "video/mc6845.h"
+#include "screen.h"
+
 #define MASTER_CLOCK    XTAL_6MHz              /* confirmed */
 #define CPU_CLOCK      (MASTER_CLOCK / 2)      /* guess */
 #define CRTC_CLOCK     (MASTER_CLOCK / 8)      /* guess */
-
-#include "emu.h"
-#include "cpu/tms9900/tms9980a.h"
-#include "video/mc6845.h"
-#include "machine/nvram.h"
 
 
 class jubilee_state : public driver_device
@@ -229,6 +230,7 @@ public:
 	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void jubileep(machine_config &config);
 };
 
 
@@ -655,7 +657,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( jubileep, jubilee_state )
+MACHINE_CONFIG_START(jubilee_state::jubileep)
 
 	// Main CPU TMS9980A, no line connections.
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, CPU_CLOCK, jubileep_map, jubileep_cru_map)
@@ -705,5 +707,5 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY    FULLNAME                    FLAGS */
-GAME( 1985, jubileep, 0,      jubileep, jubileep, driver_device, 0,    ROT0, "Jubilee", "Double-Up Poker (Jubilee)", MACHINE_NO_SOUND )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT   COMPANY    FULLNAME                     FLAGS
+GAME( 1985, jubileep, 0,      jubileep, jubileep, jubilee_state, 0,    ROT0, "Jubilee", "Double-Up Poker (Jubilee)", MACHINE_NO_SOUND )

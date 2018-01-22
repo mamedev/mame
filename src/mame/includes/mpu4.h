@@ -4,6 +4,7 @@
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
@@ -15,7 +16,7 @@
 #include "machine/meters.h"
 
 
-#define MPU4_MASTER_CLOCK (6880000)
+#define MPU4_MASTER_CLOCK           XTAL_6_88MHz
 #define VIDEO_MASTER_CLOCK          XTAL_10MHz
 
 
@@ -258,6 +259,43 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
 	DECLARE_WRITE_LINE_MEMBER(reel6_optic_cb) { if (state) m_optic_pattern |= 0x40; else m_optic_pattern &= ~0x40; }
 	DECLARE_WRITE_LINE_MEMBER(reel7_optic_cb) { if (state) m_optic_pattern |= 0x80; else m_optic_pattern &= ~0x80; }
+	void bwboki(machine_config &config);
+	void mod2(machine_config &config);
+	void mod2_alt(machine_config &config);
+	void mod4oki(machine_config &config);
+	void mod4oki_5r(machine_config &config);
+	void mod4oki_alt(machine_config &config);
+	void mod4yam(machine_config &config);
+	void mpu4_common(machine_config &config);
+	void mpu4_common2(machine_config &config);
+	void mpu4crys(machine_config &config);
+	void mpu4_std_3reel(machine_config &config);
+	void mpu4_type2_3reel(machine_config &config);
+	void mpu4_type3_3reel(machine_config &config);
+	void mpu4_type4_3reel(machine_config &config);
+	void mpu4_bwb_3reel(machine_config &config);
+	void mpu4_std_4reel(machine_config &config);
+	void mpu4_type2_4reel(machine_config &config);
+	void mpu4_type3_4reel(machine_config &config);
+	void mpu4_type4_4reel(machine_config &config);
+	void mpu4_bwb_4reel(machine_config &config);
+	void mpu4_std_5reel(machine_config &config);
+	void mpu4_type2_5reel(machine_config &config);
+	void mpu4_type3_5reel(machine_config &config);
+	void mpu4_type4_5reel(machine_config &config);
+	void mpu4_bwb_5reel(machine_config &config);
+	void mpu4_std_6reel(machine_config &config);
+	void mpu4_type2_6reel(machine_config &config);
+	void mpu4_type3_6reel(machine_config &config);
+	void mpu4_type4_6reel(machine_config &config);
+	void mpu4_bwb_6reel(machine_config &config);
+	void mpu4_std_7reel(machine_config &config);
+	void mpu4_type2_7reel(machine_config &config);
+	void mpu4_type3_7reel(machine_config &config);
+	void mpu4_type4_7reel(machine_config &config);
+	void mpu4_bwb_7reel(machine_config &config);
+	void mpu4base(machine_config &config);
+
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -275,7 +313,7 @@ protected:
 	void mpu4_config_common();
 
 	required_device<cpu_device> m_maincpu;
-	optional_device<roc10937_t> m_vfd;
+	optional_device<roc10937_device> m_vfd;
 	optional_device<ptm6840_device> m_6840ptm;
 	optional_device<pia6821_device> m_pia3;
 	optional_device<pia6821_device> m_pia4;
@@ -367,13 +405,5 @@ protected:
 	mpu4_chr_table* m_current_chr_table;
 	const bwb_chr_table* m_bwb_chr_table1;
 };
-
-MACHINE_CONFIG_EXTERN( mpu4_common );
-MACHINE_CONFIG_EXTERN( mpu4_common2 );
-
-MACHINE_CONFIG_EXTERN( mod2     );
-MACHINE_CONFIG_EXTERN( mod4oki_alt );
-MACHINE_CONFIG_EXTERN( mod4oki_5r );
-MACHINE_CONFIG_EXTERN( mod2_alt );
 
 INPUT_PORTS_EXTERN( mpu4 );

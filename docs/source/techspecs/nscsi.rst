@@ -24,19 +24,19 @@ The nscsi subsystem leverages the slot interfaces and the device naming to allow
 
 First you need to create a list of acceptable devices to plug on the bus.  This usually comprises of **cdrom**, **harddisk** and the controller chip.  For instance:
 
-| 
+|
 | static SLOT_INTERFACE_START( next_scsi_devices )
 |     SLOT_INTERFACE("cdrom", NSCSI_CDROM)
 |     SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
 |     SLOT_INTERFACE_INTERNAL("ncr5390", NCR5390)
 | SLOT_INTERFACE_END
-| 
+|
 
 The **_INTERNAL** interface indicates a device that is not user-selectable, which is useful for the controller.
 
 Then in the machine config (or in a fragment config) you need to first add the bus, and then the (potential) devices as sub-devices of the bus with the SCSI ID as the name.  For instance you can use:
 
-| 
+|
 |     MCFG_NSCSI_BUS_ADD("scsibus")
 |     MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "cdrom", 0, 0, 0, false)
 |     MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "harddisk", 0, 0, 0, false)
@@ -46,7 +46,7 @@ Then in the machine config (or in a fragment config) you need to first add the b
 |     MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, 0, 0, 0, 0, false)
 |     MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, 0, 0, 0, 0, false)
 |     MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", 0, &next_ncr5390_interface, 10000000, true)
-| 
+|
 
 That configuration puts as default a CD-ROM reader on SCSI ID 0 and a hard drive on SCSI ID 1, and forces the controller on ID 7.  The
 parameters of add are:

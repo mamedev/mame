@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
  'Swinging Singles' US distribution by Ent. Ent. Ltd
@@ -150,6 +150,8 @@ Dumped by Chack'n
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define NUM_PENS (4*8)
 #define VMEM_SIZE 0x100
@@ -181,6 +183,8 @@ public:
 	MC6845_UPDATE_ROW(ssingles_update_row);
 	MC6845_UPDATE_ROW(atamanot_update_row);
 	required_device<cpu_device> m_maincpu;
+	void ssingles(machine_config &config);
+	void atamanot(machine_config &config);
 };
 
 //fake palette
@@ -534,7 +538,7 @@ static GFXDECODE_START( atamanot )
 	GFXDECODE_ENTRY( "kanji_lc", 0, layout_8x16,     0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ssingles, ssingles_state )
+MACHINE_CONFIG_START(ssingles_state::ssingles)
 
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(ssingles_map)
@@ -570,7 +574,7 @@ INTERRUPT_GEN_MEMBER(ssingles_state::atamanot_irq)
 	// ...
 }
 
-static MACHINE_CONFIG_DERIVED( atamanot, ssingles )
+MACHINE_CONFIG_DERIVED(ssingles_state::atamanot, ssingles)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atamanot_map)
 	MCFG_CPU_IO_MAP(atamanot_io_map)

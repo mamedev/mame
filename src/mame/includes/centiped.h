@@ -7,7 +7,9 @@
 *************************************************************************/
 
 #include "machine/eepromser.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
+#include "screen.h"
 
 class centiped_state : public driver_device
 {
@@ -56,14 +58,19 @@ public:
 	DECLARE_READ8_MEMBER(centiped_IN2_r);
 	DECLARE_READ8_MEMBER(milliped_IN1_r);
 	DECLARE_READ8_MEMBER(milliped_IN2_r);
-	DECLARE_WRITE8_MEMBER(input_select_w);
-	DECLARE_WRITE8_MEMBER(control_select_w);
+	DECLARE_WRITE_LINE_MEMBER(input_select_w);
+	DECLARE_WRITE_LINE_MEMBER(control_select_w);
 	DECLARE_READ8_MEMBER(mazeinv_input_r);
 	DECLARE_WRITE8_MEMBER(mazeinv_input_select_w);
 	DECLARE_READ8_MEMBER(bullsdrt_data_port_r);
-	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_WRITE8_MEMBER(coin_count_w);
-	DECLARE_WRITE8_MEMBER(bullsdrt_coin_count_w);
+	DECLARE_WRITE_LINE_MEMBER(led_1_w);
+	DECLARE_WRITE_LINE_MEMBER(led_2_w);
+	DECLARE_WRITE_LINE_MEMBER(led_3_w);
+	DECLARE_WRITE_LINE_MEMBER(led_4_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_left_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_center_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_right_w);
+	DECLARE_WRITE_LINE_MEMBER(bullsdrt_coin_count_w);
 	DECLARE_READ8_MEMBER(caterplr_unknown_r);
 	DECLARE_WRITE8_MEMBER(caterplr_AY8910_w);
 	DECLARE_READ8_MEMBER(caterplr_AY8910_r);
@@ -73,7 +80,7 @@ public:
 
 	// video/centiped.c
 	DECLARE_WRITE8_MEMBER(centiped_videoram_w);
-	DECLARE_WRITE8_MEMBER(centiped_flip_screen_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
 	DECLARE_WRITE8_MEMBER(multiped_gfxbank_w);
 	DECLARE_WRITE8_MEMBER(bullsdrt_tilesbank_w);
 	DECLARE_WRITE8_MEMBER(bullsdrt_sprites_bank_w);
@@ -103,4 +110,14 @@ public:
 	void init_common();
 	void milliped_set_color(offs_t offset, uint8_t data);
 	inline int read_trackball(int idx, int switch_port);
+	void centiped_base(machine_config &config);
+	void milliped(machine_config &config);
+	void bullsdrt(machine_config &config);
+	void centipdb(machine_config &config);
+	void magworm(machine_config &config);
+	void caterplr(machine_config &config);
+	void centiped(machine_config &config);
+	void mazeinv(machine_config &config);
+	void warlords(machine_config &config);
+	void multiped(machine_config &config);
 };

@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "audio/exidy440.h"
+#include "screen.h"
 
 #define EXIDY440_MASTER_CLOCK       (XTAL_12_9792MHz)
 
@@ -47,6 +48,7 @@ public:
 	uint8_t m_firq_select;
 	uint8_t m_palettebank_io;
 	uint8_t m_palettebank_vis;
+	emu_timer *m_collide_firq_timer;
 	DECLARE_WRITE8_MEMBER(bankram_w);
 	DECLARE_READ8_MEMBER(exidy440_input_port_3_r);
 	DECLARE_READ8_MEMBER(sound_command_ack_r);
@@ -89,9 +91,9 @@ public:
 	TIMER_CALLBACK_MEMBER(collide_firq_callback);
 	void exidy440_update_firq();
 	void exidy440_bank_select(uint8_t bank);
+	void exidy440(machine_config &config);
+	void exidy440_video(machine_config &config);
+	void exidy440_audio(machine_config &config);
+	void topsecex(machine_config &config);
+	void topsecex_video(machine_config &config);
 };
-
-/*----------- defined in video/exidy440.c -----------*/
-
-MACHINE_CONFIG_EXTERN( exidy440_video );
-MACHINE_CONFIG_EXTERN( topsecex_video );

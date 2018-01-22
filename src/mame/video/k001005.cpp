@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "k001005.h"
 
+#include "video/k001006.h"
+
 
 /*****************************************************************************/
 /* Konami K001005 Polygon Renderer (KS10071) */
@@ -1181,10 +1183,10 @@ void k001005_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 
 
-const device_type K001005 = &device_creator<k001005_device>;
+DEFINE_DEVICE_TYPE(K001005, k001005_device, "k001005", "K001005 Polygon Renderer")
 
 k001005_device::k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K001005, "K001005 Polygon Renderer", tag, owner, clock, "k001005", __FILE__),
+	: device_t(mconfig, K001005, tag, owner, clock),
 		device_video_interface(mconfig, *this),
 		m_k001006(nullptr),
 		m_fifo(nullptr),
@@ -1196,16 +1198,6 @@ k001005_device::k001005_device(const machine_config &mconfig, const char *tag, d
 {
 		m_ram[0] = nullptr;
 		m_ram[1] = nullptr;
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void k001005_device::device_config_complete()
-{
 }
 
 //-------------------------------------------------
@@ -1221,7 +1213,7 @@ void k001005_device::device_start()
 
 	m_fifo = std::make_unique<uint32_t[]>(0x800);
 
-	m_renderer = auto_alloc(machine(), k001005_renderer(*this, *m_screen, m_k001006));
+	m_renderer = auto_alloc(machine(), k001005_renderer(*this, screen(), m_k001006));
 
 	save_pointer(NAME(m_ram[0].get()), 0x140000);
 	save_pointer(NAME(m_ram[1].get()), 0x140000);
@@ -1321,7 +1313,7 @@ READ32_MEMBER( k001005_device::read )
 			}
 
 		default:
-			//osd_printf_debug("m_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
+			//osd_printf_debug("m_r: %08X, %08X at %s\n", offset, mem_mask, machine().describe_context());
 			break;
 	}
 	return 0;
@@ -1335,7 +1327,7 @@ WRITE32_MEMBER( k001005_device::write )
 	{
 		case 0x000:         // FIFO write
 		{
-			//osd_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
+			//osd_printf_debug("K001005 FIFO write: %08X at %s\n", data, machine().describe_context());
 			if (m_status != 1 && m_status != 2)
 			{
 				if (m_fifo_write_ptr < 0x400)
@@ -1352,7 +1344,7 @@ WRITE32_MEMBER( k001005_device::write )
 				dsp->set_flag_input(1, ASSERT_LINE);
 			}
 
-		//  osd_printf_debug("K001005 FIFO write: %08X at %08X\n", data, space.device().safe_pc());
+		//  osd_printf_debug("K001005 FIFO write: %08X at %s\n", data, machine().describe_context());
 			m_fifo[m_fifo_write_ptr] = data;
 			m_fifo_write_ptr++;
 			m_fifo_write_ptr &= 0x7ff;
@@ -1459,7 +1451,7 @@ WRITE32_MEMBER( k001005_device::write )
 			break;
 
 		default:
-			//osd_printf_debug("m_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+			//osd_printf_debug("m_w: %08X, %08X, %08X at %s\n", data, offset, mem_mask, machine().describe_context());
 			break;
 	}
 

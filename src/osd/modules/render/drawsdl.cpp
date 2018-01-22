@@ -196,16 +196,16 @@ int renderer_sdl1::create()
 
 
 	if (video_config.waitvsync)
-		m_sdl_renderer = SDL_CreateRenderer(win->platform_window<SDL_Window*>(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 	else
-		m_sdl_renderer = SDL_CreateRenderer(win->platform_window<SDL_Window*>(), -1, SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window(), -1, SDL_RENDERER_ACCELERATED);
 
 	if (!m_sdl_renderer)
 	{
 		if (video_config.waitvsync)
-			m_sdl_renderer = SDL_CreateRenderer(win->platform_window<SDL_Window*>(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_SOFTWARE);
+			m_sdl_renderer = SDL_CreateRenderer(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_SOFTWARE);
 		else
-			m_sdl_renderer = SDL_CreateRenderer(win->platform_window<SDL_Window*>(), -1, SDL_RENDERER_SOFTWARE);
+			m_sdl_renderer = SDL_CreateRenderer(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window(), -1, SDL_RENDERER_SOFTWARE);
 	}
 
 	if (!m_sdl_renderer)

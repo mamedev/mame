@@ -1,5 +1,5 @@
 /* 7zArcIn.c -- 7z Input functions
-2016-03-31 : Igor Pavlov : Public domain */
+2016-05-16 : Igor Pavlov : Public domain */
 
 #include "Precomp.h"
 
@@ -1100,13 +1100,11 @@ static SRes SzReadHeader2(
     ISzAlloc *allocTemp
     )
 {
-  UInt64 type;
-  UInt32 numFiles = 0;
-  UInt32 numEmptyStreams = 0;
   CSubStreamInfo ssi;
-  const Byte *emptyStreams = NULL;
-  const Byte *emptyFiles = NULL;
 
+{
+  UInt64 type;
+  
   SzData_Clear(&ssi.sdSizes);
   SzData_Clear(&ssi.sdCRCs);
   SzData_Clear(&ssi.sdNumSubStreams);
@@ -1120,9 +1118,9 @@ static SRes SzReadHeader2(
   {
     for (;;)
     {
-      UInt64 type;
-      RINOK(ReadID(sd, &type));
-      if (type == k7zIdEnd)
+      UInt64 type2;
+      RINOK(ReadID(sd, &type2));
+      if (type2 == k7zIdEnd)
         break;
       RINOK(SkipData(sd));
     }
@@ -1160,6 +1158,13 @@ static SRes SzReadHeader2(
 
   if (type != k7zIdFilesInfo)
     return SZ_ERROR_ARCHIVE;
+}
+
+{
+  UInt32 numFiles = 0;
+  UInt32 numEmptyStreams = 0;
+  const Byte *emptyStreams = NULL;
+  const Byte *emptyFiles = NULL;
   
   RINOK(SzReadNumber32(sd, &numFiles));
   p->NumFiles = numFiles;
@@ -1458,7 +1463,7 @@ static SRes SzReadHeader2(
     if (ssi.sdNumSubStreams.Data && ssi.sdNumSubStreams.Size != 0)
       return SZ_ERROR_ARCHIVE;
   }
-  
+}
   return SZ_OK;
 }
 

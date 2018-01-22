@@ -7,7 +7,7 @@ namespace glm
 	GLM_FUNC_QUALIFIER tmat3x3<T, P> shearX2D(tmat3x3<T, P> const& m, T s)
 	{
 		tmat3x3<T, P> r(1);
-		r[0][1] = s;
+		r[1][0] = s;
 		return m * r;
 	}
 
@@ -15,7 +15,7 @@ namespace glm
 	GLM_FUNC_QUALIFIER tmat3x3<T, P> shearY2D(tmat3x3<T, P> const& m, T s)
 	{
 		tmat3x3<T, P> r(1);
-		r[1][0] = s;
+		r[0][1] = s;
 		return m * r;
 	}
 
@@ -23,8 +23,8 @@ namespace glm
 	GLM_FUNC_QUALIFIER tmat4x4<T, P> shearX3D(tmat4x4<T, P> const& m, T s, T t)
 	{
 		tmat4x4<T, P> r(1);
-		r[1][0] = s;
-		r[2][0] = t;
+		r[0][1] = s;
+		r[0][2] = t;
 		return m * r;
 	}
 
@@ -32,8 +32,8 @@ namespace glm
 	GLM_FUNC_QUALIFIER tmat4x4<T, P> shearY3D(tmat4x4<T, P> const& m, T s, T t)
 	{
 		tmat4x4<T, P> r(1);
-		r[0][1] = s;
-		r[2][1] = t;
+		r[1][0] = s;
+		r[1][2] = t;
 		return m * r;
 	}
 
@@ -41,8 +41,8 @@ namespace glm
 	GLM_FUNC_QUALIFIER tmat4x4<T, P> shearZ3D(tmat4x4<T, P> const& m, T s, T t)
 	{
 		tmat4x4<T, P> r(1);
-		r[0][2] = s;
-		r[1][2] = t;
+		r[2][0] = s;
+		r[2][1] = t;
 		return m * r;
 	}
 

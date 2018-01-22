@@ -80,9 +80,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/leland.h"
+#include "audio/leland.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 #define LOG_COMM 0
 #define LOG_EXTERN 0
@@ -131,7 +133,7 @@ WRITE_LINE_MEMBER(leland_80186_sound_device::i80186_tmr1_w)
 	set_clock_line(7, state);
 }
 
-static MACHINE_CONFIG_FRAGMENT( leland_80186_sound )
+MACHINE_CONFIG_START(leland_80186_sound_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u31 + ad7524.u46
 	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // 74hc374.u32 + ad7524.u47
@@ -172,7 +174,7 @@ static MACHINE_CONFIG_FRAGMENT( leland_80186_sound )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit1_2_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( redline_80186_sound )
+MACHINE_CONFIG_START(redline_80186_sound_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
@@ -222,7 +224,7 @@ static MACHINE_CONFIG_FRAGMENT( redline_80186_sound )
 	MCFG_PIT8253_CLK2(7000000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( ataxx_80186_sound )
+MACHINE_CONFIG_START(ataxx_80186_sound_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
@@ -249,7 +251,7 @@ static MACHINE_CONFIG_FRAGMENT( ataxx_80186_sound )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit0_2_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( wsf_80186_sound )
+MACHINE_CONFIG_START(wsf_80186_sound_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac1", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
 	MCFG_SOUND_ADD("dac2", AD7524, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
@@ -281,25 +283,6 @@ static MACHINE_CONFIG_FRAGMENT( wsf_80186_sound )
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(leland_80186_sound_device, pit0_2_w))
 MACHINE_CONFIG_END
 
-machine_config_constructor leland_80186_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( leland_80186_sound );
-}
-
-machine_config_constructor redline_80186_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( redline_80186_sound );
-}
-
-machine_config_constructor ataxx_80186_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( ataxx_80186_sound );
-}
-
-machine_config_constructor wsf_80186_sound_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( wsf_80186_sound );
-}
 
 /*************************************
  *
@@ -349,37 +332,16 @@ void leland_80186_sound_device::device_reset()
 	m_ext_active = 0;
 }
 
-const device_type LELAND_80186 = &device_creator<leland_80186_sound_device>;
+DEFINE_DEVICE_TYPE(LELAND_80186, leland_80186_sound_device, "leland_80186_sound", "80186 DAC (Leland)")
 
 leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, LELAND_80186, "80186 DAC (Leland)", tag, owner, clock, "leland_80186_sound", __FILE__),
-		m_dac1(*this, "dac1"),
-		m_dac2(*this, "dac2"),
-		m_dac3(*this, "dac3"),
-		m_dac4(*this, "dac4"),
-		m_dac5(*this, "dac5"),
-		m_dac6(*this, "dac6"),
-		m_dac7(*this, "dac7"),
-		m_dac8(*this, "dac8"),
-		m_dac9(*this, "dac9"),
-		m_dac1vol(*this, "dac1vol"),
-		m_dac2vol(*this, "dac2vol"),
-		m_dac3vol(*this, "dac3vol"),
-		m_dac4vol(*this, "dac4vol"),
-		m_dac5vol(*this, "dac5vol"),
-		m_dac6vol(*this, "dac6vol"),
-		m_dac7vol(*this, "dac7vol"),
-		m_dac8vol(*this, "dac8vol"),
-		m_pit0(*this, "pit0"),
-		m_pit1(*this, "pit1"),
-		m_pit2(*this, "pit2"),
-		m_ymsnd(*this, "ymsnd")
+	: leland_80186_sound_device(mconfig, LELAND_80186, tag, owner, clock)
 {
 	m_type = TYPE_LELAND;
 }
 
-leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		m_dac1(*this, "dac1"),
 		m_dac2(*this, "dac2"),
 		m_dac3(*this, "dac3"),
@@ -404,26 +366,26 @@ leland_80186_sound_device::leland_80186_sound_device(const machine_config &mconf
 {
 }
 
-const device_type REDLINE_80186 = &device_creator<redline_80186_sound_device>;
+DEFINE_DEVICE_TYPE(REDLINE_80186, redline_80186_sound_device, "redline_80186_sound", "80186 DAC (Redline Racer)")
 
 redline_80186_sound_device::redline_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: leland_80186_sound_device(mconfig, REDLINE_80186, "80186 DAC (Redline Racer)", tag, owner, clock, "redline_80186_sound", __FILE__)
+	: leland_80186_sound_device(mconfig, REDLINE_80186, tag, owner, clock)
 {
 	m_type = TYPE_REDLINE;
 }
 
-const device_type ATAXX_80186 = &device_creator<ataxx_80186_sound_device>;
+DEFINE_DEVICE_TYPE(ATAXX_80186, ataxx_80186_sound_device, "ataxx_80186_sound", "80186 DAC (Ataxx)")
 
 ataxx_80186_sound_device::ataxx_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: leland_80186_sound_device(mconfig, REDLINE_80186, "80186 DAC (Ataxx)", tag, owner, clock, "ataxx_80186_sound", __FILE__)
+	: leland_80186_sound_device(mconfig, ATAXX_80186, tag, owner, clock)
 {
 	m_type = TYPE_ATAXX;
 }
 
-const device_type WSF_80186 = &device_creator<wsf_80186_sound_device>;
+DEFINE_DEVICE_TYPE(WSF_80186, wsf_80186_sound_device, "wsf_80186_sound", "80186 DAC (WSF)")
 
 wsf_80186_sound_device::wsf_80186_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: leland_80186_sound_device(mconfig, REDLINE_80186, "80186 DAC (WSF)", tag, owner, clock, "wsf_80186_sound", __FILE__)
+	: leland_80186_sound_device(mconfig, WSF_80186, tag, owner, clock)
 {
 	m_type = TYPE_WSF;
 }
@@ -490,7 +452,7 @@ WRITE8_MEMBER( leland_80186_sound_device::leland_80186_control_w )
     the next command, it uses an NMI to force the issue; unfortunately, this
     seems to really screw up the sound system. It turns out it's better to
     just wait for the original interrupt to occur naturally */
-/*  space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);*/
+/*  machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);*/
 
 	/* INT0 */
 	m_audiocpu->int0_w(data & 0x20);
@@ -676,6 +638,9 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 			m_dac2vol->write(((data >> 3) & 7) << 5);
 			m_dac3vol->write(((data >> 6) & 3) << 6);
 			return;
+		case 0x21:
+			dac_w(space, 3, data, mem_mask);
+			return;
 		}
 	}
 
@@ -704,14 +669,6 @@ WRITE16_MEMBER( leland_80186_sound_device::ataxx_dac_control )
 			COMBINE_DATA(&m_ext_stop);
 			m_ext_stop <<= 4;
 			if (LOG_EXTERN) logerror("External DAC stop = %05X\n", m_ext_stop);
-			return;
-		}
-		break;
-	default:
-		switch (offset)
-		{
-		case 0x21:
-			dac_w(space, 3, data, mem_mask);
 			return;
 		}
 		break;
@@ -861,20 +818,20 @@ WRITE8_MEMBER( leland_80186_sound_device::ataxx_80186_control_w )
  *
  *************************************/
 
-ADDRESS_MAP_START( leland_80186_map_program, AS_PROGRAM, 16, driver_device )
+ADDRESS_MAP_START( leland_80186_map_program, AS_PROGRAM, 16, leland_80186_sound_device )
 	AM_RANGE(0x00000, 0x03fff) AM_MIRROR(0x1c000) AM_RAM
 	AM_RANGE(0x20000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( ataxx_80186_map_io, AS_IO, 16, driver_device )
+ADDRESS_MAP_START( ataxx_80186_map_io, AS_IO, 16, leland_80186_sound_device )
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( redline_80186_map_io, AS_IO, 16, driver_device )
+ADDRESS_MAP_START( redline_80186_map_io, AS_IO, 16, leland_80186_sound_device )
 	AM_RANGE(0x0000, 0xffff) AM_DEVWRITE("custom", redline_80186_sound_device, redline_dac_w)
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( leland_80186_map_io, AS_IO, 16, driver_device )
+ADDRESS_MAP_START( leland_80186_map_io, AS_IO, 16, leland_80186_sound_device )
 	AM_RANGE(0x0000, 0xffff) AM_DEVWRITE("custom", leland_80186_sound_device, dac_w)
 ADDRESS_MAP_END
 

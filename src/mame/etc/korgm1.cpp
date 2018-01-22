@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
+#include "machine/cxd1095.h"
 //#include "sound/ay8910.h"
 
 #define MAIN_CLOCK XTAL_16MHz // Unknown clock
@@ -31,6 +32,8 @@ public:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void korgm1(machine_config &config);
 
 protected:
 	// driver_device overrides
@@ -63,17 +66,14 @@ static ADDRESS_MAP_START( korgm1_io, AS_IO, 16, korgm1_state )
 //  AM_RANGE(0x0600, 0x0601) OPZ 1 (8-bit port)
 //  AM_RANGE(0x0700, 0x0701) OPZ 2 (8-bit port)
 //  AM_RANGE(0x0800, 0x0801) SCAN (8-bit port) (keyboard)
-//  AM_RANGE(0x0900, 0x09??) A/D Converter (M58990P, Joystick, "value" and After Touch routes here) **
-//  AM_RANGE(0x0a00, 0x0a03) PPI (CXD1095, presumably i8255 compatible, LCD, LED and SW routes here) *
+//  AM_RANGE(0x0900, 0x0900) ADC (M58990P, compatible with ADC0808; Joystick, "value" and After Touch routes here)
+//  AM_RANGE(0x0a00, 0x0a07) PIO (CXD1095Q; LCD, LED and SW routes here; also controls ADC channel select and TG/VDF/MDE reset line)
 //  AM_RANGE(0x0b00, 0x0b01) LCDC (8-bit port)
 //  AM_RANGE(0x1000, 0x11ff) TG (MB87402)
 //  AM_RANGE(0x2000, 0x23ff) SCSI
 //  AM_RANGE(0x3000, 0x33ff) FDC
 //  TG 2?
 ADDRESS_MAP_END
-
-// * Rail Chase 2 shares this (iocpu)
-// ** Lock-On shares this
 
 static INPUT_PORTS_START( korgm1 )
 	/* dummy active high structure */
@@ -162,12 +162,14 @@ PALETTE_INIT_MEMBER(korgm1_state, korgm1)
 {
 }
 
-static MACHINE_CONFIG_START( korgm1, korgm1_state )
+MACHINE_CONFIG_START(korgm1_state::korgm1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",V30,MAIN_CLOCK) // V50 actually
 	MCFG_CPU_PROGRAM_MAP(korgm1_map)
 	MCFG_CPU_IO_MAP(korgm1_io)
+
+	MCFG_DEVICE_ADD("pio", CXD1095, 0)
 
 	/* video hardware */
 	/* TODO: LCD actually */

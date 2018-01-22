@@ -9,78 +9,84 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "machine/z80pio.h"
-#include "machine/z80dart.h"
-#include "machine/z80ctc.h"
-#include "machine/upd765.h"
-#include "formats/nanos_dsk.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
+#include "machine/upd765.h"
+#include "machine/z80ctc.h"
+#include "machine/z80sio.h"
+#include "machine/z80pio.h"
+
+#include "formats/nanos_dsk.h"
+
+#include "screen.h"
 
 
 class nanos_state : public driver_device
 {
 public:
 	nanos_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_pio(*this, "z80pio"),
-	m_pio_0(*this, "z80pio_0"),
-	m_pio_1(*this, "z80pio_1"),
-	m_sio_0(*this, "z80sio_0"),
-	m_sio_1(*this, "z80sio_1"),
-	m_ctc_0(*this, "z80ctc_0"),
-	m_ctc_1(*this, "z80ctc_1"),
-	m_fdc(*this, "upd765"),
-	m_key_t(*this, "keyboard_timer"),
-	m_ram(*this, RAM_TAG),
-	m_region_maincpu(*this, "maincpu"),
-	m_bank1(*this, "bank1"),
-	m_bank2(*this, "bank2"),
-	m_bank3(*this, "bank3"),
-	m_lines(*this, {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6"}),
-	m_linec(*this, "LINEC")
-	{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pio(*this, "z80pio")
+		, m_pio_0(*this, "z80pio_0")
+		, m_pio_1(*this, "z80pio_1")
+		, m_sio_0(*this, "z80sio_0")
+		, m_sio_1(*this, "z80sio_1")
+		, m_ctc_0(*this, "z80ctc_0")
+		, m_ctc_1(*this, "z80ctc_1")
+		, m_fdc(*this, "upd765")
+		, m_key_t(*this, "keyboard_timer")
+		, m_ram(*this, RAM_TAG)
+		, m_region_maincpu(*this, "maincpu")
+		, m_p_chargen(*this, "chargen")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_lines(*this, {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6"})
+		, m_linec(*this, "LINEC")
+		{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<z80pio_device> m_pio;
-	required_device<z80pio_device> m_pio_0;
-	required_device<z80pio_device> m_pio_1;
-	required_device<z80sio0_device> m_sio_0;
-	required_device<z80sio0_device> m_sio_1;
-	required_device<z80ctc_device> m_ctc_0;
-	required_device<z80ctc_device> m_ctc_1;
-	required_device<upd765a_device> m_fdc;
-	required_device<timer_device> m_key_t;
-	required_device<ram_device> m_ram;
-	const uint8_t *m_p_chargen;
-	uint8_t m_key_command;
-	uint8_t m_last_code;
-	uint8_t m_key_pressed;
 	DECLARE_WRITE8_MEMBER( nanos_tc_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-	virtual void video_start() override;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	DECLARE_WRITE_LINE_MEMBER(z80daisy_interrupt);
 	DECLARE_READ8_MEMBER(nanos_port_a_r);
 	DECLARE_READ8_MEMBER(nanos_port_b_r);
 	DECLARE_WRITE8_MEMBER(nanos_port_b_w);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-protected:
+	void nanos(machine_config &config);
+private:
+	uint8_t m_key_command;
+	uint8_t m_last_code;
+	uint8_t m_key_pressed;
+	uint8_t row_number(uint8_t code);
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+	required_device<cpu_device> m_maincpu;
+	required_device<z80pio_device> m_pio;
+	required_device<z80pio_device> m_pio_0;
+	required_device<z80pio_device> m_pio_1;
+	required_device<z80sio_device> m_sio_0;
+	required_device<z80sio_device> m_sio_1;
+	required_device<z80ctc_device> m_ctc_0;
+	required_device<z80ctc_device> m_ctc_1;
+	required_device<upd765a_device> m_fdc;
+	required_device<timer_device> m_key_t;
+	required_device<ram_device> m_ram;
 	required_memory_region m_region_maincpu;
+	required_region_ptr<u8> m_p_chargen;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_ioport_array<7> m_lines;
 	required_ioport m_linec;
-	uint8_t row_number(uint8_t code);
 };
 
 
@@ -139,7 +145,7 @@ static ADDRESS_MAP_START( nanos_io , AS_IO, 8, nanos_state)
 
 	/* I/O card */
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("z80sio_0", z80sio0_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("z80sio_0", z80sio_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
 	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE("z80ctc_0", z80ctc_device, read, write)
 
@@ -147,7 +153,7 @@ static ADDRESS_MAP_START( nanos_io , AS_IO, 8, nanos_state)
 	AM_RANGE(0x92, 0x92) AM_WRITE(nanos_tc_w)
 	AM_RANGE(0x94, 0x95) AM_DEVICE("upd765", upd765a_device, map)
 	/* V24+IFSS card */
-	AM_RANGE(0xA0, 0xA3) AM_DEVREADWRITE("z80sio_0", z80sio0_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0xA0, 0xA3) AM_DEVREADWRITE("z80sio_0", z80sio_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0xA4, 0xA7) AM_DEVREADWRITE("z80ctc_1", z80ctc_device, read, write)
 
 	/* 256-k RAM card I  -  64k OS-Memory + 192k-RAM-Floppy */
@@ -240,11 +246,6 @@ static INPUT_PORTS_START( nanos )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)
 INPUT_PORTS_END
 
-
-void nanos_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-}
 
 uint32_t nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -454,7 +455,7 @@ static GFXDECODE_START( nanos )
 	GFXDECODE_ENTRY( "chargen", 0x0000, nanos_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( nanos, nanos_state )
+MACHINE_CONFIG_START(nanos_state::nanos)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(nanos_mem)
@@ -492,11 +493,11 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_DEVICE_ADD("z80pio_1", Z80PIO, XTAL_4MHz)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_Z80SIO0_ADD("z80sio_0", XTAL_4MHz, 0, 0, 0, 0)
-	MCFG_Z80DART_OUT_INT_CB(WRITELINE(nanos_state, z80daisy_interrupt))
+	MCFG_DEVICE_ADD("z80sio_0", Z80SIO, XTAL_4MHz)
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(nanos_state, z80daisy_interrupt))
 
-	MCFG_Z80SIO0_ADD("z80sio_1", XTAL_4MHz, 0, 0, 0, 0)
-	MCFG_Z80DART_OUT_INT_CB(WRITELINE(nanos_state, z80daisy_interrupt))
+	MCFG_DEVICE_ADD("z80sio_1", Z80SIO, XTAL_4MHz)
+	MCFG_Z80SIO_OUT_INT_CB(WRITELINE(nanos_state, z80daisy_interrupt))
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
 	MCFG_Z80PIO_IN_PA_CB(READ8(nanos_state, nanos_port_a_r))
@@ -526,5 +527,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                                              FULLNAME       FLAGS */
-COMP( 1985, nanos,  0,      0,       nanos,     nanos, driver_device,    0,   "Ingenieurhochschule fur Seefahrt Warnemunde/Wustrow", "NANOS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT  STATE         INIT  COMPANY                                                FULLNAME  FLAGS */
+COMP( 1985, nanos,  0,      0,       nanos,     nanos, nanos_state,  0,    "Ingenieurhochschule fur Seefahrt Warnemunde/Wustrow", "NANOS",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -4,6 +4,7 @@
 
     Opus Floppy Disc Controllers
 
+    8272: https://www.youtube.com/watch?v=09alLIz16ck
     EDOS: http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Opus_DiscController.html
     2791: http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Opus_DDoss.html
     2793:
@@ -12,6 +13,7 @@
 **********************************************************************/
 
 
+#include "emu.h"
 #include "opus.h"
 
 
@@ -19,20 +21,22 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_OPUS2791 = &device_creator<bbc_opus2791_device>;
-const device_type BBC_OPUS2793 = &device_creator<bbc_opus2793_device>;
-const device_type BBC_OPUS1770 = &device_creator<bbc_opus1770_device>;
+DEFINE_DEVICE_TYPE(BBC_OPUS8272, bbc_opus8272_device, "bbc_opus8272", "Opus 8272 FDC")
+DEFINE_DEVICE_TYPE(BBC_OPUS2791, bbc_opus2791_device, "bbc_opus2791", "Opus 2791 FDC")
+DEFINE_DEVICE_TYPE(BBC_OPUS2793, bbc_opus2793_device, "bbc_opus2793", "Opus 2793 FDC")
+DEFINE_DEVICE_TYPE(BBC_OPUS1770, bbc_opus1770_device, "bbc_opus1770", "Opus D-DOS(B) 1770 FDC")
 
 
 //-------------------------------------------------
 //  MACHINE_DRIVER( opus2791 )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( floppy_formats )
+FLOPPY_FORMATS_MEMBER( bbc_opusfdc_device::floppy_formats )
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_FSD_FORMAT,
-	FLOPPY_OPUS_DDOS_FORMAT
+	FLOPPY_OPUS_DDOS_FORMAT,
+	FLOPPY_OPUS_DDCPM_FORMAT
 FLOPPY_FORMATS_END0
 
 static SLOT_INTERFACE_START( bbc_floppies_525 )
@@ -43,49 +47,31 @@ static SLOT_INTERFACE_START( bbc_floppies_525 )
 	SLOT_INTERFACE("525qd",   FLOPPY_525_QD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_FRAGMENT( opus2791 )
-	MCFG_WD2791_ADD("fdc", XTAL_16MHz / 16)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opusfdc_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(bbc_opusfdc_device, motor_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_FRAGMENT( opus2793 )
-	MCFG_WD2793_ADD("fdc", XTAL_16MHz / 16)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opusfdc_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(bbc_opusfdc_device, motor_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_FRAGMENT( opus1770 )
-	MCFG_WD1770_ADD("fdc", XTAL_16MHz / 2)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opusfdc_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bbc_floppies_525, "525qd", floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-MACHINE_CONFIG_END
+ROM_START( opus8272 )
+	ROM_REGION(0x4000, "dfs_rom", 0)
+	ROM_DEFAULT_BIOS("ddos300")
+	ROM_SYSTEM_BIOS(0, "ddos300", "Opus DDOS 3.00")
+	ROMX_LOAD("opus-ddos300.rom", 0x0000, 0x4000, CRC(1b5fa131) SHA1(6b4e0363a9d39807973a2ef0871a78b287cea27e), ROM_BIOS(1))
+ROM_END
 
 ROM_START( opus2791 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
-	ROM_DEFAULT_BIOS("ddos315")
+	ROM_DEFAULT_BIOS("ddos316")
 	ROM_SYSTEM_BIOS(0, "ddos315", "Opus DDOS 3.15")
 	ROMX_LOAD("opus-ddos315.rom", 0x0000, 0x4000, CRC(5f06701c) SHA1(9e250dc7ddcde35b19e8f29f2cfe95a79f46d473), ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "edos04", "Opus EDOS 0.4")
-	ROMX_LOAD("opus-edos04.rom", 0x0000, 0x4000, CRC(1d8a3860) SHA1(05f461464707b4ca24636c9e726af561f227ccdb), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(1, "ddos316", "Opus DDOS 3.16")
+	ROMX_LOAD("opus-ddos316.rom", 0x0000, 0x4000, CRC(268ebc0d) SHA1(e608f6e40a5579147cc631f351aae275fdabec5b), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(2, "edos04", "Opus EDOS 0.4")
+	ROMX_LOAD("opus-edos04.rom", 0x0000, 0x4000, CRC(1d8a3860) SHA1(05f461464707b4ca24636c9e726af561f227ccdb), ROM_BIOS(3))
 ROM_END
 
 ROM_START( opus2793 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
-	ROM_DEFAULT_BIOS("ddos335")
+	ROM_DEFAULT_BIOS("ddos336")
 	ROM_SYSTEM_BIOS(0, "ddos335", "Opus DDOS 3.35")
 	ROMX_LOAD("opus-ddos335.rom", 0x0000, 0x4000, CRC(e33167fb) SHA1(42fbc9932db2087708da41cb1ffa94358683cf7a), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "ddos336", "Opus DDOS 3.36")
+	ROMX_LOAD("opus-ddos336.rom", 0x0000, 0x4000, CRC(2f400f69) SHA1(a6a57bb907d6b9bd351029fb0471a3a9c343da24), ROM_BIOS(2))
 ROM_END
 
 ROM_START( opus1770 )
@@ -99,25 +85,51 @@ ROM_END
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor bbc_opus2791_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( opus2791 );
-}
+MACHINE_CONFIG_START(bbc_opus8272_device::device_add_mconfig)
+	MCFG_I8272A_ADD("i8272", true)
+	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(bbc_opus8272_device, fdc_intrq_w))
+	MCFG_FLOPPY_DRIVE_ADD("i8272:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("i8272:1", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
 
-machine_config_constructor bbc_opus2793_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( opus2793 );
-}
+MACHINE_CONFIG_START(bbc_opus2791_device::device_add_mconfig)
+	MCFG_WD2791_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opusfdc_device, fdc_drq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(bbc_opusfdc_device, motor_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
 
-machine_config_constructor bbc_opus1770_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( opus1770 );
-}
+MACHINE_CONFIG_START(bbc_opus2793_device::device_add_mconfig)
+	MCFG_WD2793_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opusfdc_device, fdc_drq_w))
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(bbc_opusfdc_device, motor_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(bbc_opus1770_device::device_add_mconfig)
+	MCFG_WD1770_ADD("fdc", XTAL_16MHz / 2)
+	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opusfdc_device, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", bbc_floppies_525, "525qd", bbc_opusfdc_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+MACHINE_CONFIG_END
+
+const tiny_rom_entry *bbc_opus8272_device::device_rom_region() const
+{
+	return ROM_NAME( opus8272 );
+}
 
 const tiny_rom_entry *bbc_opus2791_device::device_rom_region() const
 {
@@ -143,8 +155,18 @@ const tiny_rom_entry *bbc_opus1770_device::device_rom_region() const
 //  bbc_opusfdc_device - constructor
 //-------------------------------------------------
 
-bbc_opusfdc_device::bbc_opusfdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+bbc_opus8272_device::bbc_opus8272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, BBC_OPUS8272, tag, owner, clock),
+	device_bbc_fdc_interface(mconfig, *this),
+	m_dfs_rom(*this, "dfs_rom"),
+	m_fdc(*this, "i8272"),
+	m_floppy0(*this, "i8272:0"),
+	m_floppy1(*this, "i8272:1")
+{
+}
+
+bbc_opusfdc_device::bbc_opusfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_bbc_fdc_interface(mconfig, *this),
 	m_dfs_rom(*this, "dfs_rom"),
 	m_fdc(*this, "fdc"),
@@ -154,17 +176,17 @@ bbc_opusfdc_device::bbc_opusfdc_device(const machine_config &mconfig, device_typ
 }
 
 bbc_opus2791_device::bbc_opus2791_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_opusfdc_device(mconfig, BBC_OPUS2791, "Opus 2791 FDC", tag, owner, clock, "bbc_opus2791", __FILE__)
+	: bbc_opusfdc_device(mconfig, BBC_OPUS2791, tag, owner, clock)
 {
 }
 
 bbc_opus2793_device::bbc_opus2793_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_opusfdc_device(mconfig, BBC_OPUS2793, "Opus 2793 FDC", tag, owner, clock, "bbc_opus2793", __FILE__)
+	: bbc_opusfdc_device(mconfig, BBC_OPUS2793, tag, owner, clock)
 {
 }
 
 bbc_opus1770_device::bbc_opus1770_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: bbc_opusfdc_device(mconfig, BBC_OPUS1770, "Opus D-DOS(B) 1770 FDC", tag, owner, clock, "bbc_opus1770", __FILE__)
+	: bbc_opusfdc_device(mconfig, BBC_OPUS1770, tag, owner, clock)
 {
 }
 
@@ -172,19 +194,35 @@ bbc_opus1770_device::bbc_opus1770_device(const machine_config &mconfig, const ch
 //  device_start - device-specific startup
 //-------------------------------------------------
 
+void bbc_opus8272_device::device_start()
+{
+	device_t* cpu = machine().device("maincpu");
+	address_space& space = cpu->memory().space(AS_PROGRAM);
+	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
+
+	space.install_readwrite_handler(0xfe80, 0xfe86, READ8_DELEGATE(bbc_opus8272_device, fdc_r), WRITE8_DELEGATE(bbc_opus8272_device, fdc_w));
+}
+
 void bbc_opusfdc_device::device_start()
 {
 	device_t* cpu = machine().device("maincpu");
 	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<bbc_fdc_slot_device *>(owner());
 
-	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_t, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_t, write));
+	space.install_readwrite_handler(0xfe80, 0xfe83, READ8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, read), WRITE8_DEVICE_DELEGATE(m_fdc, wd_fdc_device_base, write));
 	space.install_readwrite_handler(0xfe84, 0xfe84, READ8_DELEGATE(bbc_opusfdc_device, ctrl_r), WRITE8_DELEGATE(bbc_opusfdc_device, ctrl_w));
 }
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
+
+void bbc_opus8272_device::device_reset()
+{
+	machine().root_device().membank("bank4")->configure_entry(12, memregion("dfs_rom")->base());
+
+	m_fdc->soft_reset();
+}
 
 void bbc_opusfdc_device::device_reset()
 {
@@ -198,6 +236,64 @@ void bbc_opusfdc_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
+READ8_MEMBER(bbc_opus8272_device::fdc_r)
+{
+	uint8_t data = 0xff;
+
+	switch (offset)
+	{
+	case 0x02:
+		m_fdc->tc_w(true);
+		m_fdc->tc_w(false);
+		break;
+
+	case 0x06:
+		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(1);
+		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(1);
+	case 0x04:
+		data = m_fdc->msr_r(space, 0);
+		break;
+
+	case 0x05:
+		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
+		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
+	case 0x07:
+		data = m_fdc->fifo_r(space, 0);
+		break;
+	}
+	return data;
+}
+
+WRITE8_MEMBER(bbc_opus8272_device::fdc_w)
+{
+	floppy_image_device *floppy = nullptr;
+
+	switch (offset)
+	{
+	case 0x01:
+		switch (data & 0x01)
+		{
+		case 0: floppy = m_floppy1->get_device(); break;
+		case 1: floppy = m_floppy0->get_device(); break;
+		}
+		m_fdc->set_floppy(floppy);
+		break;
+
+	case 0x05:
+		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
+		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
+	case 0x07:
+		m_fdc->fifo_w(space, 0, data);
+		break;
+	}
+}
+
+WRITE_LINE_MEMBER(bbc_opus8272_device::fdc_intrq_w)
+{
+	m_slot->intrq_w(state);
+}
+
+
 READ8_MEMBER(bbc_opusfdc_device::ctrl_r)
 {
 	return m_drive_control;
@@ -210,9 +306,11 @@ WRITE8_MEMBER(bbc_opusfdc_device::ctrl_w)
 	m_drive_control = data;
 
 	// bit 0: drive select
-	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
-	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
-	floppy = (BIT(data, 0) ? floppy1 : floppy0);
+	switch (BIT(data, 0))
+	{
+	case 0: floppy = m_floppy0->get_device(); break;
+	case 1: floppy = m_floppy1->get_device(); break;
+	}
 	m_fdc->set_floppy(floppy);
 
 	// bit 1: side select
@@ -223,11 +321,6 @@ WRITE8_MEMBER(bbc_opusfdc_device::ctrl_w)
 	m_fdc->dden_w(!BIT(data, 6));
 }
 
-WRITE_LINE_MEMBER(bbc_opusfdc_device::fdc_intrq_w)
-{
-	m_slot->intrq_w(state);
-}
-
 WRITE_LINE_MEMBER(bbc_opusfdc_device::fdc_drq_w)
 {
 	m_slot->drq_w(state);
@@ -235,12 +328,6 @@ WRITE_LINE_MEMBER(bbc_opusfdc_device::fdc_drq_w)
 
 WRITE_LINE_MEMBER(bbc_opusfdc_device::motor_w)
 {
-	for (int i = 0; i != 2; i++) {
-		char devname[8];
-		sprintf(devname, "%d", i);
-		floppy_connector *con = m_fdc->subdevice<floppy_connector>(devname);
-		if (con) {
-			con->get_device()->mon_w(!state);
-		}
-	}
+	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(!state);
+	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(!state);
 }

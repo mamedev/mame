@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cubeqcpu.h"
+#include "cubedasm.h"
 
 
 /***************************************************************************
@@ -17,7 +17,7 @@
 ***************************************************************************/
 
 /* Am2901 Instruction Fields */
-static const char *const ins[] =
+const char *const cubeq_disassembler::ins[] =
 {
 	"ADD  ",
 	"SUBR ",
@@ -29,7 +29,7 @@ static const char *const ins[] =
 	"EXNOR",
 };
 
-static const char *const src[] =
+const char *const cubeq_disassembler::src[] =
 {
 	"A,Q",
 	"A,B",
@@ -41,7 +41,7 @@ static const char *const src[] =
 	"D,0",
 };
 
-static const char *const dst[] =
+const char *const cubeq_disassembler::dst[] =
 {
 	"QREG ",
 	"NOP  ",
@@ -53,12 +53,16 @@ static const char *const dst[] =
 	"RAMU ",
 };
 
+u32 cubeq_disassembler::opcode_alignment() const
+{
+	return 1;
+}
 
 /***************************************************************************
     SOUND DISASSEMBLY HOOK
 ***************************************************************************/
 
-CPU_DISASSEMBLE( cquestsnd )
+offs_t cquestsnd_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	static const char *const jmps[] =
 	{
@@ -81,7 +85,7 @@ CPU_DISASSEMBLE( cquestsnd )
 		"       ",
 	};
 
-	uint64_t inst = big_endianize_int64(*(uint64_t *)oprom);
+	uint64_t inst = opcodes.r64(pc);
 	uint32_t inslow = inst & 0xffffffff;
 	uint32_t inshig = inst >> 32;
 
@@ -103,7 +107,7 @@ CPU_DISASSEMBLE( cquestsnd )
 	int _rin    = (inslow >> 26) & 1;
 
 
-	sprintf(buffer, "%s %s %s %x,%x,%c %.2x %s %s %.2x %s %s %s %c %c %c",
+	util::stream_format(stream, "%s %s %s %x,%x,%c %02x %s %s %02x %s %s %s %c %c %c",
 			ins[i5_3],
 			src[i2_0],
 			dst[i8_6],
@@ -121,7 +125,7 @@ CPU_DISASSEMBLE( cquestsnd )
 			_ipwrt ? ' ' : 'W',
 			inca ? 'I' : ' ');
 
-	return 1 | DASMFLAG_SUPPORTED;
+	return 1 | SUPPORTED;
 }
 
 
@@ -129,7 +133,7 @@ CPU_DISASSEMBLE( cquestsnd )
     ROTATE DISASSEMBLY HOOK
 ***************************************************************************/
 
-CPU_DISASSEMBLE( cquestrot )
+offs_t cquestrot_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	static const char *const jmps[] =
 	{
@@ -185,7 +189,7 @@ CPU_DISASSEMBLE( cquestrot )
 		"???   "
 	};
 
-	uint64_t inst = big_endianize_int64(*(uint64_t *)oprom);
+	uint64_t inst = opcodes.r64(pc);
 	uint32_t inslow = inst & 0xffffffff;
 	uint32_t inshig = inst >> 32;
 
@@ -204,7 +208,7 @@ CPU_DISASSEMBLE( cquestrot )
 //  int _sex    = (inslow >> 19) & 0x1;
 	int i2_0    = (inslow >> 16) & 0x7;
 
-	sprintf(buffer, "%s %s,%s %x,%x,%c %d %s %s %s %.2x",
+	util::stream_format(stream, "%s %s,%s %x,%x,%c %d %s %s %s %02x",
 			ins[i5_3],
 			src[i2_0],
 			dst[i8_6],
@@ -217,14 +221,15 @@ CPU_DISASSEMBLE( cquestrot )
 			spfs[spf],
 			t);
 
-	return 1 | DASMFLAG_SUPPORTED;
+	return 1 | SUPPORTED;
 }
+
 
 /***************************************************************************
     LINE DRAWER DISASSEMBLY HOOK
 ***************************************************************************/
 
-CPU_DISASSEMBLE( cquestlin )
+offs_t cquestlin_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	static const char *const jmps[] =
 	{
@@ -271,7 +276,7 @@ CPU_DISASSEMBLE( cquestlin )
 		"BRES  ",
 	};
 
-	uint64_t inst = big_endianize_int64(*(uint64_t *)oprom);
+	uint64_t inst = opcodes.r64(pc);
 	uint32_t inslow = inst & 0xffffffff;
 	uint32_t inshig = inst >> 32;
 
@@ -288,7 +293,7 @@ CPU_DISASSEMBLE( cquestlin )
 	int _pbcs   = (inslow >> 27) & 0x1;
 	int i2_0    = (inslow >> 24) & 0x7;
 
-	sprintf(buffer, "%s %s,%s %x,%x %c %s %.2x %s %s %s %s",
+	util::stream_format(stream, "%s %s,%s %x,%x %c %s %02x %s %s %s %s",
 			ins[i5_3],
 			src[i2_0],
 			dst[i8_6],
@@ -302,5 +307,5 @@ CPU_DISASSEMBLE( cquestlin )
 			_pbcs ? "  " : "PB",
 			spfs[spf]);
 
-	return 1 | DASMFLAG_SUPPORTED;
+	return 1 | SUPPORTED;
 }

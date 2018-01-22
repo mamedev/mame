@@ -14,19 +14,13 @@
 
 #include "emu.h"
 #include "pds30_procolor816.h"
+#include "screen.h"
 
 #define PROCOLOR816_SCREEN_NAME "cb264_screen"
 #define PROCOLOR816_ROM_REGION  "cb264_rom"
 
 #define VRAM_SIZE   (0x200000)  // 2 megs?
 
-MACHINE_CONFIG_FRAGMENT( procolor816 )
-	MCFG_SCREEN_ADD( PROCOLOR816_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_procolor816_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-	MCFG_SCREEN_SIZE(1024,768)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-MACHINE_CONFIG_END
 
 ROM_START( procolor816 )
 	ROM_REGION(0x8000, PROCOLOR816_ROM_REGION, 0)
@@ -37,18 +31,20 @@ ROM_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type PDS030_PROCOLOR816 = &device_creator<nubus_procolor816_device>;
+DEFINE_DEVICE_TYPE(PDS030_PROCOLOR816, nubus_procolor816_device, "pd3_pc16", "Lapis ProColor Server 8*16")
 
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-machine_config_constructor nubus_procolor816_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( procolor816 );
-}
+MACHINE_CONFIG_START(nubus_procolor816_device::device_add_mconfig)
+	MCFG_SCREEN_ADD( PROCOLOR816_SCREEN_NAME, RASTER)
+	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_procolor816_device, screen_update)
+	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
+	MCFG_SCREEN_SIZE(1024,768)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+MACHINE_CONFIG_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -68,21 +64,18 @@ const tiny_rom_entry *nubus_procolor816_device::device_rom_region() const
 //-------------------------------------------------
 
 nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, PDS030_PROCOLOR816, "Lapis ProColor Server 8*16", tag, owner, clock, "pd3_pc16", __FILE__),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+	nubus_procolor816_device(mconfig, PDS030_PROCOLOR816, tag, owner, clock)
 {
-	m_assembled_tag = std::string(tag).append(":").append(PROCOLOR816_SCREEN_NAME);
-	m_screen_tag = m_assembled_tag.c_str();
 }
 
-nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		device_video_interface(mconfig, *this),
-		device_nubus_card_interface(mconfig, *this), m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr)
+nubus_procolor816_device::nubus_procolor816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_video_interface(mconfig, *this),
+	device_nubus_card_interface(mconfig, *this),
+	m_vram32(nullptr), m_mode(0), m_vbl_disable(0), m_toggle(0), m_count(0), m_clutoffs(0), m_timer(nullptr),
+	m_assembled_tag(util::string_format("%s:%s", tag, PROCOLOR816_SCREEN_NAME))
 {
-	m_assembled_tag = std::string(tag).append(":").append(PROCOLOR816_SCREEN_NAME);
-	m_screen_tag = m_assembled_tag.c_str();
+	static_set_screen(*this, m_assembled_tag.c_str());
 }
 
 //-------------------------------------------------
@@ -109,7 +102,7 @@ void nubus_procolor816_device::device_start()
 	m_nubus->install_device(slotspace+0xf00000, slotspace+0xff7fff, read32_delegate(FUNC(nubus_procolor816_device::procolor816_r), this), write32_delegate(FUNC(nubus_procolor816_device::procolor816_w), this));
 
 	m_timer = timer_alloc(0, nullptr);
-	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 //-------------------------------------------------
@@ -137,7 +130,7 @@ void nubus_procolor816_device::device_timer(emu_timer &timer, device_timer_id ti
 		raise_slot_irq();
 	}
 
-	m_timer->adjust(m_screen->time_until_pos(479, 0), 0);
+	m_timer->adjust(screen().time_until_pos(479, 0), 0);
 }
 
 /***************************************************************************
@@ -278,8 +271,8 @@ WRITE32_MEMBER( nubus_procolor816_device::procolor816_w )
 		case 0x3d800:
 			if (mem_mask == 0x00ff0000)
 			{
-		//          printf("%08x to DAC control (PC=%x)\n", data, space.device().safe_pc());
-					m_clutoffs = BITSWAP8((data>>16)&0xff, 0, 1, 2, 3, 4, 5, 6, 7);
+		//          printf("%08x to DAC control %s\n", data, machine().describe_context());
+					m_clutoffs = bitswap<8>((data>>16)&0xff, 0, 1, 2, 3, 4, 5, 6, 7);
 			}
 			else if (mem_mask == 0x000000ff)
 			{
@@ -287,7 +280,7 @@ WRITE32_MEMBER( nubus_procolor816_device::procolor816_w )
 
 					if (m_count == 3)
 					{
-//                        printf("RAMDAC: color %02x = %02x %02x %02x (PC=%x)\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], space.device().safe_pc() );
+//                        printf("RAMDAC: color %02x = %02x %02x %02x %s\n", m_clutoffs, m_colors[0], m_colors[1], m_colors[2], machine().describe_context());
 						m_palette[m_clutoffs] = rgb_t(m_colors[0], m_colors[1], m_colors[2]);
 						m_clutoffs++;
 						if (m_clutoffs > 255)
@@ -315,7 +308,7 @@ WRITE32_MEMBER( nubus_procolor816_device::procolor816_w )
 			break;
 
 		default:
-//            printf("procolor816_w: %08x @ %x, mask %08x (PC=%x)\n", data, offset, mem_mask, space.device().safe_pc());
+//            printf("procolor816_w: %08x @ %x, mask %08x %s\n", data, offset, mem_mask, machine().describe_context());
 			break;
 	}
 }
@@ -333,7 +326,7 @@ READ32_MEMBER( nubus_procolor816_device::procolor816_r )
 	}
 	else
 	{
-//      printf("procolor816_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, machine().device("maincpu")->safe_pc());
+//      printf("procolor816_r: @ %x, mask %08x [PC=%x]\n", offset, mem_mask, machine().device<cpu_device>("maincpu")->pc());
 	}
 
 	return 0;

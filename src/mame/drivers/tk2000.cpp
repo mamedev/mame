@@ -15,14 +15,21 @@
 ************************************************************************/
 
 #include "emu.h"
+#include "video/apple2.h"
+
+#include "cpu/m6502/m6502.h"
+#include "imagedev/cassette.h"
+#include "imagedev/flopdrv.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
-#include "imagedev/flopdrv.h"
-#include "imagedev/cassette.h"
+#include "machine/timer.h"
+#include "sound/spkrdev.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "formats/ap2_dsk.h"
-#include "cpu/m6502/m6502.h"
-#include "video/apple2.h"
+
 
 #define A2_CPU_TAG "maincpu"
 #define A2_BUS_TAG "a2bus"
@@ -81,6 +88,7 @@ public:
 	DECLARE_READ8_MEMBER(c100_r);
 	DECLARE_WRITE8_MEMBER(c100_w);
 
+	void tk2000(machine_config &config);
 private:
 	int m_speaker_state;
 	int m_cassette_state;
@@ -164,7 +172,7 @@ uint32_t tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 // most softswitches don't care about read vs write, so handle them here
 void tk2000_state::do_io(address_space &space, int offset)
 {
-	if(space.debugger_access())
+	if(machine().side_effect_disabled())
 	{
 		return;
 	}
@@ -555,7 +563,7 @@ static INPUT_PORTS_START( tk2000 )
 	PORT_CONFSETTING(0x03, "Amber")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tk2000, tk2000_state )
+MACHINE_CONFIG_START(tk2000_state::tk2000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2_map)
@@ -584,7 +592,7 @@ static MACHINE_CONFIG_START( tk2000, tk2000_state )
 	MCFG_DEVICE_ADD(A2_UPPERBANK_TAG, ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(inhbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -604,5 +612,5 @@ ROM_START(tk2000)
 	ROM_LOAD( "tk2000.rom",   0x000000, 0x004000, CRC(dfdbacc3) SHA1(bb37844c31616046630868a4399ee3d55d6df277) )
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     INIT      COMPANY            FULLNAME */
-COMP( 1984, tk2000,   0,        0,        tk2000,      tk2000,  driver_device,   0,        "Microdigital",    "TK2000", MACHINE_NOT_WORKING )
+/*    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT    STATE INIT      INIT  COMPANY            FULLNAME */
+COMP( 1984, tk2000,   0,        0,        tk2000,      tk2000,  tk2000_state,   0,    "Microdigital",    "TK2000", MACHINE_NOT_WORKING )

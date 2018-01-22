@@ -54,18 +54,21 @@ Updates:
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/eepromser.h"
+#include "includes/tmnt.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
-#include "sound/samples.h"
-#include "sound/k054539.h"
+#include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/tmnt.h"
-#include "includes/konamipt.h"
+#include "sound/k054539.h"
+#include "sound/okim6295.h"
+#include "sound/samples.h"
+#include "sound/ym2151.h"
+#include "speaker.h"
+
 
 READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
 {
@@ -324,8 +327,8 @@ READ16_MEMBER(tmnt_state::ssriders_protection_r)
 			return data;
 
 		default:
-			popmessage("%06x: unknown protection read",space.device().safe_pc());
-			logerror("%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",space.device().safe_pc(),(uint32_t)space.device().state().state_int(M68K_D7),cmd,data);
+			popmessage("%06x: unknown protection read",m_maincpu->pc());
+			logerror("%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",m_maincpu->pc(),(uint32_t)m_maincpu->state_int(M68K_D7),cmd,data);
 			return 0xffff;
 	}
 }
@@ -470,7 +473,7 @@ static ADDRESS_MAP_START( cuebrick_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM /* main RAM */
 	AM_RANGE(0x060000, 0x063fff) AM_RAM /* main RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE(tmnt_0a0000_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
@@ -490,7 +493,7 @@ static ADDRESS_MAP_START( mia_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM /* main RAM */
 	AM_RANGE(0x060000, 0x063fff) AM_RAM /* main RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE(tmnt_0a0000_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
@@ -511,7 +514,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tmnt_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM /* main RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x080fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE(tmnt_0a0000_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
@@ -532,7 +535,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( punkshot_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /* main RAM */
-	AM_RANGE(0x090000, 0x090fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x090000, 0x090fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("DSW1/DSW2")
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("COINS/DSW3")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P3/P4")
@@ -549,7 +552,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lgtnfght_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x090000, 0x093fff) AM_RAM /*main RAM */
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS")
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
@@ -577,7 +580,7 @@ static ADDRESS_MAP_START( blswhstl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x180000, 0x183fff) AM_DEVREADWRITE("k052109", k052109_device, word_r, word_w)
 	AM_RANGE(0x204000, 0x207fff) AM_RAM /* main RAM */
 	AM_RANGE(0x300000, 0x303fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE("k054000", k054000_device, lsb_r, lsb_w)
 	AM_RANGE(0x680000, 0x68001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")
@@ -617,7 +620,7 @@ static ADDRESS_MAP_START( glfgreat_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM /* main RAM */
 	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x108000, 0x108fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x108000, 0x108fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE("k053936", k053936_device, linectrl_r, linectrl_w)  /* 053936? */
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)              /* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k05324x_device, k053244_lsb_r, k053244_lsb_w)    /* duplicate! */
@@ -640,7 +643,7 @@ static ADDRESS_MAP_START( prmrsocr_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM /* main RAM */
 	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
-	AM_RANGE(0x108000, 0x108fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x108000, 0x108fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE("k053936", k053936_device, linectrl_r, linectrl_w)
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)              /* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE("k053245", k05324x_device, k053244_lsb_r, k053244_lsb_w)    /* duplicate! */
@@ -899,7 +902,7 @@ logerror("copy command %04x sprite %08x data %08x: %04x%04x %04x%04x  modifiers 
 static ADDRESS_MAP_START( tmnt2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_SHARE("tmnt2_rom")
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE("sunset_104000")   /* main RAM */
-	AM_RANGE(0x140000, 0x140fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x140fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x183fff) AM_RAM_WRITE(k053245_scattered_word_w) AM_SHARE("spriteram")   // k053245_scattered_word_r
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P1")
 	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P2")
@@ -923,7 +926,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ssriders_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM /* main RAM */
-	AM_RANGE(0x140000, 0x140fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x140fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P1")
 	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P2")
@@ -947,7 +950,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sunsetbl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM /* main RAM */
-	AM_RANGE(0x14c000, 0x14cfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x14c000, 0x14cfff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x14e700, 0x14e71f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_SHARE("spriteram")
 	AM_RANGE(0x184000, 0x18ffff) AM_RAM
@@ -973,7 +976,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( thndrx2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM /* main RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30001f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("k053260", k053260_device, main_read, main_write, 0x00ff)
 	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE("k054000", k054000_device, lsb_r, lsb_w)
@@ -1696,118 +1699,57 @@ static INPUT_PORTS_START( ssriders )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ssridr4p )
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_INCLUDE( ssriders )
+
+	PORT_MODIFY("COINS")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 
-	PORT_START("P1")
+	PORT_MODIFY("P1")
 	KONAMI16_LSB( 1, IPT_UNKNOWN, IPT_UNKNOWN )
 
-	PORT_START("P2")
+	PORT_MODIFY("P2")
 	KONAMI16_LSB( 2, IPT_UNKNOWN, IPT_UNKNOWN )
 
-	PORT_START("P3")
+	PORT_MODIFY("P3")
 	KONAMI16_LSB( 3, IPT_UNKNOWN, IPT_UNKNOWN )
 
-	PORT_START("P4")
+	PORT_MODIFY("P4")
 	KONAMI16_LSB( 4, IPT_UNKNOWN, IPT_UNKNOWN )
 
-	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* ?? TMNT2: OBJMPX */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")  /* ?? TMNT2: NVBLK */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* ?? TMNT2: IPL0 */
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
 INPUT_PORTS_END
 
-/* Same as 'ssridr4p', but additional Start button for each player.
+/* Same as 'ssridr4p', but additional Start button for each player.  Seemingly only needed in sets with *U* region/version codes (EG: ADD, UDA).
    COIN3, COIN4, SERVICE3 and SERVICE4 only have an effect in the "test mode". */
 static INPUT_PORTS_START( ssrid4ps )
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 
-	PORT_START("P1")
+	PORT_INCLUDE( ssridr4p )
+
+	PORT_MODIFY("P1")
 	KONAMI16_LSB( 1, IPT_UNKNOWN, IPT_START1 )
 
-	PORT_START("P2")
+	PORT_MODIFY("P2")
 	KONAMI16_LSB( 2, IPT_UNKNOWN, IPT_START2 )
 
-	PORT_START("P3")
+	PORT_MODIFY("P3")
 	KONAMI16_LSB( 3, IPT_UNKNOWN, IPT_START3 )
 
-	PORT_START("P4")
+	PORT_MODIFY("P4")
 	KONAMI16_LSB( 4, IPT_UNKNOWN, IPT_START4 )
 
-	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* ?? TMNT2: OBJMPX */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")  /* ?? TMNT2: NVBLK */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* ?? TMNT2: IPL0 */
-	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
-
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
 INPUT_PORTS_END
 
 /* Version for the bootleg, which has the service switch a little different */
 static INPUT_PORTS_START( sunsetbl )
-	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 
-	PORT_START("P1")
-	KONAMI16_LSB( 1, IPT_UNKNOWN, IPT_START1 )
+	PORT_INCLUDE( ssrid4ps )
 
-	PORT_START("P2")
-	KONAMI16_LSB( 2, IPT_UNKNOWN, IPT_START2 )
-
-	PORT_START("P3")
-	KONAMI16_LSB( 3, IPT_UNKNOWN, IPT_START3 )
-
-	PORT_START("P4")
-	KONAMI16_LSB( 4, IPT_UNKNOWN, IPT_START4 )
-
-	PORT_START("EEPROM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, do_read)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, ready_read)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_MODIFY("EEPROM")
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* unused? */
 
-	PORT_START( "EEPROMOUT" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, clk_write)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( qgakumon )
@@ -1950,7 +1892,7 @@ MACHINE_RESET_MEMBER(tmnt_state,common)
 }
 
 
-static MACHINE_CONFIG_START( cuebrick, tmnt_state )
+MACHINE_CONFIG_START(tmnt_state::cuebrick)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz */
@@ -2002,7 +1944,7 @@ static MACHINE_CONFIG_START( cuebrick, tmnt_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mia, tmnt_state )
+MACHINE_CONFIG_START(tmnt_state::mia)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
@@ -2067,7 +2009,7 @@ MACHINE_RESET_MEMBER(tmnt_state,tmnt)
 	m_upd7759->reset_w(1);
 }
 
-static MACHINE_CONFIG_START( tmnt, tmnt_state )
+MACHINE_CONFIG_START(tmnt_state::tmnt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
@@ -2134,7 +2076,7 @@ static MACHINE_CONFIG_START( tmnt, tmnt_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( punkshot, tmnt_state )
+MACHINE_CONFIG_START(tmnt_state::punkshot)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -2188,7 +2130,7 @@ static MACHINE_CONFIG_START( punkshot, tmnt_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( lgtnfght, tmnt_state )
+MACHINE_CONFIG_START(tmnt_state::lgtnfght)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -2244,7 +2186,7 @@ static MACHINE_CONFIG_START( lgtnfght, tmnt_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( blswhstl, tmnt_state )
+MACHINE_CONFIG_START(tmnt_state::blswhstl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* Confirmed */
@@ -2270,7 +2212,7 @@ static MACHINE_CONFIG_START( blswhstl, tmnt_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 2*8, 30*8-1 )
 	MCFG_SCREEN_UPDATE_DRIVER(tmnt_state, screen_update_lgtnfght)
-	MCFG_SCREEN_VBLANK_DRIVER(tmnt_state, screen_eof_blswhstl)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(tmnt_state, screen_vblank_blswhstl))
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2322,7 +2264,7 @@ static GFXDECODE_START( glfgreat )
 	GFXDECODE_ENTRY( "zoom", 0, zoomlayout, 0x400, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( glfgreat, tmnt_state )
+MACHINE_CONFIG_START(tmnt_state::glfgreat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* Confirmed */
@@ -2388,7 +2330,7 @@ MACHINE_START_MEMBER(tmnt_state,prmrsocr)
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_CONFIG_START( prmrsocr, tmnt_state )
+MACHINE_CONFIG_START(tmnt_state::prmrsocr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)       /* Confirmed */
@@ -2453,7 +2395,7 @@ static MACHINE_CONFIG_START( prmrsocr, tmnt_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tmnt2, tmnt_state )
+MACHINE_CONFIG_START(tmnt_state::tmnt2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -2516,7 +2458,7 @@ static MACHINE_CONFIG_START( tmnt2, tmnt_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ssriders, tmnt_state )
+MACHINE_CONFIG_START(tmnt_state::ssriders)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -2575,7 +2517,7 @@ static MACHINE_CONFIG_START( ssriders, tmnt_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sunsetbl, tmnt_state )
+MACHINE_CONFIG_START(tmnt_state::sunsetbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
@@ -2616,12 +2558,12 @@ static MACHINE_CONFIG_START( sunsetbl, tmnt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( thndrx2, tmnt_state )
+MACHINE_CONFIG_START(tmnt_state::thndrx2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -4156,7 +4098,7 @@ static void chunky_to_planar(memory_region *rgn)
 	for (int i = 0; i < len; i++)
 	{
 		uint32_t data = little_endianize_int32(ROM[i]);
-		data = BITSWAP32(data,31,27,23,19,15,11,7,3,30,26,22,18,14,10,6,2,29,25,21,17,13,9,5,1,28,24,20,16,12,8,4,0);
+		data = bitswap<32>(data,31,27,23,19,15,11,7,3,30,26,22,18,14,10,6,2,29,25,21,17,13,9,5,1,28,24,20,16,12,8,4,0);
 		ROM[i] = little_endianize_int32(data);
 	}
 }
@@ -4178,9 +4120,9 @@ DRIVER_INIT_MEMBER(tmnt_state, mia)
 		int B = A & 0x3ff00;
 
 		if ((A & 0x3c000) == 0x3c000)
-			B |= BITSWAP8(A,7,6,4,2,1,0,5,3);
+			B |= bitswap<8>(A,7,6,4,2,1,0,5,3);
 		else
-			B |= BITSWAP8(A,6,4,2,1,0,7,5,3);
+			B |= bitswap<8>(A,6,4,2,1,0,7,5,3);
 
 		gfxdata[A] = temp[B];
 	}
@@ -4258,69 +4200,69 @@ DRIVER_INIT_MEMBER(tmnt_state,cuebrick)
 	save_item(NAME(m_cuebrick_nvram));
 }
 
-//    YEAR, NAME,        PARENT,   MACHINE,  INPUT,     INIT,                    MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1989, cuebrick,    0,        cuebrick, cuebrick,  tmnt_state,    cuebrick, ROT0,   "Konami", "Cue Brick (World, version D)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME         PARENT    MACHINE   INPUT      STATE       INIT      MONITOR COMPANY    FULLNAME,FLAGS
+GAME( 1989, cuebrick,    0,        cuebrick, cuebrick,  tmnt_state, cuebrick, ROT0,   "Konami",  "Cue Brick (World, version D)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, mia,         0,        mia,      mia,       tmnt_state,    mia,      ROT0,   "Konami", "M.I.A. - Missing in Action (version T)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mia2,        mia,      mia,      mia,       tmnt_state,    mia,      ROT0,   "Konami", "M.I.A. - Missing in Action (version S)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mia,         0,        mia,      mia,       tmnt_state, mia,      ROT0,   "Konami",  "M.I.A. - Missing in Action (version T)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mia2,        mia,      mia,      mia,       tmnt_state, mia,      ROT0,   "Konami",  "M.I.A. - Missing in Action (version S)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, tmnt,        0,        tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (World 4 Players, version X)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, version R)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, version J)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmntub,      tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (US 4 Players, version H)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, version F)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, version S)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 4 Players, version ?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Japan 4 Players, version 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmnta,       tmnt,     tmnt,     tmnt,      tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Asia 4 Players, version ?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, version U)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Hero Turtles (UK 2 Players, version ?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Japan 2 Players, version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state,    tmnt,     ROT0,   "Konami", "Teenage Mutant Ninja Turtles (Oceania 2 Players, version ?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnt,        0,        tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (World 4 Players, version X)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntu,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version R)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntua,      tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version J)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmntub,      tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (US 4 Players, version H)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht,        tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version F)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmhta,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version S)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmhtb,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 4 Players, version ?)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1990, tmntj,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 4 Players, version 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnta,       tmnt,     tmnt,     tmnt,      tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Asia 4 Players, version ?)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht2p,      tmnt,     tmnt,     tmnt2p,    tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version U)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmht2pa,     tmnt,     tmnt,     tmnt2p,    tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Hero Turtles (UK 2 Players, version ?)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1990, tmnt2pj,     tmnt,     tmnt,     tmnt2p,    tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Japan 2 Players, version 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1989, tmnt2po,     tmnt,     tmnt,     tmnt2p,    tmnt_state, tmnt,     ROT0,   "Konami",  "Teenage Mutant Ninja Turtles (Oceania 2 Players, version ?)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, punkshot,    0,        punkshot, punkshot,  driver_device, 0,        ROT0,   "Konami", "Punk Shot (US 4 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, punkshot2,   punkshot, punkshot, punksht2,  driver_device, 0,        ROT0,   "Konami", "Punk Shot (US 2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, punkshotj,   punkshot, punkshot, punkshtj,  driver_device, 0,        ROT0,   "Konami", "Punk Shot (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshot,    0,        punkshot, punkshot,  tmnt_state, 0,        ROT0,   "Konami",  "Punk Shot (US 4 Players)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshot2,   punkshot, punkshot, punksht2,  tmnt_state, 0,        ROT0,   "Konami",  "Punk Shot (US 2 Players)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, punkshotj,   punkshot, punkshot, punkshtj,  tmnt_state, 0,        ROT0,   "Konami",  "Punk Shot (Japan 2 Players)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, lgtnfght,    0,        lgtnfght, lgtnfght,  driver_device, 0,        ROT90,  "Konami", "Lightning Fighters (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, lgtnfghta,   lgtnfght, lgtnfght, lgtnfght,  driver_device, 0,        ROT90,  "Konami", "Lightning Fighters (Asia)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, lgtnfghtu,   lgtnfght, lgtnfght, lgtnfght,  driver_device, 0,        ROT90,  "Konami", "Lightning Fighters (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, trigon,      lgtnfght, lgtnfght, trigon,    driver_device, 0,        ROT90,  "Konami", "Trigon (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lgtnfght,    0,        lgtnfght, lgtnfght,  tmnt_state, 0,        ROT90,  "Konami",  "Lightning Fighters (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lgtnfghta,   lgtnfght, lgtnfght, lgtnfght,  tmnt_state, 0,        ROT90,  "Konami",  "Lightning Fighters (Asia)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1990, lgtnfghtu,   lgtnfght, lgtnfght, lgtnfght,  tmnt_state, 0,        ROT90,  "Konami",  "Lightning Fighters (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1990, trigon,      lgtnfght, lgtnfght, trigon,    tmnt_state, 0,        ROT90,  "Konami",  "Trigon (Japan)",             MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, blswhstl,    0,        blswhstl, blswhstl,  driver_device, 0,        ROT90,  "Konami", "Bells & Whistles (World, version L)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, blswhstla,   blswhstl, blswhstl, blswhstl,  driver_device, 0,        ROT90,  "Konami", "Bells & Whistles (Asia, version M)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl,  driver_device, 0,        ROT90,  "Konami", "Detana!! Twin Bee (Japan, version J)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blswhstl,    0,        blswhstl, blswhstl,  tmnt_state, 0,        ROT90,  "Konami",  "Bells & Whistles (World, version L)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, blswhstla,   blswhstl, blswhstl, blswhstl,  tmnt_state, 0,        ROT90,  "Konami",  "Bells & Whistles (Asia, version M)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, detatwin,    blswhstl, blswhstl, blswhstl,  tmnt_state, 0,        ROT90,  "Konami",  "Detana!! Twin Bee (Japan, version J)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  driver_device, 0,        ROT0,   "Konami", "Golfing Greats", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, driver_device, 0,        ROT0,   "Konami", "Golfing Greats (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, glfgreat,    0,        glfgreat, glfgreat,  tmnt_state, 0,        ROT0,   "Konami",  "Golfing Greats",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, glfgreatj,   glfgreat, glfgreat, glfgreatj, tmnt_state, 0,        ROT0,   "Konami",  "Golfing Greats (Japan)", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders,  driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmht24pe,    tmnt2,    tmnt2,    ssriders,  driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Hero Turtles - Turtles in Time (4 Players ver EAA)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders,  driver_device, 0,        ROT0,   "Konami", "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt2,       0,        tmnt2,    ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver UAA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt2a,      tmnt2,    tmnt2,    ssrid4ps,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (4 Players ver ADA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmht22pe,    tmnt2,    tmnt2,    ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (2 Players ver EBA)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmht24pe,    tmnt2,    tmnt2,    ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Hero Turtles - Turtles in Time (4 Players ver EAA)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tmnt22pu,    tmnt2,    tmnt2,    ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Teenage Mutant Ninja Turtles - Turtles in Time (2 Players ver UDA)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon,  driver_device, 0,        ROT0,   "Konami", "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, qgakumon,    0,        tmnt2,    qgakumon,  tmnt_state, 0,        ROT0,   "Konami",  "Quiz Gakumon no Susume (Japan ver. JA2 Type L)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, ssriders,    0,        ssriders, ssridr4p,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssriderseaa, ssriders, ssriders, ssrid4ps,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersebd, ssriders, ssriders, ssriders,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver EBD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersebc, ssriders, ssriders, ssriders,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver EBC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersuda, ssriders, ssriders, ssrid4ps,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver UDA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersuac, ssriders, ssriders, ssridr4p,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver UAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersuab, ssriders, ssriders, ssridr4p,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersubc, ssriders, ssriders, ssriders,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver UBC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersadd, ssriders, ssriders, ssrid4ps,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver ADD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersabd, ssriders, ssriders, ssriders,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver ABD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersjad, ssriders, ssriders, ssrid4ps,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver JAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersjac, ssriders, ssriders, ssrid4ps,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (4 Players ver JAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders,  driver_device, 0,        ROT0,   "Konami", "Sunset Riders (2 Players ver JBD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl,  driver_device, 0,        ROT0,   "bootleg","Sunset Riders (bootleg 4 Players ver ADD)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1991, ssriders2,   ssriders, sunsetbl, sunsetbl,  driver_device, 0,        ROT0,   "bootleg","Sunset Riders 2 (bootleg 4 Players ver ADD)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssriders,    0,        ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver EAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssriderseaa, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver EAA)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersebd, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver EBD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersebc, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver EBC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersuda, ssriders, ssriders, ssrid4ps,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver UDA)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersuac, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver UAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersuab, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver UAB)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersubc, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver UBC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersadd, ssriders, ssriders, ssrid4ps,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver ADD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersabd, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver ABD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersjad, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver JAD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersjac, ssriders, ssriders, ssridr4p,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (4 Players ver JAC)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersjbd, ssriders, ssriders, ssriders,  tmnt_state, 0,        ROT0,   "Konami",  "Sunset Riders (2 Players ver JBD)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssridersb,   ssriders, sunsetbl, sunsetbl,  tmnt_state, 0,        ROT0,   "bootleg", "Sunset Riders (bootleg 4 Players ver ADD)",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ssriders2,   ssriders, sunsetbl, sunsetbl,  tmnt_state, 0,        ROT0,   "bootleg", "Sunset Riders 2 (bootleg 4 Players ver ADD)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,   driver_device, 0,        ROT0,   "Konami", "Thunder Cross II (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,   driver_device, 0,        ROT0,   "Konami", "Thunder Cross II (Asia)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2,   driver_device, 0,        ROT0,   "Konami", "Thunder Cross II (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndrx2,     0,        thndrx2,  thndrx2,   tmnt_state, 0,        ROT0,   "Konami",  "Thunder Cross II (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndrx2a,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, 0,        ROT0,   "Konami",  "Thunder Cross II (Asia)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1991, thndrx2j,    thndrx2,  thndrx2,  thndrx2,   tmnt_state, 0,        ROT0,   "Konami",  "Thunder Cross II (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, prmrsocr,    0,        prmrsocr, prmrsocr,  driver_device, 0,        ROT0,   "Konami", "Premier Soccer (ver EAB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, prmrsocrj,   prmrsocr, prmrsocr, prmrsocr,  driver_device, 0,        ROT0,   "Konami", "Premier Soccer (ver JAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, prmrsocr,    0,        prmrsocr, prmrsocr,  tmnt_state, 0,        ROT0,   "Konami",  "Premier Soccer (ver EAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, prmrsocrj,   prmrsocr, prmrsocr, prmrsocr,  tmnt_state, 0,        ROT0,   "Konami",  "Premier Soccer (ver JAB)", MACHINE_SUPPORTS_SAVE )

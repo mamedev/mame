@@ -18,48 +18,42 @@
 */
 
 #include "emu.h"
+#include "i386.h"
+
 #include "debugger.h"
 #include "i386priv.h"
-#include "i386.h"
 
 #include "debug/debugcpu.h"
 
 /* seems to be defined on mingw-gcc */
 #undef i386
 
-const device_type I386 = &device_creator<i386_device>;
-const device_type I386SX = &device_creator<i386SX_device>;
-const device_type I486 = &device_creator<i486_device>;
-const device_type PENTIUM = &device_creator<pentium_device>;
-const device_type MEDIAGX = &device_creator<mediagx_device>;
-const device_type PENTIUM_PRO = &device_creator<pentium_pro_device>;
-const device_type PENTIUM_MMX = &device_creator<pentium_mmx_device>;
-const device_type PENTIUM2 = &device_creator<pentium2_device>;
-const device_type PENTIUM3 = &device_creator<pentium3_device>;
-const device_type PENTIUM4 = &device_creator<pentium4_device>;
+DEFINE_DEVICE_TYPE(I386,        i386_device,        "i386",        "I386")
+DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "I386SX")
+DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "I486")
+DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "I486DX4")
+DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Pentium")
+DEFINE_DEVICE_TYPE(MEDIAGX,     mediagx_device,     "mediagx",     "Cyrix MediaGX")
+DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Pentium Pro")
+DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Pentium MMX")
+DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Pentium II")
+DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Pentium III")
+DEFINE_DEVICE_TYPE(PENTIUM4,    pentium4_device,    "pentium4",    "Pentium 4")
 
 
 i386_device::i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, I386, "I386", tag, owner, clock, "i386", __FILE__)
-	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
-	, m_io_config("io", ENDIANNESS_LITTLE, 32, 16, 0)
-	, m_smiact(*this)
+	: i386_device(mconfig, I386, tag, owner, clock, 32, 32, 32)
 {
-	m_program_config.m_logaddr_width = 32;
-	m_program_config.m_page_shift = 12;
-
-	// 32 unified
-	set_vtlb_dynamic_entries(32);
 }
 
 
-i386_device::i386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int program_data_width, int program_addr_width, int io_data_width)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+i386_device::i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
 	, m_smiact(*this)
+	, m_ferr_handler(*this)
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = 12;
@@ -68,68 +62,83 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	set_vtlb_dynamic_entries(32);
 }
 
-i386SX_device::i386SX_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i386_device(mconfig, I386SX, "I386SX", tag, owner, clock, "i386sx", __FILE__, 16, 24, 16)
+i386sx_device::i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i386_device(mconfig, I386SX, tag, owner, clock, 16, 24, 16)
 {
 }
 
 i486_device::i486_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i386_device(mconfig, I486, "I486", tag, owner, clock, "i486", __FILE__)
+	: i486_device(mconfig, I486, tag, owner, clock)
+{
+}
+
+i486_device::i486_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: i386_device(mconfig, type, tag, owner, clock, 32, 32, 32)
+{
+}
+
+i486dx4_device::i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i486_device(mconfig, I486DX4, tag, owner, clock)
 {
 }
 
 pentium_device::pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i386_device(mconfig, PENTIUM, "PENTIUM", tag, owner, clock, "pentium", __FILE__)
+	: pentium_device(mconfig, PENTIUM, tag, owner, clock)
 {
-	// 64 dtlb small, 8 dtlb large, 32 itlb
-	set_vtlb_dynamic_entries(96);
 }
 
-pentium_device::pentium_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: i386_device(mconfig, type, name, tag, owner, clock, shortname, source)
+pentium_device::pentium_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: i386_device(mconfig, type, tag, owner, clock, 32, 32, 32)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb
 	set_vtlb_dynamic_entries(96);
 }
 
 mediagx_device::mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i386_device(mconfig, MEDIAGX, "MEDIAGX", tag, owner, clock, "mediagx", __FILE__)
+	: i386_device(mconfig, MEDIAGX, tag, owner, clock, 32, 32, 32)
 {
 }
 
 pentium_pro_device::pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM_PRO, "Pentium Pro", tag, owner, clock, "pentium_pro", __FILE__)
+	: pentium_device(mconfig, PENTIUM_PRO, tag, owner, clock)
 {
 }
 
 pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM_MMX, "Pentium MMX", tag, owner, clock, "pentium_mmx", __FILE__)
+	: pentium_device(mconfig, PENTIUM_MMX, tag, owner, clock)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
 }
 
 pentium2_device::pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM2, "Pentium II", tag, owner, clock, "pentium2", __FILE__)
+	: pentium_device(mconfig, PENTIUM2, tag, owner, clock)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
 }
 
 pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM3, "Pentium III", tag, owner, clock, "pentium3", __FILE__)
+	: pentium_device(mconfig, PENTIUM3, tag, owner, clock)
 {
 	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
 	set_vtlb_dynamic_entries(96);
 }
 
 pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pentium_device(mconfig, PENTIUM4, "Pentium 4", tag, owner, clock, "pentium4", __FILE__)
+	: pentium_device(mconfig, PENTIUM4, tag, owner, clock)
 {
 	// 128 dtlb, 64 itlb
 	set_vtlb_dynamic_entries(196);
 }
 
+device_memory_interface::space_config_vector i386_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
 
 int i386_parity_table[256];
 MODRM_TABLE i386_MODRM_table[256];
@@ -2191,10 +2200,10 @@ void i386_device::i386_protected_mode_retf(uint8_t count, uint8_t operand32)
 				FAULT(FAULT_SS,0)
 			}
 		}
-		if(operand32 == 0)
-			REG16(SP) += (4+count);
+		if(STACK_32BIT)
+			REG32(ESP) += (operand32 ? 8 : 4) + count;
 		else
-			REG32(ESP) += (8+count);
+			REG16(SP) +=  (operand32 ? 8 : 4) + count;
 	}
 	else if(RPL > CPL)
 	{
@@ -3163,36 +3172,13 @@ uint64_t i386_device::debug_virttophys(symbol_table &table, int params, const ui
 	return result;
 }
 
-uint64_t i386_debug_segbase(symbol_table &table, void *ref, int params, const uint64_t *param)
-{
-	i386_device *i386 = (i386_device *)(ref);
-	return i386->debug_segbase(table, params, param);
-}
-
-uint64_t i386_debug_seglimit(symbol_table &table, void *ref, int params, const uint64_t *param)
-{
-	i386_device *i386 = (i386_device *)(ref);
-	return i386->debug_seglimit(table, params, param);
-}
-
-uint64_t i386_debug_segofftovirt(symbol_table &table, void *ref, int params, const uint64_t *param)
-{
-	i386_device *i386 = (i386_device *)(ref);
-	return i386->debug_segofftovirt(table, params, param);
-}
-
-static uint64_t i386_debug_virttophys(symbol_table &table, void *ref, int params, const uint64_t *param)
-{
-	i386_device *i386 = (i386_device *)(ref);
-	return i386->debug_virttophys(table, params, param);
-}
-
 void i386_device::device_debug_setup()
 {
-	debug()->symtable().add("segbase", (void *)this, 1, 1, i386_debug_segbase);
-	debug()->symtable().add("seglimit", (void *)this, 1, 1, i386_debug_seglimit);
-	debug()->symtable().add("segofftovirt", (void *)this, 2, 2, i386_debug_segofftovirt);
-	debug()->symtable().add("virttophys", (void *)this, 1, 1, i386_debug_virttophys);
+	using namespace std::placeholders;
+	debug()->symtable().add("segbase", 1, 1, std::bind(&i386_device::debug_segbase, this, _1, _2, _3));
+	debug()->symtable().add("seglimit", 1, 1, std::bind(&i386_device::debug_seglimit, this, _1, _2, _3));
+	debug()->symtable().add("segofftovirt", 2, 2, std::bind(&i386_device::debug_segofftovirt, this, _1, _2, _3));
+	debug()->symtable().add("virttophys", 1, 1, std::bind(&i386_device::debug_virttophys, this, _1, _2, _3));
 }
 
 /*************************************************************************/
@@ -3236,7 +3222,7 @@ void i386_device::i386_common_init()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 	m_smi = false;
 	m_debugger_temp = 0;
@@ -3277,6 +3263,7 @@ void i386_device::i386_common_init()
 	save_item(NAME(m_sreg[GS].d));
 	save_item(NAME(m_eip));
 	save_item(NAME(m_prev_eip));
+
 	save_item(NAME(m_CF));
 	save_item(NAME(m_DF));
 	save_item(NAME(m_SF));
@@ -3286,9 +3273,24 @@ void i386_device::i386_common_init()
 	save_item(NAME(m_AF));
 	save_item(NAME(m_IF));
 	save_item(NAME(m_TF));
+	save_item(NAME(m_IOP1));
+	save_item(NAME(m_IOP2));
+	save_item(NAME(m_NT));
+	save_item(NAME(m_RF));
+	save_item(NAME(m_VM));
+	save_item(NAME(m_AC));
+	save_item(NAME(m_VIF));
+	save_item(NAME(m_VIP));
+	save_item(NAME(m_ID));
+
+	save_item(NAME(m_CPL));
+
+	save_item(NAME(m_performed_intersegment_jump));
+
 	save_item(NAME(m_cr));
 	save_item(NAME(m_dr));
 	save_item(NAME(m_tr));
+
 	save_item(NAME(m_idtr.base));
 	save_item(NAME(m_idtr.limit));
 	save_item(NAME(m_gdtr.base));
@@ -3301,12 +3303,17 @@ void i386_device::i386_common_init()
 	save_item(NAME(m_ldtr.segment));
 	save_item(NAME(m_ldtr.limit));
 	save_item(NAME(m_ldtr.flags));
+
+	save_item(NAME(m_segment_override));
+
 	save_item(NAME(m_irq_state));
-	save_item(NAME(m_performed_intersegment_jump));
+	save_item(NAME(m_a20_mask));
+
 	save_item(NAME(m_mxcsr));
+
 	save_item(NAME(m_smm));
-	save_item(NAME(m_smi_latched));
 	save_item(NAME(m_smi));
+	save_item(NAME(m_smi_latched));
 	save_item(NAME(m_nmi_masked));
 	save_item(NAME(m_nmi_latched));
 	save_item(NAME(m_smbase));
@@ -3314,6 +3321,8 @@ void i386_device::i386_common_init()
 	machine().save().register_postload(save_prepost_delegate(FUNC(i386_device::i386_postload), this));
 
 	m_smiact.resolve_safe();
+	m_ferr_handler.resolve_safe();
+	m_ferr_handler(0);
 
 	m_icountptr = &m_cycles;
 }
@@ -3548,6 +3557,7 @@ void i386_device::state_string_export(const device_state_entry &entry, std::stri
 			str = string_format("%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
 			break;
 	}
+	float_exception_flags = 0; // kill any float exceptions that occur here
 }
 
 void i386_device::build_opcode_table(uint32_t features)
@@ -3781,59 +3791,60 @@ void i386_device::pentium_smi()
 	m_smi_latched = false;
 
 	// save state
-	WRITE32(m_cr[4], smram_state+SMRAM_IP5_CR4);
-	WRITE32(m_sreg[ES].limit, smram_state+SMRAM_IP5_ESLIM);
-	WRITE32(m_sreg[ES].base, smram_state+SMRAM_IP5_ESBASE);
-	WRITE32(m_sreg[ES].flags, smram_state+SMRAM_IP5_ESACC);
-	WRITE32(m_sreg[CS].limit, smram_state+SMRAM_IP5_CSLIM);
-	WRITE32(m_sreg[CS].base, smram_state+SMRAM_IP5_CSBASE);
-	WRITE32(m_sreg[CS].flags, smram_state+SMRAM_IP5_CSACC);
-	WRITE32(m_sreg[SS].limit, smram_state+SMRAM_IP5_SSLIM);
-	WRITE32(m_sreg[SS].base, smram_state+SMRAM_IP5_SSBASE);
-	WRITE32(m_sreg[SS].flags, smram_state+SMRAM_IP5_SSACC);
-	WRITE32(m_sreg[DS].limit, smram_state+SMRAM_IP5_DSLIM);
-	WRITE32(m_sreg[DS].base, smram_state+SMRAM_IP5_DSBASE);
-	WRITE32(m_sreg[DS].flags, smram_state+SMRAM_IP5_DSACC);
-	WRITE32(m_sreg[FS].limit, smram_state+SMRAM_IP5_FSLIM);
-	WRITE32(m_sreg[FS].base, smram_state+SMRAM_IP5_FSBASE);
-	WRITE32(m_sreg[FS].flags, smram_state+SMRAM_IP5_FSACC);
-	WRITE32(m_sreg[GS].limit, smram_state+SMRAM_IP5_GSLIM);
-	WRITE32(m_sreg[GS].base, smram_state+SMRAM_IP5_GSBASE);
-	WRITE32(m_sreg[GS].flags, smram_state+SMRAM_IP5_GSACC);
-	WRITE32(m_ldtr.flags, smram_state+SMRAM_IP5_LDTACC);
-	WRITE32(m_ldtr.limit, smram_state+SMRAM_IP5_LDTLIM);
-	WRITE32(m_ldtr.base, smram_state+SMRAM_IP5_LDTBASE);
-	WRITE32(m_gdtr.limit, smram_state+SMRAM_IP5_GDTLIM);
-	WRITE32(m_gdtr.base, smram_state+SMRAM_IP5_GDTBASE);
-	WRITE32(m_idtr.limit, smram_state+SMRAM_IP5_IDTLIM);
-	WRITE32(m_idtr.base, smram_state+SMRAM_IP5_IDTBASE);
-	WRITE32(m_task.limit, smram_state+SMRAM_IP5_TRLIM);
-	WRITE32(m_task.base, smram_state+SMRAM_IP5_TRBASE);
-	WRITE32(m_task.flags, smram_state+SMRAM_IP5_TRACC);
+	WRITE32(smram_state + SMRAM_SMBASE, m_smbase);
+	WRITE32(smram_state + SMRAM_IP5_CR4, m_cr[4]);
+	WRITE32(smram_state + SMRAM_IP5_ESLIM, m_sreg[ES].limit);
+	WRITE32(smram_state + SMRAM_IP5_ESBASE, m_sreg[ES].base);
+	WRITE32(smram_state + SMRAM_IP5_ESACC, m_sreg[ES].flags);
+	WRITE32(smram_state + SMRAM_IP5_CSLIM, m_sreg[CS].limit);
+	WRITE32(smram_state + SMRAM_IP5_CSBASE, m_sreg[CS].base);
+	WRITE32(smram_state + SMRAM_IP5_CSACC, m_sreg[CS].flags);
+	WRITE32(smram_state + SMRAM_IP5_SSLIM, m_sreg[SS].limit);
+	WRITE32(smram_state + SMRAM_IP5_SSBASE, m_sreg[SS].base);
+	WRITE32(smram_state + SMRAM_IP5_SSACC, m_sreg[SS].flags);
+	WRITE32(smram_state + SMRAM_IP5_DSLIM, m_sreg[DS].limit);
+	WRITE32(smram_state + SMRAM_IP5_DSBASE, m_sreg[DS].base);
+	WRITE32(smram_state + SMRAM_IP5_DSACC, m_sreg[DS].flags);
+	WRITE32(smram_state + SMRAM_IP5_FSLIM, m_sreg[FS].limit);
+	WRITE32(smram_state + SMRAM_IP5_FSBASE, m_sreg[FS].base);
+	WRITE32(smram_state + SMRAM_IP5_FSACC, m_sreg[FS].flags);
+	WRITE32(smram_state + SMRAM_IP5_GSLIM, m_sreg[GS].limit);
+	WRITE32(smram_state + SMRAM_IP5_GSBASE, m_sreg[GS].base);
+	WRITE32(smram_state + SMRAM_IP5_GSACC, m_sreg[GS].flags);
+	WRITE32(smram_state + SMRAM_IP5_LDTACC, m_ldtr.flags);
+	WRITE32(smram_state + SMRAM_IP5_LDTLIM, m_ldtr.limit);
+	WRITE32(smram_state + SMRAM_IP5_LDTBASE, m_ldtr.base);
+	WRITE32(smram_state + SMRAM_IP5_GDTLIM, m_gdtr.limit);
+	WRITE32(smram_state + SMRAM_IP5_GDTBASE, m_gdtr.base);
+	WRITE32(smram_state + SMRAM_IP5_IDTLIM, m_idtr.limit);
+	WRITE32(smram_state + SMRAM_IP5_IDTBASE, m_idtr.base);
+	WRITE32(smram_state + SMRAM_IP5_TRLIM, m_task.limit);
+	WRITE32(smram_state + SMRAM_IP5_TRBASE, m_task.base);
+	WRITE32(smram_state + SMRAM_IP5_TRACC, m_task.flags);
 
-	WRITE32(m_sreg[ES].selector, smram_state+SMRAM_ES);
-	WRITE32(m_sreg[CS].selector, smram_state+SMRAM_CS);
-	WRITE32(m_sreg[SS].selector, smram_state+SMRAM_SS);
-	WRITE32(m_sreg[DS].selector, smram_state+SMRAM_DS);
-	WRITE32(m_sreg[FS].selector, smram_state+SMRAM_FS);
-	WRITE32(m_sreg[GS].selector, smram_state+SMRAM_GS);
-	WRITE32(m_ldtr.segment, smram_state+SMRAM_LDTR);
-	WRITE32(m_task.segment, smram_state+SMRAM_TR);
+	WRITE32(smram_state + SMRAM_ES, m_sreg[ES].selector);
+	WRITE32(smram_state + SMRAM_CS, m_sreg[CS].selector);
+	WRITE32(smram_state + SMRAM_SS, m_sreg[SS].selector);
+	WRITE32(smram_state + SMRAM_DS, m_sreg[DS].selector);
+	WRITE32(smram_state + SMRAM_FS, m_sreg[FS].selector);
+	WRITE32(smram_state + SMRAM_GS, m_sreg[GS].selector);
+	WRITE32(smram_state + SMRAM_LDTR, m_ldtr.segment);
+	WRITE32(smram_state + SMRAM_TR, m_task.segment);
 
-	WRITE32(m_dr[7], smram_state+SMRAM_DR7);
-	WRITE32(m_dr[6], smram_state+SMRAM_DR6);
-	WRITE32(REG32(EAX), smram_state+SMRAM_EAX);
-	WRITE32(REG32(ECX), smram_state+SMRAM_ECX);
-	WRITE32(REG32(EDX), smram_state+SMRAM_EDX);
-	WRITE32(REG32(EBX), smram_state+SMRAM_EBX);
-	WRITE32(REG32(ESP), smram_state+SMRAM_ESP);
-	WRITE32(REG32(EBP), smram_state+SMRAM_EBP);
-	WRITE32(REG32(ESI), smram_state+SMRAM_ESI);
-	WRITE32(REG32(EDI), smram_state+SMRAM_EDI);
-	WRITE32(m_eip, smram_state+SMRAM_EIP);
-	WRITE32(old_flags, smram_state+SMRAM_EFLAGS);
-	WRITE32(m_cr[3], smram_state+SMRAM_CR3);
-	WRITE32(old_cr0, smram_state+SMRAM_CR0);
+	WRITE32(smram_state + SMRAM_DR7, m_dr[7]);
+	WRITE32(smram_state + SMRAM_DR6, m_dr[6]);
+	WRITE32(smram_state + SMRAM_EAX, REG32(EAX));
+	WRITE32(smram_state + SMRAM_ECX, REG32(ECX));
+	WRITE32(smram_state + SMRAM_EDX, REG32(EDX));
+	WRITE32(smram_state + SMRAM_EBX, REG32(EBX));
+	WRITE32(smram_state + SMRAM_ESP, REG32(ESP));
+	WRITE32(smram_state + SMRAM_EBP, REG32(EBP));
+	WRITE32(smram_state + SMRAM_ESI, REG32(ESI));
+	WRITE32(smram_state + SMRAM_EDI, REG32(EDI));
+	WRITE32(smram_state + SMRAM_EIP, m_eip);
+	WRITE32(smram_state + SMRAM_EFLAGS, old_flags);
+	WRITE32(smram_state + SMRAM_CR3, m_cr[3]);
+	WRITE32(smram_state + SMRAM_CR0, old_cr0);
 
 	m_sreg[DS].selector = m_sreg[ES].selector = m_sreg[FS].selector = m_sreg[GS].selector = m_sreg[SS].selector = 0;
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
@@ -3982,7 +3993,7 @@ void i386_device::execute_run()
 
 /*************************************************************************/
 
-bool i386_device::memory_translate(address_spacenum spacenum, int intention, offs_t &address)
+bool i386_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
 	bool ret = true;
 	if(spacenum == AS_PROGRAM)
@@ -3991,15 +4002,15 @@ bool i386_device::memory_translate(address_spacenum spacenum, int intention, off
 	return ret;
 }
 
-offs_t i386_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+int i386_device::get_mode() const
 {
-	std::ostringstream stream;
-	offs_t result = i386_dasm_one(stream, pc, oprom, m_sreg[CS].d ? 32 : 16);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	return m_sreg[CS].d ? 32 : 16;
 }
 
+util::disasm_interface *i386_device::create_disassembler()
+{
+	return new i386_disassembler(this);
+}
 
 /*****************************************************************************/
 /* Intel 486 */
@@ -4057,6 +4068,16 @@ void i486_device::device_reset()
 	CHANGE_PC(m_eip);
 }
 
+void i486dx4_device::device_reset()
+{
+	i486_device::device_reset();
+	m_cpuid_id0 = 0x756e6547;   // Genu
+	m_cpuid_id1 = 0x49656e69;   // ineI
+	m_cpuid_id2 = 0x6c65746e;   // ntel
+
+	m_cpuid_max_input_value_eax = 0x01;
+	m_cpu_version = REG32(EDX);
+}
 
 /*****************************************************************************/
 /* Pentium */

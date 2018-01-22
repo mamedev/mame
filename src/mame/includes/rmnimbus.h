@@ -7,8 +7,13 @@
     Phill Harvey-Smith
     2009-11-29.
 */
-#include "emu.h"
+#ifndef MAME_INCLUDES_RMNIMBUS_H
+#define MAME_INCLUDES_RMNIMBUS_H
+
+#pragma once
+
 #include "cpu/i86/i186.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/z80dart.h"
 #include "machine/wd_fdc.h"
 #include "bus/scsi/scsi.h"
@@ -18,6 +23,7 @@
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "bus/centronics/ctronics.h"
+#include "screen.h"
 
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG   "iocpu"
@@ -53,7 +59,8 @@ class rmnimbus_state : public driver_device
 public:
 	rmnimbus_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
+		m_maincpu(*this, MAINCPU_TAG),
+		m_iocpu(*this, IOCPU_TAG),
 		m_msm(*this, MSM5205_TAG),
 		m_scsibus(*this, SCSIBUS_TAG),
 		m_ram(*this, RAM_TAG),
@@ -75,9 +82,12 @@ public:
 	{
 	}
 
+	static constexpr feature_type imperfect_features() { return feature::MOUSE; }
+
 	required_device<i80186_cpu_device> m_maincpu;
+	required_device<i8031_device> m_iocpu;
 	required_device<msm5205_device> m_msm;
-	required_device<SCSI_PORT_DEVICE> m_scsibus;
+	required_device<scsi_port_device> m_scsibus;
 	required_device<ram_device> m_ram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<via6522_device> m_via;
@@ -86,7 +96,7 @@ public:
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<output_latch_device> m_scsi_ctrl_out;
-	required_device<wd2793_t> m_fdc;
+	required_device<wd2793_device> m_fdc;
 	required_device<z80sio2_device> m_z80sio;
 	required_device<screen_device> m_screen;
 	required_ioport m_io_config;
@@ -219,7 +229,10 @@ public:
 		emu_timer   *m_mouse_timer;
 	} m_nimbus_mouse;
 
+	void nimbus(machine_config &config);
 private:
-	void debug_command(int ref, int params, const char *param[]);
-	void video_debug(int ref, int params, const char *param[]);
+	void debug_command(int ref, const std::vector<std::string> &params);
+	void video_debug(int ref, const std::vector<std::string> &params);
 };
+
+#endif // MAME_INCLUDES_RMNIMBUS_H

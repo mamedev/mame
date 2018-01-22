@@ -34,12 +34,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VIDBRAIN_EXP_H
+#define MAME_BUS_VIDBRAIN_EXP_H
+
 #pragma once
 
-#ifndef __VIDEOBRAIN_EXPANSION_SLOT__
-#define __VIDEOBRAIN_EXPANSION_SLOT__
-
-#include "emu.h"
 #include "softlist_dev.h"
 
 
@@ -79,18 +78,19 @@ class device_videobrain_expansion_card_interface : public device_slot_card_inter
 
 public:
 	// construction/destruction
-	device_videobrain_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_videobrain_expansion_card_interface() { }
 
 protected:
+	device_videobrain_expansion_card_interface(const machine_config &mconfig, device_t &device);
+
 	// initialization
 	virtual uint8_t* videobrain_rom_pointer(running_machine &machine, size_t size);
 	virtual uint8_t* videobrain_ram_pointer(running_machine &machine, size_t size);
 
 	// runtime
-	virtual uint8_t videobrain_bo_r(address_space &space, offs_t offset, int cs1, int cs2) { return 0; };
-	virtual void videobrain_bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2) { };
-	virtual void videobrain_extres_w() { };
+	virtual uint8_t videobrain_bo_r(address_space &space, offs_t offset, int cs1, int cs2) { return 0; }
+	virtual void videobrain_bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2) { }
+	virtual void videobrain_extres_w() { }
 
 	videobrain_expansion_slot_device *m_slot;
 
@@ -111,9 +111,8 @@ class videobrain_expansion_slot_device : public device_t,
 public:
 	// construction/destruction
 	videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~videobrain_expansion_slot_device() { }
 
-	template<class _Object> static devcb_base &set_extres_wr_callback(device_t &device, _Object object) { return downcast<videobrain_expansion_slot_device &>(device).m_write_extres.set_callback(object); }
+	template <class Object> static devcb_base &set_extres_wr_callback(device_t &device, Object &&cb) { return downcast<videobrain_expansion_slot_device &>(device).m_write_extres.set_callback(std::forward<Object>(cb)); }
 
 	// computer interface
 	uint8_t bo_r(address_space &space, offs_t offset, int cs1, int cs2);
@@ -131,7 +130,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override { update_names(); }
 	virtual void device_start() override;
 
 	// image-level overrides
@@ -149,7 +147,7 @@ protected:
 	virtual const char *file_extensions() const override { return "bin"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	devcb_write_line   m_write_extres;
 
@@ -158,11 +156,9 @@ protected:
 
 
 // device type definition
-extern const device_type VIDEOBRAIN_EXPANSION_SLOT;
+DECLARE_DEVICE_TYPE(VIDEOBRAIN_EXPANSION_SLOT, videobrain_expansion_slot_device)
 
 
 SLOT_INTERFACE_EXTERN( vidbrain_expansion_cards );
 
-
-
-#endif
+#endif // MAME_BUS_VIDBRAIN_EXP_H

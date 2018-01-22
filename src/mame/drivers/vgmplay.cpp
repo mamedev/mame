@@ -4,33 +4,49 @@
 // A "virtual" driver to play vgm files
 // Use with mame vgmplay -bitb file.vgm
 
-#include <zlib.h>
-
 #include "emu.h"
-#include "debugger.h"
+
 #include "imagedev/bitbngr.h"
 
-#include "cpu/m6502/n2a03.h"
 #include "cpu/h6280/h6280.h"
-#include "sound/2612intf.h"
-#include "sound/ym2151.h"
-#include "sound/ym2413.h"
+#include "cpu/m6502/n2a03.h"
 #include "sound/2203intf.h"
+#include "sound/2612intf.h"
 #include "sound/3526intf.h"
 #include "sound/3812intf.h"
 #include "sound/ay8910.h"
-#include "sound/c6280.h"
-#include "sound/sn76496.h"
-#include "sound/k053260.h"
-#include "sound/segapcm.h"
-#include "sound/multipcm.h"
-#include "sound/gb.h"
-#include "sound/pokey.h"
 #include "sound/c352.h"
+#include "sound/c6280.h"
+#include "sound/gb.h"
+#include "sound/k053260.h"
+#include "sound/multipcm.h"
 #include "sound/okim6295.h"
+#include "sound/pokey.h"
+#include "sound/segapcm.h"
+#include "sound/sn76496.h"
+#include "sound/ym2151.h"
+#include "sound/ym2413.h"
+#include "sound/ymf271.h"
+#include "sound/ymz280b.h"
+#include "sound/2608intf.h"
 
-#define AS_IO16             AS_1
+#include "debugger.h"
+#include "speaker.h"
+
+#include <zlib.h>
+
+#define AS_IO16             1
 #define MCFG_CPU_IO16_MAP   MCFG_CPU_DATA_MAP
+
+class vgmplay_disassembler : public util::disasm_interface
+{
+public:
+	vgmplay_disassembler() = default;
+	virtual ~vgmplay_disassembler() = default;
+
+	virtual uint32_t opcode_alignment() const override;
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+};
 
 class vgmplay_device : public cpu_device
 {
@@ -59,6 +75,9 @@ public:
 		A_MULTIPCMB  = 0x00013010,
 		A_POKEYA     = 0x00013020,
 		A_POKEYB     = 0x00013030,
+		A_YMF271     = 0x00013040,
+		A_YMZ280B    = 0x00013050,
+		A_YM2608     = 0x00013060
 	};
 
 	enum io16_t
@@ -77,17 +96,17 @@ public:
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	READ8_MEMBER(segapcm_rom_r);
+	READ8_MEMBER(ymf271_rom_r);
+	READ8_MEMBER(ymz280b_rom_r);
 	READ8_MEMBER(multipcma_rom_r);
 	READ8_MEMBER(multipcmb_rom_r);
 	READ8_MEMBER(k053260_rom_r);
@@ -125,7 +144,7 @@ private:
 	void blocks_clear();
 };
 
-const device_type VGMPLAY = &device_creator<vgmplay_device>;
+DEFINE_DEVICE_TYPE(VGMPLAY, vgmplay_device, "vgmplay_core", "VGM Player engine")
 
 class vgmplay_state : public driver_device
 {
@@ -142,6 +161,7 @@ public:
 	DECLARE_WRITE8_MEMBER(multipcm_bank_lo_b_w);
 	DECLARE_WRITE8_MEMBER(multipcm_bank_hi_b_w);
 
+	void vgmplay(machine_config &config);
 private:
 	std::vector<uint8_t> m_file_data;
 	required_device<bitbanger_device> m_file;
@@ -168,6 +188,9 @@ private:
 	required_device<pokey_device> m_pokeyb;
 	required_device<c352_device> m_c352;
 	required_device<okim6295_device> m_okim6295;
+	required_device<ymf271_device> m_ymf271;
+	required_device<ymz280b_device> m_ymz280b;
+	required_device<ym2608_device> m_ym2608;
 
 	uint32_t m_multipcma_bank_l;
 	uint32_t m_multipcma_bank_r;
@@ -179,7 +202,7 @@ private:
 };
 
 vgmplay_device::vgmplay_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	cpu_device(mconfig, VGMPLAY, "VGM Player engine", tag, owner, clock, "vgmplay_core", __FILE__),
+	cpu_device(mconfig, VGMPLAY, tag, owner, clock),
 	m_file_config("file", ENDIANNESS_LITTLE, 8, 32),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 32),
 	m_io16_config("io16", ENDIANNESS_LITTLE, 16, 32)
@@ -334,6 +357,13 @@ void vgmplay_device::execute_run()
 				m_pc += 3;
 				break;
 
+			case 0x56:
+			case 0x57:
+				m_io->write_byte(A_YM2608+0+((code & 1) << 1), m_file->read_byte(m_pc+1));
+				m_io->write_byte(A_YM2608+1+((code & 1) << 1), m_file->read_byte(m_pc+2));
+				m_pc += 3;
+				break;
+
 			case 0xA5:
 				m_io->write_byte(A_YM2203B+0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM2203B+1, m_file->read_byte(m_pc+2));
@@ -349,6 +379,12 @@ void vgmplay_device::execute_run()
 			case 0x5b:
 				m_io->write_byte(A_YM3526+0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_YM3526+1, m_file->read_byte(m_pc+2));
+				m_pc += 3;
+				break;
+
+			case 0x5d:
+				m_io->write_byte(A_YMZ280B+0, m_file->read_byte(m_pc+1));
+				m_io->write_byte(A_YMZ280B+1, m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
 
@@ -492,6 +528,15 @@ void vgmplay_device::execute_run()
 				break;
 			}
 
+			case 0xd1:
+			{
+				uint8_t offset = m_file->read_byte(m_pc+1);
+				m_io->write_byte(A_YMF271 + (offset & 7) * 2, m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_YMF271 + (offset & 7) * 2 + 1, m_file->read_byte(m_pc+3));
+				m_pc += 4;
+				break;
+			}
+
 			case 0xe0:
 				m_ym2612_stream_offset = m_file->read_dword(m_pc+1);
 				m_pc += 5;
@@ -533,14 +578,13 @@ void vgmplay_device::execute_set_input(int inputnum, int state)
 {
 }
 
-const address_space_config *vgmplay_device::memory_space_config(address_spacenum spacenum) const
+device_memory_interface::space_config_vector vgmplay_device::memory_space_config() const
 {
-	switch(spacenum) {
-	case AS_PROGRAM: return &m_file_config;
-	case AS_IO:      return &m_io_config;
-	case AS_IO16:    return &m_io16_config;
-	default:         return nullptr;
-	}
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_file_config),
+		std::make_pair(AS_IO,      &m_io_config),
+		std::make_pair(AS_IO16,    &m_io16_config)
+	};
 }
 
 void vgmplay_device::state_import(const device_state_entry &entry)
@@ -555,104 +599,104 @@ void vgmplay_device::state_string_export(const device_state_entry &entry, std::s
 {
 }
 
-uint32_t vgmplay_device::disasm_min_opcode_bytes() const
+util::disasm_interface *vgmplay_device::create_disassembler()
+{
+	return new vgmplay_disassembler;
+}
+
+uint32_t vgmplay_disassembler::opcode_alignment() const
 {
 	return 1;
 }
 
-uint32_t vgmplay_device::disasm_max_opcode_bytes() const
+offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	return 9;
-}
-
-offs_t vgmplay_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	switch(oprom[0]) {
+	switch(opcodes.r8(pc)) {
 	case 0x4f:
-		sprintf(buffer, "psg r06 = %02x", oprom[1]);
-		return 2 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "psg r06 = %02x", opcodes.r8(pc+1));
+		return 2 | SUPPORTED;
 
 	case 0x50:
-		sprintf(buffer, "psg write %02x", oprom[1]);
-		return 2 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "psg write %02x", opcodes.r8(pc+1));
+		return 2 | SUPPORTED;
 
 	case 0x51:
-		sprintf(buffer, "ym2413 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ym2413 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x52:
-		sprintf(buffer, "ym2612.0 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ym2612.0 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x53:
-		sprintf(buffer, "ym2612.1 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ym2612.1 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x54:
-		sprintf(buffer, "ym2151 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ym2151 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x55:
-		sprintf(buffer, "ym2203a r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ym2203a r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x56:
-		sprintf(buffer, "ym2608.0 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ym2608.0 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x57:
-		sprintf(buffer, "ym2608.1 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ym2608.1 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x58:
-		sprintf(buffer, "ym2610.0 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ym2610.0 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x59:
-		sprintf(buffer, "ym2610.1 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ym2610.1 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x5a:
-		sprintf(buffer, "ym3812 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ym3812 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x5b:
-		sprintf(buffer, "ym3526 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ym3526 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x5c:
-		sprintf(buffer, "y8950 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "y8950 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x5d:
-		sprintf(buffer, "ymz280b r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ymz280b r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x5e:
-		sprintf(buffer, "ymf262.0 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ymf262.0 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x5f:
-		sprintf(buffer, "ymf262.1 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ymf262.1 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0x61: {
-		uint32_t duration = oprom[1] | (oprom[2] << 8);
-		sprintf(buffer, "wait %d", duration);
-		return 3 | DASMFLAG_SUPPORTED;
+		uint32_t duration = opcodes.r8(pc+1) | (opcodes.r8(pc+2) << 8);
+		util::stream_format(stream, "wait %d", duration);
+		return 3 | SUPPORTED;
 	}
 
 	case 0x62:
-		sprintf(buffer, "wait 735");
-		return 1 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "wait 735");
+		return 1 | SUPPORTED;
 
 	case 0x63:
-		sprintf(buffer, "wait 882");
-		return 1 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "wait 882");
+		return 1 | SUPPORTED;
 
 	case 0x66:
-		sprintf(buffer, "end");
-		return 1 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "end");
+		return 1 | SUPPORTED;
 
 	case 0x67: {
 		static const char *const basic_types[8] = {
@@ -700,159 +744,159 @@ offs_t vgmplay_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t
 			"es5503 ram"
 		};
 
-		uint8_t type = oprom[2];
-		uint32_t size = oprom[3] | (oprom[4] << 8) | (oprom[5] << 16) | (oprom[6] << 24);
+		uint8_t type = opcodes.r8(pc+2);
+		uint32_t size = opcodes.r8(pc+3) | (opcodes.r8(pc+4) << 8) | (opcodes.r8(pc+5) << 16) | (opcodes.r8(pc+6) << 24);
 		if(type < 0x8)
-			sprintf(buffer, "data-block %x, %s", size, basic_types[type]);
+			util::stream_format(stream, "data-block %x, %s", size, basic_types[type]);
 		else if(type < 0x40)
-			sprintf(buffer, "data-block %x, %02x", size, type);
+			util::stream_format(stream, "data-block %x, %02x", size, type);
 		else if(type < 0x48)
-			sprintf(buffer, "data-block %x comp., %s", size, basic_types[type & 0x3f]);
+			util::stream_format(stream, "data-block %x comp., %s", size, basic_types[type & 0x3f]);
 		else if(type < 0x7f)
-			sprintf(buffer, "data-block %x comp., %02x", size, type & 0x3f);
+			util::stream_format(stream, "data-block %x comp., %02x", size, type & 0x3f);
 		else if(type < 0x80)
-			sprintf(buffer, "decomp-table %x, %02x/%02x", size, oprom[7], oprom[8]);
+			util::stream_format(stream, "decomp-table %x, %02x/%02x", size, opcodes.r8(pc+7), opcodes.r8(pc+8));
 		else if(type < 0x94)
-			sprintf(buffer, "data-block %x, %s", size, rom_types[type & 0x7f]);
+			util::stream_format(stream, "data-block %x, %s", size, rom_types[type & 0x7f]);
 		else if(type < 0xc0)
-			sprintf(buffer, "data-block %x, rom %02x", size, type);
+			util::stream_format(stream, "data-block %x, rom %02x", size, type);
 		else if(type < 0xc3)
-			sprintf(buffer, "data-block %x, %s", size, ram_types[type & 0x1f]);
+			util::stream_format(stream, "data-block %x, %s", size, ram_types[type & 0x1f]);
 		else if(type < 0xe0)
-			sprintf(buffer, "data-block %x, ram %02x", size, type);
+			util::stream_format(stream, "data-block %x, ram %02x", size, type);
 		else if(type < 0xe2)
-			sprintf(buffer, "data-block %x, %s", size, ram2_types[type & 0x1f]);
+			util::stream_format(stream, "data-block %x, %s", size, ram2_types[type & 0x1f]);
 		else
-			sprintf(buffer, "data-block %x, ram %02x", size, type);
-		return (7+size) | DASMFLAG_SUPPORTED;
+			util::stream_format(stream, "data-block %x, ram %02x", size, type);
+		return (7+size) | SUPPORTED;
 	}
 
 	case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 	case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-		sprintf(buffer, "wait %d", 1+(oprom[0] & 0x0f));
-		return 1 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "wait %d", 1+(opcodes.r8(pc) & 0x0f));
+		return 1 | SUPPORTED;
 
 	case 0x80:
-		sprintf(buffer, "ym2612.0 r2a = rom++");
-		return 1 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ym2612.0 r2a = rom++");
+		return 1 | SUPPORTED;
 
 	case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
 	case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
-		sprintf(buffer, "ym2612.0 r2a = rom++; wait %d", oprom[0] & 0xf);
-		return 1 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ym2612.0 r2a = rom++; wait %d", opcodes.r8(pc) & 0xf);
+		return 1 | SUPPORTED;
 
 	case 0xa0:
-		sprintf(buffer, "ay8910 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ay8910 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0xa5:
-		sprintf(buffer, "ym2203b r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ym2203b r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0xb0:
-		sprintf(buffer, "rf5c68 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "rf5c68 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0xb1:
-		sprintf(buffer, "rf5c164 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "rf5c164 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0xb2:
-		sprintf(buffer, "pwm r%x = %03x", oprom[1] >> 4, oprom[2] | ((oprom[1] & 0xf) << 8));
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "pwm r%x = %03x", opcodes.r8(pc+1) >> 4, opcodes.r8(pc+2) | ((opcodes.r8(pc+1) & 0xf) << 8));
+		return 3 | SUPPORTED;
 
 	case 0xb3:
-		sprintf(buffer, "dmg r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "dmg r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0xb4:
-		sprintf(buffer, "nesapu r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "nesapu r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0xb5:
-		sprintf(buffer, "multipcm r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "multipcm r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0xb6:
-		sprintf(buffer, "upd7759 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "upd7759 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0xb7:
-		sprintf(buffer, "okim6258 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "okim6258 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0xb8:
-		sprintf(buffer, "okim6295 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "okim6295 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0xb9:
-		sprintf(buffer, "huc6280 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "huc6280 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0xba:
-		sprintf(buffer, "k053260 r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "k053260 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0xbb:
-		sprintf(buffer, "pokey r%02x = %02x", oprom[1], oprom[2]);
-		return 3 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "pokey r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
 
 	case 0xc0:
-		sprintf(buffer, "segapcm %04x = %02x", oprom[1] | (oprom[2] << 8), oprom[3]);
-		return 4 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "segapcm %04x = %02x", opcodes.r8(pc+1) | (opcodes.r8(pc+2) << 8), opcodes.r8(pc+3));
+		return 4 | SUPPORTED;
 
 	case 0xc1:
-		sprintf(buffer, "rf5c68 %04x = %02x", oprom[1] | (oprom[2] << 8), oprom[3]);
-		return 4 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "rf5c68 %04x = %02x", opcodes.r8(pc+1) | (opcodes.r8(pc+2) << 8), opcodes.r8(pc+3));
+		return 4 | SUPPORTED;
 
 	case 0xc2:
-		sprintf(buffer, "rf5c163 %04x = %02x", oprom[1] | (oprom[2] << 8), oprom[3]);
-		return 4 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "rf5c163 %04x = %02x", opcodes.r8(pc+1) | (opcodes.r8(pc+2) << 8), opcodes.r8(pc+3));
+		return 4 | SUPPORTED;
 
 	case 0xc3:
-		sprintf(buffer, "multipcm c%02x.off = %04x", oprom[1], oprom[2] | (oprom[3] << 8));
-		return 4 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "multipcm c%02x.off = %04x", opcodes.r8(pc+1), opcodes.r8(pc+2) | (opcodes.r8(pc+3) << 8));
+		return 4 | SUPPORTED;
 
 	case 0xc4:
-		sprintf(buffer, "qsound %02x = %04x", oprom[3], oprom[2] | (oprom[1] << 8));
-		return 4 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "qsound %02x = %04x", opcodes.r8(pc+3), opcodes.r8(pc+2) | (opcodes.r8(pc+1) << 8));
+		return 4 | SUPPORTED;
 
 	case 0xd0:
-		sprintf(buffer, "ymf278b r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
-		return 4 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ymf278b r%02x.%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2), opcodes.r8(pc+3));
+		return 4 | SUPPORTED;
 
 	case 0xd1:
-		sprintf(buffer, "ymf271 r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
-		return 4 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "ymf271 r%02x.%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2), opcodes.r8(pc+3));
+		return 4 | SUPPORTED;
 
 	case 0xd2:
-		sprintf(buffer, "scc1 r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
-		return 4 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "scc1 r%02x.%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2), opcodes.r8(pc+3));
+		return 4 | SUPPORTED;
 
 	case 0xd3:
-		sprintf(buffer, "k054539 r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
-		return 4 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "k054539 r%02x.%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2), opcodes.r8(pc+3));
+		return 4 | SUPPORTED;
 
 	case 0xd4:
-		sprintf(buffer, "c140 r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
-		return 4 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "c140 r%02x.%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2), opcodes.r8(pc+3));
+		return 4 | SUPPORTED;
 
 	case 0xe0: {
-		uint32_t off = oprom[1] | (oprom[2] << 8) | (oprom[3] << 16) | (oprom[4] << 24);
-		sprintf(buffer, "ym2612 offset = %x", off);
-		return 5 | DASMFLAG_SUPPORTED;
+		uint32_t off = opcodes.r8(pc+1) | (opcodes.r8(pc+2) << 8) | (opcodes.r8(pc+3) << 16) | (opcodes.r8(pc+4) << 24);
+		util::stream_format(stream, "ym2612 offset = %x", off);
+		return 5 | SUPPORTED;
 	}
 
 	case 0xe1: {
-		uint16_t addr = (oprom[1] << 8) | oprom[2];
-		uint16_t data = (oprom[3] << 8) | oprom[4];
-		sprintf(buffer, "c352 r%04x = %04x", addr, data);
-		return 5 | DASMFLAG_SUPPORTED;
+		uint16_t addr = (opcodes.r8(pc+1) << 8) | opcodes.r8(pc+2);
+		uint16_t data = (opcodes.r8(pc+3) << 8) | opcodes.r8(pc+4);
+		util::stream_format(stream, "c352 r%04x = %04x", addr, data);
+		return 5 | SUPPORTED;
 	}
 
 	default:
-		sprintf(buffer, "?? %02x", oprom[0]);
-		return 1 | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "?? %02x", opcodes.r8(pc));
+		return 1 | SUPPORTED;
 	}
 }
 
@@ -871,6 +915,16 @@ uint8_t vgmplay_device::rom_r(int chip, uint8_t type, offs_t offset)
 READ8_MEMBER(vgmplay_device::segapcm_rom_r)
 {
 	return rom_r(0, 0x80, offset);
+}
+
+READ8_MEMBER(vgmplay_device::ymf271_rom_r)
+{
+	return rom_r(0, 0x85, offset);
+}
+
+READ8_MEMBER(vgmplay_device::ymz280b_rom_r)
+{
+	return rom_r(0, 0x86, offset);
 }
 
 READ8_MEMBER(vgmplay_device::multipcma_rom_r)
@@ -924,6 +978,9 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_pokeyb(*this, "pokeyb")
 	, m_c352(*this, "c352")
 	, m_okim6295(*this, "okim6295")
+	, m_ymf271(*this, "ymf271")
+	, m_ymz280b(*this, "ymz280b")
+	, m_ym2608(*this, "ym2608")
 {
 }
 
@@ -945,7 +1002,7 @@ void vgmplay_state::machine_start()
 {
 	//m_nescpu->
 	uint32_t size = 0;
-	if(m_file->exists()) {
+	if(m_file->exists() && m_file->length() > 0) {
 		size = m_file->length();
 		m_file_data.resize(size);
 		m_file->input(&m_file_data[0], size);
@@ -1037,7 +1094,7 @@ void vgmplay_state::machine_start()
 				}
 			}
 			if(version >= 0x151 && r32(0x48))
-				logerror("Warning: file requests an unsupported YM2608\n");
+				m_ym2608->set_unscaled_clock(r32(0x48));
 			if(version >= 0x151 && r32(0x4c))
 				logerror("Warning: file requests an unsupported %s\n", r32(0x4c) & 0x80000000 ? "YM2610B" : "YM2610");
 			if(version >= 0x151 && r32(0x50)) {
@@ -1052,10 +1109,12 @@ void vgmplay_state::machine_start()
 				logerror("Warning: file requests an unsupported YMF262\n");
 			if(version >= 0x151 && r32(0x60))
 				logerror("Warning: file requests an unsupported YMF278B\n");
-			if(version >= 0x151 && r32(0x64))
-				logerror("Warning: file requests an unsupported YMF271\n");
-			if(version >= 0x151 && r32(0x68))
-				logerror("Warning: file requests an unsupported YMZ280B\n");
+			if(version >= 0x151 && r32(0x64)) {
+				m_ymf271->set_unscaled_clock(r32(0x64));
+			}
+			if(version >= 0x151 && r32(0x68)) {
+				m_ymz280b->set_unscaled_clock(r32(0x68));
+			}
 			if(version >= 0x151 && r32(0x6c))
 				logerror("Warning: file requests an unsupported RF5C164\n");
 			if(version >= 0x151 && r32(0x70))
@@ -1137,7 +1196,7 @@ void vgmplay_state::machine_start()
 			}
 			if(version >= 0x161 && r32(0xb0)) {
 				uint32_t clock = r32(0xb0);
-				m_pokeya->set_unscaled_clock(clock);
+				m_pokeya->set_unscaled_clock(clock & ~0x40000000);
 				if (clock & 0x40000000) {
 					clock &= ~0x40000000;
 					m_pokeyb->set_unscaled_clock(clock);
@@ -1248,29 +1307,32 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_MULTIPCMB+8,  vgmplay_device::A_MULTIPCMB+11)  AM_WRITE(multipcm_bank_lo_b_w)
 	AM_RANGE(vgmplay_device::A_POKEYA,       vgmplay_device::A_POKEYA+0xf)    AM_DEVWRITE    ("pokeya",        pokey_device, write)
 	AM_RANGE(vgmplay_device::A_POKEYB,       vgmplay_device::A_POKEYB+0xf)    AM_DEVWRITE    ("pokeyb",        pokey_device, write)
+	AM_RANGE(vgmplay_device::A_YMF271,       vgmplay_device::A_YMF271+0xf)    AM_DEVWRITE    ("ymf271",        ymf271_device, write)
+	AM_RANGE(vgmplay_device::A_YMZ280B,      vgmplay_device::A_YMZ280B+0x1)   AM_DEVWRITE    ("ymz280b",       ymz280b_device, write)
+	AM_RANGE(vgmplay_device::A_YM2608,       vgmplay_device::A_YM2608+0x3)    AM_DEVWRITE    ("ym2608",        ym2608_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( segapcm_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( segapcm_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x1fffff) AM_DEVREAD("vgmplay", vgmplay_device, segapcm_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( multipcma_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( multipcma_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x3fffff) AM_DEVREAD("vgmplay", vgmplay_device, multipcma_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( multipcmb_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( multipcmb_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x3fffff) AM_DEVREAD("vgmplay", vgmplay_device, multipcmb_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( k053260_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( k053260_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x1fffff) AM_DEVREAD("vgmplay", vgmplay_device, k053260_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( okim6295_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( okim6295_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x3ffff) AM_DEVREAD("vgmplay", vgmplay_device, okim6295_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c352_map, AS_0, 8, vgmplay_state )
+static ADDRESS_MAP_START( c352_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, c352_rom_r)
 ADDRESS_MAP_END
 
@@ -1286,13 +1348,14 @@ static ADDRESS_MAP_START( h6280_io_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(0, 3) AM_NOP
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
+MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_CPU_ADD("vgmplay", VGMPLAY, 44100)
 	MCFG_CPU_PROGRAM_MAP( file_map )
 	MCFG_CPU_IO_MAP( soundchips_map )
 	MCFG_CPU_IO16_MAP( soundchips16_map )
 
 	MCFG_DEVICE_ADD("file", BITBANGER, 0)
+	MCFG_BITBANGER_READONLY(true)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1314,17 +1377,17 @@ static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
 
 	MCFG_SOUND_ADD("segapcm", SEGAPCM, 4000000)
 	MCFG_SEGAPCM_BANK(BANK_512) // Should be configurable for yboard...
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, segapcm_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, segapcm_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
 	MCFG_SOUND_ADD("multipcma", MULTIPCM, 8000000)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, multipcma_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, multipcma_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
 	MCFG_SOUND_ADD("multipcmb", MULTIPCM, 8000000)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, multipcmb_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, multipcmb_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
@@ -1376,7 +1439,7 @@ static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)
 
 	MCFG_K053260_ADD("k053260", 3579545)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, k053260_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, k053260_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
@@ -1389,18 +1452,34 @@ static MACHINE_CONFIG_START( vgmplay, vgmplay_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5)
 
 	MCFG_C352_ADD("c352", 1000000, 288)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, c352_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, c352_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_OKIM6295_ADD("okim6295", 1000000, OKIM6295_PIN7_HIGH)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, okim6295_map)
+	MCFG_OKIM6295_ADD("okim6295", 1000000, PIN7_HIGH)
+	MCFG_DEVICE_ADDRESS_MAP(0, okim6295_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+
+	MCFG_SOUND_ADD("ymf271", YMF271, 16934400)
+	MCFG_YMF271_EXT_READ_HANDLER(DEVREAD8("vgmplay", vgmplay_device, ymf271_rom_r))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
+
+	MCFG_SOUND_ADD("ymz280b", YMZ280B, 16934400)
+	MCFG_YMZ280B_EXT_READ_HANDLER(DEVREAD8("vgmplay", vgmplay_device, ymz280b_rom_r))
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
+
+	MCFG_SOUND_ADD("ym2608", YM2608, 8000000)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  0.50)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 ROM_START( vgmplay )
+	ROM_REGION( 0x80000, "ym2608", ROMREGION_ERASE00 )
 ROM_END
 
-CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, driver_device, 0, "MAME", "VGM player", 0)
-
+CONS( 2016, vgmplay, 0, 0, vgmplay, vgmplay, vgmplay_state, 0, "MAME", "VGM player", 0 )

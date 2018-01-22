@@ -1,15 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
+#ifndef MAME_VIDEO_K001604_H
+#define MAME_VIDEO_K001604_H
+
 #pragma once
-#ifndef __K001604_H__
-#define __K001604_H__
 
 
 class k001604_device : public device_t, public device_gfx_interface
 {
 public:
 	k001604_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~k001604_device() {}
 
 	// static configuration
 	static void set_layer_size(device_t &device, int size) { downcast<k001604_device &>(device).m_layer_size = size; }
@@ -54,7 +54,7 @@ private:
 	TILE_GET_INFO_MEMBER(tile_info_layer_roz);
 };
 
-extern const device_type K001604;
+DECLARE_DEVICE_TYPE(K001604, k001604_device)
 
 
 #define MCFG_K001604_LAYER_SIZE(_size) \
@@ -72,4 +72,4 @@ extern const device_type K001604;
 #define MCFG_K001604_PALETTE(_palette_tag) \
 	MCFG_GFX_PALETTE(_palette_tag)
 
-#endif
+#endif // MAME_VIDEO_K001604_H

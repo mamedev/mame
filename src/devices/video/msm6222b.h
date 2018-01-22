@@ -10,8 +10,10 @@
 
 ***************************************************************************/
 
-#ifndef __MSM6222B_H__
-#define __MSM6222B_H__
+#ifndef MAME_VIDEO_MSM6222B_H
+#define MAME_VIDEO_MSM6222B_H
+
+#pragma once
 
 #define MCFG_MSM6222B_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, MSM6222B, 0 )
@@ -22,7 +24,6 @@
 class msm6222b_device : public device_t {
 public:
 	msm6222b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	msm6222b_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	void control_w(uint8_t data);
 	uint8_t control_r();
@@ -33,7 +34,15 @@ public:
 	const uint8_t *render();
 
 protected:
+	msm6222b_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
+
+	optional_region_ptr<uint8_t> m_cgrom;
+
+	void cursor_step(bool direction);
+	void shift_step(bool direction);
+	bool blink_on() const;
 
 private:
 	uint8_t cgram[8*8];
@@ -41,12 +50,6 @@ private:
 	uint8_t render_buf[80*16];
 	bool cursor_direction, cursor_blinking, two_line, shift_on_write, double_height, cursor_on, display_on;
 	uint8_t adc, shift;
-protected:
-	optional_region_ptr<uint8_t> m_cgrom;
-
-	void cursor_step(bool direction);
-	void shift_step(bool direction);
-	bool blink_on() const;
 };
 
 class msm6222b_01_device : public msm6222b_device {
@@ -57,7 +60,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
-extern const device_type MSM6222B;
-extern const device_type MSM6222B_01;
+DECLARE_DEVICE_TYPE(MSM6222B,    msm6222b_device)
+DECLARE_DEVICE_TYPE(MSM6222B_01, msm6222b_01_device)
 
-#endif
+#endif // MAME_VIDEO_MSM6222B_H

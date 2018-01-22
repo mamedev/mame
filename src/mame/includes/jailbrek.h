@@ -60,4 +60,5 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	INTERRUPT_GEN_MEMBER(interrupt_nmi);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void jailbrek(machine_config &config);
 };

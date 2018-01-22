@@ -7,7 +7,9 @@
 *************************************************************************/
 
 #include "machine/taitoio.h"
+#include "machine/taitoio_yoke.h"
 #include "video/tc0080vco.h"
+#include "screen.h"
 
 enum { TAITOAIR_FRAC_SHIFT = 16, TAITOAIR_POLY_MAX_PT = 16 };
 
@@ -38,6 +40,7 @@ public:
 			m_dsp(*this, "dsp"),
 			m_tc0080vco(*this, "tc0080vco"),
 			m_tc0220ioc(*this, "tc0220ioc"),
+			m_yoke(*this, "yokectrl"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_screen(*this, "screen"),
 			m_palette(*this, "palette")
@@ -63,6 +66,7 @@ public:
 	required_device<cpu_device> m_dsp;
 	required_device<tc0080vco_device> m_tc0080vco;
 	required_device<tc0220ioc_device> m_tc0220ioc;
+	required_device<taitoio_yoke_device> m_yoke;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -114,6 +118,7 @@ public:
 	DECLARE_WRITE16_MEMBER(airsys_gradram_w);
 	DECLARE_READ16_MEMBER(stick_input_r);
 	DECLARE_READ16_MEMBER(stick2_input_r);
+	DECLARE_WRITE8_MEMBER(coin_control_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(dsp_flags_w);
 	DECLARE_WRITE16_MEMBER(dma_regs_w);
@@ -130,4 +135,5 @@ public:
 
 	void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t header, int32_t x1, int32_t x2, int32_t sl1, int32_t sl2, int32_t y1, int32_t y2, int32_t *nx1, int32_t *nx2 );
 	void fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q );
+	void airsys(machine_config &config);
 };

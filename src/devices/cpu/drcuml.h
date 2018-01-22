@@ -141,12 +141,12 @@ public:
 
 protected:
 	// internal state
-	drcuml_state &          m_drcuml;           // pointer back to our owner
-	drc_cache &             m_cache;            // pointer to the cache
-	device_t &              m_device;           // CPU device we are associated with
-	address_space *         m_space[ADDRESS_SPACES];// pointers to CPU's address space
-	drcuml_machine_state &  m_state;            // state of the machine (in near cache)
-	data_accessors *        m_accessors;        // memory accessors (in near cache)
+	drcuml_state &               m_drcuml;      // pointer back to our owner
+	drc_cache &                  m_cache;       // pointer to the cache
+	device_t &                   m_device;      // CPU device we are associated with
+	std::vector<address_space *> m_space;       // pointers to CPU's address space
+	drcuml_machine_state &       m_state;       // state of the machine (in near cache)
+	data_accessors *             m_accessors;   // memory accessors (in near cache)
 };
 
 

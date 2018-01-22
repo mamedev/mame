@@ -56,7 +56,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(ladybug_videoram_w);
 	DECLARE_WRITE8_MEMBER(ladybug_colorram_w);
-	DECLARE_WRITE8_MEMBER(ladybug_flipscreen_w);
+	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p1_control_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p2_control_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin1_inserted);
@@ -72,4 +72,6 @@ public:
 	void palette_init_common( palette_device &palette, const uint8_t *color_prom,
 								int r_bit0, int r_bit1, int g_bit0, int g_bit1, int b_bit0, int b_bit1 );
 
+								void dorodon(machine_config &config);
+								void ladybug(machine_config &config);
 };

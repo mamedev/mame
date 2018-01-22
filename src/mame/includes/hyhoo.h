@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Takahiro Nogi
 #include "includes/nb1413m3.h"
+#include "screen.h"
 
 class hyhoo_state : public driver_device
 {
@@ -34,6 +35,7 @@ public:
 	int m_highcolorflag;
 	int m_flipscreen;
 	bitmap_rgb32 m_tmpbitmap;
+	emu_timer *m_blitter_timer;
 
 	DECLARE_WRITE8_MEMBER(hyhoo_blitter_w);
 	DECLARE_WRITE8_MEMBER(hyhoo_romsel_w);
@@ -45,6 +47,8 @@ public:
 	uint32_t screen_update_hyhoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void hyhoo_gfxdraw();
 
+	void hyhoo(machine_config &config);
+	void hyhoo2(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

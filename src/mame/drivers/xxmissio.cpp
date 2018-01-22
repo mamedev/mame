@@ -11,9 +11,12 @@ XX Mission (c) 1986 UPL
 *****************************************************************************/
 
 #include "emu.h"
+#include "includes/xxmissio.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
-#include "includes/xxmissio.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 WRITE8_MEMBER(xxmissio_state::bank_sel_w)
@@ -103,7 +106,7 @@ static ADDRESS_MAP_START( map1, AS_PROGRAM, 8, xxmissio_state )
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(bgram_r, bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
 
-	AM_RANGE(0xd800, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd800, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0xe000, 0xefff) AM_SHARE("share5") AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_SHARE("share6") AM_RAM
@@ -128,7 +131,7 @@ static ADDRESS_MAP_START( map2, AS_PROGRAM, 8, xxmissio_state )
 	AM_RANGE(0xc800, 0xcfff) AM_SHARE("bgram") AM_READWRITE(bgram_r, bgram_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("spriteram") AM_RAM
 
-	AM_RANGE(0xd800, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd800, 0xdaff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0xe000, 0xefff) AM_SHARE("share6") AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_SHARE("share5") AM_RAM
@@ -257,7 +260,7 @@ GFXDECODE_END
 
 /****************************************************************************/
 
-static MACHINE_CONFIG_START( xxmissio, xxmissio_state )
+MACHINE_CONFIG_START(xxmissio_state::xxmissio)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,12000000/4) /* 3.0MHz */
@@ -328,4 +331,4 @@ ROM_START( xxmissio )
 	ROM_LOAD16_BYTE( "xx11.4b", 0x0001,  0x8000, CRC(d9dd827c) SHA1(aea3a5abd871adf7f75ad4d6cc57eff0833135c7) )
 ROM_END
 
-GAME( 1986, xxmissio, 0, xxmissio, xxmissio, driver_device, 0, ROT90, "UPL", "XX Mission", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, xxmissio, 0, xxmissio, xxmissio, xxmissio_state, 0, ROT90, "UPL", "XX Mission", MACHINE_SUPPORTS_SAVE )

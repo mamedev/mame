@@ -20,6 +20,8 @@ function lfs.env_replace(str)
 	end
 	return str
 end
+
+_G._ = emu.lang_translate
 local dir = lfs.env_replace(manager:options().entries.pluginspath:value())
 
 package.path = dir .. "/?.lua;" .. dir .. "/?/init.lua"

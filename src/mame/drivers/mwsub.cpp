@@ -36,6 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER(submar_sound_w);
 	DECLARE_WRITE8_MEMBER(submar_led_w);
 	DECLARE_WRITE8_MEMBER(submar_irq_clear_w);
+	void submar(machine_config &config);
 };
 
 
@@ -196,7 +197,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( submar, submar_state )
+MACHINE_CONFIG_START(submar_state::submar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_19_968MHz/8)
@@ -227,4 +228,4 @@ ROM_START( submar )
 ROM_END
 
 
-GAMEL( 1979, submar, 0, submar, submar, driver_device, 0, ROT0, "Midway", "Submarine (Midway)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_submar )
+GAMEL( 1979, submar, 0, submar, submar, submar_state, 0, ROT0, "Midway", "Submarine (Midway)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL, layout_submar )

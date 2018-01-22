@@ -16,34 +16,43 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/z80ctc.h"
-#include "machine/z80dart.h"
-#include "machine/z80pio.h"
-#include "machine/z80dma.h"
 #include "machine/ram.h"
+#include "machine/z80ctc.h"
+#include "machine/z80sio.h"
+#include "machine/z80dma.h"
+#include "machine/z80pio.h"
 #include "video/i8275.h"
+#include "screen.h"
 
 
 class rt1715_state : public driver_device
 {
 public:
 	rt1715_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu"),
-		m_ram(*this, RAM_TAG) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+	{
+	}
 
-	int m_led1_val;
-	int m_led2_val;
 	DECLARE_WRITE8_MEMBER(rt1715_floppy_enable);
 	DECLARE_READ8_MEMBER(k7658_led1_r);
 	DECLARE_READ8_MEMBER(k7658_led2_r);
 	DECLARE_READ8_MEMBER(k7658_data_r);
 	DECLARE_WRITE8_MEMBER(k7658_data_w);
 	DECLARE_WRITE8_MEMBER(rt1715_rom_disable);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(rt1715);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
+
+	void rt1715(machine_config &config);
+	void rt1715w(machine_config &config);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	int m_led1_val;
+	int m_led2_val;
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 };
@@ -187,7 +196,7 @@ static ADDRESS_MAP_START( rt1715_io, AS_IO, 8, rt1715_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("a71", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("a72", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("a30", z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("a29", z80sio0_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("a29", z80sio_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE("a26", i8275_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(rt1715_floppy_enable)
 	AM_RANGE(0x28, 0x28) AM_WRITE(rt1715_rom_disable)
@@ -265,7 +274,7 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( rt1715, rt1715_state )
+MACHINE_CONFIG_START(rt1715_state::rt1715)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_2_4576MHz)
 	MCFG_CPU_PROGRAM_MAP(rt1715_mem)
@@ -296,7 +305,7 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 
 	MCFG_DEVICE_ADD("a30", Z80CTC, XTAL_10MHz/4 /* ? */)
 
-	MCFG_Z80SIO0_ADD("a29", XTAL_10MHz/4 /* ? */, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("a29", Z80SIO, XTAL_10MHz/4 /* ? */)
 
 	/* floppy */
 	MCFG_DEVICE_ADD("a71", Z80PIO, XTAL_10MHz/4 /* ? */)
@@ -308,7 +317,7 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rt1715w, rt1715 )
+MACHINE_CONFIG_DERIVED(rt1715_state::rt1715w, rt1715)
 MACHINE_CONFIG_END
 
 
@@ -371,7 +380,7 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY     FULLNAME                             FLAGS */
-COMP( 1986, rt1715,   0,      0,      rt1715,  k7658, driver_device, 0,    "Robotron",  "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658, driver_device, 0,    "Robotron",  "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, k7658, driver_device, 0,    "Robotron",  "Robotron PC-1715W",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY     FULLNAME                             FLAGS
+COMP( 1986, rt1715,   0,      0,      rt1715,  k7658, rt1715_state, 0,    "Robotron", "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658, rt1715_state, 0,    "Robotron", "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, k7658, rt1715_state, 0,    "Robotron", "Robotron PC-1715W",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

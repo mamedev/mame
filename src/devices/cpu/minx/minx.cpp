@@ -45,8 +45,9 @@ TODO:
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "minx.h"
+#include "minxd.h"
+#include "debugger.h"
 
 #define FLAG_I  0x80
 #define FLAG_D  0x40
@@ -72,15 +73,21 @@ TODO:
 #define GET_MINX_PC     ( ( m_PC & 0x8000 ) ? ( m_V << 15 ) | (m_PC & 0x7FFF ) : m_PC )
 
 
-const device_type MINX = &device_creator<minx_cpu_device>;
+DEFINE_DEVICE_TYPE(MINX, minx_cpu_device, "minx", "Nintendo Minx")
 
 
 minx_cpu_device::minx_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, MINX, "Nintendo Minx", tag, owner, clock, "minx", __FILE__)
+	: cpu_device(mconfig, MINX, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 24, 0)
 {
 }
 
+device_memory_interface::space_config_vector minx_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 uint16_t minx_cpu_device::rd16( uint32_t offset )
 {
@@ -228,8 +235,7 @@ void minx_cpu_device::execute_set_input(int inputnum, int state)
 }
 
 
-offs_t minx_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *minx_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( minx );
-	return CPU_DISASSEMBLE_NAME(minx)(this, buffer, pc, oprom, opram, options);
+	return new minx_disassembler;
 }

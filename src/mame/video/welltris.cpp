@@ -2,6 +2,7 @@
 // copyright-holders:David Haywood
 #include "emu.h"
 #include "includes/welltris.h"
+#include "screen.h"
 
 
 

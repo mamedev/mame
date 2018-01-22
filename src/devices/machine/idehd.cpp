@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#include "emu.h"
 #include "idehd.h"
 
 /***************************************************************************
@@ -19,8 +20,8 @@
 #define TIME_FULL_STROKE_SEEK               (attotime::from_usec(13000))
 #define TIME_AVERAGE_ROTATIONAL_LATENCY     (attotime::from_usec(1300))
 
-ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock,const char *shortname, const char *source)
-	: ata_hle_device(mconfig, type, name, tag, owner, clock, shortname, source),
+ata_mass_storage_device::ata_mass_storage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ata_hle_device(mconfig, type, tag, owner, clock),
 	m_can_identify_device(0),
 	m_num_cylinders(0),
 	m_num_sectors(0),
@@ -110,7 +111,7 @@ void ata_mass_storage_device::ide_build_identify_device()
 			"1.0", 4);
 	swap_strncpy(&m_identify_buffer[27],               /* 27-46: model number */
 			"MAME Compressed Hard Disk", 20);
-	m_identify_buffer[47] = 0x8001;                    /* 47: read/write multiple support */
+	m_identify_buffer[47] = 0x8010;                    /* 47: read/write multiple support, value from Seagate Quantum Fireball */
 	m_identify_buffer[48] = 0;                         /* 48: reserved */
 	m_identify_buffer[49] = 0x0f03;                    /* 49: capabilities */
 	m_identify_buffer[50] = 0;                         /* 50: reserved */
@@ -405,6 +406,18 @@ void ata_mass_storage_device::fill_buffer()
 	case IDE_COMMAND_IDENTIFY_DEVICE:
 		break;
 
+	case IDE_COMMAND_READ_MULTIPLE:
+		/* if there is more data to read, keep going */
+		if (m_sector_count > 0)
+			m_sector_count--;
+
+		if (m_sector_count > 0)
+		{
+			// Read the next sector with no delay
+			finished_read();
+		}
+		break;
+
 	default:
 		/* if there is more data to read, keep going */
 		if (m_sector_count > 0)
@@ -422,23 +435,23 @@ void ata_mass_storage_device::fill_buffer()
 
 void ata_mass_storage_device::finished_read()
 {
-	int lba = lba_address(), count;
+	int lba = lba_address(), read_status;
 
 	set_dasp(CLEAR_LINE);
 
 	/* now do the read */
-	count = read_sector(lba, &m_buffer[0]);
+	read_status = read_sector(lba, &m_buffer[0]);
 
 	/* if we succeeded, advance to the next sector and set the nice bits */
-	if (count == 1)
+	if (read_status)
 	{
 		/* advance the pointers, unless this is the last sector */
 		/* Gauntlet: Dark Legacy checks to make sure we stop on the last sector */
 		if (m_sector_count != 1)
 			next_sector();
 
-		/* signal an interrupt */
-		if (--m_sectors_until_int == 0 || m_sector_count == 1)
+		/* signal an interrupt, IDE_COMMAND_READ_MULTIPLE sets the interrupt at the start the block */
+		if (--m_sectors_until_int == 0 || (m_sector_count == 1 && m_command != IDE_COMMAND_READ_MULTIPLE))
 		{
 			m_sectors_until_int = ((m_command == IDE_COMMAND_READ_MULTIPLE) ? m_block_count : 1);
 			set_irq(ASSERT_LINE);
@@ -678,7 +691,7 @@ void ata_mass_storage_device::process_command()
 			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
 
 		/* reset the buffer */
-		m_sectors_until_int = 1;
+		m_sectors_until_int = m_block_count;
 
 		/* mark the buffer ready */
 		m_status |= IDE_STATUS_DRQ;
@@ -745,7 +758,7 @@ void ata_mass_storage_device::process_command()
 		break;
 
 	case IDE_COMMAND_SET_BLOCK_COUNT:
-		LOGPRINT(("IDE Set block count (%02X)\n", m_sector_count));
+		LOGPRINT(("IDE Set block count (%d)\n", m_sector_count));
 
 		m_block_count = m_sector_count;
 
@@ -773,20 +786,19 @@ void ata_mass_storage_device::process_command()
 //**************************************************************************
 
 // device type definition
-const device_type IDE_HARDDISK = &device_creator<ide_hdd_device>;
+DEFINE_DEVICE_TYPE(IDE_HARDDISK, ide_hdd_device, "idehd", "IDE Hard Disk")
 
 //-------------------------------------------------
 //  ide_hdd_device - constructor
 //-------------------------------------------------
 
 ide_hdd_device::ide_hdd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ata_mass_storage_device(mconfig, IDE_HARDDISK, "IDE Hard Disk", tag, owner, clock, "hdd", __FILE__),
-	m_image(*this, "image")
+	: ide_hdd_device(mconfig, IDE_HARDDISK, tag, owner, clock)
 {
 }
 
-ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: ata_mass_storage_device(mconfig, type, name, tag, owner, clock, shortname, source),
+ide_hdd_device::ide_hdd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ata_mass_storage_device(mconfig, type, tag, owner, clock),
 	m_image(*this, "image")
 {
 }
@@ -854,14 +866,9 @@ uint8_t ide_hdd_device::calculate_status()
 }
 
 //-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
-static MACHINE_CONFIG_FRAGMENT( hdd_image )
+
+MACHINE_CONFIG_START(ide_hdd_device::device_add_mconfig)
 	MCFG_HARDDISK_ADD( "image" )
 MACHINE_CONFIG_END
-
-machine_config_constructor ide_hdd_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( hdd_image );
-}

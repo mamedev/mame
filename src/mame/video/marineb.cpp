@@ -131,16 +131,16 @@ WRITE8_MEMBER(marineb_state::marineb_palette_bank_1_w)
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_flipscreen_x_w)
+WRITE_LINE_MEMBER(marineb_state::flipscreen_x_w)
 {
-	m_flipscreen_x = data ^ m_marineb_active_low_flipscreen;
+	m_flipscreen_x = state;
 	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 }
 
 
-WRITE8_MEMBER(marineb_state::marineb_flipscreen_y_w)
+WRITE_LINE_MEMBER(marineb_state::flipscreen_y_w)
 {
-	m_flipscreen_y = data ^ m_marineb_active_low_flipscreen;
+	m_flipscreen_y = state;
 	m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 }
 

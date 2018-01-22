@@ -195,13 +195,16 @@ perhaps? The two writes seem to take only two values.
  */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "includes/taitoipt.h"
 #include "includes/taitoair.h"
+#include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
+
+#include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
+#include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
+#include "speaker.h"
+
 
 /***********************************************************
                 MEMORY handlers
@@ -217,7 +220,7 @@ WRITE16_MEMBER(taitoair_state::system_control_w)
 	m_dsp->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_gradbank = (data & 0x40);
-	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", space.device().safe_pcbase(), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
+	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", m_maincpu->pcbase(), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
 }
 
 READ16_MEMBER(taitoair_state::lineram_r)
@@ -248,7 +251,7 @@ WRITE16_MEMBER(taitoair_state::dspram_w)
 READ16_MEMBER(taitoair_state::dsp_HOLD_signal_r)
 {
 	/* HOLD signal is active low */
-	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", space.device().safe_pcbase(), m_dsp_hold_signal);
+	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", m_dsp->pcbase(), m_dsp_hold_signal);
 
 	return m_dsp_hold_signal;
 }
@@ -256,7 +259,7 @@ READ16_MEMBER(taitoair_state::dsp_HOLD_signal_r)
 WRITE16_MEMBER(taitoair_state::dsp_HOLDA_signal_w)
 {
 	if (offset)
-		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n", space.device().safe_pcbase(), data);
+		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n", m_dsp->pcbase(), data);
 }
 
 
@@ -297,28 +300,21 @@ WRITE16_MEMBER(taitoair_state::airsys_gradram_w)
                 INPUTS
 ***********************************************************/
 
-#define STICK1_PORT_TAG  "STICK1"
-#define STICK2_PORT_TAG  "STICK2"
-#define STICK3_PORT_TAG  "STICK3"
-
 READ16_MEMBER(taitoair_state::stick_input_r)
 {
 	switch( offset )
 	{
 		case 0x00:  /* "counter 1" lo */
-			return ioport(STICK1_PORT_TAG)->read();
+			return m_yoke->throttle_r(space,0) & 0xff;
 
 		case 0x01:  /* "counter 2" lo */
-			return ioport(STICK2_PORT_TAG)->read();
+			return m_yoke->stickx_r(space,0) & 0xff;
 
 		case 0x02:  /* "counter 1" hi */
-			if(ioport(STICK1_PORT_TAG)->read() & 0x80)
-				return 0xff;
-
-			return 0;
+			return (m_yoke->throttle_r(space,0) & 0xff00) >> 8;
 
 		case 0x03:  /* "counter 2" hi */
-			return (ioport(STICK2_PORT_TAG)->read() & 0xff00) >> 8;
+			return (m_yoke->stickx_r(space,0) & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -329,10 +325,10 @@ READ16_MEMBER(taitoair_state::stick2_input_r)
 	switch( offset )
 	{
 		case 0x00:  /* "counter 3" lo */
-			return ioport(STICK3_PORT_TAG)->read();
+			return m_yoke->sticky_r(space,0);
 
 		case 0x02:  /* "counter 3" hi */
-			return (ioport(STICK3_PORT_TAG)->read() & 0xff00) >> 8;
+			return (m_yoke->sticky_r(space,0) & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -369,6 +365,14 @@ WRITE16_MEMBER(taitoair_state::dma_regs_w)
 			fb_copy_op();
 		}
 	}
+}
+
+WRITE8_MEMBER(taitoair_state::coin_control_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
+	machine().bookkeeping().coin_counter_w(0, data & 0x04);
+	machine().bookkeeping().coin_counter_w(1, data & 0x08);
 }
 
 /***********************************************************
@@ -544,7 +548,9 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( topland )
 	/* 0xa00200 -> 0x0c0d7c (-$7285,A5) */
 	PORT_START("DSWA")
-	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SWA:1" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWA:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Standard ) )
+	PORT_DIPSETTING(    0x00, "Deluxe" ) // with Mecha driver
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SWA:2" )
 	TAITO_DSWA_BITS_2_TO_3_LOC(SWA)
 	TAITO_COINAGE_WORLD_LOC(SWA)
@@ -567,29 +573,20 @@ static INPUT_PORTS_START( topland )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)    /* "door" (!) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Door Switch")   /* "door" (!) */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)    /* slot down */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)    /* slot up */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)    /* handle */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_down_r )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_up_r )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_left_r )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_right_r )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_down_r )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_up_r )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // DMA status flag
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
-
-	PORT_START(STICK1_PORT_TAG)
-	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1) PORT_REVERSE
-
-	PORT_START(STICK2_PORT_TAG)
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
-
-	PORT_START(STICK3_PORT_TAG)
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ainferno )
@@ -630,6 +627,7 @@ static INPUT_PORTS_START( ainferno )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START2 )
 
 	PORT_START("IN1")
+	// TODO: understand these
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_PLAYER(1)    /* lever */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_PLAYER(1)    /* handle x */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)    /* handle y */
@@ -641,15 +639,6 @@ static INPUT_PORTS_START( ainferno )
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW,  IPT_UNUSED )
-
-	PORT_START(STICK1_PORT_TAG)
-	PORT_BIT( 0x00ff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x0080,0x007f) PORT_SENSITIVITY(30) PORT_KEYDELTA(40) PORT_PLAYER(1) PORT_REVERSE
-
-	PORT_START(STICK2_PORT_TAG)
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
-
-	PORT_START(STICK3_PORT_TAG)
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 
@@ -708,7 +697,7 @@ void taitoair_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( airsys, taitoair_state )
+MACHINE_CONFIG_START(taitoair_state::airsys)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) // MC68000P12
@@ -731,14 +720,19 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
 	MCFG_TC0220IOC_READ_2_CB(IOPORT("IN0"))
 	MCFG_TC0220IOC_READ_3_CB(IOPORT("IN1"))
+	MCFG_TC0220IOC_WRITE_4_CB(WRITE8(taitoair_state, coin_control_w))
 	MCFG_TC0220IOC_READ_7_CB(IOPORT("IN2"))
+
+	MCFG_TAITOIO_YOKE_ADD("yokectrl")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*16, 32*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 28*16-1)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE(64*16, 32*16)
+//  MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 3*16, 28*16-1)
+	// Estimated, assume same as mlanding.cpp
+	MCFG_SCREEN_RAW_PARAMS(16000000, 640, 0, 512, 462, 3*16, 28*16)
 	MCFG_SCREEN_UPDATE_DRIVER(taitoair_state, screen_update_taitoair)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -807,6 +801,9 @@ ROM_START( topland )
 	ROM_LOAD16_BYTE( "b62-21.35", 0x00000, 0x02000, CRC(5f38460d) SHA1(0593718d15b30b10f7686959932e2c934de2a529) )  // cpu board
 	ROM_LOAD16_BYTE( "b62-20.6",  0x00001, 0x02000, CRC(a4afe958) SHA1(7593a327f4ea0cc9e28fd3269278871f62fb0598) )  // cpu board
 
+	ROM_REGION( 0x10000, "mechacpu", 0 )
+	ROM_LOAD( "b62_mecha.rom", 0x00000, 0x08000, NO_DUMP )
+
 	ROM_REGION( 0x100000, "gfx1", 0 )   /* 16x16 tiles */
 	ROM_LOAD16_BYTE( "b62-33.39",  0x000000, 0x20000, CRC(38786867) SHA1(7292e3fa69cad6494f2e8e7efa9c3f989bdf958d) )
 	ROM_LOAD16_BYTE( "b62-36.48",  0x000001, 0x20000, CRC(4259e76a) SHA1(eb0dc5d0a6f875e3b8335fb30d4c2ad3880c31b9) )
@@ -837,6 +834,56 @@ ROM_START( topland )
 	ROM_LOAD( "pal16l8a-b62-10.bin", 0x0600, 0x0104, CRC(6c1e3fc4) SHA1(8953d82ed94741fdfacb0465415915ca398678d4) )
 ROM_END
 
+ROM_START( toplandj )
+	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 */
+	ROM_LOAD16_BYTE( "b62_27.ic43",  0x00000, 0x20000, CRC(c717c3b7) SHA1(b5bee250dc4ba530b1d3a73926dc848a0f340a70) )
+	ROM_LOAD16_BYTE( "b62_26.ic14",  0x00001, 0x20000, CRC(340bfa56) SHA1(b5df3dc43ed299a22213b517ac4a1c1d776bbdbf) )
+	ROM_LOAD16_BYTE( "b62_25.42",  0x40000, 0x20000, CRC(1bd53a72) SHA1(ada679198739cd6a419d3fa4311bb92dc385099c) )
+	ROM_LOAD16_BYTE( "b62_24.13",  0x40001, 0x20000, CRC(845026c5) SHA1(ab8d8f5f6597bfcde4e9ccf9e0181b8b6e769ada) )
+	ROM_LOAD16_BYTE( "b62_23.41",  0x80000, 0x20000, CRC(ef3a971c) SHA1(0840668dda48f4c9a85410361bfba3ae9580a71f) )
+	ROM_LOAD16_BYTE( "b62_22.12",  0x80001, 0x20000, CRC(94279201) SHA1(8518d8e722d4f2516f75224d9a21ab20d8ee6c78) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 */
+	ROM_LOAD( "b62_19.ic34", 0x00000, 0x10000, CRC(2c0a3786) SHA1(58dc4a18d1d1b0d023721677a9c1b091a6304f4a) )
+
+	ROM_REGION( 0x20000, "dsp", 0 ) /* TMS320C25 */
+	ROM_LOAD16_BYTE( "b62-21.35", 0x00000, 0x02000, CRC(5f38460d) SHA1(0593718d15b30b10f7686959932e2c934de2a529) )  // cpu board
+	ROM_LOAD16_BYTE( "b62-20.6",  0x00001, 0x02000, CRC(a4afe958) SHA1(7593a327f4ea0cc9e28fd3269278871f62fb0598) )  // cpu board
+
+	ROM_REGION( 0x10000, "mechacpu", 0 )
+	ROM_LOAD( "b62_mecha.rom", 0x00000, 0x08000, NO_DUMP )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* 16x16 tiles */
+	ROM_LOAD16_BYTE( "b62-33.39",  0x000000, 0x20000, CRC(38786867) SHA1(7292e3fa69cad6494f2e8e7efa9c3f989bdf958d) )
+	ROM_LOAD16_BYTE( "b62-36.48",  0x000001, 0x20000, CRC(4259e76a) SHA1(eb0dc5d0a6f875e3b8335fb30d4c2ad3880c31b9) )
+	ROM_LOAD16_BYTE( "b62-29.27",  0x040000, 0x20000, CRC(efdd5c51) SHA1(6df3e9782946cf6f4a21ee3d335548c53cd21e3a) )
+	ROM_LOAD16_BYTE( "b62-34.40",  0x040001, 0x20000, CRC(a7e10ca4) SHA1(862c23c095f96f9e0cae00d70947782d5f4e45e6) )
+	ROM_LOAD16_BYTE( "b62-35.47",  0x080000, 0x20000, CRC(cba7bac5) SHA1(5305c84abcbcc23281744454803b849853b26632) )
+	ROM_LOAD16_BYTE( "b62-30.28",  0x080001, 0x20000, CRC(30e37cb8) SHA1(6bc777bdf1a56952dbfbe2f595279a43e2fa98fd) )
+	ROM_LOAD16_BYTE( "b62-31.29",  0x0c0000, 0x20000, CRC(3feebfe3) SHA1(5b014d7d6fa1daf400ac1a437f551281debfdba6) )
+	ROM_LOAD16_BYTE( "b62-32.30",  0x0c0001, 0x20000, CRC(66806646) SHA1(d8e0c37b5227d8583d523164ffc6828b4508d5a3) )
+
+	ROM_REGION( 0xa0000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_LOAD( "b62-17.5",  0x00000, 0x20000, CRC(36447066) SHA1(91c8cc4e99534b2d533895a342abb22766a20090) )
+	ROM_LOAD( "b62-16.4",  0x20000, 0x20000, CRC(203a5c27) SHA1(f6fc9322dea8d82bfec3be3fdc8616dc6adf666e) )
+	ROM_LOAD( "b62-15.3",  0x40000, 0x20000, CRC(e35ffe81) SHA1(f35afdd7cfd4c09907fb062beb5ae46c2286a381) )
+	ROM_LOAD( "b62-14.2",  0x60000, 0x20000, CRC(617948a3) SHA1(4660570fa6263c28cfae7ccdf154763cc6144896) )
+	ROM_LOAD( "b62-13.1",  0x80000, 0x20000, CRC(b37dc3ea) SHA1(198d4f828132316c624da998e49b1873b9886bf0) )
+
+	ROM_REGION( 0x20000, "ymsnd.deltat", 0 )    /* Delta-T samples */
+	ROM_LOAD( "b62-18.31", 0x00000, 0x20000, CRC(3a4e687a) SHA1(43f07fe19dec351e851defdf9c7810fb9df04736) )
+
+	ROM_REGION( 0x02000, "user1", 0 )   /* unknown */
+	ROM_LOAD( "b62-28.22", 0x00000, 0x02000, CRC(c4be68a6) SHA1(2c07a0e71d11bca67427331217c507d849500ec1) ) // video board
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "pal20l8b-b62-02.bin", 0x0000, 0x0144, CRC(c43ab9d8) SHA1(38542b10e9206a25669534ee26a0472e5f2d6257) )
+	ROM_LOAD( "pal20l8b-b62-03.bin", 0x0200, 0x0144, CRC(904753fa) SHA1(87f7414c3eab5740b188276b06c5b898ed07c1cd) )
+	ROM_LOAD( "pal20l8b-b62-04.bin", 0x0400, 0x0144, CRC(80512abc) SHA1(0e87e59df3c4d3b4adba295dbd5a2c27b9d5fefd) )
+	ROM_LOAD( "pal16l8a-b62-10.bin", 0x0600, 0x0104, CRC(6c1e3fc4) SHA1(8953d82ed94741fdfacb0465415915ca398678d4) )
+ROM_END
+
+
 ROM_START( ainferno )
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 */
 	ROM_LOAD16_BYTE( "c45_22.43", 0x00000, 0x20000, CRC(50300926) SHA1(9c2a60282d3f9f115b94cb5b6d64bbfc9d726d1d) )
@@ -852,6 +899,9 @@ ROM_START( ainferno )
 	ROM_REGION( 0x20000, "dsp", 0 ) /* TMS320C25 */
 	ROM_LOAD16_BYTE( "c45-25.35", 0x00000, 0x02000, CRC(c0d39f95) SHA1(542aa6e2af510aea00db40bf803cb6653d4e7747) )
 	ROM_LOAD16_BYTE( "c45-24.6",  0x00001, 0x02000, CRC(1013d937) SHA1(817769d21583f5281ba044ce8c134c9239d1e83e) )
+
+	ROM_REGION( 0x10000, "mechacpu", 0 ) // on "Controller P.C.B."
+	ROM_LOAD( "c45-30.9", 0x00000, 0x10000, CRC(fa2db40f) SHA1(91c34a53d2fec619f2536ca79fdc6a17fb0d21e4) ) // 27c512, 1111xxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x100000, "gfx1", 0 )   /* 16x16 tiles */
 	ROM_LOAD16_BYTE( "c45-11.28", 0x000000, 0x20000, CRC(d9b4b77c) SHA1(69d570efa8146fb0a712ff45e77bda6fd85769f8) )
@@ -905,6 +955,9 @@ ROM_START( ainfernoj )
 	ROM_LOAD16_BYTE( "c45-25.35", 0x00000, 0x02000, CRC(c0d39f95) SHA1(542aa6e2af510aea00db40bf803cb6653d4e7747) )
 	ROM_LOAD16_BYTE( "c45-24.6",  0x00001, 0x02000, CRC(1013d937) SHA1(817769d21583f5281ba044ce8c134c9239d1e83e) )
 
+	ROM_REGION( 0x10000, "mechacpu", 0 ) // on "Controller P.C.B."
+	ROM_LOAD( "c45-30.9", 0x00000, 0x10000,  CRC(fa2db40f) SHA1(91c34a53d2fec619f2536ca79fdc6a17fb0d21e4) ) // 27c512, 1111xxxxxxxxxxxx = 0xFF
+
 	ROM_REGION( 0x100000, "gfx1", 0 )   /* 16x16 tiles */
 	ROM_LOAD16_BYTE( "c45-11.28", 0x000000, 0x20000, CRC(d9b4b77c) SHA1(69d570efa8146fb0a712ff45e77bda6fd85769f8) )
 	ROM_LOAD16_BYTE( "c45-15.40", 0x000001, 0x20000, CRC(d4610698) SHA1(5de519a23300d5b3b09ce7cf8c02a1a6b2fb985c) )
@@ -942,7 +995,8 @@ ROM_START( ainfernoj )
 ROM_END
 
 
-/*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR  COMPANY  FULLNAME */
-GAME( 1988, topland,  0,        airsys,   topland, driver_device,  0,        ROT0,    "Taito Corporation Japan", "Top Landing (World)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1990, ainferno, 0,        airsys,   ainferno, driver_device, 0,        ROT0,    "Taito America Corporation", "Air Inferno (US)", MACHINE_NOT_WORKING )
-GAME( 1990, ainfernoj,ainferno, airsys,   ainferno, driver_device, 0,        ROT0,    "Taito Corporation Japan", "Air Inferno (Japan)", MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT  MONITOR  COMPANY                      FULLNAME               FLAGS
+GAME( 1988, topland,   0,        airsys,   topland,  taitoair_state, 0,    ROT0,    "Taito Corporation Japan",   "Top Landing (World)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, toplandj,  topland,  airsys,   topland,  taitoair_state, 0,    ROT0,    "Taito Corporation",         "Top Landing (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, ainferno,  0,        airsys,   ainferno, taitoair_state, 0,    ROT0,    "Taito America Corporation", "Air Inferno (US)",    MACHINE_NOT_WORKING )
+GAME( 1990, ainfernoj, ainferno, airsys,   ainferno, taitoair_state, 0,    ROT0,    "Taito Corporation Japan",   "Air Inferno (Japan)", MACHINE_NOT_WORKING )

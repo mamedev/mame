@@ -54,19 +54,19 @@ uint32_t vendetta_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	int layer[3];
 
-	m_sprite_colorbase = m_k053251->get_palette_index(K053251_CI1);
-	m_layer_colorbase[0] = m_k053251->get_palette_index(K053251_CI2);
-	m_layer_colorbase[1] = m_k053251->get_palette_index(K053251_CI3);
-	m_layer_colorbase[2] = m_k053251->get_palette_index(K053251_CI4);
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
+	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
+	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI3);
+	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI4);
 
 	m_k052109->tilemap_update();
 
 	layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(K053251_CI2);
+	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
 	layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(K053251_CI3);
+	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI3);
 	layer[2] = 2;
-	m_layerpri[2] = m_k053251->get_priority(K053251_CI4);
+	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI4);
 
 	konami_sortlayers3(layer, m_layerpri);
 

@@ -8,15 +8,17 @@
 
 ***************************************************************************/
 
-#ifndef __I82371AB_H__
-#define __I82371AB_H__
+#ifndef MAME_BUS_LPCI_I82371AB_H
+#define MAME_BUS_LPCI_I82371AB_H
+
+#pragma once
 
 #include "pci.h"
 #include "southbridge.h"
 
 // ======================> i82371ab_device
 
-class i82371ab_device :  public southbridge_device,
+class i82371ab_device :  public southbridge_extended_device,
 							public pci_device_interface
 {
 public:
@@ -48,6 +50,6 @@ private:
 };
 
 // device type definition
-extern const device_type I82371AB;
+DECLARE_DEVICE_TYPE(I82371AB, i82371ab_device)
 
-#endif /* __I82371AB_H__ */
+#endif // MAME_BUS_LPCI_I82371AB_H

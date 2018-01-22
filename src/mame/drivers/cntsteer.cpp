@@ -36,6 +36,8 @@
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class cntsteer_state : public driver_device
@@ -118,6 +120,8 @@ public:
 	void zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void zerotrgt_rearrange_gfx( int romsize, int romarea );
+	void cntsteer(machine_config &config);
+	void zerotrgt(machine_config &config);
 };
 
 
@@ -486,7 +490,7 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_background_w)
 /* checks area 0x2000-0x2fff with this address config. */
 READ8_MEMBER(cntsteer_state::cntsteer_background_mirror_r)
 {
-	return m_videoram2[BITSWAP16(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
+	return m_videoram2[bitswap<16>(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
 }
 
 /*************************************
@@ -509,7 +513,7 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_sound_w)
 WRITE8_MEMBER(cntsteer_state::zerotrgt_ctrl_w)
 {
 	/*TODO: check this.*/
-	logerror("CTRL: %04x: %04x: %04x\n", space.device().safe_pc(), offset, data);
+	logerror("CTRL: %04x: %04x: %04x\n", m_maincpu->pc(), offset, data);
 //  if (offset == 0) m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this
@@ -902,7 +906,7 @@ MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 	MACHINE_RESET_CALL_MEMBER(zerotrgt);
 }
 
-static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
+MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)      /* ? */
@@ -956,7 +960,7 @@ static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
+MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)      /* ? */
@@ -1219,7 +1223,7 @@ DRIVER_INIT_MEMBER(cntsteer_state,zerotrgt)
 
 /***************************************************************************/
 
-GAME( 1985, zerotrgt,  0,        zerotrgt,  zerotrgt, cntsteer_state,  zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CW)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+GAME( 1985, zerotrgt,  0,        zerotrgt,  zerotrgt,  cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CW)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 GAME( 1985, zerotrgta, zerotrgt, zerotrgt,  zerotrgta, cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Zero Target (World, CT)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gekitsui,  zerotrgt, zerotrgt,  zerotrgta, cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
-GAME( 1985, cntsteer,  0,        cntsteer,  cntsteer, cntsteer_state,  zerotrgt, ROT270, "Data East Corporation", "Counter Steer (Japan)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_WRONG_COLORS|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gekitsui,  zerotrgt, zerotrgt,  zerotrgta, cntsteer_state, zerotrgt, ROT0,   "Data East Corporation", "Gekitsui Oh (Japan)",     MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+GAME( 1985, cntsteer,  0,        cntsteer,  cntsteer,  cntsteer_state, zerotrgt, ROT270, "Data East Corporation", "Counter Steer (Japan)",   MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND|MACHINE_WRONG_COLORS|MACHINE_NO_COCKTAIL|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )

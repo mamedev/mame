@@ -120,10 +120,12 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/exerion.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -175,7 +177,7 @@ WRITE8_MEMBER(exerion_state::exerion_portb_w)
 
 READ8_MEMBER(exerion_state::exerion_protection_r)
 {
-	if (space.device().safe_pc() == 0x4143)
+	if (m_maincpu->pc() == 0x4143)
 		return memregion("maincpu")->base()[0x33c0 + (m_main_ram[0xd] << 2) + offset];
 	else
 		return m_main_ram[0x8 + offset];
@@ -368,7 +370,7 @@ void exerion_state::machine_reset()
 		m_background_latches[i] = 0;
 }
 
-static MACHINE_CONFIG_START( exerion, exerion_state )
+MACHINE_CONFIG_START(exerion_state::exerion)
 
 	MCFG_CPU_ADD("maincpu", Z80, EXERION_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)

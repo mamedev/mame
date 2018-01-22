@@ -3,6 +3,7 @@
 #include "video/bufsprite.h"
 #include "sound/upd7759.h"
 #include "sound/k007232.h"
+#include "screen.h"
 
 class twin16_state : public driver_device
 {
@@ -75,11 +76,14 @@ public:
 	TILE_GET_INFO_MEMBER(layer1_tile_info);
 
 	uint32_t screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_twin16(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_twin16);
 	INTERRUPT_GEN_MEMBER(CPUA_interrupt);
 	INTERRUPT_GEN_MEMBER(CPUB_interrupt);
 	TIMER_CALLBACK_MEMBER(sprite_tick);
 	DECLARE_WRITE8_MEMBER(volume_callback);
+	void devilw(machine_config &config);
+	void miaj(machine_config &config);
+	void twin16(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -105,6 +109,7 @@ public:
 	DECLARE_WRITE16_MEMBER(gfx_bank_w);
 	DECLARE_DRIVER_INIT(fround);
 
+	void fround(machine_config &config);
 protected:
 	virtual void video_start() override;
 	virtual void tile_get_info(tile_data &tileinfo, uint16_t data, int color_base) override;
@@ -123,6 +128,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nvram_bank_w);
 	DECLARE_DRIVER_INIT(cuebrickj);
 
+	void cuebrickj(machine_config &config);
 private:
 	uint16_t m_nvram[0x400 * 0x20 / 2];
 };

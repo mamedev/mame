@@ -294,13 +294,15 @@ Contra III   CONTRA_III_1   TC574000   CONTRA_III_0   TC574000    GAME1_NSSU    
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/snes.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/m6m80011ap.h"
 #include "machine/s3520cf.h"
 #include "machine/rp5h01.h"
 #include "video/m50458.h"
-#include "includes/snes.h"
 #include "rendlay.h"
+#include "speaker.h"
 
 
 class nss_state : public snes_state
@@ -348,6 +350,7 @@ public:
 	INTERRUPT_GEN_MEMBER(nss_vblank_irq);
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
+	void nss(machine_config &config);
 };
 
 
@@ -815,13 +818,14 @@ void nss_state::machine_reset()
 	m_joy_flag = 1;
 }
 
-static MACHINE_CONFIG_START( nss, nss_state )
+MACHINE_CONFIG_START(nss_state::nss)
 
 	/* base snes hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68Mhz, also 3.58Mhz */
 	MCFG_CPU_PROGRAM_MAP(snes_map)
 
-	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2) /* 2.048 Mhz, but internal divider */
+	// runs at 24.576 MHz / 12 = 2.048 MHz
+	MCFG_CPU_ADD("soundcpu", SPC700, XTAL_24_576MHz / 12)
 	MCFG_CPU_PROGRAM_MAP(spc_mem)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -1062,12 +1066,12 @@ DRIVER_INIT_MEMBER(nss_state,nss)
 	uint8_t *PROM = memregion("rp5h01")->base();
 
 	for (int i = 0; i < 0x10; i++)
-		PROM[i] = BITSWAP8(PROM[i],0,1,2,3,4,5,6,7) ^ 0xff;
+		PROM[i] = bitswap<8>(PROM[i],0,1,2,3,4,5,6,7) ^ 0xff;
 
 	DRIVER_INIT_CALL(snes);
 }
 
-GAME( 199?, nss,       0,     nss,      snes, snes_state,    snes,    ROT0, "Nintendo",                    "Nintendo Super System BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 199?, nss,       0,     nss,      snes, nss_state,    snes,   ROT0, "Nintendo",                    "Nintendo Super System BIOS", MACHINE_IS_BIOS_ROOT )
 GAME( 1992, nss_actr,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Enix",                        "Act Raiser (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 1992, nss_adam,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Ocean",                       "The Addams Family (Nintendo Super System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 1992, nss_aten,  nss,   nss,      snes, nss_state,    nss,    ROT0, "Absolute Entertainment Inc.", "David Crane's Amazing Tennis (Nintendo Super System)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

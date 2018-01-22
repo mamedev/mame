@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "includes/slapstic.h"
+#include "screen.h"
 
 class atetris_state : public driver_device
 {
@@ -50,4 +51,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_gen);
 	void reset_bank();
+	void atetrisb2(machine_config &config);
+	void atetrisb3(machine_config &config);
+	void atetris(machine_config &config);
 };

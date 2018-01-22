@@ -22,6 +22,9 @@ Other:  BMC B816140 (CPLD)
 #include "sound/okim6295.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
+#include "machine/timer.h"
+#include "screen.h"
+#include "speaker.h"
 
 class bmcpokr_state : public driver_device
 {
@@ -40,7 +43,7 @@ public:
 		m_layerctrl(*this, "layerctrl"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
-		{ }
+	{ }
 
 	// Devices
 	required_device<cpu_device> m_maincpu;
@@ -102,6 +105,8 @@ public:
 		save_item(NAME(m_pixpal));
 		machine().save().register_postload(save_prepost_delegate(FUNC(bmcpokr_state::pixbitmap_redraw), this));
 	}
+	void bmcpokr(machine_config &config);
+	void mjmaglmp(machine_config &config);
 };
 
 /***************************************************************************
@@ -298,7 +303,7 @@ uint32_t bmcpokr_state::screen_update_bmcpokr(screen_device &screen, bitmap_ind1
 
 READ16_MEMBER(bmcpokr_state::unk_r)
 {
-	return space.machine().rand();
+	return machine().rand();
 }
 
 // Hack!
@@ -326,9 +331,9 @@ WRITE16_MEMBER(bmcpokr_state::mux_w)
 	COMBINE_DATA(&m_mux);
 	if (ACCESSING_BITS_0_7)
 	{
-		m_hopper->write(space, 0,   (data & 0x0001) ? 0x80 : 0x00); // hopper motor
-		machine().bookkeeping().coin_counter_w(1, data & 0x0002);                // coin-in / key-in
-		machine().bookkeeping().coin_counter_w(2, data & 0x0004);                // pay-out
+		m_hopper->motor_w(BIT(data, 0)); // hopper motor
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));                // coin-in / key-in
+		machine().bookkeeping().coin_counter_w(2, BIT(data, 2));                // pay-out
 		//                           data & 0x0060                  // DSW mux
 		//                           data & 0x0080                  // ? always on
 	}
@@ -793,11 +798,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(bmcpokr_state::interrupt)
 		if (m_irq_enable & (1<<6)) m_maincpu->set_input_line(6, ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, bmcpokr_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, bmcpokr_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( bmcpokr, bmcpokr_state )
+MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_42MHz / 4) // 68000 @10.50MHz (42/4)
 	MCFG_CPU_PROGRAM_MAP(bmcpokr_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bmcpokr_state, interrupt, "screen", 0, 1)
@@ -825,12 +830,12 @@ static MACHINE_CONFIG_START( bmcpokr, bmcpokr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_42MHz / 40, OKIM6295_PIN7_HIGH)   // M6295 @1.05MHz (42/40), pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL_42MHz / 40, PIN7_HIGH)   // M6295 @1.05MHz (42/40), pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjmaglmp, bmcpokr )
+MACHINE_CONFIG_DERIVED(bmcpokr_state::mjmaglmp, bmcpokr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mjmaglmp_map)
 MACHINE_CONFIG_END
@@ -947,5 +952,5 @@ ROM_START( mjmaglmp )
 	ROM_LOAD( "ja-a-901.u6", 0x00000, 0x40000, CRC(25f36d00) SHA1(c182348340ca67ad69d1a67c58b47d6371a725c9) )
 ROM_END
 
-GAME( 1999, bmcpokr,  0, bmcpokr,  bmcpokr,  driver_device, 0, ROT0, "BMC", "Dongfang Shenlong",             MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mjmaglmp, 0, mjmaglmp, mjmaglmp, driver_device, 0, ROT0, "BMC", "Mahjong Magic Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, bmcpokr,  0, bmcpokr,  bmcpokr,  bmcpokr_state, 0, ROT0, "BMC", "Dongfang Shenlong",             MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mjmaglmp, 0, mjmaglmp, mjmaglmp, bmcpokr_state, 0, ROT0, "BMC", "Mahjong Magic Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )

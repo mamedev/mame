@@ -1,15 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:Raphael Nabet
 /* register names for apexc_get_reg & apexc_set_reg */
+#ifndef MAME_CPU_APEXC_APEXC_H
+#define MAME_CPU_APEXC_APEXC_H
+
 #pragma once
 
-#ifndef __APEXC_H__
-#define __APEXC_H__
+#define MCFG_APEXC_TAPE_READ_CB(_devcb) \
+	devcb = &apexc_cpu_device::set_tape_read_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_APEXC_TAPE_PUNCH_CB(_devcb) \
+	devcb = &apexc_cpu_device::set_tape_punch_cb(*device, DEVCB_##_devcb);
 
 enum
 {
 	APEXC_CR =1,    /* control register */
-	APEXC_A,        /* acumulator */
+	APEXC_A,        /* accumulator */
 	APEXC_R,        /* register */
 	APEXC_ML,       /* memory location */
 	APEXC_WS,       /* working store */
@@ -21,6 +27,18 @@ class apexc_cpu_device : public cpu_device
 public:
 	// construction/destruction
 	apexc_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// static configuration
+	template<class Object>
+	static devcb_base &set_tape_read_cb(device_t &device, Object &&object)
+	{
+		return downcast<apexc_cpu_device &>(device).m_tape_read_cb.set_callback(std::forward<Object>(object));
+	}
+	template<class Object>
+	static devcb_base &set_tape_punch_cb(device_t &device, Object &&object)
+	{
+		return downcast<apexc_cpu_device &>(device).m_tape_punch_cb.set_callback(std::forward<Object>(object));
+	}
 
 protected:
 	// device-level overrides
@@ -34,15 +52,13 @@ protected:
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	inline uint32_t apexc_readmem(uint32_t address) { return m_program->read_dword((address)<<2); }
 	inline void apexc_writemem(uint32_t address, uint32_t data) { m_program->write_dword((address)<<2, (data)); }
@@ -58,7 +74,9 @@ protected:
 	void execute();
 
 	address_space_config m_program_config;
-	address_space_config m_io_config;
+
+	devcb_read8 m_tape_read_cb;
+	devcb_write8 m_tape_punch_cb;
 
 	uint32_t m_a;   /* accumulator */
 	uint32_t m_r;   /* register */
@@ -72,7 +90,6 @@ protected:
 	uint32_t m_pc;  /* address of next instruction for the disassembler */
 
 	address_space *m_program;
-	address_space *m_io;
 	int m_icount;
 
 	// For state
@@ -81,7 +98,6 @@ protected:
 };
 
 
-extern const device_type APEXC;
+DECLARE_DEVICE_TYPE(APEXC, apexc_cpu_device)
 
-
-#endif /* __APEXC_H__ */
+#endif // MAME_CPU_APEXC_APEXC_H

@@ -18,6 +18,7 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/zx.h"
 
 
@@ -94,7 +95,7 @@ void zx_state::recalc_hsync()
 READ8_MEMBER(zx_state::ula_low_r)
 {
 	uint8_t cdata = m_program->read_byte(offset);
-	if(space.debugger_access())
+	if(machine().side_effect_disabled())
 		return cdata;
 
 	if(m_maincpu->state_int(Z80_HALT))
@@ -113,7 +114,7 @@ READ8_MEMBER(zx_state::ula_high_r)
 {
 	uint8_t cdata = m_program->read_byte(offset);
 
-	if(space.debugger_access())
+	if(machine().side_effect_disabled())
 		return cdata;
 
 	if(m_maincpu->state_int(Z80_HALT))

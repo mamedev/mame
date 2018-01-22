@@ -43,10 +43,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_sn1_ready);
 	DECLARE_WRITE_LINE_MEMBER(write_sn2_ready);
 	DECLARE_WRITE_LINE_MEMBER(write_sn3_ready);
-	DECLARE_READ8_MEMBER(t0_r);
+	DECLARE_READ_LINE_MEMBER(t0_r);
 	DECLARE_WRITE8_MEMBER(soundtrigger_w);
-	DECLARE_WRITE8_MEMBER(irq_mask_w);
-	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(misc_outputs_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(flip_screen_w);
+	DECLARE_WRITE_LINE_MEMBER(unknown_w);
 
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(spcforce);
@@ -54,4 +56,6 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void meteors(machine_config &config);
+	void spcforce(machine_config &config);
 };

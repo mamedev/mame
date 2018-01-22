@@ -1,7 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Dag Lem
-#ifndef WAVE6581_h
-#define WAVE6581_h
+#ifndef MAME_SOUND_SIDW6581_H
+#define MAME_SOUND_SIDW6581_H
+
+#pragma once
 
 /*
  * MOS-6581 R1, R3, R4
@@ -1050,4 +1052,4 @@ static const uint8_t waveform70_6581[4096+4096] =
 	0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0,0x30, 0x0, 0x0, 0x0,0x78,0x78,0x7e,0x7f,0x7f
 };
 
-#endif  // WAVE6581_h
+#endif // MAME_SOUND_SIDW6581_H

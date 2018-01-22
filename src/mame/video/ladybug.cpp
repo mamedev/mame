@@ -83,10 +83,10 @@ void ladybug_state::palette_init_common( palette_device &palette, const uint8_t 
 	{
 		uint8_t ctabentry = color_prom[(i - 0x20) >> 1];
 
-		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 0) & 0x0f, 7,6,5,4,0,1,2,3);
+		ctabentry = bitswap<8>((color_prom[i - 0x20] >> 0) & 0x0f, 7,6,5,4,0,1,2,3);
 		palette.set_pen_indirect(i + 0x00, ctabentry);
 
-		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 4) & 0x0f, 7,6,5,4,0,1,2,3);
+		ctabentry = bitswap<8>((color_prom[i - 0x20] >> 4) & 0x0f, 7,6,5,4,0,1,2,3);
 		palette.set_pen_indirect(i + 0x20, ctabentry);
 	}
 }
@@ -110,11 +110,11 @@ WRITE8_MEMBER(ladybug_state::ladybug_colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(ladybug_state::ladybug_flipscreen_w)
+WRITE_LINE_MEMBER(ladybug_state::flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
+	if (flip_screen() != state)
 	{
-		flip_screen_set(data & 0x01);
+		flip_screen_set(state);
 		machine().tilemap().mark_all_dirty();
 	}
 }

@@ -50,13 +50,13 @@ void midvunit_state::machine_start()
 {
 	save_item(NAME(m_cmos_protected));
 	save_item(NAME(m_control_data));
-	save_item(NAME(m_adc_data));
 	save_item(NAME(m_adc_shift));
 	save_item(NAME(m_last_port0));
 	save_item(NAME(m_shifter_state));
 	save_item(NAME(m_timer_rate));
-	save_item(NAME(m_output_mode));
-	save_item(NAME(m_output));
+	save_item(NAME(m_wheel_board_output));
+	save_item(NAME(m_wheel_board_last));
+	save_item(NAME(m_wheel_board_u8_latch));
 }
 
 
@@ -123,30 +123,20 @@ READ32_MEMBER(midvunit_state::port0_r)
  *
  *************************************/
 
-READ32_MEMBER(midvunit_state::midvunit_adc_r)
+READ32_MEMBER( midvunit_state::adc_r )
 {
 	if (!(m_control_data & 0x40))
-	{
-		m_maincpu->set_input_line(3, CLEAR_LINE);
-		return m_adc_data << m_adc_shift;
-	}
+		return m_adc->read(space, 0) << m_adc_shift;
 	else
 		logerror("adc_r without enabling reads!\n");
+
 	return 0xffffffff;
 }
 
-
-WRITE32_MEMBER(midvunit_state::midvunit_adc_w)
+WRITE32_MEMBER( midvunit_state::adc_w )
 {
 	if (!(m_control_data & 0x20))
-	{
-		int which = (data >> m_adc_shift) - 4;
-		if (which < 0 || which > 2)
-			logerror("adc_w: unexpected which = %02X\n", which + 4);
-		else
-			m_adc_data = m_adc_ports[which].read_safe(0);
-		timer_set(attotime::from_msec(1), TIMER_ADC_READY);
-	}
+		m_adc->write(space, 0, data >> m_adc_shift);
 	else
 		logerror("adc_w without enabling writes!\n");
 }
@@ -247,13 +237,13 @@ READ32_MEMBER(midvunit_state::tms32031_control_r)
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
 		int32_t result = (m_timer[which]->time_elapsed() * m_timer_rate).as_double();
-//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", space.device().safe_pc(), offset, result);
+//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
 		return result;
 	}
 
 	/* log anything else except the memory control register */
 	if (offset != 0x64)
-		logerror("%06X:tms32031_control_r(%02X)\n", space.device().safe_pc(), offset);
+		logerror("%06X:tms32031_control_r(%02X)\n", m_maincpu->pc(), offset);
 
 	return m_tms32031_control[offset];
 }
@@ -271,7 +261,7 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 	else if (offset == 0x20 || offset == 0x30)
 	{
 		int which = (offset >> 4) & 1;
-//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", space.device().safe_pc(), offset, data);
+//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 		if (data & 0x40)
 			m_timer[which]->reset();
 
@@ -282,7 +272,7 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 			m_timer_rate = 10000000.;
 	}
 	else
-		logerror("%06X:tms32031_control_w(%02X) = %08X\n", space.device().safe_pc(), offset, data);
+		logerror("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -373,9 +363,10 @@ WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 	m_midway_serial_pic2->write(space, 0, data >> 16);
 }
 
-READ32_MEMBER(midvunit_state::midvunit_output_r)
+READ32_MEMBER(midvunit_state::midvunit_wheel_board_r)
 {
-	return m_output;
+	//logerror("midvunit_wheel_board_r: %08X\n", m_wheel_board_output);
+	return m_wheel_board_output;
 }
 
 void midvunit_state::set_input(const char *s)
@@ -385,49 +376,39 @@ void midvunit_state::set_input(const char *s)
 	m_galil_input_length = strlen(s);
 }
 
-WRITE32_MEMBER(midvunit_state::midvunit_output_w)
+WRITE32_MEMBER(midvunit_state::midvunit_wheel_board_w)
 {
-	uint8_t op = (data >> 8) & 0xF;
-	uint8_t arg = data & 0xFF;
-	switch (op)
+	//logerror("midvunit_wheel_board_w: %08X\n", data);
+
+	// U8 PAL22V10 "DECODE0" TODO: Needs dump "A-19674"
+	if (BIT(data, 11) && !BIT(m_wheel_board_last, 11))
 	{
-		default:
-			logerror("Unknown output (%02X) = %02X\n", op, arg);
-			break;
+		logerror("Wheel board (U8 PAL22V10; DECODE0) = %03X\n", BIT(data, 11) | ((data & 0xF) << 1) | ((data & 0x700) << 1));
+		m_wheel_board_u8_latch = 0;
+		m_wheel_board_u8_latch |= BIT(data, 0) << 6; // WA0; A for U9
+		m_wheel_board_u8_latch |= BIT(data, 1) << 5; // WA1; B for U9
+		m_wheel_board_u8_latch |= BIT(data, 2) << 4; // WA2; C for U9
+		m_wheel_board_u8_latch |= BIT(data, 3) << 3; // WA3; G2B for U9
+	}
 
-		case 0xF: break; // sync/security wrapper commands. arg matches the wrapped command.
-
-		case 0x7:
-			m_output_mode = arg;
-			break;
-
-		case 0xB:
-			switch (m_output_mode)
+	if (!BIT(data, 9))
+	{
+		logerror("Wheel board (U13 74HC245; DCS) = %02X\n", data & 0xFF);
+	}
+	else if (!BIT(data, 10)) // G2A for U9
+	{
+		uint8_t arg = data & 0xFF;
+		uint8_t wa = BIT(m_wheel_board_u8_latch, 6) | (BIT(m_wheel_board_u8_latch, 5) << 1) | (BIT(m_wheel_board_u8_latch, 4) << 2);
+		if (BIT(m_wheel_board_u8_latch, 3))
+		{
+			// U19 PAL22V10 "GALIL" TODO: Needs dump "A-19675", needs Galil emulation
+			logerror("Wheel board (U19 PAL22V10; GALIL) = %03X\n", (m_wheel_board_u8_latch & 0x78) | ((data & 0x3F) << 6));
+			switch (wa)
 			{
-				default:
-					logerror("Unknown output with mode (%02X) = %02X\n", m_output_mode, arg);
+				case 0:
+					m_wheel_board_output = m_galil_input[m_galil_input_index++] << 8;
 					break;
-
-				case 0x00: //device init? 3C 1C are the only 2 writes at boot.
-					set_input(":");
-					m_galil_output_index = 0;
-					memset(m_galil_output, 0, 450);
-					break;
-
-				case 0x04: //wheel motor delta. signed byte.
-					output().set_value("wheel", arg);
-					break;
-
-				case 0x05:
-					for (uint8_t bit = 0; bit < 8; bit++)
-						output().set_lamp_value(bit, (arg >> bit) & 0x1);
-					break;
-
-				case 0x08: //get next character from input string.
-					m_output = m_galil_input[m_galil_input_index++] << 8;
-					break;
-
-				case 0x09: //Galil command input. ascii inputs terminated with carriage return.
+				case 1:
 					if (arg != 0xD)
 					{
 						m_galil_output[m_galil_output_index] = (char)arg;
@@ -437,11 +418,6 @@ WRITE32_MEMBER(midvunit_state::midvunit_output_w)
 					else
 					{
 						// G, W, S, and Q are commented out because they are error commands.
-						// When the motion tests succeeds it will send the program over to
-						// the motion controller and as this is not a real system it will
-						// assume it wants to execute them which turns off the motion system.
-						// If anyone wishes to implement a real Galil motion controller feel
-						// free to do so. This will only dump everything to stdout.
 						if (strstr(m_galil_output,"MG \"V\" IBO {$2.0}"))
 							set_input("V$00");
 						else if (strstr(m_galil_output,"MG \"X\", _TSX {$2.0}"))
@@ -465,24 +441,55 @@ WRITE32_MEMBER(midvunit_state::midvunit_output_w)
 						m_galil_output_index = 0;
 					}
 					break;
-
-				case 0x0A: //set output to 0x8000 if there is data available, otherwise 0.
-					m_output = (m_galil_input_index < m_galil_input_length) ? 0x8000 : 0x0;
+				case 2:
+					m_wheel_board_output = (m_galil_input_index < m_galil_input_length) ? 0x8000 : 0x0;
 					break;
-
-				case 0x0B: break; //0 written at boot.
-
-				case 0x0C: break; //0 written at boot.
-
-				case 0x0E: break; //0 written after test.
+				case 3: // Galil init?
+					break;
+				case 4: // Galil init?
+					set_input(":");
+					m_galil_output_index = 0;
+					memset(m_galil_output, 0, 450);
+					break;
 			}
-			break;
-
-		case 0xD: //receives same data as midvunit_sound_w. unsure what its purpose is, but it is redundant.
-			logerror("Wheelboard Sound W = %02X\n", arg);
-			//m_dcs->data_w(arg);
-			break;
+		}
+		else
+		{
+			// U9 74LS138
+			switch (wa)
+			{
+				case 0: // SNDCTLZ
+					logerror("Wheel board (U14 74HC574; DCS Control) = %02X\n", arg);
+					break;
+				case 1: // GALCTLZ
+					logerror("Wheel board (U19 PAL22V10; Galil Control) = %02X\n", arg);
+					break;
+				case 2: // ATODWRZ
+					logerror("Wheel board (ATODWRZ) = %02X\n", arg);
+					break;
+				case 3: // ATODRDZ
+					logerror("Wheel board (ATODRDZ) = %02X\n", arg);
+					break;
+				case 4: // WHLCTLZ
+					output().set_value("wheel", arg);
+					//logerror("Wheel board (U4 74HC574; Motor) = %02X\n", arg);
+					break;
+				case 5: // DRVCTLZ
+					for (uint8_t bit = 0; bit < 8; bit++)
+						output().set_lamp_value(bit, BIT(data, bit));
+					//logerror("Wheel board (U10 74HC574; Lamps) = %02X\n", arg);
+					break;
+				case 6: // PRTCTLZ
+					logerror("Wheel board (PRTCTLZ) = %02X\n", arg);
+					break;
+				case 7: // PRTSTATZ
+					logerror("Wheel board (PRTSTATZ) = %02X\n", arg);
+					break;
+			}
+		}
 	}
+
+	m_wheel_board_last = data;
 }
 
 
@@ -512,7 +519,7 @@ READ32_MEMBER(midvunit_state::midvplus_misc_r)
 	}
 
 	if (offset != 0 && offset != 3)
-		logerror("%06X:midvplus_misc_r(%d) = %08X\n", space.device().safe_pc(), offset, result);
+		logerror("%06X:midvplus_misc_r(%d) = %08X\n", m_maincpu->pc(), offset, result);
 	return result;
 }
 
@@ -541,7 +548,7 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 	}
 
 	if (logit)
-		logerror("%06X:midvplus_misc_w(%d) = %08X\n", space.device().safe_pc(), offset, data);
+		logerror("%06X:midvplus_misc_w(%d) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -588,9 +595,9 @@ static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 //  AM_RANGE(0x991050, 0x991050) AM_READONLY // seems to be another port
 	AM_RANGE(0x991060, 0x991060) AM_READ(port0_r)
 	AM_RANGE(0x992000, 0x992000) AM_READ_PORT("992000")
-	AM_RANGE(0x993000, 0x993000) AM_READWRITE(midvunit_adc_r, midvunit_adc_w)
+	AM_RANGE(0x993000, 0x993000) AM_READWRITE(adc_r, adc_w)
 	AM_RANGE(0x994000, 0x994000) AM_WRITE(midvunit_control_w)
-	AM_RANGE(0x995000, 0x995000) AM_READWRITE(midvunit_output_r, midvunit_output_w)
+	AM_RANGE(0x995000, 0x995000) AM_READWRITE(midvunit_wheel_board_r, midvunit_wheel_board_w)
 	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
 	AM_RANGE(0x997000, 0x997000) AM_NOP // communications
 	AM_RANGE(0x9a0000, 0x9a0000) AM_WRITE(midvunit_sound_w)
@@ -1120,7 +1127,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( midvcommon, midvunit_state )
+MACHINE_CONFIG_START(midvunit_state::midvcommon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS32031, CPU_CLOCK)
@@ -1141,30 +1148,35 @@ static MACHINE_CONFIG_START( midvcommon, midvunit_state )
 	MCFG_SCREEN_UPDATE_DRIVER(midvunit_state, screen_update_midvunit)
 	MCFG_SCREEN_PALETTE("palette")
 
+	MCFG_ADC0844_ADD("adc")
+	MCFG_ADC0844_INTR_CB(INPUTLINE("maincpu", 3))
+	MCFG_ADC0844_CH1_CB(IOPORT("WHEEL"))
+	MCFG_ADC0844_CH2_CB(IOPORT("ACCEL"))
+	MCFG_ADC0844_CH3_CB(IOPORT("BRAKE"))
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( midvunit, midvcommon )
+MACHINE_CONFIG_DERIVED(midvunit_state::midvunit, midvcommon)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( crusnwld, midvunit )
+MACHINE_CONFIG_DERIVED(midvunit_state::crusnwld, midvunit)
 	/* valid values are 450 or 460 */
 	MCFG_DEVICE_ADD("serial_pic", MIDWAY_SERIAL_PIC, 0)
 	MCFG_MIDWAY_SERIAL_PIC_UPPER(450)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( offroadc, midvunit )
+MACHINE_CONFIG_DERIVED(midvunit_state::offroadc, midvunit)
 	/* valid values are 230 or 234 */
 	MCFG_DEVICE_ADD("serial_pic2", MIDWAY_SERIAL_PIC2, 0)
 	MCFG_MIDWAY_SERIAL_PIC2_UPPER(230)
 	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
+MACHINE_CONFIG_DERIVED(midvunit_state::midvplus, midvcommon)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1180,6 +1192,8 @@ static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
 	MCFG_MIDWAY_IOASIC_SHUFFLE(0)
 	MCFG_MIDWAY_IOASIC_UPPER(452) /* no alternates */
 	MCFG_MIDWAY_IOASIC_YEAR_OFFS(94)
+
+	MCFG_DEVICE_REMOVE("adc")
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
@@ -1842,7 +1856,7 @@ ROM_END
 
 READ32_MEMBER(midvunit_state::generic_speedup_r)
 {
-	space.device().execute().eat_cycles(100);
+	m_maincpu->eat_cycles(100);
 	return m_generic_speedup[offset];
 }
 
@@ -1906,9 +1920,6 @@ DRIVER_INIT_MEMBER(midvunit_state,offroadc)
 DRIVER_INIT_MEMBER(midvunit_state,wargods)
 {
 	uint8_t default_nvram[256];
-
-	/* initialize the subsystems */
-	m_adc_shift = 16;
 
 	/* we need proper VRAM */
 	memset(default_nvram, 0xff, sizeof(default_nvram));

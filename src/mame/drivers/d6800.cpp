@@ -40,32 +40,36 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
-#include "sound/beep.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
-#include "sound/wave.h"
 #include "machine/6821pia.h"
+#include "machine/timer.h"
+#include "sound/beep.h"
+#include "sound/wave.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class d6800_state : public driver_device
 {
 public:
 	d6800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_cass(*this, "cassette"),
-		m_pia(*this, "pia"),
-		m_beeper(*this, "beeper"),
-		m_videoram(*this, "videoram"),
-		m_io_x0(*this, "X0"),
-		m_io_x1(*this, "X1"),
-		m_io_x2(*this, "X2"),
-		m_io_x3(*this, "X3"),
-		m_io_y0(*this, "Y0"),
-		m_io_y1(*this, "Y1"),
-		m_io_y2(*this, "Y2"),
-		m_io_y3(*this, "Y3"),
-		m_io_shift(*this, "SHIFT") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, "cassette")
+		, m_pia(*this, "pia")
+		, m_beeper(*this, "beeper")
+		, m_videoram(*this, "videoram")
+		, m_io_x0(*this, "X0")
+		, m_io_x1(*this, "X1")
+		, m_io_x2(*this, "X2")
+		, m_io_x3(*this, "X3")
+		, m_io_y0(*this, "Y0")
+		, m_io_y1(*this, "Y1")
+		, m_io_y2(*this, "Y2")
+		, m_io_y3(*this, "Y3")
+		, m_io_shift(*this, "SHIFT")
+		{ }
 
 	DECLARE_READ8_MEMBER( d6800_cassette_r );
 	DECLARE_WRITE8_MEMBER( d6800_cassette_w );
@@ -76,7 +80,16 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(d6800_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(d6800_p);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( d6800 );
-protected:
+
+	void d6800(machine_config &config);
+private:
+	uint8_t m_rtc;
+	bool m_cb2;
+	bool m_cassold;
+	uint8_t m_cass_data[4];
+	uint8_t m_portb;
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<pia6821_device> m_pia;
@@ -91,14 +104,6 @@ protected:
 	required_ioport m_io_y2;
 	required_ioport m_io_y3;
 	required_ioport m_io_shift;
-private:
-	uint8_t m_rtc;
-	bool m_cb2;
-	bool m_cassold;
-	uint8_t m_cass_data[4];
-	uint8_t m_portb;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -377,7 +382,7 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 	return result;
 }
 
-static MACHINE_CONFIG_START( d6800, d6800_state )
+MACHINE_CONFIG_START(d6800_state::d6800)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4)
 	MCFG_CPU_PROGRAM_MAP(d6800_map)
@@ -431,5 +436,5 @@ ROM_START( d6800 )
 	ROMX_LOAD( "d6800d.bin", 0xc000, 0x0800, CRC(ded5712f) SHA1(f594f313a74d7135c9fdd0bcb0093fc5771a9b7d), ROM_BIOS(2) )
 ROM_END
 
-/*    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT  CLASS,          INIT      COMPANY        FULLNAME      FLAGS */
-COMP( 1979, d6800, 0,      0,      d6800,    d6800, driver_device,   0,   "Michael Bauer", "Dream 6800", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT  COMPANY          FULLNAME      FLAGS
+COMP( 1979, d6800, 0,      0,      d6800,    d6800, d6800_state, 0,    "Michael Bauer", "Dream 6800", 0 )

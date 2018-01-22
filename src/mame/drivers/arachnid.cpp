@@ -61,10 +61,11 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
-#include "machine/ram.h"
 #include "machine/6840ptm.h"
+#include "machine/ram.h"
+#include "sound/spkrdev.h"
 #include "video/tms9928a.h"
-#include "sound/speaker.h"
+#include "speaker.h"
 
 #define SCREEN_TAG      "screen"
 #define M6809_TAG       "u3"
@@ -108,6 +109,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ptm_o1_callback);
 
 	uint8_t read_keyboard(int pa);
+	void arachnid(machine_config &config);
 };
 
 /***************************************************************************
@@ -413,10 +415,10 @@ void arachnid_state::machine_start()
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( arachnid, arachnid_state )
+    MACHINE_CONFIG_START( arachnid )
 -------------------------------------------------*/
 
-static MACHINE_CONFIG_START( arachnid, arachnid_state )
+MACHINE_CONFIG_START(arachnid_state::arachnid)
 	// basic machine hardware
 	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL_1MHz)
 	MCFG_CPU_PROGRAM_MAP(arachnid_map)
@@ -450,8 +452,7 @@ static MACHINE_CONFIG_START( arachnid, arachnid_state )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_8MHz / 4)
+	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, XTAL_8MHz / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_OUT0_CB(WRITELINE(arachnid_state, ptm_o1_callback))
 MACHINE_CONFIG_END
@@ -469,5 +470,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                   FULLNAME */
-GAME( 1990, arac6000,   0,         arachnid,        arachnid, driver_device,    0,    ROT0,  "Arachnid",         "Super Six Plus II English Mark Darts", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+/*    YEAR  NAME        PARENT     MACHINE   INPUT     STATE              INIT         COMPANY             FULLNAME */
+GAME( 1990, arac6000,   0,         arachnid, arachnid, arachnid_state,    0,    ROT0,  "Arachnid",         "Super Six Plus II English Mark Darts", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

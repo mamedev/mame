@@ -173,9 +173,7 @@ static int cbm_tap_do_work( int16_t **buffer, int length, const uint8_t *data )
 	int i, j = 0;
 	int size = 0;
 
-	int version = data[0x0c];
-	int system = data[0x0d];
-	int video_standard = data[0x0e];
+	int version, system, video_standard;
 	int tap_frequency = 0;
 
 	int byte_samples = 0;
@@ -185,6 +183,14 @@ static int cbm_tap_do_work( int16_t **buffer, int length, const uint8_t *data )
 	  Further investigations are needed to find real pulse amplitude
 	  in Commodore tapes. Implementation here would follow */
 	/* int waveamp_high, waveamp_low; */
+
+	/* is the .tap file corrupted? */
+	if ((data == nullptr) || (length <= CBM_HEADER_SIZE))
+		return -1;
+
+	version = data[0x0c];
+	system = data[0x0d];
+	video_standard = data[0x0e];
 
 	/* Log .TAP info but only once */
 	if (!(buffer == nullptr))
@@ -202,10 +208,6 @@ static int cbm_tap_do_work( int16_t **buffer, int length, const uint8_t *data )
 		LOG_FORMATS("Unsupported .tap version: %d \n", version);
 		return -1;
 	}
-
-	/* is the .tap file corrupted? */
-	if ((data == nullptr) || (length <= CBM_HEADER_SIZE))
-		return -1;
 
 
 	/* read the frequency from the .tap header */

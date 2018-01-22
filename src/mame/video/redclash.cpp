@@ -88,10 +88,10 @@ PALETTE_INIT_MEMBER(redclash_state,redclash)
 	{
 		uint8_t ctabentry = color_prom[(i - 0x20) >> 1];
 
-		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 0) & 0x0f, 7,6,5,4,0,1,2,3);
+		ctabentry = bitswap<8>((color_prom[i - 0x20] >> 0) & 0x0f, 7,6,5,4,0,1,2,3);
 		palette.set_pen_indirect(i + 0x00, ctabentry);
 
-		ctabentry = BITSWAP8((color_prom[i - 0x20] >> 4) & 0x0f, 7,6,5,4,0,1,2,3);
+		ctabentry = bitswap<8>((color_prom[i - 0x20] >> 4) & 0x0f, 7,6,5,4,0,1,2,3);
 		palette.set_pen_indirect(i + 0x20, ctabentry);
 	}
 
@@ -335,7 +335,7 @@ void redclash_state::redclash_set_stars_enable(uint8_t on)
 }
 
 /* This sets up which starfield to draw and the offset, */
-/* To be called from screen_eof_*() */
+/* To be called from screen_vblank_*() */
 
 void redclash_state::redclash_update_stars_state()
 {
@@ -435,7 +435,7 @@ void redclash_state::redclash_draw_stars(bitmap_ind16 &bitmap, const rectangle &
 	}
 }
 
-void redclash_state::screen_eof_redclash(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(redclash_state::screen_vblank_redclash)
 {
 	// falling edge
 	if (!state)
@@ -491,7 +491,7 @@ VIDEO_START_MEMBER(redclash_state,sraider)
 	m_bg_tilemap->set_transparent_pen(0);
 }
 
-void redclash_state::screen_eof_sraider(screen_device &screen, bool state)/* update starfield position */
+WRITE_LINE_MEMBER(redclash_state::screen_vblank_sraider)/* update starfield position */
 {
 	// falling edge
 	if (!state)

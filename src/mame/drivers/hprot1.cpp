@@ -57,9 +57,11 @@ Infinite loop is reached at address 0x7699
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
+#include "sound/spkrdev.h"
 #include "video/hd44780.h"
-#include "sound/speaker.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 class hprot1_state : public driver_device
 {
@@ -75,6 +77,9 @@ public:
 	DECLARE_DRIVER_INIT(hprot1);
 	DECLARE_PALETTE_INIT(hprot1);
 	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
+	void hprotr8a(machine_config &config);
+	void hprot2r6(machine_config &config);
+	void hprot1(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -98,7 +103,7 @@ DRIVER_INIT_MEMBER( hprot1_state, hprot1 )
 		bitswapped_ROM[i] = ROM[i];
 
 	for(i=0x0000;i<0x10000;i++)
-		ROM[BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 3, 2, 1, 0, 4, 5, 6, 7)] = bitswapped_ROM[i];
+		ROM[bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 3, 2, 1, 0, 4, 5, 6, 7)] = bitswapped_ROM[i];
 }
 
 //A4 = display RS
@@ -298,7 +303,7 @@ HD44780_PIXEL_UPDATE(hprot1_state::hprot1_pixel_update)
 	}
 }
 
-static MACHINE_CONFIG_START( hprot1, hprot1_state )
+MACHINE_CONFIG_START(hprot1_state::hprot1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
@@ -327,7 +332,7 @@ static MACHINE_CONFIG_START( hprot1, hprot1_state )
 	/* TODO: emulate the ADM695AN chip (watchdog/brownout reset)*/
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hprotr8a, hprot1 )
+MACHINE_CONFIG_DERIVED(hprot1_state::hprotr8a, hprot1)
 	MCFG_CPU_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_IO_MAP(i80c31_io)
@@ -343,7 +348,7 @@ static MACHINE_CONFIG_DERIVED( hprotr8a, hprot1 )
 	/* TODO: add an I2C interface (the board has GND/VCC/SDA/SCL pins available in a connector) */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hprot2r6, hprot1 )
+MACHINE_CONFIG_DERIVED(hprot1_state::hprot2r6, hprot1)
 	MCFG_CPU_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_IO_MAP(i80c31_io)
@@ -378,5 +383,5 @@ COMP( 2002, hprot1,   0,      0,      hprot1,     hprot1,   hprot1_state, hprot1
 COMP( 2006, hprotr8a, hprot1, 0,      hprotr8a,   hprotr8a, hprot1_state, hprot1, "HENRY", "Henry Prot CARD I (REV.08A)", MACHINE_NOT_WORKING)
 /* fw version: "V6.5QI I"   Release date: September 18th, 2006. */
 
-COMP( 2003, hprot2r6, hprot1, 0,      hprot2r6,   hprot2r6, hprot1_state, hprot1, "HENRY", "Henry Prot CARD II (REV.6)", MACHINE_NOT_WORKING)
+COMP( 2003, hprot2r6, hprot1, 0,      hprot2r6,   hprot2r6, hprot1_state, hprot1, "HENRY", "Henry Prot CARD II (REV.6)",  MACHINE_NOT_WORKING)
 /* fw version: "V5.8CF II"  Release date: June 23rd, 2003.      */

@@ -1,15 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde, Barry Rodewald, Carl, Philip Bennett
+#ifndef MAME_CPU_I386_I386_H
+#define MAME_CPU_I386_I386_H
+
 #pragma once
 
-#ifndef __I386INTF_H__
-#define __I386INTF_H__
-
+// SoftFloat 2 lacks an include guard
+#ifndef softfloat_h
+#define softfloat_h 1
 #include "softfloat/milieu.h"
 #include "softfloat/softfloat.h"
+#endif
+
 #include "debug/debugcpu.h"
 #include "divtlb.h"
 
+#include "i386dasm.h"
 
 #define INPUT_LINE_A20      1
 #define INPUT_LINE_SMI      2
@@ -20,19 +26,22 @@
 
 
 #define MCFG_I386_SMIACT(_devcb) \
-	i386_device::set_smiact(*device, DEVCB_##_devcb);
+	devcb = &i386_device::set_smiact(*device, DEVCB_##_devcb);
+
+#define MCFG_I486_FERR_HANDLER(_devcb) \
+	devcb = &i386_device::set_ferr(*device, DEVCB_##_devcb);
 
 #define X86_NUM_CPUS        4
 
-class i386_device : public cpu_device, public device_vtlb_interface
+class i386_device : public cpu_device, public device_vtlb_interface, public i386_disassembler::config
 {
 public:
 	// construction/destruction
 	i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	i386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int program_data_width=32, int program_addr_width=32, int io_data_width=32);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_smiact(device_t &device, _Object object) { return downcast<i386_device &>(device).m_smiact.set_callback(object); }
+	template <class Object> static devcb_base &set_smiact(device_t &device, Object &&cb) { return downcast<i386_device &>(device).m_smiact.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ferr(device_t &device, Object &&cb) { return downcast<i386_device &>(device).m_ferr_handler.set_callback(std::forward<Object>(cb)); }
 
 	uint64_t debug_segbase(symbol_table &table, int params, const uint64_t *param);
 	uint64_t debug_seglimit(symbol_table &table, int params, const uint64_t *param);
@@ -40,6 +49,8 @@ public:
 	uint64_t debug_virttophys(symbol_table &table, int params, const uint64_t *param);
 
 protected:
+	i386_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_data_width, int program_addr_width, int io_data_width);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -53,8 +64,8 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }
-	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address) override;
+	virtual space_config_vector memory_space_config() const override;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address) override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -62,9 +73,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 15; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
+	virtual int get_mode() const override;
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -73,68 +83,68 @@ protected:
 	std::unique_ptr<uint8_t[]> cycle_table_pm[X86_NUM_CPUS];
 
 
-union I386_GPR {
-	uint32_t d[8];
-	uint16_t w[16];
-	uint8_t b[32];
-};
+	union I386_GPR {
+		uint32_t d[8];
+		uint16_t w[16];
+		uint8_t b[32];
+	};
 
-struct I386_SREG {
-	uint16_t selector;
-	uint16_t flags;
-	uint32_t base;
-	uint32_t limit;
-	int d;      // Operand size
-	bool valid;
-};
+	struct I386_SREG {
+		uint16_t selector;
+		uint16_t flags;
+		uint32_t base;
+		uint32_t limit;
+		int d;      // Operand size
+		bool valid;
+	};
 
-struct I386_SYS_TABLE {
-	uint32_t base;
-	uint16_t limit;
-};
+	struct I386_SYS_TABLE {
+		uint32_t base;
+		uint16_t limit;
+	};
 
-struct I386_SEG_DESC {
-	uint16_t segment;
-	uint16_t flags;
-	uint32_t base;
-	uint32_t limit;
-};
+	struct I386_SEG_DESC {
+		uint16_t segment;
+		uint16_t flags;
+		uint32_t base;
+		uint32_t limit;
+	};
 
-union XMM_REG {
-	uint8_t  b[16];
-	uint16_t w[8];
-	uint32_t d[4];
-	uint64_t q[2];
-	int8_t   c[16];
-	int16_t  s[8];
-	int32_t  i[4];
-	int64_t  l[2];
-	float  f[4];
-	double  f64[2];
-};
+	union XMM_REG {
+		uint8_t  b[16];
+		uint16_t w[8];
+		uint32_t d[4];
+		uint64_t q[2];
+		int8_t   c[16];
+		int16_t  s[8];
+		int32_t  i[4];
+		int64_t  l[2];
+		float  f[4];
+		double  f64[2];
+	};
 
-union MMX_REG {
-	uint32_t d[2];
-	int32_t  i[2];
-	uint16_t w[4];
-	int16_t  s[4];
-	uint8_t  b[8];
-	int8_t   c[8];
-	float  f[2];
-	uint64_t q;
-	int64_t  l;
-};
+	union MMX_REG {
+		uint32_t d[2];
+		int32_t  i[2];
+		uint16_t w[4];
+		int16_t  s[4];
+		uint8_t  b[8];
+		int8_t   c[8];
+		float  f[2];
+		uint64_t q;
+		int64_t  l;
+	};
 
-struct I386_CALL_GATE
-{
-	uint16_t segment;
-	uint16_t selector;
-	uint32_t offset;
-	uint8_t ar;  // access rights
-	uint8_t dpl;
-	uint8_t dword_count;
-	uint8_t present;
-};
+	struct I386_CALL_GATE
+	{
+		uint16_t segment;
+		uint16_t selector;
+		uint32_t offset;
+		uint8_t ar;  // access rights
+		uint8_t dpl;
+		uint8_t dword_count;
+		uint8_t present;
+	};
 
 	typedef void (i386_device::*i386_modrm_func)(uint8_t modrm);
 	typedef void (i386_device::*i386_op_func)();
@@ -206,7 +216,7 @@ struct I386_CALL_GATE
 
 	uint8_t m_irq_state;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_io;
 	uint32_t m_a20_mask;
 
@@ -277,6 +287,7 @@ struct I386_CALL_GATE
 	bool m_nmi_latched;
 	uint32_t m_smbase;
 	devcb_write_line m_smiact;
+	devcb_write_line m_ferr_handler;
 	bool m_lock;
 
 	// bytes in current opcode, debug only
@@ -1380,6 +1391,8 @@ struct I386_CALL_GATE
 	void x87_fincstp(uint8_t modrm);
 	void x87_fclex(uint8_t modrm);
 	void x87_ffree(uint8_t modrm);
+	void x87_fdisi(uint8_t modrm);
+	void x87_feni(uint8_t modrm);
 	void x87_finit(uint8_t modrm);
 	void x87_fldcw(uint8_t modrm);
 	void x87_fstcw(uint8_t modrm);
@@ -1419,11 +1432,11 @@ struct I386_CALL_GATE
 };
 
 
-class i386SX_device : public i386_device
+class i386sx_device : public i386_device
 {
 public:
 	// construction/destruction
-	i386SX_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	i386sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -1434,7 +1447,19 @@ public:
 	i486_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	i486_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
+	virtual void device_reset() override;
+};
+
+class i486dx4_device : public i486_device
+{
+public:
+	// construction/destruction
+	i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
 	virtual void device_reset() override;
 };
 
@@ -1444,9 +1469,10 @@ class pentium_device : public i386_device
 public:
 	// construction/destruction
 	pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	pentium_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 protected:
+	pentium_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void execute_set_input(int inputnum, int state) override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -1525,16 +1551,16 @@ protected:
 };
 
 
-extern const device_type I386;
-extern const device_type I386SX;
-extern const device_type I486;
-extern const device_type PENTIUM;
-extern const device_type MEDIAGX;
-extern const device_type PENTIUM_PRO;
-extern const device_type PENTIUM_MMX;
-extern const device_type PENTIUM2;
-extern const device_type PENTIUM3;
-extern const device_type PENTIUM4;
+DECLARE_DEVICE_TYPE(I386,        i386_device)
+DECLARE_DEVICE_TYPE(I386SX,      i386sx_device)
+DECLARE_DEVICE_TYPE(I486,        i486_device)
+DECLARE_DEVICE_TYPE(I486DX4,     i486dx4_device)
+DECLARE_DEVICE_TYPE(PENTIUM,     pentium_device)
+DECLARE_DEVICE_TYPE(MEDIAGX,     mediagx_device)
+DECLARE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device)
+DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
+DECLARE_DEVICE_TYPE(PENTIUM2,    pentium2_device)
+DECLARE_DEVICE_TYPE(PENTIUM3,    pentium3_device)
+DECLARE_DEVICE_TYPE(PENTIUM4,    pentium4_device)
 
-
-#endif /* __I386INTF_H__ */
+#endif // MAME_CPU_I386_I386_H

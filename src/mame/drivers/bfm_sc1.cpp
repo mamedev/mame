@@ -101,6 +101,7 @@ Optional (on expansion card) (Viper)
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "machine/bfm_comn.h"
+#include "speaker.h"
 
 #include "sc1_vfd.lh"
 #include "sc1_vid.lh"
@@ -212,8 +213,11 @@ public:
 	required_device<stepper_device> m_reel4;
 	required_device<stepper_device> m_reel5;
 	optional_device<upd7759_device> m_upd7759;
-	optional_device<bfm_bd1_t> m_vfd0;
+	optional_device<bfm_bd1_device> m_vfd0;
 	required_device<meters_device> m_meters;
+	void scorpion1_adder2(machine_config &config);
+	void scorpion1(machine_config &config);
+	void scorpion1_viper(machine_config &config);
 };
 
 #define VFD_RESET  0x20
@@ -1076,7 +1080,7 @@ INPUT_PORTS_END
 // machine driver for scorpion1 board ///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static MACHINE_CONFIG_START( scorpion1, bfm_sc1_state )
+MACHINE_CONFIG_START(bfm_sc1_state::scorpion1)
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)          // 6809 CPU at 1 Mhz
 	MCFG_CPU_PROGRAM_MAP(sc1_base)                      // setup read and write memorymap
 	MCFG_CPU_PERIODIC_INT_DRIVER(bfm_sc1_state, timer_irq,  1000)               // generate 1000 IRQ's per second
@@ -1115,7 +1119,7 @@ MACHINE_CONFIG_END
 // machine driver for scorpion1 board + adder2 extension ////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static MACHINE_CONFIG_DERIVED( scorpion1_adder2, scorpion1 )
+MACHINE_CONFIG_DERIVED(bfm_sc1_state::scorpion1_adder2, scorpion1)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sc1_adder2)                // setup read and write memorymap
@@ -1129,7 +1133,7 @@ MACHINE_CONFIG_END
 // machine driver for scorpion1 board ///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static MACHINE_CONFIG_DERIVED( scorpion1_viper, scorpion1 )
+MACHINE_CONFIG_DERIVED(bfm_sc1_state::scorpion1_viper, scorpion1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sc1_viper)                 // setup read and write memorymap
 

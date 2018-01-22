@@ -13,24 +13,28 @@
     TODO:
 
     - interlaced video
+    - blinking
     - add-on ROM
     - add-on RAM
     - add-on unit
 
 */
 
-#define I8080_TAG   "ua2"
-#define TMS5501_TAG "ud2"
-#define CRT5027_TAG "uf9"
-#define RS232_TAG   "rs232"
-
+#include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i8085/i8085.h"
 #include "bus/compucolor/floppy.h"
 #include "machine/ram.h"
+#include "machine/ripple_counter.h"
 #include "machine/tms5501.h"
 #include "video/tms9927.h"
+#include "screen.h"
 #include "softlist.h"
+
+#define I8080_TAG   "ua2"
+#define TMS5501_TAG "ud2"
+#define CRT5027_TAG "uf9"
+#define RS232_TAG   "rs232"
 
 class compucolor2_state : public driver_device
 {
@@ -74,6 +78,7 @@ public:
 	IRQ_CALLBACK_MEMBER( int_ack );
 
 	uint8_t m_xo;
+	void compucolor2(machine_config &config);
 };
 
 static ADDRESS_MAP_START( compucolor2_mem, AS_PROGRAM, 8, compucolor2_state )
@@ -385,7 +390,7 @@ void compucolor2_state::machine_reset()
 	m_rs232->write_dtr(1);
 }
 
-static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
+MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 	// basic machine hardware
 	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_17_9712MHz/9)
 	MCFG_CPU_PROGRAM_MAP(compucolor2_mem)
@@ -394,18 +399,19 @@ static MACHINE_CONFIG_START( compucolor2, compucolor2_state )
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
+	MCFG_SCREEN_RAW_PARAMS(XTAL_17_9712MHz/2, 93*6, 0, 64*6, 268, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(compucolor2_state, screen_update)
-	MCFG_SCREEN_SIZE(64*6, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
 	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL_17_9712MHz/2)
 	MCFG_TMS9927_CHAR_WIDTH(6)
-	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w))
+	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE("blink", ripple_counter_device, clock_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
+
+	MCFG_DEVICE_ADD("blink", RIPPLE_COUNTER, 0) // 74LS393 at UG10
+	MCFG_RIPPLE_COUNTER_STAGES(8)
+	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w)) MCFG_DEVCB_BIT(4)
 
 	// devices
 	MCFG_DEVICE_ADD(TMS5501_TAG, TMS5501, XTAL_17_9712MHz/9)
@@ -455,4 +461,4 @@ ROM_START( compclr2 )
 	ROM_LOAD( "82s129.ug5", 0x00, 0x20, NO_DUMP ) // Color PROM
 ROM_END
 
-COMP( 1977, compclr2,    0,      0,      compucolor2,        compucolor2, driver_device, 0,      "Intelligent Systems Corporation",  "Compucolor II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1977, compclr2,    0,      0,      compucolor2,        compucolor2, compucolor2_state, 0,      "Intelligent Systems Corporation",  "Compucolor II",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

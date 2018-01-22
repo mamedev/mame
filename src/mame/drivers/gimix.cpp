@@ -33,6 +33,7 @@
 #include "machine/terminal.h"
 #include "machine/bankdev.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "formats/flex_dsk.h"
 #include "softlist.h"
 
@@ -97,9 +98,6 @@ public:
 		, m_dma_dip(*this, "dma_s2")
 	{}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	DECLARE_READ8_MEMBER(keyin_r);
-	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(system_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
@@ -108,7 +106,6 @@ public:
 	DECLARE_WRITE8_MEMBER(dma_w);
 	DECLARE_READ8_MEMBER(fdc_r);
 	DECLARE_WRITE8_MEMBER(fdc_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_READ8_MEMBER(pia_pa_r);
 	DECLARE_WRITE8_MEMBER(pia_pa_w);
 	DECLARE_READ8_MEMBER(pia_pb_r);
@@ -118,6 +115,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
+	void gimix(machine_config &config);
 private:
 	uint8_t m_term_data;
 	uint8_t m_dma_status;
@@ -141,7 +139,7 @@ private:
 	void refresh_memory();
 
 	required_device<cpu_device> m_maincpu;
-	required_device<fd1797_t> m_fdc;
+	required_device<fd1797_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<ram_device> m_ram;
@@ -176,15 +174,13 @@ private:
 
 static ADDRESS_MAP_START( gimix_banked_mem, AS_PROGRAM, 8, gimix_state)
 	AM_RANGE(0x00000, 0x0dfff) AM_RAMBANK("lower_ram")
-	AM_RANGE(0x0e000, 0x0e000) AM_DEVREADWRITE("acia1",acia6850_device,status_r,control_w)
-	AM_RANGE(0x0e001, 0x0e001) AM_DEVREADWRITE("acia1",acia6850_device,data_r,data_w)
-	AM_RANGE(0x0e004, 0x0e004) AM_DEVREADWRITE("acia2",acia6850_device,status_r,control_w)
-	AM_RANGE(0x0e005, 0x0e005) AM_DEVREADWRITE("acia2",acia6850_device,data_r,data_w)
+	AM_RANGE(0x0e000, 0x0e001) AM_DEVREADWRITE("acia1", acia6850_device, read, write)
+	AM_RANGE(0x0e004, 0x0e005) AM_DEVREADWRITE("acia2", acia6850_device, read, write)
 	//AM_RANGE(0x0e018, 0x0e01b) AM_READWRITE(fdc_r, fdc_w)  // FD1797 FDC (PIO)
 	AM_RANGE(0x0e100, 0x0e1ff) AM_RAM
 	//AM_RANGE(0x0e200, 0x0e20f) // 9511A / 9512 Arithmetic Processor
-	AM_RANGE(0x0e210, 0x0e21f) AM_DEVREADWRITE("timer",ptm6840_device,read,write)
-	AM_RANGE(0x0e220, 0x0e23f) AM_DEVREADWRITE("rtc",mm58167_device,read,write)
+	AM_RANGE(0x0e210, 0x0e21f) AM_DEVREADWRITE("timer", ptm6840_device, read, write)
+	AM_RANGE(0x0e220, 0x0e23f) AM_DEVREADWRITE("rtc", mm58167_device, read, write)
 	AM_RANGE(0x0e240, 0x0e3af) AM_RAM
 	AM_RANGE(0x0e3b0, 0x0e3b3) AM_READWRITE(dma_r, dma_w)  // DMA controller (custom?)
 	AM_RANGE(0x0e3b4, 0x0e3b7) AM_READWRITE(fdc_r, fdc_w)  // FD1797 FDC
@@ -225,23 +221,6 @@ static INPUT_PORTS_START( gimix )
 	PORT_DIPSETTING(0x00000100,"8\"")
 
 INPUT_PORTS_END
-
-READ8_MEMBER( gimix_state::keyin_r )
-{
-	uint8_t ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ8_MEMBER( gimix_state::status_r )
-{
-	return (m_term_data) ? 3 : 2;
-}
-
-WRITE8_MEMBER( gimix_state::kbd_put )
-{
-	m_term_data = data;
-}
 
 void gimix_state::refresh_memory()
 {
@@ -533,13 +512,6 @@ void gimix_state::driver_start()
 {
 }
 
-WRITE_LINE_MEMBER(gimix_state::write_acia_clock)
-{
-	m_acia1->write_txc(state);
-	m_acia1->write_rxc(state);
-	m_acia2->write_txc(state);
-	m_acia2->write_rxc(state);
-}
 
 TIMER_DEVICE_CALLBACK_MEMBER(gimix_state::test_timer_w)
 {
@@ -569,12 +541,12 @@ SLOT_INTERFACE_END
 MCFG_DEVICE_ADD(tag, ADDRESS_MAP_BANK, 0) \
 MCFG_DEVICE_PROGRAM_MAP(gimix_banked_mem) \
 MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE) \
-MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8) \
+MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8) \
 MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
-static MACHINE_CONFIG_START( gimix, gimix_state )
+MACHINE_CONFIG_START(gimix_state::gimix)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M6809E, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(gimix_mem)
 	MCFG_CPU_IO_MAP(gimix_io)
 
@@ -636,7 +608,10 @@ static MACHINE_CONFIG_START( gimix, gimix_state )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia4",acia6850_device,write_cts))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(gimix_state, write_acia_clock))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_rxc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia2", acia6850_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia2", acia6850_device, write_rxc))
 
 	/* banking */
 	MCFG_ADDRESS_BANK("bank1")
@@ -684,4 +659,4 @@ ROM_START( gimix )
 		ROM_LOAD( "gimixhd.h11",  0x000000, 0x001000, CRC(35c12201) SHA1(51ac9052f9757d79c7f5bd3aa5d8421e98cfcc37) )
 ROM_END
 
-COMP( 1980, gimix,    0,      0,      gimix,        gimix, driver_device, 0,      "Gimix",  "Gimix 6809 System",  MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1980, gimix,    0,      0,      gimix,        gimix, gimix_state, 0,      "Gimix",  "Gimix 6809 System",  MACHINE_IS_SKELETON )

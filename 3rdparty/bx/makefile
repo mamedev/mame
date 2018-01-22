@@ -1,21 +1,16 @@
 #
-# Copyright 2011-2015 Branimir Karadzic. All rights reserved.
-# License: http://www.opensource.org/licenses/BSD-2-Clause
+# Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+# License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 #
 
 GENIE=../bx/tools/bin/$(OS)/genie
 
 all:
-	$(GENIE) vs2008
-	$(GENIE) vs2010
 	$(GENIE) vs2012
 	$(GENIE) vs2013
 	$(GENIE) --gcc=android-arm gmake
 	$(GENIE) --gcc=android-mips gmake
 	$(GENIE) --gcc=android-x86 gmake
-	$(GENIE) --gcc=nacl gmake
-	$(GENIE) --gcc=nacl-arm gmake
-	$(GENIE) --gcc=pnacl gmake
 	$(GENIE) --gcc=mingw-gcc gmake
 	$(GENIE) --gcc=linux-gcc gmake
 	$(GENIE) --gcc=osx gmake
@@ -83,54 +78,11 @@ mingw-clang-release64: .build/projects/gmake-mingw-clang
 	make -R -C .build/projects/gmake-mingw-clang config=release64
 mingw-clang: mingw-clang-debug32 mingw-clang-release32 mingw-clang-debug64 mingw-clang-release64
 
-.build/projects/vs2008:
-	$(GENIE) vs2008
-vs2008-debug32:
-	devenv .build/projects/vs2008/bgfx.sln /Build "Debug|Win32"
-vs2008-release32:
-	devenv .build/projects/vs2008/bgfx.sln /Build "Release|Win32"
-vs2008-debug64:
-	devenv .build/projects/vs2008/bgfx.sln /Build "Debug|x64"
-vs2008-release64:
-	devenv .build/projects/vs2008/bgfx.sln /Build "Release|x64"
-vs2008: vs2008-debug32 vs2008-release32 vs2008-debug64 vs2008-release64
-
-.build/projects/vs2010:
-	$(GENIE) vs2010
-
 .build/projects/vs2012:
 	$(GENIE) vs2012
 
 .build/projects/vs2013:
 	$(GENIE) vs2013
-
-.build/projects/gmake-nacl:
-	$(GENIE) --gcc=nacl gmake
-nacl-debug32: .build/projects/gmake-nacl
-	make -R -C .build/projects/gmake-nacl config=debug32
-nacl-release32: .build/projects/gmake-nacl
-	make -R -C .build/projects/gmake-nacl config=release32
-nacl-debug64: .build/projects/gmake-nacl
-	make -R -C .build/projects/gmake-nacl config=debug64
-nacl-release64: .build/projects/gmake-nacl
-	make -R -C .build/projects/gmake-nacl config=release64
-nacl: nacl-debug32 nacl-release32 nacl-debug64 nacl-release64
-
-.build/projects/gmake-nacl-arm:
-	$(GENIE) --gcc=nacl-arm gmake
-nacl-arm-debug: .build/projects/gmake-nacl-arm
-	make -R -C .build/projects/gmake-nacl-arm config=debug
-nacl-arm-release: .build/projects/gmake-nacl-arm
-	make -R -C .build/projects/gmake-nacl-arm config=release
-nacl-arm: nacl-arm-debug32 nacl-arm-release32
-
-.build/projects/gmake-pnacl:
-	$(GENIE) --gcc=pnacl gmake
-pnacl-debug: .build/projects/gmake-pnacl
-	make -R -C .build/projects/gmake-pnacl config=debug
-pnacl-release: .build/projects/gmake-pnacl
-	make -R -C .build/projects/gmake-pnacl config=release
-pnacl: pnacl-debug pnacl-release
 
 .build/projects/gmake-osx:
 	$(GENIE) --gcc=osx gmake

@@ -275,7 +275,7 @@ static ADDRESS_MAP_START( puckpkmna_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0x70001c, 0x70001d) AM_READ(puckpkmna_70001c_r)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( puckpkmn, md_boot_state )
+MACHINE_CONFIG_START(md_boot_state::puckpkmn)
 	MCFG_FRAGMENT_ADD(md_ntsc)
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -285,19 +285,19 @@ static MACHINE_CONFIG_START( puckpkmn, md_boot_state )
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( puckpkmna, puckpkmn )
+MACHINE_CONFIG_DERIVED(md_boot_state::puckpkmna, puckpkmn)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(puckpkmna_map)
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jzth, puckpkmn )
+MACHINE_CONFIG_DERIVED(md_boot_state::jzth, puckpkmn)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(jzth_map)
@@ -382,7 +382,7 @@ DRIVER_INIT_MEMBER(md_boot_state,puckpkmn)
 	int i;
 
 	for (i = 0; i < len; i++)
-		rom[i] = BITSWAP8(rom[i],1,4,2,0,7,5,3,6);
+		rom[i] = bitswap<8>(rom[i],1,4,2,0,7,5,3,6);
 
 	DRIVER_INIT_CALL(megadriv);
 }
@@ -488,4 +488,4 @@ ROM_END
 GAME( 2000, puckpkmn, 0,        puckpkmn,  puckpkmn, md_boot_state, puckpkmn, ROT0, "Genie",                  "Puckman Pockimon (set 1)", 0 )
 GAME( 2000, puckpkmna,puckpkmn, puckpkmna, puckpkmn, md_boot_state, puckpkmn, ROT0, "IBS",                    "Puckman Pockimon (set 2)", 0 )
 GAME( 2000, puckpkmnb,puckpkmn, puckpkmna, puckpkmn, md_boot_state, puckpkmn, ROT0, "Sun Mixing",             "Puckman Pockimon (set 3)", 0 )
-GAME( 2000, jzth,     0,        jzth,      jzth, md_boot_state,     puckpkmn, ROT0, "<unknown>",              "Jue Zhan Tian Huang", MACHINE_IMPERFECT_SOUND )
+GAME( 2000, jzth,     0,        jzth,      jzth,     md_boot_state, puckpkmn, ROT0, "<unknown>",              "Jue Zhan Tian Huang", MACHINE_IMPERFECT_SOUND )

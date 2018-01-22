@@ -12,36 +12,46 @@ starts writing to unusual memory ports - either because the NMI/Interrupt
 timing is out, or the sheer fact that the Sound CPU code is rather poorly
 written, so it may be normal behaviour.
 
-Also, the OKI M6295 seems to be playing the wrong samples, however the current
-OKI M6295 sound ROM dump is bad.
-
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/okim6295.h"
-#include "sound/3526intf.h"
 #include "includes/bublbobl.h"
+
+#include "cpu/z80/z80.h"
+#include "sound/3526intf.h"
+#include "sound/okim6295.h"
+#include "machine/watchdog.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class missb2_state : public bublbobl_state
 {
 public:
 	missb2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: bublbobl_state(mconfig, type, tag),
-			m_bgvram(*this, "bgvram"),
-			m_bgpalette(*this, "bgpalette")
-			{ }
+		: bublbobl_state(mconfig, type, tag)
+		, m_bgvram(*this, "bgvram")
+		, m_bgpalette(*this, "bgpalette")
+		, m_oki(*this, "oki")
+	{ }
 
-	required_shared_ptr<uint8_t> m_bgvram;
-	required_device<palette_device> m_bgpalette;
 	DECLARE_WRITE8_MEMBER(missb2_bg_bank_w);
+	DECLARE_WRITE8_MEMBER(missb2_oki_w);
+	DECLARE_READ8_MEMBER(missb2_oki_r);
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 	DECLARE_DRIVER_INIT(missb2);
 	DECLARE_MACHINE_START(missb2);
 	DECLARE_MACHINE_RESET(missb2);
 	uint32_t screen_update_missb2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void missb2(machine_config &config);
+	void bublpong(machine_config &config);
+protected:
 	void configure_banks();
+
+	required_shared_ptr<uint8_t> m_bgvram;
+	required_device<palette_device> m_bgpalette;
+	required_device<okim6295_device> m_oki;
 };
 
 
@@ -154,18 +164,29 @@ WRITE8_MEMBER(missb2_state::missb2_bg_bank_w)
 	membank("bank3")->set_entry(bank);
 }
 
+WRITE8_MEMBER(missb2_state::missb2_oki_w)
+{
+	m_oki->write_command(bitswap<8>(data, 7,5,6,4,3,1,2,0));
+}
+
+READ8_MEMBER(missb2_state::missb2_oki_r)
+{
+	return bitswap<8>(m_oki->read_status(), 7,5,6,4,3,1,2,0);
+}
+
 /* Memory Maps */
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, missb2_state )
+static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_SHARE("objectram")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(bublbobl_sound_command_w)
-	AM_RANGE(0xfa03, 0xfa03) AM_WRITENOP // sound cpu reset
-	AM_RANGE(0xfa80, 0xfa80) AM_WRITENOP
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xfa00, 0xfa00) AM_MIRROR(0x007c) AM_DEVREAD("sound_to_main", generic_latch_8_device, read) AM_DEVWRITE("main_to_sound", generic_latch_8_device, write)
+	AM_RANGE(0xfa01, 0xfa01) AM_MIRROR(0x007c) AM_READ(common_sound_semaphores_r)
+	AM_RANGE(0xfa03, 0xfa03) AM_MIRROR(0x007c) AM_WRITE(bublbobl_soundcpu_reset_w)
+	AM_RANGE(0xfa80, 0xfa80) AM_MIRROR(0x007f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xfb40, 0xfb40) AM_WRITE(bublbobl_bankswitch_w)
 	AM_RANGE(0xfc00, 0xfcff) AM_RAM
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM         // ???
@@ -179,12 +200,12 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0xff98, 0xff98) AM_WRITENOP    // ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, missb2_state )
+static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")    // ROM data for the background palette ram
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")    // ROM data for the background palette ram
 	AM_RANGE(0xb000, 0xb1ff) AM_ROM         // banked ???
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("bgpalette", palette_device, write) AM_SHARE("bgpalette")
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("bgpalette", palette_device, write8) AM_SHARE("bgpalette")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM         // main ???
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(missb2_bg_bank_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP
@@ -193,15 +214,16 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, missb2_state )
 ADDRESS_MAP_END
 
 // Looks like the original bublbobl code modified to support the OKI M6295.
-
+// due to some really wacky bugs in the way the oki6295 was hacked in place, writes will happen to
+// many addresses other than 9000: 9000-9001, 0000-0001, 3827-3828, 44a8-44a9
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
-	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP // message for main cpu
-	AM_RANGE(0xb001, 0xb001) AM_READNOP AM_WRITE(bublbobl_sh_nmi_enable_w)  // bit 0: message pending for main cpu, bit 1: message pending for sound cpu
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(bublbobl_sh_nmi_disable_w)
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE(missb2_oki_r, missb2_oki_w) //AM_MIRROR(0x0fff) ???
+	AM_RANGE(0xa000, 0xa001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
+	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x0ffc) AM_DEVREAD("main_to_sound", generic_latch_8_device, read) AM_DEVWRITE("sound_to_main", generic_latch_8_device, write)
+	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x0ffc) AM_READ(common_sound_semaphores_r) AM_DEVWRITE("soundnmi", input_merger_device, in_set<0>)
+	AM_RANGE(0xb002, 0xb002) AM_MIRROR(0x0ffc) AM_DEVWRITE("soundnmi", input_merger_device, in_clear<0>)
 	AM_RANGE(0xe000, 0xefff) AM_ROM         // space for diagnostic ROM?
 ADDRESS_MAP_END
 
@@ -421,28 +443,27 @@ MACHINE_START_MEMBER(missb2_state,missb2)
 {
 	m_gfxdecode->gfx(1)->set_palette(*m_bgpalette);
 
-	save_item(NAME(m_sound_nmi_enable));
-	save_item(NAME(m_pending_nmi));
-	save_item(NAME(m_sound_status));
+	m_sreset_old = CLEAR_LINE;
 	save_item(NAME(m_video_enable));
+	save_item(NAME(m_sreset_old));
 }
 
 MACHINE_RESET_MEMBER(missb2_state,missb2)
 {
-	m_sound_nmi_enable = 0;
-	m_pending_nmi = 0;
-	m_sound_status = 0;
+	MACHINE_RESET_CALL_MEMBER(common);
+	m_oki->reset();
+	bublbobl_bankswitch_w(m_maincpu->device_t::memory().space(AS_PROGRAM), 0, 0x00, 0xFF); // force a bankswitch write of all zeroes, as /RESET clears the latch
 }
 
-static MACHINE_CONFIG_START( missb2, missb2_state )
+MACHINE_CONFIG_START(missb2_state::missb2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)   // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("slave", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_CPU_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_CPU_PROGRAM_MAP(subcpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)  // 3 MHz
@@ -450,6 +471,9 @@ static MACHINE_CONFIG_START( missb2, missb2_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", missb2_state,  irq0_line_hold)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 128);
 
 	MCFG_MACHINE_START_OVERRIDE(missb2_state,missb2)
 	MCFG_MACHINE_RESET_OVERRIDE(missb2_state,missb2)
@@ -474,17 +498,23 @@ static MACHINE_CONFIG_START( missb2, missb2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+
+	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("soundnmi", input_merger_device, in_w<1>))
+
+	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, MAIN_XTAL/8)
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(missb2_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bublpong, missb2 )
+MACHINE_CONFIG_DERIVED(missb2_state::bublpong, missb2)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bublpong)
 MACHINE_CONFIG_END
 
@@ -497,7 +527,7 @@ ROM_START( missb2 )
 	ROM_LOAD( "msbub2-u.203", 0x10000, 0x10000, CRC(29fd8afe) SHA1(94ead80d20cd3974dd4fb0358915e3bd8b793158) )
 	/* 20000-2ffff empty */
 
-	ROM_REGION( 0x10000, "slave", 0 ) /* 64k for the second CPU */
+	ROM_REGION( 0x10000, "subcpu", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "msbub2-u.11",  0x0000, 0x10000, CRC(003dc092) SHA1(dff3c2b31d0804a308e5c42cf9705cd3d6144ad7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the third CPU */
@@ -516,7 +546,8 @@ ROM_START( missb2 )
 	ROM_LOAD16_BYTE( "msbub2-u.ic4", 0x000000, 0x80000, CRC(be71c9f0) SHA1(1961e931017f644486cea0ce431d50973679c848) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* samples */
-	ROM_LOAD( "msbub2-u.13", 0x00000, 0x20000, BAD_DUMP CRC(14f07386) SHA1(097897d92226f900e11dbbdd853aff3ac46ff016) )
+	//ROM_LOAD( "msbub2-u.13", 0x00000, 0x20000, BAD_DUMP CRC(14f07386) SHA1(097897d92226f900e11dbbdd853aff3ac46ff016) ) // this dump is bad, it has data of 0xFF for every address (only after and including address 0xB57E) where the low 8 bits of the address are in the range 0x40-0xBF. the rom from bublpong below has the same sample index at the beginning, and has the missing data intact, plus all the present data is a 1:1 match.
+	ROM_LOAD( "msbub2-u.13", 0x00000, 0x20000, BAD_DUMP CRC(7a4f4272) SHA1(07712494f5166bcc8156a2152ae552a74f2184eb) ) // taken from bublpong ic13, probably correct but marked as bad until redump
 
 	/* I doubt this prom is on the board, it's loaded so we can share video emulation with bubble bobble */
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -530,7 +561,7 @@ ROM_START( bublpong )
 	ROM_LOAD( "u203", 0x10000, 0x10000, CRC(29fd8afe) SHA1(94ead80d20cd3974dd4fb0358915e3bd8b793158) )
 	/* 20000-2ffff empty */
 
-	ROM_REGION( 0x10000, "slave", 0 ) /* 64k for the second CPU */
+	ROM_REGION( 0x10000, "subcpu", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "ic11",  0x0000, 0x10000, CRC(dc1c72ba) SHA1(89b3835884f46bea1ca49356a1faeddd87f772c9) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the third CPU */
@@ -560,13 +591,13 @@ ROM_END
 void missb2_state::configure_banks()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	uint8_t *SLAVE = memregion("slave")->base();
+	uint8_t *SUBCPU = memregion("subcpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	/* 2009-11 FP: isn't there a way to configure both at once? */
-	membank("bank2")->configure_entries(0, 7, &SLAVE[0x8000], 0x1000);
-	membank("bank3")->configure_entries(0, 7, &SLAVE[0x9000], 0x1000);
+	membank("bank2")->configure_entries(0, 7, &SUBCPU[0x8000], 0x1000);
+	membank("bank3")->configure_entries(0, 7, &SUBCPU[0x9000], 0x1000);
 }
 
 DRIVER_INIT_MEMBER(missb2_state,missb2)
@@ -578,4 +609,4 @@ DRIVER_INIT_MEMBER(missb2_state,missb2)
 /* Game Drivers */
 
 GAME( 1996, missb2,   0,      missb2,   missb2, missb2_state, missb2, ROT0,  "Alpha Co.", "Miss Bubble II",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bublpong, missb2, bublpong, missb2, missb2_state, missb2, ROT0,  "Top Ltd.", "Bubble Pong Pong",  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bublpong, missb2, bublpong, missb2, missb2_state, missb2, ROT0,  "Top Ltd.",  "Bubble Pong Pong", MACHINE_SUPPORTS_SAVE )

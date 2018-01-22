@@ -130,6 +130,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "mcs51.h"
+#include "mcs51dasm.h"
 
 #define VERBOSE 0
 
@@ -221,20 +222,20 @@ enum
 };
 
 
-const device_type I8031 = &device_creator<i8031_device>;
-const device_type I8032 = &device_creator<i8032_device>;
-const device_type I8051 = &device_creator<i8051_device>;
-const device_type I8751 = &device_creator<i8751_device>;
-const device_type I8052 = &device_creator<i8052_device>;
-const device_type I8752 = &device_creator<i8752_device>;
-const device_type I80C31 = &device_creator<i80c31_device>;
-const device_type I80C51 = &device_creator<i80c51_device>;
-const device_type I87C51 = &device_creator<i87c51_device>;
-const device_type I80C32 = &device_creator<i80c32_device>;
-const device_type I80C52 = &device_creator<i80c52_device>;
-const device_type I87C52 = &device_creator<i87c52_device>;
-const device_type AT89C4051 = &device_creator<at89c4051_device>;
-const device_type DS5002FP = &device_creator<ds5002fp_device>;
+DEFINE_DEVICE_TYPE(I8031, i8031_device, "i8031", "I8031")
+DEFINE_DEVICE_TYPE(I8032, i8032_device, "i8032", "I8032")
+DEFINE_DEVICE_TYPE(I8051, i8051_device, "i8051", "I8051")
+DEFINE_DEVICE_TYPE(I8751, i8751_device, "i8751", "I8751")
+DEFINE_DEVICE_TYPE(I8052, i8052_device, "i8052", "I8052")
+DEFINE_DEVICE_TYPE(I8752, i8752_device, "i8752", "I8752")
+DEFINE_DEVICE_TYPE(I80C31, i80c31_device, "i80c31", "I80C31")
+DEFINE_DEVICE_TYPE(I80C51, i80c51_device, "i80c51", "I80C51")
+DEFINE_DEVICE_TYPE(I87C51, i87c51_device, "i87c51", "I87C51")
+DEFINE_DEVICE_TYPE(I80C32, i80c32_device, "i80c32", "I80C32")
+DEFINE_DEVICE_TYPE(I80C52, i80c52_device, "i80c52", "I80C52")
+DEFINE_DEVICE_TYPE(I87C52, i87c52_device, "i87c52", "I87C52")
+DEFINE_DEVICE_TYPE(AT89C4051, at89c4051_device, "at89c4051", "AT89C4051")
+DEFINE_DEVICE_TYPE(DS5002FP, ds5002fp_device, "ds5002fp", "DS5002FP")
 
 
 /***************************************************************************
@@ -250,27 +251,30 @@ static ADDRESS_MAP_START(program_13bit, AS_PROGRAM, 8, mcs51_cpu_device)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_7bit, AS_DATA, 8, mcs51_cpu_device)
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM /* SFR */
+	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("scratchpad")
+	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("sfr_ram") /* SFR */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, mcs51_cpu_device)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM /* SFR */
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("scratchpad")
+	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("sfr_ram") /* SFR */
 ADDRESS_MAP_END
 
 
-mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
-	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0
-		, ( ( program_width == 12 ) ? ADDRESS_MAP_NAME(program_12bit) : ( ( program_width == 13 ) ? ADDRESS_MAP_NAME(program_13bit) : nullptr ) ))
-	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0
-		, ( ( data_width == 7 ) ? ADDRESS_MAP_NAME(data_7bit) : ( ( data_width == 8 ) ? ADDRESS_MAP_NAME(data_8bit) : nullptr ) ))
+
+mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0,
+			(program_width == 12) ? ADDRESS_MAP_NAME(program_12bit) : (program_width == 13) ? ADDRESS_MAP_NAME(program_13bit) : nullptr)
+	, m_data_config("data", ENDIANNESS_LITTLE, 8, 9, 0,
+			 (data_width == 7) ? ADDRESS_MAP_NAME(data_7bit) : (data_width == 8) ? ADDRESS_MAP_NAME(data_8bit) : nullptr )
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 18, 0)
 	, m_pc(0)
 	, m_features(features)
 	, m_ram_mask( (data_width == 8) ? 0xFF : 0x7F )
 	, m_num_interrupts(5)
+	, m_sfr_ram(*this, "sfr_ram")
+	, m_scratchpad(*this, "scratchpad")
 	, m_serial_tx_cb(*this)
 	, m_serial_rx_cb(*this)
 	, m_rtemp(0)
@@ -287,92 +291,103 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 
 
 i8031_device::i8031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs51_cpu_device(mconfig, I8031, "I8031", tag, owner, clock, "i8031", 0, 7)
+	: mcs51_cpu_device(mconfig, I8031, tag, owner, clock, 0, 7)
 {
 }
 
 i8051_device::i8051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs51_cpu_device(mconfig, I8051, "I8051", tag, owner, clock, "i8051", 12, 7)
+	: mcs51_cpu_device(mconfig, I8051, tag, owner, clock, 12, 7)
 {
 }
 
 i8751_device::i8751_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs51_cpu_device(mconfig, I8751, "I8751", tag, owner, clock, "i8751", 12, 7)
+	: mcs51_cpu_device(mconfig, I8751, tag, owner, clock, 12, 7)
 {
 }
 
-i8052_device::i8052_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features)
-	: mcs51_cpu_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_I8052)
+i8052_device::i8052_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
+	: mcs51_cpu_device(mconfig, type, tag, owner, clock, program_width, data_width, features | FEATURE_I8052)
 {
 	m_num_interrupts = 6;
 }
 
 i8052_device::i8052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs51_cpu_device(mconfig, I8052, "I8052", tag, owner, clock, "i8052", 13, 8, FEATURE_I8052)
+	: i8052_device(mconfig, I8052, tag, owner, clock, 13, 8)
 {
-	m_num_interrupts = 6;
 }
 
 i8032_device::i8032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8052_device(mconfig, I8032, "I8032", tag, owner, clock, "i8032", 0, 8)
+	: i8052_device(mconfig, I8032, tag, owner, clock, 0, 8)
 {
 }
 
 i8752_device::i8752_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8052_device(mconfig, I8752, "I8752", tag, owner, clock, "i8752", 13, 8)
+	: i8052_device(mconfig, I8752, tag, owner, clock, 13, 8)
 {
 }
 
 i80c31_device::i80c31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8052_device(mconfig, I80C31, "I80C31", tag, owner, clock, "i80c31", 0, 7)
+	: i8052_device(mconfig, I80C31, tag, owner, clock, 0, 7)
 {
 }
 
-i80c51_device::i80c51_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features)
-	: mcs51_cpu_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_CMOS)
+i80c51_device::i80c51_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
+	: mcs51_cpu_device(mconfig, type, tag, owner, clock, program_width, data_width, features | FEATURE_CMOS)
 {
 }
 
 i80c51_device::i80c51_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs51_cpu_device(mconfig, I80C51, "I80C51", tag, owner, clock, "i80c51", 12, 7)
+	: i80c51_device(mconfig, I80C51, tag, owner, clock, 12, 7)
 {
 }
 
 i87c51_device::i87c51_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i80c51_device(mconfig, I87C51, "I87C51", tag, owner, clock, "i87c51", 12, 7)
+	: i80c51_device(mconfig, I87C51, tag, owner, clock, 12, 7)
 {
 }
 
 
-i80c52_device::i80c52_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features)
-	: i8052_device(mconfig, type, name, tag, owner, clock, shortname, program_width, data_width, features | FEATURE_I80C52 | FEATURE_CMOS)
+i80c52_device::i80c52_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int program_width, int data_width, uint8_t features)
+	: i8052_device(mconfig, type, tag, owner, clock, program_width, data_width, features | FEATURE_I80C52 | FEATURE_CMOS)
 {
 }
 
 i80c52_device::i80c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i8052_device(mconfig, I80C52, "I80C52", tag, owner, clock, "i80C52", 13, 8, FEATURE_I80C52 | FEATURE_CMOS)
+	: i80c52_device(mconfig, I80C52, tag, owner, clock, 13, 8)
 {
 }
 
 i80c32_device::i80c32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i80c52_device(mconfig, I80C32, "I80C32", tag, owner, clock, "i80c32", 0, 8)
+	: i80c52_device(mconfig, I80C32, tag, owner, clock, 0, 8)
 {
 }
 
 
 i87c52_device::i87c52_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i80c52_device(mconfig, I87C52, "I87C52", tag, owner, clock, "i87c52", 13, 8)
+	: i80c52_device(mconfig, I87C52, tag, owner, clock, 13, 8)
 {
 }
 
 at89c4051_device::at89c4051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i80c51_device(mconfig, AT89C4051, "AT89C4051", tag, owner, clock, "at89c4051", 12, 7)
+	: i80c51_device(mconfig, AT89C4051, tag, owner, clock, 12, 7)
 {
 }
 
+/* program width field is set to 0 because technically the SRAM isn't internal */
 ds5002fp_device::ds5002fp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mcs51_cpu_device(mconfig, DS5002FP, "DS5002FP", tag, owner, clock, "ds5002fp", 12, 7, FEATURE_DS5002FP | FEATURE_CMOS)
+	: mcs51_cpu_device(mconfig, DS5002FP, tag, owner, clock, 0, 7, FEATURE_DS5002FP | FEATURE_CMOS)
+	, device_nvram_interface(mconfig, *this)
+	, m_region(*this, "internal")
 {
+}
+
+device_memory_interface::space_config_vector mcs51_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_DATA,    &m_data_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 
@@ -455,7 +470,7 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m
 #define B           SFR_A(ADDR_B)
 #define SBUF        SFR_A(ADDR_SBUF)
 
-#define R_REG(r)    m_internal_ram[(r) | (PSW & 0x18)]
+#define R_REG(r)    m_scratchpad[(r) | (PSW & 0x18)]
 #define DPTR        ((DPH<<8) | DPL)
 
 /* 8052 Only registers */
@@ -514,7 +529,7 @@ void mcs51_cpu_device::iram_iwrite(offs_t a, uint8_t d) { if (a <= m_ram_mask) m
 #define SET_SBUF(v) SET_SFR_A(ADDR_SBUF, v)
 
 /* No actions triggered on write */
-#define SET_REG(r, v)   do { m_internal_ram[(r) | (PSW & 0x18)] = (v); } while (0)
+#define SET_REG(r, v)   do { m_scratchpad[(r) | (PSW & 0x18)] = (v); } while (0)
 
 #define SET_DPTR(n)     do { DPH = ((n) >> 8) & 0xff; DPL = (n) & 0xff; } while (0)
 
@@ -731,12 +746,6 @@ void mcs51_cpu_device::clear_current_irq()
 uint8_t mcs51_cpu_device::r_acc() { return SFR_A(ADDR_ACC); }
 
 uint8_t mcs51_cpu_device::r_psw() { return SFR_A(ADDR_PSW); }
-
-void mcs51_cpu_device::update_ptrs()
-{
-	m_internal_ram = (uint8_t *)m_data->get_write_ptr(0x00);
-	m_sfr_ram = (uint8_t *)m_data->get_write_ptr(0x100);
-}
 
 
 /* Generate an external ram address for read/writing using indirect addressing mode */
@@ -1844,7 +1853,7 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 	 *
 	 */
 	uint32_t new_state = (m_last_line_state & ~(1 << irqline)) | ((state != CLEAR_LINE) << irqline);
-	/* detect 0->1 transistions */
+	/* detect 0->1 transitions */
 	uint32_t tr_state = (~m_last_line_state) & new_state;
 
 	switch( irqline )
@@ -1949,8 +1958,6 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 void mcs51_cpu_device::execute_run()
 {
 	uint8_t op;
-
-	update_ptrs();
 
 	/* external interrupts may have been set since we last checked */
 	m_inst_cycles = 0;
@@ -2095,12 +2102,9 @@ uint8_t mcs51_cpu_device::sfr_read(size_t offset)
 void mcs51_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);
-
-	/* ensure these pointers are set before get_info is called */
-	update_ptrs();
 
 	m_serial_rx_cb.resolve_safe(0);
 	m_serial_tx_cb.resolve_safe();
@@ -2224,8 +2228,6 @@ void mcs51_cpu_device::state_string_export(const device_state_entry &entry, std:
 /* Reset registers to the initial values */
 void mcs51_cpu_device::device_reset()
 {
-	update_ptrs();
-
 	m_last_line_state = 0;
 	m_t0_cnt = 0;
 	m_t1_cnt = 0;
@@ -2284,11 +2286,11 @@ void mcs51_cpu_device::device_reset()
 	{
 		// set initial values (some of them are set using the bootstrap loader)
 		PCON = 0;
-		MCON = m_ds5002fp.mcon & 0xfb;
-		RPCTL = m_ds5002fp.rpctl & 0x01;
+		MCON = m_sfr_ram[ADDR_MCON-0x80];
+		RPCTL = m_sfr_ram[ADDR_RPCTL-0x80];
 		RPS = 0;
 		RNR = 0;
-		CRCR = m_ds5002fp.crc & 0xf0;
+		CRCR = m_sfr_ram[ADDR_CRCR-0x80];
 		CRCL = 0;
 		CRCH = 0;
 		TA = 0;
@@ -2450,7 +2452,7 @@ uint8_t ds5002fp_device::sfr_read(size_t offset)
 		case ADDR_MCON:     DS5_LOGR(MCON, data);       break;
 		case ADDR_TA:       DS5_LOGR(TA, data);         break;
 		case ADDR_RNR:      DS5_LOGR(RNR, data);        break;
-		case ADDR_RPCTL:    DS5_LOGR(RPCTL, data);      break;
+		case ADDR_RPCTL:    DS5_LOGR(RPCTL, data); return 0x80; break; /* touchgo stalls unless bit 7 is set, why? documentation is unclear */
 		case ADDR_RPS:      DS5_LOGR(RPS, data);        break;
 		case ADDR_PCON:
 			SET_PFW(0);     /* reset PFW flag */
@@ -2461,44 +2463,76 @@ uint8_t ds5002fp_device::sfr_read(size_t offset)
 	return m_data->read_byte((size_t) offset | 0x100);
 }
 
+/*
+Documentation states that having the battery connected "maintains the internal scratchpad RAM" and "certain SFRs"
+(although it isn't clear exactly which SFRs except for those explicitly mentioned)
+*/
 
-offs_t mcs51_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+void ds5002fp_device::nvram_default()
 {
-	extern CPU_DISASSEMBLE( i8051 );
-	return CPU_DISASSEMBLE_NAME(i8051)(this, buffer, pc, oprom, opram, options);
+	memset( m_scratchpad, 0, 0x80 );
+	memset( m_sfr_ram, 0, 0x80 );
+
+	int expected_bytes = 0x80 + 0x80;
+
+	if (!m_region.found())
+	{
+		logerror( "ds5002fp_device region not found\n" );
+	}
+	else if( m_region->bytes() != expected_bytes )
+	{
+		logerror( "ds5002fp_device region length 0x%x expected 0x%x\n", m_region->bytes(), expected_bytes );
+	}
+	else
+	{
+		uint8_t *region = m_region->base();
+
+		memcpy( m_scratchpad, region, 0x80 ); region += 0x80;
+		memcpy( m_sfr_ram, region, 0x80 ); region += 0x80;
+		/* does anything else need storing? any registers that aren't in sfr ram?
+		   It isn't clear if the various initial MCON registers etc. are just stored in sfr ram
+		   or if the DS5002FP stores them elsewhere and the bootstrap copies them */
+	}
 }
 
-
-offs_t i8052_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+void ds5002fp_device::nvram_read( emu_file &file )
 {
-	extern CPU_DISASSEMBLE( i8052 );
-	return CPU_DISASSEMBLE_NAME(i8052)(this, buffer, pc, oprom, opram, options);
+	file.read( m_scratchpad, 0x80 );
+	file.read( m_sfr_ram, 0x80 );
 }
 
-
-offs_t i80c31_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+void ds5002fp_device::nvram_write( emu_file &file )
 {
-	extern CPU_DISASSEMBLE( i80c51 );
-	return CPU_DISASSEMBLE_NAME(i80c51)(this, buffer, pc, oprom, opram, options);
+	file.write( m_scratchpad, 0x80 );
+	file.write( m_sfr_ram, 0x80 );
 }
 
-
-offs_t i80c51_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mcs51_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i80c51 );
-	return CPU_DISASSEMBLE_NAME(i80c51)(this, buffer, pc, oprom, opram, options);
+	return new i8051_disassembler;
 }
 
-
-offs_t i80c52_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i8052_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( i80c52 );
-	return CPU_DISASSEMBLE_NAME(i80c52)(this, buffer, pc, oprom, opram, options);
+	return new i8052_disassembler;
 }
 
-
-offs_t ds5002fp_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *i80c31_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( ds5002fp );
-	return CPU_DISASSEMBLE_NAME(ds5002fp)(this, buffer, pc, oprom, opram, options);
+	return new i80c51_disassembler;
+}
+
+util::disasm_interface *i80c51_device::create_disassembler()
+{
+	return new i80c51_disassembler;
+}
+
+util::disasm_interface *i80c52_device::create_disassembler()
+{
+	return new i80c52_disassembler;
+}
+
+util::disasm_interface *ds5002fp_device::create_disassembler()
+{
+	return new ds5002fp_disassembler;
 }

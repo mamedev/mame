@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /***************************************************************************
 
@@ -85,13 +85,10 @@ WRITE8_MEMBER(nycaptor_state::nycaptor_videoram_w)
 
 WRITE8_MEMBER(nycaptor_state::nycaptor_palette_w)
 {
-	if (m_gametype == 2) //colt
-		return;
-
 	if (offset & 0x100)
-		m_palette->write_ext(space, (offset & 0xff) + (m_palette_bank << 8), data);
+		m_palette->write8_ext(space, (offset & 0xff) + (m_palette_bank << 8), data);
 	else
-		m_palette->write(space, (offset & 0xff) + (m_palette_bank << 8), data);
+		m_palette->write8(space, (offset & 0xff) + (m_palette_bank << 8), data);
 }
 
 READ8_MEMBER(nycaptor_state::nycaptor_palette_r)

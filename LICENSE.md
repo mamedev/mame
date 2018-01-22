@@ -1,10 +1,10 @@
 The source code to MAME is provided under the GNU General Public License version 2 or later as of Git revision 35ccf865aa366845b574e1fdbc71c4866b3d6a0f and the release of MAME 0.172. Source files may also be licensed as specified in the file header. This license does not apply to prior versions of MAME.
 
-MAME is a registered trademark of Nicola Salmoria.
+MAME is a registered trademark of Gregory Ember.
 
 The text of version 2 of the GNU General Public License follows.
 
-    Copyright (C) 1997-2016  MAMEDev and contributors
+    Copyright (C) 1997-2017  MAMEDev and contributors
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

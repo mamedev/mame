@@ -9,24 +9,31 @@
 \**************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "unsp.h"
+#include "unspdasm.h"
+#include "debugger.h"
 
 
-const device_type UNSP = &device_creator<unsp_device>;
+DEFINE_DEVICE_TYPE(UNSP, unsp_device, "unsp", "u'nSP")
 
 
 unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, UNSP, "u'nSP", tag, owner, clock, "unsp", __FILE__)
-	, m_program_config("program", ENDIANNESS_BIG, 16, 23, -1), m_irq(0), m_fiq(0), m_curirq(0), m_sirq(0), m_sb(0), m_saved_sb(0), m_program(nullptr), m_icount(0), m_debugger_temp(0)
+	: cpu_device(mconfig, UNSP, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 16, 23, -1)
+	, m_irq(0), m_fiq(0), m_curirq(0), m_sirq(0), m_sb(0), m_saved_sb(0), m_program(nullptr), m_icount(0), m_debugger_temp(0)
 {
 }
 
-
-offs_t unsp_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+device_memory_interface::space_config_vector unsp_device::memory_space_config() const
 {
-	extern CPU_DISASSEMBLE( unsp );
-	return CPU_DISASSEMBLE_NAME(unsp)(this, buffer, pc, oprom, opram, options);
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
+
+util::disasm_interface *unsp_device::create_disassembler()
+{
+	return new unsp_disassembler;
 }
 
 
@@ -109,12 +116,12 @@ void unsp_device::unimplemented_opcode(uint16_t op)
 
 uint16_t unsp_device::READ16(uint32_t address)
 {
-	return m_program->read_word(address<<1);
+	return m_program->read_word(address);
 }
 
 void unsp_device::WRITE16(uint32_t address, uint16_t data)
 {
-	m_program->write_word(address<<1, data);
+	m_program->write_word(address, data);
 }
 
 /*****************************************************************************/

@@ -148,7 +148,7 @@ if not args.quiet:
     print('Current version: {version} (revision {revision})\n'.format(version = version, revision = revision))
 
 
-processed_files = [os.path.join(script_path, 'sol', x) for x in ('state.hpp', 'object.hpp', 'function.hpp', 'coroutine.hpp')]
+processed_files = [os.path.join(script_path, x) for x in ['sol.hpp']]
 result = ''
 
 ss = StringIO()

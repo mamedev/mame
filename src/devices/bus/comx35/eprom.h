@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_COMX35_EPROM_H
+#define MAME_BUS_COMX35_EPROM_H
+
 #pragma once
 
-#ifndef __COMX_EPR__
-#define __COMX_EPR__
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -50,7 +49,7 @@ private:
 
 
 // device type definition
-extern const device_type COMX_EPR;
+DECLARE_DEVICE_TYPE(COMX_EPR, comx_epr_device)
 
 
-#endif
+#endif // MAME_BUS_COMX35_EPROM_H

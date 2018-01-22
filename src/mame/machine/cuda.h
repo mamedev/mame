@@ -5,7 +5,6 @@
 #ifndef __CUDA_H__
 #define __CUDA_H__
 
-#include "emu.h"
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -108,7 +107,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	required_device<cpu_device> m_maincpu;
@@ -136,6 +135,6 @@ private:
 };
 
 // device type definition
-extern const device_type CUDA;
+DECLARE_DEVICE_TYPE(CUDA, cuda_device)
 
 #endif

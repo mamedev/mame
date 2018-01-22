@@ -13,6 +13,7 @@
 #include "video/tlc34076.h"
 #include "sound/bsmt2000.h"
 #include "machine/nvram.h"
+#include "screen.h"
 
 class btoads_state : public driver_device
 {
@@ -65,6 +66,7 @@ public:
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 
+	void btoads(machine_config &config);
 protected:
 	// device overrides
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

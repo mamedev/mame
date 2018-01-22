@@ -39,6 +39,7 @@ public:
 	bool m_sys_mode;
 	uint8_t m_prot[256];
 	uint16_t m_viol[16];
+	void altos486(machine_config &config);
 };
 
 READ8_MEMBER(altos486_state::read_rmx_ack)
@@ -51,15 +52,15 @@ READ8_MEMBER(altos486_state::read_rmx_ack)
 
 READ16_MEMBER(altos486_state::mmu_ram_r)
 {
-	if(offset < 0x7e000)
+	if (offset < 0x7e000)
 		return m_ram[offset]; // TODO
 	else
-		return m_rom->u16(offset - 0x7e000);
+		return m_rom->as_u16(offset - 0x7e000);
 }
 
 READ16_MEMBER(altos486_state::mmu_io_r)
 {
-	if(!m_sys_mode)
+	if (!m_sys_mode)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		return 0;
@@ -119,7 +120,7 @@ static ADDRESS_MAP_START(altos486_z80_io, AS_IO, 8, altos486_state)
 	//AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("sio2", z80sio0_device, read, write)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( altos486, altos486_state )
+MACHINE_CONFIG_START(altos486_state::altos486)
 	MCFG_CPU_ADD("maincpu", I80186, XTAL_8MHz)
 	MCFG_CPU_PROGRAM_MAP(altos486_mem)
 	MCFG_CPU_IO_MAP(altos486_io)
@@ -129,14 +130,18 @@ static MACHINE_CONFIG_START( altos486, altos486_state )
 	MCFG_CPU_PROGRAM_MAP(altos486_z80_mem)
 	MCFG_CPU_IO_MAP(altos486_z80_io)
 
-	MCFG_PIC8259_ADD("pic8259", DEVWRITELINE("maincpu", i80186_cpu_device, int0_w), VCC, READ8(altos486_state, read_rmx_ack))
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
+	MCFG_PIC8259_IN_SP_CB(VCC)
+	MCFG_PIC8259_CASCADE_ACK_CB(READ8(altos486_state, read_rmx_ack))
+
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
 	MCFG_UPD765A_ADD("fdc", false, false)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos486_floppies, "525qd", altos486_state::floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
-	MCFG_Z80SIO0_ADD("sio0", 4000000, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("sio0", Z80SIO0, 4000000)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
@@ -144,7 +149,8 @@ static MACHINE_CONFIG_START( altos486, altos486_state )
 	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
 	//MCFG_Z80DART_OUT_INT_CB(WRITELINE(altos486_state, sio_interrupt))
-	MCFG_Z80SIO0_ADD("sio1", 4000000, 0, 0, 0, 0)
+
+	MCFG_DEVICE_ADD("sio1", Z80SIO0, 4000000)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232c", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232c", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232c", rs232_port_device, write_rts))
@@ -152,13 +158,14 @@ static MACHINE_CONFIG_START( altos486, altos486_state )
 	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("rs232d", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("rs232d", rs232_port_device, write_rts))
 	//MCFG_Z80DART_OUT_INT_CB(WRITELINE(altos486_state, sio_interrupt))
-	MCFG_Z80SIO0_ADD("sio2", 4000000, 0, 0, 0, 0)
+
+	MCFG_DEVICE_ADD("sio2", Z80SIO0, 4000000)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232_lp", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232_lp", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232_lp", rs232_port_device, write_rts))
 	//MCFG_Z80DART_OUT_INT_CB(WRITELINE(altos486_state, sio_interrupt))
 
-	MCFG_I8274_ADD("i8274", XTAL_16MHz/4, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD("i8274", I8274, XTAL_16MHz/4)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs422_wn", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs422_wn", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs422_wn", rs232_port_device, write_rts))
@@ -219,4 +226,4 @@ ROM_START( altos486 )
 	ROM_LOAD("16019_z80.bin", 0x0000, 0x1000, CRC(68b1b2e1) SHA1(5d83609a465029212d5e3f72ac9c520b3dbed838))
 ROM_END
 
-COMP( 1984, altos486, 0, 0, altos486, 0, driver_device, 0, "Altos Computer Systems", "Altos 486",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1984, altos486, 0, 0, altos486, 0, altos486_state, 0, "Altos Computer Systems", "Altos 486",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

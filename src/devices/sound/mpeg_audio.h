@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef __MPEG_AUDIO_H__
-#define __MPEG_AUDIO_H__
+#ifndef MAME_SOUND_MPEG_AUDIO_H
+#define MAME_SOUND_MPEG_AUDIO_H
+
+#pragma once
 
 class mpeg_audio {
 public:
@@ -90,6 +92,7 @@ private:
 	double subbuffer[2][32];
 	double audio_buffer[2][32*32];
 	int audio_buffer_pos[2];
+	double m_cos_cache[32][32];
 
 	int current_pos, current_limit;
 
@@ -125,4 +128,4 @@ private:
 	}
 };
 
-#endif
+#endif // MAME_SOUND_MPEG_AUDIO_H

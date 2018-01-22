@@ -9,27 +9,24 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "cdrom.h"
 #include "chd_cd.h"
 
+#include "cdrom.h"
+
 // device type definition
-const device_type CDROM = &device_creator<cdrom_image_device>;
+DEFINE_DEVICE_TYPE(CDROM, cdrom_image_device, "cdrom_image", "CD-ROM Image")
 
 //-------------------------------------------------
 //  cdrom_image_device - constructor
 //-------------------------------------------------
 
 cdrom_image_device::cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CDROM, "CD-ROM Image", tag, owner, clock, "cdrom_image", __FILE__),
-		device_image_interface(mconfig, *this),
-		m_cdrom_handle(nullptr),
-		m_extension_list(nullptr),
-		m_interface(nullptr)
+	: cdrom_image_device(mconfig, CDROM, tag, owner, clock)
 {
 }
 
-cdrom_image_device::cdrom_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name,  tag, owner, clock, shortname, source),
+cdrom_image_device::cdrom_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type,  tag, owner, clock),
 		device_image_interface(mconfig, *this),
 		m_cdrom_handle(nullptr),
 		m_extension_list(nullptr),
@@ -55,9 +52,6 @@ void cdrom_image_device::device_config_complete()
 	m_extension_list = "chd,cue,toc,nrg,gdi,iso,cdr";
 
 	add_format("chdcd", "CD-ROM drive", m_extension_list, "");
-
-	// set brief and instance name
-	update_names();
 }
 
 //-------------------------------------------------
@@ -94,7 +88,7 @@ image_init_result cdrom_image_device::call_load()
 	if (m_cdrom_handle)
 		cdrom_close(m_cdrom_handle);
 
-	if (software_entry() == nullptr)
+	if (!loaded_through_softlist())
 	{
 		if (is_filetype("chd") && is_loaded()) {
 			err = m_self_chd.open( image_core_file() );    /* CDs are never writeable */
@@ -110,7 +104,7 @@ image_init_result cdrom_image_device::call_load()
 	if (chd) {
 		m_cdrom_handle = cdrom_open( chd );
 	} else {
-		m_cdrom_handle = cdrom_open(m_image_name.c_str());
+		m_cdrom_handle = cdrom_open(filename());
 	}
 	if ( ! m_cdrom_handle )
 		goto error;

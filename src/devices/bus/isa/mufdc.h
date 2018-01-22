@@ -14,12 +14,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_BUS_ISA_MUFDC_H
+#define MAME_BUS_ISA_MUFDC_H
+
 #pragma once
 
-#ifndef __ISA_MUFDC_H__
-#define __ISA_MUFDC_H__
-
-#include "emu.h"
 #include "isa.h"
 #include "imagedev/floppy.h"
 #include "machine/upd765.h"
@@ -31,27 +30,19 @@
 
 // ======================> mufdc_device
 
-class mufdc_device : public device_t,
-						public device_isa8_card_interface
+class mufdc_device : public device_t, public device_isa8_card_interface
 {
-public:
-	// construction/destruction
-	mufdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *name, const char *shortname);
-
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
-
-	DECLARE_READ8_MEMBER( fdc_input_r );
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-
 protected:
+	// construction/destruction
+	mufdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_isa8_card_interface
 	virtual uint8_t dack_r(int line) override;
@@ -59,6 +50,12 @@ protected:
 	virtual void eop_w(int state) override;
 
 private:
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
+
+	DECLARE_READ8_MEMBER( fdc_input_r );
+	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+
 	required_device<pc_fdc_interface> m_fdc;
 	required_ioport m_config;
 };
@@ -70,9 +67,6 @@ public:
 	fdc344_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
-
-protected:
-	virtual void device_config_complete() override { m_shortname = "fdc344"; }
 };
 
 class fdcmag_device : public mufdc_device
@@ -82,13 +76,10 @@ public:
 	fdcmag_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
-
-protected:
-	virtual void device_config_complete() override { m_shortname = "fdcmag"; }
 };
 
 // device type definition
-extern const device_type ISA8_FDC344;
-extern const device_type ISA8_FDCMAG;
+DECLARE_DEVICE_TYPE(ISA8_FDC344, fdc344_device)
+DECLARE_DEVICE_TYPE(ISA8_FDCMAG, fdcmag_device)
 
-#endif
+#endif // MAME_BUS_ISA_MUFDC_H

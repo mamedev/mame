@@ -11,25 +11,25 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/labyrunr.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/hd6309.h"
 #include "machine/watchdog.h"
 #include "sound/2203intf.h"
 
-#include "includes/konamipt.h"
-#include "includes/labyrunr.h"
+#include "speaker.h"
 
 
 INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_vblank_interrupt)
 {
-	address_space &space = generic_space();
-	if (m_k007121->ctrlram_r(space, 7) & 0x02)
+	if (m_k007121->ctrlram_r(7) & 0x02)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(labyrunr_state::labyrunr_timer_interrupt)
 {
-	address_space &space = generic_space();
-	if (m_k007121->ctrlram_r(space, 7) & 0x01)
+	if (m_k007121->ctrlram_r(7) & 0x01)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -163,7 +163,7 @@ void labyrunr_state::machine_start()
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_CONFIG_START( labyrunr, labyrunr_state )
+MACHINE_CONFIG_START(labyrunr_state::labyrunr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)      /* 24MHz/8? */
@@ -267,6 +267,6 @@ ROM_START( labyrunrk )
 ROM_END
 
 
-GAME( 1987, tricktrp, 0,        labyrunr, labyrunr, driver_device, 0, ROT90, "Konami", "Trick Trap (World?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, labyrunr, tricktrp, labyrunr, labyrunr, driver_device, 0, ROT90, "Konami", "Labyrinth Runner (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, labyrunrk,tricktrp, labyrunr, labyrunr, driver_device, 0, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, tricktrp, 0,        labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Trick Trap (World?)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1987, labyrunr, tricktrp, labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Labyrinth Runner (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, labyrunrk,tricktrp, labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", MACHINE_SUPPORTS_SAVE )

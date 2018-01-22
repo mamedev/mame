@@ -230,6 +230,24 @@ uint32_t mips3_device::compute_config_register()
 
 		configreg = 0x6460;
 	}
+	else if (m_flavor == MIPS3_TYPE_VR5500)
+	{
+		/*
+		    For VR55xx, Config is as follows:
+		    bit 31 = always 0
+		    bits 28-30 = EC
+		    bits 24-27 = EP
+		    bits 23-22 = EM
+		    bits 21-20 = always b11
+		    bits 19-18 = EW
+		    bits 17-16 = always b10
+		    bit 15 = endian indicator as standard MIPS III
+		    bits 3-14 = always b110011011110
+		    bits 0-2 = K0 ("Coherency algorithm of kseg0")
+		*/
+
+		configreg = 0x6460;
+	}
 	else
 	{
 		/* set the data cache size */
@@ -287,12 +305,18 @@ uint32_t mips3_device::compute_prid_register()
 		case MIPS3_TYPE_VR4300:
 			return 0x0b00;
 
+		case MIPS3_TYPE_VR5500:
+			return 0x5500;
+
 		case MIPS3_TYPE_R4600:
 		case MIPS3_TYPE_R4650:
 			return 0x2000;
 
 		case MIPS3_TYPE_R4700:
 			return 0x2100;
+
+		case MIPS3_TYPE_TX4925:
+			return 0x2d23;
 
 		case MIPS3_TYPE_R5000:
 		case MIPS3_TYPE_QED5271:
@@ -389,7 +413,7 @@ void mips3_device::tlb_write_common(int tlbindex)
 
 		/* fill in the new TLB entry from the COP0 registers */
 		entry->page_mask = m_core->cpr[0][COP0_PageMask];
-		entry->entry_hi = m_core->cpr[0][COP0_EntryHi] & ~(entry->page_mask & U64(0x0000000001ffe000));
+		entry->entry_hi = m_core->cpr[0][COP0_EntryHi] & ~(entry->page_mask & u64(0x0000000001ffe000U));
 		entry->entry_lo[0] = m_core->cpr[0][COP0_EntryLo0];
 		entry->entry_lo[1] = m_core->cpr[0][COP0_EntryLo1];
 

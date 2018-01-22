@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 
@@ -71,4 +70,5 @@ public:
 	DECLARE_PALETTE_INIT(zodiack);
 	INTERRUPT_GEN_MEMBER(zodiack_sound_nmi_gen);
 	INTERRUPT_GEN_MEMBER(zodiack_main_nmi_gen);
+	void zodiack(machine_config &config);
 };

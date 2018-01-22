@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+#ifndef MAME_BUS_KC_D004_H
+#define MAME_BUS_KC_D004_H
+
 #pragma once
 
-#ifndef __KC_D004_H__
-#define __KC_D004_H__
-
-#include "emu.h"
 #include "kc.h"
 #include "machine/z80ctc.h"
 #include "cpu/z80/z80.h"
@@ -27,19 +26,22 @@ class kc_d004_device :
 public:
 	// construction/destruction
 	kc_d004_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	kc_d004_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-
-	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	DECLARE_READ8_MEMBER(hw_input_gate_r);
+	DECLARE_WRITE8_MEMBER(fdd_select_w);
+	DECLARE_WRITE8_MEMBER(hw_terminal_count_w);
 
 protected:
+	kc_d004_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// kcexp_interface overrides
 	virtual uint8_t module_id_r() override { return 0xa7; }
@@ -48,14 +50,11 @@ protected:
 	virtual void io_read(offs_t offset, uint8_t &data) override;
 	virtual void io_write(offs_t offset, uint8_t data) override;
 
-public:
-	DECLARE_READ8_MEMBER(hw_input_gate_r);
-	DECLARE_WRITE8_MEMBER(fdd_select_w);
-	DECLARE_WRITE8_MEMBER(hw_terminal_count_w);
+private:
+	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
 
-private:
 	static const device_timer_id TIMER_RESET = 0;
 
 	required_device<cpu_device> m_cpu;
@@ -88,17 +87,16 @@ public:
 	// construction/destruction
 	kc_d004_gide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	DECLARE_READ8_MEMBER(gide_r);
+	DECLARE_WRITE8_MEMBER(gide_w);
 
 protected:
 	// device-level overrides
 	virtual void device_reset() override;
 
-public:
-	DECLARE_READ8_MEMBER(gide_r);
-	DECLARE_WRITE8_MEMBER(gide_w);
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
 	required_device<ata_interface_device> m_ata;
@@ -108,7 +106,7 @@ private:
 };
 
 // device type definition
-extern const device_type KC_D004;
-extern const device_type KC_D004_GIDE;
+DECLARE_DEVICE_TYPE(KC_D004,      kc_d004_device)
+DECLARE_DEVICE_TYPE(KC_D004_GIDE, kc_d004_gide_device)
 
-#endif  /* __KC_D004_H__ */
+#endif  // MAME_BUS_KC_D004_H

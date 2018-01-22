@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __SAT_SLOT_H
-#define __SAT_SLOT_H
+#ifndef MAME_BUS_SATURN_SAT_SLOT_H
+#define MAME_BUS_SATURN_SAT_SLOT_H
 
 #include "softlist_dev.h"
 
@@ -16,23 +16,20 @@
 class device_sat_cart_interface : public device_slot_card_interface
 {
 public:
-	// construction/destruction
-	device_sat_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_sat_cart_interface();
 
 	// reading from ROM
 	virtual DECLARE_READ32_MEMBER(read_rom) { return 0xffffffff; }
 	// reading and writing to Extended DRAM chips
 	virtual DECLARE_READ32_MEMBER(read_ext_dram0) { return 0xffffffff; }
-	virtual DECLARE_WRITE32_MEMBER(write_ext_dram0) {}
+	virtual DECLARE_WRITE32_MEMBER(write_ext_dram0) { }
 	virtual DECLARE_READ32_MEMBER(read_ext_dram1) { return 0xffffffff; }
-	virtual DECLARE_WRITE32_MEMBER(write_ext_dram1) {}
+	virtual DECLARE_WRITE32_MEMBER(write_ext_dram1) { }
 	// reading and writing to Extended BRAM chip
 	virtual DECLARE_READ32_MEMBER(read_ext_bram) { return 0xffffffff; }
-	virtual DECLARE_WRITE32_MEMBER(write_ext_bram) {}
+	virtual DECLARE_WRITE32_MEMBER(write_ext_bram) { }
 
-	virtual int get_cart_type() { return m_cart_type; };
-
+	int get_cart_type() const { return m_cart_type; }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void bram_alloc(uint32_t size);
@@ -48,7 +45,10 @@ public:
 	uint32_t  get_ext_bram_size() { return m_ext_bram.size(); }
 
 protected:
-	int m_cart_type;
+	// construction/destruction
+	device_sat_cart_interface(const machine_config &mconfig, device_t &device, int cart_type);
+
+	const int m_cart_type;
 
 	// internal state
 	uint32_t *m_rom;
@@ -70,10 +70,6 @@ public:
 	sat_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~sat_cart_slot_device();
 
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_config_complete() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -91,7 +87,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual DECLARE_READ32_MEMBER(read_rom);
@@ -102,13 +98,17 @@ public:
 	virtual DECLARE_READ32_MEMBER(read_ext_bram);
 	virtual DECLARE_WRITE32_MEMBER(write_ext_bram);
 
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 private:
 	device_sat_cart_interface*       m_cart;
 };
 
 
 // device type definition
-extern const device_type SATURN_CART_SLOT;
+DECLARE_DEVICE_TYPE(SATURN_CART_SLOT, sat_cart_slot_device)
 
 
 /***************************************************************************
@@ -122,4 +122,4 @@ extern const device_type SATURN_CART_SLOT;
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
-#endif
+#endif // MAME_BUS_SATURN_SAT_SLOT_H

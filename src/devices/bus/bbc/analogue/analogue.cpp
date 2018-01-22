@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "analogue.h"
 
 
@@ -13,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type BBC_ANALOGUE_SLOT = &device_creator<bbc_analogue_slot_device>;
+DEFINE_DEVICE_TYPE(BBC_ANALOGUE_SLOT, bbc_analogue_slot_device, "bbc_analogue_slot", "BBC Micro Analogue port")
 
 
 
@@ -50,8 +51,8 @@ device_bbc_analogue_interface::~device_bbc_analogue_interface()
 //-------------------------------------------------
 
 bbc_analogue_slot_device::bbc_analogue_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, BBC_ANALOGUE_SLOT, "BBC Micro Analogue port", tag, owner, clock, "bbc_analogue_slot", __FILE__),
-		device_slot_interface(mconfig, *this)
+	device_t(mconfig, BBC_ANALOGUE_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this)
 {
 }
 
@@ -102,10 +103,12 @@ void bbc_analogue_slot_device::device_reset()
 // slot devices
 #include "joystick.h"
 //#include "quinkey.h"
+#include "cfa3000a.h"
 
 
 SLOT_INTERFACE_START( bbc_analogue_devices )
 	SLOT_INTERFACE("acornjoy",    BBC_ACORNJOY)         /* Acorn ANH01 Joysticks */
 	SLOT_INTERFACE("voltmace3b",  BBC_VOLTMACE3B)       /* Voltmace Delta 3b "Twin" Joysticks */
 //  SLOT_INTERFACE("quinkey",   BBC_QUINKEY)          /* Microwriter Quinkey */
+	SLOT_INTERFACE("cfa3000a",    CFA3000_ANLG)         /* Hanson CFA 3000 Analogue */
 SLOT_INTERFACE_END

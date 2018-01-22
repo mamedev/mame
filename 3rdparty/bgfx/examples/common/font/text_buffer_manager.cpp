@@ -6,8 +6,9 @@
 #include "../common.h"
 
 #include <bgfx/bgfx.h>
+#include <bgfx/embedded_shader.h>
+
 #include <stddef.h> // offsetof
-#include <memory.h> // memcpy
 #include <wchar.h>  // wcslen
 
 #include "text_buffer_manager.h"
@@ -20,6 +21,18 @@
 #include "fs_font_distance_field.bin.h"
 #include "vs_font_distance_field_subpixel.bin.h"
 #include "fs_font_distance_field_subpixel.bin.h"
+
+static const bgfx::EmbeddedShader s_embeddedShaders[] =
+{
+	BGFX_EMBEDDED_SHADER(vs_font_basic),
+	BGFX_EMBEDDED_SHADER(fs_font_basic),
+	BGFX_EMBEDDED_SHADER(vs_font_distance_field),
+	BGFX_EMBEDDED_SHADER(fs_font_distance_field),
+	BGFX_EMBEDDED_SHADER(vs_font_distance_field_subpixel),
+	BGFX_EMBEDDED_SHADER(fs_font_distance_field_subpixel),
+
+	BGFX_EMBEDDED_SHADER_END()
+};
 
 #define MAX_BUFFERED_CHARACTERS (8192 - 5)
 
@@ -238,7 +251,7 @@ void TextBuffer::appendText(FontHandle _fontHandle, const char* _string, const c
 
 	if (_end == NULL)
 	{
-		_end = _string + strlen(_string);
+		_end = _string + bx::strLen(_string);
 	}
 	BX_CHECK(_end >= _string);
 
@@ -565,70 +578,25 @@ TextBufferManager::TextBufferManager(FontManager* _fontManager)
 {
 	m_textBuffers = new BufferCache[MAX_TEXT_BUFFER_COUNT];
 
-	const bgfx::Memory* vs_font_basic;
-	const bgfx::Memory* fs_font_basic;
-	const bgfx::Memory* vs_font_distance_field;
-	const bgfx::Memory* fs_font_distance_field;
-	const bgfx::Memory* vs_font_distance_field_subpixel;
-	const bgfx::Memory* fs_font_distance_field_subpixel;
-
-	switch (bgfx::getRendererType() )
-	{
-	case bgfx::RendererType::Direct3D9:
-		vs_font_basic = bgfx::makeRef(vs_font_basic_dx9, sizeof(vs_font_basic_dx9) );
-		fs_font_basic = bgfx::makeRef(fs_font_basic_dx9, sizeof(fs_font_basic_dx9) );
-		vs_font_distance_field = bgfx::makeRef(vs_font_distance_field_dx9, sizeof(vs_font_distance_field_dx9) );
-		fs_font_distance_field = bgfx::makeRef(fs_font_distance_field_dx9, sizeof(fs_font_distance_field_dx9) );
-		vs_font_distance_field_subpixel = bgfx::makeRef(vs_font_distance_field_subpixel_dx9, sizeof(vs_font_distance_field_subpixel_dx9) );
-		fs_font_distance_field_subpixel = bgfx::makeRef(fs_font_distance_field_subpixel_dx9, sizeof(fs_font_distance_field_subpixel_dx9) );
-		break;
-
-	case bgfx::RendererType::Direct3D11:
-	case bgfx::RendererType::Direct3D12:
-		vs_font_basic = bgfx::makeRef(vs_font_basic_dx11, sizeof(vs_font_basic_dx11) );
-		fs_font_basic = bgfx::makeRef(fs_font_basic_dx11, sizeof(fs_font_basic_dx11) );
-		vs_font_distance_field = bgfx::makeRef(vs_font_distance_field_dx11, sizeof(vs_font_distance_field_dx11) );
-		fs_font_distance_field = bgfx::makeRef(fs_font_distance_field_dx11, sizeof(fs_font_distance_field_dx11) );
-		vs_font_distance_field_subpixel = bgfx::makeRef(vs_font_distance_field_subpixel_dx11, sizeof(vs_font_distance_field_subpixel_dx11) );
-		fs_font_distance_field_subpixel = bgfx::makeRef(fs_font_distance_field_subpixel_dx11, sizeof(fs_font_distance_field_subpixel_dx11) );
-		break;
-
-	case bgfx::RendererType::Metal:
-		vs_font_basic = bgfx::makeRef(vs_font_basic_mtl, sizeof(vs_font_basic_mtl) );
-		fs_font_basic = bgfx::makeRef(fs_font_basic_mtl, sizeof(fs_font_basic_mtl) );
-		vs_font_distance_field = bgfx::makeRef(vs_font_distance_field_mtl, sizeof(vs_font_distance_field_mtl) );
-		fs_font_distance_field = bgfx::makeRef(fs_font_distance_field_mtl, sizeof(fs_font_distance_field_mtl) );
-		vs_font_distance_field_subpixel = bgfx::makeRef(vs_font_distance_field_subpixel_mtl, sizeof(vs_font_distance_field_subpixel_mtl) );
-		fs_font_distance_field_subpixel = bgfx::makeRef(fs_font_distance_field_subpixel_mtl, sizeof(fs_font_distance_field_subpixel_mtl) );
-		break;
-
-	default:
-		vs_font_basic = bgfx::makeRef(vs_font_basic_glsl, sizeof(vs_font_basic_glsl) );
-		fs_font_basic = bgfx::makeRef(fs_font_basic_glsl, sizeof(fs_font_basic_glsl) );
-		vs_font_distance_field = bgfx::makeRef(vs_font_distance_field_glsl, sizeof(vs_font_distance_field_glsl) );
-		fs_font_distance_field = bgfx::makeRef(fs_font_distance_field_glsl, sizeof(fs_font_distance_field_glsl) );
-		vs_font_distance_field_subpixel = bgfx::makeRef(vs_font_distance_field_subpixel_glsl, sizeof(vs_font_distance_field_subpixel_glsl) );
-		fs_font_distance_field_subpixel = bgfx::makeRef(fs_font_distance_field_subpixel_glsl, sizeof(fs_font_distance_field_subpixel_glsl) );
-		break;
-	}
+	bgfx::RendererType::Enum type = bgfx::getRendererType();
 
 	m_basicProgram = bgfx::createProgram(
-									  bgfx::createShader(vs_font_basic)
-									, bgfx::createShader(fs_font_basic)
-									, true
-									);
+		  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_font_basic")
+		, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_font_basic")
+		, true
+		);
 
 	m_distanceProgram = bgfx::createProgram(
-									  bgfx::createShader(vs_font_distance_field)
-									, bgfx::createShader(fs_font_distance_field)
-									, true
-									);
+		  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_font_distance_field")
+		, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_font_distance_field")
+		, true
+		);
 
 	m_distanceSubpixelProgram = bgfx::createProgram(
-									  bgfx::createShader(vs_font_distance_field_subpixel)
-									, bgfx::createShader(fs_font_distance_field_subpixel)
-									, true
-									);
+		  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_font_distance_field_subpixel")
+		, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_font_distance_field_subpixel")
+		, true
+		);
 
 	m_vertexDecl
 		.begin()
@@ -645,11 +613,11 @@ TextBufferManager::~TextBufferManager()
 	BX_CHECK(m_textBufferHandles.getNumHandles() == 0, "All the text buffers must be destroyed before destroying the manager");
 	delete [] m_textBuffers;
 
-	bgfx::destroyUniform(s_texColor);
+	bgfx::destroy(s_texColor);
 
-	bgfx::destroyProgram(m_basicProgram);
-	bgfx::destroyProgram(m_distanceProgram);
-	bgfx::destroyProgram(m_distanceSubpixelProgram);
+	bgfx::destroy(m_basicProgram);
+	bgfx::destroy(m_distanceProgram);
+	bgfx::destroy(m_distanceSubpixelProgram);
 }
 
 TextBufferHandle TextBufferManager::createTextBuffer(uint32_t _type, BufferType::Enum _bufferType)
@@ -660,8 +628,8 @@ TextBufferHandle TextBufferManager::createTextBuffer(uint32_t _type, BufferType:
 	bc.textBuffer = new TextBuffer(m_fontManager);
 	bc.fontType = _type;
 	bc.bufferType = _bufferType;
-	bc.indexBufferHandleIdx = bgfx::invalidHandle;
-	bc.vertexBufferHandleIdx = bgfx::invalidHandle;
+	bc.indexBufferHandleIdx = bgfx::kInvalidHandle;
+	bc.vertexBufferHandleIdx = bgfx::kInvalidHandle;
 
 	TextBufferHandle ret = {textIdx};
 	return ret;
@@ -676,7 +644,7 @@ void TextBufferManager::destroyTextBuffer(TextBufferHandle _handle)
 	delete bc.textBuffer;
 	bc.textBuffer = NULL;
 
-	if (bc.vertexBufferHandleIdx == bgfx::invalidHandle)
+	if (bc.vertexBufferHandleIdx == bgfx::kInvalidHandle)
 	{
 		return;
 	}
@@ -689,8 +657,8 @@ void TextBufferManager::destroyTextBuffer(TextBufferHandle _handle)
 			bgfx::VertexBufferHandle vbh;
 			ibh.idx = bc.indexBufferHandleIdx;
 			vbh.idx = bc.vertexBufferHandleIdx;
-			bgfx::destroyIndexBuffer(ibh);
-			bgfx::destroyVertexBuffer(vbh);
+			bgfx::destroy(ibh);
+			bgfx::destroy(vbh);
 		}
 
 		break;
@@ -700,8 +668,8 @@ void TextBufferManager::destroyTextBuffer(TextBufferHandle _handle)
 		bgfx::DynamicVertexBufferHandle vbh;
 		ibh.idx = bc.indexBufferHandleIdx;
 		vbh.idx = bc.vertexBufferHandleIdx;
-		bgfx::destroyDynamicIndexBuffer(ibh);
-		bgfx::destroyDynamicVertexBuffer(vbh);
+		bgfx::destroy(ibh);
+		bgfx::destroy(vbh);
 
 		break;
 
@@ -710,7 +678,7 @@ void TextBufferManager::destroyTextBuffer(TextBufferHandle _handle)
 	}
 }
 
-void TextBufferManager::submitTextBuffer(TextBufferHandle _handle, uint8_t _id, int32_t _depth)
+void TextBufferManager::submitTextBuffer(TextBufferHandle _handle, bgfx::ViewId _id, int32_t _depth)
 {
 	BX_CHECK(bgfx::isValid(_handle), "Invalid handle used");
 
@@ -762,7 +730,7 @@ void TextBufferManager::submitTextBuffer(TextBufferHandle _handle, uint8_t _id, 
 			bgfx::IndexBufferHandle ibh;
 			bgfx::VertexBufferHandle vbh;
 
-			if (bgfx::invalidHandle == bc.vertexBufferHandleIdx)
+			if (bgfx::kInvalidHandle == bc.vertexBufferHandleIdx)
 			{
 				ibh = bgfx::createIndexBuffer(
 								bgfx::copy(bc.textBuffer->getIndexBuffer(), indexSize)
@@ -782,7 +750,7 @@ void TextBufferManager::submitTextBuffer(TextBufferHandle _handle, uint8_t _id, 
 				ibh.idx = bc.indexBufferHandleIdx;
 			}
 
-			bgfx::setVertexBuffer(vbh, 0, bc.textBuffer->getVertexCount() );
+			bgfx::setVertexBuffer(0, vbh, 0, bc.textBuffer->getVertexCount() );
 			bgfx::setIndexBuffer(ibh, 0, bc.textBuffer->getIndexCount() );
 		}
 		break;
@@ -792,7 +760,7 @@ void TextBufferManager::submitTextBuffer(TextBufferHandle _handle, uint8_t _id, 
 			bgfx::DynamicIndexBufferHandle ibh;
 			bgfx::DynamicVertexBufferHandle vbh;
 
-			if (bgfx::invalidHandle == bc.vertexBufferHandleIdx )
+			if (bgfx::kInvalidHandle == bc.vertexBufferHandleIdx )
 			{
 				ibh = bgfx::createDynamicIndexBuffer(
 								bgfx::copy(bc.textBuffer->getIndexBuffer(), indexSize)
@@ -822,7 +790,7 @@ void TextBufferManager::submitTextBuffer(TextBufferHandle _handle, uint8_t _id, 
 						);
 			}
 
-			bgfx::setVertexBuffer(vbh, 0, bc.textBuffer->getVertexCount() );
+			bgfx::setVertexBuffer(0, vbh, 0, bc.textBuffer->getVertexCount() );
 			bgfx::setIndexBuffer(ibh, 0, bc.textBuffer->getIndexCount() );
 		}
 		break;
@@ -833,9 +801,9 @@ void TextBufferManager::submitTextBuffer(TextBufferHandle _handle, uint8_t _id, 
 			bgfx::TransientVertexBuffer tvb;
 			bgfx::allocTransientIndexBuffer(&tib, bc.textBuffer->getIndexCount() );
 			bgfx::allocTransientVertexBuffer(&tvb, bc.textBuffer->getVertexCount(), m_vertexDecl);
-			memcpy(tib.data, bc.textBuffer->getIndexBuffer(), indexSize);
-			memcpy(tvb.data, bc.textBuffer->getVertexBuffer(), vertexSize);
-			bgfx::setVertexBuffer(&tvb, 0, bc.textBuffer->getVertexCount() );
+			bx::memCopy(tib.data, bc.textBuffer->getIndexBuffer(), indexSize);
+			bx::memCopy(tvb.data, bc.textBuffer->getVertexBuffer(), vertexSize);
+			bgfx::setVertexBuffer(0, &tvb, 0, bc.textBuffer->getVertexCount() );
 			bgfx::setIndexBuffer(&tib, 0, bc.textBuffer->getIndexCount() );
 		}
 		break;

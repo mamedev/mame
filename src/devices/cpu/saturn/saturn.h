@@ -27,11 +27,12 @@ HP38G             09/??/95              1LT8             Yorke
 /* 4 bit processor
    20 address lines */
 
+#ifndef MAME_CPU_SATURN_SATURN_H
+#define MAME_CPU_SATURN_SATURN_H
+
 #pragma once
 
-#ifndef __SATURN_H__
-#define _SATURN_H
-
+#include "saturnds.h"
 
 #define SATURN_INT_NONE 0
 #define SATURN_INT_IRQ  1
@@ -72,21 +73,21 @@ enum
 	saturn_device::set_rsi_func(*device, DEVCB_##_rsi);
 
 
-class saturn_device : public cpu_device
+class saturn_device : public cpu_device, public saturn_disassembler::config
 {
 public:
 	// construction/destruction
 	saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_out_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_out_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_in_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_in_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_reset_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_reset_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_config_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_config_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_unconfig_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_unconfig_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_id_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_id_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_crc_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_crc_func.set_callback(object); }
-	template<class _Object> static devcb_base &set_rsi_func(device_t &device, _Object object) { return downcast<saturn_device &>(device).m_rsi_func.set_callback(object); }
+	template <class Object> static devcb_base &set_out_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_out_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_in_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_in_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_reset_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_reset_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_config_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_config_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_unconfig_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_unconfig_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_id_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_id_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_crc_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_crc_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_rsi_func(device_t &device, Object &&cb) { return downcast<saturn_device &>(device).m_rsi_func.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides
@@ -101,7 +102,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -109,9 +110,8 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
+	virtual bool get_nonstandard_mnemonics_mode() const override;
 
 private:
 	address_space_config m_program_config;
@@ -134,7 +134,7 @@ typedef uint8_t Saturn64[16];
 
 	uint8_t m_p; // 4 bit pointer
 
-		uint16_t m_out; // 12 bit (packed)
+	uint16_t m_out; // 12 bit (packed)
 	uint8_t  m_carry, m_decimal;
 	uint16_t m_st; // status 16 bit
 
@@ -149,7 +149,7 @@ typedef uint8_t Saturn64[16];
 	int     m_monitor_id;
 	int     m_monitor_in;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	int m_icount;
 	int64_t m_debugger_temp;
 
@@ -289,7 +289,6 @@ typedef uint8_t Saturn64[16];
 	void saturn_instruction();
 };
 
-extern const device_type SATURN;
+DECLARE_DEVICE_TYPE(SATURN, saturn_device)
 
-
-#endif /* __SATURN_H__ */
+#endif // MAME_CPU_SATURN_SATURN_H

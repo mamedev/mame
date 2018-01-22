@@ -13,17 +13,13 @@
 
 #pragma once
 
-#include "emu.h"
 #include "drivenum.h"
+#include "emuopts.h"
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-// forward declarations
-class machine_config;
-
 
 // core validity checker class
 class validity_checker : public osd_output
@@ -35,7 +31,7 @@ public:
 	// getters
 	int errors() const { return m_errors; }
 	int warnings() const { return m_warnings; }
-	int validate_all() const { return m_validate_all; }
+	bool validate_all() const { return m_validate_all; }
 
 	// setter
 	void set_verbose(bool verbose) { m_print_verbose = verbose; }
@@ -48,7 +44,7 @@ public:
 
 	// helpers for devices
 	void validate_tag(const char *tag);
-	int region_length(const char *tag) { return m_region_map.find(tag)->second; }
+	int region_length(const char *tag) { auto i = m_region_map.find(tag); return i == m_region_map.end() ? 0 : i->second; }
 
 	// generic registry of already-checked stuff
 	bool already_checked(const char *string) { return !m_already_checked.insert(string).second; }
@@ -64,7 +60,7 @@ private:
 	typedef std::unordered_map<std::string,uintptr_t> int_map;
 
 	// internal helpers
-	const char *ioport_string_from_index(uint32_t index);
+	const char *ioport_string_from_index(u32 index);
 	int get_defstr_index(const char *string, bool suppress_error = false);
 
 	// core helpers
@@ -77,12 +73,13 @@ private:
 	void validate_inlines();
 	void validate_rgb();
 	void validate_driver();
-	void validate_roms();
+	void validate_roms(device_t &root);
 	void validate_analog_input_field(ioport_field &field);
 	void validate_dip_settings(ioport_field &field);
 	void validate_condition(ioport_condition &condition, device_t &device, std::unordered_set<std::string> &port_map);
 	void validate_inputs();
 	void validate_devices();
+	void validate_device_types();
 
 	// output helpers
 	void build_output_prefix(std::string &str);
@@ -90,13 +87,16 @@ private:
 	void output_indented_errors(std::string &text, const char *header);
 
 	// random number generation
-	int32_t random_i32();
-	uint32_t random_u32();
-	int64_t random_i64();
-	uint64_t random_u64();
+	s32 random_i32();
+	u32 random_u32();
+	s64 random_i64();
+	u64 random_u64();
 
 	// internal driver list
 	driver_enumerator       m_drivlist;
+
+	// blank options for use during validation
+	emu_options             m_blank_options;
 
 	// error tracking
 	int                     m_errors;
@@ -114,7 +114,7 @@ private:
 
 	// current state
 	const game_driver *     m_current_driver;
-	const machine_config *  m_current_config;
+	machine_config *        m_current_config;
 	const device_t *        m_current_device;
 	const char *            m_current_ioport;
 	int_map                 m_region_map;

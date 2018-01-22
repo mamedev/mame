@@ -62,8 +62,8 @@ dynlib::dynlib(const pstring libname)
 : m_isLoaded(false), m_lib(nullptr)
 {
 #ifdef _WIN32
-	//fprintf(stderr, "win: loading <%s>\n", libname.cstr());
-	TCHAR *buffer = tstring_from_utf8(libname.cstr());
+	//fprintf(stderr, "win: loading <%s>\n", libname.c_str());
+	TCHAR *buffer = tstring_from_utf8(libname.c_str());
 	if (libname != "")
 		m_lib = LoadLibrary(buffer);
 	else
@@ -71,27 +71,27 @@ dynlib::dynlib(const pstring libname)
 	if (m_lib != nullptr)
 		m_isLoaded = true;
 	//else
-	//  fprintf(stderr, "win: library <%s> not found!\n", libname.cstr());
+	//  fprintf(stderr, "win: library <%s> not found!\n", libname.c_str());
 	pfree_array(buffer);
 #else
-	//printf("loading <%s>\n", libname.cstr());
+	//printf("loading <%s>\n", libname.c_str());
 	if (libname != "")
-		m_lib = dlopen(libname.cstr(), RTLD_LAZY);
+		m_lib = dlopen(libname.c_str(), RTLD_LAZY);
 	else
 		m_lib = dlopen(nullptr, RTLD_LAZY);
 	if (m_lib != nullptr)
 		m_isLoaded = true;
 	//else
-	//  printf("library <%s> not found: %s\n", libname.cstr(), dlerror());
+	//  printf("library <%s> not found: %s\n", libname.c_str(), dlerror());
 #endif
 	}
 
 dynlib::dynlib(const pstring path, const pstring libname)
 : m_isLoaded(false), m_lib(nullptr)
 {
-	//  printf("win: loading <%s>\n", libname.cstr());
+	//  printf("win: loading <%s>\n", libname.c_str());
 #ifdef _WIN32
-	TCHAR *buffer = tstring_from_utf8(libname.cstr());
+	TCHAR *buffer = tstring_from_utf8(libname.c_str());
 	if (libname != "")
 		m_lib = LoadLibrary(buffer);
 	else
@@ -100,20 +100,20 @@ dynlib::dynlib(const pstring path, const pstring libname)
 		m_isLoaded = true;
 	else
 	{
-		//printf("win: library <%s> not found!\n", libname.cstr());
+		//printf("win: library <%s> not found!\n", libname.c_str());
 	}
 	pfree_array(buffer);
 #else
-	//printf("loading <%s>\n", libname.cstr());
+	//printf("loading <%s>\n", libname.c_str());
 	if (libname != "")
-		m_lib = dlopen(libname.cstr(), RTLD_LAZY);
+		m_lib = dlopen(libname.c_str(), RTLD_LAZY);
 	else
 		m_lib = dlopen(nullptr, RTLD_LAZY);
 	if (m_lib != nullptr)
 		m_isLoaded = true;
 	else
 	{
-		//printf("library <%s> not found!\n", libname.cstr());
+		//printf("library <%s> not found!\n", libname.c_str());
 	}
 #endif
 }
@@ -138,9 +138,9 @@ bool dynlib::isLoaded() const
 void *dynlib::getsym_p(const pstring name)
 {
 #ifdef _WIN32
-	return (void *) GetProcAddress((HMODULE) m_lib, name.cstr());
+	return (void *) GetProcAddress((HMODULE) m_lib, name.c_str());
 #else
-	return dlsym(m_lib, name.cstr());
+	return dlsym(m_lib, name.c_str());
 #endif
 }
 

@@ -28,11 +28,13 @@
 
 #include "emu.h"
 #include "includes/esripsys.h"
+
 #include "cpu/esrip/esrip.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
 #include "machine/nvram.h"
 #include "sound/volt_reg.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -538,7 +540,7 @@ WRITE8_MEMBER(esripsys_state::tms5220_w)
 /* Not used in later revisions */
 WRITE8_MEMBER(esripsys_state::control_w)
 {
-	logerror("Sound control write: %.2x (PC:0x%.4x)\n", data, space.device().safe_pcbase());
+	logerror("Sound control write: %.2x (PC:0x%.4x)\n", data, m_soundcpu->pcbase());
 }
 
 
@@ -658,13 +660,13 @@ DRIVER_INIT_MEMBER(esripsys_state,esripsys)
 	save_item(NAME(m_fbsel));
 }
 
-static MACHINE_CONFIG_START( esripsys, esripsys_state )
-	MCFG_CPU_ADD("game_cpu", M6809E, XTAL_8MHz)
+MACHINE_CONFIG_START(esripsys_state::esripsys)
+	MCFG_CPU_ADD("game_cpu", MC6809E, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(game_cpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", esripsys_state,  esripsys_vblank_irq)
 	MCFG_QUANTUM_PERFECT_CPU("game_cpu")
 
-	MCFG_CPU_ADD("frame_cpu", M6809E, XTAL_8MHz)
+	MCFG_CPU_ADD("frame_cpu", MC6809E, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(frame_cpu_map)
 
 	MCFG_CPU_ADD("video_cpu", ESRIP, XTAL_40MHz / 4)
@@ -675,7 +677,7 @@ static MACHINE_CONFIG_START( esripsys, esripsys_state )
 	MCFG_ESRIP_DRAW_CALLBACK_OWNER(esripsys_state, esripsys_draw)
 	MCFG_ESRIP_LBRM_PROM("proms")
 
-	MCFG_CPU_ADD("sound_cpu", M6809E, XTAL_8MHz)
+	MCFG_CPU_ADD("sound_cpu", MC6809E, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -699,8 +701,7 @@ static MACHINE_CONFIG_START( esripsys, esripsys_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_8MHz / 4)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, XTAL_8MHz / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(esripsys_state, ptm_irq))
 MACHINE_CONFIG_END

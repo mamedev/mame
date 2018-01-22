@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
-#ifndef __TC0100SCN_H__
-#define __TC0100SCN_H__
+#ifndef MAME_VIDEO_TC0100SCN_H
+#define MAME_VIDEO_TC0100SCN_H
+
+#pragma once
 
 class tc0100scn_device : public device_t
 {
 public:
 	tc0100scn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~tc0100scn_device() {}
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -35,7 +36,7 @@ public:
 		dev.m_flip_text_yoffs = y_offset;
 	}
 
-	#define TC0100SCN_SINGLE_VDU    1024
+	static constexpr unsigned SINGLE_VDU = 1024; // for set_multiscr_xoffs
 
 	/* Function to set separate color banks for the three tilemapped layers.
 	To change from the default (0,0,0) use after calling TC0100SCN_vh_start */
@@ -118,7 +119,7 @@ private:
 	void restore_scroll();
 };
 
-extern const device_type TC0100SCN;
+DECLARE_DEVICE_TYPE(TC0100SCN, tc0100scn_device)
 
 
 #define MCFG_TC0100SCN_GFX_REGION(_region) \
@@ -148,4 +149,4 @@ extern const device_type TC0100SCN;
 #define MCFG_TC0100SCN_PALETTE(_palette_tag) \
 	tc0100scn_device::static_set_palette_tag(*device, "^" _palette_tag);
 
-#endif
+#endif // MAME_VIDEO_TC0100SCN_H

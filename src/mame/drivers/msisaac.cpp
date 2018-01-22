@@ -9,10 +9,14 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/msisaac.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
-#include "includes/msisaac.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 /*
 TO DO:
@@ -144,7 +148,7 @@ MCU simulation TODO:
 			return 0x45;
 
 		default:
-			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", space.device().safe_pc(), m_mcu_val);
+			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", m_maincpu->pc(), m_mcu_val);
 			return m_mcu_val;
 	}
 #endif
@@ -165,7 +169,7 @@ WRITE8_MEMBER(msisaac_state::msisaac_mcu_w)
 	m_bmcu->buggychl_mcu_w(offset,data);
 #else
 	//if(data != 0x0a && data != 0x42 && data != 0x02)
-	//  popmessage("PC = %04x %02x", space.device().safe_pc(), data);
+	//  popmessage("PC = %04x %02x", m_maincpu->pc(), data);
 	m_mcu_val = data;
 #endif
 }
@@ -173,7 +177,7 @@ WRITE8_MEMBER(msisaac_state::msisaac_mcu_w)
 static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(msisaac_bg2_textbank_w)
 	AM_RANGE(0xf001, 0xf001) AM_WRITENOP                    //???
 	AM_RANGE(0xf002, 0xf002) AM_WRITENOP                    //???
@@ -209,44 +213,26 @@ static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 //  AM_RANGE(0xfc03, 0xfc04) AM_WRITE(msisaac_coin_counter_w)
 ADDRESS_MAP_END
 
-MACHINE_RESET_MEMBER(msisaac_state,ta7630)
-{
-	int i;
-
-	double db           = 0.0;
-	double db_step      = 0.50; /* 0.50 dB step (at least, maybe more) */
-	double db_step_inc  = 0.275;
-	for (i=0; i<16; i++)
-	{
-		double max = 100.0 / pow(10.0, db/20.0 );
-		m_vol_ctrl[15 - i] = max;
-		/*logerror("vol_ctrl[%x] = %i (%f dB)\n",15 - i, m_vol_ctrl[15 - i], db);*/
-		db += db_step;
-		db_step += db_step_inc;
-	}
-
-	/*for (i=0; i<8; i++)
-	    logerror("SOUND Chan#%i name=%s\n", i, mixer_get_name(i) );*/
-/*
-  channels 0-2 AY#0
-  channels 3-5 AY#1
-  channels 6,7 MSM5232 group1,group2
-*/
-}
-
 WRITE8_MEMBER(msisaac_state::sound_control_0_w)
 {
 	m_snd_ctrl0 = data & 0xff;
 	//popmessage("SND0 0=%2x 1=%2x", m_snd_ctrl0, m_snd_ctrl1);
 
-	m_msm->set_output_gain(0, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
-	m_msm->set_output_gain(1, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
-	m_msm->set_output_gain(2, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
-	m_msm->set_output_gain(3, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
-	m_msm->set_output_gain(4, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
-	m_msm->set_output_gain(5, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
-	m_msm->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
-	m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+	for(int i=0;i<4;i++)
+	{
+		// group1
+		m_ta7630->set_channel_volume(m_msm,i,   m_snd_ctrl0 & 0xf);
+		// group2
+		m_ta7630->set_channel_volume(m_msm,i+4, m_snd_ctrl0 >> 4);
+	}
+//  m_msm->set_output_gain(0, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
+//  m_msm->set_output_gain(1, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
+//  m_msm->set_output_gain(2, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
+//  m_msm->set_output_gain(3, m_vol_ctrl[m_snd_ctrl0 & 15] / 100.0);    /* group1 from msm5232 */
+//  m_msm->set_output_gain(4, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+//  m_msm->set_output_gain(5, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+//  m_msm->set_output_gain(6, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
+//  m_msm->set_output_gain(7, m_vol_ctrl[(m_snd_ctrl0 >> 4) & 15] / 100.0); /* group2 from msm5232 */
 }
 WRITE8_MEMBER(msisaac_state::sound_control_1_w)
 {
@@ -428,7 +414,6 @@ void msisaac_state::machine_start()
 	/* sound */
 	save_item(NAME(m_sound_nmi_enable));
 	save_item(NAME(m_pending_nmi));
-	save_item(NAME(m_vol_ctrl));
 	save_item(NAME(m_snd_ctrl0));
 	save_item(NAME(m_snd_ctrl1));
 
@@ -441,7 +426,7 @@ void msisaac_state::machine_start()
 
 void msisaac_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(ta7630);
+	//MACHINE_RESET_CALL_MEMBER(ta7630);
 
 	/* video */
 	m_bg2_textbank = 0;
@@ -459,7 +444,7 @@ void msisaac_state::machine_reset()
 #endif
 }
 
-static MACHINE_CONFIG_START( msisaac, msisaac_state )
+MACHINE_CONFIG_START(msisaac_state::msisaac)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
@@ -495,11 +480,14 @@ static MACHINE_CONFIG_START( msisaac, msisaac_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_TA7630_ADD("ta7630")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
+	// port A/B likely to be TA7630 filters
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
+	// port A/B likely to be TA7630 filters
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
@@ -554,4 +542,4 @@ ROM_START( msisaac )
 ROM_END
 
 
-GAME( 1985, msisaac, 0,     msisaac, msisaac, driver_device, 0, ROT270, "Taito Corporation", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, msisaac, 0,     msisaac, msisaac, msisaac_state, 0, ROT270, "Taito Corporation", "Metal Soldier Isaac II", MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

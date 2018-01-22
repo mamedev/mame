@@ -29,44 +29,45 @@
 
 **********************************************************************/
 
-#ifndef __KR2376__
-#define __KR2376__
+#ifndef MAME_MACHINE_KR2376_H
+#define MAME_MACHINE_KR2376_H
+
+#pragma once
 
 
 #define MCFG_KR2376_STROBE_CALLBACK(_write) \
 	devcb = &kr2376_device::set_strobe_wr_callback(*device, DEVCB_##_write);
 
-/*
- * Input pins
- */
-enum kr2376_input_pin_t
-{
-	KR2376_DSII=20,         /* DSII  - Pin 20 - Data & Strobe Invert Input */
-	KR2376_PII=6            /* PII   - Pin  6 - Parity Invert Input */
-};
-
-enum kr2376_output_pin_t
-{
-	KR2376_SO=16,           /* SO    - Pin 16 - Strobe Output */
-	KR2376_PO=7         /* PO    - Pin  7 - Parity Output */
-};
-
 class kr2376_device : public device_t
 {
 public:
-	kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~kr2376_device() {}
+	/*
+	 * Input pins
+	 */
+	enum input_pin_t
+	{
+		KR2376_DSII=20,         /* DSII  - Pin 20 - Data & Strobe Invert Input */
+		KR2376_PII=6            /* PII   - Pin  6 - Parity Invert Input */
+	};
 
-	template<class _Object> static devcb_base &set_strobe_wr_callback(device_t &device, _Object object) { return downcast<kr2376_device &>(device).m_write_strobe.set_callback(object); }
+	enum output_pin_t
+	{
+		KR2376_SO=16,           /* SO    - Pin 16 - Strobe Output */
+		KR2376_PO=7         /* PO    - Pin  7 - Parity Output */
+	};
+
+	kr2376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <class Object> static devcb_base &set_strobe_wr_callback(device_t &device, Object &&cb) { return downcast<kr2376_device &>(device).m_write_strobe.set_callback(std::forward<Object>(cb)); }
 
 	/* keyboard data */
 	DECLARE_READ8_MEMBER( data_r );
 
 	/* Set an input pin */
-	void set_input_pin( kr2376_input_pin_t pin, int data );
+	void set_input_pin( input_pin_t pin, int data );
 
 	/* Get an output pin */
-	int get_output_pin( kr2376_output_pin_t pin );
+	int get_output_pin( output_pin_t pin );
 
 protected:
 	// device-level overrides
@@ -101,6 +102,6 @@ private:
 	void detect_keypress();
 };
 
-extern const device_type KR2376;
+DECLARE_DEVICE_TYPE(KR2376, kr2376_device)
 
-#endif
+#endif // MAME_MACHINE_KR2376_H

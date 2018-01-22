@@ -53,14 +53,21 @@ TODO:
 
 
 #include "emu.h"
+
 #include "cpu/tms7000/tms7000.h"
-#include "video/tms3556.h"
-#include "sound/tms5220.h"
+//#include "imagedev/cassette.h"
 #include "machine/spchrom.h"
+#include "machine/timer.h"
+#include "sound/tms5220.h"
+#include "video/tms3556.h"
+
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-//#include "imagedev/cassette.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 class exelv_state : public driver_device
 {
@@ -108,6 +115,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( exelvision_cartridge );
+	void exeltel(machine_config &config);
+	void exl100(machine_config &config);
 };
 
 
@@ -413,18 +422,6 @@ static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8, exelv_state)
 	AM_RANGE(0xc800, 0xf7ff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tms7020_port, AS_IO, 8, exelv_state)
-	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(tms7020_porta_r)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(tms7020_portb_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START(tms7041_port, AS_IO, 8, exelv_state)
-	AM_RANGE(TMS7000_PORTA, TMS7000_PORTA) AM_READ(tms7041_porta_r)
-	AM_RANGE(TMS7000_PORTB, TMS7000_PORTB) AM_WRITE(tms7041_portb_w)
-	AM_RANGE(TMS7000_PORTC, TMS7000_PORTC) AM_READWRITE(tms7041_portc_r, tms7041_portc_w)
-	AM_RANGE(TMS7000_PORTD, TMS7000_PORTD) AM_READWRITE(tms7041_portd_r, tms7041_portd_w)
-ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START(tms7040_mem, AS_PROGRAM, 8, exelv_state)
 	AM_RANGE(0x0080, 0x00ff) AM_NOP
@@ -478,17 +475,24 @@ MACHINE_START_MEMBER( exelv_state, exeltel)
 }
 
 
-static MACHINE_CONFIG_START( exl100, exelv_state )
+MACHINE_CONFIG_START(exelv_state::exl100)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS7020_EXL, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(tms7020_mem)
-	MCFG_CPU_IO_MAP(tms7020_port)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7020_porta_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7020_portb_w))
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exl100)
 
 	MCFG_CPU_ADD("tms7041", TMS7041, XTAL_4_9152MHz)
-	MCFG_CPU_IO_MAP(tms7041_port)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7041_porta_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7041_portb_w))
+	MCFG_TMS7000_IN_PORTC_CB(READ8(exelv_state, tms7041_portc_r))
+	MCFG_TMS7000_OUT_PORTC_CB(WRITE8(exelv_state, tms7041_portc_w))
+	MCFG_TMS7000_IN_PORTD_CB(READ8(exelv_state, tms7041_portd_r))
+	MCFG_TMS7000_OUT_PORTD_CB(WRITE8(exelv_state, tms7041_portd_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -499,11 +503,11 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_UPDATE_DEVICE("tms3556", tms3556_device, screen_update)
 #if TMS3556_DOUBLE_WIDTH
-	MCFG_SCREEN_SIZE(TMS3556_TOTAL_WIDTH*2, TMS3556_TOTAL_HEIGHT*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH*2-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
+	MCFG_SCREEN_SIZE(tms3556_device::TOTAL_WIDTH*2, tms3556_device::TOTAL_HEIGHT*2)
+	MCFG_SCREEN_VISIBLE_AREA(0, tms3556_device::TOTAL_WIDTH*2-1, 0, tms3556_device::TOTAL_HEIGHT*2-1)
 #else
-	MCFG_SCREEN_SIZE(TMS3556_TOTAL_WIDTH, TMS3556_TOTAL_HEIGHT*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH-1, 0, TMS3556_TOTAL_HEIGHT-1)
+	MCFG_SCREEN_SIZE(tms3556_device::TOTAL_WIDTH, tms3556_device::TOTAL_HEIGHT*2)
+	MCFG_SCREEN_VISIBLE_AREA(0, tms3556_device::TOTAL_WIDTH-1, 0, tms3556_device::TOTAL_HEIGHT-1)
 #endif
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -527,17 +531,24 @@ static MACHINE_CONFIG_START( exl100, exelv_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( exeltel, exelv_state )
+MACHINE_CONFIG_START(exelv_state::exeltel)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS7040, XTAL_4_9152MHz)
 	MCFG_CPU_PROGRAM_MAP(tms7040_mem)
-	MCFG_CPU_IO_MAP(tms7020_port)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7020_porta_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7020_portb_w))
+
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exeltel)
 
 	MCFG_CPU_ADD("tms7042", TMS7042, XTAL_4_9152MHz)
-	MCFG_CPU_IO_MAP(tms7041_port)
+	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7041_porta_r))
+	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7041_portb_w))
+	MCFG_TMS7000_IN_PORTC_CB(READ8(exelv_state, tms7041_portc_r))
+	MCFG_TMS7000_OUT_PORTC_CB(WRITE8(exelv_state, tms7041_portc_w))
+	MCFG_TMS7000_IN_PORTD_CB(READ8(exelv_state, tms7041_portd_r))
+	MCFG_TMS7000_OUT_PORTD_CB(WRITE8(exelv_state, tms7041_portd_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -548,11 +559,11 @@ static MACHINE_CONFIG_START( exeltel, exelv_state )
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MCFG_SCREEN_UPDATE_DEVICE("tms3556", tms3556_device, screen_update)
 #if TMS3556_DOUBLE_WIDTH
-	MCFG_SCREEN_SIZE(TMS3556_TOTAL_WIDTH*2, TMS3556_TOTAL_HEIGHT*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH*2-1, 0, TMS3556_TOTAL_HEIGHT*2-1)
+	MCFG_SCREEN_SIZE(tms3556_device::TOTAL_WIDTH*2, tms3556_device::TOTAL_HEIGHT*2)
+	MCFG_SCREEN_VISIBLE_AREA(0, tms3556_device::TOTAL_WIDTH*2-1, 0, tms3556_device::TOTAL_HEIGHT*2-1)
 #else
-	MCFG_SCREEN_SIZE(TMS3556_TOTAL_WIDTH, TMS3556_TOTAL_HEIGHT*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, TMS3556_TOTAL_WIDTH-1, 0, TMS3556_TOTAL_HEIGHT-1)
+	MCFG_SCREEN_SIZE(tms3556_device::TOTAL_WIDTH, tms3556_device::TOTAL_HEIGHT*2)
+	MCFG_SCREEN_VISIBLE_AREA(0, tms3556_device::TOTAL_WIDTH-1, 0, tms3556_device::TOTAL_HEIGHT-1)
 #endif
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -574,21 +585,21 @@ MACHINE_CONFIG_END
   ROM loading
 */
 ROM_START(exl100)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("exl100in.bin", 0xf800, 0x0800, CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))      /* TMS7020 ROM, correct */
+	ROM_REGION(0x800, "maincpu", 0)
+	ROM_LOAD("exl100in.bin", 0x000, 0x800, CRC(049109a3) SHA1(98a07297dcdacef41c793c197b6496dac1e8e744))      /* TMS7020 ROM, correct */
 
-	ROM_REGION(0x10000, "tms7041", 0)
-	ROM_LOAD("exl100_7041.bin", 0xf000, 0x1000, CRC(38f6fc7a) SHA1(b71d545664a974d8ad39bdf600c5b9884c3efab6))           /* TMS7041 internal ROM, correct  */
+	ROM_REGION(0x1000, "tms7041", 0)
+	ROM_LOAD("exl100_7041.bin", 0x0000, 0x1000, CRC(38f6fc7a) SHA1(b71d545664a974d8ad39bdf600c5b9884c3efab6))           /* TMS7041 internal ROM, correct  */
 //  ROM_REGION(0x8000, "vsm", 0)
 ROM_END
 
 
 ROM_START(exeltel)
-	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("exeltel_7040.bin", 0xf000, 0x1000, CRC(2792f02f) SHA1(442a852eb68ef78974733d169084752a131de23d))      /* TMS7040 internal ROM */
+	ROM_REGION(0x1000, "maincpu", 0)
+	ROM_LOAD("exeltel_7040.bin", 0x0000, 0x1000, CRC(2792f02f) SHA1(442a852eb68ef78974733d169084752a131de23d))      /* TMS7040 internal ROM */
 
-	ROM_REGION(0x10000, "tms7042", 0)
-	ROM_LOAD("exeltel_7042.bin", 0xf000, 0x1000, BAD_DUMP CRC(a0163507) SHA1(8452849df7eac8a89cf03ee98e2306047c1c4c38))         /* TMS7042 internal ROM, needs redump */
+	ROM_REGION(0x1000, "tms7042", 0)
+	ROM_LOAD("exeltel_7042.bin", 0x0000, 0x1000, BAD_DUMP CRC(a0163507) SHA1(8452849df7eac8a89cf03ee98e2306047c1c4c38))         /* TMS7042 internal ROM, needs redump */
 
 	ROM_REGION(0x10000,"user1",0)
 	ROM_SYSTEM_BIOS( 0, "french", "French v1.4" )
@@ -601,6 +612,6 @@ ROM_START(exeltel)
 ROM_END
 
 
-/*   YEAR   NAME     PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY         FULLNAME */
-COMP(1984,  exl100,  0,          0,      exl100,     exelv, driver_device,  0,       "Exelvision",   "EXL 100",  MACHINE_NOT_WORKING)
-COMP(1986,  exeltel, exl100,     0,      exeltel,    exelv, driver_device,  0,       "Exelvision",   "Exeltel",  MACHINE_NOT_WORKING)
+//   YEAR   NAME     PARENT      COMPAT  MACHINE     INPUT  STATE         INIT    COMPANY         FULLNAME    FLAGS
+COMP(1984,  exl100,  0,          0,      exl100,     exelv, exelv_state,  0,      "Exelvision",   "EXL 100",  MACHINE_NOT_WORKING)
+COMP(1986,  exeltel, exl100,     0,      exeltel,    exelv, exelv_state,  0,      "Exelvision",   "Exeltel",  MACHINE_NOT_WORKING)

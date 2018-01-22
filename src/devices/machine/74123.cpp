@@ -12,9 +12,8 @@
 #include "machine/74123.h"
 #include "machine/rescap.h"
 
-
-#define LOG     (0)
-
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 //**************************************************************************
@@ -22,14 +21,15 @@
 //**************************************************************************
 
 // device type definition
-const device_type TTL74123 = &device_creator<ttl74123_device>;
+DEFINE_DEVICE_TYPE(TTL74123, ttl74123_device, "ttl74123", "74123 TTL")
 
 //-------------------------------------------------
 //  ttl74123_device - constructor
 //-------------------------------------------------
 
 ttl74123_device::ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, TTL74123, "74123 TTL", tag, owner, clock, "ttl74123", __FILE__), m_timer(nullptr),
+	: device_t(mconfig, TTL74123, tag, owner, clock),
+		m_timer(nullptr),
 		m_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE),
 		m_res(1.0),
 		m_cap(1.0),
@@ -121,7 +121,7 @@ int ttl74123_device::timer_running()
 
 TIMER_CALLBACK_MEMBER( ttl74123_device::output_callback )
 {
-	m_output_changed_cb((offs_t)0, param);
+	m_output_changed_cb(param);
 }
 
 
@@ -135,7 +135,7 @@ void ttl74123_device::set_output()
 
 	machine().scheduler().timer_set( attotime::zero, timer_expired_delegate(FUNC(ttl74123_device::output_callback ),this), output);
 
-	if (LOG) logerror("74123 %s:  Output: %d\n", tag(), output);
+	LOG("74123:  Output: %d\n", output);
 }
 
 
@@ -147,7 +147,7 @@ TIMER_CALLBACK_MEMBER( ttl74123_device::clear_callback )
 {
 	int output = timer_running();
 
-	m_output_changed_cb((offs_t)0, output);
+	m_output_changed_cb(output);
 }
 
 //-------------------------------------------------
@@ -167,11 +167,11 @@ void ttl74123_device::start_pulse()
 		{
 			m_timer->adjust(duration);
 
-			if (LOG) logerror("74123 %s:  Retriggering pulse.  Duration: %f\n", tag(), duration.as_double());
+			LOG("74123:  Retriggering pulse.  Duration: %f\n", duration.as_double());
 		}
 		else
 		{
-			if (LOG) logerror("74123 %s:  Retriggering failed.\n", tag());
+			LOG("74123:  Retriggering failed.\n");
 		}
 	}
 	else
@@ -181,7 +181,7 @@ void ttl74123_device::start_pulse()
 
 		set_output();
 
-		if (LOG) logerror("74123 %s:  Starting pulse.  Duration: %f\n", tag(), duration.as_double());
+		LOG("74123:  Starting pulse.  Duration: %f\n", duration.as_double());
 	}
 }
 
@@ -190,15 +190,15 @@ void ttl74123_device::start_pulse()
 //  a_w - write register a data
 //-------------------------------------------------
 
-WRITE8_MEMBER( ttl74123_device::a_w )
+WRITE_LINE_MEMBER( ttl74123_device::a_w )
 {
 	/* start/regtrigger pulse if B=HI and falling edge on A (while clear is HI) */
-	if (!data && m_a && m_b && m_clear)
+	if (!state && m_a && m_b && m_clear)
 	{
 		start_pulse();
 	}
 
-	m_a = data;
+	m_a = state;
 }
 
 
@@ -206,15 +206,15 @@ WRITE8_MEMBER( ttl74123_device::a_w )
 //  b_w - write register b data
 //-------------------------------------------------
 
-WRITE8_MEMBER( ttl74123_device::b_w)
+WRITE_LINE_MEMBER( ttl74123_device::b_w)
 {
 	/* start/regtrigger pulse if A=LO and rising edge on B (while clear is HI) */
-	if (data && !m_b && !m_a && m_clear)
+	if (state && !m_b && !m_a && m_clear)
 	{
 		start_pulse();
 	}
 
-	m_b = data;
+	m_b = state;
 }
 
 
@@ -222,20 +222,20 @@ WRITE8_MEMBER( ttl74123_device::b_w)
 //  clear_w - write register clear data
 //-------------------------------------------------
 
-WRITE8_MEMBER( ttl74123_device::clear_w)
+WRITE_LINE_MEMBER( ttl74123_device::clear_w)
 {
 	/* start/regtrigger pulse if B=HI and A=LO and rising edge on clear */
-	if (data && !m_a && m_b && !m_clear)
+	if (state && !m_a && m_b && !m_clear)
 	{
 		start_pulse();
 	}
-	else if (!data)  /* clear the output  */
+	else if (!state)  /* clear the output  */
 	{
 		m_timer->adjust(attotime::zero);
 
-		if (LOG) logerror("74123 #%s:  Cleared\n", tag() );
+		LOG("74123:  Cleared\n");
 	}
-	m_clear = data;
+	m_clear = state;
 }
 
 
@@ -243,7 +243,7 @@ WRITE8_MEMBER( ttl74123_device::clear_w)
 //  reset_w - reset device
 //-------------------------------------------------
 
-WRITE8_MEMBER( ttl74123_device::reset_w)
+WRITE_LINE_MEMBER( ttl74123_device::reset_w)
 {
 	set_output();
 }

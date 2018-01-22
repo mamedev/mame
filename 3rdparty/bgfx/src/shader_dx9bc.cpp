@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -443,12 +443,12 @@ namespace bgfx
 
 		switch (_instruction.numOperands)
 		{
-		case 6: size += read(_reader, _instruction.operand[currOp++], _err);
-		case 5: size += read(_reader, _instruction.operand[currOp++], _err);
-		case 4: size += read(_reader, _instruction.operand[currOp++], _err);
-		case 3: size += read(_reader, _instruction.operand[currOp++], _err);
-		case 2: size += read(_reader, _instruction.operand[currOp++], _err);
-		case 1: size += read(_reader, _instruction.operand[currOp++], _err);
+		case 6: size += read(_reader, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 5: size += read(_reader, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 4: size += read(_reader, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 3: size += read(_reader, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 2: size += read(_reader, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 1: size += read(_reader, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
 		case 0:
 			if (!valuesBeforeOpcode
 			&&  0 < info.numValues)
@@ -482,12 +482,12 @@ namespace bgfx
 		uint32_t currOp = 0;
 		switch (_instruction.numOperands)
 		{
-		case 6: size += write(_writer, _instruction.operand[currOp++], _err);
-		case 5: size += write(_writer, _instruction.operand[currOp++], _err);
-		case 4: size += write(_writer, _instruction.operand[currOp++], _err);
-		case 3: size += write(_writer, _instruction.operand[currOp++], _err);
-		case 2: size += write(_writer, _instruction.operand[currOp++], _err);
-		case 1: size += write(_writer, _instruction.operand[currOp++], _err);
+		case 6: size += write(_writer, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 5: size += write(_writer, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 4: size += write(_writer, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 3: size += write(_writer, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 2: size += write(_writer, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
+		case 1: size += write(_writer, _instruction.operand[currOp++], _err); BX_FALLTHROUGH;
 		case 0:
 			break;
 		}
@@ -749,7 +749,7 @@ namespace bgfx
 		uint8_t* data = (uint8_t*)mb.more();
 		uint32_t size = uint32_t(bx::getSize(&writer) );
 		_dst.byteCode.reserve(size);
-		memcpy(_dst.byteCode.data(), data, size);
+		bx::memCopy(_dst.byteCode.data(), data, size);
 	}
 
 } // namespace bgfx

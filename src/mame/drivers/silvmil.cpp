@@ -28,8 +28,10 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "cpu/m68000/m68000.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
-#include "video/decospr.h"
 #include "sound/ym2151.h"
+#include "video/decospr.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class silvmil_state : public driver_device
@@ -130,6 +132,9 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
+	void puzzlovek(machine_config &config);
+	void puzzlove(machine_config &config);
+	void silvmil(machine_config &config);
 };
 
 
@@ -188,7 +193,7 @@ static ADDRESS_MAP_START( silvmil_map, AS_PROGRAM, 16, silvmil_state )
 
 	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(silvmil_fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(silvmil_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(silvmil_soundcmd_w)
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
@@ -264,7 +269,7 @@ static INPUT_PORTS_START( silvmil )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 3C_2C ) ) /* Works like 2C/1C then 1C/1C repeat */
 	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_2C ) ) /* Works the same as 1C/1C */
 	PORT_DIPSETTING(      0x3800, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Coin Box" )          PORT_DIPLOCATION("SW2:7") /* Funtionally reversed?? */
+	PORT_DIPNAME( 0x4000, 0x4000, "Coin Box" )          PORT_DIPLOCATION("SW2:7") /* Functionally reversed?? */
 	PORT_DIPSETTING(      0x4000, "1" ) /* Credits from Coin1 or Coin2 */
 	PORT_DIPSETTING(      0x0000, "2" ) /* Doesn't credit up from Coin2 */
 	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW2:8" ) /* Verified */
@@ -393,7 +398,7 @@ static ADDRESS_MAP_START( silvmil_sound_map, AS_PROGRAM, 8, silvmil_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( silvmil, silvmil_state )
+MACHINE_CONFIG_START(silvmil_state::silvmil)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* Verified */
@@ -432,11 +437,11 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz/4, OKIM6295_PIN7_HIGH) /* Verified */
+	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz/4, PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( puzzlove, silvmil )
+MACHINE_CONFIG_DERIVED(silvmil_state::puzzlove, silvmil)
 	MCFG_DEVICE_REMOVE("audiocpu")
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz) /* Verified */
 	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
@@ -445,11 +450,11 @@ static MACHINE_CONFIG_DERIVED( puzzlove, silvmil )
 	MCFG_DECO_SPRITE_BOOTLEG_TYPE(1)
 
 	MCFG_DEVICE_REMOVE("oki")
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, OKIM6295_PIN7_HIGH) /* Verified */
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( puzzlovek, puzzlove )
+MACHINE_CONFIG_DERIVED(silvmil_state::puzzlovek, puzzlove)
 		MCFG_DEVICE_REMOVE("ymsnd")
 		MCFG_YM2151_ADD("ymsnd", XTAL_15MHz/4) /* Verified */
 		MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

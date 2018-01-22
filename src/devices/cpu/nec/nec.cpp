@@ -105,6 +105,8 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "nec.h"
+#include "necdasm.h"
 #include "debugger.h"
 
 typedef uint8_t BOOLEAN;
@@ -112,18 +114,17 @@ typedef uint8_t BYTE;
 typedef uint16_t WORD;
 typedef uint32_t DWORD;
 
-#include "nec.h"
 #include "necpriv.h"
 
-const device_type V20 = &device_creator<v20_device>;
-const device_type V30 = &device_creator<v30_device>;
-const device_type V33 = &device_creator<v33_device>;
-const device_type V33A =&device_creator<v33a_device>;
+DEFINE_DEVICE_TYPE(V20,  v20_device,  "v20",  "V20")
+DEFINE_DEVICE_TYPE(V30,  v30_device,  "v30",  "V30")
+DEFINE_DEVICE_TYPE(V33,  v33_device,  "v33",  "V33")
+DEFINE_DEVICE_TYPE(V33A, v33a_device, "v33a", "V33A")
 
 
 
-nec_common_device::nec_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+nec_common_device::nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 16, 0)
 	, m_fetch_xor(fetch_xor)
@@ -135,14 +136,22 @@ nec_common_device::nec_common_device(const machine_config &mconfig, device_type 
 
 
 v20_device::v20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V20, "V20", tag, owner, clock, "v20", __FILE__, false, 0, 4, 4, V20_TYPE)
+	: nec_common_device(mconfig, V20, tag, owner, clock, false, 0, 4, 4, V20_TYPE)
 {
 }
 
 
 v30_device::v30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V30, "V30", tag, owner, clock, "v30", __FILE__, true, BYTE_XOR_LE(0), 6, 2, V30_TYPE)
+	: nec_common_device(mconfig, V30, tag, owner, clock, true, BYTE_XOR_LE(0), 6, 2, V30_TYPE)
 {
+}
+
+device_memory_interface::space_config_vector nec_common_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 
@@ -150,21 +159,20 @@ v30_device::v30_device(const machine_config &mconfig, const char *tag, device_t 
  * complete guess below, nbbatman will not work
  * properly without. */
 v33_device::v33_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V33, "V33", tag, owner, clock, "v33", __FILE__, true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+	: nec_common_device(mconfig, V33, tag, owner, clock, true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
 {
 }
 
 
 v33a_device::v33a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nec_common_device(mconfig, V33A, "V33A", tag, owner, clock, "v33A", __FILE__, true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
+	: nec_common_device(mconfig, V33A, tag, owner, clock, true, BYTE_XOR_LE(0), 6, 1, V33_TYPE)
 {
 }
 
 
-offs_t nec_common_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *nec_common_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( nec );
-	return CPU_DISASSEMBLE_NAME(nec)(this, buffer, pc, oprom, opram, options);
+	return new nec_disassembler;
 }
 
 
@@ -215,8 +223,8 @@ uint8_t nec_common_device::fetch()
 
 uint16_t nec_common_device::fetchword()
 {
-	uint16_t r = FETCH();
-	r |= (FETCH()<<8);
+	uint16_t r = fetch();
+	r |= (fetch()<<8);
 	return r;
 }
 
@@ -411,7 +419,7 @@ void nec_common_device::device_start()
 	save_item(NAME(m_prefetch_reset));
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	state_add( NEC_PC,    "PC", m_debugger_temp).callimport().callexport().formatstr("%05X");

@@ -5,15 +5,22 @@
 #include "superfx.h"
 
 
-const device_type SUPERFX = &device_creator<superfx_device>;
+DEFINE_DEVICE_TYPE(SUPERFX, superfx_device, "superfx", "SuperFX")
 
 superfx_device::superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, SUPERFX, "SuperFX", tag, owner, clock, "superfx", __FILE__)
+	: cpu_device(mconfig, SUPERFX, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 32, 0)
-	, m_out_irq_func(*this), m_pipeline(0), m_ramaddr(0), m_sfr(0), m_pbr(0), m_rombr(0), m_rambr(0), m_cbr(0), m_scbr(0), m_scmr(0), m_colr(0), m_por(0),
-	m_bramr(0), m_vcr(0), m_cfgr(0), m_clsr(0), m_romcl(0), m_romdr(0), m_ramcl(0), m_ramar(0), m_ramdr(0), m_sreg(nullptr), m_sreg_idx(0), m_dreg(nullptr),
-	m_dreg_idx(0), m_r15_modified(0), m_irq(0), m_cache_access_speed(0), m_memory_access_speed(0), m_program(nullptr), m_icount(0), m_debugger_temp(0)
+	, m_out_irq_func(*this), m_pipeline(0), m_ramaddr(0), m_sfr(0), m_pbr(0), m_rombr(0), m_rambr(0), m_cbr(0), m_scbr(0), m_scmr(0), m_colr(0), m_por(0)
+	, m_bramr(0), m_vcr(0), m_cfgr(0), m_clsr(0), m_romcl(0), m_romdr(0), m_ramcl(0), m_ramar(0), m_ramdr(0), m_sreg(nullptr), m_sreg_idx(0), m_dreg(nullptr)
+	, m_dreg_idx(0), m_r15_modified(0), m_irq(0), m_cache_access_speed(0), m_memory_access_speed(0), m_program(nullptr), m_icount(0), m_debugger_temp(0)
 {
+}
+
+device_memory_interface::space_config_vector superfx_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 
@@ -1438,21 +1445,12 @@ void superfx_device::execute_run()
 	}
 }
 
-offs_t superfx_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+u16 superfx_device::get_alt() const
 {
-	std::ostringstream stream;
-	offs_t result = disasm_disassemble(stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	return m_sfr & SUPERFX_SFR_ALT;
 }
 
-offs_t superfx_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *superfx_device::create_disassembler()
 {
-	uint8_t  op = *(uint8_t *)(opram + 0);
-	uint8_t  param0 = *(uint8_t *)(opram + 1);
-	uint8_t  param1 = *(uint8_t *)(opram + 2);
-	uint16_t alt = m_sfr & SUPERFX_SFR_ALT;
-
-	return superfx_dasm_one(stream, pc, op, param0, param1, alt);
+	return new superfx_disassembler(this);
 }

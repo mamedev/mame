@@ -14,7 +14,6 @@ public:
 
 protected:
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual void key_make(uint8_t row, uint8_t column) override;
 
 private:
@@ -23,6 +22,6 @@ private:
 	required_ioport m_modifiers;
 };
 
-extern const device_type M20_KEYBOARD;
+DECLARE_DEVICE_TYPE(M20_KEYBOARD, m20_keyboard_device)
 
 #endif // MAME_MACHINE_M20KBD_H

@@ -105,20 +105,18 @@ namespace glm
 	{
 		tvec3<T, defaultp> rgbw = tvec3<T, defaultp>(T(0.2126), T(0.7152), T(0.0722));
 
-		T col0 = (T(1) - s) * rgbw.r;
-		T col1 = (T(1) - s) * rgbw.g;
-		T col2 = (T(1) - s) * rgbw.b;
+		tvec3<T, defaultp> const col((T(1) - s) * rgbw);
 
 		tmat4x4<T, defaultp> result(T(1));
-		result[0][0] = col0 + s;
-		result[0][1] = col0;
-		result[0][2] = col0;
-		result[1][0] = col1;
-		result[1][1] = col1 + s;
-		result[1][2] = col1;
-		result[2][0] = col2;
-		result[2][1] = col2;
-		result[2][2] = col2 + s;
+		result[0][0] = col.x + s;
+		result[0][1] = col.x;
+		result[0][2] = col.x;
+		result[1][0] = col.y;
+		result[1][1] = col.y + s;
+		result[1][2] = col.y;
+		result[2][0] = col.z;
+		result[2][1] = col.z;
+		result[2][2] = col.z + s;
 		return result;
 	}
 

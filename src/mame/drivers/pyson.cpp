@@ -153,6 +153,7 @@ Notes:
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/mips/r3000.h"
+#include "screen.h"
 
 
 class pyson_state : public driver_device
@@ -165,6 +166,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void pyson(machine_config &config);
 protected:
 
 	// devices
@@ -192,7 +194,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( pyson )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( pyson, pyson_state )
+MACHINE_CONFIG_START(pyson_state::pyson)
 	MCFG_CPU_ADD("maincpu", R5000LE, 294000000) // imported from namcops2.c driver
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
@@ -250,6 +252,6 @@ ROM_START( wswe2k3 )
 ROM_END
 
 
-GAME(2002, pyson,          0,   pyson,   pyson, driver_device,       0, ROT0, "Konami", "Konami Pyson BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
-GAME(2002, wswe,       pyson,   pyson,   pyson, driver_device,       0, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style", MACHINE_IS_SKELETON)
-GAME(2003, wswe2k3,    pyson,   pyson,   pyson, driver_device,       0, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003", MACHINE_IS_SKELETON)
+GAME(2002, pyson,          0,   pyson,   pyson, pyson_state, 0, ROT0, "Konami", "Konami Pyson BIOS", MACHINE_IS_SKELETON|MACHINE_IS_BIOS_ROOT)
+GAME(2002, wswe,       pyson,   pyson,   pyson, pyson_state, 0, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game Style", MACHINE_IS_SKELETON)
+GAME(2003, wswe2k3,    pyson,   pyson,   pyson, pyson_state, 0, ROT0, "Konami", "World Soccer Winning Eleven Arcade Game 2003", MACHINE_IS_SKELETON)

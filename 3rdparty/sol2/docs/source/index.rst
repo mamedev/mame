@@ -33,6 +33,7 @@ get going:
 	tutorial/all-the-things
 	tutorial/tutorial-top
 	errors
+	compilation
 	features
 	usertypes
 	traits

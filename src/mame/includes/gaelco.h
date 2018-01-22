@@ -39,9 +39,11 @@ public:
 	/* video-related */
 	tilemap_t      *m_tilemap[2];
 
-	DECLARE_WRITE16_MEMBER(bigkarnk_sound_command_w);
-	DECLARE_WRITE16_MEMBER(bigkarnk_coin_w);
-	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
+	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(coin1_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_counter_w);
+	DECLARE_WRITE8_MEMBER(OKIM6295_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(gaelco_vram_encrypted_w);
 	DECLARE_WRITE16_MEMBER(gaelco_encrypted_w);
 	DECLARE_WRITE16_MEMBER(thoop_vram_encrypted_w);
@@ -58,4 +60,8 @@ public:
 	uint32_t screen_update_bigkarnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_maniacsq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void bigkarnk(machine_config &config);
+	void thoop(machine_config &config);
+	void maniacsq(machine_config &config);
+	void squash(machine_config &config);
 };

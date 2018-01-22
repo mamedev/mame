@@ -10,29 +10,33 @@
 
 *********************************************************************/
 
-#ifndef __DS1315_H__
-#define __DS1315_H__
+#ifndef MAME_MACHINE_DS1315_H
+#define MAME_MACHINE_DS1315_H
 
-#include "emu.h"
+#pragma once
 
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MCFG_DS1315_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, DS1315, 0)
+
+#define MCFG_DS1315_BACKING_HANDLER(_devcb) \
+	devcb = &ds1315_device::set_backing_handler(*device, DEVCB_##_devcb);
 
 /***************************************************************************
     MACROS
 ***************************************************************************/
-
-enum ds1315_mode_t
-{
-	DS_SEEK_MATCHING,
-	DS_CALENDAR_IO
-};
-
-ALLOW_SAVE_TYPE(ds1315_mode_t);
 
 class ds1315_device : public device_t
 {
 public:
 	ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~ds1315_device() {}
+
+	// this handler automates the bits 0/2 stuff
+	DECLARE_READ8_MEMBER(read);
 
 	DECLARE_READ8_MEMBER(read_0);
 	DECLARE_READ8_MEMBER(read_1);
@@ -42,15 +46,25 @@ public:
 	bool chip_enable();
 	void chip_reset();
 
+	template <class Object> static devcb_base &set_backing_handler(device_t &device, Object &&cb)
+	{ return downcast<ds1315_device &>(device).m_backing_read.set_callback(std::forward<Object>(cb)); }
+
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	devcb_read8 m_backing_read;
+
+	enum mode_t : u8
+	{
+		DS_SEEK_MATCHING,
+		DS_CALENDAR_IO
+	};
+
 	// internal state
-	ds1315_mode_t m_mode;
+	mode_t m_mode;
 
 	void fill_raw_data();
 	void input_raw_data();
@@ -59,14 +73,8 @@ private:
 	uint8_t m_raw_data[8*8];
 };
 
-extern const device_type DS1315;
+ALLOW_SAVE_TYPE(ds1315_device::mode_t);
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
+DECLARE_DEVICE_TYPE(DS1315, ds1315_device)
 
-#define MCFG_DS1315_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DS1315, 0)
-
-
-#endif /* __DS1315_H__ */
+#endif // MAME_MACHINE_DS1315_H

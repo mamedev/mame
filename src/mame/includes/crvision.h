@@ -5,7 +5,6 @@
 #define __CRVISION__
 
 
-#include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
 #include "machine/6821pia.h"
@@ -66,6 +65,8 @@ public:
 	DECLARE_READ8_MEMBER( pia_pb_r );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
+	void creativision(machine_config &config);
+	void ntsc(machine_config &config);
 protected:
 	virtual void machine_start() override;
 };
@@ -76,6 +77,7 @@ public:
 	crvision_pal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: crvision_state(mconfig, type, tag)
 	{ }
+	void pal(machine_config &config);
 };
 
 class laser2001_state : public crvision_state
@@ -107,6 +109,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( pia_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 
+	void lasr2001(machine_config &config);
 protected:
 	virtual void machine_start() override;
 };

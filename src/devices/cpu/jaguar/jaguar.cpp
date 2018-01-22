@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "jaguar.h"
+#include "jagdasm.h"
 
 
 #define LOG_GPU_IO      0
@@ -136,12 +137,12 @@ const jaguar_cpu_device::op_func jaguar_cpu_device::dsp_op_table[64] =
 #define ROPCODE(pc)           (m_direct->read_word(pc, WORD_XOR_BE(0)))
 
 
-const device_type JAGUARGPU = &device_creator<jaguargpu_cpu_device>;
-const device_type JAGUARDSP = &device_creator<jaguardsp_cpu_device>;
+DEFINE_DEVICE_TYPE(JAGUARGPU, jaguargpu_cpu_device, "jaguargpu", "Jaguar GPU")
+DEFINE_DEVICE_TYPE(JAGUARDSP, jaguardsp_cpu_device, "jaguardsp", "Jaguar DSP")
 
 
-jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, bool isdsp)
-	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool isdsp)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 24, 0)
 	, m_isdsp(isdsp)
 	, m_cpu_interrupt(*this)
@@ -163,14 +164,21 @@ jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type 
 
 
 jaguargpu_cpu_device::jaguargpu_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: jaguar_cpu_device(mconfig, JAGUARGPU, "Jaguar GPU", tag, owner, clock, "jaguargpu", __FILE__, false)
+	: jaguar_cpu_device(mconfig, JAGUARGPU, tag, owner, clock, false)
 {
 }
 
 
 jaguardsp_cpu_device::jaguardsp_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: jaguar_cpu_device(mconfig, JAGUARDSP, "Jaguar DSP", tag, owner, clock, "jaguardsp", __FILE__, true)
+	: jaguar_cpu_device(mconfig, JAGUARDSP, tag, owner, clock, true)
 {
+}
+
+device_memory_interface::space_config_vector jaguar_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
 }
 
 
@@ -330,7 +338,7 @@ void jaguar_cpu_device::device_start()
 	init_tables();
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_cpu_interrupt.resolve_safe();
 
 	save_item(NAME(m_r));
@@ -1429,16 +1437,12 @@ WRITE32_MEMBER( jaguardsp_cpu_device::ctrl_w )
 	}
 }
 
-
-offs_t jaguargpu_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *jaguargpu_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( jaguargpu );
-	return CPU_DISASSEMBLE_NAME(jaguargpu)(this, buffer, pc, oprom, opram, options);
+	return new jaguar_disassembler(jaguar_disassembler::JAGUAR_VARIANT_GPU);
 }
 
-
-offs_t jaguardsp_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *jaguardsp_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( jaguardsp );
-	return CPU_DISASSEMBLE_NAME(jaguardsp)(this, buffer, pc, oprom, opram, options);
+	return new jaguar_disassembler(jaguar_disassembler::JAGUAR_VARIANT_DSP);
 }

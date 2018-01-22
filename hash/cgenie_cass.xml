@@ -151,7 +151,18 @@ distributor of the Colour Genie EG2000 computers.
 		</part>
 	</software>
 
-	<!-- Missing: Colour-Frogger (or is this Toad Mania?) -->
+	<software name="frog" supported="yes">
+		<description>Colour Frog</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="author" value="Thomas Schmidt" />
+		<info name="usage" value="Type SYSTEM and load with FROG, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="8225">
+				<rom name="colourfrog_tcs.cas" size="8225" crc="0ddbf620" sha1="7bfff994d4b7c5785a1f5bd1289d0c9c86239da3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="colkong" supported="yes">
 		<description>Colour Kong (32k)</description>
@@ -270,9 +281,33 @@ distributor of the Colour Genie EG2000 computers.
 	</software>
 
 	<!-- Missing: Colour-Skat -->
-	<!-- Missing: Colour Synthesizer aka Synthi, TCS 1983 (Jürgen Buchmüller) -->
+	<software name="synthi" supported="yes">
+		<description>Synthesizer (TCS)</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="author" value="Jürgen Buchmüller" />
+		<info name="usage" value="Type SYSTEM and load with SYNTHI, enter / to start." />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="6928">
+				<rom name="synthesizer.cas" size="6928" crc="58d448c5" sha1="492ae1f29cbd2d9152d07f13e1058a195eff926e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Missing: Colour-Text -->
-	<!-- Missing: Colzap -->
+
+	<software name="colzap" supported="yes">
+		<description>Colour-Zap Ver 1.0 (TCS)</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="usage" value="Type SYSTEM and load with COLZAP, enter / to start." />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="5502">
+				<rom name="colourzap.cas" size="5502" crc="419a71cb" sha1="21f608f2b4fabacf46d93a352f03a7b5a119892f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Missing: Composer, TCS 1983 (Carsten Schmidt) -->
 
 	<software name="chopper" supported="yes">
@@ -356,7 +391,20 @@ distributor of the Colour Genie EG2000 computers.
 	</software>
 
 	<!-- Missing: Death-Trap -->
-	<!-- Missing: Dig-Boy, TCS 1983 -->
+
+	<software name="digboy" supported="yes">
+		<description>DIG-BOY (TCS)</description>
+		<year>1983</year>
+		<publisher>TCS</publisher>
+		<info name="author" value="Dieter Kuhn" />
+		<info name="usage" value="Type SYSTEM and load with DIGBOY, enter / to start" />
+		<part name="cass1" interface="cgenie_cass">
+			<dataarea name="cass" size="14924">
+				<rom name="digboy_tcs.cas" size="14924" crc="86fd3b59" sha1="f4531d3f8d8f2d4b0fd539a69a7ce0ca7ed19066" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Missing: Doppelwurm, TCS 1983 -->
 
 	<software name="eagle" supported="yes">

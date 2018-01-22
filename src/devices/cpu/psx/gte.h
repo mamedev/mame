@@ -7,12 +7,11 @@
  *
  */
 
+#ifndef MAME_CPU_PSX_GTE_H
+#define MAME_CPU_PSX_GTE_H
+
 #pragma once
 
-#ifndef __PSXGTE_H__
-#define __PSXGTE_H__
-
-#include "emu.h"
 
 #define GTE_SF( op ) ( ( op >> 19 ) & 1 )
 #define GTE_MX( op ) ( ( op >> 17 ) & 3 )
@@ -43,8 +42,8 @@ protected:
 	public:
 		int44( int64_t value ) :
 			m_value( value ),
-			m_positive_overflow( value > S64( 0x7ffffffffff ) ),
-			m_negative_overflow( value < S64( -0x80000000000 ) )
+			m_positive_overflow( value > 0x7ffffffffff ),
+			m_negative_overflow( value < -0x80000000000 )
 		{
 		}
 
@@ -111,4 +110,4 @@ protected:
 	int64_t m_mac3;
 };
 
-#endif
+#endif // MAME_CPU_PSX_GTE_H

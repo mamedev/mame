@@ -171,14 +171,13 @@ public:
 	required_memory_region m_fgctl_prom;
 	required_memory_region m_char_rom;
 
-	DECLARE_DRIVER_INIT(driver_init);
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 	MC6845_UPDATE_ROW( abc800m_update_row );
+	void abc800m(machine_config &config);
+	void abc800m_video(machine_config &config);
 };
 
 
@@ -198,16 +197,15 @@ public:
 	required_device<palette_device> m_palette;
 	required_memory_region m_fgctl_prom;
 
-	DECLARE_DRIVER_INIT(driver_init);
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	offs_t translate_trom_offset(offs_t offset);
 	void hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( char_ram_r );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 	DECLARE_PALETTE_INIT( abc800c );
+	void abc800c(machine_config &config);
+	void abc800c_video(machine_config &config);
 };
 
 
@@ -229,7 +227,6 @@ public:
 	required_memory_region m_char_rom;
 	required_ioport m_config;
 
-	DECLARE_DRIVER_INIT(driver_init);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -242,7 +239,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( lrs_w );
 	DECLARE_WRITE_LINE_MEMBER( mux80_40_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 	MC6845_UPDATE_ROW( abc802_update_row );
 
 	// cpu state
@@ -252,6 +248,9 @@ public:
 	int m_flshclk_ctr;          // flash clock counter
 	int m_flshclk;              // flash clock
 	int m_80_40_mux;            // 40/80 column mode
+
+	void abc802(machine_config &config);
+	void abc802_video(machine_config &config);
 };
 
 
@@ -279,7 +278,6 @@ public:
 	required_memory_region m_char_rom;
 	optional_shared_ptr<uint8_t> m_attr_ram;
 
-	DECLARE_DRIVER_INIT(driver_init);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -304,7 +302,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( keydtr_w );
 	DECLARE_WRITE_LINE_MEMBER( hs_w );
 	DECLARE_WRITE_LINE_MEMBER( vs_w );
-	DECLARE_DIRECT_UPDATE_MEMBER( direct_update_handler );
 	DECLARE_PALETTE_INIT( abc806 );
 	MC6845_UPDATE_ROW( abc806_update_row );
 
@@ -326,6 +323,9 @@ public:
 	uint32_t m_vsync_shift;       // vertical sync shift register
 	int m_vsync;                // vertical sync
 	int m_d_vsync;              // delayed vertical sync
+
+	void abc806(machine_config &config);
+	void abc806_video(machine_config &config);
 };
 
 #endif

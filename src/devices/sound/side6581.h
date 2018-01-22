@@ -4,10 +4,10 @@
 // /home/ms/source/sidplay/libsidplay/emu/RCS/enve_dl.h,v
 //
 
-#pragma once
+#ifndef MAME_SOUND_SIDE6581_H
+#define MAME_SOUND_SIDE6581_H
 
-#ifndef __SIDE6581_H__
-#define __SIDE6581_H__
+#pragma once
 
 
 //
@@ -125,4 +125,4 @@ static const uint8_t releaseTab[] =
 };
 
 
-#endif /* __SIDE6581_H__ */
+#endif // MAME_SOUND_SIDE6581_H

@@ -1,24 +1,29 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski, Phil Stroffolino, Tomasz Slanina
 
+#include "cpu/m6805/m68705.h"
+#include "machine/timer.h"
+#include "screen.h"
+
 
 class changela_state : public driver_device
 {
 public:
 	changela_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_spriteram(*this, "spriteram"),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
-		m_mcu(*this, "mcu"),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
-
-	/* memory pointers */
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
+		: driver_device(mconfig, type, tag)
+		, m_spriteram(*this, "spriteram")
+		, m_videoram(*this, "videoram")
+		, m_colorram(*this, "colorram")
+		, m_mcu(*this, "mcu")
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_port_a_out(0xff)
+		, m_port_c_out(0xff)
+		, m_mcu_out(0xff)
+		, m_mcu_in(0xff)
+	{
+	}
 
 	/* video-related */
 	bitmap_ind16 m_obj0_bitmap;
@@ -47,44 +52,22 @@ public:
 	uint8_t    m_prev_value_31;
 	int      m_dir_31;
 
-	/* mcu-related */
-	uint8_t    m_port_a_in;
-	uint8_t    m_port_a_out;
-	uint8_t    m_ddr_a;
-	uint8_t    m_port_b_out;
-	uint8_t    m_ddr_b;
-	uint8_t    m_port_c_in;
-	uint8_t    m_port_c_out;
-	uint8_t    m_ddr_c;
-
-	uint8_t    m_mcu_out;
-	uint8_t    m_mcu_in;
-	uint8_t    m_mcu_pc_1;
-	uint8_t    m_mcu_pc_0;
-
 	/* devices */
-	optional_device<cpu_device> m_mcu;
 	DECLARE_READ8_MEMBER(mcu_r);
 	DECLARE_WRITE8_MEMBER(mcu_w);
-	DECLARE_READ8_MEMBER(changela_68705_port_a_r);
 	DECLARE_WRITE8_MEMBER(changela_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(changela_68705_ddr_a_w);
-	DECLARE_READ8_MEMBER(changela_68705_port_b_r);
-	DECLARE_WRITE8_MEMBER(changela_68705_port_b_w);
-	DECLARE_WRITE8_MEMBER(changela_68705_ddr_b_w);
-	DECLARE_READ8_MEMBER(changela_68705_port_c_r);
 	DECLARE_WRITE8_MEMBER(changela_68705_port_c_w);
-	DECLARE_WRITE8_MEMBER(changela_68705_ddr_c_w);
 	DECLARE_READ8_MEMBER(changela_24_r);
 	DECLARE_READ8_MEMBER(changela_25_r);
 	DECLARE_READ8_MEMBER(changela_30_r);
 	DECLARE_READ8_MEMBER(changela_31_r);
 	DECLARE_READ8_MEMBER(changela_2c_r);
 	DECLARE_READ8_MEMBER(changela_2d_r);
-	DECLARE_WRITE8_MEMBER(mcu_pc_0_w);
-	DECLARE_WRITE8_MEMBER(changela_collision_reset_0);
-	DECLARE_WRITE8_MEMBER(changela_collision_reset_1);
-	DECLARE_WRITE8_MEMBER(changela_coin_counter_w);
+	DECLARE_WRITE_LINE_MEMBER(mcu_pc_0_w);
+	DECLARE_WRITE_LINE_MEMBER(collision_reset_0_w);
+	DECLARE_WRITE_LINE_MEMBER(collision_reset_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
+	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
 	DECLARE_WRITE8_MEMBER(changela_colors_w);
 	DECLARE_WRITE8_MEMBER(changela_mem_device_select_w);
 	DECLARE_WRITE8_MEMBER(changela_mem_device_w);
@@ -102,7 +85,23 @@ public:
 	void draw_obj1( bitmap_ind16 &bitmap );
 	void draw_river( bitmap_ind16 &bitmap, int sy );
 	void draw_tree( bitmap_ind16 &bitmap, int sy, int tree_num );
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
+
+	void changela(machine_config &config);
+protected:
+	// memory pointers
+	required_shared_ptr<u8>         m_spriteram;
+	required_shared_ptr<u8>         m_videoram;
+	required_shared_ptr<u8>         m_colorram;
+
+	// devices
+	required_device<m68705p_device> m_mcu;
+	required_device<cpu_device>     m_maincpu;
+	required_device<screen_device>  m_screen;
 	required_device<palette_device> m_palette;
+
+	// mcu-related
+	u8  m_port_a_out;
+	u8  m_port_c_out;
+	u8  m_mcu_out;
+	u8  m_mcu_in;
 };

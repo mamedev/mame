@@ -1,6 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Nicola Salmoria, Tomasz Slanina
+
 #include "audio/t5182.h"
+#include "machine/timer.h"
+#include "screen.h"
 
 class darkmist_state : public driver_device
 {
@@ -47,7 +50,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(hw_w);
 	DECLARE_WRITE8_MEMBER(tx_vram_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_bgtile_info);
 	TILE_GET_INFO_MEMBER(get_fgtile_info);
 	TILE_GET_INFO_MEMBER(get_txttile_info);
@@ -66,4 +69,5 @@ public:
 	void decrypt_snd();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void darkmist(machine_config &config);
 };

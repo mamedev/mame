@@ -26,15 +26,17 @@ drawLine(SDL_Renderer *renderer, float startx, float starty, float dx, float dy)
     float dx_prime = dx / iterations;   /* x-shift per iteration */
     float dy_prime = dy / iterations;   /* y-shift per iteration */
     SDL_Rect dstRect;           /* rect to draw brush sprite into */
+    float x;
+    float y;
+    int i;
 
     dstRect.w = BRUSH_SIZE;
     dstRect.h = BRUSH_SIZE;
 
     /* setup x and y for the location of the first sprite */
-    float x = startx - BRUSH_SIZE / 2.0f;
-    float y = starty - BRUSH_SIZE / 2.0f;
+    x = startx - BRUSH_SIZE / 2.0f;
+    y = starty - BRUSH_SIZE / 2.0f;
 
-    int i;
     /* draw a series of blots to form the line */
     for (i = 0; i < iterations; i++) {
         dstRect.x = x;
@@ -80,6 +82,7 @@ main(int argc, char *argv[])
     SDL_Window *window;         /* main window */
     SDL_Renderer *renderer;
     int done;                   /* does user want to quit? */
+    int w, h;
 
     /* initialize SDL */
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -87,10 +90,11 @@ main(int argc, char *argv[])
     }
 
     /* create main window and renderer */
-    window = SDL_CreateWindow(NULL, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT,
-                                SDL_WINDOW_OPENGL |
-                                SDL_WINDOW_BORDERLESS);
+    window = SDL_CreateWindow(NULL, 0, 0, 320, 480, SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALLOW_HIGHDPI);
     renderer = SDL_CreateRenderer(window, 0, 0);
+
+    SDL_GetWindowSize(window, &w, &h);
+    SDL_RenderSetLogicalSize(renderer, w, h);
 
     /* load brush texture */
     initializeTexture(renderer);

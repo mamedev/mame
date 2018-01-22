@@ -22,7 +22,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type Z88CART_SLOT = &device_creator<z88cart_slot_device>;
+DEFINE_DEVICE_TYPE(Z88CART_SLOT, z88cart_slot_device, "z88cart_slot", "Z88 Cartridge Slot")
 
 
 //**************************************************************************
@@ -56,10 +56,11 @@ device_z88cart_interface::~device_z88cart_interface()
 //  z88cart_slot_device - constructor
 //-------------------------------------------------
 z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, Z88CART_SLOT, "Z88 Cartridge Slot", tag, owner, clock, "z88cart_slot", __FILE__),
-		device_image_interface(mconfig, *this),
-		device_slot_interface(mconfig, *this),
-		m_out_flp_cb(*this), m_cart(nullptr), m_flp_timer(nullptr)
+	device_t(mconfig, Z88CART_SLOT, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	device_slot_interface(mconfig, *this),
+	m_out_flp_cb(*this),
+	m_cart(nullptr), m_flp_timer(nullptr)
 {
 }
 
@@ -84,18 +85,6 @@ void z88cart_slot_device::device_start()
 
 	m_flp_timer = timer_alloc(TIMER_FLP_CLEAR);
 	m_flp_timer->reset();
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void z88cart_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -125,7 +114,7 @@ image_init_result z88cart_slot_device::call_load()
 
 		if (cart_base != nullptr)
 		{
-			if (software_entry() == nullptr)
+			if (!loaded_through_softlist())
 			{
 				read_length = length();
 				fread(cart_base + (m_cart->get_cart_size() - read_length), read_length);
@@ -175,7 +164,7 @@ void z88cart_slot_device::call_unload()
     get default card software
 -------------------------------------------------*/
 
-std::string z88cart_slot_device::get_default_card_software()
+std::string z88cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("128krom");
 }
@@ -202,4 +191,17 @@ WRITE8_MEMBER(z88cart_slot_device::write)
 {
 	if (m_cart)
 		m_cart->write(space, offset, data);
+}
+
+
+/*-------------------------------------------------
+    get_cart_base
+-------------------------------------------------*/
+
+uint8_t* z88cart_slot_device::get_cart_base()
+{
+	if (m_cart)
+		return m_cart->get_cart_base();
+	else
+		return nullptr;
 }

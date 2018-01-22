@@ -4,12 +4,13 @@
 /* San Remo / Elsy Multigame? */
 
 // presumably a gambling game, maybe missing a sub-board?
-// http://www.citylan.it/wiki/index.php/Multigame_ID
+// http://www.citylan.it/wiki/index.php/Unknown_San_Remo_/_Elsy_Multigame
 
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "screen.h"
 
 
 class sanremmg_state : public driver_device
@@ -25,6 +26,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_sanremmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void sanremmg(machine_config &config);
 };
 
 
@@ -49,7 +51,7 @@ static INPUT_PORTS_START( sanremmg )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sanremmg, sanremmg_state )
+MACHINE_CONFIG_START(sanremmg_state::sanremmg)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM7, 50000000) // ??? doesn't seem to be ARM, but what is it?
@@ -75,4 +77,4 @@ ROM_START( sanremmg )
 ROM_END
 
 
-GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, driver_device,  0,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_NO_SOUND | MACHINE_IS_SKELETON )
+GAME( 2003, sanremmg, 0,        sanremmg,  sanremmg, sanremmg_state,  0,  ROT0, "San Remo Games", "unknown San Remo / Elsy Multigame", MACHINE_IS_SKELETON )

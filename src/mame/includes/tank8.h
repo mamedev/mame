@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "sound/discrete.h"
+#include "screen.h"
 
 /* Discrete Sound Input Nodes */
 #define TANK8_CRASH_EN          NODE_01
@@ -84,7 +85,7 @@ public:
 	DECLARE_PALETTE_INIT(tank8);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 	void set_pens();
 	inline int get_x_pos(int n);
 	inline int get_y_pos(int n);
@@ -92,6 +93,7 @@ public:
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_collision(int index);
 
+	void tank8(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
+#include "emu.h"
 #include "deviceswindow.h"
 #include "deviceinformationwindow.h"
 
@@ -164,13 +165,13 @@ void DevicesWindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void DevicesWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void DevicesWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
 }
 
 
-void DevicesWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void DevicesWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
 }

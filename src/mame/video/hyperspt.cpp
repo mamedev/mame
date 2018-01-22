@@ -2,7 +2,7 @@
 // copyright-holders:Chris Hardy
 /***************************************************************************
 
-  video.c
+  hyperspt.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -89,25 +89,22 @@ PALETTE_INIT_MEMBER(hyperspt_state, hyperspt)
 	}
 }
 
-WRITE8_MEMBER(hyperspt_state::hyperspt_videoram_w)
+WRITE8_MEMBER(hyperspt_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(hyperspt_state::hyperspt_colorram_w)
+WRITE8_MEMBER(hyperspt_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(hyperspt_state::hyperspt_flipscreen_w)
+WRITE_LINE_MEMBER(hyperspt_state::flipscreen_w)
 {
-	if (flip_screen() != (data & 0x01))
-	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
-	}
+	flip_screen_set(state);
+	machine().tilemap().mark_all_dirty();
 }
 
 TILE_GET_INFO_MEMBER(hyperspt_state::get_bg_tile_info)
@@ -127,17 +124,14 @@ void hyperspt_state::video_start()
 
 void hyperspt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t *spriteram = m_spriteram;
-	int offs;
-
-	for (offs = m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
+	for (int offs = m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
-		int sx = spriteram[offs + 3];
-		int sy = 240 - spriteram[offs + 1];
-		int code = spriteram[offs + 2] + 8 * (spriteram[offs] & 0x20);
-		int color = spriteram[offs] & 0x0f;
-		int flipx = ~spriteram[offs] & 0x40;
-		int flipy = spriteram[offs] & 0x80;
+		int sx = m_spriteram[offs + 3];
+		int sy = 240 - m_spriteram[offs + 1];
+		int code = m_spriteram[offs + 2] + 8 * (m_spriteram[offs] & 0x20);
+		int color = m_spriteram[offs] & 0x0f;
+		int flipx = ~m_spriteram[offs] & 0x40;
+		int flipy = m_spriteram[offs] & 0x80;
 
 		if (flip_screen())
 		{
@@ -168,11 +162,9 @@ void hyperspt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-uint32_t hyperspt_state::screen_update_hyperspt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hyperspt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int row;
-
-	for (row = 0; row < 32; row++)
+	for (int row = 0; row < 32; row++)
 	{
 		int scrollx = m_scroll[row * 2] + (m_scroll[(row * 2) + 1] & 0x01) * 256;
 		if (flip_screen()) scrollx = -scrollx;

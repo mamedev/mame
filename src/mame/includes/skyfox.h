@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "screen.h"
 
 class skyfox_state : public driver_device
 {
@@ -44,4 +45,5 @@ public:
 	INTERRUPT_GEN_MEMBER(skyfox_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void skyfox(machine_config &config);
 };

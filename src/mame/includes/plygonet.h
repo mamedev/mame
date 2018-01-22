@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Andrew Gardner
+#ifndef MAME_INCLUDES_PLYGONET_H
+#define MAME_INCLUDES_PLYGONET_H
+
+#pragma once
 
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
@@ -31,7 +35,7 @@ public:
 		m_shared_ram(*this, "shared_ram"),
 		m_dsp56k_p_mirror(*this, "dsp56k_p_mirror"),
 		m_dsp56k_p_8000(*this, "dsp56k_p_8000")
-		{ }
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -109,4 +113,7 @@ public:
 	uint32_t screen_update_polygonet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(polygonet_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
+	void plygonet(machine_config &config);
 };
+
+#endif // MAME_INCLUDES_PLYGONET_H

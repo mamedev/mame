@@ -6,6 +6,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "p1_rom.h"
 
 
@@ -13,7 +14,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type P1_ROM = &device_creator<p1_rom_device>;
+DEFINE_DEVICE_TYPE(P1_ROM, p1_rom_device, "p1_rom", "Poisk-1 ROM cart")
 
 
 //-------------------------------------------------
@@ -37,7 +38,7 @@ ROM_END
 
 const tiny_rom_entry *p1_rom_device::device_rom_region() const
 {
-	return ROM_NAME( p1_rom );
+	return ROM_NAME(p1_rom);
 }
 
 
@@ -49,9 +50,9 @@ const tiny_rom_entry *p1_rom_device::device_rom_region() const
 //  p1_rom_device - constructor
 //-------------------------------------------------
 
-p1_rom_device::p1_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, P1_ROM, "Poisk-1 ROM cart", tag, owner, clock, "p1_rom", __FILE__),
-	device_isa8_card_interface( mconfig, *this )
+p1_rom_device::p1_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, P1_ROM, tag, owner, clock)
+	, device_isa8_card_interface(mconfig, *this)
 {
 }
 

@@ -72,8 +72,11 @@
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
+#include "machine/timer.h"
 #include "sound/dmadac.h"
 #include "video/ramdac.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define SPEEDUP_HACKS   1
 
@@ -187,6 +190,7 @@ public:
 	void report_speedups();
 	void install_speedups(const speedup_entry *entries, int count);
 	void init_mediagx();
+	void mediagx(machine_config &config);
 };
 
 // Display controller registers
@@ -405,7 +409,7 @@ READ32_MEMBER(mediagx_state::disp_ctrl_r)
 
 #if SPEEDUP_HACKS
 			// wait for vblank speedup
-			space.device().execute().spin_until_interrupt();
+			m_maincpu->spin_until_interrupt();
 #endif
 			break;
 	}
@@ -523,7 +527,7 @@ READ32_MEMBER(mediagx_state::parallel_port_r)
 	{
 		uint8_t nibble = m_parallel_latched;
 		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
-		logerror("%08X:parallel_port_r()\n", space.device().safe_pc());
+		logerror("%08X:parallel_port_r()\n", m_maincpu->pc());
 #if 0
 		if (m_controls_data == 0x18)
 		{
@@ -570,7 +574,7 @@ WRITE32_MEMBER(mediagx_state::parallel_port_w)
 		        7x..ff = advance pointer
 		*/
 
-		logerror("%08X:", space.device().safe_pc());
+		logerror("%08X:", m_maincpu->pc());
 
 		m_parallel_latched = (m_ports[m_parallel_pointer / 3].read_safe(0) >> (4 * (m_parallel_pointer % 3))) & 15;
 		//parallel_pointer++;
@@ -864,11 +868,11 @@ void mediagx_state::machine_reset()
 	dmadac_enable(&m_dmadac[0], 2, 1);
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8, mediagx_state )
+static ADDRESS_MAP_START( ramdac_map, 0, 8, mediagx_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mediagx, mediagx_state )
+MACHINE_CONFIG_START(mediagx_state::mediagx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MEDIAGX, 166000000)
@@ -1010,6 +1014,8 @@ ROM_START( a51site4 )
 	ROMX_LOAD("a51s4_bios_09-15-98.u1", 0x00000, 0x40000, CRC(f8cd6a6b) SHA1(75f851ae21517b729a5596ce5e042ebfaac51778), ROM_BIOS(1)) /* Build date 09/15/98 string stored at 0x3fff5 */
 	ROM_SYSTEM_BIOS(1, "old", "v1.0f" )
 	ROMX_LOAD("a51s4_bios_07-11-98.u1", 0x00000, 0x40000, CRC(5ee189cc) SHA1(0b0d9321a4c59b1deea6854923e655a4d8c4fcfe), ROM_BIOS(2)) /* Build date 07/11/98 string stored at 0x3fff5 */
+	ROM_SYSTEM_BIOS(2, "older", "v1.0d" ) /* doesn't work with the HDs currently available, shows "FOR EVALUATION ONLY" */
+	ROMX_LOAD("a51s4_bios_04-22-98.u1", 0x00000, 0x40000, CRC(2008bfc6) SHA1(004bec8759fb04d375c6efc49d048693d1f871ee), ROM_BIOS(3)) /* Build date 04/22/98 string stored at 0x3fff5 */
 
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
@@ -1024,6 +1030,8 @@ ROM_START( a51site4a ) /* When dumped connected straight to IDE the cylinders we
 	ROMX_LOAD("a51s4_bios_09-15-98.u1", 0x00000, 0x40000, CRC(f8cd6a6b) SHA1(75f851ae21517b729a5596ce5e042ebfaac51778), ROM_BIOS(1)) /* Build date 09/15/98 string stored at 0x3fff5 */
 	ROM_SYSTEM_BIOS(1, "old", "v1.0f" )
 	ROMX_LOAD("a51s4_bios_07-11-98.u1", 0x00000, 0x40000, CRC(5ee189cc) SHA1(0b0d9321a4c59b1deea6854923e655a4d8c4fcfe), ROM_BIOS(2)) /* Build date 07/11/98 string stored at 0x3fff5 */
+	ROM_SYSTEM_BIOS(2, "older", "v1.0d" ) /* doesn't work with the HDs currently available, shows "FOR EVALUATION ONLY" */
+	ROMX_LOAD("a51s4_bios_04-22-98.u1", 0x00000, 0x40000, CRC(2008bfc6) SHA1(004bec8759fb04d375c6efc49d048693d1f871ee), ROM_BIOS(3)) /* Build date 04/22/98 string stored at 0x3fff5, doesn't work */
 
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))

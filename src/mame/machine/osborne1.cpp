@@ -9,7 +9,10 @@ There are three IRQ sources:
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/osborne1.h"
+
+#include "screen.h"
 
 
 WRITE8_MEMBER( osborne1_state::bank_0xxx_w )
@@ -39,19 +42,18 @@ READ8_MEMBER( osborne1_state::bank_2xxx_3xxx_r )
 		data &= m_pia0->read(space, offset & 0x03);
 	if ((offset & 0xA00) == 0x200) // Keyboard
 	{
-		if (offset & 0x01) data &= m_keyb_row0->read();
-		if (offset & 0x02) data &= m_keyb_row1->read();
-		if (offset & 0x04) data &= m_keyb_row3->read();
-		if (offset & 0x08) data &= m_keyb_row4->read();
-		if (offset & 0x10) data &= m_keyb_row5->read();
-		if (offset & 0x20) data &= m_keyb_row2->read();
-		if (offset & 0x40) data &= m_keyb_row6->read();
-		if (offset & 0x80) data &= m_keyb_row7->read();
+		if (offset & 0x01) data &= m_keyb_row[0]->read();
+		if (offset & 0x02) data &= m_keyb_row[1]->read();
+		if (offset & 0x04) data &= m_keyb_row[3]->read();
+		if (offset & 0x08) data &= m_keyb_row[4]->read();
+		if (offset & 0x10) data &= m_keyb_row[5]->read();
+		if (offset & 0x20) data &= m_keyb_row[2]->read();
+		if (offset & 0x40) data &= m_keyb_row[6]->read();
+		if (offset & 0x80) data &= m_keyb_row[7]->read();
 	}
 	if ((offset & 0xA00) == 0xA00) // Serial
 	{
-		if (offset & 0x01) data &= m_acia->data_r(space, 0);
-		else data &= m_acia->status_r(space, 0);
+		data &= m_acia->read(space, offset & 0x01);
 	}
 	if ((offset & 0xC00) == 0x400) // SCREEN-PAC
 	{
@@ -77,8 +79,7 @@ WRITE8_MEMBER( osborne1_state::bank_2xxx_3xxx_w )
 			m_pia0->write(space, offset & 0x03, data);
 		if ((offset & 0xA00) == 0xA00) // Serial
 		{
-			if (offset & 0x01) m_acia->data_w(space, 0, data);
-			else m_acia->control_w(space, 0, data);
+			m_acia->write(space, offset & 0x01, data);
 		}
 		if ((offset & 0xC00) == 0x400) // SCREEN-PAC
 		{
@@ -102,7 +103,7 @@ WRITE8_MEMBER( osborne1_state::videoram_w )
 
 READ8_MEMBER( osborne1_state::opcode_r )
 {
-	if (!space.debugger_access())
+	if (!machine().side_effect_disabled())
 	{
 		// Update the flipflops that control bank selection and NMI
 		uint8_t const new_ub6a_q = (m_btn_reset->read() & 0x80) ? 1 : 0;
@@ -116,12 +117,7 @@ READ8_MEMBER( osborne1_state::opcode_r )
 	}
 
 	// Now that's sorted out we can call the normal read handler
-	address_space &program_space(m_maincpu->space(AS_PROGRAM));
-	bool const prev_debugger_access(program_space.debugger_access());
-	program_space.set_debugger_access(space.debugger_access());
-	uint8_t const data(program_space.read_byte(offset));
-	program_space.set_debugger_access(prev_debugger_access);
-	return data;
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
 WRITE8_MEMBER( osborne1_state::bankswitch_w )
@@ -252,6 +248,14 @@ WRITE_LINE_MEMBER( osborne1_state::serial_acia_irq_func )
 }
 
 
+INPUT_CHANGED_MEMBER( osborne1_state::reset_key )
+{
+	// This key affects NMI
+	if (!m_ub6a_q)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
 DRIVER_INIT_MEMBER( osborne1_state, osborne1 )
 {
 	m_bank_0xxx->configure_entries(0, 1, m_ram->pointer(), 0);
@@ -261,14 +265,13 @@ DRIVER_INIT_MEMBER( osborne1_state, osborne1 )
 	m_bank_fxxx->configure_entries(0, 1, m_ram->pointer() + 0xF000, 0);
 	m_bank_fxxx->configure_entries(1, 1, m_ram->pointer() + 0x10000, 0);
 
-	m_p_chargen = memregion("chargen")->base();
-	m_video_timer = timer_alloc(TIMER_VIDEO);
+	m_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osborne1_state::video_callback), this));
 	m_tilemap = &machine().tilemap().create(
 			*m_gfxdecode,
 			tilemap_get_info_delegate(FUNC(osborne1_state::get_tile_info), this), TILEMAP_SCAN_ROWS,
 			8, 10, 128, 32);
 
-	m_acia_rxc_txc_timer = timer_alloc(TIMER_ACIA_RXC_TXC);
+	m_acia_rxc_txc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osborne1_state::acia_rxc_txc_callback), this));
 
 	save_item(NAME(m_screen_pac));
 	save_item(NAME(m_acia_rxc_txc_div));
@@ -352,22 +355,6 @@ uint32_t osborne1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-void osborne1_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_VIDEO:
-		video_callback(ptr, param);
-		break;
-	case TIMER_ACIA_RXC_TXC:
-		m_acia_rxc_txc_state = m_acia_rxc_txc_state ? 0 : 1;
-		update_acia_rxc_txc();
-		break;
-	default:
-		assert_always(false, "Unknown id in osborne1_state::device_timer");
-	}
-}
-
 TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 {
 	int const y = machine().first_screen()->vpos();
@@ -408,7 +395,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 		// to a fixed value of 1 or 9 depending on the value of the HC-LEFT
 		// signal (set by bit 1 of the value written to 0x2400).  Of course
 		// it depends on the value wrapping around to zero when it counts
-		// past 0x7F
+		// past 0x7F.
 		uint16_t const col = hires ? ((m_scroll_x & 0x60) + (m_hc_left ? 0x09 : 0x01) + 0x17) : (m_scroll_x + 0x0B);
 
 		for (uint16_t x = 0; x < (hires ? 104 : 52); x++)
@@ -443,11 +430,13 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 	m_beep_state = (ra & 0x04) ? 1 : 0;
 	m_speaker->level_w((BIT(port_b, 5) && m_beep_state) ? 1 : 0);
 
-	// Check reset key if necessary - it affects NMI
-	if (!m_ub6a_q)
-		m_maincpu->set_input_line(INPUT_LINE_NMI, (m_btn_reset->read() & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-
 	m_video_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0));
+}
+
+TIMER_CALLBACK_MEMBER(osborne1_state::acia_rxc_txc_callback)
+{
+	m_acia_rxc_txc_state = m_acia_rxc_txc_state ? 0 : 1;
+	update_acia_rxc_txc();
 }
 
 
@@ -506,4 +495,27 @@ void osborne1_state::update_acia_rxc_txc()
 	attoseconds_t const dividend = (ATTOSECONDS_PER_SECOND / 100) * (m_acia_rxc_txc_state ? m_acia_rxc_txc_p_high : m_acia_rxc_txc_p_low);
 	attoseconds_t const divisor = (15974400 / 100) / m_acia_rxc_txc_div;
 	m_acia_rxc_txc_timer->adjust(attotime(0, dividend / divisor));
+}
+
+
+MC6845_UPDATE_ROW(osborne1nv_state::crtc_update_row)
+{
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint16_t const base = (ma >> 1) & 0xF80;
+	uint32_t *p = &bitmap.pix32(y);
+	for (uint8_t x = 0; x < x_count; ++x)
+	{
+		uint16_t const offset = base | ((ma + x) & 0x7F);
+		uint8_t const chr = m_ram->pointer()[0xF000 | offset];
+		uint8_t const clr = BIT(m_ram->pointer()[0x10000 | offset], 7) ? 2 : 1;
+
+		uint8_t const gfx = ((chr & 0x80) && (ra == 9)) ? 0xFF : m_p_nuevo[(ra << 7) | (chr & 0x7F)];
+
+		for (unsigned bit = 0; 8 > bit; ++bit)
+			*p++ = palette[BIT(gfx, 7 - bit) ? clr : 0];
+	}
+}
+
+MC6845_ON_UPDATE_ADDR_CHANGED(osborne1nv_state::crtc_update_addr_changed)
+{
 }

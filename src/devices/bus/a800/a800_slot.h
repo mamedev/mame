@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Fabio Priuli
-#ifndef __A800_SLOT_H
-#define __A800_SLOT_H
+#ifndef MAME_BUS_A800_A800_SLOT_H
+#define MAME_BUS_A800_A800_SLOT_H
+
+#pragma once
 
 #include "softlist_dev.h"
 
@@ -49,7 +51,6 @@ class device_a800_cart_interface : public device_slot_card_interface
 {
 public:
 	// construction/destruction
-	device_a800_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_a800_cart_interface();
 
 	// memory accessor
@@ -69,6 +70,8 @@ public:
 	uint32_t get_nvram_size() { return m_nvram.size(); }
 
 protected:
+	device_a800_cart_interface(const machine_config &mconfig, device_t &device);
+
 	// internal state
 	uint8_t *m_rom;
 	uint32_t m_rom_size;
@@ -87,13 +90,8 @@ class a800_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~a800_cart_slot_device();
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_config_complete() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -101,7 +99,7 @@ public:
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_cart_type() { return m_type; };
-	int identify_cart_type(uint8_t *header);
+	int identify_cart_type(const uint8_t *header) const;
 	bool has_cart() { return m_cart != nullptr; }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
@@ -114,13 +112,19 @@ public:
 	virtual const char *file_extensions() const override { return "bin,rom,car"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_80xx);
 	virtual DECLARE_READ8_MEMBER(read_d5xx);
 	virtual DECLARE_WRITE8_MEMBER(write_80xx);
 	virtual DECLARE_WRITE8_MEMBER(write_d5xx);
+
+protected:
+	a800_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
 
 private:
 	device_a800_cart_interface*       m_cart;
@@ -143,7 +147,7 @@ public:
 	virtual const char *file_extensions() const override { return "bin,rom,car,a52"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 };
 
 // ======================> xegs_cart_slot_device
@@ -158,13 +162,13 @@ public:
 	virtual const char *file_extensions() const override { return "bin,rom,car"; }
 
 	// slot interface overrides
-	virtual std::string get_default_card_software() override;
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 };
 
 // device type definition
-extern const device_type A800_CART_SLOT;
-extern const device_type A5200_CART_SLOT;
-extern const device_type XEGS_CART_SLOT;
+DECLARE_DEVICE_TYPE(A800_CART_SLOT,  a800_cart_slot_device)
+DECLARE_DEVICE_TYPE(A5200_CART_SLOT, a5200_cart_slot_device)
+DECLARE_DEVICE_TYPE(XEGS_CART_SLOT,  xegs_cart_slot_device)
 
 
 /***************************************************************************
@@ -186,4 +190,4 @@ extern const device_type XEGS_CART_SLOT;
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 
-#endif
+#endif // MAME_BUS_A800_A800_SLOT_H

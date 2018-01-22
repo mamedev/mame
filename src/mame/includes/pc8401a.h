@@ -6,17 +6,19 @@
 #define __PC8401A__
 
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "machine/upd1990a.h"
 #include "video/mc6845.h"
 #include "video/sed1330.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+
+#include "screen.h"
 
 #define SCREEN_TAG      "screen"
 #define CRT_SCREEN_TAG  "screen2"
@@ -94,6 +96,8 @@ public:
 
 	uint8_t m_key_latch;
 	TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_keyboard_tick);
+	void pc8401a(machine_config &config);
+	void pc8401a_video(machine_config &config);
 };
 
 class pc8500_state : public pc8401a_state
@@ -105,11 +109,8 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void pc8500(machine_config &config);
+	void pc8500_video(machine_config &config);
 };
-
-// ---------- defined in video/pc8401a.c ----------
-
-MACHINE_CONFIG_EXTERN( pc8401a_video );
-MACHINE_CONFIG_EXTERN( pc8500_video );
 
 #endif

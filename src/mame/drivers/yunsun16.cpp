@@ -47,7 +47,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 2) 'magicbua'
 
-  - Additionnal 1P Vs COM mode with always only 1 winning round.
+  - Additional 1P Vs COM mode with always only 1 winning round.
   - Starting in 1P Vs 2P mode costs 2 credits. If no "Continue Play", the winner continues.
     And when a player joins in, if no "Continue Play", the winner also continues.
   - There is an ingame bug when in 1P Vs 2P mode : whatever the settings are, there will
@@ -89,10 +89,12 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 #include "emu.h"
 #include "includes/yunsun16.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "speaker.h"
 
 
 /***************************************************************************
@@ -125,7 +127,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, yunsun16_state )
 	AM_RANGE(0x800180, 0x800181) AM_WRITE8(sound_bank_w, 0x00ff)    // Sound
 	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITENOP    // ? 0 (during int)
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1") // Layer 1
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0") // Layer 0
 	AM_RANGE(0x910000, 0x910fff) AM_RAM AM_SHARE("spriteram")   // Sprites
@@ -175,7 +177,7 @@ static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, yunsun16_state )
 	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_device, read, write)       // M6295
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8, yunsun16_state )
+static ADDRESS_MAP_START( oki_map, 0, 8, yunsun16_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 	ADDRESS_MAP_END
@@ -584,7 +586,7 @@ MACHINE_RESET_MEMBER(yunsun16_state, shocking)
                                 Magic Bubble
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( magicbub, yunsun16_state )
+MACHINE_CONFIG_START(yunsun16_state::magicbub)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -617,7 +619,7 @@ static MACHINE_CONFIG_START( magicbub, yunsun16_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -627,7 +629,7 @@ MACHINE_CONFIG_END
                                 Shocking
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( shocking, yunsun16_state )
+MACHINE_CONFIG_START(yunsun16_state::shocking)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -650,10 +652,10 @@ static MACHINE_CONFIG_START( shocking, yunsun16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
 
 
@@ -1018,10 +1020,10 @@ ROM_END
 
 GAME( 199?, magicbub,   0,        magicbub, magicbub, yunsun16_state, magicbub, ROT0,   "Yun Sung", "Magic Bubble",                              MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, magicbuba,  magicbub, magicbub, magicbua, yunsun16_state, magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-1302 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 199?, magicbubb,  magicbub, shocking, magicbua, driver_device,  0,        ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-0211 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, paprazzi,   0,        shocking, paprazzi, driver_device,  0,        ROT270, "Yun Sung", "Paparazzi",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, shocking,   0,        shocking, shocking, driver_device,  0,        ROT0,   "Yun Sung", "Shocking",                                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, shockingk,  shocking, shocking, shocking, driver_device,  0,        ROT0,   "Yun Sung", "Shocking (Korea, set 1)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, shockingko, shocking, shocking, shocking, driver_device,  0,        ROT0,   "Yun Sung", "Shocking (Korea, set 2)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bombkick,   0,        shocking, bombkick, driver_device,  0,        ROT0,   "Yun Sung", "Bomb Kick (set 1)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, bombkicka,  bombkick, shocking, bombkick, driver_device,  0,        ROT0,   "Yun Sung", "Bomb Kick (set 2)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, magicbubb,  magicbub, shocking, magicbua, yunsun16_state, 0,        ROT0,   "Yun Sung", "Magic Bubble (Adult version, YS-0211 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, paprazzi,   0,        shocking, paprazzi, yunsun16_state, 0,        ROT270, "Yun Sung", "Paparazzi",                                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shocking,   0,        shocking, shocking, yunsun16_state, 0,        ROT0,   "Yun Sung", "Shocking",                                  MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shockingk,  shocking, shocking, shocking, yunsun16_state, 0,        ROT0,   "Yun Sung", "Shocking (Korea, set 1)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, shockingko, shocking, shocking, shocking, yunsun16_state, 0,        ROT0,   "Yun Sung", "Shocking (Korea, set 2)",                   MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bombkick,   0,        shocking, bombkick, yunsun16_state, 0,        ROT0,   "Yun Sung", "Bomb Kick (set 1)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1998, bombkicka,  bombkick, shocking, bombkick, yunsun16_state, 0,        ROT0,   "Yun Sung", "Bomb Kick (set 2)",                         MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

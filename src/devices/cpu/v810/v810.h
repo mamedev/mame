@@ -1,9 +1,9 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Tomasz Slanina
-#pragma once
+#ifndef MAME_CPU_V810_V810_H
+#define MAME_CPU_V810_V810_H
 
-#ifndef __V810_H__
-#define __V810_H__
+#pragma once
 
 
 enum
@@ -98,15 +98,13 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ((spacenum == AS_IO) ? &m_io_config : nullptr); }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	typedef uint32_t (v810_device::*opcode_func)(uint32_t op);
@@ -120,7 +118,7 @@ private:
 	uint8_t m_irq_state;
 	uint8_t m_nmi_line;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_io;
 	uint32_t m_PPC;
 	int m_icount;
@@ -194,11 +192,9 @@ private:
 	uint32_t opFpoint(uint32_t op);
 	uint32_t opBSU(uint32_t op);
 	void take_interrupt();
-
 };
 
 
-extern const device_type V810;
+DECLARE_DEVICE_TYPE(V810, v810_device)
 
-
-#endif /* __V810_H__ */
+#endif // MAME_CPU_V810_V810_H

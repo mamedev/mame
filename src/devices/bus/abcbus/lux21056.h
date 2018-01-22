@@ -6,12 +6,11 @@
 
 *********************************************************************/
 
+#ifndef MAME_BUS_ABCBUS_LUX21056_H
+#define MAME_BUS_ABCBUS_LUX21056_H
+
 #pragma once
 
-#ifndef __LUXOR_55_21056__
-#define __LUXOR_55_21056__
-
-#include "emu.h"
 #include "abcbus.h"
 #include "bus/scsi/scsi.h"
 #include "cpu/z80/z80.h"
@@ -33,11 +32,6 @@ public:
 	// construction/destruction
 	luxor_55_21056_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// optional information overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual ioport_constructor device_input_ports() const override;
-
 	DECLARE_READ8_MEMBER( sasi_status_r );
 	DECLARE_WRITE8_MEMBER( stat_w );
 	DECLARE_READ8_MEMBER( out_r );
@@ -51,21 +45,15 @@ public:
 	DECLARE_READ8_MEMBER( sasi_rst_r );
 	DECLARE_WRITE8_MEMBER( sasi_rst_w );
 
-	DECLARE_READ8_MEMBER( memory_read_byte );
-	DECLARE_WRITE8_MEMBER( memory_write_byte );
-	DECLARE_READ8_MEMBER( io_read_byte );
-	DECLARE_WRITE8_MEMBER( io_write_byte );
-
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_req );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_io );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_cd );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_msg );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_bsy );
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override;
@@ -78,9 +66,20 @@ protected:
 private:
 	void set_rdy(int state);
 
+	DECLARE_READ8_MEMBER( memory_read_byte );
+	DECLARE_WRITE8_MEMBER( memory_write_byte );
+	DECLARE_READ8_MEMBER( io_read_byte );
+	DECLARE_WRITE8_MEMBER( io_write_byte );
+
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_req );
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_io );
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_cd );
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_msg );
+	DECLARE_WRITE_LINE_MEMBER( write_sasi_bsy );
+
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
-	required_device<SCSI_PORT_DEVICE> m_sasibus;
+	required_device<scsi_port_device> m_sasibus;
 	required_device<output_latch_device> m_sasi_data_out;
 	required_device<input_buffer_device> m_sasi_data_in;
 	required_ioport m_s1;
@@ -101,8 +100,6 @@ private:
 
 
 // device type definition
-extern const device_type LUXOR_55_21056;
+DECLARE_DEVICE_TYPE(LUXOR_55_21056, luxor_55_21056_device)
 
-
-
-#endif
+#endif // MAME_BUS_ABCBUS_LUX21056_H

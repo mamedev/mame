@@ -41,6 +41,7 @@ A1                   2101            2101
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
 
 #include "ace.lh"
 
@@ -81,6 +82,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ace_postload();
+	void ace(machine_config &config);
 };
 
 
@@ -315,7 +317,7 @@ void aceal_state::machine_reset()
 		elem = 0;
 }
 
-static MACHINE_CONFIG_START( ace, aceal_state )
+MACHINE_CONFIG_START(aceal_state::ace)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* 2 MHz ? */
@@ -357,4 +359,4 @@ ROM_START( ace )
 ROM_END
 
 
-GAMEL(1976, ace, 0, ace, ace, driver_device, 0, ROT0, "Allied Leisure", "Ace", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, layout_ace )
+GAMEL(1976, ace, 0, ace, ace, aceal_state, 0, ROT0, "Allied Leisure", "Ace", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND, layout_ace )

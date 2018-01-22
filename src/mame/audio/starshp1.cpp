@@ -26,7 +26,7 @@
 #define STARSHP1_SL2_SND        NODE_17
 
 /* Timing signals */
-#define STARSHP1_HSYNC  15750   /* per manual */
+#define STARSHP1_HSYNC  (STARSHP1_PIXEL_CLOCK / STARSHP1_HTOTAL)
 #define STARSHP1_S1V    STARSHP1_HSYNC / 2
 #define STARSHP1_S128V  STARSHP1_S1V / 128
 

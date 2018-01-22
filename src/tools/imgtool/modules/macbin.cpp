@@ -2,7 +2,7 @@
 // copyright-holders:Raphael Nabet
 /****************************************************************************
 
-    macbin.c
+    macbin.cpp
 
     MacBinary filter for use with Mac and ProDOS drivers
 
@@ -82,7 +82,6 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition &partition, const char
 	imgtoolerr_t err;
 	uint8_t header[128];
 	const char *basename;
-	int i;
 
 	uint32_t type_code = 0x3F3F3F3F;
 	uint32_t creator_code = 0x3F3F3F3F;
@@ -93,23 +92,32 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition &partition, const char
 	uint8_t script_code = 0;
 	uint8_t extended_flags = 0;
 
-	imgtool_forkent fork_entries[4];
-	const imgtool_forkent *data_fork = NULL;
-	const imgtool_forkent *resource_fork = NULL;
 	uint32_t creation_time = 0;
 	uint32_t lastmodified_time = 0;
 	imgtool_attribute attr_values[10];
 
-	/* get the forks */
-	err = partition.list_file_forks(filename, fork_entries, sizeof(fork_entries));
+	// get the forks
+	std::vector<imgtool::fork_entry> fork_entries;
+	err = partition.list_file_forks(filename, fork_entries);
 	if (err)
 		return err;
-	for (i = 0; fork_entries[i].type != FORK_END; i++)
+
+	const imgtool::fork_entry *data_fork = nullptr;
+	const imgtool::fork_entry *resource_fork = nullptr;
+	for (const auto &entry : fork_entries)
 	{
-		if (fork_entries[i].type == FORK_DATA)
-			data_fork = &fork_entries[i];
-		else if (fork_entries[i].type == FORK_RESOURCE)
-			resource_fork = &fork_entries[i];
+		switch (entry.type())
+		{
+		case imgtool::fork_entry::type_t::DATA:
+			data_fork = &entry;
+			break;
+		case imgtool::fork_entry::type_t::RESOURCE:
+			resource_fork = &entry;
+			break;
+		default:
+			// do nothing
+			break;
+		}
 	}
 
 	/* get the attributes */
@@ -144,8 +152,8 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition &partition, const char
 	place_integer_be(header,  75, 2, coord_x);
 	place_integer_be(header,  77, 2, coord_y);
 	place_integer_be(header,  79, 2, finder_folder);
-	place_integer_be(header,  83, 4, data_fork ? data_fork->size : 0);
-	place_integer_be(header,  87, 4, resource_fork ? resource_fork->size : 0);
+	place_integer_be(header,  83, 4, data_fork ? data_fork->size() : 0);
+	place_integer_be(header,  87, 4, resource_fork ? resource_fork->size() : 0);
 	place_integer_be(header,  91, 4, creation_time);
 	place_integer_be(header,  95, 4, lastmodified_time);
 	place_integer_be(header, 101, 1, (finder_flags >> 0) & 0xFF);
@@ -164,7 +172,7 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition &partition, const char
 		if (err)
 			return err;
 
-		destf.fill(0, pad128(data_fork->size));
+		destf.fill(0, pad128(data_fork->size()));
 	}
 
 	if (resource_fork)
@@ -173,7 +181,7 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition &partition, const char
 		if (err)
 			return err;
 
-		destf.fill(0, pad128(resource_fork->size));
+		destf.fill(0, pad128(resource_fork->size()));
 	}
 
 	return IMGTOOLERR_SUCCESS;
@@ -315,8 +323,8 @@ static imgtoolerr_t macbinary_writefile(imgtool::partition &partition, const cha
 			return err;
 
 		/* set up attributes */
-		attr_values[0].t = mac_crack_time(creation_time);
-		attr_values[1].t = mac_crack_time(lastmodified_time);
+		attr_values[0].t = mac_crack_time(creation_time).to_time_t();
+		attr_values[1].t = mac_crack_time(lastmodified_time).to_time_t();
 		attr_values[2].i = type_code;
 		attr_values[3].i = creator_code;
 		attr_values[4].i = finder_flags;

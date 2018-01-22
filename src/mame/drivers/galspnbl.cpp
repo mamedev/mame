@@ -38,11 +38,13 @@ Manuals for both games define the controls as 4 push buttons:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/galspnbl.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
-#include "includes/galspnbl.h"
+#include "speaker.h"
 
 
 WRITE16_MEMBER(galspnbl_state::soundcommand_w)
@@ -69,7 +71,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, galspnbl_state )
 	AM_RANGE(0x905000, 0x907fff) AM_WRITENOP    /* ??? */
 	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_SHARE("bgvideoram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_WRITENOP    /* more palette ? */
-	AM_RANGE(0xa01000, 0xa017ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa01000, 0xa017ff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa01800, 0xa027ff) AM_WRITENOP    /* more palette ? */
 	AM_RANGE(0xa80000, 0xa80001) AM_READ_PORT("IN0")
 	AM_RANGE(0xa80010, 0xa80011) AM_READ_PORT("IN1") AM_WRITE(soundcommand_w)
@@ -210,7 +212,7 @@ void galspnbl_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
+MACHINE_CONFIG_START(galspnbl_state::galspnbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* 12 MHz ??? - Use value from Tecmo's Super Pinball Action - NEEDS VERIFICATION!! */
@@ -252,7 +254,7 @@ static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, OKIM6295_PIN7_HIGH) /* Use value from Super Pinball Action - clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH) /* Use value from Super Pinball Action - clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -317,5 +319,5 @@ ROM_START( hotpinbl )
 ROM_END
 
 
-GAME( 1995, hotpinbl, 0, galspnbl, hotpinbl, driver_device, 0, ROT90, "Comad & New Japan System", "Hot Pinball", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, galspnbl, 0, galspnbl, galspnbl, driver_device, 0, ROT90, "Comad", "Gals Pinball", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, hotpinbl, 0, galspnbl, hotpinbl, galspnbl_state, 0, ROT90, "Comad & New Japan System", "Hot Pinball", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, galspnbl, 0, galspnbl, galspnbl, galspnbl_state, 0, ROT90, "Comad", "Gals Pinball", MACHINE_SUPPORTS_SAVE )

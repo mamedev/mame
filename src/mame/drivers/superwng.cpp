@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /****************************************************************************************
 
@@ -35,6 +35,9 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "screen.h"
+#include "speaker.h"
+
 
 #define MASTER_CLOCK XTAL_18_432MHz
 
@@ -94,6 +97,7 @@ public:
 	uint32_t screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(superwng_nmi_interrupt);
 	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
+	void superwng(machine_config &config);
 };
 
 WRITE8_MEMBER(superwng_state::superwng_unk_a187_w)
@@ -467,7 +471,7 @@ void superwng_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-static MACHINE_CONFIG_START( superwng, superwng_state )
+MACHINE_CONFIG_START(superwng_state::superwng)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -522,4 +526,4 @@ ROM_START( superwng )
 ROM_END
 
 
-GAME( 1985, superwng,   0,      superwng, superwng, driver_device, 0, ROT90, "Wing", "Super Wing", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // crashes after bonus stage, see notes, bad rom?
+GAME( 1985, superwng,   0,      superwng, superwng, superwng_state, 0, ROT90, "Wing", "Super Wing", MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // crashes after bonus stage, see notes, bad rom?

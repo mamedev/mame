@@ -1097,7 +1097,10 @@ HRESULT CInArchive::ReadAndDecodePackedStreams(
       if (CrcCalc(data, unpackSize) != folders.FolderCRCs.Vals[i])
         ThrowIncorrect();
   }
-  HeadersSize += folders.PackPositions[folders.NumPackStreams];
+
+  if (folders.PackPositions)
+    HeadersSize += folders.PackPositions[folders.NumPackStreams];
+
   return S_OK;
 }
 
@@ -1150,9 +1153,8 @@ HRESULT CInArchive::ReadHeader(
   if (type == NID::kFilesInfo)
   {
   
-  CNum numFiles = ReadNum();
+  const CNum numFiles = ReadNum();
   db.Files.ClearAndSetSize(numFiles);
-  CNum i;
   /*
   db.Files.Reserve(numFiles);
   CNum i;
@@ -1174,8 +1176,8 @@ HRESULT CInArchive::ReadHeader(
 
   for (;;)
   {
-    UInt64 type = ReadID();
-    if (type == NID::kEnd)
+    const UInt64 type2 = ReadID();
+    if (type2 == NID::kEnd)
       break;
     UInt64 size = ReadNumber();
     if (size > _inByteBack->GetRem())
@@ -1184,9 +1186,9 @@ HRESULT CInArchive::ReadHeader(
     switchProp.Set(this, _inByteBack->GetPtr(), (size_t)size, true);
     bool addPropIdToList = true;
     bool isKnownType = true;
-    if (type > ((UInt32)1 << 30))
+    if (type2 > ((UInt32)1 << 30))
       isKnownType = false;
-    else switch ((UInt32)type)
+    else switch ((UInt32)type2)
     {
       case NID::kName:
       {
@@ -1220,7 +1222,7 @@ HRESULT CInArchive::ReadHeader(
         ReadBoolVector2(db.Files.Size(), boolVector);
         CStreamSwitch streamSwitch;
         streamSwitch.Set(this, &dataVector);
-        for (i = 0; i < numFiles; i++)
+        for (CNum i = 0; i < numFiles; i++)
         {
           CFileItem &file = db.Files[i];
           file.AttribDefined = boolVector[i];
@@ -1263,7 +1265,7 @@ HRESULT CInArchive::ReadHeader(
       {
         ReadBoolVector(numFiles, emptyStreamVector);
         numEmptyStreams = 0;
-        for (i = 0; i < (CNum)emptyStreamVector.Size(); i++)
+        for (CNum i = 0; i < (CNum)emptyStreamVector.Size(); i++)
           if (emptyStreamVector[i])
             numEmptyStreams++;
 
@@ -1337,7 +1339,7 @@ HRESULT CInArchive::ReadHeader(
     if (isKnownType)
     {
       if (addPropIdToList)
-        db.ArcInfo.FileInfoPopIDs.Add(type);
+        db.ArcInfo.FileInfoPopIDs.Add(type2);
     }
     else
     {
@@ -1358,6 +1360,9 @@ HRESULT CInArchive::ReadHeader(
   CNum sizeIndex = 0;
 
   CNum numAntiItems = 0;
+
+  CNum i;
+
   for (i = 0; i < numEmptyStreams; i++)
     if (antiFileVector[i])
       numAntiItems++;

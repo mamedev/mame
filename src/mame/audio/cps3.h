@@ -5,6 +5,10 @@
     Capcom CPS-3 Sound Hardware
 
 ****************************************************************************/
+#ifndef MAME_AUDIO_CPS3_H
+#define MAME_AUDIO_CPS3_H
+
+#pragma once
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -26,8 +30,7 @@ struct cps3_voice
 
 // ======================> cps3_sound_device
 
-class cps3_sound_device : public device_t,
-							public device_sound_interface
+class cps3_sound_device : public device_t, public device_sound_interface
 {
 public:
 	cps3_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -52,4 +55,6 @@ private:
 	int8_t*      m_base;
 };
 
-extern const device_type CPS3;
+DECLARE_DEVICE_TYPE(CPS3, cps3_sound_device)
+
+#endif // MAME_AUDIO_CPS3_H

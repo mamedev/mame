@@ -8,8 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef __MCS96_H__
-#define __MCS96_H__
+#ifndef MAME_CPU_MCS96_MCS96_H
+#define MAME_CPU_MCS96_MCS96_H
+
+#pragma once
 
 class mcs96_device : public cpu_device {
 public:
@@ -17,7 +19,11 @@ public:
 		EXINT_LINE = 1
 	};
 
-	mcs96_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, int data_width, const char *shortname, const char *source);
+	enum {
+		MCS96_PC = 1,
+		MCS96_PSW,
+		MCS96_R       // 0x74 entries
+	};
 
 protected:
 	enum {
@@ -35,38 +41,8 @@ protected:
 		F_Z  = 0x8000
 	};
 
-	struct disasm_entry {
-		const char *opcode, *opcode_fe;
-		int mode;
-		offs_t flags;
-	};
 
-	enum {
-		DASM_none,              /* No parameters */
-		DASM_nop_2,             /* One ignored parameter byte */
-		DASM_rel8,              /* Relative, 8 bits */
-		DASM_rel11,             /* Relative, 11 bits */
-		DASM_rel16,             /* Relative, 16 bits */
-		DASM_rrel8,             /* Register + relative, 8 bits */
-		DASM_brrel8,            /* Bit test + register + relative, 8 bits */
-		DASM_direct_1,          /* Register-direct references, 1 operator */
-		DASM_direct_2,          /* Register-direct references, 2 operators */
-		DASM_direct_3,          /* Register-direct references, 3 operators */
-		DASM_immed_1b,          /* Immediate references to byte, 1 operator */
-		DASM_immed_2b,          /* Immediate references to byte, 2 operators */
-		DASM_immed_or_reg_2b,   /* Immediate references to byte or register, 2 operators */
-		DASM_immed_3b,          /* Immediate references to byte, 3 operators */
-		DASM_immed_1w,          /* Immediate references to word, 1 operator */
-		DASM_immed_2w,          /* Immediate references to word, 2 operators */
-		DASM_immed_3w,          /* Immediate references to word, 3 operators */
-		DASM_indirect_1n,       /* Indirect normal, 1 operator */
-		DASM_indirect_1,        /* Indirect, normal or auto-incrementing, 1 operator */
-		DASM_indirect_2,        /* Indirect, normal or auto-incrementing, 2 operators */
-		DASM_indirect_3,        /* Indirect, normal or auto-incrementing, 3 operators */
-		DASM_indexed_1,         /* Indexed, short or long, 1 operator */
-		DASM_indexed_2,         /* Indexed, short or long, 2 operators */
-		DASM_indexed_3         /* Indexed, short or long, 3 operators */
-	};
+	mcs96_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_width);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -80,28 +56,16 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_generic(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *entries)
-	{
-		std::ostringstream stream;
-		offs_t result = disasm_generic(stream, pc, oprom, opram, options, entries);
-		std::string stream_str = stream.str();
-		strcpy(buffer, stream_str.c_str());
-		return result;
-	}
-
 	address_space_config program_config;
 	address_space *program;
-	direct_read_data *direct;
+	direct_read_data<0> *direct;
 
 	int icount, bcount, inst_state, cycles_scaling;
 	uint8_t pending_irq;
@@ -121,7 +85,6 @@ protected:
 	virtual uint16_t io_r16(uint8_t adr) = 0;
 
 	void recompute_bcount(uint64_t event_time);
-	static std::string regname(uint8_t reg);
 
 	inline void next(int cycles) { icount -= cycles_scaling*cycles; inst_state = STATE_FETCH; }
 	inline void next_noirq(int cycles) { icount -= cycles_scaling*cycles; inst_state = STATE_FETCH_NOIRQ; }
@@ -252,15 +215,6 @@ protected:
 	O(fetch_noirq);
 
 #undef O
-
-private:
-	offs_t disasm_generic(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *entries);
 };
 
-enum {
-	MCS96_PC = 1,
-	MCS96_PSW,
-	MCS96_R       // 0x74 entries
-};
-
-#endif
+#endif // MAME_CPU_MCS96_MCS96_H

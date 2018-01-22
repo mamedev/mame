@@ -56,6 +56,9 @@
         * "Gun Fight" (Midway) is ported version of "Western Gun" (Taito)
         * in Japan, Taito released "Tornado Baseball" as "Ball Park",
           "Extra Inning" as "Ball Park II".
+        * "Road Runner" (Midway): To access the test mode, adjust the
+          "Extended Time At" dipswitch to select "Test Mode". While in
+          the test mode, hold Fire until the gun alignment screen appears.
 
     Known issues/to-do's:
         * Space Encounters: verify strobe light frequency
@@ -176,7 +179,7 @@ READ8_MEMBER(mw8080bw_state::mw8080bw_shift_result_rev_r)
 {
 	uint8_t ret = m_mb14241->shift_result_r(space, 0);
 
-	return BITSWAP8(ret,0,1,2,3,4,5,6,7);
+	return bitswap<8>(ret,0,1,2,3,4,5,6,7);
 }
 
 
@@ -226,7 +229,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( mw8080bw_root, mw8080bw_state )
+MACHINE_CONFIG_START(mw8080bw_state::mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080,MW8080BW_CPU_CLOCK)
@@ -402,7 +405,7 @@ static INPUT_PORTS_START( seawolf )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( seawolf, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::seawolf, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -502,7 +505,7 @@ static INPUT_PORTS_START( gunfight )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( gunfight, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::gunfight, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -730,7 +733,7 @@ static INPUT_PORTS_START( tornbase )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( tornbase, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::tornbase, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -837,7 +840,7 @@ static INPUT_PORTS_START( lagunar )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( zzzap, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::zzzap, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -881,7 +884,8 @@ TIMER_CALLBACK_MEMBER(mw8080bw_state::maze_tone_timing_timer_callback)
 MACHINE_START_MEMBER(mw8080bw_state,maze)
 {
 	/* create astable timer for IC B1 */
-	machine().scheduler().timer_pulse(MAZE_555_B1_PERIOD, timer_expired_delegate(FUNC(mw8080bw_state::maze_tone_timing_timer_callback),this));
+	m_maze_tone_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mw8080bw_state::maze_tone_timing_timer_callback), this));
+	m_maze_tone_timer->adjust(MAZE_555_B1_PERIOD, 0, MAZE_555_B1_PERIOD);
 
 	/* initialize state of Tone Timing FF, IC C1 */
 	m_maze_tone_timing_state = 0;
@@ -948,7 +952,7 @@ static INPUT_PORTS_START( maze )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( maze, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::maze, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1040,7 +1044,7 @@ static INPUT_PORTS_START( boothill )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( boothill, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::boothill, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1147,7 +1151,7 @@ static INPUT_PORTS_START( checkmat )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( checkmat, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::checkmat, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1274,7 +1278,7 @@ static INPUT_PORTS_START( desertgu )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( desertgu, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::desertgu, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1476,7 +1480,7 @@ static INPUT_PORTS_START( einning )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( dplay, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::dplay, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1571,7 +1575,7 @@ static INPUT_PORTS_START( gmissile )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( gmissile, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::gmissile, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1665,7 +1669,7 @@ static INPUT_PORTS_START( m4 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( m4, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::m4, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1834,7 +1838,7 @@ static INPUT_PORTS_START( clowns1 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( clowns, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::clowns, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1930,7 +1934,7 @@ static INPUT_PORTS_START( spacwalk )
 	PORT_ADJUSTER( 40, "R507 - Music Volume" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( spacwalk, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::spacwalk, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2013,7 +2017,7 @@ static INPUT_PORTS_START( shuffle )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( shuffle, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::shuffle, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2100,7 +2104,7 @@ static INPUT_PORTS_START( dogpatch )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( dogpatch, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::dogpatch, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2184,7 +2188,7 @@ WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
 		m_spcenctr_bright_control = ~data & 0x08;    /*  -  -  -  -  -  0  0  0 */
 
 	else
-		logerror("%04x:  Unmapped I/O port write to %02x = %02x\n", space.device().safe_pc(), offset, data);
+		logerror("%04x:  Unmapped I/O port write to %02x = %02x\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -2250,7 +2254,7 @@ static INPUT_PORTS_START( spcenctr )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( spcenctr, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::spcenctr, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2346,7 +2350,7 @@ static INPUT_PORTS_START( phantom2 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( phantom2, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::phantom2, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2359,7 +2363,7 @@ static MACHINE_CONFIG_DERIVED( phantom2, mw8080bw_root )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(mw8080bw_state, screen_update_phantom2)
-	MCFG_SCREEN_VBLANK_DRIVER(mw8080bw_state, screen_eof_phantom2)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(mw8080bw_state, screen_vblank_phantom2))
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -2487,7 +2491,7 @@ static INPUT_PORTS_START( bowler )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( bowler, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::bowler, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2698,7 +2702,7 @@ static INPUT_PORTS_START( invaders )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_DERIVED( invaders, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::invaders, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2783,7 +2787,7 @@ static INPUT_PORTS_START( blueshrk )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( blueshrk, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::blueshrk, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2885,7 +2889,7 @@ static INPUT_PORTS_START( invad2ct )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( invad2ct, mw8080bw_root )
+MACHINE_CONFIG_DERIVED(mw8080bw_state::invad2ct, mw8080bw_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3009,7 +3013,7 @@ ROM_START( roadrunm )
 	ROM_LOAD( "9316.1h",    0x0000, 0x0800, CRC(c0030d7c) SHA1(4d0a3a59d4f8181c6e30966a6b1d19ba5b29c398) )
 	ROM_LOAD( "9316.1g",    0x0800, 0x0800, CRC(1ddde10b) SHA1(8fb8e85844a8ec6c0722883013ecdd4eeaeb08c1) )
 	ROM_LOAD( "9316.1f",    0x1000, 0x0800, CRC(808e46f1) SHA1(1cc4e9b0aa7e9546c133bd40d40ede6f2fbe93ba) )
-	ROM_LOAD( "9316.1e",    0x1800, 0x0800, CRC(db5996a5) SHA1(cbc784e3ff9c7ad4954f3af8bfd786d3d17d1e0c) )
+	ROM_LOAD( "9316.1e",    0x1800, 0x0800, CRC(06f01571) SHA1(6a72ff96a68aeeb0aca4834843c00b789c9bdaa0) )
 ROM_END
 
 
@@ -3165,20 +3169,20 @@ ROM_END
 
 /*
 CPUs
-QTY 	Type 	clock 	position 	function
-1x 	unknown DIP40 		main PCB 2n 	
-7x 	LM3900N 		sound PCB ic2-ic8 	Quad Operational Amplifier - sound
-1x 	LM377 		sound PCB 1k 	Dual Audio Amplifier - sound
-1x 	oscillator 	19.968000 	main PCB XTAL 8b 
+QTY     Type    clock   position    function
+1x  unknown DIP40       main PCB 2n
+7x  LM3900N         sound PCB ic2-ic8   Quad Operational Amplifier - sound
+1x  LM377       sound PCB 1k    Dual Audio Amplifier - sound
+1x  oscillator  19.968000   main PCB XTAL 8b
 
 ROMs
-QTY 	Type 	position 	status
-4x 	TMS2708 	main PCB 1m 1n 1r 1s 	dumped
-2x 	MCM2708 	main PCB 1j 1l 	dumped
+QTY     Type    position    status
+4x  TMS2708     main PCB 1m 1n 1r 1s    dumped
+2x  MCM2708     main PCB 1j 1l  dumped
 
 RAMs
-QTY 	Type 	position
-16x 	D2107C 	main PCB 1-16
+QTY     Type    position
+16x     D2107C  main PCB 1-16
 
 Others
 1x 18x2 edge connector (main PCB)
@@ -3191,7 +3195,7 @@ Others
 
 Notes
 main PCB is marked "CS210", "SI" and is labeled "C6902575"
-sound PCB is marked "CS214" and is labeled "C6902574", "VOLUME" 
+sound PCB is marked "CS214" and is labeled "C6902574", "VOLUME"
 */
 
 ROM_START( blueshrkmr )
@@ -3223,37 +3227,37 @@ ROM_END
  *
  *************************************/
 
-/* PCB #              rom       parent    machine   inp       init              monitor,company,fullname,flags */
+/* PCB #        year  rom         parent    machine   inp       init              monitor,company,fullname,flags */
 
-/* 596 */ GAMEL(1976, seawolf,    0,        seawolf,  seawolf,  driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
-/* 596 */ GAMEL(1976, seawolfo,   seawolf,  seawolf,  seawolf,  driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
-/* 597 */ GAMEL(1975, gunfight,   0,        gunfight, gunfight, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
-/* 597 */ GAMEL(1975, gunfighto,  gunfight, gunfight, gunfight, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
+/* 596 */ GAMEL(1976, seawolf,    0,        seawolf,  seawolf,  mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
+/* 596 */ GAMEL(1976, seawolfo,   seawolf,  seawolf,  seawolf,  mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
+/* 597 */ GAMEL(1975, gunfight,   0,        gunfight, gunfight, mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
+/* 597 */ GAMEL(1975, gunfighto,  gunfight, gunfight, gunfight, mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
 /* 604 Gun Fight (cocktail, dump does not exist) */
-/* 605 */ GAME( 1976, tornbase,   0,        tornbase, tornbase, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 610 */ GAMEL(1976, 280zzzap,   0,        zzzap,    zzzap,    driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_280zzzap )
-/* 611 */ GAMEL(1976, maze,       0,        maze,     maze,     driver_device, 0, ROT0,   "Midway", "Amazing Maze", MACHINE_SUPPORTS_SAVE, layout_maze )
-/* 612 */ GAME( 1977, boothill,   0,        boothill, boothill, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", MACHINE_SUPPORTS_SAVE )
-/* 615 */ GAME( 1977, checkmat,   0,        checkmat, checkmat, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 618 */ GAME( 1977, desertgu,   0,        desertgu, desertgu, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Desert Gun", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 618 */ GAME( 1977, roadrunm,   desertgu, desertgu, desertgu, driver_device, 0, ROT0,   "Midway", "Road Runner (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 619 */ GAME( 1977, dplay,      0,        dplay,    dplay,    driver_device, 0, ROT0,   "Midway", "Double Play", MACHINE_SUPPORTS_SAVE )
-/* 622 */ GAMEL(1977, lagunar,    0,        zzzap,    lagunar,  driver_device, 0, ROT90,  "Midway", "Laguna Racer", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lagunar )
-/* 623 */ GAME( 1977, gmissile,   0,        gmissile, gmissile, driver_device, 0, ROT0,   "Midway", "Guided Missile", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 626 */ GAME( 1977, m4,         0,        m4,       m4,       driver_device, 0, ROT0,   "Midway", "M-4", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 630 */ GAMEL(1978, clowns,     0,        clowns,   clowns,   driver_device, 0, ROT0,   "Midway", "Clowns (rev. 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
-/* 630 */ GAMEL(1978, clowns1,    clowns,   clowns,   clowns1,  driver_device, 0, ROT0,   "Midway", "Clowns (rev. 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
-/* 640 */ GAMEL(1978, spacwalk,   0,        spacwalk, spacwalk, driver_device, 0, ROT0,   "Midway", "Space Walk", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacwalk )
-/* 642 */ GAME( 1978, einning,    0,        dplay,    einning,  driver_device, 0, ROT0,   "Midway / Taito", "Extra Inning / Ball Park II", MACHINE_SUPPORTS_SAVE )
-/* 643 */ GAME( 1978, shuffle,    0,        shuffle,  shuffle,  driver_device, 0, ROT90,  "Midway", "Shuffleboard", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 644 */ GAME( 1977, dogpatch,   0,        dogpatch, dogpatch, driver_device, 0, ROT0,   "Midway", "Dog Patch", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 645 */ GAMEL(1980, spcenctr,   0,        spcenctr, spcenctr, driver_device, 0, ROT0,   "Midway", "Space Encounters", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spcenctr )
-/* 652 */ GAMEL(1979, phantom2,   0,        phantom2, phantom2, driver_device, 0, ROT0,   "Midway", "Phantom II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_phantom2 )
-/* 730 */ GAME( 1978, bowler,     0,        bowler,   bowler,   driver_device, 0, ROT90,  "Midway", "Bowling Alley", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 739 */ GAMEL(1978, invaders,   0,        invaders, invaders, driver_device, 0, ROT270, "Taito / Midway", "Space Invaders / Space Invaders M", MACHINE_SUPPORTS_SAVE, layout_invaders )
-/* 742 */ GAME( 1978, blueshrk,   0,        blueshrk, blueshrk, driver_device, 0, ROT0,   "Midway", "Blue Shark", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-          GAME( 1978, blueshrkmr, blueshrk, blueshrk, blueshrk, driver_device, 0, ROT0,   "bootleg (Model Racing)", "Blue Shark (Model Racing bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 605 */ GAME( 1976, tornbase,   0,        tornbase, tornbase, mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 610 */ GAMEL(1976, 280zzzap,   0,        zzzap,    zzzap,    mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_280zzzap )
+/* 611 */ GAMEL(1976, maze,       0,        maze,     maze,     mw8080bw_state, 0, ROT0,   "Midway", "Amazing Maze", MACHINE_SUPPORTS_SAVE, layout_maze )
+/* 612 */ GAME( 1977, boothill,   0,        boothill, boothill, mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", MACHINE_SUPPORTS_SAVE )
+/* 615 */ GAME( 1977, checkmat,   0,        checkmat, checkmat, mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 618 */ GAME( 1977, desertgu,   0,        desertgu, desertgu, mw8080bw_state, 0, ROT0,   "Dave Nutting Associates / Midway", "Desert Gun", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 618 */ GAME( 1977, roadrunm,   desertgu, desertgu, desertgu, mw8080bw_state, 0, ROT0,   "Midway", "Road Runner (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 619 */ GAME( 1977, dplay,      0,        dplay,    dplay,    mw8080bw_state, 0, ROT0,   "Midway", "Double Play", MACHINE_SUPPORTS_SAVE )
+/* 622 */ GAMEL(1977, lagunar,    0,        zzzap,    lagunar,  mw8080bw_state, 0, ROT90,  "Midway", "Laguna Racer", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lagunar )
+/* 623 */ GAME( 1977, gmissile,   0,        gmissile, gmissile, mw8080bw_state, 0, ROT0,   "Midway", "Guided Missile", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 626 */ GAME( 1977, m4,         0,        m4,       m4,       mw8080bw_state, 0, ROT0,   "Midway", "M-4", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 630 */ GAMEL(1978, clowns,     0,        clowns,   clowns,   mw8080bw_state, 0, ROT0,   "Midway", "Clowns (rev. 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
+/* 630 */ GAMEL(1978, clowns1,    clowns,   clowns,   clowns1,  mw8080bw_state, 0, ROT0,   "Midway", "Clowns (rev. 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
+/* 640 */ GAMEL(1978, spacwalk,   0,        spacwalk, spacwalk, mw8080bw_state, 0, ROT0,   "Midway", "Space Walk", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacwalk )
+/* 642 */ GAME( 1978, einning,    0,        dplay,    einning,  mw8080bw_state, 0, ROT0,   "Midway / Taito", "Extra Inning / Ball Park II", MACHINE_SUPPORTS_SAVE )
+/* 643 */ GAME( 1978, shuffle,    0,        shuffle,  shuffle,  mw8080bw_state, 0, ROT90,  "Midway", "Shuffleboard", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 644 */ GAME( 1977, dogpatch,   0,        dogpatch, dogpatch, mw8080bw_state, 0, ROT0,   "Midway", "Dog Patch", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 645 */ GAMEL(1980, spcenctr,   0,        spcenctr, spcenctr, mw8080bw_state, 0, ROT0,   "Midway", "Space Encounters", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spcenctr )
+/* 652 */ GAMEL(1979, phantom2,   0,        phantom2, phantom2, mw8080bw_state, 0, ROT0,   "Midway", "Phantom II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_phantom2 )
+/* 730 */ GAME( 1978, bowler,     0,        bowler,   bowler,   mw8080bw_state, 0, ROT90,  "Midway", "Bowling Alley", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 739 */ GAMEL(1978, invaders,   0,        invaders, invaders, mw8080bw_state, 0, ROT270, "Taito / Midway", "Space Invaders / Space Invaders M", MACHINE_SUPPORTS_SAVE, layout_invaders )
+/* 742 */ GAME( 1978, blueshrk,   0,        blueshrk, blueshrk, mw8080bw_state, 0, ROT0,   "Midway", "Blue Shark", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+		  GAME( 1978, blueshrkmr, blueshrk, blueshrk, blueshrk, mw8080bw_state, 0, ROT0,   "bootleg (Model Racing)", "Blue Shark (Model Racing bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 749 4 Player Bowling Alley (cocktail, dump does not exist) */
-/* 851 */ GAMEL(1980, invad2ct,   0,        invad2ct, invad2ct, driver_device, 0, ROT90,  "Midway", "Space Invaders II (Midway, cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invad2ct )
+/* 851 */ GAMEL(1980, invad2ct,   0,        invad2ct, invad2ct, mw8080bw_state, 0, ROT90,  "Midway", "Space Invaders II (Midway, cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invad2ct )
 /* 852 Space Invaders Deluxe (color hardware, not in this driver) */
 /* 870 Space Invaders Deluxe (cocktail, dump does not exist) */

@@ -43,25 +43,26 @@ ToDo:
 #include "machine/i8255.h"
 #include "machine/i8257.h"
 #include "video/i8275.h"
-#include "sound/speaker.h"
+#include "sound/spkrdev.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class unior_state : public driver_device
 {
 public:
-	unior_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_pit(*this, "pit"),
-		m_dma(*this, "dma"),
-		m_uart(*this, "uart"),
-		m_palette(*this, "palette")
-	{
-	}
+	unior_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pit(*this, "pit")
+		, m_dma(*this, "dma")
+		, m_palette(*this, "palette")
+		, m_p_chargen(*this, "chargen")
+		, m_p_vram(*this, "vram")
+	{ }
 
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(scroll_w);
-	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 	DECLARE_READ8_MEMBER(ppi0_b_r);
 	DECLARE_WRITE8_MEMBER(ppi0_b_w);
 	DECLARE_READ8_MEMBER(ppi1_a_r);
@@ -74,19 +75,17 @@ public:
 	DECLARE_READ8_MEMBER(dma_r);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
-	uint8_t *m_p_vram;
-	uint8_t *m_p_chargen;
+	void unior(machine_config &config);
 private:
 	uint8_t m_4c;
 	uint8_t m_4e;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<i8257_device> m_dma;
-	required_device<i8251_device> m_uart;
-public:
 	required_device<palette_device> m_palette;
+	required_region_ptr<u8> m_p_chargen;
+	required_region_ptr<u8> m_p_vram;
 };
 
 static ADDRESS_MAP_START( unior_mem, AS_PROGRAM, 8, unior_state )
@@ -171,7 +170,7 @@ static INPUT_PORTS_START( unior )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LF") PORT_CODE(KEYCODE_HOME) PORT_CHAR(10) // line feed?
 
 	PORT_START("X6")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('\xA4')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR(0xA4)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('I') // I then hangs
@@ -255,7 +254,7 @@ WRITE8_MEMBER( unior_state::vram_w )
 WRITE8_MEMBER( unior_state::scroll_w )
 {
 	if (data)
-		memcpy(m_p_vram, m_p_vram+80, 24*80);
+		memmove(m_p_vram, m_p_vram+80, 24*80);
 }
 
 I8275_DRAW_CHARACTER_MEMBER(unior_state::display_pixels)
@@ -298,12 +297,6 @@ PALETTE_INIT_MEMBER(unior_state,unior)
 
 *************************************************/
 
-
-WRITE_LINE_MEMBER(unior_state::write_uart_clock)
-{
-	m_uart->write_txc(state);
-	m_uart->write_rxc(state);
-}
 
 READ8_MEMBER( unior_state::ppi0_b_r )
 {
@@ -378,16 +371,10 @@ WRITE_LINE_MEMBER( unior_state::hrq_w )
 
 void unior_state::machine_reset()
 {
-	m_maincpu->set_state_int(I8085_PC, 0xF800);
+	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, 0xF800);
 }
 
-void unior_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
-	m_p_vram = memregion("vram")->base();
-}
-
-static MACHINE_CONFIG_START( unior, unior_state )
+MACHINE_CONFIG_START(unior_state::unior)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8080, XTAL_20MHz / 9)
 	MCFG_CPU_PROGRAM_MAP(unior_mem)
@@ -414,7 +401,8 @@ static MACHINE_CONFIG_START( unior, unior_state )
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_20MHz / 12)
 	MCFG_PIT8253_CLK1(XTAL_20MHz / 9)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(unior_state, write_uart_clock))
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 	MCFG_PIT8253_CLK2(XTAL_16MHz / 9 / 64) // unknown frequency
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
@@ -459,5 +447,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT    COMPAT   MACHINE    INPUT  CLASS           INIT    COMPANY      FULLNAME       FLAGS */
-COMP( 19??, unior,  radio86,  0,       unior,     unior, driver_device,   0,    "<unknown>",   "Unior", MACHINE_NOT_WORKING )
+/*    YEAR  NAME    PARENT    COMPAT   MACHINE    INPUT  CLASS          INIT  COMPANY      FULLNAME  FLAGS */
+COMP( 19??, unior,  radio86,  0,       unior,     unior, unior_state,   0,    "<unknown>", "Unior",  MACHINE_NOT_WORKING )

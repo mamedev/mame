@@ -6,12 +6,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_MACHINE_K033906_H
+#define MAME_MACHINE_K033906_H
+
 #pragma once
 
-#ifndef __K033906_H__
-#define __K033906_H__
-
-#include "emu.h"
 #include "video/voodoo.h"
 
 
@@ -49,7 +48,6 @@ protected:
 	virtual void device_clock_changed() override { }
 
 private:
-
 	uint32_t reg_r(int reg);
 	void reg_w(int reg, uint32_t data);
 
@@ -65,6 +63,6 @@ private:
 
 
 // device type definition
-extern const device_type K033906;
+DECLARE_DEVICE_TYPE(K033906, k033906_device)
 
-#endif  /* __K033906_H__ */
+#endif // MAME_MACHINE_K033906_H

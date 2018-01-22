@@ -9,12 +9,15 @@
  *  Created on: 16/05/2014
  */
 
+#include "emu.h"
 #include "mach32.h"
 
-const device_type ATIMACH32 = &device_creator<mach32_device>;
-const device_type ATIMACH32_8514A = &device_creator<mach32_8514a_device>;
-const device_type ATIMACH64 = &device_creator<mach64_device>;
-const device_type ATIMACH64_8514A = &device_creator<mach64_8514a_device>;
+#include "screen.h"
+
+DEFINE_DEVICE_TYPE(ATIMACH32,       mach32_device,       "mach32",       "ATi mach32")
+DEFINE_DEVICE_TYPE(ATIMACH32_8514A, mach32_8514a_device, "mach32_8514a", "ATi mach32 (2D acceleration module)")
+DEFINE_DEVICE_TYPE(ATIMACH64,       mach64_device,       "mach64",       "ATi mach64")
+DEFINE_DEVICE_TYPE(ATIMACH64_8514A, mach64_8514a_device, "mach64_8514a", "ATi mach64 (2D acceleration module)")
 
 
 /*
@@ -23,46 +26,35 @@ const device_type ATIMACH64_8514A = &device_creator<mach64_8514a_device>;
 
 // 8514/A device
 mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mach8_device(mconfig, ATIMACH32_8514A, "ATi mach32 (2D acceleration module)", tag, owner, clock, "mach32_8514a", __FILE__),
-	m_chip_ID(0),
-	m_membounds(0)
+	: mach32_8514a_device(mconfig, ATIMACH32_8514A, tag, owner, clock)
 {
 }
 
-mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: mach8_device(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_chip_ID(0),
-	m_membounds(0)
+mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: mach8_device(mconfig, type, tag, owner, clock), m_chip_ID(0), m_membounds(0)
 {
 }
 
 
 // SVGA device
 mach32_device::mach32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ati_vga_device(mconfig, ATIMACH32, "ATi mach32", tag, owner, clock, "mach32", __FILE__),
-		m_8514a(*this,"8514a")
+	: mach32_device(mconfig, ATIMACH32, tag, owner, clock)
 {
 }
 
-mach32_device::mach32_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: ati_vga_device(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_8514a(*this,"8514a")
+mach32_device::mach32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ati_vga_device(mconfig, type, tag, owner, clock), m_8514a(*this,"8514a")
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( mach32_8514a )
+MACHINE_CONFIG_START(mach32_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("8514a", ATIMACH32_8514A, 0)
 	MCFG_EEPROM_SERIAL_93C56_ADD("ati_eeprom")
 MACHINE_CONFIG_END
 
-machine_config_constructor mach32_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( mach32_8514a );
-}
-
 void mach32_8514a_device::device_config_complete()
 {
-	m_vga = dynamic_cast<vga_device*>(owner());
+	m_vga = dynamic_cast<svga_device*>(owner());
 }
 
 void mach32_8514a_device::device_start()
@@ -72,9 +64,26 @@ void mach32_8514a_device::device_start()
 	//    177h  68800-LX
 	//    2F7h  68800-6
 	//  The 68800-3 appears to return 0 for this field (undocumented)
-	m_chip_ID = 0x000;
+	m_chip_ID = 0x17;
 	m_membounds = 0;
 }
+
+// Configuration Status Register 1 (read only)
+// bit 0:     Disable VGA: 0=VGA+8514/A, 1=8514/A only
+// bits 1-3:  Bus Type:  0=16-bit ISA. 1=EISA, 2=16-bit MCA, 3=32-bit MCA, 4=LBus 386SX
+//                       5=LBus 386DX, 6=LBus 486. 7=PCI
+// bits 4-6:  RAM Type:  3=256Kx16 DRAM
+// bit 7:     Chip Disable
+// bit 8:     TST_VCTR_ENA:  1=delay memory write by 1/2 MCLK to test vector generation
+// bits 9-11: DAC Type:  0=ATI68830, 1=SC11483, 2=ATI68875, 3=Bt476, 4=Bt481, 5=ATI68860 (68800AX or higher)
+//                       The Graphics Ultra Pro has an ATI68875
+// bit 12:    Enable internal uC address decode
+// bit 13-15: Card ID:  ID when using multiple controllers
+READ16_MEMBER(mach32_8514a_device::mach32_config1_r)
+{
+	return 0x0430;  // enable VGA, 16-bit ISA, 256Kx16 DRAM, ATI68875
+}
+
 
 void mach32_8514a_device::device_reset()
 {
@@ -83,11 +92,151 @@ void mach32_8514a_device::device_reset()
 void mach32_device::device_start()
 {
 	ati_vga_device::device_start();
+	ati.vga_chip_id = 0x00;  // correct?
+	vga.svga_intf.vram_size = 0x400000;
+	vga.memory.resize(vga.svga_intf.vram_size);
+	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
+	save_item(NAME(vga.memory));
 }
 
 void mach32_device::device_reset()
 {
 	ati_vga_device::device_reset();
+}
+
+uint32_t mach32_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	ati_vga_device::screen_update(screen,bitmap,cliprect);
+	uint8_t depth = get_video_depth();
+
+	if(!m_cursor_enable)
+		return 0;
+
+	uint32_t src = (m_cursor_address & 0x000fffff) << 2;
+	uint32_t* dst;  // destination pixel
+	uint8_t x,y,z;
+	uint32_t colour0;
+	uint32_t colour1;
+
+	if(depth == 8)
+	{
+		colour0 = m_palette->pen(m_cursor_colour0_b);
+		colour1 = m_palette->pen(m_cursor_colour1_b);
+	}
+	else  // 16/24/32bpp
+	{
+		colour0 = (m_cursor_colour0_r << 16) | (m_cursor_colour0_g << 8) | (m_cursor_colour0_b);
+		colour1 = (m_cursor_colour1_r << 16) | (m_cursor_colour1_g << 8) | (m_cursor_colour1_b);
+	}
+
+	// draw hardware pointer (64x64 max)
+	for(y=0;y<64;y++)
+	{
+		dst = &bitmap.pix32(m_cursor_vertical + y, m_cursor_horizontal);
+		for(x=0;x<64;x+=8)
+		{
+			uint16_t bits = (vga.memory[(src+0) % vga.svga_intf.vram_size] | ((vga.memory[(src+1) % vga.svga_intf.vram_size]) << 8));
+
+			for(z=0;z<8;z++)
+			{
+				if(((z + x) > (m_cursor_offset_horizontal-1)) && (y < (63 - m_cursor_offset_vertical)))
+				{
+					uint8_t val = (bits >> (z*2)) & 0x03;
+					switch(val)
+					{
+						case 0:  // cursor colour 0
+							*dst = colour0;
+							break;
+						case 1:  // cursor colour 1
+							*dst = colour1;
+							break;
+						case 2:  // transparent
+							break;
+						case 3:  // complement
+							*dst = ~(*dst);
+							break;
+					}
+					dst++;
+				}
+			}
+			src+=2;
+		}
+	}
+
+	return 0;
+}
+
+// mach32 Hardware Pointer
+WRITE16_MEMBER(mach32_device::mach32_cursor_l_w)
+{
+	if(offset == 1)
+		m_cursor_address = (m_cursor_address & 0xf0000) | data;
+	if(LOG_MACH32) logerror("mach32 HW pointer data address: %05x",m_cursor_address);
+}
+
+WRITE16_MEMBER(mach32_device::mach32_cursor_h_w)
+{
+	if(offset == 1)
+	{
+		m_cursor_address = (m_cursor_address & 0x0ffff) | ((data & 0x000f) << 16);
+		m_cursor_enable = data & 0x8000;
+		if(LOG_MACH32) logerror("mach32 HW pointer data address: %05x",m_cursor_address);
+	}
+}
+
+WRITE16_MEMBER(mach32_device::mach32_cursor_pos_h)
+{
+	if(offset == 1)
+		m_cursor_horizontal = data & 0x07ff;
+}
+
+WRITE16_MEMBER(mach32_device::mach32_cursor_pos_v)
+{
+	if(offset == 1)
+		m_cursor_vertical = data & 0x0fff;
+}
+
+WRITE16_MEMBER(mach32_device::mach32_cursor_colour_b_w)
+{
+	if(offset == 1)
+	{
+		m_cursor_colour0_b = data & 0xff;
+		m_cursor_colour1_b = data >> 8;
+		if(LOG_MACH32) logerror("Mach32: HW Cursor Colour Blue write RGB: 0: %02x %02x %02x  1: %02x %02x %02x\n"
+			,m_cursor_colour0_r,m_cursor_colour0_g,m_cursor_colour0_b,m_cursor_colour1_r,m_cursor_colour1_g,m_cursor_colour1_b);
+	}
+}
+
+WRITE16_MEMBER(mach32_device::mach32_cursor_colour_0_w)
+{
+	if(offset == 1)
+	{
+		m_cursor_colour0_g = data & 0xff;
+		m_cursor_colour0_r = data >> 8;
+		if(LOG_MACH32) logerror("Mach32: HW Cursor Colour 0 write RGB: %02x %02x %02x\n",m_cursor_colour0_r,m_cursor_colour0_g,m_cursor_colour0_b);
+	}
+}
+
+WRITE16_MEMBER(mach32_device::mach32_cursor_colour_1_w)
+{
+	if(offset == 1)
+	{
+		m_cursor_colour1_g = data & 0xff;
+		m_cursor_colour1_r = data >> 8;
+		if(LOG_MACH32) logerror("Mach32: HW Cursor Colour 1 write RGB: %02x %02x %02x\n",m_cursor_colour1_r,m_cursor_colour1_g,m_cursor_colour1_b);
+	}
+}
+
+WRITE16_MEMBER(mach32_device::mach32_cursor_offset_w)
+{
+	if(offset == 1)
+	{
+		if(ACCESSING_BITS_0_7)
+			m_cursor_offset_horizontal = data & 0x00ff;
+		if(ACCESSING_BITS_8_15)
+			m_cursor_offset_vertical = data >> 8;
+		if(LOG_MACH32) logerror("Mach32: HW Cursor Offset write H:%i V:%i\n",m_cursor_offset_horizontal,m_cursor_offset_vertical);
+	}
 }
 
 /*
@@ -96,42 +245,35 @@ void mach32_device::device_reset()
 
 // 8514/A device
 mach64_8514a_device::mach64_8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mach32_8514a_device(mconfig, ATIMACH64_8514A, "ATi mach64 (2D acceleration module)", tag, owner, clock, "mach64_8514a", __FILE__)
+	: mach64_8514a_device(mconfig, ATIMACH64_8514A, tag, owner, clock)
 {
 }
 
-mach64_8514a_device::mach64_8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: mach32_8514a_device(mconfig, type, name, tag, owner, clock, shortname, source)
+mach64_8514a_device::mach64_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: mach32_8514a_device(mconfig, type, tag, owner, clock)
 {
 }
 
 
 // SVGA device
 mach64_device::mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mach32_device(mconfig, ATIMACH64, "ATi mach64", tag, owner, clock, "mach64", __FILE__),
-		m_8514a(*this,"8514a")
+	: mach64_device(mconfig, ATIMACH64, tag, owner, clock)
 {
 }
 
-mach64_device::mach64_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
-	: mach32_device(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_8514a(*this,"8514a")
+mach64_device::mach64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: mach32_device(mconfig, type, tag, owner, clock), m_8514a(*this, "8514a")
 {
 }
 
-static MACHINE_CONFIG_FRAGMENT( mach64_8514a )
+MACHINE_CONFIG_START(mach64_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("8514a", ATIMACH64_8514A, 0)
 	MCFG_EEPROM_SERIAL_93C56_ADD("ati_eeprom")
 MACHINE_CONFIG_END
 
-machine_config_constructor mach64_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( mach64_8514a );
-}
-
 void mach64_8514a_device::device_config_complete()
 {
-	m_vga = dynamic_cast<vga_device*>(owner());
+	m_vga = dynamic_cast<svga_device*>(owner());
 }
 
 void mach64_8514a_device::device_start()

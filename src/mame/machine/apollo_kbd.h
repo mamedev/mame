@@ -8,12 +8,11 @@
  *
  */
 
+#ifndef MAME_MACHINE_APOLLO_KBD_H
+#define MAME_MACHINE_APOLLO_KBD_H
+
 #pragma once
 
-#ifndef __APOLLO_KBD_H__
-#define __APOLLO_KBD_H__
-
-#include "emu.h"
 #include "sound/beep.h"
 
 // BSD-derived systems get very sad when you party with system reserved names.
@@ -35,7 +34,6 @@
 #define MCFG_APOLLO_KBD_GERMAN_CALLBACK(_cb) \
 	devcb = &apollo_kbd_device::set_german_cb(*device, DEVCB_##_cb);
 
-INPUT_PORTS_EXTERN(apollo_kbd);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -43,23 +41,21 @@ INPUT_PORTS_EXTERN(apollo_kbd);
 
 // ======================> apollo_kbd_device
 
-class apollo_kbd_device :   public device_t, public device_serial_interface
+class apollo_kbd_device : public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
 	apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object) { return downcast<apollo_kbd_device &>(device).m_tx_w.set_callback(object); }
-	template<class _Object> static devcb_base &set_german_cb(device_t &device, _Object object) { return downcast<apollo_kbd_device &>(device).m_german_r.set_callback(object); }
-
-	devcb_write_line m_tx_w;
-	devcb_read_line m_german_r;
+	template <class Object> static devcb_base &set_tx_cb(device_t &device, Object &&cb) { return downcast<apollo_kbd_device &>(device).m_tx_w.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_german_cb(device_t &device, Object &&cb) { return downcast<apollo_kbd_device &>(device).m_german_r.set_callback(std::forward<Object>(cb)); }
 
 private:
 	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// serial overrides
 	virtual void rcv_complete() override;    // Rx completed receiving byte
@@ -69,13 +65,13 @@ private:
 
 	TIMER_CALLBACK_MEMBER( kbd_scan_timer );
 
-	const char *cpu_context() ;
+	std::string cpu_context() const;
 	template <typename Format, typename... Params>
 	void logerror(Format &&fmt, Params &&... args) const;
 
 	void kgetchar(uint8_t data);
 
-	int keyboard_is_german();
+	bool keyboard_is_german();
 
 	void set_mode(uint16_t mode);
 	void putdata(const uint8_t *data, int data_length);
@@ -121,6 +117,12 @@ private:
 
 	static const int XMIT_RING_SIZE = 64;
 
+	required_ioport_array<4> m_io_keyboard;
+	required_ioport_array<3> m_io_mouse;
+
+	devcb_write_line m_tx_w;
+	devcb_read_line m_german_r;
+
 	uint8_t m_xmitring[XMIT_RING_SIZE];
 	int m_xmit_read, m_xmit_write;
 	bool m_tx_busy;
@@ -132,14 +134,6 @@ private:
 
 	apollo_kbd_device *m_device; // pointer to myself (nasty: used for cpu_context)
 
-	ioport_port *m_io_keyboard1;
-	ioport_port *m_io_keyboard2;
-	ioport_port *m_io_keyboard3;
-	ioport_port *m_io_keyboard4;
-	ioport_port *m_io_mouse1;
-	ioport_port *m_io_mouse2;
-	ioport_port *m_io_mouse3;
-
 	/* Receiver */
 	uint32_t m_rx_message;
 	uint16_t m_loopback_mode;
@@ -149,13 +143,15 @@ private:
 	uint16_t m_delay;         // key press delay after initial press
 	uint16_t m_repeat;        // key press repeat rate
 	uint16_t m_last_pressed;  // last key pressed, for repeat key handling
+	uint16_t m_numlock_state; // current num lock state
 	int m_keytime[0x80];    // time until next key press (1 ms)
 	uint8_t m_keyon[0x80];    // is 1 if key is pressed
 
-	static uint16_t m_code_table[];
+	struct code_entry { uint16_t down, up, unshifted, shifted, control, caps_lock, up_trans, auto_repeat; };
+	static code_entry const s_code_table[];
 };
 
 // device type definition
-extern const device_type APOLLO_KBD;
+DECLARE_DEVICE_TYPE(APOLLO_KBD, apollo_kbd_device)
 
-#endif
+#endif // MAME_MACHINE_APOLLO_KBD_H

@@ -52,6 +52,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class carrera_state : public driver_device
@@ -71,6 +73,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void carrera(machine_config &config);
 };
 
 
@@ -306,7 +309,7 @@ PALETTE_INIT_MEMBER(carrera_state, carrera)
 }
 
 
-static MACHINE_CONFIG_START( carrera, carrera_state )
+MACHINE_CONFIG_START(carrera_state::carrera)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 6)
 	MCFG_CPU_PROGRAM_MAP(carrera_map)
@@ -357,4 +360,4 @@ ROM_START( carrera )
 ROM_END
 
 
-GAME( 19??, carrera, 0, carrera, carrera, driver_device,0, ROT0, "BS Electronics", "Carrera (Version 6.7)", 0 )
+GAME( 19??, carrera, 0, carrera, carrera, carrera_state, 0, ROT0, "BS Electronics", "Carrera (Version 6.7)", 0 )

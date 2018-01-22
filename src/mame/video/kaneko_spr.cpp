@@ -26,13 +26,18 @@
 
 #include "emu.h"
 #include "kaneko_spr.h"
+#include "screen.h"
 
-//const device_type KANEKO16_SPRITE = &device_creator<kaneko16_sprite_device>; // we have pure virtual functions
-const device_type KANEKO_VU002_SPRITE = &device_creator<kaneko_vu002_sprite_device>;
-const device_type KANEKO_KC002_SPRITE = &device_creator<kaneko_kc002_sprite_device>;
+DEFINE_DEVICE_TYPE(KANEKO_VU002_SPRITE, kaneko_vu002_sprite_device, "kaneko_vu002", "Kaneko VU002 Sprites")
+DEFINE_DEVICE_TYPE(KANEKO_KC002_SPRITE, kaneko_kc002_sprite_device, "kaneko_kc002", "Kaneko KC002 Sprites")
 
-kaneko16_sprite_device::kaneko16_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type)
-	: device_t(mconfig, type, "Kaneko 16-bit Sprites", tag, owner, clock, "kaneko16_sprite", __FILE__)
+kaneko16_sprite_device::kaneko16_sprite_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
@@ -72,7 +77,7 @@ void kaneko16_sprite_device::device_start()
 {
 	m_first_sprite = std::make_unique<struct kan_tempsprite[]>(0x400);
 	m_sprites_regs = make_unique_clear<uint16_t[]>(0x20/2);
-	m_screen->register_screen_bitmap(m_sprites_bitmap);
+	screen().register_screen_bitmap(m_sprites_bitmap);
 
 	save_item(NAME(m_sprite_flipx));
 	save_item(NAME(m_sprite_flipy));
@@ -113,12 +118,6 @@ void kaneko16_sprite_device::set_offsets(device_t &device, int xoffs, int yoffs)
 	dev.m_sprite_xoffs = xoffs;
 	dev.m_sprite_yoffs = yoffs;
 }
-
-
-
-
-
-
 
 
 /***************************************************************************
@@ -216,12 +215,12 @@ int kaneko16_sprite_device::kaneko16_parse_sprite_type012(int i, struct kan_temp
 	if (m_sprite_flipy)
 	{
 		s->yoffs        -=      m_sprites_regs[0x2/2];
-		s->yoffs        -=      m_screen->visible_area().min_y<<6;
+		s->yoffs        -=      screen().visible_area().min_y<<6;
 	}
 	else
 	{
 		s->yoffs        -=      m_sprites_regs[0x2/2];
-		s->yoffs        +=      m_screen->visible_area().min_y<<6;
+		s->yoffs        +=      screen().visible_area().min_y<<6;
 	}
 
 	return                  ( (attr & 0x2000) ? USE_LATCHED_XY    : 0 ) |
@@ -354,7 +353,7 @@ void kaneko16_sprite_device::kaneko16_draw_sprites(_BitmapClass &bitmap, const r
 	   in a temp buffer, then draw the buffer's contents from last
 	   to first. */
 
-	int max =   (m_screen->width() > 0x100) ? (0x200<<6) : (0x100<<6);
+	int max =   (screen().width() > 0x100) ? (0x200<<6) : (0x100<<6);
 
 	int i = 0;
 	struct kan_tempsprite *s = m_first_sprite.get();
@@ -564,7 +563,7 @@ WRITE16_MEMBER(kaneko16_sprite_device::kaneko16_sprites_regs_w)
 			break;
 	}
 
-//  logerror("CPU #0 PC %06X : Warning, sprites reg %04X <- %04X\n",space.device().safe_pc(),offset*2,data);
+//  logerror("%s : Warning, sprites reg %04X <- %04X\n",m_maincpu->pc(),offset*2,data);
 }
 
 
@@ -617,12 +616,12 @@ void kaneko16_sprite_device::kaneko16_render_sprites_common(_BitmapClass &bitmap
 }
 
 kaneko_vu002_sprite_device::kaneko_vu002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: kaneko16_sprite_device(mconfig, tag, owner, clock, KANEKO_VU002_SPRITE)
+	: kaneko16_sprite_device(mconfig, KANEKO_VU002_SPRITE, tag, owner, clock)
 {
 }
 
 kaneko_kc002_sprite_device::kaneko_kc002_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: kaneko16_sprite_device(mconfig, tag, owner, clock, KANEKO_KC002_SPRITE)
+	: kaneko16_sprite_device(mconfig, KANEKO_KC002_SPRITE, tag, owner, clock)
 {
 }
 

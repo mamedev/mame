@@ -10,8 +10,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "rsp.h"
 #include "rspcp2.h"
+
+#include "rsp.h"
+#include "rspdefs.h"
+
 
 #if USE_SIMD
 #include <emmintrin.h>
@@ -586,8 +589,6 @@ void rsp_cop2::vec_store_group4(uint32_t addr, uint32_t element, uint16_t *regp,
 	_mm_store_si128((rsp_vec_t *) (m_rsp.get_dmem() + aligned_addr), data);
 }
 #endif
-
-extern offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op);
 
 /***************************************************************************
     Helpful Defines

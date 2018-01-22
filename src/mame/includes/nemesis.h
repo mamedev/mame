@@ -1,9 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
+#include "machine/timer.h"
 #include "sound/flt_rc.h"
 #include "sound/k007232.h"
 #include "sound/k005289.h"
 #include "sound/vlm5030.h"
+
+#include "screen.h"
+
 
 class nemesis_state : public driver_device
 {
@@ -82,20 +87,21 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	DECLARE_WRITE16_MEMBER(gx400_irq1_enable_word_w);
-	DECLARE_WRITE16_MEMBER(gx400_irq2_enable_word_w);
-	DECLARE_WRITE16_MEMBER(gx400_irq4_enable_word_w);
-	DECLARE_WRITE16_MEMBER(nemesis_irq_enable_word_w);
-	DECLARE_WRITE16_MEMBER(konamigt_irq_enable_word_w);
-	DECLARE_WRITE16_MEMBER(konamigt_irq2_enable_word_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(irq1_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(irq2_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(irq4_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(coin1_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(coin2_lockout_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_irq_w);
 	DECLARE_READ16_MEMBER(gx400_sharedram_word_r);
 	DECLARE_WRITE16_MEMBER(gx400_sharedram_word_w);
 	DECLARE_READ16_MEMBER(konamigt_input_word_r);
 	DECLARE_WRITE16_MEMBER(selected_ip_word_w);
 	DECLARE_READ16_MEMBER(selected_ip_word_r);
 	DECLARE_READ8_MEMBER(wd_r);
-	DECLARE_WRITE16_MEMBER(nemesis_gfx_flipx_word_w);
-	DECLARE_WRITE16_MEMBER(nemesis_gfx_flipy_word_w);
+	DECLARE_WRITE_LINE_MEMBER(gfx_flipx_w);
+	DECLARE_WRITE_LINE_MEMBER(gfx_flipy_w);
 	DECLARE_WRITE16_MEMBER(salamand_control_port_word_w);
 	DECLARE_WRITE16_MEMBER(nemesis_palette_word_w);
 	DECLARE_WRITE16_MEMBER(nemesis_videoram1_word_w);
@@ -122,4 +128,14 @@ public:
 	void nemesis_postload();
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE8_MEMBER(volume_callback);
+	void nyanpani(machine_config &config);
+	void konamigt(machine_config &config);
+	void rf2_gx400(machine_config &config);
+	void gx400(machine_config &config);
+	void bubsys(machine_config &config);
+	void hcrash(machine_config &config);
+	void salamand(machine_config &config);
+	void citybomb(machine_config &config);
+	void nemesis(machine_config &config);
+	void blkpnthr(machine_config &config);
 };

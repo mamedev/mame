@@ -44,14 +44,19 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/taitoipt.h"
+#include "audio/taitosnd.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32025/tms32025.h"
 #include "cpu/z80/z80.h"
-#include "includes/taitoipt.h"
 #include "machine/z80ctc.h"
-#include "audio/taitosnd.h"
-#include "sound/ym2151.h"
+#include "machine/taitoio_yoke.h"
 #include "sound/msm5205.h"
+#include "sound/ym2151.h"
+
+#include "screen.h"
+#include "speaker.h"
 
 
 
@@ -78,6 +83,7 @@ public:
 		m_dsp(*this, "dsp"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mechacpu(*this, "mechacpu"),
+		m_yoke(*this, "yokectrl"),
 		m_msm1(*this, "msm1"),
 		m_msm2(*this, "msm2"),
 		m_ctc(*this, "ctc"),
@@ -96,6 +102,7 @@ public:
 	required_device<cpu_device> m_dsp;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_mechacpu;
+	required_device<taitoio_yoke_device> m_yoke;
 	required_device<msm5205_device> m_msm1;
 	required_device<msm5205_device> m_msm2;
 	required_device<z80ctc_device> m_ctc;
@@ -157,6 +164,7 @@ public:
 	uint32_t exec_dma();
 	void msm5205_update(int chip);
 
+	void mlanding(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -446,6 +454,8 @@ WRITE16_MEMBER(mlanding_state::output_w)
 	*/
 	m_subcpu->set_input_line(INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
 	m_mechacpu->set_input_line(INPUT_LINE_RESET, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
+	machine().bookkeeping().coin_counter_w(0, data & 4);
+	machine().bookkeeping().coin_counter_w(1, data & 8);
 }
 
 
@@ -458,19 +468,19 @@ WRITE16_MEMBER(mlanding_state::output_w)
 
 READ16_MEMBER(mlanding_state::analog1_msb_r)
 {
-	return (ioport("THROTTLE")->read() >> 4) & 0xff;
+	return (m_yoke->throttle_r(space,0) >> 4) & 0xff;
 }
 
 
 READ16_MEMBER(mlanding_state::analog2_msb_r)
 {
-	return (ioport("STICK_X")->read() >> 4) & 0xff;
+	return (m_yoke->stickx_r(space,0) >> 4) & 0xff;
 }
 
 
 READ16_MEMBER(mlanding_state::analog3_msb_r)
 {
-	return (ioport("STICK_Y")->read() >> 4) & 0xff;
+	return (m_yoke->sticky_r(space,0) >> 4) & 0xff;
 }
 
 
@@ -479,22 +489,12 @@ READ16_MEMBER(mlanding_state::analog1_lsb_r)
 	/*
 	    76543210
 	    ....xxxx    Counter 1 bits 3-0
-	    ...x....    Handle left
-	    ..x.....    Slot down
-	    .x......    Slot up
+	    ...x....    Handle right
+	    ..x.....    Slot up
+	    .x......    Slot down
 	*/
-	uint16_t throttle = ioport("THROTTLE")->read();
-	uint16_t x = ioport("STICK_X")->read();
 
-	uint8_t res = 0x70 | (throttle & 0x0f);
-
-	if (throttle & 0x800)
-		res ^= 0x20;
-	else if (throttle > 0)
-		res ^= 0x40;
-
-	if (!(x & 0x800) && x > 0)
-		res ^= 0x10;
+	uint8_t res = (ioport("LIMIT0")->read() & 0x70) | (m_yoke->throttle_r(space,0) & 0xf);
 
 	return res;
 }
@@ -506,7 +506,7 @@ READ16_MEMBER(mlanding_state::analog2_lsb_r)
 	    76543210
 	    ....xxxx    Counter 2 bits 3-0
 	*/
-	return ioport("STICK_X")->read() & 0x0f;
+	return m_yoke->stickx_r(space,0) & 0x0f;
 }
 
 
@@ -515,22 +515,11 @@ READ16_MEMBER(mlanding_state::analog3_lsb_r)
 	/*
 	    76543210
 	    ....xxxx    Counter 3 bits 3-0
-	    ...x....    Handle up
-	    ..x.....    Handle right
-	    .x......    Handle down
+	    ...x....    Handle down
+	    ..x.....    Handle left
+	    .x......    Handle up
 	*/
-	uint16_t x = ioport("STICK_X")->read();
-	uint16_t y = ioport("STICK_Y")->read();
-
-	uint8_t res = 0x70 | (y & 0x0f);
-
-	if (y & 0x800)
-		res ^= 0x40;
-	else if (y > 0)
-		res ^= 0x10;
-
-	if (x & 0x800)
-		res ^= 0x20;
+	uint8_t res = (ioport("LIMIT1")->read() & 0x70) | (m_yoke->sticky_r(space,0) & 0xf);
 
 	return res;
 }
@@ -729,7 +718,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("sub_com_ram")
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(dma_start_w)
 	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(dma_stop_w)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x240004, 0x240005) AM_READNOP // Watchdog
 	AM_RANGE(0x240006, 0x240007) AM_READ(input_r)
 	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(power_ram_r, power_ram_w)
@@ -742,8 +731,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x2b0006, 0x2b0007) AM_READ(analog2_lsb_r)
 	AM_RANGE(0x2c0000, 0x2c0001) AM_READ(analog3_msb_r)
 	AM_RANGE(0x2c0002, 0x2c0003) AM_READ(analog3_lsb_r)
-	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
-	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
+	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
+	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -761,7 +750,8 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(dsp_control_w)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAMBANK("dma_ram")
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("sub_com_ram")
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("dot_ram")
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM
+	AM_RANGE(0x200800, 0x203fff) AM_RAM AM_SHARE("dot_ram")
 ADDRESS_MAP_END
 
 
@@ -777,7 +767,7 @@ static ADDRESS_MAP_START( dsp_map_prog, AS_PROGRAM, 16, mlanding_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_map_data, AS_DATA, 16, mlanding_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("dot_ram")
+	AM_RANGE(0x0400, 0x1fff) AM_RAM AM_SHARE("dot_ram")
 ADDRESS_MAP_END
 
 /*************************************
@@ -790,8 +780,8 @@ static ADDRESS_MAP_START( audio_map_prog, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("ciu", pc060ha_device, slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("ciu", pc060ha_device, slave_comm_r, slave_comm_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(msm5205_2_start_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(msm5205_2_stop_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(msm5205_1_start_w)
@@ -900,14 +890,16 @@ static INPUT_PORTS_START( mlanding )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("THROTTLE")
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_REVERSE
+	// despite what the service mode claims limits are really active low.
+	PORT_START("LIMIT0")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_right_r )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_up_r )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, slot_down_r )
 
-	PORT_START("STICK_X")
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
-
-	PORT_START("STICK_Y")
-	PORT_BIT( 0x0fff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0x00800, 0x07ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_PLAYER(1)
+	PORT_START("LIMIT1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_down_r )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_left_r )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("yokectrl", taitoio_yoke_device, handle_up_r )
 INPUT_PORTS_END
 
 
@@ -917,7 +909,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mlanding, mlanding_state )
+MACHINE_CONFIG_START(mlanding_state::mlanding)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // Appears to be 68000P8 in PCB photo
@@ -944,11 +936,13 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 	MCFG_DEVICE_ADD("ctc", Z80CTC, 4000000)
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(mlanding_state, z80ctc_to0))
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
+	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
+	MCFG_PC060HA_MASTER_CPU("maincpu")
+	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
+
+	MCFG_TAITOIO_YOKE_ADD("yokectrl")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -972,11 +966,11 @@ static MACHINE_CONFIG_START( mlanding, mlanding_state )
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(mlanding_state, msm5205_1_vck)) // VCK function
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      // 8 kHz, 4-bit
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8 kHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)      // Slave mode, 4-bit
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      // Slave mode, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
@@ -1026,4 +1020,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, mlanding, 0, mlanding, mlanding, driver_device, 0, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mlanding, 0, mlanding, mlanding, mlanding_state, 0, ROT0, "Taito America Corporation", "Midnight Landing (Germany)", MACHINE_SUPPORTS_SAVE )

@@ -274,8 +274,11 @@ disabled). Perhaps power on/off related??
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "machine/rp5c01.h"
-#include "sound/speaker.h"
+#include "machine/timer.h"
+#include "sound/spkrdev.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define LOG     0
@@ -338,6 +341,10 @@ public:
 	DECLARE_PALETTE_INIT(nakajies);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
+	void nakajies210(machine_config &config);
+	void nakajies220(machine_config &config);
+	void nakajies250(machine_config &config);
+	void dator3k(machine_config &config);
 };
 
 
@@ -734,7 +741,7 @@ static GFXDECODE_START( drwrt400 )
 	GFXDECODE_ENTRY( "bios", 0x580b6, nakajies_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( nakajies210, nakajies_state )
+MACHINE_CONFIG_START(nakajies_state::nakajies210)
 	MCFG_CPU_ADD( "v20hl", V20, X301 / 2 )
 	MCFG_CPU_PROGRAM_MAP( nakajies_map)
 	MCFG_CPU_IO_MAP( nakajies_io_map)
@@ -762,15 +769,15 @@ static MACHINE_CONFIG_START( nakajies210, nakajies_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", nakajies_state, kb_timer, attotime::from_hz(250))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dator3k, nakajies210 )
+MACHINE_CONFIG_DERIVED(nakajies_state::dator3k, nakajies210)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", dator3k)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nakajies220, nakajies210 )
+MACHINE_CONFIG_DERIVED(nakajies_state::nakajies220, nakajies210)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", drwrt400)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nakajies250, nakajies210 )
+MACHINE_CONFIG_DERIVED(nakajies_state::nakajies250, nakajies210)
 	MCFG_SCREEN_MODIFY( "screen" )
 	MCFG_SCREEN_SIZE( 80 * 6, 16 * 8 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 16 * 8 - 1 )
@@ -825,11 +832,11 @@ ROM_START( es210_es )
 ROM_END
 
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     INIT    COMPANY    FULLNAME            FLAGS */
-COMP( 199?, wales210,        0, 0,      nakajies210, nakajies, driver_device, 0,      "Walther", "ES-210",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* German, 128KB RAM */
-COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, driver_device, 0,      "Dator",   "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* Spanish, 128KB RAM */
-COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies, driver_device, 0,      "Nakajima","ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* Spanish, 128KB RAM */
-COMP( 199?, drwrt100, wales210, 0,      nakajies220, nakajies, driver_device, 0,      "NTS",     "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* English, 128KB RAM */
-COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, driver_device, 0,      "NTS",     "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* English, 256KB RAM */
-COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies, driver_device, 0,      "NTS",     "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* English, 128KB RAM */
-COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, driver_device, 0,      "NTS",     "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) /* English, 256KB? RAM */
+//    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     STATE           INIT    COMPANY     FULLNAME            FLAGS
+COMP( 199?, wales210,        0, 0,      nakajies210, nakajies, nakajies_state, 0,      "Walther",  "ES-210",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // German, 128KB RAM
+COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, nakajies_state, 0,      "Dator",    "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
+COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies, nakajies_state, 0,      "Nakajima", "ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
+COMP( 199?, drwrt100, wales210, 0,      nakajies220, nakajies, nakajies_state, 0,      "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
+COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, nakajies_state, 0,      "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
+COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies, nakajies_state, 0,      "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
+COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, nakajies_state, 0,      "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB? RAM

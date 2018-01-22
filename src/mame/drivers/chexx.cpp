@@ -17,10 +17,14 @@ Electro-mechanical bubble hockey games:
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/6522via.h"
+#include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "sound/digitalk.h"
-#include "machine/6522via.h"
+#include "speaker.h"
+
 #include "chexx.lh"
+
 
 #define MAIN_CLOCK XTAL_4MHz
 
@@ -75,6 +79,8 @@ public:
 	// driver_device overrides
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void faceoffh(machine_config &config);
+	void chexx83(machine_config &config);
 };
 
 
@@ -309,7 +315,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(chexx_state::update)
 #endif
 }
 
-static MACHINE_CONFIG_START( chexx83, chexx_state )
+MACHINE_CONFIG_START(chexx_state::chexx83)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6502, MAIN_CLOCK/2)
@@ -339,7 +345,7 @@ static MACHINE_CONFIG_START( chexx83, chexx_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( faceoffh, chexx83 )
+MACHINE_CONFIG_DERIVED(chexx_state::faceoffh, chexx83)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(faceoffh_map)
 
@@ -416,5 +422,5 @@ ROM_START( faceoffh )
 	ROM_FILL(         0xe000, 0x2000, 0xff ) // unpopulated
 ROM_END
 
-GAME( 1983, chexx83,  0,       chexx83,  chexx83, driver_device, 0, ROT270, "ICE",                                                 "Chexx (EM Bubble Hockey, 1983 1.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
-GAME( 1983, faceoffh, chexx83, faceoffh, chexx83, driver_device, 0, ROT270, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Face-Off (EM Bubble Hockey)",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )
+GAME( 1983, chexx83,  0,       chexx83,  chexx83, chexx_state, 0, ROT270, "ICE",                                                 "Chexx (EM Bubble Hockey, 1983 1.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_NO_SOUND )
+GAME( 1983, faceoffh, chexx83, faceoffh, chexx83, chexx_state, 0, ROT270, "SoftLogic (Entertainment Enterprises, Ltd. license)", "Face-Off (EM Bubble Hockey)",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_IMPERFECT_SOUND )

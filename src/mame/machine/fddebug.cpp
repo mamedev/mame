@@ -467,7 +467,7 @@ static inline int addr_is_valid(address_space &space, uint32_t addr, uint32_t fl
 		return 0;
 
 	/* if we're invalid, fail */
-	if (strcmp(const_cast<address_space &>(space)->get_handler_string(ROW_READ, addr), "segaic16_memory_mapper_lsb_r") == 0)
+	if (strcmp(const_cast<address_space &>(space)->get_handler_string(read_or_write::READ, addr), "segaic16_memory_mapper_lsb_r") == 0)
 		return 2;
 
 	return 1;

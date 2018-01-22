@@ -20,43 +20,31 @@
 
 ****************************************************************************/
 
+#include "emu.h"
 #include "includes/tranz330.h"
+
+#include "speaker.h"
+
 #include "tranz330.lh"
+
 
 static void construct_address_map_tranz330_mem(address_map &map)
 {
 	map.configure(AS_PROGRAM, 8);
 
-	address_map_entry *curentry = nullptr;
-	curentry = map.add(0x0000, 0x7fff);
-	curentry->set_read_type(AMH_ROM);
-
-	curentry = map.add(0x8000, 0xffff);
-	curentry->set_read_type(AMH_RAM);
-	curentry->set_write_type(AMH_RAM);
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xffff).ram();
 }
 
 static void construct_address_map_tranz330_io(address_map &map)
 {
 	map.configure(AS_IO, 8);
-	map.set_global_mask(0xff);
+	map.global_mask(0xff);
 
-	address_map_entry *curentry = nullptr;
-	curentry = map.add(0x00, 0x03);
-	curentry->set_handler(read8_delegate(&z80pio_device::read_alt,  "z80pio_device::read_alt",  PIO_TAG, (z80pio_device *)nullptr),
-						 write8_delegate(&z80pio_device::write_alt, "z80pio_device::write_alt", PIO_TAG, (z80pio_device *)nullptr));
-
-	curentry = map.add(0x10, 0x13);
-	curentry->set_handler(read8_delegate(&z80ctc_device::read,  "z80ctc_device::read",  CTC_TAG, (z80ctc_device *)nullptr),
-						 write8_delegate(&z80ctc_device::write, "z80ctc_device::write", CTC_TAG, (z80ctc_device *)nullptr));
-
-	curentry = map.add(0x20, 0x23);
-	curentry->set_handler(read8_delegate(&z80dart_device::ba_cd_r, "z80dart_device::ba_cd_r", DART_TAG, (z80dart_device *)nullptr),
-						 write8_delegate(&z80dart_device::ba_cd_w, "z80dart_device::ba_cd_w", DART_TAG, (z80dart_device *)nullptr));
-
-	curentry = map.add(0x30, 0x3f);
-	curentry->set_handler(read8_delegate(&msm6242_device::read,  "msm6242_device::read",  RTC_TAG, (msm6242_device *)nullptr),
-						 write8_delegate(&msm6242_device::write, "msm6242_device::write", RTC_TAG, (msm6242_device *)nullptr));
+	map(0x00, 0x03).rw(PIO_TAG,  FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0x10, 0x13).rw(CTC_TAG,  FUNC(z80ctc_device::read),     FUNC(z80ctc_device::write));
+	map(0x20, 0x23).rw(DART_TAG, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
+	map(0x30, 0x3f).rw(RTC_TAG,  FUNC(msm6242_device::read),    FUNC(msm6242_device::write));
 }
 
 static void construct_ioport_tranz330(device_t &owner, ioport_list &portlist, std::string &errorbuf)
@@ -155,7 +143,7 @@ static const z80_daisy_config tranz330_daisy_chain[] =
 
 // * - check clocks
 // ? - check purported RS232 hookup, inconsistent information found at the relevant webpage vs. user-submitted errata
-static MACHINE_CONFIG_START( tranz330, tranz330_state )
+MACHINE_CONFIG_START(tranz330_state::tranz330)
 	MCFG_CPU_ADD(CPU_TAG, Z80, XTAL_7_15909MHz/2) //*
 	MCFG_CPU_PROGRAM_MAP(tranz330_mem)
 	MCFG_CPU_IO_MAP(tranz330_io)
@@ -172,7 +160,7 @@ static MACHINE_CONFIG_START( tranz330, tranz330_state )
 	MCFG_Z80PIO_IN_PA_CB(READ8(tranz330_state, card_r))
 	MCFG_Z80PIO_IN_PB_CB(READ8(tranz330_state, pio_b_r))
 
-	MCFG_Z80DART_ADD(DART_TAG, XTAL_7_15909MHz/2, 0, 0, 0, 0 ) //*
+	MCFG_DEVICE_ADD(DART_TAG, Z80DART, XTAL_7_15909MHz/2) //*
 	MCFG_Z80DART_OUT_SYNCB_CB(WRITELINE(tranz330_state, syncb_w))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd)) //?
 	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr)) //?
@@ -205,5 +193,5 @@ ROM_START( tranz330 )
 ROM_END
 
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS             INIT    COMPANY     FULLNAME        FLAGS
-COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, driver_device,    0,     "VeriFone",  "Tranz 330",    MACHINE_CLICKABLE_ARTWORK )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS            INIT   COMPANY      FULLNAME        FLAGS
+COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, tranz330_state,  0,     "VeriFone",  "Tranz 330",    MACHINE_CLICKABLE_ARTWORK )

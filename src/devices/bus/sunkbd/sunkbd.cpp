@@ -1,10 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 
+#include "emu.h"
 #include "sunkbd.h"
 
 
-device_type const SUNKBD_PORT = &device_creator<sun_keyboard_port_device>;
+DEFINE_DEVICE_TYPE(SUNKBD_PORT, sun_keyboard_port_device, "sunkbd", "Sun Keyboard Port")
 
 
 int const device_sun_keyboard_port_interface::START_BIT_COUNT;
@@ -20,7 +21,7 @@ sun_keyboard_port_device::sun_keyboard_port_device(
 		char const *tag,
 		device_t *owner,
 		uint32_t clock)
-	: sun_keyboard_port_device(mconfig, SUNKBD_PORT, "Sun Keyboard Port", tag, owner, clock, "sunkbd", __FILE__)
+	: sun_keyboard_port_device(mconfig, SUNKBD_PORT, tag, owner, clock)
 {
 }
 
@@ -28,13 +29,10 @@ sun_keyboard_port_device::sun_keyboard_port_device(
 sun_keyboard_port_device::sun_keyboard_port_device(
 		machine_config const &mconfig,
 		device_type type,
-		char const *name,
 		char const *tag,
 		device_t *owner,
-		uint32_t clock,
-		char const *shortname,
-		char const *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+		uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
 	, m_rxd(0)
 	, m_rxd_handler(*this)
@@ -68,7 +66,7 @@ void sun_keyboard_port_device::device_start()
 
 WRITE_LINE_MEMBER( sun_keyboard_port_device::write_txd )
 {
-	if(m_dev)
+	if (m_dev)
 		m_dev->input_txd(state);
 }
 

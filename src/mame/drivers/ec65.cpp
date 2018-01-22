@@ -2,9 +2,9 @@
 // copyright-holders:Miodrag Milanovic, Robbbert
 /***************************************************************************
 
-        EC-65
+EC-65 (also known as Octopus)
 
-        16/07/2009 Initial driver.
+2009-07-16 Initial driver.
 
 ****************************************************************************/
 
@@ -17,6 +17,7 @@
 #include "machine/mos6551.h"
 #include "machine/6850acia.h"
 #include "machine/keyboard.h"
+#include "screen.h"
 
 #define PIA6821_TAG "pia6821"
 #define ACIA6850_TAG "acia6850"
@@ -30,23 +31,26 @@ class ec65_state : public driver_device
 {
 public:
 	ec65_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_via_0(*this, VIA6522_0_TAG),
-		m_via_1(*this, VIA6522_1_TAG),
-		m_p_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_via_0(*this, VIA6522_0_TAG)
+		, m_via_1(*this, VIA6522_1_TAG)
+		, m_p_videoram(*this, "videoram")
+		, m_p_chargen(*this, "chargen")
+		, m_maincpu(*this, "maincpu")
+		, m_palette(*this, "palette")
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(kbd_put);
+	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	uint8_t *m_p_chargen;
+
+	void ec65(machine_config &config);
+private:
+	virtual void machine_reset() override;
 	required_device<via6522_device> m_via_0;
 	required_device<via6522_device> m_via_1;
 	required_shared_ptr<uint8_t> m_p_videoram;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
+	required_region_ptr<u8> m_p_chargen;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 };
@@ -58,14 +62,14 @@ public:
 		: driver_device(mconfig, type, tag)
 	{
 	}
+	void ec65k(machine_config &config);
 };
 
 static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8, ec65_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE(PIA6821_TAG, pia6821_device, read, write)
-	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE(ACIA6850_TAG, acia6850_device, status_r, control_w)
-	AM_RANGE(0xe011, 0xe011) AM_DEVREADWRITE(ACIA6850_TAG, acia6850_device, data_r, data_w)
+	AM_RANGE(0xe010, 0xe011) AM_DEVREADWRITE(ACIA6850_TAG, acia6850_device, read, write)
 	AM_RANGE(0xe100, 0xe10f) AM_DEVREADWRITE(VIA6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0xe110, 0xe11f) AM_DEVREADWRITE(VIA6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0xe130, 0xe133) AM_DEVREADWRITE(ACIA6551_TAG,  mos6551_device, read, write)
@@ -87,18 +91,18 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( ec65 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( ec65_state::kbd_put )
+void ec65_state::kbd_put(u8 data)
 {
 	if (data)
 	{
-		m_via_0->write_pa0((data>>0)&1);
-		m_via_0->write_pa1((data>>1)&1);
-		m_via_0->write_pa2((data>>2)&1);
-		m_via_0->write_pa3((data>>3)&1);
-		m_via_0->write_pa4((data>>4)&1);
-		m_via_0->write_pa5((data>>5)&1);
-		m_via_0->write_pa6((data>>6)&1);
-		m_via_0->write_pa7((data>>7)&1);
+		m_via_0->write_pa0(BIT(data, 0));
+		m_via_0->write_pa1(BIT(data, 1));
+		m_via_0->write_pa2(BIT(data, 2));
+		m_via_0->write_pa3(BIT(data, 3));
+		m_via_0->write_pa4(BIT(data, 4));
+		m_via_0->write_pa5(BIT(data, 5));
+		m_via_0->write_pa6(BIT(data, 6));
+		m_via_0->write_pa7(BIT(data, 7));
 		m_via_0->write_ca1(1);
 		m_via_0->write_ca1(0);
 	}
@@ -114,11 +118,6 @@ void ec65_state::machine_reset()
 	m_via_1->write_pb5(1);
 	m_via_1->write_pb6(1);
 	m_via_1->write_pb7(1);
-}
-
-void ec65_state::video_start()
-{
-	m_p_chargen = memregion("chargen")->base();
 }
 
 MC6845_UPDATE_ROW( ec65_state::crtc_update_row )
@@ -167,7 +166,7 @@ static GFXDECODE_START( ec65 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ec65_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ec65, ec65_state )
+MACHINE_CONFIG_START(ec65_state::ec65)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M6502, XTAL_4MHz / 4)
@@ -202,10 +201,10 @@ static MACHINE_CONFIG_START( ec65, ec65_state )
 	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(WRITE8(ec65_state, kbd_put))
+	MCFG_GENERIC_KEYBOARD_CB(PUT(ec65_state, kbd_put))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ec65k, ec65k_state )
+MACHINE_CONFIG_START(ec65k_state::ec65k)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",G65816, XTAL_4MHz) // can use 4,2 or 1 MHz
@@ -241,10 +240,10 @@ ROM_START( ec65k )
 	ROM_LOAD( "ec65k.ic19",  0xf000, 0x1000, CRC(5e5a890a) SHA1(daa006f2179fd156833e11c73b37881cafe5dede))
 
 	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "chargen.ic19", 0x0000, 0x1000, CRC(9b56a28d) SHA1(41c04fd9fb542c50287bc0e366358a61fc4b0cd4)) // Located on VDU card
+	ROM_LOAD( "chargen.ic19", 0x0000, 0x1000, CRC(9b56a28d) SHA1(41c04fd9fb542c50287bc0e366358a61fc4b0cd4)) // Located on VDU card, suspect bad dump
 ROM_END
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1985, ec65,   0,       0,      ec65,      ec65, driver_device,    0,    "Elektor Electronics", "EC-65", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1985, ec65k,  ec65,    0,      ec65k,     ec65, driver_device,    0,    "Elektor Electronics", "EC-65K", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE         INIT  COMPANY                FULLNAME  FLAGS */
+COMP( 1985, ec65,   0,      0,      ec65,    ec65,  ec65_state,   0,    "Elektor Electronics", "EC-65",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1985, ec65k,  ec65,   0,      ec65k,   ec65,  ec65k_state,  0,    "Elektor Electronics", "EC-65K", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

@@ -79,9 +79,9 @@ PALETTE_INIT_MEMBER(wiping_state, wiping)
 
 
 
-WRITE8_MEMBER(wiping_state::flipscreen_w)
+WRITE_LINE_MEMBER(wiping_state::flipscreen_w)
 {
-	m_flipscreen = (data & 1);
+	m_flipscreen = state;
 }
 
 

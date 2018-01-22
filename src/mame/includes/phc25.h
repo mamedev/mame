@@ -6,7 +6,6 @@
 #define __PHC25__
 
 
-#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "sound/wave.h"
@@ -44,6 +43,9 @@ public:
 	MC6847_GET_CHARROM_MEMBER(ntsc_char_rom_r);
 	MC6847_GET_CHARROM_MEMBER(pal_char_rom_r);
 
+	void phc25(machine_config &config);
+	void pal(machine_config &config);
+	void ntsc(machine_config &config);
 private:
 	virtual void video_start() override;
 	uint8_t *m_char_rom;

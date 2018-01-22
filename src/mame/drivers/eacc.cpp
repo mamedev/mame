@@ -52,6 +52,7 @@
 #include "eacc.lh"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 
 
 class eacc_state : public driver_device
@@ -80,6 +81,7 @@ public:
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
 	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
+	void eacc(machine_config &config);
 private:
 	uint8_t m_digit;
 };
@@ -217,7 +219,7 @@ WRITE8_MEMBER( eacc_state::eacc_segment_w )
 		{
 			for (i = 3; i < 7; i++)
 				if (BIT(m_digit, i))
-					output().set_digit_value(i, BITSWAP8(data, 7, 0, 1, 4, 5, 6, 2, 3));
+					output().set_digit_value(i, bitswap<8>(data, 7, 0, 1, 4, 5, 6, 2, 3));
 		}
 	}
 }
@@ -237,7 +239,7 @@ WRITE8_MEMBER( eacc_state::eacc_digit_w )
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( eacc, eacc_state )
+MACHINE_CONFIG_START(eacc_state::eacc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL_3_579545MHz)  /* Divided by 4 inside the m6802*/
 	MCFG_CPU_PROGRAM_MAP(eacc_mem)
@@ -276,5 +278,5 @@ ROM_END
  Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME        FLAGS */
-COMP( 1982, eacc,       0,          0,      eacc,       eacc, driver_device,   0,     "Electronics Australia", "EA Car Computer", MACHINE_NO_SOUND_HW)
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  STATE       INIT   COMPANY                  FULLNAME           FLAGS
+COMP( 1982, eacc,   0,      0,      eacc,    eacc,  eacc_state, 0,     "Electronics Australia", "EA Car Computer", MACHINE_NO_SOUND_HW)

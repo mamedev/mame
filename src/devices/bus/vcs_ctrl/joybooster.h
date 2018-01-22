@@ -7,12 +7,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VCS_CTRL_JOYBOOSTER_H
+#define MAME_BUS_VCS_CTRL_JOYBOOSTER_H
+
 #pragma once
 
-#ifndef __VCS_JOYSTICKBOOSTER__
-#define __VCS_JOYSTICKBOOSTER__
-
-#include "emu.h"
 #include "ctrl.h"
 
 
@@ -53,7 +52,6 @@ private:
 
 
 // device type definition
-extern const device_type VCS_JOYSTICK_BOOSTER;
+DECLARE_DEVICE_TYPE(VCS_JOYSTICK_BOOSTER, vcs_joystick_booster_device)
 
-
-#endif
+#endif // MAME_BUS_VCS_CTRL_JOYBOOSTER_H

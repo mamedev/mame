@@ -6,11 +6,13 @@
 
 *************************************************************************/
 
-#include "sound/okim6295.h"
+#include "machine/74157.h"
 #include "machine/nvram.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/msm5205.h"
+#include "sound/okim6295.h"
 
 class mitchell_state : public driver_device
 {
@@ -19,10 +21,11 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_oki(*this, "oki") ,
+		m_oki(*this, "oki"),
 		m_nvram(*this, "nvram"),
 		m_eeprom(*this, "eeprom"),
 		m_msm(*this, "msm"),
+		m_adpcm_select(*this, "adpcm_select"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
@@ -30,7 +33,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_bank1(*this, "bank1"),
 		m_bank0d(*this, "bank0d"),
-		m_bank1d(*this, "bank1d") { }
+		m_bank1d(*this, "bank1d"),
+		m_soundbank(*this, "soundbank") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -39,6 +43,7 @@ public:
 	optional_device<nvram_device> m_nvram;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 	optional_device<msm5205_device> m_msm;
+	optional_device<ls157_device> m_adpcm_select;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
@@ -49,6 +54,7 @@ public:
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
+	optional_memory_bank m_soundbank;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -59,8 +65,7 @@ public:
 	std::vector<uint8_t> m_paletteram;
 
 	/* sound-related */
-	int        m_sample_buffer;
-	int        m_sample_select;
+	bool       m_sample_select;
 
 	/* misc */
 	int        m_input_type;
@@ -68,7 +73,6 @@ public:
 	int        m_dial_selected;
 	int        m_dir[2];
 	int        m_keymatrix;
-	uint8_t       m_dummy_nvram;
 
 	uint8_t m_irq_source;
 	DECLARE_READ8_MEMBER(pang_port5_r);
@@ -127,5 +131,14 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void bootleg_decode();
 	void configure_banks(void (*decode)(uint8_t *src, uint8_t *dst, int size));
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE_LINE_MEMBER(spangbl_adpcm_int);
+	void pkladiesbl(machine_config &config);
+	void mstworld(machine_config &config);
+	void mgakuen(machine_config &config);
+	void marukin(machine_config &config);
+	void pang(machine_config &config);
+	void pangba(machine_config &config);
+	void pangnv(machine_config &config);
+	void spangbl(machine_config &config);
 };

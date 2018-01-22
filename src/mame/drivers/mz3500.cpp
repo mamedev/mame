@@ -35,6 +35,8 @@
 #include "machine/pit8253.h"
 #include "sound/beep.h"
 #include "video/upd7220.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK XTAL_8MHz
 
@@ -101,6 +103,7 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
+	void mz3500(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -784,12 +787,12 @@ void mz3500_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( upd7220_1_map, AS_0, 16, mz3500_state )
+static ADDRESS_MAP_START( upd7220_1_map, 0, 16, mz3500_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x00000, 0x00fff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( upd7220_2_map, AS_0, 16, mz3500_state )
+static ADDRESS_MAP_START( upd7220_2_map, 0, 16, mz3500_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM // AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
@@ -798,7 +801,7 @@ static SLOT_INTERFACE_START( mz3500_floppies )
 SLOT_INTERFACE_END
 
 /* TODO: clocks */
-static MACHINE_CONFIG_START( mz3500, mz3500_state )
+MACHINE_CONFIG_START(mz3500_state::mz3500)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master",Z80,MAIN_CLOCK/2)
@@ -824,12 +827,12 @@ static MACHINE_CONFIG_START( mz3500, mz3500_state )
 	MCFG_FLOPPY_DRIVE_ADD("upd765a:3", mz3500_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 
 	MCFG_DEVICE_ADD("upd7220_chr", UPD7220, MAIN_CLOCK/5)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(mz3500_state, hgdc_draw_text)
 	MCFG_UPD7220_VSYNC_CALLBACK(DEVWRITELINE("upd7220_gfx", upd7220_device, ext_sync_w))
 
 	MCFG_DEVICE_ADD("upd7220_gfx", UPD7220, MAIN_CLOCK/5)
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(mz3500_state, hgdc_display_pixels)
 
 	/* video hardware */
@@ -869,4 +872,4 @@ ROM_START( mz3500 )
 	ROM_LOAD( "mz-3500_cg-rom_2-b_m5l2764k.bin", 0x000000, 0x002000, CRC(29f2f80a) SHA1(64b307cd9de5a3327e3ec9f3d0d6b3485706f436) )
 ROM_END
 
-COMP( 198?, mz3500,  0,   0,   mz3500,  mz3500, driver_device,  0,  "Sharp",      "MZ-3500", MACHINE_IS_SKELETON )
+COMP( 198?, mz3500,  0,   0,   mz3500,  mz3500, mz3500_state,  0,  "Sharp",      "MZ-3500", MACHINE_IS_SKELETON )

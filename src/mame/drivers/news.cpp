@@ -16,16 +16,19 @@ driver by David Haywood
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/news.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 static ADDRESS_MAP_START( news_map, AS_PROGRAM, 8, news_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM     /* 4000-7fff is written to during startup, probably leftover code */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(news_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(news_bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0x9000, 0x91ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x9000, 0x91ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -125,7 +128,7 @@ void news_state::machine_reset()
 	m_bgpic = 0;
 }
 
-static MACHINE_CONFIG_START( news, news_state )
+MACHINE_CONFIG_START(news_state::news)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000)         /* ? MHz */
@@ -150,7 +153,7 @@ static MACHINE_CONFIG_START( news, news_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -180,5 +183,5 @@ ROM_START( newsa )
 	ROM_LOAD( "virus.1", 0x00000, 0x40000, CRC(41f5935a) SHA1(1566d243f165019660cd4dd69df9f049e0130f15) )
 ROM_END
 
-GAME( 1993, news,  0,    news, news, driver_device,  0, ROT0, "Poby / Virus", "News (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, newsa, news, news, newsa, driver_device, 0, ROT0, "Poby",         "News (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, news,  0,    news, news,  news_state, 0, ROT0, "Poby / Virus", "News (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, newsa, news, news, newsa, news_state, 0, ROT0, "Poby",         "News (set 2)", MACHINE_SUPPORTS_SAVE )

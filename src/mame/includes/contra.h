@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "video/k007121.h"
+#include "screen.h"
 
 class contra_state : public driver_device
 {
@@ -75,4 +76,5 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void contra(machine_config &config);
 };

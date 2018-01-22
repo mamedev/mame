@@ -386,6 +386,16 @@ newoption {
 	description = "Produce WebAssembly output when building with Emscripten.",
 }
 
+newoption {
+	trigger = "SANITIZE",
+	description = "Specifies the santizer(s) to use."
+}
+
+newoption {
+	trigger = "PROJECT",
+	description = "Select projects to be built. Will look into project folder for files.",
+}
+
 dofile ("extlib.lua")
 
 if _OPTIONS["SHLIB"]=="1" then
@@ -460,6 +470,9 @@ flags {
 }
 
 configuration { "vs*" }
+	buildoptions {
+		"/bigobj",
+	}
 	flags {
 		"NoPCH",
 		"ExtraWarnings",
@@ -475,6 +488,7 @@ configuration { "vs*" }
 configuration { "Debug", "vs*" }
 	flags {
 		"Symbols",
+		"NoIncrementalLink",
 	}
 
 configuration { "Release", "vs*" }
@@ -482,7 +496,7 @@ configuration { "Release", "vs*" }
 		"Optimize",
 	}
 
--- Force VS2015 targets to use bundled SDL2
+-- Force VS2015/17 targets to use bundled SDL2
 if string.sub(_ACTION,1,4) == "vs20" and _OPTIONS["osd"]=="sdl" then
 	if _OPTIONS["with-bundled-sdl2"]==nil then
 		_OPTIONS["with-bundled-sdl2"] = "1"
@@ -515,7 +529,14 @@ msgprecompile ("Precompiling $(subst ../,,$<)...")
 
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 
-if (_OPTIONS["SOURCES"] == nil) then
+if (_OPTIONS["PROJECT"] ~= nil) then
+	PROJECT_DIR = path.join(path.getabsolute(".."),"projects",_OPTIONS["PROJECT"]) .. "/"
+	if (not os.isfile(path.join("..", "projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
+		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
+	end
+	dofile (path.join(".." ,"projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
+end
+if (_OPTIONS["SOURCES"] == nil and _OPTIONS["PROJECT"] == nil) then
 	if (not os.isfile(path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end
@@ -831,7 +852,7 @@ end
 
 configuration { "mingw-clang" }
 	buildoptions {
-		"-O1", -- without this executable crash often
+		"-Xclang -flto-visibility-public-std", -- workround for __imp___ link errors
 	}
 configuration {  }
 
@@ -934,13 +955,38 @@ end
 	buildoptions_cpp {
 		"-Woverloaded-virtual",
 	}
-
---ifdef SANITIZE
---CCOMFLAGS += -fsanitize=$(SANITIZE)
+	
+if _OPTIONS["SANITIZE"] then
+	buildoptions {
+		"-fsanitize=".. _OPTIONS["SANITIZE"]
+	}
+	linkoptions {
+		"-fsanitize=".. _OPTIONS["SANITIZE"]
+	}
+	if string.find(_OPTIONS["SANITIZE"], "address") then
+		buildoptions {
+			"-fsanitize-address-use-after-scope"
+		}
+		linkoptions {
+			"-fsanitize-address-use-after-scope"
+		}
+	end
+	if string.find(_OPTIONS["SANITIZE"], "undefined") then
+		-- 'function' produces errors without delegates by design
+		-- 'alignment' produces a lot of errors which we are not interested in
+		buildoptions {
+			"-fno-sanitize=function",
+			"-fno-sanitize=alignment"
+		}
+		linkoptions {
+			"-fno-sanitize=function",
+			"-fno-sanitize=alignment"
+		}
+	end
+end
 
 --ifneq (,$(findstring thread,$(SANITIZE)))
 --CCOMFLAGS += -fPIE
---endif
 --endif
 
 
@@ -1035,6 +1081,7 @@ configuration { "android*" }
 		"-Wno-undef",
 		"-Wno-typedef-redefinition",
 		"-Wno-unknown-warning-option",
+		"-Wno-incompatible-ms-struct",
 	}
 	buildoptions_cpp {
 		"-x c++",
@@ -1116,10 +1163,13 @@ configuration { "osx* or xcode4" }
 		}
 
 configuration { "mingw*" }
+		if _OPTIONS["osd"]~="sdl"
+		then
+			linkoptions {
+				"-static",
+			}
+		end
 		linkoptions {
-			"-static-libgcc",
-			"-static-libstdc++",
-			"-static",
 			"-Wl,--start-group",
 		}
 		links {
@@ -1134,10 +1184,14 @@ configuration { "mingw*" }
 			"shell32",
 			"userenv",
 		}
+
 configuration { "mingw-clang" }
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and ((version < 30900)) then
 		linkoptions {
 			"-pthread",
 		}
+	end
 
 
 configuration { "vs*" }
@@ -1149,6 +1203,8 @@ configuration { "vs*" }
 			"_CRT_SECURE_NO_DEPRECATE",
 			"_CRT_STDIO_LEGACY_WIDE_SPECIFIERS",
 		}
+-- Windows Store/Phone projects already link against the available libraries.
+if _OPTIONS["vs"]==nil or not (string.startswith(_OPTIONS["vs"], "winstore8") or string.startswith(_OPTIONS["vs"], "winphone8")) then
 		links {
 			"user32",
 			"winmm",
@@ -1161,6 +1217,7 @@ configuration { "vs*" }
 			"shell32",
 			"userenv",
 		}
+end
 
 		buildoptions {
 			"/WX",     -- Treats all compiler warnings as errors.
@@ -1268,7 +1325,7 @@ end
 		includedirs {
 			MAME_DIR .. "3rdparty/dxsdk/Include"
 		}
-configuration { "vs2015*" }
+configuration { "vs201*" }
 		buildoptions {
 			"/wd4334", -- warning C4334: '<<': result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
@@ -1283,15 +1340,6 @@ configuration { "vs2015*" }
 			"/wd4592", -- warning C4592: symbol will be dynamically initialized (implementation limitation)
 		}
 configuration { "winphone8* or winstore8*" }
-	removelinks {
-		"DelayImp",
-		"gdi32",
-		"psapi"
-	}
-	links {
-		"d3d11",
-		"dxgi"
-	}
 	linkoptions {
 		"/ignore:4264" -- LNK4264: archiving object file compiled with /ZW into a static library; note that when authoring Windows Runtime types it is not recommended to link with a static library that contains Windows Runtime metadata
 	}
@@ -1306,6 +1354,13 @@ configuration { "Debug", "gmake" }
 configuration { }
 
 if (_OPTIONS["SOURCES"] ~= nil) then
+	local str = _OPTIONS["SOURCES"]
+	for word in string.gmatch(str, '([^,]+)') do
+		if (not os.isfile(path.join(MAME_DIR ,word))) then
+			print("File " .. word.. " does not exist")
+			os.exit()
+		end
+	end
 	OUT_STR = os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " target " .. _OPTIONS["subtarget"])
 	load(OUT_STR)()
 	os.outputof( PYTHON .. " " .. MAME_DIR .. "scripts/build/makedep.py " .. MAME_DIR .. " " .. _OPTIONS["SOURCES"] .. " drivers " .. _OPTIONS["subtarget"] .. " > ".. GEN_DIR  .. _OPTIONS["target"] .. "/" .. _OPTIONS["subtarget"]..".flt")

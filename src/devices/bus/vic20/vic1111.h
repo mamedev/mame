@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_VIC20_VIC1111_H
+#define MAME_BUS_VIC20_VIC1111_H
+
 #pragma once
 
-#ifndef __VIC1111__
-#define __VIC1111__
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -43,8 +42,6 @@ private:
 
 
 // device type definition
-extern const device_type VIC1111;
+DECLARE_DEVICE_TYPE(VIC1111, vic1111_device)
 
-
-
-#endif
+#endif // MAME_BUS_VIC20_VIC1111_H

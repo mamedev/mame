@@ -13,7 +13,6 @@
 
 #include "debugbaseinfo.h"
 
-#include "emu.h"
 
 
 class debugwin_info : protected debugbase_info
@@ -71,6 +70,7 @@ protected:
 		ID_STEP,
 		ID_STEP_OVER,
 		ID_STEP_OUT,
+		ID_REWIND_STEP,
 		ID_HARD_RESET,
 		ID_SOFT_RESET,
 		ID_EXIT,

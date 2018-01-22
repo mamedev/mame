@@ -20,6 +20,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms32010/tms32010.h"
 #include "video/poly.h"
+#include "screen.h"
 
 
 struct atarisy4_polydata
@@ -106,6 +107,8 @@ public:
 	inline uint8_t hex_to_ascii(uint8_t in);
 	void load_ldafile(address_space &space, const uint8_t *file);
 	void load_hexfile(address_space &space, const uint8_t *file);
+	void airrace(machine_config &config);
+	void atarisy4(machine_config &config);
 };
 
 
@@ -174,7 +177,7 @@ struct gpu_
  *************************************/
 
 atarisy4_renderer::atarisy4_renderer(atarisy4_state &state, screen_device &screen)
-	: poly_manager<float, atarisy4_polydata, 2, 8192>(screen, POLYFLAG_NO_WORK_QUEUE),
+	: poly_manager<float, atarisy4_polydata, 2, 8192>(screen, FLAG_NO_WORK_QUEUE),
 		m_state(state)
 {
 }
@@ -756,7 +759,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarisy4, atarisy4_state )
+MACHINE_CONFIG_START(atarisy4_state::atarisy4)
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", atarisy4_state,  vblank_int)
@@ -775,7 +778,7 @@ static MACHINE_CONFIG_START( atarisy4, atarisy4_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( airrace, atarisy4 )
+MACHINE_CONFIG_DERIVED(atarisy4_state::airrace, atarisy4)
 
 	MCFG_CPU_ADD("dsp1", TMS32010, 16000000)
 	MCFG_CPU_PROGRAM_MAP(dsp1_map)
@@ -846,6 +849,7 @@ void atarisy4_state::load_ldafile(address_space &space, const uint8_t *file)
 		uint8_t sum = 1;
 		uint16_t len;
 		uint16_t addr;
+		uint8_t pval = 0;
 
 		if (READ_CHAR() != 0x01)
 			fatalerror("Bad .LDA file\n");
@@ -878,7 +882,11 @@ void atarisy4_state::load_ldafile(address_space &space, const uint8_t *file)
 		{
 			uint8_t data = READ_CHAR();
 			sum += data;
-			space.write_byte(addr++, data);
+			if (addr & 1)
+				space.write_word(addr >> 1, (pval << 8) | data);
+			else
+				pval = data;
+			addr ++;
 		} while (--len);
 
 		sum += READ_CHAR();

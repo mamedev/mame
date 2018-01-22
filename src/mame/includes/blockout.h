@@ -8,6 +8,8 @@
 ***************************************************************************/
 
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
+#include "screen.h"
 
 class blockout_state : public driver_device
 {
@@ -40,12 +42,12 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
-	DECLARE_WRITE16_MEMBER(blockout_sound_command_w);
 	DECLARE_WRITE16_MEMBER(blockout_irq6_ack_w);
 	DECLARE_WRITE16_MEMBER(blockout_irq5_ack_w);
 	DECLARE_WRITE16_MEMBER(blockout_paletteram_w);
 	DECLARE_WRITE16_MEMBER(blockout_frontcolor_w);
 	DECLARE_WRITE16_MEMBER(blockout_videoram_w);
+	DECLARE_DRIVER_INIT(agress);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -53,4 +55,6 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(blockout_scanline);
 	void setcolor( int color, int rgb );
 	void update_pixels( int x, int y );
+	void blockout(machine_config &config);
+	void agress(machine_config &config);
 };

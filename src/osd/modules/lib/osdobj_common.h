@@ -73,6 +73,10 @@
 #define OSDOPTION_SOUND                 "sound"
 #define OSDOPTION_AUDIO_LATENCY         "audio_latency"
 
+#define OSDOPTION_PA_API                "pa_api"
+#define OSDOPTION_PA_DEVICE             "pa_device"
+#define OSDOPTION_PA_LATENCY            "pa_latency"
+
 #define OSDOPTION_AUDIO_OUTPUT          "audio_output"
 #define OSDOPTION_AUDIO_EFFECT          "audio_effect"
 
@@ -140,7 +144,7 @@ public:
 	bool gl_vbo() const { return bool_value(OSDOPTION_GL_VBO); }
 	bool gl_pbo() const { return bool_value(OSDOPTION_GL_PBO); }
 	bool gl_glsl() const { return bool_value(OSDOPTION_GL_GLSL); }
-	bool glsl_filter() const { return bool_value(OSDOPTION_GLSL_FILTER); }
+	int glsl_filter() const { return int_value(OSDOPTION_GLSL_FILTER); }
 	const char *shader_mame(int index) const { return value(string_format("%s%d", OSDOPTION_SHADER_MAME, index).c_str()); }
 	const char *shader_screen(int index) const { return value(string_format("%s%d", OSDOPTION_SHADER_SCREEN, index).c_str()); }
 
@@ -160,7 +164,11 @@ public:
 	const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
 	const char *bgfx_avi_name() const { return value(OSDOPTION_BGFX_AVI_NAME); }
 
-private:
+	// PortAudio options
+	const char *pa_api() const { return value(OSDOPTION_PA_API); }
+	const char *pa_device() const { return value(OSDOPTION_PA_DEVICE); }
+	const float pa_latency() const { return float_value(OSDOPTION_PA_LATENCY); }
+
 	static const options_entry s_option_entries[];
 };
 
@@ -257,11 +265,11 @@ private:
 	osd_module_manager m_mod_man;
 	font_module *m_font_module;
 
-	void update_option(const char * key, std::vector<const char *> &values);
+	void update_option(const char * key, std::vector<const char *> &values) const;
 	// FIXME: should be elsewhere
 	osd_module *select_module_options(const core_options &opts, const std::string &opt_name)
 	{
-		std::string opt_val = opts.value(opt_name.c_str());
+		std::string opt_val = opts.exists(opt_name) ? opts.value(opt_name.c_str()) : "";
 		if (opt_val.compare("auto")==0)
 			opt_val = "";
 		else if (!m_mod_man.type_has_name(opt_name.c_str(), opt_val.c_str()))

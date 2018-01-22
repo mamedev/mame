@@ -8,10 +8,11 @@
 
 ***************************************************************************/
 
+#ifndef MAME_CPU_AM29000_AM29000_H
+#define MAME_CPU_AM29000_AM29000_H
+
 #pragma once
 
-#ifndef __AM29000_H__
-#define __AM29000_H__
 
 
 /***************************************************************************
@@ -431,7 +432,7 @@ enum
 #define AM29000_INTR3       3
 
 
-class am29000_cpu_device :  public cpu_device
+class am29000_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
@@ -450,25 +451,14 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override
-	{
-		switch (spacenum)
-		{
-			case AS_PROGRAM: return &m_program_config;
-			case AS_IO:      return &m_io_config;
-			case AS_DATA:    return &m_data_config;
-			default:         return nullptr;
-		}
-	}
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	void signal_exception(uint32_t type);
 	void external_irq_check();
@@ -640,9 +630,10 @@ protected:
 	uint32_t          m_next_pc;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_data;
-	direct_read_data *m_datadirect;
+
+	direct_read_data<0> *m_datadirect;
 	address_space *m_io;
 
 	typedef void ( am29000_cpu_device::*opcode_func ) ();
@@ -655,7 +646,6 @@ protected:
 };
 
 
-extern const device_type AM29000;
+DECLARE_DEVICE_TYPE(AM29000, am29000_cpu_device)
 
-
-#endif /* __AM29000_H__ */
+#endif // MAME_CPU_AM29000_AM29000_H

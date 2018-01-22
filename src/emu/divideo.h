@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DIVIDEO_H__
-#define __DIVIDEO_H__
+#ifndef MAME_EMU_DIVIDEO_H
+#define MAME_EMU_DIVIDEO_H
 
 
 //**************************************************************************
@@ -47,12 +47,14 @@ public:
 
 	// getters
 	screen_device &screen() const { return *m_screen; }
+	bool has_screen() const { return m_screen != nullptr; }
 
 protected:
 	// optional operation overrides
 	virtual void interface_validity_check(validity_checker &valid) const override;
 	virtual void interface_pre_start() override;
 
+private:
 	// configuration state
 	bool            m_screen_required;          // is a screen required?
 	const char *    m_screen_tag;               // configured tag for the target screen
@@ -65,4 +67,4 @@ protected:
 typedef device_interface_iterator<device_video_interface> video_interface_iterator;
 
 
-#endif  /* __DIVIDEO_H__ */
+#endif  /* MAME_EMU_DIVIDEO_H */

@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "screen.h"
 
 class mgolf_state : public driver_device
 {
@@ -64,6 +65,7 @@ public:
 	void update_plunger(  );
 	double calc_plunger_pos();
 
+	void mgolf(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -158,7 +160,7 @@ TIMER_CALLBACK_MEMBER(mgolf_state::interrupt_callback)
 
 	update_plunger();
 
-	generic_pulse_irq_line(*m_maincpu, 0, 1);
+	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
 
 	scanline = scanline + 32;
 
@@ -361,7 +363,7 @@ void mgolf_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( mgolf, mgolf_state )
+MACHINE_CONFIG_START(mgolf_state::mgolf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16) /* ? */
@@ -408,4 +410,4 @@ ROM_START( mgolf )
 ROM_END
 
 
-GAME( 1978, mgolf, 0, mgolf, mgolf, driver_device, 0, ROT270, "Atari", "Atari Mini Golf (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1978, mgolf, 0, mgolf, mgolf, mgolf_state, 0, ROT270, "Atari", "Atari Mini Golf (prototype)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

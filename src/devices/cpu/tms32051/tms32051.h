@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-#pragma once
+#ifndef MAME_CPU_TMS32051_TMS32051_H
+#define MAME_CPU_TMS32051_TMS32051_H
 
-#ifndef __TMS32051_H__
-#define __TMS32051_H__
+#pragma once
 
 
 enum
@@ -58,12 +58,13 @@ class tms32051_device : public cpu_device
 public:
 	// construction/destruction
 	tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	tms32051_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	DECLARE_READ16_MEMBER( cpuregs_r );
 	DECLARE_WRITE16_MEMBER( cpuregs_w );
 
 protected:
+	tms32051_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_pgm, address_map_constructor internal_data);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -76,13 +77,10 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ) ); }
-	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value) override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -161,7 +159,7 @@ protected:
 	} m_shadow;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<-1> *m_direct;
 	address_space *m_data;
 	address_space *m_io;
 	int m_icount;
@@ -376,13 +374,11 @@ public:
 	tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_config_complete() override;
 	virtual void device_reset() override;
 };
 
 
-extern const device_type TMS32051;
-extern const device_type TMS32053;
+DECLARE_DEVICE_TYPE(TMS32051, tms32051_device)
+DECLARE_DEVICE_TYPE(TMS32053, tms32053_device)
 
-
-#endif /* __TMS32051_H__ */
+#endif // MAME_CPU_TMS32051_TMS32051_H

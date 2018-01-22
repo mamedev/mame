@@ -47,8 +47,14 @@
 */
 
 
+#include "emu.h"
 #include "includes/xerox820.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
+
 /* Read/Write Handlers */
 
 void xerox820_state::bankswitch(int bank)
@@ -539,7 +545,7 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( xerox820, xerox820_state )
+MACHINE_CONFIG_START(xerox820_state::xerox820)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_20MHz/8)
 	MCFG_CPU_PROGRAM_MAP(xerox820_mem)
@@ -576,7 +582,7 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":0", xerox820_floppies, "sa400", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1771_TAG":1", xerox820_floppies, "sa400", floppy_image_device::default_floppy_formats)
 
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_20MHz/8, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL_20MHz/8)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -606,14 +612,14 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( bigboard, xerox820, bigboard_state )
+MACHINE_CONFIG_DERIVED(bigboard_state::bigboard, xerox820)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("beeper", BEEP, 950)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00) /* bigboard only */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
+MACHINE_CONFIG_START(xerox820ii_state::xerox820ii)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(xerox820ii_mem)
@@ -663,7 +669,7 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":0", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FD1797_TAG":1", xerox820_floppies, "sa450", floppy_image_device::default_floppy_formats)
 
-	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_16MHz/4, 0, 0, 0, 0)
+	MCFG_DEVICE_ADD(Z80SIO_TAG, Z80SIO0, XTAL_16MHz/4)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -708,7 +714,7 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "xerox820ii")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( xerox168, xerox820ii )
+MACHINE_CONFIG_DERIVED(xerox820ii_state::xerox168, xerox820ii)
 	MCFG_CPU_ADD(I8086_TAG, I8086, 4770000)
 	MCFG_CPU_PROGRAM_MAP(xerox168_mem)
 
@@ -718,7 +724,7 @@ static MACHINE_CONFIG_DERIVED( xerox168, xerox820ii )
 	MCFG_RAM_EXTRA_OPTIONS("320K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mk83, xerox820 )
+MACHINE_CONFIG_DERIVED(xerox820_state::mk83, xerox820)
 	MCFG_CPU_MODIFY(Z80_TAG)
 	MCFG_CPU_PROGRAM_MAP(mk83_mem)
 MACHINE_CONFIG_END
@@ -823,10 +829,10 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
-COMP( 1980, bigboard,   0,          0,      bigboard,   xerox820, driver_device,   0,      "Digital Research Computers",   "Big Board",     0 )
-COMP( 1981, x820,       bigboard,   0,      xerox820,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 820",     MACHINE_NO_SOUND_HW )
-COMP( 1982, mk82,       bigboard,   0,      bigboard,   xerox820, driver_device,   0,      "Scomar",                       "MK-82",         0 )
-COMP( 1983, x820ii,     0,          0,      xerox820ii, xerox820, driver_device,   0,      "Xerox",                        "Xerox 820-II",  MACHINE_NOT_WORKING )
-COMP( 1983, x168,       x820ii,     0,      xerox168,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 16/8",    MACHINE_NOT_WORKING )
-COMP( 1983, mk83,       x820ii,     0,      mk83,       xerox820, driver_device,   0,      "Scomar",                       "MK-83",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+//    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT     STATE             INIT  COMPANY                       FULLNAME        FLAGS
+COMP( 1980, bigboard, 0,        0,      bigboard,   xerox820, bigboard_state,   0,    "Digital Research Computers", "Big Board",    0 )
+COMP( 1981, x820,     bigboard, 0,      xerox820,   xerox820, xerox820_state,   0,    "Xerox",                      "Xerox 820",    MACHINE_NO_SOUND_HW )
+COMP( 1982, mk82,     bigboard, 0,      bigboard,   xerox820, bigboard_state,   0,    "Scomar",                     "MK-82",        0 )
+COMP( 1983, x820ii,   0,        0,      xerox820ii, xerox820, xerox820ii_state, 0,    "Xerox",                      "Xerox 820-II", MACHINE_NOT_WORKING )
+COMP( 1983, x168,     x820ii,   0,      xerox168,   xerox820, xerox820ii_state, 0,    "Xerox",                      "Xerox 16/8",   MACHINE_NOT_WORKING )
+COMP( 1983, mk83,     x820ii,   0,      mk83,       xerox820, xerox820_state,   0,    "Scomar",                     "MK-83",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

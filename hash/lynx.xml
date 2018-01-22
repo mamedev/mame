@@ -5,16 +5,12 @@ Undumped games:
 * Hyperdrome (Telegames 1999)
 
 Undumped Self-Published Titles:
-* Alpine Games (R. & J. Graf)
 * CGE 5th (Songbird Productions, CF30B2)
 * Championship Rally (Songbird Productions, CF2006)
-* Crystal Mines II - Buried Treasure (Songbird Productions, CF2008)
 * Cyber Virus (Songbird Productions, CF2007)
 * Cyber Virus - CinciClassic Edition (Songbird Productions, CF20B1)
 * Lynx Othello (H. Dodgson)
-* MegaPak 1 (Songbird Productions, CF2010)  - too new (2008)
 * PokerMania (MW Software)
-* Ponx (Songbird Productions, CF2002)
 * Remnant - Planar Wars 3D (Songbird Productions, CF2005)
 * SFX - The Ultimate Audio Tool (Songbird Productions, CF2001)
 * S.I.M.I.S. (B. Schick & M. Domin)
@@ -245,6 +241,18 @@ Known undumped prototypes:
 		<part name="cart" interface="lynx_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="crystal mines ii (euro, usa).bin" size="131072" crc="aec474c8" sha1="3364bde38508c5c4fed5575295cc80c6f72edebe" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cmines2bt" cloneof="cmines2">
+		<description>Crystal Mines II - Buried Treasure (Euro, USA)</description>
+		<year>2003</year>
+		<publisher>Songbird Productions</publisher>
+		<info name="serial" value="CF2008" />
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="crystal mines ii - buried treasure.bin" size="262144" crc="122ec861" sha1="c0977ce9f22b0182b332af96290a36f0e7b8fbe6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -596,6 +604,18 @@ Known undumped prototypes:
 		</part>
 	</software>
 
+	<software name="megapak">
+		<description>MegaPak 1 (Euro, USA)</description>
+		<year>2007</year>
+		<publisher>Songbird Productions</publisher>
+		<info name="serial" value="CF2010" />
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="Mega Pak 1.bin" size="262144" crc="ca7cf30b" sha1="c961b618021e37cf71104f4f7a04f5ea3e0ccb06" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mspacman">
 		<description>Ms. Pac-Man (Euro, USA)</description>
 		<year>1990</year>
@@ -689,6 +709,18 @@ Known undumped prototypes:
 		<part name="cart" interface="lynx_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="pit fighter - the ultimate competition (euro, usa).bin" size="524288" crc="2393135f" sha1="30f8c7acf41a988578768b251e88b636462752cb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ponx">
+		<description>Ponx</description>
+		<year>1999</year>
+		<publisher>Songbird Productions</publisher>
+		<info name="serial" value="CF2002" />
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="ponx.bin" size="262144" crc="341c88e2" sha1="3254f5c3d347d444dc1bf4cdb07523cc0241d979" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1036,6 +1068,18 @@ Known undumped prototypes:
 		<part name="cart" interface="lynx_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="zarlor mercenary (euro, usa).bin" size="131072" crc="cb27199d" sha1="7005cdfa0a2e4a9611266ce50493cbb32351e069" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alpineg" supported="no"> <!-- Needs granularity set as 0x400 instead as 0x800 like the driver expects for 512k cartridges. Also will need eeprom support -->
+		<description>Alpine Games</description>
+		<year>2004</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="developer" value="R. &amp; J. Graf" />
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="AlpineGames.bin" size="524288" crc="95a1ea09" sha1="fb71ad96f0730f88acd7d51eaa761e475a015d6c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

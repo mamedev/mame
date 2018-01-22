@@ -80,6 +80,7 @@ DEBUG TRICKS:
 #include "cpu/m6502/m6502.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "screen.h"
 #include "softlist.h"
 
 #define SOUNDCPU_BOOT_HACK      (1)
@@ -232,6 +233,7 @@ public:
 	void supracan_suprnova_draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void supracan(machine_config &config);
 };
 
 
@@ -1092,7 +1094,7 @@ WRITE16_MEMBER( supracan_state::supracan_pram_w )
 // swap address around so that 64x64 tile can be decoded as 8x8 tiles..
 void supracan_state::write_swapped_byte( int offset, uint8_t byte )
 {
-	int swapped_offset = BITSWAP32(offset, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,2,1,0,6,5,4,3);
+	int swapped_offset = bitswap<32>(offset, 31,30,29,28,27,26,25,24,23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,2,1,0,6,5,4,3);
 
 	m_vram_addr_swapped[swapped_offset] = byte;
 }
@@ -1126,14 +1128,13 @@ static ADDRESS_MAP_START( supracan_mem, AS_PROGRAM, 16, supracan_state )
 	AM_RANGE( 0xe90030, 0xe9003f ) AM_WRITE(dma_channel1_w)
 
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE(video_r, video_w)
-	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE( 0xf40000, 0xf5ffff ) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
 	AM_RANGE( 0xfc0000, 0xfcffff ) AM_MIRROR(0x30000) AM_RAM /* System work ram */
 ADDRESS_MAP_END
 
 READ8_MEMBER( supracan_state::_6502_soundmem_r )
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint8_t data = m_soundram[offset];
 
 	switch(offset)
@@ -1145,8 +1146,8 @@ READ8_MEMBER( supracan_state::_6502_soundmem_r )
 
 		case 0x410: // Sound IRQ enable
 			data = m_sound_irq_enable_reg;
-			if(!mem.debugger_access()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 0, "supracan_soundreg_r: IRQ enable: %04x\n", data);
-			if(!mem.debugger_access())
+			if(!machine().side_effect_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 0, "supracan_soundreg_r: IRQ enable: %04x\n", data);
+			if(!machine().side_effect_disabled())
 			{
 				if(m_sound_irq_enable_reg & m_sound_irq_source_reg)
 				{
@@ -1161,17 +1162,17 @@ READ8_MEMBER( supracan_state::_6502_soundmem_r )
 		case 0x411: // Sound IRQ source
 			data = m_sound_irq_source_reg;
 			m_sound_irq_source_reg = 0;
-			if(!mem.debugger_access()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 3, "supracan_soundreg_r: IRQ source: %04x\n", data);
-			if(!mem.debugger_access())
+			if(!machine().side_effect_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 3, "supracan_soundreg_r: IRQ source: %04x\n", data);
+			if(!machine().side_effect_disabled())
 			{
 				m_soundcpu->set_input_line(0, CLEAR_LINE);
 			}
 			break;
 		case 0x420:
-			if(!mem.debugger_access()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 3, "supracan_soundreg_r: Sound hardware status? (not yet implemented): %02x\n", 0);
+			if(!machine().side_effect_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 3, "supracan_soundreg_r: Sound hardware status? (not yet implemented): %02x\n", 0);
 			break;
 		case 0x422:
-			if(!mem.debugger_access()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 3, "supracan_soundreg_r: Sound hardware data? (not yet implemented): %02x\n", 0);
+			if(!machine().side_effect_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 3, "supracan_soundreg_r: Sound hardware data? (not yet implemented): %02x\n", 0);
 			break;
 		case 0x404:
 		case 0x405:
@@ -1182,7 +1183,7 @@ READ8_MEMBER( supracan_state::_6502_soundmem_r )
 		default:
 			if(offset >= 0x300 && offset < 0x500)
 			{
-				if(!mem.debugger_access()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 0, "supracan_soundreg_r: Unknown register %04x\n", offset);
+				if(!machine().side_effect_disabled()) verboselog(m_hack_68k_to_6502_access ? "maincpu" : "soundcpu", 0, "supracan_soundreg_r: Unknown register %04x\n", offset);
 			}
 			break;
 	}
@@ -1459,13 +1460,12 @@ WRITE16_MEMBER( supracan_state::sound_w )
 
 READ16_MEMBER( supracan_state::video_r )
 {
-	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint16_t data = m_video_regs[offset];
 
 	switch(offset)
 	{
 		case 0x00/2: // Video IRQ flags
-			if(!mem.debugger_access())
+			if(!machine().side_effect_disabled())
 			{
 				//verboselog("maincpu", 0, "read video IRQ flags (%04x)\n", data);
 				m_maincpu->set_input_line(7, CLEAR_LINE);
@@ -1477,16 +1477,16 @@ READ16_MEMBER( supracan_state::video_r )
 			//data = 0;
 			break;
 		case 0x100/2:
-			if(!mem.debugger_access()) verboselog("maincpu", 0, "read tilemap_flags[0] (%04x)\n", data);
+			if(!machine().side_effect_disabled()) verboselog("maincpu", 0, "read tilemap_flags[0] (%04x)\n", data);
 			break;
 		case 0x106/2:
-			if(!mem.debugger_access()) verboselog("maincpu", 0, "read tilemap_scrolly[0] (%04x)\n", data);
+			if(!machine().side_effect_disabled()) verboselog("maincpu", 0, "read tilemap_scrolly[0] (%04x)\n", data);
 			break;
 		case 0x120/2:
-			if(!mem.debugger_access()) verboselog("maincpu", 0, "read tilemap_flags[1] (%04x)\n", data);
+			if(!machine().side_effect_disabled()) verboselog("maincpu", 0, "read tilemap_flags[1] (%04x)\n", data);
 			break;
 		default:
-			if(!mem.debugger_access()) verboselog("maincpu", 0, "video_r: Unknown register: %08x (%04x & %04x)\n", 0xf00000 + (offset << 1), data, mem_mask);
+			if(!machine().side_effect_disabled()) verboselog("maincpu", 0, "video_r: Unknown register: %08x (%04x & %04x)\n", 0xf00000 + (offset << 1), data, mem_mask);
 			break;
 	}
 
@@ -1885,7 +1885,7 @@ INTERRUPT_GEN_MEMBER(supracan_state::supracan_sound_irq)
 	}
 }
 
-static MACHINE_CONFIG_START( supracan, supracan_state )
+MACHINE_CONFIG_START(supracan_state::supracan)
 
 	MCFG_CPU_ADD( "maincpu", M68000, XTAL_10_738635MHz )        /* Correct frequency unknown */
 	MCFG_CPU_PROGRAM_MAP( supracan_mem )
@@ -1924,5 +1924,5 @@ ROM_START( supracan )
 ROM_END
 
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     INIT    COMPANY                  FULLNAME        FLAGS */
-CONS( 1995, supracan,   0,      0,      supracan,   supracan, driver_device, 0,      "Funtech Entertainment", "Super A'Can",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     STATE           INIT    COMPANY                  FULLNAME        FLAGS */
+CONS( 1995, supracan,   0,      0,      supracan,   supracan, supracan_state, 0,      "Funtech Entertainment", "Super A'Can",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

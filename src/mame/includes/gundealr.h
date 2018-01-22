@@ -6,6 +6,8 @@
 
 *************************************************************************/
 
+#include "machine/timer.h"
+
 class gundealr_state : public driver_device
 {
 public:
@@ -28,7 +30,6 @@ public:
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
 	tilemap_t    *m_fg_tilemap;
-	int        m_flipscreen;
 	uint8_t      m_scroll[4];
 
 	/* misc */
@@ -40,6 +41,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gundealr_fg_scroll_w);
 	DECLARE_WRITE8_MEMBER(yamyam_fg_scroll_w);
 	DECLARE_WRITE8_MEMBER(gundealr_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(yamyam_flipscreen_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILEMAP_MAPPER_MEMBER(gundealr_scan);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -52,4 +54,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void gundealr(machine_config &config);
+	void gundealrbl(machine_config &config);
+	void yamyam(machine_config &config);
 };

@@ -87,6 +87,7 @@ L10, L15, L18 and G18 all read the same
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "screen.h"
 
 class warpspeed_state : public driver_device
 {
@@ -119,6 +120,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_circles(bitmap_ind16 &bitmap);
+	void warpspeed(machine_config &config);
 };
 
 WRITE8_MEMBER(warpspeed_state::hardware_w)
@@ -314,7 +316,7 @@ PALETTE_INIT_MEMBER(warpspeed_state, warpspeed)
 	}
 }
 
-static MACHINE_CONFIG_START( warpspeed, warpspeed_state )
+MACHINE_CONFIG_START(warpspeed_state::warpspeed)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2)
@@ -372,4 +374,4 @@ ROM_START( warpsped )
 ROM_END
 
 
-GAME( 1979?, warpsped,  0,      warpspeed, warpspeed, driver_device, 0, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // year not shown, 1979 is according to date stamps on PCB chips.
+GAME( 1979?, warpsped,  0,      warpspeed, warpspeed, warpspeed_state, 0, ROT0, "Meadows Games, Inc.", "Warp Speed (prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // year not shown, 1979 is according to date stamps on PCB chips.

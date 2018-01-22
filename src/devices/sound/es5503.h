@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-#pragma once
+#ifndef MAME_SOUND_ES5503_H
+#define MAME_SOUND_ES5503_H
 
-#ifndef __ES5503_H__
-#define __ES5503_H__
+#pragma once
 
 // channels must be a power of two
 
@@ -31,15 +31,13 @@ public:
 
 	static void static_set_channels(device_t &device, int channels);
 
-	template<class _Object> static devcb_base &static_set_irqf(device_t &device, _Object object) { return downcast<es5503_device &>(device).m_irq_func.set_callback(object); }
-	template<class _Object> static devcb_base &static_set_adcf(device_t &device, _Object object) { return downcast<es5503_device &>(device).m_adc_func.set_callback(object); }
+	template <class Object> static devcb_base &static_set_irqf(device_t &device, Object &&cb) { return downcast<es5503_device &>(device).m_irq_func.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &static_set_adcf(device_t &device, Object &&cb) { return downcast<es5503_device &>(device).m_adc_func.set_callback(std::forward<Object>(cb)); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
 	uint8_t get_channel_strobe() { return m_channel_strobe; }
-
-	sound_stream *m_stream;
 
 protected:
 	// device-level overrides
@@ -52,6 +50,8 @@ protected:
 
 	// device_rom_interface overrides
 	virtual void rom_bank_updated() override;
+
+	sound_stream *m_stream;
 
 	devcb_write_line   m_irq_func;
 	devcb_read8        m_adc_func;
@@ -99,6 +99,6 @@ private:
 
 
 // device type definition
-extern const device_type ES5503;
+DECLARE_DEVICE_TYPE(ES5503, es5503_device)
 
-#endif /* __ES5503_H__ */
+#endif // MAME_SOUND_ES5503_H

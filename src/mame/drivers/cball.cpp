@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "screen.h"
 
 
 class cball_state : public driver_device
@@ -54,6 +55,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void cball(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -113,7 +115,7 @@ TIMER_CALLBACK_MEMBER(cball_state::interrupt_callback)
 {
 	int scanline = param;
 
-	generic_pulse_irq_line(*m_maincpu, 0, 1);
+	m_maincpu->pulse_input_line(0, m_maincpu->minimum_quantum_time());
 
 	scanline = scanline + 32;
 
@@ -258,7 +260,7 @@ static GFXDECODE_START( cball )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( cball, cball_state )
+MACHINE_CONFIG_START(cball_state::cball)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 16) /* ? */
@@ -303,4 +305,4 @@ ROM_START( cball )
 ROM_END
 
 
-GAME( 1976, cball, 0, cball, cball, driver_device, 0, ROT0, "Atari", "Cannonball (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1976, cball, 0, cball, cball, cball_state, 0, ROT0, "Atari", "Cannonball (Atari, prototype)", MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

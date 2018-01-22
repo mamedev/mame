@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef PCI_APIC_H
-#define PCI_APIC_H
+#ifndef MAME_MACHINE_PCI_APIC_H
+#define MAME_MACHINE_PCI_APIC_H
+
+#pragma once
 
 #include "pci.h"
 
@@ -17,6 +19,6 @@ protected:
 	virtual void device_reset() override;
 };
 
-extern const device_type APIC;
+DECLARE_DEVICE_TYPE(APIC, apic_device)
 
-#endif
+#endif // MAME_MACHINE_PCI_APIC_H

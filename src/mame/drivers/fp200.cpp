@@ -22,6 +22,8 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define MAIN_CLOCK XTAL_6_144MHz
 
@@ -66,6 +68,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(sid_r);
 
 	DECLARE_PALETTE_INIT(fp200);
+	void fp200(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -552,7 +555,7 @@ void fp200_state::machine_start()
 
 	for(int i=0;i<0x800;i++)
 	{
-		m_chargen[i] = raw_gfx[BITSWAP16(i,15,14,13,12,11,6,5,4,3,10,9,8,7,2,1,0)];
+		m_chargen[i] = raw_gfx[bitswap<16>(i,15,14,13,12,11,6,5,4,3,10,9,8,7,2,1,0)];
 	}
 }
 
@@ -577,7 +580,7 @@ READ_LINE_MEMBER( fp200_state::sid_r )
 	return (ioport("KEYMOD")->read() >> m_keyb_mux) & 1;
 }
 
-static MACHINE_CONFIG_START( fp200, fp200_state )
+MACHINE_CONFIG_START(fp200_state::fp200)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A,MAIN_CLOCK)
@@ -623,4 +626,4 @@ ROM_START( fp200 )
 	ROM_REGION( 0x800, "chargen", ROMREGION_ERASE00 )
 ROM_END
 
-COMP( 1982, fp200,  0,   0,   fp200,  fp200, driver_device,  0,  "Casio",      "FP-200 (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1982, fp200,  0,   0,   fp200,  fp200, fp200_state,  0,  "Casio",      "FP-200 (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )

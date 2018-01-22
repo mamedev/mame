@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
   Super Free Kick / Spinkick by HEC (Haesung Enterprise Co.)
@@ -158,6 +158,8 @@ DIPSW-2
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "sound/2203intf.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class sfkick_state : public driver_device
@@ -223,6 +225,7 @@ public:
 	required_ioport m_dial;
 	required_ioport m_dsw1;
 	required_ioport m_dsw2;
+	void sfkick(machine_config &config);
 };
 
 
@@ -235,7 +238,7 @@ READ8_MEMBER(sfkick_state::ppi_port_b_r)
 	{
 		case 0: return m_in0->read();
 		case 1: return m_in1->read();
-		case 2: return BITSWAP8(m_dial->read(),4,5,6,7,3,2,1,0);
+		case 2: return bitswap<8>(m_dial->read(),4,5,6,7,3,2,1,0);
 		case 3: return m_dsw1->read();
 		case 4: return m_dsw2->read();
 	}
@@ -577,7 +580,7 @@ WRITE_LINE_MEMBER(sfkick_state::irqhandler)
 	m_soundcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
-static MACHINE_CONFIG_START( sfkick, sfkick_state )
+MACHINE_CONFIG_START(sfkick_state::sfkick)
 
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(sfkick_map)

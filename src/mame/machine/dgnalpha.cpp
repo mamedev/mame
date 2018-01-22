@@ -66,6 +66,7 @@ keeping track of it in a variable in the driver.
 
 ***************************************************************************/
 
+#include "emu.h"
 #include "includes/dgnalpha.h"
 #include "sound/ay8910.h"
 #include "imagedev/flopdrv.h"
@@ -354,12 +355,12 @@ WRITE_LINE_MEMBER( dragon_alpha_state::fdc_intrq_w )
 		else
 		{
 			if (m_pia_2->ca2_output_z())
-				m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+				maincpu().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		}
 	}
 	else
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		maincpu().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 

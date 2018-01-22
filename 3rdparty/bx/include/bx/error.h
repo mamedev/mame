@@ -1,12 +1,12 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
 #ifndef BX_ERROR_H_HEADER_GUARD
 #define BX_ERROR_H_HEADER_GUARD
 
-#include "bx.h"
+#include "string.h"
 
 #define BX_ERROR_SET(_ptr, _result, _msg) \
 			BX_MACRO_BLOCK_BEGIN \
@@ -43,48 +43,33 @@ namespace bx
 			);
 
 	public:
-		Error()
-			: m_code(0)
-		{
-		}
+		///
+		Error();
 
-		void setError(ErrorResult _errorResult, const char* _msg)
-		{
-			BX_CHECK(0 != _errorResult.code, "Invalid ErrorResult passed to setError!");
+		///
+		void reset();
 
-			if (!isOk() )
-			{
-				return;
-			}
+		///
+		void setError(ErrorResult _errorResult, const StringView& _msg);
 
-			m_code = _errorResult.code;
-			m_msg  = _msg;
-		}
+		///
+		bool isOk() const;
 
-		bool isOk() const
-		{
-			return 0 == m_code;
-		}
+		///
+		ErrorResult get() const;
 
-		ErrorResult get() const
-		{
-			ErrorResult result = { m_code };
-			return result;
-		}
+		///
+		const StringView& getMessage() const;
 
-		bool operator==(const ErrorResult& _rhs) const
-		{
-			return _rhs.code == m_code;
-		}
+		///
+		bool operator==(const ErrorResult& _rhs) const;
 
-		bool operator!=(const ErrorResult& _rhs) const
-		{
-			return _rhs.code != m_code;
-		}
+		///
+		bool operator!=(const ErrorResult& _rhs) const;
 
 	private:
-		const char* m_msg;
-		uint32_t    m_code;
+		StringView m_msg;
+		uint32_t   m_code;
 	};
 
 	///
@@ -96,21 +81,18 @@ namespace bx
 			);
 
 	public:
-		ErrorScope(Error* _err)
-			: m_err(_err)
-		{
-			BX_CHECK(NULL != _err, "_err can't be NULL");
-		}
+		///
+		ErrorScope(Error* _err);
 
-		~ErrorScope()
-		{
-			BX_CHECK(m_err->isOk(), "Error: %d", m_err->get().code);
-		}
+		///
+		~ErrorScope();
 
 	private:
 		Error* m_err;
 	};
 
 } // namespace bx
+
+#include "inline/error.inl"
 
 #endif // BX_ERROR_H_HEADER_GUARD

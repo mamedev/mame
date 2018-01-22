@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
+#include "emu.h"
 #include "mcd.h"
 #include "coreutil.h"
 
@@ -16,7 +17,7 @@ INPUT_PORTS_END
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type ISA16_MCD = &device_creator<mcd_isa_device>;
+DEFINE_DEVICE_TYPE(ISA16_MCD, mcd_isa_device, "mcd_isa", "Mitsumi ISA CD-ROM Adapter")
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -36,8 +37,8 @@ ioport_constructor mcd_isa_device::device_input_ports() const
 //-------------------------------------------------
 
 mcd_isa_device::mcd_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		cdrom_image_device(mconfig, ISA16_MCD, "Mitsumi ISA CDROM Adapter", tag, owner, clock, "mcd_isa", __FILE__),
-		device_isa16_card_interface( mconfig, *this )
+	cdrom_image_device(mconfig, ISA16_MCD, tag, owner, clock),
+	device_isa16_card_interface( mconfig, *this )
 {
 }
 
@@ -89,8 +90,8 @@ bool mcd_isa_device::read_sector(bool first)
 	if(m_mode & 0x40)
 	{
 		//correct the header
-		m_buf[12] = dec_2_bcd(m_readmsf >> 16);
-		m_buf[13] = dec_2_bcd(m_readmsf >> 8);
+		m_buf[12] = dec_2_bcd((m_readmsf >> 16) & 0xff);
+		m_buf[13] = dec_2_bcd((m_readmsf >> 8) & 0xff);
 	}
 	m_readmsf = lba_to_msf_alt(lba + 1);
 	m_buf_count = m_dmalen + 1;

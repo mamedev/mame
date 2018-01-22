@@ -4,11 +4,15 @@
 #include "audio/dsbz80.h"
 #include "audio/segam1audio.h"
 #include "machine/eepromser.h"
+#include "machine/i8251.h"
 #include "cpu/i960/i960.h"
+#include "cpu/mb86235/mb86235.h"
 #include "sound/scsp.h"
 #include "machine/315-5881_crypt.h"
 #include "machine/315-5838_317-0229_comp.h"
 #include "machine/m2comm.h"
+#include "machine/timer.h"
+#include "screen.h"
 
 class model2_renderer;
 struct raster_state;
@@ -25,12 +29,15 @@ public:
 		m_textureram0(*this, "textureram0"),
 		m_textureram1(*this, "textureram1"),
 		m_lumaram(*this, "lumaram"),
+		m_fbvram1(*this, "fbvram1"),
+		m_fbvram2(*this, "fbvram2"),
 		m_soundram(*this, "soundram"),
 		m_tgp_program(*this, "tgp_program"),
 		m_tgpx4_program(*this, "tgpx4_program"),
 		m_maincpu(*this,"maincpu"),
 		m_dsbz80(*this, DSBZ80_TAG),
 		m_m1audio(*this, "m1audio"),
+		m_uart(*this, "uart"),
 		m_m2comm(*this, "m2comm"),
 		m_audiocpu(*this, "audiocpu"),
 		m_tgp(*this, "tgp"),
@@ -43,11 +50,14 @@ public:
 		m_scsp(*this, "scsp"),
 		m_cryptdevice(*this, "315_5881"),
 		m_0229crypt(*this, "317_0229"),
-		m_in0(*this, "IN0"),
+		m_in(*this, "IN%u", 0),
+		m_steer(*this, "STEER"),
+		m_accel(*this, "ACCEL"),
+		m_brake(*this, "BRAKE"),
 		m_gears(*this, "GEARS"),
-		m_analog_ports(*this, {"ANA0", "ANA1", "ANA2", "ANA3"}),
+		m_analog_ports(*this, "ANA%u", 0),
 		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"})
-		{ }
+	{ }
 
 	required_shared_ptr<uint32_t> m_workram;
 	required_shared_ptr<uint32_t> m_bufferram;
@@ -56,6 +66,8 @@ public:
 	required_shared_ptr<uint32_t> m_textureram0;
 	required_shared_ptr<uint32_t> m_textureram1;
 	required_shared_ptr<uint32_t> m_lumaram;
+	required_shared_ptr<uint32_t> m_fbvram1;
+	required_shared_ptr<uint32_t> m_fbvram2;
 	optional_shared_ptr<uint16_t> m_soundram;
 	optional_shared_ptr<uint32_t> m_tgp_program;
 	optional_shared_ptr<uint64_t> m_tgpx4_program;
@@ -63,11 +75,12 @@ public:
 	required_device<i960_cpu_device> m_maincpu;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
 	optional_device<segam1audio_device> m_m1audio;  // Model 1 standard sound board
+	required_device<i8251_device> m_uart;
 	optional_device<m2comm_device> m_m2comm;        // Model 2 communication board
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_tgp;
 	optional_device<cpu_device> m_dsp;
-	optional_device<cpu_device> m_tgpx4;
+	optional_device<mb86235_device> m_tgpx4;
 	optional_device<cpu_device> m_drivecpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;
@@ -76,10 +89,19 @@ public:
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_0229crypt;
 
-	required_ioport m_in0;
+	optional_ioport_array<5> m_in;
+	optional_ioport m_steer;
+	optional_ioport m_accel;
+	optional_ioport m_brake;
 	optional_ioport m_gears;
 	optional_ioport_array<4> m_analog_ports;
 	optional_ioport_array<4> m_lightgun_ports;
+
+	int m_port_1c00004;
+	int m_port_1c00006;
+	int m_port_1c00010;
+	int m_port_1c00012;
+	int m_port_1c00014;
 
 	uint32_t m_intreq;
 	uint32_t m_intena;
@@ -124,8 +146,7 @@ public:
 	uint8_t m_gearsel;
 	uint8_t m_lightgun_mux;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(_1c00000_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(_1c0001c_r);
+	DECLARE_READ8_MEMBER(model2_crx_in_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(srallyc_gearbox_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(rchase2_devices_r);
 	DECLARE_READ32_MEMBER(timers_r);
@@ -136,6 +157,7 @@ public:
 	DECLARE_WRITE32_MEMBER(analog_2b_w);
 	DECLARE_READ32_MEMBER(fifoctl_r);
 	DECLARE_READ32_MEMBER(model2o_fifoctrl_r);
+	DECLARE_READ8_MEMBER(model2o_in_r);
 	DECLARE_READ32_MEMBER(videoctl_r);
 	DECLARE_WRITE32_MEMBER(videoctl_w);
 	DECLARE_WRITE32_MEMBER(rchase2_devices_w);
@@ -153,7 +175,7 @@ public:
 	DECLARE_WRITE32_MEMBER(geo_prg_w);
 	DECLARE_READ32_MEMBER(geo_r);
 	DECLARE_WRITE32_MEMBER(geo_w);
-	DECLARE_READ32_MEMBER(hotd_lightgun_r);
+	DECLARE_READ8_MEMBER(hotd_lightgun_r);
 	DECLARE_WRITE32_MEMBER(hotd_lightgun_w);
 	DECLARE_READ32_MEMBER(daytona_unk_r);
 	DECLARE_READ32_MEMBER(model2_irq_r);
@@ -184,9 +206,9 @@ public:
 	DECLARE_READ32_MEMBER(copro_status_r);
 	DECLARE_READ32_MEMBER(polygon_count_r);
 
-	DECLARE_READ8_MEMBER(driveio_port_r);
+	DECLARE_READ8_MEMBER(driveio_portg_r);
+	DECLARE_READ8_MEMBER(driveio_porth_r);
 	DECLARE_WRITE8_MEMBER(driveio_port_w);
-	DECLARE_READ8_MEMBER(driveio_port_str_r);
 	void push_geo_data(uint32_t data);
 	DECLARE_DRIVER_INIT(overrev);
 	DECLARE_DRIVER_INIT(pltkids);
@@ -199,6 +221,7 @@ public:
 	DECLARE_DRIVER_INIT(zerogun);
 	DECLARE_DRIVER_INIT(sgt24h);
 	DECLARE_MACHINE_START(model2);
+	DECLARE_MACHINE_START(srallyc);
 	DECLARE_MACHINE_RESET(model2o);
 	DECLARE_VIDEO_START(model2);
 	DECLARE_MACHINE_RESET(model2);
@@ -225,6 +248,25 @@ public:
 	void copro_fifoout_push(device_t *device, uint32_t data,uint32_t offset,uint32_t mem_mask);
 
 	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
+
+	void daytona(machine_config &config);
+	void indy500(machine_config &config);
+	void manxtt(machine_config &config);
+	void manxttdx(machine_config &config);
+	void model2a(machine_config &config);
+	void model2a_0229(machine_config &config);
+	void model2a_5881(machine_config &config);
+	void model2b(machine_config &config);
+	void model2b_0229(machine_config &config);
+	void model2b_5881(machine_config &config);
+	void model2c(machine_config &config);
+	void model2c_5881(machine_config &config);
+	void model2o(machine_config &config);
+	void overrev2c(machine_config &config);
+	void rchase2(machine_config &config);
+	void sj25_0207_01(machine_config &config);
+	void srallyc(machine_config &config);
+	void stcc(machine_config &config);
 };
 
 

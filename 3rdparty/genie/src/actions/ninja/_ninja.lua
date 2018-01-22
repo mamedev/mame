@@ -16,7 +16,7 @@ newaction
 	module      = "ninja",
 
 	-- The capabilities of this action
-	valid_kinds     = {"ConsoleApp", "WindowedApp", "SharedLib", "StaticLib"},
+	valid_kinds     = {"ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle"},
 	valid_languages = {"C", "C++", "Swift"},
 	valid_tools     = {
 		cc    = { "gcc" },

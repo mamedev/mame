@@ -51,10 +51,12 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/amiga.h"
+
+#include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/amigafdc.h"
+#include "speaker.h"
 
 
 // arcadia_state was also defined in mess/includes/arcadia.h
@@ -90,6 +92,8 @@ public:
 
 	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
 
+	void arcadia(machine_config &config);
+	void argh(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -286,7 +290,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( arcadia, arcadia_amiga_state )
+MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
@@ -295,8 +299,8 @@ static MACHINE_CONFIG_START( arcadia, arcadia_amiga_state )
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(22)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -312,11 +316,13 @@ static MACHINE_CONFIG_START( arcadia, arcadia_amiga_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("amiga", AMIGA, amiga_state::CLK_C1_NTSC)
+	MCFG_SOUND_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.50)
+	MCFG_PAULA_MEM_READ_CB(READ16(amiga_state, chip_ram_r))
+	MCFG_PAULA_INT_CB(WRITELINE(amiga_state, paula_int_w))
 
 	/* cia */
 	MCFG_DEVICE_ADD("cia_0", MOS8520, amiga_state::CLK_E_NTSC)
@@ -331,9 +337,13 @@ static MACHINE_CONFIG_START( arcadia, arcadia_amiga_state )
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
 	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
+	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(amiga_state, chip_ram_r))
+	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(amiga_state, chip_ram_w))
+	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(amiga_state, fdc_dskblk_w))
+	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( argh, arcadia )
+MACHINE_CONFIG_DERIVED(arcadia_amiga_state::argh, arcadia)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -892,7 +902,7 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 
 	/* only the low byte of ROMs are encrypted in these games */
 	for (i = 0; i < 0x20000/2; i++)
-		rom[i] = BITSWAP16(rom[i], 15,14,13,12,11,10,9,8, bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
+		rom[i] = bitswap<16>(rom[i], 15,14,13,12,11,10,9,8, bit7,bit6,bit5,bit4,bit3,bit2,bit1,bit0);
 
 	#if 0
 	{
@@ -971,43 +981,43 @@ DRIVER_INIT_MEMBER(arcadia_amiga_state,argh) { DRIVER_INIT_CALL(arcadia); generi
  *************************************/
 
 /* BIOS */
-GAME( 1988, ar_bios,    0, arcadia, arcadia, arcadia_amiga_state, arcadia,  ROT0, "Arcadia Systems", "Arcadia System BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1988, ar_bios,    0,       arcadia, arcadia, arcadia_amiga_state, arcadia,  ROT0, "Arcadia Systems", "Arcadia System BIOS", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1988, ar_blast,    ar_bios, arcadia, arcadia, arcadia_amiga_state, blast,  ROT0, "Arcadia Systems", "Blastaball (Arcadia, V 2.1)", 0 )
+GAME( 1988, ar_blast,   ar_bios, arcadia, arcadia, arcadia_amiga_state, blast,    ROT0, "Arcadia Systems", "Blastaball (Arcadia, V 2.1)", 0 )
 
-GAME( 1988, ar_airh,    ar_bios, arcadia, arcadia, arcadia_amiga_state, airh,  ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, set 1, V 2.1)", 0 )
-GAME( 1988, ar_airh2,   ar_airh, arcadia, arcadia, arcadia_amiga_state, airh,  ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, set 2)", 0 )
+GAME( 1988, ar_airh,    ar_bios, arcadia, arcadia, arcadia_amiga_state, airh,     ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, set 1, V 2.1)", 0 )
+GAME( 1988, ar_airh2,   ar_airh, arcadia, arcadia, arcadia_amiga_state, airh,     ROT0, "Arcadia Systems", "SportTime Table Hockey (Arcadia, set 2)", 0 )
 
-GAME( 1988, ar_bowl,    ar_bios, arcadia, arcadia, arcadia_amiga_state, bowl,  ROT0, "Arcadia Systems", "SportTime Bowling (Arcadia, V 2.1)", 0 )
+GAME( 1988, ar_bowl,    ar_bios, arcadia, arcadia, arcadia_amiga_state, bowl,     ROT0, "Arcadia Systems", "SportTime Bowling (Arcadia, V 2.1)", 0 )
 
-GAME( 1987, ar_dart,    ar_bios, arcadia, arcadia, arcadia_amiga_state, dart,  ROT0, "Arcadia Systems", "World Darts (Arcadia, set 1, V 2.1)", 0 )
-GAME( 1987, ar_dart2,   ar_dart, arcadia, arcadia, arcadia_amiga_state, dart,  ROT0, "Arcadia Systems", "World Darts (Arcadia, set 2)", MACHINE_NOT_WORKING ) // bad dump
+GAME( 1987, ar_dart,    ar_bios, arcadia, arcadia, arcadia_amiga_state, dart,     ROT0, "Arcadia Systems", "World Darts (Arcadia, set 1, V 2.1)", 0 )
+GAME( 1987, ar_dart2,   ar_dart, arcadia, arcadia, arcadia_amiga_state, dart,     ROT0, "Arcadia Systems", "World Darts (Arcadia, set 2)", MACHINE_NOT_WORKING ) // bad dump
 
 GAME( 1988, ar_fast,    ar_bios, arcadia, arcadia, arcadia_amiga_state, arcadia,  ROT0, "Arcadia Systems", "Magic Johnson's Fast Break (Arcadia, V 2.8)", 0 )
 GAME( 1988, ar_fasta,   ar_fast, arcadia, arcadia, arcadia_amiga_state, arcadia,  ROT0, "Arcadia Systems", "Magic Johnson's Fast Break (Arcadia, V 2.7)", 0 )
 
-GAME( 1988, ar_ldrb,    ar_bios, arcadia, arcadia, arcadia_amiga_state, ldrb,  ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 1, V 2.5)", 0 )
+GAME( 1988, ar_ldrb,    ar_bios, arcadia, arcadia, arcadia_amiga_state, ldrb,     ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 1, V 2.5)", 0 )
 GAME( 1988, ar_ldrba,   ar_ldrb, arcadia, arcadia, arcadia_amiga_state, arcadia,  ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 2, V 2.4)", 0 )
 GAME( 1988, ar_ldrbb,   ar_ldrb, arcadia, arcadia, arcadia_amiga_state, arcadia,  ROT0, "Arcadia Systems", "Leader Board (Arcadia, set 3)", 0 )
 
-GAME( 1987, ar_ninj,    ar_bios, arcadia, arcadia, arcadia_amiga_state, ninj,  ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, set 1, V 2.5)", 0 )
-GAME( 1987, ar_ninj2,   ar_ninj, arcadia, arcadia, arcadia_amiga_state, ninj,  ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, set 2)", 0 )
+GAME( 1987, ar_ninj,    ar_bios, arcadia, arcadia, arcadia_amiga_state, ninj,     ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, set 1, V 2.5)", 0 )
+GAME( 1987, ar_ninj2,   ar_ninj, arcadia, arcadia, arcadia_amiga_state, ninj,     ROT0, "Arcadia Systems", "Ninja Mission (Arcadia, set 2)", 0 )
 
-GAME( 1988, ar_rdwr,    ar_bios, arcadia, arcadia, arcadia_amiga_state, rdwr,  ROT0, "Arcadia Systems", "RoadWars (Arcadia, V 2.3)", 0  )
+GAME( 1988, ar_rdwr,    ar_bios, arcadia, arcadia, arcadia_amiga_state, rdwr,     ROT0, "Arcadia Systems", "RoadWars (Arcadia, V 2.3)", 0  )
 
-GAME( 1988, ar_sdwr,    ar_bios, arcadia, arcadia, arcadia_amiga_state, sdwr,  ROT0, "Arcadia Systems", "Sidewinder (Arcadia, set 1, V 2.1)", 0 )
-GAME( 1988, ar_sdwr2,   ar_sdwr, arcadia, arcadia, arcadia_amiga_state, sdwr,  ROT0, "Arcadia Systems", "Sidewinder (Arcadia, set 2)", 0 )
+GAME( 1988, ar_sdwr,    ar_bios, arcadia, arcadia, arcadia_amiga_state, sdwr,     ROT0, "Arcadia Systems", "Sidewinder (Arcadia, set 1, V 2.1)", 0 )
+GAME( 1988, ar_sdwr2,   ar_sdwr, arcadia, arcadia, arcadia_amiga_state, sdwr,     ROT0, "Arcadia Systems", "Sidewinder (Arcadia, set 2)", 0 )
 
-GAME( 1989, ar_socc,    ar_bios, arcadia, arcadia, arcadia_amiga_state, socc,  ROT0, "Arcadia Systems", "World Trophy Soccer (Arcadia, V 3.0)", 0 )
+GAME( 1989, ar_socc,    ar_bios, arcadia, arcadia, arcadia_amiga_state, socc,     ROT0, "Arcadia Systems", "World Trophy Soccer (Arcadia, V 3.0)", 0 )
 
 GAME( 1990, ar_spot,    ar_bios, arcadia, arcadia, arcadia_amiga_state, arcadia,  ROT0, "Arcadia Systems", "Spot (Arcadia, V 2.0)", 0 )
 
-GAME( 1987, ar_sprg,    ar_bios, arcadia, arcadia, arcadia_amiga_state, sprg,  ROT0, "Arcadia Systems", "Space Ranger (Arcadia, V 2.0)", 0 )
+GAME( 1987, ar_sprg,    ar_bios, arcadia, arcadia, arcadia_amiga_state, sprg,     ROT0, "Arcadia Systems", "Space Ranger (Arcadia, V 2.0)", 0 )
 
-GAME( 1988, ar_xeon,    ar_bios, arcadia, arcadia, arcadia_amiga_state, xeon,  ROT0, "Arcadia Systems", "Xenon (Arcadia, V 2.3)", 0 )
+GAME( 1988, ar_xeon,    ar_bios, arcadia, arcadia, arcadia_amiga_state, xeon,     ROT0, "Arcadia Systems", "Xenon (Arcadia, V 2.3)", 0 )
 
-GAME( 1988, ar_pm,      ar_bios, arcadia, arcadia, arcadia_amiga_state, pm,  ROT0, "Arcadia Systems", "Pharaohs Match (Arcadia)", 0 )
+GAME( 1988, ar_pm,      ar_bios, arcadia, arcadia, arcadia_amiga_state, pm,       ROT0, "Arcadia Systems", "Pharaohs Match (Arcadia)", 0 )
 
-GAME( 1988, ar_dlta,      ar_bios, arcadia, arcadia, arcadia_amiga_state, dlta,  ROT0, "Arcadia Systems", "Delta Command (Arcadia)", 0 )
+GAME( 1988, ar_dlta,    ar_bios, arcadia, arcadia, arcadia_amiga_state, dlta,     ROT0, "Arcadia Systems", "Delta Command (Arcadia)", 0 )
 
-GAME( 1988, ar_argh,      ar_bios, argh, arcadia, arcadia_amiga_state, argh,  ROT0, "Arcadia Systems", "Aaargh (Arcadia)", 0 )
+GAME( 1988, ar_argh,    ar_bios, argh,    arcadia, arcadia_amiga_state, argh,     ROT0, "Arcadia Systems", "Aaargh (Arcadia)", 0 )

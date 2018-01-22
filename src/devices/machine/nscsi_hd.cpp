@@ -1,17 +1,25 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
+#include "emu.h"
 #include "machine/nscsi_hd.h"
 #include "imagedev/harddriv.h"
 
-const device_type NSCSI_HARDDISK = &device_creator<nscsi_harddisk_device>;
+#define LOG_GENERAL (1U << 0)
+#define LOG_COMMAND (1U << 1)
+
+#define VERBOSE (LOG_GENERAL)
+
+#include "logmacro.h"
+
+DEFINE_DEVICE_TYPE(NSCSI_HARDDISK, nscsi_harddisk_device, "scsi_harddisk", "SCSI Hard Disk")
 
 nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_full_device(mconfig, NSCSI_HARDDISK, "SCSI HARDDISK", tag, owner, clock, "scsi_harddisk", __FILE__), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
+	nscsi_harddisk_device(mconfig, NSCSI_HARDDISK, tag, owner, clock)
 {
 }
 
-nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	nscsi_full_device(mconfig, type, name, tag, owner, clock, shortname, source), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
+nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_full_device(mconfig, type, tag, owner, clock), harddisk(nullptr), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
 {
 }
 
@@ -36,19 +44,19 @@ void nscsi_harddisk_device::device_reset()
 	} else {
 		const hard_disk_info *hdinfo = hard_disk_get_info(harddisk);
 		bytes_per_sector = hdinfo->sectorbytes;
+
+		chd_file *chd = hd->get_chd_file();
+		if(chd != nullptr)
+			chd->read_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, m_inquiry_data);
 	}
 	cur_lba = -1;
 }
 
-static MACHINE_CONFIG_FRAGMENT(scsi_harddisk)
+MACHINE_CONFIG_START(nscsi_harddisk_device::device_add_mconfig)
 	MCFG_HARDDISK_ADD("image")
 	MCFG_HARDDISK_INTERFACE("scsi_hdd")
 MACHINE_CONFIG_END
 
-machine_config_constructor nscsi_harddisk_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME(scsi_harddisk);
-}
 
 uint8_t nscsi_harddisk_device::scsi_get_data(int id, int pos)
 {
@@ -58,7 +66,7 @@ uint8_t nscsi_harddisk_device::scsi_get_data(int id, int pos)
 	if(clba != cur_lba) {
 		cur_lba = clba;
 		if(!hard_disk_read(harddisk, cur_lba, block)) {
-			logerror("%s: HD READ ERROR !\n", tag());
+			LOG("HD READ ERROR !\n");
 			memset(block, 0, sizeof(block));
 		}
 	}
@@ -77,27 +85,21 @@ void nscsi_harddisk_device::scsi_put_data(int id, int pos, uint8_t data)
 	int clba = lba + pos / bytes_per_sector;
 	if(offset == bytes_per_sector-1) {
 		if(!hard_disk_write(harddisk, clba, block))
-			logerror("%s: HD WRITE ERROR !\n", tag());
+			LOG("HD WRITE ERROR !\n");
 	}
 }
 
 void nscsi_harddisk_device::scsi_command()
 {
-	#if 0
-	if (scsi_cmdbuf[0] != SC_READ)
-	{
-		logerror("%s: ", tag());
-		for (int i = 0; i < 6; i++)
-		{
-			logerror("%02x ", scsi_cmdbuf[i]);
-		}
-		logerror("\n");
+	if(scsi_cmdbuf[0] != SC_READ_6) {
+		LOGMASKED(LOG_COMMAND, "%02x %02x %02x %02x %02x %02x\n",
+			scsi_cmdbuf[0], scsi_cmdbuf[1], scsi_cmdbuf[2],
+			scsi_cmdbuf[3], scsi_cmdbuf[4], scsi_cmdbuf[5]);
 	}
-	#endif
 
 	switch(scsi_cmdbuf[0]) {
 	case SC_TEST_UNIT_READY:
-		logerror("%s: command TEST UNIT READY\n", tag());
+		LOG("command TEST UNIT READY\n");
 		scsi_status_complete(SS_GOOD);
 		break;
 
@@ -107,8 +109,7 @@ void nscsi_harddisk_device::scsi_command()
 		if(!blocks)
 			blocks = 256;
 
-		logerror("%s: command READ start=%08x blocks=%04x\n",
-					tag(), lba, blocks);
+		LOG("command READ start=%08x blocks=%04x\n", lba, blocks);
 
 		scsi_data_in(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
@@ -120,8 +121,7 @@ void nscsi_harddisk_device::scsi_command()
 		if(!blocks)
 			blocks = 256;
 
-		logerror("%s: command WRITE start=%08x blocks=%04x\n",
-					tag(), lba, blocks);
+		LOG("command WRITE start=%08x blocks=%04x\n", lba, blocks);
 
 		scsi_data_out(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
@@ -129,47 +129,56 @@ void nscsi_harddisk_device::scsi_command()
 
 	case SC_INQUIRY: {
 		int lun = get_lun(scsi_cmdbuf[1] >> 5);
-		logerror("%s: command INQUIRY lun=%d EVPD=%d page=%d alloc=%02x link=%02x\n",
-					tag(),
-					lun, scsi_cmdbuf[1] & 1, scsi_cmdbuf[2], scsi_cmdbuf[4], scsi_cmdbuf[5]);
-		if(lun) {
-			bad_lun();
-			return;
-		}
+		LOG("command INQUIRY lun=%d EVPD=%d page=%d alloc=%02x link=%02x\n",
+			lun, scsi_cmdbuf[1] & 1, scsi_cmdbuf[2], scsi_cmdbuf[4], scsi_cmdbuf[5]);
 
 		int page = scsi_cmdbuf[2];
 		int size = scsi_cmdbuf[4];
 		switch(page) {
 		case 0:
 			memset(scsi_cmdbuf, 0, 148);
-			scsi_cmdbuf[0] = 0x00; // device is direct-access (e.g. hard disk)
+			// From Seagate SCSI Commands Reference Manual (http://www.seagate.com/staticfiles/support/disc/manuals/scsi/100293068a.pdf), page 73:
+			// If the SCSI target device is not capable of supporting a peripheral device connected to this logical unit, the
+			// device server shall set these fields to 7Fh (i.e., PERIPHERAL QUALIFIER field set to 011b and PERIPHERAL DEVICE
+			// TYPE set to 1Fh).
+			if (lun != 0)
+				scsi_cmdbuf[0] = 0x7f;
+			else
+				scsi_cmdbuf[0] = 0x00; // device is direct-access (e.g. hard disk)
 			scsi_cmdbuf[1] = 0x00; // media is not removable
 			scsi_cmdbuf[2] = 0x05; // device complies with SPC-3 standard
 			scsi_cmdbuf[3] = 0x01; // response data format = CCS
-			// Apple HD SC setup utility needs to see this
-			strcpy((char *)&scsi_cmdbuf[8], " SEAGATE");
-			strcpy((char *)&scsi_cmdbuf[15], "          ST225N");
-			strcpy((char *)&scsi_cmdbuf[31], "1.00");
-			scsi_cmdbuf[36] = 0x00; // # of extents high
-			scsi_cmdbuf[37] = 0x08; // # of extents low
-			scsi_cmdbuf[38] = 0x00; // group 0 commands 0-1f
-			scsi_cmdbuf[39] = 0x99; // commands 0,3,4,7
-			scsi_cmdbuf[40] = 0xa0; // commands 8, a
-			scsi_cmdbuf[41] = 0x27; // commands 12,15,16,17
-			scsi_cmdbuf[42] = 0x34; // commands 1a,1b,1d
-			scsi_cmdbuf[43] = 0x01; // group 1 commands 20-3f
-			scsi_cmdbuf[44] = 0x04;
-			scsi_cmdbuf[45] = 0xa0;
-			scsi_cmdbuf[46] = 0x01;
-			scsi_cmdbuf[47] = 0x18;
-			scsi_cmdbuf[48] = 0x07; // group 7 commands e0-ff
-			scsi_cmdbuf[49] = 0x00;
-			scsi_cmdbuf[50] = 0xa0; // commands 8, a
-			scsi_cmdbuf[51] = 0x00;
-			scsi_cmdbuf[52] = 0x00;
-			scsi_cmdbuf[53] = 0xff; // end of list
-			if(size > 54)
-				size = 54;
+			if(m_inquiry_data.empty()) {
+				LOG("IDNT tag not found in chd metadata, using default inquiry data\n");
+
+				// Apple HD SC setup utility needs to see this
+				strcpy((char *)&scsi_cmdbuf[8], " SEAGATE");
+				strcpy((char *)&scsi_cmdbuf[15], "          ST225N");
+				strcpy((char *)&scsi_cmdbuf[31], "1.00");
+				scsi_cmdbuf[36] = 0x00; // # of extents high
+				scsi_cmdbuf[37] = 0x08; // # of extents low
+				scsi_cmdbuf[38] = 0x00; // group 0 commands 0-1f
+				scsi_cmdbuf[39] = 0x99; // commands 0,3,4,7
+				scsi_cmdbuf[40] = 0xa0; // commands 8, a
+				scsi_cmdbuf[41] = 0x27; // commands 12,15,16,17
+				scsi_cmdbuf[42] = 0x34; // commands 1a,1b,1d
+				scsi_cmdbuf[43] = 0x01; // group 1 commands 20-3f
+				scsi_cmdbuf[44] = 0x04;
+				scsi_cmdbuf[45] = 0xa0;
+				scsi_cmdbuf[46] = 0x01;
+				scsi_cmdbuf[47] = 0x18;
+				scsi_cmdbuf[48] = 0x07; // group 7 commands e0-ff
+				scsi_cmdbuf[49] = 0x00;
+				scsi_cmdbuf[50] = 0xa0; // commands 8, a
+				scsi_cmdbuf[51] = 0x00;
+				scsi_cmdbuf[52] = 0x00;
+				scsi_cmdbuf[53] = 0xff; // end of list
+			}
+			else
+				std::copy_n(m_inquiry_data.begin(), std::min(m_inquiry_data.size(), size_t(48)), &scsi_cmdbuf[8]);
+
+			if(size > 56)
+				size = 56;
 			scsi_data_in(0, size);
 			break;
 		}
@@ -179,9 +188,8 @@ void nscsi_harddisk_device::scsi_command()
 
 	case SC_MODE_SENSE_6: {
 		int lun = get_lun(scsi_cmdbuf[1] >> 5);
-		logerror("%s: command MODE SENSE 6 lun=%d page=%02x alloc=%02x link=%02x\n",
-					tag(),
-					lun, scsi_cmdbuf[2] & 0x3f, scsi_cmdbuf[4], scsi_cmdbuf[5]);
+		LOG("command MODE SENSE 6 lun=%d page=%02x alloc=%02x link=%02x\n",
+			lun, scsi_cmdbuf[2] & 0x3f, scsi_cmdbuf[4], scsi_cmdbuf[5]);
 		if(lun) {
 			bad_lun();
 			return;
@@ -301,7 +309,7 @@ void nscsi_harddisk_device::scsi_command()
 			}
 
 			default:
-				logerror("%s: mode sense page %02x unhandled\n", tag(), page);
+				LOG("mode sense page %02x unhandled\n", page);
 				break;
 			}
 		}
@@ -315,12 +323,12 @@ void nscsi_harddisk_device::scsi_command()
 	}
 
 	case SC_START_STOP_UNIT:
-		logerror("%s: command START STOP UNIT\n", tag());
+		LOG("command START STOP UNIT\n");
 		scsi_status_complete(SS_GOOD);
 		break;
 
 	case SC_READ_CAPACITY: {
-		logerror("%s: command READ CAPACITY\n", tag());
+		LOG("command READ CAPACITY\n");
 
 		hard_disk_info *info = hard_disk_get_info(harddisk);
 		uint32_t size = info->cylinders * info->heads * info->sectors - 1;
@@ -343,8 +351,7 @@ void nscsi_harddisk_device::scsi_command()
 		lba = (scsi_cmdbuf[2]<<24) | (scsi_cmdbuf[3]<<16) | (scsi_cmdbuf[4]<<8) | scsi_cmdbuf[5];
 		blocks = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
 
-		logerror("%s: command READ EXTENDED start=%08x blocks=%04x\n",
-					tag(), lba, blocks);
+		LOG("command READ EXTENDED start=%08x blocks=%04x\n",lba, blocks);
 
 		scsi_data_in(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
@@ -354,15 +361,14 @@ void nscsi_harddisk_device::scsi_command()
 		lba = (scsi_cmdbuf[2]<<24) | (scsi_cmdbuf[3]<<16) | (scsi_cmdbuf[4]<<8) | scsi_cmdbuf[5];
 		blocks = (scsi_cmdbuf[7] << 8) | scsi_cmdbuf[8];
 
-		logerror("%s: command WRITE EXTENDED start=%08x blocks=%04x\n",
-					tag(), lba, blocks);
+		LOG("command WRITE EXTENDED start=%08x blocks=%04x\n", lba, blocks);
 
 		scsi_data_out(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
 		break;
 
 	default:
-		logerror("%s: command %02x ***UNKNOWN***\n", tag(), scsi_cmdbuf[0]);
+		LOG("command %02x ***UNKNOWN***\n", scsi_cmdbuf[0]);
 		nscsi_full_device::scsi_command();
 		break;
 	}

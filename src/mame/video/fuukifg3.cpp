@@ -223,7 +223,7 @@ uint32_t fuuki32_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-void fuuki32_state::screen_eof(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(fuuki32_state::screen_vblank)
 {
 	// rising edge
 	if (state)

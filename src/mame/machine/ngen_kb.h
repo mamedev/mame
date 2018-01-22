@@ -5,6 +5,8 @@
 #ifndef MAME_MACHINE_NGEN_KB_H
 #define MAME_MACHINE_NGEN_KB_H
 
+#pragma once
+
 #include "bus/rs232/keyboard.h"
 
 class ngen_keyboard_device : public serial_keyboard_device
@@ -27,6 +29,6 @@ private:
 	uint8_t m_last_reset;
 };
 
-extern const device_type NGEN_KEYBOARD;
+DECLARE_DEVICE_TYPE(NGEN_KEYBOARD, ngen_keyboard_device)
 
 #endif // MAME_MACHINE_NGEN_KB_H

@@ -39,11 +39,16 @@ TODO:
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/hnayayoi.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
+#include "machine/74259.h"
+#include "machine/clock.h"
 #include "machine/nvram.h"
-#include "includes/hnayayoi.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 READ8_MEMBER(hnayayoi_state::keyboard_0_r)
@@ -78,19 +83,25 @@ WRITE8_MEMBER(hnayayoi_state::adpcm_data_w)
 	m_msm->data_w(data);
 }
 
-WRITE8_MEMBER(hnayayoi_state::adpcm_vclk_w)
+
+WRITE_LINE_MEMBER(hnayayoi_state::coin_counter_w)
 {
-	m_msm->vclk_w(data & 1);
+	machine().bookkeeping().coin_counter_w(0, state);
 }
 
-WRITE8_MEMBER(hnayayoi_state::adpcm_reset_w)
+
+WRITE_LINE_MEMBER(hnayayoi_state::nmi_enable_w)
 {
-	m_msm->reset_w(data & 1);
+	m_nmi_enable = state;
+	if (!state)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-WRITE8_MEMBER(hnayayoi_state::adpcm_reset_inv_w)
+
+WRITE_LINE_MEMBER(hnayayoi_state::nmi_clock_w)
 {
-	m_msm->reset_w(~data & 1);
+	if (m_nmi_enable)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 
@@ -110,8 +121,7 @@ static ADDRESS_MAP_START( hnayayoi_io_map, AS_IO, 8, hnayayoi_state )
 //  AM_RANGE(0x09, 0x09) AM_WRITENOP // CRT Controller
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(dynax_blitter_rev1_start_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(dynax_blitter_rev1_clear_w)
-	AM_RANGE(0x23, 0x23) AM_WRITE(adpcm_vclk_w)
-	AM_RANGE(0x24, 0x24) AM_WRITE(adpcm_reset_w)
+	AM_RANGE(0x20, 0x27) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x40, 0x40) AM_WRITE(keyboard_w)
 	AM_RANGE(0x41, 0x41) AM_READ(keyboard_0_r)
 	AM_RANGE(0x42, 0x42) AM_READ(keyboard_1_r)
@@ -132,8 +142,7 @@ static ADDRESS_MAP_START( hnfubuki_map, AS_PROGRAM, 8, hnayayoi_state )
 //  AM_RANGE(0xff09, 0xff09) AM_WRITENOP // CRT Controller
 	AM_RANGE(0xff0a, 0xff0a) AM_WRITE(dynax_blitter_rev1_start_w)
 	AM_RANGE(0xff0c, 0xff0c) AM_WRITE(dynax_blitter_rev1_clear_w)
-	AM_RANGE(0xff23, 0xff23) AM_WRITE(adpcm_vclk_w)
-	AM_RANGE(0xff24, 0xff24) AM_WRITE(adpcm_reset_inv_w)
+	AM_RANGE(0xff20, 0xff27) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0xff40, 0xff40) AM_WRITE(keyboard_w)
 	AM_RANGE(0xff41, 0xff41) AM_READ(keyboard_0_r)
 	AM_RANGE(0xff42, 0xff42) AM_READ(keyboard_1_r)
@@ -162,8 +171,7 @@ static ADDRESS_MAP_START( untoucha_io_map, AS_IO, 8, hnayayoi_state )
 	AM_RANGE(0x1a, 0x1f) AM_WRITE(dynax_blitter_rev1_param_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(dynax_blitter_rev1_clear_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(dynax_blitter_rev1_start_w)
-	AM_RANGE(0x31, 0x31) AM_WRITE(adpcm_vclk_w)
-	AM_RANGE(0x32, 0x32) AM_WRITE(adpcm_reset_inv_w)
+	AM_RANGE(0x30, 0x37) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x50, 0x50) AM_DEVWRITE("ymsnd", ym2203_device, write_port_w)
 	AM_RANGE(0x51, 0x51) AM_DEVREAD("ymsnd", ym2203_device, read_port_r)
 //  AM_RANGE(0x52, 0x52) AM_WRITENOP // CRT Controller
@@ -516,13 +524,11 @@ void hnayayoi_state::machine_start()
 	save_item(NAME(m_blit_dest));
 	save_item(NAME(m_blit_src));
 	save_item(NAME(m_keyb));
+	save_item(NAME(m_nmi_enable));
 }
 
 void hnayayoi_state::machine_reset()
 {
-	/* start with the MSM5205 reset */
-	m_msm->reset_w(1);
-
 	m_palbank = 0;
 	m_blit_layer = 0;
 	m_blit_dest = 0;
@@ -531,17 +537,24 @@ void hnayayoi_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( hnayayoi, hnayayoi_state )
+MACHINE_CONFIG_START(hnayayoi_state::hnayayoi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
 	MCFG_CPU_PROGRAM_MAP(hnayayoi_map)
 	MCFG_CPU_IO_MAP(hnayayoi_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", hnayayoi_state,  irq0_line_hold)
-	MCFG_CPU_PERIODIC_INT_DRIVER(hnayayoi_state, nmi_line_pulse,  8000)
 
+	MCFG_DEVICE_ADD("nmiclock", CLOCK, 8000)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(hnayayoi_state, nmi_clock_w))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(hnayayoi_state, coin_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(DEVWRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("msm", msm5205_device, vclk_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(hnayayoi_state, nmi_enable_w)) MCFG_DEVCB_INVERT
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -552,7 +565,7 @@ static MACHINE_CONFIG_START( hnayayoi, hnayayoi_state )
 	MCFG_SCREEN_UPDATE_DRIVER(hnayayoi_state, screen_update_hnayayoi)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -567,19 +580,29 @@ static MACHINE_CONFIG_START( hnayayoi, hnayayoi_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)
+	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hnfubuki, hnayayoi )
+MACHINE_CONFIG_DERIVED(hnayayoi_state::hnfubuki, hnayayoi)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hnfubuki_map)
+	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_IO)
+
+	MCFG_DEVICE_MODIFY("mainlatch") // D5
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(hnayayoi_state, nmi_enable_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( untoucha, hnayayoi )
+MACHINE_CONFIG_DERIVED(hnayayoi_state::untoucha, hnayayoi)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(untoucha_map)
 	MCFG_CPU_IO_MAP(untoucha_io_map)
+
+	MCFG_DEVICE_MODIFY("mainlatch")
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(DEVWRITELINE("msm", msm5205_device, vclk_w))
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(hnayayoi_state, nmi_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(DEVWRITELINE("msm", msm5205_device, reset_w)) MCFG_DEVCB_INVERT
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // ?
 
 	MCFG_VIDEO_START_OVERRIDE(hnayayoi_state,untoucha)
 MACHINE_CONFIG_END
@@ -671,11 +694,11 @@ DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
 	/* swap data bits 0 and 1 */
 	for (i = 0; i < len; i++)
 	{
-		rom[i] = BITSWAP8(rom[i],7,6,5,4,3,2,0,1);
+		rom[i] = bitswap<8>(rom[i],7,6,5,4,3,2,0,1);
 	}
 }
 
 
-GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, driver_device,  0,        ROT0, "Dyna Electronics", "Hana Yayoi (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, hnayayoi_state, 0,        ROT0, "Dyna Electronics", "Hana Yayoi (Japan)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, hnfubuki, ROT0, "Dynax",            "Hana Fubuki [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, untoucha, 0,        untoucha, untoucha, driver_device,  0,        ROT0, "Dynax",            "Untouchable (Ver. 2.10)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1987, untoucha, 0,        untoucha, untoucha, hnayayoi_state, 0,        ROT0, "Dynax",            "Untouchable (Ver. 2.10)",   MACHINE_SUPPORTS_SAVE )

@@ -8,6 +8,7 @@
 
 **********************************************************************/
 
+#include "emu.h"
 #include "includes/thomson.h"
 #include "machine/wd_fdc.h"
 
@@ -275,7 +276,7 @@ static uint8_t to7_5p14_select;
 
 READ8_MEMBER( thomson_state::to7_5p14_r )
 {
-	wd2793_t *fdc = machine().device<wd2793_t>("wd2793");
+	wd2793_device *fdc = machine().device<wd2793_device>("wd2793");
 
 	if ( offset < 4 )
 		return fdc->read(space, offset );
@@ -290,7 +291,7 @@ READ8_MEMBER( thomson_state::to7_5p14_r )
 
 WRITE8_MEMBER( thomson_state::to7_5p14_w )
 {
-	wd2793_t *fdc = machine().device<wd2793_t>("wd2793");
+	wd2793_device *fdc = machine().device<wd2793_device>("wd2793");
 	if ( offset < 4 )
 		fdc->write(space, offset, data );
 	else if ( offset == 8 )
@@ -319,7 +320,7 @@ WRITE8_MEMBER( thomson_state::to7_5p14_w )
 
 void thomson_state::to7_5p14_reset()
 {
-	wd2793_t *fdc = machine().device<wd2793_t>("wd2793");
+	wd2793_device *fdc = machine().device<wd2793_device>("wd2793");
 	LOG(( "to7_5p14_reset: CD 90-640 controller\n" ));
 	fdc->reset();
 }
@@ -752,7 +753,7 @@ WRITE8_MEMBER( thomson_state::to7_qdd_w )
 			int bits, parity;
 			bits   = bit[ (data >> 3) & 7 ];
 			parity = par[ (data >> 3) & 7 ];
-			to7_qdd_stat_update(space.machine());
+			to7_qdd_stat_update(machine());
 			VLOG(( "%f $%04x to7_qdd_w: CTRL2=$%02X bits=%i par=%s blen=%i under=%s%s\n",
 					machine().time().as_double(), m_maincpu->pc(), data,
 					bits, parname[ parity ], data & QDD_C2_BLEN ? 1 : 2,
@@ -991,7 +992,7 @@ int thomson_state::thmfc_floppy_find_sector( chrn_id* dst )
 	}
 
 	thmfc1->stat0 = THMFC1_STAT0_CRC_ERROR | THMFC1_STAT0_FINISHED;
-	LOG (( "thmfc_floppy_find_sector: sector not found drive=%i track=%i sector=%i\n", floppy_get_drive(img), thmfc1->track, thmfc1->sector ));
+	LOG (( "thmfc_floppy_find_sector: sector not found drive=%s track=%i sector=%i\n", img->tag(), thmfc1->track, thmfc1->sector ));
 	return 0;
 }
 

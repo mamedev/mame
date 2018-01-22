@@ -92,10 +92,12 @@ PC1640-HD20: Amstrad 40095 (Alps DRMD20A12A), Tandon TM-262 [-chs 615,4,17 -ss 5
 PC1640-HD30: Western Digital 95038 [-chs 615,6,17 -ss 512]
 */
 
+#include "emu.h"
 #include "includes/pc1512.h"
 #include "bus/rs232/rs232.h"
 #include "bus/isa/ega.h"
 #include "softlist.h"
+#include "speaker.h"
 
 
 //**************************************************************************
@@ -1179,7 +1181,7 @@ void pc1640_state::machine_reset()
 //  MACHINE_CONFIG( pc1512 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pc1512, pc1512_state )
+MACHINE_CONFIG_START(pc1512_state::pc1512)
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc1512_mem)
 	MCFG_CPU_IO_MAP(pc1512_io)
@@ -1201,8 +1203,8 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_PC1512_MOUSE_PORT_ADD(PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse")
 	MCFG_PC1512_MOUSE_PORT_X_CB(WRITE8(pc1512_state, mouse_x_w))
 	MCFG_PC1512_MOUSE_PORT_Y_CB(WRITE8(pc1512_state, mouse_y_w))
-	MCFG_PC1512_MOUSE_PORT_M1_CB(DEVWRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_t, m1_w))
-	MCFG_PC1512_MOUSE_PORT_M2_CB(DEVWRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_t, m2_w))
+	MCFG_PC1512_MOUSE_PORT_M1_CB(DEVWRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
+	MCFG_PC1512_MOUSE_PORT_M2_CB(DEVWRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
 
 	MCFG_DEVICE_ADD(I8237A5_TAG, AM9517A, XTAL_24MHz/6)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pc1512_state, hrq_w))
@@ -1220,7 +1222,9 @@ static MACHINE_CONFIG_START( pc1512, pc1512_state )
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(pc1512_state, dack1_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pc1512_state, dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pc1512_state, dack3_w))
-	MCFG_PIC8259_ADD(I8259A2_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NOOP)
+
+	MCFG_DEVICE_ADD(I8259A2_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_28_63636MHz/24)
@@ -1291,7 +1295,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pc1512dd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pc1512dd, pc1512 )
+MACHINE_CONFIG_DERIVED(pc1512_state::pc1512dd, pc1512)
 	MCFG_DEVICE_MODIFY(PC_FDC_XT_TAG ":1")
 	MCFG_SLOT_DEFAULT_OPTION("525dd")
 MACHINE_CONFIG_END
@@ -1301,7 +1305,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pc1512hd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pc1512hd, pc1512 )
+MACHINE_CONFIG_DERIVED(pc1512_state::pc1512hd, pc1512)
 	MCFG_DEVICE_MODIFY("isa1")
 	//MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
 	MCFG_SLOT_DEFAULT_OPTION("hdc")
@@ -1312,7 +1316,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pc1640 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pc1640, pc1640_state )
+MACHINE_CONFIG_START(pc1640_state::pc1640)
 	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_24MHz/3)
 	MCFG_CPU_PROGRAM_MAP(pc1640_mem)
 	MCFG_CPU_IO_MAP(pc1640_io)
@@ -1331,8 +1335,8 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_PC1512_MOUSE_PORT_ADD(PC1512_MOUSE_PORT_TAG, pc1512_mouse_port_devices, "mouse")
 	MCFG_PC1512_MOUSE_PORT_X_CB(WRITE8(pc1512_state, mouse_x_w))
 	MCFG_PC1512_MOUSE_PORT_Y_CB(WRITE8(pc1512_state, mouse_y_w))
-	MCFG_PC1512_MOUSE_PORT_M1_CB(DEVWRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_t, m1_w))
-	MCFG_PC1512_MOUSE_PORT_M2_CB(DEVWRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_t, m2_w))
+	MCFG_PC1512_MOUSE_PORT_M1_CB(DEVWRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m1_w))
+	MCFG_PC1512_MOUSE_PORT_M2_CB(DEVWRITELINE(PC1512_KEYBOARD_TAG, pc1512_keyboard_device, m2_w))
 
 	MCFG_DEVICE_ADD(I8237A5_TAG, AM9517A, XTAL_24MHz/6)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pc1512_state, hrq_w))
@@ -1350,7 +1354,9 @@ static MACHINE_CONFIG_START( pc1640, pc1640_state )
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(pc1512_state, dack1_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(pc1512_state, dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(pc1512_state, dack3_w))
-	MCFG_PIC8259_ADD(I8259A2_TAG, INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0), VCC, NOOP)
+
+	MCFG_DEVICE_ADD(I8259A2_TAG, PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
 
 	MCFG_DEVICE_ADD(I8253_TAG, PIT8253, 0)
 	MCFG_PIT8253_CLK0(XTAL_28_63636MHz/24)
@@ -1422,7 +1428,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pc1640dd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pc1640dd, pc1640 )
+MACHINE_CONFIG_DERIVED(pc1640_state::pc1640dd, pc1640)
 	MCFG_DEVICE_MODIFY(PC_FDC_XT_TAG ":1")
 	MCFG_SLOT_DEFAULT_OPTION("525dd")
 MACHINE_CONFIG_END
@@ -1432,7 +1438,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pc1640hd )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pc1640hd, pc1640 )
+MACHINE_CONFIG_DERIVED(pc1640_state::pc1640hd, pc1640)
 	MCFG_DEVICE_MODIFY("isa1")
 	//MCFG_SLOT_DEFAULT_OPTION("wdxt_gen")
 	MCFG_SLOT_DEFAULT_OPTION("hdc")
@@ -1498,12 +1504,12 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME        FLAGS
-COMP( 1986, pc1512,     0,          0,      pc1512,     pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 SD",    MACHINE_SUPPORTS_SAVE )
-COMP( 1986, pc1512dd,   pc1512,     0,      pc1512dd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 DD",    MACHINE_SUPPORTS_SAVE )
-COMP( 1986, pc1512hd10, pc1512,     0,      pc1512hd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 HD10",  MACHINE_SUPPORTS_SAVE )
-COMP( 1986, pc1512hd20, pc1512,     0,      pc1512hd,   pc1512, driver_device,      0,      "Amstrad plc",  "PC1512 HD20",  MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640,     0,          0,      pc1640,     pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 SD",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640dd,   pc1640,     0,      pc1640dd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 DD",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd20, pc1640,     0,      pc1640hd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 HD20",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, pc1640hd30, pc1640,     0,      pc1640hd,   pc1640, driver_device,      0,      "Amstrad plc",  "PC1640 HD30",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   STATE          INIT    COMPANY         FULLNAME        FLAGS
+COMP( 1986, pc1512,     0,          0,      pc1512,     pc1512, pc1512_state,  0,      "Amstrad plc",  "PC1512 SD",    MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512dd,   pc1512,     0,      pc1512dd,   pc1512, pc1512_state,  0,      "Amstrad plc",  "PC1512 DD",    MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512hd10, pc1512,     0,      pc1512hd,   pc1512, pc1512_state,  0,      "Amstrad plc",  "PC1512 HD10",  MACHINE_SUPPORTS_SAVE )
+COMP( 1986, pc1512hd20, pc1512,     0,      pc1512hd,   pc1512, pc1512_state,  0,      "Amstrad plc",  "PC1512 HD20",  MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640,     0,          0,      pc1640,     pc1640, pc1640_state,  0,      "Amstrad plc",  "PC1640 SD",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640dd,   pc1640,     0,      pc1640dd,   pc1640, pc1640_state,  0,      "Amstrad plc",  "PC1640 DD",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd20, pc1640,     0,      pc1640hd,   pc1640, pc1640_state,  0,      "Amstrad plc",  "PC1640 HD20",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1987, pc1640hd30, pc1640,     0,      pc1640hd,   pc1640, pc1640_state,  0,      "Amstrad plc",  "PC1640 HD30",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

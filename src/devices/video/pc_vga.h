@@ -8,39 +8,20 @@
 
 ***************************************************************************/
 
-#ifndef PC_VGA_H
-#define PC_VGA_H
+#ifndef MAME_VIDEO_PC_VGA_H
+#define MAME_VIDEO_PC_VGA_H
 
-MACHINE_CONFIG_EXTERN( pcvideo_vga );
-MACHINE_CONFIG_EXTERN( pcvideo_trident_vga );
-MACHINE_CONFIG_EXTERN( pcvideo_gamtor_vga );
-MACHINE_CONFIG_EXTERN( pcvideo_s3_vga );
-
-enum
-{
-	SCREEN_OFF = 0,
-	TEXT_MODE,
-	VGA_MODE,
-	EGA_MODE,
-	CGA_MODE,
-	MONO_MODE,
-	RGB8_MODE,
-	RGB15_MODE,
-	RGB16_MODE,
-	RGB24_MODE,
-	RGB32_MODE
-};
+#include "screen.h"
 
 // ======================> vga_device
 
-class vga_device :  public device_t
+class vga_device : public device_t
 {
 	friend class ibm8514a_device;
 
 public:
 	// construction/destruction
 	vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual void zero();
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -56,7 +37,25 @@ public:
 	virtual READ8_MEMBER(mem_linear_r);
 	virtual WRITE8_MEMBER(mem_linear_w);
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
+
 protected:
+	enum
+	{
+		SCREEN_OFF = 0,
+		TEXT_MODE,
+		VGA_MODE,
+		EGA_MODE,
+		CGA_MODE,
+		MONO_MODE,
+		RGB8_MODE,
+		RGB15_MODE,
+		RGB16_MODE,
+		RGB24_MODE,
+		RGB32_MODE
+	};
+
+	vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -69,7 +68,7 @@ protected:
 	virtual uint8_t pc_vga_choosevideomode();
 	void recompute_params_clock(int divisor, int xtal);
 	uint8_t crtc_reg_read(uint8_t index);
-	void recompute_params();
+	virtual void recompute_params();
 	void crtc_reg_write(uint8_t index, uint8_t data);
 	void seq_reg_write(uint8_t index, uint8_t data);
 	uint8_t vga_vblank();
@@ -79,26 +78,27 @@ protected:
 	void attribute_reg_write(uint8_t index, uint8_t data);
 	void gc_reg_write(uint8_t index,uint8_t data);
 	virtual uint16_t offset();
+	virtual uint32_t start_addr();
 	inline uint8_t vga_latch_write(int offs, uint8_t data);
 	inline uint8_t rotate_right(uint8_t val) { return (val >> vga.gc.rotate_count) | (val << (8 - vga.gc.rotate_count)); }
 	inline uint8_t vga_logical_op(uint8_t data, uint8_t plane, uint8_t mask)
 	{
 		uint8_t res = 0;
 
-		switch(vga.gc.logical_op & 3)
+		switch (vga.gc.logical_op & 3)
 		{
-			case 0: /* NONE */
-				res = (data & mask) | (vga.gc.latch[plane] & ~mask);
-				break;
-			case 1: /* AND */
-				res = (data | ~mask) & (vga.gc.latch[plane]);
-				break;
-			case 2: /* OR */
-				res = (data & mask) | (vga.gc.latch[plane]);
-				break;
-			case 3: /* XOR */
-				res = (data & mask) ^ (vga.gc.latch[plane]);
-				break;
+		case 0: /* NONE */
+			res = (data & mask) | (vga.gc.latch[plane] & ~mask);
+			break;
+		case 1: /* AND */
+			res = (data | ~mask) & (vga.gc.latch[plane]);
+			break;
+		case 2: /* OR */
+			res = (data & mask) | (vga.gc.latch[plane]);
+			break;
+		case 3: /* XOR */
+			res = (data & mask) ^ (vga.gc.latch[plane]);
+			break;
 		}
 
 		return res;
@@ -150,30 +150,30 @@ protected:
 			uint16_t vert_disp_end;
 	/**/    uint16_t vert_retrace_start;
 	/**/    uint8_t vert_retrace_end;
-	/**/    uint16_t vert_blank_start;
+			uint16_t vert_blank_start;
 			uint16_t line_compare;
-	/**/    uint32_t cursor_addr;
+			uint32_t cursor_addr;
 	/**/    uint8_t byte_panning;
-	/**/    uint8_t preset_row_scan;
+			uint8_t preset_row_scan;
 			uint8_t scan_doubling;
-	/**/    uint8_t maximum_scan_line;
-	/**/    uint8_t cursor_enable;
-	/**/    uint8_t cursor_scan_start;
+			uint8_t maximum_scan_line;
+			uint8_t cursor_enable;
+			uint8_t cursor_scan_start;
 	/**/    uint8_t cursor_skew;
-	/**/    uint8_t cursor_scan_end;
+			uint8_t cursor_scan_end;
 			uint32_t start_addr;
 			uint32_t start_addr_latch;
-	/**/    uint8_t protect_enable;
+			uint8_t protect_enable;
 	/**/    uint8_t bandwidth;
-	/**/    uint16_t offset;
-	/**/    uint8_t word_mode;
-	/**/    uint8_t dw;
+			uint16_t offset;
+			uint8_t word_mode;
+			uint8_t dw;
 	/**/    uint8_t div4;
 	/**/    uint8_t underline_loc;
-	/**/    uint16_t vert_blank_end;
+			uint16_t vert_blank_end;
 			uint8_t sync_en;
 	/**/    uint8_t aw;
-	/**/    uint8_t div2;
+			uint8_t div2;
 	/**/    uint8_t sldiv;
 	/**/    uint8_t map14;
 	/**/    uint8_t map13;
@@ -211,12 +211,11 @@ protected:
 			uint8_t pel_shift_latch;
 		} attribute;
 
-
 		struct {
 			uint8_t read_index, write_index, mask;
 			int read;
 			int state;
-			struct { uint8_t red, green, blue; } color[0x100];
+			uint8_t color[0x300]; /* flat RGB triplets */
 			int dirty;
 		} dac;
 
@@ -235,19 +234,21 @@ protected:
 
 
 // device type definition
-extern const device_type VGA;
+DECLARE_DEVICE_TYPE(VGA, vga_device)
 
 // ======================> svga_device
 
 class svga_device :  public vga_device
 {
 public:
-	// construction/destruction
-	svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
 	virtual void zero() override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	uint8_t get_video_depth();
+
 protected:
+	// construction/destruction
+	svga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	void svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -264,19 +265,18 @@ protected:
 		uint8_t rgb24_en;
 		uint8_t rgb32_en;
 		uint8_t id;
-	}svga;
+	} svga;
 };
 
 // ======================> ibm8514_device
 
-class ibm8514a_device :  public device_t
+class ibm8514a_device : public device_t
 {
 public:
-	ibm8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_vga(const char* tag) { m_vga_tag.assign(tag); }
-	void set_vga_owner() { m_vga = dynamic_cast<vga_device*>(owner()); }
+	void set_vga_owner() { m_vga = dynamic_cast<svga_device*>(owner()); }
 
 	void enabled();
 
@@ -284,8 +284,8 @@ public:
 	WRITE16_MEMBER(ibm8514_cmd_w);
 	READ16_MEMBER(ibm8514_line_error_r);
 	WRITE16_MEMBER(ibm8514_line_error_w);
-	READ16_MEMBER(ibm8514_status_r);
-	WRITE16_MEMBER(ibm8514_htotal_w);
+	READ8_MEMBER(ibm8514_status_r);
+	WRITE8_MEMBER(ibm8514_htotal_w);
 	READ16_MEMBER(ibm8514_substatus_r);
 	WRITE16_MEMBER(ibm8514_subcontrol_w);
 	READ16_MEMBER(ibm8514_subcontrol_r);
@@ -319,7 +319,7 @@ public:
 	READ16_MEMBER(ibm8514_foremix_r);
 	WRITE16_MEMBER(ibm8514_foremix_w);
 	READ16_MEMBER(ibm8514_pixel_xfer_r);
-	WRITE16_MEMBER(ibm8514_pixel_xfer_w);
+	virtual WRITE16_MEMBER(ibm8514_pixel_xfer_w);
 	READ16_MEMBER(ibm8514_read_mask_r);
 	WRITE16_MEMBER(ibm8514_read_mask_w);
 	READ16_MEMBER(ibm8514_write_mask_r);
@@ -377,19 +377,23 @@ public:
 		uint8_t wait_vector_count;
 
 	} ibm8514;
+
 protected:
+	ibm8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
-	vga_device* m_vga;  // for pass-through
+	void ibm8514_write(uint32_t offset, uint32_t src);
+	void ibm8514_write_fg(uint32_t offset);
+	void ibm8514_write_bg(uint32_t offset);
+
+	svga_device* m_vga;  // for pass-through
 	std::string m_vga_tag;  // pass-through device tag
 private:
 	void ibm8514_draw_vector(uint8_t len, uint8_t dir, bool draw);
 	void ibm8514_wait_draw_ssv();
 	void ibm8514_draw_ssv(uint8_t data);
 	void ibm8514_wait_draw_vector();
-	void ibm8514_write_fg(uint32_t offset);
-	void ibm8514_write_bg(uint32_t offset);
-	void ibm8514_write(uint32_t offset, uint32_t src);
 
 	//uint8_t* m_vram;  // the original 8514/A has it's own VRAM, but most VGA+8514 combination cards will have
 					// only one set of VRAM, so this will only be needed in standalone 8514/A cards
@@ -397,7 +401,7 @@ private:
 };
 
 // device type definition
-extern const device_type IBM8514A;
+DECLARE_DEVICE_TYPE(IBM8514A, ibm8514a_device)
 
 #define MCFG_8514A_ADD(_tag, _param) \
 		MCFG_DEVICE_ADD(_tag, IBM8514A, 0) \
@@ -408,10 +412,9 @@ extern const device_type IBM8514A;
 		downcast<ibm8514a_device*>(device)->set_vga_owner();
 
 
-class mach8_device :  public ibm8514a_device
+class mach8_device : public ibm8514a_device
 {
 public:
-	mach8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	READ16_MEMBER(mach8_ec0_r);
@@ -439,8 +442,16 @@ public:
 	WRITE16_MEMBER(mach8_ext_leftscissor_w);
 	WRITE16_MEMBER(mach8_ext_topscissor_w);
 	READ16_MEMBER(mach8_clksel_r) { return mach8.clksel; }
+	WRITE16_MEMBER(mach8_ge_offset_l_w);
+	WRITE16_MEMBER(mach8_ge_offset_h_w);
+	WRITE16_MEMBER(mach8_ge_pitch_w);
+	WRITE16_MEMBER(mach8_scan_x_w);
+	WRITE16_MEMBER(mach8_dp_config_w);
+	READ16_MEMBER(mach8_readonly_r) { return 0; }
+	WRITE16_MEMBER(mach8_pixel_xfer_w);
 
 protected:
+	mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_start() override;
 	struct
 	{
@@ -448,11 +459,19 @@ protected:
 		uint16_t scratch1;
 		uint16_t linedraw;
 		uint16_t clksel;
+		uint16_t dp_config;
+		uint32_t ge_offset;
+		uint16_t ge_pitch;
+		uint16_t scan_x;
 	} mach8;
+
+private:
+	void mach8_wait_scan();
+
 };
 
 // device type definition
-extern const device_type MACH8;
+DECLARE_DEVICE_TYPE(MACH8, mach8_device)
 
 #define MCFG_MACH8_ADD(_tag, _param) \
 		MCFG_DEVICE_ADD(_tag, MACH8, 0) \
@@ -506,17 +525,16 @@ private:
 
 
 // device type definition
-extern const device_type TSENG_VGA;
+DECLARE_DEVICE_TYPE(TSENG_VGA, tseng_vga_device)
 
 
 // ======================> ati_vga_device
 
-class ati_vga_device :  public svga_device
+class ati_vga_device : public svga_device
 {
 public:
 	// construction/destruction
 	ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual READ8_MEMBER(mem_r) override;
 	virtual WRITE8_MEMBER(mem_w) override;
@@ -526,35 +544,37 @@ public:
 	READ8_MEMBER(ati_port_ext_r);
 	WRITE8_MEMBER(ati_port_ext_w);
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual uint16_t offset() override;
 
 	mach8_device* get_8514() { return m_8514; }
 protected:
+	ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
-private:
-	void ati_define_video_mode();
+	virtual void device_add_mconfig(machine_config &config) override;
 	struct
 	{
 		uint8_t ext_reg[64];
 		uint8_t ext_reg_select;
 		uint8_t vga_chip_id;
 	} ati;
+
+private:
+	void ati_define_video_mode();
 	mach8_device* m_8514;
 };
 
 // device type definition
-extern const device_type ATI_VGA;
+DECLARE_DEVICE_TYPE(ATI_VGA, ati_vga_device)
 
 
 // ======================> s3_vga_device
 
-class s3_vga_device :  public ati_vga_device
+class s3_vga_device : public ati_vga_device
 {
 public:
 	// construction/destruction
 	s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	s3_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual READ8_MEMBER(port_03b0_r) override;
 	virtual WRITE8_MEMBER(port_03b0_w) override;
@@ -567,14 +587,18 @@ public:
 
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
-	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb) override;
 
 	ibm8514a_device* get_8514() { return m_8514; }
+
 protected:
+	s3_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
+
 	struct
 	{
 		uint8_t memory_config;
@@ -633,7 +657,7 @@ private:
 };
 
 // device type definition
-extern const device_type S3_VGA;
+DECLARE_DEVICE_TYPE(S3_VGA, s3_vga_device)
 
 // ======================> gamtor_vga_device
 
@@ -656,7 +680,7 @@ public:
 
 
 // device type definition
-extern const device_type GAMTOR_VGA;
+DECLARE_DEVICE_TYPE(GAMTOR_VGA, gamtor_vga_device)
 
 /*
   pega notes (paradise)
@@ -699,4 +723,4 @@ extern const device_type GAMTOR_VGA;
 */
 
 
-#endif /* PC_VGA_H */
+#endif // MAME_VIDEO_PC_VGA_H

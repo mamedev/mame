@@ -7,14 +7,16 @@
 **********************************************************************/
 
 
+#include "emu.h"
 #include "m2105.h"
+#include "speaker.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-const device_type ELECTRON_M2105 = &device_creator<electron_m2105_device>;
+DEFINE_DEVICE_TYPE(ELECTRON_M2105, electron_m2105_device, "electron_m2105", "Acorn M2105 Expansion")
 
 
 //-------------------------------------------------
@@ -49,14 +51,14 @@ ROM_END
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( m2105 )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( m2105 )
+MACHINE_CONFIG_START(electron_m2105_device::device_add_mconfig)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_INPUT_MERGER_ACTIVE_HIGH("irqs")
+	MCFG_INPUT_MERGER_ANY_HIGH("irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(electron_m2105_device, intrq_w))
 
 	/* system via */
@@ -65,7 +67,7 @@ static MACHINE_CONFIG_FRAGMENT( m2105 )
 	MCFG_VIA6522_READPB_HANDLER(READ8(electron_m2105_device, m2105_via_system_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(electron_m2105_device, m2105_via_system_write_porta))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(electron_m2105_device, m2105_via_system_write_portb))*/
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_active_high_device, in0_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<0>))
 
 	/* user via */
 	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
@@ -73,16 +75,16 @@ static MACHINE_CONFIG_FRAGMENT( m2105 )
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	//MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(electron_m2105_device, m2105_via_user_write_portb))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_active_high_device, in1_w))
+	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
 
 	/* duart */
-	MCFG_MC68681_ADD("sc2681", XTAL_3_6864MHz)
-	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("irqs", input_merger_active_high_device, in2_w))
+	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_3_6864MHz)
+	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("irqs", input_merger_device, in_w<2>))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	//MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(electron_m2105_device, sio_out_w))
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sc2681", mc68681_device, rx_a_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_a_w))
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
@@ -95,17 +97,6 @@ static MACHINE_CONFIG_FRAGMENT( m2105 )
 	MCFG_TMS52XX_SPEECHROM("vsm")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
-
-
-//-------------------------------------------------
-//  machine_config_additions - device-specific
-//  machine configurations
-//-------------------------------------------------
-
-machine_config_constructor electron_m2105_device::device_mconfig_additions() const
-{
-	return MACHINE_CONFIG_NAME( m2105 );
-}
 
 const tiny_rom_entry *electron_m2105_device::device_rom_region() const
 {
@@ -121,15 +112,16 @@ const tiny_rom_entry *electron_m2105_device::device_rom_region() const
 //-------------------------------------------------
 
 electron_m2105_device::electron_m2105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELECTRON_M2105, "Acorn M2105 Expansion", tag, owner, clock, "electron_m2105", __FILE__),
-		device_electron_expansion_interface(mconfig, *this),
-		m_exp_rom(*this, "exp_rom"),
-		m_via6522_0(*this, "via6522_0"),
-		m_via6522_1(*this, "via6522_1"),
-		m_duart(*this, "sc2681"),
-		m_tms(*this, "tms5220"),
-		m_centronics(*this, "centronics"),
-		m_irqs(*this, "irqs")
+	: device_t(mconfig, ELECTRON_M2105, tag, owner, clock)
+	, device_electron_expansion_interface(mconfig, *this)
+	, m_exp_rom(*this, "exp_rom")
+	, m_via6522_0(*this, "via6522_0")
+	, m_via6522_1(*this, "via6522_1")
+	, m_duart(*this, "duart")
+	, m_tms(*this, "tms5220")
+	, m_centronics(*this, "centronics")
+	, m_irqs(*this, "irqs")
+	, m_romsel(0)
 {
 }
 
@@ -139,12 +131,7 @@ electron_m2105_device::electron_m2105_device(const machine_config &mconfig, cons
 
 void electron_m2105_device::device_start()
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
-
-	space.install_readwrite_handler(0xfc40, 0xfc5f, READ8_DEVICE_DELEGATE(m_via6522_1, via6522_device, read), WRITE8_DEVICE_DELEGATE(m_via6522_1, via6522_device, write));
-	space.install_readwrite_handler(0xfc60, 0xfc6f, READ8_DEVICE_DELEGATE(m_duart, mc68681_device, read), WRITE8_DEVICE_DELEGATE(m_duart, mc68681_device, write));
-	space.install_readwrite_handler(0xfc70, 0xfc8f, READ8_DEVICE_DELEGATE(m_via6522_0, via6522_device, read), WRITE8_DEVICE_DELEGATE(m_via6522_0, via6522_device, write));
 }
 
 //-------------------------------------------------
@@ -153,10 +140,74 @@ void electron_m2105_device::device_start()
 
 void electron_m2105_device::device_reset()
 {
-	machine().root_device().membank("bank2")->configure_entry(12, memregion("exp_rom")->base() + 0x0000);
-	machine().root_device().membank("bank2")->configure_entry(13, memregion("exp_rom")->base() + 0x4000);
-	machine().root_device().membank("bank2")->configure_entry( 0, memregion("exp_rom")->base() + 0x8000);
-	machine().root_device().membank("bank2")->configure_entry( 2, memregion("exp_rom")->base() + 0xc000);
+}
+
+//-------------------------------------------------
+//  expbus_r - expansion data read
+//-------------------------------------------------
+
+uint8_t electron_m2105_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
+{
+	if (offset >= 0x8000 && offset < 0xc000)
+	{
+		switch (m_romsel)
+		{
+		case 0:
+			data = memregion("exp_rom")->base()[0x8000 + (offset & 0x3fff)];
+			break;
+		case 2:
+			data = memregion("exp_rom")->base()[0xc000 + (offset & 0x3fff)];
+			break;
+		case 12:
+			data = memregion("exp_rom")->base()[0x0000 + (offset & 0x3fff)];
+			break;
+		case 13:
+			data = memregion("exp_rom")->base()[0x4000 + (offset & 0x3fff)];
+			break;
+		}
+	}
+	else if (offset >= 0xfc40 && offset < 0xfc60)
+	{
+		data = m_via6522_1->read(space, offset);
+	}
+	else if (offset >= 0xfc60 && offset < 0xfc70)
+	{
+		data = m_duart->read(space, offset & 0x0f);
+	}
+	else if (offset >= 0xfc70 && offset < 0xfc90)
+	{
+		data = m_via6522_0->read(space, offset);
+	}
+
+	return data;
+}
+
+//-------------------------------------------------
+//  expbus_w - expansion data write
+//-------------------------------------------------
+
+void electron_m2105_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
+{
+	if (offset >= 0x8000 && offset < 0xc000)
+	{
+		logerror("write ram bank %d\n", m_romsel);
+	}
+	else if (offset >= 0xfc40 && offset < 0xfc60)
+	{
+		m_via6522_1->write(space, offset, data);
+	}
+	else if (offset >= 0xfc60 && offset < 0xfc70)
+	{
+		m_duart->write(space, offset & 0x0f, data);
+	}
+	else if (offset >= 0xfc70 && offset < 0xfc90)
+	{
+		m_via6522_0->write(space, offset, data);
+	}
+	else if (offset == 0xfe05)
+	{
+		m_romsel = data & 0x0f;
+	}
 }
 
 

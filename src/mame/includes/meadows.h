@@ -5,10 +5,10 @@
     Meadows S2650 hardware
 
 *************************************************************************/
-#include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
+#include "screen.h"
 
 class meadows_state : public driver_device
 {
@@ -71,4 +71,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip);
 	void meadows_sh_update();
 	SAMPLES_START_CB_MEMBER(meadows_sh_start);
+	void bowl3d(machine_config &config);
+	void meadows(machine_config &config);
+	void minferno(machine_config &config);
 };

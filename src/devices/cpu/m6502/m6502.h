@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef __M6502FAM_H__
-#define __M6502FAM_H__
+#ifndef MAME_CPU_M6502_M6502_H
+#define MAME_CPU_M6502_M6502_H
 
 #define MCFG_M6502_DISABLE_DIRECT() \
 	downcast<m6502_device *>(device)->disable_direct();
@@ -27,7 +27,6 @@ public:
 	};
 
 	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	m6502_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	bool get_sync() const { return sync; }
 	void disable_direct() { direct_disabled = true; }
@@ -37,10 +36,12 @@ public:
 	devcb_write_line sync_w;
 
 protected:
+	m6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	class memory_interface {
 	public:
 		address_space *program, *sprogram;
-		direct_read_data *direct, *sdirect;
+		direct_read_data<0> *direct, *sdirect;
 
 		virtual ~memory_interface() {}
 		virtual uint8_t read(uint16_t adr) = 0;
@@ -67,47 +68,8 @@ protected:
 		virtual uint8_t read_arg(uint16_t adr) override;
 	};
 
-	struct disasm_entry {
-		const char *opcode;
-		int mode;
-		offs_t flags;
-	};
-
 	enum {
 		STATE_RESET = 0xff00
-	};
-
-	enum {
-		DASM_non,    /* no additional arguments */
-		DASM_aba,    /* absolute */
-		DASM_abx,    /* absolute + X */
-		DASM_aby,    /* absolute + Y */
-		DASM_acc,    /* accumulator */
-		DASM_adr,    /* absolute address (jmp,jsr) */
-		DASM_bzp,    /* zero page with bit selection */
-		DASM_iax,    /* indirect + X (65c02 jmp) */
-		DASM_idx,    /* zero page pre indexed */
-		DASM_idy,    /* zero page post indexed */
-		DASM_idz,    /* zero page post indexed (65ce02) */
-		DASM_imm,    /* immediate */
-		DASM_imp,    /* implicit */
-		DASM_ind,    /* indirect (jmp) */
-		DASM_isy,    /* zero page pre indexed sp and post indexed Y (65ce02) */
-		DASM_iw2,    /* immediate word (65ce02) */
-		DASM_iw3,    /* augment (65ce02) */
-		DASM_rel,    /* relative */
-		DASM_rw2,    /* relative word (65cs02, 65ce02) */
-		DASM_zpb,    /* zero page and branch (65c02 bbr, bbs) */
-		DASM_zpg,    /* zero page */
-		DASM_zpi,    /* zero page indirect (65c02) */
-		DASM_zpx,    /* zero page + X */
-		DASM_zpy,    /* zero page + Y */
-		DASM_imz,    /* load immediate byte, store to zero page address (M740) */
-		DASM_spg,    /* "special page": implied FF00 OR immediate value (M740)*/
-		DASM_biz,    /* bit, zero page (M740) */
-		DASM_bzr,    /* bit, zero page, relative offset (M740) */
-		DASM_bar,    /* bit, accumulator, relative offset (M740) */
-		DASM_bac     /* bit, accumulator (M740) */
 	};
 
 	enum {
@@ -136,7 +98,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_import(const device_state_entry &entry) override;
@@ -144,9 +106,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	address_space_config program_config, sprogram_config;
 
@@ -163,16 +123,12 @@ protected:
 	uint8_t   IR;                     /* Prefetched instruction register */
 	int     inst_state_base;        /* Current instruction bank */
 
-	memory_interface *mintf;
+	std::unique_ptr<memory_interface> mintf;
 	int inst_state, inst_substate;
 	int icount;
 	bool nmi_state, irq_state, apu_irq_state, v_state;
 	bool irq_taken, sync, direct_disabled, inhibit_interrupts;
 
-	static const disasm_entry disasm_entries[0x100];
-
-	offs_t disassemble_generic(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table);
-	offs_t disassemble_generic(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table);
 	uint8_t read(uint16_t adr) { return mintf->read(adr); }
 	uint8_t read_9(uint16_t adr) { return mintf->read_9(adr); }
 	void write(uint16_t adr, uint8_t val) { mintf->write(adr, val); }
@@ -328,6 +284,6 @@ enum {
 	M6502_SET_OVERFLOW = m6502_device::V_LINE
 };
 
-extern const device_type M6502;
+DECLARE_DEVICE_TYPE(M6502, m6502_device)
 
-#endif
+#endif // MAME_CPU_M6502_M6502_H

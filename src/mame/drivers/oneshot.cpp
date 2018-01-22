@@ -4,6 +4,8 @@
    Driver by David Haywood and Paul Priest
    Dip Switches and Inputs by stephh
 
+Hardware identified by Tuning manual as "VISYS-Board(R) (Video-System-Board)"
+
 Notes :
   - The YM3812 is used only for timing. All sound is played with ADPCM samples.
 
@@ -36,12 +38,17 @@ NOTE: An eBay auction of the PCB shows "1996.9.16 PROMAT" on the JAMMA+ adapter 
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/oneshot.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "sound/okim6295.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 
 READ16_MEMBER(oneshot_state::oneshot_in0_word_r)
 {
@@ -105,7 +112,7 @@ WRITE16_MEMBER(oneshot_state::soundbank_w)
 static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16, oneshot_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x0c0000, 0x0c07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x120000, 0x120fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(oneshot_mid_videoram_w) AM_SHARE("mid_videoram") // some people , girl etc.
 	AM_RANGE(0x181000, 0x181fff) AM_RAM_WRITE(oneshot_fg_videoram_w) AM_SHARE("fg_videoram") // credits etc.
@@ -278,21 +285,22 @@ static INPUT_PORTS_START( maddonna )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
+	// "Very important ! (Sehr WICHTIG) 4-Way Joystick !!!" (Tuning manual)
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -352,7 +360,7 @@ void oneshot_state::machine_reset()
 	m_p2_wobble = 0;
 }
 
-static MACHINE_CONFIG_START( oneshot, oneshot_state )
+MACHINE_CONFIG_START(oneshot_state::oneshot)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
@@ -384,11 +392,11 @@ static MACHINE_CONFIG_START( oneshot, oneshot_state )
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maddonna, oneshot )
+MACHINE_CONFIG_DERIVED(oneshot_state::maddonna, oneshot)
 
 	/* basic machine hardware */
 
@@ -486,6 +494,6 @@ ROM_END
 
 
 
-GAME( 1995, maddonna, 0,        maddonna, maddonna, driver_device, 0, ROT0, "Tuning",  "Mad Donna (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, maddonnb, maddonna, maddonna, maddonna, driver_device, 0, ROT0, "Tuning",  "Mad Donna (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, oneshot,  0,        oneshot,  oneshot , driver_device, 0, ROT0, "Promat",  "One Shot One Kill", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, maddonna, 0,        maddonna, maddonna, oneshot_state, 0, ROT0, "Tuning",  "Mad Donna (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, maddonnb, maddonna, maddonna, maddonna, oneshot_state, 0, ROT0, "Tuning",  "Mad Donna (set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, oneshot,  0,        oneshot,  oneshot , oneshot_state, 0, ROT0, "Promat",  "One Shot One Kill", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

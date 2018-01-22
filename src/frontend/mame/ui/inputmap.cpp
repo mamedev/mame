@@ -45,7 +45,7 @@ menu_input_groups::menu_input_groups(mame_ui_manager &mui, render_container &con
 {
 }
 
-void menu_input_groups::populate()
+void menu_input_groups::populate(float &customtop, float &custombottom)
 {
 	int player;
 
@@ -88,7 +88,7 @@ menu_input_general::menu_input_general(mame_ui_manager &mui, render_container &c
 	group = _group;
 }
 
-void menu_input_general::populate()
+void menu_input_general::populate(float &customtop, float &custombottom)
 {
 	input_item_data *itemlist = nullptr;
 	int suborder[SEQ_TYPE_TOTAL];
@@ -151,7 +151,7 @@ menu_input_specific::menu_input_specific(mame_ui_manager &mui, render_container 
 {
 }
 
-void menu_input_specific::populate()
+void menu_input_specific::populate(float &customtop, float &custombottom)
 {
 	input_item_data *itemlist = nullptr;
 	int suborder[SEQ_TYPE_TOTAL];
@@ -426,7 +426,7 @@ void menu_input::populate_and_sort(input_item_data *itemlist)
 			text = "(" + text + ")";
 
 		/* if we're polling this item, use some spaces with left/right arrows */
-		if (pollingref == item->ref)
+		if (pollingref == item->ref && pollingseq == item->seqtype)
 		{
 			subtext.assign("   ");
 			flags |= FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
@@ -538,7 +538,7 @@ menu_settings::menu_settings(mame_ui_manager &mui, render_container &container, 
 	type = _type;
 }
 
-void menu_settings::populate()
+void menu_settings::populate(float &customtop, float &custombottom)
 {
 	dip_descriptor **diplist_tailptr;
 	std::string prev_owner;
@@ -554,27 +554,30 @@ void menu_settings::populate()
 		for (ioport_field &field : port.second->fields())
 			if (field.type() == type && field.enabled())
 			{
-				uint32_t flags = 0;
-
-				/* set the left/right flags appropriately */
-				if (field.has_previous_setting())
-					flags |= FLAG_LEFT_ARROW;
-				if (field.has_next_setting())
-					flags |= FLAG_RIGHT_ARROW;
-
-				/* add the menu item */
-				if (strcmp(field.device().tag(), prev_owner.c_str()) != 0)
+				if (!field.settings().empty())
 				{
-					if (first_entry)
-						first_entry = false;
-					else
-						item_append(menu_item_type::SEPARATOR);
-					string_format("[root%s]", field.device().tag());
-					item_append(string_format("[root%s]", field.device().tag()), "", 0, nullptr);
-					prev_owner.assign(field.device().tag());
-				}
+					uint32_t flags = 0;
 
-				item_append(field.name(), field.setting_name(), flags, (void *)&field);
+					/* set the left/right flags appropriately */
+					if (field.has_previous_setting())
+						flags |= FLAG_LEFT_ARROW;
+					if (field.has_next_setting())
+						flags |= FLAG_RIGHT_ARROW;
+
+					/* add the menu item */
+					if (strcmp(field.device().tag(), prev_owner.c_str()) != 0)
+					{
+						if (first_entry)
+							first_entry = false;
+						else
+							item_append(menu_item_type::SEPARATOR);
+						string_format("[root%s]", field.device().tag());
+						item_append(string_format("[root%s]", field.device().tag()), "", 0, nullptr);
+						prev_owner.assign(field.device().tag());
+					}
+
+					item_append(field.name(), field.setting_name(), flags, (void *)&field);
+				}
 
 				/* for DIP switches, build up the model */
 				if (type == IPT_DIPSWITCH && !field.diplocations().empty())
@@ -812,7 +815,7 @@ menu_analog::menu_analog(mame_ui_manager &mui, render_container &container) : me
 {
 }
 
-void menu_analog::populate()
+void menu_analog::populate(float &customtop, float &custombottom)
 {
 	std::string prev_owner;
 	bool first_entry = true;

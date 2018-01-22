@@ -1,8 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, Alex W. Jackson
 /* ASG 971222 -- rewrote this interface */
-#ifndef __NEC_V25_H_
-#define __NEC_V25_H_
+#ifndef MAME_CPU_NEC_V25_H
+#define MAME_CPU_NEC_V25_H
+
+#pragma once
 
 
 #define NEC_INPUT_LINE_INTP0 10
@@ -15,6 +17,7 @@ enum
 	V25_PC=0,
 	V25_IP, V25_AW, V25_CW, V25_DW, V25_BW, V25_SP, V25_BP, V25_IX, V25_IY,
 	V25_FLAGS, V25_ES, V25_CS, V25_SS, V25_DS,
+	V25_IDB,
 	V25_PENDING
 };
 
@@ -48,24 +51,24 @@ enum
 class v25_common_device : public cpu_device
 {
 public:
-	// construction/destruction
-	v25_common_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
-
 	// static configuration helpers
 	static void set_decryption_table(device_t &device, const uint8_t *decryption_table) { downcast<v25_common_device &>(device).m_v25v35_decryptiontable = decryption_table; }
 
-	template<class _Object> static devcb_base & set_pt_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_pt_in.set_callback(object); }
-	template<class _Object> static devcb_base & set_p0_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p0_in.set_callback(object); }
-	template<class _Object> static devcb_base & set_p1_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p1_in.set_callback(object); }
-	template<class _Object> static devcb_base & set_p2_in_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p2_in.set_callback(object); }
+	template <class Object> static devcb_base & set_pt_in_cb(device_t &device, Object &&cb) { return downcast<v25_common_device &>(device).m_pt_in.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base & set_p0_in_cb(device_t &device, Object &&cb) { return downcast<v25_common_device &>(device).m_p0_in.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base & set_p1_in_cb(device_t &device, Object &&cb) { return downcast<v25_common_device &>(device).m_p1_in.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base & set_p2_in_cb(device_t &device, Object &&cb) { return downcast<v25_common_device &>(device).m_p2_in.set_callback(std::forward<Object>(cb)); }
 
-	template<class _Object> static devcb_base & set_p0_out_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p0_out.set_callback(object); }
-	template<class _Object> static devcb_base & set_p1_out_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p1_out.set_callback(object); }
-	template<class _Object> static devcb_base & set_p2_out_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p2_out.set_callback(object); }
+	template <class Object> static devcb_base & set_p0_out_cb(device_t &device, Object &&cb) { return downcast<v25_common_device &>(device).m_p0_out.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base & set_p1_out_cb(device_t &device, Object &&cb) { return downcast<v25_common_device &>(device).m_p1_out.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base & set_p2_out_cb(device_t &device, Object &&cb) { return downcast<v25_common_device &>(device).m_p2_out.set_callback(std::forward<Object>(cb)); }
 
 	TIMER_CALLBACK_MEMBER(v25_timer_callback);
 
 protected:
+	// construction/destruction
+	v25_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, offs_t fetch_xor, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -82,7 +85,7 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr); }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -90,20 +93,18 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-/* internal RAM and register banks */
-union internalram
-{
-	uint16_t w[128];
-	uint8_t  b[256];
-};
+	/* internal RAM and register banks */
+	union internalram
+	{
+		uint16_t w[128];
+		uint8_t  b[256];
+	};
 
 	internalram m_ram;
 	offs_t  m_fetch_xor;
@@ -140,7 +141,7 @@ union internalram
 	uint32_t  m_IDB;
 
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_io;
 	int     m_icount;
 
@@ -487,8 +488,8 @@ public:
 };
 
 
-extern const device_type V25;
-extern const device_type V35;
+DECLARE_DEVICE_TYPE(V25, v25_device)
+DECLARE_DEVICE_TYPE(V35, v35_device)
 
 
-#endif
+#endif // MAME_CPU_NEC_V25_H

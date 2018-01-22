@@ -47,6 +47,7 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 
 #include "emu.h"
 #include "includes/fantland.h"
+
 #include "cpu/i86/i86.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
@@ -54,6 +55,8 @@ Year + Game             Main CPU    Sound CPU    Sound            Video
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "sound/ym2151.h"
+#include "speaker.h"
+
 
 /***************************************************************************
 
@@ -66,7 +69,7 @@ WRITE8_MEMBER(fantland_state::fantland_nmi_enable_w)
 	m_nmi_enable = data;
 
 	if ((m_nmi_enable != 0) && (m_nmi_enable != 8))
-		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", space.device().safe_pc(), data);
+		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", m_maincpu->pc(), data);
 }
 
 WRITE16_MEMBER(fantland_state::fantland_nmi_enable_16_w)
@@ -125,7 +128,7 @@ static ADDRESS_MAP_START( fantland_map, AS_PROGRAM, 16, fantland_state )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x08000, 0x7ffff ) AM_ROM
 
-	AM_RANGE( 0xa2000, 0xa21ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0xa2000, 0xa21ff ) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE( 0xa3000, 0xa3001 ) AM_READ_PORT("a3000") AM_WRITE(fantland_nmi_enable_16_w )
 	AM_RANGE( 0xa3002, 0xa3003 ) AM_READ_PORT("a3002") AM_WRITE(fantland_soundlatch_16_w )
@@ -145,7 +148,7 @@ static ADDRESS_MAP_START( galaxygn_map, AS_PROGRAM, 8, fantland_state )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
 
-	AM_RANGE( 0x52000, 0x521ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0x52000, 0x521ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE( 0x53000, 0x53000 ) AM_READ_PORT("P1") AM_WRITE(fantland_nmi_enable_w )
 	AM_RANGE( 0x53001, 0x53001 ) AM_READ_PORT("P2")
@@ -171,7 +174,7 @@ WRITE8_MEMBER(fantland_state::borntofi_nmi_enable_w)
 	// data & 0x31 changes when lightgun fires
 
 	if ((m_nmi_enable != 0) && (m_nmi_enable != 8))
-		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", space.device().safe_pc(), data);
+		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", m_maincpu->pc(), data);
 
 //  popmessage("%02X", data);
 }
@@ -237,7 +240,7 @@ static ADDRESS_MAP_START( borntofi_map, AS_PROGRAM, 8, fantland_state )
 	AM_RANGE( 0x00000, 0x07fff ) AM_RAM
 	AM_RANGE( 0x10000, 0x2ffff ) AM_ROM
 
-	AM_RANGE( 0x52000, 0x521ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0x52000, 0x521ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE( 0x53000, 0x53001 ) AM_READWRITE(borntofi_inputs_r, borntofi_nmi_enable_w )
 	AM_RANGE( 0x53002, 0x53002 ) AM_READ_PORT( "DSW" ) AM_WRITE(fantland_soundlatch_w )
 	AM_RANGE( 0x53003, 0x53003 ) AM_READ_PORT( "Controls" )
@@ -266,7 +269,7 @@ static ADDRESS_MAP_START( wheelrun_map, AS_PROGRAM, 8, fantland_state )
 	AM_RANGE(0x30000, 0x3ffff) AM_ROM
 	AM_RANGE(0x70000, 0x7ffff) AM_ROM
 
-	AM_RANGE(0x52000, 0x521ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x52000, 0x521ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0x53000, 0x53000) AM_READ_PORT( "53000" ) AM_WRITE(borntofi_nmi_enable_w )
 	AM_RANGE(0x53001, 0x53001) AM_READ_PORT( "53001" )
@@ -345,7 +348,7 @@ WRITE8_MEMBER(fantland_state::borntofi_msm5205_w)
 		{
 			case 0x00:      borntofi_adpcm_stop(msm, voice); break;
 			case 0x03:      borntofi_adpcm_start(msm, voice); break;
-			default:        logerror("CPU #0 PC = %04X: adpcm reg %d <- %02x\n", space.device().safe_pc(), reg, data);
+			default:        logerror("CPU #0 PC = %04X: adpcm reg %d <- %02x\n", m_audiocpu->pc(), reg, data);
 		}
 	}
 	else
@@ -836,7 +839,7 @@ INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x80 / 4);
 }
 
-static MACHINE_CONFIG_START( fantland, fantland_state )
+MACHINE_CONFIG_START(fantland_state::fantland)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8086, 8000000)        // ?
@@ -887,7 +890,7 @@ WRITE_LINE_MEMBER(fantland_state::galaxygn_sound_irq)
 	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
 
-static MACHINE_CONFIG_START( galaxygn, fantland_state )
+MACHINE_CONFIG_START(fantland_state::galaxygn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 8000000)        // ?
@@ -969,7 +972,7 @@ MACHINE_RESET_MEMBER(fantland_state,borntofi)
 	borntofi_adpcm_stop(m_msm4, 3);
 }
 
-static MACHINE_CONFIG_START( borntofi, fantland_state )
+MACHINE_CONFIG_START(fantland_state::borntofi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
@@ -1003,27 +1006,27 @@ static MACHINE_CONFIG_START( borntofi, fantland_state )
 	// OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_0))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_1))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("msm3", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_2))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("msm4", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(fantland_state, borntofi_adpcm_int_3))   /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz, 4 Bits  */
+	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( wheelrun, fantland_state )
+MACHINE_CONFIG_START(fantland_state::wheelrun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V20, XTAL_18MHz/2)      // D701080C-8 (V20)
@@ -1413,8 +1416,8 @@ ROM_START( wheelrun )
 ROM_END
 
 
-GAME( 19??, borntofi,  0,        borntofi, borntofi, driver_device, 0, ROT0,  "International Games",       "Born To Fight",        MACHINE_SUPPORTS_SAVE )
-GAME( 19??, fantland,  0,        fantland, fantland, driver_device, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, fantlanda, fantland, fantland, fantland, driver_device, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, driver_device, 0, ROT0,  "International Games",       "Wheels Runner",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, driver_device, 0, ROT90, "Electronic Devices Italy",  "Galaxy Gunners",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 19??, borntofi,  0,        borntofi, borntofi, fantland_state, 0, ROT0,  "International Games",       "Born To Fight",        MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantland,  0,        fantland, fantland, fantland_state, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, fantlanda, fantland, fantland, fantland, fantland_state, 0, ROT0,  "Electronic Devices Italy",  "Fantasy Land (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 19??, wheelrun,  0,        wheelrun, wheelrun, fantland_state, 0, ROT0,  "International Games",       "Wheels Runner",        MACHINE_SUPPORTS_SAVE )
+GAME( 1989, galaxygn,  0,        galaxygn, galaxygn, fantland_state, 0, ROT90, "Electronic Devices Italy",  "Galaxy Gunners",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -262,12 +262,15 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/wecleman.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
+#include "cpu/z80/z80.h"
 #include "sound/ym2151.h"
+#include "speaker.h"
+
 #include "wecleman.lh"
-#include "includes/wecleman.h"
 
 
 /***************************************************************************
@@ -331,7 +334,7 @@ WRITE16_MEMBER(wecleman_state::irqctrl_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		// logerror("CPU #0 - PC = %06X - $140005 <- %02X (old value: %02X)\n",space.device().safe_pc(), data&0xFF, old_data&0xFF);
+		// logerror("CPU #0 - PC = %06X - $140005 <- %02X (old value: %02X)\n",m_maincpu->pc(), data&0xFF, old_data&0xFF);
 
 		// Bit 0 : SUBINT
 		if ( (m_irqctrl & 1) && (!(data & 1)) ) // 1->0 transition
@@ -432,6 +435,7 @@ WRITE16_MEMBER(wecleman_state::blitter_w)
 	/* do a blit if $80010.b has been written */
 	if ( (offset == 0x10/2) && (ACCESSING_BITS_8_15) )
 	{
+		auto &mspace = m_maincpu->space(AS_PROGRAM);
 		/* 80000.b = ?? usually 0 - other values: 02 ; 00 - ? logic function ? */
 		/* 80001.b = ?? usually 0 - other values: 3f ; 01 - ? height ? */
 		int minterm  = ( m_blitter_regs[0x0/2] & 0xFF00 ) >> 8;
@@ -464,7 +468,7 @@ WRITE16_MEMBER(wecleman_state::blitter_w)
 			for ( ; size > 0 ; size--)
 			{
 				/* maybe slower than a memcpy but safer (and errors are logged) */
-				space.write_word(dest, space.read_word(src));
+				mspace.write_word(dest, mspace.read_word(src));
 				src += 2;
 				dest += 2;
 			}
@@ -477,23 +481,23 @@ WRITE16_MEMBER(wecleman_state::blitter_w)
 				int i, j, destptr;
 
 				/* Read offset of source from the list of blits */
-				i = src + space.read_word(list+2);
+				i = src + mspace.read_word(list+2);
 				j = i + (size<<1);
 				destptr = dest;
 
 				for (; i<j; destptr+=2, i+=2)
-					space.write_word(destptr, space.read_word(i));
+					mspace.write_word(destptr, mspace.read_word(i));
 
 				destptr = dest + 14;
-				i = space.read_word(list) + m_spr_color_offs;
-				space.write_word(destptr, i);
+				i = mspace.read_word(list) + m_spr_color_offs;
+				mspace.write_word(destptr, i);
 
 				dest += 16;
 				list += 4;
 			}
 
 			/* hack for the blit to Sprites RAM - Sprite list end-marker */
-			space.write_word(dest, 0xFFFF);
+			mspace.write_word(dest, 0xFFFF);
 		}
 	}
 }
@@ -639,10 +643,10 @@ WRITE8_MEMBER(wecleman_state::wecleman_K00723216_bank_w)
 static ADDRESS_MAP_START( wecleman_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x8500, 0x8500) AM_WRITENOP    // incresed with speed (global volume)?
-	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)    // Protection
-	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)   // Protection
-	AM_RANGE(0x9006, 0x9006) AM_WRITENOP    // ?
+	AM_RANGE(0x8500, 0x8500) AM_WRITENOP            // increased with speed (global volume)?
+	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)    // 007452: Protection
+	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)   // 007452: Protection
+	AM_RANGE(0x9006, 0x9006) AM_WRITENOP            // 007452: ?
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From main CPU
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write) // K007232 (Reading offset 5/b triggers the sample)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
@@ -1066,7 +1070,7 @@ MACHINE_RESET_MEMBER(wecleman_state,wecleman)
 	m_k007232->set_bank( 0, 1 );
 }
 
-static MACHINE_CONFIG_START( wecleman, wecleman_state )
+MACHINE_CONFIG_START(wecleman_state::wecleman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* Schems show 10MHz */
@@ -1137,7 +1141,7 @@ MACHINE_RESET_MEMBER(wecleman_state,hotchase)
 }
 
 
-static MACHINE_CONFIG_START( hotchase, wecleman_state )
+MACHINE_CONFIG_START(wecleman_state::hotchase)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
@@ -1147,7 +1151,7 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 	MCFG_CPU_ADD("sub", M68000, 10000000)   /* 10 MHz - PCB is drawn in one set's readme */
 	MCFG_CPU_PROGRAM_MAP(hotchase_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", M6809, 3579545 / 2)    /* 3.579/2 MHz - PCB is drawn in one set's readme */
+	MCFG_CPU_ADD("audiocpu", MC6809E, 3579545 / 2)    /* 3.579/2 MHz - PCB is drawn in one set's readme */
 	MCFG_CPU_PROGRAM_MAP(hotchase_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(wecleman_state, hotchase_sound_timer,  496)
 
@@ -1257,9 +1261,9 @@ ROM_END
 
 ROM_START( weclemana )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU Code */
-	// I doubt these labels are correct, or one set of roms is bad.
-	ROM_LOAD16_BYTE( "602f08.17h", 0x00000, 0x10000, CRC(43241265) SHA1(3da1ed0d15b03845c07f07ec6838ce160d81633d) ) // only 17h and 23h differ slightly from parent
-	ROM_LOAD16_BYTE( "602f11.23h", 0x00001, 0x10000, CRC(3ea7dae0) SHA1(d33d67f4cc65a7680e5f43407136b75512a10230) ) // "
+	// I doubt these labels are correct, or one set of roms is bad (17h and 23h differ slightly from parent)
+	ROM_LOAD16_BYTE( "602f08.17h", 0x00000, 0x10000, CRC(43241265) SHA1(3da1ed0d15b03845c07f07ec6838ce160d81633d) ) // sldh
+	ROM_LOAD16_BYTE( "602f11.23h", 0x00001, 0x10000, CRC(3ea7dae0) SHA1(d33d67f4cc65a7680e5f43407136b75512a10230) ) // sldh
 	ROM_LOAD16_BYTE( "602a09.18h", 0x20000, 0x10000, CRC(8a9d756f) SHA1(12605e86ce29e6300b5400720baac7b0293d9e66) )
 	ROM_LOAD16_BYTE( "602a10.22h", 0x20001, 0x10000, CRC(569f5001) SHA1(ec2dd331a279083cf847fbbe71c017038a1d562a) )
 
@@ -1383,7 +1387,7 @@ void wecleman_state::bitswap(uint8_t *src,size_t len,int _14,int _13,int _12,int
 	for (i = 0;i < len;i++)
 	{
 		src[i] =
-			buffer[BITSWAP24(i,23,22,21,_14,_13,_12,_11,_10,_f,_e,_d,_c,_b,_a,_9,_8,_7,_6,_5,_4,_3,_2,_1,_0)];
+			buffer[::bitswap<24>(i,23,22,21,_14,_13,_12,_11,_10,_f,_e,_d,_c,_b,_a,_9,_8,_7,_6,_5,_4,_3,_2,_1,_0)];
 	}
 }
 
@@ -1409,7 +1413,7 @@ DRIVER_INIT_MEMBER(wecleman_state,wecleman)
 		/* TODO: could be wrong, colors have to be fixed.       */
 		/* The only certain thing is that 87 must convert to f0 */
 		/* otherwise stray lines appear, made of pens 7 & 8     */
-		RAM[i] = BITSWAP8(RAM[i],7,0,1,2,3,4,5,6);
+		RAM[i] = ::bitswap<8>(RAM[i],7,0,1,2,3,4,5,6);
 	}
 
 	bitswap(memregion("gfx1")->base(), memregion("gfx1")->bytes(),

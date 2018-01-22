@@ -83,14 +83,16 @@ TODO :  This is a partially working driver.  Most of the memory maps for
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "cpu/i860/i860.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
-#include "video/tlc34076.h"
 #include "video/mc6845.h"
+#include "video/tlc34076.h"
 #include "rendlay.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 class vcombat_state : public driver_device
@@ -136,6 +138,8 @@ public:
 	required_device<i860_cpu_device> m_vid_0;
 	optional_device<i860_cpu_device> m_vid_1;
 	required_device<dac_word_interface> m_dac;
+	void shadfgtr(machine_config &config);
+	void vcombat(machine_config &config);
 };
 
 uint32_t vcombat_state::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
@@ -541,7 +545,7 @@ WRITE_LINE_MEMBER(vcombat_state::sound_update)
 	m_soundcpu->set_input_line(M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( vcombat, vcombat_state )
+MACHINE_CONFIG_START(vcombat_state::vcombat)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
@@ -589,7 +593,7 @@ static MACHINE_CONFIG_START( vcombat, vcombat_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( shadfgtr, vcombat_state )
+MACHINE_CONFIG_START(vcombat_state::shadfgtr)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
@@ -680,6 +684,6 @@ ROM_START( shadfgtr )
 	/* The second upper-board PAL couldn't be read */
 ROM_END
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT      MONITOR COMPANY      FULLNAME           FLAGS */
-GAME( 1993, vcombat,  0,      vcombat,  vcombat, vcombat_state,  vcombat,  ORIENTATION_FLIP_X,  "VR8 Inc.",     "Virtual Combat",  MACHINE_NOT_WORKING )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT      MONITOR              COMPANY         FULLNAME           FLAGS
+GAME( 1993, vcombat,  0,      vcombat,  vcombat,  vcombat_state, vcombat,  ORIENTATION_FLIP_X,  "VR8 Inc.",     "Virtual Combat",  MACHINE_NOT_WORKING )
 GAME( 1993, shadfgtr, 0,      shadfgtr, shadfgtr, vcombat_state, shadfgtr, ROT0,                "Dutech Inc.",  "Shadow Fighters", MACHINE_NOT_WORKING )

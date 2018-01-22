@@ -6,7 +6,81 @@
 #include "imagedev/chd_cd.h"
 
 /*
-    Dimm board registers (add more information if you find it):
+
+  GPIO pins(main board: EEPROM, DIMM SPDs, option board: PIC16, JPs)
+   |
+  SH4 <-> 315-6154 <-> PCI bus -> Sega 315-6322 -> Host system interface (NAOMI, Triforce, Chihiro)
+   |         |                                  -> 2x DIMM RAM modules
+  RAM       RAM                -> Altera (PCI IDE Bus Master Controller) -> IDE bus -> GD-ROM or CF
+ 16MB       4MB                -> PCnet-FAST III -> Ethernet
+
+315-6154 - SH4 CPU to PCI bridge and SDRAM controller, also used in Sega Hikaru (2x)
+315-6322 - DIMM SDRAM controller, DES decryption, host system communication
+
+ SH4 address space
+-------------------
+00000000 - 001FFFFF Flash ROM (1st half - stock firmware, 2nd half - updated firmware)
+04000000 - 040000FF memory/PCI bridge registers (Sega 315-6154)
+0C000000 - 0CFFFFFF SH4 local RAM
+10000000 - 103FFFFF memory/PCI controller RAM
+14000000 - 1BFFFFFF 8x banked pages
+
+internal / PCI memory space
+-------------------
+00000000 - 000000FF DIMM controller registers (Sega 315-6322)
+10000000 - 4FFFFFFF DIMM memory, upto 1GB (if register 28 bit 1 is 0, otherwise some unknown MMIO)
+70000000 - 70FFFFFF SH4 local RAM
+78000000 - 783FFFFF 315-6154 PCI bridge RAM
+C00001xx   IDE registers                 \
+C00003xx   IDE registers                  | software configured in VxWorks, preconfigured or hardcoded in 1.02
+C000CCxx   IDE Bus Master DMA registers  /
+C1xxxxxx   Network registers
+
+PCI configuration space (enabled using memctl 1C reg)
+-------------------
+00000000 - 00000FFF unknown, write 142 to reg 04 at very start
+00001000 - 00001FFF PCI IDE controller (upper board Altera Flex) Vendor 11db Device 189d
+00002000 - 00002FFF AMD AM79C973BVC PCnet-FAST III Network
+
+DIMM controller registers
+-------------------
+14 5F703C |
+18 5F7040 |
+1C 5F7044 | 16bit  4x Communication registers
+20 5F7048 |
+24 5F704C   16bit  Interrupt register
+                   -------c ---b---a
+                    a - IRQ to DIMM (SH4 IRL3): 0 set / 1 clear
+                    b - unk, mask of a ???
+                    c - IRQ to NAOMI (HOLLY EXT 3): 0 set / 1 clear (write 0 from NAOMI seems ignored)
+
+28          16bit  dddd---c ------ba
+                    a - 0->1 NAOMI reset
+                    b - 1 seems disable DIMM RAM access, followed by write 01010101 to bank 10 offset 000110 or 000190 (some MMIO?)
+                    c - unk, set to 1 in VxWorks, 0 in 1.02
+                    d - unk, checked for == 1 in 1.02
+
+2A           8bit  possible DES decryption area size 8 MSB bits (16MB units number)
+                   VxWorks firmwares set this to ((DIMMsize >> 24) - 1), 1.02 set it to FF
+
+2C          32bit  SDRAM config
+30          32bit  DES key low
+34          32bit  DES key high
+
+SH4 IO port A bits
+-------------------
+9 select input, 0 - main/lower board, 1 - option/upper board (IDE, Net, PIC)
+     0             1
+0 DIMM SPD clk   JP? 0 - enable IDE
+1 DIMM SPD data  JP? 0 - enable Network
+2 93C46 DI       PIC16 D0
+3 93C46 CS       PIC16 D1
+4 93C46 CLK      PIC16 D2
+5 93C46 DO       PIC16 CLK
+
+
+
+    Dimm board communication registers software level usage:
 
     Name:                   Naomi   Dimm Bd.
     NAOMI_DIMM_COMMAND    = 5f703c  14000014 (16 bit):
@@ -24,7 +98,7 @@
 
 */
 
-const device_type NAOMI_GDROM_BOARD = &device_creator<naomi_gdrom_board>;
+DEFINE_DEVICE_TYPE(NAOMI_GDROM_BOARD, naomi_gdrom_board, "segadimm", "Sega DIMM Board")
 
 const uint32_t naomi_gdrom_board::DES_LEFTSWAP[] = {
 	0x00000000, 0x00000001, 0x00000100, 0x00000101, 0x00010000, 0x00010001, 0x00010100, 0x00010101,
@@ -327,7 +401,7 @@ void naomi_gdrom_board::write_from_qword(uint8_t *region, uint64_t qword)
 }
 
 naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: naomi_board(mconfig, NAOMI_GDROM_BOARD, "Sega NAOMI GDROM Board", tag, owner, clock, "naomi_gdrom_board", __FILE__)
+	: naomi_board(mconfig, NAOMI_GDROM_BOARD, tag, owner, clock)
 {
 	image_tag = nullptr;
 	pic_tag = nullptr;
@@ -539,4 +613,49 @@ void naomi_gdrom_board::board_advance(uint32_t size)
 	dimm_cur_address += size;
 	if(dimm_cur_address >= dimm_data_size)
 		dimm_cur_address %= dimm_data_size;
+}
+
+// DIMM firmwares:
+//  FPR-23489C - 1.02 not VxWorks based, no network, can not be software updated to 2.xx+
+// Net-DIMM firmwares:
+// all VxWorkx based, can be updated up to 4.0x, actually 1MB in size, must have CRC32 FFFFFFFF, 1st MB of flash ROM contain stock version, 2nd MB have some updated version
+//  ?          - 2.03 factory only, introduced ALL.net features, so far was seen only as stock firmware in 1st half of flash ROM, factory updated to some newer ver in 2nd ROM half
+//  FPR23718   - 2.06 factory only, most common version of NAOMI Net-DIMMs, have stock 2.03, IC label need verification
+//  ?            2.13 factory or update (NAOMI VF4)
+//  ?            2.17 factory or update (NAOMI VF4 Evolution)
+//  ?          - 3.01 added network boot support, supports Triforce and Chihiro
+//  FPR23905   - 3.03 factory or update (NAOMI WCCF)
+//  ?            3.12 factory only
+//  ?            3.17 latest known 3.xx version, factory or update (NAOMI VF4 Final Tuned or statndalone disks for Chihiro and Triforce)
+// update only - 4.01 supports Compact Flash GD-ROM-replacement
+//              "4.02" hack of 4.01 with CF card vendor check disabled
+
+ROM_START( dimm )
+	ROM_REGION( 0x200000, "segadimm", 0)
+	// Altera FLEX EPF10K30 firmwares (implements PCI IDE controller)
+	ROM_LOAD("315-6301.ic11", 0x000000, 0x01ff01, NO_DUMP ) // GD-only DIMM
+	ROM_LOAD("315-6334.ic11", 0x000000, 0x01ff01, CRC(534c342d) SHA1(3e879f432c82305487922ab28c07107cf0f3c5cf) ) // Net-DIMM
+
+	// unused and/or unknown security PICs
+	// 253-5508-0352E 317-0352-EXP BFC.BIN unknown, presumable some mahjong game (MJ1 ?)
+	ROM_LOAD("317-0352-exp.pic", 0x00, 0x4000, CRC(b216fbfc) SHA1(da2341003b35d1600d63fbe34d13ff3b42bdc939) )
+	// 253-5508-0422J 317-0422-JPN BHE.BIN Quest of D undumped version, high likely 2.0x "Gofu no Keisyousya"
+	ROM_LOAD("317-0422-jpn.pic", 0x00, 0x4000, CRC(54197fbf) SHA1(a18b5b7aec0498c7a62cacf9f2298ddefb7482c9) )
+	// 253-5508-0456J 317-0456-JPN BEG.BIN WCCF 2005-2006 undumped Japan version
+	ROM_LOAD("317-0456-jpn.pic", 0x00, 0x4000, CRC(cf3bd834) SHA1(6236cdb780260d34c02806478a39c9f3432a45e8) )
+
+	// main firmwares
+	ROM_LOAD16_WORD_SWAP( "fpr-23489c.ic14", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468) )
+	ROM_LOAD16_WORD_SWAP( "203_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(6f55f1ae0606816a4eca6645ed36eb7f9c7ad9cf) )
+	ROM_LOAD16_WORD_SWAP( "fpr23718.ic36",   0x000000, 0x200000, CRC(a738ea1c) SHA1(b7b5a55a6a4cf0aa2df1b3dff62ff67f864c55e8) )
+	ROM_LOAD16_WORD_SWAP( "213_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(17131f318632610b87bc095156ffad4597fed4ca) )
+	ROM_LOAD16_WORD_SWAP( "217_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(e5a229ae7ed48b2955cad63529fd938c6db555e5) )
+	ROM_LOAD16_WORD_SWAP( "fpr23905.ic36",   0x000000, 0x200000, CRC(ffffffff) SHA1(acade4362807c7571b1c2a48ed6067e4bddd404b) )
+	ROM_LOAD16_WORD_SWAP( "317_312.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(31d698cd659446ee09a2eeedec6e4bc6a19d05e8) )
+	ROM_LOAD16_WORD_SWAP( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638) )
+ROM_END
+
+const tiny_rom_entry *naomi_gdrom_board::device_rom_region() const
+{
+	return ROM_NAME(dimm);
 }

@@ -71,17 +71,21 @@
 
 ***********************************************************************************/
 
+#include "emu.h"
+
+#include "cpu/mcs51/mcs51.h"
+#include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "video/tms9928a.h"
+
+#include "speaker.h"
+
+#include "re900.lh"
+
 
 #define MAIN_CLOCK      XTAL_11_0592MHz
 #define VDP_CLOCK       XTAL_10_730MHz
 #define TMS_CLOCK       VDP_CLOCK / 24
-
-#include "emu.h"
-#include "cpu/mcs51/mcs51.h"
-#include "video/tms9928a.h"
-#include "sound/ay8910.h"
-#include "machine/nvram.h"
-#include "re900.lh"
 
 
 class re900_state : public driver_device
@@ -116,6 +120,8 @@ public:
 	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
 
 	DECLARE_DRIVER_INIT(re900);
+	void re900(machine_config &config);
+	void bs94(machine_config &config);
 };
 
 
@@ -373,7 +379,7 @@ INPUT_PORTS_END
 *      Machine Driver      *
 ***************************/
 
-static MACHINE_CONFIG_START( re900, re900_state )
+MACHINE_CONFIG_START(re900_state::re900)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, MAIN_CLOCK)
@@ -399,7 +405,7 @@ static MACHINE_CONFIG_START( re900, re900_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bs94, re900 )
+MACHINE_CONFIG_DERIVED(re900_state::bs94, re900)
 
 	/* sound hardware   */
 	MCFG_SOUND_MODIFY("ay_re900")
@@ -448,6 +454,6 @@ DRIVER_INIT_MEMBER(re900_state,re900)
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME   PARENT MACHINE INPUT  INIT   ROT     COMPANY                    FULLNAME            FLAGS LAYOUT */
-GAMEL( 1993, re900, 0,     re900,  re900, re900_state,   re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    MACHINE_SUPPORTS_SAVE,    layout_re900)
-GAME ( 1994, bs94 , 0,     bs94,   bs94 , driver_device, 0,     ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", MACHINE_SUPPORTS_SAVE )
+//     YEAR  NAME   PARENT MACHINE INPUT  STATE        INIT   ROT    COMPANY                     FULLNAME            FLAGS                  LAYOUT
+GAMEL( 1993, re900, 0,     re900,  re900, re900_state, re900, ROT90, "Entretenimientos GEMINIS", "Ruleta RE-900",    MACHINE_SUPPORTS_SAVE, layout_re900 )
+GAME ( 1994, bs94 , 0,     bs94,   bs94 , re900_state, 0,     ROT0,  "Entretenimientos GEMINIS", "Buena Suerte '94", MACHINE_SUPPORTS_SAVE )

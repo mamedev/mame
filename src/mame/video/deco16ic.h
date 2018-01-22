@@ -8,10 +8,10 @@
     Data East IC 55 / 56 / 74 / 141
 
 **************************************************************************/
+#ifndef MAME_VIDEO_DECO16IC_H
+#define MAME_VIDEO_DECO16IC_H
 
 #pragma once
-#ifndef __DECO16IC_H__
-#define __DECO16IC_H__
 
 
 
@@ -34,7 +34,7 @@ public:
 	static void set_bank1_callback(device_t &device, deco16_bank_cb_delegate callback) { downcast<deco16ic_device &>(device).m_bank1_cb = callback; }
 	static void set_bank2_callback(device_t &device, deco16_bank_cb_delegate callback) { downcast<deco16ic_device &>(device).m_bank2_cb = callback; }
 	static void set_split(device_t &device, int split) { downcast<deco16ic_device &>(device).m_split = split; }
-	static void set_full_width(device_t &device, int width) { downcast<deco16ic_device &>(device).m_full_width12 = width; }
+	static void set_full_width(device_t &device, int width) { downcast<deco16ic_device &>(device).m_tilemapsizes = width; }
 	static void set_pf1_trans_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf1_trans_mask = mask; }
 	static void set_pf2_trans_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf2_trans_mask = mask; }
 	static void set_pf1_col_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf1_colourmask = mask; }
@@ -142,7 +142,7 @@ private:
 	int m_pf1_8bpp_mode;
 
 	int m_split;
-	int m_full_width12;
+	int m_tilemapsizes;
 	int m_pf1_trans_mask, m_pf2_trans_mask;
 	int m_pf1_colour_bank, m_pf2_colour_bank;
 	int m_pf1_colourmask, m_pf2_colourmask;
@@ -156,7 +156,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
-extern const device_type DECO16IC;
+DECLARE_DEVICE_TYPE(DECO16IC, deco16ic_device)
 
 
 
@@ -167,10 +167,10 @@ extern const device_type DECO16IC;
 #define MCFG_DECO16IC_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
 #define MCFG_DECO16IC_BANK1_CB(_class, _method) \
-	deco16ic_device::set_bank1_callback(*device, deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	deco16ic_device::set_bank1_callback(*device, deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_DECO16IC_BANK2_CB(_class, _method) \
-	deco16ic_device::set_bank2_callback(*device, deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	deco16ic_device::set_bank2_callback(*device, deco16_bank_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_DECO16IC_SPLIT(_split) \
 	deco16ic_device::set_split(*device, _split);
@@ -208,4 +208,4 @@ extern const device_type DECO16IC;
 // function definition for a callback
 #define DECO16IC_BANK_CB_MEMBER(_name)     int _name(int bank)
 
-#endif
+#endif // MAME_VIDEO_DECO16IC_H

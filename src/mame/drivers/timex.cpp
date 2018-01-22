@@ -55,7 +55,7 @@ Changes:
 27/2/2000   KT -    Added disk image support to Spectrum +3 driver.
 27/2/2000   KT -    Added joystick I/O code to the Spectrum +3 I/O handler.
 14/3/2000   DJR -   Tape handling dipswitch.
-26/3/2000   DJR -   Snapshot files are now classifed as snapshots not
+26/3/2000   DJR -   Snapshot files are now classified as snapshots not
             cartridges.
 04/4/2000   DJR -   Spectrum 128 / +2 Support.
 13/4/2000   DJR -   +4 Support (unofficial 48K hack).
@@ -96,17 +96,17 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
                 interrupt routine is put. Due to unideal
                 bankswitching in MAME this JP were to 0001 what
                 causes Spectrum to reset. Fixing this problem
-                made much more software runing (i.e. Paperboy).
+                made much more software running (i.e. Paperboy).
             Corrected frames per second value for 48k and 128k
-            Sincalir machines.
+            Sinclair machines.
                 There are 50.08 frames per second for Spectrum
                 48k what gives 69888 cycles for each frame and
                 50.021 for Spectrum 128/+2/+2A/+3 what gives
                 70908 cycles for each frame.
-            Remaped some Spectrum+ keys.
-                Presing F3 to reset was seting 0xf7 on keyboard
+            Remapped some Spectrum+ keys.
+                Pressing F3 to reset was setting 0xf7 on keyboard
                 input port. Problem occurred for snapshots of
-                some programms where it was readed as pressing
+                some programs where it was read as pressing
                 key 4 (which is exit in Tapecopy by R. Dannhoefer
                 for example).
             Added support to load .SP snapshots.
@@ -115,7 +115,7 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
                 is an only difference.
 08/03/2002  KS -    #FF port emulation added.
                 Arkanoid works now, but is not playable due to
-                completly messed timings.
+                completely messed timings.
 
 Initialisation values used when determining which model is being emulated:
  48K        Spectrum doesn't use either port.
@@ -147,20 +147,19 @@ http://www.z88forever.org.uk/zxplus3e/
 *******************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
 #include "includes/spec128.h"
 #include "includes/timex.h"
-#include "imagedev/snapquik.h"
-#include "imagedev/cassette.h"
-#include "sound/speaker.h"
-#include "sound/ay8910.h"
-#include "formats/tzx_cas.h"
-#include "machine/spec_snqk.h"
+
+#include "cpu/z80/z80.h"
 #include "machine/beta.h"
-#include "machine/ram.h"
+#include "sound/ay8910.h"
+
+#include "screen.h"
 #include "softlist.h"
-#include "machine/spec_snqk.h"
+
+#include "formats/tzx_cas.h"
+
 
 /****************************************************************************************************/
 /* TS2048 specific functions */
@@ -209,7 +208,7 @@ WRITE8_MEMBER( spectrum_state::ts2068_port_ff_w )
  *      etc. If the bit is 0 then the chunk is controlled by the HOME
  *      bank. If the bit is 1 then the chunk is controlled by either
  *      the DOCK or EXROM depending on bit 7 of port #ff. Note this
- *      means that that the Z80 can't see chunks of the EXROM and DOCK
+ *      means that the Z80 can't see chunks of the EXROM and DOCK
  *      at the same time.
  *
  *******************************************************************/
@@ -527,9 +526,6 @@ void spectrum_state::ts2068_update_memory()
 }
 
 static ADDRESS_MAP_START(ts2068_io, AS_IO, 8, spectrum_state )
-	AM_RANGE(0x1f, 0x1f) AM_READ(spectrum_port_1f_r ) AM_MIRROR(0xff00)
-	AM_RANGE(0x7f, 0x7f) AM_READ(spectrum_port_7f_r ) AM_MIRROR(0xff00)
-	AM_RANGE(0xdf, 0xdf) AM_READ(spectrum_port_df_r ) AM_MIRROR(0xff00)
 	AM_RANGE(0xf4, 0xf4) AM_READWRITE(ts2068_port_f4_r,ts2068_port_f4_w ) AM_MIRROR(0xff00)
 	AM_RANGE(0xf5, 0xf5) AM_DEVWRITE("ay8912", ay8910_device, address_w ) AM_MIRROR(0xff00)
 	AM_RANGE(0xf6, 0xf6) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, data_w ) AM_MIRROR(0xff00)
@@ -575,9 +571,6 @@ WRITE8_MEMBER( spectrum_state::tc2048_port_ff_w )
 
 static ADDRESS_MAP_START(tc2048_io, AS_IO, 8, spectrum_state )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xfffe)
-	AM_RANGE(0x1f, 0x1f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
-	AM_RANGE(0x7f, 0x7f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
-	AM_RANGE(0xdf, 0xdf) AM_READ(spectrum_port_df_r) AM_MIRROR(0xff00)
 	AM_RANGE(0xff, 0xff) AM_READWRITE(ts2068_port_ff_r,tc2048_port_ff_w)  AM_MIRROR(0xff00)
 ADDRESS_MAP_END
 
@@ -602,7 +595,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 {
 	uint32_t size = m_dock->common_get_size("rom");
 
-	if (image.software_entry() == nullptr)
+	if (!image.loaded_through_softlist())
 	{
 		uint8_t *DOCK;
 		int chunks_in_file = 0;
@@ -614,7 +607,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "File corrupted");
 			return image_init_result::FAIL;
 		}
-		if (image.software_entry() != nullptr)
+		if (!image.loaded_through_softlist())
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Loading from softlist is not supported yet");
 			return image_init_result::FAIL;
@@ -689,7 +682,7 @@ static GFXDECODE_START( ts2068 )
 	GFXDECODE_ENTRY( "maincpu", 0x13d00, ts2068_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
+MACHINE_CONFIG_DERIVED(spectrum_state::ts2068, spectrum_128)
 	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_14_112MHz/4)        /* From Schematic; 3.528 MHz */
 	MCFG_CPU_PROGRAM_MAP(ts2068_mem)
 	MCFG_CPU_IO_MAP(ts2068_io)
@@ -704,7 +697,7 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 	MCFG_SCREEN_SIZE(TS2068_SCREEN_WIDTH, TS2068_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, TS2068_SCREEN_WIDTH-1, 0, TS2068_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_ts2068)
-	MCFG_SCREEN_VBLANK_DRIVER(spectrum_state, screen_eof_timex)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(spectrum_state, screen_vblank_timex))
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", ts2068)
 
@@ -715,13 +708,11 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cartridge */
-	MCFG_DEVICE_REMOVE("cartslot")
 	MCFG_GENERIC_CARTSLOT_ADD("dockslot", generic_plain_slot, "timex_cart")
 	MCFG_GENERIC_EXTENSIONS("dck,bin")
 	MCFG_GENERIC_LOAD(spectrum_state, timex_cart)
 
 	/* Software lists */
-	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "timex_dock")
 
 	/* internal ram */
@@ -730,13 +721,13 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( uk2086, ts2068 )
+MACHINE_CONFIG_DERIVED(spectrum_state::uk2086, ts2068)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tc2048, spectrum )
+MACHINE_CONFIG_DERIVED(spectrum_state::tc2048, spectrum)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tc2048_mem)
 	MCFG_CPU_IO_MAP(tc2048_io)
@@ -749,7 +740,7 @@ static MACHINE_CONFIG_DERIVED( tc2048, spectrum )
 	MCFG_SCREEN_SIZE(TS2068_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
 	MCFG_SCREEN_VISIBLE_AREA(0, TS2068_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
 	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_tc2048)
-	MCFG_SCREEN_VBLANK_DRIVER(spectrum_state, screen_eof_timex)
+	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(spectrum_state, screen_vblank_timex))
 
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
 
@@ -783,7 +774,7 @@ ROM_START(uk2086)
 	ROM_LOAD("ts2068_x.rom",0x14000,0x2000, CRC(ae16233a) SHA1(7e265a2c1f621ed365ea23bdcafdedbc79c1299c))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1984, tc2048,   spectrum, 0,      tc2048,     spectrum, driver_device,    0,      "Timex of Portugal",    "TC-2048" , 0)
-COMP( 1983, ts2068,   spectrum, 0,      ts2068,     spectrum, driver_device,    0,      "Timex Sinclair",       "TS-2068" , 0)
-COMP( 1986, uk2086,   spectrum, 0,      uk2086,     spectrum, driver_device,    0,      "Unipolbrit",           "UK-2086 ver. 1.2" , 0)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT     STATE           INIT  COMPANY               FULLNAME             FLAGS
+COMP( 1984, tc2048,   spectrum, 0,      tc2048,  spectrum, spectrum_state, 0,    "Timex of Portugal",  "TC-2048" ,          0 )
+COMP( 1983, ts2068,   spectrum, 0,      ts2068,  spectrum, spectrum_state, 0,    "Timex Sinclair",     "TS-2068" ,          0 )
+COMP( 1986, uk2086,   spectrum, 0,      uk2086,  spectrum, spectrum_state, 0,    "Unipolbrit",         "UK-2086 ver. 1.2" , 0 )

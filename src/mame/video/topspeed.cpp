@@ -2,6 +2,7 @@
 // copyright-holders:David Graves
 #include "emu.h"
 #include "includes/topspeed.h"
+#include "screen.h"
 
 
 /****************************************************************************

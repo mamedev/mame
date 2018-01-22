@@ -11,7 +11,9 @@
 
 #include "machine/upd765.h"
 #include "machine/ram.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
+#include "screen.h"
 
 #define PCW_BORDER_HEIGHT 8
 #define PCW_BORDER_WIDTH 8
@@ -70,8 +72,10 @@ public:
 	uint32_t m_paper_feed;  // amount of paper fed through printer, by n/360 inches.  One line feed is 61/360in (from the linefeed command in CP/M;s ptr menu)
 	std::unique_ptr<bitmap_ind16> m_prn_output;
 	uint8_t m_printer_p2_prev;
-	emu_timer* m_prn_stepper;
-	emu_timer* m_prn_pins;
+	emu_timer *m_prn_stepper;
+	emu_timer *m_prn_pins;
+	emu_timer *m_pulse_timer;
+	emu_timer *m_beep_setup_timer;
 	DECLARE_READ8_MEMBER(pcw_keyboard_r);
 	DECLARE_READ8_MEMBER(pcw_keyboard_data_r);
 	DECLARE_READ8_MEMBER(pcw_interrupt_counter_r);
@@ -92,15 +96,15 @@ public:
 	DECLARE_WRITE8_MEMBER(mcu_printer_p1_w);
 	DECLARE_READ8_MEMBER(mcu_printer_p2_r);
 	DECLARE_WRITE8_MEMBER(mcu_printer_p2_w);
-	DECLARE_READ8_MEMBER(mcu_printer_t1_r);
-	DECLARE_READ8_MEMBER(mcu_printer_t0_r);
+	DECLARE_READ_LINE_MEMBER(mcu_printer_t1_r);
+	DECLARE_READ_LINE_MEMBER(mcu_printer_t0_r);
 	DECLARE_READ8_MEMBER(mcu_kb_scan_r);
 	DECLARE_WRITE8_MEMBER(mcu_kb_scan_w);
 	DECLARE_READ8_MEMBER(mcu_kb_scan_high_r);
 	DECLARE_WRITE8_MEMBER(mcu_kb_scan_high_w);
 	DECLARE_READ8_MEMBER(mcu_kb_data_r);
-	DECLARE_READ8_MEMBER(mcu_kb_t1_r);
-	DECLARE_READ8_MEMBER(mcu_kb_t0_r);
+	DECLARE_READ_LINE_MEMBER(mcu_kb_t1_r);
+	DECLARE_READ_LINE_MEMBER(mcu_kb_t0_r);
 	DECLARE_READ8_MEMBER(pcw9512_parallel_r);
 	DECLARE_WRITE8_MEMBER(pcw9512_parallel_w);
 	void mcu_transmit_serial(uint8_t bit);
@@ -135,6 +139,10 @@ public:
 	void pcw_update_mem(int block, int data);
 	int pcw_get_sys_status();
 	void pcw_printer_fire_pins(uint16_t pins);
+	void pcw(machine_config &config);
+	void pcw8256(machine_config &config);
+	void pcw8512(machine_config &config);
+	void pcw9512(machine_config &config);
 };
 
 #endif /* PCW_H_ */

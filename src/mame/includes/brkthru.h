@@ -33,7 +33,6 @@ public:
 	int     m_bgscroll;
 	int     m_bgbasecolor;
 	int     m_flipscreen;
-	//uint8_t *m_brkthru_nmi_enable; /* needs to be tracked down */
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -45,7 +44,6 @@ public:
 	uint8_t   m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(brkthru_1803_w);
 	DECLARE_WRITE8_MEMBER(darwin_0803_w);
-	DECLARE_WRITE8_MEMBER(brkthru_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(brkthru_bgram_w);
 	DECLARE_WRITE8_MEMBER(brkthru_fgram_w);
 	DECLARE_WRITE8_MEMBER(brkthru_1800_w);
@@ -60,4 +58,6 @@ public:
 	uint32_t screen_update_brkthru(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int prio );
+	void brkthru(machine_config &config);
+	void darwin(machine_config &config);
 };

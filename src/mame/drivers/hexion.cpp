@@ -79,17 +79,20 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/hexion.h"
+#include "includes/konamipt.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
-#include "includes/konamipt.h"
-#include "includes/hexion.h"
+
+#include "speaker.h"
 
 
 WRITE8_MEMBER(hexion_state::coincntr_w)
 {
-//logerror("%04x: coincntr_w %02x\n",space.device().safe_pc(),data);
+//logerror("%04x: coincntr_w %02x\n",m_maincpu->pc(),data);
 
 	/* bits 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
@@ -110,6 +113,12 @@ WRITE_LINE_MEMBER(hexion_state::irq_ack_w)
 WRITE_LINE_MEMBER(hexion_state::nmi_ack_w)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+WRITE8_MEMBER(hexion_state::ccu_int_time_w)
+{
+	logerror("ccu_int_time rewritten with value of %02x\n", data);
+	m_ccu_int_time = data;
 }
 
 static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
@@ -229,14 +238,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::scanline)
 {
 	int scanline = param;
 
+	// z80 /IRQ is connected to the IRQ1(vblank) pin of k053252 CCU
 	if(scanline == 256)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
-	else if ((scanline == 85) || (scanline == 170)) //TODO
+
+	// z80 /NMI is connected to the IRQ2 pin of k053252 CCU
+	// the following code is emulating INT_TIME of the k053252, this code will go away
+	// when the new konami branch is merged.
+	m_ccu_int_time_count--;
+	if (m_ccu_int_time_count <= 0)
+	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_ccu_int_time_count = m_ccu_int_time;
+	}
 }
 
 
-static MACHINE_CONFIG_START( hexion, hexion_state )
+MACHINE_CONFIG_START(hexion_state::hexion)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
@@ -247,6 +265,7 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL_24MHz/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
 	MCFG_K053252_INT1_ACK_CB(WRITELINE(hexion_state, irq_ack_w))
 	MCFG_K053252_INT2_ACK_CB(WRITELINE(hexion_state, nmi_ack_w))
+	MCFG_K053252_INT_TIME_CB(WRITE8(hexion_state, ccu_int_time_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -258,25 +277,25 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hexion)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", 256)
+	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) /* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) /* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MCFG_K051649_ADD("k051649", XTAL_24MHz/16) /* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hexionb, hexion )
+MACHINE_CONFIG_DERIVED(hexion_state::hexionb, hexion)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hexionb_map)
 
 	MCFG_DEVICE_REMOVE("k051649")
 
-	MCFG_OKIM6295_ADD("oki2", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", 1056000, PIN7_LOW) // clock frequency & pin 7 not verified; this clock and pin 7 being low makes the pitch match the non-bootleg version, so is probably correct
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -334,5 +353,5 @@ ROM_START( hexionb )
 	//PAL20L10 @U31
 ROM_END
 
-GAME( 1992, hexion, 0,      hexion, hexion, driver_device, 0, ROT0, "Konami",                     "Hexion (Japan ver JAB)", 0 )
-GAME( 1992, hexionb,hexion, hexionb,hexion, driver_device, 0, ROT0, "bootleg (Impeuropex Corp.)", "Hexion (Asia ver AAA, bootleg)", 0 ) // we're missing an original Asia AAA
+GAME( 1992, hexion, 0,      hexion, hexion, hexion_state, 0, ROT0, "Konami",                     "Hexion (Japan ver JAB)",         0 )
+GAME( 1992, hexionb,hexion, hexionb,hexion, hexion_state, 0, ROT0, "bootleg (Impeuropex Corp.)", "Hexion (Asia ver AAA, bootleg)", 0 ) // we're missing an original Asia AAA

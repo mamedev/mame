@@ -21,7 +21,7 @@
 
 TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
 {
-	uint16_t data = tilemap.basemem_read(tile_index);
+	uint16_t data = m_alpha_tilemap->basemem_read(tile_index);
 	int code = data & 0x3ff;
 	int color = (data >> 13) & 0x07;
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(atarisy2_state::get_playfield_tile_info)
 {
-	uint16_t data = tilemap.basemem_read(tile_index);
+	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
 	int code = m_playfield_tile_bank[(data >> 10) & 1] + (data & 0x3ff);
 	int color = (data >> 11) & 7;
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
@@ -241,7 +241,7 @@ WRITE16_MEMBER( atarisy2_state::videoram_w )
 
 	/* alpharam? */
 	if (offs < 0x0c00)
-		m_alpha_tilemap->write(space, offs, data, mem_mask);
+		m_alpha_tilemap->write16(space, offs, data, mem_mask);
 
 	/* spriteram? */
 	else if (offs < 0x1000)
@@ -254,7 +254,7 @@ WRITE16_MEMBER( atarisy2_state::videoram_w )
 
 	/* playfieldram? */
 	else if (offs >= 0x2000)
-		m_playfield_tilemap->write(space, offs - 0x2000, data, mem_mask);
+		m_playfield_tilemap->write16(space, offs - 0x2000, data, mem_mask);
 
 	/* generic case */
 	else

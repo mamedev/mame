@@ -885,7 +885,7 @@ chd_error chd_file::read_hunk(uint32_t hunknum, void *buffer)
 		// get a pointer to the map entry
 		uint64_t blockoffs;
 		uint32_t blocklen;
-		uint32_t blockcrc;
+		util::crc32_t blockcrc;
 		uint8_t *rawmap;
 		uint8_t *dest = reinterpret_cast<uint8_t *>(buffer);
 		switch (m_version)
@@ -1254,12 +1254,8 @@ chd_error chd_file::read_metadata(chd_metadata_tag searchtag, uint32_t searchind
 			throw CHDERR_METADATA_NOT_FOUND;
 
 		// read the metadata
-		// TODO: how to properly allocate a dynamic char buffer?
-		auto   metabuf = new char[metaentry.length+1];
-		memset(metabuf, 0x00, metaentry.length+1);
-		file_read(metaentry.offset + METADATA_HEADER_SIZE, metabuf, metaentry.length);
-		output.assign(metabuf);
-		delete[] metabuf;
+		output.assign(metaentry.length, '\0');
+		file_read(metaentry.offset + METADATA_HEADER_SIZE, &output[0], metaentry.length);
 		return CHDERR_NONE;
 	}
 
@@ -2147,12 +2143,12 @@ void chd_file::decompress_v5_map()
 	// read the reader
 	uint8_t rawbuf[16];
 	file_read(m_mapoffset, rawbuf, sizeof(rawbuf));
-	uint32_t mapbytes = be_read(&rawbuf[0], 4);
-	uint64_t firstoffs = be_read(&rawbuf[4], 6);
-	uint16_t mapcrc = be_read(&rawbuf[10], 2);
-	uint8_t lengthbits = rawbuf[12];
-	uint8_t selfbits = rawbuf[13];
-	uint8_t parentbits = rawbuf[14];
+	uint32_t const mapbytes = be_read(&rawbuf[0], 4);
+	uint64_t const firstoffs = be_read(&rawbuf[4], 6);
+	util::crc16_t const mapcrc = be_read(&rawbuf[10], 2);
+	uint8_t const lengthbits = rawbuf[12];
+	uint8_t const selfbits = rawbuf[13];
+	uint8_t const parentbits = rawbuf[14];
 
 	// now read the map
 	std::vector<uint8_t> compressed(mapbytes);

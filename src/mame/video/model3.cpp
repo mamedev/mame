@@ -207,10 +207,10 @@ void model3_state::video_start()
 	m_layer8[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(model3_state::tile_info_layer3_8bit), this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	// 4-bit tiles
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, char4_layout, (uint8_t*)m_m3_char_ram.get(), 0, m_palette->entries() / 16, 0));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, char4_layout, (uint8_t*)m_m3_char_ram.get(), 0, m_palette->entries() / 16, 0));
 
 	// 8-bit tiles
-	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(*m_palette, char8_layout, (uint8_t*)m_m3_char_ram.get(), 0, m_palette->entries() / 256, 0));
+	m_gfxdecode->set_gfx(1, std::make_unique<gfx_element>(m_palette, char8_layout, (uint8_t*)m_m3_char_ram.get(), 0, m_palette->entries() / 256, 0));
 
 	init_matrix_stack();
 }
@@ -488,7 +488,7 @@ READ64_MEMBER(model3_state::model3_vid_reg_r)
 	switch(offset)
 	{
 		case 0x00/8:    return m_vid_reg0;
-		case 0x08/8:    return U64(0xffffffffffffffff);     /* ??? */
+		case 0x08/8:    return 0xffffffffffffffffU;     /* ??? */
 		case 0x20/8:    return (uint64_t)m_layer_priority << 48;
 		case 0x40/8:    return ((uint64_t)m_layer_modulate1 << 32) | (uint64_t)m_layer_modulate2;
 		default:        logerror("read reg %02X\n", offset);break;

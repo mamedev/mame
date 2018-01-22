@@ -322,6 +322,13 @@ pri_alp_bitmap
 1111 1111    opaque pixel
 */
 
+
+void taito_f3_state::device_post_load()
+{
+	/* force a reread of the dynamic tiles in the pixel layer */
+	m_gfxdecode->gfx(3)->mark_all_dirty();
+}
+
 /******************************************************************************/
 
 void taito_f3_state::print_debug_info(bitmap_rgb32 &bitmap)
@@ -499,7 +506,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
 
 /******************************************************************************/
 
-void taito_f3_state::screen_eof_f3(screen_device &screen, bool state)
+WRITE_LINE_MEMBER(taito_f3_state::screen_vblank_f3)
 {
 	// rising edge
 	if (state)
@@ -647,6 +654,13 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 	m_flipscreen = 0;
 	memset(m_spriteram16_buffered.get(),0,0x10000);
 	memset(m_spriteram.get(),0,0x10000);
+
+	save_pointer(NAME(m_videoram.get()), 0x2000/2);
+	save_pointer(NAME(m_spriteram.get()), 0x10000/2);
+	save_pointer(NAME(m_f3_vram.get()), 0x2000/2);
+	save_pointer(NAME(m_f3_pf_data.get()), 0xc000/2);
+	save_pointer(NAME(m_f3_line_ram.get()), 0x10000/2);
+	save_pointer(NAME(m_f3_pivot_ram.get()), 0x10000/2);
 
 	save_item(NAME(m_f3_control_0));
 	save_item(NAME(m_f3_control_1));

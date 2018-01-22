@@ -52,7 +52,6 @@ public:
 	uint16_t         m_coinctrl;
 
 	/* devices */
-	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(deniam_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(deniam_videoram_w);
 	DECLARE_WRITE16_MEMBER(deniam_textram_w);
@@ -81,4 +80,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
+	void deniam16c(machine_config &config);
+	void deniam16b(machine_config &config);
 };

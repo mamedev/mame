@@ -6,12 +6,11 @@
 
 **********************************************************************/
 
+#ifndef MAME_BUS_PET_64K_H
+#define MAME_BUS_PET_64K_H
+
 #pragma once
 
-#ifndef __PET_64K__
-#define __PET_64K__
-
-#include "emu.h"
 #include "exp.h"
 
 
@@ -22,8 +21,7 @@
 
 // ======================> pet_64k_expansion_device
 
-class pet_64k_expansion_device : public device_t,
-									public device_pet_expansion_card_interface
+class pet_64k_expansion_device : public device_t, public device_pet_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -50,7 +48,6 @@ private:
 
 
 // device type definition
-extern const device_type PET_64K;
+DECLARE_DEVICE_TYPE(PET_64K, pet_64k_expansion_device)
 
-
-#endif
+#endif // MAME_BUS_PET_64K_H

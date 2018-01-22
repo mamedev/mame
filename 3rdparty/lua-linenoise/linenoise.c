@@ -44,7 +44,7 @@ static int handle_ln_ok(lua_State *L)
     return 1;
 }
 
-static void completion_callback_wrapper(const char *line, linenoiseCompletions *completions)
+static void completion_callback_wrapper(const char *line, linenoiseCompletions *completions, int pos)
 {
     lua_State *L = completion_state;
 
@@ -54,8 +54,9 @@ static void completion_callback_wrapper(const char *line, linenoiseCompletions *
     lua_setmetatable(L, -2);
 
     lua_pushstring(L, line);
+    lua_pushinteger(L, pos);
 
-    lua_pcall(L, 2, 0, 0);
+    lua_pcall(L, 3, 0, 0);
 }
 
 static int l_linenoise(lua_State *L)
@@ -161,9 +162,16 @@ static int l_addcompletion(lua_State *L)
 {
     linenoiseCompletions *completions = *((linenoiseCompletions **) luaL_checkudata(L, 1, LN_COMPLETION_TYPE));
     const char *entry                 = luaL_checkstring(L, 2);
+    int pos                           = luaL_checkinteger(L, 3);
 
-    linenoiseAddCompletion(completions, (char *) entry);
+    linenoiseAddCompletion(completions, (char *) entry, pos);
 
+    return handle_ln_ok(L);
+}
+
+static int l_refresh(lua_State *L)
+{
+    linenoiseRefresh();
     return handle_ln_ok(L);
 }
 
@@ -177,6 +185,7 @@ luaL_Reg linenoise_funcs[] = {
     { "setcompletion", l_setcompletion},
     { "addcompletion", l_addcompletion },
     { "preload", l_preloadbuffer },
+    { "refresh", l_refresh },
 
     /* Aliases for more consistent function names */
     { "addhistory", l_historyadd },

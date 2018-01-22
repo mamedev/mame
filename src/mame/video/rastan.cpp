@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "includes/rastan.h"
+#include "screen.h"
 
 /***************************************************************************/
 

@@ -16,19 +16,13 @@
 
 ***************************************************************************/
 
-#ifndef __RP5H01_H__
-#define __RP5H01_H__
+#ifndef MAME_MACHINE_RP5H01_H
+#define MAME_MACHINE_RP5H01_H
 
 
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
-
-/* these also work as the address masks */
-enum {
-	COUNTER_MODE_6_BITS = 0x3f,
-	COUNTER_MODE_7_BITS = 0x7f
-};
 
 /***************************************************************************
     MACROS / CONSTANTS
@@ -49,11 +43,16 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	/* these also work as the address masks */
+	enum {
+		COUNTER_MODE_6_BITS = 0x3f,
+		COUNTER_MODE_7_BITS = 0x7f
+	};
+
 	static uint8_t const s_initial_data[0x10];
 
 	// internal state
@@ -66,7 +65,7 @@ private:
 	optional_region_ptr<uint8_t> m_rom;
 };
 
-extern const device_type RP5H01;
+DECLARE_DEVICE_TYPE(RP5H01, rp5h01_device)
 
 
 #define MCFG_RP5H01_ADD(_tag) \
@@ -78,4 +77,4 @@ extern const device_type RP5H01;
  * assigned to device.
  */
 
-#endif /* __RP5H01_H__ */
+#endif // MAME_MACHINE_RP5H01_H

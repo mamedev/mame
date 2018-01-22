@@ -33,7 +33,6 @@ function devicesProject(_target, _subtarget)
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/devices",
-		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "src/mame", -- used for sound amiga
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
@@ -80,15 +79,11 @@ if #disasm_files > 0 then
 	}
 
 	if #disasm_dependency > 0 then
-		dependency {
-			disasm_dependency[1]
-		}
+		dependency(disasm_dependency)
 	end
 
 	if #disasm_custombuildtask > 0 then
-		custombuildtask {
-			disasm_custombuildtask[1]
-		}
+		custombuildtask(disasm_custombuildtask)
 	end
 end
 

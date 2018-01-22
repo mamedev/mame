@@ -206,7 +206,7 @@ class Instruction:
         opcode, args = self.GetDasmInfo()
         args = [", " + a for a in args]
         print("%scase 0x%02x:" % (prefix, self._id), file=f)
-        print("%s  sprintf(buf, \"%s\"%s);" % (prefix, opcode, "".join(args)), file=f)
+        print("%s  util::stream_format(stream, \"%s\"%s);" % (prefix, opcode, "".join(args)), file=f)
         print("%s  break;" % prefix, file=f)
 
 

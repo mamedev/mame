@@ -41,7 +41,7 @@
 
     C027 - KMSTATUS (GLU system status)
         bit 7 - set if mouse register full
-        bit 6 - mouse interupt enable flag
+        bit 6 - mouse interrupt enable flag
         bit 5 - set if data register full
         bit 4 - data interrupt enabled
         bit 3 - set if key data full
@@ -120,6 +120,7 @@
 
 #include "includes/apple2gs.h"
 #include "includes/apple2.h"
+
 #include "machine/applefdc.h"
 #include "machine/sonydriv.h"
 #include "machine/8530scc.h"
@@ -127,7 +128,9 @@
 #include "cpu/g65816/g65816.h"
 #include "sound/es5503.h"
 #include "machine/ram.h"
+
 #include "debugger.h"
+#include "screen.h"
 
 #define LOG_C0XX            0
 #define LOG_ADB             0
@@ -896,7 +899,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 {
 	uint8_t result;
 
-	if(space.debugger_access())
+	if(machine().side_effect_disabled())
 	{
 		return 0;
 	}
@@ -916,7 +919,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 		#endif
 
 		case 0x19:  /* C019 - RDVBLBAR */
-			result = (space.machine().first_screen()->vpos() >= (192+BORDER_TOP)) ? 0x80 : 0x00;
+			result = (machine().first_screen()->vpos() >= (192+BORDER_TOP)) ? 0x80 : 0x00;
 			break;
 
 		case 0x22:  /* C022 - TBCOLOR */
@@ -1017,7 +1020,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 			break;
 
 		case 0x2F:  /* C02F - HORIZCNT */
-			result = space.machine().first_screen()->hpos() / 11;
+			result = machine().first_screen()->hpos() / 11;
 			if (result > 0)
 			{
 				result += 0x40;
@@ -1052,15 +1055,15 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 		case 0x38:  /* C038 - SCCBREG */
 			result = m_scc->cb_r(space, 0, mem_mask);
 			break;
-		
+
 		case 0x39:  /* C039 - SCCAREG */
 			result = m_scc->ca_r(space, 0, mem_mask);
 			break;
-		
+
 		case 0x3A:  /* C03A - SCCBDATA */
 			result = m_scc->db_r(space, 0, mem_mask);
 			break;
-			
+
 		case 0x3B:  /* C03B - SCCADATA */
 			result = m_scc->da_r(space, 0, mem_mask);
 			break;
@@ -1232,19 +1235,19 @@ WRITE8_MEMBER( apple2gs_state::apple2gs_c0xx_w )
 
 		case 0x38:  /* C038 - SCCBREG */
 			m_scc->cb_w(space, 0, data);
-			break;		
-		
+			break;
+
 		case 0x39:  /* C039 - SCCAREG */
 			m_scc->ca_w(space, 0, data);
-			break;		
-		
+			break;
+
 		case 0x3A:  /* C03A - SCCBDATA */
 			m_scc->db_w(space, 0, data);
-			break;		
+			break;
 
 		case 0x3B:  /* C03B - SCCADATA */
 			m_scc->da_w(space, 0, data);
-			break;		
+			break;
 
 		case 0x3C:  /* C03C - SOUNDCTL */
 		case 0x3D:  /* C03D - SOUNDDATA */
@@ -1658,7 +1661,7 @@ uint8_t apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 						m_a2_cnxx_slot = slot;
 						apple2_update_memory();
 					}
-					result = slotdevice->read_cnxx(space, address&0xff);
+					result = slotdevice->read_cnxx(address&0xff);
 				}
 				else
 				{
@@ -1671,7 +1674,7 @@ uint8_t apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 			slotdevice = nullptr;
 
 			// if CFFF accessed, reset C800 area to internal ROM
-			if(!space.debugger_access())
+			if(!machine().side_effect_disabled())
 			{
 				if ((address & 0xfff) == 0xfff)
 				{
@@ -1687,7 +1690,7 @@ uint8_t apple2gs_state::apple2gs_xxCxxx_r(address_space &space, offs_t address)
 
 			if (slotdevice)
 			{
-				result = slotdevice->read_c800(space, address&0x7ff);
+				result = slotdevice->read_c800(address&0x7ff);
 			}
 			else
 			{
@@ -1705,7 +1708,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, uin
 	int slot;
 
 	// if CFFF accessed, reset C800 area to internal ROM
-	if(!space.debugger_access())
+	if(!machine().side_effect_disabled())
 	{
 		if ((address & 0xfff) == 0xfff)
 		{
@@ -1750,7 +1753,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, uin
 						m_a2_cnxx_slot = slot;
 						apple2_update_memory();
 					}
-					slotdevice->write_cnxx(space, address&0xff, data);
+					slotdevice->write_cnxx(address&0xff, data);
 				}
 				// (else slot is your card but there's no card inserted so the write goes nowhere)
 			}
@@ -1773,7 +1776,7 @@ void apple2gs_state::apple2gs_xxCxxx_w(address_space &space, offs_t address, uin
 
 			if (slotdevice)
 			{
-				slotdevice->write_c800(space, address&0x7ff, data);
+				slotdevice->write_c800(address&0x7ff, data);
 			}
 			else
 			{

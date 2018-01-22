@@ -23,12 +23,13 @@
 **************************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "render.h"
 #include "includes/amiga.h"
+#include "cpu/m68000/m68000.h"
 #include "machine/ldp1450.h"
 #include "machine/nvram.h"
 #include "machine/amigafdc.h"
+#include "render.h"
+#include "speaker.h"
 
 
 class alg_state : public amiga_state
@@ -57,6 +58,9 @@ public:
 
 	DECLARE_VIDEO_START(alg);
 
+	void alg_r2(machine_config &config);
+	void picmatic(machine_config &config);
+	void alg_r1(machine_config &config);
 protected:
 	// amiga_state overrides
 	virtual void potgo_w(uint16_t data) override;
@@ -114,7 +118,7 @@ VIDEO_START_MEMBER(alg_state,alg)
 
 	/* configure pen 4096 as transparent in the renderer and use it for the genlock color */
 	m_palette->set_pen_color(4096, rgb_t(0,0,0,0));
-	amiga_set_genlock_color(machine(), 4096);
+	set_genlock_color(4096);
 }
 
 
@@ -288,7 +292,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( alg_r1, alg_state )
+MACHINE_CONFIG_START(alg_state::alg_r1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
@@ -297,8 +301,8 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(overlay_512kb_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(22)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(22)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -320,11 +324,13 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("amiga", AMIGA, amiga_state::CLK_C1_NTSC)
+	MCFG_SOUND_ADD("amiga", PAULA_8364, amiga_state::CLK_C1_NTSC)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(3, "lspeaker", 0.25)
+	MCFG_PAULA_MEM_READ_CB(READ16(amiga_state, chip_ram_r))
+	MCFG_PAULA_INT_CB(WRITELINE(amiga_state, paula_int_w))
 
 	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -341,16 +347,20 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 	/* fdc */
 	MCFG_DEVICE_ADD("fdc", AMIGA_FDC, amiga_state::CLK_7M_NTSC)
 	MCFG_AMIGA_FDC_INDEX_CALLBACK(DEVWRITELINE("cia_1", mos8520_device, flag_w))
+	MCFG_AMIGA_FDC_READ_DMA_CALLBACK(READ16(amiga_state, chip_ram_r))
+	MCFG_AMIGA_FDC_WRITE_DMA_CALLBACK(WRITE16(amiga_state, chip_ram_w))
+	MCFG_AMIGA_FDC_DSKBLK_CALLBACK(WRITELINE(amiga_state, fdc_dskblk_w))
+	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( alg_r2, alg_r1 )
+MACHINE_CONFIG_DERIVED(alg_state::alg_r2, alg_r1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_r2)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( picmatic, alg_r1 )
+MACHINE_CONFIG_DERIVED(alg_state::picmatic, alg_r1)
 	/* adjust for PAL specs */
 	MCFG_CPU_REPLACE("maincpu", M68000, amiga_state::CLK_7M_PAL)
 	MCFG_CPU_PROGRAM_MAP(main_map_picmatic)
@@ -780,25 +790,25 @@ DRIVER_INIT_MEMBER(alg_state,aplatoon)
  *************************************/
 
 /* BIOS */
-GAME( 199?, alg_bios,   0,         alg_r1,   alg, alg_state,    ntsc,     ROT0,  "American Laser Games", "American Laser Games BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 199?, alg_bios,   0,         alg_r1,   alg,    alg_state, ntsc,     ROT0,  "American Laser Games", "American Laser Games BIOS", MACHINE_IS_BIOS_ROOT )
 
 /* Rev. A board */
 /* PAL R1 */
-GAME( 1990, maddoga,     maddog,   alg_r1,   alg, alg_state,    palr1,    ROT0,  "American Laser Games", "Mad Dog McCree v1C board rev.A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, maddoga,     maddog,   alg_r1,   alg,    alg_state, palr1,    ROT0,  "American Laser Games", "Mad Dog McCree v1C board rev.A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* PAL R3 */
-GAME( 1991, wsjr,        alg_bios, alg_r1,   alg, alg_state,    palr3,    ROT0,  "American Laser Games", "Who Shot Johnny Rock? v1.6", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, wsjr_15,     wsjr,     alg_r1,   alg, alg_state,    palr3,    ROT0,  "American Laser Games", "Who Shot Johnny Rock? v1.5", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, wsjr,        alg_bios, alg_r1,   alg,    alg_state, palr3,    ROT0,  "American Laser Games", "Who Shot Johnny Rock? v1.6", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, wsjr_15,     wsjr,     alg_r1,   alg,    alg_state, palr3,    ROT0,  "American Laser Games", "Who Shot Johnny Rock? v1.5", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* Rev. B board */
 /* PAL R6 */
 
 GAME( 1990, maddog,      alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Mad Dog McCree v2.03 board rev.B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1990, maddog_202,  maddog, alg_r2,   alg_2p, alg_state, palr6,      ROT0,  "American Laser Games", "Mad Dog McCree v2.02 board rev.B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, maddog_202,  maddog,   alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Mad Dog McCree v2.02 board rev.B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 	/* works ok but uses right player (2) controls only for trigger and holster */
 GAME( 1992, maddog2,     alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v2.04", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, maddog2_202, maddog2, alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v2.02", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, maddog2_202, maddog2,  alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v2.02", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, maddog2_110, maddog2,  alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v1.10", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, maddog2_100, maddog2,  alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Mad Dog II: The Lost Gold v1.00", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 	/* works ok but uses right player (2) controls only for trigger and holster */
@@ -815,13 +825,13 @@ GAME( 1993, crimepat_12, crimepat, alg_r2,   alg_2p, alg_state, palr6,    ROT0, 
 GAME( 1993, crimep2,     alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Crime Patrol 2: Drug Wars v1.3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1993, crimep2_11,  crimep2,  alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "Crime Patrol 2: Drug Wars v1.1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, lastbh,      alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "The Last Bounty Hunter v1.01", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, lastbh_006,  lastbh, alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "The Last Bounty Hunter v0.06", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, lastbh_006,  lastbh,   alg_r2,   alg_2p, alg_state, palr6,    ROT0,  "American Laser Games", "The Last Bounty Hunter v0.06", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, fastdraw,    alg_bios, alg_r2,   alg_2p, alg_state, palr6,    ROT90, "American Laser Games", "Fast Draw Showdown v1.31", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, fastdraw_130,fastdraw, alg_r2,   alg_2p, alg_state, palr6,    ROT90, "American Laser Games", "Fast Draw Showdown v1.30", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 	/* works ok but uses right player (2) controls only for trigger and holster */
 
 /* NOVA games on ALG hardware with own address scramble */
-GAME( 199?, aplatoon, alg_bios, alg_r2,   alg, alg_state,    aplatoon, ROT0,  "Nova?", "Platoon V.3.1 US", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, aplatoon,    alg_bios, alg_r2,   alg,    alg_state, aplatoon, ROT0,  "Nova?", "Platoon V.3.1 US", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* Web Picmatic games PAL tv standard, own rom board */
-GAME( 1993, zortonbr, alg_bios, picmatic, alg, alg_state,    pal,     ROT0,  "Web Picmatic", "Zorton Brothers (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, zortonbr,    alg_bios, picmatic, alg,    alg_state, pal,      ROT0,  "Web Picmatic", "Zorton Brothers (Los Justicieros)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )

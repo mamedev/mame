@@ -67,6 +67,7 @@ public:
 	uint8_t m_blink;
 	DECLARE_PALETTE_INIT(pc4);
 
+	void pc4(machine_config &config);
 protected:
 	required_memory_region m_region_charset;
 	required_memory_bank m_rombank;

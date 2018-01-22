@@ -6,15 +6,16 @@
  *
  ****************************************************************************/
 
-#ifndef ARCADIA_H_
-#define ARCADIA_H_
+#ifndef MAME_INCLUDES_ARCADIA_H
+#define MAME_INCLUDES_ARCADIA_H
 
-#include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "audio/arcadia.h"
 
 #include "bus/arcadia/slot.h"
 #include "bus/arcadia/rom.h"
+
+#include "screen.h"
 
 // space vultures sprites above
 // combat below and invisible
@@ -48,7 +49,7 @@ public:
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen")  { }
 
-	DECLARE_READ8_MEMBER(vsync_r);
+	DECLARE_READ_LINE_MEMBER(vsync_r);
 	DECLARE_READ8_MEMBER(video_r);
 	DECLARE_WRITE8_MEMBER(video_w);
 	int m_line;
@@ -102,6 +103,7 @@ public:
 	uint32_t screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(video_line);
 
+	void arcadia(machine_config &config);
 protected:
 	required_device<arcadia_sound_device> m_custom;
 	required_ioport m_panel;
@@ -125,4 +127,4 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 };
-#endif /* ARCADIA_H_ */
+#endif // MAME_INCLUDES_ARCADIA_H

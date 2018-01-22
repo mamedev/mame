@@ -133,7 +133,7 @@ Retrieve these variables using this syntax:
 	std::string important_string = lua["important_string"];
 
 	// dig into a table
-	int value = lua["value"]["value"];
+	int value = lua["some_table"]["value"];
 	
 	// get a function
 	sol::function a_function = lua["a_function"];
@@ -158,7 +158,7 @@ Retrieve Lua types using ``object`` and other ``sol::`` types.
 	sol::object function_obj = lua[ "a_function" ];
 	// sol::type::function
 	sol::type t2 = function_obj.get_type();
-	bool is_it_really = function_obj.is<std::function<int()>(); // true
+	bool is_it_really = function_obj.is<std::function<int()>>(); // true
 
 	// will not contain data
 	sol::optional<int> check_for_me = lua["a_function"];
@@ -172,12 +172,11 @@ You can erase things by setting it to ``nullptr`` or ``sol::nil``.
 
 	lua.script("exists = 250");
 
-	int first_try = lua.get_or<int>( 322 );
+	int first_try = lua.get_or( "exists", 322 );
 	// first_try == 250
 
 	lua.set("exists", sol::nil);
-
-	int second_try = lua.get_or<int>( 322 );
+	int second_try = lua.get_or( "exists", 322 );
 	// second_try == 322
 
 
@@ -224,12 +223,12 @@ If you're going deep, be safe:
 
 	sol::optional<int> will_not_error = lua["abc"]["DOESNOTEXIST"]["ghi"];
 	// will_not_error == sol::nullopt
-	int will_not_error2 = lua["abc"]["def"]["ghi"]["jklm"].get_or<int>(25);
+	int also_will_not_error = lua["abc"]["def"]["ghi"]["jklm"].get_or(25);
 	// is 25
 
 	// if you don't go safe,
 	// will throw (or do at_panic if no exceptions)
-	int aaaahhh = lua["abc"]["hope_u_liek_crash"];
+	int aaaahhh = lua["boom"]["the_dynamite"];
 
 
 make tables
@@ -423,7 +422,8 @@ multiple returns from lua
 	std::tuple<int, int, int> result;
 	result = lua["f"](100, 200, 300); 
 	// result == { 100, 200, 300 }
-	int a, int b;
+	int a;
+	int b;
 	std::string c;
 	sol::tie( a, b, c ) = lua["f"](100, 200, "bark");
 	// a == 100
@@ -447,7 +447,7 @@ multiple returns to lua
 	// result == { 100, 200, 300 }
 	
 	std::tuple<int, int, std::string> result2;
-	result2 = lua["f"](100, 200, "BARK BARK BARK!")
+	result2 = lua["f"](100, 200, "BARK BARK BARK!");
 	// result2 == { 100, 200, "BARK BARK BARK!" }
 
 	int a, int b;
@@ -476,7 +476,7 @@ Is set as a :doc:`userdata + usertype<../api/usertype>`.
 
 	struct Doge { 
 		int tailwag = 50; 
-	}
+	};
 
 	Doge dog{};
 	
@@ -504,7 +504,7 @@ Is set as a :doc:`userdata + usertype<../api/usertype>`.
 
 	struct Doge { 
 		int tailwag = 50; 
-	}
+	};
 
 	sol::state lua;
 	lua.open_libraries(sol::lib::base);
@@ -528,7 +528,7 @@ Get userdata in the same way as everything else:
 
 	struct Doge { 
 		int tailwag = 50; 
-	}
+	};
 
 	sol::state lua;
 	lua.open_libraries(sol::lib::base);
@@ -543,7 +543,7 @@ Note that you can change the data of usertype variables and it will affect thing
 
 	struct Doge { 
 		int tailwag = 50; 
-	}
+	};
 
 	sol::state lua;
 	lua.open_libraries(sol::lib::base);

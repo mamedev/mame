@@ -19,7 +19,7 @@
 
 TILE_GET_INFO_MEMBER(skullxbo_state::get_alpha_tile_info)
 {
-	uint16_t data = tilemap.basemem_read(tile_index);
+	uint16_t data = m_alpha_tilemap->basemem_read(tile_index);
 	int code = (data ^ 0x400) & 0x7ff;
 	int color = (data >> 11) & 0x0f;
 	int opaque = data & 0x8000;
@@ -29,8 +29,8 @@ TILE_GET_INFO_MEMBER(skullxbo_state::get_alpha_tile_info)
 
 TILE_GET_INFO_MEMBER(skullxbo_state::get_playfield_tile_info)
 {
-	uint16_t data1 = tilemap.basemem_read(tile_index);
-	uint16_t data2 = tilemap.extmem_read(tile_index) & 0xff;
+	uint16_t data1 = m_playfield_tilemap->basemem_read(tile_index);
+	uint16_t data2 = m_playfield_tilemap->extmem_read(tile_index) & 0xff;
 	int code = data1 & 0x7fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO_MEMBER(1, code, color, (data1 >> 15) & 1);
@@ -165,7 +165,7 @@ WRITE16_MEMBER( skullxbo_state::playfield_latch_w )
 
 WRITE16_MEMBER(skullxbo_state::playfield_latched_w)
 {
-	m_playfield_tilemap->write(space, offset, data, mem_mask);
+	m_playfield_tilemap->write16(space, offset, data, mem_mask);
 	if (m_playfield_latch != -1)
 	{
 		uint16_t oldval = m_playfield_tilemap->extmem_read(offset);

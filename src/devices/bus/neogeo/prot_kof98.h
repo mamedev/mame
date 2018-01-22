@@ -2,15 +2,15 @@
 // copyright-holders:S. Smith,David Haywood,Fabio Priuli
 
 
+#ifndef MAME_BUS_NEOGEO_PROT_KOF98_H
+#define MAME_BUS_NEOGEO_PROT_KOF98_H
+
 #pragma once
 
-#ifndef __KOF98_PROT__
-#define __KOF98_PROT__
-
-extern const device_type KOF98_PROT;
+DECLARE_DEVICE_TYPE(NG_KOF98_PROT, kof98_prot_device)
 
 #define MCFG_KOF98_PROT_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, KOF98_PROT, 0)
+	MCFG_DEVICE_ADD(_tag, NG_KOF98_PROT, 0)
 
 
 class kof98_prot_device :  public device_t
@@ -30,4 +30,4 @@ protected:
 	virtual void device_reset() override;
 };
 
-#endif
+#endif // MAME_BUS_NEOGEO_PROT_KOF98_H

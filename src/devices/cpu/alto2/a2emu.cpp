@@ -5,6 +5,7 @@
  *   Xerox AltoII emulator task
  *
  *****************************************************************************/
+#include "emu.h"
 #include "alto2cpu.h"
 
 /** @brief CTL2K_U3 address line for F2 function */

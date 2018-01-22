@@ -13,7 +13,7 @@ board containing the video and sound cpus, and the video controller
 and the sound DAC and amp.
 
 Granny uses the MPU4 board, but it has a Vidiot Deluxe for the
-video, and a Cheep Squeek sound board. The manual incorrectly
+video, and a Cheap Squeek sound board. The manual incorrectly
 describes the babypac vidiot board, which is of little use.
 
 
@@ -38,14 +38,16 @@ ToDo (granny):
 
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
+#include "cpu/m6800/m6801.h"
 #include "cpu/m6809/m6809.h"
-#include "video/tms9928a.h"
 #include "machine/6821pia.h"
 #include "machine/nvram.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
+#include "video/tms9928a.h"
+#include "speaker.h"
 
 class by133_state : public driver_device
 {
@@ -104,6 +106,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	DECLARE_WRITE8_MEMBER(granny_crtc_w);
 	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void babypac(machine_config &config);
+	void granny(machine_config &config);
 private:
 	uint8_t m_mpu_to_vid;
 	uint8_t m_vid_to_mpu;
@@ -118,7 +122,7 @@ private:
 	bool m_u11_timer;
 	virtual void machine_reset() override;
 	required_device<m6800_cpu_device> m_maincpu;
-	required_device<m6809e_device> m_videocpu;
+	required_device<mc6809_device> m_videocpu;
 	required_device<m6803_cpu_device> m_audiocpu;
 	required_device<pia6821_device> m_pia_u7;
 	required_device<pia6821_device> m_pia_u10;
@@ -739,12 +743,12 @@ uint32_t by133_state::screen_update_granny(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-static MACHINE_CONFIG_START( babypac, by133_state )
+MACHINE_CONFIG_START(by133_state::babypac)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz/4) // no xtal, just 2 chips
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("videocpu", M6809E, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("videocpu", MC6809, XTAL_3_579545MHz)
 	MCFG_CPU_PROGRAM_MAP(video_map)
 
 	MCFG_CPU_ADD("audiocpu", M6803, XTAL_3_579545MHz)
@@ -794,7 +798,7 @@ static MACHINE_CONFIG_START( babypac, by133_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("dac", ZN429E, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // U32 (Vidiot) or U6 (Cheap Squeak)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
@@ -803,9 +807,9 @@ static MACHINE_CONFIG_START( babypac, by133_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "beee", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( granny, babypac )
+MACHINE_CONFIG_DERIVED(by133_state::granny, babypac)
 	MCFG_DEVICE_REMOVE("videocpu")
-	MCFG_CPU_ADD("videocpu", M6809E, XTAL_8MHz) //??
+	MCFG_CPU_ADD("videocpu", MC6809, XTAL_8MHz) // MC68B09P (XTAL value hard to read)
 	MCFG_CPU_PROGRAM_MAP(granny_map)
 
 	MCFG_DEVICE_REMOVE("screen")
@@ -816,8 +820,8 @@ static MACHINE_CONFIG_DERIVED( granny, babypac )
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, TMS9928A_TOTAL_HORZ, TMS9928A_HORZ_DISPLAY_START-12, TMS9928A_HORZ_DISPLAY_START + 256 + 12, \
-			TMS9928A_TOTAL_VERT_NTSC, TMS9928A_VERT_DISPLAY_START_NTSC - 12, TMS9928A_VERT_DISPLAY_START_NTSC + 192 + 12 )
+	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
+			tms9928a_device::TOTAL_VERT_NTSC, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12 )
 	MCFG_SCREEN_UPDATE_DRIVER(by133_state, screen_update_granny)
 MACHINE_CONFIG_END
 
@@ -876,6 +880,6 @@ ROM_START(granny)
 ROM_END
 
 
-GAME( 1982, babypac,  0,        babypac, babypac, driver_device,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1982, babypac2, babypac,  babypac, babypac, driver_device,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1984, granny,   0,        granny,  granny,  driver_device,  0,  ROT0,  "Bally", "Granny and the Gators", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1982, babypac,  0,        babypac, babypac, by133_state,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 1)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1982, babypac2, babypac,  babypac, babypac, by133_state,  0,  ROT90, "Dave Nutting Associates / Bally", "Baby Pac-Man (set 2)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1984, granny,   0,        granny,  granny,  by133_state,  0,  ROT0,  "Bally",                           "Granny and the Gators", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

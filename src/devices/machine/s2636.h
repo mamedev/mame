@@ -6,8 +6,10 @@
 
 **********************************************************************/
 
-#ifndef __S2636_H__
-#define __S2636_H__
+#ifndef MAME_MACHINE_S2636_H
+#define MAME_MACHINE_S2636_H
+
+#pragma once
 
 
 #define S2636_IS_PIXEL_DRAWN(p)     (((p) & 0x08) ? true : false)
@@ -20,14 +22,14 @@
  *
  *************************************/
 
-#define MCFG_S2636_OFFSETS(_yoffs, _xoffs) \
-	s2636_device::set_offsets(*device, _yoffs, _xoffs);
+#define MCFG_S2636_OFFSETS(yoffs, xoffs) \
+		s2636_device::set_offsets(*device, (yoffs), (xoffs));
 
-#define MCFG_S2636_DIVIDER(_divider) \
-	s2636_device::set_divider(*device, _divider);
+#define MCFG_S2636_DIVIDER(divider) \
+		s2636_device::set_divider(*device, (divider));
 
-#define MCFG_S2623_SET_INTREQ_CALLBACK(_devcb) \
-	devcb = &s2636_device::set_intreq_cb(*device, DEVCB_##_devcb);
+#define MCFG_S2623_SET_INTREQ_CALLBACK(cb) \
+		devcb = &s2636_device::set_intreq_cb(*device, DEVCB_##cb);
 
 
 /*************************************
@@ -42,7 +44,6 @@ class s2636_device : public device_t,
 {
 public:
 	s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~s2636_device() {}
 
 	static void set_offsets(device_t &device, int y_offset, int x_offset)
 	{
@@ -57,10 +58,10 @@ public:
 		dev.m_divider = divider;
 	}
 
-	template<class _Object> static devcb_base &set_intreq_cb(device_t &device, _Object object)
+	template <class Object> static devcb_base &set_intreq_cb(device_t &device, Object &&cb)
 	{
 		s2636_device &dev = downcast<s2636_device &>(device);
-		return dev.m_intreq_cb.set_callback(object);
+		return dev.m_intreq_cb.set_callback(std::forward<Object>(cb));
 	}
 
 	// returns a BITMAP_FORMAT_IND16 bitmap the size of the screen
@@ -175,6 +176,6 @@ private:
 	bool            m_sound_lvl;
 };
 
-extern const device_type S2636;
+DECLARE_DEVICE_TYPE(S2636, s2636_device)
 
-#endif /* __S2636_H__ */
+#endif // MAME_MACHINE_S2636_H

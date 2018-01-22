@@ -15,6 +15,7 @@
 #include "emu.h"
 #include "includes/alesis.h"
 #include "sr16.lh"
+#include "screen.h"
 
 
 WRITE8_MEMBER( alesis_state::kb_matrix_w )
@@ -354,7 +355,7 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 		bitmap.pix16(line*9 + y, pos*6 + x) = state;
 }
 
-static MACHINE_CONFIG_START( hr16, alesis_state )
+MACHINE_CONFIG_START(alesis_state::hr16)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8031, XTAL_12MHz)
 	MCFG_CPU_PROGRAM_MAP(hr16_mem)
@@ -386,7 +387,7 @@ static MACHINE_CONFIG_START( hr16, alesis_state )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sr16, hr16 )
+MACHINE_CONFIG_DERIVED(alesis_state::sr16, hr16)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sr16_mem)
@@ -403,7 +404,7 @@ static MACHINE_CONFIG_DERIVED( sr16, hr16 )
 	MCFG_HD44780_PIXEL_UPDATE_CB(alesis_state, sr16_pixel_update)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mmt8, hr16 )
+MACHINE_CONFIG_DERIVED(alesis_state::mmt8, hr16)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mmt8_io)
@@ -471,13 +472,13 @@ DRIVER_INIT_MEMBER(alesis_state,hr16)
 	uint8_t *orig = memregion("user1")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
-		ROM[BITSWAP16(i,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7)] = orig[i];
+		ROM[bitswap<16>(i,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7)] = orig[i];
 	}
 }
 
 /* Driver */
-/*    YEAR  NAME   PARENT   COMPAT   MACHINE    INPUT INIT                 COMPANY, FULLNAME, FLAGS */
-SYST( 1987, hr16,  0,       0,       hr16,      hr16, alesis_state,  hr16, "Alesis", "HR-16", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST( 1987, mmt8,  0,       0,       mmt8,      mmt8, driver_device, 0,    "Alesis", "MMT-8", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST( 1989, hr16b, hr16,    0,       hr16,      hr16, alesis_state,  hr16, "Alesis", "HR-16B", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-SYST( 1990, sr16,  0,       0,       sr16,      sr16, driver_device, 0,    "Alesis", "SR-16 (Alesis)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+/*    YEAR  NAME   PARENT   COMPAT   MACHINE    INPUT  STATE        INIT   COMPANY   FULLNAME          FLAGS */
+SYST( 1987, hr16,  0,       0,       hr16,      hr16,  alesis_state, hr16, "Alesis", "HR-16",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST( 1987, mmt8,  0,       0,       mmt8,      mmt8,  alesis_state, 0,    "Alesis", "MMT-8",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST( 1989, hr16b, hr16,    0,       hr16,      hr16,  alesis_state, hr16, "Alesis", "HR-16B",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST( 1990, sr16,  0,       0,       sr16,      sr16,  alesis_state, 0,    "Alesis", "SR-16 (Alesis)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

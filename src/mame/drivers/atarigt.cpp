@@ -53,10 +53,10 @@
 
 
 #include "emu.h"
-#include "machine/atarigen.h"
-#include "video/atarirle.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/atarigt.h"
+
+#include "cpu/m68000/m68000.h"
+#include "machine/eeprompar.h"
 
 
 #define LOG_PROTECTION      (0)
@@ -601,10 +601,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigt_state )
 	AM_RANGE(0xc00000, 0xc00003) AM_READWRITE(sound_data_r, sound_data_w)
 	AM_RANGE(0xd00014, 0xd00017) AM_READ(analog_port0_r)
 	AM_RANGE(0xd0001c, 0xd0001f) AM_READ(analog_port1_r)
-	AM_RANGE(0xd20000, 0xd20fff) AM_DEVREADWRITE8("eeprom", atari_eeprom_device, read, write, 0xff00ff00)
-	AM_RANGE(0xd40000, 0xd4ffff) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
-	AM_RANGE(0xd72000, 0xd75fff) AM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
-	AM_RANGE(0xd76000, 0xd76fff) AM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
+	AM_RANGE(0xd20000, 0xd20fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0xff00ff00)
+	AM_RANGE(0xd40000, 0xd4ffff) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write32)
+	AM_RANGE(0xd72000, 0xd75fff) AM_DEVWRITE("playfield", tilemap_device, write32) AM_SHARE("playfield")
+	AM_RANGE(0xd76000, 0xd76fff) AM_DEVWRITE("alpha", tilemap_device, write32) AM_SHARE("alpha")
 	AM_RANGE(0xd78000, 0xd78fff) AM_RAM AM_SHARE("rle")
 	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE(mo_command_w) AM_SHARE("mo_command")
 	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
@@ -800,7 +800,7 @@ static const atari_rle_objects_config modesc =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarigt, atarigt_state )
+MACHINE_CONFIG_START(atarigt_state::atarigt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
@@ -810,7 +810,8 @@ static MACHINE_CONFIG_START( atarigt, atarigt_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(atarigt_state,atarigt)
 
-	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_2816_ADD("eeprom")
+	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarigt)
@@ -832,21 +833,21 @@ static MACHINE_CONFIG_START( atarigt, atarigt_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tmek, atarigt )
+MACHINE_CONFIG_DERIVED(atarigt_state::tmek, atarigt)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x4fad)
 	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primrage, atarigt )
+MACHINE_CONFIG_DERIVED(atarigt_state::primrage, atarigt)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x42f2)
 	MCFG_ATARI_CAGE_IRQ_CALLBACK(WRITE8(atarigt_state,cage_irq_callback))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( primrage20, atarigt )
+MACHINE_CONFIG_DERIVED(atarigt_state::primrage20, atarigt)
 	/* sound hardware */
 	MCFG_DEVICE_ADD("cage", ATARI_CAGE, 0)
 	MCFG_ATARI_CAGE_SPEEDUP(0x48a4)
@@ -1286,21 +1287,21 @@ ROM_END
 
 WRITE32_MEMBER(atarigt_state::tmek_pf_w)
 {
-	offs_t pc = space.device().safe_pc();
+	offs_t pc = m_maincpu->pc();
 
 	/* protected version */
 	if (pc == 0x2EB3C || pc == 0x2EB48)
 	{
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", space.device().safe_pc(), 0xd72000 + offset*4, data, mem_mask, (uint32_t)space.device().state().state_int(M68K_A4) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", m_maincpu->pc(), 0xd72000 + offset*4, data, mem_mask, (uint32_t)m_maincpu->state_int(M68K_A4) - 2);
 		/* skip these writes to make more stuff visible */
 		return;
 	}
 
 	/* unprotected version */
 	if (pc == 0x25834 || pc == 0x25860)
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", space.device().safe_pc(), 0xd72000 + offset*4, data, mem_mask, (uint32_t)space.device().state().state_int(M68K_A3) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", m_maincpu->pc(), 0xd72000 + offset*4, data, mem_mask, (uint32_t)m_maincpu->state_int(M68K_A3) - 2);
 
-	m_playfield_tilemap->write(space, offset, data, mem_mask);
+	m_playfield_tilemap->write32(space, offset, data, mem_mask);
 }
 
 DRIVER_INIT_MEMBER(atarigt_state,tmek)
@@ -1331,10 +1332,10 @@ DRIVER_INIT_MEMBER(atarigt_state,primrage)
  *
  *************************************/
 
-GAME( 1994, tmek,       0,        tmek,      tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek51p,    tmek,     tmek,      tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek45,     tmek,     tmek,      tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek44,     tmek,     tmek,      tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION )
-GAME( 1994, tmek20,     tmek,     tmek,      tmek, atarigt_state,     tmek,       ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
-GAME( 1994, primrage,   0,        primrage,  primrage, atarigt_state, primrage,   ROT0, "Atari Games", "Primal Rage (version 2.3)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek,       0,        tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v5.1, The Warlords)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek51p,    tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v5.1, prototype)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek45,     tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v4.5)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek44,     tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v4.4)", MACHINE_UNEMULATED_PROTECTION )
+GAME( 1994, tmek20,     tmek,     tmek,      tmek,     atarigt_state, tmek,     ROT0, "Atari Games", "T-MEK (v2.0, prototype)", 0 )
+GAME( 1994, primrage,   0,        primrage,  primrage, atarigt_state, primrage, ROT0, "Atari Games", "Primal Rage (version 2.3)", MACHINE_UNEMULATED_PROTECTION )
 GAME( 1994, primrage20, primrage, primrage20,primrage, atarigt_state, primrage, ROT0, "Atari Games", "Primal Rage (version 2.0)", MACHINE_UNEMULATED_PROTECTION )

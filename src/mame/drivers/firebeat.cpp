@@ -137,18 +137,24 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/ataintf.h"
-#include "machine/intelfsh.h"
-#include "machine/rtc65271.h"
-#include "machine/ins8250.h"
-#include "machine/midikbd.h"
 #include "machine/atapicdr.h"
-#include "sound/ymz280b.h"
+#include "machine/ins8250.h"
+#include "machine/intelfsh.h"
+#include "machine/midikbd.h"
+#include "machine/rtc65271.h"
+#include "machine/timer.h"
 #include "sound/cdda.h"
 #include "sound/rf5c400.h"
+#include "sound/ymz280b.h"
 #include "video/k057714.h"
+
+#include "screen.h"
+#include "speaker.h"
+
 #include "firebeat.lh"
 
 
@@ -275,6 +281,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(midi_uart_ch1_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(gcu0_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(gcu1_interrupt);
+	static void cdrom_config(device_t *device);
+	void firebeat2(machine_config &config);
+	void firebeat(machine_config &config);
+	void firebeat_spu(machine_config &config);
 };
 
 
@@ -442,12 +452,12 @@ READ32_MEMBER(firebeat_state::ata_command_r )
 //  printf("ata_command_r: %08X, %08X\n", offset, mem_mask);
 	if (ACCESSING_BITS_16_31)
 	{
-		r = m_ata->read_cs0(space, offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		r = m_ata->read_cs0(offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
 		return BYTESWAP16(r) << 16;
 	}
 	else
 	{
-		r = m_ata->read_cs0(space, (offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		r = m_ata->read_cs0((offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
 		return BYTESWAP16(r) << 0;
 	}
 }
@@ -458,11 +468,11 @@ WRITE32_MEMBER(firebeat_state::ata_command_w )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		m_ata->write_cs0(space, offset*2, BYTESWAP16((data >> 16) & 0xffff), BYTESWAP16((mem_mask >> 16) & 0xffff));
+		m_ata->write_cs0(offset*2, BYTESWAP16((data >> 16) & 0xffff), BYTESWAP16((mem_mask >> 16) & 0xffff));
 	}
 	else
 	{
-		m_ata->write_cs0(space, (offset*2) + 1, BYTESWAP16((data >> 0) & 0xffff), BYTESWAP16((mem_mask >> 0) & 0xffff));
+		m_ata->write_cs0((offset*2) + 1, BYTESWAP16((data >> 0) & 0xffff), BYTESWAP16((mem_mask >> 0) & 0xffff));
 	}
 }
 
@@ -474,12 +484,12 @@ READ32_MEMBER(firebeat_state::ata_control_r )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		r = m_ata->read_cs1(space, offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		r = m_ata->read_cs1(offset*2, BYTESWAP16((mem_mask >> 16) & 0xffff));
 		return BYTESWAP16(r) << 16;
 	}
 	else
 	{
-		r = m_ata->read_cs1(space, (offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		r = m_ata->read_cs1((offset*2) + 1, BYTESWAP16((mem_mask >> 0) & 0xffff));
 		return BYTESWAP16(r) << 0;
 	}
 }
@@ -488,11 +498,11 @@ WRITE32_MEMBER(firebeat_state::ata_control_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		m_ata->write_cs1(space, offset*2, BYTESWAP16(data >> 16) & 0xffff, BYTESWAP16((mem_mask >> 16) & 0xffff));
+		m_ata->write_cs1(offset*2, BYTESWAP16(data >> 16) & 0xffff, BYTESWAP16((mem_mask >> 16) & 0xffff));
 	}
 	else
 	{
-		m_ata->write_cs1(space, (offset*2) + 1, BYTESWAP16(data >> 0) & 0xffff, BYTESWAP16((mem_mask >> 0) & 0xffff));
+		m_ata->write_cs1((offset*2) + 1, BYTESWAP16(data >> 0) & 0xffff, BYTESWAP16((mem_mask >> 0) & 0xffff));
 	}
 }
 
@@ -876,7 +886,7 @@ READ32_MEMBER(firebeat_state::ppc_spu_share_r)
 	uint32_t r = 0;
 
 #if PRINT_SPU_MEM
-	printf("ppc_spu_share_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
+	printf("ppc_spu_share_r: %08X, %08X at %08X\n", offset, mem_mask, m_maincpu->pc());
 #endif
 
 	if (ACCESSING_BITS_24_31)
@@ -907,7 +917,7 @@ READ32_MEMBER(firebeat_state::ppc_spu_share_r)
 WRITE32_MEMBER(firebeat_state::ppc_spu_share_w)
 {
 #if PRINT_SPU_MEM
-	printf("ppc_spu_share_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+	printf("ppc_spu_share_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
 #endif
 
 	if (ACCESSING_BITS_24_31)
@@ -1263,17 +1273,18 @@ WRITE_LINE_MEMBER( firebeat_state::ata_interrupt )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ4, state);
 }
 
-static MACHINE_CONFIG_FRAGMENT( cdrom_config )
-	MCFG_DEVICE_MODIFY("cdda")
+void firebeat_state::cdrom_config(device_t *device)
+{
+	device = device->subdevice("cdda");
 	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
-MACHINE_CONFIG_END
+}
 
 static SLOT_INTERFACE_START(firebeat_ata_devices)
 	SLOT_INTERFACE("cdrom", ATAPI_FIXED_CDROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( firebeat, firebeat_state )
+MACHINE_CONFIG_START(firebeat_state::firebeat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GCX, XTAL_64MHz)
@@ -1333,7 +1344,7 @@ static MACHINE_CONFIG_START( firebeat, firebeat_state )
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, firebeat_state, midi_uart_ch1_irq_callback))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( firebeat2, firebeat_state )
+MACHINE_CONFIG_START(firebeat_state::firebeat2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GCX, XTAL_64MHz)
@@ -1403,7 +1414,7 @@ static MACHINE_CONFIG_START( firebeat2, firebeat_state )
 	MCFG_MIDI_KBD_ADD("kbd1", DEVWRITELINE("duart_midi:chan1", ins8250_uart_device, rx_w), 31250)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( firebeat_spu, firebeat )
+MACHINE_CONFIG_DERIVED(firebeat_state::firebeat_spu, firebeat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", M68000, 16000000)

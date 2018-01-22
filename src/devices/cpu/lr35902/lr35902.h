@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
-#pragma once
+#ifndef MAME_CPU_LR35902_LR35902_H
+#define MAME_CPU_LR35902_LR35902_H
 
-#ifndef __LR35902_H__
-#define __LR35902_H__
+#pragma once
 
 
 #define MCFG_LR35902_TIMER_CB(_devcb) \
-	lr35902_cpu_device::set_timer_cb(*device, DEVCB_##_devcb);
+	devcb = &lr35902_cpu_device::set_timer_cb(*device, DEVCB_##_devcb);
 
 // The first release of this CPU has a bug where the programcounter
 // is not incremented properly after an interrupt after the halt opcode.
@@ -19,7 +19,7 @@
 // a 16-bit register in the $fe** region.
 // note: oldval is in hiword, newval is in loword
 #define MCFG_LR35902_INCDEC16_CB(_devcb) \
-	lr35902_cpu_device::set_incdec16_cb(*device, DEVCB_##_devcb);
+	devcb = &lr35902_cpu_device::set_incdec16_cb(*device, DEVCB_##_devcb);
 
 
 enum
@@ -33,7 +33,7 @@ enum
 };
 
 
-class lr35902_cpu_device :  public cpu_device
+class lr35902_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
@@ -83,15 +83,13 @@ protected:
 	virtual void execute_run() override;
 
 	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
+	virtual space_config_vector memory_space_config() const override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	inline void cycles_passed(uint8_t cycles);
 	inline uint8_t mem_read_byte(uint16_t addr);
@@ -140,6 +138,6 @@ protected:
 	devcb_write32 m_incdec16_func;
 };
 
-extern const device_type LR35902;
+DECLARE_DEVICE_TYPE(LR35902, lr35902_cpu_device)
 
-#endif /* __LR35902_H__ */
+#endif // MAME_CPU_LR35902_LR35902_H

@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:smf,R. Belmont,pSXAuthor,Carl
-#ifndef _included_psxcdrom_
-#define _included_psxcdrom_
+#ifndef MAME_MACHINE_PSXCD_H
+#define MAME_MACHINE_PSXCD_H
+
+#pragma once
 
 #include "imagedev/chd_cd.h"
 #include "sound/spu.h"
-
-#define MAX_PSXCD_TIMERS    (4)
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -24,7 +24,7 @@ public:
 	psxcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
-	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<psxcd_device &>(device).m_irq_handler.set_callback(object); }
+	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<psxcd_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
@@ -40,6 +40,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 private:
+	static constexpr unsigned MAX_PSXCD_TIMERS = 4;
+
 	void write_command(uint8_t byte);
 
 	typedef void (psxcd_device::*cdcmd)();
@@ -156,6 +158,6 @@ private:
 };
 
 // device type definition
-extern const device_type PSXCD;
+DECLARE_DEVICE_TYPE(PSXCD, psxcd_device)
 
-#endif
+#endif // MAME_MACHINE_PSXCD_H

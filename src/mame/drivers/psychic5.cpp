@@ -330,10 +330,13 @@ Notes (23-Jan-2016 AS):
 */
 
 #include "emu.h"
+#include "includes/psychic5.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/2203intf.h"
-#include "includes/psychic5.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 MACHINE_START_MEMBER(psychic5_state, psychic5)
@@ -709,7 +712,7 @@ static GFXDECODE_START( bombsa )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( psychic5, psychic5_state )
+MACHINE_CONFIG_START(psychic5_state::psychic5)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
@@ -719,8 +722,8 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(psychic5_vrambank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(14)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz)
@@ -763,7 +766,7 @@ static MACHINE_CONFIG_START( psychic5, psychic5_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bombsa, psychic5_state )
+MACHINE_CONFIG_START(psychic5_state::bombsa)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2 ) /* 6 MHz */
@@ -773,8 +776,8 @@ static MACHINE_CONFIG_START( bombsa, psychic5_state )
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bombsa_vrambank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(14)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz )
@@ -969,6 +972,6 @@ ROM_START( bombsa )
 ROM_END
 
 
-GAME( 1987, psychic5,  0,        psychic5, psychic5, driver_device, 0, ROT270, "Jaleco / NMK", "Psychic 5 (World)", MACHINE_SUPPORTS_SAVE ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
-GAME( 1987, psychic5j, psychic5, psychic5, psychic5, driver_device, 0, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bombsa,    0,        bombsa,   bombsa,   driver_device, 0, ROT270, "Jaleco", "Bombs Away (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, psychic5,  0,        psychic5, psychic5, psychic5_state, 0, ROT270, "Jaleco / NMK", "Psychic 5 (World)", MACHINE_SUPPORTS_SAVE ) // "Oversea's version V2.00 CHANGED BY TAMIO NAKASATO" text present in ROM, various modifications (English names, more complete attract demo etc.)
+GAME( 1987, psychic5j, psychic5, psychic5, psychic5, psychic5_state, 0, ROT270, "Jaleco / NMK", "Psychic 5 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bombsa,    0,        bombsa,   bombsa,   psychic5_state, 0, ROT270, "Jaleco", "Bombs Away (prototype)", MACHINE_IS_INCOMPLETE | MACHINE_SUPPORTS_SAVE )

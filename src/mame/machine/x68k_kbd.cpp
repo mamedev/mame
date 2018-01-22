@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald,Vas Crabb
+#include "emu.h"
 #include "machine/x68k_kbd.h"
 
 #include "machine/keyboard.ipp"
 
 
 x68k_keyboard_device::x68k_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
-	: buffered_rs232_device(mconfig, X68K_KEYBOARD, "X68k Keyboard", tag, owner, 0, "x68k_keyboard", __FILE__)
+	: buffered_rs232_device(mconfig, X68K_KEYBOARD, tag, owner, 0)
 	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINEA", "LINEB", "LINEC", "LINED", "LINEE")
 {
 }
@@ -48,13 +49,13 @@ void x68k_keyboard_device::received_byte(uint8_t data)
 
 	if (data & 0x80)  // LED status
 	{
-		machine().output().set_value("key_led_kana", (data & 0x01) ? 0 : 1);
-		machine().output().set_value("key_led_romaji", (data & 0x02) ? 0 : 1);
-		machine().output().set_value("key_led_code", (data & 0x04) ? 0 : 1);
-		machine().output().set_value("key_led_caps", (data & 0x08) ? 0 : 1);
-		machine().output().set_value("key_led_insert", (data & 0x10) ? 0 : 1);
-		machine().output().set_value("key_led_hiragana", (data & 0x20) ? 0 : 1);
-		machine().output().set_value("key_led_fullsize", (data & 0x40) ? 0 : 1);
+		machine().output().set_value("key_led_kana", data & 0x01);
+		machine().output().set_value("key_led_romaji", data & 0x02);
+		machine().output().set_value("key_led_code", data & 0x04);
+		machine().output().set_value("key_led_caps", data & 0x08);
+		machine().output().set_value("key_led_insert", data & 0x10);
+		machine().output().set_value("key_led_hiragana", data & 0x20);
+		machine().output().set_value("key_led_fullsize", data & 0x40);
 		logerror("KB: LED status set to %02x\n", data & 0x7f);
 	}
 
@@ -294,14 +295,8 @@ void x68k_keyboard_device::device_reset()
 	output_rxd(1);
 }
 
-void x68k_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	device_matrix_keyboard_interface::device_timer(timer, id, param, ptr);
-	buffered_rs232_device::device_timer(timer, id, param, ptr);
-}
 
-
-const device_type X68K_KEYBOARD = &device_creator<x68k_keyboard_device>;
+DEFINE_DEVICE_TYPE(X68K_KEYBOARD, x68k_keyboard_device, "x68k_keyboard", "Sharp X68000 Keyboard")
 
 #if 0
 

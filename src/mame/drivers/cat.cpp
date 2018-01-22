@@ -190,6 +190,17 @@ ToDo:
 
 ****************************************************************************/
 
+#include "emu.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/clock.h"
+#include "machine/mc68681.h"
+#include "machine/nvram.h"
+#include "sound/spkrdev.h"
+#include "bus/centronics/ctronics.h"
+#include "screen.h"
+#include "speaker.h"
+
+
 // Defines
 
 #undef DEBUG_GA2OPR_W
@@ -220,15 +231,6 @@ ToDo:
 #define DEBUG_SWYFT_VIA0 1
 #define DEBUG_SWYFT_VIA1 1
 
-
-// Includes
-#include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "machine/clock.h"
-#include "machine/mc68681.h"
-#include "machine/nvram.h"
-#include "sound/speaker.h"
-#include "bus/centronics/ctronics.h"
 
 class cat_state : public driver_device
 {
@@ -350,6 +352,7 @@ public:
 	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
 	IRQ_CALLBACK_MEMBER(cat_int_ack);
 
+	void cat(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -429,7 +432,10 @@ WRITE16_MEMBER( cat_state::cat_video_control_w )
 	 *     Suffice to say, whatever bit combination 0b00011100000x does, it enables both horiz and vert sync and both are positive
 	 */
 #ifdef DEBUG_VIDEO_CONTROL_W
-	static const char *const regDest[16] = { "VSE (End of frame)", "VST (End of VSync)", "VSS (Start of VSync)", "VDE (Active Lines)", "unknown 620xxx", "unknown 628xxx", "unknown 630xxx", "unknown 638xxx", "HSE (end of horizontal line)", "HST (end of HSync)", "HSS (HSync Start)", "VOC (Video Control)", "unknown 660xxx", "unknown 668xxx", "unknown 670xxx", "unknown 678xxx" };
+	static const char *const regDest[16] = { "VSE (End of frame)", "VST (End of VSync)", "VSS (Start of VSync)", "VDE (Active Lines)",
+	"unknown 620xxx", "unknown 628xxx", "unknown 630xxx", "unknown 638xxx",
+	"HSE (end of horizontal line)", "HST (end of HSync)", "HSS (HSync Start)", "VOC (Video Control)",
+	"unknown 660xxx", "unknown 668xxx", "unknown 670xxx", "unknown 678xxx" };
 	fprintf(stderr,"Write to video chip address %06X; %02X -> register %s with data %04X\n", 0x600000+(offset<<1), offset&0xFF, regDest[(offset&0x3C000)>>14], data);
 #endif
 }
@@ -713,7 +719,9 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 0   0   1   x   x   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   1       R   SVROM 0 ic6 (MASK ROM tc531000) [controlled via GA2 /SVCS0]
 0   0   1   x   x   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   0       O   OPEN BUS (reads as 0x2e) [controlled via GA2 /SVCS1] *SEE BELOW*
 0   0   1   x   x   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   1       R   SVROM 1 ic8 (not present on cat as sold, open bus reads as 0x80) [controlled via GA2 /SVCS1] *SEE BELOW*
-                                                                                                    *NOTE: on Dwight E's user-made developer unit, two 128K SRAMS are mapped in place of the two entries immediately above!* (this involves some creative wiring+sockets); the official IAI 'shadow ram board' maps the ram to the A00000-A3FFFF area instead)
+                                                                                                    *NOTE: on Dwight E's user-made developer unit, two 128K SRAMS are mapped in place of the
+                                                                                                    two entries immediately above!* (this involves some creative wiring+sockets); the official
+                                                                                                    IAI 'shadow ram board' maps the ram to the A00000-A3FFFF area instead)
 0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       *BOTH GATE ARRAYS 1 and 2 DECODE THIS AREA; 2 DEALS WITH ADDR AND 1 WITH DATA/CAS/RAS*
 0   1   0   x   x   a   b   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       RW  VIDEO/SYSTEM DRAM (ab: 00=row 0, ic26-29; 01=row 1, ic22-25; 10=row 2; ic18-21; 11=row 3; ic14-17)
                                                                                                     *NOTE: DRAM rows 2 and 3 above are only usually populated in cat developer units!*
@@ -804,7 +812,7 @@ static INPUT_PORTS_START( cat )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('\xa2')
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR(0xA2)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 
 	PORT_START("Y1")
@@ -852,7 +860,7 @@ static INPUT_PORTS_START( cat )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('\xbd') PORT_CHAR('\xbc') //PORT_CHAR('}') PORT_CHAR('{')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0xBD) PORT_CHAR(0xBC) //PORT_CHAR('}') PORT_CHAR('{')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
@@ -875,7 +883,7 @@ static INPUT_PORTS_START( cat )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Erase") PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNUSED) // totally unused
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("UNDO") PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('\xb1') PORT_CHAR('\xb0') // PORT_CHAR('\\') PORT_CHAR('~')
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR(0xB1) PORT_CHAR(0xB0) // PORT_CHAR('\\') PORT_CHAR('~')
 INPUT_PORTS_END
 
 
@@ -993,8 +1001,17 @@ WRITE_LINE_MEMBER(cat_state::cat_duart_txb) // memit sends stuff here; connects 
 
 /* mc68681 DUART Input pins:
  * IP0: CTS [using the DUART builtin hardware-CTS feature?]
- * IP1: Centronics /ACK (pin 10) positive edge detect (IP1 changes state 0->1 or 1->0 on the rising edge of /ACK using a 74ls74a d-flipflop)
- * IP2: KTOBF (IP2 changes state 0->1 or 1->0 on the rising edge of KTOBF using a 74ls74a d-flipflop; KTOBF is a 6.5536ms-period squarewave generated by one of the gate arrays, I need to check with a scope to see whether it is a single spike/pulse every 6.5536ms or if from the gate array it inverts every 6.5536ms, documentation isn't 100% clear but I suspect the former) [uses the Delta IP2 state change detection feature to generate an interrupt; I'm not sure if IP2 is used as a counter clock source but given the beep frequency of the real unit I very much doubt it, 6.5536ms is too slow]
+ * IP1: Centronics /ACK (pin 10) positive edge detect (IP1 changes state 0->1
+        or 1->0 on the rising edge of /ACK using a 74ls74a d-flipflop)
+ * IP2: KTOBF (IP2 changes state 0->1 or 1->0 on the rising edge of KTOBF
+        using a 74ls74a d-flipflop; KTOBF is a 6.5536ms-period squarewave
+        generated by one of the gate arrays, I need to check with a scope to
+        see whether it is a single spike/pulse every 6.5536ms or if from the
+        gate array it inverts every 6.5536ms, documentation isn't 100% clear
+        but I suspect the former) [uses the Delta IP2 state change detection
+        feature to generate an interrupt; I'm not sure if IP2 is used as a
+        counter clock source but given the beep frequency of the real unit I
+        very much doubt it, 6.5536ms is too slow]
  * IP3: RG ("ring" input)
  * IP4: Centronics BUSY (pin 11), inverted
  * IP5: DSR
@@ -1031,7 +1048,7 @@ WRITE_LINE_MEMBER(cat_state::prn_ack_ff) // switch the flipflop state on the ris
 #endif
 }
 
-static MACHINE_CONFIG_START( cat, cat_state )
+MACHINE_CONFIG_START(cat_state::cat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000, XTAL_19_968MHz/4)
@@ -1054,7 +1071,7 @@ static MACHINE_CONFIG_START( cat, cat_state )
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
-	MCFG_MC68681_ADD( "duartn68681", (XTAL_19_968MHz*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
+	MCFG_DEVICE_ADD( "duartn68681", MC68681, (XTAL_19_968MHz*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(cat_state, cat_duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txa))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txb))
@@ -1155,4 +1172,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME  PARENT  COMPAT   MACHINE    INPUT    DEVICE         INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1987, cat,  0,  0,       cat,       cat,     driver_device, 0,       "Canon",  "Cat", MACHINE_NOT_WORKING)
+COMP( 1987, cat,  0,      0,       cat,       cat,     cat_state,     0,       "Canon",  "Cat",         MACHINE_NOT_WORKING)

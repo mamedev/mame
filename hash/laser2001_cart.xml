@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="laser2001_cart" description="V-Tech Laser 2001 / Salora Manager cartridges">
+
+	<software name="disk">
+		<description>Disk Drive</description>
+		<year>198?</year>
+		<publisher>Salora</publisher>
+
+		<part name="cart" interface="crvision_cart">
+			<feature name="slot" value="disk" />
+
+			<dataarea name="rom" size="0x2000">
+				<rom name="disk.rom" size="0x1e00" crc="c76900e3" sha1="3d1d6c0c2fd8039c042e5985da3a501e378bbad3" offset="0x0200" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

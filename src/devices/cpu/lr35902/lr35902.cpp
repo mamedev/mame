@@ -40,8 +40,9 @@
 /*************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "lr35902.h"
+#include "lr35902d.h"
+#include "debugger.h"
 
 /* Flag bit definitions */
 enum lr35902_flag
@@ -60,11 +61,11 @@ enum lr35902_flag
 //  LR35902 DEVICE
 //**************************************************************************
 
-const device_type LR35902 = &device_creator<lr35902_cpu_device>;
+DEFINE_DEVICE_TYPE(LR35902, lr35902_cpu_device, "lr35902", "LR35902")
 
 
 lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, LR35902, "LR35902", tag, owner, clock, "lr35902", __FILE__)
+	: cpu_device(mconfig, LR35902, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_A(0)
 	, m_F(0)
@@ -86,6 +87,12 @@ lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char
 {
 }
 
+device_memory_interface::space_config_vector lr35902_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config)
+	};
+}
 
 /****************************************************************************/
 /* Memory functions                                                         */
@@ -225,13 +232,10 @@ void lr35902_cpu_device::device_reset()
 	m_entering_halt = false;
 }
 
-
-offs_t lr35902_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *lr35902_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( lr35902 );
-	return CPU_DISASSEMBLE_NAME(lr35902)(this, buffer, pc, oprom, opram, options);
+	return new lr35902_disassembler;
 }
-
 
 void lr35902_cpu_device::check_interrupts()
 {

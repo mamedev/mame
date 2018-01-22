@@ -2,7 +2,8 @@
 // copyright-holders:David Haywood, Paul Priest
 #include "video/bufsprite.h"
 #include "machine/eepromser.h"
-#include "cpu/sh2/sh2.h"
+#include "cpu/sh/sh2.h"
+#include "screen.h"
 
 
 #define MASTER_CLOCK 57272700   // main oscillator frequency
@@ -27,7 +28,7 @@ class psikyosh_state : public driver_device
 public:
 	psikyosh_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_spriteram(*this, "spriteram") ,
+		m_spriteram(*this, "spriteram") ,
 		m_bgram(*this, "bgram"),
 		m_zoomram(*this, "zoomram"),
 		m_vidregs(*this, "vidregs"),
@@ -84,4 +85,7 @@ public:
 	void psikyosh_drawgfxzoom( bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 			uint32_t code,uint32_t color,int flipx,int flipy,int offsx,int offsy,
 			int alpha, int zoomx, int zoomy, int wide, int high, uint32_t z);
+			void psikyo3v1(machine_config &config);
+			void psikyo5(machine_config &config);
+			void psikyo5_240(machine_config &config);
 };

@@ -7,7 +7,7 @@
  Chase (aka Chase1) (1976)
  Deluxe Soccer (1973)
  Fire Power (1975)                EG-1020-2
- F??tsball (1975)
+ Fötsball (1975)
  Galaxy Raider (1974)
  Hesitation (1974)                AL-6500?
  Hockey, Soccer, Tennis (1974)
@@ -30,6 +30,7 @@
 #include "machine/netlist.h"
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
+#include "screen.h"
 
 // copied by Pong, not accurate for this driver!
 // start
@@ -57,9 +58,10 @@ public:
 	}
 
 	// devices
-	required_device<netlist_mame_device_t> m_maincpu;
+	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
+	void sburners(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -100,7 +102,7 @@ void sburners_state::video_start()
 {
 }
 
-static MACHINE_CONFIG_START( sburners, sburners_state )
+MACHINE_CONFIG_START(sburners_state::sburners)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
@@ -131,4 +133,4 @@ ROM_START( sburners )
 ROM_END
 
 
-GAME( 1975, sburners,  0, sburners, 0, driver_device,  0, ROT0, "Allied Leisure", "Street Burners [TTL]", MACHINE_IS_SKELETON )
+GAME( 1975, sburners,  0, sburners, 0, sburners_state, 0, ROT0, "Allied Leisure", "Street Burners [TTL]", MACHINE_IS_SKELETON )

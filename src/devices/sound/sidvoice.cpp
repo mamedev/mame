@@ -2,10 +2,14 @@
 // copyright-holders:Peter Trauner
 #include "emu.h"
 #include "sidvoice.h"
+
 #include "sid.h"
 #include "sidenvel.h"
 #include "sidw6581.h"
 #include "sidw8580.h"
+
+#include "sound/mos6581.h"
+
 
 static uint8_t triangleTable[4096];
 static uint8_t sawtoothTable[4096];
@@ -22,6 +26,7 @@ static const uint8_t* waveform70;
 	static uint8_t noiseTableMID[1<<8];
 	static uint8_t noiseTableLSB[1<<8];
 #endif
+
 
 static std::unique_ptr<int8_t[]> ampMod1x8;
 
@@ -274,58 +279,6 @@ static void sidMode74(sidOperator* pVoice)  {
 /* */
 /* */
 
-static inline void waveCalcCycleLen(sidOperator* pVoice)
-{
-#if defined(DIRECT_FIXPOINT)
-	pVoice->cycleAddLen.w[HI] = 0;
-	pVoice->cycleAddLen.l += pVoice->cycleLen.l;
-	pVoice->cycleLenCount = pVoice->cycleAddLen.w[HI];
-#else
-	pVoice->cycleAddLenPnt += pVoice->cycleLenPnt;
-	pVoice->cycleLenCount = pVoice->cycleLen;
-	if ( pVoice->cycleAddLenPnt > 65535 ) pVoice->cycleLenCount++;
-	pVoice->cycleAddLenPnt &= 0xFFFF;
-#endif
-	/* If we keep the value cycleLen between 1 <= x <= 65535, */
-	/* the following check is not required. */
-/*  if ( pVoice->cycleLenCount == 0 ) */
-/*  { */
-/*#if defined(DIRECT_FIXPOINT) */
-/*      pVoice->waveStep.l = 0; */
-/*#else */
-/*      pVoice->waveStep = (pVoice->waveStepPnt = 0); */
-/*#endif */
-/*      pVoice->cycleLenCount = 0; */
-/*  } */
-/*  else */
-	{
-#if defined(DIRECT_FIXPOINT)
-		uint16_t diff = pVoice->cycleLenCount - pVoice->cycleLen.w[HI];
-#else
-		uint16_t diff = pVoice->cycleLenCount - pVoice->cycleLen;
-#endif
-		if ( pVoice->wavePre[diff].len != pVoice->cycleLenCount )
-		{
-			pVoice->wavePre[diff].len = pVoice->cycleLenCount;
-#if defined(DIRECT_FIXPOINT)
-			pVoice->wavePre[diff].stp = (pVoice->waveStepAdd.l = (4096UL*65536UL) / pVoice->cycleLenCount);
-#else
-			pVoice->wavePre[diff].stp = (pVoice->waveStepAdd = 4096UL / pVoice->cycleLenCount);
-			pVoice->wavePre[diff].pnt = (pVoice->waveStepAddPnt = ((4096UL % pVoice->cycleLenCount) * 65536UL) / pVoice->cycleLenCount);
-#endif
-		}
-		else
-		{
-#if defined(DIRECT_FIXPOINT)
-			pVoice->waveStepAdd.l = pVoice->wavePre[diff].stp;
-#else
-			pVoice->waveStepAdd = pVoice->wavePre[diff].stp;
-			pVoice->waveStepAddPnt = pVoice->wavePre[diff].pnt;
-#endif
-		}
-	}  /* see above (opening bracket) */
-}
-
 static inline void waveCalcFilter(sidOperator* pVoice)
 {
 	if ( pVoice->filtEnabled )
@@ -402,32 +355,6 @@ static int8_t waveCalcMute(sidOperator* pVoice)
 }
 
 
-int8_t sidWaveCalcNormal(sidOperator* pVoice)
-{
-	if ( pVoice->cycleLenCount <= 0 )
-	{
-		waveCalcCycleLen(pVoice);
-		if (( pVoice->SIDctrl & 0x40 ) == 0x40 )
-		{
-			pVoice->pulseIndex = pVoice->newPulseIndex;
-			if ( pVoice->pulseIndex > 2048 )
-			{
-#if defined(DIRECT_FIXPOINT)
-				pVoice->waveStep.w[HI] = 0;
-#else
-				pVoice->waveStep = 0;
-#endif
-			}
-		}
-	}
-	(*pVoice->waveProc)(pVoice);
-	pVoice->filtIO = ampMod1x8[(*pVoice->ADSRproc)(pVoice)|pVoice->output];
-//  pVoice->filtIO = pVoice->sid->masterVolume; // test for digi sound
-	waveCalcFilter(pVoice);
-	return pVoice->filtIO;//&pVoice->outputMask;
-}
-
-
 static int8_t waveCalcRangeCheck(sidOperator* pVoice)
 {
 #if defined(DIRECT_FIXPOINT)
@@ -442,7 +369,7 @@ static int8_t waveCalcRangeCheck(sidOperator* pVoice)
 	{
 		/* Next step switch back to normal calculation. */
 		pVoice->cycleLenCount = 0;
-		pVoice->outProc = &sidWaveCalcNormal;
+		pVoice->outProc = &sidOperator::wave_calc_normal;
 #if defined(DIRECT_FIXPOINT)
 				pVoice->waveStep.w[HI] = 4095;
 #else
@@ -453,101 +380,6 @@ static int8_t waveCalcRangeCheck(sidOperator* pVoice)
 	waveCalcFilter(pVoice);
 	return pVoice->filtIO;//&pVoice->outputMask;
 }
-
-/* -------------------------------------------------- Operator frame set-up 1 */
-
-void sidEmuSet(sidOperator* pVoice)
-{
-	uint8_t enveTemp, newWave, oldWave;
-	uint8_t ADtemp;
-	uint8_t SRtemp;
-	uint8_t tmpSusVol;
-
-	pVoice->SIDfreq = pVoice->reg[0]|(pVoice->reg[1]<<8);
-
-	pVoice->SIDpulseWidth = (pVoice->reg[2]|(pVoice->reg[3]<<8)) & 0x0FFF;
-	pVoice->newPulseIndex = 4096 - pVoice->SIDpulseWidth;
-#if defined(DIRECT_FIXPOINT)
-	if ( ((pVoice->waveStep.w[HI] + pVoice->pulseIndex) >= 0x1000)
-		&& ((pVoice->waveStep.w[HI] + pVoice->newPulseIndex) >= 0x1000) )
-	{
-		pVoice->pulseIndex = pVoice->newPulseIndex;
-	}
-	else if ( ((pVoice->waveStep.w[HI] + pVoice->pulseIndex) < 0x1000)
-			&& ((pVoice->waveStep.w[HI] + pVoice->newPulseIndex) < 0x1000) )
-	{
-		pVoice->pulseIndex = pVoice->newPulseIndex;
-	}
-#else
-	if ( ((pVoice->waveStep + pVoice->pulseIndex) >= 0x1000)
-		&& ((pVoice->waveStep + pVoice->newPulseIndex) >= 0x1000) )
-	{
-		pVoice->pulseIndex = pVoice->newPulseIndex;
-	}
-	else if ( ((pVoice->waveStep + pVoice->pulseIndex) < 0x1000)
-			&& ((pVoice->waveStep + pVoice->newPulseIndex) < 0x1000) )
-	{
-		pVoice->pulseIndex = pVoice->newPulseIndex;
-	}
-#endif
-
-
-	oldWave = pVoice->SIDctrl;
-	enveTemp = pVoice->ADSRctrl;
-	pVoice->SIDctrl = (newWave = pVoice->reg[4]|(pVoice->reg[5]<<8));
-
-	if (( newWave & 1 ) ==0 )
-	{
-		if (( oldWave & 1 ) !=0 )
-			enveTemp = ENVE_STARTRELEASE;
-/*      else if ( pVoice->gateOnCtrl ) */
-/*      { */
-/*          enveTemp = ENVE_STARTSHORTATTACK; */
-/*      } */
-	}
-	else if ( /*pVoice->gateOffCtrl || */((oldWave&1)==0) )
-	{
-		enveTemp = ENVE_STARTATTACK;
-	}
-
-	if ((( oldWave ^ newWave ) & 0xF0 ) != 0 )
-	{
-		pVoice->cycleLenCount = 0;
-	}
-
-	ADtemp = pVoice->reg[5];
-	SRtemp = pVoice->reg[6];
-	if ( pVoice->SIDAD != ADtemp )
-	{
-		enveTemp |= ENVE_ALTER;
-	}
-	else if ( pVoice->SIDSR != SRtemp )
-	{
-		enveTemp |= ENVE_ALTER;
-	}
-	pVoice->SIDAD = ADtemp;
-	pVoice->SIDSR = SRtemp;
-	tmpSusVol = masterVolumeLevels[SRtemp >> 4];
-	if (pVoice->ADSRctrl != ENVE_SUSTAIN)  /* !!! */
-	{
-		pVoice->enveSusVol = tmpSusVol;
-	}
-	else
-	{
-		if ( pVoice->enveSusVol > pVoice->enveVol )
-			pVoice->enveSusVol = 0;
-		else
-			pVoice->enveSusVol = tmpSusVol;
-	}
-
-	pVoice->ADSRproc = enveModeTable[enveTemp>>1];  /* shifting out the KEY-bit */
-	pVoice->ADSRctrl = enveTemp & (255-ENVE_ALTER-1);
-
-	pVoice->filtEnabled = pVoice->sid->filter.Enabled &&
-		((pVoice->sid->reg[0x17] & pVoice->filtVoiceMask)!=0);
-}
-
-/* -------------------------------------------------- Operator frame set-up 2 */
 
 /* MOS-8580, MOS-6581 (no 70) */
 static ptr2sidVoidFunc sidModeNormalTable[16] =
@@ -563,152 +395,310 @@ static ptr2sidVoidFunc sidModeRingTable[16] =
 	sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock, sidModeLock
 };
 
-void sidClearOperator( sidOperator* pVoice )
+
+void sidOperator::clear()
 {
-	pVoice->SIDfreq = 0;
-	pVoice->SIDctrl = 0;
-	pVoice->SIDAD = 0;
-	pVoice->SIDSR = 0;
+	SIDfreq = 0;
+	SIDctrl = 0;
+	SIDAD = 0;
+	SIDSR = 0;
 
-	pVoice->sync = false;
+	sync = false;
 
-	pVoice->pulseIndex = (pVoice->newPulseIndex = (pVoice->SIDpulseWidth = 0));
-	pVoice->curSIDfreq = (pVoice->curNoiseFreq = 0);
+	pulseIndex = newPulseIndex = SIDpulseWidth = 0;
+	curSIDfreq = curNoiseFreq = 0;
 
-	pVoice->output = (pVoice->noiseOutput = 0);
-	pVoice->filtIO = 0;
+	output = noiseOutput = 0;
+	filtIO = 0;
 
-	pVoice->filtEnabled = false;
-	pVoice->filtLow = (pVoice->filtRef = 0);
+	filtEnabled = false;
+	filtLow = filtRef = 0;
 
-	pVoice->cycleLenCount = 0;
+	cycleLenCount = 0;
 #if defined(DIRECT_FIXPOINT)
-	pVoice->cycleLen.l = (pVoice->cycleAddLen.l = 0);
+	cycleLen.l = cycleAddLen.l = 0;
 #else
-	pVoice->cycleLen = (pVoice->cycleLenPnt = 0);
-	pVoice->cycleAddLenPnt = 0;
+	cycleLen = cycleLenPnt = 0;
+	cycleAddLenPnt = 0;
 #endif
 
-	pVoice->outProc = waveCalcMute;
+	outProc = waveCalcMute;
 
 #if defined(DIRECT_FIXPOINT)
-	pVoice->waveStepAdd.l = (pVoice->waveStep.l = 0);
-	pVoice->wavePre[0].len = (pVoice->wavePre[0].stp = 0);
-	pVoice->wavePre[1].len = (pVoice->wavePre[1].stp = 0);
+	waveStepAdd.l = waveStep.l = 0;
+	wavePre[0].len = (wavePre[0].stp = 0);
+	wavePre[1].len = (wavePre[1].stp = 0);
 #else
-	pVoice->waveStepAdd = (pVoice->waveStepAddPnt = 0);
-	pVoice->waveStep = (pVoice->waveStepPnt = 0);
-	pVoice->wavePre[0].len = 0;
-	pVoice->wavePre[0].stp = (pVoice->wavePre[0].pnt = 0);
-	pVoice->wavePre[1].len = 0;
-	pVoice->wavePre[1].stp = (pVoice->wavePre[1].pnt = 0);
+	waveStepAdd = waveStepAddPnt = 0;
+	waveStep = waveStepPnt = 0;
+	wavePre[0].len = 0;
+	wavePre[0].stp = wavePre[0].pnt = 0;
+	wavePre[1].len = 0;
+	wavePre[1].stp = wavePre[1].pnt = 0;
 #endif
-	pVoice->waveStepOld = 0;
+	waveStepOld = 0;
 
 #if defined(DIRECT_FIXPOINT)
-	pVoice->noiseReg.l = noiseSeed;
+	noiseReg.l = noiseSeed;
 #else
-	pVoice->noiseReg = noiseSeed;
+	noiseReg = noiseSeed;
 #endif
-	pVoice->noiseStepAdd = (pVoice->noiseStep = 0);
-	pVoice->noiseIsLocked = false;
+	noiseStepAdd = noiseStep = 0;
+	noiseIsLocked = false;
 }
 
-void sidEmuSet2(sidOperator* pVoice)
-{
-	pVoice->outProc = &sidWaveCalcNormal;
-	pVoice->sync = false;
 
-	if ( (pVoice->SIDfreq < 16) || ((pVoice->SIDctrl & 8) != 0) )
-//    if ( /*(pVoice->SIDfreq < 16) || */((pVoice->SIDctrl & 8) != 0) )
-	{
-	pVoice->outProc = waveCalcMute;
-	if (pVoice->SIDfreq == 0)
-	{
+/* -------------------------------------------------- Operator frame set-up 1 */
+
+void sidOperator::set()
+{
+	SIDfreq = reg[0] | (reg[1] << 8);
+
+	SIDpulseWidth = (reg[2] | (reg[3] << 8)) & 0x0FFF;
+	newPulseIndex = 4096 - SIDpulseWidth;
 #if defined(DIRECT_FIXPOINT)
-		pVoice->cycleLen.l = (pVoice->cycleAddLen.l = 0);
-		pVoice->waveStep.l = 0;
-#else
-		pVoice->cycleLen = (pVoice->cycleLenPnt = 0);
-		pVoice->cycleAddLenPnt = 0;
-		pVoice->waveStep = 0;
-		pVoice->waveStepPnt = 0;
-#endif
-		pVoice->curSIDfreq = (pVoice->curNoiseFreq = 0);
-		pVoice->noiseStepAdd = 0;
-		pVoice->cycleLenCount = 0;
-	}
-	if ((pVoice->SIDctrl & 8) != 0)
+	if (((waveStep.w[HI] + pulseIndex) >= 0x1000) && ((waveStep.w[HI] + newPulseIndex) >= 0x1000))
 	{
-		if (pVoice->noiseIsLocked)
+		pulseIndex = newPulseIndex;
+	}
+	else if (((waveStep.w[HI] + pulseIndex) < 0x1000) && ((waveStep.w[HI] + newPulseIndex) < 0x1000))
+	{
+		pulseIndex = newPulseIndex;
+	}
+#else
+	if (((waveStep + pulseIndex) >= 0x1000) && ((waveStep + newPulseIndex) >= 0x1000))
+	{
+		pulseIndex = newPulseIndex;
+	}
+	else if (((waveStep + pulseIndex) < 0x1000) && ((waveStep + newPulseIndex) < 0x1000))
+	{
+		pulseIndex = newPulseIndex;
+	}
+#endif
+
+	uint8_t const oldWave = SIDctrl;
+	uint8_t const newWave = reg[4] | (reg[5] << 8); // FIXME: what's actually supposed to happen here?
+	uint8_t enveTemp = ADSRctrl;
+	SIDctrl = newWave;
+
+	if (!(newWave & 1))
+	{
+		if (oldWave & 1)
+			enveTemp = ENVE_STARTRELEASE;
+#if 0
+		else if (gateOnCtrl)
+			enveTemp = ENVE_STARTSHORTATTACK;
+#endif
+	}
+	else if (/*gateOffCtrl || */!(oldWave & 1))
+	{
+		enveTemp = ENVE_STARTATTACK;
+	}
+
+	if ((oldWave ^ newWave) & 0xF0)
+		cycleLenCount = 0;
+
+	uint8_t const ADtemp = reg[5];
+	uint8_t const SRtemp = reg[6];
+	if (SIDAD != ADtemp)
+		enveTemp |= ENVE_ALTER;
+	else if (SIDSR != SRtemp)
+		enveTemp |= ENVE_ALTER;
+
+	SIDAD = ADtemp;
+	SIDSR = SRtemp;
+	uint8_t const tmpSusVol = masterVolumeLevels[SRtemp >> 4];
+	if (ADSRctrl != ENVE_SUSTAIN)  // !!!
+		enveSusVol = tmpSusVol;
+	else if (enveSusVol > enveVol)
+		enveSusVol = 0;
+	else
+		enveSusVol = tmpSusVol;
+
+	ADSRproc = enveModeTable[enveTemp >> 1];  // shifting out the KEY-bit
+	ADSRctrl = enveTemp & (255 - ENVE_ALTER - 1);
+
+	filtEnabled = sid->filter.Enabled && (sid->reg[0x17] & filtVoiceMask);
+}
+
+
+/* -------------------------------------------------- Operator frame set-up 2 */
+
+void sidOperator::set2()
+{
+	outProc = &sidOperator::wave_calc_normal;
+	sync = false;
+
+	if ((SIDfreq < 16) || (SIDctrl & 8))
+	//if (/*(SIDfreq < 16) || */(SIDctrl & 8))
+	{
+		outProc = waveCalcMute;
+		if (SIDfreq == 0)
 		{
-		pVoice->noiseIsLocked = false;
 #if defined(DIRECT_FIXPOINT)
-		pVoice->noiseReg.l = noiseSeed;
+			cycleLen.l = cycleAddLen.l = 0;
+			waveStep.l = 0;
 #else
-		pVoice->noiseReg = noiseSeed;
+			cycleLen = cycleLenPnt = 0;
+			cycleAddLenPnt = 0;
+			waveStep = 0;
+			waveStepPnt = 0;
 #endif
+			curSIDfreq = curNoiseFreq = 0;
+			noiseStepAdd = 0;
+			cycleLenCount = 0;
 		}
-	}
+		if (SIDctrl & 8)
+		{
+			if (noiseIsLocked)
+			{
+				noiseIsLocked = false;
+#if defined(DIRECT_FIXPOINT)
+				noiseReg.l = noiseSeed;
+#else
+				noiseReg = noiseSeed;
+#endif
+			}
+		}
 	}
 	else
 	{
-	if ( pVoice->curSIDfreq != pVoice->SIDfreq )
-	{
-		pVoice->curSIDfreq = pVoice->SIDfreq;
-		/* We keep the value cycleLen between 1 <= x <= 65535. */
-		/* This makes a range-check in waveCalcCycleLen() unrequired. */
+		if (curSIDfreq != SIDfreq)
+		{
+			curSIDfreq = SIDfreq;
+			// We keep the value cycleLen between 1 <= x <= 65535.
+			// This makes a range-check in wave_calc_cycle_len() unrequired.
 #if defined(DIRECT_FIXPOINT)
-		pVoice->cycleLen.l = ((pVoice->sid->PCMsid << 12) / pVoice->SIDfreq) << 4;
-		if (pVoice->cycleLenCount > 0)
-		{
-		waveCalcCycleLen(pVoice);
-		pVoice->outProc = &waveCalcRangeCheck;
-		}
+			cycleLen.l = ((sid->PCMsid << 12) / SIDfreq) << 4;
+			if (cycleLenCount > 0)
+			{
+				wave_calc_cycle_len();
+				outProc = &waveCalcRangeCheck;
+			}
 #else
-		pVoice->cycleLen = pVoice->sid->PCMsid / pVoice->SIDfreq;
-		pVoice->cycleLenPnt = (( pVoice->sid->PCMsid % pVoice->SIDfreq ) * 65536UL ) / pVoice->SIDfreq;
-		if (pVoice->cycleLenCount > 0)
-		{
-		waveCalcCycleLen(pVoice);
-		pVoice->outProc = &waveCalcRangeCheck;
-		}
+			cycleLen = sid->PCMsid / SIDfreq;
+			cycleLenPnt = ((sid->PCMsid % SIDfreq) * 65536UL) / SIDfreq;
+			if (cycleLenCount > 0)
+			{
+				wave_calc_cycle_len();
+				outProc = &waveCalcRangeCheck;
+			}
 #endif
-	}
-
-	if ((( pVoice->SIDctrl & 0x80 ) == 0x80 ) && ( pVoice->curNoiseFreq != pVoice->SIDfreq ))
-	{
-		pVoice->curNoiseFreq = pVoice->SIDfreq;
-		pVoice->noiseStepAdd = (pVoice->sid->PCMsidNoise * pVoice->SIDfreq) >> 8;
-		if (pVoice->noiseStepAdd >= (1L<<21))
-		sidModeNormalTable[8] = sidMode80hp;
-		else
-		sidModeNormalTable[8] = sidMode80;
-	}
-
-	if (( pVoice->SIDctrl & 2 ) != 0 )
-	{
-		if ( ( pVoice->modulator->SIDfreq == 0 ) || (( pVoice->modulator->SIDctrl & 8 ) != 0 ) )
-		{
-		;
 		}
-		else if ( (( pVoice->carrier->SIDctrl & 2 ) != 0 ) &&
-				( pVoice->modulator->SIDfreq >= ( pVoice->SIDfreq << 1 )) )
-		{
-		;
-		}
-		else
-		{
-		pVoice->sync = true;
-		}
-	}
 
-	if ((( pVoice->SIDctrl & 0x14 ) == 0x14 ) && ( pVoice->modulator->SIDfreq != 0 ))
-		pVoice->waveProc = sidModeRingTable[pVoice->SIDctrl >> 4];
+		if ((SIDctrl & 0x80) && (curNoiseFreq != SIDfreq))
+		{
+			curNoiseFreq = SIDfreq;
+			noiseStepAdd = (sid->PCMsidNoise * SIDfreq) >> 8;
+			if (noiseStepAdd >= (1L << 21))
+				sidModeNormalTable[8] = sidMode80hp;
+			else
+				sidModeNormalTable[8] = sidMode80;
+		}
+
+		if (SIDctrl & 2)
+		{
+			if (!modulator->SIDfreq || (modulator->SIDctrl & 8 ))
+			{
+			}
+			else if ((carrier->SIDctrl & 2) && (modulator->SIDfreq >= (SIDfreq << 1)))
+			{
+			}
+			else
+			{
+				sync = true;
+			}
+		}
+
+	if (((SIDctrl & 0x14 ) == 0x14) && modulator->SIDfreq)
+		waveProc = sidModeRingTable[SIDctrl >> 4];
 	else
-		pVoice->waveProc = sidModeNormalTable[pVoice->SIDctrl >> 4];
+		waveProc = sidModeNormalTable[SIDctrl >> 4];
 	}
 }
+
+
+int8_t sidOperator::wave_calc_normal(sidOperator* pVoice)
+{
+	if (pVoice->cycleLenCount <= 0)
+	{
+		pVoice->wave_calc_cycle_len();
+		if (pVoice->SIDctrl & 0x40)
+		{
+			pVoice->pulseIndex = pVoice->newPulseIndex;
+			if (pVoice->pulseIndex > 2048)
+			{
+#if defined(DIRECT_FIXPOINT)
+				pVoice->waveStep.w[HI] = 0;
+#else
+				pVoice->waveStep = 0;
+#endif
+			}
+		}
+	}
+
+	(*pVoice->waveProc)(pVoice);
+	pVoice->filtIO = ampMod1x8[(*pVoice->ADSRproc)(pVoice) | pVoice->output];
+	//pVoice->filtIO = pVoice->sid->masterVolume; // test for digi sound
+	waveCalcFilter(pVoice);
+	return pVoice->filtIO;//&pVoice->outputMask;
+}
+
+
+inline void sidOperator::wave_calc_cycle_len()
+{
+#if defined(DIRECT_FIXPOINT)
+	cycleAddLen.w[HI] = 0;
+	cycleAddLen.l += cycleLen.l;
+	cycleLenCount = cycleAddLen.w[HI];
+#else
+	cycleAddLenPnt += cycleLenPnt;
+	cycleLenCount = cycleLen;
+	if (cycleAddLenPnt > 65535)
+		cycleLenCount++;
+	cycleAddLenPnt &= 0xFFFF;
+#endif
+	// If we keep the value cycleLen between 1 <= x <= 65535, the following check is not required.
+#if 0
+	if (!cycleLenCount)
+	{
+#if defined(DIRECT_FIXPOINT)
+		waveStep.l = 0;
+#else
+		waveStep = waveStepPnt = 0;
+#endif
+		cycleLenCount = 0;
+	}
+	else
+#endif
+	{
+#if defined(DIRECT_FIXPOINT)
+		uint16_t diff = cycleLenCount - cycleLen.w[HI];
+#else
+		uint16_t diff = cycleLenCount - cycleLen;
+#endif
+		if (wavePre[diff].len != cycleLenCount)
+		{
+			wavePre[diff].len = cycleLenCount;
+#if defined(DIRECT_FIXPOINT)
+			wavePre[diff].stp = waveStepAdd.l = (4096UL*65536UL) / cycleLenCount;
+#else
+			wavePre[diff].stp = waveStepAdd = 4096UL / cycleLenCount;
+			wavePre[diff].pnt = waveStepAddPnt = ((4096UL % cycleLenCount) * 65536UL) / cycleLenCount;
+#endif
+		}
+		else
+		{
+#if defined(DIRECT_FIXPOINT)
+			waveStepAdd.l = wavePre[diff].stp;
+#else
+			waveStepAdd = wavePre[diff].stp;
+			waveStepAddPnt = wavePre[diff].pnt;
+#endif
+		}
+	}  // see above (opening bracket)
+}
+
 
 void sidInitWaveformTables(int type)
 {

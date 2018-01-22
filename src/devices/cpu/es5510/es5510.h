@@ -7,12 +7,11 @@
  *
  **********************************************************************************************/
 
+#ifndef MAME_CPU_ES5510_ES5510_H
+#define MAME_CPU_ES5510_ES5510_H
+
 #pragma once
 
-#ifndef __ES5510_H__
-#define __ES5510_H__
-
-#include "emu.h"
 
 class es5510_device : public cpu_device {
 public:
@@ -125,17 +124,15 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+	virtual space_config_vector memory_space_config() const override;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override;
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override;
 	virtual uint32_t execute_min_cycles() const override;
 	virtual uint32_t execute_max_cycles() const override;
 	virtual uint32_t execute_input_lines() const override;
 	virtual void execute_run() override;
-	virtual uint32_t disasm_min_opcode_bytes() const override;
-	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	virtual void execute_set_input(int linenum, int state) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	int32_t alu_operation(uint8_t op, int32_t aValue, int32_t bValue, uint8_t &flags);
 	void alu_operation_end();
@@ -190,6 +187,6 @@ private:
 	ram_t ram, ram_p, ram_pp; // ram operations for cycles N, N-1 and N-2
 };
 
-extern const device_type ES5510;
+DECLARE_DEVICE_TYPE(ES5510, es5510_device)
 
-#endif // __ES5510_H__
+#endif // MAME_CPU_ES5510_ES5510_H

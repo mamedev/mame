@@ -12,38 +12,34 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/ultraman.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/watchdog.h"
 #include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "includes/ultraman.h"
+#include "speaker.h"
 
-WRITE16_MEMBER(ultraman_state::sound_cmd_w)
-{
-	if (ACCESSING_BITS_0_7)
-		m_soundlatch->write(space, 0, data & 0xff);
-}
 
-WRITE16_MEMBER(ultraman_state::sound_irq_trigger_w)
+WRITE8_MEMBER(ultraman_state::sound_nmi_enable_w)
 {
-	if (ACCESSING_BITS_0_7)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundnmi->in_w<1>(BIT(data, 0));
 }
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, ultraman_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x180000, 0x183fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* Palette */
+	AM_RANGE(0x180000, 0x183fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")/* Palette */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P1")
 	AM_RANGE(0x1c0004, 0x1c0005) AM_READ_PORT("P2")
 	AM_RANGE(0x1c0006, 0x1c0007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1c0008, 0x1c0009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1c0018, 0x1c0019) AM_WRITE(ultraman_gfxctrl_w)   /* counters + gfx ctrl */
-	AM_RANGE(0x1c0020, 0x1c0021) AM_WRITE(sound_cmd_w)
-	AM_RANGE(0x1c0028, 0x1c0029) AM_WRITE(sound_irq_trigger_w)
+	AM_RANGE(0x1c0020, 0x1c0021) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	AM_RANGE(0x1c0028, 0x1c0029) AM_DEVWRITE8("soundnmi", input_merger_device, in_set<0>, 0x00ff)
 	AM_RANGE(0x1c0030, 0x1c0031) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x204000, 0x204fff) AM_DEVREADWRITE8("k051316_1", k051316_device, read, write, 0x00ff) /* K051316 #0 RAM */
 	AM_RANGE(0x205000, 0x205fff) AM_DEVREADWRITE8("k051316_2", k051316_device, read, write, 0x00ff) /* K051316 #1 RAM */
@@ -59,14 +55,14 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ultraman_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-//  AM_RANGE(0xd000, 0xd000) AM_WRITENOP      /* ??? */
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(sound_nmi_enable_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("oki", okim6295_device, read, write)       /* M6295 */
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)   /* YM2151 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, ultraman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x00) AM_WRITENOP                     /* ??? */
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundnmi", input_merger_device, in_clear<0>)
 ADDRESS_MAP_END
 
 
@@ -171,9 +167,11 @@ void ultraman_state::machine_reset()
 	m_bank0 = -1;
 	m_bank1 = -1;
 	m_bank2 = -1;
+
+	m_soundnmi->in_w<0>(0);
 }
 
-static MACHINE_CONFIG_START( ultraman, ultraman_state )
+MACHINE_CONFIG_START(ultraman_state::ultraman)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)      /* 12 MHz? */
@@ -183,6 +181,9 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 	MCFG_CPU_ADD("audiocpu", Z80,24000000/6)    /* 4 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
+
+	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -230,7 +231,7 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
@@ -275,4 +276,4 @@ ROM_START( ultraman )
 ROM_END
 
 
-GAME( 1991, ultraman, 0, ultraman, ultraman, driver_device, 0, ROT0, "Banpresto / Bandai", "Ultraman (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ultraman, 0, ultraman, ultraman, ultraman_state, 0, ROT0, "Banpresto / Bandai", "Ultraman (Japan)", MACHINE_SUPPORTS_SAVE )

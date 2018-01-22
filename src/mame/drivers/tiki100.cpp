@@ -22,8 +22,13 @@
 
 */
 
+#include "emu.h"
 #include "includes/tiki100.h"
+
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
+
 
 /* Memory Banking */
 
@@ -53,7 +58,7 @@ READ8_MEMBER( tiki100_state::mrq_r )
 		data = m_video_ram[addr];
 	}
 
-	if (prom & RAM)
+	if (prom & RAM0)
 	{
 		data = m_ram->pointer()[offset];
 	}
@@ -74,7 +79,7 @@ WRITE8_MEMBER( tiki100_state::mrq_w )
 		m_video_ram[addr] = data;
 	}
 
-	if (prom & RAM)
+	if (prom & RAM0)
 	{
 		m_ram->pointer()[offset] = data;
 	}
@@ -690,7 +695,7 @@ void tiki100_state::machine_reset()
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( tiki100, tiki100_state )
+MACHINE_CONFIG_START(tiki100_state::tiki100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(tiki100_mem)
@@ -714,7 +719,7 @@ static MACHINE_CONFIG_START( tiki100, tiki100_state )
 	MCFG_TIKI100_BUS_SLOT_ADD("slot3", nullptr)
 
 	/* devices */
-	MCFG_Z80DART_ADD(Z80DART_TAG, XTAL_8MHz/4, 0, 0, 0, 0 )
+	MCFG_DEVICE_ADD(Z80DART_TAG, Z80DART, XTAL_8MHz/4)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
@@ -802,6 +807,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME        FLAGS */
-COMP( 1984, kontiki,    0,          0,      tiki100,    tiki100, driver_device, 0,      "Kontiki Data A/S", "KONTIKI 100",  MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tiki100,    kontiki,    0,      tiki100,    tiki100, driver_device, 0,      "Tiki Data A/S",    "TIKI 100",     MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT    STATE          INIT    COMPANY             FULLNAME        FLAGS
+COMP( 1984, kontiki,    0,          0,      tiki100,    tiki100, tiki100_state, 0,      "Kontiki Data A/S", "KONTIKI 100",  MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tiki100,    kontiki,    0,      tiki100,    tiki100, tiki100_state, 0,      "Tiki Data A/S",    "TIKI 100",     MACHINE_SUPPORTS_SAVE )

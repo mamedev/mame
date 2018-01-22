@@ -25,7 +25,7 @@ public:
 	bool reverse() const;
 	bool physical() const;
 
-	void set_expression(char const *string);
+	void set_expression(const std::string &string);
 	void set_data_format(uint8_t dataformat);
 	void set_chunks_per_row(uint32_t rowchunks);
 	void set_reverse(bool reverse);

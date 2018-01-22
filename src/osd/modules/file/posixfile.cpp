@@ -276,7 +276,7 @@ osd_file::error osd_file::open(std::string const &path, std::uint32_t openflags,
 			}
 		}
 
-		// if we still failed, clean up and osd_free
+		// if we still failed, clean up and free
 		if (fd < 0)
 		{
 			return errno_to_file_error(errno);
@@ -446,7 +446,7 @@ bool osd_is_absolute_path(std::string const &path)
 	if (!path.empty() && is_path_separator(path[0]))
 		return true;
 #if !defined(WIN32)
-	else if (!path.empty() && (path[0] == '.'))
+	else if (!path.empty() && (path[0] == '.') && (!path[1] || is_path_separator(path[1]))) // FIXME: why is this even here? foo/./bar is a valid way to refer to foo/bar
 		return true;
 #elif !defined(UNDER_CE)
 	else if ((path.length() > 1) && (path[1] == ':'))

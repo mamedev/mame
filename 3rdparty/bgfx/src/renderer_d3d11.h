@@ -1,12 +1,13 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #ifndef BGFX_RENDERER_D3D11_H_HEADER_GUARD
 #define BGFX_RENDERER_D3D11_H_HEADER_GUARD
 
-#define USE_D3D11_DYNAMIC_LIB BX_PLATFORM_WINDOWS
+#define USE_D3D11_DYNAMIC_LIB    BX_PLATFORM_WINDOWS
+#define USE_D3D11_STAGING_BUFFER 0
 
 #if !USE_D3D11_DYNAMIC_LIB
 #	undef  BGFX_CONFIG_DEBUG_PIX
@@ -35,6 +36,7 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 #include "hmd.h"
 #include "hmd_openvr.h"
 #include "debug_renderdoc.h"
+#include "nvapi.h"
 
 #ifndef D3DCOLOR_ARGB
 #	define D3DCOLOR_ARGB(_a, _r, _g, _b) ( (DWORD)( ( ( (_a)&0xff)<<24)|( ( (_r)&0xff)<<16)|( ( (_g)&0xff)<<8)|( (_b)&0xff) ) )
@@ -64,6 +66,9 @@ namespace bgfx { namespace d3d11
 	{
 		BufferD3D11()
 			: m_ptr(NULL)
+#if USE_D3D11_STAGING_BUFFER
+			, m_staging(NULL)
+#endif // USE_D3D11_STAGING_BUFFER
 			, m_srv(NULL)
 			, m_uav(NULL)
 			, m_flags(BGFX_BUFFER_NONE)
@@ -82,11 +87,18 @@ namespace bgfx { namespace d3d11
 				m_dynamic = false;
 			}
 
+#if USE_D3D11_STAGING_BUFFER
+			DX_RELEASE(m_staging, 0);
+#endif // USE_D3D11_STAGING_BUFFER
+
 			DX_RELEASE(m_srv, 0);
 			DX_RELEASE(m_uav, 0);
 		}
 
 		ID3D11Buffer* m_ptr;
+#if USE_D3D11_STAGING_BUFFER
+		ID3D11Buffer* m_staging;
+#endif // USE_D3D11_STAGING_BUFFER
 		ID3D11ShaderResourceView*  m_srv;
 		ID3D11UnorderedAccessView* m_uav;
 		uint32_t m_size;
@@ -154,7 +166,7 @@ namespace bgfx { namespace d3d11
 			ID3D11ComputeShader* m_computeShader;
 			ID3D11PixelShader*   m_pixelShader;
 			ID3D11VertexShader*  m_vertexShader;
-			IUnknown*            m_ptr;
+			ID3D11DeviceChild*   m_ptr;
 		};
 		const Memory* m_code;
 		ID3D11Buffer* m_buffer;
@@ -182,14 +194,14 @@ namespace bgfx { namespace d3d11
 		{
 			BX_CHECK(NULL != _vsh->m_ptr, "Vertex shader doesn't exist.");
 			m_vsh = _vsh;
-			memcpy(&m_predefined[0], _vsh->m_predefined, _vsh->m_numPredefined*sizeof(PredefinedUniform) );
+			bx::memCopy(&m_predefined[0], _vsh->m_predefined, _vsh->m_numPredefined*sizeof(PredefinedUniform) );
 			m_numPredefined = _vsh->m_numPredefined;
 
 			if (NULL != _fsh)
 			{
 				BX_CHECK(NULL != _fsh->m_ptr, "Fragment shader doesn't exist.");
 				m_fsh = _fsh;
-				memcpy(&m_predefined[m_numPredefined], _fsh->m_predefined, _fsh->m_numPredefined*sizeof(PredefinedUniform) );
+				bx::memCopy(&m_predefined[m_numPredefined], _fsh->m_predefined, _fsh->m_numPredefined*sizeof(PredefinedUniform) );
 				m_numPredefined += _fsh->m_numPredefined;
 			}
 		}
@@ -233,6 +245,7 @@ namespace bgfx { namespace d3d11
 		void commit(uint8_t _stage, uint32_t _flags, const float _palette[][4]);
 		void resolve() const;
 		TextureHandle getHandle() const;
+		DXGI_FORMAT getSrvFormat() const;
 
 		union
 		{
@@ -269,6 +282,7 @@ namespace bgfx { namespace d3d11
 			, m_denseIdx(UINT16_MAX)
 			, m_num(0)
 			, m_numTh(0)
+			, m_needPresent(false)
 		{
 		}
 
@@ -279,6 +293,8 @@ namespace bgfx { namespace d3d11
 		void postReset();
 		void resolve();
 		void clear(const Clear& _clear, const float _palette[][4]);
+		void set();
+		HRESULT present(uint32_t _syncInterval);
 
 		ID3D11RenderTargetView* m_rtv[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
 		ID3D11ShaderResourceView* m_srv[BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS-1];
@@ -291,34 +307,50 @@ namespace bgfx { namespace d3d11
 		uint16_t m_denseIdx;
 		uint8_t m_num;
 		uint8_t m_numTh;
+		bool m_needPresent;
 	};
 
 	struct TimerQueryD3D11
 	{
 		TimerQueryD3D11()
-			: m_control(BX_COUNTOF(m_frame) )
+			: m_control(BX_COUNTOF(m_query) )
 		{
 		}
 
 		void postReset();
 		void preReset();
-		void begin();
-		void end();
-		bool get();
+		uint32_t begin(uint32_t _resultIdx);
+		void end(uint32_t _idx);
+		bool update();
 
-		struct Frame
+		struct Query
 		{
 			ID3D11Query* m_disjoint;
 			ID3D11Query* m_begin;
 			ID3D11Query* m_end;
+			uint32_t     m_resultIdx;
+			bool         m_ready;
 		};
 
-		uint64_t m_begin;
-		uint64_t m_end;
-		uint64_t m_elapsed;
-		uint64_t m_frequency;
+		struct Result
+		{
+			void reset()
+			{
+				m_begin     = 0;
+				m_end       = 0;
+				m_frequency = 1;
+				m_pending   = 0;
+			}
 
-		Frame m_frame[4];
+			uint64_t m_begin;
+			uint64_t m_end;
+			uint64_t m_frequency;
+			uint32_t m_pending;
+		};
+
+		Result m_result[BGFX_CONFIG_MAX_VIEWS+1];
+
+		Query m_query[BGFX_CONFIG_MAX_VIEWS*4];
 		bx::RingBufferControl m_control;
 	};
 
@@ -334,6 +366,7 @@ namespace bgfx { namespace d3d11
 		void begin(Frame* _render, OcclusionQueryHandle _handle);
 		void end();
 		void resolve(Frame* _render, bool _wait = false);
+		void invalidate(OcclusionQueryHandle _handle);
 
 		struct Query
 		{
@@ -341,7 +374,7 @@ namespace bgfx { namespace d3d11
 			OcclusionQueryHandle m_handle;
 		};
 
-		Query m_query[BGFX_CONFIG_MAX_OCCUSION_QUERIES];
+		Query m_query[BGFX_CONFIG_MAX_OCCLUSION_QUERIES];
 		bx::RingBufferControl m_control;
 	};
 

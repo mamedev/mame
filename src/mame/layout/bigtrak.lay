@@ -32,7 +32,6 @@
 	</element>
 
 
-
 <!-- build screen -->
 
 	<view name="Internal Layout">
@@ -43,7 +42,7 @@
 
 		<bezel element="text_lamp"><bounds x="1" y="1" width="10" height="4" /></bezel>
 		<bezel element="text_dash"><bounds x="10" y="1" width="4" height="4" /></bezel>
-		<bezel name="lamp1" element="lamp_b"><bounds x="13" y="1.8" width="3" height="3" /></bezel>
+		<bezel name="0.1" element="lamp_b"><bounds x="13" y="1.8" width="3" height="3" /></bezel>
 
 		<bezel element="text_in"><bounds x="1" y="27" width="10" height="4" /></bezel>
 		<bezel element="text_dash"><bounds x="10" y="27" width="4" height="4" /></bezel>
@@ -52,7 +51,6 @@
 		<bezel element="text_out"><bounds x="1" y="31" width="10" height="4" /></bezel>
 		<bezel element="text_dash"><bounds x="10" y="31" width="4" height="4" /></bezel>
 		<bezel name="ext_out" element="ind_r"><bounds x="13" y="31.8" width="3" height="3" /></bezel>
-
 
 		<bezel element="text_l"><bounds x="2" y="12" width="4" height="4" /></bezel>
 		<bezel name="left_motor_forward" element="arrow_up">
@@ -73,7 +71,6 @@
 			<bounds x="8" y="16.4" width="4" height="10" />
 			<orientation rotate="90" />
 		</bezel>
-
 
 	</view>
 </mamelayout>

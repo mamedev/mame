@@ -43,39 +43,37 @@ enum
 #define LOG2(msg)       do { if (VERBOSE >= 2) logerror msg; } while (0)
 
 
-const device_type PIT8253 = &device_creator<pit8253_device>;
-
+DEFINE_DEVICE_TYPE(PIT8253, pit8253_device, "pit8253", "Intel 8253 PIT")
+DEFINE_DEVICE_TYPE(PIT8254, pit8254_device, "pit8254", "Intel 8254 PIT")
+DEFINE_DEVICE_TYPE(FE2010_PIT, fe2010_pit_device, "fe2010_pit", "Faraday FE2010 PIT")
 
 pit8253_device::pit8253_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PIT8253, "8253 PIT", tag, owner, clock, "pit8253", __FILE__),
+	pit8253_device(mconfig, PIT8253, tag, owner, clock, I8253)
+{
+}
+
+pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int chip_type) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_clk0(0),
 	m_clk1(0),
 	m_clk2(0),
 	m_out0_handler(*this),
 	m_out1_handler(*this),
-	m_out2_handler(*this)
-{
-}
-
-pit8253_device::pit8253_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_clk0(0),
-	m_clk1(0),
-	m_clk2(0),
-	m_out0_handler(*this),
-	m_out1_handler(*this),
-	m_out2_handler(*this)
+	m_out2_handler(*this),
+	m_type(chip_type)
 {
 }
 
 
-const device_type PIT8254 = &device_creator<pit8254_device>;
-
-pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pit8253_device(mconfig, PIT8254, "8254 PIT", tag, owner, clock, "pit8254", __FILE__)
+pit8254_device::pit8254_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pit8253_device(mconfig, PIT8254, tag, owner, clock, I8254)
 {
 }
 
+fe2010_pit_device::fe2010_pit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pit8253_device(mconfig, FE2010_PIT, tag, owner, clock, FE2010)
+{
+}
 
 pit8253_device::pit8253_timer *pit8253_device::get_timer(int which)
 {
@@ -288,6 +286,7 @@ void pit8253_device::set_output(pit8253_timer *timer, int output)
 	if (output != timer->output)
 	{
 		timer->output = output;
+		LOG2(("set_output(): timer %d, %s\n", timer->index, output ? "low to high" : "high to low"));
 
 		switch (timer->index)
 		{
@@ -556,6 +555,8 @@ void pit8253_device::simulate2(pit8253_timer *timer, int64_t elapsed_cycles)
 			/* Gate low or mode control write forces output high */
 			set_output(timer, 1);
 			cycles_to_output = CYCLES_NEVER;
+			if(m_type == FE2010)
+				load_counter_value(timer);
 		}
 		else
 		{
@@ -723,7 +724,7 @@ void pit8253_device::update(pit8253_timer *timer)
 	attotime elapsed_time = now - timer->last_updated;
 	int64_t elapsed_cycles = elapsed_time.as_double() * timer->clockin;
 
-	LOG1(("update(): timer %d, %d elapsed_cycles\n", timer->index, elapsed_cycles));
+	LOG2(("update(): timer %d, %d elapsed_cycles\n", timer->index, elapsed_cycles));
 
 	if (timer->clockin)
 		timer->last_updated += elapsed_cycles * attotime::from_hz(timer->clockin);
@@ -740,7 +741,7 @@ void pit8253_device::update(pit8253_timer *timer)
 uint16_t pit8253_device::masked_value(pit8253_timer *timer)
 {
 	LOG2(("masked_value\n"));
-	if (CTRL_MODE(timer->control) == 3)
+	if ((CTRL_MODE(timer->control) == 3) && (m_type != FE2010))
 		return timer->value & 0xfffe;
 	return timer->value;
 }
@@ -808,7 +809,15 @@ READ8_MEMBER( pit8253_device::read )
 
 				case 3:
 					/* read bits 0-7 first, then 8-15 */
-					data = (value >> (timer->rmsb ? 8 : 0)) & 0xff;
+
+					// reading back the current count while in the middle of a
+					// 16-bit write returns a xor'ed version of the value written
+					// (apricot diagnostic timer test tests this)
+					if (timer->wmsb)
+						data = ~timer->lowcount;
+					else
+						data = value >> (timer->rmsb ? 8 : 0);
+
 					timer->rmsb = 1 - timer->rmsb;
 					break;
 				}
@@ -1007,6 +1016,11 @@ WRITE8_MEMBER( pit8253_device::write )
 
 			load_count(timer, data << 8);
 			simulate2(timer, 0);
+
+			if (CTRL_MODE(timer->control) == 0)
+			{
+				set_output(timer, 0);
+			}
 			break;
 
 		case 3:

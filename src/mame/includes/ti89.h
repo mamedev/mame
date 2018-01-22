@@ -10,6 +10,7 @@
 #define TI89_H_
 
 #include "machine/intelfsh.h"
+#include "machine/timer.h"
 
 class ti68k_state : public driver_device
 {
@@ -84,6 +85,11 @@ public:
 	DECLARE_PALETTE_INIT(ti68k);
 	DECLARE_INPUT_CHANGED_MEMBER(ti68k_on_key);
 	TIMER_DEVICE_CALLBACK_MEMBER(ti68k_timer_callback);
+	void v200(machine_config &config);
+	void ti92(machine_config &config);
+	void ti89(machine_config &config);
+	void ti92p(machine_config &config);
+	void ti89t(machine_config &config);
 };
 
 #endif // TI89_H_

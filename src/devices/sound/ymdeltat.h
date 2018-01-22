@@ -1,21 +1,19 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski
+#ifndef MAME_SOUND_YMDELTAT_H
+#define MAME_SOUND_YMDELTAT_H
+
 #pragma once
-
-#ifndef __YMDELTAT_H__
-#define __YMDELTAT_H__
-
-#define YM_DELTAT_SHIFT    (16)
-
-#define YM_DELTAT_EMULATION_MODE_NORMAL 0
-#define YM_DELTAT_EMULATION_MODE_YM2610 1
 
 
 typedef void (*STATUS_CHANGE_HANDLER)(void *chip, uint8_t status_bits);
 
 
 /* DELTA-T (adpcm type B) struct */
-struct YM_DELTAT  {     /* AT: rearranged and tigntened structure */
+struct YM_DELTAT {     /* AT: rearranged and tightened structure */
+	static constexpr int EMULATION_MODE_NORMAL = 0;
+	static constexpr int EMULATION_MODE_YM2610 = 1;
+
 	uint8_t   *memory;
 	int32_t   *output_pointer;/* pointer of output pointers   */
 	int32_t   *pan;           /* pan : &output_pointer[pan]   */
@@ -27,7 +25,7 @@ struct YM_DELTAT  {     /* AT: rearranged and tigntened structure */
 	uint32_t  memory_size;
 	int     output_range;
 	uint32_t  now_addr;       /* current address      */
-	uint32_t  now_step;       /* currect step         */
+	uint32_t  now_step;       /* correct step         */
 	uint32_t  step;           /* step                 */
 	uint32_t  start;          /* start address        */
 	uint32_t  limit;          /* limit address        */
@@ -62,7 +60,7 @@ struct YM_DELTAT  {     /* AT: rearranged and tigntened structure */
 	void *  status_change_which_chip;   /* this chip id */
 	uint8_t   status_change_EOS_bit;      /* 1 on End Of Sample (record/playback/cycle time of AD/DA converting has passed)*/
 	uint8_t   status_change_BRDY_bit;     /* 1 after recording 2 datas (2x4bits) or after reading/writing 1 data */
-	uint8_t   status_change_ZERO_bit;     /* 1 if silence lasts for more than 290 miliseconds on ADPCM recording */
+	uint8_t   status_change_ZERO_bit;     /* 1 if silence lasts for more than 290 milliseconds on ADPCM recording */
 
 	/* neither Y8950 nor YM2608 can generate IRQ when PCMBSY bit changes, so instead of above,
 	** the statusflag gets ORed with PCM_BSY (below) (on each read of statusflag of Y8950 and YM2608)
@@ -72,16 +70,16 @@ struct YM_DELTAT  {     /* AT: rearranged and tigntened structure */
 	uint8_t   reg[16];        /* adpcm registers      */
 	uint8_t   emulation_mode; /* which chip we're emulating */
 	device_t *device;
+
+	/*void BRDY_callback();*/
+
+	uint8_t ADPCM_Read();
+	void ADPCM_Write(int r, int v);
+	void ADPCM_Reset(int panidx, int mode, device_t *dev);
+	void ADPCM_CALC();
+
+	void postload(uint8_t *regs);
+	void savestate(device_t *device);
 };
 
-/*void YM_DELTAT_BRDY_callback(YM_DELTAT *DELTAT);*/
-
-uint8_t YM_DELTAT_ADPCM_Read(YM_DELTAT *DELTAT);
-void YM_DELTAT_ADPCM_Write(YM_DELTAT *DELTAT,int r,int v);
-void YM_DELTAT_ADPCM_Reset(YM_DELTAT *DELTAT,int pan,int emulation_mode, device_t *device);
-void YM_DELTAT_ADPCM_CALC(YM_DELTAT *DELTAT);
-
-void YM_DELTAT_postload(YM_DELTAT *DELTAT,uint8_t *regs);
-void YM_DELTAT_savestate(device_t *device,YM_DELTAT *DELTAT);
-
-#endif /* __YMDELTAT_H__ */
+#endif // MAME_SOUND_YMDELTAT_H

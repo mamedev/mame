@@ -51,12 +51,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/tutankhm.h"
+#include "includes/konamipt.h"
+
 #include "cpu/m6809/m6809.h"
+#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
-#include "includes/konamipt.h"
-#include "audio/timeplt.h"
-#include "includes/tutankhm.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 /*************************************
@@ -74,9 +77,9 @@ INTERRUPT_GEN_MEMBER(tutankhm_state::tutankhm_interrupt)
 }
 
 
-WRITE8_MEMBER(tutankhm_state::irq_enable_w)
+WRITE_LINE_MEMBER(tutankhm_state::irq_enable_w)
 {
-	m_irq_enable = data & 1;
+	m_irq_enable = state;
 	if (!m_irq_enable)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
@@ -100,15 +103,22 @@ WRITE8_MEMBER(tutankhm_state::tutankhm_bankselect_w)
  *
  *************************************/
 
-WRITE8_MEMBER(tutankhm_state::sound_mute_w)
+WRITE_LINE_MEMBER(tutankhm_state::coin_counter_1_w)
 {
-	machine().sound().system_mute(data & 1);
+	machine().bookkeeping().coin_counter_w(0, state);
 }
 
 
-WRITE8_MEMBER(tutankhm_state::tutankhm_coin_counter_w)
+WRITE_LINE_MEMBER(tutankhm_state::coin_counter_2_w)
 {
-	machine().bookkeeping().coin_counter_w(offset ^ 1, data);
+	machine().bookkeeping().coin_counter_w(1, state);
+}
+
+
+WRITE8_MEMBER(tutankhm_state::sound_on_w)
+{
+	m_timeplt_audio->sh_irqtrigger_w(0);
+	m_timeplt_audio->sh_irqtrigger_w(1);
 }
 
 
@@ -120,7 +130,7 @@ WRITE8_MEMBER(tutankhm_state::tutankhm_coin_counter_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_SHARE("scroll")
 	AM_RANGE(0x8120, 0x8120) AM_MIRROR(0x000f) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x8160, 0x8160) AM_MIRROR(0x000f) AM_READ_PORT("DSW2") /* DSW2 (inverted bits) */
@@ -128,14 +138,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
 	AM_RANGE(0x81a0, 0x81a0) AM_MIRROR(0x000f) AM_READ_PORT("IN1")  /* IN1: Player 1 I/O */
 	AM_RANGE(0x81c0, 0x81c0) AM_MIRROR(0x000f) AM_READ_PORT("IN2")  /* IN2: Player 2 I/O */
 	AM_RANGE(0x81e0, 0x81e0) AM_MIRROR(0x000f) AM_READ_PORT("DSW1") /* DSW1 (inverted bits) */
-	AM_RANGE(0x8200, 0x8200) AM_MIRROR(0x00f8) AM_READNOP AM_WRITE(irq_enable_w)
-	AM_RANGE(0x8202, 0x8203) AM_MIRROR(0x00f8) AM_WRITE(tutankhm_coin_counter_w)
-	AM_RANGE(0x8204, 0x8204) AM_MIRROR(0x00f8) AM_WRITENOP // starfield?
-	AM_RANGE(0x8205, 0x8205) AM_MIRROR(0x00f8) AM_WRITE(sound_mute_w)
-	AM_RANGE(0x8206, 0x8206) AM_MIRROR(0x00f8) AM_WRITE(tutankhm_flip_screen_x_w)
-	AM_RANGE(0x8207, 0x8207) AM_MIRROR(0x00f8) AM_WRITE(tutankhm_flip_screen_y_w)
+	AM_RANGE(0x8200, 0x8207) AM_MIRROR(0x00f8) AM_READNOP AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x8300, 0x8300) AM_MIRROR(0x00ff) AM_WRITE(tutankhm_bankselect_w)
-	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0x00ff) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)
+	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0x00ff) AM_WRITE(sound_on_w)
 	AM_RANGE(0x8700, 0x8700) AM_MIRROR(0x00ff) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank1")
@@ -216,20 +221,37 @@ MACHINE_START_MEMBER(tutankhm_state,tutankhm)
 MACHINE_RESET_MEMBER(tutankhm_state,tutankhm)
 {
 	m_irq_toggle = 0;
-	m_irq_enable = 0;
-	m_flip_x = 0;
-	m_flip_y = 0;
 }
 
-static MACHINE_CONFIG_START( tutankhm, tutankhm_state )
+static ADDRESS_MAP_START( timeplt_sound_map, AS_PROGRAM, 8, timeplt_audio_device )
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x8000, 0xffff) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, filter_w)
+ADDRESS_MAP_END
+
+MACHINE_CONFIG_START(tutankhm_state::tutankhm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)   /* 1.5 MHz ??? */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_18_432MHz/12)   /* 1.5 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tutankhm_state,  tutankhm_interrupt)
 
 	MCFG_MACHINE_START_OVERRIDE(tutankhm_state,tutankhm)
 	MCFG_MACHINE_RESET_OVERRIDE(tutankhm_state,tutankhm)
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // C3
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(tutankhm_state, irq_enable_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // PAY OUT - not used
+	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(tutankhm_state, coin_counter_2_w))
+	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(tutankhm_state, coin_counter_1_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(NOOP) // starfield?
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("timeplt_audio", timeplt_audio_device, mute_w))
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(tutankhm_state, flip_screen_x_w))
+	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(tutankhm_state, flip_screen_y_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -248,7 +270,40 @@ static MACHINE_CONFIG_START( tutankhm, tutankhm_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_FRAGMENT_ADD(timeplt_sound)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("tpsound",Z80,XTAL_14_31818MHz/8)
+	MCFG_CPU_PROGRAM_MAP(timeplt_sound_map)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
+
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_14_31818MHz/8)
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("timeplt_audio", timeplt_audio_device, portB_r))
+	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.60)
+	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.60)
+	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.60)
+
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ROUTE(0, "filter.1.0", 0.60)
+	MCFG_SOUND_ROUTE(1, "filter.1.1", 0.60)
+	MCFG_SOUND_ROUTE(2, "filter.1.2", 0.60)
+
+	MCFG_FILTER_RC_ADD("filter.0.0", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.0.1", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.0.2", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_FILTER_RC_ADD("filter.1.0", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.1.1", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_FILTER_RC_ADD("filter.1.2", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -326,5 +381,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, tutankhm, 0,        tutankhm, tutankhm, driver_device, 0, ROT90, "Konami", "Tutankham", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
-GAME( 1982, tutankhms,tutankhm, tutankhm, tutankhm, driver_device, 0, ROT90, "Konami (Stern Electronics license)", "Tutankham (Stern Electronics)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1982, tutankhm, 0,        tutankhm, tutankhm, tutankhm_state, 0, ROT90, "Konami", "Tutankham", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)
+GAME( 1982, tutankhms,tutankhm, tutankhm, tutankhm, tutankhm_state, 0, ROT90, "Konami (Stern Electronics license)", "Tutankham (Stern Electronics)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS)

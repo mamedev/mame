@@ -1,14 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Jarek Burczynski,Ernesto Corvi
+#ifndef MAME_SOUND_YM2413_H
+#define MAME_SOUND_YM2413_H
+
 #pragma once
 
-#ifndef __YM2413_H__
-#define __YM2413_H__
 
-#include "emu.h"
-
-class ym2413_device : public device_t,
-						public device_sound_interface
+class ym2413_device : public device_t, public device_sound_interface
 {
 public:
 	ym2413_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -17,8 +15,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER( register_port_w );
 	DECLARE_WRITE8_MEMBER( data_port_w );
-
-	void _ym2413_update_request();
 
 protected:
 	// device-level overrides
@@ -130,7 +126,7 @@ private:
 	uint32_t  eg_cnt;                 /* global envelope generator counter    */
 	uint32_t  eg_timer;               /* global envelope generator counter works at frequency = chipclock/72 */
 	uint32_t  eg_timer_add;           /* step of eg_timer                     */
-	uint32_t  eg_timer_overflow;      /* envelope generator timer overlfows every 1 sample (on real chip) */
+	uint32_t  eg_timer_overflow;      /* envelope generator timer overflows every 1 sample (on real chip) */
 
 	uint8_t   rhythm;                 /* Rhythm mode                  */
 
@@ -186,6 +182,6 @@ private:
 
 };
 
-extern const device_type YM2413;
+DECLARE_DEVICE_TYPE(YM2413, ym2413_device)
 
-#endif /*__YM2413_H__*/
+#endif // MAME_SOUND_YM2413_H

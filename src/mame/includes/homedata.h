@@ -139,7 +139,7 @@ public:
 	uint32_t screen_update_reikaids(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pteacher(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mirderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_eof_homedata(screen_device &screen, bool state);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank_homedata);
 	INTERRUPT_GEN_MEMBER(homedata_irq);
 	INTERRUPT_GEN_MEMBER(upd7807_irq);
 	void mrokumei_handleblit( address_space &space, int rom_base );
@@ -152,4 +152,10 @@ public:
 	inline void lemnangl_info( tile_data &tileinfo, int tile_index, int page, int layer, int gfxset, int gfxbank );
 	inline void mirderby_info0( tile_data &tileinfo, int tile_index, int page, int gfxbank );
 	inline void mirderby_info1( tile_data &tileinfo, int tile_index, int page, int gfxbank );
+	void reikaids(machine_config &config);
+	void mrokumei(machine_config &config);
+	void mirderby(machine_config &config);
+	void pteacher(machine_config &config);
+	void lemnangl(machine_config &config);
+	void mjkinjas(machine_config &config);
 };

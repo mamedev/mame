@@ -9,8 +9,10 @@
 
 ***************************************************************************/
 
-#ifndef __H8_PORT_H__
-#define __H8_PORT_H__
+#ifndef MAME_CPU_H8_H8_PORT_H
+#define MAME_CPU_H8_H8_PORT_H
+
+#pragma once
 
 #include "h8.h"
 
@@ -48,6 +50,6 @@ protected:
 	void update_output();
 };
 
-extern const device_type H8_PORT;
+DECLARE_DEVICE_TYPE(H8_PORT, h8_port_device)
 
-#endif
+#endif // MAME_CPU_H8_H8_PORT_H

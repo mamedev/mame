@@ -84,51 +84,50 @@ History:
 
 **********************************************************************/
 
+#include "emu.h"
 #include "machine/ins8250.h"
 
-const device_type INS8250 = &device_creator<ins8250_device>;
-const device_type NS16450 = &device_creator<ns16450_device>;
-const device_type NS16550 = &device_creator<ns16550_device>;
-const device_type PC16552D = &device_creator<pc16552_device>;
+DEFINE_DEVICE_TYPE(INS8250,  ins8250_device, "ins8250",  "National Semiconductor INS8250 UART")
+DEFINE_DEVICE_TYPE(NS16450,  ns16450_device, "ns16450",  "National Semiconductor NS16450 UART")
+DEFINE_DEVICE_TYPE(NS16550,  ns16550_device, "ns16550",  "National Semiconductor NS16550 UART")
+DEFINE_DEVICE_TYPE(PC16552D, pc16552_device, "pc16552d", "National Semiconductor PC16552D UART")
 
-ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
-		: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
-			device_serial_interface(mconfig, *this),
-			m_out_tx_cb(*this),
-			m_out_dtr_cb(*this),
-			m_out_rts_cb(*this),
-			m_out_int_cb(*this),
-			m_out_out1_cb(*this),
-			m_out_out2_cb(*this),
-			m_rxd(1),
-			m_dcd(1),
-			m_dsr(1),
-			m_ri(1),
-			m_cts(1)
+ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, dev_type device_type)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_serial_interface(mconfig, *this)
+	, m_device_type(device_type)
+	, m_out_tx_cb(*this)
+	, m_out_dtr_cb(*this)
+	, m_out_rts_cb(*this)
+	, m_out_int_cb(*this)
+	, m_out_out1_cb(*this)
+	, m_out_out2_cb(*this)
+	, m_rxd(1)
+	, m_dcd(1)
+	, m_dsr(1)
+	, m_ri(1)
+	, m_cts(1)
 {
 	m_regs.ier = 0;
 }
 
 ins8250_device::ins8250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: ins8250_uart_device(mconfig, INS8250, "National Semiconductor INS8250", tag, owner, clock, "ins8250")
+	: ins8250_uart_device(mconfig, INS8250, tag, owner, clock, dev_type::INS8250)
 {
-	m_device_type = TYPE_INS8250;
 }
 
 ns16450_device::ns16450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: ins8250_uart_device(mconfig, NS16450, "National Semiconductor NS16450", tag, owner, clock, "ns16450")
+	: ins8250_uart_device(mconfig, NS16450, tag, owner, clock, dev_type::NS16450)
 {
-	m_device_type = TYPE_NS16450;
 }
 
 ns16550_device::ns16550_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: ins8250_uart_device(mconfig, NS16550, "National Semiconductor NS16550", tag, owner, clock, "ns16550")
+	: ins8250_uart_device(mconfig, NS16550, tag, owner, clock, dev_type::NS16550)
 {
-	m_device_type = TYPE_NS16550;
 }
 
-pc16552_device::pc16552_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, PC16552D, "National Semiconductor PC16552D", tag, owner, clock, "pc16552d", __FILE__)
+pc16552_device::pc16552_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PC16552D, tag, owner, clock)
 {
 }
 
@@ -144,6 +143,28 @@ void pc16552_device::device_start()
 #define COM_INT_PENDING_RECEIVER_LINE_STATUS 0x0004
 #define COM_INT_PENDING_MODEM_STATUS_REGISTER 0x0008
 #define COM_INT_PENDING_CHAR_TIMEOUT 0x0011
+
+static constexpr uint8_t INS8250_LSR_TSRE = 0x40;
+static constexpr uint8_t INS8250_LSR_THRE = 0x20;
+//static constexpr uint8_t INS8250_LSR_BI = 0x10;
+//static constexpr uint8_t INS8250_LSR_FE = 0x08;
+//static constexpr uint8_t INS8250_LSR_PE = 0x04;
+static constexpr uint8_t INS8250_LSR_OE = 0x02;
+static constexpr uint8_t INS8250_LSR_DR = 0x01;
+
+static constexpr uint8_t INS8250_MCR_DTR = 0x01;
+static constexpr uint8_t INS8250_MCR_RTS = 0x02;
+static constexpr uint8_t INS8250_MCR_OUT1 = 0x04;
+static constexpr uint8_t INS8250_MCR_OUT2 = 0x08;
+static constexpr uint8_t INS8250_MCR_LOOPBACK = 0x10;
+
+static constexpr uint8_t INS8250_LCR_BITCOUNT_MASK= 0x03;
+static constexpr uint8_t INS8250_LCR_2STOP_BITS = 0x04;
+//static constexpr uint8_t INS8250_LCR_PEN = 0x08;
+//static constexpr uint8_t INS8250_LCR_EVEN_PAR = 0x10;
+//static constexpr uint8_t INS8250_LCR_PARITY = 0x20;
+//static constexpr uint8_t INS8250_LCR_BREAK = 0x40;
+static constexpr uint8_t INS8250_LCR_DLAB = 0x80;
 
 /* ints will continue to be set for as long as there are ints pending */
 void ins8250_uart_device::update_interrupt()
@@ -211,7 +232,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 	switch (offset)
 	{
 		case 0:
-			if (m_regs.lcr & 0x80)
+			if (m_regs.lcr & INS8250_LCR_DLAB)
 			{
 				m_regs.dl = (m_regs.dl & 0xff00) | data;
 				set_rate(clock(), m_regs.dl*16);
@@ -219,23 +240,23 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			else
 			{
 				m_regs.thr = data;
-				m_regs.lsr &= ~0x20;
-				if((m_device_type >= TYPE_NS16550) && (m_regs.fcr & 1))
+				m_regs.lsr &= ~INS8250_LSR_THRE;
+				if((m_device_type >= dev_type::NS16550) && (m_regs.fcr & 1))
 					push_tx(data);
 				clear_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
-				if(m_regs.lsr & 0x40)
+				if(m_regs.lsr & INS8250_LSR_TSRE)
 					tra_complete();
 			}
 			break;
 		case 1:
-			if (m_regs.lcr & 0x80)
+			if (m_regs.lcr & INS8250_LCR_DLAB)
 			{
 				m_regs.dl = (m_regs.dl & 0xff) | (data << 8);
 				set_rate(clock(), m_regs.dl*16);
 			}
 			else
 			{
-				if ((m_regs.lsr & 0x20) && (data & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY))
+				if ((m_regs.lsr & INS8250_LSR_THRE) && (data & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY))
 					trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 				m_regs.ier = data;
 				update_interrupt();
@@ -248,7 +269,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			m_regs.lcr = data;
 
 			{
-			int data_bit_count = (m_regs.lcr & 3) + 5;
+			int data_bit_count = (m_regs.lcr & INS8250_LCR_BITCOUNT_MASK) + 5;
 			parity_t parity;
 			stop_bits_t stop_bits;
 
@@ -275,7 +296,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 				break;
 			}
 
-			if (!(m_regs.lcr & 4))
+			if (!(m_regs.lcr & INS8250_LCR_2STOP_BITS))
 				stop_bits = STOP_BITS_1;
 			else if (data_bit_count == 5)
 				stop_bits = STOP_BITS_1_5;
@@ -292,7 +313,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 
 				update_msr();
 
-				if (m_regs.mcr & 0x10)        /* loopback test */
+				if (m_regs.mcr & INS8250_MCR_LOOPBACK)
 				{
 					m_out_tx_cb(1);
 					device_serial_interface::rx_w(m_txd);
@@ -305,10 +326,10 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 				{
 					m_out_tx_cb(m_txd);
 					device_serial_interface::rx_w(m_rxd);
-					m_out_dtr_cb((m_regs.mcr & 1) ? 0 : 1);
-					m_out_rts_cb((m_regs.mcr & 2) ? 0 : 1);
-					m_out_out1_cb((m_regs.mcr & 4) ? 0 : 1);
-					m_out_out2_cb((m_regs.mcr & 8) ? 0 : 1);
+					m_out_dtr_cb((m_regs.mcr & INS8250_MCR_DTR) ? 0 : 1);
+					m_out_rts_cb((m_regs.mcr & INS8250_MCR_RTS) ? 0 : 1);
+					m_out_out1_cb((m_regs.mcr & INS8250_MCR_OUT1) ? 0 : 1);
+					m_out_out2_cb((m_regs.mcr & INS8250_MCR_OUT2) ? 0 : 1);
 				}
 			}
 			break;
@@ -318,12 +339,12 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 			  bits 5 - 0, you could cause an interrupt if the appropriate IER bit
 			  is set.
 			*/
-			m_regs.lsr = (m_regs.lsr & 0x60) | (data & ~0x60);
+			m_regs.lsr = (m_regs.lsr & (INS8250_LSR_TSRE|INS8250_LSR_THRE)) | (data & ~(INS8250_LSR_TSRE|INS8250_LSR_THRE));
 
 			tmp = 0;
-			tmp |= ( m_regs.lsr & 0x01 ) ? COM_INT_PENDING_RECEIVED_DATA_AVAILABLE : 0;
+			tmp |= ( m_regs.lsr & INS8250_LSR_DR ) ? COM_INT_PENDING_RECEIVED_DATA_AVAILABLE : 0;
 			tmp |= ( m_regs.lsr & 0x1e ) ? COM_INT_PENDING_RECEIVER_LINE_STATUS : 0;
-			tmp |= ( m_regs.lsr & 0x20 ) ? COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY : 0;
+			tmp |= ( m_regs.lsr & INS8250_LSR_THRE ) ? COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY : 0;
 			trigger_int(tmp);
 
 			break;
@@ -351,23 +372,23 @@ READ8_MEMBER( ins8250_uart_device::ins8250_r )
 	switch (offset)
 	{
 		case 0:
-			if (m_regs.lcr & 0x80)
+			if (m_regs.lcr & INS8250_LCR_DLAB)
 				data = (m_regs.dl & 0xff);
 			else
 			{
-				if((m_device_type >= TYPE_NS16550) && (m_regs.fcr & 1))
+				if((m_device_type >= dev_type::NS16550) && (m_regs.fcr & 1))
 					m_regs.rbr = pop_rx();
 				else
 				{
 					clear_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
-					if( m_regs.lsr & 0x01 )
-						m_regs.lsr &= ~0x01;
+					if( m_regs.lsr & INS8250_LSR_DR )
+						m_regs.lsr &= ~INS8250_LSR_DR;
 				}
 				data = m_regs.rbr;
 			}
 			break;
 		case 1:
-			if (m_regs.lcr & 0x80)
+			if (m_regs.lcr & INS8250_LCR_DLAB)
 				data = (m_regs.dl >> 8);
 			else
 				data = m_regs.ier & 0x0f;
@@ -417,12 +438,12 @@ void ns16550_device::rcv_complete()
 
 	if(m_rnum == 16)
 	{
-		m_regs.lsr |= 0x02; //overrun
+		m_regs.lsr |= INS8250_LSR_OE; //overrun
 		trigger_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
 		return;
 	}
 
-	m_regs.lsr |= 0x01;
+	m_regs.lsr |= INS8250_LSR_DR;
 	m_rfifo[m_rhead] = get_received_char();
 	++m_rhead &= 0x0f;
 	m_rnum++;
@@ -440,10 +461,10 @@ void ns16550_device::tra_complete()
 	{
 		transmit_register_setup(m_tfifo[m_ttail]);
 		++m_ttail &= 0x0f;
-		m_regs.lsr &= ~0x40;
+		m_regs.lsr &= ~INS8250_LSR_TSRE;
 		if(m_ttail == m_thead)
 		{
-			m_regs.lsr |= 0x20;
+			m_regs.lsr |= INS8250_LSR_THRE;
 			trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 		}
 	}
@@ -453,15 +474,15 @@ void ns16550_device::tra_complete()
 
 void ins8250_uart_device::rcv_complete()
 {
-	if(m_regs.lsr & 0x01)
+	if(m_regs.lsr & INS8250_LSR_DR)
 	{
-		m_regs.lsr |= 0x02; //overrun
+		m_regs.lsr |= INS8250_LSR_OE; //overrun
 		trigger_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
 		receive_register_reset();
 	}
 	else
 	{
-		m_regs.lsr |= 0x01;
+		m_regs.lsr |= INS8250_LSR_DR;
 		receive_register_extract();
 		m_regs.rbr = get_received_char();
 		trigger_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
@@ -470,21 +491,21 @@ void ins8250_uart_device::rcv_complete()
 
 void ins8250_uart_device::tra_complete()
 {
-	if(!(m_regs.lsr & 0x20))
+	if(!(m_regs.lsr & INS8250_LSR_THRE))
 	{
 		transmit_register_setup(m_regs.thr);
-		m_regs.lsr &= ~0x40;
-		m_regs.lsr |= 0x20;
+		m_regs.lsr &= ~INS8250_LSR_TSRE;
+		m_regs.lsr |= INS8250_LSR_THRE;
 		trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 	}
 	else
-		m_regs.lsr |= 0x40;
+		m_regs.lsr |= INS8250_LSR_TSRE;
 }
 
 void ins8250_uart_device::tra_callback()
 {
 	m_txd = transmit_register_get_data_bit();
-	if (m_regs.mcr & 0x10)
+	if (m_regs.mcr & INS8250_MCR_LOOPBACK)
 	{
 		device_serial_interface::rx_w(m_txd);
 	}
@@ -499,9 +520,10 @@ void ins8250_uart_device::update_msr()
 	uint8_t data;
 	int change;
 
-	if (m_regs.mcr & 0x10)
+	if (m_regs.mcr & INS8250_MCR_LOOPBACK)
 	{
-		data = (((m_regs.mcr & 0x0c) << 4) | ((m_regs.mcr & 0x01) << 5) | ((m_regs.mcr & 0x02) << 3));
+		data = ((m_regs.mcr & (INS8250_MCR_OUT1|INS8250_MCR_OUT2) << 4) | \
+			((m_regs.mcr & INS8250_MCR_DTR) << 5) | ((m_regs.mcr & INS8250_MCR_RTS) << 3));
 		change = (m_regs.msr ^ data) >> 4;
 		if(!(m_regs.msr & 0x40) && (data & 0x40))
 			change &= ~4;
@@ -546,7 +568,7 @@ WRITE_LINE_MEMBER(ins8250_uart_device::rx_w)
 {
 	m_rxd = state;
 
-	if (!(m_regs.mcr & 0x10))
+	if (!(m_regs.mcr & INS8250_MCR_LOOPBACK))
 		device_serial_interface::rx_w(m_rxd);
 }
 
@@ -561,7 +583,6 @@ void ins8250_uart_device::device_start()
 	set_tra_rate(0);
 	set_rcv_rate(0);
 
-	device_serial_interface::register_save_state(machine().save(), this);
 	save_item(NAME(m_regs.thr));
 	save_item(NAME(m_regs.rbr));
 	save_item(NAME(m_regs.ier));
@@ -588,7 +609,7 @@ void ins8250_uart_device::device_reset()
 	m_regs.iir = 1;
 	m_regs.lcr = 0;
 	m_regs.mcr = 0;
-	m_regs.lsr = (1<<5) | (1<<6);
+	m_regs.lsr = INS8250_LSR_THRE | INS8250_LSR_TSRE;
 	update_msr();
 	m_regs.msr &= 0xf0;
 	m_int_pending = 0;
@@ -601,11 +622,6 @@ void ins8250_uart_device::device_reset()
 	m_out_dtr_cb(1);
 	m_out_out1_cb(1);
 	m_out_out2_cb(1);
-}
-
-void ins8250_uart_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-		device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 void ns16550_device::device_start()
@@ -634,9 +650,7 @@ void ns16550_device::device_reset()
 
 void ns16550_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if(id)
-		device_serial_interface::device_timer(timer, id, param, ptr);
-	else
+	if(!id)
 	{
 		trigger_int(COM_INT_PENDING_CHAR_TIMEOUT);
 		m_timeout->adjust(attotime::never);
@@ -670,7 +684,7 @@ uint8_t ns16550_device::pop_rx()
 	else
 	{
 		m_timeout->adjust(attotime::never);
-		m_regs.lsr &= ~1;
+		m_regs.lsr &= ~INS8250_LSR_DR;
 	}
 
 	return data;
@@ -698,7 +712,7 @@ void ns16550_device::set_fcr(uint8_t data)
 	{
 		memset(&m_tfifo, '\0', sizeof(m_tfifo));
 		m_thead = m_ttail = 0;
-		m_regs.lsr |= 0x20;
+		m_regs.lsr |= INS8250_LSR_THRE;
 		trigger_int(COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 	}
 	m_rintlvl = bytes_per_int[(data>>6)&3];

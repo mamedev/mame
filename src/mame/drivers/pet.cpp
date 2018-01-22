@@ -150,7 +150,9 @@ ROM sockets:  UA3   2K or 4K character
 */
 
 #include "emu.h"
+#include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 #include "bus/ieee488/c2040.h"
@@ -166,7 +168,8 @@ ROM sockets:  UA3   2K or 4K character
 #include "machine/cbm_snqk.h"
 #include "machine/pla.h"
 #include "machine/ram.h"
-#include "sound/speaker.h"
+#include "machine/timer.h"
+#include "sound/spkrdev.h"
 #include "video/mc6845.h"
 
 #define M6502_TAG       "f3"
@@ -323,6 +326,25 @@ public:
 	int m_pia2b_irq;
 	int m_exp_irq;
 	int m_user_diag;
+	void _4k(machine_config &config);
+	void _8k(machine_config &config);
+	void _16k(machine_config &config);
+	void _32k(machine_config &config);
+	void pet(machine_config &config);
+	void pet2001n(machine_config &config);
+	void pet2001n8(machine_config &config);
+	void cbm3032(machine_config &config);
+	void pet20018(machine_config &config);
+	void pet2001n16(machine_config &config);
+	void cbm3016(machine_config &config);
+	void cbm3000(machine_config &config);
+	void cbm4000(machine_config &config);
+	void cbm4032f(machine_config &config);
+	void cbm4032(machine_config &config);
+	void cbm4016(machine_config &config);
+	void cbm3008(machine_config &config);
+	void pet2001(machine_config &config);
+	void pet2001n32(machine_config &config);
 };
 
 
@@ -334,6 +356,20 @@ public:
 	{ }
 
 	DECLARE_READ8_MEMBER( pia1_pb_r );
+	void pet2001b(machine_config &config);
+	void pet2001b32(machine_config &config);
+	void pet4000(machine_config &config);
+	void pet4000b(machine_config &config);
+	void pet4001b(machine_config &config);
+	void pet4032f(machine_config &config);
+	void pet4032b(machine_config &config);
+	void pet4032(machine_config &config);
+	void pet2001b16(machine_config &config);
+	void cbm3032b(machine_config &config);
+	void cbm4000b(machine_config &config);
+	void cbm4032b(machine_config &config);
+	void pet2001b8(machine_config &config);
+	void pet4016(machine_config &config);
 };
 
 
@@ -349,6 +385,8 @@ public:
 
 	MC6845_UPDATE_ROW( pet80_update_row );
 	MC6845_UPDATE_ROW( cbm8296_update_row );
+	void pet80(machine_config &config);
+	void pet8032(machine_config &config);
 };
 
 
@@ -358,6 +396,7 @@ public:
 	superpet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pet80_state(mconfig, type, tag)
 	{ }
+	void superpet(machine_config &config);
 };
 
 
@@ -367,6 +406,7 @@ public:
 	cbm8096_state(const machine_config &mconfig, device_type type, const char *tag) :
 		pet80_state(mconfig, type, tag)
 	{ }
+	void cbm8096(machine_config &config);
 };
 
 
@@ -405,6 +445,8 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	uint8_t m_cr;
+	void cbm8296d(machine_config &config);
+	void cbm8296(machine_config &config);
 };
 
 
@@ -479,7 +521,10 @@ READ8_MEMBER( pet_state::read )
 		break;
 
 	case SEL8:
-		data = m_video_ram[offset & (m_video_ram_size - 1)];
+		if (!(offset & 0x800))
+		{
+			data = m_video_ram[offset & (m_video_ram_size - 1)];
+		}
 		break;
 
 	case SEL9:
@@ -572,7 +617,10 @@ WRITE8_MEMBER( pet_state::write )
 		break;
 
 	case SEL8:
-		m_video_ram[offset & (m_video_ram_size - 1)] = data;
+		if (!(offset & 0x800))
+		{
+			m_video_ram[offset & (m_video_ram_size - 1)] = data;
+		}
 		break;
 
 	case SELE:
@@ -632,10 +680,10 @@ void cbm8296_state::read_pla1_eprom(offs_t offset, int phi2, int brw, int noscre
 	// PLA-EPROM adapter by Joachim Nemetz (Jogi)
 
 	uint32_t input = (offset & 0xff00) | phi2 << 7 | brw << 6 | noscreen << 5 | noio << 4 | ramsela << 3 | ramsel9 << 2 | ramon << 1 | norom;
-	input = BITSWAP16(input,13,8,9,7,12,14,11,10,6,5,4,3,2,1,0,15);
+	input = bitswap<16>(input,13,8,9,7,12,14,11,10,6,5,4,3,2,1,0,15);
 
 	uint8_t data = m_ue6_rom->base()[input];
-	data = BITSWAP8(data,7,0,1,2,3,4,5,6);
+	data = bitswap<8>(data,7,0,1,2,3,4,5,6);
 
 	cswff = BIT(data, 0);
 	cs9 = BIT(data, 1);
@@ -654,7 +702,7 @@ void cbm8296_state::read_pla1_eprom(offs_t offset, int phi2, int brw, int noscre
 
 void cbm8296_state::read_pla2(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15)
 {
-	uint32_t input = BITSWAP8(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
+	uint32_t input = bitswap<8>(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
 	uint32_t data = m_pla2->read(input);
 
 	endra = BIT(data, 4);
@@ -667,11 +715,11 @@ void cbm8296_state::read_pla2_eprom(offs_t offset, int phi2, int brw, int casena
 {
 	// PLA-EPROM adapter by Joachim Nemetz (Jogi)
 
-	uint32_t input = BITSWAP8(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
-	input = BITSWAP16(input,13,8,9,7,12,14,11,10,6,5,4,3,2,1,0,15);
+	uint32_t input = bitswap<8>(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
+	input = bitswap<16>(input,13,8,9,7,12,14,11,10,6,5,4,3,2,1,0,15);
 
 	uint8_t data = m_ue5_rom->base()[input];
-	data = BITSWAP8(data,7,0,1,2,3,4,5,6);
+	data = bitswap<8>(data,7,0,1,2,3,4,5,6);
 
 	endra = BIT(data, 4);
 	noscreen = BIT(data, 5);
@@ -1681,7 +1729,7 @@ MACHINE_RESET_MEMBER( cbm8296_state, cbm8296 )
 //  MACHINE_CONFIG( 4k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( 4k )
+MACHINE_CONFIG_START(pet_state::_4k)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4K")
 	MCFG_RAM_EXTRA_OPTIONS("8K,16K,32K")
@@ -1692,7 +1740,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( 8k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( 8k )
+MACHINE_CONFIG_START(pet_state::_8k)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
@@ -1700,10 +1748,10 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( 8k )
+//  MACHINE_CONFIG( 16k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( 16k )
+MACHINE_CONFIG_START(pet_state::_16k)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 	MCFG_RAM_EXTRA_OPTIONS("32K")
@@ -1711,10 +1759,10 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( 8k )
+//  MACHINE_CONFIG( 32k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_FRAGMENT( 32k )
+MACHINE_CONFIG_START(pet_state::_32k)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 MACHINE_CONFIG_END
@@ -1724,7 +1772,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pet, pet_state )
+MACHINE_CONFIG_START(pet_state::pet)
 	MCFG_MACHINE_START_OVERRIDE(pet_state, pet2001)
 	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet)
 
@@ -1793,11 +1841,13 @@ static MACHINE_CONFIG_START( pet, pet_state )
 	MCFG_PET_USER_PORT_M_HANDLER(DEVWRITELINE(M6522_TAG, via6522_device, write_cb2))
 
 	MCFG_QUICKLOAD_ADD("quickload", pet_state, cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_INTERFACE("cbm_quik")
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "pet_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pet_flop")
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pet_hdd")
+	MCFG_SOFTWARE_LIST_ADD("quik_list", "pet_quik")
 MACHINE_CONFIG_END
 
 
@@ -1805,8 +1855,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001, pet )
-	MCFG_FRAGMENT_ADD(4k)
+MACHINE_CONFIG_DERIVED(pet_state::pet2001, pet)
+	MCFG_FRAGMENT_ADD(_4k)
 MACHINE_CONFIG_END
 
 
@@ -1814,8 +1864,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet20018 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet20018, pet )
-	MCFG_FRAGMENT_ADD(8k)
+MACHINE_CONFIG_DERIVED(pet_state::pet20018, pet)
+	MCFG_FRAGMENT_ADD(_8k)
 MACHINE_CONFIG_END
 
 
@@ -1823,7 +1873,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001n )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001n, pet )
+MACHINE_CONFIG_DERIVED(pet_state::pet2001n, pet)
 	MCFG_GENERIC_CARTSLOT_ADD("cart_9000", generic_linear_slot, "pet_9000_rom")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 
@@ -1841,8 +1891,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001n8 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001n8, pet2001n )
-	MCFG_FRAGMENT_ADD(8k)
+MACHINE_CONFIG_DERIVED(pet_state::pet2001n8, pet2001n)
+	MCFG_FRAGMENT_ADD(_8k)
 MACHINE_CONFIG_END
 
 
@@ -1850,8 +1900,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001n16 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001n16, pet2001n )
-	MCFG_FRAGMENT_ADD(16k)
+MACHINE_CONFIG_DERIVED(pet_state::pet2001n16, pet2001n)
+	MCFG_FRAGMENT_ADD(_16k)
 MACHINE_CONFIG_END
 
 
@@ -1859,8 +1909,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001n32 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001n32, pet2001n )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet_state::pet2001n32, pet2001n)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -1868,7 +1918,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm3000 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm3000, pet2001n )
+MACHINE_CONFIG_DERIVED(pet_state::cbm3000, pet2001n)
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -1885,8 +1935,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm3008 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm3008, cbm3000 )
-	MCFG_FRAGMENT_ADD(8k)
+MACHINE_CONFIG_DERIVED(pet_state::cbm3008, cbm3000)
+	MCFG_FRAGMENT_ADD(_8k)
 MACHINE_CONFIG_END
 
 
@@ -1894,8 +1944,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm3016 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm3016, cbm3000 )
-	MCFG_FRAGMENT_ADD(16k)
+MACHINE_CONFIG_DERIVED(pet_state::cbm3016, cbm3000)
+	MCFG_FRAGMENT_ADD(_16k)
 MACHINE_CONFIG_END
 
 
@@ -1903,8 +1953,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm3032 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm3032, cbm3000 )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet_state::cbm3032, cbm3000)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -1912,7 +1962,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( pet2001b, pet2001n, pet2001b_state )
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet2001b, pet2001n)
 	MCFG_DEVICE_MODIFY(M6520_1_TAG)
 	MCFG_PIA_READPB_HANDLER(READ8(pet2001b_state, pia1_pb_r))
 MACHINE_CONFIG_END
@@ -1922,8 +1972,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001b8 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001b8, pet2001b )
-	MCFG_FRAGMENT_ADD(8k)
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet2001b8, pet2001b)
+	MCFG_FRAGMENT_ADD(_8k)
 MACHINE_CONFIG_END
 
 
@@ -1931,8 +1981,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001b16 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001b16, pet2001b )
-	MCFG_FRAGMENT_ADD(16k)
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet2001b16, pet2001b)
+	MCFG_FRAGMENT_ADD(_16k)
 MACHINE_CONFIG_END
 
 
@@ -1940,8 +1990,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001b32 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet2001b32, pet2001b )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet2001b32, pet2001b)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -1949,7 +1999,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm3032b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm3032b, pet2001b )
+MACHINE_CONFIG_DERIVED(pet2001b_state::cbm3032b, pet2001b)
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -1960,7 +2010,7 @@ static MACHINE_CONFIG_DERIVED( cbm3032b, pet2001b )
 	MCFG_DEVICE_REMOVE("sync_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sync_timer", pet_state, sync_tick, attotime::from_hz(100))
 
-	MCFG_FRAGMENT_ADD(32k)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -1968,7 +2018,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet4000 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet4000, pet2001n )
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet4000, pet2001n )
 	MCFG_DEVICE_REMOVE("cart_b000")
 MACHINE_CONFIG_END
 
@@ -1977,7 +2027,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet4016 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet4016, pet4000 )
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet4016, pet4000)
 	// RAM not upgradeable
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
@@ -1988,8 +2038,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet4032 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet4032, pet4000 )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet4032, pet4000)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -1997,7 +2047,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet4032f )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet4032f, pet4000 )
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet4032f, pet4000)
 	MCFG_MACHINE_START_OVERRIDE(pet_state, pet40)
 	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet40)
 
@@ -2022,7 +2072,7 @@ static MACHINE_CONFIG_DERIVED( pet4032f, pet4000 )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_FRAGMENT_ADD(32k)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -2030,7 +2080,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm4000 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm4000, pet2001n )
+MACHINE_CONFIG_DERIVED(pet_state::cbm4000, pet2001n)
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -2049,7 +2099,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm4016 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm4016, cbm4000 )
+MACHINE_CONFIG_DERIVED(pet_state::cbm4016, cbm4000)
 	// RAM not upgradeable
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
@@ -2060,8 +2110,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm4032 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm4032, cbm4000 )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet_state::cbm4032, cbm4000)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -2069,7 +2119,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm4032f )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm4032f, cbm4000 )
+MACHINE_CONFIG_DERIVED(pet_state::cbm4032f, cbm4000)
 	MCFG_MACHINE_START_OVERRIDE(pet_state, pet40)
 	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet40)
 
@@ -2094,7 +2144,7 @@ static MACHINE_CONFIG_DERIVED( cbm4032f, cbm4000 )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_FRAGMENT_ADD(32k)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -2102,7 +2152,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet4000b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet4000b, pet2001b )
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet4000b, pet2001b)
 	MCFG_DEVICE_REMOVE("cart_b000")
 MACHINE_CONFIG_END
 
@@ -2111,8 +2161,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet4032b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet4032b, pet4000b )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet2001b_state::pet4032b, pet4000b)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -2120,7 +2170,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm4000b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm4000b, pet2001b )
+MACHINE_CONFIG_DERIVED(pet2001b_state::cbm4000b, pet2001b)
 	// video hardware
 	MCFG_SCREEN_MODIFY(SCREEN_TAG)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -2139,8 +2189,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm4032b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm4032b, cbm4000b )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet2001b_state::cbm4032b, cbm4000b)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -2148,7 +2198,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet80 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pet80, pet80_state )
+MACHINE_CONFIG_START(pet80_state::pet80)
 	MCFG_MACHINE_START_OVERRIDE(pet80_state, pet80)
 	MCFG_MACHINE_RESET_OVERRIDE(pet80_state, pet80)
 
@@ -2227,6 +2277,7 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_PET_USER_PORT_M_HANDLER(DEVWRITELINE(M6522_TAG, via6522_device, write_cb2))
 
 	MCFG_QUICKLOAD_ADD("quickload", pet_state, cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
+	MCFG_QUICKLOAD_INTERFACE("cbm_quik")
 
 	MCFG_GENERIC_CARTSLOT_ADD("cart_9000", generic_linear_slot, "pet_9000_rom")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
@@ -2239,6 +2290,7 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pet_flop")
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "pet_hdd")
 	MCFG_SOFTWARE_LIST_ADD("rom_list", "pet_rom")
+	MCFG_SOFTWARE_LIST_ADD("quik_list", "pet_quik")
 MACHINE_CONFIG_END
 
 
@@ -2246,8 +2298,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet8032 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( pet8032, pet80 )
-	MCFG_FRAGMENT_ADD(32k)
+MACHINE_CONFIG_DERIVED(pet80_state::pet8032, pet80)
+	MCFG_FRAGMENT_ADD(_32k)
 MACHINE_CONFIG_END
 
 
@@ -2255,7 +2307,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( superpet )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( superpet, pet8032, superpet_state )
+MACHINE_CONFIG_DERIVED(superpet_state::superpet, pet8032)
 	MCFG_DEVICE_REMOVE(PET_EXPANSION_SLOT_TAG)
 	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, pet_expansion_cards, "superpet")
 	MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(READ8(pet_state, read), WRITE8(pet_state, write))
@@ -2268,7 +2320,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm8096 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( cbm8096, pet80, cbm8096_state )
+MACHINE_CONFIG_DERIVED(cbm8096_state::cbm8096, pet80)
 	MCFG_DEVICE_REMOVE(PET_EXPANSION_SLOT_TAG)
 	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, pet_expansion_cards, "64k")
 	MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(READ8(pet_state, read), WRITE8(pet_state, write))
@@ -2284,7 +2336,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm8296 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( cbm8296, pet80, cbm8296_state )
+MACHINE_CONFIG_DERIVED(cbm8296_state::cbm8296, pet80)
 	MCFG_MACHINE_START_OVERRIDE(cbm8296_state, cbm8296)
 	MCFG_MACHINE_RESET_OVERRIDE(cbm8296_state, cbm8296)
 
@@ -2315,7 +2367,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm8296d )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm8296d, cbm8296 )
+MACHINE_CONFIG_DERIVED(cbm8296_state::cbm8296d, cbm8296)
 	MCFG_DEVICE_MODIFY("ieee8")
 	MCFG_DEVICE_SLOT_INTERFACE(cbm8296d_ieee488_devices, "c8250lp", false)
 MACHINE_CONFIG_END
@@ -2835,39 +2887,39 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT                COMPANY                         FULLNAME        FLAGS
-COMP( 1977, pet2001,    0,          0,      pet2001,    pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-4",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, pet20018,   pet2001,    0,      pet20018,   pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-8",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001n,   0,          0,      pet2001n8,  pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-N8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001n16, pet2001n,   0,      pet2001n16, pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-N16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001n32, pet2001n,   0,      pet2001n32, pet,        driver_device,  0,  "Commodore Business Machines",  "PET 2001-N32", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, cbm3008,    pet2001n,   0,      cbm3008,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 3008",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, cbm3016,    pet2001n,   0,      cbm3016,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 3016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, cbm3032,    pet2001n,   0,      cbm3032,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 3032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001b,   0,          0,      pet2001b8,  petb,       driver_device,  0,  "Commodore Business Machines",  "PET 2001-B8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001b16, pet2001b,   0,      pet2001b16, petb,       driver_device,  0,  "Commodore Business Machines",  "PET 2001-B16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, pet2001b32, pet2001b,   0,      pet2001b32, petb,       driver_device,  0,  "Commodore Business Machines",  "PET 2001-B32", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1979, cbm3032b,   pet2001b,   0,      cbm3032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 3032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, pet4016,    0,          0,      pet4016,    pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, pet4032,    pet4016,    0,      pet4032,    pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, pet4032f,   pet4016,    0,      pet4032f,   pet,        driver_device,  0,  "Commodore Business Machines",  "PET 4032 (Fat 40)",     MACHINE_SUPPORTS_SAVE )
-COMP( 1980, cbm4016,    pet4016,    0,      cbm4016,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, cbm4032,    pet4016,    0,      cbm4032,    pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, cbm4032f,   pet4016,    0,      cbm4032f,   pet,        driver_device,  0,  "Commodore Business Machines",  "CBM 4032 (Fat 40)",     MACHINE_SUPPORTS_SAVE )
-COMP( 1980, pet4032b,   0,          0,      pet4032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "PET 4032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, cbm4032b,   pet4032b,   0,      cbm4032b,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 4032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1980, pet8032,    0,          0,      pet8032,    petb,       driver_device,  0,  "Commodore Business Machines",  "PET 8032",     MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8032,    pet8032,    0,      pet8032,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8032",     MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8032_de, pet8032,    0,      pet8032,    petb_de,    driver_device,  0,  "Commodore Business Machines",  "CBM 8032 (Germany)",           MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8032_fr, pet8032,    0,      pet8032,    petb_fr,    driver_device,  0,  "Commodore Business Machines",  "CBM 8032 (France)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8032_se, pet8032,    0,      pet8032,    petb_se,    driver_device,  0,  "Commodore Business Machines",  "CBM 8032 (Sweden/Finland)",    MACHINE_SUPPORTS_SAVE )
-COMP( 1981, superpet,   pet8032,    0,      superpet,   petb,       driver_device,  0,  "Commodore Business Machines",  "SuperPET SP-9000",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, mmf9000,    pet8032,    0,      superpet,   petb,       driver_device,  0,  "Commodore Business Machines",  "MicroMainFrame 9000",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, mmf9000_se, pet8032,    0,      superpet,   petb_se,    driver_device,  0,  "Commodore Business Machines",  "MicroMainFrame 9000 (Sweden/Finland)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8096,    pet8032,    0,      cbm8096,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8096",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296,    0,          0,      cbm8296,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296",                     MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296ed,  cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296 ExecuDesk",           MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296d,   cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D",                   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296d_de,cbm8296,    0,      cbm8296d,   petb_de,    driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D (Germany)",         MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296gd,  cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296GD",                   MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296dgv_de,cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D GV? (Germany)",        MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME          PARENT      COMPAT  MACHINE     INPUT       INIT                 COMPANY                         FULLNAME        FLAGS
+COMP( 1977, pet2001,      0,          0,      pet2001,    pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-4",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, pet20018,     pet2001,    0,      pet20018,   pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-8",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001n,     0,          0,      pet2001n8,  pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-N8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001n16,   pet2001n,   0,      pet2001n16, pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-N16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001n32,   pet2001n,   0,      pet2001n32, pet,        pet_state,       0,  "Commodore Business Machines",  "PET 2001-N32", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3008,      pet2001n,   0,      cbm3008,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 3008",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3016,      pet2001n,   0,      cbm3016,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 3016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3032,      pet2001n,   0,      cbm3032,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 3032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001b,     0,          0,      pet2001b8,  petb,       pet2001b_state,  0,  "Commodore Business Machines",  "PET 2001-B8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001b16,   pet2001b,   0,      pet2001b16, petb,       pet2001b_state,  0,  "Commodore Business Machines",  "PET 2001-B16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, pet2001b32,   pet2001b,   0,      pet2001b32, petb,       pet2001b_state,  0,  "Commodore Business Machines",  "PET 2001-B32", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1979, cbm3032b,     pet2001b,   0,      cbm3032b,   petb,       pet2001b_state,  0,  "Commodore Business Machines",  "CBM 3032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet4016,      0,          0,      pet4016,    pet,        pet2001b_state,  0,  "Commodore Business Machines",  "PET 4016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet4032,      pet4016,    0,      pet4032,    pet,        pet2001b_state,  0,  "Commodore Business Machines",  "PET 4032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet4032f,     pet4016,    0,      pet4032f,   pet,        pet2001b_state,  0,  "Commodore Business Machines",  "PET 4032 (Fat 40)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1980, cbm4016,      pet4016,    0,      cbm4016,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 4016",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, cbm4032,      pet4016,    0,      cbm4032,    pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 4032",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, cbm4032f,     pet4016,    0,      cbm4032f,   pet,        pet_state,       0,  "Commodore Business Machines",  "CBM 4032 (Fat 40)",     MACHINE_SUPPORTS_SAVE )
+COMP( 1980, pet4032b,     0,          0,      pet4032b,   petb,       pet2001b_state,  0,  "Commodore Business Machines",  "PET 4032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, cbm4032b,     pet4032b,   0,      cbm4032b,   petb,       pet2001b_state,  0,  "Commodore Business Machines",  "CBM 4032B",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, pet8032,      0,          0,      pet8032,    petb,       pet80_state,     0,  "Commodore Business Machines",  "PET 8032",     MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032,      pet8032,    0,      pet8032,    petb,       pet80_state,     0,  "Commodore Business Machines",  "CBM 8032",     MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032_de,   pet8032,    0,      pet8032,    petb_de,    pet80_state,     0,  "Commodore Business Machines",  "CBM 8032 (Germany)",           MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032_fr,   pet8032,    0,      pet8032,    petb_fr,    pet80_state,     0,  "Commodore Business Machines",  "CBM 8032 (France)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032_se,   pet8032,    0,      pet8032,    petb_se,    pet80_state,     0,  "Commodore Business Machines",  "CBM 8032 (Sweden/Finland)",    MACHINE_SUPPORTS_SAVE )
+COMP( 1981, superpet,     pet8032,    0,      superpet,   petb,       superpet_state,  0,  "Commodore Business Machines",  "SuperPET SP-9000",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mmf9000,      pet8032,    0,      superpet,   petb,       superpet_state,  0,  "Commodore Business Machines",  "MicroMainFrame 9000",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, mmf9000_se,   pet8032,    0,      superpet,   petb_se,    superpet_state,  0,  "Commodore Business Machines",  "MicroMainFrame 9000 (Sweden/Finland)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8096,      pet8032,    0,      cbm8096,    petb,       cbm8096_state,   0,  "Commodore Business Machines",  "CBM 8096",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296,      0,          0,      cbm8296,    petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296ed,    cbm8296,    0,      cbm8296d,   petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296 ExecuDesk",           MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296d,     cbm8296,    0,      cbm8296d,   petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296-D",                   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296d_de,  cbm8296,    0,      cbm8296d,   petb_de,    cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296-D (Germany)",         MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296gd,    cbm8296,    0,      cbm8296d,   petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296GD",                   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296dgv_de,cbm8296,    0,      cbm8296d,   petb,       cbm8296_state,   0,  "Commodore Business Machines",  "CBM 8296-D GV? (Germany)",        MACHINE_SUPPORTS_SAVE )

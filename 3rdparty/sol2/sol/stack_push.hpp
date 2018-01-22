@@ -71,7 +71,7 @@ namespace sol {
 			template <typename F>
 			static int push_fx(lua_State* L, F&& f, T* obj) {
 				if (obj == nullptr)
-					return stack::push(L, nil);
+					return stack::push(L, lua_nil);
 				T** pref = static_cast<T**>(lua_newuserdata(L, sizeof(T*)));
 				*pref = obj;
 				f();
@@ -108,7 +108,7 @@ namespace sol {
 		};
 		
 		template<typename T>
-		struct pusher<T*, meta::disable_if_t<meta::all<is_container<T>, meta::neg<meta::any<std::is_base_of<reference, meta::unqualified_t<T>>, std::is_base_of<stack_reference, meta::unqualified_t<T>>>>>::value>> {
+		struct pusher<T*, meta::disable_if_t<meta::all<is_container<meta::unqualified_t<T>>, meta::neg<meta::any<std::is_base_of<reference, meta::unqualified_t<T>>, std::is_base_of<stack_reference, meta::unqualified_t<T>>>>>::value>> {
 			template <typename... Args>
 			static int push(lua_State* L, Args&&... args) {
 				return pusher<detail::as_pointer_tag<T>>{}.push(L, std::forward<Args>(args)...);
@@ -123,7 +123,7 @@ namespace sol {
 			template <typename Arg, meta::enable<std::is_base_of<Real, meta::unqualified_t<Arg>>> = meta::enabler>
 			static int push(lua_State* L, Arg&& arg) {
 				if (unique_usertype_traits<T>::is_null(arg))
-					return stack::push(L, nil);
+					return stack::push(L, lua_nil);
 				return push_deep(L, std::forward<Arg>(arg));
 			}
 
@@ -243,12 +243,12 @@ namespace sol {
 
 		template<typename T>
 		struct pusher<T, std::enable_if_t<std::is_base_of<reference, T>::value || std::is_base_of<stack_reference, T>::value>> {
-			static int push(lua_State*, const T& ref) {
-				return ref.push();
+			static int push(lua_State* L, const T& ref) {
+				return ref.push(L);
 			}
 
-			static int push(lua_State*, T&& ref) {
-				return ref.push();
+			static int push(lua_State* L, T&& ref) {
+				return ref.push(L);
 			}
 		};
 
@@ -261,8 +261,8 @@ namespace sol {
 		};
 
 		template<>
-		struct pusher<nil_t> {
-			static int push(lua_State* L, nil_t) {
+		struct pusher<lua_nil_t> {
+			static int push(lua_State* L, lua_nil_t) {
 				lua_pushnil(L);
 				return 1;
 			}
@@ -351,8 +351,7 @@ namespace sol {
 					lua_CFunction cdel = detail::user_alloc_destroy<T>;
 					// Make sure we have a plain GC set for this data
 					if (luaL_newmetatable(L, name) != 0) {
-						lua_pushlightuserdata(L, rawdata);
-						lua_pushcclosure(L, cdel, 1);
+						lua_pushcclosure(L, cdel, 0);
 						lua_setfield(L, -2, "__gc");
 					}
 					lua_setmetatable(L, -2);
@@ -416,6 +415,8 @@ namespace sol {
 			}
 
 			static int push(lua_State* L, const char* str) {
+				if (str == nullptr)
+					return stack::push(L, lua_nil);
 				return push_sized(L, str, std::char_traits<char>::length(str));
 			}
 
@@ -484,11 +485,11 @@ namespace sol {
 
 			static int push(lua_State* L, const wchar_t* strb, const wchar_t* stre) {
 				if (sizeof(wchar_t) == 2) {
-					std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
+					static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
 					std::string u8str = convert.to_bytes(strb, stre);
 					return stack::push(L, u8str);
 				}
-				std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
+				static std::wstring_convert<std::codecvt_utf8<wchar_t>> convert;
 				std::string u8str = convert.to_bytes(strb, stre);
 				return stack::push(L, u8str);
 			}
@@ -506,10 +507,10 @@ namespace sol {
 
 			static int push(lua_State* L, const char16_t* strb, const char16_t* stre) {
 #ifdef _MSC_VER
-				std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
+				static std::wstring_convert<std::codecvt_utf8_utf16<int16_t>, int16_t> convert;
 				std::string u8str = convert.to_bytes(reinterpret_cast<const int16_t*>(strb), reinterpret_cast<const int16_t*>(stre));
 #else
-				std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+				static std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
 				std::string u8str = convert.to_bytes(strb, stre);
 #endif // VC++ is a shit
 				return stack::push(L, u8str);
@@ -528,10 +529,10 @@ namespace sol {
 
 			static int push(lua_State* L, const char32_t* strb, const char32_t* stre) {
 #ifdef _MSC_VER
-				std::wstring_convert<std::codecvt_utf8<int32_t>, int32_t> convert;
+				static std::wstring_convert<std::codecvt_utf8<int32_t>, int32_t> convert;
 				std::string u8str = convert.to_bytes(reinterpret_cast<const int32_t*>(strb), reinterpret_cast<const int32_t*>(stre));
 #else
-				std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
+				static std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> convert;
 				std::string u8str = convert.to_bytes(strb, stre);
 #endif // VC++ is a shit
 				return stack::push(L, u8str);
@@ -670,14 +671,14 @@ namespace sol {
 		template<>
 		struct pusher<nullopt_t> {
 			static int push(lua_State* L, nullopt_t) {
-				return stack::push(L, nil);
+				return stack::push(L, lua_nil);
 			}
 		};
 
 		template<>
 		struct pusher<std::nullptr_t> {
 			static int push(lua_State* L, std::nullptr_t) {
-				return stack::push(L, nil);
+				return stack::push(L, lua_nil);
 			}
 		};
 

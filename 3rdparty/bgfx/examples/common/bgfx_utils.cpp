@@ -1,9 +1,7 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
-
-#include <string.h> // strlen
 
 #include "common.h"
 
@@ -15,21 +13,15 @@ namespace stl = tinystl;
 #include <bgfx/bgfx.h>
 #include <bx/commandline.h>
 #include <bx/endian.h>
-#include <bx/fpumath.h>
+#include <bx/math.h>
 #include <bx/readerwriter.h>
 #include <bx/string.h>
 #include "entry/entry.h"
 #include <ib-compress/indexbufferdecompression.h>
 
-#define LODEPNG_NO_COMPILE_ENCODER
-#define LODEPNG_NO_COMPILE_DISK
-#define LODEPNG_NO_COMPILE_ANCILLARY_CHUNKS
-#define LODEPNG_NO_COMPILE_ERROR_TEXT
-#define LODEPNG_NO_COMPILE_ALLOCATORS
-#define LODEPNG_NO_COMPILE_CPP
-#include <lodepng/lodepng.h>
-
 #include "bgfx_utils.h"
+
+#include <bimg/decode.h>
 
 void* load(bx::FileReaderI* _reader, bx::AllocatorI* _allocator, const char* _filePath, uint32_t* _size)
 {
@@ -127,11 +119,14 @@ static bgfx::ShaderHandle loadShader(bx::FileReaderI* _reader, const char* _name
 		break;
 	}
 
-	strcpy(filePath, shaderPath);
-	strcat(filePath, _name);
-	strcat(filePath, ".bin");
+	bx::strCopy(filePath, BX_COUNTOF(filePath), shaderPath);
+	bx::strCat(filePath, BX_COUNTOF(filePath), _name);
+	bx::strCat(filePath, BX_COUNTOF(filePath), ".bin");
 
-	return bgfx::createShader(loadMem(_reader, filePath) );
+	bgfx::ShaderHandle handle = bgfx::createShader(loadMem(_reader, filePath) );
+	bgfx::setName(handle, filePath);
+
+	return handle;
 }
 
 bgfx::ShaderHandle loadShader(const char* _name)
@@ -156,182 +151,107 @@ bgfx::ProgramHandle loadProgram(const char* _vsName, const char* _fsName)
 	return loadProgram(entry::getFileReader(), _vsName, _fsName);
 }
 
-typedef unsigned char stbi_uc;
-extern "C" stbi_uc* stbi_load_from_memory(stbi_uc const* _buffer, int _len, int* _x, int* _y, int* _comp, int _req_comp);
-extern "C" void stbi_image_free(void* _ptr);
-extern void lodepng_free(void* _ptr);
-
-bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _filePath, uint32_t _flags, uint8_t _skip, bgfx::TextureInfo* _info)
+static void imageReleaseCb(void* _ptr, void* _userData)
 {
-	if (NULL != bx::stristr(_filePath, ".dds")
-	||  NULL != bx::stristr(_filePath, ".pvr")
-	||  NULL != bx::stristr(_filePath, ".ktx") )
-	{
-		const bgfx::Memory* mem = loadMem(_reader, _filePath);
-		if (NULL != mem)
-		{
-			return bgfx::createTexture(mem, _flags, _skip, _info);
-		}
+	BX_UNUSED(_ptr);
+	bimg::ImageContainer* imageContainer = (bimg::ImageContainer*)_userData;
+	bimg::imageFree(imageContainer);
+}
 
-		bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
-		DBG("Failed to load %s.", _filePath);
-		return handle;
-	}
-
+bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _filePath, uint32_t _flags, uint8_t _skip, bgfx::TextureInfo* _info, bimg::Orientation::Enum* _orientation)
+{
+	BX_UNUSED(_skip);
 	bgfx::TextureHandle handle = BGFX_INVALID_HANDLE;
-	bx::AllocatorI* allocator = entry::getAllocator();
 
-	uint32_t size = 0;
-	void* data = loadMem(_reader, allocator, _filePath, &size);
+	uint32_t size;
+	void* data = load(_reader, entry::getAllocator(), _filePath, &size);
 	if (NULL != data)
 	{
-		bgfx::TextureFormat::Enum format = bgfx::TextureFormat::RGBA8;
-		uint32_t bpp = 32;
+		bimg::ImageContainer* imageContainer = bimg::imageParse(entry::getAllocator(), data, size);
 
-		uint32_t width  = 0;
-		uint32_t height = 0;
-
-		typedef void (*ReleaseFn)(void* _ptr);
-		ReleaseFn release = stbi_image_free;
-
-		uint8_t* out = NULL;
-		static uint8_t pngMagic[] = { 0x89, 0x50, 0x4E, 0x47, 0x0d, 0x0a };
-		if (0 == memcmp(data, pngMagic, sizeof(pngMagic) ) )
+		if (NULL != imageContainer)
 		{
-			release = lodepng_free;
-
-			unsigned error;
-			LodePNGState state;
-			lodepng_state_init(&state);
-			state.decoder.color_convert = 0;
-			error = lodepng_decode(&out, &width, &height, &state, (uint8_t*)data, size);
-
-			if (0 == error)
+			if (NULL != _orientation)
 			{
-				switch (state.info_raw.bitdepth)
-				{
-				case 8:
-					switch (state.info_raw.colortype)
-					{
-					case LCT_GREY:
-						format = bgfx::TextureFormat::R8;
-						bpp    = 8;
-						break;
-
-					case LCT_GREY_ALPHA:
-						format = bgfx::TextureFormat::RG8;
-						bpp    = 16;
-						break;
-
-					case LCT_RGB:
-						format = bgfx::TextureFormat::RGB8;
-						bpp    = 24;
-						break;
-
-					case LCT_RGBA:
-						format = bgfx::TextureFormat::RGBA8;
-						bpp    = 32;
-						break;
-
-					case LCT_PALETTE:
-						format = bgfx::TextureFormat::R8;
-						bpp    = 8;
-						break;
-					}
-					break;
-
-				case 16:
-					switch (state.info_raw.colortype)
-					{
-					case LCT_GREY:
-						for (uint32_t ii = 0, num = width*height; ii < num; ++ii)
-						{
-							uint16_t* rgba = (uint16_t*)out + ii*4;
-							rgba[0] = bx::toHostEndian(rgba[0], false);
-						}
-						format = bgfx::TextureFormat::R16;
-						bpp    = 16;
-						break;
-
-					case LCT_GREY_ALPHA:
-						for (uint32_t ii = 0, num = width*height; ii < num; ++ii)
-						{
-							uint16_t* rgba = (uint16_t*)out + ii*4;
-							rgba[0] = bx::toHostEndian(rgba[0], false);
-							rgba[1] = bx::toHostEndian(rgba[1], false);
-						}
-						format = bgfx::TextureFormat::R16;
-						bpp    = 16;
-						break;
-
-					case LCT_RGBA:
-						for (uint32_t ii = 0, num = width*height; ii < num; ++ii)
-						{
-							uint16_t* rgba = (uint16_t*)out + ii*4;
-							rgba[0] = bx::toHostEndian(rgba[0], false);
-							rgba[1] = bx::toHostEndian(rgba[1], false);
-							rgba[2] = bx::toHostEndian(rgba[2], false);
-							rgba[3] = bx::toHostEndian(rgba[3], false);
-						}
-						format = bgfx::TextureFormat::RGBA16;
-						bpp    = 64;
-						break;
-
-					case LCT_RGB:
-					case LCT_PALETTE:
-						break;
-					}
-					break;
-
-				default:
-					break;
-				}
+				*_orientation = imageContainer->m_orientation;
 			}
 
-			lodepng_state_cleanup(&state);
-		}
-		else
-		{
-			int comp = 0;
-			out = stbi_load_from_memory( (uint8_t*)data, size, (int*)&width, (int*)&height, &comp, 4);
-		}
+			const bgfx::Memory* mem = bgfx::makeRef(
+					  imageContainer->m_data
+					, imageContainer->m_size
+					, imageReleaseCb
+					, imageContainer
+					);
+			unload(data);
 
-		BX_FREE(allocator, data);
+			if (imageContainer->m_cubeMap)
+			{
+				handle = bgfx::createTextureCube(
+					  uint16_t(imageContainer->m_width)
+					, 1 < imageContainer->m_numMips
+					, imageContainer->m_numLayers
+					, bgfx::TextureFormat::Enum(imageContainer->m_format)
+					, _flags
+					, mem
+					);
+			}
+			else if (1 < imageContainer->m_depth)
+			{
+				handle = bgfx::createTexture3D(
+					  uint16_t(imageContainer->m_width)
+					, uint16_t(imageContainer->m_height)
+					, uint16_t(imageContainer->m_depth)
+					, 1 < imageContainer->m_numMips
+					, bgfx::TextureFormat::Enum(imageContainer->m_format)
+					, _flags
+					, mem
+					);
+			}
+			else
+			{
+				handle = bgfx::createTexture2D(
+					  uint16_t(imageContainer->m_width)
+					, uint16_t(imageContainer->m_height)
+					, 1 < imageContainer->m_numMips
+					, imageContainer->m_numLayers
+					, bgfx::TextureFormat::Enum(imageContainer->m_format)
+					, _flags
+					, mem
+					);
+			}
 
-		if (NULL != out)
-		{
-			handle = bgfx::createTexture2D(uint16_t(width), uint16_t(height), false, 1
-											, format
-											, _flags
-											, bgfx::copy(out, width*height*bpp/8)
-											);
-			release(out);
+			bgfx::setName(handle, _filePath);
 
 			if (NULL != _info)
 			{
-				bgfx::calcTextureSize(*_info
-					, uint16_t(width)
-					, uint16_t(height)
-					, 0
-					, false
-					, false
-					, 1
-					, format
+				bgfx::calcTextureSize(
+					  *_info
+					, uint16_t(imageContainer->m_width)
+					, uint16_t(imageContainer->m_height)
+					, uint16_t(imageContainer->m_depth)
+					, imageContainer->m_cubeMap
+					, 1 < imageContainer->m_numMips
+					, imageContainer->m_numLayers
+					, bgfx::TextureFormat::Enum(imageContainer->m_format)
 					);
 			}
 		}
-	}
-	else
-	{
-		DBG("Failed to load %s.", _filePath);
 	}
 
 	return handle;
 }
 
-bgfx::TextureHandle loadTexture(const char* _name, uint32_t _flags, uint8_t _skip, bgfx::TextureInfo* _info)
+bgfx::TextureHandle loadTexture(const char* _name, uint32_t _flags, uint8_t _skip, bgfx::TextureInfo* _info, bimg::Orientation::Enum* _orientation)
 {
-	return loadTexture(entry::getFileReader(), _name, _flags, _skip, _info);
+	return loadTexture(entry::getFileReader(), _name, _flags, _skip, _info, _orientation);
+}
+
+bimg::ImageContainer* imageLoad(const char* _filePath, bgfx::TextureFormat::Enum _dstFormat)
+{
+	uint32_t size = 0;
+	void* data = loadMem(entry::getFileReader(), entry::getAllocator(), _filePath, &size);
+
+	return bimg::imageParse(entry::getAllocator(), data, size, bimg::TextureFormat::Enum(_dstFormat) );
 }
 
 void calcTangents(void* _vertices, uint16_t _numVertices, bgfx::VertexDecl _decl, const uint16_t* _indices, uint32_t _numIndices)
@@ -349,7 +269,7 @@ void calcTangents(void* _vertices, uint16_t _numVertices, bgfx::VertexDecl _decl
 	};
 
 	float* tangents = new float[6*_numVertices];
-	memset(tangents, 0, 6*_numVertices*sizeof(float) );
+	bx::memSet(tangents, 0, 6*_numVertices*sizeof(float) );
 
 	PosTexcoord v0;
 	PosTexcoord v1;
@@ -475,8 +395,8 @@ struct Group
 
 	void reset()
 	{
-		m_vbh.idx = bgfx::invalidHandle;
-		m_ibh.idx = bgfx::invalidHandle;
+		m_vbh.idx = bgfx::kInvalidHandle;
+		m_ibh.idx = bgfx::kInvalidHandle;
 		m_prims.clear();
 	}
 
@@ -617,17 +537,17 @@ struct Mesh
 		for (GroupArray::const_iterator it = m_groups.begin(), itEnd = m_groups.end(); it != itEnd; ++it)
 		{
 			const Group& group = *it;
-			bgfx::destroyVertexBuffer(group.m_vbh);
+			bgfx::destroy(group.m_vbh);
 
 			if (bgfx::isValid(group.m_ibh) )
 			{
-				bgfx::destroyIndexBuffer(group.m_ibh);
+				bgfx::destroy(group.m_ibh);
 			}
 		}
 		m_groups.clear();
 	}
 
-	void submit(uint8_t _id, bgfx::ProgramHandle _program, const float* _mtx, uint64_t _state) const
+	void submit(bgfx::ViewId _id, bgfx::ProgramHandle _program, const float* _mtx, uint64_t _state) const
 	{
 		if (BGFX_STATE_MASK == _state)
 		{
@@ -649,7 +569,7 @@ struct Mesh
 			const Group& group = *it;
 
 			bgfx::setIndexBuffer(group.m_ibh);
-			bgfx::setVertexBuffer(group.m_vbh);
+			bgfx::setVertexBuffer(0, group.m_vbh);
 			bgfx::submit(_id, _program, 0, it != itEnd-1);
 		}
 	}
@@ -680,7 +600,7 @@ struct Mesh
 				const Group& group = *it;
 
 				bgfx::setIndexBuffer(group.m_ibh);
-				bgfx::setVertexBuffer(group.m_vbh);
+				bgfx::setVertexBuffer(0, group.m_vbh);
 				bgfx::submit(state.m_viewId, state.m_program, 0, it != itEnd-1);
 			}
 		}
@@ -728,7 +648,7 @@ void meshStateDestroy(MeshState* _meshState)
 	BX_FREE(entry::getAllocator(), _meshState);
 }
 
-void meshSubmit(const Mesh* _mesh, uint8_t _id, bgfx::ProgramHandle _program, const float* _mtx, uint64_t _state)
+void meshSubmit(const Mesh* _mesh, bgfx::ViewId _id, bgfx::ProgramHandle _program, const float* _mtx, uint64_t _state)
 {
 	_mesh->submit(_id, _program, _mtx, _state);
 }
@@ -738,7 +658,7 @@ void meshSubmit(const Mesh* _mesh, const MeshState*const* _state, uint8_t _numPa
 	_mesh->submit(_state, _numPasses, _mtx, _numMatrices);
 }
 
-Args::Args(int _argc, char** _argv)
+Args::Args(int _argc, const char* const* _argv)
 	: m_type(bgfx::RendererType::Count)
 	, m_pciId(BGFX_PCI_ID_NONE)
 {

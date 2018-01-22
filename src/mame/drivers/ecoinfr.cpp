@@ -41,6 +41,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8251.h"
+#include "machine/timer.h"
 #include "ecoinfr.lh"
 #include "machine/steppers.h" // stepper motor
 #include "video/awpvid.h" // drawing reels
@@ -122,6 +123,7 @@ public:
 	required_device<stepper_device> m_reel1;
 	required_device<stepper_device> m_reel2;
 	required_device<stepper_device> m_reel3;
+	void ecoinfr(machine_config &config);
 };
 
 
@@ -322,7 +324,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0d_out_cred_data_w)
 {
 	if (m_credsel!=0xff)
 	{
-		uint8_t bf7segdata = BITSWAP8(data,7,0,1,2,3,4,5,6);
+		uint8_t bf7segdata = bitswap<8>(data,7,0,1,2,3,4,5,6);
 		output().set_digit_value(m_credsel+8, bf7segdata);
 	}
 }
@@ -335,7 +337,7 @@ WRITE8_MEMBER(ecoinfr_state::ec_port0f_out_bank_segdata_w)
 {
 	if (m_banksel!=0xff)
 	{
-		uint8_t bf7segdata = BITSWAP8(data,7,0,1,2,3,4,5,6);
+		uint8_t bf7segdata = bitswap<8>(data,7,0,1,2,3,4,5,6);
 		output().set_digit_value(m_banksel, bf7segdata);
 	}
 }
@@ -769,7 +771,7 @@ void ecoinfr_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( ecoinfr, ecoinfr_state )
+MACHINE_CONFIG_START(ecoinfr_state::ecoinfr)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(memmap)
@@ -1683,24 +1685,24 @@ DRIVER_INIT_MEMBER(ecoinfr_state,ecoinfrbr)
 }
 
 // 3rd party sets with MAB scrambling, game names might be incorrect, should be the same basic hardware as these tho.
-GAME( 19??, ec_barxmab, ec_barx  , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Electrocoin", "Bar X (MAB PCB) (Electrocoin)"       , GAME_FLAGS) // scrambled roms
-GAME( 19??, ec_spbg7mab,ec_big7  , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Electrocoin", "Super Big 7 (MAB PCB) (Electrocoin) (?)"     , GAME_FLAGS)
-GAME( 19??, ec_supbxmab,ec_sbarx , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Electrocoin", "Super Bar X (MAB PCB) (Electrocoin) (?)"     , GAME_FLAGS)
+GAME( 19??, ec_barxmab, ec_barx  , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Electrocoin",       "Bar X (MAB PCB) (Electrocoin)",                   GAME_FLAGS ) // scrambled roms
+GAME( 19??, ec_spbg7mab,ec_big7  , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Electrocoin",       "Super Big 7 (MAB PCB) (Electrocoin) (?)",         GAME_FLAGS )
+GAME( 19??, ec_supbxmab,ec_sbarx , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Electrocoin",       "Super Bar X (MAB PCB) (Electrocoin) (?)",         GAME_FLAGS )
 
 //Games using the MAB scrambling, but identified as being from Concept Games
-GAME( 19??, ec_casbxcon,ec_casbx , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Casino Bar X (Concept Games Ltd) (?)"      , GAME_FLAGS)
-GAME( 19??, ec_multb,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Multi Bar (Concept Games Ltd) (?)"     , GAME_FLAGS)
-GAME( 19??, ec_supbxcon,ec_sbarx , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Super Bar X (MAB PCB) (Concept Games Ltd) (?)"     , GAME_FLAGS)
-GAME( 19??, ec_casmb,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Casino Multi Bar (Concept Games Ltd) (?)"      , GAME_FLAGS)
-GAME( 19??, ec_supmb,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Super Multi Bar (Concept Games Ltd) (?)"       , GAME_FLAGS)
-GAME( 19??, ec_stkex,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Stake X (Concept Games Ltd) (?)"       , GAME_FLAGS)
-GAME( 19??, ec_bar7,    0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Bar 7 (Concept Games Ltd) (?)"       , GAME_FLAGS)
-GAME( 19??, ec_fltr,    0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Flutter (Concept Games Ltd) (?)"       , GAME_FLAGS)
-GAME( 19??, ec_rdht7,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Red Hot 7 (MAB PCB?) (Concept Games Ltd) (?)"      , GAME_FLAGS)
-GAME( 19??, ec_unkt,    0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "unknown 'T' (MAB PCB?) (Concept Games Ltd) (?)"        , GAME_FLAGS)
+GAME( 19??, ec_casbxcon,ec_casbx , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Casino Bar X (Concept Games Ltd) (?)",            GAME_FLAGS )
+GAME( 19??, ec_multb,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Multi Bar (Concept Games Ltd) (?)",               GAME_FLAGS )
+GAME( 19??, ec_supbxcon,ec_sbarx , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Super Bar X (MAB PCB) (Concept Games Ltd) (?)",   GAME_FLAGS )
+GAME( 19??, ec_casmb,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Casino Multi Bar (Concept Games Ltd) (?)",        GAME_FLAGS )
+GAME( 19??, ec_supmb,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Super Multi Bar (Concept Games Ltd) (?)",         GAME_FLAGS )
+GAME( 19??, ec_stkex,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Stake X (Concept Games Ltd) (?)",                 GAME_FLAGS )
+GAME( 19??, ec_bar7,    0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Bar 7 (Concept Games Ltd) (?)",                   GAME_FLAGS )
+GAME( 19??, ec_fltr,    0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Flutter (Concept Games Ltd) (?)",                 GAME_FLAGS )
+GAME( 19??, ec_rdht7,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Red Hot 7 (MAB PCB?) (Concept Games Ltd) (?)",    GAME_FLAGS )
+GAME( 19??, ec_unkt,    0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "unknown 'T' (MAB PCB?) (Concept Games Ltd) (?)",  GAME_FLAGS )
 
 //These look more like some variant of Astra Gaming hardware than the MAB PCB, but I can't be sure. Certainly they don't seem to be on the base hardware
-GAME( 19??, ec_gold7,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Golden 7 (Concept Games Ltd) (?)"      , GAME_FLAGS)
-GAME( 19??, ec_mgbel,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Megabell (Concept Games Ltd) (?)"      , GAME_FLAGS)
-GAME( 19??, ec_jackb,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Jackpot Bars (MAB PCB?) (Concept Games Ltd) (?)"       , GAME_FLAGS)
-GAME( 19??, ec_ndgxs,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Nudge Xcess (MAB PCB?) (Concept Games Ltd) (?)"        , GAME_FLAGS)
+GAME( 19??, ec_gold7,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Golden 7 (Concept Games Ltd) (?)",                GAME_FLAGS )
+GAME( 19??, ec_mgbel,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Megabell (Concept Games Ltd) (?)",                GAME_FLAGS )
+GAME( 19??, ec_jackb,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Jackpot Bars (MAB PCB?) (Concept Games Ltd) (?)", GAME_FLAGS )
+GAME( 19??, ec_ndgxs,   0        , ecoinfr,   ecoinfr_barx, ecoinfr_state,   ecoinfrmab,    ROT0,  "Concept Games Ltd", "Nudge Xcess (MAB PCB?) (Concept Games Ltd) (?)",  GAME_FLAGS )

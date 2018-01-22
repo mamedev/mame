@@ -6,16 +6,20 @@
 */
 
 
+#include "emu.h"
 #include "decocpu6.h"
 
+DEFINE_DEVICE_TYPE(DECO_CPU6, deco_cpu6_device, "decocpu6", "DECO CPU-6")
+
+
 deco_cpu6_device::deco_cpu6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, DECO_CPU6, "DECO CPU-6", tag, owner, clock, "decocpu6", __FILE__)
+	m6502_device(mconfig, DECO_CPU6, tag, owner, clock)
 {
 }
 
 void deco_cpu6_device::device_start()
 {
-	mintf = new mi_decrypt;
+	mintf = std::make_unique<mi_decrypt>();
 	init();
 }
 
@@ -27,7 +31,22 @@ void deco_cpu6_device::device_reset()
 uint8_t deco_cpu6_device::mi_decrypt::read_sync(uint16_t adr)
 {
 	if (adr&1)
-		return BITSWAP8(direct->read_byte(adr),6,4,7,5,3,2,1,0);
+		return bitswap<8>(direct->read_byte(adr),6,4,7,5,3,2,1,0);
 	else
 		return direct->read_byte(adr);
+}
+
+util::disasm_interface *deco_cpu6_device::create_disassembler()
+{
+	return new disassembler;
+}
+
+u32 deco_cpu6_device::disassembler::interface_flags() const
+{
+	return SPLIT_DECRYPTION;
+}
+
+u8 deco_cpu6_device::disassembler::decrypt8(u8 value, offs_t pc, bool opcode) const
+{
+	return opcode && (pc & 1) ? bitswap<8>(value,6,4,7,5,3,2,1,0) : value;
 }

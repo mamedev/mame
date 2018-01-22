@@ -43,8 +43,9 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "debugger.h"
 #include "v30mz.h"
+#include "cpu/nec/necdasm.h"
+#include "debugger.h"
 
 
 enum SREGS { ES=0, CS, SS, DS };
@@ -94,11 +95,11 @@ enum BREGS {
 
 /***************************************************************************/
 
-const device_type V30MZ = &device_creator<v30mz_cpu_device>;
+DEFINE_DEVICE_TYPE(V30MZ, v30mz_cpu_device, "v30mz", "V30MZ")
 
 
 v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, V30MZ, "V30MZ", tag, owner, clock, "v30mz", __FILE__)
+	: cpu_device(mconfig, V30MZ, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
 	, m_ip(0)
@@ -134,11 +135,19 @@ v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *ta
 	memset(&m_regs, 0x00, sizeof(m_regs));
 }
 
+device_memory_interface::space_config_vector v30mz_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
+
 
 void v30mz_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_io = &space(AS_IO);
 
 	save_item(NAME(m_regs.w));
@@ -1296,10 +1305,9 @@ void v30mz_cpu_device::execute_set_input( int inptnum, int state )
 }
 
 
-offs_t v30mz_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *v30mz_cpu_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( nec );
-	return CPU_DISASSEMBLE_NAME(nec)(this, buffer, pc, oprom, opram, options);
+	return new nec_disassembler;
 }
 
 

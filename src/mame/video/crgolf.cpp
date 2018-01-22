@@ -67,7 +67,7 @@ PALETTE_INIT_MEMBER(crgolf_state, mastrglf)
 
 uint32_t crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int flip = *m_screen_flip & 1;
+	int flip = m_screen_flip;
 
 	offs_t offs;
 
@@ -99,10 +99,10 @@ uint32_t crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_ind16 
 			uint8_t data_b = 0;
 			uint8_t data_a = 0;
 
-			if (~*m_screena_enable & 1)
+			if (!m_screena_enable)
 				data_a = ((data_a0 & 0x80) >> 7) | ((data_a1 & 0x80) >> 6) | ((data_a2 & 0x80) >> 5);
 
-			if (~*m_screenb_enable & 1)
+			if (!m_screenb_enable)
 				data_b = ((data_b0 & 0x80) >> 7) | ((data_b1 & 0x80) >> 6) | ((data_b2 & 0x80) >> 5);
 
 			/* screen A has priority over B */
@@ -112,7 +112,7 @@ uint32_t crgolf_state::screen_update_crgolf(screen_device &screen, bitmap_ind16 
 				color = data_b | 0x08;
 
 			/* add HI bit if enabled */
-			if (*m_color_select)
+			if (m_color_select)
 				color = color | 0x10;
 
 			bitmap.pix16(y, x) = color;
