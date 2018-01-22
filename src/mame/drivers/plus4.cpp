@@ -392,7 +392,7 @@ uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, in
 		data = m_ram->pointer()[offset & m_ram->mask()];
 	}
 
-	return m_exp->cd_r(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+	return m_exp->cd_r(space, offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);
 }
 
 
@@ -452,7 +452,7 @@ WRITE8_MEMBER( plus4_state::write )
 		m_ram->pointer()[offset & m_ram->mask()] = data;
 	}
 
-	m_exp->cd_w(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+	m_exp->cd_w(space, offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);
 }
 
 
