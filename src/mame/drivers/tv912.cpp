@@ -258,6 +258,12 @@ void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	if (m_crtc->screen_reset())
+	{
+		bitmap.fill(rgb_t::black(), cliprect);
+		return 0;
+	}
+
 	u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
 	ioport_value videoctrl = m_video_control->read();
 
@@ -281,7 +287,7 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 			u8 data = (ra > 0 && ra < 9) ? charbase[(ch & 0x7f) << 3] : 0;
 			u8 dots = data >> 2;
-			bool adv = BIT(data, 0);
+			bool adv = BIT(data, 1);
 
 			for (int d = 0; d < 7; d++)
 			{
@@ -296,8 +302,8 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 				if (!adv)
 					dots <<= 1;
 
-				if (d == 3)
-					adv = BIT(data, 1);
+				if (d == 2)
+					adv = BIT(data, 0);
 			}
 		}
 	}
