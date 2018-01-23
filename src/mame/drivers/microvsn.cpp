@@ -633,14 +633,9 @@ static INPUT_PORTS_START( microvision )
 INPUT_PORTS_END
 
 
-static ADDRESS_MAP_START( microvision_8021_io, AS_IO, 8, microvision_state )
-	AM_RANGE( 0x00, 0xFF ) AM_WRITE( i8021_p0_write )
-ADDRESS_MAP_END
-
-
 MACHINE_CONFIG_START(microvision_state::microvision)
 	MCFG_CPU_ADD("maincpu1", I8021, 2000000)    // approximately
-	MCFG_CPU_IO_MAP(microvision_8021_io)
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(microvision_state, i8021_p0_write))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(microvision_state, i8021_p1_write))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(microvision_state, i8021_p2_write))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(microvision_state, i8021_t1_read))
