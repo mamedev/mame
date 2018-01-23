@@ -89,10 +89,10 @@ static inline int limit(int32_t in)
 c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, C140, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, device_rom_interface(mconfig, *this, (16+8), ENDIANNESS_BIG, 16)
+	, device_rom_interface(mconfig, *this, 21, ENDIANNESS_BIG, 16)
 	, m_sample_rate(0)
 	, m_stream(nullptr)
-	, m_is_c219(false)
+	, m_banking_type(C140_TYPE::SYSTEM2)
 	, m_mixer_buffer_left(nullptr)
 	, m_mixer_buffer_right(nullptr)
 	, m_baserate(0)
@@ -200,7 +200,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	memset(m_mixer_buffer_right.get(), 0, samples * sizeof(int16_t));
 
 	/* get the number of voices to update */
-	voicecnt = (m_is_c219) ? 16 : 24;
+	voicecnt = (m_banking_type == C140_TYPE::ASIC219) ? 16 : 24;
 
 	//--- audio update
 	for( i=0;i<voicecnt;i++ )
@@ -242,7 +242,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			dltdt=v->dltdt;
 
 			/* Switch on data type - compressed PCM is only for C140 */
-			if ((v->mode&8) && (!m_is_c219))
+			if ((v->mode&8) && (m_banking_type != C140_TYPE::ASIC219))
 			{
 				//compressed PCM (maybe correct...)
 				/* Loop for enough to fill sample buffer as requested */
@@ -318,7 +318,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 					{
 						prevdt=lastdt;
 
-						if (m_is_c219)
+						if (m_banking_type == C140_TYPE::ASIC219)
 						{
 							lastdt = (int8_t)read_byte(BYTE_XOR_BE(base+pos));
 
@@ -390,7 +390,7 @@ WRITE8_MEMBER( c140_device::c140_w )
 	offset&=0x1ff;
 
 	// mirror the bank registers on the 219, fixes bkrtmaq (and probably xday2 based on notes in the HLE)
-	if ((offset >= 0x1f8) && (m_is_c219))
+	if ((offset >= 0x1f8) && (m_banking_type == C140_TYPE::ASIC219))
 	{
 		offset -= 8;
 	}
@@ -415,7 +415,7 @@ WRITE8_MEMBER( c140_device::c140_w )
 				v->mode = data;
 
 				// on the 219 asic, addresses are in words
-				if (m_is_c219)
+				if (m_banking_type == C140_TYPE::ASIC219)
 				{
 					v->sample_loop = (vreg->loop_msb*256 + vreg->loop_lsb)*2;
 					v->sample_start = (vreg->start_msb*256 + vreg->start_lsb)*2;
@@ -471,16 +471,30 @@ void c140_device::init_voice( C140_VOICE *v )
  */
 long c140_device::find_sample(long adrs, long bank, int voice)
 {
+	long newadr = 0;
+
 	static const int16_t asic219banks[4] = { 0x1f7, 0x1f1, 0x1f3, 0x1f5 };
 
 	adrs=(bank<<16)+adrs;
 
-	if (m_is_c219)
+	switch (m_banking_type)
 	{
-		long newadr = 0;
-		// ASIC219's banking is fairly simple
-		newadr = ((m_REG[asic219banks[voice/4]]&0x3) * 0x20000) + adrs;
-		return (newadr);
+		case C140_TYPE::SYSTEM2:
+			// System 2 banking
+			newadr = ((adrs&0x200000)>>2)|(adrs&0x7ffff);
+			break;
+
+		case C140_TYPE::SYSTEM21:
+			// System 21 banking.
+			// similar to System 2's.
+			newadr = ((adrs&0x300000)>>1)+(adrs&0x7ffff);
+			break;
+
+		case C140_TYPE::ASIC219:
+			// ASIC219's banking is fairly simple
+			newadr = ((m_REG[asic219banks[voice/4]]&0x3) * 0x20000) + adrs;
+			break;
 	}
-	return adrs;
+
+	return (newadr);
 }

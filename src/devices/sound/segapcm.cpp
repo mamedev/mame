@@ -21,6 +21,9 @@ segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 21),
 		m_ram(nullptr),
+		m_bank(0),
+		m_bankshift(0),
+		m_bankmask(0),
 		m_stream(nullptr)
 {
 }
@@ -37,6 +40,13 @@ void segapcm_device::device_start()
 	m_ram = std::make_unique<uint8_t[]>(0x800);
 
 	memset(m_ram.get(), 0xff, 0x800);
+
+	m_bankshift = (uint8_t) m_bank;
+	mask = m_bank >> 16;
+	if (!mask)
+		mask = BANK_MASK7 >> 16;
+
+	m_bankmask = mask & (0x1fffff >> m_bankshift);
 
 	m_stream = stream_alloc(0, 2, clock() / 128);
 
@@ -95,7 +105,7 @@ void segapcm_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		/* only process active channels */
 		if (!(regs[0x86]&1))
 		{
-			int offset = (regs[0x86] & 0xf8) << 13;
+			int offset = (regs[0x86] & m_bankmask) << m_bankshift;
 			uint32_t addr = (regs[0x85] << 16) | (regs[0x84] << 8) | m_low[ch];
 			uint32_t loop = (regs[0x05] << 16) | (regs[0x04] << 8);
 			uint8_t end = regs[6] + 1;

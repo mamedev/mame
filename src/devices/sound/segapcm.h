@@ -20,6 +20,13 @@
 #define MCFG_SEGAPCM_REPLACE(tag, clock) \
 		MCFG_DEVICE_REPLACE((tag), SEGAPCM, (clock))
 
+#define MCFG_SEGAPCM_BANK(bank) \
+		segapcm_device::set_bank(*device, (segapcm_device::bank));
+
+#define MCFG_SEGAPCM_BANK_MASK(bank, mask) \
+		segapcm_device::set_bank(*device, (segapcm_device::bank) | (segapcm_device::mask));
+
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -29,7 +36,17 @@ class segapcm_device : public device_t,
 					   public device_rom_interface
 {
 public:
+	static constexpr int BANK_256    = 11;
+	static constexpr int BANK_512    = 12;
+	static constexpr int BANK_12M    = 13;
+	static constexpr int BANK_MASK7  = 0x70 << 16;
+	static constexpr int BANK_MASKF  = 0xf0 << 16;
+	static constexpr int BANK_MASKF8 = 0xf8 << 16;
+
 	segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// static configuration
+	static void set_bank(device_t &device, int bank) { downcast<segapcm_device &>(device).m_bank = bank; }
 
 	DECLARE_WRITE8_MEMBER( sega_pcm_w );
 	DECLARE_READ8_MEMBER( sega_pcm_r );
@@ -47,6 +64,9 @@ protected:
 private:
 	std::unique_ptr<uint8_t[]> m_ram;
 	uint8_t m_low[16];
+	int m_bank;
+	int m_bankshift;
+	int m_bankmask;
 	sound_stream* m_stream;
 };
 

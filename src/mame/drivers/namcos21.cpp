@@ -1532,14 +1532,6 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos21_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( c140_map, 0, 16, namcos21_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("c140", 0x000000) AM_MIRROR(0x80000)
-	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("c140", 0x080000) AM_MIRROR(0x80000)
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c140", 0x100000) AM_MIRROR(0x80000)
-	AM_RANGE(0x300000, 0x37ffff) AM_ROM AM_REGION("c140", 0x180000) AM_MIRROR(0x80000)
-ADDRESS_MAP_END
-
 /*************************************************************/
 /* I/O HD63705 MCU Memory declarations                       */
 /*************************************************************/
@@ -1947,7 +1939,7 @@ MACHINE_CONFIG_START(namcos21_state::namcos21)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_DEVICE_ADDRESS_MAP(0, c140_map)
+	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -2008,7 +2000,7 @@ MACHINE_CONFIG_START(namcos21_state::driveyes)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_DEVICE_ADDRESS_MAP(0, c140_map)
+	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -2071,7 +2063,7 @@ MACHINE_CONFIG_START(namcos21_state::winrun)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 8000000/374)
-	MCFG_DEVICE_ADDRESS_MAP(0, c140_map)
+	MCFG_C140_BANK_TYPE(SYSTEM21)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
