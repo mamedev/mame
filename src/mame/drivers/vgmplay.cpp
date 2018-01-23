@@ -28,6 +28,7 @@
 #include "sound/qsound.h"
 #include "sound/segapcm.h"
 #include "sound/sn76496.h"
+#include "sound/x1_010.h"
 #include "sound/ym2151.h"
 #include "sound/ym2413.h"
 #include "sound/ymf271.h"
@@ -87,6 +88,7 @@ public:
 		A_K051649    = 0x00014000,
 		A_C140       = 0x00016000,
 		A_QSOUND     = 0x00018000,
+		A_X1_010     = 0x0001a000,
 	};
 
 	enum io16_t
@@ -112,18 +114,19 @@ public:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	virtual util::disasm_interface *create_disassembler() override;
-
-	READ8_MEMBER(segapcm_rom_r);
-	READ8_MEMBER(ymf271_rom_r);
-	READ8_MEMBER(ymz280b_rom_r);
-	READ8_MEMBER(multipcma_rom_r);
-	READ8_MEMBER(multipcmb_rom_r);
-	READ8_MEMBER(k053260_rom_r);
-	READ8_MEMBER(k054539_rom_r);
-	READ8_MEMBER(okim6295_rom_r);
+	
 	READ8_MEMBER(c140_rom_r);
 	READ8_MEMBER(c352_rom_r);
+	READ8_MEMBER(k053260_rom_r);
+	READ8_MEMBER(k054539_rom_r);
+	READ8_MEMBER(multipcma_rom_r);
+	READ8_MEMBER(multipcmb_rom_r);
+	READ8_MEMBER(okim6295_rom_r);
 	READ8_MEMBER(qsound_rom_r);
+	READ8_MEMBER(segapcm_rom_r);
+	READ8_MEMBER(x1_010_rom_r);
+	READ8_MEMBER(ymf271_rom_r);
+	READ8_MEMBER(ymz280b_rom_r);
 
 private:
 	struct rom_block {
@@ -219,6 +222,7 @@ private:
 	required_device<k051649_device> m_k051649;
 	required_device<c140_device> m_c140;
 	required_device<qsound_device> m_qsound;
+	required_device<x1_010_device> m_x1_010;
 	
 	uint32_t m_multipcma_bank_l;
 	uint32_t m_multipcma_bank_r;
@@ -579,6 +583,12 @@ void vgmplay_device::execute_run()
 				m_io->write_byte(A_QSOUND + 0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_QSOUND + 1, m_file->read_byte(m_pc+2));
 				m_io->write_byte(A_QSOUND + 2, m_file->read_byte(m_pc+3));
+				m_pc += 4;
+				break;
+
+			case 0xc8:
+				uint16_t offset = (m_file->read_word(m_pc+1) << 8) | m_file->read_word(m_pc+2);
+				m_io->write_byte(A_X1_010 + offset, m_file->read_byte(m_pc+3));
 				m_pc += 4;
 				break;
 
@@ -1061,6 +1071,11 @@ READ8_MEMBER(vgmplay_device::qsound_rom_r)
 	return rom_r(0, 0x8f, offset);
 }
 
+READ8_MEMBER(vgmplay_device::x1_010_rom_r)
+{
+	return rom_r(0, 0x91, offset);
+}
+
 READ8_MEMBER(vgmplay_device::c352_rom_r)
 {
 	return rom_r(0, 0x92, offset);
@@ -1100,6 +1115,7 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_k051649(*this, "k051649")
 	, m_c140(*this, "c140")
 	, m_qsound(*this, "qsound")
+	, m_x1_010(*this, "x1_010")
 {
 }
 
@@ -1373,6 +1389,9 @@ void vgmplay_state::machine_start()
 			if(version >= 0x171 && r8(0xd6)) {
 				c352_device::static_set_divider(*m_c352, r8(0xd6) * 4);
 			}
+			if(version >= 0x171 && r32(0xd8)) {
+				m_x1_010->set_unscaled_clock(r32(0xd8));
+			}
 			if(version >= 0x171 && r32(0xdc)) {
 				m_c352->set_unscaled_clock(r32(0xdc));
 			}
@@ -1593,6 +1612,23 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_K051649,        vgmplay_device::A_K051649+0xff)  AM_WRITE(scc1_w)
 	AM_RANGE(vgmplay_device::A_C140,           vgmplay_device::A_C140+0x1fff)   AM_DEVWRITE    ("c140",       c140_device, write)
 	AM_RANGE(vgmplay_device::A_QSOUND,         vgmplay_device::A_QSOUND+0x3)    AM_DEVWRITE    ("qsound",     qsound_device, write)
+	AM_RANGE(vgmplay_device::A_X1_010,         vgmplay_device::A_X1_010+0x1fff) AM_DEVWRITE    ("x1_010",     x1_010_device, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( c140_map, 0, 16, vgmplay_state )
+	AM_RANGE(0, 0x1fffff) AM_DEVREAD8("vgmplay", vgmplay_device, c140_rom_r, 0xffff)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( c352_map, 0, 8, vgmplay_state )
+	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, c352_rom_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( k053260_map, 0, 8, vgmplay_state )
+	AM_RANGE(0, 0x1fffff) AM_DEVREAD("vgmplay", vgmplay_device, k053260_rom_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( k054539_map, 0, 8, vgmplay_state )
+	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, k054539_rom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( segapcm_map, 0, 8, vgmplay_state )
@@ -1607,14 +1643,6 @@ static ADDRESS_MAP_START( multipcmb_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x3fffff) AM_DEVREAD("vgmplay", vgmplay_device, multipcmb_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( k053260_map, 0, 8, vgmplay_state )
-	AM_RANGE(0, 0x1fffff) AM_DEVREAD("vgmplay", vgmplay_device, k053260_rom_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( k054539_map, 0, 8, vgmplay_state )
-	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, k054539_rom_r)
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( okim6295a_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x3ffff) AM_DEVREAD("vgmplay", vgmplay_device, okim6295a_rom_r)
 ADDRESS_MAP_END
@@ -1623,16 +1651,12 @@ static ADDRESS_MAP_START( okim6295b_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x3ffff) AM_DEVREAD("vgmplay", vgmplay_device, okim6295b_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c140_map, 0, 16, vgmplay_state )
-	AM_RANGE(0, 0x1fffff) AM_DEVREAD8("vgmplay", vgmplay_device, c140_rom_r, 0xffff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( c352_map, 0, 8, vgmplay_state )
-	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, c352_rom_r)
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( qsound_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, qsound_rom_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( x1_010_map, 0, 8, vgmplay_state )
+	AM_RANGE(0, 0xfffff) AM_DEVREAD("vgmplay", vgmplay_device, x1_010_rom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nescpu_map, AS_PROGRAM, 8, vgmplay_state )
@@ -1798,6 +1822,11 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 
 	MCFG_QSOUND_ADD("qsound", 4000000)
 	MCFG_DEVICE_ADDRESS_MAP(0, qsound_map)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1)
+
+	MCFG_SOUND_ADD("x1_010", X1_010, 16000000)
+	MCFG_DEVICE_ADDRESS_MAP(0, x1_010_map)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1)
 MACHINE_CONFIG_END
