@@ -21,6 +21,16 @@ u32 mcs48_disassembler::opcode_alignment() const
 	return 1;
 }
 
+u32 mcs48_disassembler::interface_flags() const
+{
+	return PAGED;
+}
+
+u32 mcs48_disassembler::page_address_bits() const
+{
+	return 11;
+}
+
 offs_t mcs48_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	offs_t cpc = pc;
