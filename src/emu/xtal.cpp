@@ -31,9 +31,11 @@
     tolerance so be sure to reference existing parts only and not just
     accept direct readings as 100% true.
 
-    MAME doesn't yet support fractions in crystal frequencies. For example,
-    XTAL(3'579'545) should actually be 3579545.454545...Hz (39375000/11).
-    This is no problem though: see above note about tolerance.
+    MAME supports fractions in crystal frequencies, but for historical
+    and readability reasons we tend to write the closest integer
+    value. For example, XTAL(3'579'545) should actually be
+    3579545.454545...Hz (39375000/11).  This is no problem though: see
+    above note about tolerance.
 
     In the "Examples" column, please don't add 1000 examples, this is just
     for interest, so two or three examples is enough.

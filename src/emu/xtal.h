@@ -1,11 +1,37 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders:Olivier Galibert
 /*************************************************************************
 
     xtal.h
 
-    Documentation and consistent naming for known existing crystals.
-    See the .cpp file for details
+    Documentation for known existing crystals.
+    See the .cpp file for the crystal list
+
+
+Usage:
+    When you're 100% sure there is a given crystal or resonator on a
+    PCB, use XTAL(frequency) to document so.  That xtal object then
+    collates multiplies or divides done to the base frequency to
+    compute the final one.
+
+    If you recieve a XTAL object and want to turn it to a final
+    frequency, use value() to get an integer or dvalue() to get a
+    double.
+
+    If you recieve a XTAL object and want to check if the initial
+    crystal value is sane, use check(context message).  It will
+    fatalerror if the value is not in the authorized value list.  It
+    has a (small) cost, so don't do it in a hot path.
+
+    Remember that with PLLs it is perfectly normal to multiply
+    frequencies by a rational.  For instance the 315-5746 in the Sega
+    Saturn generates two dotclocks at 57.27MHz and 53.69MHz as needed
+    from a single 13.32MHz crystal.  Banks of oscillators connected to
+    a chip usually don't exist.  So if you're doing a switch to select
+    a frequency between multiple XTAL() ones, you're probably doing it
+    wrong.  If you're selecting multipliers on a single crystal otoh,
+    that's perfectly normal.  I'm looking at you, VGA pixel clock
+    generators.
 
 ***************************************************************************/
 
@@ -53,11 +79,11 @@ private:
 	static void check_ordering();
 };
 
-inline constexpr XTAL operator /(int          div,  const XTAL &xtal) { return XTAL(xtal.base(), div  / xtal.dvalue()); }
-inline constexpr XTAL operator /(unsigned int div,  const XTAL &xtal) { return XTAL(xtal.base(), div  / xtal.dvalue()); }
-inline constexpr XTAL operator /(double       div,  const XTAL &xtal) { return XTAL(xtal.base(), div  / xtal.dvalue()); }
-inline constexpr XTAL operator *(int          mult, const XTAL &xtal) { return XTAL(xtal.base(), mult * xtal.dvalue()); }
-inline constexpr XTAL operator *(unsigned int mult, const XTAL &xtal) { return XTAL(xtal.base(), mult * xtal.dvalue()); }
-inline constexpr XTAL operator *(double       mult, const XTAL &xtal) { return XTAL(xtal.base(), mult * xtal.dvalue()); }
+constexpr XTAL operator /(int          div,  const XTAL &xtal) { return XTAL(xtal.base(), div  / xtal.dvalue()); }
+constexpr XTAL operator /(unsigned int div,  const XTAL &xtal) { return XTAL(xtal.base(), div  / xtal.dvalue()); }
+constexpr XTAL operator /(double       div,  const XTAL &xtal) { return XTAL(xtal.base(), div  / xtal.dvalue()); }
+constexpr XTAL operator *(int          mult, const XTAL &xtal) { return XTAL(xtal.base(), mult * xtal.dvalue()); }
+constexpr XTAL operator *(unsigned int mult, const XTAL &xtal) { return XTAL(xtal.base(), mult * xtal.dvalue()); }
+constexpr XTAL operator *(double       mult, const XTAL &xtal) { return XTAL(xtal.base(), mult * xtal.dvalue()); }
 
 #endif // MAME_EMU_DRIVERS_XTAL_H
