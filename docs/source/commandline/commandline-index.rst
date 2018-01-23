@@ -151,3 +151,100 @@ Core Artwork Options
 | :ref:`[no]use_cpanels <mame-commandline-nousecpanels>`
 | :ref:`[no]use_marquees <mame-commandline-nousemarquees>`
 
+Core Screen Options
+~~~~~~~~~~~~~~~~~~~
+
+| :ref:`brightness <mame-commandline-brightness>`
+| :ref:`contrast <mame-commandline-contrast>`
+| :ref:`gamma <mame-commandline-gamma>`
+| :ref:`pause_brightness <mame-commandline-pausebrightness>`
+| :ref:`effect <mame-commandline-effect>`
+
+Core Vector Options
+~~~~~~~~~~~~~~~~~~~
+
+| :ref:`[no]antialias <mame-commandline-noantialias>`
+| :ref:`beam <mame-commandline-beam>`
+| :ref:`flicker <mame-commandline-flicker>`
+
+Core Sound Options
+~~~~~~~~~~~~~~~~~~
+
+| :ref:`samplerate <mame-commandline-samplerate>`
+| :ref:`[no]samples <mame-commandline-nosamples>`
+| :ref:`volume <mame-commandline-volume>`
+
+Core Input Options
+~~~~~~~~~~~~~~~~~~
+
+| :ref:`[no]coin_lockout <mame-commandline-nocoinlockout>`
+| :ref:`ctrlr <mame-commandline-ctrlr>`
+| :ref:`[no]mouse <mame-commandline-nomouse>`
+| :ref:`[no]joystick <mame-commandline-nojoystick>`
+| :ref:`[no]lightgun <mame-commandline-nolightgun>`
+| :ref:`[no]multikeyboard <mame-commandline-nomultikeyboard>`
+| :ref:`[no]multimouse <mame-commandline-nomultimouse>`
+| :ref:`[no]steadykey <mame-commandline-nosteadykey>`
+| :ref:`[no]ui_active <mame-commandline-uiactive>`
+| :ref:`[no]offscreen_reload <mame-commandline-nooffscreenreload>`
+| :ref:`joystick_map <mame-commandline-joystickmap>`
+| :ref:`joystick_deadzone <mame-commandline-joystickdeadzone>`
+| :ref:`joystick_saturation <mame-commandline-joysticksaturation>`
+| :ref:`natural <mame-commandline-natural>`
+| :ref:`joystick_contradictory <mame-commandline-joystickcontradictory>`
+| :ref:`coin_impulse <mame-commandline-coinimpulse>`
+
+
+Core Input Automatic Enable Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`paddle_device <mame-commandline-paddledevice>`
+| :ref:`adstick_device <mame-commandline-adstickdevice>`
+| :ref:`pedal_device <mame-commandline-pedaldevice>`
+| :ref:`dial_device <mame-commandline-dialdevice>`
+| :ref:`trackball_device <mame-commandline-trackballdevice>`
+| :ref:`lightgun_device <mame-commandline-lightgundevice>`
+| :ref:`positional_device <mame-commandline-positionaldevice>`
+| :ref:`mouse_device <mame-commandline-mousedevice>`
+
+
+Core Debugging Options
+~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`[no]verbose <mame-commandline-verbose>`
+| :ref:`[no]oslog <mame-commandline-oslog>`
+| :ref:`[no]log <mame-commandline-log>`
+| :ref:`[no]debug <mame-commandline-debug>`
+| :ref:`debugscript <mame-commandline-debugscript>`
+| :ref:`[no]update_in_pause <mame-commandline-updateinpause>`
+
+
+Core Communication Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`comm_localhost <mame-commandline-commlocalhost>`
+| :ref:`comm_localport <mame-commandline-commlocalport>`
+| :ref:`comm_remotehost <mame-commandline-commremotehost>`
+| :ref:`comm_remoteport <mame-commandline-commremoteport>`
+
+
+Core Misc Options
+~~~~~~~~~~~~~~~~~
+
+| :ref:`[no]drc <mame-commandline-drc>`
+| :ref:`drc_use_c <mame-commandline-drcusec>`
+| :ref:`drc_log_uml <mame-commandline-drcloguml>`
+| :ref:`drc_log_native <mame-commandline-drclognative>`
+| :ref:`bios <mame-commandline-bios>`
+| :ref:`[no]cheat <mame-commandline-cheat>`
+| :ref:`[no]skip_gameinfo <mame-commandline-skipgameinfo>`
+| :ref:`uifont <mame-commandline-uifont>`
+| :ref:`ramsize <mame-commandline-ramsize>`
+| :ref:`confirm_quit <mame-commandline-confirmquit>`
+| :ref:`ui_mouse <mame-commandline-uimouse>`
+| :ref:`autoboot_command <mame-commandline-autobootcommand>`
+| :ref:`autoboot_delay <mame-commandline-autobootdelay>`
+| :ref:`autoboot_script <mame-commandline-autobootscript>`
+| :ref:`language <mame-commandline-language>`
+
+

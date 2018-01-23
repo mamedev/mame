@@ -710,21 +710,31 @@ Core Artwork Options
 Core Screen Options
 -------------------
 
+.. _mame-commandline-brightness:
+
 **-brightness** *<value>*
 
 	Controls the default brightness, or black level, of the game screens. This option does not affect the artwork or other parts of the display. Using the MAME UI, you can individually set the brightness for each game screen; this option controls the initial value for all visible game screens. The standard value is 1.0. Selecting lower values (down to 0.1) will produce a darkened display, while selecting higher values (up to 2.0) will give a brighter display. The default is *1.0*.
+
+.. _mame-commandline-contrast:
 
 **-contrast** *<value>*
 
 	Controls the contrast, or white level, of the game screens. This option does not affect the artwork or other parts of the display. Using the MAME UI, you can individually set the contrast for each game screen; this option controls the initial value for all visible game screens. The standard value is 1.0. Selecting lower values (down to 0.1) will produce a dimmer display, while selecting higher values (up to 2.0) will give a more saturated display. The default is *1.0*.
 
+.. _mame-commandline-gamma:
+
 **-gamma** *<value>*
 
 	Controls the gamma, which produces a potentially nonlinear black to white ramp, for the game screens. This option does not affect the artwork or other parts of the display. Using the MAME UI, you can individually set the gamma for each game screen; this option controls the initial value for all visible game screens. The standard value is 1.0, which gives a linear ramp from black to white. Selecting lower 	values (down to 0.1) will increase the nonlinearity toward black, while selecting higher values (up to 3.0) will push the nonlinearity toward white. The default is *1.0*.
 
+.. _mame-commandline-pausebrightness:
+
 **-pause_brightness** *<value>*
 
 	This controls the brightness level when MAME is paused. The default value is *0.65*.
+
+.. _mame-commandline-effect:
 
 **-effect** *<filename>*
 
@@ -735,13 +745,19 @@ Core Screen Options
 Core Vector Options
 -------------------
 
+.. _mame-commandline-noantialias:
+
 **-[no]antialias** / **-[no]aa**
 
 	Enables antialiased line rendering for vector games. The default is ON (*-antialias*).
 
+.. _mame-commandline-beam:
+
 **-beam** *<width>*
 
 	Sets the width of the vectors. This is a scaling factor against the standard vector width. A value of 1.0 will keep the default vector line width. Smaller values will reduce the width, and larger values will increase the width. The default is *1.0*.
+
+.. _mame-commandline-flicker:
 
 **-flicker** *<value>*
 
@@ -752,13 +768,19 @@ Core Vector Options
 Core Sound Options
 ------------------
 
+.. _mame-commandline-samplerate:
+
 **-samplerate** *<value>* / **-sr** *<value>*
 
 	Sets the audio sample rate. Smaller values (e.g. 11025) cause lower audio quality but faster emulation speed. Higher values (e.g. 48000) cause higher audio quality but slower emulation speed. The default is *48000*.
 
+.. _mame-commandline-nosamples:
+
 **-[no]samples**
 
 	Use samples if available. The default is ON (*-samples*).
+
+.. _mame-commandline-volume:
 
 **-volume** / **-vol** *<value>*
 
@@ -769,45 +791,67 @@ Core Sound Options
 Core Input Options
 ------------------
 
+.. _mame-commandline-nocoinlockout:
+
 **-[no]coin_lockout** / **-[no]coinlock**
 
 	Enables simulation of the "coin lockout" feature that is implemented on a number of game PCBs. It was up to the operator whether or not the coin lockout outputs were actually connected to the coin mechanisms. If this feature is enabled, then attempts to enter a coin while the lockout is active will fail and will display a popup message in the user interface (In debug mode). If this feature is disabled, the coin lockout signal will be ignored. The default is ON (*-coin_lockout*).
+
+.. _mame-commandline-ctrlr:
 
 **-ctrlr** *<controller>*
 
 	Enables support for special controllers. Configuration files are loaded from the ctrlrpath. They are in the same format as the .cfg files that are saved, but only control configuration data is read from the file. The default is NULL (no controller file).
 
+.. _mame-commandline-nomouse:
+
 **-[no]mouse**
 
 	Controls whether or not MAME makes use of mouse controllers. When this is enabled, you will likely be unable to use your mouse for other purposes until you exit or pause the game. The default is OFF (*-nomouse*).
+
+.. _mame-commandline-nojoystick:
 
 **-[no]joystick** / **-[no]joy**
 
 	Controls whether or not MAME makes use of joystick/gamepad controllers. When this is enabled, MAME will ask DirectInput about which controllers are connected. The default is OFF (*-nojoystick*).
 
+.. _mame-commandline-nolightgun:
+
 **-[no]lightgun** / **-[no]gun**
 
 	Controls whether or not MAME makes use of lightgun controllers. Note that most lightguns map to the mouse, so using -lightgun and -mouse together may produce strange results. The default is OFF (*-nolightgun*).
+
+.. _mame-commandline-nomultikeyboard:
 
 **-[no]multikeyboard** / **-[no]multikey**
 
 	Determines whether MAME differentiates between multiple keyboards. Some systems may report more than one keyboard; by default, the data from all of these keyboards is combined so that it looks like a single keyboard. Turning this option on will enable MAME to report keypresses	on different keyboards independently. The default is OFF (*-nomultikeyboard*).
 
+.. _mame-commandline-nomultimouse:
+
 **-[no]multimouse**
 
 	Determines whether MAME differentiates between multiple mice. Some systems may report more than one mouse device; by default, the data from all of these mice is combined so that it looks like a single mouse. Turning this option on will enable MAME to report mouse movement and button presses on different mice independently. The default is OFF (*-nomultimouse*).
+
+.. _mame-commandline-nosteadykey:
 
 **-[no]steadykey** / **-[no]steady**
 
 	Some games require two or more buttons to be pressed at exactly the same time to make special moves. Due to limitations in the keyboard hardware, it can be difficult or even impossible to accomplish that using the standard keyboard handling. This option selects a different handling that makes it easier to register simultaneous button presses, but has the disadvantage of making controls less responsive. The default is OFF (*-nosteadykey*)
 
+.. _mame-commandline-uiactive:
+
 **-[no]ui_active**
 
         Enable user interface on top of emulated keyboard (if present).  The default is OFF (*-noui_active*)
 
+.. _mame-commandline-nooffscreenreload:
+
 **-[no]offscreen_reload** / **-[no]reload**
 
 	Controls whether or not MAME treats a second button input from a lightgun as a reload signal. In this case, MAME will report the gun's position as (0,MAX) with the trigger held, which is equivalent to an	offscreen reload. This is only needed for games that required you to shoot offscreen to reload, and then only if your gun does not support off screen reloads. The default is OFF (*-nooffscreen_reload*).
+
+.. _mame-commandline-joystickmap:
 
 **-joystick_map** *<map>* / **-joymap** *<map>*
 
@@ -843,21 +887,31 @@ Core Input Options
 
 	The remaining three rows are also missing, so they are assumed to be the up/down mirrors of the first three rows, giving three final rows of 111222333.
 
+.. _mame-commandline-joystickdeadzone:
+
 **-joystick_deadzone** *<value>* / **-joy_deadzone** *<value>* / **-jdz** *<value>*
 
 	If you play with an analog joystick, the center can drift a little. joystick_deadzone tells how far along an axis you must move before the axis starts to change. This option expects a float in the range of 0.0 to 1.0. Where 0 is the center of the joystick and 1 is the outer limit. The default is *0.3*.
+
+.. _mame-commandline-joysticksaturation:
 
 **-joystick_saturation** *<value>* / **joy_saturation** *<value>* / **-jsat** *<value>*
 
 	If you play with an analog joystick, the ends can drift a little, and may not match in the +/- directions. joystick_saturation tells how far along an axis movement change will be accepted before it reaches the maximum range. This option expects a float in the range of 0.0 to 1.0, where 0 is the center of the joystick and 1 is the outer limit. The default is *0.85*.
 
+.. _mame-commandline-natural:
+
 **\-natural**
 
         Allows user to specify whether or not to use a natural keyboard or not. This allows you to start your game or system in a 'native' mode, depending on your region, allowing compatability for non-"QWERTY" style keyboards. The default is OFF (*-nonatural*)
 
+.. _mame-commandline-joystickcontradictory:
+
 **-joystick_contradictory**
 
         Enable contradictory direction digital joystick input at the same time such as **Left and Right** or **Up and Down** at the same time.  The default is OFF (*-nojoystick_contradictory*)
+
+.. _mame-commandline-coinimpulse:
 
 **-coin_impulse** *[n]*
 
@@ -868,19 +922,35 @@ Core Input Options
 Core Input Automatic Enable Options
 -----------------------------------
 
+.. _mame-commandline-paddledevice:
+
 **\-paddle_device**       enable (none|keyboard|mouse|lightgun|joystick) if a paddle control is present
+
+.. _mame-commandline-adstickdevice:
 
 **\-adstick_device**      enable (none|keyboard|mouse|lightgun|joystick) if an analog joystick control is present
 
+.. _mame-commandline-pedaldevice:
+
 **\-pedal_device**        enable (none|keyboard|mouse|lightgun|joystick) if a pedal control is present
+
+.. _mame-commandline-dialdevice:
 
 **\-dial_device**         enable (none|keyboard|mouse|lightgun|joystick) if a dial control is present
 
+.. _mame-commandline-trackballdevice:
+
 **\-trackball_device**    enable (none|keyboard|mouse|lightgun|joystick) if a trackball control is present
+
+.. _mame-commandline-lightgundevice:
 
 **\-lightgun_device**     enable (none|keyboard|mouse|lightgun|joystick) if a lightgun control is present
 
+.. _mame-commandline-positionaldevice:
+
 **\-positional_device**   enable (none|keyboard|mouse|lightgun|joystick) if a positional control is present
+
+.. _mame-commandline-mousedevice:
 
 **\-mouse_device**        enable (none|keyboard|mouse|lightgun|joystick) if a mouse control is present
 
@@ -891,25 +961,37 @@ Core Input Automatic Enable Options
 Debugging Options
 -----------------
 
+.. _mame-commandline-verbose:
+
 **-[no]verbose** / **-[no]v**
 
 	Displays internal diagnostic information. This information is very useful for debugging problems with your configuration. IMPORTANT: when reporting bugs, please run with **mame -verbose** and include the resulting information. The default is OFF (*-noverbose*).
+
+.. _mame-commandline-oslog:
 
 **-[no]oslog**
 
 	Output error.log data to the system debugger. The default is OFF (*-nooslog*).
 
+.. _mame-commandline-log:
+
 **-[no]log**
 
 	Creates a file called error.log which contains all of the internal log messages generated by the MAME core and game drivers. The default is OFF (*-nolog*).
+
+.. _mame-commandline-debug:
 
 **-[no]debug**
 
 	Activates the integrated debugger. By default, the debugger is entered by pressing the tilde (~) key during emulation. It is also entered immediately at startup. The default is OFF (*-nodebug*).
 
+.. _mame-commandline-debugscript:
+
 **-debugscript** *<filename>*
 
 	Specifies a file that contains a list of debugger commands to execute immediately upon startup. The default is NULL (*no commands*).
+
+.. _mame-commandline-updateinpause:
 
 **-[no]update_in_pause**
 
@@ -919,17 +1001,25 @@ Debugging Options
 Core Communication Options
 --------------------------
 
+.. _mame-commandline-commlocalhost:
+
 **-comm_localhost** *<string>*
 
 	Local address to bind to.  This can be a traditional xxx.xxx.xxx.xxx address or a string containing a resolvable hostname.  The default is value is "*0.0.0.0*"
+
+.. _mame-commandline-commlocalport:
 
 **-comm_localport** *<string>*
 
 	Local port to bind to.  This can be any traditional communications port as an unsigned 16-bit integer (0-65535).  The default value is "*15122*".
 
+.. _mame-commandline-commremotehost:
+
 **-comm_remotehost** *<string>*
 
 	Remote address to connect to.  This can be a traditional xxx.xxx.xxx.xxx address or a string containing a resolvable hostname.  The default is value is "*0.0.0.0*"
+
+.. _mame-commandline-commremoteport:
 
 **-comm_remoteport** *<string>*
 
@@ -940,48 +1030,72 @@ Core Communication Options
 Core Misc Options
 -----------------
 
+.. _mame-commandline-drc:
+
 **-[no]drc**
 	Enable DRC cpu core if available.  The default is ON (*-drc*).
+
+.. _mame-commandline-drcusec:
 
 **\-drc_use_c**
 
 	Force DRC use the C code backend.  The default is OFF (*-nodrc_use_c*).
 
+.. _mame-commandline-drcloguml:
+
 **\-drc_log_uml**
 
 	Write DRC UML disassembly log.  The default is OFF (*-nodrc_log_uml*).
+
+.. _mame-commandline-drclognative:
 
 **\-drc_log_native**
 
 	write DRC native disassembly log.  The default is OFF (*-nodrc_log_native*).
 
+.. _mame-commandline-bios:
+
 **-bios** *<biosname>*
 
 	Specifies the specific BIOS to use with the current game, for game systems that make use of a BIOS. The **-listxml** output will list all of the possible BIOS names for a game. The default is '*default*'.
+
+.. _mame-commandline-cheat:
 
 **-[no]cheat** / **-[no]c**
 
 	Activates the cheat menu with autofire options and other tricks from the cheat database, if present. The default is OFF (*-nocheat*).
 
+.. _mame-commandline-skipgameinfo:
+
 **-[no]skip_gameinfo**
 
 	Forces MAME to skip displaying the game info screen. The default is OFF (*-noskip_gameinfo*).
+
+.. _mame-commandline-uifont:
 
 **-uifont** *<fontname>*
 
 	Specifies the name of a font file to use for the UI font. If this font cannot be found or cannot be loaded, the system will fall back to its built-in UI font. On some platforms 'fontname' can be a system font name (TTF) instead of a (BDF) font file. The default is '*default*' (use the OSD-determined default font).
 
+.. _mame-commandline-ramsize:
+
 **-ramsize** *[n]*
 
 	Allows you to change the default RAM size (if supported by driver).
+
+.. _mame-commandline-confirmquit:
 
 **\-confirm_quit**
 
 	Display a Confirm Quit dialong to screen on exit, requiring one extra step to exit MAME.  The default is OFF (*-noconfirm_quit*).
 
+.. _mame-commandline-uimouse:
+
 **\-ui_mouse**
 
 	Displays a mouse cursor when using the built-in UI for MAME.  The default is (*-noui_mouse*).
+
+.. _mame-commandline-autobootcommand:
 
 **-autoboot_command** *"<command>"*
 
@@ -989,13 +1103,19 @@ Core Misc Options
 
 	Example:  -autoboot_command "load """$""",8,1\\n"
 
+.. _mame-commandline-autobootdelay:
+
 **-autoboot_delay** *[n]*
 
     Timer delay (in seconds) to trigger command execution on autoboot.
 
+.. _mame-commandline-autobootscript:
+
 **-autoboot_script** / **-script** *[filename.lua]*
 
     File containing scripting to execute after machine boot.
+
+.. _mame-commandline-language:
 
 **-language** *<language>*
 
