@@ -597,8 +597,8 @@ void vgmplay_device::execute_run()
 			}
 			
 			case 0xd2:
-				m_io->write_byte(A_K051649 + (m_file->read_byte(m_pc+1) << 1) | 0, m_file->read_byte(m_pc+2));
-				m_io->write_byte(A_K051649 + (m_file->read_byte(m_pc+1) << 1) | 1, m_file->read_byte(m_pc+3));
+				m_io->write_byte(A_K051649, m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_K051649 + m_file->read_byte(m_pc+1) + 1, m_file->read_byte(m_pc+3));
 				m_pc += 4;
 				break;
 				
@@ -1555,33 +1555,30 @@ WRITE8_MEMBER(vgmplay_state::okim6295b_nmk112_bank_w)
 
 WRITE8_MEMBER(vgmplay_state::scc1_w)
 {
-	switch(offset & 1)
+	switch(offset)
 	{
 	case 0x00:
 		m_scc_reg = data;
 		break;
 	case 0x01:
-		switch(offset >> 1)
-		{
-		case 0x00:
-			m_k051649->k051649_waveform_w(space, m_scc_reg, data);
-			break;
-		case 0x01:
-			m_k051649->k051649_frequency_w(space, m_scc_reg, data);
-			break;
-		case 0x02:
-			m_k051649->k051649_volume_w(space, m_scc_reg, data);
-			break;
-		case 0x03:
-			m_k051649->k051649_keyonoff_w(space, m_scc_reg, data);
-			break;
-		case 0x04:
-			m_k051649->k052539_waveform_w(space, m_scc_reg, data);
-			break;
-		case 0x05:
-			m_k051649->k051649_test_w(space, m_scc_reg, data);
-			break;
-		}
+		m_k051649->k051649_waveform_w(space, m_scc_reg, data);
+		break;
+	case 0x02:
+		m_k051649->k051649_frequency_w(space, m_scc_reg, data);
+		break;
+	case 0x03:
+		m_k051649->k051649_volume_w(space, m_scc_reg, data);
+		break;
+	case 0x04:
+		m_k051649->k051649_keyonoff_w(space, m_scc_reg, data);
+		break;
+	case 0x05:
+		m_k051649->k052539_waveform_w(space, m_scc_reg, data);
+		break;
+	case 0x06:
+		m_k051649->k051649_test_w(space, m_scc_reg, data);
+		break;
+	default:
 		break;
 	}
 	
