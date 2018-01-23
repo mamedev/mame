@@ -350,7 +350,9 @@ util::disasm_interface *upi41_cpu_device::create_disassembler()
 
 uint8_t mcs48_cpu_device::opcode_fetch()
 {
-	return m_direct->read_byte(m_pc++);
+	uint16_t address = m_pc;
+	m_pc = ((m_pc + 1) & 0x7ff) | (m_pc & 0x800);
+	return m_direct->read_byte(address);
 }
 
 
@@ -361,7 +363,9 @@ uint8_t mcs48_cpu_device::opcode_fetch()
 
 uint8_t mcs48_cpu_device::argument_fetch()
 {
-	return m_direct->read_byte(m_pc++);
+	uint16_t address = m_pc;
+	m_pc = ((m_pc + 1) & 0x7ff) | (m_pc & 0x800);
+	return m_direct->read_byte(address);
 }
 
 
