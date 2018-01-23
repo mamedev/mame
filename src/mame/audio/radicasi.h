@@ -1,3 +1,6 @@
+// license:BSD-3-Clause
+// copyright-holders:David Haywood
+
 #ifndef MAME_AUDIO_RADICASI_H
 #define MAME_AUDIO_RADICASI_H
 
