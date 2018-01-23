@@ -230,15 +230,17 @@ WRITE_LINE_MEMBER(tv912_state::uart_reset_w)
 
 WRITE8_MEMBER(tv912_state::output_40c)
 {
-	// Bit 5: +FORCE BLANK
+	// DB6: -PRTOL
+
+	// DB5: +FORCE BLANK
 	m_force_blank = BIT(data, 5);
 
-	// Bit 4: +SEL LPT
+	// DB4: +SEL LPT
 	m_lpt_select = BIT(data, 4);
 
-	// Bit 3: -BREAK
+	// DB3: -BREAK
 
-	// Bit 2: -RQS
+	// DB2: -RQS
 	ioport_value dtr = m_dtr->read();
 	m_rs232->write_rts(BIT(data, 2));
 	if (!BIT(dtr, 0))
@@ -246,10 +248,10 @@ WRITE8_MEMBER(tv912_state::output_40c)
 	if (!BIT(dtr, 1))
 		m_rs232->write_dtr(0);
 
-	// Bit 1: +BEEP
+	// DB1: +BEEP
 	m_beep->set_state(BIT(data, 1));
 
-	// Bit 0: +PG SEL
+	// DB0: +PG SEL
 	m_dispram_bank->set_entry(BIT(data, 0));
 }
 

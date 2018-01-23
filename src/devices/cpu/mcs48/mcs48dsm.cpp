@@ -23,7 +23,7 @@ u32 mcs48_disassembler::opcode_alignment() const
 
 u32 mcs48_disassembler::interface_flags() const
 {
-	return PAGED;
+	return m_upi41 ? 0 : PAGED;
 }
 
 u32 mcs48_disassembler::page_address_bits() const
