@@ -2877,7 +2877,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_state::lufykzku_irq)
 }
 
 MACHINE_CONFIG_START(lufykzku_state::lufykzku)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 2)  // !! TAXAN KY-80, clock @X1? !!
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(20'000'000) / 2)  // !! TAXAN KY-80, clock @X1? !!
 	MCFG_CPU_PROGRAM_MAP(lufykzku_mem_map)
 	MCFG_CPU_IO_MAP(lufykzku_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lufykzku_state, lufykzku_irq, "screen", 0, 1)
@@ -2917,7 +2917,7 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_OKIM9810_ADD("oki", XTAL_4_096MHz)
+	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
