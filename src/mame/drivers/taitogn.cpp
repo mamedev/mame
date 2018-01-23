@@ -757,7 +757,7 @@ MACHINE_CONFIG_START(taitogn_state::coh3002t)
 	MCFG_CPU_PROGRAM_MAP(taitogn_mn_map)
 
 	MCFG_DEVICE_MODIFY("taito_zoom:zsg2")
-	MCFG_ZSG2_EXT_READ_HANDLER(READ32(taitogn_state, zsg2_ext_r))
+	MCFG_ZSG2_EXT_READ_HANDLER(DEVREAD32(DEVICE_SELF_OWNER, taitogn_state, zsg2_ext_r))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(taitogn_state::coh3002t_t1, coh3002t)
