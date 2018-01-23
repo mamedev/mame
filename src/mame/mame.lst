@@ -20493,13 +20493,17 @@ wmegam2                         // 1993 Victor Wondermega M2 (Japan)
 xeye                            // 1993 JVC X'eye (USA)
 dcat16                          //
 
-@source:megadrvb.cpp
+@source:megadriv_arcade_clones.cpp
 aladmdb                         // MegaDrive-based hack
 mk3mdb                          // MegaDrive-based hack
 sonic2mb                        // MegaDrive-based hack
 srmdb                           // MegaDrive-based hack
 ssf2mdb                         // MegaDrive-based hack
 topshoot                        // (c) 1995 Sun Mixing
+
+@source:megadriv_radica.cpp
+rad_sf							// (c)2004 Radica
+rad_gen1						// (c)2004 Radica
 
 @source:megaphx.cpp
 megaphx                         // (c) 1991 Dinamic / Inder

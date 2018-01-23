@@ -258,7 +258,7 @@ connector, but of course, I can be wrong.
 
 #include "emu.h"
 #include "includes/megadriv.h"
-#include "includes/megadrvb.h"
+#include "includes/megadriv_arcade_clones.h"
 
 
 /************************************ Megadrive Bootlegs *************************************/

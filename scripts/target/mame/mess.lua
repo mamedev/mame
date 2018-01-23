@@ -2836,6 +2836,8 @@ files {
 	MAME_DIR .. "src/mame/machine/gdrom.h",
 	MAME_DIR .. "src/mame/drivers/megadriv.cpp",
 	MAME_DIR .. "src/mame/includes/megadriv.h",
+	MAME_DIR .. "src/mame/drivers/megadriv_radica.cpp",
+	MAME_DIR .. "src/mame/drivers/megadriv_radica.h",
 	MAME_DIR .. "src/mame/drivers/segapico.cpp",
 	MAME_DIR .. "src/mame/drivers/sega_sawatte.cpp",
 	MAME_DIR .. "src/mame/drivers/segapm.cpp",
