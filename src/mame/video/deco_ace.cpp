@@ -1,6 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail, cam900
-/* Data East 99 "ACE" Chip Emulation */
+// copyright-holders:Bryan McPhail
+/*************************************************************************
+
+	deco_ace.cpp
+
+	Data East 99 "ACE" Chip Emulation
+
+	Original source (from deco32.cpp) by Bryan McPhail, Splited by cam900.
+
+**************************************************************************/
 /*Some notes pieced together from Tattoo Assassins info(from deco32.cpp):
 
     Bytes 0 to 0x1f : Alpha Control
@@ -9,7 +17,7 @@
 	Bytes 0x17(0x5c) to 0x1f(0x7c) - tilemap alpha control
 
 	Boogie Wings:
-	Bytes 0x00 to 0x0f(0x1f) - object alpha control
+	Bytes 0x00 to 0x0f(0x1f) - object alpha control (if ((pix & 0x100) == 0))
 	Bytes 0x10(0x20) to 0x13(0x26) - another object alpha control?
 	Bytes 0x14(0x28) to 0x19(0x32) - fixed value 0x1c 0x18 0x14 0x10 0x0c 0x08. it controls explosion object's alpha?
 	Bytes 0x1a(0x34) to 0x1f(0x3f) - tilemap alpha control?
@@ -33,6 +41,7 @@
     Byte 0x24(0x90): fadestgreen
     Byte 0x25(0x94): fadestblue
     Byte 0x26(0x98): fadetype
+	Byte 0x27(0x9c): unused/unknown
 
     The 'ST' value lerps between the 'PT' value and the palette entries.  So, if PT==0,
     then ST ranging from 0 to 255 will cause a fade to black (when ST==255 the palette
@@ -40,8 +49,8 @@
 
     'fadetype' - 1100 for multiplicative fade, 1000 for additive
 
-	Todo:
-		additive fade of 'fadetype' aren't implemented.
+	TODO:
+		additive fade is correct? verify additive fading from real pcb.
 */
 
 
@@ -96,7 +105,7 @@ void deco_ace_device::device_start()
 
 void deco_ace_device::device_reset()
 {
-	m_palette_effect_min = 0x100;
+	m_palette_effect_min = 0x100; /* Screenshots seem to suggest ACE fades do not affect playfield 1 palette (0-255) */
 	m_palette_effect_max = 0xfff;
 	memset(m_ace_ram.get(),0,0x28);
 	m_dirty_palette = 1;
@@ -105,6 +114,9 @@ void deco_ace_device::device_reset()
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
+
+/* Games have double buffered paletteram - the real palette ram is
+only updated on a DMA call */
 
 // nslasher
 READ32_MEMBER( deco_ace_device::buffered_palette_r )
@@ -117,7 +129,7 @@ WRITE32_MEMBER( deco_ace_device::buffered_palette_w )
 	COMBINE_DATA(&m_paletteram[offset]);
 }
 
-// boogwing has 16 bit cpu data bus
+// boogwing has 16 bit cpu data bus(M68000 Based)
 READ16_MEMBER( deco_ace_device::buffered_palette16_r )
 {
 	if ((offset & 1) == 0)
@@ -157,7 +169,7 @@ void deco_ace_device::palette_update()
 		uint8_t fadepsr=m_ace_ram[0x23] & 0xff;
 		uint8_t fadepsg=m_ace_ram[0x24] & 0xff;
 		uint8_t fadepsb=m_ace_ram[0x25] & 0xff;
-	//  uint16_t mode=m_ace_ram[0x26] & 0xffff;
+		uint16_t mode=m_ace_ram[0x26] & 0xffff;
 
 		m_dirty_palette=0;
 
@@ -168,19 +180,41 @@ void deco_ace_device::palette_update()
 			g = (m_paletteram_buffered[i] >> 8) & 0xff;
 			r = (m_paletteram_buffered[i] >> 0) & 0xff;
 
-			if ((i>=m_palette_effect_min) && (i<=m_palette_effect_max)) /* Screenshots seem to suggest ACE fades do not affect playfield 1 palette (0-255) */
+			if ((i>=m_palette_effect_min) && (i<=m_palette_effect_max))
 			{
-				/* Yeah, this should really be fixed point, I know */
-				// if (mode == 0x1100)
-				b = (uint8_t)((float)b + (((float)fadeptb - (float)b) * (float)fadepsb/255.0f));
-				g = (uint8_t)((float)g + (((float)fadeptg - (float)g) * (float)fadepsg/255.0f));
-				r = (uint8_t)((float)r + (((float)fadeptr - (float)r) * (float)fadepsr/255.0f));
+				switch (mode)
+				{
+					default:
+					case 0x1100: // multiplicative fade
+						b = b + (((fadeptb - b) * fadepsb)/255);
+						g = g + (((fadeptg - g) * fadepsg)/255);
+						r = r + (((fadeptr - r) * fadepsr)/255);
+						break;
+					case 0x1000: // additive fade, correct?
+						b = b + fadepsb;
+						g = g + fadepsg;
+						r = r + fadepsr;
+						break;
+				}
+				
+				if (b < 0) b = 0;
+				if (b > 0xff) b = 0xff;
+				if (g < 0) g = 0;
+				if (g > 0xff) g = 0xff;
+				if (r < 0) r = 0;
+				if (r > 0xff) r = 0xff;
 			}
 
 			m_palette->set_pen_color(i,rgb_t(r,g,b));
 		}
 	}
 }
+
+/*************************************************************************
+
+    set_palette_effect_max : Change Palette effect max bound (uses boogwing)
+
+*************************************************************************/
 
 void deco_ace_device::set_palette_effect_max(uint32_t val)
 {
@@ -191,13 +225,19 @@ void deco_ace_device::set_palette_effect_max(uint32_t val)
 	}
 }
 
+/*************************************************************************
+
+    get_alpha : Get alpha value (ACE RAM Area 0x00 - 0x1f)
+
+*************************************************************************/
+
 uint8_t deco_ace_device::get_alpha(uint8_t val)
 {
 	val &= 0x1f;
 	int alpha = m_ace_ram[val] & 0xff;
 	if (alpha > 0x20)
 	{
-		return 0x80; // todo
+		return 0x80; // TODO
 	}
 	else
 	{
@@ -208,6 +248,12 @@ uint8_t deco_ace_device::get_alpha(uint8_t val)
 		return (uint8_t)alpha;
 	}
 }
+
+/*************************************************************************
+
+    get_aceram : Get ACE RAM value
+
+*************************************************************************/
 
 uint16_t deco_ace_device::get_aceram(uint8_t val)
 {

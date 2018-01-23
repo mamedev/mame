@@ -1,8 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail, cam900
+// copyright-holders:Bryan McPhail
 /*************************************************************************
 
     deco_ace.h
+	
+	Data East 99 "ACE" Chip Emulation
+
+	Original source (from deco32.cpp) by Bryan McPhail, Splited by cam900.
 
 **************************************************************************/
 #ifndef MAME_VIDEO_DECO_ACE_H

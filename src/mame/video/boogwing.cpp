@@ -63,7 +63,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 			alpha2 = m_deco_ace->get_alpha((pix2 >> 4) & 0xf);
 
 			// pix1 sprite vs pix2 sprite
-			if (pix1 & 0x400)       // todo - check only in pri mode 2??
+			if (pix1 & 0x400)       // TODO - check only in pri mode 2??
 				spri1 = 8;
 			else
 				spri1 = 32;
@@ -102,7 +102,8 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 			// Transparency
 			if (pix2 & 0x100)
-				alpha2 = 0x80; // todo
+				alpha2 = 0x80; // TODO : Uses 0x10-0x14 of Aceram?
+				// alpha2 = m_deco_ace->get_alpha(0x14 + ((pix & 0xf0) > 0x50) ? 0x5 : ((pix2 >> 4) & 0x7)); This fixes explosion effects, but this is HACK.
 
 			// pix2 sprite vs playfield
 			switch (priority)
@@ -111,7 +112,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 					{
 						// Additional sprite alpha in this mode
 						if (pix2 & 0x400)
-							alpha2 = 0x80; // todo
+							alpha2 = 0x80; // TODO
 
 						// Sprite vs playfield
 						if ((pix2 & 0x600) == 0x600)
@@ -163,7 +164,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 				{
 					if ((!drawnpixe1) || (spri2 > spri1))
 					{
-						if (alpha2==0xff)
+						if (alpha2>=0xff)
 						{
 							dstline[x] = paldata[(pix2&0xff)+0x700];
 						}

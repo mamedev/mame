@@ -34,12 +34,12 @@
     Tattoo Assassins uses DE Pinball soundboard 520-5077-00 R
 
 
-    Todo:
+    TODO:
 
     Tattoo Assassins & Night slashers use an less emulated chip (Ace/Jack) for
     special blending effects.  It's exact effect is unclear.
 
-    Video backgrounds in Dragongun?
+    Video backgrounds(intel DVI) in Dragongun?
 
     Locked'N Loaded (parent set) is a slightly different hardware
     revision: board # DE-0420-1 where the US set is DE-0359-2.
