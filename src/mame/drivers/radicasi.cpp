@@ -1200,5 +1200,5 @@ ROM_START( rad_sinv )
 	ROM_RELOAD(0x300000, 0x100000)
 ROM_END
 
-CONS( 2004, rad_sinv,  0,   0,  radicasi,  rad_sinv, radica_6502_state, 0, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 5, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
+CONS( 2004, rad_sinv,  0,   0,  radicasi,  rad_sinv, radica_6502_state, 0, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
 CONS( 2004, rad_tetr,  0,   0,  radicasi,  rad_tetr, radica_6502_state, 0, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
