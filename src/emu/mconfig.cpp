@@ -162,7 +162,7 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 device_t *machine_config::device_add(device_t *owner, const char *tag, device_type type, const XTAL &clock)
 {
 	std::string msg = std::string("Instantiating device ") + tag;
-	clock.check(msg);
+	clock.validate(msg);
 	return device_add(owner, tag, type, clock.value());
 }
 
@@ -202,7 +202,7 @@ device_t *machine_config::device_replace(device_t *owner, const char *tag, devic
 device_t *machine_config::device_replace(device_t *owner, const char *tag, device_type type, const XTAL &clock)
 {
 	std::string msg = std::string("Replacing device ") + tag;
-	clock.check(msg);
+	clock.validate(msg);
 	return device_replace(owner, tag, type, clock.value());
 }
 

@@ -96,6 +96,7 @@ const double XTAL::known_xtals[] = {
 	  4'915'200,
 	  5'000'000, /* Mutant Night */
 	  5'068'800, /* Usually used as MC2661 or COM8116 baud rate clock */
+	  5'185'000, /* Intel INTELLEC® 4 */
 	  5'460'000, /* ec1840 and ec1841 keyboard */
 	  5'529'600, /* Kontron PSI98 keyboard */
 	  5'626'000, /* RCA CDP1869 PAL dot clock */
@@ -343,7 +344,7 @@ double XTAL::last_correct_value = -1;
 double XTAL::xtal_error_low = 0;
 double XTAL::xtal_error_high = 0;
 
-bool XTAL::check(double base_clock)
+bool XTAL::validate(double base_clock)
 {
 	if(base_clock == last_correct_value)
 		return true;
@@ -396,15 +397,15 @@ bool XTAL::check(double base_clock)
 	return false;
 }
 
-void XTAL::check(const char *message) const
+void XTAL::validate(const char *message) const
 {
-	if(!check(m_base_clock))
+	if(!validate(m_base_clock))
 		fail(m_base_clock, message);
 }
 
-void XTAL::check(const std::string &message) const
+void XTAL::validate(const std::string &message) const
 {
-	if(!check(m_base_clock))
+	if(!validate(m_base_clock))
 		fail(m_base_clock, message);
 }
 
@@ -545,7 +546,6 @@ reveals the following shipping frequencies as of 1/1/2008:
 5.000MHz
 5.0688MHz
 5.120MHz
-5.185MHz
 5.223438MHz
 5.5MHz
 5.5296MHz
