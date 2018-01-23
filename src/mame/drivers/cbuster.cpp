@@ -308,11 +308,11 @@ void cbuster_state::machine_reset()
 MACHINE_CONFIG_START(cbuster_state::twocrude)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) /* Custom chip 59 @ 12MHz Verified */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* Custom chip 59 @ 12MHz Verified */
 	MCFG_CPU_PROGRAM_MAP(twocrude_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cbuster_state,  irq4_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_24MHz/4) /* Custom chip 45, 6MHz Verified */
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL(24'000'000)/4) /* Custom chip 45, 6MHz Verified */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -368,18 +368,18 @@ MACHINE_CONFIG_START(cbuster_state::twocrude)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	// YM2203_PITCH_HACK - Pitch is too low at 1.3425MHz (see also stfight.cpp)
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/24 * 3) /* 1.3425MHz Verified */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/24 * 3) /* 1.3425MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_YM2151_ADD("ym2", XTAL_32_22MHz/9) /* 3.58MHz Verified */
+	MCFG_YM2151_ADD("ym2", XTAL(32'220'000)/9) /* 3.58MHz Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, PIN7_HIGH) /* 1.0068MHz Verified */
+	MCFG_OKIM6295_ADD("oki1", XTAL(32'220'000)/32, PIN7_HIGH) /* 1.0068MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, PIN7_HIGH) /* 2.01375MHz Verified */
+	MCFG_OKIM6295_ADD("oki2", XTAL(32'220'000)/16, PIN7_HIGH) /* 2.01375MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

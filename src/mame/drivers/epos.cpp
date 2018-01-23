@@ -456,7 +456,7 @@ MACHINE_START_MEMBER(epos_state,dealer)
 MACHINE_CONFIG_START(epos_state::epos) /* EPOS TRISTAR 8000 PCB */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_11MHz/4)    /* 2.75 MHz schematics confirm 11MHz XTAL (see notes) */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(11'000'000)/4)    /* 2.75 MHz schematics confirm 11MHz XTAL (see notes) */
 	MCFG_CPU_PROGRAM_MAP(epos_map)
 	MCFG_CPU_IO_MAP(epos_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
@@ -476,7 +476,7 @@ MACHINE_CONFIG_START(epos_state::epos) /* EPOS TRISTAR 8000 PCB */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_11MHz/16) /*  0.6875 MHz, confirmed from schematics */
+	MCFG_SOUND_ADD("aysnd", AY8912, XTAL(11'000'000)/16) /*  0.6875 MHz, confirmed from schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -484,7 +484,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_22_1184MHz/8)    /* 2.7648 MHz (measured) */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(22'118'400)/8)    /* 2.7648 MHz (measured) */
 	MCFG_CPU_PROGRAM_MAP(dealer_map)
 	MCFG_CPU_IO_MAP(dealer_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
@@ -513,7 +513,7 @@ MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_22_1184MHz/32)    /* 0.6912 MHz (measured) */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(22'118'400)/32)    /* 0.6912 MHz (measured) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(epos_state, ay_porta_mpx_r))
 	// port a writes?

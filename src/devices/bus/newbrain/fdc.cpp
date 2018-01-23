@@ -102,7 +102,7 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(newbrain_fdc_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(newbrain_fdc_mem)
 	MCFG_CPU_IO_MAP(newbrain_fdc_io)
 
@@ -114,7 +114,7 @@ MACHINE_CONFIG_START(newbrain_fdc_device::device_add_mconfig)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", newbrain_floppies, nullptr, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", newbrain_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL_16MHz/8, newbrain_expansion_cards, nullptr)
+	MCFG_NEWBRAIN_EXPANSION_SLOT_ADD(NEWBRAIN_EXPANSION_SLOT_TAG, XTAL(16'000'000)/8, newbrain_expansion_cards, nullptr)
 MACHINE_CONFIG_END
 
 

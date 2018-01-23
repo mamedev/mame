@@ -346,12 +346,12 @@ static INPUT_PORTS_START( pntnpuzl )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(pntnpuzl_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL_12MHz / 10)
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL(12'000'000) / 10)
 	MCFG_VIA6522_READPA_HANDLER(IOPORT("IN2"))
 	MCFG_VIA6522_READPB_HANDLER(IOPORT("IN1"))
 	MCFG_VIA6522_WRITEPB_HANDLER(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write)) MCFG_DEVCB_BIT(4)
@@ -359,12 +359,12 @@ MACHINE_CONFIG_START(pntnpuzl_state::pntnpuzl)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write)) MCFG_DEVCB_BIT(5)
 	// CB2 used for serial communication with 8798
 
-	MCFG_CPU_ADD("mcu", P8098, XTAL_12MHz)
+	MCFG_CPU_ADD("mcu", P8098, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(mcu_map) // FIXME: this is all internal
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", vga_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x100)

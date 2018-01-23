@@ -610,11 +610,11 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 #endif
 
 MACHINE_CONFIG_START(esq5505_state::vfx)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
-	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
+	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000))
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X40_VFX_ADD("panel")
@@ -635,11 +635,11 @@ MACHINE_CONFIG_START(esq5505_state::vfx)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL_10MHz / (16 * 21))
+	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(10'000'000) / (16 * 21))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("otis", ES5505, XTAL_10MHz)
+	MCFG_SOUND_ADD("otis", ES5505, XTAL(10'000'000))
 	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5505_CHANNELS(4)          /* channels */
@@ -687,11 +687,11 @@ MACHINE_CONFIG_END
 
 // 32-voice machines with the VFX-SD type config
 MACHINE_CONFIG_START(esq5505_state::vfx32)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_30_4761MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(30'476'100) / 2)
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
-	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
+	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000))
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X40_VFX_ADD("panel")
@@ -712,11 +712,11 @@ MACHINE_CONFIG_START(esq5505_state::vfx32)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL_30_4761MHz / (2 * 16 * 32))
+	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(30'476'100) / (2 * 16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("otis", ES5505, XTAL_30_4761MHz / 2)
+	MCFG_SOUND_ADD("otis", ES5505, XTAL(30'476'100) / 2)
 	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5505_CHANNELS(4)          /* channels */

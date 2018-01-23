@@ -4349,7 +4349,7 @@ MACHINE_CONFIG_START(ddenlovr_state::htengoku)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 
 
@@ -9646,7 +9646,7 @@ MACHINE_START_MEMBER(ddenlovr_state,sryudens)
 MACHINE_CONFIG_START(ddenlovr_state::ddenlovr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_24MHz / 2)
+	MCFG_CPU_ADD("maincpu",M68000, XTAL(24'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(ddenlovr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state, irq1_line_hold)
 
@@ -9675,17 +9675,17 @@ MACHINE_CONFIG_START(ddenlovr_state::ddenlovr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", YMZ284, XTAL_28_63636MHz / 16)  // or /8 ?
+	MCFG_SOUND_ADD("aysnd", YMZ284, XTAL(28'636'363) / 16)  // or /8 ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(28'636'363) / 28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL_32_768kHz) // internal oscillator
+	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL(32'768)) // internal oscillator
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(ddenlovr_state::ddenlovj, ddenlovr)
@@ -9697,7 +9697,7 @@ MACHINE_CONFIG_DERIVED(ddenlovr_state::ddenlovj, ddenlovr)
 	MCFG_DEVICE_REPLACE("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(ddenlovr_state, ddenlovr_blitter_irq_ack_w))
 
-	MCFG_DEVICE_REPLACE("rtc", RTC62421, XTAL_32_768kHz) // internal oscillator
+	MCFG_DEVICE_REPLACE("rtc", RTC62421, XTAL(32'768)) // internal oscillator
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(ddenlovr_state::ddenlovrk, ddenlovr)
@@ -9722,12 +9722,12 @@ MACHINE_CONFIG_DERIVED(ddenlovr_state::quiz365, ddenlovj)
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(ddenlovr_state, quiz365_oki_bank1_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(ddenlovr_state, quiz365_oki_bank2_w))
 
-	MCFG_SOUND_REPLACE("aysnd", YM2149, XTAL_28_63636MHz / 16)  // or /8 ?
+	MCFG_SOUND_REPLACE("aysnd", YM2149, XTAL(28'636'363) / 16)  // or /8 ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(ddenlovr_state, quiz365_input_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ddenlovr_state, ddenlovr_select_w))
 
-	MCFG_DEVICE_REPLACE("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_REPLACE("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(ddenlovr_state::nettoqc, ddenlovj)
@@ -9780,7 +9780,7 @@ WRITE_LINE_MEMBER(ddenlovr_state::quizchq_rtc_irq )
 MACHINE_CONFIG_START(ddenlovr_state::quizchq)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)  /* Verified */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2)  /* Verified */
 	MCFG_CPU_PROGRAM_MAP(quizchq_map)
 	MCFG_CPU_IO_MAP(quizchq_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state, quizchq_irq)
@@ -9805,14 +9805,14 @@ MACHINE_CONFIG_START(ddenlovr_state::quizchq)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz/8) // 3.579545Mhz, verified
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(28'636'363)/8) // 3.579545Mhz, verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz/28, PIN7_HIGH) // clock frequency verified 1.022MHz, pin 7 verified high
+	MCFG_OKIM6295_ADD("oki", XTAL(28'636'363)/28, PIN7_HIGH) // clock frequency verified 1.022MHz, pin 7 verified high
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, quizchq_rtc_irq))
 MACHINE_CONFIG_END
 
@@ -9901,7 +9901,7 @@ MACHINE_CONFIG_START(ddenlovr_state::mmpanic)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mmpanic_rtc_irq))
 MACHINE_CONFIG_END
 
@@ -9975,7 +9975,7 @@ MACHINE_CONFIG_START(ddenlovr_state::hanakanz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hanakanz_rtc_irq))
 MACHINE_CONFIG_END
 
@@ -9989,7 +9989,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddenlovr_state::kotbinyo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2) // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(20'000'000) / 2) // !! KL5C80A12CFP @ 10MHz? (actually 4 times faster than Z80) !!
 	MCFG_CPU_PROGRAM_MAP(hanakanz_map)
 	MCFG_CPU_IO_MAP(kotbinyo_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state, hanakanz_irq)
@@ -10014,14 +10014,14 @@ MACHINE_CONFIG_START(ddenlovr_state::kotbinyo)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_37516MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(28'375'160) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_37516MHz / 28, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(28'375'160) / 28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-//  MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+//  MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 //  MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hanakanz_rtc_irq))
 MACHINE_CONFIG_END
 
@@ -10112,7 +10112,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddenlovr_state::mjschuka)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,XTAL_16MHz/2)
+	MCFG_CPU_ADD("maincpu",Z80,XTAL(16'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(mjmyster_map)
 	MCFG_CPU_IO_MAP(mjschuka_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state, hginga_irq)
@@ -10137,17 +10137,17 @@ MACHINE_CONFIG_START(ddenlovr_state::mjschuka)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(28'636'363) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(28'636'363) / 28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", RTC62421, XTAL_32_768kHz) // internal oscillator
+	MCFG_DEVICE_ADD("rtc", RTC62421, XTAL(32'768)) // internal oscillator
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hginga_rtc_irq))
 MACHINE_CONFIG_END
 
@@ -10203,7 +10203,7 @@ MACHINE_CONFIG_DERIVED(ddenlovr_state::mjmyster, quizchq)
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)  /* Verified */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2)  /* Verified */
 	MCFG_CPU_PROGRAM_MAP(mjmyster_map)
 	MCFG_CPU_IO_MAP(mjmyster_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddenlovr_state, mjmyster_irq, "screen", 0, 1)
@@ -10312,7 +10312,7 @@ MACHINE_CONFIG_DERIVED(ddenlovr_state::mjmyuniv, quizchq)
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)  /* Verified */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2)  /* Verified */
 	MCFG_CPU_PROGRAM_MAP(mjmyster_map)
 	MCFG_CPU_IO_MAP(mjmyster_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddenlovr_state, mjmyster_irq, "screen", 0, 1)
@@ -10332,7 +10332,7 @@ MACHINE_CONFIG_DERIVED(ddenlovr_state::mjmyornt, quizchq)
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)  /* Verified */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2)  /* Verified */
 	MCFG_CPU_PROGRAM_MAP(quizchq_map)
 	MCFG_CPU_IO_MAP(mjmyster_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddenlovr_state, mjmyster_irq, "screen", 0, 1)
@@ -10369,14 +10369,14 @@ MACHINE_CONFIG_DERIVED(ddenlovr_state::mjflove, quizchq)
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)  /* Verified */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2)  /* Verified */
 	MCFG_CPU_PROGRAM_MAP(rongrong_map)
 	MCFG_CPU_IO_MAP(mjflove_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state, mjflove_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
 
-	MCFG_DEVICE_REPLACE("rtc", RTC72421, XTAL_32_768kHz)
+	MCFG_DEVICE_REPLACE("rtc", RTC72421, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjflove_rtc_irq))
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
@@ -10408,7 +10408,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddenlovr_state::jongtei)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2) // TMPZ84C015
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(20'000'000) / 2) // TMPZ84C015
 	MCFG_CPU_PROGRAM_MAP(hanakanz_map)
 	MCFG_CPU_IO_MAP(jongtei_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state, hanakanz_irq)
@@ -10433,14 +10433,14 @@ MACHINE_CONFIG_START(ddenlovr_state::jongtei)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(28'636'363) / 28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hanakanz_rtc_irq))
 MACHINE_CONFIG_END
 
@@ -10460,7 +10460,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 2) // ?
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000) / 2) // ?
 	MCFG_CPU_PROGRAM_MAP(sryudens_map)
 	MCFG_CPU_IO_MAP(sryudens_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state, mjchuuka_irq)
@@ -10485,17 +10485,17 @@ MACHINE_CONFIG_START(ddenlovr_state::sryudens)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", YMZ284, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("aysnd", YMZ284, XTAL(28'636'363) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, PIN7_HIGH) // ?
+	MCFG_OKIM6295_ADD("oki", XTAL(28'636'363) / 28, PIN7_HIGH) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", RTC62421, XTAL_32_768kHz) // internal oscillator
+	MCFG_DEVICE_ADD("rtc", RTC62421, XTAL(32'768)) // internal oscillator
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjchuuka_rtc_irq))
 MACHINE_CONFIG_END
 
@@ -10507,7 +10507,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(janshinp_map)
 	MCFG_CPU_IO_MAP(janshinp_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state, mjchuuka_irq)
@@ -10532,17 +10532,17 @@ MACHINE_CONFIG_START(ddenlovr_state::janshinp)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", YMZ284, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("aysnd", YMZ284, XTAL(28'636'363) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, PIN7_HIGH) // ?
+	MCFG_OKIM6295_ADD("oki", XTAL(28'636'363) / 28, PIN7_HIGH) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjchuuka_rtc_irq))
 MACHINE_CONFIG_END
 
@@ -10574,7 +10574,7 @@ MACHINE_START_MEMBER(ddenlovr_state,seljan2)
 MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(seljan2_map)
 	MCFG_CPU_IO_MAP(seljan2_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state, mjchuuka_irq)
@@ -10599,19 +10599,19 @@ MACHINE_CONFIG_START(ddenlovr_state::seljan2)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(28'636'363) / 8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(ddenlovr_state, seljan2_dsw_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ddenlovr_state, ddenlovr_select_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, PIN7_HIGH) // ?
+	MCFG_OKIM6295_ADD("oki", XTAL(28'636'363) / 28, PIN7_HIGH) // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjchuuka_rtc_irq))
 MACHINE_CONFIG_END
 
@@ -10624,7 +10624,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ddenlovr_state::daimyojn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(20'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(hanakanz_map)
 	MCFG_CPU_IO_MAP(daimyojn_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddenlovr_state, hanakanz_irq)
@@ -10649,14 +10649,14 @@ MACHINE_CONFIG_START(ddenlovr_state::daimyojn)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_28_63636MHz / 8)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(28'636'363) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28_63636MHz / 28, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(28'636'363) / 28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hanakanz_rtc_irq))
 MACHINE_CONFIG_END
 

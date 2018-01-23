@@ -1584,7 +1584,7 @@ INTERRUPT_GEN_MEMBER(radica_6502_state::interrupt)
 MACHINE_CONFIG_START(radica_6502_state::radicasi)
 
 	/* basic machine hardware */	
-	MCFG_CPU_ADD("maincpu",M6502,XTAL_21_28137MHz/2) // Tetris has a XTAL_21_28137MHz, not confirmed on Space Invaders, actual CPU clock unknown.
+	MCFG_CPU_ADD("maincpu",M6502,XTAL(21'281'370)/2) // Tetris has a XTAL(21'281'370), not confirmed on Space Invaders, actual CPU clock unknown.
 	MCFG_CPU_PROGRAM_MAP(radicasi_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", radica_6502_state,  interrupt)
 

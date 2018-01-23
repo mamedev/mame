@@ -1422,7 +1422,7 @@ void vga_device::recompute_params()
 	if(vga.miscellaneous_output & 8)
 		logerror("Warning: VGA external clock latch selected\n");
 	else
-		recompute_params_clock(1, (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz);
+		recompute_params_clock(1, ((vga.miscellaneous_output & 0xc) ? XTAL(28'636'363) : XTAL(25'174'800)).value());
 }
 
 void vga_device::crtc_reg_write(uint8_t index, uint8_t data)
@@ -2250,22 +2250,22 @@ void tseng_vga_device::tseng_define_video_mode()
 	switch(((et4k.aux_ctrl << 1) & 4)|(vga.miscellaneous_output & 0xc)>>2)
 	{
 		case 0:
-			xtal = XTAL_25_1748MHz;
+			xtal = XTAL(25'174'800).value();
 			break;
 		case 1:
-			xtal = XTAL_28_63636MHz;
+			xtal = XTAL(28'636'363).value();
 			break;
 		case 2:
 			xtal = 16257000*2; //2xEGA clock
 			break;
 		case 3:
-			xtal = XTAL_40MHz;
+			xtal = XTAL(40'000'000).value();
 			break;
 		case 4:
-			xtal = XTAL_36MHz;
+			xtal = XTAL(36'000'000).value();
 			break;
 		case 5:
-			xtal = XTAL_45MHz;
+			xtal = XTAL(45'000'000).value();
 			break;
 		case 6:
 			xtal = 31000000;
@@ -2763,7 +2763,7 @@ uint8_t s3_vga_device::s3_crtc_reg_read(uint8_t index)
 void s3_vga_device::s3_define_video_mode()
 {
 	int divisor = 1;
-	int xtal = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
+	int xtal = ((vga.miscellaneous_output & 0xc) ? XTAL(28'636'363) : XTAL(25'174'800)).value();
 	double freq;
 
 	if((vga.miscellaneous_output & 0xc) == 0x0c)
@@ -5155,7 +5155,7 @@ void ati_vga_device::ati_define_video_mode()
 	switch(clock_type)
 	{
 	case 0:
-		clock = XTAL_42_9545MHz;
+		clock = XTAL(42'954'545).value();
 		break;
 	case 1:
 		clock = 48771000;
@@ -5164,7 +5164,7 @@ void ati_vga_device::ati_define_video_mode()
 		clock = 16657000;
 		break;
 	case 3:
-		clock = XTAL_36MHz;
+		clock = XTAL(36'000'000).value();
 		break;
 	case 4:
 		clock = 50350000;
@@ -5182,7 +5182,7 @@ void ati_vga_device::ati_define_video_mode()
 		clock = 30240000;
 		break;
 	case 9:
-		clock = XTAL_32MHz;
+		clock = XTAL(32'000'000).value();
 		break;
 	case 10:
 		clock = 37500000;
@@ -5191,7 +5191,7 @@ void ati_vga_device::ati_define_video_mode()
 		clock = 39000000;
 		break;
 	case 12:
-		clock = XTAL_40MHz;
+		clock = XTAL(40'000'000).value();
 		break;
 	case 13:
 		clock = 56644000;
@@ -5203,7 +5203,7 @@ void ati_vga_device::ati_define_video_mode()
 		clock = 65000000;
 		break;
 	default:
-		clock = XTAL_42_9545MHz;
+		clock = XTAL(42'954'545).value();
 		logerror("Invalid dot clock %i selected.\n",clock_type);
 	}
 //  logerror("ATI: Clock select type %i (%iHz / %i)\n",clock_type,clock,div);

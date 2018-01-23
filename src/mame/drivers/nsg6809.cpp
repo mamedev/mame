@@ -65,14 +65,14 @@ static INPUT_PORTS_START( pitchhit )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(nsg6809_state::pitchhit)
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz) // clock buffered through 74HC4060
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000)) // clock buffered through 74HC4060
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4)
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
 
 	MCFG_WATCHDOG_ADD("deadman")

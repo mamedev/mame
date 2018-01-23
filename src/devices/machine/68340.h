@@ -79,6 +79,8 @@ public:
 		dev.m_clock_mode |= (m68340_sim::CLOCK_MODCK | m68340_sim::CLOCK_PLL);
 	}
 
+	static void set_crystal(device_t &device, const XTAL &crystal) { set_crystal(device, crystal.value()); }
+
 	READ32_MEMBER( m68340_internal_base_r );
 	WRITE32_MEMBER( m68340_internal_base_w );
 	READ32_MEMBER( m68340_internal_dma_r );

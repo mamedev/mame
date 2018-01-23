@@ -960,7 +960,7 @@ MACHINE_RESET_MEMBER(cvs_state,cvs)
 MACHINE_CONFIG_START(cvs_state::cvs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/16)
+	MCFG_CPU_ADD("maincpu", S2650, XTAL(14'318'181)/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_main_cpu_map)
 	MCFG_CPU_IO_MAP(cvs_main_cpu_io_map)
 	MCFG_CPU_DATA_MAP(cvs_main_cpu_data_map)
@@ -968,12 +968,12 @@ MACHINE_CONFIG_START(cvs_state::cvs)
 	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cvs_state, write_s2650_flag))
 
-	MCFG_CPU_ADD("audiocpu", S2650, XTAL_14_31818MHz/16)
+	MCFG_CPU_ADD("audiocpu", S2650, XTAL(14'318'181)/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_dac_cpu_map)
 	/* doesn't look like it is used at all */
 	//MCFG_S2650_SENSE_INPUT(READLINE(cvs_state, cvs_393hz_clock_r))
 
-	MCFG_CPU_ADD("speechcpu", S2650, XTAL_14_31818MHz/16)
+	MCFG_CPU_ADD("speechcpu", S2650, XTAL(14'318'181)/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_speech_cpu_map)
 	/* romclk is much more probable, 393 Hz results in timing issues */
 	//MCFG_S2650_SENSE_INPUT(READLINE(cvs_state, cvs_393hz_clock_r))
@@ -1022,7 +1022,7 @@ MACHINE_CONFIG_START(cvs_state::cvs)
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_ADD("tms", TMS5100, XTAL_640kHz)
+	MCFG_SOUND_ADD("tms", TMS5100, XTAL(640'000))
 	MCFG_TMS5110_DATA_CB(READLINE(cvs_state, speech_rom_read_bit))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END

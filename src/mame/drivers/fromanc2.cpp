@@ -629,11 +629,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fromanc2_state::fromanc4)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)      /* 16.00 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)      /* 16.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(fromanc4_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", fromanc2_state,  fromanc2_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/4)        /* 8.00 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/4)        /* 8.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(fromanc2_sound_map)
 	MCFG_CPU_IO_MAP(fromanc2_sound_io_map)
 

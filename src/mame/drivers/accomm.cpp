@@ -829,7 +829,7 @@ static INPUT_PORTS_START( accomm )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(accomm_state::accomm)
-	MCFG_CPU_ADD("maincpu", G65816, XTAL_16MHz / 8)
+	MCFG_CPU_ADD("maincpu", G65816, XTAL(16'000'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", accomm_state, vbl_int)
 
@@ -861,7 +861,7 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 	/* rtc pcf8573 */
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL_16MHz / 16)
+	MCFG_DEVICE_ADD("via6522", VIA6522, XTAL(16'000'000) / 16)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("centronics", centronics_device, write_strobe))
 
@@ -876,7 +876,7 @@ MACHINE_CONFIG_START(accomm_state::accomm)
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_dcd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL_16MHz / 13)
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(16'000'000) / 13)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(accomm_state, write_acia_clock))
 
 	/* econet */

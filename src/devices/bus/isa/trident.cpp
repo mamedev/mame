@@ -346,8 +346,8 @@ void trident_vga_device::trident_define_video_mode()
 	switch(tri.clock)
 	{
 	case 0:
-	default: xtal = XTAL_25_1748MHz; break;
-	case 1:  xtal = XTAL_28_63636MHz; break;
+	default: xtal = 25174800; break;
+	case 1:  xtal = 28636363; break;
 	case 2:  xtal = 44900000; break;
 	case 3:  xtal = 36000000; break;
 	case 4:  xtal = 57272000; break;
@@ -378,8 +378,8 @@ void trident_vga_device::trident_define_video_mode()
 	switch((vga.miscellaneous_output & 0x0c) >> 2)
 	{
 	case 0:
-	default: xtal = XTAL_25_1748MHz; break;
-	case 1:  xtal = XTAL_28_63636MHz; break;
+	default: xtal = 25174800; break;
+	case 1:  xtal = 28636363; break;
 	case 2:  xtal = calculate_clock(); break;
 	}
 

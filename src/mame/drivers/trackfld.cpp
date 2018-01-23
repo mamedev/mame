@@ -199,9 +199,9 @@ MAIN BOARD:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK          XTAL_18_432MHz
-#define SOUND_CLOCK           XTAL_14_31818MHz
-#define VLM_CLOCK             XTAL_3_579545MHz
+#define MASTER_CLOCK          XTAL(18'432'000)
+#define SOUND_CLOCK           XTAL(14'318'181)
+#define VLM_CLOCK             XTAL(3'579'545)
 
 
 WRITE_LINE_MEMBER(trackfld_state::coin_counter_1_w)
@@ -1057,7 +1057,7 @@ MACHINE_CONFIG_DERIVED(trackfld_state::hyprolyb, trackfld)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("vlm")
-	MCFG_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)    /* unknown clock */
+	MCFG_CPU_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
 	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")

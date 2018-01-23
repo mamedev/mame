@@ -352,8 +352,8 @@ Notes:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_20MHz
-#define VIDEO_CLOCK         XTAL_32MHz
+#define MASTER_CLOCK        XTAL(20'000'000)
+#define VIDEO_CLOCK         XTAL(32'000'000)
 #define TIMER_CLOCK         (VIDEO_CLOCK/4)
 #define HSYNC_CLOCK         (VIDEO_CLOCK/2/656.0)
 /* TODO: understand why divisors doesn't match at all with the reference */
@@ -692,7 +692,7 @@ WRITE8_MEMBER( segas24_state::frc_mode_w )
 
 READ8_MEMBER( segas24_state::frc_r )
 {
-	int32_t result = (frc_cnt_timer->time_elapsed() * (frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0)).as_double();
+	int32_t result = (frc_cnt_timer->time_elapsed() * (frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0).dvalue()).as_double();
 
 	result %= ((frc_mode) ? 0x67 : 0x100);
 
@@ -760,8 +760,8 @@ void segas24_state::irq_timer_sync()
 		break;
 	case 1: {
 		// Don't remove the floor(), the value may be slightly negative
-		int ppos = floor((irq_synctime - irq_vsynctime).as_double() * HSYNC_CLOCK);
-		int cpos = floor((ctime - irq_vsynctime).as_double() * HSYNC_CLOCK);
+		int ppos = floor((irq_synctime - irq_vsynctime).as_double() * HSYNC_CLOCK.dvalue());
+		int cpos = floor((ctime - irq_vsynctime).as_double() * HSYNC_CLOCK.dvalue());
 		irq_tval += cpos-ppos;
 		break;
 	}
@@ -769,8 +769,8 @@ void segas24_state::irq_timer_sync()
 		fatalerror("segas24_state::irq_timer_sync - case 2\n");
 	}
 	case 3: {
-		int ppos = floor((irq_synctime - irq_vsynctime).as_double() * TIMER_CLOCK);
-		int cpos = floor((ctime - irq_vsynctime).as_double() * TIMER_CLOCK);
+		int ppos = floor((irq_synctime - irq_vsynctime).as_double() * TIMER_CLOCK.dvalue());
+		int cpos = floor((ctime - irq_vsynctime).as_double() * TIMER_CLOCK.dvalue());
 		irq_tval += cpos-ppos;
 		break;
 	}

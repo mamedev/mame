@@ -47,8 +47,8 @@ Notes:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK     XTAL_12MHz
-#define SOUND_CLOCK      XTAL_45MHz
+#define MASTER_CLOCK     XTAL(12'000'000)
+#define SOUND_CLOCK      XTAL(45'000'000)
 
 
 class mwarr_state : public driver_device

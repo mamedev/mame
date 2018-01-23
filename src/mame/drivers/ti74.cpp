@@ -508,7 +508,7 @@ void ti74_state::machine_start()
 MACHINE_CONFIG_START(ti74_state::ti74)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TMS7000_IN_PORTA_CB(READ8(ti74_state, keyboard_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(ti74_state, bankswitch_w))
@@ -544,7 +544,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(ti74_state::ti95)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TMS7000_IN_PORTA_CB(READ8(ti74_state, keyboard_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(ti74_state, bankswitch_w))

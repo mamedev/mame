@@ -432,7 +432,7 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(twins_state::twinsa)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(twins_map)
 	MCFG_CPU_IO_MAP(twinsa_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", twins_state,  nmi_line_pulse)
@@ -455,7 +455,7 @@ MACHINE_CONFIG_START(twins_state::twinsa)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_16MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(16'000'000)/8) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

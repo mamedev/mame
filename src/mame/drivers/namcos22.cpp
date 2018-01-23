@@ -1166,7 +1166,7 @@
 #include "speaker.h"
 
 
-#define SS22_MASTER_CLOCK   (XTAL_49_152MHz)    /* info from Guru */
+#define SS22_MASTER_CLOCK   (XTAL(49'152'000))    /* info from Guru */
 
 #define PIXEL_CLOCK         (SS22_MASTER_CLOCK/2)
 
@@ -3765,7 +3765,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_CPU_PROGRAM_MAP( mcu_s22_program)
 	MCFG_CPU_IO_MAP( mcu_s22_io)
 
-	MCFG_CPU_ADD("iomcu", NAMCO_C74, XTAL_6_144MHz) // 6.144MHz XTAL on I/O board, not sure if it has a divider
+	MCFG_CPU_ADD("iomcu", NAMCO_C74, XTAL(6'144'000)) // 6.144MHz XTAL on I/O board, not sure if it has a divider
 	MCFG_CPU_PROGRAM_MAP( iomcu_s22_program)
 	MCFG_CPU_IO_MAP( iomcu_s22_io)
 

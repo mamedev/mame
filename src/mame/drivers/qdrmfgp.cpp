@@ -555,7 +555,7 @@ MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp2)
 {
 	/* sound irq (CCU? 240Hz) */
 	m_gp2_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(qdrmfgp_state::gp2_timer_callback), this));
-	m_gp2_timer->adjust(attotime::from_hz(XTAL_18_432MHz/76800), 0, attotime::from_hz(XTAL_18_432MHz/76800));
+	m_gp2_timer->adjust(attotime::from_hz(XTAL(18'432'000)/76800), 0, attotime::from_hz(XTAL(18'432'000)/76800));
 
 	MACHINE_START_CALL_MEMBER( qdrmfgp );
 }
@@ -577,7 +577,7 @@ void qdrmfgp_state::machine_reset()
 MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /*  16.000 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) /*  16.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(qdrmfgp_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", qdrmfgp_state, qdrmfgp_interrupt, "screen", 0, 1)
 
@@ -606,13 +606,13 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
 	MCFG_K053252_OFFSETS(40, 16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(qdrmfgp_state, k054539_irq1_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -621,7 +621,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /*  16.000 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) /*  16.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(qdrmfgp2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", qdrmfgp_state,  qdrmfgp2_interrupt)
 
@@ -650,13 +650,13 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
 	MCFG_K053252_OFFSETS(40, 16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

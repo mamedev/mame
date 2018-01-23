@@ -49,6 +49,12 @@ enum
 };
 
 
+constexpr XTAL cdp1869_device::DOT_CLK_NTSC;
+constexpr XTAL cdp1869_device::DOT_CLK_PAL;
+constexpr XTAL cdp1869_device::COLOR_CLK_NTSC;
+constexpr XTAL cdp1869_device::COLOR_CLK_PAL;
+constexpr XTAL cdp1869_device::CPU_CLK_NTSC;
+constexpr XTAL cdp1869_device::CPU_CLK_PAL;
 
 //**************************************************************************
 //  DEVICE DEFINITIONS

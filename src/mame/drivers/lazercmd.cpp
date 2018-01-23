@@ -243,7 +243,7 @@
 #include "lazercmd.lh"
 #include "medlanes.lh"
 
-#define MASTER_CLOCK XTAL_8MHz
+#define MASTER_CLOCK XTAL(8'000'000)
 
 /*************************************************************
  * Interrupt for the cpu

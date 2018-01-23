@@ -86,10 +86,10 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, inder_vid_device )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(inder_vid_device::device_add_mconfig)
-	MCFG_CPU_ADD("tms", TMS34010, XTAL_40MHz)
+	MCFG_CPU_ADD("tms", TMS34010, XTAL(40'000'000))
 	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
-	MCFG_TMS340X0_PIXEL_CLOCK(XTAL_40MHz/12) /* pixel clock */
+	MCFG_TMS340X0_PIXEL_CLOCK(XTAL(40'000'000)/12) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(inder_vid_device, scanline)     /* scanline updater (RGB32) */
 	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(inder_vid_device, m68k_gen_int))
@@ -97,7 +97,7 @@ MACHINE_CONFIG_START(inder_vid_device::device_add_mconfig)
 	MCFG_TMS340X0_FROM_SHIFTREG_CB(inder_vid_device, from_shiftreg) /* read from shiftreg function */
 
 	MCFG_SCREEN_ADD("inder_screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/12, 424, 0, 338-1, 262, 0, 246-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(40'000'000)/12, 424, 0, 338-1, 262, 0, 246-1)
 	MCFG_SCREEN_UPDATE_DEVICE("tms", tms34010_device, tms340x0_rgb32)
 
 	MCFG_PALETTE_ADD("palette", 256)

@@ -682,7 +682,7 @@ WRITE8_MEMBER(ambush_state::output_latches_w)
 //**************************************************************************
 
 MACHINE_CONFIG_START(ambush_state::ambush)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ambush_state, irq0_line_hold)
@@ -702,7 +702,7 @@ MACHINE_CONFIG_START(ambush_state::ambush)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/3, 384, 0, 256, 264, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/3, 384, 0, 256, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(ambush_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -713,11 +713,11 @@ MACHINE_CONFIG_START(ambush_state::ambush)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay1", AY8912, XTAL_18_432MHz/6/2)
+	MCFG_SOUND_ADD("ay1", AY8912, XTAL(18'432'000)/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("buttons"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_ADD("ay2", AY8912, XTAL_18_432MHz/6/2)
+	MCFG_SOUND_ADD("ay2", AY8912, XTAL(18'432'000)/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("joystick"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
@@ -743,11 +743,11 @@ MACHINE_CONFIG_DERIVED(ambush_state::mariobl, ambush)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(ambush_state, mario)
 
-	MCFG_SOUND_REPLACE("ay1", AY8910, XTAL_18_432MHz/6/2)
+	MCFG_SOUND_REPLACE("ay1", AY8910, XTAL(18'432'000)/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("buttons"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MCFG_SOUND_REPLACE("ay2", AY8910, XTAL_18_432MHz/6/2)
+	MCFG_SOUND_REPLACE("ay2", AY8910, XTAL(18'432'000)/6/2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("joystick"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END

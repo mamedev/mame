@@ -2858,7 +2858,7 @@ MACHINE_CONFIG_START(towns_state::towns_base)
 	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir7_w))
 	MCFG_PIC8259_IN_SP_CB(GND)
 
-	MCFG_MB8877_ADD("fdc",XTAL_8MHz/4)  // clock unknown
+	MCFG_MB8877_ADD("fdc",XTAL(8'000'000)/4)  // clock unknown
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(towns_state,mb8877a_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(towns_state,mb8877a_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", towns_floppies, "35hd", towns_state::floppy_formats)

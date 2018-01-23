@@ -145,11 +145,11 @@ static ADDRESS_MAP_START( magnum_io, AS_IO, 16, magnum_state )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(magnum_state::magnum)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL_12MHz / 2)
+	MCFG_CPU_ADD("maincpu", I80186, XTAL(12'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(magnum_map)
 	MCFG_CPU_IO_MAP(magnum_io)
 
-	MCFG_DEVICE_ADD("rtc", CDP1879, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", CDP1879, XTAL(32'768))
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_UPDATE_DRIVER(magnum_state, screen_update)

@@ -463,13 +463,13 @@ void blockade_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //**************************************************************************
 
 MACHINE_CONFIG_START(blockade_state::blockade)
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL_20_079MHz / 10)
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL(20'790'000) / 10)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20_079MHz / 4, 330, 0, 256, 262, 0, 224)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'790'000) / 4, 330, 0, 256, 262, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(blockade_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

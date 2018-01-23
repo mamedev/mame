@@ -190,7 +190,7 @@ void czk80_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(czk80_state::czk80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(czk80_mem)
 	MCFG_CPU_IO_MAP(czk80_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
@@ -201,19 +201,19 @@ MACHINE_CONFIG_START(czk80_state::czk80)
 	MCFG_UPD765A_ADD("fdc", false, true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", czk80_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(czk80_state, ctc_z0_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(czk80_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(czk80_state, ctc_z2_w))
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(16'000'000) / 4)
 	//MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	//MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	//MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000)/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 MACHINE_CONFIG_END
 

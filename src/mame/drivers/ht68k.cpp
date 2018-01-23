@@ -126,11 +126,11 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(ht68k_state::ht68k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu",M68000, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(ht68k_mem)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "duart68681", MC68681, XTAL_8MHz / 2 )
+	MCFG_DEVICE_ADD( "duart68681", MC68681, XTAL(8'000'000) / 2 )
 	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(ht68k_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
@@ -140,7 +140,7 @@ MACHINE_CONFIG_START(ht68k_state::ht68k)
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681", mc68681_device, rx_a_w))
 
-	MCFG_WD1770_ADD("wd1770", XTAL_8MHz )
+	MCFG_WD1770_ADD("wd1770", XTAL(8'000'000) )
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)

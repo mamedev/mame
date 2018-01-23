@@ -101,8 +101,8 @@ A                                                   12.000MHz
 #include "speaker.h"
 
 
-#define MCLK    XTAL_12MHz // this is on the video board
-#define CLK2    XTAL_8MHz // near the CPUs
+#define MCLK    XTAL(12'000'000) // this is on the video board
+#define CLK2    XTAL(8'000'000) // near the CPUs
 
 WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 {

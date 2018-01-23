@@ -716,12 +716,12 @@ INTERRUPT_GEN_MEMBER(m90_state::bomblord_interrupt)
 /* Basic hardware -- no decryption table is setup for CPU */
 MACHINE_CONFIG_START(m90_state::m90)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V35, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", V35, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(m90_main_cpu_map)
 	MCFG_CPU_IO_MAP(m90_main_cpu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m90_state,  m90_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(m90_sound_cpu_map)
 	MCFG_CPU_IO_MAP(m90_sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(m90_state, nmi_line_pulse,  128*60)    /* clocked by V1? (Vigilante) */
@@ -748,7 +748,7 @@ MACHINE_CONFIG_START(m90_state::m90)
 
 	MCFG_SOUND_ADD("m72", IREM_M72_AUDIO, 0)
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "speaker", 0.15)
 	MCFG_SOUND_ROUTE(1, "speaker", 0.15)

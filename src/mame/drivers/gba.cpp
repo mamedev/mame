@@ -132,7 +132,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 	}
 }
 
-static const uint32_t timer_clks[4] = { XTAL_16_777216MHz, XTAL_16_777216MHz / 64, XTAL_16_777216MHz / 256, XTAL_16_777216MHz / 1024 };
+static const XTAL timer_clks[4] = { XTAL(16'777'216), XTAL(16'777'216) / 64, XTAL(16'777'216) / 256, XTAL(16'777'216) / 1024 };
 
 
 void gba_state::request_irq(uint32_t int_type)
@@ -408,7 +408,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 		m_timer_recalc[tmr] = 0;
 		m_timer_regs[tmr] = (m_timer_regs[tmr] & 0xFFFF0000) | (m_timer_reload[tmr] & 0x0000FFFF);
 		rate = 0x10000 - (m_timer_regs[tmr] & 0xffff);
-		clocksel = timer_clks[(m_timer_regs[tmr] >> 16) & 3];
+		clocksel = timer_clks[(m_timer_regs[tmr] >> 16) & 3].dvalue();
 		final = clocksel / rate;
 		m_timer_hz[tmr] = final;
 		time = attotime::from_hz(final);
@@ -1079,7 +1079,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 
 					rate = 0x10000 - (m_timer_regs[timer] & 0xffff);
 
-					clocksel = timer_clks[(m_timer_regs[timer] >> 16) & 3];
+					clocksel = timer_clks[(m_timer_regs[timer] >> 16) & 3].dvalue();
 
 					final = clocksel / rate;
 
@@ -1430,7 +1430,7 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(gba_state::gbadv)
 
-	MCFG_CPU_ADD("maincpu", ARM7, XTAL_16_777216MHz)
+	MCFG_CPU_ADD("maincpu", ARM7, XTAL(16'777'216))
 	MCFG_CPU_PROGRAM_MAP(gba_map)
 
 	MCFG_GBA_LCD_ADD("lcd")
@@ -1441,7 +1441,7 @@ MACHINE_CONFIG_START(gba_state::gbadv)
 	MCFG_GBA_LCD_DMA_VBLANK(WRITELINE(gba_state, dma_vblank_callback))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", CGB04_APU, XTAL_16_777216MHz/4)
+	MCFG_SOUND_ADD("custom", CGB04_APU, XTAL(16'777'216)/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 

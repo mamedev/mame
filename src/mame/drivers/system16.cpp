@@ -2456,11 +2456,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(segas1x_bootleg_state::astormb2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) /* 12MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(astormbl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_8MHz/2) /* 4MHz */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(8'000'000)/2) /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(sys18bl_sound_map)
 
 	/* video hardware */
@@ -2486,7 +2486,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::astormb2)
 	// 1 OKI M6295 instead of original sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz/8, PIN7_HIGH) // 1MHz clock and pin verified
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000)/8, PIN7_HIGH) // 1MHz clock and pin verified
 	MCFG_DEVICE_ADDRESS_MAP(0, sys18bl_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

@@ -98,7 +98,7 @@ public:
 };
 
 
-#define MASTER_CLOCK                (XTAL_10MHz)
+#define MASTER_CLOCK                (XTAL(10'000'000))
 #define MAIN_CPU_CLOCK              (MASTER_CLOCK / 4)
 #define PIXEL_CLOCK                 (MASTER_CLOCK / 2)
 #define S14001_CLOCK                (MASTER_CLOCK / 4)

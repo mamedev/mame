@@ -309,7 +309,7 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(univac_state::uts20)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // unknown clock
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000)) // unknown clock
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
@@ -333,13 +333,13 @@ MACHINE_CONFIG_START(univac_state::uts20)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg2))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg3))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("uart", z80sio_device, txca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", z80sio_device, rxca_w))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("uart", z80sio_device, rxtxcb_w))
 
-	MCFG_DEVICE_ADD("uart", Z80SIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("uart", Z80SIO, XTAL(4'000'000))
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("uart", z80sio_device, rxa_w)) // FIXME: hacked in permanent loopback to pass test
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("uart", z80sio_device, rxb_w)) // FIXME: hacked in permanent loopback to pass test

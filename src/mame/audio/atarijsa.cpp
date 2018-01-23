@@ -77,7 +77,7 @@ ALL: the LPF (low pass filter) bit which selectively places a lowpass filter in 
 #include "audio/atarijsa.h"
 
 
-#define JSA_MASTER_CLOCK            XTAL_3_579545MHz
+#define JSA_MASTER_CLOCK            XTAL(3'579'545)
 
 
 //**************************************************************************
@@ -696,7 +696,7 @@ MACHINE_CONFIG_START(atari_jsa_i_device::device_add_mconfig)
 	// basic machine hardware
 	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa1_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
@@ -826,7 +826,7 @@ MACHINE_CONFIG_START(atari_jsa_ii_device::device_add_mconfig)
 	// basic machine hardware
 	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa2_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
@@ -908,7 +908,7 @@ MACHINE_CONFIG_START(atari_jsa_iii_device::device_add_mconfig)
 	// basic machine hardware
 	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa3_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))

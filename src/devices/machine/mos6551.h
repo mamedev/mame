@@ -54,6 +54,7 @@ public:
 	mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_xtal(device_t &device, uint32_t xtal) { downcast<mos6551_device &>(device).set_xtal(xtal); }
+	static void set_xtal(device_t &device, const XTAL &xtal) { set_xtal(device, xtal.value()); }
 	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<mos6551_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<mos6551_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_rxc_handler(device_t &device, Object &&cb) { return downcast<mos6551_device &>(device).m_rxc_handler.set_callback(std::forward<Object>(cb)); }
@@ -71,6 +72,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_dcd);
 
 	void set_xtal(uint32_t clock);
+	void set_xtal(const XTAL &clock) { set_xtal(clock.value()); }
 
 protected:
 	virtual void device_start() override;

@@ -39,7 +39,7 @@ TODO:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK XTAL_18_432MHz
+#define MASTER_CLOCK XTAL(18'432'000)
 
 class superwng_state : public driver_device
 {

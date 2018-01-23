@@ -60,7 +60,7 @@ MACHINE_CONFIG_START(isa8_number_9_rev_device::device_add_mconfig)
 	MCFG_SCREEN_UPDATE_DRIVER(isa8_number_9_rev_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 4096)
 
-	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_4_433619MHz/2) // unknown clock
+	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(4'433'619)/2) // unknown clock
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(isa8_number_9_rev_device, hgdc_display_pixels)
 	MCFG_VIDEO_SET_SCREEN("screen")

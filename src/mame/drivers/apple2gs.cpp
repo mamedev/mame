@@ -250,9 +250,9 @@ WRITE8_MEMBER(apple2gs_state::adbmicro_p3_out)
 {
 	if (((data & 0x08) == 0x08) != m_adb_line)
 	{
-		m_adb_dtime = (int)(machine().time().as_ticks(XTAL_3_579545MHz*2) - m_last_adb_time);
+		m_adb_dtime = (int)(machine().time().as_ticks(XTAL(3'579'545)*2) - m_last_adb_time);
 //      printf("ADB change to %d (dtime %d)\n", (data>>3) & 1, m_adb_dtime);
-		m_last_adb_time = machine().time().as_ticks(XTAL_3_579545MHz*2);
+		m_last_adb_time = machine().time().as_ticks(XTAL(3'579'545)*2);
 		m_adb_line = (data & 0x8) ? true : false;
 	}
 }
@@ -312,7 +312,7 @@ MACHINE_CONFIG_START(apple2gs_state::apple2gs)
 	MCFG_CPU_ADD("maincpu", G65816, APPLE2GS_14M/5)
 	MCFG_CPU_PROGRAM_MAP(apple2gs_map)
 	#if RUN_ADB_MICRO
-	MCFG_CPU_ADD(ADBMICRO_TAG, M50741, XTAL_3_579545MHz)
+	MCFG_CPU_ADD(ADBMICRO_TAG, M50741, XTAL(3'579'545))
 	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(apple2gs_state, adbmicro_p0_in))
 	MCFG_M5074X_PORT0_WRITE_CALLBACK(WRITE8(apple2gs_state, adbmicro_p0_out))
 	MCFG_M5074X_PORT1_READ_CALLBACK(READ8(apple2gs_state, adbmicro_p1_in))
@@ -419,7 +419,7 @@ MACHINE_CONFIG_DERIVED(apple2gs_state::apple2gsr1, apple2gs)
 	MCFG_MACHINE_START_OVERRIDE(apple2gs_state, apple2gsr1 )
 
 	#if RUN_ADB_MICRO
-	MCFG_CPU_REPLACE(ADBMICRO_TAG, M50740, XTAL_3_579545MHz)
+	MCFG_CPU_REPLACE(ADBMICRO_TAG, M50740, XTAL(3'579'545))
 	MCFG_M5074X_PORT0_READ_CALLBACK(READ8(apple2gs_state, adbmicro_p0_in))
 	MCFG_M5074X_PORT0_WRITE_CALLBACK(WRITE8(apple2gs_state, adbmicro_p0_out))
 	MCFG_M5074X_PORT1_READ_CALLBACK(READ8(apple2gs_state, adbmicro_p1_in))

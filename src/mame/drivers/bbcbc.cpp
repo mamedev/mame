@@ -58,7 +58,7 @@ private:
 };
 
 
-#define MAIN_CLOCK XTAL_4_433619MHz
+#define MAIN_CLOCK XTAL(4'433'619)
 
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, bbcbc_state )
@@ -118,7 +118,7 @@ MACHINE_CONFIG_START(bbcbc_state::bbcbc)
 	MCFG_Z80PIO_IN_PB_CB(READ8(bbcbc_state, input_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(bbcbc_state, input_select_w))
 
-	MCFG_DEVICE_ADD( "tms9129", TMS9129, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "tms9129", TMS9129, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", 0))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )

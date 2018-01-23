@@ -146,7 +146,7 @@ SLOT_INTERFACE_END
 
 
 MACHINE_CONFIG_START(dragon_fdc_device_base::device_add_mconfig)
-	MCFG_WD2797_ADD(WD2797_TAG, XTAL_4MHz / 4)
+	MCFG_WD2797_ADD(WD2797_TAG, XTAL(4'000'000) / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dragon_fdc_device_base, fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
@@ -163,7 +163,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(premier_fdc_device_base::device_add_mconfig)
-	MCFG_WD2791_ADD(WD2791_TAG, XTAL_2MHz / 2)
+	MCFG_WD2791_ADD(WD2791_TAG, XTAL(2'000'000) / 2)
 	MCFG_WD_FDC_FORCE_READY
 
 	MCFG_FLOPPY_DRIVE_ADD(WD2791_TAG ":0", dragon_fdc_device_base, "qd", dragon_fdc_device_base::floppy_formats)

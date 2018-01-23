@@ -236,7 +236,7 @@ void zac_proto_state::machine_reset()
 
 MACHINE_CONFIG_START(zac_proto_state::zac_proto)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", INS8060, XTAL_4MHz / 2) // Using SC/MP II chip which has an internal /2 circuit.
+	MCFG_CPU_ADD("maincpu", INS8060, XTAL(4'000'000) / 2) // Using SC/MP II chip which has an internal /2 circuit.
 	MCFG_CPU_PROGRAM_MAP(zac_proto_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

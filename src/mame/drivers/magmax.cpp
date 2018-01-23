@@ -328,11 +328,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(magmax_state::magmax)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(magmax_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", magmax_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_20MHz/8) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(20'000'000)/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(magmax_sound_map)
 	MCFG_CPU_IO_MAP(magmax_sound_io_map)
 
@@ -355,15 +355,15 @@ MACHINE_CONFIG_START(magmax_state::magmax)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_20MHz/16) /* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(20'000'000)/16) /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(magmax_state, ay8910_portA_0_w))  /*write port A*/
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(magmax_state, ay8910_portB_0_w))  /*write port B*/
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_20MHz/16) /* verified on pcb */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(20'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL_20MHz/16) /* verified on pcb */
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL(20'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")

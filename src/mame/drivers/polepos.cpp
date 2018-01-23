@@ -240,7 +240,7 @@ Todo:
 #include "topracer.lh"
 
 
-#define MASTER_CLOCK    XTAL_24_576MHz
+#define MASTER_CLOCK    XTAL(24'576'000)
 #define POLEPOS_TOGGLE  PORT_TOGGLE
 
 

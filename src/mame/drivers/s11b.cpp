@@ -247,7 +247,7 @@ DRIVER_INIT_MEMBER( s11b_state, s11b_invert )
 
 MACHINE_CONFIG_START(s11b_state::s11b)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M6808, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(s11b_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s11b_state, s11b)
 
@@ -306,7 +306,7 @@ MACHINE_CONFIG_START(s11b_state::s11b)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6802, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu", M6802, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(s11b_audio_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -329,7 +329,7 @@ MACHINE_CONFIG_START(s11b_state::s11b)
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("audiocpu", M6802_IRQ_LINE))
 
 	/* Add the background music card */
-	MCFG_CPU_ADD("bgcpu", MC6809E, XTAL_8MHz / 4) // MC68B09E
+	MCFG_CPU_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
 	MCFG_CPU_PROGRAM_MAP(s11b_bg_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 

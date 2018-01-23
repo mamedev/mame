@@ -132,7 +132,7 @@ void vis_audio_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 
 MACHINE_CONFIG_START(vis_audio_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ymf262", YMF262, XTAL_14_31818MHz)
+	MCFG_SOUND_ADD("ymf262", YMF262, XTAL(14'318'181))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(2, "lspeaker", 1.00)
@@ -259,7 +259,7 @@ vis_vga_device::vis_vga_device(const machine_config &mconfig, const char *tag, d
 
 MACHINE_CONFIG_START(vis_vga_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, vis_vga_device, screen_update)
 	MCFG_PALETTE_ADD("palette", 0x100)
 MACHINE_CONFIG_END
@@ -270,7 +270,8 @@ void vis_vga_device::recompute_params()
 	attoseconds_t refresh;
 	uint8_t hclock_m = (!vga.gc.alpha_dis) ? (vga.sequencer.data[1]&1)?8:9 : 8;
 	int pixel_clock;
-	int xtal = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
+	const XTAL base_xtal = XTAL(14'318'181);
+	const XTAL xtal = (vga.miscellaneous_output & 0xc) ? base_xtal*2 : base_xtal*1.75;
 	int divisor = 1; // divisor is 2 for 15/16 bit rgb/yuv modes and 3 for 24bit
 
 	/* safety check */
@@ -283,7 +284,7 @@ void vis_vga_device::recompute_params()
 	hblank_period = ((vga.crtc.horz_total + 5) * ((float)(hclock_m)/divisor));
 
 	/* TODO: 10b and 11b settings aren't known */
-	pixel_clock = xtal / (((vga.sequencer.data[1]&8) >> 3) + 1);
+	pixel_clock = xtal.value() / (((vga.sequencer.data[1]&8) >> 3) + 1);
 
 	refresh  = HZ_TO_ATTOSECONDS(pixel_clock) * (hblank_period) * vblank_period;
 	machine().first_screen()->configure((hblank_period), (vblank_period), visarea, refresh );
@@ -884,7 +885,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(vis_state::vis)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz )
+	MCFG_CPU_ADD("maincpu", I80286, XTAL(12'000'000) )
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)

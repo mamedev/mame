@@ -41,12 +41,12 @@ const tiny_rom_entry *sv806_device::device_rom_region() const
 
 MACHINE_CONFIG_START(sv806_device::device_add_mconfig)
 	MCFG_SCREEN_ADD_MONOCHROME("80col", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS((XTAL_12MHz / 6) * 8, 864, 0, 640, 317, 0, 192)
+	MCFG_SCREEN_RAW_PARAMS((XTAL(12'000'000) / 6) * 8, 864, 0, 640, 317, 0, 192)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD("crtc", HD6845, "80col", XTAL_12MHz / 6)
+	MCFG_MC6845_ADD("crtc", HD6845, "80col", XTAL(12'000'000) / 6)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(sv806_device, crtc_update_row)

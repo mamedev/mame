@@ -17,7 +17,7 @@
 /*************************************
 *  Constants
 *************************************/
-#define ZEUS2_VIDEO_CLOCK     XTAL_66_6667MHz
+#define ZEUS2_VIDEO_CLOCK     XTAL(66'666'700)
 
 #define DUMP_WAVE_RAM       0
 #define TRACK_REG_USAGE     0

@@ -495,7 +495,7 @@ WRITE8_MEMBER(thayers_state::den2_w)
 
 */
 
-#define SSI263_CLOCK (XTAL_4MHz/2)
+#define SSI263_CLOCK (XTAL(4'000'000)/2)
 
 static const char SSI263_PHONEMES[0x40][5] =
 {
@@ -790,11 +790,11 @@ void thayers_state::machine_reset()
 MACHINE_CONFIG_START(thayers_state::thayers)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(thayers_map)
 	MCFG_CPU_IO_MAP(thayers_io_map)
 
-	MCFG_CPU_ADD("mcu", COP421, XTAL_4MHz/2) // COP421L-PCA/N
+	MCFG_CPU_ADD("mcu", COP421, XTAL(4'000'000)/2) // COP421L-PCA/N
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
 	MCFG_COP400_READ_L_CB(READ8(thayers_state, cop_l_r))
 	MCFG_COP400_WRITE_L_CB(WRITE8(thayers_state, cop_l_w))

@@ -95,10 +95,10 @@ Noted added by ClawGrip 28-Mar-2008:
 
 #define TEST_DIPS false /* enable to test unmapped dip switches */
 
-#define MASTER_CLOCK XTAL_14_31818MHz/2
-#define SOUND_CLOCK XTAL_20MHz/4
-#define YM2203_CLOCK XTAL_20MHz/16
-#define MSM5205_CLOCK XTAL_384kHz
+#define MASTER_CLOCK XTAL(14'318'181)/2
+#define SOUND_CLOCK XTAL(20'000'000)/4
+#define YM2203_CLOCK XTAL(20'000'000)/16
+#define MSM5205_CLOCK XTAL(384'000)
 
 
 WRITE8_MEMBER(wc90b_state::bankswitch_w)

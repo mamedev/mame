@@ -349,19 +349,19 @@ static SLOT_INTERFACE_START(pwrview_floppies)
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(pwrview_state::pwrview)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(pwrview_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(pwrview_fetch_map)
 	MCFG_CPU_IO_MAP(pwrview_io)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_64MHz/8, 480, 0, 384, 1040, 0, 960)  // clock unknown
+	MCFG_SCREEN_RAW_PARAMS(XTAL(64'000'000)/8, 480, 0, 384, 1040, 0, 960)  // clock unknown
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_16MHz/16) // clocks unknown, fix above when found
-	MCFG_PIT8253_CLK1(XTAL_16MHz/16)
-	MCFG_PIT8253_CLK2(XTAL_16MHz/16)
+	MCFG_PIT8253_CLK0(XTAL(16'000'000)/16) // clocks unknown, fix above when found
+	MCFG_PIT8253_CLK1(XTAL(16'000'000)/16)
+	MCFG_PIT8253_CLK2(XTAL(16'000'000)/16)
 
 	// floppy disk controller
 	MCFG_UPD765A_ADD("fdc", true, true) // Rockwell R7675P
@@ -374,7 +374,7 @@ MACHINE_CONFIG_START(pwrview_state::pwrview)
 
 	MCFG_DEVICE_ADD("sio", Z80SIO2, 4000000)
 
-	MCFG_DEVICE_ADD("crtc", HD6845, XTAL_64MHz/64) // clock unknown
+	MCFG_DEVICE_ADD("crtc", HD6845, XTAL(64'000'000)/64) // clock unknown
 	MCFG_MC6845_CHAR_WIDTH(32) // ??
 	MCFG_MC6845_UPDATE_ROW_CB(pwrview_state, update_row)
 

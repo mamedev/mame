@@ -267,7 +267,7 @@ WRITE8_MEMBER( hardbox_device::ppi1_pc_w )
 
 MACHINE_CONFIG_START(hardbox_device::device_add_mconfig)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(hardbox_mem)
 	MCFG_CPU_IO_MAP(hardbox_io)
 

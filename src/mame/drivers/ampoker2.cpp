@@ -374,7 +374,7 @@
 *********************************************************************************/
 
 
-#define MASTER_CLOCK    XTAL_6MHz
+#define MASTER_CLOCK    XTAL(6'000'000)
 
 #include "emu.h"
 #include "includes/ampoker2.h"

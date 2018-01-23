@@ -60,7 +60,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(vic1515_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", I8039, XTAL_6MHz)
+	MCFG_CPU_ADD("maincpu", I8039, XTAL(6'000'000))
 	MCFG_CPU_PROGRAM_MAP(vic1515_mem)
 	MCFG_CPU_IO_MAP(vic1515_io)
 MACHINE_CONFIG_END

@@ -504,7 +504,7 @@ ADDRESS_MAP_END
 
 
 MACHINE_CONFIG_START(galpani3_state::galpani3)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_28_63636MHz/2) // Confirmed from PCB
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'636'363)/2) // Confirmed from PCB
 	MCFG_CPU_PROGRAM_MAP(galpani3_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", galpani3_state, galpani3_vblank, "screen", 0, 1)
 
@@ -543,7 +543,7 @@ MACHINE_CONFIG_START(galpani3_state::galpani3)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_33_333MHz / 2)  // Confirmed from PCB
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(33'333'000) / 2)  // Confirmed from PCB
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END

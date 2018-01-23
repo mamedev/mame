@@ -291,11 +291,11 @@ INTERRUPT_GEN_MEMBER(hyperspt_state::vblank_irq)
 MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL_18_432MHz/12)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL(18'432'000)/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hyperspt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", hyperspt_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(14'318'181)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hyperspt_sound_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // F2
@@ -336,10 +336,10 @@ MACHINE_CONFIG_START(hyperspt_state::hyperspt)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("snsnd", SN76496, XTAL_14_31818MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("snsnd", SN76496, XTAL(14'318'181)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -372,7 +372,7 @@ MACHINE_CONFIG_DERIVED(hyperspt_state::hypersptb, hyperspt)
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(soundb_map)
 
-	MCFG_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)    /* unknown clock */
+	MCFG_CPU_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
 	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")

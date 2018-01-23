@@ -57,7 +57,7 @@ const tiny_rom_entry *ergoline_keyboard_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(ergoline_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", I8031, XTAL_5_5296MHz)
+	MCFG_CPU_ADD("maincpu", I8031, XTAL(5'529'600))
 	MCFG_CPU_PROGRAM_MAP(kbd_mem)
 	MCFG_CPU_IO_MAP(kbd_io)
 MACHINE_CONFIG_END

@@ -124,7 +124,7 @@ MACHINE_CONFIG_START(wangpc_lvc_device::device_add_mconfig)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(60)
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845_1, SCREEN_TAG, XTAL_14_31818MHz/16)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845_1, SCREEN_TAG, XTAL(14'318'181)/16)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(wangpc_lvc_device, crtc_update_row)
@@ -296,11 +296,11 @@ void wangpc_lvc_device::wangpcbus_aiowc_w(address_space &space, offs_t offset, u
 
 				if (OPTION_80_COL)
 				{
-					m_crtc->set_clock(XTAL_14_31818MHz / 8);
+					m_crtc->set_clock(XTAL(14'318'181) / 8);
 				}
 				else
 				{
-					m_crtc->set_clock(XTAL_14_31818MHz / 16);
+					m_crtc->set_clock(XTAL(14'318'181) / 16);
 				}
 			}
 			break;

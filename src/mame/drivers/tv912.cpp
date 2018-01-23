@@ -61,6 +61,7 @@
 #include "speaker.h"
 
 #define CHAR_WIDTH 14
+#define CHARSET_TEST 0
 
 class tv912_state : public driver_device
 {
@@ -70,6 +71,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_crtc(*this, "crtc")
 		, m_uart(*this, "uart")
+		, m_rs232(*this, "rs232")
 		, m_bankdev(*this, "bankdev")
 		, m_beep(*this, "beep")
 		, m_dispram_bank(*this, "dispram")
@@ -78,10 +80,12 @@ public:
 		, m_modem_baud(*this, "MODEMBAUD")
 		, m_printer_baud(*this, "PRINTBAUD")
 		, m_uart_control(*this, "UARTCTRL")
+		, m_video_control(*this, "VIDEOCTRL")
 		, m_modifiers(*this, "MODIFIERS")
 		, m_half_duplex(*this, "HALFDUP")
 		, m_jumpers(*this, "JUMPERS")
 		, m_option(*this, "OPTION")
+		, m_dtr(*this, "DTR")
 		, m_baudgen_timer(nullptr)
 	{ }
 
@@ -115,6 +119,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_crtc;
 	required_device<ay51013_device> m_uart;
+	required_device<rs232_port_device> m_rs232;
 	required_device<address_map_bank_device> m_bankdev;
 	required_device<beep_device> m_beep;
 	required_memory_bank m_dispram_bank;
@@ -123,14 +128,17 @@ private:
 	required_ioport m_modem_baud;
 	required_ioport m_printer_baud;
 	required_ioport m_uart_control;
+	required_ioport m_video_control;
 	required_ioport m_modifiers;
 	required_ioport m_half_duplex;
 	required_ioport m_jumpers;
 	required_ioport m_option;
+	required_ioport m_dtr;
 
 	emu_timer *m_baudgen_timer;
 
 	bool m_force_blank;
+	bool m_4hz_flasher;
 	bool m_lpt_select;
 	u8 m_keyboard_scan;
 	std::unique_ptr<u8[]> m_dispram;
@@ -143,13 +151,20 @@ WRITE8_MEMBER(tv912_state::p1_w)
 
 READ8_MEMBER(tv912_state::p2_r)
 {
+	ioport_value dup = m_half_duplex->read();
+
 	// P27: -HALF DUPLEX
-	u8 result = m_half_duplex->read() << 7;
+	u8 result = BIT(dup, 0) << 7;
 
 	// P26: -PTR RDY
-	// P25: -DCR
 
-	return result | 0x7f;
+	// P25: -DCR
+	if (!BIT(dup, 1))
+		result |= m_rs232->dsr_r() << 5;
+	if (!BIT(dup, 2))
+		result |= m_rs232->dcd_r() << 5;
+
+	return result | 0x5f;
 }
 
 WRITE8_MEMBER(tv912_state::p2_w)
@@ -158,6 +173,7 @@ WRITE8_MEMBER(tv912_state::p2_w)
 	m_bankdev->set_bank(data & 0x0f);
 
 	// P24: +4Hz Flasher
+	m_4hz_flasher = BIT(data, 4);
 }
 
 READ8_MEMBER(tv912_state::crtc_r)
@@ -214,19 +230,28 @@ WRITE_LINE_MEMBER(tv912_state::uart_reset_w)
 
 WRITE8_MEMBER(tv912_state::output_40c)
 {
-	// Bit 5: +FORCE BLANK
+	// DB6: -PRTOL
+
+	// DB5: +FORCE BLANK
 	m_force_blank = BIT(data, 5);
 
-	// Bit 4: +SEL LPT
+	// DB4: +SEL LPT
 	m_lpt_select = BIT(data, 4);
 
-	// Bit 3: -BREAK
-	// Bit 2: -RQS
+	// DB3: -BREAK
 
-	// Bit 1: +BEEP
+	// DB2: -RQS
+	ioport_value dtr = m_dtr->read();
+	m_rs232->write_rts(BIT(data, 2));
+	if (!BIT(dtr, 0))
+		m_rs232->write_dtr(BIT(data, 2));
+	if (!BIT(dtr, 1))
+		m_rs232->write_dtr(0);
+
+	// DB1: +BEEP
 	m_beep->set_state(BIT(data, 1));
 
-	// Bit 0: +PG SEL
+	// DB0: +PG SEL
 	m_dispram_bank->set_entry(BIT(data, 0));
 }
 
@@ -244,7 +269,7 @@ void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 			if (!BIT(sel, b))
 			{
 				unsigned divisor = 11 * (b < 9 ? 1 << b : 176);
-				m_baudgen_timer->adjust(attotime::from_hz(XTAL_23_814MHz / 3.5 / divisor), !param);
+				m_baudgen_timer->adjust(attotime::from_hz(XTAL(23'814'000) / 3.5 / divisor), !param);
 				break;
 			}
 		}
@@ -255,6 +280,63 @@ void tv912_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	if (m_crtc->screen_reset() || m_force_blank)
+	{
+		bitmap.fill(rgb_t::black(), cliprect);
+		return 0;
+	}
+
+	u8 *dispram = static_cast<u8 *>(m_dispram_bank->base());
+	ioport_value videoctrl = m_video_control->read();
+
+	rectangle curs;
+	m_crtc->cursor_bounds(curs);
+
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		int row = y / 10;
+		int ra = y % 10;
+		int x = 0;
+		u8 *charbase = &m_p_chargen[(ra & 7) | BIT(videoctrl, 1) << 10];
+
+		for (int pos = 0; pos < 80; pos++)
+		{
+			u8 ch = (pos < 64)
+					? dispram[(row << 6) | pos]
+					: dispram[0x600 | ((row & 0x07) << 6) | ((row & 0x18) << 1) | (pos & 0x0f)];
+
+			if (CHARSET_TEST && pos >= 32 && pos < 64)
+				ch = (pos & 0x1f) | (row & 7) << 5;
+
+			u8 data = (ra > 0 && ra < 9) ? charbase[(ch & 0x7f) << 3] : 0;
+			u8 dots = (data & 0xfc) >> 1;
+			bool adv = BIT(data, 1);
+
+			if (x == curs.left() && y >= curs.top() && y <= curs.bottom())
+			{
+				if (BIT(videoctrl, 0) || !m_4hz_flasher)
+					dots ^= 0xff;
+			}
+
+			for (int d = 0; d < CHAR_WIDTH / 2; d++)
+			{
+				if (x >= cliprect.left() && x <= cliprect.right())
+					bitmap.pix(y, x) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
+				x++;
+				if (adv)
+					dots <<= 1;
+				if (x >= cliprect.left() && x <= cliprect.right())
+					bitmap.pix(y, x) = BIT(dots, 7) ? rgb_t::white() : rgb_t::black();
+				x++;
+				if (!adv)
+					dots <<= 1;
+
+				if (d == 2)
+					adv = BIT(data, 0);
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -268,6 +350,7 @@ void tv912_state::machine_start()
 
 	save_item(NAME(m_force_blank));
 	save_item(NAME(m_lpt_select));
+	save_item(NAME(m_4hz_flasher));
 	save_item(NAME(m_keyboard_scan));
 	save_pointer(NAME(m_dispram.get()), 0x1000);
 }
@@ -339,7 +422,7 @@ static INPUT_PORTS_START( switches )
 	PORT_DIPSETTING(0x3fd, "9600")
 	PORT_DIPSETTING(0x3fe, "19200")
 
-	PORT_START("VIDEO")
+	PORT_START("VIDEOCTRL")
 	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "S2:1") // disables TTL video output on earlier revisions
 	PORT_DIPNAME(0x02, 0x00, "Character Set") PORT_DIPLOCATION("S2:2")
 	PORT_DIPSETTING(0x00, "Standard")
@@ -377,9 +460,12 @@ static INPUT_PORTS_START( switches )
 	PORT_DIPNAME(0x01, 0x01, "Conversation Mode") PORT_DIPLOCATION("S2:3")
 	PORT_DIPSETTING(0x00, "Half Duplex")
 	PORT_DIPSETTING(0x01, "Full Duplex")
+	PORT_DIPNAME(0x06, 0x04, "DCR (RS232)") PORT_DIPLOCATION("S5:1,2")
+	PORT_DIPSETTING(0x04, "DSR") // at P3-6
+	PORT_DIPSETTING(0x02, "DCD") // at P3-8
 
 	PORT_START("JUMPERS")
-	PORT_DIPNAME(0x08, 0x08, "Automatic CRLF") PORT_DIPLOCATION("S4:1") // or jumper W31
+	PORT_DIPNAME(0x08, 0x00, "Automatic CRLF") PORT_DIPLOCATION("S4:1") // or jumper W31
 	PORT_DIPSETTING(0x08, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
 	PORT_DIPNAME(0x04, 0x04, "End of Send Character") PORT_DIPLOCATION("S4:2") // or jumper W32
@@ -396,6 +482,11 @@ static INPUT_PORTS_START( switches )
 	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "S4:5")
 	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "S4:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "S4:7")
+
+	PORT_START("DTR")
+	PORT_DIPNAME(0x03, 0x02, "DTR (RS232)") PORT_DIPLOCATION("S5:3,4")
+	PORT_DIPSETTING(0x02, "Tied to RTS")
+	PORT_DIPSETTING(0x01, "Pulled to +12V")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tv912b )
@@ -582,7 +673,7 @@ static INPUT_PORTS_START( tv912b )
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY30")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN) // control character (CLR TAB)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -724,7 +815,7 @@ static INPUT_PORTS_START( tv912c )
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY21")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN) // backspace?
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(LEFT)) PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(';') PORT_CHAR(':') PORT_CODE(KEYCODE_COLON)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -766,19 +857,19 @@ static INPUT_PORTS_START( tv912c )
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY28")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN) // control character 0x0c
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(0x1a) PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY29")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN) // non-printing character
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(UP)) PORT_CODE(KEYCODE_UP)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN) // control character 0xbb (CLEAR)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("KEY30")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN) // (DEL)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_UNKNOWN)
 	PORT_BIT(0xdc, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -791,7 +882,7 @@ static INPUT_PORTS_START( tv912c )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(tv912_state::tv912)
-	MCFG_CPU_ADD("maincpu", I8035, XTAL_23_814MHz / 4) // nominally +6MHz, actually 5.9535 MHz
+	MCFG_CPU_ADD("maincpu", I8035, XTAL(23'814'000) / 4) // nominally +6MHz, actually 5.9535 MHz
 	MCFG_CPU_PROGRAM_MAP(prog_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(tv912_state, p1_w))
@@ -808,10 +899,10 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_23_814MHz, 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(23'814'000), 105 * CHAR_WIDTH, 0, 80 * CHAR_WIDTH, 270, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(tv912_state, screen_update)
 
-	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL_23_814MHz)
+	MCFG_DEVICE_ADD("crtc", TMS9927, XTAL(23'814'000))
 	MCFG_TMS9927_CHAR_WIDTH(CHAR_WIDTH)
 	MCFG_TMS9927_VSYN_CALLBACK(INPUTLINE("maincpu", MCS48_INPUT_IRQ))
 	MCFG_VIDEO_SET_SCREEN("screen")
@@ -820,10 +911,10 @@ MACHINE_CONFIG_START(tv912_state::tv912)
 	MCFG_AY51013_READ_SI_CB(DEVREADLINE("rs232", rs232_port_device, rxd_r))
 	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "loopback")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beep", BEEP, XTAL_23_814MHz / 7 / 11 / 256) // nominally 1200 Hz
+	MCFG_SOUND_ADD("beep", BEEP, XTAL(23'814'000) / 7 / 11 / 256) // nominally 1200 Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

@@ -128,9 +128,9 @@ public:
 };
 
 
-#define MASTER_CLOCK    XTAL_16MHz
-#define SOUND_CLOCK     XTAL_14_31818MHz
-#define TC15_CLOCK      XTAL_12MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
+#define SOUND_CLOCK     XTAL(14'318'181)
+#define TC15_CLOCK      XTAL(12'000'000)
 
 
 /***************************************************************************

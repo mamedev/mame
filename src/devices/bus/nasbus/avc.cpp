@@ -29,7 +29,7 @@ MACHINE_CONFIG_START(nascom_avc_device::device_add_mconfig)
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_16MHz / 8)
+	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL(16'000'000) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(6)
 	MCFG_MC6845_UPDATE_ROW_CB(nascom_avc_device, crtc_update_row)

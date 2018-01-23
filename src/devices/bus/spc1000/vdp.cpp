@@ -25,7 +25,7 @@ WRITE_LINE_MEMBER(spc1000_vdp_exp_device::vdp_interrupt)
 
 MACHINE_CONFIG_START(spc1000_vdp_exp_device::device_add_mconfig)
 
-	MCFG_DEVICE_ADD("tms", TMS9928A, XTAL_10_738635MHz / 2) // TODO: which clock?
+	MCFG_DEVICE_ADD("tms", TMS9928A, XTAL(10'738'635) / 2) // TODO: which clock?
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(spc1000_vdp_exp_device, vdp_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC("tms_screen")

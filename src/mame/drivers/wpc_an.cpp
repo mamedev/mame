@@ -320,7 +320,7 @@ DRIVER_INIT_MEMBER(wpc_an_state,wpc_an)
 
 MACHINE_CONFIG_START(wpc_an_state::wpc_an_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_8MHz / 4) // 68B09E
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(8'000'000) / 4) // 68B09E
 	MCFG_CPU_PROGRAM_MAP(wpc_an_map)
 
 	MCFG_WMS_WPC_ADD("wpc")

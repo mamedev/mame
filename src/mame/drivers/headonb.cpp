@@ -161,7 +161,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(headonb_state::headonb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL_20MHz / 10) // divider guessed
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL(20'000'000) / 10) // divider guessed
 	MCFG_CPU_PROGRAM_MAP(headonb_map)
 	MCFG_CPU_IO_MAP(headonb_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", headonb_state, irq0_line_hold) // where is irqack?

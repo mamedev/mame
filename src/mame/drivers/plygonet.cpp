@@ -605,11 +605,11 @@ WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)
 
 MACHINE_CONFIG_START(polygonet_state::plygonet)
 
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", polygonet_state, polygonet_interrupt)
 
-	MCFG_CPU_ADD("dsp", DSP56156, XTAL_40MHz)
+	MCFG_CPU_ADD("dsp", DSP56156, XTAL(40'000'000))
 	MCFG_CPU_PROGRAM_MAP(dsp_program_map)
 	MCFG_CPU_DATA_MAP(dsp_data_map)
 
@@ -645,7 +645,7 @@ MACHINE_CONFIG_START(polygonet_state::plygonet)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
-	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
 	MCFG_K054539_REGION_OVERRRIDE("shared")
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(polygonet_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)

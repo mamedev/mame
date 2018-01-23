@@ -288,7 +288,7 @@ DRIVER_INIT_MEMBER( micropin_state, micropin )
 
 MACHINE_CONFIG_START(micropin_state::micropin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("v1cpu", M6800, XTAL_2MHz / 2)
+	MCFG_CPU_ADD("v1cpu", M6800, XTAL(2'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(micropin_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(micropin_state, irq0_line_hold, 500)
 

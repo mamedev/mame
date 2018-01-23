@@ -648,7 +648,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(nascom_state::nascom1)
 	// main cpu
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 8)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(nascom1_mem)
 	MCFG_CPU_IO_MAP(nascom1_io)
 
@@ -666,8 +666,8 @@ MACHINE_CONFIG_START(nascom_state::nascom1)
 
 	// uart
 	MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )
-	MCFG_AY31015_TX_CLOCK(( XTAL_16MHz / 16 ) / 256)
-	MCFG_AY31015_RX_CLOCK(( XTAL_16MHz / 16 ) / 256)
+	MCFG_AY31015_TX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
+	MCFG_AY31015_RX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
 	MCFG_AY51013_READ_SI_CB(READ8(nascom_state, nascom1_hd6402_si))
 	MCFG_AY51013_WRITE_SO_CB(WRITE8(nascom_state, nascom1_hd6402_so))
 
@@ -675,7 +675,7 @@ MACHINE_CONFIG_START(nascom_state::nascom1)
 	MCFG_CASSETTE_ADD("cassette")
 
 	// pio
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_16MHz/8)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(16'000'000)/8)
 
 	// internal extra ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -687,7 +687,7 @@ MACHINE_CONFIG_START(nascom_state::nascom1)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(nascom2_state::nascom2, nascom1)
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(nascom2_mem)
 	MCFG_CPU_IO_MAP(nascom2_io)
 

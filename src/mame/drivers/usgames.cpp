@@ -239,7 +239,7 @@ MACHINE_CONFIG_START(usgames_state::usg32)
 	MCFG_PALETTE_ADD("palette", 2*256)
 	MCFG_PALETTE_INIT_OWNER(usgames_state, usgames)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_18MHz / 16)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(18'000'000) / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 

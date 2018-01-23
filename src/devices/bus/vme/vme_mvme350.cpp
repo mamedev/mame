@@ -190,10 +190,10 @@ ROM_END
 
 MACHINE_CONFIG_START(vme_mvme350_card_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD (MVME350_CPU_TAG, M68010, XTAL_10MHz)
+	MCFG_CPU_ADD (MVME350_CPU_TAG, M68010, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP (mvme350_mem)
 	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
-	MCFG_DEVICE_ADD("pit", PIT68230, XTAL_16MHz / 2)
+	MCFG_DEVICE_ADD("pit", PIT68230, XTAL(16'000'000) / 2)
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *vme_mvme350_card_device::device_rom_region() const

@@ -498,7 +498,7 @@ DRIVER_INIT_MEMBER( chinsan_state, chinsan )
 
 // C1-00114-B
 MACHINE_CONFIG_START(chinsan_state::chinsan)
-	MCFG_CPU_ADD("maincpu", MC8123, XTAL_10MHz/2) // 317-5012
+	MCFG_CPU_ADD("maincpu", MC8123, XTAL(10'000'000)/2) // 317-5012
 	MCFG_CPU_PROGRAM_MAP(chinsan_map)
 	MCFG_CPU_IO_MAP(chinsan_io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -526,7 +526,7 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_10MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(10'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
@@ -534,7 +534,7 @@ MACHINE_CONFIG_START(chinsan_state::chinsan)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(chinsan_state, adpcm_int_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B) // 8kHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -543,7 +543,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(chinsan_state::mayumi, chinsan)
 	// standard Z80 instead of MC-8123
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(chinsan_map)
 	MCFG_CPU_IO_MAP(mayumi_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", chinsan_state, vblank_int)

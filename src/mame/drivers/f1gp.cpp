@@ -387,15 +387,15 @@ MACHINE_RESET_MEMBER(f1gp_state,f1gp)
 MACHINE_CONFIG_START(f1gp_state::f1gp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(f1gp_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000,XTAL_20MHz/2)    /* verified on pcb */
+	MCFG_CPU_ADD("sub", M68000,XTAL(20'000'000)/2)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(f1gp_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", f1gp_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_20MHz/4)  /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(20'000'000)/4)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
@@ -424,7 +424,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	MCFG_PALETTE_ADD("palette", 2048)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( f1gp_state, f1gp_old_tile_callback )
@@ -451,7 +451,7 @@ MACHINE_CONFIG_START(f1gp_state::f1gp)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)

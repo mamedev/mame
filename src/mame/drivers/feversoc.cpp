@@ -118,7 +118,7 @@ public:
 };
 
 
-#define MASTER_CLOCK XTAL_28_63636MHz
+#define MASTER_CLOCK XTAL(28'636'363)
 
 
 uint32_t feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -302,7 +302,7 @@ MACHINE_CONFIG_START(feversoc_state::feversoc)
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 
-	MCFG_JRC6355E_ADD("rtc", XTAL_32_768kHz)
+	MCFG_JRC6355E_ADD("rtc", XTAL(32'768))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

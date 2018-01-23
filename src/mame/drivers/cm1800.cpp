@@ -110,7 +110,7 @@ void cm1800_state::machine_reset()
 
 MACHINE_CONFIG_START(cm1800_state::cm1800)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 

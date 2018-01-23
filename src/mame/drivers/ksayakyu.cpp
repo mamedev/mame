@@ -75,7 +75,7 @@ SRAM:
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_18_432MHz
+#define MAIN_CLOCK XTAL(18'432'000)
 
 
 WRITE8_MEMBER(ksayakyu_state::bank_select_w)

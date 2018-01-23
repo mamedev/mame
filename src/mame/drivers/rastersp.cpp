@@ -34,8 +34,8 @@
  *
  *************************************/
 
-#define SOUND_CLOCK             XTAL_12_288MHz
-#define PLL_CLOCK               XTAL_14_31818MHz
+#define SOUND_CLOCK             XTAL(12'288'000)
+#define PLL_CLOCK               XTAL(14'318'181)
 #define NVRAM_SIZE              0x8000
 
 #define USE_SPEEDUP_HACK        1
@@ -867,7 +867,7 @@ MACHINE_CONFIG_START(rastersp_state::rastersp)
 	/* Devices */
 	MCFG_TIMER_DRIVER_ADD("tms_timer1", rastersp_state, tms_timer1)
 	MCFG_TIMER_DRIVER_ADD("tms_tx_timer", rastersp_state, tms_tx_timer)
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_NSCSI_BUS_ADD("scsibus")

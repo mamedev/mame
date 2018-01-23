@@ -401,7 +401,7 @@ void decwriter_state::machine_reset()
 
 MACHINE_CONFIG_START(decwriter_state::la120)
 
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_18MHz / 9) // 18Mhz xtal on schematics, using an i8224 clock divider/reset sanitizer IC
+	MCFG_CPU_ADD("maincpu",I8080, XTAL(18'000'000) / 9) // 18Mhz xtal on schematics, using an i8224 clock divider/reset sanitizer IC
 	MCFG_CPU_PROGRAM_MAP(la120_mem)
 	MCFG_CPU_IO_MAP(la120_io)
 
@@ -431,7 +431,7 @@ MACHINE_CONFIG_START(decwriter_state::la120)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_dsr))
 
-	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD(COM5016T_TAG, COM8116, XTAL(5'068'800))
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxc))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("i8251", i8251_device, write_txc))
 	*/

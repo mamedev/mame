@@ -153,7 +153,7 @@ WRITE8_MEMBER(poly_state::baud_rate_w)
 
 MACHINE_CONFIG_START(poly_state::poly)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_12_0576MHz / 3) // nominally 4 MHz
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(12'057'600) / 3) // nominally 4 MHz
 	MCFG_CPU_PROGRAM_MAP(poly_mem)
 
 	/* video hardware */
@@ -170,7 +170,7 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("saa5050", SAA5050, XTAL_12_0576MHz / 2)
+	MCFG_DEVICE_ADD("saa5050", SAA5050, XTAL(12'057'600) / 2)
 	MCFG_SAA5050_D_CALLBACK(READ8(poly_state, videoram_r))
 	MCFG_SAA5050_SCREEN_SIZE(40, 24, 40)
 
@@ -184,7 +184,7 @@ MACHINE_CONFIG_START(poly_state::poly)
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL_12_0576MHz / 3)
+	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(12'057'600) / 3)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_OUT1_CB(WRITELINE(poly_state, ptm_o2_callback))
 	MCFG_PTM6840_OUT2_CB(WRITELINE(poly_state, ptm_o3_callback))

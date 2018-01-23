@@ -58,8 +58,8 @@ private:
    manufacturing throughout the production of the 2A03. PALC_APU_CLOCK is
    the clock rate devised by UMC(?) for PAL Famicom clone hardware.        */
 
-#define N2A03_NTSC_XTAL           XTAL_21_4772MHz
-#define N2A03_PAL_XTAL            XTAL_26_601712MHz
+#define N2A03_NTSC_XTAL           XTAL(21'477'272)
+#define N2A03_PAL_XTAL            XTAL(26'601'712)
 #define NTSC_APU_CLOCK      (N2A03_NTSC_XTAL/12) /* 1.7897726666... MHz */
 #define PAL_APU_CLOCK       (N2A03_PAL_XTAL/16) /* 1.662607 MHz */
 #define PALC_APU_CLOCK      (N2A03_PAL_XTAL/15) /* 1.77344746666... MHz */

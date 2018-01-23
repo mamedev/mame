@@ -214,7 +214,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_8MHz
+#define MASTER_CLOCK    XTAL(8'000'000)
 
 
 class mpu12wbk_state : public driver_device

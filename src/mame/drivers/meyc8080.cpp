@@ -583,7 +583,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(meyc8080_state::meyc8080)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_20MHz / 10) // divider guessed
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(20'000'000) / 10) // divider guessed
 	MCFG_CPU_PROGRAM_MAP(meyc8080_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

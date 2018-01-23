@@ -44,7 +44,7 @@ HSync - 15.510kHz
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_18_432MHz
+#define MAIN_CLOCK XTAL(18'432'000)
 
 class ichibanjyan_state : public driver_device
 {

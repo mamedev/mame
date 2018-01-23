@@ -940,7 +940,7 @@ void isa8_ega_device::change_mode()
 	}
 
 	/* Check for changes to the crtc input clock and number of pixels per clock */
-	clock = ( ( m_misc_output & 0x0c ) ? 16257000 : XTAL_14_31818MHz );
+	clock = ( ( m_misc_output & 0x0c ) ? 16257000 : 14318181 );
 	pixels = ( ( m_sequencer.data[0x01] & 0x01 ) ? 8 : 9 );
 
 	if ( m_sequencer.data[0x01] & 0x08 )

@@ -1853,10 +1853,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(captaven_state::captaven)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz/4) /* verified on pcb (Data East 101 custom)*/
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'000'000)/4) /* verified on pcb (Data East 101 custom)*/
 	MCFG_CPU_PROGRAM_MAP(captaven_map)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4/3)  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/4/3)  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(h6280_sound_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
@@ -1867,7 +1867,7 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	MCFG_DECO_IRQ_VBLANK_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(captaven_state, screen_update_captaven)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1919,34 +1919,34 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz/9) /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000)/9) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, PIN7_HIGH)  /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
+	MCFG_OKIM6295_ADD("oki1", XTAL(32'220'000)/32, PIN7_HIGH)  /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, PIN7_HIGH) /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
+	MCFG_OKIM6295_ADD("oki2", XTAL(32'220'000)/16, PIN7_HIGH) /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
 // DE-0380-2
 MACHINE_CONFIG_START(fghthist_state::fghthist)
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz / 4)
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(fghthist_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz / 8)
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(h6280_sound_custom_latch_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(fghthist_state, screen_update_fghthist)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fghthist)
@@ -2034,7 +2034,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(fghthist_state::fghthistu, fghthsta)
 	MCFG_DEVICE_REMOVE("audiocpu")
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32_22MHz / 9)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'220'000) / 9)
 	MCFG_CPU_PROGRAM_MAP(z80_sound_mem)
 	MCFG_CPU_IO_MAP(z80_sound_io)
 
@@ -2054,7 +2054,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dragngun_state::dragngun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz / 4)
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(dragngun_map)
 
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)
@@ -2071,7 +2071,7 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 	//MCFG_SCREEN_PALETTE("palette")
 
@@ -2167,7 +2167,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz / 4)
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(lockload_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
@@ -2193,7 +2193,7 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 
 	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
@@ -2281,7 +2281,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update_nslasher)
 	
 	MCFG_DECO_ACE_ADD("deco_ace")
@@ -2344,7 +2344,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nslasher_state::nslasher)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28_322MHz / 4)
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'322'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(nslasher_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
@@ -2360,7 +2360,7 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28_322MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'322'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update_nslasher)
 
 	MCFG_DECO_ACE_ADD("deco_ace")

@@ -488,11 +488,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(toki_state::toki) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz /2)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL(20'000'000) /2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(toki_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toki_state,  irq1_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4) // verified on pcb
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(toki_audio_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(toki_audio_opcodes_map)
 
@@ -517,11 +517,11 @@ MACHINE_CONFIG_START(toki_state::toki) /* KOYO 20.000MHz near the cpu */
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_14_31818MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4)
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, PIN7_HIGH) // verified on pcb
+	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH) // verified on pcb
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)

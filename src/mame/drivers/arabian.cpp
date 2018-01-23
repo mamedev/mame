@@ -55,7 +55,7 @@
 
 
 /* constants */
-#define MAIN_OSC        XTAL_12MHz
+#define MAIN_OSC        XTAL(12'000'000)
 
 
 /*************************************

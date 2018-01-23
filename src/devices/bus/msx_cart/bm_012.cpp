@@ -47,7 +47,7 @@ MACHINE_CONFIG_START(msx_cart_bm_012_device::device_add_mconfig)
 	// - PIO
 	// - CGC
 	// - WDT
-	MCFG_CPU_ADD("tmpz84c015af", TMPZ84C015, XTAL_12MHz/2)         /* 6 MHz */
+	MCFG_CPU_ADD("tmpz84c015af", TMPZ84C015, XTAL(12'000'000)/2)         /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(bm_012_memory_map)
 	// PIO callbacks
 	MCFG_TMPZ84C015_IN_PA_CB(DEVREAD8("bm012_pio", z80pio_device, pa_r))
@@ -60,7 +60,7 @@ MACHINE_CONFIG_START(msx_cart_bm_012_device::device_add_mconfig)
 
 	// Sony CXK5864BSP-10L  (8KB ram)
 	// Sharp LH0081A Z80A-PIO-0 - For communicating between the MSX and the TMP
-	MCFG_DEVICE_ADD("bm012_pio", Z80PIO, XTAL_3_579545MHz)  // ?????
+	MCFG_DEVICE_ADD("bm012_pio", Z80PIO, XTAL(3'579'545))  // ?????
 	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("tmpz84c015af", tmpz84c015_device, pa_w))
 	MCFG_Z80PIO_IN_PA_CB(DEVREAD8("tmpz84c015af", tmpz84c015_device, pa_r))
 	MCFG_Z80PIO_OUT_PB_CB(DEVWRITE8("tmpz84c015af", tmpz84c015_device, pb_w))

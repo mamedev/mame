@@ -429,11 +429,11 @@ INTERRUPT_GEN_MEMBER(pacland_state::mcu_vblank_irq)
 MACHINE_CONFIG_START(pacland_state::pacland)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_49_152MHz/32) /* 1.536 MHz */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(49'152'000)/32) /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacland_state,  main_vblank_irq)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL_49_152MHz/8) /* 6.144 MHz? */
+	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8) /* 6.144 MHz? */
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pacland_state,  mcu_vblank_irq)
@@ -444,7 +444,7 @@ MACHINE_CONFIG_START(pacland_state::pacland)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 3*8, 39*8, 264, 2*8, 30*8)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 3*8, 39*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(pacland_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -456,7 +456,7 @@ MACHINE_CONFIG_START(pacland_state::pacland)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL_49_152MHz/2/1024)
+	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2/1024)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

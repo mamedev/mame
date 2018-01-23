@@ -321,7 +321,7 @@ MACHINE_CONFIG_START(symbolics_state::symbolics)
 	//XTALS: 16MHz @H11 (68k CPU clock)
 	//       4.9152MHz @J5 (driving the two MPSCs serial clocks)
 	//       66.67MHz @J10 (main lispcpu/system clock)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
 	MCFG_CPU_PROGRAM_MAP(m68k_mem)
 	MCFG_CPU_IO_MAP(m68k_io)
 

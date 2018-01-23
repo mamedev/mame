@@ -72,7 +72,7 @@ const tiny_rom_entry *cgenie_fdc_device::device_rom_region() const
 MACHINE_CONFIG_START(cgenie_fdc_device::device_add_mconfig)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", cgenie_fdc_device, timer_callback, attotime::from_msec(25))
 
-	MCFG_FD1793_ADD("fd1793", XTAL_1MHz)
+	MCFG_FD1793_ADD("fd1793", XTAL(1'000'000))
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(cgenie_fdc_device, intrq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", cgenie_floppies, "ssdd", cgenie_fdc_device::floppy_formats)

@@ -1755,17 +1755,17 @@ WRITE8_MEMBER(taitosj_state::taitosj_dacvol_w)
 MACHINE_CONFIG_START(taitosj_state::nomcu)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,XTAL_8MHz/2)      /* 8 MHz / 2, on CPU board */
+	MCFG_CPU_ADD("maincpu",Z80,XTAL(8'000'000)/2)      /* 8 MHz / 2, on CPU board */
 	MCFG_CPU_PROGRAM_MAP(taitosj_main_nomcu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitosj_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_6MHz/2)    /* 6 MHz / 2, on GAME board */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(6'000'000)/2)    /* 6 MHz / 2, on GAME board */
 	MCFG_CPU_PROGRAM_MAP(taitosj_audio_map)
 			/* interrupts: */
 			/* - no interrupts synced with vblank */
 			/* - NMI triggered by the main CPU */
 			/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
-	MCFG_CPU_PERIODIC_INT_DRIVER(taitosj_state, irq0_line_hold,  (double)XTAL_6MHz/(4*16*16*10*16))
+	MCFG_CPU_PERIODIC_INT_DRIVER(taitosj_state, irq0_line_hold, XTAL(6'000'000)/(4*16*16*10*16))
 
 
 	/* video hardware */
@@ -1790,23 +1790,23 @@ MACHINE_CONFIG_START(taitosj_state::nomcu)
 	MCFG_INPUT_MERGER_ANY_HIGH("soundnmi2")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC53 (this is the only AY which uses proper mixing resistors, the 3 below have outputs tied together)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC51
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC51
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitosj_state, taitosj_dacvol_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC49
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC49
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitosj_state, input_port_4_f0_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("ay4", AY8910, XTAL_6MHz/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC50
+	MCFG_SOUND_ADD("ay4", AY8910, XTAL(6'000'000)/4) // 6mhz/4 on GAME board, AY-3-8910 @ IC50
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_SINGLE_OUTPUT)
 	/* TODO: Implement ay4 Port A bits 0 and 1 which connect to a 7416 open
 	   collector inverter, to selectively tie none, either or both of two
@@ -1833,7 +1833,7 @@ MACHINE_CONFIG_DERIVED(taitosj_state::mcu, nomcu)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(taitosj_main_mcu_map)
 
-	MCFG_CPU_ADD("bmcu", TAITO_SJ_SECURITY_MCU, XTAL_3MHz)   /* xtal is 3MHz, divided by 4 internally */
+	MCFG_CPU_ADD("bmcu", TAITO_SJ_SECURITY_MCU, XTAL(3'000'000))   /* xtal is 3MHz, divided by 4 internally */
 	MCFG_TAITO_SJ_SECURITY_MCU_INT_MODE(LATCH)
 	MCFG_TAITO_SJ_SECURITY_MCU_68READ_CB(READ8(taitosj_state, mcu_mem_r))
 	MCFG_TAITO_SJ_SECURITY_MCU_68WRITE_CB(WRITE8(taitosj_state, mcu_mem_w))

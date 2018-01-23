@@ -591,11 +591,11 @@ void snk68_state::tile_callback_notpow(int &tile, int& fx, int& fy, int& region)
 MACHINE_CONFIG_START(snk68_state::pow)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_18MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pow_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", snk68_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_8MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
@@ -604,7 +604,7 @@ MACHINE_CONFIG_START(snk68_state::pow)
 	// the screen parameters are guessed but should be accurate. They
 	// give a theoretical refresh rate of 59.1856Hz while the measured
 	// rate on a SAR board is 59.16Hz.
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384, 0, 256, 264, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 384, 0, 256, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(snk68_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -622,7 +622,7 @@ MACHINE_CONFIG_START(snk68_state::pow)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2) /* verified on pcb  */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(8'000'000)/2) /* verified on pcb  */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

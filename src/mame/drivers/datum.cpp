@@ -179,7 +179,7 @@ WRITE8_MEMBER( datum_state::pb_w )
 
 MACHINE_CONFIG_START(datum_state::datum)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6802, XTAL_4MHz) // internally divided to 1 MHz
+	MCFG_CPU_ADD("maincpu",M6802, XTAL(4'000'000)) // internally divided to 1 MHz
 	MCFG_CPU_PROGRAM_MAP(datum_mem)
 
 	/* video hardware */

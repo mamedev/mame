@@ -395,7 +395,7 @@ WRITE8_MEMBER( hp9k_state::kbd_put )
 
 MACHINE_CONFIG_START(hp9k_state::hp9k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu",M68000, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(hp9k_mem)
 
 	/* video hardware */
@@ -411,7 +411,7 @@ MACHINE_CONFIG_START(hp9k_state::hp9k)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hp9k)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL_16MHz / 16)
+	MCFG_MC6845_ADD("mc6845", MC6845, "screen", XTAL(16'000'000) / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 MACHINE_CONFIG_END

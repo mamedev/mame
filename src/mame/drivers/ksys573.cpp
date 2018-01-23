@@ -2061,7 +2061,7 @@ void ksys573_state::cr589_config(device_t *device)
 
 MACHINE_CONFIG_START(ksys573_state::konami573)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
 	MCFG_CPU_PROGRAM_MAP( konami573_map )
 
 	MCFG_RAM_MODIFY( "maincpu:ram" )
@@ -2105,13 +2105,13 @@ MACHINE_CONFIG_START(ksys573_state::konami573)
 	MCFG_ADDRESS_MAP_BANK_STRIDE( 0x400000 )
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
 	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&ksys573_state::sys573_vblank, this ))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker", "rspeaker" )
 
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
+	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.0 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 
@@ -2125,7 +2125,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(ksys573_state::k573d, konami573)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( konami573d_map )
-	MCFG_KONAMI_573_DIGITAL_IO_BOARD_ADD( "k573dio", XTAL_19_6608MHz )
+	MCFG_KONAMI_573_DIGITAL_IO_BOARD_ADD( "k573dio", XTAL(19'660'800) )
 MACHINE_CONFIG_END
 
 // Variants with additional analogue i/o board

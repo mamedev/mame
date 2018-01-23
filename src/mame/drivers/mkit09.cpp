@@ -193,7 +193,7 @@ WRITE8_MEMBER( mkit09_state::pb_w )
 
 MACHINE_CONFIG_START(mkit09_state::mkit09)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mkit09_mem)
 	MCFG_CPU_IO_MAP(mkit09_io)
 
@@ -219,7 +219,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(mkit09_state::mkit09a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mkit09a_mem)
 	MCFG_CPU_IO_MAP(mkit09_io)
 

@@ -51,7 +51,7 @@
 ***************************************************************************/
 
 
-#define MASTER_CLOCK        XTAL_21_4772MHz     /* Dumper notes poorly refers to a 21.?727 Xtal. */
+#define MASTER_CLOCK        XTAL(21'477'272)     /* Dumper notes poorly refers to a 21.?727 Xtal. */
 
 
 #include "emu.h"

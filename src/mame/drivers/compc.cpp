@@ -195,11 +195,11 @@ MACHINE_CONFIG_START(compc_state::compc)
 	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
 	MCFG_DEVICE_REMOVE("mb:pit8253")
 	MCFG_DEVICE_ADD("mb:pit8253", FE2010_PIT, 0)
-	MCFG_PIT8253_CLK0(XTAL_14_31818MHz/12.0) /* heartbeat IRQ */
+	MCFG_PIT8253_CLK0(XTAL(14'318'181)/12.0) /* heartbeat IRQ */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL_14_31818MHz/12.0) /* dram refresh */
+	MCFG_PIT8253_CLK1(XTAL(14'318'181)/12.0) /* dram refresh */
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(ibm5160_mb_device, pc_pit8253_out1_changed))
-	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12.0) /* pio port c pin 4, and speaker polling enough */
+	MCFG_PIT8253_CLK2(XTAL(14'318'181)/12.0) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(ibm5160_mb_device, pc_pit8253_out2_changed))
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "mda", false)

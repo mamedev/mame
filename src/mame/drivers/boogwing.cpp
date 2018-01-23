@@ -96,6 +96,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#define MAIN_XTAL XTAL(28'000'000)
+#define SOUND_XTAL XTAL(32'220'000)
 
 READ16_MEMBER( boogwing_state::boogwing_protection_region_0_104_r )
 {
@@ -338,20 +340,17 @@ DECO16IC_BANK_CB_MEMBER(boogwing_state::bank_callback2)
 MACHINE_CONFIG_START(boogwing_state::boogwing)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 14000000)   /* DE102 */
+	MCFG_CPU_ADD("maincpu", M68000, MAIN_XTAL/2)   /* DE102 */
 	MCFG_CPU_PROGRAM_MAP(boogwing_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", boogwing_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", H6280, 32220000/4)
+	MCFG_CPU_ADD("audiocpu", H6280, SOUND_XTAL/4)
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248) // same as robocop2(cninja.cpp)? verify this from real pcb.
 	MCFG_SCREEN_UPDATE_DRIVER(boogwing_state, screen_update_boogwing)
 
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -412,17 +411,17 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", 32220000/9)
+	MCFG_YM2151_ADD("ymsnd", SOUND_XTAL/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(boogwing_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", 32220000/32, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", SOUND_XTAL/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.40)
 
-	MCFG_OKIM6295_ADD("oki2", 32220000/16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", SOUND_XTAL/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 MACHINE_CONFIG_END
@@ -662,8 +661,8 @@ DRIVER_INIT_MEMBER(boogwing_state,boogwing)
 	memcpy(dst, src, 0x100000);
 }
 
-GAME( 1992, boogwing, 0,        boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "Boogie Wings (Euro v1.5, 92.12.07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, boogwingu,boogwing, boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "Boogie Wings (USA v1.7, 92.12.14)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1992, boogwinga,boogwing, boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "Boogie Wings (Asia v1.5, 92.12.07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, boogwing, 0,        boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "Boogie Wings (Euro v1.5, 92.12.07)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, boogwingu,boogwing, boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "Boogie Wings (USA v1.7, 92.12.14)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, boogwinga,boogwing, boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "Boogie Wings (Asia v1.5, 92.12.07)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, ragtime,  boogwing, boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "The Great Ragtime Show (Japan v1.5, 92.12.07)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, ragtimea, boogwing, boogwing, boogwing, boogwing_state,  boogwing,  ROT0, "Data East Corporation", "The Great Ragtime Show (Japan v1.3, 92.11.26)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
