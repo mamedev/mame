@@ -140,6 +140,16 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 }
 
 
+void k051649_device::device_clock_changed()
+{
+	m_rate = clock()/16;
+	m_mclock = clock();
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(m_rate);
+	else
+		m_stream = machine().sound().stream_alloc(*this, 0, 1, m_rate);
+}
+
 /********************************************************************************/
 
 

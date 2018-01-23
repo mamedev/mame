@@ -572,6 +572,10 @@ static ADDRESS_MAP_START( namcona2_main_map, AS_PROGRAM, 16, namcona1_state )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( c219_map, 0, 16, namcona1_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("workram")
+ADDRESS_MAP_END
+
 /* ----- NA-1 MCU handling ----------------------------------- */
 
 READ16_MEMBER(namcona1_state::na1mcu_shared_r)
@@ -695,7 +699,6 @@ WRITE8_MEMBER(namcona1_state::port8_w)
 void namcona1_state::machine_start()
 {
 	m_mEnableInterrupts = 0;
-	m_c140->set_base(m_workram);
 
 	save_item(NAME(m_mEnableInterrupts));
 	save_item(NAME(m_count));
@@ -966,6 +969,7 @@ MACHINE_CONFIG_START(namcona1_state::namcona1)
 
 	MCFG_C140_ADD("c140", 44100)
 	MCFG_C140_BANK_TYPE(ASIC219)
+	MCFG_DEVICE_ADDRESS_MAP(0, c219_map)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END

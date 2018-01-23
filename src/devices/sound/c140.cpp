@@ -89,19 +89,37 @@ static inline int limit(int32_t in)
 c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, C140, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, device_rom_interface(mconfig, *this, 21, ENDIANNESS_BIG, 16)
 	, m_sample_rate(0)
 	, m_stream(nullptr)
 	, m_banking_type(C140_TYPE::SYSTEM2)
 	, m_mixer_buffer_left(nullptr)
 	, m_mixer_buffer_right(nullptr)
 	, m_baserate(0)
-	, m_rom_ptr(*this, DEVICE_SELF)
-	, m_pRom(nullptr)
 {
 	memset(m_REG, 0, sizeof(uint8_t)*0x200);
 	memset(m_pcmtbl, 0, sizeof(int16_t)*8);
 }
 
+
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void c140_device::rom_bank_updated()
+{
+	m_stream->update();
+}
+
+
+void c140_device::device_clock_changed()
+{
+	m_sample_rate = m_baserate = clock();
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(m_sample_rate);
+	else
+		m_stream = machine().sound().stream_alloc(*this, 0, 2, m_sample_rate);
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -112,11 +130,6 @@ void c140_device::device_start()
 	m_sample_rate = m_baserate = clock();
 
 	m_stream = stream_alloc(0, 2, m_sample_rate);
-
-	if (m_rom_ptr != nullptr)
-	{
-		m_pRom = m_rom_ptr;
-	}
 
 	/* make decompress pcm table */     //2000.06.26 CAB
 	int32_t segbase = 0;
@@ -135,7 +148,7 @@ void c140_device::device_start()
 
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
 	m_mixer_buffer_left = std::make_unique<int16_t[]>(m_sample_rate);
-	m_mixer_buffer_right = std::make_unique<int16_t[]>(m_sample_rate);;
+	m_mixer_buffer_right = std::make_unique<int16_t[]>(m_sample_rate);
 
 	save_item(NAME(m_REG));
 
@@ -151,6 +164,7 @@ void c140_device::device_start()
 		save_item(NAME(m_voi[i].lvol), i);
 		save_item(NAME(m_voi[i].frequency), i);
 		save_item(NAME(m_voi[i].bank), i);
+		save_item(NAME(m_voi[i].base), i);
 		save_item(NAME(m_voi[i].mode), i);
 		save_item(NAME(m_voi[i].sample_start), i);
 		save_item(NAME(m_voi[i].sample_end), i);
@@ -172,8 +186,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	int32_t   sdt;
 	int32_t   st,ed,sz;
 
-	int8_t    *pSampleData;
-	int32_t   frequency,delta,offset,pos;
+	int32_t   frequency,delta,offset,pos,base;
 	int32_t   cnt, voicecnt;
 	int32_t   lastdt,prevdt,dltdt;
 	float   pbase=(float)m_baserate*2.0f / (float)m_sample_rate;
@@ -219,7 +232,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 			sz=ed-st;
 
 			/* Retrieve base pointer to the sample data */
-			pSampleData = m_pRom + find_sample(st, v->bank, i);
+			base = find_sample(st, v->bank, i);
 
 			/* Fetch back previous data pointers */
 			offset=v->ptoffset;
@@ -257,7 +270,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 						}
 
 						/* Read the chosen sample byte */
-						dt=pSampleData[pos];
+						dt=(int8_t)read_byte(base+pos);
 
 						/* decompress to 13bit range */     //2000.06.26 CAB
 						sdt=dt>>3;              //signed
@@ -307,7 +320,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 						if (m_banking_type == C140_TYPE::ASIC219)
 						{
-							lastdt = pSampleData[BYTE_XOR_BE(pos)];
+							lastdt = (int8_t)read_byte(BYTE_XOR_BE(base+pos));
 
 							// Sign + magnitude format
 							if ((v->mode & 0x01) && (lastdt & 0x80))
@@ -319,7 +332,7 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 						}
 						else
 						{
-							lastdt=pSampleData[pos];
+							lastdt=(int8_t)read_byte(base+pos);
 						}
 
 						dltdt = (lastdt - prevdt);
@@ -336,7 +349,8 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 
 			/* Save positional data for next callback */
 			v->ptoffset=offset;
-			v->pos=pos;
+			v->pos=pos-pSampleBank;
+			v->base=pSampleBank;
 			v->lastdt=lastdt;
 			v->prevdt=prevdt;
 			v->dltdt=dltdt;
@@ -431,12 +445,6 @@ WRITE8_MEMBER( c140_device::c140_w )
 }
 
 
-void c140_device::set_base(void *base)
-{
-	m_pRom = (int8_t *)base;
-}
-
-
 void c140_device::init_voice( C140_VOICE *v )
 {
 	v->key=0;
@@ -445,6 +453,7 @@ void c140_device::init_voice( C140_VOICE *v )
 	v->lvol=0;
 	v->frequency=0;
 	v->bank=0;
+	v->base=0;
 	v->mode=0;
 	v->sample_start=0;
 	v->sample_end=0;

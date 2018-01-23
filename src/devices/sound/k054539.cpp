@@ -476,6 +476,14 @@ void k054539_device::device_post_load()
 	cur_limit = (rom_addr & 0x80) ? 0x4000 : 0x20000;
 }
 
+void k054539_device::device_clock_changed()
+{
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(clock()/384);
+	else
+		m_stream = machine().sound().stream_alloc(*this, 0, 2, clock()/384);
+}
+
 READ8_MEMBER(k054539_device::read)
 {
 	switch(offset) {
@@ -495,6 +503,11 @@ READ8_MEMBER(k054539_device::read)
 		break;
 	}
 	return regs[offset];
+}
+
+void k054539_device::rom_bank_updated()
+{
+	m_stream->update();
 }
 
 void k054539_device::device_start()
