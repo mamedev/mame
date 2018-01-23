@@ -64,8 +64,8 @@ public:
 	friend constexpr XTAL operator *(unsigned int mult, const XTAL &xtal);
 	friend constexpr XTAL operator *(double       mult, const XTAL &xtal);
 
-	void check(const char *message) const;
-	void check(const std::string &message) const;
+	void validate(const char *message) const;
+	void validate(const std::string &message) const;
 
 private:
 	double m_base_clock, m_current_clock;
@@ -75,7 +75,7 @@ private:
 	static const double known_xtals[];
 	static double last_correct_value, xtal_error_low, xtal_error_high;
 	static void fail(double base_clock, std::string message);
-	static bool check(double base_clock);
+	static bool validate(double base_clock);
 	static void check_ordering();
 };
 
@@ -85,5 +85,9 @@ constexpr XTAL operator /(double       div,  const XTAL &xtal) { return XTAL(xta
 constexpr XTAL operator *(int          mult, const XTAL &xtal) { return XTAL(xtal.base(), mult * xtal.dvalue()); }
 constexpr XTAL operator *(unsigned int mult, const XTAL &xtal) { return XTAL(xtal.base(), mult * xtal.dvalue()); }
 constexpr XTAL operator *(double       mult, const XTAL &xtal) { return XTAL(xtal.base(), mult * xtal.dvalue()); }
+
+constexpr XTAL operator ""_Hz_XTAL(long double clock) { return XTAL(double(clock)); }
+constexpr XTAL operator ""_kHz_XTAL(long double clock) { return XTAL(double(clock * 1e3)); }
+constexpr XTAL operator ""_MHz_XTAL(long double clock) { return XTAL(double(clock * 1e6)); }
 
 #endif // MAME_EMU_DRIVERS_XTAL_H
