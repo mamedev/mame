@@ -23,6 +23,7 @@
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
+#include "audio/rad_eu3a05.h"
 
 /*
 
@@ -59,7 +60,10 @@ public:
 	radica_eu3a14_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_unkram(*this, "unkram")
+		m_palram(*this, "palram"),
+		m_dmaparams(*this, "dmaparams"),
+		m_bank(*this, "bank"),
+		m_palette(*this, "palette")
 	{ }
 
 	READ8_MEMBER(irq_vector_r);
@@ -74,6 +78,14 @@ public:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
+	DECLARE_READ8_MEMBER(dma_trigger_r);
+	DECLARE_WRITE8_MEMBER(dma_trigger_w);
+
+	DECLARE_READ8_MEMBER(random_r) { return machine().rand(); };
+
+	// for callback
+	DECLARE_READ8_MEMBER(read_full_space);
+
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -82,8 +94,13 @@ protected:
 	virtual void video_start() override;
 
 private:
+	double hue2rgb(double p, double q, double t);
+
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<uint8_t> m_unkram;
+	required_shared_ptr<uint8_t> m_palram;
+	required_shared_ptr<uint8_t> m_dmaparams;
+	required_device<address_map_bank_device> m_bank;
+	required_device<palette_device> m_palette;
 };
 
 
@@ -91,10 +108,63 @@ void radica_eu3a14_state::video_start()
 {
 }
 
+double radica_eu3a14_state::hue2rgb(double p, double q, double t)
+{
+	if (t < 0) t += 1;
+	if (t > 1) t -= 1;
+	if (t < 1 / 6.0f) return p + (q - p) * 6 * t;
+	if (t < 1 / 2.0f) return q;
+	if (t < 2 / 3.0f) return p + (q - p) * (2 / 3.0f - t) * 6;
+	return p;
+}
+
 uint32_t radica_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
+
+	// Palette
+	int offs = 0;
+	for (int index = 0;index < 512; index++)
+	{
+		uint16_t dat = m_palram[offs++] << 8;
+		dat |= m_palram[offs++];
+
+		// llll lsss ---h hhhh
+		int l_raw = (dat & 0xf800) >> 11;
+		int sl_raw = (dat & 0x0700) >> 8;
+		int h_raw = (dat & 0x001f) >> 0;
+
+		double l = (double)l_raw / 31.0f;
+		double s = (double)sl_raw / 7.0f;
+		double h = (double)h_raw / 24.0f;
+
+	    double r, g, b;
+
+		if (s == 0) {
+			r = g = b = l; // greyscale
+		} else {
+			double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
+			double p = 2 * l - q;
+			r = hue2rgb(p, q, h + 1/3.0f);
+			g = hue2rgb(p, q, h);
+			b = hue2rgb(p, q, h - 1/3.0f);
+		}
+
+		int r_real = r * 255.0f;
+		int g_real = g * 255.0f;
+		int b_real = b * 255.0f;
+
+		m_palette->set_pen_color(index, r_real, g_real, b_real);
+	}	
+
 	return 0;
+}
+
+// sound callback
+READ8_MEMBER(radica_eu3a14_state::read_full_space)
+{
+	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
+	return fullbankspace.read_byte(offset);
 }
 
 // irq controller seems to be like the Radica Space Invaders
@@ -130,15 +200,33 @@ READ8_MEMBER(radica_eu3a14_state::irq_vector_r)
            d000 maps to b000
            e000 maps to c000
 */
+
+
+static ADDRESS_MAP_START( bank_map, AS_PROGRAM, 8, radica_eu3a14_state )          
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("maincpu", 0)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( radica_eu3a14_map, AS_PROGRAM, 8, radica_eu3a14_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x1fff) AM_RAM
 
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("unkram") 
+	AM_RANGE(0x3000, 0x3fff) AM_RAM // runs code from here
 
-	AM_RANGE(0x4800, 0x4bff) AM_RAM
+	AM_RANGE(0x4800, 0x4bff) AM_RAM AM_SHARE("palram")
 
-//	AM_RANGE(0x5000, 0x51ff) AM_RAM
+	AM_RANGE(0x500f, 0x5017) AM_RAM AM_SHARE("dmaparams") 
+	AM_RANGE(0x5018, 0x5018) AM_READWRITE(dma_trigger_r, dma_trigger_w)
+
+	// 508x sound
+	AM_RANGE(0x5080, 0x5091) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_addr_r, radicasi_sound_addr_w)
+	AM_RANGE(0x5092, 0x50a3) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_size_r, radicasi_sound_size_w)
+	AM_RANGE(0x50a4, 0x50a4) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_unk_r, radicasi_sound_unk_w)
+	AM_RANGE(0x50a5, 0x50a5) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_trigger_r, radicasi_sound_trigger_w)
+	AM_RANGE(0x50a8, 0x50a8) AM_DEVREAD("6ch_sound", radica6502_sound_device, radicasi_50a8_r)
+	//AM_RANGE(0x50a9, 0x50a9) AM_READWRITE(radicasi_50a9_r, radicasi_50a9_w)
+
+	AM_RANGE(0x5100, 0x51ff) AM_READ(random_r)
+
 
 	AM_RANGE(0x6000, 0xdfff) AM_ROM AM_REGION("maincpu", 0x8000)
 
@@ -146,6 +234,38 @@ static ADDRESS_MAP_START( radica_eu3a14_map, AS_PROGRAM, 8, radica_eu3a14_state 
 
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000)
 ADDRESS_MAP_END
+
+READ8_MEMBER(radica_eu3a14_state::dma_trigger_r)
+{
+	logerror("%s: dma_trigger_r\n", machine().describe_context());
+	return 0;
+}
+
+WRITE8_MEMBER(radica_eu3a14_state::dma_trigger_w)
+{
+	uint32_t dmasrc = (m_dmaparams[2] << 16) | (m_dmaparams[1] << 8) | (m_dmaparams[0] << 0);
+	uint32_t dmadst = (m_dmaparams[5] << 16) | (m_dmaparams[4] << 8) | (m_dmaparams[3] << 0);
+	uint32_t dmalen = (m_dmaparams[8] << 16) | (m_dmaparams[7] << 8) | (m_dmaparams[6] << 0);
+
+	logerror("%s: dma_trigger_w %02x (src %08x dst %08x size %08x)\n", machine().describe_context(), data, dmasrc, dmadst, dmalen);
+
+	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
+	address_space& destspace = m_maincpu->space(AS_PROGRAM);
+	
+	if (data == 0x08)
+	{
+		for (int i = 0; i < dmalen; i++)
+		{
+			uint8_t dat = fullbankspace.read_byte(dmasrc + i);
+			destspace.write_byte(dmadst + i, dat);
+		}
+	}
+	else
+	{
+		logerror("(UNKNOWN TRIGGER VALUE)\n");
+	}
+}
+
 
 
 static INPUT_PORTS_START( radica_eu3a14 )
@@ -159,14 +279,6 @@ void radica_eu3a14_state::machine_reset()
 {
 	// rather be safe
 	m_maincpu->set_state_int(M6502_S, 0x1ff);
-
-	uint8_t *rom = memregion("maincpu")->base();
-	// should probably just be a DMA
-	for (int i = 0; i < 0x1000; i++)
-	{
-		m_unkram[i] = rom[0x7000+i];
-	}
-
 }
 
 INTERRUPT_GEN_MEMBER(radica_eu3a14_state::interrupt)
@@ -178,12 +290,75 @@ INTERRUPT_GEN_MEMBER(radica_eu3a14_state::interrupt)
 }
 
 
+static const gfx_layout helper_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 0,4,8,12, 16,20,24,28 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	8*32
+};
+
+static const gfx_layout helper2_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0,8,16,24,32,40,48,56 },
+	{ 0*64, 1*64, 2*64, 3*64,4*64,5*64,5*64,6*64,7*64 },
+	8*64
+};
+
+static const gfx_layout helper3_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 0,4,8,12, 16,20,24,28, 32,36,40,44,48,52,56,60  },
+	{ 0 * 64, 1 * 64, 2 * 64, 3 * 64, 4 * 64, 5 * 64, 6 * 64, 7 * 64, 8 * 64, 9 * 64, 10 * 64, 11 * 64, 12 * 64, 13 * 64, 14 * 64, 15 * 64 },
+	16 * 64
+};
+
+static const gfx_layout helper4_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ 0,8,16,24,32,40,48,56,  64, 72, 80, 88, 96, 104, 112, 120 },
+	{ 0 * 128, 1 * 128, 2 * 128, 3 * 128,4 * 128,5 * 128,5 * 128,6 * 128,7 * 128,8 * 128,9 * 128,10 * 128,11 * 128,12 * 128,13 * 128,14 * 128,15 * 128 },
+	16 * 128
+};
+
+
+
+static GFXDECODE_START( helper )
+	GFXDECODE_ENTRY( "maincpu", 0, helper_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper2_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper3_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper4_layout,  0x0, 1  )
+GFXDECODE_END
+
+
 
 MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
 	/* basic machine hardware */	
 	MCFG_CPU_ADD("maincpu",M6502,XTAL(21'477'272)/2) // marked as 21'477'270
 	MCFG_CPU_PROGRAM_MAP(radica_eu3a14_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", radica_eu3a14_state,  interrupt)
+
+	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(bank_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(24)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000)
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", helper)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -194,7 +369,14 @@ MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 256)
+	MCFG_PALETTE_ADD("palette", 512)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_DEVICE_ADD("6ch_sound", RADICA6502_SOUND, 8000)
+	MCFG_RADICA6502_SOUND_SPACE_READ_CB(READ8(radica_eu3a14_state, read_full_space))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_CONFIG_END
 
 ROM_START( rad_gtg )
@@ -202,4 +384,4 @@ ROM_START( rad_gtg )
 	ROM_LOAD16_WORD_SWAP( "goldentee.bin", 0x000000, 0x400000, CRC(b1985c63) SHA1(c42a59fcb665eb801d9ca5312b90e39333e52de4) )
 ROM_END
 
-CONS( 2006, rad_gtg,  0,   0,  radica_eu3a14,  radica_eu3a14, radica_eu3a14_state, 0, "Radica (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_IS_SKELETON )
+CONS( 2006, rad_gtg,  0,   0,  radica_eu3a14,  radica_eu3a14, radica_eu3a14_state, 0, "Radica (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
