@@ -3623,11 +3623,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/rad_eu3a14.cpp",
 	MAME_DIR .. "src/mame/drivers/rad_eu3a05.cpp",
 	MAME_DIR .. "src/mame/audio/rad_eu3a05.cpp",
-	
 	MAME_DIR .. "src/mame/audio/rad_eu3a05.h",
-	
 	MAME_DIR .. "src/mame/machine/rad_eu3a05gpio.cpp",
-	
 	MAME_DIR .. "src/mame/machine/rad_eu3a05gpio.h",
 	MAME_DIR .. "src/mame/drivers/rvoice.cpp",
 	MAME_DIR .. "src/mame/drivers/sacstate.cpp",
