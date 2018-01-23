@@ -351,7 +351,7 @@ static ADDRESS_MAP_START( mt32_io, AS_IO, 16, mt32_state )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(mt32_state::mt32)
-	MCFG_CPU_ADD( "maincpu", P8098, XTAL_12MHz )
+	MCFG_CPU_ADD( "maincpu", P8098, XTAL(12'000'000) )
 	MCFG_CPU_PROGRAM_MAP( mt32_map )
 	MCFG_CPU_IO_MAP( mt32_io )
 

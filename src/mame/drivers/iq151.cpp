@@ -384,7 +384,7 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(iq151_state::iq151)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(iq151_mem)
 	MCFG_CPU_IO_MAP(iq151_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", iq151_state,  iq151_vblank_interrupt)

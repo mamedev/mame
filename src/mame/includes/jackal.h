@@ -2,8 +2,8 @@
 // copyright-holders:Curt Coder
 // thanks-to:Kenneth Lin (original driver author)
 
-#define MASTER_CLOCK         XTAL_18_432MHz
-#define SOUND_CLOCK          XTAL_3_579545MHz
+#define MASTER_CLOCK         XTAL(18'432'000)
+#define SOUND_CLOCK          XTAL(3'579'545)
 
 
 

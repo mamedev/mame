@@ -1744,7 +1744,7 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 
-	MCFG_SOUND_ADD("dmg", DMG_APU, XTAL_4_194304Mhz)
+	MCFG_SOUND_ADD("dmg", DMG_APU, XTAL(4'194'304))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 

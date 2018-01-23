@@ -31,7 +31,7 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sv801_device::device_add_mconfig)
-	MCFG_FD1793_ADD("fdc", XTAL_8MHz / 8)
+	MCFG_FD1793_ADD("fdc", XTAL(8'000'000) / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(sv801_device, intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(sv801_device, drq_w))
 

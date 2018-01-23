@@ -34,7 +34,7 @@ MACHINE_CONFIG_START(southbridge_device::device_add_mconfig)
 	MCFG_PIT8253_CLK2(4772720/4) // pio port c pin 4, and speaker polling enough
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(southbridge_device, at_pit8254_out2_changed))
 
-	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL(14'318'181)/3 )
 	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq0_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(southbridge_device, at_dma8237_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(southbridge_device, pc_dma_read_byte))
@@ -52,7 +52,7 @@ MACHINE_CONFIG_START(southbridge_device::device_add_mconfig)
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(southbridge_device, pc_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(southbridge_device, pc_dack3_w))
 
-	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL(14'318'181)/3 )
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(southbridge_device, pc_dma_hrq_changed))
 	MCFG_I8237_IN_MEMR_CB(READ8(southbridge_device, pc_dma_read_word))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(southbridge_device, pc_dma_write_word))
@@ -456,7 +456,7 @@ SLOT_INTERFACE_END
 MACHINE_CONFIG_START(southbridge_extended_device::device_add_mconfig)
 	southbridge_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL_12MHz)
+	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
 	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(INPUTLINE(":maincpu", INPUT_LINE_RESET))
 	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(INPUTLINE(":maincpu", INPUT_LINE_A20))
 	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir1_w))

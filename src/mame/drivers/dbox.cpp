@@ -599,7 +599,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(dbox_state::dbox)
 	MCFG_CPU_ADD("maincpu", M68340, 0)       // The 68340 has an internal VCO as clock source, hence need no CPU clock
-	MCFG_MC68340_ADD_CRYSTAL(XTAL_32_768kHz) // The dbox uses the VCO and has a crystal as VCO reference and to synthesize internal clocks from
+	MCFG_MC68340_ADD_CRYSTAL(XTAL(32'768)) // The dbox uses the VCO and has a crystal as VCO reference and to synthesize internal clocks from
 	MCFG_CPU_PROGRAM_MAP(dbox_map)
 	MCFG_MC68340_PA_OUTPUT_CB(WRITE8(dbox_state, write_pa))
 

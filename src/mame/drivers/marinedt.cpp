@@ -105,7 +105,7 @@ Lower PCB is plugged in with components facing up.
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_9_987MHz
+#define MAIN_CLOCK XTAL(9'987'000)
 
 class marinedt_state : public driver_device
 {

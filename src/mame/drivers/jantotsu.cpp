@@ -102,7 +102,7 @@ dumped by sayu
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_18_432MHz
+#define MAIN_CLOCK XTAL(18'432'000)
 
 class jantotsu_state : public driver_device
 {
@@ -524,7 +524,7 @@ MACHINE_CONFIG_START(jantotsu_state::jantotsu)
 	MCFG_SOUND_ADD("sn2", SN76489A, MAIN_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("adpcm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(jantotsu_state, jan_adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)  /* 6 KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

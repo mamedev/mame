@@ -173,7 +173,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(sc1_state::sc1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(sc1_mem)
 	MCFG_CPU_IO_MAP(sc1_io)
 
@@ -181,7 +181,7 @@ MACHINE_CONFIG_START(sc1_state::sc1)
 	MCFG_DEFAULT_LAYOUT(layout_sc1)
 
 	/* devices */
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(sc1_state, pio_port_a_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(sc1_state, pio_port_b_r))
 

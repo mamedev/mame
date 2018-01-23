@@ -271,7 +271,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tunhunt_state::tunhunt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz/6)        /* ??? */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'096'000)/6)        /* ??? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(tunhunt_state, irq0_line_hold,  4*60)  /* 48V, 112V, 176V, 240V */
 
@@ -292,12 +292,12 @@ MACHINE_CONFIG_START(tunhunt_state::tunhunt)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("pokey1", POKEY, XTAL_12_096MHz/10)
+	MCFG_SOUND_ADD("pokey1", POKEY, XTAL(12'096'000)/10)
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
 	MCFG_POKEY_OUTPUT_RC(RES_K(1), CAP_U(0.047), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, XTAL_12_096MHz/10)
+	MCFG_SOUND_ADD("pokey2", POKEY, XTAL(12'096'000)/10)
 	MCFG_POKEY_POT0_R_CB(IOPORT("IN1"))
 	MCFG_POKEY_POT1_R_CB(IOPORT("IN2"))
 	MCFG_POKEY_POT2_R_CB(READ8(tunhunt_state, dsw2_0r))

@@ -461,12 +461,12 @@ $a00000 checks have been seen on the Final Lap boards.
 
 /* Define clocks based on actual OSC on the PCB */
 
-#define MAIN_OSC_CLOCK      XTAL_49_152MHz
+#define MAIN_OSC_CLOCK      XTAL(49'152'000)
 #define M68K_CPU_CLOCK      (MAIN_OSC_CLOCK / 4)        /* 12.288MHz clock for 68000 (Master & Slave) */
 #define M68B09_CPU_CLOCK    (MAIN_OSC_CLOCK / 24)       /* 2.048MHz clock for 68B09 sound CPU */
 #define C65_CPU_CLOCK       (MAIN_OSC_CLOCK / 24)       /* 2.048MHz clock for 63705 (or 63B05) I/O CPU */
 #define C68_CPU_CLOCK       (MAIN_OSC_CLOCK / 6)        /* 8.192MHz clock for 37450 I/O CPU */
-#define YM2151_SOUND_CLOCK  XTAL_3_579545MHz            /* 3.579545MHz FM clock */
+#define YM2151_SOUND_CLOCK  XTAL(3'579'545)            /* 3.579545MHz FM clock */
 #define C140_SOUND_CLOCK    (MAIN_OSC_CLOCK / 384 / 6)  /* 21.333kHz C140 clock (was 8000000/374 or 21.390kHz) */
 
 

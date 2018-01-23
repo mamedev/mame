@@ -17,7 +17,7 @@
 #include "machine/cxd1095.h"
 //#include "sound/ay8910.h"
 
-#define MAIN_CLOCK XTAL_16MHz // Unknown clock
+#define MAIN_CLOCK XTAL(16'000'000) // Unknown clock
 
 class korgm1_state : public driver_device
 {

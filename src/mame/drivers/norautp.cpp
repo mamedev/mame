@@ -557,8 +557,8 @@
 #include "noraut12.lh"
 
 
-#define NORAUT_MASTER_CLOCK     XTAL_18_432MHz
-#define DPHL_MASTER_CLOCK       XTAL_18MHz
+#define NORAUT_MASTER_CLOCK     XTAL(18'432'000)
+#define DPHL_MASTER_CLOCK       XTAL(18'000'000)
 #define NORAUT_CPU_CLOCK        NORAUT_MASTER_CLOCK / 8     /* 2.30275 MHz - Measured: 2.305 MHz */
 #define DPHL_CPU_CLOCK          DPHL_MASTER_CLOCK / 9       /* 2 MHz (from 8224) */
 

@@ -67,7 +67,7 @@ protected:
 
 /*----------- video timing  -----------*/
 
-#define MASTER_CLOCK            XTAL_11MHz
+#define MASTER_CLOCK            XTAL(11'000'000)
 
 #define PIXEL_CLOCK             (MASTER_CLOCK/2)
 #define CPU_CLOCK               (PIXEL_CLOCK)

@@ -126,7 +126,7 @@ void mx2178_state::machine_reset()
 
 MACHINE_CONFIG_START(mx2178_state::mx2178)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_8696MHz / 5) // guess
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'869'600) / 5) // guess
 	MCFG_CPU_PROGRAM_MAP(mx2178_mem)
 	MCFG_CPU_IO_MAP(mx2178_io)
 
@@ -141,13 +141,13 @@ MACHINE_CONFIG_START(mx2178_state::mx2178)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_18_8696MHz / 8) // clk unknown
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(18'869'600) / 8) // clk unknown
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mx2178_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL_18_8696MHz / 30)
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(18'869'600) / 30)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia1", acia6850_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia1", acia6850_device, write_rxc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia2", acia6850_device, write_rxc))

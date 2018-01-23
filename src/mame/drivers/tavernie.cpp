@@ -290,7 +290,7 @@ void tavernie_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(tavernie_state::cpu09)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(cpu09_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(tavernie_state, cpu09)
 
@@ -310,7 +310,7 @@ MACHINE_CONFIG_START(tavernie_state::cpu09)
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL_4MHz / 4)
+	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(4'000'000) / 4)
 	// all i/o lines connect to the 40-pin expansion connector
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_OUT1_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
@@ -363,7 +363,7 @@ MACHINE_CONFIG_DERIVED(tavernie_state::ivg09, cpu09)
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(tavernie_state, pa_ivg_w))
 	MCFG_PIA_CB2_HANDLER(DEVWRITELINE("beeper", beep_device, set_state))
 
-	MCFG_FD1795_ADD("fdc", XTAL_8MHz / 8)
+	MCFG_FD1795_ADD("fdc", XTAL(8'000'000) / 8)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ifd09_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END

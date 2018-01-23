@@ -253,7 +253,7 @@ FLOPPY_FORMATS_END
 
 MACHINE_CONFIG_START(pdc_device::device_add_mconfig)
 	/* CPU - Zilog Z0840006PSC */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz / 2)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(10'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(pdc_mem)
 	MCFG_CPU_IO_MAP(pdc_io)
 	//MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -269,7 +269,7 @@ MACHINE_CONFIG_START(pdc_device::device_add_mconfig)
 	/* DMA Controller - Intel P8237A-5 */
 	/* Channel 0: uPD765a Floppy Disk Controller */
 	/* Channel 1: M68K main system memory */
-	MCFG_DEVICE_ADD(FDCDMA_TAG, AM9517A, XTAL_10MHz / 2)
+	MCFG_DEVICE_ADD(FDCDMA_TAG, AM9517A, XTAL(10'000'000) / 2)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pdc_device, i8237_hreq_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(pdc_device, i8237_eop_w))
 	MCFG_I8237_IN_MEMR_CB(READ8(pdc_device, i8237_dma_mem_r))

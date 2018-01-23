@@ -212,7 +212,7 @@
 
 **********************************************************************************/
 
-#define MASTER_CLOCK    XTAL_18MHz
+#define MASTER_CLOCK    XTAL(18'000'000)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

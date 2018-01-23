@@ -551,7 +551,7 @@ MACHINE_START_MEMBER(champbwl_state,doraemon)
 MACHINE_CONFIG_START(champbwl_state::doraemon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(14'318'181)/4)
 	MCFG_CPU_PROGRAM_MAP(doraemon)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbwl_state,  irq0_line_hold)
 
@@ -579,7 +579,7 @@ MACHINE_CONFIG_START(champbwl_state::doraemon)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("x1snd", X1_010, XTAL_14_31818MHz)
+	MCFG_SOUND_ADD("x1snd", X1_010, XTAL(14'318'181))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

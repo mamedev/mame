@@ -39,7 +39,7 @@ const tiny_rom_entry *sv603_device::device_rom_region() const
 
 MACHINE_CONFIG_START(sv603_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("snd", SN76489A, XTAL_10_738635MHz / 3)
+	MCFG_SOUND_ADD("snd", SN76489A, XTAL(10'738'635) / 3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// cartridge slot

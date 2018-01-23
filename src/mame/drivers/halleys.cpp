@@ -1923,11 +1923,11 @@ void halleys_state::machine_reset()
 
 
 MACHINE_CONFIG_START(halleys_state::halleys)
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_19_968MHz/12) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(19'968'000)/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(halleys_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", halleys_state, halleys_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(6'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(halleys_state, irq0_line_hold,  (double)6000000/(4*16*16*10*16))
 
@@ -1950,16 +1950,16 @@ MACHINE_CONFIG_START(halleys_state::halleys)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay4", AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ay4", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(halleys_state, sndnmi_msk_w)) // port Bwrite
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
@@ -1967,7 +1967,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(halleys_state::benberob, halleys)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_19_968MHz/12) /* not verified but pcb identical to halley's comet */
+	MCFG_CPU_CLOCK(XTAL(19'968'000)/12) /* not verified but pcb identical to halley's comet */
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(halleys_state, benberob_scanline)
 

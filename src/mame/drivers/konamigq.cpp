@@ -316,7 +316,7 @@ MACHINE_RESET_MEMBER(konamigq_state,konamigq)
 
 MACHINE_CONFIG_START(konamigq_state::konamigq)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CXD8530BQ, XTAL_67_7376MHz)
+	MCFG_CPU_ADD("maincpu", CXD8530BQ, XTAL(67'737'600))
 	MCFG_CPU_PROGRAM_MAP(konamigq_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -325,10 +325,10 @@ MACHINE_CONFIG_START(konamigq_state::konamigq)
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&konamigq_state::scsi_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&konamigq_state::scsi_dma_write, this ) )
 
-	MCFG_CPU_ADD("soundcpu", M68000, XTAL_32MHz/4) /* 8MHz - measured */
+	MCFG_CPU_ADD("soundcpu", M68000, XTAL(32'000'000)/4) /* 8MHz - measured */
 	MCFG_CPU_PROGRAM_MAP(konamigq_sound_map)
 
-	MCFG_CPU_ADD("dasp", TMS57002, XTAL_48MHz/2) /* 24MHz - measured */
+	MCFG_CPU_ADD("dasp", TMS57002, XTAL(48'000'000)/2) /* 24MHz - measured */
 	MCFG_CPU_DATA_MAP(konamigq_dasp_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(konamigq_state, tms_sync, 48000)
 
@@ -347,21 +347,21 @@ MACHINE_CONFIG_START(konamigq_state::konamigq)
 	MCFG_AM53CF96_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD("maincpu", "gpu", CXD8538Q, 0x200000, XTAL_53_693175MHz)
+	MCFG_PSXGPU_ADD("maincpu", "gpu", CXD8538Q, 0x200000, XTAL(53'693'175))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K056800_ADD("k056800", XTAL_18_432MHz)
+	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("soundcpu", M68K_IRQ_1))
 
-	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, k054539_map)
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(konamigq_state, k054539_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, k054539_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

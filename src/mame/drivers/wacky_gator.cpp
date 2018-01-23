@@ -274,7 +274,7 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_3_579545MHz)   // HD68B09P
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(3'579'545))   // HD68B09P
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(wackygtr_state, irq0_line_assert, 50)  // FIXME
 
@@ -285,12 +285,12 @@ MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz )
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000) )
 	MCFG_MSM5205_VCLK_CB(WRITELINE(wackygtr_state, adpcm_int))   /* IRQ handler */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 KHz, 4 Bits  */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz )
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("i8255_0", I8255, 0)
@@ -309,19 +309,19 @@ MACHINE_CONFIG_START(wackygtr_state::wackygtr)
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("pit8253_0", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_3_579545MHz/16)  // this is a guess
+	MCFG_PIT8253_CLK0(XTAL(3'579'545)/16)  // this is a guess
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(wackygtr_state, alligator0_ck))
-	MCFG_PIT8253_CLK1(XTAL_3_579545MHz/16)  // this is a guess
+	MCFG_PIT8253_CLK1(XTAL(3'579'545)/16)  // this is a guess
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(wackygtr_state, alligator1_ck))
-	MCFG_PIT8253_CLK2(XTAL_3_579545MHz/16)  // this is a guess
+	MCFG_PIT8253_CLK2(XTAL(3'579'545)/16)  // this is a guess
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(wackygtr_state, alligator2_ck))
 
 	MCFG_DEVICE_ADD("pit8253_1", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_3_579545MHz/16)  // this is a guess
+	MCFG_PIT8253_CLK0(XTAL(3'579'545)/16)  // this is a guess
 	MCFG_PIT8253_OUT0_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
-	MCFG_PIT8253_CLK1(XTAL_3_579545MHz/16)  // this is a guess
+	MCFG_PIT8253_CLK1(XTAL(3'579'545)/16)  // this is a guess
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(wackygtr_state, alligator3_ck))
-	MCFG_PIT8253_CLK2(XTAL_3_579545MHz/16)  // this is a guess
+	MCFG_PIT8253_CLK2(XTAL(3'579'545)/16)  // this is a guess
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(wackygtr_state, alligator4_ck))
 
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)

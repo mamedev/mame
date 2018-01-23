@@ -192,7 +192,7 @@ void mk14_state::machine_reset()
 MACHINE_CONFIG_START(mk14_state::mk14)
 	/* basic machine hardware */
 	// IC1 1SP-8A/600 (8060) SC/MP Microprocessor
-	MCFG_CPU_ADD("maincpu", INS8060, XTAL_4_433619MHz)
+	MCFG_CPU_ADD("maincpu", INS8060, XTAL(4'433'619))
 	MCFG_SCMP_CONFIG(WRITELINE(mk14_state, cass_w), NOOP, READLINE(mk14_state, cass_r), NOOP, READLINE(mk14_state, cass_r), NOOP)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 

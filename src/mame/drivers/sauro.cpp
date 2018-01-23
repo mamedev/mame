@@ -445,7 +445,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sauro_state::tecfri)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)       /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(20'000'000)/4)       /* verified on pcb */
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(sauro_state, irq_reset_w))
@@ -468,7 +468,7 @@ MACHINE_CONFIG_START(sauro_state::tecfri)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_20MHz/8)       /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(20'000'000)/8)       /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

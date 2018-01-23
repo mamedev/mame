@@ -157,7 +157,7 @@ WRITE_LINE_MEMBER( tim100_state::irq_w )
 
 MACHINE_CONFIG_START(tim100_state::tim100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4_9152MHz) // divider unknown
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(4'915'200)) // divider unknown
 	MCFG_CPU_PROGRAM_MAP(tim100_mem)
 	MCFG_CPU_IO_MAP(tim100_io)
 
@@ -171,7 +171,7 @@ MACHINE_CONFIG_START(tim100_state::tim100)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tim100 )
 
-	MCFG_DEVICE_ADD("crtc", I8275, XTAL_4_9152MHz)
+	MCFG_DEVICE_ADD("crtc", I8275, XTAL(4'915'200))
 	MCFG_I8275_CHARACTER_WIDTH(12)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(tim100_state, crtc_display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(WRITELINE(tim100_state, drq_w))

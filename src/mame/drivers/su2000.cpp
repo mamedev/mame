@@ -48,9 +48,9 @@
  *************************************/
 
 #define I486_CLOCK          33000000
-#define MC68000_CLOCK       XTAL_10MHz
-#define TMS320C1_CLOCK      XTAL_33_833MHz
-#define MC88110_CLOCK       XTAL_40MHz
+#define MC68000_CLOCK       XTAL(10'000'000)
+#define TMS320C1_CLOCK      XTAL(33'833'000)
+#define MC88110_CLOCK       XTAL(40'000'000)
 
 
 /*************************************
@@ -137,7 +137,7 @@ MACHINE_CONFIG_START(su2000_state::su2000)
 	MCFG_CPU_ADD("pix_cpu2", MC88110, MC88110_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(pix_cpu_b)
 
-	MCFG_CPU_ADD("format_c", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("format_c", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(formatc_map)
 #endif
 

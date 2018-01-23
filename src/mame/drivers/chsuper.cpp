@@ -355,7 +355,7 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_START(chsuper_state::chsuper)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 4)   /* HD64180RP8, 8 MHz? */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 4)   /* HD64180RP8, 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(chsuper_prg_map)
 	MCFG_CPU_IO_MAP(chsuper_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", chsuper_state,  irq0_line_hold)

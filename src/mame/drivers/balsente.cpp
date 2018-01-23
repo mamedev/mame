@@ -1289,11 +1289,11 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(balsente_state::balsente)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_20MHz/16) /* xtal verified but not speed */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(20'000'000)/16) /* xtal verified but not speed */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", balsente_state,  balsente_update_analog_inputs)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2) /* xtal verified but not speed */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* xtal verified but not speed */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(cpu2_io_map)
 

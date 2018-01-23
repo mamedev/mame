@@ -624,7 +624,7 @@ INTERRUPT_GEN_MEMBER(undrfire_state::undrfire_interrupt)
 MACHINE_CONFIG_START(undrfire_state::undrfire)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20 MHz - NOT verified */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20 MHz - NOT verified */
 	MCFG_CPU_PROGRAM_MAP(undrfire_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  undrfire_interrupt)
 
@@ -677,11 +677,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(undrfire_state::cbombers)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20 MHz - NOT verified */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20 MHz - NOT verified */
 	MCFG_CPU_PROGRAM_MAP(cbombers_cpua_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL_32MHz/2)   /* 16 MHz */
+	MCFG_CPU_ADD("sub", M68000, XTAL(32'000'000)/2)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(cbombers_cpub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", undrfire_state,  irq4_line_hold)
 

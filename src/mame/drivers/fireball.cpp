@@ -40,8 +40,8 @@
 /****************************
 *    Clock defines          *
 ****************************/
-#define CPU_CLK  XTAL_11_0592MHz
-#define AY_CLK  XTAL_11_0592MHz/8
+#define CPU_CLK  XTAL(11'059'200)
+#define AY_CLK  XTAL(11'059'200)/8
 
 
 class fireball_state : public driver_device

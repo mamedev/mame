@@ -10,7 +10,7 @@
 #include "sound/sn76496.h"
 #include "video/k051316.h"
 
-#define XTAL1 XTAL_24MHz
+#define XTAL1 XTAL(24'000'000)
 
 class divebomb_state : public driver_device
 {

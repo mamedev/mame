@@ -170,7 +170,7 @@ WRITE8_MEMBER(ajax_state::volume_callback1)
 MACHINE_CONFIG_START(ajax_state::ajax)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)    /* 052001 12/4 MHz*/
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)    /* 052001 12/4 MHz*/
 	MCFG_CPU_PROGRAM_MAP(ajax_main_map)
 
 	MCFG_CPU_ADD("sub", HD6309E, 3000000) /* ? */
@@ -185,9 +185,9 @@ MACHINE_CONFIG_START(ajax_state::ajax)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 108, 412, 256, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 108, 412, 256, 16, 240)
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
+//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(ajax_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

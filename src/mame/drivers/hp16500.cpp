@@ -484,7 +484,7 @@ MACHINE_CONFIG_START(hp16500_state::hp16500)
 	// connecting it to VBLANK
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("mlc", hp_hil_mlc_device, ap_w))
 
-	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, XTAL_15_92MHz/2)
+	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, XTAL(15'920'000)/2)
 	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(hp16500_state, irq_2))
 
 	// TODO: for now hook up the ipc hil keyboard - this might be replaced

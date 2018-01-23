@@ -320,7 +320,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(suprridr_state::suprridr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_49_152MHz/16)     /* 3 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(49'152'000)/16)     /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suprridr_state,  main_nmi_gen)
@@ -347,10 +347,10 @@ MACHINE_CONFIG_START(suprridr_state::suprridr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_49_152MHz/32)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(49'152'000)/32)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_49_152MHz/32)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(49'152'000)/32)
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

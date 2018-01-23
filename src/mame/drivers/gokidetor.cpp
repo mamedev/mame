@@ -117,7 +117,7 @@ ADDRESS_MAP_END
 
 
 MACHINE_CONFIG_START(gokidetor_state::gokidetor)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4) // divider not verified
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4) // divider not verified
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	// IRQ from ???
 	// NMI related to E002 input and TE7750 port 7

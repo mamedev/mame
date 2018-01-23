@@ -219,7 +219,7 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(miniframe_state::miniframe)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68010, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68010, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(miniframe_mem)
 
 	// internal ram

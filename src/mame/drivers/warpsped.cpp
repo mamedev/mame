@@ -319,7 +319,7 @@ PALETTE_INIT_MEMBER(warpspeed_state, warpspeed)
 MACHINE_CONFIG_START(warpspeed_state::warpspeed)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(warpspeed_map)
 	MCFG_CPU_IO_MAP(warpspeed_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpspeed_state,  irq0_line_hold)

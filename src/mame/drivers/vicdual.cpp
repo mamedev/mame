@@ -63,7 +63,7 @@
 #include "depthch.lh"
 
 
-#define VICDUAL_MASTER_CLOCK                (XTAL_15_468MHz)
+#define VICDUAL_MASTER_CLOCK                (XTAL(15'468'480))
 #define VICDUAL_MAIN_CPU_CLOCK              (VICDUAL_MASTER_CLOCK/8)
 #define VICDUAL_PIXEL_CLOCK                 (VICDUAL_MASTER_CLOCK/3)
 

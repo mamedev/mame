@@ -594,7 +594,7 @@ void spoker_state::machine_reset()
 MACHINE_CONFIG_START(spoker_state::spoker)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)   /* HD64180RP8, 8 MHz? */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 2)   /* HD64180RP8, 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(spoker_map)
 	MCFG_CPU_IO_MAP(spoker_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spoker_state, nmi_line_assert)
@@ -626,17 +626,17 @@ MACHINE_CONFIG_START(spoker_state::spoker)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz / 12, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000) / 12, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED(spoker_state::_3super8, spoker)
 
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_24MHz / 4)    /* z840006, 24/4 MHz? */
+	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(24'000'000) / 4)    /* z840006, 24/4 MHz? */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(spoker_map)
 	MCFG_CPU_IO_MAP(3super8_portmap)

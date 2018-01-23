@@ -52,7 +52,7 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(mc1502_fdc_device::device_add_mconfig)
-	MCFG_FD1793_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_FD1793_ADD("fdc", XTAL(16'000'000) / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mc1502_fdc_device, mc1502_fdc_irq_drq))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mc1502_fdc_device, mc1502_fdc_irq_drq))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mc1502_floppies, "525qd", mc1502_fdc_device::floppy_formats)

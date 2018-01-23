@@ -234,7 +234,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(carpolo_state::carpolo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz/12)       /* 940.75 kHz */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(11'289'000)/12)       /* 940.75 kHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", carpolo_state,  carpolo_timer_interrupt)   /* this not strictly VBLANK,
 	                                                   but it's supposed to happen 60

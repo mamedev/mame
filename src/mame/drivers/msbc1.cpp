@@ -93,7 +93,7 @@ void msbc1_state::machine_reset()
 
 MACHINE_CONFIG_START(msbc1_state::msbc1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(MC68000R12_TAG, M68000, XTAL_12_5MHz)
+	MCFG_CPU_ADD(MC68000R12_TAG, M68000, XTAL(12'500'000))
 	MCFG_CPU_PROGRAM_MAP(msbc1_mem)
 MACHINE_CONFIG_END
 

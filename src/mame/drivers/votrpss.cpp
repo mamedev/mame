@@ -239,7 +239,7 @@ void votrpss_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(votrpss_state::votrpss)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)  /* 4.000 MHz, verified */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)  /* 4.000 MHz, verified */
 	MCFG_CPU_PROGRAM_MAP(votrpss_mem)
 	MCFG_CPU_IO_MAP(votrpss_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(votrpss_state,irq_ack)
@@ -249,7 +249,7 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay", AY8910, XTAL_8MHz/4) /* 2.000 MHz, verified */
+	MCFG_SOUND_ADD("ay", AY8910, XTAL(8'000'000)/4) /* 2.000 MHz, verified */
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))        // port B read
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("votrax", votrax_sc01_device, write))     // port A write
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -272,11 +272,11 @@ MACHINE_CONFIG_START(votrpss_state::votrpss)
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_8MHz) /* Timer 0: baud rate gen for 8251 */
+	MCFG_PIT8253_CLK0(XTAL(8'000'000)) /* Timer 0: baud rate gen for 8251 */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
-	MCFG_PIT8253_CLK1(XTAL_8MHz / 256) /* Timer 1: Pitch */
-	MCFG_PIT8253_CLK2(XTAL_8MHz / 4096) /* Timer 2: Volume */
+	MCFG_PIT8253_CLK1(XTAL(8'000'000) / 256) /* Timer 1: Pitch */
+	MCFG_PIT8253_CLK2(XTAL(8'000'000) / 4096) /* Timer 2: Volume */
 
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(votrpss_state, ppi_pa_r))

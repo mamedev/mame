@@ -207,7 +207,7 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_c_w)
 MACHINE_CONFIG_START(pengadvb_state::pengadvb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635)/3)
 	MCFG_CPU_PROGRAM_MAP(program_mem)
 	MCFG_CPU_IO_MAP(io_mem)
 
@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(pengadvb_state::pengadvb)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(pengadvb_state, pengadvb_ppi_port_c_w))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tms9128", TMS9128, XTAL_10_738635MHz/2)
+	MCFG_DEVICE_ADD("tms9128", TMS9128, XTAL(10'738'635)/2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
@@ -255,7 +255,7 @@ MACHINE_CONFIG_START(pengadvb_state::pengadvb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_10_738635MHz/6)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(10'738'635)/6)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(pengadvb_state, pengadvb_psg_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

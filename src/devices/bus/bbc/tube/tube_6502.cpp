@@ -43,7 +43,7 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_tube_6502_device::device_add_mconfig)
-	MCFG_CPU_ADD("m6502", M65C02, XTAL_12MHz / 4)
+	MCFG_CPU_ADD("m6502", M65C02, XTAL(12'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(tube_6502_mem)
 
 	MCFG_TUBE_ADD("ula")

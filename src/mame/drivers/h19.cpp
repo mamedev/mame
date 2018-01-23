@@ -61,9 +61,9 @@ Address   Description
 
 
 // Standard H19 used a 2.048 MHz clock
-#define H19_CLOCK (XTAL_12_288MHz / 6)
-#define MC6845_CLOCK (XTAL_12_288MHz /8)
-#define INS8250_CLOCK (XTAL_12_288MHz /4)
+#define H19_CLOCK (XTAL(12'288'000) / 6)
+#define MC6845_CLOCK (XTAL(12'288'000) /8)
+#define INS8250_CLOCK (XTAL(12'288'000) /4)
 
 // Capacitor value in pF
 #define H19_KEY_DEBOUNCE_CAPACITOR 5000

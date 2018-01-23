@@ -71,7 +71,7 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK           XTAL_14MHz
+#define MAIN_CLOCK           XTAL(14'000'000)
 #define AY_CLOCK             MAIN_CLOCK / 8     /* 1.75 Mhz */
 #define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */
 #define CPU_CLOCK            MAIN_CLOCK / 4     /* 3.50 Mhz */
@@ -830,7 +830,7 @@ MACHINE_CONFIG_START(squale_state::squale)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("squale_sl", squale_state, squale_scanline, "screen", 0, 10)
 
 	/* Floppy */
-	MCFG_WD1770_ADD("wd1770", XTAL_8MHz )
+	MCFG_WD1770_ADD("wd1770", XTAL(8'000'000) )
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", squale_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop525_list", "squale")

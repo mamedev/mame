@@ -30,8 +30,8 @@ There's a chance that certain bootlegs might have the different 8/20 MHz XTALS.
 #include "speaker.h"
 
 
-#define MAIN_CLOCK      XTAL_8_2MHz
-#define VIDEO_CLOCK     XTAL_19_6MHz
+#define MAIN_CLOCK      XTAL(8'200'000)
+#define VIDEO_CLOCK     XTAL(19'600'000)
 
 
 

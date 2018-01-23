@@ -62,12 +62,12 @@ correctly.
 ***************************************************************************/
 
 /* 12mhz OSC */
-#define MASTER_CLOCK      (XTAL_12MHz)
+#define MASTER_CLOCK      (XTAL(12'000'000))
 #define MAIN_CPU_CLOCK      (MASTER_CLOCK/3)
 #define SOUND_CPU_CLOCK     (MASTER_CLOCK/4)
 #define AUDIO_CLOCK     (MASTER_CLOCK/8)
 /* 20mhz OSC - both Z80s are 4 MHz */
-#define MASTER_CLOCK_1942P     (XTAL_20MHz)
+#define MASTER_CLOCK_1942P     (XTAL(20'000'000))
 #define MAIN_CPU_CLOCK_1942P      (MASTER_CLOCK_1942P/5)
 #define SOUND_CPU_CLOCK_1942P     (MASTER_CLOCK_1942P/5)
 #define AUDIO_CLOCK_1942P     (MASTER_CLOCK_1942P/16)

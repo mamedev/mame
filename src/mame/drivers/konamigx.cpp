@@ -110,8 +110,9 @@
 
 
 // TODO: check on PCB
-#define MASTER_CLOCK XTAL_24MHz
-#define SUB_CLOCK XTAL_16MHz
+#define MASTER_CLOCK XTAL(24'000'000)
+#define SUB_CLOCK XTAL(16'000'000)
+#define PCM_CLOCK XTAL(18'432'000)
 
 /**********************************************************************************/
 /*
@@ -503,7 +504,7 @@ WRITE32_MEMBER(konamigx_state::eeprom_w)
 WRITE32_MEMBER(konamigx_state::control_w)
 {
 	// TODO: derive from reported PCB XTALs
-	const uint32_t pixclock[4] = { XTAL_6MHz, XTAL_8MHz, XTAL_12MHz, XTAL_16MHz};
+	const uint32_t pixclock[4] = { 6'000'000, 8'000'000, 12'000'000, 16'000'000 };
 	//logerror("write %x to control register (mask=%x)\n", data, mem_mask);
 
 	// known controls:
@@ -1677,10 +1678,10 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.3)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.3)
 
-	MCFG_K056800_ADD("k056800", XTAL_18_432MHz)
+	MCFG_K056800_ADD("k056800", PCM_CLOCK)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("soundcpu", M68K_IRQ_1))
 
-	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539_1", K054539, PCM_CLOCK)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, k054539_map)
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(konamigx_state, k054539_irq_gen))
 	MCFG_SOUND_ROUTE_EX(0, "dasp", 0.5, 0)
@@ -1688,7 +1689,7 @@ MACHINE_CONFIG_START(konamigx_state::konamigx)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539_2", K054539, PCM_CLOCK)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, k054539_map)
 	MCFG_SOUND_ROUTE_EX(0, "dasp", 0.5, 2)
 	MCFG_SOUND_ROUTE_EX(1, "dasp", 0.5, 3)

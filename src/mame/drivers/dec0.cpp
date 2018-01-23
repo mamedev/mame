@@ -1595,7 +1595,7 @@ GFXDECODE_END
 
 // DECO video CRTC, pixel clock is unverified (actually 24MHz/4?)
 #define MCFG_SCREEN_RAW_PARAMS_DATA_EAST \
-		MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,8,248)
+		MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,8,248)
 
 
 
@@ -1635,11 +1635,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(dec0_state::dec0, dec0_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(dec0_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_assert) /* VBL */
 
-	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8)
+	MCFG_CPU_ADD("audiocpu", M6502, XTAL(12'000'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
 
 	/* video hardware */
@@ -1651,17 +1651,17 @@ MACHINE_CONFIG_DERIVED(dec0_state::dec0, dec0_base)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000) / 8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL_12MHz / 4)
+	MCFG_SOUND_ADD("ym2", YM3812, XTAL(12'000'000) / 4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 2 / 10, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000) / 2 / 10, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -1679,17 +1679,17 @@ MACHINE_CONFIG_DERIVED(dec0_state::dec1, dec0_base)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ym2", YM3812, XTAL(12'000'000)/4) /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -1800,7 +1800,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec0_automat_state::secretab)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
 	MCFG_CPU_PROGRAM_MAP(secretab_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold)/* VBL */
 
@@ -1871,7 +1871,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(dec0_state::hbarrel, dec0)
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
 	MCFG_CPU_IO_MAP(mcu_io_map)
 
 	/* video hardware */
@@ -1881,7 +1881,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(dec0_state::baddudes, dec0)
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
 	MCFG_CPU_IO_MAP(mcu_io_map)
 
 	/* video hardware */
@@ -1905,7 +1905,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(dec0_state::robocop, dec0)
 
-	MCFG_CPU_ADD("sub", H6280, XTAL_21_4772MHz / 16)
+	MCFG_CPU_ADD("sub", H6280, XTAL(21'477'272) / 16)
 	MCFG_CPU_PROGRAM_MAP(robocop_sub_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3000))  /* Interleave between HuC6280 & 68000 */
@@ -1924,7 +1924,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(dec0_state::hippodrm, dec0)
 
-	MCFG_CPU_ADD("sub", H6280, XTAL_21_4772MHz / 16)
+	MCFG_CPU_ADD("sub", H6280, XTAL(21'477'272) / 16)
 	MCFG_CPU_PROGRAM_MAP(hippodrm_sub_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(300))   /* Interleave between H6280 & 68000 */
@@ -1936,7 +1936,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(dec0_state::ffantasybl, dec0)
 
-//  MCFG_CPU_ADD("sub", H6280, XTAL_21_4772MHz / 16)
+//  MCFG_CPU_ADD("sub", H6280, XTAL(21'477'272) / 16)
 //  MCFG_CPU_PROGRAM_MAP(hippodrm_sub_map)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(300))   /* Interleave between H6280 & 68000 */
@@ -1958,12 +1958,12 @@ MACHINE_RESET_MEMBER(dec0_state,slyspy)
 MACHINE_CONFIG_DERIVED(dec0_state::slyspy, dec1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
 	MCFG_CPU_PROGRAM_MAP(slyspy_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold) /* VBL, apparently it auto-acks */
 
 	// TODO: both games doesn't like /3 here, MT #06740
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_12MHz/2/2) /* verified on pcb (6Mhz is XIN on pin 10 of H6280) */
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL(12'000'000)/2/2) /* verified on pcb (6Mhz is XIN on pin 10 of H6280) */
 	MCFG_CPU_PROGRAM_MAP(slyspy_s_map)
 
 	MCFG_DEVICE_ADD("pfprotect", ADDRESS_MAP_BANK, 0)
@@ -1991,11 +1991,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(dec0_state::midres, dec1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
 	MCFG_CPU_PROGRAM_MAP(midres_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec0_state,  irq6_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_24MHz/4/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL(24'000'000)/4/3) /* verified on pcb (6Mhz is XIN on pin 10 of H6280, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(midres_s_map)
 
 	/* video hardware */
@@ -2012,7 +2012,7 @@ MACHINE_CONFIG_DERIVED(dec0_state::midresb, midres)
 	MCFG_CPU_REPLACE("audiocpu", M6502, 1500000 )
 	MCFG_CPU_PROGRAM_MAP(dec0_s_map)
 
-	MCFG_CPU_ADD("mcu", M68705R3, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("mcu", M68705R3, XTAL(3'579'545))
 
 	MCFG_SOUND_MODIFY("ym2")
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

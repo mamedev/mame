@@ -85,11 +85,11 @@ static SLOT_INTERFACE_START( slicer_floppies )
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(slicer_state::slicer)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(slicer_map)
 	MCFG_CPU_IO_MAP(slicer_io)
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232_1", rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232_2", rs232_port_device, write_txd))
@@ -100,7 +100,7 @@ MACHINE_CONFIG_START(slicer_state::slicer)
 	MCFG_RS232_PORT_ADD("rs232_2", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_b_w))
 
-	MCFG_FD1797_ADD("fdc", XTAL_16MHz/2/8)
+	MCFG_FD1797_ADD("fdc", XTAL(16'000'000)/2/8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int1_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", slicer_floppies, "525dd", floppy_image_device::default_floppy_formats)

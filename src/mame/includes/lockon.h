@@ -11,8 +11,8 @@
 #include "screen.h"
 
 /* Calculated from CRT controller writes */
-#define PIXEL_CLOCK            (XTAL_21MHz / 3)
-#define FRAMEBUFFER_CLOCK      XTAL_10MHz
+#define PIXEL_CLOCK            (XTAL(21'000'000) / 3)
+#define FRAMEBUFFER_CLOCK      XTAL(10'000'000)
 #define HBSTART                320
 #define HBEND                  0
 #define HTOTAL                 448

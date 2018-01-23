@@ -1020,19 +1020,19 @@ GFXDECODE_END
 MACHINE_CONFIG_START(namcos1_state::ns1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(49'152'000)/32)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("subcpu", MC6809E, XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("subcpu", MC6809E, XTAL(49'152'000)/32)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("audiocpu", MC6809E, XTAL(49'152'000)/32)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL_49_152MHz/8)
+	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos1_state,  irq0_line_assert)
@@ -1049,7 +1049,7 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 9+8*8, 9+44*8, 264, 2*8, 30*8)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 9+8*8, 9+44*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos1_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos1_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
@@ -1070,7 +1070,7 @@ MACHINE_CONFIG_START(namcos1_state::ns1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL_49_152MHz/2048/2)
+	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048/2)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_NAMCO_AUDIO_STEREO(1)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)

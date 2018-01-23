@@ -998,7 +998,7 @@ void tek4052_state::machine_start()
 
 MACHINE_CONFIG_START(tek4051_state::tek4051)
 	// basic machine hardware
-	MCFG_CPU_ADD(MC6800_TAG, M6800, XTAL_12_5MHz/15)
+	MCFG_CPU_ADD(MC6800_TAG, M6800, XTAL(12'500'000)/15)
 	MCFG_CPU_PROGRAM_MAP(tek4051_mem)
 
 	// video hardware
@@ -1018,7 +1018,7 @@ MACHINE_CONFIG_START(tek4051_state::tek4051)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", tek4051_state, keyboard_tick, attotime::from_hz(XTAL_12_5MHz/15/4))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", tek4051_state, keyboard_tick, attotime::from_hz(XTAL(12'500'000)/15/4))
 
 	MCFG_DEVICE_ADD(MC6820_X_TAG, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(tek4051_state, x_pia_pa_r))

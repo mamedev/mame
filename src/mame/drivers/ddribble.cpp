@@ -259,15 +259,15 @@ void ddribble_state::machine_reset()
 MACHINE_CONFIG_START(ddribble_state::ddribble)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_18_432MHz/12)  /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu0_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddribble_state,  ddribble_interrupt_0)
 
-	MCFG_CPU_ADD("cpu1", MC6809E, XTAL_18_432MHz/12)  /* verified on pcb */
+	MCFG_CPU_ADD("cpu1", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddribble_state,  ddribble_interrupt_1)
 
-	MCFG_CPU_ADD("cpu2", MC6809E, XTAL_18_432MHz/12)  /* verified on pcb */
+	MCFG_CPU_ADD("cpu2", MC6809E, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synch */
@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(ddribble_state::ddribble)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_AY8910_PORT_B_READ_CB(READ8(ddribble_state, ddribble_vlm5030_busy_r))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ddribble_state, ddribble_vlm5030_ctrl_w))
 	MCFG_SOUND_ROUTE(0, "filter1", 0.25)
@@ -302,7 +302,7 @@ MACHINE_CONFIG_START(ddribble_state::ddribble)
 	MCFG_SOUND_ROUTE(2, "filter3", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.25)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 

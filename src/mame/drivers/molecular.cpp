@@ -55,8 +55,8 @@ TODO:
 #include "speaker.h"
 
 
-#define I86_CLOCK XTAL_24MHz
-#define Z80_CLOCK XTAL_16MHz
+#define I86_CLOCK XTAL(24'000'000)
+#define Z80_CLOCK XTAL(16'000'000)
 
 class molecula_state : public driver_device
 {

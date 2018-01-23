@@ -216,9 +216,9 @@
 #include "formats/2d_dsk.h"
 
 
-#define MAIN_CLOCK XTAL_16MHz
-#define VDP_CLOCK  XTAL_42_9545MHz
-#define MCU_CLOCK  XTAL_6MHz
+#define MAIN_CLOCK XTAL(16'000'000)
+#define VDP_CLOCK  XTAL(42'954'545)
+#define MCU_CLOCK  XTAL(6'000'000)
 
 
 

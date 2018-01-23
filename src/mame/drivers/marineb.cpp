@@ -46,7 +46,7 @@ write
 #include "screen.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK (XTAL_12MHz)
+#define MASTER_CLOCK (XTAL(12'000'000))
 #define CPU_CLOCK (MASTER_CLOCK/4)
 #define SOUND_CLOCK (MASTER_CLOCK/8)
 

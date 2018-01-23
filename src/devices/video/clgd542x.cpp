@@ -198,6 +198,7 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 {
 	uint8_t divisor = 1;
 	float clock;
+	const XTAL xtal = XTAL(14'318'181);
 	uint8_t clocksel = (vga.miscellaneous_output & 0xc) >> 2;
 
 	svga.rgb8_en = 0;
@@ -207,14 +208,13 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 	svga.rgb32_en = 0;
 
 	if(gc_locked || m_vclk_num[clocksel] == 0 || m_vclk_denom[clocksel] == 0)
-		clock = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
+		clock = ((vga.miscellaneous_output & 0xc) ? xtal*2: xtal*1.75).dvalue();
 	else
 	{
 		int numerator = m_vclk_num[clocksel] & 0x7f;
 		int denominator = (m_vclk_denom[clocksel] & 0x3e) >> 1;
 		int mul = m_vclk_denom[clocksel] & 0x01 ? 2 : 1;
-		clock = 14.31818f * ((float)numerator / ((float)denominator * mul));
-		clock *= 1000000;
+		clock = (xtal * numerator / denominator / mul).dvalue();
 	}
 
 	if (!gc_locked && (vga.sequencer.data[0x07] & 0x01))

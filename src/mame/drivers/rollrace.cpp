@@ -248,11 +248,11 @@ INTERRUPT_GEN_MEMBER(rollrace_state::sound_timer_irq)
 MACHINE_CONFIG_START(rollrace_state::rollrace)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_24MHz/8) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80,XTAL(24'000'000)/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rollrace_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rollrace_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_24MHz/16) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rollrace_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(rollrace_state, sound_timer_irq, 4*60)
 
@@ -283,13 +283,13 @@ MACHINE_CONFIG_START(rollrace_state::rollrace)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ay2", AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MCFG_SOUND_ADD("ay2", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MCFG_SOUND_ADD("ay3", AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MCFG_SOUND_ADD("ay3", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 MACHINE_CONFIG_END
 

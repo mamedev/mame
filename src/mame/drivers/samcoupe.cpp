@@ -43,8 +43,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define SAMCOUPE_XTAL_X1  XTAL_24MHz
-#define SAMCOUPE_XTAL_X2  XTAL_4_433619MHz
+#define SAMCOUPE_XTAL_X1  XTAL(24'000'000)
+#define SAMCOUPE_XTAL_X2  XTAL(4'433'619)
 
 
 /***************************************************************************
@@ -545,7 +545,7 @@ MACHINE_CONFIG_START(samcoupe_state::samcoupe)
 
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("lpt2_data_out", "lpt2")
 
-	MCFG_DEVICE_ADD("sambus_clock", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("sambus_clock", MSM6242, XTAL(32'768))
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_FORMATS(tzx_cassette_formats)
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)

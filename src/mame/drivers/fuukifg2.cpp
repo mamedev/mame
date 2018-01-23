@@ -441,10 +441,10 @@ void fuuki16_state::machine_reset()
 MACHINE_CONFIG_START(fuuki16_state::fuuki16)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2) /* 16 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000) / 2) /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(fuuki16_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz / 2) /* 6 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000) / 2) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(fuuki16_sound_map)
 	MCFG_CPU_IO_MAP(fuuki16_sound_io_map)
 
@@ -469,16 +469,16 @@ MACHINE_CONFIG_START(fuuki16_state::fuuki16)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_28_64MHz / 8) /* 3.58 MHz */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(28'640'000) / 8) /* 3.58 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.15)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL_28_64MHz / 8) /* 3.58 MHz */
+	MCFG_SOUND_ADD("ym2", YM3812, XTAL(28'640'000) / 8) /* 3.58 MHz */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32MHz / 32, PIN7_HIGH) /* 1 Mhz */
+	MCFG_OKIM6295_ADD("oki", XTAL(32'000'000) / 32, PIN7_HIGH) /* 1 Mhz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.85)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
 MACHINE_CONFIG_END

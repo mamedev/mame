@@ -149,7 +149,7 @@ rom.
 #include "emu.h"
 #include "t5182.h"
 
-#define T5182_CLOCK     XTAL_14_31818MHz/4
+#define T5182_CLOCK     XTAL(14'318'181)/4
 
 DEFINE_DEVICE_TYPE(T5182, t5182_device, "t5182", "T5182 MCU")
 

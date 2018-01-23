@@ -640,7 +640,7 @@ MACHINE_CONFIG_START(tandy1000_state::tandy1000_common)
 	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_t1000:palette", t1000)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("sn76496", NCR7496, XTAL_14_31818MHz/4)
+	MCFG_SOUND_ADD("sn76496", NCR7496, XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mb:mono", 0.80)
 
 	MCFG_NVRAM_ADD_0FILL("nvram");
@@ -700,7 +700,7 @@ MACHINE_CONFIG_DERIVED(tandy1000_state::t1000sx, t1000hx)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tandy1000_state::t1000rl)
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_28_63636MHz / 3)
+	MCFG_CPU_ADD("maincpu", I8086, XTAL(28'636'363) / 3)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_bank_map)
 	MCFG_CPU_IO_MAP(tandy1000_bank_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
@@ -723,7 +723,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(tandy1000_state::t1000sl2, t1000rl)
 	MCFG_CPU_MODIFY( "maincpu" )
-	MCFG_CPU_CLOCK( XTAL_24MHz / 3 )
+	MCFG_CPU_CLOCK( XTAL(24'000'000) / 3 )
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, nullptr, false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, nullptr, false)
@@ -732,7 +732,7 @@ MACHINE_CONFIG_DERIVED(tandy1000_state::t1000sl2, t1000rl)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tandy1000_state::t1000tl)
-	MCFG_CPU_ADD("maincpu", I80286, XTAL_28_63636MHz / 2)
+	MCFG_CPU_ADD("maincpu", I80286, XTAL(28'636'363) / 2)
 	MCFG_CPU_PROGRAM_MAP(tandy1000_286_map)
 	MCFG_CPU_IO_MAP(tandy1000_16_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)

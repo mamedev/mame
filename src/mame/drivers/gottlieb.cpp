@@ -206,9 +206,9 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 
 #define LOG_AUDIO_DECODE    (0)
 
-#define SYSTEM_CLOCK        XTAL_20MHz
-#define CPU_CLOCK           XTAL_15MHz
-#define NTSC_CLOCK          XTAL_14_31818MHz
+#define SYSTEM_CLOCK        XTAL(20'000'000)
+#define CPU_CLOCK           XTAL(15'000'000)
+#define NTSC_CLOCK          XTAL(14'318'181)
 #define LASERDISC_CLOCK     PERIOD_OF_555_ASTABLE(16000, 10000, 0.001e-6)
 
 #define AUDIORAM_SIZE       0x400

@@ -95,7 +95,7 @@ public:
 };
 
 
-#define CRTC_CLOCK XTAL_3_579545MHz
+#define CRTC_CLOCK XTAL(3'579'545)
 
 void hitpoker_state::video_start()
 {

@@ -422,7 +422,7 @@
 #include "suprstar.lh"
 
 
-#define MASTER_CLOCK    XTAL_16MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
 #define CPU_CLOCK       MASTER_CLOCK/4  /* guess */
 #define SND_CLOCK       MASTER_CLOCK/4  /* guess */
 #define CRTC_CLOCK      MASTER_CLOCK/8  /* guess */

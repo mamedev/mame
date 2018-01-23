@@ -301,11 +301,11 @@ void bottom9_state::machine_reset()
 MACHINE_CONFIG_START(bottom9_state::bottom9)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309E, XTAL_24MHz / 8) // 63C09E
+	MCFG_CPU_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) // 63C09E
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bottom9_state,  bottom9_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bottom9_state, bottom9_sound_interrupt, 8*60)  /* irq is triggered by the main CPU */
 
@@ -342,12 +342,12 @@ MACHINE_CONFIG_START(bottom9_state::bottom9)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("k007232_1", K007232, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("k007232_1", K007232, XTAL(3'579'545))
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(bottom9_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_SOUND_ADD("k007232_2", K007232, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("k007232_2", K007232, XTAL(3'579'545))
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(bottom9_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)

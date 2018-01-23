@@ -171,7 +171,7 @@ Notes:
 #include "machine/namcomcu.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK    XTAL_50_113MHz
+#define MASTER_CLOCK    XTAL(50'113'000)
 
 
 /*************************************************************************/

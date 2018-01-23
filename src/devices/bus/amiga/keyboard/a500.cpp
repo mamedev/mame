@@ -137,7 +137,7 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(a500_kbd_device::device_add_mconfig)
-	MCFG_CPU_ADD("ic1", M6502, XTAL_3MHz / 2)
+	MCFG_CPU_ADD("ic1", M6502, XTAL(3'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mpu6500_map)
 MACHINE_CONFIG_END
 
@@ -279,7 +279,7 @@ void a500_kbd_device::device_reset()
 	m_counter = 0xffff; // not initialized by hardware
 	m_control = 0x00;
 
-	m_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_3MHz / 2));
+	m_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL(3'000'000) / 2));
 	m_watchdog->adjust(attotime::from_msec(54));
 }
 

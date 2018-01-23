@@ -197,7 +197,7 @@ GFXDECODE_END
 /* Machine driver */
 MACHINE_CONFIG_START(llc_state::llc1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'000'000))
 	MCFG_Z80_DAISY_CHAIN(llc1_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(llc1_mem)
 	MCFG_CPU_IO_MAP(llc1_io)
@@ -218,16 +218,16 @@ MACHINE_CONFIG_START(llc_state::llc1)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEFAULT_LAYOUT(layout_llc1)
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_3MHz)
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(3'000'000))
 	MCFG_Z80PIO_IN_PA_CB(READ8(llc_state, llc1_port1_a_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(llc_state, llc1_port1_a_w))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(llc_state, llc1_port1_b_w))
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_3MHz)
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(3'000'000))
 	MCFG_Z80PIO_IN_PA_CB(READ8(llc_state, llc1_port2_a_r))
 	MCFG_Z80PIO_IN_PB_CB(READ8(llc_state, llc1_port2_b_r))
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_3MHz)
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(3'000'000))
 	// timer 0 irq does digit display, and timer 3 irq does scan of the
 	// monitor keyboard.
 	// No idea how the CTC is connected, so guessed.
@@ -241,7 +241,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(llc_state::llc2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'000'000))
 	MCFG_Z80_DAISY_CHAIN(llc2_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(llc2_mem)
 	MCFG_CPU_IO_MAP(llc2_io)
@@ -265,15 +265,15 @@ MACHINE_CONFIG_START(llc_state::llc2)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_3MHz)
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(3'000'000))
 	MCFG_Z80PIO_IN_PA_CB(DEVREAD8(K7659_KEYBOARD_TAG, k7659_keyboard_device, read))
 	MCFG_Z80PIO_IN_PB_CB(READ8(llc_state, llc2_port1_b_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(llc_state, llc2_port1_b_w))
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_3MHz)
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(3'000'000))
 	MCFG_Z80PIO_IN_PA_CB(READ8(llc_state, llc2_port2_a_r))
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_3MHz)
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(3'000'000))
 
 	MCFG_K7659_KEYBOARD_ADD()
 

@@ -105,7 +105,7 @@ PALETTE_INIT_MEMBER(controlidx628_state, controlidx628)
 
 MACHINE_CONFIG_START(controlidx628_state::controlidx628)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I80C32, XTAL_11_0592MHz) /* Actually the board has an Atmel AT89S52 mcu. */
+	MCFG_CPU_ADD("maincpu", I80C32, XTAL(11'059'200)) /* Actually the board has an Atmel AT89S52 mcu. */
 	MCFG_CPU_PROGRAM_MAP(prog_map)
 	MCFG_CPU_IO_MAP(io_map)
 

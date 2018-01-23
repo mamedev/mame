@@ -2341,7 +2341,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 MACHINE_CONFIG_START(subsino2_state::bishjan)
-	MCFG_CPU_ADD("maincpu", H83044, XTAL_44_1MHz / 3)
+	MCFG_CPU_ADD("maincpu", H83044, XTAL(44'100'000) / 3)
 	MCFG_CPU_PROGRAM_MAP( bishjan_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
 
@@ -2377,7 +2377,7 @@ MACHINE_CONFIG_DERIVED(subsino2_state::new2001, bishjan)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(subsino2_state::humlan, bishjan)
-	MCFG_CPU_REPLACE("maincpu", H83044, XTAL_48MHz / 3)
+	MCFG_CPU_REPLACE("maincpu", H83044, XTAL(48'000'000) / 3)
 	MCFG_CPU_PROGRAM_MAP( humlan_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, irq0_line_hold)
 
@@ -2390,7 +2390,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 MACHINE_CONFIG_START(subsino2_state::mtrain)
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown clock */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown clock */
 	MCFG_CPU_PROGRAM_MAP( mtrain_map )
 	MCFG_CPU_IO_MAP( mtrain_io )
 
@@ -2415,7 +2415,7 @@ MACHINE_CONFIG_START(subsino2_state::mtrain)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, PIN7_HIGH)    // probably
+	MCFG_OKIM6295_ADD("oki", XTAL(8'467'200) / 8, PIN7_HIGH)    // probably
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2424,7 +2424,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 MACHINE_CONFIG_START(subsino2_state::saklove)
-	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz*2 )    // !! AMD AM188-EM !!
+	MCFG_CPU_ADD("maincpu", I80188, XTAL(20'000'000)*2 )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( saklove_map )
 	MCFG_CPU_IO_MAP( saklove_io )
 
@@ -2449,10 +2449,10 @@ MACHINE_CONFIG_START(subsino2_state::saklove)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(8'467'200) / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz / 4) // ? chip and clock unknown
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(12'000'000) / 4) // ? chip and clock unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
@@ -2461,7 +2461,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 MACHINE_CONFIG_START(subsino2_state::xplan)
-	MCFG_CPU_ADD("maincpu", I80188, XTAL_20MHz*2 )    // !! AMD AM188-EM !!
+	MCFG_CPU_ADD("maincpu", I80188, XTAL(20'000'000)*2 )    // !! AMD AM188-EM !!
 	MCFG_CPU_PROGRAM_MAP( xplan_map )
 	MCFG_CPU_IO_MAP( xplan_io )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", subsino2_state, am188em_int0_irq)
@@ -2487,7 +2487,7 @@ MACHINE_CONFIG_START(subsino2_state::xplan)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8_4672MHz / 8, PIN7_HIGH)    // probably
+	MCFG_OKIM6295_ADD("oki", XTAL(8'467'200) / 8, PIN7_HIGH)    // probably
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

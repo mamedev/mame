@@ -43,7 +43,7 @@ WRITE_LINE_MEMBER( c64_sfx_sound_expander_cartridge_device::opl_irq_w )
 
 MACHINE_CONFIG_START(c64_sfx_sound_expander_cartridge_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(YM3526_TAG, YM3526, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD(YM3526_TAG, YM3526, XTAL(3'579'545))
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(c64_sfx_sound_expander_cartridge_device, opl_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 

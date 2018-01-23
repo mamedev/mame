@@ -37,7 +37,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK XTAL_6_144MHz
+#define MASTER_CLOCK XTAL(6'144'000)
 
 class namcos16_state : public driver_device
 {

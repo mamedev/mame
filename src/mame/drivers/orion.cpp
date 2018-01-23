@@ -129,7 +129,7 @@ MACHINE_CONFIG_START(orion_state::orion128)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "orion_cass")
 
-	MCFG_FD1793_ADD("fd1793", XTAL_8MHz / 8)
+	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)
@@ -191,7 +191,7 @@ MACHINE_CONFIG_START(orion_state::orionz80)
 
 	MCFG_VIDEO_START_OVERRIDE(orion_state,orion128)
 
-	MCFG_MC146818_ADD( "rtc", XTAL_4_194304Mhz )
+	MCFG_MC146818_ADD( "rtc", XTAL(4'194'304) )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
@@ -208,7 +208,7 @@ MACHINE_CONFIG_START(orion_state::orionz80)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "orion_cass")
 
-	MCFG_FD1793_ADD("fd1793", XTAL_8MHz / 8)
+	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)
@@ -283,7 +283,7 @@ MACHINE_CONFIG_START(orion_state::orionpro)
 
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "orion_cass")
 
-	MCFG_FD1793_ADD("fd1793", XTAL_8MHz / 8)
+	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", orion_floppies, "525qd", orion_state::orion_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1", orion_floppies, "525qd", orion_state::orion_floppy_formats)

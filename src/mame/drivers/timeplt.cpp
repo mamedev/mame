@@ -58,7 +58,7 @@
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 
-#define MASTER_CLOCK         XTAL_18_432MHz
+#define MASTER_CLOCK         XTAL(18'432'000)
 
 /*************************************
  *
@@ -495,9 +495,9 @@ MACHINE_CONFIG_DERIVED(timeplt_state::chkun, bikkuric)
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("timeplt_audio:ay2")
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(timeplt_state, chkun_sound_w))
+	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("^", timeplt_state, chkun_sound_w))
 
-	MCFG_TC8830F_ADD("tc8830f", XTAL_512kHz)
+	MCFG_TC8830F_ADD("tc8830f", XTAL(512'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "timeplt_audio:mono", 0.10)
 MACHINE_CONFIG_END
 

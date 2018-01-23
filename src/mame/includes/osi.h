@@ -21,7 +21,7 @@
 #define DISCRETE_TAG    "discrete"
 
 #define X1          3932160
-#define UK101_X1    XTAL_8MHz
+#define UK101_X1    XTAL(8'000'000)
 
 #define OSI600_VIDEORAM_SIZE    0x400
 #define OSI630_COLORRAM_SIZE    0x400

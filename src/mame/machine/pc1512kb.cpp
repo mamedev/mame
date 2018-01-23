@@ -51,7 +51,7 @@ const tiny_rom_entry *pc1512_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pc1512_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_6MHz)
+	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL(6'000'000))
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pc1512_keyboard_device, kb_bus_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pc1512_keyboard_device, kb_p1_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(pc1512_keyboard_device, kb_p2_r))

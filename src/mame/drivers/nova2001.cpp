@@ -131,7 +131,7 @@ e000 - e7ff        R/W      Work RAM
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_12MHz
+#define MAIN_CLOCK XTAL(12'000'000)
 
 
 /*************************************

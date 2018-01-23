@@ -364,11 +364,11 @@ void chaknpop_state::machine_reset()
 MACHINE_CONFIG_START(chaknpop_state::chaknpop)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz / 6)    // Verified on PCB
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'000'000) / 6)    // Verified on PCB
 	MCFG_CPU_PROGRAM_MAP(chaknpop_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", chaknpop_state,  irq0_line_hold)
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL_18MHz / 6)    // Verified on PCB
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(18'000'000) / 6)    // Verified on PCB
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	/* video hardware */
@@ -387,12 +387,12 @@ MACHINE_CONFIG_START(chaknpop_state::chaknpop)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18MHz / 12)  // Verified on PCB
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'000'000) / 12)  // Verified on PCB
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18MHz / 12)  /* Verified on PCB */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'000'000) / 12)  /* Verified on PCB */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(chaknpop_state, unknown_port_1_w))   // ??
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(chaknpop_state, unknown_port_2_w))    // ??
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)

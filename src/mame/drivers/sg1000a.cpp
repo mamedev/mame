@@ -459,7 +459,7 @@ WRITE8_MEMBER(sg1000a_state::sg1000a_coin_counter_w)
 
 MACHINE_CONFIG_START(sg1000a_state::sg1000a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -470,7 +470,7 @@ MACHINE_CONFIG_START(sg1000a_state::sg1000a)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(sg1000a_state, sg1000a_coin_counter_w))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
@@ -480,12 +480,12 @@ MACHINE_CONFIG_START(sg1000a_state::sg1000a)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(sg1000a_state::sg1000ax, sg1000a)
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5033, XTAL_3_579545MHz)
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5033, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -494,7 +494,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(sg1000a_state::sderby2s, sg1000a)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_10_738635MHz / 3)
+	MCFG_CPU_CLOCK(XTAL(10'738'635) / 3)
 	MCFG_CPU_IO_MAP(sderby2_io_map)
 
 	// Actually uses a Sega 315-5066 chip, which is a TMS9918 and SN76489 in the same package but with RGB output

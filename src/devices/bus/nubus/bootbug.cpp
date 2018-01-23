@@ -46,7 +46,7 @@ DEFINE_DEVICE_TYPE(NUBUS_BOOTBUG, nubus_bootbug_device, "nb_btbug", "Brigent Boo
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(nubus_bootbug_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( "uart_0", NS16450, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "uart_0", NS16450, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport0", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport0", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport0", rs232_port_device, write_rts))

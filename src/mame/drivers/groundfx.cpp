@@ -271,7 +271,7 @@ INTERRUPT_GEN_MEMBER(groundfx_state::interrupt)
 MACHINE_CONFIG_START(groundfx_state::groundfx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20MHz - verified */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20MHz - verified */
 	MCFG_CPU_PROGRAM_MAP(groundfx_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", groundfx_state, interrupt)
 

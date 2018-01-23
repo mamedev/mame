@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(ISA8_MYB3K_COM, isa8_myb3k_com_device, "isa8_myb3k_com", "ADP
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 MACHINE_CONFIG_START(isa8_myb3k_com_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( "usart", I8251, XTAL_15_9744MHz / 8 )
+	MCFG_DEVICE_ADD( "usart", I8251, XTAL(15'974'400) / 8 )
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("com1", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("com1", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("com1", rs232_port_device, write_rts))
@@ -48,9 +48,9 @@ MACHINE_CONFIG_START(isa8_myb3k_com_device::device_add_mconfig)
 
 	/* Timer chip */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_15_9744MHz / 8 ) /* TxC */
+	MCFG_PIT8253_CLK0(XTAL(15'974'400) / 8 ) /* TxC */
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(isa8_myb3k_com_device, pit_txc))
-	MCFG_PIT8253_CLK1(XTAL_15_9744MHz / 8 ) /* RxC */
+	MCFG_PIT8253_CLK1(XTAL(15'974'400) / 8 ) /* RxC */
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(isa8_myb3k_com_device, pit_rxc))
 	// Timer 2 is not used/connected to anything on the schematics
 MACHINE_CONFIG_END

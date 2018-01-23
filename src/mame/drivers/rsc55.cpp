@@ -66,7 +66,7 @@ static ADDRESS_MAP_START( sc55_io, AS_IO, 16, sc55_state )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(sc55_state::sc55)
-	MCFG_CPU_ADD( "maincpu", P8098, XTAL_20MHz )    // probably not?
+	MCFG_CPU_ADD( "maincpu", P8098, XTAL(20'000'000) )    // probably not?
 	MCFG_CPU_PROGRAM_MAP( sc55_map )
 	MCFG_CPU_IO_MAP( sc55_io )
 MACHINE_CONFIG_END

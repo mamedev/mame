@@ -113,7 +113,7 @@ E000-FFFF  | R | D D D D D D D D | 8K ROM
 #define SL_DISPLAY    0x02  // displayed Adder screen,  1=screen1 0=screen0
 #define SL_ACCESS     0x01  // accessable Adder screen, 1=screen1 0=screen0
 
-#define ADDER_CLOCK     (XTAL_8MHz)
+#define ADDER_CLOCK     (XTAL(8'000'000))
 
 
 

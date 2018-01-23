@@ -28,7 +28,7 @@ UNDUMPED:
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_58MHz // Actual Xtal on board
+#define MAIN_CLOCK XTAL(58'000'000) // Actual Xtal on board
 
 class magreel_state : public driver_device
 {

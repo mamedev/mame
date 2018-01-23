@@ -291,7 +291,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_11_289MHz
+#define MASTER_CLOCK    XTAL(11'289'000)
 
 /* Change to 1 to allow fake debug buttons */
 #define NIBBLER_HACK    0

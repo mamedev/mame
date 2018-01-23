@@ -3687,7 +3687,7 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 		sound_data &= ~0x20;
 }
 
-#define MAIN_CLOCK XTAL_28_63636MHz
+#define MAIN_CLOCK XTAL(28'636'363)
 
 MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_CPU_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 mhz

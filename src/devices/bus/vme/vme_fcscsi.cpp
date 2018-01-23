@@ -182,8 +182,8 @@
 
 DEFINE_DEVICE_TYPE(VME_FCSCSI1, vme_fcscsi1_card_device, "fcscsi1", "Force Computer SYS68K/ISCSI-1 Intelligent Mass Storage Controller Board")
 
-#define CPU_CRYSTAL XTAL_20MHz /* Jauch */
-#define PIT_CRYSTAL XTAL_16MHz /* Jauch */
+#define CPU_CRYSTAL XTAL(20'000'000) /* Jauch */
+#define PIT_CRYSTAL XTAL(16'000'000) /* Jauch */
 
 static ADDRESS_MAP_START (fcscsi1_mem, AS_PROGRAM, 16, vme_fcscsi1_card_device)
 	ADDRESS_MAP_UNMAP_HIGH

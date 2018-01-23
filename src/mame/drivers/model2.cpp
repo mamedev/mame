@@ -2128,7 +2128,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-#define VIDEO_CLOCK         XTAL_32MHz
+#define VIDEO_CLOCK         XTAL(32'000'000)
 
 /* original Model 2 */
 MACHINE_CONFIG_START(model2_state::model2o)
@@ -2214,7 +2214,7 @@ static ADDRESS_MAP_START( drive_io_map, AS_IO, 8, model2_state )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(model2_state::sj25_0207_01)
-	MCFG_CPU_ADD("drivecpu", Z80, XTAL_8MHz/2) // confirmed
+	MCFG_CPU_ADD("drivecpu", Z80, XTAL(8'000'000)/2) // confirmed
 	MCFG_CPU_PROGRAM_MAP(drive_map)
 	MCFG_CPU_IO_MAP(drive_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", model2_state,  irq0_line_hold)

@@ -362,19 +362,19 @@ void fanucs15_state::machine_reset()
 
 MACHINE_CONFIG_START(fanucs15_state::fanucs15)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68020, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu", M68020, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_CPU_ADD("pmccpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("pmccpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(pmccpu_mem)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_CPU_ADD("gfxcpu", M68000, XTAL_10MHz)      // wants bit 15 of 70500 to be set
+	MCFG_CPU_ADD("gfxcpu", M68000, XTAL(10'000'000))      // wants bit 15 of 70500 to be set
 	MCFG_CPU_PROGRAM_MAP(gfxcpu_mem)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_CPU_ADD("convcpu", I80286, XTAL_8MHz)      // wants 70500 to return 0x8000 (same as what gfxcpu looks for, basically)
+	MCFG_CPU_ADD("convcpu", I80286, XTAL(8'000'000))      // wants 70500 to return 0x8000 (same as what gfxcpu looks for, basically)
 	MCFG_CPU_PROGRAM_MAP(convcpu_mem)
 MACHINE_CONFIG_END
 

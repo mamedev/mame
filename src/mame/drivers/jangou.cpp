@@ -38,7 +38,7 @@ $c088-$c095 player tiles
 #include "screen.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK    XTAL_19_968MHz
+#define MASTER_CLOCK    XTAL(19'968'000)
 
 class jangou_state : public driver_device
 {
@@ -899,7 +899,7 @@ MACHINE_CONFIG_DERIVED(jangou_state::jngolady, jangou)
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("cvsd")
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(400'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(jangou_state, jngolady_vclk_cb))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

@@ -27,7 +27,7 @@
 #include "machine/watchdog.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK        XTAL_32MHz
+#define MASTER_CLOCK        XTAL(32'000'000)
 
 
 

@@ -38,7 +38,7 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(nascom_fdc_device::device_add_mconfig)
-	MCFG_FD1793_ADD("fd1793", XTAL_16MHz / 4 / 4)
+	MCFG_FD1793_ADD("fd1793", XTAL(16'000'000) / 4 / 4)
 
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:0", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1793:1", nascom_floppies, "55f", nascom_fdc_device::floppy_formats)

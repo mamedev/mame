@@ -391,7 +391,7 @@ static const char *const natodef_sample_names[] =
 
 
 MACHINE_CONFIG_START(thief_state::thief)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(thief_main_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(thief_state, iack)
@@ -403,11 +403,11 @@ MACHINE_CONFIG_START(thief_state::thief)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz/4, 320, 0, 256, 272, 0, 256)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/4, 320, 0, 256, 272, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(thief_state, screen_update_thief)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("tms", TMS9927, XTAL_20MHz/4)
+	MCFG_DEVICE_ADD("tms", TMS9927, XTAL(20'000'000)/4)
 	MCFG_TMS9927_CHAR_WIDTH(8)
 	MCFG_TMS9927_VSYN_CALLBACK(ASSERTLINE("maincpu", 0))
 	MCFG_PALETTE_ADD("palette", 16)
@@ -415,10 +415,10 @@ MACHINE_CONFIG_START(thief_state::thief)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_8MHz/2/4)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(8'000'000)/2/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_8MHz/2/4)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(8'000'000)/2/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)

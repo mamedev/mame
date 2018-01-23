@@ -8,7 +8,7 @@
 #include "screen.h"
 
 
-#define EXERION_MASTER_CLOCK      (XTAL_19_968MHz)   /* verified on pcb */
+#define EXERION_MASTER_CLOCK      (XTAL(19'968'000))   /* verified on pcb */
 #define EXERION_CPU_CLOCK         (EXERION_MASTER_CLOCK / 6)
 #define EXERION_AY8910_CLOCK      (EXERION_CPU_CLOCK / 2)
 #define EXERION_PIXEL_CLOCK       (EXERION_MASTER_CLOCK / 3)

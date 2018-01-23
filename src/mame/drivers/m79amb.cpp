@@ -192,7 +192,7 @@ INTERRUPT_GEN_MEMBER(m79amb_state::m79amb_interrupt)
 MACHINE_CONFIG_START(m79amb_state::m79amb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_19_6608MHz / 10)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(19'660'800) / 10)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m79amb_state,  m79amb_interrupt)
 

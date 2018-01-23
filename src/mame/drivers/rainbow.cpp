@@ -3187,24 +3187,24 @@ MACHINE_CONFIG_START(rainbow_state::rainbow)
 MCFG_DEFAULT_LAYOUT(layout_rainbow)
 
 /* basic machine hardware */
-MCFG_CPU_ADD("maincpu", I8088, XTAL_24_0734MHz / 5)
+MCFG_CPU_ADD("maincpu", I8088, XTAL(24'073'400) / 5)
 MCFG_CPU_PROGRAM_MAP(rainbow8088_map)
 MCFG_CPU_IO_MAP(rainbow8088_io)
 
-MCFG_CPU_ADD("subcpu", Z80, XTAL_24_0734MHz / 6)
+MCFG_CPU_ADD("subcpu", Z80, XTAL(24'073'400) / 6)
 MCFG_CPU_PROGRAM_MAP(rainbowz80_mem)
 MCFG_CPU_IO_MAP(rainbowz80_io)
 MCFG_CPU_VBLANK_INT_DRIVER("screen", rainbow_state, vblank_irq)
 
 /* video hardware */
 MCFG_SCREEN_ADD("screen", RASTER)
-MCFG_SCREEN_RAW_PARAMS(XTAL_24_0734MHz / 6, 442, 0, 400, 264, 0, 240) // ~NTSC compatible video timing (?)
+MCFG_SCREEN_RAW_PARAMS(XTAL(24'073'400) / 6, 442, 0, 400, 264, 0, 240) // ~NTSC compatible video timing (?)
 
 MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
 MCFG_SCREEN_PALETTE("vt100_video:palette")
 MCFG_GFXDECODE_ADD("gfxdecode", "vt100_video:palette", rainbow)
 
-MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, XTAL_24_0734MHz)
+MCFG_DEVICE_ADD("vt100_video", RAINBOW_VIDEO, XTAL(24'073'400))
 
 MCFG_VT_SET_SCREEN("screen")
 MCFG_VT_CHARGEN("chargen")
@@ -3233,7 +3233,7 @@ MCFG_SCREEN_RAW_PARAMS(31188000 / 4 , 496, 0, 400, 262, 0, 240)
 
 MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 
-MCFG_FD1793_ADD(FD1793_TAG, XTAL_24_0734MHz / 24) // no separate 1 Mhz quartz
+MCFG_FD1793_ADD(FD1793_TAG, XTAL(24'073'400) / 24) // no separate 1 Mhz quartz
 MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
 MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":1", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
 //MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":2", rainbow_floppies, "525qd", rainbow_state::floppy_formats)
@@ -3278,15 +3278,15 @@ MCFG_HARDDISK_INTERFACE("corvus_hdd")
 
 MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
-MCFG_DEVICE_ADD("com8116_a", COM8116, XTAL_5_0688MHz)     // Baud rate generator A
+MCFG_DEVICE_ADD("com8116_a", COM8116, XTAL(5'068'800))     // Baud rate generator A
 MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_a_fr_w))
 MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_a_ft_w))
 
-MCFG_DEVICE_ADD("com8116_b", COM8116, XTAL_5_0688MHz) // Baud rate generator B
+MCFG_DEVICE_ADD("com8116_b", COM8116, XTAL(5'068'800)) // Baud rate generator B
 MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_b_fr_w))
 MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_b_ft_w))
 
-MCFG_DEVICE_ADD("upd7201", UPD7201_NEW, XTAL_2_5MHz)    // 2.5 Mhz from schematics
+MCFG_DEVICE_ADD("upd7201", UPD7201_NEW, XTAL(2'500'000))    // 2.5 Mhz from schematics
 MCFG_Z80SIO_OUT_INT_CB(WRITELINE(rainbow_state, mpsc_irq))
 
 MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232_a", rs232_port_device, write_txd))

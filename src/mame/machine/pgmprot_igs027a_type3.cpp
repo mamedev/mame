@@ -197,7 +197,7 @@ MACHINE_CONFIG_START(pgm_arm_type3_state::pgm_arm_type3)
 	MCFG_CPU_PROGRAM_MAP(svg_68k_mem)
 
 	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, XTAL_33MHz)    // 55857G - 33Mhz Xtal, at least on SVG
+	MCFG_CPU_ADD("prot", ARM7, XTAL(33'000'000))    // 55857G - 33Mhz Xtal, at least on SVG
 	MCFG_CPU_PROGRAM_MAP(55857G_arm7_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(pgm_arm_type3_state, pgm_arm_type3_reset)

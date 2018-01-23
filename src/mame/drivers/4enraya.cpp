@@ -156,7 +156,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_8MHz
+#define MAIN_CLOCK XTAL(8'000'000)
 
 
 /***********************************

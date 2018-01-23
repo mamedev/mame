@@ -329,7 +329,7 @@ TIMER_CALLBACK_MEMBER(cxhumax_state::timer_tick)
 				m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 		}
 	}
-	attotime period = attotime::from_hz(XTAL_54MHz)*m_timer_regs.timer[param].timebase;
+	attotime period = attotime::from_hz(XTAL(54'000'000))*m_timer_regs.timer[param].timebase;
 	m_timer_regs.timer[param].timer->adjust(period,param);
 }
 
@@ -375,7 +375,7 @@ WRITE32_MEMBER( cxhumax_state::cx_timers_w )
 			case TIMER_MODE:
 				COMBINE_DATA(&m_timer_regs.timer[index].mode);
 				if(data&1) {
-					attotime period = attotime::from_hz(XTAL_54MHz)*m_timer_regs.timer[index].timebase;
+					attotime period = attotime::from_hz(XTAL(54'000'000))*m_timer_regs.timer[index].timebase;
 					m_timer_regs.timer[index].timer->adjust(period,index);
 				} else {
 					m_timer_regs.timer[index].timer->adjust(attotime::never,index);

@@ -485,7 +485,7 @@ void suprgolf_state::machine_reset()
 	m_msm_nmi_mask = 0;
 }
 
-#define MASTER_CLOCK XTAL_12MHz
+#define MASTER_CLOCK XTAL(12'000'000)
 
 MACHINE_CONFIG_START(suprgolf_state::suprgolf)
 
@@ -530,7 +530,7 @@ MACHINE_CONFIG_START(suprgolf_state::suprgolf)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(suprgolf_state, writeB))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* guess */
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) /* guess */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(suprgolf_state, adpcm_int))      /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

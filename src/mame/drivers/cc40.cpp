@@ -578,7 +578,7 @@ void cc40_state::machine_start()
 MACHINE_CONFIG_START(cc40_state::cc40)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS70C20, XTAL_5MHz / 2)
+	MCFG_CPU_ADD("maincpu", TMS70C20, XTAL(5'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TMS7000_IN_PORTA_CB(READ8(cc40_state, keyboard_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(cc40_state, keyboard_w))

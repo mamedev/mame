@@ -82,7 +82,7 @@ ROM_END
 
 MACHINE_CONFIG_START(bbc_opus3_device::device_add_mconfig)
 	/* fdc */
-	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
+	MCFG_WD1770_ADD("wd1770", XTAL(16'000'000) / 2)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_opus3_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", bbc_floppies, "525qd", floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)

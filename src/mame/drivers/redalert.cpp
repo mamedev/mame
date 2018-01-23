@@ -98,7 +98,7 @@
 #include "includes/redalert.h"
 
 
-#define MAIN_PCB_CLOCK      (XTAL_12_5MHz)
+#define MAIN_PCB_CLOCK      (XTAL(12'500'000))
 #define MAIN_CPU_CLOCK      (MAIN_PCB_CLOCK / 16)
 
 

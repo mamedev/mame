@@ -63,7 +63,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(mits680b_state::mits680b)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_1MHz / 2)
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(1'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	MCFG_DEVICE_ADD("uart_clock", CLOCK, 153600)

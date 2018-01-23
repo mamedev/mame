@@ -893,7 +893,7 @@ Notes:
 
 
 // default values written to CRTC (note: SYS386F does not have this chip)
-#define PIXEL_CLOCK  (XTAL_28_63636MHz/4)
+#define PIXEL_CLOCK  (XTAL(28'636'363)/4)
 
 #define SPI_HTOTAL   (448)
 #define SPI_HBEND    (0)
@@ -1866,12 +1866,12 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 MACHINE_CONFIG_START(seibuspi_state::spi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // AMD or Intel 386DX, 25MHz
+	MCFG_CPU_ADD("maincpu", I386, XTAL(50'000'000)/2) // AMD or Intel 386DX, 25MHz
 	MCFG_CPU_PROGRAM_MAP(spi_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28_63636MHz/4) // Z84C0008PEC, 7.159MHz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'636'363)/4) // Z84C0008PEC, 7.159MHz
 	MCFG_CPU_PROGRAM_MAP(spi_soundmap)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
@@ -1904,7 +1904,7 @@ MACHINE_CONFIG_START(seibuspi_state::spi)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymf", YMF271, XTAL_16_9344MHz)
+	MCFG_SOUND_ADD("ymf", YMF271, XTAL(16'934'400))
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, ymf_irqhandler))
 	MCFG_YMF271_EXT_READ_HANDLER(READ8(seibuspi_state, flashrom_read))
 	MCFG_YMF271_EXT_WRITE_HANDLER(WRITE8(seibuspi_state, flashrom_write))
@@ -1951,7 +1951,7 @@ MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2e, spi)
 	MCFG_DEVICE_REMOVE("soundfifo2")
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL_16_9344MHz)
+	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL(16'934'400))
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, ymf_irqhandler))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1976,13 +1976,13 @@ MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2g, sxx2f) // clocks differ, but other
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") // AMD AM386DX/DX-40, 28.63636MHz
-	MCFG_CPU_CLOCK(XTAL_28_63636MHz)
+	MCFG_CPU_CLOCK(XTAL(28'636'363))
 
 	MCFG_CPU_MODIFY("audiocpu") // Z84C0004PCS, 4.9152MHz
-	MCFG_CPU_CLOCK(XTAL_4_9152MHz)
+	MCFG_CPU_CLOCK(XTAL(4'915'200))
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL_16_384MHz) // 16.384MHz(!)
+	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL(16'384'000)) // 16.384MHz(!)
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, ymf_irqhandler))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1995,7 +1995,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seibuspi_state::sys386i)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, XTAL_40MHz) // AMD 386DX, 40MHz
+	MCFG_CPU_ADD("maincpu", I386, XTAL(40'000'000)) // AMD 386DX, 40MHz
 	MCFG_CPU_PROGRAM_MAP(sys386i_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
@@ -2020,10 +2020,10 @@ MACHINE_CONFIG_START(seibuspi_state::sys386i)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/20, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", XTAL(28'636'363)/20, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/20, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", XTAL(28'636'363)/20, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -2052,7 +2052,7 @@ DRIVER_INIT_MEMBER(seibuspi_state,sys386f)
 MACHINE_CONFIG_START(seibuspi_state::sys386f)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // Intel i386DX, 25MHz
+	MCFG_CPU_ADD("maincpu", I386, XTAL(50'000'000)/2) // Intel i386DX, 25MHz
 	MCFG_CPU_PROGRAM_MAP(sys386f_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
@@ -2076,7 +2076,7 @@ MACHINE_CONFIG_START(seibuspi_state::sys386f)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_384MHz)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'384'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

@@ -238,7 +238,7 @@ protected:
 
 
 /* constants */
-#define MASTER_CLOCK    XTAL_50MHz
+#define MASTER_CLOCK    XTAL(50'000'000)
 
 
 

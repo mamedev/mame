@@ -55,7 +55,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(km035_device::device_add_mconfig)
-	MCFG_CPU_ADD(KM035_CPU_TAG, I8035, XTAL_4_608MHz)
+	MCFG_CPU_ADD(KM035_CPU_TAG, I8035, XTAL(4'608'000))
 	MCFG_CPU_PROGRAM_MAP(km035_map)
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(km035_device, bus_w))
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(km035_device, p1_r))

@@ -78,7 +78,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_14_31818MHz
+#define MASTER_CLOCK        XTAL(14'318'181)
 
 
 /*************************************

@@ -373,7 +373,7 @@ DRIVER_INIT_MEMBER( amust_state, amust )
 
 MACHINE_CONFIG_START(amust_state::amust)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", amust_state, irq_vs)
@@ -395,7 +395,7 @@ MACHINE_CONFIG_START(amust_state::amust)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz / 8)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(14'318'181) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(amust_state, crtc_update_row)

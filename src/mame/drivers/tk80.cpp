@@ -255,7 +255,7 @@ WRITE8_MEMBER( tk80_state::mikrolab_serial_w )
 
 MACHINE_CONFIG_START(tk80_state::tk80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18_432MHz / 9)
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'432'000) / 9)
 	MCFG_CPU_PROGRAM_MAP(tk80_mem)
 	MCFG_CPU_IO_MAP(tk80_io)
 
@@ -283,7 +283,7 @@ MACHINE_CONFIG_DERIVED(tk80_state::mikrolab, tk80)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tk80_state::nd80z)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_1MHz) // Sharp LH0080A, can't see writing on xtal
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(1'000'000)) // Sharp LH0080A, can't see writing on xtal
 	MCFG_CPU_PROGRAM_MAP(tk85_mem)
 	MCFG_CPU_IO_MAP(nd80z_io)
 
@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(tk80_state::nd80z)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(tk80_state::tk85, tk80)
-	MCFG_CPU_REPLACE("maincpu", I8085A, XTAL_4_9152MHz)
+	MCFG_CPU_REPLACE("maincpu", I8085A, XTAL(4'915'200))
 	MCFG_CPU_PROGRAM_MAP(tk85_mem)
 	MCFG_CPU_IO_MAP(tk80_io)
 MACHINE_CONFIG_END

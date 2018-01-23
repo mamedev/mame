@@ -47,12 +47,12 @@ DEFINE_DEVICE_TYPE(DECOBSMT, decobsmt_device, "decobsmt", "Data East/Sega/Stern 
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(decobsmt_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6809_TAG, MC6809E, XTAL_24MHz / 12) // 68B09E U6 (E & Q = 2 MHz according to manual)
+	MCFG_CPU_ADD(M6809_TAG, MC6809E, XTAL(24'000'000) / 12) // 68B09E U6 (E & Q = 2 MHz according to manual)
 	MCFG_CPU_PROGRAM_MAP(decobsmt_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(decobsmt_device, decobsmt_firq_interrupt, 489) /* Fixed FIRQ of 489Hz as measured on real (pinball) machine */
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_BSMT2000_ADD(BSMT_TAG, XTAL_24MHz)
+	MCFG_BSMT2000_ADD(BSMT_TAG, XTAL(24'000'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, bsmt_map)
 	MCFG_BSMT2000_READY_CALLBACK(decobsmt_device, bsmt_ready_callback)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)

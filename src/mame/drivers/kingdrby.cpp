@@ -136,8 +136,8 @@ public:
 };
 
 
-#define CLK_1   XTAL_20MHz
-#define CLK_2   XTAL_3_579545MHz
+#define CLK_1   XTAL(20'000'000)
+#define CLK_2   XTAL(3'579'545)
 
 
 /*************************************

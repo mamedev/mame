@@ -700,14 +700,14 @@ void taitoair_state::machine_reset()
 MACHINE_CONFIG_START(taitoair_state::airsys)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) // MC68000P12
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) // MC68000P12
 	MCFG_CPU_PROGRAM_MAP(airsys_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoair_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz / 4)   // Z8400AB1
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)   // Z8400AB1
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_CPU_ADD("dsp", TMS32025, XTAL_36MHz) // Unverified
+	MCFG_CPU_ADD("dsp", TMS32025, XTAL(36'000'000)) // Unverified
 	MCFG_CPU_PROGRAM_MAP(DSP_map_program)
 	MCFG_CPU_DATA_MAP(DSP_map_data)
 	MCFG_TMS32025_HOLD_IN_CB(READ16(taitoair_state, dsp_HOLD_signal_r))
@@ -750,7 +750,7 @@ MACHINE_CONFIG_START(taitoair_state::airsys)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz / 2)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000) / 2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)

@@ -317,7 +317,7 @@ void socrates_state::kbmcu_sim_fifo_head_clear()
 void socrates_state::machine_start()
 {
 	m_kbmcu_sim_timer = timer_alloc(TIMER_KBMCU_SIM);
-	m_kbmcu_sim_timer->adjust(attotime::from_hz((XTAL_21_4772MHz/6)/3000)); // timer rate is a massive guess, depends on instructions per loop of mcu
+	m_kbmcu_sim_timer->adjust(attotime::from_hz((XTAL(21'477'272)/6)/3000)); // timer rate is a massive guess, depends on instructions per loop of mcu
 	m_clear_speech_timer = timer_alloc(TIMER_CLEAR_SPEECH);
 	m_clear_irq_timer = timer_alloc(TIMER_CLEAR_IRQ);
 	save_item(NAME(m_rom_bank));
@@ -995,7 +995,7 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(common_rom_bank_r, common_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
 	AM_RANGE(0x08, 0x08) AM_READWRITE(common_ram_bank_r, common_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
 	AM_RANGE(0x10, 0x17) AM_READWRITE(read_f3, socrates_sound_w) AM_MIRROR (0x8) /* sound section:
-	0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL_21_4772MHz/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
+	0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL(21'477'272)/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
 	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
 	0x12 - W - 0b***EVVVV enable, volume control for channel 1
 	0x13 - W - 0b***EVVVV enable, volume control for channel 2
@@ -1448,7 +1448,7 @@ TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_sim_cb)
 
 MACHINE_CONFIG_START(socrates_state::socrates)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272)/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -1486,7 +1486,7 @@ MACHINE_CONFIG_START(socrates_state::socrates)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL_21_4772MHz/(512+256)) // this is correct, as strange as it sounds.
+	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256)) // this is correct, as strange as it sounds.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "socrates_cart")
@@ -1496,7 +1496,7 @@ MACHINE_CONFIG_START(socrates_state::socrates)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(socrates_state::socrates_pal, socrates)
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_26_601712MHz/8)
+	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(26'601'712)/8)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
@@ -1509,13 +1509,13 @@ MACHINE_CONFIG_DERIVED(socrates_state::socrates_pal, socrates)
 	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 229) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
 	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
 
-	MCFG_SOUND_REPLACE("soc_snd", SOCRATES_SOUND, XTAL_26_601712MHz/(512+256)) // this is correct, as strange as it sounds.
+	MCFG_SOUND_REPLACE("soc_snd", SOCRATES_SOUND, XTAL(26'601'712)/(512+256)) // this is correct, as strange as it sounds.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(iqunlim_state::iqunlimz)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) /* not accurate */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000)) /* not accurate */
 	MCFG_CPU_PROGRAM_MAP(iqunlimz_mem)
 	MCFG_CPU_IO_MAP(iqunlimz_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", iqunlim_state,  assert_irq)
@@ -1558,7 +1558,7 @@ MACHINE_CONFIG_START(iqunlim_state::iqunlimz)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL_21_4772MHz/(512+256))
+	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)

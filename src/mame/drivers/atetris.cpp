@@ -60,8 +60,8 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_14_31818MHz
-#define BOOTLEG_CLOCK       XTAL_14_7456MHz
+#define MASTER_CLOCK        XTAL(14'318'181)
+#define BOOTLEG_CLOCK       XTAL(14'745'600)
 
 
 /*************************************

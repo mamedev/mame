@@ -1657,13 +1657,13 @@ MACHINE_CONFIG_START(cps_state::kodb)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("2151", XTAL_3_579545MHz)  /* verified on pcb */
+	MCFG_YM2151_ADD("2151", XTAL(3'579'545))  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
 	/* CPS PPU is fed by a 16mhz clock,pin 117 outputs a 4mhz clock which is divided by 4 using 2 74ls74 */
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4/4, PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/4/4, PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -2298,13 +2298,13 @@ MACHINE_CONFIG_START(cps_state::sgyxz)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("2151", XTAL_3_579545MHz)  /* verified on pcb */
+	MCFG_YM2151_ADD("2151", XTAL(3'579'545))  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
 	/* CPS PPU is fed by a 16mhz clock,pin 117 outputs a 4mhz clock which is divided by 4 using 2 74ls74 */
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4/4, PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/4/4, PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -2558,12 +2558,12 @@ DRIVER_INIT_MEMBER(cps_state, punipic3)
 MACHINE_CONFIG_START(cps_state::sf2m1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz )
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000) )
 	MCFG_CPU_PROGRAM_MAP(sf2m1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cps_state, cps1_int_ack)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(sgyxz_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,sf2m1)
@@ -2583,11 +2583,11 @@ MACHINE_CONFIG_START(cps_state::sf2m1)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_YM2151_ADD("2151", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("2151", XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4/4, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/4/4, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -3025,12 +3025,12 @@ MACHINE_CONFIG_START(cps_state::varthb)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("2151", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("2151", XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4/4, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/4/4, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

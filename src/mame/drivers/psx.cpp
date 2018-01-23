@@ -493,7 +493,7 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(psx1_state::psj)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
 	MCFG_CPU_PROGRAM_MAP( psx_map )
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -511,11 +511,11 @@ MACHINE_CONFIG_START(psx1_state::psj)
 	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_txd))
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
+	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
@@ -540,7 +540,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psx1_state::pse)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL(67'737'600) )
 	MCFG_CPU_PROGRAM_MAP( psx_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -559,11 +559,11 @@ MACHINE_CONFIG_START(psx1_state::pse)
 
 	/* video hardware */
 	/* TODO: visible area and refresh rate */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
+	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 

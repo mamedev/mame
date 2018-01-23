@@ -502,7 +502,7 @@ void vidbrain_state::machine_reset()
 
 MACHINE_CONFIG_START(vidbrain_state::vidbrain)
 	// basic machine hardware
-	MCFG_CPU_ADD(F3850_TAG, F8, XTAL_4MHz/2)
+	MCFG_CPU_ADD(F3850_TAG, F8, XTAL(4'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(vidbrain_mem)
 	MCFG_CPU_IO_MAP(vidbrain_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vidbrain_state,vidbrain_int_ack)
@@ -522,7 +522,7 @@ MACHINE_CONFIG_START(vidbrain_state::vidbrain)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	// devices
-	MCFG_DEVICE_ADD(F3853_TAG, F3853, XTAL_4MHz/2)
+	MCFG_DEVICE_ADD(F3853_TAG, F3853, XTAL(4'000'000)/2)
 	MCFG_F3853_EXT_INPUT_CB(vidbrain_state, f3853_int_req_w)
 
 	// cartridge

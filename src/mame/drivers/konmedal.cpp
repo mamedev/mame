@@ -383,7 +383,7 @@ void konmedal_state::machine_reset()
 
 MACHINE_CONFIG_START(konmedal_state::tsukande)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(medal_main)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
 
@@ -409,14 +409,14 @@ MACHINE_CONFIG_START(konmedal_state::tsukande)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL_16_9344MHz) // 16.9344MHz xtal verified on PCB
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400)) // 16.9344MHz xtal verified on PCB
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konmedal_state::ddboy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(ddboy_main)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
 
@@ -441,11 +441,11 @@ MACHINE_CONFIG_START(konmedal_state::ddboy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_14_31818MHz/14, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(14'318'181)/14, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
-	MCFG_K051649_ADD("k051649", XTAL_14_31818MHz/8)
+	MCFG_K051649_ADD("k051649", XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
@@ -543,7 +543,7 @@ WRITE8_MEMBER(konmedal_state::shuri_vrom_bank_w)
 
 MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 3) // divisor unknown
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000) / 3) // divisor unknown
 	MCFG_CPU_PROGRAM_MAP(shuriboy_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konmedal_state, scanline, "screen", 0, 1)
 
@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_K051649_ADD("k051649", XTAL_24MHz / 12) // divisor unknown
+	MCFG_K051649_ADD("k051649", XTAL(24'000'000) / 12) // divisor unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
 	// upd7759c

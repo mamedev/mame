@@ -318,7 +318,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(buster_state::buster)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_3_579545MHz)        /* ? MHz */
+	MCFG_CPU_ADD("maincpu", Z80,XTAL(3'579'545))        /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(mainmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", buster_state,  irq0_line_hold)
 
@@ -331,7 +331,7 @@ MACHINE_CONFIG_START(buster_state::buster)
 	MCFG_SCREEN_UPDATE_DRIVER(buster_state, screen_update_buster)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_3_579545MHz/4) //unknown clock / type
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(3'579'545)/4) //unknown clock / type
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 

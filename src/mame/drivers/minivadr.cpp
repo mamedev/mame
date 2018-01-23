@@ -109,7 +109,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(minivadr_state::minivadr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 6)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000) / 6)
 	MCFG_CPU_PROGRAM_MAP(minivadr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", minivadr_state, irq0_line_hold)
 
