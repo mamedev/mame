@@ -194,7 +194,7 @@ public:
 	static void static_set_char_ram_write(device_t &device, char_ram_write_delegate &&cb) { downcast<cdp1869_device &>(device).m_out_char_ram_func = std::move(cb); }
 	static void static_set_pcb_read(device_t &device, pcb_read_delegate &&cb) { downcast<cdp1869_device &>(device).m_in_pcb_func = std::move(cb); }
 	static void static_set_color_clock(device_t &device, int color_clock) { downcast<cdp1869_device &>(device).m_color_clock = color_clock; }
-	static void static_set_color_clock(device_t &device, const XTAL &xtal) { xtal.check("selecting cdp1869 clock"); static_set_color_clock(device, xtal.value()); }
+	static void static_set_color_clock(device_t &device, const XTAL &xtal) { xtal.validate("selecting cdp1869 clock"); static_set_color_clock(device, xtal.value()); }
 
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
 	virtual DECLARE_ADDRESS_MAP(char_map, 8);
