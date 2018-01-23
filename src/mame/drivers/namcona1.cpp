@@ -573,7 +573,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( c219_map, 0, 16, namcona1_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_SHARE("workram")
+	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
+	AM_RANGE(0x00000, 0x7ffff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
 /* ----- NA-1 MCU handling ----------------------------------- */
@@ -968,7 +969,7 @@ MACHINE_CONFIG_START(namcona1_state::namcona1)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_C140_ADD("c140", 44100)
-	MCFG_C140_BANK_TYPE(ASIC219)
+	MCFG_IS_C219(true)
 	MCFG_DEVICE_ADDRESS_MAP(0, c219_map)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)

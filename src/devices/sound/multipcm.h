@@ -15,8 +15,6 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
 
-	void set_bank(uint32_t leftoffs, uint32_t rightoffs);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -96,8 +94,6 @@ private:
 	slot_t *m_slots;
 	uint32_t m_cur_slot;
 	uint32_t m_address;
-	uint32_t m_bank_right;
-	uint32_t m_bank_left;
 	float m_rate;
 
 	uint32_t *m_attack_step;

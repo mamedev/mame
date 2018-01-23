@@ -1081,13 +1081,15 @@ WRITE8_MEMBER(segas32_state::sound_bank_hi_w)
 
 WRITE8_MEMBER(segas32_state::multipcm_bank_w)
 {
-	m_multipcm->set_bank(0x80000 * ((data >> 3) & 7), 0x80000 * (data & 7));
+	membank("pcmbank1")->set_base(memregion("sega")->base() + (0x80000 * (data & 7)));
+	membank("pcmbank2")->set_base(memregion("sega")->base() + (0x80000 * ((data >> 3) & 7)));
 }
 
 
 WRITE8_MEMBER(segas32_state::scross_bank_w)
 {
-	m_multipcm->set_bank(0x80000 * (data & 7), 0x80000 * (data & 7));
+	membank("pcmbank1")->set_base(memregion("sega")->base() + (0x80000 * (data & 7)));
+	membank("pcmbank2")->set_base(memregion("sega")->base() + (0x80000 * (data & 7)));
 }
 
 
@@ -1210,6 +1212,12 @@ static ADDRESS_MAP_START( multi32_sound_portmap, AS_IO, 8, segas32_state )
 	AM_RANGE(0xf1, 0xf1) AM_READWRITE(sound_dummy_r, sound_dummy_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( mpcm_map, AS_IO, 8, segas32_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("sega", 0)
+	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK("pcmbank1")
+	AM_RANGE(0x180000, 0x1fffff) AM_ROMBANK("pcmbank2")
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -2613,6 +2621,7 @@ MACHINE_CONFIG_START(sega_multi32_state::device_add_mconfig)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.40)
 
 	MCFG_SOUND_ADD("sega", MULTIPCM, MASTER_CLOCK/4)
+	MCFG_DEVICE_ADDRESS_MAP(0, mpcm_map)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 

@@ -554,6 +554,14 @@ READ8_MEMBER( segaorun_state::sound_data_r )
 	return m_soundlatch->read(space, 0);
 }
 
+READ8_MEMBER( segaorun_state::pcm_r )
+{
+	uint8_t *rom = memregion("pcm")->base();
+	uint32_t size = memregion("pcm")->bytes();
+	offset = ((offset >> 1) & ~0xffff) | (offset & 0xffff);
+	return rom[offset % size];
+}
+
 
 
 //**************************************************************************
@@ -933,6 +941,11 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segaorun_state )
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( segapcm_map, 0, 8, segaorun_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
+	AM_RANGE(0x00000, 0xfffff) AM_READ(pcm_r)
+ADDRESS_MAP_END
+
 
 
 //**************************************************************************
@@ -1233,7 +1246,7 @@ MACHINE_CONFIG_START(segaorun_state::outrun_base)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
 	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/4)
-	MCFG_SEGAPCM_BANK(BANK_512)
+	MCFG_DEVICE_ADDRESS_MAP(0, segapcm_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

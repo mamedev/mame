@@ -74,6 +74,8 @@ public:
 
 	// Z80 sound CPU read/write handlers
 	DECLARE_READ8_MEMBER( sound_data_r );
+	
+	DECLARE_READ8_MEMBER( pcm_r );
 
 	// game-specific driver init
 	DECLARE_DRIVER_INIT(generic);

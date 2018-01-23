@@ -17,8 +17,8 @@
 #define MCFG_C140_REPLACE(tag, clock) \
 		MCFG_DEVICE_REPLACE((tag), C140, (clock))
 
-#define MCFG_C140_BANK_TYPE(type) \
-		c140_device::set_bank_type(*device, (c140_device::C140_TYPE::type));
+#define MCFG_IS_C219(type) \
+		c140_device::set_c219(*device, type);
 
 
 //**************************************************************************
@@ -32,17 +32,10 @@ class c140_device : public device_t,
 					public device_sound_interface
 {
 public:
-	enum class C140_TYPE
-	{
-		SYSTEM2,
-		SYSTEM21,
-		ASIC219
-	};
-
 	c140_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
-	static void set_bank_type(device_t &device, C140_TYPE bank) { downcast<c140_device &>(device).m_banking_type = bank; }
+	static void set_c219(device_t &device, bool c219) { downcast<c140_device &>(device).m_is_c219 = c219; }
 
 	DECLARE_READ8_MEMBER( c140_r );
 	DECLARE_WRITE8_MEMBER( c140_w );
@@ -90,7 +83,7 @@ private:
 
 	int m_sample_rate;
 	sound_stream *m_stream;
-	C140_TYPE m_banking_type;
+	bool m_is_c219;
 	/* internal buffers */
 	std::unique_ptr<int16_t[]> m_mixer_buffer_left;
 	std::unique_ptr<int16_t[]> m_mixer_buffer_right;

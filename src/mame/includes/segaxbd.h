@@ -55,6 +55,8 @@ public:
 
 	// sound Z80 CPU read/write handlers
 	DECLARE_READ8_MEMBER(sound_data_r);
+	DECLARE_READ8_MEMBER(pcm_r);
+	DECLARE_READ8_MEMBER(pcm2_r);
 
 	// video updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
