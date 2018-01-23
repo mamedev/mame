@@ -204,7 +204,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 2008-08
 Dip locations verified with US conversion kit manual.
 
-Todo:
+TODO:
 	Blend function aren't fully emulated.
 
 ***************************************************************************/

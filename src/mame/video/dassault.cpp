@@ -56,7 +56,7 @@ void dassault_state::mixdassaultlayer(bitmap_rgb32 &bitmap, bitmap_ind16* sprite
 
 				if (alpha!=0xff)
 				{
-					if (pix&0x400) // todo
+					if (pix&0x400) // TODO, Additive/Subtractive Blending?
 					{
 						uint32_t base = dstline[x];
 						dstline[x] = alpha_blend_r32(base, paldata[pen+penbase], alpha);
