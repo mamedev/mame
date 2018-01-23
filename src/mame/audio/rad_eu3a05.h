@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_AUDIO_RADICASI_H
-#define MAME_AUDIO_RADICASI_H
+#ifndef MAME_AUDIO_RAD_EU3A05_H
+#define MAME_AUDIO_RAD_EU3A05_H
 
 #define MCFG_RADICA6502_SOUND_SPACE_READ_CB(_devcb) \
 	devcb = &radica6502_sound_device::set_space_read_callback(*device, DEVCB_##_devcb);
@@ -61,4 +61,4 @@ private:
 
 DECLARE_DEVICE_TYPE(RADICA6502_SOUND, radica6502_sound_device)
 
-#endif // MAME_AUDIO_RADICASI_H
+#endif // MAME_AUDIO_RAD_EU3A05_H

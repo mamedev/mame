@@ -4,7 +4,7 @@
 // Format not understood, it is not OKI ADPCM or IMA ADPCM, maybe something more basic?
 
 #include "emu.h"
-#include "radicasi.h"
+#include "rad_eu3a05.h"
 
 DEFINE_DEVICE_TYPE(RADICA6502_SOUND, radica6502_sound_device, "radica6502sound", "Radica 6502 Sound")
 

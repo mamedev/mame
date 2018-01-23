@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "radicasi_gpio.h"
+#include "rad_eu3a05gpio.h"
 
 DEFINE_DEVICE_TYPE(RADICA6502_GPIO, radica6502_gpio_device, "radica6502gpio", "Radica 6502 GPIO")
 

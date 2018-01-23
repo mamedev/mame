@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_AUDIO_RADICASI_GPIO_H
-#define MAME_AUDIO_RADICASI_GPIO_H
+#ifndef MAME_AUDIO_RAD_EU3A05GPIO_H
+#define MAME_AUDIO_RAD_EU3A05GPIO_H
 
 #define MCFG_RADICA6502_GPIO_READ_PORT0_CB(_devcb) \
 	devcb = &radica6502_gpio_device::set_gpio_read_0_callback(*device, DEVCB_##_devcb);
@@ -49,4 +49,4 @@ private:
 
 DECLARE_DEVICE_TYPE(RADICA6502_GPIO, radica6502_gpio_device)
 
-#endif // MAME_AUDIO_RADICASI_GPIO_H
+#endif // MAME_AUDIO_RAD_EU3A05GPIO_H

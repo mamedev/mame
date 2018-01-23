@@ -21,7 +21,7 @@
 
 #include "emu.h"
 #include "includes/megadriv.h"
-#include "includes/megadriv_radica.h"
+#include "includes/megadriv_rad.h"
 
 // todo, use actual MD map, easier once maps are part of base class.
 static ADDRESS_MAP_START( megadriv_radica_map, AS_PROGRAM, 16, megadriv_radica_state )

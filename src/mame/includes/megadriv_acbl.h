@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_INCLUDES_MEGADRIV_ARCADE_CLONES_H
-#define MAME_INCLUDES_MEGADRIV_ARCADE_CLONES_H
+#ifndef MAME_INCLUDES_MEGADRIV_ACBL_H
+#define MAME_INCLUDES_MEGADRIV_ACBL_H
 
 class md_boot_state : public md_base_state
 {
@@ -44,4 +44,4 @@ private:
 	int m_protcount;
 };
 
-#endif // MAME_INCLUDES_MEGADRIV_ARCADE_CLONES_H
+#endif // MAME_INCLUDES_MEGADRIV_ACBL_H

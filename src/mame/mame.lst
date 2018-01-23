@@ -20493,7 +20493,7 @@ wmegam2                         // 1993 Victor Wondermega M2 (Japan)
 xeye                            // 1993 JVC X'eye (USA)
 dcat16                          //
 
-@source:megadriv_arcade_clones.cpp
+@source:megadriv_acbl.cpp
 aladmdb                         // MegaDrive-based hack
 mk3mdb                          // MegaDrive-based hack
 sonic2mb                        // MegaDrive-based hack
@@ -20501,7 +20501,7 @@ srmdb                           // MegaDrive-based hack
 ssf2mdb                         // MegaDrive-based hack
 topshoot                        // (c) 1995 Sun Mixing
 
-@source:megadriv_radica.cpp
+@source:megadriv_rad.cpp
 rad_sf							// (c)2004 Radica
 rad_gen1						// (c)2004 Radica
 
@@ -32423,10 +32423,10 @@ r9751                           // ROLM 9751 phone system
 @source:rabbit.cpp
 rabbit                          // (c) 1997 Electronic Arts
 
-@source:radica_elan_eu3a14.cpp
+@source:rad_eu3a14.cpp
 rad_gtg
 
-@source:radicasi.cpp
+@source:rad_eu3a05.cpp
 rad_sinv
 rad_tetr
 
@@ -37987,7 +37987,7 @@ laser350                        // 1984? Laser 350
 laser500                        // 1984? Laser 500
 laser700                        // 1984? Laser 700
 
-@source:vtech_elan_eu3a12.cpp
+@source:vtech_eu3a12.cpp
 vreadere
 
 @source:vtech_unk1.cpp

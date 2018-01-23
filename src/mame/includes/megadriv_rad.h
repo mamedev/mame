@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_INCLUDES_MEGADRIV_RADICA_H
-#define MAME_INCLUDES_MEGADRIV_RADICA_H
+#ifndef MAME_INCLUDES_MEGADRIV_RAD_H
+#define MAME_INCLUDES_MEGADRIV_RAD_H
 
 class megadriv_radica_state : public md_base_state
 {
@@ -29,4 +29,4 @@ private:
 	required_region_ptr<uint16_t> m_rom;
 };
 
-#endif // MAME_INCLUDES_MEGADRIV_RADICA_H
+#endif // MAME_INCLUDES_MEGADRIV_RAD_H
