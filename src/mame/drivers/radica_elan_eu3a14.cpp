@@ -59,12 +59,35 @@ uint32_t radica_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
+/* 
+   code at 0000 maps to e000
+   code at 1000 maps to f000
+
+   data at 2000
+   data at 3000
+   data at 4000
+   blank   5000
+   blank   6000
+
+   code at 7000 maps to 3000
+   code at 8000 maps to 6000
+           9000 maps to 7000
+           a000 maps to 8000
+           b000 maps to 9000
+           c000 maps to a000
+           d000 maps to b000
+           e000 maps to c000
+*/
 static ADDRESS_MAP_START( radica_eu3a14_map, AS_PROGRAM, 8, radica_eu3a14_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0x0200, 0x09ff) AM_RAM
 
 	AM_RANGE(0x3000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x7000)
 
 	AM_RANGE(0x4800, 0x4bff) AM_RAM
+
+	AM_RANGE(0x6000, 0xdfff) AM_ROM AM_REGION("maincpu", 0x8000)
+
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000)
 ADDRESS_MAP_END
 
@@ -102,7 +125,7 @@ MACHINE_CONFIG_END
 
 ROM_START( rad_gtg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "goldentee.bin", 0x000000, 0x400000, CRC(41538e08) SHA1(1aef9a2c678e39243eab8d910bb7f9f47bae0aee) )
+	ROM_LOAD16_WORD_SWAP( "goldentee.bin", 0x000000, 0x400000, CRC(b1985c63) SHA1(c42a59fcb665eb801d9ca5312b90e39333e52de4) )
 ROM_END
 
 CONS( 2006, rad_gtg,  0,   0,  radica_eu3a14,  radica_eu3a14, radica_eu3a14_state, 0, "Radica (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_IS_SKELETON )
