@@ -146,7 +146,7 @@ void x1_010_device::device_clock_changed()
 //  rom_bank_updated - the rom bank has changed
 //-------------------------------------------------
 
-void multipcm_device::rom_bank_updated()
+void x1_010_device::rom_bank_updated()
 {
 	m_stream->update();
 }

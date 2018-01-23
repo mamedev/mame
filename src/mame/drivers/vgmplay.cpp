@@ -19,6 +19,7 @@
 #include "sound/c352.h"
 #include "sound/c6280.h"
 #include "sound/gb.h"
+#include "sound/iremga20.h"
 #include "sound/k053260.h"
 #include "sound/k054539.h"
 #include "sound/k051649.h"
@@ -26,6 +27,7 @@
 #include "sound/okim6295.h"
 #include "sound/pokey.h"
 #include "sound/qsound.h"
+#include "sound/saa1099.h"
 #include "sound/segapcm.h"
 #include "sound/sn76496.h"
 #include "sound/x1_010.h"
@@ -89,6 +91,9 @@ public:
 		A_C140       = 0x00016000,
 		A_QSOUND     = 0x00018000,
 		A_X1_010     = 0x0001a000,
+		A_SAA1099A   = 0x0001c000,
+		A_SAA1099B   = 0x0001c010,
+		A_GA20       = 0x0001d000,
 	};
 
 	enum io16_t
@@ -117,6 +122,7 @@ public:
 	
 	READ8_MEMBER(c140_rom_r);
 	READ8_MEMBER(c352_rom_r);
+	READ8_MEMBER(ga20_rom_r);
 	READ8_MEMBER(k053260_rom_r);
 	READ8_MEMBER(k054539_rom_r);
 	READ8_MEMBER(multipcma_rom_r);
@@ -223,6 +229,9 @@ private:
 	required_device<c140_device> m_c140;
 	required_device<qsound_device> m_qsound;
 	required_device<x1_010_device> m_x1_010;
+	required_device<saa1099_device> m_saa1099a;
+	required_device<saa1099_device> m_saa1099b;
+	required_device<iremga20_device> m_ga20;
 	
 	uint32_t m_multipcma_bank_l;
 	uint32_t m_multipcma_bank_r;
@@ -550,7 +559,7 @@ void vgmplay_device::execute_run()
 				m_io->write_byte(A_K053260 + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
-
+				
 			case 0xbb:
 			{
 				uint8_t offset = m_file->read_byte(m_pc+1);
@@ -561,6 +570,27 @@ void vgmplay_device::execute_run()
 				m_pc += 3;
 				break;
 			}
+
+			case 0xbd:
+			{
+				if (offset & 0x80)
+				{
+					m_io->write_byte(A_SAA1099B + 1, m_file->read_byte(m_pc+1));
+					m_io->write_byte(A_SAA1099B + 0, m_file->read_byte(m_pc+2));
+				}
+				else
+				{
+					m_io->write_byte(A_SAA1099A + 1, m_file->read_byte(m_pc+1));
+					m_io->write_byte(A_SAA1099A + 0, m_file->read_byte(m_pc+2));
+				}
+				m_pc += 3;
+				break;
+			}
+			
+			case 0xbf:
+				m_io->write_byte(A_GA20 + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
+				m_pc += 3;
+				break;
 
 			case 0xc3:
 			{
@@ -916,9 +946,17 @@ offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case 0xba:
 		util::stream_format(stream, "k053260 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
 		return 3 | SUPPORTED;
-
+		
 	case 0xbb:
 		util::stream_format(stream, "pokey r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
+
+	case 0xbd:
+		util::stream_format(stream, "saa1099 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		return 3 | SUPPORTED;
+
+	case 0xbf:
+		util::stream_format(stream, "ga20 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
 		return 3 | SUPPORTED;
 
 	case 0xc0:
@@ -936,9 +974,13 @@ offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	case 0xc3:
 		util::stream_format(stream, "multipcm c%02x.off = %04x", opcodes.r8(pc+1), opcodes.r8(pc+2) | (opcodes.r8(pc+3) << 8));
 		return 4 | SUPPORTED;
-
+		
 	case 0xc4:
 		util::stream_format(stream, "qsound %02x = %04x", opcodes.r8(pc+3), opcodes.r8(pc+2) | (opcodes.r8(pc+1) << 8));
+		return 4 | SUPPORTED;
+
+	case 0xc8:
+		util::stream_format(stream, "x1_010 %04x = %02x", (opcodes.r8(pc+1) << 8) | opcodes.r8(pc+2), opcodes.r8(pc+3));
 		return 4 | SUPPORTED;
 
 	case 0xd0:
@@ -1081,6 +1123,11 @@ READ8_MEMBER(vgmplay_device::c352_rom_r)
 	return rom_r(0, 0x92, offset);
 }
 
+READ8_MEMBER(vgmplay_device::ga20_rom_r)
+{
+	return rom_r(0, 0x93, offset);
+}
+
 vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag)
 	, m_file(*this, "file")
@@ -1116,6 +1163,9 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_c140(*this, "c140")
 	, m_qsound(*this, "qsound")
 	, m_x1_010(*this, "x1_010")
+	, m_saa1099a(*this, "saa1099a")
+	, m_saa1099b(*this, "saa1099b")
+	, m_ga20(*this, "ga20")
 {
 }
 
@@ -1386,6 +1436,14 @@ void vgmplay_state::machine_start()
 
 		if (data_start > 0xc0)
 		{
+			if(version >= 0x171 && r32(0xc8)) {
+				uint32_t clock = r32(0xc8);
+				m_saa1099a->set_unscaled_clock(clock & ~0x40000000);
+				if (clock & 0x40000000) {
+					clock &= ~0x40000000;
+					m_saa1099b->set_unscaled_clock(clock);
+				}
+			}
 			if(version >= 0x171 && r8(0xd6)) {
 				c352_device::static_set_divider(*m_c352, r8(0xd6) * 4);
 			}
@@ -1394,6 +1452,9 @@ void vgmplay_state::machine_start()
 			}
 			if(version >= 0x171 && r32(0xdc)) {
 				m_c352->set_unscaled_clock(r32(0xdc));
+			}
+			if(version >= 0x171 && r32(0xe0)) {
+				m_ga20->set_unscaled_clock(r32(0xe0));
 			}
 		}
 	}
@@ -1580,13 +1641,13 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_SN76496+1,      vgmplay_device::A_SN76496+1)     AM_DEVWRITE    ("sn76496",       sn76496_device, write)
 	AM_RANGE(vgmplay_device::A_K053260,        vgmplay_device::A_K053260+0x2f)  AM_DEVWRITE    ("k053260",       k053260_device, write)
 	AM_RANGE(vgmplay_device::A_C6280,          vgmplay_device::A_C6280+0xf)     AM_DEVWRITE    ("c6280",         c6280_device, c6280_w)
-	AM_RANGE(vgmplay_device::A_OKIM6295A,      vgmplay_device::A_OKIM6295A)      AM_DEVWRITE    ("okim6295a",      okim6295_device, write)
+	AM_RANGE(vgmplay_device::A_OKIM6295A,      vgmplay_device::A_OKIM6295A)      AM_DEVWRITE    ("okim6295a",    okim6295_device, write)
 	AM_RANGE(vgmplay_device::A_OKIM6295A+0x8,  vgmplay_device::A_OKIM6295A+0xb)  AM_WRITE(okim6295a_clock_w)
 	AM_RANGE(vgmplay_device::A_OKIM6295A+0xc,  vgmplay_device::A_OKIM6295A+0xc)  AM_WRITE(okim6295a_pin7_w)
 	AM_RANGE(vgmplay_device::A_OKIM6295A+0xe,  vgmplay_device::A_OKIM6295A+0xe)  AM_WRITE(okim6295a_nmk112_bank_enable_w)
 	AM_RANGE(vgmplay_device::A_OKIM6295A+0xf,  vgmplay_device::A_OKIM6295A+0xf)  AM_WRITE(okim6295a_bank_w)
 	AM_RANGE(vgmplay_device::A_OKIM6295A+0x10, vgmplay_device::A_OKIM6295A+0x13) AM_WRITE(okim6295a_nmk112_bank_w)
-	AM_RANGE(vgmplay_device::A_OKIM6295B,      vgmplay_device::A_OKIM6295B)      AM_DEVWRITE    ("okim6295b",      okim6295_device, write)
+	AM_RANGE(vgmplay_device::A_OKIM6295B,      vgmplay_device::A_OKIM6295B)      AM_DEVWRITE    ("okim6295b",    okim6295_device, write)
 	AM_RANGE(vgmplay_device::A_OKIM6295B+0x8,  vgmplay_device::A_OKIM6295B+0xb)  AM_WRITE(okim6295b_clock_w)
 	AM_RANGE(vgmplay_device::A_OKIM6295B+0xc,  vgmplay_device::A_OKIM6295B+0xc)  AM_WRITE(okim6295b_pin7_w)
 	AM_RANGE(vgmplay_device::A_OKIM6295B+0xe,  vgmplay_device::A_OKIM6295B+0xe)  AM_WRITE(okim6295b_nmk112_bank_enable_w)
@@ -1610,9 +1671,12 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_YM2608,         vgmplay_device::A_YM2608+0x3)    AM_DEVWRITE    ("ym2608",        ym2608_device, write)
 	AM_RANGE(vgmplay_device::A_K054539,        vgmplay_device::A_K054539+0x22f) AM_DEVWRITE    ("k054539",       k054539_device, write)
 	AM_RANGE(vgmplay_device::A_K051649,        vgmplay_device::A_K051649+0xff)  AM_WRITE(scc1_w)
-	AM_RANGE(vgmplay_device::A_C140,           vgmplay_device::A_C140+0x1fff)   AM_DEVWRITE    ("c140",       c140_device, write)
-	AM_RANGE(vgmplay_device::A_QSOUND,         vgmplay_device::A_QSOUND+0x3)    AM_DEVWRITE    ("qsound",     qsound_device, write)
-	AM_RANGE(vgmplay_device::A_X1_010,         vgmplay_device::A_X1_010+0x1fff) AM_DEVWRITE    ("x1_010",     x1_010_device, write)
+	AM_RANGE(vgmplay_device::A_C140,           vgmplay_device::A_C140+0x1fff)   AM_DEVWRITE    ("c140",          c140_device, write)
+	AM_RANGE(vgmplay_device::A_QSOUND,         vgmplay_device::A_QSOUND+0x3)    AM_DEVWRITE    ("qsound",        qsound_device, write)
+	AM_RANGE(vgmplay_device::A_X1_010,         vgmplay_device::A_X1_010+0x1fff) AM_DEVWRITE    ("x1_010",        x1_010_device, write)
+	AM_RANGE(vgmplay_device::A_SAA1099A,       vgmplay_device::A_SAA1099A+0x1)  AM_DEVWRITE    ("saa1099a",      saa1099_device, write)
+	AM_RANGE(vgmplay_device::A_SAA1099B,       vgmplay_device::A_SAA1099B+0x1)  AM_DEVWRITE    ("saa1099b",      saa1099_device, write)
+	AM_RANGE(vgmplay_device::A_GA20,           vgmplay_device::A_GA20+0x1f)     AM_DEVWRITE    ("ga20",          iremga20_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c140_map, 0, 16, vgmplay_state )
@@ -1621,6 +1685,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c352_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, c352_rom_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ga20_map, 0, 8, vgmplay_state )
+	AM_RANGE(0, 0xfffff) AM_DEVREAD("vgmplay", vgmplay_device, ga20_rom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( k053260_map, 0, 8, vgmplay_state )
@@ -1829,6 +1897,19 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_DEVICE_ADDRESS_MAP(0, x1_010_map)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1)
+
+	MCFG_SAA1099_ADD("saa1099a", 8000000)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
+
+	MCFG_SAA1099_ADD("saa1099b", 8000000)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
+
+	MCFG_IREMGA20_ADD("ga20", 3579545)
+	MCFG_DEVICE_ADDRESS_MAP(0, ga20_map)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 ROM_START( vgmplay )
