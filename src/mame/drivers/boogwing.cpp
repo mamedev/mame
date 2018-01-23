@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail, David Haywood, cam900
+// copyright-holders:Bryan McPhail, David Haywood
 /*
     Boogie Wings (aka The Great Ragtime Show)
     Data East, 1992
@@ -53,7 +53,7 @@
 
     Driver by Bryan McPhail and David Haywood.
 
-	DECO 99 "ACE" Chip emulation by cam900.
+	DECO 99 "ACE" Chip hooked up by cam900.
 
     Todo:
         * Sprite priorities aren't verified to be 100% accurate.

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail, cam900
+// copyright-holders:Bryan McPhail
 /***************************************************************************
 
     Data East 32 bit ARM based games:
@@ -36,7 +36,7 @@
 
     Todo:
 
-    Tattoo Assassins & Dragongun use an unemulated chip (Ace/Jack) for
+    Tattoo Assassins & Night slashers use an less emulated chip (Ace/Jack) for
     special blending effects.  It's exact effect is unclear.
 
     Video backgrounds in Dragongun?

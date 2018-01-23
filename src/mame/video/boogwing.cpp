@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail, David Haywood, cam900
+// copyright-holders:Bryan McPhail, David Haywood
 #include "emu.h"
 #include "includes/boogwing.h"
 #include "screen.h"
