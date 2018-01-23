@@ -223,16 +223,6 @@ MACHINE_RESET_MEMBER(tutankhm_state,tutankhm)
 	m_irq_toggle = 0;
 }
 
-static ADDRESS_MAP_START( timeplt_sound_map, AS_PROGRAM, 8, timeplt_audio_device )
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0x8000, 0xffff) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, filter_w)
-ADDRESS_MAP_END
-
 MACHINE_CONFIG_START(tutankhm_state::tutankhm)
 
 	/* basic machine hardware */
@@ -270,40 +260,8 @@ MACHINE_CONFIG_START(tutankhm_state::tutankhm)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("tpsound",Z80,XTAL_14_31818MHz/8)
-	MCFG_CPU_PROGRAM_MAP(timeplt_sound_map)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
 	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
-
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_14_31818MHz/8)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
-	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("timeplt_audio", timeplt_audio_device, portB_r))
-	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.60)
-	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.60)
-	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.60)
-
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_14_31818MHz/8)
-	MCFG_SOUND_ROUTE(0, "filter.1.0", 0.60)
-	MCFG_SOUND_ROUTE(1, "filter.1.1", 0.60)
-	MCFG_SOUND_ROUTE(2, "filter.1.2", 0.60)
-
-	MCFG_FILTER_RC_ADD("filter.0.0", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter.0.1", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter.0.2", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_FILTER_RC_ADD("filter.1.0", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter.1.1", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_FILTER_RC_ADD("filter.1.2", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	downcast<timeplt_audio_device *>(device)->timeplt_sound(config);
 MACHINE_CONFIG_END
 
 
@@ -341,7 +299,7 @@ ROM_START( tutankhm )
 	/* the other banks (1900-1fff) are empty */
 
 	/* ROMS located on the KT-5112-2B board. */
-	ROM_REGION(  0x10000 , "tpsound", 0 ) /* 64k for Z80 sound CPU code */
+	ROM_REGION(  0x10000 , "timeplt_audio:tpsound", 0 ) /* 64k for Z80 sound CPU code */
 	ROM_LOAD( "s1.7a", 0x0000, 0x1000, CRC(b52d01fa) SHA1(9b6cf9ea51d3a87c174f34d42a4b1b5f38b48723) )
 	ROM_LOAD( "s2.8a", 0x1000, 0x1000, CRC(9db5c0ce) SHA1(b5bc1d89a7f7d7a0baae64390c37ee11f69a0e76) )
 ROM_END
@@ -368,7 +326,7 @@ ROM_START( tutankhms )
 	/* the other banks (1900-1fff) are empty */
 
 	/* ROMS located on the KT-5112-2B board. */
-	ROM_REGION(  0x10000, "tpsound", 0 ) /* 64k for Z80 sound CPU code */
+	ROM_REGION(  0x10000, "timeplt_audio:tpsound", 0 ) /* 64k for Z80 sound CPU code */
 	ROM_LOAD( "s1.7a", 0x0000, 0x1000, CRC(b52d01fa) SHA1(9b6cf9ea51d3a87c174f34d42a4b1b5f38b48723) )
 	ROM_LOAD( "s2.8a", 0x1000, 0x1000, CRC(9db5c0ce) SHA1(b5bc1d89a7f7d7a0baae64390c37ee11f69a0e76) )
 ROM_END
