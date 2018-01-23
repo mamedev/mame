@@ -67,6 +67,14 @@ static INPUT_PORTS_START( megadriv_radica_3button )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
 INPUT_PORTS_END
 
+// the 6-in-1 units really only have a single wired controller, and no way to connect a 2nd one, despite having some 2 player games!
+static INPUT_PORTS_START( megadriv_radica_3button_1player )
+	PORT_INCLUDE( megadriv_radica_3button )
+
+	PORT_MODIFY("PAD2")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( megadriv_radica_6button )
 	PORT_INCLUDE( megadriv_radica_3button )
 
@@ -142,6 +150,6 @@ DRIVER_INIT_MEMBER(megadriv_radica_state,megadriv_radica_6button_pal)
 	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_6button),this);
 }
 
-CONS( 2004, rad_sf,  0, 0, megadriv_radica_6button_pal,  megadriv_radica_6button,  megadriv_radica_state,  megadriv_radica_6button_pal, "Radica / Capcom / Sega", "Street Fighter II: Special Champion Edition (and Ghouls'n Ghosts) (Radica, Arcade Legends) (Europe)", 0) // SF2 game is region locked,  US version ROM is definitely different
-CONS( 2004, rad_gen1,0, 0, megadriv_radica_3button_ntsc, megadriv_radica_3button,  megadriv_radica_state,  megadriv,                    "Radica / Sega",          "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0) 
+CONS( 2004, rad_sf,  0, 0, megadriv_radica_6button_pal,  megadriv_radica_6button,         megadriv_radica_state,  megadriv_radica_6button_pal, "Radica / Capcom / Sega", "Street Fighter II: Special Champion Edition (and Ghouls'n Ghosts) (Radica, Arcade Legends) (Europe)", 0) // SF2 game is region locked,  US version ROM is definitely different
+CONS( 2004, rad_gen1,0, 0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state,  megadriv,                    "Radica / Sega",          "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0) 
 
