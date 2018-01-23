@@ -62,23 +62,23 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 MACHINE_CONFIG_START(qvt103_state::qvt103)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_29_376MHz / 9) // divider guessed
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(29'376'000) / 9) // divider guessed
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_29_376MHz / 9)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(29'376'000) / 9)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL_29_376MHz / 9)
+	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(29'376'000) / 9)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_29_376MHz * 2 / 3, 102 * 10, 0, 80 * 10, 320, 0, 300)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL_29_376MHz, 170 * 9, 0, 132 * 9, 320, 0, 300)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(29'376'000) * 2 / 3, 102 * 10, 0, 80 * 10, 320, 0, 300)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(29'376'000), 170 * 9, 0, 132 * 9, 320, 0, 300)
 	MCFG_SCREEN_UPDATE_DRIVER(qvt103_state, screen_update)
 
-	MCFG_CPU_ADD("kbdmcu", I8741, XTAL_6MHz)
+	MCFG_CPU_ADD("kbdmcu", I8741, XTAL(6'000'000))
 MACHINE_CONFIG_END
 
 /**************************************************************************************************************

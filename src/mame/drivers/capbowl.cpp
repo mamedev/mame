@@ -97,7 +97,7 @@
 #include "sound/volt_reg.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK        XTAL_8MHz
+#define MASTER_CLOCK        XTAL(8'000'000)
 
 
 /*************************************

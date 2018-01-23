@@ -59,8 +59,8 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK  XTAL_16MHz
-#define SND_CLOCK   XTAL_14_31818MHz
+#define MAIN_CLOCK  XTAL(16'000'000)
+#define SND_CLOCK   XTAL(14'318'181)
 
 
 class itgambl2_state : public driver_device

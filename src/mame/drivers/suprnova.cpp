@@ -791,7 +791,7 @@ MACHINE_CONFIG_START(skns_state::skns)
 	MCFG_CPU_PROGRAM_MAP(skns_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", skns_state, irq, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 

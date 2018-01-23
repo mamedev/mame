@@ -183,7 +183,7 @@ the MSM5205-derived interrupt assigned to the NMI line instead.
 #include "screen.h"
 #include "speaker.h"
 
-#define FIRETRAP_XTAL XTAL_12MHz
+#define FIRETRAP_XTAL XTAL(12'000'000)
 
 
 WRITE8_MEMBER(firetrap_state::firetrap_nmi_disable_w)
@@ -623,7 +623,7 @@ MACHINE_CONFIG_START(firetrap_state::firetrap)
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */

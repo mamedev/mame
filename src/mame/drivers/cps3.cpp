@@ -2536,7 +2536,7 @@ MACHINE_CONFIG_START(cps3_state::cps3)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_60MHz/8, 486, 0, 384, 259, 0, 224)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(60'000'000)/8, 486, 0, 384, 259, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(cps3_state, screen_update_cps3)
 /*
     Measured clocks:

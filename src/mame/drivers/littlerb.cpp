@@ -252,12 +252,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_step_cb)
 }
 
 MACHINE_CONFIG_START(littlerb_state::littlerb)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) // 10MHz rated part, near 16Mhz XTAL
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) // 10MHz rated part, near 16Mhz XTAL
 	MCFG_CPU_PROGRAM_MAP(littlerb_main)
 
-	MCFG_INDER_VIDEO_ADD("inder_vid") // XTAL_40MHz
+	MCFG_INDER_VIDEO_ADD("inder_vid") // XTAL(40'000'000)
 
-	// TODO: not accurate - driven by XTAL_6MHz?
+	// TODO: not accurate - driven by XTAL(6'000'000)?
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("step_timer", littlerb_state, littlerb_sound_step_cb,  attotime::from_hz(7500/150))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sound_timer", littlerb_state, littlerb_sound_cb,  attotime::from_hz(7500))
 

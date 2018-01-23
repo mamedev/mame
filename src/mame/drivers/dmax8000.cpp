@@ -146,17 +146,17 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz ) // no idea what crystal is used, but 4MHz clock is confirmed
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000) ) // no idea what crystal is used, but 4MHz clock is confirmed
 	MCFG_CPU_PROGRAM_MAP(dmax8000_mem)
 	MCFG_CPU_IO_MAP(dmax8000_io)
 	MCFG_MACHINE_RESET_OVERRIDE(dmax8000_state, dmax8000)
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_4MHz / 2) // 2MHz
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(4'000'000) / 2) // 2MHz
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg0))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg1))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("dart1", z80dart_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart1", z80dart_device, txca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart2", z80dart_device, rxca_w))
@@ -164,7 +164,7 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("dart2", z80dart_device, rxtxcb_w))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("dart1", z80dart_device, rxtxcb_w))
 
-	MCFG_DEVICE_ADD("dart1", Z80DART, XTAL_4MHz) // A = terminal; B = aux
+	MCFG_DEVICE_ADD("dart1", Z80DART, XTAL(4'000'000)) // A = terminal; B = aux
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -175,15 +175,15 @@ MACHINE_CONFIG_START(dmax8000_state::dmax8000)
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("dart1", z80dart_device, ria_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("dart1", z80dart_device, ctsa_w))
 
-	MCFG_DEVICE_ADD("dart2", Z80DART, XTAL_4MHz) // RS232 ports
+	MCFG_DEVICE_ADD("dart2", Z80DART, XTAL(4'000'000)) // RS232 ports
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(dmax8000_state, port0c_w))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(dmax8000_state, port0d_w))
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL(4'000'000))
 
-	MCFG_FD1793_ADD("fdc", XTAL_2MHz) // no idea
+	MCFG_FD1793_ADD("fdc", XTAL(2'000'000)) // no idea
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(dmax8000_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", floppies, "8dsdd", floppy_image_device::default_floppy_formats)

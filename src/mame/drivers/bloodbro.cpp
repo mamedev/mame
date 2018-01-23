@@ -519,11 +519,11 @@ WRITE16_MEMBER( bloodbro_state::weststry_layer_scroll_w )
 
 MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(bloodbro_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_7_15909MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(7'159'090)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	// video hardware
@@ -548,11 +548,11 @@ MACHINE_CONFIG_START(bloodbro_state::bloodbro)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_7_15909MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(7'159'090)/2)
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -569,7 +569,7 @@ MACHINE_CONFIG_DERIVED(bloodbro_state::weststry, bloodbro)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq6_line_hold)
 
 	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_CLOCK(XTAL_20MHz/4) /* 5MHz - verified on PCB */
+	MCFG_CPU_CLOCK(XTAL(20'000'000)/4) /* 5MHz - verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(weststry_sound_map)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", weststry)
@@ -585,10 +585,10 @@ MACHINE_CONFIG_DERIVED(bloodbro_state::weststry, bloodbro)
 
 	// Bootleg sound hardware is close copy of Seibu, but uses different interrupts
 
-	MCFG_OKIM6295_REPLACE("oki", XTAL_20MHz/16, PIN7_HIGH) /* 1.25MHz - verified on PCB */
+	MCFG_OKIM6295_REPLACE("oki", XTAL(20'000'000)/16, PIN7_HIGH) /* 1.25MHz - verified on PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL_20MHz/4) /* ~4.9MHz - see notes at top */
+	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL(20'000'000)/4) /* ~4.9MHz - see notes at top */
 	MCFG_YM3812_IRQ_HANDLER(WRITELINE(bloodbro_state, weststry_opl_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

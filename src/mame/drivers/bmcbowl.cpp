@@ -452,7 +452,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, bmcbowl_state )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(bmcbowl_state::bmcbowl)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_21_4772MHz / 2 )
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(21'477'272) / 2 )
 	MCFG_CPU_PROGRAM_MAP(bmcbowl_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bmcbowl_state, irq2_line_hold)
 
@@ -471,11 +471,11 @@ MACHINE_CONFIG_START(bmcbowl_state::bmcbowl)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz )  // guessed chip type, clock not verified
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545) )  // guessed chip type, clock not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_3_579545MHz / 2)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(3'579'545) / 2)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(bmcbowl_state, dips1_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(bmcbowl_state, input_mux_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)

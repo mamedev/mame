@@ -364,7 +364,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::dfruit_irq_scanline)
 	}
 }
 
-#define MASTER_CLOCK XTAL_14MHz
+#define MASTER_CLOCK XTAL(14'000'000)
 
 MACHINE_CONFIG_START(dfruit_state::dfruit)
 

@@ -34,7 +34,7 @@ DEFINE_DEVICE_TYPE(POFO_HPC102, pofo_hpc102_device, "pofo_hpc102", "Atari Portfo
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pofo_hpc102_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M82C50A_TAG, INS8250, XTAL_1_8432MHz) // should be INS8250A
+	MCFG_DEVICE_ADD(M82C50A_TAG, INS8250, XTAL(1'843'200)) // should be INS8250A
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))

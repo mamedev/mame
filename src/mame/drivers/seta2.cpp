@@ -930,7 +930,7 @@ ADDRESS_MAP_END
 
 // Simulate coin drop through two sensors
 
-#define FUNCUBE_SUB_CPU_CLOCK (XTAL_14_7456MHz)
+#define FUNCUBE_SUB_CPU_CLOCK (XTAL(14'745'600))
 
 READ16_MEMBER(seta2_state::funcube_coins_r)
 {
@@ -940,7 +940,7 @@ READ16_MEMBER(seta2_state::funcube_coins_r)
 
 	uint8_t hopper_bit = (m_funcube_hopper_motor && !(m_screen->frame_number()%20)) ? 1 : 0;
 
-	const uint64_t coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK / (1000/20);
+	const uint64_t coin_total_cycles = FUNCUBE_SUB_CPU_CLOCK.value() / (1000/20);
 
 	if ( m_funcube_coin_start_cycles )
 	{
@@ -2504,7 +2504,7 @@ INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
 }
 
 MACHINE_CONFIG_START(seta2_state::seta2)
-	MCFG_CPU_ADD("maincpu", M68301, XTAL_50MHz/3)   // !! TMP68301 !!
+	MCFG_CPU_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
 	MCFG_CPU_PROGRAM_MAP(mj4simai_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
@@ -2531,7 +2531,7 @@ MACHINE_CONFIG_START(seta2_state::seta2)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, XTAL_50MHz/3)   // clock?
+	MCFG_SOUND_ADD("x1snd", X1_010, XTAL(50'000'000)/3)   // clock?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2612,7 +2612,7 @@ MACHINE_CONFIG_DERIVED(seta2_state::penbros, seta2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(seta2_state::ablastb, penbros)
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_16MHz) // TMP68HC000P-16
+	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000P-16
 	MCFG_CPU_PROGRAM_MAP(ablastb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state, irq2_line_hold)
 
@@ -2717,7 +2717,7 @@ MACHINE_RESET_MEMBER(seta2_state, funcube)
 
 MACHINE_CONFIG_START(seta2_state::funcube)
 
-	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL_25_447MHz)
+	MCFG_CPU_ADD("maincpu", MCF5206E, XTAL(25'447'000))
 	MCFG_CPU_PROGRAM_MAP(funcube_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta2_state, funcube_interrupt, "screen", 0, 1)
 
@@ -2754,7 +2754,7 @@ MACHINE_CONFIG_START(seta2_state::funcube)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM9810_ADD("oki", XTAL_4_096MHz)
+	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -2781,7 +2781,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(seta2_state::namcostr)
-	MCFG_CPU_ADD("maincpu", M68301, XTAL_50MHz/3)   // !! TMP68301 !!
+	MCFG_CPU_ADD("maincpu", M68301, XTAL(50'000'000)/3)   // !! TMP68301 !!
 	MCFG_CPU_PROGRAM_MAP(namcostr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta2_state,  seta2_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
@@ -2806,7 +2806,7 @@ MACHINE_CONFIG_START(seta2_state::namcostr)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM9810_ADD("oki", XTAL_4_096MHz)
+	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END

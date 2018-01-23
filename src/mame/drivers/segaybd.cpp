@@ -1389,7 +1389,7 @@ MACHINE_CONFIG_DERIVED(segaybd_state::yboard_link, yboard)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_link)
 
-	MCFG_CPU_ADD("linkcpu", Z80, XTAL_16MHz/2 ) // 8 Mhz
+	MCFG_CPU_ADD("linkcpu", Z80, XTAL(16'000'000)/2 ) // 8 Mhz
 	MCFG_CPU_PROGRAM_MAP(link_map)
 	MCFG_CPU_IO_MAP(link_portmap)
 
@@ -1401,7 +1401,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(segaybd_state::yboard_deluxe, yboard)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("motorcpu", Z80, XTAL_16MHz/2 ) // 8 Mhz(guessed)
+	MCFG_CPU_ADD("motorcpu", Z80, XTAL(16'000'000)/2 ) // 8 Mhz(guessed)
 	MCFG_CPU_PROGRAM_MAP(motor_map)
 //  MCFG_CPU_IO_MAP(motor_portmap)
 

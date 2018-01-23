@@ -148,10 +148,10 @@ Find lamps/reels after UPD changes.
  *
  *************************************/
 
-#define DUART_CLOCK     XTAL_3_6864MHz
+#define DUART_CLOCK     XTAL(3'686'400)
 #define PIXEL_CLOCK     0
-#define MASTER_CLOCK    XTAL_16MHz
-#define SOUND_CLOCK     XTAL_11_0592MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
+#define SOUND_CLOCK     XTAL(11'059'200)
 
 /*************************************
  *

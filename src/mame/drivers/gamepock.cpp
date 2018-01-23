@@ -42,7 +42,7 @@ INPUT_PORTS_END
 
 
 MACHINE_CONFIG_START(gamepock_state::gamepock)
-	MCFG_CPU_ADD("maincpu", UPD78C06, XTAL_6MHz)    /* uPD78C06AG */
+	MCFG_CPU_ADD("maincpu", UPD78C06, XTAL(6'000'000))    /* uPD78C06AG */
 	MCFG_CPU_PROGRAM_MAP( gamepock_mem)
 	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(gamepock_state, port_a_w))
 	MCFG_UPD7810_PORTB_READ_CB(READ8(gamepock_state, port_b_r))

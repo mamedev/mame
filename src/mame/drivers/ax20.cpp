@@ -124,7 +124,7 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(ax20_state::ax20)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)
 	MCFG_CPU_PROGRAM_MAP(ax20_map)
 	MCFG_CPU_IO_MAP(ax20_io)
 

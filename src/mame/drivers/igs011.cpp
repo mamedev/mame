@@ -4149,7 +4149,7 @@ GFXDECODE_END
 #endif
 
 MACHINE_CONFIG_START(igs011_state::igs011_base)
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_22MHz/3)
+	MCFG_CPU_ADD("maincpu",M68000, XTAL(22'000'000)/3)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -4168,7 +4168,7 @@ MACHINE_CONFIG_START(igs011_state::igs011_base)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz/21, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(22'000'000)/21, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -4184,7 +4184,7 @@ MACHINE_CONFIG_DERIVED(igs011_state::drgnwrld, igs011_base)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs011_state, irq6_line_hold)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_irq", igs011_state, lev5_timer_irq_cb, attotime::from_hz(240)) // lev5 frequency drives the music tempo
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -4253,7 +4253,7 @@ MACHINE_CONFIG_DERIVED(igs011_state::lhb2, igs011_base)
 
 //  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
@@ -4269,7 +4269,7 @@ MACHINE_CONFIG_DERIVED(igs011_state::nkishusp, igs011_base)
 
 //  MCFG_GFXDECODE_ADD("gfxdecode", "palette", igs011_hi)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 

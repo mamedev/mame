@@ -202,7 +202,7 @@ READ8_MEMBER( selz80_state::kbd_r )
 
 MACHINE_CONFIG_START(selz80_state::selz80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000)) // it's actually a 5MHz XTAL with a NEC uPD780C-1 cpu
 	MCFG_CPU_PROGRAM_MAP(selz80_mem)
 	MCFG_CPU_IO_MAP(selz80_io)
 	MCFG_MACHINE_RESET_OVERRIDE(selz80_state, selz80 )

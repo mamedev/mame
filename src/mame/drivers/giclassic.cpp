@@ -293,7 +293,7 @@ void giclassicsvr_state::machine_reset()
 MACHINE_CONFIG_START(giclassic_state::giclassic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2) // PCB is marked "68000 12 MHz", but only visible osc is 20 MHz
 	MCFG_CPU_PROGRAM_MAP(satellite_main)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", giclassic_state, giclassic_interrupt)
 
@@ -319,7 +319,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // unknown speed
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // unknown speed
 	MCFG_CPU_PROGRAM_MAP(server_main)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", giclassicsvr_state, giclassicsvr_interrupt)
 
@@ -346,10 +346,10 @@ MACHINE_CONFIG_START(giclassicsvr_state::giclassvr)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_PS, -60, 24)
 	MCFG_K055673_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k053252a", K053252, XTAL_32MHz/4)
+	MCFG_DEVICE_ADD("k053252a", K053252, XTAL(32'000'000)/4)
 	MCFG_K053252_OFFSETS(40, 16) // TODO
 
-	MCFG_DEVICE_ADD("k053252b", K053252, XTAL_32MHz/4)
+	MCFG_DEVICE_ADD("k053252b", K053252, XTAL(32'000'000)/4)
 	MCFG_K053252_OFFSETS(40, 16) // TODO
 MACHINE_CONFIG_END
 

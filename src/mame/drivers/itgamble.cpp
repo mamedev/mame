@@ -54,13 +54,13 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK  XTAL_30MHz
-#define SND_CLOCK   XTAL_1MHz
+#define MAIN_CLOCK  XTAL(30'000'000)
+#define SND_CLOCK   XTAL(1'000'000)
 
-#define MNUMBER_MAIN_CLOCK  XTAL_24MHz
-#define MNUMBER_SND_CLOCK   XTAL_16MHz
+#define MNUMBER_MAIN_CLOCK  XTAL(24'000'000)
+#define MNUMBER_SND_CLOCK   XTAL(16'000'000)
 
-#define EJOLLYX5_MAIN_CLOCK XTAL_16MHz
+#define EJOLLYX5_MAIN_CLOCK XTAL(16'000'000)
 
 
 class itgamble_state : public driver_device

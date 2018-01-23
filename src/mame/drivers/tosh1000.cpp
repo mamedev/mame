@@ -247,7 +247,7 @@ void tosh1000_state::cfg_fdc_35(device_t *device)
 }
 
 MACHINE_CONFIG_START(tosh1000_state::tosh1000)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_5MHz)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(tosh1000_map)
 	MCFG_CPU_IO_MAP(tosh1000_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(tosh1000_state::tosh1000)
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)

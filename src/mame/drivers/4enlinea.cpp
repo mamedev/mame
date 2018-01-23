@@ -196,9 +196,9 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK           XTAL_16MHz
-#define SEC_CLOCK            XTAL_8MHz
-#define HCGA_CLOCK           XTAL_14_31818MHz
+#define MAIN_CLOCK           XTAL(16'000'000)
+#define SEC_CLOCK            XTAL(8'000'000)
+#define HCGA_CLOCK           XTAL(14'318'181)
 
 #define PRG_CPU_CLOCK        MAIN_CLOCK /2      /* 8 MHz. (measured) */
 #define SND_CPU_CLOCK        SEC_CLOCK /2       /* 4 MHz. (measured) */

@@ -1185,7 +1185,7 @@ INTERRUPT_GEN_MEMBER(vii_state::vii_vblank)
 
 MACHINE_CONFIG_START(vii_state::vii)
 
-	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
+	MCFG_CPU_ADD( "maincpu", UNSP, XTAL(27'000'000))
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vii_state,  vii_vblank)
 
@@ -1206,7 +1206,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vii_state::vsmile)
 
-	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
+	MCFG_CPU_ADD( "maincpu", UNSP, XTAL(27'000'000))
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vii_state,  vii_vblank)
 
@@ -1227,7 +1227,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vii_state::batman)
 
-	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
+	MCFG_CPU_ADD( "maincpu", UNSP, XTAL(27'000'000))
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vii_state,  vii_vblank)
 
@@ -1245,7 +1245,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vii_state::wirels60)
 
-	MCFG_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
+	MCFG_CPU_ADD( "maincpu", UNSP, XTAL(27'000'000))
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vii_state,  vii_vblank)
 

@@ -476,7 +476,7 @@ void destroyr_state::machine_start()
 MACHINE_CONFIG_START(destroyr_state::destroyr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 16)
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(12'096'000) / 16)
 	MCFG_CPU_PROGRAM_MAP(destroyr_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(destroyr_state, irq0_line_assert,  4*60)
 

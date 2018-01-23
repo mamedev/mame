@@ -1463,7 +1463,7 @@ MACHINE_CONFIG_DERIVED(a2000_state::a2000, amiga_base)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
 
 	// real-time clock
-	MCFG_DEVICE_ADD("u65", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("u65", MSM6242, XTAL(32'768))
 
 	// cpu slot
 	MCFG_EXPANSION_SLOT_ADD("maincpu", a2000_expansion_cards, nullptr)
@@ -1534,13 +1534,13 @@ MACHINE_CONFIG_DERIVED(cdtv_state::cdtv, amiga_base)
 	MCFG_CPU_PROGRAM_MAP(cdtv_mem)
 
 	// remote control input converter
-	MCFG_CPU_ADD("u75", M6502, XTAL_3MHz)
+	MCFG_CPU_ADD("u75", M6502, XTAL(3'000'000))
 	MCFG_CPU_PROGRAM_MAP(cdtv_rc_mem)
 	MCFG_DEVICE_DISABLE()
 
 	// lcd controller
 #if 0
-	MCFG_CPU_ADD("u62", LC6554, XTAL_4MHz)
+	MCFG_CPU_ADD("u62", LC6554, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(lcd_mem)
 #endif
 
@@ -1558,7 +1558,7 @@ MACHINE_CONFIG_DERIVED(cdtv_state::cdtv, amiga_base)
 	MCFG_NVRAM_ADD_0FILL("memcard")
 
 	// real-time clock
-	MCFG_DEVICE_ADD("u61", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("u61", MSM6242, XTAL(32'768))
 
 	// cd-rom controller
 	MCFG_DMAC_ADD("u36", amiga_state::CLK_7M_PAL)
@@ -1604,7 +1604,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(a3000_state::a3000, amiga_base)
 	// main cpu
-	MCFG_CPU_ADD("maincpu", M68030, XTAL_32MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68030, XTAL(32'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(a3000_mem)
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
@@ -1615,7 +1615,7 @@ MACHINE_CONFIG_DERIVED(a3000_state::a3000, amiga_base)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
 
 	// real-time clock
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
 
 	// todo: zorro3 slots, super dmac, scsi
 
@@ -1648,7 +1648,7 @@ MACHINE_CONFIG_DERIVED(a500p_state::a500p, amiga_base)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x200000)
 
 	// real-time clock
-	MCFG_DEVICE_ADD("u9", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("u9", MSM6242, XTAL(32'768))
 
 	// cpu slot
 	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
@@ -1782,7 +1782,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(a4000_state::a4000, amiga_base)
 	// main cpu
-	MCFG_CPU_ADD("maincpu", M68040, XTAL_50MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68040, XTAL(50'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(a4000_mem)
 
 	MCFG_DEVICE_ADD("overlay", ADDRESS_MAP_BANK, 0)
@@ -1801,7 +1801,7 @@ MACHINE_CONFIG_DERIVED(a4000_state::a4000, amiga_base)
 	MCFG_VIDEO_START_OVERRIDE(amiga_state, amiga_aga)
 
 	// real-time clock
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
 
 	// ide
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, false)
@@ -1833,7 +1833,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(a4000_state::a400030, a4000)
 	// main cpu
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", M68EC030, XTAL_50MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68EC030, XTAL(50'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(a400030_mem)
 
 	// todo: ide
@@ -1922,7 +1922,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(a4000_state::a4000t, a4000)
 	// main cpu
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", M68040, XTAL_50MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68040, XTAL(50'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(a4000t_mem)
 
 	// todo: ide, zorro3, scsi, super dmac

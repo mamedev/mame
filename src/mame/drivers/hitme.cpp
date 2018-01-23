@@ -25,7 +25,7 @@
 
 #include "barricad.lh"
 
-#define MASTER_CLOCK (XTAL_8_945MHz) /* confirmed on schematic */
+#define MASTER_CLOCK (XTAL(8'945'000)) /* confirmed on schematic */
 
 
 /*************************************

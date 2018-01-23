@@ -85,7 +85,7 @@ PS / PD :  key matrix
 #include "speaker.h"
 
 
-#define MASTER_CLOCK XTAL_12MHz
+#define MASTER_CLOCK XTAL(12'000'000)
 
 void speedatk_state::machine_start()
 {

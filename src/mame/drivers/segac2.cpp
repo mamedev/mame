@@ -87,8 +87,8 @@
 #include "speaker.h"
 
 
-#define XL1_CLOCK           XTAL_640kHz
-#define XL2_CLOCK           XTAL_53_693175MHz
+#define XL1_CLOCK           XTAL(640'000)
+#define XL2_CLOCK           XTAL(53'693'175)
 
 
 #define LOG_PROTECTION      1

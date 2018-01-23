@@ -21,9 +21,9 @@
 #endif
 
 /* CoJag and Jaguar have completely different XTALs, pixel clock in Jaguar is the same as the GPU one */
-#define COJAG_PIXEL_CLOCK       XTAL_14_31818MHz
-#define JAGUAR_CLOCK            XTAL_25_590906MHz // NTSC
-// XTAL_25_593900MHz PAL, TODO
+#define COJAG_PIXEL_CLOCK       XTAL(14'318'181)
+#define JAGUAR_CLOCK            XTAL(25'590'906) // NTSC
+// XTAL(25'593'900) PAL, TODO
 
 class jaguar_state : public driver_device
 {

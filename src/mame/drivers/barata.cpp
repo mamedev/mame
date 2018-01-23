@@ -41,7 +41,7 @@
 
 #include "barata.lh"
 
-#define CPU_CLOCK       (XTAL_6MHz)         /* main cpu clock */
+#define CPU_CLOCK       (XTAL(6'000'000))         /* main cpu clock */
 
 class barata_state : public driver_device
 {

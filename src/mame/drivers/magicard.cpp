@@ -403,9 +403,9 @@
 #include "speaker.h"
 
 
-#define CLOCK_A XTAL_30MHz
-#define CLOCK_B XTAL_8MHz
-#define CLOCK_C XTAL_19_6608MHz
+#define CLOCK_A XTAL(30'000'000)
+#define CLOCK_B XTAL(8'000'000)
+#define CLOCK_C XTAL(19'660'800)
 
 
 class magicard_state : public driver_device

@@ -163,7 +163,7 @@ MACHINE_CONFIG_START(coco_t4426_device::device_add_mconfig)
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE (UART_TAG, acia6850_device, write_cts))
 
 	/* Bit Rate Generator */
-	MCFG_MC14411_ADD (BRG_TAG, XTAL_1_8432MHz)
+	MCFG_MC14411_ADD (BRG_TAG, XTAL(1'843'200))
 	MCFG_MC14411_F1_CB(WRITELINE (coco_t4426_device, write_f1_clock))
 	MCFG_MC14411_F3_CB(WRITELINE (coco_t4426_device, write_f3_clock))
 	MCFG_MC14411_F5_CB(WRITELINE (coco_t4426_device, write_f5_clock))

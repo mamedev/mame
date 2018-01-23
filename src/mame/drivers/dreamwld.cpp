@@ -797,7 +797,7 @@ void dreamwld_state::machine_reset()
 MACHINE_CONFIG_START(dreamwld_state::baryon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* 16MHz verified */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz verified */
 	MCFG_CPU_PROGRAM_MAP(baryon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
 
@@ -818,7 +818,7 @@ MACHINE_CONFIG_START(dreamwld_state::baryon)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/32, PIN7_LOW) /* 1MHz verified */
+	MCFG_OKIM6295_ADD("oki1", XTAL(32'000'000)/32, PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
@@ -832,7 +832,7 @@ MACHINE_CONFIG_DERIVED(dreamwld_state::dreamwld, baryon)
 	MCFG_CPU_PROGRAM_MAP(dreamwld_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz/32, PIN7_LOW) /* 1MHz verified */
+	MCFG_OKIM6295_ADD("oki2", XTAL(32'000'000)/32, PIN7_LOW) /* 1MHz verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)

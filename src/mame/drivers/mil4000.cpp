@@ -117,8 +117,8 @@
 #include "mil4000.lh"
 
 
-#define MAIN_CLOCK    XTAL_12MHz
-#define SEC_CLOCK     XTAL_14_31818MHz
+#define MAIN_CLOCK    XTAL(12'000'000)
+#define SEC_CLOCK     XTAL(14'318'181)
 
 #define CPU_CLOCK     MAIN_CLOCK
 

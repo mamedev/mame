@@ -356,8 +356,8 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-#define MASTER_CLOCK XTAL_24MHz
-#define OKI_CLOCK XTAL_8MHz
+#define MASTER_CLOCK XTAL(24'000'000)
+#define OKI_CLOCK XTAL(8'000'000)
 
 MACHINE_CONFIG_START(tecmo16_state::fstarfrc)
 

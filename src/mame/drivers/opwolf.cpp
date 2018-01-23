@@ -270,8 +270,8 @@ register. So what is controlling priority.
 
 /* Define clocks based on actual OSC on the PCB */
 
-#define CPU_CLOCK       (XTAL_16MHz / 2)    /* clock for 68000 */
-#define SOUND_CPU_CLOCK     (XTAL_8MHz / 2)     /* clock for Z80 sound CPU */
+#define CPU_CLOCK       (XTAL(16'000'000) / 2)    /* clock for 68000 */
+#define SOUND_CPU_CLOCK     (XTAL(8'000'000) / 2)     /* clock for Z80 sound CPU */
 
 #include "emu.h"
 #include "includes/opwolf.h"
@@ -784,7 +784,7 @@ MACHINE_CONFIG_START(opwolf_state::opwolf)
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK ) /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(opwolf_sound_z80_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL_12MHz / 2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000) / 2) /* ? MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 

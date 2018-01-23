@@ -99,7 +99,7 @@ WRITE8_MEMBER(ad1848_device::write)
 				case 9:
 				{
 					m_play = (data & 1) ? true : false;
-					attotime rate = m_play ? attotime::from_hz(((m_regs.dform & 1) ? XTAL_24_576MHz : XTAL_16_9344MHz)
+					attotime rate = m_play ? attotime::from_hz(((m_regs.dform & 1) ? XTAL(24'576'000) : XTAL(16'934'400))
 							/ div_factor[(m_regs.dform >> 1) & 7]) : attotime::never;
 					m_timer->adjust(rate, 0 , rate);
 					m_drq_cb(m_play ? ASSERT_LINE : CLEAR_LINE);

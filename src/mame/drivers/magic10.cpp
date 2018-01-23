@@ -101,8 +101,8 @@
 #include "musicsrt.lh"
 
 
-#define MAIN_CLOCK    XTAL_20MHz
-#define AUX_CLOCK     XTAL_30MHz
+#define MAIN_CLOCK    XTAL(20'000'000)
+#define AUX_CLOCK     XTAL(30'000'000)
 
 #define CPU_CLOCK    MAIN_CLOCK/2
 

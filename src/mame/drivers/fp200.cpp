@@ -25,7 +25,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_6_144MHz
+#define MAIN_CLOCK XTAL(6'144'000)
 
 class fp200_state : public driver_device
 {

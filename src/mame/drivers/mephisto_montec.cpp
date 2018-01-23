@@ -441,9 +441,9 @@ static INPUT_PORTS_START( smondial2 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(mephisto_montec_state::montec)
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M65C02, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP( montec_mem )
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_assert, (double)XTAL_4MHz / (1 << 13))
+	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_assert, XTAL(4'000'000) / (1 << 13))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -458,14 +458,14 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(mephisto_montec_state::monteciv, montec)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_8MHz )
+	MCFG_CPU_CLOCK( XTAL(8'000'000) )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(mephisto_montec_state::megaiv, montec)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_4_9152MHz )
+	MCFG_CPU_CLOCK( XTAL(4'915'200) )
 	MCFG_CPU_PROGRAM_MAP(megaiv_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, (double)XTAL_4_9152MHz / (1 << 13))
+	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'915'200) / (1 << 13))
 
 	MCFG_DEVICE_REMOVE("board")
 	MCFG_MEPHISTO_BUTTONS_BOARD_ADD("board")
@@ -475,9 +475,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(mephisto_montec_state::mondial2, megaiv)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_2MHz )
+	MCFG_CPU_CLOCK( XTAL(2'000'000) )
 	MCFG_CPU_PROGRAM_MAP(mondial2_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, (double)XTAL_2MHz / (1 << 12))
+	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(2'000'000) / (1 << 12))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("refresh_leds", mephisto_montec_state, refresh_leds, attotime::from_hz(10))
 	MCFG_DEFAULT_LAYOUT(layout_mephisto_mondial2)
@@ -485,9 +485,9 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(mephisto_montec_state::smondial, megaiv)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_4MHz )
+	MCFG_CPU_CLOCK( XTAL(4'000'000) )
 	MCFG_CPU_PROGRAM_MAP(smondial_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, (double)XTAL_4MHz / (1 << 13))
+	MCFG_CPU_PERIODIC_INT_DRIVER(mephisto_montec_state, nmi_line_pulse, XTAL(4'000'000) / (1 << 13))
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(mephisto_montec_state::smondial2, smondial)

@@ -93,7 +93,7 @@ VBlank = 58Hz
 #include "sound/okim6295.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK      XTAL_12MHz
+#define MAIN_CLOCK      XTAL(12'000'000)
 #define CPU_CLOCK           MAIN_CLOCK / 6
 #define PIXEL_CLOCK     MAIN_CLOCK / 2
 

@@ -33,7 +33,7 @@ TODO:
 
 #include "dotrikun.lh"
 
-#define MASTER_CLOCK XTAL_4MHz
+#define MASTER_CLOCK XTAL(4'000'000)
 
 
 class dotrikun_state : public driver_device

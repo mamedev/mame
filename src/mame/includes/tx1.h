@@ -13,7 +13,7 @@
 #include "screen.h"
 
 
-#define TX1_PIXEL_CLOCK     (XTAL_18MHz / 3)
+#define TX1_PIXEL_CLOCK     (XTAL(18'000'000) / 3)
 #define TX1_HBSTART         256
 #define TX1_HBEND           0
 #define TX1_HTOTAL          384
@@ -26,7 +26,7 @@
  * that prevents one of the start countdown tones
  * from playing.
  */
-#define BB_PIXEL_CLOCK      (XTAL_18MHz / 3)
+#define BB_PIXEL_CLOCK      (XTAL(18'000'000) / 3)
 #define BB_HBSTART          256
 #define BB_HBEND            0
 #define BB_HTOTAL           384
@@ -34,7 +34,7 @@
 #define BB_VBEND            0
 #define BB_VTOTAL           288 + 1
 
-#define CPU_MASTER_CLOCK    (XTAL_15MHz)
+#define CPU_MASTER_CLOCK    (XTAL(15'000'000))
 #define BUGGYBOY_ZCLK       (CPU_MASTER_CLOCK / 2)
 
 struct math_t

@@ -201,7 +201,7 @@
 #include "kas89.lh"
 
 
-#define MASTER_CLOCK        XTAL_21_4772MHz
+#define MASTER_CLOCK        XTAL(21'477'272)
 #define VDP_MEM             0x40000
 
 

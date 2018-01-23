@@ -211,7 +211,7 @@ void vcs80_state::machine_start()
 
 MACHINE_CONFIG_START(vcs80_state::vcs80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_5MHz/2) /* U880D */
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(5'000'000)/2) /* U880D */
 	MCFG_CPU_PROGRAM_MAP(vcs80_mem)
 	MCFG_CPU_IO_MAP(vcs80_io)
 	MCFG_Z80_DAISY_CHAIN(vcs80_daisy_chain)
@@ -223,7 +223,7 @@ MACHINE_CONFIG_START(vcs80_state::vcs80)
 	MCFG_DEFAULT_LAYOUT( layout_vcs80 )
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_5MHz/2)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(5'000'000)/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(vcs80_state, pio_pa_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(vcs80_state, pio_pb_w))

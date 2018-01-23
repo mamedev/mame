@@ -128,7 +128,7 @@ HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)
 MACHINE_CONFIG_START(piggypas_state::piggypas)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL_8_448MHz) // OKI M80C31F or M80C154S
+	MCFG_CPU_ADD("maincpu", I80C31, XTAL(8'448'000)) // OKI M80C31F or M80C154S
 	MCFG_CPU_PROGRAM_MAP(piggypas_map)
 	MCFG_CPU_IO_MAP(piggypas_io)
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(piggypas_state, mcs51_tx_callback))
@@ -153,7 +153,7 @@ MACHINE_CONFIG_START(piggypas_state::piggypas)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8_448MHz / 8, PIN7_HIGH) // clock and pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(8'448'000) / 8, PIN7_HIGH) // clock and pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0) // OKI M82C55A-2

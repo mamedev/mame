@@ -79,7 +79,7 @@ public:
 };
 
 
-#define CPU_CLOCK           XTAL_8MHz
+#define CPU_CLOCK           XTAL(8'000'000)
 #define DATA_NVRAM_SIZE     0x100
 
 

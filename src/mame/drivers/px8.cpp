@@ -43,8 +43,8 @@
     CONSTANTS
 ***************************************************************************/
 
-#define XTAL_CR1        XTAL_9_8304MHz
-#define XTAL_CR2        XTAL_32_768kHz
+#define XTAL_CR1        XTAL(9'830'400)
+#define XTAL_CR2        XTAL(32'768)
 
 /* interrupt sources */
 #define INT0_7508       0x01

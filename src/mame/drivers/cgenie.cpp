@@ -436,16 +436,16 @@ const rgb_t cgenie_state::m_palette_nz[] =
 
 MACHINE_CONFIG_START(cgenie_state::cgenie)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_17_73447MHz / 8)  // 2.2168 MHz
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(17'734'470) / 8)  // 2.2168 MHz
 	MCFG_CPU_PROGRAM_MAP(cgenie_mem)
 	MCFG_CPU_IO_MAP(cgenie_io)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_17_73447MHz / 2, 568, 32, 416, 312, 28, 284)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(17'734'470) / 2, 568, 32, 416, 312, 28, 284)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_17_73447MHz / 16)
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(17'734'470) / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_BEGIN_UPDATE_CB(cgenie_state, crtc_begin_update)
@@ -453,7 +453,7 @@ MACHINE_CONFIG_START(cgenie_state::cgenie)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_17_73447MHz / 8)
+	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(17'734'470) / 8)
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("par", cg_parallel_slot_device, pa_r))
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("par", cg_parallel_slot_device, pa_w))
 	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("par", cg_parallel_slot_device, pb_r))

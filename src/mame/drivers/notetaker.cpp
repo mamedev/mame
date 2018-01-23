@@ -256,7 +256,7 @@ TIMER_CALLBACK_MEMBER(notetaker_state::timer_fifoclk)
 	}
 	m_outfifo_tail_ptr&=0xF;
 	m_dac->write(data);
-	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL(960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 }
 
 uint32_t notetaker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -364,8 +364,8 @@ WRITE16_MEMBER(notetaker_state::FIFOReg_w)
 	m_FrSel2 = (data&0x0400)?1:0;
 	m_TabletXOn = (data&0x0200)?1:0;
 	m_TabletYOn = (data&0x0100)?1:0;
-	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
-	logerror("Write to 0x60 FIFOReg_w of %04x; fifo timer set to %d hz\n", data, (((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL(960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
+	logerror("Write to 0x60 FIFOReg_w of %04x; fifo timer set to %d hz\n", data, (((XTAL(960'000)/10)/4).value()/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1)));
 }
 
 WRITE16_MEMBER(notetaker_state::FIFOBus_w)
@@ -800,7 +800,7 @@ void notetaker_state::ip_reset()
 	m_SHConA = 0;
 	m_SetSH = 0;
 	// handle consequences of above
-	m_FIFO_timer->adjust(attotime::from_hz(((XTAL_960kHz/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // See below
+	m_FIFO_timer->adjust(attotime::from_hz(((XTAL(960'000)/10)/4)/((m_FrSel0<<3)+(m_FrSel1<<2)+(m_FrSel2<<1)+1))); // See below
 	/* FIFO timer is clocked by 960khz divided by 10 (74ls162 decade counter),
 	   divided by 4 (mc14568B with divider 1 pins set to 4), divided by
 	   1,3,5,7,9,11,13,15 (or 0,2,4,6,8,10,12,14?) */
@@ -847,7 +847,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(notetaker_state::notetakr)
 	/* basic machine hardware */
 	/* IO CPU: 8086@8MHz */
-	MCFG_CPU_ADD("iocpu", I8086, XTAL_24MHz/3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
+	MCFG_CPU_ADD("iocpu", I8086, XTAL(24'000'000)/3) /* iD8086-2 @ E4A; 24Mhz crystal divided down to 8Mhz by i8284 clock generator */
 	MCFG_CPU_PROGRAM_MAP(notetaker_iocpu_mem)
 	MCFG_CPU_IO_MAP(notetaker_iocpu_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("iopic8259", pic8259_device, inta_cb)
@@ -856,7 +856,7 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("iocpu", 0))
 
 	/* Emulator CPU: 8086@5MHz */
-	/*MCFG_CPU_ADD("emulatorcpu", I8086, XTAL_15MHz/3)
+	/*MCFG_CPU_ADD("emulatorcpu", I8086, XTAL(15'000'000)/3)
 	MCFG_CPU_PROGRAM_MAP(notetaker_emulatorcpu_mem)
 	MCFG_CPU_IO_MAP(notetaker_emulatorcpu_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("emulatorpic8259", pic8259_device, inta_cb)
@@ -877,7 +877,7 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL_36MHz/4)/8) // See below
+	MCFG_DEVICE_ADD( "crt5027", CRT5027, (XTAL(36'000'000)/4)/8) // See below
 	/* the clock for the crt5027 is configurable rate; 36MHz xtal divided by 1*,
 	   2, 3, 4, 5, 6, 7, or 8 (* because this is a 74s163 this setting probably
 	   means divide by 1; documentation at
@@ -893,15 +893,15 @@ MACHINE_CONFIG_START(notetaker_state::notetakr)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_DEVICE_ADD( "kbduart", AY31015, 0 ) // HD6402, == AY-3-1015D
-	MCFG_AY31015_RX_CLOCK(XTAL_960kHz) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK(XTAL_960kHz) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	MCFG_AY31015_RX_CLOCK(XTAL(960'000)) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
+	MCFG_AY31015_TX_CLOCK(XTAL(960'000)) // hard-wired to 960KHz xtal #f11 (60000 baud, 16 clocks per baud)
 
 	MCFG_DEVICE_ADD( "eiauart", AY31015, 0 ) // HD6402, == AY-3-1015D
-	MCFG_AY31015_RX_CLOCK(((XTAL_960kHz/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
-	MCFG_AY31015_TX_CLOCK(((XTAL_960kHz/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	MCFG_AY31015_RX_CLOCK(((XTAL(960'000)/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
+	MCFG_AY31015_TX_CLOCK(((XTAL(960'000)/10)/4)/5) // hard-wired through an mc14568b divider set to divide by 4, the result set to divide by 5; this resulting 4800hz signal being 300 baud (16 clocks per baud)
 
 	/* Floppy */
-	MCFG_FD1791_ADD("wd1791", (((XTAL_24MHz/3)/2)/2)) // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
+	MCFG_FD1791_ADD("wd1791", (((XTAL(24'000'000)/3)/2)/2)) // 2mhz, from 24mhz ip clock divided by 6 via 8284, an additional 2 by LS161 at #e1 on display/floppy board
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", notetaker_floppies, "525dd", floppy_image_device::default_floppy_formats)
 
 	/* sound hardware */

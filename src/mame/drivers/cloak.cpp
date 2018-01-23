@@ -363,12 +363,12 @@ MACHINE_CONFIG_START(cloak_state::cloak)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* more low pass filters ==> DISCRETE processing */
-	MCFG_SOUND_ADD("pokey1", POKEY, XTAL_10MHz/8)      /* Accurate to recording */
+	MCFG_SOUND_ADD("pokey1", POKEY, XTAL(10'000'000)/8)      /* Accurate to recording */
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("START"))
 	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(1), CAP_U(0.047), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("pokey2", POKEY, XTAL_10MHz/8)      /* Accurate to recording */
+	MCFG_SOUND_ADD("pokey2", POKEY, XTAL(10'000'000)/8)      /* Accurate to recording */
 	MCFG_POKEY_ALLPOT_R_CB(IOPORT("DSW"))
 	MCFG_POKEY_OUTPUT_OPAMP_LOW_PASS(RES_K(1), CAP_U(0.022), 5.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

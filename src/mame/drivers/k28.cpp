@@ -454,7 +454,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(k28_state::k28)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8021, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("maincpu", I8021, XTAL(3'579'545))
 	MCFG_CPU_IO_MAP(k28_mcu_map)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(k28_state, mcu_p1_r))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(k28_state, mcu_p2_r))
@@ -462,7 +462,7 @@ MACHINE_CONFIG_START(k28_state::k28)
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(k28_state, mcu_prog_w))
 	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("speech", votrax_sc01_device, request)) // SC-01 A/R pin
 
-	MCFG_DEVICE_ADD("tms6100", TMS6100, XTAL_3_579545MHz) // CLK tied to 8021 ALE pin
+	MCFG_DEVICE_ADD("tms6100", TMS6100, XTAL(3'579'545)) // CLK tied to 8021 ALE pin
 
 	MCFG_TIMER_ADD_NONE("on_button")
 

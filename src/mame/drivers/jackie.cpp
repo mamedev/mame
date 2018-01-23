@@ -600,7 +600,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jackie_state::irq)
 MACHINE_CONFIG_START(jackie_state::jackie)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(jackie_prg_map)
 	MCFG_CPU_IO_MAP(jackie_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jackie_state, irq, "screen", 0, 1)

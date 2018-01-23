@@ -116,7 +116,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(a51xx_state::a5120)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(a5120_mem)
 	MCFG_CPU_IO_MAP(a5120_io)
 

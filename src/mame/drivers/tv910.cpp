@@ -39,7 +39,7 @@
 #define RS232_TAG   "rs232"
 #define KBDC_TAG    "ay3600"
 
-#define MASTER_CLOCK XTAL_13_608MHz
+#define MASTER_CLOCK XTAL(13'608'000)
 
 class tv910_state : public driver_device
 {
@@ -540,7 +540,7 @@ MACHINE_CONFIG_START(tv910_state::tv910)
 	MCFG_AY3600_AKO_CB(WRITELINE(tv910_state, ay3600_ako_w))
 
 	MCFG_DEVICE_ADD(ACIA_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))

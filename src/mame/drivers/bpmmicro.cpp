@@ -360,7 +360,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(bpmmicro_state::bpmmicro)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL_32MHz/4) /* divider is guessed, cpu is an AMD N80L286-16/S part */
+	MCFG_CPU_ADD("maincpu", I80286, XTAL(32'000'000)/4) /* divider is guessed, cpu is an AMD N80L286-16/S part */
 	MCFG_CPU_PROGRAM_MAP(i286_mem)
 	MCFG_CPU_IO_MAP(i286_io)
 

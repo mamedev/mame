@@ -97,7 +97,7 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(vectrex_state::vectrex)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_6MHz) // 68A09
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(6'000'000)) // 68A09
 	MCFG_CPU_PROGRAM_MAP(vectrex_map)
 
 	/* video hardware */
@@ -114,13 +114,13 @@ MACHINE_CONFIG_START(vectrex_state::vectrex)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
-	MCFG_SOUND_ADD("ay8912", AY8912, XTAL_6MHz / 4)
+	MCFG_SOUND_ADD("ay8912", AY8912, XTAL(6'000'000) / 4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("BUTTONS"))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(vectrex_state, vectrex_psg_port_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL_6MHz / 4)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL(6'000'000) / 4)
 	MCFG_VIA6522_READPA_HANDLER(READ8(vectrex_state, vectrex_via_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(vectrex_state, vectrex_via_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(vectrex_state, v_via_pa_w))

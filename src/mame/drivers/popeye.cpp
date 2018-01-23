@@ -447,7 +447,7 @@ WRITE8_MEMBER(popeye_state::popeye_portB_w)
 
 MACHINE_CONFIG_START(popeye_state::tnx1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)   /* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(tnx1_map)
 	MCFG_CPU_IO_MAP(popeye_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", popeye_state,  popeye_interrupt)
@@ -468,7 +468,7 @@ MACHINE_CONFIG_START(popeye_state::tnx1)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_8MHz/4)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(8'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(popeye_state, popeye_portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

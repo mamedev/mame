@@ -206,7 +206,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
 	MCFG_CPU_PROGRAM_MAP(mikrosha_mem)
 	MCFG_CPU_IO_MAP(mikrosha_io)
 
@@ -221,7 +221,7 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(radio86_state, mikrosha_8255_font_page_w))
 
-	MCFG_DEVICE_ADD("i8275", I8275, XTAL_16MHz / 12)
+	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mikrosha_state, display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma8257",i8257_device, dreq2_w))
@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(mikrosha_state::mikrosha)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL_16MHz / 9)
+	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(16'000'000) / 9)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(radio86_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(radio86_state, memory_read_byte))
 	MCFG_I8257_OUT_MEMW_CB(WRITE8(radio86_state, memory_write_byte))

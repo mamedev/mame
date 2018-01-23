@@ -497,7 +497,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(okean240_state::okean240t)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_12MHz / 6)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL(12'000'000) / 6)
 	MCFG_CPU_PROGRAM_MAP(okean240_mem)
 	MCFG_CPU_IO_MAP(okean240t_io)
 

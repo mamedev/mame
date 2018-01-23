@@ -381,7 +381,7 @@ const tiny_rom_entry *victor_9000_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(victor_9000_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8021_TAG, I8021, XTAL_3_579545MHz)
+	MCFG_CPU_ADD(I8021_TAG, I8021, XTAL(3'579'545))
 	// P0 is unconnected on pcb
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(victor_9000_keyboard_device, kb_p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(victor_9000_keyboard_device, kb_p1_w))

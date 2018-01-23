@@ -514,19 +514,19 @@ WRITE16_MEMBER( cubeqst_state::sound_dac_w )
  *************************************/
 
 MACHINE_CONFIG_START(cubeqst_state::cubeqst)
-	MCFG_CPU_ADD("main_cpu", M68000, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("main_cpu", M68000, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(m68k_program_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cubeqst_state,  vblank)
 
-	MCFG_CPU_ADD("rotate_cpu", CQUESTROT, XTAL_10MHz / 2)
+	MCFG_CPU_ADD("rotate_cpu", CQUESTROT, XTAL(10'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(rotate_map)
 	MCFG_CQUESTROT_CONFIG( DEVWRITE16( "line_cpu", cquestlin_cpu_device, linedata_w ) )
 
-	MCFG_CPU_ADD("line_cpu", CQUESTLIN, XTAL_10MHz / 2)
+	MCFG_CPU_ADD("line_cpu", CQUESTLIN, XTAL(10'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(line_sound_map)
 	MCFG_CQUESTLIN_CONFIG( DEVREAD16( "rotate_cpu", cquestrot_cpu_device, linedata_r ) )
 
-	MCFG_CPU_ADD("sound_cpu", CQUESTSND, XTAL_10MHz / 2)
+	MCFG_CPU_ADD("sound_cpu", CQUESTSND, XTAL(10'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(line_sound_map)
 	MCFG_CQUESTSND_CONFIG( WRITE16( cubeqst_state, sound_dac_w ), "soundproms" )
 

@@ -175,7 +175,7 @@ const tiny_rom_entry *aha1542_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(aha1542_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z84C0010_TAG, Z80, XTAL_12MHz)
+	MCFG_CPU_ADD(Z84C0010_TAG, Z80, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP( z84c0010_mem )
 MACHINE_CONFIG_END
 

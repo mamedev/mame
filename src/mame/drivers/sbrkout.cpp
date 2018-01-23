@@ -105,7 +105,7 @@ public:
  *
  *************************************/
 
-#define MAIN_CLOCK      XTAL_12_096MHz
+#define MAIN_CLOCK      XTAL(12'096'000)
 #define TIME_4V         attotime::from_hz(MAIN_CLOCK/2/256/2/4)
 
 

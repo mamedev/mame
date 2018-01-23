@@ -127,7 +127,7 @@ WRITE_LINE_MEMBER(a1200_kbd_device::mpu_tcmp)
 }
 
 MACHINE_CONFIG_START(a1200_kbd_device::device_add_mconfig)
-	MCFG_CPU_ADD("mpu", M68HC705C8A, XTAL_3MHz)
+	MCFG_CPU_ADD("mpu", M68HC705C8A, XTAL(3'000'000))
 	MCFG_M68HC05_PORTB_R_CB(READ8(a1200_kbd_device, mpu_portb_r));
 	MCFG_M68HC05_PORTD_R_CB(IOPORT("MOD"));
 	MCFG_M68HC05_PORTA_W_CB(WRITE8(a1200_kbd_device, mpu_porta_w));

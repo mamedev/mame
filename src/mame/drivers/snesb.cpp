@@ -697,7 +697,7 @@ MACHINE_CONFIG_START(snesb_state::kinstb)
 
 	/* audio CPU */
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	MCFG_CPU_ADD("soundcpu", SPC700, XTAL_24_576MHz / 12)
+	MCFG_CPU_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
 	MCFG_CPU_PROGRAM_MAP(spc_mem)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -724,7 +724,7 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_DERIVED(snesb_state::mk3snes, kinstb)
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
 	MCFG_CPU_IO_MAP(mcu_io_map)
 MACHINE_CONFIG_END
 

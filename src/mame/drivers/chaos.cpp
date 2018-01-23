@@ -144,7 +144,7 @@ void chaos_state::machine_reset()
 
 MACHINE_CONFIG_START(chaos_state::chaos)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu", S2650, XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_DATA_MAP(data_map)

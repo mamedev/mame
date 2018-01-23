@@ -26,7 +26,7 @@ Electro-mechanical bubble hockey games:
 #include "chexx.lh"
 
 
-#define MAIN_CLOCK XTAL_4MHz
+#define MAIN_CLOCK XTAL(4'000'000)
 
 class chexx_state : public driver_device
 {

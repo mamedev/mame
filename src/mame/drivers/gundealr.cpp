@@ -427,7 +427,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::gundealr_scanline)
 MACHINE_CONFIG_START(gundealr_state::gundealr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)   /* 6 MHz verified for Yam! Yam!? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)   /* 6 MHz verified for Yam! Yam!? */
 	MCFG_CPU_PROGRAM_MAP(gundealr_main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gundealr_state, gundealr_scanline, "screen", 0, 1)
@@ -449,7 +449,7 @@ MACHINE_CONFIG_START(gundealr_state::gundealr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* 1.5Mhz verified for Yam! Yam!? */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* 1.5Mhz verified for Yam! Yam!? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

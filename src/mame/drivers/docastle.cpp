@@ -574,15 +574,15 @@ void docastle_state::machine_start()
 MACHINE_CONFIG_START(docastle_state::docastle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(docastle_map)
 	MCFG_CPU_IO_MAP(docastle_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("slave", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("slave", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(docastle_map2)
 
-	MCFG_CPU_ADD("cpu3", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("cpu3", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(docastle_map3)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", docastle_state, nmi_line_pulse)
 
@@ -603,7 +603,7 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_9_828MHz / 16)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(9'828'000) / 16)
 	/*
 	The games program the CRTC for a width of 32 characters (256 pixels).
 	However, the DE output from the CRTC is first ANDed with the NAND of
@@ -616,7 +616,7 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(docastle_state, docastle_tint))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_9_828MHz/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from crtc
+	MCFG_SCREEN_RAW_PARAMS(XTAL(9'828'000)/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0) // from crtc
 	MCFG_SCREEN_UPDATE_DRIVER(docastle_state, screen_update_docastle)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -627,16 +627,16 @@ MACHINE_CONFIG_START(docastle_state::docastle)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_4MHz)
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, XTAL_4MHz)
+	MCFG_SOUND_ADD("sn2", SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn3", SN76489A, XTAL_4MHz)
+	MCFG_SOUND_ADD("sn3", SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn4", SN76489A, XTAL_4MHz)
+	MCFG_SOUND_ADD("sn4", SN76489A, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -669,7 +669,7 @@ MACHINE_CONFIG_DERIVED(docastle_state::idsoccer, docastle)
 	MCFG_VIDEO_START_OVERRIDE(docastle_state,dorunrun)
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* Crystal verified on American Soccer board. */
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) /* Crystal verified on American Soccer board. */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(docastle_state, idsoccer_adpcm_int)) // interrupt function
 	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)      // 6 kHz    ???
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

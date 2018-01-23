@@ -329,7 +329,7 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 
 MACHINE_CONFIG_START(ravens_state::ravens)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz) // frequency is unknown
+	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
 	MCFG_CPU_PROGRAM_MAP(ravens_mem)
 	MCFG_CPU_IO_MAP(ravens_io)
 	MCFG_S2650_SENSE_INPUT(READLINE(ravens_state, cass_r))
@@ -350,7 +350,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ravens_state::ravens2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz) // frequency is unknown
+	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
 	MCFG_CPU_PROGRAM_MAP(ravens_mem)
 	MCFG_CPU_IO_MAP(ravens2_io)
 	MCFG_S2650_SENSE_INPUT(READLINE(ravens_state, cass_r))

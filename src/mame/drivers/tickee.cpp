@@ -100,9 +100,9 @@ protected:
 };
 
 
-#define CPU_CLOCK           XTAL_40MHz
-#define VIDEO_CLOCK         XTAL_14_31818MHz
-#define OKI_CLOCK           XTAL_1MHz
+#define CPU_CLOCK           XTAL(40'000'000)
+#define VIDEO_CLOCK         XTAL(14'318'181)
+#define OKI_CLOCK           XTAL(1'000'000)
 
 
 /*************************************
@@ -751,7 +751,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tickee_state::tickee)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
+	MCFG_CPU_ADD("maincpu", TMS34010, XTAL(40'000'000))
 	MCFG_CPU_PROGRAM_MAP(tickee_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
@@ -799,7 +799,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tickee_state::rapidfir)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_50MHz)
+	MCFG_CPU_ADD("maincpu", TMS34010, XTAL(50'000'000))
 	MCFG_CPU_PROGRAM_MAP(rapidfir_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
@@ -833,7 +833,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tickee_state::mouseatk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
+	MCFG_CPU_ADD("maincpu", TMS34010, XTAL(40'000'000))
 	MCFG_CPU_PROGRAM_MAP(mouseatk_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */

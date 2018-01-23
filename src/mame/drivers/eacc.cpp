@@ -241,7 +241,7 @@ WRITE8_MEMBER( eacc_state::eacc_digit_w )
 
 MACHINE_CONFIG_START(eacc_state::eacc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, XTAL_3_579545MHz)  /* Divided by 4 inside the m6802*/
+	MCFG_CPU_ADD("maincpu", M6802, XTAL(3'579'545))  /* Divided by 4 inside the m6802*/
 	MCFG_CPU_PROGRAM_MAP(eacc_mem)
 
 	MCFG_DEFAULT_LAYOUT(layout_eacc)

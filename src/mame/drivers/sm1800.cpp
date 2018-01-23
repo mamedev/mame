@@ -156,7 +156,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(sm1800_state::sm1800)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(sm1800_mem)
 	MCFG_CPU_IO_MAP(sm1800_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sm1800_state,  sm1800_vblank_interrupt)

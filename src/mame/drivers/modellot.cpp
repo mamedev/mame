@@ -173,7 +173,7 @@ uint32_t modellot_state::screen_update_modellot(screen_device &screen, bitmap_in
 
 MACHINE_CONFIG_START(modellot_state::modellot)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 

@@ -129,7 +129,7 @@ DISCRETE_SOUND_END
 
 MACHINE_CONFIG_START(abc77_device::device_add_mconfig)
 	// keyboard cpu
-	MCFG_CPU_ADD(I8035_TAG, I8035, XTAL_4_608MHz)
+	MCFG_CPU_ADD(I8035_TAG, I8035, XTAL(4'608'000))
 	MCFG_CPU_PROGRAM_MAP(abc77_map)
 	MCFG_CPU_IO_MAP(abc77_io)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(abc77_device, p1_r))
@@ -139,7 +139,7 @@ MACHINE_CONFIG_START(abc77_device::device_add_mconfig)
 
 	// watchdog
 	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(XTAL_4_608MHz/3/5/4096))
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(XTAL(4'608'000)/3/5/4096))
 
 	// discrete sound
 	MCFG_SPEAKER_STANDARD_MONO("mono")

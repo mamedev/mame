@@ -428,7 +428,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_16MHz          /* unknown */
+#define MASTER_CLOCK    XTAL(16'000'000)          /* unknown */
 #define CPU_CLOCK       MASTER_CLOCK/4      /* guess... seems accurate */
 #define CRTC_CLOCK      MASTER_CLOCK/24     /* it gives 63.371293 Hz. with current settings */
 

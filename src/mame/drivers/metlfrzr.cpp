@@ -361,7 +361,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
 MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(metlfrzr_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metlfrzr_state, scanline, "screen", 0, 1)
@@ -386,7 +386,7 @@ MACHINE_CONFIG_START(metlfrzr_state::metlfrzr)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz / 4)    /* 3.579545 MHz */
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181) / 4)    /* 3.579545 MHz */
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("t5182", t5182_device, ym2151_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)

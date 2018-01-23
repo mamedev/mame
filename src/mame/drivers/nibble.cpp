@@ -54,7 +54,7 @@
 #include "screen.h"
 
 
-#define MASTER_CLOCK    XTAL_12MHz
+#define MASTER_CLOCK    XTAL(12'000'000)
 
 
 class nibble_state : public driver_device

@@ -50,7 +50,7 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(bbc_tube_arm_device::device_add_mconfig)
-	MCFG_CPU_ADD("arm", ARM, XTAL_20MHz / 3)
+	MCFG_CPU_ADD("arm", ARM, XTAL(20'000'000) / 3)
 	MCFG_CPU_PROGRAM_MAP(tube_arm_mem)
 
 	MCFG_TUBE_ADD("ula")

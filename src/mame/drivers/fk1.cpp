@@ -408,7 +408,7 @@ uint32_t fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 MACHINE_CONFIG_START(fk1_state::fk1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(fk1_mem)
 	MCFG_CPU_IO_MAP(fk1_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fk1_state,fk1_irq_callback)

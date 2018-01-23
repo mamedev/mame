@@ -275,7 +275,7 @@ static GFXDECODE_START( pitnrun )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(pitnrun_state::pitnrun)
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)       /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80,XTAL(18'432'000)/6)       /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  nmi_source)
 
@@ -287,7 +287,7 @@ MACHINE_CONFIG_START(pitnrun_state::pitnrun)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(pitnrun_state, hflip_w)) // HFLIP
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(pitnrun_state, vflip_w)) // VFLIP
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz/2)          /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000)/2)          /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_sound_map)
 	MCFG_CPU_IO_MAP(pitnrun_sound_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pitnrun_state,  irq0_line_hold)
@@ -314,12 +314,12 @@ MACHINE_CONFIG_START(pitnrun_state::pitnrun)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)    /* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/12)    /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)    /* verified on pcb */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'432'000)/12)    /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
@@ -331,7 +331,7 @@ MACHINE_CONFIG_DERIVED(pitnrun_state::pitnrun_mcu, pitnrun)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pitnrun_map_mcu)
 
-	MCFG_CPU_ADD("mcu", M68705P5, XTAL_18_432MHz/6)     /* verified on pcb */
+	MCFG_CPU_ADD("mcu", M68705P5, XTAL(18'432'000)/6)     /* verified on pcb */
 	MCFG_M68705_PORTA_R_CB(READ8(pitnrun_state, m68705_portA_r))
 	MCFG_M68705_PORTB_R_CB(READ8(pitnrun_state, m68705_portB_r))
 	MCFG_M68705_PORTC_R_CB(READ8(pitnrun_state, m68705_portC_r))

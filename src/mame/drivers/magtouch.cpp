@@ -197,7 +197,7 @@ MACHINE_CONFIG_START(magtouch_state::magtouch)
 	MCFG_DEVICE_REPLACE("vga", TVGA9000_VGA, 0)
 
 	MCFG_FRAGMENT_ADD( pcat_common )
-	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ns16450_0", NS16450, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("microtouch", microtouch_device, rx))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE("pic8259_1", pic8259_device, ir4_w))
 	MCFG_MICROTOUCH_ADD( "microtouch", 9600, DEVWRITELINE("ns16450_0", ins8250_uart_device, rx_w) )

@@ -190,7 +190,7 @@ MACHINE_CONFIG_START(dps1_state::dps1)
 	MCFG_MACHINE_RESET_OVERRIDE(dps1_state, dps1)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("uart", MC2661, XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD("uart", MC2661, XTAL(5'068'800))
 	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))

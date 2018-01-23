@@ -376,7 +376,7 @@ void unior_state::machine_reset()
 
 MACHINE_CONFIG_START(unior_state::unior)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_20MHz / 9)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL(20'000'000) / 9)
 	MCFG_CPU_PROGRAM_MAP(unior_mem)
 	MCFG_CPU_IO_MAP(unior_io)
 
@@ -399,11 +399,11 @@ MACHINE_CONFIG_START(unior_state::unior)
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_20MHz / 12)
-	MCFG_PIT8253_CLK1(XTAL_20MHz / 9)
+	MCFG_PIT8253_CLK0(XTAL(20'000'000) / 12)
+	MCFG_PIT8253_CLK1(XTAL(20'000'000) / 9)
 	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
-	MCFG_PIT8253_CLK2(XTAL_16MHz / 9 / 64) // unknown frequency
+	MCFG_PIT8253_CLK2(XTAL(16'000'000) / 9 / 64) // unknown frequency
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_DEVICE_ADD("ppi0", I8255, 0)
@@ -420,12 +420,12 @@ MACHINE_CONFIG_START(unior_state::unior)
 	MCFG_I8255_IN_PORTC_CB(READ8(unior_state, ppi1_c_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(unior_state, ppi1_c_w))
 
-	MCFG_DEVICE_ADD("dma", I8257, XTAL_20MHz / 9)
+	MCFG_DEVICE_ADD("dma", I8257, XTAL(20'000'000) / 9)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(unior_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(unior_state, dma_r))
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("crtc", i8275_device, dack_w))
 
-	MCFG_DEVICE_ADD("crtc", I8275, XTAL_20MHz / 12)
+	MCFG_DEVICE_ADD("crtc", I8275, XTAL(20'000'000) / 12)
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(unior_state, display_pixels)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma",i8257_device, dreq2_w))

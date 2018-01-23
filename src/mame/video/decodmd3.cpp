@@ -132,14 +132,14 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(decodmd_type3_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dmdcpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("dmdcpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(decodmd3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer", decodmd_type3_device, dmd_irq, attotime::from_hz(150))
 
-	MCFG_MC6845_ADD("dmd6845", MC6845, nullptr, XTAL_12MHz / 4)  // TODO: confirm clock speed
+	MCFG_MC6845_ADD("dmd6845", MC6845, nullptr, XTAL(12'000'000) / 4)  // TODO: confirm clock speed
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(16)
 	MCFG_MC6845_UPDATE_ROW_CB(decodmd_type3_device, crtc_update_row)

@@ -1328,7 +1328,7 @@ void peplus_state::machine_reset()
 
 MACHINE_CONFIG_START(peplus_state::peplus)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I80C32, XTAL_20MHz/2) /* 10MHz */
+	MCFG_CPU_ADD("maincpu", I80C32, XTAL(20'000'000)/2) /* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(peplus_map)
 	MCFG_CPU_IO_MAP(peplus_iomap)
 
@@ -1346,7 +1346,7 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	MCFG_PALETTE_ADD("palette", 16*16*2)
 	MCFG_PALETTE_INIT_OWNER(peplus_state, peplus)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_20MHz/8/3)
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(20'000'000)/8/3)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_ADDR_CHANGED_CB(peplus_state, crtc_addr)
@@ -1357,7 +1357,7 @@ MACHINE_CONFIG_START(peplus_state::peplus)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_20MHz/12)
+	MCFG_SOUND_ADD("aysnd", AY8912, XTAL(20'000'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 

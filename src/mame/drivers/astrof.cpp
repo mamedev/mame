@@ -63,7 +63,7 @@
 #include "cpu/m6502/m6502.h"
 
 
-#define MASTER_CLOCK        (XTAL_10_595MHz)
+#define MASTER_CLOCK        (XTAL(10'595'000))
 #define MAIN_CPU_CLOCK      (MASTER_CLOCK / 16)
 #define PIXEL_CLOCK         (MASTER_CLOCK / 2)
 #define HTOTAL              (0x150)

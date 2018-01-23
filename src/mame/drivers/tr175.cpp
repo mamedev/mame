@@ -94,7 +94,7 @@ MACHINE_CONFIG_START(tr175_state::tr175)
 	MCFG_DEVICE_ADDRESS_MAP(0, vram_map)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_11_0592MHz / 3) // is this the right clock?
+	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(11'059'200) / 3) // is this the right clock?
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_1))
 
 	MCFG_PALETTE_ADD("palette", 0x100)

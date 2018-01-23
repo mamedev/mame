@@ -270,7 +270,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(zrt80_state::zrt80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(2'457'600))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -290,7 +290,7 @@ MACHINE_CONFIG_START(zrt80_state::zrt80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_20MHz / 8)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(20'000'000) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
 	MCFG_MC6845_UPDATE_ROW_CB(zrt80_state, crtc_update_row)

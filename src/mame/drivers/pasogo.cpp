@@ -536,7 +536,7 @@ void pasogo_state::machine_reset()
 
 MACHINE_CONFIG_START(pasogo_state::pasogo)
 
-	MCFG_CPU_ADD("maincpu", V30, XTAL_32_22MHz/2)
+	MCFG_CPU_ADD("maincpu", V30, XTAL(32'220'000)/2)
 	MCFG_CPU_PROGRAM_MAP(pasogo_mem)
 	MCFG_CPU_IO_MAP(pasogo_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pasogo_state,  pasogo_interrupt)

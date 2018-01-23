@@ -266,9 +266,9 @@
 *********************************************************************/
 
 
-#define CPU_CLOCK       XTAL_12_288MHz
-#define MCU_CLOCK       XTAL_8MHz
-#define VID_CLOCK       XTAL_21_4772MHz
+#define CPU_CLOCK       XTAL(12'288'000)
+#define MCU_CLOCK       XTAL(8'000'000)
+#define VID_CLOCK       XTAL(21'477'272)
 
 #define VDP_MEM         0x20000  // 4x 4464 (64K x 4 DRAM)
 

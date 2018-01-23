@@ -113,7 +113,7 @@ const tiny_rom_entry *abc800_keyboard_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(abc800_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5_9904MHz)
+	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL(5'990'400))
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(abc800_keyboard_device, kb_p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(abc800_keyboard_device, kb_p1_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(abc800_keyboard_device, kb_p2_w))
@@ -337,7 +337,7 @@ void abc800_keyboard_device::device_start()
 {
 	// allocate timers
 	m_serial_timer = timer_alloc();
-	m_serial_timer->adjust(attotime::from_hz(XTAL_5_9904MHz/(3*5)/20), 0, attotime::from_hz(XTAL_5_9904MHz/(3*5)/20)); // ???
+	m_serial_timer->adjust(attotime::from_hz(XTAL(5'990'400)/(3*5)/20), 0, attotime::from_hz(XTAL(5'990'400)/(3*5)/20)); // ???
 
 	// state saving
 	save_item(NAME(m_row));

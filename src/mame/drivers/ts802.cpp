@@ -182,7 +182,7 @@ DRIVER_INIT_MEMBER( ts802_state, ts802 )
 
 MACHINE_CONFIG_START(ts802_state::ts802)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(ts802_mem)
 	MCFG_CPU_IO_MAP(ts802_io)
 	//MCFG_Z80_DAISY_CHAIN(daisy_chain_intf) // causes problems
@@ -192,7 +192,7 @@ MACHINE_CONFIG_START(ts802_state::ts802)
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ts802_state, kbd_put))
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(16'000'000) / 4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(INPUTLINE("maincpu", INPUT_LINE_HALT))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(ts802_state, memory_read_byte))
@@ -200,16 +200,16 @@ MACHINE_CONFIG_START(ts802_state::ts802)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(ts802_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(ts802_state, io_write_byte))
 
-	MCFG_DEVICE_ADD("dart1", Z80DART, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("dart1", Z80DART, XTAL(16'000'000) / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("dart2", Z80DART, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("dart2", Z80DART, XTAL(16'000'000) / 4)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_FD1793_ADD("fdc", XTAL_4MHz / 2)                  // unknown clock
+	MCFG_FD1793_ADD("fdc", XTAL(4'000'000) / 2)                  // unknown clock
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ts802_floppies, "525dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END

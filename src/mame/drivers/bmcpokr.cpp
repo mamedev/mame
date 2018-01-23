@@ -803,7 +803,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, bmcpokr_state )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_42MHz / 4) // 68000 @10.50MHz (42/4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(42'000'000) / 4) // 68000 @10.50MHz (42/4)
 	MCFG_CPU_PROGRAM_MAP(bmcpokr_mem)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bmcpokr_state, interrupt, "screen", 0, 1)
 
@@ -826,11 +826,11 @@ MACHINE_CONFIG_START(bmcpokr_state::bmcpokr)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_42MHz / 12)    // UM3567 @3.50MHz (42/12)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(42'000'000) / 12)    // UM3567 @3.50MHz (42/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_42MHz / 40, PIN7_HIGH)   // M6295 @1.05MHz (42/40), pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(42'000'000) / 40, PIN7_HIGH)   // M6295 @1.05MHz (42/40), pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

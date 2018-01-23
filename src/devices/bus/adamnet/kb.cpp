@@ -74,7 +74,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(adam_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
+	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(adam_kb_mem)
 	MCFG_CPU_IO_MAP(adam_kb_io)
 MACHINE_CONFIG_END

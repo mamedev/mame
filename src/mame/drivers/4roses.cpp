@@ -184,7 +184,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_16MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
 
 class _4roses_state : public funworld_state
 {

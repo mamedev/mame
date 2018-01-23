@@ -169,7 +169,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(tk80bs_state::tk80bs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz) //unknown clock
+	MCFG_CPU_ADD("maincpu",I8080, XTAL(1'000'000)) //unknown clock
 	MCFG_CPU_PROGRAM_MAP(tk80bs_mem)
 
 	/* video hardware */

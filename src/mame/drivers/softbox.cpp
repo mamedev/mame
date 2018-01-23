@@ -370,7 +370,7 @@ void softbox_state::ieee488_ifc(int state)
 
 MACHINE_CONFIG_START(softbox_state::softbox)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(softbox_mem)
 	MCFG_CPU_IO_MAP(softbox_io)
 
@@ -397,7 +397,7 @@ MACHINE_CONFIG_START(softbox_state::softbox)
 	MCFG_I8255_IN_PORTC_CB(READ8(softbox_state, ppi1_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(softbox_state, ppi1_pc_w))
 
-	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD(COM8116_TAG, COM8116, XTAL(5'068'800))
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_rxc))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_txc))
 

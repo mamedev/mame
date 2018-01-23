@@ -99,8 +99,8 @@ namespace {
 }
 
 // **** Constants ****
-constexpr unsigned SYS_CLOCK = XTAL_4_9152MHz;
-constexpr unsigned VIDEO_DOT_CLOCK   = XTAL_21_06MHz;
+constexpr auto SYS_CLOCK = XTAL(4'915'200);
+constexpr auto VIDEO_DOT_CLOCK   = XTAL(21'060'000);
 constexpr unsigned VIDEO_VIS_ROWS    = 24;
 constexpr unsigned VIDEO_TOT_ROWS    = 25;
 constexpr unsigned VIDEO_VIS_COLS    = 80;
@@ -710,7 +710,7 @@ void hp2645_state::update_async_control(uint8_t new_control)
 		if (new_rate_idx == 0) {
 			rxc_txc_freq = 0.0;
 		} else {
-			rxc_txc_freq = double(SYS_CLOCK) / baud_rate_divisors[ new_rate_idx ];
+			rxc_txc_freq = SYS_CLOCK.dvalue() / baud_rate_divisors[ new_rate_idx ];
 		}
 		m_uart->set_receiver_clock(rxc_txc_freq);
 		m_uart->set_transmitter_clock(rxc_txc_freq);

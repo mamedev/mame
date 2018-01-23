@@ -1289,7 +1289,7 @@
 #include "upndown.lh"
 
 
-#define MASTER_CLOCK    XTAL_10MHz
+#define MASTER_CLOCK    XTAL(10'000'000)
 #define CPU_CLOCK       (MASTER_CLOCK/16)
 
 

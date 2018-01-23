@@ -292,16 +292,16 @@ INTERRUPT_GEN_MEMBER(megazone_state::vblank_irq)
 MACHINE_CONFIG_START(megazone_state::megazone)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL_18_432MHz/9)        /* 2.048 MHz */
+	MCFG_CPU_ADD("maincpu", KONAMI1, XTAL(18'432'000)/9)        /* 2.048 MHz */
 	MCFG_CPU_PROGRAM_MAP(megazone_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", megazone_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)     /* Z80 Clock is derived from the H1 signal */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6)     /* Z80 Clock is derived from the H1 signal */
 	MCFG_CPU_PROGRAM_MAP(megazone_sound_map)
 	MCFG_CPU_IO_MAP(megazone_sound_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", megazone_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("daccpu", I8039, XTAL_14_31818MHz/2)    /* 7.15909MHz */
+	MCFG_CPU_ADD("daccpu", I8039, XTAL(14'318'181)/2)    /* 7.15909MHz */
 	MCFG_CPU_PROGRAM_MAP(megazone_i8039_map)
 	MCFG_CPU_IO_MAP(megazone_i8039_io_map)
 	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("dac", dac_byte_interface, write))
@@ -336,7 +336,7 @@ MACHINE_CONFIG_START(megazone_state::megazone)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(14'318'181)/8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(megazone_state, megazone_port_a_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(megazone_state, megazone_port_b_w))
 	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.30)

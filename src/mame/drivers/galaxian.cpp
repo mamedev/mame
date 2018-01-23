@@ -669,7 +669,7 @@ TODO:
 #include "speaker.h"
 
 
-#define KONAMI_SOUND_CLOCK      XTAL_14_31818MHz
+#define KONAMI_SOUND_CLOCK      XTAL(14'318'181)
 
 
 
@@ -6109,11 +6109,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(galaxian_state::takeoff, explorer) // takeoff shares the same main map as explorer, but uses only one AY8912 for sound.
 
 	MCFG_SOUND_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL_12MHz / 8) // XTAL verified, divider not verified
+	MCFG_DEVICE_CLOCK(XTAL(12'000'000) / 8) // XTAL verified, divider not verified
 
 	/* 2nd CPU to drive sound */
 	MCFG_SOUND_MODIFY("audiocpu")
-	MCFG_DEVICE_CLOCK(XTAL_12MHz / 8)
+	MCFG_DEVICE_CLOCK(XTAL(12'000'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(takeoff_sound_map)
 	MCFG_CPU_IO_MAP(takeoff_sound_portmap)
 
@@ -6121,7 +6121,7 @@ MACHINE_CONFIG_DERIVED(galaxian_state::takeoff, explorer) // takeoff shares the 
 	MCFG_DEVICE_REMOVE("8910.0")
 	MCFG_DEVICE_REMOVE("8910.1")
 
-	MCFG_SOUND_ADD("8912", AY8912, XTAL_12MHz / 8)
+	MCFG_SOUND_ADD("8912", AY8912, XTAL(12'000'000) / 8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(galaxian_state, explorer_sound_latch_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END

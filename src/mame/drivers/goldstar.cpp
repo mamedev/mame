@@ -212,7 +212,7 @@
 ***************************************************************************/
 
 
-#define MASTER_CLOCK    XTAL_12MHz
+#define MASTER_CLOCK    XTAL(12'000'000)
 #define CPU_CLOCK       MASTER_CLOCK / 4
 #define PSG_CLOCK       MASTER_CLOCK / 4
 #define AY_CLOCK        MASTER_CLOCK / 8
@@ -9108,12 +9108,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(unkch_state::bonusch)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(bonusch_map)
 	MCFG_CPU_IO_MAP(bonusch_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
 
-	MCFG_CPU_ADD("mcu", I80C51, XTAL_12MHz)
+	MCFG_CPU_ADD("mcu", I80C51, XTAL(12'000'000))
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */

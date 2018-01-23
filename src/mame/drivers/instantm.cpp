@@ -116,14 +116,14 @@ void instantm_state::machine_reset()
 	m_clock_en = true;
 }
 
-// OSC1 = XTAL_3_579545MHz
+// OSC1 = XTAL(3'579'545)
 
 MACHINE_CONFIG_START(instantm_state::instantm)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("subcpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(sub_io)
 

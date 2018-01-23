@@ -432,7 +432,7 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_START(harddriv_sound_board_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("soundcpu", M68000, XTAL_16MHz/2)
+	MCFG_CPU_ADD("soundcpu", M68000, XTAL(16'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(driversnd_68k_map)
 
 	MCFG_DEVICE_ADD("latch", LS259, 0) // 80R
@@ -443,7 +443,7 @@ MACHINE_CONFIG_START(harddriv_sound_board_device::device_add_mconfig)
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sounddsp", INPUT_LINE_HALT)) MCFG_DEVCB_INVERT // RES320
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(harddriv_sound_board_device, led_w))
 
-	MCFG_CPU_ADD("sounddsp", TMS32010, XTAL_20MHz)
+	MCFG_CPU_ADD("sounddsp", TMS32010, XTAL(20'000'000))
 	MCFG_CPU_PROGRAM_MAP(driversnd_dsp_program_map)
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(driversnd_dsp_io_map)

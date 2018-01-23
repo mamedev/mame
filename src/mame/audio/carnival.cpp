@@ -199,13 +199,13 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_START(vicdual_state::carnival_audio)
 
 	/* music board */
-	MCFG_CPU_ADD("audiocpu", I8039, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", I8039, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(mboard_map)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(vicdual_state, carnival_music_port_1_w))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(vicdual_state, carnival_music_port_2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(vicdual_state, carnival_music_port_t1_r))
 
-	MCFG_SOUND_ADD("psg", AY8912, XTAL_3_579545MHz/3)
+	MCFG_SOUND_ADD("psg", AY8912, XTAL(3'579'545)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* samples */
