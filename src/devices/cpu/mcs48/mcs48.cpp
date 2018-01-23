@@ -323,11 +323,17 @@ i8742_device::i8742_device(const machine_config &mconfig, const char *tag, devic
 
 device_memory_interface::space_config_vector mcs48_cpu_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_data_config),
-		std::make_pair(AS_IO,      &m_io_config)
-	};
+	if ((m_feature_mask & UPI41_FEATURE) == 0)
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_DATA,    &m_data_config),
+			std::make_pair(AS_IO,      &m_io_config)
+		};
+	else
+		return space_config_vector {
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_DATA,    &m_data_config)
+		};
 }
 
 util::disasm_interface *mcs48_cpu_device::create_disassembler()
@@ -979,7 +985,7 @@ void mcs48_cpu_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_direct = m_program->direct<0>();
 	m_data = &space(AS_DATA);
-	m_io = &space(AS_IO);
+	m_io = (m_feature_mask & UPI41_FEATURE) == 0 ? &space(AS_IO) : nullptr;
 
 	// resolve callbacks
 	for (auto &cb : m_port_in_cb)
