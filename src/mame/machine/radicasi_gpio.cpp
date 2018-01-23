@@ -59,12 +59,12 @@ READ8_MEMBER(radica6502_gpio_device::gpio_r)
 void radica6502_gpio_device::write_port_data(int which, uint8_t data)
 {
 	//todo, actually use the direction registers
-	logerror("%s: write_port_data (port %d) %02x (direction register %02x)\n", which, data, m_ddr[which]);
+	logerror("%s: write_port_data (port %d) %02x (direction register %02x)\n", machine().describe_context(), which, data, m_ddr[which]);
 }
 
 void radica6502_gpio_device::write_direction(int which, uint8_t data)
 {
-	logerror("%s: write_direction (port %d) %02x\n", which, data);
+	logerror("%s: write_direction (port %d) %02x\n", machine().describe_context(), which, data);
 	m_ddr[which] = data;
 }
 
@@ -78,7 +78,7 @@ WRITE8_MEMBER(radica6502_gpio_device::gpio_w)
 
 WRITE8_MEMBER(radica6502_gpio_device::gpio_unk_w)
 {
-	logerror("%s: gpio_unk_w (port %d) %02x (direction register %02x)\n", offset, data, m_ddr[offset]);
+	logerror("%s: gpio_unk_w (port %d) %02x (direction register %02x)\n", machine().describe_context(), offset, data, m_ddr[offset]);
 }
 
 

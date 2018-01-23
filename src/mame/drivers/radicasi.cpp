@@ -637,7 +637,7 @@ uint32_t radica_eu3a05_state::screen_update(screen_device &screen, bitmap_ind16 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_rombank_hi_w)
 {
 	// written with the banking?
-	//logerror("%s: radicasi_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context(), data);
 	m_rombank_hi = data;
 
 	m_bank->set_bank(m_rombank_lo | (m_rombank_hi << 8));
@@ -645,7 +645,7 @@ WRITE8_MEMBER(radica_eu3a05_state::radicasi_rombank_hi_w)
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_rombank_lo_w)
 {
-	//logerror("%s: radicasi_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context(), data);
 	m_rombank_lo = data;
 }
 
@@ -658,7 +658,7 @@ READ8_MEMBER(radica_eu3a05_state::radicasi_pal_ntsc_r)
 {
 	// how best to handle this, we probably need to run the PAL machine at 50hz
 	// the text under the radica logo differs between regions
-	logerror("%s: radicasi_pal_ntsc_r (region + more?)\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_pal_ntsc_r (region + more?)\n", machine().describe_context());
 	return 0xff; // NTSC
 	//return 0x00; // PAL
 }
@@ -675,7 +675,7 @@ READ8_MEMBER(radica_eu3a05_state::radicasi_5003_r)
 	
 	*/
 
-	logerror("%s: radicasi_5003_r (RNG?)\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_5003_r (RNG?)\n", machine().describe_context());
 
 	return machine().rand();
 }
@@ -687,25 +687,25 @@ READ8_MEMBER(radica_eu3a05_state::radicasi_5003_r)
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_tile_gfxbase_lo_w)
 {
-	//logerror("%s: radicasi_tile_gfxbase_lo_w (select GFX base lower) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_tile_gfxbase_lo_w (select GFX base lower) %02x\n", machine().describe_context(), data);
 	m_tile_gfxbase_lo_data = data;
 }
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_tile_gfxbase_hi_w)
 {
-	//logerror("%s: radicasi_tile_gfxbase_hi_w (select GFX base upper) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_tile_gfxbase_hi_w (select GFX base upper) %02x\n", machine().describe_context(), data);
 	m_tile_gfxbase_hi_data = data;
 }
 
 READ8_MEMBER(radica_eu3a05_state::radicasi_tile_gfxbase_lo_r)
 {
-	//logerror("%s: radicasi_tile_gfxbase_lo_r (GFX base lower)\n", machine().describe_context().c_str());
+	//logerror("%s: radicasi_tile_gfxbase_lo_r (GFX base lower)\n", machine().describe_context());
 	return m_tile_gfxbase_lo_data;
 }
 
 READ8_MEMBER(radica_eu3a05_state::radicasi_tile_gfxbase_hi_r)
 {
-	//logerror("%s: radicasi_tile_gfxbase_hi_r (GFX base upper)\n", machine().describe_context().c_str());
+	//logerror("%s: radicasi_tile_gfxbase_hi_r (GFX base upper)\n", machine().describe_context());
 	return m_tile_gfxbase_hi_data;
 }
 
@@ -713,25 +713,25 @@ READ8_MEMBER(radica_eu3a05_state::radicasi_tile_gfxbase_hi_r)
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_w)
 {
-	//logerror("%s: radicasi_sprite_gfxbase_lo_w (select Sprite GFX base lower) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_sprite_gfxbase_lo_w (select Sprite GFX base lower) %02x\n", machine().describe_context(), data);
 	m_sprite_gfxbase_lo_data = data;
 }
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_w)
 {
-	//logerror("%s: radicasi_sprite_gfxbase_hi_w (select Sprite GFX base upper) %02x\n", machine().describe_context().c_str(), data);
+	//logerror("%s: radicasi_sprite_gfxbase_hi_w (select Sprite GFX base upper) %02x\n", machine().describe_context(), data);
 	m_sprite_gfxbase_hi_data = data;
 }
 
 READ8_MEMBER(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_r)
 {
-	//logerror("%s: radicasi_sprite_gfxbase_lo_r (Sprite GFX base lower)\n", machine().describe_context().c_str());
+	//logerror("%s: radicasi_sprite_gfxbase_lo_r (Sprite GFX base lower)\n", machine().describe_context());
 	return m_sprite_gfxbase_lo_data;
 }
 
 READ8_MEMBER(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_r)
 {
-	//logerror("%s: radicasi_sprite_gfxbase_hi_r (Sprite GFX base upper)\n", machine().describe_context().c_str());
+	//logerror("%s: radicasi_sprite_gfxbase_hi_r (Sprite GFX base upper)\n", machine().describe_context());
 	return m_sprite_gfxbase_hi_data;
 }
 
@@ -749,7 +749,7 @@ WRITE8_MEMBER(radica_eu3a05_state::radicasi_sprite_bg_scroll_w)
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_vidctrl_w)
 {
-	logerror("%s: radicasi_vidctrl_w %02x (video control?)\n", machine().describe_context().c_str(), data);
+	logerror("%s: radicasi_vidctrl_w %02x (video control?)\n", machine().describe_context(), data);
 	/*
 		c3  8bpp 16x16         1100 0011
 		e3  4bpp 16x16         1110 0011
@@ -763,37 +763,37 @@ WRITE8_MEMBER(radica_eu3a05_state::radicasi_vidctrl_w)
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_lo_w)
 {
-	logerror("%s: radicasi_dmasrc_lo_w (select DMA source low) %02x\n", machine().describe_context().c_str(), data);
+	logerror("%s: radicasi_dmasrc_lo_w (select DMA source low) %02x\n", machine().describe_context(), data);
 	m_dmasrc_lo_data = data;
 }
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_md_w)
 {
-	logerror("%s: radicasi_dmasrc_md_w (select DMA source middle) %02x\n", machine().describe_context().c_str(), data);
+	logerror("%s: radicasi_dmasrc_md_w (select DMA source middle) %02x\n", machine().describe_context(), data);
 	m_dmasrc_md_data = data;
 }
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_hi_w)
 {
-	logerror("%s: radicasi_dmasrc_hi_w (select DMA source upper) %02x\n", machine().describe_context().c_str(), data);
+	logerror("%s: radicasi_dmasrc_hi_w (select DMA source upper) %02x\n", machine().describe_context(), data);
 	m_dmasrc_hi_data = data;
 }
 
 READ8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_lo_r)
 {
-	logerror("%s: radicasi_dmasrc_lo_r (DMA source low)\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_dmasrc_lo_r (DMA source low)\n", machine().describe_context());
 	return m_dmasrc_lo_data;
 }
 
 READ8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_md_r)
 {
-	logerror("%s: radicasi_dmasrc_md_r (DMA source middle)\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_dmasrc_md_r (DMA source middle)\n", machine().describe_context());
 	return m_dmasrc_md_data;
 }
 
 READ8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_hi_r)
 {
-	logerror("%s: radicasi_dmasrc_hi_r (DMA source upper)\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_dmasrc_hi_r (DMA source upper)\n", machine().describe_context());
 	return m_dmasrc_hi_data;
 }
 
@@ -801,63 +801,63 @@ READ8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_hi_r)
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmadst_lo_w)
 {
-	logerror("%s: radicasi_dmadst_lo_w (select DMA Dest lower) %02x\n", machine().describe_context().c_str(), data);
+	logerror("%s: radicasi_dmadst_lo_w (select DMA Dest lower) %02x\n", machine().describe_context(), data);
 	m_dmadst_lo_data = data;
 }
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmadst_hi_w)
 {
-	logerror("%s: radicasi_dmadst_hi_w (select DMA Dest upper) %02x\n", machine().describe_context().c_str(), data);
+	logerror("%s: radicasi_dmadst_hi_w (select DMA Dest upper) %02x\n", machine().describe_context(), data);
 	m_dmadst_hi_data = data;
 }
 
 READ8_MEMBER(radica_eu3a05_state::radicasi_dmadst_lo_r)
 {
-	logerror("%s: radicasi_dmadst_lo_r (DMA Dest lower)\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_dmadst_lo_r (DMA Dest lower)\n", machine().describe_context());
 	return m_dmadst_lo_data;
 }
 
 READ8_MEMBER(radica_eu3a05_state::radicasi_dmadst_hi_r)
 {
-	logerror("%s: radicasi_dmadst_hi_r (DMA Dest upper)\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_dmadst_hi_r (DMA Dest upper)\n", machine().describe_context());
 	return m_dmadst_hi_data;
 }
 
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasize_lo_w)
 {
-	logerror("%s: radicasi_dmasize_lo_w (select DMA Size lower) %02x\n", machine().describe_context().c_str(), data);
+	logerror("%s: radicasi_dmasize_lo_w (select DMA Size lower) %02x\n", machine().describe_context(), data);
 	m_dmasize_lo_data = data;
 }
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasize_hi_w)
 {
-	logerror("%s: radicasi_dmasize_hi_w (select DMA Size upper) %02x\n", machine().describe_context().c_str(), data);
+	logerror("%s: radicasi_dmasize_hi_w (select DMA Size upper) %02x\n", machine().describe_context(), data);
 	m_dmasize_hi_data = data;
 }
 
 READ8_MEMBER(radica_eu3a05_state::radicasi_dmasize_lo_r)
 {
-	logerror("%s: radicasi_dmasize_lo_r (DMA Size lower)\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_dmasize_lo_r (DMA Size lower)\n", machine().describe_context());
 	return m_dmasize_lo_data;
 }
 
 READ8_MEMBER(radica_eu3a05_state::radicasi_dmasize_hi_r)
 {
-	logerror("%s: radicasi_dmasize_hi_r (DMA Size upper)\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_dmasize_hi_r (DMA Size upper)\n", machine().describe_context());
 	return m_dmasize_hi_data;
 }
 
 READ8_MEMBER(radica_eu3a05_state::radicasi_dmatrg_r)
 {
-	logerror("%s: radicasi_dmatrg_r (DMA operation state?)\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_dmatrg_r (DMA operation state?)\n", machine().describe_context());
 	return 0x00;//m_dmatrg_data;
 }
 
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmatrg_w)
 {
-	logerror("%s: radicasi_dmatrg_w (trigger DMA operation) %02x\n", machine().describe_context().c_str(), data);
+	logerror("%s: radicasi_dmatrg_w (trigger DMA operation) %02x\n", machine().describe_context(), data);
 	//m_dmatrg_data = data;
 
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
@@ -885,13 +885,13 @@ WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmatrg_w)
 // probably also sound device, maybe for forcing channels to stop?
 READ8_MEMBER(radica_eu3a05_state::radicasi_50a9_r)
 {
-	logerror("%s: radicasi_50a9_r\n", machine().describe_context().c_str());
+	logerror("%s: radicasi_50a9_r\n", machine().describe_context());
 	return m_50a9_data;
 }
 
 WRITE8_MEMBER(radica_eu3a05_state::radicasi_50a9_w)
 {
-	logerror("%s: radicasi_50a9_w %02x\n", machine().describe_context().c_str(), data);
+	logerror("%s: radicasi_50a9_w %02x\n", machine().describe_context(), data);
 	m_50a9_data = data;
 }
 
