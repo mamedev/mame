@@ -612,7 +612,7 @@ void multipcm_device::device_start()
 //  changes
 //-------------------------------------------------
 
-void okim6295_device::device_clock_changed()
+void multipcm_device::device_clock_changed()
 {
 	const float clock_divider = 180.0f;
 	m_rate = (float)clock() / clock_divider;
