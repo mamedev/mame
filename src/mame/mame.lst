@@ -31423,6 +31423,9 @@ orleg2_101                      //
 orleg2_104cn                    //
 orleg2_103cn                    //
 orleg2_101cn                    //
+orleg2_104jp                    //
+orleg2_103jp                    //
+orleg2_101jp                    //
 kof98umh                        // (c) 2009
 
 @source:pgm3.cpp
