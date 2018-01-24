@@ -1319,6 +1319,21 @@ ROM_START( mc_hh210 )
 	ROM_LOAD( "msp55lv128t.u4", 0x00000, 0x1000000, CRC(9ba520d4) SHA1(627f811b24314197e289a2ade668ff4115421bed) )
 ROM_END
 
+ROM_START( dvnimbus )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "2012-7-4-V1.BIN", 0x00000, 0x1000000, CRC(a91d7aa6) SHA1(9421b70b281bb630752bc352c3715258044c0bbe) )
+ROM_END
+
+ROM_START( cbrs8 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "RS-8.bin", 0x00000, 0x1000000, CRC(10b2bed0) SHA1(0453a1e6769818ccf25dcf22b2c6198a5688a1d4) )
+ROM_END
+
+ROM_START( mc_tv200 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "S29GL064N90.bin", 0x00000, 0x800000, CRC(ae1905d2) SHA1(11582055713ba937c1ad32c4ada8683eebc1c83c) )
+ROM_END
+
 // earlier version of vdogdemo
 CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
 
@@ -1377,6 +1392,9 @@ CONS( 200?, sarc110a,   sarc110,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 CONS( 200?, mc_110cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy", "110 in 1 CoolBaby (CoolBoy RS-1S)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, mc_138cb,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_IMPERFECT_GRAPHICS )
 
+// doesn't boot, bad dump
+CONS( 201?, cbrs8,   		0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "CoolBoy", "CoolBoy RS-8 168 in 1", MACHINE_NOT_WORKING )
+
 CONS( 200?, gprnrs1,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, gprnrs16,  0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
 // unsorted, these were all in nes.xml listed as ONE BUS systems
@@ -1390,6 +1408,7 @@ CONS( 200?, mc_7x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 CONS( 200?, mc_8x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "888888 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2004, mc_dcat8,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_IMPERFECT_GRAPHICS )
+
 // Runs well, minor GFX issues in intro
 CONS( 2017, sy889,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-889 300 in 1 Handheld", MACHINE_NOT_WORKING )
 // Same hardware as SY-889
@@ -1404,3 +1423,7 @@ CONS( 201?, mc_pg150,  	0, 				0,  nes_vt_bt,    nes_vt, nes_vt_state,  0, "<unk
 // No title screen, but press start and menu and games run fine. Makes odd
 // memory accesses which probably explain broken title screen
 CONS( 201?, mc_hh210,  	0, 				0,  nes_vt_xx,    nes_vt, nes_vt_state,  0, "<unknown>", 	"Handheld 210 in 1", MACHINE_NOT_WORKING )
+
+CONS( 201?, dvnimbus,  	0, 				0,  nes_vt_vg,    nes_vt, nes_vt_state,  0, "<unknown>", 	"DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
+
+CONS( 201?, mc_tv200,  	0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "Thumbs Up", 	"200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
