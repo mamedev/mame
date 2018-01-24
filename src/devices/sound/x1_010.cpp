@@ -89,7 +89,7 @@ DEFINE_DEVICE_TYPE(X1_010, x1_010_device, "x1_010", "Seta X1-010")
 x1_010_device::x1_010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, X1_010, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
-		m_region(*this, DEVICE_SELF),
+		device_rom_interface(mconfig, *this, 20),
 		m_rate(0),
 		m_adr(0),
 		m_stream(nullptr),
@@ -132,6 +132,24 @@ void x1_010_device::device_start()
 	save_item(NAME(m_base_clock));
 }
 
+void x1_010_device::device_clock_changed()
+{
+	m_base_clock    = clock();
+	m_rate          = clock() / 512;
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(m_rate);
+	else
+		m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
+}
+
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void x1_010_device::rom_bank_updated()
+{
+	m_stream->update();
+}
 
 void x1_010_device::enable_w(int data)
 {
@@ -193,8 +211,8 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 {
 	X1_010_CHANNEL  *reg;
 	int     ch, i, volL, volR, freq, div;
-	int8_t   *start, *end, data;
-	uint8_t  *env;
+	uint32_t start, end, env;
+	int8_t   data;
 	uint32_t smp_offs, smp_step, env_offs, env_step, delta;
 
 	// mixer buffer zero clear
@@ -210,8 +228,8 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 			stream_sample_t *bufR = outputs[1];
 			div = (reg->status&0x80) ? 1 : 0;
 			if( (reg->status&2) == 0 ) {                        // PCM sampling
-				start    = m_region + reg->start*0x1000;
-				end      = m_region + (0x100-reg->end)*0x1000;
+				start    = reg->start*0x1000;
+				end      = (0x100-reg->end)*0x1000;
 				volL     = ((reg->volume>>4)&0xf)*VOL_BASE;
 				volR     = ((reg->volume>>0)&0xf)*VOL_BASE;
 				smp_offs = m_smp_offset[ch];
@@ -232,19 +250,19 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 						reg->status &= 0xfe;                    // Key off
 						break;
 					}
-					data = *(start+delta);
+					data = (int8_t)read_byte(start+delta);
 					*bufL++ += (data*volL/256);
 					*bufR++ += (data*volR/256);
 					smp_offs += smp_step;
 				}
 				m_smp_offset[ch] = smp_offs;
 			} else {                                            // Wave form
-				start    = (int8_t *)&(m_reg[reg->volume*128+0x1000]);
+				start    = reg->volume*128+0x1000;
 				smp_offs = m_smp_offset[ch];
 				freq     = ((reg->pitch_hi<<8)+reg->frequency)>>div;
 				smp_step = (uint32_t)((float)m_base_clock/128.0f/1024.0f/4.0f*freq*(1<<FREQ_BASE_BITS)/(float)m_rate);
 
-				env      = (uint8_t *)&(m_reg[reg->end*128]);
+				env      = reg->end*128;
 				env_offs = m_env_offset[ch];
 				env_step = (uint32_t)((float)m_base_clock/128.0f/1024.0f/4.0f*reg->start*(1<<ENV_BASE_BITS)/(float)m_rate);
 				/* Print some more debug info */
@@ -260,10 +278,10 @@ void x1_010_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 						reg->status &= 0xfe;                    // Key off
 						break;
 					}
-					vol = *(env+(delta&0x7f));
+					vol = (uint8_t)m_reg[env+(delta&0x7f)];
 					volL = ((vol>>4)&0xf)*VOL_BASE;
 					volR = ((vol>>0)&0xf)*VOL_BASE;
-					data  = *(start+((smp_offs>>FREQ_BASE_BITS)&0x7f));
+					data  = (int8_t)m_reg[start+((smp_offs>>FREQ_BASE_BITS)&0x7f)];
 					*bufL++ += (data*volL/256);
 					*bufR++ += (data*volR/256);
 					smp_offs += smp_step;

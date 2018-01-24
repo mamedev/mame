@@ -630,6 +630,22 @@ void multipcm_device::device_start()
 	lfo_init();
 }
 
+void multipcm_device::device_clock_changed()
+{
+	const float clock_divider = 180.0f;
+	m_rate = (float)clock() / clock_divider;
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(m_rate);
+	else
+		m_stream = machine().sound().stream_alloc(*this, 0, 2, m_rate);
+
+	for (int32_t i = 0; i < 0x400; ++i)
+	{
+		const float fcent = m_rate * (1024.0f + (float)i) / 1024.0f;
+		m_freq_step_table[i] = value_to_fixed(TL_SHIFT, fcent);
+	}
+}
+
 //-----------------------------------------------------
 //  clamp_to_int16 - clamp a 32-bit value to 16 bits
 //-----------------------------------------------------

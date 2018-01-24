@@ -200,6 +200,16 @@ void saa1099_device::device_start()
 }
 
 
+void saa1099_device::device_clock_changed()
+{
+	m_master_clock = clock();
+	m_sample_rate = clock() / 256;
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(m_sample_rate);
+	else
+		m_stream = machine().sound().stream_alloc(*this, 0, 2, m_sample_rate);
+}
+
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------

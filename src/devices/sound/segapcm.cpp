@@ -55,6 +55,13 @@ void segapcm_device::device_start()
 }
 
 
+void segapcm_device::device_clock_changed()
+{
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(clock() / 128);
+	else
+		m_stream = machine().sound().stream_alloc(*this, 0, 2, clock() / 128);
+}
 
 //-------------------------------------------------
 //  rom_bank_updated - the rom bank has changed
