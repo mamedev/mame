@@ -274,10 +274,10 @@
  *
  *************************************/
 
-#define MASTER_CLOCK        XTAL(48'660'000)
-#define SOUND_CLOCK         XTAL(4'000'000)
+static constexpr XTAL MASTER_CLOCK  = 48.66_MHz_XTAL;
+static constexpr XTAL SOUND_CLOCK   = 4.0_MHz_XTAL;
 
-#define PIXEL_CLOCK         (MASTER_CLOCK/8)
+static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK/8;
 
 #define HTOTAL              (384)
 #define HBEND               (0)
