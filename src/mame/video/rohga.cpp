@@ -201,11 +201,11 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 			{
 				case 0x20:
 					{
-						if ((pix1 & 0xc00) == 0x600)
+						if ((pix1 & 0xe00) == 0x600)
 							pri1 = 1;
-						else if ((pix1 & 0xc00) == 0x400)
+						else if ((pix1 & 0xe00) == 0x400)
 							pri1 = 2;
-						else if ((pix1 & 0xc00) == 0x200)
+						else if ((pix1 & 0xe00) == 0x200)
 							pri1 = 4;
 						else if ((pix1 & 0x800) == 0x800) // TODO
 							pri1 = 16;
@@ -215,11 +215,11 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 					break;
 				default:
 					{
-						if ((pix1 & 0xc00) == 0x600)
+						if ((pix1 & 0xe00) == 0x600)
 							pri1 = 1;
-						else if ((pix1 & 0xc00) == 0x400)
+						else if ((pix1 & 0xe00) == 0x400)
 							pri1 = 2;
-						else if ((pix1 & 0xc00) == 0x200)
+						else if ((pix1 & 0xe00) == 0x200)
 							pri1 = 8;
 						else if ((pix1 & 0x800) == 0x800) // TODO
 							pri1 = 64;
