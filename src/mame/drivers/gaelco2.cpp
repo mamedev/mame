@@ -25,10 +25,6 @@
     sounds cut out sometimes, others are often missing (sound status reads as busy,
     so no attempt made to play new sound) probably bug in devices\sound\gaelco.cpp ??
 
-Known to exist but not dumped is a Maniac Square v1.0 with checksum 66B1
-  This version of Maniac Square runs on a REF. 960419/1 PCB, the same PCB
-  as the current sets of Snow Board runs on.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -1375,6 +1371,50 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 MACHINE_CONFIG_END
 
 
+MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(30'000'000) / 2)         /* 15 MHz */
+	MCFG_CPU_PROGRAM_MAP(snowboar_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
+
+	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
+
+	/* video hardware */
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.1)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*16, 32*16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0080000)
+	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+
+	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
+	MCFG_GAELCO_SND_DATA("gfx1")
+	MCFG_GAELCO_BANKS(0 * 0x0080000, 1 * 0x0080000, 0, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
+
+
 /*
 PCB Layout:
 
@@ -1463,7 +1503,20 @@ ROM_START( snowboar )
 	ROM_FILL(               0x1200000, 0x0200000, 0x00 )         /* Empty */
 ROM_END
 
+ROM_START( maniacsqs )
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "ms1.ic53", 0x000000, 0x020000, CRC(911fb089) SHA1(62bebf5072331421d4beedf0bde0cffc362b0514) )
+	ROM_LOAD16_BYTE( "ms2.ic55", 0x000001, 0x020000, CRC(e77a5537) SHA1(e7e1c7b794515238c4b5e5b8ef050eb945c96a3f) )
 
+	ROM_REGION( 0x0280000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_LOAD( "f0.bin",   0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    /* GFX + Sound */
+	ROM_LOAD( "f1.bin",   0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    /* GFX + Sound */
+	ROM_LOAD( "f2.bin",   0x0100000, 0x0020000, CRC(af4ea5e7) SHA1(ffaf09dc2588e32c124e7dd2f86ba009f1b8b176) )    /* GFX only */
+	ROM_FILL(          0x0120000, 0x0060000, 0x00 )         /* Empty */
+	ROM_LOAD( "f3.bin",   0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
+	ROM_FILL(          0x01a0000, 0x0060000, 0x00 )         /* Empty */
+	ROM_FILL(          0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
+ROM_END
 
 /*============================================================================
                             WORLD RALLY 2
@@ -1809,6 +1862,7 @@ GAME( 1995, wrally2,  0,        wrally2, wrally2,  wrally2_state, 0,        ROT0
 GAME( 1996, maniacsq, 0,        maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", 0 )
 GAME( 1996, maniacsqa,maniacsq, maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum CF2D)", 0 )
 GAME( 1996, maniacsqu,maniacsq, maniacsq,         maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum BB73)", 0 )
+GAME( 1996, maniacsqs,maniacsq, maniacsqs,        snowboar, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum 66B1, 960419/1 PCB)", 0 ) // Official version on Snow Board Championship PCB, doesn't use the protection
 
 GAME( 1996, snowboar, 0,        snowboar, snowboar, gaelco2_state, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
 GAME( 1996, snowboara,snowboar, snowboar, snowboar, gaelco2_state, snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", 0 )
