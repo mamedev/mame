@@ -197,32 +197,28 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 			int pri1, pri2;
 
 			// pix1 sprite vs playfield
-			switch (priority)
+			switch (priority) // TODO : Highest Priority bit unknown
 			{
 				case 0x20:
 					{
-						if ((pix1 & 0xe00) == 0x600)
+						if ((pix1 & 0x600) == 0x600)
 							pri1 = 1;
-						else if ((pix1 & 0xe00) == 0x400)
+						else if ((pix1 & 0x600) == 0x400)
 							pri1 = 2;
-						else if ((pix1 & 0xe00) == 0x200)
+						else if ((pix1 & 0x600) == 0x200)
 							pri1 = 4;
-						else if ((pix1 & 0x800) == 0x800) // TODO
-							pri1 = 16;
 						else
 							pri1 = 64;
 					}
 					break;
 				default:
 					{
-						if ((pix1 & 0xe00) == 0x600)
+						if ((pix1 & 0x600) == 0x600)
 							pri1 = 1;
-						else if ((pix1 & 0xe00) == 0x400)
+						else if ((pix1 & 0x600) == 0x400)
 							pri1 = 2;
-						else if ((pix1 & 0xe00) == 0x200)
+						else if ((pix1 & 0x600) == 0x200)
 							pri1 = 8;
-						else if ((pix1 & 0x800) == 0x800) // TODO
-							pri1 = 64;
 						else
 							pri1 = 32;
 					}
