@@ -61,9 +61,11 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_palram(*this, "palram"),
+		m_mainram(*this, "mainram"),
 		m_dmaparams(*this, "dmaparams"),
 		m_bank(*this, "bank"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_gfxdecode(*this, "gfxdecode")
 	{ }
 
 	READ8_MEMBER(irq_vector_r);
@@ -98,9 +100,11 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_palram;
+	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_dmaparams;
 	required_device<address_map_bank_device> m_bank;
 	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
 };
 
 
@@ -157,6 +161,116 @@ uint32_t radica_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 
 		m_palette->set_pen_color(index, r_real, g_real, b_real);
 	}	
 
+
+	gfx_element *gfx;
+
+	for (int i = 0; i < 0x200; i += 8)
+	{
+		/*
+		+0  e--- hhww  enable, height, width  
+		+1  yyyy yyyy  ypos
+		+2  xxxx xxxx  xpos
+		+3  pppp ----  palette
+		+4  tttt tttt  tile bits
+		+5  tttt tttt
+		+6  ---- ---- (more tile bits)
+		+7  ---- ----
+		
+		*/
+
+		int attr = m_mainram[i+0];
+		int y = m_mainram[i+1];
+		int x = m_mainram[i+2];
+		int attr2 = m_mainram[i+3];
+
+		int h=attr&0x0c;
+		int w=attr&0x03;
+
+		int height = 0;
+		int width = 0;
+		int pal = attr2 >>4;
+
+		switch (h)
+		{
+		case 0x0:height=2;break;
+		case 0x4:height=4;break;
+		case 0x8:height=8;break;
+		case 0xc:height=16;break;
+		}
+
+		switch (w)
+		{
+		case 0x0:width=1;break;
+		case 0x1:width=2;break;
+		case 0x2:width=4;break;
+		case 0x3:width=8;break;
+		}
+
+		y-= ((height*2)-4);
+
+		x-= ((width*4)-4);
+
+		height *= 4;
+
+	//	int base = 0x18000;
+		int offset = ((m_mainram[i+5]<<8) + (m_mainram[i+4]<<0));
+		int extra = m_mainram[i+6];
+		gfx = m_gfxdecode->gfx(1);
+
+		/*
+		static int test = 0x0000;
+		if (machine().input().code_pressed_once(KEYCODE_W))
+		{
+			test+=0x2000;
+			popmessage("%02x",test);
+		}
+		if (machine().input().code_pressed_once(KEYCODE_Q))
+		{
+			test-=0x2000;
+			popmessage("%02x",test);
+		}
+		*/
+		
+		// these additions are odd, because 0x8000 should already be coming
+		// from the tile bits above
+
+		if (extra == 0x04)
+			offset += 0x08000;
+
+		// must be a bpp select somewhere
+		if (extra == 0x0a)
+		{
+			offset += 0x18000;
+			offset <<= 1;
+			gfx = m_gfxdecode->gfx(0);
+			pal = 0;
+		}
+
+		if (extra == 0x0c)
+			offset += 0x18000;
+
+		if (extra == 0x14)
+			offset += 0x28000;
+
+		offset = offset >> 1;
+
+		if (attr & 0x80)
+		{
+		//	printf("offset %08x\n", offset);
+
+			int count = 0;
+			for (int yy = 0; yy < height; yy++)
+			{
+				for (int xx = 0; xx < width; xx++)
+				{
+					gfx->transpen(bitmap, cliprect, offset + count, pal, 0, 0, x + xx*8, y + yy, 0);
+					count++;
+				}
+			}
+		}
+	}
+
+
 	return 0;
 }
 
@@ -208,7 +322,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( radica_eu3a14_map, AS_PROGRAM, 8, radica_eu3a14_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x1fff) AM_RAM
+	AM_RANGE(0x0200, 0x1fff) AM_RAM AM_SHARE("mainram")
 
 	AM_RANGE(0x3000, 0x3fff) AM_RAM // runs code from here
 
@@ -226,7 +340,6 @@ static ADDRESS_MAP_START( radica_eu3a14_map, AS_PROGRAM, 8, radica_eu3a14_state 
 	//AM_RANGE(0x50a9, 0x50a9) AM_READWRITE(radicasi_50a9_r, radicasi_50a9_w)
 
 	AM_RANGE(0x5100, 0x51ff) AM_READ(random_r)
-
 
 	AM_RANGE(0x6000, 0xdfff) AM_ROM AM_REGION("maincpu", 0x8000)
 
@@ -290,57 +403,43 @@ INTERRUPT_GEN_MEMBER(radica_eu3a14_state::interrupt)
 }
 
 
-static const gfx_layout helper_layout =
+static const gfx_layout helper8x1x2_layout =
 {
-	8,8,
+	8,1,
+	RGN_FRAC(1,1),
+	2,
+	{ STEP2(0,1) },
+	{ STEP8(0,2) },
+	{ 0 },
+	8 * 2
+};
+
+static const gfx_layout helper8x1x4_layout =
+{
+	8,1,
 	RGN_FRAC(1,1),
 	4,
-	{ 0,1,2,3 },
-	{ 0,4,8,12, 16,20,24,28 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*32
+	{ STEP4(0,1) },
+	{ STEP8(0,4) },
+	{ 0 },
+	8 * 4
 };
 
-static const gfx_layout helper2_layout =
+static const gfx_layout helper8x1x8_layout =
 {
-	8,8,
+	8,1,
 	RGN_FRAC(1,1),
 	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0,8,16,24,32,40,48,56 },
-	{ 0*64, 1*64, 2*64, 3*64,4*64,5*64,5*64,6*64,7*64 },
-	8*64
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	{ 0 },
+	8 * 8
 };
-
-static const gfx_layout helper3_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 0,4,8,12, 16,20,24,28, 32,36,40,44,48,52,56,60  },
-	{ 0 * 64, 1 * 64, 2 * 64, 3 * 64, 4 * 64, 5 * 64, 6 * 64, 7 * 64, 8 * 64, 9 * 64, 10 * 64, 11 * 64, 12 * 64, 13 * 64, 14 * 64, 15 * 64 },
-	16 * 64
-};
-
-static const gfx_layout helper4_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0,8,16,24,32,40,48,56,  64, 72, 80, 88, 96, 104, 112, 120 },
-	{ 0 * 128, 1 * 128, 2 * 128, 3 * 128,4 * 128,5 * 128,5 * 128,6 * 128,7 * 128,8 * 128,9 * 128,10 * 128,11 * 128,12 * 128,13 * 128,14 * 128,15 * 128 },
-	16 * 128
-};
-
-
 
 static GFXDECODE_START( helper )
-	GFXDECODE_ENTRY( "maincpu", 0, helper_layout,  0x0, 1  )
-	GFXDECODE_ENTRY( "maincpu", 0, helper2_layout,  0x0, 1  )
-	GFXDECODE_ENTRY( "maincpu", 0, helper3_layout,  0x0, 1  )
-	GFXDECODE_ENTRY( "maincpu", 0, helper4_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x2_layout,    0x0, 128  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x4_layout,    0x0, 32  )
+	GFXDECODE_ENTRY( "maincpu", 0, helper8x1x8_layout,    0x0, 2  )
 GFXDECODE_END
 
 
