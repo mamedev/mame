@@ -238,7 +238,7 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 						{
 							case 0x000:
 							default:
-								pri1 = 0x010;
+								pri1 = 0x020;
 								break;
 							case 0x200:
 								pri1 = 0x004;
@@ -350,10 +350,10 @@ uint32_t rohga_state::screen_update_nitrobal(screen_device &screen, bitmap_rgb32
 	{
 		case 0:
 		default:
-			m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 4);
+			m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0x008);
 			break;
 		case 0x20:
-			m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 32);
+			m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, 0, 0x010);
 			break;
 	}
 
