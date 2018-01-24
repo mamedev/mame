@@ -79,7 +79,7 @@ public:
 		A_YMF271     = 0x00013040,
 		A_YMZ280B    = 0x00013050,
 		A_YM2608     = 0x00013060,
-		A_QSOUND     = 0x00001000
+		A_QSOUND     = 0x00013070
 	};
 
 	enum io16_t
