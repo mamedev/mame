@@ -164,7 +164,7 @@ uint32_t radica_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 
 
 	gfx_element *gfx;
 
-	for (int i = 0; i < 0x200; i += 8)
+	for (int i = 0; i < 0x800; i += 8)
 	{
 		/*
 		+0  e--- hhww  enable, height, width  
@@ -189,6 +189,10 @@ uint32_t radica_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 
 		int height = 0;
 		int width = 0;
 		int pal = attr2 >>4;
+
+		// no idea
+		if (attr2&0x08)
+			pal += 0x10;
 
 		switch (h)
 		{
@@ -217,7 +221,7 @@ uint32_t radica_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 
 		int extra = m_mainram[i+6];
 		gfx = m_gfxdecode->gfx(1);
 
-		/*
+#if 0	
 		static int test = 0x0000;
 		if (machine().input().code_pressed_once(KEYCODE_W))
 		{
@@ -229,10 +233,19 @@ uint32_t radica_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 
 			test-=0x2000;
 			popmessage("%02x",test);
 		}
-		*/
+#endif		
 		
 		// these additions are odd, because 0x8000 should already be coming
 		// from the tile bits above
+
+		// must be a bpp select somewhere (could even be this bit)
+		if (extra == 0x02)
+		{
+			offset += 0x8000;
+			offset <<= 1;
+			gfx = m_gfxdecode->gfx(0);
+			pal = 0;
+		}
 
 		if (extra == 0x04)
 			offset += 0x08000;
@@ -328,8 +341,16 @@ static ADDRESS_MAP_START( radica_eu3a14_map, AS_PROGRAM, 8, radica_eu3a14_state 
 
 	AM_RANGE(0x4800, 0x4bff) AM_RAM AM_SHARE("palram")
 
+	AM_RANGE(0x5007, 0x5007) AM_READNOP
+	AM_RANGE(0x5009, 0x5009) AM_READNOP
+	AM_RANGE(0x500b, 0x500b) AM_READNOP
+	AM_RANGE(0x500d, 0x500d) AM_READNOP
+
 	AM_RANGE(0x500f, 0x5017) AM_RAM AM_SHARE("dmaparams") 
 	AM_RANGE(0x5018, 0x5018) AM_READWRITE(dma_trigger_r, dma_trigger_w)
+
+	AM_RANGE(0x5041, 0x5041) AM_READ_PORT("IN0")
+	AM_RANGE(0x5043, 0x5043) AM_READ_PORT("IN1")
 
 	// 508x sound
 	AM_RANGE(0x5080, 0x5091) AM_DEVREADWRITE("6ch_sound", radica6502_sound_device, radicasi_sound_addr_r, radicasi_sound_addr_w)
@@ -382,6 +403,45 @@ WRITE8_MEMBER(radica_eu3a14_state::dma_trigger_w)
 
 
 static INPUT_PORTS_START( radica_eu3a14 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) // back / backspin
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) // up and down in the menus should be the trackball?!
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 void radica_eu3a14_state::machine_start()
