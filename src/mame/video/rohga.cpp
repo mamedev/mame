@@ -153,7 +153,7 @@ uint32_t rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32
 
 	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0400, 0x400, 0x1ff); // 0x000 and 0x200 of 0x600
 
-	mixwizdfirelayer(bitmap, cliprect, 4, 0x000, 0x000);
+	mixwizdfirelayer(bitmap, cliprect, 0x000, 0x000);
 
 	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
