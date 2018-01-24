@@ -817,7 +817,7 @@ void ddragon3_state::machine_reset()
 MACHINE_CONFIG_START(ddragon3_state::ddragon3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
+	MCFG_CPU_ADD("maincpu", M68000, 20.0_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(ddragon3_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon3_state, ddragon3_scanline, "screen", 0, 1)
 
@@ -826,7 +826,7 @@ MACHINE_CONFIG_START(ddragon3_state::ddragon3)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
+	MCFG_SCREEN_RAW_PARAMS(28.0_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(ddragon3_state, screen_update_ddragon3)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
@@ -848,7 +848,7 @@ MACHINE_CONFIG_START(ddragon3_state::ddragon3)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'056'000), PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.50)
 MACHINE_CONFIG_END
@@ -892,7 +892,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wwfwfest_state::wwfwfest)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)  /* 24 crystal, 12 rated chip */
+	MCFG_CPU_ADD("maincpu", M68000, 24.0_MHz_XTAL / 2)  /* 24 crystal, 12 rated chip */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon3_state, ddragon3_scanline, "screen", 0, 1)
 
@@ -903,7 +903,7 @@ MACHINE_CONFIG_START(wwfwfest_state::wwfwfest)
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
+	MCFG_SCREEN_RAW_PARAMS(28.0_MHz_XTAL / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(wwfwfest_state, screen_update_wwfwfest)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
