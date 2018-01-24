@@ -253,10 +253,10 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 								pri1 = 0x100;
 								break;
 							case 0xa00:
-								pri1 = 0x010;
+								pri1 = 0x020;
 								break;
 							case 0xc00:
-								pri1 = 0x020;
+								pri1 = 0x008;
 								break;
 							case 0xe00:
 								pri1 = 0x200;
@@ -275,7 +275,7 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 					pri2 = 0x080;
 					break;
 				case 0x20:
-					pri2 = 0x008;
+					pri2 = 0x010;
 					break;
 			}
 
