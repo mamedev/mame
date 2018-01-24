@@ -518,10 +518,10 @@ MACHINE_CONFIG_DERIVED(laserbat_state::laserbat, laserbat_base)
 	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)              // GND, Vreg
 	MCFG_SN76477_ENABLE(0)                          // AB SOUND
 
-	MCFG_TMS3615_ADD("synth_low", XTAL(4'000'000)/16/2) // from the other one's /2 clock output
+	MCFG_TMS3615_ADD("synth_low", 4.0_MHz_XTAL/16/2) // from the other one's /2 clock output
 	MCFG_SOUND_ROUTE(tms3615_device::FOOTAGE_8, "speaker", 1.0)
 
-	MCFG_TMS3615_ADD("synth_high", XTAL(4'000'000)/16) // 4MHz divided down with a 74LS161
+	MCFG_TMS3615_ADD("synth_high", 4.0_MHz_XTAL/16) // 4MHz divided down with a 74LS161
 	MCFG_SOUND_ROUTE(tms3615_device::FOOTAGE_8, "speaker", 1.0)
 
 MACHINE_CONFIG_END
