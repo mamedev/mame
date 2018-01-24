@@ -35,11 +35,13 @@ static ADDRESS_MAP_START( segam1audio_map, AS_PROGRAM, 16, segam1audio_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpcm1_map, 0, 8, segam1audio_device )
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION(":m1pcm1", 0)
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION(":m1pcm1", 0)
+	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("m1pcm1_bank")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpcm2_map, 0, 8, segam1audio_device )
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION(":m1pcm2", 0)
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION(":m1pcm2", 0)
+	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("m1pcm2_bank")
 ADDRESS_MAP_END
 
 //**************************************************************************
@@ -120,12 +122,12 @@ void segam1audio_device::device_reset()
 
 WRITE16_MEMBER(segam1audio_device::m1_snd_mpcm_bnk1_w)
 {
-	m_multipcm_1->set_bank(0x100000 * (data & 3), 0x100000 * (data & 3));
+	membank("m1pcm1_bank")->set_base(memregion(":m1pcm1")->base() + (0x100000 * (data & 3)));
 }
 
 WRITE16_MEMBER(segam1audio_device::m1_snd_mpcm_bnk2_w)
 {
-	m_multipcm_2->set_bank(0x100000 * (data & 3), 0x100000 * (data & 3));
+	membank("m1pcm2_bank")->set_base(memregion(":m1pcm2")->base() + (0x100000 * (data & 3)));
 }
 
 WRITE_LINE_MEMBER(segam1audio_device::write_txd)
