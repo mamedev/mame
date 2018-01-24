@@ -1546,10 +1546,10 @@ MACHINE_CONFIG_START(fhawk_state::fhawk)
 	MCFG_CPU_PROGRAM_MAP(fhawk_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitol_state, irq_callback)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/3)     /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, 12.0_MHz_XTAL/3)     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(fhawk_3_map)
 
-	MCFG_CPU_ADD("slave", Z80, XTAL(12'000'000)/3)        /* verified on pcb */
+	MCFG_CPU_ADD("slave", Z80, 12.0_MHz_XTAL/3)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(fhawk_2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
 
@@ -1572,7 +1572,7 @@ MACHINE_CONFIG_START(fhawk_state::fhawk)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)       /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, 12.0_MHz_XTAL/4)       /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(fhawk_state, portA_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
@@ -1604,7 +1604,7 @@ MACHINE_CONFIG_DERIVED(champwr_state::champwr, fhawk)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(champwr_state, portA_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(champwr_state, msm5205_volume_w))
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
+	MCFG_SOUND_ADD("msm", MSM5205, 384.0_kHz_XTAL)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(champwr_state, msm5205_vck)) /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -1646,7 +1646,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::raimais)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
+	MCFG_SOUND_ADD("ymsnd", YM2610, 8.0_MHz_XTAL)      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -1665,7 +1665,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::kurikint)
 	MCFG_CPU_PROGRAM_MAP(kurikint_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitol_state, irq_callback)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/3)        /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, 12.0_MHz_XTAL/3)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kurikint_2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
 
@@ -1690,7 +1690,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::kurikint)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)       /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, 12.0_MHz_XTAL/4)       /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -1738,7 +1738,7 @@ MACHINE_CONFIG_DERIVED(taitol_1cpu_state::puzznic, plotting)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(puzznic_map)
 
-	MCFG_DEVICE_ADD("mcu", ARKANOID_68705P3, XTAL(3'000'000))
+	MCFG_DEVICE_ADD("mcu", ARKANOID_68705P3, 3.0_MHz_XTAL)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(taitol_1cpu_state::puzznici, plotting)
@@ -1807,7 +1807,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::evilston)
 	MCFG_CPU_PROGRAM_MAP(evilston_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(taitol_state, irq_callback)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/3)     /* not verified */
+	MCFG_CPU_ADD("audiocpu", Z80, 12.0_MHz_XTAL/3)     /* not verified */
 	MCFG_CPU_PROGRAM_MAP(evilston_2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitol_state, irq0_line_hold)
 
@@ -1833,7 +1833,7 @@ MACHINE_CONFIG_START(taitol_2cpu_state::evilston)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)       /* not verified */
+	MCFG_SOUND_ADD("ymsnd", YM2203, 12.0_MHz_XTAL/4)       /* not verified */
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)

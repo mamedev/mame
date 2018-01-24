@@ -8869,6 +8869,49 @@
 		</part>
 	</software>
 
+	<software name="link386p">
+		<description>Links 386 Pro</description>
+		<year>1992</year>
+		<publisher>Access Software</publisher>
+		<info name="version" value="1.21" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Links 386 Pro [Access Software] [1992] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="05447e7c" sha1="5a872efeb2385215f2a317c94c969ff35a239e8d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Links 386 Pro [Access Software] [1992] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="c245e3dd" sha1="0aa342d1b1980858794abd6e8517375e93e4ecb1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Links 386 Pro [Access Software] [1992] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="d849aa7d" sha1="6b93aff6352906d2849190c6929f1fcfcd59595d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Links 386 Pro [Access Software] [1992] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="95871b0b" sha1="4ecb10f076fc6abd9823ab786755ec3ac48fa03d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bntf_crs">
+		<description>Links Championship Course: Bountiful Golf Club Championship Course</description>
+		<year>1994</year>
+		<publisher>Access Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Bountiful Golf Club Championship Course [Access Software] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="621a66b9" sha1="85c8c10d2e152663eeba4625713bd3493a6e37d7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Bountiful Golf Club Championship Course [Access Software] [1994] [3.5DD] [Disk 2 of 2].img" size="737280" crc="57f590be" sha1="88fec38908f18ddd4d42f87d0e7a49d08de9fe32" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tleodoom">
 		<description>The Lost Episodes of Doom (Companion Disk)</description>
 		<year>1995</year>

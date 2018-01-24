@@ -163,9 +163,9 @@ Notes:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL(20'000'000)
-#define CPU_CLOCK       MASTER_CLOCK / 2
-#define PIXEL_CLOCK     MASTER_CLOCK / 4
+static constexpr XTAL MASTER_CLOCK  = 20.0_MHz_XTAL;
+static constexpr XTAL CPU_CLOCK     = MASTER_CLOCK / 2;
+static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 4;
 
 
 /*******************************************************************************
@@ -442,7 +442,7 @@ MACHINE_CONFIG_START(wwfsstar_state::wwfsstar)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(1'056'000), PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END
