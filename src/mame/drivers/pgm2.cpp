@@ -1148,6 +1148,15 @@ ROM_START( kov3_102 )
 	KOV3_VIDEO_SOUND_ROMS
 ROM_END
 
+ROM_START( kov3_101 )
+	KOV3_INTERNAL_CHINA
+
+	ROM_REGION( 0x1000000, "user1", 0 )
+	ROM_LOAD( "kov3_v101.bin",         0x00000000, 0x0800000, BAD_DUMP CRC(f156c62b) SHA1(bd39f4ba0862c9bd8178f6679b1af01a9f5dc162) ) // not raw but descrambled
+
+	KOV3_VIDEO_SOUND_ROMS
+ROM_END
+
 ROM_START( kov3_100 )
 	KOV3_INTERNAL_CHINA
 
@@ -1425,6 +1434,7 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojt)
 // currently we don't know how to derive address/data xor values from real keys, so we need both
 static const kov3_module_key kov3_104_key = { { 0x40,0xac,0x30,0x00,0x47,0x49,0x00,0x00 } ,{ 0xeb,0x7d,0x8d,0x90,0x2c,0xf4,0x09,0x82 }, 0x18ec71, 0xb89d }; // fake zero-key
 static const kov3_module_key kov3_102_key = { { 0x49,0xac,0xb0,0xec,0x47,0x49,0x95,0x38 } ,{ 0x09,0xbd,0xf1,0x31,0xe6,0xf0,0x65,0x2b }, 0x021d37, 0x81d0 };
+static const kov3_module_key kov3_101_key = { { 0xc1,0x2c,0xc1,0xe5,0x3c,0xc1,0x59,0x9e } ,{ 0xf2,0xb2,0xf0,0x89,0x37,0xf2,0xc7,0x0b }, 0, 0 }; // xor values is unknown, 0 for not scrambled dump
 static const kov3_module_key kov3_100_key = { { 0x40,0xac,0x30,0x00,0x47,0x49,0x00,0x00 } ,{ 0x96,0xf0,0x91,0xe1,0xb3,0xf1,0xef,0x90 }, 0x3e8aa8, 0xc530 }; // fake zero-key
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
@@ -1457,6 +1467,16 @@ DRIVER_INIT_MEMBER(pgm2_state, kov3_104)
 DRIVER_INIT_MEMBER(pgm2_state, kov3_102)
 {
 	module_key = &kov3_102_key;
+	DRIVER_INIT_CALL(kov3);
+}
+
+DRIVER_INIT_MEMBER(pgm2_state, kov3_101)
+{
+	// patch data change check
+	uint32_t* rom = (uint32_t*)memregion("maincpu")->base();
+	rom[0x1cfc / 4] = 0xe320f000;
+
+	module_key = &kov3_101_key;
 	DRIVER_INIT_CALL(kov3);
 }
 
@@ -1507,6 +1527,7 @@ GAME( 2010, ddpdojt,      0,    pgm2_ramrom,    pgm2, pgm2_state,     ddpdojt,  
 // Knights of Valour 3 - should be a V103 and V101 too
 GAME( 2011, kov3,         0,    pgm2_hires, pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
 GAME( 2011, kov3_102,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_102,   ROT0, "IGS", "Knights of Valour 3 (V102, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2011, kov3_101,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_101,   ROT0, "IGS", "Knights of Valour 3 (V101, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
 GAME( 2011, kov3_100,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_100,   ROT0, "IGS", "Knights of Valour 3 (V100, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
 
 // King of Fighters '98: Ultimate Match Hero
