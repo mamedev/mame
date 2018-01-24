@@ -20504,6 +20504,7 @@ topshoot                        // (c) 1995 Sun Mixing
 @source:megadriv_rad.cpp
 rad_sf							// (c)2004 Radica
 rad_gen1						// (c)2004 Radica
+rad_ssoc						// (c)2004 Radica
 
 @source:megaphx.cpp
 megaphx                         // (c) 1991 Dinamic / Inder
