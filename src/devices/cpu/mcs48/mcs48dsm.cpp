@@ -412,6 +412,7 @@ offs_t mcs48_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 						util::stream_format(stream, "mov  psw,a");
 					else
 						util::stream_format(stream, "illegal");
+			break;
 		case 0xd8:      util::stream_format(stream, "xrl  a,r0");                                           break;
 		case 0xd9:      util::stream_format(stream, "xrl  a,r1");                                           break;
 		case 0xda:      util::stream_format(stream, "xrl  a,r2");                                           break;
