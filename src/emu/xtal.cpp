@@ -46,6 +46,9 @@
 
 **************************************************************************/
 
+#include "emu.h"
+
+
 // This array *must* stay in order, it's binary-searched
 const double XTAL::known_xtals[] = {
 /*
