@@ -614,6 +614,20 @@ Core Performance Options
 
 	Allows MAME to dynamically adjust the gameplay speed such that it does not exceed the slowest refresh rate for any targeted monitors in your system. Thus, if you have a 60Hz monitor and run a game that is actually designed to run at 60.6Hz, MAME will dynamically change the speed down to 99% in order to prevent sound hiccups or other undesirable side effects of running at a slower refresh rate. The default is OFF (*-norefreshspeed*).
 
+.. _mame-commandline-numprocessors:
+
+**-numprocessors** *<auto|value>* / **-np** *<auto|value>*
+
+	Specify the number of processors to use for work queues. Specifying "*auto*" will use the value reported by the system or environment variable **OSDPROCESSORS**. To avoid abuse, this value is internally limited to 4 times the number of processors reported by the system. The default is "*auto*".
+
+.. _mame-commandline-bench:
+
+**-bench** *[n]*
+
+        Benchmark for *[n]* number of emulated seconds; implies the command string:
+
+        **-str [n] -video none -sound none -nothrottle**
+
 
 
 Core Rotation Options
@@ -662,6 +676,174 @@ Core Rotation Options
 | 
 |
 |	Flip (mirror) the game screen either horizontally (-flipx) or vertically (-flipy). The flips are applied after the -rotate and -ror/-rol options are applied. The default for both of these options is OFF (*-noflipx -noflipy*).
+|
+|
+
+
+Core Video Options
+------------------
+
+.. _mame-commandline-video:
+
+**-video** *<bgfx|gdi|d3d|opengl|soft|none>*
+
+|
+|	Specifies which video subsystem to use for drawing. Options here depend on the operating system and whether this is an SDL-compiled version of MAME.
+|
+|	On Windows:
+|
+|	Using '**bgfx**' specifies the new hardware accelerated renderer.
+|   Using '**gdi**' here, tells MAME to render video using older standard Windows graphics drawing calls. This is the slowest but most compatible option on older versions of Windows.
+|   Using '**d3d**' tells MAME to use Direct3D for rendering. This produces the better quality output than gdi and enables additional rendering options. It is recommended if you have a semi-recent (2002+) video card or onboard Intel video of the HD3000 line or better. 
+|   Using '**none**' displays no windows and does no drawing. This is primarily present for doing CPU benchmarks without the overhead of the video system. The default is *d3d*.
+|
+|   On other platforms (including SDL on Windows):
+|
+|   Using '**opengl**' tells MAME to render video using OpenGL acceleration. This may not work on all platforms due to wildly varying quality of stack and drivers.
+|   Using '**soft**' uses software rendering for video output. This isn't as fast or as nice as OpenGL but will work on any platform.
+|
+|   Defaults:
+|
+|   The default on Windows is **d3d**.
+|   The default for Mac OS X is '*opengl*' because OS X is guaranteed to have a compliant OpenGL stack.
+|   The default on all other systems is '*soft*'.
+
+
+.. _mame-commandline-numscreens:
+
+**-numscreens** *<count>*
+
+	Tells MAME how many output windows to create. For most games, a single output window is all you need, but some games originally used multiple screens (*e.g. Darius, PlayChoice-10*). Each screen (up to 4) has its own independent settings for physical monitor, aspect ratio, resolution, and view, which can be set using the options below. The default is *1*.
+
+.. _mame-commandline-window:
+
+**-[no]window** / **-[no]w**
+
+	Run MAME in either a window or full screen. The default is OFF (*-nowindow*).
+
+.. _mame-commandline-maximize:
+
+**-[no]maximize** / **-[no]max**
+
+	Controls initial window size in windowed mode. If it is set on, the window will initially be set to the maximum supported size when you start MAME. If it is turned off, the window will start out at the smallest supported size. This option only has an effect when the -window option is used. The default is ON (*-maximize*).
+
+.. _mame-commandline-keepaspect:
+
+**-[no]keepaspect** / **-[no]ka**
+
+	Enables aspect ratio enforcement. When this option is on, the game's proper aspect ratio (generally 4:3 or 3:4) is enforced, so you get the game looking like it should. When running in a window with this option on, you can only resize the window to the proper aspect ratio, unless you are holding down the CONTROL key. By turning the option off, the aspect ratio is allowed to float. In full screen mode, this means that all games will stretch to the full screen size (even vertical games). In window mode, it means that you can freely resize the window without any constraints. The default is ON (*-keepaspect*).
+
+	The MAME team heavily suggests you leave this at default. Stretching games beyond their original aspect ratio will mangle the appearance of the game in ways that no filtering or HLSL can repair.
+
+.. _mame-commandline-waitvsync:
+
+**-[no]waitvsync**
+
+	Waits for the refresh period on your computer's monitor to finish before starting to draw video to your screen. If this option is off, MAME will just draw to the screen at any old time, even in the middle of a refresh cycle. This can cause "tearing" artifacts, where the top portion of the screen is out of sync with the bottom portion. Tearing is not noticeable on all games, and some people hate it more than others. However, if you turn this option on, you will waste more of your CPU cycles waiting for the proper time to draw, so you will see a performance hit. You should only need to turn this on in windowed mode. In full screen mode, it is only needed if **-triplebuffer** does not remove the tearing, in which case you should use **-notriplebuffer -waitvsync**. Note that this option does not work with **-video gdi** mode. The default is OFF (*-nowaitvsync*).
+
+	Note that SDL-based MAME support for this option depends entirely on your operating system and video drivers; in general it will not work in windowed mode so **-video opengl** and fullscreen give the greatest chance of success.
+
+.. _mame-commandline-syncrefresh:
+
+**-[no]syncrefresh**
+
+	Enables speed throttling only to the refresh of your monitor. This means that the game's actual refresh rate is ignored; however, the sound code still attempts to keep up with the game's original refresh rate, so you may encounter sound problems. This option is intended mainly for those who have tweaked their video card's settings to provide carefully matched refresh rate options. Note that this option does not work with -video gdi mode. The default is OFF (*-nosyncrefresh*).
+
+.. _mame-commandline-prescale:
+
+**-prescale** *<amount>*
+
+	Controls the size of the screen images when they are passed off to the graphics system for scaling. At the minimum setting of 1, the screen is rendered at its original resolution before being scaled. At higher settings, the screen is expanded by a factor of *<amount>* before being scaled. With **-video d3d**, this produces a less blurry image at the expense of some speed. The default is *1*.
+
+	This is supported with all video output types (bgfx, d3d, etc) on Windows and is **ONLY** supported with OpenGL on other platforms.
+
+.. _mame-commandline-filter:
+
+**-[no]filter** / **-[no]d3dfilter** / **-[no]flt**
+
+	Enable bilinear filtering on the game screen graphics. When disabled, point filtering is applied, which is crisper but leads to scaling artifacts. If you don't like the filtered look, you are probably better off increasing the *-prescale* value rather than turning off filtering altogether. The default is ON (*-filter*).
+
+	This is supported with all video output types (bgfx, d3d, etc) on Windows and is **ONLY** supported with OpenGL on other platforms.
+
+.. _mame-commandline-unevenstretch:
+
+**-[no]unevenstretch**
+
+	Allow non-integer stretch factors allowing for great window sizing flexability.  The default is ON. (*-unevenstretch*)
+
+
+Core Full Screen Options
+------------------------
+
+.. _mame-commandline-switchres:
+
+**-[no]switchres**
+
+	Enables resolution switching. This option is required for the **-resolution\*** options to switch resolutions in full screen mode. On modern video cards, there is little reason to switch resolutions unless you are trying to achieve the "exact" pixel resolutions of the original games, which requires significant tweaking. This option is also useful on LCD displays, since they run with a fixed resolution and switching resolutions on them is just silly. This option does not work with **-video gdi**. The default is OFF (*-noswitchres*).
+
+
+Core Per-Window Options
+-----------------------
+
+.. _mame-commandline-screen:
+
+NOTE:  **Multiple Screens may fail to work correctly on some Mac machines as of right now.**
+
+| **-screen** *<display>*
+| **-screen0** *<display>*
+| **-screen1** *<display>*
+| **-screen2** *<display>*
+| **-screen3** *<display>*
+|
+|	Specifies which physical monitor on your system you wish to have each window use by default. In order to use multiple windows, you must have increased the value of the **-numscreens** option. The name of each display in your system can be determined by running MAME with the -verbose option. The display names are typically in the format of: *\\\\.\\DISPLAYn*, where 'n' is a number from 1 to the number of connected monitors. The default value for these options is '*auto*', which means that the first window is placed on the first display, the second window on the second display, etc.
+|
+|	The **-screen0**, **-screen1**, **-screen2**, **-screen3** parameters apply to the specific window. The **-screen** parameter applies to all windows. The window-specific options override values from the all window option. 
+|
+|
+
+
+.. _mame-commandline-aspect:
+
+| **-aspect** *<width:height>* / **-screen_aspect** *<num:den>*
+| **-aspect0** *<width:height>*
+| **-aspect1** *<width:height>*
+| **-aspect2** *<width:height>*
+| **-aspect3** *<width:height>*
+|
+|
+|	Specifies the physical aspect ratio of the physical monitor for each window. In order to use multiple windows, you must have increased the value of the **-numscreens** option. The physical aspect ratio can be determined by measuring the width and height of the visible screen image and specifying them separated by a colon. The default value for these options is '*auto*', which means that MAME assumes the aspect ratio is proportional to the number of pixels in the desktop video mode for each monitor.
+|
+|	The **-aspect0**, **-aspect1**, **-aspect2**, **-aspect3** parameters apply to the specific window. The **-aspect** parameter applies to all windows. The window-specific options override values from the all window option.
+|
+|
+
+
+.. _mame-commandline-resolution:
+
+| **-resolution** *<widthxheight[@refresh]>* / **-r** *<widthxheight[@refresh]>*
+| **-resolution0** *<widthxheight[@refresh]>* / **-r0** *<widthxheight[@refresh]>*
+| **-resolution1** *<widthxheight[@refresh]>* / **-r1** *<widthxheight[@refresh]>*
+| **-resolution2** *<widthxheight[@refresh]>* / **-r2** *<widthxheight[@refresh]>*
+| **-resolution3** *<widthxheight[@refresh]>* / **-r3** *<widthxheight[@refresh]>*
+|
+|	Specifies an exact resolution to run in. In full screen mode, MAME will try to use the specific resolution you request. The width and height are required; the refresh rate is optional. If omitted or set to 0, MAME will determine the mode automatically. For example, **-resolution 640x480** will force 640x480 resolution, but MAME is free to choose the refresh rate. Similarly, **-resolution 0x0@60** will force a 60Hz refresh rate, but allows MAME to choose the resolution. The string "*auto*" is also supported, and is equivalent to *0x0@0*. In window mode, this resolution is used as a maximum size for the window. This option requires the **-switchres** option as well in order to actually enable resolution switching with **-video d3d**. The default value for these options is '*auto*'.
+|
+|	The **-resolution0**, **-resolution1**, **-resolution2**, **-resolution3** parameters apply to the specific window. The -resolution parameter applies to all windows. The window-specific options override values from the all window option.
+|
+|
+
+
+.. _mame-commandline-view:
+
+| **-view** *<viewname>*
+| **-view0** *<viewname>*
+| **-view1** *<viewname>*
+| **-view2** *<viewname>*
+| **-view3** *<viewname>*
+|
+|	Specifies the initial view setting for each window. The *<viewname>* does not need to be a perfect match; rather, it will select the first view whose name matches all the characters specified by *<viewname>*. For example, **-view native** will match the "*Native (15:14)*" view even though it is not a perfect match. The value '*auto*' is also supported, and requests that MAME perform a default selection. The default value for these options is '*auto*'.
+|
+|	The **-view0**, **-view1**, **-view2**, **-view3** parameters apply to the specific window. The **-view** parameter applies to all windows. The window-specific options override values from the all window option.
 |
 |
 
@@ -785,6 +967,18 @@ Core Sound Options
 **-volume** / **-vol** *<value>*
 
 	Sets the startup volume. It can later be changed with the user interface (see Keys section). The volume is an attenuation in dB: e.g., "**-volume -12**" will start with -12dB attenuation. The default is *0*.
+
+.. _mame-commandline-sound:
+
+**-sound** *<dsound|sdl|none>*
+
+	Specifies which sound subsystem to use. '*none*' disables sound altogether. The default is *dsound* on Windows and *sdl* on all other platforms..
+
+.. _mame-commandline-audiolatency:
+
+**-audio_latency** *<value>*
+
+	This controls the amount of latency built into the audio streaming. By default MAME tries to keep the DirectSound audio buffer between 1/5 and 2/5 full. On some systems, this is pushing it too close to the edge, and you get poor sound sometimes. The latency parameter controls the lower threshold. The default is *1* (meaning lower=1/5 and upper=2/5). Set it to 2 (**-audio_latency 2**) to keep the sound buffer between 2/5 and 3/5 full. If you crank it up to 4, you can *definitely* notice audio lag.
 
 
 
@@ -977,7 +1171,7 @@ Debugging Options
 
 **-[no]log**
 
-	Creates a file called error.log which contains all of the internal log messages generated by the MAME core and game drivers. The default is OFF (*-nolog*).
+	Creates a file called error.log which contains all of the internal log messages generated by the MAME core and game drivers. This can be used at the same time as -log to output the log data to both targets as well. The default is OFF (*-nolog*).
 
 .. _mame-commandline-debug:
 
@@ -996,6 +1190,12 @@ Debugging Options
 **-[no]update_in_pause**
 
 	Enables updating of the main screen bitmap while the game is paused. This means that the VIDEO_UPDATE callback will be called repeatedly during pause, which can be useful for debugging. The default is OFF (*-noupdate_in_pause*).
+
+.. _mame-commandline-watchdog:
+
+**-watchdog** *<duration>* / **-wdog** *<duration>*
+
+	Enables an internal watchdog timer that will automatically kill the MAME process if more than *<duration>* seconds passes without a frame update. Keep in mind that some games sit for a while during load time without updating the screen, so *<duration>* should be long enough to cover that. 10-30 seconds on a modern system should be plenty in general. By default there is no watchdog.
 
 
 Core Communication Options

@@ -10,11 +10,13 @@ Universal Commandline Options
 
 This section contains configuration options that are applicable to *all* MAME sub-builds (both SDL and Windows native).
 
+
 Core Commands
 ~~~~~~~~~~~~~
 
 | :ref:`help <mame-commandline-help>`
 | :ref:`validate <mame-commandline-validate>`
+
 
 Configuration Commands
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -22,6 +24,7 @@ Configuration Commands
 | :ref:`createconfig <mame-commandline-createconfig>`
 | :ref:`showconfig <mame-commandline-showconfig>`
 | :ref:`showusage <mame-commandline-showusage>`
+
 
 Frontend Commands
 ~~~~~~~~~~~~~~~~~
@@ -45,6 +48,7 @@ Frontend Commands
 | :ref:`getsoftlist <mame-commandline-getsoftlist>`
 | :ref:`verifysoftlist <mame-commandline-verifysoftlist>`
 
+
 OSD-related Options
 ~~~~~~~~~~~~~~~~~~~
 
@@ -56,21 +60,25 @@ OSD-related Options
 | :ref:`lightgunprovider <mame-commandline-lightgunprovider>`
 | :ref:`joystickprovider <mame-commandline-joystickprovider>`
 
+
 OSD CLI Options
 ~~~~~~~~~~~~~~~
 
 | :ref:`listmidi <mame-commandline-listmidi>`
 | :ref:`listnetwork <mame-commandline-listnetwork>`
 
+
 OSD Output Options
 ~~~~~~~~~~~~~~~~~~
 
 | :ref:`output <mame-commandline-output>`
 
+
 Configuration Options
 ~~~~~~~~~~~~~~~~~~~~~
 
 | :ref:`noreadconfig <mame-commandline-noreadconfig>`
+
 
 Core Search Path Options
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -87,6 +95,7 @@ Core Search Path Options
 | :ref:`pluginspath <mame-commandline-pluginspath>`
 | :ref:`languagepath <mame-commandline-languagepath>`
 
+
 Core Output Directory Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -97,6 +106,7 @@ Core Output Directory Options
 | :ref:`snapshot_directory <mame-commandline-snapshotdirectory>`
 | :ref:`diff_directory <mame-commandline-diffdirectory>`
 | :ref:`comment_directory <mame-commandline-commentdirectory>`
+
 
 Core State/Playback Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -119,6 +129,7 @@ Core State/Playback Options
 | :ref:`statename <mame-commandline-statename>`
 | :ref:`[no]burnin <mame-commandline-noburnin>`
 
+
 Core Performance Options
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -129,6 +140,9 @@ Core Performance Options
 | :ref:`[no]sleep <mame-commandline-nosleep>`
 | :ref:`speed <mame-commandline-speed>`
 | :ref:`[no]refreshspeed <mame-commandline-norefreshspeed>`
+| :ref:`numprocessors <mame-commandline-numprocessors>`
+| :ref:`bench <mame-commandline-bench>`
+
 
 Core Rotation Options
 ~~~~~~~~~~~~~~~~~~~~~
@@ -141,6 +155,37 @@ Core Rotation Options
 | :ref:`[no]flipx <mame-commandline-noflipx>`
 | :ref:`[no]flipy <mame-commandline-noflipy>`
 
+
+Core Video Options
+~~~~~~~~~~~~~~~~~~
+
+| :ref:`video <mame-commandline-video>`
+| :ref:`numscreens <mame-commandline-numscreens>`
+| :ref:`[no]window <mame-commandline-window>`
+| :ref:`[no]maximize <mame-commandline-maximize>`
+| :ref:`[no]keepaspect <mame-commandline-keepaspect>`
+| :ref:`[no]waitvsync <mame-commandline-waitvsync>`
+| :ref:`[no]syncrefresh <mame-commandline-syncrefresh>`
+| :ref:`prescale <mame-commandline-prescale>`
+| :ref:`[no]filter <mame-commandline-filter>`
+| :ref:`[no]unevenstretch <mame-commandline-unevenstretch>`
+
+
+Core Full Screen Options
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`[no]switchres <mame-commandline-switchres>`
+
+
+Core Per-Window Video Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`screen <mame-commandline-screen>`
+| :ref:`aspect <mame-commandline-aspect>`
+| :ref:`resolution <mame-commandline-resolution>`
+| :ref:`view <mame-commandline-view>`
+
+
 Core Artwork Options
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -151,6 +196,7 @@ Core Artwork Options
 | :ref:`[no]use_cpanels <mame-commandline-nousecpanels>`
 | :ref:`[no]use_marquees <mame-commandline-nousemarquees>`
 
+
 Core Screen Options
 ~~~~~~~~~~~~~~~~~~~
 
@@ -160,6 +206,7 @@ Core Screen Options
 | :ref:`pause_brightness <mame-commandline-pausebrightness>`
 | :ref:`effect <mame-commandline-effect>`
 
+
 Core Vector Options
 ~~~~~~~~~~~~~~~~~~~
 
@@ -167,12 +214,17 @@ Core Vector Options
 | :ref:`beam <mame-commandline-beam>`
 | :ref:`flicker <mame-commandline-flicker>`
 
+
 Core Sound Options
 ~~~~~~~~~~~~~~~~~~
+
 
 | :ref:`samplerate <mame-commandline-samplerate>`
 | :ref:`[no]samples <mame-commandline-nosamples>`
 | :ref:`volume <mame-commandline-volume>`
+| :ref:`sound <mame-commandline-sound>`
+| :ref:`audio_latency <mame-commandline-audiolatency>`
+
 
 Core Input Options
 ~~~~~~~~~~~~~~~~~~
@@ -217,6 +269,7 @@ Core Debugging Options
 | :ref:`[no]debug <mame-commandline-debug>`
 | :ref:`debugscript <mame-commandline-debugscript>`
 | :ref:`[no]update_in_pause <mame-commandline-updateinpause>`
+| :ref:`watchdog <mame-commandline-watchdog>`
 
 
 Core Communication Options
@@ -247,4 +300,101 @@ Core Misc Options
 | :ref:`autoboot_script <mame-commandline-autobootscript>`
 | :ref:`language <mame-commandline-language>`
 
+
+Windows-Specific Commandline Options
+------------------------------------
+
+Windows Debugging options
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`debugger_font <mame-wcommandline-debuggerfont>`
+| :ref:`debugger_font_size <mame-wcommandline-debuggerfontsize>`
+
+
+Windows Performance Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`priority <mame-wcommandline-priority>`
+| :ref:`profile <mame-wcommandline-profile>`
+
+
+Windows Full Screen Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`[no]triplebuffer <mame-wcommandline-triplebuffer>`
+| :ref:`full_screen_brightness <mame-wcommandline-fullscreenbrightness>`
+| :ref:`full_screen_contrast <mame-wcommandline-fullscreencontrast>`
+| :ref:`full_screen_gamma <mame-wcommandline-fullscreengamma>`
+
+
+Windows Input Device Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`[no]dual_lightgun <mame-wcommandline-duallightgun>`
+
+
+SDL-Specific Commandline Options
+--------------------------------
+
+This section contains configuration options that are specific to any build supported by SDL (including Windows where compiled as SDL instead of native).
+
+
+SDL Performance Options
+~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`sdlvideofps <mame-scommandline-sdlvideofps>`
+
+
+SDL Video Options
+~~~~~~~~~~~~~~~~~
+
+| :ref:`[no]centerh <mame-scommandline-centerh>`
+| :ref:`[no]centerv <mame-scommandline-centerv>`
+
+
+SDL Video Soft-Specific Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`scalemode <mame-scommandline-scalemode>`
+
+
+SDL Video OpenGL Debugging Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`[no]gl_forcepow2texture <mame-scommandline-glforcepow2texture>`
+| :ref:`[no]gl_notexturerect <mame-scommandline-glnotexturerect>`
+| :ref:`[no]gl_vbo <mame-scommandline-glvbo>`
+| :ref:`[no]gl_pbo <mame-scommandline-glpbo>`
+
+
+SDL Video OpenGL GLSL Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`gl_glsl <mame-scommandline-glglsl>`
+| :ref:`gl_glsl_filter <mame-scommandline-glglslfilter>`
+| :ref:`glsl_shader_mame[0-9] <mame-scommandline-glslshadermame>`
+| :ref:`glsl_shader_screen[0-9] <mame-scommandline-glslshaderscreen>`
+| :ref:`gl_glsl_vid_attr <mame-scommandline-glglslvidattr>`
+
+
+SDL Keyboard Mapping
+~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`keymap <mame-scommandline-keymap>`
+| :ref:`keymap_file <mame-scommandline-keymapfile>`
+
+
+SDL Joystick Mapping
+~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`joyidx <mame-scommandline-joyidx>`
+| :ref:`sixaxis <mame-scommandline-sixaxis>`
+
+
+SDL Low-level Driver Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`videodriver <mame-scommandline-videodriver>`
+| :ref:`audiodriver <mame-scommandline-audiodriver>`
+| :ref:`gl_lib <mame-scommandline-gllib>`
 
