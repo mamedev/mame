@@ -68,6 +68,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palram(*this, "palram"),
 		m_scrollregs(*this, "scrollregs"),
+		m_tilebase(*this, "tilebase"),
 		m_mainram(*this, "mainram"),
 		m_dmaparams(*this, "dmaparams"),
 		m_bank(*this, "bank"),
@@ -116,6 +117,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_palram;
 	required_shared_ptr<uint8_t> m_scrollregs;
+	required_shared_ptr<uint8_t> m_tilebase;
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_dmaparams;
 	required_device<address_map_bank_device> m_bank;
@@ -191,13 +193,15 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 	gfx_element *gfx =  m_gfxdecode->gfx(3);
 	int xdraw = 0;
 	int ydraw = 0;
-
 	int count = 0;
+
+	int base = (m_tilebase[1] << 8) | m_tilebase[0];
+
 	for (int i = 0x800; i < 0x1000;i+=2)
 	{
 		int tile = m_mainram[i+0] | (m_mainram[i+1] << 8);
 
-		gfx->transpen(bitmap, cliprect, tile+0xa00, 0, 0, 0, xdraw, ydraw, 0);
+		gfx->transpen(bitmap, cliprect, tile+base, 0, 0, 0, xdraw, ydraw, 0);
 		xdraw+=16;
 
 		count++;
@@ -476,7 +480,8 @@ static ADDRESS_MAP_START( radica_eu3a14_map, AS_PROGRAM, 8, radica_eu3a14_state 
 	AM_RANGE(0x5103, 0x5106) AM_RAM
 	AM_RANGE(0x5107, 0x5107) AM_RAM
 	AM_RANGE(0x5110, 0x5112) AM_RAM // startup
-	AM_RANGE(0x5113, 0x5115) AM_RAM // rarely
+	AM_RANGE(0x5113, 0x5113) AM_RAM // written with tilebase?
+	AM_RANGE(0x5114, 0x5115) AM_RAM AM_SHARE("tilebase")
 	AM_RANGE(0x5116, 0x5117) AM_RAM
 	AM_RANGE(0x5121, 0x5124) AM_RAM AM_SHARE("scrollregs")
 	AM_RANGE(0x5150, 0x5150) AM_RAM // startup
