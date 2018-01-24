@@ -190,50 +190,92 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 			uint16_t pix2 = srcline2[x];
 
 			/* Here we have
-			 pix1 - raw pixel / colour / priority data from first 1sdt chip
+			 pix1 - raw pixel / colour / priority data from first 1st chip
 			 pix2 - raw pixel / colour / priority data from first 2nd chip
 			*/
-
+			
 			int pri1, pri2;
-
+			
 			// pix1 sprite vs playfield
 			switch (priority) // TODO : Highest Priority bit unknown
 			{
-				case 0x20:
-					{
-						if ((pix1 & 0x600) == 0x600)
-							pri1 = 1;
-						else if ((pix1 & 0x600) == 0x400)
-							pri1 = 2;
-						else if ((pix1 & 0x600) == 0x200)
-							pri1 = 4;
-						else
-							pri1 = 64;
-					}
-					break;
+				case 0x00:
 				default:
 					{
-						if ((pix1 & 0x600) == 0x600)
-							pri1 = 1;
-						else if ((pix1 & 0x600) == 0x400)
-							pri1 = 2;
-						else if ((pix1 & 0x600) == 0x200)
-							pri1 = 8;
-						else
-							pri1 = 32;
+						switch (pix1 & 0xe00)
+						{
+							case 0x000:
+							default:
+								pri1 = 0x200;
+								break;
+							case 0x200:
+								pri1 = 0x020;
+								break;
+							case 0x400:
+								pri1 = 0x008;
+								break;
+							case 0x600:
+								pri1 = 0x002;
+								break;
+							case 0x800:
+								pri1 = 0x080;
+								break;
+							case 0xa00:
+								pri1 = 0x040;
+								break;
+							case 0xc00:
+								pri1 = 0x004;
+								break;
+							case 0xe00:
+								pri1 = 0x001;
+								break;
+						}
+					}
+					break;
+				case 0x20:
+					{
+						switch (pix1 & 0xe00)
+						{
+							case 0x000:
+							default:
+								pri1 = 0x010;
+								break;
+							case 0x200:
+								pri1 = 0x004;
+								break;
+							case 0x400:
+								pri1 = 0x002;
+								break;
+							case 0x600:
+								pri1 = 0x001;
+								break;
+							case 0x800:
+								pri1 = 0x040;
+								break;
+							case 0xa00:
+								pri1 = 0x080;
+								break;
+							case 0xc00:
+								pri1 = 0x100;
+								break;
+							case 0xe00:
+								pri1 = 0x200;
+								break;
+						}
 					}
 					break;
 			}
 
 			// pix2 sprite vs pix1 sprite
-			pri2 = 16;
+			pri2 = 0x0100;
 			switch (priority)
 			{
-				case 0x20:
-					pri2 = 8;
-					break;
+				case 0x00:
 				default:
-					pri2 = 16;
+					pri2 = 0x0100;
+					break;
+				case 0x20:
+					pri2 = 0x0008;
 					break;
 			}
 
