@@ -751,7 +751,7 @@ offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 			"y8950 delta-t rom",
 			"multipcm rom",
 			"upd7759 rom",
-			"okim6295a rom",
+			"okim6295 rom",
 			"k054539 rom",
 			"c140 rom",
 			"k053260 rom",
@@ -855,7 +855,7 @@ offs_t vgmplay_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		return 3 | SUPPORTED;
 
 	case 0xb8:
-		util::stream_format(stream, "okim6295a r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
+		util::stream_format(stream, "okim6295 r%02x = %02x", opcodes.r8(pc+1), opcodes.r8(pc+2));
 		return 3 | SUPPORTED;
 
 	case 0xb9:
