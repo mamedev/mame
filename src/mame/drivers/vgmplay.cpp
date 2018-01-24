@@ -162,7 +162,6 @@ public:
 	DECLARE_WRITE8_MEMBER(multipcm_bank_hi_a_w);
 	DECLARE_WRITE8_MEMBER(multipcm_bank_lo_b_w);
 	DECLARE_WRITE8_MEMBER(multipcm_bank_hi_b_w);
-	DECLARE_WRITE8_MEMBER(multipcm_bank_lo_b_w);
 	DECLARE_WRITE8_MEMBER(okim6295_clock_a_w);
 	DECLARE_WRITE8_MEMBER(okim6295_pin7_a_w);
 	DECLARE_WRITE8_MEMBER(okim6295_nmk112_enable_a_w);
