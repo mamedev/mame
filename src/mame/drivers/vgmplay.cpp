@@ -1371,11 +1371,11 @@ static ADDRESS_MAP_START( k053260_map, 0, 8, vgmplay_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( k054539a_map, 0, 8, vgmplay_state )
-	AM_RANGE(0, 0x1fffff) AM_DEVREAD("vgmplay", vgmplay_device, k054539a_rom_r)
+	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, k054539a_rom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( k054539b_map, 0, 8, vgmplay_state )
-	AM_RANGE(0, 0x1fffff) AM_DEVREAD("vgmplay", vgmplay_device, k054539b_rom_r)
+	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, k054539b_rom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( okim6295_map, 0, 8, vgmplay_state )
