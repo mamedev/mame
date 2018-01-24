@@ -128,6 +128,7 @@ private:
 	uint8_t m_rombank_lo;
 
 	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -186,18 +187,17 @@ void radica_eu3a14_state::handle_palette(screen_device &screen, bitmap_ind16 &bi
 	}
 }
 
-void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void radica_eu3a14_state::draw_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int xbase, int ybase)
 {
-	// incomplete, need to work out capabilities
-
 	gfx_element *gfx =  m_gfxdecode->gfx(3);
-	int xdraw = 0;
-	int ydraw = 0;
-	int count = 0;
 
 	int base = (m_tilebase[1] << 8) | m_tilebase[0];
 
-	for (int i = 0x800; i < 0x1000;i+=2)
+	int xdraw = xbase;
+	int ydraw = ybase;
+	int count = 0;
+
+	for (int i = 0x800+0x1c0*which; i < 0x800+0x1c0*(which+1); i+=2)
 	{
 		int tile = m_mainram[i+0] | (m_mainram[i+1] << 8);
 
@@ -211,6 +211,32 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 			ydraw += 16;
 		}
 	}
+}
+
+void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int xscroll = m_scrollregs[0] | (m_scrollregs[1] << 8);
+	int yscroll = m_scrollregs[2] | (m_scrollregs[3] << 8);
+
+	draw_page(screen,bitmap,cliprect,0, 0-xscroll, 0-yscroll);
+	draw_page(screen,bitmap,cliprect,1, 256-xscroll, 0-yscroll);
+	draw_page(screen,bitmap,cliprect,2, 0-xscroll, 224-yscroll);
+	draw_page(screen,bitmap,cliprect,3, 256-xscroll, 224-yscroll);
+
+	draw_page(screen,bitmap,cliprect,0, 512+0-xscroll, 0-yscroll);
+	draw_page(screen,bitmap,cliprect,1, 512+256-xscroll, 0-yscroll);
+	draw_page(screen,bitmap,cliprect,2, 512+0-xscroll, 224-yscroll);
+	draw_page(screen,bitmap,cliprect,3, 512+256-xscroll, 224-yscroll);
+	
+	draw_page(screen,bitmap,cliprect,0, 0-xscroll, 448+0-yscroll);
+	draw_page(screen,bitmap,cliprect,1, 256-xscroll, 448+0-yscroll);
+	draw_page(screen,bitmap,cliprect,2, 0-xscroll, 448+224-yscroll);
+	draw_page(screen,bitmap,cliprect,3, 256-xscroll, 448+224-yscroll);
+	
+	draw_page(screen,bitmap,cliprect,0, 512+0-xscroll, 448+0-yscroll);
+	draw_page(screen,bitmap,cliprect,1, 512+256-xscroll, 448+0-yscroll);
+	draw_page(screen,bitmap,cliprect,2, 512+0-xscroll, 448+224-yscroll);
+	draw_page(screen,bitmap,cliprect,3, 512+256-xscroll, 448+224-yscroll);
 }
 
 void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -478,7 +504,8 @@ static ADDRESS_MAP_START( radica_eu3a14_map, AS_PROGRAM, 8, radica_eu3a14_state 
 	// video regs are here this time
 	AM_RANGE(0x5100, 0x5100) AM_RAM
 	AM_RANGE(0x5103, 0x5106) AM_RAM
-	AM_RANGE(0x5107, 0x5107) AM_RAM
+	AM_RANGE(0x5107, 0x5107) AM_RAM // on transitions, maybe layer disables?
+
 	AM_RANGE(0x5110, 0x5112) AM_RAM // startup
 	AM_RANGE(0x5113, 0x5113) AM_RAM // written with tilebase?
 	AM_RANGE(0x5114, 0x5115) AM_RAM AM_SHARE("tilebase")
@@ -674,6 +701,7 @@ MACHINE_CONFIG_START(radica_eu3a14_state::radica_eu3a14)
 	MCFG_SCREEN_UPDATE_DRIVER(radica_eu3a14_state, screen_update)
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
