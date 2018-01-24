@@ -197,7 +197,7 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 			int pri1, pri2;
 			
 			// pix1 sprite vs playfield
-			switch (priority) // TODO : Highest Priority bit unknown
+			switch (priority) // TODO : Verify this from real pcb
 			{
 				case 0x00:
 				default:
@@ -218,7 +218,7 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 								pri1 = 0x002;
 								break;
 							case 0x800:
-								pri1 = 0x080;
+								pri1 = 0x100;
 								break;
 							case 0xa00:
 								pri1 = 0x040;
@@ -267,15 +267,15 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 			}
 
 			// pix2 sprite vs pix1 sprite
-			pri2 = 0x0100;
+			pri2 = 0x080;
 			switch (priority)
 			{
 				case 0x00:
 				default:
-					pri2 = 0x0100;
+					pri2 = 0x080;
 					break;
 				case 0x20:
-					pri2 = 0x0008;
+					pri2 = 0x008;
 					break;
 			}
 
