@@ -12,10 +12,11 @@ TODO:
 #include "emu.h"
 
 #include "includes/a2600.h"
+#include "machine/bankdev.h"
 
-
-#define CONTROL1_TAG    "joyport1"
-#define CONTROL2_TAG    "joyport2"
+#include "screen.h"
+#include "softlist.h"
+#include "speaker.h"
 
 class tvboy_state : public a2600_state
 {
@@ -36,21 +37,24 @@ private:
   
   required_region_ptr<uint8_t> m_rom;
   
-  virtual void machine_start() override;
+  virtual void machine_start_tvboyii();
   virtual void machine_reset() override;
-}
+};
 
-void tvboy_state::machine_start() {
+void tvboy_state::machine_start_tvboyii() {
   m_crom->set_bank(0);
   m_bank0->configure_entries(0, 128, &m_rom[0x00000], 0x1000);
 }
 
 void tvboy_state::machine_reset() {
   m_bank0->set_entry(0);
+  a2600_state::machine_reset();
 }
 
 WRITE8_MEMBER(tvboy_state::bank_write) {
   logerror("banking (?) write %04x, %02x\n", offset, data);
+  if((offset & 0xFF00) == 0x0800)
+    m_bank0->set_entry(data);
 }
 
 static ADDRESS_MAP_START(tvboy_mem, AS_PROGRAM, 8, tvboy_state ) // 6507 has 13-bit address space, 0x0000 - 0x1fff
@@ -127,14 +131,30 @@ MACHINE_CONFIG_START(tvboy_state::tvboyii)
   
 MACHINE_CONFIG_END
 
-ROM_START( tvboyii )
-	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
-ROM_END
+static INPUT_PORTS_START( tvboyii )
+	PORT_START("SWB")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Game") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Select Game") PORT_CODE(KEYCODE_1)
+	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x08, 0x08, "TV Type" ) PORT_CODE(KEYCODE_C) PORT_TOGGLE
+	PORT_DIPSETTING(    0x08, "Color" )
+	PORT_DIPSETTING(    0x00, "B&W" )
+	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x40, 0x00, "Left Diff. Switch" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
+	PORT_DIPSETTING(    0x40, "A" )
+	PORT_DIPSETTING(    0x00, "B" )
+	PORT_DIPNAME( 0x80, 0x00, "Right Diff. Switch" ) PORT_CODE(KEYCODE_4) PORT_TOGGLE
+	PORT_DIPSETTING(    0x80, "A" )
+	PORT_DIPSETTING(    0x00, "B" )
+INPUT_PORTS_END
 
 ROM_START( tvboyii )
+  ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+
 	ROM_REGION( 0x80000, "mainrom", 0 )
-  ROM_LOAD( "HY23400P.bin", 0x00000, 0x800000, CRC(f8485173) SHA1(cafbaa0c5437f192cb4fb49f9a672846aa038870) )
+  ROM_LOAD( "HY23400P.bin", 0x00000, 0x80000, CRC(f8485173) SHA1(cafbaa0c5437f192cb4fb49f9a672846aa038870) )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE        INIT    COMPANY     FULLNAME */
-CONS( 199?, tvboyii, a2600,      0, tvboyii,  a2600, tvboy_state, 0, "Systema", "TV Boy II (PAL)" , MACHINE_SUPPORTS_SAVE )
+CONS( 199?, tvboyii, a2600,      0, tvboyii,  tvboyii, tvboy_state, 0, "Systema", "TV Boy II (PAL)" , MACHINE_SUPPORTS_SAVE )
