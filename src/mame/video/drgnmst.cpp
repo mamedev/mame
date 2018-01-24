@@ -12,10 +12,6 @@ WRITE16_MEMBER(drgnmst_state::drgnmst_paletteram_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	int bright = 0x5 + ((data >> 12) & 0xf);	// TODO : verify brightness value from real pcb
-
-	if (bright < 0) bright = 0;
-	if (bright > 0xff) bright = 0xff;
-
 	int r = (pal4bit((data >> 8) & 0x0f) * bright) / 0x14;
 	int g = (pal4bit((data >> 4) & 0x0f) * bright) / 0x14;
 	int b = (pal4bit((data >> 0) & 0x0f) * bright) / 0x14;
