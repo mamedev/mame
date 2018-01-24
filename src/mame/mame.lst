@@ -12991,7 +12991,7 @@ bigkarnk                        // (c) 1991 - Ref 901112-1
 biomtoy                         // (c) 1995 - Ref 922804/2 - (unprotected)
 biomtoya                        // (c) 1995 - Ref 922804/2 - (unprotected)
 biomtoyb                        // (c) 1995 - Ref 922804/2 - (unprotected)
-bioplayc						// (prototype)
+bioplayc                        // (prototype)
 maniacsp                        // (c) 1996 - Ref 922804/2 - (prototype)
 lastkm                          // (c) 1995 - Ref 922804/2
 squash                          // (c) 1992 - Ref 922804/2
@@ -13312,6 +13312,7 @@ dkongjrm                        // bootleg
 dkongjrmc                       // bootleg (Centromatic)
 drivfrcb                        // bootleg
 drivfrcg                        // [1984] Shinkai (Magic Electronics USA license)
+drivfrcsg                       // [1984] Seatongrove
 drivfrct                        // bootleg
 froggerv                        // bootleg
 guttangt                        //
@@ -17306,7 +17307,7 @@ kenseim                         // 18/04/1994 (c) 1994 Togo/Sigma (Japan) not li
 @source:kickgoal.cpp
 actionhw                        // (c) 1995
 kickgoal                        // (c) 1995
-kickgoala						//
+kickgoala                       //
 
 @source:kim1.cpp
 kim1                            // Commodore (MOS) KIM-1 1975
@@ -29660,7 +29661,7 @@ samsho3h                        // 0087 (c) 1995 SNK
 samsho4                         // 0222 (c) 1996 SNK
 samsho4k                        // Censored Korean release of samsho4
 samsho5                         // 0270 (c) 2003 Playmore
-samsho5a						// 0270 (c) 2003 Playmore
+samsho5a                        // 0270 (c) 2003 Playmore
 samsho5b                        // bootleg
 samsho5h                        // 0270 (c) 2003 Playmore
 samshoh                         // 0045 (c) 1993 SNK
