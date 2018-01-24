@@ -18,7 +18,7 @@
 class mcs48_disassembler : public util::disasm_interface
 {
 public:
-	mcs48_disassembler(bool upi41);
+	mcs48_disassembler(bool upi41, bool i802x);
 	virtual ~mcs48_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override;
@@ -28,6 +28,7 @@ public:
 
 private:
 	bool m_upi41;
+	bool m_i802x;
 };
 
 #endif
