@@ -10529,11 +10529,10 @@ ROM_START( wof )
 ROM_END
 
 /* B-Board 91635B-2 */
-/* FIXME Probably this set uses a patched program ROM coming from a desuicided board, or simply the original C-Board
-   is not a 92641C-1. A verification and a new fresh dump are needed to confirm if it's genuine or not. */
+/* Dumped from 2 different sets. Dumper's note for the second set: 'the c board was unmodified b21 with dead battery' */
 ROM_START( wofr1 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "tk2e_23b.8f", 0x000000, 0x80000, CRC(11fb2ed1) SHA1(19e09ad6f9edc7997b030cddfe1d9c96d88135f2) )  // patched?
+	ROM_LOAD16_WORD_SWAP( "tk2e_23b.8f", 0x000000, 0x80000, CRC(11fb2ed1) SHA1(19e09ad6f9edc7997b030cddfe1d9c96d88135f2) )
 	ROM_LOAD16_WORD_SWAP( "tk2e_22b.7f", 0x080000, 0x80000, CRC(479b3f24) SHA1(9fb8ae06856fe115addfb6794c28978a4f6716ec) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
