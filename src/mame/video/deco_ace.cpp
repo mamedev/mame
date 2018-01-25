@@ -63,7 +63,6 @@ DEFINE_DEVICE_TYPE(DECO_ACE, deco_ace_device, "deco_ace", "Data East 99 'ACE' Ch
 deco_ace_device::deco_ace_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECO_ACE, tag, owner, clock),
 	device_video_interface(mconfig, *this),
-	m_dirty_palette(0),
 	m_palette_effect_min(0x100),
 	m_palette_effect_max(0xfff),
 	m_palette(*this, finder_base::DUMMY_TAG),
@@ -107,6 +106,15 @@ void deco_ace_device::device_reset()
 	m_palette_effect_min = 0x100; /* Screenshots seem to suggest ACE fades do not affect playfield 1 palette (0-255) */
 	m_palette_effect_max = 0xfff;
 	memset(m_ace_ram.get(),0,0x28);
+}
+
+//-------------------------------------------------
+//  device_post_load - device-specific post-load
+//-------------------------------------------------
+
+void deco_ace_device::device_post_load()
+{
+	palette_update();
 }
 
 /*****************************************************************************

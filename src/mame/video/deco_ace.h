@@ -45,10 +45,10 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_post_load() override;
 
 private:
 	// internal state
-	uint8_t m_dirty_palette;
 	uint32_t m_palette_effect_min;
 	uint32_t m_palette_effect_max;
 	required_device<palette_device> m_palette;
