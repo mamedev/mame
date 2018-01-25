@@ -1,16 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
+#ifndef MAME_INCLUDES_MEGADRIV_ACBL_H
+#define MAME_INCLUDES_MEGADRIV_ACBL_H
+
 class md_boot_state : public md_base_state
 {
 public:
 	md_boot_state(const machine_config &mconfig, device_type type, const char *tag)
 	: md_base_state(mconfig, type, tag) { m_protcount = 0;}
-
-	// bootleg specific
-	int m_aladmdb_mcu_port;
-
-	int m_protcount;
 
 	DECLARE_DRIVER_INIT(aladmdb);
 	DECLARE_DRIVER_INIT(mk3mdb);
@@ -38,4 +36,12 @@ public:
 	void puckpkmn(machine_config &config);
 	void jzth(machine_config &config);
 	void puckpkmna(machine_config &config);
+
+private:
+	// bootleg specific
+	int m_aladmdb_mcu_port;
+
+	int m_protcount;
 };
+
+#endif // MAME_INCLUDES_MEGADRIV_ACBL_H

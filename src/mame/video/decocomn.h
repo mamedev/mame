@@ -25,7 +25,6 @@ public:
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
 
-	DECLARE_WRITE16_MEMBER( nonbuffered_palette_w );
 	DECLARE_WRITE16_MEMBER( buffered_palette_w );
 	DECLARE_WRITE16_MEMBER( palette_dma_w );
 	DECLARE_WRITE16_MEMBER( priority_w );

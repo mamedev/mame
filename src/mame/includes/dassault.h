@@ -21,7 +21,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
-		m_decocomn(*this, "deco_common"),
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_deco_tilegen2(*this, "tilegen2"),
 		m_oki2(*this, "oki2"),
@@ -42,7 +41,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_subcpu;
-	required_device<decocomn_device> m_decocomn;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
 	required_device<okim6295_device> m_oki2;
@@ -59,6 +57,9 @@ public:
 	required_shared_ptr<uint16_t> m_ram;
 	required_shared_ptr<uint16_t> m_ram2;
 
+	uint16_t m_priority;
+
+	DECLARE_WRITE16_MEMBER(priority_w);
 	DECLARE_WRITE16_MEMBER(main_irq_ack_w);
 	DECLARE_WRITE16_MEMBER(sub_irq_ack_w);
 	DECLARE_READ16_MEMBER(dassault_control_r);
@@ -67,6 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_DRIVER_INIT(thndzone);
 	DECLARE_DRIVER_INIT(dassault);
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_dassault(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mixdassaultlayer(bitmap_rgb32 &bitmap, bitmap_ind16* sprite_bitmap, const rectangle &cliprect, uint16_t pri, uint16_t primask, uint16_t penbase, uint8_t alpha);
