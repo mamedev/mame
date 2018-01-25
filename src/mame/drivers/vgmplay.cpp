@@ -205,8 +205,10 @@ private:
 
 	uint32_t m_multipcma_bank_l;
 	uint32_t m_multipcma_bank_r;
+	uint32_t m_multipcma_banked;
 	uint32_t m_multipcmb_bank_l;
 	uint32_t m_multipcmb_bank_r;
+	uint32_t m_multipcmb_banked;
 
 	uint32_t r32(int offset) const;
 	uint8_t r8(int offset) const;
@@ -958,11 +960,55 @@ READ8_MEMBER(vgmplay_device::ymz280b_rom_r)
 
 READ8_MEMBER(vgmplay_device::multipcma_rom_r)
 {
+	if (m_multipcma_banked == 1)
+	{
+		offset &= 0x1fffff;
+		if (offset & 0x100000)
+		{
+			if (m_multipcma_bank_l == m_multipcma_bank_r)
+			{
+				offset = ((m_multipcma_bank_r & ~0xf) << 16) | (offset & 0xfffff);
+			}
+			else
+			{
+				if (offset & 0x80000)
+				{
+					offset = ((m_multipcma_bank_l & ~0x7) << 16) | (offset & 0x7ffff);
+				}
+				else
+				{
+					offset = ((m_multipcma_bank_r & ~0x7) << 16) | (offset & 0x7ffff);
+				}
+			}
+		}
+	}
 	return rom_r(0, 0x89, offset);
 }
 
 READ8_MEMBER(vgmplay_device::multipcmb_rom_r)
 {
+	if (m_multipcmb_banked == 1)
+	{
+		offset &= 0x1fffff;
+		if (offset & 0x100000)
+		{
+			if (m_multipcmb_bank_l == m_multipcmb_bank_r)
+			{
+				offset = ((m_multipcmb_bank_r & ~0xf) << 16) | (offset & 0xfffff);
+			}
+			else
+			{
+				if (offset & 0x80000)
+				{
+					offset = ((m_multipcmb_bank_l & ~0x7) << 16) | (offset & 0x7ffff);
+				}
+				else
+				{
+					offset = ((m_multipcmb_bank_r & ~0x7) << 16) | (offset & 0x7ffff);
+				}
+			}
+		}
+	}
 	return rom_r(1, 0x89, offset);
 }
 
@@ -1306,7 +1352,7 @@ WRITE8_MEMBER(vgmplay_state::multipcm_bank_lo_a_w)
 	if (offset & 2)
 		m_multipcma_bank_r = (m_multipcma_bank_r & 0xff00) | data;
 
-	m_multipcma->set_bank(m_multipcma_bank_l << 16, m_multipcma_bank_r << 16);
+	m_multipcma_banked = 1;
 }
 
 WRITE8_MEMBER(vgmplay_state::multipcm_bank_hi_b_w)
@@ -1324,7 +1370,7 @@ WRITE8_MEMBER(vgmplay_state::multipcm_bank_lo_b_w)
 	if (offset & 2)
 		m_multipcmb_bank_r = (m_multipcmb_bank_r & 0xff00) | data;
 
-	m_multipcmb->set_bank(m_multipcmb_bank_l << 16, m_multipcmb_bank_r << 16);
+	m_multipcmb_banked = 1;
 }
 
 static INPUT_PORTS_START( vgmplay )
