@@ -736,8 +736,6 @@ ROM_START( bang )
 	ROM_FILL(                0x0900000, 0x0100000, 0x00 )            /* Empty */
 ROM_END
 
-
-
 ROM_START( bangj )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "bang-a.ic53", 0x000000, 0x080000, CRC(5ee514e9) SHA1(b78b507d18de41be58049f5c597acd107ec1273f) )
@@ -1051,7 +1049,6 @@ static ADDRESS_MAP_START( touchgo_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0xfe0000, 0xfe7fff) AM_RAM                                                                         /* Work RAM */
 	AM_RANGE(0xfe8000, 0xfeffff) AM_RAM AM_SHARE("shareram")                                                    /* Work RAM (shared with D5002FP) */
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( touchgo )
@@ -1449,10 +1446,9 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-
 MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL(30'000'000) / 2)         /* 15 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)         /* 12 MHz - see PCB layout above with ROM set */
 	MCFG_CPU_PROGRAM_MAP(snowboar_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
@@ -1493,7 +1489,6 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
 MACHINE_CONFIG_END
 
 
-
 /*
 PCB Layout:
 
@@ -1529,7 +1524,7 @@ REF: 960419/1
 -----------------------------------------------------------------------------|
 */
 
-ROM_START( snowboara )
+ROM_START( snowboara ) // REF 960419/1
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE(    "sb53", 0x000000, 0x080000, CRC(e4eaefd4) SHA1(c7de2ae3a4a919fbe16d4997e3f9e2303b8c96b1) ) /* Version 2.0 program roms */
 	ROM_LOAD16_BYTE(    "sb55", 0x000001, 0x080000, CRC(e2476994) SHA1(2ad18652a1fc6ac058c8399373fb77e7a81d5bbd) ) /* Version 2.0 program roms */
