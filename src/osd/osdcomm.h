@@ -41,11 +41,6 @@
 #define UNEXPECTED(exp)         __builtin_expect(!!(exp), 0)
 #define EXPECTED(exp)           __builtin_expect(!!(exp), 1)
 #define RESTRICT                __restrict__
-#if defined(__clang__) && __clang__ == 1
-#define FALLTHROUGH             [[clang::fallthrough]];
-#else
-#define FALLTHROUGH             [[gnu::fallthrough]];
-#endif
 #else
 #define ATTR_UNUSED
 #define ATTR_PRINTF(x,y)
@@ -56,6 +51,16 @@
 #define UNEXPECTED(exp)         (exp)
 #define EXPECTED(exp)           (exp)
 #define RESTRICT
+#endif
+
+/* fallthrough placeholder */
+#if __cplusplus == 201703L
+#define FALLTHROUGH             [[fallthrough]];
+#elif defined(__clang__) && __clang__ == 1 && (__clang_major__ >= 4 || (__clang_major__ == 3 && __clang_minor__ >= 9))
+#define FALLTHROUGH             [[clang::fallthrough]];
+#elif defined(__GNUC__) && __GNUC__ >= 7
+#define FALLTHROUGH             [[gnu::fallthrough]];
+#else
 #define FALLTHROUGH             // fallthrough
 #endif
 
