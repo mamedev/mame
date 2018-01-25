@@ -194,8 +194,6 @@ uint32_t boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rg
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
-	m_deco_ace->palette_update();
-
 	/* Draw playfields */
 	bitmap.fill(m_palette->pen(0x400), cliprect); /* pen not confirmed */
 	screen.priority().fill(0);
