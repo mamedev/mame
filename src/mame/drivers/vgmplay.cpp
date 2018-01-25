@@ -19,6 +19,7 @@
 #include "sound/c6280.h"
 #include "sound/gb.h"
 #include "sound/k053260.h"
+#include "sound/k054539.h"
 #include "sound/multipcm.h"
 #include "sound/okim6295.h"
 #include "sound/pokey.h"
@@ -80,6 +81,8 @@ public:
 		A_YMF271     = 0x00013040,
 		A_YMZ280B    = 0x00013050,
 		A_YM2608     = 0x00013060,
+		A_K054539A   = 0x00014000,
+		A_K054539B   = 0x00014400,
 		A_QSOUND     = 0x00013070
 	};
 
@@ -115,6 +118,8 @@ public:
 	READ8_MEMBER(k053260_rom_r);
 	READ8_MEMBER(okim6295a_rom_r);
 	READ8_MEMBER(okim6295b_rom_r);
+	READ8_MEMBER(k054539a_rom_r);
+	READ8_MEMBER(k054539b_rom_r);
 	READ8_MEMBER(c352_rom_r);
 	READ8_MEMBER(qsound_rom_r);
 
@@ -197,6 +202,8 @@ private:
 	required_device<n2a03_device> m_nescpu;
 	required_shared_ptr<uint8_t> m_nesram;
 	required_device<k053260_device> m_k053260;
+	required_device<k054539_device> m_k054539a;
+	required_device<k054539_device> m_k054539b;
 	required_device<c6280_device> m_c6280;
 	required_device<h6280_device> m_h6280;
 	required_device<pokey_device> m_pokeya;
@@ -573,6 +580,17 @@ void vgmplay_device::execute_run()
 				uint8_t offset = m_file->read_byte(m_pc+1);
 				m_io->write_byte(A_YMF271 + (offset & 7) * 2, m_file->read_byte(m_pc+2));
 				m_io->write_byte(A_YMF271 + (offset & 7) * 2 + 1, m_file->read_byte(m_pc+3));
+				m_pc += 4;
+				break;
+			}
+			
+			case 0xd3:
+			{
+				uint16_t offset = m_file->read_byte(m_pc+1) << 16 | m_file->read_byte(m_pc+2);
+				if (offset & 0x8000)
+					m_io->write_byte(A_K054539B + (offset & 0x3ff), m_file->read_byte(m_pc+3));
+				else
+					m_io->write_byte(A_K054539A + (offset & 0x3ff), m_file->read_byte(m_pc+3));
 				m_pc += 4;
 				break;
 			}
@@ -1017,6 +1035,16 @@ READ8_MEMBER(vgmplay_device::okim6295b_rom_r)
 	return rom_r(1, 0x8b, offset);
 }
 
+READ8_MEMBER(vgmplay_device::k054539a_rom_r)
+{
+	return rom_r(0, 0x8c, offset);
+}
+
+READ8_MEMBER(vgmplay_device::k054539b_rom_r)
+{
+	return rom_r(1, 0x8c, offset);
+}
+
 READ8_MEMBER(vgmplay_device::k053260_rom_r)
 {
 	return rom_r(0, 0x8e, offset);
@@ -1052,6 +1080,8 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_nescpu(*this, "nescpu")
 	, m_nesram(*this, "nesapu_ram")
 	, m_k053260(*this, "k053260")
+	, m_k054539a(*this, "k054539a")
+	, m_k054539b(*this, "k054539b")
 	, m_c6280(*this, "c6280")
 	, m_h6280(*this, "h6280")
 	, m_pokeya(*this, "pokeya")
@@ -1260,6 +1290,10 @@ void vgmplay_state::machine_start()
 					m_multipcmb->set_unscaled_clock(clock);
 				}
 			}
+			if(version >= 0x161 && r8(0x95)) {
+				m_k054539a->init_flags(r8(0x95));
+				m_k054539b->init_flags(r8(0x95));
+			}
 			if(version >= 0x161 && r32(0x98)) {
 				m_okim6295a_clock = r32(0x98);
 				m_okim6295a_pin7 = 0;
@@ -1275,6 +1309,14 @@ void vgmplay_state::machine_start()
 					m_okim6295b_pin7 = m_okim6295a_pin7;
 					okim6295_device::static_set_pin7(*m_okim6295b, m_okim6295b_pin7);
 					m_okim6295b->set_unscaled_clock(m_okim6295b_clock);
+				}
+			}
+			if(version >= 0x161 && r32(0xa0)) {
+				uint32_t clock = r32(0xa0);
+				m_k054539a->set_unscaled_clock(clock & ~0x40000000);
+				if (clock & 0x40000000) {
+					clock &= ~0x40000000;
+					m_k054539b->set_unscaled_clock(clock);
 				}
 			}
 			if(version >= 0x161 && r32(0xac)) {
@@ -1495,6 +1537,8 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_YMF271,         vgmplay_device::A_YMF271+0xf)     AM_DEVWRITE    ("ymf271",        ymf271_device, write)
 	AM_RANGE(vgmplay_device::A_YMZ280B,        vgmplay_device::A_YMZ280B+0x1)    AM_DEVWRITE    ("ymz280b",       ymz280b_device, write)
 	AM_RANGE(vgmplay_device::A_YM2608,         vgmplay_device::A_YM2608+0x3)     AM_DEVWRITE    ("ym2608",        ym2608_device, write)
+	AM_RANGE(vgmplay_device::A_K054539A,       vgmplay_device::A_K054539A+0x22f) AM_DEVWRITE    ("k054539a",      k054539_device, write)
+	AM_RANGE(vgmplay_device::A_K054539B,       vgmplay_device::A_K054539B+0x22f) AM_DEVWRITE    ("k054539b",      k054539_device, write)
 	AM_RANGE(vgmplay_device::A_QSOUND,         vgmplay_device::A_QSOUND+0x2)     AM_DEVWRITE    ("qsound",        qsound_device, qsound_w)
 ADDRESS_MAP_END
 
@@ -1520,6 +1564,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( okim6295b_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0x3ffff) AM_DEVREAD("vgmplay", vgmplay_device, okim6295b_rom_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( k054539a_map, 0, 8, vgmplay_state )
+	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, k054539a_rom_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( k054539b_map, 0, 8, vgmplay_state )
+	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, k054539b_rom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c352_map, 0, 8, vgmplay_state )
@@ -1676,6 +1728,16 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
 	
+	MCFG_DEVICE_ADD("k054539a", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADDRESS_MAP(0, k054539a_map)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
+	
+	MCFG_DEVICE_ADD("k054539b", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADDRESS_MAP(0, k054539b_map)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
+
 	MCFG_QSOUND_ADD("qsound", 4000000)
 	MCFG_DEVICE_ADDRESS_MAP(0, qsound_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
