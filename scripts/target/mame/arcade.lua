@@ -1552,6 +1552,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/deco32.cpp",
 	MAME_DIR .. "src/mame/includes/deco32.h",
 	MAME_DIR .. "src/mame/video/deco32.cpp",
+	MAME_DIR .. "src/mame/audio/deco6280.cpp",
+	MAME_DIR .. "src/mame/audio/deco6280.h",
 	MAME_DIR .. "src/mame/video/dvi.cpp",
 	MAME_DIR .. "src/mame/video/deco_ace.cpp",
 	MAME_DIR .. "src/mame/video/deco_ace.h",
