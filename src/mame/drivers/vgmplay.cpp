@@ -123,6 +123,21 @@ public:
 	READ8_MEMBER(c352_rom_r);
 	READ8_MEMBER(qsound_rom_r);
 
+	DECLARE_WRITE8_MEMBER(multipcm_bank_lo_a_w);
+	DECLARE_WRITE8_MEMBER(multipcm_bank_hi_a_w);
+	DECLARE_WRITE8_MEMBER(multipcm_bank_lo_b_w);
+	DECLARE_WRITE8_MEMBER(multipcm_bank_hi_b_w);
+	DECLARE_WRITE8_MEMBER(okim6295_clock_a_w);
+	DECLARE_WRITE8_MEMBER(okim6295_pin7_a_w);
+	DECLARE_WRITE8_MEMBER(okim6295_nmk112_enable_a_w);
+	DECLARE_WRITE8_MEMBER(okim6295_bank_a_w);
+	DECLARE_WRITE8_MEMBER(okim6295_nmk112_bank_a_w);
+	DECLARE_WRITE8_MEMBER(okim6295_clock_b_w);
+	DECLARE_WRITE8_MEMBER(okim6295_pin7_b_w);
+	DECLARE_WRITE8_MEMBER(okim6295_nmk112_enable_b_w);
+	DECLARE_WRITE8_MEMBER(okim6295_bank_b_w);
+	DECLARE_WRITE8_MEMBER(okim6295_nmk112_bank_b_w);
+
 private:
 	struct rom_block {
 		offs_t start_address;
@@ -149,6 +164,23 @@ private:
 
 	uint32_t m_ym2612_stream_offset;
 
+	uint32_t m_multipcma_bank_l;
+	uint32_t m_multipcma_bank_r;
+	uint32_t m_multipcma_banked;
+	uint32_t m_multipcmb_bank_l;
+	uint32_t m_multipcmb_bank_r;
+	uint32_t m_multipcmb_banked;
+	uint32_t m_okim6295a_clock;
+	uint32_t m_okim6295a_pin7;
+	uint32_t m_okim6295a_nmk112_enable;
+	uint32_t m_okim6295a_bank;
+	uint32_t m_okim6295a_nmk112_bank[4];
+	uint32_t m_okim6295b_clock;
+	uint32_t m_okim6295b_pin7;
+	uint32_t m_okim6295b_nmk112_enable;
+	uint32_t m_okim6295b_bank;
+	uint32_t m_okim6295b_nmk112_bank[4];
+
 	uint8_t rom_r(int chip, uint8_t type, offs_t offset);
 	uint32_t handle_data_block(uint32_t address);
 	void blocks_clear();
@@ -165,21 +197,6 @@ public:
 
 	DECLARE_READ8_MEMBER(file_r);
 	DECLARE_READ8_MEMBER(file_size_r);
-
-	DECLARE_WRITE8_MEMBER(multipcm_bank_lo_a_w);
-	DECLARE_WRITE8_MEMBER(multipcm_bank_hi_a_w);
-	DECLARE_WRITE8_MEMBER(multipcm_bank_lo_b_w);
-	DECLARE_WRITE8_MEMBER(multipcm_bank_hi_b_w);
-	DECLARE_WRITE8_MEMBER(okim6295_clock_a_w);
-	DECLARE_WRITE8_MEMBER(okim6295_pin7_a_w);
-	DECLARE_WRITE8_MEMBER(okim6295_nmk112_enable_a_w);
-	DECLARE_WRITE8_MEMBER(okim6295_bank_a_w);
-	DECLARE_WRITE8_MEMBER(okim6295_nmk112_bank_a_w);
-	DECLARE_WRITE8_MEMBER(okim6295_clock_b_w);
-	DECLARE_WRITE8_MEMBER(okim6295_pin7_b_w);
-	DECLARE_WRITE8_MEMBER(okim6295_nmk112_enable_b_w);
-	DECLARE_WRITE8_MEMBER(okim6295_bank_b_w);
-	DECLARE_WRITE8_MEMBER(okim6295_nmk112_bank_b_w);
 
 	void vgmplay(machine_config &config);
 private:
@@ -215,21 +232,6 @@ private:
 	required_device<ymz280b_device> m_ymz280b;
 	required_device<ym2608_device> m_ym2608;
 	required_device<qsound_device> m_qsound;
-
-	uint32_t m_multipcma_bank_l;
-	uint32_t m_multipcma_bank_r;
-	uint32_t m_multipcmb_bank_l;
-	uint32_t m_multipcmb_bank_r;
-	uint32_t m_okim6295a_clock;
-	uint32_t m_okim6295a_pin7;
-	uint32_t m_okim6295a_nmk112_enable;
-	uint32_t m_okim6295a_bank;
-	uint32_t m_okim6295a_nmk112_bank[4];
-	uint32_t m_okim6295b_clock;
-	uint32_t m_okim6295b_pin7;
-	uint32_t m_okim6295b_nmk112_enable;
-	uint32_t m_okim6295b_bank;
-	uint32_t m_okim6295b_nmk112_bank[4];
 
 	uint32_t r32(int offset) const;
 	uint8_t r8(int offset) const;
@@ -987,11 +989,55 @@ READ8_MEMBER(vgmplay_device::ymz280b_rom_r)
 
 READ8_MEMBER(vgmplay_device::multipcma_rom_r)
 {
+	if (m_multipcma_banked == 1)
+	{
+		offset &= 0x1fffff;
+		if (offset & 0x100000)
+		{
+			if (m_multipcma_bank_l == m_multipcma_bank_r)
+			{
+				offset = ((m_multipcma_bank_r & ~0xf) << 16) | (offset & 0xfffff);
+			}
+			else
+			{
+				if (offset & 0x80000)
+				{
+					offset = ((m_multipcma_bank_l & ~0x7) << 16) | (offset & 0x7ffff);
+				}
+				else
+				{
+					offset = ((m_multipcma_bank_r & ~0x7) << 16) | (offset & 0x7ffff);
+				}
+			}
+		}
+	}
 	return rom_r(0, 0x89, offset);
 }
 
 READ8_MEMBER(vgmplay_device::multipcmb_rom_r)
 {
+	if (m_multipcmb_banked == 1)
+	{
+		offset &= 0x1fffff;
+		if (offset & 0x100000)
+		{
+			if (m_multipcmb_bank_l == m_multipcmb_bank_r)
+			{
+				offset = ((m_multipcmb_bank_r & ~0xf) << 16) | (offset & 0xfffff);
+			}
+			else
+			{
+				if (offset & 0x80000)
+				{
+					offset = ((m_multipcmb_bank_l & ~0x7) << 16) | (offset & 0x7ffff);
+				}
+				else
+				{
+					offset = ((m_multipcmb_bank_r & ~0x7) << 16) | (offset & 0x7ffff);
+				}
+			}
+		}
+	}
 	return rom_r(1, 0x89, offset);
 }
 
@@ -1363,7 +1409,7 @@ READ8_MEMBER(vgmplay_state::file_size_r)
 	return size >> (8*offset);
 }
 
-WRITE8_MEMBER(vgmplay_state::multipcm_bank_hi_a_w)
+WRITE8_MEMBER(vgmplay_device::multipcm_bank_hi_a_w)
 {
 	if (offset & 1)
 		m_multipcma_bank_l = (m_multipcma_bank_l & 0xff) | (data << 16);
@@ -1371,17 +1417,17 @@ WRITE8_MEMBER(vgmplay_state::multipcm_bank_hi_a_w)
 		m_multipcma_bank_r = (m_multipcma_bank_r & 0xff) | (data << 16);
 }
 
-WRITE8_MEMBER(vgmplay_state::multipcm_bank_lo_a_w)
+WRITE8_MEMBER(vgmplay_device::multipcm_bank_lo_a_w)
 {
 	if (offset & 1)
 		m_multipcma_bank_l = (m_multipcma_bank_l & 0xff00) | data;
 	if (offset & 2)
 		m_multipcma_bank_r = (m_multipcma_bank_r & 0xff00) | data;
 
-	m_multipcma->set_bank(m_multipcma_bank_l << 16, m_multipcma_bank_r << 16);
+	m_multipcma_banked = 1;
 }
 
-WRITE8_MEMBER(vgmplay_state::multipcm_bank_hi_b_w)
+WRITE8_MEMBER(vgmplay_device::multipcm_bank_hi_b_w)
 {
 	if (offset & 1)
 		m_multipcmb_bank_l = (m_multipcmb_bank_l & 0xff) | (data << 16);
@@ -1389,17 +1435,17 @@ WRITE8_MEMBER(vgmplay_state::multipcm_bank_hi_b_w)
 		m_multipcmb_bank_r = (m_multipcmb_bank_r & 0xff) | (data << 16);
 }
 
-WRITE8_MEMBER(vgmplay_state::multipcm_bank_lo_b_w)
+WRITE8_MEMBER(vgmplay_device::multipcm_bank_lo_b_w)
 {
 	if (offset & 1)
 		m_multipcmb_bank_l = (m_multipcmb_bank_l & 0xff00) | data;
 	if (offset & 2)
 		m_multipcmb_bank_r = (m_multipcmb_bank_r & 0xff00) | data;
 
-	m_multipcmb->set_bank(m_multipcmb_bank_l << 16, m_multipcmb_bank_r << 16);
+	m_multipcmb_banked = 1;
 }
 
-WRITE8_MEMBER(vgmplay_state::okim6295_clock_a_w)
+WRITE8_MEMBER(vgmplay_device::okim6295_clock_a_w)
 {
 	uint32_t old = m_okim6295a_clock;
 	int shift = ((offset & 3) << 3);
@@ -1409,7 +1455,7 @@ WRITE8_MEMBER(vgmplay_state::okim6295_clock_a_w)
 
 }
 
-WRITE8_MEMBER(vgmplay_state::okim6295_pin7_a_w)
+WRITE8_MEMBER(vgmplay_device::okim6295_pin7_a_w)
 {
 	if ((data & mem_mask) != (m_okim6295a_pin7 & mem_mask))
 	{
@@ -1418,12 +1464,12 @@ WRITE8_MEMBER(vgmplay_state::okim6295_pin7_a_w)
 	}
 }
 
-WRITE8_MEMBER(vgmplay_state::okim6295_nmk112_enable_a_w)
+WRITE8_MEMBER(vgmplay_device::okim6295_nmk112_enable_a_w)
 {
 	COMBINE_DATA(&m_okim6295a_nmk112_enable);
 }
 
-WRITE8_MEMBER(vgmplay_state::okim6295_bank_a_w)
+WRITE8_MEMBER(vgmplay_device::okim6295_bank_a_w)
 {
 	if ((data & mem_mask) != (m_okim6295a_bank & mem_mask))
 	{
@@ -1431,7 +1477,7 @@ WRITE8_MEMBER(vgmplay_state::okim6295_bank_a_w)
 	}
 }
 
-WRITE8_MEMBER(vgmplay_state::okim6295_nmk112_bank_a_w)
+WRITE8_MEMBER(vgmplay_device::okim6295_nmk112_bank_a_w)
 {
 	offset &= 3;
 	if ((data & mem_mask) != (m_okim6295a_nmk112_bank[offset] & mem_mask))
@@ -1440,7 +1486,7 @@ WRITE8_MEMBER(vgmplay_state::okim6295_nmk112_bank_a_w)
 	}
 }
 
-WRITE8_MEMBER(vgmplay_state::okim6295_clock_b_w)
+WRITE8_MEMBER(vgmplay_device::okim6295_clock_b_w)
 {
 	uint32_t old = m_okim6295b_clock;
 	int shift = ((offset & 3) << 3);
@@ -1450,7 +1496,7 @@ WRITE8_MEMBER(vgmplay_state::okim6295_clock_b_w)
 
 }
 
-WRITE8_MEMBER(vgmplay_state::okim6295_pin7_b_w)
+WRITE8_MEMBER(vgmplay_device::okim6295_pin7_b_w)
 {
 	if ((data & mem_mask) != (m_okim6295b_pin7 & mem_mask))
 	{
@@ -1459,12 +1505,12 @@ WRITE8_MEMBER(vgmplay_state::okim6295_pin7_b_w)
 	}
 }
 
-WRITE8_MEMBER(vgmplay_state::okim6295_nmk112_enable_b_w)
+WRITE8_MEMBER(vgmplay_device::okim6295_nmk112_enable_b_w)
 {
 	COMBINE_DATA(&m_okim6295b_nmk112_enable);
 }
 
-WRITE8_MEMBER(vgmplay_state::okim6295_bank_b_w)
+WRITE8_MEMBER(vgmplay_device::okim6295_bank_b_w)
 {
 	if ((data & mem_mask) != (m_okim6295b_bank & mem_mask))
 	{
@@ -1472,7 +1518,7 @@ WRITE8_MEMBER(vgmplay_state::okim6295_bank_b_w)
 	}
 }
 
-WRITE8_MEMBER(vgmplay_state::okim6295_nmk112_bank_b_w)
+WRITE8_MEMBER(vgmplay_device::okim6295_nmk112_bank_b_w)
 {
 	offset &= 3;
 	if ((data & mem_mask) != (m_okim6295b_nmk112_bank[offset] & mem_mask))
@@ -1510,28 +1556,28 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_K053260,        vgmplay_device::A_K053260+0x2f)   AM_DEVWRITE    ("k053260",       k053260_device, write)
 	AM_RANGE(vgmplay_device::A_C6280,          vgmplay_device::A_C6280+0xf)      AM_DEVWRITE    ("c6280",         c6280_device, c6280_w)
 	AM_RANGE(vgmplay_device::A_OKIM6295A,      vgmplay_device::A_OKIM6295A)      AM_DEVWRITE    ("okim6295a",     okim6295_device, write)
-	AM_RANGE(vgmplay_device::A_OKIM6295A+0x8,  vgmplay_device::A_OKIM6295A+0xb)  AM_WRITE(okim6295_clock_a_w)
-	AM_RANGE(vgmplay_device::A_OKIM6295A+0xc,  vgmplay_device::A_OKIM6295A+0xc)  AM_WRITE(okim6295_pin7_a_w)
-	AM_RANGE(vgmplay_device::A_OKIM6295A+0xe,  vgmplay_device::A_OKIM6295A+0xe)  AM_WRITE(okim6295_nmk112_enable_a_w)
-	AM_RANGE(vgmplay_device::A_OKIM6295A+0xf,  vgmplay_device::A_OKIM6295A+0xf)  AM_WRITE(okim6295_bank_a_w)
-	AM_RANGE(vgmplay_device::A_OKIM6295A+0x10, vgmplay_device::A_OKIM6295A+0x13) AM_WRITE(okim6295_nmk112_bank_a_w)
+	AM_RANGE(vgmplay_device::A_OKIM6295A+0x8,  vgmplay_device::A_OKIM6295A+0xb)  AM_DEVWRITE    ("vgmplay",       vgmplay_device, okim6295_clock_a_w)
+	AM_RANGE(vgmplay_device::A_OKIM6295A+0xc,  vgmplay_device::A_OKIM6295A+0xc)  AM_DEVWRITE    ("vgmplay",       vgmplay_device, okim6295_pin7_a_w)
+	AM_RANGE(vgmplay_device::A_OKIM6295A+0xe,  vgmplay_device::A_OKIM6295A+0xe)  AM_DEVWRITE    ("vgmplay",       vgmplay_device, okim6295_nmk112_enable_a_w)
+	AM_RANGE(vgmplay_device::A_OKIM6295A+0xf,  vgmplay_device::A_OKIM6295A+0xf)  AM_DEVWRITE    ("vgmplay",       vgmplay_device, okim6295_bank_a_w)
+	AM_RANGE(vgmplay_device::A_OKIM6295A+0x10, vgmplay_device::A_OKIM6295A+0x13) AM_DEVWRITE    ("vgmplay",       vgmplay_device, okim6295_nmk112_bank_a_w)
 	AM_RANGE(vgmplay_device::A_OKIM6295B,      vgmplay_device::A_OKIM6295B)      AM_DEVWRITE    ("okim6295b",     okim6295_device, write)
-	AM_RANGE(vgmplay_device::A_OKIM6295B+0x8,  vgmplay_device::A_OKIM6295B+0xb)  AM_WRITE(okim6295_clock_b_w)
-	AM_RANGE(vgmplay_device::A_OKIM6295B+0xc,  vgmplay_device::A_OKIM6295B+0xc)  AM_WRITE(okim6295_pin7_b_w)
-	AM_RANGE(vgmplay_device::A_OKIM6295B+0xe,  vgmplay_device::A_OKIM6295B+0xe)  AM_WRITE(okim6295_nmk112_enable_b_w)
-	AM_RANGE(vgmplay_device::A_OKIM6295B+0xf,  vgmplay_device::A_OKIM6295B+0xf)  AM_WRITE(okim6295_bank_b_w)
-	AM_RANGE(vgmplay_device::A_OKIM6295B+0x10, vgmplay_device::A_OKIM6295B+0x13) AM_WRITE(okim6295_nmk112_bank_b_w)
+	AM_RANGE(vgmplay_device::A_OKIM6295B+0x8,  vgmplay_device::A_OKIM6295B+0xb)  AM_DEVWRITE    ("vgmplay",       vgmplay_device, okim6295_clock_b_w)
+	AM_RANGE(vgmplay_device::A_OKIM6295B+0xc,  vgmplay_device::A_OKIM6295B+0xc)  AM_DEVWRITE    ("vgmplay",       vgmplay_device, okim6295_pin7_b_w)
+	AM_RANGE(vgmplay_device::A_OKIM6295B+0xe,  vgmplay_device::A_OKIM6295B+0xe)  AM_DEVWRITE    ("vgmplay",       vgmplay_device, okim6295_nmk112_enable_b_w)
+	AM_RANGE(vgmplay_device::A_OKIM6295B+0xf,  vgmplay_device::A_OKIM6295B+0xf)  AM_DEVWRITE    ("vgmplay",       vgmplay_device, okim6295_bank_b_w)
+	AM_RANGE(vgmplay_device::A_OKIM6295B+0x10, vgmplay_device::A_OKIM6295B+0x13) AM_DEVWRITE    ("vgmplay",       vgmplay_device, okim6295_nmk112_bank_b_w)
 	AM_RANGE(vgmplay_device::A_SEGAPCM,        vgmplay_device::A_SEGAPCM+0x7ff)  AM_DEVWRITE    ("segapcm",       segapcm_device, sega_pcm_w)
 	AM_RANGE(vgmplay_device::A_GAMEBOY,        vgmplay_device::A_GAMEBOY+0x16)   AM_DEVWRITE    ("dmg",           gameboy_sound_device, sound_w)
 	AM_RANGE(vgmplay_device::A_GAMEBOY+0x20,   vgmplay_device::A_GAMEBOY+0x2f)   AM_DEVWRITE    ("dmg",           gameboy_sound_device, wave_w)
 	AM_RANGE(vgmplay_device::A_NESAPU,         vgmplay_device::A_NESAPU+0x1f)    AM_DEVWRITE    ("nescpu:nesapu", nesapu_device, write)
 	AM_RANGE(vgmplay_device::A_NESRAM,         vgmplay_device::A_NESRAM+0xffff)  AM_RAM AM_SHARE("nesapu_ram")
 	AM_RANGE(vgmplay_device::A_MULTIPCMA,      vgmplay_device::A_MULTIPCMA+3)    AM_DEVWRITE    ("multipcma",     multipcm_device, write )
-	AM_RANGE(vgmplay_device::A_MULTIPCMA+4,    vgmplay_device::A_MULTIPCMA+7)    AM_WRITE(multipcm_bank_hi_a_w)
-	AM_RANGE(vgmplay_device::A_MULTIPCMA+8,    vgmplay_device::A_MULTIPCMA+11)   AM_WRITE(multipcm_bank_lo_a_w)
+	AM_RANGE(vgmplay_device::A_MULTIPCMA+4,    vgmplay_device::A_MULTIPCMA+7)    AM_DEVWRITE    ("vgmplay",       vgmplay_device, multipcm_bank_hi_a_w)
+	AM_RANGE(vgmplay_device::A_MULTIPCMA+8,    vgmplay_device::A_MULTIPCMA+11)   AM_DEVWRITE    ("vgmplay",       vgmplay_device, multipcm_bank_lo_a_w)
 	AM_RANGE(vgmplay_device::A_MULTIPCMB,      vgmplay_device::A_MULTIPCMB+3)    AM_DEVWRITE    ("multipcmb",     multipcm_device, write )
-	AM_RANGE(vgmplay_device::A_MULTIPCMB+4,    vgmplay_device::A_MULTIPCMB+7)    AM_WRITE(multipcm_bank_hi_b_w)
-	AM_RANGE(vgmplay_device::A_MULTIPCMB+8,    vgmplay_device::A_MULTIPCMB+11)   AM_WRITE(multipcm_bank_lo_b_w)
+	AM_RANGE(vgmplay_device::A_MULTIPCMB+4,    vgmplay_device::A_MULTIPCMB+7)    AM_DEVWRITE    ("vgmplay",       vgmplay_device, multipcm_bank_hi_b_w)
+	AM_RANGE(vgmplay_device::A_MULTIPCMB+8,    vgmplay_device::A_MULTIPCMB+11)   AM_DEVWRITE    ("vgmplay",       vgmplay_device, multipcm_bank_lo_b_w)
 	AM_RANGE(vgmplay_device::A_POKEYA,         vgmplay_device::A_POKEYA+0xf)     AM_DEVWRITE    ("pokeya",        pokey_device, write)
 	AM_RANGE(vgmplay_device::A_POKEYB,         vgmplay_device::A_POKEYB+0xf)     AM_DEVWRITE    ("pokeyb",        pokey_device, write)
 	AM_RANGE(vgmplay_device::A_YMF271,         vgmplay_device::A_YMF271+0xf)     AM_DEVWRITE    ("ymf271",        ymf271_device, write)
