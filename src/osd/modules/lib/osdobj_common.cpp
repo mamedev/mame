@@ -199,8 +199,6 @@ osd_common_t::osd_common_t(osd_options &options)
 
 osd_common_t::~osd_common_t()
 {
-	for(unsigned int i= 0; i < m_video_names.size(); ++i)
-		free(const_cast<char*>(m_video_names[i]));
 	//m_video_options,reset();
 	osd_output::pop(this);
 }
