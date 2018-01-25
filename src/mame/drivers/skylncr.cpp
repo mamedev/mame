@@ -2,7 +2,7 @@
 // copyright-holders:Roberto Fresca, David Haywood
 /***************************************************************************************************
 
-  Sky Lancer / Butterfly / Mad Zoo / Super Star 97
+  Sky Lancer / Butterfly / Mad Zoo / Super Star 97 and others...
   Bordun International.
 
   Original preliminary driver by Luca Elia.
