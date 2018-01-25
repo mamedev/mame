@@ -316,9 +316,25 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, co
 	palette_init();
 }
 
+void segaxbd_state::install_segapcm(const char *region)
+{
+	// lowest segapcm bank bit is unused
+	uint32_t len    =   memregion(region)->bytes();
+	uint8_t *src    =   memregion(region)->base();
+	std::vector<uint8_t> buf(len);
+
+	for (int i = 0; i < len / 2; i += 0x10000)
+	{
+		memcpy(&buf[(i * 0x20000)],           src[i * 0x10000], 0x10000);
+		memcpy(&buf[(i * 0x20000) + 0x10000], src[i * 0x10000], 0x10000);
+	}
+	memcpy(&src[0], &buf[0], len);
+}
 
 void segaxbd_state::device_start()
 {
+	install_segapcm("pcm");
+
 	if(!m_segaic16road->started())
 		throw device_missing_dependencies();
 
@@ -1757,7 +1773,6 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
 	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/4)
-	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1937,10 +1952,15 @@ MACHINE_CONFIG_START(segaxbd_smgp_fd1094_state::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
 	MCFG_SEGAPCM_ADD("pcm2", SOUND_CLOCK/4)
-	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
 MACHINE_CONFIG_END
+
+void segaxbd_smgp_fd1094_state::device_start()
+{
+	segaxbd_state::device_start();
+	install_segapcm("pcm2");
+}
 
 MACHINE_CONFIG_START(segaxbd_new_state::sega_smgp_fd1094)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_SMGP_FD1094, 0)
@@ -1978,10 +1998,15 @@ MACHINE_CONFIG_START(segaxbd_smgp_state::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
 	MCFG_SEGAPCM_ADD("pcm2", SOUND_CLOCK/4)
-	MCFG_SEGAPCM_BANK(BANK_512)
 	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
 MACHINE_CONFIG_END
+
+void segaxbd_smgp_state::device_start()
+{
+	segaxbd_state::device_start();
+	install_segapcm("pcm2");
+}
 
 MACHINE_CONFIG_START(segaxbd_new_state::sega_smgp)
 	MCFG_DEVICE_ADD("mainpcb", SEGA_XBD_SMGP, 0)

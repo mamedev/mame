@@ -200,6 +200,8 @@ private:
 	uint32_t m_multipcma_bank_r;
 	uint32_t m_multipcmb_bank_l;
 	uint32_t m_multipcmb_bank_r;
+	uint32_t m_segapcm_bankmask;
+	uint32_t m_segapcm_bankshift;
 
 	uint32_t r32(int offset) const;
 	uint8_t r8(int offset) const;
@@ -925,6 +927,10 @@ uint8_t vgmplay_device::rom_r(int chip, uint8_t type, offs_t offset)
 
 READ8_MEMBER(vgmplay_device::segapcm_rom_r)
 {
+	if (m_segapcm_bankshift)
+	{
+		offset = (((offset >> 13) & m_segapcm_bankmask) << m_segapcm_bankshift) + (offset & 0xffff);
+	}
 	return rom_r(0, 0x80, offset);
 }
 
@@ -1093,9 +1099,15 @@ void vgmplay_state::machine_start()
 			m_ym2612->set_unscaled_clock(r32(0x2c));
 		if(version >= 0x110 && r32(0x30))
 			m_ym2151->set_unscaled_clock(r32(0x30));
-
+			
 		if(version >= 0x151 && r32(0x38))
 			m_segapcm->set_unscaled_clock(r32(0x38));
+
+		if(version >= 0x151 && r32(0x3c)) {
+			uint32_t bank = r32(0x3c);
+			m_segapcm_bankshift = bank & 0xff;
+			m_segapcm_bankmask = bank >> 16;
+		}
 
 		if (data_start > 0x40)
 		{
@@ -1401,7 +1413,6 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.5)
 
 	MCFG_SOUND_ADD("segapcm", SEGAPCM, 4000000)
-	MCFG_SEGAPCM_BANK(BANK_512) // Should be configurable for yboard...
 	MCFG_DEVICE_ADDRESS_MAP(0, segapcm_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
