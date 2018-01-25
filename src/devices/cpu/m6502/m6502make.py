@@ -102,6 +102,7 @@ case %(substate)s:;
 
 PARTIAL_MEMORY="""\
 \tif(icount == 0) { inst_substate = %(substate)s; return; }
+\tFALLTHROUGH
 case %(substate)s:
 %(ins)s
 \ticount--;
