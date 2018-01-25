@@ -6,6 +6,16 @@ Universal Commandline Options
 
 This section contains configuration options that are applicable to *all* MAME sub-builds (both SDL and Windows native).
 
+
+Patterns
+--------
+
+Many commands support the use of *patterns*, which are either a system or device short name (e.g. **a2600**, **zorba_kbd**) or a glob pattern that matches either (e.g. **zorba_\***)
+
+Depending on the command you're using the pattern with, pattern matching may match systems or systems and devices.
+
+
+
 Core Commands
 -------------
 
@@ -17,11 +27,14 @@ Core Commands
 
 .. _mame-commandline-validate:
 
-**-validate** / **-valid**
+**-validate** / **-valid** [*<pattern>*]
 
-	Performs internal validation on every driver in the system. Run this
-	before submitting changes to ensure that you haven't violated any of
-	the core system rules.
+	Performs internal validation on one or more drivers and devices in the
+	system. Run this before submitting changes to ensure that you haven't
+	violated any of the core system rules.
+
+	If a pattern is specified, it will validate systems matching
+	the pattern, otherwise it will validate all systems.
 
 
 
@@ -75,63 +88,63 @@ Example:
 
 .. _mame-commandline-listxml:
 
-**-listxml** / **-lx** [*<gamename|wildcard>*]
+**-listxml** / **-lx** [*<pattern>*]
 
-	List comprehensive details for all of the supported games. The output is quite long, so it is usually better to redirect this into a file. The output is in XML format. By default all games are listed; however, you can limit this list by specifying a driver name or wildcard after the -listxml command.
+	List comprehensive details for all of the supported systems and drivers. The output is quite long, so it is usually better to redirect this into a file. The output is in XML format. By default all systems are listed; however, you can limit this list by specifying a *pattern* after the -listxml command.
 
 .. _mame-commandline-listfull:
 
-**-listfull** / **-ll** [*<gamename|wildcard>*]
+**-listfull** / **-ll** [*<pattern>*]
 
-	Displays a list of game driver names and descriptions. By default all games are listed; however, you can limit this list by specifying a driver name or wildcard after the **-listfull** command.
+	Displays a list of system driver names and descriptions. By default all systems are listed; however, you can limit this list by specifying a *pattern* after the **-listfull** command.
 
 .. _mame-commandline-listsource:
 
-**-listsource** / **-ls** [<*gamename|wildcard>*]
+**-listsource** / **-ls** [<*pattern>*]
 
-	Displays a list of drivers and the names of the source files their game drivers live in. Useful for finding which driver a game runs on in order to fix bugs. By default all games are listed; however, you	can limit this list by specifying a driver name or wildcard after the **-listsource** command.
+	Displays a list of drivers and the names of the source files their game drivers live in. Useful for finding which driver a game runs on in order to fix bugs. By default all systems are listed; however, you can limit this list by specifying a *pattern* after the **-listsource** command.
 
 .. _mame-commandline-listclones:
 
-**-listclones** / **-lc** [<*gamename|wildcard*>]
+**-listclones** / **-lc** [<*pattern*>]
 
 	Displays a list of clones. By default all clones are listed; however, you can limit this list by specifying a driver name or wildcard after the **-listsource** command.
 
 .. _mame-commandline-listbrothers:
 
-**-listbrothers** / **-lb** [<*gamename|wildcard*>]
+**-listbrothers** / **-lb** [<*pattern*>]
 
-	Displays a list of '*brothers*', or rather, other sets which are located in the same sourcefile as the gamename searched for.
+	Displays a list of '*brothers*', or rather, other sets which are located in the same sourcefile as the system name searched for.
 
 .. _mame-commandline-listcrc:
 
-**-listcrc** [<*gamename|wildcard*>]
+**-listcrc** [<*pattern*>]
 
-	Displays a full list of CRCs of all ROM images referenced by all drivers within MAME.
+	Displays a full list of CRCs of all ROM images referenced by the specified pattern of system or device names. If no pattern is specified, the results will be *all* systems and devices.
 
 .. _mame-commandline-listroms:
 
-**-listroms** [<*gamename|wildcard*>]
+**-listroms** [<*pattern*>]
 
-	Displays a list of ROM images referenced by the specified game.
+	Displays a list of ROM images referenced by the specified pattern of system or device names. If no pattern is specified, the results will be *all* systems and devices.
 
 .. _mame-commandline-listsamples:
 
-**-listsamples** [<*gamename|wildcard*>]
+**-listsamples** [<*pattern*>]
 
-	Displays a list of samples referenced by the specified game.
+	Displays a list of samples referenced by the specified pattern of system or device names. If no pattern is specified, the results will be *all* systems and devices.
 
 .. _mame-commandline-verifyroms:
 
-**-verifyroms** [<*gamename|wildcard*>]
+**-verifyroms** [<*pattern*>]
 
-	Checks for invalid or missing ROM images. By default all drivers that have valid ZIP files or directories in the rompath are verified; however, you can limit this list by specifying a driver name or wildcard after the **-verifyroms** command.
+	Checks for invalid or missing ROM images. By default all drivers that have valid ZIP files or directories in the rompath are verified; however, you can limit this list by specifying a *pattern* after the **-verifyroms** command.
 
 .. _mame-commandline-verifysamples:
 
-**-verifysamples** [<*gamename|wildcard*>]
+**-verifysamples** [<*pattern*>]
 
-	Checks for invalid or missing samples. By default all drivers that have valid ZIP files or directories in the samplepath are verified;	however, you can limit this list by specifying a driver name or wildcard after the **-verifyroms** command.
+	Checks for invalid or missing samples. By default all drivers that have valid ZIP files or directories in the samplepath are verified; however, you can limit this list by specifying a *pattern* after the **-verifyroms** command.
 
 .. _mame-commandline-romident:
 
@@ -146,39 +159,41 @@ Example:
 
 .. _mame-commandline-listdevices:
 
-**-listdevices** / **-ld** [<*gamename|wildcard*>]
+**-listdevices** / **-ld** [<*pattern*>]
 
-        Displays a list of all devices known to be hooked up to a game.  The ":" is considered the game itself with the devices list being attached to give the user a better understanding of what the emulation is using.
+        Displays a list of all devices known to be hooked up to a system. The ":" is considered the game itself with the devices list being attached to give the user a better understanding of what the emulation is using. If slots are populated with devices, any additional slots those devices provide will be visible with **-listdevices** as well. For instance, installing a floppy controller into a PC will expose the disk drive slots.
 
 .. _mame-commandline-listslots:
 
-**-listslots** [<*gamename|wildcard*>]
+**-listslots** [<*pattern*>]
 
-        Show available slots and options for each slot (if available).  Primarily used for MAME to allow control over internal plug-in cards, much like PCs needing video, sound and other expansion cards.
+        Show available slots and options for each slot (if available). Primarily used for MAME to allow control over internal plug-in cards, much like PCs needing video, sound and other expansion cards.
+		
+		If slots are populated with devices, any additional slots those devices provide will be visible with **-listslots** as well. For instance, installing a floppy controller into a PC will expose the disk drive slots.
 		
         The slot name (e.g. **ctrl1**) can be used from the command line (**-ctrl1** in this case) 
 
 .. _mame-commandline-listmedia:
 
-**-listmedia** / **-lm** [<*gamename|wildcard*>]
+**-listmedia** / **-lm** [<*pattern*>]
 
-        List available media that the chosen game or system allows to be used.  This includes media types (cartridge, cassette, diskette and more) as well as common file extentions which are supported.
+        List available media that the chosen system allows to be used. This includes media types (cartridge, cassette, diskette and more) as well as common file extensions which are supported.
 
 .. _mame-commandline-listsoftware:
 
-**-listsoftware** [<*gamename|wildcard*>]
+**-listsoftware** [<*pattern*>]
 
-        Posts to screen all software lists which can be used by the entered gamename or system.  Note that this is simply a copy/paste of the .XML file which reside in the HASH folder which are allowed to be used.
+        Posts to screen all software lists which can be used by the entered *pattern* or system. Note that this is simply a copy/paste of the .XML file which reside in the HASH folder which are allowed to be used.
 
 .. _mame-commandline-verifysoftware:
 
-**-verifysoftware** [<*gamename|wildcard*>]
+**-verifysoftware** [<*pattern*>]
 
-	Checks for invalid or missing ROM images in your software lists. By default all drivers that have valid ZIP files or directories in the rompath are verified; however, you can limit this list by specifying a specific driver name or wildcard after the -verifysoftware command.
+	Checks for invalid or missing ROM images in your software lists. By default all drivers that have valid ZIP files or directories in the rompath are verified; however, you can limit this list by specifying a specific driver name or *pattern* after the -verifysoftware command.
 
 .. _mame-commandline-getsoftlist:
 
-**-getsoftlist** [<*gamename|wildcard*>]
+**-getsoftlist** [<*pattern*>]
 
         Posts to screen a specific software list which matches with the gamename provided.
 
@@ -198,19 +213,19 @@ OSD-related Options
 
 **-uimodekey** [*keystring*]
 
-	Key used to toggle emulated keyboard on and off.  Default setting is *SCRLOCK*.
+	Key used to toggle emulated keyboard on and off. Default setting is *SCRLOCK*.
 
 .. _mame-commandline-uifontprovider:
 
 **\-uifontprovider**
 
-	Chooses provider for UI font:  win, none or auto.  Default setting is *AUTO*.
+	Chooses provider for UI font:  win, none or auto. Default setting is *AUTO*.
 
 .. _mame-commandline-menu:
 
 **\-menu**
 
-	Enables menu bar at the top of the MAME window, if available by UI implementation.  Default is *OFF*
+	Enables menu bar at the top of the MAME window, if available by UI implementation. Default is *OFF*
 
 .. _mame-commandline-keyboardprovider:
 
@@ -305,20 +320,20 @@ Configuration Options
 		- <mymame>.ini   (i.e. if MAME was renamed mame060.exe, MAME parses mame060.ini here)
 		- debug.ini      (if the debugger is enabled)
 		- <driver>.ini   (based on the source filename of the driver)
-		- vertical.ini   (for games with vertical monitor orientation)
-		- horizont.ini   (for games with horizontal monitor orientation)
-		- arcade.ini     (for games in source added with GAME() macro)
-		- console.ini    (for games in source added with CONS() macro)
-		- computer.ini   (for games in source added with COMP() macro)
-		- othersys.ini   (for games in source added with SYST() macro)
-		- vector.ini     (for vector games only)
+		- vertical.ini   (for systems with vertical monitor orientation)
+		- horizont.ini   (for systems with horizontal monitor orientation)
+		- arcade.ini     (for systems in source added with GAME() macro)
+		- console.ini    (for systems in source added with CONS() macro)
+		- computer.ini   (for systems in source added with COMP() macro)
+		- othersys.ini   (for systems in source added with SYST() macro)
+		- vector.ini     (for vector systems only)
 		- <parent>.ini   (for clones only, may be called recursively)
 		- <gamename>.ini
 
         (See :ref:`advanced-multi-CFG` for further details)
 
 	The settings in the later INIs override those in the earlier INIs.
-	So, for example, if you wanted to disable overlay effects in the vector games, you can create a vector.ini with the "effect none" line in it, and it will override whatever effect value you have in your mame.ini. The default is ON (*-readconfig*).
+	So, for example, if you wanted to disable overlay effects in the vector systems, you can create a vector.ini with the "effect none" line in it, and it will override whatever effect value you have in your mame.ini. The default is ON (*-readconfig*).
 
 
 
@@ -377,7 +392,7 @@ Core Search Path Options
 
 **-crosshairpath** *<path>*
 
-	Specifies a list of paths within which to find crosshair files. Multiple paths can be specified by separating them with semicolons. The default is 'crsshair' (that is, a directory "crsshair" in the same directory as the MAME executable).  If the Crosshair is set to default in the menu, MAME will look for gamename\\cross#.png and then cross#.png in the specified crsshairpath, where # is the player number.  Failing that, MAME will use built-in default crosshairs.
+	Specifies a list of paths within which to find crosshair files. Multiple paths can be specified by separating them with semicolons. The default is 'crsshair' (that is, a directory "crsshair" in the same directory as the MAME executable). If the Crosshair is set to default in the menu, MAME will look for gamename\\cross#.png and then cross#.png in the specified crsshairpath, where # is the player number. Failing that, MAME will use built-in default crosshairs.
 
 .. _mame-commandline-pluginspath:
 
@@ -406,7 +421,7 @@ Core Output Directory Options
 
 **-nvram_directory** *<path>*
 
-	Specifies a single directory where NVRAM files are stored. NVRAM files store the contents of EEPROM and non-volatile RAM (NVRAM) for games which used this type of hardware. This data is read at startup and written when MAME exits. The default is 'nvram' (that is, a directory "nvram" in the same directory as the MAME executable). If this directory does not exist, it will be automatically created.
+	Specifies a single directory where NVRAM files are stored. NVRAM files store the contents of EEPROM and non-volatile RAM (NVRAM) for systems which used this type of hardware. This data is read at startup and written when MAME exits. The default is 'nvram' (that is, a directory "nvram" in the same directory as the MAME executable). If this directory does not exist, it will be automatically created.
 
 .. _mame-commandline-inputdirectory:
 
@@ -467,13 +482,13 @@ Core State/Playback Options
 
 **-[no]autosave**
 
-	When enabled, automatically creates a save state file when exiting MAME and automatically attempts to reload it when later starting MAME with the same game. This only works for games that have explicitly enabled save state support in their driver. The default is OFF (-noautosave).
+	When enabled, automatically creates a save state file when exiting MAME and automatically attempts to reload it when later starting MAME with the same game. This only works for systems that have explicitly enabled save state support in their driver. The default is OFF (-noautosave).
 
 .. _mame-commandline-playback:
 
 **-playback** / **-pb** *<filename>*
 
-	Specifies a file from which to play back a series of game inputs. Thisfeature does not work reliably for all games, but can be used to watch a previously recorded game session from start to finish. In order to make things consistent, you should only record and playback with all configuration (.cfg), NVRAM (.nv), and memory card files deleted. The default is NULL (no playback).
+	Specifies a file from which to play back a series of game inputs. This feature does not work reliably for all systems, but can be used to watch a previously recorded game session from start to finish. In order to make things consistent, you should only record and playback with all configuration (.cfg), NVRAM (.nv), and memory card files deleted. The default is NULL (no playback).
 
 .. _mame-commandline-exitafterplayback:
 
@@ -485,7 +500,7 @@ Core State/Playback Options
 
 **-record** / **-rec** *<filename>*
 
-	Specifies a file to record all input from a game session. This can be used to record a game session for later playback. This feature does not work reliably for all games, but can be used to watch a previously recorded game session from start to finish. In order to make things consistent, you should only record and playback with all configuration (.cfg), NVRAM (.nv), and memory card files deleted. The default is NULL (no recording).
+	Specifies a file to record all input from a game session. This can be used to record a game session for later playback. This feature does not work reliably for all systems, but can be used to watch a previously recorded game session from start to finish. In order to make things consistent, you should only record and playback with all configuration (.cfg), NVRAM (.nv), and memory card files deleted. The default is NULL (no recording).
 
 .. _mame-commandline-recordtimecode:
 
@@ -519,9 +534,9 @@ Core State/Playback Options
 	
 	Three simple substitutions are provided: the / character represents the path separator on any target platform (even Windows); the string %g represents the driver name of the current game; and the string %i represents an incrementing index. If %i is omitted, then each snapshot taken will overwrite the previous one; otherwise, MAME will find the next empty value for %i and use that for a filename.
 	
-	The default is %g/%i, which creates a separate folder for each game, and names the snapshots under it starting with 0000 and increasing from there.  
+	The default is %g/%i, which creates a separate folder for each game, and names the snapshots under it starting with 0000 and increasing from there.
 	
-	In addition to the above, for drivers using different media, like carts or floppy disks, you can also use the %d_[media] indicator.  Replace [media] with the media switch you want to use. 
+	In addition to the above, for drivers using different media, like carts or floppy disks, you can also use the %d_[media] indicator. Replace [media] with the media switch you want to use. 
 	
 	A few examples: if you use 'mame robby -snapname foo/%g%i' snapshots will be saved as 'snaps\\foo\\robby0000.png' , 'snaps\\foo\\robby0001.png' and so on; if you use 'mame nes -cart robby -snapname %g/%d_cart' snapshots will be saved as 'snaps\\nes\\robby.png' ; if you use 'mame c64 -flop1 robby -snapname %g/%d_flop1/%i' snapshots will be saved as 'snaps\\c64\\robby\\0000.png'.
 
@@ -543,7 +558,7 @@ Core State/Playback Options
 
 **-[no]snapbilinear**
 
-	Specify if the snapshot or movie should have bilinear filtering	applied.  Shutting this off can make a difference in some performance while recording video to a file.  The default is ON (*-snapbilinear*).
+	Specify if the snapshot or movie should have bilinear filtering	applied. Shutting this off can make a difference in some performance while recording video to a file. The default is ON (*-snapbilinear*).
 
 .. _mame-commandline-statename:
 
@@ -553,9 +568,9 @@ Core State/Playback Options
 	
 	Two simple substitutions are provided: the / character represents the path separator on any target platform (even Windows); the string %g represents the driver name of the current game.
 	
-	The default is %g, which creates a separate folder for each game.  
+	The default is %g, which creates a separate folder for each game.
 	
-	In addition to the above, for drivers using different media, like carts or floppy disks, you can also use the %d_[media] indicator.  Replace [media] with the media switch you want to use. 
+	In addition to the above, for drivers using different media, like carts or floppy disks, you can also use the %d_[media] indicator. Replace [media] with the media switch you want to use. 
 	
 	A few examples: if you use 'mame robby -statename foo/%g' save states will be stored inside 'sta\\foo\\robby\\' ; if you use 'mame nes -cart robby -statename %g/%d_cart' save states will be stored inside 'sta\\nes\\robby\\' ; if you use 'mame c64 -flop1 robby -statename %g/%d_flop1' save states will be stored inside 'sta\\c64\\robby\\'.
 
@@ -563,7 +578,7 @@ Core State/Playback Options
 
 **-[no]burnin**
 
-	Tracks brightness of the screen during play and at the end of emulation generates a PNG that can be used to simulate burn-in effects on other games. The resulting PNG is created such that the least used-areas of the screen are fully white (since burned-in areas are darker, all other areas of the screen must be lightened a touch). 
+	Tracks brightness of the screen during play and at the end of emulation generates a PNG that can be used to simulate burn-in effects on other systems. The resulting PNG is created such that the least used-areas of the screen are fully white (since burned-in areas are darker, all other areas of the screen must be lightened a touch).
 
 	The intention is that this PNG can be loaded via an artwork file with a low alpha (e.g, 0.1-0.2 seems to work well) and blended over the entire screen. The PNG files are saved in the snap directory under the gamename/burnin-<screen.name>.png. The default is OFF (*-noburnin*).
 
@@ -594,7 +609,7 @@ Core Performance Options
 
 **-[no]throttle**
 
-	Configures the default thottling setting. When throttling is on, MAME attempts to keep the game running at the game's intended speed. When throttling is off, MAME runs the game as fast as it can. Note that the fastest speed is more often than not limited by your graphics card, especially for older games. The default is ON (*-throttle*).
+	Configures the default thottling setting. When throttling is on, MAME attempts to keep the game running at the game's intended speed. When throttling is off, MAME runs the game as fast as it can. Note that the fastest speed is more often than not limited by your graphics card, especially for older systems. The default is ON (*-throttle*).
 
 .. _mame-commandline-nosleep:
 
@@ -637,7 +652,7 @@ Core Rotation Options
 
 | **-[no]rotate**
 |
-|	Rotate the game to match its normal state (horizontal/vertical). This ensures that both vertically and horizontally oriented games show up correctly without the need to rotate your monitor. If you want to keep the game displaying 'raw' on the screen the way it would have in the arcade, turn this option OFF. The default is ON (*-rotate*).
+|	Rotate the game to match its normal state (horizontal/vertical). This ensures that both vertically and horizontally oriented systems show up correctly without the need to rotate your monitor. If you want to keep the game displaying 'raw' on the screen the way it would have in the arcade, turn this option OFF. The default is ON (*-rotate*).
 |
 |
 
@@ -713,7 +728,7 @@ Core Video Options
 
 **-numscreens** *<count>*
 
-	Tells MAME how many output windows to create. For most games, a single output window is all you need, but some games originally used multiple screens (*e.g. Darius, PlayChoice-10*). Each screen (up to 4) has its own independent settings for physical monitor, aspect ratio, resolution, and view, which can be set using the options below. The default is *1*.
+	Tells MAME how many output windows to create. For most systems, a single output window is all you need, but some systems originally used multiple screens (*e.g. Darius and PlayChoice-10 arcade machines*). Each screen (up to 4) has its own independent settings for physical monitor, aspect ratio, resolution, and view, which can be set using the options below. The default is *1*.
 
 .. _mame-commandline-window:
 
@@ -731,15 +746,15 @@ Core Video Options
 
 **-[no]keepaspect** / **-[no]ka**
 
-	Enables aspect ratio enforcement. When this option is on, the game's proper aspect ratio (generally 4:3 or 3:4) is enforced, so you get the game looking like it should. When running in a window with this option on, you can only resize the window to the proper aspect ratio, unless you are holding down the CONTROL key. By turning the option off, the aspect ratio is allowed to float. In full screen mode, this means that all games will stretch to the full screen size (even vertical games). In window mode, it means that you can freely resize the window without any constraints. The default is ON (*-keepaspect*).
+	Enables aspect ratio enforcement. When this option is on, the game's proper aspect ratio (generally 4:3 or 3:4) is enforced, so you get the game looking like it should. When running in a window with this option on, you can only resize the window to the proper aspect ratio, unless you are holding down the CONTROL key. By turning the option off, the aspect ratio is allowed to float. In full screen mode, this means that all systems will stretch to the full screen size (even vertical systems). In window mode, it means that you can freely resize the window without any constraints. The default is ON (*-keepaspect*).
 
-	The MAME team heavily suggests you leave this at default. Stretching games beyond their original aspect ratio will mangle the appearance of the game in ways that no filtering or HLSL can repair.
+	The MAME team heavily suggests you leave this at default. Stretching systems beyond their original aspect ratio will mangle the appearance of the game in ways that no filtering or HLSL can repair.
 
 .. _mame-commandline-waitvsync:
 
 **-[no]waitvsync**
 
-	Waits for the refresh period on your computer's monitor to finish before starting to draw video to your screen. If this option is off, MAME will just draw to the screen at any old time, even in the middle of a refresh cycle. This can cause "tearing" artifacts, where the top portion of the screen is out of sync with the bottom portion. Tearing is not noticeable on all games, and some people hate it more than others. However, if you turn this option on, you will waste more of your CPU cycles waiting for the proper time to draw, so you will see a performance hit. You should only need to turn this on in windowed mode. In full screen mode, it is only needed if **-triplebuffer** does not remove the tearing, in which case you should use **-notriplebuffer -waitvsync**. Note that this option does not work with **-video gdi** mode. The default is OFF (*-nowaitvsync*).
+	Waits for the refresh period on your computer's monitor to finish before starting to draw video to your screen. If this option is off, MAME will just draw to the screen at any old time, even in the middle of a refresh cycle. This can cause "tearing" artifacts, where the top portion of the screen is out of sync with the bottom portion. Tearing is not noticeable on all systems, and some people hate it more than others. However, if you turn this option on, you will waste more of your CPU cycles waiting for the proper time to draw, so you will see a performance hit. You should only need to turn this on in windowed mode. In full screen mode, it is only needed if **-triplebuffer** does not remove the tearing, in which case you should use **-notriplebuffer -waitvsync**. Note that this option does not work with **-video gdi** mode. The default is OFF (*-nowaitvsync*).
 
 	Note that SDL-based MAME support for this option depends entirely on your operating system and video drivers; in general it will not work in windowed mode so **-video opengl** and fullscreen give the greatest chance of success.
 
@@ -769,7 +784,7 @@ Core Video Options
 
 **-[no]unevenstretch**
 
-	Allow non-integer stretch factors allowing for great window sizing flexability.  The default is ON. (*-unevenstretch*)
+	Allow non-integer stretch factors allowing for great window sizing flexability. The default is ON. (*-unevenstretch*)
 
 
 Core Full Screen Options
@@ -779,7 +794,7 @@ Core Full Screen Options
 
 **-[no]switchres**
 
-	Enables resolution switching. This option is required for the **-resolution\*** options to switch resolutions in full screen mode. On modern video cards, there is little reason to switch resolutions unless you are trying to achieve the "exact" pixel resolutions of the original games, which requires significant tweaking. This option is also useful on LCD displays, since they run with a fixed resolution and switching resolutions on them is just silly. This option does not work with **-video gdi**. The default is OFF (*-noswitchres*).
+	Enables resolution switching. This option is required for the **-resolution\*** options to switch resolutions in full screen mode. On modern video cards, there is little reason to switch resolutions unless you are trying to achieve the "exact" pixel resolutions of the original systems, which requires significant tweaking. This option is also useful on LCD displays, since they run with a fixed resolution and switching resolutions on them is just silly. This option does not work with **-video gdi**. The default is OFF (*-noswitchres*).
 
 
 Core Per-Window Options
@@ -855,7 +870,7 @@ Core Artwork Options
 
 **-[no]artwork_crop** / **-[no]artcrop**
 
-	Enable cropping of artwork to the game screen area only. This works best with -video gdi or -video d3d, and means that vertically oriented games running full screen can display their artwork to the left and right sides of the screen. This option can also be controlled via the Video Options menu in the user interface. The default is OFF (*-noartwork_crop*).
+	Enable cropping of artwork to the game screen area only. This works best with -video gdi or -video d3d, and means that vertically oriented systems running full screen can display their artwork to the left and right sides of the screen. This option can also be controlled via the Video Options menu in the user interface. The default is OFF (*-noartwork_crop*).
 
 .. _mame-commandline-nousebackdrops:
 
@@ -931,7 +946,7 @@ Core Vector Options
 
 **-[no]antialias** / **-[no]aa**
 
-	Enables antialiased line rendering for vector games. The default is ON (*-antialias*).
+	Enables antialiased line rendering for vector systems. The default is ON (*-antialias*).
 
 .. _mame-commandline-beam:
 
@@ -1031,13 +1046,13 @@ Core Input Options
 
 **-[no]steadykey** / **-[no]steady**
 
-	Some games require two or more buttons to be pressed at exactly the same time to make special moves. Due to limitations in the keyboard hardware, it can be difficult or even impossible to accomplish that using the standard keyboard handling. This option selects a different handling that makes it easier to register simultaneous button presses, but has the disadvantage of making controls less responsive. The default is OFF (*-nosteadykey*)
+	Some systems require two or more buttons to be pressed at exactly the same time to make special moves. Due to limitations in the keyboard hardware, it can be difficult or even impossible to accomplish that using the standard keyboard handling. This option selects a different handling that makes it easier to register simultaneous button presses, but has the disadvantage of making controls less responsive. The default is OFF (*-nosteadykey*)
 
 .. _mame-commandline-uiactive:
 
 **-[no]ui_active**
 
-        Enable user interface on top of emulated keyboard (if present).  The default is OFF (*-noui_active*)
+        Enable user interface on top of emulated keyboard (if present). The default is OFF (*-noui_active*)
 
 .. _mame-commandline-nooffscreenreload:
 
@@ -1103,13 +1118,13 @@ Core Input Options
 
 **-joystick_contradictory**
 
-        Enable contradictory direction digital joystick input at the same time such as **Left and Right** or **Up and Down** at the same time.  The default is OFF (*-nojoystick_contradictory*)
+        Enable contradictory direction digital joystick input at the same time such as **Left and Right** or **Up and Down** at the same time. The default is OFF (*-nojoystick_contradictory*)
 
 .. _mame-commandline-coinimpulse:
 
 **-coin_impulse** *[n]*
 
-        Set coin impulse time based on n (n<0 disable impulse, n==0 obey driver, 0<n set time n).  Default is *0*.
+        Set coin impulse time based on n (n<0 disable impulse, n==0 obey driver, 0<n set time n). Default is *0*.
 
 
 
@@ -1195,7 +1210,7 @@ Debugging Options
 
 **-watchdog** *<duration>* / **-wdog** *<duration>*
 
-	Enables an internal watchdog timer that will automatically kill the MAME process if more than *<duration>* seconds passes without a frame update. Keep in mind that some games sit for a while during load time without updating the screen, so *<duration>* should be long enough to cover that. 10-30 seconds on a modern system should be plenty in general. By default there is no watchdog.
+	Enables an internal watchdog timer that will automatically kill the MAME process if more than *<duration>* seconds passes without a frame update. Keep in mind that some systems sit for a while during load time without updating the screen, so *<duration>* should be long enough to cover that. 10-30 seconds on a modern system should be plenty in general. By default there is no watchdog.
 
 
 Core Communication Options
@@ -1205,25 +1220,25 @@ Core Communication Options
 
 **-comm_localhost** *<string>*
 
-	Local address to bind to.  This can be a traditional xxx.xxx.xxx.xxx address or a string containing a resolvable hostname.  The default is value is "*0.0.0.0*"
+	Local address to bind to. This can be a traditional xxx.xxx.xxx.xxx address or a string containing a resolvable hostname. The default is value is "*0.0.0.0*"
 
 .. _mame-commandline-commlocalport:
 
 **-comm_localport** *<string>*
 
-	Local port to bind to.  This can be any traditional communications port as an unsigned 16-bit integer (0-65535).  The default value is "*15122*".
+	Local port to bind to. This can be any traditional communications port as an unsigned 16-bit integer (0-65535). The default value is "*15122*".
 
 .. _mame-commandline-commremotehost:
 
 **-comm_remotehost** *<string>*
 
-	Remote address to connect to.  This can be a traditional xxx.xxx.xxx.xxx address or a string containing a resolvable hostname.  The default is value is "*0.0.0.0*"
+	Remote address to connect to. This can be a traditional xxx.xxx.xxx.xxx address or a string containing a resolvable hostname. The default is value is "*0.0.0.0*"
 
 .. _mame-commandline-commremoteport:
 
 **-comm_remoteport** *<string>*
 
-	Remote port to connect to.  This can be any traditional communications port as an unsigned 16-bit integer (0-65535).  The default value is "*15122*".
+	Remote port to connect to. This can be any traditional communications port as an unsigned 16-bit integer (0-65535). The default value is "*15122*".
 
 
 
@@ -1233,25 +1248,25 @@ Core Misc Options
 .. _mame-commandline-drc:
 
 **-[no]drc**
-	Enable DRC cpu core if available.  The default is ON (*-drc*).
+	Enable DRC cpu core if available. The default is ON (*-drc*).
 
 .. _mame-commandline-drcusec:
 
 **\-drc_use_c**
 
-	Force DRC use the C code backend.  The default is OFF (*-nodrc_use_c*).
+	Force DRC use the C code backend. The default is OFF (*-nodrc_use_c*).
 
 .. _mame-commandline-drcloguml:
 
 **\-drc_log_uml**
 
-	Write DRC UML disassembly log.  The default is OFF (*-nodrc_log_uml*).
+	Write DRC UML disassembly log. The default is OFF (*-nodrc_log_uml*).
 
 .. _mame-commandline-drclognative:
 
 **\-drc_log_native**
 
-	write DRC native disassembly log.  The default is OFF (*-nodrc_log_native*).
+	write DRC native disassembly log. The default is OFF (*-nodrc_log_native*).
 
 .. _mame-commandline-bios:
 
@@ -1287,19 +1302,19 @@ Core Misc Options
 
 **\-confirm_quit**
 
-	Display a Confirm Quit dialong to screen on exit, requiring one extra step to exit MAME.  The default is OFF (*-noconfirm_quit*).
+	Display a Confirm Quit dialong to screen on exit, requiring one extra step to exit MAME. The default is OFF (*-noconfirm_quit*).
 
 .. _mame-commandline-uimouse:
 
 **\-ui_mouse**
 
-	Displays a mouse cursor when using the built-in UI for MAME.  The default is (*-noui_mouse*).
+	Displays a mouse cursor when using the built-in UI for MAME. The default is (*-noui_mouse*).
 
 .. _mame-commandline-autobootcommand:
 
 **-autoboot_command** *"<command>"*
 
-	Command string to execute after machine boot (in quotes " ").  To issue a quote to the emulation, use """ in the string.  Using **\\n** will issue a create a new line, issuing what was typed prior as a command. 
+	Command string to execute after machine boot (in quotes " "). To issue a quote to the emulation, use """ in the string. Using **\\n** will issue a create a new line, issuing what was typed prior as a command. 
 
 	Example:  -autoboot_command "load """$""",8,1\\n"
 
