@@ -30,18 +30,30 @@ public:
   DECLARE_WRITE8_MEMBER(bank_write);
 
   void tvboyii(machine_config &config);
-  
+  void supertvboy(machine_config &config);
+
 private:
   required_device<address_map_bank_device> m_crom;
   required_memory_bank m_bank0;
   
   required_region_ptr<uint8_t> m_rom;
   
+  virtual void machine_start() override;
   virtual void machine_start_tvboyii();
+  virtual void machine_start_supertvboy();
+
   virtual void machine_reset() override;
 };
 
 void tvboy_state::machine_start_tvboyii() {
+  machine_start();
+}
+
+void tvboy_state::machine_start_supertvboy() {
+  machine_start();
+}
+
+void tvboy_state::machine_start() {
   m_crom->set_bank(0);
   m_bank0->configure_entries(0, 128, &m_rom[0x00000], 0x1000);
 }
@@ -131,6 +143,9 @@ MACHINE_CONFIG_START(tvboy_state::tvboyii)
   
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_DERIVED(tvboy_state::supertvboy, tvboyii)
+MACHINE_CONFIG_END
+
 static INPUT_PORTS_START( tvboyii )
 	PORT_START("SWB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Game") PORT_CODE(KEYCODE_2)
@@ -156,5 +171,15 @@ ROM_START( tvboyii )
   ROM_LOAD( "HY23400P.bin", 0x00000, 0x80000, CRC(f8485173) SHA1(cafbaa0c5437f192cb4fb49f9a672846aa038870) )
 ROM_END
 
+
+ROM_START( supertvboy )
+  ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x80000, "mainrom", 0 )
+  ROM_LOAD( "supertvboy.bin", 0x00000, 0x80000, CRC(af2e73e8) SHA1(04b9ddc3b30b0e5b81b9f868d455e902a0151491) )
+ROM_END
+
+
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT  STATE        INIT    COMPANY     FULLNAME */
-CONS( 199?, tvboyii, a2600,      0, tvboyii,  tvboyii, tvboy_state, 0, "Systema", "TV Boy II (PAL)" , MACHINE_SUPPORTS_SAVE )
+CONS( 199?, tvboyii,    a2600,      0, tvboyii,  tvboyii, tvboy_state, 0, "Systema", "TV Boy II (PAL)" , MACHINE_SUPPORTS_SAVE )
+CONS( 1995, supertvboy, a2600,      0, supertvboy,  tvboyii, tvboy_state, 0, "Akor", "Super TV Boy" , MACHINE_SUPPORTS_SAVE )
