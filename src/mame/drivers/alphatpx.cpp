@@ -974,7 +974,6 @@ WRITE8_MEMBER(alphatp_34_state::fdc_cmd_w)
 
 static SLOT_INTERFACE_START( alphatp2_floppies ) // P3:  two BASF 6106 drives
 	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD)   // P30: two Shugart SA465-3AA drives
-	SLOT_INTERFACE("525sssd", FLOPPY_525_SSSD)
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( alphatp2su_floppies )
