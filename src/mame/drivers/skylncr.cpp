@@ -1930,7 +1930,7 @@ ROM_END
 
 
 /*
-  Super Star 97
+  明星 97 (Ming Xing 97) / Super Star 97
   Bordun International.
 
   For amusement only (as seen in the title).
