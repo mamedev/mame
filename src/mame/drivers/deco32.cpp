@@ -34,12 +34,12 @@
     Tattoo Assassins uses DE Pinball soundboard 520-5077-00 R
 
 
-    Todo:
+    TODO:
 
-    Tattoo Assassins & Dragongun use an unemulated chip (Ace/Jack) for
+    Tattoo Assassins & Night slashers use an less emulated chip (Ace/Jack) for
     special blending effects.  It's exact effect is unclear.
 
-    Video backgrounds in Dragongun?
+    Video backgrounds(intel DVI) in Dragongun?
 
     Locked'N Loaded (parent set) is a slightly different hardware
     revision: board # DE-0420-1 where the US set is DE-0359-2.
@@ -564,14 +564,14 @@ static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32, nslasher_state )
 	AM_RANGE(0x140000, 0x140003) AM_WRITE(vblank_ack_w)
 	AM_RANGE(0x150000, 0x150003) AM_WRITE(tattass_control_w) /* Volume port/Eprom/Priority */
 	AM_RANGE(0x162000, 0x162fff) AM_RAM             /* 'Jack' RAM!? */
-	AM_RANGE(0x163000, 0x16309f) AM_RAM_WRITE(ace_ram_w) AM_SHARE("ace_ram")
+	AM_RANGE(0x163000, 0x16309f) AM_DEVREADWRITE16("deco_ace", deco_ace_device, ace_r, ace_w, 0x0000ffff) /* 'Ace' RAM */
 	AM_RANGE(0x164000, 0x164003) AM_WRITENOP /* Palette control BG2/3 ($1a constant) */
 	AM_RANGE(0x164004, 0x164007) AM_WRITENOP /* Palette control Obj1 ($6 constant) */
 	AM_RANGE(0x164008, 0x16400b) AM_WRITENOP /* Palette control Obj2 ($5 constant) */
 	AM_RANGE(0x16400c, 0x16400f) AM_WRITENOP
-	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE(buffered_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x168000, 0x169fff) AM_DEVREADWRITE("deco_ace", deco_ace_device, buffered_palette_r, buffered_palette_w)
 	AM_RANGE(0x16c000, 0x16c003) AM_WRITENOP
-	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE(palette_dma_w)
+	AM_RANGE(0x16c008, 0x16c00b) AM_DEVWRITE16("deco_ace", deco_ace_device, palette_dma_w, 0xffffffff)
 	AM_RANGE(0x170000, 0x171fff) AM_READWRITE(spriteram_r, spriteram_w)
 	AM_RANGE(0x174000, 0x174003) AM_WRITENOP /* Sprite DMA mode (2) */
 	AM_RANGE(0x174010, 0x174013) AM_WRITE(buffer_spriteram_w)
@@ -601,14 +601,14 @@ static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32, nslasher_state )
 	AM_RANGE(0x140000, 0x140003) AM_WRITE(vblank_ack_w)
 	AM_RANGE(0x150000, 0x150003) AM_WRITE8(eeprom_w, 0x000000ff)
 	AM_RANGE(0x150000, 0x150003) AM_WRITE8(volume_w, 0x0000ff00)
-	AM_RANGE(0x163000, 0x16309f) AM_RAM_WRITE(ace_ram_w) AM_SHARE("ace_ram") /* 'Ace' RAM!? */
+	AM_RANGE(0x163000, 0x16309f) AM_DEVREADWRITE16("deco_ace", deco_ace_device, ace_r, ace_w, 0x0000ffff) /* 'Ace' RAM */
 	AM_RANGE(0x164000, 0x164003) AM_WRITENOP /* Palette control BG2/3 ($1a constant) */
 	AM_RANGE(0x164004, 0x164007) AM_WRITENOP /* Palette control Obj1 ($4 constant) */
 	AM_RANGE(0x164008, 0x16400b) AM_WRITENOP /* Palette control Obj2 ($6 constant) */
 	AM_RANGE(0x16400c, 0x16400f) AM_WRITENOP
-	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE(buffered_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x168000, 0x169fff) AM_DEVREADWRITE("deco_ace", deco_ace_device, buffered_palette_r, buffered_palette_w)
 	AM_RANGE(0x16c000, 0x16c003) AM_WRITENOP
-	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE(palette_dma_w)
+	AM_RANGE(0x16c008, 0x16c00b) AM_DEVWRITE16("deco_ace", deco_ace_device, palette_dma_w, 0xffffffff)
 	AM_RANGE(0x170000, 0x171fff) AM_READWRITE(spriteram_r, spriteram_w)
 	AM_RANGE(0x174000, 0x174003) AM_WRITENOP /* Sprite DMA mode (2) */
 	AM_RANGE(0x174010, 0x174013) AM_WRITE(buffer_spriteram_w)
@@ -2283,6 +2283,9 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update_nslasher)
+	
+	MCFG_DECO_ACE_ADD("deco_ace")
+	MCFG_DECO_ACE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2359,6 +2362,9 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'322'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update_nslasher)
+
+	MCFG_DECO_ACE_ADD("deco_ace")
+	MCFG_DECO_ACE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
