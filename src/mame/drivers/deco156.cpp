@@ -61,7 +61,7 @@ public:
 	DECLARE_DRIVER_INIT(hvysmsh);
 	DECLARE_DRIVER_INIT(wcvol95);
 	virtual void video_start() override;
-	uint32_t screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 	void descramble_sound( const char *tag );
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
@@ -82,7 +82,7 @@ void deco156_state::video_start()
 }
 
 
-uint32_t deco156_state::screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t deco156_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	//FIXME: flip_screen_x should not be written!
 	flip_screen_set_no_update(1);
@@ -331,7 +331,7 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update_wcvol95)
+	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -339,7 +339,8 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -383,7 +384,7 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update_wcvol95)
+	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -391,7 +392,8 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)

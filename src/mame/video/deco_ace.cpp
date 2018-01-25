@@ -63,7 +63,6 @@ DEFINE_DEVICE_TYPE(DECO_ACE, deco_ace_device, "deco_ace", "Data East 99 'ACE' Ch
 deco_ace_device::deco_ace_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECO_ACE, tag, owner, clock),
 	device_video_interface(mconfig, *this),
-	m_dirty_palette(0),
 	m_palette_effect_min(0x100),
 	m_palette_effect_max(0xfff),
 	m_palette(*this, finder_base::DUMMY_TAG),
@@ -93,7 +92,6 @@ void deco_ace_device::device_start()
 	m_paletteram_buffered = make_unique_clear<uint32_t[]>(4096);
 	m_ace_ram = make_unique_clear<uint16_t[]>(0x28);
 
-	save_item(NAME(m_dirty_palette));
 	save_pointer(NAME(m_paletteram.get()), 4096);
 	save_pointer(NAME(m_paletteram_buffered.get()), 4096);
 	save_pointer(NAME(m_ace_ram.get()), 0x28);
@@ -108,7 +106,15 @@ void deco_ace_device::device_reset()
 	m_palette_effect_min = 0x100; /* Screenshots seem to suggest ACE fades do not affect playfield 1 palette (0-255) */
 	m_palette_effect_max = 0xfff;
 	memset(m_ace_ram.get(),0,0x28);
-	m_dirty_palette = 1;
+}
+
+//-------------------------------------------------
+//  device_post_load - device-specific post-load
+//-------------------------------------------------
+
+void deco_ace_device::device_post_load()
+{
+	palette_update();
 }
 
 /*****************************************************************************
@@ -155,59 +161,46 @@ WRITE16_MEMBER( deco_ace_device::ace_w )
 {
 	COMBINE_DATA(&m_ace_ram[offset]);
 	if ((offset >= 0x20) && (offset <= 0x26))
-		m_dirty_palette = 1;
+		palette_update();
 }
 
 void deco_ace_device::palette_update()
 {
-	if (m_dirty_palette != 0)
+	int r,g,b,i;
+	uint8_t fadeptr=m_ace_ram[0x20] & 0xff;
+	uint8_t fadeptg=m_ace_ram[0x21] & 0xff;
+	uint8_t fadeptb=m_ace_ram[0x22] & 0xff;
+	uint8_t fadepsr=m_ace_ram[0x23] & 0xff;
+	uint8_t fadepsg=m_ace_ram[0x24] & 0xff;
+	uint8_t fadepsb=m_ace_ram[0x25] & 0xff;
+	uint16_t mode=m_ace_ram[0x26] & 0xffff;
+
+	for (i=0; i<2048; i++)
 	{
-		int r,g,b,i;
-		uint8_t fadeptr=m_ace_ram[0x20] & 0xff;
-		uint8_t fadeptg=m_ace_ram[0x21] & 0xff;
-		uint8_t fadeptb=m_ace_ram[0x22] & 0xff;
-		uint8_t fadepsr=m_ace_ram[0x23] & 0xff;
-		uint8_t fadepsg=m_ace_ram[0x24] & 0xff;
-		uint8_t fadepsb=m_ace_ram[0x25] & 0xff;
-		uint16_t mode=m_ace_ram[0x26] & 0xffff;
+		/* Lerp palette entry to 'fadept' according to 'fadeps' */
+		b = (m_paletteram_buffered[i] >>16) & 0xff;
+		g = (m_paletteram_buffered[i] >> 8) & 0xff;
+		r = (m_paletteram_buffered[i] >> 0) & 0xff;
 
-		m_dirty_palette=0;
-
-		for (i=0; i<2048; i++)
+		if ((i>=m_palette_effect_min) && (i<=m_palette_effect_max))
 		{
-			/* Lerp palette entry to 'fadept' according to 'fadeps' */
-			b = (m_paletteram_buffered[i] >>16) & 0xff;
-			g = (m_paletteram_buffered[i] >> 8) & 0xff;
-			r = (m_paletteram_buffered[i] >> 0) & 0xff;
-
-			if ((i>=m_palette_effect_min) && (i<=m_palette_effect_max))
+			switch (mode)
 			{
-				switch (mode)
-				{
-					default:
-					case 0x1100: // multiplicative fade
-						/* Yeah, this should really be fixed point, I know */
-						b = (uint8_t)((float)b + (((float)fadeptb - (float)b) * (float)fadepsb/255.0f));
-						g = (uint8_t)((float)g + (((float)fadeptg - (float)g) * (float)fadepsg/255.0f));
-						r = (uint8_t)((float)r + (((float)fadeptr - (float)r) * (float)fadepsr/255.0f));
-						break;
-					case 0x1000: // additive fade, correct?
-						b = b + fadepsb;
-						g = g + fadepsg;
-						r = r + fadepsr;
-						break;
-				}
-				
-				if (b < 0) b = 0;
-				if (b > 0xff) b = 0xff;
-				if (g < 0) g = 0;
-				if (g > 0xff) g = 0xff;
-				if (r < 0) r = 0;
-				if (r > 0xff) r = 0xff;
+				default:
+				case 0x1100: // multiplicative fade
+					/* Yeah, this should really be fixed point, I know */
+					b = (uint8_t)((float)b + (((float)fadeptb - (float)b) * (float)fadepsb/255.0f));
+					g = (uint8_t)((float)g + (((float)fadeptg - (float)g) * (float)fadepsg/255.0f));
+					r = (uint8_t)((float)r + (((float)fadeptr - (float)r) * (float)fadepsr/255.0f));
+					break;
+				case 0x1000: // additive fade, correct?
+					b = std::min(b + fadepsb, 0xff);
+					g = std::min(g + fadepsg, 0xff);
+					r = std::min(r + fadepsr, 0xff);
+					break;
 			}
-
-			m_palette->set_pen_color(i,rgb_t(r,g,b));
 		}
+		m_palette->set_pen_color(i,rgb_t(r,g,b));
 	}
 }
 
@@ -222,7 +215,7 @@ void deco_ace_device::set_palette_effect_max(uint32_t val)
 	if (m_palette_effect_max != val)
 	{
 		m_palette_effect_max = val;
-		m_dirty_palette = 1;
+		palette_update();
 	}
 }
 
@@ -265,7 +258,7 @@ uint16_t deco_ace_device::get_aceram(uint8_t val)
 WRITE16_MEMBER( deco_ace_device::palette_dma_w )
 {
 	memcpy(m_paletteram_buffered.get(), m_paletteram.get(), 4096);
-	m_dirty_palette = 1;
+	palette_update();
 }
 
 /*****************************************************************************************/

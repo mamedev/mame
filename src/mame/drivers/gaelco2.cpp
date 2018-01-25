@@ -19,7 +19,7 @@
     Maniac Square  | 1996 | CG-1V 427 | 960419/1 | Lattice IspLSI 1016-80LJ (not used, unprotected)
     Snow Board     | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
     Bang!          | 1998 | CG-1V 388 | 980921/1 | No
-    Play 2000      | 1999 | CG-1V-149 | ?        | DS5002FP (by Nova Desitec)
+    Play 2000      | 1999 | CG-1V-149 | 990315   | DS5002FP (by Nova Desitec)
 
     Notes:
     touchgo:
@@ -239,6 +239,41 @@ ROM_START( maniacsq ) // REF 940411
 	ROM_FILL(          0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 ROM_END
 
+/*
+Maniac Square
+PCB Layout:
+
+REF: 940411
+------------------------------------------------------------------------------
+|                POT1               KM424C257Z-6 (x3)                        |
+|                                                                            |
+|                POT2                                                        |
+|---                                                                         |
+   |                                                               U47       |
+   |                   30.000MHz          |----------|                       |
+|---                                      |          |             U48       |
+|                                         | GAE1 449 |                       |
+| J                            6264       | (QFP208) |             U49       |
+|                              6264       |          |                       |
+| A                                       |----------|             U50       |
+|                                                                            |
+| M                                                                          |
+|                         |-------------------------|                        |
+| M                       |                         |  24.000MHz     62256   |
+|                         |  62256  DS5002  BATT_3V |                62256   |
+| A                       |                         |                        |
+|                         |-------------------------|                        |
+|                                                                            |
+|---                                    62256                                |
+   |                                    62256                                |
+   |                                                                         |
+|---                                                                         |
+|   DSW1                         MC68000P12        U45                       |
+|                                                  U44                       |
+|   DSW2                                                                     |
+|                                                                            |
+-----------------------------------------------------------------------------|
+*/
 ROM_START( maniacsqa ) // REF 940411
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "MS_U_45.U45",   0x000000, 0x020000, CRC(98f4fdc0) SHA1(1e4d5b0a8a432de885c96319c21280d304b38db0) )
@@ -284,9 +319,10 @@ Maniac Square
 
 PCB Layout:
 REF: 960419/1
+Part No.: E193
 ------------------------------------------------------------------------------
-|                                   KM428C256J-6 (x2)                        |
-|                                                                            |
+|                                   KM428C256J-6                             |
+|                                   KM428C256J-6                             |
 |                POT1                                                        |
 |---                                                                         |
    |         SW2                                                   IC43*     |
@@ -299,9 +335,9 @@ REF: 960419/1
 |                                                                            |
 | M                                                                IC47      |
 |                                                                            |
-| M                         62256                                    62256   |
+| M                                                                  62256   |
 |                                                                    62256   |
-| A                         62256                                    62256   |
+| A                                                                  62256   |
 |                                            |----------|                    |
 |                                24.000MHz   | Lattice  |                    |
 |---                                         | IspLSI   |                    |
@@ -318,6 +354,7 @@ Daughterboard plugs in through IC47 and IC44 sockets
 
 PCB Layout:
 MUN-M4M/1
+Part No.: E192
 +--------+
 |   F0   |
 |        |
@@ -495,6 +532,41 @@ ROM_START( play2000 ) /* there are version 4.0 and version 1.0 strings in this, 
 	ROM_LOAD( "palce16v8h.u29",  0x0000, 0x0117, BAD_DUMP CRC(4a0a6f39) SHA1(57351e471649391c9abf110828fe2f128fe84eee) )
 ROM_END
 
+/*
+Play 2000
+
+PCB Layout:
+REF: 990315
+------------------------------------------------------------------------------
+|                                   KM428C256TR  KM428C256TR                 |
+|                                                                            |
+|                POT1                                                        |
+|---                                                                         |
+   |                                                               U50       |
+   |                   SRAM_32Kx8         |----------|                       |
+|---                   SRAM_32Kx8         |          |             U51       |
+|                      34.000MHz          |  CG-1V   |                       |
+| J                    SRAM_32Kx8         |   149    |             U52       |
+|                      SRAM_32Kx8         |          |                       |
+| A                                       |----------|             U53       |
+|                                                                            |
+| M                                                                U54       |
+|                         |---------------------------|                      |
+| M                       |                           |         SRAM_32Kx8   |
+|                         | BATT_3V DS5002 SRAM_32Kx8 |         SRAM_32Kx8   |
+| A                       |                           |                      |
+|                         |---------------------------|                      |
+|                                                                            |
+|---                                         11.0592MHz                      |
+   |                                                                         |
+   |                                                                         |
+|---          |------------|          U39                                    |
+|             |            |                                                 |
+|             |  MC68HC000 |          U40                                    |
+|             |    FN12    |                                                 |
+|             |------------|                                                 |
+-----------------------------------------------------------------------------|
+*/
 ROM_START( play2000a )
 	/*at least 1.u40 is bad, on every 0x40 bytes the first four are always 0xff.*/
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
