@@ -4727,7 +4727,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(fxmcr165_state::fxmcr165)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, XTAL(400'000))
+	MCFG_CPU_ADD("maincpu", TMS1100, 400.0_kHz_XTAL)
 	MCFG_TMS1XXX_READ_K_CB(READ8(fxmcr165_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(fxmcr165_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(fxmcr165_state, write_o))
