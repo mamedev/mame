@@ -22,6 +22,7 @@
 #include "sound/multipcm.h"
 #include "sound/okim6295.h"
 #include "sound/pokey.h"
+#include "sound/qsound.h"
 #include "sound/segapcm.h"
 #include "sound/sn76496.h"
 #include "sound/ym2151.h"
@@ -78,7 +79,8 @@ public:
 		A_POKEYB     = 0x00013030,
 		A_YMF271     = 0x00013040,
 		A_YMZ280B    = 0x00013050,
-		A_YM2608     = 0x00013060
+		A_YM2608     = 0x00013060,
+		A_QSOUND     = 0x00013070
 	};
 
 	enum io16_t
@@ -104,7 +106,7 @@ public:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	virtual util::disasm_interface *create_disassembler() override;
-
+	
 	READ8_MEMBER(segapcm_rom_r);
 	READ8_MEMBER(ymf271_rom_r);
 	READ8_MEMBER(ymz280b_rom_r);
@@ -114,6 +116,7 @@ public:
 	READ8_MEMBER(okim6295a_rom_r);
 	READ8_MEMBER(okim6295b_rom_r);
 	READ8_MEMBER(c352_rom_r);
+	READ8_MEMBER(qsound_rom_r);
 
 private:
 	struct rom_block {
@@ -204,6 +207,7 @@ private:
 	required_device<ymf271_device> m_ymf271;
 	required_device<ymz280b_device> m_ymz280b;
 	required_device<ym2608_device> m_ym2608;
+	required_device<qsound_device> m_qsound;
 
 	uint32_t m_multipcma_bank_l;
 	uint32_t m_multipcma_bank_r;
@@ -486,12 +490,7 @@ void vgmplay_device::execute_run()
 				m_io->write_byte(A_GAMEBOY + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
-
-			case 0xc0:
-				m_io->write_byte(A_SEGAPCM + (m_file->read_word(m_pc+1) & 0x7ff), m_file->read_byte(m_pc+3));
-				m_pc += 4;
-				break;
-
+				
 			case 0xb4:
 				m_io->write_byte(A_NESAPU + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
 				m_pc += 3;
@@ -539,6 +538,11 @@ void vgmplay_device::execute_run()
 				m_pc += 3;
 				break;
 			}
+			
+			case 0xc0:
+				m_io->write_byte(A_SEGAPCM + (m_file->read_word(m_pc+1) & 0x7ff), m_file->read_byte(m_pc+3));
+				m_pc += 4;
+				break;
 
 			case 0xc3:
 			{
@@ -556,6 +560,13 @@ void vgmplay_device::execute_run()
 				m_pc += 4;
 				break;
 			}
+			
+			case 0xc4:
+				m_io->write_byte(A_QSOUND + 0, m_file->read_byte(m_pc+1));
+				m_io->write_byte(A_QSOUND + 1, m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_QSOUND + 2, m_file->read_byte(m_pc+3));
+				m_pc += 4;
+				break;
 
 			case 0xd1:
 			{
@@ -1011,6 +1022,11 @@ READ8_MEMBER(vgmplay_device::k053260_rom_r)
 	return rom_r(0, 0x8e, offset);
 }
 
+READ8_MEMBER(vgmplay_device::qsound_rom_r)
+{
+	return rom_r(0, 0x8f, offset);
+}
+
 READ8_MEMBER(vgmplay_device::c352_rom_r)
 {
 	return rom_r(0, 0x92, offset);
@@ -1046,6 +1062,7 @@ vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, co
 	, m_ymf271(*this, "ymf271")
 	, m_ymz280b(*this, "ymz280b")
 	, m_ym2608(*this, "ym2608")
+	, m_qsound(*this, "qsound")
 {
 }
 
@@ -1274,6 +1291,9 @@ void vgmplay_state::machine_start()
 					m_pokeyb->set_unscaled_clock(clock);
 				}
 			}
+			if(version >= 0x161 && r32(0xb4)) {
+				m_qsound->set_unscaled_clock(r32(0xb4));
+			}
 		}
 
 		if (data_start > 0xc0)
@@ -1475,6 +1495,7 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_YMF271,         vgmplay_device::A_YMF271+0xf)     AM_DEVWRITE    ("ymf271",        ymf271_device, write)
 	AM_RANGE(vgmplay_device::A_YMZ280B,        vgmplay_device::A_YMZ280B+0x1)    AM_DEVWRITE    ("ymz280b",       ymz280b_device, write)
 	AM_RANGE(vgmplay_device::A_YM2608,         vgmplay_device::A_YM2608+0x3)     AM_DEVWRITE    ("ym2608",        ym2608_device, write)
+	AM_RANGE(vgmplay_device::A_QSOUND,         vgmplay_device::A_QSOUND+0x2)     AM_DEVWRITE    ("qsound",        qsound_device, qsound_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( segapcm_map, 0, 8, vgmplay_state )
@@ -1503,6 +1524,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c352_map, 0, 8, vgmplay_state )
 	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, c352_rom_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( qsound_map, 0, 8, vgmplay_state )
+	AM_RANGE(0, 0xffffff) AM_DEVREAD("vgmplay", vgmplay_device, qsound_rom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nescpu_map, AS_PROGRAM, 8, vgmplay_state )
@@ -1650,6 +1675,11 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
+	
+	MCFG_QSOUND_ADD("qsound", 4000000)
+	MCFG_DEVICE_ADDRESS_MAP(0, qsound_map)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
 MACHINE_CONFIG_END
 
 ROM_START( vgmplay )

@@ -60,7 +60,7 @@ static ADDRESS_MAP_START( dietgo_map, AS_PROGRAM, 16, dietgo_state )
 	AM_RANGE(0x220000, 0x2207ff) AM_WRITEONLY AM_SHARE("pf1_rowscroll")
 	AM_RANGE(0x222000, 0x2227ff) AM_WRITEONLY AM_SHARE("pf2_rowscroll")
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x300000, 0x300bff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x300000, 0x300bff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x340000, 0x343fff) AM_READWRITE(dietgo_protection_region_0_104_r,dietgo_protection_region_0_104_w)AM_SHARE("prot16ram") /* Protection device */
 	AM_RANGE(0x380000, 0x38ffff) AM_RAM // mainram
 ADDRESS_MAP_END
@@ -231,10 +231,9 @@ MACHINE_CONFIG_START(dietgo_state::dietgo)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dietgo)
+	MCFG_PALETTE_FORMAT(XBGR)
 
-	MCFG_DECOCOMN_ADD("deco_common")
-	MCFG_DECOCOMN_PALETTE("palette")
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dietgo)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
