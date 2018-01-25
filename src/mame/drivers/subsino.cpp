@@ -2758,7 +2758,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(subsino_state::victor21)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown clock */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown clock */
 	MCFG_CPU_PROGRAM_MAP(victor21_map)
 	MCFG_CPU_IO_MAP(subsino_iomap)
 
@@ -2790,10 +2790,10 @@ MACHINE_CONFIG_START(subsino_state::victor21)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4_433619MHz / 4, PIN7_HIGH)  /* Clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", XTAL(4'433'619) / 4, PIN7_HIGH)  /* Clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2808,7 +2808,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(subsino_state::crsbingo)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown CPU and clock */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown CPU and clock */
 	MCFG_CPU_PROGRAM_MAP(crsbingo_map)
 	MCFG_CPU_IO_MAP(subsino_iomap)
 
@@ -2833,14 +2833,14 @@ MACHINE_CONFIG_START(subsino_state::crsbingo)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)   /* Unknown clock */
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))   /* Unknown clock */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(subsino_state::srider)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown clock */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown clock */
 	MCFG_CPU_PROGRAM_MAP(srider_map)
 	MCFG_CPU_IO_MAP(subsino_iomap)
 
@@ -2875,10 +2875,10 @@ MACHINE_CONFIG_START(subsino_state::srider)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4_433619MHz / 4, PIN7_HIGH)  /* Clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", XTAL(4'433'619) / 4, PIN7_HIGH)  /* Clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2892,7 +2892,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(subsino_state::tisub)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown CPU and clock */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown CPU and clock */
 	MCFG_CPU_PROGRAM_MAP(tisub_map)
 	MCFG_CPU_IO_MAP(subsino_iomap)
 
@@ -2927,13 +2927,13 @@ MACHINE_CONFIG_START(subsino_state::tisub)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)   /* Unknown clock */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(3'579'545))   /* Unknown clock */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(subsino_state::stbsub)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)   /* Unknown clock */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 8)   /* Unknown clock */
 	MCFG_CPU_PROGRAM_MAP(stbsub_map)
 	MCFG_CPU_IO_MAP(subsino_iomap)
 
@@ -2970,7 +2970,7 @@ MACHINE_CONFIG_START(subsino_state::stbsub)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

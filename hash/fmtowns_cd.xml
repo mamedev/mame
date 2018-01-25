@@ -6636,8 +6636,8 @@ User/save disks that can be created from the game itself are not included.
 		<info name="release" value="199001xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="System Disk" />
-			<dataarea name="flop" size="1261568">
-				<rom name="harukanaru_systemdisk.hdm" size="1261568" crc="a4e3344e" sha1="a07bbb21b6d53db1ea95caab043355e8b1ef865a" offset="000000" />
+			<dataarea name="flop" size="3577399">
+				<rom name="harukanaru_systemdisk.mfm" size="3577399" crc="02c52d10" sha1="97091496c01bb68ac44a7090e85de08dbc82389f" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cdrom" interface="fmt_cdrom">

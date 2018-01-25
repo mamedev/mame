@@ -359,17 +359,17 @@ static const z80_daisy_config chessmstdm_daisy_chain[] =
 MACHINE_CONFIG_START(chessmst_state::chessmst)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_9_8304MHz/4) // U880 Z80 clone
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(9'830'400)/4) // U880 Z80 clone
 	MCFG_CPU_PROGRAM_MAP(chessmst_mem)
 	MCFG_CPU_IO_MAP(chessmst_io)
 	MCFG_Z80_DAISY_CHAIN(chessmst_daisy_chain)
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_9_8304MHz/4)
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(9'830'400)/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(chessmst_state, pio1_port_a_w))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio1_port_b_w))
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_9_8304MHz/4)
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(9'830'400)/4)
 	MCFG_Z80PIO_IN_PA_CB(READ8(chessmst_state, pio2_port_a_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio2_port_b_w))
 
@@ -384,17 +384,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(chessmst_state::chessmsta)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/4) // U880 Z80 clone
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/4) // U880 Z80 clone
 	MCFG_CPU_PROGRAM_MAP(chessmst_mem)
 	MCFG_CPU_IO_MAP(chessmst_io)
 	MCFG_Z80_DAISY_CHAIN(chessmst_daisy_chain)
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_8MHz/4)
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(8'000'000)/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(chessmst_state, pio1_port_a_w))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio1_port_b_w))
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_8MHz/4)
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(8'000'000)/4)
 	MCFG_Z80PIO_IN_PA_CB(READ8(chessmst_state, pio2_port_a_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio2_port_b_w))
 
@@ -409,17 +409,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(chessmst_state::chessmstdm)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2) // U880 Z80 clone
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2) // U880 Z80 clone
 	MCFG_CPU_PROGRAM_MAP(chessmstdm)
 	MCFG_CPU_IO_MAP(chessmstdm_io)
 	MCFG_Z80_DAISY_CHAIN(chessmstdm_daisy_chain)
 
-	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_8MHz/4)
+	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL(8'000'000)/4)
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(chessmst_state, pio1_port_a_w))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio1_port_b_dm_w))
 	MCFG_Z80PIO_IN_PB_CB(IOPORT("EXTRA"))
 
-	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL_8MHz/4)
+	MCFG_DEVICE_ADD("z80pio2", Z80PIO, XTAL(8'000'000)/4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(chessmst_state, pio2_port_a_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(chessmst_state, pio2_port_b_w))

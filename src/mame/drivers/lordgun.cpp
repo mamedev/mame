@@ -633,11 +633,11 @@ void lordgun_state::machine_start()
 }
 
 MACHINE_CONFIG_START(lordgun_state::lordgun)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(lordgun_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_20MHz / 4)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
 	MCFG_CPU_IO_MAP(lordgun_soundio_map)
 
@@ -675,21 +675,21 @@ MACHINE_CONFIG_START(lordgun_state::lordgun)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, PIN7_HIGH)   // ? 5MHz can't be right!
+	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000) / 20, PIN7_HIGH)   // ? 5MHz can't be right!
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(lordgun_state::aliencha)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(aliencha_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lordgun_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_20MHz / 4)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(20'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
 	MCFG_CPU_IO_MAP(aliencha_soundio_map)
 
@@ -732,10 +732,10 @@ MACHINE_CONFIG_START(lordgun_state::aliencha)
 	MCFG_YMF278B_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, PIN7_HIGH)   // ? 5MHz can't be right
+	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000) / 20, PIN7_HIGH)   // ? 5MHz can't be right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_20MHz / 20, PIN7_HIGH)  // ? 5MHz can't be right
+	MCFG_OKIM6295_ADD("oki2", XTAL(20'000'000) / 20, PIN7_HIGH)  // ? 5MHz can't be right
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

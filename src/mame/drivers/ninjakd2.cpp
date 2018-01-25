@@ -160,8 +160,8 @@ TODO:
 #include "speaker.h"
 
 
-#define MAIN_CLOCK_12 XTAL_12MHz
-#define MAIN_CLOCK_5  XTAL_5MHz
+#define MAIN_CLOCK_12 XTAL(12'000'000)
+#define MAIN_CLOCK_5  XTAL(5'000'000)
 
 
 /*************************************

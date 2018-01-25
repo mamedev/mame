@@ -3038,7 +3038,7 @@ void metro_state::machine_start()
 }
 
 MACHINE_CONFIG_START(metro_state::i4100_config)
-	MCFG_DEVICE_ADD("vdp", I4100, XTAL_26_666MHz)
+	MCFG_DEVICE_ADD("vdp", I4100, XTAL(26'666'000))
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3054,7 +3054,7 @@ MACHINE_CONFIG_START(metro_state::i4100_config)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::i4220_config)
-	MCFG_DEVICE_ADD("vdp2", I4220, XTAL_26_666MHz)
+	MCFG_DEVICE_ADD("vdp2", I4220, XTAL(26'666'000))
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3070,7 +3070,7 @@ MACHINE_CONFIG_START(metro_state::i4220_config)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::i4300_config)
-	MCFG_DEVICE_ADD("vdp3", I4300, XTAL_26_666MHz)
+	MCFG_DEVICE_ADD("vdp3", I4300, XTAL(26'666'000))
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3130,7 +3130,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::msgogo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(msgogo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt) // timing is off, shaking sprites in intro
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
@@ -3189,7 +3189,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(metro_state::metro_upd7810_sound)
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL(24'000'000)/2)
 	MCFG_UPD7810_RXD(READLINE(metro_state, metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_UPD7810_PORTA_READ_CB(READ8(metro_state, metro_porta_r))
@@ -3199,7 +3199,7 @@ MACHINE_CONFIG_START(metro_state::metro_upd7810_sound)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::daitorid_upd7810_sound)
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_12MHz)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL(12'000'000))
 	MCFG_UPD7810_RXD(READLINE(metro_state, metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_UPD7810_PORTA_READ_CB(READ8(metro_state, metro_porta_r))
@@ -3212,7 +3212,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::daitorid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(daitorid_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3229,7 +3229,7 @@ MACHINE_CONFIG_START(metro_state::daitorid)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
@@ -3241,7 +3241,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::dharma)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(dharma_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3256,17 +3256,17 @@ MACHINE_CONFIG_START(metro_state::dharma)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // sample rate =  M6295 clock / 132
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // sample rate =  M6295 clock / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::karatour)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(karatour_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3281,10 +3281,10 @@ MACHINE_CONFIG_START(metro_state::karatour)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -3292,7 +3292,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::_3kokushi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(kokushi_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3307,10 +3307,10 @@ MACHINE_CONFIG_START(metro_state::_3kokushi)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -3318,7 +3318,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::lastfort)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(lastfort_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3333,17 +3333,17 @@ MACHINE_CONFIG_START(metro_state::lastfort)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_LOW) // sample rate =  M6295 clock / 165
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_LOW) // sample rate =  M6295 clock / 165
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::lastforg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(lastforg_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3357,17 +3357,17 @@ MACHINE_CONFIG_START(metro_state::lastforg)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::dokyusei)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(dokyusei_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
@@ -3381,14 +3381,14 @@ MACHINE_CONFIG_START(metro_state::dokyusei)
 	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(metro_state::dokyusp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(dokyusp_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
@@ -3406,7 +3406,7 @@ MACHINE_CONFIG_START(metro_state::dokyusp)
 	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -3432,7 +3432,7 @@ MACHINE_CONFIG_START(metro_state::gakusai)
 	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END
 
@@ -3458,7 +3458,7 @@ MACHINE_CONFIG_START(metro_state::gakusai2)
 	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END
 
@@ -3466,7 +3466,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::pangpoms)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(pangpoms_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3481,10 +3481,10 @@ MACHINE_CONFIG_START(metro_state::pangpoms)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -3492,7 +3492,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::poitto)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(poitto_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3507,10 +3507,10 @@ MACHINE_CONFIG_START(metro_state::poitto)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -3518,7 +3518,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::pururun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)       /* Not confirmed */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* Not confirmed */
 	MCFG_CPU_PROGRAM_MAP(pururun_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3533,11 +3533,11 @@ MACHINE_CONFIG_START(metro_state::pururun)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)  /* Confirmed match to reference video */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* Confirmed match to reference video */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_3_579545MHz/3, PIN7_HIGH) // sample rate =  M6295 clock / 132
+	MCFG_OKIM6295_ADD("oki", XTAL(3'579'545)/3, PIN7_HIGH) // sample rate =  M6295 clock / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -3545,7 +3545,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::skyalert)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(skyalert_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3560,10 +3560,10 @@ MACHINE_CONFIG_START(metro_state::skyalert)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_LOW) // sample rate =  M6295 clock / 165
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_LOW) // sample rate =  M6295 clock / 165
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -3571,7 +3571,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::toride2g)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(toride2g_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3586,10 +3586,10 @@ MACHINE_CONFIG_START(metro_state::toride2g)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -3597,7 +3597,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::mouja)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(mouja_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
@@ -3609,11 +3609,11 @@ MACHINE_CONFIG_START(metro_state::mouja)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/1024*132, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/1024*132, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, mouja_okimap)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -3621,7 +3621,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::vmetal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(vmetal_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3636,7 +3636,7 @@ MACHINE_CONFIG_START(metro_state::vmetal)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_ES8712_ADD("essnd", 12000)
@@ -3650,17 +3650,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::blzntrnd)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_sound_map)
 	MCFG_CPU_IO_MAP(blzntrnd_sound_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdp2", I4220, XTAL_26_666MHz)
+	MCFG_DEVICE_ADD("vdp2", I4220, XTAL(26'666'000))
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3684,7 +3684,7 @@ MACHINE_CONFIG_START(metro_state::blzntrnd)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -3706,7 +3706,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(metro_state::puzzlet)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83007, XTAL_20MHz) // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
+	MCFG_CPU_ADD("maincpu", H83007, XTAL(20'000'000)) // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
 	MCFG_CPU_PROGRAM_MAP(puzzlet_map)
 	MCFG_CPU_IO_MAP(puzzlet_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  puzzlet_interrupt)
@@ -3725,10 +3725,10 @@ MACHINE_CONFIG_START(metro_state::puzzlet)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_20MHz/5, PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000)/5, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_20MHz/5)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(20'000'000)/5)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 MACHINE_CONFIG_END
 

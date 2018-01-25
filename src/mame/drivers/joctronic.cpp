@@ -317,12 +317,12 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(joctronic_state::joctronic)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4) // 3 MHz - uses WAIT
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4) // 3 MHz - uses WAIT
 	MCFG_CPU_PROGRAM_MAP(maincpu_map) // 139
 	MCFG_CPU_IO_MAP(maincpu_io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_12MHz/2) // 6 MHz - uses WAIT
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(12'000'000)/2) // 6 MHz - uses WAIT
 	MCFG_CPU_PROGRAM_MAP(joctronic_sound_map)
 	MCFG_CPU_IO_MAP(joctronic_sound_io_map)
 
@@ -333,7 +333,7 @@ MACHINE_CONFIG_START(joctronic_state::joctronic)
 	//MCFG_DEVCB_CHAIN_OUTPUT(WRITE8(joctronic_state, ls145_w)) MCFG_DEVCB_RSHIFT(4)
 	//MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(joctronic_state, display_reset_w))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_12MHz/4) // 3 MHz
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(12'000'000)/4) // 3 MHz
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(ASSERTLINE("soundcpu", INPUT_LINE_IRQ0)) // SINT
 
@@ -346,12 +346,12 @@ MACHINE_CONFIG_START(joctronic_state::joctronic)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// Datasheet suggests YM2203 as a possible replacement for this AY8910
-	MCFG_SOUND_ADD("aysnd1", AY8910, XTAL_12MHz/8) // 1.5 MHz
+	MCFG_SOUND_ADD("aysnd1", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("r2r1", dac_8bit_r2r_device, write))
 	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("r2r2", dac_8bit_r2r_device, write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("aysnd2", AY8910, XTAL_12MHz/8) // 1.5 MHz
+	MCFG_SOUND_ADD("aysnd2", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("r2r1", DAC_8BIT_R2R, 0)
@@ -363,12 +363,12 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(joctronic_state::slalom03)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) // 6 MHz - uses WAIT
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2) // 6 MHz - uses WAIT
 	MCFG_CPU_PROGRAM_MAP(slalom03_maincpu_map) // 138, 368, 32
 	MCFG_CPU_IO_MAP(maincpu_io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_12MHz/2) // 6 MHz - uses WAIT
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(12'000'000)/2) // 6 MHz - uses WAIT
 	MCFG_CPU_PROGRAM_MAP(slalom03_sound_map)
 	MCFG_CPU_IO_MAP(slalom03_sound_io_map)
 
@@ -379,7 +379,7 @@ MACHINE_CONFIG_START(joctronic_state::slalom03)
 	//MCFG_ADDRESSABLE_LATCH_PARALLEL_OUT_CB(WRITE8(joctronic_state, ls145_w)) MCFG_DEVCB_RSHIFT(3) MCFG_DEVCB_MASK(0x38)
 	//MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(joctronic_state, slalom03_reset_w))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_12MHz/2) // 6 MHz
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(12'000'000)/2) // 6 MHz
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	//MCFG_Z80CTC_ZC0_CB(ASSERTLINE("soundcpu", INPUT_LINE_IRQ0)) // SINT
 
@@ -393,12 +393,12 @@ MACHINE_CONFIG_START(joctronic_state::slalom03)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd1", AY8910, XTAL_12MHz/8) // 1.5 MHz
+	MCFG_SOUND_ADD("aysnd1", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(joctronic_state, slalom03_oki_bank_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("adpcm_select", ls157_device, ba_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("aysnd2", AY8910, XTAL_12MHz/8) // 1.5 MHz
+	MCFG_SOUND_ADD("aysnd2", AY8910, XTAL(12'000'000)/8) // 1.5 MHz
 	MCFG_AY8910_PORT_A_WRITE_CB(DEVWRITE8("r2r", dac_8bit_r2r_device, write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
@@ -408,7 +408,7 @@ MACHINE_CONFIG_START(joctronic_state::slalom03)
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
 	MCFG_74157_OUT_CB(DEVWRITE8("oki", msm5205_device, data_w))
 
-	MCFG_SOUND_ADD("oki", MSM5205, XTAL_12MHz/2/16) // 375 kHz
+	MCFG_SOUND_ADD("oki", MSM5205, XTAL(12'000'000)/2/16) // 375 kHz
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B) // frequency modifiable during operation
 	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(joctronic_state, vck_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

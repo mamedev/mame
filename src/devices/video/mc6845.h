@@ -152,6 +152,7 @@ public:
 
 	/* set the clock (pin 21) of the chip */
 	void set_clock(int clock);
+	void set_clock(const XTAL &xtal) { set_clock(int(xtal.value())); }
 
 	/* set number of pixels per video memory address */
 	void set_hpixels_per_column(int hpixels_per_column);

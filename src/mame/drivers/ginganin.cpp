@@ -65,8 +65,8 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_6MHz
-#define SOUND_CLOCK XTAL_3_579545MHz
+#define MAIN_CLOCK XTAL(6'000'000)
+#define SOUND_CLOCK XTAL(3'579'545)
 
 
 /*

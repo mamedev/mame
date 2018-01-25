@@ -1040,7 +1040,7 @@ private:
 ----------------------------------*/
 
 MACHINE_CONFIG_DERIVED(mod4_state::mod4, intellec4)
-	MCFG_CPU_ADD("maincpu", I4004, 5185000. / 7)
+	MCFG_CPU_ADD("maincpu", I4004, 5.185_MHz_XTAL / 7)
 	MCFG_I4004_ROM_MAP(intellec4_rom)
 	MCFG_I4004_RAM_MEMORY_MAP(intellec4_ram_memory)
 	MCFG_I4004_ROM_PORTS_MAP(intellec4_rom_ports)
@@ -1231,7 +1231,7 @@ private:
 ----------------------------------*/
 
 MACHINE_CONFIG_DERIVED(mod40_state::mod40, intellec4)
-	MCFG_CPU_ADD("maincpu", I4040, 5185000. / 7)
+	MCFG_CPU_ADD("maincpu", I4040, 5.185_MHz_XTAL / 7)
 	MCFG_I4040_ROM_MAP(intellec4_rom)
 	MCFG_I4040_RAM_MEMORY_MAP(intellec4_ram_memory)
 	MCFG_I4040_ROM_PORTS_MAP(intellec4_rom_ports)

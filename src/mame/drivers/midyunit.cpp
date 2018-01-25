@@ -123,13 +123,13 @@ Notes:
 
 
 /* master clocks vary based on game */
-#define SLOW_MASTER_CLOCK       XTAL_40MHz      /* "slow" == smashtv, trog, hiimpact */
-#define FAST_MASTER_CLOCK       XTAL_48MHz      /* "fast" == narc, mk, totcarn, strkforc */
-#define FASTER_MASTER_CLOCK     XTAL_50MHz      /* "faster" == term2 */
+#define SLOW_MASTER_CLOCK       XTAL(40'000'000)      /* "slow" == smashtv, trog, hiimpact */
+#define FAST_MASTER_CLOCK       XTAL(48'000'000)      /* "fast" == narc, mk, totcarn, strkforc */
+#define FASTER_MASTER_CLOCK     XTAL(50'000'000)      /* "faster" == term2 */
 
 /* pixel clocks are 48MHz (narc) or 24MHz (all others) regardless */
-#define MEDRES_PIXEL_CLOCK      (XTAL_48MHz / 6)
-#define STDRES_PIXEL_CLOCK      (XTAL_24MHz / 6)
+#define MEDRES_PIXEL_CLOCK      (XTAL(48'000'000) / 6)
+#define STDRES_PIXEL_CLOCK      (XTAL(24'000'000) / 6)
 
 
 
@@ -1257,7 +1257,7 @@ MACHINE_CONFIG_DERIVED(midyunit_state::mkyawdim, yunit_core)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(yawdim_sound_map)
 
 	/* video hardware */
@@ -1269,7 +1269,7 @@ MACHINE_CONFIG_DERIVED(midyunit_state::mkyawdim, yunit_core)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000) / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 

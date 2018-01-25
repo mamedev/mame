@@ -156,7 +156,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(c10_state::c10)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(c10_mem)
 	MCFG_CPU_IO_MAP(c10_io)
 

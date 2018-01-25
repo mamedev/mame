@@ -124,14 +124,14 @@ static const floppy_format_type tim011_floppy_formats[] = {
 
 MACHINE_CONFIG_START(tim011_state::tim011)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z180, XTAL_12_288MHz / 2) // location U17 HD64180
+	MCFG_CPU_ADD("maincpu",Z180, XTAL(12'288'000) / 2) // location U17 HD64180
 	MCFG_CPU_PROGRAM_MAP(tim011_mem)
 	MCFG_CPU_IO_MAP(tim011_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tim011_state, irq0_line_hold)
 
-//  MCFG_CPU_ADD("keyboard",CDP1802, XTAL_1_75MHz) // CDP1802, unknown clock
+//  MCFG_CPU_ADD("keyboard",CDP1802, XTAL(1'750'000)) // CDP1802, unknown clock
 
-	// FDC9266 location U43 XTAL_8MHz
+	// FDC9266 location U43 XTAL(8'000'000)
 	MCFG_UPD765A_ADD(FDC9266_TAG, true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_IRQ2))
 

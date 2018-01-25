@@ -58,7 +58,7 @@ uint32_t dms5000_state::screen_update_dms5000(screen_device &screen, bitmap_ind1
 
 MACHINE_CONFIG_START(dms5000_state::dms5000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8086, XTAL_9_8304MHz)
+	MCFG_CPU_ADD("maincpu",I8086, XTAL(9'830'400))
 	MCFG_CPU_PROGRAM_MAP(dms5000_mem)
 	MCFG_CPU_IO_MAP(dms5000_io)
 

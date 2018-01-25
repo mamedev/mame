@@ -1806,7 +1806,7 @@ void gba_lcd_device::device_reset()
 
 MACHINE_CONFIG_START(gba_lcd_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16_777216MHz / 4, 308, 0, 240, 228, 0, 160)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'777'216) / 4, 308, 0, 240, 228, 0, 160)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, gba_lcd_device, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

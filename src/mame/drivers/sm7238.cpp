@@ -220,11 +220,11 @@ void sm7238_state::recompute_parameters()
 
 	if (m_video.stride == 80)
 	{
-		refresh = HZ_TO_ATTOSECONDS(XTAL_12_5MHz) * m_video.stride * 10 * KSM_TOTAL_VERT;
+		refresh = HZ_TO_ATTOSECONDS(12.5_MHz_XTAL) * m_video.stride * 10 * KSM_TOTAL_VERT;
 	}
 	else
 	{
-		refresh = HZ_TO_ATTOSECONDS(XTAL_20_625MHz) * m_video.stride * 10 * KSM_TOTAL_VERT;
+		refresh = HZ_TO_ATTOSECONDS(20.625_MHz_XTAL) * m_video.stride * 10 * KSM_TOTAL_VERT;
 	}
 
 	machine().first_screen()->configure(m_video.stride * 10, KSM_TOTAL_VERT, visarea, refresh);
@@ -355,7 +355,7 @@ PALETTE_INIT_MEMBER(sm7238_state, sm7238)
 }
 
 MACHINE_CONFIG_START(sm7238_state::sm7238)
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_16_5888MHz/9)
+	MCFG_CPU_ADD("maincpu", I8080, 16.5888_MHz_XTAL/9)
 	MCFG_CPU_PROGRAM_MAP(sm7238_mem)
 	MCFG_CPU_IO_MAP(sm7238_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20_625MHz, KSM_TOTAL_HORZ, 0, KSM_DISP_HORZ, KSM_TOTAL_VERT, 0, KSM_DISP_VERT);
+	MCFG_SCREEN_RAW_PARAMS(20.625_MHz_XTAL, KSM_TOTAL_HORZ, 0, KSM_DISP_HORZ, KSM_TOTAL_VERT, 0, KSM_DISP_VERT);
 	MCFG_SCREEN_UPDATE_DRIVER(sm7238_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("pic8259", pic8259_device, ir2_w))
 	MCFG_SCREEN_PALETTE("palette")
@@ -382,19 +382,19 @@ MACHINE_CONFIG_START(sm7238_state::sm7238)
 	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("t_hblank", PIT8253, 0)
-	MCFG_PIT8253_CLK1(XTAL_16_384MHz/9) // XXX workaround -- keyboard is slower and doesn't sync otherwise
+	MCFG_PIT8253_CLK1(16.384_MHz_XTAL/9) // XXX workaround -- keyboard is slower and doesn't sync otherwise
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(sm7238_state, write_keyboard_clock))
 
 	MCFG_DEVICE_ADD("t_vblank", PIT8253, 0)
-	MCFG_PIT8253_CLK2(XTAL_16_5888MHz/9)
+	MCFG_PIT8253_CLK2(16.5888_MHz_XTAL/9)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(sm7238_state, write_printer_clock))
 
 	MCFG_DEVICE_ADD("t_color", PIT8253, 0)
 
 	MCFG_DEVICE_ADD("t_iface", PIT8253, 0)
-	MCFG_PIT8253_CLK1(XTAL_16_5888MHz/9)
+	MCFG_PIT8253_CLK1(16.5888_MHz_XTAL/9)
 	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_txc))
-	MCFG_PIT8253_CLK2(XTAL_16_5888MHz/9)
+	MCFG_PIT8253_CLK2(16.5888_MHz_XTAL/9)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("i8251line", i8251_device, write_rxc))
 
 	// serial connection to host

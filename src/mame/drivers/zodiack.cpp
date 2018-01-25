@@ -98,7 +98,7 @@ Notes:
 #include "speaker.h"
 
 
-#define PIXEL_CLOCK         (XTAL_18_432MHz/3)
+#define PIXEL_CLOCK         (XTAL(18'432'000)/3)
 
 #define HTOTAL              (396)
 #define HBEND               (0)
@@ -566,12 +566,12 @@ void zodiack_state::machine_reset()
 MACHINE_CONFIG_START(zodiack_state::zodiack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zodiack_state, zodiack_main_nmi_gen)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zodiack_state, irq0_line_hold, 1*60) // sound related - unknown source, timing is guessed
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zodiack_state, zodiack_sound_nmi_gen, 8*60) // sound tempo - unknown source, timing is guessed
@@ -594,7 +594,7 @@ MACHINE_CONFIG_START(zodiack_state::zodiack)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(18'432'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

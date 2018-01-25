@@ -737,7 +737,7 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 /* Machine driver */
 MACHINE_CONFIG_START(homelab_state::homelab)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(homelab2_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homelab_state,  homelab_frame)
 
@@ -769,7 +769,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homelab_state::homelab3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(homelab3_mem)
 	MCFG_CPU_IO_MAP(homelab3_io)
 	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,homelab3)
@@ -802,7 +802,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(homelab_state::brailab4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(brailab4_mem)
 	MCFG_CPU_IO_MAP(brailab4_io)
 	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,brailab4)

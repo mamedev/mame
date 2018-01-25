@@ -128,12 +128,12 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 #include "machine/jalcrpt.h"
 #include "speaker.h"
 
-#define SYS_A_CPU_CLOCK     (XTAL_12MHz / 2)    /* clock for main 68000 */
-#define SYS_B_CPU_CLOCK     XTAL_8MHz       /* clock for main 68000 */
-#define SYS_C_CPU_CLOCK     (XTAL_24MHz / 2)    /* clock for main 68000 */
-#define SYS_D_CPU_CLOCK     XTAL_8MHz       /* clock for main 68000 */
-#define SOUND_CPU_CLOCK     XTAL_7MHz       /* clock for sound 68000 */
-#define OKI4_SOUND_CLOCK    XTAL_4MHz
+#define SYS_A_CPU_CLOCK     (XTAL(12'000'000) / 2)    /* clock for main 68000 */
+#define SYS_B_CPU_CLOCK     XTAL(8'000'000)       /* clock for main 68000 */
+#define SYS_C_CPU_CLOCK     (XTAL(24'000'000) / 2)    /* clock for main 68000 */
+#define SYS_D_CPU_CLOCK     XTAL(8'000'000)       /* clock for main 68000 */
+#define SOUND_CPU_CLOCK     XTAL(7'000'000)       /* clock for sound 68000 */
+#define OKI4_SOUND_CLOCK    XTAL(4'000'000)
 
 
 MACHINE_RESET_MEMBER(megasys1_state,megasys1)

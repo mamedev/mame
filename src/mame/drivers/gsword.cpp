@@ -777,17 +777,17 @@ GFXDECODE_END
 MACHINE_CONFIG_START(gsword_state::gsword)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'000'000)/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_IO_MAP(cpu1_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gsword_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_18MHz/6) /* verified on pcb */
+	MCFG_CPU_ADD("sub", Z80, XTAL(18'000'000)/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(cpu2_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(gsword_state, sound_interrupt, 4*60)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'000'000)/6) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000)) /* Allow time for 2nd cpu to interleave*/
@@ -820,14 +820,14 @@ MACHINE_CONFIG_START(gsword_state::gsword)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18MHz/12) /* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'000'000)/12) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(gsword_state, nmi_set_w)) /* portA write */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END

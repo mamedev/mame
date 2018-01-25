@@ -65,20 +65,6 @@ void decocomn_device::device_reset()
 /* Later games have double buffered paletteram - the real palette ram is
 only updated on a DMA call */
 
-WRITE16_MEMBER( decocomn_device::nonbuffered_palette_w )
-{
-	int r,g,b;
-
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	if (offset&1) offset--;
-
-	b = (m_generic_paletteram_16[offset] >> 0) & 0xff;
-	g = (m_generic_paletteram_16[offset + 1] >> 8) & 0xff;
-	r = (m_generic_paletteram_16[offset + 1] >> 0) & 0xff;
-
-	m_palette->set_pen_color(offset / 2, rgb_t(r,g,b));
-}
-
 WRITE16_MEMBER( decocomn_device::buffered_palette_w )
 {
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);

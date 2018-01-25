@@ -273,7 +273,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(blockhl_state::blockhl)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)     // Konami 052526
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)     // Konami 052526
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(blockhl_state, banking_callback))
 
@@ -284,16 +284,16 @@ MACHINE_CONFIG_START(blockhl_state::blockhl)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(12)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 112, 400, 256, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 112, 400, 256, 16, 240)
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
+//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(blockhl_state, screen_update_blockhl)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -317,7 +317,7 @@ MACHINE_CONFIG_START(blockhl_state::blockhl)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 MACHINE_CONFIG_END

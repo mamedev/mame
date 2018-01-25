@@ -6,7 +6,7 @@
 
 **************************************************************************/
 
-#define MIDZEUS_VIDEO_CLOCK     XTAL_66_6667MHz
+#define MIDZEUS_VIDEO_CLOCK     XTAL(66'666'700)
 
 #include "machine/timekpr.h"
 #include "screen.h"

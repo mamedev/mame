@@ -77,7 +77,7 @@ void tricep_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(tricep_state::tricep)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(tricep_mem)
 
 	/* video hardware */

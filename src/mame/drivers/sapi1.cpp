@@ -616,7 +616,7 @@ DRIVER_INIT_MEMBER( sapi1_state, sapizps3b )
 /* Machine driver */
 MACHINE_CONFIG_START(sapi1_state::sapi1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz / 9) // Tesla MHB8080A + MHB8224 + MHB8228
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
 	MCFG_CPU_PROGRAM_MAP(sapi1_mem)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapi1)
 
@@ -683,15 +683,15 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(sapi1_state::sapi3a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz / 9) // Tesla MHB8080A + MHB8224 + MHB8228
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'000'000) / 9) // Tesla MHB8080A + MHB8224 + MHB8228
 	MCFG_CPU_PROGRAM_MAP(sapi3a_mem)
 	MCFG_CPU_IO_MAP(sapi3a_io)
 	MCFG_MACHINE_RESET_OVERRIDE(sapi1_state, sapizps3 )
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("uart", AY51013, 0) // Tesla MHB1012
-	MCFG_AY51013_TX_CLOCK(XTAL_12_288MHz / 80) // not actual rate?
-	MCFG_AY51013_RX_CLOCK(XTAL_12_288MHz / 80) // not actual rate?
+	MCFG_AY51013_TX_CLOCK(XTAL(12'288'000) / 80) // not actual rate?
+	MCFG_AY51013_RX_CLOCK(XTAL(12'288'000) / 80) // not actual rate?
 	MCFG_AY51013_READ_SI_CB(DEVREADLINE("v24", rs232_port_device, rxd_r))
 	MCFG_AY51013_WRITE_SO_CB(DEVWRITELINE("v24", rs232_port_device, write_txd))
 

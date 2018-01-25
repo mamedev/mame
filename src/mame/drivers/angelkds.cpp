@@ -513,12 +513,12 @@ void angelkds_state::machine_reset()
 
 MACHINE_CONFIG_START(angelkds_state::angelkds)
 
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_6MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(6'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("sub", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(sub_portmap)
 
@@ -551,14 +551,14 @@ MACHINE_CONFIG_START(angelkds_state::angelkds)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_4MHz)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(4'000'000))
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.65)
 	MCFG_SOUND_ROUTE(1, "mono", 0.65)
 	MCFG_SOUND_ROUTE(2, "mono", 0.65)
 	MCFG_SOUND_ROUTE(3, "mono", 0.45)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_4MHz)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(0, "mono", 0.65)
 	MCFG_SOUND_ROUTE(1, "mono", 0.65)
 	MCFG_SOUND_ROUTE(2, "mono", 0.65)
@@ -567,7 +567,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(angelkds_state::spcpostn, angelkds)
 	/* encryption */
-	MCFG_CPU_REPLACE("maincpu", SEGA_317_0005, XTAL_6MHz)
+	MCFG_CPU_REPLACE("maincpu", SEGA_317_0005, XTAL(6'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", angelkds_state,  irq0_line_hold)

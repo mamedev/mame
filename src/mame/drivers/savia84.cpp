@@ -173,7 +173,7 @@ READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
 
 MACHINE_CONFIG_START(savia84_state::savia84)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz / 2)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 

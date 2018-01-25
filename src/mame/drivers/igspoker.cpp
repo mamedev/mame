@@ -1954,7 +1954,7 @@ MACHINE_CONFIG_DERIVED(igspoker_state::number10, igspoker)
 	MCFG_SCREEN_UPDATE_DRIVER(igspoker_state, screen_update_cpokerpk)
 	MCFG_VIDEO_START_OVERRIDE(igspoker_state,cpokerpk)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz / 12, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000) / 12, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

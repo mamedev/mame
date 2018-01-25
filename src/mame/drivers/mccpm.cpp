@@ -76,7 +76,7 @@ void mccpm_state::machine_reset()
 
 MACHINE_CONFIG_START(mccpm_state::mccpm)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mccpm_mem)
 	MCFG_CPU_IO_MAP(mccpm_io)
 
@@ -85,7 +85,7 @@ MACHINE_CONFIG_START(mccpm_state::mccpm)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("sio", z80sio_device, txca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, rxca_w))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'000'000))
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
@@ -95,7 +95,7 @@ MACHINE_CONFIG_START(mccpm_state::mccpm)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(4'000'000))
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -406,16 +406,16 @@ void spdodgeb_state::machine_reset()
 MACHINE_CONFIG_START(spdodgeb_state::spdodgeb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/6)   /* 2MHz ? */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000)/6)   /* 2MHz ? */
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", spdodgeb_state, interrupt, "screen", 0, 1) /* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
 
-	MCFG_CPU_ADD("audiocpu", MC6809, XTAL_12MHz/2) // HD68A09P (1.5MHz internally)
+	MCFG_CPU_ADD("audiocpu", MC6809, XTAL(12'000'000)/2) // HD68A09P (1.5MHz internally)
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 0, 256, 272, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(spdodgeb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -429,7 +429,7 @@ MACHINE_CONFIG_START(spdodgeb_state::spdodgeb)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(12'000'000)/4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)

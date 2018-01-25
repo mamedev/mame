@@ -415,7 +415,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(minitel_state::minitel2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32, XTAL_14_31818MHz) //verified on pcb
+	MCFG_CPU_ADD("maincpu", I80C32, XTAL(14'318'181)) //verified on pcb
 	MCFG_CPU_PROGRAM_MAP(mem_prg)
 	MCFG_CPU_IO_MAP(mem_io)
 

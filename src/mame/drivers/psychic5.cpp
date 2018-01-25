@@ -715,7 +715,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(psychic5_state::psychic5)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(psychic5_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
@@ -726,7 +726,7 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(psychic5_sound_map)
 	MCFG_CPU_IO_MAP(psychic5_soundport_map)
 
@@ -736,7 +736,7 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,394, 0, 256, 282, 16, 240) // was 53.8 Hz before, assume same as Bombs Away
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240) // was 53.8 Hz before, assume same as Bombs Away
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_psychic5)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", psychic5)
@@ -752,14 +752,14 @@ MACHINE_CONFIG_START(psychic5_state::psychic5)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
@@ -769,7 +769,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(psychic5_state::bombsa)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2 ) /* 6 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2 ) /* 6 MHz */
 	MCFG_CPU_PROGRAM_MAP(bombsa_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", psychic5_state, scanline, "screen", 0, 1)
 
@@ -780,7 +780,7 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(14)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz )
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000) )
 	MCFG_CPU_PROGRAM_MAP(bombsa_sound_map)
 	MCFG_CPU_IO_MAP(bombsa_soundport_map)
 
@@ -790,7 +790,7 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,394, 0, 256, 282, 16, 240) /* Guru says : VSync - 54Hz . HSync - 15.25kHz */
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,394, 0, 256, 282, 16, 240) /* Guru says : VSync - 54Hz . HSync - 15.25kHz */
 	MCFG_SCREEN_UPDATE_DRIVER(psychic5_state, screen_update_bombsa)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bombsa)
@@ -804,14 +804,14 @@ MACHINE_CONFIG_START(psychic5_state::bombsa)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 	MCFG_SOUND_ROUTE(2, "mono", 0.30)
 	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.30)
 	MCFG_SOUND_ROUTE(2, "mono", 0.30)

@@ -919,11 +919,11 @@ void lwings_state::machine_reset()
 MACHINE_CONFIG_START(lwings_state::lwings)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* verified on PCB */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(lwings_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lwings_state,  lwings_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_12MHz/4) /* verified on PCB */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(12'000'000)/4) /* verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(lwings_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222) // approximation from pcb music recording - where is the frequency actually derived from??
 
@@ -951,13 +951,13 @@ MACHINE_CONFIG_START(lwings_state::lwings)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("2203a", YM2203, XTAL_12MHz/8)   /* verified on PCB */
+	MCFG_SOUND_ADD("2203a", YM2203, XTAL(12'000'000)/8)   /* verified on PCB */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("2203b", YM2203, XTAL_12MHz/8)   /* verified on PCB */
+	MCFG_SOUND_ADD("2203b", YM2203, XTAL(12'000'000)/8)   /* verified on PCB */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -975,11 +975,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(lwings_state::fball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(fball_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lwings_state,  avengers_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_12MHz/4) // ?
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(12'000'000)/4) // ?
 	MCFG_CPU_PROGRAM_MAP(fball_sound_map)
 //  MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222)
 
@@ -1007,7 +1007,7 @@ MACHINE_CONFIG_START(lwings_state::fball)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, fball_oki_map)
 
@@ -1018,13 +1018,13 @@ MACHINE_CONFIG_DERIVED(lwings_state::trojan, lwings)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_12MHz/4)            /* verified on PCB */
+	MCFG_CPU_CLOCK(XTAL(12'000'000)/4)            /* verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(trojan_map)
 
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CLOCK(XTAL_12MHz/4)            /* verified on PCB */
+	MCFG_CPU_CLOCK(XTAL(12'000'000)/4)            /* verified on PCB */
 
-	MCFG_CPU_ADD("adpcm", Z80, XTAL_12MHz/4)    /* verified on PCB */
+	MCFG_CPU_ADD("adpcm", Z80, XTAL(12'000'000)/4)    /* verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(trojan_adpcm_map)
 	MCFG_CPU_IO_MAP(trojan_adpcm_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold,  4000)
@@ -1040,7 +1040,7 @@ MACHINE_CONFIG_DERIVED(lwings_state::trojan, lwings)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("5205", MSM5205, XTAL_384kHz)    /* verified on PCB */
+	MCFG_SOUND_ADD("5205", MSM5205, XTAL(384'000))    /* verified on PCB */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* slave mode */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

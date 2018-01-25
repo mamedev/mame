@@ -1403,11 +1403,11 @@ MACHINE_RESET_MEMBER(aerofgt_state,aerofgt)
 MACHINE_CONFIG_START(aerofgt_state::pspikes)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)    /* verified on pcb */
+	MCFG_CPU_ADD("maincpu",M68000,XTAL(20'000'000)/2)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pspikes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
-	MCFG_CPU_ADD("audiocpu",Z80,XTAL_20MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu",Z80,XTAL(20'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
@@ -1433,7 +1433,7 @@ MACHINE_CONFIG_START(aerofgt_state::pspikes)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
@@ -1534,11 +1534,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::kickball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL_10MHz) // 10Mhz XTAL near 10Mhz rated CPU
+	MCFG_CPU_ADD("maincpu",M68000,XTAL(10'000'000)) // 10Mhz XTAL near 10Mhz rated CPU
 	MCFG_CPU_PROGRAM_MAP(kickball_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold) /* only IRQ1 is valid */
 
-	MCFG_CPU_ADD("audiocpu",Z80,XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu",Z80,XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(kickball_sound_map)
 	MCFG_CPU_IO_MAP(kickball_sound_portmap)
 
@@ -1574,11 +1574,11 @@ MACHINE_CONFIG_START(aerofgt_state::kickball)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) // K-666 (YM3812)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000)) // K-666 (YM3812)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_LOW) // AD-65 (M6295) clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_LOW) // AD-65 (M6295) clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1649,7 +1649,7 @@ MACHINE_CONFIG_START(aerofgt_state::karatblz)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
@@ -1670,7 +1670,7 @@ MACHINE_CONFIG_START(aerofgt_state::karatblz)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz ) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000) ) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1726,7 +1726,7 @@ MACHINE_CONFIG_START(aerofgt_state::karatblzbl)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(8'000'000)/2)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -1737,11 +1737,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(spinlbrk_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold) /* there are vectors for 3 and 4 too, analog related? */
 
-	MCFG_CPU_ADD("audiocpu",Z80,XTAL_20MHz/4)   /* 5mhz verified on pcb */
+	MCFG_CPU_ADD("audiocpu",Z80,XTAL(20'000'000)/4)   /* 5mhz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(spinlbrk_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
@@ -1762,7 +1762,7 @@ MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024) // doesn't fully initialize palette at start-up ...
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(1)
@@ -1784,7 +1784,7 @@ MACHINE_CONFIG_START(aerofgt_state::spinlbrk)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1795,11 +1795,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(turbofrc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
-	MCFG_CPU_ADD("audiocpu",Z80,XTAL_5MHz)  /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu",Z80,XTAL(5'000'000))  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(turbofrc_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
@@ -1820,7 +1820,7 @@ MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
@@ -1841,7 +1841,7 @@ MACHINE_CONFIG_START(aerofgt_state::turbofrc)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1878,7 +1878,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgtb)
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
-	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL_14_31818MHz / 2) // divider not verified
+	MCFG_DEVICE_ADD("gga", VSYSTEM_GGA, XTAL(14'318'181) / 2) // divider not verified
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
@@ -1910,11 +1910,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu",M68000,XTAL(20'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(aerofgt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* all irq vectors are the same */
 
-	MCFG_CPU_ADD("audiocpu",Z80,XTAL_20MHz/4) /* 5 MHz verified on pcb */
+	MCFG_CPU_ADD("audiocpu",Z80,XTAL(20'000'000)/4) /* 5 MHz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(aerofgt_sound_portmap)
 								/* IRQs are triggered by the YM2610 */
@@ -1962,7 +1962,7 @@ MACHINE_CONFIG_START(aerofgt_state::aerofgt)
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)

@@ -368,7 +368,7 @@ WRITE_LINE_MEMBER(hunter2_state::rxd_w)
 
 MACHINE_CONFIG_START(hunter2_state::hunter2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NSC800, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", NSC800, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(hunter2_mem)
 	MCFG_CPU_IO_MAP(hunter2_io)
 
@@ -383,7 +383,7 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(hunter2_state, hunter2)
-	MCFG_DEVICE_ADD("lcdc", HD61830, XTAL_4_9152MHz/2/2) // unknown clock
+	MCFG_DEVICE_ADD("lcdc", HD61830, XTAL(4'915'200)/2/2) // unknown clock
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	/* sound hardware */
@@ -397,7 +397,7 @@ MACHINE_CONFIG_START(hunter2_state::hunter2)
 	MCFG_MM58274C_MODE24(0) // 12 hour
 	MCFG_MM58274C_DAY1(1)   // monday
 
-	MCFG_NSC810_ADD("iotimer",XTAL_4MHz,XTAL_4MHz)
+	MCFG_NSC810_ADD("iotimer",XTAL(4'000'000),XTAL(4'000'000))
 	MCFG_NSC810_PORTA_READ(READ8(hunter2_state,keyboard_r))
 	MCFG_NSC810_PORTB_READ(READ8(hunter2_state,serial_dsr_r))
 	MCFG_NSC810_PORTB_WRITE(WRITE8(hunter2_state,keyboard_w))

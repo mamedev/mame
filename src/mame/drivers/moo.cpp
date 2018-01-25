@@ -493,11 +493,11 @@ MACHINE_RESET_MEMBER(moo_state,moo)
 MACHINE_CONFIG_START(moo_state::moo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // 16MHz verified
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // 16MHz verified
 	MCFG_CPU_PROGRAM_MAP(moo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", moo_state,  moo_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_32MHz/4) // 8MHz verified
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(32'000'000)/4) // 8MHz verified
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
@@ -505,7 +505,7 @@ MACHINE_CONFIG_START(moo_state::moo)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4) // 8MHz
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4) // 8MHz
 	MCFG_K053252_OFFSETS(40, 16)
 
 	/* video hardware */
@@ -543,11 +543,11 @@ MACHINE_CONFIG_START(moo_state::moo)
 
 	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) // 4MHz verified
+	MCFG_YM2151_ADD("ymsnd", XTAL(32'000'000)/8) // 4MHz verified
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END

@@ -380,11 +380,11 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(airraid_state::airraid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)        /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80,XTAL(12'000'000)/2)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(airraid_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airraid_state, cshooter_scanline, "airraid_vid:screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)      /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(airraid_sound_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
 
@@ -398,7 +398,7 @@ MACHINE_CONFIG_START(airraid_state::airraid)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)

@@ -4,8 +4,8 @@
 #ifndef BWIDOW_H_
 #define BWIDOW_H_
 
-#define MASTER_CLOCK (XTAL_12_096MHz)
-#define CLOCK_3KHZ   ((double)MASTER_CLOCK / 4096)
+#define MASTER_CLOCK (XTAL(12'096'000))
+#define CLOCK_3KHZ   (MASTER_CLOCK / 4096)
 
 
 class bwidow_state : public driver_device

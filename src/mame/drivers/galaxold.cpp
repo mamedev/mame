@@ -4,7 +4,7 @@
 
  Galaxian/Moon Cresta hardware
 
-NOTE:  Eventually to be merged into GALAXIAN.C
+NOTE:  Eventually to be merged into GALAXIAN.CPP
 
 Main clock: XTAL = 18.432 MHz
 Z80 Clock: XTAL/6 = 3.072 MHz
@@ -69,7 +69,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
   - IN0 bit 1 is supposed to be COIN2 (see coinage routine at 0x0288), but
     there is a test on it at 0x0082 (in NMI routine) which jumps to 0xc003
     (unmapped memory) if it pressed (HIGH).
-  - IN0 bit 7 is tested on startup (code at 0x0048) in combinaison with bits 0 and 1
+  - IN0 bit 7 is tested on startup (code at 0x0048) in combination with bits 0 and 1
     (which are supposed to be COIN1 and COIN2). If all of them are pressed (HIGH),
     the game displays a "CREDIT FAULT" message then jumps back to 0x0048.
   - IN0 bit 4 and IN1 bit 4 should have been IPT_JOYSTICK_DOWN (Upright and Cocktail)
@@ -117,7 +117,7 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
  *
  *************************************/
 
-#define MASTER_CLOCK        (XTAL_18_432MHz)
+#define MASTER_CLOCK        (XTAL(18'432'000))
 
 #define PIXEL_CLOCK         (MASTER_CLOCK/3)
 
@@ -3300,6 +3300,35 @@ ROM_START( drivfrcg )
 	ROM_LOAD( "bot.clr",      0x0020, 0x0020, CRC(0f0782af) SHA1(32c0dd09ead5c70cee2657e9cb8cb9fcf54c5a6a) )
 ROM_END
 
+ROM_START( drivfrcsg ) // This PCB has a big epoxy block by Tanaka Enterprises marked E-0010, possibly providing ROM addressing
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "6N-2-2764A.bin", 0x2800, 0x0400, CRC(85242241) SHA1(bad2609c7f6d83a15809b602a0c141793909ceb0) )
+	ROM_CONTINUE(               0x2c00, 0x0400 )
+	ROM_CONTINUE(               0x0000, 0x0400 )
+	ROM_CONTINUE(               0x0400, 0x0400 )
+	ROM_CONTINUE(               0x0800, 0x0400 )
+	ROM_CONTINUE(               0x0c00, 0x0400 )
+	ROM_CONTINUE(               0x2000, 0x0400 )
+	ROM_CONTINUE(               0x2400, 0x0400 )
+	ROM_LOAD( "6M-1-2764A.bin", 0x6800, 0x0400, CRC(42d99594) SHA1(1b03132279a3a6edd2281a2f55ef2d3133003a16) )
+	ROM_CONTINUE(               0x6c00, 0x0400 )
+	ROM_CONTINUE(               0x4000, 0x0400 )
+	ROM_CONTINUE(               0x4400, 0x0400 )
+	ROM_CONTINUE(               0x4800, 0x0400 )
+	ROM_CONTINUE(               0x4c00, 0x0400 )
+	ROM_CONTINUE(               0x6000, 0x0400 )
+	ROM_CONTINUE(               0x6400, 0x0400 )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "1J-2764A.bin", 0x0000, 0x2000, CRC(156e20bd) SHA1(8ec4020d179674856f43e543ce5e54730752568a) )
+	ROM_LOAD( "1L-2764A.bin", 0x2000, 0x2000, CRC(88d0f70b) SHA1(c91aa798f7450c0cf1a8db4225d4a4efa25555d8) )
+
+	/* piggy-backed colour proms, not dumped for this board */
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "top.clr",      0x0000, 0x0020, CRC(3110ddae) SHA1(53b2e1cc07915592f6c868131ec296c63a407f04) )
+	ROM_LOAD( "bot.clr",      0x0020, 0x0020, CRC(0f0782af) SHA1(32c0dd09ead5c70cee2657e9cb8cb9fcf54c5a6a) )
+ROM_END
+
 ROM_START( drivfrcb )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "dfp.bin",      0x2800, 0x0400, CRC(b5b2981d) SHA1(c9ff19791895bf05b569457b1e53dfa0aaeb8e95) )
@@ -3556,6 +3585,7 @@ GAME( 1983, spcwarp,   0,        spcwarp,   hunchbkg,  galaxold_state, 0,       
 GAME( 1984, drivfrcg,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, 0,         ROT90,  "Shinkai Inc. (Magic Electronics USA license)", "Driving Force (Galaxian conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, drivfrct,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, 0,         ROT90,  "bootleg (EMT Germany)", "Top Racer (bootleg of Driving Force)", MACHINE_SUPPORTS_SAVE ) // Video Klein PCB
 GAME( 1985, drivfrcb,  drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, 0,         ROT90,  "bootleg (Elsys Software)", "Driving Force (Galaxian conversion bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, drivfrcsg, drivfrcp, drivfrcg,  drivfrcg,  galaxold_state, 0,         ROT90,  "Seatongrove UK", "Driving Force (Galaxian conversion, Seatongrove UK)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, racknrol,  0,        racknrol,  racknrol,  galaxold_state, 0,         ROT0,   "Senko Industries (Status license from Shinkai Inc.)", "Rack + Roll", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, hexpool,   racknrol, racknrol,  racknrol,  galaxold_state, 0,         ROT90,  "Senko Industries (Shinkai Inc. license)", "Hex Pool (Shinkai)", MACHINE_SUPPORTS_SAVE ) // still has Senko logo in gfx rom
 GAME( 1985, hexpoola,  racknrol, hexpoola,  racknrol,  galaxold_state, 0,         ROT90,  "Senko Industries", "Hex Pool (Senko)", MACHINE_SUPPORTS_SAVE )

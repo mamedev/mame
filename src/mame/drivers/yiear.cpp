@@ -281,7 +281,7 @@ void yiear_state::machine_reset()
 MACHINE_CONFIG_START(yiear_state::yiear)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_18_432MHz/12)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(18'432'000)/12)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", yiear_state,  yiear_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(yiear_state, yiear_nmi_interrupt, 480) /* music tempo (correct frequency unknown) */
@@ -306,10 +306,10 @@ MACHINE_CONFIG_START(yiear_state::yiear)
 
 	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/12)   /* verified on pcb */
+	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL(18'432'000)/12)   /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz)   /* verified on pcb */
+	MCFG_SOUND_ADD("vlm", VLM5030, XTAL(3'579'545))   /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

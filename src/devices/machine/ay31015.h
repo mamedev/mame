@@ -55,7 +55,9 @@ public:
 	ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_tx_clock(device_t &device, double tx_clock) { downcast<ay31015_device &>(device).m_tx_clock = tx_clock; }
+	static void set_tx_clock(device_t &device, const XTAL &xtal) { set_tx_clock(device, xtal.dvalue()); }
 	static void set_rx_clock(device_t &device, double rx_clock) { downcast<ay31015_device &>(device).m_rx_clock = rx_clock; }
+	static void set_rx_clock(device_t &device, const XTAL &xtal) { set_rx_clock(device, xtal.dvalue()); }
 	template <class Object> static devcb_base &set_read_si_callback(device_t &device, Object &&cb) { return downcast<ay31015_device &>(device).m_read_si_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_so_callback(device_t &device, Object &&cb) { return downcast<ay31015_device &>(device).m_write_so_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_status_changed_callback(device_t &device, Object &&cb) { return downcast<ay31015_device &>(device).m_status_changed_cb.set_callback(std::forward<Object>(cb)); }

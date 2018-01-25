@@ -1440,7 +1440,7 @@ MACHINE_CONFIG_START(nc_state::nc100)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(nc_state, write_uart_clock))
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(nc_state, nc100_tc8521_alarm_callback))
 
 	/* cartridge */
@@ -1501,7 +1501,7 @@ MACHINE_CONFIG_DERIVED(nc_state::nc200, nc100)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 
-	MCFG_MC146818_ADD( "mc", XTAL_4_194304Mhz )
+	MCFG_MC146818_ADD( "mc", XTAL(4'194'304) )
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

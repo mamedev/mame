@@ -228,8 +228,8 @@ seem to have access to.
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_20MHz
-#define SOUND_CLOCK     XTAL_8MHz
+#define MASTER_CLOCK    XTAL(20'000'000)
+#define SOUND_CLOCK     XTAL(8'000'000)
 
 
 /*************************************

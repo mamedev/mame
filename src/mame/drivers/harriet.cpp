@@ -197,7 +197,7 @@ void harriet_state::machine_reset()
 MACHINE_CONFIG_START(harriet_state::harriet)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68010,XTAL_8MHz) // TODO: clock
+	MCFG_CPU_ADD("maincpu",M68010,XTAL(8'000'000)) // TODO: clock
 	MCFG_CPU_PROGRAM_MAP(harriet_map)
 
 	/* video hardware */

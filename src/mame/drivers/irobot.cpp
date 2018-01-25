@@ -86,8 +86,8 @@
 #include "machine/nvram.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK      XTAL_12_096MHz
-#define VIDEO_CLOCK     XTAL_20MHz
+#define MAIN_CLOCK      XTAL(12'096'000)
+#define VIDEO_CLOCK     XTAL(20'000'000)
 
 /*************************************
  *

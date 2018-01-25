@@ -1674,7 +1674,7 @@ DRIVER_INIT_MEMBER(namcos12_state,technodr)
 MACHINE_CONFIG_START(namcos12_state::coh700)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CXD8661R, XTAL_100MHz)
+	MCFG_CPU_ADD("maincpu", CXD8661R, XTAL(100'000'000))
 	MCFG_CPU_PROGRAM_MAP( namcos12_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -1688,7 +1688,7 @@ MACHINE_CONFIG_START(namcos12_state::coh700)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
 	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("sub:sci1", h8_sci_device, rx_w))
 
 	MCFG_DEVICE_MODIFY("sub:sci1")
@@ -1699,7 +1699,7 @@ MACHINE_CONFIG_START(namcos12_state::coh700)
 	MCFG_AT28C16_ADD("at28c16", nullptr)
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
 	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&namcos12_state::namcos12_sub_irq, this ) )
 
 	/* sound hardware */
@@ -1733,7 +1733,7 @@ MACHINE_CONFIG_DERIVED(namcos12_boothack_state::golgo13, coh700)
 	MCFG_CPU_IO_MAP(golgo13_h8iomap)
 MACHINE_CONFIG_END
 
-#define JVSCLOCK    (XTAL_14_7456MHz)
+#define JVSCLOCK    (XTAL(14'745'600))
 static ADDRESS_MAP_START( jvsmap, AS_PROGRAM, 16, namcos12_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("iocpu", 0)
 	AM_RANGE(0xc000, 0xffff) AM_RAM

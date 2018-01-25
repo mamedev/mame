@@ -338,7 +338,7 @@ void beta_state::machine_start()
 
 MACHINE_CONFIG_START(beta_state::beta)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_4MHz/4)
+	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL(4'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(beta_mem)
 
 	/* video hardware */
@@ -350,7 +350,7 @@ MACHINE_CONFIG_START(beta_state::beta)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
-	MCFG_DEVICE_ADD(M6532_TAG, MOS6532_NEW, XTAL_4MHz/4)
+	MCFG_DEVICE_ADD(M6532_TAG, MOS6532_NEW, XTAL(4'000'000)/4)
 	MCFG_MOS6530n_IN_PA_CB(READ8(beta_state, riot_pa_r))
 	MCFG_MOS6530n_OUT_PA_CB(WRITE8(beta_state, riot_pa_w))
 	MCFG_MOS6530n_IN_PB_CB(READ8(beta_state, riot_pb_r))

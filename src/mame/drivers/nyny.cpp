@@ -83,12 +83,12 @@
 #include "speaker.h"
 
 
-#define MAIN_CPU_MASTER_CLOCK       XTAL_11_2MHz
+#define MAIN_CPU_MASTER_CLOCK       XTAL(11'200'000)
 #define PIXEL_CLOCK                 (MAIN_CPU_MASTER_CLOCK / 2)
 #define CRTC_CLOCK                  (MAIN_CPU_MASTER_CLOCK / 16)
-#define AUDIO_1_MASTER_CLOCK        XTAL_4MHz
+#define AUDIO_1_MASTER_CLOCK        XTAL(4'000'000)
 #define AUDIO_CPU_1_CLOCK           AUDIO_1_MASTER_CLOCK
-#define AUDIO_2_MASTER_CLOCK        XTAL_4MHz
+#define AUDIO_2_MASTER_CLOCK        XTAL(4'000'000)
 #define AUDIO_CPU_2_CLOCK           AUDIO_2_MASTER_CLOCK
 
 

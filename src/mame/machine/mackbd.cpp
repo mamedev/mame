@@ -75,18 +75,6 @@ ROM_START( mackbd )
 	ROM_LOAD( "341-0332-a.bin", 0x000400, 0x000400, CRC(6554f5b6) SHA1(a80404a122d74721cda13b285c412057c2c78bd7) )
 ROM_END
 
-//-------------------------------------------------
-//  ADDRESS_MAP
-//-------------------------------------------------
-
-static ADDRESS_MAP_START( mackbd_map, AS_PROGRAM, 8, mackbd_device )
-	AM_RANGE(0x0000, 0x03ff) AM_ROM AM_REGION(MACKBD_CPU_TAG, 0)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mackbd_io_map, AS_IO, 8, mackbd_device )
-	AM_RANGE(0x2f, 0x36) AM_WRITE(p0_w)
-ADDRESS_MAP_END
-
 
 static INPUT_PORTS_START( mackbd )
 	PORT_START("COL0")
@@ -174,9 +162,8 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(mackbd_device::device_add_mconfig)
 	MCFG_CPU_ADD(MACKBD_CPU_TAG, I8021, 3000000)    // "the approximate clock rate of the MPU is 3 MHz"
-	MCFG_CPU_PROGRAM_MAP(mackbd_map)
-	MCFG_CPU_IO_MAP(mackbd_io_map)
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(mackbd_device, p0_r))
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(mackbd_device, p0_w))
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(mackbd_device, p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(mackbd_device, p1_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(mackbd_device, p2_r))

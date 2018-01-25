@@ -336,7 +336,7 @@ MC6845_ON_UPDATE_ADDR_CHANGED(i7000_state::crtc_addr)
 MACHINE_CONFIG_START(i7000_state::i7000)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NSC800, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", NSC800, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(i7000_mem)
 	MCFG_CPU_IO_MAP(i7000_io)
 
@@ -353,7 +353,7 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(i7000_state, i7000)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_20MHz) /* (?) */
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(20'000'000)) /* (?) */
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_ADDR_CHANGED_CB(i7000_state, crtc_addr)
@@ -365,11 +365,11 @@ MACHINE_CONFIG_START(i7000_state::i7000)
 
 	/* Programmable timer */
 	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-//  MCFG_PIT8253_CLK0(XTAL_4MHz / 2) /* TODO: verify on PCB */
+//  MCFG_PIT8253_CLK0(XTAL(4'000'000) / 2) /* TODO: verify on PCB */
 //  MCFG_PIT8253_OUT0_HANDLER(WRITELINE(i7000_state,i7000_pit_out0))
-//  MCFG_PIT8253_CLK1(XTAL_4MHz / 2) /* TODO: verify on PCB */
+//  MCFG_PIT8253_CLK1(XTAL(4'000'000) / 2) /* TODO: verify on PCB */
 //  MCFG_PIT8253_OUT1_HANDLER(WRITELINE(i7000_state,i7000_pit_out1))
-	MCFG_PIT8253_CLK2(XTAL_4MHz / 2) /* TODO: verify on PCB */
+	MCFG_PIT8253_CLK2(XTAL(4'000'000) / 2) /* TODO: verify on PCB */
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
 	/* Keyboard interface */

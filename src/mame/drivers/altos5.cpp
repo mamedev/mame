@@ -347,18 +347,18 @@ DRIVER_INIT_MEMBER( altos5_state, altos5 )
 
 MACHINE_CONFIG_START(altos5_state::altos5)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_8MHz / 4) // 2MHz
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(8'000'000) / 4) // 2MHz
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc" ,z80ctc_device, trg0))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc" ,z80ctc_device, trg1))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc" ,z80ctc_device, trg2))
 
 	/* devices */
-	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_8MHz / 2)
+	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(8'000'000) / 2)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(altos5_state, busreq_w))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	// BAO, not used
@@ -367,22 +367,22 @@ MACHINE_CONFIG_START(altos5_state::altos5)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(altos5_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(altos5_state, io_write_byte))
 
-	MCFG_DEVICE_ADD("pio0", Z80PIO, XTAL_8MHz / 2)
+	MCFG_DEVICE_ADD("pio0", Z80PIO, XTAL(8'000'000) / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(altos5_state, port08_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(altos5_state, port08_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(altos5_state, port09_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(altos5_state, port09_w))
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL_8MHz / 2)
+	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(8'000'000) / 2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL_8MHz / 2)
+	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(8'000'000) / 2)
 	// Channel A - console #3
 	// Channel B - printer
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_8MHz / 2)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(8'000'000) / 2)
 	// Channel A - console #2
 	// WRDY connects to (altos5_state, fdc_intrq_w)
 	// Channel B - console #1
@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(altos5_state::altos5)
 	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_8MHz / 2)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(8'000'000) / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))    // SIO Ch B
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("dart", z80dart_device, txca_w))       // Z80DART Ch A, SIO Ch A
@@ -405,7 +405,7 @@ MACHINE_CONFIG_START(altos5_state::altos5)
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("sio", z80sio_device, dcdb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w))
 
-	MCFG_FD1797_ADD("fdc", XTAL_8MHz / 8)
+	MCFG_FD1797_ADD("fdc", XTAL(8'000'000) / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(altos5_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats)

@@ -40,7 +40,7 @@
 ***************************************************************************/
 
 
-#define MAIN_CLOCK          XTAL_28_63636MHz
+#define MAIN_CLOCK          XTAL(28'636'363)
 #define CPU_CLOCK           MAIN_CLOCK / 6
 #define SND_CLOCK           MAIN_CLOCK / 12
 

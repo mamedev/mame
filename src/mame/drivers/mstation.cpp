@@ -439,7 +439,7 @@ PALETTE_INIT_MEMBER(mstation_state, mstation)
 
 MACHINE_CONFIG_START(mstation_state::mstation)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)      //unknown clock
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))      //unknown clock
 	MCFG_CPU_PROGRAM_MAP(mstation_mem)
 	MCFG_CPU_IO_MAP(mstation_io)
 
@@ -465,7 +465,7 @@ MACHINE_CONFIG_START(mstation_state::mstation)
 	// IRQ 1 is used for scan the kb and for cursor blinking
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", mstation_state, mstation_kb_timer, attotime::from_hz(50))
 
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(mstation_state, rtc_irq))
 
 	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)

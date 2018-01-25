@@ -26,6 +26,32 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
+	DECLARE_WRITE8_MEMBER(questions_bank_w);
+	DECLARE_WRITE8_MEMBER(trackfld_videoram_w);
+	DECLARE_WRITE8_MEMBER(trackfld_colorram_w);
+	DECLARE_WRITE8_MEMBER(atlantol_gfxbank_w);
+	DECLARE_READ8_MEMBER(trackfld_SN76496_r);
+	DECLARE_READ8_MEMBER(trackfld_speech_r);
+	DECLARE_WRITE8_MEMBER(trackfld_VLM5030_control_w);
+	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
+	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(space, offset, m_SN76496_latch); };
+
+	void reaktor(machine_config &config);
+	void atlantol(machine_config &config);
+	void yieartf(machine_config &config);
+	void wizzquiz(machine_config &config);
+	void trackfld(machine_config &config);
+	void trackfldu(machine_config &config);
+	void hyprolyb(machine_config &config);
+	void mastkin(machine_config &config);
+
+	DECLARE_DRIVER_INIT(trackfld);
+	DECLARE_DRIVER_INIT(atlantol);
+	DECLARE_DRIVER_INIT(wizzquiz);
+	DECLARE_DRIVER_INIT(mastkin);
+	DECLARE_DRIVER_INIT(trackfldnz);
+
+private:
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram2;
 	required_shared_ptr<uint8_t> m_scroll;
@@ -52,28 +78,14 @@ public:
 	bool     m_irq_mask;
 	bool     m_nmi_mask;
 
+	uint8_t m_SN76496_latch;
+
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_1_w);
 	DECLARE_WRITE_LINE_MEMBER(coin_counter_2_w);
-	DECLARE_WRITE8_MEMBER(questions_bank_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_mask_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_mask_w);
-	DECLARE_WRITE8_MEMBER(trackfld_videoram_w);
-	DECLARE_WRITE8_MEMBER(trackfld_colorram_w);
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE8_MEMBER(atlantol_gfxbank_w);
-	DECLARE_READ8_MEMBER(trackfld_SN76496_r);
-	DECLARE_READ8_MEMBER(trackfld_speech_r);
-	DECLARE_WRITE8_MEMBER(trackfld_VLM5030_control_w);
 
-	DECLARE_DRIVER_INIT(trackfld);
-	DECLARE_DRIVER_INIT(atlantol);
-	DECLARE_DRIVER_INIT(wizzquiz);
-	DECLARE_DRIVER_INIT(mastkin);
-	DECLARE_DRIVER_INIT(trackfldnz);
-
-	uint8_t m_SN76496_latch;
-	DECLARE_WRITE8_MEMBER( konami_SN76496_latch_w ) { m_SN76496_latch = data; };
-	DECLARE_WRITE8_MEMBER( konami_SN76496_w ) { m_sn->write(space, offset, m_SN76496_latch); };
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_MACHINE_START(trackfld);
 	DECLARE_MACHINE_RESET(trackfld);
@@ -85,11 +97,4 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 	INTERRUPT_GEN_MEMBER(yieartf_timer_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void reaktor(machine_config &config);
-	void atlantol(machine_config &config);
-	void yieartf(machine_config &config);
-	void wizzquiz(machine_config &config);
-	void trackfld(machine_config &config);
-	void hyprolyb(machine_config &config);
-	void mastkin(machine_config &config);
 };

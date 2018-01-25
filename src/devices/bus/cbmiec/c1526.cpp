@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c1526_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL_4MHz/4)
+	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL(4'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(c1526_mem)
 MACHINE_CONFIG_END
 
@@ -98,7 +98,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(c4023_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL_4MHz/4)
+	MCFG_CPU_ADD(M6504_TAG, M6504, XTAL(4'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(c1526_mem)
 MACHINE_CONFIG_END
 

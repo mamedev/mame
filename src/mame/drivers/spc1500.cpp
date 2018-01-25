@@ -239,7 +239,7 @@ TODO:
 
 #include "formats/spc1000_cas.h"
 
-#define VDP_CLOCK  XTAL_42_9545MHz
+#define VDP_CLOCK  XTAL(42'954'545)
 
 class spc1500_state : public driver_device
 {
@@ -870,7 +870,7 @@ READ8_MEMBER( spc1500_state::porta_r )
 
 MACHINE_CONFIG_START(spc1500_state::spc1500)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(spc1500_mem)
 	//MCFG_CPU_IO_MAP(spc1500_io)
 	MCFG_CPU_IO_MAP(spc1500_double_io)
@@ -903,7 +903,7 @@ MACHINE_CONFIG_START(spc1500_state::spc1500)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 2)
+	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(4'000'000) / 2)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(spc1500_state, psga_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(spc1500_state, psgb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

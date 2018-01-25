@@ -57,11 +57,11 @@ void s11c_bg_device::data_w(uint8_t data)
 }
 
 MACHINE_CONFIG_START(s11c_bg_device::device_add_mconfig)
-	MCFG_CPU_ADD("bgcpu", MC6809E, XTAL_8MHz / 4) // MC68B09E
+	MCFG_CPU_ADD("bgcpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
 	MCFG_CPU_PROGRAM_MAP(s11c_bg_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
-	MCFG_YM2151_ADD("ym2151", XTAL_3_579545MHz) // "3.58 MHz" on schematics and parts list
+	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545)) // "3.58 MHz" on schematics and parts list
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(s11c_bg_device, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.25)
 

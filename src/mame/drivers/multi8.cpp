@@ -562,7 +562,7 @@ void multi8_state::machine_reset()
 
 MACHINE_CONFIG_START(multi8_state::multi8)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(multi8_mem)
 	MCFG_CPU_IO_MAP(multi8_io)
 
@@ -588,7 +588,7 @@ MACHINE_CONFIG_START(multi8_state::multi8)
 	/* devices */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", multi8_state, keyboard_callback, attotime::from_hz(240/32))
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_3_579545MHz/2)    /* unknown clock, hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(3'579'545)/2)    /* unknown clock, hand tuned to get ~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(multi8_state, crtc_update_row)

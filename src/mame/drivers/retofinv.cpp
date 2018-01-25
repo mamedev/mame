@@ -412,19 +412,19 @@ INTERRUPT_GEN_MEMBER(retofinv_state::sub_vblank_irq)
 MACHINE_CONFIG_START(retofinv_state::retofinv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)    /* XTAL and divider verified, 3.072 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", retofinv_state,  main_vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)    /* XTAL and divider verified, 3.072 MHz */
+	MCFG_CPU_ADD("sub", Z80, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", retofinv_state,  sub_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)   /* XTAL and divider verified, 3.072 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6)   /* XTAL and divider verified, 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(retofinv_state, nmi_line_pulse, 2*60) // wrong, should be ~128-132 per frame, not 120.
 
-	MCFG_CPU_ADD("68705", TAITO68705_MCU, XTAL_18_432MHz/6)    /* XTAL and divider verified, 3.072 MHz */
+	MCFG_CPU_ADD("68705", TAITO68705_MCU, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -457,10 +457,10 @@ MACHINE_CONFIG_START(retofinv_state::retofinv)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_18_432MHz/6)   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(18'432'000)/6)   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, XTAL_18_432MHz/6)   /* @IC6?; XTAL, chip type, and divider verified, 3.072 MHz */
+	MCFG_SOUND_ADD("sn2", SN76489A, XTAL(18'432'000)/6)   /* @IC6?; XTAL, chip type, and divider verified, 3.072 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

@@ -53,7 +53,7 @@ public:
 	void tonton(machine_config &config);
 };
 
-#define MAIN_CLOCK      XTAL_21_4772MHz
+#define MAIN_CLOCK      XTAL(21'477'272)
 #define CPU_CLOCK       MAIN_CLOCK/6
 #define YM2149_CLOCK    MAIN_CLOCK/6/2  // '/SEL' pin tied to GND, so internal divisor x2 is active
 

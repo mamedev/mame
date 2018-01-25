@@ -84,8 +84,8 @@
 #include "speaker.h"
 
 // TBD, assume same as Seibu SPI
-#define MAIN_CLOCK   (XTAL_50MHz/2)
-#define PIXEL_CLOCK  (XTAL_28_63636MHz/4)
+#define MAIN_CLOCK   (XTAL(50'000'000)/2)
+#define PIXEL_CLOCK  (XTAL(28'636'363)/4)
 
 #define SPI_HTOTAL   (448)
 #define SPI_HBEND    (0)
@@ -301,7 +301,7 @@ MACHINE_CONFIG_START(seibucats_state::seibucats)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	//MCFG_JRC6355E_ADD("rtc", XTAL_32_768kHz)
+	//MCFG_JRC6355E_ADD("rtc", XTAL(32'768))
 
 	MCFG_DEVICE_ADD("usart1", I8251, 0)
 	MCFG_DEVICE_ADD("usart2", I8251, 0)
@@ -321,7 +321,7 @@ MACHINE_CONFIG_START(seibucats_state::seibucats)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_384MHz)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'384'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

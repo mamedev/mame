@@ -105,7 +105,7 @@ static const z80_daisy_config daisy_chain[] =
 
 MACHINE_CONFIG_START(dsb46_state::dsb46)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 6)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000) / 6)
 	MCFG_CPU_PROGRAM_MAP(dsb46_mem)
 	MCFG_CPU_IO_MAP(dsb46_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
@@ -113,12 +113,12 @@ MACHINE_CONFIG_START(dsb46_state::dsb46)
 	MCFG_MACHINE_RESET_OVERRIDE(dsb46_state, dsb46)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(1'843'200))
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc1", z80ctc_device, trg0))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc1", z80ctc_device, trg2))
 
 	/* Devices */
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_24MHz / 6)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(24'000'000) / 6)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
@@ -128,7 +128,7 @@ MACHINE_CONFIG_START(dsb46_state::dsb46)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio", z80sio_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsa_w))
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_24MHz / 6)
+	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(24'000'000) / 6)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))

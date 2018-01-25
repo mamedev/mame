@@ -115,7 +115,7 @@
 #include "turbotag.lh"
 
 
-#define MASTER_CLOCK        XTAL_20MHz
+#define MASTER_CLOCK        XTAL(20'000'000)
 
 
 

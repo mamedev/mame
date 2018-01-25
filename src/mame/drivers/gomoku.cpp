@@ -123,7 +123,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(gomoku_state::gomoku)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/12)      /* 1.536 MHz ? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/12)      /* 1.536 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(gomoku_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gomoku_state,  irq0_line_hold)
 

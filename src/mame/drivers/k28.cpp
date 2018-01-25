@@ -93,6 +93,7 @@ public:
 	void power_off();
 
 	void k28(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -359,11 +360,6 @@ WRITE_LINE_MEMBER(k28_state::mcu_prog_w)
 }
 
 
-static ADDRESS_MAP_START( k28_mcu_map, AS_IO, 8, k28_state )
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_WRITE(mcu_p0_w)
-ADDRESS_MAP_END
-
-
 
 /***************************************************************************
 
@@ -454,15 +450,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(k28_state::k28)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8021, XTAL_3_579545MHz)
-	MCFG_CPU_IO_MAP(k28_mcu_map)
+	MCFG_CPU_ADD("maincpu", I8021, 3.579545_MHz_XTAL)
+	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(k28_state, mcu_p0_w))
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(k28_state, mcu_p1_r))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(k28_state, mcu_p2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(k28_state, mcu_p2_w))
 	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(k28_state, mcu_prog_w))
 	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("speech", votrax_sc01_device, request)) // SC-01 A/R pin
 
-	MCFG_DEVICE_ADD("tms6100", TMS6100, XTAL_3_579545MHz) // CLK tied to 8021 ALE pin
+	MCFG_DEVICE_ADD("tms6100", TMS6100, 3.579545_MHz_XTAL) // CLK tied to 8021 ALE pin
 
 	MCFG_TIMER_ADD_NONE("on_button")
 

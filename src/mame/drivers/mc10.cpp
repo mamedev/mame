@@ -503,14 +503,14 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mc10_state::mc10)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)  /* 0,894886 MHz */
+	MCFG_CPU_ADD("maincpu", M6803, XTAL(3'579'545))  /* 0,894886 MHz */
 	MCFG_CPU_PROGRAM_MAP(mc10_mem)
 	MCFG_CPU_IO_MAP(mc10_io)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL(3'579'545))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(mc10_state, mc6847_videoram_r))
 
 	/* sound hardware */
@@ -539,7 +539,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(mc10_state::alice32)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("maincpu", M6803, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(alice32_mem)
 	MCFG_CPU_IO_MAP(mc10_io)
 

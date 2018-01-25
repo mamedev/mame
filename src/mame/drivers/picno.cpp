@@ -62,7 +62,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(picno_state::picno)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",  H83002, XTAL_20MHz) /* TODO: correct CPU type (H8/532), crystal is a guess, divided by 2 in the cpu */
+	MCFG_CPU_ADD("maincpu",  H83002, XTAL(20'000'000)) /* TODO: correct CPU type (H8/532), crystal is a guess, divided by 2 in the cpu */
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 

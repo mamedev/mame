@@ -333,7 +333,7 @@ INTERRUPT_GEN_MEMBER(zaccaria_state::vblank_irq)
 MACHINE_CONFIG_START(zaccaria_state::zaccaria)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80,XTAL(18'432'000)/6)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", zaccaria_state,  vblank_irq)
 //  MCFG_QUANTUM_TIME(attotime::from_hz(1000000))

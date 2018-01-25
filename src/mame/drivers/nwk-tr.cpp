@@ -817,17 +817,17 @@ void nwktr_state::machine_reset()
 MACHINE_CONFIG_START(nwktr_state::nwktr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
+	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(nwktr_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL_64MHz/4)    /* 16MHz */
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
+	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(sharc0_map)
 
-	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL_36MHz)
+	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(sharc1_map)
 
@@ -882,10 +882,10 @@ MACHINE_CONFIG_START(nwktr_state::nwktr)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K056800_ADD("k056800", XTAL_16_9344MHz)
+	MCFG_K056800_ADD("k056800", XTAL(16'934'400))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL_16_9344MHz)  // as per Guru readme above
+	MCFG_RF5C400_ADD("rfsnd", XTAL(16'934'400))  // as per Guru readme above
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

@@ -900,7 +900,7 @@ INTERRUPT_GEN_MEMBER(rabbit_state::vblank_interrupt)
 }
 
 MACHINE_CONFIG_START(rabbit_state::rabbit)
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_24MHz)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(24'000'000))
 	MCFG_CPU_PROGRAM_MAP(rabbit_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rabbit_state,  vblank_interrupt)
 
@@ -924,7 +924,7 @@ MACHINE_CONFIG_START(rabbit_state::rabbit)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_I5000_SND_ADD("i5000snd", XTAL_40MHz)
+	MCFG_I5000_SND_ADD("i5000snd", XTAL(40'000'000))
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END

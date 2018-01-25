@@ -357,7 +357,7 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 
 MACHINE_CONFIG_START(alesis_state::hr16)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8031, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu",I8031, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(hr16_mem)
 	MCFG_CPU_IO_MAP(hr16_io)
 
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	MCFG_HD44780_LCD_SIZE(2, 16)
 
 	/* sound hardware */
-	MCFG_ALESIS_DM3AG_ADD("dm3ag", XTAL_12MHz/2)
+	MCFG_ALESIS_DM3AG_ADD("dm3ag", XTAL(12'000'000)/2)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END

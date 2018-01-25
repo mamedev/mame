@@ -112,7 +112,7 @@ void konin_state::machine_start()
 
 MACHINE_CONFIG_START(konin_state::konin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(konin_mem)
 	MCFG_CPU_IO_MAP(konin_io)
 	MCFG_I8085A_INTE(DEVWRITELINE("picu", i8214_device, inte_w))
@@ -123,7 +123,7 @@ MACHINE_CONFIG_START(konin_state::konin)
 	MCFG_I8212_DI_CALLBACK(DEVREAD8("picu", i8214_device, vector_r))
 	MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE))
 
-	MCFG_DEVICE_ADD("picu", I8214, XTAL_4MHz)
+	MCFG_DEVICE_ADD("picu", I8214, XTAL(4'000'000))
 	MCFG_I8214_INT_CALLBACK(DEVWRITELINE("intlatch", i8212_device, stb_w))
 
 	MCFG_DEVICE_ADD("mainpit", PIT8253, 0)

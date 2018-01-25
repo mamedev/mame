@@ -201,7 +201,7 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dmdcpu", Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("dmdcpu", Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(decodmd1_map)
 	MCFG_CPU_IO_MAP(decodmd1_io_map)
 

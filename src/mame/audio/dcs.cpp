@@ -2452,7 +2452,7 @@ int dcs_audio_device::preprocess_write(uint16_t data)
 /* Basic DCS system with ADSP-2105 and 2k of SRAM (T-unit, V-unit, Killer Instinct) */
 
 MACHINE_CONFIG_START(dcs_audio_device::add_mconfig_dcs )
-	MCFG_CPU_ADD("dcs", ADSP2105, XTAL_10MHz)
+	MCFG_CPU_ADD("dcs", ADSP2105, XTAL(10'000'000))
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
 	MCFG_CPU_PROGRAM_MAP(dcs_2k_program_map)
@@ -2555,7 +2555,7 @@ dcs2_audio_device::dcs2_audio_device(const machine_config &mconfig, device_type 
 }
 
 MACHINE_CONFIG_START(dcs2_audio_device::add_mconfig_dcs2 )
-	MCFG_CPU_ADD("dcs2", ADSP2115, XTAL_16MHz)
+	MCFG_CPU_ADD("dcs2", ADSP2115, XTAL(16'000'000))
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
 	MCFG_CPU_PROGRAM_MAP(dcs2_2115_program_map)
@@ -2608,7 +2608,7 @@ MACHINE_CONFIG_START(dcs2_audio_2104_device::device_add_mconfig)
 
 	dcs2_audio_device::add_mconfig_dcs2(config);
 
-	MCFG_CPU_REPLACE("dcs2", ADSP2104, XTAL_16MHz)
+	MCFG_CPU_REPLACE("dcs2", ADSP2104, XTAL(16'000'000))
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device,timer_enable_callback))   /* callback for timer fired */
 	MCFG_CPU_PROGRAM_MAP(dcs2_2104_program_map)
@@ -2627,7 +2627,7 @@ dcs2_audio_dsio_device::dcs2_audio_dsio_device(const machine_config &mconfig, co
 }
 
 MACHINE_CONFIG_START(dcs2_audio_dsio_device::device_add_mconfig)
-	MCFG_CPU_ADD("dsio", ADSP2181, XTAL_32MHz)
+	MCFG_CPU_ADD("dsio", ADSP2181, XTAL(32'000'000))
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
 	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(dcs_audio_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction
@@ -2668,7 +2668,7 @@ dcs2_audio_denver_device::dcs2_audio_denver_device(const machine_config &mconfig
 }
 
 MACHINE_CONFIG_START(dcs2_audio_denver_device::device_add_mconfig)
-	MCFG_CPU_ADD("denver", ADSP2181, XTAL_33_333MHz)
+	MCFG_CPU_ADD("denver", ADSP2181, XTAL(33'333'000))
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(dcs_audio_device, sound_tx_callback))      /* callback for serial transmit */
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(dcs_audio_device, timer_enable_callback))   /* callback for timer fired */
 	MCFG_ADSP21XX_DMOVLAY_CB(WRITE32(dcs_audio_device, dmovlay_callback)) // callback for adsp 2181 dmovlay instruction

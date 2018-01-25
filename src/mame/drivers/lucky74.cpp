@@ -773,7 +773,7 @@
 #include "lucky74.lh"
 
 
-#define MASTER_CLOCK        XTAL_12MHz      /* confirmed */
+#define MASTER_CLOCK        XTAL(12'000'000)      /* confirmed */
 
 /* custom 06B49P clocks */
 #define C_06B49P_CLKOUT_01  (MASTER_CLOCK/2)        /* 6 MHz. */

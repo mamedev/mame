@@ -320,14 +320,14 @@ PALETTE_INIT_MEMBER(zx_state, zx)
 
 MACHINE_CONFIG_START(zx_state::zx80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_6_5MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(6'500'000)/2)
 	MCFG_CPU_PROGRAM_MAP(zx80_map)
 	MCFG_CPU_IO_MAP(zx80_io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(ula_map)
 	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE16(zx_state, refresh_w))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(XTAL_6_5MHz/2/64159.0) // 54223 for NTSC
+	MCFG_SCREEN_REFRESH_RATE(XTAL(6'500'000)/2/64159.0) // 54223 for NTSC
 
 	/* video hardware */
 	MCFG_SCREEN_UPDATE_DRIVER(zx_state, screen_update)

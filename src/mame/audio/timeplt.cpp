@@ -20,7 +20,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK         XTAL_14_31818MHz
+#define MASTER_CLOCK         XTAL(14'318'181)
 
 
 DEFINE_DEVICE_TYPE(TIMEPLT_AUDIO, timeplt_audio_device, "timplt_audio", "Time Pilot Audio")

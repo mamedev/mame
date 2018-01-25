@@ -631,7 +631,7 @@ WRITE_LINE_MEMBER(vpoker_state::ptm_irq)
 MACHINE_CONFIG_START(vpoker_state::vpoker)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809,XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",M6809,XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vpoker_state, irq0_line_hold) //irq0 valid too
 
@@ -650,7 +650,7 @@ MACHINE_CONFIG_START(vpoker_state::vpoker)
 	MCFG_PALETTE_ADD_3BIT_GBR("palette")
 
 	/* 6840 PTM */
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, XTAL_4MHz)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, XTAL(4'000'000))
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(vpoker_state, ptm_irq))
 

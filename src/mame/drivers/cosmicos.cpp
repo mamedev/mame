@@ -501,7 +501,7 @@ QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 
 MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL_1_75MHz)
+	MCFG_CPU_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
 	MCFG_CPU_PROGRAM_MAP(cosmicos_mem)
 	MCFG_CPU_IO_MAP(cosmicos_io)
 	MCFG_COSMAC_WAIT_CALLBACK(READLINE(cosmicos_state, wait_r))
@@ -520,7 +520,7 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("digit", cosmicos_state, digit_tick, attotime::from_hz(100))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("interrupt", cosmicos_state, int_tick, attotime::from_hz(1000))
 
-	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL_1_75MHz)
+	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL(1'750'000))
 	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
 
 	/* sound hardware */
@@ -529,7 +529,7 @@ MACHINE_CONFIG_START(cosmicos_state::cosmicos)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL_1_75MHz, GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), WRITELINE(cosmicos_state, dmaout_w), WRITELINE(cosmicos_state, efx_w), NOOP, VCC, VCC, VCC)
+	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL(1'750'000), GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), WRITELINE(cosmicos_state, dmaout_w), WRITELINE(cosmicos_state, efx_w), NOOP, VCC, VCC, VCC)
 	MCFG_CDP1864_CHROMINANCE(RES_K(2), 0, 0, 0) // R2
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

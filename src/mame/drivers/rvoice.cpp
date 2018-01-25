@@ -361,17 +361,17 @@ void rvoice_state::null_kbd_put(u8 data)
 
 MACHINE_CONFIG_START(rvoice_state::rvoicepc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD63701, XTAL_7_3728MHz)
+	MCFG_CPU_ADD("maincpu", HD63701, XTAL(7'372'800))
 	MCFG_CPU_PROGRAM_MAP(hd63701_main_mem)
 	MCFG_CPU_IO_MAP(hd63701_main_io)
 
-	//MCFG_CPU_ADD("playercpu", HD63701, XTAL_7_3728MHz) // not dumped yet
+	//MCFG_CPU_ADD("playercpu", HD63701, XTAL(7'372'800)) // not dumped yet
 	//MCFG_CPU_PROGRAM_MAP(hd63701_slave_mem)
 	//MCFG_CPU_IO_MAP(hd63701_slave_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_DEVICE_ADD("acia65c51", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 
 	/* video hardware */
 	//MCFG_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash

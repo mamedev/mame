@@ -163,18 +163,18 @@ void dmv_k234_device::device_reset()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(dmv_k230_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_15MHz / 3)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(15'000'000) / 3)
 	MCFG_CPU_PROGRAM_MAP(k230_mem)
 	MCFG_CPU_IO_MAP(k230_io)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dmv_k234_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", M68008, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68008, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(k234_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dmv_k235_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", V20, XTAL_15MHz / 3)
+	MCFG_CPU_ADD("maincpu", V20, XTAL(15'000'000) / 3)
 	MCFG_CPU_PROGRAM_MAP(k230_mem)
 	MCFG_CPU_IO_MAP(k235_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)

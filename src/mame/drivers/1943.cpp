@@ -312,11 +312,11 @@ void _1943_state::machine_reset()
 MACHINE_CONFIG_START(_1943_state::_1943)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(c1943_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _1943_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/8) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(_1943_state, irq0_line_hold, 4*60)
 
@@ -341,13 +341,13 @@ MACHINE_CONFIG_START(_1943_state::_1943)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_24MHz/16) /* verified on pcb */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_24MHz/16) /* verified on pcb */
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(24'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)

@@ -67,7 +67,7 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(epson_lx800_device::device_add_mconfig)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", UPD7810, XTAL_14_7456MHz)
+	MCFG_CPU_ADD("maincpu", UPD7810, XTAL(14'745'600))
 	MCFG_CPU_PROGRAM_MAP(lx800_mem)
 	MCFG_UPD7810_PORTA_READ_CB(READ8(epson_lx800_device, porta_r))
 	MCFG_UPD7810_PORTA_WRITE_CB(WRITE8(epson_lx800_device, porta_w))

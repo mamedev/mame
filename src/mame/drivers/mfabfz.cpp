@@ -97,7 +97,7 @@ void mfabfz_state::machine_reset()
 
 MACHINE_CONFIG_START(mfabfz_state::mfabfz)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4MHz / 2)
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(4'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mfabfz_mem)
 	MCFG_CPU_IO_MAP(mfabfz_io)
 
@@ -131,7 +131,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(mfabfz_state::mfabfz85)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4MHz / 2)
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(4'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mfabfz_mem)
 	MCFG_CPU_IO_MAP(mfabfz85_io)
 	MCFG_I8085A_SID(DEVREADLINE("rs232", rs232_port_device, rxd_r))

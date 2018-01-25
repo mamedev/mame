@@ -170,7 +170,7 @@ WRITE16_MEMBER(lethalj_state::lethalj_blitter_w)
 		else
 			do_blit();
 
-		m_gen_ext1_int_timer->adjust(attotime::from_hz(XTAL_32MHz) * ((m_blitter_data[5] + 1) * (m_blitter_data[7] + 1)));
+		m_gen_ext1_int_timer->adjust(attotime::from_hz(XTAL(32'000'000)) * ((m_blitter_data[5] + 1) * (m_blitter_data[7] + 1)));
 	}
 
 	/* clear the IRQ on offset 0 */

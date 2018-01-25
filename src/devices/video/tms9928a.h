@@ -31,7 +31,7 @@
 #include "screen.h"
 
 
-//  MCFG_DEVICE_ADD(_tag, _variant, XTAL_10_738635MHz / 2 )
+//  MCFG_DEVICE_ADD(_tag, _variant, XTAL(10'738'635) / 2 )
 
 #define MCFG_TMS9928A_VRAM_SIZE(_size) \
 	tms9928a_device::set_vram_size(*device, _size);
@@ -48,14 +48,14 @@
 #define MCFG_TMS9928A_SCREEN_ADD_NTSC(_screen_tag) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	MCFG_SCREEN_ADD( _screen_tag, RASTER ) \
-	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
+	MCFG_SCREEN_RAW_PARAMS( XTAL(10'738'635) / 2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
 			tms9928a_device::TOTAL_VERT_NTSC, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12 )
 
 
 #define MCFG_TMS9928A_SCREEN_ADD_PAL(_screen_tag) \
 	MCFG_VIDEO_SET_SCREEN(_screen_tag) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER ) \
-	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
+	MCFG_SCREEN_RAW_PARAMS( XTAL(10'738'635) / 2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
 			tms9928a_device::TOTAL_VERT_PAL, tms9928a_device::VERT_DISPLAY_START_PAL - 12, tms9928a_device::VERT_DISPLAY_START_PAL + 192 + 12 )
 
 

@@ -199,8 +199,6 @@ osd_common_t::osd_common_t(osd_options &options)
 
 osd_common_t::~osd_common_t()
 {
-	for(unsigned int i= 0; i < m_video_names.size(); ++i)
-		free(const_cast<char*>(m_video_names[i]));
 	//m_video_options,reset();
 	osd_output::pop(this);
 }
@@ -354,9 +352,9 @@ void osd_common_t::register_options()
 	update_option(OSDOPTION_VIDEO, m_video_names);
 }
 
-void osd_common_t::update_option(const char * key, std::vector<const char *> &values) const
+void osd_common_t::update_option(const std::string &key, std::vector<const char *> &values)
 {
-	std::string current_value(m_options.description(key));
+	std::string current_value(m_options.description(key.c_str()));
 	std::string new_option_value("");
 	for (unsigned int index = 0; index < values.size(); index++)
 	{
@@ -370,8 +368,9 @@ void osd_common_t::update_option(const char * key, std::vector<const char *> &va
 		}
 		new_option_value.append(t);
 	}
-	// TODO: core_strdup() is leaked
-	m_options.set_description(key, core_strdup(current_value.append(new_option_value).c_str()));
+
+	m_option_descs[key] = current_value + new_option_value;
+	m_options.set_description(key.c_str(), m_option_descs[key].c_str());
 }
 
 
@@ -751,5 +750,5 @@ void osd_common_t::osd_exit()
 void osd_common_t::video_options_add(const char *name, void *type)
 {
 	//m_video_options.add(name, type, false);
-	m_video_names.push_back(core_strdup(name));
+	m_video_names.push_back(name);
 }

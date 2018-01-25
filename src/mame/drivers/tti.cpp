@@ -55,12 +55,12 @@ static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, tti_state )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(tti_state::tti)
-	MCFG_DEVICE_ADD("maincpu", M68008, XTAL_20MHz / 2) // guess
+	MCFG_DEVICE_ADD("maincpu", M68008, XTAL(20'000'000) / 2) // guess
 	MCFG_CPU_PROGRAM_MAP(prg_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(tti_state, intack)
 
 	MCFG_DEVICE_ADD("mfp", MC68901, 0)
-	MCFG_MC68901_TIMER_CLOCK(XTAL_20MHz / 2) // guess
+	MCFG_MC68901_TIMER_CLOCK(XTAL(20'000'000) / 2) // guess
 	MCFG_MC68901_RX_CLOCK(9600) // for testing (FIXME: actually 16x)
 	MCFG_MC68901_TX_CLOCK(9600) // for testing (FIXME: actually 16x)
 	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))

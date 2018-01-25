@@ -226,7 +226,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // confirmed
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545)) // confirmed
 	MCFG_CPU_PROGRAM_MAP(lcmate2_mem)
 	MCFG_CPU_IO_MAP(lcmate2_io)
 
@@ -255,7 +255,7 @@ MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("rtc", RP5C15, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RP5C15, XTAL(32'768))
 MACHINE_CONFIG_END
 
 /* ROM definition */

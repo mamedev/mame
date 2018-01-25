@@ -85,7 +85,7 @@ namespace
 
 MACHINE_CONFIG_START(coco_dc_modem_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(UART_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(coco_dc_modem_device, uart_irq_w))
 MACHINE_CONFIG_END
 

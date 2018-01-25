@@ -155,11 +155,11 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(mice_state::mice)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz)
+	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(mice_mem)
 	MCFG_CPU_IO_MAP(mice_io)
 
-	MCFG_DEVICE_ADD("uart", I8251, XTAL_6_144MHz / 2)
+	MCFG_DEVICE_ADD("uart", I8251, 6.144_MHz_XTAL / 2)
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -172,7 +172,7 @@ MACHINE_CONFIG_START(mice_state::mice)
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart", i8251_device, write_cts))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", mice_terminal)
 
-	MCFG_DEVICE_ADD("rpt", I8155, XTAL_6_144MHz / 2)
+	MCFG_DEVICE_ADD("rpt", I8155, 6.144_MHz_XTAL / 2)
 	MCFG_I8155_IN_PORTC_CB(IOPORT("BAUD"))
 	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))

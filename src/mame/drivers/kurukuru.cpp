@@ -430,10 +430,10 @@ public:
 	void kurukuru(machine_config &config);
 };
 
-#define MAIN_CLOCK      XTAL_21_4772MHz
+#define MAIN_CLOCK      XTAL(21'477'272)
 #define CPU_CLOCK       MAIN_CLOCK/6
 #define YM2149_CLOCK    MAIN_CLOCK/6/2  // '/SEL' pin tied to GND, so internal divisor x2 is active
-#define M5205_CLOCK     XTAL_384kHz
+#define M5205_CLOCK     XTAL(384'000)
 
 #define HOPPER_PULSE    50          // time between hopper pulses in milliseconds
 #define VDP_MEM         0x30000

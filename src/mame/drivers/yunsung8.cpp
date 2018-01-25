@@ -353,17 +353,17 @@ void yunsung8_state::machine_reset()
 MACHINE_CONFIG_START(yunsung8_state::yunsung8)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)           /* Z80B @ 8MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/2)           /* Z80B @ 8MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", yunsung8_state, irq0_line_assert)   /* No nmi routine */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)          /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)          /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2, 512, 64, 512-64, 262, 8, 256-8) /* TODO: completely inaccurate */
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2, 512, 64, 512-64, 262, 8, 256-8) /* TODO: completely inaccurate */
 	MCFG_SCREEN_UPDATE_DRIVER(yunsung8_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -376,14 +376,14 @@ MACHINE_CONFIG_START(yunsung8_state::yunsung8)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(400'000)) /* verified on pcb */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(yunsung8_state, adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4KHz, 4 Bits */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)

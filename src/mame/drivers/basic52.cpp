@@ -102,7 +102,7 @@ void basic52_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(basic52_state::basic31)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8031, XTAL_11_0592MHz)
+	MCFG_CPU_ADD("maincpu", I8031, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
 	MCFG_CPU_IO_MAP(basic52_io)
 	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8("terminal", generic_terminal_device, write))
@@ -117,7 +117,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(basic52_state::basic52, basic31)
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", I8052, XTAL_11_0592MHz)
+	MCFG_CPU_REPLACE("maincpu", I8052, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(basic52_mem)
 	MCFG_CPU_IO_MAP(basic52_io)
 	MCFG_MCS51_SERIAL_TX_CB(DEVWRITE8("terminal", generic_terminal_device, write))

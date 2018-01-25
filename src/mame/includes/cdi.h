@@ -12,8 +12,8 @@
 
 /*----------- driver state -----------*/
 
-#define CLOCK_A XTAL_30MHz
-#define CLOCK_B XTAL_19_6608MHz
+#define CLOCK_A XTAL(30'000'000)
+#define CLOCK_B XTAL(19'660'800)
 
 class cdi_state : public driver_device
 {

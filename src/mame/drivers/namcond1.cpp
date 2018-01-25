@@ -346,11 +346,11 @@ WRITE_LINE_MEMBER( namcond1_state::raster_irq_w )
 MACHINE_CONFIG_START(namcond1_state::namcond1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_49_152MHz/4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(49'152'000)/4)
 	MCFG_CPU_PROGRAM_MAP(namcond1_map)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("mcu", H83002, XTAL_49_152MHz/3 )
+	MCFG_CPU_ADD("mcu", H83002, XTAL(49'152'000)/3 )
 	MCFG_CPU_PROGRAM_MAP( nd1h8rwmap)
 	MCFG_CPU_IO_MAP( nd1h8iomap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  mcu_interrupt)
@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 	H 804 108 576 48 32
 	V 261 26 224 3 0
 	*/
-	MCFG_SCREEN_RAW_PARAMS( XTAL_49_152MHz/8, 804/2, 108/2, (108+576)/2, 261, 26, 26+224)
+	MCFG_SCREEN_RAW_PARAMS( XTAL(49'152'000)/8, 804/2, 108/2, (108+576)/2, 261, 26, 26+224)
 	MCFG_SCREEN_UPDATE_DEVICE("ygv608", ygv608_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -378,7 +378,7 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_C352_ADD("c352", XTAL_49_152MHz/2, 288)
+	MCFG_C352_ADD("c352", XTAL(49'152'000)/2, 288)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 	//MCFG_SOUND_ROUTE(2, "lspeaker", 1.00) // Second DAC not present.
@@ -390,7 +390,7 @@ MACHINE_CONFIG_START(namcond1_state::namcond1)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(namcond1_state::abcheck, namcond1)
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_49_152MHz/4)
+	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(49'152'000)/4)
 	MCFG_CPU_PROGRAM_MAP(abcheck_map)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", namcond1_state,  irq1_line_hold)
 

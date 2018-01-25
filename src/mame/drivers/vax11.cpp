@@ -140,7 +140,7 @@ void vax11_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(vax11_state::vax11)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
+	MCFG_CPU_ADD("maincpu",T11, XTAL(4'000'000)) // Need proper CPU here
 	MCFG_T11_INITIAL_MODE(0 << 13)
 	MCFG_CPU_PROGRAM_MAP(vax11_mem)
 

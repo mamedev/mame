@@ -9,7 +9,7 @@ Crazy Ballooon
 #include "sound/discrete.h"
 #include "sound/sn76477.h"
 
-#define CRBALOON_MASTER_XTAL    (XTAL_9_987MHz)
+#define CRBALOON_MASTER_XTAL    (XTAL(9'987'000))
 
 
 class crbaloon_state : public driver_device

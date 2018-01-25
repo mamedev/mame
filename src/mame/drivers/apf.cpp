@@ -513,13 +513,13 @@ SLOT_INTERFACE_END
 MACHINE_CONFIG_START(apf_state::apfm1000)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz / 4 )  // divided by 4 in external clock circuit
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(3'579'545) / 4 )  // divided by 4 in external clock circuit
 	MCFG_CPU_PROGRAM_MAP(apfm1000_map)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL(3'579'545))
 	MCFG_MC6847_FSYNC_CALLBACK(DEVWRITELINE("pia0", pia6821_device, cb1_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(apf_state, videoram_r))
 	MCFG_MC6847_FIXED_MODE(mc6847_ntsc_device::MODE_GM2 | mc6847_ntsc_device::MODE_GM1)

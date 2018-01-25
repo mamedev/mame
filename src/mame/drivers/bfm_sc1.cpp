@@ -224,7 +224,7 @@ public:
 #define VFD_CLOCK1 0x80
 #define VFD_DATA   0x40
 
-#define MASTER_CLOCK    (XTAL_4MHz)
+#define MASTER_CLOCK    (XTAL(4'000'000))
 
 
 void bfm_sc1_state::save_state()

@@ -352,9 +352,9 @@ Notes:
 #include "softlist.h"
 #include "speaker.h"
 
-#define COJAG_CLOCK         XTAL_52MHz
-#define R3000_CLOCK         XTAL_40MHz
-#define M68K_CLOCK          XTAL_50MHz
+#define COJAG_CLOCK         XTAL(52'000'000)
+#define R3000_CLOCK         XTAL(40'000'000)
+#define M68K_CLOCK          XTAL(50'000'000)
 
 
 /*************************************

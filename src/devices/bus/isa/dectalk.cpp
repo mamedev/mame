@@ -154,12 +154,12 @@ const tiny_rom_entry* dectalk_isa_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(dectalk_isa_device::device_add_mconfig)
-	MCFG_CPU_ADD("dectalk_cpu", I80186, XTAL_20MHz)
+	MCFG_CPU_ADD("dectalk_cpu", I80186, XTAL(20'000'000))
 	MCFG_CPU_IO_MAP(dectalk_cpu_io)
 	MCFG_CPU_PROGRAM_MAP(dectalk_cpu_map)
 	MCFG_80186_TMROUT0_HANDLER(WRITELINE(dectalk_isa_device, clock_w));
 
-	MCFG_CPU_ADD("dectalk_dsp", TMS32015, XTAL_20MHz)
+	MCFG_CPU_ADD("dectalk_dsp", TMS32015, XTAL(20'000'000))
 	MCFG_CPU_IO_MAP(dectalk_dsp_io)
 	MCFG_TMS32010_BIO_IN_CB(READLINE(dectalk_isa_device, bio_line_r))
 	MCFG_CPU_PROGRAM_MAP(dectalk_dsp_map)

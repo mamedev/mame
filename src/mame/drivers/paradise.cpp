@@ -729,7 +729,7 @@ INTERRUPT_GEN_MEMBER(paradise_state::irq)
 MACHINE_CONFIG_START(paradise_state::paradise)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)          /* Z8400B - 6mhz Verified */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)          /* Z8400B - 6mhz Verified */
 	MCFG_CPU_PROGRAM_MAP(paradise_map)
 	MCFG_CPU_IO_MAP(paradise_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(paradise_state, irq, 4*54)    /* No nmi routine, timing is confirmed (i.e. three timing irqs for each vblank irq */
@@ -751,10 +751,10 @@ MACHINE_CONFIG_START(paradise_state::paradise)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_12MHz/12, PIN7_HIGH)    /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki1", XTAL(12'000'000)/12, PIN7_HIGH)    /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_12MHz/12, PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki2", XTAL(12'000'000)/12, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

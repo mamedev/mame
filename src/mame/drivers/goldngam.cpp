@@ -237,8 +237,8 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_8MHz   /* from CPU Board */
-#define SECONDARY_CLOCK XTAL_6MHz   /* from GFX Board */
+#define MASTER_CLOCK    XTAL(8'000'000)   /* from CPU Board */
+#define SECONDARY_CLOCK XTAL(6'000'000)   /* from GFX Board */
 
 
 class goldngam_state : public driver_device

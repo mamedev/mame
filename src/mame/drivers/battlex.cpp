@@ -291,7 +291,7 @@ void battlex_state::machine_reset()
 MACHINE_CONFIG_START(battlex_state::battlex)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_10MHz/4 )      // ?
+	MCFG_CPU_ADD("maincpu", Z80,XTAL(10'000'000)/4 )      // ?
 	MCFG_CPU_PROGRAM_MAP(battlex_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(battlex_state, battlex_interrupt, 400) /* controls game speed? */
@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(battlex_state::battlex)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_10MHz/8)   // ?
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(10'000'000)/8)   // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -322,7 +322,7 @@ MACHINE_CONFIG_DERIVED(battlex_state::dodgeman, battlex)
 
 	MCFG_VIDEO_START_OVERRIDE(battlex_state, dodgeman)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_10MHz/8)   // ?
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(10'000'000)/8)   // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 

@@ -199,11 +199,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(prehisle_state::prehisle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_18MHz/2)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(18'000'000)/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(prehisle_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", prehisle_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)    /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000))    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(prehisle_sound_map)
 	MCFG_CPU_IO_MAP(prehisle_sound_io_map)
 
@@ -212,7 +212,7 @@ MACHINE_CONFIG_START(prehisle_state::prehisle)
 	// the screen parameters are guessed but should be accurate. They
 	// give a theoretical refresh rate of 59.1856Hz while the measured
 	// rate on a snk68.c with very similar hardware board is 59.16Hz.
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 384, 0, 256, 264, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 384, 0, 256, 264, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(prehisle_state, screen_update_prehisle)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -226,7 +226,7 @@ MACHINE_CONFIG_START(prehisle_state::prehisle)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz)  /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000))  /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 

@@ -324,7 +324,7 @@
 #include "fortecrd.lh"
 
 
-#define MASTER_CLOCK    XTAL_12MHz
+#define MASTER_CLOCK    XTAL(12'000'000)
 #define CPU_CLOCK       (MASTER_CLOCK/4)
 #define CRTC_CLOCK      (MASTER_CLOCK/8)
 #define AY_CLOCK        (MASTER_CLOCK/8)

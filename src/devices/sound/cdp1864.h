@@ -48,7 +48,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define CDP1864_CLOCK   XTAL_1_75MHz
+#define CDP1864_CLOCK   XTAL(1'750'000)
 
 
 

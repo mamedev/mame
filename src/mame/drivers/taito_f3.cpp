@@ -460,7 +460,7 @@ MACHINE_RESET_MEMBER(taito_f3_state,f3)
 MACHINE_CONFIG_START(taito_f3_state::f3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(f3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
 
@@ -555,7 +555,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(taito_f3_state::bubsympb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(bubsympb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state, f3_interrupt2)
 

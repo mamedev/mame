@@ -236,11 +236,11 @@ void goindol_state::machine_reset()
 MACHINE_CONFIG_START(goindol_state::goindol)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* XTAL confirmed, divisor is not */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* XTAL confirmed, divisor is not */
 	MCFG_CPU_PROGRAM_MAP(goindol_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goindol_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2) /* XTAL confirmed, divisor is not */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/2) /* XTAL confirmed, divisor is not */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(goindol_state, irq0_line_hold, 4*60)
 
@@ -262,7 +262,7 @@ MACHINE_CONFIG_START(goindol_state::goindol)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8)   /* Confirmed pitch from recording */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8)   /* Confirmed pitch from recording */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -150,11 +150,11 @@ void d6809_state::machine_reset()
 
 MACHINE_CONFIG_START(d6809_state::d6809)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_14_7456MHz / 8) // MC68B09EP
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(14'745'600) / 8) // MC68B09EP
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
-	MCFG_DEVICE_ADD("acia1", MOS6551, XTAL_14_7456MHz / 8) // uses Q clock
-	MCFG_DEVICE_ADD("acia2", MOS6551, XTAL_14_7456MHz / 8) // uses Q clock
+	MCFG_DEVICE_ADD("acia1", MOS6551, XTAL(14'745'600) / 8) // uses Q clock
+	MCFG_DEVICE_ADD("acia2", MOS6551, XTAL(14'745'600) / 8) // uses Q clock
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)

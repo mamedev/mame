@@ -328,7 +328,7 @@ void lbeach_state::machine_reset()
 MACHINE_CONFIG_START(lbeach_state::lbeach)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_16MHz / 32) // Motorola MC6800P, 500kHz
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(16'000'000) / 32) // Motorola MC6800P, 500kHz
 	MCFG_CPU_PROGRAM_MAP(lbeach_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lbeach_state, nmi_line_pulse)
 

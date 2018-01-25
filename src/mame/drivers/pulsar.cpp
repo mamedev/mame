@@ -208,7 +208,7 @@ DRIVER_INIT_MEMBER( pulsar_state, pulsar )
 
 MACHINE_CONFIG_START(pulsar_state::pulsar)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(pulsar_mem)
 	MCFG_CPU_IO_MAP(pulsar_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
@@ -221,9 +221,9 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	MCFG_I8255_IN_PORTC_CB(READ8(pulsar_state, ppi_pc_r))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(pulsar_state, ppi_pc_w))
 
-	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
+	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
 
-	MCFG_DEVICE_ADD("dart", Z80DART, XTAL_4MHz)
+	MCFG_DEVICE_ADD("dart", Z80DART, XTAL(4'000'000))
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -234,14 +234,14 @@ MACHINE_CONFIG_START(pulsar_state::pulsar)
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("dart", z80dart_device, ctsa_w))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("brg", COM8116, XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD("brg", COM8116, XTAL(5'068'800))
 	// Schematic has the labels for FT and FR the wrong way around, but the pin numbers are correct.
 	MCFG_COM8116_FR_HANDLER(DEVWRITELINE("dart", z80dart_device, txca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxca_w))
 	MCFG_COM8116_FT_HANDLER(DEVWRITELINE("dart", z80dart_device, txcb_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("dart", z80dart_device, rxcb_w))
 
-	MCFG_FD1797_ADD("fdc", XTAL_4MHz / 2)
+	MCFG_FD1797_ADD("fdc", XTAL(4'000'000) / 2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pulsar_floppies, "525hd", floppy_image_device::default_floppy_formats)

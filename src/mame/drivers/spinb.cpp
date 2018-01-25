@@ -626,14 +626,14 @@ uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 MACHINE_CONFIG_START(spinb_state::spinb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(spinb_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(spinb_state, irq0_line_hold, 160) // NE556 adjustable (if faster, then jolypark has a stack problem)
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz / 2)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(spinb_audio_map)
-	MCFG_CPU_ADD("musiccpu", Z80, XTAL_5MHz / 2)
+	MCFG_CPU_ADD("musiccpu", Z80, XTAL(5'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(spinb_music_map)
-	MCFG_CPU_ADD("dmdcpu",I8031, XTAL_16MHz)
+	MCFG_CPU_ADD("dmdcpu",I8031, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(dmd_mem)
 	MCFG_CPU_IO_MAP(dmd_io)
 
@@ -653,12 +653,12 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("msmavol")
-	MCFG_SOUND_ADD("msm_a", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("msm_a", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("ic5a", ttl7474_device, clock_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmavol", 1.0)
 	MCFG_SPEAKER_STANDARD_MONO("msmmvol")
-	MCFG_SOUND_ADD("msm_m", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("msm_m", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("ic5m", ttl7474_device, clock_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmmvol", 1.0)
@@ -722,11 +722,11 @@ MACHINE_CONFIG_START(spinb_state::spinb)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(spinb_state::jolypark, spinb)
-	MCFG_SOUND_REPLACE("msm_a", MSM6585, XTAL_640kHz)
+	MCFG_SOUND_REPLACE("msm_a", MSM6585, XTAL(640'000))
 	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("ic5a", ttl7474_device, clock_w))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmavol", 1.0)
-	MCFG_SOUND_REPLACE("msm_m", MSM6585, XTAL_640kHz)
+	MCFG_SOUND_REPLACE("msm_m", MSM6585, XTAL(640'000))
 	MCFG_MSM6585_VCK_CALLBACK(DEVWRITELINE("ic5m", ttl7474_device, clock_w))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmmvol", 1.0)

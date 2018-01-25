@@ -398,11 +398,11 @@ void quickpick5_state::machine_reset()
 
 MACHINE_CONFIG_START(quickpick5_state::quickpick5)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_32MHz/4) // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(32'000'000)/4) // z84c0008pec 8mhz part, 32Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(quickpick5_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", quickpick5_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4) /* K053252, xtal verified, divider not verified */
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4) /* K053252, xtal verified, divider not verified */
 	MCFG_K053252_INT1_ACK_CB(WRITELINE(quickpick5_state, vbl_ack_w))
 	MCFG_K053252_INT2_ACK_CB(WRITELINE(quickpick5_state, nmi_ack_w))
 	MCFG_K053252_INT_TIME_CB(WRITE8(quickpick5_state, ccu_int_time_w))
@@ -431,10 +431,10 @@ MACHINE_CONFIG_START(quickpick5_state::quickpick5)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_K051649_ADD("k051649", XTAL_32MHz/18)  // xtal is verified, divider is not
+	MCFG_K051649_ADD("k051649", XTAL(32'000'000)/18)  // xtal is verified, divider is not
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/18, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(32'000'000)/18, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END

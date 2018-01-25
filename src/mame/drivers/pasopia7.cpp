@@ -139,7 +139,7 @@ private:
 	required_ioport_array<12> m_keyboard;
 };
 
-#define VDP_CLOCK XTAL_3_579545MHz/4
+#define VDP_CLOCK XTAL(3'579'545)/4
 #define LCD_CLOCK VDP_CLOCK/10
 
 // needed to scan the keyboard, as the pio emulation doesn't do it.
@@ -913,7 +913,7 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(pasopia7_state::p7_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(pasopia7_mem)
 	MCFG_CPU_IO_MAP(pasopia7_io)
 	MCFG_Z80_DAISY_CHAIN(p7_daisy)
@@ -929,13 +929,13 @@ MACHINE_CONFIG_START(pasopia7_state::p7_base)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg1))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2)) // beep interface
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(pasopia7_state, mux_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(pasopia7_state, keyb_r))

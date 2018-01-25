@@ -236,10 +236,10 @@ MACHINE_CONFIG_START(unichamp_state::unichamp)
 	/* basic machine hardware */
 
 	//The CPU is really clocked this way:
-	//MCFG_CPU_ADD("maincpu", CP1610, XTAL_3_579545MHz/4)
+	//MCFG_CPU_ADD("maincpu", CP1610, XTAL(3'579'545)/4)
 	//But since it is only running 7752/29868 th's of the time...
 	//TODO find a more accurate method? (the emulation will me the same though)
-	MCFG_CPU_ADD("maincpu", CP1610, (int)((7752.0/29868.0)*XTAL_3_579545MHz/4))
+	MCFG_CPU_ADD("maincpu", CP1610, (7752.0/29868.0)*XTAL(3'579'545)/4)
 
 	MCFG_CPU_PROGRAM_MAP(unichamp_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -247,7 +247,7 @@ MACHINE_CONFIG_START(unichamp_state::unichamp)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL_3_579545MHz,
+	MCFG_SCREEN_RAW_PARAMS( XTAL(3'579'545),
 							gic_device::LINE_CLOCKS,
 							gic_device::START_ACTIVE_SCAN,
 							gic_device::END_ACTIVE_SCAN,
@@ -263,7 +263,7 @@ MACHINE_CONFIG_START(unichamp_state::unichamp)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_GIC_ADD( "gic", XTAL_3_579545MHz, "screen", READ8(unichamp_state, unichamp_gicram_r) )
+	MCFG_GIC_ADD( "gic", XTAL(3'579'545), "screen", READ8(unichamp_state, unichamp_gicram_r) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	/* cartridge */

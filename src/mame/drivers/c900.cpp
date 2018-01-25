@@ -109,7 +109,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(c900_state::c900)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z8001, XTAL_12MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z8001, XTAL(12'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_DATA_MAP(data_map)
 	MCFG_CPU_IO_MAP(io_map)
