@@ -74,6 +74,8 @@ public:
 	optional_shared_ptr<uint16_t> m_ram;
 	optional_memory_bank m_okibank;
 
+	uint16_t m_priority;
+
 	DECLARE_WRITE16_MEMBER(cninja_sound_w);
 	DECLARE_WRITE16_MEMBER(stoneage_sound_w);
 	DECLARE_WRITE16_MEMBER(cninja_pf12_control_w);
@@ -82,6 +84,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cninjabl2_oki_bank_w);
 	DECLARE_DRIVER_INIT(mutantf);
 	DECLARE_DRIVER_INIT(cninjabl2);
+	DECLARE_MACHINE_START(robocop2);
+	DECLARE_MACHINE_RESET(robocop2);
 	DECLARE_VIDEO_START(stoneage);
 	DECLARE_VIDEO_START(mutantf);
 	uint32_t screen_update_cninja(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -108,8 +112,10 @@ public:
 	DECLARE_WRITE16_MEMBER( mutantf_protection_region_0_146_w );
 	DECLARE_READ16_MEMBER( cninja_protection_region_0_104_r );
 	DECLARE_WRITE16_MEMBER( cninja_protection_region_0_104_w );
-
+	
 	DECLARE_READ16_MEMBER(cninjabl2_sprite_dma_r);
+	DECLARE_WRITE16_MEMBER(robocop2_priority_w);
+	DECLARE_READ16_MEMBER(mutantf_71_r);
 	void cninjabl(machine_config &config);
 	void edrandy(machine_config &config);
 	void cninja(machine_config &config);

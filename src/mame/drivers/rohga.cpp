@@ -105,6 +105,9 @@
                 JN-00         : Fujitsu MB7116 PROM
                 VSync         : 58kHz
 
+	TODO:
+		nitrobal : blending, priority function wrong
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -852,11 +855,11 @@ static GFXDECODE_START( rohga )
 GFXDECODE_END
 
 static GFXDECODE_START( wizdfire )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,        0, 32 )  /* Gfx chip 1 as 8x8 */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,        0, 32 )  /* Gfx chip 1 as 16x16 */
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,      512, 32 )  /* Gfx chip 2 as 16x16 */
-	GFXDECODE_ENTRY( "gfx4", 0, spritelayout,   0, 32 ) /* Sprites 16x16 */
-	GFXDECODE_ENTRY( "gfx5", 0, spritelayout,   0, 32 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,           0, 32 )  /* Gfx chip 1 as 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout,           0, 32 )  /* Gfx chip 1 as 16x16 */
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,         512, 32 )  /* Gfx chip 2 as 16x16 */
+	GFXDECODE_ENTRY( "gfx4", 0, spritelayout, 0/*1024*/, 128 ) /* Sprites 16x16 */
+	GFXDECODE_ENTRY( "gfx5", 0, spritelayout, 0/*1536*/, 128 )
 GFXDECODE_END
 
 static GFXDECODE_START( schmeisr )
