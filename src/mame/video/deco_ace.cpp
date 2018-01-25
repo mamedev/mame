@@ -186,9 +186,10 @@ void deco_ace_device::palette_update()
 				{
 					default:
 					case 0x1100: // multiplicative fade
-						b = b + (((fadeptb - b) * fadepsb)/255);
-						g = g + (((fadeptg - g) * fadepsg)/255);
-						r = r + (((fadeptr - r) * fadepsr)/255);
+						/* Yeah, this should really be fixed point, I know */
+						b = (uint8_t)((float)b + (((float)fadeptb - (float)b) * (float)fadepsb/255.0f));
+						g = (uint8_t)((float)g + (((float)fadeptg - (float)g) * (float)fadepsg/255.0f));
+						r = (uint8_t)((float)r + (((float)fadeptr - (float)r) * (float)fadepsr/255.0f));
 						break;
 					case 0x1000: // additive fade, correct?
 						b = b + fadepsb;
