@@ -1342,12 +1342,18 @@ ROM_START( wirels60 )
 ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     STATE      INIT      COMPANY                                              FULLNAME             FLAGS
-CONS( 2004, batmantv, vii,      0,        batman,   batman,   vii_state, batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman",        MACHINE_NO_SOUND )
+
+// VTech systems
 CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "VTech",                                             "V.Smile (US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2005, vsmileg,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "VTech",                                             "V.Smile (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2005, vsmilef,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "VTech",                                             "V.Smile (France)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2005, vsmileb,  0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "VTech",                                             "V.Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2007, vii,      0,        0,        vii,      vii,      vii_state, vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",               MACHINE_NO_SOUND )
-CONS( 2008, walle,    vii,      0,        batman,   walle,    vii_state, walle,    "JAKKS Pacific Inc",                                 "Wall-E",            MACHINE_NO_SOUND )
+
+// Jungle Soft TV games
+CONS( 2007, vii,      0,        0,        vii,      vii,      vii_state, vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // some games run, others crash
 CONS( 2010, zone60,   0,        0,        wirels60, wirels60, vii_state, wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 60",           MACHINE_NO_SOUND )
 CONS( 2010, wirels60, 0,        0,        wirels60, wirels60, vii_state, wirels60, "Jungle Soft / Kids Station Toys Inc",               "Wireless 60",       MACHINE_NO_SOUND )
+
+// JAKKS Pacific Inc TV games
+CONS( 2004, batmantv, 0,        0,        batman,   batman,   vii_state, batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman",        MACHINE_NO_SOUND )
+CONS( 2008, walle,    0,        0,        batman,   walle,    vii_state, walle,    "JAKKS Pacific Inc",                                 "Wall-E",            MACHINE_NO_SOUND )

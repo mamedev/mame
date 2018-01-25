@@ -31246,30 +31246,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="radicav1">
-		<description>Radica: Volume 1 (USA)</description>
-		<year>2004</year>
-		<publisher>Radica Games ~ Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_radica"/>
-			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="radicav1.bin" size="4194304" crc="3b4c8438" sha1="5ed9c053f9ebc8d4bf571d57e562cf347585d158" offset="0x000000" loadflag="load16_word_swap"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="radicasf">
-		<description>Radica: Street Fighter Pack (Euro)</description>
-		<year>2004</year>
-		<publisher>Radica Games ~ Capcom</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_radica"/>
-			<dataarea name="rom" width="16" endianness="big" size="4194304">
-				<rom name="radicasf.bin" size="4194304" crc="868afb44" sha1="f4339e36272c18b1d49aa4095127ed18e0961df6" offset="0x000000" loadflag="load16_word_swap"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="tomclown">
 		<description>Tom Clown (USA)</description>
 		<year>1993</year>
@@ -32901,6 +32877,4 @@ This dump is either a bad dump or a wrongly patched one.
 			</dataarea>
 		</part>
 	</software>
-
-
 </softwarelist>

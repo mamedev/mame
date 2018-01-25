@@ -8,7 +8,6 @@
 
 #include "video/decospr.h"
 #include "video/deco16ic.h"
-#include "video/decocomn.h"
 #include "machine/deco104.h"
 
 class dietgo_state : public driver_device
@@ -24,7 +23,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_deco_tilegen1(*this, "tilegen1"),
-		m_decocomn(*this, "deco_common"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
@@ -39,7 +37,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
-	required_device<decocomn_device> m_decocomn;
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 	DECLARE_DRIVER_INIT(dietgo);
 	virtual void machine_start() override;
