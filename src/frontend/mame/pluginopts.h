@@ -24,6 +24,7 @@ public:
 	void parse_json(std::string path);
 private:
 	static const options_entry s_option_entries[];
+	std::vector<std::string> m_descriptions;
 };
 
 #endif /* __PLUGIN_OPTS_H__ */

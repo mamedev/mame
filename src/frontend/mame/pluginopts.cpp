@@ -75,7 +75,8 @@ void plugin_options::parse_json(std::string path)
 
 						if (type=="plugin")
 						{
-							add_entry({ std::move(plugin_name) }, core_strdup(description.c_str()), option_type::BOOLEAN, start ? "1" : "0");
+							m_descriptions.push_back(std::move(description));
+							add_entry({ std::move(plugin_name) }, m_descriptions.back().c_str(), option_type::BOOLEAN, start ? "1" : "0");
 						}
 					}
 

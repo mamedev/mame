@@ -8,7 +8,6 @@
 #include "sound/okim6295.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
-#include "video/decocomn.h"
 #include "machine/deco104.h"
 
 class pktgaldx_state : public driver_device
@@ -26,7 +25,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_oki2(*this, "oki2"),
 		m_deco_tilegen1(*this, "tilegen1"),
-		m_decocomn(*this, "deco_common"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
@@ -45,7 +43,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki2;
 	optional_device<deco16ic_device> m_deco_tilegen1;
-	optional_device<decocomn_device> m_decocomn;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
