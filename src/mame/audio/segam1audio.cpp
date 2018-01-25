@@ -120,12 +120,12 @@ void segam1audio_device::device_reset()
 
 WRITE16_MEMBER(segam1audio_device::m1_snd_mpcm_bnk1_w)
 {
-	m_multipcm_1->set_bank(0x100000 * (data & 3), 0x100000 * (data & 3));
+	m_multipcm_1->set_sega_bank_1m(data & 3);
 }
 
 WRITE16_MEMBER(segam1audio_device::m1_snd_mpcm_bnk2_w)
 {
-	m_multipcm_2->set_bank(0x100000 * (data & 3), 0x100000 * (data & 3));
+	m_multipcm_2->set_sega_bank_1m(data & 3);
 }
 
 WRITE_LINE_MEMBER(segam1audio_device::write_txd)

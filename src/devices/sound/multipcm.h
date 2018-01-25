@@ -15,7 +15,8 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
 
-	void set_bank(uint32_t leftoffs, uint32_t rightoffs);
+	void set_sega_bank_1m(uint8_t bank);
+	void set_sega_bank_512k(uint8_t low_bank, uint8_t high_bank);
 
 protected:
 	// device-level overrides
@@ -96,8 +97,9 @@ private:
 	slot_t *m_slots;
 	uint32_t m_cur_slot;
 	uint32_t m_address;
-	uint32_t m_bank_right;
-	uint32_t m_bank_left;
+	bool m_sega_banking;
+	uint32_t m_sega_bank0;
+	uint32_t m_sega_bank1;
 	float m_rate;
 
 	uint32_t *m_attack_step;

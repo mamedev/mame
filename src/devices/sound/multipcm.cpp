@@ -78,6 +78,7 @@ void multipcm_device::init_sample(sample_t *sample, uint32_t index)
 	uint32_t address = index * 12;
 
 	sample->m_start = (read_byte(address) << 16) | (read_byte(address + 1) << 8) | read_byte(address + 2);
+	sample->m_start &= 0x3fffff;
 	sample->m_loop = (read_byte(address + 3) << 8) | read_byte(address + 4);
 	sample->m_end = 0xffff - ((read_byte(address + 5) << 8) | read_byte(address + 6));
 	sample->m_attack_reg = (read_byte(address + 8) >> 4) & 0xf;
@@ -333,7 +334,7 @@ void multipcm_device::write_slot(slot_t *slot, int32_t reg, uint8_t data)
 			//according to YMF278 sample write causes some base params written to the regs (envelope+lfos)
 			//the game should never change the sample while playing.
 			sample_t sample;
-			init_sample(&sample, slot->m_regs[1]);
+			init_sample(&sample, slot->m_regs[1] | ((slot->m_regs[2] & 1) << 8));
 			write_slot(slot, 6, sample.m_lfo_vibrato_reg);
 			write_slot(slot, 7, sample.m_lfo_amplitude_reg);
 			break;
@@ -358,7 +359,7 @@ void multipcm_device::write_slot(slot_t *slot, int32_t reg, uint8_t data)
 		case 4:     //KeyOn/Off (and more?)
 			if (data & 0x80)       //KeyOn
 			{
-				init_sample(&slot->m_sample, slot->m_regs[1]);
+				init_sample(&slot->m_sample, slot->m_regs[1] | ((slot->m_regs[2] & 1) << 8));
 				slot->m_playing = true;
 				slot->m_base = slot->m_sample.m_start;
 				slot->m_offset = 0;
@@ -369,15 +370,19 @@ void multipcm_device::write_slot(slot_t *slot, int32_t reg, uint8_t data)
 				slot->m_envelope_gen.m_state = state_t::ATTACK;
 				slot->m_envelope_gen.m_volume = 0;
 
-				if (slot->m_base >= 0x100000)
+				if (m_sega_banking)
 				{
-					if (slot->m_pan & 8)
+					slot->m_base &= 0x1fffff; // SEGA arcade machines probably have a 2 MB address space
+					if (slot->m_base & 0x100000)
 					{
-						slot->m_base = (slot->m_base & 0xfffff) | m_bank_left;
-					}
-					else
-					{
-						slot->m_base = (slot->m_base & 0xfffff) | m_bank_right;
+						if (slot->m_base & 0x080000)
+						{
+							slot->m_base = (slot->m_base & 0x07ffff) | m_sega_bank1;
+						}
+						else
+						{
+							slot->m_base = (slot->m_base & 0x07ffff) | m_sega_bank0;
+						}
 					}
 				}
 
@@ -454,13 +459,20 @@ WRITE8_MEMBER( multipcm_device::write )
 	}
 }
 
-/* MAME/M1 access functions */
-
-void multipcm_device::set_bank(uint32_t leftoffs, uint32_t rightoffs)
+void multipcm_device::set_sega_bank_1m(uint8_t bank)
 {
-	m_bank_left = leftoffs;
-	m_bank_right = rightoffs;
-	printf("%08x, %08x\n", leftoffs, rightoffs);
+	m_sega_banking = true;
+	m_sega_bank0 = (bank << 20) | 0x000000;
+	m_sega_bank1 = (bank << 20) | 0x080000;
+	printf("ymw258f 1m banking: bank: %06x\n", m_sega_bank0);
+}
+
+void multipcm_device::set_sega_bank_512k(uint8_t low_bank, uint8_t high_bank)
+{
+	m_sega_banking = true;
+	m_sega_bank0 = low_bank << 19;
+	m_sega_bank1 = high_bank << 19;
+	printf("ymw258f 512k banking: low bank: %06x, high bank: %06x\n", m_sega_bank0, m_sega_bank1);
 }
 
 DEFINE_DEVICE_TYPE(MULTIPCM, multipcm_device, "ymw258f", "Yamaha YMW-258-F")
@@ -473,8 +485,9 @@ multipcm_device::multipcm_device(const machine_config &mconfig, const char *tag,
 		m_slots(nullptr),
 		m_cur_slot(0),
 		m_address(0),
-		m_bank_right(0),
-		m_bank_left(0),
+		m_sega_banking(false),
+		m_sega_bank0(0),
+		m_sega_bank1(0),
 		m_rate(0),
 		m_attack_step(nullptr),
 		m_decay_release_step(nullptr),
@@ -592,8 +605,9 @@ void multipcm_device::device_start()
 
 	save_item(NAME(m_cur_slot));
 	save_item(NAME(m_address));
-	save_item(NAME(m_bank_left));
-	save_item(NAME(m_bank_right));
+	save_item(NAME(m_sega_banking));
+	save_item(NAME(m_sega_bank0));
+	save_item(NAME(m_sega_bank1));
 
 	// Slots
 	m_slots = auto_alloc_array_clear(machine(), slot_t, 28);
