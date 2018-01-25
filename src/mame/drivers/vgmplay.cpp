@@ -1330,7 +1330,7 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_YMF271,       vgmplay_device::A_YMF271+0xf)    AM_DEVWRITE    ("ymf271",        ymf271_device, write)
 	AM_RANGE(vgmplay_device::A_YMZ280B,      vgmplay_device::A_YMZ280B+0x1)   AM_DEVWRITE    ("ymz280b",       ymz280b_device, write)
 	AM_RANGE(vgmplay_device::A_YM2608,       vgmplay_device::A_YM2608+0x3)    AM_DEVWRITE    ("ym2608",        ym2608_device, write)
-	AM_RANGE(vgmplay_device::A_QSOUND,       vgmplay_device::A_QSOUND+0x2)    AM_DEVWRITE    ("qsound",        qsound_device, write)
+	AM_RANGE(vgmplay_device::A_QSOUND,       vgmplay_device::A_QSOUND+0x2)    AM_DEVWRITE    ("qsound",        qsound_device, qsound_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( segapcm_map, 0, 8, vgmplay_state )
