@@ -2171,11 +2171,11 @@ MACHINE_CONFIG_START(model2_state::model2o)
 
 	MCFG_VIDEO_START_OVERRIDE(model2_state,model2)
 
-	MCFG_SEGAM1AUDIO_ADD("m1audio")
+	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
 	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("uart", I8251, 8000000) // uPD71051C, clock unknown
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("m1audio", segam1audio_device, write_txd))
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
 
 	MCFG_CLOCK_ADD("uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
@@ -2297,11 +2297,11 @@ MACHINE_CONFIG_DERIVED(model2_state::manxtt, model2a)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(model2_state::manxttdx, manxtt) /* Includes a Model 1 Sound board for additional sounds - Deluxe version only */
-	MCFG_SEGAM1AUDIO_ADD("m1audio")
+	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
 	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("uart", i8251_device, write_rxd))
 
 	MCFG_DEVICE_MODIFY("uart")
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("m1audio", segam1audio_device, write_txd))
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
 MACHINE_CONFIG_END
 
 uint16_t model2_state::crypt_read_callback(uint32_t addr)
