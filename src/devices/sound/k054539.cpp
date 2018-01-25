@@ -20,7 +20,7 @@ DEFINE_DEVICE_TYPE(K054539, k054539_device, "k054539", "K054539 ADPCM")
 
 k054539_device::k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K054539, tag, owner, clock)
-	, device_sound_interface(mconfig, *this),
+	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this, 24)
 	, flags(0)
 	, ram(nullptr)
@@ -473,7 +473,6 @@ WRITE8_MEMBER(k054539_device::write)
 
 void k054539_device::device_post_load()
 {
-	int data = regs[0x22e];
 	cur_limit = rom_addr == 0x80 ? 0x4000 : 0x20000;
 }
 
@@ -549,8 +548,8 @@ void k054539_device::device_reset()
 //  rom_bank_updated - the rom bank has changed
 //-------------------------------------------------
 
-void k053260_device::rom_bank_updated()
+void k054539_device::rom_bank_updated()
 {
-	m_stream->update();
+	stream->update();
 }
 

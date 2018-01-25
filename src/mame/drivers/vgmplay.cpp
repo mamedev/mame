@@ -81,7 +81,7 @@ public:
 		A_YMZ280B    = 0x00013050,
 		A_YM2608     = 0x00013060,
 		A_K054539A   = 0x00014000,
-		A_K054539B   = 0x00014400
+		A_K054539B   = 0x00014400,
 		A_QSOUND     = 0x00013070
 	};
 
@@ -556,6 +556,7 @@ void vgmplay_device::execute_run()
 			}
 			
 			case 0xd3:
+			{
 				uint16_t offset = m_file->read_byte(m_pc+1) << 16 | m_file->read_byte(m_pc+2);
 				if (offset & 0x8000)
 					m_io->write_byte(A_K054539B + (offset & 0x3ff), m_file->read_byte(m_pc+3));
@@ -563,6 +564,7 @@ void vgmplay_device::execute_run()
 					m_io->write_byte(A_K054539A + (offset & 0x3ff), m_file->read_byte(m_pc+3));
 				m_pc += 4;
 				break;
+			}
 
 			case 0xe0:
 				m_ym2612_stream_offset = m_file->read_dword(m_pc+1);
@@ -1370,8 +1372,8 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_YMF271,       vgmplay_device::A_YMF271+0xf)     AM_DEVWRITE    ("ymf271",        ymf271_device, write)
 	AM_RANGE(vgmplay_device::A_YMZ280B,      vgmplay_device::A_YMZ280B+0x1)    AM_DEVWRITE    ("ymz280b",       ymz280b_device, write)
 	AM_RANGE(vgmplay_device::A_YM2608,       vgmplay_device::A_YM2608+0x3)     AM_DEVWRITE    ("ym2608",        ym2608_device, write)
-	AM_RANGE(vgmplay_device::A_K054539A,     vgmplay_device::A_K054539A+0x22f) AM_DEVWRITE    ("k054539a",      k054539a_device, write)
-	AM_RANGE(vgmplay_device::A_K054539B,     vgmplay_device::A_K054539B+0x22f) AM_DEVWRITE    ("k054539b",      k054539b_device, write)
+	AM_RANGE(vgmplay_device::A_K054539A,     vgmplay_device::A_K054539A+0x22f) AM_DEVWRITE    ("k054539a",      k054539_device, write)
+	AM_RANGE(vgmplay_device::A_K054539B,     vgmplay_device::A_K054539B+0x22f) AM_DEVWRITE    ("k054539b",      k054539_device, write)
 	AM_RANGE(vgmplay_device::A_QSOUND,       vgmplay_device::A_QSOUND+0x2)     AM_DEVWRITE    ("qsound",        qsound_device, qsound_w)
 ADDRESS_MAP_END
 
