@@ -37359,7 +37359,7 @@ tv990                           // 1992? TeleVideo
 tv995                           // 1994 TeleVideo
 
 @source:tvboy.cpp
-supertvboy
+stvboy
 tvboyii                         //
 
 @source:tvc.cpp
