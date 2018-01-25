@@ -93,7 +93,8 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_dasp(*this, "dasp"),
 		m_am53cf96(*this, "am53cf96"),
-		m_k056800(*this, "k056800")
+		m_k056800(*this, "k056800"),
+		m_pcmram(*this, "pcmram")
 	{
 	}
 
@@ -102,6 +103,7 @@ public:
 	required_device<tms57002_device> m_dasp;
 	required_device<am53cf96_device> m_am53cf96;
 	required_device<k056800_device> m_k056800;
+	required_shared_ptr<uint8_t> m_pcmram;
 
 	uint8_t *m_p_n_pcmram;
 	uint8_t m_sector_buffer[ 512 ];
@@ -151,12 +153,12 @@ WRITE16_MEMBER(konamigq_state::eeprom_w)
 
 WRITE8_MEMBER(konamigq_state::pcmram_w)
 {
-	m_p_n_pcmram[ offset ] = data;
+	m_pcmram[ offset ] = data;
 }
 
 READ8_MEMBER(konamigq_state::pcmram_r)
 {
-	return m_p_n_pcmram[ offset ];
+	return m_pcmram[ offset ];
 }
 
 /* Video */
@@ -242,6 +244,13 @@ static ADDRESS_MAP_START( konamigq_dasp_map, AS_DATA, 8, konamigq_state )
 ADDRESS_MAP_END
 
 
+/* K058141 memory handling */
+static ADDRESS_MAP_START( konamigq_k054539_map, 0, 8, konamigq_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("k054539", 0)
+	AM_RANGE(0x080000, 0x3fffff) AM_RAM AM_SHARE("pcmram")
+ADDRESS_MAP_END
+
+
 /* 058141 */
 WRITE_LINE_MEMBER(konamigq_state::k054539_irq_gen)
 {
@@ -297,12 +306,10 @@ void konamigq_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, i
 
 DRIVER_INIT_MEMBER(konamigq_state,konamigq)
 {
-	m_p_n_pcmram = memregion( "shared" )->base() + 0x80000;
 }
 
 MACHINE_START_MEMBER(konamigq_state,konamigq)
 {
-	save_pointer(NAME(m_p_n_pcmram), 0x380000);
 	save_item(NAME(m_sector_buffer));
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_intck));
@@ -354,13 +361,13 @@ MACHINE_CONFIG_START(konamigq_state::konamigq)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("soundcpu", M68K_IRQ_1))
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
-	MCFG_K054539_REGION_OVERRRIDE("shared")
+	MCFG_DEVICE_ADDRESS_MAP(0, konamigq_k054539_map)
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(konamigq_state, k054539_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL(18'432'000))
-	MCFG_K054539_REGION_OVERRRIDE("shared")
+	MCFG_DEVICE_ADDRESS_MAP(0, konamigq_k054539_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -453,7 +460,7 @@ ROM_START( cryptklr )
 	ROM_REGION( 0x80000, "soundcpu", 0 ) /* 68000 sound program */
 	ROM_LOAD16_WORD_SWAP( "420a01.2g", 0x000000, 0x080000, CRC(84fc2613) SHA1(e06f4284614d33c76529eb43b168d095200a9eac) )
 
-	ROM_REGION( 0x400000, "shared", 0 )
+	ROM_REGION( 0x80000, "k054539", 0 )
 	ROM_LOAD( "420a02.3m",    0x000000, 0x080000, CRC(2169c3c4) SHA1(6d525f10385791e19eb1897d18f0bab319640162) )
 
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) /* bios */
