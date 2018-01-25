@@ -56,6 +56,7 @@
 
 #include "emu.h"
 #include "video/deco_ace.h"
+#include <algorithm>
 
 
 DEFINE_DEVICE_TYPE(DECO_ACE, deco_ace_device, "deco_ace", "Data East 99 'ACE' Chip")
@@ -88,12 +89,12 @@ void deco_ace_device::static_set_palette_tag(device_t &device, const char *tag)
 
 void deco_ace_device::device_start()
 {
-	m_paletteram = make_unique_clear<uint32_t[]>(4096);
-	m_paletteram_buffered = make_unique_clear<uint32_t[]>(4096);
+	m_paletteram = make_unique_clear<uint32_t[]>(2048);
+	m_paletteram_buffered = make_unique_clear<uint32_t[]>(2048);
 	m_ace_ram = make_unique_clear<uint16_t[]>(0x28);
 
-	save_pointer(NAME(m_paletteram.get()), 4096);
-	save_pointer(NAME(m_paletteram_buffered.get()), 4096);
+	save_pointer(NAME(m_paletteram.get()), 2048);
+	save_pointer(NAME(m_paletteram_buffered.get()), 2048);
 	save_pointer(NAME(m_ace_ram.get()), 0x28);
 }
 
@@ -166,7 +167,6 @@ WRITE16_MEMBER( deco_ace_device::ace_w )
 
 void deco_ace_device::palette_update()
 {
-	int r,g,b,i;
 	uint8_t fadeptr=m_ace_ram[0x20] & 0xff;
 	uint8_t fadeptg=m_ace_ram[0x21] & 0xff;
 	uint8_t fadeptb=m_ace_ram[0x22] & 0xff;
@@ -175,12 +175,12 @@ void deco_ace_device::palette_update()
 	uint8_t fadepsb=m_ace_ram[0x25] & 0xff;
 	uint16_t mode=m_ace_ram[0x26] & 0xffff;
 
-	for (i=0; i<2048; i++)
+	for (int i = 0; i < 2048; i++)
 	{
 		/* Lerp palette entry to 'fadept' according to 'fadeps' */
-		b = (m_paletteram_buffered[i] >>16) & 0xff;
-		g = (m_paletteram_buffered[i] >> 8) & 0xff;
-		r = (m_paletteram_buffered[i] >> 0) & 0xff;
+		uint8_t b = (m_paletteram_buffered[i] >>16) & 0xff;
+		uint8_t g = (m_paletteram_buffered[i] >> 8) & 0xff;
+		uint8_t r = (m_paletteram_buffered[i] >> 0) & 0xff;
 
 		if ((i>=m_palette_effect_min) && (i<=m_palette_effect_max))
 		{
@@ -257,7 +257,7 @@ uint16_t deco_ace_device::get_aceram(uint8_t val)
 
 WRITE16_MEMBER( deco_ace_device::palette_dma_w )
 {
-	memcpy(m_paletteram_buffered.get(), m_paletteram.get(), 4096);
+	std::copy(&m_paletteram[0], &m_paletteram[2048], &m_paletteram_buffered[0]);
 	palette_update();
 }
 
