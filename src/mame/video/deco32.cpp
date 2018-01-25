@@ -376,8 +376,6 @@ uint32_t nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rg
 	if (m_deco_ace->get_aceram(0x17)!=0x0 && m_pri)
 		alphaTilemap=1;
 
-	m_deco_ace->palette_update();
-
 	screen.priority().fill(0, cliprect);
 
 	bitmap.fill(m_palette->pen(0x200), cliprect);
