@@ -121,6 +121,16 @@ public:
 	READ8_MEMBER(c352_rom_r);
 	READ8_MEMBER(qsound_rom_r);
 
+	DECLARE_WRITE8_MEMBER(multipcm_bank_lo_a_w);
+	DECLARE_WRITE8_MEMBER(multipcm_bank_hi_a_w);
+	DECLARE_WRITE8_MEMBER(multipcm_bank_lo_b_w);
+	DECLARE_WRITE8_MEMBER(multipcm_bank_hi_b_w);
+
+	void segapcm_bank_w(uint32_t bank){
+			m_segapcm_bankshift = bank & 0xff;
+			m_segapcm_bankmask = bank >> 16;
+	}
+
 private:
 	struct rom_block {
 		offs_t start_address;
@@ -147,6 +157,16 @@ private:
 
 	uint32_t m_ym2612_stream_offset;
 
+	uint32_t m_multipcma_bank_l;
+	uint32_t m_multipcma_bank_r;
+	uint32_t m_multipcma_banked;
+	uint32_t m_multipcmb_bank_l;
+	uint32_t m_multipcmb_bank_r;
+	uint32_t m_multipcmb_banked;
+
+	uint32_t m_segapcm_bankmask;
+	uint32_t m_segapcm_bankshift;
+
 	uint8_t rom_r(int chip, uint8_t type, offs_t offset);
 	uint32_t handle_data_block(uint32_t address);
 	void blocks_clear();
@@ -164,14 +184,10 @@ public:
 	DECLARE_READ8_MEMBER(file_r);
 	DECLARE_READ8_MEMBER(file_size_r);
 
-	DECLARE_WRITE8_MEMBER(multipcm_bank_lo_a_w);
-	DECLARE_WRITE8_MEMBER(multipcm_bank_hi_a_w);
-	DECLARE_WRITE8_MEMBER(multipcm_bank_lo_b_w);
-	DECLARE_WRITE8_MEMBER(multipcm_bank_hi_b_w);
-
 	void vgmplay(machine_config &config);
 private:
 	std::vector<uint8_t> m_file_data;
+	required_device<vgmplay_device> m_vgmplay;
 	required_device<bitbanger_device> m_file;
 	required_device<ym2612_device>  m_ym2612;
 	required_device<ym2151_device>  m_ym2151;
@@ -202,13 +218,6 @@ private:
 	required_device<ymz280b_device> m_ymz280b;
 	required_device<ym2608_device> m_ym2608;
 	required_device<qsound_device> m_qsound;
-
-	uint32_t m_multipcma_bank_l;
-	uint32_t m_multipcma_bank_r;
-	uint32_t m_multipcmb_bank_l;
-	uint32_t m_multipcmb_bank_r;
-	uint32_t m_segapcm_bankmask;
-	uint32_t m_segapcm_bankshift;
 
 	uint32_t r32(int offset) const;
 	uint8_t r8(int offset) const;
@@ -964,11 +973,55 @@ READ8_MEMBER(vgmplay_device::ymz280b_rom_r)
 
 READ8_MEMBER(vgmplay_device::multipcma_rom_r)
 {
+	if (m_multipcma_banked == 1)
+	{
+		offset &= 0x1fffff;
+		if (offset & 0x100000)
+		{
+			if (m_multipcma_bank_l == m_multipcma_bank_r)
+			{
+				offset = ((m_multipcma_bank_r & ~0xf) << 16) | (offset & 0xfffff);
+			}
+			else
+			{
+				if (offset & 0x80000)
+				{
+					offset = ((m_multipcma_bank_l & ~0x7) << 16) | (offset & 0x7ffff);
+				}
+				else
+				{
+					offset = ((m_multipcma_bank_r & ~0x7) << 16) | (offset & 0x7ffff);
+				}
+			}
+		}
+	}
 	return rom_r(0, 0x89, offset);
 }
 
 READ8_MEMBER(vgmplay_device::multipcmb_rom_r)
 {
+	if (m_multipcmb_banked == 1)
+	{
+		offset &= 0x1fffff;
+		if (offset & 0x100000)
+		{
+			if (m_multipcmb_bank_l == m_multipcmb_bank_r)
+			{
+				offset = ((m_multipcmb_bank_r & ~0xf) << 16) | (offset & 0xfffff);
+			}
+			else
+			{
+				if (offset & 0x80000)
+				{
+					offset = ((m_multipcmb_bank_l & ~0x7) << 16) | (offset & 0x7ffff);
+				}
+				else
+				{
+					offset = ((m_multipcmb_bank_r & ~0x7) << 16) | (offset & 0x7ffff);
+				}
+			}
+		}
+	}
 	return rom_r(1, 0x89, offset);
 }
 
@@ -1135,8 +1188,7 @@ void vgmplay_state::machine_start()
 
 		if(version >= 0x151 && r32(0x3c)) {
 			uint32_t bank = r32(0x3c);
-			m_segapcm_bankshift = bank & 0xff;
-			m_segapcm_bankmask = bank >> 16;
+			m_vgmplay->segapcm_bank_w(bank);
 		}
 
 		if (data_start > 0x40)
@@ -1303,7 +1355,7 @@ READ8_MEMBER(vgmplay_state::file_size_r)
 	return size >> (8*offset);
 }
 
-WRITE8_MEMBER(vgmplay_state::multipcm_bank_hi_a_w)
+WRITE8_MEMBER(vgmplay_device::multipcm_bank_hi_a_w)
 {
 	if (offset & 1)
 		m_multipcma_bank_l = (m_multipcma_bank_l & 0xff) | (data << 16);
@@ -1311,17 +1363,17 @@ WRITE8_MEMBER(vgmplay_state::multipcm_bank_hi_a_w)
 		m_multipcma_bank_r = (m_multipcma_bank_r & 0xff) | (data << 16);
 }
 
-WRITE8_MEMBER(vgmplay_state::multipcm_bank_lo_a_w)
+WRITE8_MEMBER(vgmplay_device::multipcm_bank_lo_a_w)
 {
 	if (offset & 1)
 		m_multipcma_bank_l = (m_multipcma_bank_l & 0xff00) | data;
 	if (offset & 2)
 		m_multipcma_bank_r = (m_multipcma_bank_r & 0xff00) | data;
 
-	m_multipcma->set_bank(m_multipcma_bank_l << 16, m_multipcma_bank_r << 16);
+	m_multipcma_banked = 1;
 }
 
-WRITE8_MEMBER(vgmplay_state::multipcm_bank_hi_b_w)
+WRITE8_MEMBER(vgmplay_device::multipcm_bank_hi_b_w)
 {
 	if (offset & 1)
 		m_multipcmb_bank_l = (m_multipcmb_bank_l & 0xff) | (data << 16);
@@ -1329,14 +1381,14 @@ WRITE8_MEMBER(vgmplay_state::multipcm_bank_hi_b_w)
 		m_multipcmb_bank_r = (m_multipcmb_bank_r & 0xff) | (data << 16);
 }
 
-WRITE8_MEMBER(vgmplay_state::multipcm_bank_lo_b_w)
+WRITE8_MEMBER(vgmplay_device::multipcm_bank_lo_b_w)
 {
 	if (offset & 1)
 		m_multipcmb_bank_l = (m_multipcmb_bank_l & 0xff00) | data;
 	if (offset & 2)
 		m_multipcmb_bank_r = (m_multipcmb_bank_r & 0xff00) | data;
 
-	m_multipcmb->set_bank(m_multipcmb_bank_l << 16, m_multipcmb_bank_r << 16);
+	m_multipcmb_banked = 1;
 }
 
 static INPUT_PORTS_START( vgmplay )
@@ -1374,11 +1426,11 @@ static ADDRESS_MAP_START( soundchips_map, AS_IO, 8, vgmplay_state )
 	AM_RANGE(vgmplay_device::A_NESAPU,       vgmplay_device::A_NESAPU+0x1f)    AM_DEVWRITE    ("nescpu:nesapu", nesapu_device, write)
 	AM_RANGE(vgmplay_device::A_NESRAM,       vgmplay_device::A_NESRAM+0xffff)  AM_RAM AM_SHARE("nesapu_ram")
 	AM_RANGE(vgmplay_device::A_MULTIPCMA,    vgmplay_device::A_MULTIPCMA+3)    AM_DEVWRITE    ("multipcma",     multipcm_device, write )
-	AM_RANGE(vgmplay_device::A_MULTIPCMA+4,  vgmplay_device::A_MULTIPCMA+7)    AM_WRITE(multipcm_bank_hi_a_w)
-	AM_RANGE(vgmplay_device::A_MULTIPCMA+8,  vgmplay_device::A_MULTIPCMA+11)   AM_WRITE(multipcm_bank_lo_a_w)
+	AM_RANGE(vgmplay_device::A_MULTIPCMA+4,  vgmplay_device::A_MULTIPCMA+7)    AM_DEVWRITE    ("vgmplay",       vgmplay_device, multipcm_bank_hi_a_w)
+	AM_RANGE(vgmplay_device::A_MULTIPCMA+8,  vgmplay_device::A_MULTIPCMA+11)   AM_DEVWRITE    ("vgmplay",       vgmplay_device, multipcm_bank_lo_a_w)
 	AM_RANGE(vgmplay_device::A_MULTIPCMB,    vgmplay_device::A_MULTIPCMB+3)    AM_DEVWRITE    ("multipcmb",     multipcm_device, write )
-	AM_RANGE(vgmplay_device::A_MULTIPCMB+4,  vgmplay_device::A_MULTIPCMB+7)    AM_WRITE(multipcm_bank_hi_b_w)
-	AM_RANGE(vgmplay_device::A_MULTIPCMB+8,  vgmplay_device::A_MULTIPCMB+11)   AM_WRITE(multipcm_bank_lo_b_w)
+	AM_RANGE(vgmplay_device::A_MULTIPCMB+4,  vgmplay_device::A_MULTIPCMB+7)    AM_DEVWRITE    ("vgmplay",       vgmplay_device, multipcm_bank_hi_b_w)
+	AM_RANGE(vgmplay_device::A_MULTIPCMB+8,  vgmplay_device::A_MULTIPCMB+11)   AM_DEVWRITE    ("vgmplay",       vgmplay_device, multipcm_bank_lo_b_w)
 	AM_RANGE(vgmplay_device::A_POKEYA,       vgmplay_device::A_POKEYA+0xf)     AM_DEVWRITE    ("pokeya",        pokey_device, write)
 	AM_RANGE(vgmplay_device::A_POKEYB,       vgmplay_device::A_POKEYB+0xf)     AM_DEVWRITE    ("pokeyb",        pokey_device, write)
 	AM_RANGE(vgmplay_device::A_YMF271,       vgmplay_device::A_YMF271+0xf)     AM_DEVWRITE    ("ymf271",        ymf271_device, write)
