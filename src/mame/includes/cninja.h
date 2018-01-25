@@ -8,7 +8,6 @@
 
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
-#include "video/decocomn.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
 #include "machine/deco_irq.h"
@@ -25,7 +24,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ioprot(*this, "ioprot"),
-		m_decocomn(*this, "deco_common"),
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_deco_tilegen2(*this, "tilegen2"),
 		m_oki2(*this, "oki2"),
@@ -50,7 +48,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<deco_146_base_device> m_ioprot;
-	required_device<decocomn_device> m_decocomn;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
 	optional_device<okim6295_device> m_oki2;
