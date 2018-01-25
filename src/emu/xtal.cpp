@@ -229,7 +229,7 @@ const double XTAL::known_xtals[] = {
 	 21'052'600, /* NEC PC-98xx pixel clock */
 	 21'060'000, /* HP 264x display clock (60 Hz configuration) */
 	 21'254'400, /* TeleVideo 970 132-column display clock */
-	 21'281'370, /* Radica Tetris */
+	 21'281'370, /* Radica Tetris (PAL) */
 	 21'300'000,
 	 21'477'272, /* BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */
 	 22'000'000,
