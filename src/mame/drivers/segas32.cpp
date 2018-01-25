@@ -5179,7 +5179,7 @@ void segas32_state::segas32_common_init()
 {
 	uint8_t *Z80 = memregion("soundcpu")->base();
 	uint32_t size = memregion("soundcpu")->bytes();
-	membank("bank1")->configure_entries(0, size / 0x2000, &Z80[0]);
+	membank("bank1")->configure_entries(0, size / 0x2000, &Z80[0], 0x2000);
 	/* reset the custom handlers and other pointers */
 	m_system32_prot_vblank = nullptr;
 	m_sw1_output = nullptr;
@@ -5191,8 +5191,8 @@ void segas32_state::multi32_common_init()
 {
 	uint8_t *ROM = memregion("sega")->base();
 	uint32_t size = memregion("sega")->bytes();
-	membank("multipcmbanklo")->configure_entries(0, size / 0x80000, &ROM[0]);
-	membank("multipcmbankhi")->configure_entries(0, size / 0x80000, &ROM[0]);
+	membank("multipcmbanklo")->configure_entries(0, size / 0x80000, &ROM[0], 0x80000);
+	membank("multipcmbankhi")->configure_entries(0, size / 0x80000, &ROM[0], 0x80000);
 	segas32_common_init();
 }
 
