@@ -158,13 +158,14 @@ All three of the above are called "segment H".
 
 ******************************************************************************
 
-Super 9 Sensory Chess Challenger (SU9)
+Super 9 Sensory Chess Challenger (SU9/DS9)
 This is basically the Fidelity Elite A/S program on CSC hardware.
+Model DS9(Deluxe) has a 5MHz XTAL, but is otherwise same.
 ---------------------------------
 
-R6502AP CPU, assume 2MHz
-1 RAM chip, assume 4KB
-2*8KB ROM + 1*2KB ROM (+another 8KB ROM?)
+R6502AP CPU, 1.95MHz(3.9MHz resonator)
+2 RAM chips, assume 4KB
+2*8KB ROM + 1*2KB ROM
 built-in CB9 module
 
 See CSC description above for more information.
@@ -493,6 +494,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(csc_pia1_cb2_w);
 	DECLARE_READ_LINE_MEMBER(csc_pia1_ca1_r);
 	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
+	DECLARE_MACHINE_RESET(su9);
+	DECLARE_INPUT_CHANGED_MEMBER(su9_cpu_freq);
+	void su9_set_cpu_freq();
 	void csc(machine_config &config);
 	void su9(machine_config &config);
 	void rsc(machine_config &config);
@@ -594,6 +598,18 @@ void fidel6502_state::csc_prepare_display()
 READ8_MEMBER(fidel6502_state::csc_speech_r)
 {
 	return m_speech_rom[m_speech_bank << 12 | offset];
+}
+
+void fidel6502_state::su9_set_cpu_freq()
+{
+	// SU9 CPU is clocked 1.95MHz, DS9 is 2.5MHz
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (5.0_MHz_XTAL/2) : (3.9_MHz_XTAL/2));
+}
+
+MACHINE_RESET_MEMBER(fidel6502_state, su9)
+{
+	fidelbase_state::machine_reset();
+	su9_set_cpu_freq();
 }
 
 
@@ -1350,7 +1366,17 @@ static INPUT_PORTS_START( su9 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("LV / Rook")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PV / Queen")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel6502_state, su9_cpu_freq, nullptr) // factory set
+	PORT_CONFSETTING(    0x00, "1.95MHz (SU9)" )
+	PORT_CONFSETTING(    0x01, "2.5MHz (DS9)" )
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(fidel6502_state::su9_cpu_freq)
+{
+	su9_set_cpu_freq();
+}
 
 static INPUT_PORTS_START( su9sp )
 	PORT_INCLUDE( su9 )
@@ -1677,6 +1703,8 @@ MACHINE_CONFIG_DERIVED(fidel6502_state::su9, csc)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(su9_map)
+
+	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, su9)
 
 	MCFG_DEFAULT_LAYOUT(layout_fidel_su9)
 MACHINE_CONFIG_END
