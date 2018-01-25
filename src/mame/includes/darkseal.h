@@ -1,10 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
 
-#include "machine/gen_latch.h"
 #include "video/deco16ic.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
+#include "audio/deco6280.h"
 
 class darkseal_state : public driver_device
 {
@@ -12,13 +12,12 @@ public:
 	darkseal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
+		m_decosnd(*this, DECOSND_TAG),
 		m_palette(*this, "palette"),
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_deco_tilegen2(*this, "tilegen2"),
 		m_sprgen(*this, "spritegen"),
 		m_spriteram(*this, "spriteram"),
-		m_soundlatch(*this, "soundlatch"),
 		m_ram(*this, "ram"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
@@ -26,13 +25,12 @@ public:
 		m_generic_paletteram2_16(*this, "paletteram2") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<deco_6280_ym2203_2xoki_device> m_decosnd;
 	required_device<palette_device> m_palette;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
 	required_device<decospr_device> m_sprgen;
 	required_device<buffered_spriteram16_device> m_spriteram;
-	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint16_t> m_ram;
 	required_shared_ptr<uint16_t> m_pf1_rowscroll;

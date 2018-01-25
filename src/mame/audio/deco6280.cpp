@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Bryan McPhail
 /**************************************************************************************
 
     deco6280.cpp
 
     Functions to emulate the Data East HuC6280( Sticker says "45" at most Data East PCBs ) CPU Based Sound HWs
+
+	Original code by Bryan McPhail
 
 ***************************************************************************************
 
@@ -89,18 +91,25 @@ CPU Internal Functions                                       1FE000-1FFFFF FF   
 #include "emu.h"
 #include "audio/deco6280.h"
 
-
 #define MASTER_CLOCK            XTAL(32'220'000)
+
+#define YM2203_TAG "ym2203"
+#define YM2151_TAG "ym2151"
+#define OKI1_TAG "oki1"
+#define OKI2_TAG "oki2"
+#define LATCH_TAG "soundlatch"
+#define CPU_TAG "cpu"
+#define OKI1BANK_TAG "oki1bank"
+#define OKI2BANK_TAG "oki2bank"
 
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(DECO6280,               deco_6280_base_device,          "deco6280",               "DECO HuC6280 Based Sound System")
-DEFINE_DEVICE_TYPE(DECO6280_2XOKI,         deco_6280_2xoki_device,         "deco6280_2xoki",         "DECO HuC6280 Based Sound System (with 2X OKIM6295)")
-DEFINE_DEVICE_TYPE(DECO6280_YM2203_2XOKI,  deco_6280_ym2203_2xoki_device,  "deco6280_ym2203_2xoki",  "DECO HuC6280 Based Sound System (with YM2203, 2X OKIM6295)")
-
+DEFINE_DEVICE_TYPE(DECO6280,               deco_6280_base_device,          "deco6280",  "DECO HuC6280 Based Sound System")
+DEFINE_DEVICE_TYPE(DECO6280_2XOKI,         deco_6280_2xoki_device,         "deco2oki",  "DECO HuC6280 Based Sound System (with 2X OKIM6295)")
+DEFINE_DEVICE_TYPE(DECO6280_YM2203_2XOKI,  deco_6280_ym2203_2xoki_device,  "deco2203",  "DECO HuC6280 Based Sound System (with YM2203, 2X OKIM6295)")
 
 
 //**************************************************************************
@@ -110,47 +119,47 @@ DEFINE_DEVICE_TYPE(DECO6280_YM2203_2XOKI,  deco_6280_ym2203_2xoki_device,  "deco
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, deco_6280_base_device )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE(YM2151_TAG, ym2151_device, read, write)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE(OKI1_TAG, okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_NOP
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("cpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("cpu", h6280_device, irq_status_w)
+	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE(CPU_TAG, h6280_device, timer_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE(CPU_TAG, h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_2xoki_map, AS_PROGRAM, 8, deco_6280_2xoki_device )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE(YM2151_TAG, ym2151_device, read, write)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE(OKI1_TAG, okim6295_device, read, write)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE(OKI2_TAG, okim6295_device, read, write)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("cpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("cpu", h6280_device, irq_status_w)
+	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE(CPU_TAG, h6280_device, timer_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE(CPU_TAG, h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_ym2203_2xoki_map, AS_PROGRAM, 8, deco_6280_ym2203_2xoki_device )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym2203", ym2203_device, read, write)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
+	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE(YM2203_TAG, ym2203_device, read, write)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE(YM2151_TAG, ym2151_device, read, write)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE(OKI1_TAG, okim6295_device, read, write)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE(OKI2_TAG, okim6295_device, read, write)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAM AM_SHARE("ram")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("cpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("cpu", h6280_device, irq_status_w)
+	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE(CPU_TAG, h6280_device, timer_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE(CPU_TAG, h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( deco6280_oki1_map, 0, 8, deco_6280_2xoki_device )
-	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("oki1bank")
+	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK(OKI1BANK_TAG)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( deco6280_oki2_map, 0, 8, deco_6280_2xoki_device )
-	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("oki2bank")
+	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK(OKI2BANK_TAG)
 ADDRESS_MAP_END
 
 
@@ -170,12 +179,12 @@ deco_6280_base_device::deco_6280_base_device(const machine_config &mconfig, cons
 deco_6280_base_device::deco_6280_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels)
 	: device_t(mconfig, devtype, tag, owner, clock),
 		device_mixer_interface(mconfig, *this, channels),
-		m_cpu(*this, "cpu"),
-		m_ym2151(*this, "ym2151"),
-		m_oki1(*this, "oki1"),
-		m_oki1_region(*this, "oki1"),
-		m_soundlatch_cb(*this),
-		m_soundlatch(0)
+		m_cpu(*this, CPU_TAG),
+		m_ym2151(*this, YM2151_TAG),
+		m_oki1(*this, OKI1_TAG),
+		m_soundlatch(*this, LATCH_TAG),
+		m_oki1_region(*this, OKI1_TAG),
+		m_soundlatch_cb(*this)
 {
 }
 
@@ -187,7 +196,6 @@ void deco_6280_base_device::device_start()
 {
 	// resolve devices
 	m_soundlatch_cb.resolve_safe(0);
-	save_item(NAME(m_soundlatch));
 }
 
 
@@ -197,7 +205,6 @@ void deco_6280_base_device::device_start()
 
 void deco_6280_base_device::device_reset()
 {
-	m_soundlatch = 0;
 }
 
 
@@ -209,8 +216,7 @@ READ8_MEMBER( deco_6280_base_device::soundlatch_r )
 {
 	if (m_soundlatch_cb.isnull())
 	{
-		return m_soundlatch;
-		m_cpu->set_input_line(0, CLEAR_LINE);
+		return m_soundlatch->read(space,0);
 	}
 
 	return m_soundlatch_cb();
@@ -221,10 +227,9 @@ READ8_MEMBER( deco_6280_base_device::soundlatch_r )
 //  soundlatch_w: Handle soundlatch writes
 //-------------------------------------------------
 
-WRITE8_MEMBER( deco_6280_base_device::soundlatch_r )
+WRITE8_MEMBER( deco_6280_base_device::soundlatch_w )
 {
-	m_soundlatch = data & 0xff;
-	m_cpu->set_input_line(0, ASSERT_LINE);
+	m_soundlatch->write(space,0,data,mem_mask);
 }
 
 //-------------------------------------------------
@@ -234,16 +239,19 @@ WRITE8_MEMBER( deco_6280_base_device::soundlatch_r )
 MACHINE_CONFIG_START(deco_6280_base_device::device_add_mconfig)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("cpu", H6280, DERIVED_CLOCK(1,1))
+	MCFG_CPU_ADD(CPU_TAG, H6280, DERIVED_CLOCK(1,1))
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
+	MCFG_GENERIC_LATCH_8_ADD(LATCH_TAG)
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE(CPU_TAG, 0))
+
 	// sound hardware
-	MCFG_YM2151_ADD("ym2151", MASTER_CLOCK/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("cpu", 1))
+	MCFG_YM2151_ADD(YM2151_TAG, MASTER_CLOCK/9)
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE(CPU_TAG, 1)) // IRQ2
 	MCFG_MIXER_ROUTE(0, DEVICE_SELF_OWNER, 1, DECO_YM2151_OUT0)
 	MCFG_MIXER_ROUTE(1, DEVICE_SELF_OWNER, 1, DECO_YM2151_OUT1)
 
-	MCFG_OKIM6295_ADD("oki1", MASTER_CLOCK/32, PIN7_HIGH)
+	MCFG_OKIM6295_ADD(OKI1_TAG, MASTER_CLOCK/32, PIN7_HIGH)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1, DECO_OKI1_OUT)
 MACHINE_CONFIG_END
 
@@ -263,10 +271,10 @@ deco_6280_2xoki_device::deco_6280_2xoki_device(const machine_config &mconfig, co
 
 deco_6280_2xoki_device::deco_6280_2xoki_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, uint32_t clock, int channels)
 	: deco_6280_base_device(mconfig, devtype, tag, owner, clock, channels),
-		m_oki2(*this, "oki2"),
-		m_oki2_region(*this, "oki2"),
-		m_oki1_bank(*this, "oki1bank"),
-		m_oki2_bank(*this, "oki2bank"),
+		m_oki2(*this, OKI2_TAG),
+		m_oki2_region(*this, OKI2_TAG),
+		m_oki1_bank(*this, OKI1BANK_TAG),
+		m_oki2_bank(*this, OKI2BANK_TAG),
 		m_oki1_bankbase(0),
 		m_oki2_bankbase(0),
 		m_ym2151_cb(*this)
@@ -347,6 +355,29 @@ WRITE8_MEMBER( deco_6280_2xoki_device::ym2151_port_w )
 
 
 //-------------------------------------------------
+//  default_banked_oki12_w: Default both OKI
+//  bankswitch configuration
+//-------------------------------------------------
+
+WRITE8_MEMBER( deco_6280_2xoki_device::default_banked_oki12_w )
+{
+	oki1_bank_w((data >> 0) & 1, 1);
+	oki2_bank_w((data >> 1) & 1, 1);
+}
+
+
+//-------------------------------------------------
+//  default_banked_oki12_w: Default 2nd OKI
+//  bankswitch configuration
+//-------------------------------------------------
+
+WRITE8_MEMBER( deco_6280_2xoki_device::default_banked_oki2_w )
+{
+	oki2_bank_w(data & 1, 1);
+}
+
+
+//-------------------------------------------------
 //  oki1_bank_w: Handle writes to OKIM6295 - 1 Bank
 //-------------------------------------------------
 
@@ -383,17 +414,17 @@ MACHINE_CONFIG_START(deco_6280_2xoki_device::device_add_mconfig)
 	deco_6280_base_device::device_add_mconfig(config);
 
 	// basic machine hardware
-	MCFG_CPU_MODIFY("cpu")
+	MCFG_CPU_MODIFY(CPU_TAG)
 	MCFG_CPU_PROGRAM_MAP(sound_2xoki_map)
 
 	// sound hardware
-	MCFG_SOUND_MODIFY("ym2151")
+	MCFG_SOUND_MODIFY(YM2151_TAG)
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco_6280_2xoki_device, ym2151_port_w))
 
-	MCFG_SOUND_MODIFY("oki1")
+	MCFG_SOUND_MODIFY(OKI1_TAG)
 	MCFG_DEVICE_ADDRESS_MAP(0, deco6280_oki1_map)
 
-	MCFG_OKIM6295_ADD("oki2", MASTER_CLOCK/16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD(OKI2_TAG, MASTER_CLOCK/16, PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, deco6280_oki2_map)
 	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 1, DECO_OKI2_OUT)
 MACHINE_CONFIG_END
@@ -408,8 +439,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 deco_6280_ym2203_2xoki_device::deco_6280_ym2203_2xoki_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: deco_6280_2xoki_device(mconfig, DECO6280_YM2203_2XOKI, tag, owner, clock, 8),
-		m_ym2203(*this, "ym2203")
+	: deco_6280_2xoki_device(mconfig, DECO6280_YM2203_2XOKI, tag, owner, clock, 5),
+		m_ym2203(*this, YM2203_TAG)
 {
 }
 
@@ -422,15 +453,15 @@ MACHINE_CONFIG_START(deco_6280_ym2203_2xoki_device::device_add_mconfig)
 	deco_6280_2xoki_device::device_add_mconfig(config);
 
 	// basic machine hardware
-	MCFG_CPU_MODIFY("cpu")
+	MCFG_CPU_MODIFY(CPU_TAG)
 	MCFG_CPU_PROGRAM_MAP(sound_ym2203_2xoki_map)
 
 	// sound hardware
-	MCFG_SOUND_ADD("ym2203", YM2203, MASTER_CLOCK/8)
-	MCFG_MIXER_ROUTE(0, DEVICE_SELF_OWNER, 1, DECO_YM2203_OUT0)
-	MCFG_MIXER_ROUTE(1, DEVICE_SELF_OWNER, 1, DECO_YM2203_OUT1)
-	MCFG_MIXER_ROUTE(2, DEVICE_SELF_OWNER, 1, DECO_YM2203_OUT2)
-	MCFG_MIXER_ROUTE(3, DEVICE_SELF_OWNER, 1, DECO_YM2203_OUT3)
+	MCFG_SOUND_ADD(YM2203_TAG, YM2203, MASTER_CLOCK/8)
+	MCFG_MIXER_ROUTE(0, DEVICE_SELF_OWNER, 1, DECO_YM2203_OUT)
+	MCFG_MIXER_ROUTE(1, DEVICE_SELF_OWNER, 1, DECO_YM2203_OUT)
+	MCFG_MIXER_ROUTE(2, DEVICE_SELF_OWNER, 1, DECO_YM2203_OUT)
+	MCFG_MIXER_ROUTE(3, DEVICE_SELF_OWNER, 1, DECO_YM2203_OUT)
 MACHINE_CONFIG_END
 
 

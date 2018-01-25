@@ -213,10 +213,7 @@ TODO:
 #include "includes/dassault.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
 #include "machine/mb8421.h"
-#include "sound/2203intf.h"
-#include "sound/ym2151.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -283,7 +280,7 @@ static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(main_irq_ack_w)
 	AM_RANGE(0x140006, 0x140007) AM_WRITENOP /* ? */
 
-	AM_RANGE(0x180000, 0x180001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	AM_RANGE(0x180000, 0x180001) AM_DEVWRITE8(DECOSND_TAG, deco_6280_ym2203_2xoki_device, soundlatch_w, 0x00ff)
 
 	AM_RANGE(0x1c0000, 0x1c000f) AM_READ(dassault_control_r)
 	AM_RANGE(0x1c000a, 0x1c000b) AM_WRITE(priority_w)
@@ -316,20 +313,6 @@ static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16, dassault_state )
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("ram2") /* Sub cpu ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram") /* Sprite ram */
 	AM_RANGE(0x3fe000, 0x3fefff) AM_DEVREADWRITE("sharedram", mb8421_mb8431_16_device, right_r, right_w)
-ADDRESS_MAP_END
-
-/******************************************************************************/
-
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dassault_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
 /**********************************************************************************/
@@ -506,14 +489,6 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-WRITE8_MEMBER(dassault_state::sound_bankswitch_w)
-{
-	/* the second OKIM6295 ROM is bank switched */
-	m_oki2->set_rom_bank(data & 1);
-}
-
-/**********************************************************************************/
-
 DECO16IC_BANK_CB_MEMBER(dassault_state::bank_callback)
 {
 	return ((bank >> 4) & 0xf) << 12;
@@ -534,9 +509,6 @@ MACHINE_CONFIG_START(dassault_state::dassault)
 	MCFG_CPU_ADD("sub", M68000, XTAL(28'000'000)/2)   /* 14MHz - Accurate */
 	MCFG_CPU_PROGRAM_MAP(dassault_sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dassault_state,  irq5_line_assert)
-
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/8)    /* Accurate */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 //  MCFG_QUANTUM_TIME(attotime::from_hz(8400)) /* 140 CPU slices per frame */
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") // I was seeing random lockups.. let's see if this helps
@@ -602,27 +574,17 @@ MACHINE_CONFIG_START(dassault_state::dassault)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0)) // IRQ1
-
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-
-	MCFG_YM2151_ADD("ym2", XTAL(32'220'000)/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(dassault_state,sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
-
-	MCFG_OKIM6295_ADD("oki1", XTAL(32'220'000)/32, PIN7_HIGH) // verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-
-	MCFG_OKIM6295_ADD("oki2", XTAL(32'220'000)/16, PIN7_HIGH) // verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+	
+	MCFG_DECO6280_2XOKI_YM2203_ADD(DECOSND_TAG, XTAL(32'220'000)/8)    /* Accurate */
+	MCFG_DECO6280_YM2151_CALLBACK(DEVWRITE8(DECOSND_TAG, deco_6280_2xoki_device, default_banked_oki2_w))
+	MCFG_SOUND_ROUTE(DECO_YM2203_OUT, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(DECO_YM2203_OUT, "rspeaker", 0.40)
+	MCFG_SOUND_ROUTE(DECO_YM2151_OUT0, "lspeaker", 0.45)
+	MCFG_SOUND_ROUTE(DECO_YM2151_OUT1, "rspeaker", 0.45)
+	MCFG_SOUND_ROUTE(DECO_OKI1_OUT, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(DECO_OKI1_OUT, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(DECO_OKI2_OUT, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(DECO_OKI2_OUT, "rspeaker", 0.25)
 MACHINE_CONFIG_END
 
 /**********************************************************************************/
@@ -640,7 +602,7 @@ ROM_START( thndzone ) /* World rev 1 set, DSW selectable 2 or 4 players */
 	ROM_LOAD16_BYTE("gt11-1.a14", 0x40000, 0x20000, CRC(80cb23de) SHA1(d52426460eea2285c57cfc3fe37aa6dc79990e25) ) /* Same data as GS11.A14 */
 	ROM_LOAD16_BYTE("gt09-1.a11", 0x40001, 0x20000, CRC(0a8fa7e1) SHA1(330ae9602b5f56b5dc4961a41991b64412a59880) ) /* Same data as GS09.A11 */
 
-	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION(0x10000, DECOSND_CPU_TAG, 0 ) /* Sound CPU */
 	ROM_LOAD( "gt04.f18",    0x00000, 0x10000, CRC(81c29ebf) SHA1(1b241277a8e35cdeaeb120970d14a09d33032459) ) /* Same data for all regions, different label */
 
 	ROM_REGION(0x020000, "gfx1", 0 )
@@ -671,10 +633,10 @@ ROM_START( thndzone ) /* World rev 1 set, DSW selectable 2 or 4 players */
 	ROM_LOAD16_BYTE( "gt14.n3", 0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) )
 	ROM_LOAD16_BYTE( "gt15.n5", 0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) )
 
-	ROM_REGION(0x40000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION(0x40000, DECOSND_OKI1_TAG, 0 ) /* Oki samples */
 	ROM_LOAD( "gt07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) ) /* Same data as GS07.H15 */
 
-	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
+	ROM_REGION(0x80000, DECOSND_OKI2_TAG, 0 ) /* Extra Oki samples */
 	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )   /* banked */
 
 	ROM_REGION( 0x1000, "proms", 0 )
@@ -706,7 +668,7 @@ ROM_START( thndzonea ) /* World set, DSW selectable 2 or 4 players */
 	ROM_LOAD16_BYTE("gt11-1.a14", 0x40000, 0x20000, CRC(80cb23de) SHA1(d52426460eea2285c57cfc3fe37aa6dc79990e25) ) /* Same data as GS11.A14 */
 	ROM_LOAD16_BYTE("gt09-1.a11", 0x40001, 0x20000, CRC(0a8fa7e1) SHA1(330ae9602b5f56b5dc4961a41991b64412a59880) ) /* Same data as GS09.A11 */
 
-	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION(0x10000, DECOSND_CPU_TAG, 0 ) /* Sound CPU */
 	ROM_LOAD( "gt04.f18",    0x00000, 0x10000, CRC(81c29ebf) SHA1(1b241277a8e35cdeaeb120970d14a09d33032459) ) /* Same data for all regions, different label */
 
 	ROM_REGION(0x020000, "gfx1", 0 )
@@ -737,10 +699,10 @@ ROM_START( thndzonea ) /* World set, DSW selectable 2 or 4 players */
 	ROM_LOAD16_BYTE( "gt14.n3", 0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) )
 	ROM_LOAD16_BYTE( "gt15.n5", 0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) )
 
-	ROM_REGION(0x40000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION(0x40000, DECOSND_OKI1_TAG, 0 ) /* Oki samples */
 	ROM_LOAD( "gt07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) ) /* Same data as GS07.H15 */
 
-	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
+	ROM_REGION(0x80000, DECOSND_OKI2_TAG, 0 ) /* Extra Oki samples */
 	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )   /* banked */
 
 	ROM_REGION( 0x2000, "proms", 0 )
@@ -773,7 +735,7 @@ ROM_START( thndzone4 ) /* World set, 4 Player (shared credits) only English set 
 	ROM_LOAD16_BYTE("d27c010.a14", 0x40000, 0x20000, CRC(3d96d47e) SHA1(e2c01a17237cb6dc914da847642629415eda14a8) )
 	ROM_LOAD16_BYTE("d27c010.a11", 0x40001, 0x20000, CRC(2ab9b63f) SHA1(2ab06abbdee6e0d9c83004cdcb871c7389624086) )
 
-	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION(0x10000, DECOSND_CPU_TAG, 0 ) /* Sound CPU */
 	ROM_LOAD( "gu04.f18",    0x00000, 0x10000, CRC(81c29ebf) SHA1(1b241277a8e35cdeaeb120970d14a09d33032459) ) /* Same data for all regions, different label */
 
 	ROM_REGION(0x020000, "gfx1", 0 )
@@ -804,10 +766,10 @@ ROM_START( thndzone4 ) /* World set, 4 Player (shared credits) only English set 
 	ROM_LOAD16_BYTE( "gt14.n3", 0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) )
 	ROM_LOAD16_BYTE( "gt15.n5", 0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) )
 
-	ROM_REGION(0x40000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION(0x40000, DECOSND_OKI1_TAG, 0 ) /* Oki samples */
 	ROM_LOAD( "gs07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) )
 
-	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
+	ROM_REGION(0x80000, DECOSND_OKI2_TAG, 0 ) /* Extra Oki samples */
 	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )   /* banked */
 
 	ROM_REGION( 0x2000, "proms", 0 )
@@ -840,7 +802,7 @@ ROM_START( thndzonej ) /* Japan set, DSW selectable 2 or 4 players - Japanese la
 	ROM_LOAD16_BYTE("gu11.a14", 0x40000, 0x20000, CRC(c0d6eb82) SHA1(44070e6d37f5327cf7f647e44ea49a1fe6844e5e) )
 	ROM_LOAD16_BYTE("gu09.a11", 0x40001, 0x20000, CRC(42de13a7) SHA1(f948d31e368499fd8c35da0c7dd7519cfbd4b5f7) )
 
-	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION(0x10000, DECOSND_CPU_TAG, 0 ) /* Sound CPU */
 	ROM_LOAD( "gu04.f18",    0x00000, 0x10000, CRC(81c29ebf) SHA1(1b241277a8e35cdeaeb120970d14a09d33032459) ) /* Same data for all regions, different label */
 
 	ROM_REGION(0x020000, "gfx1", 0 )
@@ -876,12 +838,12 @@ ROM_START( thndzonej ) /* Japan set, DSW selectable 2 or 4 players - Japanese la
 	ROM_LOAD16_BYTE( "gt14.n3", 0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) ) /* REMOVE when MAL-14.N3 is dumped & added */
 	ROM_LOAD16_BYTE( "gt15.n5", 0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) ) /* REMOVE when MAL-15.N5 is dumped & added */
 
-	ROM_REGION(0x40000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION(0x40000, DECOSND_OKI1_TAG, 0 ) /* Oki samples */
 	/* This rom is also a Mask ROM label MAL-07 and _NOT_ MAJ-07 */
 	ROM_LOAD( "mal-07.h15",  0x00000,  0x20000, NO_DUMP ) /* Mask ROM - Need to verify if these are the same or different as the other sets */
 	ROM_LOAD( "gs07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) ) /* REMOVE when MAL-07.H15 is dumped & added */
 
-	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
+	ROM_REGION(0x80000, DECOSND_OKI2_TAG, 0 ) /* Extra Oki samples */
 	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )   /* banked */
 
 	ROM_REGION( 0x2000, "proms", 0 )
@@ -914,7 +876,7 @@ ROM_START( dassault ) /* USA set, DSW selectable 2, 3 or 4 players */
 	ROM_LOAD16_BYTE("gs11.a14",   0x40000, 0x20000, CRC(80cb23de) SHA1(d52426460eea2285c57cfc3fe37aa6dc79990e25) ) /* Same data as GT11-1.A14 */
 	ROM_LOAD16_BYTE("gs09.a11",   0x40001, 0x20000, CRC(0a8fa7e1) SHA1(330ae9602b5f56b5dc4961a41991b64412a59880) ) /* Same data as GT09-1.A11 */
 
-	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION(0x10000, DECOSND_CPU_TAG, 0 ) /* Sound CPU */
 	ROM_LOAD( "gs04.f18",    0x00000, 0x10000, CRC(81c29ebf) SHA1(1b241277a8e35cdeaeb120970d14a09d33032459) ) /* Same data for all regions, different label */
 
 	ROM_REGION(0x020000, "gfx1", 0 )
@@ -945,10 +907,10 @@ ROM_START( dassault ) /* USA set, DSW selectable 2, 3 or 4 players */
 	ROM_LOAD16_BYTE( "gs14.n3", 0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) )
 	ROM_LOAD16_BYTE( "gs15.n5", 0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) )
 
-	ROM_REGION(0x40000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION(0x40000, DECOSND_OKI1_TAG, 0 ) /* Oki samples */
 	ROM_LOAD( "gs07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) )
 
-	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
+	ROM_REGION(0x80000, DECOSND_OKI2_TAG, 0 ) /* Extra Oki samples */
 	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )   /* banked */
 
 	ROM_REGION( 0x2000, "proms", 0 )
@@ -981,7 +943,7 @@ ROM_START( dassault4 ) /* USA set, 4 player only */
 	ROM_LOAD16_BYTE("gs11.a14", 0x40000, 0x20000, CRC(80cb23de) SHA1(d52426460eea2285c57cfc3fe37aa6dc79990e25) ) /* Same data as GT11-1.A14 */
 	ROM_LOAD16_BYTE("gs09.a11", 0x40001, 0x20000, CRC(0a8fa7e1) SHA1(330ae9602b5f56b5dc4961a41991b64412a59880) ) /* Same data as GT09-1.A11 */
 
-	ROM_REGION(0x10000, "audiocpu", 0 ) /* Sound CPU */
+	ROM_REGION(0x10000, DECOSND_CPU_TAG, 0 ) /* Sound CPU */
 	ROM_LOAD( "gs04.f18",    0x00000, 0x10000, CRC(81c29ebf) SHA1(1b241277a8e35cdeaeb120970d14a09d33032459) ) /* Same data for all regions, different label */
 
 	ROM_REGION(0x020000, "gfx1", 0 )
@@ -1012,10 +974,10 @@ ROM_START( dassault4 ) /* USA set, 4 player only */
 	ROM_LOAD16_BYTE( "gs14.n3", 0x040000, 0x20000, CRC(750fc523) SHA1(ef8794359ff3a44a97ab402821fbe205a0be8f6a) )
 	ROM_LOAD16_BYTE( "gs15.n5", 0x040001, 0x20000, CRC(f14edd3d) SHA1(802d576df6dac2c9bf99f963f1955fc3a7ffdac0) )
 
-	ROM_REGION(0x40000, "oki1", 0 ) /* Oki samples */
+	ROM_REGION(0x40000, DECOSND_OKI1_TAG, 0 ) /* Oki samples */
 	ROM_LOAD( "gs07.h15",  0x00000,  0x20000,  CRC(750b7e5d) SHA1(d33b17a1d8c9b05d5c1daf0c80fed6381e04b167) )
 
-	ROM_REGION(0x80000, "oki2", 0 ) /* Extra Oki samples */
+	ROM_REGION(0x80000, DECOSND_OKI2_TAG, 0 ) /* Extra Oki samples */
 	ROM_LOAD( "maj-03.h16", 0x00000, 0x80000,  CRC(31dcfac3) SHA1(88c7fc139f871991defbc8dc2c9c66b150dd6f6f) )   /* banked */
 
 	ROM_REGION( 0x2000, "proms", 0 )

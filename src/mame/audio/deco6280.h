@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Bryan McPhail
 /***************************************************************************
 
     deco6280.h
@@ -22,10 +22,15 @@
 #define DECO_YM2151_OUT1    1
 #define DECO_OKI1_OUT       2
 #define DECO_OKI2_OUT       3
-#define DECO_YM2203_OUT0    4
-#define DECO_YM2203_OUT1    5
-#define DECO_YM2203_OUT2    6
-#define DECO_YM2203_OUT3    7
+#define DECO_YM2203_OUT     4
+
+#define DECOSND_TAG "decosnd"
+#define DECOSND_CPU_TAG "decosnd:cpu"
+#define DECOSND_YM2203_TAG "decosnd:ym2203"
+#define DECOSND_YM2151_TAG "decosnd:ym2151"
+#define DECOSND_OKI1_TAG "decosnd:oki1"
+#define DECOSND_OKI2_TAG "decosnd:oki2"
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -42,13 +47,19 @@ DECLARE_DEVICE_TYPE(DECO6280_YM2203_2XOKI, deco_6280_ym2203_2xoki_device)
 //**************************************************************************
 
 #define MCFG_DECO6280_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, DECO6280, _clock) \
+	MCFG_DEVICE_ADD(_tag, DECO6280, _clock)
 
 #define MCFG_DECO6280_2XOKI_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, DECO6280_2XOKI, _clock) \
-
+	MCFG_DEVICE_ADD(_tag, DECO6280_2XOKI, _clock)
+	
 #define MCFG_DECO6280_2XOKI_YM2203_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, DECO6280_YM2203_2XOKI, _clock) \
+	MCFG_DEVICE_ADD(_tag, DECO6280_YM2203_2XOKI, _clock)
+	
+#define MCFG_DECO6280_SOUNDLATCH_CALLBACK(_cb) \
+	devcb = &deco_6280_base_device::static_set_soundlatch_cb(*device, DEVCB_##_cb);
+
+#define MCFG_DECO6280_YM2151_CALLBACK(_cb) \
+	devcb = &deco_6280_2xoki_device::static_set_ym2151_cb(*device, DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -87,15 +98,13 @@ protected:
 	required_device<h6280_device> m_cpu;
 	required_device<ym2151_device> m_ym2151;
 	required_device<okim6295_device> m_oki1;
+	required_device<generic_latch_8_device> m_soundlatch;
 	
 	// memory regions
 	required_memory_region m_oki1_region;
 
 	// configuration state
 	devcb_read8    m_soundlatch_cb;
-
-	// internal state
-	uint8_t m_soundlatch;
 };
 
 
@@ -116,6 +125,8 @@ public:
 
 	// read/write handlers
 	DECLARE_WRITE8_MEMBER(ym2151_port_w);
+	DECLARE_WRITE8_MEMBER(default_banked_oki12_w);
+	DECLARE_WRITE8_MEMBER(default_banked_oki2_w);
 	
 	void oki1_bank_w(uint32_t bank, uint32_t mask);
 	void oki2_bank_w(uint32_t bank, uint32_t mask);

@@ -87,12 +87,8 @@
 #include "includes/boogwing.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
 #include "machine/deco102.h"
 #include "machine/decocrpt.h"
-#include "machine/gen_latch.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -104,7 +100,7 @@ READ16_MEMBER( boogwing_state::boogwing_protection_region_0_104_r )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint16_t data = m_ioprot->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -113,7 +109,7 @@ WRITE16_MEMBER( boogwing_state::boogwing_protection_region_0_104_w )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_ioprot->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
 WRITE16_MEMBER( boogwing_state::priority_w )
@@ -163,19 +159,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, boogwing_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, boogwing_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_NOP
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot", deco104_device, soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
-
 
 /**********************************************************************************/
 
@@ -345,9 +328,6 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", boogwing_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", H6280, SOUND_XTAL/4)
-	MCFG_CPU_PROGRAM_MAP(audio_map)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL / 4, 442, 0, 320, 274, 8, 248) // same as robocop2(cninja.cpp)? verify this from real pcb.
@@ -406,26 +386,22 @@ MACHINE_CONFIG_START(boogwing_state::boogwing)
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE(DECOSND_CPU_TAG, 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_YM2151_ADD("ymsnd", SOUND_XTAL/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
-	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(boogwing_state, sound_bankswitch_w))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
-
-	MCFG_OKIM6295_ADD("oki1", SOUND_XTAL/32, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.40)
-
-	MCFG_OKIM6295_ADD("oki2", SOUND_XTAL/16, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	
+	MCFG_DECO6280_2XOKI_ADD(DECOSND_TAG, SOUND_XTAL/4)
+	MCFG_DECO6280_SOUNDLATCH_CALLBACK(DEVREAD8("ioprot", deco_146_base_device, soundlatch_r))
+	MCFG_DECO6280_YM2151_CALLBACK(DEVWRITE8(DECOSND_TAG, deco_6280_2xoki_device, default_banked_oki12_w))
+	MCFG_SOUND_ROUTE(DECO_YM2151_OUT0, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(DECO_YM2151_OUT1, "rspeaker", 0.80)
+	MCFG_SOUND_ROUTE(DECO_OKI1_OUT, "lspeaker", 1.40)
+	MCFG_SOUND_ROUTE(DECO_OKI1_OUT, "rspeaker", 1.40)
+	MCFG_SOUND_ROUTE(DECO_OKI2_OUT, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(DECO_OKI2_OUT, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
 /**********************************************************************************/
@@ -437,7 +413,7 @@ ROM_START( boogwing ) /* VER 1.5 EUR 92.12.07 */
 	ROM_LOAD16_BYTE( "kn_01-2.4b",    0x080000, 0x040000, CRC(3ad4b54c) SHA1(5141001768266995078407851b445378b21453de) )
 	ROM_LOAD16_BYTE( "kn_03-2.4e",    0x080001, 0x040000, CRC(10b61f4a) SHA1(41d7f670defbd7dae89afafac9839a9e237814d5) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )
 	ROM_LOAD( "km06.18p",    0x00000, 0x10000, CRC(3e8bc4e1) SHA1(7e4c357afefa47b8f101727e06485eb9ebae635d) )
 
 	ROM_REGION( 0x20000, "tiles1", 0 ) /* Tiles 1 */
@@ -464,10 +440,10 @@ ROM_START( boogwing ) /* VER 1.5 EUR 92.12.07 */
 	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
 	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
 
-	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
+	ROM_REGION( 0x80000, DECOSND_OKI1_TAG, 0 ) /* Oki samples 1 */
 	ROM_LOAD( "mbd-10.17p",    0x000000, 0x080000, CRC(f159f76a) SHA1(0b1ea69fecdd151e2b1fa96a21eade492499691d) )
 
-	ROM_REGION( 0x80000, "oki2", 0 ) /* Oki samples 1 */
+	ROM_REGION( 0x80000, DECOSND_OKI2_TAG, 0 ) /* Oki samples 1 */
 	ROM_LOAD( "mbd-09.16p",    0x000000, 0x080000, CRC(f44f2f87) SHA1(d941520bdfc9e6d88c45462bc1f697c18f33498e) )
 
 	ROM_REGION( 0x000400, "proms", 0 ) /* Priority (not used) */
@@ -481,7 +457,7 @@ ROM_START( boogwingu ) /* VER 1.7 USA 92.12.14 */
 	ROM_LOAD16_BYTE( "kl_01.4b",    0x080000, 0x040000, CRC(d109ba13) SHA1(93fcda71e260ba94141e2d4d6b248f2cb8530b61) )
 	ROM_LOAD16_BYTE( "kl_03.4e",    0x080001, 0x040000, CRC(fef2a176) SHA1(b0505466237fe17b6aaa7eea47e309cd679208d1) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )
 	ROM_LOAD( "kl06.18p",    0x00000, 0x10000, CRC(3e8bc4e1) SHA1(7e4c357afefa47b8f101727e06485eb9ebae635d) ) /* same as other sets but labeled KL */
 
 	ROM_REGION( 0x20000, "tiles1", 0 ) /* Tiles 1 */
@@ -508,10 +484,10 @@ ROM_START( boogwingu ) /* VER 1.7 USA 92.12.14 */
 	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
 	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
 
-	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
+	ROM_REGION( 0x80000, DECOSND_OKI1_TAG, 0 ) /* Oki samples 1 */
 	ROM_LOAD( "mbd-10.17p",    0x000000, 0x080000, CRC(f159f76a) SHA1(0b1ea69fecdd151e2b1fa96a21eade492499691d) )
 
-	ROM_REGION( 0x80000, "oki2", 0 ) /* Oki samples 1 */
+	ROM_REGION( 0x80000, DECOSND_OKI2_TAG, 0 ) /* Oki samples 1 */
 	ROM_LOAD( "mbd-09.16p",    0x000000, 0x080000, CRC(f44f2f87) SHA1(d941520bdfc9e6d88c45462bc1f697c18f33498e) )
 
 	ROM_REGION( 0x000400, "proms", 0 ) /* Priority (not used) */
@@ -525,7 +501,7 @@ ROM_START( boogwinga ) /* VER 1.5 ASA 92.12.07 */
 	ROM_LOAD16_BYTE( "km_01-2.4b",    0x080000, 0x040000, CRC(7fdce2d3) SHA1(5ce9b8ac26700f1c3bfb3ce4845f890b81241823) )
 	ROM_LOAD16_BYTE( "km_03-2.4e",    0x080001, 0x040000, CRC(0b582de3) SHA1(f5c58c7e0e8a227506a81e38c266356596dcda7b) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )
 	ROM_LOAD( "km06.18p",    0x00000, 0x10000, CRC(3e8bc4e1) SHA1(7e4c357afefa47b8f101727e06485eb9ebae635d) )
 
 	ROM_REGION( 0x20000, "tiles1", 0 ) /* Tiles 1 */
@@ -552,10 +528,10 @@ ROM_START( boogwinga ) /* VER 1.5 ASA 92.12.07 */
 	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
 	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
 
-	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
+	ROM_REGION( 0x80000, DECOSND_OKI1_TAG, 0 ) /* Oki samples 1 */
 	ROM_LOAD( "mbd-10.17p",    0x000000, 0x080000, CRC(f159f76a) SHA1(0b1ea69fecdd151e2b1fa96a21eade492499691d) )
 
-	ROM_REGION( 0x80000, "oki2", 0 ) /* Oki samples 1 */
+	ROM_REGION( 0x80000, DECOSND_OKI2_TAG, 0 ) /* Oki samples 1 */
 	ROM_LOAD( "mbd-09.16p",    0x000000, 0x080000, CRC(f44f2f87) SHA1(d941520bdfc9e6d88c45462bc1f697c18f33498e) )
 
 	ROM_REGION( 0x000400, "proms", 0 ) /* Priority (not used) */
@@ -569,7 +545,7 @@ ROM_START( ragtime ) /* VER 1.5 JPN 92.12.07 */
 	ROM_LOAD16_BYTE( "kh_01-2.4b",    0x080000, 0x040000, CRC(12dfee70) SHA1(a7c8fd118f589ef13bcb43a6aa446ff81015f5b3) )
 	ROM_LOAD16_BYTE( "kh_03-2.4e",    0x080001, 0x040000, CRC(076fea18) SHA1(342ca71b6d8c8be92dbf221ada717bdbd0061226) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )
 	ROM_LOAD( "km06.18p",    0x00000, 0x10000, CRC(3e8bc4e1) SHA1(7e4c357afefa47b8f101727e06485eb9ebae635d) )
 
 	ROM_REGION( 0x20000, "tiles1", 0 ) /* Tiles 1 */
@@ -596,10 +572,10 @@ ROM_START( ragtime ) /* VER 1.5 JPN 92.12.07 */
 	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
 	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
 
-	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
+	ROM_REGION( 0x80000, DECOSND_OKI1_TAG, 0 ) /* Oki samples 1 */
 	ROM_LOAD( "mbd-10.17p",    0x000000, 0x080000, CRC(f159f76a) SHA1(0b1ea69fecdd151e2b1fa96a21eade492499691d) )
 
-	ROM_REGION( 0x80000, "oki2", 0 ) /* Oki samples 1 */
+	ROM_REGION( 0x80000, DECOSND_OKI2_TAG, 0 ) /* Oki samples 1 */
 	ROM_LOAD( "mbd-09.16p",    0x000000, 0x080000, CRC(f44f2f87) SHA1(d941520bdfc9e6d88c45462bc1f697c18f33498e) )
 
 	ROM_REGION( 0x000400, "proms", 0 ) /* Priority (not used) */
@@ -613,7 +589,7 @@ ROM_START( ragtimea ) /* VER 1.3 JPN 92.11.26 */
 	ROM_LOAD16_BYTE( "kh_01-1.4b",    0x080000, 0x040000, CRC(4dab63ad) SHA1(8c6f6e8382bcbba6e1a7ced504397181e7d6e1d1) )
 	ROM_LOAD16_BYTE( "kh_03-1.4e",    0x080001, 0x040000, CRC(8a4cbb18) SHA1(272c8e2b20b0a38ce37552be00130c4117533ea9) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )
 	ROM_LOAD( "km06.18p",    0x00000, 0x10000, CRC(3e8bc4e1) SHA1(7e4c357afefa47b8f101727e06485eb9ebae635d) )
 
 	ROM_REGION( 0x20000, "tiles1", 0 ) /* Tiles 1 */
@@ -640,10 +616,10 @@ ROM_START( ragtimea ) /* VER 1.3 JPN 92.11.26 */
 	ROM_REGION( 0x0100000, "gfx6", 0 ) /* 1bpp graphics */
 	ROM_LOAD16_BYTE( "mbd-02.10e",    0x000000, 0x080000, CRC(b25aa721) SHA1(efe800759080bd1dac2da93bd79062a48c5da2b2) )
 
-	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki samples 1 */
+	ROM_REGION( 0x80000, DECOSND_OKI1_TAG, 0 ) /* Oki samples 1 */
 	ROM_LOAD( "mbd-10.17p",    0x000000, 0x080000, CRC(f159f76a) SHA1(0b1ea69fecdd151e2b1fa96a21eade492499691d) )
 
-	ROM_REGION( 0x80000, "oki2", 0 ) /* Oki samples 1 */
+	ROM_REGION( 0x80000, DECOSND_OKI2_TAG, 0 ) /* Oki samples 1 */
 	ROM_LOAD( "mbd-09.16p",    0x000000, 0x080000, CRC(f44f2f87) SHA1(d941520bdfc9e6d88c45462bc1f697c18f33498e) )
 
 	ROM_REGION( 0x000400, "proms", 0 ) /* Priority (not used) */

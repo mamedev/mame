@@ -6,9 +6,9 @@
 
 *************************************************************************/
 
-#include "machine/gen_latch.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
+#include "audio/deco6280.h"
 
 class cbuster_state : public driver_device
 {
@@ -25,11 +25,10 @@ public:
 		m_paletteram_ext(*this, "palette_ext"),
 		m_sprgen(*this, "spritegen"),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu"),
+		m_decosnd(*this, DECOSND_TAG),
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_deco_tilegen2(*this, "tilegen2"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
+		m_palette(*this, "palette")
 	{ }
 
 	/* memory pointers */
@@ -51,11 +50,10 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<deco_6280_ym2203_2xoki_device> m_decosnd;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE16_MEMBER(twocrude_control_w);
 	DECLARE_READ16_MEMBER(twocrude_control_r);

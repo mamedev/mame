@@ -3,6 +3,8 @@
 
 #include "machine/gen_latch.h"
 #include "video/decospr.h"
+#include "sound/ym2151.h"
+#include "sound/3812intf.h"
 #include "sound/okim6295.h"
 
 class tumbleb_state : public driver_device

@@ -21,10 +21,6 @@
 #include "includes/darkseal.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
-#include "sound/2203intf.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -38,8 +34,7 @@ WRITE16_MEMBER(darkseal_state::control_w)
 		m_spriteram->copy();
 		return;
 	case 8: /* Sound CPU write */
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
+		m_decosnd->soundlatch_w(space, 0, data & 0xff);
 		return;
 	case 0xa: /* IRQ Ack (VBL) */
 		return;
@@ -84,20 +79,6 @@ static ADDRESS_MAP_START( darkseal_map, AS_PROGRAM, 16, darkseal_state )
 	AM_RANGE(0x260000, 0x261fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_r, pf1_data_w)
 	AM_RANGE(0x262000, 0x263fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
 	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
-ADDRESS_MAP_END
-
-/******************************************************************************/
-
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, darkseal_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -235,9 +216,6 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	MCFG_CPU_PROGRAM_MAP(darkseal_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", darkseal_state,  irq6_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -284,25 +262,15 @@ MACHINE_CONFIG_START(darkseal_state::darkseal)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-
-	MCFG_YM2151_ADD("ym2", XTAL(32'220'000)/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
-	MCFG_SOUND_ROUTE(0, "mono", 0.55)
-	MCFG_SOUND_ROUTE(1, "mono", 0.55)
-
-	MCFG_OKIM6295_ADD("oki1", XTAL(32'220'000)/32, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_OKIM6295_ADD("oki2", XTAL(32'220'000)/16, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	
+	MCFG_DECO6280_2XOKI_YM2203_ADD(DECOSND_TAG, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
+	MCFG_SOUND_ROUTE(DECO_YM2203_OUT, "mono", 0.45)
+	MCFG_SOUND_ROUTE(DECO_YM2151_OUT0, "mono", 0.55)
+	MCFG_SOUND_ROUTE(DECO_YM2151_OUT1, "mono", 0.55)
+	MCFG_SOUND_ROUTE(DECO_OKI1_OUT, "mono", 1.0)
+	MCFG_SOUND_ROUTE(DECO_OKI2_OUT, "mono", 0.60)
 MACHINE_CONFIG_END
 
 /******************************************************************************/
@@ -314,7 +282,7 @@ ROM_START( darkseal )
 	ROM_LOAD16_BYTE( "ga_00.h12",   0x40000, 0x20000, CRC(fbf3ac63) SHA1(51af581ee951eedeb4aa413ecbebe8bf4d30613b) )
 	ROM_LOAD16_BYTE( "ga_05.j14",   0x40001, 0x20000, CRC(d5e3ae3f) SHA1(12f6e92af115422c6ab6ef1d33675d1e1cd58e10) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "fz_06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
@@ -331,10 +299,10 @@ ROM_START( darkseal )
 	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_08.l17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI2_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_07.k14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
@@ -345,7 +313,7 @@ ROM_START( darkseal1 )
 	ROM_LOAD16_BYTE( "FZ_00-2.H12", 0x40000, 0x20000, CRC(fbf3ac63) SHA1(51af581ee951eedeb4aa413ecbebe8bf4d30613b) )
 	ROM_LOAD16_BYTE( "FZ_05-2.J14", 0x40001, 0x20000, CRC(d5e3ae3f) SHA1(12f6e92af115422c6ab6ef1d33675d1e1cd58e10) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "FZ_06-1.J15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
@@ -362,10 +330,10 @@ ROM_START( darkseal1 )
 	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "FZ_08-1.K17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI2_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "FZ_07-.K14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
@@ -376,7 +344,7 @@ ROM_START( darksealj )
 	ROM_LOAD16_BYTE( "fz_00-2.h12", 0x40000, 0x20000, CRC(1ab99aa7) SHA1(1da51f3ee0d15094911d4090264b945090d51242) )
 	ROM_LOAD16_BYTE( "fz_05-2.j14", 0x40001, 0x20000, CRC(3374ef8c) SHA1(4144e71e452e281078bcd9b9a996db9f5dccc346) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "fz_06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
@@ -393,10 +361,10 @@ ROM_START( darksealj )
 	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_08.l17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI2_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_07.k14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
@@ -407,7 +375,7 @@ ROM_START( gatedoom )
 	ROM_LOAD16_BYTE( "gb_00.h12",   0x40000, 0x20000, CRC(a88c16a1) SHA1(e02d5470692f23afa658b9bda933bb20be64602f) )
 	ROM_LOAD16_BYTE( "gb_05.j14",   0x40001, 0x20000, CRC(252d7e14) SHA1(b2f27cd9686dfc697f3faca74d20b298a59efab2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "fz_06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
@@ -424,10 +392,10 @@ ROM_START( gatedoom )
 	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_08.l17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI2_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_07.k14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 
@@ -438,7 +406,7 @@ ROM_START( gatedoom1 )
 	ROM_LOAD16_BYTE( "gb_00.h12", 0x40000, 0x20000, CRC(a88c16a1) SHA1(e02d5470692f23afa658b9bda933bb20be64602f) )
 	ROM_LOAD16_BYTE( "gb_05.j14", 0x40001, 0x20000, CRC(252d7e14) SHA1(b2f27cd9686dfc697f3faca74d20b298a59efab2) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "fz_06-1.j15", 0x00000, 0x10000, CRC(c4828a6d) SHA1(fbfd0c85730bbe18401879cd68c19aaec9d482d8) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
@@ -455,10 +423,10 @@ ROM_START( gatedoom1 )
 	ROM_LOAD( "mac-00.b1", 0x000000, 0x80000, CRC(52acf1d6) SHA1(a7b68782417baafc86371b106fd31c5317f5b3d8) ) /* sprites */
 	ROM_LOAD( "mac-01.b3", 0x080000, 0x80000, CRC(b28f7584) SHA1(e02ddd45130a7b50f80b6dd049059dba8071d768) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_08.l17", 0x00000, 0x20000, CRC(c9bf68e1) SHA1(c81e2534a814fe44c8787946a9fbe18f1743c3b4) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI2_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "fz_07.k14", 0x00000, 0x20000, CRC(588dd3cb) SHA1(16c4e7670a4967768ddbfd52939d4e6e42268441) )
 ROM_END
 

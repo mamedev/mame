@@ -18,24 +18,8 @@
 #include "includes/madmotor.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
-#include "sound/2203intf.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
-
-
-/******************************************************************************/
-
-WRITE16_MEMBER(madmotor_state::madmotor_sound_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-	}
-}
 
 
 /******************************************************************************/
@@ -63,22 +47,7 @@ static ADDRESS_MAP_START( madmotor_map, AS_PROGRAM, 16, madmotor_state )
 	AM_RANGE(0x3f8002, 0x3f8003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3f8004, 0x3f8005) AM_READ_PORT("DSW")
 	AM_RANGE(0x3f8006, 0x3f8007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3fc004, 0x3fc005) AM_WRITE(madmotor_sound_w)
-ADDRESS_MAP_END
-
-/******************************************************************************/
-
-/* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, madmotor_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
+	AM_RANGE(0x3fc004, 0x3fc005) AM_DEVWRITE8(DECOSND_TAG, deco_6280_base_device, soundlatch_w, 0x00ff)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -239,10 +208,6 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_CPU_PROGRAM_MAP(madmotor_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", madmotor_state,  irq6_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", H6280, 8053000/2) /* Custom chip 45, Crystal near CPU is 8.053 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -272,25 +237,27 @@ MACHINE_CONFIG_START(madmotor_state::madmotor)
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
 
 
-
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+	
+	MCFG_DECO6280_2XOKI_YM2203_ADD(DECOSND_TAG, 8053000/2) /* Custom chip 45, Crystal near CPU is 8.053 MHz */
+	MCFG_SOUND_ROUTE(DECO_YM2203_OUT, "mono", 0.40)
+	MCFG_SOUND_ROUTE(DECO_YM2151_OUT0, "mono", 0.45)
+	MCFG_SOUND_ROUTE(DECO_YM2151_OUT1, "mono", 0.45)
+	MCFG_SOUND_ROUTE(DECO_OKI1_OUT, "mono", 0.50)
+	MCFG_SOUND_ROUTE(DECO_OKI2_OUT, "mono", 0.40)
+	
+	MCFG_DEVICE_MODIFY(DECOSND_YM2203_TAG)
+	MCFG_DEVICE_CLOCK(21470000/6)
+	
+	MCFG_DEVICE_MODIFY(DECOSND_YM2151_TAG)
+	MCFG_DEVICE_CLOCK(21470000/6)
+	
+	MCFG_DEVICE_MODIFY(DECOSND_OKI1_TAG)
+	MCFG_DEVICE_CLOCK(1023924) // clock frequency & pin 7 not verified
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_SOUND_ADD("ym1", YM2203, 21470000/6)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-
-	MCFG_YM2151_ADD("ym2", 21470000/6)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
-	MCFG_SOUND_ROUTE(0, "mono", 0.45)
-	MCFG_SOUND_ROUTE(1, "mono", 0.45)
-
-	MCFG_OKIM6295_ADD("oki1", 1023924, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_OKIM6295_ADD("oki2", 2047848, PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_DEVICE_MODIFY(DECOSND_OKI2_TAG)
+	MCFG_DEVICE_CLOCK(2047848) // clock frequency & pin 7 not verified
 MACHINE_CONFIG_END
 
 /******************************************************************************/
@@ -303,7 +270,7 @@ ROM_START( madmotor )
 	ROM_LOAD16_BYTE( "03-2.B6", 0x40000, 0x20000, CRC(442a0a52) SHA1(86bb5470d5653d125481250f778c632371dddad8) )
 	ROM_LOAD16_BYTE( "01-2.B3", 0x40001, 0x20000, CRC(e246876e) SHA1(648dca8bab001cfb42618081bbc1efa14118743e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "14.L7",    0x00000, 0x10000, CRC(1c28a7e5) SHA1(ed30d0a5a8a079677bd34b6d98ab1b15b934b30f) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
@@ -330,10 +297,10 @@ ROM_START( madmotor )
 	ROM_LOAD( "21.J16",    0x0c0000, 0x20000, CRC(9c72d364) SHA1(9290e463273fa1f921279f1bab808d91d3aa9648) )
 	ROM_LOAD( "22.J18",    0x0e0000, 0x20000, CRC(1e78aa60) SHA1(f5f58ee6f5efe56e72623e57ce27884551e09bd9) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "12.H1",    0x00000, 0x20000, CRC(c202d200) SHA1(8470654923a0e8780dad678f5745f8e3e3be08b2) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI2_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "13.H3",    0x00000, 0x20000, CRC(cc4d65e9) SHA1(b9bcaa52c570f94d2f2e5dd84c94773cc4115442) )
 ROM_END
 

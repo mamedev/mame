@@ -7,13 +7,13 @@
 #include "video/deco_ace.h"
 #include "machine/deco_irq.h"
 #include "machine/eepromser.h"
-#include "machine/gen_latch.h"
 #include "sound/lc7535.h"
 #include "sound/okim6295.h"
 #include "sound/ym2151.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"
 #include "video/deco_zoomspr.h"
+#include "audio/deco6280.h"
 #include "screen.h"
 
 class deco32_state : public driver_device
@@ -23,6 +23,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_decosnd(*this, DECOSND_TAG),
 		m_ioprot(*this, "ioprot"),
 		m_deco_irq(*this, "irq"),
 		m_decobsmt(*this, "decobsmt"),
@@ -40,17 +41,19 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
 		m_ram(*this, "ram"),
 		m_pf1_rowscroll32(*this, "pf1_rowscroll32"),
 		m_pf2_rowscroll32(*this, "pf2_rowscroll32"),
 		m_pf3_rowscroll32(*this, "pf3_rowscroll32"),
 		m_pf4_rowscroll32(*this, "pf4_rowscroll32"),
-		m_generic_paletteram_32(*this, "paletteram")
+		m_generic_paletteram_32(*this, "paletteram"),
+		m_lspeaker(*this, "lspeaker"),
+		m_rspeaker(*this, "rspeaker")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
+	optional_device<deco_6280_2xoki_device> m_decosnd;
 	required_device<deco_146_base_device> m_ioprot;
 	optional_device<deco_irq_device> m_deco_irq;
 	optional_device<decobsmt_device> m_decobsmt;
@@ -68,7 +71,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_device<generic_latch_8_device> m_soundlatch;
+	required_device<speaker_device> m_lspeaker;
+	required_device<speaker_device> m_rspeaker;
 
 	required_shared_ptr<uint32_t> m_ram;
 	// we use the pointers below to store a 32-bit copy..
@@ -221,6 +225,8 @@ public:
 		m_sprite_layout_1_ram(*this, "lay1"),
 		m_sprite_lookup_0_ram(*this, "look0"),
 		m_sprite_lookup_1_ram(*this, "look1"),
+		m_oki2_region(*this, "oki2"),
+		m_oki2bank(*this, "oki2bank"),
 		m_oki3(*this, "oki3"),
 		m_vol_main(*this, "vol_main"),
 		m_vol_gun(*this, "vol_gun"),
@@ -231,6 +237,8 @@ public:
 	required_shared_ptr<uint32_t> m_sprite_layout_1_ram;
 	required_shared_ptr<uint32_t> m_sprite_lookup_0_ram;
 	required_shared_ptr<uint32_t> m_sprite_lookup_1_ram;
+	optional_memory_region m_oki2_region;
+	optional_memory_bank m_oki2_bank;
 	optional_device<okim6295_device> m_oki3;
 	required_device<lc7535_device> m_vol_main;
 	required_device<lc7535_device> m_vol_gun;
@@ -239,6 +247,9 @@ public:
 	int m_lightgun_port;
 	bitmap_rgb32 m_temp_render_bitmap;
 
+	uint32_t m_oki2_bankbase;
+
+	void oki2_bank(uint32_t bank, uin32_t mask){ m_oki2_bankbase=(m_oki2_bankbase&~mask)|(bank&mask); m_oki2bank->set_entry(m_oki2_bankbase); };
 	DECLARE_READ32_MEMBER(lightgun_r);
 	DECLARE_WRITE32_MEMBER(lightgun_w);
 	DECLARE_WRITE32_MEMBER(sprite_control_w);
@@ -252,6 +263,7 @@ public:
 	DECLARE_WRITE32_MEMBER(speaker_switch_w);
 	LC7535_VOLUME_CHANGED(volume_main_changed);
 	LC7535_VOLUME_CHANGED(volume_gun_changed);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 
 	virtual void video_start() override;
 	DECLARE_DRIVER_INIT(dragngun);

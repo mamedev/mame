@@ -42,10 +42,6 @@
 #include "includes/cbuster.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
-#include "sound/2203intf.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -64,8 +60,7 @@ WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 		return;
 
 	case 2: /* Sound CPU write */
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
+		m_decosnd->soundlatch_w(space, 0, data & 0xff);
 		return;
 
 	case 4: /* Protection, maybe this is a PAL on the board?
@@ -149,21 +144,6 @@ static ADDRESS_MAP_START( twocrude_map, AS_PROGRAM, 16, cbuster_state )
 	AM_RANGE(0x0bc000, 0x0bc00f) AM_READWRITE(twocrude_control_r, twocrude_control_w)
 ADDRESS_MAP_END
 
-
-
-/******************************************************************************/
-
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cbuster_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
 
 /******************************************************************************/
 
@@ -312,10 +292,6 @@ MACHINE_CONFIG_START(cbuster_state::twocrude)
 	MCFG_CPU_PROGRAM_MAP(twocrude_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cbuster_state,  irq4_line_hold)/* VBL */
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(24'000'000)/4) /* Custom chip 45, 6MHz Verified */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
@@ -366,23 +342,17 @@ MACHINE_CONFIG_START(cbuster_state::twocrude)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	
+	MCFG_DECO6280_2XOKI_YM2203_ADD(DECOSND_TAG, XTAL(24'000'000)/4) /* Custom chip 45, 6MHz Verified */
+	MCFG_SOUND_ROUTE(DECO_YM2203_OUT, "mono", 0.60)
+	MCFG_SOUND_ROUTE(DECO_YM2151_OUT0, "mono", 0.45)
+	MCFG_SOUND_ROUTE(DECO_YM2151_OUT1, "mono", 0.45)
+	MCFG_SOUND_ROUTE(DECO_OKI1_OUT, "mono", 0.75)
+	MCFG_SOUND_ROUTE(DECO_OKI2_OUT, "mono", 0.60)
 
 	// YM2203_PITCH_HACK - Pitch is too low at 1.3425MHz (see also stfight.cpp)
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/24 * 3) /* 1.3425MHz Verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-
-	MCFG_YM2151_ADD("ym2", XTAL(32'220'000)/9) /* 3.58MHz Verified */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
-	MCFG_SOUND_ROUTE(0, "mono", 0.45)
-	MCFG_SOUND_ROUTE(1, "mono", 0.45)
-
-	MCFG_OKIM6295_ADD("oki1", XTAL(32'220'000)/32, PIN7_HIGH) /* 1.0068MHz Verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-
-	MCFG_OKIM6295_ADD("oki2", XTAL(32'220'000)/16, PIN7_HIGH) /* 2.01375MHz Verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_DEVICE_MODIFY(DECOSND_YM2203_TAG)
+	MCFG_DEVICE_CLOCK(XTAL(32'220'000)/24 * 3) /* 1.3425MHz Verified */
 MACHINE_CONFIG_END
 
 /******************************************************************************/
@@ -394,7 +364,7 @@ ROM_START( cbuster )
 	ROM_LOAD16_BYTE( "fx03.9l", 0x40000, 0x20000, CRC(c3d65bf9) SHA1(99dd650fd4b427bca25a0776fbd6221f93504106) )
 	ROM_LOAD16_BYTE( "fx02.6l", 0x40001, 0x20000, CRC(b875266b) SHA1(a76f8e061392e17394a3f975584823ad39e0097e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "fu11-.19h", 0x00000, 0x10000, CRC(65f20f10) SHA1(cf914893edd98a0f39bbf7068a469ed7d34bd90e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -416,10 +386,10 @@ ROM_START( cbuster )
 	ROM_LOAD( "fu09-.7a", 0x160000, 0x10000, CRC(526809ca) SHA1(2cb9e7417211c1eb23d32e3fee71c5254d34a3ff) )
 	ROM_LOAD( "fu10-.8a", 0x170000, 0x10000, CRC(6be6d50e) SHA1(b944db4b3a7c76190f6b40f71f033e16e7964f6a) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "fu12-.16k", 0x00000, 0x20000, CRC(2d1d65f2) SHA1(be3d57b9976ddf7ee6d20ee9e78fe826ee411d79) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI2_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "fu13-.21e", 0x00000, 0x20000, CRC(b8525622) SHA1(4a6ec5e3f64256b1383bfbab4167cbd2ec11b5c5) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -433,7 +403,7 @@ ROM_START( cbusterw )
 	ROM_LOAD16_BYTE( "fu03-.9l", 0x40000, 0x20000, CRC(def46956) SHA1(e1f71a440430f8f9351ee9e1826ca2d0d5a372f8) )
 	ROM_LOAD16_BYTE( "fu02-.6l", 0x40001, 0x20000, CRC(649c3338) SHA1(06373b364283706f0b00ab6d014c674e4b9818fa) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "fu11-.19h", 0x00000, 0x10000, CRC(65f20f10) SHA1(cf914893edd98a0f39bbf7068a469ed7d34bd90e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -455,10 +425,10 @@ ROM_START( cbusterw )
 	ROM_LOAD( "fu09-.7a", 0x160000, 0x10000, CRC(526809ca) SHA1(2cb9e7417211c1eb23d32e3fee71c5254d34a3ff) )
 	ROM_LOAD( "fu10-.8a", 0x170000, 0x10000, CRC(6be6d50e) SHA1(b944db4b3a7c76190f6b40f71f033e16e7964f6a) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "fu12-.16k", 0x00000, 0x20000, CRC(2d1d65f2) SHA1(be3d57b9976ddf7ee6d20ee9e78fe826ee411d79) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI2_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "fu13-.21e", 0x00000, 0x20000, CRC(b8525622) SHA1(4a6ec5e3f64256b1383bfbab4167cbd2ec11b5c5) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -472,7 +442,7 @@ ROM_START( cbusterj )
 	ROM_LOAD16_BYTE( "fr03.9l",   0x40000, 0x20000, CRC(02c06118) SHA1(a251f936f80d8a9af033fe6d0d42e1e17ebbbf98) )
 	ROM_LOAD16_BYTE( "fr02.6l",   0x40001, 0x20000, CRC(b6c34332) SHA1(c1215c72a03b368655e20f4557475a2fc4c46c9e) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "fu11-.19h", 0x00000, 0x10000, CRC(65f20f10) SHA1(cf914893edd98a0f39bbf7068a469ed7d34bd90e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -496,10 +466,10 @@ ROM_START( cbusterj )
 	ROM_LOAD( "fr09.7a", 0x160000, 0x10000, CRC(f8363424) SHA1(6a6b143a3474965ef89f75e9d7b15946ae26d0d4) )
 	ROM_LOAD( "fr10.8a", 0x170000, 0x10000, CRC(241d5760) SHA1(cd216ecf7e88939b91a6e0f02a23c8b875ac24dc) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "fu12-.16k", 0x00000, 0x20000, CRC(2d1d65f2) SHA1(be3d57b9976ddf7ee6d20ee9e78fe826ee411d79) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI2_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "fu13-.21e", 0x00000, 0x20000, CRC(b8525622) SHA1(4a6ec5e3f64256b1383bfbab4167cbd2ec11b5c5) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -513,7 +483,7 @@ ROM_START( twocrude )
 	ROM_LOAD16_BYTE( "ft03.9l",   0x40000, 0x20000, CRC(28002c99) SHA1(6397b05a1a237bb17657bee6c8185f61c60c6a2c) )
 	ROM_LOAD16_BYTE( "ft02.6l",   0x40001, 0x20000, CRC(37ea0626) SHA1(ec1822eda83829c599cad217b6d5dd34fb970101) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "ft11-.19h", 0x00000, 0x10000, CRC(65f20f10) SHA1(cf914893edd98a0f39bbf7068a469ed7d34bd90e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -536,10 +506,10 @@ ROM_START( twocrude )
 	ROM_LOAD( "ft09-.7a", 0x160000, 0x10000, CRC(6e3657b9) SHA1(7e6a140e33f9bc18e35c255680eebe152a5d8858) )
 	ROM_LOAD( "ft10-.8a", 0x170000, 0x10000, CRC(cdb83560) SHA1(8b258c4436ccea5a74edff1b6219ab7a5eac0328) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "ft12-.16k", 0x00000, 0x20000, CRC(2d1d65f2) SHA1(be3d57b9976ddf7ee6d20ee9e78fe826ee411d79) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI2_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "ft13-.21e", 0x00000, 0x20000, CRC(b8525622) SHA1(4a6ec5e3f64256b1383bfbab4167cbd2ec11b5c5) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
@@ -553,7 +523,7 @@ ROM_START( twocrudea )
 	ROM_LOAD16_BYTE( "ft03.9l", 0x40000, 0x20000, CRC(28002c99) SHA1(6397b05a1a237bb17657bee6c8185f61c60c6a2c) )
 	ROM_LOAD16_BYTE( "ft02.6l", 0x40001, 0x20000, CRC(37ea0626) SHA1(ec1822eda83829c599cad217b6d5dd34fb970101) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "ft11-.19h", 0x00000, 0x10000, CRC(65f20f10) SHA1(cf914893edd98a0f39bbf7068a469ed7d34bd90e) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -575,10 +545,10 @@ ROM_START( twocrudea )
 	ROM_LOAD( "ft09-.7a", 0x160000, 0x10000, CRC(6e3657b9) SHA1(7e6a140e33f9bc18e35c255680eebe152a5d8858) )
 	ROM_LOAD( "ft10-.8a", 0x170000, 0x10000, CRC(cdb83560) SHA1(8b258c4436ccea5a74edff1b6219ab7a5eac0328) )
 
-	ROM_REGION( 0x40000, "oki1", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "ft12-.16k", 0x00000, 0x20000, CRC(2d1d65f2) SHA1(be3d57b9976ddf7ee6d20ee9e78fe826ee411d79) )
 
-	ROM_REGION( 0x40000, "oki2", 0 )    /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI2_TAG, 0 )    /* ADPCM samples */
 	ROM_LOAD( "ft13-.21e", 0x00000, 0x20000, CRC(b8525622) SHA1(4a6ec5e3f64256b1383bfbab4167cbd2ec11b5c5) )
 
 	ROM_REGION( 0x0100, "proms", 0 )

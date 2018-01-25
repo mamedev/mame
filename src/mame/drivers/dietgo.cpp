@@ -24,12 +24,8 @@ PAL16R6A 11H
 #include "includes/dietgo.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
 #include "machine/decocrpt.h"
 #include "machine/deco102.h"
-#include "machine/gen_latch.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -39,7 +35,7 @@ READ16_MEMBER( dietgo_state::dietgo_protection_region_0_104_r )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint16_t data = m_ioprot->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -48,7 +44,7 @@ WRITE16_MEMBER( dietgo_state::dietgo_protection_region_0_104_w )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
-	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_ioprot->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
 
@@ -68,21 +64,6 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, dietgo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
-
-
-/* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dietgo_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_NOP     /* YM2203 - this board doesn't have one */
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_NOP     /* This board only has 1 oki chip */
-	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot104", deco104_device, soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
-ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( dietgo )
@@ -217,10 +198,6 @@ MACHINE_CONFIG_START(dietgo_state::dietgo)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dietgo_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/4/3)  /* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -255,23 +232,22 @@ MACHINE_CONFIG_START(dietgo_state::dietgo)
 	MCFG_DECO_SPRITE_GFX_REGION(2)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
 
-	MCFG_DECO104_ADD("ioprot104")
+	MCFG_DECO104_ADD("ioprot")
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE(DECOSND_CPU_TAG, 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 	MCFG_DECO146_SET_USE_MAGIC_ADDRESS_XOR
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000)/9) /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-
-	MCFG_OKIM6295_ADD("oki", XTAL(32'220'000)/32, PIN7_HIGH) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_DECO6280_ADD(DECOSND_TAG, XTAL(32'220'000)/4/3)  /* Custom chip 45; XIN is 32.220MHZ/4, verified on pcb */
+	MCFG_DECO6280_SOUNDLATCH_CALLBACK(DEVREAD8("ioprot", deco_146_base_device, soundlatch_r))
+	MCFG_SOUND_ROUTE(DECO_YM2151_OUT0, "mono", 0.45)
+	MCFG_SOUND_ROUTE(DECO_YM2151_OUT1, "mono", 0.45)
+	MCFG_SOUND_ROUTE(DECO_OKI1_OUT, "mono", 0.60)
 MACHINE_CONFIG_END
 
 
@@ -282,7 +258,7 @@ ROM_START( dietgo )
 	ROM_LOAD16_BYTE( "jy_00-2.4h", 0x000001, 0x040000, CRC(014dcf62) SHA1(1a28ce4a643ec8b6f062b1200342ed4dc6db38a1) )
 	ROM_LOAD16_BYTE( "jy_01-2.5h", 0x000000, 0x040000, CRC(793ebd83) SHA1(b9178f18ce6e9fca848cbbf9dce3f3856672bf94) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )
 	ROM_LOAD( "jy_02.14m", 0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -292,7 +268,7 @@ ROM_START( dietgo )
 	ROM_LOAD16_BYTE( "may-01.14a", 0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494) )
 	ROM_LOAD16_BYTE( "may-02.16a", 0x000001, 0x100000, CRC(3a66a713) SHA1(beeb99156332cf4870738f7769b719a02d7b40af) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, DECOSND_OKI1_TAG, 0 ) /* Oki samples */
 	ROM_LOAD( "may-03.11l", 0x00000, 0x80000, CRC(b6e42bae) SHA1(c282cdf7db30fb63340cc609bf00f5ab63a75583) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
@@ -306,7 +282,7 @@ ROM_START( dietgoe ) // weird, still version 1.1 but different (earlier) date
 	ROM_LOAD16_BYTE( "jy_00-1.4h", 0x000001, 0x040000, CRC(8bce137d) SHA1(55f5b1c89330803c6147f9656f2cabe8d1de8478) )
 	ROM_LOAD16_BYTE( "jy_01-1.5h", 0x000000, 0x040000, CRC(eca50450) SHA1(1a24117e3b1b66d7dbc5484c94cc2c627d34e6a3) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )
 	ROM_LOAD( "jy_02.14m", 0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -316,7 +292,7 @@ ROM_START( dietgoe ) // weird, still version 1.1 but different (earlier) date
 	ROM_LOAD16_BYTE( "may-01.14a", 0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494) )
 	ROM_LOAD16_BYTE( "may-02.16a", 0x000001, 0x100000, CRC(3a66a713) SHA1(beeb99156332cf4870738f7769b719a02d7b40af) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, DECOSND_OKI1_TAG, 0 ) /* Oki samples */
 	ROM_LOAD( "may-03.11l", 0x00000, 0x80000, CRC(b6e42bae) SHA1(c282cdf7db30fb63340cc609bf00f5ab63a75583) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
@@ -330,7 +306,7 @@ ROM_START( dietgou )
 	ROM_LOAD16_BYTE( "jx_00-.4h", 0x000001, 0x040000, CRC(1a9de04f) SHA1(7ce1e7cf4cdce2b02da4df2a6ae9a9e665e24422) )
 	ROM_LOAD16_BYTE( "jx_01-.5h", 0x000000, 0x040000, CRC(79c097c8) SHA1(be49055ee324535e1118d243bd49e74ec1d2a2d7) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )
 	ROM_LOAD( "jx_02.14m", 0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) ) /* Same as other regions but different label */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -340,7 +316,7 @@ ROM_START( dietgou )
 	ROM_LOAD16_BYTE( "may-01.14a", 0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494) )
 	ROM_LOAD16_BYTE( "may-02.16a", 0x000001, 0x100000, CRC(3a66a713) SHA1(beeb99156332cf4870738f7769b719a02d7b40af) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, DECOSND_OKI1_TAG, 0 ) /* Oki samples */
 	ROM_LOAD( "may-03.11l", 0x00000, 0x80000, CRC(b6e42bae) SHA1(c282cdf7db30fb63340cc609bf00f5ab63a75583) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
@@ -354,7 +330,7 @@ ROM_START( dietgoj )
 	ROM_LOAD16_BYTE( "jw_00-2.4h", 0x000001, 0x040000, CRC(e6ba6c49) SHA1(d5eaea81f1353c58c03faae67428f7ee98e766b1) )
 	ROM_LOAD16_BYTE( "jw_01-2.5h", 0x000000, 0x040000, CRC(684a3d57) SHA1(bd7a57ba837a1dc8f92b5ebcb46e50db1f98524f) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )
 	ROM_LOAD( "jw_02.14m", 0x00000, 0x10000, CRC(4e3492a5) SHA1(5f302bdbacbf95ea9f3694c48545a1d6bba4b019) ) /* Same as other regions but different label */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -364,7 +340,7 @@ ROM_START( dietgoj )
 	ROM_LOAD16_BYTE( "may-01.14a", 0x000000, 0x100000, CRC(2da57d04) SHA1(3898e9fef365ecaa4d86aa11756b527a4fffb494) )
 	ROM_LOAD16_BYTE( "may-02.16a", 0x000001, 0x100000, CRC(3a66a713) SHA1(beeb99156332cf4870738f7769b719a02d7b40af) )
 
-	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, DECOSND_OKI1_TAG, 0 ) /* Oki samples */
 	ROM_LOAD( "may-03.11l", 0x00000, 0x80000, CRC(b6e42bae) SHA1(c282cdf7db30fb63340cc609bf00f5ab63a75583) )
 
 	ROM_REGION( 0x0600, "plds", 0 )

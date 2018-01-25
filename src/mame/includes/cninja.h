@@ -7,6 +7,7 @@
 *************************************************************************/
 
 #include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "video/deco16ic.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
@@ -14,6 +15,7 @@
 #include "machine/deco146.h"
 #include "machine/deco104.h"
 #include "machine/gen_latch.h"
+#include "audio/deco6280.h"
 #include "screen.h"
 
 class cninja_state : public driver_device
@@ -26,7 +28,6 @@ public:
 		m_ioprot(*this, "ioprot"),
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_deco_tilegen2(*this, "tilegen2"),
-		m_oki2(*this, "oki2"),
 		m_sprgen(*this, "spritegen"),
 		m_sprgen1(*this, "spritegen1"),
 		m_sprgen2(*this, "spritegen2"),
@@ -34,6 +35,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
+		m_decosnd(*this, DECOSND_TAG),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2") ,
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
@@ -46,11 +48,10 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	optional_device<cpu_device> m_audiocpu;
 	optional_device<deco_146_base_device> m_ioprot;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
-	optional_device<okim6295_device> m_oki2;
 	optional_device<decospr_device> m_sprgen;
 	optional_device<decospr_device> m_sprgen1;
 	optional_device<decospr_device> m_sprgen2;
@@ -58,6 +59,7 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<deco_6280_2xoki_device> m_decosnd;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	optional_device<buffered_spriteram16_device> m_spriteram2;
 
@@ -71,11 +73,8 @@ public:
 
 	uint16_t m_priority;
 
-	DECLARE_WRITE16_MEMBER(cninja_sound_w);
-	DECLARE_WRITE16_MEMBER(stoneage_sound_w);
 	DECLARE_WRITE16_MEMBER(cninja_pf12_control_w);
 	DECLARE_WRITE16_MEMBER(cninja_pf34_control_w);
-	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(cninjabl2_oki_bank_w);
 	DECLARE_DRIVER_INIT(mutantf);
 	DECLARE_DRIVER_INIT(cninjabl2);

@@ -93,11 +93,7 @@ Notes:
 #include "includes/funkyjet.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/h6280/h6280.h"
 #include "machine/decocrpt.h"
-#include "machine/gen_latch.h"
-#include "sound/ym2151.h"
-#include "sound/okim6295.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -112,7 +108,7 @@ READ16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_r )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,  /* note, same bitswap as fghthist */      10,  9,  8,  7,  6,   5,  4,  3,  2,  1,    0) & 0x7fff;
 	uint8_t cs = 0;
-	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	uint16_t data = m_ioprot->read_data( deco146_addr, mem_mask, cs );
 
 //  if ((realdat & mem_mask) != (data & mem_mask))
 //      printf("returned %04x instead of %04x (real address %08x swapped addr %08x)\n", data, realdat, real_address, deco146_addr);
@@ -127,7 +123,7 @@ WRITE16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_w )
 	int real_address = 0 + (offset *2);
 	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14, /* note, same bitswap as fghthist */       10,  9,  8,  7,  6,   5,  4,  3,  2,  1,    0) & 0x7fff;
 	uint8_t cs = 0;
-	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
+	m_ioprot->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
 
@@ -144,21 +140,6 @@ static ADDRESS_MAP_START( funkyjet_map, AS_PROGRAM, 16, funkyjet_state )
 	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_r, pf2_data_w)
 	AM_RANGE(0x340000, 0x340bff) AM_RAM AM_SHARE("pf1_rowscroll")
 	AM_RANGE(0x342000, 0x342bff) AM_RAM AM_SHARE("pf2_rowscroll")
-ADDRESS_MAP_END
-
-/******************************************************************************/
-
-/* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, funkyjet_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_NOP /* YM2203 - this board doesn't have one */
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_NOP /* This board only has 1 oki chip */
-	AM_RANGE(0x140000, 0x140000) AM_DEVREAD("ioprot", deco146_device, soundlatch_r)
-	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -317,10 +298,6 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	MCFG_CPU_PROGRAM_MAP(funkyjet_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funkyjet_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
-
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
@@ -334,7 +311,7 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	MCFG_DECO146_IN_PORTA_CB(IOPORT("INPUTS"))
 	MCFG_DECO146_IN_PORTB_CB(IOPORT("SYSTEM"))
 	MCFG_DECO146_IN_PORTC_CB(IOPORT("DSW"))
-	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE("audiocpu", 0))
+	MCFG_DECO146_SOUNDLATCH_IRQ_CB(INPUTLINE(DECOSND_CPU_TAG, 0))
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_INTERLEAVE
 
 
@@ -362,15 +339,13 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000)/9)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
-
-	MCFG_OKIM6295_ADD("oki", XTAL(28'000'000)/28, PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	
+	MCFG_DECO6280_ADD(DECOSND_TAG, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
+	MCFG_DECO6280_SOUNDLATCH_CALLBACK(DEVREAD8("ioprot", deco_146_base_device, soundlatch_r))
+	MCFG_SOUND_ROUTE(DECO_YM2151_OUT0, "lspeaker", 0.45)
+	MCFG_SOUND_ROUTE(DECO_YM2151_OUT1, "rspeaker", 0.45)
+	MCFG_SOUND_ROUTE(DECO_OKI1_OUT, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(DECO_OKI1_OUT, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 /******************************************************************************/
@@ -380,7 +355,7 @@ ROM_START( funkyjet )
 	ROM_LOAD16_BYTE( "jk00-1.12f", 0x00000, 0x40000, CRC(ce61579d) SHA1(fe755b62c822c996d479cafa6fa7ac7724af6560) )
 	ROM_LOAD16_BYTE( "jk01-1.13f", 0x00001, 0x40000, CRC(274d04be) SHA1(a14ec81e40504d3c7deb28114b85b9bbb76a51f5) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "jk02.16f",    0x00000, 0x10000, CRC(748c0bd8) SHA1(35910e6a4c4f198fb76bde0f5b053e2c66cfa0ff) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -390,7 +365,7 @@ ROM_START( funkyjet )
 	ROM_LOAD( "mat01", 0x000000, 0x80000, CRC(24093a8d) SHA1(71f76ddd8a4b6e05ceb2fff4e20b6edb5e011e79) ) /* sprites */
 	ROM_LOAD( "mat00", 0x080000, 0x80000, CRC(fbda0228) SHA1(815d49898d02e699393e370209181f2ca8301949) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 ) /* ADPCM samples */
 	ROM_LOAD( "jk03.15h",    0x00000, 0x20000, CRC(69a0eaf7) SHA1(05038e82ee03106625f05082fe9912e16be181ee) )
 ROM_END
 
@@ -399,7 +374,7 @@ ROM_START( funkyjeta )
 	ROM_LOAD16_BYTE( "jk00.12f", 0x00000, 0x40000, CRC(712089c1) SHA1(84167c90303a228107f55596e2ff8b9f111d1bc2) ) /* Unverified revision, could be JK00-0 or JK00-2 */
 	ROM_LOAD16_BYTE( "jk01.13f", 0x00001, 0x40000, CRC(be3920d7) SHA1(6627956d148681bc49991c544a09b07271ea4c7f) ) /* Unverified revision, could be JK01-0 or JK01-2 */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "jk02.16f",    0x00000, 0x10000, CRC(748c0bd8) SHA1(35910e6a4c4f198fb76bde0f5b053e2c66cfa0ff) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -409,7 +384,7 @@ ROM_START( funkyjeta )
 	ROM_LOAD( "mat01", 0x000000, 0x80000, CRC(24093a8d) SHA1(71f76ddd8a4b6e05ceb2fff4e20b6edb5e011e79) ) /* sprites */
 	ROM_LOAD( "mat00", 0x080000, 0x80000, CRC(fbda0228) SHA1(815d49898d02e699393e370209181f2ca8301949) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 ) /* ADPCM samples */
 	ROM_LOAD( "jk03.15h",    0x00000, 0x20000, CRC(69a0eaf7) SHA1(05038e82ee03106625f05082fe9912e16be181ee) )
 ROM_END
 
@@ -418,7 +393,7 @@ ROM_START( funkyjetj )
 	ROM_LOAD16_BYTE( "jh00-2.11f", 0x00000, 0x40000, CRC(5b98b700) SHA1(604bd04f4031b0a3b53db2fab4a0e160dff6936d) )
 	ROM_LOAD16_BYTE( "jh01-2.13f", 0x00001, 0x40000, CRC(21280220) SHA1(b365b6c8aa778e21a14b2813e93b9c9d02e14995) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "jh02.16f",    0x00000, 0x10000, CRC(748c0bd8) SHA1(35910e6a4c4f198fb76bde0f5b053e2c66cfa0ff) ) /* same as jk02.16f from world set */
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -428,7 +403,7 @@ ROM_START( funkyjetj )
 	ROM_LOAD( "mat01", 0x000000, 0x80000, CRC(24093a8d) SHA1(71f76ddd8a4b6e05ceb2fff4e20b6edb5e011e79) ) /* sprites */
 	ROM_LOAD( "mat00", 0x080000, 0x80000, CRC(fbda0228) SHA1(815d49898d02e699393e370209181f2ca8301949) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 ) /* ADPCM samples */
 	ROM_LOAD( "jh03.15h",    0x00000, 0x20000, CRC(69a0eaf7) SHA1(05038e82ee03106625f05082fe9912e16be181ee) ) /* same as jk03.15h from world set */
 ROM_END
 
@@ -437,7 +412,7 @@ ROM_START( sotsugyo )
 	ROM_LOAD16_BYTE( "03.12f", 0x00000, 0x40000, CRC(d175dfd1) SHA1(61c91d5e20b0492e6ac3b19fe9639eb4f169ae77) )
 	ROM_LOAD16_BYTE( "04.13f", 0x00001, 0x40000, CRC(2072477c) SHA1(23820a519e4503854e63ab3ad7eec58178c8d822) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
+	ROM_REGION( 0x10000, DECOSND_CPU_TAG, 0 )    /* Sound CPU */
 	ROM_LOAD( "sb020.16f",    0x00000, 0x10000, CRC(baf5ec93) SHA1(82b22a0b565e51cd40733f21fa876dd7064eb604) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
@@ -447,7 +422,7 @@ ROM_START( sotsugyo )
 	ROM_LOAD( "01.4a", 0x000000, 0x80000, CRC(fa10dd54) SHA1(5dfe66df0bbab5eb151bf65f7e767a2325a50b36) ) /* sprites */
 	ROM_LOAD( "00.2a", 0x080000, 0x80000, CRC(d35a14ef) SHA1(b8d27766db7e183aee208c690364e4383f3c6882) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_REGION( 0x40000, DECOSND_OKI1_TAG, 0 ) /* ADPCM samples */
 	ROM_LOAD( "sb030.15h",    0x00000, 0x20000, CRC(1ea43f48) SHA1(74cc8c740f1c7fa94c2cb460ea4ee7aa0c490ed7) )
 ROM_END
 
