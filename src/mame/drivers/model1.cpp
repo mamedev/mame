@@ -640,7 +640,6 @@ Notes:
 
 #include "vr.lh"
 
-
 READ16_MEMBER(model1_state::io_r)
 {
 	if(offset < 0x8)
@@ -1641,11 +1640,11 @@ MACHINE_CONFIG_START(model1_state::model1)
 
 	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
-	MCFG_SEGAM1AUDIO_ADD("m1audio")
+	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
 	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("m1uart", I8251, 8000000) // uPD71051C, clock unknown
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("m1audio", segam1audio_device, write_txd))
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
 
 	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_txc))
@@ -1661,7 +1660,7 @@ MACHINE_CONFIG_DERIVED(model1_state::swa, model1)
 	MCFG_SOUND_ROUTE(1, "dright", 1.0)
 
 	// Apparently m1audio has to filter out commands the DSB shouldn't see
-	MCFG_DEVICE_MODIFY("m1audio")
+	MCFG_DEVICE_MODIFY(M1AUDIO_TAG)
 	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_rxd))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(DSBZ80_TAG, dsbz80_device, write_txd))
 MACHINE_CONFIG_END
@@ -1711,11 +1710,11 @@ MACHINE_CONFIG_START(model1_state::model1_vr)
 
 	MCFG_VIDEO_START_OVERRIDE(model1_state,model1)
 
-	MCFG_SEGAM1AUDIO_ADD("m1audio")
+	MCFG_SEGAM1AUDIO_ADD(M1AUDIO_TAG)
 	MCFG_SEGAM1AUDIO_RXD_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_rxd))
 
 	MCFG_DEVICE_ADD("m1uart", I8251, 8000000) // uPD71051C, clock unknown
-	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("m1audio", segam1audio_device, write_txd))
+	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(M1AUDIO_TAG, segam1audio_device, write_txd))
 
 	MCFG_CLOCK_ADD("m1uart_clock", 500000) // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("m1uart", i8251_device, write_txc))
