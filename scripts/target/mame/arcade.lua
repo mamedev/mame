@@ -1553,6 +1553,8 @@ files {
 	MAME_DIR .. "src/mame/includes/deco32.h",
 	MAME_DIR .. "src/mame/video/deco32.cpp",
 	MAME_DIR .. "src/mame/video/dvi.cpp",
+	MAME_DIR .. "src/mame/video/deco_ace.cpp",
+	MAME_DIR .. "src/mame/video/deco_ace.h",
 	MAME_DIR .. "src/mame/video/deco_zoomspr.cpp",
 	MAME_DIR .. "src/mame/video/deco_zoomspr.h",
 	MAME_DIR .. "src/mame/drivers/decocass.cpp",
