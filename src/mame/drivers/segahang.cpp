@@ -487,11 +487,6 @@ static ADDRESS_MAP_START( sound_portmap_2203x2, AS_IO, 8, segahang_state )
 	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0x3e) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( segapcm_map, 0, 8, segahang_state )	// lowest segapcm bank is unused
-	AM_RANGE(0x00000, 0x0ffff) AM_ROM AM_REGION("pcm",0x00000) AM_MIRROR(0x10000)
-	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_REGION("pcm",0x10000) AM_MIRROR(0x10000)
-ADDRESS_MAP_END
-
 //**************************************************************************
 //  I8751 MCU ADDRESS MAPS
 //**************************************************************************
@@ -904,7 +899,6 @@ MACHINE_CONFIG_START(segahang_state::sound_board_2151)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
 	MCFG_SEGAPCM_ADD("pcm", MASTER_CLOCK_8MHz/2)
-	MCFG_DEVICE_ADDRESS_MAP(0, segapcm_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2004,6 +1998,18 @@ ROM_END
 
 DRIVER_INIT_MEMBER(segahang_state,generic)
 {
+	// lowest segapcm bank bit is unused
+	uint32_t len    =   memregion("pcm")->bytes();
+	uint8_t *src    =   memregion("pcm")->base();
+	std::vector<uint8_t> buf(len);
+
+	for (int i = 0; i < len / 2; i += 0x10000)
+	{
+		memcpy(&buf[(i * 0x20000)],           src[i * 0x10000], 0x10000);
+		memcpy(&buf[(i * 0x20000) + 0x10000], src[i * 0x10000], 0x10000);
+	}
+	memcpy(&src[0], &buf[0], len);
+
 	// point globals to allocated memory regions
 	m_segaic16road->segaic16_roadram_0 = reinterpret_cast<uint16_t *>(memshare("roadram")->ptr());
 
