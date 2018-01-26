@@ -213,19 +213,19 @@ OSD-related Options
 
 **-uimodekey** [*keystring*]
 
-	Key used to toggle emulated keyboard on and off. Default setting is *SCRLOCK*.
+	Key used to toggle emulated keyboard on and off. Default setting is *SCRLOCK* on Windows, *Forward Delete* on Mac (use *FN-Delete* on laptop/compact keyboards).
 
 .. _mame-commandline-uifontprovider:
 
 **\-uifontprovider**
 
-	Chooses provider for UI font:  win, none or auto. Default setting is *AUTO*.
+	Chooses provider for UI font.
 
-.. _mame-commandline-menu:
+	On Windows, you can choose from: **win**, **dwrite**, **none** or **auto**.
+	On Mac, you can choose from: **osx** or **auto**.
+	On other platforms, you can choose from: **sdl** or **auto**.
 
-**\-menu**
-
-	Enables menu bar at the top of the MAME window, if available by UI implementation. Default is *OFF*
+	Default setting is *AUTO*.
 
 .. _mame-commandline-keyboardprovider:
 
