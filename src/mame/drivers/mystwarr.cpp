@@ -914,11 +914,12 @@ MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
 MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
 {
 	int i;
+	k054539_device *k054539 = subdevice<k054539_device>("k054539");
 
-	m_k054539_1->init_flags(k054539_device::REVERSE_STEREO);
+	k054539->init_flags(k054539_device::REVERSE_STEREO);
 
 	// boost voice(chip 0 channel 4-7)
-	for (i=4; i<=7; i++) m_k054539_1->set_gain(i, 1.4);
+	for (i=4; i<=7; i++) k054539->set_gain(i, 1.4);
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
