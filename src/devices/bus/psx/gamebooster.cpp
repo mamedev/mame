@@ -47,6 +47,7 @@ psx_gamebooster_device::psx_gamebooster_device(const machine_config &mconfig, co
 	: device_t(mconfig, PSX_GAMEBOOSTER, tag, owner, clock)
 	, psx_parallel_interface(mconfig, *this)
 	, m_rom(*this, "rom")
+	, m_cartslot(*this, "gbslot")
 {
 }
 
@@ -67,11 +68,88 @@ void psx_gamebooster_device::device_reset()
 {
 }
 
+
+
+
 //**************************************************************************
 //  IMPLEMENTATION
 //**************************************************************************
 
 READ16_MEMBER(psx_gamebooster_device::exp_r)
 {
-	return m_rom->base()[(offset * 2) & 0x3ffff] | (m_rom->base()[((offset * 2) + 1) & 0x3ffff] << 8);
+	if (offset<0x20000)
+		return m_rom->base()[(offset * 2) & 0x3ffff] | (m_rom->base()[((offset * 2) + 1) & 0x3ffff] << 8);
+	else
+	{
+		// TODO, wrong
+		//printf("exp_r %04x\n", offset*2);
+
+		offset -= 0x20000;
+		uint16_t retval = 0;;
+
+		if (mem_mask & 0x00ff) retval |= m_cartslot->read_rom(space, (offset*2)+1);
+		if (mem_mask & 0xff00) retval |= (m_cartslot->read_rom(space, (offset*2)+0))<<8;
+
+		return retval;
+	}
+
+	return 0x0000;
 }
+
+WRITE16_MEMBER(psx_gamebooster_device::exp_w)
+{
+	//printf("exp_w %04x %04x\n", offset*2, data);
+
+	if (offset < 0x20000)
+	{
+
+	}
+	else
+	{
+		// TODO, wrong
+		offset -= 0x20000;
+
+		if (mem_mask & 0x00ff) m_cartslot->write_bank(space, (offset*2)+1, data);
+		if (mem_mask & 0xff00) m_cartslot->write_bank(space, (offset*2)+0, data>>8);
+	}
+}
+
+static SLOT_INTERFACE_START(gb_cart)
+	SLOT_INTERFACE_INTERNAL("rom",         GB_STD_ROM)
+	SLOT_INTERFACE_INTERNAL("rom_mbc1",    GB_ROM_MBC1)
+	SLOT_INTERFACE_INTERNAL("rom_mbc1col", GB_ROM_MBC1)
+	SLOT_INTERFACE_INTERNAL("rom_mbc2",    GB_ROM_MBC2)
+	SLOT_INTERFACE_INTERNAL("rom_mbc3",    GB_ROM_MBC3)
+	SLOT_INTERFACE_INTERNAL("rom_huc1",    GB_ROM_MBC3)
+	SLOT_INTERFACE_INTERNAL("rom_huc3",    GB_ROM_MBC3)
+	SLOT_INTERFACE_INTERNAL("rom_mbc5",    GB_ROM_MBC5)
+	SLOT_INTERFACE_INTERNAL("rom_mbc6",    GB_ROM_MBC6)
+	SLOT_INTERFACE_INTERNAL("rom_mbc7",    GB_ROM_MBC7)
+	SLOT_INTERFACE_INTERNAL("rom_tama5",   GB_ROM_TAMA5)
+	SLOT_INTERFACE_INTERNAL("rom_mmm01",   GB_ROM_MMM01)
+	SLOT_INTERFACE_INTERNAL("rom_m161",    GB_ROM_M161)
+	SLOT_INTERFACE_INTERNAL("rom_sachen1", GB_ROM_SACHEN1)
+	SLOT_INTERFACE_INTERNAL("rom_sachen2", GB_ROM_SACHEN2)
+	SLOT_INTERFACE_INTERNAL("rom_wisdom",  GB_ROM_WISDOM)
+	SLOT_INTERFACE_INTERNAL("rom_yong",    GB_ROM_YONG)
+	SLOT_INTERFACE_INTERNAL("rom_lasama",  GB_ROM_LASAMA)
+	SLOT_INTERFACE_INTERNAL("rom_atvrac",  GB_ROM_ATVRAC)
+	SLOT_INTERFACE_INTERNAL("rom_camera",  GB_STD_ROM)
+	SLOT_INTERFACE_INTERNAL("rom_188in1",  GB_ROM_188IN1)
+	SLOT_INTERFACE_INTERNAL("rom_sintax",  GB_ROM_SINTAX)
+	SLOT_INTERFACE_INTERNAL("rom_chong",   GB_ROM_CHONGWU)
+	SLOT_INTERFACE_INTERNAL("rom_licheng", GB_ROM_LICHENG)
+	SLOT_INTERFACE_INTERNAL("rom_digimon", GB_ROM_DIGIMON)
+	SLOT_INTERFACE_INTERNAL("rom_rock8",   GB_ROM_ROCKMAN8)
+	SLOT_INTERFACE_INTERNAL("rom_sm3sp",   GB_ROM_SM3SP)
+//  SLOT_INTERFACE_INTERNAL("rom_dkong5",  GB_ROM_DKONG5)
+//  SLOT_INTERFACE_INTERNAL("rom_unk01",   GB_ROM_UNK01)
+SLOT_INTERFACE_END
+
+MACHINE_CONFIG_START(psx_gamebooster_device::device_add_mconfig)
+	/* cartslot */
+	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, nullptr)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list","gameboy")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gbc_list","gbcolor")
+MACHINE_CONFIG_END

@@ -8,6 +8,8 @@
 
 
 #include "parallel.h"
+#include "bus/gameboy/rom.h"
+#include "bus/gameboy/mbc.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -30,11 +32,14 @@ protected:
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual DECLARE_READ16_MEMBER(exp_r) override;
+	virtual DECLARE_WRITE16_MEMBER(exp_w) override;
 
 private:
 	required_memory_region m_rom;
+	required_device<gb_cart_slot_device> m_cartslot;
 };
 
 

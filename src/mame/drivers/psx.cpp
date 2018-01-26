@@ -443,6 +443,12 @@ READ16_MEMBER(psx1_state::parallel_r)
 
 WRITE16_MEMBER(psx1_state::parallel_w)
 {
+	if (m_parallel->hascard())
+	{
+		m_parallel->exp_w(space,offset,data, mem_mask);
+		return;
+	}
+
 	if (m_exe_buffer.size() != 0)
 	{
 		if (load_psxexe(m_exe_buffer) ||
@@ -496,7 +502,7 @@ void psx1_state::cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t
 }
 
 static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32, psx1_state )
-	AM_RANGE(0x1f000000, 0x1f03ffff) AM_READWRITE16(parallel_r, parallel_w, 0xffffffff)
+	AM_RANGE(0x1f000000, 0x1f07ffff) AM_READWRITE16(parallel_r, parallel_w, 0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, psx1_state )
