@@ -1556,6 +1556,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "atari")
 files {
+	MAME_DIR .. "src/mame/drivers/a2600.h",
 	MAME_DIR .. "src/mame/drivers/a2600.cpp",
 	MAME_DIR .. "src/mame/drivers/a7800.cpp",
 	MAME_DIR .. "src/mame/video/maria.cpp",
@@ -1573,6 +1574,7 @@ files {
 	MAME_DIR .. "src/mame/audio/lynx.h",
 	MAME_DIR .. "src/mame/machine/lynx.cpp",
 	MAME_DIR .. "src/mame/drivers/pofo.cpp",
+	MAME_DIR .. "src/mame/drivers/tvboy.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "att")
