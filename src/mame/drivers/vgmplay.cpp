@@ -1176,7 +1176,8 @@ void vgmplay_state::machine_start()
 		if(version >= 0x151 && r32(0x38))
 			m_segapcm->set_unscaled_clock(r32(0x38));
 
-		if(version >= 0x151 && r32(0x3c)) {
+		if(version >= 0x151 && r32(0x3c))
+		{
 			uint32_t bank = r32(0x3c);
 			m_vgmplay->segapcm_bank_w(bank);
 		}

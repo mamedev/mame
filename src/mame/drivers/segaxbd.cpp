@@ -316,25 +316,8 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, co
 	palette_init();
 }
 
-void segaxbd_state::install_segapcm(const char *region)
-{
-	// lowest segapcm bank bit is unused
-	uint32_t len    =   memregion(region)->bytes();
-	uint8_t *src    =   memregion(region)->base();
-	std::vector<uint8_t> buf(len);
-
-	for (int i = 0; i < len / 2; i += 0x10000)
-	{
-		memcpy(&buf[(i * 0x20000)],           src[i * 0x10000], 0x10000);
-		memcpy(&buf[(i * 0x20000) + 0x10000], src[i * 0x10000], 0x10000);
-	}
-	memcpy(&src[0], &buf[0], len);
-}
-
 void segaxbd_state::device_start()
 {
-	install_segapcm("pcm");
-
 	if(!m_segaic16road->started())
 		throw device_missing_dependencies();
 
@@ -1028,7 +1011,6 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segaxbd_state )
 ADDRESS_MAP_END
 
 
-
 //**************************************************************************
 //  Z80 SOUND CPU ADDRESS MAPS
 //**************************************************************************
@@ -1047,6 +1029,22 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segaxbd_state )
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
+
+//**************************************************************************
+//  SEGA PCM CHIP ADDRESS MAPS
+//**************************************************************************
+
+// Lowest bank bit is unused
+static ADDRESS_MAP_START( pcm_map, 0, 8, segaxbd_state )
+	AM_RANGE(0x00000, 0x0ffff) AM_ROM AM_REGION("pcm", 0x00000) AM_MIRROR(0x10000)
+	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_REGION("pcm", 0x10000) AM_MIRROR(0x10000)
+	AM_RANGE(0x40000, 0x4ffff) AM_ROM AM_REGION("pcm", 0x20000) AM_MIRROR(0x10000)
+	AM_RANGE(0x60000, 0x6ffff) AM_ROM AM_REGION("pcm", 0x30000) AM_MIRROR(0x10000)
+	AM_RANGE(0x80000, 0x8ffff) AM_ROM AM_REGION("pcm", 0x40000) AM_MIRROR(0x10000)
+	AM_RANGE(0xa0000, 0xaffff) AM_ROM AM_REGION("pcm", 0x50000) AM_MIRROR(0x10000)
+	AM_RANGE(0xc0000, 0xcffff) AM_ROM AM_REGION("pcm", 0x60000) AM_MIRROR(0x10000)
+	AM_RANGE(0xe0000, 0xeffff) AM_ROM AM_REGION("pcm", 0x70000) AM_MIRROR(0x10000)
+ADDRESS_MAP_END
 
 
 //**************************************************************************
@@ -1069,6 +1067,22 @@ static ADDRESS_MAP_START( smgp_sound2_portmap, AS_IO, 8, segaxbd_state )
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
+
+//**************************************************************************
+//  SUPER MONACO GP 2ND SEGA PCM CHIP ADDRESS MAPS
+//**************************************************************************
+
+// Lowest bank bit is unused
+static ADDRESS_MAP_START( smgp_pcm2_map, 0, 8, segaxbd_state )
+	AM_RANGE(0x00000, 0x0ffff) AM_ROM AM_REGION("pcm2", 0x00000) AM_MIRROR(0x10000)
+	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_REGION("pcm2", 0x10000) AM_MIRROR(0x10000)
+	AM_RANGE(0x40000, 0x4ffff) AM_ROM AM_REGION("pcm2", 0x20000) AM_MIRROR(0x10000)
+	AM_RANGE(0x60000, 0x6ffff) AM_ROM AM_REGION("pcm2", 0x30000) AM_MIRROR(0x10000)
+	AM_RANGE(0x80000, 0x8ffff) AM_ROM AM_REGION("pcm2", 0x40000) AM_MIRROR(0x10000)
+	AM_RANGE(0xa0000, 0xaffff) AM_ROM AM_REGION("pcm2", 0x50000) AM_MIRROR(0x10000)
+	AM_RANGE(0xc0000, 0xcffff) AM_ROM AM_REGION("pcm2", 0x60000) AM_MIRROR(0x10000)
+	AM_RANGE(0xe0000, 0xeffff) AM_ROM AM_REGION("pcm2", 0x70000) AM_MIRROR(0x10000)
+ADDRESS_MAP_END
 
 
 //**************************************************************************
@@ -1773,6 +1787,7 @@ MACHINE_CONFIG_START(segaxbd_state::xboard_base_mconfig )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.43)
 
 	MCFG_SEGAPCM_ADD("pcm", SOUND_CLOCK/4)
+	MCFG_DEVICE_ADDRESS_MAP(0, pcm_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1952,6 +1967,7 @@ MACHINE_CONFIG_START(segaxbd_smgp_fd1094_state::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
 	MCFG_SEGAPCM_ADD("pcm2", SOUND_CLOCK/4)
+	MCFG_DEVICE_ADDRESS_MAP(0, smgp_pcm2_map)
 	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
 MACHINE_CONFIG_END
@@ -1959,7 +1975,6 @@ MACHINE_CONFIG_END
 void segaxbd_smgp_fd1094_state::device_start()
 {
 	segaxbd_state::device_start();
-	install_segapcm("pcm2");
 }
 
 MACHINE_CONFIG_START(segaxbd_new_state::sega_smgp_fd1094)
@@ -1998,6 +2013,7 @@ MACHINE_CONFIG_START(segaxbd_smgp_state::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
 	MCFG_SEGAPCM_ADD("pcm2", SOUND_CLOCK/4)
+	MCFG_DEVICE_ADDRESS_MAP(0, smgp_pcm2_map)
 	MCFG_SOUND_ROUTE(0, "rearleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "rearright", 1.0)
 MACHINE_CONFIG_END
@@ -2005,7 +2021,6 @@ MACHINE_CONFIG_END
 void segaxbd_smgp_state::device_start()
 {
 	segaxbd_state::device_start();
-	install_segapcm("pcm2");
 }
 
 MACHINE_CONFIG_START(segaxbd_new_state::sega_smgp)

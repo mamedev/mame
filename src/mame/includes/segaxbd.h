@@ -66,7 +66,6 @@ public:
 	void install_loffire(void);
 	void install_smgp(void);
 	void install_gprider(void);
-	void install_segapcm(const char *region);
 
 protected:
 	// timer IDs
