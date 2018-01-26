@@ -1,12 +1,13 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Bryan McPhail
+// copyright-holders:Bryan McPhail
 /**************************************************************************************
 
     deco6280.cpp
 
     Functions to emulate the Data East HuC6280( Sticker says "45" at most Data East PCBs ) CPU Based Sound HWs
-
+	
 	Original code by Bryan McPhail
+	Splitted by cam900
 
 ***************************************************************************************
 
