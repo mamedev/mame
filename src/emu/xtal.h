@@ -36,8 +36,10 @@ Usage:
 ***************************************************************************/
 
 
-#ifndef MAME_EMU_DRIVERS_XTAL_H
-#define MAME_EMU_DRIVERS_XTAL_H
+#ifndef MAME_EMU_XTAL_H
+#define MAME_EMU_XTAL_H
+
+#include "emucore.h"
 
 #pragma once
 
@@ -90,4 +92,8 @@ constexpr XTAL operator ""_Hz_XTAL(long double clock) { return XTAL(double(clock
 constexpr XTAL operator ""_kHz_XTAL(long double clock) { return XTAL(double(clock * 1e3)); }
 constexpr XTAL operator ""_MHz_XTAL(long double clock) { return XTAL(double(clock * 1e6)); }
 
-#endif // MAME_EMU_DRIVERS_XTAL_H
+constexpr XTAL operator ""_Hz_XTAL(unsigned long long clock) { return XTAL(double(clock)); }
+constexpr XTAL operator ""_kHz_XTAL(unsigned long long clock) { return XTAL(double(clock) * 1e3); }
+constexpr XTAL operator ""_MHz_XTAL(unsigned long long clock) { return XTAL(double(clock) * 1e6); }
+
+#endif // MAME_EMU_XTAL_H
