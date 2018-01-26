@@ -38,6 +38,8 @@ public:
 	DECLARE_WRITE8_MEMBER(unk2_w);
 	DECLARE_READ8_MEMBER(unk3_r);
 	DECLARE_WRITE8_MEMBER(unk3_w);
+	DECLARE_READ8_MEMBER(unk4_r);
+	DECLARE_WRITE8_MEMBER(unk4_w);
 	DECLARE_READ8_MEMBER(led_r);
 	DECLARE_WRITE8_MEMBER(led_w);
 	DECLARE_READ8_MEMBER(pitclock_r);
@@ -66,14 +68,20 @@ private:
 	required_device<address_map_bank_device> m_biosbank;
 	std::vector<u16> m_vram;
 	u8 m_leds[2];
-	u8 m_switch, m_c001, m_c009, m_c280, m_errcode, m_vramwin[2];
+	u8 m_switch, m_c001, m_c009, m_c280, m_c080, m_errcode, m_vramwin[2];
 	emu_timer *m_dmahack;
+	emu_timer *m_tmr0ext;
+	enum {
+		DMA_TIMER,
+		TMR0_TIMER
+	};
 };
 
 void pwrview_state::device_start()
 {
 	save_item(NAME(m_vram));
-	m_dmahack = timer_alloc();
+	m_dmahack = timer_alloc(DMA_TIMER);
+	m_tmr0ext = timer_alloc(TMR0_TIMER);
 	membank("vram1")->configure_entries(0, 0x400, &m_vram[0], 0x80);
 	membank("vram2")->configure_entries(0, 0x400, &m_vram[0], 0x80);
 }
@@ -82,7 +90,7 @@ void pwrview_state::device_reset()
 {
 	m_leds[0] = m_leds[1] = 0;
 	m_switch = 0xe0;
-	m_c001 = m_c009 = 0;
+	m_c001 = m_c009 = m_c080 = 0;
 	m_errcode = 0x31;
 	membank("vram1")->set_entry(0);
 	membank("vram2")->set_entry(0);
@@ -92,8 +100,17 @@ void pwrview_state::device_reset()
 
 void pwrview_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	m_maincpu->drq0_w(1);
-	m_maincpu->drq1_w(1); // TODO: this is unfortunate
+	switch(id)
+	{
+		case DMA_TIMER:
+			m_maincpu->drq0_w(1);
+			m_maincpu->drq1_w(1); // TODO: this is unfortunate
+			break;
+		case TMR0_TIMER:
+			m_maincpu->tmrin0_w(ASSERT_LINE);
+			m_maincpu->tmrin0_w(CLEAR_LINE);
+			break;
+	}
 }
 
 MC6845_UPDATE_ROW(pwrview_state::update_row)
@@ -253,6 +270,33 @@ WRITE8_MEMBER(pwrview_state::unk3_w)
 	}
 }
 
+READ8_MEMBER(pwrview_state::unk4_r)
+{
+	return m_c080;
+}
+
+WRITE8_MEMBER(pwrview_state::unk4_w)
+{
+	m_c080 = data;
+	if(!BIT(data, 7))
+	{
+		m_tmr0ext->adjust(attotime::never);
+		return;
+	}
+	switch(data & 7) // this is all hand tuned to match the expected ratio with the pit clock
+	{
+		case 2:
+			m_tmr0ext->adjust(attotime::from_hz(31500), 0, attotime::from_hz(31500));
+			break;
+		case 3:
+			m_tmr0ext->adjust(attotime::from_hz(90), 0, attotime::from_hz(90));
+			break;
+		case 4:
+			m_tmr0ext->adjust(attotime::from_hz(500000), 0, attotime::from_hz(500000));
+			break;
+	}
+}
+
 READ8_MEMBER(pwrview_state::led_r)
 {
 	return m_leds[offset];
@@ -330,7 +374,7 @@ static ADDRESS_MAP_START(pwrview_io, AS_IO, 16, pwrview_state)
 	AM_RANGE(0xc008, 0xc009) AM_READWRITE8(unk2_r, unk2_w, 0xff00)
 	AM_RANGE(0xc00a, 0xc00b) AM_READ8(err_r, 0xff00)
 	AM_RANGE(0xc00c, 0xc00d) AM_RAM
-	AM_RANGE(0xc080, 0xc081) AM_RAM
+	AM_RANGE(0xc080, 0xc081) AM_READWRITE8(unk4_r, unk4_w, 0x00ff)
 	AM_RANGE(0xc088, 0xc089) AM_DEVWRITE8("crtc", hd6845_device, address_w, 0x00ff)
 	AM_RANGE(0xc08a, 0xc08b) AM_DEVREADWRITE8("crtc", hd6845_device, register_r, register_w, 0x00ff)
 	AM_RANGE(0xc280, 0xc287) AM_READWRITE8(unk3_r, unk3_w, 0x00ff)

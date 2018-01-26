@@ -14679,8 +14679,8 @@ lightfgt                        // Milton Bradley
 mdallas                         // Mattel
 plus1                           // Milton Bradley
 qkracer                         // National Semiconductor
-vidchal                         // Select Merchandise
 unkeinv                         // Gordon Barlow Design
+vidchal                         // Select Merchandise
 
 @source:hh_hmcs40.cpp
 alnattck                        // Coleco
@@ -34685,18 +34685,18 @@ skykido                         // (c) 1985
 skykids                         // (c) 1985
 
 @source:skylncr.cpp
+bdream97                        // Bootleg?
 butrfly                         // (c) 1995 Bordun International
 gallag50                        // Bootleg?
 leader                          // Bootleg?
 madzoo                          // (c) 1995 Bordun International
 mbutrfly                        // (c) 1999 (Bordun International?)
+miaction                        // (c) Vegas
 neraidou                        // Bootleg?
 skylncr                         // (c) 1995 Bordun International
-sstar97                         // (c) 199? Bordun International
-bdream97                        // Bootleg?
 sonikfig                        // Z Games
-ypovrixi                        // (c) Vegas
-ypovrixia                       // (c) Vegas
+sstar97                         // (c) 199? Bordun International
+tigerslt                        // Bootleg?
 
 @source:skyraid.cpp
 skyraid                         // 009709           1978/03 [6502]
@@ -37357,6 +37357,10 @@ tv950                           //
 @source:tv990.cpp
 tv990                           // 1992? TeleVideo
 tv995                           // 1994 TeleVideo
+
+@source:tvboy.cpp
+stvboy
+tvboyii                         //
 
 @source:tvc.cpp
 tvc64                           //
