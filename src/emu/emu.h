@@ -56,10 +56,6 @@
 #include "romload.h"
 #include "save.h"
 
-// define machine_config_constructor here due to circular dependency
-// between devices and the machine config
-typedef void (*machine_config_constructor)(machine_config &config, device_t *owner, device_t *device);
-
 // I/O
 #include "input.h"
 #include "ioport.h"
