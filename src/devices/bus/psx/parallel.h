@@ -62,8 +62,6 @@ public:
 
 protected:
 	psx_parallel_interface(const machine_config &mconfig, device_t &device);
-
-	psx_parallel_slot_device *m_slot;
 };
 
 

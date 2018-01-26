@@ -57,7 +57,6 @@ psx_gamebooster_device::psx_gamebooster_device(const machine_config &mconfig, co
 
 void psx_gamebooster_device::device_start()
 {
-	m_slot = dynamic_cast<psx_parallel_slot_device *>(owner());
 }
 
 //-------------------------------------------------
@@ -67,9 +66,6 @@ void psx_gamebooster_device::device_start()
 void psx_gamebooster_device::device_reset()
 {
 }
-
-
-
 
 //**************************************************************************
 //  IMPLEMENTATION

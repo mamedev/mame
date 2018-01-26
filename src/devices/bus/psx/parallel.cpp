@@ -27,7 +27,6 @@ DEFINE_DEVICE_TYPE(PSX_PARALLEL_SLOT, psx_parallel_slot_device, "psx_parallel_sl
 psx_parallel_interface::psx_parallel_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
 {
-	m_slot = dynamic_cast<psx_parallel_slot_device *>(device.owner());
 }
 
 
@@ -77,10 +76,6 @@ void psx_parallel_slot_device::device_start()
 
 void psx_parallel_slot_device::device_reset()
 {
-	if (get_card_device())
-	{
-		get_card_device()->reset();
-	}
 }
 
 //-------------------------------------------------
