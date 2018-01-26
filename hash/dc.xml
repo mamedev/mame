@@ -110,13 +110,13 @@ http://segaretro.org/
     
     <!--
     <software name="4x4jam">
-        <description>4x4 Jam (World)</description>
+        <description>4x4-Jam (World)</description>
         <year>2017</year>
         <publisher>JoshProd</publisher>
         <info name="release" value="20170930" />
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="4x4 jam (world)" status="nodump"/>
+                <disk name="4x4-jam (world)" status="nodump"/>
             </diskarea>
         </part>
     </software>
@@ -182,33 +182,41 @@ http://segaretro.org/
         </part>
     </software>
     
-    <!--
     <software name="18wheelrp1" cloneof="18wheel">
+        <!--
+        <rom name="18 Wheeler v1.000 2001-04-05 U.gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
+        <rom name="track01.bin" size="1058400" md5="df131f56c69e3e9ddf3040c6dc25503e" sha1="718d4d534154a0f262d90c8a58bd12f3b43d0e05"/>
+        <rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
+        <rom name="track03.bin" size="1185760800" md5="2442c1b6e4d1b2c00ba05a49efa5fccd" sha1="a7834a9321c944e1bda9035cf1c79d3cc469608c"/>
+        -->
         <description>18 Wheeler: American Pro Trucker (USA, Prototype 20010405)</description>
         <year>2001</year>
         <publisher>Sega</publisher>
         <info name="release" value="20010405" />
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="18 Wheeler v1.000 2001-04-05 U GD-R Beta" status="nodump"/>
+                <disk name="18 Wheeler v1.000 2001-04-05 U GD-R Beta" sha1="7346922f7a904242f0bff336a1ae3612f5d37381"/>
             </diskarea>
         </part>
     </software>
-    -->
     
-    <!--
     <software name="18wheelrp2" cloneof="18wheel">
+        <!--
+        <rom name="18WHEELER_AMERICAN-PRO-TRUCKE.gdi" size="83" md5="959dda0935b75865e18449e6068f5db0" sha1="7b3d2d36b0e930ad89ad90c988eadc057468d627"/>
+        <rom name="track01.iso" size="921600" md5="04c8d221ccbb2243577025b68153749e" sha1="887f027130e9973a6a2e15883167ac664659bcda"/>
+        <rom name="track02.raw" size="1735776" md5="8bafd2d23c80e5539dbd5ed65c5b7c4c" sha1="2b6fb002a412c2ac1fbe75f758e936efd59e7cb4"/>
+        <rom name="track03.iso" size="1032499200" md5="d210a684bdd78f0573f3fe70bbceb7cb" sha1="b8d53ca8f3c8be8860221d82e5ffd7f33447a4a9"/>
+        -->
         <description>18 Wheeler: American Pro Trucker (USA, Prototype 20010202)</description>
         <year>2001</year>
         <publisher>Sega</publisher>
         <info name="release" value="20010202" />
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="18 Wheeles American Pro Trucker TEST" status="nodump"/>
+                <disk name="18 Wheeles American Pro Trucker TEST" sha1="a8c971199902f637f4ea18b3ac65dfdff5060f7f" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
     <!-- 
     Also released as a Dorikore version, which is identical to retail, as well as a Limited Edition (T-46504M), which shares the 
@@ -710,7 +718,7 @@ http://segaretro.org/
     -->
     
     <!-- Both the Eng/Spa/Ned (T-9501D-76) and Ger/Fra/Ita (T-9501D-77) release share the same disc (T-9501D-50) -->
-    <software name="dedskies">
+    <software name="deadlysk">
         <!--
         <rom name="Deadly Skies v1.003 (1999)(Konami)(PAL)(M5)[!].gdi" size="946" md5="6abbb83295989e223eeb59a3a23c9690" sha1="bcfda4acf7db5d01784a72982458cff78330776a"/>
         <rom name="track01.bin" size="705600" md5="3dcfa961690659ecc16b4b004ffab5d1" sha1="8ca9faa7a89818a51f82c428d958ffc23e15d232"/>
@@ -755,7 +763,7 @@ http://segaretro.org/
         </part>
     </software>
     
-    <software name="airfdeltu" cloneof="dedskies">
+    <software name="airforcd" cloneof="deadlysk">
         <!--
         <rom name="Airforce Delta v1.000 (1999)(Konami)(NTSC)(US)[!][1S T-9501NAF].gdi" size="946" md5="5807915c07432be55a653540267d302e" sha1="7672f6cd3fac974ef8a2acca42327257780eb0a8"/>
         <rom name="track01.bin" size="705600" md5="bf8bb04621eca8ec28c516db0ff79574" sha1="2ffe7ff2c6f630cb6d2125c8fc15fa18c35a4c6d"/>
@@ -802,7 +810,7 @@ http://segaretro.org/
         </part>
     </software>
     
-    <software name="airfdeltua" cloneof="dedskies">
+    <software name="airforcd1" cloneof="deadlysk">
         <!--
         <rom name="Airforce Delta v1.000 (1999)(Konami)(NTSC)(US)[!][2S T-9501NAF].gdi" size="946" md5="5807915c07432be55a653540267d302e" sha1="7672f6cd3fac974ef8a2acca42327257780eb0a8"/>
         <rom name="track01.bin" size="705600" md5="bf8bb04621eca8ec28c516db0ff79574" sha1="2ffe7ff2c6f630cb6d2125c8fc15fa18c35a4c6d"/>
@@ -850,7 +858,7 @@ http://segaretro.org/
     </software>
     
     <!--
-    <software name="airfdeltub" cloneof="dedskies">
+    <software name="airforcd2" cloneof="deadlysk">
         <description>Airforce Delta (USA, Alt 2)</description>
         <year>1999</year>
         <publisher>Konami</publisher>
@@ -866,7 +874,7 @@ http://segaretro.org/
     -->    
 
     <!-- Also released as a Dorikore version, which is identical to retail. -->
-    <software name="airfdeltj" cloneof="dedskies">
+    <software name="airforcdj" cloneof="deadlysk">
         <!--
         <rom name="Airforce Delta v1.002 (1999)(Konami)(NTSC)(JP)[!].gdi" size="946" md5="83735ce2658c59889933bf18ed6e30e0" sha1="44140535b052c55acada76b3aa577ae20af1c729"/>
         <rom name="track01.bin" size="705600" md5="606c55c4de6fd627b974c7de1b815a1f" sha1="b6667507d44c765b0184a245f336004662270753"/>
@@ -914,7 +922,7 @@ http://segaretro.org/
     </software>
     
     <!--
-    <software name="airfdeltb" cloneof="dedskies">
+    <software name="airforcdb" cloneof="deadlysk">
         <description>Airforce Delta (Bra)</description>
         <year>200?</year>
         <publisher>Tec Toy</publisher>
@@ -948,7 +956,7 @@ http://segaretro.org/
     </software>
     
     <!--
-    <software name="alabama">
+    <software name="willvi">
         <description>Alabama Meets Will Vi (Jpn)</description>
         <year>1999</year>
         <publisher>Toyota</publisher>
@@ -1117,7 +1125,7 @@ http://segaretro.org/
     </software>
     -->
     
-    <software name="afo">
+    <software name="alienfnto">
         <!--
         <rom name="Alien Front Online v1.000 (2001)(Sega)(NTSC)(US)[!].gdi" size="149" md5="cc3bb1b3a8a5c4acba6c995a01baaabb" sha1="810eb70257b9e0a1395c601cf3668ab5f6ca0427"/>
         <rom name="track01.bin" size="1058400" md5="a8b7c98303f941de9d3fe138ed598b52" sha1="e06734e9bbc97581366459ff721be27aaad7ae74"/>
@@ -1138,7 +1146,27 @@ http://segaretro.org/
         </part>
     </software>
     
-    <software name="aitdtnn">
+    <software name="alienfntop">
+        <!--
+        <rom name="ALIENFRONT_ONLINE.gdi" size="143" md5="0a3db521ea34e40a63967a0108d4bc78" sha1="397340cf23de1f66776741a3b9da8914c9b48203"/>
+        <rom name="track01.iso" size="921600" md5="98de8e5db931c9106cbf5c53b75f7cc7" sha1="5e23b9e4a63d4720e114bc777640bd65f0edca9b"/>
+        <rom name="track02.raw" size="13 994 400" md5="a55424800b9a45851b3670fa8afbf6a9" sha1="6cd6c33fc86f008d87f9d4385371e5df684c4c60"/>
+        <rom name="track03.iso" size="876 550 144" md5="17f9a991a2b7758f5ae1b2c2a08adb65" sha1="e99bcff45222f59148463dab5833ddf5e8aa93bd"/>
+        <rom name="track04.raw" size="13 818 000" md5="52d4f2952f4aca03f15d23825f5609b0" sha1="b00cc2ffa6abbd0908675ced977586fd9111d881"/>
+        <rom name="track05.iso" size="143 302 656" md5="d4ca27065a01df92300d240093d61ff5" sha1="2db3177f076caaa5e779a70f1ba546ac1b709e26"/>
+        -->
+        <description>Alien Front Online (USA, Prototype 20010625)</description>
+        <year>2001</year>
+        <publisher>Sega</publisher>
+        <info name="release" value="20010625" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="alien front online (usa, prototype 20010625)" sha1="97dd8256fa70526cb7e266d1d77a5e44093a533a" status="baddump"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="aitdnn">
         <!--
         <rom name="Alone in the Dark - The New Nightmare v1.000 (2001)(Infogrames)(NTSC)(US)(Disc 1 of 2)[!].gdi" size="149" md5="513e1ef0bd3e058d4b370fc301151745" sha1="55c0c3627622f94d3c498adb509a06b0772c4654"/>
         <rom name="track01.bin" size="1425312" md5="a0c02dc1e33fb1c5cd18071555c85865" sha1="2fbfafc3fd44cc0b298842fcd854136a536d3dad"/>
@@ -1173,7 +1201,7 @@ http://segaretro.org/
         </part>
     </software>
     
-    <software name="aitdtnne" cloneof="aitdtnn">
+    <software name="aitdnne" cloneof="aitdnn">
         <!--
         <rom name="Alone in the Dark - The New Nightmare v1.000 (2001)(Infogrames)(PAL)(Disc 1 of 2)[!].gdi" size="149" md5="20c49fb4e6918a108a464b574993e654" sha1="2bd2966d9b0e4764473c26a9620bd17e55e4841c"/>
         <rom name="track01.bin" size="16075920" md5="4e49daced7d62506af058d9245f95f9b" sha1="acd62514d438aa5525167f0c5a03cd78e936bfc7"/>
@@ -1208,7 +1236,7 @@ http://segaretro.org/
         </part>
     </software>
     
-    <software name="aitdtnng" cloneof="aitdtnn">
+    <software name="aitdnng" cloneof="aitdnn">
         <!--
         <rom name="Alone in the Dark - The New Nightmare v1.000 (2001)(Infogrames)(PAL)(DE)(Disc 1 of 2)[!].gdi" size="149" md5="5986b5ea72c8333b41f43e17187f95de" sha1="627446bb9914ea45dc59ff4a9a2d3a216afbd2f2"/>
         <rom name="track01.bin" size="16075920" md5="4e49daced7d62506af058d9245f95f9b" sha1="acd62514d438aa5525167f0c5a03cd78e936bfc7"/>
@@ -1243,7 +1271,7 @@ http://segaretro.org/
         </part>
     </software>
     
-    <software name="aitdtnnf" cloneof="aitdtnn">
+    <software name="aitdnnf" cloneof="aitdnn">
         <!--
         <rom name="Alone in the Dark - The New Nightmare v1.000 (2001)(Infogrames)(PAL)(FR)(Disc 1 of 2)[!].gdi" size="149" md5="f851c0db001b598e744f52b2434c1bdd" sha1="e0bd4f0fcdca1e05d93847cfbe4001c7c9d38a04"/>
         <rom name="track01.bin" size="16075920" md5="4e49daced7d62506af058d9245f95f9b" sha1="acd62514d438aa5525167f0c5a03cd78e936bfc7"/>
@@ -1279,7 +1307,7 @@ http://segaretro.org/
     </software>
     
     <!--
-    <software name="aitdtnnis" cloneof="aitdtnn">
+    <software name="aitdnnis" cloneof="aitdnn">
         <description>Alone in the Dark: The New Nightmare (Ita / Spa)</description>
         <year>2001</year>
         <publisher>Infogrames</publisher>
@@ -1333,6 +1361,7 @@ http://segaretro.org/
             </diskarea>
         </part>
     </software>
+    
     <!--
     <software name="anglwishsp">
         <description>Angel Wish: Kimi no Egao ni Chu! - Special Pack-ban (Jpn)</description>
@@ -1453,7 +1482,7 @@ http://segaretro.org/
         </part>
     </software>
     
-        <software name="amshu" cloneof="amsh">
+    <software name="amensargu" cloneof="amensarg">
         <!--
         <rom name="Army Men - Sarge's Heroes v1.001 (2000)(Midway)(NTSC)(US)[!].gdi" size="149" md5="98f3d1aaeff3f1e50c9dd76cef5a85f8" sha1="7de7049737a72c4fe670946a7b41d28977821fde"/>
         <rom name="track01.bin" size="1425312" md5="e71f149c7bae0b60cc61b65dafe17dcd" sha1="660b5f68e2c9be8cb1999a8ffc7b9fd32b048fab"/>
@@ -1475,7 +1504,7 @@ http://segaretro.org/
     </software>
     
     <!-- Both the Ger/Fra/Ned (T-9708D-51) and Eng/Spa/Ita (T-9708D-61) release share the same disc (T-9708D-50) -->
-    <software name="amsh">
+    <software name="amensarg">
         <!--
         <rom name="Army Men - Sarge's Heroes v1.001 (2000)(Midway)(PAL)(M5)[!].gdi" size="150" md5="3a7ac4a8ce7f57a1dd91a37573d9339f" sha1="d04ce34fa8aa9e2e968339f1606d2de5d89462de"/>
         <rom name="track01.bin" size="16075920" md5="666f1fcecf6b191fcce2c51b8245319b" sha1="b84839aed53a3a448f1d0f26fb3551e8d4dba982"/>
@@ -1496,7 +1525,7 @@ http://segaretro.org/
         </part>
     </software>
     
-    <software name="atariae">
+    <software name="atariann">
         <!--
         <rom name="Atari Anniversary Edition v1.001 (2001)(Infogrames)(NTSC)(US)[!][compilation].gdi" size="149" md5="4e4b7d3c5f6cb02a99ef0cbb39fa657e" sha1="5097454aa0717b5a46327e7f41fd484d83574927"/>
         <rom name="track01.bin" size="1425312" md5="acd51da89ca95e0bd67a25f1234491e8" sha1="f6b8c447dad7a6b11a145a376ec124b03367ac70"/>
@@ -1555,7 +1584,7 @@ http://segaretro.org/
     
     <!--
     <software name="aggonsenwmc" cloneof="aggonsenbb">
-        <description>Atsumare! Guru Guru Onsen - Original WebMoney Card-Tsuki (Jpn)</description>
+        <description>Atsumare! Guru Guru Onsen - Original WebMoney Card-tsuki (Jpn)</description>
         <year>2000</year>
         <publisher>Sega</publisher>
         <info name="serial" value="HDR-0120"/>
