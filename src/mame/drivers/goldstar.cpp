@@ -11553,6 +11553,12 @@ ROM_END
 
 /*
   Super 97-2
+
+  Code jumps above $C000, so offset range C000-F7FF was defined
+  as ROM space. However, the game isn't working due to the high
+  memory code looks strange. Maybe the program needs some sort
+  of address/data descramble...
+
 */
 ROM_START( super972 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
