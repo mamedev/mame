@@ -73,9 +73,11 @@ void psx_gamebooster_device::device_reset()
 
 READ16_MEMBER(psx_gamebooster_device::exp_r)
 {
-	if (offset<0x20000)
+	if (offset < 0x20000)
+	{
 		return m_rom->base()[(offset * 2) & 0x3ffff] | (m_rom->base()[((offset * 2) + 1) & 0x3ffff] << 8);
-	else
+	}
+	else if (offset < 0x24000)
 	{
 		offset -= 0x20000;
 		uint16_t retval = 0;;
@@ -85,22 +87,33 @@ READ16_MEMBER(psx_gamebooster_device::exp_r)
 
 		return retval;
 	}
+	else
+	{
+		logerror("%s: psx_gamebooster_device::exp_r %04x\n", machine().describe_context(), offset*2);
+	}
 
 	return 0x0000;
 }
 
 WRITE16_MEMBER(psx_gamebooster_device::exp_w)
 {
+
 	if (offset < 0x20000)
 	{
-
+		logerror("%s: psx_gamebooster_device::exp_w %04x %04x\n", machine().describe_context(), offset*2, data);
 	}
-	else
+	else if (offset < 0x24000)
 	{
+		logerror("%s: psx_gamebooster_device::exp_w %04x %04x\n", machine().describe_context(), offset*2, data);
+
 		offset -= 0x20000;
 
 		if (mem_mask & 0x00ff) m_cartslot->write_bank(space, (offset*2)+0, data);
 		if (mem_mask & 0xff00) m_cartslot->write_bank(space, (offset*2)+1, data>>8);
+	}
+	else
+	{
+		logerror("%s: psx_gamebooster_device::exp_w %04x %04x\n", machine().describe_context(), offset*2, data);
 	}
 }
 
