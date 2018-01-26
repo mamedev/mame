@@ -618,7 +618,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( banked_oki_map, 0, 8, vamphalf_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_REGION("okibank")
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
 /*
