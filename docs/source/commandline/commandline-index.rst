@@ -54,7 +54,6 @@ OSD-related Options
 
 | :ref:`uimodekey <mame-commandline-uimodekey>`
 | :ref:`uifontprovider <mame-commandline-uifontprovider>`
-| :ref:`menu <mame-commandline-menu>`
 | :ref:`keyboardprovider <mame-commandline-keyboardprovider>`
 | :ref:`mouseprovider <mame-commandline-mouseprovider>`
 | :ref:`lightgunprovider <mame-commandline-lightgunprovider>`
