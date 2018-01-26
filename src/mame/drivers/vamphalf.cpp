@@ -2565,6 +2565,7 @@ int vamphalf_state::irq_active()
 
 void vamphalf_state::banked_oki(const char *region)
 {
+	assert(m_okibank.found());
 	uint8_t *ROM = memregion(region)->base();
 	uint32_t size = memregion(region)->bytes();
 	if (size > 0x40000)
