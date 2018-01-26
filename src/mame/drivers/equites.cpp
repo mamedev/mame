@@ -1130,7 +1130,7 @@ void equites_state::machine_reset()
 MACHINE_CONFIG_START(equites_state::equites)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 12.0_MHz_XTAL/4) /* 68000P8 running at 3mhz! verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, 12_MHz_XTAL/4) /* 68000P8 running at 3mhz! verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(equites_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, equites_scanline, "screen", 0, 1)
 
@@ -1180,7 +1180,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(equites_state::splndrbt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 24.0_MHz_XTAL/4) /* 68000P8 running at 6mhz, verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, 24_MHz_XTAL/4) /* 68000P8 running at 6mhz, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(splndrbt_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, splndrbt_scanline, "screen", 0, 1)
 

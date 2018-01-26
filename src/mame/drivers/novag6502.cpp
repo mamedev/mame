@@ -443,7 +443,7 @@ READ8_MEMBER(novag6502_state::sexpert_input2_r)
 void novag6502_state::sexpert_set_cpu_freq()
 {
 	// machines were released with either 5MHz or 6MHz CPU
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (12.0_MHz_XTAL/2) : (10.0_MHz_XTAL/2));
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (12_MHz_XTAL/2) : (10_MHz_XTAL/2));
 }
 
 MACHINE_RESET_MEMBER(novag6502_state, sexpert)
@@ -857,7 +857,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(novag6502_state::supercon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 8.0_MHz_XTAL/2)
+	MCFG_CPU_ADD("maincpu", M6502, 8_MHz_XTAL/2)
 	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 600) // guessed
 	MCFG_CPU_PROGRAM_MAP(supercon_map)
 
@@ -875,7 +875,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(novag6502_state::cforte)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 10.0_MHz_XTAL/2)
+	MCFG_CPU_ADD("maincpu", R65C02, 10_MHz_XTAL/2)
 	MCFG_CPU_PROGRAM_MAP(cforte_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for 11us
@@ -899,7 +899,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(novag6502_state::sexpert)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 10.0_MHz_XTAL/2) // or 12.0_MHz_XTAL/2
+	MCFG_CPU_ADD("maincpu", M65C02, 10_MHz_XTAL/2) // or 12_MHz_XTAL/2
 	MCFG_CPU_PROGRAM_MAP(sexpert_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(21500)) // active for 21.5us

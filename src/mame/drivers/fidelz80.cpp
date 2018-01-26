@@ -1665,7 +1665,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidelz80_state::cc10)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", Z80, 4_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(cc10_map)
 	MCFG_CPU_IO_MAP(vcc_io)
 
@@ -1691,7 +1691,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidelz80_state::vcc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", Z80, 4_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(vcc_map)
 	MCFG_CPU_IO_MAP(vcc_io)
 
@@ -1747,12 +1747,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidelz80_state::vbrc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 5.0_MHz_XTAL/2)
+	MCFG_CPU_ADD("maincpu", Z80, 5_MHz_XTAL/2)
 	MCFG_CPU_PROGRAM_MAP(vbrc_main_map)
 	MCFG_CPU_IO_MAP(vbrc_main_io)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("mcu", I8041, 5.0_MHz_XTAL)
+	MCFG_CPU_ADD("mcu", I8041, 5_MHz_XTAL)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(fidelz80_state, vbrc_mcu_p1_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(fidelz80_state, vbrc_mcu_p2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(DEVWRITE8("i8243", i8243_device, p2_w))

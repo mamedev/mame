@@ -275,7 +275,7 @@
  *************************************/
 
 static constexpr XTAL MASTER_CLOCK  = 48.66_MHz_XTAL;
-static constexpr XTAL SOUND_CLOCK   = 4.0_MHz_XTAL;
+static constexpr XTAL SOUND_CLOCK   = 4_MHz_XTAL;
 
 static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK/8;
 
