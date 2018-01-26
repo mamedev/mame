@@ -1,0 +1,1570 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+This is a software list of the disc-based media released for the Sega Dreamcast.
+
+Much of the information in this softlist has been gathered from Sega Retro:
+http://segaretro.org/
+-->
+
+<softwarelist name="dc" description="Sega Dreamcast GD-ROMs">
+    <!-- 
+    Both the Ger/Fra/Ned (T-9706D-51) and Eng/Spa/Ita (T-9706D-61) release share the same disc (T-9706D-50)
+    Promo version has the serial 950-0068-50 952-0063-50
+    -->
+    <software name="4wt">
+        <!--
+        <rom name="4 Wheel Thunder v1.002 (2000)(Midway)(PAL)(en-fr)[!].gdi" size="563" md5="fc9d4c8e437d08c91268a812ebdcfdd2" sha1="64221e21bde4e11efd0810e722da4f9d83725f30"/>
+        <rom name="track01.bin" size="2817696" md5="673b843d54ca08e11a304df6f415bf90" sha1="6516c76403bcee8853826d97b580f19f1418d983"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="134188656" md5="f457fa86b9e22555021141ec54a25500" sha1="0f554cded881ce15092759c17416fe59b5869dc8"/>
+        <rom name="track04.raw" size="46604880" md5="eab31ef064bf87ecffb46e43ed4ff906" sha1="5a31bdbe3dfcd2fe452ba0475e07e3f65adcc003"/>
+        <rom name="track05.raw" size="53359824" md5="c2b1b16117ced532ee9cb3dcc35f0197" sha1="f65e7d004bd528ac375b0d752e565ea1df0ec378"/>
+        <rom name="track06.raw" size="54194784" md5="aad6879fe2be673772c80711efcf2725" sha1="76fbd79276db58b60c16fe49657f4bf1e4aa338d"/>
+        <rom name="track07.raw" size="62328000" md5="8b696db6635203cf72f023d160a1df13" sha1="d144cdc3d8f0db396e5164ea32f54b38468f2cb6"/>
+        <rom name="track08.raw" size="56377440" md5="7495c609c15c02a79aac794215b83cbc" sha1="6a3566ae8a16add3d645c341daac50211373db35"/>
+        <rom name="track09.raw" size="57642816" md5="245c750112874577973577ded5ce1447" sha1="a4ad791c07f0dfd7456d378bd4d6b93aa448bf9c"/>
+        <rom name="track10.raw" size="56304528" md5="d2deeb72b48e8132fcbd43c1d859fa5f" sha1="6c96ae9959773b56c902eded1d1a6f659c325b85"/>
+        <rom name="track11.raw" size="34675536" md5="bdea201f42ba46dbb3bc14143be8950b" sha1="adb90a89246a00c02069a68a156eea1d2cd6a5de"/>
+        <rom name="track12.raw" size="47155248" md5="390ee9a242778cf1b1cb3f6f139e2db9" sha1="a243221dc8f0096d096f5197c0d4ab843a5a2304"/>
+        <rom name="track13.raw" size="54862752" md5="725b19c2716248ebeff21fc86304a1d7" sha1="a7bd52e1b668dd2397d4b2cb503cd83ac97d6a75"/>
+        <rom name="track14.raw" size="42484176" md5="ee21422f93375cdffce63be9353099b6" sha1="9796a1e43e05a807f4485c31b7a5b49058563785"/>
+        <rom name="track15.raw" size="52002720" md5="b7a2f43140d2244177c5f4c582109391" sha1="5ceb4be34f70938cb3012d6ee175a98115d6108b"/>
+        <rom name="track16.raw" size="51812208" md5="32c3edafd548e66c9dbc54e95a2a0ea4" sha1="9228adbcac676199925a39372ea2dd29a7bdd00f"/>
+        <rom name="track17.raw" size="42514752" md5="2436b7f3020c7a375308fa6225789e3d" sha1="6d180eb11ebc5797a2b31c177a599141e8f85007"/>
+        <rom name="track18.bin" size="338546880" md5="1e85898d0e322f128700d9257a45b8a9" sha1="ec6ee2f949a2eb0b6ba7ea7013265e95ce9727ec"/>
+        -->
+        <description>4 Wheel Thunder (Euro)</description>
+        <year>2000</year>
+        <publisher>Midway</publisher>
+        <info name="serial" value="T-9706D-50, T-9706D-51, T-9706D-61, 950-0068-50 952-0063-50"/>
+        <info name="release" value="200005xx" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="4 wheel thunder (euro)" sha1="9d3c5b15c1d62c310eecf457bec4e6c844699db1"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="4wtu" cloneof="4wt">
+        <!--
+        <rom name="4 Wheel Thunder v1.002 (2000)(Midway)(NTSC)(US)[!].gdi" size="563" md5="524bbca3dbb8459089f43d97b10b32ea" sha1="e6bd93e29be2337834b6f8d539f2216b62272818"/>
+        <rom name="track01.bin" size="2817696" md5="7e8d309edf2f9da4641c24c4a46559c2" sha1="b238bfba1a0b30fb1a2fa53546fdc8fbdda74a34"/>
+        <rom name="track02.raw" size="1237152" md5="a25923b4e3e7c15d172ec835af577416" sha1="a667d6cf552f1dbbf0009bc0e3cffee0e0f08fcb"/>
+        <rom name="track03.bin" size="332838576" md5="566e7289984087f64f429fe73d6389ba" sha1="d8bbcac1ff8dfebbe7090f11f72d4452c6461b15"/>
+        <rom name="track04.raw" size="46604880" md5="50ea664fecfe3157d86cdbaa48d42f52" sha1="7c325b1c19fd60c929fdcadf6ed8b468cf6e881e"/>
+        <rom name="track05.raw" size="18780720" md5="7c814c5882df344ef07c17797a4c42fb" sha1="500f5ec79a091f3af70415503dba0891aba7b55c"/>
+        <rom name="track06.raw" size="54194784" md5="8388834a9806fee72db47f712b4e26fa" sha1="f67c9aa71773e8f70ee9fd24418bc57b8fda3c5e"/>
+        <rom name="track07.raw" size="19622736" md5="77017b84cfbf34a7de721b7aba4870ba" sha1="f891302ac0cd27bd48f4532d67b29e0bd4f6f2af"/>
+        <rom name="track08.raw" size="26274192" md5="4dccbdd4faf272b577844da85df5d80a" sha1="38d7a52a24eefe9001b84a5de6dac0dbf1c38a25"/>
+        <rom name="track09.raw" size="13636896" md5="cdf5531b8e7efbd8473084b21165d74b" sha1="0d051c183360f8a0f369050b191df8875427476a"/>
+        <rom name="track10.raw" size="21537264" md5="a2c6fb0ffab00457c89ea93d10197345" sha1="a8a6e69692cfc24b1100ee276b444856852f5d62"/>
+        <rom name="track11.raw" size="34675536" md5="b082fbf219ec956b32eadcacf8bfe192" sha1="14e2b5b08ff627297fe6e92e026b3933b4deb956"/>
+        <rom name="track12.raw" size="34508544" md5="a9c306d4c886ddb6bd2b1b7b54e95303" sha1="07d2de2d8e14d72e37a5a10cbd91effdd853765a"/>
+        <rom name="track13.raw" size="54862752" md5="0778e1e53eefade056866e7229041e1b" sha1="e09495096eaa93df3d13a9bc606d078291bdb770"/>
+        <rom name="track14.raw" size="42484176" md5="49fb42593501c101413c71910c4c3001" sha1="2891df02da02de7e1b6eb0dd18b77f29ee915106"/>
+        <rom name="track15.raw" size="52002720" md5="dcdb4e06cfc678a1dbb92bef1ad9799e" sha1="4aac2e06b6539af695708951ba53e85915c51a26"/>
+        <rom name="track16.raw" size="51812208" md5="a9d3cd726bc5962596b685cce82d4976" sha1="9a702d4378347da0b22afb88b69f80a4905ef52b"/>
+        <rom name="track17.raw" size="42514752" md5="b636a1202e3fdb48e8b41ddc4619d2d6" sha1="2789c2f7b2d23448da546d4ea6a1c778d7d1b619"/>
+        <rom name="track18.bin" size="338704464" md5="5167b743b57e9e4fc17030e4d7d8a6ab" sha1="fbedd3665f13ef5b3377475f38e75d435751393d"/>
+        -->
+        <description>4 Wheel Thunder (USA)</description>
+        <year>2000</year>
+        <publisher>Midway</publisher>
+        <info name="serial" value="T-9708N"/>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="4 wheel thunder (usa)" sha1="c5fc00052fb37c2a0ba6c0c868b5de2f11851f0b"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="4x4evo">
+        <!--
+        <rom name="4X4 EVO v1.001 (2000)(GOD)(NTSC)(US)[!].gdi" size="338" md5="0ac561fc5f6e69d672a76d07245f6010" sha1="2286edcd905b8ec8b0346b1b37784d0773c813bf"/>
+        <rom name="track01.bin" size="1425312" md5="725de5c63f7afdb715d3d77f5def9960" sha1="ece1a9f45f34f2673a109024081e0fa1dcb1f8db"/>
+        <rom name="track02.raw" size="1237152" md5="94fde9cacd7a4b3c18d8918836e9cda5" sha1="4b9ed2a2eefaae6691674522b9f047a066304a75"/>
+        <rom name="track03.bin" size="768718272" md5="8aede0810539c3244fed0ee51bc35c91" sha1="67825d9fd1a48954e49eb568fa97915d25c55cb2"/>
+        <rom name="track04.raw" size="40675488" md5="f84d0f7b59f178704236b94076f10d19" sha1="9e6187408f44d3593032fb8f88ff1f78ee5c94b7"/>
+        <rom name="track05.raw" size="33123216" md5="bc82fa551a496b2c9d513ea142c128b6" sha1="8a03d803f8b87c0be00e6d3a73a678b911555892"/>
+        <rom name="track06.raw" size="37977744" md5="25caa2d24efd6c4f18b205aafbcc1518" sha1="11744054bbdba3869032ef8fd0938776fbfc0e8f"/>
+        <rom name="track07.raw" size="29409408" md5="737463353f3321c9f510692840b47833" sha1="8b596f34959a32bf555e6e2b0fb68311d968daf9"/>
+        <rom name="track08.raw" size="26626992" md5="3993c04da57edd76c2a02992c34c1913" sha1="c45ee9849b3a724f21600486fe845f4409f9c9ee"/>
+        <rom name="track09.raw" size="27850032" md5="d7f7a1758132882f6db025592352d23c" sha1="04b65db69eda368e0737b446af628d68ec35b83e"/>
+        <rom name="track10.raw" size="34670832" md5="556247b16fa2f13a676a6fed73b03779" sha1="2da38da42d2775ebc107457316289b9aa3ffba21"/>
+        <rom name="track11.bin" size="186003216" md5="7dbc2e3f9129e9fc9498f60677728120" sha1="3ef8c103670dfe290c4e32c9699206b52b0b351b"/>
+        -->
+        <description>4x4 Evo (USA)</description>
+        <year>2000</year>
+        <publisher>Gathering of Developers</publisher>
+        <info name="serial" value="T-41903N"/>
+        <info name="release" value="20001010" />
+		<info name="alt_title" value="4x4 Evolution (Box)" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="4x4 evo (usa)" sha1="3465ba91e70937a0b27b80062ebd884cfe00d4c3"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!--
+    <software name="4x4jam">
+        <description>4x4 Jam (World)</description>
+        <year>2017</year>
+        <publisher>JoshProd</publisher>
+        <info name="release" value="20170930" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="4x4 jam (world)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->    
+
+    <software name="18wheelr">
+        <!--
+        <rom name="18 Wheeler - American Pro Trucker v1.500 (2001)(Sega)(NTSC)(US)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
+        <rom name="track01.bin" size="1058400" md5="4bd9dce3c5606b086b64b88ef9610eb7" sha1="c7794a4af576c2adfa9f099984ca91839dfbe6c7"/>
+        <rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
+        <rom name="track03.bin" size="1185760800" md5="16b0672b221ed0d0eecb6a9d6e8783f9" sha1="fc4ce908933d90cf3624737349208caca5533700"/>
+        -->
+        <description>18 Wheeler: American Pro Trucker (USA)</description>
+        <year>2001</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="51064"/>
+        <info name="release" value="20010518" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="18 wheeler american pro trucker (usa)" sha1="4bcdb9605bf93fbd2d79165d03053f87c3c8d19c"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!-- Promo version has the serial 950-0164-50 952-0158-50 -->
+    <software name="18wheelre" cloneof="18wheel">
+        <!--
+        <rom name="18 Wheeler - American Pro Trucker v1.700 (2001)(Sega)(PAL)(M4)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
+        <rom name="track01.bin" size="1058400" md5="202a2b7b53f8be7314d6cea6102bda10" sha1="43ba242fe1a06bf70a451fd1bcfae7853e9c4f34"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="1185760800" md5="39616eca907750cc818a22528f506d75" sha1="96f9eea7459f0e675a3771418a6593b52a345822"/>
+        -->
+        <description>18 Wheeler - American Pro Trucker (Euro)</description>
+        <year>2001</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="MK-51064-50, 950-0164-50 952-0158-50"/>
+        <info name="release" value="20010106" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="18 wheeler american pro trucker (euro)" sha1="6fa7d6f7ec1bc0ccd99af1fd1f4028d4cfcaf56a"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!-- Also released as a Dorikore version, which is identical to retail. -->
+    <software name="18wheelrj" cloneof="18wheel">
+        <!--
+        <rom name="18 Wheeler - American Pro Trucker v1.006 (2000)(Sega)(NTSC)(JP)(en)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
+        <rom name="track01.bin" size="1058400" md5="df865245bce0b72fc274a4e58004d8cb" sha1="973878d419578fa851462188c243cefa987e6d61"/>
+        <rom name="track02.raw" size="1735776" md5="d09be539a7074a058159505b7f5fdcb3" sha1="db680939aae4bf61d0e588414c72a47c6dd92cdd"/>
+        <rom name="track03.bin" size="1185760800" md5="26ae2954b884c924a5b4a5adce93de91" sha1="d842dd2ddd8e47ddeb113a96deea6c5d4adab67d"/>
+        -->
+        <description>18 Wheeler: American Pro Trucker (Jpn)</description>
+        <year>2000</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="HDR-0080"/>
+        <info name="release" value="20001012" />
+		<info name="alt_title" value="エイティーン･ホイーラー" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="18 wheeler american pro trucker (jpn)" sha1="383b5971088edd6f36e6af5f9397f60451cc867e"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!--
+    <software name="18wheelrp1" cloneof="18wheel">
+        <description>18 Wheeler: American Pro Trucker (USA, Prototype 20010405)</description>
+        <year>2001</year>
+        <publisher>Sega</publisher>
+        <info name="release" value="20010405" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="18 Wheeler v1.000 2001-04-05 U GD-R Beta" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="18wheelrp2" cloneof="18wheel">
+        <description>18 Wheeler: American Pro Trucker (USA, Prototype 20010202)</description>
+        <year>2001</year>
+        <publisher>Sega</publisher>
+        <info name="release" value="20010202" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="18 Wheeles American Pro Trucker TEST" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!-- 
+    Also released as a Dorikore version, which is identical to retail, as well as a Limited Edition (T-46504M), which shares the 
+    same disc content as the regular edition.
+    -->
+    <!--
+    <software name="21twoone">
+        <description>21: Two One (Jpn)</description>
+        <year>2001</year>
+        <publisher>Princess Soft</publisher>
+        <info name="serial" value="T-46503M, T-46504M"/>
+        <info name="release" value="20011227" />
+		<info name="alt_title" value="21: Two One 初回限定版 (Box, Limited Edition)" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="21 two one (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!-- A promo version exists (950-0181-50 952-0166-50), it is most likely the same as retail -->
+    <software name="90min">
+        <!--
+        <rom name="90 Minutes - Sega Championship Football v1.009 (2001)(Sega)(PAL)(M5)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
+        <rom name="track01.bin" size="1058400" md5="892df16103f2a48874c9b1c877db3d1b" sha1="534fe69656a14148d36d9d66e9b2c6f6966c8040"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="1185760800" md5="6485741c36f28e54f9ca334becf9eb67" sha1="84a42d53b6dba77f6fe26a83e300e8c43c8614a7"/>
+        -->
+        <description>90 Minutes: Sega Championship Football (Euro)</description>
+        <year>2001</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="MK-51190-50"/>
+        <info name="release" value="20011025" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="90 minutes sega championship football (euro)" sha1="71106d52cd8860c5658dcd646b6e178d49d44b6e"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!--
+    <software name="jlspecso" cloneof="90min">
+        <description>J.League Spectacle Soccer (Jpn)</description>
+        <year>2002</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="HDR-0154"/>
+        <info name="release" value="20020207" />
+		<info name="alt_title" value="Jリーグ スペクタクルサッカー" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="j.league spectacle soccer (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="arcdx">
+        <description>Action Replay CDX (Euro)</description>
+        <year>2000</year>
+        <publisher>Datel</publisher>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="action replay cdx (euro)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="arcdxdemo" cloneof="arcdx">
+        <description>Action Replay CDX - Demo Version (Euro)</description>
+        <year>2000</year>
+        <publisher>Datel</publisher>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="action replay cdx - demo version (euro)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="eqxtreme" cloneof="arcdx">
+        <description>Equalizer Xtreme (Euro)</description>
+        <year>200?</year>
+        <publisher>Datel</publisher>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="equalizer xtreme (euro)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="gmshrkcdx" cloneof="arcdx">
+        <description>GameShark CDX (USA)</description>
+        <year>2000</year>
+        <publisher>InterAct</publisher>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="gameshark cdx (usa)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="gmshrklite" cloneof="arcdx">
+        <description>GameShark Lite (USA)</description>
+        <year>200?</year>
+        <publisher>InterAct</publisher>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="gameshark lite (usa)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="dcpar" cloneof="arcdx">
+        <description>Pro Action Replay (Jpn)</description>
+        <year>200?</year>
+        <publisher>Karat</publisher>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="pro action replay (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="adai2001">
+        <description>Advanced Daisenryaku 2001 (Jpn)</description>
+        <year>2001</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="HDR-0158"/>
+        <info name="release" value="20010426" />
+		<info name="alt_title" value="アドバンスド大戦略2001" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="advanced daisenryaku 2001 (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <software name="adaisue">
+        <!--
+        <rom name="Advanced Daisenryaku - Sturm uber Europa - Der Deutsche Blitzkrieg v1.013 (2000)(Sega)(NTSC)(JP)[!].gdi" size="88" md5="c452dd377ef30f27d750768191d25d75" sha1="0d962a86eb55e91bf02f1292129f2447c0d16d3f"/>
+        <rom name="track01.bin" size="3843168" md5="42982e5e5469cfa18aa20151d8b241d8" sha1="1c01362b7c792bad8fed26ba5e8923b4b343239a"/>
+        <rom name="track02.raw" size="1735776" md5="209fbca925053ddec7f2d8e02675156d" sha1="39a287b7820ee283936916aac4b96e1d87f37c8e"/>
+        <rom name="track03.bin" size="1185760800" md5="bc9b8f7e9d15964387aa45fff09c7092" sha1="f1a8a226138fb642c7ad1bf977a55e19649a50e2"/>
+        -->
+        <description>Advanced Daisenryaku: Sturm über Europa - Der Deutsche Blitzkrieg (Jpn)</description>
+        <year>2000</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="HDR-0066"/>
+        <info name="release" value="20000622" />
+		<info name="alt_title" value="アドバンスド大戦略～ヨーロッパの嵐･ドイツ電撃作戦～" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="advanced daisenryaku sturm uber europa - der deutsche blitzkrieg (jpn)" sha1="fec0f11a13240f104e11a876d4cac14ded23d9cd"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!--
+    <software name="aerodi">
+        <description>Aero Dancing i (Jpn)</description>
+        <year>2001</year>
+        <publisher>CRI</publisher>
+        <info name="serial" value="T-6807M"/>
+        <info name="release" value="20010215" />
+		<info name="alt_title" value="エアロダンシングi" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aero dancing i (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <software name="aerodijsmm" > <!-- cloneof="aerodi" -->
+        <!--
+        <rom name="Aero Dancing i - Jikai Saku Made Matemasen v1.000 (2001)(CRI)(NTSC)(JP)[!].gdi" size="149" md5="a81b690650231cad5e630bc34312e2d5" sha1="f6902ac7eb39aff210c7ed0cfd080d457c3e9556"/>
+        <rom name="track01.bin" size="719712" md5="d808b8e61ed195281e795b6f24cdcf8d" sha1="22df00b2b6c1c0dcfbcd1c44586cb01b6a2c2296"/>
+        <rom name="track02.raw" size="40452048" md5="f78f5ea32ee19b32a8afd79c02fbd398" sha1="7ab539881d28515eb91dbee51cd428cd9723a833"/>
+        <rom name="track03.bin" size="1136093616" md5="85ab6eee7496814af615b61e57a4032a" sha1="7db166edfb6a97afa4bd37a6e1d919dae302e238"/>
+        <rom name="track04.raw" size="40275648" md5="c25ee26f2f08d38bb3e6ff766a0d5cbb" sha1="211849f353c179a42017bb4c191bce2c3415030a"/>
+        <rom name="track05.bin" size="8685936" md5="bd36894b6ed9f39b017fc6ffb992ceb6" sha1="45c135c1278d6c82e5925a2a9240744d848125ee"/>
+        -->
+        <description>Aero Dancing i: Jikai Saku Made Matemasen (Jpn)</description>
+        <year>2001</year>
+        <publisher>CRI</publisher>
+        <info name="serial" value="T-6809M"/>
+        <info name="release" value="20010823" />
+		<info name="alt_title" value="エアロダンシングi　次回作まで待てませ～ん" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aero dancing i jikai saku made matemasen (jpn)" sha1="91d365e779577e6ad92f1718af7aaf28fd548a80"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!-- A promo version exists (950-0008-50), it is most likely the same as retail -->
+    <software name="aerowing">
+        <!--
+        <rom name="AeroWings v1.001 (1999)(Crave)(PAL)(M3)[!].gdi" size="88" md5="a21d63aaf3c2a6d94ca25bd8e95110ac" sha1="01f2f821ae4054918638dd4b12522b2c1badfc1c"/>
+        <rom name="track01.bin" size="2154432" md5="f8fedc416112be087b191cbeef98dd19" sha1="5208ec2b6a5f8f0470bb542b8dd9cbaf31dff23f"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="1185760800" md5="892a002605fcba463aefc28cec1377d1" sha1="5b16894f2eae9a816d14a6f3344e08fe94779cc2"/>
+        -->
+        <description>AeroWings (Euro)</description>
+        <year>1999</year>
+        <publisher>Crave</publisher>
+        <info name="serial" value="T-40202D-50"/>
+        <info name="release" value="199910xx" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aerowings (euro)" sha1="22102c120f35d5e4619f5cbc4421a081eedf54b0"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="aerowingu" cloneof="aerowing">
+        <!--
+        <rom name="AeroWings v1.002 (1999)(Crave)(NTSC)(US)[!].gdi" size="88" md5="a21d63aaf3c2a6d94ca25bd8e95110ac" sha1="01f2f821ae4054918638dd4b12522b2c1badfc1c"/>
+        <rom name="track01.bin" size="2154432" md5="c74fc49de7f1c13ee6c4892c5b3b84c6" sha1="ce9d0c5c45f48da5e86b13c3a827f987a2e915f6"/>
+        <rom name="track02.raw" size="6656160" md5="9b1f55b5878f796d904fa55d7785a19f" sha1="ca5ecb6f65d24571e416f4fe56c36b57ca6de1be"/>
+        <rom name="track03.bin" size="1185760800" md5="6ea8ec30a246b215e58c56d1582f4f58" sha1="cfffe79a3d73452b56b6c1711f220c35b0b71ad2"/>
+        -->
+        <description>AeroWings (USA)</description>
+        <year>1999</year>
+        <publisher>Crave</publisher>
+        <info name="serial" value="T-40201N"/>
+        <info name="release" value="19990909" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aerowings (usa)" sha1="c733f3be9e6bc758918a2a1219e9ac39539f592e"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="aerodfbi" cloneof="aerowing">
+        <!--
+        <rom name="Aero Dancing - Featuring Blue Impulse v1.003 (1999)(CRI)(NTSC)(JP)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+        <rom name="track01.bin" size="705600" md5="58f4e4d058221b567c4b7e3f9919fb23" sha1="ba6e5e7ca31c6d4a8a3c231568a61a80b69f7990"/>
+        <rom name="track02.raw" size="10584000" md5="93c679730d7a6cf531ea2ece5e5e2b4b" sha1="2e952ee632f6df53e2bb74bd60a7ab82d09e671e"/>
+        <rom name="track03.bin" size="1185760800" md5="2440c8a900ebcd3b37c49f824fe84a6c" sha1="64bc51aad63990f5db72172ab60f047bf618222f"/>
+        -->
+        <description>Aero Dancing featuring Blue Impulse (Jpn)</description>
+        <year>1999</year>
+        <publisher>CRI</publisher>
+        <info name="serial" value="T-6802M"/>
+        <info name="release" value="19990304" />
+		<info name="alt_title" value="エアロダンシング featuring Blue Impulse" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aero dancing featuring blue impulse (jpn)" sha1="e13645c05d9e2b93dc906c15a9e397c0b1176a05"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!--
+    <software name="aerodfbitt" cloneof="aerowing">
+        <description>Aero Dancing featuring Blue Impulse Tentou Taikenban (Jpn)</description>
+        <year>1999</year>
+        <publisher>CRI</publisher>
+        <info name="serial" value="610-7106"/>
+		<info name="alt_title" value="エアロダンシング featuring Blue Impulse 店頭体験版" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aero dancing featuring blue impulse tentou taikenban (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->    
+
+    <software name="aerodtthd" cloneof="aerowing">
+        <!--
+        <rom name="Aero Dancing - Todoroki Taichou no Himitsu Disc v1.001 (1999)(CRI)(NTSC)(JP)[!].gdi" size="87" md5="2efbdd541b221519f4c8d86682137d44" sha1="60763c9dd179cdc706c43513eeda31ab63e96865"/>
+        <rom name="track01.bin" size="1909824" md5="0b201ae31b9b6ed541f723cf4df2a3dd" sha1="c2552f9915dc030a93df018c548b6258ac9bfa9f"/>
+        <rom name="track02.raw" size="21005712" md5="f491d8b2591502f0fc7a0115ef415ac9" sha1="762e0f254a0f3037b7f2308f9196e37ce7447f7d"/>
+        <rom name="track03.bin" size="1185760800" md5="8ad7eeae939d2277fdfff3b764158adc" sha1="587b30610131e079dd49505ac797077d6deb3087"/>
+        -->
+        <description>Aero Dancing: Todoroki Taichou no Himitsu Disc (Jpn)</description>
+        <year>2000</year>
+        <publisher>CRI</publisher>
+        <info name="serial" value="T-6803M"/>
+        <info name="release" value="20000120" />
+		<info name="alt_title" value="エアロダンシング 轟隊長のひみつディスク" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aero dancing todoroki taichou no himitsu disc (jpn)" sha1="685344cdc51ad8c422ea21dc9ef31f6816ced849"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!-- A promo version exists (950-0121-50 952-0113-50), it is most likely the same as retail -->
+    <software name="aerowin2">
+        <!--
+        <rom name="AeroWings 2 - Airstrike v1.001 (2000)(Crave - Ubi Soft)(PAL)(en-de)[!].gdi" size="88" md5="9cc48283141be731b3fe38793314de2f" sha1="cacb3216b183f991b3f4963ad9653906e5e44fac"/>
+        <rom name="track01.bin" size="4325328" md5="7d73c25c31db616f0279242062b20a91" sha1="72d17f8bda82d1b4fdeedc19711bcac0c873128f"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="1185760800" md5="4280fb803593ef5ba52181687db1d28f" sha1="8c698f2c7d3e4de52d2d2efe6e54ea06e8f1ab5b"/>
+        -->
+        <description>AeroWings 2: Airstrike (Euro)</description>
+        <year>2000</year>
+        <publisher>Crave/Ubisoft</publisher>
+        <info name="serial" value="T-40209D-50"/>
+        <info name="release" value="200010xx" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aerowings 2 airstrike (euro)" sha1="f5e822959a6c405c3cf4322ba986117bcf677071"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="aerowin2u" cloneof="aerowin2">
+        <!--
+        <rom name="AeroWings 2 - Airstrike v1.001 (2000)(Crave)(NTSC)(US)[!].gdi" size="87" md5="5b38a611e63871dc385875fb740c00e9" sha1="37d8dd96a4d81234590325844af4044c62183f5e"/>
+        <rom name="track01.bin" size="1279488" md5="83c0f100b61e627ba0face38a84c85cf" sha1="500ad059be5f9722bea1fcf7a23404e856dee00a"/>
+        <rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
+        <rom name="track03.bin" size="1185760800" md5="362d8bf3d92d0f6369a6d744545a6d8b" sha1="7adb934c4f47792cc7ef1d55b8fdb3c478d78e17"/>
+        -->
+        <description>AeroWings 2: Airstrike (USA)</description>
+        <year>2000</year>
+        <publisher>Crave</publisher>
+        <info name="serial" value="T-40210N"/>
+        <info name="release" value="20000824" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aerowings 2 airstrike (usa)" sha1="01c920695add7b8dedb28c42548cdb92331b2f7c"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="aerodanf" cloneof="aerowin2">
+        <!--
+        <rom name="Aero Dancing F v1.006 (2000)(CRI)(NTSC)(JP)[!].gdi" size="88" md5="a21d63aaf3c2a6d94ca25bd8e95110ac" sha1="01f2f821ae4054918638dd4b12522b2c1badfc1c"/>
+        <rom name="track01.bin" size="2154432" md5="2ea1b4a9043e477fd6913a284716c18b" sha1="85009cc39cee035fc32c423e3f4c8bb25629a735"/>
+        <rom name="track02.raw" size="37363872" md5="7e5739ff224eb362428ee604b158b770" sha1="a7250f04d17022090f6d99af23fe102ab0027bff"/>
+        <rom name="track03.bin" size="1185760800" md5="9fa073ad083749c15be2fb304482d8a2" sha1="42435d075e03ba0866da9fa921671bdb3e8ec7c4"/>
+        -->
+        <description>Aero Dancing F (Jpn)</description>
+        <year>2000</year>
+        <publisher>CRI</publisher>
+        <info name="serial" value="T-6804M"/>
+        <info name="release" value="20000224" />
+		<info name="alt_title" value="エアロダンシングF" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aero dancing f (jpn)" sha1="d7cfa770a6ded65be3a024775927a0cf311b376a"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!-- Updated Dorikore release. It does not share the same disc as the original release. -->
+    <!--
+    <software name="aerodanf1" cloneof="aerowin2">
+        <description>Aero Dancing F (Jpn, Rev. 1)</description>
+        <year>2000</year>
+        <publisher>CRI</publisher>
+        <info name="serial" value="T-6808M"/>
+        <info name="release" value="20001228" />
+		<info name="alt_title" value="エアロダンシングF" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aero dancing f (jpn, rev. 1)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="aerodanft" cloneof="aerowin2">
+        <description>Aero Dancing F Taikenban (Jpn)</description>
+        <year>2000</year>
+        <publisher>CRI</publisher>
+        <info name="serial" value="610-7740"/>
+		<info name="alt_title" value="エアロダンシングF 体験版" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aero dancing f taikenban (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="aerodftthh" cloneof="aerowin2">
+        <description>Aero Dancing F: Todoroki Tsubasa no Hatsu Hikou (Jpn)</description>
+        <year>2000</year>
+        <publisher>CRI</publisher>
+        <info name="serial" value="T-6805M"/>
+        <info name="release" value="20001116" />
+		<info name="alt_title" value="エアロダンシングＦ 〜轟つばさの初飛行〜" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aero dancing f todoroki tsubasa no hatsu hikou (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <software name="atjddtd">
+        <!--
+        <rom name="Aero To Jet De Dancing - Taikenban Disc v1.001 (2000)(CRI)(NTSC)(JP)(en)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
+        <rom name="track01.bin" size="1058400" md5="32a2d72b757f7e4f9e3a52d31d506eec" sha1="5914a39063acb999eb0a7f7dd84e98923d8e2225"/>
+        <rom name="track02.raw" size="1735776" md5="376474a62776e12988c9892cd649b85e" sha1="f7e8a9fce09173a71e5f91331b7695a151b5b2e8"/>
+        <rom name="track03.bin" size="1185760800" md5="96e83987e07c1bef5e623a412c69bae6" sha1="5ca3d9a50b6beffd4668dba9bbea31e5f19a7f54"/>
+        -->
+        <description>Aero to Jet de Dancing - Taikenban Disc (Jpn)</description>
+        <year>2000</year>
+        <publisher>CRI</publisher>
+        <info name="serial" value="610-8017"/>
+		<info name="alt_title" value="エアロとジェットでダンシング! ～体験版DISC～" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aero to jet de dancing - taikenban disc (jpn)" sha1="df7c6e946bb0e0a0c4eeb89243bc6c45fc74917a"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!--
+    <software name="aftersg">
+        <description>After...: Wasureenu Kizuna Shokai Genteiban (Jpn)</description>
+        <year>2004</year>
+        <publisher>Pionesoft</publisher>
+        <info name="serial" value="T-18705M"/>
+        <info name="release" value="20040226" />
+		<info name="alt_title" value="After... 〜忘れえぬ絆〜 初回限定版" />
+        <part interface="dc_gdrom" name="gdrom1">
+            <feature name="part_id" value="After...: Wasureenu Kizuna"/>
+            <diskarea name="gdrom">
+                <disk name="after... wasureenu kizuna shokai genteiban (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+        <part interface="dc_gdrom" name="gdrom2">
+            <diskarea name="gdrom">
+            <feature name="part_id" value="Kaze no Form"/>
+                <disk name="after... wasureenu kizuna shokai genteiban (jpn) (kaze no form)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="after" cloneof="aftersg">
+        <description>After...: Wasureenu Kizuna (Jpn)</description>
+        <year>2004</year>
+        <publisher>Pionesoft</publisher>
+        <info name="serial" value="T-18706M"/>
+        <info name="release" value="20040226" />
+		<info name="alt_title" value="After... 〜忘れえぬ絆〜" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="after... wasureenu kizuna (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!-- There's also a Limited Edition available (T-20131M), but it uses the same disc as the regular -->
+    <!--
+    <software name="aikagi">
+        <description>Aikagi: Hidamari to Kanojo no Heyagi (Jpn)</description>
+        <year>2003</year>
+        <publisher>NEC Interchannel</publisher>
+        <info name="serial" value="T-20130M"/>
+        <info name="release" value="20030807" />
+		<info name="alt_title" value="あいかぎ 〜ひだまりと彼女の部屋着〜" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aikagi hidamari to kanojo no heyagi (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="air">
+        <description>Air (Jpn)</description>
+        <year>2001</year>
+        <publisher>NEC Interchannel</publisher>
+        <info name="serial" value="T-20112M"/>
+        <info name="release" value="20010920" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="air (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!-- Both the Eng/Spa/Ned (T-9501D-76) and Ger/Fra/Ita (T-9501D-77) release share the same disc (T-9501D-50) -->
+    <software name="dedskies">
+        <!--
+        <rom name="Deadly Skies v1.003 (1999)(Konami)(PAL)(M5)[!].gdi" size="946" md5="6abbb83295989e223eeb59a3a23c9690" sha1="bcfda4acf7db5d01784a72982458cff78330776a"/>
+        <rom name="track01.bin" size="705600" md5="3dcfa961690659ecc16b4b004ffab5d1" sha1="8ca9faa7a89818a51f82c428d958ffc23e15d232"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="209175120" md5="1dcdfe3dc6263a7ac8a2456f544ad7a0" sha1="08b19bcf1cbb986b08ce88f7cfe23fccacfd0dbb"/>
+        <rom name="track04.raw" size="38100048" md5="b58f0d606fea4864b37bb66d6f7eda98" sha1="b3028ce3f1b575b030a76f125e96a06d9fb33e78"/>
+        <rom name="track05.raw" size="40143936" md5="67ee6a825d33c9da6f58baeb5e394301" sha1="931921973621a6b090131d7154105b47a3badf74"/>
+        <rom name="track06.raw" size="43655472" md5="a3fa2dded6ed789e4d541c288d9612d8" sha1="4fcc72ed7fe60133b05c0a3c8eefcfe11270d144"/>
+        <rom name="track07.raw" size="37679040" md5="fb80197b1cfd31d440928f45197d43b3" sha1="369d9ff03bfdfb0104591cb284fa99ad2b62c3c2"/>
+        <rom name="track08.raw" size="36246672" md5="46c4aec3ef3f50d67e790f4d6f9aec95" sha1="2ea915d6063709fb1fc43c0fc3dcebb95fb7038c"/>
+        <rom name="track09.raw" size="44798544" md5="b5aeca09e434bec028598672a676fc63" sha1="9ddf430a71206a5da8c0b2712c1afbbf5b960822"/>
+        <rom name="track10.raw" size="34856640" md5="88b23c5229223ae81f13558ea42ecf49" sha1="9664530cbcc830613a62342193c3038b60f24922"/>
+        <rom name="track11.raw" size="42166656" md5="751042b8f1a0a5c51ab026e3162fe711" sha1="3a4ef8b91963fdea54d847d7e112e048f71022eb"/>
+        <rom name="track12.raw" size="40329744" md5="426a2e3a529b9fe9373182e1f192efc6" sha1="6ad6083f70f632450a270b826cc06a8fda093d4f"/>
+        <rom name="track13.raw" size="38812704" md5="5f75e8b942729cfcd26fad2c09d64104" sha1="06e2c88f826311b74310d5ba71facb561a54cf04"/>
+        <rom name="track14.raw" size="38855040" md5="d91e8842c212528ff2718e88a26933fd" sha1="e311d3fb53801536a2d5f99a2048d9226d53e639"/>
+        <rom name="track15.raw" size="38622192" md5="7e2906a72c0d81e4dcb7b62cf8796a70" sha1="2eb7802b2236eb258d7dd754a0e3b2423dae1516"/>
+        <rom name="track16.raw" size="42004368" md5="bd242a88d6ae8852ea718db58f4f0ff8" sha1="44a12b152a2e3f804cef5b9ee105fd8c68547edd"/>
+        <rom name="track17.raw" size="37338000" md5="3650da0ad269efa9fb0888f9e42dead8" sha1="be6a1542f58593cddfa64a0793f04e837357a96c"/>
+        <rom name="track18.raw" size="36935808" md5="dcd39495daf1e0974db137e14376902d" sha1="1ddecb85494624c8164123a281c99a48116f74eb"/>
+        <rom name="track19.raw" size="36839376" md5="f5b84c579e5dbe149b166d4fc7d49763" sha1="14795e7597f223fa4848fbf8e4ecab97b1521e18"/>
+        <rom name="track20.raw" size="40990656" md5="b78c20b65cd9ce4f4390b6e33d13e4eb" sha1="c55dbf1538f08a14d88da784d34e16b5c1c81123"/>
+        <rom name="track21.raw" size="38589264" md5="e5d7d064c829c20aa33dc7dab3b9ea39" sha1="3ccf8f466e75b1f1f085d29399d79425dcb678c2"/>
+        <rom name="track22.raw" size="36594768" md5="3ced2e69270d95180131586611c264b2" sha1="35619c8e5877b6b92030fdba472bc6e682c4ca34"/>
+        <rom name="track23.raw" size="45047856" md5="9691cff2393d9377089c56a1cfe1104a" sha1="f940e5c01dabbdaafdeb2fa52e69d226a76c042d"/>
+        <rom name="track24.raw" size="10351152" md5="d6c2b12c60698161f341e8491feae111" sha1="4cd95e7aa2f9a492870c454c36f9c446c16ea642"/>
+        <rom name="track25.raw" size="8556576" md5="4f3e63043aa55189f5b59cc13a47a7db" sha1="14c2c1a25a73332e681c47affdbc44ad9e9da476"/>
+        <rom name="track26.raw" size="19098240" md5="da72ba271633c00f03cebb6f2ba94621" sha1="69a46252204e434fc986d2a8a9d8c1a96dd8e321"/>
+        <rom name="track27.raw" size="39022032" md5="b03ecca9b93912d0b7f61aaa0d5bfd8a" sha1="6b86a06935da5f3af259016549518d0970d751db"/>
+        <rom name="track28.raw" size="20810496" md5="8777f2dde766d071cecc4c513a41ffad" sha1="8229092bf6e00dc887c09701a37566d4ce6e2938"/>
+        <rom name="track29.raw" size="7858032" md5="ecf2487ba1399ef908bad149bc51ae99" sha1="db5a16c78537b81d50a6715c70c64148de67ad65"/>
+        <rom name="track30.bin" size="81576768" md5="9193a358d8454d398c0517114cad1b95" sha1="e91a87059f7aa12711dae250b4671b5582b99396"/>
+        -->
+        <description>Deadly Skies (Euro)</description>
+        <year>1999</year>
+        <publisher>Konami</publisher>
+        <info name="serial" value="T-9501D-50, T-9501D-76, T-9501D-77"/>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="deadly skies (euro)" sha1="12d38e0f745581a243ebeae2c3c61585f8af4c0a"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="airfdeltu" cloneof="dedskies">
+        <!--
+        <rom name="Airforce Delta v1.000 (1999)(Konami)(NTSC)(US)[!][1S T-9501NAF].gdi" size="946" md5="5807915c07432be55a653540267d302e" sha1="7672f6cd3fac974ef8a2acca42327257780eb0a8"/>
+        <rom name="track01.bin" size="705600" md5="bf8bb04621eca8ec28c516db0ff79574" sha1="2ffe7ff2c6f630cb6d2125c8fc15fa18c35a4c6d"/>
+        <rom name="track02.raw" size="1166592" md5="59134618b676898b720a87f56cdd756b" sha1="9cbf6ec526c479a9fc31599e11093b132112985c"/>
+        <rom name="track03.bin" size="212430288" md5="6a7c8958a47b03cca15f64a0926b5ce1" sha1="c130a63ee12865a5d117c43fb6bcb57aa9623656"/>
+        <rom name="track04.raw" size="38100048" md5="003893c667b979f5207ccaf0e526b137" sha1="4498d2ae99c8a2cfeacfa71414eff4d048894f7c"/>
+        <rom name="track05.raw" size="40143936" md5="723800afefbac613e374d257becf1664" sha1="7916554fbcf4cc23c71b1f4166e38c23400afee7"/>
+        <rom name="track06.raw" size="43655472" md5="0d01e790d7f405e2eb857b2ba1363f30" sha1="3e9d0ec364b55f93ea27443ce4cab3215044444c"/>
+        <rom name="track07.raw" size="37679040" md5="cc68c3f77008b7cb7a38372fb03a7686" sha1="0fcd49a128729ae3135b0de4865fe25c9001f4a0"/>
+        <rom name="track08.raw" size="36246672" md5="889a638466a0ad7f934920468b1dc8c0" sha1="74d8d602ed066d563fc0cb9e4f86f596abe2af61"/>
+        <rom name="track09.raw" size="44798544" md5="6676c7e68b48483b004ce5483917dba6" sha1="fd4f99b8f894b96cc20d47c10ac678a10d169ddb"/>
+        <rom name="track10.raw" size="34856640" md5="89e7b823f7dc20d9c7fc31b759449bcc" sha1="5785617c36782270c8ebfd94253f9bb4ba44f6e4"/>
+        <rom name="track11.raw" size="42166656" md5="fd400c750cf5a66ff62ce799b171651f" sha1="cad77e6f938b457eae1a28241293fb6c58600df4"/>
+        <rom name="track12.raw" size="40329744" md5="621b222ebd4d9d72a411c26bdfa2e8fc" sha1="85f99f706432bf05e00e32ced0f4ae94f03cded8"/>
+        <rom name="track13.raw" size="38812704" md5="9860188e3ddb28ac37ea5c8f494f6b13" sha1="cef4d22cd4048add778fea0dca56768b1d188b5e"/>
+        <rom name="track14.raw" size="38855040" md5="bbec37c9c7127fde01836e74ad134d9f" sha1="89e9ce7a9769daba8ef009b9cb2c6c7b109f366e"/>
+        <rom name="track15.raw" size="38622192" md5="82c29fc7b0a47dd731c0c417c2fe927e" sha1="c7ff05f5dbc0d626e387d51e84bbf10bc869505d"/>
+        <rom name="track16.raw" size="42004368" md5="2278e6d478d5ff17bfa6824dc2925c4f" sha1="2c7a7ff0df7dec276361f9d392228b17668bf519"/>
+        <rom name="track17.raw" size="37338000" md5="f9259d8c376f5edf33e07fa728a97559" sha1="715a60d027dc198611173280af82d7fe30461ba3"/>
+        <rom name="track18.raw" size="36935808" md5="6c5b7a9b967992a131f2361c500905e2" sha1="fccb825e7a5d6ce5b0384617664f6a30c5e69ff0"/>
+        <rom name="track19.raw" size="36839376" md5="131ab6923a259fbff8088316be8b94b0" sha1="a4ea0570b9e1bb4cba70238c2a6510d4f1ae69d9"/>
+        <rom name="track20.raw" size="40990656" md5="d3f2e0c59dbccefd0929a2a7095d2444" sha1="6fc2232a9731a51fd59a9130088afc55c9e1ce9b"/>
+        <rom name="track21.raw" size="38589264" md5="0c8410f46e261ffe70d82df654872c6a" sha1="4d21360d1d745e0fb8f0190e649f3145366abf33"/>
+        <rom name="track22.raw" size="36594768" md5="967547723fe92223d176cf4841459dee" sha1="70b7f992ef21d79c00b37d0a0175ea7abf66459c"/>
+        <rom name="track23.raw" size="45047856" md5="344f99ee79db901f0878d738a31b414e" sha1="d95672166ac98bb90a4cfb0232ec62c6e945742d"/>
+        <rom name="track24.raw" size="10351152" md5="308995c606af5a1bda9708efb07f76ba" sha1="ac2bac4c9c3e507aa422dc1adac873fca15c98c4"/>
+        <rom name="track25.raw" size="8556576" md5="473ad352755aa92b44a77b6cff5b0d33" sha1="c61b31055be5d47705c5be89ed64d967fe4a7aa5"/>
+        <rom name="track26.raw" size="19098240" md5="7840e152bb6ae05332bd4db21ca0b0d8" sha1="1c0adca45a3ff4132ad9d13369b41075f6da9a76"/>
+        <rom name="track27.raw" size="39022032" md5="08c0a522c38d503b049c68d38e02a874" sha1="fa0825b0d2b2b8cb2a5b70e328d1a429328f872c"/>
+        <rom name="track28.raw" size="20810496" md5="15a32987304042301dc040e8d5647f81" sha1="c179f2b618e4614f017c8c9fa3cc80b191858981"/>
+        <rom name="track29.raw" size="7858032" md5="8c69d7eac811a99a05387f53cd0842b9" sha1="d117e014d2a8cdda271ee8cc8712443098670af9"/>
+        <rom name="track30.bin" size="78321600" md5="939575ba42d8598af45855764ec01bcd" sha1="22fc338a50f001118a9f09ad6ac955b280793cee"/>
+        -->
+        <description>Airforce Delta (USA)</description>
+        <year>1999</year>
+        <publisher>Konami</publisher>
+        <info name="serial" value="T-9501N"/>
+        <info name="release" value="19990909" />
+        <info name="ring_code" value="1S T-9501NAF"/>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="airforce delta (usa)" sha1="7b9a726813b55041d9c133076dd5eb3ac860db58"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="airfdeltua" cloneof="dedskies">
+        <!--
+        <rom name="Airforce Delta v1.000 (1999)(Konami)(NTSC)(US)[!][2S T-9501NAF].gdi" size="946" md5="5807915c07432be55a653540267d302e" sha1="7672f6cd3fac974ef8a2acca42327257780eb0a8"/>
+        <rom name="track01.bin" size="705600" md5="bf8bb04621eca8ec28c516db0ff79574" sha1="2ffe7ff2c6f630cb6d2125c8fc15fa18c35a4c6d"/>
+        <rom name="track02.raw" size="1166592" md5="817d9d392689fb1680e1b12de224e42a" sha1="fe0d4da9937657d0bc3aae20e005609c01d585b8"/>
+        <rom name="track03.bin" size="212430288" md5="6a7c8958a47b03cca15f64a0926b5ce1" sha1="c130a63ee12865a5d117c43fb6bcb57aa9623656"/>
+        <rom name="track04.raw" size="38100048" md5="9ccda6cf32f424ea04cfae37a1980b3a" sha1="f89739346dcb08d5cf957ab2667c77f3d8afcfc0"/>
+        <rom name="track05.raw" size="40143936" md5="16579e72ab7513c34d18c3f9cbc1540e" sha1="9207e429bb2ddca9cf9be45d92c8fb170aba5307"/>
+        <rom name="track06.raw" size="43655472" md5="e6459fc1d49739ffabb995d514343b1d" sha1="6351b11d4e878f140e40fb1377c2178462c324ed"/>
+        <rom name="track07.raw" size="37679040" md5="c97235ad35993c78eb4fd17ef21693a7" sha1="a5de202e4668b9165ddab8a1d7c6d50554d83208"/>
+        <rom name="track08.raw" size="36246672" md5="e83b6af86727b1bf2528415a27b2b7e3" sha1="fedf24aff3b03afc956b39879ee7fb0bc5cecb75"/>
+        <rom name="track09.raw" size="44798544" md5="d896e06ee106c3423fdae480e52904c7" sha1="0291487f35c44b4ab63779001d9f17b9fca0c8d4"/>
+        <rom name="track10.raw" size="34856640" md5="a2483a2dd6236b8d0b4ce0c0628bb63b" sha1="bea1ec489d13fe9afc26bd241b8447bac4b6bac7"/>
+        <rom name="track11.raw" size="42166656" md5="d0aedec6cf7a533cd4822e075cfbfba3" sha1="483d5e921613cb45942c0dba2137cd4971bf9529"/>
+        <rom name="track12.raw" size="40329744" md5="a2cf7d315d912f50c02758bfb7b09764" sha1="56a2abe9abfe9080358f674d35cc57ead046a231"/>
+        <rom name="track13.raw" size="38812704" md5="1aa074368193b5733d8e967b63988bee" sha1="94544b6715500ead0efbb31cd73b81d07d3e3206"/>
+        <rom name="track14.raw" size="38855040" md5="1aea8e4d69f77ca65ddd46cb4ab912d0" sha1="9e8c1cf42e517c2ab86c4daeced4c9e3675519f0"/>
+        <rom name="track15.raw" size="38622192" md5="2820e68ead256a4f471fc8f63a6d9af7" sha1="b32ad43b287149eeda2e55e7b067c488a000d47e"/>
+        <rom name="track16.raw" size="42004368" md5="a8d12360d426d1692682960c8587d828" sha1="c3cd0b6f0f4b3817f3f800734fcb346b1f0a970f"/>
+        <rom name="track17.raw" size="37338000" md5="ab05ae25eea02ebaa56bea42ef4031d6" sha1="a950af2672dc8db773f5c05b99d1b9b963f20021"/>
+        <rom name="track18.raw" size="36935808" md5="4a94e5e133fe0cfbabd76ee348b36c18" sha1="f9f7108dd3ea7d1da6b1c4a4a357f0c2f2b3d6a5"/>
+        <rom name="track19.raw" size="36839376" md5="0d7ac963c1c6bcb912963fed4f13e6e9" sha1="d85adf11177ff1586e68e8fac72162291930d261"/>
+        <rom name="track20.raw" size="40990656" md5="64bb3fd90d5f3dff4421b8c81a118b95" sha1="410e04790b4709610972dc35a26475dfb2dd92c8"/>
+        <rom name="track21.raw" size="38589264" md5="03d3f74db3b8d3487464d1b7a3b05297" sha1="c315180c19a90e1a21f198b2060496442b412d4c"/>
+        <rom name="track22.raw" size="36594768" md5="d6a2c804abf2ec0acf97f6667d3fe86f" sha1="ba26f05e5902240daf9e5e63724029460e12fa02"/>
+        <rom name="track23.raw" size="45047856" md5="7584b7a5a849b1693ba4bff0a049142f" sha1="c920f0bc9274e681d83ba2e9dd223996e69f9e70"/>
+        <rom name="track24.raw" size="10351152" md5="5a12f950c938c34bf188eb9aba4aaf11" sha1="c0a6f36efcdafd354f9fb778eb74765e7046285b"/>
+        <rom name="track25.raw" size="8556576" md5="d94fa493c61c6419d6e30ca50d254fa2" sha1="6a048e4b1d56fd8fcad1d6bfdb6ad325be69d74d"/>
+        <rom name="track26.raw" size="19098240" md5="ec8e93cd52c3dd1ca609651b1363a6d9" sha1="d337ec698ce3af505e7dd92c458f4340cc835972"/>
+        <rom name="track27.raw" size="39022032" md5="115eded4e284d7a77bbc3f437a509bb7" sha1="2607053b709628b6e5bd53da6ae56f61ab21a8b7"/>
+        <rom name="track28.raw" size="20810496" md5="141a7b829def77fc1d4582f99b68d13c" sha1="06e7b32ac06c7a41872e86028a15a0faaf1fee50"/>
+        <rom name="track29.raw" size="7858032" md5="dcd1a2bd98d617158a80fd09440ba319" sha1="5d0fce6e808417fcd6b8e8db5b825ed7c9b6d3ee"/>
+        <rom name="track30.bin" size="78321600" md5="939575ba42d8598af45855764ec01bcd" sha1="22fc338a50f001118a9f09ad6ac955b280793cee"/>
+        -->
+        <description>Airforce Delta (USA, Alt)</description>
+        <year>1999</year>
+        <publisher>Konami</publisher>
+        <info name="serial" value="T-9501N"/>
+        <info name="release" value="19990909" />
+        <info name="ring_code" value="2S T-9501NAF"/>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="airforce delta (usa, alt)" sha1="8bb6925717a7c16b38475120392fc8088ebed3a7"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!--
+    <software name="airfdeltub" cloneof="dedskies">
+        <description>Airforce Delta (USA, Alt 2)</description>
+        <year>1999</year>
+        <publisher>Konami</publisher>
+        <info name="serial" value="T-9501N"/>
+        <info name="release" value="19990909" />
+        <info name="ring_code" value="3S T-9501NAF"/>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="airforce delta (usa, alt 2)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->    
+
+    <!-- Also released as a Dorikore version, which is identical to retail. -->
+    <software name="airfdeltj" cloneof="dedskies">
+        <!--
+        <rom name="Airforce Delta v1.002 (1999)(Konami)(NTSC)(JP)[!].gdi" size="946" md5="83735ce2658c59889933bf18ed6e30e0" sha1="44140535b052c55acada76b3aa577ae20af1c729"/>
+        <rom name="track01.bin" size="705600" md5="606c55c4de6fd627b974c7de1b815a1f" sha1="b6667507d44c765b0184a245f336004662270753"/>
+        <rom name="track02.raw" size="1796928" md5="f763837ad12fe52303f05b48930fe588" sha1="40d60b76cc17ff578c12b8f4b775315576095a17"/>
+        <rom name="track03.bin" size="211938720" md5="f948620735dad9cbde673d79339303f9" sha1="3c89cc29a8582c044a2957bfa262f5c29d7ab8d1"/>
+        <rom name="track04.raw" size="38100048" md5="b58f0d606fea4864b37bb66d6f7eda98" sha1="b3028ce3f1b575b030a76f125e96a06d9fb33e78"/>
+        <rom name="track05.raw" size="40143936" md5="67ee6a825d33c9da6f58baeb5e394301" sha1="931921973621a6b090131d7154105b47a3badf74"/>
+        <rom name="track06.raw" size="43655472" md5="a3fa2dded6ed789e4d541c288d9612d8" sha1="4fcc72ed7fe60133b05c0a3c8eefcfe11270d144"/>
+        <rom name="track07.raw" size="37679040" md5="fb80197b1cfd31d440928f45197d43b3" sha1="369d9ff03bfdfb0104591cb284fa99ad2b62c3c2"/>
+        <rom name="track08.raw" size="36246672" md5="46c4aec3ef3f50d67e790f4d6f9aec95" sha1="2ea915d6063709fb1fc43c0fc3dcebb95fb7038c"/>
+        <rom name="track09.raw" size="44798544" md5="b5aeca09e434bec028598672a676fc63" sha1="9ddf430a71206a5da8c0b2712c1afbbf5b960822"/>
+        <rom name="track10.raw" size="34856640" md5="88b23c5229223ae81f13558ea42ecf49" sha1="9664530cbcc830613a62342193c3038b60f24922"/>
+        <rom name="track11.raw" size="42166656" md5="751042b8f1a0a5c51ab026e3162fe711" sha1="3a4ef8b91963fdea54d847d7e112e048f71022eb"/>
+        <rom name="track12.raw" size="40329744" md5="426a2e3a529b9fe9373182e1f192efc6" sha1="6ad6083f70f632450a270b826cc06a8fda093d4f"/>
+        <rom name="track13.raw" size="38812704" md5="5f75e8b942729cfcd26fad2c09d64104" sha1="06e2c88f826311b74310d5ba71facb561a54cf04"/>
+        <rom name="track14.raw" size="38855040" md5="d91e8842c212528ff2718e88a26933fd" sha1="e311d3fb53801536a2d5f99a2048d9226d53e639"/>
+        <rom name="track15.raw" size="38622192" md5="7e2906a72c0d81e4dcb7b62cf8796a70" sha1="2eb7802b2236eb258d7dd754a0e3b2423dae1516"/>
+        <rom name="track16.raw" size="42004368" md5="bd242a88d6ae8852ea718db58f4f0ff8" sha1="44a12b152a2e3f804cef5b9ee105fd8c68547edd"/>
+        <rom name="track17.raw" size="37338000" md5="3650da0ad269efa9fb0888f9e42dead8" sha1="be6a1542f58593cddfa64a0793f04e837357a96c"/>
+        <rom name="track18.raw" size="36935808" md5="dcd39495daf1e0974db137e14376902d" sha1="1ddecb85494624c8164123a281c99a48116f74eb"/>
+        <rom name="track19.raw" size="36839376" md5="f5b84c579e5dbe149b166d4fc7d49763" sha1="14795e7597f223fa4848fbf8e4ecab97b1521e18"/>
+        <rom name="track20.raw" size="40990656" md5="b78c20b65cd9ce4f4390b6e33d13e4eb" sha1="c55dbf1538f08a14d88da784d34e16b5c1c81123"/>
+        <rom name="track21.raw" size="38589264" md5="e5d7d064c829c20aa33dc7dab3b9ea39" sha1="3ccf8f466e75b1f1f085d29399d79425dcb678c2"/>
+        <rom name="track22.raw" size="36594768" md5="3ced2e69270d95180131586611c264b2" sha1="35619c8e5877b6b92030fdba472bc6e682c4ca34"/>
+        <rom name="track23.raw" size="45047856" md5="9691cff2393d9377089c56a1cfe1104a" sha1="f940e5c01dabbdaafdeb2fa52e69d226a76c042d"/>
+        <rom name="track24.raw" size="10351152" md5="d6c2b12c60698161f341e8491feae111" sha1="4cd95e7aa2f9a492870c454c36f9c446c16ea642"/>
+        <rom name="track25.raw" size="8556576" md5="4f3e63043aa55189f5b59cc13a47a7db" sha1="14c2c1a25a73332e681c47affdbc44ad9e9da476"/>
+        <rom name="track26.raw" size="19098240" md5="da72ba271633c00f03cebb6f2ba94621" sha1="69a46252204e434fc986d2a8a9d8c1a96dd8e321"/>
+        <rom name="track27.raw" size="39022032" md5="b03ecca9b93912d0b7f61aaa0d5bfd8a" sha1="6b86a06935da5f3af259016549518d0970d751db"/>
+        <rom name="track28.raw" size="20810496" md5="8777f2dde766d071cecc4c513a41ffad" sha1="8229092bf6e00dc887c09701a37566d4ce6e2938"/>
+        <rom name="track29.raw" size="7858032" md5="ecf2487ba1399ef908bad149bc51ae99" sha1="db5a16c78537b81d50a6715c70c64148de67ad65"/>
+        <rom name="track30.bin" size="78813168" md5="a2ddd4dd891fb011bfca3f4bb5fa06e8" sha1="6779407e09a66d81072ca808db21c8ef3b24c820"/>
+        -->
+        <description>Airforce Delta (Jpn)</description>
+        <year>1999</year>
+        <publisher>Konami</publisher>
+        <info name="serial" value="T-9502M"/>
+        <info name="release" value="19990729" />
+		<info name="alt_title" value="エアフォース デルタ" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="airforce delta (jpn)" sha1="038cc87fa3e7b1012c0b857508275b4531314fc4"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!--
+    <software name="airfdeltb" cloneof="dedskies">
+        <description>Airforce Delta (Bra)</description>
+        <year>200?</year>
+        <publisher>Tec Toy</publisher>
+        <info name="serial" value="197136"/>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="airforce delta (bra)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <software name="patapies">
+        <!--
+        <rom name="Akihabara Dennou Gumi Pata Pies! v1.000 (1999)(Sega)(NTSC)(JP)[!].gdi" size="87" md5="2b76347e486970e272601475664cbf90" sha1="3f6db4a24a9ef1f4efaf36985c5cb9cc2f56013d"/>
+        <rom name="track01.bin" size="1232448" md5="26275ca4174a459818bd2f0748345c0b" sha1="16569ba4b216d2e6391288fe8a7a2622fe19a398"/>
+        <rom name="track02.raw" size="22191120" md5="d74cdff08907fec2f60e282c9160cc7f" sha1="ec69d8c454a1098debb39b7be8c2dcc88e5d4b7b"/>
+        <rom name="track03.bin" size="1185760800" md5="50fbfd98cc587525eab8de24350006e2" sha1="2378ab7c1790de8b3bd470557b4a52f5110cbefa"/>
+        -->
+        <description>Akihabara Dennou-gumi Pata Pies! (Jpn)</description>
+        <year>1999</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="HDR-0019"/>
+        <info name="release" value="19990729" />
+		<info name="alt_title" value="アキハバラ電脳組 パタPies!" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="akihabara dennou-gumi pata pies (jpn)" sha1="89dc4434fbceb2fc62545104b1629542abdc0357"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!--
+    <software name="alabama">
+        <description>Alabama Meets Will Vi (Jpn)</description>
+        <year>1999</year>
+        <publisher>Toyota</publisher>
+        <info name="serial" value="610-7196"/>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="alabama meets will vi (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="aliced">
+        <description>Alice Dreams (World)</description>
+        <year>2006</year>
+        <publisher>Alice Dreams</publisher>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="alice dreams (world)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="alicedtce">
+        <description>Alice Dreams Tournament (Euro, Collector's Edition)</description>
+        <year>2017</year>
+        <publisher>Alice Dreams</publisher>
+        <info name="release" value="20170218" />
+        <part interface="dc_gdrom" name="gdrom1">
+            <feature name="part_id" value="Alice Dreams Tournament"/>
+            <diskarea name="gdrom">
+                <disk name="alice dreams tournament (euro, collector's edition)" status="nodump"/>
+            </diskarea>
+        </part>
+        <part interface="dc_gdrom" name="gdrom2">
+            <diskarea name="gdrom">
+            <feature name="part_id" value="Bonus CD"/>
+                <disk name="alice dreams tournament (euro, collector's edition) (bunus cd)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="alicedtceu" cloneof="alicedtce">
+        <description>Alice Dreams Tournament (USA, Collector's Edition)</description>
+        <year>2017</year>
+        <publisher>Alice Dreams</publisher>
+        <info name="release" value="20170218" />
+        <part interface="dc_gdrom" name="gdrom1">
+            <feature name="part_id" value="Alice Dreams Tournament"/>
+            <diskarea name="gdrom">
+                <disk name="alice dreams tournament (usa, collector's edition)" status="nodump"/>
+            </diskarea>
+        </part>
+        <part interface="dc_gdrom" name="gdrom2">
+            <diskarea name="gdrom">
+            <feature name="part_id" value="Bonus CD"/>
+                <disk name="alice dreams tournament (usa, collector's edition) (bunus cd)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="alicedtcej" cloneof="alicedtce">
+        <description>Alice Dreams Tournament (Jpn, Collector's Edition)</description>
+        <year>2017</year>
+        <publisher>Alice Dreams</publisher>
+        <info name="release" value="20170218" />
+        <part interface="dc_gdrom" name="gdrom1">
+            <feature name="part_id" value="Alice Dreams Tournament"/>
+            <diskarea name="gdrom">
+                <disk name="alice dreams tournament (jpn, collector's edition)" status="nodump"/>
+            </diskarea>
+        </part>
+        <part interface="dc_gdrom" name="gdrom2">
+            <diskarea name="gdrom">
+            <feature name="part_id" value="Bonus CD"/>
+                <disk name="alice dreams tournament (jpn, collector's edition) (bunus cd)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="alicedt" cloneof="alicedtce">
+        <description>Alice Dreams Tournament (Euro)</description>
+        <year>2017</year>
+        <publisher>Alice Dreams</publisher>
+        <info name="release" value="20170218" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="alice dreams tournament (euro)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="alicedtu" cloneof="alicedtce">
+        <description>Alice Dreams Tournament (USA)</description>
+        <year>2017</year>
+        <publisher>Alice Dreams</publisher>
+        <info name="release" value="20170218" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="alice dreams tournament (usa)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="alicedtj" cloneof="alicedtce">
+        <description>Alice Dreams Tournament (Jpn)</description>
+        <year>2017</year>
+        <publisher>Alice Dreams</publisher>
+        <info name="release" value="20170218" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="alice dreams tournament (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+            
+    <!--
+    <software name="alicemomle">
+        <description>Alice's Mom's Rescue - Limited Edition (World)</description>
+        <year>2015</year>
+        <publisher>Hucast</publisher>
+        <info name="release" value="20150209" />
+		<info name="alt_title" value="アリスの母親の救出 Limited Edition" />
+        <part interface="dc_gdrom" name="gdrom1">
+            <feature name="part_id" value="Alice's Mom's Rescue"/>
+            <diskarea name="gdrom">
+                <disk name="alice's mom's rescue - limited edition (world)" status="nodump"/>
+            </diskarea>
+        </part>
+        <part interface="dc_gdrom" name="gdrom2">
+            <diskarea name="gdrom">
+            <feature name="part_id" value="Alice OST"/>
+                <disk name="alice's mom's rescue - limited edition (world) (alice ost)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="alicemom" cloneof="alicemomle">
+        <description>Alice's Mom's Rescue (World)</description>
+        <year>2015</year>
+        <publisher>Hucast</publisher>
+        <info name="serial" value="AMRRE-1"/>
+        <info name="release" value="20150209" />
+		<info name="alt_title" value="アリスの母親の救出" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="alice's mom's rescue (world)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <software name="afo">
+        <!--
+        <rom name="Alien Front Online v1.000 (2001)(Sega)(NTSC)(US)[!].gdi" size="149" md5="cc3bb1b3a8a5c4acba6c995a01baaabb" sha1="810eb70257b9e0a1395c601cf3668ab5f6ca0427"/>
+        <rom name="track01.bin" size="1058400" md5="a8b7c98303f941de9d3fe138ed598b52" sha1="e06734e9bbc97581366459ff721be27aaad7ae74"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="1006663056" md5="3000afbf1424ea21103cf06ca2fdfbda" sha1="b4caf3ca55aa033101b66c95026c01b7a7d8bd5b"/>
+        <rom name="track04.raw" size="13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
+        <rom name="track05.bin" size="164574144" md5="845e881fb3a716044da157d48f9aaefe" sha1="b5b3bd178d1c41bc3a8baf8feaa788c5147cfc57"/>
+        -->
+        <description>Alien Front Online (USA)</description>
+        <year>2001</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="51171"/>
+        <info name="release" value="20010809" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="alien front online (usa)" sha1="c50388952170ac77ffe0e458a76bb6164237d68c"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="aitdtnn">
+        <!--
+        <rom name="Alone in the Dark - The New Nightmare v1.000 (2001)(Infogrames)(NTSC)(US)(Disc 1 of 2)[!].gdi" size="149" md5="513e1ef0bd3e058d4b370fc301151745" sha1="55c0c3627622f94d3c498adb509a06b0772c4654"/>
+        <rom name="track01.bin" size="1425312" md5="a0c02dc1e33fb1c5cd18071555c85865" sha1="2fbfafc3fd44cc0b298842fcd854136a536d3dad"/>
+        <rom name="track02.raw" size="1237152" md5="94fde9cacd7a4b3c18d8918836e9cda5" sha1="4b9ed2a2eefaae6691674522b9f047a066304a75"/>
+        <rom name="track03.bin" size="130902912" md5="8dd2c59fcfed47796533180abc5429c8" sha1="035019d4dd3ea17cce3b2ba672d24ad881b8c62d"/>
+        <rom name="track04.raw" size="1060752" md5="166d547d4b80a87ad3538f9377fbf6d8" sha1="471abb758a709c9d678bd2e76f31a6d721b5f4f0"/>
+        <rom name="track05.bin" size="1053091536" md5="c471505c36aa51a87ea95ab9d8a80e06" sha1="1aeb60330e59a9adbd6b2cfba55210f477a62f2d"/>
+
+        <rom name="Alone in the Dark - The New Nightmare v1.000 (2001)(Infogrames)(NTSC)(US)(Disc 2 of 2)[!].gdi" size="147" md5="5d5425fdf2bbbb8bbeb229a3d86d4314" sha1="9eade7303c72c020b085abec5f4028006de3d1fb"/>
+        <rom name="track01.bin" size="1425312" md5="d5bfab87454c14925ae7b9b7ce36850f" sha1="a4f995236d77c07a0e5a4aed99ea22258fbaa9e3"/>
+        <rom name="track02.raw" size="1237152" md5="94fde9cacd7a4b3c18d8918836e9cda5" sha1="4b9ed2a2eefaae6691674522b9f047a066304a75"/>
+        <rom name="track03.bin" size="34466208" md5="8bab5e2ee1b5f24bb1ed748af816346a" sha1="c0f220f181edb56f302cd410839409e02071e632"/>
+        <rom name="track04.raw" size="1060752" md5="166d547d4b80a87ad3538f9377fbf6d8" sha1="471abb758a709c9d678bd2e76f31a6d721b5f4f0"/>
+        <rom name="track05.bin" size="1149528240" md5="152ab174337f0c5646cbc118bd8eebbb" sha1="31efc77f22f022fcad88d4a0c2c5c980436a60ff"/>
+        -->
+        <description>Alone in the Dark: The New Nightmare (USA)</description>
+        <year>2001</year>
+        <publisher>Infogrames</publisher>
+        <info name="serial" value="T-15117N"/>
+        <info name="release" value="20010924" />
+        <part interface="dc_gdrom" name="gdrom1">
+            <feature name="part_id" value="Disc 1"/>
+            <diskarea name="gdrom">
+                <disk name="alone in the dark the new nightmare (usa) (disc 1)" sha1="772082cd647707925656daff964313b824c43012"/>
+            </diskarea>
+        </part>
+        <part interface="dc_gdrom" name="gdrom2">
+            <feature name="part_id" value="Disc 2"/>
+            <diskarea name="gdrom">
+                <disk name="alone in the dark the new nightmare (usa) (disc 2)" sha1="525618bd335350ebc750fc80be5adfb3723b3f48"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="aitdtnne" cloneof="aitdtnn">
+        <!--
+        <rom name="Alone in the Dark - The New Nightmare v1.000 (2001)(Infogrames)(PAL)(Disc 1 of 2)[!].gdi" size="149" md5="20c49fb4e6918a108a464b574993e654" sha1="2bd2966d9b0e4764473c26a9620bd17e55e4841c"/>
+        <rom name="track01.bin" size="16075920" md5="4e49daced7d62506af058d9245f95f9b" sha1="acd62514d438aa5525167f0c5a03cd78e936bfc7"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="118227984" md5="ed32ad4cd084f2a80dad098f7468053e" sha1="353401d606bb23e430b7571f6b20249bd2a02d44"/>
+        <rom name="track04.raw" size="13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
+        <rom name="track05.bin" size="1053009216" md5="7e310a09a311fa8f5ad2958bd9a6abff" sha1="9e7f8ff68f9483bbe8c8af2fce726744af978038"/>
+
+        <rom name="Alone in the Dark - The New Nightmare v1.000 (2001)(Infogrames)(PAL)(Disc 2 of 2)[!].gdi" size="148" md5="067cb7b77e88ff9981578db48cf21f6b" sha1="7ff6edb1793bde5ed801a715d5aea8b6b4b7c90a"/>
+        <rom name="track01.bin" size="16075920" md5="744941106d8333008caaba46cb14f88d" sha1="c7cfea08ec73791078983bff6587c6034c2814a4"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="21873600" md5="fccf29f781838fb09d50d48cd4758366" sha1="23c155ca4c53e3550fd203694d1ae45e0cd31ff1"/>
+        <rom name="track04.raw" size="13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
+        <rom name="track05.bin" size="1149363600" md5="2ee0bd50cb1e5878e13082ebc91d927a" sha1="90ed1115de77bbdef7d268e59d940b4a410d485c"/>
+        -->
+        <description>Alone in the Dark: The New Nightmare (Euro)</description>
+        <year>2001</year>
+        <publisher>Infogrames</publisher>
+        <info name="serial" value="T-15112D-05"/>
+        <info name="release" value="20010622" />
+        <part interface="dc_gdrom" name="gdrom1">
+            <feature name="part_id" value="Disc 1"/>
+            <diskarea name="gdrom">
+                <disk name="alone in the dark the new nightmare (euro) (disc 1)" sha1="04e27f28101df2305b58cd26b151ff78fa88b496"/>
+            </diskarea>
+        </part>
+        <part interface="dc_gdrom" name="gdrom2">
+            <feature name="part_id" value="Disc 2"/>
+            <diskarea name="gdrom">
+                <disk name="alone in the dark the new nightmare (euro) (disc 2)" sha1="4f4833779b96dc21e082c213cfdaabde166c36fc"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="aitdtnng" cloneof="aitdtnn">
+        <!--
+        <rom name="Alone in the Dark - The New Nightmare v1.000 (2001)(Infogrames)(PAL)(DE)(Disc 1 of 2)[!].gdi" size="149" md5="5986b5ea72c8333b41f43e17187f95de" sha1="627446bb9914ea45dc59ff4a9a2d3a216afbd2f2"/>
+        <rom name="track01.bin" size="16075920" md5="4e49daced7d62506af058d9245f95f9b" sha1="acd62514d438aa5525167f0c5a03cd78e936bfc7"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="117153120" md5="e9ebc3cd1040505b6aff7ba961621224" sha1="5aefb72b8469d94df487fc670880d1f10d6d8144"/>
+        <rom name="track04.raw" size="13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
+        <rom name="track05.bin" size="1054084080" md5="4ae491ce53dca872ba341f471578779b" sha1="5e0f075f2f4b18d00be5e1a290076bf59b1e022e"/>
+
+        <rom name="Alone in the Dark - The New Nightmare v1.000 (2001)(Infogrames)(PAL)(DE)(Disc 2 of 2)[!].gdi" size="148" md5="916d977138a294a0efb71c20349d8565" sha1="935a1a8227defedd8331ef5f04c24815bff35742"/>
+        <rom name="track01.bin" size="16075920" md5="744941106d8333008caaba46cb14f88d" sha1="c7cfea08ec73791078983bff6587c6034c2814a4"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="27984096" md5="ab3fec49df9ec0fe19860a6a3bdc6724" sha1="870c98a3c28651e895bdb47bfa854271cd8ed0eb"/>
+        <rom name="track04.raw" size="13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
+        <rom name="track05.bin" size="1143253104" md5="2302dfd70f54678b3b18c20cf20c7a41" sha1="bd0be80932ce6e43f5c89960333c19596d677a05"/>
+        -->
+        <description>Alone in the Dark: The New Nightmare (Ger)</description>
+        <year>2001</year>
+        <publisher>Infogrames</publisher>
+        <info name="serial" value="T-15112D-18"/>
+        <info name="release" value="20010622" />
+        <part interface="dc_gdrom" name="gdrom1">
+            <feature name="part_id" value="Disc 1"/>
+            <diskarea name="gdrom">
+                <disk name="alone in the dark the new nightmare (ger) (disc 1)" sha1="c8acb133bcc7f575bf0f9c1c27cb90f5e5009305"/>
+            </diskarea>
+        </part>
+        <part interface="dc_gdrom" name="gdrom2">
+            <feature name="part_id" value="Disc 2"/>
+            <diskarea name="gdrom">
+                <disk name="alone in the dark the new nightmare (ger) (disc 2)" sha1="c9432b2d519cb3d4aecd576ac48e1f45cbdf254b"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="aitdtnnf" cloneof="aitdtnn">
+        <!--
+        <rom name="Alone in the Dark - The New Nightmare v1.000 (2001)(Infogrames)(PAL)(FR)(Disc 1 of 2)[!].gdi" size="149" md5="f851c0db001b598e744f52b2434c1bdd" sha1="e0bd4f0fcdca1e05d93847cfbe4001c7c9d38a04"/>
+        <rom name="track01.bin" size="16075920" md5="4e49daced7d62506af058d9245f95f9b" sha1="acd62514d438aa5525167f0c5a03cd78e936bfc7"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="123910416" md5="4dadcc7c64737a85606f1f372c1568ed" sha1="d914623c4ec9c3b77ec230320acafa2f934eaede"/>
+        <rom name="track04.raw" size="13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
+        <rom name="track05.bin" size="1047326784" md5="4601b25277f6f5c7f733f81ca862aba6" sha1="a465bb1114ae57027dfdf3ef8d24f5e46e228c29"/>
+
+        <rom name="Alone in the Dark - The New Nightmare v1.000 (2001)(Infogrames)(PAL)(FR)(Disc 2 of 2)[!].gdi" size="148" md5="cfd31a9fa9bc0b4d9a6d4672cfb7a7e2" sha1="b293dda2b26cac3121e98e9276611c6c7ede5032"/>
+        <rom name="track01.bin" size="16075920" md5="744941106d8333008caaba46cb14f88d" sha1="c7cfea08ec73791078983bff6587c6034c2814a4"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="34743744" md5="a6a83442782dd2da421e76d34c5f9a41" sha1="f8efbb1212b7e73c7162ea8811ec01b47d780ef7"/>
+        <rom name="track04.raw" size="13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
+        <rom name="track05.bin" size="1136493456" md5="d97ba2bf7cc0f2cf89fb0e757f4907aa" sha1="73f802a8f9c602b642fa6e3735132832bc97516f"/>
+        -->
+        <description>Alone in the Dark: The New Nightmare (Fra)</description>
+        <year>2001</year>
+        <publisher>Infogrames</publisher>
+        <info name="serial" value="T-15112D-09"/>
+        <info name="release" value="20010622" />
+        <part interface="dc_gdrom" name="gdrom1">
+            <feature name="part_id" value="Disc 1"/>
+            <diskarea name="gdrom">
+                <disk name="alone in the dark the new nightmare (fra) (disc 1)" sha1="19f3570cac974b98388fc63474a053db9693f035"/>
+            </diskarea>
+        </part>
+        <part interface="dc_gdrom" name="gdrom2">
+            <feature name="part_id" value="Disc 2"/>
+            <diskarea name="gdrom">
+                <disk name="alone in the dark the new nightmare (fra) (disc 2)" sha1="30222540da2a1c2b5d522e9c69f3aee9c5b701a2"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!--
+    <software name="aitdtnnis" cloneof="aitdtnn">
+        <description>Alone in the Dark: The New Nightmare (Ita / Spa)</description>
+        <year>2001</year>
+        <publisher>Infogrames</publisher>
+        <info name="serial" value="T-15112D-60"/>
+        <info name="release" value="20010622" />
+        <part interface="dc_gdrom" name="gdrom1">
+            <feature name="part_id" value="Disc 1"/>
+            <diskarea name="gdrom">
+                <disk name="alone in the dark the new nightmare (ita-spa) (disc 1)" status="nodump"/>
+            </diskarea>
+        </part>
+        <part interface="dc_gdrom" name="gdrom2">
+            <feature name="part_id" value="Disc 2"/>
+            <diskarea name="gdrom">
+                <disk name="alone in the dark the new nightmare (ita-spa) (disc 2)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="am2ofcri">
+        <description>AM2 of CRI New Lineup Movie Collection (Jpn)</description>
+        <year>2001</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="073-02536(?)"/>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="am2 of cri new lineup movie collection (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+
+    <software name="angelpre">
+        <!--
+        <rom name="Angel Present v1.001 (2000)(NEC InterChannel)(NTSC)(JP)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+        <rom name="track01.bin" size="705600" md5="45259f35684abb8802c851d25f619bf5" sha1="1c6e451894f1f908524a466dc566ef5425adcc59"/>
+        <rom name="track02.raw" size="2036832" md5="92a199dd5e6b8e1693665e29f9bdaeb6" sha1="b66273ef95aad180ad67dc565889707e1dc9a5c0"/>
+        <rom name="track03.bin" size="1185760800" md5="86dbe73c0b9a72f5ad3572bf5e3b4818" sha1="24bb2c38f753baf8b9a230f92614c9218a9fda6e"/>
+        -->
+        <description>Angel Present (Jpn)</description>
+        <year>2001</year>
+        <publisher>NEC Interchannel</publisher>
+        <info name="serial" value="T-20107M"/>
+        <info name="release" value="20010412" />
+		<info name="alt_title" value="エンジェルプレゼント" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="angel present (jpn)" sha1="c00a6b5327bcda32b6a47b52fe8fbb444b13c011"/>
+            </diskarea>
+        </part>
+    </software>
+    <!--
+    <software name="anglwishsp">
+        <description>Angel Wish: Kimi no Egao ni Chu! - Special Pack-ban (Jpn)</description>
+        <year>2005</year>
+        <publisher>Pionesoft</publisher>
+        <info name="serial" value="PIO-05202"/>
+        <info name="release" value="20050224" />
+        <part interface="dc_gdrom" name="gdrom1">
+            <feature name="part_id" value="Angel Wish: Kimi no Egao ni Chu!"/>
+            <diskarea name="gdrom">
+                <disk name="angel wish kimi no egao ni chu! - special pack-ban (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+        <part interface="dc_gdrom" name="gdrom2">
+            <feature name="part_id" value="Original Voice Drama"/>
+            <diskarea name="gdrom">
+                <disk name="angel wish kimi no egao ni chu! - special pack-ban (jpn) (original voice drama)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+
+    <!--
+    <software name="anglwish" cloneof="anglwishsp">
+        <description>Angel Wish: Kimi no Egao ni Chu! (Jpn)</description>
+        <year>2005</year>
+        <publisher>Pionesoft</publisher>
+        <info name="serial" value="T-18712M"/>
+        <info name="release" value="20050224" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="angel wish kimi no egao ni chu! (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <software name="animasta">
+        <!--
+        <rom name="Animastar v1.009 (2000)(AKI)(NTSC)(JP)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+        <rom name="track01.bin" size="705600" md5="3f16a206ba67b97e7d4a5f8dca045802" sha1="9fec224262632381c3f6d53eb0a2be244628e910"/>
+        <rom name="track02.raw" size="1949808" md5="68d2b87a6ee8e5997925c745e6926292" sha1="e94af67fb767b3bce16e0178c874a338664a00ba"/>
+        <rom name="track03.bin" size="1185760800" md5="23f231c2ca110a42a0dfaf173aecba40" sha1="f9c2623b75074f117ad7b9b3ffde8bf7bbe32376"/>
+        -->
+        <description>Animastar (Jpn)</description>
+        <year>2000</year>
+        <publisher>AKI</publisher>
+        <info name="serial" value="T-34101M"/>
+        <info name="release" value="20000615" />
+		<info name="alt_title" value="アニマスター" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="animastar (jpn)" sha1="f0c0d3bb5e66b95bacf7447dd9f3332980abd31c"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!--
+    <software name="aono6go">
+        <description>Ao no 6-go Saigetsufutai Hito: Time and Tide (Jpn)</description>
+        <year>2000</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="HDR-0075"/>
+        <info name="release" value="20001207" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="ao no 6-go saigetsufutai hito time and tide (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <software name="aquagt">
+        <!--
+        <rom name="Aqua GT v1.000 (2000)(Take 2)(PAL)(M3)[!].gdi" size="338" md5="1844766a84ea10d3cb0605bdab397af1" sha1="f302c8c290c1cdc8458e4ce204a4f30f93f8347a"/>
+        <rom name="track01.bin" size="1422960" md5="8f545b505256a456da553df2edad4748" sha1="ed54c6f5d2d1d87b3b60f8c4611e92184941e341"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="815572464" md5="dc5b242779de56db0aa57b2d8a605570" sha1="e253e6e2ca8b1ed70d866b5c856036918f1aad71"/>
+        <rom name="track04.raw" size="32304720" md5="ed124f9e1bf9cf4b11bb41ebda0e9a54" sha1="b174df5446b3de70c236bbc4a60d0301461b28e0"/>
+        <rom name="track05.raw" size="58574208" md5="7f814f5a2408f1c21f37fe1c1e8e23a8" sha1="d18d2f7e28234ca34a31049cfa7040321f7604c8"/>
+        <rom name="track06.raw" size="31773168" md5="8423c8163c7ba7663b00ae752d7a5e43" sha1="794bfaec8c60621aa5c861729dfb870e1df37a29"/>
+        <rom name="track07.raw" size="33711216" md5="f7d13209ee65874f6811268cb0d5f77d" sha1="d13a2d16147260f7c2c5386eda76acae718bc27c"/>
+        <rom name="track08.raw" size="41028288" md5="04e36c0552fead331314ca1837566432" sha1="493556053280d417c3a79e20e9380112fbb90558"/>
+        <rom name="track09.raw" size="21883008" md5="f099ee98cfd5d52bcceda4a500137f90" sha1="9487456e27c85cd3680d5ba47bcb401f9dd2c196"/>
+        <rom name="track10.raw" size="19538064" md5="160c9a3fa1b6ad6a5a7cb5f3779aeb22" sha1="07764b80271b6300db74dffe66c3212954d6228d"/>
+        <rom name="track11.bin" size="130670064" md5="b7875c366ff6c24ce4ba88cddb961062" sha1="176883c8b0d261e8ed2b42d08414a935e3902b8a"/>
+        -->
+        <description>Aqua GT (Euro)</description>
+        <year>2000</year>
+        <publisher>Take 2</publisher>
+        <info name="serial" value="T-40509D-50"/>
+        <info name="release" value="20001222" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="aqua gt (euro)" sha1="0632ba0643bc0bbe694b0677dc62ffa8acdb72b6"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="armada">
+        <!--
+        <rom name="Armada v1.000 (1999)(Metro3D)(NTSC)(US)[!].gdi" size="149" md5="6c03122e07c0e5d2952542b32f52dfa8" sha1="ce34b5d6ccd455170c879c1ca5c3403f669aff96"/>
+        <rom name="track01.bin" size="1425312" md5="b2ff2808abe8e11bcd6319d1fe745e45" sha1="59c93bc3106c2fa9504041f9aed64327fc28a4a9"/>
+        <rom name="track02.raw" size="1284192" md5="622fda00a9bb254151497ff4c40c7623" sha1="eba72eaadbc0b4420fe1ea9ee00c11c65f0ea414"/>
+        <rom name="track03.bin" size="246235584" md5="c0143d0c5feb8c908ae58b87fb00866b" sha1="ad93a5d08808b25e06773ad0b150644665c0119c"/>
+        <rom name="track04.raw" size="668132640" md5="974b2b4dbfffcac9a1fd1e36a4f11a2d" sha1="79318ce7f725795c0ba7253a32a49b405e06ef0a"/>
+        <rom name="track05.bin" size="270686976" md5="ca60db8d179e77ce2b1d381ff2490aea" sha1="fd26690e14f8d3f8b4b1dc942ce393ec0cb37448"/>
+        -->
+        <description>Armada (USA)</description>
+        <year>1999</year>
+        <publisher>Metro3D</publisher>
+        <info name="serial" value="T-40301N"/>
+        <info name="release" value="19991031" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="armada (usa)" sha1="1ee0a7614b7e3b7210f64ce854e939e981e573ab"/>
+            </diskarea>
+        </part>
+    </software>
+    
+        <software name="amshu" cloneof="amsh">
+        <!--
+        <rom name="Army Men - Sarge's Heroes v1.001 (2000)(Midway)(NTSC)(US)[!].gdi" size="149" md5="98f3d1aaeff3f1e50c9dd76cef5a85f8" sha1="7de7049737a72c4fe670946a7b41d28977821fde"/>
+        <rom name="track01.bin" size="1425312" md5="e71f149c7bae0b60cc61b65dafe17dcd" sha1="660b5f68e2c9be8cb1999a8ffc7b9fd32b048fab"/>
+        <rom name="track02.raw" size="1237152" md5="87af6d21a8b10aeffb90874118531e29" sha1="b0d28980a64765c022b4b3e47244aad32a345270"/>
+        <rom name="track03.bin" size="640306128" md5="677ff954646f4260d348760b6878708a" sha1="8832b2dd2f170b021cdb2fb609cdeda723d4cccb"/>
+        <rom name="track04.raw" size="1060752" md5="3a892db029c4b1ba6ed24ccdaf5cff62" sha1="36b69ee3a5dd70637228feaa14528ac23f848ee7"/>
+        <rom name="track05.bin" size="543688320" md5="0dcdaf84cf0470fa4442586f6b97c681" sha1="3c4c4babae62fb9d40560e47d2850525ea1d304e"/>
+        -->
+        <description>Army Men: Sarge's Heroes (USA)</description>
+        <year>2000</year>
+        <publisher>Midway</publisher>
+        <info name="serial" value="T-9715N"/>
+        <info name="release" value="20001030" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="army men sarge's heroes (usa)" sha1="5d66f134946fc21ba54fbb61d5a99a2608a97937"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!-- Both the Ger/Fra/Ned (T-9708D-51) and Eng/Spa/Ita (T-9708D-61) release share the same disc (T-9708D-50) -->
+    <software name="amsh">
+        <!--
+        <rom name="Army Men - Sarge's Heroes v1.001 (2000)(Midway)(PAL)(M5)[!].gdi" size="150" md5="3a7ac4a8ce7f57a1dd91a37573d9339f" sha1="d04ce34fa8aa9e2e968339f1606d2de5d89462de"/>
+        <rom name="track01.bin" size="16075920" md5="666f1fcecf6b191fcce2c51b8245319b" sha1="b84839aed53a3a448f1d0f26fb3551e8d4dba982"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="578956560" md5="467636a13b435f7f4517606dce064164" sha1="33b1abefa53a0104b1c8ca495a36a06f60402ac5"/>
+        <rom name="track04.raw" size="13818000" md5="e081e4437e3193c4f9f712f5d607ce52" sha1="415049310c4e753b5554b75fc9fc484b9b946179"/>
+        <rom name="track05.bin" size="592280640" md5="765b0041eccbbc20d7b543ad02375806" sha1="cf653b64f69febc783223ee39374a700c229bdc3"/>
+        -->
+        <description>Army Men: Sarge's Heroes (Euro)</description>
+        <year>2000</year>
+        <publisher>Midway</publisher>
+        <info name="serial" value="T-9708D-50, T-9708D-51, T-9708D-61"/>
+        <info name="release" value="20001117" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="army men sarge's heroes (euro)" sha1="046d34b8ba2f2d20c8719387010aa84367b9eeb3"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="atariae">
+        <!--
+        <rom name="Atari Anniversary Edition v1.001 (2001)(Infogrames)(NTSC)(US)[!][compilation].gdi" size="149" md5="4e4b7d3c5f6cb02a99ef0cbb39fa657e" sha1="5097454aa0717b5a46327e7f41fd484d83574927"/>
+        <rom name="track01.bin" size="1425312" md5="acd51da89ca95e0bd67a25f1234491e8" sha1="f6b8c447dad7a6b11a145a376ec124b03367ac70"/>
+        <rom name="track02.raw" size="1237152" md5="94fde9cacd7a4b3c18d8918836e9cda5" sha1="4b9ed2a2eefaae6691674522b9f047a066304a75"/>
+        <rom name="track03.bin" size="239475936" md5="80539bc6fc3a94d1e8534950f5a0e5e9" sha1="17b8ea552997e865afeb69926fae4e01a2e2ec3f"/>
+        <rom name="track04.raw" size="1060752" md5="166d547d4b80a87ad3538f9377fbf6d8" sha1="471abb758a709c9d678bd2e76f31a6d721b5f4f0"/>
+        <rom name="track05.bin" size="944518512" md5="c15ac7af5164d06be5f02e88f3c814b8" sha1="c0cd335bf99b7ad1ac9e277e79d365ab87c64cdd"/>
+        -->
+        <description>Atari Anniversary Edition (USA)</description>
+        <year>2001</year>
+        <publisher>Infogrames</publisher>
+        <info name="serial" value="15130N"/>
+        <info name="release" value="200107xx" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="atari anniversary edition (usa)" sha1="4a218b6d01e82ddb826191f95a6192a4395d466f"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <software name="aggonsen"> <!-- cloneof="aggonsenbb" -->
+        <!--
+        <rom name="Atsumare! Guru Guru Onsen v1.008 (1999)(Sega)(NTSC)(JP)[!].gdi" size="87" md5="9d1f603062285fdb7bc099ed4d1e5ff1" sha1="2a37adc5e75d6f43b27bc61dc4fc09d5ad473ce0"/>
+        <rom name="track01.bin" size="1470000" md5="8c574a476783c9792d7f7e472a9e78ef" sha1="cd126ac8f68969f9736d830427564c93b84961d3"/>
+        <rom name="track02.raw" size="3944304" md5="d042be6db4b76bcaaad95bd885e49439" sha1="ac00fbd4137c4ad845e3e819d4cbf6e586a6cb72"/>
+        <rom name="track03.bin" size="1185760800" md5="3624bdfa8622727fff36b776f4e00016" sha1="2493ab5cc8940dea15c1ac37c856f7b187b84d2d"/>
+        -->
+        <description>Atsumare! Guru Guru Onsen (Jpn)</description>
+        <year>1999</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="HDR-0015"/>
+        <info name="release" value="19990923" />
+		<info name="alt_title" value="あつまれ!ぐるぐる温泉" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="atsumare guru guru onsen (jpn)" sha1="5b7d61c5011c13a35e43f6d176499f21cd956990"/>
+            </diskarea>
+        </part>
+    </software>
+    
+    <!--
+    <software name="aggonsenbb">
+        <description>Atsumare! Guru Guru Onsen BB (Jpn)</description>
+        <year>2000</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="HDR-0121"/>
+        <info name="release" value="20001031" />
+		<info name="alt_title" value="あつまれ!ぐるぐる温泉BB" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="atsumare guru guru onsen bb (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+    
+    <!--
+    <software name="aggonsenwmc" cloneof="aggonsenbb">
+        <description>Atsumare! Guru Guru Onsen - Original WebMoney Card-Tsuki (Jpn)</description>
+        <year>2000</year>
+        <publisher>Sega</publisher>
+        <info name="serial" value="HDR-0120"/>
+		<info name="alt_title" value="あつまれ!ぐるぐる温泉 - オリジナル”ウェブマネー”カード付き" />
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="atsumare guru guru onsen - original webmoney card-tsuki (jpn)" status="nodump"/>
+            </diskarea>
+        </part>
+    </software>
+    -->
+</softwarelist>
