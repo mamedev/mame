@@ -204,8 +204,10 @@ public:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap);
 	void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap);
 	void handle_flipped_visible_area(screen_device &screen);
+	void banked_oki(const char *region);
 	void common(machine_config &config);
 	void sound_ym_oki(machine_config &config);
+	void sound_ym_banked_oki(machine_config &config);
 	void sound_suplup(machine_config &config);
 	void sound_qs1000(machine_config &config);
 	void mrkickera(machine_config &config);
@@ -220,6 +222,7 @@ public:
 	void jmpbreak(machine_config &config);
 	void aoh(machine_config &config);
 	void coolmini(machine_config &config);
+	void mrkicker(machine_config &config);
 };
 
 READ16_MEMBER(vamphalf_state::eeprom_r)
@@ -319,7 +322,7 @@ F94B
 
 WRITE32_MEMBER(vamphalf_state::finalgdr_oki_bank_w)
 {
-	m_oki->set_rom_bank((data & 0x300) >> 8);
+	membank("okibank")->set_entry((data & 0x300) >> 8);
 }
 
 WRITE32_MEMBER(vamphalf_state::finalgdr_backupram_bank_w)
@@ -357,19 +360,19 @@ WRITE32_MEMBER(vamphalf_state::finalgdr_prize_w)
 
 WRITE32_MEMBER(vamphalf_state::aoh_oki_bank_w)
 {
-	m_oki2->set_rom_bank(data & 0x3);
+	membank("okibank")->set_entry(data & 0x3);
 }
 
 WRITE16_MEMBER(vamphalf_state::boonggab_oki_bank_w)
 {
 	if(offset)
-		m_oki->set_rom_bank(data & 0x7);
+		membank("okibank")->set_entry(data & 0x7);
 }
 
 
 WRITE16_MEMBER(vamphalf_state::mrkicker_oki_bank_w)
 {
-	m_oki->set_rom_bank(data & 0x3);
+	membank("okibank")->set_entry(data & 0x3);
 }
 
 WRITE16_MEMBER(vamphalf_state::boonggab_prize_w)
@@ -483,7 +486,6 @@ static ADDRESS_MAP_START( misncrft_io, AS_IO, 16, vamphalf_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( coolmini_io, AS_IO, 16, vamphalf_state )
-//  AM_RANGE(0x002, 0x003) AM_WRITE(mrkicker_oki_bank_w) // not coolmini?, installed on init
 	AM_RANGE(0x200, 0x203) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x300, 0x303) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x304, 0x307) AM_READ_PORT("P1_P2")
@@ -493,6 +495,11 @@ static ADDRESS_MAP_START( coolmini_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x540, 0x543) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
 	AM_RANGE(0x544, 0x547) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
 	AM_RANGE(0x7c0, 0x7c3) AM_READ(eeprom_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mrkicker_io, AS_IO, 16, vamphalf_state )
+	AM_RANGE(0x002, 0x003) AM_WRITE(mrkicker_oki_bank_w)
+	AM_IMPORT_FROM(coolmini_io)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( suplup_io, AS_IO, 16, vamphalf_state )
@@ -607,6 +614,11 @@ static ADDRESS_MAP_START( boonggab_io, AS_IO, 16, vamphalf_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yorijori_io, AS_IO, 32, vamphalf_state )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( banked_oki_map, 0, 8, vamphalf_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_REGION("okibank")
 ADDRESS_MAP_END
 
 /*
@@ -1041,6 +1053,19 @@ MACHINE_CONFIG_START(vamphalf_state::sound_ym_oki)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(vamphalf_state::sound_ym_banked_oki)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_YM2151_ADD("ymsnd", XTAL(28'000'000)/8) /* 3.5MHz */
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", XTAL(28'000'000)/16 , PIN7_HIGH) /* 1.75MHz */
+	MCFG_DEVICE_ADDRESS_MAP(0, banked_oki_map)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_START(vamphalf_state::sound_suplup)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1088,6 +1113,13 @@ MACHINE_CONFIG_DERIVED(vamphalf_state::coolmini, common)
 	MCFG_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_DERIVED(vamphalf_state::mrkicker, common)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(mrkicker_io)
+
+	MCFG_FRAGMENT_ADD(sound_ym_banked_oki)
+MACHINE_CONFIG_END
+
 MACHINE_CONFIG_DERIVED(vamphalf_state::suplup, common)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(suplup_io)
@@ -1129,7 +1161,7 @@ MACHINE_CONFIG_DERIVED(vamphalf_state::finalgdr, common)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(sound_ym_oki)
+	MCFG_FRAGMENT_ADD(sound_ym_banked_oki)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(vamphalf_state::mrkickera, common)
@@ -1140,7 +1172,7 @@ MACHINE_CONFIG_DERIVED(vamphalf_state::mrkickera, common)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_FRAGMENT_ADD(sound_ym_oki)
+	MCFG_FRAGMENT_ADD(sound_ym_banked_oki)
 MACHINE_CONFIG_END
 
 
@@ -1178,6 +1210,7 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_OKIM6295_ADD("oki_2", XTAL(32'000'000)/32, PIN7_HIGH) /* 1MHz */
+	MCFG_DEVICE_ADDRESS_MAP(0, banked_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1186,7 +1219,7 @@ MACHINE_CONFIG_DERIVED(vamphalf_state::boonggab, common)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(boonggab_io)
 
-	MCFG_FRAGMENT_ADD(sound_ym_oki)
+	MCFG_FRAGMENT_ADD(sound_ym_banked_oki)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(vamphalf_state::yorijori, common)
@@ -1808,7 +1841,9 @@ ROM_START( dtfamily )
 	ROM_LOAD32_WORD( "romu02", 0x800002, 0x200000, CRC(80830961) SHA1(b318e9e3a4d1d7dca61d7d4c9ee01f605e2b2f4a) )
 	/* roml03 empty */
 	/* romu03 empty */
-
+	
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is what gets switched */
 	ROM_REGION( 0x80000, "oki", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1", 0x00000, 0x80000, CRC(4aacaef3) SHA1(c079170dc0ba0b91b1780cd175dc38151d640ff0) )
 ROM_END
@@ -2272,21 +2307,11 @@ ROM_START( finalgdr ) /* version 2.20.5915, Korea only */
 	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(f28578a5) SHA1(a5c7b17aff101f1f4f52657d0567a6c9d12a178d) )
 	/* roml01 empty */
 	/* romh01 empty */
-
-	ROM_REGION( 0x080000, "user2", 0 ) /* Oki Samples */
-	ROM_LOAD( "u7", 0x000000, 0x080000, CRC(080f61f8) SHA1(df3764b1b07f9fc38685e3706b0f834f62088727) )
-
+	
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x020000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user2", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
+	ROM_REGION( 0x80000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "u7", 0x000000, 0x080000, CRC(080f61f8) SHA1(df3764b1b07f9fc38685e3706b0f834f62088727) )
 ROM_END
 
 /*
@@ -2390,21 +2415,11 @@ ROM_START( mrkickera )
 	ROM_LOAD32_WORD( "romh00", 0x000002, 0x200000, CRC(b6337d4a) SHA1(2f46e2933af7fd0f71083900d5e6e4f602ab4c66) )
 	/* roml01 empty */
 	/* romh01 empty */
-
-	ROM_REGION( 0x080000, "user2", 0 ) /* Oki Samples */
-	ROM_LOAD( "at27c040.u7", 0x000000, 0x080000, CRC(e8141fcd) SHA1(256fd1987030e0a1df0a66a228c1fea996cda686) ) /* Mask ROM */
-
+	
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x020000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user2", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
+	ROM_REGION( 0x80000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "at27c040.u7", 0x000000, 0x080000, CRC(e8141fcd) SHA1(256fd1987030e0a1df0a66a228c1fea996cda686) ) /* Mask ROM */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM (it doesn't boot without and the game code crashes) (game also refuses to boot if program attempts to rewrite it, CPU bug or protection?) */
 	ROM_LOAD( "eeprom-mrkicker.bin", 0x0000, 0x0080, CRC(87afb8f7) SHA1(444203b793c1d7929fc5916f18b510198719cd38) )
@@ -2424,21 +2439,11 @@ ROM_START( mrkicker )
 	/* romh02 empty */
 	/* roml03 empty */
 	/* romh03 empty */
-
-	ROM_REGION( 0x080000, "user2", 0 ) /* Oki Samples */
-	ROM_LOAD( "11-semicom.vrom1", 0x000000, 0x080000, CRC(e8141fcd) SHA1(256fd1987030e0a1df0a66a228c1fea996cda686) ) /* same data as above */
-
+	
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x100000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x020000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user2", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
+	ROM_REGION( 0x80000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "11-semicom.vrom1", 0x000000, 0x080000, CRC(e8141fcd) SHA1(256fd1987030e0a1df0a66a228c1fea996cda686) ) /* same data as above */
 ROM_END
 
 /*
@@ -2502,21 +2507,11 @@ ROM_START( aoh )
 
 	ROM_REGION( 0x40000, "oki_1", 0 ) /* Oki Samples */
 	ROM_LOAD( "rom3", 0x00000, 0x40000, CRC(db8cb455) SHA1(6723b4018208d554bd1bf1e0640b72d2f4f47302) )
-
-	ROM_REGION( 0x80000, "user2", 0 ) /* Oki Samples */
-	ROM_LOAD( "rom4", 0x00000, 0x80000, CRC(bba47755) SHA1(e6eeb5f64eaa88a74536119b731a76921e79f8ff) )
-
+	
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x100000, "oki_2", 0 ) /* Samples */
-	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x020000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user2", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
+	ROM_REGION( 0x80000, "oki_2", 0 ) /* Oki Samples */
+	ROM_LOAD( "rom4", 0x00000, 0x80000, CRC(bba47755) SHA1(e6eeb5f64eaa88a74536119b731a76921e79f8ff) )
 ROM_END
 
 /*
@@ -2554,30 +2549,12 @@ ROM_START( boonggab )
 	/* romu04 empty */
 	/* roml09 empty */
 	/* romu09 empty */
-
-	ROM_REGION( 0x100000, "user2", 0 ) /* Oki Samples */
-	ROM_LOAD( "3.vrom1",      0x00000, 0x80000, CRC(0696bfcb) SHA1(bba61f3cae23271215bbbf8214ce3b73459d5da5) )
-	ROM_LOAD( "4.vrom2",      0x80000, 0x80000, CRC(305c2b16) SHA1(fa199c4cd4ebb952d934e3863fca8740eeba9294) )
-
+	
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x200000, "oki", 0 ) /* Samples */
-	ROM_COPY( "user2", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x020000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user2", 0x020000, 0x060000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user2", 0x040000, 0x0a0000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x100000, 0x020000)
-	ROM_COPY( "user2", 0x080000, 0x120000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x140000, 0x020000)
-	ROM_COPY( "user2", 0x0a0000, 0x160000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x180000, 0x020000)
-	ROM_COPY( "user2", 0x0c0000, 0x1a0000, 0x020000)
-	ROM_COPY( "user2", 0x000000, 0x1c0000, 0x020000)
-	ROM_COPY( "user2", 0x0e0000, 0x1e0000, 0x020000)
+	ROM_REGION( 0x100000, "oki", 0 ) /* Oki Samples */
+	ROM_LOAD( "3.vrom1",      0x00000, 0x80000, CRC(0696bfcb) SHA1(bba61f3cae23271215bbbf8214ce3b73459d5da5) )
+	ROM_LOAD( "4.vrom2",      0x80000, 0x80000, CRC(305c2b16) SHA1(fa199c4cd4ebb952d934e3863fca8740eeba9294) )
 ROM_END
 
 int vamphalf_state::irq_active()
@@ -2587,6 +2564,16 @@ int vamphalf_state::irq_active()
 		return 1;
 	else
 		return 0;
+}
+
+void vamphalf_state::banked_oki(const char *region)
+{
+	uint8_t *ROM = memregion(region)->base();
+	uint32_t size = memregion(region)->bytes();
+	if (size > 0x40000)
+		membank("okibank")->configure_entries(0, size/0x20000, &ROM[0], 0x20000);
+	else
+		membank("okibank")->set_base(&ROM[0x20000]);
 }
 
 READ16_MEMBER(vamphalf_state::vamphalf_speedup_r)
@@ -2980,8 +2967,8 @@ DRIVER_INIT_MEMBER(vamphalf_state,coolminii)
 
 DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
 {
+	banked_oki("oki");
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00063fc0, 0x00063fc1, read16_delegate(FUNC(vamphalf_state::mrkicker_speedup_r), this));
-	m_maincpu->space(AS_IO).install_write_handler(0x002, 0x003, write16_delegate(FUNC(vamphalf_state::mrkicker_oki_bank_w), this));
 
 	m_palshift = 0;
 	m_flip_bit = 1;
@@ -3066,6 +3053,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 
 DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 {
+	banked_oki("oki");
 	m_finalgdr_backupram_bank = 1;
 	m_finalgdr_backupram = std::make_unique<uint8_t[]>(0x80*0x100);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x005e870, 0x005e873, read32_delegate(FUNC(vamphalf_state::finalgdr_speedup_r), this));
@@ -3086,6 +3074,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 
 DRIVER_INIT_MEMBER(vamphalf_state,mrkickera)
 {
+	banked_oki("oki");
 	// backup ram isn't used
 	m_finalgdr_backupram_bank = 1;
 	m_finalgdr_backupram = std::make_unique<uint8_t[]>(0x80*0x100);
@@ -3113,6 +3102,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,dquizgo2)
 
 DRIVER_INIT_MEMBER(vamphalf_state,dtfamily)
 {
+	banked_oki("oki");
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xcc2a8, 0xcc2a9, read16_delegate(FUNC(vamphalf_state::dtfamily_speedup_r), this));
 
 	m_palshift = 0;
@@ -3130,6 +3120,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,toyland)
 
 DRIVER_INIT_MEMBER(vamphalf_state,aoh)
 {
+	banked_oki("oki_2");
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x028a09c, 0x028a09f, read32_delegate(FUNC(vamphalf_state::aoh_speedup_r), this));
 
 	m_palshift = 0;
@@ -3162,6 +3153,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,poosho)
 
 DRIVER_INIT_MEMBER(vamphalf_state,boonggab)
 {
+	banked_oki("oki");
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000f1b74, 0x000f1b75, read16_delegate(FUNC(vamphalf_state::boonggab_speedup_r), this));
 
 	m_palshift = 0;
@@ -3185,9 +3177,9 @@ GAME( 2000, dquizgo2,  0,        coolmini,  common,   vamphalf_state, dquizgo2, 
 GAME( 2000, misncrft,  0,        misncrft,  common,   vamphalf_state, misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.7)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2000, misncrfta, misncrft, misncrft,  common,   vamphalf_state, misncrft,  ROT90,  "Sun",                           "Mission Craft (version 2.4)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2000, mrdig,     0,        mrdig,     common,   vamphalf_state, mrdig,     ROT0,   "Sun",                           "Mr. Dig", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, dtfamily,  0,        coolmini,  common,   vamphalf_state, dtfamily,  ROT0,   "SemiCom",                       "Diet Family", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, dtfamily,  0,        mrkicker,  common,   vamphalf_state, dtfamily,  ROT0,   "SemiCom",                       "Diet Family", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, finalgdr,  0,        finalgdr,  finalgdr, vamphalf_state, finalgdr,  ROT0,   "SemiCom",                       "Final Godori (Korea, version 2.20.5915)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, mrkicker,  0,        coolmini,  common,   vamphalf_state, mrkicker,  ROT0,   "SemiCom",                       "Mr. Kicker (F-E1-16-010 PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 2001, mrkicker,  0,        mrkicker,  common,   vamphalf_state, mrkicker,  ROT0,   "SemiCom",                       "Mr. Kicker (F-E1-16-010 PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, mrkickera, mrkicker, mrkickera, finalgdr, vamphalf_state, mrkickera, ROT0,   "SemiCom",                       "Mr. Kicker (SEMICOM-003b PCB)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // if you allow eeprom saving works then this set corrupts the eeprom and then won't boot
 GAME( 2001, toyland,   0,        coolmini,  common,   vamphalf_state, toyland,   ROT0,   "SemiCom",                       "Toy Land Adventure", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, wivernwg,  0,        wyvernwg,  common,   vamphalf_state, wyvernwg,  ROT270, "SemiCom",                       "Wivern Wings", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
