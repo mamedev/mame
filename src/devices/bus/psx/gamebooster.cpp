@@ -73,5 +73,5 @@ void psx_gamebooster_device::device_reset()
 
 READ16_MEMBER(psx_gamebooster_device::exp_r)
 {
-	return m_rom->base()[offset & 0x1ffff];
+	return m_rom->base()[(offset * 2) & 0x3ffff] | (m_rom->base()[((offset * 2) + 1) & 0x3ffff] << 8);
 }

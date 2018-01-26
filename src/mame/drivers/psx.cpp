@@ -496,7 +496,7 @@ void psx1_state::cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t
 }
 
 static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32, psx1_state )
-	AM_RANGE(0x1f000000, 0x1f0001ff) AM_READWRITE16(parallel_r, parallel_w, 0xffffffff)
+	AM_RANGE(0x1f000000, 0x1f03ffff) AM_READWRITE16(parallel_r, parallel_w, 0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, psx1_state )
