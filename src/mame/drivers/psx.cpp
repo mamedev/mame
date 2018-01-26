@@ -585,6 +585,8 @@ MACHINE_CONFIG_START(psx1_state::pse)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
 
+	MCFG_PSX_PARALLEL_SLOT_ADD("parallel", psx_parallel_devices, nullptr)
+
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_PSX_CD_READ_HANDLER( DEVREAD8( PSXCD_TAG, psxcd_device, read ) )
 	MCFG_PSX_CD_WRITE_HANDLER( DEVWRITE8( PSXCD_TAG, psxcd_device, write ) )
