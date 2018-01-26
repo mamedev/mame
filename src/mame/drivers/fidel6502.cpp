@@ -603,7 +603,7 @@ READ8_MEMBER(fidel6502_state::csc_speech_r)
 void fidel6502_state::su9_set_cpu_freq()
 {
 	// SU9 CPU is clocked 1.95MHz, DS9 is 2.5MHz
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (5.0_MHz_XTAL/2) : (3.9_MHz_XTAL/2));
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (5_MHz_XTAL/2) : (3.9_MHz_XTAL/2));
 }
 
 MACHINE_RESET_MEMBER(fidel6502_state, su9)
@@ -1712,7 +1712,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::eas)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 3.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", R65C02, 3_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(eas_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
@@ -1747,7 +1747,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(fidel6502_state::eag, eas)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 5.0_MHz_XTAL) // R65C02P4
+	MCFG_CPU_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
 	MCFG_CPU_PROGRAM_MAP(eag_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
@@ -1804,13 +1804,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::sc12)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 3.0_MHz_XTAL) // R65C02P3
+	MCFG_CPU_ADD("maincpu", R65C02, 3_MHz_XTAL) // R65C02P3
 	MCFG_CPU_PROGRAM_MAP(sc12_trampoline)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nF, 102K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(3.0_MHz_XTAL)) // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(3_MHz_XTAL)) // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
 
 	MCFG_DEVICE_ADD("sc12_map", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(sc12_map)
@@ -1838,7 +1838,7 @@ MACHINE_CONFIG_DERIVED(fidel6502_state::sc12b, sc12)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(4.0_MHz_XTAL) // R65C02P4
+	MCFG_DEVICE_CLOCK(4_MHz_XTAL) // R65C02P4
 
 	// change irq timer frequency
 	MCFG_DEVICE_REMOVE("irq_on")
@@ -1848,13 +1848,13 @@ MACHINE_CONFIG_DERIVED(fidel6502_state::sc12b, sc12)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(596))
 
 	MCFG_DEVICE_REMOVE("dummy_timer")
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(4.0_MHz_XTAL)) // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(4_MHz_XTAL)) // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fexcel)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, 12.0_MHz_XTAL/4) // G65SC102P-3, 12.0M ceramic resonator
+	MCFG_CPU_ADD("maincpu", M65SC02, 12_MHz_XTAL/4) // G65SC102P-3, 12.0M ceramic resonator
 	MCFG_CPU_PROGRAM_MAP(fexcel_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nF, 102K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
@@ -1873,7 +1873,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(fidel6502_state::fexcel4, fexcel)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 4.0_MHz_XTAL) // R65C02P4
+	MCFG_CPU_REPLACE("maincpu", R65C02, 4_MHz_XTAL) // R65C02P4
 	MCFG_CPU_PROGRAM_MAP(fexcel_map)
 MACHINE_CONFIG_END
 
@@ -1887,7 +1887,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(fidel6502_state::fexcelp, fexcel)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 5.0_MHz_XTAL) // R65C02P4
+	MCFG_CPU_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
@@ -1895,13 +1895,13 @@ MACHINE_CONFIG_DERIVED(fidel6502_state::granits, fexcelp)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(8.0_MHz_XTAL) // overclocked
+	MCFG_DEVICE_CLOCK(8_MHz_XTAL) // overclocked
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(fidel6502_state::fdes2100, fexcel)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M65C02, 5.0_MHz_XTAL) // WDC 65C02
+	MCFG_CPU_REPLACE("maincpu", M65C02, 5_MHz_XTAL) // WDC 65C02
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 
 	// change irq timer frequency
@@ -1917,7 +1917,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(fidel6502_state::fdes2000, fdes2100)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 3.0_MHz_XTAL) // RP65C02G
+	MCFG_CPU_REPLACE("maincpu", R65C02, 3_MHz_XTAL) // RP65C02G
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
@@ -1938,7 +1938,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::fdes2100d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, 6.0_MHz_XTAL) // W65C02P-6
+	MCFG_CPU_ADD("maincpu", M65C02, 6_MHz_XTAL) // W65C02P-6
 	MCFG_CPU_PROGRAM_MAP(fdesdis_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nF, 102K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
@@ -1957,7 +1957,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(fidel6502_state::fdes2000d, fdes2100d)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, 3.0_MHz_XTAL) // R65C02P3
+	MCFG_CPU_REPLACE("maincpu", R65C02, 3_MHz_XTAL) // R65C02P3
 	MCFG_CPU_PROGRAM_MAP(fdesdis_map)
 MACHINE_CONFIG_END
 
@@ -1983,7 +1983,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::chesster)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, 5.0_MHz_XTAL) // RP65C02G
+	MCFG_CPU_ADD("maincpu", R65C02, 5_MHz_XTAL) // RP65C02G
 	MCFG_CPU_PROGRAM_MAP(chesster_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(9615)) // R/C circuit, measured
 	MCFG_TIMER_START_DELAY(attotime::from_hz(9615) - attotime::from_nsec(2600)) // active for 2.6us
