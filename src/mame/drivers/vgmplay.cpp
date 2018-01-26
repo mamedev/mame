@@ -113,19 +113,19 @@ public:
 	DECLARE_READ8_MEMBER(segapcm_rom_r);
 	DECLARE_READ8_MEMBER(ymf271_rom_r);
 	DECLARE_READ8_MEMBER(ymz280b_rom_r);
-	template<int chip> DECLARE_READ8_MEMBER(multipcm_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(multipcm_rom_r);
 	DECLARE_READ8_MEMBER(k053260_rom_r);
-	template<int chip> DECLARE_READ8_MEMBER(okim6295_rom_r);
-	template<int chip> DECLARE_READ8_MEMBER(k054539_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(okim6295_rom_r);
+	template<int Chip> DECLARE_READ8_MEMBER(k054539_rom_r);
 	DECLARE_READ8_MEMBER(c352_rom_r);
 	DECLARE_READ8_MEMBER(qsound_rom_r);
 
-	template<int chip> DECLARE_WRITE8_MEMBER(multipcm_bank_hi_w);
-	template<int chip> DECLARE_WRITE8_MEMBER(multipcm_bank_lo_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(multipcm_bank_hi_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(multipcm_bank_lo_w);
 
-	template<int chip> DECLARE_WRITE8_MEMBER(okim6295_nmk112_enable_w);
-	template<int chip> DECLARE_WRITE8_MEMBER(okim6295_bank_w);
-	template<int chip> DECLARE_WRITE8_MEMBER(okim6295_nmk112_bank_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_nmk112_enable_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_bank_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_nmk112_bank_w);
 
 private:
 	struct rom_block {
@@ -178,8 +178,8 @@ public:
 	DECLARE_READ8_MEMBER(file_r);
 	DECLARE_READ8_MEMBER(file_size_r);
 
-	template<int chip> DECLARE_WRITE8_MEMBER(okim6295_clock_w);
-	template<int chip> DECLARE_WRITE8_MEMBER(okim6295_pin7_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_clock_w);
+	template<int Chip> DECLARE_WRITE8_MEMBER(okim6295_pin7_w);
 
 	void vgmplay(machine_config &config);
 private:
@@ -967,59 +967,59 @@ READ8_MEMBER(vgmplay_device::ymz280b_rom_r)
 	return rom_r(0, 0x86, offset);
 }
 
-template<int chip>
+template<int Chip>
 READ8_MEMBER(vgmplay_device::multipcm_rom_r)
 {
-	if (m_multipcm_banked[chip] == 1)
+	if (m_multipcm_banked[Chip] == 1)
 	{
 		offset &= 0x1fffff;
 		if (offset & 0x100000)
 		{
-			if (m_multipcm_bank_l[chip] == m_multipcm_bank_r[chip])
+			if (m_multipcm_bank_l[Chip] == m_multipcm_bank_r[Chip])
 			{
-				offset = ((m_multipcm_bank_r[chip] & ~0xf) << 16) | (offset & 0xfffff);
+				offset = ((m_multipcm_bank_r[Chip] & ~0xf) << 16) | (offset & 0xfffff);
 			}
 			else
 			{
 				if (offset & 0x80000)
 				{
-					offset = ((m_multipcm_bank_l[chip] & ~0x7) << 16) | (offset & 0x7ffff);
+					offset = ((m_multipcm_bank_l[Chip] & ~0x7) << 16) | (offset & 0x7ffff);
 				}
 				else
 				{
-					offset = ((m_multipcm_bank_r[chip] & ~0x7) << 16) | (offset & 0x7ffff);
+					offset = ((m_multipcm_bank_r[Chip] & ~0x7) << 16) | (offset & 0x7ffff);
 				}
 			}
 		}
 	}
-	return rom_r(chip, 0x89, offset);
+	return rom_r(Chip, 0x89, offset);
 }
 
-template<int chip>
+template<int Chip>
 READ8_MEMBER(vgmplay_device::okim6295_rom_r)
 {
-	if (m_okim6295_nmk112_enable[chip])
+	if (m_okim6295_nmk112_enable[Chip])
 	{
-		if ((offset < 0x400) && (m_okim6295_nmk112_enable[chip] & 0x80))
+		if ((offset < 0x400) && (m_okim6295_nmk112_enable[Chip] & 0x80))
 		{
-			offset = (m_okim6295_nmk112_bank[chip][(offset >> 8) & 0x3] << 16) | (offset & 0xff);
+			offset = (m_okim6295_nmk112_bank[Chip][(offset >> 8) & 0x3] << 16) | (offset & 0xff);
 		}
 		else
 		{
-			offset = (m_okim6295_nmk112_bank[chip][(offset >> 16) & 0x3] << 16) | (offset & 0xffff);
+			offset = (m_okim6295_nmk112_bank[Chip][(offset >> 16) & 0x3] << 16) | (offset & 0xffff);
 		}
 	}
 	else
 	{
-		offset = (m_okim6295_bank[chip] * 0x40000) | offset;
+		offset = (m_okim6295_bank[Chip] * 0x40000) | offset;
 	}
-	return rom_r(chip, 0x8b, offset);
+	return rom_r(Chip, 0x8b, offset);
 }
 
-template<int chip>
+template<int Chip>
 READ8_MEMBER(vgmplay_device::k054539_rom_r)
 {
-	return rom_r(chip, 0x8c, offset);
+	return rom_r(Chip, 0x8c, offset);
 }
 
 READ8_MEMBER(vgmplay_device::k053260_rom_r)
@@ -1334,69 +1334,69 @@ READ8_MEMBER(vgmplay_state::file_size_r)
 	return size >> (8*offset);
 }
 
-template<int chip>
+template<int Chip>
 WRITE8_MEMBER(vgmplay_device::multipcm_bank_hi_w)
 {
 	if (offset & 1)
-		m_multipcm_bank_l[chip] = (m_multipcm_bank_l[chip] & 0xff) | (data << 16);
+		m_multipcm_bank_l[Chip] = (m_multipcm_bank_l[Chip] & 0xff) | (data << 16);
 	if (offset & 2)
-		m_multipcm_bank_r[chip] = (m_multipcm_bank_r[chip] & 0xff) | (data << 16);
+		m_multipcm_bank_r[Chip] = (m_multipcm_bank_r[Chip] & 0xff) | (data << 16);
 }
 
-template<int chip>
+template<int Chip>
 WRITE8_MEMBER(vgmplay_device::multipcm_bank_lo_w)
 {
 	if (offset & 1)
-		m_multipcm_bank_l[chip] = (m_multipcm_bank_l[chip] & 0xff00) | data;
+		m_multipcm_bank_l[Chip] = (m_multipcm_bank_l[Chip] & 0xff00) | data;
 	if (offset & 2)
-		m_multipcm_bank_r[chip] = (m_multipcm_bank_r[chip] & 0xff00) | data;
+		m_multipcm_bank_r[Chip] = (m_multipcm_bank_r[Chip] & 0xff00) | data;
 
-	m_multipcm_banked[chip] = 1;
+	m_multipcm_banked[Chip] = 1;
 }
 
-template<int chip>
+template<int Chip>
 WRITE8_MEMBER(vgmplay_state::okim6295_clock_w)
 {
-	uint32_t old = m_okim6295_clock[chip];
+	uint32_t old = m_okim6295_clock[Chip];
 	int shift = ((offset & 3) << 3);
-	m_okim6295_clock[chip] = (m_okim6295_clock[chip] & ~(mem_mask << shift)) | ((data & mem_mask) << shift);
-	if (old != m_okim6295_clock[chip])
-		m_okim6295[chip]->set_unscaled_clock(m_okim6295_clock[chip]);
+	m_okim6295_clock[Chip] = (m_okim6295_clock[Chip] & ~(mem_mask << shift)) | ((data & mem_mask) << shift);
+	if (old != m_okim6295_clock[Chip])
+		m_okim6295[Chip]->set_unscaled_clock(m_okim6295_clock[Chip]);
 
 }
 
-template<int chip>
+template<int Chip>
 WRITE8_MEMBER(vgmplay_state::okim6295_pin7_w)
 {
-	if ((data & mem_mask) != (m_okim6295_pin7[chip] & mem_mask))
+	if ((data & mem_mask) != (m_okim6295_pin7[Chip] & mem_mask))
 	{
-		COMBINE_DATA(&m_okim6295_pin7[chip]);
-		okim6295_device::static_set_pin7(*m_okim6295[chip], m_okim6295_pin7[chip]);
+		COMBINE_DATA(&m_okim6295_pin7[Chip]);
+		okim6295_device::static_set_pin7(*m_okim6295[Chip], m_okim6295_pin7[Chip]);
 	}
 }
 
-template<int chip>
+template<int Chip>
 WRITE8_MEMBER(vgmplay_device::okim6295_nmk112_enable_w)
 {
-	COMBINE_DATA(&m_okim6295_nmk112_enable[chip]);
+	COMBINE_DATA(&m_okim6295_nmk112_enable[Chip]);
 }
 
-template<int chip>
+template<int Chip>
 WRITE8_MEMBER(vgmplay_device::okim6295_bank_w)
 {
-	if ((data & mem_mask) != (m_okim6295_bank[chip] & mem_mask))
+	if ((data & mem_mask) != (m_okim6295_bank[Chip] & mem_mask))
 	{
-		COMBINE_DATA(&m_okim6295_bank[chip]);
+		COMBINE_DATA(&m_okim6295_bank[Chip]);
 	}
 }
 
-template<int chip>
+template<int Chip>
 WRITE8_MEMBER(vgmplay_device::okim6295_nmk112_bank_w)
 {
 	offset &= 3;
-	if ((data & mem_mask) != (m_okim6295_nmk112_bank[chip][offset] & mem_mask))
+	if ((data & mem_mask) != (m_okim6295_nmk112_bank[Chip][offset] & mem_mask))
 	{
-		COMBINE_DATA(&m_okim6295_nmk112_bank[chip][offset]);
+		COMBINE_DATA(&m_okim6295_nmk112_bank[Chip][offset]);
 	}
 }
 
