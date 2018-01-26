@@ -27,7 +27,7 @@ public:
 
 private:
 	static const options_entry s_option_entries[];
-	std::list<std::string const> m_descriptions;
+	std::list<std::string> m_descriptions;
 };
 
 #endif // MAME_FRONTEND_PLUGINOPTS_H
