@@ -160,7 +160,7 @@ uint8_t plus4_expansion_slot_device::cd_r(address_space &space, offs_t offset, u
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->plus4_cd_r(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+		data = m_card->plus4_cd_r(space, offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);
 	}
 
 	return data;
@@ -175,7 +175,7 @@ void plus4_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint
 {
 	if (m_card != nullptr)
 	{
-		m_card->plus4_cd_w(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+		m_card->plus4_cd_w(space, offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);
 	}
 }
 
