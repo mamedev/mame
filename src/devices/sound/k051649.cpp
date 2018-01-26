@@ -72,7 +72,6 @@ void k051649_device::device_start()
 
 	// build the mixer table
 	make_mixer_table(5);
-	save_item(NAME(m_mixer_buffer));
 }
 
 
