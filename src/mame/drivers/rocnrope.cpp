@@ -16,7 +16,6 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/74259.h"
 #include "machine/konami1.h"
-#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "screen.h"
 #include "speaker.h"
@@ -76,7 +75,7 @@ static ADDRESS_MAP_START( rocnrope_map, AS_PROGRAM, 8, rocnrope_state )
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x8080, 0x8087) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sound_data_w)
 	AM_RANGE(0x8182, 0x818d) AM_WRITE(rocnrope_interrupt_vector_w)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -238,8 +237,6 @@ MACHINE_CONFIG_START(rocnrope_state::rocnrope)
 	MCFG_PALETTE_INIT_OWNER(rocnrope_state, rocnrope)
 
 	/* sound hardware */
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
 	downcast<timeplt_audio_device *>(device)->timeplt_sound(config);
