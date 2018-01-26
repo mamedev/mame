@@ -452,7 +452,7 @@ void gcpinbal_state::machine_reset()
 MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32.0_MHz_XTAL/2) /* 16 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(gcpinbal_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gcpinbal_state,  gcpinbal_interrupt)
 
@@ -485,7 +485,7 @@ MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 	MCFG_DEVICE_ADD("adpcm_select", HCT157, 0)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm6585_device, data_w))
 
-	MCFG_SOUND_ADD("msm", MSM6585, 640.0_kHz_XTAL)
+	MCFG_SOUND_ADD("msm", MSM6585, 640_kHz_XTAL)
 	MCFG_MSM6585_VCK_CALLBACK(WRITELINE(gcpinbal_state, gcp_adpcm_int))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* 16 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

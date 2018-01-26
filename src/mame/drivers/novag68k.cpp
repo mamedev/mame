@@ -182,7 +182,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(novag68k_state::diablo68k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_CPU_PERIODIC_INT_DRIVER(novag68k_state, irq2_line_hold, 256) // guessed
 	MCFG_CPU_PROGRAM_MAP(diablo68k_map)
 

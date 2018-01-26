@@ -695,7 +695,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sderby_state::shinygld)
 
-	MCFG_CPU_ADD("maincpu", M68000, 24.0_MHz_XTAL / 2) // verified
+	MCFG_CPU_ADD("maincpu", M68000, 24_MHz_XTAL / 2) // verified
 	MCFG_CPU_PROGRAM_MAP(shinygld_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sderby_state, irq4_line_hold)
 
