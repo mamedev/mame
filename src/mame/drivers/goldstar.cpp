@@ -250,7 +250,7 @@
 
 namespace {
 
-constexpr XTAL MASTER_CLOCK = 12.0_MHz_XTAL;
+constexpr XTAL MASTER_CLOCK = 12_MHz_XTAL;
 constexpr XTAL CPU_CLOCK    = MASTER_CLOCK / 4;
 constexpr XTAL PSG_CLOCK    = MASTER_CLOCK / 4;
 constexpr XTAL AY_CLOCK     = MASTER_CLOCK / 8;
@@ -9114,12 +9114,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(unkch_state::bonusch)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 12.0_MHz_XTAL / 2)
+	MCFG_CPU_ADD("maincpu", Z80, 12_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(bonusch_map)
 	MCFG_CPU_IO_MAP(bonusch_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
 
-	MCFG_CPU_ADD("mcu", I80C51, 12.0_MHz_XTAL)
+	MCFG_CPU_ADD("mcu", I80C51, 12_MHz_XTAL)
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */

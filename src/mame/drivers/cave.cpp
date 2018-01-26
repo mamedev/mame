@@ -2099,7 +2099,7 @@ MACHINE_RESET_MEMBER(cave_state,cave)
 MACHINE_CONFIG_START(cave_state::dfeveron)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(dfeveron_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
@@ -2140,7 +2140,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::ddonpach)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(ddonpach_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
@@ -2180,7 +2180,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::donpachi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(donpachi_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
@@ -2227,7 +2227,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::esprade)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(esprade_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
@@ -2267,7 +2267,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::gaia)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(gaia_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
@@ -2308,7 +2308,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::guwange)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(guwange_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
@@ -2347,11 +2347,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::hotdogst)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32.0_MHz_XTAL/2)
+	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL/2)
 	MCFG_CPU_PROGRAM_MAP(hotdogst_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32.0_MHz_XTAL/8)
+	MCFG_CPU_ADD("audiocpu", Z80, 32_MHz_XTAL/8)
 	MCFG_CPU_PROGRAM_MAP(hotdogst_sound_map)
 	MCFG_CPU_IO_MAP(hotdogst_sound_portmap)
 
@@ -2380,14 +2380,14 @@ MACHINE_CONFIG_START(cave_state::hotdogst)
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 32.0_MHz_XTAL/8)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 32_MHz_XTAL/8)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", 32.0_MHz_XTAL/16, PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 32_MHz_XTAL/16, PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 MACHINE_CONFIG_END
@@ -2400,7 +2400,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::korokoro)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(korokoro_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
@@ -2445,11 +2445,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::mazinger)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(mazinger_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 4.0_MHz_XTAL) // Bidirectional communication
+	MCFG_CPU_ADD("audiocpu", Z80, 4_MHz_XTAL) // Bidirectional communication
 	MCFG_CPU_PROGRAM_MAP(mazinger_sound_map)
 	MCFG_CPU_IO_MAP(mazinger_sound_portmap)
 
@@ -2481,7 +2481,7 @@ MACHINE_CONFIG_START(cave_state::mazinger)
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 4.0_MHz_XTAL)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 4_MHz_XTAL)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
@@ -2501,11 +2501,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::metmqstr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 32.0_MHz_XTAL / 2)
+	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(metmqstr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 32.0_MHz_XTAL / 4)
+	MCFG_CPU_ADD("audiocpu", Z80, 32_MHz_XTAL / 4)
 	MCFG_CPU_PROGRAM_MAP(metmqstr_sound_map)
 	MCFG_CPU_IO_MAP(metmqstr_sound_portmap)
 
@@ -2537,15 +2537,15 @@ MACHINE_CONFIG_START(cave_state::metmqstr)
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 16.0_MHz_XTAL / 4)
+	MCFG_YM2151_ADD("ymsnd", 16_MHz_XTAL / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 
-	MCFG_OKIM6295_ADD("oki1", 32.0_MHz_XTAL / 16 , PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", 32_MHz_XTAL / 16 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 
-	MCFG_OKIM6295_ADD("oki2", 32.0_MHz_XTAL / 16 , PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", 32_MHz_XTAL / 16 , PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 MACHINE_CONFIG_END
@@ -2560,7 +2560,7 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28.0_MHz_XTAL / 2)
+	MCFG_CPU_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(pacslot_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
@@ -2592,12 +2592,12 @@ MACHINE_CONFIG_START(cave_state::pacslot)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", 28.0_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", 28_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	// oki2 chip is present but its rom socket is unpopulated
-	MCFG_OKIM6295_ADD("oki2", 28.0_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki2", 28_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2618,7 +2618,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( cave_state::timer_lev2_cb )
 MACHINE_CONFIG_START(cave_state::ppsatan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(ppsatan_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt_ppsatan)
 
@@ -2681,11 +2681,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::pwrinst2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16.0_MHz_XTAL) /* 16 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL) /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(pwrinst2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 16.0_MHz_XTAL / 2)    /* 8 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, 16_MHz_XTAL / 2)    /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(pwrinst2_sound_map)
 	MCFG_CPU_IO_MAP(pwrinst2_sound_portmap)
 
@@ -2714,17 +2714,17 @@ MACHINE_CONFIG_START(cave_state::pwrinst2)
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 16.0_MHz_XTAL / 4)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 16_MHz_XTAL / 4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 	MCFG_SOUND_ROUTE(2, "mono", 0.40)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki1", 3.0_MHz_XTAL, PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki1", 3_MHz_XTAL, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki2", 3.0_MHz_XTAL, PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki2", 3_MHz_XTAL, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_DEVICE_ADD("nmk112", NMK112, 0)
@@ -2752,14 +2752,14 @@ MACHINE_RESET_MEMBER(cave_state,sailormn)
 MACHINE_CONFIG_START(cave_state::sailormn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(sailormn_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
 	// could be a wachdog, but if it is then our watchdog address is incorrect as there are periods where the game doesn't write it.
 	MCFG_TIMER_DRIVER_ADD("startup", cave_state, sailormn_startup)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 8.0_MHz_XTAL) // Bidirectional Communication
+	MCFG_CPU_ADD("audiocpu", Z80, 8_MHz_XTAL) // Bidirectional Communication
 	MCFG_CPU_PROGRAM_MAP(sailormn_sound_map)
 	MCFG_CPU_IO_MAP(sailormn_sound_portmap)
 
@@ -2790,7 +2790,7 @@ MACHINE_CONFIG_START(cave_state::sailormn)
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", 16.0_MHz_XTAL/4)
+	MCFG_YM2151_ADD("ymsnd", 16_MHz_XTAL/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
@@ -2815,7 +2815,7 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28.0_MHz_XTAL / 2)
+	MCFG_CPU_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(tekkencw_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
@@ -2847,7 +2847,7 @@ MACHINE_CONFIG_START(cave_state::tekkencw)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", 28.0_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", 28_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -2869,7 +2869,7 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 28.0_MHz_XTAL / 2)
+	MCFG_CPU_ADD("maincpu", M68000, 28_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(tjumpman_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
@@ -2901,7 +2901,7 @@ MACHINE_CONFIG_START(cave_state::tjumpman)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", 28.0_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki1", 28_MHz_XTAL / 28, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
@@ -2916,7 +2916,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cave_state::uopoko)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16.0_MHz_XTAL)
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(uopoko_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
