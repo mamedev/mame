@@ -86,7 +86,8 @@ public:
 			m_tiles(*this,"tiles"),
 			m_wram(*this,"wram"),
 			m_tiles32(*this,"tiles32"),
-			m_wram32(*this,"wram32") {
+			m_wram32(*this,"wram32"),
+			m_okibank(*this,"okibank") {
 			m_has_extra_gfx = 0;
 		}
 
@@ -102,6 +103,8 @@ public:
 	optional_shared_ptr<uint16_t> m_wram;
 	optional_shared_ptr<uint32_t> m_tiles32;
 	optional_shared_ptr<uint32_t> m_wram32;
+	
+	optional_memory_bank m_okibank;
 
 	// driver init configuration
 	int m_flip_bit;
@@ -322,7 +325,7 @@ F94B
 
 WRITE32_MEMBER(vamphalf_state::finalgdr_oki_bank_w)
 {
-	membank("okibank")->set_entry((data & 0x300) >> 8);
+	m_okibank->set_entry((data & 0x300) >> 8);
 }
 
 WRITE32_MEMBER(vamphalf_state::finalgdr_backupram_bank_w)
@@ -360,19 +363,19 @@ WRITE32_MEMBER(vamphalf_state::finalgdr_prize_w)
 
 WRITE32_MEMBER(vamphalf_state::aoh_oki_bank_w)
 {
-	membank("okibank")->set_entry(data & 0x3);
+	m_okibank->set_entry(data & 0x3);
 }
 
 WRITE16_MEMBER(vamphalf_state::boonggab_oki_bank_w)
 {
 	if(offset)
-		membank("okibank")->set_entry(data & 0x7);
+		m_okibank->set_entry(data & 0x7);
 }
 
 
 WRITE16_MEMBER(vamphalf_state::mrkicker_oki_bank_w)
 {
-	membank("okibank")->set_entry(data & 0x3);
+	m_okibank->set_entry(data & 0x3);
 }
 
 WRITE16_MEMBER(vamphalf_state::boonggab_prize_w)
@@ -1054,16 +1057,10 @@ MACHINE_CONFIG_START(vamphalf_state::sound_ym_oki)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_ym_banked_oki)
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_FRAGMENT_ADD(sound_ym_oki)
 
-	MCFG_YM2151_ADD("ymsnd", XTAL(28'000'000)/8) /* 3.5MHz */
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MCFG_OKIM6295_ADD("oki", XTAL(28'000'000)/16 , PIN7_HIGH) /* 1.75MHz */
+	MCFG_DEVICE_MODIFY("oki")
 	MCFG_DEVICE_ADDRESS_MAP(0, banked_oki_map)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vamphalf_state::sound_suplup)
@@ -2571,9 +2568,9 @@ void vamphalf_state::banked_oki(const char *region)
 	uint8_t *ROM = memregion(region)->base();
 	uint32_t size = memregion(region)->bytes();
 	if (size > 0x40000)
-		membank("okibank")->configure_entries(0, size/0x20000, &ROM[0], 0x20000);
+		m_okibank->configure_entries(0, size/0x20000, &ROM[0], 0x20000);
 	else
-		membank("okibank")->set_base(&ROM[0x20000]);
+		m_okibank->set_base(&ROM[0x20000]);
 }
 
 READ16_MEMBER(vamphalf_state::vamphalf_speedup_r)
