@@ -22,7 +22,7 @@ DEFINE_DEVICE_TYPE(ELECTRON_ROMBOX, electron_rombox_device, "electron_rombox", "
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( rombox )
+//  INPUT_PORTS( rombox )
 //-------------------------------------------------
 
 static INPUT_PORTS_START( rombox )
@@ -39,13 +39,17 @@ static INPUT_PORTS_START( rombox )
 INPUT_PORTS_END
 
 //-------------------------------------------------
-//  device_add_mconfig - add device configuration
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 ioport_constructor electron_rombox_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( rombox );
 }
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
 
 MACHINE_CONFIG_START(electron_rombox_device::device_add_mconfig)
 	/* rom sockets */
