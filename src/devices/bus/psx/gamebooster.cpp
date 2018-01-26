@@ -81,9 +81,6 @@ READ16_MEMBER(psx_gamebooster_device::exp_r)
 		return m_rom->base()[(offset * 2) & 0x3ffff] | (m_rom->base()[((offset * 2) + 1) & 0x3ffff] << 8);
 	else
 	{
-		// TODO, wrong
-		//printf("exp_r %04x\n", offset*2);
-
 		offset -= 0x20000;
 		uint16_t retval = 0;;
 
@@ -98,15 +95,12 @@ READ16_MEMBER(psx_gamebooster_device::exp_r)
 
 WRITE16_MEMBER(psx_gamebooster_device::exp_w)
 {
-	//printf("exp_w %04x %04x\n", offset*2, data);
-
 	if (offset < 0x20000)
 	{
 
 	}
 	else
 	{
-		// TODO, wrong
 		offset -= 0x20000;
 
 		if (mem_mask & 0x00ff) m_cartslot->write_bank(space, (offset*2)+0, data);
