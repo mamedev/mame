@@ -144,7 +144,7 @@ public:
 	void reset_all_subcpus(int state);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
-
+	
 	// C123 Tilemap Emulation
 	// TODO: merge with namcos1.cpp implementation and convert to device
 public:
