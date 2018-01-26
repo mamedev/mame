@@ -30,7 +30,8 @@ public:
 		m_palette2(*this, "rpalette"),
 		m_lscreen(*this, "lscreen"),
 		m_rscreen(*this, "rscreen"),
-		m_keys(*this, "KEY.%u", 0)
+		m_keys(*this, "KEY.%u", 0),
+		m_ymf_bank(*this, "ymfbank%u", 0)
 	{ }
 
 	/* memory pointers */
@@ -40,7 +41,7 @@ public:
 	required_shared_ptr<uint32_t> m_bgpen_2;
 	required_shared_ptr<uint32_t> m_paletteram;
 
-	memory_bank *m_ymf_bank[4];
+	required_memory_bank_array<4> m_ymf_bank;
 	uint8_t m_ymf_max_bank;
 	uint8_t m_io_select;
 
