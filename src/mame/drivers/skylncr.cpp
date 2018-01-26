@@ -1889,9 +1889,11 @@ ROM_START( neraidou )
 ROM_END
 
 /*
-  Missing In Action / Ypovrixio (Submarine).
+  Missing In Action.
   from Vegas.
 
+  People call it Ypovrixio (Submarine).
+  But is not the real title.
 */
 ROM_START( miaction )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -2119,7 +2121,7 @@ GAME( 1995, madzoo,    0,        skylncr,  skylncr,  skylncr_state,  0,        R
 GAME( 1995, leader,    0,        skylncr,  leader,   skylncr_state,  0,        ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
 GAME( 199?, gallag50,  0,        skylncr,  gallag50, skylncr_state,  0,        ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
 GAME( 199?, neraidou,  0,        neraidou, neraidou, skylncr_state,  0,        ROT0, "bootleg",              "Neraidoula",                                     0 )
-GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  miaction, ROT0, "Vegas",                "Missing In Action / Ypovrixio (Submarine)",      MACHINE_NOT_WORKING )
+GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  miaction, ROT0, "Vegas",                "Missing In Action",                              MACHINE_NOT_WORKING )
 GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  miaction, ROT0, "bootleg",              "Tiger (slot)",                                   MACHINE_NOT_WORKING )
 GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  0,        ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
 GAME( 1995, bdream97,  0,        bdream97, skylncr,  skylncr_state,  0,        ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
