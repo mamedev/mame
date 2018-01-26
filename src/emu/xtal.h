@@ -46,22 +46,15 @@ Usage:
 class XTAL {
 public:
 
-	constexpr XTAL(double base_clock) : m_base_clock(base_clock), m_current_clock(base_clock) {}
+	constexpr explicit XTAL(double base_clock) : m_base_clock(base_clock), m_current_clock(base_clock) {}
 
 	constexpr double dvalue() const noexcept { return m_current_clock; }
 	constexpr u32    value()  const noexcept { return u32(m_current_clock); }
 	constexpr double base()   const noexcept { return m_base_clock; }
 
-	constexpr XTAL operator *(int          mult) const noexcept { return XTAL(m_base_clock, m_current_clock * mult); }
-	constexpr XTAL operator *(unsigned int mult) const noexcept { return XTAL(m_base_clock, m_current_clock * mult); }
-	constexpr XTAL operator *(double       mult) const noexcept { return XTAL(m_base_clock, m_current_clock * mult); }
-	constexpr XTAL operator /(int          div)  const noexcept { return XTAL(m_base_clock, m_current_clock / div); }
-	constexpr XTAL operator /(unsigned int div)  const noexcept { return XTAL(m_base_clock, m_current_clock / div); }
-	constexpr XTAL operator /(double       div)  const noexcept { return XTAL(m_base_clock, m_current_clock / div); }
+	template <typename T> constexpr XTAL operator *(T &&mult) const noexcept { return XTAL(m_base_clock, m_current_clock * mult); }
+	template <typename T> constexpr XTAL operator /(T &&div) const noexcept { return XTAL(m_base_clock, m_current_clock / div); }
 
-	friend constexpr XTAL operator /(int          div,  const XTAL &xtal);
-	friend constexpr XTAL operator /(unsigned int div,  const XTAL &xtal);
-	friend constexpr XTAL operator /(double       div,  const XTAL &xtal);
 	friend constexpr XTAL operator *(int          mult, const XTAL &xtal);
 	friend constexpr XTAL operator *(unsigned int mult, const XTAL &xtal);
 	friend constexpr XTAL operator *(double       mult, const XTAL &xtal);
@@ -81,9 +74,8 @@ private:
 	static void check_ordering();
 };
 
-constexpr XTAL operator /(int          div,  const XTAL &xtal) { return XTAL(xtal.base(), div  / xtal.dvalue()); }
-constexpr XTAL operator /(unsigned int div,  const XTAL &xtal) { return XTAL(xtal.base(), div  / xtal.dvalue()); }
-constexpr XTAL operator /(double       div,  const XTAL &xtal) { return XTAL(xtal.base(), div  / xtal.dvalue()); }
+template <typename T> constexpr auto operator /(T &&div, const XTAL &xtal) { return div / xtal.dvalue(); }
+
 constexpr XTAL operator *(int          mult, const XTAL &xtal) { return XTAL(xtal.base(), mult * xtal.dvalue()); }
 constexpr XTAL operator *(unsigned int mult, const XTAL &xtal) { return XTAL(xtal.base(), mult * xtal.dvalue()); }
 constexpr XTAL operator *(double       mult, const XTAL &xtal) { return XTAL(xtal.base(), mult * xtal.dvalue()); }

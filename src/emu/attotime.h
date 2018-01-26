@@ -72,7 +72,7 @@ inline constexpr attoseconds_t DOUBLE_TO_ATTOSECONDS(double x) { return attoseco
 // convert between hertz (as a double) and attoseconds
 inline constexpr double ATTOSECONDS_TO_HZ(attoseconds_t x) { return double(ATTOSECONDS_PER_SECOND) / double(x); }
 template <typename T> inline constexpr attoseconds_t HZ_TO_ATTOSECONDS(T &&x) { return attoseconds_t(ATTOSECONDS_PER_SECOND / x); }
-inline constexpr attoseconds_t HZ_TO_ATTOSECONDS(const XTAL &x) { return attoseconds_t(ATTOSECONDS_PER_SECOND / x.dvalue()); }
+inline constexpr attoseconds_t HZ_TO_ATTOSECONDS(const XTAL &x) { return attoseconds_t(ATTOSECONDS_PER_SECOND / x); }
 
 // macros for converting other seconds types to attoseconds
 template <typename T> inline constexpr attoseconds_t ATTOSECONDS_IN_SEC(T &&x) { return attoseconds_t(x) * ATTOSECONDS_PER_SECOND; }
