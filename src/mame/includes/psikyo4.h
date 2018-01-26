@@ -23,6 +23,7 @@ public:
 		m_bgpen_1(*this, "bgpen_1"),
 		m_bgpen_2(*this, "bgpen_2"),
 		m_paletteram(*this, "paletteram"),
+		m_ymf_bank(*this, "ymfbank%u", 0),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -30,8 +31,7 @@ public:
 		m_palette2(*this, "rpalette"),
 		m_lscreen(*this, "lscreen"),
 		m_rscreen(*this, "rscreen"),
-		m_keys(*this, "KEY.%u", 0),
-		m_ymf_bank(*this, "ymfbank%u", 0)
+		m_keys(*this, "KEY.%u", 0)
 	{ }
 
 	/* memory pointers */
