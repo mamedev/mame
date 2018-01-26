@@ -35,6 +35,9 @@
 
 #pragma once
 
+#include "emucore.h"
+#include "xtal.h"
+
 #include <math.h>
 #undef min
 #undef max
@@ -48,13 +51,13 @@ typedef s64 attoseconds_t;
 typedef s32 seconds_t;
 
 // core definitions
-const attoseconds_t ATTOSECONDS_PER_SECOND_SQRT = 1'000'000'000;
-const attoseconds_t ATTOSECONDS_PER_SECOND = ATTOSECONDS_PER_SECOND_SQRT * ATTOSECONDS_PER_SECOND_SQRT;
-const attoseconds_t ATTOSECONDS_PER_MILLISECOND = ATTOSECONDS_PER_SECOND / 1'000;
-const attoseconds_t ATTOSECONDS_PER_MICROSECOND = ATTOSECONDS_PER_SECOND / 1'000'000;
-const attoseconds_t ATTOSECONDS_PER_NANOSECOND = ATTOSECONDS_PER_SECOND / 1'000'000'000;
+constexpr attoseconds_t ATTOSECONDS_PER_SECOND_SQRT = 1'000'000'000;
+constexpr attoseconds_t ATTOSECONDS_PER_SECOND = ATTOSECONDS_PER_SECOND_SQRT * ATTOSECONDS_PER_SECOND_SQRT;
+constexpr attoseconds_t ATTOSECONDS_PER_MILLISECOND = ATTOSECONDS_PER_SECOND / 1'000;
+constexpr attoseconds_t ATTOSECONDS_PER_MICROSECOND = ATTOSECONDS_PER_SECOND / 1'000'000;
+constexpr attoseconds_t ATTOSECONDS_PER_NANOSECOND = ATTOSECONDS_PER_SECOND / 1'000'000'000;
 
-const seconds_t ATTOTIME_MAX_SECONDS = 1'000'000'000;
+constexpr seconds_t ATTOTIME_MAX_SECONDS = 1'000'000'000;
 
 
 
@@ -69,8 +72,7 @@ inline constexpr attoseconds_t DOUBLE_TO_ATTOSECONDS(double x) { return attoseco
 // convert between hertz (as a double) and attoseconds
 inline constexpr double ATTOSECONDS_TO_HZ(attoseconds_t x) { return double(ATTOSECONDS_PER_SECOND) / double(x); }
 template <typename T> inline constexpr attoseconds_t HZ_TO_ATTOSECONDS(T &&x) { return attoseconds_t(ATTOSECONDS_PER_SECOND / x); }
-inline constexpr attoseconds_t HZ_TO_ATTOSECONDS(const XTAL &x) { return attoseconds_t(ATTOSECONDS_PER_SECOND / x.dvalue()); }
-inline constexpr attoseconds_t HZ_TO_ATTOSECONDS(XTAL &&x) { return attoseconds_t(ATTOSECONDS_PER_SECOND / x.dvalue()); }
+inline constexpr attoseconds_t HZ_TO_ATTOSECONDS(const XTAL &x) { return attoseconds_t(ATTOSECONDS_PER_SECOND / x); }
 
 // macros for converting other seconds types to attoseconds
 template <typename T> inline constexpr attoseconds_t ATTOSECONDS_IN_SEC(T &&x) { return attoseconds_t(x) * ATTOSECONDS_PER_SECOND; }

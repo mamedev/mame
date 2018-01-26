@@ -1864,6 +1864,13 @@ ROM_START( leader )
 	ROM_LOAD16_BYTE( "leadergfx2.dmp22", 0x40001, 0x20000, CRC(04cc0118) SHA1(016ccbe7daf8c4676830aadcc906a64e2826d11a) )
 ROM_END
 
+/*
+  Neraidoula
+
+  There is a complete screen of the game Out Run
+  inside the graphics ROMs.
+  Maybe it's a leftover, or it's a sort of stealth game.
+*/
 ROM_START( neraidou )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "aepi.prg",  0x00000, 0x10000, CRC(7ac74830) SHA1(1e3322341711e329b40d94ac6ec25fbafb1d4d62) )
@@ -1882,9 +1889,11 @@ ROM_START( neraidou )
 ROM_END
 
 /*
-  Missing In Action / Ypovrixio (Submarine).
+  Missing In Action.
   from Vegas.
 
+  People call it Ypovrixio (Submarine).
+  But is not the real title.
 */
 ROM_START( miaction )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -2111,8 +2120,8 @@ GAME( 1999, mbutrfly,  0,        mbutrfly, mbutrfly, skylncr_state,  0,        R
 GAME( 1995, madzoo,    0,        skylncr,  skylncr,  skylncr_state,  0,        ROT0, "Bordun International", "Mad Zoo (version U450C)",                        0 )
 GAME( 1995, leader,    0,        skylncr,  leader,   skylncr_state,  0,        ROT0, "bootleg",              "Leader (version Z 2E, Greece)",                  0 )
 GAME( 199?, gallag50,  0,        skylncr,  gallag50, skylncr_state,  0,        ROT0, "bootleg",              "Gallag Video Game / Petalouda (Butterfly, x50)", 0 )
-GAME( 199?, neraidou,  0,        neraidou, neraidou, skylncr_state,  0,        ROT0, "bootleg",              "Neraidoula (Fairy Butterfly)",                   0 )
-GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  miaction, ROT0, "Vegas",                "Missing In Action / Ypovrixio (Submarine)",      MACHINE_NOT_WORKING )
+GAME( 199?, neraidou,  0,        neraidou, neraidou, skylncr_state,  0,        ROT0, "bootleg",              "Neraidoula",                                     0 )
+GAME( 199?, miaction,  0,        skylncr,  skylncr,  skylncr_state,  miaction, ROT0, "Vegas",                "Missing In Action",                              MACHINE_NOT_WORKING )
 GAME( 199?, tigerslt,  0,        skylncr,  skylncr,  skylncr_state,  miaction, ROT0, "bootleg",              "Tiger (slot)",                                   MACHINE_NOT_WORKING )
 GAME( 199?, sstar97,   0,        sstar97,  sstar97,  skylncr_state,  0,        ROT0, "Bordun International", "Super Star 97 / Ming Xing 97 (version V153B)",   0 )
 GAME( 1995, bdream97,  0,        bdream97, skylncr,  skylncr_state,  0,        ROT0, "bootleg (KKK)",        "Hudie Meng 97",                                  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

@@ -15,6 +15,14 @@
   ports, descriptions and a lot of things... :)
 
 
+  Pyon Pyon series:
+
+  ぴょんぴょん (Pyon Pyon),                1988 Success / Taiyo Jidoki.
+  くるくるぴょんぴょん (Kuru Kuru Pyon Pyon), 1990 Success / Taiyo Jidoki.
+  ぴょんぴょんジャンプ (Pyon Pyon Jump),     1991 Success / Taiyo Jidoki.
+  スイスイぴょんぴょん (Sui Sui Pyon Pyon),  1992 Success / Taiyo Jidoki.
+
+
 ************************************************************************************
 
   Technical Notes....
@@ -931,6 +939,7 @@ MACHINE_CONFIG_END
 *************************************************/
 
 /*  Kuru Kuru Pyon Pyon.
+    くるくるぴょんぴょん
     1990, Success / Taiyo Jidoki.
 */
 ROM_START( kurukuru )
@@ -955,6 +964,7 @@ ROM_START( kurukuru )
 ROM_END
 
 /*  Pyon Pyon Jump.
+    ぴょんぴょんジャンプ
     Ver 1.40.
     1991, Success / Taiyo Jidoki.
 */
@@ -990,5 +1000,5 @@ GAME( 1991, ppj,      0,      ppj,      ppj,      kurukuru_state, 0,    ROT0, "S
 
 // unemulated....
 
-//    1988, Success / Taiyo Jidoki, Pyon Pyon
-//    1992, Success / Taiyo Jidoki, Sui Sui Pyon Pyon
+//  ぴょんぴょん (Pyon Pyon),                1988 Success / Taiyo Jidoki.
+//  スイスイぴょんぴょん (Sui Sui Pyon Pyon),  1992 Success / Taiyo Jidoki.

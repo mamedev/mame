@@ -56,7 +56,6 @@
 
 #include "cpu/m6809/m6809.h"
 #include "machine/74259.h"
-#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "screen.h"
 #include "speaker.h"
@@ -141,7 +140,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
 	AM_RANGE(0x8200, 0x8207) AM_MIRROR(0x00f8) AM_READNOP AM_DEVWRITE("mainlatch", ls259_device, write_d0)
 	AM_RANGE(0x8300, 0x8300) AM_MIRROR(0x00ff) AM_WRITE(tutankhm_bankselect_w)
 	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0x00ff) AM_WRITE(sound_on_w)
-	AM_RANGE(0x8700, 0x8700) AM_MIRROR(0x00ff) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x8700, 0x8700) AM_MIRROR(0x00ff) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sound_data_w)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xffff) AM_ROM
@@ -257,8 +256,6 @@ MACHINE_CONFIG_START(tutankhm_state::tutankhm)
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
 	/* sound hardware */
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
 	downcast<timeplt_audio_device *>(device)->timeplt_sound(config);

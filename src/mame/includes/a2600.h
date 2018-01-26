@@ -13,28 +13,27 @@
 
 #pragma once
 
-#define USE_NEW_RIOT 0
-
-
-#define CONTROL1_TAG    "joyport1"
-#define CONTROL2_TAG    "joyport2"
-
+#include "bus/vcs/compumat.h"
+#include "bus/vcs/dpc.h"
+#include "bus/vcs/harmony_melody.h"
+#include "bus/vcs/rom.h"
+#include "bus/vcs/scharger.h"
+#include "bus/vcs/vcs_slot.h"
+#include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m6507.h"
 #include "sound/tiaintf.h"
 #include "video/tia.h"
-#include "bus/vcs/vcs_slot.h"
-#include "bus/vcs/rom.h"
-#include "bus/vcs/dpc.h"
-#include "bus/vcs/harmony_melody.h"
-#include "bus/vcs/scharger.h"
-#include "bus/vcs/compumat.h"
-#include "bus/vcs_ctrl/ctrl.h"
+
+#define USE_NEW_RIOT 0
 
 #if USE_NEW_RIOT
 #include "machine/mos6530n.h"
 #else
 #include "machine/6532riot.h"
 #endif
+
+#define CONTROL1_TAG    "joyport1"
+#define CONTROL2_TAG    "joyport2"
 
 
 class a2600_state : public driver_device
