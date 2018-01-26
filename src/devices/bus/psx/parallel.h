@@ -32,11 +32,9 @@ public:
 	DECLARE_READ16_MEMBER(exp_r);
 	DECLARE_WRITE16_MEMBER(exp_w);
 
-	bool hascard()
+	const bool hascard() const
 	{
-		if (m_card)
-			return true;
-		else return false;
+		return bool(m_card);
 	};
 
 protected:

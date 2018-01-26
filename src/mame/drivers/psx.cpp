@@ -70,7 +70,7 @@ public:
 	void psj(machine_config &config);
 
 private:
-	optional_device<psx_parallel_slot_device> m_parallel;
+	required_device<psx_parallel_slot_device> m_parallel;
 };
 
 
