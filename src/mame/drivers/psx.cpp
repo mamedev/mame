@@ -12,6 +12,7 @@
 #include "emu.h"
 
 #include "bus/psx/ctlrport.h"
+#include "bus/psx/parallel.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/psx/psx.h"
 #include "imagedev/chd_cd.h"
@@ -35,7 +36,8 @@ public:
 	psx1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, "maincpu:ram")
+		m_ram(*this, "maincpu:ram"),
+		m_parallel(*this, "parallel")
 	{
 	}
 
@@ -66,6 +68,9 @@ public:
 	void pse(machine_config &config);
 	void psu(machine_config &config);
 	void psj(machine_config &config);
+
+private:
+	optional_device<psx_parallel_slot_device> m_parallel;
 };
 
 
@@ -407,6 +412,13 @@ int psx1_state::load_psf(std::vector<uint8_t> buffer)
 
 READ16_MEMBER(psx1_state::parallel_r)
 {
+	if (m_parallel->hascard())
+	{
+		uint16_t dat = m_parallel->exp_r(space,offset,mem_mask);
+		return dat;
+	}
+
+	// all this could probably be a fake parallel device instead?
 	const uint16_t bootloader[] =
 	{
 		0x00b0, 0x1f00, 0x694c, 0x6563, 0x736e, 0x6465, 0x6220, 0x2079,
@@ -522,6 +534,8 @@ MACHINE_CONFIG_START(psx1_state::psj)
 	MCFG_QUICKLOAD_ADD("quickload", psx1_state, psx_exe_load, "cpe,exe,psf,psx", 0)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
+
+	MCFG_PSX_PARALLEL_SLOT_ADD("parallel", psx_parallel_devices, nullptr)
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_PSX_CD_READ_HANDLER( DEVREAD8( PSXCD_TAG, psxcd_device, read ) )

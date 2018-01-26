@@ -3073,6 +3073,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/psx/parallel.h,BUSES["PSX_PARALLEL"] = true
+---------------------------------------------------
+
+if (BUSES["PSX_PARALLEL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/psx/parallel.cpp",
+		MAME_DIR .. "src/devices/bus/psx/parallel.h",
+		MAME_DIR .. "src/devices/bus/psx/gamebooster.cpp",
+		MAME_DIR .. "src/devices/bus/psx/gamebooster.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/nasbus/nasbus.h,BUSES["NASBUS"] = true
 ---------------------------------------------------
 
