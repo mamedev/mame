@@ -668,11 +668,11 @@ WRITE_LINE_MEMBER(dwarfd_state::drq_w)
 
 static const gfx_layout tiles8x8_layout =
 {
-	4,8,
+	8,8,
 	RGN_FRAC(1,1),
 	3,
 	{ 3,2,1 },
-	{ STEP8(0, 4) },
+	{ 0, 0, 4, 4, 8, 8, 12, 12 },
 	{ STEP8(0, 16) },
 	8*16
 };
