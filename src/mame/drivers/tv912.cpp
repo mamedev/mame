@@ -10,7 +10,9 @@
     suffix indicated a typewriter-style keyboard. The TVI-920 added a row of
     function keys but was otherwise mostly identical to the TVI-912. The
     TVI-912C keyboard matrix and ribbon connector pinout are almost the same
-    as in the TVI-910.
+    as in the TVI-910. The system self-test can be triggered by shorting two
+    wires on the keyboard unit near the connector (TODO: figure out how to do
+    this on the emulated system).
 
     Settings for these terminals are controlled by DIP switches, which are not
     read by the CPU except for those of S4 (which is usually left as a block of
@@ -943,5 +945,5 @@ ROM_START( tv912b )
 	ROM_LOAD( "televideo912b_rom_a3.bin", 0x0000, 0x0800, CRC(bb9a7fbd) SHA1(5f1c4d41b25bd3ca4dbc336873362935daf283da) ) // AMI 8110QV (A3-2)
 ROM_END
 
-COMP( 1978, tv912c, 0,      0, tv912, tv912c, tv912_state, 0, "TeleVideo Systems", "TVI-912C", MACHINE_NOT_WORKING )
-COMP( 1978, tv912b, tv912c, 0, tv912, tv912b, tv912_state, 0, "TeleVideo Systems", "TVI-912B", MACHINE_NOT_WORKING )
+COMP( 1978, tv912c, 0,      0, tv912, tv912c, tv912_state, 0, "TeleVideo Systems", "TVI-912C", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // attributes not emulated
+COMP( 1978, tv912b, tv912c, 0, tv912, tv912b, tv912_state, 0, "TeleVideo Systems", "TVI-912B", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // attributes not emulated
