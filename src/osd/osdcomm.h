@@ -61,7 +61,7 @@
 #elif defined(__GNUC__) && __GNUC__ >= 7
 #define FALLTHROUGH             [[gnu::fallthrough]];
 #else
-#define FALLTHROUGH             // fallthrough
+#define FALLTHROUGH
 #endif
 
 
