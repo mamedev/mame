@@ -346,6 +346,9 @@ MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 	MCFG_SOUND_ROUTE(DECO_YM2151_OUT1, "rspeaker", 0.45)
 	MCFG_SOUND_ROUTE(DECO_OKI1_OUT, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(DECO_OKI1_OUT, "rspeaker", 0.50)
+
+	MCFG_DEVICE_MODIFY(DECOSND_OKI1_TAG)
+	MCFG_DEVICE_CLOCK(XTAL(28'000'000)/28)
 MACHINE_CONFIG_END
 
 /******************************************************************************/
