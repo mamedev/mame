@@ -84,7 +84,7 @@ uint8_t electron_pwrjoy_device::expbus_r(address_space &space, offs_t offset, ui
 	{
 		if (m_romsel == 15)
 		{
-			data = memregion("exp_rom")->base()[offset & 0x1fff];
+			data = m_exp_rom->base()[offset & 0x1fff];
 		}
 	}
 	else if (offset == 0xfcc0)
