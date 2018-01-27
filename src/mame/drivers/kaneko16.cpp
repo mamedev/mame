@@ -160,6 +160,16 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_coin_lockout_w)
 
 ***************************************************************************/
 
+void kaneko16_state::kaneko16_common_oki_bank_w(int bankno, int bank, size_t fixedsize, size_t bankedsize)
+{
+	size_t length = (m_okiregion[bankno]->bytes() - fixedsize) / bankedsize;
+
+	if (bank < length)
+	{
+		m_okibank[bankno]->set_enrty(bank);
+	}
+}
+
 WRITE16_MEMBER(kaneko16_state::kaneko16_soundlatch_w)
 {
 	if (ACCESSING_BITS_8_15)
@@ -170,39 +180,31 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_soundlatch_w)
 }
 
 /* Two identically mapped YM2149 chips */
-
-READ16_MEMBER(kaneko16_state::kaneko16_ay1_YM2149_r)
+template<int chip>
+READ16_MEMBER(kaneko16_state::kaneko16_ay_YM2149_r)
 {
 	/* Each 2149 register is mapped to a different address */
-	m_ym2149[0]->address_w(space,0,offset);
-	return m_ym2149[0]->data_r(space,0);
+	m_ym2149[chip]->address_w(space,0,offset);
+	return m_ym2149[chip]->data_r(space,0);
 }
 
-WRITE16_MEMBER(kaneko16_state::kaneko16_ay1_YM2149_w)
+
+template<int chip>
+WRITE16_MEMBER(kaneko16_state::kaneko16_ay_YM2149_w)
 {
 	/* Each 2149 register is mapped to a different address */
-	m_ym2149[0]->address_w(space,0,offset);
+	m_ym2149[chip]->address_w(space,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_BITS_0_7) m_ym2149[0]->data_w(space,0, data       & 0xff);
-	else                m_ym2149[0]->data_w(space,0,(data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7) m_ym2149[chip]->data_w(space,0, data       & 0xff);
+	else                m_ym2149[chip]->data_w(space,0,(data >> 8) & 0xff);
 }
 
-READ16_MEMBER(kaneko16_state::kaneko16_ay2_YM2149_r)
+template<int bankno, mask, fixedsize, bankedsize>
+WRITE8_MEMBER(kaneko16_state::oki_bank_w)
 {
-	/* Each 2149 register is mapped to a different address */
-	m_ym2149[1]->address_w(space,0,offset);
-	return m_ym2149[1]->data_r(space,0);
+	kaneko16_common_oki_bank_w(bankno, (data & mask), fixedsize, bankedsize);
+//	logerror("%s:Selecting OKI bank %02X\n",machine().describe_context(),data&0xff);
 }
-
-WRITE16_MEMBER(kaneko16_state::kaneko16_ay2_YM2149_w)
-{
-	/* Each 2149 register is mapped to a different address */
-	m_ym2149[1]->address_w(space,0,offset);
-	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_BITS_0_7) m_ym2149[1]->data_w(space,0, data       & 0xff);
-	else                m_ym2149[1]->data_w(space,0,(data >> 8) & 0xff);
-}
-
 
 /***************************************************************************
 
@@ -321,8 +323,8 @@ static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16, kaneko16_berlwall_state )
 //  AM_RANGE(0x680006, 0x680007) AM_READ_PORT("UNK")
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(kaneko16_coin_lockout_w)  // Coin Lockout
 	AM_RANGE(0x780000, 0x780001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
-	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(kaneko16_ay1_YM2149_r, kaneko16_ay1_YM2149_w) // Sound
-	AM_RANGE(0x800200, 0x80021f) AM_READWRITE(kaneko16_ay2_YM2149_r, kaneko16_ay2_YM2149_w)
+	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(kaneko16_ay_YM2149_r<0>, kaneko16_ay_YM2149_w<0>) // Sound
+	AM_RANGE(0x800200, 0x80021f) AM_READWRITE(kaneko16_ay_YM2149_r<1>, kaneko16_ay1_YM2149_w<1>)
 	AM_RANGE(0x8003fe, 0x8003ff) AM_NOP // for OKI when accessed as .l
 	AM_RANGE(0x800400, 0x800401) AM_READWRITE( berlwall_oki_r, berlwall_oki_w )
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
@@ -338,22 +340,14 @@ ADDRESS_MAP_END
 /* The two YM2149 chips are only used when entering high score initials, and */
 /* when the game is fully completed. Overkill??? */
 
-WRITE16_MEMBER(kaneko16_state::bakubrkr_oki_bank_w)
-{
-	if (ACCESSING_BITS_0_7) {
-		m_oki->set_rom_bank(data & 0x7);
-		logerror("%s:Selecting OKI bank %02X\n",machine().describe_context(),data&0xff);
-	}
-}
-
 static ADDRESS_MAP_START( bakubrkr, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM     // ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM     // Work RAM
-	AM_RANGE(0x400000, 0x40001f) AM_READ(kaneko16_ay1_YM2149_r) // Sound
-	AM_RANGE(0x400000, 0x40001d) AM_WRITE(kaneko16_ay1_YM2149_w)
-	AM_RANGE(0x40001e, 0x40001f) AM_WRITE(bakubrkr_oki_bank_w) // OKI bank Switch
-	AM_RANGE(0x400200, 0x40021f) AM_READWRITE(kaneko16_ay2_YM2149_r,kaneko16_ay2_YM2149_w)          // Sound
-	AM_RANGE(0x400400, 0x400401) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  //
+	AM_RANGE(0x400000, 0x40001f) AM_READ(kaneko16_ay_YM2149_r<0>) // Sound
+	AM_RANGE(0x400000, 0x40001d) AM_WRITE(kaneko16_ay_YM2149_w<0>)
+	AM_RANGE(0x40001e, 0x40001f) AM_WRITE8(oki_bank_w<0,7,0x20000,0x20000>, 0x00ff) // OKI bank Switch
+	AM_RANGE(0x400200, 0x40021f) AM_READWRITE(kaneko16_ay_YM2149_r<1>,kaneko16_ay1_YM2149_w<1>)          // Sound
+	AM_RANGE(0x400400, 0x400401) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)  //
 	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_SHARE("spriteram")                   // Sprites
@@ -399,24 +393,6 @@ ADDRESS_MAP_END
                                 Blood Warrior
 ***************************************************************************/
 
-WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_0_bank_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_oki[0]->set_rom_bank(data & 0xf);
-//      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",m_maincpu->pc(),data);
-	}
-}
-
-WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_1_bank_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_oki[1]->set_rom_bank(data);
-//      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",m_maincpu->pc(),data);
-	}
-}
-
 WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_coin_lockout_w)
 {
 	if (ACCESSING_BITS_8_15)
@@ -454,33 +430,14 @@ static ADDRESS_MAP_START( bloodwar, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(bloodwar_coin_lockout_w)  // Coin Lockout
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(bloodwar_oki_0_bank_w)
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(bloodwar_oki_1_bank_w)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank_w<0,0xf,0x00000,0x10000>, 0x00ff)
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank_w<1,0x3,0x00000,0x40000>, 0x00ff)
 ADDRESS_MAP_END
 
 
 /***************************************************************************
                                 Bonk's Adventure
 ***************************************************************************/
-
-WRITE16_MEMBER(kaneko16_gtmr_state::bonkadv_oki_0_bank_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_oki[0]->set_rom_bank(data & 0xf);
-		logerror("%s: OKI0  bank %08X\n",machine().describe_context(),data);
-	}
-}
-
-WRITE16_MEMBER(kaneko16_gtmr_state::bonkadv_oki_1_bank_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_oki[1]->set_rom_bank(data);
-		logerror("%s: OKI1  bank %08X\n",machine().describe_context(),data);
-	}
-}
-
 
 static ADDRESS_MAP_START( bonkadv, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM     // ROM
@@ -508,8 +465,8 @@ static ADDRESS_MAP_START( bonkadv, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(bloodwar_coin_lockout_w)  // Coin Lockout
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(bonkadv_oki_0_bank_w)
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(bonkadv_oki_1_bank_w)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank_w<0,0xf,0x00000,0x10000>, 0x00ff)
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank_w<1,0xf,0x00000,0x40000>, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -529,24 +486,6 @@ READ16_MEMBER(kaneko16_gtmr_state::gtmr_wheel_r)
 			return  (ioport("WHEEL1")->read());
 		default:
 			return  (0);
-	}
-}
-
-WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_0_bank_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_oki[0]->set_rom_bank(data & 0xf);
-//      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",m_maincpu->pc(),data);
-	}
-}
-
-WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_1_bank_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_oki[1]->set_rom_bank(data & 0x1);
-//      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",m_maincpu->pc(),data);
 	}
 }
 
@@ -589,8 +528,8 @@ static ADDRESS_MAP_START( gtmr_map, AS_PROGRAM, 16, kaneko16_gtmr_state )
 
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
 
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(gtmr_oki_0_bank_w)                                        // Samples Bankswitching
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(gtmr_oki_1_bank_w)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank_w<0,0xf,0x00000,0x10000>, 0x00ff)                                        // Samples Bankswitching
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank_w<0,0x1,0x00000,0x40000>, 0x00ff)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -657,8 +596,8 @@ static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16, kaneko16_gtmr_state )
 
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
 
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(gtmr_oki_0_bank_w)    // Samples Bankswitching
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(gtmr_oki_1_bank_w)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank_w<0,0xf,0x00000,0x10000>, 0x00ff)    // Samples Bankswitching
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank_w<0,0x1,0x00000,0x40000>, 0x00ff)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -668,9 +607,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mgcrystl, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM     // ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM     // Work RAM
-	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(kaneko16_ay1_YM2149_r, kaneko16_ay1_YM2149_w) // Sound
-	AM_RANGE(0x400200, 0x40021f) AM_READWRITE(kaneko16_ay2_YM2149_r, kaneko16_ay2_YM2149_w)
-	AM_RANGE(0x400400, 0x400401) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(kaneko16_ay_YM2149_r<0>, kaneko16_ay_YM2149_w<0>) // Sound
+	AM_RANGE(0x400200, 0x40021f) AM_READWRITE(kaneko16_ay_YM2149_r<1>, kaneko16_ay1_YM2149_w<1>)
+	AM_RANGE(0x400400, 0x400401) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x680000, 0x683fff) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
@@ -691,26 +630,12 @@ ADDRESS_MAP_END
                                 Shogun Warriors
 ***************************************************************************/
 
-void kaneko16_shogwarr_state::kaneko16_common_oki_bank_w(const char *bankname, const char *tag, int bank, size_t fixedsize, size_t bankedsize)
-{
-	uint32_t bankaddr;
-	uint8_t* samples = memregion(tag)->base();
-	size_t length = memregion(tag)->bytes();
-
-	bankaddr = fixedsize + (bankedsize * bank);
-
-	if (bankaddr <= (length-bankedsize))
-	{
-		membank(bankname)->set_base(samples + bankaddr);
-	}
-}
-
 WRITE16_MEMBER(kaneko16_shogwarr_state::shogwarr_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		kaneko16_common_oki_bank_w("bank10", "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
-		kaneko16_common_oki_bank_w("bank11", "oki2", (data & 0xf)     , 0x00000, 0x40000);
+		kaneko16_common_oki_bank_w(0, (data >> 4) & 0xf, 0x30000, 0x10000);
+		kaneko16_common_oki_bank_w(1, (data & 0xf)     , 0x00000, 0x40000);
 	}
 }
 
@@ -718,11 +643,10 @@ WRITE16_MEMBER(kaneko16_shogwarr_state::brapboys_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		kaneko16_common_oki_bank_w("bank10", "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
-		kaneko16_common_oki_bank_w("bank11", "oki2", (data & 0xf)     , 0x20000, 0x20000);
+		kaneko16_common_oki_bank_w(0, (data >> 4) & 0xf, 0x30000, 0x10000);
+		kaneko16_common_oki_bank_w(1, (data & 0xf)     , 0x20000, 0x20000);
 	}
 }
-
 
 static ADDRESS_MAP_START( shogwarr, AS_PROGRAM, 16, kaneko16_shogwarr_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM     // ROM
@@ -748,6 +672,12 @@ static ADDRESS_MAP_START( shogwarr, AS_PROGRAM, 16, kaneko16_shogwarr_state )
 	AM_RANGE(0xb80006, 0xb80007) AM_READ_PORT("UNK")
 	AM_RANGE(0xd00000, 0xd00001) AM_NOP                         // ? (bit 0)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(shogwarr_oki_bank_w)  // Samples Bankswitching
+ADDRESS_MAP_END
+
+// sample banking is different on brap boys for the music, why? GALs / PALs ?
+static ADDRESS_MAP_START( brapboys, AS_PROGRAM, 16, kaneko16_shogwarr_state )
+	AM_IMPORT_FROM(shogwarr)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(brapboys_oki_bank_w)  // Samples Bankswitching
 ADDRESS_MAP_END
 
 
@@ -779,21 +709,13 @@ ADDRESS_MAP_END
                                  Wing Force
 ***************************************************************************/
 
-WRITE8_MEMBER(kaneko16_state::wingforc_oki_bank_w)
-{
-	if (data <= 2)
-		m_oki->set_rom_bank(data);
-	else
-		logerror("%s: unknown OKI bank %02X\n", machine().describe_context(), data);
-}
-
 static ADDRESS_MAP_START( wingforc_soundport, AS_IO, 8, kaneko16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) // 02 written at boot
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x0a, 0x0a) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(wingforc_oki_bank_w)
+	AM_RANGE(0x0a, 0x0a) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(oki_bank_w<0,0x3,0x20000,0x20000>)
 ADDRESS_MAP_END
 
 
@@ -1916,7 +1838,7 @@ MACHINE_CONFIG_START(kaneko16_berlwall_state::berlwall)
 	MCFG_SOUND_ADD("ym2149_2", YM2149, 1000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", 12000000/6, PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki1", 12000000/6, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1925,6 +1847,11 @@ MACHINE_CONFIG_END
 /***************************************************************************
                             Bakuretsu Breaker
 ***************************************************************************/
+
+static ADDRESS_MAP_START( bakubrkr_oki1_map, 0, 8, kaneko16_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank1")
+ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 
@@ -1982,8 +1909,9 @@ MACHINE_CONFIG_START(kaneko16_state::bakubrkr)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/6, PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki1", XTAL(12'000'000)/6, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, bakubrkr_oki1_map)
 MACHINE_CONFIG_END
 
 
@@ -2102,8 +2030,9 @@ MACHINE_CONFIG_START(kaneko16_state::wingforc)
 	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, bakubrkr_oki1_map)
 MACHINE_CONFIG_END
 
 
@@ -2120,6 +2049,15 @@ MACHINE_CONFIG_END
 
     VIDEO_UPDATE_AFTER_VBLANK fixes the mangled/wrong colored sprites
 */
+
+static ADDRESS_MAP_START( gtmr_oki1_map, 0, 8, kaneko16_state )
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( gtmr_oki2_map, 0, 8, kaneko16_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("okibank2")
+ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 
@@ -2174,9 +2112,11 @@ MACHINE_CONFIG_START(kaneko16_gtmr_state::gtmr)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/8, PIN7_LOW)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki1_map)
 
 	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000)/8, PIN7_LOW)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki2_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(kaneko16_gtmr_state::gtmre, gtmr)
@@ -2299,7 +2239,7 @@ MACHINE_CONFIG_START(kaneko16_state::mgcrystl)
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(kaneko16_state, eeprom_w)) /* outputs B:  0,EEPROM reset */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/6, PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki1", XTAL(12'000'000)/6, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2364,15 +2304,6 @@ static const uint16_t shogwarr_default_eeprom[64] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0010, 0x0000, 0x0000, 0xFFFF
 };
 
-static ADDRESS_MAP_START( shogwarr_oki1_map, 0, 8, kaneko16_shogwarr_state )
-	AM_RANGE(0x00000, 0x2ffff) AM_ROM
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank10")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( shogwarr_oki2_map, 0, 8, kaneko16_shogwarr_state )
-	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank11")
-ADDRESS_MAP_END
-
 MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 
 	/* basic machine hardware */
@@ -2425,11 +2356,11 @@ MACHINE_CONFIG_START(kaneko16_shogwarr_state::shogwarr)
 
 	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/8, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, shogwarr_oki1_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki1_map)
 
 	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000)/8, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_DEVICE_ADDRESS_MAP(0, shogwarr_oki2_map)
+	MCFG_DEVICE_ADDRESS_MAP(0, gtmr_oki2_map)
 MACHINE_CONFIG_END
 
 
@@ -2446,10 +2377,13 @@ static const uint16_t brapboys_default_eeprom[64] = {
 
 static ADDRESS_MAP_START( brapboys_oki2_map, 0, 8, kaneko16_shogwarr_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank11")
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank2")
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_DERIVED(kaneko16_shogwarr_state::brapboys, shogwarr)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(brapboys)
+
 	MCFG_SOUND_MODIFY("oki2")
 	MCFG_DEVICE_ADDRESS_MAP(0, brapboys_oki2_map)
 
@@ -2491,32 +2425,33 @@ void kaneko16_state::kaneko16_unscramble_tiles(const char *region)
 	}
 }
 
-void kaneko16_gtmr_state::kaneko16_expand_sample_banks(const char *region)
+void kaneko16_state::kaneko16_common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize)
 {
-	/* The sample data for the first OKI has an address translator/
-	   banking register in it that munges the addresses as follows:
+	assert((m_okibank[bankno].found()) && (m_okiregion[bankno].found()));
+	uint8_t *sample  = m_okiregion[bankno]->base();
+	size_t length = m_okiregion[bankno]->bytes() - fixedsize;
 
-	     Offsets 00000-2FFFF always come from ROM 00000-2FFFF
-	     Offsets 30000-3FFFF come from ROM (10000*bank) + 00000-0FFFF
+	m_okibank[bankno]->configure_entries(0, length / bankedsize, &sample[fixedsize], bankedsize);
+}
 
-	   Because we can't do this dynamically, we pre-generate all 16
-	   possible combinations of these and swap between them.
-	*/
-	int bank;
-	uint8_t *src0;
+void kaneko16_gtmr_state::kaneko16_common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize)
+{
+	assert((m_okibank[bankno].found()) && (m_okiregion[bankno].found()));
+	uint8_t *sample  = m_okiregion[bankno]->base();
+	size_t length = m_okiregion[bankno]->bytes();
 
-	if (memregion(region)->bytes() < 0x40000 * 16)
-		fatalerror("gtmr SOUND1 region too small\n");
-
-	/* bank 0 maps to itself, so we just leave it alone */
-	src0 = memregion(region)->base();
-	for (bank = 15; bank > 0; bank--)
+	if (fixedsize > 0)
 	{
-		uint8_t *srcn = src0 + 0x10000 * (bank < 3 ? 3 : bank);
-		uint8_t *dst = src0 + 0x40000 * bank;
-
-		memcpy(dst + 0x30000, srcn + 0x00000, 0x10000);
-		memcpy(dst + 0x00000, src0 + 0x00000, 0x30000);
+		int i = 0;
+		while (i < fixedsize / bankedsize)
+		{
+			m_okibank[bankno]->configure_entry(i++, &sample[fixedsize]);
+		}
+		m_okibank[bankno]->configure_entries(i, (length - fixedsize)/bankedsize, &sample[fixedsize], bankedsize);
+	}
+	else
+	{
+		m_okibank[bankno]->configure_entries(0, length/bankedsize, &sample[0], bankedsize);
 	}
 }
 
@@ -2524,6 +2459,12 @@ DRIVER_INIT_MEMBER( kaneko16_state, kaneko16 )
 {
 	kaneko16_unscramble_tiles("gfx2");
 	kaneko16_unscramble_tiles("gfx3");
+}
+
+DRIVER_INIT_MEMBER( kaneko16_state, bakubrkr )
+{
+	kaneko16_common_oki_bank_install(0, 0x20000, 0x20000);
+	DRIVER_INIT_CALL(kaneko16);
 }
 
 /*
@@ -2605,9 +2546,9 @@ DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwallk )
 
 DRIVER_INIT_MEMBER( kaneko16_gtmr_state, gtmr )
 {
-	kaneko16_unscramble_tiles("gfx2");
-	kaneko16_unscramble_tiles("gfx3");
-	kaneko16_expand_sample_banks("oki1");
+	kaneko16_common_oki_bank_install(0, 0x30000, 0x10000);
+	kaneko16_common_oki_bank_install(1, 0x00000, 0x40000);
+	DRIVER_INIT_CALL(kaneko16);
 }
 
 
@@ -2685,29 +2626,11 @@ ROM_START( explbrkr )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles */
 	ROM_LOAD( "ts020.u33",  0x000000, 0x100000, CRC(eb58c35d) SHA1(762c5219de6f729a0fc1df90fce09cdf711c2a1e) )
-
-	ROM_REGION( 0x100000, "user1", 0 )  /* OKI Sample ROM */
-	ROM_LOAD( "ts030.u5",    0x000000, 0x100000, CRC(1d68e9d1) SHA1(aaa64a8e8d7cd7f91d2be346fafb9d1f29b40eda) )
-
+	
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x200000, "oki", 0 )    /* Samples */
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user1", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user1", 0x040000, 0x060000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user1", 0x060000, 0x0a0000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "user1", 0x080000, 0x0e0000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x100000, 0x020000)
-	ROM_COPY( "user1", 0x0a0000, 0x120000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x140000, 0x020000)
-	ROM_COPY( "user1", 0x0c0000, 0x160000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x180000, 0x020000)
-	ROM_COPY( "user1", 0x0e0000, 0x1a0000, 0x020000)
-	ROM_FILL(                    0x1c0000, 0x020000, 0x000000 )
-	ROM_FILL(                    0x1e0000, 0x020000, 0x000000 )
+	ROM_REGION( 0x100000, "oki1", 0 )  /* OKI Sample ROM */
+	ROM_LOAD( "ts030.u5",    0x000000, 0x100000, CRC(1d68e9d1) SHA1(aaa64a8e8d7cd7f91d2be346fafb9d1f29b40eda) )
 ROM_END
 
 ROM_START( bakubrkr )
@@ -2727,29 +2650,11 @@ ROM_START( bakubrkr )
 
 	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles */
 	ROM_LOAD( "ts020.u33",  0x000000, 0x100000, CRC(eb58c35d) SHA1(762c5219de6f729a0fc1df90fce09cdf711c2a1e) )
-
-	ROM_REGION( 0x100000, "user1", 0 )  /* OKI Sample ROM */
-	ROM_LOAD( "ts030.u5",    0x000000, 0x100000, CRC(1d68e9d1) SHA1(aaa64a8e8d7cd7f91d2be346fafb9d1f29b40eda) )
-
+	
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x200000, "oki", 0 )    /* Samples */
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user1", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user1", 0x040000, 0x060000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user1", 0x060000, 0x0a0000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "user1", 0x080000, 0x0e0000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x100000, 0x020000)
-	ROM_COPY( "user1", 0x0a0000, 0x120000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x140000, 0x020000)
-	ROM_COPY( "user1", 0x0c0000, 0x160000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x180000, 0x020000)
-	ROM_COPY( "user1", 0x0e0000, 0x1a0000, 0x020000)
-	ROM_FILL(                    0x1c0000, 0x020000, 0x000000 )
-	ROM_FILL(                    0x1e0000, 0x020000, 0x000000 )
+	ROM_REGION( 0x100000, "oki1", 0 )  /* OKI Sample ROM */
+	ROM_LOAD( "ts030.u5",    0x000000, 0x100000, CRC(1d68e9d1) SHA1(aaa64a8e8d7cd7f91d2be346fafb9d1f29b40eda) )
 ROM_END
 
 
@@ -2809,7 +2714,7 @@ ROM_START( berlwall )
 	ROM_LOAD16_BYTE( "bw007.u76",  0x300000, 0x080000, CRC(97f85c87) SHA1(865e076e098c49c96639f62be793f2de24b4926b) )
 	ROM_LOAD16_BYTE( "bw00b.u68",  0x300001, 0x080000, CRC(b0a48225) SHA1(de256bb6e2a824114274bff0c6c1234934c31c49) ) // FIXED BITS (xxxxxxx0)
 
-	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x040000, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "bw000.u46",  0x000000, 0x040000, CRC(d8fe869d) SHA1(75e9044c4164ca6db9519fcff8eca6c8a2d8d5d1) )
 
 	ROM_REGION( 0x600, "plds", 0 )     /* 3 x GAL16V8A-25LP */
@@ -2841,7 +2746,7 @@ ROM_START( berlwallt )
 	ROM_LOAD16_BYTE( "bw007.u76",  0x300000, 0x080000, CRC(97f85c87) SHA1(865e076e098c49c96639f62be793f2de24b4926b) )
 	ROM_LOAD16_BYTE( "bw00b.u68",  0x300001, 0x080000, CRC(b0a48225) SHA1(de256bb6e2a824114274bff0c6c1234934c31c49) ) // FIXED BITS (xxxxxxx0)
 
-	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x040000, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "bw000.u46",  0x000000, 0x040000, CRC(d8fe869d) SHA1(75e9044c4164ca6db9519fcff8eca6c8a2d8d5d1) )
 
 	ROM_REGION( 0x600, "plds", 0 )     /* 3 x GAL16V8A-25LP */
@@ -2875,7 +2780,7 @@ ROM_START( berlwallk )
 	ROM_LOAD16_BYTE( "bw007.u76",  0x300000, 0x080000, CRC(97f85c87) SHA1(865e076e098c49c96639f62be793f2de24b4926b) )
 	ROM_LOAD16_BYTE( "bw00b.u68",  0x300001, 0x080000, CRC(b0a48225) SHA1(de256bb6e2a824114274bff0c6c1234934c31c49) ) // FIXED BITS (xxxxxxx0)
 
-	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x040000, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "bw000k.u46",  0x000000, 0x040000, CRC(52e81a50) SHA1(0adf6b42dee244dba2a4fb237155b04699b0254f) )
 
 	ROM_REGION( 0x600, "plds", 0 )     /* 3 x GAL16V8A-25LP */
@@ -2904,7 +2809,7 @@ ROM_START( packbang ) /* same PCB as Berlin Wall - BW-002 */
 	ROM_LOAD16_BYTE( "bb.u75",  0x200000, 0x080000, CRC(5cb4669f) SHA1(ab061f5b34435dca46f710ea8118c919a3a9f87c) )
 	ROM_LOAD16_BYTE( "bb.u67",  0x200001, 0x080000, CRC(ce5c9417) SHA1(30aca496d1f4218b44a32b3630e58889f0c54564) ) // FIXED BITS (xxxxxxx0)
 
-	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x040000, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "bw000.u46",  0x000000, 0x040000, CRC(d8fe869d) SHA1(75e9044c4164ca6db9519fcff8eca6c8a2d8d5d1) )
 ROM_END
 
@@ -3040,21 +2945,11 @@ ROM_START( wingforc )
 	ROM_LOAD16_BYTE( "bg0bm.u2", 0x000001, 0x80000, CRC(9df92283) SHA1(53bcac1d63b7bb84b664507906ee768a83be28c9) )
 	ROM_LOAD16_BYTE( "bg1am.u3", 0x100000, 0x80000, CRC(a44fdebb) SHA1(676ade63d22818c7a7adf39d42aad41fa93319d2) )
 	ROM_LOAD16_BYTE( "bg1bm.u3", 0x100001, 0x80000, CRC(a9b9fc5d) SHA1(33db691007a8cf25aea6b87a0f009c50df2676f2) )
-
-	ROM_REGION( 0x80000, "user1", 0 )  /* OKI Sample ROM */
-	ROM_LOAD( "pcm.u5", 0x00000, 0x80000, CRC(233569fd) SHA1(eb835008bcb961528c0ef4ca72e44ee08c517b81) )
-
+	
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x100000, "oki", 0 )    /* Samples */
-	ROM_COPY( "user1", 0x000000, 0x000000, 0x020000)
-	ROM_COPY( "user1", 0x020000, 0x020000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x040000, 0x020000)
-	ROM_COPY( "user1", 0x040000, 0x060000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x080000, 0x020000)
-	ROM_COPY( "user1", 0x060000, 0x0a0000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "user1", 0x000000, 0x0e0000, 0x020000)
+	ROM_REGION( 0x80000, "oki1", 0 )  /* OKI Sample ROM */
+	ROM_LOAD( "pcm.u5", 0x00000, 0x80000, CRC(233569fd) SHA1(eb835008bcb961528c0ef4ca72e44ee08c517b81) )
 ROM_END
 
 
@@ -3171,7 +3066,7 @@ ROM_START( bloodwar )
 	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles (scrambled) */
 	ROM_LOAD( "of-301-0226.55",    0x000000, 0x100000, CRC(fcf215de) SHA1(83015f10e62b917efd6e3edfbd45fb8f9b35db2b) )
 
-	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "of-101-f-0223.101", 0x000000, 0x100000, CRC(295f3c93) SHA1(558698f1d04b23dd2a73e2eae5ecce598defb228) ) /* 0224 ? */
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* Samples */
@@ -3215,7 +3110,7 @@ ROM_START( oedfight )
 	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles (scrambled) */
 	ROM_LOAD( "of-301-0226.55",    0x000000, 0x100000, CRC(fcf215de) SHA1(83015f10e62b917efd6e3edfbd45fb8f9b35db2b) )
 
-	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "of-101-j-0224.101", 0x000000, 0x100000, CRC(83a1f826) SHA1(3b5f576735d5954770cd572b03e71bf121ae88d2) )
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* Samples */
@@ -3355,7 +3250,7 @@ ROM_START( gtmr )
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
 	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
 
-	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "mm-100-401-e0.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) )  // 16 x $10000
 
 	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASE00 )   /* Samples */
@@ -3384,7 +3279,7 @@ ROM_START( gtmra )
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
 	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
 
-	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "mm-100-401-e0.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) )  // 16 x $10000
 
 	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASE00 )   /* Samples */
@@ -3413,7 +3308,7 @@ ROM_START( gtmrb )
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
 	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
 
-	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "mm-100-401-e0.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) )  // 16 x $10000
 
 	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASE00 )   /* Samples */
@@ -3446,7 +3341,7 @@ ROM_START( gtmro )
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
 	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
 
-	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "mm-100-401-e0.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) )  // 16 x $10000
 
 	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASE00 )   /* Samples */
@@ -3487,7 +3382,7 @@ ROM_START( gtmre )
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
 	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
 
-	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "gmmu23.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) ) // 16 x $10000
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* Samples */
@@ -3524,7 +3419,7 @@ ROM_START( gtmrusa )
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
 	ROM_COPY("gfx2",0x000000,0,0x200000) // it isn't on the board twice.
 
-	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "mm-100-401-a0.bin",  0x000000, 0x100000, CRC(b9cbfbee) SHA1(051d48a68477ef9c29bd5cc0bb7955d513a0ab94) ) // 16 x $10000
 
 	ROM_REGION( 0x100000, "oki2", 0 )   /* Samples */
@@ -3713,7 +3608,7 @@ ROM_START( gtmr2 )
 	ROM_REGION( 0x440000, "gfx3", 0 )   /* Tiles (scrambled) */
 	ROM_COPY("gfx2",0x000000,0,0x440000) // it isn't on the board twice.
 
-	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "m2-100-0.u48",      0x000000, 0x100000, CRC(5250fa45) SHA1(b1ad4660906997faea0aa89866de01a0e9f2b61d) )
 
 	ROM_REGION( 0x080000, "oki2", 0 )   /* Samples */
@@ -3744,7 +3639,7 @@ ROM_START( gtmr2a )
 	ROM_REGION( 0x440000, "gfx3", 0 )   /* Tiles (scrambled) */
 	ROM_COPY("gfx2",0x000000,0,0x440000) // it isn't on the board twice.
 
-	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "m2-100-0.u48",      0x000000, 0x100000, CRC(5250fa45) SHA1(b1ad4660906997faea0aa89866de01a0e9f2b61d) )
 
 	ROM_REGION( 0x080000, "oki2", 0 )   /* Samples */
@@ -3775,7 +3670,7 @@ ROM_START( gtmr2u )
 	ROM_REGION( 0x440000, "gfx3", 0 )   /* Tiles (scrambled) */
 	ROM_COPY("gfx2",0x000000,0,0x440000) // it isn't on the board twice.
 
-	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "m2-100-0.u48",      0x000000, 0x100000, CRC(5250fa45) SHA1(b1ad4660906997faea0aa89866de01a0e9f2b61d) )
 
 	ROM_REGION( 0x080000, "oki2", 0 )   /* Samples */
@@ -3853,7 +3748,7 @@ ROM_START( mgcrystl ) /* Master Up: 92/01/10 14:21:30 */
 	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles (Scrambled) */
 	ROM_LOAD( "mc020.u34",  0x000000, 0x100000, CRC(1ea92ff1) SHA1(66ec53e664b2a5a751a280a538aaeceafc187ceb) )
 
-	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x040000, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "mc030.u32",  0x000000, 0x040000, CRC(c165962e) SHA1(f7e130db387ae9dcb7223f7ad6e51270d3033bc9) )
 ROM_END
 
@@ -3877,7 +3772,7 @@ ROM_START( mgcrystlo ) /* Master Up: 91/12/10 01:56:06 */
 	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles (Scrambled) */
 	ROM_LOAD( "mc020.u34",  0x000000, 0x100000, CRC(1ea92ff1) SHA1(66ec53e664b2a5a751a280a538aaeceafc187ceb) )
 
-	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x040000, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "mc030.u32",  0x000000, 0x040000, CRC(c165962e) SHA1(f7e130db387ae9dcb7223f7ad6e51270d3033bc9) )
 ROM_END
 
@@ -3902,7 +3797,7 @@ ROM_START( mgcrystlj ) /* Master Up: 92/01/13 14:44:20 */
 	ROM_REGION( 0x100000, "gfx3", 0 )   /* Tiles (Scrambled) */
 	ROM_LOAD( "kaneko__mc-020_0004.u34",  0x000000, 0x100000, CRC(1ea92ff1) SHA1(66ec53e664b2a5a751a280a538aaeceafc187ceb) ) // Mask rom
 
-	ROM_REGION( 0x040000, "oki", 0 )    /* Samples */
+	ROM_REGION( 0x040000, "oki1", 0 )    /* Samples */
 	ROM_LOAD( "kaneko__mc-030_0005_t99.u32",  0x000000, 0x040000, CRC(c165962e) SHA1(f7e130db387ae9dcb7223f7ad6e51270d3033bc9) )
 ROM_END
 
@@ -4462,7 +4357,7 @@ ROM_START( bonkadv )
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Tiles (scrambled) */
 	ROM_LOAD( "pc500105.55",         0x000000, 0x100000, CRC(bebb3edc) SHA1(e0fed4307316deaeb811ec29f5022adeaf577a95) )
 
-	ROM_REGION( 0x400000, "oki1", 0 )   /* Samples, plus room for expansion */
+	ROM_REGION( 0x100000, "oki1", 0 )   /* Samples */
 	ROM_LOAD( "pc604109.101",        0x000000, 0x100000, CRC(76025530) SHA1(e0c8192d783057798eea084aa3e87938f6e01cb7) )
 
 	ROM_REGION( 0x300000, "oki2", 0 )   /* Samples */
@@ -4476,20 +4371,17 @@ ROM_END
 DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, shogwarr )
 {
 	// default sample banks
-	kaneko16_common_oki_bank_w("bank10", "oki1", 0, 0x30000, 0x10000);
-	kaneko16_common_oki_bank_w("bank11", "oki2", 0, 0x00000, 0x40000);
+	kaneko16_common_oki_bank_install(0, 0x30000, 0x10000);
+	kaneko16_common_oki_bank_install(1, 0x00000, 0x40000);
 	DRIVER_INIT_CALL(kaneko16);
 }
 
 
 DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 {
-	// sample banking is different on brap boys for the music, why? GALs / PALs ?
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe00000, 0xe00001, write16_delegate(FUNC(kaneko16_shogwarr_state::brapboys_oki_bank_w),this));
-
 	// default sample banks
-	kaneko16_common_oki_bank_w("bank10", "oki1", 0, 0x30000, 0x10000);
-	kaneko16_common_oki_bank_w("bank11", "oki2", 0, 0x20000, 0x20000);
+	kaneko16_common_oki_bank_install(0, 0x30000, 0x10000);
+	kaneko16_common_oki_bank_install(1, 0x20000, 0x20000);
 	DRIVER_INIT_CALL(kaneko16);
 }
 
@@ -4511,9 +4403,9 @@ GAME( 1991, mgcrystl,   0,        mgcrystl, mgcrystl, kaneko16_state,          k
 GAME( 1991, mgcrystlo,  mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mgcrystlj,  mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko (Atlus license)", "Magical Crystals (Japan, 92/01/13)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, blazeon,    0,        blazeon,  blazeon,  kaneko16_state,          kaneko16, ROT0,  "A.I (Atlus license)",  "Blaze On (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, explbrkr,   0,        bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Explosive Breaker", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr, kaneko16_state,          kaneko16, ROT90, "Kaneko", "Bakuretsu Breaker", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wingforc,   0,        wingforc, wingforc, kaneko16_state,          kaneko16, ROT270,"A.I (Atlus license)",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, explbrkr,   0,        bakubrkr, bakubrkr, kaneko16_state,          bakubrkr, ROT90, "Kaneko", "Explosive Breaker", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr, kaneko16_state,          bakubrkr, ROT90, "Kaneko", "Bakuretsu Breaker", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wingforc,   0,        wingforc, wingforc, kaneko16_state,          bakubrkr, ROT270,"A.I (Atlus license)",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, bonkadv,    0,        bonkadv,  bonkadv,  kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, bloodwar,   0,        bloodwar, bloodwar, kaneko16_gtmr_state,     gtmr,     ROT0,  "Kaneko", "Blood Warrior", MACHINE_SUPPORTS_SAVE )
