@@ -197,7 +197,7 @@ static ADDRESS_MAP_START(goupil_g2_mem, AS_PROGRAM, 8, goupil_g2_state)
 
 	AM_RANGE(0xE8F0,0xE8FF) AM_DEVREADWRITE("fd1791", fd1791_device, read, write)
 	AM_RANGE(0xEC00,0xF3FF) AM_READWRITE(visu24x80_ram_r, visu24x80_ram_w)
-	AM_RANGE(0xF000,0xF7FF) AM_ROM AM_REGION("maincpu", 0xF000) // Monitor (MON 1)
+	AM_RANGE(0xF400,0xF7FF) AM_ROM AM_REGION("maincpu", 0xF400) // Monitor (MON 1)
 	AM_RANGE(0xF800,0xFFFF) AM_ROM AM_REGION("maincpu", 0xF800) // Monitor (MON 2)
 ADDRESS_MAP_END
 
