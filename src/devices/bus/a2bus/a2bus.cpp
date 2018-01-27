@@ -307,7 +307,6 @@ device_a2bus_card_interface::~device_a2bus_card_interface()
 void device_a2bus_card_interface::static_set_a2bus_tag(device_t &device, const char *tag, const char *slottag)
 {
 	device_a2bus_card_interface &a2bus_card = dynamic_cast<device_a2bus_card_interface &>(device);
-	assert(a2bus_card);
 	a2bus_card.m_a2bus_tag = tag;
 	a2bus_card.m_a2bus_slottag = slottag;
 }

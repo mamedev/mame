@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// copyright-holders:Vas Crabb
 /*
  Sartorius 3733 digital scale
 
