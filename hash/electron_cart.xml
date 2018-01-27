@@ -141,13 +141,62 @@
 
 	<!-- Business -->
 
-	<software name="click" supported="no">
-		<description>Click</description>
+	<software name="click100" cloneof="click">
+		<description>Click v1.00</description>
 		<year>1990</year>
 		<publisher>Slogger</publisher>
 		<part name="cart" interface="electron_cart">
-			<dataarea name="lorom" size="32768">
+			<feature name="slot" value="click" />
+			<dataarea name="rom" size="32768">
+				<rom name="click-1.00.rom" size="32768" crc="a47cfa73" sha1="d22a61a61cda401fe571f4741c53cfe61235ba00" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="click101" cloneof="click">
+		<description>Click v1.01</description>
+		<year>1990</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="click" />
+			<dataarea name="rom" size="32768">
+				<rom name="click-1.01.rom" size="32768" crc="7b864336" sha1="a46ecc9da40976eeeb95a8823f42078a3a4ae491" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="click103" cloneof="click">
+		<description>Click v1.03</description>
+		<year>1990</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="click" />
+			<dataarea name="rom" size="32768">
 				<rom name="click-1.03.rom" size="32768" crc="955b9d29" sha1="5fbe78d09b1b989c1ff3939a9d29f7597d0e66d9" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
+		<software name="click">
+		<description>Click v1.04</description>
+		<year>1990</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="click" />
+			<dataarea name="rom" size="32768">
+				<rom name="click-1.04.rom" size="32768" crc="aa16ba3d" sha1="03492c8cc0bfdb46ccb4a53caa28016b2d4e1cb2" offset="0" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+				<rom value="0x00" size="32768" offset="0" loadflag="fill" />
 			</dataarea>
 		</part>
 	</software>
@@ -231,47 +280,169 @@
 
 	<!-- Expansion Cartridges -->
 
-	<software name="ap3" supported="no">
+	<software name="abr">
+		<description>Advanced Battery-Backed RAM</description>
+		<year>1987</year>
+		<publisher>P.R.E.S.</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="abr" />
+			<dataarea name="nvram" size="32768">
+				<rom name="pres-abr-utils-1.10.rom" size="16360" crc="e5aec5c1" sha1="b0066d9ee83a9144eb5942f106776174ae5df0d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ap3" cloneof="ap34" supported="no">
 		<description>Advanced Plus 3</description>
 		<year>1988</year>
 		<publisher>P.R.E.S.</publisher>
 		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="ap34" />
 			<dataarea name="uprom" size="16384">
 				<rom name="pres-adfs-v1.15.rom" size="16384" crc="8f81edc3" sha1="32007425058a7b0f8bd5c17b3c22552aa3a03eca" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="ap4" supported="no">
+	<software name="ap4" cloneof="ap34" supported="no">
 		<description>Advanced Plus 4</description>
+		<year>1986</year>
+		<publisher>Advanced Computer Products</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="ap34" />
+			<dataarea name="lorom" size="16384">
+				<rom name="acp1770-dfs-2.20.rom" size="16384" crc="c42ef768" sha1="666f5dc77724ae5c625d2134b34dcee78073f0e3" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="8192" />
+		</part>
+	</software>
+
+	<software name="ap34" supported="no">
+		<description>Advanced Plus 34</description>
 		<year>1988</year>
 		<publisher>P.R.E.S.</publisher>
 		<part name="cart" interface="electron_cart">
-			<dataarea name="uprom" size="16384">
-				<rom name="acp1770-dfs-2.20.rom" size="16384" crc="f3dc9bc5" sha1="99449db032a16795efa28c211d8a257ec36c1eae" offset="0" />
+			<feature name="slot" value="ap34" />
+			<dataarea name="lorom" size="16384">
+				<rom name="acp1770-dfs-2.20.rom" size="16384" crc="c42ef768" sha1="666f5dc77724ae5c625d2134b34dcee78073f0e3" offset="0" />
 			</dataarea>
+			<dataarea name="uprom" size="16384">
+				<rom name="pres-adfs-v1.15.rom" size="16384" crc="8f81edc3" sha1="32007425058a7b0f8bd5c17b3c22552aa3a03eca" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="8192" />
+		</part>
+	</software>
+
+	<software name="aqr" supported="no">
+		<description>Advanced Quarter Meg RAM</description>
+		<year>1988</year>
+		<publisher>P.R.E.S.</publisher>
+		<part name="cart" interface="electron_cart">
+			<dataarea name="ram" size="262144" />
+		</part>
+	</software>
+
+	<software name="cumana100" cloneof="cumana" supported="no">
+		<description>Cumana Floppy Disc System v1.00</description>
+		<year>1984</year>
+		<publisher>Cumana</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="cumana" />
+			<dataarea name="rom" size="16384">
+				<rom name="cumana-dfs-1.00.rom" size="16384" crc="3d351cee" sha1="d6f7af671bf78b3ea7b9a235d47ef8b22b9bee31" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="2048" />
+		</part>
+	</software>
+
+	<software name="cumana101" cloneof="cumana" supported="no">
+		<description>Cumana Floppy Disc System v1.01</description>
+		<year>1984</year>
+		<publisher>Cumana</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="cumana" />
+			<dataarea name="rom" size="16384">
+				<rom name="cumana-dfs-1.01.rom" size="16384" crc="bc02e94a" sha1="8cbdbcc91516b4bbe6904db482f9fdaa34ca029d" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="2048" />
 		</part>
 	</software>
 
 	<software name="cumana" supported="no">
-		<description>Cumana Floppy Disc System</description>
+		<description>Cumana Floppy Disc System v1.02</description>
 		<year>1984</year>
 		<publisher>Cumana</publisher>
 		<part name="cart" interface="electron_cart">
-			<dataarea name="uprom" size="16384">
-				<rom name="cumana-dfs-1.00.rom" size="16384" crc="3d351cee" sha1="d6f7af671bf78b3ea7b9a235d47ef8b22b9bee31" offset="0" />
+			<feature name="slot" value="cumana" />
+			<dataarea name="rom" size="16384">
+				<rom name="cumana-dfs-1.02.rom" size="16384" crc="44b21e47" sha1="1c5112d2e629f0e093a961c6348456e4ceac86e3" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="2048" />
 		</part>
 	</software>
 
-	<software name="peg400" supported="no">
-		<description>Pegasus 400</description>
+	<software name="peg4001" cloneof="peg400">
+		<description>Pegasus 400 v1.01</description>
 		<year>1987</year>
 		<publisher>Slogger</publisher>
 		<part name="cart" interface="electron_cart">
-			<dataarea name="uprom" size="16384">
+			<feature name="slot" value="peg400" />
+			<dataarea name="rom" size="16384">
+				<rom name="pegasus400_dfs_slogger-v1.01.rom" size="16384" crc="54d79fa6" sha1="bd52bf5b741a760b5d20a753b217191d8958ca19" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="8192" />
+		</part>
+	</software>
+
+	<software name="peg400">
+		<description>Pegasus 400 v1.02</description>
+		<year>1987</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="peg400" />
+			<dataarea name="rom" size="16384">
 				<rom name="pegasus400_dfs_slogger-v1.02.rom" size="16384" crc="52d4c45d" sha1="fb6c3adc719b1a2034ec15fc41ecc10345885449" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="8192" />
+		</part>
+	</software>
+
+	<software name="seds100" cloneof="seds" supported="no">
+		<description>Slogger Electron Disk System v1.00</description>
+		<year>1986</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="cumana" />
+			<dataarea name="rom" size="16384">
+				<rom name="sedfs-1.00.rom" size="16384" crc="4f28b0a6" sha1="e94aa15b2884c1fd2f7bfe81acc5942aa1faceb5" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="2048" />
+		</part>
+	</software>
+
+	<software name="seds102" cloneof="seds" supported="no">
+		<description>Slogger Electron Disk System v1.02</description>
+		<year>1986</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="cumana" />
+			<dataarea name="rom" size="16384">
+				<rom name="sedfs-1.02.rom" size="16384" crc="0a9570f4" sha1="84072e99aa755bec32165b04f5f19f4499e0ba4b" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="2048" />
+		</part>
+	</software>
+
+	<software name="seds" supported="no">
+		<description>Slogger Electron Disk System v1.03</description>
+		<year>1986</year>
+		<publisher>Slogger</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="cumana" />
+			<dataarea name="rom" size="16384">
+				<rom name="sedfs-1.03.rom" size="16384" crc="186e84dd" sha1="7cb350b3291447331aaaed2c590f719115a7bfed" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="2048" />
 		</part>
 	</software>
 
@@ -280,7 +451,7 @@
 		<year>1988</year>
 		<publisher>Project Expansions</publisher>
 		<part name="cart" interface="electron_cart">
-			<dataarea name="uprom" size="8192">
+			<dataarea name="rom" size="8192">
 				<rom name="sound_expansion-v1.00.rom" size="8192" crc="01a43480" sha1="9f570abbff97e6615a29c9d2de5ec9f37d22c564" offset="0" />
 			</dataarea>
 		</part>
@@ -291,7 +462,7 @@
 		<year>1989</year>
 		<publisher>Complex Software Systems</publisher>
 		<part name="cart" interface="electron_cart">
-			<dataarea name="uprom" size="16384">
+			<dataarea name="rom" size="16384">
 				<rom name="sound_expansion-v3.00.rom" size="16384" crc="65ebfb98" sha1="2e409b92c97cda34ff25c2951e5f799125fe7e32" offset="0" />
 			</dataarea>
 		</part>

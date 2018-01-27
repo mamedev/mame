@@ -671,6 +671,7 @@ BUSES["ECBBUS"] = true
 BUSES["ECONET"] = true
 BUSES["EINSTEIN_USERPORT"] = true
 BUSES["ELECTRON"] = true
+BUSES["ELECTRON_CART"] = true
 BUSES["EP64"] = true
 BUSES["EPSON_SIO"] = true
 BUSES["GAMATE"] = true

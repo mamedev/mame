@@ -4,6 +4,8 @@
 
     Slogger Rombox Plus
 
+    http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Slogger_RomBoxPlus.html
+
     The Electron Rombox+ by Slogger has been designed to be
     compatible with the Acorn Plus 1 but with the added facility to allow
     the popular ROM based software to be used on the Electron microcomputer.
@@ -26,7 +28,7 @@
 DEFINE_DEVICE_TYPE(ELECTRON_ROMBOXP, electron_romboxp_device, "electron_romboxp", "Slogger Rombox+")
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( romboxp )
+//  ROM( romboxp )
 //-------------------------------------------------
 
 ROM_START( romboxp )
@@ -55,6 +57,9 @@ ROM_START( romboxp )
 	ROMX_LOAD("elkexp210.rom", 0x0000, 0x2000, CRC(12442575) SHA1(eb8609991a9a8fb017b8100bfca4248d65faeea8), ROM_BIOS(7))
 ROM_END
 
+//-------------------------------------------------
+//  INPUT_PORTS( romboxp )
+//-------------------------------------------------
 
 static INPUT_PORTS_START( romboxp )
 	PORT_START("OPTION")
@@ -67,13 +72,17 @@ static INPUT_PORTS_START( romboxp )
 INPUT_PORTS_END
 
 //-------------------------------------------------
-//  device_add_mconfig - add device configuration
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 ioport_constructor electron_romboxp_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( romboxp );
 }
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
 
 MACHINE_CONFIG_START(electron_romboxp_device::device_add_mconfig)
 	/* printer */
@@ -96,10 +105,12 @@ MACHINE_CONFIG_START(electron_romboxp_device::device_add_mconfig)
 	MCFG_GENERIC_LOAD(electron_romboxp_device, rom4_load)
 
 	/* cartridges */
-	MCFG_GENERIC_CARTSLOT_ADD("cart1", generic_plain_slot, "electron_cart") // ROM SLOT 0/1
-	MCFG_GENERIC_LOAD(electron_romboxp_device, cart1_load)
-	MCFG_GENERIC_CARTSLOT_ADD("cart2", generic_plain_slot, "electron_cart") // ROM SLOT 2/3
-	MCFG_GENERIC_LOAD(electron_romboxp_device, cart2_load)
+	MCFG_ELECTRON_CARTSLOT_ADD("cart1", electron_cart, nullptr) // ROM SLOT 0/1
+	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(electron_romboxp_device, irq_w))
+	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(electron_romboxp_device, nmi_w))
+	MCFG_ELECTRON_CARTSLOT_ADD("cart2", electron_cart, nullptr) // ROM SLOT 2/3
+	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(electron_romboxp_device, irq_w))
+	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(electron_romboxp_device, nmi_w))
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *electron_romboxp_device::device_rom_region() const
@@ -136,6 +147,7 @@ electron_romboxp_device::electron_romboxp_device(const machine_config &mconfig, 
 
 void electron_romboxp_device::device_start()
 {
+	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
 }
 
 //-------------------------------------------------
@@ -161,14 +173,14 @@ uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset, u
 		case 1:
 			if (m_cart[1]->exists())
 			{
-				data = m_cart[1]->read_rom(space, (offset & 0x3fff) + (m_romsel & 0x01) * 0x4000);
+				data = m_cart[1]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
 			}
 			break;
 		case 2:
 		case 3:
 			if (m_cart[0]->exists())
 			{
-				data = m_cart[0]->read_rom(space, (offset & 0x3fff) + (m_romsel & 0x01) * 0x4000);
+				data = m_cart[0]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
 			}
 			break;
 		case 4:
@@ -181,7 +193,7 @@ uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset, u
 			}
 			break;
 		case 12:
-			data = memregion("exp_rom")->base()[offset & 0x1fff];
+			data = m_exp_rom->base()[offset & 0x1fff];
 			break;
 		case 13:
 		case 14:
@@ -193,9 +205,20 @@ uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset, u
 			break;
 		}
 	}
-	else if (offset == 0xfc72)
+	else if ((offset & 0xfc00) == 0xfc00)
 	{
-		data = status_r(space, offset);
+		data &= m_cart[0]->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
+		data &= m_cart[1]->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
+
+		if (offset == 0xfc72)
+		{
+			data &= status_r(space, offset);
+		}
+	}
+	else if ((offset & 0xfd00) == 0xfd00)
+	{
+		data &= m_cart[0]->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
+		data &= m_cart[1]->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
 	}
 
 	return data;
@@ -207,13 +230,44 @@ uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset, u
 
 void electron_romboxp_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
 {
-	if (offset == 0xfc71)
+	if (offset >= 0x8000 && offset < 0xc000)
 	{
-		m_cent_data_out->write(data);
+		switch (m_romsel)
+		{
+		case 0:
+		case 1:
+			if (m_cart[1]->exists())
+			{
+				m_cart[1]->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
+			}
+			break;
+		case 2:
+		case 3:
+			if (m_cart[0]->exists())
+			{
+				m_cart[0]->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
+			}
+			break;
+		}
 	}
-	else if (offset == 0xfe05)
+	else if ((offset & 0xfc00) == 0xfc00)
 	{
-		m_romsel = data & 0x0f;
+		m_cart[0]->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
+		m_cart[1]->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
+
+		if (offset == 0xfc71)
+		{
+			m_cent_data_out->write(data);
+		}
+		else if (offset == 0xfe05)
+		{
+			m_romsel = data & 0x0f;
+		}
+	}
+	else if ((offset & 0xfd00) == 0xfd00)
+	{
+		m_cart[0]->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
+		m_cart[1]->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
 	}
 }
 
@@ -255,48 +309,12 @@ image_init_result electron_romboxp_device::load_rom(device_image_interface &imag
 	return image_init_result::PASS;
 }
 
-
-image_init_result electron_romboxp_device::load_cart(device_image_interface &image, generic_slot_device *slot)
+WRITE_LINE_MEMBER(electron_romboxp_device::irq_w)
 {
-	if (image.software_entry() == nullptr)
-	{
-		uint32_t filesize = image.length();
+	m_slot->irq_w(state);
+}
 
-		if (filesize != 16384)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only 16K is supported");
-			return image_init_result::FAIL;
-		}
-
-		slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-		image.fread(slot->get_rom_base(), filesize);
-		return image_init_result::PASS;
-	}
-	else
-	{
-		int upsize = image.get_software_region_length("uprom");
-		int losize = image.get_software_region_length("lorom");
-
-		if (upsize != 16384 && upsize != 0)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for uprom");
-			return image_init_result::FAIL;
-		}
-
-		if (losize != 16384 && losize != 0)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for lorom");
-			return image_init_result::FAIL;
-		}
-
-		slot->rom_alloc(0x8000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-
-		if (upsize)
-			memcpy(slot->get_rom_base(), image.get_software_region("uprom"), upsize);
-
-		if (losize)
-			memcpy(slot->get_rom_base() + 0x4000, image.get_software_region("lorom"), losize);
-
-		return image_init_result::PASS;
-	}
+WRITE_LINE_MEMBER(electron_romboxp_device::nmi_w)
+{
+	m_slot->nmi_w(state);
 }

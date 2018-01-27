@@ -4,6 +4,8 @@
 
     Slogger Rombox Plus
 
+    http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Slogger_RomBoxPlus.html
+
 **********************************************************************/
 
 
@@ -12,6 +14,7 @@
 
 #include "exp.h"
 #include "bus/centronics/ctronics.h"
+#include "bus/electron/cart/slot.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
 
@@ -43,6 +46,8 @@ protected:
 private:
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE_LINE_MEMBER(busy_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 
 	image_init_result load_rom(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_rom[0]); }
@@ -50,13 +55,9 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom3_load) { return load_rom(image, m_rom[2]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom4_load) { return load_rom(image, m_rom[3]); }
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart1_load) { return load_cart(image, m_cart[0]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart2_load) { return load_cart(image, m_cart[1]); }
-
 	required_memory_region m_exp_rom;
 	required_device_array<generic_slot_device, 4> m_rom;
-	required_device_array<generic_slot_device, 2> m_cart;
+	required_device_array<electron_cartslot_device, 2> m_cart;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_ioport m_option;
