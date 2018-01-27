@@ -102,9 +102,6 @@ a2bus_cffa2_6502_device::a2bus_cffa2_6502_device(const machine_config &mconfig, 
 
 void a2bus_cffa2000_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(CFFA2_ROM_REGION).c_str())->base();
 
 	// patch default setting so slave device is enabled and up to 13 devices on both connectors
@@ -216,7 +213,7 @@ void a2bus_cffa2000_device::write_c0nx(uint8_t offset, uint8_t data)
 
 uint8_t a2bus_cffa2000_device::read_cnxx(uint8_t offset)
 {
-	int slotimg = m_slot * 0x100;
+	int const slotimg = slotno() * 0x100;
 
 	// ROM contains a CnXX image for each of slots 1-7
 	return m_eeprom[offset+slotimg];
