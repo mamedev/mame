@@ -2220,7 +2220,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="vz editor 1.6 with atok 7.bin" size="1281280" crc="59c8f9db" sha1="c159eecc31b17fa596afa992d2ba96084c1e7a5d" offset="0" />
+				<rom name="vz editor 1.6 with atok 7.bin" size="1261568" crc="59c8f9db" sha1="c159eecc31b17fa596afa992d2ba96084c1e7a5d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
