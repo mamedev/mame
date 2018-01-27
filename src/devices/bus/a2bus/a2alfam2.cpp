@@ -101,8 +101,6 @@ a2bus_aesms_device::a2bus_aesms_device(const machine_config &mconfig, const char
 
 void a2bus_sn76489_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
 	m_latch0 = m_latch1 = m_latch2 = m_latch3 = 0;
 
 	save_item(NAME(m_latch0));

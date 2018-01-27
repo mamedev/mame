@@ -87,9 +87,6 @@ a2bus_applicard_device::a2bus_applicard_device(const machine_config &mconfig, co
 
 void a2bus_applicard_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	// locate Z80 ROM
 	m_z80rom = device().machine().root_device().memregion(this->subtag(Z80_ROM_REGION).c_str())->base();
 

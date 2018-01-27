@@ -101,6 +101,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(sw_do_enable);
 
 	void intellec4(machine_config &config);
+
 protected:
 	intellec4_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
