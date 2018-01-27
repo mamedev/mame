@@ -107,9 +107,6 @@ public:
 	{
 	}
 
-	DECLARE_WRITE16_MEMBER(bloodwar_oki_1_bank_w);
-	DECLARE_WRITE16_MEMBER(gtmr_oki_0_bank_w);
-	DECLARE_WRITE16_MEMBER(gtmr_oki_1_bank_w);
 	DECLARE_WRITE16_MEMBER(bloodwar_coin_lockout_w);
 	DECLARE_READ16_MEMBER(gtmr_wheel_r);
 	DECLARE_READ16_MEMBER(gtmr2_wheel_r);
