@@ -5136,20 +5136,12 @@ uint16_t ati_vga_device::offset()
 }
 
 
-void ati_vga_device::ati_define_video_mode()
+void ati_vga_device::set_dot_clock()
 {
 	int clock;
 	uint8_t clock_type;
 	int div = ((ati.ext_reg[0x38] & 0xc0) >> 6) + 1;
 	int divisor = 1;
-
-	svga.rgb8_en = 0;
-	svga.rgb15_en = 0;
-	svga.rgb16_en = 0;
-	svga.rgb32_en = 0;
-
-	if(ati.ext_reg[0x30] & 0x20)
-		svga.rgb8_en = 1;
 
 	clock_type = ((ati.ext_reg[0x3e] & 0x10)>>1) | ((ati.ext_reg[0x39] & 0x02)<<1) | ((vga.miscellaneous_output & 0x0c)>>2);
 	switch(clock_type)
@@ -5208,6 +5200,20 @@ void ati_vga_device::ati_define_video_mode()
 	}
 //  logerror("ATI: Clock select type %i (%iHz / %i)\n",clock_type,clock,div);
 	recompute_params_clock(divisor,clock / div);
+
+}
+
+void ati_vga_device::ati_define_video_mode()
+{
+	svga.rgb8_en = 0;
+	svga.rgb15_en = 0;
+	svga.rgb16_en = 0;
+	svga.rgb32_en = 0;
+
+	if(ati.ext_reg[0x30] & 0x20)
+		svga.rgb8_en = 1;
+
+	set_dot_clock();
 }
 
 READ8_MEMBER(ati_vga_device::mem_r)
@@ -5517,6 +5523,36 @@ READ16_MEMBER(ibm8514a_device::ibm8514_subcontrol_r)
 	return ibm8514.subctrl;
 }
 
+/*  22E8 (W)
+ * Display Control
+ *  bits 1-2: Line skip control - 0=bits 1-2 skipped, 1=bit 2 skipped
+ *  bit    3: Double scan
+ *  bit    4: Interlace
+ *  bits 5-6: Emable Display - 0=no change, 1=enable 8514/A, 2 or 3=8514/A reset
+ */
+WRITE16_MEMBER(ibm8514a_device::ibm8514_display_ctrl_w)
+{
+	ibm8514.display_ctrl = data & 0x7e;
+	switch(data & 0x60)
+	{
+		case 0x00:
+			break;  // do nothing
+		case 0x20:
+			ibm8514.enabled = true;  // enable 8514/A
+			break;
+		case 0x40:
+		case 0x60:  // reset (does this disable the 8514/A?)
+			ibm8514.enabled = false;
+			break;
+	}
+}
+
+WRITE16_MEMBER(ibm8514a_device::ibm8514_advfunc_w)
+{
+	ibm8514.advfunction_ctrl = data;
+	ibm8514.passthrough = data & 0x0001;
+}
+
 READ16_MEMBER(ibm8514a_device::ibm8514_htotal_r)
 {
 	return ibm8514.htotal;
@@ -5709,6 +5745,13 @@ WRITE16_MEMBER(mach8_device::mach8_scratch1_w)
 	if(LOG_8514) logerror("Mach8: Scratch Pad 1 write %04x\n",data);
 }
 
+WRITE16_MEMBER(mach8_device::mach8_crt_pitch_w)
+{
+	mach8.crt_pitch = data & 0x00ff;
+	m_vga->set_offset(mach8.crt_pitch);
+	if(LOG_8514) logerror("Mach8: CRT pitch write %04x\n",mach8.crt_pitch);
+}
+
 WRITE16_MEMBER(mach8_device::mach8_ge_offset_l_w)
 {
 	mach8.ge_offset = (mach8.ge_offset & 0x0f0000) | data;
@@ -5723,8 +5766,8 @@ WRITE16_MEMBER(mach8_device::mach8_ge_offset_h_w)
 
 WRITE16_MEMBER(mach8_device::mach8_ge_pitch_w)
 {
-	mach8.ge_pitch = mach8.ge_offset & 0x00ff;
-	if(LOG_8514) logerror("Mach8: Graphics Engine pitch write %05x\n",mach8.ge_pitch);
+	mach8.ge_pitch = data & 0x00ff;
+	if(LOG_8514) logerror("Mach8: Graphics Engine pitch write %04x\n",mach8.ge_pitch);
 }
 
 WRITE16_MEMBER(mach8_device::mach8_scan_x_w)
@@ -5836,4 +5879,19 @@ bit    0  SHARE_CLOCK. If set the Mach8 shares clock with the VGA
 READ16_MEMBER(mach8_device::mach8_config2_r)
 {
 	return 0x0002;
+}
+
+/* 7AEE (W)   Mach 8 (16-bit)
+ * bits    0-2  Monitor Alias - Monitor ID
+ * bit       3  Enable reporting of Monitor Alias
+ * bit      12  EEPROM Data Out
+ * bit      13  EEPROM Clock
+ * bit      14  EEPROM Chip Select
+ * bit      15  EEPROM Select (Enables read/write of external EEPROM)
+ */
+WRITE16_MEMBER(mach8_device::mach8_ge_ext_config_w)
+{
+	mach8.ge_ext_config = data;
+	if(data & 0x8000)
+		popmessage("EEPROM enabled via 7AEE");
 }

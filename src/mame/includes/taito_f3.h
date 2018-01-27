@@ -120,7 +120,6 @@ public:
 	uint16_t *m_f3_pf_data_6;
 	uint16_t *m_f3_pf_data_7;
 	uint16_t *m_f3_pf_data_8;
-	int m_f3_skip_this_frame;
 	int m_sprite_lag;
 	uint8_t m_sprite_pri_usage;
 	bitmap_ind8 m_pri_alp_bitmap;

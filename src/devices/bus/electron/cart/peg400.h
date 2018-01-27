@@ -1,0 +1,57 @@
+// license:BSD-3-Clause
+// copyright-holders:Nigel Barnes
+/**********************************************************************
+
+    Slogger Pegasus 400 disk interface
+
+**********************************************************************/
+
+#ifndef MAME_BUS_ELECTRON_CART_PEG400_H
+#define MAME_BUS_ELECTRON_CART_PEG400_H
+
+#include "slot.h"
+#include "machine/wd_fdc.h"
+#include "formats/acorn_dsk.h"
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class electron_peg400_device :
+	public device_t,
+	public device_electron_cart_interface
+{
+public:
+	// construction/destruction
+	electron_peg400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+
+	// electron_cart_interface overrides
+	virtual uint8_t read(address_space &space, offs_t offset, int infc, int infd, int romqa) override;
+	virtual void write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa) override;
+
+private:
+	DECLARE_WRITE8_MEMBER(wd1770_control_w);
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+
+	required_device<wd1770_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
+
+	int m_drive_control;
+	int m_fdc_ie;
+};
+
+
+// device type definition
+DECLARE_DEVICE_TYPE(ELECTRON_PEG400, electron_peg400_device)
+
+
+#endif // MAME_BUS_ELECTRON_CART_PEG400_H
