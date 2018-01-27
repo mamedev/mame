@@ -451,16 +451,19 @@ uint32_t popeye_state::screen_update_tnx1(screen_device &screen, bitmap_ind16 &b
 			sy ^= 0x1ff;
 
 		sy -= 0x200 - (2 * m_background_pos[1]);
-		if (sy < 0)
-			sy = 0; // TODO: find out exactly where the data is fetched from
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			// TODO: confirm the memory layout
-			int sx = x + (2 * (m_background_pos[0] | ((m_background_pos[2] & 1) << 8))) + 0x70;
-			int shift = (sx & 0x200) / 0x80;
+			if (sy < 0)
+				bitmap.pix16(y, x) = m_bitmapram[0x3f] & 0xf; // TODO: find out exactly where the data is fetched from
+			else
+			{
+				// TODO: confirm the memory layout
+				int sx = x + (2 * (m_background_pos[0] | ((m_background_pos[2] & 1) << 8))) + 0x70;
+				int shift = (sx & 0x200) / 0x80;
 
-			bitmap.pix16(y, x) = (m_bitmapram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+				bitmap.pix16(y, x) = (m_bitmapram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+			}
 		}
 	}
 
@@ -483,16 +486,19 @@ uint32_t popeye_state::screen_update_tpp1(screen_device &screen, bitmap_ind16 &b
 			sy ^= 0x1ff;
 
 		sy -= 0x200 - (2 * m_background_pos[1]);
-		if (sy < 0)
-			sy = 0; // TODO: find out exactly where the data is fetched from
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			// TODO: confirm the memory layout
-			int sx = x + (2 * m_background_pos[0]) + 0x70;
-			int shift = (sy & 4);
+			if (sy < 0)
+				bitmap.pix16(y, x) = m_bitmapram[0x3f] & 0xf; // TODO: find out exactly where the data is fetched from
+			else
+			{
+				// TODO: confirm the memory layout
+				int sx = x + (2 * m_background_pos[0]) + 0x70;
+				int shift = (sy & 4);
 
-			bitmap.pix16(y, x) = (m_bitmapram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+				bitmap.pix16(y, x) = (m_bitmapram[((sx / 8) & 0x3f) + ((sy / 8) * 0x40)] >> shift) & 0xf;
+			}
 		}
 	}
 
