@@ -484,7 +484,7 @@ static ADDRESS_MAP_START( sprtauth_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("rombank")
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
+	AM_RANGE(0xc000, 0xffff) AM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(reelfun_standard)

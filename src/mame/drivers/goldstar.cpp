@@ -396,8 +396,6 @@ static ADDRESS_MAP_START( star100_map, AS_PROGRAM, 8, sanghopm_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 
-	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-
 ADDRESS_MAP_END
 
 
@@ -1263,7 +1261,6 @@ static ADDRESS_MAP_START( bonusch_map, AS_PROGRAM, 8, unkch_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM     // ok
 
 	AM_RANGE(0xd800, 0xdfff) AM_RAM //AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")

@@ -335,8 +335,9 @@ WRITE8_MEMBER(rvoice_state::main_hd63701_internal_registers_w)
 static ADDRESS_MAP_START(hd63701_main_mem, AS_PROGRAM, 8, rvoice_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0027) AM_READWRITE(main_hd63701_internal_registers_r, main_hd63701_internal_registers_w) // INTERNAL REGS
-	AM_RANGE(0x0040, 0x013f) AM_RAM // INTERNAL RAM (overlaps acia)
+	AM_RANGE(0x0040, 0x005f) AM_RAM // INTERNAL RAM (overlaps acia)
 	AM_RANGE(0x0060, 0x007f) AM_DEVREADWRITE("acia65c51", mos6551_device, read, write) // ACIA 65C51
+	AM_RANGE(0x0080, 0x013f) AM_RAM // INTERNAL RAM (overlaps acia)
 	AM_RANGE(0x2000, 0x7fff) AM_RAM // EXTERNAL SRAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM // 27512 EPROM
 ADDRESS_MAP_END
