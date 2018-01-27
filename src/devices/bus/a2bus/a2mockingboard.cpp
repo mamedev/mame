@@ -145,9 +145,6 @@ a2bus_echoplus_device::a2bus_echoplus_device(const machine_config &mconfig, cons
 
 void a2bus_ayboard_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	save_item(NAME(m_porta1));
 	save_item(NAME(m_porta2));
 }
@@ -250,7 +247,7 @@ void a2bus_ayboard_device::write_cnxx(uint8_t offset, uint8_t data)
 		}
 		else
 		{
-			logerror("Mockingboard(%d): unk write %02x to Cn%02X (%s)\n", m_slot, data, offset, machine().describe_context());
+			logerror("Mockingboard(%d): unk write %02x to Cn%02X (%s)\n", slotno(), data, offset, machine().describe_context());
 		}
 	}
 }
