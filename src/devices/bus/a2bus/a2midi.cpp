@@ -74,8 +74,6 @@ a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, device_type 
 
 void a2bus_midi_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
 }
 
 void a2bus_midi_device::device_reset()

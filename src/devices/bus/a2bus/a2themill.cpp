@@ -79,9 +79,6 @@ a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, const 
 
 void a2bus_themill_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	save_item(NAME(m_bEnabled));
 	save_item(NAME(m_flipAddrSpace));
 	save_item(NAME(m_6809Mode));

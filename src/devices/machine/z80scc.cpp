@@ -517,10 +517,6 @@ void z80scc_device::device_reset()
 {
 	LOG("%s %s \n",tag(), FUNCNAME);
 
-	// Do channel reset on both channels
-	m_chanA->reset();
-	m_chanB->reset();
-
 	// Hardware reset values for registers where it differs from channel reset values
 	m_wr9  &= 0x3c;
 	m_wr9  |= 0xc0;

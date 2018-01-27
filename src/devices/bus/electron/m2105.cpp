@@ -153,16 +153,16 @@ uint8_t electron_m2105_device::expbus_r(address_space &space, offs_t offset, uin
 		switch (m_romsel)
 		{
 		case 0:
-			data = memregion("exp_rom")->base()[0x8000 + (offset & 0x3fff)];
+			data = m_exp_rom->base()[0x8000 + (offset & 0x3fff)];
 			break;
 		case 2:
-			data = memregion("exp_rom")->base()[0xc000 + (offset & 0x3fff)];
+			data = m_exp_rom->base()[0xc000 + (offset & 0x3fff)];
 			break;
 		case 12:
-			data = memregion("exp_rom")->base()[0x0000 + (offset & 0x3fff)];
+			data = m_exp_rom->base()[0x0000 + (offset & 0x3fff)];
 			break;
 		case 13:
-			data = memregion("exp_rom")->base()[0x4000 + (offset & 0x3fff)];
+			data = m_exp_rom->base()[0x4000 + (offset & 0x3fff)];
 			break;
 		}
 	}
