@@ -58,12 +58,26 @@ bbc_joyport_slot_device::bbc_joyport_slot_device(const machine_config &mconfig, 
 
 
 //-------------------------------------------------
+//  device_validity_check -
+//-------------------------------------------------
+
+void bbc_joyport_slot_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const carddev = get_card_device();
+	if (carddev && !dynamic_cast<device_bbc_joyport_interface *>(carddev))
+		osd_printf_error("Card device %s (%s) does not implement device_bbc_joyport_interface\n", carddev->tag(), carddev->name());
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void bbc_joyport_slot_device::device_start()
 {
-	m_device = dynamic_cast<device_bbc_joyport_interface *>(get_card_device());
+	device_t *const carddev = get_card_device();
+	m_device = dynamic_cast<device_bbc_joyport_interface *>(carddev);
+	if (carddev && !m_device)
+		fatalerror("Card device %s (%s) does not implement device_bbc_joyport_interface\n", carddev->tag(), carddev->name());
 }
 
 uint8_t bbc_joyport_slot_device::cb_r()
@@ -88,10 +102,6 @@ uint8_t bbc_joyport_slot_device::pb_r()
 
 void bbc_joyport_slot_device::device_reset()
 {
-	if (get_card_device())
-	{
-		get_card_device()->reset();
-	}
 }
 
 

@@ -70,12 +70,27 @@ vic20_expansion_slot_device::vic20_expansion_slot_device(const machine_config &m
 
 
 //-------------------------------------------------
+//  device_validity_check -
+//-------------------------------------------------
+
+void vic20_expansion_slot_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const carddev = get_card_device();
+	if (carddev && !dynamic_cast<device_vic20_expansion_card_interface *>(carddev))
+		osd_printf_error("Card device %s (%s) does not implement device_vic20_expansion_card_interface\n", carddev->tag(), carddev->name());
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void vic20_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_vic20_expansion_card_interface *>(get_card_device());
+	device_t *const carddev = get_card_device();
+	m_card = dynamic_cast<device_vic20_expansion_card_interface *>(carddev);
+	if (carddev && !m_card)
+		fatalerror("Card device %s (%s) does not implement device_vic20_expansion_card_interface\n", carddev->tag(), carddev->name());
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();
@@ -98,10 +113,6 @@ void vic20_expansion_slot_device::device_start()
 
 void vic20_expansion_slot_device::device_reset()
 {
-	if (get_card_device())
-	{
-		get_card_device()->reset();
-	}
 }
 
 
