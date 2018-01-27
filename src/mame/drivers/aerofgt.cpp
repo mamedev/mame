@@ -2733,6 +2733,7 @@ ROM_START( karatblzbl )
 	ROM_LOAD16_BYTE( "8.u65",        0x080001, 0x040000, CRC(b491201a) SHA1(c18cb1cc8a8bf031e00d8d89de62f7ed5548e767) )
 ROM_END
 
+// There is known to exist but not currently dumped a version of Turbo Force with the program roms stamped "7"
 ROM_START( turbofrc ) // World version with no copyright notice
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "4v2.subpcb.u2", 0x00000, 0x40000, CRC(721300ee) SHA1(79ab32fdfd377592a0bdbd1c4794cfd529a3eb7b) ) // 27c2048 - located on a OR-10 SUB BOARD - 4 stamped on chip with VideoSystem logo V
@@ -2767,12 +2768,11 @@ ROM_START( turbofrc ) // World version with no copyright notice
 	ROM_LOAD( "lh538o7j.u179", 0x000000, 0x100000, CRC(60ca0333) SHA1(28b94edc98d360386759780ccd1122d43ffa5279) ) // mask rom
 ROM_END
 
-ROM_START( turbofrco )
+ROM_START( turbofrco ) // World version with no copyright notice
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
-	// all marked 3 instead of 4 compared to set above
-	ROM_LOAD16_WORD_SWAP( "4v2.subpcb.u2", 0x00000, 0x40000, CRC(721300ee) SHA1(79ab32fdfd377592a0bdbd1c4794cfd529a3eb7b) ) // 27c2048 - located on a OR-10 SUB BOARD - 3 stamped on chip with VideoSystem logo V
+	ROM_LOAD16_WORD_SWAP( "3v2.subpcb.u2", 0x00000, 0x40000, CRC(721300ee) SHA1(79ab32fdfd377592a0bdbd1c4794cfd529a3eb7b) ) // 27c2048 - located on a OR-10 SUB BOARD - 3 stamped on chip with VideoSystem logo V
 	ROM_LOAD16_WORD_SWAP( "3v1.subpcb.u1", 0x40000, 0x40000, CRC(71b6431b) SHA1(471bada4730a1a323af9b493f8c5f57c2a147f8d) ) // 27c2048 - located on a OR-10 SUB BOARD - 3 stamped on chip with VideoSystem logo V
-	ROM_LOAD16_WORD_SWAP( "4v3.u14",       0x80000, 0x40000, CRC(63f50557) SHA1(f8dba8c9ba412c9a67457ec31a804c57593ab20b) ) // 27c2048 - 3 stamped on chip with VideoSystem logo V
+	ROM_LOAD16_WORD_SWAP( "3v3.u14",       0x80000, 0x40000, CRC(63f50557) SHA1(f8dba8c9ba412c9a67457ec31a804c57593ab20b) ) // 27c2048 - 3 stamped on chip with VideoSystem logo V
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
 	ROM_LOAD( "6.u166", 0x00000, 0x20000, CRC(2ca14a65) SHA1(95f6e7b4fa7ca26872ff472d7e6fb75fd4f281d5) ) // 27c1001
@@ -2802,7 +2802,7 @@ ROM_START( turbofrco )
 	ROM_LOAD( "lh538o7j.u179", 0x000000, 0x100000, CRC(60ca0333) SHA1(28b94edc98d360386759780ccd1122d43ffa5279) ) // mask rom
 ROM_END
 
-ROM_START( turbofrcu )
+ROM_START( turbofrcu ) // US version
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "8v2.subpcb.u2", 0x00000, 0x40000, CRC(721300ee) SHA1(79ab32fdfd377592a0bdbd1c4794cfd529a3eb7b) ) // 27c2048 - located on a OR-10 SUB BOARD - 8 stamped on chip with VideoSystem logo V
 	ROM_LOAD16_WORD_SWAP( "8v1.subpcb.u1", 0x40000, 0x40000, CRC(cc324da6) SHA1(ed2eaff7351914e3ebaf925ddc01be9d44d89fa6) ) // 27c2048 - located on a OR-10 SUB BOARD - 8 stamped on chip with VideoSystem logo V
