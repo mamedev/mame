@@ -63,9 +63,6 @@ a2bus_softcard_device::a2bus_softcard_device(const machine_config &mconfig, cons
 
 void a2bus_softcard_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	save_item(NAME(m_bEnabled));
 	save_item(NAME(m_FirstZ80Boot));
 }

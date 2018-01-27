@@ -71,8 +71,6 @@ a2bus_arcboard_device::a2bus_arcboard_device(const machine_config &mconfig, devi
 
 void a2bus_arcboard_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
 }
 
 void a2bus_arcboard_device::device_reset()
