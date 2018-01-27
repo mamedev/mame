@@ -87,10 +87,6 @@ void electron_expansion_slot_device::device_start()
 
 void electron_expansion_slot_device::device_reset()
 {
-	if (m_card != nullptr)
-	{
-		m_card->device().reset();
-	}
 }
 
 //-------------------------------------------------
