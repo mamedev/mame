@@ -324,7 +324,7 @@ static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16, kaneko16_berlwall_state )
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(kaneko16_coin_lockout_w)  // Coin Lockout
 	AM_RANGE(0x780000, 0x780001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(kaneko16_ay_YM2149_r<0>, kaneko16_ay_YM2149_w<0>) // Sound
-	AM_RANGE(0x800200, 0x80021f) AM_READWRITE(kaneko16_ay_YM2149_r<1>, kaneko16_ay1_YM2149_w<1>)
+	AM_RANGE(0x800200, 0x80021f) AM_READWRITE(kaneko16_ay_YM2149_r<1>, kaneko16_ay_YM2149_w<1>)
 	AM_RANGE(0x8003fe, 0x8003ff) AM_NOP // for OKI when accessed as .l
 	AM_RANGE(0x800400, 0x800401) AM_READWRITE( berlwall_oki_r, berlwall_oki_w )
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
@@ -346,7 +346,7 @@ static ADDRESS_MAP_START( bakubrkr, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x400000, 0x40001f) AM_READ(kaneko16_ay_YM2149_r<0>) // Sound
 	AM_RANGE(0x400000, 0x40001d) AM_WRITE(kaneko16_ay_YM2149_w<0>)
 	AM_RANGE(0x40001e, 0x40001f) AM_WRITE8(oki_bank_w<0,7,0x20000,0x20000>, 0x00ff) // OKI bank Switch
-	AM_RANGE(0x400200, 0x40021f) AM_READWRITE(kaneko16_ay_YM2149_r<1>,kaneko16_ay1_YM2149_w<1>)          // Sound
+	AM_RANGE(0x400200, 0x40021f) AM_READWRITE(kaneko16_ay_YM2149_r<1>,kaneko16_ay_YM2149_w<1>)          // Sound
 	AM_RANGE(0x400400, 0x400401) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)  //
 	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x580000, 0x583fff) AM_DEVREADWRITE("view2_1", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
@@ -608,7 +608,7 @@ static ADDRESS_MAP_START( mgcrystl, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM     // ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM     // Work RAM
 	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(kaneko16_ay_YM2149_r<0>, kaneko16_ay_YM2149_w<0>) // Sound
-	AM_RANGE(0x400200, 0x40021f) AM_READWRITE(kaneko16_ay_YM2149_r<1>, kaneko16_ay1_YM2149_w<1>)
+	AM_RANGE(0x400200, 0x40021f) AM_READWRITE(kaneko16_ay_YM2149_r<1>, kaneko16_ay_YM2149_w<1>)
 	AM_RANGE(0x400400, 0x400401) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x500000, 0x500fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
