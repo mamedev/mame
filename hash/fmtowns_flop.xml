@@ -458,7 +458,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 
 <!-- GAME DISCS -->
 
-	<software name="abunaten">
+	<!-- Doesn't boot; probably related to floppy motor control -->
+	<software name="abunaten" supported="no">
 		<description>Abunai Tengu Densetsu</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -483,7 +484,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="asuka120">
+	<!-- Some graphics issues -->
+	<software name="asuka120" supported="partial">
 		<description>Asuka 120% Burning Fest.</description>
 		<year>1994</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
@@ -508,7 +510,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="brandish">
+	<!-- Hangs after the intro -->
+	<software name="brandish" supported="no">
 		<description>Brandish</description>
 		<year>1991</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -530,7 +533,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="columns">
+	<!-- Triggers copy protection -->
+	<software name="columns" supported="no">
 		<description>Columns</description>
 		<year>1990</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
@@ -542,7 +546,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="dps">
+	<!-- Doesn't boot; probably related to floppy motor control -->
+	<software name="dps" supported="no">
 		<description>D.P.S - Dream Program System</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -559,7 +564,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="dpssg">
+	<!-- Doesn't boot; probably related to floppy motor control -->
+	<software name="dpssg" supported="no">
 		<description>D.P.S SG - Dream Program System SG</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -590,7 +596,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="dpssg2">
+	<!-- Doesn't boot; probably related to floppy motor control -->
+	<software name="dpssg2" supported="no">
 		<description>D.P.S SG 2 - Dream Program System SG Set 2</description>
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -621,7 +628,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="dpssg3">
+	<!-- Doesn't boot; probably related to floppy motor control -->
+	<software name="dpssg3" supported="no">
 		<description>D.P.S SG 3 - Dream Program System SG Set 3</description>
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -652,7 +660,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="dinosaur">
+	<!-- Reboots the machine - copy protection? -->
+	<software name="dinosaur" supported="no">
 		<description>Dinosaur</description>
 		<year>1991</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
@@ -673,7 +682,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="drstop">
+	<!-- Doesn't boot; probably related to floppy motor control -->
+	<software name="drstop" supported="no">
 		<description>Dr. Stop!</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -1047,7 +1057,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="irium">
+	<!-- Black screen on boot -->
+	<software name="irium" supported="no">
 		<description>Irium</description>
 		<year>1993</year>
 		<publisher>オレンジハウス (Orange House)</publisher>
@@ -1191,7 +1202,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="musicpro">
+	<!-- Black screen on boot -->
+	<software name="musicpro" supported="no">
 		<description>Music Pro-Towns</description>
 		<year>1989</year>
 		<publisher>Musical Plan</publisher>
@@ -1202,7 +1214,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="premium2">
+	<!-- Doesn't boot; probably related to floppy motor control -->
+	<software name="premium2" supported="no">
 		<description>Premium 2</description>
 		<year>1993</year>
 		<publisher>シルキーズ (Silky's)</publisher>
@@ -1229,8 +1242,9 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="rance">
-		<description>Rance - Hikari o Motomete.hdm</description>
+	<!-- Doesn't boot; probably related to floppy motor control -->
+	<software name="rance" supported="no">
+		<description>Rance - Hikari o Motomete</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
 		<info name="release" value="199003xx" />
@@ -1256,7 +1270,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="rance2">
+	<!-- Doesn't boot; probably related to floppy motor control -->
+	<software name="rance2" supported="no">
 		<description>Rance 2 - Hangyaku no Shoujotachi</description>
 		<year>1990</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -1495,7 +1510,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="toshinto">
+	<!-- Doesn't boot; probably related to floppy motor control -->
+	<software name="toshinto" supported="no">
 		<description>Toushin Toshi</description>
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -1536,7 +1552,8 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="toshintoa" cloneof="toshinto">
+	<!-- Doesn't boot; probably related to floppy motor control -->
+	<software name="toshintoa" cloneof="toshinto" supported="no">
 		<description>Toushin Toshi (Alt Disk 2)</description>
 		<year>1991</year>
 		<publisher>アリスソフト (AliceSoft)</publisher>
@@ -2196,13 +2213,14 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<software name="vzedit">
+	<!-- Hangs on boot -->
+	<software name="vzedit" supported="no">
 		<description>VZ Editor 1.6 with ATOK 7</description>
 		<year>199?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1281280">
-				<rom name="vz editor 1.6 with atok 7.bin" size="1281280" crc="514f8e0b" sha1="cc1a7fa78e6fb3c44d1c3c17dd00e863a80a191f" offset="0" />
+			<dataarea name="flop" size="1261568">
+				<rom name="vz editor 1.6 with atok 7.bin" size="1261568" crc="59c8f9db" sha1="c159eecc31b17fa596afa992d2ba96084c1e7a5d" offset="0" />
 			</dataarea>
 		</part>
 	</software>

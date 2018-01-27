@@ -721,6 +721,7 @@ BUSES["PLUS4"] = true
 BUSES["POFO"] = true
 BUSES["PSI_KEYBOARD"] = true
 BUSES["PSX_CONTROLLER"] = true
+BUSES["PSX_PARALLEL"] = true
 BUSES["QL"] = true
 BUSES["RS232"] = true
 BUSES["S100"] = true
