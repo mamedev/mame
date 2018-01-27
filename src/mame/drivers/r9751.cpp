@@ -136,8 +136,6 @@ private:
 	uint32_t smioc_dma_r_length;
 	uint32_t fdd_dma_bank;
 	attotime timer_32khz_last;
-	uint8_t m_term_data;
-	uint16_t m_serial_status;
 	uint16_t m_serial_status2;
 	std::queue<uint8_t> kbd_queue;
 	std::queue<uint16_t> serial_status_queue;
