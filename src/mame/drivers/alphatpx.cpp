@@ -869,17 +869,17 @@ WRITE8_MEMBER(alphatp_12_state::fdc_cmd_w)
 
 	// select drive
 	if (!(data & 0x80))
-		{
+	{
 		floppy = m_con1 ? m_con1->get_device() : nullptr;
-		}
+	}
 	else if (!(data & 0x40))
-		{
+	{
 		floppy = m_con2 ? m_con2->get_device() : nullptr;
-		}
+	}
 	else if (!(data & 0x20))
-		{
+	{
 		floppy = m_con3 ? m_con3->get_device() : nullptr;
-		}
+	}
 
 	// selecting a new drive?
 	if (floppy != m_curfloppy)
