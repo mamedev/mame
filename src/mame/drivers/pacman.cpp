@@ -1286,7 +1286,7 @@ static ADDRESS_MAP_START( superabc_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x4800, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("28c16.u17") // nvram
+	AM_RANGE(0x4800, 0x4fef) AM_MIRROR(0xa000) AM_RAM AM_SHARE("28c16.u17") // nvram
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf3c) AM_WRITE(superabc_bank_w)
 	AM_RANGE(0x5000, 0x5007) AM_MIRROR(0xaf38) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
