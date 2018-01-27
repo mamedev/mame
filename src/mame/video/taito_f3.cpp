@@ -82,7 +82,8 @@ Line ram memory map:
     0x5000: Clip plane 0 (low bits)
     0x5200: Clip plane 1 (low bits)
     0x5400: Unused?
-    0x5600: Unused?
+    0x5600: Used by quizhuhu (taito logo and ingame text), and landmakr (winning text), 
+	        special clip used in tandem with b*00 bit 11? [unemulated]
 
     0x6000: Sync register
     0x6004: Sprite alpha control
