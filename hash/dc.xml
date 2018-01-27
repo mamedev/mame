@@ -9,6 +9,9 @@ http://segaretro.org/
 
 CDI images were converted to ISO with cdi2iso before being compressed with chdman,
 this is probably not a lossless process. Keep your original images.
+
+NRG images were converted to BIN/CUE with IsoBuster before being compressed with chdman,
+this is probably not a lossless process. Keep your original images.
 -->
 
 <softwarelist name="dc" description="Sega Dreamcast GD-ROMs">
@@ -21,7 +24,7 @@ this is probably not a lossless process. Keep your original images.
         <publisher>2D-Retroperspectives</publisher>
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="2D House of Terror (World)" sha1="3314904eacfe788969c480d0356e056d5753381e"/>
+                <disk name="2d house of terror (world)" sha1="3314904eacfe788969c480d0356e056d5753381e" status="baddump"/>
             </diskarea>
         </part>
     </software>
@@ -217,6 +220,7 @@ this is probably not a lossless process. Keep your original images.
         </part>
     </software>
     
+    <!-- Apparently dumped via Dreamshell, which is known to give bad dumps -->
     <software name="18wheelrp2" cloneof="18wheelr">
         <!--
         <rom name="18WHEELER_AMERICAN-PRO-TRUCKE.gdi" size="83" md5="959dda0935b75865e18449e6068f5db0" sha1="7b3d2d36b0e930ad89ad90c988eadc057468d627"/>
@@ -237,10 +241,13 @@ this is probably not a lossless process. Keep your original images.
     
     <!-- 
     Also released as a Dorikore version, which is identical to retail, as well as a Limited Edition (T-46504M), which shares the 
-    same disc content as the regular edition.
+    same disc content as the regular edition but includes a bonus calendar.
     -->
-    <!--
+    <!-- Both Dumpcast and Redump have dumps available, preferably replace this dump with either one. -->
     <software name="21twoone">
+        <!--
+        <rom name="21 Two One (Japan)[R18_Color][Zorlon].cdi" size="796719727" md5="ca8ce3e785e84cc4002efae91c57a954" sha1="af2789c6998eebe3cade21ccccdbf03883a0e1c9"/>
+        -->
         <description>21: Two One (Jpn)</description>
         <year>2001</year>
         <publisher>Princess Soft</publisher>
@@ -249,13 +256,12 @@ this is probably not a lossless process. Keep your original images.
 		<info name="alt_title" value="21: Two One 初回限定版 (Box, Limited Edition)" />
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="21 two one (jpn)" status="nodump"/>
+                <disk name="21 two one (jpn)" sha1="8f28c70713a29adb95503ad3514804ff878e7605" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
-    <!-- A promo version exists (950-0181-50 952-0166-50), it is most likely the same as retail -->
+    <!-- A promo version exists (950-0181-50 952-0166-50), it is most likely the same as retail. -->
     <software name="90min">
         <!--
         <rom name="90 Minutes - Sega Championship Football v1.009 (2001)(Sega)(PAL)(M5)[!].gdi" size="87" md5="346fea58ab1a55c577138c5b04319157" sha1="980036e44ad9d694ea1699cd05c86ccd0c894c47"/>
@@ -275,8 +281,11 @@ this is probably not a lossless process. Keep your original images.
         </part>
     </software>
     
-    <!--
+    <!-- Both Dumpcast and Redump have dumps available, preferably replace this dump with either one. -->
     <software name="jlspecso" cloneof="90min">
+        <!--
+        <rom name="J.League Spectacle Soccer (Japan)[LipeRJ].cdi" size="725055807" md5="c61270e06cd4dd876157b355cbfafb3c" sha1="d22c9e7d4edd5714827e520c38dc3624dfef178f"/>
+        -->
         <description>J.League Spectacle Soccer (Jpn)</description>
         <year>2002</year>
         <publisher>Sega</publisher>
@@ -285,50 +294,52 @@ this is probably not a lossless process. Keep your original images.
 		<info name="alt_title" value="Jリーグ スペクタクルサッカー" />
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="j.league spectacle soccer (jpn)" status="nodump"/>
+                <disk name="j.league spectacle soccer (jpn)" sha1="878797ed1c18a4aefb18961939bcf5660e00c52c" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
-    <!--
     <software name="gmshrkcdx">
+        <!--
+        <rom name="Game Shark CDX.cdi" size="2834627" md5="0ba19574a2959b2d2864a103a0dda218" sha1="f4e81396acf74ce6b712f5acebdecb87608aee28"/>
+        -->
         <description>GameShark CDX (USA)</description>
         <year>2000</year>
         <publisher>InterAct</publisher>
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="gameshark cdx (usa)" status="nodump"/>
+                <disk name="gameshark cdx (usa)" sha1="bb148a6ed992a303aabb0c65942a220e6d3aaec9" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
-    <!--
     <software name="arcdx" cloneof="gmshrkcdx">
+        <!--
+        <rom name="GEN-CDX.cdi" size="2479234" md5="4d82a30ca5d37105e920aa1d7b0d3ade" sha1="83fbf870eb0981b5c32666dbad10304b9f9379c3"/>
+        -->
         <description>Action Replay CDX (Euro)</description>
         <year>2000</year>
         <publisher>Datel</publisher>
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="action replay cdx (euro)" status="nodump"/>
+                <disk name="action replay cdx (euro)" sha1="f5fcf4f3e5ebd78860b0b93e39738037ac4b02b2" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
-    <!--
-    <software name="arcdxdemo" cloneof="gmshrkcdx">
+    <software name="arcdxd" cloneof="gmshrkcdx">
+        <!--
+        <rom name="Cdxdemo.cdi" size="4172496" md5="ecf541273950818891767ee0c5d386fd" sha1="bb48b9092ef5a5375860f7040dbc46e3ed761e04"/>
+        -->
         <description>Action Replay CDX - Demo Version (Euro)</description>
         <year>2000</year>
         <publisher>Datel</publisher>
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="action replay cdx - demo version (euro)" status="nodump"/>
+                <disk name="action replay cdx - demo version (euro)" sha1="cdc3c0bc250a4979ad505568253f9b615fdef644" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
     <!--
     <software name="eqxtreme" cloneof="gmshrkcdx">
@@ -343,18 +354,20 @@ this is probably not a lossless process. Keep your original images.
     </software>
     -->
     
-    <!--
     <software name="gmshrklite" cloneof="gmshrkcdx">
+        <!--
+        <rom name="DC-GAMESHARK_LITE.BIN" size="35515200" md5="36fbaf85f645e05c85ed22fc35120447" sha1="a9253ce7086a945ad91489fd3935158e98b6a8a0"/>
+        <rom name="DC-GAMESHARK_LITE.CUE" size="189" md5="ebb51d5019e8f1fc217a4e213f897bd8" sha1="4d18494d3261f81078521ad7c5d0e5255e0d18ce"/>
+        -->
         <description>GameShark Lite (USA)</description>
         <year>200?</year>
         <publisher>InterAct</publisher>
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="gameshark lite (usa)" status="nodump"/>
+                <disk name="gameshark lite (usa)" sha1="a019fc289a19007b2f06bfc45a59ee133e6ea5e8" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
     <!--
     <software name="dcpar" cloneof="gmshrkcdx">
@@ -369,8 +382,11 @@ this is probably not a lossless process. Keep your original images.
     </software>
     -->
     
-    <!--
+    <!-- Redump have a dump available, preferably replace this with their dump. -->
     <software name="adai2001">
+        <!--
+        <rom name="Advanced Daisenryaku 2001 (Japan).cdi" size="805017184" md5="811b7647e582d016d8fbeaf484cdac60" sha1="32739db3d457059f350da947910147fd72475fb9"/>
+        -->
         <description>Advanced Daisenryaku 2001 (Jpn)</description>
         <year>2001</year>
         <publisher>Sega</publisher>
@@ -379,11 +395,10 @@ this is probably not a lossless process. Keep your original images.
 		<info name="alt_title" value="アドバンスド大戦略2001" />
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="advanced daisenryaku 2001 (jpn)" status="nodump"/>
+                <disk name="advanced daisenryaku 2001 (jpn)" sha1="24adbce61005aa7fac44038b2c3b308debf876c8" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
     <software name="adaisue">
         <!--
@@ -405,8 +420,11 @@ this is probably not a lossless process. Keep your original images.
         </part>
     </software>
     
-    <!--
+    <!-- Both Dumpcast and Redump have dumps available, preferably replace this dump with either one. -->
     <software name="aerodi">
+        <!--
+        <rom name="eur-aedi.cdi" size="756177809" md5="ecaffb4a2e94a3ada5c709b00febff9e" sha1="0beddeaa9e71ec342dd273ad5cf3f37b3c4119c1"/>
+        -->
         <description>Aero Dancing i (Jpn)</description>
         <year>2001</year>
         <publisher>CRI</publisher>
@@ -415,13 +433,12 @@ this is probably not a lossless process. Keep your original images.
 		<info name="alt_title" value="エアロダンシングi" />
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="aero dancing i (jpn)" status="nodump"/>
+                <disk name="aero dancing i (jpn)" sha1="697418a385b6294affb807fcb589033e0934c981" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
-    <software name="aerodijsmm" > <!-- cloneof="aerodi" -->
+    <software name="aerodijsmm" cloneof="aerodi" >
         <!--
         <rom name="Aero Dancing i - Jikai Saku Made Matemasen v1.000 (2001)(CRI)(NTSC)(JP)[!].gdi" size="149" md5="a81b690650231cad5e630bc34312e2d5" sha1="f6902ac7eb39aff210c7ed0cfd080d457c3e9556"/>
         <rom name="track01.bin" size="719712" md5="d808b8e61ed195281e795b6f24cdcf8d" sha1="22df00b2b6c1c0dcfbcd1c44586cb01b6a2c2296"/>
@@ -462,7 +479,7 @@ this is probably not a lossless process. Keep your original images.
         </part>
     </software>
     
-    <!-- A promo version exists (950-0008-50), it is most likely the same as retail -->
+    <!-- A promo version exists (950-0008-50), it is most likely the same as retail. -->
     <software name="aerowinge" cloneof="aerowing">
         <!--
         <rom name="AeroWings v1.001 (1999)(Crave)(PAL)(M3)[!].gdi" size="88" md5="a21d63aaf3c2a6d94ca25bd8e95110ac" sha1="01f2f821ae4054918638dd4b12522b2c1badfc1c"/>
@@ -628,8 +645,11 @@ this is probably not a lossless process. Keep your original images.
     </software>
     -->
     
-    <!--
+    <!-- Redump have a dump available, preferably replace this with their dump. -->
     <software name="aerodftthh" cloneof="aerowin2">
+        <!--
+        <rom name="Aero Dancing F - Todoroki Tsubasa no Hatsu Hikou (Japan)[Unk].cdi" size="733238666" md5="876d0b63e8a67abafbd711c12c1fce08" sha1="400a85d99fb327c69dbfa823988baad6f7e36a23"/>
+        -->
         <description>Aero Dancing F: Todoroki Tsubasa no Hatsu Hikou (Jpn)</description>
         <year>2000</year>
         <publisher>CRI</publisher>
@@ -638,11 +658,10 @@ this is probably not a lossless process. Keep your original images.
 		<info name="alt_title" value="エアロダンシングＦ 〜轟つばさの初飛行〜" />
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="aero dancing f todoroki tsubasa no hatsu hikou (jpn)" status="nodump"/>
+                <disk name="aero dancing f todoroki tsubasa no hatsu hikou (jpn)" sha1="6946cfc360ff488dddaef3015178c247e929a1f2" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
     <software name="atjddtd">
         <!--
@@ -663,8 +682,16 @@ this is probably not a lossless process. Keep your original images.
         </part>
     </software>
     
-    <!--
+    <!-- Redump have a dump available, preferably replace this with their dump. -->
     <software name="aftersg">
+        <!--
+        <rom name="After- - Wasureenu Kizuna (Japan) (Limited Edition).gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+        <rom name="track01.bin" size="705600" md5="44920ffcbe0a3f2e39181d5bcf33432a" sha1="f36dc1960e47d47a9b7ae04cbc8867b6510675dd"/>
+        <rom name="track02.raw" size="1735776" md5="fddc71381cbacd4a4b4a738e23eca364" sha1="63863e049d253286c98ac8ee025d8bca669ab21f"/>
+        <rom name="track03.bin" size="1185760800" md5="31cd9397c045d45fa47f89e590406c64" sha1="747f081e30361945bfcdadf3a7486993e11dc59e"/>
+
+        <rom name="After- - Wasureenu Kizuna (Japan) (Limited Edition) - (Premium Disc) [Audio CD].nrg" size="163553706" md5="cd1ad6f82f62bc87da23d1a684b79314" sha1="df949aa8f78d044184505ef6cb849a81d8b64216"/>
+        -->
         <description>After...: Wasureenu Kizuna Shokai Genteiban (Jpn)</description>
         <year>2004</year>
         <publisher>Pionesoft</publisher>
@@ -674,17 +701,16 @@ this is probably not a lossless process. Keep your original images.
         <part interface="dc_gdrom" name="gdrom1">
             <feature name="part_id" value="After...: Wasureenu Kizuna"/>
             <diskarea name="gdrom">
-                <disk name="after... wasureenu kizuna shokai genteiban (jpn)" status="nodump"/>
+                <disk name="after... wasureenu kizuna shokai genteiban (jpn)" sha1="ce398638a22c7fd395cd0fc67b552392a02c5de7"/>
             </diskarea>
         </part>
         <part interface="dc_gdrom" name="gdrom2">
             <diskarea name="gdrom">
             <feature name="part_id" value="Kaze no Form"/>
-                <disk name="after... wasureenu kizuna shokai genteiban (jpn) (kaze no form)" status="nodump"/>
+                <disk name="after... wasureenu kizuna shokai genteiban (jpn) (kaze no form)" sha1="73b40fb8f44cbe621cec7b89a173e4f3ab45bf46" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
     <!--
     <software name="after" cloneof="aftersg">
@@ -702,9 +728,12 @@ this is probably not a lossless process. Keep your original images.
     </software>
     -->
     
-    <!-- There's a Limited Edition available (T-20131M), but it uses the same disc as the regular -->
-    <!--
+    <!-- There's a Limited Edition available (T-20131M), but it uses the same disc as the standard edition. -->
+    <!-- Redump have a dump available, preferably replace this with their dump. -->
     <software name="aikagi">
+        <!--
+        <rom name="Aikagi (Japan)[Team USA].cdi" size="810693761" md5="97720759604c7874f1be89a21d3c6116" sha1="1dc4780858c08622603074479b6a1307ee8e3b66"/>
+        -->
         <description>Aikagi: Hidamari to Kanojo no Heyagi (Jpn)</description>
         <year>2003</year>
         <publisher>NEC Interchannel</publisher>
@@ -713,14 +742,16 @@ this is probably not a lossless process. Keep your original images.
 		<info name="alt_title" value="あいかぎ 〜ひだまりと彼女の部屋着〜" />
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="aikagi hidamari to kanojo no heyagi (jpn)" status="nodump"/>
+                <disk name="aikagi hidamari to kanojo no heyagi (jpn)" sha1="992ad466a29834667a1ff3312ec7b4952f20b356" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
-    <!--
+    <!-- Both Dumpcast and Redump have dumps available, preferably replace this dump with either one. -->
     <software name="air">
+        <!--
+        <rom name="Air (Japan)[Team IDH].cdi" size="796128346" md5="dbbca9f03d79e796b4a8136e59792ed6" sha1="0cd6e1dbf1a218484aed5f9535947ee5f8e9b822"/>
+        -->
         <description>Air (Jpn)</description>
         <year>2001</year>
         <publisher>NEC Interchannel</publisher>
@@ -728,11 +759,10 @@ this is probably not a lossless process. Keep your original images.
         <info name="release" value="20010920" />
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="air (jpn)" status="nodump"/>
+                <disk name="air (jpn)" sha1="643805e963ad127336175fcf678a068d9d3be39e" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
     <software name="airforcd">
         <!--
@@ -781,52 +811,7 @@ this is probably not a lossless process. Keep your original images.
         </part>
     </software>
     
-    <!-- Both the Eng/Spa/Ned (T-9501D-76) and Ger/Fra/Ita (T-9501D-77) release share the same disc (T-9501D-50) -->
-    <software name="deadlysk" cloneof="airforcd">
-        <!--
-        <rom name="Deadly Skies v1.003 (1999)(Konami)(PAL)(M5)[!].gdi" size="946" md5="6abbb83295989e223eeb59a3a23c9690" sha1="bcfda4acf7db5d01784a72982458cff78330776a"/>
-        <rom name="track01.bin" size="705600" md5="3dcfa961690659ecc16b4b004ffab5d1" sha1="8ca9faa7a89818a51f82c428d958ffc23e15d232"/>
-        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
-        <rom name="track03.bin" size="209175120" md5="1dcdfe3dc6263a7ac8a2456f544ad7a0" sha1="08b19bcf1cbb986b08ce88f7cfe23fccacfd0dbb"/>
-        <rom name="track04.raw" size="38100048" md5="b58f0d606fea4864b37bb66d6f7eda98" sha1="b3028ce3f1b575b030a76f125e96a06d9fb33e78"/>
-        <rom name="track05.raw" size="40143936" md5="67ee6a825d33c9da6f58baeb5e394301" sha1="931921973621a6b090131d7154105b47a3badf74"/>
-        <rom name="track06.raw" size="43655472" md5="a3fa2dded6ed789e4d541c288d9612d8" sha1="4fcc72ed7fe60133b05c0a3c8eefcfe11270d144"/>
-        <rom name="track07.raw" size="37679040" md5="fb80197b1cfd31d440928f45197d43b3" sha1="369d9ff03bfdfb0104591cb284fa99ad2b62c3c2"/>
-        <rom name="track08.raw" size="36246672" md5="46c4aec3ef3f50d67e790f4d6f9aec95" sha1="2ea915d6063709fb1fc43c0fc3dcebb95fb7038c"/>
-        <rom name="track09.raw" size="44798544" md5="b5aeca09e434bec028598672a676fc63" sha1="9ddf430a71206a5da8c0b2712c1afbbf5b960822"/>
-        <rom name="track10.raw" size="34856640" md5="88b23c5229223ae81f13558ea42ecf49" sha1="9664530cbcc830613a62342193c3038b60f24922"/>
-        <rom name="track11.raw" size="42166656" md5="751042b8f1a0a5c51ab026e3162fe711" sha1="3a4ef8b91963fdea54d847d7e112e048f71022eb"/>
-        <rom name="track12.raw" size="40329744" md5="426a2e3a529b9fe9373182e1f192efc6" sha1="6ad6083f70f632450a270b826cc06a8fda093d4f"/>
-        <rom name="track13.raw" size="38812704" md5="5f75e8b942729cfcd26fad2c09d64104" sha1="06e2c88f826311b74310d5ba71facb561a54cf04"/>
-        <rom name="track14.raw" size="38855040" md5="d91e8842c212528ff2718e88a26933fd" sha1="e311d3fb53801536a2d5f99a2048d9226d53e639"/>
-        <rom name="track15.raw" size="38622192" md5="7e2906a72c0d81e4dcb7b62cf8796a70" sha1="2eb7802b2236eb258d7dd754a0e3b2423dae1516"/>
-        <rom name="track16.raw" size="42004368" md5="bd242a88d6ae8852ea718db58f4f0ff8" sha1="44a12b152a2e3f804cef5b9ee105fd8c68547edd"/>
-        <rom name="track17.raw" size="37338000" md5="3650da0ad269efa9fb0888f9e42dead8" sha1="be6a1542f58593cddfa64a0793f04e837357a96c"/>
-        <rom name="track18.raw" size="36935808" md5="dcd39495daf1e0974db137e14376902d" sha1="1ddecb85494624c8164123a281c99a48116f74eb"/>
-        <rom name="track19.raw" size="36839376" md5="f5b84c579e5dbe149b166d4fc7d49763" sha1="14795e7597f223fa4848fbf8e4ecab97b1521e18"/>
-        <rom name="track20.raw" size="40990656" md5="b78c20b65cd9ce4f4390b6e33d13e4eb" sha1="c55dbf1538f08a14d88da784d34e16b5c1c81123"/>
-        <rom name="track21.raw" size="38589264" md5="e5d7d064c829c20aa33dc7dab3b9ea39" sha1="3ccf8f466e75b1f1f085d29399d79425dcb678c2"/>
-        <rom name="track22.raw" size="36594768" md5="3ced2e69270d95180131586611c264b2" sha1="35619c8e5877b6b92030fdba472bc6e682c4ca34"/>
-        <rom name="track23.raw" size="45047856" md5="9691cff2393d9377089c56a1cfe1104a" sha1="f940e5c01dabbdaafdeb2fa52e69d226a76c042d"/>
-        <rom name="track24.raw" size="10351152" md5="d6c2b12c60698161f341e8491feae111" sha1="4cd95e7aa2f9a492870c454c36f9c446c16ea642"/>
-        <rom name="track25.raw" size="8556576" md5="4f3e63043aa55189f5b59cc13a47a7db" sha1="14c2c1a25a73332e681c47affdbc44ad9e9da476"/>
-        <rom name="track26.raw" size="19098240" md5="da72ba271633c00f03cebb6f2ba94621" sha1="69a46252204e434fc986d2a8a9d8c1a96dd8e321"/>
-        <rom name="track27.raw" size="39022032" md5="b03ecca9b93912d0b7f61aaa0d5bfd8a" sha1="6b86a06935da5f3af259016549518d0970d751db"/>
-        <rom name="track28.raw" size="20810496" md5="8777f2dde766d071cecc4c513a41ffad" sha1="8229092bf6e00dc887c09701a37566d4ce6e2938"/>
-        <rom name="track29.raw" size="7858032" md5="ecf2487ba1399ef908bad149bc51ae99" sha1="db5a16c78537b81d50a6715c70c64148de67ad65"/>
-        <rom name="track30.bin" size="81576768" md5="9193a358d8454d398c0517114cad1b95" sha1="e91a87059f7aa12711dae250b4671b5582b99396"/>
-        -->
-        <description>Deadly Skies (Euro)</description>
-        <year>1999</year>
-        <publisher>Konami</publisher>
-        <info name="serial" value="T-9501D-50, T-9501D-76, T-9501D-77"/>
-        <part interface="dc_gdrom" name="gdrom">
-            <diskarea name="gdrom">
-                <disk name="deadly skies (euro)" sha1="12d38e0f745581a243ebeae2c3c61585f8af4c0a"/>
-            </diskarea>
-        </part>
-    </software>
-    
+    <!-- Redump shows us that this Alt simply is a disc with a different write offset than "1S". Still, the disc *is* different. -->
     <software name="airforcd1" cloneof="airforcd">
         <!--
         <rom name="Airforce Delta v1.000 (1999)(Konami)(NTSC)(US)[!][2S T-9501NAF].gdi" size="946" md5="5807915c07432be55a653540267d302e" sha1="7672f6cd3fac974ef8a2acca42327257780eb0a8"/>
@@ -889,6 +874,52 @@ this is probably not a lossless process. Keep your original images.
         </part>
     </software>
     -->    
+    
+    <!-- Both the Eng/Spa/Ned (T-9501D-76) and Ger/Fra/Ita (T-9501D-77) release share the same disc (T-9501D-50) -->
+    <software name="deadlysk" cloneof="airforcd">
+        <!--
+        <rom name="Deadly Skies v1.003 (1999)(Konami)(PAL)(M5)[!].gdi" size="946" md5="6abbb83295989e223eeb59a3a23c9690" sha1="bcfda4acf7db5d01784a72982458cff78330776a"/>
+        <rom name="track01.bin" size="705600" md5="3dcfa961690659ecc16b4b004ffab5d1" sha1="8ca9faa7a89818a51f82c428d958ffc23e15d232"/>
+        <rom name="track02.raw" size="13994400" md5="d1838bcbca4a24b39deddeae2a9d371a" sha1="b643df4def042b6c23f90f54c690ac7df431233f"/>
+        <rom name="track03.bin" size="209175120" md5="1dcdfe3dc6263a7ac8a2456f544ad7a0" sha1="08b19bcf1cbb986b08ce88f7cfe23fccacfd0dbb"/>
+        <rom name="track04.raw" size="38100048" md5="b58f0d606fea4864b37bb66d6f7eda98" sha1="b3028ce3f1b575b030a76f125e96a06d9fb33e78"/>
+        <rom name="track05.raw" size="40143936" md5="67ee6a825d33c9da6f58baeb5e394301" sha1="931921973621a6b090131d7154105b47a3badf74"/>
+        <rom name="track06.raw" size="43655472" md5="a3fa2dded6ed789e4d541c288d9612d8" sha1="4fcc72ed7fe60133b05c0a3c8eefcfe11270d144"/>
+        <rom name="track07.raw" size="37679040" md5="fb80197b1cfd31d440928f45197d43b3" sha1="369d9ff03bfdfb0104591cb284fa99ad2b62c3c2"/>
+        <rom name="track08.raw" size="36246672" md5="46c4aec3ef3f50d67e790f4d6f9aec95" sha1="2ea915d6063709fb1fc43c0fc3dcebb95fb7038c"/>
+        <rom name="track09.raw" size="44798544" md5="b5aeca09e434bec028598672a676fc63" sha1="9ddf430a71206a5da8c0b2712c1afbbf5b960822"/>
+        <rom name="track10.raw" size="34856640" md5="88b23c5229223ae81f13558ea42ecf49" sha1="9664530cbcc830613a62342193c3038b60f24922"/>
+        <rom name="track11.raw" size="42166656" md5="751042b8f1a0a5c51ab026e3162fe711" sha1="3a4ef8b91963fdea54d847d7e112e048f71022eb"/>
+        <rom name="track12.raw" size="40329744" md5="426a2e3a529b9fe9373182e1f192efc6" sha1="6ad6083f70f632450a270b826cc06a8fda093d4f"/>
+        <rom name="track13.raw" size="38812704" md5="5f75e8b942729cfcd26fad2c09d64104" sha1="06e2c88f826311b74310d5ba71facb561a54cf04"/>
+        <rom name="track14.raw" size="38855040" md5="d91e8842c212528ff2718e88a26933fd" sha1="e311d3fb53801536a2d5f99a2048d9226d53e639"/>
+        <rom name="track15.raw" size="38622192" md5="7e2906a72c0d81e4dcb7b62cf8796a70" sha1="2eb7802b2236eb258d7dd754a0e3b2423dae1516"/>
+        <rom name="track16.raw" size="42004368" md5="bd242a88d6ae8852ea718db58f4f0ff8" sha1="44a12b152a2e3f804cef5b9ee105fd8c68547edd"/>
+        <rom name="track17.raw" size="37338000" md5="3650da0ad269efa9fb0888f9e42dead8" sha1="be6a1542f58593cddfa64a0793f04e837357a96c"/>
+        <rom name="track18.raw" size="36935808" md5="dcd39495daf1e0974db137e14376902d" sha1="1ddecb85494624c8164123a281c99a48116f74eb"/>
+        <rom name="track19.raw" size="36839376" md5="f5b84c579e5dbe149b166d4fc7d49763" sha1="14795e7597f223fa4848fbf8e4ecab97b1521e18"/>
+        <rom name="track20.raw" size="40990656" md5="b78c20b65cd9ce4f4390b6e33d13e4eb" sha1="c55dbf1538f08a14d88da784d34e16b5c1c81123"/>
+        <rom name="track21.raw" size="38589264" md5="e5d7d064c829c20aa33dc7dab3b9ea39" sha1="3ccf8f466e75b1f1f085d29399d79425dcb678c2"/>
+        <rom name="track22.raw" size="36594768" md5="3ced2e69270d95180131586611c264b2" sha1="35619c8e5877b6b92030fdba472bc6e682c4ca34"/>
+        <rom name="track23.raw" size="45047856" md5="9691cff2393d9377089c56a1cfe1104a" sha1="f940e5c01dabbdaafdeb2fa52e69d226a76c042d"/>
+        <rom name="track24.raw" size="10351152" md5="d6c2b12c60698161f341e8491feae111" sha1="4cd95e7aa2f9a492870c454c36f9c446c16ea642"/>
+        <rom name="track25.raw" size="8556576" md5="4f3e63043aa55189f5b59cc13a47a7db" sha1="14c2c1a25a73332e681c47affdbc44ad9e9da476"/>
+        <rom name="track26.raw" size="19098240" md5="da72ba271633c00f03cebb6f2ba94621" sha1="69a46252204e434fc986d2a8a9d8c1a96dd8e321"/>
+        <rom name="track27.raw" size="39022032" md5="b03ecca9b93912d0b7f61aaa0d5bfd8a" sha1="6b86a06935da5f3af259016549518d0970d751db"/>
+        <rom name="track28.raw" size="20810496" md5="8777f2dde766d071cecc4c513a41ffad" sha1="8229092bf6e00dc887c09701a37566d4ce6e2938"/>
+        <rom name="track29.raw" size="7858032" md5="ecf2487ba1399ef908bad149bc51ae99" sha1="db5a16c78537b81d50a6715c70c64148de67ad65"/>
+        <rom name="track30.bin" size="81576768" md5="9193a358d8454d398c0517114cad1b95" sha1="e91a87059f7aa12711dae250b4671b5582b99396"/>
+        -->
+        <description>Deadly Skies (Euro)</description>
+        <year>1999</year>
+        <publisher>Konami</publisher>
+        <info name="serial" value="T-9501D-50, T-9501D-76, T-9501D-77"/>
+        <part interface="dc_gdrom" name="gdrom">
+            <diskarea name="gdrom">
+                <disk name="deadly skies (euro)" sha1="12d38e0f745581a243ebeae2c3c61585f8af4c0a"/>
+            </diskarea>
+        </part>
+    </software>
 
     <!-- Also released as a Dorikore version, which is identical to retail. -->
     <software name="airforcdj" cloneof="airforcd">
@@ -986,18 +1017,19 @@ this is probably not a lossless process. Keep your original images.
     </software>
     -->
     
-    <!--
     <software name="aliced">
+        <!--
+        <rom name="aliced3.cdi" size="60946640" md5="0e30a6476dcc9a9d33d10056d9ad36ea" sha1="d402772efa54188a3e23b4d0f0f0572f38027e2f"/>
+        -->
         <description>Alice Dreams (World)</description>
         <year>2006</year>
         <publisher>Alice Dreams</publisher>
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="alice dreams (world)" status="nodump"/>
+                <disk name="alice dreams (world)" sha1="05c1045286066de808cea35150aa8cbaaa2f5729" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
     <!--
     <software name="alicedtce">
@@ -1126,8 +1158,10 @@ this is probably not a lossless process. Keep your original images.
     </software>
     -->
     
-    <!--
-    <software name="alicemom" cloneof="alicemomle">
+    <software name="alicemom"> <!-- cloneof="alicemomle" -->
+        <!--
+        <rom name="Alice's Moms Rescue.cdi" size="25426153" md5="7ca1fa8f839c8e0f7ca8fa3736dfb05a" sha1="4b2d3933a4785c228a04e968402fe09ce8bc8998"/>
+        -->
         <description>Alice's Mom's Rescue (World)</description>
         <year>2015</year>
         <publisher>Hucast</publisher>
@@ -1136,11 +1170,10 @@ this is probably not a lossless process. Keep your original images.
 		<info name="alt_title" value="アリスの母親の救出" />
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="alice's mom's rescue (world)" status="nodump"/>
+                <disk name="alice's mom's rescue (world)" sha1="4d06c161339b3afddbcd1d37ae2d6c15fd91e258" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
     <software name="alienfnto">
         <!--
@@ -1163,6 +1196,7 @@ this is probably not a lossless process. Keep your original images.
         </part>
     </software>
     
+    <!-- Apparently dumped via Dreamshell, which is known to give bad dumps -->
     <software name="alienfntop">
         <!--
         <rom name="ALIENFRONT_ONLINE.gdi" size="143" md5="0a3db521ea34e40a63967a0108d4bc78" sha1="397340cf23de1f66776741a3b9da8914c9b48203"/>
@@ -1323,8 +1357,12 @@ this is probably not a lossless process. Keep your original images.
         </part>
     </software>
     
-    <!--
     <software name="aitdnnis" cloneof="aitdnn">
+        <!--
+        <rom name="Alone in the Dark - The New Nightmare (CD 1 of 2) (Spain)[LAILLAS].cdi" size="814742917" md5="bca33fc2e20625b4fa0a9700ac79886b" sha1="3d6a8c02863888adb14c0b42d6271d45cc30e962"/>
+
+        <rom name="Alone in the Dark - The New Nightmare (CD 2 of 2) (Spain)[LAILLAS].cdi" size="815582629" md5="9dbd6a03d8190c91c1477b1a1e1771df" sha1="30cb4573dad4a1c5d72616d3a4e37e59f23364a7"/>
+        -->
         <description>Alone in the Dark: The New Nightmare (Ita / Spa)</description>
         <year>2001</year>
         <publisher>Infogrames</publisher>
@@ -1333,17 +1371,16 @@ this is probably not a lossless process. Keep your original images.
         <part interface="dc_gdrom" name="gdrom1">
             <feature name="part_id" value="Disc 1"/>
             <diskarea name="gdrom">
-                <disk name="alone in the dark the new nightmare (ita-spa) (disc 1)" status="nodump"/>
+                <disk name="alone in the dark the new nightmare (ita-spa) (disc 1)" sha1="834b4c5630e589937c44137112848666b8966dfa" status="baddump"/>
             </diskarea>
         </part>
         <part interface="dc_gdrom" name="gdrom2">
             <feature name="part_id" value="Disc 2"/>
             <diskarea name="gdrom">
-                <disk name="alone in the dark the new nightmare (ita-spa) (disc 2)" status="nodump"/>
+                <disk name="alone in the dark the new nightmare (ita-spa) (disc 2)" sha1="c3b42c6de6eb7f4db5a28af57ebff8a08b9e0bf1" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
     <!--
     <software name="am2ofcri">
@@ -1436,20 +1473,25 @@ this is probably not a lossless process. Keep your original images.
         </part>
     </software>
     
-    <!--
     <software name="aono6go">
+        <!--
+        <rom name="Blue Submarine No. 6 Saigetsu Fumahito- Time and Tide v.1.008 (2000)(Sega)(NTSC)(JP)[!].gdi" size="87" md5="b3ecdf113fd42344dd84142679e4cb36" sha1="9d50b816d3f69ad192f5986ab487769965c2e082"/>
+        <rom name="track01.bin" size="705600" md5="b83518f4878450881be0c9cbec29569b" sha1="a8ba87f7158cfae3fc9a1c59e84b2891157dd88f"/>
+        <rom name="track02.raw" size="1735776" md5="a3eb757c01a75746ab5a77b40ba20953" sha1="cbf6e5ebf591a6c29d7a902a60d7cead2cba7d37"/>
+        <rom name="track03.bin" size="1185760800" md5="6f7de3feef96c268d4bc978706733546" sha1="5d0d98514b0680a376a132ec274de8bafe19dd95"/>
+        -->
         <description>Ao no 6-go Saigetsufutai Hito: Time and Tide (Jpn)</description>
         <year>2000</year>
         <publisher>Sega</publisher>
         <info name="serial" value="HDR-0075"/>
         <info name="release" value="20001207" />
+		<info name="alt_title" value="青の6号　～歳月不待人～ TIME AND TIDE" />
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="ao no 6-go saigetsufutai hito time and tide (jpn)" status="nodump"/>
+                <disk name="ao no 6-go saigetsufutai hito time and tide (jpn)" sha1="e094b8ad7a107ecad17458dd1cd3f98d82ace719"/>
             </diskarea>
         </part>
     </software>
-    -->
     
     <software name="aquagt">
         <!--
@@ -1563,7 +1605,7 @@ this is probably not a lossless process. Keep your original images.
         </part>
     </software>
     
-    <software name="aggonsen"> <!-- cloneof="aggonsenbb" -->
+    <software name="aggonsen" cloneof="aggonsenbb">
         <!--
         <rom name="Atsumare! Guru Guru Onsen v1.008 (1999)(Sega)(NTSC)(JP)[!].gdi" size="87" md5="9d1f603062285fdb7bc099ed4d1e5ff1" sha1="2a37adc5e75d6f43b27bc61dc4fc09d5ad473ce0"/>
         <rom name="track01.bin" size="1470000" md5="8c574a476783c9792d7f7e472a9e78ef" sha1="cd126ac8f68969f9736d830427564c93b84961d3"/>
@@ -1583,8 +1625,10 @@ this is probably not a lossless process. Keep your original images.
         </part>
     </software>
     
-    <!--
     <software name="aggonsenbb">
+        <!--
+        <rom name="Atsumare! GuruGuru Onsen BB (Japan)[TES].cdi" size="751305000" md5="a34e02e0dfbfdf412ff9da2169857017" sha1="3aaf60ddd63c5aece3f51139d65f5d19b9912bbf"/>
+        -->        
         <description>Atsumare! Guru Guru Onsen BB (Jpn)</description>
         <year>2000</year>
         <publisher>Sega</publisher>
@@ -1593,11 +1637,10 @@ this is probably not a lossless process. Keep your original images.
 		<info name="alt_title" value="あつまれ!ぐるぐる温泉BB" />
         <part interface="dc_gdrom" name="gdrom">
             <diskarea name="gdrom">
-                <disk name="atsumare guru guru onsen bb (jpn)" status="nodump"/>
+                <disk name="atsumare guru guru onsen bb (jpn)" sha1="0ef1d5cf17171ba9866ae69a5455eec202e4ef19" status="baddump"/>
             </diskarea>
         </part>
     </software>
-    -->
     
     <!--
     <software name="aggonsenwmc" cloneof="aggonsenbb">
