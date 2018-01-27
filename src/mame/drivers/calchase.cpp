@@ -392,7 +392,7 @@ static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
 	AM_RANGE(0x000d0024, 0x000d0027) AM_DEVWRITE16("ldac", dac_word_interface, write, 0x0000ffff)
 	AM_RANGE(0x000d0028, 0x000d002b) AM_DEVWRITE16("rdac", dac_word_interface, write, 0x0000ffff)
 	AM_RANGE(0x000d0800, 0x000d0fff) AM_ROM AM_REGION("nvram",0) //
-	AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
+//	AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
 
 	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	//GRULL-AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
