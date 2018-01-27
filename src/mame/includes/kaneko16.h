@@ -69,8 +69,7 @@ public:
 
 	template<int chip> DECLARE_READ16_MEMBER(kaneko16_ay_YM2149_r);
 	template<int chip> DECLARE_WRITE16_MEMBER(kaneko16_ay_YM2149_w);
-	template<int bankno, mask, fixedsize, bankedsize> DECLARE_WRITE16_MEMBER(oki_bank_w);
-	DECLARE_WRITE8_MEMBER(wingforc_oki_bank_w);
+	template<int bankno, mask, fixedsize, bankedsize> DECLARE_WRITE8_MEMBER(oki_bank_w);
 
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
