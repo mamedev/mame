@@ -186,6 +186,11 @@ void c219_device::device_reset()
 	std::fill(&m_c219bank[0], &m_c219bank[4], 0);
 }
 
+void c140_device::device_post_load()
+{
+	device_clock_changed();
+}
+
 void c140_device::device_clock_changed()
 {
 	int old_rate = m_sample_rate;
