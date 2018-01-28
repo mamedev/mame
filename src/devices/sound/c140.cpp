@@ -189,17 +189,26 @@ void c140_device::device_clock_changed()
 {
 	int old_rate = m_sample_rate;
 	m_sample_rate = m_baserate = clock();
-	
-	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	memset(&m_mixer_buffer_left[0], 0, old_rate * sizeof(int16_t));
-	memset(&m_mixer_buffer_right[0], 0, old_rate * sizeof(int16_t));
-	m_mixer_buffer_left.resize(m_sample_rate);
-	m_mixer_buffer_right.resize(m_sample_rate);
-
+	if (old_rate < m_sample_rate)
+	{
+		memset(&m_mixer_buffer_left[0], 0, sizeof(m_mixer_buffer_left));
+		memset(&m_mixer_buffer_right[0], 0, sizeof(m_mixer_buffer_right));
+		m_mixer_buffer_left.resize(m_sample_rate);
+		m_mixer_buffer_right.resize(m_sample_rate);
+	}
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(m_sample_rate);
 	else
 		m_stream = machine().sound().stream_alloc(*this, 0, 2, m_sample_rate);
+		
+	if (old_rate > m_sample_rate)
+	{
+		memset(&m_mixer_buffer_left[0], 0, sizeof(m_mixer_buffer_left));
+		memset(&m_mixer_buffer_right[0], 0, sizeof(m_mixer_buffer_right));
+		m_mixer_buffer_left.resize(m_sample_rate);
+		m_mixer_buffer_right.resize(m_sample_rate);
+	}
+
 }
 
 void c140_device::voice_update()
