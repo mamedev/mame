@@ -400,7 +400,7 @@ T lua_engine::addr_space::direct_mem_read(offs_t address)
 	for(int i = 0; i < sizeof(T); i++)
 	{
 		int addr = space.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
-		uint8_t *base = (uint8_t *)space.get_read_ptr(space.address_to_byte(addr & ~lowmask));
+		uint8_t *base = (uint8_t *)space.get_read_ptr(addr & ~lowmask);
 		if(!base)
 			continue;
 		mem_content <<= 8;
@@ -425,7 +425,7 @@ void lua_engine::addr_space::direct_mem_write(offs_t address, T val)
 	for(int i = 0; i < sizeof(T); i++)
 	{
 		int addr = space.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
-		uint8_t *base = (uint8_t *)space.get_read_ptr(space.address_to_byte(addr & ~lowmask));
+		uint8_t *base = (uint8_t *)space.get_read_ptr(addr & ~lowmask);
 		if(!base)
 			continue;
 		if(space.endianness() == ENDIANNESS_BIG)
@@ -1442,6 +1442,7 @@ void lua_engine::initialize()
 			"write_direct_i64", &addr_space::direct_mem_write<int64_t>,
 			"write_direct_u64", &addr_space::direct_mem_write<uint64_t>,
 			"name", sol::property(&addr_space::name),
+			"shift", sol::property([](addr_space &sp) { return sp.space.addr_shift(); }),
 			"map", sol::property([this](addr_space &sp) {
 					address_space &space = sp.space;
 					sol::table map = sol().create_table();
