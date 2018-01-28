@@ -1051,7 +1051,9 @@ ROM_START( hangon )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) // Sega PCM sound data
 	ROM_LOAD( "epr-6831.ic5", 0x00000, 0x8000, CRC(cfef5481) SHA1(c04b302fee58f0e59a097b2be2b61e5d03df7c91) )
+	ROM_RELOAD(               0x10000, 0x8000)
 	ROM_LOAD( "epr-6832.ic6", 0x08000, 0x8000, CRC(4165aea5) SHA1(be05c6d295807af2f396a1ff72d5a3d2a1e6054d) )
+	ROM_RELOAD(               0x18000, 0x8000)
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
@@ -1106,7 +1108,9 @@ ROM_START( hangon1 )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) // Sega PCM sound data
 	ROM_LOAD( "epr-6831.ic5", 0x00000, 0x8000, CRC(cfef5481) SHA1(c04b302fee58f0e59a097b2be2b61e5d03df7c91) )
+	ROM_RELOAD(               0x10000, 0x8000)
 	ROM_LOAD( "epr-6832.ic6", 0x08000, 0x8000, CRC(4165aea5) SHA1(be05c6d295807af2f396a1ff72d5a3d2a1e6054d) )
+	ROM_RELOAD(               0x18000, 0x8000)
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
@@ -1160,7 +1164,9 @@ ROM_START( hangon2 ) // no labels on the main CPU roms just a black sticker, lik
 
 	ROM_REGION( 0x20000, "pcm", 0 ) // Sega PCM sound data
 	ROM_LOAD( "epr-6831.ic5", 0x00000, 0x8000, CRC(cfef5481) SHA1(c04b302fee58f0e59a097b2be2b61e5d03df7c91) )
+	ROM_RELOAD(               0x10000, 0x8000)
 	ROM_LOAD( "epr-6832.ic6", 0x08000, 0x8000, CRC(4165aea5) SHA1(be05c6d295807af2f396a1ff72d5a3d2a1e6054d) )
+	ROM_RELOAD(               0x18000, 0x8000)
 
 	ROM_REGION( 0x8000, "gfx3", 0 ) // road gfx
 	ROM_LOAD( "epr-6840.ic108", 0x0000, 0x8000, CRC(581230e3) SHA1(954eab35059322a12a197bba04bf85f816132f20) )
@@ -1467,7 +1473,9 @@ ROM_START( sharrier )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) // Sega PCM sound data
 	ROM_LOAD( "epr-7231.ic5", 0x00000, 0x8000, CRC(871c6b14) SHA1(6d04ddc32fdf1db409cb519890821bd10fc9e58b) )
+	ROM_RELOAD(               0x10000, 0x8000)
 	ROM_LOAD( "epr-7232.ic6", 0x08000, 0x8000, CRC(4b59340c) SHA1(a01ba8580b65dd17bfd92560265e502d95d3ff16) )
+	ROM_RELOAD(               0x18000, 0x8000)
 
 	ROM_REGION( 0x10000, "mcu", 0 ) // Internal i8751 MCU code
 	ROM_LOAD( "315-5163a.ic32", 0x00000, 0x1000, NO_DUMP )
@@ -1548,7 +1556,9 @@ ROM_START( sharrier1 )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) // Sega PCM sound data
 	ROM_LOAD( "epr-7231.ic5", 0x00000, 0x8000, CRC(871c6b14) SHA1(6d04ddc32fdf1db409cb519890821bd10fc9e58b) )
+	ROM_RELOAD(               0x10000, 0x8000)
 	ROM_LOAD( "epr-7232.ic6", 0x08000, 0x8000, CRC(4b59340c) SHA1(a01ba8580b65dd17bfd92560265e502d95d3ff16) )
+	ROM_RELOAD(               0x18000, 0x8000)
 
 	ROM_REGION( 0x10000, "mcu", 0 ) // Internal i8751 MCU code
 	ROM_LOAD( "315-5163.ic32", 0x00000, 0x1000, NO_DUMP )
@@ -1776,7 +1786,9 @@ ROM_START( enduror1 )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) // Sega PCM sound data
 	ROM_LOAD( "epr-7762.ic5", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
+	ROM_RELOAD(               0x10000, 0x8000)
 	ROM_LOAD( "epr-7763.ic6", 0x08000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
+	ROM_RELOAD(               0x18000, 0x8000)
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
@@ -1846,7 +1858,9 @@ ROM_START( enduror1d )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) // Sega PCM sound data
 	ROM_LOAD( "epr-7762.ic5", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
+	ROM_RELOAD(               0x10000, 0x8000)
 	ROM_LOAD( "epr-7763.ic6", 0x08000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
+	ROM_RELOAD(               0x18000, 0x8000)
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )

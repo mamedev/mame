@@ -29,13 +29,6 @@ class segapcm_device : public device_t,
 					   public device_rom_interface
 {
 public:
-	static constexpr int BANK_256    = 11;
-	static constexpr int BANK_512    = 12;
-	static constexpr int BANK_12M    = 13;
-	static constexpr int BANK_MASK7  = 0x70 << 16;
-	static constexpr int BANK_MASKF  = 0xf0 << 16;
-	static constexpr int BANK_MASKF8 = 0xf8 << 16;
-
 	segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( sega_pcm_w );
