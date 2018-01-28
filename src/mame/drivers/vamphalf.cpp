@@ -78,8 +78,6 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_qs1000(*this, "qs1000"),
-			m_oki(*this, "oki"),
-			m_oki2(*this, "oki_2"),
 			m_eeprom(*this, "eeprom"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette"),
@@ -87,13 +85,13 @@ public:
 			m_wram(*this,"wram"),
 			m_tiles32(*this,"tiles32"),
 			m_wram32(*this,"wram32"),
+			m_oki(*this, "oki%u", 1),
 			m_okibank(*this,"okibank") {
 			m_has_extra_gfx = 0;
 		}
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<qs1000_device> m_qs1000;
-	optional_device<okim6295_device> m_oki;
 	optional_device<okim6295_device> m_oki2;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -104,6 +102,7 @@ public:
 	optional_shared_ptr<uint32_t> m_tiles32;
 	optional_shared_ptr<uint32_t> m_wram32;
 	
+	optional_memory_region_array<2> m_okiregion;
 	optional_memory_bank m_okibank;
 
 	// driver init configuration
@@ -207,7 +206,7 @@ public:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap);
 	void draw_sprites_aoh(screen_device &screen, bitmap_ind16 &bitmap);
 	void handle_flipped_visible_area(screen_device &screen);
-	void banked_oki(const char *region);
+	void banked_oki(int chip);
 	void common(machine_config &config);
 	void sound_ym_oki(machine_config &config);
 	void sound_ym_banked_oki(machine_config &config);
@@ -469,7 +468,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vamphalf_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x0c0, 0x0c1) AM_NOP // return 0, when oki chip is read / written
-	AM_RANGE(0x0c2, 0x0c3) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x0c2, 0x0c3) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x140, 0x143) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
 	AM_RANGE(0x146, 0x147) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
 	AM_RANGE(0x1c0, 0x1c3) AM_READ(eeprom_r)
@@ -494,7 +493,7 @@ static ADDRESS_MAP_START( coolmini_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x304, 0x307) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x308, 0x30b) AM_WRITE(eeprom_w)
 	AM_RANGE(0x4c0, 0x4c1) AM_NOP // return 0, when oki chip is read / written
-	AM_RANGE(0x4c2, 0x4c3) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x4c2, 0x4c3) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x540, 0x543) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
 	AM_RANGE(0x544, 0x547) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
 	AM_RANGE(0x7c0, 0x7c3) AM_READ(eeprom_r)
@@ -510,7 +509,7 @@ static ADDRESS_MAP_START( suplup_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x040, 0x043) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x060, 0x063) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x080, 0x081) AM_NOP // return 0, when oki chip is read / written
-	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
 	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
 	AM_RANGE(0x100, 0x103) AM_READ(eeprom_r)
@@ -532,7 +531,7 @@ static ADDRESS_MAP_START( finalgdr_io, AS_IO, 32, vamphalf_state )
 	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(finalgdr_backupram_r, finalgdr_backupram_w)
 	AM_RANGE(0x3000, 0x3007) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x0000ff00)
 	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x0000ff00)
+	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x3c00, 0x3c03) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x4400, 0x4403) AM_READ(eeprom32_r)
 	AM_RANGE(0x6000, 0x6003) AM_READNOP //?
@@ -552,7 +551,7 @@ static ADDRESS_MAP_START( mrkickera_io, AS_IO, 32, vamphalf_state )
 	AM_RANGE(0x40a0, 0x40a3) AM_WRITE(finalgdr_oki_bank_w)
 	AM_RANGE(0x6400, 0x6403) AM_READ(finalgdr_prot_r)
 	AM_RANGE(0x7000, 0x7007) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x0000ff00)
-	AM_RANGE(0x7400, 0x7403) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x0000ff00)
+	AM_RANGE(0x7400, 0x7403) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x7800, 0x7803) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x7c00, 0x7c03) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
@@ -566,7 +565,7 @@ static ADDRESS_MAP_START( jmpbreak_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x280, 0x283) AM_WRITE(eeprom_w)
 	AM_RANGE(0x2c0, 0x2c3) AM_READ(eeprom_r)
 	AM_RANGE(0x440, 0x441) AM_NOP // return 0, when oki chip is read / written
-	AM_RANGE(0x442, 0x443) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x442, 0x443) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x540, 0x543) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x680, 0x683) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
 	AM_RANGE(0x684, 0x687) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
@@ -577,7 +576,7 @@ static ADDRESS_MAP_START( mrdig_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x3c0, 0x3c3) AM_WRITE(eeprom_w)
 	AM_RANGE(0x180, 0x183) AM_READ(eeprom_r)
 	AM_RANGE(0x080, 0x081) AM_NOP // return 0, when oki chip is read / written
-	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x280, 0x283) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
 	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
@@ -594,7 +593,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aoh_io, AS_IO, 32, vamphalf_state )
 	AM_RANGE(0x0480, 0x0483) AM_WRITE(eeprom32_w)
-	AM_RANGE(0x0620, 0x0623) AM_DEVREADWRITE8("oki_2", okim6295_device, read, write, 0x0000ff00)
+	AM_RANGE(0x0620, 0x0623) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8("oki_1", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x0640, 0x0647) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x0000ff00)
 	AM_RANGE(0x0680, 0x0683) AM_WRITE(aoh_oki_bank_w)
@@ -611,7 +610,7 @@ static ADDRESS_MAP_START( boonggab_io, AS_IO, 16, vamphalf_state )
 	AM_RANGE(0x414, 0x41b) AM_WRITE(boonggab_lamps_w)
 	AM_RANGE(0x600, 0x603) AM_WRITE(boonggab_oki_bank_w)
 	AM_RANGE(0x700, 0x701) AM_NOP // return 0, when oki chip is read / written
-	AM_RANGE(0x702, 0x703) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x702, 0x703) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x740, 0x743) AM_DEVWRITE8("ymsnd", ym2151_device, register_w, 0x00ff)
 	AM_RANGE(0x744, 0x747) AM_DEVREADWRITE8("ymsnd", ym2151_device, status_r, data_w, 0x00ff)
 ADDRESS_MAP_END
@@ -1051,7 +1050,7 @@ MACHINE_CONFIG_START(vamphalf_state::sound_ym_oki)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(28'000'000)/16 , PIN7_HIGH) /* 1.75MHz */
+	MCFG_OKIM6295_ADD("oki1", XTAL(28'000'000)/16 , PIN7_HIGH) /* 1.75MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1059,7 +1058,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(vamphalf_state::sound_ym_banked_oki)
 	MCFG_FRAGMENT_ADD(sound_ym_oki)
 
-	MCFG_DEVICE_MODIFY("oki")
+	MCFG_DEVICE_MODIFY("oki1")
 	MCFG_DEVICE_ADDRESS_MAP(0, banked_oki_map)
 MACHINE_CONFIG_END
 
@@ -1070,7 +1069,7 @@ MACHINE_CONFIG_START(vamphalf_state::sound_suplup)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL(14'318'181)/8, PIN7_HIGH) /* 1.7897725 MHz */
+	MCFG_OKIM6295_ADD("oki1", XTAL(14'318'181)/8, PIN7_HIGH) /* 1.7897725 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1206,7 +1205,7 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki_2", XTAL(32'000'000)/32, PIN7_HIGH) /* 1MHz */
+	MCFG_OKIM6295_ADD("oki2", XTAL(32'000'000)/32, PIN7_HIGH) /* 1MHz */
 	MCFG_DEVICE_ADDRESS_MAP(0, banked_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
@@ -1314,7 +1313,7 @@ ROM_START( vamphalf )
 	ROM_LOAD32_WORD( "eur.roml01", 0x400000, 0x200000, CRC(a7995b06) SHA1(8b789b6a00bc177c3329ee4a31722fc65376b975) )
 	ROM_LOAD32_WORD( "eur.romu01", 0x400002, 0x200000, CRC(e269f5fe) SHA1(70f1308f11e147dd20f8bd45b91aefc9fd653da6) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "snd.vrom1", 0x00000, 0x40000, CRC(ee9e371e) SHA1(3ead5333121a77d76e4e40a0e0bf0dbc75f261eb) )
 ROM_END
 
@@ -1327,7 +1326,7 @@ ROM_START( vamphalfr1 )
 	ROM_LOAD32_WORD( "elc.roml01", 0x000000, 0x400000, CRC(19df4056) SHA1(8b05769d8e245f8b25bf92013b98c9d7e5ab4548) ) /* only 2 roms, though twice as big as other sets */
 	ROM_LOAD32_WORD( "evi.romu01", 0x000002, 0x400000, CRC(f9803923) SHA1(adc1d4fa2c6283bc24829f924b58fbd9d1bacdd2) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "ws1-01202.vrom1", 0x00000, 0x40000, CRC(ee9e371e) SHA1(3ead5333121a77d76e4e40a0e0bf0dbc75f261eb) ) /* same data as other sets */
 ROM_END
 
@@ -1343,7 +1342,7 @@ ROM_START( vamphalfk )
 	ROM_LOAD32_WORD( "roml01", 0x400000, 0x200000, CRC(626c9925) SHA1(c90c72372d145165a8d3588def12e15544c6223b) )
 	ROM_LOAD32_WORD( "romu01", 0x400002, 0x200000, CRC(d5be3363) SHA1(dbdd0586909064e015f190087f338f37bbf205d2) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "snd.vrom1", 0x00000, 0x40000, CRC(ee9e371e) SHA1(3ead5333121a77d76e4e40a0e0bf0dbc75f261eb) )
 ROM_END
 
@@ -1402,7 +1401,7 @@ ROM_START( suplup ) /* version 4.0 / 990518 - also has 'Puzzle Bang Bang' title 
 	ROM_LOAD32_WORD( "suplup-roml01.bin", 0x400000, 0x200000, CRC(15769f55) SHA1(2c13e8da2682ccc7878218aaebe3c3c67d163fd2) )
 	ROM_LOAD32_WORD( "suplup-romu01.bin", 0x400002, 0x200000, CRC(6687bc6f) SHA1(cf842dfb2bcdfda0acc0859985bdba91d4a80434) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM */
@@ -1420,7 +1419,7 @@ ROM_START( luplup ) /* version 3.0 / 990128 */
 	ROM_LOAD32_WORD( "luplup30-roml01", 0x400000, 0x200000, CRC(40e85f94) SHA1(531e67eb4eedf47b0dded52ba2f4942b12cbbe2f) ) /* This one changed between v2.9 & v3.0 */
 	ROM_LOAD32_WORD( "luplup30-romu01", 0x400002, 0x200000, CRC(f2645b78) SHA1(b54c3047346c0f40dba0ba23b0d607cc53384edb) ) /* This one changed between v2.9 & v3.0 */
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
 
 	ROM_REGION( 0x0400, "plds", 0 )
@@ -1439,7 +1438,7 @@ ROM_START( luplup29 ) /* version 2.9 / 990108 */
 	ROM_LOAD32_WORD( "luplup-roml01", 0x400000, 0x200000, CRC(41c7ca8c) SHA1(55704f9d54f31bbaa044cd9d10ac2d9cb5e8fb70) )
 	ROM_LOAD32_WORD( "luplup-romu01", 0x400002, 0x200000, CRC(16746158) SHA1(a5036a7aaa717fde89d62b7ff7a3fded8b7f5cda) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
 ROM_END
 
@@ -1455,7 +1454,7 @@ ROM_START( puzlbang ) /* version 2.9 / 990108 - Korea only, cannot select title,
 	ROM_LOAD32_WORD( "luplup-roml01", 0x400000, 0x200000, CRC(41c7ca8c) SHA1(55704f9d54f31bbaa044cd9d10ac2d9cb5e8fb70) )
 	ROM_LOAD32_WORD( "luplup-romu01", 0x400002, 0x200000, CRC(16746158) SHA1(a5036a7aaa717fde89d62b7ff7a3fded8b7f5cda) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
 ROM_END
 
@@ -1470,7 +1469,7 @@ ROM_START( puzlbanga ) /* version 2.8 / 990106 - Korea only, cannot select title
 	ROM_LOAD32_WORD( "luplup-romu00", 0x000002, 0x200000, CRC(b57f4ca5) SHA1(b968c44a0ceb3274e066fa1d057fb6b017bb3fd3) )
 	ROM_LOAD32_WORD( "luplup-roml01", 0x400000, 0x200000, CRC(41c7ca8c) SHA1(55704f9d54f31bbaa044cd9d10ac2d9cb5e8fb70) )
 	ROM_LOAD32_WORD( "luplup-romu01", 0x400002, 0x200000, CRC(16746158) SHA1(a5036a7aaa717fde89d62b7ff7a3fded8b7f5cda) )
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(34a56987) SHA1(4d8983648a7f0acf43ff4c9c8aa6c8640ee2bbfe) )
 ROM_END
 
@@ -1542,7 +1541,7 @@ ROM_START( jmpbreak ) /* Released February 1999 */
 	ROM_LOAD32_WORD( "roml01.bin", 0x400000, 0x200000, CRC(6796a104) SHA1(3f7352cd37f78c1b01f7df45344ee7800db110f9) )
 	ROM_LOAD32_WORD( "romu01.bin", 0x400002, 0x200000, CRC(0cc907c8) SHA1(86029eca0870f3b7dd4f1ee8093ccb09077cc00b) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(1b6e3671) SHA1(bd601460387b56c989785ae03d5bb3c6cdb30a50) )
 ROM_END
 
@@ -1557,7 +1556,7 @@ ROM_START( poosho ) /* Released November 1999 - Updated sequel to Jumping Break 
 	ROM_LOAD32_WORD( "roml01.bin", 0x400000, 0x200000, CRC(05e81ca0) SHA1(22c6b78e3a0f27195142221bd179a4ecac819684) )
 	ROM_LOAD32_WORD( "romu01.bin", 0x400002, 0x200000, CRC(fd2d02c7) SHA1(cc4fb765c6083e36a49f32f0d4e77792eb354f44) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(1b6e3671) SHA1(bd601460387b56c989785ae03d5bb3c6cdb30a50) )
 
 	ROM_REGION( 0x0400, "plds", 0 )
@@ -1623,7 +1622,7 @@ ROM_START( mrdig )
 	ROM_LOAD32_WORD( "roml00.bin", 0x000000, 0x200000, CRC(f6b161ea) SHA1(c417a4c877ffa2fdf5857ecc9c78ffc0c09dc516) )
 	ROM_LOAD32_WORD( "romh00.bin", 0x000002, 0x200000, CRC(5477efed) SHA1(e4991ee1b41d512eaa508351b6a78261dfde5a3d) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(5fd9e1c6) SHA1(fef82ef816af69f31d12fc4634d06d825e8b7416) )
 ROM_END
 
@@ -1676,7 +1675,7 @@ ROM_START( coolmini )
 	ROM_LOAD32_WORD( "roml03", 0xc00000, 0x200000, CRC(231650bf) SHA1(065f742a37d5476ec6f72f0bd8ba2cfbe626b872) )
 	ROM_LOAD32_WORD( "romu03", 0xc00002, 0x200000, CRC(273d5654) SHA1(0ae3d1c4c4862a8642dbebd7c955b29df29c4938) )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "cm-vrom1.020", 0x00000, 0x40000, CRC(fcc28081) SHA1(44031df0ee28ca49df12bcb73c83299fac205e21) )
 ROM_END
 
@@ -1695,7 +1694,7 @@ ROM_START( coolminii )
 	ROM_LOAD32_WORD( "roml03", 0xc00000, 0x200000, CRC(231650bf) SHA1(065f742a37d5476ec6f72f0bd8ba2cfbe626b872) BAD_DUMP )
 	ROM_LOAD32_WORD( "romu03", 0xc00002, 0x200000, CRC(273d5654) SHA1(0ae3d1c4c4862a8642dbebd7c955b29df29c4938) BAD_DUMP )
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "cm-vrom1.020", 0x00000, 0x40000, CRC(e1fc2ba4) SHA1(d2a9c55b9e90135b15abc53bc30d214716e83f25) )
 ROM_END
 
@@ -1767,7 +1766,7 @@ ROM_START( dquizgo2 )
 	/* roml03 empty */
 	/* romu03 empty */
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1", 0x00000, 0x40000, CRC(24d5b55f) SHA1(cb4d3a22440831e37df0a7fe5433bea708d60f31) )
 ROM_END
 
@@ -1841,7 +1840,7 @@ ROM_START( dtfamily )
 	
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x80000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1", 0x00000, 0x80000, CRC(4aacaef3) SHA1(c079170dc0ba0b91b1780cd175dc38151d640ff0) )
 ROM_END
 
@@ -1913,7 +1912,7 @@ ROM_START( toyland )
 	/* roml03 empty */
 	/* romu03 empty */
 
-	ROM_REGION( 0x40000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x40000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "vrom1.bin", 0x00000, 0x40000, CRC(d7e6fc5d) SHA1(ab5bca4035299214d98b222320276fbcaedb0898) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM */
@@ -2307,7 +2306,7 @@ ROM_START( finalgdr ) /* version 2.20.5915, Korea only */
 	
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x80000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "u7", 0x000000, 0x080000, CRC(080f61f8) SHA1(df3764b1b07f9fc38685e3706b0f834f62088727) )
 ROM_END
 
@@ -2415,7 +2414,7 @@ ROM_START( mrkickera )
 	
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x80000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "at27c040.u7", 0x000000, 0x080000, CRC(e8141fcd) SHA1(256fd1987030e0a1df0a66a228c1fea996cda686) ) /* Mask ROM */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) /* Default EEPROM (it doesn't boot without and the game code crashes) (game also refuses to boot if program attempts to rewrite it, CPU bug or protection?) */
@@ -2439,7 +2438,7 @@ ROM_START( mrkicker )
 	
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x80000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x80000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "11-semicom.vrom1", 0x000000, 0x080000, CRC(e8141fcd) SHA1(256fd1987030e0a1df0a66a228c1fea996cda686) ) /* same data as above */
 ROM_END
 
@@ -2507,7 +2506,7 @@ ROM_START( aoh )
 	
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x80000, "oki_2", 0 ) /* Oki Samples */
+	ROM_REGION( 0x80000, "oki2", 0 ) /* Oki Samples */
 	ROM_LOAD( "rom4", 0x00000, 0x80000, CRC(bba47755) SHA1(e6eeb5f64eaa88a74536119b731a76921e79f8ff) )
 ROM_END
 
@@ -2549,7 +2548,7 @@ ROM_START( boonggab )
 	
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is what gets switched */
-	ROM_REGION( 0x100000, "oki", 0 ) /* Oki Samples */
+	ROM_REGION( 0x100000, "oki1", 0 ) /* Oki Samples */
 	ROM_LOAD( "3.vrom1",      0x00000, 0x80000, CRC(0696bfcb) SHA1(bba61f3cae23271215bbbf8214ce3b73459d5da5) )
 	ROM_LOAD( "4.vrom2",      0x80000, 0x80000, CRC(305c2b16) SHA1(fa199c4cd4ebb952d934e3863fca8740eeba9294) )
 ROM_END
@@ -2563,11 +2562,11 @@ int vamphalf_state::irq_active()
 		return 0;
 }
 
-void vamphalf_state::banked_oki(const char *region)
+void vamphalf_state::banked_oki(int chip)
 {
-	assert(m_okibank.found());
-	uint8_t *ROM = memregion(region)->base();
-	uint32_t size = memregion(region)->bytes();
+	assert((m_okiregion[chip].found()) && (m_okibank.found()));
+	uint8_t *ROM = m_okiregion[chip]->base();
+	uint32_t size = m_okiregion[chip]->bytes();
 	if (size > 0x40000)
 		m_okibank->configure_entries(0, size/0x20000, &ROM[0], 0x20000);
 	else
@@ -2965,7 +2964,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,coolminii)
 
 DRIVER_INIT_MEMBER(vamphalf_state,mrkicker)
 {
-	banked_oki("oki");
+	banked_oki(0);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00063fc0, 0x00063fc1, read16_delegate(FUNC(vamphalf_state::mrkicker_speedup_r), this));
 
 	m_palshift = 0;
@@ -3051,7 +3050,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,yorijori)
 
 DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 {
-	banked_oki("oki");
+	banked_oki(0);
 	m_finalgdr_backupram_bank = 1;
 	m_finalgdr_backupram = std::make_unique<uint8_t[]>(0x80*0x100);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x005e870, 0x005e873, read32_delegate(FUNC(vamphalf_state::finalgdr_speedup_r), this));
@@ -3072,7 +3071,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,finalgdr)
 
 DRIVER_INIT_MEMBER(vamphalf_state,mrkickera)
 {
-	banked_oki("oki");
+	banked_oki(0);
 	// backup ram isn't used
 	m_finalgdr_backupram_bank = 1;
 	m_finalgdr_backupram = std::make_unique<uint8_t[]>(0x80*0x100);
@@ -3100,7 +3099,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,dquizgo2)
 
 DRIVER_INIT_MEMBER(vamphalf_state,dtfamily)
 {
-	banked_oki("oki");
+	banked_oki(0);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xcc2a8, 0xcc2a9, read16_delegate(FUNC(vamphalf_state::dtfamily_speedup_r), this));
 
 	m_palshift = 0;
@@ -3118,7 +3117,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,toyland)
 
 DRIVER_INIT_MEMBER(vamphalf_state,aoh)
 {
-	banked_oki("oki_2");
+	banked_oki(1);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x028a09c, 0x028a09f, read32_delegate(FUNC(vamphalf_state::aoh_speedup_r), this));
 
 	m_palshift = 0;
@@ -3151,7 +3150,7 @@ DRIVER_INIT_MEMBER(vamphalf_state,poosho)
 
 DRIVER_INIT_MEMBER(vamphalf_state,boonggab)
 {
-	banked_oki("oki");
+	banked_oki(0);
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x000f1b74, 0x000f1b75, read16_delegate(FUNC(vamphalf_state::boonggab_speedup_r), this));
 
 	m_palshift = 0;
