@@ -229,11 +229,9 @@ namespace sol
 //-------------------------------------------------
 
 template <typename T>
-T lua_engine::addr_space::mem_read(offs_t address, sol::object shift)
+T lua_engine::addr_space::mem_read(offs_t address)
 {
 	T mem_content = 0;
-	if(!shift.as<bool>())
-		address = space.address_to_byte(address);
 	switch(sizeof(mem_content) * 8) {
 		case 8:
 			mem_content = space.read_byte(address);
@@ -272,10 +270,8 @@ T lua_engine::addr_space::mem_read(offs_t address, sol::object shift)
 //-------------------------------------------------
 
 template <typename T>
-void lua_engine::addr_space::mem_write(offs_t address, T val, sol::object shift)
+void lua_engine::addr_space::mem_write(offs_t address, T val)
 {
-	if(!shift.as<bool>())
-		address = space.address_to_byte(address);
 	switch(sizeof(val) * 8) {
 		case 8:
 			space.write_byte(address, val);
@@ -317,7 +313,6 @@ T lua_engine::addr_space::log_mem_read(offs_t address)
 	T mem_content = 0;
 	if(!dev.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		return 0;
-	address = space.address_to_byte(address);
 
 	switch(sizeof(mem_content) * 8) {
 		case 8:
@@ -361,7 +356,6 @@ void lua_engine::addr_space::log_mem_write(offs_t address, T val)
 {
 	if(!dev.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 		return;
-	address = space.address_to_byte(address);
 
 	switch(sizeof(val) * 8) {
 		case 8:
@@ -1454,8 +1448,8 @@ void lua_engine::initialize()
 					for (address_map_entry &entry : space.map()->m_entrylist)
 					{
 						sol::table mapentry = sol().create_table();
-						mapentry["offset"] = space.address_to_byte(entry.m_addrstart) & space.addrmask();
-						mapentry["endoff"] = space.address_to_byte(entry.m_addrend) & space.addrmask();
+						mapentry["offset"] = entry.m_addrstart & space.addrmask();
+						mapentry["endoff"] = entry.m_addrend & space.addrmask();
 						mapentry["readtype"] = entry.m_read.m_type;
 						mapentry["writetype"] = entry.m_write.m_type;
 						map.add(mapentry);
