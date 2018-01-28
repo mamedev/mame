@@ -486,13 +486,13 @@ READ8_MEMBER(pc9801_state::fdc_2dd_ctrl_r)
 
 WRITE8_MEMBER(pc9801_state::fdc_2dd_ctrl_w)
 {
-		logerror("%02x ctrl\n",data);
-		if(((m_fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
-			m_fdc_2dd->soft_reset();
+	logerror("%02x ctrl\n",data);
+	if(((m_fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
+		m_fdc_2dd->soft_reset();
 
-		m_fdc_2dd_ctrl = data;
-		m_fdc_2dd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
-		m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
+	m_fdc_2dd_ctrl = data;
+	m_fdc_2dd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
+	m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 READ8_MEMBER(pc9801_state::ide_ctrl_r)
