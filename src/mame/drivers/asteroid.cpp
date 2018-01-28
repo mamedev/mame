@@ -658,8 +658,6 @@ MACHINE_CONFIG_START(asteroid_state::asteroid_base)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_TTL153_ADD("dsw_sel")
-
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
