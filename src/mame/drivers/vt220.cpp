@@ -98,7 +98,7 @@ uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &b
 
 MACHINE_CONFIG_START(vt220_state::vt220)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8051, XTAL(11'059'200)) // from schematic for earlier version 
+	MCFG_CPU_ADD("maincpu", I8051, XTAL(11'059'200)) // from schematic for earlier version
 	MCFG_CPU_PROGRAM_MAP(vt220_mem)
 	MCFG_CPU_IO_MAP(vt220_io)
 

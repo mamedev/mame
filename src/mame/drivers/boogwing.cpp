@@ -53,7 +53,7 @@
 
     Driver by Bryan McPhail and David Haywood.
 
-	DECO 99 "ACE" Chip hooked up by cam900.
+    DECO 99 "ACE" Chip hooked up by cam900.
 
     Todo:
         * Sprite priorities aren't verified to be 100% accurate.

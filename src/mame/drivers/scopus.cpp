@@ -86,13 +86,13 @@ static GFXDECODE_START( sagitta180 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sagitta180_charlayout, 0, 1 )
 GFXDECODE_END
 
-I8275_DRAW_CHARACTER_MEMBER(sagitta180_state::crtc_display_pixels) 
-{ 
+I8275_DRAW_CHARACTER_MEMBER(sagitta180_state::crtc_display_pixels)
+{
 	unsigned i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
 	uint8_t pixels;
- 
+
 	if (lten) {
 		pixels = ~0;
 	} else if (vsp != 0 || (linecount & 8) != 0) {
@@ -118,7 +118,7 @@ void sagitta180_state::machine_reset()
 static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, sagitta180_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-//	AM_RANGE(0x0800, 0x17ff) AM_ROM
+//  AM_RANGE(0x0800, 0x17ff) AM_ROM
 	AM_RANGE(0x1800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -193,10 +193,10 @@ MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 
-//	MCFG_DEVICE_ADD("intlatch", I8212, 0)
-//	MCFG_I8212_MD_CALLBACK(GND) // guessed !
-//	MCFG_I8212_DI_CALLBACK(DEVREAD8("picu", i8214_device, vector_r))
-//	MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE)) // guessed !
+//  MCFG_DEVICE_ADD("intlatch", I8212, 0)
+//  MCFG_I8212_MD_CALLBACK(GND) // guessed !
+//  MCFG_I8212_DI_CALLBACK(DEVREAD8("picu", i8214_device, vector_r))
+//  MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE)) // guessed !
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

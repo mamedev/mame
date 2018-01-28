@@ -42,9 +42,9 @@ public:
 
 	template <class Object> static devcb_base &set_read_bg_callback(device_t &device, Object &&cb) { return downcast<ppu_vt03_device &>(device).m_read_bg.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_read_sp_callback(device_t &device, Object &&cb) { return downcast<ppu_vt03_device &>(device).m_read_sp.set_callback(std::forward<Object>(cb)); }
-	
+
 	static void set_palette_mode(device_t &device, vtxx_pal_mode pmode) { downcast<ppu_vt03_device &>(device).m_pal_mode = pmode; }
-	
+
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;
 	virtual DECLARE_READ8_MEMBER(palette_read) override;
@@ -86,9 +86,9 @@ private:
 	palette_device *m_palette;
 
 	uint8_t m_201x_regs[0x20];
-	
+
 	vtxx_pal_mode m_pal_mode = PAL_MODE_VT0x;
-	
+
 	void set_2010_reg(uint8_t data);
 
 	void set_new_pen(int i);

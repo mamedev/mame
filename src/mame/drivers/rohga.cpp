@@ -105,8 +105,8 @@
                 JN-00         : Fujitsu MB7116 PROM
                 VSync         : 58kHz
 
-	TODO:
-		nitrobal : blending, priority function wrong
+    TODO:
+        nitrobal : blending, priority function wrong
 
 ***************************************************************************/
 
