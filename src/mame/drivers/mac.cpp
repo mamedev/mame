@@ -880,8 +880,8 @@ static SLOT_INTERFACE_START(mac_nubus_cards)
 	SLOT_INTERFACE("asmc3nb", NUBUS_ASNTMC3NB)  /* Asante MC3NB Ethernet card */
 	SLOT_INTERFACE("portrait", NUBUS_WSPORTRAIT)    /* Apple Macintosh II Portrait video card */
 	SLOT_INTERFACE("enetnb", NUBUS_APPLEENET)   /* Apple NuBus Ethernet */
-	SLOT_INTERFACE("bootbug", NUBUS_BOOTBUG)	/* Brigent BootBug debugger card */
-	SLOT_INTERFACE("quadralink", NUBUS_QUADRALINK)	/* AE Quadralink serial card */
+	SLOT_INTERFACE("bootbug", NUBUS_BOOTBUG)    /* Brigent BootBug debugger card */
+	SLOT_INTERFACE("quadralink", NUBUS_QUADRALINK)  /* AE Quadralink serial card */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(mac_pds030_cards)

@@ -2601,7 +2601,7 @@ ROM_START( cookbib2a )
 	ROM_REGION( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from
 	   shared ram, the MCU puts it there
-	   
+
 	   this one is hacked from the cookbib2 one, absolute code jump needed to be changed at least */
 	ROM_LOAD16_WORD_SWAP( "protdata_alt.bin", 0x00000, 0x200, BAD_DUMP CRC(bc136ead) SHA1(96459c2ccf7f95880421ba082c2414fa1040f3ed) )
 

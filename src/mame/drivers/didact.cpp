@@ -8,7 +8,7 @@
  * Lars Bjorklund. They constructed a series of microcomputers for educational purposes such as "Mikrodator 6802",
  * Esselte 100 and the Candela computer for the swedish schools to educate the students in assembly programming
  * and BASIC for electro mechanical applications such as stepper motors, simple process control, buttons
- * and LED:s. Didact designs were marketed by Esselte Studium to the swedish schools. 
+ * and LED:s. Didact designs were marketed by Esselte Studium to the swedish schools.
  *
  * The Esselte 1000 was an educational package based on Apple II plus software and litterature
  * but the relation to Didact is at this point unknown so it is probably a pure Esselte software production.
