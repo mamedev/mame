@@ -79,8 +79,8 @@
 #define TRACE_SMIOC_READ(address, data, reg, text) UnifiedTrace((address),(data)," Read", "SMIOC", (reg), (text))
 #define TRACE_SMIOC_WRITE(address, data, reg, text) UnifiedTrace((address),(data),"Write", "SMIOC", (reg), (text))
 #else
-#define TRACE_SMIOC_READ(address, data, reg, text)
-#define TRACE_SMIOC_WRITE(address, data, reg, text)
+#define TRACE_SMIOC_READ(address, data, reg, text) do {} while (0)
+#define TRACE_SMIOC_WRITE(address, data, reg, text) do {} while (0)
 #endif
 
 class r9751_state : public driver_device

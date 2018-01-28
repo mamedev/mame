@@ -159,7 +159,7 @@ public:
 	uint8_t m_key_irq_flag;       /**< Keyboard IRQ pending. */
 	uint8_t m_key_irq_vector;     /**< Keyboard IRQ vector. */
 
-private:
+protected:
 	struct scrn_reg_t
 	{
 		uint8_t gfx_bank;
