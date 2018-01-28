@@ -2227,7 +2227,8 @@ MACHINE_CONFIG_START(x1_state::x1)
 	MCFG_VIDEO_START_OVERRIDE(x1_state,x1)
 
 	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w)) // XXX: wag
+	// TODO: guesswork, try to implicitily start the motor
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w)) 
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)
