@@ -432,7 +432,7 @@ uint32_t alphatpx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		{
 			uint8_t code = m_vram[(vramy * 128) + x];   // helwie44 must be 128d is 080h physical display-ram step line
 			// draw 12 lines of the character
-			bool cursoren = cursor.contains(x * 8, vramy * 12);
+			bool cursoren = cursor.contains(x * 8, y * 12);
 			for (int line = 0; line < 12; line++)
 			{
 				uint8_t data = m_gfx[((code & 0x7f) * 16) + line];
