@@ -67,6 +67,7 @@ void k051649_device::device_start()
 	m_stream = stream_alloc(0, 1, m_rate);
 	m_mclock = clock();
 
+	m_prev_buffer_size = 2 * m_rate;
 	// allocate a buffer to mix into - 1 second's worth should be more than enough
 	m_mixer_buffer.resize(2 * m_rate);
 
@@ -118,14 +119,16 @@ void k051649_device::device_clock_changed()
 	
 	if (old_rate < m_rate)
 	{
-		memset(&m_mixer_buffer[0], 0, sizeof(m_mixer_buffer));
-		m_mixer_buffer.resize(2 * m_rate);
+		std::fill(&m_mixer_buffer[0], &m_mixer_buffer[m_prev_buffer_size], 0);
+		m_prev_buffer_size = 2 * m_rate;
+		m_mixer_buffer.resize(m_prev_buffer_size);
 	}
 	m_stream->set_sample_rate(m_rate);
 	if (old_rate > m_rate)
 	{
-		memset(&m_mixer_buffer[0], 0, sizeof(m_mixer_buffer));
-		m_mixer_buffer.resize(2 * m_rate);
+		std::fill(&m_mixer_buffer[0], &m_mixer_buffer[m_prev_buffer_size], 0);
+		m_prev_buffer_size = 2 * m_rate;
+		m_mixer_buffer.resize(m_prev_buffer_size);
 	}
 }
 
@@ -137,7 +140,7 @@ void k051649_device::device_clock_changed()
 void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	// zap the contents of the mixer buffer
-	memset(&m_mixer_buffer[0], 0, samples * sizeof(short));
+	std::fill(&m_mixer_buffer[0], &m_mixer_buffer[samples], 0);
 
 	for (sound_channel &voice : m_channel_list)
 	{

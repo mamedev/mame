@@ -78,6 +78,7 @@ private:
 	sound_stream *m_stream;
 	int m_mclock;
 	int m_rate;
+	int m_prev_buffer_size;
 
 	/* mixer tables and internal buffers */
 	std::unique_ptr<int16_t[]> m_mixer_table;
