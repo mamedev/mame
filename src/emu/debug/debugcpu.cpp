@@ -836,7 +836,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
 				auto dis = m_machine.disable_side_effect(disable_se);
-				return read_memory(space, space.address_to_byte(address), size, true);
+				return read_memory(space, address, size, true);
 			}
 			break;
 		}
@@ -860,7 +860,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
 				auto dis = m_machine.disable_side_effect(disable_se);
-				return read_memory(space, space.address_to_byte(address), size, false);
+				return read_memory(space, address, size, false);
 			}
 			break;
 		}
@@ -1041,7 +1041,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
 				auto dis = m_machine.disable_side_effect(disable_se);
-				write_memory(space, space.address_to_byte(address), data, size, true);
+				write_memory(space, address, data, size, true);
 			}
 			break;
 
@@ -1060,7 +1060,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
 				auto dis = m_machine.disable_side_effect(disable_se);
-				write_memory(space, space.address_to_byte(address), data, size, false);
+				write_memory(space, address, data, size, false);
 			}
 			break;
 
