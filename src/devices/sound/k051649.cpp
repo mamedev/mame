@@ -115,11 +115,18 @@ void k051649_device::device_clock_changed()
 	uint32_t old_rate = m_rate;
 	m_rate = clock()/16;
 	m_mclock = clock();
-
-	// allocate a buffer to mix into - 1 second's worth should be more than enough
+	
+	if (old_rate < m_rate)
+	{
+		memset(&m_mixer_buffer[0], 0, sizeof(m_mixer_buffer));
+		m_mixer_buffer.resize(2 * m_rate);
+	}
 	m_stream->set_sample_rate(m_rate);
-	memset(&m_mixer_buffer[0], 0, 2 * old_rate * sizeof(short));
-	m_mixer_buffer.resize(2 * m_rate);
+	if (old_rate > m_rate)
+	{
+		memset(&m_mixer_buffer[0], 0, sizeof(m_mixer_buffer));
+		m_mixer_buffer.resize(2 * m_rate);
+	}
 }
 
 
