@@ -227,7 +227,7 @@ void deco16ic_device::device_start()
 
 	m_bank1_cb.bind_relative_to(*owner());
 	m_bank2_cb.bind_relative_to(*owner());
-	
+
 	int fullheight1 = 0;
 	int fullwidth1 = 0;
 

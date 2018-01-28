@@ -365,7 +365,7 @@ Part No.: E192
 
 * Denotes unpopulated sockets
 
-Although this version of Maniac Square use the same PCB as Snow Board Championship, there are some minor 
+Although this version of Maniac Square use the same PCB as Snow Board Championship, there are some minor
 omponent changes:
 
  Slower OSC clocks

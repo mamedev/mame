@@ -283,7 +283,7 @@ void k001604_device::draw_front_layer( screen_device &screen, bitmap_rgb32 &bitm
 
 	int pivotx = (int16_t)(0xfec0);
 	int pivoty = (int16_t)(0xff28);
-	
+
 	int startx = ((x - pivotx) * 256) * 32;
 	int starty = ((y - pivoty) * 256) * 32;
 	int incxx = (xx) * 32;
@@ -302,7 +302,7 @@ void k001604_device::draw_front_layer( screen_device &screen, bitmap_rgb32 &bitm
 	const rgb_t *clut = palette().palette()->entry_list_raw();
 
 	int window_x, window_y, window_xmask, window_ymask;
-	
+
 	window_x = 0;
 	window_y = 0;
 	window_xmask = pixmap.width() - 1;

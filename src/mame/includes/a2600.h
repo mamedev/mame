@@ -94,4 +94,4 @@ protected:
 
 #endif /* MAME_INCLUDES_A2600H */
 
- 
+

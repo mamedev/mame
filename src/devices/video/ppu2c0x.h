@@ -219,8 +219,8 @@ protected:
 	uint8_t m_planebuf[2];
 	int                         m_scanline;         /* scanline count */
 	std::unique_ptr<uint8_t[]>  m_spriteram;           /* sprite ram */
-	
-	
+
+
 private:
 	static constexpr device_timer_id TIMER_HBLANK = 0;
 	static constexpr device_timer_id TIMER_NMI = 1;

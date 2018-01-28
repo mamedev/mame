@@ -2,25 +2,25 @@
 // copyright-holders:Bryan McPhail
 /*************************************************************************
 
-	deco_ace.cpp
+    deco_ace.cpp
 
-	Data East 99 "ACE" Chip Emulation
+    Data East 99 "ACE" Chip Emulation
 
-	Original source (from deco32.cpp) by Bryan McPhail, Splited by cam900.
+    Original source (from deco32.cpp) by Bryan McPhail, Splited by cam900.
 
 **************************************************************************/
 /*Some notes pieced together from Tattoo Assassins info(from deco32.cpp):
 
     Bytes 0 to 0x1f : Alpha Control
-	Tattoo Assassins : 
-	Bytes 0x00 to 0x16(0x58) - object alpha control?
-	Bytes 0x17(0x5c) to 0x1f(0x7c) - tilemap alpha control
+    Tattoo Assassins :
+    Bytes 0x00 to 0x16(0x58) - object alpha control?
+    Bytes 0x17(0x5c) to 0x1f(0x7c) - tilemap alpha control
 
-	Boogie Wings:
-	Bytes 0x00 to 0x0f(0x1f) - object alpha control (if ((pix & 0x100) == 0))
-	Bytes 0x10(0x20) to 0x13(0x26) - another object alpha control?
-	Bytes 0x14(0x28) to 0x19(0x32) - fixed value 0x1c 0x18 0x14 0x10 0x0c 0x08. it controls explosion object's alpha?
-	Bytes 0x1a(0x34) to 0x1f(0x3f) - tilemap alpha control?
+    Boogie Wings:
+    Bytes 0x00 to 0x0f(0x1f) - object alpha control (if ((pix & 0x100) == 0))
+    Bytes 0x10(0x20) to 0x13(0x26) - another object alpha control?
+    Bytes 0x14(0x28) to 0x19(0x32) - fixed value 0x1c 0x18 0x14 0x10 0x0c 0x08. it controls explosion object's alpha?
+    Bytes 0x1a(0x34) to 0x1f(0x3f) - tilemap alpha control?
 
     0 = opaque, 0x10 = 50% transparent, 0x20 = fully transparent
 
@@ -41,7 +41,7 @@
     Byte 0x24(0x90): fadestgreen
     Byte 0x25(0x94): fadestblue
     Byte 0x26(0x98): fadetype
-	Byte 0x27(0x9c): unused/unknown
+    Byte 0x27(0x9c): unused/unknown
 
     The 'ST' value lerps between the 'PT' value and the palette entries.  So, if PT==0,
     then ST ranging from 0 to 255 will cause a fade to black (when ST==255 the palette
@@ -49,8 +49,8 @@
 
     'fadetype' - 1100 for multiplicative fade, 1000 for additive
 
-	TODO:
-		additive fade is correct? verify additive fading from real pcb.
+    TODO:
+        additive fade is correct? verify additive fading from real pcb.
 */
 
 

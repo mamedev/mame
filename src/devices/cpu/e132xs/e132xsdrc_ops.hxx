@@ -4528,9 +4528,9 @@ void hyperstone_device::generate_lddp(drcuml_block *block, compiler_state *compi
 	UML_ADD(block, I3, I0, 8);
 	UML_AND(block, I0, I0, ~3);
 	UML_CALLH(block, *m_mem_read32);
-	UML_MOV(block, I2, I1);				// I2: dreg[0]
+	UML_MOV(block, I2, I1);             // I2: dreg[0]
 	UML_ADD(block, I0, I0, 4);
-	UML_CALLH(block, *m_mem_read32);	// I1: dreg[4]
+	UML_CALLH(block, *m_mem_read32);    // I1: dreg[4]
 
 	if (SRC_GLOBAL)
 	{
@@ -4847,9 +4847,9 @@ void hyperstone_device::generate_frame(drcuml_block *block, compiler_state *comp
 
 	UML_ROLAND(block, I1, DRC_SR, 7, 0x7f);
 	UML_SUB(block, I1, I1, op & 0xf);
-	UML_ROLINS(block, DRC_SR, I1, 25, 0xfe000000);	// SET_FP(GET_FP - SRC_CODE)
-	UML_ROLINS(block, DRC_SR, op, 17, 0x01e00000);	// SET_FL(DST_CODE)
-	UML_AND(block, DRC_SR, DRC_SR, ~M_MASK);		// SET_M(0)
+	UML_ROLINS(block, DRC_SR, I1, 25, 0xfe000000);  // SET_FP(GET_FP - SRC_CODE)
+	UML_ROLINS(block, DRC_SR, op, 17, 0x01e00000);  // SET_FL(DST_CODE)
+	UML_AND(block, DRC_SR, DRC_SR, ~M_MASK);        // SET_M(0)
 
 	UML_MOV(block, I0, mem(&SP));
 	UML_MOV(block, I6, I0);
@@ -4859,7 +4859,7 @@ void hyperstone_device::generate_frame(drcuml_block *block, compiler_state *comp
 	UML_ROLAND(block, I2, I0, 30, 0x7f);
 	UML_ADD(block, I2, I2, (64 - 10));
 	UML_SUB(block, I3, I2, I1);
-	UML_SEXT(block, I3, I3, SIZE_BYTE);				// difference = ((SP & 0x1fc) >> 2) + (64 - 10) - ((GET_FP - SRC_CODE) + GET_FL)
+	UML_SEXT(block, I3, I3, SIZE_BYTE);             // difference = ((SP & 0x1fc) >> 2) + (64 - 10) - ((GET_FP - SRC_CODE) + GET_FL)
 
 	int diff_in_range, done;
 	UML_CMP(block, I3, -64);

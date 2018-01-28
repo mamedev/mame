@@ -2,20 +2,20 @@
 // copyright-holders:David Haywood
 
 /*
-	Radica 'Mega Drive' and 'Genesis' clones
-	these were mini battery operated "TV Game" consoles with wired in controller and no cartslot
-	fully licensed by Sega
+    Radica 'Mega Drive' and 'Genesis' clones
+    these were mini battery operated "TV Game" consoles with wired in controller and no cartslot
+    fully licensed by Sega
 
-	reproduction 'System on a Chip' hardware, not perfect, flaws will need emulating eventually.
+    reproduction 'System on a Chip' hardware, not perfect, flaws will need emulating eventually.
 
-	not dumped
+    not dumped
 
-	Genesis Volume 2
-	Genesis SF2 / GnG (PAL one is locked to PAL)
+    Genesis Volume 2
+    Genesis SF2 / GnG (PAL one is locked to PAL)
 
-	Outrun 2019 (probably identical ROM to MD version, just custom controller)
+    Outrun 2019 (probably identical ROM to MD version, just custom controller)
 
-	more?
+    more?
 
 */
 
@@ -95,7 +95,7 @@ static INPUT_PORTS_START( megadriv_radica_6button )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_START("IN0")
 	PORT_START("UNK")
 INPUT_PORTS_END
@@ -104,7 +104,7 @@ INPUT_PORTS_END
 MACHINE_START_MEMBER(megadriv_radica_state, megadriv_radica_6button)
 {
 	MACHINE_START_CALL_MEMBER(megadriv);
-	m_vdp->stop_timers(); 
+	m_vdp->stop_timers();
 
 	m_io_pad_6b[0] = ioport("EXTRA1");
 	m_io_pad_6b[1] = ioport("EXTRA2");
@@ -121,7 +121,7 @@ MACHINE_START_MEMBER(megadriv_radica_state, megadriv_radica_6button)
 MACHINE_START_MEMBER(megadriv_radica_state, megadriv_radica_3button)
 {
 	MACHINE_START_CALL_MEMBER(megadriv);
-	m_vdp->stop_timers(); 
+	m_vdp->stop_timers();
 	save_item(NAME(m_bank));
 }
 
@@ -183,7 +183,7 @@ DRIVER_INIT_MEMBER(megadriv_radica_state,megadriv_radica_6button_pal)
 }
 
 // NTSC releases
-CONS( 2004, rad_gen1,0, 0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state,  megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0) 
+CONS( 2004, rad_gen1,0, 0, megadriv_radica_3button_ntsc, megadriv_radica_3button_1player, megadriv_radica_state,  megadriv,                    "Radica / Sega",                     "Genesis Collection Volume 1 (Radica, Arcade Legends) (USA)", 0)
 
 // PAL releases
 CONS( 2004, rad_sf,  0, 0, megadriv_radica_6button_pal,  megadriv_radica_6button,         megadriv_radica_state,  megadriv_radica_6button_pal, "Radica / Capcom / Sega",            "Street Fighter II: Special Champion Edition [Ghouls'n Ghosts] (Radica, Arcade Legends) (Europe)", 0) // SF2 game is region locked,  US version ROM is definitely different
