@@ -1143,7 +1143,7 @@ MACHINE_CONFIG_DERIVED(mystwarr_state::martchmp, mystwarr)
 	MCFG_CPU_PROGRAM_MAP(martchmp_map)
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(mystwarr_state, mchamp_interrupt)
-	
+
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PROGRAM_MAP(martchmp_sound_map)
 
@@ -1170,7 +1170,7 @@ MACHINE_CONFIG_DERIVED(mystwarr_state::martchmp, mystwarr)
 	MCFG_DEVICE_MODIFY("k055673")
 	MCFG_K055673_CB(mystwarr_state, martchmp_sprite_callback)
 	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_GX, -58, -23)
-	
+
 	MCFG_DEVICE_REMOVE("k054539_1")
 	MCFG_DEVICE_REMOVE("k054539_2")
 

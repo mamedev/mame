@@ -2,15 +2,15 @@
 // copyright-holders:Aaron Giles, Phil Bennett
 /***************************************************************************
 
-	Atari Cyberstorm hardware
+    Atari Cyberstorm hardware
 
-	driver by Aaron Giles and Phil Bennett
+    driver by Aaron Giles and Phil Bennett
 
-	Games supported:
-		* Cyberstorm (prototype) (1993)
+    Games supported:
+        * Cyberstorm (prototype) (1993)
 
-	Known bugs:
-		* STAIN effect not 100% correct
+    Known bugs:
+        * STAIN effect not 100% correct
 
 ***************************************************************************/
 
@@ -25,7 +25,7 @@
 
 /*************************************
  *
- *	Initialization
+ *  Initialization
  *
  *************************************/
 
@@ -52,7 +52,7 @@ MACHINE_RESET_MEMBER(cybstorm_state,cybstorm)
 
 /*************************************
  *
- *	I/O handling
+ *  I/O handling
  *
  *************************************/
 
@@ -82,14 +82,14 @@ WRITE32_MEMBER(cybstorm_state::latch_w)
 
 /*************************************
  *
- *	Main CPU memory handlers
+ *  Main CPU memory handlers
  *
  *************************************/
 
 
 /*************************************
  *
- *	Memory maps
+ *  Memory maps
  *
  *************************************/
 
@@ -124,7 +124,7 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *	Port definitions
+ *  Port definitions
  *
  *************************************/
 
@@ -178,7 +178,7 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *	Graphics definitions
+ *  Graphics definitions
  *
  *************************************/
 
@@ -219,16 +219,16 @@ static const gfx_layout molayout =
 
 
 static GFXDECODE_START( cybstorm )
-	GFXDECODE_ENTRY( "gfx2", 0, pflayout,     0, 16 )		/* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx3", 0, molayout,  4096, 64 )		/* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx1", 0, anlayout, 16384, 64 )		/* characters 8x8 */
+	GFXDECODE_ENTRY( "gfx2", 0, pflayout,     0, 16 )       /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx3", 0, molayout,  4096, 64 )       /* sprites & playfield */
+	GFXDECODE_ENTRY( "gfx1", 0, anlayout, 16384, 64 )       /* characters 8x8 */
 GFXDECODE_END
 
 
 
 /*************************************
  *
- *	Machine driver
+ *  Machine driver
  *
  *************************************/
 
@@ -289,18 +289,18 @@ MACHINE_CONFIG_END
 
 /*************************************
  *
- *	ROM definition(s)
+ *  ROM definition(s)
  *
  *************************************/
 
 ROM_START( cybstorm )
-	ROM_REGION( 0x200000, "maincpu", 0 )	/* 6*128k for 68020 code */
+	ROM_REGION( 0x200000, "maincpu", 0 )    /* 6*128k for 68020 code */
 	ROM_LOAD32_BYTE( "st_11.22.prog.6a",    0x000000, 0x080000, CRC(8b112ee9) SHA1(cd8367c47c653b8a1ba236c354f009f4297d521d) )
 	ROM_LOAD32_BYTE( "st_11.22.prog.8a",    0x000001, 0x080000, CRC(36b7cec9) SHA1(c9c2ba6df1fc849200e0c66a7cbc292e8b0b22f3) )
 	ROM_LOAD32_BYTE( "st_11.22.prog2.13a",  0x000002, 0x080000, CRC(1318f2c5) SHA1(929fbe96621852a10b7072490e1e554cdb2f20d8) )
 	ROM_LOAD32_BYTE( "st_11.22.prog.16a",   0x000003, 0x080000, CRC(4ae586a8) SHA1(daa803ed38f6582677b397e744dd8f5f60cfb508) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 )	/* 64k + 16k for 6502 code */
+	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k + 16k for 6502 code */
 	ROM_LOAD( "st_11.22.6502",     0x010000, 0x004000, CRC(947421b2) SHA1(72b2b66122e779135f1f5af794e4d8513ccbbef6) )
 	ROM_CONTINUE(             0x004000, 0x00c000 )
 
@@ -343,7 +343,7 @@ ROM_START( cybstorm )
 	ROM_LOAD( "st_11.22.mo34",0x980000, 0x080000, CRC(b8b0c8b6) SHA1(f47218a4d94aa151964687a6e4c02f2b3065fdd3) )
 	ROM_LOAD( "st_11.22.mo35",0xb80000, 0x080000, CRC(f0b9cf9d) SHA1(7ce30b05c1ee02346e8f568f36274b46d1ed99c4) )
 
-	ROM_REGION( 0x100000, "jsa:oki1", 0 )	/* 1MB for ADPCM */
+	ROM_REGION( 0x100000, "jsa:oki1", 0 )   /* 1MB for ADPCM */
 	ROM_LOAD( "st_11.22.5a",    0x000000, 0x080000, CRC(d469692c) SHA1(b7d94c042cf9f28ea65d44f5305d56459562d209) )
 
 	ROM_REGION( 0x100000, "jsa:oki2", 0 )    /* 1MB for ADPCM */
@@ -354,7 +354,7 @@ ROM_END
 
 /*************************************
  *
- *	Driver initialization
+ *  Driver initialization
  *
  *************************************/
 
@@ -367,7 +367,7 @@ DRIVER_INIT_MEMBER(cybstorm_state, cybstorm)
 
 /*************************************
  *
- *	Game driver(s)
+ *  Game driver(s)
  *
  *************************************/
 

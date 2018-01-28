@@ -345,7 +345,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 						pdat = 0x00; // This gets wrong when background color is not black
 					}
 					else
-					{	// 320x200, 40x25 char, 8 color
+					{   // 320x200, 40x25 char, 8 color
 						uint32_t rowstart = (((x_pos + ma) * 32 + ra) & 0x7fff) + page;
 						pdat  = ((m_vram[rowstart +  0]  & 0xff) << 16); // Green 8 bits
 						pdat |= ((m_vram[rowstart +  8]  & 0xf0) << 8);  // Red upper 4 bits
@@ -448,8 +448,8 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 	m_vmode = data;
 	switch (data & 7)
 	{
-	case 0: // Disambiguity between reality and the service manual. Reality is 640x200 in 8 color or tones! 
-	        {
+	case 0: // Disambiguity between reality and the service manual. Reality is 640x200 in 8 color or tones!
+			{
 			LOGVMOD(" - 640x200 on 80x25  \n");
 			rectangle rect(0, 640 - 1, 0, 200 - 1);
 			m_screen->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));

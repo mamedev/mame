@@ -193,7 +193,7 @@ void mtxl_state::cdrom(device_t *device)
 	device_slot_interface::static_option_reset(*ide0);
 	SLOT_INTERFACE_NAME(mt6k_ata_devices)(ide0);
 	device_slot_interface::static_set_default_option(*ide0, "cdrom");
-	device_slot_interface::static_set_fixed(*ide0, true);	
+	device_slot_interface::static_set_fixed(*ide0, true);
 
 	auto ide1 = device->subdevice("ide:1");
 	device_slot_interface::static_set_default_option(*ide1, "");

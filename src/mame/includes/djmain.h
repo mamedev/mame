@@ -21,7 +21,7 @@ public:
 		m_sndram(*this, "sndram")
 	{
 	}
-	
+
 	required_shared_ptr<uint32_t> m_obj_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<k056832_device> m_k056832;

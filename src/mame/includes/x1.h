@@ -155,7 +155,7 @@ public:
 	optional_device<z80dma_device> m_dma;
 	void x1turbo(machine_config &config);
 	void x1(machine_config &config);
-	
+
 	uint8_t m_key_irq_flag;       /**< Keyboard IRQ pending. */
 	uint8_t m_key_irq_vector;     /**< Keyboard IRQ vector. */
 
@@ -184,7 +184,7 @@ protected:
 	{
 		uint8_t sec, min, hour, day, wday, month, year;
 	};
-	
+
 	void x1_draw_pixel(bitmap_rgb32 &bitmap,int y,int x,uint16_t pen,uint8_t width,uint8_t height);
 	void draw_fgtilemap(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	void draw_gfxbitmap(bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri);
