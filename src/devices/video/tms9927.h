@@ -48,9 +48,9 @@ public:
 
 	DECLARE_READ_LINE_MEMBER(bl_r);
 
-	bool screen_reset();
-	int upscroll_offset();
-	bool cursor_bounds(rectangle &bounds);
+	bool screen_reset() const { return m_reset; }
+	int upscroll_offset() const { return m_start_datarow; }
+	bool cursor_bounds(rectangle &bounds) const;
 
 protected:
 	tms9927_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
