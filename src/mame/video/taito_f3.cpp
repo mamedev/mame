@@ -82,8 +82,8 @@ Line ram memory map:
     0x5000: Clip plane 0 (low bits)
     0x5200: Clip plane 1 (low bits)
     0x5400: Unused?
-    0x5600: Used by quizhuhu (taito logo and ingame text), and landmakr (winning text), 
-	        special clip used in tandem with b*00 bit 11? [unemulated]
+    0x5600: Used by quizhuhu (taito logo and ingame text), and landmakr (winning text),
+            special clip used in tandem with b*00 bit 11? [unemulated]
 
     0x6000: Sync register
     0x6004: Sprite alpha control
@@ -839,7 +839,7 @@ WRITE16_MEMBER(taito_f3_state::f3_lineram_w)
 	/* Update: this doesn't seem to occur anymore, I'll leave this snippet in but commented out.
 	 *         fwiw PC=0x1768a0/0x1768a4 is where the game clears lineram in round D, which is a
 	 *         move.w Dn, (An,D7.w*2) , a kind of opcode that could've been bugged back then.
-	 */        
+	 */
 	if (m_f3_game==DARIUSG) {
 		if (m_f3_skip_this_frame)
 			return;
@@ -849,7 +849,7 @@ WRITE16_MEMBER(taito_f3_state::f3_lineram_w)
 		}
 	}
 	#endif
-	
+
 	COMBINE_DATA(&m_f3_line_ram[offset]);
 }
 

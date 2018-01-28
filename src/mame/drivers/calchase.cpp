@@ -395,7 +395,7 @@ static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
 	AM_RANGE(0x000d0024, 0x000d0027) AM_DEVWRITE16("ldac", dac_word_interface, write, 0x0000ffff)
 	AM_RANGE(0x000d0028, 0x000d002b) AM_DEVWRITE16("rdac", dac_word_interface, write, 0x0000ffff)
 	AM_RANGE(0x000d0800, 0x000d0fff) AM_ROM AM_REGION("nvram",0) //
-//	AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
+//  AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
 
 	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	//GRULL-AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
@@ -460,7 +460,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( calchase )
 	PORT_START("pc_keyboard_0")
 	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
-//	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
+//  AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
 	// 0x0004, KEYCODE_0
 	// 0x0008, KEYCODE_1
 	// 0x0010, KEYCODE_2
@@ -475,7 +475,7 @@ static INPUT_PORTS_START( calchase )
 	// 0x2000, KEYCODE_EQUAL
 	// 0x4000, KEYCODE_BACKSPACE
 	// 0x8000, KEYCODE_TAB
-	
+
 	PORT_START("pc_keyboard_1")
 	// 0x0001, KEYCODE_Q
 	// 0x0002, KEYCODE_W
@@ -499,7 +499,7 @@ static INPUT_PORTS_START( calchase )
 	PORT_START("pc_keyboard_3")
 	AT_KEYB_HELPER( 0x0001, "B",            KEYCODE_B           ) /* B                           30  B0 */
 	AT_KEYB_HELPER( 0x0002, "N",            KEYCODE_N           ) /* N                           31  B1 */
-	AT_KEYB_HELPER( 0x0200, "SPACE",        KEYCODE_SPACE		) /* N                           31  B1 */
+	AT_KEYB_HELPER( 0x0200, "SPACE",        KEYCODE_SPACE       ) /* N                           31  B1 */
 	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_F1          ) /* F1                          3B  BB */
 //  AT_KEYB_HELPER( 0x8000, "F5",           KEYCODE_F5          )
 

@@ -129,7 +129,7 @@ public:
 	template<typename _device> address_map_entry &r(const char *tag, uint16_t (_device::*read)(address_space &, offs_t, uint16_t), const char *read_name, uint64_t mask = 0) {
 		return r(read16_delegate(read, read_name, tag, (_device *)nullptr),
 				 mask);
-	} 
+	}
 
 	template<typename _device> address_map_entry &r(const char *tag, uint32_t (_device::*read)(address_space &, offs_t, uint32_t), const char *read_name, uint64_t mask = 0) {
 		return r(read32_delegate(read, read_name, tag, (_device *)nullptr),
@@ -142,14 +142,14 @@ public:
 	}
 
 	template<typename _device> address_map_entry &w(const char *tag, void (_device::*write)(address_space &, offs_t, uint8_t, uint8_t), const char *write_name, uint64_t mask = 0) {
-		return w(write8_delegate(write, write_name, tag, (_device *)nullptr), 
+		return w(write8_delegate(write, write_name, tag, (_device *)nullptr),
 				 mask);
 	}
 
 	template<typename _device> address_map_entry &w(const char *tag, void (_device::*write)(address_space &, offs_t, uint16_t, uint16_t), const char *write_name, uint64_t mask = 0) {
 		return w(write16_delegate(write, write_name, tag, (_device *)nullptr),
 				 mask);
-	} 
+	}
 
 	template<typename _device> address_map_entry &w(const char *tag, void (_device::*write)(address_space &, offs_t, uint32_t, uint32_t), const char *write_name, uint64_t mask = 0) {
 		return w(write32_delegate(write, write_name, tag, (_device *)nullptr),
@@ -163,7 +163,7 @@ public:
 
 	template<typename _device> address_map_entry &rw(const char *tag, uint8_t (_device::*read)(address_space &, offs_t, uint8_t), const char *read_name, void (_device::*write)(address_space &, offs_t, uint8_t, uint8_t), const char *write_name, uint64_t mask = 0) {
 		return rw(read8_delegate(read, read_name, tag, (_device *)nullptr),
-				  write8_delegate(write, write_name, tag, (_device *)nullptr), 
+				  write8_delegate(write, write_name, tag, (_device *)nullptr),
 				  mask);
 	}
 
@@ -171,7 +171,7 @@ public:
 		return rw(read16_delegate(read, read_name, tag, (_device *)nullptr),
 				  write16_delegate(write, write_name, tag, (_device *)nullptr),
 				  mask);
-	} 
+	}
 
 	template<typename _device> address_map_entry &rw(const char *tag, uint32_t (_device::*read)(address_space &, offs_t, uint32_t), const char *read_name, void (_device::*write)(address_space &, offs_t, uint32_t, uint32_t), const char *write_name, uint64_t mask = 0) {
 		return rw(read32_delegate(read, read_name, tag, (_device *)nullptr),

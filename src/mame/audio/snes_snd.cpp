@@ -178,7 +178,7 @@ void snes_sound_device::device_start()
 	memcpy(m_ipl_region, machine().root_device().memregion("sound_ipl")->base(), 64);
 
 	m_tick_timer = timer_alloc(TIMER_TICK_ID);
-	
+
 	state_register();
 	save_pointer(NAME(m_ram.get()), SNES_SPCRAM_SIZE);
 }
@@ -207,10 +207,10 @@ void snes_sound_device::device_reset()
 		m_counter[i] = 0;
 		m_subcounter[i] = 0;
 	}
-	
+
 	attotime period = attotime::from_hz(64000);
 	m_tick_timer->adjust(period, 0, period);
-	
+
 	dsp_reset();
 }
 
@@ -218,9 +218,9 @@ inline void snes_sound_device::update_timer_tick(uint8_t which)
 {
 	if(m_timer_enabled[which] == false)
 		return;
-	
+
 	m_subcounter[which]++;
-	
+
 	// if timer channel is 0 or 1 we update at 64000/8
 	if(m_subcounter[which] >= 8 || which == 2)
 	{
@@ -242,7 +242,7 @@ void snes_sound_device::device_timer(emu_timer &timer, device_timer_id id, int p
 		assert_always(false, "Unknown id in snes_sound_device::device_timer");
 		return;
 	}
-	
+
 	for(int ch=0;ch<3;ch++)
 		update_timer_tick(ch);
 }

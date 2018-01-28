@@ -9,7 +9,7 @@
  * - take mc6845 device functions into account;
  *
  ***************************************************************************/
- 
+
 #include "emu.h"
 #include "includes/x1.h"
 

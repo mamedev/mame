@@ -3863,7 +3863,7 @@ ROM_END
 // Green Lizard [Reel Game] / Export / A - 05/01/01
 // Requires set chip version: 4.04.xx
 // Variation (% and NO):
-// Doesn't requires touch screen 
+// Doesn't requires touch screen
 ROM_START( glizrdce )
 	ARISTOCRAT_MK5_BIOS
 	/*
@@ -4493,7 +4493,7 @@ ROM_END
 // Keep Your Hat On / Export / B - 08/05/2000
 // Requires set chips 4.01.xx
 // Variation (% and NO)
-// Requires touch screen 
+// Requires touch screen
 ROM_START( kyhatonu )
 	ARISTOCRAT_MK5_BIOS
 	/*

@@ -131,7 +131,7 @@ public:
 	DECLARE_DRIVER_INIT(xtrmhnt2);
 
 	DECLARE_READ64_MEMBER( xtrmhnt2_hack_r );
-	
+
 	void aw_base(machine_config &config);
 	void aw1c(machine_config &config);
 	void aw2c(machine_config &config);

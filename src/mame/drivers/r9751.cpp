@@ -199,7 +199,7 @@ void r9751_state::UnifiedTrace(u32 address, u32 data, const char* operation, con
 		stacktrace[i] = 0;
 	for(int i=0; i<2; i++)
 		basepointer[i] = 0;
-	
+
 	stacktrace[0] = m_maincpu->pc();
 	if(reg_a6 + 4 < 0xFFFFFF) stacktrace[1] = m_maincpu->space(AS_PROGRAM).read_dword(reg_a6 + 4);
 	if(reg_a6 < 0xFFFFFF && reg_a6 != 0) basepointer[0] = m_maincpu->space(AS_PROGRAM).read_dword(reg_a6);

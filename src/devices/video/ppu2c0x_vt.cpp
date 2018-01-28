@@ -40,7 +40,7 @@ READ8_MEMBER(ppu_vt03_device::palette_read)
 
 void ppu_vt03_device::set_new_pen(int i)
 {
-	if(m_pal_mode == PAL_MODE_NEW_RGB) {		
+	if(m_pal_mode == PAL_MODE_NEW_RGB) {
 		uint16_t rgbval = (m_newpal[i&0x7f] & 0xff) | ((m_newpal[(i&0x7f)+0x80] & 0xff)<<8);
 		uint8_t blue = (rgbval & 0x001f) << 3;
 		uint8_t green = (rgbval & 0x3e0) >> 2;
@@ -49,7 +49,7 @@ void ppu_vt03_device::set_new_pen(int i)
 	} else {
 		// TODO: should this be tidied up?
 		uint16_t palval = (m_newpal[i&0x7f] & 0x3f) | ((m_newpal[(i&0x7f)+0x80] & 0x3f)<<6);
-		
+
 		uint8_t rhue = palval & 0x0F;
 		uint8_t rlum = (palval >> 4) & 0x0F;
 		uint8_t rsat = (palval >> 8) & 0x0F;
@@ -61,7 +61,7 @@ void ppu_vt03_device::set_new_pen(int i)
 			uint8_t hue_lut[16] = {0xD, 0x7, 0x8, 0x9, 0xA, 0xB, 0xC, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x0, 0xE, 0xF};
 			rhue = hue_lut[rhue];
 		}
-		
+
 		// Get base color
 		double hue = 287.0;
 
@@ -69,7 +69,7 @@ void ppu_vt03_device::set_new_pen(int i)
 		double Kb = 0.1145;
 		double Ku = 2.029;
 		double Kv = 1.140;
-		
+
 		double sat;
 		double y, u, v;
 		double rad;
@@ -97,7 +97,7 @@ void ppu_vt03_device::set_new_pen(int i)
 			y = (m_pal_mode == PAL_MODE_NEW_VG) ? 0.4 : 0.9;
 			break;
 		}
-		
+
 		sat *= (rsat / 15.0);
 		y *= (rlum / 15.0);
 		u = sat * cos(rad);
@@ -121,7 +121,7 @@ void ppu_vt03_device::set_new_pen(int i)
 			B = 0;
 		if (B > 255)
 			B = 255;
-		
+
 		m_palette->set_pen_color(i & 0x7f, rgb_t(R, G ,B));
 	}
 
@@ -194,7 +194,7 @@ void ppu_vt03_device::device_reset()
 	// todo: what are the actual defaults for these?
 	for (int i = 0;i < 0x20;i++)
 		set_201x_reg(i, 0x00);
-	
+
 	init_palette(*m_palette, 0);
 	m_read_bg4_bg3 = 0;
 	m_va34 = 0;

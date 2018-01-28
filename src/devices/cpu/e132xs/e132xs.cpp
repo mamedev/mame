@@ -415,7 +415,7 @@ void hyperstone_device::dump_registers()
 	{
 		//if (m_core->global_regs[0] == 0x11094)
 		//{
-		//	total_11094++;
+		//  total_11094++;
 		//}
 		return;
 	} else if (total_ops == 0ULL) {

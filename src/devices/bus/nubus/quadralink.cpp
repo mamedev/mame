@@ -126,35 +126,35 @@ WRITE32_MEMBER( nubus_quadralink_device::dev_w )
 	//printf("write %x to QL space @ %x, mask %08x\n", data, offset, mem_mask);
 	switch (offset)
 	{
-		case 0x0000:	// SCC 2 A control
+		case 0x0000:    // SCC 2 A control
 			m_scc2->ca_w(space, 0, data & 0xff);
 			break;
 
-		case 0x0002:	// SCC 2 A data
+		case 0x0002:    // SCC 2 A data
 			m_scc2->da_w(space, 0, data & 0xff);
 			break;
 
-		case 0x0004:	// SCC 2 B control
+		case 0x0004:    // SCC 2 B control
 			m_scc2->cb_w(space, 0, data & 0xff);
 			break;
 
-		case 0x0006:	// SCC 2 B data
+		case 0x0006:    // SCC 2 B data
 			m_scc2->db_w(space, 0, data & 0xff);
 			break;
 
-		case 0x10000:	// SCC 1 A control
+		case 0x10000:   // SCC 1 A control
 			m_scc1->ca_w(space, 0, data & 0xff);
 			break;
 
-		case 0x10002:	// SCC 1 A data
+		case 0x10002:   // SCC 1 A data
 			m_scc1->da_w(space, 0, data & 0xff);
 			break;
 
-		case 0x10004:	// SCC 1 B control
+		case 0x10004:   // SCC 1 B control
 			m_scc1->cb_w(space, 0, data & 0xff);
 			break;
 
-		case 0x10006:	// SCC 1 B data
+		case 0x10006:   // SCC 1 B data
 			m_scc1->db_w(space, 0, data & 0xff);
 			break;
 	}
@@ -173,7 +173,7 @@ READ32_MEMBER( nubus_quadralink_device::dev_r )
 
 		case 0x0004:
 			return m_scc2->cb_r(space, 0);
-			
+
 		case 0x0006:
 			return m_scc2->db_r(space, 0);
 
@@ -185,7 +185,7 @@ READ32_MEMBER( nubus_quadralink_device::dev_r )
 
 		case 0x10004:
 			return m_scc1->cb_r(space, 0);
-			
+
 		case 0x10006:
 			return m_scc1->db_r(space, 0);
 	}

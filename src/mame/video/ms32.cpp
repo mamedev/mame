@@ -420,8 +420,8 @@ uint32_t ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bit
 	else
 		rot_pri++;
 
-//	popmessage("%02x %02x %02x",m_priram[0x2b00 / 2],m_priram[0x2e00 / 2],m_priram[0x3a00 / 2]);
-	
+//  popmessage("%02x %02x %02x",m_priram[0x2b00 / 2],m_priram[0x2e00 / 2],m_priram[0x3a00 / 2]);
+
 	// tile-tile mixing
 	for(int prin=0;prin<3;prin++)
 	{
@@ -442,7 +442,7 @@ uint32_t ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bit
 			m_tx_tilemap->draw(screen, m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 	}
 
-	// tile-sprite mixing 
+	// tile-sprite mixing
 	/* this mixing isn't 100% accurate, it should be using ALL the data in
 	   the priority ram, probably for per-pixel / pen mixing, or more levels
 	   than are supported here..  I don't know, it will need hw tests I think */

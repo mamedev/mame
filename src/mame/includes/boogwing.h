@@ -60,7 +60,7 @@ public:
 	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	uint16_t m_priority;
-	
+
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(priority_w);
 	DECLARE_DRIVER_INIT(boogwing);
