@@ -90,6 +90,8 @@ protected:
 	std::vector<int16_t> m_mixer_buffer_left;
 	std::vector<int16_t> m_mixer_buffer_right;
 
+	int m_prev_buffer_size;
+
 	int m_baserate;
 	uint8_t m_REG[0x200];
 

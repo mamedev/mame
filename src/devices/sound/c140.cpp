@@ -100,15 +100,15 @@ c140_device::c140_device(const machine_config &mconfig, device_type type, const 
 	, m_stream(nullptr)
 	, m_baserate(0)
 {
-	memset(m_REG, 0, sizeof(uint8_t)*0x200);
-	memset(m_pcmtbl, 0, sizeof(int16_t)*8);
+	std::fill(&m_REG[0],&m_REG[0x200],0);
+	std::fill(&m_pcmtbl[0], &m_pcmtbl[8], 0);
 }
 
 
 c219_device::c219_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: c140_device(mconfig, C219, tag, owner, clock, 19, 16)
 {
-	memset(m_c219bank, 0, sizeof(uint8_t)*4);
+	std::fill(&m_c219bank[0], &m_c219bank[4], 0);
 }
 
 //-------------------------------------------------
@@ -128,17 +128,18 @@ void c140_device::device_start()
 		m_pcmtbl[i]=segbase;    //segment base value
 		segbase += 16<<i;
 	}
-
-	memset(m_REG,0,sizeof(m_REG));
+	
+	std::fill(&m_REG[0],&m_REG[0x200],0);
 
 	for(int i = 0; i < MAX_VOICE; i++)
 	{
 		init_voice(&m_voi[i]);
 	}
 
+	m_prev_buffer_size = m_sample_rate;
 	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	m_mixer_buffer_left.resize(m_sample_rate);
-	m_mixer_buffer_right.resize(m_sample_rate);
+	m_mixer_buffer_left.resize(m_prev_buffer_size);
+	m_mixer_buffer_right.resize(m_prev_buffer_size);
 
 	save_item(NAME(m_REG));
 
@@ -164,14 +165,14 @@ void c140_device::device_start()
 void c219_device::device_start()
 {
 	c140_device::device_start();
-	memset(m_c219bank, 0, sizeof(m_c219bank));
+	std::fill(&m_c219bank[0], &m_c219bank[4], 0);
 
 	save_item(NAME(m_c219bank));
 }
 
 void c140_device::device_reset()
 {
-	memset(m_REG,0,sizeof(m_REG));
+	std::fill(&m_REG[0],&m_REG[0x200],0);
 
 	for(int i = 0; i < MAX_VOICE; i++)
 	{
@@ -182,7 +183,7 @@ void c140_device::device_reset()
 void c219_device::device_reset()
 {
 	c140_device::device_reset();
-	memset(m_c219bank, 0, sizeof(m_c219bank));
+	std::fill(&m_c219bank[0], &m_c219bank[4], 0);
 }
 
 void c140_device::device_clock_changed()
@@ -191,10 +192,11 @@ void c140_device::device_clock_changed()
 	m_sample_rate = m_baserate = clock();
 	if (old_rate < m_sample_rate)
 	{
-		memset(&m_mixer_buffer_left[0], 0, sizeof(m_mixer_buffer_left));
-		memset(&m_mixer_buffer_right[0], 0, sizeof(m_mixer_buffer_right));
-		m_mixer_buffer_left.resize(m_sample_rate);
-		m_mixer_buffer_right.resize(m_sample_rate);
+		std::fill(&m_mixer_buffer_left[0], &m_mixer_buffer_left[m_prev_buffer_size], 0);
+		std::fill(&m_mixer_buffer_right[0], &m_mixer_buffer_right[m_prev_buffer_size], 0);
+		m_prev_buffer_size = m_sample_rate;
+		m_mixer_buffer_left.resize(m_prev_buffer_size);
+		m_mixer_buffer_right.resize(m_prev_buffer_size);
 	}
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(m_sample_rate);
@@ -203,10 +205,11 @@ void c140_device::device_clock_changed()
 		
 	if (old_rate > m_sample_rate)
 	{
-		memset(&m_mixer_buffer_left[0], 0, sizeof(m_mixer_buffer_left));
-		memset(&m_mixer_buffer_right[0], 0, sizeof(m_mixer_buffer_right));
-		m_mixer_buffer_left.resize(m_sample_rate);
-		m_mixer_buffer_right.resize(m_sample_rate);
+		std::fill(&m_mixer_buffer_left[0], &m_mixer_buffer_left[m_prev_buffer_size], 0);
+		std::fill(&m_mixer_buffer_right[0], &m_mixer_buffer_right[m_prev_buffer_size], 0);
+		m_prev_buffer_size = m_sample_rate;
+		m_mixer_buffer_left.resize(m_prev_buffer_size);
+		m_mixer_buffer_right.resize(m_prev_buffer_size);
 	}
 
 }
@@ -484,8 +487,8 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	if(samples>m_sample_rate) samples=m_sample_rate;
 
 	/* zap the contents of the mixer buffer */
-	memset(&m_mixer_buffer_left[0], 0, samples * sizeof(int16_t));
-	memset(&m_mixer_buffer_right[0], 0, samples * sizeof(int16_t));
+	std::fill(&m_mixer_buffer_left[0], &m_mixer_buffer_left[samples], 0);
+	std::fill(&m_mixer_buffer_right[0], &m_mixer_buffer_right[samples], 0);
 
 	//--- audio update
 	voice_update();
