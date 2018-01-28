@@ -4,7 +4,6 @@
 #include "sound/dac.h"
 #include "sound/namco.h"
 #include "video/namco_c116.h"
-#include "machine/74157.h"
 
 class namcos1_state : public driver_device
 {
@@ -28,9 +27,7 @@ public:
 		m_rom(*this, "user1"),
 		m_soundbank(*this, "soundbank"),
 		m_mcubank(*this, "mcubank"),
-		m_io_dipsw(*this, "DIPSW"),
-		m_dsw_sel(*this, "dsw_sel")
-	{ }
+		m_io_dipsw(*this, "DIPSW") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -53,7 +50,6 @@ public:
 	required_memory_bank m_mcubank;
 
 	required_ioport m_io_dipsw;
-	required_device<ls157_device> m_dsw_sel;
 
 	int m_key_id;
 	int m_key_reg;
