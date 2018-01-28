@@ -288,8 +288,8 @@ void towns_state::init_rtc()
 	m_towns_rtc_reg[7] = systm.local_time.mday % 10;
 	m_towns_rtc_reg[8] = systm.local_time.mday / 10;
 	// month
-	m_towns_rtc_reg[9] = systm.local_time.month % 10;
-	m_towns_rtc_reg[10] = systm.local_time.month / 10;
+	m_towns_rtc_reg[9] = (systm.local_time.month + 1) % 10;
+	m_towns_rtc_reg[10] = (systm.local_time.month + 1) / 10;
 	// year
 	m_towns_rtc_reg[11] = (systm.local_time.year - 2000) % 10;
 	m_towns_rtc_reg[12] = (systm.local_time.year - 2000) / 10;
