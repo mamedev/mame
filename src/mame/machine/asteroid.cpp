@@ -84,13 +84,24 @@ READ8_MEMBER(asteroid_state::asteroid_IN1_r)
 
 READ8_MEMBER(asteroid_state::asteroid_DSW1_r)
 {
-	int res;
-	int res1;
+	// 765432--  not used
+	// ------1-  ls253 dsw selector 2y
+	// -------0  ls253 dsw selector 1y
 
-	res1 = ioport("DSW1")->read();
+	uint8_t val = m_dsw1->read();
 
-	res = 0xfc | ((res1 >> (2 * (3 - (offset & 0x3)))) & 0x3);
-	return res;
+	m_dsw_sel->i3a_w(BIT(val, 0));
+	m_dsw_sel->i3b_w(BIT(val, 1));
+	m_dsw_sel->i2a_w(BIT(val, 2));
+	m_dsw_sel->i2b_w(BIT(val, 3));
+	m_dsw_sel->i1a_w(BIT(val, 4));
+	m_dsw_sel->i1b_w(BIT(val, 5));
+	m_dsw_sel->i0a_w(BIT(val, 6));
+	m_dsw_sel->i0b_w(BIT(val, 7));
+
+	m_dsw_sel->s_w(space, 0, offset & 0x03);
+
+	return 0xfc | (m_dsw_sel->zb_r() << 1) | m_dsw_sel->za_r();
 }
 
 
