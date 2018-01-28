@@ -371,8 +371,12 @@ void tms9927_device::recompute_parameters(bool postload)
 
 	m_hsyn = false;
 	if (!m_write_hsyn.isnull())
+	{
+		m_write_hsyn(0);
 		m_hsync_timer->adjust(screen().time_until_pos(m_vsyn_start, m_hsyn_start));
+	}
 
 	m_vsyn = false;
+	m_write_vsyn(0);
 	m_vsync_timer->adjust(screen().time_until_pos(m_vsyn_start, m_hsyn_start));
 }
