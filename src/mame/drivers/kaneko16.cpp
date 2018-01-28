@@ -180,7 +180,7 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_soundlatch_w)
 }
 
 /* Two identically mapped YM2149 chips */
-template<int chip>
+template<int Chip>
 READ16_MEMBER(kaneko16_state::kaneko16_ay_YM2149_r)
 {
 	/* Each 2149 register is mapped to a different address */
@@ -189,7 +189,7 @@ READ16_MEMBER(kaneko16_state::kaneko16_ay_YM2149_r)
 }
 
 
-template<int chip>
+template<int Chip>
 WRITE16_MEMBER(kaneko16_state::kaneko16_ay_YM2149_w)
 {
 	/* Each 2149 register is mapped to a different address */
@@ -199,7 +199,7 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_ay_YM2149_w)
 	else                m_ym2149[chip]->data_w(space,0,(data >> 8) & 0xff);
 }
 
-template<int bankno, mask, fixedsize, bankedsize>
+template<int Bankno, int Mask, int FixedSize, int BankedSize>
 WRITE8_MEMBER(kaneko16_state::oki_bank_w)
 {
 	kaneko16_common_oki_bank_w(bankno, (data & mask), fixedsize, bankedsize);
