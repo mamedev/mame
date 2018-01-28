@@ -166,7 +166,7 @@ void kaneko16_state::kaneko16_common_oki_bank_w(int bankno, int bank, size_t fix
 
 	if (bank < length)
 	{
-		m_okibank[bankno]->set_enrty(bank);
+		m_okibank[bankno]->set_entry(bank);
 	}
 }
 
