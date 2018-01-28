@@ -24,7 +24,7 @@ static const char * glsl_mamebm_fsh_files [GLSL_SHADER_FEAT_INT_NUMBER] =
 {
 	"/tmp/glsl_plain_rgb32_dir.fsh",                           // rgb32 dir plain
 	"/tmp/glsl_bilinear_rgb32_dir.fsh",                         // rgb32 dir bilinear
-    "/tmp/glsl_bicubic_rgb32_dir.fsh",                         // rgb32 dir bicubic
+	"/tmp/glsl_bicubic_rgb32_dir.fsh",                         // rgb32 dir bicubic
 };
 
 #else // GLSL_SOURCE_ON_DISK

@@ -957,7 +957,7 @@ MACHINE_CONFIG_DERIVED(trackfld_state::trackfldu, trackfld)
 	MCFG_CPU_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* exact M6809 model unknown */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state, vblank_irq)
-	
+
 MACHINE_CONFIG_END
 
 INTERRUPT_GEN_MEMBER(trackfld_state::yieartf_timer_irq)

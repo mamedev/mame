@@ -3,10 +3,10 @@
 /*************************************************************************
 
     deco_ace.h
-	
-	Data East 99 "ACE" Chip Emulation
 
-	Original source (from deco32.cpp) by Bryan McPhail, Splited by cam900.
+    Data East 99 "ACE" Chip Emulation
+
+    Original source (from deco32.cpp) by Bryan McPhail, Splited by cam900.
 
 **************************************************************************/
 #ifndef MAME_VIDEO_DECO_ACE_H
@@ -28,7 +28,7 @@ public:
 
 	// static configuration
 	static void static_set_palette_tag(device_t &device, const char *tag);
-	
+
 	DECLARE_READ32_MEMBER( buffered_palette_r );
 	DECLARE_READ16_MEMBER( buffered_palette16_r );
 	DECLARE_READ16_MEMBER( ace_r );

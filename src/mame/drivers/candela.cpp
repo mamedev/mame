@@ -5,7 +5,7 @@
  * History of Candela Data AB
  *---------------------------
  * The Candela computer was designed to be the big breakthough and developed by Candela Data AB, "a Didact Company".
- * The Candela system was based around a main unit that could run OS-9 or Flex and a terminal unit that had a 
+ * The Candela system was based around a main unit that could run OS-9 or Flex and a terminal unit that had a
  * propietary software including CDBASIC. The Candela system lost the battle of the swedish schools to
  * the Compis computer by TeleNova which was based on CP/M initially.  Later both lost to IBM PC as we know.
  * Candela Data continued to sell their system to the swedish industry without major successes despite great

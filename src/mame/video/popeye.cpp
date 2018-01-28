@@ -181,9 +181,9 @@ void popeye_state::update_palette()
 			bit2 = (~color_prom[i] >> 7) & 0x01;
 			//if (m_bitmap_type == TYPE_TNX1)
 			//{
-			//	/* Sky Skipper has different weights */
-			//	bit0 = bit1;
-			//	bit1 = 0;
+			//  /* Sky Skipper has different weights */
+			//  bit0 = bit1;
+			//  bit1 = 0;
 			//}
 			int b = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
 

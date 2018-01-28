@@ -2290,7 +2290,7 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update_nslasher)
-	
+
 	MCFG_DECO_ACE_ADD("deco_ace")
 	MCFG_DECO_ACE_PALETTE("palette")
 

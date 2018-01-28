@@ -109,7 +109,7 @@ public:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	virtual util::disasm_interface *create_disassembler() override;
-	
+
 	DECLARE_READ8_MEMBER(segapcm_rom_r);
 	DECLARE_READ8_MEMBER(ymf271_rom_r);
 	DECLARE_READ8_MEMBER(ymz280b_rom_r);
@@ -488,7 +488,7 @@ void vgmplay_device::execute_run()
 				m_io->write_byte(A_GAMEBOY + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
 				m_pc += 3;
 				break;
-				
+
 			case 0xb4:
 				m_io->write_byte(A_NESAPU + m_file->read_byte(m_pc+1), m_file->read_byte(m_pc+2));
 				m_pc += 3;
@@ -536,7 +536,7 @@ void vgmplay_device::execute_run()
 				m_pc += 3;
 				break;
 			}
-			
+
 			case 0xc0:
 				m_io->write_byte(A_SEGAPCM + (m_file->read_word(m_pc+1) & 0x7ff), m_file->read_byte(m_pc+3));
 				m_pc += 4;
@@ -558,7 +558,7 @@ void vgmplay_device::execute_run()
 				m_pc += 4;
 				break;
 			}
-			
+
 			case 0xc4:
 				m_io->write_byte(A_QSOUND + 0, m_file->read_byte(m_pc+1));
 				m_io->write_byte(A_QSOUND + 1, m_file->read_byte(m_pc+2));
@@ -574,7 +574,7 @@ void vgmplay_device::execute_run()
 				m_pc += 4;
 				break;
 			}
-			
+
 			case 0xd3:
 			{
 				uint16_t offset = m_file->read_byte(m_pc+1) << 16 | m_file->read_byte(m_pc+2);
@@ -1638,7 +1638,7 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_DEVICE_ADDRESS_MAP(0, c352_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
-	
+
 	MCFG_OKIM6295_ADD("okim6295a", 1000000, PIN7_HIGH)
 	MCFG_DEVICE_ADDRESS_MAP(0, okim6295a_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
@@ -1664,12 +1664,12 @@ MACHINE_CONFIG_START(vgmplay_state::vgmplay)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  0.50)
 	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
-	
+
 	MCFG_DEVICE_ADD("k054539a", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539a_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1)
-	
+
 	MCFG_DEVICE_ADD("k054539b", K054539, XTAL(18'432'000))
 	MCFG_DEVICE_ADDRESS_MAP(0, k054539b_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1)

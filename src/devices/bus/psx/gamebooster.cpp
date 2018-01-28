@@ -3,8 +3,8 @@
 /**********************************************************************
 
     Datel Game Booster for Playstation 1
-	
-	Gameboy emulator with Gameboy cartridge slot
+
+    Gameboy emulator with Gameboy cartridge slot
 
 **********************************************************************/
 
@@ -106,7 +106,7 @@ WRITE16_MEMBER(psx_gamebooster_device::exp_w)
 	{
 		offset -= 0x20000;
 		logerror("%s: psx_gamebooster_device::exp_w %04x %04x\n", machine().describe_context(), offset*2, data);
-	
+
 		if (mem_mask & 0xff00) m_cartslot->write_bank(space, (offset*2)+1, data>>8);
 		if (mem_mask & 0x00ff) m_cartslot->write_bank(space, (offset*2)+0, data); // send this 2nd or it erases the bank with the above
 
