@@ -184,8 +184,8 @@ template<int Chip>
 READ16_MEMBER(kaneko16_state::kaneko16_ay_YM2149_r)
 {
 	/* Each 2149 register is mapped to a different address */
-	m_ym2149[chip]->address_w(space,0,offset);
-	return m_ym2149[chip]->data_r(space,0);
+	m_ym2149[Chip]->address_w(space,0,offset);
+	return m_ym2149[Chip]->data_r(space,0);
 }
 
 
@@ -193,16 +193,16 @@ template<int Chip>
 WRITE16_MEMBER(kaneko16_state::kaneko16_ay_YM2149_w)
 {
 	/* Each 2149 register is mapped to a different address */
-	m_ym2149[chip]->address_w(space,0,offset);
+	m_ym2149[Chip]->address_w(space,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_BITS_0_7) m_ym2149[chip]->data_w(space,0, data       & 0xff);
-	else                m_ym2149[chip]->data_w(space,0,(data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7) m_ym2149[Chip]->data_w(space,0, data       & 0xff);
+	else                m_ym2149[Chip]->data_w(space,0,(data >> 8) & 0xff);
 }
 
 template<int Bankno, int Mask, int FixedSize, int BankedSize>
 WRITE8_MEMBER(kaneko16_state::oki_bank_w)
 {
-	kaneko16_common_oki_bank_w(bankno, (data & mask), fixedsize, bankedsize);
+	kaneko16_common_oki_bank_w(Bankno, (data & Mask), FixedSize, BankedSize);
 //	logerror("%s:Selecting OKI bank %02X\n",machine().describe_context(),data&0xff);
 }
 
