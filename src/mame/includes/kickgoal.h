@@ -43,9 +43,9 @@ public:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_actionhwbg2);
 	DECLARE_VIDEO_START(kickgoal);
 	DECLARE_VIDEO_START(actionhw);
-	
+
 	INTERRUPT_GEN_MEMBER(kickgoal_interrupt);
-	
+
 	uint32_t screen_update_kickgoal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void kickgoal(machine_config &config);
@@ -78,7 +78,7 @@ private:
 	int m_bg2_region;
 
 	int m_sprbase;
-	
+
 	void kickgoal_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	/* memory pointers */

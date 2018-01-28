@@ -5,12 +5,12 @@
     volt_reg.c
 
     Direct current.
-	
-	TODO:
-	- If we continue having this device in MAME, add support for default voltage other
-	  than (currently hardcoded) 5.0
-	- When used in combination with a DAC, vreg device 1st stream update is skipped,
-	  causing the DAC to fetch invalid input data. Why does this happen?
+
+    TODO:
+    - If we continue having this device in MAME, add support for default voltage other
+      than (currently hardcoded) 5.0
+    - When used in combination with a DAC, vreg device 1st stream update is skipped,
+      causing the DAC to fetch invalid input data. Why does this happen?
 
 ***************************************************************************/
 

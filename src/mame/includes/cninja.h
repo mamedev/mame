@@ -107,7 +107,7 @@ public:
 	DECLARE_WRITE16_MEMBER( mutantf_protection_region_0_146_w );
 	DECLARE_READ16_MEMBER( cninja_protection_region_0_104_r );
 	DECLARE_WRITE16_MEMBER( cninja_protection_region_0_104_w );
-	
+
 	DECLARE_READ16_MEMBER(cninjabl2_sprite_dma_r);
 	DECLARE_WRITE16_MEMBER(robocop2_priority_w);
 	DECLARE_READ16_MEMBER(mutantf_71_r);

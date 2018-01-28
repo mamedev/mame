@@ -48,8 +48,8 @@
     properly implement RTC (integrated into the CPU)
     Verify Sprite Zoom (check exactly which pixels are doubled / missed on hardware for flipped , non-flipped cases etc.)
     Fix Save States (is this a driver problem or an ARM core problem, they don't work unless you get through the startup tests)
-	Determine motherboard card reader MCU internal ROM size and add as NO_DUMP to the sets
-	See if kov2nl needs another idle skip, after Game Over there is a period where the current one is ineffective
+    Determine motherboard card reader MCU internal ROM size and add as NO_DUMP to the sets
+    See if kov2nl needs another idle skip, after Game Over there is a period where the current one is ineffective
 
     Debug features (require DIP SW1:8 On and SW1:1 Off):
     - QC TEST mode: hold P1 A+B during boot
@@ -142,7 +142,7 @@ void pgm2_state::postload()
 
 		if (m_romboard_ram)
 		{
-			decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0x0200000); 
+			decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0x0200000);
 		}
 		else
 		{

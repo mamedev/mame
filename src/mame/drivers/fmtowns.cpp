@@ -288,8 +288,8 @@ void towns_state::init_rtc()
 	m_towns_rtc_reg[7] = systm.local_time.mday % 10;
 	m_towns_rtc_reg[8] = systm.local_time.mday / 10;
 	// month
-	m_towns_rtc_reg[9] = systm.local_time.month % 10;
-	m_towns_rtc_reg[10] = systm.local_time.month / 10;
+	m_towns_rtc_reg[9] = (systm.local_time.month + 1) % 10;
+	m_towns_rtc_reg[10] = (systm.local_time.month + 1) / 10;
 	// year
 	m_towns_rtc_reg[11] = (systm.local_time.year - 2000) % 10;
 	m_towns_rtc_reg[12] = (systm.local_time.year - 2000) / 10;
@@ -1532,8 +1532,8 @@ void towns_state::towns_cdrom_read(cdrom_image_device* device)
 
 	// parameter 7 = sector count?
 	// lemmings 2 sets this to 4 but hates 4 extra sectors being read
-//	if(m_towns_cd.parameter[1] != 0)
-//		m_towns_cd.lba_last += m_towns_cd.parameter[1];
+//  if(m_towns_cd.parameter[1] != 0)
+//      m_towns_cd.lba_last += m_towns_cd.parameter[1];
 
 	if(LOG_CD) logerror("CD: Mode 1 read from LBA next:%i last:%i track:%i\n",m_towns_cd.lba_current,m_towns_cd.lba_last,track);
 
