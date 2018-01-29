@@ -371,6 +371,8 @@ private:
 
 	u8 m_rtc_d;
 	bool m_rtc_busy;
+	u8 m_vram_mask[4];
+	u8 m_vram_mask_addr;
 public:
 	INTERRUPT_GEN_MEMBER(towns_vsync_irq);
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
