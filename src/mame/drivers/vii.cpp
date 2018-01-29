@@ -102,25 +102,22 @@ Detailed list of bugs:
 #define TILE_X_FLIP             0x0004
 #define TILE_Y_FLIP             0x0008
 
-class vii_state : public driver_device
+class spg2xx_game_state : public driver_device
 {
 public:
-	vii_state(const machine_config &mconfig, device_type type, const char *tag)
+	spg2xx_game_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_cart(*this, "cartslot"),
 		m_p_ram(*this, "p_ram"),
 		m_p_rowscroll(*this, "p_rowscroll"),
 		m_p_palette(*this, "p_palette"),
 		m_p_spriteram(*this, "p_spriteram"),
-		m_bank(*this, "cart"),
-		m_bios_rom(*this, "bios"),
 		m_io_p1(*this, "P1"),
-		m_io_p2(*this, "P2")
+		m_io_p2(*this, "P2"),
+		m_io_p3(*this, "P3"),
+		m_bank(*this, "cart")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<generic_slot_device> m_cart;
 	DECLARE_READ16_MEMBER(video_r);
 	DECLARE_WRITE16_MEMBER(video_w);
 	DECLARE_READ16_MEMBER(audio_r);
@@ -128,17 +125,42 @@ public:
 	DECLARE_READ16_MEMBER(io_r);
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_READ16_MEMBER(rom_r);
-	required_shared_ptr<uint16_t> m_p_ram;
-	required_shared_ptr<uint16_t> m_p_rowscroll;
-	required_shared_ptr<uint16_t> m_p_palette;
-	required_shared_ptr<uint16_t> m_p_spriteram;
-	required_memory_bank m_bank;
+
+	DECLARE_DRIVER_INIT(walle);
+	DECLARE_DRIVER_INIT(batman);
+	DECLARE_DRIVER_INIT(wirels60);
+	DECLARE_DRIVER_INIT(rad_skat);
+
+	uint32_t screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	
+	INTERRUPT_GEN_MEMBER(vii_vblank);
+	
+	TIMER_CALLBACK_MEMBER(tmb1_tick);
+	TIMER_CALLBACK_MEMBER(tmb2_tick);
+	
+	void spg2xx_base(machine_config &config);
+	void spg2xx_basep(machine_config &config);
+	void batman(machine_config &config);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+	void switch_bank(uint32_t bank);
+	uint32_t m_centered_coordinates; // this must be a vreg?
+	void test_centered(uint8_t *ROM);
+
+	typedef delegate<uint16_t (uint16_t, int)> vii_io_rw_delegate;
+	vii_io_rw_delegate   m_vii_io_rw;
+private:
+
+	uint16_t do_spg240_rad_skat_io(uint16_t what, int index);
+	uint16_t do_spg243_batman_io(uint16_t what, int index);
+	uint16_t do_spg243_wireless60_io(uint16_t what, int index);
 
 	uint32_t m_current_bank;
 
 	uint16_t m_video_regs[0x100];
-	uint32_t m_centered_coordinates;
-	void test_centered(uint8_t *ROM);
 
 	struct
 	{
@@ -150,40 +172,13 @@ public:
 	uint16_t m_uart_rx_count;
 	uint8_t m_controller_input[8];
 	uint8_t m_w60_controller_input;
-	uint32_t m_spg243_mode;
 
 	emu_timer *m_tmb1;
 	emu_timer *m_tmb2;
 	void do_dma(uint32_t len);
 	void do_gpio(uint32_t offset);
-	void switch_bank(uint32_t bank);
 	void do_i2c();
 	void spg_do_dma(uint32_t len);
-	DECLARE_DRIVER_INIT(vsmile);
-	DECLARE_DRIVER_INIT(walle);
-	DECLARE_DRIVER_INIT(vii);
-	DECLARE_DRIVER_INIT(batman);
-	DECLARE_DRIVER_INIT(wirels60);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vii_vblank);
-	TIMER_CALLBACK_MEMBER(tmb1_tick);
-	TIMER_CALLBACK_MEMBER(tmb2_tick);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vii_cart);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vsmile_cart);
-
-	void vii(machine_config &config);
-	void vsmile(machine_config &config);
-	void wirels60(machine_config &config);
-	void batman(machine_config &config);
-protected:
-	optional_memory_region m_bios_rom;
-	required_ioport m_io_p1;
-	optional_ioport m_io_p2;
-
-	memory_region *m_cart_rom;
 
 	void blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile);
 	void blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs);
@@ -194,29 +189,59 @@ protected:
 	inline uint8_t mix_channel(uint8_t a, uint8_t b);
 	void mix_pixel(uint32_t offset, uint16_t rgb);
 	void set_pixel(uint32_t offset, uint16_t rgb);
+
+	// devices
+
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint16_t> m_p_ram;
+	required_shared_ptr<uint16_t> m_p_rowscroll;
+	required_shared_ptr<uint16_t> m_p_palette;
+	required_shared_ptr<uint16_t> m_p_spriteram;
+	required_ioport m_io_p1;
+	optional_ioport m_io_p2;
+	optional_ioport m_io_p3;
+protected:
+	required_memory_bank m_bank;
 };
 
-enum
+
+class spg2xx_cart_state : public spg2xx_game_state
 {
-	SPG243_VII = 0,
-	SPG243_BATMAN,
-	SPG243_VSMILE,
-	SPG243_WIRELESS60,
+public:
+	spg2xx_cart_state(const machine_config &mconfig, device_type type, const char *tag)
+		: spg2xx_game_state(mconfig, type, tag),
+		m_cart(*this, "cartslot")
+	{ }
 
-	SPG243_MODEL_COUNT
+	DECLARE_DRIVER_INIT(vii);
+	DECLARE_DRIVER_INIT(vsmile);
+
+	uint16_t do_spg243_vsmile_io(uint16_t what, int index);
+	uint16_t do_spg243_vii_io(uint16_t what, int index);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vii_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vsmile_cart);
+
+	void vii(machine_config &config);
+	void vsmile(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	optional_device<generic_slot_device> m_cart;
+	memory_region *m_cart_rom;
 };
-
 
 #define VII_CTLR_IRQ_ENABLE m_io_regs[0x21]
 #define VII_VIDEO_IRQ_ENABLE    m_video_regs[0x62]
 #define VII_VIDEO_IRQ_STATUS    m_video_regs[0x63]
 
-
 #define VERBOSE_LEVEL   (3)
 
 #define ENABLE_VERBOSE_LOG (1)
 
-inline void vii_state::verboselog(int n_level, const char *s_fmt, ...)
+inline void spg2xx_game_state::verboselog(int n_level, const char *s_fmt, ...)
 {
 #if ENABLE_VERBOSE_LOG
 	if( VERBOSE_LEVEL >= n_level )
@@ -234,38 +259,38 @@ inline void vii_state::verboselog(int n_level, const char *s_fmt, ...)
 *     Video Hardware     *
 *************************/
 
-void vii_state::video_start()
+void spg2xx_game_state::video_start()
 {
 }
 
-inline uint8_t vii_state::expand_rgb5_to_rgb8(uint8_t val)
+inline uint8_t spg2xx_game_state::expand_rgb5_to_rgb8(uint8_t val)
 {
 	uint8_t temp = val & 0x1f;
 	return (temp << 3) | (temp >> 2);
 }
 
 // Perform a lerp between a and b
-inline uint8_t vii_state::mix_channel(uint8_t a, uint8_t b)
+inline uint8_t spg2xx_game_state::mix_channel(uint8_t a, uint8_t b)
 {
 	uint8_t alpha = m_video_regs[0x1c] & 0x00ff;
 	return ((64 - alpha) * a + alpha * b) / 64;
 }
 
-void vii_state::mix_pixel(uint32_t offset, uint16_t rgb)
+void spg2xx_game_state::mix_pixel(uint32_t offset, uint16_t rgb)
 {
 	m_screenram[offset].r = mix_channel(m_screenram[offset].r, expand_rgb5_to_rgb8(rgb >> 10));
 	m_screenram[offset].g = mix_channel(m_screenram[offset].g, expand_rgb5_to_rgb8(rgb >> 5));
 	m_screenram[offset].b = mix_channel(m_screenram[offset].b, expand_rgb5_to_rgb8(rgb));
 }
 
-void vii_state::set_pixel(uint32_t offset, uint16_t rgb)
+void spg2xx_game_state::set_pixel(uint32_t offset, uint16_t rgb)
 {
 	m_screenram[offset].r = expand_rgb5_to_rgb8(rgb >> 10);
 	m_screenram[offset].g = expand_rgb5_to_rgb8(rgb >> 5);
 	m_screenram[offset].b = expand_rgb5_to_rgb8(rgb);
 }
 
-void vii_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile)
+void spg2xx_game_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t xoff, uint32_t yoff, uint32_t attr, uint32_t ctrl, uint32_t bitmap_addr, uint16_t tile)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -333,7 +358,7 @@ void vii_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t x
 	}
 }
 
-void vii_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs)
+void spg2xx_game_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs)
 {
 	uint32_t x0, y0;
 	uint32_t xscroll = regs[0];
@@ -402,7 +427,7 @@ void vii_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int d
 	}
 }
 
-void vii_state::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t base_addr)
+void spg2xx_game_state::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t base_addr)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint16_t tile, attr;
@@ -443,7 +468,7 @@ void vii_state::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int
 	blit(bitmap, cliprect, x, y, attr, 0, bitmap_addr, tile);
 }
 
-void vii_state::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth)
+void spg2xx_game_state::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth)
 {
 	uint32_t n;
 
@@ -461,7 +486,7 @@ void vii_state::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 	}
 }
 
-uint32_t vii_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t spg2xx_game_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i, x, y;
 
@@ -491,7 +516,7 @@ uint32_t vii_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitma
 *    Machine Hardware    *
 *************************/
 
-void vii_state::do_dma(uint32_t len)
+void spg2xx_game_state::do_dma(uint32_t len)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint32_t src = m_video_regs[0x70];
@@ -507,7 +532,7 @@ void vii_state::do_dma(uint32_t len)
 	m_video_regs[0x63] |= 4;
 }
 
-READ16_MEMBER( vii_state::video_r )
+READ16_MEMBER( spg2xx_game_state::video_r )
 {
 	switch(offset)
 	{
@@ -526,7 +551,7 @@ READ16_MEMBER( vii_state::video_r )
 	return m_video_regs[offset];
 }
 
-WRITE16_MEMBER( vii_state::video_w )
+WRITE16_MEMBER( spg2xx_game_state::video_w )
 {
 	switch(offset)
 	{
@@ -580,7 +605,7 @@ WRITE16_MEMBER( vii_state::video_w )
 	}
 }
 
-READ16_MEMBER( vii_state::audio_r )
+READ16_MEMBER( spg2xx_game_state::audio_r )
 {
 	switch(offset)
 	{
@@ -591,7 +616,7 @@ READ16_MEMBER( vii_state::audio_r )
 	return 0;
 }
 
-WRITE16_MEMBER( vii_state::audio_w )
+WRITE16_MEMBER( spg2xx_game_state::audio_w )
 {
 	switch(offset)
 	{
@@ -601,7 +626,7 @@ WRITE16_MEMBER( vii_state::audio_w )
 	}
 }
 
-void vii_state::switch_bank(uint32_t bank)
+void spg2xx_game_state::switch_bank(uint32_t bank)
 {
 	if (bank != m_current_bank)
 	{
@@ -610,7 +635,99 @@ void vii_state::switch_bank(uint32_t bank)
 	}
 }
 
-void vii_state::do_gpio(uint32_t offset)
+uint16_t spg2xx_cart_state::do_spg243_vii_io(uint16_t what, int index)
+{
+	if(index == 1)
+	{
+		uint32_t bank = ((what & 0x80) >> 7) | ((what & 0x20) >> 4);
+		switch_bank(bank);
+	}
+	return what;
+}
+
+uint16_t spg2xx_cart_state::do_spg243_vsmile_io(uint16_t what, int index)
+{
+	// TODO: find out how vsmile accesses these GPIO regs!
+	return what;
+}
+
+
+
+uint16_t spg2xx_game_state::do_spg243_batman_io(uint16_t what, int index)
+{
+	if (index == 0)
+	{
+		uint16_t temp = m_io_p1->read();
+		what |= (temp & 0x0001) ? 0x8000 : 0;
+		what |= (temp & 0x0002) ? 0x4000 : 0;
+		what |= (temp & 0x0004) ? 0x2000 : 0;
+		what |= (temp & 0x0008) ? 0x1000 : 0;
+		what |= (temp & 0x0010) ? 0x0800 : 0;
+		what |= (temp & 0x0020) ? 0x0400 : 0;
+		what |= (temp & 0x0040) ? 0x0200 : 0;
+		what |= (temp & 0x0080) ? 0x0100 : 0;
+	}
+
+	if (index == 2)
+	{
+	}
+	return what;
+}
+
+uint16_t spg2xx_game_state::do_spg240_rad_skat_io(uint16_t what, int index)
+{
+	// have not checked for outputs yet.
+
+	if (index == 0)
+	{
+		what = m_io_p1->read();
+	}
+	else if (index == 1)
+	{
+		what = m_io_p2->read();
+	}
+	else if (index == 2)
+	{
+		what = m_io_p3->read();
+	}
+	return what;
+}
+
+uint16_t spg2xx_game_state::do_spg243_wireless60_io(uint16_t what, int index)
+{
+	if(index == 0)
+	{
+		switch(what & 0x300)
+		{
+			case 0x300:
+				m_w60_controller_input = -1;
+				break;
+
+			case 0x200:
+				m_w60_controller_input++;
+				break;
+
+			default:
+				uint16_t temp1 = m_io_p1->read();
+				uint16_t temp2 = m_io_p2->read();
+				uint16_t temp3 = 1 << m_w60_controller_input;
+				if (temp1 & temp3) what ^= 0x400;
+				if (temp2 & temp3) what ^= 0x800;
+				break;
+		}
+	}
+
+	if(index == 1)
+	{
+		uint32_t bank = (what & 7);
+		switch_bank(bank);
+	}
+
+	return what;
+}
+
+
+void spg2xx_game_state::do_gpio(uint32_t offset)
 {
 	uint32_t index  = (offset - 1) / 5;
 	uint16_t buffer = m_io_regs[5*index + 2];
@@ -624,76 +741,17 @@ void vii_state::do_gpio(uint32_t offset)
 	what ^= (dir & ~attr);
 	what &= ~special;
 
-	if (m_spg243_mode == SPG243_VII)
-	{
-		if(index == 1)
-		{
-			uint32_t bank = ((what & 0x80) >> 7) | ((what & 0x20) >> 4);
-			switch_bank(bank);
-		}
-	}
-	else if (m_spg243_mode == SPG243_BATMAN)
-	{
-		if(index == 0)
-		{
-			uint16_t temp = m_io_p1->read();
-			what |= (temp & 0x0001) ? 0x8000 : 0;
-			what |= (temp & 0x0002) ? 0x4000 : 0;
-			what |= (temp & 0x0004) ? 0x2000 : 0;
-			what |= (temp & 0x0008) ? 0x1000 : 0;
-			what |= (temp & 0x0010) ? 0x0800 : 0;
-			what |= (temp & 0x0020) ? 0x0400 : 0;
-			what |= (temp & 0x0040) ? 0x0200 : 0;
-			what |= (temp & 0x0080) ? 0x0100 : 0;
-		}
-
-		if(index == 2)
-		{
-		}
-	}
-	else if (m_spg243_mode == SPG243_VSMILE)
-	{
-		// TODO: find out how vsmile accesses these GPIO regs!
-	}
-	else if (m_spg243_mode == SPG243_WIRELESS60)
-	{
-		if(index == 0)
-		{
-			switch(what & 0x300)
-			{
-				case 0x300:
-					m_w60_controller_input = -1;
-					break;
-
-				case 0x200:
-					m_w60_controller_input++;
-					break;
-
-				default:
-					uint16_t temp1 = m_io_p1->read();
-					uint16_t temp2 = m_io_p2->read();
-					uint16_t temp3 = 1 << m_w60_controller_input;
-					if (temp1 & temp3) what ^= 0x400;
-					if (temp2 & temp3) what ^= 0x800;
-					break;
-			}
-		}
-
-		if(index == 1)
-		{
-			uint32_t bank = (what & 7);
-			switch_bank(bank);
-		}
-	}
+	if (!m_vii_io_rw.isnull())
+		what = m_vii_io_rw(what, index);
 
 	m_io_regs[5*index + 1] = what;
 }
 
-void vii_state::do_i2c()
+void spg2xx_game_state::do_i2c()
 {
 }
 
-void vii_state::spg_do_dma(uint32_t len)
+void spg2xx_game_state::spg_do_dma(uint32_t len)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
@@ -707,8 +765,10 @@ void vii_state::spg_do_dma(uint32_t len)
 	m_io_regs[0x102] = 0;
 }
 
-READ16_MEMBER( vii_state::io_r )
+READ16_MEMBER( spg2xx_game_state::io_r )
 {
+	logerror("io_r %04x\n", offset);
+
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[] = { 'A', 'B', 'C' };
 
@@ -740,6 +800,9 @@ READ16_MEMBER( vii_state::io_r )
 		case 0x22: // IRQ Status
 			verboselog(3, "io_r: Controller IRQ Status = %04x (%04x)\n", val, mem_mask);
 			break;
+
+		case 0x2b:
+			return 0x0000;
 
 		case 0x2c: case 0x2d: // Timers?
 			val = machine().rand() & 0x0000ffff;
@@ -778,7 +841,7 @@ READ16_MEMBER( vii_state::io_r )
 	return val;
 }
 
-WRITE16_MEMBER( vii_state::io_w )
+WRITE16_MEMBER( spg2xx_game_state::io_w )
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[3] = { 'A', 'B', 'C' };
@@ -919,7 +982,7 @@ WRITE16_MEMBER( vii_state::io_w )
 }
 
 /*
-WRITE16_MEMBER( vii_state::rowscroll_w )
+WRITE16_MEMBER( spg2xx_game_state::rowscroll_w )
 {
     switch(offset)
     {
@@ -929,7 +992,7 @@ WRITE16_MEMBER( vii_state::rowscroll_w )
     }
 }
 
-WRITE16_MEMBER( vii_state::spriteram_w )
+WRITE16_MEMBER( spg2xx_game_state::spriteram_w )
 {
     switch(offset)
     {
@@ -940,7 +1003,7 @@ WRITE16_MEMBER( vii_state::spriteram_w )
 }
 */
 
-static ADDRESS_MAP_START( vii_mem, AS_PROGRAM, 16, vii_state )
+static ADDRESS_MAP_START( vii_mem, AS_PROGRAM, 16, spg2xx_game_state )
 	AM_RANGE( 0x000000, 0x0027ff ) AM_RAM AM_SHARE("p_ram")
 	AM_RANGE( 0x002800, 0x0028ff ) AM_READWRITE(video_r, video_w)
 	AM_RANGE( 0x002900, 0x002aff ) AM_RAM AM_SHARE("p_rowscroll")
@@ -953,73 +1016,173 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vii )
 	PORT_START("P1")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("Button A")
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Button B")
-		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("Button C")
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("Button D")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("Button A")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Button B")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("Button C")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("Button D")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( batman )
 	PORT_START("P1")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Menu")
-		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("B Button")
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("X Button")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Menu")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("B Button")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("X Button")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vsmile )
 	PORT_START("P1")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Menu")
-		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("B Button")
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("X Button")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Menu")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("B Button")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("X Button")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( walle )
 	PORT_START("P1")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wirels60 )
 	PORT_START("P1")
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
-		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("Menu")
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("Menu")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("Start")
+
 	PORT_START("P2")
-		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_NAME("Joypad Up")
-		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_NAME("Joypad Down")
-		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_NAME("Joypad Left")
-		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_NAME("Joypad Right")
-		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(2) PORT_NAME("A Button")
-		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(2) PORT_NAME("B Button")
-		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(2) PORT_NAME("Menu")
-		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(2) PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(2) PORT_NAME("A Button")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(2) PORT_NAME("B Button")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(2) PORT_NAME("Menu")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(2) PORT_NAME("Start")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rad_skat )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) // actually just left, but not as fast, maybe needs to be handled like analog?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) // ^
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("P2")
+	PORT_DIPNAME( 0x0001, 0x0001, "2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("P3") // PAL/NTSC flag
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_SPECIAL ) 
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rad_skatp )
+	PORT_INCLUDE(rad_skat)
+	
+	PORT_MODIFY("P3") // PAL/NTSC flag
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) 
 INPUT_PORTS_END
 
 
-void vii_state::test_centered(uint8_t *ROM)
+
+void spg2xx_game_state::test_centered(uint8_t *ROM)
 {
 	if (ROM[0x3cd808] == 0x99 &&
 		ROM[0x3cd809] == 0x99 &&
@@ -1034,46 +1197,33 @@ void vii_state::test_centered(uint8_t *ROM)
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
-{
-	uint32_t size = m_cart->common_get_size("rom");
-
-	if (size < 0x800000)
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return image_init_result::FAIL;
-	}
-
-	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	test_centered(m_cart->get_rom_base());
-
-	return image_init_result::PASS;
-}
-
-DEVICE_IMAGE_LOAD_MEMBER( vii_state, vsmile_cart )
-{
-	uint32_t size = m_cart->common_get_size("rom");
-
-	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
-	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
-
-	return image_init_result::PASS;
-}
 
 
-TIMER_CALLBACK_MEMBER(vii_state::tmb1_tick)
+TIMER_CALLBACK_MEMBER(spg2xx_game_state::tmb1_tick)
 {
 	m_io_regs[0x22] |= 1;
 }
 
-TIMER_CALLBACK_MEMBER(vii_state::tmb2_tick)
+TIMER_CALLBACK_MEMBER(spg2xx_game_state::tmb2_tick)
 {
 	m_io_regs[0x22] |= 2;
 }
 
-void vii_state::machine_start()
+void spg2xx_cart_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
+
+	// if there's a cart, override the standard banking
+	if (m_cart && m_cart->exists())
+	{
+		std::string region_tag;
+		m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+		m_bank->configure_entries(0, ceilf((float)m_cart_rom->bytes()/0x800000), m_cart_rom->base(), 0x800000 );
+		m_bank->set_entry(0);
+	}
+}
+
+void spg2xx_game_state::machine_start()
 {
 	memset(m_video_regs, 0, 0x100 * sizeof(uint16_t));
 	memset(m_io_regs, 0, 0x100 * sizeof(uint16_t));
@@ -1085,43 +1235,27 @@ void vii_state::machine_start()
 	m_controller_input[7] = 0;
 	m_w60_controller_input = -1;
 
-	if (m_cart && m_cart->exists())
-	{
-		std::string region_tag;
-		m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-		m_bank->configure_entries(0, ceilf((float)m_cart_rom->bytes()/0x800000), m_cart_rom->base(), 0x800000 );
-		m_bank->set_entry(0);
-	}
-	else if (m_spg243_mode == SPG243_VII || m_spg243_mode == SPG243_WIRELESS60)   // Vii bios is banked
-	{
-		m_bank->configure_entries(0, ceilf((float)m_bios_rom->bytes()/0x800000), m_bios_rom->base(), 0x800000 );
-		m_bank->set_entry(0);
-	}
-	else
-	{
-		m_bank->configure_entries(0, ceilf((float)memregion("maincpu")->bytes()/0x800000), memregion("maincpu")->base(), 0x800000 );
-		m_bank->set_entry(0);
-	}
-
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
 
-	m_tmb1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vii_state::tmb1_tick),this));
-	m_tmb2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vii_state::tmb2_tick),this));
+	m_tmb1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_game_state::tmb1_tick),this));
+	m_tmb2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_game_state::tmb2_tick),this));
 	m_tmb1->reset();
 	m_tmb2->reset();
+
+	m_bank->configure_entries(0, ceilf((float)memregion("maincpu")->bytes()/0x800000), memregion("maincpu")->base(), 0x800000 );
+	m_bank->set_entry(0);
 }
 
-void vii_state::machine_reset()
+void spg2xx_game_state::machine_reset()
 {
 }
 
-INTERRUPT_GEN_MEMBER(vii_state::vii_vblank)
+INTERRUPT_GEN_MEMBER(spg2xx_game_state::vii_vblank)
 {
 	uint32_t x = machine().rand() & 0x3ff;
 	uint32_t y = machine().rand() & 0x3ff;
 	uint32_t z = machine().rand() & 0x3ff;
-
 
 	m_controller_input[0] = m_io_p1->read();
 	m_controller_input[1] = (uint8_t)x;
@@ -1184,185 +1318,189 @@ INTERRUPT_GEN_MEMBER(vii_state::vii_vblank)
 
 }
 
-MACHINE_CONFIG_START(vii_state::vii)
 
+
+DEVICE_IMAGE_LOAD_MEMBER( spg2xx_cart_state, vii_cart )
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	if (size < 0x800000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return image_init_result::FAIL;
+	}
+
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	test_centered(m_cart->get_rom_base());
+
+	return image_init_result::PASS;
+}
+
+DEVICE_IMAGE_LOAD_MEMBER( spg2xx_cart_state, vsmile_cart )
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+MACHINE_CONFIG_START(spg2xx_game_state::spg2xx_base)
 	MCFG_CPU_ADD( "maincpu", UNSP, XTAL(27'000'000))
 	MCFG_CPU_PROGRAM_MAP( vii_mem )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vii_state,  vii_vblank)
-
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spg2xx_game_state,  vii_vblank)
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vii_state, screen_update_vii)
+	MCFG_SCREEN_UPDATE_DRIVER(spg2xx_game_state, screen_update_vii)
 	MCFG_PALETTE_ADD("palette", 32768)
+MACHINE_CONFIG_END
 
+MACHINE_CONFIG_DERIVED(spg2xx_game_state::spg2xx_basep, spg2xx_base)
+
+	MCFG_SCREEN_MODIFY( "screen" )
+	MCFG_SCREEN_REFRESH_RATE(50)
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_DERIVED(spg2xx_cart_state::vii, spg2xx_base)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vii_cart")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-	MCFG_GENERIC_LOAD(vii_state, vii_cart)
+	MCFG_GENERIC_LOAD(spg2xx_cart_state, vii_cart)
 
 	MCFG_SOFTWARE_LIST_ADD("vii_cart","vii")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(vii_state::vsmile)
-
-	MCFG_CPU_ADD( "maincpu", UNSP, XTAL(27'000'000))
-	MCFG_CPU_PROGRAM_MAP( vii_mem )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vii_state,  vii_vblank)
-
-
-	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vii_state, screen_update_vii)
-	MCFG_PALETTE_ADD("palette", 32768)
-
+MACHINE_CONFIG_DERIVED(spg2xx_cart_state::vsmile, spg2xx_base)
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "vsmile_cart")
 	MCFG_GENERIC_WIDTH(GENERIC_ROM16_WIDTH)
-	MCFG_GENERIC_LOAD(vii_state, vsmile_cart)
+	MCFG_GENERIC_LOAD(spg2xx_cart_state, vsmile_cart)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vsmile_cart")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(vii_state::batman)
-
-	MCFG_CPU_ADD( "maincpu", UNSP, XTAL(27'000'000))
-	MCFG_CPU_PROGRAM_MAP( vii_mem )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vii_state,  vii_vblank)
-
-
+MACHINE_CONFIG_DERIVED(spg2xx_game_state::batman, spg2xx_base)
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_DATA_SIZE(0x200)
-
-	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vii_state, screen_update_vii)
-	MCFG_PALETTE_ADD("palette", 32768)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(vii_state::wirels60)
 
-	MCFG_CPU_ADD( "maincpu", UNSP, XTAL(27'000'000))
-	MCFG_CPU_PROGRAM_MAP( vii_mem )
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vii_state,  vii_vblank)
-
-
-	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(320, 240)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
-	MCFG_SCREEN_UPDATE_DRIVER(vii_state, screen_update_vii)
-	MCFG_PALETTE_ADD("palette", 32768)
-MACHINE_CONFIG_END
-
-DRIVER_INIT_MEMBER(vii_state,vii)
+DRIVER_INIT_MEMBER(spg2xx_cart_state,vii)
 {
-	m_spg243_mode = SPG243_VII;
+	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_cart_state::do_spg243_vii_io, this);
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(vii_state,batman)
+DRIVER_INIT_MEMBER(spg2xx_cart_state,vsmile)
 {
-	m_spg243_mode = SPG243_BATMAN;
+	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_cart_state::do_spg243_vsmile_io, this);
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(vii_state,vsmile)
+DRIVER_INIT_MEMBER(spg2xx_game_state,batman)
 {
-	m_spg243_mode = SPG243_VSMILE;
+	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg243_batman_io, this);
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(vii_state,walle)
+DRIVER_INIT_MEMBER(spg2xx_game_state,rad_skat)
 {
-	m_spg243_mode = SPG243_BATMAN;
+	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg240_rad_skat_io, this);
+	m_centered_coordinates = 1;
+}
+
+DRIVER_INIT_MEMBER(spg2xx_game_state,walle)
+{
+	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg243_batman_io, this);
 	m_centered_coordinates = 0;
 }
 
-DRIVER_INIT_MEMBER(vii_state,wirels60)
+DRIVER_INIT_MEMBER(spg2xx_game_state,wirels60)
 {
-	m_spg243_mode = SPG243_WIRELESS60;
+	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg243_wireless60_io, this);
 	m_centered_coordinates = 1;
 }
 
 ROM_START( vii )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
-
-	ROM_REGION( 0x2000000, "bios", 0 )
-	ROM_LOAD( "vii.bin", 0x0000, 0x2000000, CRC(04627639) SHA1(f883a92d31b53c9a5b0cdb112d07cd793c95fc43))
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_LOAD16_WORD_SWAP( "vii.bin", 0x0000, 0x2000000, CRC(04627639) SHA1(f883a92d31b53c9a5b0cdb112d07cd793c95fc43))
 ROM_END
 
 ROM_START( batmantv )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
 	ROM_LOAD16_WORD_SWAP( "batman.bin", 0x000000, 0x400000, CRC(46f848e5) SHA1(5875d57bb3fe0cac5d20e626e4f82a0e5f9bb94c) )
 ROM_END
 
 ROM_START( vsmile )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
 	ROM_LOAD( "vsmilebios.bin", 0x000000, 0x200000, CRC(11f1b416) SHA1(11f77c4973d29c962567390e41879c86a759c93b) )
 ROM_END
 
 ROM_START( vsmileg )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
 	ROM_LOAD16_WORD_SWAP( "bios german.bin", 0x000000, 0x200000, CRC(205c5296) SHA1(7fbcf761b5885c8b1524607aabaf364b4559c8cc) )
 ROM_END
 
 ROM_START( vsmilef )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
 	ROM_LOAD16_WORD_SWAP( "sysrom_france", 0x000000, 0x200000, CRC(0cd0bdf5) SHA1(5c8d1eada1b6b545555b8d2b09325d7127681af8) )
 ROM_END
 
 ROM_START( vsmileb )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
 	ROM_LOAD( "vbabybios.bin", 0x000000, 0x800000, CRC(ddc7f845) SHA1(2c17d0f54200070176d03d44a40c7923636e596a) )
 ROM_END
 
 ROM_START( walle )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
 	ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, BAD_DUMP CRC(bd554cba) SHA1(6cd06a036ab12e7b0e1fd8003db873b0bb783868) )
 	// Alternate dump, we need to decide which one is correct.
 	//ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, CRC(6bc90b16) SHA1(184d72de059057aae7800da510fcf05ed1da9ec9))
 ROM_END
 
 ROM_START( zone60 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
-
-	ROM_REGION( 0x4000000, "bios", 0 )
-	ROM_LOAD( "zone60.bin", 0x0000, 0x4000000, CRC(4cb637d1) SHA1(1f97cbdb4299ac0fbafc2a3aa592066cb0727066))
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_LOAD16_WORD_SWAP( "zone60.bin", 0x0000, 0x4000000, CRC(4cb637d1) SHA1(1f97cbdb4299ac0fbafc2a3aa592066cb0727066))
 ROM_END
 
 ROM_START( wirels60 )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
-
-	ROM_REGION( 0x4000000, "bios", 0 )
-	ROM_LOAD( "wirels60.bin", 0x0000, 0x4000000, CRC(b4df8b28) SHA1(00e3da542e4bc14baf4724ad436f66d4c0f65c84))
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_LOAD16_WORD_SWAP( "wirels60.bin", 0x0000, 0x4000000, CRC(b4df8b28) SHA1(00e3da542e4bc14baf4724ad436f66d4c0f65c84))
 ROM_END
 
 ROM_START( rad_skat )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
 	ROM_LOAD16_WORD_SWAP( "skateboarder.bin", 0x000000, 0x400000, CRC(08b9ab91) SHA1(6665edc4740804956136c68065890925a144626b) )
 ROM_END
 
-//    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     STATE      INIT      COMPANY                                              FULLNAME             FLAGS
+ROM_START( rad_skatp ) // rom was dumped from the NTSC version, but region comes from an io port, so ROM is probably the same
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_LOAD16_WORD_SWAP( "skateboarder.bin", 0x000000, 0x400000, CRC(08b9ab91) SHA1(6665edc4740804956136c68065890925a144626b) )
+ROM_END
+
+//    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     STATE              INIT      COMPANY                                              FULLNAME             FLAGS
 
 // VTech systems
-CONS( 2005, vsmile,   0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "VTech",                                             "V.Smile (US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2005, vsmileg,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "VTech",                                             "V.Smile (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2005, vsmilef,  vsmile,   0,        vsmile,   vsmile,   vii_state, vsmile,   "VTech",                                             "V.Smile (France)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2005, vsmileb,  0,        0,        vsmile,   vsmile,   vii_state, vsmile,   "VTech",                                             "V.Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2005, vsmile,   0,        0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (US)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileg,  vsmile,   0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (Germany)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmilef,  vsmile,   0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile (France)",  MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2005, vsmileb,  0,        0,        vsmile,      vsmile,   spg2xx_cart_state, vsmile,   "VTech",                                             "V.Smile Baby (US)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 // Jungle Soft TV games
-CONS( 2007, vii,      0,        0,        vii,      vii,      vii_state, vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // some games run, others crash
-CONS( 2010, zone60,   0,        0,        wirels60, wirels60, vii_state, wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 60",           MACHINE_NO_SOUND )
-CONS( 2010, wirels60, 0,        0,        wirels60, wirels60, vii_state, wirels60, "Jungle Soft / Kids Station Toys Inc",               "Wireless 60",       MACHINE_NO_SOUND )
+CONS( 2007, vii,      0,        0,        vii,         vii,      spg2xx_cart_state, vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",               MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // some games run, others crash
+
+CONS( 2010, zone60,   0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 60",           MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2010, wirels60, 0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft / Kids Station Toys Inc",               "Wireless 60",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // JAKKS Pacific Inc TV games
-CONS( 2004, batmantv, 0,        0,        batman,   batman,   vii_state, batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman",        MACHINE_NO_SOUND )
-CONS( 2008, walle,    0,        0,        batman,   walle,    vii_state, walle,    "JAKKS Pacific Inc",                                 "Wall-E",            MACHINE_NO_SOUND )
+CONS( 2004, batmantv, 0,        0,        batman,      batman,   spg2xx_game_state, batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman",        MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, walle,    0,        0,        batman,      walle,    spg2xx_game_state, walle,    "JAKKS Pacific Inc",                                 "Wall-E",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Radica TV games
-CONS( 2006, rad_skat, 0,        0,        batman,   batman,   vii_state, batman,   "Radica",                                            "ConnecTV Skateboarder / PlayTV Skateboarder",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2006, rad_skat,  0,       0,        spg2xx_base, rad_skat, spg2xx_game_state, rad_skat, "Radica",                                            "PlayTV Skateboarder (NTSC)",        MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2006, rad_skatp, rad_skat,0,        spg2xx_basep,rad_skatp,spg2xx_game_state, rad_skat, "Radica",                                            "ConnecTV Skateboarder (PAL)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
