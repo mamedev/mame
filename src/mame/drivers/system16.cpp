@@ -267,8 +267,8 @@ READ16_MEMBER(segas1x_bootleg_state::passht4b_io3_r)
 static ADDRESS_MAP_START( passht4b_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on original, buffer on bootleg
-	AM_RANGE(0x408000, 0x409fff) AM_RAM AM_SHARE("bg0_tileram")
-	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_SHARE("bg1_tileram")
+	AM_RANGE(0x409000, 0x409fff) AM_RAM AM_SHARE("bg0_tileram")
+	AM_RANGE(0x40a000, 0x40afff) AM_RAM AM_SHARE("bg1_tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_SHARE("textram")
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
