@@ -196,8 +196,8 @@ void c140_device::device_clock_changed()
 	m_sample_rate = m_baserate = clock();
 	if (old_rate < m_sample_rate)
 	{
-		m_mixer_buffer_left.clear();
-		m_mixer_buffer_right.clear();
+		std::fill(m_mixer_buffer_left.begin(), m_mixer_buffer_left.end(), 0);
+		std::fill(m_mixer_buffer_right.begin(), m_mixer_buffer_right.end(), 0);
 		m_mixer_buffer_left.resize(m_sample_rate);
 		m_mixer_buffer_right.resize(m_sample_rate);
 	}
@@ -208,8 +208,8 @@ void c140_device::device_clock_changed()
 		
 	if (old_rate > m_sample_rate)
 	{
-		m_mixer_buffer_left.clear();
-		m_mixer_buffer_right.clear();
+		std::fill(m_mixer_buffer_left.begin(), m_mixer_buffer_left.end(), 0);
+		std::fill(m_mixer_buffer_right.begin(), m_mixer_buffer_right.end(), 0);
 		m_mixer_buffer_left.resize(m_sample_rate);
 		m_mixer_buffer_right.resize(m_sample_rate);
 	}
@@ -250,8 +250,8 @@ void c140_device::voice_update()
 			rvol=(vreg->volume_right*32)/MAX_VOICE;
 
 			/* Set mixer outputs base pointers */
-			lmix = m_mixer_buffer_left.begin();
-			rmix = m_mixer_buffer_right.begin();
+			lmix = &m_mixer_buffer_left[0];
+			rmix = &m_mixer_buffer_right[0];
 
 			/* Retrieve sample start/end and calculate size */
 			st=v->sample_start;
@@ -402,8 +402,8 @@ void c219_device::voice_update()
 			rvol=(vreg->volume_right*32)/MAX_VOICE;
 
 			/* Set mixer outputs base pointers */
-			lmix = m_mixer_buffer_left.begin();
-			rmix = m_mixer_buffer_right.begin();
+			lmix = &m_mixer_buffer_left[0];
+			rmix = &m_mixer_buffer_right[0];
 
 			/* Retrieve sample start/end and calculate size */
 			st=v->sample_start;
@@ -489,15 +489,15 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	if(samples>m_sample_rate) samples=m_sample_rate;
 
 	/* zap the contents of the mixer buffer */
-	m_mixer_buffer_left.clear();
-	m_mixer_buffer_right.clear();
+	std::fill(m_mixer_buffer_left.begin(), m_mixer_buffer_left.end(), 0);
+	std::fill(m_mixer_buffer_right.begin(), m_mixer_buffer_right.end(), 0);
 
 	//--- audio update
 	voice_update();
 
 	/* render to MAME's stream buffer */
-	lmix = m_mixer_buffer_left.begin();
-	rmix = m_mixer_buffer_right.begin();
+	lmix = &m_mixer_buffer_left[0];
+	rmix = &m_mixer_buffer_right[0];
 	{
 		stream_sample_t *dest1 = outputs[0];
 		stream_sample_t *dest2 = outputs[1];
