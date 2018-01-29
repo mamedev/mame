@@ -5,10 +5,18 @@
 
     74LS157/74HCT157 Quad 2 to 1-Line Data Selectors/Multiplexers (TTL)
 
-    Often used to help feed 8-bit ROM data into a MSM5205, and for many
-    other purposes.
+    Often used to help feed 8-bit ROM data into a MSM5205 (which may
+    require additional pullups for CMOS compatibility), and for many other
+    purposes.
 
     74LS158 has inverted outputs; 74LS157 is non-inverting.
+
+    74LS257 and 74LS258 have three-state outputs with an active-low enable,
+    making these devices popular for bus-compatible applications which the
+    emulation here is not particularly suitable for. When pin 15 is tied to
+    GND, however, these devices become pin-compatible replacements for
+    74LS157 and 74LS158; this substitution is somewhat common on arcade
+    bootlegs.
 
 ***************************************************************************/
 
