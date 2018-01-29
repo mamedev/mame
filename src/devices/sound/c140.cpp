@@ -250,8 +250,8 @@ void c140_device::voice_update()
 			rvol=(vreg->volume_right*32)/MAX_VOICE;
 
 			/* Set mixer outputs base pointers */
-			lmix = &m_mixer_buffer_left[0];
-			rmix = &m_mixer_buffer_right[0];
+			lmix = m_mixer_buffer_left.begin();
+			rmix = m_mixer_buffer_right.begin();
 
 			/* Retrieve sample start/end and calculate size */
 			st=v->sample_start;
@@ -402,8 +402,8 @@ void c219_device::voice_update()
 			rvol=(vreg->volume_right*32)/MAX_VOICE;
 
 			/* Set mixer outputs base pointers */
-			lmix = &m_mixer_buffer_left[0];
-			rmix = &m_mixer_buffer_right[0];
+			lmix = m_mixer_buffer_left.begin();
+			rmix = m_mixer_buffer_right.begin();
 
 			/* Retrieve sample start/end and calculate size */
 			st=v->sample_start;
@@ -496,8 +496,8 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 	voice_update();
 
 	/* render to MAME's stream buffer */
-	lmix = &m_mixer_buffer_left[0];
-	rmix = &m_mixer_buffer_right[0];
+	lmix = m_mixer_buffer_left.begin();
+	rmix = m_mixer_buffer_right.begin();
 	{
 		stream_sample_t *dest1 = outputs[0];
 		stream_sample_t *dest2 = outputs[1];
