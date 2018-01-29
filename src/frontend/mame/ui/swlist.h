@@ -29,7 +29,7 @@ public:
 		ENTRY
 	};
 
-	menu_software_parts(mame_ui_manager &mui, render_container &container, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result);
+	menu_software_parts(mame_ui_manager &mui, render_container &container, const software_list_device *swlist, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result);
 	virtual ~menu_software_parts() override;
 
 private:
@@ -42,6 +42,7 @@ private:
 	virtual void handle() override;
 
 	// variables
+	const software_list_device *m_swlist;
 	const software_info *   m_info;
 	const char *            m_interface;
 	const software_part **  m_selected_part;

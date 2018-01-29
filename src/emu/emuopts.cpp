@@ -921,7 +921,7 @@ emu_options::software_options emu_options::evaluate_initial_softlist_options(con
 						for (const software_part &swpart : swinfo->parts())
 						{
 							// only load compatible software this way
-							if (swlistdev.is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
+							if (swpart.is_compatible(swlistdev.filter()) == SOFTWARE_IS_COMPATIBLE)
 							{
 								// we need to find a mountable image slot, but we need to ensure it is a slot
 								// for which we have not already distributed a part to

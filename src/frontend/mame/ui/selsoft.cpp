@@ -317,7 +317,7 @@ void menu_select_software::build_software_list()
 		for (const software_info &swinfo : swlist.get_info())
 		{
 			const software_part &part = swinfo.parts().front();
-			if (swlist.is_compatible(part) == SOFTWARE_IS_COMPATIBLE)
+			if (part.is_compatible(swlist.filter()) == SOFTWARE_IS_COMPATIBLE)
 			{
 				const char *instance_name = nullptr;
 				const char *type_name = nullptr;

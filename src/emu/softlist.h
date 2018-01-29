@@ -29,6 +29,12 @@
 #define SOFTWARE_SUPPORTED_PARTIAL  1
 #define SOFTWARE_SUPPORTED_NO       2
 
+enum software_compatibility
+{
+	SOFTWARE_IS_COMPATIBLE,
+	SOFTWARE_IS_INCOMPATIBLE,
+	SOFTWARE_NOT_COMPATIBLE
+};
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -86,6 +92,7 @@ public:
 
 	// helpers
 	bool matches_interface(const char *interface) const;
+	software_compatibility is_compatible(const char *filter) const;
 	const char *feature(const std::string &feature_name) const;
 
 private:
@@ -126,7 +133,7 @@ public:
 	const std::list<software_part> &parts() const { return m_partdata; }
 
 	// additional operations
-	const software_part *find_part(const std::string &part_name, const char *interface = nullptr) const;
+	const software_part *find_part(const std::string &part_name, const char *interface = nullptr, const char *filter = nullptr) const;
 	bool has_multiple_parts(const char *interface) const;
 
 private:

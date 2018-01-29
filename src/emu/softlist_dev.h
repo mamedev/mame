@@ -31,14 +31,6 @@ enum softlist_type
 	SOFTWARE_LIST_COMPATIBLE_SYSTEM
 };
 
-enum software_compatibility
-{
-	SOFTWARE_IS_COMPATIBLE,
-	SOFTWARE_IS_INCOMPATIBLE,
-	SOFTWARE_NOT_COMPATIBLE
-};
-
-
 //**************************************************************************
 //  MACROS
 //**************************************************************************
@@ -154,7 +146,6 @@ public:
 	const software_info *find(const std::string &look_for);
 	void find_approx_matches(const std::string &name, int matches, const software_info **list, const char *interface);
 	void release();
-	software_compatibility is_compatible(const software_part &part) const;
 
 	// static helpers
 	static software_list_device *find_by_name(const machine_config &mconfig, const std::string &name);

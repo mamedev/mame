@@ -148,7 +148,7 @@ void software_list_device::find_approx_matches(const std::string &name, int matc
 	{
 		for (const software_part &swpart : swinfo.parts())
 		{
-			if ((interface == nullptr || swpart.matches_interface(interface)) && is_compatible(swpart) == SOFTWARE_IS_COMPATIBLE)
+			if ((interface == nullptr || swpart.matches_interface(interface)) && swpart.is_compatible(filter()) == SOFTWARE_IS_COMPATIBLE)
 			{
 				// pick the best match between driver name and description
 				int longpenalty = driver_list::penalty_compare(name.c_str(), swinfo.longname().c_str());
@@ -321,56 +321,6 @@ void software_list_device::parse()
 	// indicate that we've been parsed
 	m_parsed = true;
 }
-
-
-//-------------------------------------------------
-//  is_compatible - determine if we are compatible
-//  with the given software_list_device
-//-------------------------------------------------
-
-software_compatibility software_list_device::is_compatible(const software_part &swpart) const
-{
-	// get the softlist filter; if null, assume compatible
-	if (m_filter == nullptr)
-		return SOFTWARE_IS_COMPATIBLE;
-
-	// copy the comma-delimited string and ensure it ends with a final comma
-	std::string filt = std::string(m_filter).append(",");
-
-	// get the incompatibility filter and test against it first if it exists
-	const char *incompatibility = swpart.feature("incompatibility");
-	if (incompatibility != nullptr)
-	{
-		// copy the comma-delimited string and ensure it ends with a final comma
-		std::string incomp = std::string(incompatibility).append(",");
-
-		// iterate over filter items and see if they exist in the list; if so, it's incompatible
-		for (int start = 0, end = filt.find_first_of(',', start); end != -1; start = end + 1, end = filt.find_first_of(',', start))
-		{
-			std::string token(filt, start, end - start + 1);
-			if (incomp.find(token) != -1)
-				return SOFTWARE_IS_INCOMPATIBLE;
-		}
-	}
-
-	// get the compatibility feature; if null, assume compatible
-	const char *compatibility = swpart.feature("compatibility");
-	if (compatibility == nullptr)
-		return SOFTWARE_IS_COMPATIBLE;
-
-	// copy the comma-delimited string and ensure it ends with a final comma
-	std::string comp = std::string(compatibility).append(",");
-
-	// iterate over filter items and see if they exist in the compatibility list; if so, it's compatible
-	for (int start = 0, end = filt.find_first_of(',', start); end != -1; start = end + 1, end = filt.find_first_of(',', start))
-	{
-		std::string token(filt, start, end - start + 1);
-		if (comp.find(token) != -1)
-			return SOFTWARE_IS_COMPATIBLE;
-	}
-	return SOFTWARE_NOT_COMPATIBLE;
-}
-
 
 //-------------------------------------------------
 //  find_mountable_image - find an image interface

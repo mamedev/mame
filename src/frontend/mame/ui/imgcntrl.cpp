@@ -195,7 +195,7 @@ void menu_control_device_image::handle()
 
 	case START_OTHER_PART:
 		m_submenu_result.swparts = menu_software_parts::result::INVALID;
-		menu::stack_push<menu_software_parts>(ui(), container(), m_swi, m_swp->interface().c_str(), &m_swp, true, m_submenu_result.swparts);
+		menu::stack_push<menu_software_parts>(ui(), container(), m_sld, m_swi, m_swp->interface().c_str(), &m_swp, true, m_submenu_result.swparts);
 		m_state = SELECT_OTHER_PART;
 		break;
 
@@ -218,7 +218,7 @@ void menu_control_device_image::handle()
 		{
 			m_submenu_result.swparts = menu_software_parts::result::INVALID;
 			m_swp = nullptr;
-			menu::stack_push<menu_software_parts>(ui(), container(), m_swi, m_image.image_interface(), &m_swp, false, m_submenu_result.swparts);
+			menu::stack_push<menu_software_parts>(ui(), container(), m_sld, m_swi, m_image.image_interface(), &m_swp, false, m_submenu_result.swparts);
 			m_state = SELECT_ONE_PART;
 		}
 		else

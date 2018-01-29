@@ -1326,7 +1326,7 @@ void device_image_interface::update_names()
 //  find_software_item
 //-------------------------------------------------
 
-const software_part *device_image_interface::find_software_item(const std::string &identifier, bool restrict_to_interface, software_list_device **dev) const
+const software_part *device_image_interface::find_software_item(const std::string &identifier, bool restrict_to_interface, bool restrict_to_filter, software_list_device **dev) const
 {
 	// split full software name into software list name and short software name
 	std::string list_name, software_name, part_name;
@@ -1341,12 +1341,16 @@ const software_part *device_image_interface::find_software_item(const std::strin
 	// find the software list if explicitly specified
 	for (software_list_device &swlistdev : software_list_device_iterator(device().mconfig().root_device()))
 	{
+		const char *filter = restrict_to_filter
+			? swlistdev.filter()
+			: nullptr;
+
 		if (list_name.empty() || (list_name == swlistdev.list_name()))
 		{
 			const software_info *info = swlistdev.find(software_name);
 			if (info != nullptr)
 			{
-				const software_part *part = info->find_part(part_name, interface);
+				const software_part *part = info->find_part(part_name, interface, filter);
 				if (part != nullptr)
 				{
 					if (dev != nullptr)
@@ -1365,7 +1369,7 @@ const software_part *device_image_interface::find_software_item(const std::strin
 			const software_info *info = swlistdev.find(part_name);
 			if (info != nullptr)
 			{
-				const software_part *part = info->find_part("", interface);
+				const software_part *part = info->find_part("", interface, filter);
 				if (part != nullptr)
 				{
 					if (dev != nullptr)
@@ -1410,7 +1414,7 @@ bool device_image_interface::load_software_part(const std::string &identifier)
 {
 	// if no match has been found, we suggest similar shortnames
 	software_list_device *swlist;
-	m_software_part_ptr = find_software_item(identifier, true, &swlist);
+	m_software_part_ptr = find_software_item(identifier, true, true, &swlist);
 	if (m_software_part_ptr == nullptr)
 	{
 		software_list_device::display_matches(device().machine().config(), image_interface(), identifier);
@@ -1424,7 +1428,7 @@ bool device_image_interface::load_software_part(const std::string &identifier)
 	bool result = loader.load_software(*this, *swlist, swname, start_entry);
 
 	// check compatibility
-	switch (swlist->is_compatible(*m_software_part_ptr))
+	switch (m_software_part_ptr->is_compatible(swlist->filter()))
 	{
 		case SOFTWARE_IS_COMPATIBLE:
 			break;
@@ -1442,7 +1446,7 @@ bool device_image_interface::load_software_part(const std::string &identifier)
 	const char *requirement = m_software_part_ptr->feature("requirement");
 	if (requirement != nullptr)
 	{
-		const software_part *req_swpart = find_software_item(requirement, false);
+		const software_part *req_swpart = find_software_item(requirement, false, false);
 		if (req_swpart != nullptr)
 		{
 			device_image_interface *req_image = software_list_device::find_mountable_image(device().mconfig(), *req_swpart);
@@ -1467,7 +1471,7 @@ std::string device_image_interface::software_get_default_slot(const char *defaul
 	if (!image_name.empty())
 	{
 		result.assign(default_card_slot);
-		const software_part *swpart = find_software_item(image_name, true);
+		const software_part *swpart = find_software_item(image_name, true, true);
 		if (swpart != nullptr)
 		{
 			const char *slot = swpart->feature("slot");

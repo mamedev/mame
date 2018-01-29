@@ -549,7 +549,7 @@ bool consolewin_info::get_softlist_info(device_image_interface *img)
 		for (const software_info &swinfo : swlist.get_info())
 		{
 			const software_part &part = swinfo.parts().front();
-			if (swlist.is_compatible(part) == SOFTWARE_IS_COMPATIBLE)
+			if (part.is_compatible(swlist.filter()) == SOFTWARE_IS_COMPATIBLE)
 			{
 				for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 				{
