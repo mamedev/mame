@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles, Phil Bennett
 /***************************************************************************
 
-	Atari Cyberstorm hardware
+    Atari Cyberstorm hardware
 
 ****************************************************************************/
 
@@ -13,7 +13,7 @@
 
 /*************************************
  *
- *	Tilemap callbacks
+ *  Tilemap callbacks
  *
  *************************************/
 
@@ -58,42 +58,42 @@ TILEMAP_MAPPER_MEMBER(cybstorm_state::playfield_scan)
 
 /*************************************
  *
- *	Video system start
+ *  Video system start
  *
  *************************************/
 
 const atari_motion_objects_config cybstorm_state::s_mob_config =
 {
-	1,					/* index to which gfx system */
-	1,					/* number of motion object banks */
-	1,					/* are the entries linked? */
-	0,					/* are the entries split? */
-	1,					/* render in reverse order? */
-	0,					/* render in swapped X/Y order? */
-	0,					/* does the neighbor bit affect the next object? */
-	8,					/* pixels per SLIP entry (0 for no-slip) */
-	0,					/* pixel offset for SLIPs */
-	0,					/* maximum number of links to visit/scanline (0=all) */
+	1,                  /* index to which gfx system */
+	1,                  /* number of motion object banks */
+	1,                  /* are the entries linked? */
+	0,                  /* are the entries split? */
+	1,                  /* render in reverse order? */
+	0,                  /* render in swapped X/Y order? */
+	0,                  /* does the neighbor bit affect the next object? */
+	8,                  /* pixels per SLIP entry (0 for no-slip) */
+	0,                  /* pixel offset for SLIPs */
+	0,                  /* maximum number of links to visit/scanline (0=all) */
 
-	0x1000,				/* base palette entry */
-	0x1000,				/* maximum number of colors */
-	0,					/* transparent pen index */
+	0x1000,             /* base palette entry */
+	0x1000,             /* maximum number of colors */
+	0,                  /* transparent pen index */
 
-	{{ 0x03ff,0,0,0 }},	/* mask for the link */
-	{{ 0,0x7fff,0,0 }, { 0x3c00,0,0,0 }},	/* mask for the code index */
-	{{ 0,0,0x000f,0 }},	/* mask for the color */
-	{{ 0,0,0xff80,0 }},	/* mask for the X position */
-	{{ 0,0,0,0xff80 }},	/* mask for the Y position */
-	{{ 0,0,0,0x0070 }},	/* mask for the width, in tiles*/
-	{{ 0,0,0,0x0007 }},	/* mask for the height, in tiles */
-	{{ 0,0x8000,0,0 }},	/* mask for the horizontal flip */
-	{{ 0 }},			/* mask for the vertical flip */
-	{{ 0,0,0x0070,0 }},	/* mask for the priority */
-	{{ 0 }},			/* mask for the neighbor */
-	{{ 0 }},			/* mask for absolute coordinates */
+	{{ 0x03ff,0,0,0 }}, /* mask for the link */
+	{{ 0,0x7fff,0,0 }, { 0x3c00,0,0,0 }},   /* mask for the code index */
+	{{ 0,0,0x000f,0 }}, /* mask for the color */
+	{{ 0,0,0xff80,0 }}, /* mask for the X position */
+	{{ 0,0,0,0xff80 }}, /* mask for the Y position */
+	{{ 0,0,0,0x0070 }}, /* mask for the width, in tiles*/
+	{{ 0,0,0,0x0007 }}, /* mask for the height, in tiles */
+	{{ 0,0x8000,0,0 }}, /* mask for the horizontal flip */
+	{{ 0 }},            /* mask for the vertical flip */
+	{{ 0,0,0x0070,0 }}, /* mask for the priority */
+	{{ 0 }},            /* mask for the neighbor */
+	{{ 0 }},            /* mask for absolute coordinates */
 
-	{{ 0 }},			/* mask for the special value */
-	0,					/* resulting value to indicate "special" */
+	{{ 0 }},            /* mask for the special value */
+	0,                  /* resulting value to indicate "special" */
 };
 
 VIDEO_START_MEMBER(cybstorm_state,cybstorm)
@@ -106,7 +106,7 @@ VIDEO_START_MEMBER(cybstorm_state,cybstorm)
 
 /*************************************
  *
- *	Main refresh
+ *  Main refresh
  *
  *************************************/
 

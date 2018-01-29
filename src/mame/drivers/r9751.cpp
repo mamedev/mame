@@ -78,7 +78,6 @@
 #define TRACE_SMIOC_READ(address, data, reg, text) do { if (ENABLE_TRACE_SMIOC) UnifiedTrace((address),(data)," Read", "SMIOC", (reg), (text)); } while (0)
 #define TRACE_SMIOC_WRITE(address, data, reg, text) do { if (ENABLE_TRACE_SMIOC) UnifiedTrace((address),(data),"Write", "SMIOC", (reg), (text)); } while (0)
 
-
 class r9751_state : public driver_device
 {
 public:
@@ -132,8 +131,6 @@ private:
 	uint32_t smioc_dma_r_length;
 	uint32_t fdd_dma_bank;
 	attotime timer_32khz_last;
-	uint8_t m_term_data;
-	uint16_t m_serial_status;
 	uint16_t m_serial_status2;
 	std::queue<uint8_t> kbd_queue;
 	std::queue<uint16_t> serial_status_queue;
@@ -197,7 +194,7 @@ void r9751_state::UnifiedTrace(u32 address, u32 data, const char* operation, con
 		stacktrace[i] = 0;
 	for(int i=0; i<2; i++)
 		basepointer[i] = 0;
-	
+
 	stacktrace[0] = m_maincpu->pc();
 	if(reg_a6 + 4 < 0xFFFFFF) stacktrace[1] = m_maincpu->space(AS_PROGRAM).read_dword(reg_a6 + 4);
 	if(reg_a6 < 0xFFFFFF && reg_a6 != 0) basepointer[0] = m_maincpu->space(AS_PROGRAM).read_dword(reg_a6);

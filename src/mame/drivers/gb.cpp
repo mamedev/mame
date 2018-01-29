@@ -462,7 +462,7 @@ static ADDRESS_MAP_START(megaduck_map, AS_PROGRAM, 8, megaduck_state)
 	AM_RANGE(0xa000, 0xafff) AM_NOP                                                          /* unused? */
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(bank2_w)
 	AM_RANGE(0xb001, 0xbfff) AM_NOP                                                          /* unused? */
-	AM_RANGE(0xc000, 0xfe9f) AM_RAM                                                          /* 8k/16k? RAM */
+	AM_RANGE(0xc000, 0xfdff) AM_RAM                                                          /* 8k/16k? RAM */
 	AM_RANGE(0xfe00, 0xfeff) AM_DEVREADWRITE("ppu", dmg_ppu_device, oam_r, oam_w)            /* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w)                                  /* I/O */
 	AM_RANGE(0xff10, 0xff1f) AM_READWRITE(megaduck_video_r, megaduck_video_w)                /* video controller */

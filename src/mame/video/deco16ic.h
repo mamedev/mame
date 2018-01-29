@@ -14,10 +14,10 @@
 #pragma once
 
 
-#define DECO_32x32	0
-#define DECO_64x32	1
-#define DECO_32x64	2
-#define DECO_64x64	3
+#define DECO_32x32  0
+#define DECO_64x32  1
+#define DECO_32x64  2
+#define DECO_64x64  3
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -180,7 +180,7 @@ DECLARE_DEVICE_TYPE(DECO16IC, deco16ic_device)
 
 #define MCFG_DECO16IC_SPLIT(_split) \
 	deco16ic_device::set_split(*device, _split);
-	
+
 #define MCFG_DECO16IC_PF1_SIZE(_size) \
 	deco16ic_device::set_pf1_size(*device, _size);
 

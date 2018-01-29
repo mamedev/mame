@@ -3,7 +3,7 @@
 <softwarelist name="cd32" description="Amiga CD-32 CD-ROMs">
 
 	<!--- Sourced from Redump -->
-	
+
 	<!-- Doesn't boot -->
 	<software name="arabian" supported="no">
 		<description>Arabian Nights</description>
@@ -108,7 +108,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Doesn't boot -->
 	<software name="benefact" supported="no">
 		<description>Benefactor</description>
@@ -179,7 +179,7 @@
 				<disk name="bump n burn (europe)" sha1="15c624de3acbbc6e23b45deefbe5b007e4eaf8ab"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<!-- Freezes after the intro, glitchy graphics-->
 	<software name="chaoseng" supported="no">
@@ -192,7 +192,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Doesn't boot -->
 	<software name="chuckrck" supported="no">
 		<description>Chuck Rock</description>
@@ -216,7 +216,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Doesn't boot -->
 	<software name="darkseed" supported="no">
 		<description>Darkseed</description>
@@ -228,7 +228,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- v1.01, appears to work -->
 	<software name="deepcore" supported="partial">
 		<description>Deep Core</description>
@@ -240,7 +240,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Appears to work? -->
 	<software name="dgen">
 		<description>D-Generation</description>
@@ -251,8 +251,8 @@
 				<disk name="d-generation (europe)" sha1="caefe01fe46eee977e9d46f32ecc3bbf37acb613"/>
 			</diskarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<!-- Doesn't progress past loading screen-->
 	<software name="disphero" supported="no">
 		<description>Disposable Hero</description>
@@ -264,7 +264,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Doesn't boot -->
 	<software name="donk" supported="no">
 		<description>Donk! The Samurai Duck!</description>
@@ -276,7 +276,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Doesn't boot -->
 	<software name="dstone" supported="no">
 		<description>Dragonstone</description>
@@ -324,7 +324,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Glitchy graphics -->
 	<software name="fireice" supported="partial">
 		<description>Fire And Ice - The Daring Adventures of Cool Coyote</description>
@@ -336,7 +336,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Doesn't boot -->
 	<software name="flink" supported="no">
 		<description>Flink</description>
@@ -431,7 +431,7 @@
 				<disk name="kid chaos (europe)" sha1="5c0345d317f19501fe0ecb3c1df54a3b7a7cde31"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<!-- Doesn't boot -->
 	<software name="lotus" supported="no">
@@ -491,7 +491,7 @@
 				<disk name="overkill and lunar-c (europe)" sha1="b17f3f64dedada407ddb3cd7b835bc1da17cb0ee"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<!-- Doesn't boot? -->
 	<software name="projxubb" supported="no">
@@ -504,7 +504,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Seems to run? -->
 	<software name="quik" supported="partial">
 		<description>Quik the Thunder Rabbit</description>
@@ -515,7 +515,7 @@
 				<disk name="quik the thunder rabbit (europe)" sha1="18f6fc02352b650edeaf4c479c8f2043899aa220"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<!-- Glitchy graphics, gameplay too fast? -->
 	<software name="riserobo" supported="partial">
@@ -528,7 +528,7 @@
 			</diskarea>
 		</part>
 	</software>
-	
+
 	<!-- Doesn't boot -->
 	<software name="roadkill" supported="no">
 		<description>Roadkill</description>
@@ -539,7 +539,7 @@
 				<disk name="roadkill (europe)" sha1="234bd47866333732f74a7563e149f0ab73529294"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<!-- Glitchy graphics, works okay otherwise -->
 	<software name="seekdest" supported="partial">
@@ -587,7 +587,7 @@
 				<disk name="skeleton krew (europe)" sha1="cd23102a322ff40fad7b2c50f43d7135ebeb16b4"/>
 			</diskarea>
 		</part>
-	</software>	
+	</software>
 
 	<!-- Doesn't work -->
 	<software name="suprputt" supported="no">

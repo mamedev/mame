@@ -1042,7 +1042,7 @@ void towns_state::towns_crtc_draw_scan_layer_hicolour(bitmap_rgb32 &bitmap,const
 	}
 	else
 		linesize = m_video.towns_crtc_reg[20] * 8;
-	
+
 	if(m_video.towns_display_page_sel != 0)
 	{
 		off = 0x20000;
@@ -1121,7 +1121,7 @@ void towns_state::towns_crtc_draw_scan_layer_256(bitmap_rgb32 &bitmap,const rect
 	}
 
 	linesize = m_video.towns_crtc_reg[20] * 8;
-	
+
 	if(!(m_video.towns_crtc_reg[28] & 0x20))
 		off += m_video.towns_crtc_reg[17] << 3;  // initial offset
 	else

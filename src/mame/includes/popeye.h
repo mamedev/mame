@@ -1,3 +1,5 @@
+#include "machine/eepromser.h"
+
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Couriersud
 // thanks-to: Marc Lafontaine
@@ -29,13 +31,10 @@ public:
 	required_region_ptr<uint8_t> m_color_prom;
 	required_region_ptr<uint8_t> m_color_prom_spr;
 
-	std::unique_ptr<uint8_t[]> m_bitmapram;
+	uint8_t m_bitmapram[0x1000];
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
-	std::unique_ptr<bitmap_ind16> m_background_bitmap;
-	uint8_t m_invertmask;
-	uint8_t m_bitmap_type;
 	tilemap_t *m_fg_tilemap;
-	uint8_t m_lastflip;
+	uint8_t m_last_palette;
 	int   m_field;
 
 	DECLARE_READ8_MEMBER(protection_r);
@@ -49,17 +48,17 @@ public:
 	DECLARE_DRIVER_INIT(tnx1);
 	DECLARE_DRIVER_INIT(tpp2);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void driver_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tpp1);
 	DECLARE_VIDEO_START(tpp1);
 	DECLARE_PALETTE_INIT(popeyebl);
 	DECLARE_PALETTE_INIT(tnx1);
-	uint32_t screen_update_popeye(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tnx1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tpp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(popeye_interrupt);
 	DECLARE_CUSTOM_INPUT_MEMBER( pop_field_r );
-	void convert_color_prom(const uint8_t *color_prom);
-	void set_background_palette(int bank);
-	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void update_palette();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -5174,7 +5174,7 @@ ROM_END
  *  Common driver inits
  *
  *************************************/
- 
+
 void segas32_state::segas32_common_init()
 {
 	uint8_t *Z80 = memregion("soundcpu")->base();

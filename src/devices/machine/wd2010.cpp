@@ -17,7 +17,7 @@ Implements WD2010 / WD1010 controller basics for a single hard disk.
 
 UNIMPLEMENTED FEATURES :
         - more than 1 drive (untested)
-	- multi sector transfers (M = 1)
+    - multi sector transfers (M = 1)
         - seek and index timers / ID not found.
         - implied seeks / implied writes / retries
         - edge or level triggered seek complete (SC)
@@ -399,7 +399,7 @@ void wd2010_device::restore(uint8_t data)
 	// Datasheet: DIRIN HIGH = in ;  LOW = out
 	m_out_dirin_cb(0); // 0 = heads move away from the spindle, towards track O.
 
-	// Omitted: store step rate for later (implied seeks). 
+	// Omitted: store step rate for later (implied seeks).
 
 	int step_pulses = 0;
 	while (step_pulses <= STEP_LIMIT)
@@ -419,7 +419,7 @@ void wd2010_device::restore(uint8_t data)
 
 		if ( m_in_tk000_cb() || (step_pulses == STEP_LIMIT) ) // Simulate TRACK 00 signal (normally from DRIVE)
 		{
-			m_present_cylinder = 0; 
+			m_present_cylinder = 0;
 			m_task_file[TASK_FILE_CYLINDER_HIGH] = 0;
 			m_task_file[TASK_FILE_CYLINDER_LOW] = 0;
 
@@ -428,9 +428,9 @@ void wd2010_device::restore(uint8_t data)
 			newstatus &= ~(STATUS_BSY | STATUS_CIP); // prepare new status; (INTRQ later) reset BSY, CIP
 
 			// NOTE: calculation needs 'data' (extracted from command register)
-			float step_ms = SETTLING_MS + LATENCY_MS + ( (float)sqrt(1.0 * step_pulses) * STEP_RATE_MS );  
+			float step_ms = SETTLING_MS + LATENCY_MS + ( (float)sqrt(1.0 * step_pulses) * STEP_RATE_MS );
 
-			cmd_timer->adjust(attotime::from_usec(1000 * step_ms), newstatus); 
+			cmd_timer->adjust(attotime::from_usec(1000 * step_ms), newstatus);
 			return;
 		}
 
@@ -463,7 +463,7 @@ void wd2010_device::seek(uint8_t data)
 
 	int direction; // 0 = towards 0
 	int step_pulses;
-	
+
 	// Calculate number of steps by comparing the cylinder registers
 	//           HI/LO with the internally stored position.
 	uint32_t cylinder_registers = CYLINDER;
@@ -479,7 +479,7 @@ void wd2010_device::seek(uint8_t data)
 	}
 
 	// NOTE: calculation needs 'step_pulses' and 'data' (taken from command register)
-	float step_ms = SETTLING_MS + LATENCY_MS + ( (float)sqrt(1.0 * step_pulses) * STEP_RATE_MS );  
+	float step_ms = SETTLING_MS + LATENCY_MS + ( (float)sqrt(1.0 * step_pulses) * STEP_RATE_MS );
 
 	m_out_dirin_cb(direction);
 
@@ -532,7 +532,7 @@ void wd2010_device::seek(uint8_t data)
 	m_task_file[TASK_FILE_CYLINDER_LOW] = (m_present_cylinder - ((m_task_file[TASK_FILE_CYLINDER_HIGH] << 8) )) & 0xff;
 
 	//LOGERROR("SEEK (END) - m_present_cylinder = %u SDH CYL L/H %02x / %02x\n", m_present_cylinder,m_task_file[TASK_FILE_CYLINDER_LOW],m_task_file[TASK_FILE_CYLINDER_HIGH]);
-	cmd_timer->adjust(attotime::from_usec(1000 * step_ms), newstatus); 
+	cmd_timer->adjust(attotime::from_usec(1000 * step_ms), newstatus);
 }
 
 //-------------------------------------------------

@@ -666,7 +666,7 @@ READ8_MEMBER(sigmab98_state::d013_r)
 {
 	// bit 5 must go 0->1 (vblank?)
 	// bit 2 must be set (sprite buffered? triggered by pulsing bit 3 of port C6?)
-//	return (m_screen->vblank() ? 0x20 : 0x00) | 0x04;
+//  return (m_screen->vblank() ? 0x20 : 0x00) | 0x04;
 	return (m_screen->vblank() ? 0x20 : 0x01) | 0x04;
 //  return machine().rand();
 }
@@ -1164,7 +1164,7 @@ WRITE8_MEMBER(lufykzku_state::lufykzku_watchdog_w)
 WRITE8_MEMBER(lufykzku_state::lufykzku_c4_w)
 {
 	machine().bookkeeping().coin_lockout_w(1, (~data) & 0x20); // 100 yen lockout
-//	machine().bookkeeping().coin_lockout_w(2, (~data) & 0x40); // (unused coin lockout)
+//  machine().bookkeeping().coin_lockout_w(2, (~data) & 0x40); // (unused coin lockout)
 	machine().bookkeeping().coin_lockout_w(0, (~data) & 0x80); // medal lockout
 
 	m_c4 = data;
@@ -1175,13 +1175,13 @@ WRITE8_MEMBER(lufykzku_state::lufykzku_c4_w)
 WRITE8_MEMBER(lufykzku_state::lufykzku_c6_w)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 0x01); // 100 yen in
-//	machine().bookkeeping().coin_counter_w(2, data & 0x02); // (unused coin in)
+//  machine().bookkeeping().coin_counter_w(2, data & 0x02); // (unused coin in)
 	machine().bookkeeping().coin_counter_w(0, data & 0x04); // medal in
 	machine().bookkeeping().coin_counter_w(3, data & 0x08); // medal out
 	output().set_led_value(0,                 data & 0x10); // button led
-//	output().set_led_value(1,                 data & 0x20); // (unused button led)
-//	output().set_led_value(2,                 data & 0x40); // (unused button led)
-//	output().set_led_value(3,                 data & 0x80); // (unused button led)
+//  output().set_led_value(1,                 data & 0x20); // (unused button led)
+//  output().set_led_value(2,                 data & 0x40); // (unused button led)
+//  output().set_led_value(3,                 data & 0x80); // (unused button led)
 
 	m_c6 = data;
 	show_outputs();
@@ -2913,7 +2913,7 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-//	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram") // same as sammymdl?
+//  MCFG_BUFFERED_SPRITERAM8_ADD("spriteram") // same as sammymdl?
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3476,7 +3476,7 @@ DRIVER_INIT_MEMBER(lufykzku_state,lufykzku)
 
     Xilinx XC9536 VM1212F01 (@U5) - In-System Programmable CPLD
     MX29F0??C (@U3) - Empty 32 Pin ROM Socket
-	M5295A (@U8) - Watchdog Timer (Near CUT-DEBUG MODE Jumper)
+    M5295A (@U8) - Watchdog Timer (Near CUT-DEBUG MODE Jumper)
     M93C46MN6T (@U11?) - Serial EEPROM
     Cell Battery (@BAT)
     25 Pin Edge Connector

@@ -92,7 +92,7 @@ READ16_MEMBER(mach32_8514a_device::mach32_config1_r)
  * bits    6-7  16bpp colour mode (0=555, 1=565, 2=655, 3=664)
  * bit       8  Multiplex pixels - processes 4 pixels in parallel by the DAC
  * bit       9  24bpp config (0=3Bytes/pixel, 1=4Bytes/pixel)
- * bit      10  24bpp colour order (0=RGB, LSB reserved in 4Bpp, 1=BGR, MSB reserved in 4Bpp) 
+ * bit      10  24bpp colour order (0=RGB, LSB reserved in 4Bpp, 1=BGR, MSB reserved in 4Bpp)
  * bit      11  Display pixel size to be written
  * bits  12-13  DAC extended address inputs RS2,RS3
  * bit      14  Enabled 8-bit DAC (0=6-bit)
@@ -164,7 +164,7 @@ void mach32_device::ati_define_video_mode()
 		ati_vga_device::ati_define_video_mode();
 		return;
 	}
-	
+
 	set_dot_clock();
 }
 

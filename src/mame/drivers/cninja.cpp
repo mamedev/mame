@@ -1179,7 +1179,7 @@ MACHINE_CONFIG_START(cninja_state::robocop2)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_robocop2)
 	MCFG_SCREEN_PALETTE("palette")
-	
+
 	MCFG_MACHINE_START_OVERRIDE(cninja_state,robocop2)
 	MCFG_MACHINE_RESET_OVERRIDE(cninja_state,robocop2)
 
@@ -1270,7 +1270,7 @@ MACHINE_CONFIG_START(cninja_state::mutantf)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248) // same as robocop2? verify this from real pcb
 	MCFG_SCREEN_UPDATE_DRIVER(cninja_state, screen_update_mutantf)
-	
+
 	MCFG_MACHINE_START_OVERRIDE(cninja_state,robocop2)
 	MCFG_MACHINE_RESET_OVERRIDE(cninja_state,robocop2)
 	MCFG_VIDEO_START_OVERRIDE(cninja_state,mutantf)

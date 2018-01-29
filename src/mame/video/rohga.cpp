@@ -193,9 +193,9 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 			 pix1 - raw pixel / colour / priority data from first 1st chip
 			 pix2 - raw pixel / colour / priority data from first 2nd chip
 			*/
-			
+
 			int pri1, pri2;
-			
+
 			// pix1 sprite vs playfield
 			switch (priority) // TODO : Verify this from real pcb
 			{
@@ -345,7 +345,7 @@ uint32_t rohga_state::screen_update_nitrobal(screen_device &screen, bitmap_rgb32
 
 	/* pf3 and pf4 are combined into a single 8bpp bitmap */
 	m_deco_tilegen2->tilemap_12_combine_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	
+
 	switch (priority)
 	{
 		case 0:

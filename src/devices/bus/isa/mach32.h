@@ -31,7 +31,7 @@ public:
 	DECLARE_READ16_MEMBER(mach32_config1_r);
 	DECLARE_WRITE16_MEMBER(mach32_horz_overscan_w) {}  // TODO
 	DECLARE_READ16_MEMBER(mach32_ext_ge_r) { return 0x0000; }  // TODO
-	
+
 	bool has_display_mode_changed() { if(display_mode_change) { display_mode_change = false; return true; } else return false; }
 
 protected:

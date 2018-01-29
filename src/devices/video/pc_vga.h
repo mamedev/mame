@@ -39,7 +39,7 @@ public:
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
 
 	void set_offset(uint16_t val) { vga.crtc.offset = val; }
-	
+
 protected:
 	enum
 	{
@@ -284,7 +284,7 @@ public:
 
 	bool is_8514a_enabled() { return ibm8514.enabled; }
 	bool is_passthrough_set() { return ibm8514.passthrough; }
-	
+
 	READ16_MEMBER(ibm8514_gpstatus_r);
 	WRITE16_MEMBER(ibm8514_cmd_w);
 	WRITE16_MEMBER(ibm8514_display_ctrl_w);
@@ -331,7 +331,7 @@ public:
 	READ16_MEMBER(ibm8514_write_mask_r);
 	WRITE16_MEMBER(ibm8514_write_mask_w);
 	WRITE16_MEMBER(ibm8514_advfunc_w);
-	
+
 	void ibm8514_wait_draw();
 	struct
 	{
@@ -469,7 +469,7 @@ public:
 	WRITE16_MEMBER(mach8_advfunc_w) { mach8.ati_mode = false; ibm8514_advfunc_w(space,offset,data,mem_mask); }
 	uint16_t get_ext_config() { return mach8.ge_ext_config; }
 	uint16_t offset() { if(mach8.ati_mode) return mach8.ge_pitch; else return 128; }
-	
+
 protected:
 	mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual void device_start() override;

@@ -221,8 +221,8 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	//0x400000 0x400001 "13M" even addresses
 	//0x400002,0x400003 "13J" odd addresses
-	AM_RANGE(0x400000, 0x401fff) AM_DEVREAD("k056832", k056832_device, rom_long_r)
-	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_device, unpaged_ram_long_r, unpaged_ram_long_w)
+//  AM_RANGE(0x400000, 0x401fff) AM_DEVREAD("k056832", k056832_device, rom_long_r)
+//  AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_device, unpaged_ram_long_r, unpaged_ram_long_w)
 	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_device, long_w)
 
 

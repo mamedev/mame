@@ -5024,7 +5024,7 @@ WRITE16_MEMBER(nmk16_state::afega_scroll1_w)
 */
 
 
-static ADDRESS_MAP_START( afega, AS_PROGRAM, 16, nmk16_state )
+static ADDRESS_MAP_START( afega_map, AS_PROGRAM, 16, nmk16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")            // Buttons
@@ -5212,7 +5212,7 @@ MACHINE_CONFIG_START(nmk16_state::stagger1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL(12'000'000)) /* 68000p10 running at 12mhz, verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(afega)
+	MCFG_CPU_PROGRAM_MAP(afega_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000)) /* verified on pcb */
@@ -5327,7 +5327,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(nmk16_state::spec2k, firehawk)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(afega)
+	MCFG_CPU_PROGRAM_MAP(afega_map)
 MACHINE_CONFIG_END
 
 

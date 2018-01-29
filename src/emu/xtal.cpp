@@ -35,7 +35,7 @@
     and readability reasons we tend to write the closest integer
     value. For example, 3.579545_MHz_XTAL should actually be
     3.579545454545...MHz (315/88). This is no problem though: see above
-	note about tolerance.
+    note about tolerance.
 
     In the "Examples" column, please don't add 1000 examples, this is just
     for interest, so two or three examples is enough.
@@ -54,15 +54,15 @@ const double XTAL::known_xtals[] = {
 /*
     Frequency       Sugarvassed            Examples
     -----------  ----------------------    ---------------------------------------- */
-	     32'768, /* 32.768_kHz_XTAL        Used to drive RTC chips */
-	    384'000, /* 384_kHz_XTAL           Resonator - Commonly used for driving OKI MSM5205 */
-	    400'000, /* 400_kHz_XTAL           Resonator - OKI MSM5205 on Great Swordman h/w */
-	    430'000, /* 430_kHz_XTAL           Resonator */
-	    455'000, /* 455_kHz_XTAL           Resonator - OKI MSM5205 on Gladiator h/w */
-	    512'000, /* 512_kHz_XTAL           Resonator - Toshiba TC8830F */
-	    600'000, /* 600_kHz_XTAL           - */
-	    640'000, /* 640_kHz_XTAL           Resonator - NEC UPD7759, Texas Instruments Speech Chips @ 8khz */
-	    960'000, /* 960_kHz_XTAL           Resonator - Xerox Notetaker Keyboard UART */
+		 32'768, /* 32.768_kHz_XTAL        Used to drive RTC chips */
+		384'000, /* 384_kHz_XTAL           Resonator - Commonly used for driving OKI MSM5205 */
+		400'000, /* 400_kHz_XTAL           Resonator - OKI MSM5205 on Great Swordman h/w */
+		430'000, /* 430_kHz_XTAL           Resonator */
+		455'000, /* 455_kHz_XTAL           Resonator - OKI MSM5205 on Gladiator h/w */
+		512'000, /* 512_kHz_XTAL           Resonator - Toshiba TC8830F */
+		600'000, /* 600_kHz_XTAL           - */
+		640'000, /* 640_kHz_XTAL           Resonator - NEC UPD7759, Texas Instruments Speech Chips @ 8khz */
+		960'000, /* 960_kHz_XTAL           Resonator - Xerox Notetaker Keyboard UART */
 	  1'000'000, /* 1_MHz_XTAL             Used to drive OKI M6295 chips */
 	  1'056'000, /* 1.056_MHz_XTAL         Resonator - OKI M6295 on Trio The Punch h/w */
 	  1'294'400, /* 1.2944_MHz_XTAL        BBN BitGraph PSG */
