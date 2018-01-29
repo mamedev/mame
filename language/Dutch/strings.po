@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-28 14:01+1100\n"
-"PO-Revision-Date: 2017-11-14 14:25+0100\n"
+"PO-Revision-Date: 2018-01-29 19:54+0100\n"
 "Last-Translator: Jos van Mourik\n"
 "Language-Team: MAME Language Team\n"
 "Language: nl\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.0.4\n"
+"X-Generator: Poedit 2.0.6\n"
 
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
@@ -1742,7 +1742,7 @@ msgstr "Automatisch opslaan/hervatten"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Rewind capacity"
-msgstr ""
+msgstr "Terugspoelcapaciteit"
 
 #: src/frontend/mame/ui/submenu.cpp:68
 msgid "Bilinear snapshot"
@@ -2189,6 +2189,8 @@ msgid ""
 "ROM Audit \tDisabled\n"
 "Samples Audit \tDisabled\n"
 msgstr ""
+"ROM-controle \tUitgeschakeld\n"
+"Samplecontrole \tUitgeschakeld\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1167
 #, c-format
@@ -2433,7 +2435,7 @@ msgstr "[aanmaken]"
 #: src/frontend/mame/ui/filesel.cpp:419
 #, c-format
 msgid "Error accessing %s"
-msgstr ""
+msgstr "Fout bij toegang tot %s"
 
 #: src/frontend/mame/ui/filesel.cpp:515
 msgid "Select access mode"
@@ -2799,21 +2801,21 @@ msgstr "Cheatzoeker"
 
 #: plugins/portname/init.lua:89
 msgid "Save input names to file"
-msgstr ""
+msgstr "Sla ingangsnamen op in bestand"
 
 #: plugins/portname/init.lua:115 plugins/portname/init.lua:120
 #: plugins/portname/init.lua:136
 msgid "Failed to save input name file"
-msgstr ""
+msgstr "Opslaan van ingangsnamenbestand mislukt"
 
 #: plugins/portname/init.lua:153
 #, lua-format
 msgid "Input port name file saved to %s"
-msgstr ""
+msgstr "Ingangspoortnaambestand opgeslagen in %s"
 
 #: plugins/portname/init.lua:158
 msgid "Input ports"
-msgstr ""
+msgstr "Ingangspoorten"
 
 #~ msgid ""
 #~ "ROM Audit Disabled\t\n"
