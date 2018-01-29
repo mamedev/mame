@@ -11,9 +11,8 @@ class mexico86_state : public driver_device
 public:
 	mexico86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_objectram(*this, "objectram"),
 		m_protection_ram(*this, "protection_ram"),
-		m_videoram(*this, "videoram"),
+		m_mainram(*this, "mainram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
@@ -25,9 +24,8 @@ public:
 	}
 
 	/* memory pointers */
-	required_shared_ptr<u8> m_objectram;
 	required_shared_ptr<u8> m_protection_ram;
-	required_shared_ptr<u8> m_videoram;
+	required_shared_ptr<u8> m_mainram;
 
 	/* video-related */
 	int      m_charbank;
