@@ -247,7 +247,6 @@ namespace plib {
 		pmfp(MemberFunctionType mftp, O *object)
 		: pmfp_base<R, Targs...>()
 		{
-			printf("constructor\n");
 			this->set(mftp, object);
 		}
 
