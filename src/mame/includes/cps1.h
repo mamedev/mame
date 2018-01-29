@@ -30,7 +30,7 @@
     Frame size: 262 scanlines
     Refresh rate: 59.63 MHz.
 */
-#define CPS_PIXEL_CLOCK  (XTAL_16MHz/2)
+#define CPS_PIXEL_CLOCK  (XTAL(16'000'000)/2)
 
 #define CPS_HTOTAL       (512)
 #define CPS_HBEND        (64)

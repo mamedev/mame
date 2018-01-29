@@ -7853,11 +7853,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::downtown)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(downtown_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("m_scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M65C02, XTAL_16MHz/8) /* verified on pcb */
+	MCFG_CPU_ADD("sub", M65C02, XTAL(16'000'000)/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(downtown_sub_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("s_scantimer", seta_state, seta_sub_interrupt, "screen", 0, 1)
 
@@ -7988,12 +7988,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::calibr50)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(calibr50_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, calibr50_interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_CPU_ADD("sub", M65C02, XTAL_16MHz/8) /* verified on pcb */
+	MCFG_CPU_ADD("sub", M65C02, XTAL(16'000'000)/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(calibr50_sub_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(seta_state, irq0_line_assert, 4*60)  // IRQ: 4/frame
 
@@ -8282,7 +8282,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::daioh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)   /* 16 MHz, MC68000-16, Verified from PCB */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))   /* 16 MHz, MC68000-16, Verified from PCB */
 	MCFG_CPU_PROGRAM_MAP(daioh_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
@@ -8307,7 +8307,7 @@ MACHINE_CONFIG_START(seta_state::daioh)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, XTAL_16MHz)   /* 16 MHz, Verified from PCB audio */
+	MCFG_SOUND_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz, Verified from PCB audio */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8319,7 +8319,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(seta_state::daiohp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)   /* 16 MHz, MC68000-16, Verified from PCB */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))   /* 16 MHz, MC68000-16, Verified from PCB */
 	MCFG_CPU_PROGRAM_MAP(daiohp_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", seta_state, seta_interrupt_1_and_2, "screen", 0, 1)
 
@@ -8344,7 +8344,7 @@ MACHINE_CONFIG_START(seta_state::daiohp)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, XTAL_16MHz)   /* 16 MHz, Verified from PCB audio */
+	MCFG_SOUND_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz, Verified from PCB audio */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -8448,7 +8448,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(setaroul_state::interrupt)
 MACHINE_CONFIG_START(setaroul_state::setaroul)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* 8 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(setaroul_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", setaroul_state, interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -8462,7 +8462,7 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL_32_768kHz) // ! Actually D4911C !
+	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL(32'768)) // ! Actually D4911C !
 	MCFG_DEVICE_ADD ("acia0", ACIA6850, 0)
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
@@ -8486,7 +8486,7 @@ MACHINE_CONFIG_START(setaroul_state::setaroul)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("x1snd", X1_010, XTAL_16MHz)   /* 16 MHz */
+	MCFG_SOUND_ADD("x1snd", X1_010, XTAL(16'000'000))   /* 16 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -9675,7 +9675,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jockeyc_state::interrupt)
 MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) // TMP68000N-8
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) // TMP68000N-8
 	MCFG_CPU_PROGRAM_MAP(jockeyc_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", jockeyc_state, interrupt, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -9688,7 +9688,7 @@ MACHINE_CONFIG_START(jockeyc_state::jockeyc)
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL_32_768kHz) // ! Actually D4911C !
+	MCFG_DEVICE_ADD("rtc", UPD4992, XTAL(32'768)) // ! Actually D4911C !
 	MCFG_DEVICE_ADD ("acia0", ACIA6850, 0)
 	MCFG_TICKET_DISPENSER_ADD("hopper1", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 	MCFG_TICKET_DISPENSER_ADD("hopper2", attotime::from_msec(150), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
@@ -9727,7 +9727,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(jockeyc_state::inttoote, jockeyc)
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) // TMP68HC000N-16
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)) // TMP68HC000N-16
 	MCFG_CPU_PROGRAM_MAP(inttoote_map)
 
 	// I/O board (not hooked up yet)

@@ -8,7 +8,6 @@
 
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
-#include "video/decocomn.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
 #include "machine/deco_irq.h"
@@ -24,9 +23,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_deco146(*this, "ioprot"),
-		m_deco104(*this, "ioprot104"),
-		m_decocomn(*this, "deco_common"),
+		m_ioprot(*this, "ioprot"),
 		m_deco_tilegen1(*this, "tilegen1"),
 		m_deco_tilegen2(*this, "tilegen2"),
 		m_oki2(*this, "oki2"),
@@ -50,9 +47,7 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<deco146_device> m_deco146;
-	optional_device<deco104_device> m_deco104;
-	required_device<decocomn_device> m_decocomn;
+	optional_device<deco_146_base_device> m_ioprot;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
 	optional_device<okim6295_device> m_oki2;
@@ -74,6 +69,8 @@ public:
 	optional_shared_ptr<uint16_t> m_ram;
 	optional_memory_bank m_okibank;
 
+	uint16_t m_priority;
+
 	DECLARE_WRITE16_MEMBER(cninja_sound_w);
 	DECLARE_WRITE16_MEMBER(stoneage_sound_w);
 	DECLARE_WRITE16_MEMBER(cninja_pf12_control_w);
@@ -82,6 +79,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cninjabl2_oki_bank_w);
 	DECLARE_DRIVER_INIT(mutantf);
 	DECLARE_DRIVER_INIT(cninjabl2);
+	DECLARE_MACHINE_START(robocop2);
+	DECLARE_MACHINE_RESET(robocop2);
 	DECLARE_VIDEO_START(stoneage);
 	DECLARE_VIDEO_START(mutantf);
 	uint32_t screen_update_cninja(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -110,6 +109,8 @@ public:
 	DECLARE_WRITE16_MEMBER( cninja_protection_region_0_104_w );
 
 	DECLARE_READ16_MEMBER(cninjabl2_sprite_dma_r);
+	DECLARE_WRITE16_MEMBER(robocop2_priority_w);
+	DECLARE_READ16_MEMBER(mutantf_71_r);
 	void cninjabl(machine_config &config);
 	void edrandy(machine_config &config);
 	void cninja(machine_config &config);

@@ -78,8 +78,8 @@ of save-state is also needed.
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        (XTAL_12MHz)
-#define SOUND_CLOCK         (XTAL_3_579545MHz)
+#define MASTER_CLOCK        (XTAL(12'000'000))
+#define SOUND_CLOCK         (XTAL(3'579'545))
 
 class wmg_state : public williams_state
 {

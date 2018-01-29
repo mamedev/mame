@@ -1760,7 +1760,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dkong_state::dkong3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2) /* verified in schematics */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2) /* verified in schematics */
 	MCFG_CPU_PROGRAM_MAP(dkong3_map)
 	MCFG_CPU_IO_MAP(dkong3_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state, vblank_irq)

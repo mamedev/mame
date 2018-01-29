@@ -486,13 +486,13 @@ READ8_MEMBER(pc9801_state::fdc_2dd_ctrl_r)
 
 WRITE8_MEMBER(pc9801_state::fdc_2dd_ctrl_w)
 {
-		logerror("%02x ctrl\n",data);
-		if(((m_fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
-			m_fdc_2dd->soft_reset();
+	logerror("%02x ctrl\n",data);
+	if(((m_fdc_2dd_ctrl & 0x80) == 0) && (data & 0x80))
+		m_fdc_2dd->soft_reset();
 
-		m_fdc_2dd_ctrl = data;
-		m_fdc_2dd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
-		m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
+	m_fdc_2dd_ctrl = data;
+	m_fdc_2dd->subdevice<floppy_connector>("0")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
+	m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 READ8_MEMBER(pc9801_state::ide_ctrl_r)
@@ -1800,8 +1800,8 @@ READ8_MEMBER(pc9801_state::get_slave_ack)
    PC-9801RS needs X1 for the pit, otherwise Uchiyama Aki no Chou Bangai has sound pitch bugs
    PC-9821 definitely needs X2, otherwise there's a timer error at POST. Unless it needs a different clock anyway ...
    */
-#define MAIN_CLOCK_X1 XTAL_1_9968MHz
-#define MAIN_CLOCK_X2 XTAL_2_4576MHz
+#define MAIN_CLOCK_X1 XTAL(1'996'800)
+#define MAIN_CLOCK_X2 XTAL(2'457'600)
 
 /****************************************
 *
@@ -2373,7 +2373,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801)
 	MCFG_FLOPPY_DRIVE_ADD("upd765_2dd:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats)
 
 	MCFG_FRAGMENT_ADD(pc9801_sasi)
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, NOOP)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
 
 	MCFG_DEVICE_MODIFY("i8237")
 	MCFG_I8237_IN_IOR_3_CB(DEVREAD8("upd765_2dd", upd765a_device, mdma_r))
@@ -2407,7 +2407,7 @@ MACHINE_CONFIG_START(pc9801_state::pc9801rs)
 	MCFG_DEVICE_CLOCK(MAIN_CLOCK_X1*8); // unknown clock
 
 	MCFG_FRAGMENT_ADD(pc9801_ide)
-	MCFG_UPD4990A_ADD("upd1990a", XTAL_32_768kHz, NOOP, NOOP)
+	MCFG_UPD4990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1664K")

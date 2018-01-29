@@ -48,9 +48,6 @@ a2bus_agat7langcard_device::a2bus_agat7langcard_device(const machine_config &mco
 
 void a2bus_agat7langcard_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	memset(m_ram, 0, 32 * 1024);
 
 	save_item(NAME(m_inh_state));

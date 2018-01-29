@@ -405,18 +405,18 @@ GFXDECODE_END
 MACHINE_CONFIG_START(spbactn_state::spbactn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(spbactn_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 #if 0
 	// actual blanking frequencies unknown, but should be close to NTSC
-	MCFG_SCREEN_RAW_PARAMS(XTAL_22_656MHz / 2, 720, 0, 512, 262, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(22'656'000) / 2, 720, 0, 512, 262, 16, 240)
 #else
 	// MCFG_SCREEN_RAW_PARAMS breaks sprites; keeping this in for now
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -446,11 +446,11 @@ MACHINE_CONFIG_START(spbactn_state::spbactn)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH) /* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH) /* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -458,15 +458,15 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(spbactn_state::spbactnp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(spbactnp_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map)
 
 	// yes another cpu..
-	MCFG_CPU_ADD("extracpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("extracpu", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(spbactnp_extra_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq0_line_hold)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  nmi_line_pulse)
@@ -500,11 +500,11 @@ MACHINE_CONFIG_START(spbactn_state::spbactnp)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

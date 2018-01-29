@@ -328,11 +328,11 @@ void idsa_state::machine_reset()
 
 MACHINE_CONFIG_START(idsa_state::idsa)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 	MCFG_CPU_IO_MAP(maincpu_io_map)
 
-	MCFG_DEVICE_ADD("irqclk", CLOCK, XTAL_8MHz / 4 )
+	MCFG_DEVICE_ADD("irqclk", CLOCK, XTAL(8'000'000) / 4 )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(idsa_state, clock_w))
 
 	/* video hardware */

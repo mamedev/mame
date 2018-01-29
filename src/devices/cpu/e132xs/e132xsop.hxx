@@ -336,7 +336,7 @@ void hyperstone_device::hyperstone_mov()
 
 	check_delay_PC();
 
- 	const bool h = (SR & H_MASK) != 0;
+	const bool h = (SR & H_MASK) != 0;
 	SR &= ~H_MASK;
 	if (DST_GLOBAL && h && !(SR & S_MASK))
 	{

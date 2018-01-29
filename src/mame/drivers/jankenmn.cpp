@@ -156,7 +156,7 @@
 
 #include "jankenmn.lh"
 
-#define MASTER_CLOCK        XTAL_2_5MHz
+#define MASTER_CLOCK        XTAL(2'500'000)
 
 
 class jankenmn_state : public driver_device

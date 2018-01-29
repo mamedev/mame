@@ -249,7 +249,7 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 #include "speaker.h"
 
 
-#define MASTER_CLOCK            XTAL_18_432MHz
+#define MASTER_CLOCK            XTAL(18'432'000)
 
 
 void cclimber_state::machine_start()
@@ -1230,7 +1230,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(cclimber_state::swimmer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)    /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(swimmer_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cclimber_state,  vblank_irq)
 
@@ -1241,7 +1241,7 @@ MACHINE_CONFIG_START(cclimber_state::swimmer)
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(cclimber_state, sidebg_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(cclimber_state, palette_bank_w))
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_4MHz/2)  /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(4'000'000)/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(swimmer_audio_map)
 	MCFG_CPU_IO_MAP(swimmer_audio_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cclimber_state, nmi_line_pulse,  (double)4000000/16384) /* IRQs are triggered by the main CPU */
@@ -1266,10 +1266,10 @@ MACHINE_CONFIG_START(cclimber_state::swimmer)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_4MHz/2)  /* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(4'000'000)/2)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_4MHz/2)  /* verified on pcb */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(4'000'000)/2)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 

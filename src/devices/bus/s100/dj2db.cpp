@@ -102,10 +102,10 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(s100_dj2db_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD(BR1941_TAG, COM8116, XTAL(5'068'800))
 	MCFG_COM8116_FR_HANDLER(WRITELINE(s100_dj2db_device, fr_w))
 
-	MCFG_MB8866_ADD(MB8866_TAG, XTAL_10MHz/5)
+	MCFG_MB8866_ADD(MB8866_TAG, XTAL(10'000'000)/5)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(s100_dj2db_device, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(s100_dj2db_device, fdc_drq_w))
 

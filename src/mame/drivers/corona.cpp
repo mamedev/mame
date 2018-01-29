@@ -312,10 +312,10 @@
 #include "luckyrlt.lh"
 
 
-#define WC81_MAIN_XTAL      XTAL_24MHz        /* Main crystal for Winners Circle 28*28 pins PCB's */
-#define WC82_MAIN_XTAL      XTAL_18_432MHz    /* Main crystal for Winners Circle 18*22 pins PCB's */
-#define RE_MAIN_XTAL        XTAL_16MHz        /* Main for roulette boards */
-#define VIDEO_XTAL          XTAL_20MHz        /* Video circuitry crystal (all) */
+#define WC81_MAIN_XTAL      XTAL(24'000'000)        /* Main crystal for Winners Circle 28*28 pins PCB's */
+#define WC82_MAIN_XTAL      XTAL(18'432'000)    /* Main crystal for Winners Circle 18*22 pins PCB's */
+#define RE_MAIN_XTAL        XTAL(16'000'000)        /* Main for roulette boards */
+#define VIDEO_XTAL          XTAL(20'000'000)        /* Video circuitry crystal (all) */
 #define AY_CLK1             1000000           /* AY-3-8912 clock for WC81 (28*28 PCB), measured */
 #define AY_CLK2             2000000           /* AY-3-8910 clock for 81b & 82 (18*22 PCB), guessed */
 #define VIDEOBUF_SIZE       512*512

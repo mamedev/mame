@@ -4727,7 +4727,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(fxmcr165_state::fxmcr165)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1100, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", TMS1100, 400_kHz_XTAL)
 	MCFG_TMS1XXX_READ_K_CB(READ8(fxmcr165_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(fxmcr165_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(fxmcr165_state, write_o))
@@ -7218,7 +7218,7 @@ public:
 
 void bankshot_state::prepare_display()
 {
-	display_matrix(7, 11, m_o, m_r & ~3);
+	display_matrix(8, 11, m_o, m_r & ~3);
 }
 
 WRITE16_MEMBER(bankshot_state::write_r)
@@ -7236,9 +7236,8 @@ WRITE16_MEMBER(bankshot_state::write_r)
 
 WRITE16_MEMBER(bankshot_state::write_o)
 {
-	// O0-O6: led state
-	// O7: N/C
-	m_o = data & 0x7f;
+	// O0-O7: led state
+	m_o = data;
 	prepare_display();
 }
 

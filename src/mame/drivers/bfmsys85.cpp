@@ -137,7 +137,7 @@ public:
 	void bfmsys85(machine_config &config);
 };
 
-#define MASTER_CLOCK    (XTAL_4MHz)
+#define MASTER_CLOCK    (XTAL(4'000'000))
 
 ///////////////////////////////////////////////////////////////////////////
 // Serial Communications (Where does this go?) ////////////////////////////

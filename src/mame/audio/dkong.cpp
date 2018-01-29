@@ -360,7 +360,7 @@ static DISCRETE_SOUND_START(dkong2b)
 	/************************************************/
 	/* Noise */
 	DISCRETE_TASK_START(1)
-	DISCRETE_LFSR_NOISE(NODE_11, 1, 1, CLOCK_2VF, 1.0, 0, 0.5, &dkong_lfsr)
+	DISCRETE_LFSR_NOISE(NODE_11, 1, 1, CLOCK_2VF.dvalue(), 1.0, 0, 0.5, &dkong_lfsr)
 	DISCRETE_COUNTER(NODE_12, 1, 0, NODE_11, 0, 7, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)    /* LS161, IC 3J */
 	DISCRETE_TRANSFORM3(NODE_13,NODE_12,3,DK_SUP_V,"01>2*")
 
@@ -652,7 +652,7 @@ static DISCRETE_SOUND_START(radarscp)
 	/* Noise                                      */
 	/************************************************/
 
-	DISCRETE_LFSR_NOISE(NODE_11, 1, 1, CLOCK_2VF, 1.0, 0, 0.5, &dkong_lfsr)
+	DISCRETE_LFSR_NOISE(NODE_11, 1, 1, CLOCK_2VF.dvalue(), 1.0, 0, 0.5, &dkong_lfsr)
 	/* Clear (1) from SOUND6 */
 	DISCRETE_COUNTER(NODE_12, 1, DS_SOUND6_INV, NODE_11, 0, 15, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)   /* LS161, IC 3J */
 	DISCRETE_TRANSFORM3(NODE_13,NODE_12,0x04,DK_SUP_V,"01&1=2*")  /*QC => SND02 */
@@ -1375,7 +1375,7 @@ MACHINE_CONFIG_DERIVED(dkong_state::radarscp1_audio, radarscp_audio)
 	/* tms memory controller */
 	MCFG_DEVICE_ADD("m58819", M58819, 0)
 
-	MCFG_SOUND_ADD("tms", M58817, XTAL_640kHz)
+	MCFG_SOUND_ADD("tms", M58817, XTAL(640'000))
 	MCFG_TMS5110_M0_CB(DEVWRITELINE("m58819", tms6100_device, m0_w))
 	MCFG_TMS5110_M1_CB(DEVWRITELINE("m58819", tms6100_device, m1_w))
 	MCFG_TMS5110_ADDR_CB(DEVWRITE8("m58819", tms6100_device, add_w))

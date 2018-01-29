@@ -83,7 +83,7 @@ enum
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(a2bus_corvfdc01_device::device_add_mconfig)
-	MCFG_FD1793_ADD(FDC01_FDC_TAG, XTAL_16MHz / 8)
+	MCFG_FD1793_ADD(FDC01_FDC_TAG, XTAL(16'000'000) / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(a2bus_corvfdc01_device, drq_w))
 	MCFG_FLOPPY_DRIVE_ADD(FDC01_FDC_TAG":0", corv_floppies, "8sssd", a2bus_corvfdc01_device::corv_floppy_formats)
@@ -128,9 +128,6 @@ a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, co
 
 void a2bus_corvfdc01_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(FDC01_ROM_REGION).c_str())->base();
 
 	save_item(NAME(m_fdc_local_status));

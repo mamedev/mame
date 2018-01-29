@@ -51,19 +51,17 @@ public:
 	uint16_t   m_pf2_rowscroll[0x800/2];
 	std::unique_ptr<uint16_t[]> m_spriteram;
 	DECLARE_WRITE32_MEMBER(hvysmsh_eeprom_w);
-	DECLARE_WRITE32_MEMBER(wcvol95_nonbuffered_palette_w);
-	DECLARE_WRITE32_MEMBER(deco156_nonbuffered_palette_w);
-	DECLARE_READ32_MEMBER(wcvol95_pf1_rowscroll_r);
-	DECLARE_READ32_MEMBER(wcvol95_pf2_rowscroll_r);
-	DECLARE_READ32_MEMBER(wcvol95_spriteram_r);
-	DECLARE_WRITE32_MEMBER(wcvol95_pf1_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(wcvol95_pf2_rowscroll_w);
-	DECLARE_WRITE32_MEMBER(wcvol95_spriteram_w);
+	DECLARE_READ32_MEMBER(pf1_rowscroll_r);
+	DECLARE_READ32_MEMBER(pf2_rowscroll_r);
+	DECLARE_READ32_MEMBER(spriteram_r);
+	DECLARE_WRITE32_MEMBER(pf1_rowscroll_w);
+	DECLARE_WRITE32_MEMBER(pf2_rowscroll_w);
+	DECLARE_WRITE32_MEMBER(spriteram_w);
 	DECLARE_WRITE32_MEMBER(hvysmsh_oki_0_bank_w);
 	DECLARE_DRIVER_INIT(hvysmsh);
 	DECLARE_DRIVER_INIT(wcvol95);
 	virtual void video_start() override;
-	uint32_t screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 	void descramble_sound( const char *tag );
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
@@ -84,7 +82,7 @@ void deco156_state::video_start()
 }
 
 
-uint32_t deco156_state::screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t deco156_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	//FIXME: flip_screen_x should not be written!
 	flip_screen_set_no_update(1);
@@ -116,12 +114,12 @@ WRITE32_MEMBER(deco156_state::hvysmsh_oki_0_bank_w)
 	m_oki1->set_rom_bank(data & 1);
 }
 
-READ32_MEMBER(deco156_state::wcvol95_pf1_rowscroll_r){ return m_pf1_rowscroll[offset] ^ 0xffff0000; }
-READ32_MEMBER(deco156_state::wcvol95_pf2_rowscroll_r){ return m_pf2_rowscroll[offset] ^ 0xffff0000; }
-READ32_MEMBER(deco156_state::wcvol95_spriteram_r){ return m_spriteram[offset] ^ 0xffff0000; }
-WRITE32_MEMBER(deco156_state::wcvol95_pf1_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
-WRITE32_MEMBER(deco156_state::wcvol95_pf2_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
-WRITE32_MEMBER(deco156_state::wcvol95_spriteram_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_spriteram[offset]); }
+READ32_MEMBER(deco156_state::pf1_rowscroll_r){ return m_pf1_rowscroll[offset] ^ 0xffff0000; }
+READ32_MEMBER(deco156_state::pf2_rowscroll_r){ return m_pf2_rowscroll[offset] ^ 0xffff0000; }
+READ32_MEMBER(deco156_state::spriteram_r){ return m_spriteram[offset] ^ 0xffff0000; }
+WRITE32_MEMBER(deco156_state::pf1_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
+WRITE32_MEMBER(deco156_state::pf2_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
+WRITE32_MEMBER(deco156_state::spriteram_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_spriteram[offset]); }
 
 
 static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32, deco156_state )
@@ -137,11 +135,11 @@ static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
 	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE(wcvol95_pf1_rowscroll_r, wcvol95_pf1_rowscroll_w)
-	AM_RANGE(0x1a4000, 0x1a4fff) AM_READWRITE(wcvol95_pf2_rowscroll_r, wcvol95_pf2_rowscroll_w)
+	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE(pf1_rowscroll_r, pf1_rowscroll_w)
+	AM_RANGE(0x1a4000, 0x1a4fff) AM_READWRITE(pf2_rowscroll_r, pf2_rowscroll_w)
 	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x1d0010, 0x1d002f) AM_READNOP // Check for DMA complete?
-	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE(wcvol95_spriteram_r, wcvol95_spriteram_w)
+	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE(spriteram_r, spriteram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wcvol95_map, AS_PROGRAM, 32, deco156_state )
@@ -149,12 +147,12 @@ static ADDRESS_MAP_START( wcvol95_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf_control_dword_r, pf_control_dword_w)
 	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf1_data_dword_r, pf1_data_dword_w)
 	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE("tilegen1", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
-	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(wcvol95_pf1_rowscroll_r, wcvol95_pf1_rowscroll_w)
-	AM_RANGE(0x124000, 0x124fff) AM_READWRITE(wcvol95_pf2_rowscroll_r, wcvol95_pf2_rowscroll_w)
+	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(pf1_rowscroll_r, pf1_rowscroll_w)
+	AM_RANGE(0x124000, 0x124fff) AM_READWRITE(pf2_rowscroll_r, pf2_rowscroll_w)
 	AM_RANGE(0x130000, 0x137fff) AM_RAM
 	AM_RANGE(0x140000, 0x140003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x150000, 0x150003) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x160000, 0x161fff) AM_READWRITE(wcvol95_spriteram_r, wcvol95_spriteram_w)
+	AM_RANGE(0x160000, 0x161fff) AM_READWRITE(spriteram_r, spriteram_w)
 	AM_RANGE(0x170000, 0x170003) AM_NOP // Irq ack?
 	AM_RANGE(0x180000, 0x180fff) AM_READONLY AM_DEVWRITE16("palette", palette_device, write16, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x000000ff)
@@ -333,7 +331,7 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update_wcvol95)
+	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -341,7 +339,8 @@ MACHINE_CONFIG_START(deco156_state::hvysmsh)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -385,7 +384,7 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
 	MCFG_SCREEN_SIZE(40*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update_wcvol95)
+	MCFG_SCREEN_UPDATE_DRIVER(deco156_state, screen_update)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hvysmsh)
 	MCFG_PALETTE_ADD("palette", 1024)
@@ -393,7 +392,8 @@ MACHINE_CONFIG_START(deco156_state::wcvol95)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)

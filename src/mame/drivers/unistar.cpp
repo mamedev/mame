@@ -93,11 +93,11 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(unistar_state::unistar)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(unistar_mem)
 	MCFG_CPU_IO_MAP(unistar_io)
 
-	MCFG_DEVICE_ADD("stc", AM9513, XTAL_8MHz)
+	MCFG_DEVICE_ADD("stc", AM9513, XTAL(8'000'000))
 	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("stc", am9513_device, source1_w))
 
 	MCFG_DEVICE_ADD("ppi", I8255A, 0)

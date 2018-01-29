@@ -355,7 +355,7 @@ WRITE8_MEMBER( play_2_state::psg_w )
 // **************** Machine *****************************
 MACHINE_CONFIG_START(play_2_state::play_2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CDP1802, XTAL_2_95MHz)
+	MCFG_CPU_ADD("maincpu", CDP1802, XTAL(2'950'000))
 	MCFG_CPU_PROGRAM_MAP(play_2_map)
 	MCFG_CPU_IO_MAP(play_2_io)
 	MCFG_COSMAC_WAIT_CALLBACK(VCC)
@@ -369,7 +369,7 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_play_2)
 
-	MCFG_DEVICE_ADD("tpb_clock", CLOCK, XTAL_2_95MHz / 8) // TPB line from CPU
+	MCFG_DEVICE_ADD("tpb_clock", CLOCK, XTAL(2'950'000) / 8) // TPB line from CPU
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(play_2_state, clock_w))
 
 	MCFG_DEVICE_ADD("xpoint", CLOCK, 60) // crossing-point detector
@@ -388,12 +388,12 @@ MACHINE_CONFIG_START(play_2_state::play_2)
 	MCFG_FRAGMENT_ADD( genpin_audio )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_CDP1863_ADD("1863", 0, XTAL_2_95MHz / 8)
+	MCFG_CDP1863_ADD("1863", 0, XTAL(2'950'000) / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(play_2_state::zira, play_2)
-	MCFG_CPU_ADD("cop402", COP402, XTAL_2MHz)
+	MCFG_CPU_ADD("cop402", COP402, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(zira_sound_map)
 	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
 	MCFG_COP400_WRITE_D_CB(WRITE8(play_2_state, sound_d_w))
@@ -402,7 +402,7 @@ MACHINE_CONFIG_DERIVED(play_2_state::zira, play_2)
 	MCFG_COP400_WRITE_L_CB(WRITE8(play_2_state, psg_w))
 	MCFG_COP400_READ_IN_CB(READ8(play_2_state, sound_in_r))
 
-	MCFG_SOUND_ADD("aysnd1", AY8910, XTAL_2MHz)
+	MCFG_SOUND_ADD("aysnd1", AY8910, XTAL(2'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

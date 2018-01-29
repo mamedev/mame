@@ -747,7 +747,7 @@ INTERRUPT_GEN_MEMBER(m63_state::vblank_irq)
 MACHINE_CONFIG_START(m63_state::m63)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80,XTAL_12MHz/4)     /* 3 MHz */
+	MCFG_CPU_ADD("maincpu",Z80,XTAL(12'000'000)/4)     /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(m63_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
 
@@ -758,7 +758,7 @@ MACHINE_CONFIG_START(m63_state::m63)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(m63_state, coin1_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(m63_state, coin2_w))
 
-	MCFG_CPU_ADD("soundcpu",I8039,XTAL_12MHz/4) /* ????? */
+	MCFG_CPU_ADD("soundcpu",I8039,XTAL(12'000'000)/4) /* ????? */
 	MCFG_CPU_PROGRAM_MAP(i8039_map)
 	MCFG_CPU_IO_MAP(i8039_port_map)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(m63_state, p1_w))
@@ -789,10 +789,10 @@ MACHINE_CONFIG_START(m63_state::m63)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8) /* ????? */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8) /* ????? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -804,7 +804,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(m63_state::fghtbskt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)     /* 3 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)     /* 3 MHz */
 	MCFG_CPU_PROGRAM_MAP(fghtbskt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m63_state,  vblank_irq)
 
@@ -813,7 +813,7 @@ MACHINE_CONFIG_START(m63_state::fghtbskt)
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(m63_state, fghtbskt_flipscreen_w))
 	//MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(m63_state, fghtbskt_samples_w))
 
-	MCFG_CPU_ADD("soundcpu", I8039,XTAL_12MHz/4)    /* ????? */
+	MCFG_CPU_ADD("soundcpu", I8039,XTAL(12'000'000)/4)    /* ????? */
 	MCFG_CPU_PROGRAM_MAP(i8039_map)
 	MCFG_CPU_IO_MAP(i8039_port_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(m63_state, snd_irq,  60/2)
@@ -839,7 +839,7 @@ MACHINE_CONFIG_START(m63_state::fghtbskt)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)

@@ -329,7 +329,7 @@ static INPUT_PORTS_START( invqix )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(invqix_state::invqix)
-	MCFG_CPU_ADD("maincpu", H8S2394, XTAL_20MHz)
+	MCFG_CPU_ADD("maincpu", H8S2394, XTAL(20'000'000))
 	MCFG_CPU_PROGRAM_MAP(invqix_prg_map)
 	MCFG_CPU_IO_MAP(invqix_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", invqix_state,  irq1_line_hold)
@@ -346,7 +346,7 @@ MACHINE_CONFIG_START(invqix_state::invqix)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM9810_ADD("oki", XTAL_4_096MHz)
+	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 

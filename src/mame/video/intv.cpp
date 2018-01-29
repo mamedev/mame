@@ -37,7 +37,7 @@ uint32_t intv_state::screen_update_intvkbd(screen_device &screen, bitmap_ind16 &
 		{
 			for(int x=0;x<40;x++)
 			{
-				if ((cursor_row == current_row) && (cursor_col == x+1)) {
+				if ((cursor_row == y) && (cursor_col == x+1)) {
 					/* draw the cursor as a solid white block */
 					m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					191, /* a block */

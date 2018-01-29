@@ -113,7 +113,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(wangpc_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8051_TAG, I8051, XTAL_4MHz)
+	MCFG_CPU_ADD(I8051_TAG, I8051, XTAL(4'000'000))
 	MCFG_CPU_IO_MAP(wangpc_keyboard_io)
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(wangpc_keyboard_device, mcs51_tx_callback))
 	MCFG_MCS51_SERIAL_RX_CB(READ8(wangpc_keyboard_device, mcs51_rx_callback))

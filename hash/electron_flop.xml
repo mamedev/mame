@@ -777,6 +777,32 @@
 		</part>
 	</software>
 
+	<software name="adfse00">
+		<description>P.R.E.S. ADFS E00</description>
+		<year>1986</year>
+		<publisher>P.R.E.S.</publisher>
+		<info name="usage" value="Requires 32K SWR (ABR)" />
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="pres_adfs_e00-adfs_e.adf" size="327680" crc="4fcf968c" sha1="1b625588c6e50fc91cefabfa238ed7fadccc3c70" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dfse00">
+		<description>Advanced Electron DFS E00</description>
+		<year>1986</year>
+		<publisher>Advanced Computer Products</publisher>
+		<info name="usage" value="Requires 16K SWR (ABR)" />
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="acp_dfs_e00-adfs_e.adf" size="327680" crc="4f2910a6" sha1="704196274014bd27c337403e6b16e8c7e9a4b711" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Magazines -->
 
 	<software name="euser401">

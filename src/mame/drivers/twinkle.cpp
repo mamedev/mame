@@ -1024,7 +1024,7 @@ void twinkle_state::cdrom_config(device_t *device)
 
 MACHINE_CONFIG_START(twinkle_state::twinkle)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
 	MCFG_CPU_PROGRAM_MAP( main_map )
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -1055,7 +1055,7 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 
 	MCFG_DEVICE_ADD("rtc", RTC65271, 0)
 
-	MCFG_DEVICE_ADD("fdc37c665gt", FDC37C665GT, XTAL_24MHz)
+	MCFG_DEVICE_ADD("fdc37c665gt", FDC37C665GT, XTAL(24'000'000))
 
 	MCFG_DEVICE_ADD("rs232", RS232_PORT, 0)
 	MCFG_SLOT_OPTION_ADD("xvd701", JVC_XVD701)
@@ -1073,16 +1073,16 @@ MACHINE_CONFIG_START(twinkle_state::twinkle)
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("^rs232", rs232_port_device, write_rts))
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("speakerleft", "speakerright")
 
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
+	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE( 0, "speakerleft", 0.75 )
 	MCFG_SOUND_ROUTE( 1, "speakerright", 0.75 )
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL_33_8688MHz/2);
+	MCFG_RF5C400_ADD("rfsnd", XTAL(33'868'800)/2);
 	MCFG_DEVICE_ADDRESS_MAP(0, rf5c400_map)
 	MCFG_SOUND_ROUTE(0, "speakerleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "speakerright", 1.0)

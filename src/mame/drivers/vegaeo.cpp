@@ -219,7 +219,7 @@ uint32_t vegaeo_state::screen_update_vega(screen_device &screen, bitmap_ind16 &b
 
 
 MACHINE_CONFIG_START(vegaeo_state::vega)
-	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL_55MHz)
+	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL(55'000'000))
 	MCFG_CPU_PROGRAM_MAP(vega_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", vegaeo_state, eolith_speedup, "screen", 0, 1)
 
@@ -245,7 +245,7 @@ MACHINE_CONFIG_START(vegaeo_state::vega)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("qs1000", QS1000, XTAL_24MHz)
+	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
 	MCFG_QS1000_IN_P1_CB(READ8(vegaeo_state, qs1000_p1_r))
 	MCFG_QS1000_OUT_P1_CB(WRITE8(vegaeo_state, qs1000_p1_w))

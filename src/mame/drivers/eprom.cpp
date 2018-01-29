@@ -186,13 +186,12 @@ static ADDRESS_MAP_START( guts_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x360020, 0x360021) AM_DEVWRITE("jsa", atari_jsa_ii_device, sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_DEVWRITE8("jsa", atari_jsa_ii_device, main_command_w, 0x00ff)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM AM_SHARE("paletteram")
-	AM_RANGE(0xff0000, 0xff1fff) AM_DEVWRITE("playfield", tilemap_device, write16_ext) AM_SHARE("playfield_ext")
-	AM_RANGE(0xff8000, 0xff9fff) AM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
+	AM_RANGE(0xff0000, 0xff1fff) AM_RAM AM_DEVWRITE("playfield", tilemap_device, write16_ext) AM_SHARE("playfield_ext")
+	AM_RANGE(0xff8000, 0xff9fff) AM_RAM AM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
 	AM_RANGE(0xffa000, 0xffbfff) AM_RAM AM_SHARE("mob")
-	AM_RANGE(0xffc000, 0xffcf7f) AM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
+	AM_RANGE(0xffc000, 0xffcf7f) AM_RAM AM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
 	AM_RANGE(0xffcf80, 0xffcfff) AM_RAM AM_SHARE("mob:slip")
-	AM_RANGE(0xff0000, 0xff1fff) AM_RAM
-	AM_RANGE(0xff8000, 0xffffff) AM_RAM
+	AM_RANGE(0xffd000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 

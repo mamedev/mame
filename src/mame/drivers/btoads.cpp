@@ -14,9 +14,9 @@
 #include "speaker.h"
 
 
-#define CPU_CLOCK           XTAL_64MHz
-#define VIDEO_CLOCK         XTAL_20MHz
-#define SOUND_CLOCK         XTAL_24MHz
+#define CPU_CLOCK           XTAL(64'000'000)
+#define VIDEO_CLOCK         XTAL(20'000'000)
+#define SOUND_CLOCK         XTAL(24'000'000)
 
 
 

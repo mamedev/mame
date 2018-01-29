@@ -58,8 +58,8 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 /* Define clocks based on actual OSC on the PCB */
 
-#define CPU_CLOCK           (XTAL_32MHz / 4)        /* 8 MHz clock for 68000 */
-#define SOUND_CPU_CLOCK     (XTAL_32MHz / 8)        /* 4 MHz clock for Z80 sound CPU */
+#define CPU_CLOCK           (XTAL(32'000'000) / 4)        /* 8 MHz clock for 68000 */
+#define SOUND_CPU_CLOCK     (XTAL(32'000'000) / 8)        /* 4 MHz clock for Z80 sound CPU */
 
 
 /***********************************************************
@@ -229,7 +229,7 @@ MACHINE_CONFIG_START(volfied_state::volfied)
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)   /* 4MHz sound CPU, required to run the game */
 	MCFG_CPU_PROGRAM_MAP(z80_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)/2) /* ? MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 

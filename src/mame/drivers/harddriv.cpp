@@ -1437,7 +1437,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_CPU_ADD("maincpu", M68010, HARDDRIV_MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(driver_68k_map)
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", harddriv_state, video_int_gen)
-	MCFG_CPU_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen,  (double)HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
+	MCFG_CPU_PERIODIC_INT_DRIVER(harddriv_state, hd68k_irq_gen, HARDDRIV_MASTER_CLOCK/16/16/16/16/2)
 
 	MCFG_SLAPSTIC_ADD("slapstic", 117)
 	MCFG_SLAPSTIC_68K_ACCESS(1)
@@ -1460,7 +1460,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_nomsp)
 	MCFG_M48T02_ADD("200e") // MK48T02
 	MCFG_EEPROM_2816_ADD("210e") // MK48Z02
 
-	MCFG_DEVICE_ADD("duartn68681", MC68681, XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duartn68681", MC68681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(harddriv_state, harddriv_duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE ("rs232", rs232_port_device, write_txd))
 
@@ -1484,7 +1484,7 @@ MACHINE_CONFIG_START(harddriv_state::driver_msp)
 	MCFG_FRAGMENT_ADD( driver_nomsp )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("msp", TMS34010, XTAL_50MHz)
+	MCFG_CPU_ADD("msp", TMS34010, XTAL(50'000'000))
 	MCFG_CPU_PROGRAM_MAP(driver_msp_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(5000000) /* pixel clock */
@@ -1523,7 +1523,7 @@ MACHINE_CONFIG_START(harddriv_state::multisync_msp)
 	MCFG_FRAGMENT_ADD( multisync_nomsp )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("msp", TMS34010, XTAL_50MHz)
+	MCFG_CPU_ADD("msp", TMS34010, XTAL(50'000'000))
 	MCFG_CPU_PROGRAM_MAP(driver_msp_map)
 	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(5000000) /* pixel clock */
@@ -1562,7 +1562,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(harddriv_state::adsp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("adsp", ADSP2100, XTAL_32MHz/4)
+	MCFG_CPU_ADD("adsp", ADSP2100, XTAL(32'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
 	MCFG_CPU_DATA_MAP(adsp_data_map)
 MACHINE_CONFIG_END
@@ -1572,12 +1572,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(harddriv_state::ds3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("adsp", ADSP2101, XTAL_12MHz)
+	MCFG_CPU_ADD("adsp", ADSP2101, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(ds3_program_map)
 	MCFG_CPU_DATA_MAP(ds3_data_map)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))
 
-	MCFG_CPU_ADD("ds3sdsp", ADSP2105, XTAL_10MHz)
+	MCFG_CPU_ADD("ds3sdsp", ADSP2105, XTAL(10'000'000))
 	MCFG_ADSP21XX_SPORT_RX_CB(READ32(harddriv_state, hdds3sdsp_serial_rx_callback))
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(harddriv_state, hdds3sdsp_serial_tx_callback))
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(harddriv_state, hdds3sdsp_timer_enable_callback))
@@ -1585,7 +1585,7 @@ MACHINE_CONFIG_START(harddriv_state::ds3)
 	MCFG_CPU_DATA_MAP(ds3sdsp_data_map)
 	MCFG_TIMER_DRIVER_ADD("ds3sdsp_timer", harddriv_state, ds3sdsp_internal_timer_callback)
 
-	MCFG_CPU_ADD("ds3xdsp", ADSP2105, XTAL_10MHz)
+	MCFG_CPU_ADD("ds3xdsp", ADSP2105, XTAL(10'000'000))
 	MCFG_ADSP21XX_SPORT_RX_CB(READ32(harddriv_state, hdds3xdsp_serial_rx_callback))
 	MCFG_ADSP21XX_SPORT_TX_CB(WRITE32(harddriv_state, hdds3xdsp_serial_tx_callback))
 	MCFG_ADSP21XX_TIMER_FIRED_CB(WRITELINE(harddriv_state, hdds3xdsp_timer_enable_callback))
@@ -1614,7 +1614,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(harddriv_state::dsk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dsp32", DSP32C, XTAL_40MHz)
+	MCFG_CPU_ADD("dsp32", DSP32C, XTAL(40'000'000))
 	MCFG_DSP32C_OUTPUT_CALLBACK(WRITE32(harddriv_state,hddsk_update_pif))
 	MCFG_CPU_PROGRAM_MAP(dsk_dsp32_map)
 
@@ -1630,7 +1630,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(harddriv_state::dsk2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("dsp32", DSP32C, XTAL_40MHz)
+	MCFG_CPU_ADD("dsp32", DSP32C, XTAL(40'000'000))
 	MCFG_DSP32C_OUTPUT_CALLBACK(WRITE32(harddriv_state,hddsk_update_pif))
 	MCFG_CPU_PROGRAM_MAP(dsk2_dsp32_map)
 

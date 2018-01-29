@@ -1032,11 +1032,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(vamphalf_state::sound_ym_oki)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_28MHz/8) /* 3.5MHz */
+	MCFG_YM2151_ADD("ymsnd", XTAL(28'000'000)/8) /* 3.5MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28MHz/16 , PIN7_HIGH) /* 1.75MHz */
+	MCFG_OKIM6295_ADD("oki", XTAL(28'000'000)/16 , PIN7_HIGH) /* 1.75MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1044,11 +1044,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(vamphalf_state::sound_suplup)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4) /* 3.579545 MHz */
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* 3.579545 MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_14_31818MHz/8, PIN7_HIGH) /* 1.7897725 MHz */
+	MCFG_OKIM6295_ADD("oki", XTAL(14'318'181)/8, PIN7_HIGH) /* 1.7897725 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1057,7 +1057,7 @@ MACHINE_CONFIG_START(vamphalf_state::sound_qs1000)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("qs1000", QS1000, XTAL_24MHz)
+	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
 	MCFG_QS1000_IN_P1_CB(READ8(vamphalf_state, qs1000_p1_r))
 	MCFG_QS1000_OUT_P3_CB(WRITE8(vamphalf_state, qs1000_p3_w))
@@ -1073,7 +1073,7 @@ MACHINE_CONFIG_DERIVED(vamphalf_state::vamphalf, common)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(vamphalf_state::misncrft, common)
-	MCFG_CPU_REPLACE("maincpu", GMS30C2116, XTAL_50MHz)   /* 50 MHz */
+	MCFG_CPU_REPLACE("maincpu", GMS30C2116, XTAL(50'000'000))   /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_IO_MAP(misncrft_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
@@ -1103,7 +1103,7 @@ MACHINE_CONFIG_DERIVED(vamphalf_state::jmpbreak, common)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(vamphalf_state::mrdig, common)
-	MCFG_CPU_REPLACE("maincpu", GMS30C2116, XTAL_50MHz)   /* 50 MHz */
+	MCFG_CPU_REPLACE("maincpu", GMS30C2116, XTAL(50'000'000))   /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_map)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mrdig_io)
@@ -1113,7 +1113,7 @@ MACHINE_CONFIG_DERIVED(vamphalf_state::mrdig, common)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(vamphalf_state::wyvernwg, common)
-	MCFG_CPU_REPLACE("maincpu", E132T, XTAL_50MHz)    /* 50 MHz */
+	MCFG_CPU_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(wyvernwg_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
@@ -1122,7 +1122,7 @@ MACHINE_CONFIG_DERIVED(vamphalf_state::wyvernwg, common)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(vamphalf_state::finalgdr, common)
-	MCFG_CPU_REPLACE("maincpu", E132T, XTAL_50MHz)    /* 50 MHz */
+	MCFG_CPU_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(finalgdr_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
@@ -1133,7 +1133,7 @@ MACHINE_CONFIG_DERIVED(vamphalf_state::finalgdr, common)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(vamphalf_state::mrkickera, common)
-	MCFG_CPU_REPLACE("maincpu", E132T, XTAL_50MHz)    /* 50 MHz */
+	MCFG_CPU_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(common_32bit_map)
 	MCFG_CPU_IO_MAP(mrkickera_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
@@ -1146,7 +1146,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(vamphalf_state::aoh)
-	MCFG_CPU_ADD("maincpu", E132XN, XTAL_20MHz*4) /* 4x internal multiplier */
+	MCFG_CPU_ADD("maincpu", E132XN, XTAL(20'000'000)*4) /* 4x internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(aoh_map)
 	MCFG_CPU_IO_MAP(aoh_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)
@@ -1169,15 +1169,15 @@ MACHINE_CONFIG_START(vamphalf_state::aoh)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki_1", XTAL_32MHz/8, PIN7_HIGH) /* 4MHz */
+	MCFG_OKIM6295_ADD("oki_1", XTAL(32'000'000)/8, PIN7_HIGH) /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki_2", XTAL_32MHz/32, PIN7_HIGH) /* 1MHz */
+	MCFG_OKIM6295_ADD("oki_2", XTAL(32'000'000)/32, PIN7_HIGH) /* 1MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1190,7 +1190,7 @@ MACHINE_CONFIG_DERIVED(vamphalf_state::boonggab, common)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(vamphalf_state::yorijori, common)
-	MCFG_CPU_REPLACE("maincpu", E132T, XTAL_50MHz)    /* 50 MHz */
+	MCFG_CPU_REPLACE("maincpu", E132T, XTAL(50'000'000))    /* 50 MHz */
 	MCFG_CPU_PROGRAM_MAP(yorijori_32bit_map)
 	MCFG_CPU_IO_MAP(yorijori_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vamphalf_state,  irq1_line_hold)

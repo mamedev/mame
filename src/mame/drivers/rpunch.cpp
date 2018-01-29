@@ -117,8 +117,8 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_16MHz
-#define VIDEO_CLOCK         XTAL_13_333MHz
+#define MASTER_CLOCK        XTAL(16'000'000)
+#define VIDEO_CLOCK         XTAL(13'333'000)
 
 
 /*************************************

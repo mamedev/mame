@@ -240,5 +240,5 @@ MACHINE_CONFIG_START(cgc7900_state::cgc7900_video)
 	MCFG_PALETTE_ADD("palette", 8)
 	MCFG_PALETTE_INIT_OWNER(cgc7900_state, cgc7900)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink", cgc7900_state, blink_tick, attotime::from_hz(XTAL_28_48MHz/7500000))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("blink", cgc7900_state, blink_tick, attotime::from_hz(XTAL(28'480'000)/7500000))
 MACHINE_CONFIG_END

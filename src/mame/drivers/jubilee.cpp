@@ -199,7 +199,7 @@
 #include "video/mc6845.h"
 #include "screen.h"
 
-#define MASTER_CLOCK    XTAL_6MHz              /* confirmed */
+#define MASTER_CLOCK    XTAL(6'000'000)              /* confirmed */
 #define CPU_CLOCK      (MASTER_CLOCK / 2)      /* guess */
 #define CRTC_CLOCK     (MASTER_CLOCK / 8)      /* guess */
 

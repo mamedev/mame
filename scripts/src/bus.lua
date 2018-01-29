@@ -740,6 +740,27 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/electron/cart/slot.h,BUSES["ELECTRON_CART"] = true
+---------------------------------------------------
+
+if (BUSES["ELECTRON_CART"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/electron/cart/slot.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/slot.h",
+		MAME_DIR .. "src/devices/bus/electron/cart/abr.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/abr.h",
+		MAME_DIR .. "src/devices/bus/electron/cart/click.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/click.h",
+		MAME_DIR .. "src/devices/bus/electron/cart/peg400.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/peg400.h",
+		MAME_DIR .. "src/devices/bus/electron/cart/std.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/std.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/ep64/exp.h,BUSES["EP64"] = true
 ---------------------------------------------------
 
@@ -3068,6 +3089,20 @@ if (BUSES["PSX_CONTROLLER"]~=null) then
 		MAME_DIR .. "src/devices/bus/psx/multitap.h",
 		MAME_DIR .. "src/devices/bus/psx/memcard.cpp",
 		MAME_DIR .. "src/devices/bus/psx/memcard.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/psx/parallel.h,BUSES["PSX_PARALLEL"] = true
+---------------------------------------------------
+
+if (BUSES["PSX_PARALLEL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/psx/parallel.cpp",
+		MAME_DIR .. "src/devices/bus/psx/parallel.h",
+		MAME_DIR .. "src/devices/bus/psx/gamebooster.cpp",
+		MAME_DIR .. "src/devices/bus/psx/gamebooster.h",
 	}
 end
 

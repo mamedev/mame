@@ -45,7 +45,7 @@ A1                   2101            2101
 
 #include "ace.lh"
 
-#define MASTER_CLOCK XTAL_18MHz
+#define MASTER_CLOCK XTAL(18'000'000)
 
 
 class aceal_state : public driver_device

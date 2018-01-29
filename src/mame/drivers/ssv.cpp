@@ -2543,9 +2543,9 @@ DRIVER_INIT_MEMBER(ssv_state,ultrax)        {   init(1); }
 DRIVER_INIT_MEMBER(ssv_state,vasara)        {   init(0); }
 DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init(0); save_item(NAME(m_latches)); }
 
-#define SSV_MASTER_CLOCK XTAL_48MHz/3
+#define SSV_MASTER_CLOCK XTAL(48'000'000)/3
 
-#define SSV_PIXEL_CLOCK XTAL_42_9545MHz/6
+#define SSV_PIXEL_CLOCK XTAL(42'954'545)/6
 #define SSV_HTOTAL 0x1c6
 #define SSV_HBEND 0
 #define SSV_HBSTART 0x150

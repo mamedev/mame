@@ -125,7 +125,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(pimps_state::pimps)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 

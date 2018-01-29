@@ -322,7 +322,7 @@ void konamigv_state::cdrom_config(device_t *device)
 
 MACHINE_CONFIG_START(konamigv_state::konamigv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530BQ, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530BQ, XTAL(67'737'600) )
 	MCFG_CPU_PROGRAM_MAP( konamigv_map )
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -343,12 +343,12 @@ MACHINE_CONFIG_START(konamigv_state::konamigv)
 	MCFG_AM53CF96_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0x100000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0x100000, XTAL(53'693'175) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
+	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.75 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.75 )
 MACHINE_CONFIG_END

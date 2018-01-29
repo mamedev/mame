@@ -1030,7 +1030,7 @@ static const char *const alphamc07_sample_names[] =
 // the sound board is the same in all games
 MACHINE_CONFIG_START(equites_state::common_sound)
 
-	MCFG_CPU_ADD("audiocpu", I8085A, XTAL_6_144MHz) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", I8085A, 6.144_MHz_XTAL) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_I8085A_CLK_OUT_DEVICE("audio8155")
@@ -1061,7 +1061,7 @@ MACHINE_CONFIG_START(equites_state::common_sound)
 	MCFG_SOUND_ROUTE(9, "speaker", 1.0)        // pin 2 SOLO 16' (this actually feeds an analog section)
 	MCFG_SOUND_ROUTE(10,"speaker", 0.12)       // pin 22 Noise Output (this actually feeds an analog section)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_6_144MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("aysnd", AY8910, 6.144_MHz_XTAL/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(equites_state, equites_8910porta_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(equites_state, equites_8910portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
@@ -1130,7 +1130,7 @@ void equites_state::machine_reset()
 MACHINE_CONFIG_START(equites_state::equites)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, 12_MHz_XTAL/4) /* 68000P8 running at 3mhz! verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(equites_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, equites_scanline, "screen", 0, 1)
 
@@ -1180,7 +1180,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(equites_state::splndrbt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, 24_MHz_XTAL/4) /* 68000P8 running at 6mhz, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(splndrbt_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, splndrbt_scanline, "screen", 0, 1)
 

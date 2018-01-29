@@ -131,7 +131,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(cvicny_state::cvicny)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(cvicny_mem)
 
 	/* video hardware */

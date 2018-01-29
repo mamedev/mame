@@ -48,8 +48,8 @@
     properly implement RTC (integrated into the CPU)
     Verify Sprite Zoom (check exactly which pixels are doubled / missed on hardware for flipped , non-flipped cases etc.)
     Fix Save States (is this a driver problem or an ARM core problem, they don't work unless you get through the startup tests)
-	Determine motherboard card reader MCU internal ROM size and add as NO_DUMP to the sets
-	See if kov2nl needs another idle skip, after Game Over there is a period where the current one is ineffective
+    Determine motherboard card reader MCU internal ROM size and add as NO_DUMP to the sets
+    See if kov2nl needs another idle skip, after Game Over there is a period where the current one is ineffective
 
     Debug features (require DIP SW1:8 On and SW1:1 Off):
     - QC TEST mode: hold P1 A+B during boot
@@ -142,7 +142,7 @@ void pgm2_state::postload()
 
 		if (m_romboard_ram)
 		{
-			decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0x0200000); 
+			decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0x0200000);
 		}
 		else
 		{
@@ -470,28 +470,29 @@ READ16_MEMBER(pgm2_state::module_rom_r)
 WRITE16_MEMBER(pgm2_state::module_rom_w)
 {
 	//printf("module write %04X at %08X\n", data, offset);
-	switch (data)
+	uint32_t dec_val = ((module_key->key[0] | (module_key->key[1] << 8) | (module_key->key[2] << 16)) >> 6) & 0xffff;
+	if (data == dec_val)
 	{
-	case 0x4947: // "IG" 1st part of key
-		break;
-	case 0xc2b1: // 2nd part of key, assume it enables descramble
 		// might be wrong and normal data access enabled only after whole sequence complete
 		decrypt_kov3_module(module_key->addr_xor, module_key->data_xor);
-		break;
-	// following might be wrong, and trigger is address or both
-	case 0x00c2: // checksum read mode enable, step 1 and 4
-		module_sum_read = true;
-		if (offset != 0xe5a7 && offset != 0xa521)
-			popmessage("module write %04X at %08X\n", data, offset);
-		break;
-	case 0x0084: // checksum read mode enable, step 2 and 3
-		if (offset != 0x5e7a && offset != 0x5a12)
-			popmessage("module write %04X at %08X\n", data, offset);
-		break;
-	default:
-		popmessage("module write %04X at %08X\n", data, offset);
-		break;
 	}
+	else
+		switch (data)
+		{
+			// following might be wrong, and trigger is address or both
+		case 0x00c2: // checksum read mode enable, step 1 and 4
+			module_sum_read = true;
+			if (offset != 0xe5a7 && offset != 0xa521)
+				popmessage("module write %04X at %08X\n", data, offset);
+			break;
+		case 0x0084: // checksum read mode enable, step 2 and 3
+			if (offset != 0x5e7a && offset != 0x5a12)
+				popmessage("module write %04X at %08X\n", data, offset);
+			break;
+		default:
+			logerror("module write %04X at %08X\n", data, offset);
+			break;
+		}
 }
 
 // very primitive Atmel ARM PIO simulation, should be improved and devicified
@@ -882,7 +883,7 @@ MACHINE_CONFIG_END
 	ROM_LOAD( #prefix "_v101" #extension ".u7",  0x000000, 0x800000, CRC(45805b53) SHA1(f2a8399c821b75fadc53e914f6f318707e70787c) )
 
 /*
-   Internal ROMs for CHINA and OVERSEA are confirmed to differ by just the region byte, other regions not yet verified.
+   Internal ROMs for CHINA, JAPAN and OVERSEA are confirmed to differ by just the region byte, other regions not yet verified.
    label is a localized version of the game title and the country code (see above)
    For OVERSEA this is "O/L2", but we omit the / due to naming rules
    For the CHINA version this uses the Chinese characters
@@ -897,6 +898,10 @@ MACHINE_CONFIG_END
 #define ORLEG2_INTERNAL_OVERSEAS \
 	ROM_REGION( 0x04000, "maincpu", 0 ) \
 	ROM_LOAD( "ol2_fa.igs036", 0x00000000, 0x0004000, CRC(cc4d398a) SHA1(c50bcc81f02cd5aa8ad157d73209dc53bdedc023) )
+
+#define ORLEG2_INTERNAL_JAPAN \
+	ROM_REGION( 0x04000, "maincpu", 0 ) \
+	ROM_LOAD( "ol2_a10.igs036", 0x00000000, 0x0004000, CRC(69375284) SHA1(a120c6a3d8d7898cc3ca508abea78e5e54090c66) )
 
 ROM_START( orleg2 )
 	ORLEG2_INTERNAL_OVERSEAS
@@ -931,6 +936,24 @@ ROM_END
 ROM_START( orleg2_101cn )
 	ORLEG2_INTERNAL_CHINA
 	ORLEG2_PROGRAM_101(xyj2,cn)
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_104jp )
+	ORLEG2_INTERNAL_JAPAN
+	ORLEG2_PROGRAM_104(ol2,a10)
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_103jp )
+	ORLEG2_INTERNAL_JAPAN
+	ORLEG2_PROGRAM_103(ol2,a10)
+	ORLEG2_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( orleg2_101jp )
+	ORLEG2_INTERNAL_JAPAN
+	ORLEG2_PROGRAM_101(ol2,a10)
 	ORLEG2_VIDEO_SOUND_ROMS
 ROM_END
 
@@ -1122,6 +1145,15 @@ ROM_START( kov3_102 )
 
 	ROM_REGION( 0x1000000, "user1", 0 )
 	ROM_LOAD( "kov3_v102cn_raw.bin",         0x00000000, 0x0800000, CRC(61d0dabd) SHA1(959b22ef4e342ca39c2386549ac7274f9d580ab8) )
+
+	KOV3_VIDEO_SOUND_ROMS
+ROM_END
+
+ROM_START( kov3_101 )
+	KOV3_INTERNAL_CHINA
+
+	ROM_REGION( 0x1000000, "user1", 0 )
+	ROM_LOAD( "kov3_v101.bin",         0x00000000, 0x0800000, BAD_DUMP CRC(d6664449) SHA1(64d912425f018c3531951019b33e909657724547) ) // dump was not raw, manually xored with fake value
 
 	KOV3_VIDEO_SOUND_ROMS
 ROM_END
@@ -1403,6 +1435,7 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojt)
 // currently we don't know how to derive address/data xor values from real keys, so we need both
 static const kov3_module_key kov3_104_key = { { 0x40,0xac,0x30,0x00,0x47,0x49,0x00,0x00 } ,{ 0xeb,0x7d,0x8d,0x90,0x2c,0xf4,0x09,0x82 }, 0x18ec71, 0xb89d }; // fake zero-key
 static const kov3_module_key kov3_102_key = { { 0x49,0xac,0xb0,0xec,0x47,0x49,0x95,0x38 } ,{ 0x09,0xbd,0xf1,0x31,0xe6,0xf0,0x65,0x2b }, 0x021d37, 0x81d0 };
+static const kov3_module_key kov3_101_key = { { 0xc1,0x2c,0xc1,0xe5,0x3c,0xc1,0x59,0x9e } ,{ 0xf2,0xb2,0xf0,0x89,0x37,0xf2,0xc7,0x0b }, 0, 0xffff }; // real xor values is unknown
 static const kov3_module_key kov3_100_key = { { 0x40,0xac,0x30,0x00,0x47,0x49,0x00,0x00 } ,{ 0x96,0xf0,0x91,0xe1,0xb3,0xf1,0xef,0x90 }, 0x3e8aa8, 0xc530 }; // fake zero-key
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
@@ -1438,6 +1471,12 @@ DRIVER_INIT_MEMBER(pgm2_state, kov3_102)
 	DRIVER_INIT_CALL(kov3);
 }
 
+DRIVER_INIT_MEMBER(pgm2_state, kov3_101)
+{
+	module_key = &kov3_101_key;
+	DRIVER_INIT_CALL(kov3);
+}
+
 DRIVER_INIT_MEMBER(pgm2_state, kov3_100)
 {
 	module_key = &kov3_100_key;
@@ -1465,6 +1504,10 @@ GAME( 2007, orleg2_104cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,     
 GAME( 2007, orleg2_103cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
 GAME( 2007, orleg2_101cn, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
 
+GAME( 2007, orleg2_104jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V104, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_103jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V103, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101jp, orleg2,    pgm2,    pgm2, pgm2_state,     orleg2,       ROT0, "IGS", "Oriental Legend 2 (V101, Japan)", MACHINE_SUPPORTS_SAVE )
+
 // Knights of Valour 2 New Legend
 GAME( 2008, kov2nl,       0,         pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V302, Oversea)", MACHINE_SUPPORTS_SAVE )
 GAME( 2008, kov2nl_301,   kov2nl,    pgm2,    pgm2, pgm2_state,     kov2nl,       ROT0, "IGS", "Knights of Valour 2 New Legend (V301, Oversea)", MACHINE_SUPPORTS_SAVE )
@@ -1481,6 +1524,7 @@ GAME( 2010, ddpdojt,      0,    pgm2_ramrom,    pgm2, pgm2_state,     ddpdojt,  
 // Knights of Valour 3 - should be a V103 and V101 too
 GAME( 2011, kov3,         0,    pgm2_hires, pgm2, pgm2_state,     kov3_104,   ROT0, "IGS", "Knights of Valour 3 (V104, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
 GAME( 2011, kov3_102,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_102,   ROT0, "IGS", "Knights of Valour 3 (V102, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2011, kov3_101,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_101,   ROT0, "IGS", "Knights of Valour 3 (V101, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
 GAME( 2011, kov3_100,     kov3, pgm2_hires, pgm2, pgm2_state,     kov3_100,   ROT0, "IGS", "Knights of Valour 3 (V100, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
 
 // King of Fighters '98: Ultimate Match Hero

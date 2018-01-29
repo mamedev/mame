@@ -243,7 +243,7 @@ DRIVER_INIT_MEMBER(de_3b_state,de_3b)
 
 MACHINE_CONFIG_START(de_3b_state::de_3b)
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE3B_ADD("decocpu",XTAL_8MHz / 2, ":maincpu")
+	MCFG_DECOCPU_TYPE3B_ADD("decocpu",XTAL(8'000'000) / 2, ":maincpu")
 	MCFG_DECOCPU_DISPLAY(READ8(de_3b_state,display_r),WRITE8(de_3b_state,display_w))
 	MCFG_DECOCPU_SOUNDLATCH(WRITE8(de_3b_state,sound_w))
 	MCFG_DECOCPU_SWITCH(READ8(de_3b_state,switch_r),WRITE8(de_3b_state,switch_w))
@@ -261,7 +261,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(de_3b_state::detest)
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE3B_ADD("decocpu",XTAL_8MHz / 2, ":maincpu")
+	MCFG_DECOCPU_TYPE3B_ADD("decocpu",XTAL(8'000'000) / 2, ":maincpu")
 
 	MCFG_FRAGMENT_ADD( genpin_audio )
 MACHINE_CONFIG_END

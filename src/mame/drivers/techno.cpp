@@ -257,7 +257,7 @@ void techno_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	else if (id == IRQ_SET_TIMER)
 	{
 		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, ASSERT_LINE, m_vector);
-		m_irq_advance_timer->adjust(attotime::from_hz(XTAL_8MHz / 32));
+		m_irq_advance_timer->adjust(attotime::from_hz(XTAL(8'000'000) / 32));
 	}
 }
 
@@ -272,18 +272,18 @@ void techno_state::machine_reset()
 	m_vector = 0x88;
 	m_digit = 0;
 
-	attotime freq = attotime::from_hz(XTAL_8MHz / 256); // 31250Hz
+	attotime freq = attotime::from_hz(XTAL(8'000'000) / 256); // 31250Hz
 	m_irq_set_timer->adjust(freq, 0, freq);
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
 MACHINE_CONFIG_START(techno_state::techno)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(techno_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	//MCFG_CPU_ADD("cpu2", TMS7000, XTAL_4MHz)
+	//MCFG_CPU_ADD("cpu2", TMS7000, XTAL(4'000'000))
 	//MCFG_CPU_PROGRAM_MAP(techno_sub_map)
 
 	/* Video */

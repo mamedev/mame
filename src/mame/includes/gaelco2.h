@@ -60,6 +60,7 @@ public:
 	void alighunt_d5002fp(machine_config &config);
 	void snowboar(machine_config &config);
 	void maniacsq(machine_config &config);
+	void maniacsqs(machine_config &config);
 	void touchgo_d5002fp(machine_config &config);
 protected:
 	required_device<m68000_device> m_maincpu;

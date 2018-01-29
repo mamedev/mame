@@ -404,7 +404,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(safarir_state::safarir)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18MHz/12)  /* 1.5 MHz ? */
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'000'000)/12)  /* 1.5 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	/* video hardware */

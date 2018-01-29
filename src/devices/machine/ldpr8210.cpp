@@ -53,13 +53,13 @@
 #define SEEK_FAST_SPEED                 (4000 / 30)         // 4000 frames/second
 
 // serial timing, mostly from the service manual, derived from the XTAL
-#define SERIAL_CLOCK                    XTAL_455kHz
-#define SERIAL_0_BIT_TIME               attotime::from_hz((double)SERIAL_CLOCK / 512)
-#define SERIAL_1_BIT_TIME               attotime::from_hz((double)SERIAL_CLOCK / 1024)
-#define SERIAL_MIDPOINT_TIME            attotime::from_hz((double)SERIAL_CLOCK / 600)
-#define SERIAL_MAX_BIT_TIME             attotime::from_hz((double)SERIAL_CLOCK / 4096)
-#define SERIAL_MAX_WORD_TIME            attotime::from_hz((double)SERIAL_CLOCK / 11520)
-#define SERIAL_REJECT_DUPLICATE_TIME    attotime::from_hz((double)SERIAL_CLOCK / 11520 / 4)
+#define SERIAL_CLOCK                    XTAL(455'000)
+#define SERIAL_0_BIT_TIME               attotime::from_hz(SERIAL_CLOCK / 512)
+#define SERIAL_1_BIT_TIME               attotime::from_hz(SERIAL_CLOCK / 1024)
+#define SERIAL_MIDPOINT_TIME            attotime::from_hz(SERIAL_CLOCK / 600)
+#define SERIAL_MAX_BIT_TIME             attotime::from_hz(SERIAL_CLOCK / 4096)
+#define SERIAL_MAX_WORD_TIME            attotime::from_hz(SERIAL_CLOCK / 11520)
+#define SERIAL_REJECT_DUPLICATE_TIME    attotime::from_hz(SERIAL_CLOCK / 11520 / 4)
 
 
 
@@ -373,7 +373,7 @@ const tiny_rom_entry *pioneer_pr8210_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pioneer_pr8210_device::device_add_mconfig)
-	MCFG_CPU_ADD("pr8210", I8049, XTAL_4_41MHz)
+	MCFG_CPU_ADD("pr8210", I8049, XTAL(4'410'000))
 	MCFG_CPU_IO_MAP(pr8210_portmap)
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(pioneer_pr8210_device, i8049_bus_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(pioneer_pr8210_device, i8049_port1_w))
@@ -1000,7 +1000,7 @@ const tiny_rom_entry *simutrek_special_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(simutrek_special_device::device_add_mconfig)
-	MCFG_CPU_ADD("simutrek", I8748, XTAL_6MHz)
+	MCFG_CPU_ADD("simutrek", I8748, XTAL(6'000'000))
 	MCFG_CPU_IO_MAP(simutrek_portmap)
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(simutrek_special_device, i8748_port2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(simutrek_special_device, i8748_port2_w))

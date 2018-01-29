@@ -294,7 +294,7 @@ WRITE_LINE_MEMBER(kron180_state::keyb_interrupt)
  */
 MACHINE_CONFIG_START(kron180_state::kron180)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", Z180, XTAL_12_288MHz)
+	MCFG_CPU_ADD ("maincpu", Z180, XTAL(12'288'000))
 	MCFG_CPU_PROGRAM_MAP (kron180_mem)
 	MCFG_CPU_IO_MAP(kron180_iomap)
 

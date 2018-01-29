@@ -16,6 +16,7 @@ public:
 		m_rowscrollram(*this, "rowscrollram"),
 		m_vidregs2(*this, "vidregs2"),
 		m_spriteram(*this, "spriteram"),
+		m_generic_paletteram_16(*this, "paletteram"),
 		m_oki_1(*this, "oki1"),
 		m_oki_2(*this, "oki2") ,
 		m_maincpu(*this, "maincpu"),
@@ -31,6 +32,7 @@ public:
 	required_shared_ptr<uint16_t> m_rowscrollram;
 	required_shared_ptr<uint16_t> m_vidregs2;
 	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_generic_paletteram_16;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;
@@ -58,6 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER(drgnmst_pcm_banksel_w);
 	DECLARE_WRITE8_MEMBER(drgnmst_oki_w);
 	DECLARE_WRITE8_MEMBER(drgnmst_snd_control_w);
+	DECLARE_WRITE16_MEMBER(drgnmst_paletteram_w);
 	DECLARE_WRITE16_MEMBER(drgnmst_fg_videoram_w);
 	DECLARE_WRITE16_MEMBER(drgnmst_bg_videoram_w);
 	DECLARE_WRITE16_MEMBER(drgnmst_md_videoram_w);

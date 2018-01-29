@@ -88,17 +88,11 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
  *
  *************************************/
 
-void djmain_state::sndram_set_bank()
-{
-	m_sndram = memregion("shared")->base() + 0x80000 * m_sndram_bank;
-}
-
 WRITE32_MEMBER(djmain_state::sndram_bank_w)
 {
 	if (ACCESSING_BITS_16_31)
 	{
 		m_sndram_bank = (data >> 16) & 0x1f;
-		sndram_set_bank();
 	}
 }
 
@@ -106,6 +100,7 @@ READ32_MEMBER(djmain_state::sndram_r)
 {
 	uint32_t data = 0;
 
+	offset |= 0x80000 * m_sndram_bank;
 	if (ACCESSING_BITS_24_31)
 		data |= m_sndram[offset * 4] << 24;
 
@@ -123,6 +118,7 @@ READ32_MEMBER(djmain_state::sndram_r)
 
 WRITE32_MEMBER(djmain_state::sndram_w)
 {
+	offset |= 0x80000 * m_sndram_bank;
 	if (ACCESSING_BITS_24_31)
 		m_sndram[offset * 4] = data >> 24;
 
@@ -426,6 +422,9 @@ static ADDRESS_MAP_START(maincpu_djmaina, AS_PROGRAM, 32, djmain_state)
 	AM_RANGE(0xf00000, 0xf01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_long_r, ram_long_w)  // VIDEO RAM (tilemap)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(k054539_map, 0, 8, djmain_state)
+	AM_RANGE(0x000000, 0xffffff) AM_RAM AM_SHARE("sndram")
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -1351,8 +1350,6 @@ void djmain_state::machine_start()
 	save_item(NAME(m_pending_vb_int));
 	save_item(NAME(m_v_ctrl));
 	save_item(NAME(m_obj_regs));
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(djmain_state::sndram_set_bank), this));
 }
 
 
@@ -1360,7 +1357,6 @@ void djmain_state::machine_reset()
 {
 	/* reset sound ram bank */
 	m_sndram_bank = 0;
-	sndram_set_bank();
 
 	/* reset LEDs */
 	output().set_led_value(0, 1);
@@ -1410,13 +1406,13 @@ MACHINE_CONFIG_START(djmain_state::djmainj)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
-	MCFG_K054539_REGION_OVERRRIDE("shared")
+	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL_18_432MHz)
-	MCFG_K054539_REGION_OVERRRIDE("shared")
+	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADDRESS_MAP(0, k054539_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1460,8 +1456,6 @@ ROM_START( bm1stmix )
 	DISK_IMAGE( "753jaa11", 0, SHA1(2e70cf31a853322f29f99b6f292c187a2cf33015) ) /* ver 1.00 JA */
 	// There is an alternate image
 	//DISK_IMAGE( "753jaa11", 0, MD5(260c9b72f4a03055e3abad61c6225324) SHA1(2cc3e149744516bf2353a2b47d33bc9d2072b6c4) ) /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( bm2ndmix )
@@ -1483,8 +1477,6 @@ ROM_START( bm2ndmix )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "853jaa11", 0, SHA1(9683ff8462491252b6eb2e5b3aa6496884c01506) ) /* ver 1.10 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( bm2ndmxa )
@@ -1506,8 +1498,6 @@ ROM_START( bm2ndmxa )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "853jaa11", 0, SHA1(9683ff8462491252b6eb2e5b3aa6496884c01506) ) /* ver 1.10 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( bm3rdmix )
@@ -1529,8 +1519,6 @@ ROM_START( bm3rdmix )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "825jaa11", 0, SHA1(048919977232bbce046406a7212586cf39b77cf2) ) /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( bmcompmx )
@@ -1552,8 +1540,6 @@ ROM_START( bmcompmx )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "858jaa11", 0, SHA1(bc590472046336a1000f29901fe3fd7b29747e47) ) /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( hmcompmx )
@@ -1575,8 +1561,6 @@ ROM_START( hmcompmx )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "858jaa11", 0, SHA1(bc590472046336a1000f29901fe3fd7b29747e47) ) /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( bm4thmix )
@@ -1598,8 +1582,6 @@ ROM_START( bm4thmix )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "847jaa11", 0, SHA1(8cad631531b5616d6a4b0a99d988f4b525932dc7) ) /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( bm5thmix )
@@ -1621,8 +1603,6 @@ ROM_START( bm5thmix )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "981jaa11", 0, SHA1(dc7353fa436d96ae174a58d3a38ca9928a63727f) ) /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( bmclubmx )
@@ -1646,8 +1626,6 @@ ROM_START( bmclubmx )
 	DISK_IMAGE( "993hdda01", 0, SHA1(f5d4df1dd27ce6ee2d0897852342691d55b63bfb) )
 	// this image has not been verified
 	//  DISK_IMAGE( "993jaa11", 0, MD5(e26eb62d7cf3357585f5066da6063143) )  /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( bmcompm2 )
@@ -1669,8 +1647,6 @@ ROM_START( bmcompm2 )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "988jaa11", 0, SHA1(12a0988c631dd3331e54b8417a9659402afe168b) ) /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( hmcompm2 )
@@ -1692,8 +1668,6 @@ ROM_START( hmcompm2 )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "988jaa11", 0, SHA1(12a0988c631dd3331e54b8417a9659402afe168b) ) /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( bmdct )
@@ -1715,8 +1689,6 @@ ROM_START( bmdct )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "995jaa11", 0, SHA1(8fec3c4d97f64f48b9867230a97cda4347496075) ) /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( bmcorerm )
@@ -1738,8 +1710,6 @@ ROM_START( bmcorerm )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "a05jaa11", 0, SHA1(7ebc41cc3e9a0a922b49201b34e29201522eb726) ) /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( bm6thmix )
@@ -1761,8 +1731,6 @@ ROM_START( bm6thmix )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "a21jaa11", 0, SHA1(ed0a07212a360e75934fc22c56265842cf0829b6) ) /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( bm7thmix )
@@ -1786,8 +1754,6 @@ ROM_START( bm7thmix )
 	DISK_IMAGE( "b07jaa11", 0, SHA1(e4925494f0a801abb4d3aa6524c379eb445d8dff) ) /* ver 1.00 JA */
 	// this image has not been verified
 	//DISK_IMAGE( "b07jab11", 0, MD5(0e9440787ca69567792095085e2a3619) )    /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( bmfinal )
@@ -1811,8 +1777,6 @@ ROM_START( bmfinal )
 	DISK_IMAGE( "c01jaa11", 0, SHA1(0a53c4412a72a886f5fb98c12c529d056d625244) ) /* ver 1.00 JA */
 	// this image has not been verified
 	//DISK_IMAGE( "c01jaa11", 0, MD5(8bb7e6b6bc63cac8a4f2997307c25748) )    /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( popn1 )
@@ -1834,8 +1798,6 @@ ROM_START( popn1 )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "803aaa11", 0, SHA1(8684c1a1f0de9496bac0333c0302e35359173d8a) )  /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( popn2 )
@@ -1857,8 +1819,6 @@ ROM_START( popn2 )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "831jhdda01", 0, SHA1(ef62d5fcc1a36235fc932e6ecef71dc845d1d72d) )
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( popn3 )
@@ -1880,8 +1840,6 @@ ROM_START( popn3 )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "980hdda01", 0, SHA1(57ece2b63c32d194d4e41b4e4a45aaab30150fd4) )
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( popnstage )
@@ -1903,8 +1861,6 @@ ROM_START( popnstage )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "970jba11", 0, SHA1(72e92b73b22a8f35e9faca93211e5acf781e66bb) )  /* GQ970  pop'n stage 1.5 ver1.00  1999/10/15 (C) KONAMI */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 #if 0
@@ -1928,8 +1884,6 @@ ROM_START( bm3rdmxb )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "825jab11", 0, MD5(f4360da10a932ba90e93469df7426d1d) SHA1(1) )  /* ver 1.01 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( popn1j )
@@ -1951,8 +1905,6 @@ ROM_START( popn1j )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "803jaa11", 0, MD5(54a8ac87857d81740621c622e27736d7) )  /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 
 ROM_START( popnstex )
@@ -1974,8 +1926,6 @@ ROM_START( popnstex )
 
 	DISK_REGION( "ata:0:hdd:image" )            /* IDE HARD DRIVE */
 	DISK_IMAGE( "970jba11", 0, MD5(1616905838fdb2b521d53499c6c2a7a4) )  /* ver 1.00 JA */
-
-	ROM_REGION( 0x1000000, "shared", ROMREGION_ERASE00 )        /* K054539 RAM */
 ROM_END
 #endif
 

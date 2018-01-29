@@ -65,8 +65,8 @@ Dip locations verified with manual for ddragon & ddragon2
 #include "speaker.h"
 
 
-#define MAIN_CLOCK      XTAL_12MHz
-#define SOUND_CLOCK     XTAL_3_579545MHz
+#define MAIN_CLOCK      XTAL(12'000'000)
+#define SOUND_CLOCK     XTAL(3'579'545)
 #define MCU_CLOCK       MAIN_CLOCK / 3
 #define PIXEL_CLOCK     MAIN_CLOCK / 2
 
@@ -1108,7 +1108,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(darktowr_state::darktowr, ddragon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL_4MHz)
+	MCFG_CPU_ADD("mcu", M68705P3, XTAL(4'000'000))
 	MCFG_M68705_PORTA_W_CB(WRITE8(darktowr_state, mcu_port_a_w))
 
 	/* video hardware */

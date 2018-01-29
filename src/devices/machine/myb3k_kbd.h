@@ -72,7 +72,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	output_delegate             m_keyboard_cb;
-	required_ioport_array<12>	m_io_kbd_t;
+	required_ioport_array<12>   m_io_kbd_t;
 	u8                          m_io_kbd_state[12][8];
 
 	int m_x, m_y;
@@ -84,7 +84,7 @@ protected:
 class jb3000_keyboard_device : public myb3k_keyboard_device
 {
 public:
-     jb3000_keyboard_device(
+	 jb3000_keyboard_device(
 		 const machine_config &mconfig,
 		 char const *tag,
 		 device_t *owner,
@@ -96,7 +96,7 @@ private:
 class stepone_keyboard_device : public myb3k_keyboard_device
 {
 public:
-     stepone_keyboard_device(
+	 stepone_keyboard_device(
 		 const machine_config &mconfig,
 		 char const *tag,
 		 device_t *owner,

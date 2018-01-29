@@ -421,7 +421,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(tec1_state::tecjmon)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545) / 2)
 	MCFG_CPU_PROGRAM_MAP(tecjmon_map)
 	MCFG_CPU_IO_MAP(tecjmon_io)
 

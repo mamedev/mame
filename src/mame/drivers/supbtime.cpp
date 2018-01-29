@@ -431,15 +431,15 @@ GFXDECODE_END
 //**************************************************************************
 
 MACHINE_CONFIG_START(supbtime_state::supbtime)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(supbtime_map)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz / 8)
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(supbtime_state, vblank_w))
 	MCFG_SCREEN_UPDATE_DRIVER(supbtime_state, screen_update_supbtime)
 	MCFG_SCREEN_PALETTE("palette")
@@ -450,7 +450,8 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -471,12 +472,12 @@ MACHINE_CONFIG_START(supbtime_state::supbtime)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz / 9)
+	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000) / 9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ 2
 	MCFG_SOUND_ROUTE(0, "mono", 0.45)
 	MCFG_SOUND_ROUTE(1, "mono", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_21_4772MHz / 20, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(21'477'272) / 20, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

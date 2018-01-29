@@ -1751,7 +1751,7 @@ MACHINE_CONFIG_DERIVED(blitz68k_state::steaser, ilpag)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(blitz68k_state::cjffruit)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22_1184MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'118'400)/2)
 	MCFG_CPU_PROGRAM_MAP(cjffruit_map)
 
 	// MC68HC705C8P (Sound MCU)
@@ -1765,7 +1765,7 @@ MACHINE_CONFIG_START(blitz68k_state::cjffruit)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_22_1184MHz/8)
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(22'118'400)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
@@ -1779,7 +1779,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::bankrob)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(bankrob_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
@@ -1797,7 +1797,7 @@ MACHINE_CONFIG_START(blitz68k_state::bankrob)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
@@ -1811,7 +1811,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::bankroba)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz )
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200) )
 	MCFG_CPU_PROGRAM_MAP(bankroba_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq5_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 3,4 read from MCUs
@@ -1827,7 +1827,7 @@ MACHINE_CONFIG_START(blitz68k_state::bankroba)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+7, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
@@ -1841,7 +1841,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::deucesw2)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22_1184MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'118'400) / 2)
 	MCFG_CPU_PROGRAM_MAP(deucesw2_map)
 	// irq 2 reads from MCUs
 
@@ -1856,7 +1856,7 @@ MACHINE_CONFIG_START(blitz68k_state::deucesw2)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_22_1184MHz/8)
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(22'118'400)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
@@ -1870,7 +1870,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::dualgame)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz )
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200) )
 	MCFG_CPU_PROGRAM_MAP(dualgame_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq2_line_hold) // lev 2 = MCUs, lev 3 = vblank
 
@@ -1887,7 +1887,7 @@ MACHINE_CONFIG_START(blitz68k_state::dualgame)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
@@ -1901,7 +1901,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::hermit)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22_1184MHz/2 )
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'118'400)/2 )
 	MCFG_CPU_PROGRAM_MAP(hermit_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq1_line_hold)   // protection prevents correct irq frequency by crtc
 
@@ -1916,7 +1916,7 @@ MACHINE_CONFIG_START(blitz68k_state::hermit)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0+4, 256-1-4)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_22_1184MHz/8)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(22'118'400)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
@@ -1930,7 +1930,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(blitz68k_state::maxidbl)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(maxidbl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", blitz68k_state,  irq3_line_hold)   // protection prevents correct irq frequency by crtc
 	// irq 2 reads from MCUs
@@ -1950,7 +1950,7 @@ MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_DRIVER(blitz68k_state, screen_update_blitz68k_noblit)
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_11_0592MHz/4)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(11'059'200)/4)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 	MCFG_MC6845_ADDR_CHANGED_CB(blitz68k_state, crtc_addr)
@@ -1960,7 +1960,7 @@ MACHINE_CONFIG_START(blitz68k_state::maxidbl)
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SAA1099_ADD("saa", XTAL_8MHz/2)
+	MCFG_SAA1099_ADD("saa", XTAL(8'000'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

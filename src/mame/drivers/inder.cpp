@@ -1341,7 +1341,7 @@ DRIVER_INIT_MEMBER( inder_state, inder1 )
 
 MACHINE_CONFIG_START(inder_state::brvteam)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(brvteam_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
 
@@ -1353,13 +1353,13 @@ MACHINE_CONFIG_START(inder_state::brvteam)
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("snvol")
-	MCFG_SOUND_ADD("sn", SN76489, XTAL_8MHz / 2) // jumper choice of 2 or 4 MHz
+	MCFG_SOUND_ADD("sn", SN76489, XTAL(8'000'000) / 2) // jumper choice of 2 or 4 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "snvol", 2.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inder_state::canasta)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(canasta_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
 
@@ -1371,16 +1371,16 @@ MACHINE_CONFIG_START(inder_state::canasta)
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
-	MCFG_SOUND_ADD("ay", AY8910, XTAL_4MHz / 2)
+	MCFG_SOUND_ADD("ay", AY8910, XTAL(4'000'000) / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inder_state::lapbylap)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(lapbylap_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_2MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(lapbylap_sub_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
 
@@ -1392,19 +1392,19 @@ MACHINE_CONFIG_START(inder_state::lapbylap)
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_2MHz) // same xtal that drives subcpu
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_2MHz) // same xtal that drives subcpu
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(2'000'000)) // same xtal that drives subcpu
 	MCFG_AY8910_PORT_A_READ_CB(READ8(inder_state, sndcmd_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(inder_state::inder)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(5'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(inder_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE556
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz / 2)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(5'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(inder_sub_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(inder_state, irq0_line_hold, 250) // NE555
 
@@ -1416,7 +1416,7 @@ MACHINE_CONFIG_START(inder_state::inder)
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("msmvol")
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCK_CALLBACK(DEVWRITELINE("9a", ttl7474_device, clock_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("9b", ttl7474_device, clock_w)) // order of writes is sensitive
 

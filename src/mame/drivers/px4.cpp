@@ -1476,7 +1476,7 @@ PALETTE_INIT_MEMBER( px4p_state, px4p )
 
 MACHINE_CONFIG_START(px4_state::px4)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_7_3728MHz / 2)    // uPD70008
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(7'372'800) / 2)    // uPD70008
 	MCFG_CPU_PROGRAM_MAP(px4_mem)
 	MCFG_CPU_IO_MAP(px4_io)
 
@@ -1499,7 +1499,7 @@ MACHINE_CONFIG_START(px4_state::px4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("one_sec", px4_state, upd7508_1sec_callback, attotime::from_seconds(1))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("frc", px4_state, frc_tick, attotime::from_hz(XTAL_7_3728MHz / 2 / 6))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("frc", px4_state, frc_tick, attotime::from_hz(XTAL(7'372'800) / 2 / 6))
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

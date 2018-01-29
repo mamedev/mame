@@ -469,7 +469,7 @@ void atari_s2_state::machine_reset()
 
 MACHINE_CONFIG_START(atari_s2_state::atari_s2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_4MHz / 4)
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(4'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(atari_s2_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -487,7 +487,7 @@ MACHINE_CONFIG_START(atari_s2_state::atari_s2)
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_atari_s2)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", atari_s2_state, irq, attotime::from_hz(XTAL_4MHz / 8192))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", atari_s2_state, irq, attotime::from_hz(XTAL(4'000'000) / 8192))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", atari_s2_state, timer_s, attotime::from_hz(150000))
 MACHINE_CONFIG_END
 

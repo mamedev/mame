@@ -128,7 +128,7 @@
 #include "gypsyjug.lh"
 #include "minferno.lh"
 
-#define MASTER_CLOCK XTAL_5MHz
+#define MASTER_CLOCK XTAL(5'000'000)
 
 
 

@@ -48,7 +48,7 @@ Notes:
 #include "speaker.h"
 
 
-#define SUNA8_MASTER_CLOCK      XTAL_24MHz
+#define SUNA8_MASTER_CLOCK      XTAL(24'000'000)
 
 /***************************************************************************
 

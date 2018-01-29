@@ -64,7 +64,7 @@
 #include "screen.h"
 
 
-#define MASTER_CLOCK    XTAL_22_1184MHz
+#define MASTER_CLOCK    XTAL(22'118'400)
 
 
 class nsmpoker_state : public driver_device

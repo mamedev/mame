@@ -33,7 +33,7 @@
 ***************************************************************************/
 
 #define XTAL1   8866000
-#define XTAL2   XTAL_7_15909MHz
+#define XTAL2   XTAL(7'159'090)
 
 
 /***************************************************************************
@@ -349,7 +349,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(aquarius_state::aquarius)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // ???
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545)) // ???
 	MCFG_CPU_PROGRAM_MAP(aquarius_mem)
 	MCFG_CPU_IO_MAP(aquarius_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aquarius_state,  irq0_line_hold)
@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", aquarius )
-	MCFG_TEA1002_ADD("encoder", XTAL_8_867238MHz)
+	MCFG_TEA1002_ADD("encoder", XTAL(8'867'238))
 	MCFG_PALETTE_ADD("palette", 512)
 	MCFG_PALETTE_INDIRECT_ENTRIES(16)
 	MCFG_PALETTE_INIT_OWNER(aquarius_state, aquarius)
@@ -374,7 +374,7 @@ MACHINE_CONFIG_START(aquarius_state::aquarius)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_3_579545MHz/2) // ??? AY-3-8914
+	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(3'579'545)/2) // ??? AY-3-8914
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("RIGHT"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("LEFT"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

@@ -40,7 +40,7 @@
   1x PPI 8255 (@U10)
   3x 4099 (8-Bit Addressable Latch) @U1-U3-U5.
   3x 4512 (8-Channel Data Selector) @U2-U4-U7.
-  
+
   1x INMOS B IMS1630K-70M (8K x 8 SRAM, DIL28)... NOTE: Replaced by UT6264CPC-70LL in another board.
   4x sanded IC's identified as 4464 (64K x 4 DRAM) @U16-U17-U18-U19, near the Yamaha 9938 for video RAM.
 
@@ -51,7 +51,7 @@
   1x unknown DAC (DIL16) @U13.
   1x LM324 (Single Supply Quad Operational Amplifier)
 
-  1x Maxim MAX691CPE (battery supervisor). 
+  1x Maxim MAX691CPE (battery supervisor).
 
   1x 21.47727 MHz. crystal, near the Yamaha 9938/58 VDP.
   1x 12.288 MHz. crystal, near the Zilog Z180.
@@ -138,7 +138,7 @@
 *********************************************************************
 
   Program ROM
-  Data Lines Scrambling.     
+  Data Lines Scrambling.
 
   BUS     ROM
 
@@ -177,7 +177,7 @@
 *********************************************************************
 
   I/O:
-  
+
   1x PPI 8255.
   3x 4099 (8-Bit Addressable Latch).
   3x 4512 (8-Channel Data Selector).
@@ -196,7 +196,7 @@
   |         PB0 |------> I/O 4099 (A0) & 4512 (A)
   |         PB1 |------> I/O 4099 (A1) & 4512 (B)
   |         PB2 |------> I/O 4099 (A2) & 4512 (C)
-  |         PB3 |------> I/O 4099 (WD 4099 #0, Players) 
+  |         PB3 |------> I/O 4099 (WD 4099 #0, Players)
   |         PB4 |------> I/O 4099 (WD 4099 #1, Counters)
   |         PB5 |------> I/O 4099 (WD 4099 #2, unknown)
   |         PB6 |------> I/O 4099 (D)
@@ -266,9 +266,9 @@
 *********************************************************************/
 
 
-#define CPU_CLOCK       XTAL_12_288MHz
-#define MCU_CLOCK       XTAL_8MHz
-#define VID_CLOCK       XTAL_21_4772MHz
+#define CPU_CLOCK       XTAL(12'288'000)
+#define MCU_CLOCK       XTAL(8'000'000)
+#define VID_CLOCK       XTAL(21'477'272)
 
 #define VDP_MEM         0x20000  // 4x 4464 (64K x 4 DRAM)
 
@@ -359,9 +359,9 @@ ADDRESS_MAP_END
 /*
 ;*********** PPI 8255 *******
 PORTCN    EQU  C0H    ;80H C
-P_AUDIO	  EQU  C0H    ;Port A ---> DAC
+P_AUDIO   EQU  C0H    ;Port A ---> DAC
 PORTIN    EQU  C2H    ;Port C (High nibble) Inputs. (4=EE, 5=PLATE, 6=KEY, 7=DIP)
-PORT_EE	  EQU  C2H    ;Port C (Low nibble) EEPROM.  (0=DI, 1=CS, 2=SK)
+PORT_EE   EQU  C2H    ;Port C (Low nibble) EEPROM.  (0=DI, 1=CS, 2=SK)
 PORTIO    EQU  C1H    ;Port B I/O 4099 (0=A0, 1=A1, 2=A2, 3=WJ, 4=WC, 5=WP, 6=D, 7=LED)
 PPI_CTRL  EQU  C3H    ;Mode.
 

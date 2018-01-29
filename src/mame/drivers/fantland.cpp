@@ -1029,11 +1029,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fantland_state::wheelrun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V20, XTAL_18MHz/2)      // D701080C-8 (V20)
+	MCFG_CPU_ADD("maincpu", V20, XTAL(18'000'000)/2)      // D701080C-8 (V20)
 	MCFG_CPU_PROGRAM_MAP(wheelrun_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", fantland_state,  fantland_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/2)     // Z8400BB1 (Z80B)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'000'000)/2)     // Z8400BB1 (Z80B)
 	MCFG_CPU_PROGRAM_MAP(wheelrun_sound_map)
 	// IRQ by YM3526, NMI when soundlatch is written
 
@@ -1058,7 +1058,7 @@ MACHINE_CONFIG_START(fantland_state::wheelrun)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_14MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL(14'000'000)/4)
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END

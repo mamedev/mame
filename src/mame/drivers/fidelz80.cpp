@@ -1631,7 +1631,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(fidelz80_state::bcc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("maincpu", Z80, 3.579545_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(bcc_map)
 	MCFG_CPU_IO_MAP(bcc_io)
 
@@ -1648,7 +1648,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidelz80_state::scc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_9MHz)
+	MCFG_CPU_ADD("maincpu", Z80, 3.9_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(scc_map)
 	MCFG_CPU_IO_MAP(scc_io)
 
@@ -1665,7 +1665,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidelz80_state::cc10)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", Z80, 4_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(cc10_map)
 	MCFG_CPU_IO_MAP(vcc_io)
 
@@ -1691,7 +1691,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidelz80_state::vcc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", Z80, 4_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(vcc_map)
 	MCFG_CPU_IO_MAP(vcc_io)
 
@@ -1719,7 +1719,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidelz80_state::vsc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_9MHz) // 3.9MHz resonator
+	MCFG_CPU_ADD("maincpu", Z80, 3.9_MHz_XTAL) // 3.9MHz resonator
 	MCFG_CPU_PROGRAM_MAP(vsc_map)
 	MCFG_CPU_IO_MAP(vsc_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80_state, nmi_line_pulse, 587) // 555 timer, measured
@@ -1729,7 +1729,7 @@ MACHINE_CONFIG_START(fidelz80_state::vsc)
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(fidelz80_state, vsc_ppi_portb_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(fidelz80_state, vsc_ppi_portc_w))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_3_9MHz)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, 3.9_MHz_XTAL)
 	MCFG_Z80PIO_IN_PA_CB(READ8(fidelz80_state, vsc_pio_porta_r))
 	MCFG_Z80PIO_IN_PB_CB(READ8(fidelz80_state, vsc_pio_portb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(fidelz80_state, vsc_pio_portb_w))
@@ -1747,12 +1747,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidelz80_state::vbrc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_5MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, 5_MHz_XTAL/2)
 	MCFG_CPU_PROGRAM_MAP(vbrc_main_map)
 	MCFG_CPU_IO_MAP(vbrc_main_io)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MCFG_CPU_ADD("mcu", I8041, XTAL_5MHz)
+	MCFG_CPU_ADD("mcu", I8041, 5_MHz_XTAL)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(fidelz80_state, vbrc_mcu_p1_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(fidelz80_state, vbrc_mcu_p2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(DEVWRITE8("i8243", i8243_device, p2_w))
@@ -1775,7 +1775,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidelz80_state::dsc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_9MHz) // 3.9MHz resonator
+	MCFG_CPU_ADD("maincpu", Z80, 3.9_MHz_XTAL) // 3.9MHz resonator
 	MCFG_CPU_PROGRAM_MAP(dsc_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidelz80_state, irq_on, attotime::from_hz(523)) // from 555 timer (22nF, 120K, 2.7K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(523) - attotime::from_usec(41)) // active for 41us

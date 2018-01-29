@@ -58,8 +58,8 @@ References:
 #define VBLANK_OUT_TAG  "videobrd:vblank"
 #define TVINTERQ_OUT_TAG "videobrd:tvinterq"
 
-#define VIDEO_CLOCK     (XTAL_33_264MHz/2)
-#define VIDEOBRD_CLOCK  (XTAL_33_264MHz*30)
+#define VIDEO_CLOCK     (XTAL(33'264'000)/2)
+#define VIDEOBRD_CLOCK  (XTAL(33'264'000)*30)
 
 #define SR2_FULL_DUPLEX (0x01)
 #define SR2_UPPER_ONLY  (0x08)
@@ -460,7 +460,7 @@ WRITE8_MEMBER(hazl1500_state::refresh_address_w)
 {
 	synchronize();
 	//printf("refresh: %02x, %d, %d\n", data, m_screen->hpos(), m_screen->vpos());
-	m_iowq_timer->adjust(attotime::from_hz(XTAL_18MHz/9));
+	m_iowq_timer->adjust(attotime::from_hz(XTAL(18'000'000)/9));
 	m_cpu_iowq->write(0);
 	m_cpu_ba4->write(0);
 	m_cpu_db0->write((data >> 0) & 1);
@@ -689,7 +689,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(CPU_TAG, I8080, XTAL_18MHz/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
+	MCFG_CPU_ADD(CPU_TAG, I8080, XTAL(18'000'000)/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
 	MCFG_CPU_PROGRAM_MAP(hazl1500_mem)
 	MCFG_CPU_IO_MAP(hazl1500_io)
 	MCFG_QUANTUM_PERFECT_CPU(CPU_TAG)
@@ -697,17 +697,17 @@ MACHINE_CONFIG_START(hazl1500_state::hazl1500)
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(hazl1500_state, screen_update_hazl1500)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL_33_264MHz / 2,
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(33'264'000) / 2,
 	//    SCREEN_HTOTAL, SCREEN_HSTART, SCREEN_HSTART + SCREEN_HDISP,
 	//    SCREEN_VTOTAL, SCREEN_VSTART, SCREEN_VSTART + SCREEN_VDISP); // TODO: Figure out exact visibility
-	MCFG_SCREEN_RAW_PARAMS(XTAL_33_264MHz / 2,
+	MCFG_SCREEN_RAW_PARAMS(XTAL(33'264'000) / 2,
 		SCREEN_HTOTAL, 0, SCREEN_HTOTAL,
 		SCREEN_VTOTAL, 0, SCREEN_VTOTAL);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hazl1500)
 
-	MCFG_DEVICE_ADD(BAUDGEN_TAG, COM8116, XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD(BAUDGEN_TAG, COM8116, XTAL(5'068'800))
 	MCFG_COM8116_FR_HANDLER(WRITELINE(hazl1500_state, com5016_fr_w))
 
 	MCFG_DEVICE_ADD(UART_TAG, AY51013, 0)

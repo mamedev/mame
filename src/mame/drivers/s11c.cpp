@@ -152,7 +152,7 @@ DRIVER_INIT_MEMBER(s11c_state,s11c)
 
 MACHINE_CONFIG_START(s11c_state::s11c)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M6808, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(s11c_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s11c_state, s11c)
 

@@ -482,7 +482,7 @@ WRITE8_MEMBER( kdt6_state::status0_w )
 	// ------1-  system frequency (0 = half)
 	// -------0  watchdog enable
 
-	m_cpu->set_unscaled_clock((XTAL_16MHz / 4) * (BIT(data, 1) ? 1 : 0.5));
+	m_cpu->set_unscaled_clock((XTAL(16'000'000) / 4) * (BIT(data, 1) ? 1 : 0.5));
 
 	if ((BIT(m_status0, 2) ^ BIT(data, 2)) && BIT(data, 2))
 	{
@@ -610,20 +610,20 @@ static const z80_daisy_config daisy_chain_intf[] =
 };
 
 MACHINE_CONFIG_START(kdt6_state::psi98)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(psi98_mem)
 	MCFG_CPU_IO_MAP(psi98_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
 	// video hardware
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL_13_5168MHz, 824, 48, 688, 274, 0, 250)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(13'516'800), 824, 48, 688, 274, 0, 250)
 	MCFG_SCREEN_UPDATE_DRIVER(kdt6_state, screen_update)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEFAULT_LAYOUT(layout_kdt6)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_13_5168MHz / 8)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(13'516'800) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(kdt6_state, crtc_update_row)
@@ -638,7 +638,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 
 	MCFG_TIMER_DRIVER_ADD("beep_timer", kdt6_state, beeper_off)
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(16'000'000) / 4)
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(kdt6_state, busreq_w))
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80DMA_IN_MREQ_CB(READ8(kdt6_state, memory_r))
@@ -647,22 +647,22 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(kdt6_state, io_w))
 
 	// jumper J3 allows selection of 16MHz / 8 instead
-	MCFG_CLOCK_ADD("uart_clk", XTAL_9_8304MHz / 8)
+	MCFG_CLOCK_ADD("uart_clk", XTAL(9'830'400) / 8)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc1", z80ctc_device, trg1))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc1", z80ctc_device, trg2))
 
-	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("ctc1", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC1_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("sio", z80sio_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio", z80sio_device, txca_w))
 
-	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("ctc2", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc2", z80ctc_device, trg3))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(16'000'000) / 4)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
@@ -683,7 +683,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("sio", z80sio_device, syncb_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("sio", z80sio_device, ctsb_w))  MCFG_DEVCB_XOR(1)
 
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(16'000'000) / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(kdt6_state, pio_porta_w))
 	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
@@ -699,7 +699,7 @@ MACHINE_CONFIG_START(kdt6_state::psi98)
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_UPD1990A_ADD("rtc", XTAL_32_768kHz, NOOP, NOOP)
+	MCFG_UPD1990A_ADD("rtc", XTAL(32'768), NOOP, NOOP)
 
 	MCFG_UPD765A_ADD("fdc", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("ctc1", z80ctc_device, trg0))

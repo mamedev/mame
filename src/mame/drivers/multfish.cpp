@@ -1022,7 +1022,7 @@ void igrosoft_gamble_state::machine_reset()
 
 MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(igrosoft_gamble_map)
 	MCFG_CPU_IO_MAP(igrosoft_gamble_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igrosoft_gamble_state, irq0_line_hold)

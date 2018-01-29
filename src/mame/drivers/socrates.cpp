@@ -199,10 +199,10 @@ protected:
 };
 
 
-class iqunlim_state : public socrates_state
+class iqunlimz_state : public socrates_state
 {
 public:
-	iqunlim_state(const machine_config &mconfig, device_type type, const char *tag)
+	iqunlimz_state(const machine_config &mconfig, device_type type, const char *tag)
 		: socrates_state(mconfig, type, tag)
 		{ }
 
@@ -317,7 +317,7 @@ void socrates_state::kbmcu_sim_fifo_head_clear()
 void socrates_state::machine_start()
 {
 	m_kbmcu_sim_timer = timer_alloc(TIMER_KBMCU_SIM);
-	m_kbmcu_sim_timer->adjust(attotime::from_hz((XTAL_21_4772MHz/6)/3000)); // timer rate is a massive guess, depends on instructions per loop of mcu
+	m_kbmcu_sim_timer->adjust(attotime::from_hz((XTAL(21'477'272)/6)/3000)); // timer rate is a massive guess, depends on instructions per loop of mcu
 	m_clear_speech_timer = timer_alloc(TIMER_CLEAR_SPEECH);
 	m_clear_irq_timer = timer_alloc(TIMER_CLEAR_IRQ);
 	save_item(NAME(m_rom_bank));
@@ -846,7 +846,7 @@ WRITE8_MEMBER(socrates_state::socrates_sound_w)
 //
 //-----------------------------------------------------------------------------
 
-int iqunlim_state::get_color(int index, int y)
+int iqunlimz_state::get_color(int index, int y)
 {
 	if (index < 8)
 		return m_colors[index];
@@ -854,7 +854,7 @@ int iqunlim_state::get_color(int index, int y)
 		return m_vram_reg->as_u8(0xf000 + ((index & 0x0f) << 8) + ((m_scroll_offset + y + 1) & 0xff));
 }
 
-uint32_t iqunlim_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t iqunlimz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t *videoram = m_vram_reg->base();
 
@@ -913,7 +913,7 @@ uint32_t iqunlim_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-READ8_MEMBER( iqunlim_state::status_r )
+READ8_MEMBER( iqunlimz_state::status_r )
 {
 	// ---x ----    main battery status
 	// --x- ----    backup battery status
@@ -921,12 +921,12 @@ READ8_MEMBER( iqunlim_state::status_r )
 	return 0x30;
 }
 
-READ8_MEMBER( iqunlim_state::video_regs_r )
+READ8_MEMBER( iqunlimz_state::video_regs_r )
 {
 	return m_video_regs[offset];
 }
 
-WRITE8_MEMBER( iqunlim_state::video_regs_w )
+WRITE8_MEMBER( iqunlimz_state::video_regs_w )
 {
 	if (offset == 2 && ((m_video_regs[offset] ^ data) & 0x02))
 	{
@@ -938,7 +938,7 @@ WRITE8_MEMBER( iqunlim_state::video_regs_w )
 	m_video_regs[offset] = data;
 }
 
-void iqunlim_state::machine_reset()
+void iqunlimz_state::machine_reset()
 {
 	socrates_state::machine_reset();
 
@@ -947,7 +947,7 @@ void iqunlim_state::machine_reset()
 	kbmcu_sim_reset();
 }
 
-WRITE8_MEMBER( iqunlim_state::colors_w )
+WRITE8_MEMBER( iqunlimz_state::colors_w )
 {
 	m_colors[offset] = data;
 }
@@ -955,7 +955,7 @@ WRITE8_MEMBER( iqunlim_state::colors_w )
 
 // IQ Unlimited keyboard MCU simulation
 
-INPUT_CHANGED_MEMBER( iqunlim_state::send_input )
+INPUT_CHANGED_MEMBER( iqunlimz_state::send_input )
 {
 	uint8_t data = (uint8_t)(uintptr_t)param;
 
@@ -995,7 +995,7 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(common_rom_bank_r, common_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */
 	AM_RANGE(0x08, 0x08) AM_READWRITE(common_ram_bank_r, common_ram_bank_w) AM_MIRROR(0x7) /* ram banks select - RW - 4 low bits; Format: 0b****HHLL where LL controls whether window 0 points at ram area: 0b00: 0x0000-0x3fff; 0b01: 0x4000-0x7fff; 0b10: 0x8000-0xbfff; 0b11: 0xc000-0xffff. HH controls the same thing for window 1 */
 	AM_RANGE(0x10, 0x17) AM_READWRITE(read_f3, socrates_sound_w) AM_MIRROR (0x8) /* sound section:
-	0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL_21_4772MHz/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
+	0x10 - W - frequency control for channel 1 (louder channel) - 01=high pitch, ff=low; time between 1->0/0->1 transitions = (XTAL(21'477'272)/(512+256) / (freq_reg+1)) (note that this is double the actual frequency since each full low and high squarewave pulse is two transitions)
 	0x11 - W - frequency control for channel 2 (softer channel) - 01=high pitch, ff=low; same equation as above
 	0x12 - W - 0b***EVVVV enable, volume control for channel 1
 	0x13 - W - 0b***EVVVV enable, volume control for channel 2
@@ -1014,7 +1014,7 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	AM_RANGE(0x70, 0xFF) AM_READ(read_f3) // nothing mapped here afaik
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(iqunlimz_mem, AS_PROGRAM, 8, iqunlim_state)
+static ADDRESS_MAP_START(iqunlimz_mem, AS_PROGRAM, 8, iqunlimz_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_DEVICE("rombank2", address_map_bank_device, amap8)
 	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("rombank1", address_map_bank_device, amap8)
@@ -1022,19 +1022,19 @@ static ADDRESS_MAP_START(iqunlimz_mem, AS_PROGRAM, 8, iqunlim_state)
 	AM_RANGE(0xc000, 0xffff) AM_DEVICE("rambank2", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( iqunlimz_rombank_map, AS_PROGRAM, 8, iqunlim_state )
+static ADDRESS_MAP_START( iqunlimz_rombank_map, AS_PROGRAM, 8, iqunlimz_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("maincpu", 0) AM_MIRROR(0xF00000)      // xxxx 00** **** **** **** ****
 	AM_RANGE(0x040000, 0x07ffff) AM_READ(socrates_cart_r) AM_SELECT(0xF80000)            // **** *1** **** **** **** ****
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM AM_REGION("maincpu", 0x40000) AM_MIRROR(0xF00000)// xxxx 10** **** **** **** ****
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( iqunlimz_rambank_map, AS_PROGRAM, 8, iqunlim_state )
+static ADDRESS_MAP_START( iqunlimz_rambank_map, AS_PROGRAM, 8, iqunlimz_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3ffff) AM_RAM AM_REGION("vram", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( iqunlimz_io , AS_IO, 8, iqunlim_state)
+static ADDRESS_MAP_START( iqunlimz_io , AS_IO, 8, iqunlimz_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_READWRITE(common_rom_bank_r, common_rom_bank_w) AM_MIRROR(0x06)
@@ -1249,104 +1249,104 @@ static INPUT_PORTS_START( iqunlimz )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START( "IN1" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_N ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x10 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_M ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x11 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_COMMA ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x12 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_B ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x13 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_C ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x14 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Z ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x15 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_V ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x16 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_X ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x17 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_N ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x10 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_M ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x11 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_COMMA ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x12 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_B ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x13 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_C ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x14 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Z ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x15 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_V ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x16 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_X ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x17 )
 
 	PORT_START( "IN2" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x20 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_2_PAD ) PORT_CODE( KEYCODE_DOWN ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x21 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_5_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x22 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_DEL_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x23 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SLASH_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x24 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_8_PAD ) PORT_CODE( KEYCODE_UP ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x25 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ASTERISK ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x26 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_7_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x27 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x20 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_2_PAD ) PORT_CODE( KEYCODE_DOWN ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x21 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_5_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x22 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_DEL_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x23 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SLASH_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x24 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_8_PAD ) PORT_CODE( KEYCODE_UP ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x25 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ASTERISK ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x26 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_7_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x27 )
 
 	PORT_START( "IN3" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x30 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x31 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x32 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x33 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F1 ) PORT_NAME( "Help" ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x34 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_9 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x35 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_BACKSPACE ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x36 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_0 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x37 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x30 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x31 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x32 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x33 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F1 ) PORT_NAME( "Help" ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x34 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_9 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x35 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_BACKSPACE ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x36 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_0 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x37 )
 
 	PORT_START( "IN4" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_H ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x40 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_J ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x41 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_K ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x42 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_G ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x43 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_D ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x44 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_A ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x45 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x46 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_S ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x47 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_H ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x40 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_J ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x41 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_K ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x42 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_G ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x43 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_D ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x44 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_A ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x45 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x46 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_S ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x47 )
 
 	PORT_START( "IN5" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x50 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x51 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x52 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x53 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_EQUALS ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x54 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_O ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x55 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_NUMLOCK ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x56 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_P ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x57 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x50 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x51 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x52 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x53 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_EQUALS ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x54 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_O ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x55 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_NUMLOCK ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x56 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_P ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x57 )
 
 	PORT_START( "IN6" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Y ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x60 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_U ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x61 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_I ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x62 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_T ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x63 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_E ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x64 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Q ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x65 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_R ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x66 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_W ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x67 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Y ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x60 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_U ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x61 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_I ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x62 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_T ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x63 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_E ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x64 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_Q ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x65 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_R ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x66 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_W ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x67 )
 
 	PORT_START( "IN7" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_MINUS ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x70 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SLASH ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x71 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x72 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_STOP ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x73 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_QUOTE ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x74 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_L ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x75 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ENTER ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x76 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_COLON ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x77 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_MINUS ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x70 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SLASH ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x71 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x72 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_STOP ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x73 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_QUOTE ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x74 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_L ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x75 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ENTER ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x76 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_COLON ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x77 )
 
 	PORT_START( "IN8" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_6 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x80 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_7 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x81 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_8 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x82 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_5 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x83 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_3 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x84 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x85 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_4 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x86 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_2 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x87 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_6 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x80 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_7 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x81 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_8 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x82 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_5 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x83 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_3 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x84 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x85 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_4 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x86 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_2 ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x87 )
 
 	PORT_START( "IN9" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_4_PAD ) PORT_CODE( KEYCODE_LEFT ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x90 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_3_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x91 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_6_PAD ) PORT_CODE( KEYCODE_RIGHT ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x92 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_PLUS_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x93 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_0_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x94 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_9_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x95 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_MINUS_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x96 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0x97 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_4_PAD ) PORT_CODE( KEYCODE_LEFT ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x90 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_3_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x91 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_6_PAD ) PORT_CODE( KEYCODE_RIGHT ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x92 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_PLUS_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x93 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_0_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x94 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_9_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x95 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_MINUS_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x96 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1_PAD ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0x97 )
 
 	PORT_START( "INA" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0xa0 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0xa1 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0xa2 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0xa3 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F2 ) PORT_NAME("Answer") PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0xa4 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ESC ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0xa5 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SPACE ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0xa6 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_TAB ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlim_state, send_input, 0xa7 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa0 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa2 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa3 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F2 ) PORT_NAME("Answer") PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa4 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_ESC ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa5 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_SPACE ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa6 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_TAB ) PORT_CHANGED_MEMBER( DEVICE_SELF, iqunlimz_state, send_input, 0xa7 )
 INPUT_PORTS_END
 
 /******************************************************************************
@@ -1448,7 +1448,7 @@ TIMER_CALLBACK_MEMBER(socrates_state::kbmcu_sim_cb)
 
 MACHINE_CONFIG_START(socrates_state::socrates)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_21_4772MHz/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272)/6)  /* Toshiba TMPZ84C00AP @ 3.579545 MHz, verified, xtal is divided by 6 */
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -1486,7 +1486,7 @@ MACHINE_CONFIG_START(socrates_state::socrates)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL_21_4772MHz/(512+256)) // this is correct, as strange as it sounds.
+	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256)) // this is correct, as strange as it sounds.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "socrates_cart")
@@ -1496,7 +1496,7 @@ MACHINE_CONFIG_START(socrates_state::socrates)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(socrates_state::socrates_pal, socrates)
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_26_601712MHz/8)
+	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(26'601'712)/8)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
@@ -1509,16 +1509,16 @@ MACHINE_CONFIG_DERIVED(socrates_state::socrates_pal, socrates)
 	MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 229) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
 	MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
 
-	MCFG_SOUND_REPLACE("soc_snd", SOCRATES_SOUND, XTAL_26_601712MHz/(512+256)) // this is correct, as strange as it sounds.
+	MCFG_SOUND_REPLACE("soc_snd", SOCRATES_SOUND, XTAL(26'601'712)/(512+256)) // this is correct, as strange as it sounds.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(iqunlim_state::iqunlimz)
+MACHINE_CONFIG_START(iqunlimz_state::iqunlimz)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) /* not accurate */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000)) /* not accurate */
 	MCFG_CPU_PROGRAM_MAP(iqunlimz_mem)
 	MCFG_CPU_IO_MAP(iqunlimz_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", iqunlim_state,  assert_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", iqunlimz_state,  assert_irq)
 
 	MCFG_DEVICE_ADD("rombank1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(iqunlimz_rombank_map)
@@ -1548,7 +1548,7 @@ MACHINE_CONFIG_START(iqunlim_state::iqunlimz)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(iqunlim_state, screen_update)
+	MCFG_SCREEN_UPDATE_DRIVER(iqunlimz_state, screen_update)
 	MCFG_SCREEN_SIZE(256, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 	MCFG_SCREEN_PALETTE("palette")
@@ -1558,7 +1558,7 @@ MACHINE_CONFIG_START(iqunlim_state::iqunlimz)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL_21_4772MHz/(512+256))
+	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL(21'477'272)/(512+256))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, nullptr)
@@ -1682,4 +1682,4 @@ COMP( 1988, profweis, socrates, 0,      socrates_pal, socrates, socrates_state, 
 // Yeno Professeur Saitout goes here (french SECAM)
 // ? goes here (spanish PAL)
 
-COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlim_state,  iqunlimz, "Video Technology",      "IQ Unlimited (Z80)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1991, iqunlimz, 0,        0,      iqunlimz,     iqunlimz, iqunlimz_state, iqunlimz, "Video Technology",      "IQ Unlimited (Z80)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

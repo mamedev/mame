@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(A2BUS_EZCGI_9958, a2bus_ezcgi_9958_device, "a2ezcgi5", "E-Z C
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(a2bus_ezcgi_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( TMS_TAG, TMS9918A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k of VRAM
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(a2bus_ezcgi_device, tms_irq_w))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
@@ -49,7 +49,7 @@ MACHINE_CONFIG_START(a2bus_ezcgi_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a2bus_ezcgi_9938_device::device_add_mconfig)
-	MCFG_V9938_ADD(TMS_TAG, SCREEN_TAG, 0x30000, XTAL_21_4772MHz)    // 192K of VRAM / typical 9938 clock, not verified
+	MCFG_V9938_ADD(TMS_TAG, SCREEN_TAG, 0x30000, XTAL(21'477'272))    // 192K of VRAM / typical 9938 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(a2bus_ezcgi_9938_device, tms_irq_w))
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -62,7 +62,7 @@ MACHINE_CONFIG_START(a2bus_ezcgi_9938_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(a2bus_ezcgi_9958_device::device_add_mconfig)
-	MCFG_V9958_ADD(TMS_TAG, SCREEN_TAG, 0x30000, XTAL_21_4772MHz)    // 192K of VRAM / typcial 9938/9958 clock, not verified
+	MCFG_V9958_ADD(TMS_TAG, SCREEN_TAG, 0x30000, XTAL(21'477'272))    // 192K of VRAM / typcial 9938/9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(a2bus_ezcgi_9958_device, tms_irq_w))
 
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -120,8 +120,6 @@ a2bus_ezcgi_9958_device::a2bus_ezcgi_9958_device(const machine_config &mconfig, 
 
 void a2bus_ezcgi_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
 }
 
 void a2bus_ezcgi_device::device_reset()
@@ -130,8 +128,6 @@ void a2bus_ezcgi_device::device_reset()
 
 void a2bus_ezcgi_9938_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
 }
 
 void a2bus_ezcgi_9938_device::device_reset()
@@ -140,8 +136,6 @@ void a2bus_ezcgi_9938_device::device_reset()
 
 void a2bus_ezcgi_9958_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
 }
 
 void a2bus_ezcgi_9958_device::device_reset()

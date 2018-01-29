@@ -201,7 +201,7 @@ TODO:
 #include "screen.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK    XTAL_18_432MHz
+#define MASTER_CLOCK    XTAL(18'432'000)
 
 
 /*************************************
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START( jungler_map, AS_PROGRAM, 8, rallyx_state )
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("radarattr")   // jungler writes to a03x
 	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0xa100, 0xa100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa100, 0xa100) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sound_data_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w) /* only jungler and tactcian */
 	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w) /* only jungler and tactcian */
 	AM_RANGE(0xa180, 0xa187) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
@@ -905,8 +905,6 @@ MACHINE_CONFIG_START(rallyx_state::jungler)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_INIT_OWNER(rallyx_state,jungler)
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,jungler)
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)

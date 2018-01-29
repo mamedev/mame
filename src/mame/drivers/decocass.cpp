@@ -51,7 +51,7 @@
 #include "sound/ay8910.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK    XTAL_12MHz
+#define MASTER_CLOCK    XTAL(12'000'000)
 #define HCLK            (MASTER_CLOCK/2)
 #define HCLK1           (HCLK/2)
 #define HCLK2           (HCLK1/2)

@@ -62,6 +62,9 @@ public:
 	static void set_clk0(device_t &device, double clk0) { downcast<pit8253_device &>(device).m_clk0 = clk0; }
 	static void set_clk1(device_t &device, double clk1) { downcast<pit8253_device &>(device).m_clk1 = clk1; }
 	static void set_clk2(device_t &device, double clk2) { downcast<pit8253_device &>(device).m_clk2 = clk2; }
+	static void set_clk0(device_t &device, const XTAL &xtal) { set_clk0(device, xtal.dvalue()); }
+	static void set_clk1(device_t &device, const XTAL &xtal) { set_clk1(device, xtal.dvalue()); }
+	static void set_clk2(device_t &device, const XTAL &xtal) { set_clk2(device, xtal.dvalue()); }
 	template <class Object> static devcb_base &set_out0_handler(device_t &device, Object &&cb) { return downcast<pit8253_device &>(device).m_out0_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out1_handler(device_t &device, Object &&cb) { return downcast<pit8253_device &>(device).m_out1_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out2_handler(device_t &device, Object &&cb) { return downcast<pit8253_device &>(device).m_out2_handler.set_callback(std::forward<Object>(cb)); }

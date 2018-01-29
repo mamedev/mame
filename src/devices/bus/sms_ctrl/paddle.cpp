@@ -36,7 +36,7 @@ DEFINE_DEVICE_TYPE(SMS_PADDLE, sms_paddle_device, "sms_paddle", "Sega SMS Paddle
 
 // time interval not verified
 // Player 2 of Galactic Protector is the most sensible to this timming.
-#define PADDLE_INTERVAL attotime::from_hz(XTAL_10_738635MHz/3/100)
+#define PADDLE_INTERVAL attotime::from_hz(XTAL(10'738'635)/3/100)
 
 
 CUSTOM_INPUT_MEMBER( sms_paddle_device::rldu_pins_r )

@@ -3853,7 +3853,7 @@ MACHINE_CONFIG_START(apple2e_state::apple2e)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", apple2e_state, apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD(A2_VIDEO_TAG, APPLE2_VIDEO, XTAL_14_31818MHz)
+	MCFG_DEVICE_ADD(A2_VIDEO_TAG, APPLE2_VIDEO, XTAL(14'318'181))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(1021800*14, (65*7)*2, 0, (40*7)*2, 262, 0, 192)
@@ -4018,7 +4018,7 @@ MACHINE_CONFIG_DERIVED(apple2e_state::apple2ee, apple2e)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(apple2e_state::spectred, apple2e)
-	MCFG_CPU_ADD("keyb_mcu", I8035, XTAL_4MHz) /* guessed frequency */
+	MCFG_CPU_ADD("keyb_mcu", I8035, XTAL(4'000'000)) /* guessed frequency */
 	MCFG_CPU_PROGRAM_MAP(spectred_keyb_map)
 
 		//TODO: implement the actual interfacing to this 8035 MCU and
@@ -4054,11 +4054,11 @@ MACHINE_CONFIG_DERIVED(apple2e_state::apple2c, apple2ee)
 	MCFG_A2BUS_SLOT_REMOVE("sl7")
 
 	MCFG_DEVICE_ADD(IIC_ACIA1_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_14_31818MHz / 8) // ~1.789 MHz
+	MCFG_MOS6551_XTAL(XTAL(14'318'181) / 8) // ~1.789 MHz
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(PRINTER_PORT_TAG, rs232_port_device, write_txd))
 
 	MCFG_DEVICE_ADD(IIC_ACIA2_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)   // matches SSC so modem software is compatible
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))   // matches SSC so modem software is compatible
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("modem", rs232_port_device, write_txd))
 
 	MCFG_RS232_PORT_ADD(PRINTER_PORT_TAG, default_rs232_devices, nullptr)

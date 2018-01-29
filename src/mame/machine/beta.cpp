@@ -267,7 +267,7 @@ ROM_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(beta_disk_device::device_add_mconfig)
-	MCFG_KR1818VG93_ADD("wd179x", XTAL_8MHz / 8)
+	MCFG_KR1818VG93_ADD("wd179x", XTAL(8'000'000) / 8)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", beta_disk_floppies, "525qd", beta_disk_device::floppy_formats)

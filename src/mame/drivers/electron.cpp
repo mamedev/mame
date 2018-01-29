@@ -198,7 +198,7 @@ static INPUT_PORTS_START( electron )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(electron_state::electron)
-	MCFG_CPU_ADD( "maincpu", M6502, XTAL_16MHz/8 )
+	MCFG_CPU_ADD( "maincpu", M6502, XTAL(16'000'000)/8 )
 	MCFG_CPU_PROGRAM_MAP( electron_mem )
 
 	MCFG_SCREEN_ADD("screen", RASTER)

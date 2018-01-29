@@ -463,16 +463,16 @@ uint32_t mrgame_state::screen_update_mrgame(screen_device &screen, bitmap_ind16 
 
 MACHINE_CONFIG_START(mrgame_state::mrgame)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_6MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(6'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mrgame_state, irq1_line_hold, 183)
-	MCFG_CPU_ADD("videocpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("videocpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(video_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mrgame_state, nmi_line_pulse)
-	MCFG_CPU_ADD("audiocpu1", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu1", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(audio1_map)
 	MCFG_CPU_IO_MAP(audio1_io)
-	MCFG_CPU_ADD("audiocpu2", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu2", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(audio2_map)
 	MCFG_CPU_IO_MAP(audio2_io)
 

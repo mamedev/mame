@@ -227,7 +227,7 @@ WRITE8_MEMBER(jpmmps_state::jpmmps_ic22_portc_w)
 
 
 // BCLKOUT (used by peripherals) is normally TMS9995 CLKOUT; however, MPS1 allows an external CLK DMA to be selected instead
-#define MAIN_CLOCK XTAL_6MHz
+#define MAIN_CLOCK XTAL(6'000'000)
 #define SOUND_CLOCK (MAIN_CLOCK / 4)
 #define DUART_CLOCK (MAIN_CLOCK / 4)
 
@@ -255,7 +255,7 @@ MACHINE_CONFIG_START(jpmmps_state::jpmmps)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // bb
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // diagnostic led
 
-	//MCFG_CPU_ADD("reelmcu", TMS7041, XTAL_5MHz)
+	//MCFG_CPU_ADD("reelmcu", TMS7041, XTAL(5'000'000))
 
 	MCFG_DEVICE_ADD("ppi8255_ic26", I8255, 0)
 	// Port B 0 is coin lockout

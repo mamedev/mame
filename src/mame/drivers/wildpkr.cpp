@@ -171,11 +171,11 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK  XTAL_12MHz
+#define MAIN_CLOCK  XTAL(12'000'000)
 #define AY_CLOCK    MAIN_CLOCK / 8
-#define SEC_CLOCK   XTAL_3_6864MHz
-#define AUX1_CLOCK  XTAL_26MHz
-#define AUX2_CLOCK  XTAL_24MHz
+#define SEC_CLOCK   XTAL(3'686'400)
+#define AUX1_CLOCK  XTAL(26'000'000)
+#define AUX2_CLOCK  XTAL(24'000'000)
 
 
 class wildpkr_state : public driver_device
@@ -485,7 +485,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(wildpkr_state::tabpkr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(tabpkr_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(wildpkr_state, irq3_line_assert, 60*256)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(wildpkr_state, tabpkr_irq_ack)

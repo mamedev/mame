@@ -239,7 +239,7 @@ DRIVER_INIT_MEMBER(mmodular_state, gen32)
 }
 
 MACHINE_CONFIG_START(mmodular_state::alm16)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(alm16_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 600)
 
@@ -256,7 +256,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(mmodular_state::alm32)
-	MCFG_CPU_ADD("maincpu", M68020, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu", M68020, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(alm32_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq6_line_hold, 750)
 
@@ -275,7 +275,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(mmodular_state::gen32)
-	MCFG_CPU_ADD("maincpu", M68030, XTAL_33_333MHz)
+	MCFG_CPU_ADD("maincpu", M68030, XTAL(33'333'000))
 	MCFG_CPU_PROGRAM_MAP(gen32_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 375)
 
@@ -288,7 +288,7 @@ MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START(berlinp_state::berlinp)
-	MCFG_CPU_ADD("maincpu", M68020, XTAL_24_576MHz)
+	MCFG_CPU_ADD("maincpu", M68020, XTAL(24'576'000))
 	MCFG_CPU_PROGRAM_MAP(berlinp_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(berlinp_state, irq2_line_hold, 750)
 

@@ -46,7 +46,7 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_10MHz
+#define MAIN_CLOCK XTAL(10'000'000)
 
 class _3x3puzzle_state : public driver_device
 {
@@ -405,7 +405,7 @@ MACHINE_CONFIG_START(_3x3puzzle_state::_3x3puzzle)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

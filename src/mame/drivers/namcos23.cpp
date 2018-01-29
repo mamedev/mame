@@ -1269,7 +1269,7 @@ Notes:
 #include <float.h>
 
 
-#define JVSCLOCK    (XTAL_14_7456MHz)
+#define JVSCLOCK    (XTAL(14'745'600))
 
 //#define H8CLOCK     (16737350)      /* from 2061 */
 //#define BUSCLOCK    (16737350*2)    /* 33MHz CPU bus clock / input */
@@ -3573,7 +3573,7 @@ MACHINE_CONFIG_START(namcos23_state::gorgon)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
 	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
 	MCFG_DEVICE_MODIFY("subcpu:sci1")
@@ -3639,7 +3639,7 @@ MACHINE_CONFIG_START(namcos23_state::s23)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
 	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
 	MCFG_DEVICE_MODIFY("subcpu:sci1")
@@ -3688,7 +3688,7 @@ MACHINE_CONFIG_DERIVED(namcos23_state::gmen, s23)
 	MCFG_CPU_CLOCK(BUSCLOCK*5)
 	MCFG_CPU_PROGRAM_MAP(gmen_mips_map)
 
-	MCFG_CPU_ADD("gmen_sh2", SH2, XTAL_28_7MHz)
+	MCFG_CPU_ADD("gmen_sh2", SH2, XTAL(28'700'000))
 	MCFG_CPU_PROGRAM_MAP(gmen_sh2_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos23_state,gmen)
@@ -3716,7 +3716,7 @@ MACHINE_CONFIG_START(namcos23_state::ss23)
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
 	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
 	MCFG_DEVICE_MODIFY("subcpu:sci1")

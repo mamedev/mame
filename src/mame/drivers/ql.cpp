@@ -103,10 +103,10 @@
 #define RS232_B_TAG "ser2"
 #define QIMI_TAG    "qimi"
 
-#define X1 XTAL_15MHz
-#define X2 XTAL_32_768kHz
+#define X1 XTAL(15'000'000)
+#define X2 XTAL(32'768)
 #define X3 XTAL_4_436MHz
-#define X4 XTAL_11MHz
+#define X4 XTAL(11'000'000)
 
 class ql_state : public driver_device
 {

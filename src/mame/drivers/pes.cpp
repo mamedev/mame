@@ -61,7 +61,7 @@ Address map:
 #include "speaker.h"
 
 
-#define CPU_CLOCK       XTAL_10_245MHz
+#define CPU_CLOCK       XTAL(10'245'000)
 
 #undef DEBUG_FIFO
 #undef DEBUG_SERIAL_CB

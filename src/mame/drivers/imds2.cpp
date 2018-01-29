@@ -93,19 +93,19 @@
 #include "speaker.h"
 
 // CPU oscillator of IPC board: 8 MHz
-#define IPC_XTAL_Y2     XTAL_8MHz
+#define IPC_XTAL_Y2     XTAL(8'000'000)
 
 // Y1 oscillator of IPC board: 19.6608 MHz
-#define IPC_XTAL_Y1     XTAL_19_6608MHz
+#define IPC_XTAL_Y1     XTAL(19'660'800)
 
 // Main oscillator of IOC board: 22.032 MHz
 #define IOC_XTAL_Y2     22032000
 
 // FDC oscillator of IOC board: 8 MHz
-#define IOC_XTAL_Y1     XTAL_8MHz
+#define IOC_XTAL_Y1     XTAL(8'000'000)
 
 // PIO oscillator: 6 MHz
-#define IOC_XTAL_Y3     XTAL_6MHz
+#define IOC_XTAL_Y3     XTAL(6'000'000)
 
 // Frequency of beeper
 #define IOC_BEEP_FREQ   3300
@@ -868,7 +868,7 @@ MACHINE_CONFIG_START(imds2_state::imds2)
 		MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(imds2_state, imds2_pio_port_p2_w))
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
-		MCFG_CPU_ADD("kbcpu", I8741, XTAL_3_579545MHz)         /* 3.579545 MHz */
+		MCFG_CPU_ADD("kbcpu", I8741, XTAL(3'579'545))         /* 3.579545 MHz */
 		MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(imds2_state, imds2_kb_port_p1_w))
 		MCFG_MCS48_PORT_P2_IN_CB(READ8(imds2_state, imds2_kb_port_p2_r))
 		MCFG_MCS48_PORT_T0_IN_CB(READLINE(imds2_state, imds2_kb_port_t0_r))

@@ -16,18 +16,15 @@
     Touch & Go     | 1995 | GAE1 501  | 950906   | DS5002FP (unprotected version available)
     Touch & Go     | 1995 | GAE1 501  | 950510-1 | DS5002FP
     Maniac Square  | 1996 | GAE1 501  | 940411   | DS5002FP (unprotected version available)
+    Maniac Square  | 1996 | CG-1V 427 | 960419/1 | Lattice IspLSI 1016-80LJ (not used, unprotected)
     Snow Board     | 1996 | CG-1V 366 | 960419/1 | Lattice IspLSI 1016-80LJ
     Bang!          | 1998 | CG-1V 388 | 980921/1 | No
-    Play 2000      | 1999 | CG-1V-149 | ?        | DS5002FP (by Nova Desitec)
+    Play 2000      | 1999 | CG-1V-149 | 990315   | DS5002FP (by Nova Desitec)
 
     Notes:
     touchgo:
     sounds cut out sometimes, others are often missing (sound status reads as busy,
     so no attempt made to play new sound) probably bug in devices\sound\gaelco.cpp ??
-
-Known to exist but not dumped is a Maniac Square v1.0 with checksum 66B1
-  This version of Maniac Square runs on a REF. 960419/1 PCB, the same PCB
-  as the current sets of Snow Board runs on.
 
 ***************************************************************************/
 
@@ -180,7 +177,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_26MHz / 2)     /* 13 MHz? */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(26'000'000) / 2)     /* 13 MHz? */
 	MCFG_CPU_PROGRAM_MAP(maniacsq_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
@@ -212,7 +209,7 @@ MACHINE_CONFIG_START(gaelco2_state::maniacsq)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(gaelco2_state::maniacsq_d5002fp, maniacsq)
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* ? */
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* ? */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
 
@@ -242,6 +239,41 @@ ROM_START( maniacsq ) // REF 940411
 	ROM_FILL(          0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 ROM_END
 
+/*
+Maniac Square
+PCB Layout:
+
+REF: 940411
+------------------------------------------------------------------------------
+|                POT1               KM424C257Z-6 (x3)                        |
+|                                                                            |
+|                POT2                                                        |
+|---                                                                         |
+   |                                                               U47       |
+   |                   30.000MHz          |----------|                       |
+|---                                      |          |             U48       |
+|                                         | GAE1 449 |                       |
+| J                            6264       | (QFP208) |             U49       |
+|                              6264       |          |                       |
+| A                                       |----------|             U50       |
+|                                                                            |
+| M                                                                          |
+|                         |-------------------------|                        |
+| M                       |                         |  24.000MHz     62256   |
+|                         |  62256  DS5002  BATT_3V |                62256   |
+| A                       |                         |                        |
+|                         |-------------------------|                        |
+|                                                                            |
+|---                                    62256                                |
+   |                                    62256                                |
+   |                                                                         |
+|---                                                                         |
+|   DSW1                         MC68000P12        U45                       |
+|                                                  U44                       |
+|   DSW2                                                                     |
+|                                                                            |
+-----------------------------------------------------------------------------|
+*/
 ROM_START( maniacsqa ) // REF 940411
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "MS_U_45.U45",   0x000000, 0x020000, CRC(98f4fdc0) SHA1(1e4d5b0a8a432de885c96319c21280d304b38db0) )
@@ -267,7 +299,7 @@ ROM_START( maniacsqa ) // REF 940411
 	ROM_FILL(          0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 ROM_END
 
-ROM_START( maniacsqu )
+ROM_START( maniacsqu ) // REF 940411
 	ROM_REGION( 0x040000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "d8-d15.1m",   0x000000, 0x020000, CRC(9121d1b6) SHA1(ad8f0d996b6d42fc0c6645466608e82ca96e0b66) )
 	ROM_LOAD16_BYTE( "d0-d7.1m",    0x000001, 0x020000, CRC(a95cfd2a) SHA1(b5bad76f12d2a1f6bf6b35482f2f933ceb00e552) )
@@ -280,6 +312,85 @@ ROM_START( maniacsqu )
 	ROM_LOAD( "d24-d31.1m", 0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
 	ROM_FILL(               0x01a0000, 0x0060000, 0x00 )         /* Empty */
 	ROM_FILL(               0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
+ROM_END
+
+/*
+Maniac Square
+
+PCB Layout:
+REF: 960419/1
+Part No.: E193
+------------------------------------------------------------------------------
+|                                                                            |
+|                                               KM428C256J-6                 |
+|                POT1                                                        |
+|---                                            KM428C256J-6                 |
+   |         SW2                                                   IC43*     |
+   |                   30.000MHz          |----------|                       |
+|---        93C66                         |          |             IC44      |
+|                                         |  CG-1V   |                       |
+| J                                       |   427    |             IC45*     |
+|                                         |          |                       |
+| A                            6264       |----------|             IC46*     |
+|                              6264                                          |
+| M                                                                IC47      |
+|                                                                            |
+| M                                                                  62256   |
+|                                                                    62256   |
+| A                                          |----------|            62256   |
+|                                24.000MHz   | Lattice  |                    |
+|---                                         | IspLSI   |                    |
+   |                                         |   1016   |          MS1.IC53  |
+   |                                         |----------|                    |
+|---                                        |------------|           62256   |
+|                                           |            |                   |
+|                                           |  MC68HC000 |         MS2.IC55  |
+|                                           |    FN16    |                   |
+|                                           |------------|                   |
+-----------------------------------------------------------------------------|
+
+Daughterboard plugs in through IC47 and IC44 sockets
+
+PCB Layout:
+MUN-M4M/1
+Part No.: E192
++--------+
+|   F0   |
+|        |
+|   F1   |
+|   F2   |
+|        |
+|   F3   |
++--------+
+
+* Denotes unpopulated sockets
+
+Although this version of Maniac Square use the same PCB as Snow Board Championship, there are some minor
+omponent changes:
+
+ Slower OSC clocks
+   30.000MHz down from 34.000MHz
+   24.000MHz down from 30.000MHz
+
+The CG-1V 366 has been upgraded to a CG-1V 427
+
+Game configuration is store in 93C66 EEPROM as this PCB doesn't have dipswitches
+
+*/
+
+ROM_START( maniacsqs ) // REF 960419/1
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "ms1.ic53", 0x000000, 0x020000, CRC(911fb089) SHA1(62bebf5072331421d4beedf0bde0cffc362b0514) )
+	ROM_LOAD16_BYTE( "ms2.ic55", 0x000001, 0x020000, CRC(e77a5537) SHA1(e7e1c7b794515238c4b5e5b8ef050eb945c96a3f) )
+
+	ROM_REGION( 0x0280000, "gfx1", 0 ) /* GFX + Sound - same data as other sets */
+	ROM_LOAD( "f0.bin",  0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    /* GFX + Sound */
+	ROM_LOAD( "f1.bin",  0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    /* GFX + Sound */
+	ROM_LOAD( "f2.bin",  0x0100000, 0x0020000, CRC(af4ea5e7) SHA1(ffaf09dc2588e32c124e7dd2f86ba009f1b8b176) )    /* GFX only */
+	ROM_FILL(            0x0120000, 0x0060000, 0x00 )         /* Empty */
+	ROM_LOAD( "f3.bin",  0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    /* GFX only */
+	ROM_FILL(            0x01a0000, 0x0060000, 0x00 )         /* Empty */
+	ROM_FILL(            0x0200000, 0x0080000, 0x00 )         /* to decode GFX as 5bpp */
 ROM_END
 
 /*============================================================================
@@ -420,6 +531,41 @@ ROM_START( play2000 ) /* there are version 4.0 and version 1.0 strings in this, 
 	ROM_LOAD( "palce16v8h.u29",  0x0000, 0x0117, BAD_DUMP CRC(4a0a6f39) SHA1(57351e471649391c9abf110828fe2f128fe84eee) )
 ROM_END
 
+/*
+Play 2000
+
+PCB Layout:
+REF: 990315
+------------------------------------------------------------------------------
+|                                   KM428C256TR  KM428C256TR                 |
+|                                                                            |
+|                POT1                                                        |
+|---                                                                         |
+   |                                                               U50       |
+   |                   SRAM_32Kx8         |----------|                       |
+|---                   SRAM_32Kx8         |          |             U51       |
+|                      34.000MHz          |  CG-1V   |                       |
+| J                    SRAM_32Kx8         |   149    |             U52       |
+|                      SRAM_32Kx8         |          |                       |
+| A                                       |----------|             U53       |
+|                                                                            |
+| M                                                                U54       |
+|                         |---------------------------|                      |
+| M                       |                           |         SRAM_32Kx8   |
+|                         | BATT_3V DS5002 SRAM_32Kx8 |         SRAM_32Kx8   |
+| A                       |                           |                      |
+|                         |---------------------------|                      |
+|                                                                            |
+|---                                         11.0592MHz                      |
+   |                                                                         |
+   |                                                                         |
+|---          |------------|          U39                                    |
+|             |            |                                                 |
+|             |  MC68HC000 |          U40                                    |
+|             |    FN12    |                                                 |
+|             |------------|                                                 |
+-----------------------------------------------------------------------------|
+*/
 ROM_START( play2000a )
 	/*at least 1.u40 is bad, on every 0x40 bytes the first four are always 0xff.*/
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
@@ -447,11 +593,11 @@ ROM_END
 
 MACHINE_CONFIG_START(gaelco2_state::play2000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_11_0592MHz)     /* or from the 34MHz? (34MHz drives the CG-1V-149 PLD?) */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(11'059'200))     /* or from the 34MHz? (34MHz drives the CG-1V-149 PLD?) */
 	MCFG_CPU_PROGRAM_MAP(play2000_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
-	// MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_11_0592MHz) /* 11.0592MHz */
+	// MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(11'059'200)) /* 11.0592MHz */
 	// MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	/* video hardware */
@@ -544,7 +690,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(bang_state::bang)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_30MHz / 2) /* 15 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(30'000'000) / 2) /* 15 MHz */
 	MCFG_CPU_PROGRAM_MAP(bang_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bang_state, bang_irq, "screen", 0, 1)
 
@@ -660,8 +806,6 @@ ROM_START( bang )
 	ROM_LOAD( "bang14.ic14", 0x0880000, 0x0080000, CRC(858fcbf9) SHA1(1e67431c8775666f4839bdc427fabf59ffc708c0) )   /* GFX only */
 	ROM_FILL(                0x0900000, 0x0100000, 0x00 )            /* Empty */
 ROM_END
-
-
 
 ROM_START( bangj )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
@@ -791,7 +935,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelco2_state::alighunt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)         /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)         /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(alighunt_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
@@ -823,7 +967,7 @@ MACHINE_CONFIG_START(gaelco2_state::alighunt)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(gaelco2_state::alighunt_d5002fp, alighunt)
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* 12 MHz */
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* 12 MHz */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
 
@@ -978,7 +1122,6 @@ static ADDRESS_MAP_START( touchgo_map, AS_PROGRAM, 16, gaelco2_state )
 ADDRESS_MAP_END
 
 
-
 static INPUT_PORTS_START( touchgo )
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -1088,7 +1231,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelco2_state::touchgo)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)         /* 16 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000) / 2)         /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(touchgo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
@@ -1136,7 +1279,7 @@ MACHINE_CONFIG_START(gaelco2_state::touchgo)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(gaelco2_state::touchgo_d5002fp, touchgo)
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_40MHz / 4) /* 10MHz? - Not verified */
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(40'000'000) / 4) /* 10MHz? - Not verified */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 MACHINE_CONFIG_END
 
@@ -1334,7 +1477,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_30MHz / 2)         /* 15 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(30'000'000) / 2)         /* 15 MHz */
 	MCFG_CPU_PROGRAM_MAP(snowboar_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
 
@@ -1374,30 +1517,71 @@ MACHINE_CONFIG_START(gaelco2_state::snowboar)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_START(gaelco2_state::maniacsqs)
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2)         /* 12 MHz - see PCB layout above with ROM set */
+	MCFG_CPU_PROGRAM_MAP(snowboar_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco2_state,  irq6_line_hold)
+
+	MCFG_EEPROM_SERIAL_93C66_ADD("eeprom")
+
+	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
+	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(gaelco2_state, coin1_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gaelco2_state, coin2_counter_w))
+	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, di_write))              /* EEPROM data */
+	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, clk_write))             /* EEPROM serial clock */
+	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("eeprom", eeprom_serial_93cxx_device, cs_write))              /* EEPROM chip select */
+
+	/* video hardware */
+	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.1)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_SIZE(64*16, 32*16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 16, 256-1)
+	MCFG_SCREEN_UPDATE_DRIVER(gaelco2_state, screen_update_gaelco2)
+	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x0080000)
+	MCFG_PALETTE_ADD("palette", 4096*16 - 16)   /* game's palette is 4096 but we allocate 15 more for shadows & highlights */
+
+	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_DEVICE_ADD("gaelco", GAELCO_GAE1, 0)
+	MCFG_GAELCO_SND_DATA("gfx1")
+	MCFG_GAELCO_BANKS(0 * 0x0080000, 1 * 0x0080000, 0, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+MACHINE_CONFIG_END
+
 
 /*
 PCB Layout:
 
 REF: 960419/1
 ------------------------------------------------------------------------------
-|                                   KM428C256J-6 (x2)                        |
 |                                                                            |
+|                                               KM428C256J-6                 |
 |                POT1                                                        |
-|---                                                                         |
-   |         SW1                                                   IC43      |
+|---                                            KM428C256J-6                 |
+   |         SW2                                                   IC43      |
    |                   34.000MHz          |----------|                       |
 |---        93C66                         |          |             IC44      |
 |                                         |  CG-1V   |                       |
-| J                            6264       |   366    |             IC45      |
-|                              6264       |          |                       |
-| A                                       |----------|             IC46      |
+| J                                       |   366    |             IC45      |
+|                                         |          |                       |
+| A                            6264       |----------|             IC46      |
+|                              6264                                          |
+| M                                                                IC47*     |
 |                                                                            |
-| M                                                                          |
-|                                                                            |
-| M                         62256                                    62256   |
+| M                                                                  62256   |
 |                                                                    62256   |
-| A                         62256                                    62256   |
-|                                            |----------|                    |
+| A                                          |----------|            62256   |
 |                                30.000MHz   | Lattice  |                    |
 |---                                         | IspLSI   |                    |
    |                                         |   1016   |          SB53      |
@@ -1408,22 +1592,26 @@ REF: 960419/1
 |                                           |    FN16    |                   |
 |                                           |------------|                   |
 -----------------------------------------------------------------------------|
+
+* Denotes unpopulated socket
+
+PCB sets with rom board attached to the underside of the main PCB use CG-1V 0797 instead
 */
 
-ROM_START( snowboara )
+ROM_START( snowboara ) // REF 960419/1
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
-	ROM_LOAD16_BYTE(    "sb53", 0x000000, 0x080000, CRC(e4eaefd4) SHA1(c7de2ae3a4a919fbe16d4997e3f9e2303b8c96b1) ) /* Version 2.0 program roms */
-	ROM_LOAD16_BYTE(    "sb55", 0x000001, 0x080000, CRC(e2476994) SHA1(2ad18652a1fc6ac058c8399373fb77e7a81d5bbd) ) /* Version 2.0 program roms */
+	ROM_LOAD16_BYTE( "sb_53.ic53", 0x000000, 0x080000, CRC(e4eaefd4) SHA1(c7de2ae3a4a919fbe16d4997e3f9e2303b8c96b1) ) /* Version 2.0 program roms */
+	ROM_LOAD16_BYTE( "sb_55.ic55", 0x000001, 0x080000, CRC(e2476994) SHA1(2ad18652a1fc6ac058c8399373fb77e7a81d5bbd) ) /* Version 2.0 program roms */
 
 	ROM_REGION( 0x1400000, "gfx1", 0 )  /* GFX + Sound */
 	/* 0x0000000-0x0ffffff filled in in the DRIVER_INIT */
-	ROM_LOAD( "sb43",       0x1000000, 0x0200000, CRC(afce54ed) SHA1(1d2933d64790612918adbaabcd2a82dad79953c9) )    /* GFX only */
-	ROM_FILL(               0x1200000, 0x0200000, 0x00 )         /* Empty */
+	ROM_LOAD( "sb_ic43.ic43", 0x1000000, 0x0200000, CRC(afce54ed) SHA1(1d2933d64790612918adbaabcd2a82dad79953c9) )    /* GFX only */
+	ROM_FILL(                 0x1200000, 0x0200000, 0x00 )         /* Empty */
 
 	ROM_REGION( 0x0c00000, "gfx2", 0 ) /* Temporary storage */
-	ROM_LOAD( "sb44",       0x0000000, 0x0400000, CRC(1bbe88bc) SHA1(15bce9ada2b742ba4d537fa8efc0f29f661bff00) )    /* GFX only */
-	ROM_LOAD( "sb45",       0x0400000, 0x0400000, CRC(373983d9) SHA1(05e35a8b27cab469885f0ec2a5df200a366b50a1) )    /* Sound only */
-	ROM_LOAD( "sb46",       0x0800000, 0x0400000, CRC(22e7c648) SHA1(baddb9bc13accd83bea61533d7286cf61cd89279) )    /* GFX only */
+	ROM_LOAD( "sb_ic44.ic44", 0x0000000, 0x0400000, CRC(1bbe88bc) SHA1(15bce9ada2b742ba4d537fa8efc0f29f661bff00) )    /* GFX only */
+	ROM_LOAD( "sb_ic45.ic45", 0x0400000, 0x0400000, CRC(373983d9) SHA1(05e35a8b27cab469885f0ec2a5df200a366b50a1) )    /* Sound only */
+	ROM_LOAD( "sb_ic46.ic46", 0x0800000, 0x0400000, CRC(22e7c648) SHA1(baddb9bc13accd83bea61533d7286cf61cd89279) )    /* GFX only */
 ROM_END
 
 ROM_START( snowboar )
@@ -1462,8 +1650,6 @@ ROM_START( snowboar )
 	ROM_LOAD( "sb.e3",      0x1180000, 0x0080000, CRC(4baa678f) SHA1(a7fbbd687e2d8d7e96207c8ace0799a3cc9c3272) )    /* GFX only */
 	ROM_FILL(               0x1200000, 0x0200000, 0x00 )         /* Empty */
 ROM_END
-
-
 
 /*============================================================================
                             WORLD RALLY 2
@@ -1577,11 +1763,11 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(wrally2_state::wrally2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_26MHz / 2) /* 13 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(26'000'000) / 2) /* 13 MHz */
 	MCFG_CPU_PROGRAM_MAP(wrally2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", gaelco2_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_34MHz / 4) /* 8.5MHz? (or 13MHz - 26MHz/2) - Not verified */
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(34'000'000) / 4) /* 8.5MHz? (or 13MHz - 26MHz/2) - Not verified */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
@@ -1798,17 +1984,18 @@ GAME( 1994, aligators,  aligator,alighunt_d5002fp, alighunt, gaelco2_state, alig
 GAME( 1994, aligatorun, aligator,alighunt,         alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 1)", 0 )
 GAME( 1994, aligatoruna,aligator,alighunt,         alighunt, gaelco2_state, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected, set 2)", 0 ) // strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
 
-GAME( 1995, touchgo,  0,        touchgo_d5002fp,  touchgo,  gaelco2_state, touchgo, ROT0, "Gaelco", "Touch & Go (World)", MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgon, touchgo,  touchgo_d5002fp,  touchgo,  gaelco2_state, touchgo, ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgoe, touchgo,  touchgo_d5002fp,  touchgo,  gaelco2_state, touchgo, ROT0, "Gaelco", "Touch & Go (earlier revision)",  MACHINE_IMPERFECT_SOUND )
-GAME( 1995, touchgok, touchgo,  touchgo,          touchgo,  gaelco2_state, touchgo, ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
+GAME( 1995, touchgo,  0,        touchgo_d5002fp,   touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (World)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgon, touchgo,  touchgo_d5002fp,   touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Non North America)", MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgoe, touchgo,  touchgo_d5002fp,   touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (earlier revision)",  MACHINE_IMPERFECT_SOUND )
+GAME( 1995, touchgok, touchgo,  touchgo,           touchgo,  gaelco2_state, touchgo,  ROT0, "Gaelco", "Touch & Go (Korea, unprotected)", MACHINE_IMPERFECT_SOUND ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
 
-GAME( 1995, wrally2,  0,        wrally2, wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", 0 )
+GAME( 1995, wrally2,  0,        wrally2,           wrally2,  wrally2_state, 0,        ROT0, "Gaelco", "World Rally 2: Twin Racing", 0 )
 
 // All sets identify as Version 1.0, but are clearly different revisions
-GAME( 1996, maniacsq, 0,        maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", 0 )
-GAME( 1996, maniacsqa,maniacsq, maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum CF2D)", 0 )
-GAME( 1996, maniacsqu,maniacsq, maniacsq,         maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum BB73)", 0 )
+GAME( 1996, maniacsq,  0,        maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", 0 )
+GAME( 1996, maniacsqa, maniacsq, maniacsq_d5002fp, maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum CF2D)", 0 )
+GAME( 1996, maniacsqu, maniacsq, maniacsq,         maniacsq, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum BB73)", 0 )
+GAME( 1996, maniacsqs, maniacsq, maniacsqs,        snowboar, gaelco2_state, 0,        ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum 66B1, 960419/1 PCB)", 0 ) // Official version on Snow Board Championship PCB, doesn't use the protection
 
 GAME( 1996, snowboar, 0,        snowboar, snowboar, gaelco2_state, 0,        ROT0, "Gaelco", "Snow Board Championship (Version 2.1)", 0 )
 GAME( 1996, snowboara,snowboar, snowboar, snowboar, gaelco2_state, snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", 0 )

@@ -423,7 +423,7 @@ K28 modules:
 // The typical osc freq curve for TMS5100 is unknown. Let's assume it is set to the default frequency,
 // which is 640kHz for 8KHz according to the TMS5100 documentation.
 
-#define MASTER_CLOCK (XTAL_640kHz)
+#define MASTER_CLOCK 640_kHz_XTAL
 
 
 class tispeak_state : public hh_tms1k_state

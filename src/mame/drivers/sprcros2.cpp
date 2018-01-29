@@ -59,7 +59,7 @@ SC-61.5A
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_10MHz
+#define MAIN_CLOCK XTAL(10'000'000)
 
 class sprcros2_state : public driver_device
 {

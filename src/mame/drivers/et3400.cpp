@@ -206,7 +206,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(et3400_state::et3400)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_4MHz / 4 ) // 1MHz with memory i/o accessory, or 500khz without it
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(4'000'000) / 4 ) // 1MHz with memory i/o accessory, or 500khz without it
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	/* video hardware */

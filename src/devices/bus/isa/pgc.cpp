@@ -151,7 +151,7 @@ DEFINE_DEVICE_TYPE(ISA8_PGC, isa8_pgc_device, "isa_ibm_pgc", "IBM Professional G
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_24MHz/3)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(24'000'000)/3)
 	MCFG_CPU_PROGRAM_MAP(pgc_map)
 	MCFG_CPU_IO_MAP(pgc_io)
 #if 0
@@ -161,10 +161,10 @@ MACHINE_CONFIG_START(isa8_pgc_device::device_add_mconfig)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", isa8_pgc_device, scanline_callback,
 		attotime::from_hz(60*PGC_TOTAL_VERT))
-	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_50MHz/(2*PGC_HORZ_START)))
+	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL(50'000'000)/(2*PGC_HORZ_START)))
 
 	MCFG_SCREEN_ADD(PGC_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_50MHz/2,
+	MCFG_SCREEN_RAW_PARAMS(XTAL(50'000'000)/2,
 		PGC_TOTAL_HORZ, PGC_HORZ_START, PGC_HORZ_START+PGC_DISP_HORZ,
 		PGC_TOTAL_VERT, PGC_VERT_START, PGC_VERT_START+PGC_DISP_VERT)
 	MCFG_SCREEN_UPDATE_DRIVER(isa8_pgc_device, screen_update)

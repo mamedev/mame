@@ -837,7 +837,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pc2000_state, pc2000_cart )
 
 MACHINE_CONFIG_START(pc2000_state::pc2000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) /* probably not accurate */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000)) /* probably not accurate */
 	MCFG_CPU_PROGRAM_MAP(pc2000_mem)
 	MCFG_CPU_IO_MAP(pc2000_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(pc2000_state, irq0_line_hold, 50)

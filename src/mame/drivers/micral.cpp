@@ -369,10 +369,10 @@ MACHINE_RESET_MEMBER( micral_state, micral )
 
 MACHINE_CONFIG_START(micral_state::micral)
 	// basic machine hardware
-	MCFG_CPU_ADD( "maincpu", Z80, XTAL_4MHz )
+	MCFG_CPU_ADD( "maincpu", Z80, XTAL(4'000'000) )
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	// no i/o ports on main cpu
-	MCFG_CPU_ADD( "keyboard", Z80, XTAL_1MHz ) // freq unknown
+	MCFG_CPU_ADD( "keyboard", Z80, XTAL(1'000'000) ) // freq unknown
 	MCFG_CPU_PROGRAM_MAP(mem_kbd)
 	MCFG_CPU_IO_MAP(io_kbd)
 

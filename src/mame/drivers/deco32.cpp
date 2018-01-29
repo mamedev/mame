@@ -34,12 +34,12 @@
     Tattoo Assassins uses DE Pinball soundboard 520-5077-00 R
 
 
-    Todo:
+    TODO:
 
-    Tattoo Assassins & Dragongun use an unemulated chip (Ace/Jack) for
+    Tattoo Assassins & Night slashers use an less emulated chip (Ace/Jack) for
     special blending effects.  It's exact effect is unclear.
 
-    Video backgrounds in Dragongun?
+    Video backgrounds(intel DVI) in Dragongun?
 
     Locked'N Loaded (parent set) is a slightly different hardware
     revision: board # DE-0420-1 where the US set is DE-0359-2.
@@ -564,14 +564,14 @@ static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32, nslasher_state )
 	AM_RANGE(0x140000, 0x140003) AM_WRITE(vblank_ack_w)
 	AM_RANGE(0x150000, 0x150003) AM_WRITE(tattass_control_w) /* Volume port/Eprom/Priority */
 	AM_RANGE(0x162000, 0x162fff) AM_RAM             /* 'Jack' RAM!? */
-	AM_RANGE(0x163000, 0x16309f) AM_RAM_WRITE(ace_ram_w) AM_SHARE("ace_ram")
+	AM_RANGE(0x163000, 0x16309f) AM_DEVREADWRITE16("deco_ace", deco_ace_device, ace_r, ace_w, 0x0000ffff) /* 'Ace' RAM */
 	AM_RANGE(0x164000, 0x164003) AM_WRITENOP /* Palette control BG2/3 ($1a constant) */
 	AM_RANGE(0x164004, 0x164007) AM_WRITENOP /* Palette control Obj1 ($6 constant) */
 	AM_RANGE(0x164008, 0x16400b) AM_WRITENOP /* Palette control Obj2 ($5 constant) */
 	AM_RANGE(0x16400c, 0x16400f) AM_WRITENOP
-	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE(buffered_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x168000, 0x169fff) AM_DEVREADWRITE("deco_ace", deco_ace_device, buffered_palette_r, buffered_palette_w)
 	AM_RANGE(0x16c000, 0x16c003) AM_WRITENOP
-	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE(palette_dma_w)
+	AM_RANGE(0x16c008, 0x16c00b) AM_DEVWRITE16("deco_ace", deco_ace_device, palette_dma_w, 0xffffffff)
 	AM_RANGE(0x170000, 0x171fff) AM_READWRITE(spriteram_r, spriteram_w)
 	AM_RANGE(0x174000, 0x174003) AM_WRITENOP /* Sprite DMA mode (2) */
 	AM_RANGE(0x174010, 0x174013) AM_WRITE(buffer_spriteram_w)
@@ -601,14 +601,14 @@ static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32, nslasher_state )
 	AM_RANGE(0x140000, 0x140003) AM_WRITE(vblank_ack_w)
 	AM_RANGE(0x150000, 0x150003) AM_WRITE8(eeprom_w, 0x000000ff)
 	AM_RANGE(0x150000, 0x150003) AM_WRITE8(volume_w, 0x0000ff00)
-	AM_RANGE(0x163000, 0x16309f) AM_RAM_WRITE(ace_ram_w) AM_SHARE("ace_ram") /* 'Ace' RAM!? */
+	AM_RANGE(0x163000, 0x16309f) AM_DEVREADWRITE16("deco_ace", deco_ace_device, ace_r, ace_w, 0x0000ffff) /* 'Ace' RAM */
 	AM_RANGE(0x164000, 0x164003) AM_WRITENOP /* Palette control BG2/3 ($1a constant) */
 	AM_RANGE(0x164004, 0x164007) AM_WRITENOP /* Palette control Obj1 ($4 constant) */
 	AM_RANGE(0x164008, 0x16400b) AM_WRITENOP /* Palette control Obj2 ($6 constant) */
 	AM_RANGE(0x16400c, 0x16400f) AM_WRITENOP
-	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE(buffered_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x168000, 0x169fff) AM_DEVREADWRITE("deco_ace", deco_ace_device, buffered_palette_r, buffered_palette_w)
 	AM_RANGE(0x16c000, 0x16c003) AM_WRITENOP
-	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE(palette_dma_w)
+	AM_RANGE(0x16c008, 0x16c00b) AM_DEVWRITE16("deco_ace", deco_ace_device, palette_dma_w, 0xffffffff)
 	AM_RANGE(0x170000, 0x171fff) AM_READWRITE(spriteram_r, spriteram_w)
 	AM_RANGE(0x174000, 0x174003) AM_WRITENOP /* Sprite DMA mode (2) */
 	AM_RANGE(0x174010, 0x174013) AM_WRITE(buffer_spriteram_w)
@@ -1853,10 +1853,10 @@ GFXDECODE_END
 MACHINE_CONFIG_START(captaven_state::captaven)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz/4) /* verified on pcb (Data East 101 custom)*/
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'000'000)/4) /* verified on pcb (Data East 101 custom)*/
 	MCFG_CPU_PROGRAM_MAP(captaven_map)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4/3)  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/4/3)  /* pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(h6280_sound_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
@@ -1867,7 +1867,7 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	MCFG_DECO_IRQ_VBLANK_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<1>))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(captaven_state, screen_update_captaven)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -1877,7 +1877,8 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x20)
@@ -1890,7 +1891,8 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)    // pf3 is in 8bpp mode, pf4 is not used
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(0)
+	MCFG_DECO16IC_PF1_SIZE(DECO_32x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_32x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0xff)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x00)
 	MCFG_DECO16IC_PF1_COL_BANK(0x10)
@@ -1919,34 +1921,34 @@ MACHINE_CONFIG_START(captaven_state::captaven)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz/9) /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000)/9) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(deco32_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.42)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.42)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, PIN7_HIGH)  /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
+	MCFG_OKIM6295_ADD("oki1", XTAL(32'220'000)/32, PIN7_HIGH)  /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, PIN7_HIGH) /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
+	MCFG_OKIM6295_ADD("oki2", XTAL(32'220'000)/16, PIN7_HIGH) /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
 // DE-0380-2
 MACHINE_CONFIG_START(fghthist_state::fghthist)
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz / 4)
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(fghthist_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz / 8)
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(h6280_sound_custom_latch_map)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(fghthist_state, screen_update_fghthist)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", fghthist)
@@ -1954,7 +1956,8 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -1969,7 +1972,8 @@ MACHINE_CONFIG_START(fghthist_state::fghthist)
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x20)
@@ -2034,7 +2038,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(fghthist_state::fghthistu, fghthsta)
 	MCFG_DEVICE_REMOVE("audiocpu")
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32_22MHz / 9)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'220'000) / 9)
 	MCFG_CPU_PROGRAM_MAP(z80_sound_mem)
 	MCFG_CPU_IO_MAP(z80_sound_io)
 
@@ -2054,7 +2058,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dragngun_state::dragngun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz / 4)
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(dragngun_map)
 
 	MCFG_CPU_ADD("audiocpu", H6280, 32220000/8)
@@ -2071,7 +2075,7 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 	//MCFG_SCREEN_PALETTE("palette")
 
@@ -2079,7 +2083,8 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x20)
@@ -2094,7 +2099,8 @@ MACHINE_CONFIG_START(dragngun_state::dragngun)
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0xff)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0xff)
 	MCFG_DECO16IC_PF1_COL_BANK(0x04)
@@ -2161,13 +2167,14 @@ MACHINE_CONFIG_DERIVED(dragngun_state::lockloadu, dragngun)
 	MCFG_DECO_IRQ_LIGHTGUN_IRQ_CB(DEVWRITELINE("irq_merger", input_merger_any_high_device, in_w<2>))
 
 	MCFG_DEVICE_MODIFY("tilegen2")
-	MCFG_DECO16IC_WIDTH12(0)    // lockload definitely wants pf34 half width..
+	MCFG_DECO16IC_PF1_SIZE(DECO_32x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_32x32)    // lockload definitely wants pf34 half width..
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28MHz / 4)
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(lockload_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("irq_merger")
@@ -2193,7 +2200,7 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(dragngun_state, screen_update_dragngun)
 
 	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
@@ -2205,7 +2212,8 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x20)
@@ -2220,7 +2228,8 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(0)    // lockload definitely wants pf34 half width..
+	MCFG_DECO16IC_PF1_SIZE(DECO_32x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_32x32)    // lockload definitely wants pf34 half width..
 	MCFG_DECO16IC_PF1_TRANS_MASK(0xff)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0xff)
 	MCFG_DECO16IC_PF1_COL_BANK(0x04)
@@ -2245,8 +2254,6 @@ MACHINE_CONFIG_START(dragngun_state::lockload)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("sound_irq_merger", input_merger_any_high_device, in_w<1>))
@@ -2281,12 +2288,16 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update_nslasher)
+
+	MCFG_DECO_ACE_ADD("deco_ace")
+	MCFG_DECO_ACE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -2301,7 +2312,8 @@ MACHINE_CONFIG_START(nslasher_state::tattass)
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x20)
@@ -2341,7 +2353,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nslasher_state::nslasher)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28_322MHz / 4)
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'322'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(nslasher_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", deco32_state, irq0_line_assert)
 
@@ -2357,12 +2369,16 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28_322MHz / 4, 442, 0, 320, 274, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'322'000) / 4, 442, 0, 320, 274, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(nslasher_state, screen_update_nslasher)
+
+	MCFG_DECO_ACE_ADD("deco_ace")
+	MCFG_DECO_ACE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -2377,7 +2393,8 @@ MACHINE_CONFIG_START(nslasher_state::nslasher)
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x20)

@@ -148,7 +148,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(fidelmcs48_state::sc6)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8040, XTAL_11MHz)
+	MCFG_CPU_ADD("maincpu", I8040, 11_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(sc6_map)
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(fidelmcs48_state, sc6_mux_w))
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(fidelmcs48_state, sc6_input_r))

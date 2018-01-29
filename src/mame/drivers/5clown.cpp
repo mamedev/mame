@@ -452,7 +452,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_10MHz
+#define MASTER_CLOCK    XTAL(10'000'000)
 
 
 class _5clown_state : public driver_device

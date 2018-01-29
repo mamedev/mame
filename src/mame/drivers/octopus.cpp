@@ -611,7 +611,7 @@ WRITE8_MEMBER(octopus_state::vidcontrol_w)
 {
 	m_vidctrl = data;
 	m_fdc->dden_w(data & 0x04);
-	m_fdc->set_unscaled_clock((data & 0x08) ? XTAL_16MHz / 16 : XTAL_16MHz / 8);
+	m_fdc->set_unscaled_clock((data & 0x08) ? XTAL(16'000'000) / 16 : XTAL(16'000'000) / 8);
 }
 
 // Sound hardware
@@ -868,16 +868,16 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(octopus_state::octopus)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8088, XTAL_24MHz / 3)  // 8MHz
+	MCFG_CPU_ADD("maincpu",I8088, XTAL(24'000'000) / 3)  // 8MHz
 	MCFG_CPU_PROGRAM_MAP(octopus_mem)
 	MCFG_CPU_IO_MAP(octopus_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(octopus_state, x86_irq_cb)
 
-	MCFG_CPU_ADD("subcpu",Z80, XTAL_24MHz / 4) // 6MHz
+	MCFG_CPU_ADD("subcpu",Z80, XTAL(24'000'000) / 4) // 6MHz
 	MCFG_CPU_PROGRAM_MAP(octopus_sub_mem)
 	MCFG_CPU_IO_MAP(octopus_sub_io)
 
-	MCFG_DEVICE_ADD("dma1", AM9517A, XTAL_24MHz / 6)  // 4MHz
+	MCFG_DEVICE_ADD("dma1", AM9517A, XTAL(24'000'000) / 6)  // 4MHz
 	MCFG_I8237_OUT_HREQ_CB(DEVWRITELINE("dma2", am9517a_device, dreq0_w))
 	MCFG_I8237_IN_MEMR_CB(READ8(octopus_state,dma_read))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(octopus_state,dma_write))
@@ -893,7 +893,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_I8237_OUT_DACK_1_CB(WRITELINE(octopus_state, dack1_w))
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(octopus_state, dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(octopus_state, dack3_w))
-	MCFG_DEVICE_ADD("dma2", AM9517A, XTAL_24MHz / 6)  // 4MHz
+	MCFG_DEVICE_ADD("dma2", AM9517A, XTAL(24'000'000) / 6)  // 4MHz
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(octopus_state, dma_hrq_changed))
 	MCFG_I8237_IN_MEMR_CB(READ8(octopus_state,dma_read))
 	MCFG_I8237_OUT_MEMW_CB(WRITE8(octopus_state,dma_write))
@@ -927,7 +927,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(octopus_state,rtc_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(octopus_state,cntl_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(octopus_state,gpo_w))
-	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
+	MCFG_MC146818_ADD("rtc", XTAL(32'768))
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic_slave",pic8259_device, ir2_w)) MCFG_DEVCB_INVERT
 
 	// Keyboard UART
@@ -942,7 +942,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_DEVICE_ADD("keyboard_clock_tx", CLOCK, 1200 * 64)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("keyboard",i8251_device,write_txc))
 
-	MCFG_FD1793_ADD("fdc",XTAL_16MHz / 8)
+	MCFG_FD1793_ADD("fdc",XTAL(16'000'000) / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic_master",pic8259_device, ir5_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("dma2",am9517a_device, dreq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", octopus_floppies, "525dd", floppy_image_device::default_floppy_formats)
@@ -961,7 +961,7 @@ MACHINE_CONFIG_START(octopus_state::octopus)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("serial", Z80SIO, XTAL_16MHz / 4) // clock rate not mentioned in tech manual
+	MCFG_DEVICE_ADD("serial", Z80SIO, XTAL(16'000'000) / 4) // clock rate not mentioned in tech manual
 	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("pic_master",pic8259_device, ir1_w))
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_txd))

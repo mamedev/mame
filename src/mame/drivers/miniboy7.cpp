@@ -144,7 +144,7 @@
 #include "miniboy7.lh"
 
 
-#define MASTER_CLOCK    XTAL_12_4725MHz    /* 12.4725 MHz */
+#define MASTER_CLOCK    XTAL(12'472'500)    /* 12.4725 MHz */
 
 
 class miniboy7_state : public driver_device

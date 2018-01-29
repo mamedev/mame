@@ -364,7 +364,7 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(at_state::ibm5170)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz/2 /*6000000*/)
+	MCFG_CPU_ADD("maincpu", I80286, XTAL(12'000'000)/2 /*6000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
@@ -389,7 +389,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(at_state::ibm5170a, ibm5170)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_16MHz/2)
+	MCFG_CPU_CLOCK(XTAL(16'000'000)/2)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(at_state::ec1842, ibm5170)
@@ -407,7 +407,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(at_state::ibmps1, ibm5170)
 	MCFG_MACHINE_START_OVERRIDE(at_state, vrom_fix)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_10MHz)
+	MCFG_CPU_CLOCK(XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(at16l_map)
 	MCFG_CPU_IO_MAP(ps1_16_io)
 	MCFG_DEVICE_MODIFY("isa1")
@@ -513,7 +513,7 @@ MACHINE_CONFIG_END
 // Commodore PC 30-III
 MACHINE_CONFIG_DERIVED(at_state::pc30iii, ibm5170)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000) // should be XTAL_24MHz/2, but doesn't post with that setting
+	MCFG_CPU_CLOCK(6000000) // should be XTAL(24'000'000)/2, but doesn't post with that setting
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be ATI EGA Wonder 800+
 MACHINE_CONFIG_END
@@ -521,18 +521,18 @@ MACHINE_CONFIG_END
 // Commodore PC 40-III
 MACHINE_CONFIG_DERIVED(at_state::pc40iii, ibm5170)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000) // should be XTAL_24MHz/2, but doesn't post with that setting
+	MCFG_CPU_CLOCK(6000000) // should be XTAL(24'000'000)/2, but doesn't post with that setting
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be onboard Paradise VGA, see ROM declarations
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megapc_state::megapc)
-	MCFG_CPU_ADD("maincpu", I386SX, XTAL_50MHz / 2)
+	MCFG_CPU_ADD("maincpu", I386SX, XTAL(50'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(megapc_map)
 	MCFG_CPU_IO_MAP(megapc_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 
-	MCFG_WD7600_ADD("wd7600",XTAL_50MHz / 2, ":maincpu", ":isa", ":bios", ":keybc")
+	MCFG_WD7600_ADD("wd7600",XTAL(50'000'000) / 2, ":maincpu", ":isa", ":bios", ":keybc")
 	MCFG_WD7600_HOLD(WRITELINE(megapc_state, wd7600_hold));
 	MCFG_WD7600_NMI(INPUTLINE("maincpu", INPUT_LINE_NMI));
 	MCFG_WD7600_INTR(INPUTLINE("maincpu", INPUT_LINE_IRQ0));
@@ -575,7 +575,7 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 	// ISA cards
 	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, nullptr, false)
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL_12MHz)
+	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
 	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(DEVWRITELINE("wd7600", wd7600_device, kbrst_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(DEVWRITELINE("wd7600", wd7600_device, gatea20_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(DEVWRITELINE("wd7600", wd7600_device, irq01_w))
@@ -689,7 +689,7 @@ MACHINE_CONFIG_END
 // Compaq Portable III
 MACHINE_CONFIG_START(at_state::comportiii)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL_48MHz/4 /*12000000*/)
+	MCFG_CPU_ADD("maincpu", I80286, XTAL(48'000'000)/4 /*12000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)

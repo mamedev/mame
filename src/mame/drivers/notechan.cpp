@@ -294,7 +294,7 @@
 #include "notechan.lh"
 
 
-#define MASTER_CLOCK     XTAL_8_448MHz
+#define MASTER_CLOCK     XTAL(8'448'000)
 #define CPU_CLOCK        MASTER_CLOCK / 2    // guess... not verified
 #define SND_CLOCK        MASTER_CLOCK / 8    // guess... not verified
 

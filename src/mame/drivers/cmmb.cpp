@@ -51,7 +51,7 @@ OSC @ 72.576MHz
 #include "machine/at29x.h"
 #include "screen.h"
 
-#define MAIN_CLOCK XTAL_72_576MHz
+#define MAIN_CLOCK XTAL(72'576'000)
 
 class cmmb_state : public driver_device
 {

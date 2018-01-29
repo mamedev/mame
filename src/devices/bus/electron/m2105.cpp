@@ -78,7 +78,7 @@ MACHINE_CONFIG_START(electron_m2105_device::device_add_mconfig)
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
 
 	/* duart */
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("irqs", input_merger_device, in_w<2>))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	//MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(electron_m2105_device, sio_out_w))
@@ -153,16 +153,16 @@ uint8_t electron_m2105_device::expbus_r(address_space &space, offs_t offset, uin
 		switch (m_romsel)
 		{
 		case 0:
-			data = memregion("exp_rom")->base()[0x8000 + (offset & 0x3fff)];
+			data = m_exp_rom->base()[0x8000 + (offset & 0x3fff)];
 			break;
 		case 2:
-			data = memregion("exp_rom")->base()[0xc000 + (offset & 0x3fff)];
+			data = m_exp_rom->base()[0xc000 + (offset & 0x3fff)];
 			break;
 		case 12:
-			data = memregion("exp_rom")->base()[0x0000 + (offset & 0x3fff)];
+			data = m_exp_rom->base()[0x0000 + (offset & 0x3fff)];
 			break;
 		case 13:
-			data = memregion("exp_rom")->base()[0x4000 + (offset & 0x3fff)];
+			data = m_exp_rom->base()[0x4000 + (offset & 0x3fff)];
 			break;
 		}
 	}

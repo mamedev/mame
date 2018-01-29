@@ -33,7 +33,7 @@ http://www.zimmers.net/anonftp/pub/cbm/schematics/computers/C64DX_aka_C65_System
 #include "softlist_dev.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_28_37516MHz/8
+#define MAIN_CLOCK XTAL(28'375'160)/8
 
 class c65_state : public driver_device
 {

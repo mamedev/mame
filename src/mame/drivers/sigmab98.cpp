@@ -666,7 +666,7 @@ READ8_MEMBER(sigmab98_state::d013_r)
 {
 	// bit 5 must go 0->1 (vblank?)
 	// bit 2 must be set (sprite buffered? triggered by pulsing bit 3 of port C6?)
-//	return (m_screen->vblank() ? 0x20 : 0x00) | 0x04;
+//  return (m_screen->vblank() ? 0x20 : 0x00) | 0x04;
 	return (m_screen->vblank() ? 0x20 : 0x01) | 0x04;
 //  return machine().rand();
 }
@@ -1164,7 +1164,7 @@ WRITE8_MEMBER(lufykzku_state::lufykzku_watchdog_w)
 WRITE8_MEMBER(lufykzku_state::lufykzku_c4_w)
 {
 	machine().bookkeeping().coin_lockout_w(1, (~data) & 0x20); // 100 yen lockout
-//	machine().bookkeeping().coin_lockout_w(2, (~data) & 0x40); // (unused coin lockout)
+//  machine().bookkeeping().coin_lockout_w(2, (~data) & 0x40); // (unused coin lockout)
 	machine().bookkeeping().coin_lockout_w(0, (~data) & 0x80); // medal lockout
 
 	m_c4 = data;
@@ -1175,13 +1175,13 @@ WRITE8_MEMBER(lufykzku_state::lufykzku_c4_w)
 WRITE8_MEMBER(lufykzku_state::lufykzku_c6_w)
 {
 	machine().bookkeeping().coin_counter_w(1, data & 0x01); // 100 yen in
-//	machine().bookkeeping().coin_counter_w(2, data & 0x02); // (unused coin in)
+//  machine().bookkeeping().coin_counter_w(2, data & 0x02); // (unused coin in)
 	machine().bookkeeping().coin_counter_w(0, data & 0x04); // medal in
 	machine().bookkeeping().coin_counter_w(3, data & 0x08); // medal out
 	output().set_led_value(0,                 data & 0x10); // button led
-//	output().set_led_value(1,                 data & 0x20); // (unused button led)
-//	output().set_led_value(2,                 data & 0x40); // (unused button led)
-//	output().set_led_value(3,                 data & 0x80); // (unused button led)
+//  output().set_led_value(1,                 data & 0x20); // (unused button led)
+//  output().set_led_value(2,                 data & 0x40); // (unused button led)
+//  output().set_led_value(3,                 data & 0x80); // (unused button led)
 
 	m_c6 = data;
 	show_outputs();
@@ -2877,7 +2877,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lufykzku_state::lufykzku_irq)
 }
 
 MACHINE_CONFIG_START(lufykzku_state::lufykzku)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 2)  // !! TAXAN KY-80, clock @X1? !!
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(20'000'000) / 2)  // !! TAXAN KY-80, clock @X1? !!
 	MCFG_CPU_PROGRAM_MAP(lufykzku_mem_map)
 	MCFG_CPU_IO_MAP(lufykzku_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", lufykzku_state, lufykzku_irq, "screen", 0, 1)
@@ -2913,11 +2913,11 @@ MACHINE_CONFIG_START(lufykzku_state::lufykzku)
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
 
-//	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram") // same as sammymdl?
+//  MCFG_BUFFERED_SPRITERAM8_ADD("spriteram") // same as sammymdl?
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_OKIM9810_ADD("oki", XTAL_4_096MHz)
+	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -2947,7 +2947,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymdl_irq)
 }
 
 MACHINE_CONFIG_START(sigmab98_state::sammymdl)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz / 2)    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(20'000'000) / 2)    // !! KL5C80A120FP @ 10MHz? (actually 4 times faster than Z80) !!
 	MCFG_CPU_PROGRAM_MAP( animalc_map )
 	MCFG_CPU_IO_MAP( animalc_io )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sigmab98_state, sammymdl_irq, "screen", 0, 1)
@@ -2981,7 +2981,7 @@ MACHINE_CONFIG_START(sigmab98_state::sammymdl)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM9810_ADD("oki", XTAL_4_096MHz)
+	MCFG_OKIM9810_ADD("oki", XTAL(4'096'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -3476,7 +3476,7 @@ DRIVER_INIT_MEMBER(lufykzku_state,lufykzku)
 
     Xilinx XC9536 VM1212F01 (@U5) - In-System Programmable CPLD
     MX29F0??C (@U3) - Empty 32 Pin ROM Socket
-	M5295A (@U8) - Watchdog Timer (Near CUT-DEBUG MODE Jumper)
+    M5295A (@U8) - Watchdog Timer (Near CUT-DEBUG MODE Jumper)
     M93C46MN6T (@U11?) - Serial EEPROM
     Cell Battery (@BAT)
     25 Pin Edge Connector

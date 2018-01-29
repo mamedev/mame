@@ -345,7 +345,7 @@ MC6845_UPDATE_ROW( myb3k_state::crtc_update_row )
 						pdat = 0x00; // This gets wrong when background color is not black
 					}
 					else
-					{	// 320x200, 40x25 char, 8 color
+					{   // 320x200, 40x25 char, 8 color
 						uint32_t rowstart = (((x_pos + ma) * 32 + ra) & 0x7fff) + page;
 						pdat  = ((m_vram[rowstart +  0]  & 0xff) << 16); // Green 8 bits
 						pdat |= ((m_vram[rowstart +  8]  & 0xf0) << 8);  // Red upper 4 bits
@@ -448,8 +448,8 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
 	m_vmode = data;
 	switch (data & 7)
 	{
-	case 0: // Disambiguity between reality and the service manual. Reality is 640x200 in 8 color or tones! 
-	        {
+	case 0: // Disambiguity between reality and the service manual. Reality is 640x200 in 8 color or tones!
+			{
 			LOGVMOD(" - 640x200 on 80x25  \n");
 			rectangle rect(0, 640 - 1, 0, 200 - 1);
 			m_screen->configure(640, 200, rect, HZ_TO_ATTOSECONDS(50));
@@ -927,7 +927,7 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(myb3k_state::myb3k)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz / 3) /* 14.3182 main crystal divided by three through a 8284A */
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181) / 3) /* 14.3182 main crystal divided by three through a 8284A */
 	MCFG_CPU_PROGRAM_MAP(myb3k_map)
 	MCFG_CPU_IO_MAP(myb3k_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic", pic8259_device, inta_cb)
@@ -948,7 +948,7 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(myb3k_state, ppi_portc_w))
 
 	/* DMA controller */
-	MCFG_DEVICE_ADD("dma", I8257, XTAL_14_31818MHz / 6)
+	MCFG_DEVICE_ADD("dma", I8257, XTAL(14'318'181) / 6)
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(myb3k_state, hrq_w))
 	MCFG_I8257_OUT_TC_CB(WRITELINE(myb3k_state, tc_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(myb3k_state, dma_memory_read_byte))
@@ -968,15 +968,15 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 
 	/* Timer */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
-	MCFG_PIT8253_CLK0(XTAL_14_31818MHz / 12.0) /* TIMINT straight into IRQ0 */
+	MCFG_PIT8253_CLK0(XTAL(14'318'181) / 12.0) /* TIMINT straight into IRQ0 */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("pic", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL_14_31818MHz / 12.0) /* speaker if port c bit 5 is low */
+	MCFG_PIT8253_CLK1(XTAL(14'318'181) / 12.0) /* speaker if port c bit 5 is low */
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(myb3k_state, pit_out1_changed))
-	//  MCFG_PIT8253_CLK2(XTAL_14_31818MHz / 12.0) /* ANDed with port c bit 6 but marked as "not use"*/
+	//  MCFG_PIT8253_CLK2(XTAL(14'318'181) / 12.0) /* ANDed with port c bit 6 but marked as "not use"*/
 	//  MCFG_PIT8253_OUT2_HANDLER(WRITELINE(myb3k_state, pit_out2_changed))
 
 	/* Video controller */
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_14_31818MHz / 16) /* Main crystal divided by 16 through a 74163 4 bit counter */
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(14'318'181) / 16) /* Main crystal divided by 16 through a 74163 4 bit counter */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(myb3k_state, crtc_update_row)
@@ -1017,7 +1017,7 @@ MACHINE_CONFIG_START(myb3k_state::myb3k)
 
 	/* Monitor */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz / 3, 600, 0, 600, 400, 0, 400)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181) / 3, 600, 0, 600, 400, 0, 400)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", h46505_device, screen_update)
 MACHINE_CONFIG_END
 

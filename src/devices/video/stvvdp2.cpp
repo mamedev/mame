@@ -64,7 +64,7 @@ Video emulation TODO:
 - virtual hydlide:
  \- transparent pens usage on most vdp1 items should be black instead.
  \- likewise "press start button" is the other way around, i.e. black pen where it should be transparent instead.
- 
+
 Notes of Interest & Unclear features:
 
 -the test mode / bios is drawn with layer NBG3;
@@ -6018,7 +6018,7 @@ int saturn_state::get_pixel_clock( void )
 {
 	int res,divider;
 
-	res = m_vdp2.dotsel ? MASTER_CLOCK_352 : MASTER_CLOCK_320;
+	res = (m_vdp2.dotsel ? MASTER_CLOCK_352 : MASTER_CLOCK_320).value();
 	/* TODO: divider is ALWAYS 8, this thing is just to over-compensate for MAME framework faults ... */
 	divider = 8;
 

@@ -115,8 +115,8 @@ video z80
 #include "speaker.h"
 
 
-#define MASTER_CLOCK XTAL_4MHz
-#define SOUND_CLOCK XTAL_14_31818MHz
+#define MASTER_CLOCK XTAL(4'000'000)
+#define SOUND_CLOCK XTAL(14'318'181)
 
 
 class mazerbla_state : public driver_device

@@ -12,6 +12,7 @@
 #include "emu.h"
 
 #include "bus/psx/ctlrport.h"
+#include "bus/psx/parallel.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/psx/psx.h"
 #include "imagedev/chd_cd.h"
@@ -35,7 +36,8 @@ public:
 	psx1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_ram(*this, "maincpu:ram")
+		m_ram(*this, "maincpu:ram"),
+		m_parallel(*this, "parallel")
 	{
 	}
 
@@ -66,6 +68,9 @@ public:
 	void pse(machine_config &config);
 	void psu(machine_config &config);
 	void psj(machine_config &config);
+
+private:
+	required_device<psx_parallel_slot_device> m_parallel;
 };
 
 
@@ -407,6 +412,13 @@ int psx1_state::load_psf(std::vector<uint8_t> buffer)
 
 READ16_MEMBER(psx1_state::parallel_r)
 {
+	if (m_parallel->hascard())
+	{
+		uint16_t dat = m_parallel->exp_r(space,offset,mem_mask);
+		return dat;
+	}
+
+	// all this could probably be a fake parallel device instead?
 	const uint16_t bootloader[] =
 	{
 		0x00b0, 0x1f00, 0x694c, 0x6563, 0x736e, 0x6465, 0x6220, 0x2079,
@@ -431,6 +443,12 @@ READ16_MEMBER(psx1_state::parallel_r)
 
 WRITE16_MEMBER(psx1_state::parallel_w)
 {
+	if (m_parallel->hascard())
+	{
+		m_parallel->exp_w(space,offset,data, mem_mask);
+		return;
+	}
+
 	if (m_exe_buffer.size() != 0)
 	{
 		if (load_psxexe(m_exe_buffer) ||
@@ -484,7 +502,7 @@ void psx1_state::cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t
 }
 
 static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32, psx1_state )
-	AM_RANGE(0x1f000000, 0x1f0001ff) AM_READWRITE16(parallel_r, parallel_w, 0xffffffff)
+	AM_RANGE(0x1f000000, 0x1f07ffff) AM_READWRITE16(parallel_r, parallel_w, 0xffffffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, psx1_state )
@@ -493,7 +511,7 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(psx1_state::psj)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
 	MCFG_CPU_PROGRAM_MAP( psx_map )
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -511,17 +529,19 @@ MACHINE_CONFIG_START(psx1_state::psj)
 	MCFG_PSX_SIO_TXD_HANDLER(DEVWRITELINE("^controllers", psxcontrollerports_device, write_txd))
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
+	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	MCFG_QUICKLOAD_ADD("quickload", psx1_state, psx_exe_load, "cpe,exe,psf,psx", 0)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
+
+	MCFG_PSX_PARALLEL_SLOT_ADD("parallel", psx_parallel_devices, nullptr)
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_PSX_CD_READ_HANDLER( DEVREAD8( PSXCD_TAG, psxcd_device, read ) )
@@ -540,7 +560,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(psx1_state::pse)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530AQ, XTAL(67'737'600) )
 	MCFG_CPU_PROGRAM_MAP( psx_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -559,17 +579,19 @@ MACHINE_CONFIG_START(psx1_state::pse)
 
 	/* video hardware */
 	/* TODO: visible area and refresh rate */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
+	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	MCFG_QUICKLOAD_ADD("quickload", psx1_state, psx_exe_load, "cpe,exe,psf,psx", 0)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
+
+	MCFG_PSX_PARALLEL_SLOT_ADD("parallel", psx_parallel_devices, nullptr)
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_PSX_CD_READ_HANDLER( DEVREAD8( PSXCD_TAG, psxcd_device, read ) )

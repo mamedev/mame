@@ -118,7 +118,7 @@ public:
 
 
 #define MAIN_CLOCK 4000000 /* 4 MHz */
-#define PIXEL_CLOCK XTAL_4_433619MHz
+#define PIXEL_CLOCK XTAL(4'433'619)
 
 
 MC6845_UPDATE_ROW( m20_state::update_row )

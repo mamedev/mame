@@ -52,12 +52,12 @@ MACHINE_CONFIG_START(msx_cart_sfg_device::device_add_mconfig)
 	// YM2148 (MKS)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_YM2151_ADD("ym2151", XTAL_3_579545MHz)  // The SFG01 uses a YM2151, the SFG05 uses a YM2164, input clock comes from the main cpu frequency
+	MCFG_YM2151_ADD("ym2151", XTAL(3'579'545))  // The SFG01 uses a YM2151, the SFG05 uses a YM2164, input clock comes from the main cpu frequency
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(msx_cart_sfg_device, ym2151_irq_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
-	MCFG_DEVICE_ADD("ym2148", YM2148, XTAL_4MHz)
+	MCFG_DEVICE_ADD("ym2148", YM2148, XTAL(4'000'000))
 	MCFG_YM2148_TXD_HANDLER(DEVWRITELINE("mdout", midi_port_device, write_txd))
 	MCFG_YM2148_PORT_WRITE_HANDLER(DEVWRITE8("kbdc", msx_audio_kbdc_port_device, write))
 	MCFG_YM2148_PORT_READ_HANDLER(DEVREAD8("kbdc", msx_audio_kbdc_port_device, read))

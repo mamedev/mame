@@ -1498,7 +1498,7 @@ MACHINE_CONFIG_START(crystal_state::crystal)
 
 	MCFG_PALETTE_ADD_RRRRRGGGGGGBBBBB("palette")
 
-	MCFG_DS1302_ADD("rtc", XTAL_32_768kHz)
+	MCFG_DS1302_ADD("rtc", XTAL(32'768))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

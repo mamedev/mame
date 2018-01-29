@@ -36,7 +36,7 @@ public:
 		m_tgpx4_program(*this, "tgpx4_program"),
 		m_maincpu(*this,"maincpu"),
 		m_dsbz80(*this, DSBZ80_TAG),
-		m_m1audio(*this, "m1audio"),
+		m_m1audio(*this, M1AUDIO_TAG),
 		m_uart(*this, "uart"),
 		m_m2comm(*this, "m2comm"),
 		m_audiocpu(*this, "audiocpu"),

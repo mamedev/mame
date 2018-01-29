@@ -195,12 +195,12 @@ INTERRUPT_GEN_MEMBER(horse_state::interrupt)
 MACHINE_CONFIG_START(horse_state::horse)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_12MHz / 2)
+	MCFG_CPU_ADD("maincpu", I8085A, XTAL(12'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(horse_map)
 	MCFG_CPU_IO_MAP(horse_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", horse_state,  interrupt)
 
-	MCFG_DEVICE_ADD("i8155", I8155, XTAL_12MHz / 2) // port A input, B output, C output but unused
+	MCFG_DEVICE_ADD("i8155", I8155, XTAL(12'000'000) / 2) // port A input, B output, C output but unused
 	MCFG_I8155_IN_PORTA_CB(READ8(horse_state, input_r))
 	MCFG_I8155_OUT_PORTB_CB(WRITE8(horse_state, output_w))
 	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))

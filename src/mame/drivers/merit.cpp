@@ -77,7 +77,7 @@ Merit Riviera Notes - There are several known versions:
 #include "screen.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK            (XTAL_10MHz)
+#define MASTER_CLOCK            (XTAL(10'000'000))
 #define CPU_CLOCK               (MASTER_CLOCK / 4)
 #define PIXEL_CLOCK             (MASTER_CLOCK / 1)
 #define CRTC_CLOCK              (MASTER_CLOCK / 8)

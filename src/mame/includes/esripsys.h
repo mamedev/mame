@@ -17,7 +17,7 @@
 #include "screen.h"
 
 /* TODO */
-#define ESRIPSYS_PIXEL_CLOCK    (XTAL_25MHz / 2)
+#define ESRIPSYS_PIXEL_CLOCK    (XTAL(25'000'000) / 2)
 #define ESRIPSYS_HTOTAL         (512 + 141 + 2)
 #define ESRIPSYS_HBLANK_START   (512)
 #define ESRIPSYS_HBLANK_END     (0)

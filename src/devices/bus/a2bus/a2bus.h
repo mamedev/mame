@@ -51,7 +51,7 @@
 	MCFG_DEVICE_INPUT_DEFAULTS(_def_inp) \
 	device_a2bus_card_interface::static_set_a2bus_tag(*device, _nbtag, _tag);
 
-// 7M = XTAL_14_31818MHz / 2 or XTAL_28_63636MHz / 4 (for IIgs)
+// 7M = XTAL(14'318'181) / 2 or XTAL(28'636'363) / 4 (for IIgs)
 static constexpr uint32_t A2BUS_7M_CLOCK = 7159090;
 
 //**************************************************************************
@@ -67,13 +67,13 @@ public:
 	// construction/destruction
 	a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// inline configuration
 	static void static_set_a2bus_slot(device_t &device, const char *tag, const char *slottag);
 protected:
 	a2bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
 
 	// configuration
 	const char *m_a2bus_tag, *m_a2bus_slottag;
@@ -84,6 +84,7 @@ DECLARE_DEVICE_TYPE(A2BUS_SLOT, a2bus_slot_device)
 
 
 class device_a2bus_card_interface;
+
 // ======================> a2bus_device
 class a2bus_device : public device_t
 {
@@ -167,8 +168,6 @@ public:
 
 	device_a2bus_card_interface *next() const { return m_next; }
 
-	void set_a2bus_device();
-
 	uint32_t get_slotromspace() { return 0xc000 | (m_slot<<8); }      // return Cn00 address for this slot
 	uint32_t get_slotiospace() { return 0xc080 + (m_slot<<4); }       // return C0n0 address for this slot
 
@@ -194,6 +193,12 @@ public:
 protected:
 	device_a2bus_card_interface(const machine_config &mconfig, device_t &device);
 
+	virtual void interface_pre_start() override;
+
+	int slotno() const { assert(m_a2bus); return m_slot; }
+	a2bus_device &a2bus() { assert(m_a2bus); return *m_a2bus; }
+
+private:
 	a2bus_device  *m_a2bus;
 	const char *m_a2bus_tag, *m_a2bus_slottag;
 	int m_slot;

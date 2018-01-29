@@ -512,7 +512,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(sprint2_state::sprint2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'096'000) / 16)
 	MCFG_CPU_PROGRAM_MAP(sprint2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sprint2_state,  sprint2)
 

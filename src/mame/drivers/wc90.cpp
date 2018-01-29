@@ -346,15 +346,15 @@ void wc90_state::machine_start()
 MACHINE_CONFIG_START(wc90_state::wc90)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz)     /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000))     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(wc90_map_1)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_8MHz)     /* verified on pcb */
+	MCFG_CPU_ADD("sub", Z80, XTAL(8'000'000))     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(wc90_map_2)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)  /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	/* NMIs are triggered by the main CPU */
 
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(wc90_state::wc90)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL_8MHz)  /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)

@@ -17,12 +17,22 @@ public:
 		m_ata(*this, "ata"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_turntable(*this, {"TT1", "TT2"})
+		m_turntable(*this, {"TT1", "TT2"}),
+		m_sndram(*this, "sndram")
 	{
 	}
 
+	required_shared_ptr<uint32_t> m_obj_ram;
+	required_device<cpu_device> m_maincpu;
+	required_device<k056832_device> m_k056832;
+	required_device<k055555_device> m_k055555;
+	required_device<ata_interface_device> m_ata;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	optional_ioport_array<2> m_turntable;
+	required_shared_ptr<uint8_t> m_sndram;
+
 	int m_sndram_bank;
-	uint8_t *m_sndram;
 	int m_turntable_select;
 	uint8_t m_turntable_last_pos[2];
 	uint16_t m_turntable_pos[2];
@@ -31,7 +41,6 @@ public:
 	uint32_t m_obj_regs[0xa0/4];
 	const uint8_t *m_ata_user_password;
 	const uint8_t *m_ata_master_password;
-	required_shared_ptr<uint32_t> m_obj_ram;
 	DECLARE_WRITE32_MEMBER(sndram_bank_w);
 	DECLARE_READ32_MEMBER(sndram_r);
 	DECLARE_WRITE32_MEMBER(sndram_w);
@@ -67,16 +76,8 @@ public:
 	uint32_t screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vb_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	void sndram_set_bank();
 	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<k056832_device> m_k056832;
-	required_device<k055555_device> m_k055555;
-	required_device<ata_interface_device> m_ata;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 	K056832_CB_MEMBER(tile_callback);
-	optional_ioport_array<2> m_turntable;
 	void djmainj(machine_config &config);
 	void djmainu(machine_config &config);
 	void djmaina(machine_config &config);

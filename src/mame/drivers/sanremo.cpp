@@ -101,7 +101,7 @@
 #include "sanremo.lh"
 
 
-#define MASTER_CLOCK    XTAL_18MHz
+#define MASTER_CLOCK    XTAL(18'000'000)
 
 #define CPU_CLOCK       MASTER_CLOCK/3
 #define SND_CLOCK       MASTER_CLOCK/12

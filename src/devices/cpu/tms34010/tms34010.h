@@ -162,6 +162,7 @@ public:
 
 	static void set_halt_on_reset(device_t &device, bool halt_on_reset) { downcast<tms340x0_device &>(device).m_halt_on_reset = halt_on_reset; }
 	static void set_pixel_clock(device_t &device, uint32_t pixclock) { downcast<tms340x0_device &>(device).m_pixclock = pixclock; }
+	static void set_pixel_clock(device_t &device, const XTAL &xtal) { set_pixel_clock(device, xtal.value()); }
 	static void set_pixels_per_clock(device_t &device, int pixperclock) { downcast<tms340x0_device &>(device).m_pixperclock = pixperclock; }
 	static void set_scanline_ind16_callback(device_t &device, scanline_ind16_cb_delegate callback) { downcast<tms340x0_device &>(device).m_scanline_ind16_cb = callback; }
 	static void set_scanline_rgb32_callback(device_t &device, scanline_rgb32_cb_delegate callback) { downcast<tms340x0_device &>(device).m_scanline_rgb32_cb = callback; }

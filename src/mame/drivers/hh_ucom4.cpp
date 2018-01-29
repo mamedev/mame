@@ -969,7 +969,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(bcclimbr_state::bcclimbr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(bcclimbr_state, plate_w))
@@ -1186,7 +1186,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(invspace_state::invspace)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D552, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D552, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(invspace_state, grid_w))
@@ -1302,7 +1302,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(efball_state::efball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_READ_C_CB(IOPORT("IN.2"))
@@ -1402,7 +1402,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(galaxy2_state::galaxy2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(galaxy2_state, grid_w))
@@ -1520,7 +1520,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(astrocmd_state::astrocmd)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(astrocmd_state, grid_w))
@@ -1616,7 +1616,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(edracula_state::edracula)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(edracula_state, grid_w))
@@ -1704,7 +1704,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(mcompgin_state::mcompgin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D650, XTAL_400kHz) // TDK FCR400K
+	MCFG_CPU_ADD("maincpu", NEC_D650, 400_kHz_XTAL) // TDK FCR400K
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_E_CB(WRITE8(mcompgin_state, lcd_w))
@@ -2276,7 +2276,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tmpacman_state::tmpacman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_430kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 430_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(tmpacman_state, grid_w))
@@ -2379,7 +2379,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tmscramb_state::tmscramb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(tmscramb_state, grid_w))
@@ -2479,7 +2479,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(tcaveman_state::tcaveman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(tcaveman_state, grid_w))
 	MCFG_UCOM4_WRITE_D_CB(WRITE8(tcaveman_state, grid_w))
@@ -2611,7 +2611,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(alnchase_state::alnchase)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(READ8(alnchase_state, input_r))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.2"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(alnchase_state, output_w))

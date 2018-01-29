@@ -151,7 +151,7 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(abc99_device::device_add_mconfig)
 	// keyboard CPU
-	MCFG_CPU_ADD(I8035_Z2_TAG, I8035, XTAL_6MHz/3) // from Z5 T0 output
+	MCFG_CPU_ADD(I8035_Z2_TAG, I8035, XTAL(6'000'000)/3) // from Z5 T0 output
 	MCFG_CPU_PROGRAM_MAP(abc99_z2_mem)
 	MCFG_CPU_IO_MAP(abc99_z2_io)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(abc99_device, z2_p1_w))
@@ -160,7 +160,7 @@ MACHINE_CONFIG_START(abc99_device::device_add_mconfig)
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(abc99_device, z2_t1_r))
 
 	// mouse CPU
-	MCFG_CPU_ADD(I8035_Z5_TAG, I8035, XTAL_6MHz)
+	MCFG_CPU_ADD(I8035_Z5_TAG, I8035, XTAL(6'000'000))
 	MCFG_CPU_PROGRAM_MAP(abc99_z5_mem)
 	//MCFG_MCS48_PORT_P1_IN_CB(READ8(abc99_device, z5_p1_r))
 	//MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(abc99_device, z5_p2_w))
@@ -497,7 +497,7 @@ void abc99_device::device_start()
 {
 	// allocate timers
 	m_serial_timer = timer_alloc(TIMER_SERIAL);
-	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL_6MHz/3), 0, MCS48_ALE_CLOCK(XTAL_6MHz/3));
+	m_serial_timer->adjust(MCS48_ALE_CLOCK(XTAL(6'000'000)/3), 0, MCS48_ALE_CLOCK(XTAL(6'000'000)/3));
 
 	m_mouse_timer = timer_alloc(TIMER_MOUSE);
 

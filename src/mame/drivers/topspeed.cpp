@@ -571,19 +571,19 @@ void topspeed_state::machine_reset()
 MACHINE_CONFIG_START(topspeed_state::topspeed)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(cpua_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", topspeed_state, irq6_line_hold)
 
-	MCFG_CPU_ADD("subcpu", M68000, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("subcpu", M68000, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(cpub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", topspeed_state, irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(z80_prg)
 	MCFG_CPU_IO_MAP(z80_io)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(topspeed_state, z80ctc_to0))
 
 	MCFG_DEVICE_ADD("pc080sn_1", PC080SN, 0)
@@ -624,18 +624,18 @@ MACHINE_CONFIG_START(topspeed_state::topspeed)
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz / 4)
+	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000) / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(topspeed_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "filter1l", 1.0)
 	MCFG_SOUND_ROUTE(1, "filter1r", 1.0)
 
-	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("msm1", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(topspeed_state, msm5205_1_vck)) // VCK function
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8 kHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 1.0)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("msm2", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      // Slave mode, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 1.0)
 

@@ -98,7 +98,7 @@ private:
 };
 
 
-#define H8_CLOCK (XTAL_12_288MHz / 6)
+#define H8_CLOCK (XTAL(12'288'000) / 6)
 #define H8_BEEP_FRQ (H8_CLOCK / 1024)
 #define H8_IRQ_PULSE (H8_BEEP_FRQ / 2)
 

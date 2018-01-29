@@ -560,16 +560,16 @@ void ep64_state::machine_reset()
 
 MACHINE_CONFIG_START(ep64_state::ep64)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(ep64_mem)
 	MCFG_CPU_IO_MAP(ep64_io)
 
 	// video hardware
-	MCFG_NICK_ADD(NICK_TAG, SCREEN_TAG, XTAL_8MHz)
+	MCFG_NICK_ADD(NICK_TAG, SCREEN_TAG, XTAL(8'000'000))
 	MCFG_NICK_VIRQ_CALLBACK(DEVWRITELINE(DAVE_TAG, dave_device, int1_w))
 
 	// sound hardware
-	MCFG_DAVE_ADD(DAVE_TAG, XTAL_8MHz, dave_64k_mem, dave_io)
+	MCFG_DAVE_ADD(DAVE_TAG, XTAL(8'000'000), dave_64k_mem, dave_io)
 	MCFG_DAVE_IRQ_CALLBACK(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
 	// devices

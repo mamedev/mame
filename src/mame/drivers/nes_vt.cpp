@@ -20,13 +20,13 @@
 
   VT16 - ?
   VT18 - ?
-	
-	VT3x - used in SY889
-		Uses SQI rather than parallel flash
-		Vaguely OneBus compatible but some registers different ($411C in particular)
-		Uses RGB format for palettes
-		Credit to NewRisingSun2 for much of the reverse engineering
-	
+
+    VT3x - used in SY889
+        Uses SQI rather than parallel flash
+        Vaguely OneBus compatible but some registers different ($411C in particular)
+        Uses RGB format for palettes
+        Credit to NewRisingSun2 for much of the reverse engineering
+
   (more)
 
   VT1682 - NOT compatible with NES, different video system, sound CPU (4x
@@ -34,10 +34,10 @@
            driver)
 
   todo (VT03):
-	
-	Super Mario Bros 3 crashes after title screen, some kind of memory map issue
-	possibly with MMC3 emulation mode
-	
+
+    Super Mario Bros 3 crashes after title screen, some kind of memory map issue
+    possibly with MMC3 emulation mode
+
   APU refactoring to allow for mostly doubled up functionality + PCM channel
   *more*
 
@@ -104,7 +104,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vt03_410x_w);
 	DECLARE_WRITE8_MEMBER(vt03_8000_w);
 	DECLARE_WRITE8_MEMBER(vt03_4034_w);
-	
+
 	DECLARE_WRITE8_MEMBER(vt03_41bx_w);
 	DECLARE_READ8_MEMBER(vt03_41bx_r);
 	DECLARE_WRITE8_MEMBER(vt03_411c_w);
@@ -140,7 +140,7 @@ private:
 	uint8_t m_411c;
 	uint8_t m_412c;
 	uint8_t m_vdma_ctrl;
-	
+
 	int m_timer_irq_enabled;
 	int m_timer_running;
 	int m_timer_val;
@@ -166,7 +166,7 @@ private:
 	required_memory_bank m_prgbank2;
 	required_memory_bank m_prgbank3;
 	required_region_ptr<uint8_t> m_prgrom;
-	
+
 	uint16_t decode_nt_addr(uint16_t addr);
 	void do_dma(uint8_t data, bool broken);
 };
@@ -496,7 +496,7 @@ void nes_vt_state::machine_reset()
 	m_timer_running = 0;
 	m_timer_val = 0;
 	m_vdma_ctrl = 0;
-	
+
 	update_banks();
 }
 
@@ -764,7 +764,7 @@ WRITE8_MEMBER(nes_vt_state::vt03_8000_w)
 			case 0x07:
 				m_410x[0x8] = data;
 				update_banks();
-				break;	
+				break;
 		}
 	} else if((addr >= 0xA000) && (addr < 0xC000) && !(addr & 0x01)) {
 		// Mirroring
@@ -785,9 +785,9 @@ WRITE8_MEMBER(nes_vt_state::vt03_8000_w)
 		// IRQ enable
 		vt03_410x_w(space, 4, data);
 	} else {
-		
+
 	}
-	
+
 }
 
 /* APU plumbing, this is because we have a plain M6502 core in the VT03, otherwise this is handled in the core */
@@ -872,9 +872,9 @@ static ADDRESS_MAP_START( nes_vt_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg1_4015_r, psg1_4015_w) /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(nes_in0_r, nes_in0_w)
 	AM_RANGE(0x4017, 0x4017) AM_READ(nes_in1_r) AM_WRITE(psg1_4017_w)
-	
+
 	AM_RANGE(0x4034, 0x4034) AM_WRITE(vt03_4034_w)
-	
+
 	AM_RANGE(0x4100, 0x410b) AM_WRITE(vt03_410x_w)
 
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
@@ -1000,7 +1000,7 @@ MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60.0988)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
 	MCFG_SCREEN_SIZE(32*8, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(nes_vt_state, screen_update_vt)
@@ -1061,10 +1061,10 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_dg, nes_vt_xx)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nes_vt_dg_map)
-	
+
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50.0070)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
 	MCFG_SCREEN_SIZE(32*8, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 MACHINE_CONFIG_END
@@ -1089,7 +1089,7 @@ MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_hh, nes_vt_xx)
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50.0070)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) * (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)))
 	MCFG_SCREEN_SIZE(32*8, 312)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 MACHINE_CONFIG_END
@@ -1371,6 +1371,6 @@ CONS( 200?, mc_8x6ss,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 CONS( 2004, mc_dcat8,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_IMPERFECT_GRAPHICS )
 // Runs well, minor GFX issues in intro
-CONS( 2017, sy889,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-889 300 in 1 Handheld", MACHINE_NOT_WORKING )
+CONS( 2017, sy889,          0,              0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp",     "SY-889 300 in 1 Handheld", MACHINE_NOT_WORKING )
 // Runs well, only issues in SMB3 which crashes
-CONS( 2017, bittboy,  	0, 				0,  nes_vt_bt,    nes_vt, nes_vt_state,  0, "BittBoy", 	"BittBoy Mini FC 300 in 1", MACHINE_NOT_WORKING )
+CONS( 2017, bittboy,    0,              0,  nes_vt_bt,    nes_vt, nes_vt_state,  0, "BittBoy",  "BittBoy Mini FC 300 in 1", MACHINE_NOT_WORKING )

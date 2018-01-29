@@ -71,7 +71,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(iskr_1030_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5MHz)
+	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL(5'000'000))
 	MCFG_CPU_IO_MAP(iskr_1030_keyboard_io)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(iskr_1030_keyboard_device, p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(iskr_1030_keyboard_device, p1_w))

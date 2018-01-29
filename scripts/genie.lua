@@ -955,7 +955,7 @@ end
 	buildoptions_cpp {
 		"-Woverloaded-virtual",
 	}
-	
+
 if _OPTIONS["SANITIZE"] then
 	buildoptions {
 		"-fsanitize=".. _OPTIONS["SANITIZE"]

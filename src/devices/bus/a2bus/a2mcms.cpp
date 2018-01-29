@@ -81,8 +81,6 @@ a2bus_mcms1_device::a2bus_mcms1_device(const machine_config &mconfig, const char
 
 void a2bus_mcms1_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
 }
 
 void a2bus_mcms1_device::device_reset()
@@ -159,18 +157,13 @@ a2bus_mcms2_device::a2bus_mcms2_device(const machine_config &mconfig, const char
 
 void a2bus_mcms2_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
-	if (m_slot < 2)
-	{
+	if (slotno() < 2)
 		fatalerror("MCMS: Card 2 must be in slot 2 or greater\n");
-	}
 }
 
 void a2bus_mcms2_device::device_reset()
 {
-	m_card1 = static_cast<a2bus_mcms1_device *>(m_a2bus->m_device_list[m_slot-1]);
+	m_card1 = downcast<a2bus_mcms1_device *>(a2bus().m_device_list[slotno()-1]);
 	m_engine = m_card1->get_engine();
 }
 

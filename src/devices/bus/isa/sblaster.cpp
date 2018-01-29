@@ -52,8 +52,8 @@
 
   jumperable? normally 0x220
 */
-#define ym3812_StdClock XTAL_3_579545MHz
-#define ymf262_StdClock XTAL_14_31818MHz
+#define ym3812_StdClock XTAL(3'579'545)
+#define ymf262_StdClock XTAL(14'318'181)
 
 static const int m_cmd_fifo_length[256] =
 {

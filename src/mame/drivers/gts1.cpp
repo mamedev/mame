@@ -678,7 +678,7 @@ WRITE8_MEMBER(gts1_state::gts1_do_w)
 
 MACHINE_CONFIG_START(gts1_state::gts1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPS4_2, XTAL_3_579545MHz)  // divided by 18 in the CPU
+	MCFG_CPU_ADD("maincpu", PPS4_2, XTAL(3'579'545))  // divided by 18 in the CPU
 	MCFG_CPU_PROGRAM_MAP(gts1_map)
 	MCFG_CPU_DATA_MAP(gts1_data)
 	MCFG_CPU_IO_MAP(gts1_io)
@@ -710,7 +710,7 @@ MACHINE_CONFIG_START(gts1_state::gts1)
 					WRITE8(gts1_state,gts1_lamp_apm_w) )
 
 	/* 10788 General Purpose Display and Keyboard */
-	MCFG_DEVICE_ADD( "u6", R10788, XTAL_3_579545MHz / 18 )  // divided in the circuit
+	MCFG_DEVICE_ADD( "u6", R10788, XTAL(3'579'545) / 18 )  // divided in the circuit
 	MCFG_R10788_UPDATE( WRITE8(gts1_state,gts1_display_w) )
 
 	/* Video */
