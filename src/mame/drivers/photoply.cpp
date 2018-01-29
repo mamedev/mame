@@ -44,6 +44,7 @@ static ADDRESS_MAP_START( photoply_map, AS_PROGRAM, 32, photoply_state )
 	AM_RANGE(0x000c8000, 0x000cffff) AM_RAM AM_REGION("video_bios", 0)
 	AM_RANGE(0x000d0000, 0x000dffff) AM_RAM AM_REGION("ex_bios", 0)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("bios", 0)
+	AM_RANGE(0x00100000, 0x07ffffff) AM_RAM // 64MB RAM, guess!
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
@@ -52,7 +53,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( photoply_io, AS_IO, 32, photoply_state )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
 	AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
 	AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
 	//AM_RANGE(0x03bc, 0x03bf) AM_RAM //parallel port 3
@@ -60,7 +61,7 @@ static ADDRESS_MAP_START( photoply_io, AS_IO, 32, photoply_state )
 	AM_RANGE(0x03c0, 0x03cf) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, port_03c0_r, port_03c0_w, 0xffffffff)
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, port_03d0_r, port_03d0_w, 0xffffffff)
 
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs1, write_cs1, 0xffffffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs1, write_cs1)
 	
 	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_bus_legacy_device, read, write)
 
@@ -122,7 +123,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(photoply_state::photoply)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I486, 75000000) /* I486DX4, 75 or 100 Mhz */
+	MCFG_CPU_ADD("maincpu", I486DX4, 75000000) /* I486DX4, 75 or 100 Mhz */
 	MCFG_CPU_PROGRAM_MAP(photoply_map)
 	MCFG_CPU_IO_MAP(photoply_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
@@ -131,7 +132,7 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", photoply )
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
+	MCFG_IDE_CONTROLLER_32_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir6_w))
 
 	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
