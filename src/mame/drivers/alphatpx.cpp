@@ -181,7 +181,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bank_w);
 
 	void alphatp3(machine_config &config);
-	
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -435,7 +435,7 @@ PORT_START("COL.6")
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K")           PORT_CODE(KEYCODE_K)        PORT_CHAR('k')      PORT_CHAR('k')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(", ;")         PORT_CODE(KEYCODE_COMMA)    PORT_CHAR(',')      PORT_CHAR(';')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("<>")			PORT_CODE(KEYCODE_BACKSLASH2)PORT_CHAR('<')		PORT_CHAR('>')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("<>")          PORT_CODE(KEYCODE_BACKSLASH2)PORT_CHAR('<')     PORT_CHAR('>')
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7")           PORT_CODE(KEYCODE_7)        PORT_CHAR('7')      PORT_CHAR('/')
 
 PORT_START("COL.7")
@@ -609,7 +609,7 @@ PORT_START("COL.6")
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K")           PORT_CODE(KEYCODE_K)        PORT_CHAR('k')      PORT_CHAR('k')
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(", ;")         PORT_CODE(KEYCODE_COMMA)    PORT_CHAR(',')      PORT_CHAR(';')
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN)
-	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("<>")			PORT_CODE(KEYCODE_BACKSLASH2)PORT_CHAR('<')		PORT_CHAR('>')
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("<>")          PORT_CODE(KEYCODE_BACKSLASH2)PORT_CHAR('<')     PORT_CHAR('>')
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7")           PORT_CODE(KEYCODE_7)        PORT_CHAR('7')      PORT_CHAR('/')
 
 PORT_START("COL.7")
@@ -828,14 +828,14 @@ READ8_MEMBER(alphatp_12_state::fdc_stat_r)
 	uint8_t res = 0;
 	floppy_image_device *floppy1,*floppy2;
 	floppy1 = floppy2 = nullptr;
-	
+
 	floppy1 = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
 	floppy2 = m_floppy[1] ? m_floppy[1]->get_device() : nullptr;
 
 	res = m_fdc_drq ? 0x80 : 0x00;
 	res |= m_fdc_irq ? 0x40 : 0x00;
 	res |= m_fdc_hld ? 0x00 : 0x20;
-	
+
 	if (floppy2) res |= !floppy2->ready_r() ? 0x08 : 0;
 	if (floppy1) res |= !floppy1->ready_r() ? 0x04 : 0;
 	if (m_curfloppy) res |= m_curfloppy->wpt_r() ? 0x02 : 0;
@@ -969,7 +969,7 @@ WRITE8_MEMBER(alphatp_34_state::fdc_cmd_w)
 //**************************************************************************
 
 static SLOT_INTERFACE_START( alphatp2_floppies ) // two BASF 2471 drives
-	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD)   
+	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD)
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( alphatp2su_floppies )
@@ -977,7 +977,7 @@ static SLOT_INTERFACE_START( alphatp2su_floppies )
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( alphatp3_floppies ) // P3:  two BASF 6106 drives
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)		 // P30: two Shugart SA465-3AA drives
+	SLOT_INTERFACE("525qd", FLOPPY_525_QD)       // P30: two Shugart SA465-3AA drives
 SLOT_INTERFACE_END
 
 //**************************************************************************
@@ -1142,8 +1142,8 @@ ROM_START( alphatp1 )
 	ROM_LOAD("p1mos2.bin", 0x0800, 0x0800, CRC(f38113a3) SHA1(078405ad202e26b7bac7132b06682fb01270af63) )
 	ROM_LOAD("p1mos3.bin", 0x1000, 0x0800, CRC(fb5ae050) SHA1(ba55553764326dfda3fbd35237761c3fb6fde18a) )
 
-	ROM_REGION(0x400, "kbdmcu", 0)                                                                                         
-	ROM_LOAD("p2_keyboard_ip8041a_8278.bin",  0x000, 0x400, CRC(5db00d85) SHA1(0dc8e274a5aece261ef60494901601c0d8b1eb51))	// P1 keyboard driver is contained in a MF-1702AR on the keyboard		
+	ROM_REGION(0x400, "kbdmcu", 0)
+	ROM_LOAD("p2_keyboard_ip8041a_8278.bin",  0x000, 0x400, CRC(5db00d85) SHA1(0dc8e274a5aece261ef60494901601c0d8b1eb51))   // P1 keyboard driver is contained in a MF-1702AR on the keyboard
 																															// needs to be dumped
 	ROM_REGION(0x800, "gfx", 0)
 	ROM_LOAD("p1chargen.bin", 0x000, 0x800, CRC(51ea8a7e) SHA1(c514df7ab3761490af4a16c9106d08540f0d7352))
@@ -1233,4 +1233,4 @@ COMP( 198?, alphatp1,  alphatp2, 0,     alphatp2, alphatp2, alphatp_12_state, 0,
 COMP( 198?, alphatp2,  0,        0,     alphatp2, alphatp2, alphatp_12_state, 0,    "Triumph-Adler", "alphatronic P2", MACHINE_NOT_WORKING )
 COMP( 198?, alphatp2u, alphatp2, 0,     alphatp2u,alphatp3, alphatp_12_state, 0,    "Triumph-Adler", "alphatronic P2U", MACHINE_NOT_WORKING )
 COMP( 1982, alphatp3,  0,        0,     alphatp3, alphatp3, alphatp_34_state, 0,    "Triumph-Adler", "alphatronic P3", MACHINE_NOT_WORKING )
-COMP( 198?, alphatp30, alphatp3, 0,     alphatp3, alphatp3, alphatp_34_state, 0,  "Triumph-Adler", "alphatronic P30",MACHINE_NOT_WORKING )
+COMP( 198?, alphatp30, alphatp3, 0,     alphatp3, alphatp3, alphatp_34_state, 0,    "Triumph-Adler", "alphatronic P30",MACHINE_NOT_WORKING )
