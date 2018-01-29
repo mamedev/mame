@@ -1084,12 +1084,12 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( rad_skat )
 	PORT_START("P1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Motion Left") // this does quick turns? maybe leaning further on the board?
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Motion Right")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) // in menus (eg trick lists)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Full Left")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Full Right")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Slight Left") // you have to use this for the menus (eg trick lists)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Slight Right")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Front")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Back")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	// there only seem to be 3 buttons on the pad part, so presumably all the above are the skateboard, and below are the pad?
@@ -1435,5 +1435,5 @@ CONS( 2004, batmantv, 0,        0,        batman,      batman,   spg2xx_game_sta
 CONS( 2008, walle,    0,        0,        batman,      walle,    spg2xx_game_state, walle,    "JAKKS Pacific Inc",                                 "Wall-E",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Radica TV games
-CONS( 2006, rad_skat,  0,       0,        spg2xx_base, rad_skat, spg2xx_game_state, rad_skat, "Radica",                                            "PlayTV Skateboarder (NTSC)",        MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-CONS( 2006, rad_skatp, rad_skat,0,        spg2xx_basep,rad_skatp,spg2xx_game_state, rad_skat, "Radica",                                            "ConnecTV Skateboarder (PAL)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 2006, rad_skat,  0,       0,        spg2xx_base, rad_skat, spg2xx_game_state, rad_skat, "Radica",                                            "Play TV Skateboarder (NTSC)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, rad_skatp, rad_skat,0,        spg2xx_basep,rad_skatp,spg2xx_game_state, rad_skat, "Radica",                                            "Connectv Skateboarder (PAL)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
