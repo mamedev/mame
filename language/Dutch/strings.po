@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-28 14:01+1100\n"
-"PO-Revision-Date: 2018-01-29 21:00+0100\n"
+"PO-Revision-Date: 2018-01-29 21:03+0100\n"
 "Last-Translator: Jos van Mourik\n"
 "Language-Team: MAME Language Team\n"
 "Language: nl\n"
@@ -2806,7 +2806,7 @@ msgstr "Sla invoernamen op in bestand"
 #: plugins/portname/init.lua:115 plugins/portname/init.lua:120
 #: plugins/portname/init.lua:136
 msgid "Failed to save input name file"
-msgstr "Opslaan van invoernamenbestand mislukt"
+msgstr "Opslaan van invoernaambestand mislukt"
 
 #: plugins/portname/init.lua:153
 #, lua-format
