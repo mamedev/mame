@@ -1093,9 +1093,9 @@ static INPUT_PORTS_START( rad_skat )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	// there only seem to be 3 buttons on the pad part, so presumably all the above are the skateboard, and below are the pad?
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("M Button")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("X Button")
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("O Button")
 	PORT_BIT( 0xf800, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
