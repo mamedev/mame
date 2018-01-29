@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-28 14:01+1100\n"
-"PO-Revision-Date: 2017-09-29 10:32+0200\n"
+"PO-Revision-Date: 2018-01-29 09:55+0100\n"
 "Last-Translator: Lothar Serra Mari <rootfather@scummvm.org>\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.0.3\n"
+"X-Generator: Poedit 2.0.6\n"
 
 #: src/frontend/mame/ui/auditmenu.cpp:96
 #, c-format
@@ -1748,7 +1748,7 @@ msgstr "Automatisch speichern/wiederherstellen"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Rewind capacity"
-msgstr ""
+msgstr "Rückspulfähigkeit"
 
 #: src/frontend/mame/ui/submenu.cpp:68
 msgid "Bilinear snapshot"
@@ -2172,29 +2172,31 @@ msgstr "Benötigt CHD\tNein\n"
 
 #: src/frontend/mame/ui/selgame.cpp:970
 msgid "ROM Audit Result\tOK\n"
-msgstr ""
+msgstr "ROM-Überprüfung\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:972
 msgid "ROM Audit Result\tBAD\n"
-msgstr ""
+msgstr "ROM-Überprüfung\tFEHLERHAFT\n"
 
 #: src/frontend/mame/ui/selgame.cpp:975
 msgid "Samples Audit Result\tNone Needed\n"
-msgstr ""
+msgstr "Samples-Überprüfung\tNicht nötig\n"
 
 #: src/frontend/mame/ui/selgame.cpp:977
 msgid "Samples Audit Result\tOK\n"
-msgstr ""
+msgstr "Samples-Überprüfung\tOK\n"
 
 #: src/frontend/mame/ui/selgame.cpp:979
 msgid "Samples Audit Result\tBAD\n"
-msgstr ""
+msgstr "Samples-Überprüfung\tFEHLERHAFT\n"
 
 #: src/frontend/mame/ui/selgame.cpp:983
 msgid ""
 "ROM Audit \tDisabled\n"
 "Samples Audit \tDisabled\n"
 msgstr ""
+"ROM-Überprüfung\tDeaktiviert\n"
+"Samples-Überprüfung\tDeaktiviert\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1167
 #, c-format
@@ -2439,7 +2441,7 @@ msgstr "[erzeugen]"
 #: src/frontend/mame/ui/filesel.cpp:419
 #, c-format
 msgid "Error accessing %s"
-msgstr ""
+msgstr "Fehler beim Zugriff auf%s"
 
 #: src/frontend/mame/ui/filesel.cpp:515
 msgid "Select access mode"
@@ -2532,27 +2534,27 @@ msgstr "Hotkeys einstellen"
 #: plugins/cheat/init.lua:720
 #, lua-format
 msgid "Activated: %s = %s"
-msgstr ""
+msgstr "Aktiviert:%s =%s"
 
 #: plugins/cheat/init.lua:723 plugins/cheat/init.lua:781
 #, lua-format
 msgid "Activated: %s"
-msgstr ""
+msgstr "Aktiviert: %s"
 
 #: plugins/cheat/init.lua:785
 #, lua-format
 msgid "Enabled: %s"
-msgstr ""
+msgstr "Aktiviert: %s"
 
 #: plugins/cheat/init.lua:790
 #, lua-format
 msgid "Disabled: %s"
-msgstr ""
+msgstr "Deaktiviert: %s"
 
 #: plugins/cheat/init.lua:849
 #, lua-format
 msgid "%s added"
-msgstr ""
+msgstr "%s hinzugefügt"
 
 #: plugins/data/data_command.lua:19
 msgid "Command"
@@ -2621,7 +2623,7 @@ msgstr "Cheatname"
 #: plugins/cheatfind/init.lua:354 plugins/cheatfind/init.lua:718
 #, lua-format
 msgid "Default name is %s"
-msgstr ""
+msgstr "Standardname ist %s"
 
 #: plugins/cheatfind/init.lua:362
 msgid "Player"
@@ -2638,7 +2640,7 @@ msgstr "Speichern"
 #: plugins/cheatfind/init.lua:399
 #, lua-format
 msgid "Cheat written to %s and added to cheat.simple"
-msgstr ""
+msgstr "Cheat nach %s geschrieben und zu cheat.simple hinzugefügt"
 
 #: plugins/cheatfind/init.lua:407
 msgid "Cheat added to cheat.simple"
@@ -2649,6 +2651,8 @@ msgid ""
 "Unable to write file\n"
 "Ensure that cheatpath folder exists"
 msgstr ""
+"Kann Datei nicht schreiben\n"
+"Überprüfen Sie ob das cheatpath Verzeichnis existiert"
 
 #: plugins/cheatfind/init.lua:421
 msgid "Cancel"
@@ -2803,21 +2807,21 @@ msgstr "Cheat-Finder"
 
 #: plugins/portname/init.lua:89
 msgid "Save input names to file"
-msgstr ""
+msgstr "Datei mit Eingabenamen in Datei speichern"
 
 #: plugins/portname/init.lua:115 plugins/portname/init.lua:120
 #: plugins/portname/init.lua:136
 msgid "Failed to save input name file"
-msgstr ""
+msgstr "Speichern der Datei für Eingabenamen fehlgeschlagen"
 
 #: plugins/portname/init.lua:153
 #, lua-format
 msgid "Input port name file saved to %s"
-msgstr ""
+msgstr "Datei mit Eingabenamen nach %s gespeichert"
 
 #: plugins/portname/init.lua:158
 msgid "Input ports"
-msgstr ""
+msgstr "Eingaben"
 
 #~ msgid "Default name is "
 #~ msgstr "Standardname ist "
