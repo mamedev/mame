@@ -316,31 +316,34 @@ void menu_select_software::build_software_list()
 		m_filter_data.add_list(swlist.list_name(), swlist.description());
 		for (const software_info &swinfo : swlist.get_info())
 		{
-			const software_part &part = swinfo.parts().front();
-			if (part.is_compatible(swlist.filter()) == SOFTWARE_IS_COMPATIBLE)
+			for (const software_part &part : swinfo.parts())
 			{
-				const char *instance_name = nullptr;
-				const char *type_name = nullptr;
-				for (device_image_interface &image : image_interface_iterator(config.root_device()))
+				if (part.is_compatible(swlist.filter()) == SOFTWARE_IS_COMPATIBLE)
 				{
-					char const *const interface = image.image_interface();
-					if (interface && part.matches_interface(interface))
+					const char *instance_name = nullptr;
+					const char *type_name = nullptr;
+					for (device_image_interface &image : image_interface_iterator(config.root_device()))
 					{
-						instance_name = image.instance_name().c_str();
-						type_name = image.image_type_name();
-						break;
+						char const *const interface = image.image_interface();
+						if (interface && part.matches_interface(interface))
+						{
+							instance_name = image.instance_name().c_str();
+							type_name = image.image_type_name();
+							break;
+						}
 					}
+					if (!instance_name || !type_name)
+						continue;
+
+					ui_software_info tmpmatches(swinfo, part, *m_driver, swlist.list_name(), instance_name, type_name);
+
+					m_filter_data.add_region(tmpmatches.longname);
+					m_filter_data.add_publisher(tmpmatches.publisher);
+					m_filter_data.add_year(tmpmatches.year);
+					m_filter_data.add_device_type(tmpmatches.devicetype);
+					m_swinfo.emplace_back(std::move(tmpmatches));
+					break;
 				}
-				if (!instance_name || !type_name)
-					continue;
-
-				ui_software_info tmpmatches(swinfo, part, *m_driver, swlist.list_name(), instance_name, type_name);
-
-				m_filter_data.add_region(tmpmatches.longname);
-				m_filter_data.add_publisher(tmpmatches.publisher);
-				m_filter_data.add_year(tmpmatches.year);
-				m_filter_data.add_device_type(tmpmatches.devicetype);
-				m_swinfo.emplace_back(std::move(tmpmatches));
 			}
 		}
 	}

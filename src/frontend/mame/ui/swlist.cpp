@@ -49,13 +49,13 @@ static bool is_valid_softlist_part_char(char32_t ch)
 //  ctor
 //-------------------------------------------------
 
-menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container &container, const software_list_device *swlist, const software_info *info, const char *interface, const software_part **part, bool other_opt, result &result)
+menu_software_parts::menu_software_parts(mame_ui_manager &mui, render_container &container, const software_info *info, const char *interface, const char *filter, const software_part **part, bool other_opt, result &result)
 	: menu(mui, container),
 		m_result(result)
 {
-	m_swlist = swlist;
 	m_info = info;
 	m_interface = interface;
+	m_filter = filter;
 	m_selected_part = part;
 	m_other_opt = other_opt;
 }
@@ -97,7 +97,7 @@ void menu_software_parts::populate(float &customtop, float &custombottom)
 
 	for (const software_part &swpart : m_info->parts())
 	{
-		if (swpart.matches_interface(m_interface) && swpart.is_compatible(m_swlist->filter()) == SOFTWARE_IS_COMPATIBLE)
+		if (swpart.matches_interface(m_interface) && swpart.is_compatible(m_filter) == SOFTWARE_IS_COMPATIBLE)
 		{
 			software_part_menu_entry *entry = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry));
 			// check if the available parts have specific part_id to be displayed (e.g. "Map Disc", "Bonus Disc", etc.)

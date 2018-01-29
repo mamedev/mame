@@ -548,20 +548,22 @@ bool consolewin_info::get_softlist_info(device_image_interface *img)
 	{
 		for (const software_info &swinfo : swlist.get_info())
 		{
-			const software_part &part = swinfo.parts().front();
-			if (part.is_compatible(swlist.filter()) == SOFTWARE_IS_COMPATIBLE)
+			for (const software_part &part : swinfo.parts())
 			{
-				for (device_image_interface &image : image_interface_iterator(machine().root_device()))
+				if (part.is_compatible(swlist.filter()) == SOFTWARE_IS_COMPATIBLE)
 				{
-					if (!image.user_loadable())
-						continue;
-					if (!has_software && (opt_name == image.instance_name()))
+					for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 					{
-						const char *interface = image.image_interface();
-						if (interface && part.matches_interface(interface))
+						if (!image.user_loadable())
+							continue;
+						if (!has_software && (opt_name == image.instance_name()))
 						{
-							sl_dir = "\\" + swlist.list_name();
-							has_software = true;
+							const char *interface = image.image_interface();
+							if (interface && part.matches_interface(interface))
+							{
+								sl_dir = "\\" + swlist.list_name();
+								has_software = true;
+							}
 						}
 					}
 				}
