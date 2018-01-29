@@ -37792,6 +37792,7 @@ vsmileg                         //
 walle                           //
 wirels60                        // Wireless 60
 zone60                          // Zone 60
+rad_skat						//
 
 @source:vsmilepro.cpp
 vsmilpro

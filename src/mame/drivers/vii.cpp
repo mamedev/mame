@@ -27,6 +27,7 @@
 
     Known u'nSP-Based Systems:
 
+	 	 D - SPG240 - Radica Skateboarder (Sunplus QL8041C die)
         ND - SPG243 - Some form of Leapfrog "edutainment" system
         ND - SPG243 - Star Wars: Clone Wars
         ND - SPG243 - Toy Story
@@ -1341,6 +1342,11 @@ ROM_START( wirels60 )
 	ROM_LOAD( "wirels60.bin", 0x0000, 0x4000000, CRC(b4df8b28) SHA1(00e3da542e4bc14baf4724ad436f66d4c0f65c84))
 ROM_END
 
+ROM_START( rad_skat )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+	ROM_LOAD16_WORD_SWAP( "skateboarder.bin", 0x000000, 0x400000, CRC(08b9ab91) SHA1(6665edc4740804956136c68065890925a144626b) )
+ROM_END
+
 //    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     STATE      INIT      COMPANY                                              FULLNAME             FLAGS
 
 // VTech systems
@@ -1357,3 +1363,6 @@ CONS( 2010, wirels60, 0,        0,        wirels60, wirels60, vii_state, wirels6
 // JAKKS Pacific Inc TV games
 CONS( 2004, batmantv, 0,        0,        batman,   batman,   vii_state, batman,   "JAKKS Pacific Inc / HotGen Ltd",                    "The Batman",        MACHINE_NO_SOUND )
 CONS( 2008, walle,    0,        0,        batman,   walle,    vii_state, walle,    "JAKKS Pacific Inc",                                 "Wall-E",            MACHINE_NO_SOUND )
+
+// Radica TV games
+CONS( 2006, rad_skat, 0,        0,        batman,   batman,   vii_state, batman,   "Radica",                                            "ConnecTV Skateboarder / PlayTV Skateboarder",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
