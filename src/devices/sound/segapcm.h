@@ -47,7 +47,7 @@ protected:
 	virtual void rom_bank_updated() override;
 
 private:
-	std::unique_ptr<uint8_t[]> m_ram;
+	uint8_t m_ram[0x800];
 	uint8_t m_low[16];
 	sound_stream* m_stream;
 };
