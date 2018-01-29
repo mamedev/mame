@@ -149,7 +149,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			int c=voice.counter;
 			int step = ((int64_t(m_mclock) << FREQ_BITS) / float((voice.frequency + 1) * 16 * (m_rate / 32))) + 0.5f;
 
-			short *mix = &m_mixer_buffer[0];
+			short *mix = m_mixer_buffer.begin();
 
 			// add our contribution
 			for (int i = 0; i < samples; i++)
@@ -168,7 +168,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 	// mix it down
 	stream_sample_t *buffer = outputs[0];
-	short *mix = &m_mixer_buffer[0];
+	short *mix = m_mixer_buffer.begin();
 	for (int i = 0; i < samples; i++)
 		*buffer++ = m_mixer_lookup[*mix++];
 }
