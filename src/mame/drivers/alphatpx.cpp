@@ -1,6 +1,6 @@
 // license: GPL-2.0+
 // copyright-holders: Dirk Best
-// test / modify oct-2017 begin: rfka01 + helwie44
+// testing, modification: rfka01, helwie44
 /***************************************************************************
 
     Triumph-Adler Alphatronic Px series
@@ -87,8 +87,7 @@ public:
 		m_kbdmcu(*this, "kbdmcu"),
 		m_crtc(*this, "crtc"),
 		m_fdc (*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1"),
+		m_floppy(*this, "fdc:%u", 0),
 		m_beep(*this, "beeper"),
 		m_keycols(*this, "COL.%u", 0),
 		m_palette(*this, "palette"),
@@ -127,8 +126,7 @@ protected:
 	required_device<i8041_device> m_kbdmcu;
 	required_device<crt5027_device> m_crtc;
 	required_device<fd1791_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<beep_device> m_beep;
 	required_ioport_array<16> m_keycols;
 
@@ -140,7 +138,6 @@ private:
 	required_shared_ptr<u8> m_ram;
 	floppy_image_device *m_curfloppy;
 	bool m_fdc_irq, m_fdc_drq, m_fdc_hld;
-	floppy_connector *m_con1, *m_con2, *m_con3;
 };
 
 //**************************************************************************
@@ -156,8 +153,7 @@ public:
 		m_kbdmcu(*this, "kbdmcu"),
 		m_crtc(*this, "crtc"),
 		m_fdc (*this, "fdc"),
-		m_floppy0(*this, "fdc:0"),
-		m_floppy1(*this, "fdc:1"),
+		m_floppy(*this, "fdc:%u", 0),
 		m_beep(*this, "beeper"),
 		m_keycols(*this, "COL.%u", 0),
 		m_palette(*this, "palette"),
@@ -194,8 +190,7 @@ protected:
 	required_device<i8041_device> m_kbdmcu;
 	required_device<crt5037_device> m_crtc;
 	required_device<fd1791_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<beep_device> m_beep;
 	required_ioport_array<16> m_keycols;
 
@@ -831,17 +826,16 @@ WRITE_LINE_MEMBER(alphatp_12_state::fdchld_w)
 READ8_MEMBER(alphatp_12_state::fdc_stat_r)
 {
 	uint8_t res = 0;
-	floppy_image_device *floppy1,*floppy2,*floppy3;
-	floppy1 = floppy2 = floppy3 = nullptr;
+	floppy_image_device *floppy1,*floppy2;
+	floppy1 = floppy2 = nullptr;
 	
-	floppy1 = m_con1 ? m_con1->get_device() : nullptr;
-	floppy2 = m_con2 ? m_con2->get_device() : nullptr;
-	floppy3 = m_con3 ? m_con3->get_device() : nullptr;
+	floppy1 = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
+	floppy2 = m_floppy[1] ? m_floppy[1]->get_device() : nullptr;
 
 	res = m_fdc_drq ? 0x80 : 0x00;
 	res |= m_fdc_irq ? 0x40 : 0x00;
 	res |= m_fdc_hld ? 0x00 : 0x20;
-	if (floppy3) res |= !floppy3->ready_r() ? 0x10 : 0;
+	
 	if (floppy2) res |= !floppy2->ready_r() ? 0x08 : 0;
 	if (floppy1) res |= !floppy1->ready_r() ? 0x04 : 0;
 	if (m_curfloppy) res |= m_curfloppy->wpt_r() ? 0x02 : 0;
@@ -849,7 +843,6 @@ READ8_MEMBER(alphatp_12_state::fdc_stat_r)
 	return res;
 }
 
-/* As far as we can tell, the mess of ttl de-inverts the bus */
 READ8_MEMBER(alphatp_12_state::fdc_r)
 {
 	return m_fdc->gen_r(offset) ^ 0xff;
@@ -870,15 +863,11 @@ WRITE8_MEMBER(alphatp_12_state::fdc_cmd_w)
 	// select drive
 	if (!(data & 0x80))
 	{
-		floppy = m_con1 ? m_con1->get_device() : nullptr;
+		floppy = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
 	}
 	else if (!(data & 0x40))
 	{
-		floppy = m_con2 ? m_con2->get_device() : nullptr;
-	}
-	else if (!(data & 0x20))
-	{
-		floppy = m_con3 ? m_con3->get_device() : nullptr;
+		floppy = m_floppy[1] ? m_floppy[1]->get_device() : nullptr;
 	}
 
 	// selecting a new drive?
@@ -919,21 +908,11 @@ WRITE_LINE_MEMBER(alphatp_34_state::fdchld_w)
 	m_fdc_hld = state;
 }
 
-/*
-    7 Data Request (DRQ - inverted 1791-Signal)
-    6 Interrupt Request (INTRQ - 1791-Signal)
-    5 Head Load (HLD - inverted 1791-Signal)
-    4 Ready 3 (Drive 3 ready)
-    3 Ready 2 (Drive 2 ready)
-    2 Ready l (Drive 1 ready)
-    1 Write protect (the disk in the selected drive is write protected)
-    0 HLT (Halt signal during head load and track change)
-*/
 READ8_MEMBER(alphatp_34_state::fdc_stat_r)
 {
 	uint8_t res = 0;
-	floppy_image_device *floppy1 = m_floppy0->get_device();
-	floppy_image_device *floppy2 = m_floppy1->get_device();
+	floppy_image_device *floppy1 = m_floppy[0]->get_device();
+	floppy_image_device *floppy2 = m_floppy[1]->get_device();
 
 	res = m_fdc_drq ? 0x80 : 0x00;
 	res |= m_fdc_irq ? 0x40 : 0x00;
@@ -945,7 +924,6 @@ READ8_MEMBER(alphatp_34_state::fdc_stat_r)
 	return res;
 }
 
-/* As far as we can tell, the mess of ttl de-inverts the bus */
 READ8_MEMBER(alphatp_34_state::fdc_r)
 {
 	return m_fdc->gen_r(offset) ^ 0xff;
@@ -965,9 +943,9 @@ WRITE8_MEMBER(alphatp_34_state::fdc_cmd_w)
 
 	// select drive
 	if (!(data & 0x80))
-		floppy = m_floppy0->get_device();
+		floppy = m_floppy[0]->get_device();
 	else if (!(data & 0x40))
-		floppy = m_floppy1->get_device();
+		floppy = m_floppy[1]->get_device();
 
 	// selecting a new drive?
 	if (floppy != m_curfloppy)
@@ -990,16 +968,16 @@ WRITE8_MEMBER(alphatp_34_state::fdc_cmd_w)
 //  FLOPPY - Drive definitions
 //**************************************************************************
 
-static SLOT_INTERFACE_START( alphatp2_floppies ) // P3:  two BASF 6106 drives
-	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD)   // P30: two Shugart SA465-3AA drives
+static SLOT_INTERFACE_START( alphatp2_floppies ) // two BASF 2471 drives
+	SLOT_INTERFACE("525ssdd", FLOPPY_525_SSDD)   
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START( alphatp2su_floppies )
 	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static SLOT_INTERFACE_START( alphatp3_floppies ) // two BASF 2471 drives
-	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
+static SLOT_INTERFACE_START( alphatp3_floppies ) // P3:  two BASF 6106 drives
+	SLOT_INTERFACE("525qd", FLOPPY_525_QD)		 // P30: two Shugart SA465-3AA drives
 SLOT_INTERFACE_END
 
 //**************************************************************************
@@ -1020,10 +998,6 @@ void alphatp_12_state::machine_reset()
 	m_kbdread = 1;
 	m_kbdclk = 1;   m_fdc_irq = m_fdc_drq = m_fdc_hld = 0;
 	m_curfloppy = nullptr;
-	// look up floppies in advance
-	m_con1 = machine().device<floppy_connector>("fdc:0");
-	m_con2 = machine().device<floppy_connector>("fdc:1");
-	m_con3 = machine().device<floppy_connector>("fdc:2");
 }
 
 MACHINE_CONFIG_START(alphatp_12_state::alphatp2)
