@@ -256,11 +256,11 @@ void momoko_state::machine_reset()
 MACHINE_CONFIG_START(momoko_state::momoko)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/2)   /* 5.0MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/2)   /* 5.0MHz */
 	MCFG_CPU_PROGRAM_MAP(momoko_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", momoko_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_10MHz/4)  /* 2.5MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(10'000'000)/4)  /* 2.5MHz */
 	MCFG_CPU_PROGRAM_MAP(momoko_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -284,13 +284,13 @@ MACHINE_CONFIG_START(momoko_state::momoko)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_10MHz/8)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(10'000'000)/8)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_10MHz/8)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(10'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)

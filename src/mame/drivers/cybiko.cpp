@@ -386,7 +386,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(cybiko_state::cybikov1)
 	// cpu
-	MCFG_CPU_ADD( "maincpu", H8S2241, XTAL_11_0592MHz )
+	MCFG_CPU_ADD( "maincpu", H8S2241, XTAL(11'059'200) )
 	MCFG_CPU_PROGRAM_MAP( cybikov1_mem )
 	MCFG_CPU_IO_MAP( cybikov1_io )
 
@@ -438,7 +438,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(cybiko_state::cybikov2, cybikov1)
 	// cpu
-	MCFG_CPU_REPLACE("maincpu", H8S2246, XTAL_11_0592MHz)
+	MCFG_CPU_REPLACE("maincpu", H8S2246, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(cybikov2_mem)
 	MCFG_CPU_IO_MAP(cybikov2_io)
 
@@ -463,7 +463,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(cybiko_state::cybikoxt, cybikov1)
 	// cpu
-	MCFG_CPU_REPLACE("maincpu", H8S2323, XTAL_18_432MHz)
+	MCFG_CPU_REPLACE("maincpu", H8S2323, XTAL(18'432'000))
 	MCFG_CPU_PROGRAM_MAP(cybikoxt_mem )
 	MCFG_CPU_IO_MAP(cybikoxt_io )
 

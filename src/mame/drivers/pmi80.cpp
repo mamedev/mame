@@ -155,7 +155,7 @@ void pmi80_state::machine_reset()
 
 MACHINE_CONFIG_START(pmi80_state::pmi80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(pmi80_mem)
 	MCFG_CPU_IO_MAP(pmi80_io)
 

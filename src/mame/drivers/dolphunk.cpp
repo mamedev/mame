@@ -226,7 +226,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(dauphin_state::dauphin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(dauphin_mem)
 	MCFG_CPU_IO_MAP(dauphin_io)
 	MCFG_S2650_SENSE_INPUT(READLINE(dauphin_state, cass_r))

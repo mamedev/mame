@@ -267,7 +267,7 @@ READ16_MEMBER(segas1x_bootleg_state::passht4b_io3_r)
 static ADDRESS_MAP_START( passht4b_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on original, buffer on bootleg
-	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_SHARE("bg0_tileram")
+	AM_RANGE(0x408000, 0x409fff) AM_RAM AM_SHARE("bg0_tileram")
 	AM_RANGE(0x40a000, 0x40bfff) AM_RAM AM_SHARE("bg1_tileram")
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_SHARE("textram")
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("sprites")
@@ -2456,11 +2456,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(segas1x_bootleg_state::astormb2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) /* 12MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2) /* 12MHz */
 	MCFG_CPU_PROGRAM_MAP(astormbl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas1x_bootleg_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_8MHz/2) /* 4MHz */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(8'000'000)/2) /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(sys18bl_sound_map)
 
 	/* video hardware */
@@ -2486,7 +2486,7 @@ MACHINE_CONFIG_START(segas1x_bootleg_state::astormb2)
 	// 1 OKI M6295 instead of original sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz/8, PIN7_HIGH) // 1MHz clock and pin verified
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000)/8, PIN7_HIGH) // 1MHz clock and pin verified
 	MCFG_DEVICE_ADDRESS_MAP(0, sys18bl_oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

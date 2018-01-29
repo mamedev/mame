@@ -187,9 +187,6 @@ void z80dart_device::device_start()
 void z80dart_device::device_reset()
 {
 	LOG("Z80DART \"%s\" Reset\n", tag());
-
-	m_chanA->reset();
-	m_chanB->reset();
 }
 
 //-------------------------------------------------

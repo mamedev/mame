@@ -546,17 +546,17 @@ void airbustr_state::machine_reset()
 MACHINE_CONFIG_START(airbustr_state::airbustr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master", Z80, XTAL_12MHz/2)   /* verified on pcb */
+	MCFG_CPU_ADD("master", Z80, XTAL(12'000'000)/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_IO_MAP(master_io_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airbustr_state, airbustr_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("slave", Z80, XTAL_12MHz/2)    /* verified on pcb */
+	MCFG_CPU_ADD("slave", Z80, XTAL(12'000'000)/2)    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_IO_MAP(slave_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", airbustr_state,  slave_interrupt) /* nmi signal from master cpu */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", airbustr_state,  irq0_line_hold)       // nmi are caused by sub cpu writing a sound command
@@ -593,7 +593,7 @@ MACHINE_CONFIG_START(airbustr_state::airbustr)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)   /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)   /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))       // DSW-1 connected to port A
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))       // DSW-2 connected to port B
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -601,7 +601,7 @@ MACHINE_CONFIG_START(airbustr_state::airbustr)
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/4, PIN7_LOW)   /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/4, PIN7_LOW)   /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 

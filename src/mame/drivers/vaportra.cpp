@@ -241,11 +241,11 @@ void vaportra_state::machine_reset()
 MACHINE_CONFIG_START(vaportra_state::vaportra)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2) /* Custom chip 59 */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL(24'000'000)/2) /* Custom chip 59 */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vaportra_state, irq6_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_24MHz/4) /* Custom chip 45; Audio section crystal is 32.220 MHz but CPU clock is confirmed as coming from the 24MHz crystal (6Mhz exactly on the CPU) */
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL(24'000'000)/4) /* Custom chip 45; Audio section crystal is 32.220 MHz but CPU clock is confirmed as coming from the 24MHz crystal (6Mhz exactly on the CPU) */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -266,7 +266,8 @@ MACHINE_CONFIG_START(vaportra_state::vaportra)
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -281,7 +282,8 @@ MACHINE_CONFIG_START(vaportra_state::vaportra)
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x30)
@@ -303,18 +305,18 @@ MACHINE_CONFIG_START(vaportra_state::vaportra)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/8)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(32'220'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_YM2151_ADD("ym2", XTAL_32_22MHz/9) // uses a preset LS163 to force the odd speed
+	MCFG_YM2151_ADD("ym2", XTAL(32'220'000)/9) // uses a preset LS163 to force the odd speed
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ 2 */
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_32_22MHz/32, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", XTAL(32'220'000)/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", XTAL(32'220'000)/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

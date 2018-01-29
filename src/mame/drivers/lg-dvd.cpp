@@ -30,7 +30,7 @@ static ADDRESS_MAP_START( lg_dvd_map, AS_PROGRAM, 8, lg_dvd_state )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(lg_dvd_state::lg)
-	MCFG_CPU_ADD( "maincpu", I80C52, XTAL_16MHz )
+	MCFG_CPU_ADD( "maincpu", I80C52, XTAL(16'000'000) )
 	MCFG_CPU_PROGRAM_MAP( lg_dvd_map )
 MACHINE_CONFIG_END
 

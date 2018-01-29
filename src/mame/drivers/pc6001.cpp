@@ -2372,7 +2372,7 @@ MACHINE_CONFIG_DERIVED(pc6001_state::pc6001sr, pc6001m2)
 	MCFG_SCREEN_UPDATE_DRIVER(pc6001_state, screen_update_pc6001sr)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz) //*Yes*, PC-6001 SR Z80 CPU is actually slower than older models
+	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(3'579'545)) //*Yes*, PC-6001 SR Z80 CPU is actually slower than older models
 	MCFG_CPU_PROGRAM_MAP(pc6001sr_map)
 	MCFG_CPU_IO_MAP(pc6001sr_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pc6001_state,  pc6001sr_interrupt)

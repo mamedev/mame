@@ -753,7 +753,7 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_CPU_IO_MAP(avigo_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
@@ -787,7 +787,7 @@ MACHINE_CONFIG_START(avigo_state::avigo)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* real time clock */
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(avigo_state, tc8521_alarm_int))
 
 	/* flash ROMs */

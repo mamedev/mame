@@ -373,7 +373,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by6803_state::pia0_timer )
 
 MACHINE_CONFIG_START(by6803_state::by6803)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6803, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("maincpu", M6803, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(by6803_map)
 	MCFG_CPU_IO_MAP(by6803_io)
 

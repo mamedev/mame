@@ -1238,16 +1238,16 @@ MACHINE_RESET_MEMBER(armedf_state,armedf)
 
 
 MACHINE_CONFIG_START(armedf_state::terraf_sound)
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8) // 10-pin SIP with 74HC374P latch
@@ -1260,7 +1260,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(armedf_state::terraf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz?
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz?
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
@@ -1295,16 +1295,16 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(armedf_state::terrafjb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
-	MCFG_CPU_ADD("extra", Z80, XTAL_16MHz/4)         // 4mhz?
+	MCFG_CPU_ADD("extra", Z80, XTAL(16'000'000)/4)         // 4mhz?
 	MCFG_CPU_PROGRAM_MAP(terrafjb_extraz80_map)
 	MCFG_CPU_IO_MAP(terrafjb_extraz80_portmap)
 
@@ -1334,7 +1334,7 @@ MACHINE_CONFIG_START(armedf_state::terrafjb)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8) // unknown DAC
@@ -1351,7 +1351,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(armedf_state::kozure)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(kozure_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
@@ -1385,14 +1385,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(armedf_state::armedf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(armedf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1420,7 +1420,7 @@ MACHINE_CONFIG_START(armedf_state::armedf)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
@@ -1433,14 +1433,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(armedf_state::cclimbr2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1470,7 +1470,7 @@ MACHINE_CONFIG_START(armedf_state::cclimbr2)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6) // or YM3526?
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(24'000'000)/6) // or YM3526?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
@@ -1483,14 +1483,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(armedf_state::legion)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(legion_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_3526_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1520,7 +1520,7 @@ MACHINE_CONFIG_START(armedf_state::legion)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_24MHz/6)      // 4mhz
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // 10-pin SIP with 74HC374P latch
@@ -1533,14 +1533,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(armedf_state::legionjb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(legionjb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
-	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
+	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL(8'000'000)/2/512)    // ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
@@ -1568,7 +1568,7 @@ MACHINE_CONFIG_START(armedf_state::legionjb)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6) // or YM3526?
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(24'000'000)/6) // or YM3526?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
@@ -1580,11 +1580,11 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(bigfghtr_state::bigfghtr)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // verified
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   // verified
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_16MHz/2)   // verified
+	MCFG_CPU_ADD("mcu", I8751, XTAL(16'000'000)/2)   // verified
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_mcu_map)
 	MCFG_CPU_IO_MAP(bigfghtr_mcu_io_map)
 
@@ -1593,7 +1593,7 @@ MACHINE_CONFIG_START(bigfghtr_state::bigfghtr)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2,531,12*8,(64-12)*8, 254, 1*8, 31*8) // guess, matches 59.3 Hz from reference - measured at 59.1358Hz
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2,531,12*8,(64-12)*8, 254, 1*8, 31*8) // guess, matches 59.3 Hz from reference - measured at 59.1358Hz
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)

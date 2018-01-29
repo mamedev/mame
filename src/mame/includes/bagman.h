@@ -90,7 +90,7 @@ public:
 
 /*----------- timings -----------*/
 
-#define BAGMAN_MAIN_CLOCK   XTAL_18_432MHz
+#define BAGMAN_MAIN_CLOCK   XTAL(18'432'000)
 #define BAGMAN_HCLK         (BAGMAN_MAIN_CLOCK / 3)
 #define BAGMAN_H0           (BAGMAN_HCLK / 2)
 #define BAGMAN_H1           (BAGMAN_H0   / 2)

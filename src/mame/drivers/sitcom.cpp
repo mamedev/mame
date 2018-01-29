@@ -333,7 +333,7 @@ void sitcom_timer_state::update_dac(uint8_t value)
 
 MACHINE_CONFIG_START(sitcom_state::sitcom)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz) // 3.072MHz can be used for an old slow 8085
+	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL) // 3.072MHz can be used for an old slow 8085
 	MCFG_CPU_PROGRAM_MAP(sitcom_mem)
 	MCFG_CPU_IO_MAP(sitcom_io)
 	MCFG_I8085A_SID(READLINE(sitcom_state, sid_line))

@@ -482,7 +482,7 @@ DRIVER_INIT_MEMBER(pegasus_state, pegasus)
 
 MACHINE_CONFIG_START(pegasus_state::pegasus)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))  // actually a 6809C - 4MHZ clock coming in, 1MHZ internally
 	MCFG_CPU_PROGRAM_MAP(pegasus_mem)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("pegasus_firq", pegasus_state, pegasus_firq, attotime::from_hz(400))

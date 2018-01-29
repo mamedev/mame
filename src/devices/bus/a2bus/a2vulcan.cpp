@@ -131,9 +131,6 @@ a2bus_vulcangold_device::a2bus_vulcangold_device(const machine_config &mconfig, 
 
 void a2bus_vulcanbase_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(VULCAN_ROM_REGION).c_str())->base();
 
 	save_item(NAME(m_lastdata));
@@ -262,7 +259,7 @@ void a2bus_vulcanbase_device::write_c0nx(uint8_t offset, uint8_t data)
 
 uint8_t a2bus_vulcanbase_device::read_cnxx(uint8_t offset)
 {
-	int slotimg = m_slot * 0x100;
+	int const slotimg = slotno() * 0x100;
 
 	// ROM contains a CnXX image for each of slots 1-7 at 0x3400
 	return m_rom[offset+slotimg+0x3400];

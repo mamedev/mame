@@ -2562,7 +2562,7 @@ WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 MACHINE_CONFIG_START(taitotz_state::taitotz)
 	/* IBM EMPPC603eBG-100 */
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
-	MCFG_PPC_BUS_FREQUENCY(XTAL_66_6667MHz)    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)
 
 	/* TMP95C063F I/O CPU */

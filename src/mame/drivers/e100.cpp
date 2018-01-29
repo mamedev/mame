@@ -7,12 +7,12 @@
  * See didact.cpp
  *
  * The Esselte 100 was an original design with a CRT and a full Keyboard that also had a BASIC interpreter
- * extended with commands suitable for educational experiments using the exapansion bus and its built in 
+ * extended with commands suitable for educational experiments using the exapansion bus and its built in
  * io control capabilities.
  *
  * The Esselte 1000 was an educational package based on Apple II plus software and litterature but the relation
- * to Didact is at this point unknown so it is probably a pure Esselte software production. If this branded 
- * distribution is recovered it will be added as a clone of the Apple II driver or just as softlist item. 
+ * to Didact is at this point unknown so it is probably a pure Esselte software production. If this branded
+ * distribution is recovered it will be added as a clone of the Apple II driver or just as softlist item.
  *
  * Misc links about the boards supported by this driver.
  *-----------------------------------------------------
@@ -131,7 +131,7 @@ class e100_state : public driver_device // public didact_state
 {
 public:
 	e100_state(const machine_config &mconfig, device_type type, const char * tag)
-	//		: didact_state(mconfig, type, tag)
+	//      : didact_state(mconfig, type, tag)
 		: driver_device(mconfig, type, tag)
 		,m_maincpu(*this, "maincpu")
 		,m_kbd_74145(*this, "kbd_74145")
@@ -541,7 +541,7 @@ static INPUT_PORTS_START( e100 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(e100_state::e100)
-	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M6802, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(e100_map)
 
 	/* Devices */
@@ -592,7 +592,7 @@ MACHINE_CONFIG_START(e100_state::e100)
 
 	/* screen TODO: simplify the screen config, look at zx.cpp */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_4MHz/2, 265, 0, 265, 265, 0, 265)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(4'000'000)/2, 265, 0, 265, 265, 0, 265)
 	MCFG_SCREEN_UPDATE_DRIVER(e100_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")

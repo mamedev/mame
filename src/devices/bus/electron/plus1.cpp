@@ -105,10 +105,12 @@ MACHINE_CONFIG_START(electron_plus1_device::device_add_mconfig)
 	MCFG_ADC0844_CH4_CB(IOPORT("JOY4"))
 
 	/* cartridges */
-	MCFG_GENERIC_CARTSLOT_ADD("cart_sk1", generic_plain_slot, "electron_cart")
-	MCFG_GENERIC_LOAD(electron_plus1_device, electron_cart_sk1)
-	MCFG_GENERIC_CARTSLOT_ADD("cart_sk2", generic_plain_slot, "electron_cart")
-	MCFG_GENERIC_LOAD(electron_plus1_device, electron_cart_sk2)
+	MCFG_ELECTRON_CARTSLOT_ADD("cart_sk1", electron_cart, nullptr)
+	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(electron_plus1_device, irq_w))
+	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(electron_plus1_device, nmi_w))
+	MCFG_ELECTRON_CARTSLOT_ADD("cart_sk2", electron_cart, nullptr)
+	MCFG_ELECTRON_CARTSLOT_IRQ_HANDLER(WRITELINE(electron_plus1_device, irq_w))
+	MCFG_ELECTRON_CARTSLOT_NMI_HANDLER(WRITELINE(electron_plus1_device, nmi_w))
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -152,6 +154,7 @@ electron_plus1_device::electron_plus1_device(const machine_config &mconfig, cons
 
 void electron_plus1_device::device_start()
 {
+	m_slot = dynamic_cast<electron_expansion_slot_device *>(owner());
 }
 
 
@@ -169,28 +172,39 @@ uint8_t electron_plus1_device::expbus_r(address_space &space, offs_t offset, uin
 		case 1:
 			if (m_cart_sk2->exists())
 			{
-				data = m_cart_sk2->read_rom(space, (offset & 0x3fff) + (m_romsel & 0x01) * 0x4000);
+				data = m_cart_sk2->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
 			}
 			break;
 		case 2:
 		case 3:
 			if (m_cart_sk1->exists())
 			{
-				data = m_cart_sk1->read_rom(space, (offset & 0x3fff) + (m_romsel & 0x01) * 0x4000);
+				data = m_cart_sk1->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
 			}
 			break;
 		case 12:
-			data = memregion("exp_rom")->base()[offset & 0x1fff];
+			data = m_exp_rom->base()[offset & 0x1fff];
 			break;
 		}
 	}
-	else if (offset == 0xfc70)
+	else if ((offset & 0xfc00) == 0xfc00)
 	{
-		data = m_adc->read(space, offset);
+		data &= m_cart_sk1->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
+		data &= m_cart_sk2->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
+
+		if (offset == 0xfc70)
+		{
+			data &= m_adc->read(space, offset);
+		}
+		else if (offset == 0xfc72)
+		{
+			data &= status_r(space, offset);
+		}
 	}
-	else if (offset == 0xfc72)
+	else if ((offset & 0xfd00) == 0xfd00)
 	{
-		data = status_r(space, offset);
+		data &= m_cart_sk1->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
+		data &= m_cart_sk2->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
 	}
 
 	return data;
@@ -203,17 +217,48 @@ uint8_t electron_plus1_device::expbus_r(address_space &space, offs_t offset, uin
 
 void electron_plus1_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
 {
-	if (offset == 0xfc70)
+	if (offset >= 0x8000 && offset < 0xc000)
 	{
-		m_adc->write(space, offset, data);
+		switch (m_romsel)
+		{
+		case 0:
+		case 1:
+			if (m_cart_sk2->exists())
+			{
+				m_cart_sk2->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
+			}
+			break;
+		case 2:
+		case 3:
+			if (m_cart_sk1->exists())
+			{
+				m_cart_sk1->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
+			}
+			break;
+		}
 	}
-	else if (offset == 0xfc71)
+	else if ((offset & 0xfc00) == 0xfc00)
 	{
-		m_cent_data_out->write(data);
+		m_cart_sk1->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
+		m_cart_sk2->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
+
+		if (offset == 0xfc70)
+		{
+			m_adc->write(space, offset, data);
+		}
+		else if (offset == 0xfc71)
+		{
+			m_cent_data_out->write(data);
+		}
+		else if (offset == 0xfe05)
+		{
+			m_romsel = data & 0x0f;
+		}
 	}
-	else if (offset == 0xfe05)
+	else if ((offset & 0xfd00) == 0xfd00)
 	{
-		m_romsel = data & 0x0f;
+		m_cart_sk1->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
+		m_cart_sk2->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
 	}
 }
 
@@ -246,47 +291,12 @@ WRITE_LINE_MEMBER(electron_plus1_device::ready_w)
 	m_adc_ready = !state;
 }
 
-image_init_result electron_plus1_device::load_cart(device_image_interface &image, generic_slot_device *slot)
+WRITE_LINE_MEMBER(electron_plus1_device::irq_w)
 {
-	if (image.software_entry() == nullptr)
-	{
-		uint32_t filesize = image.length();
+	m_slot->irq_w(state);
+}
 
-		if (filesize != 16384)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size: Only size 16384 is supported");
-			return image_init_result::FAIL;
-		}
-
-		slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-		image.fread(slot->get_rom_base(), filesize);
-		return image_init_result::PASS;
-	}
-	else
-	{
-		int upsize = image.get_software_region_length("uprom");
-		int losize = image.get_software_region_length("lorom");
-
-		if (upsize != 16384 && upsize != 0)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for uprom");
-			return image_init_result::FAIL;
-		}
-
-		if (losize != 16384 && losize != 0)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid size for lorom");
-			return image_init_result::FAIL;
-		}
-
-		slot->rom_alloc(0x8000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
-
-		if (upsize)
-			memcpy(slot->get_rom_base(), image.get_software_region("uprom"), upsize);
-
-		if (losize)
-			memcpy(slot->get_rom_base() + 0x4000, image.get_software_region("lorom"), losize);
-
-		return image_init_result::PASS;
-	}
+WRITE_LINE_MEMBER(electron_plus1_device::nmi_w)
+{
+	m_slot->nmi_w(state);
 }

@@ -2100,7 +2100,7 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 
 	MCFG_DEVICE_ADD("z80sio", Z80SIO, 6000000)
 
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
 	MCFG_RP5C15_OUT_ALARM_CB(WRITELINE(mz2500_state, mz2500_rtc_alarm_irq))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
@@ -2111,7 +2111,7 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 	MCFG_PIT8253_CLK2(16) //CH2, used by Super MZ demo / The Black Onyx and a few others (TODO: timing of this)
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("pit", pit8253_device, write_clk1))
 
-	MCFG_MB8877_ADD("mb8877a", XTAL_1MHz)
+	MCFG_MB8877_ADD("mb8877a", XTAL(1'000'000))
 
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2500_floppies, "dd", floppy_image_device::default_floppy_formats)
@@ -2122,7 +2122,7 @@ MACHINE_CONFIG_START(mz2500_state::mz2500)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
+	MCFG_SCREEN_RAW_PARAMS(XTAL(21'477'272), 640+108, 0, 640, 480, 0, 200) //unknown clock / divider
 	MCFG_SCREEN_UPDATE_DRIVER(mz2500_state, screen_update_mz2500)
 	MCFG_SCREEN_PALETTE("palette")
 

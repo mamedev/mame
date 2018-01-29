@@ -279,7 +279,7 @@ MACHINE_CONFIG_START(jupiter2_state::jupiter2)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":0", jupiter_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(INS1771N1_TAG":1", jupiter_floppies, nullptr, floppy_image_device::default_floppy_formats)
 
-	MCFG_DEVICE_ADD("acia0", ACIA6850, XTAL_2MHz) // unknown frequency
+	MCFG_DEVICE_ADD("acia0", ACIA6850, XTAL(2'000'000)) // unknown frequency
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial0", rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial0", rs232_port_device, write_rts))
 
@@ -287,7 +287,7 @@ MACHINE_CONFIG_START(jupiter2_state::jupiter2)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia0", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("acia1", ACIA6850, XTAL_2MHz) // unknown frequency
+	MCFG_DEVICE_ADD("acia1", ACIA6850, XTAL(2'000'000)) // unknown frequency
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial1", rs232_port_device, write_rts))
 

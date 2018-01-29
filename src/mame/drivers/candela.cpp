@@ -5,7 +5,7 @@
  * History of Candela Data AB
  *---------------------------
  * The Candela computer was designed to be the big breakthough and developed by Candela Data AB, "a Didact Company".
- * The Candela system was based around a main unit that could run OS-9 or Flex and a terminal unit that had a 
+ * The Candela system was based around a main unit that could run OS-9 or Flex and a terminal unit that had a
  * propietary software including CDBASIC. The Candela system lost the battle of the swedish schools to
  * the Compis computer by TeleNova which was based on CP/M initially.  Later both lost to IBM PC as we know.
  * Candela Data continued to sell their system to the swedish industry without major successes despite great
@@ -659,11 +659,11 @@ DEVICE_INPUT_DEFAULTS_END
 #endif
 
 /* Fake clock values until we TODO: figure out how the PTM generates the clocks */
-#define CAN09T_BAUDGEN_CLOCK XTAL_1_8432MHz
+#define CAN09T_BAUDGEN_CLOCK XTAL(1'843'200)
 #define CAN09T_ACIA_CLOCK (CAN09T_BAUDGEN_CLOCK / 12)
 
 MACHINE_CONFIG_START(can09t_state::can09t)
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4_9152MHz) // IPL crystal
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'915'200)) // IPL crystal
 	MCFG_CPU_PROGRAM_MAP(can09t_map)
 
 	/* --PIA inits----------------------- */
@@ -704,7 +704,7 @@ MACHINE_CONFIG_START(can09t_state::can09t)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE (can09t_state, write_acia_clock))
 MACHINE_CONFIG_END
 
-#define CAN09_X1_CLOCK XTAL_22_1184MHz        /* UKI 22118.40 Khz */
+#define CAN09_X1_CLOCK XTAL(22'118'400)        /* UKI 22118.40 Khz */
 #define CAN09_CPU_CLOCK (CAN09_X1_CLOCK / 16) /* ~1.38MHz Divider needs to be check but is the most likelly */
 MACHINE_CONFIG_START(can09_state::can09)
 	MCFG_CPU_ADD("maincpu", MC6809E, CAN09_CPU_CLOCK) // MC68A09EP
@@ -746,13 +746,13 @@ MACHINE_CONFIG_START(can09_state::can09)
 	/* screen - totally faked value for now */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_4MHz/2, 512, 0, 512, 576, 0, 576)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(4'000'000)/2, 512, 0, 512, 576, 0, 576)
 	MCFG_SCREEN_UPDATE_DRIVER(can09_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Floppy */
-	MCFG_WD1770_ADD("wd1770", XTAL_8MHz ) // TODO: Verify 8MHz UKI crystal assumed to be used
+	MCFG_WD1770_ADD("wd1770", XTAL(8'000'000) ) // TODO: Verify 8MHz UKI crystal assumed to be used
 #if 0
 	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", candela_floppies, "3dd", floppy_image_device::default_floppy_formats)
 	MCFG_SOFTWARE_LIST_ADD("flop3_list", "candela")

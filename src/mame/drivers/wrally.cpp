@@ -261,11 +261,11 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(wrally_state::wrally)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)        /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000,XTAL(24'000'000)/2)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(wrally_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", wrally_state,  irq6_line_hold)
 
-	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL_24MHz / 2) /* verified on pcb */
+	MCFG_DEVICE_ADD("gaelco_ds5002fp", GAELCO_DS5002FP, XTAL(24'000'000) / 2) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, mcu_hostmem_map)
 
 	/* video hardware */
@@ -294,7 +294,7 @@ MACHINE_CONFIG_START(wrally_state::wrally)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH)                 /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH)                 /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

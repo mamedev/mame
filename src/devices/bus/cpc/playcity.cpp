@@ -25,15 +25,15 @@ DEFINE_DEVICE_TYPE(CPC_PLAYCITY, cpc_playcity_device, "cpc_playcity", "PlayCity"
 
 // device machine config
 MACHINE_CONFIG_START(cpc_playcity_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(cpc_playcity_device, ctc_zc1_cb))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc",z80ctc_device, trg3))
 	MCFG_Z80CTC_INTR_CB(WRITELINE(cpc_playcity_device, ctc_intr_cb))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
-	MCFG_SOUND_ADD("ymz_1",YMZ294,XTAL_4MHz)  // when timer is not set, operates at 4MHz (interally divided by 2, so equivalent to the ST)
+	MCFG_SOUND_ADD("ymz_1",YMZ294,XTAL(4'000'000))  // when timer is not set, operates at 4MHz (interally divided by 2, so equivalent to the ST)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
-	MCFG_SOUND_ADD("ymz_2",YMZ294,XTAL_4MHz)
+	MCFG_SOUND_ADD("ymz_2",YMZ294,XTAL(4'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 
 	// pass-through
@@ -132,7 +132,7 @@ void cpc_playcity_device::update_ymz_clock()
 {
 	// Bit of a hack job here, since there is no way currently to connect the CTC channel output directly to the YMZ clocks.
 	uint8_t rate = m_ctc->get_channel_constant(0);
-	uint32_t clk = XTAL_4MHz;
+	uint32_t clk = 4000000;
 
 	switch(rate)
 	{

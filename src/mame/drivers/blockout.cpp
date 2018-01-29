@@ -76,8 +76,8 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_10MHz
-#define AUDIO_CLOCK XTAL_3_579545MHz
+#define MAIN_CLOCK XTAL(10'000'000)
+#define AUDIO_CLOCK XTAL(3'579'545)
 
 WRITE16_MEMBER(blockout_state::blockout_irq6_ack_w)
 {
@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( agress_map, AS_PROGRAM, 16, blockout_state )
 	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM /* work RAM */
 	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM /* work RAM */
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("frontvideoram") 
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("frontvideoram")
 	AM_RANGE(0x208000, 0x21ffff) AM_RAM /* ??? */
 	AM_RANGE(0x280002, 0x280003) AM_WRITE(blockout_frontcolor_w)
 	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_SHARE("paletteram")
@@ -226,8 +226,8 @@ static INPUT_PORTS_START( blockoutj )
 	/* these can still be used on the difficutly select even if they can't be used for rotating pieces in this version */
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )        /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )        /* Listed as "Unused" */
-//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 )        PORT_DIPLOCATION("SW2:7")
-//	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_DIPLOCATION("SW2:8")
+//  PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON4 )        PORT_DIPLOCATION("SW2:7")
+//  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_DIPLOCATION("SW2:8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( agress )
@@ -238,12 +238,12 @@ static INPUT_PORTS_START( agress )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Button 3 (Bomb)")
-	
+
 	PORT_MODIFY("P2")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Button 3 (Bomb)")
-	
+
 	/* factory shipment setting is all dips OFF */
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x04, 0x04, "Opening Cut" )           PORT_DIPLOCATION("SW1:3")
@@ -256,8 +256,8 @@ static INPUT_PORTS_START( agress )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Players ) )      PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )     
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )     
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
 INPUT_PORTS_END
 
 
@@ -315,7 +315,7 @@ MACHINE_CONFIG_START(blockout_state::blockout)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* assume same as ddragon3 with adjusted visible display area */
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 448, 0, 320, 272, 10, 250)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000) / 4, 448, 0, 320, 272, 10, 250)
 	MCFG_SCREEN_UPDATE_DRIVER(blockout_state, screen_update_blockout)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -436,22 +436,22 @@ DRIVER_INIT_MEMBER(blockout_state,agress)
 {
 	/*
 	 * agress checks at F3A that this is mirrored, blockout glitches if you mirror to it
-	 * But actually mirroring this VRAM makes display to be offset 
+	 * But actually mirroring this VRAM makes display to be offset
 	 * (clearly visible with text being on top bank instead of bottom during gameplay)
 	 * There are many possible solutions to this:
 	 * A) reads are actually ORed between upper and lower banks
-	 * B) VRAM is initialized with same pattern checked, or extreme open bus occurs for the second uninitalized bank. 
+	 * B) VRAM is initialized with same pattern checked, or extreme open bus occurs for the second uninitalized bank.
 	 * C) Agress isn't truly identical to Block Out HW wise, it really mirrors VRAM data and offsets display
-	 * D) it's not supposed to enter into trace mode at all, cause of the bogus mirror check (trace exception 
+	 * D) it's not supposed to enter into trace mode at all, cause of the bogus mirror check (trace exception
 	 *    occurs at very beginning of the program execution)
 	 * For now let's use D and just patch the TRACE exception that causes the bogus mirror check
 	 */
-	 
- 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x82/2] = 0x2700;
 }
- 
+
 GAME( 1989, blockout, 0,        blockout, blockout,  blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, blockout2,blockout, blockout, blockout,  blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, blockoutj,blockout, blockout, blockoutj, blockout_state, 0, ROT0, "Technos Japan / California Dreams", "Block Out (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -35,7 +35,7 @@ http://www.dragons-lair-project.com/tech/pages/dl2.asp
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_30MHz
+#define MAIN_CLOCK XTAL(30'000'000)
 
 class dlair2_state : public driver_device
 {

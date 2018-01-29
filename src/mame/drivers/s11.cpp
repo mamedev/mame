@@ -381,7 +381,7 @@ DRIVER_INIT_MEMBER( s11_state, s11 )
 
 MACHINE_CONFIG_START(s11_state::s11)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M6802, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(s11_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s11_state, s11)
 
@@ -440,7 +440,7 @@ MACHINE_CONFIG_START(s11_state::s11)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6808, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu", M6808, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(s11_audio_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")

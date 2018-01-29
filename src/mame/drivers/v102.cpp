@@ -70,13 +70,13 @@ static INPUT_PORTS_START( v102 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(v102_state::v102)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_575MHz / 5) // divider not verified
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'575'000) / 5) // divider not verified
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_18_575MHz, 970, 0, 800, 319, 0, 300)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL_18_575MHz, 948, 0, 792, 319, 0, 300)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(18'575'000), 970, 0, 800, 319, 0, 300)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(18'575'000), 948, 0, 792, 319, 0, 300)
 	MCFG_SCREEN_UPDATE_DRIVER(v102_state, screen_update)
 
 	//MCFG_DEVICE_ADD("vpac", CRT9007, CRTC_CLOCK)
@@ -84,9 +84,9 @@ MACHINE_CONFIG_START(v102_state::v102)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
 
-	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL_18_575MHz / 5) // divider not verified
+	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL(18'575'000) / 5) // divider not verified
 
-	MCFG_DEVICE_ADD("usart", I8251, XTAL_18_575MHz / 5) // divider not verified
+	MCFG_DEVICE_ADD("usart", I8251, XTAL(18'575'000) / 5) // divider not verified
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 

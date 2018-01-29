@@ -6,7 +6,7 @@
     Silicon Gaming.
     PC based hardware.
 
-	Preliminary driver by Roberto Fresca.
+    Preliminary driver by Roberto Fresca.
 
 ******************************************************************
 
@@ -14,12 +14,12 @@
   --------------
 
   System Hardware:
-  
+
   The slot machine system is based on an Intel Pentium motherboard.
   Could be either a Thor or Tucson motherboard with a Pentium micro
   processor running at 133 MHz or higher, with the following bus
   interfaces:
-  
+
   - PCI bus for connecting to the video controller, peripheral memory
     board, and SCSI disk controller.
 
@@ -30,30 +30,30 @@
   the 82437FX/82438FX PCI bridge chips, the PIIX ISA bridge chip, the 87306
   chip that provides the serial ports, timers and interrupts, and the IEEE
   1284 parallel port interface to the GPIO system.
-  
+
   The Tucson motherboard is based on Intel's Triton-II chipset, which includes
   the 82439HX PCI bridge chip, the PIIX3 ISA bridge chip, and the 87306B super
   I/O chip that provides the serial ports, timers and interrupts, and the IEEE
   1284 parallel port interface to the GPIO system.
-  
+
   The original manufacturer's BIOS is removed from the motherboard. The system
-  uses the Silicon Gaming BIOS on the Peripheral Memory Board instead. 
-  
+  uses the Silicon Gaming BIOS on the Peripheral Memory Board instead.
+
   The motherboard has 4x 16MB SIMMs, getting an amount of 64MB of RAM.
-  
-  
+
+
   Peripheral Memory Board:
-  
+
   The Peripheral Memory Board stores the boot code, motherboard basic I/O
   system (BIOS), operating system (OS), drivers, authentication software,
   system configuration, statistics, and game state information. Data on
   the Peripheral Memory Board remains after the system is powered off,
   using the following memory modules:
-  
+
   - ROM
   - NVRAM
   - EEPROM
-  
+
   A GPIO box is connected to the motherboard through parallel interface.
   Could be either GPIO I or GPIO II.
 
@@ -151,24 +151,24 @@ MACHINE_CONFIG_END
 
 /*
 #define ODYSSEY_BIOS \
-	ROM_REGION( 0x80000, "maincpu", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "bios0", "SGI BIOS 76" ) \
-	ROM_LOAD_BIOS( 0,  "sgi_bios_76.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) ) \
-	ROM_SYSTEM_BIOS( 1, "bios1", "SGI BIOS 65" ) \
-	ROM_LOAD_BIOS( 1,  "sgi_bios_65.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) ) \
-	ROM_SYSTEM_BIOS( 2, "bios2", "SGI BIOS 55" ) \
-	ROM_LOAD_BIOS( 2,  "sgi_bios_55.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) ) \
-	ROM_SYSTEM_BIOS( 3, "bios3", "SGI BIOS 46" ) \
-	ROM_LOAD_BIOS( 3,  "sgi_bios_46.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) ) \
-	ROM_SYSTEM_BIOS( 4, "bios4", "SGI BIOS 31" ) \
-	ROM_LOAD_BIOS( 4,  "sgi_bios_31.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) ) \
-	ROM_SYSTEM_BIOS( 5, "bios5", "SGI BIOS 00" ) \
-	ROM_LOAD_BIOS( 5,  "sgi_bios_00.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) )
+    ROM_REGION( 0x80000, "maincpu", 0 ) \
+    ROM_SYSTEM_BIOS( 0, "bios0", "SGI BIOS 76" ) \
+    ROM_LOAD_BIOS( 0,  "sgi_bios_76.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) ) \
+    ROM_SYSTEM_BIOS( 1, "bios1", "SGI BIOS 65" ) \
+    ROM_LOAD_BIOS( 1,  "sgi_bios_65.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) ) \
+    ROM_SYSTEM_BIOS( 2, "bios2", "SGI BIOS 55" ) \
+    ROM_LOAD_BIOS( 2,  "sgi_bios_55.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) ) \
+    ROM_SYSTEM_BIOS( 3, "bios3", "SGI BIOS 46" ) \
+    ROM_LOAD_BIOS( 3,  "sgi_bios_46.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) ) \
+    ROM_SYSTEM_BIOS( 4, "bios4", "SGI BIOS 31" ) \
+    ROM_LOAD_BIOS( 4,  "sgi_bios_31.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) ) \
+    ROM_SYSTEM_BIOS( 5, "bios5", "SGI BIOS 00" ) \
+    ROM_LOAD_BIOS( 5,  "sgi_bios_00.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) )
 */
 
 ROM_START( odyssey )
 
-//	ODYSSEY_BIOS
+//  ODYSSEY_BIOS
 
 	ROM_REGION( 0x80000, "maincpu", 0 )  // main BIOS
 	ROM_LOAD( "sgi_bios_76.bin", 0x000000, 0x80000, CRC(00592222) SHA1(29281d25aaf2051e0794dece8be146bb63d5c488) )

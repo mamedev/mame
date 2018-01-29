@@ -29,7 +29,7 @@ static SLOT_INTERFACE_START( isbc_208_floppies )
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(isbc_208_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("dmac", AM9517A, XTAL_8MHz/4)
+	MCFG_DEVICE_ADD("dmac", AM9517A, XTAL(8'000'000)/4)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(isbc_208_device, hreq_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(isbc_208_device, out_eop_w))
 	MCFG_I8237_IN_MEMR_CB(READ8(isbc_208_device, dma_read_byte))

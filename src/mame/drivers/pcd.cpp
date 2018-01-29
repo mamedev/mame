@@ -490,13 +490,13 @@ static INPUT_PORTS_START(pcx)
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(pcd_state::pcd)
-	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(pcd_map)
 	MCFG_CPU_IO_MAP(pcd_io)
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(pcd_state, i186_timer1_w))
 	MCFG_80186_IRQ_SLAVE_ACK(READ8(pcd_state, irq_callback))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(XTAL_16MHz / 24)) // adjusted to pass post
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer0_tick", pcd_state, timer0_tick, attotime::from_hz(XTAL(16'000'000) / 24)) // adjusted to pass post
 
 	MCFG_DEVICE_ADD("pic1", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
@@ -513,7 +513,7 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	// floppy disk controller
-	MCFG_WD2793_ADD("fdc", XTAL_16MHz / 8)
+	MCFG_WD2793_ADD("fdc", XTAL(16'000'000) / 8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("pic1", pic8259_device, ir6_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq1_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
@@ -523,15 +523,15 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pcd_floppies, "55f", pcd_state::floppy_formats)
 
 	// usart
-	MCFG_DEVICE_ADD("usart1", MC2661, XTAL_4_9152MHz)
+	MCFG_DEVICE_ADD("usart1", MC2661, XTAL(4'915'200))
 	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir3_w))
 	MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir3_w))
 	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232_1", rs232_port_device, write_txd))
-	MCFG_DEVICE_ADD("usart2", MC2661, XTAL_4_9152MHz)
+	MCFG_DEVICE_ADD("usart2", MC2661, XTAL(4'915'200))
 	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir2_w))
 	//MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir2_w)) // this gets stuck high causing the keyboard to not work
 	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("keyboard", pcd_keyboard_device, t0_w))
-	MCFG_DEVICE_ADD("usart3", MC2661, XTAL_4_9152MHz)
+	MCFG_DEVICE_ADD("usart3", MC2661, XTAL(4'915'200))
 	MCFG_MC2661_RXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir4_w))
 	MCFG_MC2661_TXRDY_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir4_w))
 	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232_2", rs232_port_device, write_txd))
@@ -547,7 +547,7 @@ MACHINE_CONFIG_START(pcd_state::pcd)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	// rtc
-	MCFG_MC146818_ADD("rtc", XTAL_32_768kHz)
+	MCFG_MC146818_ADD("rtc", XTAL(32'768))
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic1", pic8259_device, ir7_w))
 	MCFG_MC146818_BINARY(true)
 	MCFG_MC146818_BINARY_YEAR(true)

@@ -219,10 +219,10 @@ READ8_MEMBER(zac1b111xx_melody_base::melodypsg1_portb_r)
 }
 
 MACHINE_CONFIG_START(zac1b111xx_melody_base::device_add_mconfig)
-	MCFG_CPU_ADD("melodycpu", M6802, XTAL_3_579545MHz) // verified on pcb
+	MCFG_CPU_ADD("melodycpu", M6802, XTAL(3'579'545)) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(zac1b111xx_melody_base_map)
 
-	MCFG_DEVICE_ADD("timebase", CLOCK, XTAL_3_579545MHz/4096/2) // CPU clock divided using 4040 and half of 74LS74
+	MCFG_DEVICE_ADD("timebase", CLOCK, XTAL(3'579'545)/4096/2) // CPU clock divided using 4040 and half of 74LS74
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("melodypia", pia6821_device, cb1_w))
 
 	MCFG_DEVICE_ADD("melodypia", PIA6821, 0)
@@ -232,10 +232,10 @@ MACHINE_CONFIG_START(zac1b111xx_melody_base::device_add_mconfig)
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("melodycpu", INPUT_LINE_NMI))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("melodycpu", M6802_IRQ_LINE))
 
-	MCFG_SOUND_ADD("melodypsg1", AY8910, XTAL_3_579545MHz/2) // CPU clock divided using 4040
+	MCFG_SOUND_ADD("melodypsg1", AY8910, XTAL(3'579'545)/2) // CPU clock divided using 4040
 	MCFG_AY8910_PORT_B_READ_CB(READ8(zac1b111xx_melody_base, melodypsg1_portb_r))
 
-	MCFG_SOUND_ADD("melodypsg2", AY8910, XTAL_3_579545MHz/2) // CPU clock divided using 4040
+	MCFG_SOUND_ADD("melodypsg2", AY8910, XTAL(3'579'545)/2) // CPU clock divided using 4040
 MACHINE_CONFIG_END
 
 void zac1b111xx_melody_base::device_start()
@@ -419,7 +419,7 @@ MACHINE_CONFIG_START(zac1b11142_audio_device::device_add_mconfig)
 	MCFG_SOUND_ROUTE_EX(1, "sound_nl", 1.0, 4)
 	MCFG_SOUND_ROUTE_EX(2, "sound_nl", 1.0, 5)
 
-	MCFG_CPU_ADD("audiocpu", M6802, XTAL_3_579545MHz) // verified on pcb
+	MCFG_CPU_ADD("audiocpu", M6802, XTAL(3'579'545)) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(zac1b11142_audio_map)
 
 	MCFG_DEVICE_ADD("pia_1i", PIA6821, 0)

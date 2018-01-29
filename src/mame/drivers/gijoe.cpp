@@ -292,11 +292,11 @@ void gijoe_state::machine_reset()
 MACHINE_CONFIG_START(gijoe_state::gijoe)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)   /* 16MHz Confirmed */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)   /* 16MHz Confirmed */
 	MCFG_CPU_PROGRAM_MAP(gijoe_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gijoe_state,  gijoe_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/4)  /* Amuse & confirmed. Z80E at 8MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/4)  /* Amuse & confirmed. Z80E at 8MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
@@ -332,7 +332,7 @@ MACHINE_CONFIG_START(gijoe_state::gijoe)
 
 	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

@@ -350,7 +350,7 @@ tiny_rom_entry const *kaypro_10_keyboard_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(kaypro_10_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", I8049, XTAL_6MHz)
+	MCFG_CPU_ADD("mcu", I8049, 6_MHz_XTAL)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(kaypro_10_keyboard_device, p1_r))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(kaypro_10_keyboard_device, p2_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(kaypro_10_keyboard_device, p2_w))

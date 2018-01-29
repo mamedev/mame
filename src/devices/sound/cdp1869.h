@@ -137,13 +137,13 @@ class cdp1869_device :  public device_t,
 						public device_memory_interface
 {
 public:
-	static constexpr float DOT_CLK_PAL         = XTAL_5_626MHz;
-	static constexpr float DOT_CLK_NTSC        = XTAL_5_67MHz;
-	static constexpr float COLOR_CLK_PAL       = XTAL_8_867236MHz;
-	static constexpr float COLOR_CLK_NTSC      = XTAL_7_15909MHz;
+	static constexpr auto DOT_CLK_PAL         = XTAL(5'626'000);
+	static constexpr auto DOT_CLK_NTSC        = XTAL(5'670'000);
+	static constexpr auto COLOR_CLK_PAL       = XTAL(8'867'236);
+	static constexpr auto COLOR_CLK_NTSC      = XTAL(7'159'090);
 
-	static constexpr float CPU_CLK_PAL         = DOT_CLK_PAL / 2;
-	static constexpr float CPU_CLK_NTSC        = DOT_CLK_NTSC / 2;
+	static constexpr auto CPU_CLK_PAL         = DOT_CLK_PAL / 2;
+	static constexpr auto CPU_CLK_NTSC        = DOT_CLK_NTSC / 2;
 
 	static constexpr unsigned CHAR_WIDTH          = 6;
 
@@ -194,6 +194,7 @@ public:
 	static void static_set_char_ram_write(device_t &device, char_ram_write_delegate &&cb) { downcast<cdp1869_device &>(device).m_out_char_ram_func = std::move(cb); }
 	static void static_set_pcb_read(device_t &device, pcb_read_delegate &&cb) { downcast<cdp1869_device &>(device).m_in_pcb_func = std::move(cb); }
 	static void static_set_color_clock(device_t &device, int color_clock) { downcast<cdp1869_device &>(device).m_color_clock = color_clock; }
+	static void static_set_color_clock(device_t &device, const XTAL &xtal) { xtal.validate("selecting cdp1869 clock"); static_set_color_clock(device, xtal.value()); }
 
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
 	virtual DECLARE_ADDRESS_MAP(char_map, 8);

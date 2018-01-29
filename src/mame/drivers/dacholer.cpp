@@ -646,12 +646,12 @@ PALETTE_INIT_MEMBER(dacholer_state, dacholer)
 MACHINE_CONFIG_START(dacholer_state::dacholer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)  /* ? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/4)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dacholer_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_19_968MHz/8) /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(19'968'000)/8) /* ? */
 	MCFG_CPU_PROGRAM_MAP(snd_map)
 	MCFG_CPU_IO_MAP(snd_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dacholer_state, sound_irq)
@@ -677,16 +677,16 @@ MACHINE_CONFIG_START(dacholer_state::dacholer)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_19_968MHz/16)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(19'968'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_19_968MHz/16)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(19'968'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL_19_968MHz/16)
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL(19'968'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dacholer_state, adpcm_int))          /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 = 3906.25Hz playback  - guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

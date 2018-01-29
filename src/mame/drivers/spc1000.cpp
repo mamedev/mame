@@ -18,7 +18,7 @@ NOTE: 2014-09-13: added code from someone's modified MESS driver for floppy
                   author is Miso Kim.
 
                   Hardware details of the fdc: Intelligent device, Z80 CPU,
-                  XTAL_8MHz, PPI 8255, FDC uPD765C, 2 RAM chips, 28 other
+                  XTAL(8'000'000), PPI 8255, FDC uPD765C, 2 RAM chips, 28 other
                   small ics. And of course, no schematic.
 
 
@@ -461,14 +461,14 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(spc1000_state::spc1000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(spc1000_mem)
 	MCFG_CPU_IO_MAP(spc1000_io)
 
 	/* video hardware */
 	MCFG_SCREEN_MC6847_NTSC_ADD("screen", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL_3_579545MHz)
+	MCFG_DEVICE_ADD("mc6847", MC6847_NTSC, XTAL(3'579'545))
 	MCFG_MC6847_FSYNC_CALLBACK(WRITELINE(spc1000_state, irq_w))
 	MCFG_MC6847_INPUT_CALLBACK(READ8(spc1000_state, mc6847_videoram_r))
 	MCFG_MC6847_CHARROM_CALLBACK(spc1000_state, get_char_rom)
@@ -477,7 +477,7 @@ MACHINE_CONFIG_START(spc1000_state::spc1000)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, XTAL_4MHz / 1)
+	MCFG_SOUND_ADD("ay8910", AY8910, XTAL(4'000'000) / 1)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(spc1000_state, porta_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)

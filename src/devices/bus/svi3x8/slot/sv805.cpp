@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(SV805, sv805_device, "sv805", "SV-805 RS-232 Interface")
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sv805_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("uart", INS8250, XTAL_3_072MHz)
+	MCFG_DEVICE_ADD("uart", INS8250, XTAL(3'072'000))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(sv805_device, uart_intr_w))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))

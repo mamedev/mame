@@ -293,11 +293,11 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(mbc200_state::mbc200)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz/2) // NEC D780C-1
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000)/2) // NEC D780C-1
 	MCFG_CPU_PROGRAM_MAP(mbc200_mem)
 	MCFG_CPU_IO_MAP(mbc200_io)
 
-	MCFG_CPU_ADD("subcpu",Z80, XTAL_8MHz/2) // NEC D780C-1
+	MCFG_CPU_ADD("subcpu",Z80, XTAL(8'000'000)/2) // NEC D780C-1
 	MCFG_CPU_PROGRAM_MAP(mbc200_sub_mem)
 	MCFG_CPU_IO_MAP(mbc200_sub_io)
 
@@ -311,7 +311,7 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mbc200)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_8MHz / 4) // HD46505SP
+	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL(8'000'000) / 4) // HD46505SP
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mbc200_state, update_row)
@@ -337,7 +337,7 @@ MACHINE_CONFIG_START(mbc200_state::mbc200)
 
 	MCFG_DEVICE_ADD("uart2", I8251, 0) // INS8251A
 
-	MCFG_MB8876_ADD("fdc", XTAL_8MHz / 8) // guess
+	MCFG_MB8876_ADD("fdc", XTAL(8'000'000) / 8) // guess
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mbc200_floppies, "qd", floppy_image_device::default_floppy_formats)

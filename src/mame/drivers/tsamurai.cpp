@@ -705,15 +705,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/8)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(z80_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sound1_map)
 
-	MCFG_CPU_ADD("audio2", Z80, XTAL_24MHz/8)
+	MCFG_CPU_ADD("audio2", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sound2_map)
 
 	MCFG_MACHINE_START_OVERRIDE(tsamurai_state,tsamurai)
@@ -741,7 +741,7 @@ MACHINE_CONFIG_START(tsamurai_state::tsamurai)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz/8)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(24'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
@@ -755,11 +755,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/8)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(vsgongf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sound_vsgongf_map)
 	MCFG_CPU_IO_MAP(vsgongf_audio_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(tsamurai_state, vsgongf_sound_interrupt, 3*60)
@@ -791,7 +791,7 @@ MACHINE_CONFIG_START(tsamurai_state::vsgongf)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz/8)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(24'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
@@ -803,18 +803,18 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tsamurai_state::m660)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/8)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(m660_map)
 	MCFG_CPU_IO_MAP(z80_m660_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sound1_m660_map)
 
-	MCFG_CPU_ADD("audio2", Z80, XTAL_24MHz/8)
+	MCFG_CPU_ADD("audio2", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sound2_m660_map)
 
-	MCFG_CPU_ADD("audio3", Z80, XTAL_24MHz/8)
+	MCFG_CPU_ADD("audio3", Z80, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sound3_m660_map)
 	MCFG_CPU_IO_MAP(sound3_m660_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tsamurai_state,  nmi_line_pulse)
@@ -845,7 +845,7 @@ MACHINE_CONFIG_START(tsamurai_state::m660)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz/8)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(24'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC

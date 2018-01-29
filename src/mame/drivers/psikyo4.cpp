@@ -629,9 +629,6 @@ void psikyo4_state::machine_start()
 	m_ymf_max_bank = YMFROM->bytes() / 0x100000;
 	for (int i = 0; i < 4; i++)
 	{
-		char banktag[16];
-		sprintf(banktag, "ymfbank%d", i);
-		m_ymf_bank[i] = membank(banktag);
 		m_ymf_bank[i]->configure_entries(0, m_ymf_max_bank, YMFROM->base(), 0x100000);
 		m_ymf_bank[i]->set_entry(i);
 	}

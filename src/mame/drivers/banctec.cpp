@@ -131,7 +131,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(banctec_state::banctec)
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL_11_0592MHz)
+	MCFG_CPU_ADD("maincpu", I80C31, XTAL(11'059'200))
 	MCFG_CPU_PROGRAM_MAP(banctec_mem)
 
 	MCFG_CPU_ADD("mcu", M6803, 4000000)     /* Actual MCU is a Motorola 6803 and the clock frequency is still unknown */
@@ -149,7 +149,7 @@ MACHINE_CONFIG_START(banctec_state::banctec)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", banctec)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_2MHz) /* (?) */
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(2'000'000)) /* (?) */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(banctec_state, crtc_update_row)

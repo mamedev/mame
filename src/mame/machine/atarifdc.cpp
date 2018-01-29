@@ -123,7 +123,7 @@ void atari_fdc_device::atari_load_proc(device_image_interface &image, bool is_cr
 {
 	int id = atari_fdc_get_drive(&image.device());
 	int size, i;
-	
+
 	if (id == -1)
 		return;
 

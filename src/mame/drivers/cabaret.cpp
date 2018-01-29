@@ -355,7 +355,7 @@ INTERRUPT_GEN_MEMBER(cabaret_state::cabaret_interrupt)
 
 MACHINE_CONFIG_START(cabaret_state::cabaret)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(cabaret_map)
 	MCFG_CPU_IO_MAP(cabaret_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cabaret_state, cabaret_interrupt)
@@ -391,7 +391,7 @@ MACHINE_CONFIG_START(cabaret_state::cabaret)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

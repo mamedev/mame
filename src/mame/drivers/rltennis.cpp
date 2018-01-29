@@ -74,7 +74,7 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 
 #define RLT_REFRESH_RATE   60
 #define RLT_TIMER_FREQ     (RLT_REFRESH_RATE*256)
-#define RLT_XTAL           XTAL_12MHz
+#define RLT_XTAL           XTAL(12'000'000)
 
 READ16_MEMBER(rltennis_state::io_r)
 {

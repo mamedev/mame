@@ -271,12 +271,12 @@ const tiny_rom_entry *pioneer_ldv1000_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(pioneer_ldv1000_device::device_add_mconfig)
-	MCFG_CPU_ADD("ldv1000", Z80, XTAL_5MHz/2)
+	MCFG_CPU_ADD("ldv1000", Z80, XTAL(5'000'000)/2)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(ldv1000_map)
 	MCFG_CPU_IO_MAP(ldv1000_portmap)
 
-	MCFG_DEVICE_ADD("ldvctc", Z80CTC, XTAL_5MHz/2)
+	MCFG_DEVICE_ADD("ldvctc", Z80CTC, XTAL(5'000'000)/2)
 	MCFG_Z80CTC_INTR_CB(WRITELINE(pioneer_ldv1000_device, ctc_interrupt))
 
 	MCFG_DEVICE_ADD("ldvppi0", I8255, 0)

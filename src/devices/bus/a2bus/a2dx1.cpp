@@ -63,8 +63,6 @@ a2bus_dx1_device::a2bus_dx1_device(const machine_config &mconfig, const char *ta
 
 void a2bus_dx1_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
 }
 
 uint8_t a2bus_dx1_device::read_c0nx(uint8_t offset)

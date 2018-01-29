@@ -18,7 +18,7 @@
 #include "sound/samples.h"
 
 /* constants */
-#define MAIN_OSC_MCR_I      XTAL_19_968MHz
+#define MAIN_OSC_MCR_I      XTAL(19'968'000)
 
 
 class mcr_state : public driver_device

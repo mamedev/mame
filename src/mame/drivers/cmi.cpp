@@ -122,10 +122,10 @@
 #include "speaker.h"
 
 
-#define Q209_CPU_CLOCK      XTAL_40_210MHz / 40 // divider not verified (very complex circuit)
+#define Q209_CPU_CLOCK      XTAL(40'210'000) / 40 // divider not verified (very complex circuit)
 
 #define M6809_CLOCK             8000000 // wrong
-#define MASTER_OSCILLATOR       XTAL_34_291712MHz
+#define MASTER_OSCILLATOR       XTAL(34'291'712)
 
 #define CPU_1                   0
 #define CPU_2                   1
@@ -141,7 +141,7 @@
 #define PAGE_MASK               (PAGE_SIZE - 1)
 #define PAGE_SHIFT              5
 
-#define PIXEL_CLOCK             XTAL_10_38MHz
+#define PIXEL_CLOCK             XTAL(10'380'000)
 #define HTOTAL                  672
 #define HBLANK_END              0
 #define HBLANK_START            512
@@ -149,8 +149,8 @@
 #define VBLANK_END              0
 #define VBLANK_START            256
 
-#define HBLANK_FREQ     ((double)PIXEL_CLOCK / (double)HTOTAL)
-#define VBLANK_FREQ     ((double)HBLANK_FREQ / (double)VTOTAL)
+#define HBLANK_FREQ     (PIXEL_CLOCK / HTOTAL)
+#define VBLANK_FREQ     (HBLANK_FREQ / VTOTAL)
 
 #define MAPSEL_P2_B             0x00
 #define MAPSEL_P2_A             0x03
@@ -1831,7 +1831,7 @@ void cmi01a_device::run_voice()
 	int o_val = (val_a >> 2) & 0xf;
 
 	int m_tune = m_cmi02_pia_0->b_output();
-	double mfreq = (double)(0xf00 | m_tune) * ((double)MASTER_OSCILLATOR / 2.0) / 4096.0;
+	double mfreq = (double)(0xf00 | m_tune) * (MASTER_OSCILLATOR / 2.0 / 4096.0).dvalue();
 
 	double cfreq = ((double)(0x800 | (pitch << 1))* mfreq) / 4096.0;
 
@@ -2755,14 +2755,14 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cmi_state, cpu2_interrupt_callback)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu2")
 
-	MCFG_CPU_ADD("muskeys", M6802, XTAL_4MHz)
+	MCFG_CPU_ADD("muskeys", M6802, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(muskeys_map)
 
-	MCFG_CPU_ADD("alphakeys", M6802, XTAL_3_84MHz)
+	MCFG_CPU_ADD("alphakeys", M6802, XTAL(3'840'000))
 	MCFG_CPU_PROGRAM_MAP(alphakeys_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cmi_state, irq0_line_hold, XTAL_3_84MHz / 400) // TODO: PIA controls this
+	MCFG_CPU_PERIODIC_INT_DRIVER(cmi_state, irq0_line_hold, XTAL(3'840'000) / 400) // TODO: PIA controls this
 
-	MCFG_CPU_ADD("smptemidi", M68000, XTAL_20MHz / 2)
+	MCFG_CPU_ADD("smptemidi", M68000, XTAL(20'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(midicpu_map)
 
 	MCFG_CPU_ADD("cmi07cpu", MC6809E, Q209_CPU_CLOCK) // ?
@@ -2782,7 +2782,7 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_SCREEN_UPDATE_DRIVER(cmi_state, screen_update_cmi2x)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MSM5832_ADD("msm5832", XTAL_32_768kHz)
+	MCFG_MSM5832_ADD("msm5832", XTAL(32'768))
 
 	MCFG_DEVICE_ADD("i8214_1", I8214, 1000000) // cmi_8214_intf_1
 	MCFG_I8214_INT_CALLBACK(WRITELINE(cmi_state, i8214_1_int_w))
@@ -2809,7 +2809,7 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi_state, pia_q219_irqb))
 
 	MCFG_DEVICE_ADD("q219_ptm", PTM6840, 2000000) // ptm_q219_config
-	MCFG_PTM6840_EXTERNAL_CLOCKS(HBLANK_FREQ, VBLANK_FREQ, 1000000)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(HBLANK_FREQ.dvalue(), VBLANK_FREQ.dvalue(), 1'000'000) // TODO: does the third thing come from a crystal?
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, ptm_q219_irq))
 
 	MCFG_DEVICE_ADD("cmi02_pia_1", PIA6821, 0) // pia_cmi02_1_config
@@ -2821,27 +2821,27 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_PTM6840_OUT1_CB(WRITELINE(cmi_state, cmi02_ptm_o1))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, cmi02_ptm_irq))
 
-	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, XTAL_1_8432MHz / 12)
+	MCFG_DEVICE_ADD("mkbd_acia_clock", CLOCK, XTAL(1'843'200) / 12)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(cmi_state, mkbd_acia_clock))
 
-	MCFG_DEVICE_ADD("q133_acia_0", MOS6551, XTAL_1_8432MHz)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("q133_acia_0", MOS6551, XTAL(1'843'200))
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(cmi_state, q133_acia_irq0))
 
-	MCFG_DEVICE_ADD("q133_acia_1", MOS6551, XTAL_1_8432MHz)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("q133_acia_1", MOS6551, XTAL(1'843'200))
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(cmi_state, q133_acia_irq1))
 
-	MCFG_DEVICE_ADD("q133_acia_2", MOS6551, XTAL_1_8432MHz)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("q133_acia_2", MOS6551, XTAL(1'843'200))
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(cmi_state, q133_acia_irq2))
 
-	MCFG_DEVICE_ADD("q133_acia_3", MOS6551, XTAL_1_8432MHz)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("q133_acia_3", MOS6551, XTAL(1'843'200))
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(cmi_state, q133_acia_irq3))
 
-	MCFG_DEVICE_ADD("acia_mkbd_kbd", ACIA6850, XTAL_1_8432MHz / 12) // acia_mkbd_kbd
-	MCFG_DEVICE_ADD("acia_mkbd_cmi", ACIA6850, XTAL_1_8432MHz / 12) // acia_mkbd_cmi
+	MCFG_DEVICE_ADD("acia_mkbd_kbd", ACIA6850, XTAL(1'843'200) / 12) // acia_mkbd_kbd
+	MCFG_DEVICE_ADD("acia_mkbd_cmi", ACIA6850, XTAL(1'843'200) / 12) // acia_mkbd_cmi
 	MCFG_DEVICE_ADD("ank_pia", PIA6821, 0) // pia_ank_config
 
 	MCFG_DEVICE_MODIFY("q133_acia_0")
@@ -2875,7 +2875,7 @@ MACHINE_CONFIG_START(cmi_state::cmi2x)
 	MCFG_DEVICE_ADD("cmi07_ptm", PTM6840, 2000000) // ptm_cmi07_config TODO
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, cmi07_irq))
 
-	MCFG_FD1791_ADD("wd1791", XTAL_16MHz / 8) // wd1791_interface
+	MCFG_FD1791_ADD("wd1791", XTAL(16'000'000) / 8) // wd1791_interface
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(cmi_state, wd1791_irq))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(cmi_state, wd1791_drq))
 	MCFG_FLOPPY_DRIVE_ADD("wd1791:0", cmi2x_floppies, "8dsdd", floppy_image_device::default_floppy_formats)

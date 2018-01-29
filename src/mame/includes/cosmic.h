@@ -11,8 +11,8 @@
 #include "sound/dac.h"
 #include "screen.h"
 
-#define COSMICG_MASTER_CLOCK     XTAL_9_828MHz
-#define Z80_MASTER_CLOCK         XTAL_10_816MHz
+#define COSMICG_MASTER_CLOCK     XTAL(9'828'000)
+#define Z80_MASTER_CLOCK         XTAL(10'816'000)
 
 
 class cosmic_state : public driver_device

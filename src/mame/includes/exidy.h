@@ -10,7 +10,7 @@
 #include "sound/samples.h"
 #include "screen.h"
 
-#define EXIDY_MASTER_CLOCK              (XTAL_11_289MHz)
+#define EXIDY_MASTER_CLOCK              (XTAL(11'289'000))
 #define EXIDY_CPU_CLOCK                 (EXIDY_MASTER_CLOCK / 16)
 #define EXIDY_PIXEL_CLOCK               (EXIDY_MASTER_CLOCK / 2)
 #define EXIDY_HTOTAL                    (0x150)

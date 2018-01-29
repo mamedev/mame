@@ -328,7 +328,7 @@ const tiny_rom_entry *hp82937_io_card_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(hp82937_io_card_device::device_add_mconfig)
-	MCFG_CPU_ADD("cpu" , I8049 , XTAL_11MHz)
+	MCFG_CPU_ADD("cpu" , I8049 , XTAL(11'000'000))
 	MCFG_CPU_IO_MAP(cpu_io_map)
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(hp82937_io_card_device , t0_r))
 	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("xlator" , hp_1mb5_device , int_r))

@@ -358,7 +358,7 @@ Boards:
  *
  *************************************/
 
-#define MASTER_CLOCK        (XTAL_18_432MHz)
+#define MASTER_CLOCK        (XTAL(18'432'000))
 
 #define PIXEL_CLOCK         (MASTER_CLOCK/3)
 
@@ -612,9 +612,9 @@ READ8_MEMBER(pacman_state::maketrax_special_port2_r)
 		0x00, 0xc0, 0x00, 0x40, 0xc0, 0x40, 0x00, 0xc0, 0x00, 0x40, 0x00, 0xc0, 0x00, 0x40, 0xc0, 0x40,
 		0x00, 0xc0, 0x00, 0x40, 0x00, 0xc0, 0x00, 0x40, 0xc0, 0x40, 0x00, 0xc0, 0x00, 0x40
 	};
- 
+
 	uint8_t data = ioport("DSW1")->read() & 0x3f;
- 
+
 	if (m_maketrax_disable_protection == 0)
 		return protdata[m_maketrax_offset] | data;
 
@@ -640,7 +640,7 @@ READ8_MEMBER(pacman_state::maketrax_special_port3_r)
 		0x1f, 0x3f, 0x2f, 0x2f, 0x0f, 0x0f, 0x0f, 0x3f, 0x0f, 0x0f, 0x1c, 0x3c, 0x2c, 0x2c, 0x0c, 0x0c,
 		0x0c, 0x3c, 0x0c, 0x0c, 0x11, 0x31, 0x21, 0x21, 0x01, 0x01, 0x01, 0x31, 0x01, 0x01
 	};
- 
+
 	if (m_maketrax_disable_protection == 0)
 		return protdata[m_maketrax_offset];
 
@@ -1286,7 +1286,7 @@ static ADDRESS_MAP_START( superabc_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x4800, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("28c16.u17") // nvram
+	AM_RANGE(0x4800, 0x4fef) AM_MIRROR(0xa000) AM_RAM AM_SHARE("28c16.u17") // nvram
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf3c) AM_WRITE(superabc_bank_w)
 	AM_RANGE(0x5000, 0x5007) AM_MIRROR(0xaf38) AM_DEVWRITE("mainlatch", ls259_device, write_d0)

@@ -43,8 +43,8 @@ TODO:
 
 #include "cdi.lh"
 
-#define CLOCK_A XTAL_30MHz
-#define CLOCK_B XTAL_19_6608MHz
+#define CLOCK_A XTAL(30'000'000)
+#define CLOCK_B XTAL(19'660'800)
 
 #if ENABLE_VERBOSE_LOG
 static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, const char *s_fmt, ...)

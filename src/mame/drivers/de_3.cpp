@@ -21,7 +21,7 @@
 
 // 6808 CPU's input clock is 4MHz
 // but because it has an internal /4 divider, its E clock runs at 1/4 that frequency
-#define E_CLOCK (XTAL_4MHz/4)
+#define E_CLOCK (XTAL(4'000'000)/4)
 
 // Length of time in cycles between IRQs on the main 6808 CPU
 // This length is determined by the settings of the W14 and W15 jumpers
@@ -396,7 +396,7 @@ DRIVER_INIT_MEMBER(de_3_state,de_3)
 
 MACHINE_CONFIG_START(de_3_state::de_3)
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE3_ADD("decocpu",XTAL_8MHz / 2, ":maincpu")
+	MCFG_DECOCPU_TYPE3_ADD("decocpu",XTAL(8'000'000) / 2, ":maincpu")
 	MCFG_DECOCPU_DISPLAY(READ8(de_3_state,display_r),WRITE8(de_3_state,display_w))
 	MCFG_DECOCPU_SOUNDLATCH(WRITE8(de_3_state,sound_w))
 	MCFG_DECOCPU_SWITCH(READ8(de_3_state,switch_r),WRITE8(de_3_state,switch_w))

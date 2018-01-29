@@ -300,11 +300,11 @@ CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
 MACHINE_CONFIG_START(crimfght_state::crimfght)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)       /* 052001 (verified on pcb) */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)       /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(crimfght_map)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(crimfght_state, banking_callback))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(crimfght_sound_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(DEVICE_SELF, crimfght_state, audiocpu_irq_ack)
 
@@ -319,9 +319,9 @@ MACHINE_CONFIG_START(crimfght_state::crimfght)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 96, 416, 256, 16, 240) // measured 59.17
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 96, 416, 256, 16, 240) // measured 59.17
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
+//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(crimfght_state, screen_update_crimfght)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -344,12 +344,12 @@ MACHINE_CONFIG_START(crimfght_state::crimfght)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)  /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* verified on pcb */
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(crimfght_state, ym2151_ct_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)    /* verified on pcb */
+	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(crimfght_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)

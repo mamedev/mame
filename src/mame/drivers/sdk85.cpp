@@ -52,13 +52,14 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_keyboard(*this, "X%u", 0)
-		{ }
+	{ }
 
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 
 	void sdk85(machine_config &config);
+
 protected:
 	virtual void machine_reset() override;
 
@@ -144,24 +145,24 @@ READ8_MEMBER( sdk85_state::kbd_r )
 
 MACHINE_CONFIG_START(sdk85_state::sdk85)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz)
+	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(sdk85_mem)
 	MCFG_CPU_IO_MAP(sdk85_io)
 
-	MCFG_DEVICE_ADD("romio", I8355, XTAL_6_144MHz / 2) // Monitor ROM (A14)
+	MCFG_DEVICE_ADD("romio", I8355, 6.144_MHz_XTAL / 2) // Monitor ROM (A14)
 
-	MCFG_DEVICE_ADD("expromio", I8355, XTAL_6_144MHz / 2) // Expansion ROM (A15)
+	MCFG_DEVICE_ADD("expromio", I8355, 6.144_MHz_XTAL / 2) // Expansion ROM (A15)
 
-	MCFG_DEVICE_ADD("ramio", I8155, XTAL_6_144MHz / 2) // Basic RAM (A16)
+	MCFG_DEVICE_ADD("ramio", I8155, 6.144_MHz_XTAL / 2) // Basic RAM (A16)
 	MCFG_I8155_OUT_TIMEROUT_CB(INPUTLINE("maincpu", I8085_TRAP_LINE))
 
-	MCFG_DEVICE_ADD("expramio", I8155, XTAL_6_144MHz / 2) // Expansion RAM (A17)
+	MCFG_DEVICE_ADD("expramio", I8155, 6.144_MHz_XTAL / 2) // Expansion RAM (A17)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_sdk85)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("kdc", I8279, XTAL_6_144MHz / 2) // Keyboard/Display Controller (A13)
+	MCFG_DEVICE_ADD("kdc", I8279, 6.144_MHz_XTAL / 2) // Keyboard/Display Controller (A13)
 	MCFG_I8279_OUT_IRQ_CB(INPUTLINE("maincpu", I8085_RST55_LINE))   // irq
 	MCFG_I8279_OUT_SL_CB(WRITE8(sdk85_state, scanlines_w))          // scan SL lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(sdk85_state, digit_w))            // display A&B

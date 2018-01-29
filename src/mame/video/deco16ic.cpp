@@ -71,7 +71,7 @@ Note: A version of Night Slashers runs on the DE-0395-1 using the 156 encryption
     Custom chip 101 = Arm6 cpu
     Custom chip 113 = Alpha blending
     Custom chip 153 = Alpha blending (same functions as 113, smaller PQFP package)
-    Custom chip 99  = 'Ace' chip (Special alpha blending?)
+    Custom chip 99  = 'Ace' chip (Alpha blending with palette effects)
     Custom chip 156 = Encrypted ARM cpu
     Custom chip 102 = Encrypted 68000 cpu
 
@@ -174,7 +174,7 @@ Rowscroll style:
 #include "video/deco16ic.h"
 #include "render.h"
 
-DEFINE_DEVICE_TYPE(DECO16IC, deco16ic_device, "deco16ic", "DECO 55 / 56 / 74 / 141 IC")
+DEFINE_DEVICE_TYPE(DECO16IC, deco16ic_device, "deco16ic", "DECO 55 / 56 / 74 / 141 Tilemap Generator")
 
 deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECO16IC, tag, owner, clock),
@@ -192,7 +192,8 @@ deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag,
 		m_pf12_last_big(0),
 		m_pf1_8bpp_mode(0),
 		m_split(0),
-		m_tilemapsizes(1),
+		m_pf1_size(0),
+		m_pf2_size(0),
 		m_pf1_trans_mask(0xf),
 		m_pf2_trans_mask(0xf),
 		m_pf1_colour_bank(0),
@@ -227,26 +228,30 @@ void deco16ic_device::device_start()
 	m_bank1_cb.bind_relative_to(*owner());
 	m_bank2_cb.bind_relative_to(*owner());
 
-	int fullheight = 0;
-	int fullwidth = 0;
-	int fullheight_8x8 = 0;
+	int fullheight1 = 0;
+	int fullwidth1 = 0;
 
+	int fullheight2 = 0;
+	int fullwidth2 = 0;
 
-	if (m_tilemapsizes&4)
-		fullheight_8x8 = 1;
+	if (m_pf1_size&DECO_32x64)
+		fullheight1 = 1;
 
-	if (m_tilemapsizes&2)
-		fullheight = 1;
+	if (m_pf1_size&DECO_64x32)
+		fullwidth1 = 1;
 
-	if (m_tilemapsizes&1)
-		fullwidth = 1;
+	if (m_pf2_size&DECO_32x64)
+		fullheight2 = 1;
 
-	m_pf1_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ?64 : 32);
-//  m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, m_tilemapsizes ? 64 : 32, 32);
-	m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, 64 , fullheight_8x8 ? 64 : 32); // nitroball
+	if (m_pf2_size&DECO_64x32)
+		fullwidth2 = 1;
 
-	m_pf2_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
-	m_pf2_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, fullwidth ? 64 : 32, fullheight ? 64 : 32);
+	m_pf1_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth1 ? 64 : 32, fullheight1 ? 64 : 32);
+//  m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, fullwidth1 ? 64 : 32, fullheight1 ? 64 : 32);
+	m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, fullwidth1 ? 64 : 32, fullheight1 ? 64 : 32);
+
+	m_pf2_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth2 ? 64 : 32, fullheight2 ? 64 : 32);
+	m_pf2_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, fullwidth2 ? 64 : 32, fullheight2 ? 64 : 32);
 
 	m_pf1_tilemap_8x8->set_transparent_pen(0);
 	m_pf2_tilemap_8x8->set_transparent_pen(0);
@@ -261,7 +266,6 @@ void deco16ic_device::device_start()
 	m_pf1_data = make_unique_clear<uint16_t[]>(0x2000 / 2);
 	m_pf2_data = make_unique_clear<uint16_t[]>(0x2000 / 2);
 	m_pf12_control = make_unique_clear<uint16_t[]>(0x10 / 2);
-
 
 	save_item(NAME(m_use_custom_pf1));
 	save_item(NAME(m_use_custom_pf2));
@@ -744,7 +748,7 @@ static int deco16_pf_update(
 			int numrows = rows;
 
 			// wolffang uses a larger 8x8 tilemap for the Japanese intro text, everything else seems to need this logic tho?
-			if (!(tilemapsizes & 4))
+			if (!(tilemapsizes & DECO_32x64))
 				numrows = rows >> 1;
 
 			// cap at tilemap size
@@ -846,8 +850,8 @@ void deco16ic_device::pf_update( const uint16_t *rowscroll_1_ptr, const uint16_t
 	/* Update scrolling and tilemap enable */
 	m_pf1_rowscroll_ptr = rowscroll_1_ptr;
 	m_pf2_rowscroll_ptr = rowscroll_2_ptr;
-	m_use_custom_pf2 = deco16_pf_update(m_pf2_tilemap_8x8, m_pf2_tilemap_16x16, rowscroll_2_ptr, m_pf12_control[3], m_pf12_control[4], m_pf12_control[5] >> 8, m_pf12_control[6] >> 8, m_tilemapsizes);
-	m_use_custom_pf1 = deco16_pf_update(m_pf1_tilemap_8x8, m_pf1_tilemap_16x16, rowscroll_1_ptr, m_pf12_control[1], m_pf12_control[2], m_pf12_control[5] & 0xff, m_pf12_control[6] & 0xff, m_tilemapsizes);
+	m_use_custom_pf2 = deco16_pf_update(m_pf2_tilemap_8x8, m_pf2_tilemap_16x16, rowscroll_2_ptr, m_pf12_control[3], m_pf12_control[4], m_pf12_control[5] >> 8, m_pf12_control[6] >> 8, m_pf2_size);
+	m_use_custom_pf1 = deco16_pf_update(m_pf1_tilemap_8x8, m_pf1_tilemap_16x16, rowscroll_1_ptr, m_pf12_control[1], m_pf12_control[2], m_pf12_control[5] & 0xff, m_pf12_control[6] & 0xff, m_pf1_size);
 
 	/* Update banking and global flip state */
 	if (!m_bank1_cb.isnull())

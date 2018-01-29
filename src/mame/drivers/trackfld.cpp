@@ -199,9 +199,9 @@ MAIN BOARD:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK          XTAL_18_432MHz
-#define SOUND_CLOCK           XTAL_14_31818MHz
-#define VLM_CLOCK             XTAL_3_579545MHz
+#define MASTER_CLOCK          XTAL(18'432'000)
+#define SOUND_CLOCK           XTAL(14'318'181)
+#define VLM_CLOCK             XTAL(3'579'545)
 
 
 WRITE_LINE_MEMBER(trackfld_state::coin_counter_1_w)
@@ -953,6 +953,12 @@ MACHINE_CONFIG_START(trackfld_state::trackfld)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_DERIVED(trackfld_state::trackfldu, trackfld)
+	MCFG_CPU_REPLACE("maincpu", MC6809E, MASTER_CLOCK/6/2)    /* exact M6809 model unknown */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", trackfld_state, vblank_irq)
+
+MACHINE_CONFIG_END
 
 INTERRUPT_GEN_MEMBER(trackfld_state::yieartf_timer_irq)
 {
@@ -1057,7 +1063,7 @@ MACHINE_CONFIG_DERIVED(trackfld_state::hyprolyb, trackfld)
 
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("vlm")
-	MCFG_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)    /* unknown clock */
+	MCFG_CPU_ADD("adpcm", M6802, XTAL(14'318'181)/8)    /* unknown clock */
 	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -1196,6 +1202,37 @@ ROM_START( trackfldc )
 	ROM_LOAD( "c12_d07.bin",  0x2000, 0x2000, CRC(800ff1f1) SHA1(33d73b18903e3e6bfb30f1a06db4b8105d4040d8) )
 	ROM_LOAD( "c13_d08.bin",  0x4000, 0x2000, CRC(d9faf183) SHA1(4448b6242790783d37acf50704d597af5878c2ab) )
 	ROM_LOAD( "c14_d09.bin",  0x6000, 0x2000, CRC(5886c802) SHA1(884a12a8f63600da4f23b29be6dbaacef37add20) )
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "h16_e12.bin",  0x0000, 0x2000, CRC(50075768) SHA1(dfff92c0f59dd3d8d3d6256944bfd48792cef6a9) )
+	ROM_LOAD( "h15_e11.bin",  0x2000, 0x2000, CRC(dda9e29f) SHA1(0f41cde82bb60c3f1591ee14dc3cff4642bbddc1) )
+	ROM_LOAD( "h14_e10.bin",  0x4000, 0x2000, CRC(c2166a5c) SHA1(5ba25900e653ce4edcf35f1fbce758a327a715ce) )
+
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "361b16.f1",    0x0000, 0x0020, CRC(d55f30b5) SHA1(4d6a851f4886778307f75771645078b97ad55f5f) ) /* palette */
+	ROM_LOAD( "361b17.b16",   0x0020, 0x0100, CRC(d2ba4d32) SHA1(894b5cedf01ba9225a0d6215291857e455b84903) ) /* sprite lookup table */
+	ROM_LOAD( "361b18.e15",   0x0120, 0x0100, CRC(053e5861) SHA1(6740a62cf7b6938a4f936a2fed429704612060a5) ) /* char lookup table */
+
+	ROM_REGION( 0x2000, "vlm", 0 ) /* 8k for the VLM5030 data */
+	ROM_LOAD( "c9_d15.bin",   0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) )
+ROM_END
+
+ROM_START( trackfldu ) // unencrypted, only maincpu and two of the gfx1 ROMs differ. Two dumps from different boards and dumpers were provided. OCBs look original (GX361).
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "361_105.a7",  0x6000, 0x2000, CRC(c813f140) SHA1(088bfb1979c55b232b19a3b75bf87a1915422ba4) )
+	ROM_LOAD( "361_104.a6",  0x8000, 0x2000, CRC(b785e7ee) SHA1(aaed6a3bc04896c9980f68e00a3190b8cfab04f6) )
+	ROM_LOAD( "361_103.a5",  0xa000, 0x2000, CRC(060c16e6) SHA1(7215a23fcb9e34ed62b961a2bc068bf88e4da29d) )
+	ROM_LOAD( "361_102.a4",  0xc000, 0x2000, CRC(46bde4ea) SHA1(44730a88ed320a835e8dfd8cd97206be5dfdef7c) )
+	ROM_LOAD( "361_101.a2",  0xe000, 0x2000, CRC(b2d8be9a) SHA1(bfc155ddca567d9dff2ea6ddecfcc192316e5021) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "c2_d13.bin",   0x0000, 0x2000, CRC(95bf79b6) SHA1(ea9135acd7ad162c19c5cdde356e69792d61b675) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "361_d06.a20",  0x0000, 0x2000, CRC(82e2185a) SHA1(1da9ea20e7af0b49c62fb39834a7ec686491af04) )
+	ROM_LOAD( "361_d07.a21",  0x2000, 0x2000, CRC(800ff1f1) SHA1(33d73b18903e3e6bfb30f1a06db4b8105d4040d8) )
+	ROM_LOAD( "361_d08.a17",  0x4000, 0x2000, CRC(e5193cf8) SHA1(8c90452e1f2599fc656af8b7141bf30ff1e2fc02) )
+	ROM_LOAD( "361_d09.a19",  0x6000, 0x2000, CRC(91062288) SHA1(24160f78b3ed854f15e36987e3925865ca9923d4) )
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
 	ROM_LOAD( "h16_e12.bin",  0x0000, 0x2000, CRC(50075768) SHA1(dfff92c0f59dd3d8d3d6256944bfd48792cef6a9) )
@@ -1671,20 +1708,21 @@ DRIVER_INIT_MEMBER(trackfld_state,wizzquiz)
 }
 
 
-GAME( 1983, trackfld,   0,        trackfld, trackfld, trackfld_state, trackfld,   ROT0,  "Konami",                               "Track & Field",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, trackfldc,  trackfld, trackfld, trackfld, trackfld_state, trackfld,   ROT0,  "Konami (Centuri license)",             "Track & Field (Centuri)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hyprolym,   trackfld, trackfld, trackfld, trackfld_state, trackfld,   ROT0,  "Konami",                               "Hyper Olympic",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hyprolymb,  trackfld, hyprolyb, trackfld, trackfld_state, trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 1)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hyprolymba, trackfld, hyprolyb, trackfld, trackfld_state, trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 2)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, hipoly,     trackfld, hyprolyb, trackfld, trackfld_state, trackfld,   ROT0,  "bootleg",                              "Hipoly (bootleg of Hyper Olympic)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, atlantol,   trackfld, atlantol, atlantol, trackfld_state, atlantol,   ROT0,  "bootleg",                              "Atlant Olimpic",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1982, trackfldnz, trackfld, trackfld, trackfld, trackfld_state, trackfldnz, ROT0,  "bootleg? (Goldberg Enterprizes Inc.)", "Track & Field (NZ bootleg?)",       MACHINE_SUPPORTS_SAVE) // bootleg of the Centuri version
+GAME( 1983, trackfld,   0,        trackfld,  trackfld, trackfld_state, trackfld,   ROT0,  "Konami",                               "Track & Field",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, trackfldc,  trackfld, trackfld,  trackfld, trackfld_state, trackfld,   ROT0,  "Konami (Centuri license)",             "Track & Field (Centuri)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1983, trackfldu,  trackfld, trackfldu, trackfld, trackfld_state, trackfld,   ROT0,  "Konami (Centuri license)",             "Track & Field (Centuri, unencrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hyprolym,   trackfld, trackfld,  trackfld, trackfld_state, trackfld,   ROT0,  "Konami",                               "Hyper Olympic",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hyprolymb,  trackfld, hyprolyb,  trackfld, trackfld_state, trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hyprolymba, trackfld, hyprolyb,  trackfld, trackfld_state, trackfld,   ROT0,  "bootleg",                              "Hyper Olympic (bootleg, set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, hipoly,     trackfld, hyprolyb,  trackfld, trackfld_state, trackfld,   ROT0,  "bootleg",                              "Hipoly (bootleg of Hyper Olympic)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, atlantol,   trackfld, atlantol,  atlantol, trackfld_state, atlantol,   ROT0,  "bootleg",                              "Atlant Olimpic",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1982, trackfldnz, trackfld, trackfld,  trackfld, trackfld_state, trackfldnz, ROT0,  "bootleg? (Goldberg Enterprizes Inc.)", "Track & Field (NZ bootleg?)",          MACHINE_SUPPORTS_SAVE) // bootleg of the Centuri version
 
-GAME( 1988, mastkin,    0,        mastkin,  mastkin,  trackfld_state, mastkin,    ROT0,  "Du Tech",                              "The Masters of Kin", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mastkin,    0,        mastkin,   mastkin,  trackfld_state, mastkin,    ROT0,  "Du Tech",                              "The Masters of Kin", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, wizzquiz,   0,        wizzquiz, wizzquiz, trackfld_state, wizzquiz,   ROT0,  "Zilec-Zenitone (Konami license)",      "Wizz Quiz (Konami version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, wizzquiza,  wizzquiz, wizzquiz, wizzquiz, trackfld_state, wizzquiz,   ROT0,  "Zilec-Zenitone",                       "Wizz Quiz (version 4)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wizzquiz,   0,        wizzquiz,  wizzquiz, trackfld_state, wizzquiz,   ROT0,  "Zilec-Zenitone (Konami license)",      "Wizz Quiz (Konami version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, wizzquiza,  wizzquiz, wizzquiz,  wizzquiz, trackfld_state, wizzquiz,   ROT0,  "Zilec-Zenitone",                       "Wizz Quiz (version 4)",      MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, reaktor,    0,        reaktor,  reaktor,  trackfld_state, 0,          ROT90, "Zilec",                                "Reaktor (Track & Field conversion)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, reaktor,    0,        reaktor,   reaktor,  trackfld_state, 0,          ROT90, "Zilec",                                "Reaktor (Track & Field conversion)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1985, yieartf,    yiear,    yieartf,  yieartf,  trackfld_state, 0,          ROT0,  "Konami",                               "Yie Ar Kung-Fu (GX361 conversion)", MACHINE_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...
+GAME( 1985, yieartf,    yiear,    yieartf,   yieartf,  trackfld_state, 0,          ROT0,  "Konami",                               "Yie Ar Kung-Fu (GX361 conversion)", MACHINE_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...

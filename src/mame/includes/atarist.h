@@ -39,13 +39,13 @@
 
 // Atari ST
 
-#define Y1      XTAL_2_4576MHz
+#define Y1      XTAL(2'457'600)
 
 // STBook
 
-#define U517    XTAL_16MHz
-#define Y200    XTAL_2_4576MHz
-#define Y700    XTAL_10MHz
+#define U517    XTAL(16'000'000)
+#define Y200    XTAL(2'457'600)
+#define Y700    XTAL(10'000'000)
 
 #define DMA_STATUS_DRQ              0x04
 #define DMA_STATUS_SECTOR_COUNT     0x02

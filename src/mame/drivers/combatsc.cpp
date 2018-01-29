@@ -714,7 +714,7 @@ MACHINE_CONFIG_START(combatsc_state::combatsc)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 0, 256, 256, 16, 240) // not accurate, assuming same to other Konami games (59.17)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 0, 256, 256, 16, 240) // not accurate, assuming same to other Konami games (59.17)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatsc)
 	MCFG_SCREEN_PALETTE("palette")
 

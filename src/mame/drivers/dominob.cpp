@@ -293,7 +293,7 @@ GFXDECODE_END
 MACHINE_CONFIG_START(dominob_state::dominob)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80,XTAL(12'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(memmap)
 	MCFG_CPU_IO_MAP(portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dominob_state,  irq0_line_hold)
@@ -314,7 +314,7 @@ MACHINE_CONFIG_START(dominob_state::dominob)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_12MHz/4)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(12'000'000)/4)
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END

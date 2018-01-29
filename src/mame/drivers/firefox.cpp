@@ -132,7 +132,7 @@ public:
 
 
 
-#define MASTER_XTAL     XTAL_14_31818MHz
+#define MASTER_XTAL     XTAL(14'318'181)
 
 
 /*
@@ -756,7 +756,7 @@ MACHINE_CONFIG_START(firefox_state::firefox)
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(firefox_state, led3_w))
 
 	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz((double)MASTER_XTAL/8/16/16/16/16))
+	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(MASTER_XTAL/8/16/16/16/16))
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", firefox)

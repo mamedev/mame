@@ -47,7 +47,7 @@
 #define CMP_REGISTER 0
 #define AUX_REGISTER 1
 
-#define MAIN_CLOCK XTAL_4MHz
+#define MAIN_CLOCK XTAL(4'000'000)
 
 class cops_state : public driver_device
 {
@@ -473,9 +473,9 @@ WRITE8_MEMBER(cops_state::dacia_w)
 				{
 					m_dacia_reg1 = CMP_REGISTER;
 				}
-				if (LOG_DACIA) logerror("DACIA TIME %02d\n", XTAL_3_6864MHz / m_dacia_ic_div_1);
+				if (LOG_DACIA) logerror("DACIA TIME %02d\n", (XTAL(3'686'400) / m_dacia_ic_div_1).value());
 
-//              m_ld_timer->adjust(attotime::from_hz(XTAL_3_6864MHz / m_dacia_ic_div_1), 0, attotime::from_hz(XTAL_3_6864MHz / m_dacia_ic_div_1));
+//              m_ld_timer->adjust(attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_1), 0, attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_1));
 
 				if (LOG_DACIA) logerror("DACIA Ctrl Register: %02x\n", data);
 
@@ -543,9 +543,9 @@ WRITE8_MEMBER(cops_state::dacia_w)
 				{
 					m_dacia_reg2 = CMP_REGISTER;
 				}
-				if (LOG_DACIA) logerror("DACIA TIME 2 %02d\n", XTAL_3_6864MHz / m_dacia_ic_div_1);
+				if (LOG_DACIA) logerror("DACIA TIME 2 %02d\n", (XTAL(3'686'400) / m_dacia_ic_div_1).value());
 
-				m_ld_timer->adjust(attotime::from_hz(XTAL_3_6864MHz / m_dacia_ic_div_2), 0, attotime::from_hz(XTAL_3_6864MHz / m_dacia_ic_div_2));
+				m_ld_timer->adjust(attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_2), 0, attotime::from_hz(XTAL(3'686'400) / m_dacia_ic_div_2));
 
 				if (LOG_DACIA) logerror("DACIA Ctrl Register 2: %02x\n", data);
 
@@ -966,7 +966,7 @@ MACHINE_CONFIG_START(cops_state::revlatns)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(cops_state, via1_b_w))
 	MCFG_VIA6522_CB1_HANDLER(WRITE8(cops_state, via1_cb1_w))
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 
 	/* acia (really a 65C52)*/
 

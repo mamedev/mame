@@ -117,7 +117,7 @@ PCB2  (Top board, CPU board)
 #include "screen.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK            XTAL_18_432MHz
+#define MASTER_CLOCK            XTAL(18'432'000)
 
 class sub_state : public driver_device
 {

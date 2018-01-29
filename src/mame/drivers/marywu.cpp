@@ -184,12 +184,12 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(marywu_state::marywu)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL_10_738635MHz) //actual CPU is a Winbond w78c31b-24
+	MCFG_CPU_ADD("maincpu", I80C31, XTAL(10'738'635)) //actual CPU is a Winbond w78c31b-24
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
 
 	/* Keyboard & display interface */
-	MCFG_DEVICE_ADD("i8279", I8279, XTAL_10_738635MHz) /* should it be perhaps a fraction of the XTAL clock ? */
+	MCFG_DEVICE_ADD("i8279", I8279, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
 	MCFG_I8279_OUT_SL_CB(WRITE8(marywu_state, multiplex_7seg_w))          // select  block of 7seg modules by multiplexing the SL scan lines
 	MCFG_I8279_IN_RL_CB(READ8(marywu_state, keyboard_r))                  // keyboard Return Lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(marywu_state, display_7seg_data_w))
@@ -199,12 +199,12 @@ MACHINE_CONFIG_START(marywu_state::marywu)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_10_738635MHz) /* should it be perhaps a fraction of the XTAL clock ? */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(marywu_state, ay1_port_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(marywu_state, ay1_port_b_w))
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_10_738635MHz) /* should it be perhaps a fraction of the XTAL clock ? */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(10'738'635)) /* should it be perhaps a fraction of the XTAL clock ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(marywu_state, ay2_port_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(marywu_state, ay2_port_b_w))

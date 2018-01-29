@@ -228,7 +228,7 @@ DRIVER_INIT_MEMBER( minicom_state, minicom )
 
 MACHINE_CONFIG_START(minicom_state::minicom)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I87C52, XTAL_10MHz) /*FIX-ME: verify the correct clock frequency */
+	MCFG_CPU_ADD("maincpu", I87C52, XTAL(10'000'000)) /*FIX-ME: verify the correct clock frequency */
 	MCFG_CPU_IO_MAP(i87c52_io)
 
 	/* video hardware */

@@ -2138,9 +2138,14 @@ void mcs51_cpu_device::device_start()
 	state_add( MCS51_PSW, "PSW", PSW).formatstr("%02X");
 	state_add( MCS51_ACC, "A", ACC).formatstr("%02X");
 	state_add( MCS51_B,   "B", B).formatstr("%02X");
-	state_add( MCS51_DPH, "DPH", DPH).formatstr("%02X");
-	state_add( MCS51_DPL, "DPL", DPL).formatstr("%02X");
+	state_add<uint16_t>( MCS51_DPTR, "DPTR", [this](){ return DPTR; }, [this](uint16_t dp){ SET_DPTR(dp); }).formatstr("%04X");
+	state_add( MCS51_DPH, "DPH", DPH).noshow();
+	state_add( MCS51_DPL, "DPL", DPL).noshow();
 	state_add( MCS51_IE,  "IE", IE).formatstr("%02X");
+	state_add<uint8_t>( MCS51_P0,  "P0", [this](){ return P0; }, [this](uint8_t p){ SET_P0(p); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_P1,  "P1", [this](){ return P1; }, [this](uint8_t p){ SET_P1(p); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_P2,  "P2", [this](){ return P2; }, [this](uint8_t p){ SET_P2(p); }).formatstr("%02X");
+	state_add<uint8_t>( MCS51_P3,  "P3", [this](){ return P3; }, [this](uint8_t p){ SET_P3(p); }).formatstr("%02X");
 	state_add( MCS51_R0,  "R0", m_rtemp).callimport().callexport().formatstr("%02X");
 	state_add( MCS51_R1,  "R1", m_rtemp).callimport().callexport().formatstr("%02X");
 	state_add( MCS51_R2,  "R2", m_rtemp).callimport().callexport().formatstr("%02X");

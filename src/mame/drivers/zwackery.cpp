@@ -492,7 +492,7 @@ void zwackery_state::machine_start()
 
 MACHINE_CONFIG_START(zwackery_state::zwackery)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL_16MHz/2
+	MCFG_CPU_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL(16'000'000)/2
 	MCFG_CPU_PROGRAM_MAP(zwackery_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")

@@ -159,7 +159,7 @@ void zapcomp_state::machine_start()
 
 MACHINE_CONFIG_START(zapcomp_state::zapcomp)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(zapcomp_mem)
 	MCFG_CPU_IO_MAP(zapcomp_io)
 

@@ -338,7 +338,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(segam1_state::segam1)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(segam1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segam1_state, irq4_line_hold)
 

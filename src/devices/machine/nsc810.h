@@ -28,7 +28,9 @@ public:
 	template <class Object> static devcb_base &set_timer1_callback(device_t &device, Object &&cb) { return downcast<nsc810_device &>(device).m_timer1_out.set_callback(std::forward<Object>(cb)); }
 
 	void set_timer0_clock(uint32_t clk) { m_timer0_clock = clk; }
+	void set_timer0_clock(const XTAL &clk) { set_timer0_clock(clk.value()); }
 	void set_timer1_clock(uint32_t clk) { m_timer1_clock = clk; }
+	void set_timer1_clock(const XTAL &clk) { set_timer1_clock(clk.value()); }
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);

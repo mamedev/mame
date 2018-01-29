@@ -23,7 +23,7 @@ TODO:
 #include "machine/74259.h"
 #include "screen.h"
 
-#define MASTER_CLOCK    XTAL_12_096MHz
+#define MASTER_CLOCK    XTAL(12'096'000)
 #define PIXEL_CLOCK     (MASTER_CLOCK / 2)
 
 

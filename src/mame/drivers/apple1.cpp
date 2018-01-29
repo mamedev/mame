@@ -592,7 +592,7 @@ MACHINE_CONFIG_START(apple1_state::apple1)
 
 	// video timings are identical to the Apple II, unsurprisingly
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, (65*7)*2, 0, (40*7)*2, 262, 0, 192)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181), (65*7)*2, 0, (40*7)*2, 262, 0, 192)
 	MCFG_SCREEN_UPDATE_DRIVER(apple1_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

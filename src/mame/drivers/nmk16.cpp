@@ -4045,7 +4045,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::vandyke)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* 68000p12 running at 10Mhz, verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000)) /* 68000p12 running at 10Mhz, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(vandyke_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
@@ -4066,18 +4066,18 @@ MACHINE_CONFIG_START(nmk16_state::vandyke)
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_12MHz/3, PIN7_LOW) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki1", XTAL(12'000'000)/3, PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_12MHz/3, PIN7_LOW) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki2", XTAL(12'000'000)/3, PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -4192,7 +4192,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::tdragon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(tdragon_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
@@ -4213,18 +4213,18 @@ MACHINE_CONFIG_START(nmk16_state::tdragon)
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_8MHz/2, PIN7_LOW) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki1", XTAL(8'000'000)/2, PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_8MHz/2, PIN7_LOW) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki2", XTAL(8'000'000)/2, PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -4390,7 +4390,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::blkheart)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(macross_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
@@ -4411,18 +4411,18 @@ MACHINE_CONFIG_START(nmk16_state::blkheart)
 	MCFG_NMK004_ADD("nmk004", 8000000)
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8 ) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8 ) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_8MHz/2, PIN7_LOW) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki1", XTAL(8'000'000)/2, PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_8MHz/2, PIN7_LOW) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki2", XTAL(8'000'000)/2, PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -4430,7 +4430,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(nmk16_state::gunnail)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gunnail_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
@@ -4447,21 +4447,21 @@ MACHINE_CONFIG_START(nmk16_state::gunnail)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_NMK004_ADD("nmk004", XTAL_16MHz/2) /* verified on pcb */
+	MCFG_NMK004_ADD("nmk004", XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_NMK004_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("nmk004", nmk004_device, ym2203_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 1.20)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/4, PIN7_LOW) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki1", XTAL(16'000'000)/4, PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/4, PIN7_LOW) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki2", XTAL(16'000'000)/4, PIN7_LOW) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
@@ -5024,7 +5024,7 @@ WRITE16_MEMBER(nmk16_state::afega_scroll1_w)
 */
 
 
-static ADDRESS_MAP_START( afega, AS_PROGRAM, 16, nmk16_state )
+static ADDRESS_MAP_START( afega_map, AS_PROGRAM, 16, nmk16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")            // Buttons
@@ -5211,11 +5211,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(nmk16_state::stagger1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_12MHz) /* 68000p10 running at 12mhz, verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(afega)
+	MCFG_CPU_ADD("maincpu", M68000,XTAL(12'000'000)) /* 68000p10 running at 12mhz, verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(afega_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(afega_sound_cpu)
 
 	/* video hardware */
@@ -5234,12 +5234,12 @@ MACHINE_CONFIG_START(nmk16_state::stagger1)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_4MHz) /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(4'000'000)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_4MHz/4, PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki1", XTAL(4'000'000)/4, PIN7_HIGH) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.70)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.70)
 MACHINE_CONFIG_END
@@ -5327,7 +5327,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(nmk16_state::spec2k, firehawk)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(afega)
+	MCFG_CPU_PROGRAM_MAP(afega_map)
 MACHINE_CONFIG_END
 
 

@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(AL_MAGICSOUND, al_magicsound_device, "al_magicsound", "Aleste
 
 
 MACHINE_CONFIG_START(al_magicsound_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( "dmac", AM9517A, XTAL_4MHz )  // CLK from expansion port
+	MCFG_DEVICE_ADD( "dmac", AM9517A, XTAL(4'000'000) )  // CLK from expansion port
 	// According to the schematics, the TC pin (EOP on western chips) is connected to NMI on the expansion port.
 	// NMIs seem to occur too quickly when this is active, so either EOP is not triggered at the correct time, or
 	// the K1810WT37 is different to the i8237/AM9517A
@@ -42,19 +42,19 @@ MACHINE_CONFIG_START(al_magicsound_device::device_add_mconfig)
 	// passes through an inverter to each CLK pin on both timers.  This seems to be too fast.
 	// Timer outputs to SAM0/1/2/3 are sample clocks for each sound channel, D/A0 is the low bit of the channel select.
 	MCFG_DEVICE_ADD("timer1", PIT8254, 0)
-	MCFG_PIT8253_CLK0(XTAL_4MHz)
+	MCFG_PIT8253_CLK0(XTAL(4'000'000))
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(al_magicsound_device, sam0_w))
-	MCFG_PIT8253_CLK1(XTAL_4MHz)
+	MCFG_PIT8253_CLK1(XTAL(4'000'000))
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(al_magicsound_device, sam1_w))
-	MCFG_PIT8253_CLK2(XTAL_4MHz)
+	MCFG_PIT8253_CLK2(XTAL(4'000'000))
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(al_magicsound_device, sam2_w))
 
 	MCFG_DEVICE_ADD("timer2", PIT8254, 0)
-	MCFG_PIT8253_CLK0(XTAL_4MHz)
+	MCFG_PIT8253_CLK0(XTAL(4'000'000))
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(al_magicsound_device, sam3_w))
-	MCFG_PIT8253_CLK1(XTAL_4MHz)
+	MCFG_PIT8253_CLK1(XTAL(4'000'000))
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(al_magicsound_device, da0_w))
-	MCFG_PIT8253_CLK2(XTAL_4MHz)
+	MCFG_PIT8253_CLK2(XTAL(4'000'000))
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC

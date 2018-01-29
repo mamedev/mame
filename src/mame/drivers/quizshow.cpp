@@ -24,7 +24,7 @@ TODO:
 #include "quizshow.lh"
 
 
-#define MASTER_CLOCK    XTAL_12_096MHz
+#define MASTER_CLOCK    XTAL(12'096'000)
 #define PIXEL_CLOCK     (MASTER_CLOCK/2)
 
 #define HTOTAL          ((32+8+4+1) * 8)

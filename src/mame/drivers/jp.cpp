@@ -324,9 +324,9 @@ DRIVER_INIT_MEMBER( jp_state, jp )
 
 MACHINE_CONFIG_START(jp_state::jp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(jp_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(jp_state, irq0_line_hold, XTAL_8MHz / 8192) // 4020 divider
+	MCFG_CPU_PERIODIC_INT_DRIVER(jp_state, irq0_line_hold, XTAL(8'000'000) / 8192) // 4020 divider
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -364,7 +364,7 @@ MACHINE_CONFIG_START(jp_state::jp)
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 	MCFG_SPEAKER_STANDARD_MONO("ayvol")
-	MCFG_SOUND_ADD("ay", AY8910, XTAL_8MHz / 4)
+	MCFG_SOUND_ADD("ay", AY8910, XTAL(8'000'000) / 4)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(jp_state, porta_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(jp_state, portb_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 0.9)
@@ -398,7 +398,7 @@ IRQ_CALLBACK_MEMBER(jp_state::sound_int_cb)
 }
 
 MACHINE_CONFIG_DERIVED(jp_state::jps, jp)
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(jp_sound_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(jp_state, sound_int_cb)
 
@@ -406,7 +406,7 @@ MACHINE_CONFIG_DERIVED(jp_state::jps, jp)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
 	MCFG_SPEAKER_STANDARD_MONO("msmvol")
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) // not labeled in manual; clock unknown
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) // not labeled in manual; clock unknown
 	MCFG_MSM5205_VCK_CALLBACK(WRITELINE(jp_state, vck_w))
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B) // unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msmvol", 1.0)

@@ -67,7 +67,7 @@ uint32_t mk85_state::screen_update_mk85(screen_device &screen, bitmap_ind16 &bit
 
 MACHINE_CONFIG_START(mk85_state::mk85)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL(4'000'000))
 	MCFG_T11_INITIAL_MODE(0)
 	MCFG_CPU_PROGRAM_MAP(mk85_mem)
 

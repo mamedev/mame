@@ -159,7 +159,7 @@ FLOPPY_FORMATS_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(victor_9000_fdc_device::device_add_mconfig)
-	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_30MHz/6)
+	MCFG_CPU_ADD(I8048_TAG, I8048, XTAL(30'000'000)/6)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(victor_9000_fdc_device, floppy_p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(victor_9000_fdc_device, floppy_p1_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(victor_9000_fdc_device, floppy_p2_r))
@@ -168,7 +168,7 @@ MACHINE_CONFIG_START(victor_9000_fdc_device::device_add_mconfig)
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(victor_9000_fdc_device, tach1_r))
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(victor_9000_fdc_device, da_w))
 
-	MCFG_DEVICE_ADD(M6522_4_TAG, VIA6522, XTAL_30MHz/30)
+	MCFG_DEVICE_ADD(M6522_4_TAG, VIA6522, XTAL(30'000'000)/30)
 	MCFG_VIA6522_READPA_HANDLER(READ8(victor_9000_fdc_device, via4_pa_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor_9000_fdc_device, via4_pa_w))
 	MCFG_VIA6522_READPB_HANDLER(READ8(victor_9000_fdc_device, via4_pb_r))
@@ -176,12 +176,12 @@ MACHINE_CONFIG_START(victor_9000_fdc_device::device_add_mconfig)
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(victor_9000_fdc_device, wrsync_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor_9000_fdc_device, via4_irq_w))
 
-	MCFG_DEVICE_ADD(M6522_5_TAG, VIA6522, XTAL_30MHz/30)
+	MCFG_DEVICE_ADD(M6522_5_TAG, VIA6522, XTAL(30'000'000)/30)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(victor_9000_fdc_device, via5_irq_w))
 	MCFG_VIA6522_READPA_HANDLER(READ8(victor_9000_fdc_device, via5_pa_r))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(victor_9000_fdc_device, via5_pb_w))
 
-	MCFG_DEVICE_ADD(M6522_6_TAG, VIA6522, XTAL_30MHz/30)
+	MCFG_DEVICE_ADD(M6522_6_TAG, VIA6522, XTAL(30'000'000)/30)
 	MCFG_VIA6522_READPA_HANDLER(READ8(victor_9000_fdc_device, via6_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(victor_9000_fdc_device, via6_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(victor_9000_fdc_device, via6_pa_w))
@@ -245,7 +245,7 @@ victor_9000_fdc_device::victor_9000_fdc_device(const machine_config &mconfig, co
 	m_via4_irq(CLEAR_LINE),
 	m_via5_irq(CLEAR_LINE),
 	m_via6_irq(CLEAR_LINE),
-	m_period(attotime::from_hz(XTAL_15MHz/32))
+	m_period(attotime::from_hz(XTAL(15'000'000)/32))
 {
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;

@@ -430,7 +430,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(ckz80_state::master)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, 8_MHz_XTAL/2)
 	MCFG_CPU_PROGRAM_MAP(master_trampoline)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", ckz80_state, irq_on, attotime::from_hz(429)) // theoretical frequency from 555 timer (22nF, 150K, 1K5), measurement was 418Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(429) - attotime::from_nsec(22870)) // active for 22.87us

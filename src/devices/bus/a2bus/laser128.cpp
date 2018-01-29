@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "laser128.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
@@ -54,9 +57,6 @@ a2bus_laser128_device::a2bus_laser128_device(const machine_config &mconfig, cons
 
 void a2bus_laser128_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	save_item(NAME(m_slot7_bank));
 	save_item(NAME(m_slot7_ram_bank));
 }
@@ -79,12 +79,12 @@ void a2bus_laser128_device::write_c0nx(uint8_t offset, uint8_t data)
 
 uint8_t a2bus_laser128_device::read_cnxx(uint8_t offset)
 {
-	return m_rom[offset + (m_slot * 0x100) + 0x4000];
+	return m_rom[offset + (slotno() * 0x100) + 0x4000];
 }
 
 uint8_t a2bus_laser128_device::read_c800(uint16_t offset)
 {
-	switch (m_slot)
+	switch (slotno())
 	{
 		case 1:
 			return m_rom[(offset & 0x7ff) + 0x4800];
@@ -100,10 +100,9 @@ uint8_t a2bus_laser128_device::read_c800(uint16_t offset)
 
 		case 7:
 			if (offset < 0x400)
-			{
 				return m_slot7_ram[offset];
-			}
-			return m_rom[(offset & 0x3ff) + 0x6000 + m_slot7_bank];
+			else
+				return m_rom[(offset & 0x3ff) + 0x6000 + m_slot7_bank];
 	}
 
 	return 0xff;
@@ -111,29 +110,34 @@ uint8_t a2bus_laser128_device::read_c800(uint16_t offset)
 
 void a2bus_laser128_device::write_c800(uint16_t offset, uint8_t data)
 {
-	if ((m_slot == 7) && (offset < 0x400))
+	if ((slotno() == 7) && (offset < 0x400))
 	{
 		m_slot7_ram[offset] = data;
 	}
 
 	// UDCREG
-	if ((m_slot == 7) && (offset == 0x7f8))
+	if ((slotno() == 7) && (offset == 0x7f8))
 	{
-//      printf("%02x to UDCREG\n", data);
+		LOG("%02x to UDCREG\n", data);
 
 		m_slot7_ram_bank = (data & 0x8) ? 0x400 : 0;
 		m_slot7_bank = (((data >> 4) & 0x7) * 0x400);
 
-//      printf("\tRAM bank %x, ROM bank %x\n", m_slot7_ram_bank, m_slot7_bank);
+		LOG("\tRAM bank %x, ROM bank %x\n", m_slot7_ram_bank, m_slot7_bank);
 	}
 }
 
 bool a2bus_laser128_device::take_c800()
 {
-	if ((m_slot == 1) || (m_slot == 2) || (m_slot == 5) || (m_slot == 6) || (m_slot == 7))
+	switch (slotno())
 	{
-		return true;
+		case 1:
+		case 2:
+		case 5:
+		case 6:
+		case 7:
+			return true;
+		default:
+			return false;
 	}
-
-	return false;
 }

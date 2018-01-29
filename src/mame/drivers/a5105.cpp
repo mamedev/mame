@@ -559,7 +559,7 @@ static const z80_daisy_config a5105_daisy_chain[] =
 
 MACHINE_CONFIG_START(a5105_state::a5105)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_15MHz / 4)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(15'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(a5105_mem)
 	MCFG_CPU_IO_MAP(a5105_io)
 	MCFG_Z80_DAISY_CHAIN(a5105_daisy_chain)
@@ -583,17 +583,17 @@ MACHINE_CONFIG_START(a5105_state::a5105)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_15MHz / 16) // unk clock
+	MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL(15'000'000) / 16) // unk clock
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(a5105_state, hgdc_display_pixels)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(a5105_state, hgdc_draw_text)
 
-	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL_15MHz / 4)
+	MCFG_DEVICE_ADD("z80ctc", Z80CTC, XTAL(15'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", 0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg2))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("z80ctc", z80ctc_device, trg3))
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_15MHz / 4)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(15'000'000) / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_CASSETTE_ADD( "cassette" )

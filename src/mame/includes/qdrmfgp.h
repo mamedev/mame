@@ -22,7 +22,8 @@ public:
 		m_ata(*this, "ata"),
 		m_inputs_port(*this, "INPUTS"),
 		m_dsw_port(*this, "DSW"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_sndram(*this, "sndram")
 	{
 	}
 
@@ -36,8 +37,8 @@ public:
 	required_ioport m_inputs_port;
 	required_ioport m_dsw_port;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_sndram;
 
-	uint8_t *m_sndram;
 	uint16_t m_control;
 	int32_t m_gp2_irq_control;
 	int32_t m_pal;

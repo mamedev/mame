@@ -115,6 +115,37 @@ NETLIST_END()
 
 
 
+void popeye_state::driver_start()
+{
+	save_item(NAME(m_prot0));
+	save_item(NAME(m_prot1));
+	save_item(NAME(m_prot_shift));
+}
+
+DRIVER_INIT_MEMBER(popeye_state, tnx1)
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+
+	/* decrypt the program ROMs */
+	std::vector<uint8_t> buffer(len);
+	for (int i = 0;i < len; i++)
+		buffer[i] = bitswap<8>(rom[bitswap<16>(i,15,14,13,12,11,10,8,7,0,1,2,4,5,9,3,6) ^ 0xfc],3,4,2,5,1,6,0,7);
+	memcpy(rom,&buffer[0],len);
+}
+
+DRIVER_INIT_MEMBER(popeye_state,tpp2)
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
+
+	/* decrypt the program ROMs */
+	std::vector<uint8_t> buffer(len);
+	for (int i = 0;i < len; i++)
+		buffer[i] = bitswap<8>(rom[bitswap<16>(i,15,14,13,12,11,10,8,7,6,3,9,5,4,2,1,0) ^ 0x3f],3,4,2,5,1,6,0,7);
+	memcpy(rom,&buffer[0],len);
+}
+
 INTERRUPT_GEN_MEMBER(popeye_state::popeye_interrupt)
 {
 	m_field ^= 1;
@@ -430,7 +461,7 @@ static const gfx_layout spritelayout =
 
 static GFXDECODE_START( popeye )
 	GFXDECODE_SCALE( "gfx1", 0, charlayout,   16, 16, 2, 2 ) /* chars */
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16+16*2, 64 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16+16*2, 8 ) /* sprites */
 GFXDECODE_END
 
 
@@ -447,7 +478,7 @@ WRITE8_MEMBER(popeye_state::popeye_portB_w)
 
 MACHINE_CONFIG_START(popeye_state::tnx1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)   /* 4 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)   /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(tnx1_map)
 	MCFG_CPU_IO_MAP(popeye_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", popeye_state,  popeye_interrupt)
@@ -458,23 +489,26 @@ MACHINE_CONFIG_START(popeye_state::tnx1)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*16, 32*16)
 	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 2*16, 30*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(popeye_state, screen_update_popeye)
+	MCFG_SCREEN_UPDATE_DRIVER(popeye_state, screen_update_tnx1)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", popeye)
-	MCFG_PALETTE_ADD("palette", 16+16*2+64*4)
+	MCFG_PALETTE_ADD("palette", 16+16*2+8*4)
 	MCFG_PALETTE_INIT_OWNER(popeye_state, tnx1)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_8MHz/4)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(8'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW0"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(popeye_state, popeye_portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(popeye_state::tpp1, tnx1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(popeye_state, screen_update_tpp1)
+
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(popeye_state,tpp1)
 
@@ -550,9 +584,9 @@ ROM_START( skyskipr )
 	ROM_LOAD( "tnx1-t.4a",    0x0000, 0x0020, CRC(98846924) SHA1(89688d05c4c2d6f389da4e9c0c13e0f022f2d376) ) /* background palette */
 	ROM_LOAD( "tnx1-t.1a",    0x0020, 0x0020, CRC(c2bca435) SHA1(e7d3e68d153d646eaf12b263d58b07da2615399c) ) /* char palette */
 
-	ROM_REGION( 0x0200, "sprpal", 0 )
-	ROM_LOAD( "tnx1-t.3a",    0x0000, 0x0100, CRC(8abf9de4) SHA1(6e5500639a2dca3c288619fb8bdd120eb49bf8e0) ) /* sprite palette - low 4 bits */
-	ROM_LOAD( "tnx1-t.2a",    0x0100, 0x0100, CRC(aa7ff322) SHA1(522d21854aa11e24f3679163354ae4fb35619eff) ) /* sprite palette - high 4 bits */
+	ROM_REGION( 0x0100, "sprpal", 0 )
+	ROM_LOAD_NIB_LOW(  "tnx1-t.3a", 0x0000, 0x0100, CRC(8abf9de4) SHA1(6e5500639a2dca3c288619fb8bdd120eb49bf8e0) ) /* sprite palette - low 4 bits */
+	ROM_LOAD_NIB_HIGH( "tnx1-t.2a", 0x0000, 0x0100, CRC(aa7ff322) SHA1(522d21854aa11e24f3679163354ae4fb35619eff) ) /* sprite palette - high 4 bits */
 
 	ROM_REGION( 0x0100, "timing", 0 )
 	ROM_LOAD( "tnx1-t.3j",    0x0000, 0x0100, CRC(1c5c8dea) SHA1(5738303b2a9c79b7d06bcf20fdb4d9b29f6e2d96) ) /* video timing prom */
@@ -586,9 +620,9 @@ ROM_START( popeye )
 	ROM_LOAD( "tpp2-c.4a", 0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
 	ROM_LOAD( "tpp2-c.3a", 0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
 
-	ROM_REGION( 0x0200, "sprpal", 0 )
-	ROM_LOAD( "tpp2-c.5b",   0x0000, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
-	ROM_LOAD( "tpp2-c.5a",   0x0100, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
+	ROM_REGION( 0x0100, "sprpal", 0 )
+	ROM_LOAD_NIB_LOW(  "tpp2-c.5b", 0x0000, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
+	ROM_LOAD_NIB_HIGH( "tpp2-c.5a", 0x0000, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
 
 	ROM_REGION( 0x0100, "timing", 0 )
 	ROM_LOAD( "tpp2-v.7j", 0x0000, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* video timing prom */
@@ -615,9 +649,9 @@ ROM_START( popeyeu )
 	ROM_LOAD( "tpp2-c.4a", 0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
 	ROM_LOAD( "tpp2-c.3a", 0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
 
-	ROM_REGION( 0x0200, "sprpal", 0 )
-	ROM_LOAD( "tpp2-c.5b",   0x0000, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
-	ROM_LOAD( "tpp2-c.5a",   0x0100, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
+	ROM_REGION( 0x0100, "sprpal", 0 )
+	ROM_LOAD_NIB_LOW(  "tpp2-c.5b", 0x0000, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
+	ROM_LOAD_NIB_HIGH( "tpp2-c.5a", 0x0000, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
 
 	ROM_REGION( 0x0100, "timing", 0 )
 	ROM_LOAD( "tpp2-v.7j", 0x0000, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* video timing prom */
@@ -644,9 +678,9 @@ ROM_START( popeyef )
 	ROM_LOAD( "tpp2-c.4a",   0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
 	ROM_LOAD( "tpp2-c.3a",   0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
 
-	ROM_REGION( 0x0200, "sprpal", 0 )
-	ROM_LOAD( "tpp2-c.5b",   0x0000, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
-	ROM_LOAD( "tpp2-c.5a",   0x0100, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
+	ROM_REGION( 0x0100, "sprpal", 0 )
+	ROM_LOAD_NIB_LOW(  "tpp2-c.5b", 0x0000, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
+	ROM_LOAD_NIB_HIGH( "tpp2-c.5a", 0x0000, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
 
 	ROM_REGION( 0x0100, "timing", 0 )
 	ROM_LOAD( "tpp2-v.7j",   0x0000, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* video timing prom */
@@ -669,13 +703,13 @@ ROM_START( popeyebl )
 	ROM_LOAD( "v-1j",         0x4000, 0x2000, CRC(7e864668) SHA1(8e275dbb1c586f4ebca7548db05246ef0f56d7b1) )
 	ROM_LOAD( "v-1k",         0x6000, 0x2000, CRC(49e1d170) SHA1(bd51a4e34ce8109f26954760156e3cf05fb9db57) )
 
-	ROM_REGION( 0x40, "proms", 0 )
+	ROM_REGION( 0x40, "proms", ROMREGION_INVERT )
 	ROM_LOAD( "popeye.pr1",   0x0000, 0x0020, CRC(d138e8a4) SHA1(eba7f870ccab72105593007f5cd7e0b863912402) ) /* background palette */
 	ROM_LOAD( "popeye.pr2",   0x0020, 0x0020, CRC(0f364007) SHA1(b77d71df391a9ac9e778e84475627e72de2b8507) ) /* char palette */
 
-	ROM_REGION( 0x0200, "sprpal", 0 )
-	ROM_LOAD( "popeye.pr3",   0x0000, 0x0100, CRC(ca4d7b6a) SHA1(ec979fffea9db5a327a5270241e376c21516e343) ) /* sprite palette - low 4 bits */
-	ROM_LOAD( "popeye.pr4",   0x0100, 0x0100, CRC(cab9bc53) SHA1(e63ba8856190187996e405f6fcee254c8ca6e81f) ) /* sprite palette - high 4 bits */
+	ROM_REGION( 0x0100, "sprpal", ROMREGION_INVERT )
+	ROM_LOAD_NIB_LOW(  "popeye.pr3", 0x0000, 0x0100, CRC(ca4d7b6a) SHA1(ec979fffea9db5a327a5270241e376c21516e343) ) /* sprite palette - low 4 bits */
+	ROM_LOAD_NIB_HIGH( "popeye.pr4", 0x0000, 0x0100, CRC(cab9bc53) SHA1(e63ba8856190187996e405f6fcee254c8ca6e81f) ) /* sprite palette - high 4 bits */
 
 	ROM_REGION( 0x0020, "blprot", 0 )
 	ROM_LOAD( "po_d1-e1.bin", 0x0000, 0x0020, CRC(8de22998) SHA1(e3a232ff85fb207afbe23049a65e828420589342) ) /* protection PROM */
@@ -698,13 +732,13 @@ ROM_START( popeyeb2 )
 	ROM_LOAD( "8.6s.2764",    0x4000, 0x2000, CRC(7e864668) SHA1(8e275dbb1c586f4ebca7548db05246ef0f56d7b1) )
 	ROM_LOAD( "9.6u.2764",    0x6000, 0x2000, CRC(49e1d170) SHA1(bd51a4e34ce8109f26954760156e3cf05fb9db57) )
 
-	ROM_REGION( 0x40, "proms", 0 )
+	ROM_REGION( 0x40, "proms", ROMREGION_INVERT )
 	ROM_LOAD( "6.2u.18s030",  0x0000, 0x0020, CRC(d138e8a4) SHA1(eba7f870ccab72105593007f5cd7e0b863912402) ) /* background palette */
 	ROM_LOAD( "5.2t.18s030",  0x0020, 0x0020, CRC(0f364007) SHA1(b77d71df391a9ac9e778e84475627e72de2b8507) ) /* char palette */
 
-	ROM_REGION( 0x0200, "sprpal", 0 )
-	ROM_LOAD( "3.2r.24s10",   0x0000, 0x0100, CRC(3d7aa7b1) SHA1(aea11f558487ccfa6f0218fdf4020ddaa2f635f8) ) /* sprite palette - low 4 bits */
-	ROM_LOAD( "4.2s.24s10",   0x0100, 0x0100, CRC(cab9bc53) SHA1(e63ba8856190187996e405f6fcee254c8ca6e81f) ) /* sprite palette - high 4 bits */
+	ROM_REGION( 0x0100, "sprpal", ROMREGION_INVERT )
+	ROM_LOAD_NIB_LOW(  "3.2r.24s10", 0x0000, 0x0100, CRC(3d7aa7b1) SHA1(aea11f558487ccfa6f0218fdf4020ddaa2f635f8) ) /* sprite palette - low 4 bits */
+	ROM_LOAD_NIB_HIGH( "4.2s.24s10", 0x0000, 0x0100, CRC(cab9bc53) SHA1(e63ba8856190187996e405f6fcee254c8ca6e81f) ) /* sprite palette - high 4 bits */
 
 	ROM_REGION( 0x0020, "blprot", 0 )
 	ROM_LOAD( "po_d1-e1.bin", 0x0000, 0x0020, BAD_DUMP CRC(8de22998) SHA1(e3a232ff85fb207afbe23049a65e828420589342) ) /* protection PROM */
@@ -738,9 +772,9 @@ ROM_START( popeyeb3 )
 	ROM_LOAD( "tpp2-c.4a", 0x0000, 0x0020, BAD_DUMP CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
 	ROM_LOAD( "tpp2-c.3a", 0x0020, 0x0020, BAD_DUMP CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
 
-	ROM_REGION( 0x0200, "sprpal", 0 )
-	ROM_LOAD( "tpp2-c.5b",   0x0000, 0x0100, BAD_DUMP CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
-	ROM_LOAD( "tpp2-c.5a",   0x0100, 0x0100, BAD_DUMP CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
+	ROM_REGION( 0x0100, "sprpal", 0 )
+	ROM_LOAD_NIB_LOW(  "tpp2-c.5b", 0x0000, 0x0100, BAD_DUMP CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
+	ROM_LOAD_NIB_HIGH( "tpp2-c.5a", 0x0000, 0x0100, BAD_DUMP CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
 
 	ROM_REGION( 0x0100, "timing", 0 )
 	ROM_LOAD( "tpp2-v.7j", 0x0000, 0x0100, BAD_DUMP CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* video timing prom */
@@ -767,12 +801,12 @@ ROM_START( popeyej )
 	ROM_LOAD( "TPP1-E.5E.2763",    0x6000, 0x2000, CRC(49e1d170) SHA1(bd51a4e34ce8109f26954760156e3cf05fb9db57) )
 
 	ROM_REGION( 0x40, "proms", 0 )
-	ROM_LOAD( "TPP1-T.4A.82S123",    0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
-	ROM_LOAD( "TPP1-T.1A.82S123",    0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
+	ROM_LOAD( "TPP1-T.4A.82S123",  0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
+	ROM_LOAD( "TPP1-T.1A.82S123",  0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
 
-	ROM_REGION( 0x0200, "sprpal", 0 )
-	ROM_LOAD( "TPP1-T.3A.82S129",   0x0000, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
-	ROM_LOAD( "TPP1-T.2A.82S129",   0x0100, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
+	ROM_REGION( 0x0100, "sprpal", 0 )
+	ROM_LOAD_NIB_LOW(  "TPP1-T.3A.82S129", 0x0000, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
+	ROM_LOAD_NIB_HIGH( "TPP1-T.2A.82S129", 0x0000, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
 
 	ROM_REGION( 0x0100, "timing", 0 )
 	ROM_LOAD( "TPP1-T.3J.82S129", 0x0000, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* video timing prom */
@@ -801,55 +835,16 @@ ROM_START( popeyejo )
 	ROM_LOAD( "tpp1-e.5e.bin",     0x6000, 0x2000, CRC(7355ff16) SHA1(15d3cb701ad360a36c26eb5c34b2e89b5972ba82) )
 
 	ROM_REGION( 0x40, "proms", 0 )
-	ROM_LOAD( "TPP1-T.4A.82S123",    0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
-	ROM_LOAD( "TPP1-T.1A.82S123",    0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
+	ROM_LOAD( "TPP1-T.4A.82S123",  0x0000, 0x0020, CRC(375e1602) SHA1(d84159a0af5db577821c43712bc733329a43af80) ) /* background palette */
+	ROM_LOAD( "TPP1-T.1A.82S123",  0x0020, 0x0020, CRC(e950bea1) SHA1(0b48082fe79d9fcdca7e80caff1725713d0c3163) ) /* char palette */
 
-	ROM_REGION( 0x0200, "sprpal", 0 )
-	ROM_LOAD( "TPP1-T.3A.82S129",   0x0000, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
-	ROM_LOAD( "TPP1-T.2A.82S129",   0x0100, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
+	ROM_REGION( 0x0100, "sprpal", 0 )
+	ROM_LOAD_NIB_LOW(  "TPP1-T.3A.82S129", 0x0000, 0x0100, CRC(c5826883) SHA1(f2c4d3473b3bfa55bffad003dc1fd79540e7e0d1) ) /* sprite palette - low 4 bits */
+	ROM_LOAD_NIB_HIGH( "TPP1-T.2A.82S129", 0x0000, 0x0100, CRC(c576afba) SHA1(013c8e8db08a03c7ba156cfefa671d26155fe835) ) /* sprite palette - high 4 bits */
 
 	ROM_REGION( 0x0100, "timing", 0 )
 	ROM_LOAD( "TPP1-T.3J.82S129", 0x0000, 0x0100, CRC(a4655e2e) SHA1(2a620932fccb763c6c667278c0914f31b9f00ddf) ) /* video timing prom */
 ROM_END
-
-
-DRIVER_INIT_MEMBER(popeye_state,tnx1)
-{
-	uint8_t *rom = memregion("maincpu")->base();
-	int len = memregion("maincpu")->bytes();
-
-	/* decrypt the program ROMs */
-	{
-		std::vector<uint8_t> buffer(len);
-		int i;
-		for (i = 0;i < len; i++)
-			buffer[i] = bitswap<8>(rom[bitswap<16>(i,15,14,13,12,11,10,8,7,0,1,2,4,5,9,3,6) ^ 0xfc],3,4,2,5,1,6,0,7);
-		memcpy(rom,&buffer[0],len);
-	}
-
-	save_item(NAME(m_prot0));
-	save_item(NAME(m_prot1));
-	save_item(NAME(m_prot_shift));
-}
-
-DRIVER_INIT_MEMBER(popeye_state,tpp2)
-{
-	uint8_t *rom = memregion("maincpu")->base();
-	int len = memregion("maincpu")->bytes();
-
-	/* decrypt the program ROMs */
-	{
-		std::vector<uint8_t> buffer(len);
-		int i;
-		for (i = 0;i < len; i++)
-			buffer[i] = bitswap<8>(rom[bitswap<16>(i,15,14,13,12,11,10,8,7,6,3,9,5,4,2,1,0) ^ 0x3f],3,4,2,5,1,6,0,7);
-		memcpy(rom,&buffer[0],len);
-	}
-
-	save_item(NAME(m_prot0));
-	save_item(NAME(m_prot1));
-	save_item(NAME(m_prot_shift));
-}
 
 
 GAME( 1981, skyskipr, 0,      tnx1,     skyskipr, popeye_state, tnx1, ROT0, "Nintendo", "Sky Skipper",                          MACHINE_SUPPORTS_SAVE )

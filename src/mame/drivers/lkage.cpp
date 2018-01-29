@@ -95,10 +95,10 @@ TODO:
 #include "speaker.h"
 
 
-#define MAIN_CPU_CLOCK      (XTAL_12MHz/2)
-#define SOUND_CPU_CLOCK     (XTAL_8MHz/2)
-#define AUDIO_CLOCK         (XTAL_8MHz/2)
-#define MCU_CLOCK           (XTAL_12MHz/4)
+#define MAIN_CPU_CLOCK      (XTAL(12'000'000)/2)
+#define SOUND_CPU_CLOCK     (XTAL(8'000'000)/2)
+#define AUDIO_CLOCK         (XTAL(8'000'000)/2)
+#define MCU_CLOCK           (XTAL(12'000'000)/4)
 
 
 WRITE8_MEMBER(lkage_state::lkage_sh_nmi_disable_w)

@@ -10,9 +10,10 @@
 
 #pragma once
 
-#define M1AUDIO_CPU_REGION "m1sndcpu"
-#define M1AUDIO_MPCM1_REGION "m1pcm1"
-#define M1AUDIO_MPCM2_REGION "m1pcm2"
+#define M1AUDIO_TAG "m1audio"
+#define M1AUDIO_CPU_REGION "m1audio:sndcpu"
+#define M1AUDIO_MPCM1_REGION "m1audio:pcm1"
+#define M1AUDIO_MPCM2_REGION "m1audio:pcm2"
 
 #define MCFG_SEGAM1AUDIO_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, SEGAM1AUDIO, 0)
@@ -51,6 +52,12 @@ private:
 	required_device<multipcm_device> m_multipcm_2;
 	required_device<ym3438_device> m_ym;
 	required_device<i8251_device> m_uart;
+
+	required_memory_region m_multipcm1_region;
+	required_memory_region m_multipcm2_region;
+
+	required_memory_bank m_mpcmbank1;
+	required_memory_bank m_mpcmbank2;
 
 	devcb_write_line   m_rxd_handler;
 

@@ -351,7 +351,7 @@ void homerun_state::machine_reset()
 MACHINE_CONFIG_START(homerun_state::dynashot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(20'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(homerun_memmap)
 	MCFG_CPU_IO_MAP(homerun_iomap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homerun_state,  irq0_line_hold)
@@ -363,10 +363,10 @@ MACHINE_CONFIG_START(homerun_state::dynashot)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//	MCFG_SCREEN_REFRESH_RATE(60)
-//	MCFG_SCREEN_SIZE(256, 256)
-//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz/4,328,0,256,253,0,240)
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_SIZE(256, 256)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/4,328,0,256,253,0,240)
 	MCFG_SCREEN_UPDATE_DRIVER(homerun_state, screen_update_homerun)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -376,7 +376,7 @@ MACHINE_CONFIG_START(homerun_state::dynashot)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_20MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(20'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(homerun_state, homerun_banking_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

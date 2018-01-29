@@ -23,7 +23,9 @@
 		devcb = &k054539_device::set_timer_handler(*device, DEVCB_##_devcb);
 
 
-class k054539_device : public device_t, public device_sound_interface
+class k054539_device : public device_t,
+						public device_sound_interface,
+						public device_rom_interface
 {
 public:
 	// control flags, may be set at DRIVER_INIT().
@@ -41,7 +43,6 @@ public:
 
 	// static configuration helpers
 	static void set_analog_callback(device_t &device, cb_delegate &&cb) { downcast<k054539_device &>(device).m_apan_cb = std::move(cb); }
-	static void set_override(device_t &device, const char *rgnoverride) { downcast<k054539_device &>(device).m_rom.set_tag(rgnoverride); }
 	template <class Object> static devcb_base &set_timer_handler(device_t &device, Object &&cb) { return downcast<k054539_device &>(device).m_timer_handler.set_callback(std::forward<Object>(cb)); }
 
 
@@ -73,6 +74,9 @@ protected:
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
+	// device_rom_interface overrides
+	virtual void rom_bank_updated() override;
+
 private:
 	struct channel {
 		uint32_t pos;
@@ -94,9 +98,7 @@ private:
 
 	int32_t cur_ptr;
 	int cur_limit;
-	unsigned char *cur_zone;
-	required_region_ptr<uint8_t> m_rom;
-	uint32_t rom_mask;
+	uint32_t rom_addr;
 
 	channel channels[8];
 	sound_stream *stream;

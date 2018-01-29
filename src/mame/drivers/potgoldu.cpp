@@ -41,7 +41,7 @@ public:
 };
 
 
-#define CPU_CLOCK           XTAL_40MHz
+#define CPU_CLOCK           XTAL(40'000'000)
 #define VIDEO_CLOCK         (22118400) // ?
 #define SOUND_CLOCK         (3579645)
 
@@ -75,7 +75,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(potgold_state::potgold)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
+	MCFG_CPU_ADD("maincpu", TMS34010, XTAL(40'000'000))
 	MCFG_CPU_PROGRAM_MAP(potgold_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */

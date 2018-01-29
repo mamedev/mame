@@ -78,7 +78,7 @@
 #include "machine/nvram.h"
 #include "screen.h"
 
-#define MASTER_CLOCK    XTAL_8MHz   /* guess */
+#define MASTER_CLOCK    XTAL(8'000'000)   /* guess */
 
 
 class jokrwild_state : public driver_device

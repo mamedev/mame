@@ -1350,7 +1350,7 @@ SLOT_INTERFACE_END
 MACHINE_CONFIG_START(vboy_state::vboy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", V810, XTAL_20MHz )
+	MCFG_CPU_ADD( "maincpu", V810, XTAL(20'000'000) )
 	MCFG_CPU_PROGRAM_MAP(vboy_mem)
 	MCFG_CPU_IO_MAP(vboy_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer_l", vboy_state, vboy_scanlineL, "3dleft", 0, 1)
@@ -1369,13 +1369,13 @@ MACHINE_CONFIG_START(vboy_state::vboy)
 
 	/* Left screen */
 	MCFG_SCREEN_ADD("3dleft", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz/2,757,0,384,264,0,224)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/2,757,0,384,264,0,224)
 	MCFG_SCREEN_UPDATE_DRIVER(vboy_state, screen_update_vboy_left)
 	MCFG_SCREEN_PALETTE("palette")
 
 	/* Right screen */
 	MCFG_SCREEN_ADD("3dright", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz/2,757,0,384,264,0,224)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000)/2,757,0,384,264,0,224)
 	MCFG_SCREEN_UPDATE_DRIVER(vboy_state, screen_update_vboy_right)
 	MCFG_SCREEN_PALETTE("palette")
 

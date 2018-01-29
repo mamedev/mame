@@ -392,9 +392,9 @@ MACHINE_CONFIG_START(taito_state::taito_ay_audio)
 	MCFG_CPU_PROGRAM_MAP(taito_sub_map5)
 
 	MCFG_SPEAKER_STANDARD_MONO("aysnd")
-	MCFG_SOUND_ADD("aysnd_0", AY8910, XTAL_3_579545MHz/2) /* guess */
+	MCFG_SOUND_ADD("aysnd_0", AY8910, XTAL(3'579'545)/2) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "aysnd", 0.8)
-	MCFG_SOUND_ADD("aysnd_1", AY8910, XTAL_3_579545MHz/2) /* guess */
+	MCFG_SOUND_ADD("aysnd_1", AY8910, XTAL(3'579'545)/2) /* guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "aysnd", 0.8)
 MACHINE_CONFIG_END
 

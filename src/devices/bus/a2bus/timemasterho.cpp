@@ -138,9 +138,6 @@ a2bus_timemasterho_device::a2bus_timemasterho_device(const machine_config &mconf
 
 void a2bus_timemasterho_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(TIMEMASTER_ROM_REGION).c_str())->base();
 }
 

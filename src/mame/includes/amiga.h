@@ -463,15 +463,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_dsksyn_w);
 
 	// standard clocks
-	static const int CLK_28M_PAL = XTAL_28_37516MHz;
-	static const int CLK_7M_PAL = CLK_28M_PAL / 4;
-	static const int CLK_C1_PAL = CLK_28M_PAL / 8;
-	static const int CLK_E_PAL = CLK_7M_PAL / 10;
+	static constexpr XTAL CLK_28M_PAL = XTAL(28'375'160);
+	static constexpr XTAL CLK_7M_PAL = CLK_28M_PAL / 4;
+	static constexpr XTAL CLK_C1_PAL = CLK_28M_PAL / 8;
+	static constexpr XTAL CLK_E_PAL = CLK_7M_PAL / 10;
 
-	static const int CLK_28M_NTSC = XTAL_28_63636MHz;
-	static const int CLK_7M_NTSC = CLK_28M_NTSC / 4;
-	static const int CLK_C1_NTSC = CLK_28M_NTSC / 8;
-	static const int CLK_E_NTSC = CLK_7M_NTSC / 10;
+	static constexpr XTAL CLK_28M_NTSC = XTAL(28'636'363);
+	static constexpr XTAL CLK_7M_NTSC = CLK_28M_NTSC / 4;
+	static constexpr XTAL CLK_C1_NTSC = CLK_28M_NTSC / 8;
+	static constexpr XTAL CLK_E_NTSC = CLK_7M_NTSC / 10;
 
 	// screen layout
 	enum

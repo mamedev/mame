@@ -103,7 +103,7 @@ WRITE_LINE_MEMBER( sandy_superqboard_device::busy_w )
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(sandy_superqboard_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, XTAL_16MHz/2)
+	MCFG_DEVICE_ADD(WD1772_TAG, WD1772, XTAL(16'000'000)/2)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", sandy_superqboard_floppies, "35hd", sandy_superqboard_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":1", sandy_superqboard_floppies, nullptr, sandy_superqboard_device::floppy_formats)
 
@@ -411,7 +411,7 @@ void sandy_superqboard_device::write(address_space &space, offs_t offset, uint8_
 				break;
 
 			case 5:
-				m_fdc->set_unscaled_clock(XTAL_16MHz / (BIT(data, 0) ? 1 : 2));
+				m_fdc->set_unscaled_clock(XTAL(16'000'000) / (BIT(data, 0) ? 1 : 2));
 				break;
 			}
 		}

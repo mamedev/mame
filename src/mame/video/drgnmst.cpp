@@ -8,6 +8,23 @@
 #include "includes/drgnmst.h"
 
 
+WRITE16_MEMBER(drgnmst_state::drgnmst_paletteram_w)
+{
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	int bright = 0x5 + ((data >> 12) & 0xf);    // TODO : verify brightness value from real pcb
+	int r = (pal4bit((data >> 8) & 0x0f) * bright) / 0x14;
+	int g = (pal4bit((data >> 4) & 0x0f) * bright) / 0x14;
+	int b = (pal4bit((data >> 0) & 0x0f) * bright) / 0x14;
+
+	if (r < 0) r = 0;
+	if (r > 0xff) r = 0xff;
+	if (g < 0) g = 0;
+	if (g > 0xff) g = 0xff;
+	if (b < 0) b = 0;
+	if (b > 0xff) b = 0xff;
+	m_palette->set_pen_color(offset, rgb_t(r, g, b));
+}
+
 TILE_GET_INFO_MEMBER(drgnmst_state::get_drgnmst_fg_tile_info)
 {
 	int tileno, colour, flipyx;

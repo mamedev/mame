@@ -284,7 +284,7 @@ TODO:
 #include "speaker.h"
 
 
-#define MAIN_XTAL   XTAL_24MHz
+#define MAIN_XTAL   XTAL(24'000'000)
 
 
 /*************************************
@@ -1003,7 +1003,7 @@ MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(bublbobl_state::bublbobl, bublbobl_nomcu)
-	MCFG_CPU_ADD("mcu", M6801, XTAL_4MHz) // actually 6801U4 - xtal is 4MHz, divided by 4 internally
+	MCFG_CPU_ADD("mcu", M6801, XTAL(4'000'000)) // actually 6801U4 - xtal is 4MHz, divided by 4 internally
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	MCFG_SCREEN_MODIFY("screen")
@@ -1064,7 +1064,7 @@ MACHINE_RESET_MEMBER(bub68705_state, bub68705)
 MACHINE_CONFIG_DERIVED(bub68705_state::bub68705, bublbobl_nomcu)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL_4MHz) // xtal is 4MHz, divided by 4 internally
+	MCFG_CPU_ADD("mcu", M68705P3, XTAL(4'000'000)) // xtal is 4MHz, divided by 4 internally
 	MCFG_M68705_PORTC_R_CB(IOPORT("IN0"))
 	MCFG_M68705_PORTA_W_CB(WRITE8(bub68705_state, port_a_w))
 	MCFG_M68705_PORTB_W_CB(WRITE8(bub68705_state, port_b_w))

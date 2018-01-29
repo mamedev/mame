@@ -83,7 +83,7 @@ Dip locations and factory settings verified with China Gate US manual.
 #include "speaker.h"
 
 
-#define MAIN_CLOCK      XTAL_12MHz
+#define MAIN_CLOCK      XTAL(12'000'000)
 #define PIXEL_CLOCK     MAIN_CLOCK / 2
 
 class chinagat_state : public ddragon_state
@@ -555,7 +555,7 @@ MACHINE_CONFIG_START(chinagat_state::chinagat)
 	MCFG_CPU_ADD("sub", HD6309, MAIN_CLOCK / 2)     /* 1.5 MHz (12MHz oscillator / 4 internally) */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_3_579545MHz)     /* 3.579545 MHz */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(3'579'545))     /* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* heavy interleaving to sync up sprite<->main cpu's */
@@ -600,7 +600,7 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub1)
 	MCFG_CPU_ADD("sub", MC6809E, MAIN_CLOCK / 8)      /* 68B09EP 1.5 MHz (12MHz oscillator) */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_3_579545MHz)     /* 3.579545 MHz oscillator */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(3'579'545))     /* 3.579545 MHz oscillator */
 	MCFG_CPU_PROGRAM_MAP(saiyugoub1_sound_map)
 
 	MCFG_CPU_ADD("mcu", I8748, 9263750)     /* 9.263750 MHz oscillator, divided by 3*5 internally */
@@ -656,7 +656,7 @@ MACHINE_CONFIG_START(chinagat_state::saiyugoub2)
 	MCFG_CPU_ADD("sub", MC6809E, MAIN_CLOCK / 8)      /* 1.5 MHz (12MHz oscillator) */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_3_579545MHz)     /* 3.579545 MHz oscillator */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(3'579'545))     /* 3.579545 MHz oscillator */
 	MCFG_CPU_PROGRAM_MAP(ym2203c_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* heavy interleaving to sync up sprite<->main cpu's */

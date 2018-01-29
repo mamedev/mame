@@ -669,7 +669,7 @@ TODO:
 #include "speaker.h"
 
 
-#define KONAMI_SOUND_CLOCK      XTAL_14_31818MHz
+#define KONAMI_SOUND_CLOCK      XTAL(14'318'181)
 
 
 
@@ -1812,8 +1812,9 @@ static ADDRESS_MAP_START( anteaterg_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x2605, 0x2605) AM_MIRROR(0x01f8) //POUT2
 	AM_RANGE(0x2606, 0x2606) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_x_w)
 	AM_RANGE(0x2607, 0x2607) AM_MIRROR(0x01f8) AM_WRITE(galaxian_flip_screen_y_w)
-	AM_RANGE(0x4000, 0xbfff) AM_ROM
+	AM_RANGE(0x4000, 0x7bff) AM_ROM
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram") /* mirror! */
+	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xf400, 0xf400) AM_MIRROR(0x01ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x01fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 ADDRESS_MAP_END
@@ -6109,11 +6110,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(galaxian_state::takeoff, explorer) // takeoff shares the same main map as explorer, but uses only one AY8912 for sound.
 
 	MCFG_SOUND_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL_12MHz / 8) // XTAL verified, divider not verified
+	MCFG_DEVICE_CLOCK(XTAL(12'000'000) / 8) // XTAL verified, divider not verified
 
 	/* 2nd CPU to drive sound */
 	MCFG_SOUND_MODIFY("audiocpu")
-	MCFG_DEVICE_CLOCK(XTAL_12MHz / 8)
+	MCFG_DEVICE_CLOCK(XTAL(12'000'000) / 8)
 	MCFG_CPU_PROGRAM_MAP(takeoff_sound_map)
 	MCFG_CPU_IO_MAP(takeoff_sound_portmap)
 
@@ -6121,7 +6122,7 @@ MACHINE_CONFIG_DERIVED(galaxian_state::takeoff, explorer) // takeoff shares the 
 	MCFG_DEVICE_REMOVE("8910.0")
 	MCFG_DEVICE_REMOVE("8910.1")
 
-	MCFG_SOUND_ADD("8912", AY8912, XTAL_12MHz / 8)
+	MCFG_SOUND_ADD("8912", AY8912, XTAL(12'000'000) / 8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(galaxian_state, explorer_sound_latch_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END

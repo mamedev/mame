@@ -617,7 +617,7 @@ MACHINE_RESET_MEMBER(punchout_state, spnchout)
 MACHINE_CONFIG_START(punchout_state::punchout)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(punchout_map)
 	MCFG_CPU_IO_MAP(punchout_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, vblank_irq)

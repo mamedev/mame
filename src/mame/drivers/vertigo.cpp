@@ -25,7 +25,7 @@
 #include "machine/nvram.h"
 #include "screen.h"
 
-#define EXIDY440_AUDIO_CLOCK    (XTAL_12_9792MHz / 4)
+#define EXIDY440_AUDIO_CLOCK    (XTAL(12'979'200) / 4)
 #define EXIDY440_MC3418_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 16)
 
 
@@ -125,24 +125,24 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(vertigo_state::vertigo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 3)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 3)
 	MCFG_CPU_PROGRAM_MAP(vertigo_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(vertigo_state, vertigo_interrupt, 60)
 
 	MCFG_FRAGMENT_ADD(exidy440_audio)
 
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
-	MCFG_PIT8253_CLK0(XTAL_24MHz / 100)
+	MCFG_PIT8253_CLK0(XTAL(24'000'000) / 100)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(vertigo_state, v_irq4_w))
-	MCFG_PIT8253_CLK1(XTAL_24MHz / 100)
+	MCFG_PIT8253_CLK1(XTAL(24'000'000) / 100)
 	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(vertigo_state, v_irq3_w))
-	MCFG_PIT8253_CLK2(XTAL_24MHz / 100)
+	MCFG_PIT8253_CLK2(XTAL(24'000'000) / 100)
 
 	MCFG_DEVICE_ADD("74148", TTL74148, 0)
 	MCFG_74148_OUTPUT_CB(vertigo_state, update_irq)
 
 	/* motor controller */
-	MCFG_CPU_ADD("motorcpu", M68705P3, XTAL_24MHz / 6)
+	MCFG_CPU_ADD("motorcpu", M68705P3, XTAL(24'000'000) / 6)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

@@ -416,7 +416,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(istrebiteli_state::istreb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_8MHz / 4)       // KR580VM80A
+	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL(8'000'000) / 4)       // KR580VM80A
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -432,7 +432,7 @@ MACHINE_CONFIG_START(istrebiteli_state::istreb)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_8MHz / 2, 256, 64, 256, 312, 0, 256)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(8'000'000) / 2, 256, 64, 256, 312, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(istrebiteli_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -442,7 +442,7 @@ MACHINE_CONFIG_START(istrebiteli_state::istreb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", ISTREBITELI_SOUND, XTAL_8MHz / 2 / 256)
+	MCFG_SOUND_ADD("custom", ISTREBITELI_SOUND, XTAL(8'000'000) / 2 / 256)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

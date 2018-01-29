@@ -633,11 +633,11 @@ void thunderx_state::machine_reset()
 MACHINE_CONFIG_START(thunderx_state::scontra)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)     /* 052001 (verified on pcb) */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)     /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(scontra_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thunderx_state,  vblank_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)     /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(scontra_sound_map)
 
 	MCFG_DEVICE_ADD("bank5800", ADDRESS_MAP_BANK, 0)
@@ -676,11 +676,11 @@ MACHINE_CONFIG_START(thunderx_state::scontra)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)  /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
-	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)    /* verified on pcb */
+	MCFG_SOUND_ADD("k007232", K007232, XTAL(3'579'545))    /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(thunderx_state, volume_callback))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)

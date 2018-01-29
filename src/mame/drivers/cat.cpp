@@ -933,7 +933,7 @@ MACHINE_RESET_MEMBER(cat_state,cat)
 	m_6ms_counter = 0;
 	m_wdt_counter = 0;
 	m_floppy_control = 0;
-	m_6ms_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL_19_968MHz/2)/65536));
+	m_6ms_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL(19'968'000)/2)/65536));
 }
 
 VIDEO_START_MEMBER(cat_state,cat)
@@ -1051,7 +1051,7 @@ WRITE_LINE_MEMBER(cat_state::prn_ack_ff) // switch the flipflop state on the ris
 MACHINE_CONFIG_START(cat_state::cat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_19_968MHz/4)
+	MCFG_CPU_ADD("maincpu",M68000, XTAL(19'968'000)/4)
 	MCFG_CPU_PROGRAM_MAP(cat_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cat_state,cat_int_ack)
 
@@ -1071,7 +1071,7 @@ MACHINE_CONFIG_START(cat_state::cat)
 
 	MCFG_VIDEO_START_OVERRIDE(cat_state,cat)
 
-	MCFG_DEVICE_ADD( "duartn68681", MC68681, (XTAL_19_968MHz*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
+	MCFG_DEVICE_ADD( "duartn68681", MC68681, (XTAL(19'968'000)*2)/11 ) // duart is normally clocked by 3.6864mhz xtal, but cat seemingly uses a divider from the main xtal instead which probably yields 3.63054545Mhz. There is a trace to cut and a mounting area to allow using an actual 3.6864mhz xtal if you so desire
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(cat_state, cat_duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txa))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(cat_state, cat_duart_txb))

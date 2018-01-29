@@ -50,7 +50,7 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK    XTAL_16MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
 
 
 class k3_state : public driver_device

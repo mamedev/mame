@@ -100,7 +100,7 @@ ioport_constructor pcd_video_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_START(pcd_video_device::device_add_mconfig)
-	MCFG_CPU_ADD("graphics", I8741, XTAL_16MHz/2)
+	MCFG_CPU_ADD("graphics", I8741, XTAL(16'000'000)/2)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(pcd_video_device, p1_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(pcd_video_device, p2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(pcd_video_device, t1_r))
@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( pcx_vram, 0, 8, pcx_video_device )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(pcx_video_device::device_add_mconfig)
-	MCFG_CPU_ADD("graphics", I8031, XTAL_24MHz/2)
+	MCFG_CPU_ADD("graphics", I8031, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(pcx_vid_map)
 	MCFG_CPU_IO_MAP(pcx_vid_io)
 

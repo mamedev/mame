@@ -41,8 +41,8 @@
 #define VERBOSE_KEYBOARD    0
 #define VERBOSE_DISK        0
 
-#define XTAL_X001  XTAL_10_738635MHz
-#define XTAL_X002  XTAL_8MHz
+#define XTAL_X001  XTAL(10'738'635)
+#define XTAL_X002  XTAL(8'000'000)
 
 #define IC_I001  "i001"  /* Z8400A */
 #define IC_I030  "i030"  /* AY-3-8910 */
@@ -609,7 +609,7 @@ MACHINE_CONFIG_START(einstein_state::einstein)
 	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(einstein_state, int_w<4>))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdp", TMS9129, XTAL_10_738635MHz / 2)
+	MCFG_DEVICE_ADD("vdp", TMS9129, XTAL(10'738'635) / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k RAM, provided by IC i040 and i041
 	MCFG_TMS9928A_SET_SCREEN("screen")
 	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")

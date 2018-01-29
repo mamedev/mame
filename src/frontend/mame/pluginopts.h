@@ -7,23 +7,27 @@
     Plugin options manager.
 
 ***************************************************************************/
+#ifndef MAME_FRONTEND_PLUGINOPTS_H
+#define MAME_FRONTEND_PLUGINOPTS_H
 
 #pragma once
 
-#ifndef __PLUGIN_OPTS_H__
-#define __PLUGIN_OPTS_H__
-
 #include "options.h"
+
+#include <list>
+#include <string>
+
 
 class plugin_options : public core_options
 {
 public:
-	// construction/destruction
 	plugin_options();
 
 	void parse_json(std::string path);
+
 private:
 	static const options_entry s_option_entries[];
+	std::list<std::string> m_descriptions;
 };
 
-#endif /* __PLUGIN_OPTS_H__ */
+#endif // MAME_FRONTEND_PLUGINOPTS_H

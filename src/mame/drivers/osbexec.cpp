@@ -24,7 +24,7 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK  XTAL_23_9616MHz
+#define MAIN_CLOCK  XTAL(23'961'600)
 
 #define MODEM_PORT_TAG "modem"
 #define PRINTER_PORT_TAG "printer"

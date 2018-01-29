@@ -309,6 +309,7 @@ intv.cpp
 ipc.cpp
 ipds.cpp
 iq151.cpp
+iqunlim.cpp
 iris3130.cpp
 irisha.cpp
 isbc.cpp
@@ -374,6 +375,7 @@ mc8030.cpp
 mcb216.cpp
 mccpm.cpp
 megadriv.cpp
+megadriv_rad.cpp
 mekd2.cpp
 mephisto.cpp
 mephisto_montec.cpp
@@ -566,7 +568,8 @@ qvt201.cpp
 qvt6800.cpp
 qx10.cpp
 r9751.cpp
-radicasi.cpp
+rad_eu3a05.cpp
+rad_eu3a14.cpp
 radio86.cpp
 rainbow.cpp
 rambo.cpp
@@ -719,6 +722,7 @@ tv910.cpp
 tv912.cpp
 tv950.cpp
 tv990.cpp
+tvboy.cpp
 tvc.cpp
 tvgame.cpp
 tx0.cpp
@@ -765,6 +769,9 @@ vt520.cpp
 vta2000.cpp
 vtech1.cpp
 vtech2.cpp
+vtech_eu3a12.cpp
+vtech_unk1.cpp
+vtech_unk2.cpp
 wangpc.cpp
 wicat.cpp
 wswan.cpp

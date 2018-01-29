@@ -812,7 +812,7 @@ MACHINE_CONFIG_DERIVED(c1pmf_state::c1pmf, c1p)
 	/* floppy ACIA */
 	MCFG_DEVICE_ADD("acia_1", ACIA6850, 0)
 
-	MCFG_DEVICE_ADD("floppy_clock", CLOCK, XTAL_4MHz/8) // 250 kHz
+	MCFG_DEVICE_ADD("floppy_clock", CLOCK, XTAL(4'000'000)/8) // 250 kHz
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia_1", acia6850_device, write_txc))
 
 	MCFG_FLOPPY_DRIVE_ADD("floppy0", osi_floppies, "ssdd", floppy_image_device::default_floppy_formats)

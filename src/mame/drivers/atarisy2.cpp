@@ -132,9 +132,9 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_20MHz
-#define SOUND_CLOCK         XTAL_14_31818MHz
-#define VIDEO_CLOCK         XTAL_32MHz
+#define MASTER_CLOCK        XTAL(20'000'000)
+#define SOUND_CLOCK         XTAL(14'318'181)
+#define VIDEO_CLOCK         XTAL(32'000'000)
 
 
 
@@ -1195,7 +1195,7 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)MASTER_CLOCK/2/16/16/16/10)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, MASTER_CLOCK/2/16/16/16/10)
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)

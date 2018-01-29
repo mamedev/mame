@@ -45,7 +45,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_4MHz
+#define MAIN_CLOCK XTAL(4'000'000)
 
 
 class alphatro_state : public driver_device
@@ -727,7 +727,7 @@ MACHINE_CONFIG_START(alphatro_state::alphatro)
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("fdc", upd765a_device, mdma_w))
 	MCFG_I8257_OUT_TC_CB(DEVWRITELINE("fdc", upd765a_device, tc_line_w))
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8) // clk unknown
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(12'288'000) / 8) // clk unknown
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(alphatro_state, crtc_update_row)

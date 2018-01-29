@@ -447,9 +447,9 @@ INPUT_CHANGED_MEMBER(gimix_state::drive_size_cb)
 {
 	// set FDC clock based on DIP Switch S2-9 (5.25"/8" drive select)
 	if(m_dma_dip->read() & 0x00000100)
-		m_fdc->set_unscaled_clock(XTAL_8MHz / 4); // 8 inch (2MHz)
+		m_fdc->set_unscaled_clock(XTAL(8'000'000) / 4); // 8 inch (2MHz)
 	else
-		m_fdc->set_unscaled_clock(XTAL_8MHz / 8); // 5.25 inch (1MHz)
+		m_fdc->set_unscaled_clock(XTAL(8'000'000) / 8); // 5.25 inch (1MHz)
 }
 
 void gimix_state::machine_reset()
@@ -470,9 +470,9 @@ void gimix_state::machine_reset()
 
 	// initialise FDC clock based on DIP Switch S2-9 (5.25"/8" drive select)
 	if(m_dma_dip->read() & 0x00000100)
-		m_fdc->set_unscaled_clock(XTAL_8MHz / 4); // 8 inch (2MHz)
+		m_fdc->set_unscaled_clock(XTAL(8'000'000) / 4); // 8 inch (2MHz)
 	else
-		m_fdc->set_unscaled_clock(XTAL_8MHz / 8); // 5.25 inch (1MHz)
+		m_fdc->set_unscaled_clock(XTAL(8'000'000) / 8); // 5.25 inch (1MHz)
 }
 
 void gimix_state::machine_start()
@@ -546,20 +546,20 @@ MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
 MACHINE_CONFIG_START(gimix_state::gimix)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(gimix_mem)
 	MCFG_CPU_IO_MAP(gimix_io)
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(gimix_state,irq_w))
 
 	/* timer */
-	MCFG_DEVICE_ADD("timer", PTM6840, XTAL_2MHz)  // clock is a guess
+	MCFG_DEVICE_ADD("timer", PTM6840, XTAL(2'000'000))  // clock is a guess
 	MCFG_PTM6840_IRQ_CB(WRITELINE(gimix_state,irq_w))  // PCB pictures show both the RTC and timer set to generate IRQs (are jumper configurable)
 
 	/* floppy disks */
-	MCFG_FD1797_ADD("fdc",XTAL_8MHz / 4)
+	MCFG_FD1797_ADD("fdc",XTAL(8'000'000) / 4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(gimix_state,fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(gimix_state,fdc_drq_w))
 	MCFG_WD_FDC_FORCE_READY
@@ -567,27 +567,27 @@ MACHINE_CONFIG_START(gimix_state::gimix)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", gimix_floppies, "525hd", gimix_state::floppy_formats)
 
 	/* parallel ports */
-	MCFG_DEVICE_ADD("pia1",PIA6821,XTAL_2MHz)
+	MCFG_DEVICE_ADD("pia1",PIA6821,XTAL(2'000'000))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(gimix_state,pia_pa_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(gimix_state,pia_pb_w))
 	MCFG_PIA_READPA_HANDLER(READ8(gimix_state,pia_pa_r))
 	MCFG_PIA_READPB_HANDLER(READ8(gimix_state,pia_pb_r))
-	MCFG_DEVICE_ADD("pia2",PIA6821,XTAL_2MHz)
+	MCFG_DEVICE_ADD("pia2",PIA6821,XTAL(2'000'000))
 
 	/* serial ports */
-	MCFG_DEVICE_ADD("acia1",ACIA6850,XTAL_2MHz)
+	MCFG_DEVICE_ADD("acia1",ACIA6850,XTAL(2'000'000))
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial1",rs232_port_device,write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial1",rs232_port_device,write_rts))
 
-	MCFG_DEVICE_ADD("acia2",ACIA6850,XTAL_2MHz)
+	MCFG_DEVICE_ADD("acia2",ACIA6850,XTAL(2'000'000))
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial2",rs232_port_device,write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial2",rs232_port_device,write_rts))
 
-	MCFG_DEVICE_ADD("acia3",ACIA6850,XTAL_2MHz)
+	MCFG_DEVICE_ADD("acia3",ACIA6850,XTAL(2'000'000))
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial3",rs232_port_device,write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial3",rs232_port_device,write_rts))
 
-	MCFG_DEVICE_ADD("acia4",ACIA6850,XTAL_2MHz)
+	MCFG_DEVICE_ADD("acia4",ACIA6850,XTAL(2'000'000))
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("serial4",rs232_port_device,write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("serial4",rs232_port_device,write_rts))
 

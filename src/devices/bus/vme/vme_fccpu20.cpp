@@ -222,9 +222,9 @@ DEFINE_DEVICE_TYPE(VME_FCCPU21YA, vme_fccpu21ya_card_device, "fccpu21ya", "Force
 DEFINE_DEVICE_TYPE(VME_FCCPU21B,  vme_fccpu21b_card_device,  "fccpu21b",  "Force Computer SYS68K/CPU-21B CPU Board")
 DEFINE_DEVICE_TYPE(VME_FCCPU21YB, vme_fccpu21yb_card_device, "fccpu21yb", "Force Computer SYS68K/CPU-21YB CPU Board")
 
-#define CLOCK50 XTAL_50MHz /* HCJ */
-#define CLOCK40 XTAL_40MHz /* HCJ */
-#define CLOCK32 XTAL_32MHz /* HCJ */
+#define CLOCK50 XTAL(50'000'000) /* HCJ */
+#define CLOCK40 XTAL(40'000'000) /* HCJ */
+#define CLOCK32 XTAL(32'000'000) /* HCJ */
 
 static ADDRESS_MAP_START (cpu20_mem, AS_PROGRAM, 32, vme_fccpu20_device)
 	ADDRESS_MAP_UNMAP_HIGH

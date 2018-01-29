@@ -61,7 +61,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_12MHz
+#define MASTER_CLOCK        XTAL(12'000'000)
 
 
 /*************************************

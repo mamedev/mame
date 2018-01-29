@@ -46,7 +46,7 @@ TODO:
 
 */
 
-#define MASTER_CLOCK    XTAL_22_1184MHz
+#define MASTER_CLOCK    XTAL(22'118'400)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

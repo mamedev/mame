@@ -67,7 +67,7 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(tg100_state::tg100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",  H83002, XTAL_20MHz) /* TODO: correct CPU type (H8/520) */
+	MCFG_CPU_ADD("maincpu",  H83002, XTAL(20'000'000)) /* TODO: correct CPU type (H8/520) */
 	MCFG_CPU_PROGRAM_MAP( tg100_map )
 	MCFG_CPU_IO_MAP( tg100_io_map )
 

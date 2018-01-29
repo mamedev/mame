@@ -233,17 +233,17 @@ WRITE8_MEMBER( pc1512_state::vdu_w )
 			case ALPHA_40:
 			case GRAPHICS_1:
 				m_vdu->set_hpixels_per_column(8);
-				m_vdu->set_clock(XTAL_28_63636MHz/32);
+				m_vdu->set_clock(XTAL(28'636'363)/32);
 				break;
 
 			case ALPHA_80:
 				m_vdu->set_hpixels_per_column(8);
-				m_vdu->set_clock(XTAL_28_63636MHz/16);
+				m_vdu->set_clock(XTAL(28'636'363)/16);
 				break;
 
 			case GRAPHICS_2:
 				m_vdu->set_hpixels_per_column(16);
-				m_vdu->set_clock(XTAL_28_63636MHz/32);
+				m_vdu->set_clock(XTAL(28'636'363)/32);
 				break;
 			}
 		}
@@ -601,7 +601,7 @@ MACHINE_CONFIG_START(pc1512_state::pc1512_video)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MCFG_MC6845_ADD(AMS40041_TAG, AMS40041, SCREEN_TAG, XTAL_28_63636MHz/32)
+	MCFG_MC6845_ADD(AMS40041_TAG, AMS40041, SCREEN_TAG, XTAL(28'636'363)/32)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(pc1512_state, crtc_update_row)

@@ -248,7 +248,7 @@ void m24_state::cfg_m20_format(device_t *device)
 
 MACHINE_CONFIG_START(m24_state::olivetti)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", I8086, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(m24_map)
 	MCFG_CPU_IO_MAP(m24_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
@@ -270,7 +270,7 @@ MACHINE_CONFIG_START(m24_state::olivetti)
 	MCFG_RAM_DEFAULT_SIZE("640K")
 	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
 
-	MCFG_CPU_ADD("kbc", TMS7000, XTAL_4MHz)
+	MCFG_CPU_ADD("kbc", TMS7000, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(kbc_map)
 	MCFG_TMS7000_IN_PORTA_CB(READ8(m24_state, pa_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(m24_state, pb_w))

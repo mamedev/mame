@@ -351,6 +351,11 @@ static ADDRESS_MAP_START( qdrmfgp2_map, AS_PROGRAM, 16, qdrmfgp_state )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( qdrmfgp_k054539_map, 0, 8, qdrmfgp_state )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_REGION("k054539", 0)
+	AM_RANGE(0x100000, 0x45ffff) AM_RAM AM_SHARE("sndram")
+ADDRESS_MAP_END
+
 /*************************************
  *
  *  Port definitions
@@ -555,15 +560,13 @@ MACHINE_START_MEMBER(qdrmfgp_state,qdrmfgp2)
 {
 	/* sound irq (CCU? 240Hz) */
 	m_gp2_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(qdrmfgp_state::gp2_timer_callback), this));
-	m_gp2_timer->adjust(attotime::from_hz(XTAL_18_432MHz/76800), 0, attotime::from_hz(XTAL_18_432MHz/76800));
+	m_gp2_timer->adjust(attotime::from_hz(XTAL(18'432'000)/76800), 0, attotime::from_hz(XTAL(18'432'000)/76800));
 
 	MACHINE_START_CALL_MEMBER( qdrmfgp );
 }
 
 void qdrmfgp_state::machine_reset()
 {
-	m_sndram = memregion("k054539")->base() + 0x100000;
-
 	/* reset the IDE controller */
 	m_gp2_irq_control = 0;
 }
@@ -577,7 +580,7 @@ void qdrmfgp_state::machine_reset()
 MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /*  16.000 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) /*  16.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(qdrmfgp_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", qdrmfgp_state, qdrmfgp_interrupt, "screen", 0, 1)
 
@@ -606,13 +609,14 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
 	MCFG_K053252_OFFSETS(40, 16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADDRESS_MAP(0, qdrmfgp_k054539_map)
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(qdrmfgp_state, k054539_irq1_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -621,7 +625,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /*  16.000 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) /*  16.000 MHz */
 	MCFG_CPU_PROGRAM_MAP(qdrmfgp2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", qdrmfgp_state,  qdrmfgp2_interrupt)
 
@@ -650,13 +654,14 @@ MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
 	MCFG_K053252_OFFSETS(40, 16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADDRESS_MAP(0, qdrmfgp_k054539_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -677,7 +682,7 @@ ROM_START( qdrmfgp )
 	ROM_LOAD( "gq_460_a01.15e", 0x000000, 0x80000, CRC(6536b700) SHA1(47ffe0cfbf80810179560150b23d825fe1a5c5ca) )
 	ROM_LOAD( "gq_460_a02.17e", 0x080000, 0x80000, CRC(ac01d675) SHA1(bf66433ace95f4ef14699d03add7cbc2e5d90eea) )
 
-	ROM_REGION( 0x460000, "k054539", 0)      /* SE SAMPLES + space for additional RAM */
+	ROM_REGION( 0x100000, "k054539", 0)      /* SE SAMPLES + space for additional RAM */
 	ROM_LOAD( "gq_460_a07.14h", 0x000000, 0x80000, CRC(67d8ea6b) SHA1(11af1b5a33de2a6e24823964d210bef193ecefe4) )
 	ROM_LOAD( "gq_460_a06.12h", 0x080000, 0x80000, CRC(97ed5a77) SHA1(68600fd8d914451284cf181fb4bd5872860fb9ad) )
 
@@ -694,7 +699,7 @@ ROM_START( qdrmfgp2 )
 	ROM_LOAD( "ge_557_a01.13e", 0x000000, 0x80000, CRC(c301d406) SHA1(5fad8cc611edd83380972abf37ec80561b9317a6) )
 	ROM_LOAD( "ge_557_a02.15e", 0x080000, 0x80000, CRC(3bfe1e56) SHA1(9e4df512a804a96fcb545d4e0eb58b5421d65ea4) )
 
-	ROM_REGION( 0x460000, "k054539", 0)      /* SE SAMPLES + space for additional RAM */
+	ROM_REGION( 0x100000, "k054539", 0)      /* SE SAMPLES + space for additional RAM */
 	ROM_LOAD( "ge_557_a07.19h", 0x000000, 0x80000, CRC(7491e0c8) SHA1(6459ab5e7af052ef7a1c4ce01cd844c0f4319f2e) )
 	ROM_LOAD( "ge_557_a08.19k", 0x080000, 0x80000, CRC(3da2b20c) SHA1(fdc2cdc27f3299f541944a78ce36ed33a7926056) )
 

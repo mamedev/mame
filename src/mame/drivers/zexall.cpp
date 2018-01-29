@@ -157,7 +157,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(zexall_state::zexall)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 
 	/* video hardware */

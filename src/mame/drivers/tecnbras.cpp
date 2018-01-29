@@ -102,7 +102,7 @@ void tecnbras_state::machine_reset()
 
 MACHINE_CONFIG_START(tecnbras_state::tecnbras)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL_12MHz) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", I80C31, XTAL(12'000'000)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(i80c31_prg)
 	MCFG_CPU_IO_MAP(i80c31_io)
 

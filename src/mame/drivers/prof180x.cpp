@@ -236,7 +236,7 @@ void prof180x_state::machine_reset()
 
 MACHINE_CONFIG_START(prof180x_state::prof180x)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(HD64180_TAG, Z80, XTAL_9_216MHz)
+	MCFG_CPU_ADD(HD64180_TAG, Z80, XTAL(9'216'000))
 	MCFG_CPU_PROGRAM_MAP(prof180x_mem)
 	MCFG_CPU_IO_MAP(prof180x_io)
 

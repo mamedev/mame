@@ -289,11 +289,11 @@ void ladyfrog_state::machine_reset()
 MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_8MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80,XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(ladyfrog_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ladyfrog_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_8MHz/2)
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(ladyfrog_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ladyfrog_state, irq0_line_hold, 2*60)
 
@@ -306,7 +306,7 @@ MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1) // black borders in ladyfrog gameplay are correct
-	MCFG_SCREEN_RAW_PARAMS( XTAL_8MHz, 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
+	MCFG_SCREEN_RAW_PARAMS( XTAL(8'000'000), 510, 0, 256, 262, 2*8, 30*8 ) // pixel clock appears to run at 8 MHz
 	MCFG_SCREEN_UPDATE_DRIVER(ladyfrog_state, screen_update_ladyfrog)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -319,12 +319,12 @@ MACHINE_CONFIG_START(ladyfrog_state::ladyfrog)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_8MHz/4)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(8'000'000)/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(ladyfrog_state, unk_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(ladyfrog_state, unk_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5232, XTAL_8MHz/4)
+	MCFG_SOUND_ADD("msm", MSM5232, XTAL(8'000'000)/4)
 	MCFG_MSM5232_SET_CAPACITORS(0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)    // pin 28  2'-1
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)    // pin 29  4'-1

@@ -450,7 +450,7 @@ ROM_START( ti_fdc )
 ROM_END
 
 MACHINE_CONFIG_START(ti_fdc_device::device_add_mconfig)
-	MCFG_FD1771_ADD(FDC_TAG, XTAL_1MHz)
+	MCFG_FD1771_ADD(FDC_TAG, XTAL(1'000'000))
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(ti_fdc_device, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(ti_fdc_device, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("0", tifdc_floppies, "525dd", ti_fdc_device::floppy_formats)

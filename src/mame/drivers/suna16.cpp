@@ -799,18 +799,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(suna16_state::bssoccer_interrupt)
 MACHINE_CONFIG_START(suna16_state::bssoccer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/4)    /* 8MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/4)    /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna16_state, bssoccer_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)      /* Z80B at 3.579545MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)      /* Z80B at 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, XTAL_32MHz/6)      /* Z80B at 5.333MHz */
+	MCFG_CPU_ADD("pcm1", Z80, XTAL(32'000'000)/6)      /* Z80B at 5.333MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
 	MCFG_CPU_IO_MAP(bssoccer_pcm_1_io_map)
 
-	MCFG_CPU_ADD("pcm2", Z80, XTAL_32MHz/6)      /* Z80B at 5.333MHz */
+	MCFG_CPU_ADD("pcm2", Z80, XTAL(32'000'000)/6)      /* Z80B at 5.333MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_2_map)
 	MCFG_CPU_IO_MAP(bssoccer_pcm_2_io_map)
 
@@ -838,7 +838,7 @@ MACHINE_CONFIG_START(suna16_state::bssoccer)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)  /* 3.579545MHz */
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)  /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.2)
 
@@ -862,14 +862,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(suna16_state::uballoon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/4)   /* 8MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/4)   /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(uballoon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna16_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)   /* Z80B at 3.579545MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)   /* Z80B at 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(uballoon_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, XTAL_32MHz/6) /* Z80B at 5.333MHz */
+	MCFG_CPU_ADD("pcm1", Z80, XTAL(32'000'000)/6) /* Z80B at 5.333MHz */
 	MCFG_CPU_PROGRAM_MAP(uballoon_pcm_1_map)
 	MCFG_CPU_IO_MAP(uballoon_pcm_1_io_map)
 
@@ -899,7 +899,7 @@ MACHINE_CONFIG_START(suna16_state::uballoon)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)    /* 3.579545MHz */
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)    /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -917,14 +917,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(suna16_state::sunaq)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)   /* 6MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/4)   /* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(sunaq_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suna16_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)   /* Z80B at 3.579545MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)   /* Z80B at 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(sunaq_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, XTAL_24MHz/4) /* Z80B at 6MHz */
+	MCFG_CPU_ADD("pcm1", Z80, XTAL(24'000'000)/4) /* Z80B at 6MHz */
 	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
 	MCFG_CPU_IO_MAP(bssoccer_pcm_1_io_map)
 
@@ -955,7 +955,7 @@ MACHINE_CONFIG_START(suna16_state::sunaq)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)    /* 3.579545MHz */
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)    /* 3.579545MHz */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
@@ -978,14 +978,14 @@ WRITE8_MEMBER(suna16_state::bestbest_ay8910_port_a_w)
 MACHINE_CONFIG_START(suna16_state::bestbest)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)   /* 6MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/4)   /* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(bestbest_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", suna16_state, bssoccer_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4) /* 6MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/4) /* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(bestbest_sound_map)
 
-	MCFG_CPU_ADD("pcm1", Z80, XTAL_24MHz/4) /* 6MHz */
+	MCFG_CPU_ADD("pcm1", Z80, XTAL(24'000'000)/4) /* 6MHz */
 	MCFG_CPU_PROGRAM_MAP(bestbest_pcm_1_map)
 	MCFG_CPU_IO_MAP(bestbest_pcm_1_iomap)
 
@@ -1014,12 +1014,12 @@ MACHINE_CONFIG_START(suna16_state::bestbest)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz/16)  /* 1.5MHz */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(24'000'000)/16)  /* 1.5MHz */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(suna16_state, bestbest_ay8910_port_a_w))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL_24MHz/8)   /* 3MHz */
+	MCFG_SOUND_ADD("ymsnd", YM3526, XTAL(24'000'000)/8)   /* 3MHz */
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)

@@ -9,7 +9,7 @@
 #include "audio/exidy440.h"
 #include "screen.h"
 
-#define EXIDY440_MASTER_CLOCK       (XTAL_12_9792MHz)
+#define EXIDY440_MASTER_CLOCK       (XTAL(12'979'200))
 
 
 class exidy440_state : public driver_device

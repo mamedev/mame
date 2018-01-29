@@ -108,7 +108,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#define A7800_NTSC_Y1   XTAL_14_31818MHz
+#define A7800_NTSC_Y1   XTAL(14'318'181)
 #define CLK_PAL 1773447
 
 

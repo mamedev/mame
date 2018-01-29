@@ -1089,7 +1089,7 @@ static GFXDECODE_START( pinkiri8 )
 GFXDECODE_END
 
 MACHINE_CONFIG_START(pinkiri8_state::pinkiri8)
-	MCFG_CPU_ADD("maincpu",Z180,XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu",Z180,XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(pinkiri8_map)
 	MCFG_CPU_IO_MAP(pinkiri8_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pinkiri8_state, nmi_line_assert)

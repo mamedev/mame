@@ -62,13 +62,8 @@ a2bus_ssb_device::a2bus_ssb_device(const machine_config &mconfig, const char *ta
 
 void a2bus_ssb_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
-	if (m_slot != 2)
-	{
+	if (slotno() != 2)
 		popmessage("SSB Card should be in slot 2!\n");
-	}
 }
 
 void a2bus_ssb_device::device_reset()

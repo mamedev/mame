@@ -104,7 +104,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 
 #define X2_CLOCK_PAL    59000000
 #define X2_CLOCK_NTSC   49090000
-#define X601_CLOCK      XTAL_16_9344MHz
+#define X601_CLOCK      XTAL(16'934'400)
 
 
 static ADDRESS_MAP_START( 3do_mem, AS_PROGRAM, 32, _3do_state )
@@ -157,7 +157,7 @@ void _3do_state::machine_reset()
 MACHINE_CONFIG_START(_3do_state::_3do)
 
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7_BE, XTAL_50MHz/4 )
+	MCFG_CPU_ADD( "maincpu", ARM7_BE, XTAL(50'000'000)/4 )
 	MCFG_CPU_PROGRAM_MAP( 3do_mem)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -177,7 +177,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(_3do_state::_3do_pal)
 
 	/* Basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7_BE, XTAL_50MHz/4 )
+	MCFG_CPU_ADD("maincpu", ARM7_BE, XTAL(50'000'000)/4 )
 	MCFG_CPU_PROGRAM_MAP( 3do_mem)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")

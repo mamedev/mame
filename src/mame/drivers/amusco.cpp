@@ -86,8 +86,8 @@
 #include "amusco.lh"
 
 
-#define MASTER_CLOCK        XTAL_22_1184MHz     /* confirmed */
-#define SECOND_CLOCK        XTAL_15MHz          /* confirmed */
+#define MASTER_CLOCK        XTAL(22'118'400)     /* confirmed */
+#define SECOND_CLOCK        XTAL(15'000'000)          /* confirmed */
 
 #define CPU_CLOCK           MASTER_CLOCK / 4    /* guess */
 #define CRTC_CLOCK          SECOND_CLOCK / 8    /* guess */
@@ -554,7 +554,7 @@ MACHINE_CONFIG_START(amusco_state::amusco)
 	MCFG_I8155_IN_PORTB_CB(READ8(amusco_state, lpt_status_r))
 	// Port C uses ALT 3 mode, which MAME does not currently emulate
 
-	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
+	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
 
 	MCFG_DEVICE_ADD("rtc_interface", I8155, 0)
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(amusco_state, rtc_control_w))

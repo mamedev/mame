@@ -1951,7 +1951,7 @@ void dec8_state::machine_reset()
 
 // DECO video CRTC, unverified
 #define MCFG_SCREEN_RAW_PARAMS_DATA_EAST \
-		MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,8,248)
+		MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,8,248)
 
 
 MACHINE_CONFIG_START(dec8_state::lastmisn)
@@ -2072,7 +2072,7 @@ MACHINE_CONFIG_START(dec8_state::gondo)
 	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
 	MCFG_CPU_IO_MAP(dec8_mcu_io_map)
 
 
@@ -2126,7 +2126,7 @@ MACHINE_CONFIG_START(dec8_state::garyoret)
 	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
 	MCFG_CPU_IO_MAP(dec8_mcu_io_map)
 
 
@@ -2233,14 +2233,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec8_state::csilver)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(csilver_map)
 
-	MCFG_CPU_ADD("sub", MC6809E, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_CPU_ADD("sub", MC6809E, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(csilver_sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  nmi_line_pulse)
 
-	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", M6502, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(csilver_s_map)
 								/* NMIs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -2273,17 +2273,17 @@ MACHINE_CONFIG_START(dec8_state::csilver)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
 	MCFG_SOUND_ROUTE(2, "mono", 0.23)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
-	MCFG_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ym2", YM3526, XTAL(12'000'000)/4) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* verified on pcb */
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) /* verified on pcb */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dec8_state, csilver_adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz            */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.88)
@@ -2292,14 +2292,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(dec8_state::oscar)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", HD6309, XTAL(12'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(oscar_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dec8_state,  oscar_interrupt)
 
-	MCFG_CPU_ADD("sub", HD6309, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("sub", HD6309, XTAL(12'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(oscar_sub_map)
 
-	MCFG_CPU_ADD("audiocpu", DECO_222, XTAL_12MHz/8)
+	MCFG_CPU_ADD("audiocpu", DECO_222, XTAL(12'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(oscar_s_map)
 								/* NMIs are caused by the main CPU */
 	MCFG_QUANTUM_TIME(attotime::from_hz(2400)) /* 40 CPU slices per frame */
@@ -2334,7 +2334,7 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000)/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
 	MCFG_SOUND_ROUTE(2, "mono", 0.23)
@@ -2342,7 +2342,7 @@ MACHINE_CONFIG_START(dec8_state::oscar)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ym2", YM3526, XTAL(12'000'000)/4) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
@@ -2358,7 +2358,7 @@ MACHINE_CONFIG_START(dec8_state::srdarwin)
 	MCFG_CPU_PROGRAM_MAP(dec8_s_map)
 								/* NMIs are caused by the main CPU */
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz) /* unknown frequency */
+	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000)) /* unknown frequency */
 	MCFG_CPU_IO_MAP(srdarwin_mcu_io_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu") /* needed for stability with emulated MCU or sometimes commands get missed and game crashes at bosses */

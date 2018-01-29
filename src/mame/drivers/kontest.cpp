@@ -26,7 +26,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_24MHz
+#define MAIN_CLOCK XTAL(24'000'000)
 
 class kontest_state : public driver_device
 {

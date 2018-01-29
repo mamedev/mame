@@ -187,14 +187,14 @@ const tiny_rom_entry *sns_rom_sgb1_device::device_rom_region() const
 
 
 MACHINE_CONFIG_START(sns_rom_sgb2_device::device_add_mconfig)
-	MCFG_CPU_ADD("sgb_cpu", LR35902, XTAL_4_194304Mhz)   /* 4.194MHz derived from clock on sgb2 pcb */
+	MCFG_CPU_ADD("sgb_cpu", LR35902, XTAL(4'194'304))   /* 4.194MHz derived from clock on sgb2 pcb */
 	MCFG_CPU_PROGRAM_MAP(supergb_map)
 	MCFG_LR35902_TIMER_CB(WRITE8(sns_rom_sgb_device, gb_timer_callback))
 	MCFG_LR35902_HALT_BUG
 
 	MCFG_SGB_PPU_ADD("sgb_ppu", "sgb_cpu")
 
-	MCFG_SOUND_ADD("sgb_apu", DMG_APU, XTAL_4_194304Mhz)
+	MCFG_SOUND_ADD("sgb_apu", DMG_APU, XTAL(4'194'304))
 
 	MCFG_GB_CARTRIDGE_ADD("gb_slot", supergb_cart, nullptr)
 MACHINE_CONFIG_END

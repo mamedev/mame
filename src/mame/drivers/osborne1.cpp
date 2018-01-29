@@ -98,7 +98,7 @@ TODO:
 #include "softlist.h"
 
 
-#define MAIN_CLOCK  XTAL_15_9744MHz
+static constexpr XTAL MAIN_CLOCK = 15.9744_MHz_XTAL;
 
 
 static ADDRESS_MAP_START( osborne1_mem, AS_PROGRAM, 8, osborne1_state )
@@ -346,7 +346,7 @@ MACHINE_CONFIG_DERIVED(osborne1nv_state::osborne1nv, osborne1)
 	MCFG_SCREEN_NO_PALETTE
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_12_288MHz/8)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL(12'288'000)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(osborne1nv_state, crtc_update_row)

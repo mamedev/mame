@@ -6,7 +6,7 @@
 #pragma once
 
 #include "machine/eepromser.h"
-#include "machine/gen_latch.h"
+#include "machine/k054321.h"
 #include "video/k053936.h"
 #include "cpu/dsp56k/dsp56k.h"
 
@@ -29,9 +29,7 @@ public:
 		m_k053936(*this, "k053936"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2"),
-		m_soundlatch3(*this, "soundlatch3"),
+		m_k054321(*this, "k054321"),
 		m_shared_ram(*this, "shared_ram"),
 		m_dsp56k_p_mirror(*this, "dsp56k_p_mirror"),
 		m_dsp56k_p_8000(*this, "dsp56k_p_8000")
@@ -44,9 +42,7 @@ public:
 	required_device<k053936_device> m_k053936;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<generic_latch_8_device> m_soundlatch2;
-	required_device<generic_latch_8_device> m_soundlatch3;
+	required_device<k054321_device> m_k054321;
 
 	/* 68k-side shared ram */
 	required_shared_ptr<uint32_t> m_shared_ram;
@@ -78,8 +74,6 @@ public:
 
 	DECLARE_WRITE8_MEMBER(polygonet_sys_w);
 	DECLARE_READ8_MEMBER(polygonet_inputs_r);
-	DECLARE_READ8_MEMBER(sound_comms_r);
-	DECLARE_WRITE8_MEMBER(sound_comms_w);
 	DECLARE_WRITE32_MEMBER(sound_irq_w);
 	DECLARE_READ32_MEMBER(dsp_host_interface_r);
 	DECLARE_WRITE32_MEMBER(shared_ram_write);

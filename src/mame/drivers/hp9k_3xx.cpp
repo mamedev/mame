@@ -200,8 +200,7 @@ static ADDRESS_MAP_START(hp9k310_map, AS_PROGRAM, 16, hp9k3xx_state)
 	AM_RANGE(0x5c0000, 0x5c0003) AM_READWRITE(buserror16_r, buserror16_w)   // no add-on FP coprocessor
 
 	AM_RANGE(0x5f8000, 0x5f800f) AM_DEVREADWRITE8(PTM6840_TAG, ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0x600000, 0x7ffffd) AM_READWRITE(buserror16_r, buserror16_w)   // prevent reading invalid DIO slots
-	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE(buserror16_r, buserror16_w)
+	AM_RANGE(0x600000, 0x7fffff) AM_READWRITE(buserror16_r, buserror16_w)   // prevent reading invalid DIO slots
 	AM_RANGE(0x800000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -380,7 +379,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k310)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(hp9k3xx_state, iocpu_port1_r))
 	MCFG_MCS48_PORT_T0_IN_CB(READ8(hp9k3xx_state, iocpu_test0_r))
 
-	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL_15_92MHz/2)
+	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL(15'920'000)/2)
 	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
@@ -409,7 +408,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k320)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(hp9k3xx_state, iocpu_port1_r))
 	MCFG_MCS48_PORT_T0_IN_CB(READ8(hp9k3xx_state, iocpu_test0_r))
 
-	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL_15_92MHz/2)
+	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL(15'920'000)/2)
 	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
@@ -444,7 +443,7 @@ MACHINE_CONFIG_START(hp9k3xx_state::hp9k332)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(hp9k3xx_state, iocpu_port1_r))
 	MCFG_MCS48_PORT_T0_IN_CB(READ8(hp9k3xx_state, iocpu_test0_r))
 
-	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL_15_92MHz/2)
+	MCFG_DEVICE_ADD(MLC_TAG, HP_HIL_MLC, XTAL(15'920'000)/2)
 	MCFG_HP_HIL_SLOT_ADD(MLC_TAG, "hil1", hp_hil_devices, "hp_ipc_kbd")
 
 	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840

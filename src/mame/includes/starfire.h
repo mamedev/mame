@@ -10,7 +10,7 @@
 #include "screen.h"
 
 
-#define STARFIRE_MASTER_CLOCK   (XTAL_20MHz)
+#define STARFIRE_MASTER_CLOCK   (XTAL(20'000'000))
 #define STARFIRE_CPU_CLOCK      (STARFIRE_MASTER_CLOCK / 8)
 #define STARFIRE_PIXEL_CLOCK    (STARFIRE_MASTER_CLOCK / 4)
 #define STARFIRE_HTOTAL         (0x13f)  /* could be 0x140, but I think this is right */

@@ -637,8 +637,8 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		//        the linescroll ram fills a buffer and it's cleared automatically between frames?
 		// for (int ii = 0; ii < 0x2000/4; ii++)
 		//{
-		//	const int realAddress = floorAddress/4;
-		//	m_videoram[realAddress+ii] = 0x00000000;
+		//  const int realAddress = floorAddress/4;
+		//  m_videoram[realAddress+ii] = 0x00000000;
 		// }
 
 
@@ -647,8 +647,8 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 		rectangle clip = visarea;
 
 		// this was wrong, see below
-//		if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
-//		{
+//      if (global_alt_scroll_register_format) // globally selects alt scroll register layout???
+//      {
 			// Logic would dictate that this should be the 'complex' scroll register layout,
 			// but per-line.  That doesn't work however.
 			//
@@ -664,10 +664,10 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 			// buriki line data is at 20146000 (physical)
 
 //#if HNG64_VIDEO_DEBUG
-//			popmessage("Unhandled rowscroll %02x", tileregs>>12);
+//          popmessage("Unhandled rowscroll %02x", tileregs>>12);
 //#endif
-//		}
-//		else // 'simple' mode with linescroll, used in some ss64_2 levels (assumed to be correct, but doesn't do much with it.. so could be wrong)
+//      }
+//      else // 'simple' mode with linescroll, used in some ss64_2 levels (assumed to be correct, but doesn't do much with it.. so could be wrong)
 		{
 			int32_t xtopleft, xmiddle;
 			int32_t ytopleft, ymiddle;
@@ -698,8 +698,8 @@ void hng64_state::hng64_drawtilemap(screen_device &screen, bitmap_rgb32 &bitmap,
 
 				const int xinc = (xmiddle - xtopleft) / 512;
 				const int yinc = (ymiddle - ytopleft) / 512;
-				// TODO: if global_alt_scroll_register_format is enabled uses incxy / incyx into calculation somehow ... 
-				
+				// TODO: if global_alt_scroll_register_format is enabled uses incxy / incyx into calculation somehow ...
+
 				hng64_tilemap_draw_roz(screen, bitmap,clip,tilemap,xtopleft,ytopleft,
 						xinc<<1,0,0,yinc<<1,
 						1,

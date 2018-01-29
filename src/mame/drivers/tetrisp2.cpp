@@ -1367,7 +1367,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(tetrisp2_state::nndmseal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(nndmseal_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
 
@@ -1392,7 +1392,7 @@ MACHINE_CONFIG_START(tetrisp2_state::nndmseal)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_2MHz, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(2'000'000), PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

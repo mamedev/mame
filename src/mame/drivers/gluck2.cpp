@@ -199,8 +199,8 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_10MHz
-#define SND_CLOCK       XTAL_3_579545MHz
+#define MASTER_CLOCK    XTAL(10'000'000)
+#define SND_CLOCK       XTAL(3'579'545)
 
 
 class gluck2_state : public driver_device

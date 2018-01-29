@@ -98,11 +98,11 @@ uint32_t vt220_state::screen_update_vt220(screen_device &screen, bitmap_ind16 &b
 
 MACHINE_CONFIG_START(vt220_state::vt220)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8051, XTAL_11_0592MHz) // from schematic for earlier version
+	MCFG_CPU_ADD("maincpu", I8051, XTAL(11'059'200)) // from schematic for earlier version
 	MCFG_CPU_PROGRAM_MAP(vt220_mem)
 	MCFG_CPU_IO_MAP(vt220_io)
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", MCS51_INT1_LINE))
 
 	/* video hardware */

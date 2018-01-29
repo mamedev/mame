@@ -287,9 +287,9 @@ Notes:
 //  CONSTANTS
 //**************************************************************************
 
-const uint32_t MASTER_CLOCK = XTAL_40MHz;
-const uint32_t SOUND_CLOCK = XTAL_16MHz;
-const uint32_t MASTER_CLOCK_25MHz = XTAL_25_1748MHz;
+const auto MASTER_CLOCK = XTAL(40'000'000);
+const auto SOUND_CLOCK = XTAL(16'000'000);
+const auto MASTER_CLOCK_25MHz = XTAL(25'174'800);
 
 //**************************************************************************
 //  PPI READ/WRITE CALLBACKS

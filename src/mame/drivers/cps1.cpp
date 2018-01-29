@@ -3339,12 +3339,12 @@ MACHINE_START_MEMBER(cps_state,qsound)
 MACHINE_CONFIG_START(cps_state::cps1_10MHz)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz )    /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000) )    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cps_state, cps1_int_ack)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)  /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,cps1)
@@ -3367,13 +3367,13 @@ MACHINE_CONFIG_START(cps_state::cps1_10MHz)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("2151", XTAL_3_579545MHz)  /* verified on pcb */
+	MCFG_YM2151_ADD("2151", XTAL(3'579'545))  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
 	/* CPS PPU is fed by a 16mhz clock,pin 117 outputs a 4mhz clock which is divided by 4 using 2 74ls74 */
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4/4, PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/4/4, PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
@@ -3390,7 +3390,7 @@ MACHINE_CONFIG_DERIVED(cps_state::cps1_12MHz, cps1_10MHz)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_12MHz )    /* verified on pcb */
+	MCFG_CPU_CLOCK( XTAL(12'000'000) )    /* verified on pcb */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(cps_state::pang3, cps1_12MHz)
@@ -3411,12 +3411,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(cps_state::qsound, cps1_12MHz)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_12MHz )    /* verified on pcb */
+	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(12'000'000) )    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(qsound_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cps_state, cps1_int_ack)
 
-	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL_8MHz)  /* verified on pcb */
+	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(qsound_decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cps_state, irq0_line_hold, 250) // measured (cps2.c)
@@ -10529,11 +10529,10 @@ ROM_START( wof )
 ROM_END
 
 /* B-Board 91635B-2 */
-/* FIXME Probably this set uses a patched program ROM coming from a desuicided board, or simply the original C-Board
-   is not a 92641C-1. A verification and a new fresh dump are needed to confirm if it's genuine or not. */
+/* Dumped from 2 different sets. Dumper's note for the second set: 'the c board was unmodified b21 with dead battery' */
 ROM_START( wofr1 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "tk2e_23b.8f", 0x000000, 0x80000, CRC(11fb2ed1) SHA1(19e09ad6f9edc7997b030cddfe1d9c96d88135f2) )  // patched?
+	ROM_LOAD16_WORD_SWAP( "tk2e_23b.8f", 0x000000, 0x80000, CRC(11fb2ed1) SHA1(19e09ad6f9edc7997b030cddfe1d9c96d88135f2) )
 	ROM_LOAD16_WORD_SWAP( "tk2e_22b.7f", 0x080000, 0x80000, CRC(479b3f24) SHA1(9fb8ae06856fe115addfb6794c28978a4f6716ec) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )

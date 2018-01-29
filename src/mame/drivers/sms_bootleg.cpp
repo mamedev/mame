@@ -273,7 +273,7 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635)/3)
 	MCFG_CPU_PROGRAM_MAP(sms_supergame_map)
 	MCFG_CPU_IO_MAP(sms_supergame_io)
 
@@ -285,14 +285,14 @@ MACHINE_CONFIG_START(smsbootleg_state::sms_supergame)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("segapsg", SEGAPSG, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ADD("segapsg", SEGAPSG, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
+	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH - 2, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256 + 10, \
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
-	MCFG_SCREEN_REFRESH_RATE((double) XTAL_10_738635MHz/2 / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
+	MCFG_SCREEN_REFRESH_RATE(XTAL(10'738'635)/2 / (sega315_5124_device::WIDTH * sega315_5124_device::HEIGHT_NTSC))
 	MCFG_SCREEN_UPDATE_DRIVER(sms_state, screen_update_sms)
 
 	MCFG_DEVICE_ADD("sms_vdp", SEGA315_5246, 0)

@@ -867,7 +867,7 @@ uint32_t systeme_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 }
 
 MACHINE_CONFIG_START(systeme_state::systeme)
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -876,7 +876,7 @@ MACHINE_CONFIG_START(systeme_state::systeme)
 	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
+	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 192)
 	MCFG_SCREEN_UPDATE_DRIVER(systeme_state, screen_update)
@@ -893,10 +893,10 @@ MACHINE_CONFIG_START(systeme_state::systeme)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SEGAPSG, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ADD("sn1", SEGAPSG, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SEGAPSG, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ADD("sn2", SEGAPSG, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -922,14 +922,14 @@ MACHINE_CONFIG_DERIVED(systeme_state::ridleofp, systeme)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(systeme_state::systemex, systeme)
-	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
+	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(systeme_state::systemex_315_5177, systeme)
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5177, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5177, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -937,7 +937,7 @@ MACHINE_CONFIG_DERIVED(systeme_state::systemex_315_5177, systeme)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(systeme_state::systemeb, systeme)
-	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
+	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map)

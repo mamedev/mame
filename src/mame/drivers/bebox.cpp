@@ -158,7 +158,7 @@ MACHINE_CONFIG_START(bebox_state::bebox)
 	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("kbdc", kbdc8042_device, write_out2))
 
-	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL(14'318'181)/3 )
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(bebox_state, bebox_dma_hrq_changed))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(bebox_state, bebox_dma8237_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(bebox_state, bebox_dma_read_byte))
@@ -170,7 +170,7 @@ MACHINE_CONFIG_START(bebox_state::bebox)
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(bebox_state, pc_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(bebox_state, pc_dack3_w))
 
-	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL(14'318'181)/3 )
 
 	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(bebox_state, bebox_pic8259_master_set_int_line))
@@ -188,9 +188,9 @@ MACHINE_CONFIG_START(bebox_state::bebox)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
-	
+
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
 
@@ -227,7 +227,7 @@ MACHINE_CONFIG_START(bebox_state::bebox)
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8237_1", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("smc37c78:0", bebox_floppies, "35hd", bebox_state::floppy_formats)
 
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
 
 	MCFG_DEVICE_ADD("kbdc", KBDC8042, 0)
 	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_STANDARD)

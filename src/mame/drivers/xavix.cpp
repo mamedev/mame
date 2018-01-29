@@ -52,7 +52,7 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_21_4772MHz
+#define MAIN_CLOCK XTAL(21'477'272)
 
 class xavix_state : public driver_device
 {

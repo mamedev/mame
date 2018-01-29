@@ -20,7 +20,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK         XTAL_14_31818MHz
+#define MASTER_CLOCK         XTAL(14'318'181)
 
 
 DEFINE_DEVICE_TYPE(TIMEPLT_AUDIO, timeplt_audio_device, "timplt_audio", "Time Pilot Audio")
@@ -29,6 +29,7 @@ timeplt_audio_device::timeplt_audio_device(const machine_config &mconfig, const 
 	: device_t(mconfig, TIMEPLT_AUDIO, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_soundcpu(*this, "tpsound")
+	, m_soundlatch(*this, "soundlatch")
 	, m_filter_0(*this, "filter.0.%u", 0)
 	, m_filter_1(*this, "filter.1.%u", 0)
 	, m_last_irq_state(0)
@@ -118,6 +119,12 @@ WRITE8_MEMBER( timeplt_audio_device::filter_w )
  *
  *************************************/
 
+WRITE8_MEMBER(timeplt_audio_device::sound_data_w)
+{
+	m_soundlatch->write(space, 0, data);
+}
+
+
 WRITE_LINE_MEMBER(timeplt_audio_device::sh_irqtrigger_w)
 {
 	if (m_last_irq_state == 0 && state)
@@ -181,8 +188,10 @@ MACHINE_CONFIG_START(timeplt_audio_device::timeplt_sound)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("^soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(timeplt_audio_device, portB_r))
 	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.60)
 	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.60)

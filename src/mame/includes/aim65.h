@@ -29,7 +29,7 @@
  * crystal controlled oscillator. Dual D-type flip-flop Z10 divides the 4 MHz
  * signal by four to drive the R6502 phase 0 (O0) input with a 1 MHz clock.
  */
-#define AIM65_CLOCK  XTAL_4MHz/4
+#define AIM65_CLOCK  XTAL(4'000'000)/4
 
 
 class aim65_state : public driver_device

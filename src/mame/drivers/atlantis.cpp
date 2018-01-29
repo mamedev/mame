@@ -854,13 +854,13 @@ MACHINE_CONFIG_START(atlantis_state::mwskins)
 	}
 
 	// TL16C552 UART
-	MCFG_DEVICE_ADD("uart1", NS16550, XTAL_24MHz)
+	MCFG_DEVICE_ADD("uart1", NS16550, XTAL(24'000'000))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("com1", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("com1", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("com1", rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(":", atlantis_state, duart_irq_callback))
 
-	MCFG_DEVICE_ADD("uart2", NS16550, XTAL_24MHz)
+	MCFG_DEVICE_ADD("uart2", NS16550, XTAL(24'000'000))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("com2", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("com2", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("com2", rs232_port_device, write_rts))

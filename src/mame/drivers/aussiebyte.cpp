@@ -443,7 +443,7 @@ MACHINE_RESET_MEMBER( aussiebyte_state, aussiebyte )
 
 MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(aussiebyte_map)
 	MCFG_CPU_IO_MAP(aussiebyte_io)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
@@ -474,12 +474,12 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_4_9152MHz / 4)
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(4'915'200) / 4)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg0))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg1))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE("sio1", z80sio_device, rxca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio1", z80sio_device, txca_w))
@@ -489,7 +489,7 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(aussiebyte_state, ctc_z2_w))    // SIO2 Ch B, CTC Ch 3
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("sio2", z80sio_device, rxtxcb_w))
 
-	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL(16'000'000) / 4)
 	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(aussiebyte_state, busreq_w))
 	// BAO, not used
@@ -498,22 +498,22 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_Z80DMA_IN_IORQ_CB(READ8(aussiebyte_state, io_read_byte))
 	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(aussiebyte_state, io_write_byte))
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("pio1", Z80PIO, XTAL(16'000'000) / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
 	MCFG_Z80PIO_OUT_ARDY_CB(DEVWRITELINE("centronics", centronics_device, write_strobe)) MCFG_DEVCB_INVERT
 
-	MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL(16'000'000) / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(aussiebyte_state, port20_w))
 
-	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("sio1", Z80SIO, XTAL(16'000'000) / 4)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_WRDYA_CB(WRITELINE(aussiebyte_state, sio1_rdya_w))
 	MCFG_Z80SIO_OUT_WRDYB_CB(WRITELINE(aussiebyte_state, sio1_rdyb_w))
 
-	MCFG_DEVICE_ADD("sio2", Z80SIO, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("sio2", Z80SIO, XTAL(16'000'000) / 4)
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_WRDYA_CB(WRITELINE(aussiebyte_state, sio2_rdya_w))
 	MCFG_Z80SIO_OUT_WRDYB_CB(WRITELINE(aussiebyte_state, sio2_rdyb_w))
@@ -524,7 +524,7 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("sio2", z80sio_device, rxa_w))
 
-	MCFG_WD2797_ADD("fdc", XTAL_16MHz / 16)
+	MCFG_WD2797_ADD("fdc", XTAL(16'000'000) / 16)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(aussiebyte_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(aussiebyte_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", aussiebyte_floppies, "525qd", floppy_image_device::default_floppy_formats)
@@ -533,13 +533,13 @@ MACHINE_CONFIG_START(aussiebyte_state::aussiebyte)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_16MHz / 8)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL(16'000'000) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(aussiebyte_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(aussiebyte_state, crtc_update_addr)
 
-	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
+	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
 MACHINE_CONFIG_END
 
 

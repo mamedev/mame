@@ -74,12 +74,12 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(adam_spi_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL_4MHz)
+	MCFG_CPU_ADD(M6801_TAG, M6801, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(adam_spi_mem)
 	MCFG_CPU_IO_MAP(adam_spi_io)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_DEVICE_ADD(MC2661_TAG, MC2661, XTAL_4_9152MHz)
+	MCFG_DEVICE_ADD(MC2661_TAG, MC2661, XTAL(4'915'200))
 
 	MCFG_RS232_PORT_ADD(RS232_TAG, default_rs232_devices, nullptr)
 

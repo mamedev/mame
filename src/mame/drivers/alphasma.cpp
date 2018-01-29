@@ -422,7 +422,7 @@ void alphasmart_state::machine_reset()
 
 MACHINE_CONFIG_START(alphasmart_state::alphasmart)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC68HC11, XTAL_8MHz/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
+	MCFG_CPU_ADD("maincpu", MC68HC11, XTAL(8'000'000)/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
 	MCFG_CPU_PROGRAM_MAP(alphasmart_mem)
 	MCFG_CPU_IO_MAP(alphasmart_io)
 	MCFG_MC68HC11_CONFIG(0, 192, 0x00)

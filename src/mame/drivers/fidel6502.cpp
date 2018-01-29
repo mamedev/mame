@@ -158,13 +158,14 @@ All three of the above are called "segment H".
 
 ******************************************************************************
 
-Super 9 Sensory Chess Challenger (SU9)
+Super 9 Sensory Chess Challenger (SU9/DS9)
 This is basically the Fidelity Elite A/S program on CSC hardware.
+Model DS9(Deluxe) has a 5MHz XTAL, but is otherwise same.
 ---------------------------------
 
-R6502AP CPU, assume 2MHz
-1 RAM chip, assume 4KB
-2*8KB ROM + 1*2KB ROM (+another 8KB ROM?)
+R6502AP CPU, 1.95MHz(3.9MHz resonator)
+2 RAM chips, assume 4KB
+2*8KB ROM + 1*2KB ROM
 built-in CB9 module
 
 See CSC description above for more information.
@@ -493,6 +494,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(csc_pia1_cb2_w);
 	DECLARE_READ_LINE_MEMBER(csc_pia1_ca1_r);
 	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
+	DECLARE_MACHINE_RESET(su9);
+	DECLARE_INPUT_CHANGED_MEMBER(su9_cpu_freq);
+	void su9_set_cpu_freq();
 	void csc(machine_config &config);
 	void su9(machine_config &config);
 	void rsc(machine_config &config);
@@ -594,6 +598,18 @@ void fidel6502_state::csc_prepare_display()
 READ8_MEMBER(fidel6502_state::csc_speech_r)
 {
 	return m_speech_rom[m_speech_bank << 12 | offset];
+}
+
+void fidel6502_state::su9_set_cpu_freq()
+{
+	// SU9 CPU is clocked 1.95MHz, DS9 is 2.5MHz
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (5_MHz_XTAL/2) : (3.9_MHz_XTAL/2));
+}
+
+MACHINE_RESET_MEMBER(fidel6502_state, su9)
+{
+	fidelbase_state::machine_reset();
+	su9_set_cpu_freq();
 }
 
 
@@ -1350,7 +1366,17 @@ static INPUT_PORTS_START( su9 )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("LV / Rook")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("PV / Queen")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("PB / King")
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x01, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, fidel6502_state, su9_cpu_freq, nullptr) // factory set
+	PORT_CONFSETTING(    0x00, "1.95MHz (SU9)" )
+	PORT_CONFSETTING(    0x01, "2.5MHz (DS9)" )
 INPUT_PORTS_END
+
+INPUT_CHANGED_MEMBER(fidel6502_state::su9_cpu_freq)
+{
+	su9_set_cpu_freq();
+}
 
 static INPUT_PORTS_START( su9sp )
 	PORT_INCLUDE( su9 )
@@ -1639,7 +1665,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::csc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_9MHz/2) // from 3.9MHz resonator
+	MCFG_CPU_ADD("maincpu", M6502, 3.9_MHz_XTAL/2) // from 3.9MHz resonator
 	MCFG_CPU_PROGRAM_MAP(csc_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // 38400kHz/64
 
@@ -1678,13 +1704,15 @@ MACHINE_CONFIG_DERIVED(fidel6502_state::su9, csc)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(su9_map)
 
+	MCFG_MACHINE_RESET_OVERRIDE(fidel6502_state, su9)
+
 	MCFG_DEFAULT_LAYOUT(layout_fidel_su9)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::eas)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, XTAL_3MHz)
+	MCFG_CPU_ADD("maincpu", R65C02, 3_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(eas_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
@@ -1719,7 +1747,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(fidel6502_state::eag, eas)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_5MHz) // R65C02P4
+	MCFG_CPU_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
 	MCFG_CPU_PROGRAM_MAP(eag_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 
@@ -1729,7 +1757,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::sc9d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_3_9MHz/2) // R6502AP, 3.9MHz resonator
+	MCFG_CPU_ADD("maincpu", M6502, 3.9_MHz_XTAL/2) // R6502AP, 3.9MHz resonator
 	MCFG_CPU_PROGRAM_MAP(sc9d_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(610)) // from 555 timer (22nF, 102K, 2.7K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(610) - attotime::from_usec(41)) // active for 41us
@@ -1776,13 +1804,13 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::sc12)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, XTAL_3MHz) // R65C02P3
+	MCFG_CPU_ADD("maincpu", R65C02, 3_MHz_XTAL) // R65C02P3
 	MCFG_CPU_PROGRAM_MAP(sc12_trampoline)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nF, 102K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(XTAL_3MHz)) // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(3_MHz_XTAL)) // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
 
 	MCFG_DEVICE_ADD("sc12_map", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(sc12_map)
@@ -1810,7 +1838,7 @@ MACHINE_CONFIG_DERIVED(fidel6502_state::sc12b, sc12)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL_4MHz) // R65C02P4
+	MCFG_DEVICE_CLOCK(4_MHz_XTAL) // R65C02P4
 
 	// change irq timer frequency
 	MCFG_DEVICE_REMOVE("irq_on")
@@ -1820,13 +1848,13 @@ MACHINE_CONFIG_DERIVED(fidel6502_state::sc12b, sc12)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(596))
 
 	MCFG_DEVICE_REMOVE("dummy_timer")
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(XTAL_4MHz)) // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("dummy_timer", fidel6502_state, dummy, attotime::from_hz(4_MHz_XTAL)) // MCFG_QUANTUM_PERFECT_CPU("maincpu") didn't work
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fexcel)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, XTAL_12MHz/4) // G65SC102P-3, 12.0M ceramic resonator
+	MCFG_CPU_ADD("maincpu", M65SC02, 12_MHz_XTAL/4) // G65SC102P-3, 12.0M ceramic resonator
 	MCFG_CPU_PROGRAM_MAP(fexcel_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nF, 102K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
@@ -1845,7 +1873,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(fidel6502_state::fexcel4, fexcel)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_4MHz) // R65C02P4
+	MCFG_CPU_REPLACE("maincpu", R65C02, 4_MHz_XTAL) // R65C02P4
 	MCFG_CPU_PROGRAM_MAP(fexcel_map)
 MACHINE_CONFIG_END
 
@@ -1859,7 +1887,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(fidel6502_state::fexcelp, fexcel)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_5MHz) // R65C02P4
+	MCFG_CPU_REPLACE("maincpu", R65C02, 5_MHz_XTAL) // R65C02P4
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
@@ -1867,13 +1895,13 @@ MACHINE_CONFIG_DERIVED(fidel6502_state::granits, fexcelp)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL_8MHz) // overclocked
+	MCFG_DEVICE_CLOCK(8_MHz_XTAL) // overclocked
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(fidel6502_state::fdes2100, fexcel)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M65C02, XTAL_5MHz) // WDC 65C02
+	MCFG_CPU_REPLACE("maincpu", M65C02, 5_MHz_XTAL) // WDC 65C02
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 
 	// change irq timer frequency
@@ -1889,7 +1917,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(fidel6502_state::fdes2000, fdes2100)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_3MHz) // RP65C02G
+	MCFG_CPU_REPLACE("maincpu", R65C02, 3_MHz_XTAL) // RP65C02G
 	MCFG_CPU_PROGRAM_MAP(fexcelp_map)
 MACHINE_CONFIG_END
 
@@ -1910,7 +1938,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::fdes2100d)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL_6MHz) // W65C02P-6
+	MCFG_CPU_ADD("maincpu", M65C02, 6_MHz_XTAL) // W65C02P-6
 	MCFG_CPU_PROGRAM_MAP(fdesdis_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nF, 102K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
@@ -1929,14 +1957,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(fidel6502_state::fdes2000d, fdes2100d)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_3MHz) // R65C02P3
+	MCFG_CPU_REPLACE("maincpu", R65C02, 3_MHz_XTAL) // R65C02P3
 	MCFG_CPU_PROGRAM_MAP(fdesdis_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(fidel6502_state::fphantom)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, XTAL_4_9152MHz) // R65C02P4
+	MCFG_CPU_ADD("maincpu", R65C02, 4.9152_MHz_XTAL) // R65C02P4
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidel6502_state, irq0_line_hold, 600) // guessed
 	MCFG_CPU_PROGRAM_MAP(fphantom_map)
 
@@ -1955,7 +1983,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(fidel6502_state::chesster)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, XTAL_5MHz) // RP65C02G
+	MCFG_CPU_ADD("maincpu", R65C02, 5_MHz_XTAL) // RP65C02G
 	MCFG_CPU_PROGRAM_MAP(chesster_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(9615)) // R/C circuit, measured
 	MCFG_TIMER_START_DELAY(attotime::from_hz(9615) - attotime::from_nsec(2600)) // active for 2.6us
@@ -1976,7 +2004,7 @@ MACHINE_CONFIG_DERIVED(fidel6502_state::kishon, chesster)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL_3_579545MHz)
+	MCFG_DEVICE_CLOCK(3.579545_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(kishon_map)
 MACHINE_CONFIG_END
 

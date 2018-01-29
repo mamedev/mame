@@ -211,9 +211,6 @@ a2bus_aevm80_device::a2bus_aevm80_device(const machine_config &mconfig, const ch
 
 void a2bus_videx80_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(VIDEOTERM_ROM_REGION).c_str())->base();
 
 	m_chrrom = device().machine().root_device().memregion(this->subtag(VIDEOTERM_GFX_REGION).c_str())->base();

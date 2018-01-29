@@ -6,8 +6,8 @@
 #define VERBOSE 0
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
-#define M1_MASTER_CLOCK (XTAL_8MHz)
-#define M1_DUART_CLOCK  (XTAL_3_6864MHz)
+#define M1_MASTER_CLOCK (XTAL(8'000'000))
+#define M1_DUART_CLOCK  (XTAL(3'686'400))
 
 #include "cpu/m6809/m6809.h"
 #include "machine/i8279.h"

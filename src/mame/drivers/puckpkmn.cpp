@@ -51,7 +51,7 @@ Notes:
 #include "sound/2612intf.h"
 
 #include "includes/megadriv.h"
-#include "includes/megadrvb.h"
+#include "includes/megadriv_acbl.h"
 
 /* Puckman Pockimon Input Ports */
 static INPUT_PORTS_START( puckpkmn )
@@ -285,7 +285,7 @@ MACHINE_CONFIG_START(md_boot_state::puckpkmn)
 
 	MCFG_DEVICE_REMOVE("genesis_snd_z80")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz / 4, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000) / 4, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
 MACHINE_CONFIG_END

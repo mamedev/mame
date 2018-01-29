@@ -881,9 +881,9 @@ S11 S13 S15 S17  |EPR12194 -        -        -        EPR12195 -        -       
 //  CONSTANTS
 //**************************************************************************
 
-#define MASTER_CLOCK_10MHz              XTAL_10MHz
-#define MASTER_CLOCK_8MHz               XTAL_8MHz
-#define MASTER_CLOCK_25MHz              XTAL_25_1748MHz
+#define MASTER_CLOCK_10MHz              XTAL(10'000'000)
+#define MASTER_CLOCK_8MHz               XTAL(8'000'000)
+#define MASTER_CLOCK_25MHz              XTAL(25'174'800)
 
 
 
@@ -3878,11 +3878,11 @@ MACHINE_CONFIG_DERIVED(segas16b_state::fpointbla, fpointbl)
 MACHINE_CONFIG_START(segas16b_state::lockonph)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) // ?
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) // ?
 	MCFG_CPU_PROGRAM_MAP(lockonph_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16b_state, irq4_line_hold)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_16MHz/4) // ?
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(16'000'000)/4) // ?
 	MCFG_CPU_PROGRAM_MAP(lockonph_sound_map)
 	MCFG_CPU_IO_MAP(lockonph_sound_iomap)
 
@@ -3909,12 +3909,12 @@ MACHINE_CONFIG_START(segas16b_state::lockonph)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4) // ??
+	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4) // ??
 //  MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0)) // does set up the timer, but end up with no sound?
 	MCFG_SOUND_ROUTE(0, "mono", 0.5)
 	MCFG_SOUND_ROUTE(1, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_LOW) // clock / pin not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_LOW) // clock / pin not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.2)
 
@@ -3935,7 +3935,7 @@ MACHINE_CONFIG_DERIVED(segas16b_state::atomicp, system16b) // 10MHz CPU Clock ve
 	// sound hardware
 	MCFG_DEVICE_REMOVE("soundlatch")
 	MCFG_DEVICE_REMOVE("ym2151")
-	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_20MHz/4) // 20MHz OSC divided by 4 (verified)
+	MCFG_SOUND_ADD("ym2413", YM2413, XTAL(20'000'000)/4) // 20MHz OSC divided by 4 (verified)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_REMOVE("upd")

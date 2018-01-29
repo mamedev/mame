@@ -478,7 +478,7 @@ MACHINE_START_MEMBER( exelv_state, exeltel)
 MACHINE_CONFIG_START(exelv_state::exl100)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS7020_EXL, XTAL_4_9152MHz)
+	MCFG_CPU_ADD("maincpu", TMS7020_EXL, XTAL(4'915'200))
 	MCFG_CPU_PROGRAM_MAP(tms7020_mem)
 	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7020_porta_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7020_portb_w))
@@ -486,7 +486,7 @@ MACHINE_CONFIG_START(exelv_state::exl100)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exl100)
 
-	MCFG_CPU_ADD("tms7041", TMS7041, XTAL_4_9152MHz)
+	MCFG_CPU_ADD("tms7041", TMS7041, XTAL(4'915'200))
 	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7041_porta_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7041_portb_w))
 	MCFG_TMS7000_IN_PORTC_CB(READ8(exelv_state, tms7041_portc_r))
@@ -534,7 +534,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(exelv_state::exeltel)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS7040, XTAL_4_9152MHz)
+	MCFG_CPU_ADD("maincpu", TMS7040, XTAL(4'915'200))
 	MCFG_CPU_PROGRAM_MAP(tms7040_mem)
 	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7020_porta_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7020_portb_w))
@@ -542,7 +542,7 @@ MACHINE_CONFIG_START(exelv_state::exeltel)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exeltel)
 
-	MCFG_CPU_ADD("tms7042", TMS7042, XTAL_4_9152MHz)
+	MCFG_CPU_ADD("tms7042", TMS7042, XTAL(4'915'200))
 	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7041_porta_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7041_portb_w))
 	MCFG_TMS7000_IN_PORTC_CB(READ8(exelv_state, tms7041_portc_r))
