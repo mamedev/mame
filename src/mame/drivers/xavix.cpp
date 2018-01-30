@@ -87,7 +87,7 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 
 static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("bios", 0x00f000)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("bios", 0x00c000)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( xavix )

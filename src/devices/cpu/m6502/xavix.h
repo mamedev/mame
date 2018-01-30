@@ -26,7 +26,8 @@ protected:
 #define O(o) void o ## _full(); void o ## _partial()
 
 	// xaviv opcodes
-	O(xav_xa3);
+	O(callf_xa3);
+	O(retf_imp);
 
 #undef O
 };
