@@ -14,6 +14,7 @@ TODO:
 - PCI hookups (no idea about what this uses), and improve/device-ify SiS85C49x;
 - ISA bus cards are completely guessworked;
 - EEPROM (most likely at i/o 0x200);
+- Eventually needs AudioDrive ES688 / ES1688 / ES1788 & ES1868 devices and serial ports "for linking" before actually booting;
 
 
 *******************************************************************************************************/
