@@ -132,12 +132,12 @@ public:
 	DECLARE_DRIVER_INIT(rad_skat);
 
 	uint32_t screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	INTERRUPT_GEN_MEMBER(vii_vblank);
-	
+
 	TIMER_CALLBACK_MEMBER(tmb1_tick);
 	TIMER_CALLBACK_MEMBER(tmb2_tick);
-	
+
 	void spg2xx_base(machine_config &config);
 	void spg2xx_basep(machine_config &config);
 	void batman(machine_config &config);
@@ -150,7 +150,7 @@ protected:
 	uint32_t m_centered_coordinates; // this must be a vreg?
 	void test_centered(uint8_t *ROM);
 
-	typedef delegate<uint16_t (uint16_t, int)> vii_io_rw_delegate;
+	typedef delegate<uint16_t(uint16_t, int)> vii_io_rw_delegate;
 	vii_io_rw_delegate   m_vii_io_rw;
 private:
 
@@ -166,7 +166,7 @@ private:
 	{
 		uint8_t r, g, b;
 	}
-	m_screenram[320*240];
+	m_screenram[320 * 240];
 
 	uint16_t m_io_regs[0x200];
 	uint16_t m_uart_rx_count;
@@ -184,7 +184,7 @@ private:
 	void blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t bitmap_addr, uint16_t *regs);
 	void blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, uint32_t base_addr);
 	void blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth);
-	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
+	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3, 4);
 	inline uint8_t expand_rgb5_to_rgb8(uint8_t val);
 	inline uint8_t mix_channel(uint8_t a, uint8_t b);
 	void mix_pixel(uint32_t offset, uint16_t rgb);
@@ -244,13 +244,13 @@ private:
 inline void spg2xx_game_state::verboselog(int n_level, const char *s_fmt, ...)
 {
 #if ENABLE_VERBOSE_LOG
-	if( VERBOSE_LEVEL >= n_level )
+	if (VERBOSE_LEVEL >= n_level)
 	{
 		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsprintf( buf, s_fmt, v );
-		va_end( v );
+		char buf[32768];
+		va_start(v, s_fmt);
+		vsprintf(buf, s_fmt, v);
+		va_end(v);
 	}
 #endif
 }
@@ -306,23 +306,23 @@ void spg2xx_game_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, ui
 	palette_offset >>= nc;
 	palette_offset <<= nc;
 
-	uint32_t m = bitmap_addr + nc*w*h/16*tile;
+	uint32_t m = bitmap_addr + nc * w*h / 16 * tile;
 	uint32_t bits = 0;
 	uint32_t nbits = 0;
 
 	uint32_t x, y;
 
-	for(y = 0; y < h; y++)
+	for (y = 0; y < h; y++)
 	{
 		uint32_t yy = (yoff + (y ^ yflipmask)) & 0x1ff;
 
-		for(x = 0; x < w; x++)
+		for (x = 0; x < w; x++)
 		{
 			uint32_t xx = (xoff + (x ^ xflipmask)) & 0x1ff;
 			uint32_t pal;
 
 			bits <<= nc;
-			if(nbits < nc)
+			if (nbits < nc)
 			{
 				uint16_t b = space.read_word(m++ & 0x3fffff);
 				b = (b << 8) | (b >> 8);
@@ -334,23 +334,23 @@ void spg2xx_game_state::blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, ui
 			pal = palette_offset | (bits >> 16);
 			bits &= 0xffff;
 
-			if((ctrl & 0x0010) && yy < 240)
+			if ((ctrl & 0x0010) && yy < 240)
 			{
 				xx = (xx - (int16_t)m_p_rowscroll[yy]) & 0x01ff;
 			}
 
-			if(xx < 320 && yy < 240)
+			if (xx < 320 && yy < 240)
 			{
 				uint16_t rgb = m_p_palette[pal];
-				if(!(rgb & 0x8000))
+				if (!(rgb & 0x8000))
 				{
 					if (attr & 0x4000)
 					{
-						mix_pixel(xx + 320*yy, rgb);
+						mix_pixel(xx + 320 * yy, rgb);
 					}
 					else
 					{
-						set_pixel(xx + 320*yy, rgb);
+						set_pixel(xx + 320 * yy, rgb);
 					}
 				}
 			}
@@ -370,12 +370,12 @@ void spg2xx_game_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	uint32_t h, w, hn, wn;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	if(!(ctrl & PAGE_ENABLE_MASK))
+	if (!(ctrl & PAGE_ENABLE_MASK))
 	{
 		return;
 	}
 
-	if(((attr & PAGE_DEPTH_FLAG_MASK) >> PAGE_DEPTH_FLAG_SHIFT) != depth)
+	if (((attr & PAGE_DEPTH_FLAG_MASK) >> PAGE_DEPTH_FLAG_SHIFT) != depth)
 	{
 		return;
 	}
@@ -386,21 +386,21 @@ void spg2xx_game_state::blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	hn = 256 / h;
 	wn = 512 / w;
 
-	for(y0 = 0; y0 < hn; y0++)
+	for (y0 = 0; y0 < hn; y0++)
 	{
-		for(x0 = 0; x0 < wn; x0++)
+		for (x0 = 0; x0 < wn; x0++)
 		{
 			uint16_t tile = space.read_word(tilemap + x0 + wn * y0);
 			uint16_t palette = 0;
 			uint32_t xx, yy;
 
-			if(!tile)
+			if (!tile)
 			{
 				continue;
 			}
 
 			palette = space.read_word(palette_map + (x0 + wn * y0) / 2);
-			if(x0 & 1)
+			if (x0 & 1)
 			{
 				palette >>= 8;
 			}
@@ -440,17 +440,17 @@ void spg2xx_game_state::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &clipr
 	y = space.read_word(base_addr + 2);
 	attr = space.read_word(base_addr + 3);
 
-	if(!tile)
+	if (!tile)
 	{
 		return;
 	}
 
-	if(((attr & PAGE_DEPTH_FLAG_MASK) >> PAGE_DEPTH_FLAG_SHIFT) != depth)
+	if (((attr & PAGE_DEPTH_FLAG_MASK) >> PAGE_DEPTH_FLAG_SHIFT) != depth)
 	{
 		return;
 	}
 
-	if(m_centered_coordinates)
+	if (m_centered_coordinates)
 	{
 		x = 160 + x;
 		y = 120 - y;
@@ -458,8 +458,8 @@ void spg2xx_game_state::blit_sprite(bitmap_rgb32 &bitmap, const rectangle &clipr
 		h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 		w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
-		x -= (w/2);
-		y -= (h/2) - 8;
+		x -= (w / 2);
+		y -= (h / 2) - 8;
 	}
 
 	x &= 0x01ff;
@@ -477,11 +477,11 @@ void spg2xx_game_state::blit_sprites(bitmap_rgb32 &bitmap, const rectangle &clip
 		return;
 	}
 
-	for(n = 0; n < 256; n++)
+	for (n = 0; n < 256; n++)
 	{
 		//if(space.read_word(0x2c00 + 4*n)
 		{
-			blit_sprite(bitmap, cliprect, depth, 0x2c00 + 4*n);
+			blit_sprite(bitmap, cliprect, depth, 0x2c00 + 4 * n);
 		}
 	}
 }
@@ -494,18 +494,18 @@ uint32_t spg2xx_game_state::screen_update_vii(screen_device &screen, bitmap_rgb3
 
 	memset(m_screenram, 0, sizeof(m_screenram));
 
-	for(i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++)
 	{
 		blit_page(bitmap, cliprect, i, 0x40 * m_video_regs[0x20], m_video_regs + 0x10);
 		blit_page(bitmap, cliprect, i, 0x40 * m_video_regs[0x21], m_video_regs + 0x16);
 		blit_sprites(bitmap, cliprect, i);
 	}
 
-	for(y = 0; y < 240; y++)
+	for (y = 0; y < 240; y++)
 	{
-		for(x = 0; x < 320; x++)
+		for (x = 0; x < 320; x++)
 		{
-			bitmap.pix32(y, x) = (m_screenram[x + 320*y].r << 16) | (m_screenram[x + 320*y].g << 8) | m_screenram[x + 320*y].b;
+			bitmap.pix32(y, x) = (m_screenram[x + 320 * y].r << 16) | (m_screenram[x + 320 * y].g << 8) | m_screenram[x + 320 * y].b;
 		}
 	}
 
@@ -523,106 +523,106 @@ void spg2xx_game_state::do_dma(uint32_t len)
 	uint32_t dst = m_video_regs[0x71] + 0x2c00;
 	uint32_t j;
 
-	for(j = 0; j < len; j++)
+	for (j = 0; j < len; j++)
 	{
-		mem.write_word(dst+j, mem.read_word(src+j));
+		mem.write_word(dst + j, mem.read_word(src + j));
 	}
 
 	m_video_regs[0x72] = 0;
 	m_video_regs[0x63] |= 4;
 }
 
-READ16_MEMBER( spg2xx_game_state::video_r )
+READ16_MEMBER(spg2xx_game_state::video_r)
 {
-	switch(offset)
+	switch (offset)
 	{
-		case 0x62: // Video IRQ Enable
-			verboselog(0, "video_r: Video IRQ Enable: %04x\n", VII_VIDEO_IRQ_ENABLE);
-			return VII_VIDEO_IRQ_ENABLE;
+	case 0x62: // Video IRQ Enable
+		verboselog(0, "video_r: Video IRQ Enable: %04x\n", VII_VIDEO_IRQ_ENABLE);
+		return VII_VIDEO_IRQ_ENABLE;
 
-		case 0x63: // Video IRQ Status
-			verboselog(0, "video_r: Video IRQ Status: %04x\n", VII_VIDEO_IRQ_STATUS);
-			return VII_VIDEO_IRQ_STATUS;
+	case 0x63: // Video IRQ Status
+		verboselog(0, "video_r: Video IRQ Status: %04x\n", VII_VIDEO_IRQ_STATUS);
+		return VII_VIDEO_IRQ_STATUS;
 
-		default:
-			verboselog(0, "video_r: Unknown register %04x = %04x\n", 0x2800 + offset, m_video_regs[offset]);
-			break;
+	default:
+		verboselog(0, "video_r: Unknown register %04x = %04x\n", 0x2800 + offset, m_video_regs[offset]);
+		break;
 	}
 	return m_video_regs[offset];
 }
 
-WRITE16_MEMBER( spg2xx_game_state::video_w )
+WRITE16_MEMBER(spg2xx_game_state::video_w)
 {
-	switch(offset)
+	switch (offset)
 	{
-		case 0x10: case 0x16:   // page 1,2 X scroll
-			data &= 0x01ff;
-			COMBINE_DATA(&m_video_regs[offset]);
-			break;
+	case 0x10: case 0x16:   // page 1,2 X scroll
+		data &= 0x01ff;
+		COMBINE_DATA(&m_video_regs[offset]);
+		break;
 
-		case 0x11: case 0x17:   // page 1,2 Y scroll
-			data &= 0x00ff;
-			COMBINE_DATA(&m_video_regs[offset]);
-			break;
-		case 0x36:      // IRQ pos V
-		case 0x37:      // IRQ pos H
-			data &= 0x01ff;
-			COMBINE_DATA(&m_video_regs[offset]);
-			break;
-		case 0x62: // Video IRQ Enable
-			verboselog(0, "video_w: Video IRQ Enable = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&VII_VIDEO_IRQ_ENABLE);
-			break;
+	case 0x11: case 0x17:   // page 1,2 Y scroll
+		data &= 0x00ff;
+		COMBINE_DATA(&m_video_regs[offset]);
+		break;
+	case 0x36:      // IRQ pos V
+	case 0x37:      // IRQ pos H
+		data &= 0x01ff;
+		COMBINE_DATA(&m_video_regs[offset]);
+		break;
+	case 0x62: // Video IRQ Enable
+		verboselog(0, "video_w: Video IRQ Enable = %04x (%04x)\n", data, mem_mask);
+		COMBINE_DATA(&VII_VIDEO_IRQ_ENABLE);
+		break;
 
-		case 0x63: // Video IRQ Acknowledge
-			verboselog(0, "video_w: Video IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
-			VII_VIDEO_IRQ_STATUS &= ~data;
-			if(!VII_VIDEO_IRQ_STATUS)
-			{
-				m_maincpu->set_input_line(UNSP_IRQ0_LINE, CLEAR_LINE);
-			}
-			break;
+	case 0x63: // Video IRQ Acknowledge
+		verboselog(0, "video_w: Video IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
+		VII_VIDEO_IRQ_STATUS &= ~data;
+		if (!VII_VIDEO_IRQ_STATUS)
+		{
+			m_maincpu->set_input_line(UNSP_IRQ0_LINE, CLEAR_LINE);
+		}
+		break;
 
-		case 0x70: // Video DMA Source
-			verboselog(0, "video_w: Video DMA Source = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&m_video_regs[offset]);
-			break;
+	case 0x70: // Video DMA Source
+		verboselog(0, "video_w: Video DMA Source = %04x (%04x)\n", data, mem_mask);
+		COMBINE_DATA(&m_video_regs[offset]);
+		break;
 
-		case 0x71: // Video DMA Dest
-			verboselog(0, "video_w: Video DMA Dest = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&m_video_regs[offset]);
-			break;
+	case 0x71: // Video DMA Dest
+		verboselog(0, "video_w: Video DMA Dest = %04x (%04x)\n", data, mem_mask);
+		COMBINE_DATA(&m_video_regs[offset]);
+		break;
 
-		case 0x72: // Video DMA Length
-			verboselog(0, "video_w: Video DMA Length = %04x (%04x)\n", data, mem_mask);
-			do_dma(data);
-			break;
+	case 0x72: // Video DMA Length
+		verboselog(0, "video_w: Video DMA Length = %04x (%04x)\n", data, mem_mask);
+		do_dma(data);
+		break;
 
-		default:
-			verboselog(0, "video_w: Unknown register %04x = %04x (%04x)\n", 0x2800 + offset, data, mem_mask);
-			COMBINE_DATA(&m_video_regs[offset]);
-			break;
+	default:
+		verboselog(0, "video_w: Unknown register %04x = %04x (%04x)\n", 0x2800 + offset, data, mem_mask);
+		COMBINE_DATA(&m_video_regs[offset]);
+		break;
 	}
 }
 
-READ16_MEMBER( spg2xx_game_state::audio_r )
+READ16_MEMBER(spg2xx_game_state::audio_r)
 {
-	switch(offset)
+	switch (offset)
 	{
-		default:
-			verboselog(4, "audio_r: Unknown register %04x\n", 0x3000 + offset);
-			break;
+	default:
+		verboselog(4, "audio_r: Unknown register %04x\n", 0x3000 + offset);
+		break;
 	}
 	return 0;
 }
 
-WRITE16_MEMBER( spg2xx_game_state::audio_w )
+WRITE16_MEMBER(spg2xx_game_state::audio_w)
 {
-	switch(offset)
+	switch (offset)
 	{
-		default:
-			verboselog(4, "audio_w: Unknown register %04x = %04x (%04x)\n", 0x3000 + offset, data, mem_mask);
-			break;
+	default:
+		verboselog(4, "audio_w: Unknown register %04x = %04x (%04x)\n", 0x3000 + offset, data, mem_mask);
+		break;
 	}
 }
 
@@ -637,7 +637,7 @@ void spg2xx_game_state::switch_bank(uint32_t bank)
 
 uint16_t spg2xx_cart_state::do_spg243_vii_io(uint16_t what, int index)
 {
-	if(index == 1)
+	if (index == 1)
 	{
 		uint32_t bank = ((what & 0x80) >> 7) | ((what & 0x20) >> 4);
 		switch_bank(bank);
@@ -650,8 +650,6 @@ uint16_t spg2xx_cart_state::do_spg243_vsmile_io(uint16_t what, int index)
 	// TODO: find out how vsmile accesses these GPIO regs!
 	return what;
 }
-
-
 
 uint16_t spg2xx_game_state::do_spg243_batman_io(uint16_t what, int index)
 {
@@ -670,7 +668,9 @@ uint16_t spg2xx_game_state::do_spg243_batman_io(uint16_t what, int index)
 
 	if (index == 2)
 	{
+		// TODO: what is here?
 	}
+
 	return what;
 }
 
@@ -695,29 +695,29 @@ uint16_t spg2xx_game_state::do_spg240_rad_skat_io(uint16_t what, int index)
 
 uint16_t spg2xx_game_state::do_spg243_wireless60_io(uint16_t what, int index)
 {
-	if(index == 0)
+	if (index == 0)
 	{
-		switch(what & 0x300)
+		switch (what & 0x300)
 		{
-			case 0x300:
-				m_w60_controller_input = -1;
-				break;
+		case 0x300:
+			m_w60_controller_input = -1;
+			break;
 
-			case 0x200:
-				m_w60_controller_input++;
-				break;
+		case 0x200:
+			m_w60_controller_input++;
+			break;
 
-			default:
-				uint16_t temp1 = m_io_p1->read();
-				uint16_t temp2 = m_io_p2->read();
-				uint16_t temp3 = 1 << m_w60_controller_input;
-				if (temp1 & temp3) what ^= 0x400;
-				if (temp2 & temp3) what ^= 0x800;
-				break;
+		default:
+			uint16_t temp1 = m_io_p1->read();
+			uint16_t temp2 = m_io_p2->read();
+			uint16_t temp3 = 1 << m_w60_controller_input;
+			if (temp1 & temp3) what ^= 0x400;
+			if (temp2 & temp3) what ^= 0x800;
+			break;
 		}
 	}
 
-	if(index == 1)
+	if (index == 1)
 	{
 		uint32_t bank = (what & 7);
 		switch_bank(bank);
@@ -729,22 +729,22 @@ uint16_t spg2xx_game_state::do_spg243_wireless60_io(uint16_t what, int index)
 
 void spg2xx_game_state::do_gpio(uint32_t offset)
 {
-	uint32_t index  = (offset - 1) / 5;
-	uint16_t buffer = m_io_regs[5*index + 2];
-	uint16_t dir    = m_io_regs[5*index + 3];
-	uint16_t attr   = m_io_regs[5*index + 4];
-	uint16_t special= m_io_regs[5*index + 5];
+	uint32_t index = (offset - 1) / 5;
+	uint16_t buffer = m_io_regs[5 * index + 2];
+	uint16_t dir = m_io_regs[5 * index + 3];
+	uint16_t attr = m_io_regs[5 * index + 4];
+	uint16_t special = m_io_regs[5 * index + 5];
 
-	uint16_t push   = dir;
-	uint16_t pull   = (~dir) & (~attr);
-	uint16_t what   = (buffer & (push | pull));
+	uint16_t push = dir;
+	uint16_t pull = (~dir) & (~attr);
+	uint16_t what = (buffer & (push | pull));
 	what ^= (dir & ~attr);
 	what &= ~special;
 
 	if (!m_vii_io_rw.isnull())
 		what = m_vii_io_rw(what, index);
 
-	m_io_regs[5*index + 1] = what;
+	m_io_regs[5 * index + 1] = what;
 }
 
 void spg2xx_game_state::do_i2c()
@@ -759,13 +759,13 @@ void spg2xx_game_state::spg_do_dma(uint32_t len)
 	uint32_t dst = m_io_regs[0x103] & 0x3fff;
 	uint32_t j;
 
-	for(j = 0; j < len; j++)
-		mem.write_word(dst+j, mem.read_word(src+j));
+	for (j = 0; j < len; j++)
+		mem.write_word(dst + j, mem.read_word(src + j));
 
 	m_io_regs[0x102] = 0;
 }
 
-READ16_MEMBER( spg2xx_game_state::io_r )
+READ16_MEMBER(spg2xx_game_state::io_r)
 {
 	logerror("io_r %04x\n", offset);
 
@@ -774,210 +774,210 @@ READ16_MEMBER( spg2xx_game_state::io_r )
 
 	uint16_t val = m_io_regs[offset];
 
-	switch(offset)
+	switch (offset)
 	{
-		case 0x01: case 0x06: case 0x0b: // GPIO Data Port A/B/C
-			do_gpio(offset);
-			verboselog(3, "io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
-			val = m_io_regs[offset];
-			break;
+	case 0x01: case 0x06: case 0x0b: // GPIO Data Port A/B/C
+		do_gpio(offset);
+		verboselog(3, "io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
+		val = m_io_regs[offset];
+		break;
 
-		case 0x02: case 0x03: case 0x04: case 0x05:
-		case 0x07: case 0x08: case 0x09: case 0x0a:
-		case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Other GPIO regs
-			verboselog(3, "io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
-			break;
+	case 0x02: case 0x03: case 0x04: case 0x05:
+	case 0x07: case 0x08: case 0x09: case 0x0a:
+	case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Other GPIO regs
+		verboselog(3, "io_r: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], m_io_regs[offset], mem_mask);
+		break;
 
-		case 0x1c: // Random
-			val = machine().rand() & 0x00ff;
-			verboselog(3, "io_r: Random = %04x (%04x)\n", val, mem_mask);
-			break;
+	case 0x1c: // Random
+		val = machine().rand() & 0x00ff;
+		verboselog(3, "io_r: Random = %04x (%04x)\n", val, mem_mask);
+		break;
 
-		case 0x21: // IRQ Control
-			verboselog(3, "io_r: Controller IRQ Control = %04x (%04x)\n", val, mem_mask);
-			break;
+	case 0x21: // IRQ Control
+		verboselog(3, "io_r: Controller IRQ Control = %04x (%04x)\n", val, mem_mask);
+		break;
 
-		case 0x22: // IRQ Status
-			verboselog(3, "io_r: Controller IRQ Status = %04x (%04x)\n", val, mem_mask);
-			break;
+	case 0x22: // IRQ Status
+		verboselog(3, "io_r: Controller IRQ Status = %04x (%04x)\n", val, mem_mask);
+		break;
 
-		case 0x2b:
-			return 0x0000;
+	case 0x2b:
+		return 0x0000;
 
-		case 0x2c: case 0x2d: // Timers?
-			val = machine().rand() & 0x0000ffff;
-			verboselog(3, "io_r: Unknown Timer %d Register = %04x (%04x)\n", offset - 0x2c, val, mem_mask);
-			break;
+	case 0x2c: case 0x2d: // Timers?
+		val = machine().rand() & 0x0000ffff;
+		verboselog(3, "io_r: Unknown Timer %d Register = %04x (%04x)\n", offset - 0x2c, val, mem_mask);
+		break;
 
-		case 0x2f: // Data Segment
-			val = m_maincpu->state_int(UNSP_SR) >> 10;
-			verboselog(3, "io_r: Data Segment = %04x (%04x)\n", val, mem_mask);
-			break;
+	case 0x2f: // Data Segment
+		val = m_maincpu->state_int(UNSP_SR) >> 10;
+		verboselog(3, "io_r: Data Segment = %04x (%04x)\n", val, mem_mask);
+		break;
 
-		case 0x31: // Unknown, UART Status?
-			verboselog(3, "io_r: Unknown (UART Status?) = %04x (%04x)\n", 3, mem_mask);
-			val = 3;
-			break;
+	case 0x31: // Unknown, UART Status?
+		verboselog(3, "io_r: Unknown (UART Status?) = %04x (%04x)\n", 3, mem_mask);
+		val = 3;
+		break;
 
-		case 0x36: // UART RX Data
-			val = m_controller_input[m_uart_rx_count];
-			m_uart_rx_count = (m_uart_rx_count + 1) % 8;
-			verboselog(3, "io_r: UART RX Data = %04x (%04x)\n", val, mem_mask);
-			break;
+	case 0x36: // UART RX Data
+		val = m_controller_input[m_uart_rx_count];
+		m_uart_rx_count = (m_uart_rx_count + 1) % 8;
+		verboselog(3, "io_r: UART RX Data = %04x (%04x)\n", val, mem_mask);
+		break;
 
-		case 0x59: // I2C Status
-			verboselog(3, "io_r: I2C Status = %04x (%04x)\n", val, mem_mask);
-			break;
+	case 0x59: // I2C Status
+		verboselog(3, "io_r: I2C Status = %04x (%04x)\n", val, mem_mask);
+		break;
 
-		case 0x5e: // I2C Data In
-			verboselog(3, "io_r: I2C Data In = %04x (%04x)\n", val, mem_mask);
-			break;
+	case 0x5e: // I2C Data In
+		verboselog(3, "io_r: I2C Data In = %04x (%04x)\n", val, mem_mask);
+		break;
 
-		default:
-			verboselog(3, "io_r: Unknown register %04x\n", 0x3d00 + offset);
-			break;
+	default:
+		verboselog(3, "io_r: Unknown register %04x\n", 0x3d00 + offset);
+		break;
 	}
 
 	return val;
 }
 
-WRITE16_MEMBER( spg2xx_game_state::io_w )
+WRITE16_MEMBER(spg2xx_game_state::io_w)
 {
 	static const char *const gpioregs[] = { "GPIO Data Port", "GPIO Buffer Port", "GPIO Direction Port", "GPIO Attribute Port", "GPIO IRQ/Latch Port" };
 	static const char gpioports[3] = { 'A', 'B', 'C' };
 
 	uint16_t temp = 0;
 
-	switch(offset)
+	switch (offset)
 	{
-		case 0x00: // GPIO special function select
-			verboselog(3, "io_w: GPIO Function Select = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&m_io_regs[offset]);
-			break;
+	case 0x00: // GPIO special function select
+		verboselog(3, "io_w: GPIO Function Select = %04x (%04x)\n", data, mem_mask);
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
 
-		case 0x01: case 0x06: case 0x0b: // GPIO data, port A/B/C
-			offset++;
-			// Intentional fallthrough
+	case 0x01: case 0x06: case 0x0b: // GPIO data, port A/B/C
+		offset++;
+		// Intentional fallthrough
 
-		case 0x02: case 0x03: case 0x04: case 0x05: // Port A
-		case 0x07: case 0x08: case 0x09: case 0x0a: // Port B
-		case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Port C
-			verboselog(3, "io_w: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], data, mem_mask);
-			COMBINE_DATA(&m_io_regs[offset]);
-			do_gpio(offset);
-			break;
+	case 0x02: case 0x03: case 0x04: case 0x05: // Port A
+	case 0x07: case 0x08: case 0x09: case 0x0a: // Port B
+	case 0x0c: case 0x0d: case 0x0e: case 0x0f: // Port C
+		verboselog(3, "io_w: %s %c = %04x (%04x)\n", gpioregs[(offset - 1) % 5], gpioports[(offset - 1) / 5], data, mem_mask);
+		COMBINE_DATA(&m_io_regs[offset]);
+		do_gpio(offset);
+		break;
 
-		case 0x10:      // timebase control
-			if ((m_io_regs[offset] & 0x0003) != (data & 0x0003)) {
-				uint16_t hz = 8 << (data & 0x0003);
-				verboselog(3, "*** TMB1 FREQ set to %dHz\n", hz);
-				m_tmb1->adjust(attotime::zero, 0, attotime::from_hz( hz ));
-			}
-			if ((m_io_regs[offset] & 0x000c) != (data & 0x000c)) {
-				uint16_t hz = 128 << ((data & 0x000c) >> 2);
-				verboselog(3, "*** TMB2 FREQ set to %dHz\n", hz);
-				m_tmb2->adjust(attotime::zero, 0, attotime::from_hz( hz ));
-			}
-			COMBINE_DATA(&m_io_regs[offset]);
-			break;
-		case 0x21: // IRQ Enable
-			verboselog(3, "io_w: Controller IRQ Control = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&VII_CTLR_IRQ_ENABLE);
-			if(!VII_CTLR_IRQ_ENABLE)
-			{
-				m_maincpu->set_input_line(UNSP_IRQ3_LINE, CLEAR_LINE);
-			}
-			break;
+	case 0x10:      // timebase control
+		if ((m_io_regs[offset] & 0x0003) != (data & 0x0003)) {
+			uint16_t hz = 8 << (data & 0x0003);
+			verboselog(3, "*** TMB1 FREQ set to %dHz\n", hz);
+			m_tmb1->adjust(attotime::zero, 0, attotime::from_hz(hz));
+		}
+		if ((m_io_regs[offset] & 0x000c) != (data & 0x000c)) {
+			uint16_t hz = 128 << ((data & 0x000c) >> 2);
+			verboselog(3, "*** TMB2 FREQ set to %dHz\n", hz);
+			m_tmb2->adjust(attotime::zero, 0, attotime::from_hz(hz));
+		}
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
+	case 0x21: // IRQ Enable
+		verboselog(3, "io_w: Controller IRQ Control = %04x (%04x)\n", data, mem_mask);
+		COMBINE_DATA(&VII_CTLR_IRQ_ENABLE);
+		if (!VII_CTLR_IRQ_ENABLE)
+		{
+			m_maincpu->set_input_line(UNSP_IRQ3_LINE, CLEAR_LINE);
+		}
+		break;
 
-		case 0x22: // IRQ Acknowledge
-			verboselog(3, "io_w: Controller IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
-			m_io_regs[0x22] &= ~data;
-			if(!m_io_regs[0x22])
-			{
-				m_maincpu->set_input_line(UNSP_IRQ3_LINE, CLEAR_LINE);
-			}
-			break;
+	case 0x22: // IRQ Acknowledge
+		verboselog(3, "io_w: Controller IRQ Acknowledge = %04x (%04x)\n", data, mem_mask);
+		m_io_regs[0x22] &= ~data;
+		if (!m_io_regs[0x22])
+		{
+			m_maincpu->set_input_line(UNSP_IRQ3_LINE, CLEAR_LINE);
+		}
+		break;
 
-		case 0x2f: // Data Segment
-			temp = m_maincpu->state_int(UNSP_SR);
-			m_maincpu->set_state_int(UNSP_SR, (temp & 0x03ff) | ((data & 0x3f) << 10));
-			verboselog(3, "io_w: Data Segment = %04x (%04x)\n", data, mem_mask);
-			break;
+	case 0x2f: // Data Segment
+		temp = m_maincpu->state_int(UNSP_SR);
+		m_maincpu->set_state_int(UNSP_SR, (temp & 0x03ff) | ((data & 0x3f) << 10));
+		verboselog(3, "io_w: Data Segment = %04x (%04x)\n", data, mem_mask);
+		break;
 
-		case 0x31: // Unknown UART
-			verboselog(3, "io_w: Unknown UART = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&m_io_regs[offset]);
-			break;
+	case 0x31: // Unknown UART
+		verboselog(3, "io_w: Unknown UART = %04x (%04x)\n", data, mem_mask);
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
 
-		case 0x32: // UART Reset
-			verboselog(3, "io_w: UART Reset\n");
-			break;
+	case 0x32: // UART Reset
+		verboselog(3, "io_w: UART Reset\n");
+		break;
 
-		case 0x33: // UART Baud Rate
-			verboselog(3, "io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (m_io_regs[0x34] << 8) - data));
-			COMBINE_DATA(&m_io_regs[offset]);
-			break;
+	case 0x33: // UART Baud Rate
+		verboselog(3, "io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (m_io_regs[0x34] << 8) - data));
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
 
-		case 0x35: // UART TX Data
-			verboselog(3, "io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (data << 8) - m_io_regs[0x33]));
-			COMBINE_DATA(&m_io_regs[offset]);
-			break;
+	case 0x35: // UART TX Data
+		verboselog(3, "io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (data << 8) - m_io_regs[0x33]));
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
 
-		case 0x5a: // I2C Access Mode
-			verboselog(3, "io_w: I2C Access Mode = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&m_io_regs[offset]);
-			break;
+	case 0x5a: // I2C Access Mode
+		verboselog(3, "io_w: I2C Access Mode = %04x (%04x)\n", data, mem_mask);
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
 
-		case 0x5b: // I2C Device Address
-			verboselog(3, "io_w: I2C Device Address = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&m_io_regs[offset]);
-			break;
+	case 0x5b: // I2C Device Address
+		verboselog(3, "io_w: I2C Device Address = %04x (%04x)\n", data, mem_mask);
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
 
-		case 0x5c: // I2C Sub-Address
-			verboselog(3, "io_w: I2C Sub-Address = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&m_io_regs[offset]);
-			break;
+	case 0x5c: // I2C Sub-Address
+		verboselog(3, "io_w: I2C Sub-Address = %04x (%04x)\n", data, mem_mask);
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
 
-		case 0x5d: // I2C Data Out
-			verboselog(3, "io_w: I2C Data Out = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&m_io_regs[offset]);
-			break;
+	case 0x5d: // I2C Data Out
+		verboselog(3, "io_w: I2C Data Out = %04x (%04x)\n", data, mem_mask);
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
 
-		case 0x5e: // I2C Data In
-			verboselog(3, "io_w: I2C Data In = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&m_io_regs[offset]);
-			break;
+	case 0x5e: // I2C Data In
+		verboselog(3, "io_w: I2C Data In = %04x (%04x)\n", data, mem_mask);
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
 
-		case 0x5f: // I2C Controller Mode
-			verboselog(3, "io_w: I2C Controller Mode = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&m_io_regs[offset]);
-			break;
+	case 0x5f: // I2C Controller Mode
+		verboselog(3, "io_w: I2C Controller Mode = %04x (%04x)\n", data, mem_mask);
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
 
-		case 0x58: // I2C Command
-			verboselog(3, "io_w: I2C Command = %04x (%04x)\n", data, mem_mask);
-			COMBINE_DATA(&m_io_regs[offset]);
-			do_i2c();
-			break;
+	case 0x58: // I2C Command
+		verboselog(3, "io_w: I2C Command = %04x (%04x)\n", data, mem_mask);
+		COMBINE_DATA(&m_io_regs[offset]);
+		do_i2c();
+		break;
 
-		case 0x59: // I2C Status / IRQ Acknowledge(?)
-			verboselog(3, "io_w: I2C Status / Ack = %04x (%04x)\n", data, mem_mask);
-			m_io_regs[offset] &= ~data;
-			break;
+	case 0x59: // I2C Status / IRQ Acknowledge(?)
+		verboselog(3, "io_w: I2C Status / Ack = %04x (%04x)\n", data, mem_mask);
+		m_io_regs[offset] &= ~data;
+		break;
 
-		case 0x100: // DMA Source (L)
-		case 0x101: // DMA Source (H)
-		case 0x103: // DMA Destination
-			COMBINE_DATA(&m_io_regs[offset]);
-			break;
+	case 0x100: // DMA Source (L)
+	case 0x101: // DMA Source (H)
+	case 0x103: // DMA Destination
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
 
-		case 0x102: // DMA Length
-			spg_do_dma(data);
-			break;
+	case 0x102: // DMA Length
+		spg_do_dma(data);
+		break;
 
-		default:
-			verboselog(3, "io_w: Unknown register %04x = %04x (%04x)\n", 0x3d00 + offset, data, mem_mask);
-			COMBINE_DATA(&m_io_regs[offset]);
-			break;
+	default:
+		verboselog(3, "io_w: Unknown register %04x = %04x (%04x)\n", 0x3d00 + offset, data, mem_mask);
+		COMBINE_DATA(&m_io_regs[offset]);
+		break;
 	}
 }
 
@@ -1151,7 +1151,7 @@ void spg2xx_cart_state::machine_start()
 	{
 		std::string region_tag;
 		m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-		m_bank->configure_entries(0, ceilf((float)m_cart_rom->bytes()/0x800000), m_cart_rom->base(), 0x800000 );
+		m_bank->configure_entries(0, ceilf((float)m_cart_rom->bytes() / 0x800000), m_cart_rom->base(), 0x800000);
 		m_bank->set_entry(0);
 	}
 }
@@ -1171,12 +1171,12 @@ void spg2xx_game_state::machine_start()
 	m_video_regs[0x36] = 0xffff;
 	m_video_regs[0x37] = 0xffff;
 
-	m_tmb1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_game_state::tmb1_tick),this));
-	m_tmb2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_game_state::tmb2_tick),this));
+	m_tmb1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_game_state::tmb1_tick), this));
+	m_tmb2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spg2xx_game_state::tmb2_tick), this));
 	m_tmb1->reset();
 	m_tmb2->reset();
 
-	m_bank->configure_entries(0, ceilf((float)memregion("maincpu")->bytes()/0x800000), memregion("maincpu")->base(), 0x800000 );
+	m_bank->configure_entries(0, ceilf((float)memregion("maincpu")->bytes() / 0x800000), memregion("maincpu")->base(), 0x800000);
 	m_bank->set_entry(0);
 }
 
@@ -1205,17 +1205,17 @@ INTERRUPT_GEN_MEMBER(spg2xx_game_state::vii_vblank)
 	m_uart_rx_count = 0;
 
 	VII_VIDEO_IRQ_STATUS = VII_VIDEO_IRQ_ENABLE & 1;
-	if(VII_VIDEO_IRQ_STATUS)
+	if (VII_VIDEO_IRQ_STATUS)
 	{
 		verboselog(0, "Video IRQ\n");
 		m_maincpu->set_input_line(UNSP_IRQ0_LINE, ASSERT_LINE);
 	}
 
-//  {
-//      verboselog(0, "audio 1 IRQ\n");
-//      m_maincpu->set_input_line(UNSP_IRQ1_LINE, ASSERT_LINE);
-//  }
-	if(m_io_regs[0x22] & m_io_regs[0x21] & 0x0c00)
+	//  {
+	//      verboselog(0, "audio 1 IRQ\n");
+	//      m_maincpu->set_input_line(UNSP_IRQ1_LINE, ASSERT_LINE);
+	//  }
+	if (m_io_regs[0x22] & m_io_regs[0x21] & 0x0c00)
 	{
 		verboselog(0, "timerA, timer B IRQ\n");
 		m_maincpu->set_input_line(UNSP_IRQ2_LINE, ASSERT_LINE);
@@ -1223,37 +1223,36 @@ INTERRUPT_GEN_MEMBER(spg2xx_game_state::vii_vblank)
 
 	//if(m_io_regs[0x22] & m_io_regs[0x21] & 0x2100)
 	// For now trigger always if any enabled
-	if(VII_CTLR_IRQ_ENABLE)
+	if (VII_CTLR_IRQ_ENABLE)
 	{
 		verboselog(0, "UART, ADC IRQ\n");
 		m_maincpu->set_input_line(UNSP_IRQ3_LINE, ASSERT_LINE);
 	}
-//  {
-//      verboselog(0, "audio 4 IRQ\n");
-//      m_maincpu->set_input_line(UNSP_IRQ4_LINE, ASSERT_LINE);
-//  }
+	//  {
+	//      verboselog(0, "audio 4 IRQ\n");
+	//      m_maincpu->set_input_line(UNSP_IRQ4_LINE, ASSERT_LINE);
+	//  }
 
-	if(m_io_regs[0x22] & m_io_regs[0x21] & 0x1200)
+	if (m_io_regs[0x22] & m_io_regs[0x21] & 0x1200)
 	{
 		verboselog(0, "External IRQ\n");
 		m_maincpu->set_input_line(UNSP_IRQ5_LINE, ASSERT_LINE);
 	}
-	if(m_io_regs[0x22] & m_io_regs[0x21] & 0x0070)
+	if (m_io_regs[0x22] & m_io_regs[0x21] & 0x0070)
 	{
 		verboselog(0, "1024Hz, 2048HZ, 4096HZ IRQ\n");
 		m_maincpu->set_input_line(UNSP_IRQ6_LINE, ASSERT_LINE);
 	}
-	if(m_io_regs[0x22] & m_io_regs[0x21] & 0x008b)
+	if (m_io_regs[0x22] & m_io_regs[0x21] & 0x008b)
 	{
 		verboselog(0, "TMB1, TMB2, 4Hz, key change IRQ\n");
 		m_maincpu->set_input_line(UNSP_IRQ7_LINE, ASSERT_LINE);
 	}
-
 }
 
 
 
-DEVICE_IMAGE_LOAD_MEMBER( spg2xx_cart_state, vii_cart )
+DEVICE_IMAGE_LOAD_MEMBER(spg2xx_cart_state, vii_cart)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -1271,7 +1270,7 @@ DEVICE_IMAGE_LOAD_MEMBER( spg2xx_cart_state, vii_cart )
 	return image_init_result::PASS;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( spg2xx_cart_state, vsmile_cart )
+DEVICE_IMAGE_LOAD_MEMBER(spg2xx_cart_state, vsmile_cart)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -1323,37 +1322,37 @@ MACHINE_CONFIG_DERIVED(spg2xx_game_state::batman, spg2xx_base)
 MACHINE_CONFIG_END
 
 
-DRIVER_INIT_MEMBER(spg2xx_cart_state,vii)
+DRIVER_INIT_MEMBER(spg2xx_cart_state, vii)
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_cart_state::do_spg243_vii_io, this);
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_cart_state,vsmile)
+DRIVER_INIT_MEMBER(spg2xx_cart_state, vsmile)
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_cart_state::do_spg243_vsmile_io, this);
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_game_state,batman)
+DRIVER_INIT_MEMBER(spg2xx_game_state, batman)
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg243_batman_io, this);
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_game_state,rad_skat)
+DRIVER_INIT_MEMBER(spg2xx_game_state, rad_skat)
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg240_rad_skat_io, this);
 	m_centered_coordinates = 1;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_game_state,walle)
+DRIVER_INIT_MEMBER(spg2xx_game_state, walle)
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg243_batman_io, this);
 	m_centered_coordinates = 0;
 }
 
-DRIVER_INIT_MEMBER(spg2xx_game_state,wirels60)
+DRIVER_INIT_MEMBER(spg2xx_game_state, wirels60)
 {
 	m_vii_io_rw = vii_io_rw_delegate(&spg2xx_game_state::do_spg243_wireless60_io, this);
 	m_centered_coordinates = 1;
