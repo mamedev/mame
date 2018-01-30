@@ -74,6 +74,7 @@
 #include "sound/beep.h"
 #include "screen.h"
 #include "speaker.h"
+#include "debugger.h"
 
 
 //**************************************************************************
@@ -288,12 +289,9 @@ READ_LINE_MEMBER(alphatp_12_state::kbd_matrix_r)
 
 WRITE8_MEMBER(alphatp_12_state::kbd_matrix_w)
 {
-	int rd_masks[8] = { 1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80 };
-	int tmp_read;
-
 	if ((data & 0x80) && (!m_kbdclk))
 	{
-		tmp_read = m_keycols[(data >> 3) & 0xf]->read() & rd_masks[data & 0x7];
+		const ioport_value tmp_read = m_keycols[(data >> 3) & 0xf]->read() & (1 << (data & 0x7));
 		m_kbdread = (tmp_read != 0) ? 1 : 0;
 	}
 
@@ -324,12 +322,9 @@ READ_LINE_MEMBER(alphatp_34_state::kbd_matrix_r)
 
 WRITE8_MEMBER(alphatp_34_state::kbd_matrix_w)
 {
-	int rd_masks[8] = { 1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80 };
-	int tmp_read;
-
 	if ((data & 0x80) && (!m_kbdclk))
 	{
-		tmp_read = m_keycols[(data >> 3) & 0xf]->read() & rd_masks[data & 0x7];
+		const ioport_value tmp_read = m_keycols[(data >> 3) & 0xf]->read() & (1 << (data & 0x7));
 		m_kbdread = (tmp_read != 0) ? 1 : 0;
 	}
 
@@ -459,7 +454,7 @@ PORT_START("COL.8")
 PORT_START("COL.9")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ü Ü")         PORT_CODE(KEYCODE_OPENBRACE)PORT_CHAR(0x00fc)   PORT_CHAR(0x00dc)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ä Ä")         PORT_CODE(KEYCODE_QUOTE)    PORT_CHAR(0x00e4)   PORT_CHAR(0x00c4)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R_SHIFT")     PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R_SHIFT")     PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 Pad")       PORT_CODE(KEYCODE_0_PAD)    PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0")           PORT_CODE(KEYCODE_0)        PORT_CHAR('0')      PORT_CHAR('=')
@@ -473,7 +468,7 @@ PORT_START("COL.10")
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ß ?")         PORT_CODE(KEYCODE_MINUS)    PORT_CHAR(0x00df)   PORT_CHAR('?')      // ß and ?
 
 PORT_START("COL.11")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAB")         PORT_CODE(KEYCODE_TAB)      PORT_CHAR(UCHAR_MAMEKEY(TAB))
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAB")         PORT_CODE(KEYCODE_TAB)      PORT_CHAR('\t')							// TAB key
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER")       PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 Pad")       PORT_CODE(KEYCODE_1_PAD)    PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ Pad")       PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
@@ -633,7 +628,7 @@ PORT_START("COL.8")
 PORT_START("COL.9")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ü Ü")         PORT_CODE(KEYCODE_OPENBRACE)PORT_CHAR(0x00fc)   PORT_CHAR(0x00dc)
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ä Ä")         PORT_CODE(KEYCODE_QUOTE)    PORT_CHAR(0x00e4)   PORT_CHAR(0x00c4)
-	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R_SHIFT")     PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_MAMEKEY(RSHIFT))
+	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R_SHIFT")     PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0 Pad")       PORT_CODE(KEYCODE_0_PAD)    PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
 	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0")           PORT_CODE(KEYCODE_0)        PORT_CHAR('0')      PORT_CHAR('=')
@@ -647,7 +642,7 @@ PORT_START("COL.10")
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ß ?")         PORT_CODE(KEYCODE_MINUS)    PORT_CHAR(0x00df)   PORT_CHAR('?')      // ß and ?
 
 PORT_START("COL.11")
-	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAB")         PORT_CODE(KEYCODE_TAB)      PORT_CHAR(UCHAR_MAMEKEY(TAB))
+	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAB")         PORT_CODE(KEYCODE_TAB)      PORT_CHAR('\t')							// TAB key
 	PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER")       PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(13)
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1 Pad")       PORT_CODE(KEYCODE_1_PAD)    PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 	PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+ Pad")       PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHAR(UCHAR_MAMEKEY(PLUS_PAD))
@@ -727,7 +722,7 @@ uint32_t alphatp_12_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 			for (int line = 0; line < 12; line++)
 			{
 				uint8_t data = m_gfx[((code & 0x7f) * 16) + line];
-				if(cursoren)
+				if (cursoren)
 					data ^= 0xff;
 				bitmap.pix32(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
 				bitmap.pix32(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
@@ -769,7 +764,7 @@ uint32_t alphatp_34_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 			for (int line = 0; line < 12; line++)
 			{
 				uint8_t data = m_gfx[((code & 0x7f) * 16) + line];
-				if(cursoren)
+				if (cursoren)
 					data ^= 0xff;
 				bitmap.pix32(y * 12 + line, x * 8 + 0) = pen[BIT(data, 0) ^ BIT(code, 7)];
 				bitmap.pix32(y * 12 + line, x * 8 + 1) = pen[BIT(data, 1) ^ BIT(code, 7)];
@@ -897,8 +892,6 @@ WRITE_LINE_MEMBER(alphatp_34_state::fdcirq_w)
 {
 	m_fdc_irq = state;
 }
-
-#include "debugger.h"
 
 WRITE_LINE_MEMBER(alphatp_34_state::fdcdrq_w)
 {

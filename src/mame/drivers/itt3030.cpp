@@ -321,14 +321,11 @@ READ_LINE_MEMBER(itt3030_state::kbd_matrix_r)
 
 WRITE8_MEMBER(itt3030_state::kbd_matrix_w)
 {
-	int rd_masks[8] = { 1, 2, 4, 8, 0x10, 0x20, 0x40, 0x80 };
-	int tmp_read;
-
 //  printf("matrix_w: %02x (col %d row %d clk %d)\n", data, m_kbdcol, m_kbdrow, (data & 0x80) ? 1 : 0);
 
 	if ((data & 0x80) && (!m_kbdclk))
 	{
-		tmp_read = m_keyrows[(data >> 3) & 0xf]->read() & rd_masks[data & 0x7];
+		const ioport_value tmp_read = m_keyrows[(data >> 3) & 0xf]->read() & (1 << (data & 0x7));
 		m_kbdread = (tmp_read != 0) ? 1 : 0;
 	}
 
