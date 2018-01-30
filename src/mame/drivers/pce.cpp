@@ -72,7 +72,8 @@ Super System Card:
 #include "speaker.h"
 
 
-/* todo: alternate forms of input (multitap, mouse, etc.) */
+// TODO: slotify this mess, also add alternate forms of input (multitap, mouse, pachinko controller etc.)
+//       hucard pachikun gives you option to select pachinko controller after pressing start, likely because it doesn't have a true header id
 static INPUT_PORTS_START( pce )
 
 	PORT_START("JOY_P.0")
@@ -96,7 +97,10 @@ static INPUT_PORTS_START( pce )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)                       PORT_CONDITION("JOY_TYPE", 0x000c, EQUALS, 0x0000)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)                       PORT_CONDITION("JOY_TYPE", 0x000c, EQUALS, 0x0000)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)                      PORT_CONDITION("JOY_TYPE", 0x000c, EQUALS, 0x0000)
+	// pachinko controller paddle maps here (!?) with this arrangement
+	//PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,0x5f) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
 
+	
 	PORT_START("JOY_P.2")
 	/* II is left of I on the original pad so we map them in reverse order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P3 Button I") PORT_PLAYER(3)    PORT_CONDITION("JOY_TYPE", 0x0030, EQUALS, 0x0000)

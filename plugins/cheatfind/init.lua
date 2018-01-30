@@ -67,7 +67,7 @@ function cheatfind.startplugin()
 			local temp = {}
 			local j = 1
 			if data.shift >= 0 then -- region or byte wide space
-				for i = start, start + size, 1 << data.shift do
+				for i = start, start + (size << data.shift), 1 << data.shift do
 					if j < 65536 then
 						temp[j] = string.pack("B", space:read_u8(i))
 						j = j + 1
