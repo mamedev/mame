@@ -45,8 +45,7 @@
 
 
 #include "emu.h"
-#include "cpu/g65816/g65816.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/xavix.h"
 //#include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
@@ -87,9 +86,8 @@ uint32_t xavix_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 }
 
 static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
-	AM_RANGE(0x000000, 0x0001ff) AM_RAM
-	AM_RANGE(0x00f000, 0x00ffff) AM_ROM AM_REGION("bios", 0x00f000)
-	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("bios", 0x000000) // wrong
+	AM_RANGE(0x0000, 0x01ff) AM_RAM
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("bios", 0x00f000)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( xavix )
@@ -177,7 +175,7 @@ void xavix_state::machine_reset()
 MACHINE_CONFIG_START(xavix_state::xavix)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",G65816,MAIN_CLOCK/4)
+	MCFG_CPU_ADD("maincpu",XAVIX,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(xavix_map)
 
 	/* video hardware */
