@@ -197,6 +197,7 @@ protected:
 	uint8_t m_fifo[2][16];
 	int m_buffer_idx;
 	int m_fifo_idx;
+	int m_dma_idx;
 	bool m_fifo_next;
 	int m_buffer_dma;
 
