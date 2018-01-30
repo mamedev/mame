@@ -47,6 +47,7 @@ Unmapped registers:
 
 #include "emu.h"
 #include "c140.h"
+#include <algorithm>
 
 struct voice_registers
 {
