@@ -808,8 +808,6 @@ WRITE_LINE_MEMBER(alphatp_12_state::fdcirq_w)
 	m_fdc_irq = state;
 }
 
-#include "debugger.h"
-
 WRITE_LINE_MEMBER(alphatp_12_state::fdcdrq_w)
 {
 	m_fdc_drq = state;
