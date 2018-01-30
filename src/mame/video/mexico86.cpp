@@ -31,24 +31,24 @@ uint32_t mexico86_state::screen_update_mexico86(screen_device &screen, bitmap_in
 	sx = 0;
 
 	/* the score display seems to be outside of the main objectram. */
-	for (offs = 0; offs < m_objectram.bytes() + 0x200; offs += 4)
+	for (offs = 0x1500; offs < 0x2000; offs += 4)
 	{
 		int height;
 
-		if (offs >= m_objectram.bytes() && offs < m_objectram.bytes() + 0x180)
+		if (offs >= 0x1800 && offs < 0x1980)
 			continue;
 
-		if (offs >= m_objectram.bytes() + 0x1c0)
+		if (offs >= 0x19c0)
 			continue;
 
 		/* skip empty sprites */
 		/* this is dword aligned so the uint32_t * cast shouldn't give problems */
 		/* on any architecture */
-		if (*(uint32_t *)(&m_objectram[offs]) == 0)
+		if (*(uint32_t *)(&m_mainram[offs]) == 0)
 			continue;
 
-		gfx_num = m_objectram[offs + 1];
-		gfx_attr = m_objectram[offs + 3];
+		gfx_num = m_mainram[offs + 1];
+		gfx_attr = m_mainram[offs + 3];
 
 		if (!BIT(gfx_num, 7))  /* 16x16 sprites */
 		{
@@ -65,10 +65,10 @@ uint32_t mexico86_state::screen_update_mexico86(screen_device &screen, bitmap_in
 			sx += 16;
 		else
 		{
-			sx = m_objectram[offs + 2];
+			sx = m_mainram[offs + 2];
 			//if (gfx_attr & 0x40) sx -= 256;
 		}
-		sy = 256 - height * 8 - (m_objectram[offs + 0]);
+		sy = 256 - height * 8 - (m_mainram[offs + 0]);
 
 		for (xc = 0; xc < 2; xc++)
 		{
@@ -77,10 +77,10 @@ uint32_t mexico86_state::screen_update_mexico86(screen_device &screen, bitmap_in
 				int goffs, code, color, flipx, flipy, x, y;
 
 				goffs = gfx_offs + xc * 0x40 + yc * 0x02;
-				code = m_videoram[goffs] + ((m_videoram[goffs + 1] & 0x07) << 8)
-						+ ((m_videoram[goffs + 1] & 0x80) << 4) + (m_charbank << 12);
-				color = ((m_videoram[goffs + 1] & 0x38) >> 3) + ((gfx_attr & 0x02) << 2);
-				flipx = m_videoram[goffs + 1] & 0x40;
+				code = m_mainram[goffs] + ((m_mainram[goffs + 1] & 0x07) << 8)
+						+ ((m_mainram[goffs + 1] & 0x80) << 4) + (m_charbank << 12);
+				color = ((m_mainram[goffs + 1] & 0x38) >> 3) + ((gfx_attr & 0x02) << 2);
+				flipx = m_mainram[goffs + 1] & 0x40;
 				flipy = 0;
 
 				//x = sx + xc * 8;
@@ -109,15 +109,15 @@ uint32_t mexico86_state::screen_update_kikikai(screen_device &screen, bitmap_ind
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	sx = 0;
-	for (offs = 0; offs < m_objectram.bytes(); offs += 4)
+	for (offs = 0x1500; offs < 0x1800; offs += 4)
 	{
-		if (*(uint32_t*)(m_objectram + offs) == 0)
+		if (*(uint32_t*)(m_mainram + offs) == 0)
 			continue;
 
-		ty = m_objectram[offs];
-		gfx_num = m_objectram[offs + 1];
-		tx = m_objectram[offs + 2];
-		//gfx_attr = m_objectram[offs + 3];
+		ty = m_mainram[offs];
+		gfx_num = m_mainram[offs + 1];
+		tx = m_mainram[offs + 2];
+		//gfx_attr = m_mainram[offs + 3];
 
 		if (gfx_num & 0x80)
 		{
@@ -141,8 +141,8 @@ uint32_t mexico86_state::screen_update_kikikai(screen_device &screen, bitmap_ind
 		{
 			y = (sy + (yc << 2)) & 0xff;
 			goffs = gfx_offs + yc;
-			code = m_videoram[goffs] + ((m_videoram[goffs + 1] & 0x1f) << 8);
-			color = (m_videoram[goffs + 1] & 0xe0) >> 5;
+			code = m_mainram[goffs] + ((m_mainram[goffs + 1] & 0x1f) << 8);
+			color = (m_mainram[goffs + 1] & 0xe0) >> 5;
 			goffs += 0x40;
 
 			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
@@ -151,8 +151,8 @@ uint32_t mexico86_state::screen_update_kikikai(screen_device &screen, bitmap_ind
 					0,0,
 					sx&0xff,y,15);
 
-			code = m_videoram[goffs] + ((m_videoram[goffs + 1] & 0x1f) << 8);
-			color = (m_videoram[goffs + 1] & 0xe0) >> 5;
+			code = m_mainram[goffs] + ((m_mainram[goffs + 1] & 0x1f) << 8);
+			color = (m_mainram[goffs + 1] & 0xe0) >> 5;
 
 			m_gfxdecode->gfx(0)->transpen(bitmap,cliprect,
 					code,

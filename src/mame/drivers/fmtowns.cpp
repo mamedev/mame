@@ -2704,6 +2704,7 @@ void towns_state::machine_reset()
 	m_serial_irq_source = 0;
 	m_rtc_d = 0;
 	m_rtc_busy = false;
+	m_vram_mask_addr = 0;
 }
 
 READ8_MEMBER(towns_state::get_slave_ack)
