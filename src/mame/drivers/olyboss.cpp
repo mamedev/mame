@@ -60,23 +60,12 @@ public:
 			m_char_rom(*this, UPD3301_TAG)
 		{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<i8257_device> m_dma;
-	required_device<upd3301_device> m_crtc;
-	required_memory_region m_char_rom;
-
 	DECLARE_DRIVER_INIT(olyboss);
-	//uint32_t screen_update_olyboss(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	DECLARE_READ8_MEMBER( videoram_read );
 	DECLARE_WRITE8_MEMBER( videoram_write );
-
 	DECLARE_READ8_MEMBER(keyboard_read);
-
 	DECLARE_READ8_MEMBER(port_read);
 	DECLARE_WRITE8_MEMBER(port_write);
-
-	void keyboard_put(u8 data);
 
 	UPD3301_DRAW_CHARACTER_MEMBER( olyboss_display_pixels );
 
@@ -84,13 +73,19 @@ public:
 	DECLARE_READ8_MEMBER( dma_mem_r );
 	
 	void olybossd(machine_config &config);
-
+	
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<i8257_device> m_dma;
+	required_device<upd3301_device> m_crtc;
+	required_memory_region m_char_rom;
+	//uint32_t screen_update_olyboss(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);	
 private:
 
-	bool keybHit;
-	u8 keyStroke;
+	bool m_keybhit;
+	u8 m_keystroke;
 	uint8_t m_mainVideoram[0x2000];
-	
+	void keyboard_put(u8 data);	
 
 
 };
@@ -136,7 +131,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( olyboss_state::olyboss_display_pixels )
 	//if (lc >= 8) return;
 	if (csr) 
 	{
-		printf("csr\n");
+		logerror("csr\n");
 		data = 0xff;
 	}
 
@@ -191,7 +186,7 @@ uint32_t olyboss_state::screen_update_olyboss(screen_device &screen, bitmap_ind1
 
 WRITE8_MEMBER( olyboss_state::videoram_write )
 {
-	//printf("vramw [%2.2x][%2.2x] port0 [%2.2x] fbfd [%2.2x] fbfe [%2.2x] PC [%4.4x]\n",offset,data,m_port0,m_fbfd,m_fbfe,m_maincpu->safe_pc());
+	// logerror("vramw [%2.2x][%2.2x] port0 [%2.2x] fbfd [%2.2x] fbfe [%2.2x] PC [%4.4x]\n",offset,data,m_port0,m_fbfd,m_fbfe,m_maincpu->safe_pc());
 	m_mainVideoram[offset]=data;
 }
 
@@ -206,10 +201,10 @@ READ8_MEMBER( olyboss_state::videoram_read )
 
 READ8_MEMBER( olyboss_state::keyboard_read )
 {
-	//printf("keyboard_read offs [%d]\n",offset);
+	// logerror ("keyboard_read offs [%d]\n",offset);
 	if (offset==0)
 	{
-		if (keybHit)
+		if (m_keybhit)
 		{
 			return 0x01;
 		}
@@ -218,10 +213,10 @@ READ8_MEMBER( olyboss_state::keyboard_read )
 	}
 	else if (offset==1)
 	{
-		if (keybHit)
+		if (m_keybhit)
 		{
-			keybHit=false;
-			return keyStroke;
+			m_keybhit=false;
+			return m_keystroke;
 		}
 		
 		return 0x00;
@@ -232,7 +227,7 @@ READ8_MEMBER( olyboss_state::keyboard_read )
 
 DRIVER_INIT_MEMBER( olyboss_state, olyboss )
 {
-	keybHit=false;
+	m_keybhit=false;
 
 	/* initialize DMA */
 	m_dma->ready_w(1);
@@ -242,9 +237,9 @@ void olyboss_state::keyboard_put(u8 data)
 {
 	if (data)
 	{
-		//printf("Keyboard stroke [%2x]\n",data);
-		keyStroke=data;
-		keybHit=true;
+		//logerror("Keyboard stroke [%2x]\n",data);
+		m_keystroke=data;
+		m_keybhit=true;
 	}
 }
 
@@ -252,7 +247,7 @@ void olyboss_state::keyboard_put(u8 data)
 
 WRITE_LINE_MEMBER( olyboss_state::hrq_w )
 {
-	//printf("hrq_w\n");
+	//logerror("hrq_w\n");
 	m_maincpu->set_input_line(INPUT_LINE_HALT,state);
 	m_dma->hlda_w(state);
 }
@@ -263,7 +258,7 @@ READ8_MEMBER( olyboss_state::dma_mem_r )
 
 	if (offset==0xf2c6)
 	{
-		printf("DMA read at offset [%x] val is [%2.2x]\n",offset,program.read_byte(offset));
+		logerror("DMA read at offset [%x] val is [%2.2x]\n",offset,program.read_byte(offset));
 	}
 	
 	return program.read_byte(offset);
@@ -273,12 +268,12 @@ READ8_MEMBER( olyboss_state::dma_mem_r )
 
 WRITE8_MEMBER( olyboss_state::port_write )
 {
-	printf("Wrote to port [%2.2x] value [%2.2x]\n",offset,data);
+	logerror("Wrote to port [%2.2x] value [%2.2x]\n",offset,data);
 }
 
 READ8_MEMBER( olyboss_state::port_read)
 {
-	printf("Reading from port [%2.2x]\n",offset);
+	logerror("Reading from port [%2.2x]\n",offset);
 	return 0xff;
 }
 
@@ -287,7 +282,7 @@ READ8_MEMBER( olyboss_state::port_read)
 //**************************************************************************
 
 MACHINE_CONFIG_START( olyboss_state::olybossd )
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000))
+	MCFG_CPU_ADD(Z80_TAG, Z80, 4_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(olyboss_mem)
 	MCFG_CPU_IO_MAP(olyboss_io)
 
