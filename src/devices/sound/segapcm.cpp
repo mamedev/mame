@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "segapcm.h"
+#include <algorithm>
 
 
 // device type definition
