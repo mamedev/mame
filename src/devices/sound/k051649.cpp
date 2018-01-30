@@ -26,6 +26,7 @@
 
 #include "emu.h"
 #include "k051649.h"
+#include <algorithm>
 
 #define FREQ_BITS   16
 #define DEF_GAIN    8
