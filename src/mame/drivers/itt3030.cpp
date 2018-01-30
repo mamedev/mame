@@ -197,12 +197,10 @@ Beeper Circuit, all ICs shown:
 #include "machine/wd_fdc.h"
 #include "sound/beep.h"
 #include "video/tms9927.h"          //Display hardware
-
 #include "screen.h"
 #include "speaker.h"
-
 #include "formats/itt3030_dsk.h"
-
+#include "debugger.h"
 
 #define MAIN_CLOCK XTAL_4.194MHz
 
@@ -282,7 +280,7 @@ private:
 };
 
 //**************************************************************************
-//  ADDRESS MAPS - Alphatronic P1, P2, P2S, P2U and Hell 2069
+//  ADDRESS MAPS
 //**************************************************************************
 
 // The lower 48K is switchable among the first 48K of each of 8 48K banks numbered 0-7 or "bank 8" which is the internal ROM and VRAM
@@ -313,7 +311,7 @@ ADDRESS_MAP_END
 
 
 //**************************************************************************
-//  INPUTS -  Alphatronic P1, P2, P2S, P2U and Hell 2069
+//  INPUTS
 //**************************************************************************
 
 READ_LINE_MEMBER(itt3030_state::kbd_matrix_r)
@@ -350,7 +348,7 @@ READ8_MEMBER(itt3030_state::kbd_port2_r)
 
 
 //**************************************************************************
-//  KEYBOARD - Alphatronic P1, P2, P2S, P2U and Hell 2069
+//  KEYBOARD
 //**************************************************************************
 
 static INPUT_PORTS_START( itt3030 )
@@ -552,7 +550,6 @@ WRITE_LINE_MEMBER(itt3030_state::fdcirq_w)
 	m_fdc_irq = state;
 }
 
-#include "debugger.h"
 
 WRITE_LINE_MEMBER(itt3030_state::fdcdrq_w)
 {
@@ -668,7 +665,7 @@ SLOT_INTERFACE_END
 
 
 //**************************************************************************
-//  MACHINE - Alphatronic P1, P2, P2S, P2U and Hell 2069
+//  MACHINE
 //**************************************************************************
 
 void itt3030_state::machine_start()

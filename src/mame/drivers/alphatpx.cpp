@@ -1,6 +1,5 @@
 // license: GPL-2.0+
 // copyright-holders: Dirk Best
-// testing, modification: rfka01, helwie44
 /***************************************************************************
 
     Triumph-Adler Alphatronic Px series
@@ -59,6 +58,9 @@
     P30 and P40
     ===========
     Those were P3 and P4's with an additional 8088 card, a 128K RAM card (some with an extra 32K graphics extension) to support MS-DOS.
+	
+	
+	comments, testing, modification: rfka01, helwie44
 
 ***************************************************************************/
 
