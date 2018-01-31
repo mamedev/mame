@@ -32,7 +32,6 @@
 
 
     Notes:
-
     To access internal test on Tetris hold P1 Down + P1 Anticlockwise (Button 2) on boot
     There appears to be a similar mode for Invaders but I don't know if it's accessible
 
@@ -962,19 +961,18 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_eu3a05_state )
 
 	AM_RANGE(0x6000, 0xdfff) AM_DEVICE("bank", address_map_bank_device, amap8)
 
-	// not sure how these work,, might be a modified 6502 core instead.
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f8000)
+	// not sure how these work,, might be a modified 6502 core instead.
 	AM_RANGE(0xfffa, 0xfffb) AM_READ(radicasi_nmi_vector_r)
 	AM_RANGE(0xfffe, 0xffff) AM_READ(radicasi_irq_vector_r)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( radicasi_bank_map, AS_PROGRAM, 8, radica_eu3a05_state )
+	AM_RANGE(0x000000, 0xffffff) AM_NOP // shut up any logging when video params are invalid
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM // ?? only ever cleared maybe a mirror of below?
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("pixram") // Qix writes here and sets the tile base here instead of ROM so it can have a pixel layer
-
-	AM_RANGE(0x000000, 0xffffff) AM_NOP // shut up any logging when video params are invalid
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rad_sinv )
