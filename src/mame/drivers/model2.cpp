@@ -6082,6 +6082,7 @@ GAME( 1998, dyndeka2,  dynamcop, model2a_5881, model2,   model2_state, genprot, 
 GAME( 1998, pltkidsa,   pltkids, model2a_5881, model2,   model2_state, pltkids, ROT0, "Psikyo", "Pilot Kids (Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2B-CRX (SHARC, SCSP sound board)
+GAME( 1994, rchase2,          0, rchase2,      rchase2, model2_state, rchase2,  ROT0, "Sega",   "Rail Chase 2 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, vstriker,         0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Virtua Striker (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, vstrikero, vstriker, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Virtua Striker", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, fvipers,          0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Fighting Vipers (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
@@ -6090,6 +6091,8 @@ GAME( 1995, gunblade,         0, model2b,      model2,  model2_state, 0,        
 GAME( 1995, indy500,          0, indy500,      srallyc, model2_state, 0,        ROT0, "Sega",   "INDY 500 Twin (Revision A, Newer)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, indy500d,   indy500, indy500,      srallyc, model2_state, 0,        ROT0, "Sega",   "INDY 500 Deluxe (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, indy500to,  indy500, indy500,      srallyc, model2_state, 0,        ROT0, "Sega",   "INDY 500 Twin (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, von,              0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Cyber Troopers Virtual-On (USA, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1995, vonj,           von, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Cyber Troopers Virtual-On (Japan, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, schamp,           0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Sonic Championship (USA)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, sfight,      schamp, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Sonic the Fighters (Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, lastbrnx,         0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Last Bronx (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
@@ -6097,8 +6100,6 @@ GAME( 1996, lastbrnxu, lastbrnx, model2b,      model2,  model2_state, 0,        
 GAME( 1996, lastbrnxj, lastbrnx, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Last Bronx (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, doa,              0, model2b_0229, model2,  model2_state, doa,      ROT0, "Sega",   "Dead or Alive (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, sgt24h,           0, indy500,      srallyc, model2_state, sgt24h,   ROT0, "Jaleco", "Super GT 24h", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, von,              0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Cyber Troopers Virtual-On (USA, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, vonj,           von, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Cyber Troopers Virtual-On (Japan, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, dynabb,           0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Dynamite Baseball", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, dynabb97,         0, model2b,      model2,  model2_state, 0,        ROT0, "Sega",   "Dynamite Baseball 97 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, overrevb,   overrev, indy500,      srallyc, model2_state, 0,        ROT0, "Jaleco", "Over Rev (Model 2B, Revision B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
@@ -6107,7 +6108,6 @@ GAME( 1997, zerogunj,   zerogun, model2b_5881, model2,  model2_state, zerogun,  
 GAME( 1998, dynamcopb, dynamcop, model2b_5881, model2,  model2_state, genprot,  ROT0, "Sega",   "Dynamite Cop (Export, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dyndeka2b, dynamcop, model2b_5881, model2,  model2_state, genprot,  ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2B)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkids,          0, model2b_5881, model2,  model2_state, pltkids,  ROT0, "Psikyo", "Pilot Kids (Model 2B, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1995, rchase2,          0, rchase2,      rchase2, model2_state, rchase2,  ROT0, "Sega",   "Rail Chase 2 (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 
 // Model 2C-CRX (TGPx4, SCSP sound board)
 GAME( 1996, skisuprg,         0, model2c,      model2,   model2_state, 0,       ROT0, "Sega",   "Sega Ski Super G", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS|MACHINE_UNEMULATED_PROTECTION )

@@ -730,7 +730,7 @@ static INPUT_PORTS_START( ampoker2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 
 	PORT_START("IN7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* not used */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Remote Credit") PORT_IMPULSE(12) PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2)
 	PORT_DIPNAME( 0x08, 0x08, "Jackpot" )        PORT_DIPLOCATION("SW1:8") /* DSW8 */
@@ -1456,4 +1456,4 @@ GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        R
 GAMEL( 1990, rabbitpk, ampoker2, ampoker2, ampoker2, ampoker2_state, rabbitpk, ROT0, "bootleg",           "Rabbit Poker (Arizona Poker v1.1?)", MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
 GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, ampoker2_state, 0,        ROT0, "Sigma Inc.",        "Sigma Poker",                        MACHINE_SUPPORTS_SAVE,  layout_sigmapkr )
 GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k,  ampoker2_state, 0,        ROT0, "Sigma Inc.",        "Sigma Poker 2000",                   MACHINE_SUPPORTS_SAVE,  layout_sigmapkr )
-GAME(  1990, piccolop, ampoker2, ampoker2, piccolop, ampoker2_state, piccolop, ROT0, "Admiral/Novomatic", "Piccolo Poker 100",                  MACHINE_SUPPORTS_SAVE )
+GAME(  1991, piccolop, ampoker2, ampoker2, piccolop, ampoker2_state, piccolop, ROT0, "Admiral/Novomatic", "Piccolo Poker 100",                  MACHINE_SUPPORTS_SAVE )

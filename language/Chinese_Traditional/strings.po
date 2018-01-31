@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-01-28 14:01+1100\n"
-"PO-Revision-Date: 2017-10-03 22:41+0800\n"
+"PO-Revision-Date: 2018-01-28 17:35+0800\n"
 "Last-Translator: YuiFAN\n"
 "Language-Team: MAME Language Team\n"
 "Language: zh_TW\n"
@@ -1727,7 +1727,7 @@ msgstr "自動儲存/還原"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Rewind capacity"
-msgstr ""
+msgstr "倒轉容量"
 
 #: src/frontend/mame/ui/submenu.cpp:68
 msgid "Bilinear snapshot"
@@ -2174,6 +2174,8 @@ msgid ""
 "ROM Audit \tDisabled\n"
 "Samples Audit \tDisabled\n"
 msgstr ""
+"ROM 驗證 \t停用\n"
+"樣本檔驗證 \t停用\n"
 
 #: src/frontend/mame/ui/selgame.cpp:1167
 #, c-format
@@ -2183,7 +2185,7 @@ msgstr "%1$s %2$s （ %3$d / %4$d 機台 (%5$d BIOS) ）"
 #: src/frontend/mame/ui/selgame.cpp:1183 src/frontend/mame/ui/selsoft.cpp:555
 #, c-format
 msgid "%1$s: %2$s - Search: %3$s_"
-msgstr "%1$s： %2$s - 搜搜尋： %3$s_"
+msgstr "%1$s： %2$s - 搜尋： %3$s_"
 
 #: src/frontend/mame/ui/selgame.cpp:1185 src/frontend/mame/ui/selsoft.cpp:557
 #, c-format
@@ -2414,7 +2416,7 @@ msgstr "[建立]"
 #: src/frontend/mame/ui/filesel.cpp:419
 #, c-format
 msgid "Error accessing %s"
-msgstr ""
+msgstr "錯誤存取 %s"
 
 #: src/frontend/mame/ui/filesel.cpp:515
 msgid "Select access mode"
@@ -2776,21 +2778,21 @@ msgstr "作弊碼搜尋器"
 
 #: plugins/portname/init.lua:89
 msgid "Save input names to file"
-msgstr ""
+msgstr "儲存輸入名稱至檔案"
 
 #: plugins/portname/init.lua:115 plugins/portname/init.lua:120
 #: plugins/portname/init.lua:136
 msgid "Failed to save input name file"
-msgstr ""
+msgstr "儲存輸入名稱檔案時失敗"
 
 #: plugins/portname/init.lua:153
 #, lua-format
 msgid "Input port name file saved to %s"
-msgstr ""
+msgstr "輸入埠名稱檔案儲存至 %s"
 
 #: plugins/portname/init.lua:158
 msgid "Input ports"
-msgstr ""
+msgstr "輸入埠"
 
 #~ msgid ""
 #~ "ROM Audit Disabled\t\n"
@@ -2798,13 +2800,6 @@ msgstr ""
 #~ msgstr ""
 #~ "ROM 驗證已停用\t\n"
 #~ "樣本檔驗證已停用\t\n"
-
-#~ msgid ""
-#~ "Roms Audit Pass\tDisabled\n"
-#~ "Samples Audit Pass\tDisabled\n"
-#~ msgstr ""
-#~ "ROM 驗證通過\t已停用\n"
-#~ "樣本檔驗證通過\t已停用\n"
 
 #~ msgid "Activated"
 #~ msgstr "啟動"
