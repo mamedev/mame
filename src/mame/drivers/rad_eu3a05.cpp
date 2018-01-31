@@ -962,7 +962,7 @@ static ADDRESS_MAP_START( radicasi_map, AS_PROGRAM, 8, radica_eu3a05_state )
 	AM_RANGE(0x6000, 0xdfff) AM_DEVICE("bank", address_map_bank_device, amap8)
 
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f8000)
-	// not sure how these work,, might be a modified 6502 core instead.
+	// not sure how these work, might be a modified 6502 core instead.
 	AM_RANGE(0xfffa, 0xfffb) AM_READ(radicasi_nmi_vector_r)
 	AM_RANGE(0xfffe, 0xffff) AM_READ(radicasi_irq_vector_r)
 ADDRESS_MAP_END
