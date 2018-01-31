@@ -2,28 +2,31 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    Slogger Pegasus 400 disk interface
+    Cumana Floppy Disk System
+
+    http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Cumana_FDsystem.html
 
 **********************************************************************/
 
-#ifndef MAME_BUS_ELECTRON_CART_PEG400_H
-#define MAME_BUS_ELECTRON_CART_PEG400_H
+#ifndef MAME_BUS_ELECTRON_CART_CUMANA_H
+#define MAME_BUS_ELECTRON_CART_CUMANA_H
 
 #include "slot.h"
 #include "machine/wd_fdc.h"
+#include "machine/mc146818.h"
 #include "formats/acorn_dsk.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class electron_peg400_device :
+class electron_cumana_device :
 	public device_t,
 	public device_electron_cart_interface
 {
 public:
 	// construction/destruction
-	electron_peg400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	electron_cumana_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -37,20 +40,18 @@ protected:
 	virtual void write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa) override;
 
 private:
-	DECLARE_WRITE8_MEMBER(wd1770_control_w);
+	DECLARE_WRITE8_MEMBER(wd1793_control_w);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
-	required_device<wd1770_device> m_fdc;
+	required_device<fd1793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-
-	int m_fdc_ie;
+	required_device<mc146818_device> m_rtc;
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(ELECTRON_PEG400, electron_peg400_device)
+DECLARE_DEVICE_TYPE(ELECTRON_CUMANA, electron_cumana_device)
 
 
-#endif // MAME_BUS_ELECTRON_CART_PEG400_H
+#endif // MAME_BUS_ELECTRON_CART_CUMANA_H

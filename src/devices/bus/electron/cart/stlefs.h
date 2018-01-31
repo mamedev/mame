@@ -2,12 +2,14 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    Slogger Pegasus 400 disk interface
+    Solidisk EFS
+
+    http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/Solidisk_EFS.html
 
 **********************************************************************/
 
-#ifndef MAME_BUS_ELECTRON_CART_PEG400_H
-#define MAME_BUS_ELECTRON_CART_PEG400_H
+#ifndef MAME_BUS_ELECTRON_CART_STLEFS_H
+#define MAME_BUS_ELECTRON_CART_STLEFS_H
 
 #include "slot.h"
 #include "machine/wd_fdc.h"
@@ -17,13 +19,13 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class electron_peg400_device :
+class electron_stlefs_device :
 	public device_t,
 	public device_electron_cart_interface
 {
 public:
 	// construction/destruction
-	electron_peg400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	electron_stlefs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
@@ -38,19 +40,18 @@ protected:
 
 private:
 	DECLARE_WRITE8_MEMBER(wd1770_control_w);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
+	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-
-	int m_fdc_ie;
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(ELECTRON_PEG400, electron_peg400_device)
+DECLARE_DEVICE_TYPE(ELECTRON_STLEFS, electron_stlefs_device)
 
 
-#endif // MAME_BUS_ELECTRON_CART_PEG400_H
+#endif // MAME_BUS_ELECTRON_CART_STLEFS_H

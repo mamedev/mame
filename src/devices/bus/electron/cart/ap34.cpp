@@ -2,36 +2,39 @@
 // copyright-holders:Nigel Barnes
 /**********************************************************************
 
-    Slogger Pegasus 400 disk interface
+    P.R.E.S. Advanced Plus3/4
+
+    http://chrisacorns.computinghistory.org.uk/8bit_Upgrades/PRES_AP3A.html
 
     TODO:
-    - add spare ROM slot
+    - AP4 (DFS) is unreliable, maybe WD1770 reset issue to be investigated
+    - add spare ROM slot in AP3 and AP4, not AP3/4
 
 **********************************************************************/
 
 
 #include "emu.h"
-#include "peg400.h"
+#include "ap34.h"
 
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ELECTRON_PEG400, electron_peg400_device, "electron_peg400", "Slogger Pegasus 400 disk interface")
+DEFINE_DEVICE_TYPE(ELECTRON_AP34, electron_ap34_device, "electron_ap34", "P.R.E.S. Advanced Plus 3/4")
 
 
 //-------------------------------------------------
-//  MACHINE_DRIVER( peg400 )
+//  MACHINE_DRIVER( ap34 )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER(electron_peg400_device::floppy_formats)
+FLOPPY_FORMATS_MEMBER(electron_ap34_device::floppy_formats)
 	FLOPPY_ACORN_SSD_FORMAT,
 	FLOPPY_ACORN_DSD_FORMAT,
 	FLOPPY_ACORN_ADFS_OLD_FORMAT
 FLOPPY_FORMATS_END0
 
-SLOT_INTERFACE_START(peg400_floppies)
+SLOT_INTERFACE_START(ap34_floppies)
 	SLOT_INTERFACE("35dd",  FLOPPY_35_DD)
 	SLOT_INTERFACE("525qd", FLOPPY_525_QD)
 SLOT_INTERFACE_END
@@ -40,13 +43,12 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(electron_peg400_device::device_add_mconfig)
+MACHINE_CONFIG_START(electron_ap34_device::device_add_mconfig)
 	/* fdc */
 	MCFG_WD1770_ADD("fdc", 16_MHz_XTAL / 2)
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(electron_peg400_device, fdc_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", peg400_floppies, "525qd", electron_peg400_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ap34_floppies, "525qd", electron_ap34_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", peg400_floppies, nullptr, electron_peg400_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ap34_floppies, nullptr, electron_ap34_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
@@ -55,11 +57,11 @@ MACHINE_CONFIG_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  electron_peg400_device - constructor
+//  electron_ap34_device - constructor
 //-------------------------------------------------
 
-electron_peg400_device::electron_peg400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELECTRON_PEG400, tag, owner, clock)
+electron_ap34_device::electron_ap34_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ELECTRON_AP34, tag, owner, clock)
 	, device_electron_cart_interface(mconfig, *this)
 	, m_fdc(*this, "fdc")
 	, m_floppy0(*this, "fdc:0")
@@ -71,7 +73,7 @@ electron_peg400_device::electron_peg400_device(const machine_config &mconfig, co
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void electron_peg400_device::device_start()
+void electron_ap34_device::device_start()
 {
 }
 
@@ -79,9 +81,9 @@ void electron_peg400_device::device_start()
 //  read - cartridge data read
 //-------------------------------------------------
 
-uint8_t electron_peg400_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa)
+uint8_t electron_ap34_device::read(address_space &space, offs_t offset, int infc, int infd, int romqa)
 {
-	uint8_t data = 0xff;
+	uint8_t data = 0xfe;
 
 	if (infc)
 	{
@@ -98,21 +100,14 @@ uint8_t electron_peg400_device::read(address_space &space, offs_t offset, int in
 
 	if (!infc && !infd)
 	{
-		switch (romqa)
+		if (offset >= 0x0000 && offset < 0x4000)
 		{
-		case 0:
-			if (offset < 0x3800)
-			{
-				data = m_rom[(offset & 0x3fff) + (romqa * 0x4000)];
-			}
-			else
-			{
-				data = m_ram[offset & 0x07ff];
-			}
-			break;
-		case 1:
 			data = m_rom[(offset & 0x3fff) + (romqa * 0x4000)];
-			break;
+		}
+
+		if (m_ram.size() != 0 && romqa == 0 && offset >= 0x3000)
+		{
+			data = m_ram[offset & 0x0fff];
 		}
 	}
 
@@ -123,7 +118,7 @@ uint8_t electron_peg400_device::read(address_space &space, offs_t offset, int in
 //  write - cartridge data write
 //-------------------------------------------------
 
-void electron_peg400_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa)
+void electron_ap34_device::write(address_space &space, offs_t offset, uint8_t data, int infc, int infd, int romqa)
 {
 	if (infc)
 	{
@@ -143,9 +138,9 @@ void electron_peg400_device::write(address_space &space, offs_t offset, uint8_t 
 
 	if (!infc && !infd)
 	{
-		if (romqa == 0 && offset >= 0x3800)
+		if (m_ram.size() != 0 && romqa == 0 && offset >= 0x3000)
 		{
-			m_ram[offset & 0x07ff] = data;
+			m_ram[offset & 0x0fff] = data;
 		}
 	}
 }
@@ -155,7 +150,7 @@ void electron_peg400_device::write(address_space &space, offs_t offset, uint8_t 
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE8_MEMBER(electron_peg400_device::wd1770_control_w)
+WRITE8_MEMBER(electron_ap34_device::wd1770_control_w)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -171,13 +166,8 @@ WRITE8_MEMBER(electron_peg400_device::wd1770_control_w)
 	// bit 3: density
 	m_fdc->dden_w(BIT(data, 3));
 
-	// bit 4: send DRQ to NMI signal
-	m_fdc_ie = BIT(data, 4);
+	// bit 4: NMI - not connected
 
-	// bit 5: head load
-}
-
-WRITE_LINE_MEMBER(electron_peg400_device::fdc_drq_w)
-{
-	m_slot->nmi_w((state && m_fdc_ie) ? ASSERT_LINE : CLEAR_LINE);
+	// bit 5: reset
+	if (!BIT(data, 5)) m_fdc->soft_reset();
 }
