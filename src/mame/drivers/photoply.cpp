@@ -13,7 +13,7 @@ TODO:
 - VGA BIOS reports being a Cirrus Logic GD5436 / 5446, it is unknown what exactly this game uses.
 - PCI hookups (no idea about what this uses), and improve/device-ify SiS85C49x;
 - ISA bus cards are completely guessworked;
-- EEPROM writes fail due to timing issues (likely unemulated wait states on port accesses);
+- EEPROM timings are hacked (writes mostly fail otherwise);
 - Eventually needs AudioDrive ES688 / ES1688 / ES1788 & ES1868 devices and serial ports "for linking" before actually booting;
 
 
@@ -314,6 +314,8 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5446, 0)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+	MCFG_EEPROM_WRITE_TIME(attotime::from_usec(1))
+	MCFG_EEPROM_ERASE_ALL_TIME(attotime::from_usec(10))
 MACHINE_CONFIG_END
 
 
