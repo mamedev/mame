@@ -904,6 +904,7 @@ end
 --			"android_support",
 --			"stdc++",
 -->>>>>>> 2beedc540f14267850036f8b2aba81e874895ade
+			"stdc++",
 			"gcc",
 		}
 -- LIBRETRO HACK END support ndk-r13b structure
@@ -950,6 +951,7 @@ end
 				"unwind",
 			}
 			linkoptions {
+				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a/libunwind.a -lgcc",
 				"-gcc-toolchain $(ANDROID_NDK_ARM)",
 				"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm",
 				"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtbegin_so.o",

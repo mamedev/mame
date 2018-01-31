@@ -869,7 +869,8 @@ public:
 		int i,j;
  		char defname[32];
 
-		Input_Binding(machine);
+		if (buttons_profiles)
+			Input_Binding(machine);
 
 		for (i = 0; i < 4; i++)
 		{
