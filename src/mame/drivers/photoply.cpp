@@ -13,7 +13,7 @@ TODO:
 - VGA BIOS reports being a Cirrus Logic GD5436 / 5446, it is unknown what exactly this game uses.
 - PCI hookups (no idea about what this uses), and improve/device-ify SiS85C49x;
 - ISA bus cards are completely guessworked;
-- EEPROM (most likely at i/o 0x200);
+- EEPROM writes fail due to timing issues (likely unemulated wait states on port accesses);
 - Eventually needs AudioDrive ES688 / ES1688 / ES1788 & ES1868 devices and serial ports "for linking" before actually booting;
 
 
@@ -21,6 +21,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "machine/eepromser.h"
 #include "machine/lpci.h"
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
@@ -32,11 +33,14 @@ class photoply_state : public pcat_base_state
 public:
 	photoply_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag),
+		m_eeprom(*this, "eeprom"),
 		m_main_bios(*this, "bios"),
 		m_video_bios(*this, "video_bios"),
 		m_ex_bios(*this, "ex_bios")
 	{
 	}
+
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
 	required_region_ptr<uint8_t> m_main_bios;
 	required_region_ptr<uint8_t> m_video_bios;
@@ -46,6 +50,7 @@ public:
 
 	DECLARE_READ8_MEMBER(bios_r);
 	DECLARE_WRITE8_MEMBER(bios_w);
+	DECLARE_WRITE8_MEMBER(eeprom_w);
 
 	uint16_t m_pci_shadow_reg;
 	DECLARE_DRIVER_INIT(photoply);
@@ -144,6 +149,11 @@ READ8_MEMBER(photoply_state::bios_r)
 		// multifunction board bios
 		// Note: if filled with a reload on 0x4000-0x7fff it will repeat the "Combo I/O" EEPROM check (which looks unlikely)
 		case 1: // c8000-cffff
+			if ((offset & 0x7fff) == 0x3fff)
+			{
+				// other bits are unknown
+				return m_eeprom->do_read() << 2;
+			}
 			return m_ex_bios[offset & 0x7fff];
 		case 2: // d0000-dffff
 		case 3:
@@ -167,6 +177,17 @@ WRITE8_MEMBER(photoply_state::bios_w)
 	}
 }
 
+WRITE8_MEMBER(photoply_state::eeprom_w)
+{
+	//logerror("Writing %X to EEPROM output port\n", data);
+	m_eeprom->di_write(BIT(data, 0));
+	m_eeprom->clk_write(BIT(data, 1));
+	m_eeprom->cs_write(BIT(data, 2));
+
+	// Bits 2-3 also seem to be used to bank something else.
+	// Bits 4-7 are set for some writes, but may do nothing?
+}
+
 static ADDRESS_MAP_START( photoply_map, AS_PROGRAM, 32, photoply_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, mem_r, mem_w, 0xffffffff)
@@ -185,7 +206,7 @@ static ADDRESS_MAP_START( photoply_io, AS_IO, 32, photoply_state )
 
 	AM_RANGE(0x0170, 0x0177) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs0, write_cs0)
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
-	AM_RANGE(0x0200, 0x0203) AM_NOP // eeprom
+	AM_RANGE(0x0200, 0x0203) AM_WRITE8(eeprom_w, 0x00ff0000)
 //	AM_RANGE(0x0278, 0x027f) AM_RAM //parallel port 2
 	AM_RANGE(0x0370, 0x0377) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs1, write_cs1)
 //	AM_RANGE(0x0378, 0x037f) AM_RAM //parallel port
@@ -291,6 +312,8 @@ MACHINE_CONFIG_START(photoply_state::photoply)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
 	MCFG_DEVICE_ADD("vga", CIRRUS_GD5446, 0)
+
+	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
 
