@@ -569,8 +569,8 @@ static ADDRESS_MAP_START( robby_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_SHARE("protected_ram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_SHARE("protected_ram")
 	AM_RANGE(0xe800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -587,8 +587,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( profpac_map, AS_PROGRAM, 8, astrocde_state )
-	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_SHARE("protected_ram")
 	AM_IMPORT_FROM(demndrgn_map)
+	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(protected_ram_r, protected_ram_w) AM_SHARE("protected_ram")
 ADDRESS_MAP_END
 
 
@@ -601,9 +601,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( profpac_bank4000_map, AS_PROGRAM, 8, astrocde_state )
+	AM_IMPORT_FROM(bank4000_map)
 	AM_RANGE(0x10000, 0xaffff) AM_ROM AM_REGION("epromboard", 0)
 	AM_RANGE(0xb0000, 0xb3fff) AM_READNOP
-	AM_IMPORT_FROM(bank4000_map)
 ADDRESS_MAP_END
 
 
@@ -665,6 +665,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( port_map_16col_pattern_tenpindx, AS_IO, 8, astrocde_state )
+	AM_IMPORT_FROM(port_map_16col_pattern_nosound)
 	AM_RANGE(0x0060, 0x0060) AM_MIRROR(0xff00) AM_READ_PORT("P60")
 	AM_RANGE(0x0061, 0x0061) AM_MIRROR(0xff00) AM_READ_PORT("P61")
 	AM_RANGE(0x0062, 0x0062) AM_MIRROR(0xff00) AM_READ_PORT("P62")
@@ -674,7 +675,6 @@ static ADDRESS_MAP_START( port_map_16col_pattern_tenpindx, AS_IO, 8, astrocde_st
 	AM_RANGE(0x0067, 0x0067) AM_MIRROR(0xff00) AM_WRITE(tenpindx_counter_w)
 	AM_RANGE(0x0068, 0x0068) AM_MIRROR(0xff00) AM_WRITE(tenpindx_lights_w)
 	AM_RANGE(0x0097, 0x0097) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_IMPORT_FROM(port_map_16col_pattern_nosound)
 ADDRESS_MAP_END
 
 

@@ -124,8 +124,8 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsoccr94_io_map, AS_IO, 16, m107_state )
-	AM_RANGE(0x06, 0x07) AM_WRITE8(bankswitch_w, 0x00ff)
 	AM_IMPORT_FROM(main_portmap)
+	AM_RANGE(0x06, 0x07) AM_WRITE8(bankswitch_w, 0x00ff)
 ADDRESS_MAP_END
 
 /* same as M107 but with an extra i/o board */
@@ -140,17 +140,17 @@ WRITE16_MEMBER(m107_state::wpksoc_output_w)
 }
 
 static ADDRESS_MAP_START( wpksoc_map, AS_PROGRAM, 16, m107_state )
+	AM_IMPORT_FROM(main_map)
 	AM_RANGE(0xf0000, 0xf0001) AM_READ_PORT("WPK_DSW0")
 	AM_RANGE(0xf0002, 0xf0003) AM_READ_PORT("WPK_DSW1")
 	AM_RANGE(0xf0004, 0xf0005) AM_READ_PORT("WPK_DSW2")
-	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wpksoc_io_map, AS_IO, 16, m107_state )
+	AM_IMPORT_FROM(main_portmap)
 	AM_RANGE(0x22, 0x23) AM_WRITE(wpksoc_output_w)
 	AM_RANGE(0xc0, 0xc1) AM_READ_PORT("WPK_IN0")
 	AM_RANGE(0xc2, 0xc3) AM_READ_PORT("WPK_IN1")
-	AM_IMPORT_FROM(main_portmap)
 ADDRESS_MAP_END
 
 /******************************************************************************/

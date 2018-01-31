@@ -651,6 +651,7 @@ static ADDRESS_MAP_START(dmac_mem, AS_PROGRAM, 16, altos8600_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(dmac_io, AS_IO, 16, altos8600_state)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmi_r, nmi_w)
 	AM_RANGE(0x0000, 0x0007) AM_READ(fault_r)
 	AM_RANGE(0x0008, 0x000f) AM_WRITE(clear_w)
 	AM_RANGE(0x0010, 0x0017) AM_READ(errlo_r)
@@ -671,7 +672,6 @@ static ADDRESS_MAP_START(dmac_io, AS_IO, 16, altos8600_state)
 	AM_RANGE(0x0078, 0x0079) AM_WRITE8(ics_attn_w, 0xffff)
 	AM_RANGE(0x0200, 0x03ff) AM_READWRITE(mmuflags_r, mmuflags_w)
 	AM_RANGE(0x0400, 0x05ff) AM_READWRITE(mmuaddr_r, mmuaddr_w)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmi_r, nmi_w)
 ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START(altos8600_floppies)

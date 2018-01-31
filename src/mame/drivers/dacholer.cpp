@@ -235,9 +235,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dacholer_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itaten_main_map, AS_PROGRAM, 8, dacholer_state )
+	AM_IMPORT_FROM( main_map )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xb7ff) AM_RAM
-	AM_IMPORT_FROM( main_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, dacholer_state )

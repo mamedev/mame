@@ -60,7 +60,6 @@ static ADDRESS_MAP_START( crospang_base_map, AS_PROGRAM, 16, crospang_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crospang_map, AS_PROGRAM, 16, crospang_state )
-
 	AM_IMPORT_FROM(crospang_base_map)
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP

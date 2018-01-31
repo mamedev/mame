@@ -54,8 +54,8 @@ static ADDRESS_MAP_START( kyugo_main_map, AS_PROGRAM, 8, kyugo_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gyrodine_main_map, AS_PROGRAM, 8, kyugo_state )
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_IMPORT_FROM(kyugo_main_map)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 

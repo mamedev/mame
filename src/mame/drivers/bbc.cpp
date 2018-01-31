@@ -194,6 +194,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
+	AM_IMPORT_FROM(bbc_base)
+
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)                                     /*    0000-3fff                 Regular Ram                     */
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE(bbc_memoryb3_w)                                     /*    4000-7fff                 Regular Ram                     */
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE(bbc_memoryb4_w)                                     /*    8000-bfff                 Paged ROM                       */
@@ -201,22 +203,23 @@ static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
 																																																							/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_DEVICE("i8271", i8271_device, map)                                              /*    fe80-fe83  8271 FDC       Floppy disc controller          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("i8271", i8271_device, data_r, data_w)                             /*    fe84-fe9f  8271 FDC       Floppy disc controller          */
-	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bbcb_nofdc_mem, AS_PROGRAM, 8, bbc_state )
+	AM_IMPORT_FROM(bbc_base)
+
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)                                     /*    0000-3fff                 Regular Ram                     */
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank3") AM_WRITE(bbc_memoryb3_w)                                     /*    4000-7fff                 Regular Ram                     */
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank4") AM_WRITE(bbc_memoryb4_w)                                     /*    8000-bfff                 Paged ROM                       */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectb_w)                                         /* R: fe30-fe3f  NC             Not Connected                   */
 																																																							/* W: fe30-fe3f  84LS161        Paged ROM selector              */
 	AM_RANGE(0xfe80, 0xfe83) AM_NOP                                                                             /*    fe80-fe9f                 Floppy disc controller          */
-	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
+	AM_IMPORT_FROM(bbc_base)
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)                    /*    0000-2fff                 Regular Ram                     */
 	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybp2_w)                    /*    3000-7fff                 Video/Shadow Ram                */
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_w)                    /*    8000-afff                 Paged ROM or 12K of SWRAM       */
@@ -226,11 +229,11 @@ static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe80, 0xfe83) AM_READWRITE(bbc_fe_r, bbc_wd1770_status_w)                        /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)              /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfee0, 0xfeff) AM_DEVREADWRITE("tube", bbc_tube_slot_device, host_r, host_w)      /*    fee0-feff  Tube ULA       Tube system interface           */
-	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
+	AM_IMPORT_FROM(bbc_base)
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)                    /*    0000-2fff                 Regular Ram                     */
 	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybp2_w)                    /*    3000-7fff                 Video/Shadow Ram                */
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_128_w)                /*    8000-afff                 Paged ROM or 12K of SWRAM       */
@@ -240,11 +243,11 @@ static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe80, 0xfe83) AM_READWRITE(bbc_fe_r, bbc_wd1770_status_w)                        /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_DEVREADWRITE("wd1770", wd1770_device, read, write)              /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfee0, 0xfeff) AM_DEVREADWRITE("tube", bbc_tube_slot_device, host_r, host_w)      /*    fee0-feff  Tube ULA       Tube system interface           */
-	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( reutapm_mem, AS_PROGRAM, 8, bbc_state )
+	AM_IMPORT_FROM(bbc_base)
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)                    /*    0000-2fff                 Regular Ram                     */
 	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybp2_w)                    /*    3000-7fff                 Video/Shadow Ram                */
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybp4_w)                    /*    8000-afff                 Paged ROM or 12K of SWRAM       */
@@ -254,7 +257,6 @@ static ADDRESS_MAP_START( reutapm_mem, AS_PROGRAM, 8, bbc_state )
 	AM_RANGE(0xfe80, 0xfe83) AM_NOP                                                             /*    fe80-fe83  1770 FDC       Drive control register          */
 	AM_RANGE(0xfe84, 0xfe9f) AM_NOP                                                             /*    fe84-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)                                                  /*    fee0-feff  Tube ULA       Tube system interface           */
-	AM_IMPORT_FROM(bbc_base)
 ADDRESS_MAP_END
 
 /******************************************************************************

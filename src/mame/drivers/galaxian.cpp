@@ -1821,6 +1821,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( anteatergg_map, AS_PROGRAM, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_IMPORT_FROM(galaxian_map_discrete)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_RAM_WRITE(galaxian_videoram_w) AM_SHARE("videoram")
@@ -1837,7 +1838,6 @@ static ADDRESS_MAP_START( anteatergg_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_x_w)
 	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x07f8) AM_WRITE(galaxian_flip_screen_y_w)
 	AM_RANGE(0x7800, 0x7800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
-	AM_IMPORT_FROM(galaxian_map_discrete)
 ADDRESS_MAP_END
 
 /* map derived from schematics */

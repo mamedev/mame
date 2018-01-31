@@ -108,9 +108,9 @@ static ADDRESS_MAP_START( diamond_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x3d01, 0x3d01) AM_WRITENOP // ?
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(gng_bankswitch_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x6000, 0xffff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_READ(diamond_hack_r)
 	AM_RANGE(0x6048, 0x6048) AM_WRITENOP // ?
-	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 

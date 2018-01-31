@@ -1340,11 +1340,11 @@ static ADDRESS_MAP_START( ptblank2_map, AS_PROGRAM, 32, namcos12_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tektagt_map, AS_PROGRAM, 32, namcos12_state )
+	AM_IMPORT_FROM( namcos12_map )
+
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_READWRITE16(tektagt_protection_1_r, tektagt_protection_1_w, 0xffffffff)
 	AM_RANGE(0x1fb80000, 0x1fb80003) AM_READWRITE16(tektagt_protection_2_r, tektagt_protection_2_w, 0xffffffff)
 	AM_RANGE(0x1f700000, 0x1f700003) AM_READ16(tektagt_protection_3_r, 0xffffffff)
-
-	AM_IMPORT_FROM( namcos12_map )
 ADDRESS_MAP_END
 
 WRITE16_MEMBER(namcos12_state::system11gun_w)
@@ -1632,10 +1632,10 @@ READ16_MEMBER(namcos12_state::s12_mcu_gun_v_r)
 }
 
 static ADDRESS_MAP_START( golgo13_h8iomap, AS_IO, 16, namcos12_state )
+	AM_IMPORT_FROM( s12h8iomap )
+
 	AM_RANGE(h8_device::ADC_1, h8_device::ADC_1) AM_READ(s12_mcu_gun_h_r)
 	AM_RANGE(h8_device::ADC_2, h8_device::ADC_2) AM_READ(s12_mcu_gun_v_r)
-
-	AM_IMPORT_FROM( s12h8iomap )
 ADDRESS_MAP_END
 
 

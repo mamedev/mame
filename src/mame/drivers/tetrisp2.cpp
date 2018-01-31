@@ -323,8 +323,6 @@ static ADDRESS_MAP_START( tetrisp2_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP                                                    // scr_size
 	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")                       // Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(tetrisp2_systemregs_w)                                // system param
-	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP                                                    // Lev 4 irq ack
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP                                                    // Lev 2 irq ack
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP                                                     // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")                                        // Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ(tetrisp2_ip_1_word_r)                                  // Inputs & protection
@@ -389,8 +387,6 @@ static ADDRESS_MAP_START( nndmseal_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(nndmseal_sound_bank_w)
 
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w    )   // system param
-	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP    // Lev 4 irq ack
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP    // Lev 2 irq ack
 
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("BUTTONS"         )   // Inputs
@@ -426,8 +422,6 @@ static ADDRESS_MAP_START( rockn1_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP                                                    // scr_size
 	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")                       // Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w)                                   // system param
-	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP                                                    // Lev 4 irq ack
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP                                                    // Lev 2 irq ack
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP                                                     // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")                                        // Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")                                         // Inputs
@@ -460,8 +454,6 @@ static ADDRESS_MAP_START( rockn2_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP                                                    // scr_size
 	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")                   // Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w)                                   // system param
-	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP                                                    // Lev 4 irq ack
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP                                                    // Lev 2 irq ack
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP                                                     // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")                                        // Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")                                         // Inputs
@@ -495,8 +487,6 @@ static ADDRESS_MAP_START( rocknms_main_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP                                                    // scr_size
 	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")                       // Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w)                                   // system param
-	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP                                                    // Lev 4 irq ack
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP                                                    // Lev 2 irq ack
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP                                                     // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")                                         // Inputs
@@ -529,8 +519,6 @@ static ADDRESS_MAP_START( rocknms_sub_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP                                                    // scr_size
 	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("sub_rotregs")                       // Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rocknms_sub_systemregs_w)                             // system param
-	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP                                                    // Lev 4 irq ack
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP                                                    // Lev 2 irq ack
 //  AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP                                                     // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READWRITE(rocknms_main2sub_r, rocknms_sub2main_w)           // MAIN <-> SUB Communication
 	AM_RANGE(0xbe000a, 0xbe000b) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)       // Watchdog
@@ -632,7 +620,6 @@ static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP                                                    // scr_size
 	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_SHARE("rotregs")                               // Rotation Registers
 	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(rockn_systemregs_w)                                   // System param
-	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP                                                    // Lev 2 irq ack
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP                                                     // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("BUTTONS")                                        // Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ(stepstag_coins_r)                                      // Inputs & protection
@@ -662,19 +649,19 @@ static ADDRESS_MAP_START( stepstag_sub_map, AS_PROGRAM, 16, stepstag_state )
 
 	// left screen sprites
 	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_SHARE("spriteram")       // Object RAM
-	AM_RANGE(0x800000, 0x87ffff) AM_RAM
+	AM_RANGE(0x804000, 0x87ffff) AM_RAM
 	AM_RANGE(0x880000, 0x880001) AM_WRITENOP // cleared after writing this sprite list
 //  AM_RANGE(0x8c0000, 0x8c0001) AM_WRITENOP // cleared at boot
 
 	// middle screen sprites
 	AM_RANGE(0x900000, 0x903fff) AM_RAM AM_SHARE("spriteram2")      // Object RAM
-	AM_RANGE(0x900000, 0x97ffff) AM_RAM
+	AM_RANGE(0x904000, 0x97ffff) AM_RAM
 	AM_RANGE(0x980000, 0x980001) AM_WRITENOP // cleared after writing this sprite list
 //  AM_RANGE(0x9c0000, 0x9c0001) AM_WRITENOP // cleared at boot
 
 	// right screen sprites
 	AM_RANGE(0xa00000, 0xa03fff) AM_RAM AM_SHARE("spriteram3")      // Object RAM
-	AM_RANGE(0xa00000, 0xa7ffff) AM_RAM
+	AM_RANGE(0xa04000, 0xa7ffff) AM_RAM
 	AM_RANGE(0xa80000, 0xa80001) AM_WRITENOP // cleared after writing this sprite list
 //  AM_RANGE(0xac0000, 0xac0001) AM_WRITENOP // cleared at boot
 

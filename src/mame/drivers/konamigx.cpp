@@ -1014,6 +1014,7 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
+	AM_IMPORT_FROM(gx_base_memmap)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM         // LAN RAM? (Racin' Force has, Open Golf doesn't)
 	AM_RANGE(0xdd0000, 0xdd00ff) AM_READNOP AM_WRITENOP // LAN board
@@ -1029,16 +1030,16 @@ static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READ(type1_roz_r2)  // ROM readback
 	AM_RANGE(0xf80000, 0xf80fff) AM_RAM // chip 21Q / S
 	AM_RANGE(0xfc0000, 0xfc00ff) AM_RAM // chip 22N / S
-	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type2_map, AS_PROGRAM, 32, konamigx_state )
+	AM_IMPORT_FROM(gx_base_memmap)
 	AM_RANGE(0xcc0000, 0xcc0003) AM_WRITE(esc_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
-	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32, konamigx_state )
+	AM_IMPORT_FROM(gx_base_memmap)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
 	//AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_SHARE("k053936_0_ctrl")
@@ -1049,10 +1050,10 @@ static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xea0000, 0xea3fff) AM_RAM AM_SHARE("subpaletteram")
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)
 	//AM_RANGE(0xf00000, 0xf07fff) AM_RAM
-	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type4_map, AS_PROGRAM, 32, konamigx_state )
+	AM_IMPORT_FROM(gx_base_memmap)
 	AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_SHARE("k053936_0_ctrl")
@@ -1064,7 +1065,6 @@ static ADDRESS_MAP_START( gx_type4_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)      // type 4 polls this too
 	AM_RANGE(0xf00000, 0xf07fff) AM_RAM_WRITE(konamigx_t4_psacmap_w) AM_SHARE("psacram")    // PSAC2 tilemap
 //  AM_RANGE(0xf00000, 0xf07fff) AM_RAM
-	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
 /**********************************************************************************/

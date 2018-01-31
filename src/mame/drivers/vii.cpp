@@ -1004,6 +1004,8 @@ WRITE16_MEMBER( spg2xx_game_state::spriteram_w )
 */
 
 static ADDRESS_MAP_START( vii_mem, AS_PROGRAM, 16, spg2xx_game_state )
+	AM_RANGE( 0x000000, 0x3fffff ) AM_ROMBANK("cart")
+
 	AM_RANGE( 0x000000, 0x0027ff ) AM_RAM AM_SHARE("p_ram")
 	AM_RANGE( 0x002800, 0x0028ff ) AM_READWRITE(video_r, video_w)
 	AM_RANGE( 0x002900, 0x002aff ) AM_RAM AM_SHARE("p_rowscroll")
@@ -1011,7 +1013,6 @@ static ADDRESS_MAP_START( vii_mem, AS_PROGRAM, 16, spg2xx_game_state )
 	AM_RANGE( 0x002c00, 0x002fff ) AM_RAM AM_SHARE("p_spriteram")
 	AM_RANGE( 0x003000, 0x0037ff ) AM_READWRITE(audio_r, audio_w)
 	AM_RANGE( 0x003d00, 0x003eff ) AM_READWRITE(io_r,    io_w)
-	AM_RANGE( 0x000000, 0x3fffff ) AM_ROMBANK("cart")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vii )

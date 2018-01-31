@@ -503,8 +503,8 @@ static ADDRESS_MAP_START( tx1_math, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0x02800, 0x02bff) AM_WRITE(halt_math_w)
 	AM_RANGE(0x02C00, 0x02fff) AM_WRITE(tx1_flgcs_w)
 	AM_RANGE(0x03000, 0x03fff) AM_READWRITE(tx1_math_r, tx1_math_w)
-	AM_RANGE(0x05000, 0x07fff) AM_READ(tx1_spcs_rom_r)
 	AM_RANGE(0x04000, 0x07fff) AM_MIRROR(0xf8000) AM_ROM
+	AM_RANGE(0x05000, 0x07fff) AM_READ(tx1_spcs_rom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tx1_sound_prg, AS_PROGRAM, 8, tx1_state )
@@ -566,8 +566,8 @@ static ADDRESS_MAP_START( buggyboy_math, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0x02000, 0x022ff) AM_RAM AM_SHARE("objram")
 	AM_RANGE(0x02400, 0x024ff) AM_WRITE(buggyboy_gas_w)
 	AM_RANGE(0x03000, 0x03fff) AM_READWRITE(buggyboy_math_r, buggyboy_math_w)
-	AM_RANGE(0x05000, 0x07fff) AM_READ(buggyboy_spcs_rom_r)
 	AM_RANGE(0x04000, 0x07fff) AM_MIRROR(0xf8000) AM_ROM
+	AM_RANGE(0x05000, 0x07fff) AM_READ(buggyboy_spcs_rom_r)
 ADDRESS_MAP_END
 
 /* Buggy Boy Sound PCB TC033A */

@@ -201,46 +201,46 @@ ADDRESS_MAP_END
 
 // base map + ALPHA-8x0x protection
 static ADDRESS_MAP_START( champbasj_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("alpha_8201", alpha_8201_device, ext_ram_r, ext_ram_w)
 	AM_IMPORT_FROM( champbas_map )
+	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("alpha_8201", alpha_8201_device, ext_ram_r, ext_ram_w)
 ADDRESS_MAP_END
 
 // different protection for champbasja
 static ADDRESS_MAP_START( champbasja_map, AS_PROGRAM, 8, champbas_state )
+	AM_IMPORT_FROM( champbas_map )
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_protection_r)
-	AM_IMPORT_FROM( champbas_map )
 ADDRESS_MAP_END
 
 // champbasjb appears to have no protection
 static ADDRESS_MAP_START( champbasjb_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_IMPORT_FROM( champbas_map )
+	AM_RANGE(0x6000, 0x63ff) AM_RAM
 ADDRESS_MAP_END
 
 // champbb2
 static ADDRESS_MAP_START( champbb2_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x7800, 0x7fff) AM_ROM
 	AM_IMPORT_FROM( champbasj_map )
+	AM_RANGE(0x7800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tbasebal_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x7800, 0x7fff) AM_ROM
 	AM_IMPORT_FROM( champbas_map )
+	AM_RANGE(0x7800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 // more sprites in exctsccr
 static ADDRESS_MAP_START( exctsccr_map, AS_PROGRAM, 8, champbas_state )
+	AM_IMPORT_FROM( champbasj_map )
 	AM_RANGE(0x7000, 0x7001) AM_UNMAP // aysnd is controlled by audiocpu
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM
 	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_IMPORT_FROM( champbasj_map )
 ADDRESS_MAP_END
 
 // exctsccrb
 static ADDRESS_MAP_START( exctsccrb_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_IMPORT_FROM( champbasj_map )
+	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
 ADDRESS_MAP_END
 
 

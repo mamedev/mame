@@ -282,9 +282,9 @@ static ADDRESS_MAP_START( olibochu_map, AS_PROGRAM, 8, olibochu_state )
 	AM_RANGE(0xa005, 0xa005) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa800, 0xa801) AM_WRITE(sound_command_w)
 	AM_RANGE(0xa802, 0xa802) AM_WRITE(olibochu_flipscreen_w)    /* bit 6 = enable sound? */
+	AM_RANGE(0xf000, 0xffff) AM_RAM
 	AM_RANGE(0xf400, 0xf41f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf440, 0xf47f) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( olibochu_sound_map, AS_PROGRAM, 8, olibochu_state )

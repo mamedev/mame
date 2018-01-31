@@ -121,6 +121,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(hec2hrp_mem, AS_PROGRAM, 8, hec2hrp_state )
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
+	/* Main ROM page*/
+	AM_RANGE(0x0000,0x3fff) AM_ROM
+
 	/* Hardware address mapping*/
 	AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)/* Bank management*/
 	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
@@ -129,9 +132,6 @@ static ADDRESS_MAP_START(hec2hrp_mem, AS_PROGRAM, 8, hec2hrp_state )
 	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
 	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
 	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
-
-	/* Main ROM page*/
-	AM_RANGE(0x0000,0x3fff) AM_ROM
 
 	/* Video br mapping*/
 	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
@@ -145,6 +145,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(hec2hrx_mem, AS_PROGRAM, 8, hec2hrp_state )
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
+	/* Main ROM page*/
+	AM_RANGE(0x0000,0x3fff) AM_ROMBANK("bank2")
+
 	/* Hardware address mapping*/
 	AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)/* Bank management*/
 	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
@@ -153,9 +156,6 @@ static ADDRESS_MAP_START(hec2hrx_mem, AS_PROGRAM, 8, hec2hrp_state )
 	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
 	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
 	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
-
-	/* Main ROM page*/
-	AM_RANGE(0x0000,0x3fff) AM_ROMBANK("bank2")
 
 	/* Video br mapping*/
 	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")

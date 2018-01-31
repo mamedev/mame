@@ -157,7 +157,7 @@ void radica_eu3a14_state::handle_palette(screen_device &screen, bitmap_ind16 &bi
 		uint16_t dat = m_palram[offs++] << 8;
 		dat |= m_palram[offs++];
 
-		// llll lsss ---h hhhh
+		// llll lsss ---h hhhh
 		int l_raw = (dat & 0xf800) >> 11;
 		int sl_raw = (dat & 0x0700) >> 8;
 		int h_raw = (dat & 0x001f) >> 0;
@@ -516,9 +516,9 @@ static ADDRESS_MAP_START( radica_eu3a14_map, AS_PROGRAM, 8, radica_eu3a14_state 
 
 	AM_RANGE(0x6000, 0xdfff) AM_DEVICE("bank", address_map_bank_device, amap8)
 
-	AM_RANGE(0xfffe, 0xffff) AM_READ(irq_vector_r)
-
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu", 0x0000)
+
+	AM_RANGE(0xfffe, 0xffff) AM_READ(irq_vector_r)
 ADDRESS_MAP_END
 
 READ8_MEMBER(radica_eu3a14_state::dma_trigger_r)

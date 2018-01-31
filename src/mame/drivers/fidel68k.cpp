@@ -394,13 +394,13 @@ static ADDRESS_MAP_START( fex68k_map, AS_PROGRAM, 16, fidel68k_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fex68km2_map, AS_PROGRAM, 16, fidel68k_state )
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM
 	AM_IMPORT_FROM( fex68k_map )
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fex68km3_map, AS_PROGRAM, 16, fidel68k_state )
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_IMPORT_FROM( fex68k_map )
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 ADDRESS_MAP_END
 
 

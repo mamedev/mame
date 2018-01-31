@@ -165,7 +165,7 @@ static ADDRESS_MAP_START(pdp11_mem, AS_PROGRAM, 16, pdp11_state)
 	AM_RANGE( 0xea00, 0xfeff ) AM_ROM
 	AM_RANGE( 0xff70, 0xff77 ) AM_READWRITE(teletype_ctrl_r,teletype_ctrl_w)
 
-	AM_RANGE( 0xfe78, 0xfe7b ) AM_DEVREADWRITE("rx01", rx01_device, read, write)
+	AM_RANGE( 0xfe78, 0xfe7b ) AM_DEVWRITE("rx01", rx01_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pdp11qb_mem, AS_PROGRAM, 16, pdp11_state)

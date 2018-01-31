@@ -232,9 +232,9 @@ static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8, tecmo_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x2000, 0x207f) AM_RAM             /* Silkworm set #2 has a custom CPU which */
 												/* writes code to this area */
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_start_w)

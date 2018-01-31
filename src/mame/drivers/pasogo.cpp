@@ -446,16 +446,16 @@ static ADDRESS_MAP_START(emsbank_map, AS_PROGRAM, 16, pasogo_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pasogo_mem, AS_PROGRAM, 16, pasogo_state)
-	AM_RANGE(0xb8000, 0xbffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x80000, 0xeffff) AM_READWRITE(emsram_r, emsram_w)
+	AM_RANGE(0xb8000, 0xbffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("bank27")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(pasogo_io, AS_IO, 16, pasogo_state)
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
 	AM_RANGE(0x0026, 0x0027) AM_READWRITE8(vg230_io_r, vg230_io_w, 0xffff)
 	AM_RANGE(0x006c, 0x006f) AM_READWRITE(ems_r, ems_w)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
 ADDRESS_MAP_END
 
 
