@@ -782,12 +782,10 @@ ifdef WEBASSEMBLY
 PARAMS += --WEBASSEMBLY='$(WEBASSEMBLY)'
 endif
 
-<<<<<<< HEAD
-=======
 ifdef SANITIZE
 PARAMS += --SANITIZE='$(SANITIZE)'
 endif
->>>>>>> 5be2496d0cfa035881ebd3b6352951232880fc4b
+
 #-------------------------------------------------
 # All scripts
 #-------------------------------------------------
