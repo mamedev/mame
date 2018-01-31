@@ -746,14 +746,14 @@ void avigo_state::nvram_init(nvram_device &nvram, void *base, size_t size)
 	memset(base, 0x00, size);
 }
 
-static MACHINE_CONFIG_START( avigo )
+MACHINE_CONFIG_START(avigo_state::avigo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(avigo_mem)
 	MCFG_CPU_IO_MAP(avigo_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
@@ -787,7 +787,7 @@ static MACHINE_CONFIG_START( avigo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* real time clock */
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(avigo_state, tc8521_alarm_int))
 
 	/* flash ROMs */

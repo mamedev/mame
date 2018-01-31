@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE8_MEMBER( mpcc_reg_w );
 	void kbd_put(u8 data);
 
+	void besta(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -133,7 +134,7 @@ void besta_state::machine_reset()
 }
 
 /* CP31 processor board */
-static MACHINE_CONFIG_START( besta )
+MACHINE_CONFIG_START(besta_state::besta)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 2*16670000)
 	MCFG_CPU_PROGRAM_MAP(besta_mem)

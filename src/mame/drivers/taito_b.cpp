@@ -468,7 +468,7 @@ WRITE16_MEMBER(taitob_state::realpunc_output_w)
 
 static ADDRESS_MAP_START( rastsag2_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x600000, 0x607fff) AM_RAM /* Main RAM */ /*ashura up to 603fff only*/
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
@@ -483,7 +483,7 @@ static ADDRESS_MAP_START( crimec_map, AS_PROGRAM, 16, taitob_state )
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x600001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM /* Main RAM */
 ADDRESS_MAP_END
 
@@ -495,12 +495,12 @@ static ADDRESS_MAP_START( tetrist_map, AS_PROGRAM, 16, taitob_state )
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x60000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
 	AM_RANGE(0x800000, 0x807fff) AM_RAM /* Main RAM */
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tetrista_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	TC0180VCU_MEMRW( 0x400000 )
 	AM_RANGE(0x600000, 0x600003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0xff00)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM /* Main RAM */
@@ -517,7 +517,7 @@ static ADDRESS_MAP_START( hitice_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x700000, 0x700001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0xff00)
 	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM /* Main RAM */
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM_WRITE(hitice_pixelram_w) AM_SHARE("pixelram")
 	AM_RANGE(0xbffff0, 0xbffff5) AM_WRITE(hitice_pixel_scroll_w)
 //  { 0xbffffa, 0xbffffb, ???
@@ -539,7 +539,7 @@ static ADDRESS_MAP_START( rambo3_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x60001c, 0x60001d) AM_READ(trackx2_lo_r)
 	AM_RANGE(0x60001e, 0x60001f) AM_READ(trackx2_hi_r)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM /* Main RAM */
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 
@@ -554,7 +554,7 @@ static ADDRESS_MAP_START( pbobble_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(gain_control_w)
 	AM_RANGE(0x700000, 0x700001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM /* Main RAM */
 ADDRESS_MAP_END
 
@@ -570,7 +570,7 @@ static ADDRESS_MAP_START( spacedx_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(gain_control_w)
 	AM_RANGE(0x700000, 0x700001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM /* Main RAM */
 ADDRESS_MAP_END
 
@@ -582,7 +582,7 @@ static ADDRESS_MAP_START( spacedxo_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x210000, 0x210001) AM_READ_PORT("IN3")
 	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("IN4")
 	AM_RANGE(0x230000, 0x230001) AM_READ_PORT("IN5")
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x302000, 0x303fff) AM_READONLY
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM /* Main RAM */
 	TC0180VCU_MEMRW( 0x500000 )
@@ -600,7 +600,7 @@ static ADDRESS_MAP_START( qzshowby_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x600000, 0x600001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x700000, 0x700003) AM_WRITE(gain_control_w)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM /* Main RAM */
 ADDRESS_MAP_END
 
@@ -610,7 +610,7 @@ static ADDRESS_MAP_START( viofight_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x200000, 0x200001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0xff00)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0xff00)
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x80000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
 	AM_RANGE(0xa00000, 0xa03fff) AM_RAM /* Main RAM */
 ADDRESS_MAP_END
@@ -620,7 +620,7 @@ static ADDRESS_MAP_START( masterw_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM /* Main RAM */
 	TC0180VCU_MEMRW( 0x400000 )
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8("tc0040ioc", tc0040ioc_device, read, write, 0xff00)
 	AM_RANGE(0xa00000, 0xa00001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0xff00)
@@ -639,7 +639,7 @@ static ADDRESS_MAP_START( silentd_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x230000, 0x230001) AM_READ_PORT("IN5")
 	AM_RANGE(0x240000, 0x240001) AM_WRITENOP // ???
 //  AM_RANGE(0x240000, 0x240001) AM_READNOP /* read 4 times at init */
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x400000, 0x403fff) AM_RAM /* Main RAM */
 	TC0180VCU_MEMRW( 0x500000 )
 ADDRESS_MAP_END
@@ -649,7 +649,7 @@ static ADDRESS_MAP_START( selfeena_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM /* Main RAM */
 	TC0180VCU_MEMRW( 0x200000 )
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00)
 	AM_RANGE(0x410000, 0x41000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0xff00) /* mirror address - seems to be only used for coin control */
 	AM_RANGE(0x500000, 0x500001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
@@ -660,7 +660,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sbm_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM /* Main RAM */
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("tc0510nio", tc0510nio_device, halfword_wordswap_r, halfword_wordswap_w)
 	AM_RANGE(0x320000, 0x320001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
@@ -678,9 +678,9 @@ static ADDRESS_MAP_START( realpunc_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x188002, 0x188003) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_comm_w, 0xff00)
 	AM_RANGE(0x18c000, 0x18c001) AM_WRITE(realpunc_output_w)
 	TC0180VCU_MEMRW( 0x200000 )
-	AM_RANGE(0x280000, 0x281fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
-	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
+	AM_RANGE(0x280000, 0x281fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
+	AM_RANGE(0x300000, 0x300001) AM_DEVREADWRITE("hd63484", hd63484_device, status16_r, address16_w)
+	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE("hd63484", hd63484_device, data16_r, data16_w)
 //  AM_RANGE(0x320000, 0x320001) AM_NOP // ?
 	AM_RANGE(0x320002, 0x320003) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_comm_w, 0xff00)
 ADDRESS_MAP_END
@@ -1904,14 +1904,14 @@ void taitob_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( rastsag2 )
+MACHINE_CONFIG_START(taitob_state::rastsag2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(rastsag2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  rastansaga2_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -1949,7 +1949,7 @@ static MACHINE_CONFIG_START( rastsag2 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -1961,14 +1961,14 @@ static MACHINE_CONFIG_START( rastsag2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( masterw )
+MACHINE_CONFIG_START(taitob_state::masterw)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(masterw_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  masterw_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)  /* 6 MHz Z80B */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/4)  /* 6 MHz Z80B */
 	MCFG_CPU_PROGRAM_MAP(masterw_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2006,7 +2006,7 @@ static MACHINE_CONFIG_START( masterw )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz/8)  /* 3 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(24'000'000)/8)  /* 3 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitob_state, bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -2020,7 +2020,7 @@ static MACHINE_CONFIG_START( masterw )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tetrist, rastsag2 ) /* Nastar conversion kit with slightly different memory map */
+MACHINE_CONFIG_DERIVED(taitob_state::tetrist, rastsag2) /* Nastar conversion kit with slightly different memory map */
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tetrist_map)
@@ -2030,21 +2030,21 @@ static MACHINE_CONFIG_DERIVED( tetrist, rastsag2 ) /* Nastar conversion kit with
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tetrista, masterw ) /* Master of Weapon conversion kit with slightly different memory map */
+MACHINE_CONFIG_DERIVED(taitob_state::tetrista, masterw) /* Master of Weapon conversion kit with slightly different memory map */
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tetrista_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ashura )
+MACHINE_CONFIG_START(taitob_state::ashura)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(rastsag2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  rastansaga2_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2082,7 +2082,7 @@ static MACHINE_CONFIG_START( ashura )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2094,14 +2094,14 @@ static MACHINE_CONFIG_START( ashura )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( crimec )
+MACHINE_CONFIG_START(taitob_state::crimec)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(crimec_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  crimec_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2139,7 +2139,7 @@ static MACHINE_CONFIG_START( crimec )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -2152,14 +2152,14 @@ static MACHINE_CONFIG_START( crimec )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hitice )
+MACHINE_CONFIG_START(taitob_state::hitice)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(hitice_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  hitice_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)  /* 6 MHz Z80B */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/4)  /* 6 MHz Z80B */
 	MCFG_CPU_PROGRAM_MAP(viofight_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2198,7 +2198,7 @@ static MACHINE_CONFIG_START( hitice )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz/8)  /* 3 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(24'000'000)/8)  /* 3 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitob_state, bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -2215,14 +2215,14 @@ static MACHINE_CONFIG_START( hitice )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rambo3p )
+MACHINE_CONFIG_START(taitob_state::rambo3p)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rambo3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  rambo3_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2260,7 +2260,7 @@ static MACHINE_CONFIG_START( rambo3p )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)   /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)   /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -2273,14 +2273,14 @@ static MACHINE_CONFIG_START( rambo3p )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rambo3 )
+MACHINE_CONFIG_START(taitob_state::rambo3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12MHz verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12MHz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rambo3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  rambo3_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* 4MHz verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* 4MHz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2318,7 +2318,7 @@ static MACHINE_CONFIG_START( rambo3 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2330,14 +2330,14 @@ static MACHINE_CONFIG_START( rambo3 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pbobble )
+MACHINE_CONFIG_START(taitob_state::pbobble)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(pbobble_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  pbobble_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/2)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -2381,7 +2381,7 @@ static MACHINE_CONFIG_START( pbobble )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610B, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610B, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2393,14 +2393,14 @@ static MACHINE_CONFIG_START( pbobble )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spacedx )
+MACHINE_CONFIG_START(taitob_state::spacedx)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(spacedx_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  pbobble_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2444,7 +2444,7 @@ static MACHINE_CONFIG_START( spacedx )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2456,14 +2456,14 @@ static MACHINE_CONFIG_START( spacedx )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spacedxo )
+MACHINE_CONFIG_START(taitob_state::spacedxo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(spacedxo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  selfeena_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2501,7 +2501,7 @@ static MACHINE_CONFIG_START( spacedxo )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2513,7 +2513,7 @@ static MACHINE_CONFIG_START( spacedxo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( qzshowby )
+MACHINE_CONFIG_START(taitob_state::qzshowby)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz according to the readme*/
@@ -2576,14 +2576,14 @@ static MACHINE_CONFIG_START( qzshowby )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( viofight )
+MACHINE_CONFIG_START(taitob_state::viofight)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(viofight_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  viofight_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)  /* 6 MHz verified */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/4)  /* 6 MHz verified */
 	MCFG_CPU_PROGRAM_MAP(viofight_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2621,7 +2621,7 @@ static MACHINE_CONFIG_START( viofight )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz/8)   /* 3 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(24'000'000)/8)   /* 3 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitob_state, bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
@@ -2629,7 +2629,7 @@ static MACHINE_CONFIG_START( viofight )
 	MCFG_SOUND_ROUTE(2, "mono", 0.25)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4_224MHz/4, PIN7_HIGH) // 1.056MHz clock frequency, but pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(4'224'000)/4, PIN7_HIGH) // 1.056MHz clock frequency, but pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
@@ -2638,14 +2638,14 @@ static MACHINE_CONFIG_START( viofight )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( silentd )
+MACHINE_CONFIG_START(taitob_state::silentd)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(silentd_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  silentd_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2683,7 +2683,7 @@ static MACHINE_CONFIG_START( silentd )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2695,14 +2695,14 @@ static MACHINE_CONFIG_START( silentd )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( selfeena )
+MACHINE_CONFIG_START(taitob_state::selfeena)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(selfeena_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  selfeena_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2740,7 +2740,7 @@ static MACHINE_CONFIG_START( selfeena )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2761,14 +2761,14 @@ void taitob_state::ryujin_patch(void)
 }
 #endif
 
-static MACHINE_CONFIG_START( ryujin )
+MACHINE_CONFIG_START(taitob_state::ryujin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* 12 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)   /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(selfeena_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitob_state,  selfeena_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)  /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)  /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
@@ -2806,7 +2806,7 @@ static MACHINE_CONFIG_START( ryujin )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2825,7 +2825,7 @@ void taitob_state::sbm_patch(void)
 }
 #endif
 
-static MACHINE_CONFIG_START( sbm )
+MACHINE_CONFIG_START(taitob_state::sbm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz */
@@ -2881,7 +2881,7 @@ static MACHINE_CONFIG_START( sbm )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( realpunc )
+MACHINE_CONFIG_START(taitob_c_state::realpunc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)

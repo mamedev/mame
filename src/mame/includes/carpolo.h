@@ -130,4 +130,5 @@ public:
 	int check_sprite_sprite_collision(int x1, int y1, int code1, int flipy1,
 										int x2, int y2, int code2, int flipy2,
 										int *col_x, int *col_y);
+										void carpolo(machine_config &config);
 };

@@ -39,7 +39,7 @@ const char *ccvf_format::extensions() const
 const ccvf_format::format ccvf_format::file_formats[] = {
 	{
 		floppy_image::FF_525, floppy_image::SSSD,
-		(int) (1./(9600*8))*1000000000, 10, 41, 1, 128, {}, 0, { 0,5,1,6,2,7,3,8,4,9 }
+		(int) ((1./(9600*8))*1000000000), 10, 41, 1, 128, {}, 0, { 0,5,1,6,2,7,3,8,4,9 }
 	},
 	{}
 };

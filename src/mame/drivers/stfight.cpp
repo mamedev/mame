@@ -270,8 +270,8 @@ TODO:
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")                  /* sf02.bin */
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xc100, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xc100, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("P1")
 	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("P2")
 	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("START")
@@ -448,18 +448,18 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( stfight_base )
+MACHINE_CONFIG_START(stfight_state::stfight_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz / 4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
 
-	MCFG_CPU_ADD("mcu", M68705P5, XTAL_12MHz / 4)
+	MCFG_CPU_ADD("mcu", M68705P5, XTAL(12'000'000) / 4)
 	MCFG_M68705_PORTB_R_CB(READ8(stfight_state, stfight_68705_port_b_r));
 	MCFG_M68705_PORTA_W_CB(WRITE8(stfight_state, stfight_68705_port_a_w));
 	MCFG_M68705_PORTB_W_CB(WRITE8(stfight_state, stfight_68705_port_b_w));
@@ -474,25 +474,25 @@ static MACHINE_CONFIG_START( stfight_base )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// YM2203_PITCH_HACK - These should be clocked at 1.5Mhz (see TODO list)
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8 * 3)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000) / 8 * 3)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz / 8 * 3)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000) / 8 * 3)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(stfight_state, stfight_adpcm_int)) // Interrupt function
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  // 8KHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( stfight, stfight_base )
+MACHINE_CONFIG_DERIVED(stfight_state::stfight, stfight_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(stfight_cpu1_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -502,7 +502,7 @@ static MACHINE_CONFIG_DERIVED( stfight, stfight_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cshooter, stfight_base )
+MACHINE_CONFIG_DERIVED(stfight_state::cshooter, stfight_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cshooter_cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("airraid_vid:screen", stfight_state,  stfight_vb_interrupt)

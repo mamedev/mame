@@ -494,6 +494,7 @@ public:
 	// configuration helpers
 	void add_machine_configuration(machine_config &config) { device_add_mconfig(config); }
 	static void static_set_clock(device_t &device, u32 clock);
+	static void static_set_clock(device_t &device, const XTAL &xtal) { static_set_clock(device, xtal.value()); }
 	static void static_set_input_default(device_t &device, const input_device_default *config) { device.m_input_defaults = config; }
 	static void static_set_default_bios_tag(device_t &device, const char *tag) { device.m_default_bios_tag = tag; }
 
@@ -508,6 +509,7 @@ public:
 	u32 clock() const { return m_clock; }
 	u32 unscaled_clock() const { return m_unscaled_clock; }
 	void set_unscaled_clock(u32 clock);
+	void set_unscaled_clock(const XTAL &xtal) { set_unscaled_clock(xtal.value()); }
 	double clock_scale() const { return m_clock_scale; }
 	void set_clock_scale(double clockscale);
 	attotime clocks_to_attotime(u64 clocks) const;

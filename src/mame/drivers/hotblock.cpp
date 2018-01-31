@@ -77,6 +77,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void hotblock(machine_config &config);
 };
 
 
@@ -104,9 +105,6 @@ READ8_MEMBER(hotblock_state::port4_r)
 
 WRITE8_MEMBER(hotblock_state::port4_w)
 {
-//  osd_printf_debug("port4_w: pc = %06x : data %04x\n", space.device().safe_pc(), data);
-//  popmessage("port4_w: pc = %06x : data %04x", space.device().safe_pc(), data);
-
 	m_port4 = data;
 }
 
@@ -114,8 +112,6 @@ WRITE8_MEMBER(hotblock_state::port4_w)
 
 WRITE8_MEMBER(hotblock_state::port0_w)
 {
-//  popmessage("port4_w: pc = %06x : data %04x", space.device().safe_pc(), data);
-
 	m_port0 = data;
 }
 
@@ -206,7 +202,7 @@ static INPUT_PORTS_START( hotblock )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( hotblock )
+MACHINE_CONFIG_START(hotblock_state::hotblock)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, 10000000)

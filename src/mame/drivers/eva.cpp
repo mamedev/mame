@@ -56,6 +56,10 @@ public:
 	DECLARE_WRITE16_MEMBER(eva11_write_o);
 	DECLARE_WRITE16_MEMBER(eva11_write_r);
 
+	void tms5110_route(machine_config &config);
+	void eva11(machine_config &config);
+	void eva24(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -153,9 +157,10 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( tms5110_route )
+MACHINE_CONFIG_START(eva_state::tms5110_route)
 
 	/* sound hardware */
+	MCFG_DEVICE_MODIFY("tms5100")
 	MCFG_TMS5110_M0_CB(DEVWRITELINE("tms6100", tms6100_device, m0_w))
 	MCFG_TMS5110_M1_CB(DEVWRITELINE("tms6100", tms6100_device, m1_w))
 	MCFG_TMS5110_ADDR_CB(DEVWRITE8("tms6100", tms6100_device, add_w))
@@ -164,36 +169,36 @@ static MACHINE_CONFIG_START( tms5110_route )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( eva24 )
+MACHINE_CONFIG_START(eva_state::eva24)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP420, XTAL_640kHz/2) // guessed
+	MCFG_CPU_ADD("maincpu", COP420, 640_kHz_XTAL/2) // guessed
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(eva_state, eva24_write_d))
 	MCFG_COP400_WRITE_G_CB(WRITE8(eva_state, eva24_write_g))
 	MCFG_COP400_READ_G_CB(READ8(eva_state, eva24_read_g))
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("tms6100", TMS6100, XTAL_640kHz/4)
+	MCFG_DEVICE_ADD("tms6100", TMS6100, 640_kHz_XTAL/4)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5100", TMS5110A, XTAL_640kHz)
+	MCFG_SOUND_ADD("tms5100", TMS5110A, 640_kHz_XTAL)
 	MCFG_FRAGMENT_ADD(tms5110_route)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( eva11 )
+MACHINE_CONFIG_START(eva_state::eva11)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, XTAL_640kHz/2) // from TMS5110A CPU CK
+	MCFG_CPU_ADD("maincpu", TMS1000, 640_kHz_XTAL/2) // from TMS5110A CPU CK
 	MCFG_TMS1XXX_READ_K_CB(READ8(eva_state, eva11_read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(eva_state, eva11_write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(eva_state, eva11_write_r))
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("tms6100", TMS6100, XTAL_640kHz/4)
+	MCFG_DEVICE_ADD("tms6100", TMS6100, 640_kHz_XTAL/4)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("tms5100", TMS5110A, XTAL_640kHz)
+	MCFG_SOUND_ADD("tms5100", TMS5110A, 640_kHz_XTAL)
 	MCFG_FRAGMENT_ADD(tms5110_route)
 MACHINE_CONFIG_END
 

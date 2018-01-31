@@ -48,7 +48,7 @@ DECLARE_DEVICE_TYPE(K007420, k007420_device)
 	k007420_device::static_set_bank_limit(*device, _limit);
 
 #define MCFG_K007420_CALLBACK_OWNER(_class, _method) \
-	k007420_device::static_set_callback(*device, k007420_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	k007420_device::static_set_callback(*device, k007420_delegate(&_class::_method, #_class "::" #_method, this));
 
 // function definition for a callback
 #define K007420_CALLBACK_MEMBER(_name)     void _name(int *code, int *color)

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, David Haywood
 /*
-Real Battle Mahjong King by 'Game Men System Co. Ltd.'
+实战麻将王 (Shízhàn Májiàng Wáng) by 'Game Men System Co. Ltd.'
 
 PCB Layout
 ----------
@@ -91,6 +91,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mcu_irq);
 
+	void rbmk(machine_config &config);
+	void rbspm(machine_config &config);
 protected:
 	virtual void video_start() override;
 
@@ -164,7 +166,7 @@ static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
 	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("vidram2")
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access
-	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("vidram")
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(eeprom_w)
 	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(dip_mux_r, dip_mux_w)
@@ -185,7 +187,7 @@ static ADDRESS_MAP_START( rbspm_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("IN3")
 	AM_RANGE(0x328000, 0x328001) AM_WRITE(unk_w)
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
-	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // if removed fails gfx test?
+	AM_RANGE(0x900000, 0x900fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // if removed fails gfx test?
 	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("vidram2") // if removed fails palette test?
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access, u25 and u26 according to test mode
 	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("vidram")
@@ -556,7 +558,7 @@ INTERRUPT_GEN_MEMBER(rbmk_state::mcu_irq)
 	m_mcu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( rbmk )
+MACHINE_CONFIG_START(rbmk_state::rbmk)
 	MCFG_CPU_ADD("maincpu", M68000, 22000000 /2)
 	MCFG_CPU_PROGRAM_MAP(rbmk_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rbmk_state,  irq1_line_hold)
@@ -593,7 +595,7 @@ static MACHINE_CONFIG_START( rbmk )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rbspm, rbmk )
+MACHINE_CONFIG_DERIVED(rbmk_state::rbspm, rbmk)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rbspm_mem)
 
@@ -603,6 +605,7 @@ static MACHINE_CONFIG_DERIVED( rbspm, rbmk )
 	// PIC16F84 if decapped
 MACHINE_CONFIG_END
 
+// 实战麻将王 (Shízhàn Májiàng Wáng)
 ROM_START( rbmk )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD( "p1.u64", 0x00000, 0x80000, CRC(83b3c505) SHA1(b943d7312dacdf46d4a55f9dc3cf92e291c40ce7) )
@@ -627,6 +630,7 @@ ROM_START( rbmk )
 ROM_END
 
 /*
+实战頂凰麻雀 (Shízhàn Dǐng Huáng Máquè)
 Gameplay videos:
 http://youtu.be/pPk-6N1wXoE
 http://youtu.be/VGbrR7GfDck
@@ -658,5 +662,5 @@ ROM_START( rbspm )
 	ROM_LOAD16_WORD_SWAP( "93c46.u51", 0x00, 0x080, NO_DUMP )
 ROM_END
 
-GAME( 1998, rbmk, 0, rbmk, rbmk, rbmk_state, 0, ROT0,  "GMS", "Real Battle Mahjong King (Version 8.8)", MACHINE_NOT_WORKING )
-GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, 0, ROT0,  "GMS", "Real Battle Super Phoenix Mahjong (Version 4.1)", MACHINE_NOT_WORKING )
+GAME( 1998, rbmk,  0, rbmk,  rbmk,  rbmk_state, 0, ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)", MACHINE_NOT_WORKING )
+GAME( 1998, rbspm, 0, rbspm, rbspm, rbmk_state, 0, ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)", MACHINE_NOT_WORKING )

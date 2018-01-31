@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
 	AM_RANGE(0x160000, 0x160007) AM_DEVWRITE("k056832", k056832_device, b_word_w)                                    // VSCCS (board dependent)
 	AM_RANGE(0x170000, 0x170001) AM_WRITENOP                                                // Watchdog
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_SHARE("workram")                 // Main RAM.  Spec. 180000-1803ff, 180400-187fff
-	AM_RANGE(0x190000, 0x190fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x190000, 0x190fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVWRITE("k053251", k053251_device, lsb_w)
 	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVWRITE("k056832", k056832_device, word_w)
 	AM_RANGE(0x1c0000, 0x1c001f) AM_DEVICE8("k054321", k054321_device, main_map, 0x00ff)
@@ -289,14 +289,14 @@ void gijoe_state::machine_reset()
 	m_cur_control2 = 0;
 }
 
-static MACHINE_CONFIG_START( gijoe )
+MACHINE_CONFIG_START(gijoe_state::gijoe)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)   /* 16MHz Confirmed */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)   /* 16MHz Confirmed */
 	MCFG_CPU_PROGRAM_MAP(gijoe_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gijoe_state,  gijoe_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/4)  /* Amuse & confirmed. Z80E at 8MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/4)  /* Amuse & confirmed. Z80E at 8MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
@@ -332,7 +332,7 @@ static MACHINE_CONFIG_START( gijoe )
 
 	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

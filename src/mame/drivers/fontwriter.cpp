@@ -43,6 +43,7 @@ public:
 		m_vbl ^= 0xff;
 		return m_vbl;
 	}
+	void fontwriter(machine_config &config);
 protected:
 
 	// devices
@@ -86,8 +87,8 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( fontwriter )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( fontwriter )
-	MCFG_CPU_ADD("maincpu", M37720S1, XTAL_16MHz) /* M37720S1 @ 16MHz - main CPU */
+MACHINE_CONFIG_START(fontwriter_state::fontwriter)
+	MCFG_CPU_ADD("maincpu", M37720S1, XTAL(16'000'000)) /* M37720S1 @ 16MHz - main CPU */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(io_map)
 

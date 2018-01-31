@@ -71,7 +71,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(a2bus_corvus_device::device_add_mconfig)
+MACHINE_CONFIG_START(a2bus_corvus_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(CORVUS_HD_TAG, CORVUS_HDC, 0)
 	MCFG_HARDDISK_ADD("harddisk1")
 	MCFG_HARDDISK_INTERFACE("corvus_hdd")
@@ -114,9 +114,6 @@ a2bus_corvus_device::a2bus_corvus_device(const machine_config &mconfig, const ch
 
 void a2bus_corvus_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(CORVUS_ROM_REGION).c_str())->base();
 }
 

@@ -111,6 +111,7 @@ public:
 
 	uint8_t m_analog_select;
 	uint8_t m_analog_count;
+	void spyhuntertec(machine_config &config);
 };
 
 WRITE8_MEMBER(spyhuntertec_state::ay1_porta_w)
@@ -407,7 +408,7 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 
 
 	*/
-//  printf("%04x spyhuntertec_in2_r\n", space.device().safe_pc());
+//  printf("%04x spyhuntertec_in2_r\n", m_maincpu->pc());
 
 	return (ioport("IN2")->read() & ~0x40) | ((m_analog_count == 0) ? 0x40 : 0x00);
 }
@@ -415,7 +416,7 @@ READ8_MEMBER(spyhuntertec_state::spyhuntertec_in2_r)
 READ8_MEMBER(spyhuntertec_state::spyhuntertec_in3_r)
 {
 	uint8_t ret = ioport("IN3")->read();
-//  printf("%04x spyhuntertec_in3_r\n", space.device().safe_pc());
+//  printf("%04x spyhuntertec_in3_r\n",m_maincpu->pc());
 	return ret;
 }
 
@@ -657,7 +658,7 @@ void spyhuntertec_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( spyhuntertec )
+MACHINE_CONFIG_START(spyhuntertec_state::spyhuntertec)
 
 // note: no ctc, no nvram
 // 2*z80, 3*ay8912

@@ -57,6 +57,7 @@ public:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void clpoker(machine_config &config);
 protected:
 	virtual void video_start() override;
 
@@ -246,9 +247,9 @@ static GFXDECODE_START( clpoker )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( clpoker )
+MACHINE_CONFIG_START(clpoker_state::clpoker)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 3) // Z0840004PSC, divider not verified
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 3) // Z0840004PSC, divider not verified
 	MCFG_CPU_PROGRAM_MAP(prg_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -282,7 +283,7 @@ static MACHINE_CONFIG_START( clpoker )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_12MHz / 8) // AY38910A/P, divider not verified
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(12'000'000) / 8) // AY38910A/P, divider not verified
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)

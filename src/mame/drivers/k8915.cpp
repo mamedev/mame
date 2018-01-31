@@ -32,6 +32,7 @@ public:
 	DECLARE_DRIVER_INIT(k8915);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void k8915(machine_config &config);
 private:
 	uint8_t m_framecnt;
 	virtual void machine_reset() override;
@@ -126,9 +127,9 @@ uint32_t k8915_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 }
 
 
-static MACHINE_CONFIG_START( k8915 )
+MACHINE_CONFIG_START(k8915_state::k8915)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4_9152MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'915'200) / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -143,13 +144,13 @@ static MACHINE_CONFIG_START( k8915 )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_4_9152MHz / 2)
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(4'915'200) / 2)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4_9152MHz / 2)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'915'200) / 2)
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("sio", z80sio_device, rxtxcb_w))
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL_4_9152MHz / 2)
+	MCFG_DEVICE_ADD("sio", Z80SIO, XTAL(4'915'200) / 2)
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))

@@ -76,6 +76,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_quake(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void quake(machine_config &config);
 };
 
 
@@ -116,7 +117,7 @@ void quakeat_state::machine_start()
 }
 /*************************************************************/
 
-static MACHINE_CONFIG_START( quake )
+MACHINE_CONFIG_START(quakeat_state::quake)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM2, 233000000) /* Pentium II, 233MHz */
 	MCFG_CPU_PROGRAM_MAP(quake_map)

@@ -10,8 +10,8 @@
 
 
 /* oscillators and clocks */
-#define JEDI_MAIN_CPU_OSC       (XTAL_10MHz)
-#define JEDI_AUDIO_CPU_OSC      (XTAL_12_096MHz)
+#define JEDI_MAIN_CPU_OSC       (XTAL(10'000'000))
+#define JEDI_AUDIO_CPU_OSC      (XTAL(12'096'000))
 #define JEDI_MAIN_CPU_CLOCK     (JEDI_MAIN_CPU_OSC / 4)
 #define JEDI_AUDIO_CPU_CLOCK    (JEDI_AUDIO_CPU_OSC / 8)
 #define JEDI_POKEY_CLOCK        (JEDI_AUDIO_CPU_CLOCK)
@@ -97,10 +97,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
+	void jedi(machine_config &config);
+	void jedi_audio(machine_config &config);
+	void jedi_video(machine_config &config);
 };
-
-/*----------- defined in audio/jedi.c -----------*/
-MACHINE_CONFIG_EXTERN( jedi_audio );
-
-/*----------- defined in video/jedi.c -----------*/
-MACHINE_CONFIG_EXTERN( jedi_video );

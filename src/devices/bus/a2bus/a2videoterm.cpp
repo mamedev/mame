@@ -117,7 +117,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_videx80_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_videx80_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( VIDEOTERM_SCREEN_NAME, RASTER) // 560x216?  (80x24 7x9 characters)
 	MCFG_SCREEN_RAW_PARAMS(MDA_CLOCK, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( VIDEOTERM_MC6845_NAME, mc6845_device, screen_update )
@@ -211,9 +211,6 @@ a2bus_aevm80_device::a2bus_aevm80_device(const machine_config &mconfig, const ch
 
 void a2bus_videx80_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(VIDEOTERM_ROM_REGION).c_str())->base();
 
 	m_chrrom = device().machine().root_device().memregion(this->subtag(VIDEOTERM_GFX_REGION).c_str())->base();
@@ -238,8 +235,6 @@ void a2bus_videx80_device::device_reset()
 
 uint8_t a2bus_videx80_device::read_c0nx(uint8_t offset)
 {
-//    printf("Read c0n%x (PC=%x)\n", offset, space.device().safe_pc());
-
 	m_rambank = ((offset>>2) & 3) * 512;
 
 	if (offset == 1)
@@ -257,8 +252,6 @@ uint8_t a2bus_videx80_device::read_c0nx(uint8_t offset)
 
 void a2bus_videx80_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-//    printf("Write %02x to c0n%x (PC=%x)\n", data, offset, space.device().safe_pc());
-
 	if (offset == 0)
 	{
 		m_crtc->address_w(data);

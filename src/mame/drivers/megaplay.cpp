@@ -88,6 +88,7 @@ public:
 	DECLARE_MACHINE_RESET(megaplay);
 	uint32_t screen_update_megplay(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void megaplay(machine_config &config);
 private:
 
 	uint32_t m_bios_mode;  // determines whether ROM banks or Game data is to read from 0x8000-0xffff
@@ -577,7 +578,7 @@ WRITE8_MEMBER(mplay_state::game_w)
 		m_bios_mode = MP_GAME;
 		m_readpos = 1;
 //      popmessage("Game bank selected: 0x%03x", m_game_banksel);
-		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n", space.device().safe_pcbase(), m_game_banksel);
+		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n", m_bioscpu->pcbase(), m_game_banksel);
 	}
 
 	m_bios_bank_addr = ((m_bios_bank_addr >> 1) | (data << 23)) & 0xff8000;
@@ -657,7 +658,7 @@ MACHINE_RESET_MEMBER(mplay_state,megaplay)
 	MACHINE_RESET_CALL_MEMBER(megadriv);
 }
 
-static MACHINE_CONFIG_START( megaplay )
+MACHINE_CONFIG_START(mplay_state::megaplay)
 	/* basic machine hardware */
 	MCFG_FRAGMENT_ADD(md_ntsc)
 
@@ -691,7 +692,7 @@ static MACHINE_CONFIG_START( megaplay )
 
 	/* New update functions to handle the extra layer */
 	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
+	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
 			sega315_5124_device::WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
 	MCFG_SCREEN_UPDATE_DRIVER(mplay_state, screen_update_megplay)

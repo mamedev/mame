@@ -89,7 +89,7 @@ uint32_t macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static MACHINE_CONFIG_START( pippin )
+MACHINE_CONFIG_START(macpci_state::pippin)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC603, 66000000)
 	MCFG_CPU_PROGRAM_MAP(pippin_mem)

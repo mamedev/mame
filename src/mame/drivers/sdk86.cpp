@@ -51,6 +51,7 @@ public:
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
 
+	void sdk86(machine_config &config);
 private:
 	uint8_t m_digit;
 	required_device<cpu_device> m_maincpu;
@@ -136,9 +137,9 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( sdk86 )
+MACHINE_CONFIG_START(sdk86_state::sdk86)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_14_7456MHz/3) /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
+	MCFG_CPU_ADD("maincpu", I8086, XTAL(14'745'600)/3) /* divided down by i8284 clock generator; jumper selection allows it to be slowed to 2.5MHz, hence changing divider from 3 to 6 */
 	MCFG_CPU_PROGRAM_MAP(sdk86_mem)
 	MCFG_CPU_IO_MAP(sdk86_io)
 
@@ -156,7 +157,7 @@ static MACHINE_CONFIG_START( sdk86 )
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_dsr))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL_14_7456MHz/3/16)
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(14'745'600)/3/16)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE(I8251_TAG, i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE(I8251_TAG, i8251_device, write_rxc))
 

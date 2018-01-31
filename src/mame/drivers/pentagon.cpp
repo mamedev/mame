@@ -41,6 +41,8 @@ public:
 	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
 	TIMER_CALLBACK_MEMBER(irq_on);
 	TIMER_CALLBACK_MEMBER(irq_off);
+	void pent1024(machine_config &config);
+	void pentagon(machine_config &config);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -135,7 +137,7 @@ void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int para
 TIMER_CALLBACK_MEMBER(pentagon_state::irq_on)
 {
 	m_maincpu->set_input_line(0, HOLD_LINE);
-	timer_set(attotime::from_ticks(32, XTAL_14MHz / 4), TIMER_IRQ_OFF, 0);
+	timer_set(attotime::from_ticks(32, XTAL(14'000'000) / 4), TIMER_IRQ_OFF, 0);
 }
 
 TIMER_CALLBACK_MEMBER(pentagon_state::irq_off)
@@ -145,7 +147,7 @@ TIMER_CALLBACK_MEMBER(pentagon_state::irq_off)
 
 INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
 {
-	timer_set(attotime::from_ticks(179, XTAL_14MHz / 4), TIMER_IRQ_ON, 0);
+	timer_set(attotime::from_ticks(179, XTAL(14'000'000) / 4), TIMER_IRQ_ON, 0);
 }
 
 READ8_MEMBER(pentagon_state::beta_neutral_r)
@@ -248,9 +250,9 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_DERIVED( pentagon, spectrum_128 )
+MACHINE_CONFIG_DERIVED(pentagon_state::pentagon, spectrum_128)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_14MHz / 4)
+	MCFG_CPU_CLOCK(XTAL(14'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(pentagon_mem)
 	MCFG_CPU_IO_MAP(pentagon_io)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(pentagon_switch)
@@ -258,15 +260,15 @@ static MACHINE_CONFIG_DERIVED( pentagon, spectrum_128 )
 	MCFG_MACHINE_RESET_OVERRIDE(pentagon_state, pentagon )
 
 	MCFG_SCREEN_MODIFY("screen")
-	//MCFG_SCREEN_RAW_PARAMS(XTAL_14MHz / 2, 448, 0, 352,  320, 0, 304)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14MHz / 2, 448, 0, 352,  320, 0, 287)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 304)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 287)
 
 	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pentagon)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_REPLACE("ay8912", AY8912, XTAL_14MHz / 8)
+	MCFG_SOUND_REPLACE("ay8912", AY8912, XTAL(14'000'000) / 8)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
@@ -277,7 +279,7 @@ static MACHINE_CONFIG_DERIVED( pentagon, spectrum_128 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list_pen","pentagon_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pent1024, pentagon)
+MACHINE_CONFIG_DERIVED(pentagon_state::pent1024, pentagon)
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1024K")

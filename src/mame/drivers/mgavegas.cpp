@@ -43,7 +43,7 @@ Ver. 2.2 should exist
 /****************************
 *    Clock defines          *
 ****************************/
-#define MAIN_XTAL XTAL_8MHz
+#define MAIN_XTAL XTAL(8'000'000)
 #define CPU_CLK MAIN_XTAL/2
 #define AY_CLK  CPU_CLK/2
 #define MSM_CLK   384000
@@ -143,6 +143,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
 
 
+	void mgavegas(machine_config &config);
 protected:
 
 	// devices
@@ -586,7 +587,7 @@ DRIVER_INIT_MEMBER(mgavegas_state,mgavegas133)
 *************************/
 
 
-static MACHINE_CONFIG_START( mgavegas )
+MACHINE_CONFIG_START(mgavegas_state::mgavegas)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLK)
 	MCFG_CPU_PROGRAM_MAP(mgavegas_map)

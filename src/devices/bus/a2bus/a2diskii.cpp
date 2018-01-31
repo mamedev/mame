@@ -61,12 +61,12 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_floppy_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_floppy_device::device_add_mconfig)
 	MCFG_APPLEFDC_ADD(FDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( a2bus_iwmflop_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_iwmflop_device::device_add_mconfig)
 	MCFG_IWM_ADD(FDC_TAG, fdc_interface)
 	MCFG_LEGACY_FLOPPY_APPLE_2_DRIVES_ADD(floppy_interface,15,16)
 MACHINE_CONFIG_END
@@ -117,9 +117,6 @@ a2bus_agat7flop_device::a2bus_agat7flop_device(const machine_config &mconfig, co
 
 void a2bus_floppy_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(DISKII_ROM_REGION).c_str())->base();
 }
 

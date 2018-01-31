@@ -6882,6 +6882,72 @@
 		</part>
 	</software>
 
+	<software name="atraincs">
+		<description>A-Train Construction Set</description>
+		<year>1992</year>
+		<publisher>Maxis</publisher>
+		<info name="version" value="1.00" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="A-Train Construction Set (USA) (Add-on).img" size="1474560" crc="fa4f2bbd" sha1="a944aac62d33c210ccab2dda2b7acbf6f87cf1d0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aopac">
+		<description>Aces of the Pacific</description>
+		<year>1992</year>
+		<publisher>Dynamix</publisher>
+		<info name="version" value="1.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="aopac201.img" size="1474560" crc="933f6eae" sha1="1941ec5c541508bb07d1b8dbdcf40d179508aab6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="aopac202.img" size="1474560" crc="53d10b5d" sha1="20ee5006d5978ff2a1051210864ba87a8718bae5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="aopac203.img" size="1474560" crc="511fe908" sha1="9f2169021e509cf50286a7965f5f855317272373" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aopacex">
+		<description>Aces of the Pacific Expansion Disk - WWII: 1946</description>
+		<year>1992</year>
+		<publisher>Dynamix</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces of the Pacific - Expansion Disk - WWII - 1946 (USA, Europe) (v1.0).img" size="1474560" crc="6fae419b" sha1="3822bc87cea3be8e57e9b35d0d8bfcc3941cf00c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aoefr">
+		<description>Aces Over Europe (French)</description>
+		<year>1993</year>
+		<publisher>Dynamix</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe (France) (Disk 1).img" size="1474560" crc="4659ac93" sha1="f1296c37734f6a2cc5d6bcfa55a810535413795a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe (France) (Disk 2).img" size="1474560" crc="cffa9daa" sha1="8a0aa92aed613de44b157d38b2b0fec94d0ffca3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Aces Over Europe (France) (Disk 3).img" size="1474560" crc="945f95f5" sha1="ee1ecf7bbb8577f81a6bd1bfd4206c8b50bf2de9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- installer hangs -->
 	<software name="a4netwrk" supported="no">
 		<description>AIV Networks (German)</description>
@@ -7076,6 +7142,42 @@
 		</part>
 	</software>
 
+	<software name="bstone">
+		<description>Blake Stone: Aliens of Gold (v3.0)</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="JAM Productions" />
+		<info name="version" value="3.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Blake Stone - Aliens of Gold (3.0) [Apogee Software] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="1f60fad0" sha1="74af4ff89c839a4dca219160bdb1fdc76a654ce7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Blake Stone - Aliens of Gold (3.0) [Apogee Software] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="f0789329" sha1="c7851394eba175afd084ac5ee5910044bb2e7f6c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstonea" cloneof="bstone">
+		<description>Blake Stone: Aliens of Gold (v2.1)</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="JAM Productions" />
+		<info name="version" value="2.1" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Blake Stone - Aliens of Gold (2.1) [Apogee Software] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="f3207ca6" sha1="d7a19072c14aed709ab84c94589acac9d811d6c1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Blake Stone - Aliens of Gold (2.1) [Apogee Software] [1994] [3.5HD] [Disk 2 of 2].img" size="1474560" crc="c241071f" sha1="6579c53898a6ced800caa18a3059b2468e259073" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bodyblow">
 		<description>Body Blows</description>
 		<year>1993</year>
@@ -7101,6 +7203,28 @@
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Boppin' - Super Ultimate (USA) (v1.1) (Disk 2).img" size="1474560" crc="20c4dc37" sha1="e39ac3f58f81813e515e8fa203dff7e9b9ebf9d3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bytsz137">
+		<description>Byte Size Software #137 - Boppin' &amp; Dits and Dats</description>
+		<year>1995</year>
+		<publisher>Byte Size Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="bytesize_137.img" size="1474560" crc="fc09ffe5" sha1="30b848ebbd27c95e56270af80cf8ba2f72e88efa" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bytsz149">
+		<description>Byte Size Software #149 - AJ's Quest &amp; Machine Nation</description>
+		<year>1995</year>
+		<publisher>Byte Size Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="bytesize_149.img" size="1474560" crc="210fc964" sha1="93ed421c783e55f8030cf3074568aabe5c8a3fb1" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8296,6 +8420,120 @@
 		</part>
 	</software>
 
+	<software name="incait">
+		<description>Inca (Italian)</description>
+		<year>1992</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 01 of 10].img" size="1474560" crc="124fe8c9" sha1="75f6a558c1950cbcc3dbec61084326656a772f65" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 02 of 10].img" size="1474560" crc="cff36eac" sha1="45cd1a36ac24d0f416552d239f2a68a8e85d5887" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 03 of 10].img" size="1474560" crc="051c60c6" sha1="3cb6e49f5c85617b642c39dbc7a7113995fda343" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 04 of 10].img" size="1474560" crc="eb9dd7d4" sha1="26cc06f971a1002eb82ef80ee9d3d11a7208023c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 05 of 10].img" size="1474560" crc="9175cc28" sha1="159189f47e408928f910da16ce515b3439ed5ea6" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 06 of 10].img" size="1474560" crc="18451a6d" sha1="c6b448e0d300446c870d9f4e14d11eee8fa2cfd8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 07 of 10].img" size="1474560" crc="a0f7d798" sha1="f38c6b75808813952257d1febf6a067371aadad2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 08 of 10].img" size="1474560" crc="870661b1" sha1="1245f9a49a089fcb061ae46846d05210daca24d1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 09 of 10].img" size="1474560" crc="b2234232" sha1="d0598467582d36ac1259d0ba29a30cd2429a2e08" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca [Sierra On-Line] [1992] [Italian] [3.5HD] [Disk 10 of 10].img" size="1474560" crc="e5d36c0a" sha1="8a1a7615f1559f3a597ee7b8bc61de459488cc19" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="inca2">
+		<description>Inca 2: Wiracocha (French/German/English)</description>
+		<year>1993</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="developer" value="Coktel Vision" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 01 of 10].img" size="1474560" crc="4d6c20c1" sha1="53fc21df728cd3eebbf6d038b727415391b6329a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 02 of 10].img" size="1474560" crc="9922bd34" sha1="6fc30f712d9985d2761ee6a9c1245ac54e801ace" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 03 of 10].img" size="1474560" crc="b2509aa1" sha1="acc6d8b419477c1711190a52f071339e0a660cce" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 04 of 10].img" size="1474560" crc="3c272165" sha1="058c27ba399c536ac0b4f5f1bf186788c2406d71" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 05 of 10].img" size="1474560" crc="21c5a6c3" sha1="ca0624cbf795f856aaf14e23aab3e0900be1f990" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 06 of 10].img" size="1474560" crc="cc3de8fb" sha1="e7a2cceee07d53b2a4fddaffac60ea87280691d4" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 07 of 10].img" size="1474560" crc="372ae3cb" sha1="1c26820cdcf165071d96197dae0adbaa217ade4c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 08 of 10].img" size="1474560" crc="c3303cd7" sha1="b0953da58af6be48a227e3fc27ded726b7a74296" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 09 of 10].img" size="1474560" crc="fbc00191" sha1="9c2cbc3664cf77354911fea926590394b4fadb3c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Inca 2 [Sierra On-Line] [1993] [3.5HD] [Disk 10 of 10].img" size="1474560" crc="25c547ad" sha1="452d545c58f29ef0cf5be4386ad14b7b7cc07d7a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="incrmach">
 		<description>Incredible Machine</description>
 		<year>1993</year>
@@ -8631,6 +8869,49 @@
 		</part>
 	</software>
 
+	<software name="link386p">
+		<description>Links 386 Pro</description>
+		<year>1992</year>
+		<publisher>Access Software</publisher>
+		<info name="version" value="1.21" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Links 386 Pro [Access Software] [1992] [3.5HD] [Disk 1 of 4].img" size="1474560" crc="05447e7c" sha1="5a872efeb2385215f2a317c94c969ff35a239e8d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Links 386 Pro [Access Software] [1992] [3.5HD] [Disk 2 of 4].img" size="1474560" crc="c245e3dd" sha1="0aa342d1b1980858794abd6e8517375e93e4ecb1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Links 386 Pro [Access Software] [1992] [3.5HD] [Disk 3 of 4].img" size="1474560" crc="d849aa7d" sha1="6b93aff6352906d2849190c6929f1fcfcd59595d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Links 386 Pro [Access Software] [1992] [3.5HD] [Disk 4 of 4].img" size="1474560" crc="95871b0b" sha1="4ecb10f076fc6abd9823ab786755ec3ac48fa03d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bntf_crs">
+		<description>Links Championship Course: Bountiful Golf Club Championship Course</description>
+		<year>1994</year>
+		<publisher>Access Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Bountiful Golf Club Championship Course [Access Software] [1994] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="621a66b9" sha1="85c8c10d2e152663eeba4625713bd3493a6e37d7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Bountiful Golf Club Championship Course [Access Software] [1994] [3.5DD] [Disk 2 of 2].img" size="737280" crc="57f590be" sha1="88fec38908f18ddd4d42f87d0e7a49d08de9fe32" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tleodoom">
 		<description>The Lost Episodes of Doom (Companion Disk)</description>
 		<year>1995</year>
@@ -8924,7 +9205,7 @@
 		</part>
 	</software>
 
-	<software name="omf2097" supported="partial">
+	<software name="omf2097">
 		<description>One Must Fall 2097</description>
 		<year>1994</year>
 		<publisher>Epic MegaGames</publisher>
@@ -8969,6 +9250,7 @@
 	</software>
 
 	<software name="ppersia2">
+		<!-- Dumped via Kryoflux, all tracks show as good and unmodified -->
 		<description>Prince of Persia 2 - The Shadow &amp; the Flame</description>
 		<year>1993</year>
 		<publisher>Brøderbund Software</publisher>
@@ -9271,6 +9553,28 @@
 		</part>
 	</software>
 
+	<software name="simonsrc">
+		<description>Simon the Sorcerer</description>
+		<year>1993</year>
+		<publisher>Infocom</publisher>
+		<info name="developer" value="Adventuresoft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Simon The Sorcerer [Infocom] [1993] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="1539a70a" sha1="c877dfb10479eb39ff0676a9d0d6a66976f631b5" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Simon The Sorcerer [Infocom] [1993] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="f8021446" sha1="031580bd049edb0c94efae69809c37f7bc64f7ee" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Simon The Sorcerer [Infocom] [1993] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="a6dccd4c" sha1="6cf2d9689176fda1a69b29b3bb9e82bc8073f256" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sq5">
 		<description>Space Quest V: The Next Mutation (3.5", v1.04)</description>
 		<year>1993</year>
@@ -9441,11 +9745,27 @@
 	</software>
 
 	<software name="spectrec">
-		<!-- Dumped via Kryoflux, track 0 shows as modified -->
-		<description>Spectre Challenger</description>
+		<!-- Dumped via Kryoflux, all tracks show as good and modified -->
+		<description>Spectre Challenger (V1.1, 1993-11-08)</description>
 		<year>1992</year>
 		<publisher>Velocity Development Corporation</publisher>
 		<info name="developer" value="Peninsula Gameworks" />
+		<info name="version" value="1.1" />
+		<info name="serial" value="XSP121OWW25300" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="disk1.img" size="737280" crc="5dabc1c8" sha1="4fb384ea7e070301c914b58c84593ab908ca372e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spectreca" cloneof="spectrec">
+		<!-- Dumped via Kryoflux, track 0 shows as modified -->
+		<description>Spectre Challenger (V1.1, 1993-09-08)</description>
+		<year>1992</year>
+		<publisher>Velocity Development Corporation</publisher>
+		<info name="developer" value="Peninsula Gameworks" />
+		<info name="version" value="1.1" />
 		<info name="serial" value="333-3025" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
@@ -9886,6 +10206,28 @@
 			<feature name="disk_serial" value="TN110420" />
 			<dataarea name="flop" size = "1474560">
 				<rom name="[PC] Wing Commander II - Special Operations 2 [3.5HD] [Disk 2 of 2].img" size="1474560" crc="92f07e68" sha1="8815ed73649d9713fa8213f28b729e065ded8fe8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wngcm2sp">
+		<description>Wing Commander II - Vengeance of the Kilrathi - Speech Accessory Pack</description>
+		<year>1991</year>
+		<publisher>ORIGIN Systems</publisher>
+		<info name="developer" value="ORIGIN Systems" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Wing Commander 2 - Speech Accessory Pack [ORIGIN Systems] [1991] [3.5HD] [Disk 1 of 3].img" size="1474560" crc="2c259119" sha1="f758dd456f5681736b490fb11660970772a0bdca" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Wing Commander 2 - Speech Accessory Pack [ORIGIN Systems] [1991] [3.5HD] [Disk 2 of 3].img" size="1474560" crc="be8f095d" sha1="adea7b9ea3bac9e21eaf842dee41e6eb1ad7f0f7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Wing Commander 2 - Speech Accessory Pack [ORIGIN Systems] [1991] [3.5HD] [Disk 3 of 3].img" size="1474560" crc="dc3ce5d6" sha1="2fbf2b8b98833bab2a9d7fe0597c4f1bcc95c540" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

@@ -55,6 +55,8 @@ public:
 
 	uint8_t m_sysctl, m_pa, m_kbcin, m_kbcout;
 	bool m_kbcibf, m_kbdata, m_i86_halt, m_i86_halt_perm;
+	static void cfg_m20_format(device_t *device);
+	void olivetti(machine_config &config);
 };
 
 void m24_state::machine_reset()
@@ -238,17 +240,15 @@ FLOPPY_FORMATS_MEMBER( m24_state::floppy_formats )
 	FLOPPY_M20_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_START( cfg_m20_format )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	static_cast<floppy_connector *>(device)->set_formats(m24_state::floppy_formats);
+void m24_state::cfg_m20_format(device_t *device)
+{
+	device->subdevice<floppy_connector>("fdc:0")->set_formats(m24_state::floppy_formats);
+	device->subdevice<floppy_connector>("fdc:1")->set_formats(m24_state::floppy_formats);
+}
 
-	MCFG_DEVICE_MODIFY("fdc:1")
-	static_cast<floppy_connector *>(device)->set_formats(m24_state::floppy_formats);
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( olivetti )
+MACHINE_CONFIG_START(m24_state::olivetti)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", I8086, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(m24_map)
 	MCFG_CPU_IO_MAP(m24_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
@@ -270,7 +270,7 @@ static MACHINE_CONFIG_START( olivetti )
 	MCFG_RAM_DEFAULT_SIZE("640K")
 	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
 
-	MCFG_CPU_ADD("kbc", TMS7000, XTAL_4MHz)
+	MCFG_CPU_ADD("kbc", TMS7000, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(kbc_map)
 	MCFG_TMS7000_IN_PORTA_CB(READ8(m24_state, pa_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(m24_state, pb_w))

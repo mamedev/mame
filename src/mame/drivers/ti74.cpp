@@ -115,6 +115,8 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ti74_cartridge);
 	HD44780_PIXEL_UPDATE(ti74_pixel_update);
 	HD44780_PIXEL_UPDATE(ti95_pixel_update);
+	void ti74(machine_config &config);
+	void ti95(machine_config &config);
 };
 
 
@@ -503,10 +505,10 @@ void ti74_state::machine_start()
 	save_item(NAME(m_power));
 }
 
-static MACHINE_CONFIG_START( ti74 )
+MACHINE_CONFIG_START(ti74_state::ti74)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TMS7000_IN_PORTA_CB(READ8(ti74_state, keyboard_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(ti74_state, bankswitch_w))
@@ -539,10 +541,10 @@ static MACHINE_CONFIG_START( ti74 )
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "ti74_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ti95 )
+MACHINE_CONFIG_START(ti74_state::ti95)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", TMS70C46, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TMS7000_IN_PORTA_CB(READ8(ti74_state, keyboard_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(ti74_state, bankswitch_w))

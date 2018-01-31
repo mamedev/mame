@@ -123,13 +123,13 @@ Notes:
 
 
 /* master clocks vary based on game */
-#define SLOW_MASTER_CLOCK       XTAL_40MHz      /* "slow" == smashtv, trog, hiimpact */
-#define FAST_MASTER_CLOCK       XTAL_48MHz      /* "fast" == narc, mk, totcarn, strkforc */
-#define FASTER_MASTER_CLOCK     XTAL_50MHz      /* "faster" == term2 */
+#define SLOW_MASTER_CLOCK       XTAL(40'000'000)      /* "slow" == smashtv, trog, hiimpact */
+#define FAST_MASTER_CLOCK       XTAL(48'000'000)      /* "fast" == narc, mk, totcarn, strkforc */
+#define FASTER_MASTER_CLOCK     XTAL(50'000'000)      /* "faster" == term2 */
 
 /* pixel clocks are 48MHz (narc) or 24MHz (all others) regardless */
-#define MEDRES_PIXEL_CLOCK      (XTAL_48MHz / 6)
-#define STDRES_PIXEL_CLOCK      (XTAL_24MHz / 6)
+#define MEDRES_PIXEL_CLOCK      (XTAL(48'000'000) / 6)
+#define STDRES_PIXEL_CLOCK      (XTAL(24'000'000) / 6)
 
 
 
@@ -1097,7 +1097,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( zunit )
+MACHINE_CONFIG_START(midyunit_state::zunit)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, FAST_MASTER_CLOCK)
@@ -1139,7 +1139,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( yunit_core )
+MACHINE_CONFIG_START(midyunit_state::yunit_core)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, SLOW_MASTER_CLOCK)
@@ -1170,7 +1170,7 @@ static MACHINE_CONFIG_START( yunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_slow, yunit_core )
+MACHINE_CONFIG_DERIVED(midyunit_state::yunit_cvsd_4bit_slow, yunit_core)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
@@ -1183,7 +1183,7 @@ static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_slow, yunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_fast, yunit_core )
+MACHINE_CONFIG_DERIVED(midyunit_state::yunit_cvsd_4bit_fast, yunit_core)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1199,7 +1199,7 @@ static MACHINE_CONFIG_DERIVED( yunit_cvsd_4bit_fast, yunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yunit_cvsd_6bit_slow, yunit_core )
+MACHINE_CONFIG_DERIVED(midyunit_state::yunit_cvsd_6bit_slow, yunit_core)
 
 	/* basic machine hardware */
 	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
@@ -1212,7 +1212,7 @@ static MACHINE_CONFIG_DERIVED( yunit_cvsd_6bit_slow, yunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_fast, yunit_core )
+MACHINE_CONFIG_DERIVED(midyunit_state::yunit_adpcm_6bit_fast, yunit_core)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1228,7 +1228,7 @@ static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_fast, yunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_faster, yunit_core )
+MACHINE_CONFIG_DERIVED(midyunit_state::yunit_adpcm_6bit_faster, yunit_core)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1244,7 +1244,7 @@ static MACHINE_CONFIG_DERIVED( yunit_adpcm_6bit_faster, yunit_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( term2, yunit_adpcm_6bit_faster )
+MACHINE_CONFIG_DERIVED(midyunit_state::term2, yunit_adpcm_6bit_faster)
 	MCFG_ADC0844_ADD("adc") // U2 on Coil Lamp Driver Board (A-14915)
 	MCFG_ADC0844_CH1_CB(IOPORT("STICK0_X"))
 	MCFG_ADC0844_CH2_CB(IOPORT("STICK0_Y"))
@@ -1253,11 +1253,11 @@ static MACHINE_CONFIG_DERIVED( term2, yunit_adpcm_6bit_faster )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mkyawdim, yunit_core )
+MACHINE_CONFIG_DERIVED(midyunit_state::mkyawdim, yunit_core)
 
 	/* basic machine hardware */
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(yawdim_sound_map)
 
 	/* video hardware */
@@ -1269,7 +1269,7 @@ static MACHINE_CONFIG_DERIVED( mkyawdim, yunit_core )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000) / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 

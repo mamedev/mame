@@ -5,17 +5,70 @@
 // Driver for HP2640-series terminals
 // **********************************
 //
-// This is WIP: lot of things still missing
+// HP264x terminals are built around a few common elements:
+// - Chassis with a passive card cage and power supply. Cards share a common bus
+//   with a daisy-chained priority order (i.e. cards closer to power supply have
+//   higher priority in accessing the bus). The bus also distributes a 4.9152 MHz
+//   system clock.
+// - White phosphor CRT (with its unusual 2:1 ratio) and the related drive board
+// - Keyboard
+// The "personality" in each version is in the set of cards installed in
+// the card cage (and in a few minor differences of the common elements).
+// This driver emulates the HP2645A model, as composed of the following cards:
+// - 02640-60123    Keyboard interface
+// - 02640-60112    Display control
+// - 02640-60088    Display timing
+// - 02640-60124    Display extended DMA
+// - 02640-60024    Display enhancement
+// - 02640-60209    CPU
+// - 02640-60192    Control storage (firmware ROMs & 256-byte SRAM)
+// - 02640-60065    4k DRAM (4 of these for a 16k total)
+// - 02640-60086    Asynchronous data comm
+//
+// The following table summarizes the emulated character sets.
+//
+// | Char. set | Description    | No. of chars |      ROMs | Type              |
+// |-----------+----------------+--------------+-----------+-------------------|
+// |         0 | Std ASCII set  |          128 | 1816-0612 | Alphanumeric      |
+// |           |                |              | 1816-0613 |                   |
+// |         1 | Math symbols   |           64 | 1816-0642 | Alphanumeric      |
+// |         2 | Line drawing   |           64 | 1816-1417 | 8-bit microvector |
+// |         3 | Big characters |           64 | 1816-1425 | 8-bit microvector |
+//
+// All characters are rendered in a 9x15 cell.
+// Fonts are rendered in different ways according to type: alphanumeric fonts
+// take advantage of half-pixel shifting for aesthetic improvement, microvector fonts
+// are rendered by mapping 8 bits to 9 pixels (bit 0 is displayed twice).
+// Earlier versions of display hw used weird 9-bit PROMs for microvector fonts.
+// Then, luckily, HP wised up and reverted to 8-bit memories.
+//
+// All non-volatile settings of this terminal are "stored" in mechanical switches
+// and not in non-volatile memories (they were probably too expensive/limited/unreliable
+// back then).
+// There are 3 switches in a corner of the keyboard (data comm switches) and 24 option
+// switches (named A to Z) on the keyboard interface PCB.
+//
+// Notes:
+// - Speed of the CPU is not accurately emulated. The effects of bus sharing by
+//   video DMA and CPU are not taken into account.
+// - LEDs are not output.
+// - RESET key is not implemented.
+// - A few TODOs here & there.
+// - DC100 data cassettes are not emulated.
 
 #include "emu.h"
 #include "screen.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/timer.h"
+#include "bus/rs232/rs232.h"
+#include "machine/ay31015.h"
+#include "sound/beep.h"
+#include "speaker.h"
 
 #include "hp2640.lh"
 
 // Debugging
-#define VERBOSE 1
+#define VERBOSE 0
 #include "logmacro.h"
 
 // Bit manipulation
@@ -46,8 +99,8 @@ namespace {
 }
 
 // **** Constants ****
-constexpr unsigned SYS_CLOCK = 4915200;
-constexpr unsigned VIDEO_DOT_CLOCK   = 21060000;
+constexpr auto SYS_CLOCK = XTAL(4'915'200);
+constexpr auto VIDEO_DOT_CLOCK   = XTAL(21'060'000);
 constexpr unsigned VIDEO_VIS_ROWS    = 24;
 constexpr unsigned VIDEO_TOT_ROWS    = 25;
 constexpr unsigned VIDEO_VIS_COLS    = 80;
@@ -57,6 +110,8 @@ constexpr unsigned VIDEO_CHAR_HEIGHT = 15;
 constexpr uint16_t START_DMA_ADDR   = 0xffff;
 constexpr unsigned MAX_DMA_CYCLES   = 450;
 constexpr unsigned CURSOR_BLINK_INH_MS  = 110;
+constexpr unsigned BEEP_FREQUENCY   = 650;
+constexpr unsigned BEEP_DURATION_MS = 100;
 
 // ************
 // hp2645_state
@@ -89,20 +144,38 @@ public:
 	DECLARE_WRITE8_MEMBER(cy_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_cursor_blink_inh);
 
+	DECLARE_READ8_MEMBER(async_data_r);
+	DECLARE_READ8_MEMBER(async_status_r);
+	DECLARE_WRITE8_MEMBER(async_control_w);
+	DECLARE_WRITE8_MEMBER(async_data_w);
+	DECLARE_WRITE8_MEMBER(async_status_change);
+	DECLARE_WRITE_LINE_MEMBER(async_txd_w);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(timer_beep_exp);
+
+	void hp2645(machine_config &config);
 protected:
 	required_device<i8080a_cpu_device> m_cpu;
 	required_device<timer_device> m_timer_10ms;
 	required_ioport_array<4> m_io_key;
+	required_ioport m_io_comm;
+	required_ioport m_io_sw_ah;
+	required_ioport m_io_sw_jr;
+	required_ioport m_io_sw_sz;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<timer_device> m_timer_cursor_blink_inh;
+	required_device<rs232_port_device> m_rs232;
+	required_device<ay31015_device> m_uart;
+	required_device<beep_device> m_beep;
+	required_device<timer_device> m_timer_beep;
 
 	uint8_t m_mode_byte;
 	bool m_timer_irq;
 	bool m_datacom_irq;
 
 	// Character generators
-	required_region_ptr<uint8_t> m_chargen0;
+	required_region_ptr_array<uint8_t , 4> m_chargen;
 
 	// Video DMA
 	struct line_buffer {
@@ -127,12 +200,18 @@ protected:
 	uint8_t m_cursor_x;
 	uint8_t m_cursor_y;
 	bool m_cursor_blink_inh;
+	bool m_blanking;
+
+	// Async line interface
+	uint8_t m_async_control;
 
 	void update_irq();
 	uint8_t video_dma_get();
 	void video_load_buffer(bool buff_idx , unsigned& idx , uint8_t ch , bool iv , uint8_t attrs);
 	void video_fill_buffer(bool buff_idx , unsigned max_cycles);
 	void video_render_buffer(unsigned video_scanline , unsigned line_in_row , bool buff_idx , bool cyen);
+	void update_async_control(uint8_t new_control);
+	void update_async_irq();
 };
 
 hp2645_state::hp2645_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -140,10 +219,18 @@ hp2645_state::hp2645_state(const machine_config &mconfig, device_type type, cons
 	  m_cpu(*this , "cpu"),
 	  m_timer_10ms(*this , "timer_10ms"),
 	  m_io_key(*this , "KEY%u" , 0),
+	  m_io_comm(*this , "comm"),
+	  m_io_sw_ah(*this , "sw_ah"),
+	  m_io_sw_jr(*this , "sw_jr"),
+	  m_io_sw_sz(*this , "sw_sz"),
 	  m_screen(*this , "screen"),
 	  m_palette(*this , "palette"),
 	  m_timer_cursor_blink_inh(*this , "timer_cursor_blink_inh"),
-	  m_chargen0(*this , "chargen0")
+	  m_rs232(*this , "rs232"),
+	  m_uart(*this , "uart"),
+	  m_beep(*this , "beep"),
+	  m_timer_beep(*this , "timer_beep"),
+	  m_chargen(*this , "chargen%u" , 0)
 {
 }
 
@@ -151,6 +238,7 @@ void hp2645_state::machine_start()
 {
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
 
+	// TODO: save more state
 	save_item(NAME(m_mode_byte));
 	save_item(NAME(m_timer_irq));
 	save_item(NAME(m_datacom_irq));
@@ -163,7 +251,20 @@ void hp2645_state::machine_reset()
 	m_datacom_irq = false;
 	m_timer_10ms->reset();
 	update_irq();
+	m_blanking = true;
 	m_dma_on = true;
+	m_eop = true;
+	m_uart->set_input_pin(AY31015_XR , 1);
+	m_uart->set_input_pin(AY31015_SWE , 0);
+	m_uart->set_input_pin(AY31015_CS , 1);
+	m_uart->set_input_pin(AY31015_NB2 , 1);
+	m_async_control = 0;
+	m_uart->set_receiver_clock(0);
+	m_uart->set_transmitter_clock(0);
+	update_async_control(0x00);
+	m_rs232->write_dtr(0);
+	async_txd_w(0);
+	m_beep->set_state(0);
 }
 
 IRQ_CALLBACK_MEMBER(hp2645_state::irq_callback)
@@ -181,7 +282,7 @@ IRQ_CALLBACK_MEMBER(hp2645_state::irq_callback)
 		// RST 0: should never happen (TM)
 		res = 0xc7;
 	}
-
+	LOG("IRQ ACK %02x\n" , res);
 	return res;
 }
 
@@ -217,38 +318,49 @@ READ8_MEMBER(hp2645_state::kb_r)
 
 WRITE8_MEMBER(hp2645_state::kb_prev_w)
 {
+	// This port is used to set the threshold in key sense circuit for hysteresis.
+	// We can safely ignore all writes.
 }
 
 WRITE8_MEMBER(hp2645_state::kb_reset_w)
 {
+	// TODO: enabled/disable CPU reset
 }
 
 READ8_MEMBER(hp2645_state::switches_ah_r)
 {
-	// TODO:
-	return 0;
+	uint8_t res = m_io_sw_ah->read();
+	LOG("SW AH=%02x\n" , res);
+	return res;
 }
 
 READ8_MEMBER(hp2645_state::switches_jr_r)
 {
-	// TODO:
-	return 0;
+	uint8_t res = m_io_sw_jr->read();
+	LOG("SW JR=%02x\n" , res);
+	return res;
 }
 
 READ8_MEMBER(hp2645_state::switches_sz_r)
 {
-	// TODO:
-	return 0;
+	uint8_t res = m_io_sw_sz->read();
+	LOG("SW SZ=%02x\n" , res);
+	return res;
 }
 
 READ8_MEMBER(hp2645_state::datacomm_sw_r)
 {
-	// TODO:
-	return 0;
+	uint8_t res = m_io_comm->read();
+	LOG("COM SW=%02x\n" , res);
+	return res;
 }
 
 WRITE8_MEMBER(hp2645_state::kb_led_w)
 {
+	if (BIT(data , 7)) {
+		m_beep->set_state(1);
+		m_timer_beep->adjust(attotime::from_msec(BEEP_DURATION_MS));
+	}
 	// TODO:
 	LOG("LED = %02x\n" , data);
 }
@@ -273,7 +385,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::scanline_timer)
 				m_row_reset = true;
 				m_row_counter = 0;
 				m_dma_addr = START_DMA_ADDR;
-				m_eop = false;
+				m_eop = m_blanking;
 				m_skipeol = false;
 			} else {
 				m_even = !m_even;
@@ -294,16 +406,16 @@ WRITE8_MEMBER(hp2645_state::cx_w)
 
 WRITE8_MEMBER(hp2645_state::cy_w)
 {
-	// TODO: video enable
+	m_blanking = BIT(data , 7);
 	m_cursor_y = data & 0x1f;
-	m_dma_on = !BIT(data , 6);
+	m_dma_on = m_blanking || !BIT(data , 6);
 	if (m_cursor_y == m_row_counter) {
 		LOG("ROW MATCH %02x\n" , data);
-		if (m_dma_on && BIT(data , 5)) {
+		if (!BIT(data , 6) && BIT(data , 5)) {
 			LOG("EOP on cy\n");
 			m_eop = true;
 		}
-		if (!m_dma_on && !BIT(data , 5) && m_en_skipeol) {
+		if (BIT(data , 6) && !BIT(data , 5) && m_en_skipeol) {
 			LOG("SKIPEOL on cy\n");
 			m_skipeol = true;
 		}
@@ -320,6 +432,70 @@ WRITE8_MEMBER(hp2645_state::cy_w)
 TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::timer_cursor_blink_inh)
 {
 	m_cursor_blink_inh = false;
+}
+
+READ8_MEMBER(hp2645_state::async_data_r)
+{
+	uint8_t res = m_uart->get_received_data();
+	m_uart->set_input_pin(AY31015_RDAV , 0);
+	LOG("ASYNC RX=%02x\n" , res);
+	// Update datacomm IRQ
+	update_async_irq();
+	return res;
+}
+
+READ8_MEMBER(hp2645_state::async_status_r)
+{
+	uint8_t res = 0;
+
+	if (m_uart->get_output_pin(AY31015_DAV)) {
+		BIT_SET(res, 0);
+	}
+	if (m_uart->get_output_pin(AY31015_TBMT)) {
+		BIT_SET(res, 1);
+	}
+	if (m_uart->get_output_pin(AY31015_OR)) {
+		BIT_SET(res, 2);
+	}
+	if (m_uart->get_output_pin(AY31015_PE)) {
+		BIT_SET(res, 3);
+	}
+	if (m_rs232->dcd_r()) {
+		BIT_SET(res, 4);
+	}
+	if (m_rs232->cts_r()) {
+		BIT_SET(res, 5);
+	}
+	// Secondary ch. receive always 1
+	BIT_SET(res, 6);
+	LOG("ASYNC ST=%02x\n" , res);
+	return res;
+}
+
+WRITE8_MEMBER(hp2645_state::async_control_w)
+{
+	update_async_control(data);
+}
+
+WRITE8_MEMBER(hp2645_state::async_data_w)
+{
+	LOG("ASYNC TX=%02x\n" , data);
+	m_uart->set_transmit_data(data);
+}
+
+WRITE8_MEMBER(hp2645_state::async_status_change)
+{
+	update_async_irq();
+}
+
+WRITE_LINE_MEMBER(hp2645_state::async_txd_w)
+{
+	m_rs232->write_txd(!BIT(m_async_control , 6) && m_uart->get_output_pin(AY31015_SO));
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(hp2645_state::timer_beep_exp)
+{
+	m_beep->set_state(0);
 }
 
 void hp2645_state::update_irq()
@@ -433,6 +609,11 @@ void hp2645_state::video_fill_buffer(bool buff_idx , unsigned max_cycles)
 
 void hp2645_state::video_render_buffer(unsigned video_scanline , unsigned line_in_row , bool buff_idx , bool cyen)
 {
+	if (m_blanking) {
+		m_bitmap.fill(rgb_t::black() , rectangle(0 , VIDEO_VIS_COLS * VIDEO_CHAR_WIDTH * 2 , video_scanline , video_scanline));
+		return;
+	}
+
 	bool cursor_blink;
 	unsigned fn = (unsigned)m_screen->frame_number();
 	unsigned fn_12 = fn / 12;
@@ -445,54 +626,111 @@ void hp2645_state::video_render_buffer(unsigned video_scanline , unsigned line_i
 		cursor_blink = BIT(fn_12 , 0);
 	}
 
-	// TODO: incomplete
 	for (unsigned i = 0 , x_left = 0; i < VIDEO_VIS_COLS; i++ , x_left += VIDEO_CHAR_WIDTH * 2) {
 		uint8_t ch = m_buffers[ buff_idx ].m_chars[ i ];
 		bool iv = BIT(ch , 7);
 		BIT_CLR(ch, 7);
 		uint8_t attrs = m_buffers[ buff_idx ].m_attrs[ i ];
-
+		uint8_t char_set = (attrs >> 4) & 3;
 		uint16_t ch_addr = ch & 0x1f;
 		if (BIT(ch , 6)) {
 			BIT_SET(ch_addr, 5);
 		}
-		if ((ch <= 0x1f) || (ch >= 0x60)) {
+		uint8_t byte;
+		if (char_set == 0 && ((ch <= 0x1f) || (ch >= 0x60))) {
 			BIT_SET(ch_addr, 6);
 		}
-		uint8_t byte = m_chargen0[ (ch_addr << 4) + line_in_row ];
-		uint32_t pixels;
-		if (cyen && (line_in_row == 11 || line_in_row == 12) && i == m_cursor_x) {
-			pixels = cursor_blink ? ~0 : 0;
-		} else if (BIT(fn_12 , 1) && BIT(attrs , 0)) {
-			pixels = 0;
-		} else if (line_in_row == 11 && BIT(attrs , 2)) {
-			pixels = ~0;
+		if (char_set == 0 || ch >= 0x20) {
+			byte = ~m_chargen[ char_set ][ (ch_addr << 4) + line_in_row ];
 		} else {
-			pixels = uint32_t((byte >> 1) ^ 0x7f);
-			pixels = ((pixels & 0x40) << 8) |
-				((pixels & 0x20) << 7) |
-				((pixels & 0x10) << 6) |
-				((pixels & 0x08) << 5) |
-				((pixels & 0x04) << 4) |
-				((pixels & 0x02) << 3) |
-				((pixels & 0x01) << 2);
-			pixels |= (pixels << 1);
-			if (!BIT(byte , 0)) {
-				pixels <<= 1;
-				if (BIT(pixels , 16)) {
-					BIT_SET(pixels, 17);
+			byte = 0;
+		}
+		uint16_t pixels_e;
+		uint16_t pixels_o;
+		bool microvector = (char_set == 2) || (char_set == 3);
+
+		if (cyen && (line_in_row == 11 || line_in_row == 12) && i == m_cursor_x) {
+			pixels_e = pixels_o = cursor_blink ? ~0 : 0;
+		} else if (BIT(fn_12 , 1) && BIT(attrs , 0)) {
+			pixels_e = pixels_o = 0;
+		} else if (line_in_row == 11 && BIT(attrs , 2)) {
+			pixels_e = pixels_o = ~0;
+		} else if (microvector) {
+			pixels_e = pixels_o = uint16_t(byte) << 1;
+			// Copy b0
+			if (BIT(pixels_e , 1)) {
+				BIT_SET(pixels_e, 0);
+				BIT_SET(pixels_o, 0);
+			}
+		} else {
+			bool half_shift = BIT(byte , 0);
+			pixels_e = pixels_o = uint16_t(byte & 0xfe);
+			if (half_shift) {
+				pixels_e <<= 1;
+				if (BIT(pixels_o , 7)) {
+					BIT_SET(pixels_o, 8);
 				}
 			}
 		}
 		if (iv) {
-			pixels = ~pixels;
+			pixels_e = ~pixels_e;
+			pixels_o = ~pixels_o;
 		}
 		unsigned on_pen = BIT(attrs , 3) ? 1 : 2;
-		for (unsigned x = 0; x < VIDEO_CHAR_WIDTH * 2; x++) {
-			m_bitmap.pix32(video_scanline , x_left + x) = m_palette->pen(BIT(pixels , 0) ? on_pen : 0);
-			pixels >>= 1;
+		for (unsigned x = 0; x < VIDEO_CHAR_WIDTH * 2; x += 2) {
+			m_bitmap.pix32(video_scanline , x_left + x) = m_palette->pen(BIT(pixels_e , 0) ? on_pen : 0);
+			m_bitmap.pix32(video_scanline , x_left + x + 1) = m_palette->pen(BIT(pixels_o , 0) ? on_pen : 0);
+			pixels_e >>= 1;
+			pixels_o >>= 1;
 		}
 	}
+}
+
+static const unsigned baud_rate_divisors[] = {
+	0,      // 0: external clock (here: no clock)
+	2800,   // 1: 110 baud
+	2048,   // 2: 150 baud
+	1024,   // 3: 300 baud
+	256,    // 4: 1200 baud
+	128,    // 5: 2400 baud
+	64,     // 6: 4800 baud
+	32      // 7: 9600 baud
+};
+
+void hp2645_state::update_async_control(uint8_t new_control)
+{
+	LOG("ASYNC CT=%02x\n" , new_control);
+	uint8_t diff = m_async_control ^ new_control;
+	m_async_control = new_control;
+	m_rs232->write_rts(BIT(m_async_control , 0));
+	if (diff & 0x0e) {
+		unsigned new_rate_idx = (m_async_control >> 1) & 0x07;
+		// Set baud rate
+		double rxc_txc_freq;
+		if (new_rate_idx == 0) {
+			rxc_txc_freq = 0.0;
+		} else {
+			rxc_txc_freq = SYS_CLOCK.dvalue() / baud_rate_divisors[ new_rate_idx ];
+		}
+		m_uart->set_receiver_clock(rxc_txc_freq);
+		m_uart->set_transmitter_clock(rxc_txc_freq);
+		m_uart->set_input_pin(AY31015_TSB , new_rate_idx == 1);
+		LOG("ASYNC freq=%f\n" , rxc_txc_freq);
+	}
+	if (diff & 0x30) {
+		m_uart->set_input_pin(AY31015_NP , BIT(new_control , 5));
+		m_uart->set_input_pin(AY31015_NB1 , BIT(new_control , 5));
+		m_uart->set_input_pin(AY31015_EPS , BIT(new_control , 4));
+	}
+	// Update TxD
+	async_txd_w(0);
+}
+
+void hp2645_state::update_async_irq()
+{
+	m_datacom_irq = m_uart->get_output_pin(AY31015_DAV);
+	LOG("ASYNC IRQ=%d\n" , m_datacom_irq);
+	update_irq();
 }
 
 #define IOP_MASK(x) BIT_MASK<ioport_value>((x))
@@ -523,7 +761,7 @@ static INPUT_PORTS_START(hp2645)
 	PORT_BIT(IOP_MASK(21) , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))    // 025 PAD3
 	PORT_BIT(IOP_MASK(22) , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD))    // 026 PAD6
 	PORT_BIT(IOP_MASK(23) , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_NAME("f5")  // 027 F5
-	PORT_BIT(IOP_MASK(24) , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_NAME("Memory lock")                                    // 030 MEMORY LOCK
+	PORT_BIT(IOP_MASK(24) , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_TOGGLE PORT_NAME("Memory lock")                        // 030 MEMORY LOCK
 	PORT_BIT(IOP_MASK(25) , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')          // 031 3
 	PORT_BIT(IOP_MASK(26) , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')          // 032 E
 	PORT_BIT(IOP_MASK(27) , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')          // 033 C
@@ -614,11 +852,112 @@ static INPUT_PORTS_START(hp2645)
 	PORT_BIT(IOP_MASK(13) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                // 155
 	PORT_BIT(IOP_MASK(14) , IP_ACTIVE_HIGH , IPT_UNUSED)                                                                // 156
 	PORT_BIT(IOP_MASK(15) , IP_ACTIVE_HIGH , IPT_KEYBOARD)  PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_NAME("f1")  // 157 F1
+
+	// Default: Full duplex, no parity, 9600 bps
+	PORT_START("comm")
+	PORT_CONFNAME(0x80, 0x80, "Duplex")
+	PORT_CONFSETTING(0x80, "Full")
+	PORT_CONFSETTING(0x00, "Half")
+	PORT_CONFNAME(0x30, 0x20, "Parity")
+	PORT_CONFSETTING(0x00, "Odd")
+	PORT_CONFSETTING(0x10, "Even")
+	PORT_CONFSETTING(0x20, "None")
+	PORT_CONFNAME(0x0e, 0x0e, "Baud rate")
+	PORT_CONFSETTING(0x00, "Ext")
+	PORT_CONFSETTING(0x02, "110")
+	PORT_CONFSETTING(0x04, "150")
+	PORT_CONFSETTING(0x06, "300")
+	PORT_CONFSETTING(0x08, "1200")
+	PORT_CONFSETTING(0x0a, "2400")
+	PORT_CONFSETTING(0x0c, "4800")
+	PORT_CONFSETTING(0x0e, "9600")
+
+	// Default: all switches closed except R, U & V
+	// This setting should work for standard character-oriented I/O
+	PORT_START("sw_ah")
+	PORT_CONFNAME(0x01, 0x00, "Switch A")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x01, DEF_STR(Off))
+	PORT_CONFNAME(0x02, 0x00, "Switch B")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x02, DEF_STR(Off))
+	PORT_CONFNAME(0x04, 0x00, "Switch C")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x04, DEF_STR(Off))
+	PORT_CONFNAME(0x08, 0x00, "Switch D")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x08, DEF_STR(Off))
+	PORT_CONFNAME(0x10, 0x00, "Switch E")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x10, DEF_STR(Off))
+	PORT_CONFNAME(0x20, 0x00, "Switch F")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x20, DEF_STR(Off))
+	PORT_CONFNAME(0x40, 0x00, "Switch G")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x40, DEF_STR(Off))
+	PORT_CONFNAME(0x80, 0x00, "Switch H")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x80, DEF_STR(Off))
+	PORT_START("sw_jr")
+	PORT_CONFNAME(0x01, 0x00, "Switch J")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x01, DEF_STR(Off))
+	PORT_CONFNAME(0x02, 0x00, "Switch K")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x02, DEF_STR(Off))
+	PORT_CONFNAME(0x04, 0x00, "Switch L")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x04, DEF_STR(Off))
+	PORT_CONFNAME(0x08, 0x00, "Switch M")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x08, DEF_STR(Off))
+	PORT_CONFNAME(0x10, 0x00, "Switch N")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x10, DEF_STR(Off))
+	PORT_CONFNAME(0x20, 0x00, "Switch P")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x20, DEF_STR(Off))
+	PORT_CONFNAME(0x40, 0x00, "Switch Q")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x40, DEF_STR(Off))
+	PORT_CONFNAME(0x80, 0x80, "Switch R")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x80, DEF_STR(Off))
+	PORT_START("sw_sz")
+	PORT_CONFNAME(0x01, 0x00, "Switch S")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x01, DEF_STR(Off))
+	PORT_CONFNAME(0x02, 0x00, "Switch T")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x02, DEF_STR(Off))
+	PORT_CONFNAME(0x04, 0x04, "Switch U")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x04, DEF_STR(Off))
+	PORT_CONFNAME(0x08, 0x08, "Switch V")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x08, DEF_STR(Off))
+	PORT_CONFNAME(0x10, 0x00, "Switch W")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x10, DEF_STR(Off))
+	PORT_CONFNAME(0x20, 0x00, "Switch X")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x20, DEF_STR(Off))
+	PORT_CONFNAME(0x40, 0x00, "Switch Y")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x40, DEF_STR(Off))
+	PORT_CONFNAME(0x80, 0x00, "Switch Z")
+	PORT_CONFSETTING(0x00, DEF_STR(On))
+	PORT_CONFSETTING(0x80, DEF_STR(Off))
 INPUT_PORTS_END
 
 static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 8 , hp2645_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000 , 0x57ff) AM_ROM
+	AM_RANGE(0x8100 , 0x8100) AM_READ(async_data_r)
+	AM_RANGE(0x8120 , 0x8120) AM_READ(async_status_r)
+	AM_RANGE(0x8140 , 0x8140) AM_WRITE(async_control_w)
+	AM_RANGE(0x8160 , 0x8160) AM_WRITE(async_data_w)
 	AM_RANGE(0x8300 , 0x8300) AM_WRITE(kb_led_w)
 	AM_RANGE(0x8300 , 0x830d) AM_READ(kb_r)
 	AM_RANGE(0x830e , 0x830e) AM_READ(switches_ah_r)
@@ -637,7 +976,7 @@ static ADDRESS_MAP_START(cpu_io_map , AS_IO , 8 , hp2645_state)
 	AM_RANGE(0x00 , 0xff) AM_WRITE(mode_byte_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START(hp2645)
+MACHINE_CONFIG_START(hp2645_state::hp2645)
 	MCFG_CPU_ADD("cpu" , I8080A , SYS_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP(cpu_mem_map)
 	MCFG_CPU_IO_MAP(cpu_io_map)
@@ -657,6 +996,22 @@ static MACHINE_CONFIG_START(hp2645)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hp2645_state, scanline_timer, "screen", 0, 1)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 	MCFG_DEFAULT_LAYOUT(layout_hp2640)
+
+	// RS232
+	MCFG_RS232_PORT_ADD("rs232" , default_rs232_devices , nullptr)
+
+	// UART
+	MCFG_DEVICE_ADD("uart", AY31015, 0)
+	MCFG_AY31015_READ_SI_CB(DEVREADLINE("rs232" , rs232_port_device , rxd_r))
+	MCFG_AY31015_WRITE_SO_CB(WRITELINE(hp2645_state , async_txd_w))
+	MCFG_AY31015_STATUS_CHANGED_CB(WRITE8(hp2645_state , async_status_change))
+
+	// Beep
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("beep" , BEEP , BEEP_FREQUENCY)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS , "mono" , 1.00)
+	MCFG_TIMER_DRIVER_ADD("timer_beep" , hp2645_state , timer_beep_exp)
+
 MACHINE_CONFIG_END
 
 ROM_START(hp2645)
@@ -676,6 +1031,15 @@ ROM_START(hp2645)
 	ROM_REGION(0x2000, "chargen0", 0)
 	ROM_LOAD("1816-0612.bin", 0x0000, 0x400, CRC(5d7befd6) SHA1(31357e7b8630f52698f1b6825e79c7a51ff3f245))
 	ROM_LOAD("1816-0613.bin", 0x0400, 0x400, CRC(b6bac431) SHA1(42a557ecff769425d295ebbd1b73b26ddbfd3a09))
+
+	ROM_REGION(0x1000, "chargen1", 0)
+	ROM_LOAD("1816-0642.bin", 0x0000, 0x400, CRC(2b8d151d) SHA1(208ae3ec780eb8bbbe6ac39cc61141730eda7fdd))
+
+	ROM_REGION(0x1000, "chargen2", 0)
+	ROM_LOAD("1816-1417.bin", 0x0000, 0x400, CRC(e91343a4) SHA1(b37be2f3699bc8766435b5ee3775d36510df8d1e))
+
+	ROM_REGION(0x1000, "chargen3", 0)
+	ROM_LOAD("1816-1425.bin", 0x0000, 0x400, CRC(69a34fef) SHA1(816929cadd53c2fe42b3ca561c029cb1ccd4ca24))
 ROM_END
 
-COMP(1976 , hp2645 , 0 , 0 , hp2645 , hp2645 , hp2645_state , 0 , "HP" , "HP 2645A" , MACHINE_NO_SOUND)
+COMP(1976 , hp2645 , 0 , 0 , hp2645 , hp2645 , hp2645_state , 0 , "HP" , "HP 2645A" , 0)

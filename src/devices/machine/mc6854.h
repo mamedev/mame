@@ -24,7 +24,7 @@
 	devcb = &mc6854_device::set_out_txd_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_MC6854_OUT_FRAME_CB(_class, _method) \
-	mc6854_device::set_out_frame_callback(*device, mc6854_device::out_frame_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	mc6854_device::set_out_frame_callback(*device, mc6854_device::out_frame_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_MC6854_OUT_RTS_CB(_devcb) \
 	devcb = &mc6854_device::set_out_rts_callback(*device, DEVCB_##_devcb);

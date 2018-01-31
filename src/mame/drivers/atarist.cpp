@@ -2072,7 +2072,7 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( st )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( st )
+MACHINE_CONFIG_START(st_state::st)
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MCFG_CPU_PROGRAM_MAP(st_map)
@@ -2162,7 +2162,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( megast )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( megast )
+MACHINE_CONFIG_START(megast_state::megast)
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MCFG_CPU_PROGRAM_MAP(megast_map)
@@ -2189,7 +2189,7 @@ static MACHINE_CONFIG_START( megast )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
 
 	MCFG_WD1772_ADD(WD1772_TAG, Y2/4)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE(MC68901_TAG, mc68901_device, i5_w)) MCFG_DEVCB_INVERT
@@ -2253,7 +2253,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( ste )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ste )
+MACHINE_CONFIG_START(ste_state::ste)
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, Y2/4)
 	MCFG_CPU_PROGRAM_MAP(ste_map)
@@ -2351,10 +2351,10 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( megaste )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( megaste, ste )
+MACHINE_CONFIG_DERIVED(megaste_state::megaste, ste)
 	MCFG_CPU_MODIFY(M68000_TAG)
 	MCFG_CPU_PROGRAM_MAP(megaste_map)
-	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(RP5C15_TAG, RP5C15, XTAL(32'768))
 	MCFG_DEVICE_ADD(Z8530_TAG, SCC8530, Y2/4)
 
 	/* internal ram */
@@ -2368,7 +2368,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( stbook )
 //-------------------------------------------------
 #if 0
-static MACHINE_CONFIG_START( stbook )
+static MACHINE_CONFIG_START(stbook_state::stbook)
 	// basic machine hardware
 	MCFG_CPU_ADD(M68000_TAG, M68000, U517/2)
 	MCFG_CPU_PROGRAM_MAP(stbook_map)
@@ -2454,7 +2454,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( tt030 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( tt030, ste )
+MACHINE_CONFIG_DERIVED(ste_state::tt030, ste)
 MACHINE_CONFIG_END
 
 
@@ -2462,7 +2462,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( falcon )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( falcon, ste )
+MACHINE_CONFIG_DERIVED(ste_state::falcon, ste)
 MACHINE_CONFIG_END
 
 
@@ -2470,7 +2470,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( falcon40 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( falcon40, ste )
+MACHINE_CONFIG_DERIVED(ste_state::falcon40, ste)
 MACHINE_CONFIG_END
 
 

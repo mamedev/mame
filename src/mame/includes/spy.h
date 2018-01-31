@@ -60,4 +60,5 @@ public:
 	DECLARE_WRITE8_MEMBER(volume_callback1);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
+	void spy(machine_config &config);
 };

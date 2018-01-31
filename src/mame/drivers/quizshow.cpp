@@ -24,7 +24,7 @@ TODO:
 #include "quizshow.lh"
 
 
-#define MASTER_CLOCK    XTAL_12_096MHz
+#define MASTER_CLOCK    XTAL(12'096'000)
 #define PIXEL_CLOCK     (MASTER_CLOCK/2)
 
 #define HTOTAL          ((32+8+4+1) * 8)
@@ -79,6 +79,7 @@ public:
 	DECLARE_PALETTE_INIT(quizshow);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(clock_timer_cb);
+	void quizshow(machine_config &config);
 };
 
 
@@ -378,7 +379,7 @@ void quizshow_state::machine_reset()
 	m_tape_head_pos = 0;
 }
 
-static MACHINE_CONFIG_START( quizshow )
+MACHINE_CONFIG_START(quizshow_state::quizshow)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK / 16) // divider guessed

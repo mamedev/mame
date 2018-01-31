@@ -370,12 +370,6 @@ some other components. It will be documented at a later date.
 
 #define SDRAM_CLOCK         166666666       // Main SDRAMs run at 166MHz
 
-
-
-static emu_timer *ds2430_timer;
-static timer_device *ds2430_bit_timer;
-
-
 class viper_state : public driver_device
 {
 public:
@@ -384,19 +378,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ata(*this, "ata"),
 		m_voodoo(*this, "voodoo"),
+		m_lpci(*this, "pcibus"),
+		m_ds2430_bit_timer(*this, "ds2430_timer2"),
 		m_workram(*this, "workram"),
+		m_ds2430_rom(*this, "ds2430"),
 		m_io_ports(*this, {"IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7"})
 	{
 	}
-
-	uint32_t m_epic_iack;
-	int m_cf_card_ide;
-	uint32_t m_voodoo3_pci_reg[0x100];
-	int m_unk_serial_bit_w;
-	uint16_t m_unk_serial_cmd;
-	uint16_t m_unk_serial_data;
-	uint16_t m_unk_serial_data_r;
-	uint8_t m_unk_serial_regs[0x80];
 
 	DECLARE_READ32_MEMBER(epic_r);
 	DECLARE_WRITE32_MEMBER(epic_w);
@@ -431,13 +419,107 @@ public:
 	DECLARE_DRIVER_INIT(viper);
 	DECLARE_DRIVER_INIT(vipercf);
 	DECLARE_DRIVER_INIT(viperhd);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	uint32_t screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
 	WRITE_LINE_MEMBER(voodoo_pciint);
+	DECLARE_CUSTOM_INPUT_MEMBER(ds2430_unk_r);
+
+	//the following two arrays need to stay public til the legacy PCI bus is removed
+	uint32_t m_voodoo3_pci_reg[0x100];
+	uint32_t m_mpc8240_regs[256/4];
+
+	void viper(machine_config &config);
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
+
+	int m_cf_card_ide;
+	int m_unk_serial_bit_w;
+	uint16_t m_unk_serial_cmd;
+	uint16_t m_unk_serial_data;
+	uint16_t m_unk_serial_data_r;
+	uint8_t m_unk_serial_regs[0x80];
+	uint64_t m_e00008_data;
+
+	// MPC8240 EPIC, to be device-ified
+	enum
+	{
+		MPC8240_IRQ0 = 0,
+		MPC8240_IRQ1,
+		MPC8240_IRQ2,
+		MPC8240_IRQ3,
+		MPC8240_IRQ4,
+		MPC8240_IRQ5,
+		MPC8240_IRQ6,
+		MPC8240_IRQ7,
+		MPC8240_IRQ8,
+		MPC8240_IRQ9 ,
+		MPC8240_IRQ10,
+		MPC8240_IRQ11,
+		MPC8240_IRQ12,
+		MPC8240_IRQ13,
+		MPC8240_IRQ14,
+		MPC8240_IRQ15,
+		MPC8240_I2C_IRQ,
+		MPC8240_DMA0_IRQ,
+		MPC8240_DMA1_IRQ,
+		MPC8240_MSG_IRQ,
+		MPC8240_GTIMER0_IRQ,
+		MPC8240_GTIMER1_IRQ,
+		MPC8240_GTIMER2_IRQ,
+		MPC8240_GTIMER3_IRQ,
+		MPC8240_NUM_INTERRUPTS
+	};
+
+	enum
+	{
+		I2C_STATE_ADDRESS_CYCLE = 1,
+		I2C_STATE_DATA_TRANSFER
+	};
+
+	struct MPC8240_IRQ
+	{
+		uint32_t vector;
+		int priority;
+		int destination;
+		int active;
+		int pending;
+		int mask;
+	};
+
+	struct MPC8240_GLOBAL_TIMER
+	{
+		uint32_t base_count;
+		int enable;
+		emu_timer *timer;
+	};
+
+	struct MPC8240_EPIC
+	{
+		uint32_t iack;
+		uint32_t eicr;
+		uint32_t svr;
+
+		int active_irq;
+
+		MPC8240_IRQ irq[MPC8240_NUM_INTERRUPTS];
+
+		uint8_t i2c_adr;
+		int i2c_freq_div, i2c_freq_sample_rate;
+		uint8_t i2c_cr;
+		uint8_t i2c_sr;
+		int i2c_state;
+
+		MPC8240_GLOBAL_TIMER global_timer[4];
+
+	};
+
+	MPC8240_EPIC m_epic;
+
 #if VIPER_DEBUG_EPIC_REGS
 	const char* epic_get_register_name(uint32_t reg);
 #endif
@@ -445,24 +527,44 @@ public:
 	void mpc8240_interrupt(int irq);
 	void mpc8240_epic_init();
 	void mpc8240_epic_reset(void);
+
+	// DS2430, to be device-ified, used at least by pyson.cpp, too
+	enum
+	{
+		DS2430_STATE_ROM_COMMAND = 1,
+		DS2430_STATE_MEM_COMMAND,
+		DS2430_STATE_READ_ROM,
+		DS2430_STATE_MEM_FUNCTION,
+		DS2430_STATE_READ_MEM,
+		DS2430_STATE_READ_MEM_ADDRESS
+	};
+
+	uint8_t m_ds2430_data;
+	int m_ds2430_data_count;
+	int m_ds2430_reset;
+	int m_ds2430_state;
+	uint8_t m_ds2430_cmd;
+	uint8_t m_ds2430_addr;
+	uint8_t m_ds2430_unk_status;
+	emu_timer *m_ds2430_timer;
 	int ds2430_insert_cmd_bit(int bit);
+
 	void DS2430_w(int bit);
+
 	required_device<ppc_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
 	required_device<voodoo_3_device> m_voodoo;
+	required_device<pci_bus_legacy_device> m_lpci;
+	required_device<timer_device> m_ds2430_bit_timer;
 	required_shared_ptr<uint64_t> m_workram;
+	required_region_ptr<uint8_t> m_ds2430_rom;
 	required_ioport_array<8> m_io_ports;
-	uint8_t m_ds2430_unk_status;
-	DECLARE_CUSTOM_INPUT_MEMBER(ds2430_unk_r);
 };
 
 uint32_t viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo");
-	return voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
+	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
-
-uint32_t m_mpc8240_regs[256/4];
 
 #ifdef UNUSED_FUNCTION
 static inline uint64_t read64le_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, uint64_t mem_mask)
@@ -511,8 +613,7 @@ static inline void write64be_with_32le_device_handler(write32_delegate handler, 
 
 static uint32_t mpc8240_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
-// device is null?
-//  viper_state *state = device->machine().driver_data<viper_state>();
+	viper_state *state = busdevice->machine().driver_data<viper_state>();
 	#ifdef VIPER_DEBUG_LOG
 //  printf("MPC8240: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 	#endif
@@ -520,123 +621,43 @@ static uint32_t mpc8240_pci_r(device_t *busdevice, device_t *device, int functio
 	switch (reg)
 	{
 	}
-	return m_mpc8240_regs[reg/4];
-	//return state->m_mpc8240_regs[reg/4];
+	return state->m_mpc8240_regs[reg/4];
 }
 
 static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
-// device is null?
-//  viper_state *state = device->machine().driver_data<viper_state>();
+	viper_state *state = busdevice->machine().driver_data<viper_state>();
 	#ifdef VIPER_DEBUG_LOG
 //  printf("MPC8240: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	#endif
-	COMBINE_DATA(m_mpc8240_regs + (reg/4));
-	//COMBINE_DATA(state->m_mpc8240_regs + (reg/4));
+	COMBINE_DATA(state->m_mpc8240_regs + (reg/4));
 }
 
 
 READ64_MEMBER(viper_state::pci_config_addr_r)
 {
-	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
-	return device->read_64be(space, 0, 0xffffffff00000000U);
+	return m_lpci->read_64be(space, 0, 0xffffffff00000000U);
 }
 
 WRITE64_MEMBER(viper_state::pci_config_addr_w)
 {
-	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
-	device->write_64be(space, 0, data, 0xffffffff00000000U);
+	m_lpci->write_64be(space, 0, data, 0xffffffff00000000U);
 }
 
 READ64_MEMBER(viper_state::pci_config_data_r)
 {
-	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
-	return device->read_64be(space, 1, 0x00000000ffffffffU) << 32;
+	return m_lpci->read_64be(space, 1, 0x00000000ffffffffU) << 32;
 }
 
 WRITE64_MEMBER(viper_state::pci_config_data_w)
 {
-	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
-	device->write_64be(space, 1, data >> 32, 0x00000000ffffffffU);
+	m_lpci->write_64be(space, 1, data >> 32, 0x00000000ffffffffU);
 }
 
 
 
 /*****************************************************************************/
 // MPC8240 Embedded Programmable Interrupt Controller (EPIC)
-
-#define MPC8240_IRQ0                0
-#define MPC8240_IRQ1                1
-#define MPC8240_IRQ2                2
-#define MPC8240_IRQ3                3
-#define MPC8240_IRQ4                4
-#define MPC8240_IRQ5                5
-#define MPC8240_IRQ6                6
-#define MPC8240_IRQ7                7
-#define MPC8240_IRQ8                8
-#define MPC8240_IRQ9                9
-#define MPC8240_IRQ10               10
-#define MPC8240_IRQ11               11
-#define MPC8240_IRQ12               12
-#define MPC8240_IRQ13               13
-#define MPC8240_IRQ14               14
-#define MPC8240_IRQ15               15
-#define MPC8240_I2C_IRQ             16
-#define MPC8240_DMA0_IRQ            17
-#define MPC8240_DMA1_IRQ            18
-#define MPC8240_MSG_IRQ             19
-#define MPC8240_GTIMER0_IRQ         20
-#define MPC8240_GTIMER1_IRQ         21
-#define MPC8240_GTIMER2_IRQ         22
-#define MPC8240_GTIMER3_IRQ         23
-
-#define MPC8240_NUM_INTERRUPTS      24
-
-#define I2C_STATE_ADDRESS_CYCLE     1
-#define I2C_STATE_DATA_TRANSFER     2
-
-
-struct MPC8240_IRQ
-{
-	uint32_t vector;
-	int priority;
-	int destination;
-	int active;
-	int pending;
-	int mask;
-};
-
-struct MPC8240_GLOBAL_TIMER
-{
-	uint32_t base_count;
-	int enable;
-	emu_timer *timer;
-};
-
-
-
-struct MPC8240_EPIC
-{
-	uint32_t iack;
-	uint32_t eicr;
-	uint32_t svr;
-
-	int active_irq;
-
-	MPC8240_IRQ irq[MPC8240_NUM_INTERRUPTS];
-
-	uint8_t i2c_adr;
-	int i2c_freq_div, i2c_freq_sample_rate;
-	uint8_t i2c_cr;
-	uint8_t i2c_sr;
-	int i2c_state;
-
-	MPC8240_GLOBAL_TIMER global_timer[4];
-
-};
-
-// TODO: move to viper_state
-static MPC8240_EPIC epic;
 
 #if VIPER_DEBUG_EPIC_REGS
 const char* viper_state::epic_get_register_name(uint32_t reg)
@@ -758,10 +779,10 @@ TIMER_CALLBACK_MEMBER(viper_state::epic_global_timer_callback)
 {
 	int timer_num = param;
 
-	if (epic.global_timer[timer_num].enable && epic.global_timer[timer_num].base_count > 0)
+	if (m_epic.global_timer[timer_num].enable && m_epic.global_timer[timer_num].base_count > 0)
 	{
-		attotime timer_duration =  attotime::from_hz((SDRAM_CLOCK / 8) / epic.global_timer[timer_num].base_count);
-		epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
+		attotime timer_duration =  attotime::from_hz((SDRAM_CLOCK / 8) / m_epic.global_timer[timer_num].base_count);
+		m_epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
 
 #if VIPER_DEBUG_EPIC_TIMERS
 		printf("EPIC GTIMER%d: next in %s\n", timer_num, attotime_string(timer_duration, 8));
@@ -769,7 +790,7 @@ TIMER_CALLBACK_MEMBER(viper_state::epic_global_timer_callback)
 	}
 	else
 	{
-		epic.global_timer[timer_num].timer->reset();
+		m_epic.global_timer[timer_num].timer->reset();
 	}
 
 	mpc8240_interrupt(MPC8240_GTIMER0_IRQ + timer_num);
@@ -786,36 +807,36 @@ void viper_state::epic_update_interrupts()
 	// find the highest priority pending interrupt
 	for (i=MPC8240_NUM_INTERRUPTS-1; i >= 0; i--)
 	{
-		if (epic.irq[i].pending)
+		if (m_epic.irq[i].pending)
 		{
 			// pending interrupt can only be serviced if its mask is enabled and priority is non-zero
-			if (epic.irq[i].mask == 0 && epic.irq[i].priority > 0)
+			if (m_epic.irq[i].mask == 0 && m_epic.irq[i].priority > 0)
 			{
-				if (epic.irq[i].priority > priority)
+				if (m_epic.irq[i].priority > priority)
 				{
 					irq = i;
-					priority = epic.irq[i].priority;
+					priority = m_epic.irq[i].priority;
 				}
 			}
 		}
 	}
 
-	if (irq >= 0 && epic.active_irq == -1)
+	if (irq >= 0 && m_epic.active_irq == -1)
 	{
 #if VIPER_DEBUG_EPIC_INTS
 		if (irq > 4 && irq < 20)
 			printf("EPIC IRQ%d taken\n", irq);
 #endif
 
-		epic.active_irq = irq;
-		epic.irq[epic.active_irq].pending = 0;
-		epic.irq[epic.active_irq].active = 1;
+		m_epic.active_irq = irq;
+		m_epic.irq[m_epic.active_irq].pending = 0;
+		m_epic.irq[m_epic.active_irq].active = 1;
 
-		epic.iack = epic.irq[epic.active_irq].vector;
+		m_epic.iack = m_epic.irq[m_epic.active_irq].vector;
 
 #if VIPER_DEBUG_EPIC_INTS
 		if (irq > 4 && irq < 20)
-			printf("vector = %02X\n", epic.iack);
+			printf("vector = %02X\n", m_epic.iack);
 #endif
 
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
@@ -837,11 +858,11 @@ READ32_MEMBER(viper_state::epic_r)
 		const char *regname = epic_get_register_name(reg);
 		if (regname)
 		{
-			printf("EPIC: read %08X (%s) at %08X\n", reg, regname, space.device().safe_pc());
+			printf("EPIC: read %08X (%s) at %08X\n", reg, regname, m_maincpu->pc());
 		}
 		else
 		{
-			printf("EPIC: read %08X at %08X\n", reg, space.device().safe_pc());
+			printf("EPIC: read %08X at %08X\n", reg, m_maincpu->pc());
 		}
 	}
 #endif
@@ -857,41 +878,41 @@ READ32_MEMBER(viper_state::epic_r)
 			{
 				case 0x3000:            // Offset 0x3000 - I2CADR
 				{
-					ret = epic.i2c_adr;
+					ret = m_epic.i2c_adr;
 					break;
 				}
 				case 0x3004:            // Offset 0x3004 - I2CFDR
 				{
-					ret = epic.i2c_freq_div | (epic.i2c_freq_sample_rate << 8);
+					ret = m_epic.i2c_freq_div | (m_epic.i2c_freq_sample_rate << 8);
 					break;
 				}
 				case 0x3008:            // Offset 0x3008 - I2CCR
 				{
-					ret = epic.i2c_cr;
+					ret = m_epic.i2c_cr;
 					break;
 				}
 				case 0x300c:            // Offset 0x300c - I2CSR
 				{
-					ret = epic.i2c_sr;
+					ret = m_epic.i2c_sr;
 					break;
 				}
 				case 0x3010:            // Offset 0x3010 - I2CDR
 				{
-					if (epic.i2c_cr & 0x80)     // only do anything if the I2C module is enabled
+					if (m_epic.i2c_cr & 0x80)     // only do anything if the I2C module is enabled
 					{
-						if (epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)
+						if (m_epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)
 						{
 #if VIPER_DEBUG_EPIC_I2C
 							printf("I2C address cycle read\n");
 #endif
 
-							epic.i2c_state = I2C_STATE_DATA_TRANSFER;
+							m_epic.i2c_state = I2C_STATE_DATA_TRANSFER;
 
 							// set transfer complete in status register
-							epic.i2c_sr |= 0x80;
+							m_epic.i2c_sr |= 0x80;
 
 							// generate interrupt if interrupt are enabled
-							if (epic.i2c_cr & 0x40)
+							if (m_epic.i2c_cr & 0x40)
 							{
 #if VIPER_DEBUG_EPIC_I2C
 								printf("I2C interrupt\n");
@@ -899,28 +920,28 @@ READ32_MEMBER(viper_state::epic_r)
 								mpc8240_interrupt(MPC8240_I2C_IRQ);
 
 								// set interrupt flag in status register
-								epic.i2c_sr |= 0x2;
+								m_epic.i2c_sr |= 0x2;
 							}
 						}
-						else if (epic.i2c_state == I2C_STATE_DATA_TRANSFER)
+						else if (m_epic.i2c_state == I2C_STATE_DATA_TRANSFER)
 						{
 #if VIPER_DEBUG_EPIC_I2C
 							printf("I2C data read\n");
 #endif
 
-							epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
+							m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
 
 							// set transfer complete in status register
-							epic.i2c_sr |= 0x80;
+							m_epic.i2c_sr |= 0x80;
 
 							// generate interrupt if interrupt are enabled
-							/*if (epic.i2c_cr & 0x40)
+							/*if (m_epic.i2c_cr & 0x40)
 							{
 							    printf("I2C interrupt\n");
 							    mpc8240_interrupt(MPC8240_I2C_IRQ);
 
 							    // set interrupt flag in status register
-							    epic.i2c_sr |= 0x2;
+							    m_epic.i2c_sr |= 0x2;
 							}*/
 						}
 					}
@@ -942,10 +963,10 @@ READ32_MEMBER(viper_state::epic_r)
 				{
 					int timer_num = ((reg & 0xffff) - 0x1120) >> 6;
 
-					ret |= epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask ? 0x80000000 : 0;
-					ret |= epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority << 16;
-					ret |= epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector;
-					ret |= epic.irq[MPC8240_GTIMER0_IRQ + timer_num].active ? 0x40000000 : 0;
+					ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask ? 0x80000000 : 0;
+					ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority << 16;
+					ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector;
+					ret |= m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].active ? 0x40000000 : 0;
 					break;
 				}
 			}
@@ -976,18 +997,18 @@ READ32_MEMBER(viper_state::epic_r)
 				{
 					int irq = ((reg & 0xffff) - 0x200) >> 5;
 
-					ret |= epic.irq[MPC8240_IRQ0 + irq].mask ? 0x80000000 : 0;
-					ret |= epic.irq[MPC8240_IRQ0 + irq].priority << 16;
-					ret |= epic.irq[MPC8240_IRQ0 + irq].vector;
-					ret |= epic.irq[MPC8240_IRQ0 + irq].active ? 0x40000000 : 0;
+					ret |= m_epic.irq[MPC8240_IRQ0 + irq].mask ? 0x80000000 : 0;
+					ret |= m_epic.irq[MPC8240_IRQ0 + irq].priority << 16;
+					ret |= m_epic.irq[MPC8240_IRQ0 + irq].vector;
+					ret |= m_epic.irq[MPC8240_IRQ0 + irq].active ? 0x40000000 : 0;
 					break;
 				}
 				case 0x1020:            // Offset 0x51020 - I2C IRQ vector/priority register
 				{
-					ret |= epic.irq[MPC8240_I2C_IRQ].mask ? 0x80000000 : 0;
-					ret |= epic.irq[MPC8240_I2C_IRQ].priority << 16;
-					ret |= epic.irq[MPC8240_I2C_IRQ].vector;
-					ret |= epic.irq[MPC8240_I2C_IRQ].active ? 0x40000000 : 0;
+					ret |= m_epic.irq[MPC8240_I2C_IRQ].mask ? 0x80000000 : 0;
+					ret |= m_epic.irq[MPC8240_I2C_IRQ].priority << 16;
+					ret |= m_epic.irq[MPC8240_I2C_IRQ].vector;
+					ret |= m_epic.irq[MPC8240_I2C_IRQ].active ? 0x40000000 : 0;
 					break;
 				}
 			}
@@ -1003,14 +1024,14 @@ READ32_MEMBER(viper_state::epic_r)
 				{
 					epic_update_interrupts();
 
-					if (epic.active_irq >= 0)
+					if (m_epic.active_irq >= 0)
 					{
-						ret = epic.iack;
+						ret = m_epic.iack;
 					}
 					else
 					{
 						// spurious vector register is returned if no pending interrupts
-						ret = epic.svr;
+						ret = m_epic.svr;
 					}
 					break;
 				}
@@ -1036,11 +1057,11 @@ WRITE32_MEMBER(viper_state::epic_w)
 		const char *regname = epic_get_register_name(reg);
 		if (regname)
 		{
-			printf("EPIC: write %08X, %08X (%s) at %08X\n", data, reg, regname, space.device().safe_pc());
+			printf("EPIC: write %08X, %08X (%s) at %08X\n", data, reg, regname, m_maincpu->pc());
 		}
 		else
 		{
-			printf("EPIC: write %08X, %08X at %08X\n", data, reg, space.device().safe_pc());
+			printf("EPIC: write %08X, %08X at %08X\n", data, reg, m_maincpu->pc());
 		}
 	}
 #endif
@@ -1053,38 +1074,38 @@ WRITE32_MEMBER(viper_state::epic_w)
 			{
 				case 0x3000:            // Offset 0x3000 - I2CADR
 				{
-					epic.i2c_adr = data;
+					m_epic.i2c_adr = data;
 					break;
 				}
 				case 0x3004:            // Offset 0x3004 - I2CFDR
 				{
-					epic.i2c_freq_div = data & 0x3f;
-					epic.i2c_freq_sample_rate = (data >> 8) & 0x3f;
+					m_epic.i2c_freq_div = data & 0x3f;
+					m_epic.i2c_freq_sample_rate = (data >> 8) & 0x3f;
 					break;
 				}
 				case 0x3008:            // Offset 0x3008 - I2CCR
 				{
-					if ((epic.i2c_cr & 0x80) == 0 && (data & 0x80) != 0)
+					if ((m_epic.i2c_cr & 0x80) == 0 && (data & 0x80) != 0)
 					{
-						epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
+						m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
 					}
-					if ((epic.i2c_cr & 0x10) != (data & 0x10))
+					if ((m_epic.i2c_cr & 0x10) != (data & 0x10))
 					{
-						epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
+						m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
 					}
-					epic.i2c_cr = data;
+					m_epic.i2c_cr = data;
 					break;
 				}
 				case 0x300c:            // Offset 0x300c - I2CSR
 				{
-					epic.i2c_sr = data;
+					m_epic.i2c_sr = data;
 					break;
 				}
 				case 0x3010:            // Offset 0x3010 - I2CDR
 				{
-					if (epic.i2c_cr & 0x80)     // only do anything if the I2C module is enabled
+					if (m_epic.i2c_cr & 0x80)     // only do anything if the I2C module is enabled
 					{
-						if (epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)          // waiting for address cycle
+						if (m_epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)          // waiting for address cycle
 						{
 							//int rw = data & 1;
 
@@ -1092,13 +1113,13 @@ WRITE32_MEMBER(viper_state::epic_w)
 							int addr = (data >> 1) & 0x7f;
 							printf("I2C address cycle, addr = %02X\n", addr);
 #endif
-							epic.i2c_state = I2C_STATE_DATA_TRANSFER;
+							m_epic.i2c_state = I2C_STATE_DATA_TRANSFER;
 
 							// set transfer complete in status register
-							epic.i2c_sr |= 0x80;
+							m_epic.i2c_sr |= 0x80;
 
 							// generate interrupt if interrupt are enabled
-							if (epic.i2c_cr & 0x40)
+							if (m_epic.i2c_cr & 0x40)
 							{
 #if VIPER_DEBUG_EPIC_I2C
 								printf("I2C interrupt\n");
@@ -1106,21 +1127,21 @@ WRITE32_MEMBER(viper_state::epic_w)
 								mpc8240_interrupt(MPC8240_I2C_IRQ);
 
 								// set interrupt flag in status register
-								epic.i2c_sr |= 0x2;
+								m_epic.i2c_sr |= 0x2;
 							}
 						}
-						else if (epic.i2c_state == I2C_STATE_DATA_TRANSFER)     // waiting for data transfer
+						else if (m_epic.i2c_state == I2C_STATE_DATA_TRANSFER)     // waiting for data transfer
 						{
 #if VIPER_DEBUG_EPIC_I2C
 							printf("I2C data transfer, data = %02X\n", data);
 #endif
-							epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
+							m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
 
 							// set transfer complete in status register
-							epic.i2c_sr |= 0x80;
+							m_epic.i2c_sr |= 0x80;
 
 							// generate interrupt if interrupts are enabled
-							if (epic.i2c_cr & 0x40)
+							if (m_epic.i2c_cr & 0x40)
 							{
 #if VIPER_DEBUG_EPIC_I2C
 								printf("I2C interrupt\n");
@@ -1128,7 +1149,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 								mpc8240_interrupt(MPC8240_I2C_IRQ);
 
 								// set interrupt flag in status register
-								epic.i2c_sr |= 0x2;
+								m_epic.i2c_sr |= 0x2;
 							}
 						}
 					}
@@ -1145,14 +1166,14 @@ WRITE32_MEMBER(viper_state::epic_w)
 			{
 				case 0x1030:            // Offset 0x41030 - EICR
 				{
-					epic.eicr = data;
+					m_epic.eicr = data;
 					if (data & 0x08000000)
 						fatalerror("EPIC: serial interrupts mode not implemented\n");
 					break;
 				}
 				case 0x10e0:            // Offset 0x410E0 - Spurious Vector Register
 				{
-					epic.svr = data;
+					m_epic.svr = data;
 					break;
 				}
 				case 0x1120:            // Offset 0x41120 - Global timer 0 vector/priority register
@@ -1162,9 +1183,9 @@ WRITE32_MEMBER(viper_state::epic_w)
 				{
 					int timer_num = ((reg & 0xffff) - 0x1120) >> 6;
 
-					epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask = (data & 0x80000000) ? 1 : 0;
-					epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority = (data >> 16) & 0xf;
-					epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector = data & 0xff;
+					m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].mask = (data & 0x80000000) ? 1 : 0;
+					m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority = (data >> 16) & 0xf;
+					m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector = data & 0xff;
 
 					epic_update_interrupts();
 					break;
@@ -1176,7 +1197,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 				{
 					int timer_num = ((reg & 0xffff) - 0x1130) >> 6;
 
-					epic.irq[MPC8240_GTIMER0_IRQ + timer_num].destination = data & 0x1;
+					m_epic.irq[MPC8240_GTIMER0_IRQ + timer_num].destination = data & 0x1;
 
 					epic_update_interrupts();
 					break;
@@ -1188,13 +1209,13 @@ WRITE32_MEMBER(viper_state::epic_w)
 				{
 					int timer_num = ((reg & 0xffff) - 0x1110) >> 6;
 
-					epic.global_timer[timer_num].enable = (data & 0x80000000) ? 0 : 1;
-					epic.global_timer[timer_num].base_count = data & 0x7fffffff;
+					m_epic.global_timer[timer_num].enable = (data & 0x80000000) ? 0 : 1;
+					m_epic.global_timer[timer_num].base_count = data & 0x7fffffff;
 
-					if (epic.global_timer[timer_num].enable && epic.global_timer[timer_num].base_count > 0)
+					if (m_epic.global_timer[timer_num].enable && m_epic.global_timer[timer_num].base_count > 0)
 					{
-						attotime timer_duration =  attotime::from_hz((SDRAM_CLOCK / 8) / epic.global_timer[timer_num].base_count);
-						epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
+						attotime timer_duration =  attotime::from_hz((SDRAM_CLOCK / 8) / m_epic.global_timer[timer_num].base_count);
+						m_epic.global_timer[timer_num].timer->adjust(timer_duration, timer_num);
 
 #if VIPER_DEBUG_EPIC_TIMERS
 						printf("EPIC GTIMER%d: next in %s\n", timer_num, attotime_string(timer_duration, 8));
@@ -1202,7 +1223,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 					}
 					else
 					{
-						epic.global_timer[timer_num].timer->reset();
+						m_epic.global_timer[timer_num].timer->reset();
 					}
 					break;
 				}
@@ -1234,18 +1255,18 @@ WRITE32_MEMBER(viper_state::epic_w)
 				{
 					int irq = ((reg & 0xffff) - 0x200) >> 5;
 
-					epic.irq[MPC8240_IRQ0 + irq].mask = (data & 0x80000000) ? 1 : 0;
-					epic.irq[MPC8240_IRQ0 + irq].priority = (data >> 16) & 0xf;
-					epic.irq[MPC8240_IRQ0 + irq].vector = data & 0xff;
+					m_epic.irq[MPC8240_IRQ0 + irq].mask = (data & 0x80000000) ? 1 : 0;
+					m_epic.irq[MPC8240_IRQ0 + irq].priority = (data >> 16) & 0xf;
+					m_epic.irq[MPC8240_IRQ0 + irq].vector = data & 0xff;
 
 					epic_update_interrupts();
 					break;
 				}
 				case 0x1020:            // Offset 0x51020 - I2C IRQ vector/priority register
 				{
-					epic.irq[MPC8240_I2C_IRQ].mask = (data & 0x80000000) ? 1 : 0;
-					epic.irq[MPC8240_I2C_IRQ].priority = (data >> 16) & 0xf;
-					epic.irq[MPC8240_I2C_IRQ].vector = data & 0xff;
+					m_epic.irq[MPC8240_I2C_IRQ].mask = (data & 0x80000000) ? 1 : 0;
+					m_epic.irq[MPC8240_I2C_IRQ].priority = (data >> 16) & 0xf;
+					m_epic.irq[MPC8240_I2C_IRQ].vector = data & 0xff;
 
 					epic_update_interrupts();
 					break;
@@ -1269,14 +1290,14 @@ WRITE32_MEMBER(viper_state::epic_w)
 				{
 					int irq = ((reg & 0xffff) - 0x210) >> 5;
 
-					epic.irq[MPC8240_IRQ0 + irq].destination = data & 0x1;
+					m_epic.irq[MPC8240_IRQ0 + irq].destination = data & 0x1;
 
 					epic_update_interrupts();
 					break;
 				}
 				case 0x1030:            // Offset 0x51030 - I2C IRQ destination register
 				{
-					epic.irq[MPC8240_I2C_IRQ].destination = data & 0x1;
+					m_epic.irq[MPC8240_I2C_IRQ].destination = data & 0x1;
 					epic_update_interrupts();
 					break;
 				}
@@ -1291,11 +1312,11 @@ WRITE32_MEMBER(viper_state::epic_w)
 			{
 				case 0x00b0:            // Offset 0x600B0 - EOI
 #if VIPER_DEBUG_EPIC_INTS
-					if (epic.active_irq > 4 && epic.active_irq < 20)
-						printf("EPIC IRQ%d cleared.\n", epic.active_irq);
+					if (m_epic.active_irq > 4 && m_epic.active_irq < 20)
+						printf("EPIC IRQ%d cleared.\n", m_epic.active_irq);
 #endif
-					epic.irq[epic.active_irq].active = 0;
-					epic.active_irq = -1;
+					m_epic.irq[m_epic.active_irq].active = 0;
+					m_epic.active_irq = -1;
 
 					epic_update_interrupts();
 					break;
@@ -1317,16 +1338,17 @@ WRITE64_MEMBER(viper_state::epic_64be_w)
 
 void viper_state::mpc8240_interrupt(int irq)
 {
-	epic.irq[irq].pending = 1;
+	m_epic.irq[irq].pending = 1;
 	epic_update_interrupts();
 }
 
 void viper_state::mpc8240_epic_init()
 {
-	epic.global_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
-	epic.global_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
-	epic.global_timer[2].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
-	epic.global_timer[3].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
+	memset(&m_epic, 0, sizeof(m_epic));
+	m_epic.global_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
+	m_epic.global_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
+	m_epic.global_timer[2].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
+	m_epic.global_timer[3].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
 }
 
 void viper_state::mpc8240_epic_reset(void)
@@ -1335,13 +1357,13 @@ void viper_state::mpc8240_epic_reset(void)
 
 	for (i=0; i < MPC8240_NUM_INTERRUPTS; i++)
 	{
-		epic.irq[i].mask = 1;
+		m_epic.irq[i].mask = 1;
 	}
 
-	epic.active_irq = -1;
+	m_epic.active_irq = -1;
 
 	// Init I2C
-	epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
+	m_epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
 }
 
 /*****************************************************************************/
@@ -1701,7 +1723,7 @@ READ64_MEMBER(viper_state::voodoo3_io_r)
 }
 WRITE64_MEMBER(viper_state::voodoo3_io_w)
 {
-//  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, space.device().safe_pc());
+//  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
 	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_io_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
@@ -1712,7 +1734,7 @@ READ64_MEMBER(viper_state::voodoo3_r)
 }
 WRITE64_MEMBER(viper_state::voodoo3_w)
 {
-//  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, space.device().safe_pc());
+//  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
 	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
@@ -1723,27 +1745,10 @@ READ64_MEMBER(viper_state::voodoo3_lfb_r)
 }
 WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 {
-//  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, space.device().safe_pc());
+//  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, m_maincpu->pc());
 
 	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_fb_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
-
-
-
-#define DS2430_STATE_ROM_COMMAND            1
-#define DS2430_STATE_MEM_COMMAND            2
-#define DS2430_STATE_READ_ROM               3
-#define DS2430_STATE_MEM_FUNCTION           4
-#define DS2430_STATE_READ_MEM               5
-#define DS2430_STATE_READ_MEM_ADDRESS       6
-
-static uint8_t ds2430_data;
-static int ds2430_data_count = 0;
-static int ds2430_reset = 0;
-static int ds2430_state;
-static uint8_t ds2430_cmd;
-static uint8_t *ds2430_rom;
-static uint8_t ds2430_addr;
 
 
 TIMER_CALLBACK_MEMBER(viper_state::ds2430_timer_callback)
@@ -1753,13 +1758,13 @@ TIMER_CALLBACK_MEMBER(viper_state::ds2430_timer_callback)
 	if (param == 1)
 	{
 		m_ds2430_unk_status = 0;
-		ds2430_timer->adjust(attotime::from_usec(150), 2);
+		m_ds2430_timer->adjust(attotime::from_usec(150), 2);
 	}
 	else if (param == 2)
 	{
 		m_ds2430_unk_status = 1;
-		ds2430_reset = 1;
-		ds2430_state = DS2430_STATE_ROM_COMMAND;
+		m_ds2430_reset = 1;
+		m_ds2430_state = DS2430_STATE_ROM_COMMAND;
 	}
 }
 
@@ -1818,15 +1823,15 @@ READ8_MEMBER(viper_state::input_r)
 
 int viper_state::ds2430_insert_cmd_bit(int bit)
 {
-	ds2430_data <<= 1;
-	ds2430_data |= bit & 1;
-	ds2430_data_count++;
+	m_ds2430_data <<= 1;
+	m_ds2430_data |= bit & 1;
+	m_ds2430_data_count++;
 
-	if (ds2430_data_count >= 8)
+	if (m_ds2430_data_count >= 8)
 	{
-		ds2430_cmd = ds2430_data;
-		ds2430_data = 0;
-		ds2430_data_count = 0;
+		m_ds2430_cmd = m_ds2430_data;
+		m_ds2430_data = 0;
+		m_ds2430_data_count = 0;
 		return 1;
 	}
 	return 0;
@@ -1834,18 +1839,18 @@ int viper_state::ds2430_insert_cmd_bit(int bit)
 
 void viper_state::DS2430_w(int bit)
 {
-	switch (ds2430_state)
+	switch (m_ds2430_state)
 	{
 		case DS2430_STATE_ROM_COMMAND:
 		{
 			if (ds2430_insert_cmd_bit(bit))
 			{
-				printf("DS2430_w: rom command %02X\n", ds2430_cmd);
-				switch (ds2430_cmd)
+				printf("DS2430_w: rom command %02X\n", m_ds2430_cmd);
+				switch (m_ds2430_cmd)
 				{
-					case 0x33:      ds2430_state = DS2430_STATE_READ_ROM; break;
-					case 0xcc:      ds2430_state = DS2430_STATE_MEM_FUNCTION; break;
-					default:        fatalerror("DS2430_w: unimplemented rom command %02X\n", ds2430_cmd);
+					case 0x33:      m_ds2430_state = DS2430_STATE_READ_ROM; break;
+					case 0xcc:      m_ds2430_state = DS2430_STATE_MEM_FUNCTION; break;
+					default:        fatalerror("DS2430_w: unimplemented rom command %02X\n", m_ds2430_cmd);
 				}
 			}
 			break;
@@ -1855,11 +1860,11 @@ void viper_state::DS2430_w(int bit)
 		{
 			if (ds2430_insert_cmd_bit(bit))
 			{
-				printf("DS2430_w: mem function %02X\n", ds2430_cmd);
-				switch (ds2430_cmd)
+				printf("DS2430_w: mem function %02X\n", m_ds2430_cmd);
+				switch (m_ds2430_cmd)
 				{
-					case 0xf0:      ds2430_state = DS2430_STATE_READ_MEM_ADDRESS; break;
-					default:        fatalerror("DS2430_w: unimplemented mem function %02X\n", ds2430_cmd);
+					case 0xf0:      m_ds2430_state = DS2430_STATE_READ_MEM_ADDRESS; break;
+					default:        fatalerror("DS2430_w: unimplemented mem function %02X\n", m_ds2430_cmd);
 				}
 			}
 			break;
@@ -1869,50 +1874,50 @@ void viper_state::DS2430_w(int bit)
 		{
 			if (ds2430_insert_cmd_bit(bit))
 			{
-				printf("DS2430_w: read mem address %02X\n", ds2430_cmd);
-				ds2430_addr = ds2430_cmd;
-				ds2430_state = DS2430_STATE_READ_MEM;
+				printf("DS2430_w: read mem address %02X\n", m_ds2430_cmd);
+				m_ds2430_addr = m_ds2430_cmd;
+				m_ds2430_state = DS2430_STATE_READ_MEM;
 			}
 			break;
 		}
 
 		case DS2430_STATE_READ_MEM:
 		{
-			m_ds2430_unk_status = (ds2430_rom[(ds2430_data_count/8)] >> (ds2430_data_count%8)) & 1;
-			ds2430_data_count++;
-			printf("DS2430_w: read mem %d, bit = %d\n", ds2430_data_count, m_ds2430_unk_status);
+			m_ds2430_unk_status = (m_ds2430_rom[(m_ds2430_data_count/8)] >> (m_ds2430_data_count%8)) & 1;
+			m_ds2430_data_count++;
+			printf("DS2430_w: read mem %d, bit = %d\n", m_ds2430_data_count, m_ds2430_unk_status);
 
-			if (ds2430_data_count >= 256)
+			if (m_ds2430_data_count >= 256)
 			{
 				//machine().debug_break();
 
-				ds2430_data_count = 0;
-				ds2430_state = DS2430_STATE_ROM_COMMAND;
-				ds2430_reset = 0;
+				m_ds2430_data_count = 0;
+				m_ds2430_state = DS2430_STATE_ROM_COMMAND;
+				m_ds2430_reset = 0;
 			}
 			break;
 		}
 
 		case DS2430_STATE_READ_ROM:
 		{
-			int rombit = (ds2430_rom[0x20 + (ds2430_data_count/8)] >> (ds2430_data_count%8)) & 1;
-			ds2430_data_count++;
-			printf("DS2430_w: read rom %d, bit = %d\n", ds2430_data_count, rombit);
+			int rombit = (m_ds2430_rom[0x20 + (m_ds2430_data_count/8)] >> (m_ds2430_data_count%8)) & 1;
+			m_ds2430_data_count++;
+			printf("DS2430_w: read rom %d, bit = %d\n", m_ds2430_data_count, rombit);
 
 			m_ds2430_unk_status = rombit;
 
-			if (ds2430_data_count >= 64)
+			if (m_ds2430_data_count >= 64)
 			{
-				ds2430_data_count = 0;
-				ds2430_state = DS2430_STATE_ROM_COMMAND;
-				ds2430_reset = 0;
+				m_ds2430_data_count = 0;
+				m_ds2430_state = DS2430_STATE_ROM_COMMAND;
+				m_ds2430_reset = 0;
 			}
 			break;
 		}
 
 		default:
 		{
-			fatalerror("DS2430_w: unknown state %d\n", ds2430_cmd);
+			fatalerror("DS2430_w: unknown state %d\n", m_ds2430_cmd);
 		}
 	}
 
@@ -1923,8 +1928,8 @@ READ64_MEMBER(viper_state::e70000_r)
 {
 	if (ACCESSING_BITS_56_63)
 	{
-		ds2430_bit_timer->reset();
-		ds2430_bit_timer->start_time();
+		m_ds2430_bit_timer->reset();
+		m_ds2430_bit_timer->start_time();
 
 //      printf("e70000_r: %08X (mask %08X%08X) at %08X\n", offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, cpu->safe_pc());
 	}
@@ -1936,12 +1941,12 @@ WRITE64_MEMBER(viper_state::e70000_w)
 {
 	if (ACCESSING_BITS_56_63)
 	{
-		if (!ds2430_reset)
+		if (!m_ds2430_reset)
 		{
-			ds2430_timer->adjust(attotime::from_usec(40), 1);   // presence pulse for 240 microsecs
+			m_ds2430_timer->adjust(attotime::from_usec(40), 1);   // presence pulse for 240 microsecs
 
 			m_ds2430_unk_status = 1;
-//          printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, space.device().safe_pc());
+//          printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, m_maincpu->pc());
 		}
 		else
 		{
@@ -1949,8 +1954,8 @@ WRITE64_MEMBER(viper_state::e70000_w)
 			// Bit 0 = ~3.6 microsecs
 			// Bit 1 = ~98 microsecs
 
-			attotime diff_time = ds2430_bit_timer->time_elapsed();
-			ds2430_bit_timer->reset();
+			attotime diff_time = m_ds2430_bit_timer->time_elapsed();
+			m_ds2430_bit_timer->reset();
 			if (diff_time < attotime::from_usec(20))
 				DS2430_w(0);
 			else
@@ -1979,14 +1984,12 @@ WRITE64_MEMBER(viper_state::unk1b_w)
 	}
 }
 
-static uint64_t e00008_data;
-
 READ64_MEMBER(viper_state::e00008_r)
 {
 	uint64_t r = 0;
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= e00008_data;
+		r |= m_e00008_data;
 	}
 
 	return r;
@@ -1996,7 +1999,7 @@ WRITE64_MEMBER(viper_state::e00008_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		e00008_data = data & 0xff;
+		m_e00008_data = data & 0xff;
 	}
 }
 
@@ -2302,8 +2305,7 @@ WRITE_LINE_MEMBER(viper_state::voodoo_pciint)
 
 void viper_state::machine_start()
 {
-	ds2430_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::ds2430_timer_callback),this));
-	ds2430_bit_timer = machine().device<timer_device>("ds2430_timer2");
+	m_ds2430_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::ds2430_timer_callback),this));
 	mpc8240_epic_init();
 
 	/* set conservative DRC options */
@@ -2312,7 +2314,47 @@ void viper_state::machine_start()
 	/* configure fast RAM regions for DRC */
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x00ffffff, false, m_workram);
 
-	ds2430_rom = (uint8_t*)memregion("ds2430")->base();
+	save_item(NAME(m_voodoo3_pci_reg));
+	save_item(NAME(m_mpc8240_regs));
+	save_item(NAME(m_cf_card_ide));
+	save_item(NAME(m_unk_serial_bit_w));
+	save_item(NAME(m_unk_serial_cmd));
+	save_item(NAME(m_unk_serial_data));
+	save_item(NAME(m_unk_serial_data_r));
+	save_item(NAME(m_unk_serial_regs));
+
+	save_item(NAME(m_ds2430_unk_status));
+	save_item(NAME(m_ds2430_data));
+	save_item(NAME(m_ds2430_data_count));
+	save_item(NAME(m_ds2430_reset));
+	save_item(NAME(m_ds2430_state));
+	save_item(NAME(m_ds2430_cmd));
+	save_item(NAME(m_ds2430_addr)); // written but never used
+
+	save_item(NAME(m_epic.iack));
+	save_item(NAME(m_epic.eicr)); // written but never used
+	save_item(NAME(m_epic.svr));
+	save_item(NAME(m_epic.active_irq));
+	save_item(NAME(m_epic.i2c_adr));
+	save_item(NAME(m_epic.i2c_freq_div));
+	save_item(NAME(m_epic.i2c_freq_sample_rate));
+	save_item(NAME(m_epic.i2c_cr));
+	save_item(NAME(m_epic.i2c_sr));
+	save_item(NAME(m_epic.i2c_state));
+	for (int i = 0; i < MPC8240_NUM_INTERRUPTS; i ++)
+	{
+		save_item(NAME(m_epic.irq[i].vector), i);
+		save_item(NAME(m_epic.irq[i].priority), i);
+		save_item(NAME(m_epic.irq[i].destination), i); // written but never read
+		save_item(NAME(m_epic.irq[i].active), i);
+		save_item(NAME(m_epic.irq[i].pending), i);
+		save_item(NAME(m_epic.irq[i].mask), i);
+	}
+	for (int i = 0; i < 4; i ++)
+	{
+		save_item(NAME(m_epic.global_timer[i].base_count), i);
+		save_item(NAME(m_epic.global_timer[i].enable), i);
+	}
 }
 
 void viper_state::machine_reset()
@@ -2329,7 +2371,7 @@ void viper_state::machine_reset()
 	m_ds2430_unk_status = 1;
 }
 
-static MACHINE_CONFIG_START( viper )
+MACHINE_CONFIG_START(viper_state::viper)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MPC8240, 200000000)
@@ -2477,7 +2519,7 @@ ROM_START(gticlub2) //*
 	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	// both with non-default settings (check sound options for istance)
+	// both with non-default settings (check sound options for instance)
 	ROM_LOAD("nvram.u39", 0x00000, 0x2000, BAD_DUMP CRC(d0604e84) SHA1(18d1183f1331af3e655a56692eb7ab877b4bc239))
 	ROM_LOAD("941jab_nvram.u39", 0x00000, 0x2000, BAD_DUMP CRC(6c4a852f) SHA1(2753dda42cdd81af22dc6780678f1ddeb3c62013))
 

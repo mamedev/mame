@@ -261,7 +261,7 @@ public:
 	DECLARE_READ64_MEMBER(cde_r);
 	DECLARE_WRITE64_MEMBER(cde_w);
 	DECLARE_READ64_MEMBER(device2_r);
-	DECLARE_READ64_MEMBER(cpu_r);
+	template<bool maincpu> DECLARE_READ64_MEMBER(cpu_r);
 	DECLARE_READ8_MEMBER(id3_r);
 	DECLARE_READ8_MEMBER(id4_r);
 	DECLARE_READ8_MEMBER(id5_r);
@@ -279,6 +279,8 @@ public:
 	void cde_dma_transfer(address_space &space, int channel, int next);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	void m2(machine_config &config);
+	void _3do_m2(machine_config &config);
 };
 
 
@@ -387,7 +389,7 @@ READ64_MEMBER(konamim2_state::unk3_r)
 READ64_MEMBER(konamim2_state::unk4_r)
 {
 	uint64_t r = 0;
-//  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), space.device().safe_pc());
+//  logerror("unk4_r: %08X, %08X%08X %s\n", offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), machine().describe_context());
 
 	if (ACCESSING_BITS_32_63)
 	{
@@ -403,14 +405,13 @@ READ64_MEMBER(konamim2_state::unk4_r)
 
 WRITE64_MEMBER(konamim2_state::unk4_w)
 {
-//  logerror("unk4_w: %08X%08X, %08X, %08X%08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data),
-//      offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), space.device().safe_pc());
+//  logerror("unk4_w: %08X%08X, %08X, %08X%08X %s\n", (uint32_t)(data >> 32), (uint32_t)(data),
+//      offset, (uint32_t)(mem_mask>>32), (uint32_t)(mem_mask), machine().describe_context());
 
 	if (ACCESSING_BITS_0_31)
 	{
 		if (data & 0x800000)
 		{
-//          osd_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", device().tag(), space.device().safe_pc());
 			m_subcpu->set_input_line(PPC_IRQ, ASSERT_LINE);
 		}
 
@@ -929,7 +930,6 @@ READ64_MEMBER(konamim2_state::cde_r)
 
 		default:
 		{
-//                      osd_printf_debug("cde_r: %08X at %08X\n", reg*4, space.device().safe_pc());
 			break;
 		}
 	}
@@ -963,8 +963,6 @@ WRITE64_MEMBER(konamim2_state::cde_w)
 	{
 		case 0x028/4:       // Command write
 		{
-			//printf("cde_w: %08X, %08X at %08X\n", d, reg*4, space.device().safe_pc());
-
 			if (d == 0x0180)
 			{
 				if (m_cde_response)
@@ -1091,7 +1089,6 @@ WRITE64_MEMBER(konamim2_state::cde_w)
 
 		default:
 		{
-//                      osd_printf_debug("cde_w: %08X, %08X at %08X\n", d, reg*4, space.device().safe_pc());
 			break;
 		}
 	}
@@ -1128,13 +1125,13 @@ READ64_MEMBER(konamim2_state::device2_r)
 	}
 }
 
-READ64_MEMBER(konamim2_state::cpu_r)
+template<bool maincpu> READ64_MEMBER(konamim2_state::cpu_r)
 {
 	uint64_t r = 0;
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r = (uint64_t)((&space.device() != m_maincpu) ? 0x80000000 : 0);
+		r = (uint64_t)(maincpu ? 0 : 0x80000000);
 		r |= m_in_monitor->read() << 30;
 		return r << 32;
 	}
@@ -1199,12 +1196,21 @@ static ADDRESS_MAP_START( m2_main, AS_PROGRAM, 64, konamim2_state )
 
 	AM_RANGE(0x07000000, 0x07000007) AM_READ8(id7_r, 0x00ff000000000000U)
 
-	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r)
 	AM_RANGE(0x10000008, 0x10001007) AM_NOP     // ???
 
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x40000000, 0x407fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("boot", 0) AM_SHARE("share2")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( m2_main_m, AS_PROGRAM, 64, konamim2_state )
+	AM_IMPORT_FROM( m2_main )
+	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r<true>)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( m2_main_s, AS_PROGRAM, 64, konamim2_state )
+	AM_IMPORT_FROM( m2_main )
+	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r<false>)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 3do_m2_main, AS_PROGRAM, 64, konamim2_state )
@@ -1213,6 +1219,17 @@ static ADDRESS_MAP_START( 3do_m2_main, AS_PROGRAM, 64, konamim2_state )
 
 //  AM_RANGE(0x00000000, 0x000cffff) devices?
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( 3do_m2_main_m, AS_PROGRAM, 64, konamim2_state )
+	AM_IMPORT_FROM( 3do_m2_main )
+	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r<true>)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( 3do_m2_main_s, AS_PROGRAM, 64, konamim2_state )
+	AM_IMPORT_FROM( 3do_m2_main )
+	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r<false>)
+ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( m2 )
 	// TODO: it's unknown if these are actual dip-switches or internal to something
@@ -1269,17 +1286,17 @@ void konamim2_state::machine_reset()
 	cde_init();
 }
 
-static MACHINE_CONFIG_START( m2 )
+MACHINE_CONFIG_START(konamim2_state::m2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC602, 66000000)   /* actually PPC602, 66MHz */
 	MCFG_PPC_BUS_FREQUENCY(33000000)  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
-	MCFG_CPU_PROGRAM_MAP(m2_main)
+	MCFG_CPU_PROGRAM_MAP(m2_main_m)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", konamim2_state,  m2)
 
 	MCFG_CPU_ADD("sub", PPC602, 66000000)   /* actually PPC602, 66MHz */
 	MCFG_PPC_BUS_FREQUENCY(33000000)  /* Multiplier 2, Bus = 33MHz, Core = 66MHz */
-	MCFG_CPU_PROGRAM_MAP(m2_main)
+	MCFG_CPU_PROGRAM_MAP(m2_main_s)
 
 	// TODO: declaring as second screen causes palette confusion (wants to use palette from the other screen?)
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
@@ -1302,16 +1319,14 @@ static MACHINE_CONFIG_START( m2 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED ( 3do_m2, m2 )
-
+MACHINE_CONFIG_DERIVED(konamim2_state::_3do_m2, m2)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(3do_m2_main)
+	MCFG_CPU_PROGRAM_MAP(3do_m2_main_m)
 
 	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_PROGRAM_MAP(3do_m2_main)
+	MCFG_CPU_PROGRAM_MAP(3do_m2_main_s)
 
 	MCFG_SOFTWARE_LIST_ADD("cd_list","3do_m2")
-
 MACHINE_CONFIG_END
 
 
@@ -1458,4 +1473,4 @@ GAME( 1998, evilngt,  0,        m2, m2, konamim2_state, m2, ROT0, "Konami", "Evi
 GAME( 1998, evilngte, evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Evil Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1998, hellngt,  evilngt,  m2, m2, konamim2_state, m2, ROT0, "Konami", "Hell Night (ver EAA)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-CONS( 199?, 3do_m2,     0,      0,    3do_m2,    m2,    konamim2_state, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 199?, 3do_m2,     0,      0,    _3do_m2,    m2,    konamim2_state, 0,      "3DO",  "3DO M2",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

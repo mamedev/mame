@@ -98,6 +98,7 @@ public:
 	emu_timer *m_vsync_off_timer;
 	emu_timer *m_500hz_timer;
 
+	void kcgd(machine_config &config);
 private:
 	void draw_scanline(uint16_t *p, uint16_t offset);
 	rectangle m_tmpclip;
@@ -343,17 +344,17 @@ static GFXDECODE_START( kcgd )
 	GFXDECODE_ENTRY("maincpu", 0112236, kcgd_charlayout, 0, 1)
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( kcgd )
-	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL_30_8MHz/4)
+MACHINE_CONFIG_START(kcgd_state::kcgd)
+	MCFG_CPU_ADD("maincpu", K1801VM2, XTAL(30'800'000)/4)
 	MCFG_CPU_PROGRAM_MAP(kcgd_mem)
 	MCFG_T11_INITIAL_MODE(0100000)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("scantimer", kcgd_state, scanline_callback, attotime::from_hz(50*28*11)) // XXX verify
-	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_30_8MHz/KCGD_HORZ_START))
+	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL(30'800'000)/KCGD_HORZ_START))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(kcgd_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_30_8MHz, KCGD_TOTAL_HORZ, KCGD_HORZ_START,
+	MCFG_SCREEN_RAW_PARAMS(XTAL(30'800'000), KCGD_TOTAL_HORZ, KCGD_HORZ_START,
 		KCGD_HORZ_START+KCGD_DISP_HORZ, KCGD_TOTAL_VERT, KCGD_VERT_START,
 		KCGD_VERT_START+KCGD_DISP_VERT);
 

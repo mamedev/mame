@@ -104,6 +104,7 @@ public:
 	INTERRUPT_GEN_MEMBER(iq151_vblank_interrupt);
 	DECLARE_INPUT_CHANGED_MEMBER(iq151_break);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_timer);
+	void iq151(machine_config &config);
 };
 
 READ8_MEMBER(iq151_state::keyboard_row_r)
@@ -381,9 +382,9 @@ static SLOT_INTERFACE_START(iq151_cart)
 	SLOT_INTERFACE("amos3"  , IQ151_AMOS3)              // AMOS cart 3
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( iq151 )
+MACHINE_CONFIG_START(iq151_state::iq151)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(iq151_mem)
 	MCFG_CPU_IO_MAP(iq151_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", iq151_state,  iq151_vblank_interrupt)

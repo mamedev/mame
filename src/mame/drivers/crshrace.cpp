@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16, crshrace_state )
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM
 	AM_RANGE(0xffc000, 0xffc001) AM_WRITE(crshrace_roz_bank_w)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(crshrace_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1") AM_WRITE(crshrace_gfxctrl_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW0")
@@ -399,7 +399,7 @@ void crshrace_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-static MACHINE_CONFIG_START( crshrace )
+MACHINE_CONFIG_START(crshrace_state::crshrace)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000)    /* 16 MHz ??? */

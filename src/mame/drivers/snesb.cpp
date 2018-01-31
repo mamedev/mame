@@ -185,6 +185,9 @@ public:
 	DECLARE_DRIVER_INIT(mk3snes);
 	DECLARE_DRIVER_INIT(legendsb);
 	DECLARE_MACHINE_RESET(ffight2b);
+	void mk3snes(machine_config &config);
+	void ffight2b(machine_config &config);
+	void kinstb(machine_config &config);
 };
 
 
@@ -219,14 +222,14 @@ READ8_MEMBER(snesb_state::sb2b_6a6xxx_r)
 		case 0xfb7: return 0x47;
 	}
 
-	logerror("Unknown protection read read %x @ %x\n",offset, space.device().safe_pc());
+	logerror("Unknown protection read read %x @ %x\n",offset, m_maincpu->pc());
 
 	return 0;
 }
 
 READ8_MEMBER(snesb_state::sb2b_7xxx_r)
 {
-	return space.read_byte(0xc07000 + offset);
+	return m_maincpu->space(AS_PROGRAM).read_byte(0xc07000 + offset);
 }
 
 
@@ -243,7 +246,7 @@ READ8_MEMBER(snesb_state::endless_580xxx_r)
 		case 0xe83: return 0x6b;
 	}
 
-	logerror("Unknown protection read read %x @ %x\n",offset, space.device().safe_pc());
+	logerror("Unknown protection read read %x @ %x\n",offset, m_maincpu->pc());
 
 	return 0;
 }
@@ -686,14 +689,15 @@ static INPUT_PORTS_START( endless )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( kinstb )
+MACHINE_CONFIG_START(snesb_state::kinstb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
 	MCFG_CPU_PROGRAM_MAP(snesb_map)
 
 	/* audio CPU */
-	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2) /* 2.048 Mhz, but internal divider */
+	// runs at 24.576 MHz / 12 = 2.048 MHz
+	MCFG_CPU_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
 	MCFG_CPU_PROGRAM_MAP(spc_mem)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -718,9 +722,9 @@ static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, snesb_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_DERIVED( mk3snes, kinstb )
+MACHINE_CONFIG_DERIVED(snesb_state::mk3snes, kinstb)
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
 	MCFG_CPU_IO_MAP(mcu_io_map)
 MACHINE_CONFIG_END
 
@@ -734,7 +738,7 @@ MACHINE_RESET_MEMBER( snesb_state, ffight2b )
 	cpu0space.write_byte(0x7eadce, 0x00);
 }
 
-static MACHINE_CONFIG_DERIVED( ffight2b, kinstb )
+MACHINE_CONFIG_DERIVED(snesb_state::ffight2b, kinstb)
 	MCFG_MACHINE_RESET_OVERRIDE( snesb_state, ffight2b )
 MACHINE_CONFIG_END
 

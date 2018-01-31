@@ -105,6 +105,8 @@ public:
 	INTERRUPT_GEN_MEMBER(sound_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void itaten(machine_config &config);
+	void dacholer(machine_config &config);
 };
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
@@ -641,15 +643,15 @@ PALETTE_INIT_MEMBER(dacholer_state, dacholer)
 }
 
 /* note: clocks are taken from itaten sound reference recording */
-static MACHINE_CONFIG_START( dacholer )
+MACHINE_CONFIG_START(dacholer_state::dacholer)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)  /* ? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/4)  /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dacholer_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_19_968MHz/8) /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(19'968'000)/8) /* ? */
 	MCFG_CPU_PROGRAM_MAP(snd_map)
 	MCFG_CPU_IO_MAP(snd_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dacholer_state, sound_irq)
@@ -675,22 +677,22 @@ static MACHINE_CONFIG_START( dacholer )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_19_968MHz/16)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(19'968'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_19_968MHz/16)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(19'968'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL_19_968MHz/16)
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL(19'968'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dacholer_state, adpcm_int))          /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)  /* 1 / 96 = 3906.25Hz playback  - guess */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( itaten, dacholer )
+MACHINE_CONFIG_DERIVED(dacholer_state::itaten, dacholer)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(itaten_main_map)
 

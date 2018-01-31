@@ -27,6 +27,7 @@ public:
 	virtual void machine_reset() override;
 
 	required_device<cpu_device> m_maincpu;
+	void clowndwn(machine_config &config);
 };
 
 static ADDRESS_MAP_START(clowndwn_map, AS_PROGRAM, 8, clowndwn_state)
@@ -53,7 +54,7 @@ void clowndwn_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( clowndwn )
+MACHINE_CONFIG_START(clowndwn_state::clowndwn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, 8000000) // unknown type and clock

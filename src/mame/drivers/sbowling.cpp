@@ -87,6 +87,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void postload();
+	void sbowling(machine_config &config);
 };
 
 TILE_GET_INFO_MEMBER(sbowling_state::get_tile_info)
@@ -402,8 +403,8 @@ PALETTE_INIT_MEMBER(sbowling_state, sbowling)
 	}
 }
 
-static MACHINE_CONFIG_START( sbowling )
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_19_968MHz/10)   /* ? */
+MACHINE_CONFIG_START(sbowling_state::sbowling)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(19'968'000)/10)   /* ? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sbowling_state, interrupt, "screen", 0, 1)
@@ -426,7 +427,7 @@ static MACHINE_CONFIG_START( sbowling )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_19_968MHz/16)  /* ? */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(19'968'000)/16)  /* ? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 

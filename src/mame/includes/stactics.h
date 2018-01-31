@@ -87,6 +87,6 @@ public:
 	void set_indicator_leds(int data, const char *output_name, int base_index);
 	void update_artwork();
 	void move_motor();
+	void stactics(machine_config &config);
+	void stactics_video(machine_config &config);
 };
-/*----------- defined in video/stactics.c -----------*/
-MACHINE_CONFIG_EXTERN( stactics_video );

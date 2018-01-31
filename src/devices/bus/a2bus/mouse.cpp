@@ -127,7 +127,7 @@ ioport_constructor a2bus_mouse_device::device_input_ports() const
     machine configurations
 -------------------------------------------------*/
 
-MACHINE_CONFIG_MEMBER(a2bus_mouse_device::device_add_mconfig)
+MACHINE_CONFIG_START(a2bus_mouse_device::device_add_mconfig)
 	MCFG_CPU_ADD(MOUSE_MCU_TAG, M68705P3, 2043600)
 	MCFG_M68705_PORTA_R_CB(READ8(a2bus_mouse_device, mcu_port_a_r))
 	MCFG_M68705_PORTB_R_CB(READ8(a2bus_mouse_device, mcu_port_b_r))
@@ -180,9 +180,6 @@ a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, const char
 
 void a2bus_mouse_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	// register save state variables
 	save_item(NAME(m_port_a_in));
 	save_item(NAME(m_port_b_in));

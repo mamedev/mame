@@ -886,6 +886,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void system246(machine_config &config);
+	void system256(machine_config &config);
 protected:
 
 	// devices
@@ -913,7 +915,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( system246 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( system246 )
+MACHINE_CONFIG_START(namcops2_state::system246)
 	MCFG_CPU_ADD("maincpu", R5000LE, 294000000) // actually R5900 @ 294 MHz
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
@@ -929,7 +931,7 @@ static MACHINE_CONFIG_START( system246 )
 	MCFG_PALETTE_ADD("palette", 65536)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system256, system246 )
+MACHINE_CONFIG_DERIVED(namcops2_state::system256, system246)
 MACHINE_CONFIG_END
 
 #define SYSTEM246_BIOS  \

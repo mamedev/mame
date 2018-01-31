@@ -24,11 +24,11 @@
 
 /* Spectrum crystals */
 
-#define X1 XTAL_14MHz       // Main clock (48k Spectrum)
+#define X1 XTAL(14'000'000)       // Main clock (48k Spectrum)
 #define X1_128_AMSTRAD  35469000 // Main clock (Amstrad 128K model, +2A?)
 #define X1_128_SINCLAIR 17734475 // Main clock (Sinclair 128K model)
 
-#define X2 XTAL_4_433619MHz // PAL color subcarrier
+#define X2 XTAL(4'433'619) // PAL color subcarrier
 
 /* Spectrum screen size in pixels */
 #define SPEC_UNSEEN_LINES  16   /* Non-visible scanlines before first border
@@ -184,6 +184,13 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
+	void spectrum_common(machine_config &config);
+	void spectrum(machine_config &config);
+	void ts2068(machine_config &config);
+	void uk2086(machine_config &config);
+	void tc2048(machine_config &config);
+	void spectrum_plus3(machine_config &config);
+	void spectrum_128(machine_config &config);
 protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
@@ -257,7 +264,5 @@ protected:
 INPUT_PORTS_EXTERN( spectrum );
 INPUT_PORTS_EXTERN( spec128 );
 INPUT_PORTS_EXTERN( spec_plus );
-
-MACHINE_CONFIG_EXTERN( spectrum );
 
 #endif // MAME_INCLUDES_SPECTRUM_H

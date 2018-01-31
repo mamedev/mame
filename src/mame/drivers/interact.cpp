@@ -76,6 +76,8 @@ public:
 	DECLARE_MACHINE_START(interact);
 	DECLARE_MACHINE_RESET(interact);
 	uint32_t screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void hector1(machine_config &config);
+	void interact(machine_config &config);
 };
 
 
@@ -120,10 +122,10 @@ uint32_t interact_state::screen_update_interact(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static MACHINE_CONFIG_START( interact )
+MACHINE_CONFIG_START(interact_state::interact)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(interact_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
 
@@ -157,10 +159,10 @@ static MACHINE_CONFIG_START( interact )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hector1 )
+MACHINE_CONFIG_START(interact_state::hector1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_1_75MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(1'750'000))
 	MCFG_CPU_PROGRAM_MAP(interact_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
 

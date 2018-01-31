@@ -1834,7 +1834,7 @@ bool winwindow_qt_filter(void *message)
 		if(msg->hwnd) // get the machine associated with this window
 			ptr = GetWindowLongPtr(msg->hwnd, GWLP_USERDATA);
 		else // any one will have to do
-			ptr = (LONG_PTR)osd_common_t::s_window_list;
+			ptr = (LONG_PTR)osd_common_t::s_window_list.front().get();
 
 		winwindow_dispatch_message(((win_window_info *)ptr)->machine(), msg);
 		return true;

@@ -207,7 +207,8 @@ void splash_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 	int i;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 
-	for (i = 0; i < 0x400; i += 4){
+	for (i = 0x400-4; i >= 0; i -= 4)
+	{
 		int sx = m_spriteram[i+2] & 0xff;
 		int sy = (240 - (m_spriteram[i+1] & 0xff)) & 0xff;
 		int attr = m_spriteram[i+3] & 0xff;
@@ -227,7 +228,8 @@ void funystrp_state::funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle 
 	int i;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 
-	for (i = 0; i < 0x400; i += 4){
+	for (i = 0x400-4; i >= 0; i -= 4)
+	{
 		int sx = m_spriteram[i+2] & 0xff;
 		int sy = (240 - (m_spriteram[i+1] & 0xff)) & 0xff;
 		int attr = m_spriteram[i+3] & 0xff;

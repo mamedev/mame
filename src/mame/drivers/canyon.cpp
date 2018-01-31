@@ -247,10 +247,10 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( canyon )
+MACHINE_CONFIG_START(canyon_state::canyon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'096'000) / 16)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", canyon_state,  nmi_line_pulse)
 

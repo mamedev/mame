@@ -70,7 +70,7 @@ void cdp1879_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 	// comparator IRQ
 	bool new_state = true;
-	for (int i = R_CNT_SECONDS; i <= R_CNT_MONTH; i++)
+	for (int i = R_CNT_SECONDS; i <= R_CNT_HOURS; i++)
 	{
 		if(m_regs[i] != m_regs[i + 6])
 		{

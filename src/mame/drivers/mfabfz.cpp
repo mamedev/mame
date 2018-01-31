@@ -55,6 +55,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 		{ }
 
+		void mfabfz85(machine_config &config);
+		void mfabfz(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -93,9 +95,9 @@ void mfabfz_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( mfabfz )
+MACHINE_CONFIG_START(mfabfz_state::mfabfz)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4MHz / 2)
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(4'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mfabfz_mem)
 	MCFG_CPU_IO_MAP(mfabfz_io)
 
@@ -127,9 +129,9 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( mfabfz85 )
+MACHINE_CONFIG_START(mfabfz_state::mfabfz85)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_4MHz / 2)
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(4'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mfabfz_mem)
 	MCFG_CPU_IO_MAP(mfabfz85_io)
 	MCFG_I8085A_SID(DEVREADLINE("rs232", rs232_port_device, rxd_r))

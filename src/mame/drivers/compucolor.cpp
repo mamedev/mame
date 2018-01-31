@@ -13,6 +13,7 @@
     TODO:
 
     - interlaced video
+    - blinking
     - add-on ROM
     - add-on RAM
     - add-on unit
@@ -24,6 +25,7 @@
 #include "cpu/i8085/i8085.h"
 #include "bus/compucolor/floppy.h"
 #include "machine/ram.h"
+#include "machine/ripple_counter.h"
 #include "machine/tms5501.h"
 #include "video/tms9927.h"
 #include "screen.h"
@@ -76,6 +78,7 @@ public:
 	IRQ_CALLBACK_MEMBER( int_ack );
 
 	uint8_t m_xo;
+	void compucolor2(machine_config &config);
 };
 
 static ADDRESS_MAP_START( compucolor2_mem, AS_PROGRAM, 8, compucolor2_state )
@@ -387,30 +390,31 @@ void compucolor2_state::machine_reset()
 	m_rs232->write_dtr(1);
 }
 
-static MACHINE_CONFIG_START( compucolor2 )
+MACHINE_CONFIG_START(compucolor2_state::compucolor2)
 	// basic machine hardware
-	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL_17_9712MHz/9)
+	MCFG_CPU_ADD(I8080_TAG, I8080, XTAL(17'971'200)/9)
 	MCFG_CPU_PROGRAM_MAP(compucolor2_mem)
 	MCFG_CPU_IO_MAP(compucolor2_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(compucolor2_state,int_ack)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
+	MCFG_SCREEN_RAW_PARAMS(XTAL(17'971'200)/2, 93*6, 0, 64*6, 268, 0, 256)
 	MCFG_SCREEN_UPDATE_DRIVER(compucolor2_state, screen_update)
-	MCFG_SCREEN_SIZE(64*6, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*6-1, 0, 32*8-1)
 
 	MCFG_PALETTE_ADD_3BIT_RGB("palette")
 
-	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL_17_9712MHz/2)
+	MCFG_DEVICE_ADD(CRT5027_TAG, CRT5027, XTAL(17'971'200)/2)
 	MCFG_TMS9927_CHAR_WIDTH(6)
-	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w))
+	MCFG_TMS9927_VSYN_CALLBACK(DEVWRITELINE("blink", ripple_counter_device, clock_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
+	MCFG_DEVICE_ADD("blink", RIPPLE_COUNTER, 0) // 74LS393 at UG10
+	MCFG_RIPPLE_COUNTER_STAGES(8)
+	MCFG_RIPPLE_COUNTER_COUNT_OUT_CB(DEVWRITELINE(TMS5501_TAG, tms5501_device, sens_w)) MCFG_DEVCB_BIT(4)
+
 	// devices
-	MCFG_DEVICE_ADD(TMS5501_TAG, TMS5501, XTAL_17_9712MHz/9)
+	MCFG_DEVICE_ADD(TMS5501_TAG, TMS5501, XTAL(17'971'200)/9)
 	MCFG_TMS5501_IRQ_CALLBACK(INPUTLINE(I8080_TAG, I8085_INTR_LINE))
 	MCFG_TMS5501_XMT_CALLBACK(WRITELINE(compucolor2_state, xmt_w))
 	MCFG_TMS5501_XI_CALLBACK(READ8(compucolor2_state, xi_r))

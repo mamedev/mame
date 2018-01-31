@@ -197,7 +197,7 @@ INTERRUPT_GEN_MEMBER(ssozumo_state::sound_timer_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( ssozumo )
+MACHINE_CONFIG_START(ssozumo_state::ssozumo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1200000) /* 1.2 MHz ???? */
@@ -215,7 +215,7 @@ static MACHINE_CONFIG_START( ssozumo )
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8 - 1, 1*8, 31*8 - 1)
 	// DECO video CRTC, unverified
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,8,248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,8,248)
 	MCFG_SCREEN_UPDATE_DRIVER(ssozumo_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 

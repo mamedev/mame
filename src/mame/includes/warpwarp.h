@@ -97,4 +97,9 @@ public:
 	void draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,pen_t pen);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void warpwarp(machine_config &config);
+	void geebee(machine_config &config);
+	void navarone(machine_config &config);
+	void bombbee(machine_config &config);
+	void geebeeb(machine_config &config);
 };

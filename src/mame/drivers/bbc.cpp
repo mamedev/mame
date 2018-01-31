@@ -825,7 +825,7 @@ WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
 }
 
 // 4 x EPROM sockets (16K) in BBC-A, these should grow to 16 for BBC-B and later...
-static MACHINE_CONFIG_START( bbc_eprom_sockets )
+MACHINE_CONFIG_START(bbc_state::bbc_eprom_sockets)
 	MCFG_GENERIC_SOCKET_ADD("exp_rom1", generic_linear_slot, "bbc_cart")
 	MCFG_GENERIC_EXTENSIONS("bin,rom")
 	MCFG_GENERIC_LOAD(bbc_state, exp1_load)
@@ -851,9 +851,9 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-static MACHINE_CONFIG_START( bbca )
+MACHINE_CONFIG_START(bbc_state::bbca)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_16MHz/8)         /* 2.00 MHz */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(16'000'000)/8)         /* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(bbca_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbc_state, bbcb_vsync)      /* screen refresh interrupts */
 	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcb_keyscan, 1000)        /* scan keyboard */
@@ -873,7 +873,7 @@ static MACHINE_CONFIG_START( bbca )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	//MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz, 1024, 0, 640, 312, 0, 256)
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000), 1024, 0, 640, 312, 0, 256)
 	MCFG_SCREEN_SIZE(640, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -883,11 +883,11 @@ static MACHINE_CONFIG_START( bbca )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(bbc_state,bbc)
 
-	MCFG_DEVICE_ADD("saa5050", SAA5050, XTAL_12MHz/2)
+	MCFG_DEVICE_ADD("saa5050", SAA5050, XTAL(12'000'000)/2)
 	MCFG_SAA5050_SCREEN_SIZE(40, 25, 40)
 
 	/* crtc */
-	MCFG_MC6845_ADD("hd6845", HD6845, "screen", XTAL_16MHz / 8)
+	MCFG_MC6845_ADD("hd6845", HD6845, "screen", XTAL(16'000'000) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(12)
 	MCFG_MC6845_UPDATE_ROW_CB(bbc_state, crtc_update_row)
@@ -901,7 +901,7 @@ static MACHINE_CONFIG_START( bbca )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489", SN76489, XTAL_16MHz/4) /* 4 MHz */
+	MCFG_SOUND_ADD("sn76489", SN76489, XTAL(16'000'000)/4) /* 4 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* cassette */
@@ -924,11 +924,11 @@ static MACHINE_CONFIG_START( bbca )
 	MCFG_RS232_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL_16MHz / 13)
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(16'000'000) / 13)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bbc_state, write_acia_clock))
 
 	/* system via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL_16MHz / 16)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL(16'000'000) / 16)
 	MCFG_VIA6522_READPA_HANDLER(READ8(bbc_state, bbcb_via_system_read_porta))
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_system_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_porta))
@@ -940,7 +940,7 @@ static MACHINE_CONFIG_START( bbca )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bbcb, bbca )
+MACHINE_CONFIG_DERIVED(bbc_state::bbcb, bbca)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(bbcb_nofdc_mem)
@@ -960,7 +960,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* user via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_16MHz / 16)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL(16'000'000) / 16)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_READPB_HANDLER(DEVREAD8("userport", bbc_userport_slot_device, pb_r))
 	MCFG_VIA6522_WRITEPB_HANDLER(DEVWRITE8("userport", bbc_userport_slot_device, pb_w))
@@ -1015,7 +1015,7 @@ static MACHINE_CONFIG_DERIVED( bbcb, bbca )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bbcb_de, bbcb )
+MACHINE_CONFIG_DERIVED(bbc_state::bbcb_de, bbcb)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bbcb_mem)
@@ -1036,7 +1036,7 @@ static MACHINE_CONFIG_DERIVED( bbcb_de, bbcb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bbcb_us, bbcb )
+MACHINE_CONFIG_DERIVED(bbc_state::bbcb_us, bbcb)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bbcb_mem)
@@ -1063,7 +1063,7 @@ static MACHINE_CONFIG_DERIVED( bbcb_us, bbcb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bbcbp, bbcb )
+MACHINE_CONFIG_DERIVED(bbc_state::bbcbp, bbcb)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )  /* M6512 */
 	MCFG_CPU_PROGRAM_MAP(bbcbp_mem)
@@ -1073,7 +1073,7 @@ static MACHINE_CONFIG_DERIVED( bbcbp, bbcb )
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("fdc")
-	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
+	MCFG_WD1770_ADD("wd1770", XTAL(16'000'000) / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, fdc_drq_w))
 
@@ -1084,7 +1084,7 @@ static MACHINE_CONFIG_DERIVED( bbcbp, bbcb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bbcbp128, bbcbp )
+MACHINE_CONFIG_DERIVED(bbc_state::bbcbp128, bbcbp)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )  /* M6512 */
 	MCFG_CPU_PROGRAM_MAP(bbcbp128_mem)
@@ -1101,7 +1101,7 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-static MACHINE_CONFIG_DERIVED( torchf, bbcb )
+MACHINE_CONFIG_DERIVED(torch240_state::torchf, bbcb)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bbcb_mem)
@@ -1126,7 +1126,7 @@ static MACHINE_CONFIG_DERIVED( torchf, bbcb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( torchh10, torchf )
+MACHINE_CONFIG_DERIVED(torch240_state::torchh10, torchf)
 	/* fdc */
 	MCFG_DEVICE_REMOVE("i8271:1")
 
@@ -1135,7 +1135,7 @@ static MACHINE_CONFIG_DERIVED( torchh10, torchf )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( torchh21, torchf )
+MACHINE_CONFIG_DERIVED(torch240_state::torchh21, torchf)
 	/* fdc */
 	MCFG_DEVICE_REMOVE("i8271:1")
 
@@ -1151,7 +1151,7 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-static MACHINE_CONFIG_DERIVED( abc110, bbcbp )
+MACHINE_CONFIG_DERIVED(bbc_state::abc110, bbcbp)
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770:1")
 
@@ -1183,7 +1183,7 @@ static MACHINE_CONFIG_DERIVED( abc110, bbcbp )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( acw443, bbcbp )
+MACHINE_CONFIG_DERIVED(bbc_state::acw443, bbcbp)
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770:1")
 
@@ -1207,7 +1207,7 @@ static MACHINE_CONFIG_DERIVED( acw443, bbcbp )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( abc310, bbcbp )
+MACHINE_CONFIG_DERIVED(bbc_state::abc310, bbcbp)
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770:1")
 
@@ -1234,7 +1234,7 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-static MACHINE_CONFIG_DERIVED( reutapm, bbcbp )
+MACHINE_CONFIG_DERIVED(bbc_state::reutapm, bbcbp)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )  /* M6512 */
 	MCFG_CPU_PROGRAM_MAP(reutapm_mem)
@@ -1270,7 +1270,7 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-static MACHINE_CONFIG_DERIVED( econx25, bbcbp )
+MACHINE_CONFIG_DERIVED(bbc_state::econx25, bbcbp)
 	/* sound hardware */
 	MCFG_DEVICE_REMOVE("vsm")
 	MCFG_DEVICE_REMOVE("tms5220")
@@ -1297,9 +1297,9 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-static MACHINE_CONFIG_START( bbcm )
+MACHINE_CONFIG_START(bbc_state::bbcm)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65SC02, XTAL_16MHz/8)        /* 2.00 MHz */
+	MCFG_CPU_ADD("maincpu", M65SC02, XTAL(16'000'000)/8)        /* 2.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(bbcm_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bbc_state, bbcb_vsync)      /* screen refresh interrupts */
 	MCFG_CPU_PERIODIC_INT_DRIVER(bbc_state, bbcb_keyscan, 1000)        /* scan keyboard */
@@ -1329,11 +1329,11 @@ static MACHINE_CONFIG_START( bbcm )
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(bbc_state, bbc)
 
-	MCFG_DEVICE_ADD("saa5050", SAA5050, XTAL_12MHz / 2)
+	MCFG_DEVICE_ADD("saa5050", SAA5050, XTAL(12'000'000) / 2)
 	MCFG_SAA5050_SCREEN_SIZE(40, 25, 40)
 
 	/* crtc */
-	MCFG_MC6845_ADD("hd6845", HD6845, "screen", XTAL_16MHz / 8)
+	MCFG_MC6845_ADD("hd6845", HD6845, "screen", XTAL(16'000'000) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(12)
 	MCFG_MC6845_UPDATE_ROW_CB(bbc_state, crtc_update_row)
@@ -1345,11 +1345,11 @@ static MACHINE_CONFIG_START( bbcm )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489", SN76489, XTAL_16MHz/4) /* 4 MHz */
+	MCFG_SOUND_ADD("sn76489", SN76489, XTAL(16'000'000)/4) /* 4 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* rtc and cmos */
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
@@ -1389,7 +1389,7 @@ static MACHINE_CONFIG_START( bbcm )
 	MCFG_RS232_DCD_HANDLER(WRITELINE(bbc_state, write_dcd_serial))
 	MCFG_RS232_CTS_HANDLER(WRITELINE(bbc_state, write_cts_serial))
 
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL_16MHz / 13)
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, XTAL(16'000'000) / 13)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(bbc_state, write_acia_clock))
 
 	/* adc */
@@ -1398,7 +1398,7 @@ static MACHINE_CONFIG_START( bbcm )
 	MCFG_UPD7002_EOC_CB(bbc_state, BBC_uPD7002_EOC)
 
 	/* system via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL_16MHz / 16)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, XTAL(16'000'000) / 16)
 	MCFG_VIA6522_READPA_HANDLER(READ8(bbc_state, bbcb_via_system_read_porta))
 	MCFG_VIA6522_READPB_HANDLER(READ8(bbc_state, bbcb_via_system_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(bbc_state, bbcb_via_system_write_porta))
@@ -1406,7 +1406,7 @@ static MACHINE_CONFIG_START( bbcm )
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<1>))
 
 	/* user via */
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL_16MHz / 16)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, XTAL(16'000'000) / 16)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_READPB_HANDLER(DEVREAD8("userport", bbc_userport_slot_device, pb_r))
 	MCFG_VIA6522_WRITEPB_HANDLER(DEVWRITE8("userport", bbc_userport_slot_device, pb_w))
@@ -1414,7 +1414,7 @@ static MACHINE_CONFIG_START( bbcm )
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("irqs", input_merger_device, in_w<2>))
 
 	/* fdc */
-	MCFG_WD1770_ADD("wd1770", XTAL_16MHz / 2)
+	MCFG_WD1770_ADD("wd1770", XTAL(16'000'000) / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, fdc_drq_w))
 
@@ -1453,7 +1453,7 @@ static MACHINE_CONFIG_START( bbcm )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bbcmt, bbcm )
+MACHINE_CONFIG_DERIVED(bbc_state::bbcmt, bbcm)
 	/* Add 65C102 co-processor */
 	MCFG_DEVICE_MODIFY("intube")
 	MCFG_SLOT_DEFAULT_OPTION("65c102")
@@ -1461,7 +1461,7 @@ static MACHINE_CONFIG_DERIVED( bbcmt, bbcm )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bbcmaiv, bbcm )
+MACHINE_CONFIG_DERIVED(bbc_state::bbcmaiv, bbcm)
 	/* Add 65C102 co-processor */
 	MCFG_DEVICE_MODIFY("intube")
 	MCFG_SLOT_DEFAULT_OPTION("65c102")
@@ -1474,7 +1474,7 @@ static MACHINE_CONFIG_DERIVED( bbcmaiv, bbcm )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bbcmet, bbcm )
+MACHINE_CONFIG_DERIVED(bbc_state::bbcmet, bbcm)
 	/* printer */
 	MCFG_DEVICE_REMOVE("centronics")
 	MCFG_DEVICE_REMOVE("cent_data_out")
@@ -1510,7 +1510,7 @@ static MACHINE_CONFIG_DERIVED( bbcmet, bbcm )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bbcm512, bbcm )
+MACHINE_CONFIG_DERIVED(bbc_state::bbcm512, bbcm)
 	/* Add Intel 80186 co-processor */
 	MCFG_DEVICE_MODIFY("intube")
 	MCFG_SLOT_DEFAULT_OPTION("80186")
@@ -1518,7 +1518,7 @@ static MACHINE_CONFIG_DERIVED( bbcm512, bbcm )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bbcmarm, bbcm )
+MACHINE_CONFIG_DERIVED(bbc_state::bbcmarm, bbcm)
 	/* Add ARM co-processor */
 	MCFG_DEVICE_MODIFY("extube")
 	MCFG_SLOT_DEFAULT_OPTION("arm")
@@ -1526,7 +1526,7 @@ static MACHINE_CONFIG_DERIVED( bbcmarm, bbcm )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( discmate, bbcm )
+MACHINE_CONFIG_DERIVED(bbc_state::discmate, bbcm)
 	/* Add Sony CDK-3000PII Auto Disc Loader */
 
 	/* Add interface boards connected to cassette and RS423 */
@@ -1541,7 +1541,7 @@ static MACHINE_CONFIG_DERIVED( discmate, bbcm )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cfa3000, bbcm )
+MACHINE_CONFIG_DERIVED(bbc_state::cfa3000, bbcm)
 	MCFG_MACHINE_START_OVERRIDE(bbc_state, cfa3000)
 
 	/* fdc */
@@ -1579,14 +1579,14 @@ MACHINE_CONFIG_END
 ****************************************************************************/
 
 
-static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
+MACHINE_CONFIG_DERIVED(bbc_state::bbcmc, bbcm)
 	/* cassette */
 	MCFG_DEVICE_REMOVE("cassette")
 
 	/* fdc */
 	MCFG_DEVICE_REMOVE("wd1770")
 
-	MCFG_WD1772_ADD("wd1772", XTAL_16MHz / 2)
+	MCFG_WD1772_ADD("wd1772", XTAL(16'000'000) / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(bbc_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(bbc_state, fdc_drq_w))
 
@@ -1624,7 +1624,7 @@ static MACHINE_CONFIG_DERIVED( bbcmc, bbcm )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED(pro128s, bbcmc)
+MACHINE_CONFIG_DERIVED(bbc_state::pro128s, bbcmc)
 	/* software lists */
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_mc")
 	MCFG_SOFTWARE_LIST_REMOVE("flop_ls_pro128s")
@@ -1641,13 +1641,13 @@ MACHINE_CONFIG_END
 
 /* Both LTM machines used a 9" Hantarex MT3000 green monitor */
 
-static MACHINE_CONFIG_DERIVED(ltmpbp, bbcbp)
+MACHINE_CONFIG_DERIVED(bbc_state::ltmpbp, bbcbp)
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, ltmpbp)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED(ltmpm, bbcm)
+MACHINE_CONFIG_DERIVED(bbc_state::ltmpm, bbcm)
 	/* basic machine hardware */
 	MCFG_MACHINE_RESET_OVERRIDE(bbc_state, ltmpm)
 MACHINE_CONFIG_END

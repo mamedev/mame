@@ -63,6 +63,7 @@ public:
 	int     m_lmotor;           // left motor position (0-100)
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
+	void icecold(machine_config &config);
 };
 
 static ADDRESS_MAP_START( icecold_map, AS_PROGRAM, 8, icecold_state )
@@ -330,10 +331,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
 	}
 }
 
-static MACHINE_CONFIG_START( icecold )
+MACHINE_CONFIG_START(icecold_state::icecold)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_6MHz/4) // 68A09E
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(6'000'000)/4) // 68A09E
 	MCFG_CPU_PROGRAM_MAP(icecold_map)
 
 	MCFG_DEVICE_ADD( "pia0", PIA6821, 0)
@@ -353,7 +354,7 @@ static MACHINE_CONFIG_START( icecold )
 	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("i8279", I8279, XTAL_6MHz/4)
+	MCFG_DEVICE_ADD("i8279", I8279, XTAL(6'000'000)/4)
 	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("pia0", pia6821_device, cb1_w)) // irq
 	MCFG_I8279_OUT_SL_CB(WRITE8(icecold_state, scanlines_w))        // scan SL lines
 	MCFG_I8279_OUT_DISP_CB(WRITE8(icecold_state, digit_w))         // display A&B
@@ -370,12 +371,12 @@ static MACHINE_CONFIG_START( icecold )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay0", AY8910, XTAL_6MHz/4)
+	MCFG_SOUND_ADD("ay0", AY8910, XTAL(6'000'000)/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW4"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(icecold_state, ay8910_0_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(6'000'000)/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(icecold_state, ay8910_1_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(icecold_state, ay8910_1_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

@@ -701,7 +701,7 @@ void mcpx_ide_device::device_reset()
 	pci_device::device_reset();
 }
 
-MACHINE_CONFIG_MEMBER(mcpx_ide_device::device_add_mconfig)
+MACHINE_CONFIG_START(mcpx_ide_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("ide", BUS_MASTER_IDE_CONTROLLER, 0)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(mcpx_ide_device, ide_interrupt))
 	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE("maincpu", AS_PROGRAM)
@@ -798,10 +798,10 @@ WRITE32_MEMBER(nv2a_gpu_device::geforce_w)
 
 READ32_MEMBER(nv2a_gpu_device::nv2a_mirror_r)
 {
-	return m_program->read_dword(offset);
+	return m_program->read_dword(offset << 2);
 }
 
 WRITE32_MEMBER(nv2a_gpu_device::nv2a_mirror_w)
 {
-	m_program->write_dword(offset, data, mem_mask);
+	m_program->write_dword(offset << 2, data, mem_mask);
 }

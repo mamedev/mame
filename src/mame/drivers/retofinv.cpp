@@ -409,22 +409,22 @@ INTERRUPT_GEN_MEMBER(retofinv_state::sub_vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( retofinv )
+MACHINE_CONFIG_START(retofinv_state::retofinv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)    /* XTAL and divider verified, 3.072 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", retofinv_state,  main_vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)    /* XTAL and divider verified, 3.072 MHz */
+	MCFG_CPU_ADD("sub", Z80, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", retofinv_state,  sub_vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)   /* XTAL and divider verified, 3.072 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6)   /* XTAL and divider verified, 3.072 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(retofinv_state, nmi_line_pulse, 2*60) // wrong, should be ~128-132 per frame, not 120.
 
-	MCFG_CPU_ADD("68705", TAITO68705_MCU, XTAL_18_432MHz/6)    /* XTAL and divider verified, 3.072 MHz */
+	MCFG_CPU_ADD("68705", TAITO68705_MCU, XTAL(18'432'000)/6)    /* XTAL and divider verified, 3.072 MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -457,21 +457,21 @@ static MACHINE_CONFIG_START( retofinv )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_18_432MHz/6)   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(18'432'000)/6)   /* @IC5?; XTAL, chip type, and divider verified, 3.072 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, XTAL_18_432MHz/6)   /* @IC6?; XTAL, chip type, and divider verified, 3.072 MHz */
+	MCFG_SOUND_ADD("sn2", SN76489A, XTAL(18'432'000)/6)   /* @IC6?; XTAL, chip type, and divider verified, 3.072 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 /* bootleg which has different palette clut */
-static MACHINE_CONFIG_DERIVED( retofinvb1, retofinv )
+MACHINE_CONFIG_DERIVED(retofinv_state::retofinvb1, retofinv)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(retofinv_state, retofinv_bl)
 MACHINE_CONFIG_END
 
 /* bootleg which has no mcu */
-static MACHINE_CONFIG_DERIVED( retofinvb_nomcu, retofinv )
+MACHINE_CONFIG_DERIVED(retofinv_state::retofinvb_nomcu, retofinv)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 
@@ -482,7 +482,7 @@ static MACHINE_CONFIG_DERIVED( retofinvb_nomcu, retofinv )
 MACHINE_CONFIG_END
 
 /* bootleg which has different pallete clut and also has no mcu */
-static MACHINE_CONFIG_DERIVED( retofinvb1_nomcu, retofinvb1 )
+MACHINE_CONFIG_DERIVED(retofinv_state::retofinvb1_nomcu, retofinvb1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bootleg_map)
 

@@ -38,6 +38,7 @@ public:
 	DECLARE_DRIVER_INIT(indiana);
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	void indiana(machine_config &config);
 };
 
 
@@ -86,9 +87,9 @@ static DEVICE_INPUT_DEFAULTS_START( keyboard )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( indiana )
+MACHINE_CONFIG_START(indiana_state::indiana)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(M68K_TAG, M68030, XTAL_16MHz)
+	MCFG_CPU_ADD(M68K_TAG, M68030, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(indiana_mem)
 
 	MCFG_DEVICE_ADD(ISABUS_TAG, ISA16, 0)
@@ -99,8 +100,8 @@ static MACHINE_CONFIG_START( indiana )
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa3", indiana_isa_cards, "comat", false)
 	MCFG_ISA16_SLOT_ADD(ISABUS_TAG, "isa4", indiana_isa_cards, "ide", false)
 
-	MCFG_DEVICE_ADD(MFP_TAG, MC68901, XTAL_16MHz/4)
-	MCFG_MC68901_TIMER_CLOCK(XTAL_16MHz/4)
+	MCFG_DEVICE_ADD(MFP_TAG, MC68901, XTAL(16'000'000)/4)
+	MCFG_MC68901_TIMER_CLOCK(XTAL(16'000'000)/4)
 	MCFG_MC68901_RX_CLOCK(0)
 	MCFG_MC68901_TX_CLOCK(0)
 	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("keyboard", rs232_port_device, write_txd))

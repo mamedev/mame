@@ -124,6 +124,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
 	required_device<screen_device> m_screen;
+	void cliffhgr(machine_config &config);
 };
 
 
@@ -674,7 +675,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cliffhgr )
+MACHINE_CONFIG_START(cliffhgr_state::cliffhgr)
 
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)       /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(mainmem)
@@ -688,7 +689,7 @@ static MACHINE_CONFIG_START( cliffhgr )
 	MCFG_LASERDISC_OVERLAY_CLIP(tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START+32*8+12-1, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC+24*8+12-1)
 
 	/* start with the TMS9928a video configuration */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9128, XTAL_10_738635MHz / 2 )   /* TMS9128NL on the board */
+	MCFG_DEVICE_ADD( "tms9928a", TMS9128, XTAL(10'738'635) / 2 )   /* TMS9128NL on the board */
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 

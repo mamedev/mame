@@ -289,7 +289,7 @@ PALETTE_INIT_MEMBER(triplhnt_state, triplhnt)
 }
 
 
-static MACHINE_CONFIG_START( triplhnt )
+MACHINE_CONFIG_START(triplhnt_state::triplhnt)
 
 /* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 800000)

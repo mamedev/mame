@@ -11,4 +11,5 @@ class smsbootleg_state : public sms_state
 	DECLARE_WRITE8_MEMBER(port08_w);
 	DECLARE_WRITE8_MEMBER(port18_w);
 
+	void sms_supergame(machine_config &config);
 };

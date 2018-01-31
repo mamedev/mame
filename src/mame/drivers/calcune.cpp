@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE16_MEMBER(cal_vdp_w);
 
 	uint32_t screen_update_calcune(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void calcune(machine_config &config);
 private:
 	int vdp_state;
 
@@ -245,7 +246,7 @@ MACHINE_START_MEMBER(calcune_state,calcune)
 	m_vdp2->stop_timers();
 }
 
-static MACHINE_CONFIG_START( calcune )
+MACHINE_CONFIG_START(calcune_state::calcune)
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(calcune_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(calcune_state,genesis_int_callback)
@@ -292,7 +293,7 @@ static MACHINE_CONFIG_START( calcune )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

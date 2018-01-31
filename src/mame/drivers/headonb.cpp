@@ -56,6 +56,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	void headonb(machine_config &config);
 };
 
 
@@ -157,10 +158,10 @@ static GFXDECODE_START( headonb )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( headonb )
+MACHINE_CONFIG_START(headonb_state::headonb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL_20MHz / 10) // divider guessed
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL(20'000'000) / 10) // divider guessed
 	MCFG_CPU_PROGRAM_MAP(headonb_map)
 	MCFG_CPU_IO_MAP(headonb_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", headonb_state, irq0_line_hold) // where is irqack?

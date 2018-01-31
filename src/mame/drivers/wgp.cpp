@@ -425,7 +425,7 @@ WRITE16_MEMBER(wgp_state::cpua_ctrl_w)/* assumes Z80 sandwiched between 68Ks */
 
 	parse_control();
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n",space.device().safe_pc(),data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n",m_maincpu->pc(),data);
 }
 
 
@@ -472,7 +472,7 @@ INTERRUPT_GEN_MEMBER(wgp_state::cpub_interrupt)
 
 READ16_MEMBER(wgp_state::lan_status_r)
 {
-	logerror("CPU #2 PC %06x: warning - read lan status\n",space.device().safe_pc());
+	logerror("CPU #2 PC %06x: warning - read lan status\n",m_subcpu->pc());
 
 	return  (0x4 << 8); /* CPUB expects this in code at $104d0 (Wgp) */
 }
@@ -499,7 +499,7 @@ WRITE16_MEMBER(wgp_state::rotate_port_w)
 	{
 		case 0x00:
 		{
-//logerror("CPU #0 PC %06x: warning - port %04x write %04x\n",space.device().safe_pc(),port_sel,data);
+//logerror("CPU #0 PC %06x: warning - port %04x write %04x\n",m_maincpu->pc(),port_sel,data);
 
 			m_rotate_ctrl[m_port_sel] = data;
 			return;
@@ -573,7 +573,7 @@ READ16_MEMBER(wgp_state::adinput_r)
 			return m_unknown.read_safe(0);   /* unknown */
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",space.device().safe_pc(),offset);
+logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",m_maincpu->pc(),offset);
 
 	return 0xff;
 }
@@ -625,7 +625,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wgp_state )
 	AM_RANGE(0x502000, 0x517fff) AM_RAM_WRITE(pivram_word_w) AM_SHARE("pivram") /* piv tilemaps */
 	AM_RANGE(0x520000, 0x52001f) AM_RAM_WRITE(piv_ctrl_word_w) AM_SHARE("piv_ctrlram")
 	AM_RANGE(0x600000, 0x600003) AM_WRITE(rotate_port_w)    /* rotation control ? */
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 16  /* LAN areas not mapped... */, wgp_state )
@@ -902,7 +902,7 @@ void wgp_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(wgp_state::postload), this));
 }
 
-static MACHINE_CONFIG_START( wgp )
+MACHINE_CONFIG_START(wgp_state::wgp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -962,7 +962,7 @@ static MACHINE_CONFIG_START( wgp )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wgp2, wgp )
+MACHINE_CONFIG_DERIVED(wgp_state::wgp2, wgp)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 	/* video hardware */

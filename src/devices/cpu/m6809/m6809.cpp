@@ -131,7 +131,6 @@ March 2013 NPW:
 DEFINE_DEVICE_TYPE(MC6809, mc6809_device, "mc6809", "MC6809")
 DEFINE_DEVICE_TYPE(MC6809E, mc6809e_device, "mc6809e", "MC6809E")
 DEFINE_DEVICE_TYPE(M6809, m6809_device, "m6809", "MC6809 (legacy)")
-DEFINE_DEVICE_TYPE(M6809E, m6809e_device, "m6809e", "MC6809E (legacy)")
 
 
 //-------------------------------------------------
@@ -155,7 +154,7 @@ m6809_base_device::m6809_base_device(const machine_config &mconfig, const char *
 void m6809_base_device::device_start()
 {
 	if (!m_mintf)
-		m_mintf = new mi_default;
+		m_mintf = std::make_unique<mi_default>();
 
 	m_mintf->m_program  = &space(AS_PROGRAM);
 	m_mintf->m_sprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_mintf->m_program;
@@ -631,16 +630,5 @@ mc6809e_device::mc6809e_device(const machine_config &mconfig, const char *tag, d
 
 m6809_device::m6809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m6809_base_device(mconfig, tag, owner, clock, M6809, 1)
-{
-}
-
-
-
-//-------------------------------------------------
-//  m6809e_device
-//-------------------------------------------------
-
-m6809e_device::m6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: m6809_base_device(mconfig, tag, owner, clock, M6809E, 4)
 {
 }

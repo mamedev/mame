@@ -102,8 +102,8 @@ WRITE8_MEMBER(atari_rle_objects_device::control_write)
 		return;
 
 	// force a partial update first
-	int scanline = m_screen->vpos();
-	m_screen->update_partial(scanline);
+	int scanline = screen().vpos();
+	screen().update_partial(scanline);
 
 	// if the erase flag was set, erase the front map
 	if ((oldbits & ATARIRLE_CONTROL_ERASE) != 0)
@@ -197,7 +197,7 @@ void atari_rle_objects_device::device_start()
 	m_ram.set(*share, 2);
 
 	// register a VBLANK callback
-	m_screen->register_vblank_callback(vblank_state_delegate(&atari_rle_objects_device::vblank_callback, this));
+	screen().register_vblank_callback(vblank_state_delegate(&atari_rle_objects_device::vblank_callback, this));
 
 	// build and allocate the generic tables
 	build_rle_tables();
@@ -223,7 +223,7 @@ void atari_rle_objects_device::device_start()
 	m_objectcount   = count_objects();
 
 	// set up a cliprect
-	m_cliprect      = m_screen->visible_area();
+	m_cliprect      = screen().visible_area();
 	if (m_rightclip != 0)
 	{
 		m_cliprect.min_x = m_leftclip;
@@ -247,16 +247,16 @@ void atari_rle_objects_device::device_start()
 		prescan_rle(objnum);
 
 	// register the bitmaps with the target screen
-	m_screen->register_screen_bitmap(m_vram[0][0]);
-	m_screen->register_screen_bitmap(m_vram[0][1]);
+	screen().register_screen_bitmap(m_vram[0][0]);
+	screen().register_screen_bitmap(m_vram[0][1]);
 	m_vram[0][0].fill(0);
 	m_vram[0][1].fill(0);
 
 	// allocate alternate bitmaps if needed
 	if (m_vrammask.mask() != 0)
 	{
-		m_screen->register_screen_bitmap(m_vram[1][0]);
-		m_screen->register_screen_bitmap(m_vram[1][1]);
+		screen().register_screen_bitmap(m_vram[1][0]);
+		screen().register_screen_bitmap(m_vram[1][1]);
 		m_vram[1][0].fill(0);
 		m_vram[1][1].fill(0);
 	}
@@ -548,7 +548,7 @@ void atari_rle_objects_device::draw_rle(bitmap_ind16 &bitmap, const rectangle &c
 	if (hflip)
 		scaled_xoffs = ((xscale * info.width) >> 12) - scaled_xoffs;
 
-//if (clip.min_y == m_screen->visible_area().min_y)
+//if (clip.min_y == screen().visible_area().min_y)
 //logerror("   Sprite: c=%04X l=%04X h=%d X=%4d (o=%4d w=%3d) Y=%4d (o=%4d h=%d) s=%04X\n",
 //  code, color, hflip,
 //  x, -scaled_xoffs, (xscale * info.width) >> 12,
@@ -980,7 +980,7 @@ void atari_rle_objects_device::hilite_object(bitmap_ind16 &bitmap, int hilite)
 			int ey = sy + scaled_height - 1;
 
 			// left edge clip
-			const rectangle &visarea = m_screen->visible_area();
+			const rectangle &visarea = screen().visible_area();
 			if (sx < visarea.min_x)
 				sx = visarea.min_x;
 			if (sx > visarea.max_x)

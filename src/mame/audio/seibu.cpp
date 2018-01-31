@@ -245,7 +245,7 @@ WRITE8_MEMBER( seibu_sound_device::pending_w )
 
 READ8_MEMBER( seibu_sound_device::main_r )
 {
-	//logerror("%06x: seibu_main_r(%x)\n",space.device().safe_pc(),offset);
+	//logerror("%s: seibu_main_r(%x)\n",machine().describe_context(),offset);
 	switch (offset)
 	{
 		case 2:
@@ -254,14 +254,13 @@ READ8_MEMBER( seibu_sound_device::main_r )
 		case 5:
 			return m_main2sub_pending ? 1 : 0;
 		default:
-			//logerror("%06x: seibu_main_r(%x)\n",space.device().safe_pc(),offset);
+			//logerror("%s: seibu_main_r(%x)\n",machine().describe_context(),offset);
 			return 0xff;
 	}
 }
 
 WRITE8_MEMBER( seibu_sound_device::main_w )
 {
-	//printf("%06x: seibu_main_w(%x,%02x)\n",space.device().safe_pc(),offset,data);
 	switch (offset)
 	{
 		case 0:
@@ -278,7 +277,7 @@ WRITE8_MEMBER( seibu_sound_device::main_w )
 			m_main2sub_pending = 1;
 			break;
 		default:
-			//logerror("%06x: seibu_main_w(%x,%02x)\n",space.device().safe_pc(),offset,data);
+			//logerror("%s: seibu_main_w(%x,%02x)\n",machine().describe_context(),offset,data);
 			break;
 	}
 }

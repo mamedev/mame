@@ -105,6 +105,9 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(extrom_load);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rompak_load);
 	DECLARE_SNAPSHOT_LOAD_MEMBER(mtx);
+	void rs128(machine_config &config);
+	void mtx500(machine_config &config);
+	void mtx512(machine_config &config);
 };
 
 #endif /* __MTX_H__ */

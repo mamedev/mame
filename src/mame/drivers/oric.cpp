@@ -87,6 +87,8 @@ public:
 	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
+	void oric(machine_config &config);
+	void prav8d(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -153,6 +155,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void telstrat(machine_config &config);
 protected:
 	enum {
 		P_IRQEN  = 0x01,
@@ -767,15 +770,15 @@ static INPUT_PORTS_START(telstrat)
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( oric )
+MACHINE_CONFIG_START(oric_state::oric)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/12)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000)/12)
 	MCFG_CPU_PROGRAM_MAP(oric_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 64*6, 0, 40*6, 312, 0, 28*8) // 260 lines in 60 Hz mode
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 64*6, 0, 40*6, 312, 0, 28*8) // 260 lines in 60 Hz mode
 	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(oric_state, vblank_w))
 
@@ -785,7 +788,7 @@ static MACHINE_CONFIG_START( oric )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay8912", AY8912, XTAL_12MHz/12)
+	MCFG_SOUND_ADD("ay8912", AY8912, XTAL(12'000'000)/12)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(4700, 4700, 4700)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(oric_state, psg_a_w))
@@ -804,7 +807,7 @@ static MACHINE_CONFIG_START( oric )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape_timer", oric_state, update_tape, attotime::from_hz(4800))
 
 	/* via */
-	MCFG_DEVICE_ADD( "via6522", VIA6522, XTAL_12MHz/12 )
+	MCFG_DEVICE_ADD( "via6522", VIA6522, XTAL(12'000'000)/12 )
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(oric_state, via_a_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(oric_state, via_b_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(oric_state, via_ca2_w))
@@ -815,7 +818,7 @@ static MACHINE_CONFIG_START( oric )
 	MCFG_ORICEXT_ADD( "ext", oricext_intf, nullptr, "maincpu", WRITELINE(oric_state, ext_irq_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( prav8d, oric )
+MACHINE_CONFIG_DERIVED(oric_state::prav8d, oric)
 MACHINE_CONFIG_END
 
 FLOPPY_FORMATS_MEMBER( telestrat_state::floppy_formats )
@@ -826,17 +829,17 @@ static SLOT_INTERFACE_START( telestrat_floppies )
 	SLOT_INTERFACE( "3dsdd", FLOPPY_3_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_DERIVED( telstrat, oric )
+MACHINE_CONFIG_DERIVED(telestrat_state::telstrat, oric)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(telestrat_mem)
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(telestrat_state, acia_irq_w))
 
 	/* via */
-	MCFG_DEVICE_ADD( "via6522_2", VIA6522, XTAL_12MHz/12 )
+	MCFG_DEVICE_ADD( "via6522_2", VIA6522, XTAL(12'000'000)/12 )
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(telestrat_state, via2_a_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(telestrat_state, via2_b_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(telestrat_state, via2_ca2_w))
@@ -844,7 +847,7 @@ static MACHINE_CONFIG_DERIVED( telstrat, oric )
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(telestrat_state, via2_irq_w))
 
 	/* microdisc */
-	MCFG_FD1793_ADD("fdc", XTAL_8MHz/8)
+	MCFG_FD1793_ADD("fdc", XTAL(8'000'000)/8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(telestrat_state, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(telestrat_state, fdc_drq_w))
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(telestrat_state, fdc_hld_w))

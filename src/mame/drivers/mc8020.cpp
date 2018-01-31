@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port_b_w);
 	uint32_t screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void mc8020(machine_config &config);
 private:
 	u8 m_row;
 	required_shared_ptr<u8> m_p_videoram;
@@ -289,9 +290,9 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( mc8020 )
+MACHINE_CONFIG_START(mc8020_state::mc8020)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_2_4576MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(2'457'600))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
@@ -308,15 +309,15 @@ static MACHINE_CONFIG_START( mc8020 )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_2_4576MHz)
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(2'457'600))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(mc8020_state, port_a_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(mc8020_state, port_b_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(mc8020_state, port_b_w))
 
-	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_2_4576MHz / 64) // guess
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL(2'457'600) / 64) // guess
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ctc", z80ctc_device, trg2))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_2_4576MHz)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(2'457'600))
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_ZC2_CB(DEVWRITELINE("ctc", z80ctc_device, trg1))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ctc", z80ctc_device, trg0))

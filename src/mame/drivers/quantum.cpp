@@ -74,11 +74,12 @@ public:
 	DECLARE_READ8_MEMBER(input_2_r);
 	required_device<cpu_device> m_maincpu;
 	required_device<avg_quantum_device> m_avg;
+	void quantum(machine_config &config);
 };
 
 
-#define MASTER_CLOCK (XTAL_12_096MHz)
-#define CLOCK_3KHZ   ((double)MASTER_CLOCK / 4096)
+#define MASTER_CLOCK (XTAL(12'096'000))
+#define CLOCK_3KHZ   (MASTER_CLOCK / 4096)
 
 
 /*************************************
@@ -264,7 +265,7 @@ DISCRETE_SOUND_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( quantum )
+MACHINE_CONFIG_START(quantum_state::quantum)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)

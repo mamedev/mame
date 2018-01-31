@@ -107,6 +107,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
+	void discoboy(machine_config &config);
 };
 
 void discoboy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -443,15 +444,15 @@ WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_toggle);
 }
 
-static MACHINE_CONFIG_START( discoboy )
+MACHINE_CONFIG_START(discoboy_state::discoboy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* 6 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(discoboy_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", discoboy_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_10MHz/2) /* 5 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(10'000'000)/2) /* 5 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("rambank1", ADDRESS_MAP_BANK, 0)
@@ -480,14 +481,14 @@ static MACHINE_CONFIG_START( discoboy )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_10MHz/4)   /* 2.5 MHz? */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(10'000'000)/4)   /* 2.5 MHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(400'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(discoboy_state, yunsung8_adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)      /* 4KHz, 4 Bits */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)

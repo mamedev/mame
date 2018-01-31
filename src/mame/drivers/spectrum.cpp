@@ -652,7 +652,7 @@ INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
 	timer_set(attotime::from_ticks(32, m_maincpu->clock()), 0, 0);
 }
 
-MACHINE_CONFIG_START( spectrum_common )
+MACHINE_CONFIG_START(spectrum_state::spectrum_common)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, X1 / 4)        /* This is verified only for the ZX Spectrum. Other clones are reported to have different clocks */
@@ -699,7 +699,7 @@ MACHINE_CONFIG_START( spectrum_common )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "spectrum_cass")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( spectrum, spectrum_common )
+MACHINE_CONFIG_DERIVED(spectrum_state::spectrum, spectrum_common)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)               // This configuration is verified only for the original ZX Spectrum.

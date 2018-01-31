@@ -22,77 +22,6 @@ WRITE32_MEMBER( dragngun_state::spriteram_dma_w )
 	memset(m_spriteram->live(),0,0x2000);
 }
 
-WRITE32_MEMBER( nslasher_state::ace_ram_w )
-{
-	/* Some notes pieced together from Tattoo Assassins info:
-
-	    Bytes 0 to 0x58 - object alpha control?
-	    Bytes 0x5c to 0x7c - tilemap alpha control
-
-	    0 = opaque, 0x10 = 50% transparent, 0x20 = fully transparent
-
-	    Byte 0x00: ACEO000P0
-	                        P8
-	                        1P0
-	                        1P8
-	                        O010C1
-	                        o010C8
-	                        ??
-
-	    Hardware fade registers:
-
-	    Byte 0x80: fadeptred
-	    Byte 0x84: fadeptgreen
-	    Byte 0x88: fadeptblue
-	    Byte 0x8c: fadestred
-	    Byte 0x90: fadestgreen
-	    Byte 0x94: fadestblue
-	    Byte 0x98: fadetype
-
-	    The 'ST' value lerps between the 'PT' value and the palette entries.  So, if PT==0,
-	    then ST ranging from 0 to 255 will cause a fade to black (when ST==255 the palette
-	    becomes zero).
-
-	    'fadetype' - 1100 for multiplicative fade, 1000 for additive
-	*/
-	if (offset>=(0x80/4) && (data!=m_ace_ram[offset]))
-		m_ace_ram_dirty=1;
-
-	COMBINE_DATA(&m_ace_ram[offset]);
-}
-
-void nslasher_state::updateAceRam()
-{
-	int r,g,b,i;
-	uint8_t fadeptr=m_ace_ram[0x20];
-	uint8_t fadeptg=m_ace_ram[0x21];
-	uint8_t fadeptb=m_ace_ram[0x22];
-	uint8_t fadepsr=m_ace_ram[0x23];
-	uint8_t fadepsg=m_ace_ram[0x24];
-	uint8_t fadepsb=m_ace_ram[0x25];
-//  uint8_t mode=m_ace_ram[0x26];
-
-	m_ace_ram_dirty=0;
-
-	for (i=0; i<2048; i++)
-	{
-		/* Lerp palette entry to 'fadept' according to 'fadeps' */
-		b = (m_generic_paletteram_32[i] >>16) & 0xff;
-		g = (m_generic_paletteram_32[i] >> 8) & 0xff;
-		r = (m_generic_paletteram_32[i] >> 0) & 0xff;
-
-		if (i>255) /* Screenshots seem to suggest ACE fades do not affect playfield 1 palette (0-255) */
-		{
-			/* Yeah, this should really be fixed point, I know */
-			b = (uint8_t)((float)b + (((float)fadeptb - (float)b) * (float)fadepsb/255.0f));
-			g = (uint8_t)((float)g + (((float)fadeptg - (float)g) * (float)fadepsg/255.0f));
-			r = (uint8_t)((float)r + (((float)fadeptr - (float)r) * (float)fadepsr/255.0f));
-		}
-
-		m_palette->set_pen_color(i,rgb_t(r,g,b));
-	}
-}
-
 /******************************************************************************/
 
 /* Later games have double buffered paletteram - the real palette ram is
@@ -119,13 +48,6 @@ WRITE32_MEMBER( deco32_state::palette_dma_w )
 			m_palette->set_pen_color(i,rgb_t(r,g,b));
 		}
 	}
-}
-
-WRITE32_MEMBER( nslasher_state::palette_dma_w )
-{
-	for (int i = 0; i < m_palette->entries(); i++)
-		if (m_dirty_palette[i])
-			m_ace_ram_dirty = 1;
 }
 
 /******************************************************************************/
@@ -158,16 +80,12 @@ VIDEO_START_MEMBER( fghthist_state, fghthist )
 VIDEO_START_MEMBER( nslasher_state, nslasher )
 {
 	int width, height;
-	m_dirty_palette = std::make_unique<uint8_t[]>(4096);
 	width = m_screen->width();
 	height = m_screen->height();
 	m_tilemap_alpha_bitmap=std::make_unique<bitmap_ind16>(width, height );
 	m_sprgen1->alloc_sprite_bitmap();
 	m_sprgen2->alloc_sprite_bitmap();
-	memset(m_dirty_palette.get(),0,4096);
 
-	save_pointer(NAME(m_dirty_palette.get()), 4096);
-	save_item(NAME(m_ace_ram_dirty));
 	save_item(NAME(m_spriteram16_2));
 	save_item(NAME(m_spriteram16_2_buffered));
 
@@ -388,7 +306,7 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 					*/
 
 					/* Alpha values are tied to ACE ram... */
-					//int alpha=((m_ace_ram[0x0 + (((priColAlphaPal1&0xf0)>>4)/2)]) * 8)-1;
+					//int alpha=m_deco_ace->get_alpha(((priColAlphaPal1&0xf0)>>4)/2);
 					//if (alpha<0)
 					//  alpha=0;
 
@@ -436,11 +354,11 @@ void nslasher_state::mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bi
 						&& ((priColAlphaPal1&0xff)==0 || (pri1&0x3)==2 || (pri1&0x3)==3 || alpha1))
 					{
 						/* Alpha values are tied to ACE ram */
-						int alpha=((m_ace_ram[0x17 + (((p&0xf0)>>4)/2)]) * 8)-1;
+						int alpha=m_deco_ace->get_alpha(0x17 + (((p&0xf0)>>4)/2));
 						if (alpha<0)
 							alpha=0;
 
-						destLine[x]=alpha_blend_r32(destLine[x], pal2[p], 255-alpha);
+						destLine[x]=alpha_blend_r32(destLine[x], pal2[p], alpha);
 					}
 				}
 			}
@@ -455,11 +373,8 @@ uint32_t nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rg
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
 	/* This is not a conclusive test for deciding if tilemap needs alpha blending */
-	if (m_ace_ram[0x17]!=0x0 && m_pri)
+	if (m_deco_ace->get_aceram(0x17)!=0x0 && m_pri)
 		alphaTilemap=1;
-
-	if (m_ace_ram_dirty)
-		updateAceRam();
 
 	screen.priority().fill(0, cliprect);
 

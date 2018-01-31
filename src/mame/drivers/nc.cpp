@@ -1396,7 +1396,7 @@ INPUT_PORTS_END
 
 /**********************************************************************************************************/
 
-static MACHINE_CONFIG_START( nc100 )
+MACHINE_CONFIG_START(nc_state::nc100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, /*6000000*/ 4606000)        /* Russell Marks says this is more accurate */
 	MCFG_CPU_PROGRAM_MAP(nc_map)
@@ -1440,7 +1440,7 @@ static MACHINE_CONFIG_START( nc100 )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(nc_state, write_uart_clock))
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(nc_state, nc100_tc8521_alarm_callback))
 
 	/* cartridge */
@@ -1467,7 +1467,7 @@ static SLOT_INTERFACE_START( ibmpc_floppies )
 		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_DERIVED( nc200, nc100 )
+MACHINE_CONFIG_DERIVED(nc_state::nc200, nc100)
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_IO_MAP(nc200_io)
@@ -1501,7 +1501,7 @@ static MACHINE_CONFIG_DERIVED( nc200, nc100 )
 	MCFG_FLOPPY_DRIVE_ADD("upd765:0", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("upd765:1", ibmpc_floppies, "525dd", ibmpc_floppy_formats)
 
-	MCFG_MC146818_ADD( "mc", XTAL_4_194304Mhz )
+	MCFG_MC146818_ADD( "mc", XTAL(4'194'304) )
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

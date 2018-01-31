@@ -390,7 +390,7 @@ void m6800_cpu_device::WM16(uint32_t Addr, PAIR *p )
 /* IRQ enter */
 void m6800_cpu_device::enter_interrupt(const char *message,uint16_t irq_vector)
 {
-	LOG((message, tag()));
+	LOG((message));
 	if( m_wai_state & (M6800_WAI|M6800_SLP) )
 	{
 		if( m_wai_state & M6800_WAI )
@@ -423,7 +423,7 @@ void m6800_cpu_device::CHECK_IRQ_LINES()
 			m_wai_state &= ~M6800_SLP;
 
 		m_nmi_pending = false;
-		enter_interrupt("M6800 '%s' take NMI\n",0xfffc);
+		enter_interrupt("take NMI\n", 0xfffc);
 	}
 	else
 	{
@@ -434,7 +434,7 @@ void m6800_cpu_device::CHECK_IRQ_LINES()
 
 			if( !(CC & 0x10) )
 			{
-				enter_interrupt("M6800 '%s' take IRQ1\n",0xfff8);
+				enter_interrupt("take IRQ1\n", 0xfff8);
 				standard_irq_callback(M6800_IRQ_LINE);
 			}
 		}
@@ -544,7 +544,7 @@ void m6800_cpu_device::execute_set_input(int irqline, int state)
 		break;
 
 	default:
-		LOG(("M6800 '%s' set_irq_line %d,%d\n", tag(), irqline, state));
+		LOG(("set_irq_line %d,%d\n", irqline, state));
 		m_irq_state[irqline] = state;
 		break;
 	}

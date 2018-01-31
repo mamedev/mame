@@ -269,7 +269,7 @@ void neoboot_prot_device::samsho5b_vx_decrypt(uint8_t* ymsndrom, uint32_t ymsndr
 
 READ16_MEMBER( neoboot_prot_device::mslug5p_prot_r )
 {
-	logerror("PC %06x: access protected\n", space.device().safe_pc());
+	logerror("%s access protected\n", machine().describe_context());
 	return 0xa0;
 }
 
@@ -278,12 +278,12 @@ READ16_MEMBER( neoboot_prot_device::mslug5p_prot_r )
 WRITE16_MEMBER( neoboot_prot_device::ms5plus_bankswitch_w )
 {
     int bankaddress;
-    logerror("offset: %06x PC %06x: set banking %04x\n",offset,space.device().safe_pc(),data);
+    logerror("offset: %06x %s set banking %04x\n",offset,machine().describe_context(),data);
     if ((offset == 0) && (data == 0xa0))
     {
         bankaddress = 0xa0;
         m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
-        logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,space.device().safe_pc(),bankaddress);
+        logerror("offset: %06x %s set banking %04x\n\n",offset,machine().describe_context(),bankaddress);
     }
     else if(offset == 2)
     {
@@ -291,7 +291,7 @@ WRITE16_MEMBER( neoboot_prot_device::ms5plus_bankswitch_w )
         //data = data & 7;
         bankaddress = data * 0x100000;
         m_bankdev->neogeo_set_main_cpu_bank_address(bankaddress);
-        logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,space.device().safe_pc(),bankaddress);
+        logerror("offset: %06x %s set banking %04x\n\n",offset,machine().describe_context(),bankaddress);
     }
 }
 */

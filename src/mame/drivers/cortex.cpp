@@ -72,6 +72,7 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_DRIVER_INIT(init);
 
+	void cortex(machine_config &config);
 private:
 	bool m_kbd_ack;
 	bool m_vdp_int;
@@ -174,12 +175,12 @@ DRIVER_INIT_MEMBER( cortex_state, init )
 	membank("bankw0")->configure_entry(0, &main[0x00000]);
 }
 
-static MACHINE_CONFIG_START( cortex )
+MACHINE_CONFIG_START(cortex_state::cortex)
 	/* basic machine hardware */
 	/* TMS9995 CPU @ 12.0 MHz */
 	// Standard variant, no overflow int
 	// No lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_12MHz, mem_map, io_map)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(12'000'000), mem_map, io_map)
 
 	MCFG_DEVICE_ADD("control", LS259, 0) // IC64
 	//MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(cortex_state, basic_led_w))
@@ -191,7 +192,7 @@ static MACHINE_CONFIG_START( cortex )
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(DEVWRITELINE("beeper", beep_device, set_state))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "crtc", TMS9929A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "crtc", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INT_9995_INT1))
 	MCFG_DEVCB_CHAIN_OUTPUT(WRITELINE(cortex_state, vdp_int_w))
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
@@ -201,8 +202,8 @@ static MACHINE_CONFIG_START( cortex )
 	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(cortex_state, kbd_put))
 
-	//MCFG_DEVICE_ADD("uart1", TMS9902, XTAL_12MHz / 4)
-	//MCFG_DEVICE_ADD("uart2", TMS9902, XTAL_12MHz / 4)
+	//MCFG_DEVICE_ADD("uart1", TMS9902, XTAL(12'000'000) / 4)
+	//MCFG_DEVICE_ADD("uart2", TMS9902, XTAL(12'000'000) / 4)
 
 	/* Sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

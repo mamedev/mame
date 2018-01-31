@@ -146,11 +146,11 @@ Pin #11(+) | | R               |
 #include "speaker.h"
 
 
-#define MASTER_CLOCK            XTAL_40MHz
-#define SOUND_CLOCK             XTAL_2MHz
+#define MASTER_CLOCK            XTAL(40'000'000)
+#define SOUND_CLOCK             XTAL(2'000'000)
 
-#define VIDEO_CLOCK             XTAL_11_289MHz
-#define VIDEO_CLOCK_LETHALJ     XTAL_11_0592MHz
+#define VIDEO_CLOCK             XTAL(11'289'000)
+#define VIDEO_CLOCK_LETHALJ     XTAL(11'059'200)
 
 
 
@@ -629,7 +629,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gameroom )
+MACHINE_CONFIG_START(lethalj_state::gameroom)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, MASTER_CLOCK)
@@ -663,7 +663,7 @@ static MACHINE_CONFIG_START( gameroom )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lethalj, gameroom )
+MACHINE_CONFIG_DERIVED(lethalj_state::lethalj, gameroom)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK_LETHALJ) /* pixel clock */

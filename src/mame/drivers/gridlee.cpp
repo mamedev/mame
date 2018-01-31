@@ -407,7 +407,7 @@ static const char *const sample_names[] =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gridlee )
+MACHINE_CONFIG_START(gridlee_state::gridlee)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, GRIDLEE_CPU_CLOCK)

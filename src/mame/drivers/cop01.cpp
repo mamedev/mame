@@ -66,8 +66,8 @@ Mighty Guy board layout:
 #define MIGHTGUY_HACK    0
 #define TIMER_RATE       11475  /* unknown, hand-tuned to match audio reference */
 
-#define MAINCPU_CLOCK    XTAL_12MHz
-#define AUDIOCPU_CLOCK   XTAL_8MHz
+#define MAINCPU_CLOCK    XTAL(12'000'000)
+#define AUDIOCPU_CLOCK   XTAL(8'000'000)
 
 /*************************************
  *
@@ -509,7 +509,7 @@ void cop01_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( cop01 )
+MACHINE_CONFIG_START(cop01_state::cop01)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown clock / divider */
@@ -517,7 +517,7 @@ static MACHINE_CONFIG_START( cop01 )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cop01_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3MHz)    /* unknown clock / divider, hand-tuned to match audio reference */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'000'000))    /* unknown clock / divider, hand-tuned to match audio reference */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
 
@@ -551,7 +551,7 @@ static MACHINE_CONFIG_START( cop01 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mightguy )
+MACHINE_CONFIG_START(cop01_state::mightguy)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK/2)   /* unknown divider */

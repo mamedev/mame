@@ -75,6 +75,7 @@ public:
 	{
 	}
 
+	void sun1(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -110,12 +111,12 @@ void sun1_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( sun1 )
+MACHINE_CONFIG_START(sun1_state::sun1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(sun1_mem)
 
-	MCFG_DEVICE_ADD("timer", AM9513, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("timer", AM9513, XTAL(16'000'000) / 4)
 	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("timer", am9513_device, gate1_w))
 	MCFG_AM9513_OUT1_CALLBACK(NOOP) // Watchdog; generates BERR/Reset
 	MCFG_AM9513_OUT2_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_6)) // User timer
@@ -125,7 +126,7 @@ static MACHINE_CONFIG_START( sun1 )
 	MCFG_AM9513_OUT5_CALLBACK(DEVWRITELINE("iouart", upd7201_new_device, rxcb_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("iouart", upd7201_new_device, txcb_w))
 
-	MCFG_DEVICE_ADD("iouart", UPD7201_NEW, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("iouart", UPD7201_NEW, XTAL(16'000'000) / 4)
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))

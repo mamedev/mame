@@ -55,4 +55,7 @@ public:
 	uint32_t screen_update_shootout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_shootouj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits );
+	void shootouj(machine_config &config);
+	void shootouk(machine_config &config);
+	void shootout(machine_config &config);
 };

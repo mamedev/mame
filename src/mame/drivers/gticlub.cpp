@@ -329,6 +329,10 @@ public:
 	uint32_t screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void thunderh(machine_config &config);
+	void hangplt(machine_config &config);
+	void slrasslt(machine_config &config);
+	void gticlub(machine_config &config);
 private:
 	void gticlub_led_setreg(int offset, uint8_t data);
 
@@ -934,17 +938,17 @@ uint32_t gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb3
 
 	return 0;
 }
-static MACHINE_CONFIG_START( gticlub )
+MACHINE_CONFIG_START(gticlub_state::gticlub)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
+	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(gticlub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gticlub_state,  gticlub_vblank)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL_64MHz/4)    /* 16MHz */
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
+	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(sharc_map)
 
@@ -993,12 +997,12 @@ static MACHINE_CONFIG_START( gticlub )
 	MCFG_K001006_GFX_REGION("gfx1")
 	MCFG_K001006_TEX_LAYOUT(1)
 
-	MCFG_K056800_ADD("k056800", XTAL_33_8688MHz/2)
+	MCFG_K056800_ADD("k056800", XTAL(33'868'800)/2)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL_33_8688MHz/2)
+	MCFG_RF5C400_ADD("rfsnd", XTAL(33'868'800)/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1007,7 +1011,7 @@ static MACHINE_CONFIG_START( gticlub )
 	MCFG_KONPPC_CGBOARD_TYPE(GTICLUB)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( thunderh, gticlub )
+MACHINE_CONFIG_DERIVED(gticlub_state::thunderh, gticlub)
 
 	MCFG_DEVICE_REMOVE("adc1038")
 	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
@@ -1019,7 +1023,7 @@ static MACHINE_CONFIG_DERIVED( thunderh, gticlub )
 	MCFG_K056230_HACK(1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( slrasslt, gticlub )
+MACHINE_CONFIG_DERIVED(gticlub_state::slrasslt, gticlub)
 
 	MCFG_DEVICE_REMOVE("adc1038")
 	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
@@ -1041,20 +1045,20 @@ MACHINE_RESET_MEMBER(gticlub_state,hangplt)
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( hangplt )
+MACHINE_CONFIG_START(gticlub_state::hangplt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
+	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(hangplt_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL_64MHz/4)    /* 16MHz */
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
+	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(hangplt_sharc0_map)
 
-	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL_36MHz)
+	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(hangplt_sharc1_map)
 
@@ -1120,12 +1124,12 @@ static MACHINE_CONFIG_START( hangplt )
 	MCFG_K001604_ROZ_OFFSET(16384)
 	MCFG_K001604_PALETTE("palette")
 
-	MCFG_K056800_ADD("k056800", XTAL_33_8688MHz/2)
+	MCFG_K056800_ADD("k056800", XTAL(33'868'800)/2)
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL_33_8688MHz/2)
+	MCFG_RF5C400_ADD("rfsnd", XTAL(33'868'800)/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

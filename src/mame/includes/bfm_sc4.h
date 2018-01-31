@@ -622,6 +622,30 @@ public:
 	void find_mbus(uint16_t* rom);
 
 
+	void sc4_common(machine_config &config);
+	void sc4(machine_config &config);
+	void sc4_200_4r(machine_config &config);
+	void sc4_200_4ra(machine_config &config);
+	void sc4_200_4rb(machine_config &config);
+	void sc4_200_5r(machine_config &config);
+	void sc4_200_5ra(machine_config &config);
+	void sc4_200_5rb(machine_config &config);
+	void sc4_200_5rc(machine_config &config);
+	void sc4_200_alt(machine_config &config);
+	void sc4_200_alta(machine_config &config);
+	void sc4_200_altb(machine_config &config);
+	void sc4_200_std(machine_config &config);
+	void sc4_3reel(machine_config &config);
+	void sc4_3reel_200(machine_config &config);
+	void sc4_3reel_200_48(machine_config &config);
+	void sc4_4reel(machine_config &config);
+	void sc4_4reel_200(machine_config &config);
+	void sc4_4reel_alt(machine_config &config);
+	void sc4_5reel(machine_config &config);
+	void sc4_5reel_alt(machine_config &config);
+	void sc4_adder4(machine_config &config);
+	void sc4_no_reels(machine_config &config);
+	void sc4dmd(machine_config &config);
 protected:
 	optional_ioport_array<16> m_io_ports;
 };
@@ -643,33 +667,10 @@ public:
 
 	// devices
 	required_device<m68340_cpu_device> m_adder4cpu;
+	void sc4_adder4(machine_config &config);
 };
 
 
-MACHINE_CONFIG_EXTERN( sc4 );
-MACHINE_CONFIG_EXTERN( sc4_adder4 );
-MACHINE_CONFIG_EXTERN( sc4dmd );
-MACHINE_CONFIG_EXTERN(sc4_3reel);
-MACHINE_CONFIG_EXTERN(sc4_4reel);
-MACHINE_CONFIG_EXTERN(sc4_4reel_alt);
-MACHINE_CONFIG_EXTERN(sc4_5reel);
-MACHINE_CONFIG_EXTERN(sc4_5reel_alt);
-MACHINE_CONFIG_EXTERN(sc4_200_std);
-MACHINE_CONFIG_EXTERN(sc4_200_alt);
-MACHINE_CONFIG_EXTERN(sc4_200_alta);
-MACHINE_CONFIG_EXTERN(sc4_200_altb);
-MACHINE_CONFIG_EXTERN(sc4_200_5r);
-MACHINE_CONFIG_EXTERN(sc4_200_5ra);
-MACHINE_CONFIG_EXTERN(sc4_200_5rb);
-MACHINE_CONFIG_EXTERN(sc4_200_5rc);
-MACHINE_CONFIG_EXTERN(sc4_200_5rc);
-MACHINE_CONFIG_EXTERN(sc4_200_4r);
-MACHINE_CONFIG_EXTERN(sc4_200_4ra);
-MACHINE_CONFIG_EXTERN(sc4_200_4rb);
-MACHINE_CONFIG_EXTERN(sc4_4reel_200);
-MACHINE_CONFIG_EXTERN(sc4_3reel_200);
-MACHINE_CONFIG_EXTERN(sc4_3reel_200_48);
-MACHINE_CONFIG_EXTERN(sc4_no_reels);
 
 
 INPUT_PORTS_EXTERN( sc4_base );

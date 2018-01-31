@@ -39,6 +39,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void gaelcopc(machine_config &config);
 protected:
 
 	// devices
@@ -66,7 +67,7 @@ static INPUT_PORTS_START( gaelcopc )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( gaelcopc )
+MACHINE_CONFIG_START(gaelcopc_state::gaelcopc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Pentium4? */
 	MCFG_CPU_PROGRAM_MAP(gaelcopc_map)

@@ -105,6 +105,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER (write_f14_clock){ write_acia_clocks(mc14411_device::TIMER_F14, state); }
 	DECLARE_WRITE_LINE_MEMBER (write_f15_clock){ write_acia_clocks(mc14411_device::TIMER_F15, state); }
 
+	void proteus3(machine_config &config);
 private:
 	uint8_t m_video_data;
 	uint8_t m_flashcnt;
@@ -374,9 +375,9 @@ void proteus3_state::machine_reset()
  Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( proteus3 )
+MACHINE_CONFIG_START(proteus3_state::proteus3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz)  /* Divided by 4 internally */
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(3'579'545))  /* Divided by 4 internally */
 	MCFG_CPU_PROGRAM_MAP(proteus3_mem)
 
 	/* video hardware */
@@ -418,7 +419,7 @@ static MACHINE_CONFIG_START( proteus3 )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia2", acia6850_device, write_cts))
 
 	/* Bit Rate Generator */
-	MCFG_MC14411_ADD ("brg", XTAL_1_8432MHz) // crystal needs verification but is the likely one
+	MCFG_MC14411_ADD ("brg", XTAL(1'843'200)) // crystal needs verification but is the likely one
 	MCFG_MC14411_F1_CB(WRITELINE (proteus3_state, write_f1_clock))
 	MCFG_MC14411_F2_CB(WRITELINE (proteus3_state, write_f2_clock))
 	MCFG_MC14411_F3_CB(WRITELINE (proteus3_state, write_f3_clock))

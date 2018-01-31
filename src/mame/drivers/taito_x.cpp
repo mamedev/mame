@@ -394,7 +394,7 @@ WRITE16_MEMBER( taitox_state::cchip1_ram_w )
 	}
 	else
 	{
-		logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",space.device().safe_pc(),m_current_bank,offset,data);
+		logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",m_maincpu->pc(),m_current_bank,offset,data);
 	}
 }
 
@@ -545,7 +545,7 @@ static ADDRESS_MAP_START( superman_map, AS_PROGRAM, 16, taitox_state )
 	AM_RANGE(0x900000, 0x9007ff) AM_READWRITE(cchip1_ram_r, cchip1_ram_w)
 	AM_RANGE(0x900802, 0x900803) AM_READWRITE(cchip1_ctrl_r, cchip1_ctrl_w)
 	AM_RANGE(0x900c00, 0x900c01) AM_WRITE(cchip1_bank_w)
-	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16) // Sprites Code + X + Attr
@@ -560,7 +560,7 @@ static ADDRESS_MAP_START( daisenpu_map, AS_PROGRAM, 16, taitox_state )
 	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x900000, 0x90000f) AM_READWRITE(daisenpu_input_r, daisenpu_input_w)
-	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16) // Sprites Code + X + Attr
@@ -575,7 +575,7 @@ static ADDRESS_MAP_START( gigandes_map, AS_PROGRAM, 16, taitox_state )
 	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x900000, 0x90000f) AM_READWRITE(daisenpu_input_r, daisenpu_input_w)
-	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16) // Sprites Code + X + Attr
@@ -590,7 +590,7 @@ static ADDRESS_MAP_START( ballbros_map, AS_PROGRAM, 16, taitox_state )
 	AM_RANGE(0x800000, 0x800001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0x900000, 0x90000f) AM_READWRITE(daisenpu_input_r, daisenpu_input_w)
-	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb00000, 0xb00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16) // Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16) // Sprites Code + X + Attr
@@ -917,17 +917,17 @@ MACHINE_START_MEMBER(taitox_state,superman)
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( superman )
+MACHINE_CONFIG_START(taitox_state::superman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(superman_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitox_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_TAITO_CCHIP_ADD("cchip", XTAL_12MHz/2) /* ? MHz */
+	MCFG_TAITO_CCHIP_ADD("cchip", XTAL(12'000'000)/2) /* ? MHz */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
@@ -954,7 +954,7 @@ static MACHINE_CONFIG_START( superman )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)   /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)   /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -966,14 +966,14 @@ static MACHINE_CONFIG_START( superman )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( daisenpu )
+MACHINE_CONFIG_START(taitox_state::daisenpu)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(daisenpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitox_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(daisenpu_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
@@ -1001,7 +1001,7 @@ static MACHINE_CONFIG_START( daisenpu )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)  /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
@@ -1011,7 +1011,7 @@ static MACHINE_CONFIG_START( daisenpu )
 	MCFG_PC060HA_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gigandes )
+MACHINE_CONFIG_START(taitox_state::gigandes)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz? */
@@ -1058,7 +1058,7 @@ static MACHINE_CONFIG_START( gigandes )
 	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ballbros )
+MACHINE_CONFIG_START(taitox_state::ballbros)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)    /* 8 MHz? */

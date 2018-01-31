@@ -1303,7 +1303,7 @@ INPUT_PORTS_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( yboard )
+MACHINE_CONFIG_START(segaybd_state::yboard)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -1383,13 +1383,13 @@ MACHINE_CONFIG_END
 
 
 // irq at 0x28 is from MB8421, and irq at 0x38 probably from MB89372?
-static MACHINE_CONFIG_DERIVED( yboard_link, yboard )
+MACHINE_CONFIG_DERIVED(segaybd_state::yboard_link, yboard)
 
 	// basic machine hardware
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(main_map_link)
 
-	MCFG_CPU_ADD("linkcpu", Z80, XTAL_16MHz/2 ) // 8 Mhz
+	MCFG_CPU_ADD("linkcpu", Z80, XTAL(16'000'000)/2 ) // 8 Mhz
 	MCFG_CPU_PROGRAM_MAP(link_map)
 	MCFG_CPU_IO_MAP(link_portmap)
 
@@ -1398,10 +1398,10 @@ static MACHINE_CONFIG_DERIVED( yboard_link, yboard )
 	MCFG_MB8421_INTR_HANDLER(WRITELINE(segaybd_state, mb8421_intr))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( yboard_deluxe, yboard )
+MACHINE_CONFIG_DERIVED(segaybd_state::yboard_deluxe, yboard)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("motorcpu", Z80, XTAL_16MHz/2 ) // 8 Mhz(guessed)
+	MCFG_CPU_ADD("motorcpu", Z80, XTAL(16'000'000)/2 ) // 8 Mhz(guessed)
 	MCFG_CPU_PROGRAM_MAP(motor_map)
 //  MCFG_CPU_IO_MAP(motor_portmap)
 

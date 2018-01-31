@@ -213,7 +213,7 @@ void spdodgeb_state::mcu63705_update_inputs()
 
 READ8_MEMBER(spdodgeb_state::mcu63701_r)
 {
-//  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",space.device().safe_pc(),offset);
+//  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",m_maincpu->pc(),offset);
 
 	if (m_mcu63701_command == 0) return 0x6a;
 	else switch (offset)
@@ -229,7 +229,7 @@ READ8_MEMBER(spdodgeb_state::mcu63701_r)
 
 WRITE8_MEMBER(spdodgeb_state::mcu63701_w)
 {
-//  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",space.device().safe_pc(),data);
+//  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",m_maincpu->pc(),data);
 	m_mcu63701_command = data;
 	mcu63705_update_inputs();
 }
@@ -403,19 +403,19 @@ void spdodgeb_state::machine_reset()
 	m_last_dash[0] = m_last_dash[1] = 0;
 }
 
-static MACHINE_CONFIG_START( spdodgeb )
+MACHINE_CONFIG_START(spdodgeb_state::spdodgeb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/6)   /* 2MHz ? */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000)/6)   /* 2MHz ? */
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", spdodgeb_state, interrupt, "screen", 0, 1) /* 1 IRQ every 8 visible scanlines, plus NMI for vblank */
 
-	MCFG_CPU_ADD("audiocpu", MC6809, XTAL_12MHz/2) // HD68A09P (1.5MHz internally)
+	MCFG_CPU_ADD("audiocpu", MC6809, XTAL(12'000'000)/2) // HD68A09P (1.5MHz internally)
 	MCFG_CPU_PROGRAM_MAP(spdodgeb_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 0, 256, 272, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 0, 256, 272, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(spdodgeb_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -429,7 +429,7 @@ static MACHINE_CONFIG_START( spdodgeb )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(12'000'000)/4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)

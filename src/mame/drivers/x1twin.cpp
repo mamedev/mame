@@ -34,12 +34,13 @@ public:
 	uint32_t screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
+	void x1twin(machine_config &config);
 };
 
 
-#define X1_MAIN_CLOCK XTAL_16MHz
-#define VDP_CLOCK  XTAL_42_9545MHz
-#define MCU_CLOCK  XTAL_6MHz
+#define X1_MAIN_CLOCK XTAL(16'000'000)
+#define VDP_CLOCK  XTAL(42'954'545)
+#define MCU_CLOCK  XTAL(6'000'000)
 #define PCE_MAIN_CLOCK      VDP_CLOCK / 2
 
 uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -401,7 +402,7 @@ static SLOT_INTERFACE_START( x1_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( x1twin )
+MACHINE_CONFIG_START(x1twin_state::x1twin)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("x1_cpu", Z80, X1_MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(x1_mem)
@@ -436,7 +437,7 @@ static MACHINE_CONFIG_START( x1twin )
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 	/* video hardware */
-	MCFG_SCREEN_ADD("x1_screen", RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
@@ -449,8 +450,8 @@ static MACHINE_CONFIG_START( x1twin )
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, huc6260_device::WPF, 70, 70 + 512 + 32, huc6260_device::LPF, 14, 14+242)
 	MCFG_SCREEN_UPDATE_DRIVER(x1twin_state, screen_update_x1pce)
 
-	MCFG_MC6845_ADD("crtc", H46505, "x1_screen", (VDP_CLOCK/48)) //unknown divider
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", (VDP_CLOCK/48)) //unknown divider
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
@@ -461,6 +462,8 @@ static MACHINE_CONFIG_START( x1twin )
 	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
 	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
+	// TODO: guesswork, try to implicitily start the motor
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)

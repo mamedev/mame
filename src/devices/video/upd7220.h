@@ -45,10 +45,10 @@
 
 
 #define MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(_class, _method) \
-	upd7220_device::static_set_display_pixels_callback(*device, upd7220_device::display_pixels_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	upd7220_device::static_set_display_pixels_callback(*device, upd7220_device::display_pixels_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(_class, _method) \
-	upd7220_device::static_set_draw_text_callback(*device, upd7220_device::draw_text_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	upd7220_device::static_set_draw_text_callback(*device, upd7220_device::draw_text_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_UPD7220_DRQ_CALLBACK(_write) \
 	devcb = &upd7220_device::set_drq_wr_callback(*device, DEVCB_##_write);

@@ -14,9 +14,9 @@
 #include "speaker.h"
 
 
-#define CPU_CLOCK           XTAL_64MHz
-#define VIDEO_CLOCK         XTAL_20MHz
-#define SOUND_CLOCK         XTAL_24MHz
+#define CPU_CLOCK           XTAL(64'000'000)
+#define VIDEO_CLOCK         XTAL(20'000'000)
+#define SOUND_CLOCK         XTAL(24'000'000)
 
 
 
@@ -300,7 +300,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( btoads )
+MACHINE_CONFIG_START(btoads_state::btoads)
 
 	MCFG_CPU_ADD("maincpu", TMS34020, CPU_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)

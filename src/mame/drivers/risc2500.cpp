@@ -47,6 +47,7 @@ public:
 	void install_boot_rom();
 	void remove_boot_rom();
 
+	void risc2500(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -294,8 +295,8 @@ static ADDRESS_MAP_START(risc2500_mem, AS_PROGRAM, 32, risc2500_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( risc2500 )
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_28_322MHz / 2)      // VY86C010
+MACHINE_CONFIG_START(risc2500_state::risc2500)
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(28'322'000) / 2)      // VY86C010
 	MCFG_CPU_PROGRAM_MAP(risc2500_mem)
 	MCFG_ARM_COPRO(VL86C020)
 	MCFG_CPU_PERIODIC_INT_DRIVER(risc2500_state, irq1_line_hold, 250)

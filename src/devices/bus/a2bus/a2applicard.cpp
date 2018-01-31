@@ -50,7 +50,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_applicard_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_applicard_device::device_add_mconfig)
 	MCFG_CPU_ADD(Z80_TAG, Z80, 6000000) // Z80 runs at 6 MHz
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)
@@ -87,9 +87,6 @@ a2bus_applicard_device::a2bus_applicard_device(const machine_config &mconfig, co
 
 void a2bus_applicard_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	// locate Z80 ROM
 	m_z80rom = device().machine().root_device().memregion(this->subtag(Z80_ROM_REGION).c_str())->base();
 

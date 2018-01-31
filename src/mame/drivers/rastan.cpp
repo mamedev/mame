@@ -211,7 +211,7 @@ WRITE8_MEMBER(rastan_state::rastan_msm5205_stop_w)
 static ADDRESS_MAP_START( rastan_map, AS_PROGRAM, 16, rastan_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x350008, 0x350009) AM_WRITENOP    /* 0 only (often) ? */
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(rastan_spritectrl_w)  /* sprite palette bank, coin counters & lockout */
 	AM_RANGE(0x390000, 0x390001) AM_READ_PORT("P1")
@@ -362,14 +362,14 @@ void rastan_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( rastan )
+MACHINE_CONFIG_START(rastan_state::rastan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rastan_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rastan_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(rastan_s_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
@@ -400,13 +400,13 @@ static MACHINE_CONFIG_START( rastan )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz/4)  /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000)/4)  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(rastan_state,rastan_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* verified on pcb */
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000)) /* verified on pcb */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(rastan_state, rastan_msm5205_vck)) /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

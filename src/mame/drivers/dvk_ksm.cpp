@@ -123,6 +123,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ksm_ppi_porta_w);
 	DECLARE_WRITE8_MEMBER(ksm_ppi_portc_w);
 
+	void ksm(machine_config &config);
 private:
 	uint32_t draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline);
 	rectangle m_tmpclip;
@@ -410,8 +411,8 @@ static GFXDECODE_START( ksm )
 	GFXDECODE_ENTRY("chargen", 0x0000, ksm_charlayout, 0, 1)
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ksm )
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_15_4MHz/10)
+MACHINE_CONFIG_START(ksm_state::ksm)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(15'400'000)/10)
 	MCFG_CPU_PROGRAM_MAP(ksm_mem)
 	MCFG_CPU_IO_MAP(ksm_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
@@ -420,7 +421,7 @@ static MACHINE_CONFIG_START( ksm )
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(ksm_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_15_4MHz, KSM_TOTAL_HORZ, KSM_HORZ_START,
+	MCFG_SCREEN_RAW_PARAMS(XTAL(15'400'000), KSM_TOTAL_HORZ, KSM_HORZ_START,
 		KSM_HORZ_START+KSM_DISP_HORZ, KSM_TOTAL_VERT, KSM_VERT_START,
 		KSM_VERT_START+KSM_DISP_VERT);
 

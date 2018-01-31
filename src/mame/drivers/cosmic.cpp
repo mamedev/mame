@@ -1000,7 +1000,7 @@ MACHINE_RESET_MEMBER(cosmic_state,cosmicg)
 	m_maincpu->set_input_line(INT_9980A_RESET, CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( cosmic )
+MACHINE_CONFIG_START(cosmic_state::cosmic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,Z80_MASTER_CLOCK/6) /* 1.8026 MHz */
@@ -1028,7 +1028,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cosmic_state::panic_scanline)
 }
 
 
-static MACHINE_CONFIG_DERIVED( panic, cosmic )
+MACHINE_CONFIG_DERIVED(cosmic_state::panic, cosmic)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1058,7 +1058,7 @@ static MACHINE_CONFIG_DERIVED( panic, cosmic )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
+MACHINE_CONFIG_DERIVED(cosmic_state::cosmica, cosmic)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1082,7 +1082,7 @@ static MACHINE_CONFIG_DERIVED( cosmica, cosmic )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cosmicg )
+MACHINE_CONFIG_START(cosmic_state::cosmicg)
 
 	/* basic machine hardware */
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, COSMICG_MASTER_CLOCK/8, cosmicg_map, cosmicg_io_map)
@@ -1120,7 +1120,7 @@ static MACHINE_CONFIG_START( cosmicg )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( magspot, cosmic )
+MACHINE_CONFIG_DERIVED(cosmic_state::magspot, cosmic)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", Z80, Z80_MASTER_CLOCK/4) /* 2.704 MHz, verified via schematics */
@@ -1144,7 +1144,7 @@ static MACHINE_CONFIG_DERIVED( magspot, cosmic )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( devzone, magspot )
+MACHINE_CONFIG_DERIVED(cosmic_state::devzone, magspot)
 
 	/* basic machine hardware */
 
@@ -1154,7 +1154,7 @@ static MACHINE_CONFIG_DERIVED( devzone, magspot )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( nomnlnd, cosmic )
+MACHINE_CONFIG_DERIVED(cosmic_state::nomnlnd, cosmic)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

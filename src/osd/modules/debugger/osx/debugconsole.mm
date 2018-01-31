@@ -181,7 +181,7 @@
 	[dasmSplit setFrame:rhsFrame];
 
 	// select the current processor
-	[self setCPU:machine->firstcpu];
+	[self setCPU:machine->debugger().cpu().get_visible_cpu()];
 
 	[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(auxiliaryWindowWillClose:)

@@ -281,6 +281,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(midi_uart_ch1_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(gcu0_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(gcu1_interrupt);
+	static void cdrom_config(device_t *device);
+	void firebeat2(machine_config &config);
+	void firebeat(machine_config &config);
+	void firebeat_spu(machine_config &config);
 };
 
 
@@ -882,7 +886,7 @@ READ32_MEMBER(firebeat_state::ppc_spu_share_r)
 	uint32_t r = 0;
 
 #if PRINT_SPU_MEM
-	printf("ppc_spu_share_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
+	printf("ppc_spu_share_r: %08X, %08X at %08X\n", offset, mem_mask, m_maincpu->pc());
 #endif
 
 	if (ACCESSING_BITS_24_31)
@@ -913,7 +917,7 @@ READ32_MEMBER(firebeat_state::ppc_spu_share_r)
 WRITE32_MEMBER(firebeat_state::ppc_spu_share_w)
 {
 #if PRINT_SPU_MEM
-	printf("ppc_spu_share_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+	printf("ppc_spu_share_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, m_maincpu->pc());
 #endif
 
 	if (ACCESSING_BITS_24_31)
@@ -1269,20 +1273,21 @@ WRITE_LINE_MEMBER( firebeat_state::ata_interrupt )
 	m_maincpu->set_input_line(INPUT_LINE_IRQ4, state);
 }
 
-static MACHINE_CONFIG_START( cdrom_config )
-	MCFG_DEVICE_MODIFY("cdda")
+void firebeat_state::cdrom_config(device_t *device)
+{
+	device = device->subdevice("cdda");
 	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
-MACHINE_CONFIG_END
+}
 
 static SLOT_INTERFACE_START(firebeat_ata_devices)
 	SLOT_INTERFACE("cdrom", ATAPI_FIXED_CDROM)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( firebeat )
+MACHINE_CONFIG_START(firebeat_state::firebeat)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GCX, XTAL_64MHz)
+	MCFG_CPU_ADD("maincpu", PPC403GCX, XTAL(64'000'000))
 	MCFG_CPU_PROGRAM_MAP(firebeat_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", firebeat_state,  firebeat_interrupt)
 
@@ -1330,19 +1335,19 @@ static MACHINE_CONFIG_START( firebeat )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("duart_com", PC16552D, 0)  // pgmd to 9600baud
-	MCFG_DEVICE_ADD("duart_com:chan0", NS16550, XTAL_19_6608MHz)
-	MCFG_DEVICE_ADD("duart_com:chan1", NS16550, XTAL_19_6608MHz)
+	MCFG_DEVICE_ADD("duart_com:chan0", NS16550, XTAL(19'660'800))
+	MCFG_DEVICE_ADD("duart_com:chan1", NS16550, XTAL(19'660'800))
 	MCFG_DEVICE_ADD("duart_midi", PC16552D, 0)  // in all memory maps, pgmd to 31250baud
-	MCFG_DEVICE_ADD("duart_midi:chan0", NS16550, XTAL_24MHz)
+	MCFG_DEVICE_ADD("duart_midi:chan0", NS16550, XTAL(24'000'000))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, firebeat_state, midi_uart_ch0_irq_callback))
-	MCFG_DEVICE_ADD("duart_midi:chan1", NS16550, XTAL_24MHz)
+	MCFG_DEVICE_ADD("duart_midi:chan1", NS16550, XTAL(24'000'000))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, firebeat_state, midi_uart_ch1_irq_callback))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( firebeat2 )
+MACHINE_CONFIG_START(firebeat_state::firebeat2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GCX, XTAL_64MHz)
+	MCFG_CPU_ADD("maincpu", PPC403GCX, XTAL(64'000'000))
 	MCFG_CPU_PROGRAM_MAP(firebeat_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", firebeat_state,  firebeat_interrupt)
 
@@ -1398,18 +1403,18 @@ static MACHINE_CONFIG_START( firebeat2 )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	MCFG_DEVICE_ADD("duart_com", PC16552D, 0)
-	MCFG_DEVICE_ADD("duart_com:chan0", NS16550, XTAL_19_6608MHz)
-	MCFG_DEVICE_ADD("duart_com:chan1", NS16550, XTAL_19_6608MHz)
+	MCFG_DEVICE_ADD("duart_com:chan0", NS16550, XTAL(19'660'800))
+	MCFG_DEVICE_ADD("duart_com:chan1", NS16550, XTAL(19'660'800))
 	MCFG_DEVICE_ADD("duart_midi", PC16552D, 0)
-	MCFG_DEVICE_ADD("duart_midi:chan0", NS16550, XTAL_24MHz)
+	MCFG_DEVICE_ADD("duart_midi:chan0", NS16550, XTAL(24'000'000))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, firebeat_state, midi_uart_ch0_irq_callback))
-	MCFG_DEVICE_ADD("duart_midi:chan1", NS16550, XTAL_24MHz)
+	MCFG_DEVICE_ADD("duart_midi:chan1", NS16550, XTAL(24'000'000))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(DEVICE_SELF_OWNER, firebeat_state, midi_uart_ch1_irq_callback))
 	MCFG_MIDI_KBD_ADD("kbd0", DEVWRITELINE("duart_midi:chan0", ins8250_uart_device, rx_w), 31250)
 	MCFG_MIDI_KBD_ADD("kbd1", DEVWRITELINE("duart_midi:chan1", ins8250_uart_device, rx_w), 31250)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( firebeat_spu, firebeat )
+MACHINE_CONFIG_DERIVED(firebeat_state::firebeat_spu, firebeat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("audiocpu", M68000, 16000000)
@@ -1417,7 +1422,7 @@ static MACHINE_CONFIG_DERIVED( firebeat_spu, firebeat )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("sputimer", firebeat_state, spu_timer_callback, attotime::from_hz(1000));
 
-	MCFG_RF5C400_ADD("rf5c400", XTAL_16_9344MHz)
+	MCFG_RF5C400_ADD("rf5c400", XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

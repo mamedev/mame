@@ -13,8 +13,8 @@
 #include "video/konami_helper.h"
 #include "screen.h"
 
-#define CPU_CLOCK       (XTAL_24MHz / 2)        /* 68000 clock */
-#define SOUND_CLOCK     XTAL_16_9344MHz     /* YMZ280 clock */
+#define CPU_CLOCK       (XTAL(24'000'000) / 2)        /* 68000 clock */
+#define SOUND_CLOCK     XTAL(16'934'400)     /* YMZ280 clock */
 
 class bishi_state : public driver_device
 {
@@ -38,6 +38,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bishi_scanline);
 	K056832_CB_MEMBER(tile_callback);
 
+	void bishi(machine_config &config);
+	void dobouchn(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

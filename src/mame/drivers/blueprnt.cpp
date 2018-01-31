@@ -342,7 +342,7 @@ void blueprnt_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( blueprnt )
+MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 7000000/2) // 3.5 MHz
@@ -389,7 +389,7 @@ static MACHINE_CONFIG_START( blueprnt )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( grasspin, blueprnt )
+MACHINE_CONFIG_DERIVED(blueprnt_state::grasspin, blueprnt)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

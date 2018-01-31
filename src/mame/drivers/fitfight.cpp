@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0xb14000, 0xb17fff) AM_RAM //used by histryma @0x0000b25a,b270
 	AM_RANGE(0xb18000, 0xb1bfff) AM_RAM //used by histryma @0x0000b25a,b270,b286
 
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_SHARE("spriteram")
 
@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( bbprot_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE(fof_txt_tileram_w) AM_SHARE("fof_txt_tileram")
 
 	AM_RANGE(0xc00000, 0xc00fff) AM_READONLY
-	AM_RANGE(0xc00000, 0xc03fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_SHARE("spriteram")
 
@@ -225,35 +225,35 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(fitfight_state::snd_porta_r)
 {
-	//osd_printf_debug("PA R @%x\n",space.device().safe_pc());
+	//logerror("PA R %s\n",machine().describe_context());
 	return machine().rand();
 }
 
 READ8_MEMBER(fitfight_state::snd_portb_r)
 {
-	//osd_printf_debug("PB R @%x\n",space.device().safe_pc());
+	//logerror("PB R %s\n",machine().describe_context());
 	return machine().rand();
 }
 
 READ8_MEMBER(fitfight_state::snd_portc_r)
 {
-	//osd_printf_debug("PC R @%x\n",space.device().safe_pc());
+	//logerror("PC R %s\n",machine().describe_context());
 	return machine().rand();
 }
 
 WRITE8_MEMBER(fitfight_state::snd_porta_w)
 {
-	//osd_printf_debug("PA W %x @%x\n",data,space.device().safe_pc());
+	//logerror("PA W %x %s\n",data,machine().describe_context());
 }
 
 WRITE8_MEMBER(fitfight_state::snd_portb_w)
 {
-	//osd_printf_debug("PB W %x @%x\n",data,space.device().safe_pc());
+	//logerror("PB W %x %s\n",data,machine().describe_context());
 }
 
 WRITE8_MEMBER(fitfight_state::snd_portc_w)
 {
-	//osd_printf_debug("PC W %x @%x\n",data,space.device().safe_pc());
+	//logerror("PC W %x %s\n",data,machine().describe_context());
 }
 
 INTERRUPT_GEN_MEMBER(fitfight_state::snd_irq)
@@ -722,7 +722,7 @@ void fitfight_state::machine_reset()
 	m_fof_700000_data = 0;
 }
 
-static MACHINE_CONFIG_START( fitfight )
+MACHINE_CONFIG_START(fitfight_state::fitfight)
 
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(fitfight_main_map)
@@ -758,7 +758,7 @@ static MACHINE_CONFIG_START( fitfight )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bbprot )
+MACHINE_CONFIG_START(fitfight_state::bbprot)
 
 	MCFG_CPU_ADD("maincpu",M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(bbprot_main_map)

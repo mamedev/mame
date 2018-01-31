@@ -92,7 +92,7 @@ Notes:
 
 WRITE8_MEMBER(hexion_state::coincntr_w)
 {
-//logerror("%04x: coincntr_w %02x\n",space.device().safe_pc(),data);
+//logerror("%04x: coincntr_w %02x\n",m_maincpu->pc(),data);
 
 	/* bits 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0,data & 0x01);
@@ -254,15 +254,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::scanline)
 }
 
 
-static MACHINE_CONFIG_START( hexion )
+MACHINE_CONFIG_START(hexion_state::hexion)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
 	MCFG_CPU_PROGRAM_MAP(hexion_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, scanline, "screen", 0, 1)
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_24MHz/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL(24'000'000)/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
 	MCFG_K053252_INT1_ACK_CB(WRITELINE(hexion_state, irq_ack_w))
 	MCFG_K053252_INT2_ACK_CB(WRITELINE(hexion_state, nmi_ack_w))
 	MCFG_K053252_INT_TIME_CB(WRITE8(hexion_state, ccu_int_time_w))
@@ -285,11 +285,11 @@ static MACHINE_CONFIG_START( hexion )
 	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) /* MSM6295GS @ 5E, clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_K051649_ADD("k051649", XTAL_24MHz/16) /* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
+	MCFG_K051649_ADD("k051649", XTAL(24'000'000)/16) /* KONAMI 051649 // 2212P003 // JAPAN 8910EAJ @ 1D, xtal verified, divider not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hexionb, hexion )
+MACHINE_CONFIG_DERIVED(hexion_state::hexionb, hexion)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hexionb_map)
 

@@ -100,6 +100,7 @@ public:
 	uint32_t screen_update_mjsenpu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<palette_device> m_palette;
+	void mjsenpu(machine_config &config);
 };
 
 
@@ -454,7 +455,7 @@ following clocks are on the PCB
 
 */
 
-static MACHINE_CONFIG_START( mjsenpu )
+MACHINE_CONFIG_START(mjsenpu_state::mjsenpu)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E132XT, 27000000*2) /* ?? Mhz */
@@ -504,7 +505,7 @@ READ32_MEMBER(mjsenpu_state::mjsenpu_speedup_r)
 
 	if (pc == 0xadb8)
 	{
-		space.device().execute().spin_until_interrupt();
+		m_maincpu->spin_until_interrupt();
 	}
 	else
 	{

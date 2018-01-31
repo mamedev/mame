@@ -119,7 +119,7 @@ INTERRUPT_GEN_MEMBER(cheekyms_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( cheekyms )
+MACHINE_CONFIG_START(cheekyms_state::cheekyms)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,5000000/2)  /* 2.5 MHz */

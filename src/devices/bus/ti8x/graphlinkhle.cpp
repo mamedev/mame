@@ -49,7 +49,7 @@ void graph_link_hle_device::device_reset()
 }
 
 
-MACHINE_CONFIG_MEMBER(graph_link_hle_device::device_add_mconfig)
+MACHINE_CONFIG_START(graph_link_hle_device::device_add_mconfig)
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(WRITELINE(graph_link_hle_device, rx_w))
 MACHINE_CONFIG_END

@@ -147,7 +147,7 @@ WRITE8_MEMBER(dcheese_state::sound_control_w)
 	if ((diff & 0x40) && (data & 0x40))
 		m_bsmt->reset();
 	if (data != 0x40 && data != 0x60)
-		logerror("%04X:sound_control_w = %02X\n", space.device().safe_pc(), data);
+		logerror("%04X:sound_control_w = %02X\n", m_audiocpu->pc(), data);
 }
 
 
@@ -370,7 +370,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( dcheese )
+MACHINE_CONFIG_START(dcheese_state::dcheese)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_OSC)
@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( dcheese )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fredmem, dcheese )
+MACHINE_CONFIG_DERIVED(dcheese_state::fredmem, dcheese)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 359, 0, 239)
 MACHINE_CONFIG_END

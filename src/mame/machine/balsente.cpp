@@ -1059,7 +1059,7 @@ WRITE8_MEMBER(balsente_state::balsente_chip_select_w)
 					"PULSE_WIDTH",
 					"WAVE_SELECT"
 				};
-				logerror("s%04X:   CEM#%d:%s=%f\n", space.device().safe_pcbase(), i, names[m_dac_register], voltage);
+				logerror("s%04X:   CEM#%d:%s=%f\n", m_audiocpu->pcbase(), i, names[m_dac_register], voltage);
 			}
 #endif
 		}

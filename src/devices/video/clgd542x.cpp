@@ -60,24 +60,6 @@ cirrus_gd5430_device::cirrus_gd5430_device(const machine_config &mconfig, const 
 {
 }
 
-MACHINE_CONFIG_START( pcvideo_cirrus_gd5428 )
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
-
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START( pcvideo_cirrus_gd5430 )
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5430_device, screen_update)
-
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_DEVICE_ADD("vga", CIRRUS_GD5430, 0)
-MACHINE_CONFIG_END
-
 void cirrus_gd5428_device::device_start()
 {
 	zero();
@@ -216,6 +198,7 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 {
 	uint8_t divisor = 1;
 	float clock;
+	const XTAL xtal = XTAL(14'318'181);
 	uint8_t clocksel = (vga.miscellaneous_output & 0xc) >> 2;
 
 	svga.rgb8_en = 0;
@@ -225,14 +208,13 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 	svga.rgb32_en = 0;
 
 	if(gc_locked || m_vclk_num[clocksel] == 0 || m_vclk_denom[clocksel] == 0)
-		clock = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
+		clock = ((vga.miscellaneous_output & 0xc) ? xtal*2: xtal*1.75).dvalue();
 	else
 	{
 		int numerator = m_vclk_num[clocksel] & 0x7f;
 		int denominator = (m_vclk_denom[clocksel] & 0x3e) >> 1;
 		int mul = m_vclk_denom[clocksel] & 0x01 ? 2 : 1;
-		clock = 14.31818f * ((float)numerator / ((float)denominator * mul));
-		clock *= 1000000;
+		clock = (xtal * numerator / denominator / mul).dvalue();
 	}
 
 	if (!gc_locked && (vga.sequencer.data[0x07] & 0x01))

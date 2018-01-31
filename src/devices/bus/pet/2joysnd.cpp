@@ -93,7 +93,7 @@ ioport_constructor pet_userport_joystick_and_sound_device::device_input_ports() 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( pet_userport_joystick_and_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(pet_userport_joystick_and_sound_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)

@@ -279,18 +279,18 @@
 
 READ64_MEMBER(dc_cons_state::dcus_idle_skip_r )
 {
-	//if (space.device().safe_pc()==0xc0ba52a)
-	//  space.device().execute().spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(&space.device());
+	//if (m_maincpu->pc()==0xc0ba52a)
+	//  m_maincpu->spin_until_time(attotime::from_usec(2500));
+	//  device_spinuntil_int(m_maincpu);
 
 	return dc_ram[0x2303b0/8];
 }
 
 READ64_MEMBER(dc_cons_state::dcjp_idle_skip_r )
 {
-	//if (space.device().safe_pc()==0xc0bac62)
-	//  space.device().execute().spin_until_time(attotime::from_usec(2500));
-	//  device_spinuntil_int(&space.device());
+	//if (m_maincpu->pc()==0xc0bac62)
+	//  m_maincpu->spin_until_time(attotime::from_usec(2500));
+	//  device_spinuntil_int(m_maincpu);
 
 	return dc_ram[0x2302f8/8];
 }
@@ -568,13 +568,14 @@ static INPUT_PORTS_START( dc )
 	PORT_CONFSETTING(    0x03, "S-Video" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gdrom_config )
-	MCFG_DEVICE_MODIFY("cdda")
+void dc_cons_state::gdrom_config(device_t *device)
+{
+	device = device->subdevice("cdda");
 	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
-MACHINE_CONFIG_END
+}
 
-static MACHINE_CONFIG_START( dc )
+MACHINE_CONFIG_START(dc_cons_state::dc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, CPU_CLOCK)
 	MCFG_SH4_MD0(1)
@@ -593,7 +594,7 @@ static MACHINE_CONFIG_START( dc )
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL(33'868'800)*2)/3)/8)   // AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(dc_cons_state,dc_console )
@@ -621,7 +622,7 @@ static MACHINE_CONFIG_START( dc )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 
-	MCFG_AICARTC_ADD("aicartc", XTAL_32_768kHz)
+	MCFG_AICARTC_ADD("aicartc", XTAL(32'768))
 
 	MCFG_DEVICE_ADD("ata", ATA_INTERFACE, 0)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(dc_cons_state, ata_interrupt))

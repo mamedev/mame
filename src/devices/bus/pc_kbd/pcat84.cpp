@@ -103,7 +103,7 @@ const tiny_rom_entry *ibm_3270pc_122_keyboard_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ibm_pc_at_84_keyboard_device::device_add_mconfig )
+MACHINE_CONFIG_START(ibm_pc_at_84_keyboard_device::device_add_mconfig)
 	MCFG_CPU_ADD(I8048_TAG, I8048, 5364000)
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(ibm_pc_at_84_keyboard_device, bus_w))
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(ibm_pc_at_84_keyboard_device, p1_r))

@@ -85,6 +85,7 @@ public:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	uint16_t m_start_address;
 	uint16_t m_cursor_address;
+	void a6809(machine_config &config);
 private:
 	uint8_t m_cass_data[4];
 	bool m_cass_state;
@@ -220,9 +221,9 @@ void a6809_state::kbd_put(u8 data)
 	m_via->write_cb1(0);
 }
 
-static MACHINE_CONFIG_START( a6809 )
+MACHINE_CONFIG_START(a6809_state::a6809)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(a6809_mem)
 	MCFG_CPU_IO_MAP(a6809_io)
 	MCFG_MACHINE_RESET_OVERRIDE(a6809_state, a6809)
@@ -242,11 +243,11 @@ static MACHINE_CONFIG_START( a6809 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4)
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(a6809_state, cass_w))
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_MC6845_ADD("mc6845", HD6845, "screen", XTAL_4MHz / 2)
+	MCFG_MC6845_ADD("mc6845", HD6845, "screen", XTAL(4'000'000) / 2)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(12)
 

@@ -119,4 +119,5 @@ public:
 	void tilemap_copy_to_compose(uint16_t pri);
 	void do_final_mix(bitmap_rgb32 &bitmap);
 	void descramble();
+	void deroon(machine_config &config);
 };

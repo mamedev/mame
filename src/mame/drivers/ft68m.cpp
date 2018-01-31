@@ -31,6 +31,7 @@ public:
 
 	DECLARE_READ16_MEMBER(switches_r);
 
+	void ft68m(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -78,10 +79,10 @@ void ft68m_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_START( ft68m )
+MACHINE_CONFIG_START(ft68m_state::ft68m)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_19_6608MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(19'660'800) / 2)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 
 	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, 0)
@@ -91,7 +92,7 @@ static MACHINE_CONFIG_START( ft68m )
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_5))
 
-	MCFG_DEVICE_ADD("stc", AM9513A, XTAL_19_6608MHz / 8)
+	MCFG_DEVICE_ADD("stc", AM9513A, XTAL(19'660'800) / 8)
 	MCFG_AM9513_OUT2_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_6))
 	MCFG_AM9513_OUT3_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
 	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("mpsc", upd7201_new_device, rxca_w))

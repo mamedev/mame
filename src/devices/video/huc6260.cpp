@@ -66,8 +66,8 @@ huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, d
 
 void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int vpos = m_screen->vpos();
-	int hpos = m_screen->hpos();
+	int vpos = screen().vpos();
+	int hpos = screen().hpos();
 	int h = m_last_h;
 	int v = m_last_v;
 	uint16_t *bitmap_line = &m_bmp->pix16(v);
@@ -177,7 +177,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		}
 	}
 
-	m_timer->adjust( m_screen->time_until_pos( v, h ) );
+	m_timer->adjust( screen().time_until_pos( v, h ) );
 }
 
 
@@ -294,16 +294,16 @@ void huc6260_device::device_reset()
 	m_pixel_clock = 0;
 	memset(m_palette, 0x00, sizeof(m_palette));
 
-	m_last_v = m_screen->vpos();
-	m_last_h = m_screen->hpos();
-	m_timer->adjust( m_screen->time_until_pos( ( m_screen->vpos() + 1 ) % 263, 0 ) );
+	m_last_v = screen().vpos();
+	m_last_h = screen().hpos();
+	m_timer->adjust( screen().time_until_pos( ( screen().vpos() + 1 ) % 263, 0 ) );
 }
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( huc6260_device::device_add_mconfig )
+MACHINE_CONFIG_START(huc6260_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette",  huc6260_device::PALETTE_SIZE)
 	MCFG_PALETTE_INIT_OWNER(huc6260_device, huc6260)
 MACHINE_CONFIG_END

@@ -36,7 +36,7 @@
 	downcast<gt64xxx_device *>(device)->set_irq_info(_irq_num);
 
 #define MCFG_GT64XXX_SET_CS(_cs_num, _map) \
-	downcast<gt64xxx_device *>(device)->set_map(_cs_num, address_map_delegate(ADDRESS_MAP_NAME(_map), #_map), owner);
+	downcast<gt64xxx_device *>(device)->set_map(_cs_num, address_map_delegate(ADDRESS_MAP_NAME(_map), #_map), this);
 
 #define MCFG_GT64XX_SET_SIMM(_index, _size) \
 	downcast<gt64xxx_device *>(device)->set_simm_size(_index, _size);

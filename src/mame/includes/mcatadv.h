@@ -59,4 +59,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_mcatadv);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void mcatadv_draw_tilemap_part( screen_device &screen, uint16_t* current_scroll, uint16_t* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void nost(machine_config &config);
+	void mcatadv(machine_config &config);
 };

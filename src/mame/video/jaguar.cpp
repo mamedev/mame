@@ -822,7 +822,7 @@ void jaguar_state::video_start()
 	save_item(NAME(m_blitter_regs));
 	save_item(NAME(m_gpu_regs));
 	save_item(NAME(m_cpu_irq_state));
-	m_pixel_clock = m_is_cojag ? COJAG_PIXEL_CLOCK : JAGUAR_CLOCK;
+	m_pixel_clock = m_is_cojag ? COJAG_PIXEL_CLOCK.value() : JAGUAR_CLOCK.value();
 }
 
 

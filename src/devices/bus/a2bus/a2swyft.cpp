@@ -61,9 +61,6 @@ a2bus_swyft_device::a2bus_swyft_device(const machine_config &mconfig, device_typ
 
 void a2bus_swyft_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(SWYFT_ROM_REGION).c_str())->base();
 
 	save_item(NAME(m_rombank));

@@ -88,6 +88,7 @@ public:
 	DECLARE_READ8_MEMBER(c100_r);
 	DECLARE_WRITE8_MEMBER(c100_w);
 
+	void tk2000(machine_config &config);
 private:
 	int m_speaker_state;
 	int m_cassette_state;
@@ -562,14 +563,14 @@ static INPUT_PORTS_START( tk2000 )
 	PORT_CONFSETTING(0x03, "Amber")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tk2000 )
+MACHINE_CONFIG_START(tk2000_state::tk2000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(A2_CPU_TAG, M6502, 1021800)     /* close to actual CPU frequency of 1.020484 MHz */
 	MCFG_CPU_PROGRAM_MAP(apple2_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tk2000_state, apple2_interrupt, "screen", 0, 1)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_DEVICE_ADD(A2_VIDEO_TAG, APPLE2_VIDEO, XTAL_14_31818MHz)
+	MCFG_DEVICE_ADD(A2_VIDEO_TAG, APPLE2_VIDEO, XTAL(14'318'181))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)

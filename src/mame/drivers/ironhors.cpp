@@ -373,7 +373,7 @@ Hsync is 15,56khz
 These clocks make the emulation run too fast.
 */
 
-static MACHINE_CONFIG_START( ironhors )
+MACHINE_CONFIG_START(ironhors_state::ironhors)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, 18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
@@ -439,7 +439,7 @@ READ8_MEMBER(ironhors_state::farwest_soundlatch_r)
 	return m_soundlatch->read(m_soundcpu->space(AS_PROGRAM), 0);
 }
 
-static MACHINE_CONFIG_DERIVED( farwest, ironhors )
+MACHINE_CONFIG_DERIVED(ironhors_state::farwest, ironhors)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(farwest_master_map)

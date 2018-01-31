@@ -184,12 +184,12 @@ WRITE32_MEMBER(psikyo_state::s1945_mcu_w)
 			m_s1945_mcu_latching |= 4;
 			break;
 		default:
-//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, m_s1945_mcu_direction, m_s1945_mcu_latch1, m_s1945_mcu_latch2, space.device().safe_pc());
+//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, m_s1945_mcu_direction, m_s1945_mcu_latch1, m_s1945_mcu_latch2, m_maincpu->pc());
 			break;
 		}
 		break;
 	default:
-//      logerror("MCU.w %x, %02x (%x)\n", offset, data, space.device().safe_pc());
+//      logerror("MCU.w %x, %02x (%x)\n", offset, data, m_maincpu->pc());
 		;
 	}
 }
@@ -232,7 +232,7 @@ READ32_MEMBER(psikyo_state::s1945_mcu_r)
 static ADDRESS_MAP_START( psikyo_map, AS_PROGRAM, 32, psikyo_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                                     // ROM (not all used)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")       // Sprites, buffered by two frames (list buffered + fb buffered)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(psikyo_vram_0_w) AM_SHARE("vram_0")       // Layer 0
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(psikyo_vram_1_w) AM_SHARE("vram_1")       // Layer 1
 	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_SHARE("vregs")                           // RAM + Vregs
@@ -280,7 +280,7 @@ static ADDRESS_MAP_START( psikyo_bootleg_map, AS_PROGRAM, 32, psikyo_state )
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("boot_spritebuf")              // RAM (it copies the spritelist here, the HW probably doesn't have automatic buffering like the originals?
 
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")       // Sprites, buffered by two frames (list buffered + fb buffered)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(psikyo_vram_0_w) AM_SHARE("vram_0")       // Layer 0
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(psikyo_vram_1_w) AM_SHARE("vram_1")       // Layer 1
 	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_SHARE("vregs")                               // RAM + Vregs
@@ -303,7 +303,7 @@ READ32_MEMBER(psikyo_state::sngkace_input_r)
 		case 0x0:   return ioport("P1_P2")->read();
 		case 0x1:   return ioport("DSW")->read();
 		case 0x2:   return ioport("COIN")->read();
-		default:    logerror("PC %06X - Read input %02X !\n", space.device().safe_pc(), offset * 2);
+		default:    logerror("PC %06X - Read input %02X !\n", m_maincpu->pc(), offset * 2);
 				return 0;
 	}
 }
@@ -344,7 +344,7 @@ READ32_MEMBER(psikyo_state::gunbird_input_r)
 	{
 		case 0x0:   return ioport("P1_P2")->read();
 		case 0x1:   return ioport("DSW")->read();
-		default:    logerror("PC %06X - Read input %02X !\n", space.device().safe_pc(), offset * 2);
+		default:    logerror("PC %06X - Read input %02X !\n", m_maincpu->pc(), offset * 2);
 				return 0;
 	}
 }
@@ -391,7 +391,7 @@ READ32_MEMBER(psikyo_state::s1945_input_r)
 		case 0x0:   return ioport("P1_P2")->read();
 		case 0x1:   return (ioport("DSW")->read() & 0xffff000f) | s1945_mcu_r(space, offset - 1, mem_mask);
 		case 0x2:   return s1945_mcu_r(space, offset - 1, mem_mask);
-		default:    logerror("PC %06X - Read input %02X !\n", space.device().safe_pc(), offset * 2);
+		default:    logerror("PC %06X - Read input %02X !\n", m_maincpu->pc(), offset * 2);
 					return 0;
 	}
 }
@@ -999,14 +999,14 @@ void psikyo_state::machine_reset()
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( sngkace )
+MACHINE_CONFIG_START(psikyo_state::sngkace)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sngkace_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", psikyo_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sngkace_sound_map)
 	MCFG_CPU_IO_MAP(sngkace_sound_io_map)
 
@@ -1030,7 +1030,7 @@ static MACHINE_CONFIG_START( sngkace )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(32'000'000)/4) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono",  1.0)
 
@@ -1046,7 +1046,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( gunbird )
+MACHINE_CONFIG_START(psikyo_state::gunbird)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
@@ -1086,12 +1086,12 @@ static MACHINE_CONFIG_START( gunbird )
 	MCFG_GENERIC_LATCH_SEPARATE_ACKNOWLEDGE(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( s1945jn, gunbird )
+MACHINE_CONFIG_DERIVED(psikyo_state::s1945jn, gunbird)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(s1945jn_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( s1945bl ) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
+MACHINE_CONFIG_START(psikyo_state::s1945bl) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
@@ -1118,7 +1118,7 @@ static MACHINE_CONFIG_START( s1945bl ) /* Bootleg hardware based on the unprotec
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_LOW) // ?? clock
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_LOW) // ?? clock
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, s1945bl_oki_map)
 MACHINE_CONFIG_END
@@ -1130,7 +1130,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( s1945 )
+MACHINE_CONFIG_START(psikyo_state::s1945)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)

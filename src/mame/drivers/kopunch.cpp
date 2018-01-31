@@ -229,7 +229,7 @@ void kopunch_state::machine_start()
 	save_item(NAME(m_scrollx));
 }
 
-static MACHINE_CONFIG_START( kopunch )
+MACHINE_CONFIG_START(kopunch_state::kopunch)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, 4000000) // 4 MHz?

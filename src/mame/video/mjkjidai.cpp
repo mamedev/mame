@@ -47,7 +47,7 @@ WRITE8_MEMBER(mjkjidai_state::mjkjidai_videoram_w)
 
 WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
 {
-//  logerror("%04x: port c0 = %02x\n",space.device().safe_pc(),data);
+//  logerror("%s: port c0 = %02x\n",m_maincpu->pc(),data);
 
 	/* bit 0 = NMI enable */
 	m_nmi_enable = data & 1;

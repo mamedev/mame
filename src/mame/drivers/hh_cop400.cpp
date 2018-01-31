@@ -7,8 +7,11 @@
 
   TODO:
   - why does h2hbaskb(and clones) need a workaround on writing L pins?
-  - is h2hhockey supposed to show timer countdown? or only on TMS1000 version?
   - plus1: which sensor position is which colour?
+  - vidchal: Add screen and gun cursor with brightness detection callback,
+    and softwarelist for the video tapes. We'd also need a VHS player device.
+    The emulated lightgun itself appears to be working fine(eg. add a 30hz
+    timer to IN3 to score +100)
 
 ***************************************************************************/
 
@@ -36,6 +39,8 @@
 #include "lightfgt.lh" // clickable
 #include "mdallas.lh"
 #include "qkracer.lh"
+#include "unkeinv.lh"
+#include "vidchal.lh"
 
 //#include "hh_cop400_test.lh" // common test-layout - use external artwork
 
@@ -72,7 +77,7 @@ public:
 	int m_sk;                       // MCU SK line state
 	u16 m_inp_mux;                  // multiplexed inputs mask
 
-	u16 read_inputs(int columns);
+	u16 read_inputs(int columns, u16 colmask = ~0);
 
 	// display common
 	int m_display_wait;             // led/lamp off-delay in milliseconds (default 33ms)
@@ -221,10 +226,10 @@ void hh_cop400_state::display_matrix(int maxx, int maxy, u32 setx, u32 sety, boo
 
 // generic input handlers
 
-u16 hh_cop400_state::read_inputs(int columns)
+u16 hh_cop400_state::read_inputs(int columns, u16 colmask)
 {
 	// active low
-	u16 ret = ~0;
+	u16 ret = ~0 & colmask;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
@@ -263,6 +268,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_g);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_READ8_MEMBER(read_l);
+	void ctstein(machine_config &config);
 };
 
 // handlers
@@ -282,9 +288,8 @@ WRITE8_MEMBER(ctstein_state::write_l)
 READ8_MEMBER(ctstein_state::read_l)
 {
 	// L4-L7: multiplexed inputs
-	return read_inputs(3) << 4 | 0xf;
+	return read_inputs(3, 0xf) << 4 | 0xf;
 }
-
 
 // config
 
@@ -308,7 +313,7 @@ static INPUT_PORTS_START( ctstein )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Blue Button")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ctstein )
+MACHINE_CONFIG_START(ctstein_state::ctstein)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP421, 850000) // approximation - RC osc. R=12K, C=100pF
@@ -333,7 +338,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
-  Coleco Head to Head Basketball/Hockey/Soccer
+  Coleco Head to Head: Electronic Basketball/Hockey/Soccer (model 2150/2160/2170)
   * COP420 MCU label COP420L-NEZ/N
   * 2-digit 7seg display, 41 other leds, 1-bit sound
 
@@ -341,7 +346,9 @@ MACHINE_CONFIG_END
   the same, only differing on game time. The PCB is pre-configured on G1+IN2
   and IN3 to select the game.
 
-  An earlier revision of this runs on TMS1000.
+  An earlier revision of this runs on TMS1000. Model numbers are the same.
+  From the outside, an easy way to spot the difference is the Start/Display
+  button: TMS1000 version button label is D, COP420 label is a *.
 
 ***************************************************************************/
 
@@ -356,7 +363,9 @@ public:
 	DECLARE_WRITE8_MEMBER(write_g);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_READ8_MEMBER(read_in);
-	DECLARE_WRITE_LINE_MEMBER(write_so);
+	void h2hsoccer(machine_config &config);
+	void h2hbaskb(machine_config &config);
+	void h2hhockey(machine_config &config);
 };
 
 // handlers
@@ -392,9 +401,8 @@ WRITE8_MEMBER(h2hbaskb_state::write_l)
 READ8_MEMBER(h2hbaskb_state::read_in)
 {
 	// IN: multiplexed inputs
-	return (read_inputs(4) & 7) | (m_inp_matrix[4]->read() & 8);
+	return read_inputs(4, 7) | (m_inp_matrix[4]->read() & 8);
 }
-
 
 // config
 
@@ -447,7 +455,7 @@ static INPUT_PORTS_START( h2hsoccer )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( h2hbaskb )
+MACHINE_CONFIG_START(h2hbaskb_state::h2hbaskb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP420, 850000) // approximation - RC osc. R=43K, C=101pF
@@ -467,13 +475,13 @@ static MACHINE_CONFIG_START( h2hbaskb )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( h2hhockey, h2hbaskb )
+MACHINE_CONFIG_DERIVED(h2hbaskb_state::h2hhockey, h2hbaskb)
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_h2hhockey)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( h2hsoccer, h2hbaskb )
+MACHINE_CONFIG_DERIVED(h2hbaskb_state::h2hsoccer, h2hbaskb)
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_h2hsoccer)
@@ -507,6 +515,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_sk);
 	DECLARE_WRITE_LINE_MEMBER(write_so);
 	DECLARE_WRITE8_MEMBER(write_l);
+	void einvaderc(machine_config &config);
 };
 
 // handlers
@@ -558,7 +567,6 @@ WRITE8_MEMBER(einvaderc_state::write_l)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( einvaderc )
@@ -571,7 +579,7 @@ static INPUT_PORTS_START( einvaderc )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( einvaderc )
+MACHINE_CONFIG_START(einvaderc_state::einvaderc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP444L, 850000) // approximation - RC osc. R=47K, C=100pF
@@ -590,6 +598,130 @@ static MACHINE_CONFIG_START( einvaderc )
 	MCFG_SCREEN_VISIBLE_AREA(0, 913-1, 0, 1080-1)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_einvaderc)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Gordon Barlow Design electronic Space Invaders game (unreleased, from patent US4345764)
+  * COP421 (likely a development chip)
+  * 36+9 LEDs, 1-bit sound
+
+  This game is presumedly unreleased. The title is unknown, the patent simply names
+  it "Hand-held electronic game". There is no mass-manufacture company assigned
+  to it either. The game seems unfinished(no scorekeeping, some bugs), and the design
+  is very complex. Player ship and bullets are on a moving "wand", a 2-way mirror
+  makes it appear on the same plane as the enemies and barriers.
+
+***************************************************************************/
+
+class unkeinv_state : public hh_cop400_state
+{
+public:
+	unkeinv_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_cop400_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(write_g);
+	DECLARE_WRITE8_MEMBER(write_d);
+	DECLARE_WRITE8_MEMBER(write_l);
+	DECLARE_READ8_MEMBER(read_l);
+
+	DECLARE_INPUT_CHANGED_MEMBER(position_changed);
+	void unkeinv(machine_config &config);
+};
+
+// handlers
+
+void unkeinv_state::prepare_display()
+{
+	display_matrix(8+8, 8+12, m_g << 4 | m_d, m_l, false);
+
+	// positional led row is on L6,L7
+	u16 wand = m_display_state[7] << 8 | m_display_state[6];
+	m_display_state[8 + m_inp_matrix[1]->read()] = wand;
+	display_update();
+}
+
+WRITE8_MEMBER(unkeinv_state::write_g)
+{
+	// G0-G3: led select part
+	// G2,G3: input mux
+	m_g = ~data & 0xf;
+	prepare_display();
+}
+
+WRITE8_MEMBER(unkeinv_state::write_d)
+{
+	// D0-D3: led select part
+	m_d = ~data & 0xf;
+	prepare_display();
+}
+
+WRITE8_MEMBER(unkeinv_state::write_l)
+{
+	// L0-L7: led data
+	m_l = ~data & 0xff;
+	prepare_display();
+}
+
+READ8_MEMBER(unkeinv_state::read_l)
+{
+	u8 ret = 0xff;
+
+	// L0-L5+G2: positional odd
+	// L0-L5+G3: positional even
+	u8 pos = m_inp_matrix[1]->read();
+	if (m_g & 4 && pos & 1)
+		ret ^= (1 << (pos >> 1));
+	if (m_g & 8 && ~pos & 1)
+		ret ^= (1 << (pos >> 1));
+
+	// L7+G3: fire button
+	if (m_g & 8 && m_inp_matrix[0]->read())
+		ret ^= 0x80;
+
+	return ret & ~m_l;
+}
+
+// config
+
+INPUT_CHANGED_MEMBER(unkeinv_state::position_changed)
+{
+	prepare_display();
+}
+
+static INPUT_PORTS_START( unkeinv )
+	PORT_START("IN.0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	PORT_START("IN.1")
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, unkeinv_state, position_changed, nullptr)
+INPUT_PORTS_END
+
+MACHINE_CONFIG_START(unkeinv_state::unkeinv)
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", COP421, 850000) // frequency guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_COP400_WRITE_G_CB(WRITE8(unkeinv_state, write_g))
+	MCFG_COP400_WRITE_D_CB(WRITE8(unkeinv_state, write_d))
+	MCFG_COP400_WRITE_L_CB(WRITE8(unkeinv_state, write_l))
+	MCFG_COP400_READ_L_CB(READ8(unkeinv_state, read_l))
+	MCFG_COP400_READ_L_TRISTATE_CB(CONSTANT(0xff))
+	MCFG_COP400_WRITE_SO_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_unkeinv)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -633,6 +765,7 @@ public:
 	DECLARE_READ8_MEMBER(read_g);
 	DECLARE_WRITE_LINE_MEMBER(write_so);
 	DECLARE_READ_LINE_MEMBER(read_si);
+	void lchicken(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -673,7 +806,7 @@ WRITE8_MEMBER(lchicken_state::write_g)
 READ8_MEMBER(lchicken_state::read_g)
 {
 	// G0-G3: multiplexed inputs
-	return read_inputs(4) & m_g;
+	return read_inputs(4, m_g);
 }
 
 WRITE_LINE_MEMBER(lchicken_state::write_so)
@@ -688,7 +821,6 @@ READ_LINE_MEMBER(lchicken_state::read_si)
 	// SI: SO
 	return m_so;
 }
-
 
 // config
 
@@ -732,7 +864,7 @@ void lchicken_state::machine_start()
 	save_item(NAME(m_motor_pos));
 }
 
-static MACHINE_CONFIG_START( lchicken )
+MACHINE_CONFIG_START(lchicken_state::lchicken)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP421, 850000) // approximation - RC osc. R=12K, C=100pF
@@ -778,6 +910,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_g);
 	DECLARE_READ8_MEMBER(read_l);
 	DECLARE_READ8_MEMBER(read_g);
+	void funjacks(machine_config &config);
 };
 
 // handlers
@@ -807,7 +940,7 @@ WRITE8_MEMBER(funjacks_state::write_g)
 READ8_MEMBER(funjacks_state::read_l)
 {
 	// L4,L5: multiplexed inputs
-	return (read_inputs(3) & 0x30) | m_l;
+	return read_inputs(3, 0x30) | m_l;
 }
 
 READ8_MEMBER(funjacks_state::read_g)
@@ -816,7 +949,6 @@ READ8_MEMBER(funjacks_state::read_g)
 	// G2,G3: inputs
 	return m_inp_matrix[3]->read() | (m_g & 2);
 }
-
 
 // config
 
@@ -842,7 +974,7 @@ static INPUT_PORTS_START( funjacks )
 	PORT_CONFSETTING(    0x08, "2" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( funjacks )
+MACHINE_CONFIG_START(funjacks_state::funjacks)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=47K, C=56pF
@@ -890,6 +1022,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_g);
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	void funrlgl(machine_config &config);
 };
 
 // handlers
@@ -915,7 +1048,6 @@ WRITE8_MEMBER(funrlgl_state::write_g)
 	m_speaker->level_w(data >> 3 & 1);
 }
 
-
 // config
 
 static INPUT_PORTS_START( funrlgl )
@@ -937,7 +1069,7 @@ INPUT_CHANGED_MEMBER(funrlgl_state::reset_button)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( funrlgl )
+MACHINE_CONFIG_START(funrlgl_state::funrlgl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=91pF
@@ -983,6 +1115,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_g);
 	DECLARE_READ8_MEMBER(read_in);
+	void mdallas(machine_config &config);
 };
 
 // handlers
@@ -1019,9 +1152,8 @@ WRITE8_MEMBER(mdallas_state::write_g)
 READ8_MEMBER(mdallas_state::read_in)
 {
 	// IN: multiplexed inputs
-	return read_inputs(6) & 0xf;
+	return read_inputs(6, 0xf);
 }
-
 
 // config
 
@@ -1073,7 +1205,7 @@ static INPUT_PORTS_START( mdallas )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("North") // N
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mdallas )
+MACHINE_CONFIG_START(mdallas_state::mdallas)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP444L, 1000000) // approximation - RC osc. R=57K, C=101pF
@@ -1118,6 +1250,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_READ8_MEMBER(read_l);
+	void plus1(machine_config &config);
 };
 
 // handlers
@@ -1139,7 +1272,6 @@ READ8_MEMBER(plus1_state::read_l)
 	return m_inp_matrix[1]->read() & m_l;
 }
 
-
 // config
 
 static INPUT_PORTS_START( plus1 )
@@ -1157,7 +1289,7 @@ static INPUT_PORTS_START( plus1 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( plus1 )
+MACHINE_CONFIG_START(plus1_state::plus1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=100pF
@@ -1211,6 +1343,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_READ8_MEMBER(read_g);
+	void lightfgt(machine_config &config);
 };
 
 // handlers
@@ -1247,9 +1380,8 @@ READ8_MEMBER(lightfgt_state::read_g)
 {
 	// G: multiplexed inputs
 	m_inp_mux = m_d << 1 | m_so;
-	return read_inputs(5);
+	return read_inputs(5, 0xf);
 }
-
 
 // config
 
@@ -1285,7 +1417,7 @@ static INPUT_PORTS_START( lightfgt )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_COCKTAIL
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( lightfgt )
+MACHINE_CONFIG_START(lightfgt_state::lightfgt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP421, 950000) // approximation - RC osc. R=82K, C=56pF
@@ -1329,6 +1461,7 @@ public:
 	DECLARE_READ8_MEMBER(read_l);
 	DECLARE_READ8_MEMBER(read_in);
 	DECLARE_WRITE_LINE_MEMBER(write_so);
+	void bship82(machine_config &config);
 };
 
 // handlers
@@ -1342,13 +1475,13 @@ WRITE8_MEMBER(bship82_state::write_d)
 READ8_MEMBER(bship82_state::read_l)
 {
 	// L: multiplexed inputs
-	return read_inputs(4) & 0xff;
+	return read_inputs(4, 0xff);
 }
 
 READ8_MEMBER(bship82_state::read_in)
 {
 	// IN: multiplexed inputs
-	return read_inputs(4) >> 8 & 0xf;
+	return read_inputs(4, 0xf00) >> 8;
 }
 
 WRITE_LINE_MEMBER(bship82_state::write_so)
@@ -1356,7 +1489,6 @@ WRITE_LINE_MEMBER(bship82_state::write_so)
 	// SO: led
 	display_matrix(1, 1, state, 1);
 }
-
 
 // config
 
@@ -1439,13 +1571,13 @@ base pulled high with 4.7K resistor, connects directly to G3, 1K resistor to G2,
 
 */
 
-static MACHINE_CONFIG_START( bship82 )
+MACHINE_CONFIG_START(bship82_state::bship82)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP420, 750000) // approximation - RC osc. R=14K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(bship82_state, write_d))
-	MCFG_COP400_WRITE_G_CB(DEVWRITE8("dac", dac_byte_interface, write)) // G: 4-bit signed DAC
+	MCFG_COP400_WRITE_G_CB(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_COP400_READ_L_CB(READ8(bship82_state, read_l))
 	MCFG_COP400_READ_IN_CB(READ8(bship82_state, read_in))
 	MCFG_COP400_WRITE_SO_CB(WRITELINE(bship82_state, write_so))
@@ -1456,7 +1588,7 @@ static MACHINE_CONFIG_START( bship82 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // unknown DAC
+	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // see above
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
@@ -1488,6 +1620,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_READ8_MEMBER(read_in);
 	DECLARE_WRITE_LINE_MEMBER(write_sk);
+	void qkracer(machine_config &config);
 };
 
 // handlers
@@ -1526,7 +1659,7 @@ WRITE8_MEMBER(qkracer_state::write_l)
 READ8_MEMBER(qkracer_state::read_in)
 {
 	// IN: multiplexed inputs
-	return read_inputs(5) & 0xf;
+	return read_inputs(5, 0xf);
 }
 
 WRITE_LINE_MEMBER(qkracer_state::write_sk)
@@ -1535,7 +1668,6 @@ WRITE_LINE_MEMBER(qkracer_state::write_sk)
 	m_sk = state;
 	prepare_display();
 }
-
 
 // config
 
@@ -1571,7 +1703,7 @@ static INPUT_PORTS_START( qkracer )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Tables")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( qkracer )
+MACHINE_CONFIG_START(qkracer_state::qkracer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP420, 1000000) // approximation - RC osc. R=47K, C=100pF
@@ -1586,6 +1718,101 @@ static MACHINE_CONFIG_START( qkracer )
 	MCFG_DEFAULT_LAYOUT(layout_qkracer)
 
 	/* no sound! */
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Select Merchandise Video Challenger
+  * COP420 MCU label COP420-TDX/N
+  * 6-digit 7seg led display, 3 other leds, 4-bit sound
+
+  This is a lightgun with scorekeeping. The "games" themselves were released
+  on VHS tapes. To determine scoring, the lightgun detects strobe lighting
+  from objects in the video.
+
+  known releases:
+  - Japan: Video Challenger, published by Takara
+  - UK: Video Challenger, published by Bandai
+  - Canada: Video Challenger, published by Irwin
+
+***************************************************************************/
+
+class vidchal_state : public hh_cop400_state
+{
+public:
+	vidchal_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_cop400_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(write_d);
+	DECLARE_WRITE8_MEMBER(write_l);
+	DECLARE_WRITE_LINE_MEMBER(write_sk);
+	void vidchal(machine_config &config);
+};
+
+// handlers
+
+void vidchal_state::prepare_display()
+{
+	set_display_segmask(0x3f, 0xff);
+	display_matrix(8, 7, m_l, m_d | m_sk << 6);
+}
+
+WRITE8_MEMBER(vidchal_state::write_d)
+{
+	// D: CD4028BE to digit select
+	m_d = 1 << data & 0x3f;
+	prepare_display();
+}
+
+WRITE8_MEMBER(vidchal_state::write_l)
+{
+	// L: digit segment data
+	m_l = bitswap<8>(data,0,3,1,5,4,7,2,6);
+	prepare_display();
+}
+
+WRITE_LINE_MEMBER(vidchal_state::write_sk)
+{
+	// SK: hit led
+	m_sk = state;
+	prepare_display();
+}
+
+// config
+
+static INPUT_PORTS_START( vidchal )
+	PORT_START("IN.0") // port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // TODO: light sensor
+INPUT_PORTS_END
+
+MACHINE_CONFIG_START(vidchal_state::vidchal)
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", COP420, 900000) // approximation
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_COP400_WRITE_D_CB(WRITE8(vidchal_state, write_d))
+	MCFG_COP400_WRITE_G_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_COP400_WRITE_L_CB(WRITE8(vidchal_state, write_l))
+	MCFG_COP400_READ_IN_CB(IOPORT("IN.0"))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(vidchal_state, write_sk))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_vidchal)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1609,12 +1836,12 @@ ROM_START( h2hbaskb )
 	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
 ROM_END
 
-ROM_START( h2hhockey )
+ROM_START( h2hhockey ) // dumped from Basketball
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
 ROM_END
 
-ROM_START( h2hsoccer )
+ROM_START( h2hsoccer ) // dumped from Basketball
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "cop420l-nmy", 0x0000, 0x0400, CRC(87152509) SHA1(acdb869b65d49b3b9855a557ed671cbbb0f61e2c) )
 ROM_END
@@ -1626,6 +1853,12 @@ ROM_START( einvaderc )
 
 	ROM_REGION( 80636, "svg", 0)
 	ROM_LOAD( "einvaderc.svg", 0, 80636, CRC(a52d0166) SHA1(f69397ebcc518701f30a47b4d62e5a700825375a) )
+ROM_END
+
+
+ROM_START( unkeinv )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop421_us4345764", 0x0000, 0x0400, CRC(0068c3a3) SHA1(4e5fd566a5a26c066cc14623a9bd01e109ebf797) ) // typed in from patent US4345764, good print quality
 ROM_END
 
 
@@ -1677,15 +1910,23 @@ ROM_START( qkracer )
 ROM_END
 
 
+ROM_START( vidchal )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop420-tdx_n", 0x0000, 0x0400, CRC(c9bd041c) SHA1(ab0dcaf4741620fa4c28ab75337a23d646af7626) )
+ROM_END
+
+
 
 //    YEAR  NAME       PARENT   CMP MACHINE    INPUT      STATE          INIT COMPANY, FULLNAME, FLAGS
 CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   ctstein_state,   0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1980, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  h2hbaskb_state,  0, "Coleco", "Head to Head Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hhockey, h2hbaskb, 0, h2hhockey, h2hhockey, h2hbaskb_state,  0, "Coleco", "Head to Head Hockey (COP420L version)", MACHINE_SUPPORTS_SAVE )
-CONS( 1980, h2hsoccer, h2hbaskb, 0, h2hsoccer, h2hsoccer, h2hbaskb_state,  0, "Coleco", "Head to Head Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  h2hbaskb_state,  0, "Coleco", "Head to Head: Electronic Basketball (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hhockey, h2hbaskb, 0, h2hhockey, h2hhockey, h2hbaskb_state,  0, "Coleco", "Head to Head: Electronic Hockey (COP420L version)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, h2hsoccer, h2hbaskb, 0, h2hsoccer, h2hsoccer, h2hbaskb_state,  0, "Coleco", "Head to Head: Electronic Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, einvaderc_state, 0, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE )
+
+CONS( 1980, unkeinv,   0,        0, unkeinv,   unkeinv,   unkeinv_state,   0, "Gordon Barlow Design", "unknown electronic Space Invaders game (patent)", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, lchicken,  0,        0, lchicken,  lchicken,  lchicken_state,  0, "LJN", "I Took a Lickin' From a Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_MECHANICAL )
 
@@ -1698,6 +1939,8 @@ CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  lightfgt_state,  0, "M
 CONS( 1982, bship82,   bship,    0, bship82,   bship82,   bship82_state,   0, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1978, qkracer,   0,        0, qkracer,   qkracer,   qkracer_state,   0, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
+CONS( 1987, vidchal,   0,        0, vidchal,   vidchal,   vidchal_state,   0, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

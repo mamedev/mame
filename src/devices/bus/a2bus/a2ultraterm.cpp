@@ -104,7 +104,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_videx160_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_videx160_device::device_add_mconfig)
 	MCFG_SCREEN_ADD( ULTRATERM_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(CLOCK_LOW, 882, 0, 720, 370, 0, 350 )
 	MCFG_SCREEN_UPDATE_DEVICE( ULTRATERM_MC6845_NAME, mc6845_device, screen_update )
@@ -157,9 +157,6 @@ a2bus_ultratermenh_device::a2bus_ultratermenh_device(const machine_config &mconf
 
 void a2bus_videx160_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = machine().root_device().memregion(this->subtag(ULTRATERM_ROM_REGION).c_str())->base();
 
 	m_chrrom = machine().root_device().memregion(this->subtag(ULTRATERM_GFX_REGION).c_str())->base();
@@ -256,7 +253,7 @@ void a2bus_videx160_device::write_c0nx(uint8_t offset, uint8_t data)
 
 uint8_t a2bus_videx160_device::read_cnxx(uint8_t offset)
 {
-	return m_rom[offset+(m_slot * 0x100)];
+	return m_rom[offset+(slotno() * 0x100)];
 }
 
 /*-------------------------------------------------

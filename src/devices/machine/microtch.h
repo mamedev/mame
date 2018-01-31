@@ -76,6 +76,6 @@ DECLARE_DEVICE_TYPE(MICROTOUCH, microtouch_device)
 	devcb = &microtouch_device::static_set_stx_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_MICROTOUCH_TOUCH_CB(_class, _touch_cb) \
-	microtouch_device::static_set_touch_callback(*device, microtouch_device::touch_cb(&_class::_touch_cb, (_class *)owner));
+	microtouch_device::static_set_touch_callback(*device, microtouch_device::touch_cb(&_class::_touch_cb, this));
 
 #endif // MAME_MACHINE_MICROTCH_H

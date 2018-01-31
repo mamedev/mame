@@ -16,11 +16,11 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/74259.h"
 #include "machine/konami1.h"
-#include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "screen.h"
+#include "speaker.h"
 
-#define MASTER_CLOCK          XTAL_18_432MHz
+#define MASTER_CLOCK          XTAL(18'432'000)
 
 
 /*************************************
@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( rocnrope_map, AS_PROGRAM, 8, rocnrope_state )
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x8080, 0x8087) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sound_data_w)
 	AM_RANGE(0x8182, 0x818d) AM_WRITE(rocnrope_interrupt_vector_w)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -205,8 +205,7 @@ INTERRUPT_GEN_MEMBER(rocnrope_state::vblank_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-
-static MACHINE_CONFIG_START( rocnrope )
+MACHINE_CONFIG_START(rocnrope_state::rocnrope)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI1, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
@@ -239,9 +238,8 @@ static MACHINE_CONFIG_START( rocnrope )
 
 	/* sound hardware */
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-
-	MCFG_FRAGMENT_ADD(timeplt_sound)
+	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
+	downcast<timeplt_audio_device *>(device)->timeplt_sound(config);
 MACHINE_CONFIG_END
 
 /*************************************
@@ -265,7 +263,7 @@ ROM_START( rocnrope )
 	ROM_LOAD( "rr4.4h",       0xc000, 0x2000, CRC(7acb2a05) SHA1(93762d1890f40abc98372a2aa9fe0f63252b6389) )
 	ROM_LOAD( "rnr_h5.vid",   0xe000, 0x2000, CRC(150a6264) SHA1(930ccf8dcf4971d0a15f406d9114be5ecfaa1727) )
 
-	ROM_REGION( 0x10000, "tpsound", 0 )
+	ROM_REGION( 0x10000, "timeplt_audio:tpsound", 0 )
 	ROM_LOAD( "rnr_7a.snd",   0x0000, 0x1000, CRC(75d2c4e2) SHA1(b701019b4e7b06b268be660ce7958b5367318c27) )
 	ROM_LOAD( "rnr_8a.snd",   0x1000, 0x1000, CRC(ca4325ae) SHA1(34ac035c0c2ed6bcafde1491d976bb9e9d2a2a7d) )
 
@@ -296,7 +294,7 @@ ROM_START( rocnropek )
 	ROM_LOAD( "rnr_h4.vid",   0xc000, 0x2000, CRC(9b2e5f2a) SHA1(e91d7a9141dbe0fc5eacc2c5a672935993a3316f) )
 	ROM_LOAD( "rnr_h5.vid",   0xe000, 0x2000, CRC(150a6264) SHA1(930ccf8dcf4971d0a15f406d9114be5ecfaa1727) )
 
-	ROM_REGION( 0x10000, "tpsound", 0 )
+	ROM_REGION( 0x10000, "timeplt_audio:tpsound", 0 )
 	ROM_LOAD( "rnr_7a.snd",   0x0000, 0x1000, CRC(75d2c4e2) SHA1(b701019b4e7b06b268be660ce7958b5367318c27) )
 	ROM_LOAD( "rnr_8a.snd",   0x1000, 0x1000, CRC(ca4325ae) SHA1(34ac035c0c2ed6bcafde1491d976bb9e9d2a2a7d) )
 
@@ -344,7 +342,7 @@ ROM_START( ropeman )
 	ROM_LOAD( "r4.4j",            0xc000, 0x2000, CRC(7acb2a05) SHA1(93762d1890f40abc98372a2aa9fe0f63252b6389) )
 	ROM_LOAD( "r5.5j",            0xe000, 0x2000, CRC(150a6264) SHA1(930ccf8dcf4971d0a15f406d9114be5ecfaa1727) )
 
-	ROM_REGION( 0x10000, "tpsound", 0 )
+	ROM_REGION( 0x10000, "timeplt_audio:tpsound", 0 )
 	ROM_LOAD( "r12.7a",           0x0000, 0x1000, CRC(75d2c4e2) SHA1(b701019b4e7b06b268be660ce7958b5367318c27) )
 	ROM_LOAD( "r13.8a",           0x1000, 0x1000, CRC(ca4325ae) SHA1(34ac035c0c2ed6bcafde1491d976bb9e9d2a2a7d) )
 

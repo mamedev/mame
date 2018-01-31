@@ -180,7 +180,7 @@ WRITE8_MEMBER(crgolf_state::switch_input_select_w)
 
 WRITE8_MEMBER(crgolf_state::unknown_w)
 {
-	logerror("%04X:unknown_w = %02X\n", space.device().safe_pc(), data);
+	logerror("%04X:unknown_w = %02X\n", m_audiocpu->pc(), data);
 }
 
 
@@ -513,7 +513,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( crgolf )
+MACHINE_CONFIG_START(crgolf_state::crgolf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/3/2)
@@ -559,7 +559,7 @@ static MACHINE_CONFIG_START( crgolf )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( crgolfhi, crgolf )
+MACHINE_CONFIG_DERIVED(crgolf_state::crgolfhi, crgolf)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(crgolf_state, vck_callback))
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_DERIVED( crgolfhi, crgolf )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mastrglf, crgolfhi )
+MACHINE_CONFIG_DERIVED(crgolf_state::mastrglf, crgolfhi)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

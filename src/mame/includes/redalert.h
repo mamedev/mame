@@ -73,16 +73,18 @@ public:
 	DECLARE_WRITE8_MEMBER(demoneye_ay8910_data_w);
 	void get_pens(pen_t *pens);
 	void get_panther_pens(pen_t *pens);
+	void demoneye(machine_config &config);
+	void demoneye_video(machine_config &config);
+	void demoneye_audio(machine_config &config);
+	void ww3(machine_config &config);
+	void ww3_video(machine_config &config);
+	void ww3_audio(machine_config &config);
+	void panther(machine_config &config);
+	void panther_video(machine_config &config);
+	void redalert(machine_config &config);
+	void redalert_video(machine_config &config);
+	void redalert_video_common(machine_config &config);
+	void redalert_audio(machine_config &config);
+	void redalert_audio_m37b(machine_config &config);
+	void redalert_audio_voice(machine_config &config);
 };
-/*----------- defined in audio/redalert.c -----------*/
-
-MACHINE_CONFIG_EXTERN( redalert_audio );
-MACHINE_CONFIG_EXTERN( ww3_audio );
-MACHINE_CONFIG_EXTERN( demoneye_audio );
-
-/*----------- defined in video/redalert.c -----------*/
-
-MACHINE_CONFIG_EXTERN( ww3_video );
-MACHINE_CONFIG_EXTERN( panther_video );
-MACHINE_CONFIG_EXTERN( redalert_video );
-MACHINE_CONFIG_EXTERN( demoneye_video );

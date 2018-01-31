@@ -350,7 +350,6 @@ public:
 	uint8_t m_vblank_state;
 	uint8_t m_cpuio_data[4];
 	uint8_t m_sio_reset_ctrl;
-	uint8_t m_sio_irq_clear;
 	uint8_t m_sio_irq_enable;
 	uint8_t m_sio_irq_state;
 	uint8_t m_sio_led_state;
@@ -413,7 +412,26 @@ public:
 	DECLARE_WRITE32_MEMBER(wheel_board_w);
 
 	std::string sioIRQString(uint8_t data);
+	void vegascore(machine_config &config);
+	void vegas(machine_config &config);
+	void vegas250(machine_config &config);
+	void vegas32m(machine_config &config);
+	void vegasban(machine_config &config);
+	void vegasv3(machine_config &config);
+	void denver(machine_config &config);
 
+	void nbanfl(machine_config &config);
+	void sf2049te(machine_config &config);
+	void sf2049se(machine_config &config);
+	void nbashowt(machine_config &config);
+	void gauntdl(machine_config &config);
+	void sf2049(machine_config &config);
+	void gauntleg(machine_config &config);
+	void cartfury(machine_config &config);
+	void tenthdeg(machine_config &config);
+	void nbagold(machine_config &config);
+	void roadburn(machine_config &config);
+	void warfa(machine_config &config);
 };
 
 /*************************************
@@ -448,7 +466,6 @@ void vegas_state::machine_start()
 	save_item(NAME(m_vblank_state));
 	save_item(NAME(m_cpuio_data));
 	save_item(NAME(m_sio_reset_ctrl));
-	save_item(NAME(m_sio_irq_clear));
 	save_item(NAME(m_sio_irq_enable));
 	save_item(NAME(m_sio_irq_state));
 	save_item(NAME(m_sio_led_state));
@@ -550,8 +567,11 @@ READ32_MEMBER( vegas_state::timekeeper_r )
 		result = (result & ~0x00ff0000) | (m_timekeeper->read(space, offset * 4 + 2, 0xff) << 16);
 	if (ACCESSING_BITS_24_31)
 		result = (result & ~0xff000000) | (m_timekeeper->read(space, offset * 4 + 3, 0xff) << 24);
-	if (offset*4 >= 0x7ff0)
-		if (LOG_TIMEKEEPER) logerror("timekeeper_r(%04X & %08X) = %08X\n", offset*4, mem_mask, result);
+	if (offset * 4 >= 0x7ff0) {
+		// Initial RTC check expects reads to the RTC to take some time
+		machine().device<cpu_device>("maincpu")->eat_cycles(30);
+		if (LOG_TIMEKEEPER) logerror("%s: timekeeper_r(%04X & %08X) = %08X\n", machine().describe_context(), offset * 4, mem_mask, result);
+	}
 	return result;
 }
 
@@ -599,9 +619,9 @@ WRITE_LINE_MEMBER(vegas_state::duart_irq_cb)
 WRITE_LINE_MEMBER(vegas_state::vblank_assert)
 {
 	if (LOG_SIO)
-		logerror("vblank_assert: state: %d\n", state);
+		logerror("vblank_assert: m_sio_reset_ctrl: %04x state: %d\n", m_sio_reset_ctrl, state);
 	// latch on the correct polarity transition
-	if ((state && !(m_sio_reset_ctrl & 0x10)) || (!state && (m_sio_reset_ctrl & 0x10)))
+	if ((m_sio_irq_enable & 0x20) && ((state && !(m_sio_reset_ctrl & 0x10)) || (!state && (m_sio_reset_ctrl & 0x10))))
 	{
 		m_sio_irq_state |= 0x20;
 		update_sio_irqs();
@@ -630,7 +650,6 @@ WRITE_LINE_MEMBER(vegas_state::ethernet_interrupt)
 void vegas_state::reset_sio()
 {
 	m_sio_reset_ctrl = 0;
-	m_sio_irq_clear = 0;
 	m_sio_irq_enable = 0;
 	m_sio_irq_state = 0;
 	m_sio_led_state = 0;
@@ -644,7 +663,7 @@ READ8_MEMBER(vegas_state::sio_r)
 	switch (index) {
 	case 0:
 		// Reset Control:  Bit 0=>Reset IOASIC, Bit 1=>Reset NSS Connection, Bit 2=>Reset SMC, Bit 3=>Reset VSYNC, Bit 4=>VSYNC Polarity
-		result = m_sio_irq_clear;
+		result = m_sio_reset_ctrl;
 		// Hack for fpga programming finished
 		m_cpuio_data[3] |= 0x1;
 		break;
@@ -663,6 +682,7 @@ READ8_MEMBER(vegas_state::sio_r)
 			std::string sioBitSel = sioIRQString(result);
 			logerror("%08X: sio_r: INTR CAUSE 0x%02x %s\n", machine().device("maincpu")->safe_pc(), result, sioBitSel);
 		}
+		//m_sio_irq_state &= ~0x02;
 		break;
 	case 3:
 		// Interrupt Status
@@ -724,20 +744,22 @@ WRITE8_MEMBER(vegas_state::sio_w)
 			if (LOG_SIO)
 				logerror("sio_w: Reset Control offset: %08x index: %d data: %02X\n", offset, index, data);
 			// Reset Control:  Bit 0=>Reset IOASIC, Bit 1=>Reset NSS Connection, Bit 2=>Reset SMC, Bit 3=>Reset VSYNC, Bit 4=>VSYNC Polarity
-			m_sio_reset_ctrl = data;
-			/* bit 0x01 is used to reset the IOASIC */
-			if (!(data & 0x01))
+			/* bit 0 is used to reset the IOASIC */
+			if (!(data & (1 << 0)))
 			{
 				m_ioasic->ioasic_reset();
 				m_dcs->reset_w(data & 0x01);
 			}
-			/* toggle bit 0x08 low to reset the VBLANK */
-			if (!(data & 0x08))
+			if ((data & (1 << 2)) && !(m_sio_reset_ctrl & (1 << 2))) {
+				m_ethernet->reset();
+			}
+			/* toggle bit 3 low to reset the VBLANK */
+			if (!(data & (1 << 3)))
 			{
 				m_sio_irq_state &= ~0x20;
 				update_sio_irqs();
 			}
-			m_sio_irq_clear = data;
+			m_sio_reset_ctrl = data;
 			break;
 		case 1:
 			// Interrupt Enable
@@ -770,7 +792,7 @@ WRITE8_MEMBER(vegas_state::sio_w)
 			m_timekeeper->watchdog_write(space, offset, data);
 			if (0 && LOG_SIO)
 				logerror("sio_w: Watchdog: %08x index: %d data: %02X\n", offset, index, data);
-			//space.device().execute().eat_cycles(100);
+			//m_maincpu->eat_cycles(100);
 			break;
 		}
 	}
@@ -871,8 +893,8 @@ READ32_MEMBER( vegas_state::analog_port_r )
 {
 	//logerror("%08X: analog_port_r = %08X & %08X\n", machine().device("maincpu")->safe_pc(), m_pending_analog_read, mem_mask);
 	// Clear interrupt
+	m_sio_irq_state &= ~0x02;
 	if (m_sio_irq_enable & 0x02) {
-		m_sio_irq_state &= ~0x02;
 		update_sio_irqs();
 	}
 	// TODO: Need to look at the proper shift value for sf2049
@@ -1032,6 +1054,7 @@ CUSTOM_INPUT_MEMBER(vegas_state::i40_r)
 		data = ~index & 0xf;
 		break;
 	default:
+		//logerror("%08X: i40_r: select: %x index: %d data: %x\n", machine().device("maincpu")->safe_pc(), m_i40_data, index, data);
 		break;
 	}
 	//if (m_i40_data & 0x1000)
@@ -1675,7 +1698,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( vegascore )
+MACHINE_CONFIG_START(vegas_state::vegascore)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R5000LE, vegas_state::SYSTEM_CLOCK*2)
@@ -1714,6 +1737,7 @@ static MACHINE_CONFIG_START( vegascore )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
+	// Screeen size and timing is re-calculated later in voodoo card
 	MCFG_SCREEN_REFRESH_RATE(57)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
@@ -1723,28 +1747,23 @@ static MACHINE_CONFIG_START( vegascore )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( vegas, vegascore )
+MACHINE_CONFIG_DERIVED(vegas_state::vegas, vegascore)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( vegas250, vegascore )
+MACHINE_CONFIG_DERIVED(vegas_state::vegas250, vegascore)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(vegas_state::SYSTEM_CLOCK*2.5)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( vegas32m, vegas250)
+MACHINE_CONFIG_DERIVED(vegas_state::vegas32m, vegas250)
 	MCFG_DEVICE_MODIFY(PCI_ID_NILE)
 	MCFG_VRC5074_SET_SDRAM(0, 0x02000000)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( vegasban, vegas32m)
-	// Short term hack to get nbashowt, nbanfl, nbagold to boot.
-	// Probably due to CRTC registers not used for timing in voodoo
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(120)
-
+MACHINE_CONFIG_DERIVED(vegas_state::vegasban, vegas32m)
 	MCFG_DEVICE_REMOVE(PCI_ID_VIDEO)
 	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_BANSHEE, ":maincpu")
 	MCFG_VOODOO_PCI_FBMEM(16)
@@ -1753,16 +1772,11 @@ static MACHINE_CONFIG_DERIVED( vegasban, vegas32m)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( vegasv3, vegas32m)
+MACHINE_CONFIG_DERIVED(vegas_state::vegasv3, vegas32m)
 	MCFG_CPU_REPLACE("maincpu", RM7000LE, vegas_state::SYSTEM_CLOCK*2.5)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
 	MCFG_MIPS3_SYSTEM_CLOCK(vegas_state::SYSTEM_CLOCK)
-
-	// Short term hack to get cartfury to boot.
-	// Probably due to CRTC registers not used for timing in voodoo
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(120)
 
 	MCFG_DEVICE_REMOVE(PCI_ID_VIDEO)
 	MCFG_VOODOO_PCI_ADD(PCI_ID_VIDEO, TYPE_VOODOO_3, ":maincpu")
@@ -1772,7 +1786,7 @@ static MACHINE_CONFIG_DERIVED( vegasv3, vegas32m)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( denver, vegascore )
+MACHINE_CONFIG_DERIVED(vegas_state::denver, vegascore)
 	MCFG_CPU_REPLACE("maincpu", RM7000LE, vegas_state::SYSTEM_CLOCK*2.5)
 	MCFG_MIPS3_ICACHE_SIZE(16384)
 	MCFG_MIPS3_DCACHE_SIZE(16384)
@@ -1819,7 +1833,7 @@ MACHINE_CONFIG_END
 
 // Per driver configs
 
-static MACHINE_CONFIG_DERIVED( gauntleg, vegas )
+MACHINE_CONFIG_DERIVED(vegas_state::gauntleg, vegas)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
@@ -1832,7 +1846,7 @@ static MACHINE_CONFIG_DERIVED( gauntleg, vegas )
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gauntdl, vegas )
+MACHINE_CONFIG_DERIVED(vegas_state::gauntdl, vegas)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
@@ -1845,7 +1859,7 @@ static MACHINE_CONFIG_DERIVED( gauntdl, vegas )
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( warfa, vegas250 )
+MACHINE_CONFIG_DERIVED(vegas_state::warfa, vegas250)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
@@ -1858,7 +1872,7 @@ static MACHINE_CONFIG_DERIVED( warfa, vegas250 )
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tenthdeg, vegas )
+MACHINE_CONFIG_DERIVED(vegas_state::tenthdeg, vegas)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
@@ -1871,10 +1885,10 @@ static MACHINE_CONFIG_DERIVED( tenthdeg, vegas )
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( roadburn, vegas32m )
+MACHINE_CONFIG_DERIVED(vegas_state::roadburn, vegas32m)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DSIO, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x200a)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0ddd)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
@@ -1884,7 +1898,7 @@ static MACHINE_CONFIG_DERIVED( roadburn, vegas32m )
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nbashowt, vegasban )
+MACHINE_CONFIG_DERIVED(vegas_state::nbashowt, vegasban)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
@@ -1899,7 +1913,7 @@ static MACHINE_CONFIG_DERIVED( nbashowt, vegasban )
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, i40_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nbanfl, vegasban )
+MACHINE_CONFIG_DERIVED(vegas_state::nbanfl, vegasban)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 
@@ -1912,7 +1926,7 @@ static MACHINE_CONFIG_DERIVED( nbanfl, vegasban )
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, i40_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nbagold, vegasban)
+MACHINE_CONFIG_DERIVED(vegas_state::nbagold, vegasban)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
 
@@ -1925,10 +1939,10 @@ static MACHINE_CONFIG_DERIVED( nbagold, vegasban)
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, i40_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sf2049 , denver )
+MACHINE_CONFIG_DERIVED(vegas_state::sf2049, denver)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x200d)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
@@ -1939,9 +1953,10 @@ static MACHINE_CONFIG_DERIVED( sf2049 , denver )
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, wheel_board_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sf2049se, denver )
+MACHINE_CONFIG_DERIVED(vegas_state::sf2049se, denver)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
@@ -1952,9 +1967,10 @@ static MACHINE_CONFIG_DERIVED( sf2049se, denver )
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, wheel_board_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sf2049te, denver )
+MACHINE_CONFIG_DERIVED(vegas_state::sf2049te, denver)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x872)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_SFRUSHRK)
@@ -1965,9 +1981,10 @@ static MACHINE_CONFIG_DERIVED( sf2049te, denver )
 	MCFG_MIDWAY_IOASIC_AUX_OUT_CB(WRITE32(vegas_state, wheel_board_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cartfury, vegasv3 )
+MACHINE_CONFIG_DERIVED(vegas_state::cartfury, vegasv3)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CARNEVIL)
@@ -2398,8 +2415,8 @@ GAME( 1999, warfac,     warfa,    warfa,    warfa,    vegas_state,  warfa,    RO
 
 
 /* Durango + DSIO + Voodoo 2 */
-GAME( 1999, roadburn,   0,        roadburn, roadburn, vegas_state, roadburn, ROT0, "Atari Games",   "Road Burners (ver 1.04)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, roadburn1,  roadburn, roadburn, roadburn, vegas_state, roadburn, ROT0, "Atari Games",   "Road Burners (ver 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, roadburn,   0,        roadburn, roadburn, vegas_state, roadburn, ROT0, "Atari Games",   "Road Burners (ver 1.04)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, roadburn1,  roadburn, roadburn, roadburn, vegas_state, roadburn, ROT0, "Atari Games",   "Road Burners (ver 1.0)", MACHINE_SUPPORTS_SAVE )
 
 /* Durango + DSIO? + Voodoo banshee */
 GAME( 1998, nbashowt,   0,        nbashowt, nbashowt, vegas_state, nbashowt, ROT0, "Midway Games",  "NBA Showtime: NBA on NBC (ver 2.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -1052,7 +1052,7 @@ WRITE32_MEMBER(interpro_ioga_device::timer3_w)
 		LOGMASKED(LOG_TIMER3, "timer3_w data 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
 
 		// theory: timer 3 is 12.5MHz (typical value of 12500 giving a delay of 1ms)
-		m_timer3->adjust(attotime::zero, false, attotime::from_hz(XTAL_12_5MHz));
+		m_timer3->adjust(attotime::zero, false, attotime::from_hz(XTAL(12'500'000)));
 	}
 }
 
@@ -1210,7 +1210,7 @@ WRITE16_MEMBER(turquoise_ioga_device::eth_w)
 	m_memory_space->write_word(address, data, mem_mask);
 }
 
-READ16_MEMBER(turquoise_ioga_device::eth_r) const
+READ16_MEMBER(turquoise_ioga_device::eth_r)
 {
 	const u32 address = m_eth_base | ((offset << 1) & ~ETH_BASE_MASK);
 
@@ -1291,7 +1291,7 @@ WRITE32_MEMBER(sapphire_ioga_device::eth_w)
 	m_memory_space->write_dword(address, data, mem_mask);
 }
 
-READ32_MEMBER(sapphire_ioga_device::eth_r) const
+READ32_MEMBER(sapphire_ioga_device::eth_r)
 {
 	// top two bits give channel (0=A, 4=B, 8=C, f=?)
 	const int channel = offset >> 28;

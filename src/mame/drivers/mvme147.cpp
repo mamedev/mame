@@ -184,7 +184,7 @@
 #endif
 
 /* from documentataion: http://www.m88k.com/Docs/147/147aih.pdf but crystal and divider not known */
-#define BAUDGEN_CLOCK XTAL_5MHz
+#define BAUDGEN_CLOCK XTAL(5'000'000)
 #define SCC_CLOCK (BAUDGEN_CLOCK) /* This gives prompt at the RS232 terminal device (9600) */
 
 class mvme147_state : public driver_device
@@ -215,6 +215,7 @@ mvme147_state(const machine_config &mconfig, device_type type, const char *tag)
 	//DECLARE_WRITE16_MEMBER (vme_a16_w);
 	virtual void machine_start () override;
 	virtual void machine_reset () override;
+	void mvme147(machine_config &config);
 protected:
 
 private:
@@ -287,8 +288,8 @@ READ32_MEMBER (mvme147_state::bootvect_r){
 }
 
 WRITE32_MEMBER (mvme147_state::bootvect_w){
-	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
@@ -644,9 +645,9 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (mvme147)
+MACHINE_CONFIG_START(mvme147_state::mvme147)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68030, XTAL_16MHz)
+	MCFG_CPU_ADD ("maincpu", M68030, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP (mvme147_mem)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", 1, mvme147_vme_cards, nullptr)

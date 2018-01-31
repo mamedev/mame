@@ -13,7 +13,7 @@
    software.
 */
 
-#define UPD7759_STANDARD_CLOCK      XTAL_640kHz
+#define UPD7759_STANDARD_CLOCK      XTAL(640'000)
 
 class upd775x_device : public device_t, public device_sound_interface
 {

@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, yunsun16_state )
 	AM_RANGE(0x800180, 0x800181) AM_WRITE8(sound_bank_w, 0x00ff)    // Sound
 	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  // Sound
 	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITENOP    // ? 0 (during int)
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    // Palette
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    // Palette
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(vram_1_w) AM_SHARE("vram_1") // Layer 1
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(vram_0_w) AM_SHARE("vram_0") // Layer 0
 	AM_RANGE(0x910000, 0x910fff) AM_RAM AM_SHARE("spriteram")   // Sprites
@@ -586,21 +586,21 @@ MACHINE_RESET_MEMBER(yunsun16_state, shocking)
                                 Magic Bubble
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( magicbub )
+MACHINE_CONFIG_START(yunsun16_state::magicbub)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", yunsun16_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_port_map)
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2, 512, 0x20, 0x180-0x20, 260, 0, 0xe0) /* TODO: completely inaccurate */
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2, 512, 0x20, 0x180-0x20, 260, 0, 0xe0) /* TODO: completely inaccurate */
 	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update_yunsun16)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -614,12 +614,12 @@ static MACHINE_CONFIG_START( magicbub )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
@@ -629,10 +629,10 @@ MACHINE_CONFIG_END
                                 Shocking
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( shocking )
+MACHINE_CONFIG_START(yunsun16_state::shocking)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", yunsun16_state,  irq2_line_hold)
 
@@ -641,7 +641,7 @@ static MACHINE_CONFIG_START( shocking )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2, 512, 0, 0x180-4, 260, 0, 0xe0) /* TODO: completely inaccurate */
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000)/2, 512, 0, 0x180-4, 260, 0, 0xe0) /* TODO: completely inaccurate */
 	MCFG_SCREEN_UPDATE_DRIVER(yunsun16_state, screen_update_yunsun16)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -652,7 +652,7 @@ static MACHINE_CONFIG_START( shocking )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)

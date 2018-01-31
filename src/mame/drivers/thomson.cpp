@@ -617,7 +617,7 @@ SLOT_INTERFACE_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_START( to7 )
+MACHINE_CONFIG_START(thomson_state::to7)
 
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to7 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to7 )
@@ -688,7 +688,7 @@ static MACHINE_CONFIG_START( to7 )
 	MCFG_LEGACY_FLOPPY_CONFIG(thomson_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(thomson_state, fdc_index_3_w))
 
-		MCFG_WD2793_ADD("wd2793", XTAL_1MHz)
+		MCFG_WD2793_ADD("wd2793", XTAL(1'000'000))
 		MCFG_FLOPPY_DRIVE_ADD("wd2793:0", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
 		MCFG_FLOPPY_DRIVE_ADD("wd2793:1", cd90_640_floppies, "dd", thomson_state::cd90_640_formats)
 
@@ -718,7 +718,7 @@ static MACHINE_CONFIG_START( to7 )
 
 /* TODO: CONVERT THIS TO A SLOT DEVICE (RF 57-932) */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
 	/// 2400 7N2
@@ -761,7 +761,7 @@ static MACHINE_CONFIG_START( to7 )
 	MCFG_SOFTWARE_LIST_ADD("to7_qd_list","to7_qd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( t9000, to7 )
+MACHINE_CONFIG_DERIVED(thomson_state::t9000, to7)
 MACHINE_CONFIG_END
 
 
@@ -923,7 +923,7 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_DERIVED( to770, to7 )
+MACHINE_CONFIG_DERIVED(thomson_state::to770, to7)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to770 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to770 )
 
@@ -949,7 +949,7 @@ static MACHINE_CONFIG_DERIVED( to770, to7 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_cart_list","to7_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( to770a, to770 )
+MACHINE_CONFIG_DERIVED(thomson_state::to770a, to770)
 	MCFG_DEVICE_REMOVE("t770_cart_list")
 	MCFG_SOFTWARE_LIST_ADD("t770a_cart_list","to770a_cart")
 MACHINE_CONFIG_END
@@ -1113,7 +1113,7 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_DERIVED( mo5, to7 )
+MACHINE_CONFIG_DERIVED(thomson_state::mo5, to7)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5 )
 
@@ -1158,7 +1158,7 @@ static MACHINE_CONFIG_DERIVED( mo5, to7 )
 	MCFG_RAM_DEFAULT_SIZE("112K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mo5e, mo5 )
+MACHINE_CONFIG_DERIVED(thomson_state::mo5e, mo5)
 MACHINE_CONFIG_END
 
 
@@ -1473,7 +1473,7 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_DERIVED( to9, to7 )
+MACHINE_CONFIG_DERIVED(thomson_state::to9, to7)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9 )
 
@@ -1695,7 +1695,7 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_DERIVED( to8, to7 )
+MACHINE_CONFIG_DERIVED(thomson_state::to8, to7)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to8 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to8 )
 
@@ -1732,7 +1732,7 @@ static MACHINE_CONFIG_DERIVED( to8, to7 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("to7_qd_list", "to7_qd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( to8d, to8 )
+MACHINE_CONFIG_DERIVED(thomson_state::to8d, to8)
 MACHINE_CONFIG_END
 
 
@@ -1858,7 +1858,7 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_DERIVED( to9p, to7 )
+MACHINE_CONFIG_DERIVED(thomson_state::to9p, to7)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9p )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9p )
 
@@ -2207,7 +2207,7 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_DERIVED( mo6, to7 )
+MACHINE_CONFIG_DERIVED(thomson_state::mo6, to7)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo6 )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo6 )
 
@@ -2261,7 +2261,7 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("mo5_qd_list","mo5_qd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pro128, mo6 )
+MACHINE_CONFIG_DERIVED(thomson_state::pro128, mo6)
 	MCFG_DEVICE_REMOVE("mo6_cass_list")
 	MCFG_DEVICE_REMOVE("mo6_flop_list")
 
@@ -2476,7 +2476,7 @@ INPUT_PORTS_END
 
 /* ------------ driver ------------ */
 
-static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
+MACHINE_CONFIG_DERIVED(thomson_state::mo5nr, to7)
 	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5nr )
 	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5nr )
 

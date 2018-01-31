@@ -103,6 +103,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(piratesh_interrupt);
 	K056832_CB_MEMBER(piratesh_tile_callback);
 	K055673_CB_MEMBER(piratesh_sprite_callback);
+	void piratesh(machine_config &config);
 };
 
 
@@ -394,7 +395,7 @@ static ADDRESS_MAP_START( piratesh_map, AS_PROGRAM, 16, piratesh_state )
 	AM_RANGE(0x2a1000, 0x2a3fff) AM_WRITENOP
 	AM_RANGE(0x2b0000, 0x2b000f) AM_DEVREADWRITE("k053250", k053250ps_device, reg_r, reg_w) // LVC
 	AM_RANGE(0x300000, 0x3000ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
-	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("IN0")
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("IN1")
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("DSW1")
@@ -580,16 +581,16 @@ MACHINE_RESET_MEMBER(piratesh_state,piratesh)
 
 }
 
-static MACHINE_CONFIG_START( piratesh )
+MACHINE_CONFIG_START(piratesh_state::piratesh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(piratesh_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", piratesh_state, piratesh_interrupt, "screen", 0, 1)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
 	MCFG_K053252_OFFSETS(40, 16) // TODO
 
 	MCFG_MACHINE_START_OVERRIDE(piratesh_state, piratesh)
@@ -642,7 +643,7 @@ static MACHINE_CONFIG_START( piratesh )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(piratesh_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.2)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.2)

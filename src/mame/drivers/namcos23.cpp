@@ -1269,7 +1269,7 @@ Notes:
 #include <float.h>
 
 
-#define JVSCLOCK    (XTAL_14_7456MHz)
+#define JVSCLOCK    (XTAL(14'745'600))
 
 //#define H8CLOCK     (16737350)      /* from 2061 */
 //#define BUSCLOCK    (16737350*2)    /* 33MHz CPU bus clock / input */
@@ -1597,6 +1597,13 @@ public:
 	void render_project(poly_vertex &pv);
 	void render_one_model(const namcos23_render_entry *re);
 	void render_run(bitmap_rgb32 &bitmap);
+	void timecrs2v4a(machine_config &config);
+	void ss23e2(machine_config &config);
+	void gorgon(machine_config &config);
+	void ss23(machine_config &config);
+	void s23(machine_config &config);
+	void gmen(machine_config &config);
+	void timecrs2(machine_config &config);
 };
 
 
@@ -3536,7 +3543,7 @@ static GFXDECODE_START( namcos23 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( gorgon )
+MACHINE_CONFIG_START(namcos23_state::gorgon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
@@ -3566,7 +3573,7 @@ static MACHINE_CONFIG_START( gorgon )
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
 	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
 	MCFG_DEVICE_MODIFY("subcpu:sci1")
@@ -3602,7 +3609,7 @@ static MACHINE_CONFIG_START( gorgon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( s23 )
+MACHINE_CONFIG_START(namcos23_state::s23)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*4)
@@ -3632,7 +3639,7 @@ static MACHINE_CONFIG_START( s23 )
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
 	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
 	MCFG_DEVICE_MODIFY("subcpu:sci1")
@@ -3667,28 +3674,28 @@ static MACHINE_CONFIG_START( s23 )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( timecrs2, s23 )
+MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2, s23)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("iocpu")
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gmen, s23 )
+MACHINE_CONFIG_DERIVED(namcos23_state::gmen, s23)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(BUSCLOCK*5)
 	MCFG_CPU_PROGRAM_MAP(gmen_mips_map)
 
-	MCFG_CPU_ADD("gmen_sh2", SH2, XTAL_28_7MHz)
+	MCFG_CPU_ADD("gmen_sh2", SH2, XTAL(28'700'000))
 	MCFG_CPU_PROGRAM_MAP(gmen_sh2_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(namcos23_state,gmen)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ss23 )
+MACHINE_CONFIG_START(namcos23_state::ss23)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4650BE, BUSCLOCK*5)
@@ -3709,7 +3716,7 @@ static MACHINE_CONFIG_START( ss23 )
 
 	MCFG_NAMCO_SETTINGS_ADD("namco_settings")
 
-	MCFG_RTC4543_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC4543_ADD("rtc", XTAL(32'768))
 	MCFG_RTC4543_DATA_CALLBACK(DEVWRITELINE("subcpu:sci1", h8_sci_device, rx_w))
 
 	MCFG_DEVICE_MODIFY("subcpu:sci1")
@@ -3744,7 +3751,7 @@ static MACHINE_CONFIG_START( ss23 )
 	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( timecrs2v4a, ss23 )
+MACHINE_CONFIG_DERIVED(namcos23_state::timecrs2v4a, ss23)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("iocpu", H83334, JVSCLOCK )
 	MCFG_CPU_PROGRAM_MAP( timecrs2iobrdmap )
@@ -3756,7 +3763,7 @@ static MACHINE_CONFIG_DERIVED( timecrs2v4a, ss23 )
 	MCFG_H8_SCI_TX_CALLBACK(DEVWRITELINE(":iocpu:sci0", h8_sci_device, rx_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ss23e2, ss23 )
+MACHINE_CONFIG_DERIVED(namcos23_state::ss23e2, ss23)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

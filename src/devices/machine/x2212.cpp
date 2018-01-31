@@ -125,8 +125,8 @@ void x2212_device::nvram_default()
 
 void x2212_device::nvram_read(emu_file &file)
 {
-	uint8_t *buffer = (uint8_t *) alloca(m_size_data);
-	file.read(buffer, m_size_data);
+	auto buffer = std::make_unique<uint8_t[]>(m_size_data);
+	file.read(buffer.get(), m_size_data);
 	for (int byte = 0; byte < m_size_data; byte++)
 	{
 		m_sram->write_byte(byte, 0xff);

@@ -86,8 +86,8 @@
 #include "amusco.lh"
 
 
-#define MASTER_CLOCK        XTAL_22_1184MHz     /* confirmed */
-#define SECOND_CLOCK        XTAL_15MHz          /* confirmed */
+#define MASTER_CLOCK        XTAL(22'118'400)     /* confirmed */
+#define SECOND_CLOCK        XTAL(15'000'000)          /* confirmed */
 
 #define CPU_CLOCK           MASTER_CLOCK / 4    /* guess */
 #define CRTC_CLOCK          SECOND_CLOCK / 8    /* guess */
@@ -127,6 +127,8 @@ public:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(update_row);
 	DECLARE_PALETTE_INIT(amusco);
+	void amusco(machine_config &config);
+	void draw88pkr(machine_config &config);
 protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
@@ -520,7 +522,7 @@ PALETTE_INIT_MEMBER(amusco_state,amusco)
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( amusco )
+MACHINE_CONFIG_START(amusco_state::amusco)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088, CPU_CLOCK)        // 5 MHz ?
@@ -552,7 +554,7 @@ static MACHINE_CONFIG_START( amusco )
 	MCFG_I8155_IN_PORTB_CB(READ8(amusco_state, lpt_status_r))
 	// Port C uses ALT 3 mode, which MAME does not currently emulate
 
-	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
+	MCFG_MSM5832_ADD("rtc", XTAL(32'768))
 
 	MCFG_DEVICE_ADD("rtc_interface", I8155, 0)
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(amusco_state, rtc_control_w))
@@ -587,7 +589,7 @@ static MACHINE_CONFIG_START( amusco )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( draw88pkr, amusco )
+MACHINE_CONFIG_DERIVED(amusco_state::draw88pkr, amusco)
 	//MCFG_DEVICE_MODIFY("ppi_outputs") // Some bits are definitely different
 MACHINE_CONFIG_END
 

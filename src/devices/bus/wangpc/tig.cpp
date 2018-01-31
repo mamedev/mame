@@ -112,7 +112,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( wangpc_tig_device::hgdc_display_pixels )
 //  MACHINE_CONFIG_START( wangpc_tig )
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( wangpc_tig_device::device_add_mconfig )
+MACHINE_CONFIG_START(wangpc_tig_device::device_add_mconfig)
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, wangpc_tig_device, screen_update)
 	MCFG_SCREEN_SIZE(80*10, 25*12)
@@ -122,12 +122,12 @@ MACHINE_CONFIG_MEMBER( wangpc_tig_device::device_add_mconfig )
 
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_DEVICE_ADD(UPD7720_0_TAG, UPD7220, XTAL_52_832MHz/28)
+	MCFG_DEVICE_ADD(UPD7720_0_TAG, UPD7220, XTAL(52'832'000)/28)
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_0_map)
 	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(wangpc_tig_device, hgdc_draw_text)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
 
-	MCFG_DEVICE_ADD(UPD7720_1_TAG, UPD7220, XTAL_52_832MHz/28)
+	MCFG_DEVICE_ADD(UPD7720_1_TAG, UPD7220, XTAL(52'832'000)/28)
 	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
 	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(wangpc_tig_device, hgdc_display_pixels)
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)

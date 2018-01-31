@@ -728,8 +728,33 @@ if (BUSES["ELECTRON"]~=null) then
 		MAME_DIR .. "src/devices/bus/electron/plus3.h",
 		MAME_DIR .. "src/devices/bus/electron/pwrjoy.cpp",
 		MAME_DIR .. "src/devices/bus/electron/pwrjoy.h",
+		MAME_DIR .. "src/devices/bus/electron/rombox.cpp",
+		MAME_DIR .. "src/devices/bus/electron/rombox.h",
+		MAME_DIR .. "src/devices/bus/electron/romboxp.cpp",
+		MAME_DIR .. "src/devices/bus/electron/romboxp.h",
 		MAME_DIR .. "src/devices/bus/electron/m2105.cpp",
 		MAME_DIR .. "src/devices/bus/electron/m2105.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/electron/cart/slot.h,BUSES["ELECTRON_CART"] = true
+---------------------------------------------------
+
+if (BUSES["ELECTRON_CART"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/electron/cart/slot.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/slot.h",
+		MAME_DIR .. "src/devices/bus/electron/cart/abr.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/abr.h",
+		MAME_DIR .. "src/devices/bus/electron/cart/click.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/click.h",
+		MAME_DIR .. "src/devices/bus/electron/cart/peg400.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/peg400.h",
+		MAME_DIR .. "src/devices/bus/electron/cart/std.cpp",
+		MAME_DIR .. "src/devices/bus/electron/cart/std.h",
 	}
 end
 
@@ -1835,6 +1860,10 @@ if (BUSES["NUBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/nubus/nubus_image.h",
 		MAME_DIR .. "src/devices/bus/nubus/nubus_wsportrait.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/nubus_wsportrait.h",
+		MAME_DIR .. "src/devices/bus/nubus/bootbug.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/bootbug.h",
+		MAME_DIR .. "src/devices/bus/nubus/quadralink.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/quadralink.h",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_cb264.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_cb264.h",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_procolor816.cpp",
@@ -3060,6 +3089,20 @@ if (BUSES["PSX_CONTROLLER"]~=null) then
 		MAME_DIR .. "src/devices/bus/psx/multitap.h",
 		MAME_DIR .. "src/devices/bus/psx/memcard.cpp",
 		MAME_DIR .. "src/devices/bus/psx/memcard.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/psx/parallel.h,BUSES["PSX_PARALLEL"] = true
+---------------------------------------------------
+
+if (BUSES["PSX_PARALLEL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/psx/parallel.cpp",
+		MAME_DIR .. "src/devices/bus/psx/parallel.h",
+		MAME_DIR .. "src/devices/bus/psx/gamebooster.cpp",
+		MAME_DIR .. "src/devices/bus/psx/gamebooster.h",
 	}
 end
 

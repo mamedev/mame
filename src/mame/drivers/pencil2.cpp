@@ -115,6 +115,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
+	void pencil2(machine_config &config);
 private:
 	virtual void machine_start() override;
 	int m_centronics_busy;
@@ -303,21 +304,21 @@ void pencil2_state::machine_start()
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
-static MACHINE_CONFIG_START( pencil2 )
+MACHINE_CONFIG_START(pencil2_state::pencil2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635)/3)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9929A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_10_738635MHz/3) // guess
+	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL(10'738'635)/3) // guess
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

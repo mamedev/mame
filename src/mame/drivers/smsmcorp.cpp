@@ -253,6 +253,8 @@ public:
 	uint32_t screen_update_sms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	void sureshot(machine_config &config);
+	void sms(machine_config &config);
 };
 
 
@@ -533,11 +535,11 @@ void smsmfg_state::machine_reset()
 	m_communication_port_status = 0;
 }
 
-static MACHINE_CONFIG_START( sms )
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_24MHz/8)
+MACHINE_CONFIG_START(smsmfg_state::sms)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(24'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sms_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_16MHz/8)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(16'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -568,11 +570,11 @@ static MACHINE_CONFIG_START( sms )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_16MHz/8)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(16'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sureshot, sms )
+MACHINE_CONFIG_DERIVED(smsmfg_state::sureshot, sms)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sureshot_map)

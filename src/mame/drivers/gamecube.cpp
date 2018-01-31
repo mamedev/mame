@@ -25,6 +25,7 @@ public:
 	m_cpu(*this, "maincpu")
 	{ }
 
+	void gc(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -139,7 +140,7 @@ void gamecube_state::machine_reset()
 //  MACHINE DEFINITIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( gc )
+MACHINE_CONFIG_START(gamecube_state::gc)
 	MCFG_CPU_ADD("maincpu", PPC603, 485000000 / 100) // 485 MHz IBM "Gekko" (750CXe/750FX based)
 	MCFG_CPU_PROGRAM_MAP(ppc_mem)
 MACHINE_CONFIG_END

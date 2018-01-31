@@ -78,6 +78,7 @@ public:
 	uint8_t sub_data;
 	uint8_t main_data;
 	uint8_t host_io_40;
+	void sderby2(machine_config &config);
 };
 
 
@@ -284,13 +285,13 @@ void sderby2_state::machine_reset()
 
 }
 
-static MACHINE_CONFIG_START( sderby2 )
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
+MACHINE_CONFIG_START(sderby2_state::sderby2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(main_program_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sderby2_state, irq0_line_hold)
 
-	MCFG_CPU_ADD("subcpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("subcpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(sub_program_map)
 	MCFG_CPU_IO_MAP(sub_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sderby2_state, irq0_line_hold)

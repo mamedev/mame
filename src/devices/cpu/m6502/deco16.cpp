@@ -31,9 +31,9 @@ util::disasm_interface *deco16_device::create_disassembler()
 void deco16_device::device_start()
 {
 	if(direct_disabled)
-		mintf = new mi_default_nd;
+		mintf = std::make_unique<mi_default_nd>();
 	else
-		mintf = new mi_default_normal;
+		mintf = std::make_unique<mi_default_normal>();
 
 	init();
 

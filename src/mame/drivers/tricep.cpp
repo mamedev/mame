@@ -29,6 +29,7 @@ public:
 	DECLARE_WRITE16_MEMBER(tricep_terminal_w);
 	void kbd_put(u8 data);
 
+	void tricep(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -74,9 +75,9 @@ void tricep_state::kbd_put(u8 data)
 {
 }
 
-static MACHINE_CONFIG_START( tricep )
+MACHINE_CONFIG_START(tricep_state::tricep)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(tricep_mem)
 
 	/* video hardware */

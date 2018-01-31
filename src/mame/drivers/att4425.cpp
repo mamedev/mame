@@ -60,6 +60,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void att4425(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -231,9 +232,9 @@ static const z80_daisy_config att4425_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( att4425 )
+MACHINE_CONFIG_START(att4425_state::att4425)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_32MHz/8) // XXX
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(32'000'000)/8) // XXX
 	MCFG_CPU_PROGRAM_MAP(att4425_mem)
 	MCFG_CPU_IO_MAP(att4425_io)
 	MCFG_Z80_DAISY_CHAIN(att4425_daisy_chain)
@@ -250,7 +251,7 @@ static MACHINE_CONFIG_START( att4425 )
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
 	// ch.3 -- timer?
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_32MHz) // XXX
+	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL(32'000'000)) // XXX
 	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 #ifdef notdef
 	MCFG_Z80CTC_ZC0_CB(DEVWRITELINE(Z80SIO_TAG, z80sio_device, rxca_w))

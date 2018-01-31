@@ -46,9 +46,6 @@ a2bus_ssramcard_device::a2bus_ssramcard_device(const machine_config &mconfig, co
 
 void a2bus_ssramcard_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	memset(m_ram, 0, 128*1024);
 
 	save_item(NAME(m_inh_state));

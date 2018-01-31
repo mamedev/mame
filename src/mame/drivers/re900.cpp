@@ -83,8 +83,8 @@
 #include "re900.lh"
 
 
-#define MAIN_CLOCK      XTAL_11_0592MHz
-#define VDP_CLOCK       XTAL_10_730MHz
+#define MAIN_CLOCK      XTAL(11'059'200)
+#define VDP_CLOCK       XTAL(10'730'000)
 #define TMS_CLOCK       VDP_CLOCK / 24
 
 
@@ -120,6 +120,8 @@ public:
 	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
 
 	DECLARE_DRIVER_INIT(re900);
+	void re900(machine_config &config);
+	void bs94(machine_config &config);
 };
 
 
@@ -377,7 +379,7 @@ INPUT_PORTS_END
 *      Machine Driver      *
 ***************************/
 
-static MACHINE_CONFIG_START( re900 )
+MACHINE_CONFIG_START(re900_state::re900)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, MAIN_CLOCK)
@@ -385,7 +387,7 @@ static MACHINE_CONFIG_START( re900 )
 	MCFG_CPU_IO_MAP(mem_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9128", TMS9128, XTAL_10_738635MHz / 2 )   /* TMS9128NL on the board */
+	MCFG_DEVICE_ADD( "tms9128", TMS9128, XTAL(10'738'635) / 2 )   /* TMS9128NL on the board */
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
@@ -403,7 +405,7 @@ static MACHINE_CONFIG_START( re900 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bs94, re900 )
+MACHINE_CONFIG_DERIVED(re900_state::bs94, re900)
 
 	/* sound hardware   */
 	MCFG_SOUND_MODIFY("ay_re900")

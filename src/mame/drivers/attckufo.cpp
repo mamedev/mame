@@ -32,6 +32,7 @@ public:
 	DECLARE_READ8_MEMBER( vic_videoram_r );
 	DECLARE_READ8_MEMBER( vic_colorram_r );
 
+	void attckufo(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -110,8 +111,8 @@ READ8_MEMBER(attckufo_state::vic_colorram_r)
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( attckufo )
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_14_31818MHz / 14)
+MACHINE_CONFIG_START(attckufo_state::attckufo)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(14'318'181) / 14)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -119,7 +120,7 @@ static MACHINE_CONFIG_START( attckufo )
 	MCFG_PIA_READPB_HANDLER(IOPORT("INPUT"))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS656X_ATTACK_UFO_ADD("mos6560", "screen", XTAL_14_31818MHz / 14, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS656X_ATTACK_UFO_ADD("mos6560", "screen", XTAL(14'318'181) / 14, vic_videoram_map, vic_colorram_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -10,7 +10,7 @@ typedef device_delegate<int (uint16_t code, uint8_t color)> gfxbank_cb_delegate;
 #define SETA001_SPRITE_GFXBANK_CB_MEMBER(_name) int _name(uint16_t code, uint8_t color)
 
 #define MCFG_SETA001_SPRITE_GFXBANK_CB(_class, _method) \
-	seta001_device::set_gfxbank_callback(*device, gfxbank_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	seta001_device::set_gfxbank_callback(*device, gfxbank_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 class seta001_device : public device_t
 {

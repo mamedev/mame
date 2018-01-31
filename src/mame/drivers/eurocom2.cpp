@@ -92,6 +92,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(pia1_cb1_r);
 	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
 
+	void eurocom2(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
@@ -139,6 +140,7 @@ public:
 	DECLARE_READ8_MEMBER(waveterm_adc);
 	DECLARE_WRITE8_MEMBER(waveterm_dac);
 
+	void waveterm(machine_config &config);
 protected:
 	bool m_driveh;
 	uint8_t m_drive;
@@ -426,12 +428,12 @@ static SLOT_INTERFACE_START( eurocom_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( eurocom2 )
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_10_7172MHz/2) // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
+MACHINE_CONFIG_START(eurocom2_state::eurocom2)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(10'717'200)/2) // EXTAL = CLK/2 = 5.3586 MHz; Q = E = 1.33965 MHz
 	MCFG_CPU_PROGRAM_MAP(eurocom2_map)
 
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_RAW_PARAMS(XTAL_10_7172MHz, VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(10'717'200), VC_TOTAL_HORZ, 0, VC_DISP_HORZ, VC_TOTAL_VERT, 0, VC_DISP_VERT)
 	MCFG_SCREEN_UPDATE_DRIVER(eurocom2_state, screen_update)
 
 	MCFG_SCREEN_PALETTE("palette")
@@ -461,7 +463,7 @@ static MACHINE_CONFIG_START( eurocom2 )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE ("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE ("acia", acia6850_device, write_cts))
 
-	MCFG_FD1793_ADD("fdc", XTAL_2MHz/2)
+	MCFG_FD1793_ADD("fdc", XTAL(2'000'000)/2)
 //  MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", eurocom_floppies, "525qd", eurocom2_state::floppy_formats)
 //  MCFG_FLOPPY_DRIVE_SOUND(true)
@@ -469,7 +471,7 @@ static MACHINE_CONFIG_START( eurocom2 )
 //  MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(waveterm, eurocom2)
+MACHINE_CONFIG_DERIVED(waveterm_state::waveterm, eurocom2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(waveterm_map)
 

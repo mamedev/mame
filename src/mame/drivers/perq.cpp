@@ -21,6 +21,7 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void perq(machine_config &config);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
@@ -31,7 +32,7 @@ private:
 static INPUT_PORTS_START( perq )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( perq )
+MACHINE_CONFIG_START(perq_state::perq)
 MACHINE_CONFIG_END
 
 ROM_START( perq )

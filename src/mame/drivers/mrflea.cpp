@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( mrflea_master_map, AS_PROGRAM, 8, mrflea_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(mrflea_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xe800, 0xe83f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe800, 0xe83f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xec00, 0xecff) AM_RAM_WRITE(mrflea_spriteram_w) AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
@@ -251,7 +251,7 @@ void mrflea_state::machine_reset()
 	m_gfx_bank = 0;
 }
 
-static MACHINE_CONFIG_START( mrflea )
+MACHINE_CONFIG_START(mrflea_state::mrflea)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */

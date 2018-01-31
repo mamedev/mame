@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, asterix_state )
 	AM_RANGE(0x180000, 0x1807ff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_word_r, k053245_word_w)
 	AM_RANGE(0x180800, 0x180fff) AM_RAM                             // extra RAM, or mirror for the above?
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_word_r, k053244_word_w)
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("k053244", k05324x_device, k053244_lsb_r, k053244_lsb_w)
 	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("IN0")
 	AM_RANGE(0x380002, 0x380003) AM_READ_PORT("IN1")
@@ -257,14 +257,14 @@ void asterix_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( asterix )
+MACHINE_CONFIG_START(asterix_state::asterix)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2) // 12MHz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2) // 12MHz
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", asterix_state,  asterix_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/4) // 8MHz Z80E ??
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/4) // 8MHz Z80E ??
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
@@ -297,11 +297,11 @@ static MACHINE_CONFIG_START( asterix )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) // 4MHz
+	MCFG_YM2151_ADD("ymsnd", XTAL(32'000'000)/8) // 4MHz
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K053260_ADD("k053260", XTAL_32MHz/8) // 4MHz
+	MCFG_K053260_ADD("k053260", XTAL(32'000'000)/8) // 4MHz
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END

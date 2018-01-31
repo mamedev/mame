@@ -33,6 +33,7 @@ public:
 
 	IRQ_CALLBACK_MEMBER(intack);
 
+	void tti(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68901_device> m_mfp;
@@ -53,13 +54,13 @@ static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, tti_state )
 	AM_RANGE(0x80070, 0x80077) AM_DEVWRITE("bitlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( tti )
-	MCFG_DEVICE_ADD("maincpu", M68008, XTAL_20MHz / 2) // guess
+MACHINE_CONFIG_START(tti_state::tti)
+	MCFG_DEVICE_ADD("maincpu", M68008, XTAL(20'000'000) / 2) // guess
 	MCFG_CPU_PROGRAM_MAP(prg_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(tti_state, intack)
 
 	MCFG_DEVICE_ADD("mfp", MC68901, 0)
-	MCFG_MC68901_TIMER_CLOCK(XTAL_20MHz / 2) // guess
+	MCFG_MC68901_TIMER_CLOCK(XTAL(20'000'000) / 2) // guess
 	MCFG_MC68901_RX_CLOCK(9600) // for testing (FIXME: actually 16x)
 	MCFG_MC68901_TX_CLOCK(9600) // for testing (FIXME: actually 16x)
 	MCFG_MC68901_OUT_SO_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))

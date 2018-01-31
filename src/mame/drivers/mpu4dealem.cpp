@@ -38,6 +38,7 @@ public:
 	uint32_t screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(dealem_vsync_changed);
 	required_device<gfxdecode_device> m_gfxdecode;
+	void dealem(machine_config &config);
 };
 
 
@@ -194,7 +195,7 @@ MACHINE_RESET_MEMBER(mpu4dealem_state,dealem_vid)
 
 
 /* machine driver for Zenitone Deal 'Em board */
-static MACHINE_CONFIG_START( dealem )
+MACHINE_CONFIG_START(mpu4dealem_state::dealem)
 	MCFG_MACHINE_START_OVERRIDE(mpu4dealem_state,mod2)                          /* main mpu4 board initialisation */
 	MCFG_MACHINE_RESET_OVERRIDE(mpu4dealem_state,dealem_vid)
 

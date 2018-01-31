@@ -992,7 +992,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( exidy440 )
+MACHINE_CONFIG_START(exidy440_state::exidy440)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CPU_CLOCK)
@@ -1009,7 +1009,7 @@ static MACHINE_CONFIG_START( exidy440 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( topsecex, exidy440 )
+MACHINE_CONFIG_DERIVED(exidy440_state::topsecex, exidy440)
 
 	/* basic machine hardware */
 

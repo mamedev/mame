@@ -71,6 +71,8 @@
 #include "bus/nubus/nubus_asntmc3b.h"
 #include "bus/nubus/nubus_image.h"
 #include "bus/nubus/nubus_m2video.h"
+#include "bus/nubus/bootbug.h"
+#include "bus/nubus/quadralink.h"
 #include "bus/nubus/pds30_cb264.h"
 #include "bus/nubus/pds30_procolor816.h"
 #include "bus/nubus/pds30_sigmalview.h"
@@ -878,6 +880,8 @@ static SLOT_INTERFACE_START(mac_nubus_cards)
 	SLOT_INTERFACE("asmc3nb", NUBUS_ASNTMC3NB)  /* Asante MC3NB Ethernet card */
 	SLOT_INTERFACE("portrait", NUBUS_WSPORTRAIT)    /* Apple Macintosh II Portrait video card */
 	SLOT_INTERFACE("enetnb", NUBUS_APPLEENET)   /* Apple NuBus Ethernet */
+	SLOT_INTERFACE("bootbug", NUBUS_BOOTBUG)    /* Brigent BootBug debugger card */
+	SLOT_INTERFACE("quadralink", NUBUS_QUADRALINK)  /* AE Quadralink serial card */
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(mac_pds030_cards)
@@ -906,7 +910,7 @@ static const floppy_interface mac_floppy_interface =
 	"floppy_3_5"
 };
 
-static MACHINE_CONFIG_START( mac512ke )
+MACHINE_CONFIG_START(mac_state::mac512ke)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
@@ -934,7 +938,7 @@ static MACHINE_CONFIG_START( mac512ke )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
@@ -960,7 +964,7 @@ static MACHINE_CONFIG_START( mac512ke )
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
+MACHINE_CONFIG_DERIVED(mac_state::macplus, mac512ke)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(macplus_map)
 
@@ -984,7 +988,7 @@ static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( macse, macplus )
+MACHINE_CONFIG_DERIVED(mac_state::macse, macplus)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(macse_map)
 
@@ -1008,7 +1012,7 @@ static MACHINE_CONFIG_DERIVED( macse, macplus )
 	MCFG_MACPDS_SLOT_ADD("sepds", "pds", mac_sepds_cards, nullptr)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( macclasc, macplus )
+MACHINE_CONFIG_DERIVED(mac_state::macclasc, macplus)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(macse_map)
 
@@ -1029,7 +1033,7 @@ static MACHINE_CONFIG_DERIVED( macclasc, macplus )
 	MCFG_MACKBD_REMOVE(MACKBD_TAG)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macprtb )
+MACHINE_CONFIG_START(mac_state::macprtb)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C15M)
 	MCFG_CPU_PROGRAM_MAP(macprtb_map)
@@ -1058,7 +1062,7 @@ static MACHINE_CONFIG_START( macprtb )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
@@ -1090,7 +1094,7 @@ static MACHINE_CONFIG_START( macprtb )
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macii )
+MACHINE_CONFIG_START(mac_state::macii)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68020PMMU, C15M)
@@ -1106,7 +1110,7 @@ static MACHINE_CONFIG_START( macii )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
 	MCFG_DEVICE_ADD("nubus", NUBUS, 0)
 	MCFG_NUBUS_CPU("maincpu")
 	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
@@ -1162,13 +1166,13 @@ static MACHINE_CONFIG_START( macii )
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maciihmu, macii )
+MACHINE_CONFIG_DERIVED(mac_state::maciihmu, macii)
 	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( maciifx )
+MACHINE_CONFIG_START(mac_state::maciifx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68030, 40000000)
@@ -1182,7 +1186,7 @@ static MACHINE_CONFIG_START( maciifx )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
 	MCFG_DEVICE_ADD("nubus", NUBUS, 0)
 	MCFG_NUBUS_CPU("maincpu")
 	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))
@@ -1230,7 +1234,7 @@ static MACHINE_CONFIG_START( maciifx )
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maclc, macii )
+MACHINE_CONFIG_DERIVED(mac_state::maclc, macii)
 
 	MCFG_CPU_REPLACE("maincpu", M68020HMMU, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
@@ -1287,7 +1291,7 @@ static MACHINE_CONFIG_DERIVED( maclc, macii )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maclc2, maclc )
+MACHINE_CONFIG_DERIVED(mac_state::maclc2, maclc)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
@@ -1299,7 +1303,7 @@ static MACHINE_CONFIG_DERIVED( maclc2, maclc )
 	MCFG_RAM_EXTRA_OPTIONS("6M,8M,10M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maccclas, maclc2 )
+MACHINE_CONFIG_DERIVED(mac_state::maccclas, maclc2)
 
 	MCFG_EGRET_REMOVE()
 	MCFG_CUDA_ADD(CUDA_341S0788)    // should be 0417, but that version won't sync up properly with the '030 right now
@@ -1312,7 +1316,7 @@ static MACHINE_CONFIG_DERIVED( maccclas, maclc2 )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_cdadb))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maclc3, maclc )
+MACHINE_CONFIG_DERIVED(mac_state::maclc3, maclc)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
@@ -1340,7 +1344,7 @@ static MACHINE_CONFIG_DERIVED( maclc3, maclc )
 	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maclc520, maclc3 )
+MACHINE_CONFIG_DERIVED(mac_state::maclc520, maclc3)
 
 	MCFG_EGRET_REMOVE()
 	MCFG_CUDA_ADD(CUDA_341S0060)
@@ -1353,7 +1357,7 @@ static MACHINE_CONFIG_DERIVED( maclc520, maclc3 )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mac_state,mac_via_out_b_cdadb))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maciivx, maclc )
+MACHINE_CONFIG_DERIVED(mac_state::maciivx, maclc)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C32M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
@@ -1389,7 +1393,7 @@ static MACHINE_CONFIG_DERIVED( maciivx, maclc )
 	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maciivi, maclc )
+MACHINE_CONFIG_DERIVED(mac_state::maciivi, maclc)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc3_map)
@@ -1425,7 +1429,7 @@ static MACHINE_CONFIG_DERIVED( maciivi, maclc )
 	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maciix, macii )
+MACHINE_CONFIG_DERIVED(mac_state::maciix, macii)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macii_map)
@@ -1436,13 +1440,13 @@ static MACHINE_CONFIG_DERIVED( maciix, macii )
 	MCFG_RAM_EXTRA_OPTIONS("8M,32M,64M,96M,128M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maciicx, maciix )    // IIcx is a IIx with only slots 9/a/b
+MACHINE_CONFIG_DERIVED(mac_state::maciicx, maciix)    // IIcx is a IIx with only slots 9/a/b
 	MCFG_NUBUS_SLOT_REMOVE("nbc")
 	MCFG_NUBUS_SLOT_REMOVE("nbd")
 	MCFG_NUBUS_SLOT_REMOVE("nbe")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macse30 )
+MACHINE_CONFIG_START(mac_state::macse30)
 
 	MCFG_CPU_ADD("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macse30_map)
@@ -1470,7 +1474,7 @@ static MACHINE_CONFIG_START( macse30 )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
 
 	MCFG_DEVICE_ADD("scsi", SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD("scsi:" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_6)
@@ -1520,7 +1524,7 @@ static MACHINE_CONFIG_START( macse30 )
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macpb140 )
+MACHINE_CONFIG_START(mac_state::macpb140)
 
 	MCFG_CPU_ADD("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
@@ -1587,7 +1591,7 @@ static MACHINE_CONFIG_START( macpb140 )
 MACHINE_CONFIG_END
 
 // PowerBook 145 = 140 @ 25 MHz (still 2MB RAM - the 145B upped that to 4MB)
-static MACHINE_CONFIG_DERIVED( macpb145, macpb140 )
+MACHINE_CONFIG_DERIVED(mac_state::macpb145, macpb140)
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1598,7 +1602,7 @@ static MACHINE_CONFIG_DERIVED( macpb145, macpb140 )
 MACHINE_CONFIG_END
 
 // PowerBook 170 = 140 @ 25 MHz with an active-matrix LCD (140/145/145B were passive)
-static MACHINE_CONFIG_DERIVED( macpb170, macpb140 )
+MACHINE_CONFIG_DERIVED(mac_state::macpb170, macpb140)
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb140_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1608,7 +1612,7 @@ static MACHINE_CONFIG_DERIVED( macpb170, macpb140 )
 	MCFG_RAM_EXTRA_OPTIONS("6M,8M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macpb160 )
+MACHINE_CONFIG_START(mac_state::macpb160)
 
 	MCFG_CPU_ADD("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpb160_map)
@@ -1674,7 +1678,7 @@ static MACHINE_CONFIG_START( macpb160 )
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( macpb180, macpb160 )
+MACHINE_CONFIG_DERIVED(mac_state::macpb180, macpb160)
 	MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(macpb160_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1684,7 +1688,7 @@ static MACHINE_CONFIG_DERIVED( macpb180, macpb160 )
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( macpb180c, macpb160 )
+MACHINE_CONFIG_DERIVED(mac_state::macpb180c, macpb160)
 	MCFG_CPU_REPLACE("maincpu", M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(macpb165c_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1700,7 +1704,7 @@ static MACHINE_CONFIG_DERIVED( macpb180c, macpb160 )
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( macpd210, macpb160 )
+MACHINE_CONFIG_DERIVED(mac_state::macpd210, macpb160)
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(macpd210_map)
 	MCFG_CPU_DISASSEMBLE_OVERRIDE(mac_state, mac_dasm_override)
@@ -1710,7 +1714,7 @@ static MACHINE_CONFIG_DERIVED( macpd210, macpb160 )
 	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M,20M,24M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( macclas2, maclc )
+MACHINE_CONFIG_DERIVED(mac_state::macclas2, maclc)
 	MCFG_CPU_REPLACE("maincpu", M68030, C15M)
 	MCFG_CPU_PROGRAM_MAP(maclc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(MAC_SCREEN_NAME, mac_state,  mac_rbv_vbl)
@@ -1739,7 +1743,7 @@ static MACHINE_CONFIG_DERIVED( macclas2, maclc )
 	MCFG_EGRET_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maciici, macii )
+MACHINE_CONFIG_DERIVED(mac_state::maciici, macii)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
@@ -1770,7 +1774,7 @@ static MACHINE_CONFIG_DERIVED( maciici, macii )
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M,48M,64M,128M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( maciisi, macii )
+MACHINE_CONFIG_DERIVED(mac_state::maciisi, macii)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 20000000)
 	MCFG_CPU_PROGRAM_MAP(maciici_map)
@@ -1814,7 +1818,7 @@ static MACHINE_CONFIG_DERIVED( maciisi, macii )
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pwrmac )
+MACHINE_CONFIG_START(mac_state::pwrmac)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC601, 60000000)
@@ -1882,7 +1886,7 @@ static MACHINE_CONFIG_START( pwrmac )
 	MCFG_CUDA_VIA_DATA_CALLBACK(DEVWRITELINE("via6522_0", via6522_device, write_cb2))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macqd700 )
+MACHINE_CONFIG_START(mac_state::macqd700)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68040, 25000000)
 	MCFG_CPU_PROGRAM_MAP(quadra700_map)
@@ -1907,7 +1911,7 @@ static MACHINE_CONFIG_START( macqd700 )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
 	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
 	MCFG_DEVICE_ADD("nubus", NUBUS, 0)
 	MCFG_NUBUS_CPU("maincpu")
 	MCFG_NUBUS_OUT_IRQ9_CB(WRITELINE(mac_state, nubus_irq_9_w))

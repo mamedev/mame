@@ -42,7 +42,7 @@
 #endif
 
 
-#define DUSCC_CLOCK XTAL_14_7456MHz /* XXX Unverified */
+#define DUSCC_CLOCK XTAL(14'745'600) /* XXX Unverified */
 #define RS232P1_TAG      "rs232p1"
 #define RS232P2_TAG      "rs232p2"
 
@@ -121,7 +121,7 @@ ioport_constructor vme_hcpu30_card_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(vme_hcpu30_card_device::device_add_mconfig)
+MACHINE_CONFIG_START(vme_hcpu30_card_device::device_add_mconfig)
 	MCFG_CPU_ADD("maincpu", M68030, 2*16670000)
 	MCFG_CPU_PROGRAM_MAP(hcpu30_mem)
 
@@ -153,8 +153,8 @@ READ32_MEMBER(vme_hcpu30_card_device::bootvect_r)
 WRITE32_MEMBER(vme_hcpu30_card_device::bootvect_w)
 {
 	LOG("%s\n", FUNCNAME);
-	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 

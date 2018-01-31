@@ -54,6 +54,7 @@ public:
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(interrupt);
+	void horse(machine_config &config);
 };
 
 void horse_state::machine_start()
@@ -191,15 +192,15 @@ INTERRUPT_GEN_MEMBER(horse_state::interrupt)
 	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( horse )
+MACHINE_CONFIG_START(horse_state::horse)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_12MHz / 2)
+	MCFG_CPU_ADD("maincpu", I8085A, XTAL(12'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(horse_map)
 	MCFG_CPU_IO_MAP(horse_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", horse_state,  interrupt)
 
-	MCFG_DEVICE_ADD("i8155", I8155, XTAL_12MHz / 2) // port A input, B output, C output but unused
+	MCFG_DEVICE_ADD("i8155", I8155, XTAL(12'000'000) / 2) // port A input, B output, C output but unused
 	MCFG_I8155_IN_PORTA_CB(READ8(horse_state, input_r))
 	MCFG_I8155_OUT_PORTB_CB(WRITE8(horse_state, output_w))
 	MCFG_I8155_OUT_TIMEROUT_CB(DEVWRITELINE("speaker", speaker_sound_device, level_w))

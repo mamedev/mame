@@ -111,14 +111,6 @@
 
 /***************************************************************************/
 
-READ32_MEMBER(deco_mlc_state::test2_r)
-{
-//  if (offset==0)
-//      return ioport("IN0")->read(); //0xffffffff;
-//   logerror("%08x:  Test2_r %d\n",space.device().safe_pc(),offset);
-	return machine().rand(); //0xffffffff;
-}
-
 READ32_MEMBER(deco_mlc_state::mlc_440008_r)
 {
 	return 0xffffffff;
@@ -132,7 +124,7 @@ READ32_MEMBER(deco_mlc_state::mlc_44001c_r)
 */
 //if (offset==0)
 //  return machine().rand()|(machine().rand()<<16);
-//  logerror("%08x:  Test3_r %d\n",space.device().safe_pc(),offset);
+//  logerror("%08x:  Test3_r %d\n",m_maincpu->pc(),offset);
 //  return 0x00100000;
 	return 0xffffffff;
 }
@@ -144,7 +136,7 @@ WRITE32_MEMBER(deco_mlc_state::mlc_44001c_w)
 READ32_MEMBER(deco_mlc_state::mlc_200070_r)
 {
 	m_vbl_i ^=0xffffffff;
-//logerror("vbl r %08x\n", space.device().safe_pc());
+//logerror("vbl r %08x\n", m_maincpu->pc());
 	// Todo: Vblank probably in $10
 	return m_vbl_i;
 }
@@ -502,7 +494,7 @@ MACHINE_RESET_MEMBER(deco_mlc_state,mlc)
 	m_raster_irq_timer = machine().device<timer_device>("int_timer");
 }
 
-static MACHINE_CONFIG_START( avengrgs )
+MACHINE_CONFIG_START(deco_mlc_state::avengrgs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
@@ -535,7 +527,7 @@ static MACHINE_CONFIG_START( avengrgs )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mlc )
+MACHINE_CONFIG_START(deco_mlc_state::mlc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
@@ -571,11 +563,11 @@ static MACHINE_CONFIG_START( mlc )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mlc_6bpp, mlc )
+MACHINE_CONFIG_DERIVED(deco_mlc_state::mlc_6bpp, mlc)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 6bpp)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mlc_5bpp, mlc )
+MACHINE_CONFIG_DERIVED(deco_mlc_state::mlc_5bpp, mlc)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", 5bpp)
 
 	// TODO: mono? ch.0 doesn't output any sound in-game
@@ -903,9 +895,9 @@ void deco_mlc_state::descramble_sound(  )
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 {
 	uint32_t a=m_mlc_ram[0x89a0/4];
-	uint32_t p=space.device().safe_pc();
+	uint32_t p=m_maincpu->pc();
 
-	if ((p==0x3234 || p==0x32dc) && (a&1)) space.device().execute().spin_until_interrupt();
+	if ((p==0x3234 || p==0x32dc) && (a&1)) m_maincpu->spin_until_interrupt();
 
 	return a;
 }

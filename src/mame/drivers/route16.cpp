@@ -89,7 +89,7 @@
 
 
 
-WRITE8_MEMBER(route16_state::route16_sharedram_w)
+template<bool cpu1> WRITE8_MEMBER(route16_state::route16_sharedram_w)
 {
 	m_sharedram[offset] = data;
 
@@ -97,7 +97,7 @@ WRITE8_MEMBER(route16_state::route16_sharedram_w)
 	if (offset >= 0x0313 && offset <= 0x0319 && data == 0xff)
 	{
 		// Let the other CPU run
-		space.device().execute().yield();
+		(cpu1 ? m_cpu1 : m_cpu2)->yield();
 	}
 }
 
@@ -218,9 +218,9 @@ WRITE8_MEMBER(route16_state::speakres_out2_w)
  *************************************/
 
 static ADDRESS_MAP_START( route16_cpu1_map, AS_PROGRAM, 8, route16_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	/*AM_RANGE(0x3000, 0x3001) AM_NOP   protection device */
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w) AM_SHARE("sharedram")
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x3000, 0x3001) AM_READ(route16_prot_read)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<true>) AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
@@ -230,7 +230,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( routex_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w) AM_SHARE("sharedram")
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<true>) AM_SHARE("sharedram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE(out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
@@ -274,7 +274,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( route16_cpu2_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w) AM_SHARE("sharedram")
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(route16_sharedram_w<false>) AM_SHARE("sharedram")
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("videoram2")
 ADDRESS_MAP_END
 
@@ -598,8 +598,12 @@ MACHINE_START_MEMBER(route16_state, ttmahjng)
 	save_item(NAME(m_ttmahjng_port_select));
 }
 
+DRIVER_INIT_MEMBER(route16_state, route16)
+{
+	save_item(NAME(m_protection_data));
+}
 
-static MACHINE_CONFIG_START( route16 )
+MACHINE_CONFIG_START(route16_state::route16)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("cpu1", Z80, 2500000)  /* 10MHz / 4 = 2.5MHz */
@@ -627,7 +631,7 @@ static MACHINE_CONFIG_START( route16 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( routex, route16 )
+MACHINE_CONFIG_DERIVED(route16_state::routex, route16)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -635,7 +639,7 @@ static MACHINE_CONFIG_DERIVED( routex, route16 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stratvox, route16 )
+MACHINE_CONFIG_DERIVED(route16_state::stratvox, route16)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -675,7 +679,7 @@ static MACHINE_CONFIG_DERIVED( stratvox, route16 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( speakres, stratvox )
+MACHINE_CONFIG_DERIVED(route16_state::speakres, stratvox)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu1")
@@ -685,7 +689,7 @@ static MACHINE_CONFIG_DERIVED( speakres, stratvox )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spacecho, speakres )
+MACHINE_CONFIG_DERIVED(route16_state::spacecho, speakres)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("cpu2")
@@ -693,7 +697,7 @@ static MACHINE_CONFIG_DERIVED( spacecho, speakres )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ttmahjng, route16 )
+MACHINE_CONFIG_DERIVED(route16_state::ttmahjng, route16)
 	MCFG_CPU_MODIFY("cpu1")
 	MCFG_CPU_PROGRAM_MAP(ttmahjng_cpu1_map)
 	MCFG_CPU_IO_MAP(0)
@@ -1045,11 +1049,16 @@ ROM_END
 
 READ8_MEMBER(route16_state::routex_prot_read)
 {
-	if (space.device().safe_pc() == 0x2f) return 0xfb;
+	if (m_cpu1->pc() == 0x2f) return 0xfb;
 
-	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", space.device().tag(), space.device().safe_pc());
+	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", m_cpu1->tag(), m_cpu1->pc());
 	return 0x00;
+}
 
+READ8_MEMBER(route16_state::route16_prot_read)
+{
+	m_protection_data++;
+	return (1 << ((m_protection_data >> 1) & 7));
 }
 
 
@@ -1059,58 +1068,6 @@ READ8_MEMBER(route16_state::routex_prot_read)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(route16_state,route16)
-{
-	uint8_t *ROM = memregion("cpu1")->base();
-	/* TO DO : Replace these patches with simulation of the protection device */
-
-	/* patch the protection */
-	ROM[0x0105] = 0x00; /* jp nz,$4109 (nirvana) - NOP's in route16c */
-	ROM[0x0106] = 0x00;
-	ROM[0x0107] = 0x00;
-
-	ROM[0x072a] = 0x00; /* jp nz,$4238 (nirvana) */
-	ROM[0x072b] = 0x00;
-	ROM[0x072c] = 0x00;
-
-	DRIVER_INIT_CALL(route16c);
-}
-
-DRIVER_INIT_MEMBER(route16_state,route16c)
-{
-	uint8_t *ROM = memregion("cpu1")->base();
-	/* Is this actually a bootleg? some of the protection has
-	   been removed */
-
-	/* patch the protection */
-	ROM[0x00e9] = 0x3a;
-
-	ROM[0x0754] = 0xc3;
-	ROM[0x0755] = 0x63;
-	ROM[0x0756] = 0x07;
-}
-
-
-DRIVER_INIT_MEMBER(route16_state,route16a)
-{
-	uint8_t *ROM = memregion("cpu1")->base();
-	/* TO DO : Replace these patches with simulation of the protection device */
-
-	/* patch the protection */
-	ROM[0x00e9] = 0x3a;
-
-	ROM[0x0105] = 0x00; /* jp nz,$4109 (nirvana) - NOP's in route16c */
-	ROM[0x0106] = 0x00;
-	ROM[0x0107] = 0x00;
-
-	ROM[0x0731] = 0x00; /* jp nz,$4238 (nirvana) */
-	ROM[0x0732] = 0x00;
-	ROM[0x0733] = 0x00;
-
-	ROM[0x0747] = 0xc3;
-	ROM[0x0748] = 0x56;
-	ROM[0x0749] = 0x07;
-}
 
 
 
@@ -1123,8 +1080,8 @@ DRIVER_INIT_MEMBER(route16_state,route16a)
  *************************************/
 
 GAME( 1981, route16,  0,        route16,  route16,  route16_state, route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16a, route16,  route16,  route16,  route16_state, route16a, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, route16c, route16,  route16,  route16,  route16_state, route16c, ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
+GAME( 1981, route16a, route16,  route16,  route16,  route16_state, route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, route16c, route16,  route16,  route16,  route16_state, route16,  ROT270, "Tehkan / Sun Electronics (Centuri license)", "Route 16 (set 3, bootleg?)", MACHINE_SUPPORTS_SAVE ) // similar to set 1 but with some protection removed?
 GAME( 1981, route16bl,route16,  route16,  route16,  route16_state, 0,        ROT270, "bootleg (Leisure and Allied)",               "Route 16 (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, routex,   route16,  routex,   route16,  route16_state, 0,        ROT270, "bootleg",                                    "Route X (bootleg)", MACHINE_SUPPORTS_SAVE )
 

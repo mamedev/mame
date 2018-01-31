@@ -11,7 +11,7 @@
 #include "screen.h"
 
 
-#define MYSTSTON_MASTER_CLOCK   (XTAL_12MHz)
+#define MYSTSTON_MASTER_CLOCK   (XTAL(12'000'000))
 
 
 class mystston_state : public driver_device
@@ -63,8 +63,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void mystston(machine_config &config);
+	void mystston_video(machine_config &config);
 };
-
-/*----------- defined in video/mystston.c -----------*/
-
-MACHINE_CONFIG_EXTERN( mystston_video );

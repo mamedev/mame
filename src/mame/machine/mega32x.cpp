@@ -459,10 +459,10 @@ READ16_MEMBER( sega_32x_device::_32x_dreq_common_r )
 		//  printf("reading FIFO!\n");
 
 			if (m_current_fifo_readblock == m_fifo_block_a && !m_fifo_block_a_full)
-				printf("Fifo block a isn't filled!\n");
+				logerror("Fifo block a isn't filled!\n");
 
 			if (m_current_fifo_readblock == m_fifo_block_b && !m_fifo_block_b_full)
-				printf("%08x Fifo block b isn't filled!\n",space.device().safe_pc());
+				logerror("%s Fifo block b isn't filled!\n", machine().describe_context());
 
 
 			if (m_current_fifo_read_pos==4)
@@ -1772,7 +1772,7 @@ const rom_entry *sega_32x_device::device_rom_region() const
 #define _32X_INTERLEAVE_LEVEL \
 	MCFG_QUANTUM_TIME(attotime::from_hz(1800000))
 
-MACHINE_CONFIG_MEMBER( sega_32x_ntsc_device::device_add_mconfig )
+MACHINE_CONFIG_START(sega_32x_ntsc_device::device_add_mconfig)
 
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
 	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
@@ -1802,7 +1802,7 @@ MACHINE_CONFIG_MEMBER( sega_32x_ntsc_device::device_add_mconfig )
 	_32X_INTERLEAVE_LEVEL
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( sega_32x_pal_device::device_add_mconfig )
+MACHINE_CONFIG_START(sega_32x_pal_device::device_add_mconfig)
 
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
 	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )

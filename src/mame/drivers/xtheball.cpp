@@ -58,6 +58,7 @@ public:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
+	void xtheball(machine_config &config);
 };
 
 
@@ -293,7 +294,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( xtheball )
+MACHINE_CONFIG_START(xtheball_state::xtheball)
 
 	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)

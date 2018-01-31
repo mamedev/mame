@@ -95,10 +95,10 @@ Noted added by ClawGrip 28-Mar-2008:
 
 #define TEST_DIPS false /* enable to test unmapped dip switches */
 
-#define MASTER_CLOCK XTAL_14_31818MHz/2
-#define SOUND_CLOCK XTAL_20MHz/4
-#define YM2203_CLOCK XTAL_20MHz/16
-#define MSM5205_CLOCK XTAL_384kHz
+#define MASTER_CLOCK XTAL(14'318'181)/2
+#define SOUND_CLOCK XTAL(20'000'000)/4
+#define YM2203_CLOCK XTAL(20'000'000)/16
+#define MSM5205_CLOCK XTAL(384'000)
 
 
 WRITE8_MEMBER(wc90b_state::bankswitch_w)
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( wc90b_map2, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xe800, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
@@ -350,7 +350,7 @@ void wc90b_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( wc90b )
+MACHINE_CONFIG_START(wc90b_state::wc90b)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)

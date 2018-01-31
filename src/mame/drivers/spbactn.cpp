@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_SHARE("spvideoram")
 	AM_RANGE(0x60000, 0x67fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x70000, 0x77fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x80000, 0x827ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x80000, 0x827ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x90000, 0x90001) AM_READ_PORT("IN0")
 	AM_RANGE(0x90010, 0x90011) AM_READ_PORT("IN1")
 	AM_RANGE(0x90020, 0x90021) AM_READ_PORT("SYSTEM")
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( spbactnp_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_SHARE("spvideoram")
 	AM_RANGE(0x60000, 0x67fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x70000, 0x77fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bgvideoram")
-	AM_RANGE(0x80000, 0x827ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")   // yes R and G are swapped vs. the released version
+	AM_RANGE(0x80000, 0x827ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")   // yes R and G are swapped vs. the released version
 
 	AM_RANGE(0x90002, 0x90003) AM_WRITE(main_irq_ack_w)
 	AM_RANGE(0x90006, 0x90007) AM_WRITE(spbatnp_90006_w)
@@ -402,21 +402,21 @@ static GFXDECODE_START( spbactnp )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( spbactn )
+MACHINE_CONFIG_START(spbactn_state::spbactn)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(spbactn_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 #if 0
 	// actual blanking frequencies unknown, but should be close to NTSC
-	MCFG_SCREEN_RAW_PARAMS(XTAL_22_656MHz / 2, 720, 0, 512, 262, 16, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(22'656'000) / 2, 720, 0, 512, 262, 16, 240)
 #else
 	// MCFG_SCREEN_RAW_PARAMS breaks sprites; keeping this in for now
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -446,27 +446,27 @@ static MACHINE_CONFIG_START( spbactn )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000)) /* Was 3.579545MHz, a common clock, but no way to generate via on PCB OSCs */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH) /* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
+	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH) /* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spbactnp )
+MACHINE_CONFIG_START(spbactn_state::spbactnp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(spbactnp_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map)
 
 	// yes another cpu..
-	MCFG_CPU_ADD("extracpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("extracpu", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(spbactnp_extra_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq0_line_hold)
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  nmi_line_pulse)
@@ -500,11 +500,11 @@ static MACHINE_CONFIG_START( spbactnp )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000))
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

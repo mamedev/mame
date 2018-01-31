@@ -26,11 +26,12 @@
     - backup ram (stores config.sys)
     - HardRAM (static RAM board)
     - native keyboard (MCU dump missing)
-    - font selector (CRTC register 0x12)
+    - font selector (CRTC register 0x12; DIP switches PJ20, PJ21)
 
     Useful links:
     - board photo: http://s8.hostingkartinok.com/uploads/images/2016/05/579e9d152bc772d9c16bc8ac611eb97f.jpg
     - manuals: http://www.minuszerodegrees.net/manuals/Toshiba/Toshiba.htm
+    - http://www.seasip.info/VintagePC/t1000.html
 
 ***************************************************************************/
 
@@ -44,6 +45,7 @@
 #include "machine/bankdev.h"
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
+#include "machine/tosh1000_bram.h"
 #include "softlist.h"
 
 
@@ -67,6 +69,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_bankdev(*this, "bankdev")
+		, m_bram(*this, "bram")
 		{ }
 
 	DECLARE_MACHINE_RESET(tosh1000);
@@ -75,9 +78,24 @@ public:
 	DECLARE_WRITE8_MEMBER(romdos_bank_w);
 	DECLARE_READ8_MEMBER(romdos_bank_r);
 
+	DECLARE_WRITE8_MEMBER(bram_w);
+	DECLARE_READ8_MEMBER(bram_r);
+
+	static void cfg_fdc_35(device_t *device);
+	void tosh1000(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
+	required_device<tosh1000_bram_device> m_bram;
+
+private:
+	enum {
+		IDLE, READ_DATA, WRITE_DATA
+	};
+
+	bool m_bram_latch = false;
+	int m_bram_offset = 0;
+	int m_bram_state = IDLE;
 };
 
 
@@ -87,6 +105,9 @@ DRIVER_INIT_MEMBER(tosh1000_state, tosh1000)
 
 MACHINE_RESET_MEMBER(tosh1000_state, tosh1000)
 {
+	m_bram_latch = false;
+	m_bram_offset = 0;
+	m_bram_state = IDLE;
 	m_bankdev->set_bank(8);
 }
 
@@ -103,6 +124,92 @@ WRITE8_MEMBER(tosh1000_state::romdos_bank_w)
 	{
 		m_bankdev->set_bank(8);
 	}
+}
+
+WRITE8_MEMBER(tosh1000_state::bram_w)
+{
+	DBG_LOG(2, "BRAM", ("%02x <- %02x\n", 0xc0 + offset, data));
+
+	switch (offset)
+	{
+	case 1:
+		if (m_bram_latch)
+		{
+			DBG_LOG(1, "Backup RAM", ("%02x <- %02x\n", m_bram_offset % 160, data));
+			m_bram->write(m_bram_offset % 160, data);
+			m_bram_offset++;
+		}
+		else
+		{
+			if (m_bram_state == WRITE_DATA)
+			{
+				m_bram_latch = true;
+				m_bram_offset = 0;
+			}
+		}
+		break;
+
+	case 3:
+		switch (data & 0xc0)
+		{
+		case 0:
+			m_bram_state = IDLE;
+			break;
+
+		case 0x40:
+			m_bram_state = READ_DATA;
+			break;
+
+		case 0x80:
+			m_bram_state = WRITE_DATA;
+			m_bram_latch = false;
+			break;
+
+		default:
+			m_bram_state = IDLE;
+			break;
+		}
+		break;
+	}
+}
+
+READ8_MEMBER(tosh1000_state::bram_r)
+{
+	uint8_t data = 0;
+
+	switch (offset)
+	{
+	case 2:
+		if (m_bram_state == READ_DATA)
+		{
+			data = m_bram->read(m_bram_offset % 160);
+			DBG_LOG(1, "BRAM", ("@ %02x == %02x\n", m_bram_offset % 160, data));
+			m_bram_offset++;
+		}
+		break;
+
+	case 3:
+		data = 0x2c;
+		switch (m_bram_state)
+		{
+		case IDLE:
+			// bit 4 -- floppy drive disk change signal
+			break;
+
+		case READ_DATA:
+			data |= 0x43; // always ready to read (and write ??)
+			break;
+
+		case WRITE_DATA:
+			data |= 0x82; // always ready to write
+			break;
+		}
+		break;
+	}
+
+	DBG_LOG(2, "BRAM", ("%02x == %02x\n", 0xc0 + offset, data));
+
+	return data;
 }
 
 
@@ -126,21 +233,21 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tosh1000_io, AS_IO, 8, tosh1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
+	AM_RANGE(0x00c0, 0x00c3) AM_READWRITE(bram_r, bram_w)
 	AM_RANGE(0x00c8, 0x00c8) AM_WRITE(romdos_bank_w)    // ROM-DOS page select [p. B-15]
 	AM_RANGE(0x02c0, 0x02df) AM_DEVREADWRITE("rtc", tc8521_device, read, write)
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( cfg_fdc_35 )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	MCFG_SLOT_DEFAULT_OPTION("35dd")
-	MCFG_SLOT_FIXED(true)
+void tosh1000_state::cfg_fdc_35(device_t *device)
+{
+	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
+	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
+	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+}
 
-	MCFG_DEVICE_REMOVE("fdc:1")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( tosh1000 )
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_5MHz)
+MACHINE_CONFIG_START(tosh1000_state::tosh1000)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(tosh1000_map)
 	MCFG_CPU_IO_MAP(tosh1000_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
@@ -156,7 +263,7 @@ static MACHINE_CONFIG_START( tosh1000 )
 
 	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
 
-	MCFG_DEVICE_ADD("rtc", TC8521, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", TC8521, XTAL(32'768))
 
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
@@ -173,6 +280,8 @@ static MACHINE_CONFIG_START( tosh1000 )
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
+
+	MCFG_TOSH1000_BRAM_ADD("bram")
 MACHINE_CONFIG_END
 
 

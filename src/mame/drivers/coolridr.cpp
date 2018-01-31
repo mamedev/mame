@@ -537,6 +537,8 @@ public:
 	};
 
 	objcachemanager decode[2];
+	void aquastge(machine_config &config);
+	void coolridr(machine_config &config);
 };
 
 #define PRINT_BLIT_STUFF \
@@ -3685,9 +3687,9 @@ WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 		sound_data &= ~0x20;
 }
 
-#define MAIN_CLOCK XTAL_28_63636MHz
+#define MAIN_CLOCK XTAL(28'636'363)
 
-static MACHINE_CONFIG_START( coolridr )
+MACHINE_CONFIG_START(coolridr_state::coolridr)
 	MCFG_CPU_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 mhz
 	MCFG_CPU_PROGRAM_MAP(system_h1_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_main, "screen", 0, 1)
@@ -3734,7 +3736,7 @@ static MACHINE_CONFIG_START( coolridr )
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aquastge, coolridr )
+MACHINE_CONFIG_DERIVED(coolridr_state::aquastge, coolridr)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aquastge_h1_map)
 
@@ -3856,7 +3858,7 @@ TODO: both irq routines writes 1 to 0x60d8894, sets up the Watchdog timer then e
 */
 READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 {
-	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
+	offs_t pc = m_maincpu->pc();
 
 	if(pc == 0x6002cba || pc == 0x6002d42)
 		return 0;
@@ -3871,7 +3873,7 @@ READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 
 READ32_MEMBER(coolridr_state::aquastge_hack_r)
 {
-	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
+	offs_t pc = m_maincpu->pc();
 
 	if ((pc == 0x6009e76) || (pc == 0x6009e78))
 		return 0;

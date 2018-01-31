@@ -110,6 +110,7 @@ c65.cpp
 c80.cpp
 c900.cpp
 camplynx.cpp
+candela.cpp
 canon_s80.cpp
 casloopy.cpp
 cat.cpp
@@ -181,6 +182,7 @@ dsb46.cpp
 dual68.cpp
 dvk_kcgd.cpp
 dvk_ksm.cpp
+e100.cpp
 eacc.cpp
 ec184x.cpp
 ec65.cpp
@@ -307,6 +309,7 @@ intv.cpp
 ipc.cpp
 ipds.cpp
 iq151.cpp
+iqunlim.cpp
 iris3130.cpp
 irisha.cpp
 isbc.cpp
@@ -372,6 +375,7 @@ mc8030.cpp
 mcb216.cpp
 mccpm.cpp
 megadriv.cpp
+megadriv_rad.cpp
 mekd2.cpp
 mephisto.cpp
 mephisto_montec.cpp
@@ -559,8 +563,13 @@ px8.cpp
 pyl601.cpp
 ql.cpp
 qtsbc.cpp
+qvt103.cpp
+qvt201.cpp
+qvt6800.cpp
 qx10.cpp
 r9751.cpp
+rad_eu3a05.cpp
+rad_eu3a14.cpp
 radio86.cpp
 rainbow.cpp
 rambo.cpp
@@ -586,12 +595,14 @@ sage2.cpp
 samcoupe.cpp
 sansa_fuze.cpp
 sapi1.cpp
+sartorius.cpp
 saturn.cpp
 savia84.cpp
 sbc6510.cpp
 sbrain.cpp
 sc1.cpp
 sc2.cpp
+scopus.cpp
 scorpion.cpp
 scv.cpp
 sdk80.cpp
@@ -693,6 +704,7 @@ tmc1800.cpp
 tmc2000e.cpp
 tmc600.cpp
 tosh1000.cpp
+tr175.cpp
 tr606.cpp
 tranz330.cpp
 tricep.cpp
@@ -707,8 +719,10 @@ tsispch.cpp
 tti.cpp
 tutor.cpp
 tv910.cpp
+tv912.cpp
 tv950.cpp
 tv990.cpp
+tvboy.cpp
 tvc.cpp
 tvgame.cpp
 tx0.cpp
@@ -720,6 +734,8 @@ univac.cpp
 unixpc.cpp
 ut88.cpp
 uzebox.cpp
+v100.cpp
+v102.cpp
 v1050.cpp
 v6809.cpp
 vax11.cpp
@@ -753,6 +769,9 @@ vt520.cpp
 vta2000.cpp
 vtech1.cpp
 vtech2.cpp
+vtech_eu3a12.cpp
+vtech_unk1.cpp
+vtech_unk2.cpp
 wangpc.cpp
 wicat.cpp
 wswan.cpp

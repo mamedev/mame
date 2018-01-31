@@ -98,6 +98,9 @@ public:
 	static void set_timer_clock(device_t &device, int timer_clock) { downcast<mc68901_device &>(device).m_timer_clock = timer_clock; }
 	static void set_rx_clock(device_t &device, int rx_clock) { downcast<mc68901_device &>(device).m_rx_clock = rx_clock; }
 	static void set_tx_clock(device_t &device, int tx_clock) { downcast<mc68901_device &>(device).m_tx_clock = tx_clock; }
+	static void set_timer_clock(device_t &device, const XTAL &xtal) { set_timer_clock(device, xtal.value()); }
+	static void set_rx_clock(device_t &device, const XTAL &xtal) { set_rx_clock(device, xtal.value()); }
+	static void set_tx_clock(device_t &device, const XTAL &xtal) { set_tx_clock(device, xtal.value()); }
 	template <class Object> static devcb_base &set_out_irq_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_gpio_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_gpio_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_out_tao_callback(device_t &device, Object &&cb) { return downcast<mc68901_device &>(device).m_out_tao_cb.set_callback(std::forward<Object>(cb)); }

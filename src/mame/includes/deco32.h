@@ -4,6 +4,7 @@
 #include "video/bufsprite.h"
 #include "video/decospr.h"
 #include "video/deco16ic.h"
+#include "video/deco_ace.h"
 #include "machine/deco_irq.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
@@ -136,6 +137,7 @@ public:
 	DECO16IC_BANK_CB_MEMBER(captaven_bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(captaven_pri_callback);
 
+	void captaven(machine_config &config);
 private:
 };
 
@@ -158,6 +160,9 @@ public:
 
 	DECO16IC_BANK_CB_MEMBER(fghthist_bank_callback);
 
+	void fghthist(machine_config &config);
+	void fghthistu(machine_config &config);
+	void fghthsta(machine_config &config);
 private:
 };
 
@@ -167,8 +172,9 @@ class nslasher_state : public deco32_state
 public:
 	nslasher_state(const machine_config &mconfig, device_type type, const char *tag)
 		: deco32_state(mconfig, type, tag),
-		m_ace_ram(*this, "ace_ram")
+		m_deco_ace(*this, "deco_ace")
 	{ }
+	required_device<deco_ace_device> m_deco_ace;
 
 	DECLARE_WRITE32_MEMBER(tattass_control_w);
 	DECLARE_WRITE_LINE_MEMBER(tattass_sound_irq_w);
@@ -176,8 +182,6 @@ public:
 	DECLARE_READ32_MEMBER(spriteram2_r);
 	DECLARE_WRITE32_MEMBER(spriteram2_w);
 	DECLARE_WRITE32_MEMBER(buffer_spriteram2_w);
-	DECLARE_WRITE32_MEMBER(ace_ram_w);
-	DECLARE_WRITE32_MEMBER(palette_dma_w);
 
 	DECLARE_DRIVER_INIT(tattass);
 	DECLARE_DRIVER_INIT(nslasher);
@@ -188,11 +192,11 @@ public:
 	DECLARE_READ16_MEMBER(port_b_tattass);
 	DECO16IC_BANK_CB_MEMBER(tattass_bank_callback);
 
+	void nslasheru(machine_config &config);
+	void tattass(machine_config &config);
+	void nslasher(machine_config &config);
 private:
-	void updateAceRam();
 	void mixDualAlphaSprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
-
-	required_shared_ptr<uint32_t> m_ace_ram;
 
 	std::unique_ptr<bitmap_ind16> m_tilemap_alpha_bitmap;
 
@@ -206,7 +210,6 @@ private:
 	int m_pendingCommand;
 	int m_readBitCount;
 	int m_byteAddr;
-	int m_ace_ram_dirty;
 };
 
 class dragngun_state : public deco32_state
@@ -264,6 +267,9 @@ public:
 	DECO16IC_BANK_CB_MEMBER(bank_1_callback);
 	DECO16IC_BANK_CB_MEMBER(bank_2_callback);
 
+	void dragngun(machine_config &config);
+	void lockload(machine_config &config);
+	void lockloadu(machine_config &config);
 private:
 	bool m_gun_speaker_disabled;
 };

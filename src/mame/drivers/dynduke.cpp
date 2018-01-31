@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0x00000, 0x05fff) AM_RAM
 	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE(background_w) AM_SHARE("back_data")
 	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE(foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x07000, 0x07fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x07000, 0x07fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0a000, 0x0a001) AM_WRITE(gfxbank_w)
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITENOP
@@ -304,7 +304,7 @@ INTERRUPT_GEN_MEMBER(dynduke_state::interrupt)
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( dynduke )
+MACHINE_CONFIG_START(dynduke_state::dynduke)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", V30, 16000000/2) // NEC V30-8 CPU
 	MCFG_CPU_PROGRAM_MAP(master_map)
@@ -357,7 +357,7 @@ static MACHINE_CONFIG_START( dynduke )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dbldyn, dynduke )
+MACHINE_CONFIG_DERIVED(dynduke_state::dbldyn, dynduke)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(masterj_map)

@@ -182,8 +182,8 @@
 
 DEFINE_DEVICE_TYPE(VME_FCSCSI1, vme_fcscsi1_card_device, "fcscsi1", "Force Computer SYS68K/ISCSI-1 Intelligent Mass Storage Controller Board")
 
-#define CPU_CRYSTAL XTAL_20MHz /* Jauch */
-#define PIT_CRYSTAL XTAL_16MHz /* Jauch */
+#define CPU_CRYSTAL XTAL(20'000'000) /* Jauch */
+#define PIT_CRYSTAL XTAL(16'000'000) /* Jauch */
 
 static ADDRESS_MAP_START (fcscsi1_mem, AS_PROGRAM, 16, vme_fcscsi1_card_device)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -226,7 +226,7 @@ ROM_START (fcscsi1)
 ROM_END
 
 
-MACHINE_CONFIG_MEMBER(vme_fcscsi1_card_device::device_add_mconfig)
+MACHINE_CONFIG_START(vme_fcscsi1_card_device::device_add_mconfig)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68010, CPU_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
 	MCFG_CPU_PROGRAM_MAP (fcscsi1_mem)

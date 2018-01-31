@@ -682,8 +682,8 @@ static GFXDECODE_START( ts2068 )
 	GFXDECODE_ENTRY( "maincpu", 0x13d00, ts2068_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
-	MCFG_CPU_REPLACE("maincpu", Z80, XTAL_14_112MHz/4)        /* From Schematic; 3.528 MHz */
+MACHINE_CONFIG_DERIVED(spectrum_state::ts2068, spectrum_128)
+	MCFG_CPU_REPLACE("maincpu", Z80, XTAL(14'112'000)/4)        /* From Schematic; 3.528 MHz */
 	MCFG_CPU_PROGRAM_MAP(ts2068_mem)
 	MCFG_CPU_IO_MAP(ts2068_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spectrum_state,  spec_interrupt)
@@ -704,7 +704,7 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 	MCFG_VIDEO_START_OVERRIDE(spectrum_state, ts2068 )
 
 	/* sound */
-	MCFG_SOUND_REPLACE("ay8912", AY8912, XTAL_14_112MHz/8)        /* From Schematic; 1.764 MHz */
+	MCFG_SOUND_REPLACE("ay8912", AY8912, XTAL(14'112'000)/8)        /* From Schematic; 1.764 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* cartridge */
@@ -721,13 +721,13 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( uk2086, ts2068 )
+MACHINE_CONFIG_DERIVED(spectrum_state::uk2086, ts2068)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(50)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tc2048, spectrum )
+MACHINE_CONFIG_DERIVED(spectrum_state::tc2048, spectrum)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tc2048_mem)
 	MCFG_CPU_IO_MAP(tc2048_io)

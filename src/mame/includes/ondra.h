@@ -42,6 +42,7 @@ public:
 	INTERRUPT_GEN_MEMBER(ondra_interrupt);
 	TIMER_CALLBACK_MEMBER(nmi_check_callback);
 
+	void ondra(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

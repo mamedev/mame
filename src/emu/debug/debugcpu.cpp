@@ -48,6 +48,7 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	, m_visiblecpu(nullptr)
 	, m_breakcpu(nullptr)
 	, m_symtable(nullptr)
+	, m_vblank_occurred(false)
 	, m_execution_state(EXECUTION_STATE_STOPPED)
 	, m_stop_when_not_device(nullptr)
 	, m_bpindex(1)
@@ -87,7 +88,15 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	}
 
 	/* first CPU is visible by default */
-	m_visiblecpu = m_machine.firstcpu;
+	for (device_t &device : device_iterator(m_machine.root_device()))
+	{
+		auto *cpu = dynamic_cast<cpu_device *>(&device);
+		if (cpu != nullptr)
+		{
+			m_visiblecpu = cpu;
+			break;
+		}
+	}
 
 	/* add callback for breaking on VBLANK */
 	if (m_machine.first_screen() != nullptr)
@@ -827,7 +836,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
 				auto dis = m_machine.disable_side_effect(disable_se);
-				return read_memory(space, space.address_to_byte(address), size, true);
+				return read_memory(space, address, size, true);
 			}
 			break;
 		}
@@ -851,7 +860,7 @@ u64 debugger_cpu::expression_read_memory(void *param, const char *name, expressi
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
 				auto dis = m_machine.disable_side_effect(disable_se);
-				return read_memory(space, space.address_to_byte(address), size, false);
+				return read_memory(space, address, size, false);
 			}
 			break;
 		}
@@ -1032,7 +1041,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_LOGICAL));
 				auto dis = m_machine.disable_side_effect(disable_se);
-				write_memory(space, space.address_to_byte(address), data, size, true);
+				write_memory(space, address, data, size, true);
 			}
 			break;
 
@@ -1051,7 +1060,7 @@ void debugger_cpu::expression_write_memory(void *param, const char *name, expres
 			{
 				address_space &space = memory->space(AS_PROGRAM + (spacenum - EXPSPACE_PROGRAM_PHYSICAL));
 				auto dis = m_machine.disable_side_effect(disable_se);
-				write_memory(space, space.address_to_byte(address), data, size, false);
+				write_memory(space, address, data, size, false);
 			}
 			break;
 

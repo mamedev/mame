@@ -359,7 +359,7 @@ WRITE8_MEMBER(homedata_state::reikaids_upd7807_portc_w)
 	   1 \ ROM bank
 	   0 /
 	  */
-//  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n", space.device().safe_pc(), data, BIT(data, 2), BIT(data, 6));
+//  logerror("%s: port C wr %02x (STATUS %d DATA %d)\n", machine().describe_context(), data, BIT(data, 2), BIT(data, 6));
 
 	membank("bank2")->set_entry(data & 0x03);
 
@@ -386,21 +386,21 @@ READ8_MEMBER(homedata_state::reikaids_io_r)
 
 	m_vblank = 0;
 
-	//logerror("%04x: io_r %02x\n", space.device().safe_pc(), res);
+	//logerror("%s: io_r %02x\n", machine().describe_context(), res);
 
 	return res;
 }
 
 READ8_MEMBER(homedata_state::reikaids_snd_command_r)
 {
-	//logerror("%04x: sndmcd_r (%02x)\n", space.device().safe_pc(), m_snd_command);
+	//logerror("%s: sndmcd_r (%02x)\n", machine().describe_context(), m_snd_command);
 	return m_snd_command;
 }
 
 WRITE8_MEMBER(homedata_state::reikaids_snd_command_w)
 {
 	m_snd_command = data;
-	//logerror("%04x: coprocessor_command_w %02x\n", space.device().safe_pc(), data);
+	//logerror("%s: coprocessor_command_w %02x\n", machine().describe_context(), data);
 }
 
 
@@ -414,13 +414,13 @@ WRITE8_MEMBER(homedata_state::reikaids_snd_command_w)
 
 WRITE8_MEMBER(homedata_state::pteacher_snd_command_w)
 {
-	//logerror("%04x: snd_command_w %02x\n", space.device().safe_pc(), data);
+	//logerror("%s: snd_command_w %02x\n", machine().describe_context(), data);
 	m_from_cpu = data;
 }
 
 READ8_MEMBER(homedata_state::pteacher_snd_r)
 {
-	//logerror("%04x: pteacher_snd_r %02x\n",space.device().safe_pc(),to_cpu);
+	//logerror("%s: pteacher_snd_r %02x\n",machine().describe_context(),to_cpu);
 	return m_to_cpu;
 }
 
@@ -446,7 +446,7 @@ READ8_MEMBER(homedata_state::pteacher_keyboard_r)
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 	int dips = ioport("DSW")->read();
 
-	//  logerror("%04x: keyboard_r with port A = %02x\n",space.device().safe_pc(),upd7807_porta);
+	//  logerror("%s: keyboard_r with port A = %02x\n",machine().describe_context(),upd7807_porta);
 
 	if (m_upd7807_porta & 0x80)
 	{
@@ -469,7 +469,7 @@ READ8_MEMBER(homedata_state::pteacher_upd7807_porta_r)
 	if (!BIT(m_upd7807_portc, 6))
 		m_upd7807_porta = m_from_cpu;
 	else
-		logerror("%04x: read PA with PC *not* clear\n", space.device().safe_pc());
+		logerror("%s: read PA with PC *not* clear\n", machine().describe_context());
 
 	return m_upd7807_porta;
 }
@@ -477,7 +477,7 @@ READ8_MEMBER(homedata_state::pteacher_upd7807_porta_r)
 WRITE8_MEMBER(homedata_state::pteacher_snd_answer_w)
 {
 	m_to_cpu = data;
-	//logerror("%04x: to_cpu = %02x\n", space.device().safe_pc(), m_to_cpu);
+	//logerror("%s: to_cpu = %02x\n", machine().describe_context(), m_to_cpu);
 }
 
 WRITE8_MEMBER(homedata_state::pteacher_upd7807_porta_w)
@@ -498,7 +498,7 @@ WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
 	   0 input (coin)
 	  */
 
-	//  logerror("%04x: port C wr %02x\n", space.device().safe_pc(), data);
+	//  logerror("%s: port C wr %02x\n", machine().describe_context(), data);
 
 	membank("bank2")->set_entry((data & 0x0c) >> 2);
 
@@ -1211,7 +1211,7 @@ MACHINE_RESET_MEMBER(homedata_state,reikaids)
 	m_gfx_bank[1] = 0;  // this is not used by reikaids
 }
 
-static MACHINE_CONFIG_START( mrokumei )
+MACHINE_CONFIG_START(homedata_state::mrokumei)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)  /* 4MHz ? */
@@ -1258,7 +1258,7 @@ MACHINE_CONFIG_END
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( reikaids )
+MACHINE_CONFIG_START(homedata_state::reikaids)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)  /* 4MHz ? */
@@ -1314,7 +1314,7 @@ MACHINE_CONFIG_END
 
 /**************************************************************************/
 
-static MACHINE_CONFIG_START( pteacher )
+MACHINE_CONFIG_START(homedata_state::pteacher)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)  /* 4MHz ? */
@@ -1364,13 +1364,13 @@ static MACHINE_CONFIG_START( pteacher )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mjkinjas, pteacher )
+MACHINE_CONFIG_DERIVED(homedata_state::mjkinjas, pteacher)
 
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_CLOCK(11000000)    /* 11MHz ? */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( lemnangl, pteacher )
+MACHINE_CONFIG_DERIVED(homedata_state::lemnangl, pteacher)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", lemnangl)
@@ -1483,7 +1483,7 @@ GFXDECODE_END
 
 /* clocks are 16mhz and 9mhz */
 
-static MACHINE_CONFIG_START( mirderby )
+MACHINE_CONFIG_START(homedata_state::mirderby)
 
 	MCFG_CPU_ADD("maincpu", M6809, 16000000/8)  /* 2 Mhz */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)

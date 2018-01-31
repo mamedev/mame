@@ -873,10 +873,10 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( perfrman )
+MACHINE_CONFIG_START(slapfght_state::perfrman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4) // 4MHz? XTAL is known, divider is guessed
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000)/4) // 4MHz? XTAL is known, divider is guessed
 	MCFG_CPU_PROGRAM_MAP(perfrman_map)
 	MCFG_CPU_IO_MAP(io_map_nomcu)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
@@ -887,7 +887,7 @@ static MACHINE_CONFIG_START( perfrman )
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(slapfght_state, irq_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(slapfght_state, palette_bank_w))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/8) // 2MHz? XTAL is known, divider is guessed
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/8) // 2MHz? XTAL is known, divider is guessed
 	MCFG_CPU_PROGRAM_MAP(perfrman_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 240) // music speed, verified
 
@@ -912,22 +912,22 @@ static MACHINE_CONFIG_START( perfrman )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_16MHz/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(16'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_16MHz/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(16'000'000)/8)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tigerh )
+MACHINE_CONFIG_START(slapfght_state::tigerh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_36MHz/6) // 6MHz
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(36'000'000)/6) // 6MHz
 	MCFG_CPU_PROGRAM_MAP(tigerh_map_mcu)
 	MCFG_CPU_IO_MAP(io_map_mcu)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
@@ -937,11 +937,11 @@ static MACHINE_CONFIG_START( tigerh )
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(slapfght_state, flipscreen_w))
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(slapfght_state, irq_enable_w))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) // 3MHz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
 	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360) // music speed, verified with pcb recording
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU_TIGER, XTAL_36MHz/12) // 3MHz
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU_TIGER, XTAL(36'000'000)/12) // 3MHz
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -964,18 +964,18 @@ static MACHINE_CONFIG_START( tigerh )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_36MHz/24) // 1.5MHz
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(36'000'000)/24) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_36MHz/24) // 1.5MHz
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(36'000'000)/24) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tigerhb1, tigerh )
+MACHINE_CONFIG_DERIVED(slapfght_state::tigerhb1, tigerh)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -985,7 +985,7 @@ static MACHINE_CONFIG_DERIVED( tigerhb1, tigerh )
 	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tigerhb2, tigerhb1 )
+MACHINE_CONFIG_DERIVED(slapfght_state::tigerhb2, tigerhb1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -993,10 +993,10 @@ static MACHINE_CONFIG_DERIVED( tigerhb2, tigerhb1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( slapfigh )
+MACHINE_CONFIG_START(slapfght_state::slapfigh)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_36MHz/6) // 6MHz
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(36'000'000)/6) // 6MHz
 	MCFG_CPU_PROGRAM_MAP(slapfigh_map_mcu)
 	MCFG_CPU_IO_MAP(io_map_mcu)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
@@ -1007,11 +1007,11 @@ static MACHINE_CONFIG_START( slapfigh )
 	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(slapfght_state, irq_enable_w))
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(MEMBANK("bank1"))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) // 3MHz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(36'000'000)/12) // 3MHz
 	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 180)
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL_36MHz/12) // 3MHz
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(36'000'000)/12) // 3MHz
 	MCFG_TAITO_M68705_AUX_STROBE_CB(WRITE8(slapfght_state, scroll_from_mcu_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -1035,18 +1035,18 @@ static MACHINE_CONFIG_START( slapfigh )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_36MHz/24) // 1.5MHz
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(36'000'000)/24) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("IN1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_36MHz/24) // 1.5MHz
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(36'000'000)/24) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( slapfighb1, slapfigh )
+MACHINE_CONFIG_DERIVED(slapfght_state::slapfighb1, slapfigh)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1056,21 +1056,21 @@ static MACHINE_CONFIG_DERIVED( slapfighb1, slapfigh )
 	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( slapfighb2, slapfighb1 )
+MACHINE_CONFIG_DERIVED(slapfght_state::slapfighb2, slapfighb1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(slapfighb2_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( getstarb1, slapfighb1 )
+MACHINE_CONFIG_DERIVED(slapfght_state::getstarb1, slapfighb1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(getstarb1_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( getstarb2, slapfighb1 )
+MACHINE_CONFIG_DERIVED(slapfght_state::getstarb2, slapfighb1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

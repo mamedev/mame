@@ -227,6 +227,8 @@ public:
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void pyuutajr(machine_config &config);
+	void tutor(machine_config &config);
 };
 
 
@@ -733,14 +735,14 @@ static INPUT_PORTS_START(pyuutajr)
 		PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tutor )
+MACHINE_CONFIG_START(tutor_state::tutor)
 	// basic machine hardware
 	// TMS9995 CPU @ 10.7 MHz
 	// No lines connected yet
-	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL_10_738635MHz, tutor_memmap, tutor_io)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995, XTAL(10'738'635), tutor_memmap, tutor_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
@@ -768,7 +770,7 @@ static MACHINE_CONFIG_START( tutor )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tutor")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pyuutajr, tutor )
+MACHINE_CONFIG_DERIVED(tutor_state::pyuutajr, tutor)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pyuutajr_mem)
 	//MCFG_DEVICE_REMOVE("centronics")

@@ -259,6 +259,9 @@ public:
 	void mac_driver_init(mac128model_t model);
 	void update_volume();
 
+	void mac512ke(machine_config &config);
+	void mac128k(machine_config &config);
+	void macplus(machine_config &config);
 private:
 	// wait states for accessing the VIA
 	int m_via_cycles;
@@ -634,7 +637,7 @@ READ16_MEMBER ( mac128_state::mac_iwm_r )
 	result = fdc->read(offset >> 8);
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, space.device().safe_pc());
+		printf("mac_iwm_r: offset=0x%08x mem_mask %04x = %02x (PC %x)\n", offset, mem_mask, result, m_maincpu->pc());
 
 	return (result << 8) | result;
 }
@@ -644,7 +647,7 @@ WRITE16_MEMBER ( mac128_state::mac_iwm_w )
 	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	if (LOG_MAC_IWM)
-		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, space.device().safe_pc());
+		printf("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, m_maincpu->pc());
 
 	if (ACCESSING_BITS_0_7)
 		fdc->write((offset >> 8), data & 0xff);
@@ -1320,7 +1323,7 @@ static const floppy_interface mac_floppy_interface =
 	"floppy_3_5"
 };
 
-static MACHINE_CONFIG_START( mac512ke )
+MACHINE_CONFIG_START(mac128_state::mac512ke)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, C7M)        /* 7.8336 MHz */
 	MCFG_CPU_PROGRAM_MAP(mac512ke_map)
@@ -1346,7 +1349,7 @@ static MACHINE_CONFIG_START( mac512ke )
 	MCFG_SOUND_ROUTE_EX(0, DAC_TAG, 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, DAC_TAG, -1.0, DAC_VREF_NEG_INPUT)
 
 	/* devices */
-	MCFG_RTC3430042_ADD("rtc", XTAL_32_768kHz)
+	MCFG_RTC3430042_ADD("rtc", XTAL(32'768))
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
@@ -1376,7 +1379,7 @@ static MACHINE_CONFIG_START( mac512ke )
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mac128k, mac512ke )
+MACHINE_CONFIG_DERIVED(mac128_state::mac128k, mac512ke)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -1384,7 +1387,7 @@ static MACHINE_CONFIG_DERIVED( mac128k, mac512ke )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( macplus, mac512ke )
+MACHINE_CONFIG_DERIVED(mac128_state::macplus, mac512ke)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(macplus_map)
 

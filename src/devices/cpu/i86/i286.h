@@ -112,7 +112,7 @@ private:
 	void switch_task(uint16_t ntask, int type);
 	void trap(uint32_t error);
 	int verify(uint16_t selector, int operation, uint8_t rights, bool valid);
-	uint32_t pc() { return m_pc = m_base[CS] + m_ip; }
+	uint32_t update_pc() { return m_pc = m_base[CS] + m_ip; }
 
 	int m_trap_level;
 	uint16_t m_msw;
@@ -163,7 +163,7 @@ private:
 };
 
 #define MCFG_80286_A20(_class, _a20_cb) \
-		i80286_cpu_device::static_set_a20_callback(*device, i80286_cpu_device::a20_cb(&_class::_a20_cb, (_class *)owner));
+		i80286_cpu_device::static_set_a20_callback(*device, i80286_cpu_device::a20_cb(&_class::_a20_cb, this));
 
 #define MCFG_80286_SHUTDOWN(_devcb) \
 	devcb = &i80286_cpu_device::static_set_shutdown_callback(*device, DEVCB_##_devcb);

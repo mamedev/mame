@@ -58,6 +58,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(t15_sts_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(togglekey_changed);
+
+	void hp9845_base(machine_config &config);
 protected:
 	required_device<hp_5061_3001_cpu_device> m_lpu;
 	required_device<hp_5061_3001_cpu_device> m_ppu;

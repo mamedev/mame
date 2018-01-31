@@ -305,7 +305,7 @@ static SLOT_INTERFACE_START(pce_cart)
 	SLOT_INTERFACE_INTERNAL("sf2", PCE_ROM_SF2)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pce_common )
+MACHINE_CONFIG_START(pce_state::pce_common)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)
@@ -343,19 +343,19 @@ static MACHINE_CONFIG_START( pce_common )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pce, pce_common )
+MACHINE_CONFIG_DERIVED(pce_state::pce, pce_common)
 	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pce")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tg16, pce_common )
+MACHINE_CONFIG_DERIVED(pce_state::tg16, pce_common)
 	MCFG_TG16_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tg16")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sgx )
+MACHINE_CONFIG_START(pce_state::sgx)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(sgx_mem)

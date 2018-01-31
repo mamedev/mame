@@ -149,7 +149,7 @@ rom.
 #include "emu.h"
 #include "t5182.h"
 
-#define T5182_CLOCK     XTAL_14_31818MHz/4
+#define T5182_CLOCK     XTAL(14'318'181)/4
 
 DEFINE_DEVICE_TYPE(T5182, t5182_device, "t5182", "T5182 MCU")
 
@@ -369,7 +369,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( t5182_device::device_add_mconfig )
+MACHINE_CONFIG_START(t5182_device::device_add_mconfig)
 	MCFG_CPU_ADD("t5182_z80", Z80, T5182_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(t5182_map)
 	MCFG_CPU_IO_MAP(t5182_io)

@@ -72,4 +72,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
+	void sshanghb(machine_config &config);
+	void sshangha(machine_config &config);
 };

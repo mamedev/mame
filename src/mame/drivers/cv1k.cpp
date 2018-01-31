@@ -237,6 +237,8 @@ public:
 	uint32_t m_idleramoffs;
 	uint32_t m_idlepc;
 	void install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed);
+	void cv1k_d(machine_config &config);
+	void cv1k(machine_config &config);
 };
 
 
@@ -449,10 +451,10 @@ void cv1k_state::machine_reset()
 	m_blitter->reset();
 }
 
-static MACHINE_CONFIG_START( cv1k )
+MACHINE_CONFIG_START(cv1k_state::cv1k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SH3BE, XTAL_12_8MHz*8) // 102.4MHz
+	MCFG_CPU_ADD("maincpu", SH3BE, 12.8_MHz_XTAL*8) // 102.4MHz
 	MCFG_SH4_MD0(0)  // none of this is verified
 	MCFG_SH4_MD1(0)  // (the sh3 is different to the sh4 anyway, should be changed)
 	MCFG_SH4_MD2(0)
@@ -462,7 +464,7 @@ static MACHINE_CONFIG_START( cv1k )
 	MCFG_SH4_MD6(0)
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(XTAL_12_8MHz*8) // 102.4MHz
+	MCFG_SH4_CLOCK(12.8_MHz_XTAL*8) // 102.4MHz
 	MCFG_CPU_PROGRAM_MAP(cv1k_map)
 	MCFG_CPU_IO_MAP(cv1k_port)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
@@ -481,19 +483,19 @@ static MACHINE_CONFIG_START( cv1k )
 	MCFG_PALETTE_ADD("palette", 0x10000)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_YMZ770_ADD("ymz770", XTAL_16_384MHz)
+	MCFG_YMZ770_ADD("ymz770", 16.384_MHz_XTAL)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0) // only Right output used, Left is not connected
 
 	MCFG_EPIC12_ADD("blitter")
 	MCFG_EPIC12_SET_MAINRAMSIZE(0x800000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cv1k_d, cv1k )
+MACHINE_CONFIG_DERIVED(cv1k_state::cv1k_d, cv1k)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("maincpu")
 
-	MCFG_CPU_ADD("maincpu", SH3BE, XTAL_12_8MHz*8) // 102.4MHz
+	MCFG_CPU_ADD("maincpu", SH3BE, 12.8_MHz_XTAL*8) // 102.4MHz
 	MCFG_SH4_MD0(0)  // none of this is verified
 	MCFG_SH4_MD1(0)  // (the sh3 is different to the sh4 anyway, should be changed)
 	MCFG_SH4_MD2(0)
@@ -503,7 +505,7 @@ static MACHINE_CONFIG_DERIVED( cv1k_d, cv1k )
 	MCFG_SH4_MD6(0)
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
-	MCFG_SH4_CLOCK(XTAL_12_8MHz*8) // 102.4MHz
+	MCFG_SH4_CLOCK(12.8_MHz_XTAL*8) // 102.4MHz
 	MCFG_CPU_PROGRAM_MAP(cv1k_d_map)
 	MCFG_CPU_IO_MAP(cv1k_port)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cv1k_state, irq2_line_hold)
@@ -863,7 +865,7 @@ ROM_END
 
 READ64_MEMBER(cv1k_state::speedup_r)
 {
-	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
+	offs_t pc = m_maincpu->pc();
 
 	if (pc == m_idlepc || pc == m_idlepc + 2) m_maincpu->spin_until_time(attotime::from_usec(10));
 

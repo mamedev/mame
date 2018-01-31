@@ -53,6 +53,8 @@ public:
 	DECLARE_WRITE8_MEMBER(display_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
+	void atari_s2(machine_config &config);
+	void atari_s3(machine_config &config);
 private:
 	bool m_timer_sb;
 	uint8_t m_timer_s[5];
@@ -465,9 +467,9 @@ void atari_s2_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( atari_s2 )
+MACHINE_CONFIG_START(atari_s2_state::atari_s2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_4MHz / 4)
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(4'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(atari_s2_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -485,11 +487,11 @@ static MACHINE_CONFIG_START( atari_s2 )
 	/* Video */
 	MCFG_DEFAULT_LAYOUT(layout_atari_s2)
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", atari_s2_state, irq, attotime::from_hz(XTAL_4MHz / 8192))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq", atari_s2_state, irq, attotime::from_hz(XTAL(4'000'000) / 8192))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_s", atari_s2_state, timer_s, attotime::from_hz(150000))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( atari_s3, atari_s2 )
+MACHINE_CONFIG_DERIVED(atari_s2_state::atari_s3, atari_s2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(atari_s3_map)
 MACHINE_CONFIG_END

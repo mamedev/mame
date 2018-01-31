@@ -23,6 +23,7 @@ public:
 		m_bgpen_1(*this, "bgpen_1"),
 		m_bgpen_2(*this, "bgpen_2"),
 		m_paletteram(*this, "paletteram"),
+		m_ymf_bank(*this, "ymfbank%u", 0),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -40,7 +41,7 @@ public:
 	required_shared_ptr<uint32_t> m_bgpen_2;
 	required_shared_ptr<uint32_t> m_paletteram;
 
-	memory_bank *m_ymf_bank[4];
+	required_memory_bank_array<4> m_ymf_bank;
 	uint8_t m_ymf_max_bank;
 	uint8_t m_io_select;
 
@@ -75,4 +76,6 @@ public:
 	uint32_t screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(psikyosh_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t scr);
+	void ps4big(machine_config &config);
+	void ps4small(machine_config &config);
 };

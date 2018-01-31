@@ -54,6 +54,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void intel82439tx_init();
+	void queen(machine_config &config);
 };
 
 
@@ -270,7 +271,7 @@ void queen_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( queen )
+MACHINE_CONFIG_START(queen_state::queen)
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 533000000/16) // Celeron or Pentium 3, 533 Mhz
 	MCFG_CPU_PROGRAM_MAP(queen_map)
 	MCFG_CPU_IO_MAP(queen_io)

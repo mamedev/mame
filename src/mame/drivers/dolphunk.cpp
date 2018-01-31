@@ -107,6 +107,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_WRITE8_MEMBER(port06_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(dauphin_c);
+	void dauphin(machine_config &config);
 private:
 	uint8_t m_cass_data;
 	uint8_t m_last_key;
@@ -223,9 +224,9 @@ static INPUT_PORTS_START( dauphin )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( dauphin )
+MACHINE_CONFIG_START(dauphin_state::dauphin)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",S2650, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu",S2650, XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(dauphin_mem)
 	MCFG_CPU_IO_MAP(dauphin_io)
 	MCFG_S2650_SENSE_INPUT(READLINE(dauphin_state, cass_r))

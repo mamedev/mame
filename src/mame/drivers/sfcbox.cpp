@@ -154,6 +154,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_READ8_MEMBER(spc_ram_100_r);
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
+	void sfcbox(machine_config &config);
 };
 
 uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
@@ -445,23 +446,24 @@ void sfcbox_state::machine_reset()
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( sfcbox )
+MACHINE_CONFIG_START(sfcbox_state::sfcbox)
 
 	/* base snes hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
 	MCFG_CPU_PROGRAM_MAP(snes_map)
 
-	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2) /* 2.048 Mhz, but internal divider */
+	// runs at 24.576 MHz / 12 = 2.048 MHz
+	MCFG_CPU_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
 	MCFG_CPU_PROGRAM_MAP(spc_mem)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* sfcbox hardware */
-	MCFG_CPU_ADD("bios", Z180, XTAL_12MHz / 2)  /* HD64180RF6X */
+	MCFG_CPU_ADD("bios", Z180, XTAL(12'000'000) / 2)  /* HD64180RF6X */
 	MCFG_CPU_PROGRAM_MAP(sfcbox_map)
 	MCFG_CPU_IO_MAP(sfcbox_io)
 
-	MCFG_MB90082_ADD("mb90082",XTAL_12MHz / 2) /* TODO: correct clock */
+	MCFG_MB90082_ADD("mb90082",XTAL(12'000'000) / 2) /* TODO: correct clock */
 	MCFG_S3520CF_ADD("s3520cf") /* RTC */
 
 	/* sound hardware */

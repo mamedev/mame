@@ -287,8 +287,8 @@ Note: Roms for Tempest Analog Vector-Generator PCB Assembly A037383-03 or A03738
 #include "speaker.h"
 
 
-#define MASTER_CLOCK (XTAL_12_096MHz)
-#define CLOCK_3KHZ   ((double)MASTER_CLOCK / 4096)
+#define MASTER_CLOCK (XTAL(12'096'000))
+#define CLOCK_3KHZ   (MASTER_CLOCK / 4096)
 
 #define TEMPEST_KNOB_P1_TAG "KNOBP1"
 #define TEMPEST_KNOB_P2_TAG "KNOBP2"
@@ -339,6 +339,7 @@ public:
 	DECLARE_READ8_MEMBER(rom_ae1f_r);
 
 	virtual void machine_start() override;
+	void tempest(machine_config &config);
 };
 
 
@@ -589,7 +590,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tempest )
+MACHINE_CONFIG_START(tempest_state::tempest)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)

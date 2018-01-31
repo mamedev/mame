@@ -456,12 +456,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy1_state )
 	AM_RANGE(0x860000, 0x860001) AM_WRITE(atarisy1_bankselect_w) AM_SHARE("bankselect")
 	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(video_int_ack_w)
-	AM_RANGE(0x8c0000, 0x8c0001) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write)
+	AM_RANGE(0x8c0000, 0x8c0001) AM_DEVWRITE("eeprom", eeprom_parallel_28xx_device, unlock_write16)
 	AM_RANGE(0x900000, 0x9fffff) AM_RAM
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write) AM_SHARE("playfield")
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("playfield", tilemap_device, write16) AM_SHARE("playfield")
 	AM_RANGE(0xa02000, 0xa02fff) AM_RAM_WRITE(atarisy1_spriteram_w) AM_SHARE("mob")
-	AM_RANGE(0xa03000, 0xa03fff) AM_RAM_DEVWRITE("alpha", tilemap_device, write) AM_SHARE("alpha")
-	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa03000, 0xa03fff) AM_RAM_DEVWRITE("alpha", tilemap_device, write16) AM_SHARE("alpha")
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xf00000, 0xf00fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0xf20000, 0xf20007) AM_READ(trakball_r)
 	AM_RANGE(0xf40000, 0xf4001f) AM_READWRITE(joystick_r, joystick_w)
@@ -725,7 +725,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atarisy1 )
+MACHINE_CONFIG_START(atarisy1_state::atarisy1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
@@ -802,27 +802,27 @@ static MACHINE_CONFIG_START( atarisy1 )
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(atarisy1_state, via_pb_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( marble, atarisy1 )
+MACHINE_CONFIG_DERIVED(atarisy1_state::marble, atarisy1)
 	MCFG_SLAPSTIC_ADD("slapstic", 103)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( peterpak, atarisy1 )
+MACHINE_CONFIG_DERIVED(atarisy1_state::peterpak, atarisy1)
 	MCFG_SLAPSTIC_ADD("slapstic", 107)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( indytemp, atarisy1 )
+MACHINE_CONFIG_DERIVED(atarisy1_state::indytemp, atarisy1)
 	MCFG_SLAPSTIC_ADD("slapstic", 105)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( roadrunn, atarisy1 )
+MACHINE_CONFIG_DERIVED(atarisy1_state::roadrunn, atarisy1)
 	MCFG_SLAPSTIC_ADD("slapstic", 108)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( roadb109, atarisy1 )
+MACHINE_CONFIG_DERIVED(atarisy1_state::roadb109, atarisy1)
 	MCFG_SLAPSTIC_ADD("slapstic", 109)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( roadb110, atarisy1 )
+MACHINE_CONFIG_DERIVED(atarisy1_state::roadb110, atarisy1)
 	MCFG_SLAPSTIC_ADD("slapstic", 110)
 MACHINE_CONFIG_END
 

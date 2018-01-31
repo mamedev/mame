@@ -143,7 +143,7 @@ void ym3802_device::midi_clk()
 
 void ym3802_device::reset_midi_timer()
 {
-	uint64_t rate;
+	uint32_t rate;
 	uint8_t divisor = m_reg[REG_TRR] & 0x1f;
 
 	if(!(divisor & 0x10))
@@ -260,7 +260,7 @@ WRITE8_MEMBER(ym3802_device::write)
 				{
 					if((data & 0x07) == 2)
 					{
-						uint64_t rate = (m_reg[REG_CCR] & 0x02) ? m_clkm_rate / 4 : m_clkm_rate / 8;
+						const double rate = (m_reg[REG_CCR] & 0x02) ? m_clkm_rate / 4 : m_clkm_rate / 8;
 
 						// start message to click counter
 						m_midi_counter_timer->adjust(attotime::from_hz(rate),0,attotime::from_hz(rate));

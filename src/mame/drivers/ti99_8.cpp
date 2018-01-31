@@ -261,6 +261,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(cassette_motor);
 	DECLARE_WRITE8_MEMBER(tms9901_interrupt);
 
+	void ti99_8(machine_config &config);
+	void ti99_8_60hz(machine_config &config);
+	void ti99_8_50hz(machine_config &config);
 private:
 	// Keyboard support
 	void    set_keyboard_column(int number, int data);
@@ -713,11 +716,11 @@ MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
 	console_reset(CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( ti99_8 )
+MACHINE_CONFIG_START(ti99_8_state::ti99_8)
 	// basic machine hardware */
 	// TMS9995-MP9537 CPU @ 10.7 MHz
 	// MP9537 mask: This variant of the TMS9995 does not contain on-chip RAM
-	MCFG_TMS99xx_ADD("maincpu", TMS9995_MP9537, XTAL_10_738635MHz, memmap, crumap)
+	MCFG_TMS99xx_ADD("maincpu", TMS9995_MP9537, XTAL(10'738'635), memmap, crumap)
 	MCFG_TMS9995_EXTOP_HANDLER( WRITE8(ti99_8_state, external_operation) )
 	MCFG_TMS9995_CLKOUT_HANDLER( WRITELINE(ti99_8_state, clock_out) )
 	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(ti99_8_state, dbin_line) )
@@ -727,7 +730,7 @@ static MACHINE_CONFIG_START( ti99_8 )
 	MCFG_MACHINE_RESET_OVERRIDE(ti99_8_state, ti99_8 )
 
 	// 9901 configuration
-	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, XTAL_10_738635MHz/4.0)
+	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, XTAL(10'738'635)/4.0)
 	MCFG_TMS9901_READBLOCK_HANDLER( READ8(ti99_8_state, read_by_9901) )
 	MCFG_TMS9901_P0_HANDLER( WRITELINE( ti99_8_state, keyC0) )
 	MCFG_TMS9901_P1_HANDLER( WRITELINE( ti99_8_state, keyC1) )
@@ -824,9 +827,9 @@ MACHINE_CONFIG_END
 /*
     TI-99/8 US version (NTSC, 60 Hz)
 */
-static MACHINE_CONFIG_DERIVED( ti99_8_60hz, ti99_8 )
+MACHINE_CONFIG_DERIVED(ti99_8_state::ti99_8_60hz, ti99_8)
 	// Video hardware
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9118, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9118, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_8_state, video_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( TI_SCREEN_TAG )
@@ -836,9 +839,9 @@ MACHINE_CONFIG_END
 /*
     TI-99/8 European version (PAL, 50 Hz)
 */
-static MACHINE_CONFIG_DERIVED( ti99_8_50hz, ti99_8 )
+MACHINE_CONFIG_DERIVED(ti99_8_state::ti99_8_50hz, ti99_8)
 	// Video hardware
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9129, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9129, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_8_state,video_interrupt))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( TI_SCREEN_TAG )

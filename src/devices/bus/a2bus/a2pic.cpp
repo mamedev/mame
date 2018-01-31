@@ -71,7 +71,7 @@ ioport_constructor a2bus_pic_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_pic_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_pic_device::device_add_mconfig)
 	MCFG_CENTRONICS_ADD(PIC_CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_DATA_INPUT_BUFFER("ctx_data_in")
 	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(a2bus_pic_device, ack_w))
@@ -115,9 +115,6 @@ a2bus_pic_device::a2bus_pic_device(const machine_config &mconfig, device_type ty
 
 void a2bus_pic_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(PIC_ROM_REGION).c_str())->base();
 
 	m_timer = timer_alloc(0, nullptr);

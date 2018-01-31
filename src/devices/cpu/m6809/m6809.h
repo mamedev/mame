@@ -22,7 +22,6 @@
 DECLARE_DEVICE_TYPE(MC6809, mc6809_device)
 DECLARE_DEVICE_TYPE(MC6809E, mc6809e_device)
 DECLARE_DEVICE_TYPE(M6809, m6809_device)
-DECLARE_DEVICE_TYPE(M6809E, m6809e_device)
 
 // ======================> m6809_base_device
 
@@ -156,7 +155,7 @@ protected:
 	};
 
 	// Memory interface
-	memory_interface *          m_mintf;
+	std::unique_ptr<memory_interface> m_mintf;
 
 	// CPU registers
 	PAIR16                      m_pc;               // program counter
@@ -327,15 +326,6 @@ class m6809_device : public m6809_base_device
 public:
 	// construction/destruction
 	m6809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
-// ======================> m6809e_device (LEGACY)
-
-class m6809e_device : public m6809_base_device
-{
-public:
-	// construction/destruction
-	m6809e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 enum

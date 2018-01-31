@@ -49,6 +49,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(argo);
 
+	void argo(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -342,7 +343,7 @@ uint32_t argo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	return 0;
 }
 
-static MACHINE_CONFIG_START( argo )
+MACHINE_CONFIG_START(argo_state::argo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3500000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)

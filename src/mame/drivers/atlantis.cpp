@@ -182,6 +182,7 @@ public:
 
 	DECLARE_READ8_MEMBER(parallel_r);
 	DECLARE_WRITE8_MEMBER(parallel_w);
+	void mwskins(machine_config &config);
 };
 
 // Parallel Port
@@ -335,7 +336,9 @@ WRITE32_MEMBER(atlantis_state::board_ctrl_w)
 READ8_MEMBER(atlantis_state::cmos_r)
 {
 	uint8_t result = m_rtc->read(space, offset);
-
+	// Initial RTC check expects reads to the RTC to take some time
+	if (offset == 0x7ff9)
+		machine().device<cpu_device>("maincpu")->eat_cycles(30);
 	if (LOG_RTC || ((offset >= 0x7ff0) && (offset != 0x7ff9)))
 		logerror("%s:RTC read from offset %04X = %08X\n", machine().describe_context(), offset, result);
 	return result;
@@ -792,7 +795,7 @@ DEVICE_INPUT_DEFAULTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mwskins )
+MACHINE_CONFIG_START(atlantis_state::mwskins)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", VR4310LE, 166666666)    // clock is TRUSTED
@@ -836,7 +839,7 @@ static MACHINE_CONFIG_START( mwskins )
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x200d)
+	MCFG_DCS2_AUDIO_POLLING_OFFSET(0xe33)
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
@@ -851,13 +854,13 @@ static MACHINE_CONFIG_START( mwskins )
 	}
 
 	// TL16C552 UART
-	MCFG_DEVICE_ADD("uart1", NS16550, XTAL_24MHz)
+	MCFG_DEVICE_ADD("uart1", NS16550, XTAL(24'000'000))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("com1", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("com1", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("com1", rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(":", atlantis_state, duart_irq_callback))
 
-	MCFG_DEVICE_ADD("uart2", NS16550, XTAL_24MHz)
+	MCFG_DEVICE_ADD("uart2", NS16550, XTAL(24'000'000))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("com2", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("com2", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("com2", rs232_port_device, write_rts))

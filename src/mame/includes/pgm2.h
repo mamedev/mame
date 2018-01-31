@@ -18,6 +18,14 @@
 #include "machine/atmel_arm_aic.h"
 #include "machine/pgm2_memcard.h"
 
+struct kov3_module_key
+{
+	uint8_t key[8];
+	uint8_t sum[8];
+	uint32_t addr_xor; // 22bit
+	uint16_t data_xor;
+};
+
 class pgm2_state : public driver_device
 {
 public:
@@ -59,11 +67,21 @@ public:
 	DECLARE_WRITE16_MEMBER(vbl_ack_w);
 	DECLARE_WRITE16_MEMBER(unk30120014_w);
 
+	DECLARE_WRITE32_MEMBER(pio_sodr_w);
+	DECLARE_WRITE32_MEMBER(pio_codr_w);
+	DECLARE_READ32_MEMBER(pio_pdsr_r);
+	DECLARE_WRITE16_MEMBER(module_rom_w);
+	DECLARE_READ16_MEMBER(module_rom_r);
+	DECLARE_READ_LINE_MEMBER(module_data_r);
+	DECLARE_WRITE_LINE_MEMBER(module_data_w);
+	DECLARE_WRITE_LINE_MEMBER(module_clk_w);
+
 	DECLARE_READ32_MEMBER(orleg2_speedup_r);
 	DECLARE_READ32_MEMBER(kov2nl_speedup_r);
 	DECLARE_READ32_MEMBER(kof98umh_speedup_r);
-	DECLARE_READ32_MEMBER(ddpdojh_speedup_r);
-	DECLARE_READ32_MEMBER(ddpdojh_speedup2_r);
+	DECLARE_READ32_MEMBER(ddpdojt_speedup_r);
+	DECLARE_READ32_MEMBER(ddpdojt_speedup2_r);
+	DECLARE_READ32_MEMBER(kov3_speedup_r);
 
 	DECLARE_READ8_MEMBER(encryption_r);
 	DECLARE_WRITE8_MEMBER(encryption_w);
@@ -72,10 +90,11 @@ public:
 
 	DECLARE_DRIVER_INIT(kov2nl);
 	DECLARE_DRIVER_INIT(orleg2);
-	DECLARE_DRIVER_INIT(ddpdojh);
+	DECLARE_DRIVER_INIT(ddpdojt);
 	DECLARE_DRIVER_INIT(kov3);
 	DECLARE_DRIVER_INIT(kov3_104);
 	DECLARE_DRIVER_INIT(kov3_102);
+	DECLARE_DRIVER_INIT(kov3_101);
 	DECLARE_DRIVER_INIT(kov3_100);
 	DECLARE_DRIVER_INIT(kof98umh);
 
@@ -86,6 +105,10 @@ public:
 	INTERRUPT_GEN_MEMBER(igs_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt2);
 
+	void pgm2_ramrom(machine_config &config);
+	void pgm2_lores(machine_config &config);
+	void pgm2(machine_config &config);
+	void pgm2_hires(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -105,8 +128,8 @@ private:
 
 	void skip_sprite_chunk(int &palette_offset, uint32_t maskdata, int reverse);
 	void draw_sprite_pixel(const rectangle &cliprect, int palette_offset, int realx, int realy, int pal);
-	void draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int growx, int &realxdraw, int realdraw_inc, int palette_inc);
-	void draw_sprite_line(const rectangle &cliprect, int &mask_offset, int &palette_offset, int x, int realy, int flipx, int reverse, int sizex, int pal, int zoomybit, int zoomx_bits, int growx);
+	void draw_sprite_chunk(const rectangle &cliprect, int &palette_offset, int x, int realy, int sizex, int xdraw, int pal, uint32_t maskdata, uint32_t zoomx_bits, int repeats, int &realxdraw, int realdraw_inc, int palette_inc);
+	void draw_sprite_line(const rectangle &cliprect, int &mask_offset, int &palette_offset, int x, int realy, int flipx, int reverse, int sizex, int pal, int zoomybit, int zoomx_bits, int xrepeats);
 	void draw_sprites(screen_device &screen, const rectangle &cliprect, uint32_t* spriteram);
 	void copy_sprites_from_bitmap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
 
@@ -116,6 +139,7 @@ private:
 	void common_encryption_init();
 	uint8_t m_encryption_table[0x100];
 	int m_has_decrypted;    // so we only do it once.
+	int m_has_decrypted_kov3_module;
 	uint32_t m_spritekey;
 	uint32_t m_realspritekey;
 	int m_sprite_predecrypted;
@@ -129,6 +153,18 @@ private:
 	void mcu_command(address_space &space, bool is_command);
 
 	std::vector<uint8_t> m_encrypted_copy;
+
+	uint32_t pio_out_data;
+	const kov3_module_key *module_key;
+	bool module_sum_read;
+	uint32_t module_in_latch;
+	uint32_t module_out_latch;
+	int module_prev_state;
+	int module_clk_cnt;
+	uint8_t module_rcv_buf[10];
+	uint8_t module_send_buf[9];
+
+	void postload();
 
 	// devices
 	required_device<cpu_device> m_maincpu;

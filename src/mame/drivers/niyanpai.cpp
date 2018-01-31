@@ -687,7 +687,7 @@ INTERRUPT_GEN_MEMBER(niyanpai_state::interrupt)
 }
 
 
-static MACHINE_CONFIG_START( niyanpai )
+MACHINE_CONFIG_START(niyanpai_state::niyanpai)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12288000/2) /* TMP68301, 6.144 MHz */
@@ -696,6 +696,7 @@ static MACHINE_CONFIG_START( niyanpai )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("tmp68301",tmp68301_device,irq_callback)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_CPU("maincpu")
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(niyanpai_state, tmp68301_parallel_port_w))
 
 
@@ -716,7 +717,7 @@ static MACHINE_CONFIG_START( niyanpai )
 	MCFG_NICHISND_ADD("nichisnd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( musobana, niyanpai )
+MACHINE_CONFIG_DERIVED(niyanpai_state::musobana, niyanpai)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -725,14 +726,14 @@ static MACHINE_CONFIG_DERIVED( musobana, niyanpai )
 	MCFG_MACHINE_START_OVERRIDE(niyanpai_state, musobana)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mhhonban, musobana )
+MACHINE_CONFIG_DERIVED(niyanpai_state::mhhonban, musobana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mhhonban_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( zokumahj, musobana )
+MACHINE_CONFIG_DERIVED(niyanpai_state::zokumahj, musobana)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

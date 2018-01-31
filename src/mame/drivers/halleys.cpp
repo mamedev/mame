@@ -292,6 +292,8 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void benberob(machine_config &config);
+	void halleys(machine_config &config);
 };
 
 
@@ -1039,7 +1041,7 @@ WRITE8_MEMBER(halleys_state::bgtile_w)
 
 READ8_MEMBER(halleys_state::blitter_status_r)
 {
-	if (m_game_id==GAME_HALLEYS && space.device().safe_pc()==0x8017) return(0x55); // HACK: trick SRAM test on startup
+	if (m_game_id==GAME_HALLEYS && m_maincpu->pc()==0x8017) return(0x55); // HACK: trick SRAM test on startup
 
 	return(0);
 }
@@ -1079,7 +1081,7 @@ WRITE8_MEMBER(halleys_state::blitter_w)
 		else
 		{
 			m_blitter_busy = 1;
-			m_blitter_reset_timer->adjust(downcast<cpu_device *>(&space.device())->cycles_to_attotime(100)); // free blitter if no updates in 100 cycles
+			m_blitter_reset_timer->adjust(m_maincpu->cycles_to_attotime(100)); // free blitter if no updates in 100 cycles
 		}
 	}
 }
@@ -1109,7 +1111,7 @@ READ8_MEMBER(halleys_state::collision_id_r)
     UPDATE: re-implemented pixel collision to accompany the hack method.
 */
 
-	if (m_game_id==GAME_HALLEYS && space.device().safe_pc()==m_collision_detection) // HACK: collision detection bypass
+	if (m_game_id==GAME_HALLEYS && m_maincpu->pc()==m_collision_detection) // HACK: collision detection bypass
 	{
 		if (m_collision_count) { m_collision_count--; return(m_collision_list[m_collision_count]); }
 
@@ -1920,12 +1922,12 @@ void halleys_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( halleys )
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_19_968MHz/12) /* verified on pcb */
+MACHINE_CONFIG_START(halleys_state::halleys)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(19'968'000)/12) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(halleys_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", halleys_state, halleys_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(6'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(halleys_state, irq0_line_hold,  (double)6000000/(4*16*16*10*16))
 
@@ -1948,24 +1950,24 @@ static MACHINE_CONFIG_START( halleys )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ay4", AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("ay4", AY8910, XTAL(6'000'000)/4) /* verified on pcb */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(halleys_state, sndnmi_msk_w)) // port Bwrite
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( benberob, halleys )
+MACHINE_CONFIG_DERIVED(halleys_state::benberob, halleys)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_19_968MHz/12) /* not verified but pcb identical to halley's comet */
+	MCFG_CPU_CLOCK(XTAL(19'968'000)/12) /* not verified but pcb identical to halley's comet */
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(halleys_state, benberob_scanline)
 

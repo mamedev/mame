@@ -29,6 +29,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void laz_ribrac(machine_config &config);
 //  required_device<mcs51_cpu_device> m_maincpu;
 };
 
@@ -46,7 +47,7 @@ void laz_ribrac_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( laz_ribrac )
+MACHINE_CONFIG_START(laz_ribrac_state::laz_ribrac)
 
 	/* basic machine hardware */
 //  MCFG_CPU_ADD("maincpu", ??, 8000000) // unknown

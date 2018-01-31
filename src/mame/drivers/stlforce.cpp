@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( stlforce_map, AS_PROGRAM, 16, stlforce_state )
 	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_SHARE("mlow_scrollram")
 	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_SHARE("mhigh_scrollram")
 	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_SHARE("vidattrram")
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x105000, 0x107fff) AM_RAM /* unknown / ram */
 	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x109000, 0x11ffff) AM_RAM
@@ -191,7 +191,7 @@ static GFXDECODE_START( stlforce )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( stlforce )
+MACHINE_CONFIG_START(stlforce_state::stlforce)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 15000000)
@@ -216,21 +216,21 @@ static MACHINE_CONFIG_START( stlforce )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(32'000'000)/32, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( twinbrat, stlforce )
+MACHINE_CONFIG_DERIVED(stlforce_state::twinbrat, stlforce)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_14_7456MHz)
+	MCFG_CPU_CLOCK(XTAL(14'745'600))
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(3*8, 45*8-1, 0*8, 30*8-1)
 
 	MCFG_DEVICE_MODIFY("oki")
-	MCFG_DEVICE_CLOCK(XTAL_30MHz / 32) // verified on 2 PCBs
+	MCFG_DEVICE_CLOCK(XTAL(30'000'000) / 32) // verified on 2 PCBs
 	MCFG_DEVICE_ADDRESS_MAP(0, twinbrat_oki_map)
 MACHINE_CONFIG_END
 

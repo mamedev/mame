@@ -96,6 +96,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( busrq_w );
 
+	void tiki100(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -124,7 +125,7 @@ protected:
 		ROM0 = 0x01,
 		ROM1 = 0x02,
 		VIR  = 0x04,
-		RAM  = 0x08
+		RAM0 = 0x08
 	};
 
 	// memory state

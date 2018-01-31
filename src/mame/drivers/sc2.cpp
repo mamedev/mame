@@ -43,6 +43,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
+	void sc2(machine_config &config);
 };
 
 READ8_MEMBER( sc2_state::sc2_beep )
@@ -197,9 +198,9 @@ WRITE8_MEMBER( sc2_state::pio_port_b_w )
 		m_kp_matrix = data;
 }
 
-static MACHINE_CONFIG_START( sc2 )
+MACHINE_CONFIG_START(sc2_state::sc2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(sc2_mem)
 	MCFG_CPU_IO_MAP(sc2_io)
 
@@ -208,7 +209,7 @@ static MACHINE_CONFIG_START( sc2 )
 	MCFG_DEFAULT_LAYOUT(layout_sc2)
 
 	/* devices */
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(4'000'000))
 	MCFG_Z80PIO_IN_PA_CB(READ8(sc2_state, pio_port_a_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(sc2_state, pio_port_a_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(sc2_state, pio_port_b_r))

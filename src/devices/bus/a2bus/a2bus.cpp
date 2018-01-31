@@ -311,18 +311,25 @@ void device_a2bus_card_interface::static_set_a2bus_tag(device_t &device, const c
 	a2bus_card.m_a2bus_slottag = slottag;
 }
 
-void device_a2bus_card_interface::set_a2bus_device()
+void device_a2bus_card_interface::interface_pre_start()
 {
-	// extract the slot number from the last digit of the slot tag
-	int tlen = strlen(m_a2bus_slottag);
-
-	m_slot = (m_a2bus_slottag[tlen-1] - '0');
-
-	if (m_slot < 0 || m_slot > 7)
+	if (!m_a2bus)
 	{
-		fatalerror("Slot %x out of range for Apple II Bus\n", m_slot);
-	}
+		// extract the slot number from the last digit of the slot tag
+		size_t const tlen = strlen(m_a2bus_slottag);
 
-	m_a2bus = dynamic_cast<a2bus_device *>(device().machine().device(m_a2bus_tag));
-	m_a2bus->add_a2bus_card(m_slot, this);
+		m_slot = (m_a2bus_slottag[tlen-1] - '0');
+		if (m_slot < 0 || m_slot > 7)
+			fatalerror("Slot %x out of range for Apple II Bus\n", m_slot);
+
+		device_t *const bus = device().machine().device(m_a2bus_tag);
+		if (!bus)
+			fatalerror("Can't find Apple II Bus device %s\n", m_a2bus_tag);
+
+		m_a2bus = dynamic_cast<a2bus_device *>(bus);
+		if (!m_a2bus)
+			fatalerror("Device %s (%s) is not an instance of a2bus_device\n", bus->tag(), bus->name());
+
+		m_a2bus->add_a2bus_card(m_slot, this);
+	}
 }

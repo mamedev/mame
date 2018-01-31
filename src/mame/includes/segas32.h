@@ -183,9 +183,10 @@ public:
 	uint32_t multi32_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
 	void update_irq_state();
 	void signal_v60_irq(int which);
-	void int_control_w(address_space &space, int offset, uint8_t data);
+	void int_control_w(int offset, uint8_t data);
 	void update_sound_irq_state();
 	void segas32_common_init();
+	void multi32_common_init();
 	void radm_sw1_output( int which, uint16_t data );
 	void radm_sw2_output( int which, uint16_t data );
 	void radr_sw2_output( int which, uint16_t data );
@@ -331,6 +332,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scsi_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(scsi_drq_w);
 
+	static void cdrom_config(device_t *device);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;

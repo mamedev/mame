@@ -355,6 +355,19 @@ public:
 
 	MC6854_OUT_FRAME_CB(to7_network_got_frame);
 
+	void to9(machine_config &config);
+	void to7(machine_config &config);
+	void mo5e(machine_config &config);
+	void to770a(machine_config &config);
+	void t9000(machine_config &config);
+	void to8(machine_config &config);
+	void pro128(machine_config &config);
+	void mo6(machine_config &config);
+	void mo5(machine_config &config);
+	void to9p(machine_config &config);
+	void mo5nr(machine_config &config);
+	void to770(machine_config &config);
+	void to8d(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;

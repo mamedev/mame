@@ -123,6 +123,7 @@ public:
 	READ16_MEMBER( wf_protection_region_0_104_r );
 	WRITE16_MEMBER( wf_protection_region_0_104_w );
 
+	void dblewing(machine_config &config);
 private:
 	bool m_soundlatch_pending;
 };
@@ -183,7 +184,7 @@ static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 	AM_RANGE(0x288000, 0x288001) AM_RAM
 	AM_RANGE(0x28c000, 0x28c00f) AM_RAM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x320000, 0x3207ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x320000, 0x3207ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
 ADDRESS_MAP_END
 
@@ -339,15 +340,15 @@ DECOSPR_PRIORITY_CB_MEMBER(dblewing_state::pri_callback)
 	return 0; // sprites always on top?
 }
 
-static MACHINE_CONFIG_START( dblewing )
+MACHINE_CONFIG_START(dblewing_state::dblewing)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2)   /* DE102 */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000)/2)   /* DE102 */
 	MCFG_CPU_PROGRAM_MAP(dblewing_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dblewing_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32_22MHz/9)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'220'000)/9)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io)
 
@@ -372,7 +373,8 @@ static MACHINE_CONFIG_START( dblewing )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -402,11 +404,11 @@ static MACHINE_CONFIG_START( dblewing )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz/9)
+	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000)/9)
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("soundirq", input_merger_device, in_w<1>))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28MHz/28, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(28'000'000)/28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 

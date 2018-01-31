@@ -59,7 +59,7 @@ static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, speedbal_state )
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with SOUND
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(background_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(foreground_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xf000, 0xf5ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf000, 0xf5ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf600, 0xfeff) AM_RAM
 	AM_RANGE(0xff00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -258,15 +258,15 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( speedbal )
+MACHINE_CONFIG_START(speedbal_state::speedbal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // 4 MHz
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000)) // 4 MHz
 	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
 	MCFG_CPU_IO_MAP(main_cpu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", speedbal_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz) // 4 MHz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000)) // 4 MHz
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
 	MCFG_CPU_IO_MAP(sound_cpu_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(speedbal_state, irq0_line_hold, 1000/2) // approximate?
@@ -288,7 +288,7 @@ static MACHINE_CONFIG_START( speedbal )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz) // 4 MHz(?)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(4'000'000)) // 4 MHz(?)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

@@ -132,7 +132,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t &device, int n_level, co
 	}
 }
 
-static const uint32_t timer_clks[4] = { XTAL_16_777216MHz, XTAL_16_777216MHz / 64, XTAL_16_777216MHz / 256, XTAL_16_777216MHz / 1024 };
+static const XTAL timer_clks[4] = { XTAL(16'777'216), XTAL(16'777'216) / 64, XTAL(16'777'216) / 256, XTAL(16'777'216) / 1024 };
 
 
 void gba_state::request_irq(uint32_t int_type)
@@ -408,7 +408,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 		m_timer_recalc[tmr] = 0;
 		m_timer_regs[tmr] = (m_timer_regs[tmr] & 0xFFFF0000) | (m_timer_reload[tmr] & 0x0000FFFF);
 		rate = 0x10000 - (m_timer_regs[tmr] & 0xffff);
-		clocksel = timer_clks[(m_timer_regs[tmr] >> 16) & 3];
+		clocksel = timer_clks[(m_timer_regs[tmr] >> 16) & 3].dvalue();
 		final = clocksel / rate;
 		m_timer_hz[tmr] = final;
 		time = attotime::from_hz(final);
@@ -531,7 +531,7 @@ TIMER_CALLBACK_MEMBER(gba_state::handle_irq)
 	m_irq_timer->adjust(attotime::never);
 }
 
-static const char *reg_names[] = {
+static const char *const reg_names[] = {
 	/* Sound Registers */
 	"SOUND1CNT_L", "SOUND1CNT_H", "SOUND1CNT_X", "Unused",
 	"SOUND2CNT_L", "Unused",      "SOUND2CNT_H", "Unused",
@@ -669,7 +669,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 				double time, ticks;
 				int timer = offset + 0x60/4 - 0x100/4;
 
-//              printf("Read timer reg %x (PC=%x)\n", timer, space.device().safe_pc());
+//              printf("Read timer reg %x (PC=%x)\n", timer, m_maincpu->pc());
 
 				// update times for
 				if (m_timer_regs[timer] & 0x800000)
@@ -1059,7 +1059,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 
 				m_timer_regs[timer] = (m_timer_regs[timer] & ~(mem_mask & 0xFFFF0000)) | (data & (mem_mask & 0xFFFF0000));
 
-//              printf("%x to timer %d (mask %x PC %x)\n", data, timer, ~mem_mask, space.device().safe_pc());
+//              printf("%x to timer %d (mask %x PC %x)\n", data, timer, ~mem_mask, m_maincpu->pc());
 
 				if (ACCESSING_BITS_0_15)
 				{
@@ -1079,7 +1079,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 
 					rate = 0x10000 - (m_timer_regs[timer] & 0xffff);
 
-					clocksel = timer_clks[(m_timer_regs[timer] >> 16) & 3];
+					clocksel = timer_clks[(m_timer_regs[timer] >> 16) & 3].dvalue();
 
 					final = clocksel / rate;
 
@@ -1179,6 +1179,7 @@ READ32_MEMBER(gba_state::gba_bios_r)
 
 READ32_MEMBER(gba_state::gba_10000000_r)
 {
+	auto &mspace = m_maincpu->space(AS_PROGRAM);
 	uint32_t data;
 	uint32_t pc = m_maincpu->state_int(ARM7_PC);
 	if (pc >= 0x10000000)
@@ -1188,11 +1189,11 @@ READ32_MEMBER(gba_state::gba_10000000_r)
 	uint32_t cpsr = m_maincpu->state_int(ARM7_CPSR);
 	if (T_IS_SET( cpsr))
 	{
-		data = space.read_dword(pc + 8);
+		data = mspace.read_dword(pc + 8);
 	}
 	else
 	{
-		uint16_t insn = space.read_word(pc + 4);
+		uint16_t insn = mspace.read_word(pc + 4);
 		data = (insn << 16) | (insn << 0);
 	}
 	logerror("%s: unmapped program memory read from %08X = %08X & %08X\n", machine().describe_context( ), 0x10000000 + (offset << 2), data, mem_mask);
@@ -1427,9 +1428,9 @@ static SLOT_INTERFACE_START(gba_cart)
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( gbadv )
+MACHINE_CONFIG_START(gba_state::gbadv)
 
-	MCFG_CPU_ADD("maincpu", ARM7, XTAL_16_777216MHz)
+	MCFG_CPU_ADD("maincpu", ARM7, XTAL(16'777'216))
 	MCFG_CPU_PROGRAM_MAP(gba_map)
 
 	MCFG_GBA_LCD_ADD("lcd")
@@ -1440,7 +1441,7 @@ static MACHINE_CONFIG_START( gbadv )
 	MCFG_GBA_LCD_DMA_VBLANK(WRITELINE(gba_state, dma_vblank_callback))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("custom", CGB04_APU, XTAL_16_777216MHz/4)
+	MCFG_SOUND_ADD("custom", CGB04_APU, XTAL(16'777'216)/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 

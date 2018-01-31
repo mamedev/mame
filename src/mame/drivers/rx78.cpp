@@ -99,6 +99,7 @@ public:
 	DECLARE_DRIVER_INIT(rx78);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void rx78(machine_config &config);
 private:
 	uint8_t m_vram_read_bank;
 	uint8_t m_vram_write_bank;
@@ -114,7 +115,7 @@ private:
 };
 
 
-#define MASTER_CLOCK XTAL_28_63636MHz
+#define MASTER_CLOCK XTAL(28'636'363)
 
 
 WRITE8_MEMBER( rx78_state::cass_w )
@@ -462,7 +463,7 @@ static GFXDECODE_START( rx78 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( rx78 )
+MACHINE_CONFIG_START(rx78_state::rx78)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7) // unknown divider
 	MCFG_CPU_PROGRAM_MAP(rx78_mem)
@@ -499,7 +500,7 @@ static MACHINE_CONFIG_START( rx78 )
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_28_63636MHz/8) // unknown divider
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(28'636'363)/8) // unknown divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Software lists */

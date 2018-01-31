@@ -551,6 +551,7 @@ public:
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
+	void clcd(machine_config &config);
 private:
 	required_device<m65c02_device> m_maincpu;
 	required_device<mos6551_device> m_acia;
@@ -734,7 +735,7 @@ static INPUT_PORTS_START( clcd )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // clears screen and goes into infinite loop
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START(clcd)
+MACHINE_CONFIG_START(clcd_state::clcd)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65C02, 2000000)
 	MCFG_CPU_PROGRAM_MAP(clcd_mem)
@@ -753,7 +754,7 @@ static MACHINE_CONFIG_START(clcd)
 	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 
 	MCFG_DEVICE_ADD("acia", MOS6551, 2000000)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(clcd_state, write_irq_acia))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -792,7 +793,7 @@ static MACHINE_CONFIG_START(clcd)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x400)
 
-	MCFG_DEVICE_ADD("rtc", MSM58321, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MSM58321, XTAL(32'768))
 	MCFG_MSM58321_D0_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa0))
 	MCFG_MSM58321_D1_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa1))
 	MCFG_MSM58321_D2_HANDLER(DEVWRITELINE("via1", via6522_device, write_pa2))

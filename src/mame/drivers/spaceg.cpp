@@ -214,6 +214,7 @@ public:
 	uint8_t m_sound2;
 	uint8_t m_sound3;
 
+	void spaceg(machine_config &config);
 protected:
 	virtual void driver_start() override;
 };
@@ -289,8 +290,8 @@ WRITE8_MEMBER(spaceg_state::zvideoram_w)
 			break;
 
 		default:
-			logerror("mode = %02x pc = %04x\n", *m_io9401, space.device().safe_pc());
-			popmessage("mode = %02x pc = %04x\n", *m_io9401, space.device().safe_pc());
+			logerror("mode = %02x pc = %04x\n", *m_io9401, m_maincpu->pc());
+			popmessage("mode = %02x pc = %04x\n", *m_io9401, m_maincpu->pc());
 			return;
 	}
 
@@ -497,7 +498,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( spaceg )
+MACHINE_CONFIG_START(spaceg_state::spaceg)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,2500000)         /* 2.5 MHz */

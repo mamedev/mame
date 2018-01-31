@@ -154,6 +154,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
 	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
+	void fp(machine_config &config);
 };
 
 
@@ -574,9 +575,9 @@ SLOT_INTERFACE_END
 //  MACHINE_CONFIG( fp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( fp )
+MACHINE_CONFIG_START(fp_state::fp)
 	/* basic machine hardware */
-	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL_15MHz/3)
+	MCFG_CPU_ADD(I8086_TAG, I8086, XTAL(15'000'000)/3)
 	MCFG_CPU_PROGRAM_MAP(fp_mem)
 	MCFG_CPU_IO_MAP(fp_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)

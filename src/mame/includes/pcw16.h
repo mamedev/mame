@@ -141,6 +141,7 @@ public:
 	void pcw16_vh_decode_mode0(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
 	void pcw16_vh_decode_mode1(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
 	void pcw16_vh_decode_mode2(bitmap_ind16 &bitmap, int x, int y, unsigned char byte);
+	void pcw16(machine_config &config);
 };
 
 #endif /* PCW16_H_ */

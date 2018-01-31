@@ -229,6 +229,7 @@ public:
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_READ16_MEMBER(input_r);
+	void cfrogger(machine_config &config);
 };
 
 // handlers
@@ -274,7 +275,6 @@ READ16_MEMBER(cfrogger_state::input_r)
 	return (m_inp_matrix[2]->read() & 8) | (read_inputs(2) & 3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( cfrogger )
@@ -295,10 +295,10 @@ static INPUT_PORTS_START( cfrogger )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cfrogger )
+MACHINE_CONFIG_START(cfrogger_state::cfrogger)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M58846, XTAL_600kHz)
+	MCFG_CPU_ADD("maincpu", M58846, 600_kHz_XTAL)
 	MCFG_MELPS4_READ_K_CB(READ16(cfrogger_state, input_r))
 	MCFG_MELPS4_WRITE_S_CB(WRITE8(cfrogger_state, plate_w))
 	MCFG_MELPS4_WRITE_F_CB(WRITE8(cfrogger_state, plate_w))
@@ -345,6 +345,7 @@ public:
 	DECLARE_WRITE16_MEMBER(grid_w);
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_READ16_MEMBER(input_r);
+	void gjungler(machine_config &config);
 };
 
 // handlers
@@ -389,7 +390,6 @@ READ16_MEMBER(gjungler_state::input_r)
 	return (m_inp_matrix[2]->read() & 0xc) | (read_inputs(2) & 3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( gjungler )
@@ -411,10 +411,10 @@ static INPUT_PORTS_START( gjungler )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gjungler )
+MACHINE_CONFIG_START(gjungler_state::gjungler)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M58846, XTAL_600kHz)
+	MCFG_CPU_ADD("maincpu", M58846, 600_kHz_XTAL)
 	MCFG_MELPS4_READ_K_CB(READ16(gjungler_state, input_r))
 	MCFG_MELPS4_WRITE_S_CB(WRITE8(gjungler_state, plate_w))
 	MCFG_MELPS4_WRITE_F_CB(WRITE8(gjungler_state, plate_w))

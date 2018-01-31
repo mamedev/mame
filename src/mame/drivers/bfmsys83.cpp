@@ -18,6 +18,7 @@ public:
 
 	uint8_t m_codec_data[256];
 	required_device<cpu_device> m_maincpu;
+	void bfmsys83(machine_config &config);
 };
 
 
@@ -31,7 +32,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( bfmsys83 )
+MACHINE_CONFIG_START(bfmsys83_state::bfmsys83)
 	MCFG_CPU_ADD("maincpu", M6802, 40000000/4)
 	MCFG_CPU_PROGRAM_MAP(memmap)
 

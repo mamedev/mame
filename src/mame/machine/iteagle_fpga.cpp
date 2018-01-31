@@ -36,13 +36,13 @@ iteagle_fpga_device::iteagle_fpga_device(const machine_config &mconfig, const ch
 {
 }
 
-MACHINE_CONFIG_MEMBER(iteagle_fpga_device::device_add_mconfig)
+MACHINE_CONFIG_START(iteagle_fpga_device::device_add_mconfig)
 	MCFG_NVRAM_ADD_0FILL("eagle2_rtc")
 	MCFG_NVRAM_ADD_1FILL("eagle1_bram")
 
 	// RS232 serial ports
 	// The console terminal (com1) operates at 38400 baud
-	MCFG_SCC85C30_ADD(AM85C30_TAG, XTAL_7_3728MHz, XTAL_7_3728MHz, 0, XTAL_7_3728MHz, 0)
+	MCFG_SCC85C30_ADD(AM85C30_TAG, XTAL(7'372'800).value(), XTAL(7'372'800).value(), 0, XTAL(7'372'800).value(), 0)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(iteagle_fpga_device, serial_interrupt))
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(COM2_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(COM1_TAG, rs232_port_device, write_txd))
@@ -647,7 +647,7 @@ DEVICE_ADDRESS_MAP_START(eeprom_map, 32, iteagle_eeprom_device)
 	AM_RANGE(0x0000, 0x000F) AM_READWRITE(eeprom_r, eeprom_w)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER( iteagle_eeprom_device::device_add_mconfig )
+MACHINE_CONFIG_START(iteagle_eeprom_device::device_add_mconfig)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
@@ -761,7 +761,7 @@ WRITE32_MEMBER( iteagle_eeprom_device::eeprom_w )
 // Attached Peripheral Controller
 //************************************
 
-MACHINE_CONFIG_MEMBER(iteagle_periph_device::device_add_mconfig)
+MACHINE_CONFIG_START(iteagle_periph_device::device_add_mconfig)
 	MCFG_NVRAM_ADD_0FILL("eagle1_rtc")
 MACHINE_CONFIG_END
 

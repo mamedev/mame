@@ -282,10 +282,10 @@ void circus_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( circus )
+MACHINE_CONFIG_START(circus_state::circus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
 	MCFG_CPU_PROGRAM_MAP(circus_map)
 
 
@@ -317,10 +317,10 @@ static MACHINE_CONFIG_START( circus )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( robotbwl )
+MACHINE_CONFIG_START(circus_state::robotbwl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
 	MCFG_CPU_PROGRAM_MAP(circus_map)
 	// does not generate irq!
 
@@ -359,10 +359,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(circus_state::crash_scanline)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( crash )
+MACHINE_CONFIG_START(circus_state::crash)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
 	MCFG_CPU_PROGRAM_MAP(circus_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", circus_state, crash_scanline, "screen", 0, 1)
 
@@ -393,10 +393,10 @@ static MACHINE_CONFIG_START( crash )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ripcord )
+MACHINE_CONFIG_START(circus_state::ripcord)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(11'289'000) / 16) /* 705.562kHz */
 	MCFG_CPU_PROGRAM_MAP(circus_map)
 
 

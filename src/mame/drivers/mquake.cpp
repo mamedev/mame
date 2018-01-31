@@ -60,6 +60,7 @@ public:
 	DECLARE_READ16_MEMBER( coin_chip_r );
 	DECLARE_WRITE16_MEMBER( coin_chip_w );
 
+	void mquake(machine_config &config);
 private:
 	required_device<es5503_device> m_es5503;
 	required_region_ptr<uint8_t> m_es5503_rom;
@@ -86,7 +87,7 @@ ADDRESS_MAP_END
 WRITE16_MEMBER( mquake_state::output_w )
 {
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x:output_w(%x) = %02x\n", space.device().safe_pc(), offset, data);
+		logerror("%06x:output_w(%x) = %02x\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -94,13 +95,13 @@ READ16_MEMBER( mquake_state::coin_chip_r )
 {
 	if (offset == 1)
 		return ioport("COINCHIP")->read();
-	logerror("%06x:coin_chip_r(%02x) & %04x\n", space.device().safe_pc(), offset, mem_mask);
+	logerror("%06x:coin_chip_r(%02x) & %04x\n", m_maincpu->pc(), offset, mem_mask);
 	return 0xffff;
 }
 
 WRITE16_MEMBER( mquake_state::coin_chip_w )
 {
-	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", space.device().safe_pc(), offset, data, mem_mask);
+	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", m_maincpu->pc(), offset, data, mem_mask);
 }
 
 // inputs at 282000, 282002 (full word)
@@ -302,7 +303,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mquake )
+MACHINE_CONFIG_START(mquake_state::mquake)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)

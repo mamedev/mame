@@ -1871,7 +1871,7 @@ static GFXDECODE_START( rallybik )
 GFXDECODE_END
 
 
-#define PIXEL_CLOCK         (XTAL_28MHz/4)
+#define PIXEL_CLOCK         (XTAL(28'000'000)/4)
 
 // HTOTAL and VTOTAL taken from CRTC registers (toaplan1_bcu_control_w)
 // rallybik, demonwld and outzone program a larger VTOTAL than the other
@@ -1887,14 +1887,14 @@ GFXDECODE_END
 #define VBSTART             (240)
 
 
-static MACHINE_CONFIG_START( rallybik )
+MACHINE_CONFIG_START(toaplan1_rallybik_state::rallybik)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(rallybik_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(rallybik_sound_io_map)
 
@@ -1927,20 +1927,20 @@ static MACHINE_CONFIG_START( rallybik )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( truxton )
+MACHINE_CONFIG_START(toaplan1_state::truxton)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(truxton_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(truxton_sound_io_map)
 
@@ -1965,20 +1965,20 @@ static MACHINE_CONFIG_START( truxton )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hellfire )
+MACHINE_CONFIG_START(toaplan1_state::hellfire)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(hellfire_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(hellfire_sound_io_map)
 
@@ -2003,20 +2003,20 @@ static MACHINE_CONFIG_START( hellfire )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( zerowing )
+MACHINE_CONFIG_START(toaplan1_state::zerowing)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(zerowing_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(zerowing_sound_io_map)
 
@@ -2041,24 +2041,24 @@ static MACHINE_CONFIG_START( zerowing )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( demonwld )
+MACHINE_CONFIG_START(toaplan1_state::demonwld)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(demonwld_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(demonwld_sound_io_map)
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL_28MHz/2)
+	MCFG_CPU_ADD("dsp", TMS32010, XTAL(28'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(DSP_program_map)
 	MCFG_CPU_IO_MAP(DSP_io_map)
 	MCFG_TMS32010_BIO_IN_CB(READLINE(toaplan1_state, demonwld_BIO_r))
@@ -2084,20 +2084,20 @@ static MACHINE_CONFIG_START( demonwld )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( samesame )
+MACHINE_CONFIG_START(toaplan1_state::samesame)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(samesame_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)    /* HD647180XOFS6 CPU */
+	MCFG_CPU_ADD("audiocpu", Z180, XTAL(28'000'000)/8)    /* HD647180XOFS6 CPU */
 	MCFG_CPU_PROGRAM_MAP(samesame_hd647180_mem_map)
 	MCFG_CPU_IO_MAP(samesame_hd647180_io_map)
 
@@ -2122,20 +2122,20 @@ static MACHINE_CONFIG_START( samesame )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( outzone )
+MACHINE_CONFIG_START(toaplan1_state::outzone)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(outzone_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(outzone_sound_io_map)
 
@@ -2160,20 +2160,20 @@ static MACHINE_CONFIG_START( outzone )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( outzonecv )
+MACHINE_CONFIG_START(toaplan1_state::outzonecv)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(outzonecv_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(toaplan1_sound_map)
 	MCFG_CPU_IO_MAP(zerowing_sound_io_map)
 
@@ -2198,20 +2198,20 @@ static MACHINE_CONFIG_START( outzonecv )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vimana )
+MACHINE_CONFIG_START(toaplan1_state::vimana)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(vimana_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)    /* HD647180XOFS6 CPU */
+	MCFG_CPU_ADD("audiocpu", Z180, XTAL(28'000'000)/8)    /* HD647180XOFS6 CPU */
 	MCFG_CPU_PROGRAM_MAP(vimana_hd647180_mem_map)
 	MCFG_CPU_IO_MAP(vimana_hd647180_io_map)
 
@@ -2236,7 +2236,7 @@ static MACHINE_CONFIG_START( vimana )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)   /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)   /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

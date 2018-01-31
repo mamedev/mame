@@ -341,6 +341,12 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void systemex_315_5177(machine_config &config);
+	void systemex(machine_config &config);
+	void ridleofp(machine_config &config);
+	void hangonjr(machine_config &config);
+	void systeme(machine_config &config);
+	void systemeb(machine_config &config);
 private:
 	// Devices
 	required_device<cpu_device>          m_maincpu;
@@ -860,8 +866,8 @@ uint32_t systeme_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-static MACHINE_CONFIG_START( systeme )
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
+MACHINE_CONFIG_START(systeme_state::systeme)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -870,7 +876,7 @@ static MACHINE_CONFIG_START( systeme )
 	MCFG_I8255_TRISTATE_PORTB_CB(CONSTANT(0))
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, \
+	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_192_TBORDER_HEIGHT + 192)
 	MCFG_SCREEN_UPDATE_DRIVER(systeme_state, screen_update)
@@ -887,21 +893,21 @@ static MACHINE_CONFIG_START( systeme )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SEGAPSG, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ADD("sn1", SEGAPSG, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SEGAPSG, XTAL_10_738635MHz/3)
+	MCFG_SOUND_ADD("sn2", SEGAPSG, XTAL(10'738'635)/3)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hangonjr, systeme )
+MACHINE_CONFIG_DERIVED(systeme_state::hangonjr, systeme)
 	MCFG_DEVICE_MODIFY("ppi")
 	MCFG_I8255_IN_PORTA_CB(READ8(systeme_state, hangonjr_port_f8_read))
 	MCFG_I8255_IN_PORTC_CB(CONSTANT(0)) // bit 4 must be the ADC0804 /INTR signal
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(systeme_state, hangonjr_port_fa_write)) // CD4051 selector input
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ridleofp, systeme )
+MACHINE_CONFIG_DERIVED(systeme_state::ridleofp, systeme)
 	MCFG_DEVICE_ADD("upd4701", UPD4701A, 0) // on 834-6193 I/O sub board
 	MCFG_UPD4701_PORTX("PAD1")
 	MCFG_UPD4701_PORTY("PAD2")
@@ -915,23 +921,23 @@ static MACHINE_CONFIG_DERIVED( ridleofp, systeme )
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("upd4701", upd4701_device, resety_w)) MCFG_DEVCB_BIT(0) // or possibly bit 1
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( systemex, systeme )
-	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
+MACHINE_CONFIG_DERIVED(systeme_state::systemex, systeme)
+	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( systemex_315_5177, systeme )
-	MCFG_CPU_REPLACE("maincpu", SEGA_315_5177, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
+MACHINE_CONFIG_DERIVED(systeme_state::systemex_315_5177, systeme)
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5177, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_SEGAZ80_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( systemeb, systeme )
-	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL_10_738635MHz/2) /* Z80B @ 5.3693Mhz */
+MACHINE_CONFIG_DERIVED(systeme_state::systemeb, systeme)
+	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(10'738'635)/2) /* Z80B @ 5.3693Mhz */
 	MCFG_CPU_PROGRAM_MAP(systeme_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map)

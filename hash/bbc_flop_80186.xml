@@ -3,11 +3,6 @@
 
 <!-- BBC Micro - 80186 Co-Processor Discs -->
 
-<!-- Loading Instructions:
-
-      Hold down the SHIFT key and press and release the BREAK key.
--->
-
 <softwarelist name="bbc_flop_80186" description="80186 Co-Processor Discs">
 
 	<software name="m512sys">
@@ -146,6 +141,32 @@
 			<feature name="part_id" value="Bonus"/>
 			<dataarea name="flop" size="819200">
 				<rom name="dabs-shareware-vol2-bonus.img" size="819200" crc="69b81821" sha1="2977d4628e262907ddf5f5b3ad35abf703092809" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psolve2">
+		<description>Problem Solver 2.0</description>
+		<year>1989</year>
+		<publisher>Shibumi Software</publisher>
+		<info name="format" value="DOS+" />
+		<info name="usage" value="Requires 80186 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="819200">
+				<rom name="Problem Solver 2.0.img" size="819200" crc="c57dbf6d" sha1="ec7419115e049a39a58d0a616ac2d0613de1668c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ratdrvr">
+		<description>Rat Driver</description>
+		<year>1988</year>
+		<publisher>Shibumi Software</publisher>
+		<info name="format" value="DOS+" />
+		<info name="usage" value="Requires 80186 co-processor" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="819200">
+				<rom name="Rat Driver 1.0.img" size="819200" crc="67b8cd2a" sha1="0079272af9d8ae9a0774b94e4e2fc46d5c4dcb6c" offset="0" />
 			</dataarea>
 		</part>
 	</software>

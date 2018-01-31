@@ -171,7 +171,7 @@ Notes:
 #include "machine/namcomcu.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK    XTAL_50_113MHz
+#define MASTER_CLOCK    XTAL(50'113'000)
 
 
 /*************************************************************************/
@@ -282,6 +282,11 @@ READ16_MEMBER(namcona1_state::custom_key_r)
 	case NAMCO_XDAY2:
 		if( offset==2 ) return 0x018a;
 		if( offset==3 ) return m_count;
+		break;
+
+	case NAMCO_SWCOURTB: // TODO: this hasn't got a real keycus, see comments above ROM definitions
+		if( offset==1 ) return 0x8061;
+		if( offset==2 ) return m_count;
 		break;
 
 	default:
@@ -576,7 +581,7 @@ READ16_MEMBER(namcona1_state::na1mcu_shared_r)
 #if 0
 	if (offset >= 0x70000/2)
 	{
-		logerror("MD: %04x @ %x PC %x\n", data, offset*2, space.device().safe_pc());
+		logerror("MD: %04x @ %x %s\n", data, offset*2, machine().describe_context());
 	}
 #endif
 	return data;
@@ -629,7 +634,7 @@ WRITE8_MEMBER(namcona1_state::port4_w)
 {
 	if ((data & 0x08) && !(m_mcu_port4 & 0x08))
 	{
-		logerror("launching 68k, PC=%x\n", space.device().safe_pc());
+		logerror("launching 68k, %s\n", machine().describe_context());
 
 		// reset and launch the 68k
 		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -689,8 +694,6 @@ WRITE8_MEMBER(namcona1_state::port8_w)
 
 void namcona1_state::machine_start()
 {
-	m_prgrom = (uint16_t *)memregion("maincpu")->base();
-	m_maskrom = (uint16_t *)memregion("maskrom")->base();
 	m_mEnableInterrupts = 0;
 	m_c140->set_base(m_workram);
 
@@ -930,7 +933,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::interrupt)
 }
 
 /* cropped at sides */
-static MACHINE_CONFIG_START( namcona1 )
+MACHINE_CONFIG_START(namcona1_state::namcona1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -969,7 +972,7 @@ MACHINE_CONFIG_END
 
 
 /* full-width */
-static MACHINE_CONFIG_DERIVED( namcona1w, namcona1 )
+MACHINE_CONFIG_DERIVED(namcona1_state::namcona1w, namcona1)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -977,7 +980,7 @@ static MACHINE_CONFIG_DERIVED( namcona1w, namcona1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( namcona2, namcona1 )
+MACHINE_CONFIG_DERIVED(namcona1_state::namcona2, namcona1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -988,7 +991,7 @@ static MACHINE_CONFIG_DERIVED( namcona2, namcona1 )
 	MCFG_CPU_IO_MAP( namcona1_mcu_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( namcona2w, namcona2 )
+MACHINE_CONFIG_DERIVED(namcona1_state::namcona2w, namcona2)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1006,6 +1009,7 @@ DRIVER_INIT_MEMBER(namcona1_state,knckhead)  { m_gametype = NAMCO_KNCKHEAD; }
 DRIVER_INIT_MEMBER(namcona1_state,numanath)  { m_gametype = NAMCO_NUMANATH; }
 DRIVER_INIT_MEMBER(namcona1_state,quiztou)   { m_gametype = NAMCO_QUIZTOU; }
 DRIVER_INIT_MEMBER(namcona1_state,swcourt)   { m_gametype = NAMCO_SWCOURT; }
+DRIVER_INIT_MEMBER(namcona1_state,swcourtb)  { m_gametype = NAMCO_SWCOURTB; }
 DRIVER_INIT_MEMBER(namcona1_state,tinklpit)  { m_gametype = NAMCO_TINKLPIT; save_item(NAME(m_keyval)); }
 DRIVER_INIT_MEMBER(namcona1_state,xday2)     { m_gametype = NAMCO_XDAY2; }
 
@@ -1153,6 +1157,41 @@ ROM_START( swcourtj )
 	ROM_LOAD16_BYTE( "sc1-ma0u.bin", 0x000000, 0x100000, CRC(31e76a45) SHA1(5c278c167c1025c648ce2da2c3764645e96dcd55) )
 	ROM_LOAD16_BYTE( "sc1-ma1l.bin", 0x200001, 0x100000, CRC(8ba3a4ec) SHA1(f881e7b4728f388d18450ba85e13e233071fbc88) )
 	ROM_LOAD16_BYTE( "sc1-ma1u.bin", 0x200000, 0x100000, CRC(252dc4b7) SHA1(f1be6bd045495c7a0ecd97f01d1dc8ad341fecfd) )
+ROM_END
+
+/*
+This bootleg is running on the older type rom board (Cosmo Gang etc). Super World Court normally runs on the newer type 'B' board with extra chip at 6J.
+It has a small pcb replacement keycus with a 74hc4060 , LS04 and 2 chips with the ID scratched (possibly PAL chips).
+Program ROMs are almost identical. They hacked the keycus routine and the copyright year (from 1992 to 1994):
+sc2-ep0l.4c  [2/2]      0l.0l        [2/2]      IDENTICAL
+sc2-ep0u.4f  [2/2]      0u.0u        [2/2]      IDENTICAL
+sc2-ep0u.4f  [1/2]      0u.0u        [1/2]      99.997711%
+sc2-ep0l.4c  [1/2]      0l.0l        [1/2]      99.997330%
+
+GFX ROMs are 27c040's double stacked with flying wires to the PAL board. They are the same as the 801 dumps, chopped in half. Pin 22 of OLH and OUH go to C pad on custom board.
+Pin 22 of 1LH and 1UH go to B pad on custom board. All Lower pin '22's are tied high.
+
+Believed to be a Playmark bootleg because the PCB has the typical slightly blue tinge to the solder mask and the same font.
+*/
+
+ROM_START( swcourtb )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "0l.0l", 0x000001, 0x080000, CRC(669c9b10) SHA1(8c40f5331f899c458699ab856c5900c540e8471e) ) /* 0xc00000 */
+	ROM_LOAD16_BYTE( "0u.0u", 0x000000, 0x080000, CRC(742f3da1) SHA1(b3df6afd9849af8dd1643991ac70c93bf9f8fcb2) )
+	ROM_LOAD16_BYTE( "1l.1l", 0x100001, 0x080000, CRC(fb45cf5f) SHA1(6ded351daa9b39d0b8149100caefc4fa0c598e79) )
+	ROM_LOAD16_BYTE( "1u.1u", 0x100000, 0x080000, CRC(1ce07b15) SHA1(b1b28cc480301c9ad642597c7cdd8e9cdec996a6) )
+
+	ROM_REGION16_BE( 0x800000, "maskrom", 0 )
+	ROM_LOAD16_BYTE( "OLL.ol.2c", 0x000001, 0x80000, CRC(df0920ef) SHA1(c8d583d8967b3eb86ecfbabb906cc82d2a05d139) ) /* 0x400000 */
+	ROM_LOAD16_BYTE( "OUL.ou.2f", 0x000000, 0x80000, CRC(844c6a1c) SHA1(ad186c8209688e1bc567fb5015d9d970099139bb) )
+	ROM_LOAD16_BYTE( "OLH.ol.2c", 0x100001, 0x80000, CRC(0a21abea) SHA1(cf8f8ff37abdc398cbabf0f0a77aa15ccbc37257) )
+	ROM_LOAD16_BYTE( "OUH.ou.2f", 0x100000, 0x80000, CRC(6b7c93f9) SHA1(2f823a2a2d8ca5cdb679dd1c1ca66803d47c6b40) )
+	ROM_LOAD16_BYTE( "1LL.1l.3c", 0x200001, 0x80000, CRC(f7e30277) SHA1(65db7e07919c36011fa930976d43dd2d4fb7b8e5) )
+	ROM_LOAD16_BYTE( "1UL.1u.3f", 0x200000, 0x80000, CRC(5f03c51a) SHA1(75cd042db716b6cb56f812af9ba6dca0efae8cac) )
+	ROM_LOAD16_BYTE( "1LH.1l.3c", 0x300001, 0x80000, CRC(6531236e) SHA1(9270a2235b6a713d8c4e791da789d8428b461a1a) )
+	ROM_LOAD16_BYTE( "1UH.1u.3f", 0x300000, 0x80000, CRC(acae6746) SHA1(fb06b544e187c71b27318c249f1e52ff86aab00c) )
+
+	//PALs? See comments above
 ROM_END
 
 ROM_START( tinklpit )
@@ -1324,6 +1363,7 @@ GAME( 1992, fghtatck,   0,        namcona1,  namcona1_joy,  namcona1_state, fa, 
 GAME( 1992, fa,         fghtatck, namcona1,  namcona1_joy,  namcona1_state, fa,       ROT90,"Namco", "F/A (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, swcourt,    0,        namcona1w, namcona1_joy,  namcona1_state, swcourt,  ROT0, "Namco", "Super World Court (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, swcourtj,   swcourt,  namcona1w, namcona1_joy,  namcona1_state, swcourt,  ROT0, "Namco", "Super World Court (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, swcourtb,   swcourt,  namcona1w, namcona1_joy,  namcona1_state, swcourtb, ROT0, "bootleg (Playmark?)", "Super World Court (World, bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, emeraldaj,  emeralda, namcona1w, namcona1_joy,  namcona1_state, emeraldj, ROT0, "Namco", "Emeraldia (Japan Version B)", MACHINE_SUPPORTS_SAVE ) /* Parent is below on NA-2 Hardware */
 GAME( 1993, emeraldaja, emeralda, namcona1w, namcona1_joy,  namcona1_state, emeraldj, ROT0, "Namco", "Emeraldia (Japan)", MACHINE_SUPPORTS_SAVE ) /* Parent is below on NA-2 Hardware */
 GAME( 1993, tinklpit,   0,        namcona1w, namcona1_joy,  namcona1_state, tinklpit, ROT0, "Namco", "Tinkle Pit (Japan)", MACHINE_SUPPORTS_SAVE )

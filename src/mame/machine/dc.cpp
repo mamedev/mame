@@ -375,7 +375,7 @@ READ64_MEMBER(dc_state::dc_sysctrl_r )
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x41) && (reg != 0x42) && (reg != 0x23) && (reg > 2))  // filter out IRQ status reads
 	{
-		osd_printf_verbose("%s",string_format("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %x (PC=%x)\n", 0x5f6800+reg*4, dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, space.device().safe_pc()).c_str());
+		osd_printf_verbose("%s",string_format("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %x (PC=%x)\n", 0x5f6800+reg*4, dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, m_maincpu->pc()).c_str());
 	}
 	#endif
 

@@ -92,7 +92,7 @@ WRITE16_MEMBER(cabal_state::sound_irq_trigger_word_w)
 		m_seibu_sound->main_w(space, 4, data & 0x00ff);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
-	space.device().execute().spin_until_time(attotime::from_usec(50));
+	m_maincpu->spin_until_time(attotime::from_usec(50));
 }
 
 WRITE16_MEMBER(cabal_state::cabalbl_sound_irq_trigger_word_w)
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(sound_irq_trigger_word_w) // fix coin insertion
 	AM_RANGE(0xe8000, 0xe800d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 ADDRESS_MAP_END
@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( cabalbl_main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(flipscreen_w)
-	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(cabalbl_sndcmd_w)
 	AM_RANGE(0xe8004, 0xe8005) AM_DEVREAD8("soundlatch", generic_latch_8_device, read, 0x00ff)
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabalbl_sound_irq_trigger_word_w)
@@ -489,14 +489,14 @@ static GFXDECODE_START( cabal )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( cabal )
+MACHINE_CONFIG_START(cabal_state::cabal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cabal_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
 
@@ -524,7 +524,7 @@ static MACHINE_CONFIG_START( cabal )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
@@ -535,7 +535,7 @@ static MACHINE_CONFIG_START( cabal )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cabalt, cabal )
+MACHINE_CONFIG_DERIVED(cabal_state::cabalt, cabal)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trackball_main_map)
 
@@ -548,7 +548,7 @@ static MACHINE_CONFIG_DERIVED( cabalt, cabal )
 	MCFG_UPD4701_PORTY("IN3")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cabalbl2, cabal )
+MACHINE_CONFIG_DERIVED(cabal_state::cabalbl2, cabal)
 	MCFG_DEVICE_REMOVE("sei80bu")
 
 	MCFG_DEVICE_MODIFY("audiocpu")
@@ -558,23 +558,23 @@ MACHINE_CONFIG_END
 
 
 /* the bootleg has different sound hardware (2 extra Z80s for ADPCM playback) */
-static MACHINE_CONFIG_START( cabalbl )
+MACHINE_CONFIG_START(cabal_state::cabalbl)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cabalbl_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cabal_state,  irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cabalbl_sound_map)
 
 	/* there are 2x z80s for the ADPCM */
-	MCFG_CPU_ADD("adpcm_1", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("adpcm_1", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cabalbl_talk1_map)
 	MCFG_CPU_IO_MAP(cabalbl_talk1_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cabal_state, irq0_line_hold, 8000)
 
-	MCFG_CPU_ADD("adpcm_2", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("adpcm_2", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cabalbl_talk2_map)
 	MCFG_CPU_IO_MAP(cabalbl_talk2_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cabal_state, irq0_line_hold, 8000)
@@ -604,15 +604,15 @@ static MACHINE_CONFIG_START( cabalbl )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono", 0.80)
 
-	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator) */
+	MCFG_SOUND_ADD("msm1", MSM5205, XTAL(12'000'000)/32) /* verified on pcb (no resonator) */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_12MHz/32) /* verified on pcb (no resonator)*/
+	MCFG_SOUND_ADD("msm2", MSM5205, XTAL(12'000'000)/32) /* verified on pcb (no resonator)*/
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END

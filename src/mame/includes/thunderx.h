@@ -78,6 +78,9 @@ public:
 	K051960_CB_MEMBER(sprite_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
 
+	void scontra(machine_config &config);
+	void gbusters(machine_config &config);
+	void thunderx(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

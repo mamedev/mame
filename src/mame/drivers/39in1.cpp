@@ -98,6 +98,8 @@ public:
 	void pxa255_start();
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	void _60in1(machine_config &config);
+	void _39in1(machine_config &config);
 };
 
 
@@ -1355,13 +1357,13 @@ READ32_MEMBER(_39in1_state::unknown_r)
 
 READ32_MEMBER(_39in1_state::cpld_r)
 {
-	//if (space.device().safe_pc() != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, space.device().safe_pc(), state);
+	//if (m_maincpu->pc() != 0xe3af4) printf("CPLD read @ %x (PC %x state %d)\n", offset, m_maincpu->pc(), state);
 
-	if (space.device().safe_pc() == 0x3f04)
+	if (m_maincpu->pc() == 0x3f04)
 	{
 		return 0xf0;      // any non-zero value works here
 	}
-	else if (space.device().safe_pc() == 0xe3af4)
+	else if (m_maincpu->pc() == 0xe3af4)
 	{
 		return ioport("MCUIPT")->read();
 	}
@@ -1415,11 +1417,11 @@ WRITE32_MEMBER(_39in1_state::cpld_w)
 		m_seed = data<<16;
 	}
 
-	if (space.device().safe_pc() == 0x280c)
+	if (m_maincpu->pc() == 0x280c)
 	{
 		m_state = 1;
 	}
-	if (space.device().safe_pc() == 0x2874)
+	if (m_maincpu->pc() == 0x2874)
 	{
 		m_state = 2;
 		m_magic = space.read_byte(0xa02d4ff0);
@@ -1430,7 +1432,7 @@ WRITE32_MEMBER(_39in1_state::cpld_w)
 #if 0
 	else
 	{
-		printf("%08x: CPLD_W: %08x = %08x & %08x\n", space.device().safe_pc(), offset, data, mem_mask);
+		printf("%08x: CPLD_W: %08x = %08x & %08x\n", m_maincpu->pc(), offset, data, mem_mask);
 	}
 #endif
 }
@@ -1572,7 +1574,7 @@ MACHINE_START_MEMBER(_39in1_state,60in1)
 	pxa255_start();
 }
 
-static MACHINE_CONFIG_START( 39in1 )
+MACHINE_CONFIG_START(_39in1_state::_39in1)
 
 	MCFG_CPU_ADD("maincpu", PXA255, 200000000)
 	MCFG_CPU_PROGRAM_MAP(39in1_map)
@@ -1597,7 +1599,7 @@ static MACHINE_CONFIG_START( 39in1 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( 60in1, 39in1 )
+MACHINE_CONFIG_DERIVED(_39in1_state::_60in1, _39in1)
 	MCFG_MACHINE_START_OVERRIDE(_39in1_state,60in1)
 MACHINE_CONFIG_END
 
@@ -1718,11 +1720,11 @@ ROM_START( 19in1 )
 	ROM_LOAD16_WORD_SWAP( "19in1_eeprom.bin", 0x000, 0x200, NO_DUMP )
 ROM_END
 
-GAME(2004, 4in1a,  39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "4 in 1 MAME bootleg (set 1, ver 3.00)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 4in1b,  39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "4 in 1 MAME bootleg (set 2)",                       MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 19in1,  39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "19 in 1 MAME bootleg",                              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 39in1,  0,     39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "39 in 1 MAME bootleg",                              MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1,  39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 1, ver 3.09)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1b, 39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 2, ver 3.09, alt flash)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1a, 39in1, 39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 3, ver 3.02)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
-GAME(2004, 60in1,  39in1, 60in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "60 in 1 MAME bootleg (ver 3.00)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1a,  39in1, _39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "4 in 1 MAME bootleg (set 1, ver 3.00)",             MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1b,  39in1, _39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "4 in 1 MAME bootleg (set 2)",                       MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 19in1,  39in1, _39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "19 in 1 MAME bootleg",                              MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 39in1,  0,     _39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "39 in 1 MAME bootleg",                              MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1,  39in1, _39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 1, ver 3.09)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1b, 39in1, _39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 2, ver 3.09, alt flash)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1a, 39in1, _39in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "48 in 1 MAME bootleg (set 3, ver 3.02)",            MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)
+GAME(2004, 60in1,  39in1, _60in1, 39in1, _39in1_state, 39in1, ROT270, "bootleg", "60 in 1 MAME bootleg (ver 3.00)",                   MACHINE_NOT_WORKING|MACHINE_IMPERFECT_SOUND)

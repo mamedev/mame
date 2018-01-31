@@ -42,7 +42,6 @@
 #include "cpu/tms9900/tms9900.h"
 
 #include "sound/wave.h"
-#include "video/v9938.h"
 #include "machine/tms9901.h"
 #include "imagedev/cassette.h"
 
@@ -145,6 +144,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( video_interrupt_evpc_in );
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
+	void ti99_4(machine_config &config);
+	void ti99_4_50hz(machine_config &config);
+	void ti99_4ev_60hz(machine_config &config);
+	void ti99_4qi(machine_config &config);
+	void ti99_4qi_60hz(machine_config &config);
+	void ti99_4a_50hz(machine_config &config);
+	void ti99_4a_60hz(machine_config &config);
+	void ti99_4a(machine_config &config);
+	void ti99_4_60hz(machine_config &config);
 private:
 	void    set_keyboard_column(int number, int data);
 	int     m_keyboard_column;
@@ -828,7 +836,7 @@ MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4)
     TI-99/4 - predecessor of the more popular TI-99/4A
 ***********************************************************************/
 
-static MACHINE_CONFIG_START( ti99_4 )
+MACHINE_CONFIG_START(ti99_4x_state::ti99_4)
 	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4x_state, external_operation) )
@@ -904,8 +912,8 @@ MACHINE_CONFIG_END
 /*
     US version: 60 Hz, NTSC
 */
-static MACHINE_CONFIG_DERIVED( ti99_4_60hz, ti99_4 )
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918, XTAL_10_738635MHz / 2 )                  \
+MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4_60hz, ti99_4)
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918, XTAL(10'738'635) / 2 )                  \
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in)) \
 	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
@@ -916,8 +924,8 @@ MACHINE_CONFIG_END
 /*
     European version: 50 Hz, PAL
 */
-static MACHINE_CONFIG_DERIVED( ti99_4_50hz, ti99_4 )
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9929, XTAL_10_738635MHz / 2 ) \
+MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4_50hz, ti99_4)
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9929, XTAL(10'738'635) / 2 ) \
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))   \
 	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
@@ -945,7 +953,7 @@ MACHINE_RESET_MEMBER(ti99_4x_state,ti99_4a)
 	m_int12 = CLEAR_LINE;
 }
 
-static MACHINE_CONFIG_START( ti99_4a )
+MACHINE_CONFIG_START(ti99_4x_state::ti99_4a)
 	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4x_state, external_operation) )
@@ -1020,8 +1028,8 @@ MACHINE_CONFIG_END
 /*
     US version: 60 Hz, NTSC
 */
-static MACHINE_CONFIG_DERIVED( ti99_4a_60hz, ti99_4a )
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918A, XTAL_10_738635MHz / 2 )                  \
+MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4a_60hz, ti99_4a)
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918A, XTAL(10'738'635) / 2 )                  \
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in)) \
 	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
@@ -1032,8 +1040,8 @@ MACHINE_CONFIG_END
 /*
     European version: 50 Hz, PAL
 */
-static MACHINE_CONFIG_DERIVED( ti99_4a_50hz, ti99_4a )
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9929A, XTAL_10_738635MHz / 2 ) \
+MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4a_50hz, ti99_4a)
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9929A, XTAL(10'738'635) / 2 ) \
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))   \
 	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
@@ -1057,7 +1065,7 @@ MACHINE_START_MEMBER(ti99_4x_state, ti99_4qi)
 	register_save_state();
 }
 
-static MACHINE_CONFIG_DERIVED( ti99_4qi, ti99_4a )
+MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4qi, ti99_4a)
 	MCFG_MACHINE_START_OVERRIDE(ti99_4x_state, ti99_4qi )
 MACHINE_CONFIG_END
 
@@ -1065,8 +1073,8 @@ MACHINE_CONFIG_END
     US version: 60 Hz, NTSC
     There were no European versions.
 */
-static MACHINE_CONFIG_DERIVED( ti99_4qi_60hz, ti99_4qi )
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918A, XTAL_10_738635MHz / 2 )                  \
+MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4qi_60hz, ti99_4qi)
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918A, XTAL(10'738'635) / 2 )                  \
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in)) \
 	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
@@ -1099,10 +1107,10 @@ MACHINE_RESET_MEMBER(ti99_4x_state, ti99_4ev)
 	m_int1 = CLEAR_LINE;
 	m_int2 = CLEAR_LINE;
 	m_int12 = CLEAR_LINE;
-	m_gromclk_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_10_738635MHz/24));
+	m_gromclk_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL(10'738'635)/24));
 }
 
-static MACHINE_CONFIG_START( ti99_4ev_60hz )
+MACHINE_CONFIG_START(ti99_4x_state::ti99_4ev_60hz)
 	// CPU
 	MCFG_TMS99xx_ADD("maincpu", TMS9900, 3000000, memmap, cru_map)
 	MCFG_TMS99xx_EXTOP_HANDLER( WRITE8(ti99_4x_state, external_operation) )

@@ -18,7 +18,7 @@ driver by Allard van der Bas
 #include "speaker.h"
 
 
-#define MASTER_CLOCK XTAL_18_432MHz
+#define MASTER_CLOCK XTAL(18'432'000)
 
 TIMER_DEVICE_CALLBACK_MEMBER(shaolins_state::interrupt)
 {
@@ -192,7 +192,7 @@ static GFXDECODE_START( shaolins )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( shaolins )
+MACHINE_CONFIG_START(shaolins_state::shaolins)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/12)        /* verified on pcb */

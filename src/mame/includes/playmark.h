@@ -121,4 +121,11 @@ public:
 	required_device<palette_device> m_palette;
 	optional_device<ticket_dispenser_device> m_ticket;
 	optional_device<ticket_dispenser_device> m_token;
+	void wbeachvl(machine_config &config);
+	void hrdtimes(machine_config &config);
+	void luckboomh(machine_config &config);
+	void bigtwin(machine_config &config);
+	void hotmind(machine_config &config);
+	void bigtwinb(machine_config &config);
+	void excelsr(machine_config &config);
 };

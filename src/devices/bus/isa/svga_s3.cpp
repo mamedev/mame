@@ -40,9 +40,9 @@ DEFINE_DEVICE_TYPE(ISA16_SVGA_S3, isa16_svga_s3_device, "s3_764", "Number Nine 9
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa16_svga_s3_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa16_svga_s3_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3_vga_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
@@ -147,9 +147,9 @@ DEFINE_DEVICE_TYPE(ISA16_S3VIRGE, isa16_s3virge_device, "s3virge", "S3 ViRGE Gra
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa16_s3virge_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa16_s3virge_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3virge_vga_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
@@ -229,9 +229,9 @@ DEFINE_DEVICE_TYPE(ISA16_S3VIRGEDX, isa16_s3virgedx_device, "s3virgedx", "S3 ViR
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa16_s3virgedx_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa16_s3virgedx_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3virgedx_vga_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x100)
@@ -312,9 +312,9 @@ DEFINE_DEVICE_TYPE(ISA16_DMS3D2KPRO, isa16_stealth3d2kpro_device, "dms3d2kp", "D
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa16_stealth3d2kpro_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa16_stealth3d2kpro_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_25_1748MHz,900,0,640,526,0,480)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
 	MCFG_SCREEN_UPDATE_DEVICE("vga", s3virgedx_rev1_vga_device, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x100)

@@ -8,6 +8,8 @@
 
 #include "emu.h"
 #include "audio/exidy.h"
+#include "includes/exidy.h"
+#include "includes/victory.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/rescap.h"
@@ -22,7 +24,7 @@
  *
  *************************************/
 
-#define CRYSTAL_OSC             (XTAL_3_579545MHz)
+#define CRYSTAL_OSC             (XTAL(3'579'545))
 #define SH8253_CLOCK            (CRYSTAL_OSC / 2)
 #define SH6840_CLOCK            (CRYSTAL_OSC / 4)
 #define SH6532_CLOCK            (CRYSTAL_OSC / 4)
@@ -194,9 +196,9 @@ void exidy_sound_device::sh6840_register_state_globals()
 
 void exidy_sound_device::common_sh_start()
 {
-	int sample_rate = SH8253_CLOCK;
+	int sample_rate = SH8253_CLOCK.value();
 
-	m_sh6840_clocks_per_sample = (int)((double)SH6840_CLOCK / (double)sample_rate * (double)(1 << 24));
+	m_sh6840_clocks_per_sample = (int)(SH6840_CLOCK.dvalue() / (double)sample_rate * (double)(1 << 24));
 
 	/* allocate the stream */
 	m_stream = machine().sound().stream_alloc(*this, 0, 1, sample_rate);
@@ -503,7 +505,7 @@ WRITE8_MEMBER( exidy_sound_device::sh8253_w )
 				m_sh8253_timer[chan].clstate = 0;
 				m_sh8253_timer[chan].count = (m_sh8253_timer[chan].count & 0x00ff) | ((data << 8) & 0xff00);
 				if (m_sh8253_timer[chan].count)
-					m_sh8253_timer[chan].step = m_freq_to_step * (double)SH8253_CLOCK / (double)m_sh8253_timer[chan].count;
+					m_sh8253_timer[chan].step = m_freq_to_step * SH8253_CLOCK.dvalue() / m_sh8253_timer[chan].count;
 				else
 					m_sh8253_timer[chan].step = 0;
 			}
@@ -685,7 +687,7 @@ void venture_sound_device::device_start()
 	m_cvsd = machine().device<hc55516_device>("cvsd");
 
 	/* 8253 */
-	m_freq_to_step = (double)(1 << 24) / (double)SH8253_CLOCK;
+	m_freq_to_step = (1 << 24) / SH8253_CLOCK;
 
 	save_item(NAME(m_riot_irq_state));
 	sh8253_register_state_globals();
@@ -737,7 +739,7 @@ static ADDRESS_MAP_START( venture_audio_map, AS_PROGRAM, 8, venture_sound_device
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( venture_audio )
+MACHINE_CONFIG_START(exidy_state::venture_audio)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 3579545/4)
 	MCFG_CPU_PROGRAM_MAP(venture_audio_map)
@@ -816,7 +818,7 @@ static ADDRESS_MAP_START( cvsd_iomap, AS_IO, 8, venture_sound_device )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( mtrap_cvsd_audio )
+MACHINE_CONFIG_START(exidy_state::mtrap_cvsd_audio)
 
 	MCFG_CPU_ADD("cvsdcpu", Z80, CVSD_Z80_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(cvsd_map)
@@ -835,7 +837,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#define VICTORY_AUDIO_CPU_CLOCK     (XTAL_3_579545MHz / 4)
+#define VICTORY_AUDIO_CPU_CLOCK     (XTAL(3'579'545) / 4)
 #define VICTORY_LOG_SOUND           0
 
 
@@ -935,7 +937,7 @@ void victory_sound_device::device_start()
 	m_cvsd = machine().device<hc55516_device>("cvsd");
 
 	/* 8253 */
-	m_freq_to_step = (double)(1 << 24) / (double)SH8253_CLOCK;
+	m_freq_to_step = (1 << 24) / SH8253_CLOCK;
 
 	save_item(NAME(m_riot_irq_state));
 	sh8253_register_state_globals();
@@ -991,7 +993,7 @@ static ADDRESS_MAP_START( victory_audio_map, AS_PROGRAM, 8, venture_sound_device
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( victory_audio )
+MACHINE_CONFIG_START(victory_state::victory_audio)
 
 	MCFG_CPU_ADD("audiocpu", M6502, VICTORY_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(victory_audio_map)

@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "audio/exidy440.h"
+#include "includes/exidy440.h"
 
 #include "cpu/m6809/m6809.h"
 #include "speaker.h"
@@ -20,7 +21,7 @@
 #define FADE_TO_ZERO    1
 
 
-#define EXIDY440_AUDIO_CLOCK    (XTAL_12_9792MHz / 4)
+#define EXIDY440_AUDIO_CLOCK    (XTAL(12'979'200) / 4)
 #define EXIDY440_MC3418_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 16)
 #define EXIDY440_MC3417_CLOCK   (EXIDY440_AUDIO_CLOCK / 4 / 32)
 
@@ -873,7 +874,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( exidy440_audio )
+MACHINE_CONFIG_START(exidy440_state::exidy440_audio)
 
 	MCFG_CPU_ADD("audiocpu", MC6809, EXIDY440_AUDIO_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(exidy440_audio_map)

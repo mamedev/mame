@@ -183,7 +183,7 @@ the MSM5205-derived interrupt assigned to the NMI line instead.
 #include "screen.h"
 #include "speaker.h"
 
-#define FIRETRAP_XTAL XTAL_12MHz
+#define FIRETRAP_XTAL XTAL(12'000'000)
 
 
 WRITE8_MEMBER(firetrap_state::firetrap_nmi_disable_w)
@@ -204,7 +204,7 @@ READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
 	uint8_t coin = 0;
 	uint8_t port = ioport("IN2")->read() & 0x70;
 
-	if (space.device().safe_pc() == 0x1188)
+	if (m_maincpu->pc() == 0x1188)
 		return ~m_coin_command_pending;
 
 	if (port != 0x70)
@@ -224,7 +224,7 @@ READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
 
 READ8_MEMBER(firetrap_state::firetrap_8751_r)
 {
-	//logerror("PC:%04x read from 8751\n",space.device().safe_pc());
+	//logerror("PC:%04x read from 8751\n",m_maincpu->pc());
 	return m_i8751_return;
 }
 
@@ -303,7 +303,7 @@ WRITE8_MEMBER(firetrap_state::firetrap_8751_w)
 	else
 	{
 		m_i8751_return = 0xff;
-		logerror("%04x: Unknown i8751 command %02x!\n",space.device().safe_pc(),data);
+		logerror("%04x: Unknown i8751 command %02x!\n",m_maincpu->pc(),data);
 	}
 
 	/* Signal main cpu task is complete */
@@ -611,7 +611,7 @@ void firetrap_state::machine_reset()
 	m_coin_command_pending = 0;
 }
 
-static MACHINE_CONFIG_START( firetrap )
+MACHINE_CONFIG_START(firetrap_state::firetrap)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)       // 6 MHz
@@ -623,7 +623,7 @@ static MACHINE_CONFIG_START( firetrap )
 							/* IRQs are caused by the ADPCM chip */
 							/* NMIs are caused by the main CPU */
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
@@ -659,7 +659,7 @@ static MACHINE_CONFIG_START( firetrap )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( firetrapbl )
+MACHINE_CONFIG_START(firetrap_state::firetrapbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)       // 6 MHz

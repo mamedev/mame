@@ -229,11 +229,9 @@ namespace sol
 //-------------------------------------------------
 
 template <typename T>
-T lua_engine::addr_space::mem_read(offs_t address, sol::object shift)
+T lua_engine::addr_space::mem_read(offs_t address)
 {
 	T mem_content = 0;
-	if(!shift.as<bool>())
-		address = space.address_to_byte(address);
 	switch(sizeof(mem_content) * 8) {
 		case 8:
 			mem_content = space.read_byte(address);
@@ -272,10 +270,8 @@ T lua_engine::addr_space::mem_read(offs_t address, sol::object shift)
 //-------------------------------------------------
 
 template <typename T>
-void lua_engine::addr_space::mem_write(offs_t address, T val, sol::object shift)
+void lua_engine::addr_space::mem_write(offs_t address, T val)
 {
-	if(!shift.as<bool>())
-		address = space.address_to_byte(address);
 	switch(sizeof(val) * 8) {
 		case 8:
 			space.write_byte(address, val);
@@ -317,7 +313,6 @@ T lua_engine::addr_space::log_mem_read(offs_t address)
 	T mem_content = 0;
 	if(!dev.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		return 0;
-	address = space.address_to_byte(address);
 
 	switch(sizeof(mem_content) * 8) {
 		case 8:
@@ -361,7 +356,6 @@ void lua_engine::addr_space::log_mem_write(offs_t address, T val)
 {
 	if(!dev.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 		return;
-	address = space.address_to_byte(address);
 
 	switch(sizeof(val) * 8) {
 		case 8:
@@ -406,7 +400,7 @@ T lua_engine::addr_space::direct_mem_read(offs_t address)
 	for(int i = 0; i < sizeof(T); i++)
 	{
 		int addr = space.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
-		uint8_t *base = (uint8_t *)space.get_read_ptr(space.address_to_byte(addr & ~lowmask));
+		uint8_t *base = (uint8_t *)space.get_read_ptr(addr & ~lowmask);
 		if(!base)
 			continue;
 		mem_content <<= 8;
@@ -431,7 +425,7 @@ void lua_engine::addr_space::direct_mem_write(offs_t address, T val)
 	for(int i = 0; i < sizeof(T); i++)
 	{
 		int addr = space.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
-		uint8_t *base = (uint8_t *)space.get_read_ptr(space.address_to_byte(addr & ~lowmask));
+		uint8_t *base = (uint8_t *)space.get_read_ptr(addr & ~lowmask);
 		if(!base)
 			continue;
 		if(space.endianness() == ENDIANNESS_BIG)
@@ -1448,14 +1442,15 @@ void lua_engine::initialize()
 			"write_direct_i64", &addr_space::direct_mem_write<int64_t>,
 			"write_direct_u64", &addr_space::direct_mem_write<uint64_t>,
 			"name", sol::property(&addr_space::name),
+			"shift", sol::property([](addr_space &sp) { return sp.space.addr_shift(); }),
 			"map", sol::property([this](addr_space &sp) {
 					address_space &space = sp.space;
 					sol::table map = sol().create_table();
 					for (address_map_entry &entry : space.map()->m_entrylist)
 					{
 						sol::table mapentry = sol().create_table();
-						mapentry["offset"] = space.address_to_byte(entry.m_addrstart) & space.addrmask();
-						mapentry["endoff"] = space.address_to_byte(entry.m_addrend) & space.addrmask();
+						mapentry["offset"] = entry.m_addrstart & space.addrmask();
+						mapentry["endoff"] = entry.m_addrend & space.addrmask();
 						mapentry["readtype"] = entry.m_read.m_type;
 						mapentry["writetype"] = entry.m_write.m_type;
 						map.add(mapentry);
@@ -1496,10 +1491,21 @@ void lua_engine::initialize()
 			"field", &ioport_port::field,
 			"fields", sol::property([this](ioport_port &p){
 					sol::table f_table = sol().create_table();
+					// parse twice for custom and default names, default has priority
 					for(ioport_field &field : p.fields())
 					{
 						if (field.type_class() != INPUT_CLASS_INTERNAL)
 							f_table[field.name()] = &field;
+					}
+					for(ioport_field &field : p.fields())
+					{
+						if (field.type_class() != INPUT_CLASS_INTERNAL)
+						{
+							if(field.specific_name())
+								f_table[field.specific_name()] = &field;
+							else
+								f_table[field.manager().type_name(field.type(), field.player())] = &field;
+						}
 					}
 					return f_table;
 				}));
@@ -1511,6 +1517,9 @@ void lua_engine::initialize()
 			"set_value", &ioport_field::set_value,
 			"device", sol::property(&ioport_field::device),
 			"name", sol::property(&ioport_field::name),
+			"default_name", sol::property([](ioport_field &f) {
+					return f.specific_name() ? f.specific_name() : f.manager().type_name(f.type(), f.player());
+				}),
 			"player", sol::property(&ioport_field::player, &ioport_field::set_player),
 			"mask", sol::property(&ioport_field::mask),
 			"defvalue", sol::property(&ioport_field::defvalue),
@@ -1529,8 +1538,15 @@ void lua_engine::initialize()
 			"analog_invert", sol::property(&ioport_field::analog_invert),
 			"impulse", sol::property(&ioport_field::impulse),
 			"type", sol::property(&ioport_field::type),
+			"live", sol::property(&ioport_field::live),
 			"crosshair_scale", sol::property(&ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale),
 			"crosshair_offset", sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset));
+
+/* field.live
+ */
+
+	sol().registry().new_usertype<ioport_field_live>("ioport_field_live", "new", sol::no_constructor,
+			"name", &ioport_field_live::name);
 
 /* machine:parameters()
  * parameter:add(tag, val) - add tag = val parameter

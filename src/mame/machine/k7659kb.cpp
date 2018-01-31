@@ -61,7 +61,7 @@ const tiny_rom_entry *k7659_keyboard_device::device_rom_region() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( k7659_keyboard_device::device_add_mconfig )
+MACHINE_CONFIG_START(k7659_keyboard_device::device_add_mconfig)
 
 MACHINE_CONFIG_END
 

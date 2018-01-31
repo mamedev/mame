@@ -267,11 +267,15 @@ public:
 	uint8_t binary_to_BCD(uint8_t data);
 	DECLARE_WRITE_LINE_MEMBER(meritm_vdp0_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(meritm_vdp1_interrupt);
+	void meritm_crt260(machine_config &config);
+	void meritm_crt250(machine_config &config);
+	void meritm_crt250_questions(machine_config &config);
+	void meritm_crt250_crt252_crt258(machine_config &config);
 };
 
 
-#define SYSTEM_CLK  XTAL_21_4772MHz
-#define UART_CLK    XTAL_1_8432MHz // standard 8250 clock
+#define SYSTEM_CLK  XTAL(21'477'272)
+#define UART_CLK    XTAL(1'843'200) // standard 8250 clock
 
 
 /*************************************
@@ -398,7 +402,7 @@ void meritm_state::meritm_switch_banks(  )
 WRITE8_MEMBER(meritm_state::meritm_psd_a15_w)
 {
 	m_psd_a15 = data;
-	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, space.device().safe_pc() );
+	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, m_maincpu->pc() );
 	meritm_switch_banks();
 }
 
@@ -1087,7 +1091,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_end_tick)
 	m_z80pio_0->port_a_write(m_vint);
 }
 
-static MACHINE_CONFIG_START( meritm_crt250 )
+MACHINE_CONFIG_START(meritm_state::meritm_crt250)
 	MCFG_CPU_ADD("maincpu", Z80, SYSTEM_CLK/6)
 	MCFG_CPU_PROGRAM_MAP(meritm_crt250_map)
 	MCFG_CPU_IO_MAP(meritm_crt250_io_map)
@@ -1135,13 +1139,13 @@ static MACHINE_CONFIG_START( meritm_crt250 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( meritm_crt250_questions, meritm_crt250 )
+MACHINE_CONFIG_DERIVED(meritm_state::meritm_crt250_questions, meritm_crt250)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(meritm_crt250_questions_map)
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_questions)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( meritm_crt250_crt252_crt258, meritm_crt250_questions )
+MACHINE_CONFIG_DERIVED(meritm_state::meritm_crt250_crt252_crt258, meritm_crt250_questions)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(meritm_crt250_crt258_io_map)
 	MCFG_MACHINE_START_OVERRIDE(meritm_state,meritm_crt250_crt252_crt258)
@@ -1152,7 +1156,7 @@ static MACHINE_CONFIG_DERIVED( meritm_crt250_crt252_crt258, meritm_crt250_questi
 	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, meritm_touch_coord_transform)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
+MACHINE_CONFIG_DERIVED(meritm_state::meritm_crt260, meritm_crt250)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(meritm_map)
 	MCFG_CPU_IO_MAP(meritm_io_map)

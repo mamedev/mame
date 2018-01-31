@@ -23,6 +23,7 @@ public:
 		m_maincpu(*this, "maincpu") { }
 	DECLARE_DRIVER_INIT(ecoinf1);
 	required_device<cpu_device> m_maincpu;
+	void ecoinf1_older(machine_config &config);
 };
 
 
@@ -248,7 +249,7 @@ static INPUT_PORTS_START( ecoinf1 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ecoinf1_older )
+MACHINE_CONFIG_START(ecoinf1_state::ecoinf1_older)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(older_memmap)

@@ -141,4 +141,18 @@ public:
 	void spikes91_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void aerfboot_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void wbbc97_draw_bitmap( bitmap_rgb32 &bitmap );
+	void spinlbrk(machine_config &config);
+	void aerofgt(machine_config &config);
+	void karatblz(machine_config &config);
+	void pspikesb(machine_config &config);
+	void aerfboo2(machine_config &config);
+	void pspikes(machine_config &config);
+	void wbbc97(machine_config &config);
+	void aerfboot(machine_config &config);
+	void pspikesc(machine_config &config);
+	void karatblzbl(machine_config &config);
+	void spikes91(machine_config &config);
+	void aerofgtb(machine_config &config);
+	void turbofrc(machine_config &config);
+	void kickball(machine_config &config);
 };

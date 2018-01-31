@@ -28,7 +28,7 @@ static ADDRESS_MAP_START( news_map, AS_PROGRAM, 8, news_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM     /* 4000-7fff is written to during startup, probably leftover code */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(news_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(news_bgram_w) AM_SHARE("bgram")
-	AM_RANGE(0x9000, 0x91ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x9000, 0x91ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -128,7 +128,7 @@ void news_state::machine_reset()
 	m_bgpic = 0;
 }
 
-static MACHINE_CONFIG_START( news )
+MACHINE_CONFIG_START(news_state::news)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,8000000)         /* ? MHz */

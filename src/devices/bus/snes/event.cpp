@@ -219,7 +219,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( sns_pfest94_device::device_add_mconfig )
+MACHINE_CONFIG_START(sns_pfest94_device::device_add_mconfig)
 	MCFG_CPU_ADD("dsp", UPD7725, 8000000)
 	MCFG_CPU_PROGRAM_MAP(dsp_prg_map_lorom)
 	MCFG_CPU_DATA_MAP(dsp_data_map_lorom)

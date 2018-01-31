@@ -92,6 +92,8 @@ public:
 
 	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
 
+	void arcadia(machine_config &config);
+	void argh(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 
@@ -288,7 +290,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( arcadia )
+MACHINE_CONFIG_START(arcadia_amiga_state::arcadia)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, amiga_state::CLK_7M_NTSC)
@@ -341,7 +343,7 @@ static MACHINE_CONFIG_START( arcadia )
 	MCFG_AMIGA_FDC_DSKSYN_CALLBACK(WRITELINE(amiga_state, fdc_dsksyn_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( argh, arcadia )
+MACHINE_CONFIG_DERIVED(arcadia_amiga_state::argh, arcadia)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

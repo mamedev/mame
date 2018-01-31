@@ -63,16 +63,16 @@ READ8_MEMBER(scramble_state::mariner_protection_2_r )
 
 READ8_MEMBER(scramble_state::triplep_pip_r )
 {
-	logerror("PC %04x: triplep read port 2\n",space.device().safe_pc());
-	if (space.device().safe_pc() == 0x015a) return 0xff;
-	else if (space.device().safe_pc() == 0x0886) return 0x05;
+	logerror("PC %04x: triplep read port 2\n",m_maincpu->pc());
+	if (m_maincpu->pc() == 0x015a) return 0xff;
+	else if (m_maincpu->pc() == 0x0886) return 0x05;
 	else return 0;
 }
 
 READ8_MEMBER(scramble_state::triplep_pap_r )
 {
-	logerror("PC %04x: triplep read port 3\n",space.device().safe_pc());
-	if (space.device().safe_pc() == 0x015d) return 0x04;
+	logerror("PC %04x: triplep read port 3\n",m_maincpu->pc());
+	if (m_maincpu->pc() == 0x015d) return 0x04;
 	else return 0;
 }
 

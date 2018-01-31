@@ -58,6 +58,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( usart_clock_tick );
 
+	void isbc8010b(machine_config &config);
+	void isbc8010a(machine_config &config);
+	void isbc8010(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;
@@ -84,7 +87,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(isbc8010b_mem, AS_PROGRAM, 8, isbc8010_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x0000, 0x3bff) AM_ROM
 	AM_RANGE(0x3c00, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -159,9 +162,9 @@ static DEVICE_INPUT_DEFAULTS_START( terminal ) // set up terminal to default to 
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( isbc8010 )
+MACHINE_CONFIG_START(isbc8010_state::isbc8010)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18_432MHz/9)
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'432'000)/9)
 	MCFG_CPU_PROGRAM_MAP(isbc8010_mem)
 	MCFG_CPU_IO_MAP(isbc8010_io)
 
@@ -179,7 +182,7 @@ static MACHINE_CONFIG_START( isbc8010 )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_cts))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL_18_432MHz/60)
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(18'432'000)/60)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(isbc8010_state, usart_clock_tick))
 
 	/* video hardware */
@@ -206,8 +209,8 @@ static MACHINE_CONFIG_START( isbc8010 )
 
 	// Video board UART
 //  MCFG_DEVICE_ADD( "hd6402", AY31015, 0 )
-//  MCFG_AY31015_TX_CLOCK(( XTAL_16MHz / 16 ) / 256)
-//  MCFG_AY31015_RX_CLOCK(( XTAL_16MHz / 16 ) / 256)
+//  MCFG_AY31015_TX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
+//  MCFG_AY31015_RX_CLOCK(( XTAL(16'000'000) / 16 ) / 256)
 //  MCFG_AY51013_READ_SI_CB(READ8(sdk80_state, nascom1_hd6402_si))
 //  MCFG_AY51013_WRITE_SO_CB(WRITE8(sdk80_state, nascom1_hd6402_so))
 
@@ -222,13 +225,13 @@ static MACHINE_CONFIG_START( isbc8010 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( isbc8010a, isbc8010 )
+MACHINE_CONFIG_DERIVED(isbc8010_state::isbc8010a, isbc8010)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(isbc8010a_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( isbc8010b, isbc8010 )
+MACHINE_CONFIG_DERIVED(isbc8010_state::isbc8010b, isbc8010)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(isbc8010b_mem)

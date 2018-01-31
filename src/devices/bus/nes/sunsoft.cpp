@@ -610,13 +610,13 @@ WRITE8_MEMBER(nes_sunsoft_5_device::write_h)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nes_sunsoft_5_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_sunsoft_5_device::device_add_mconfig)
 
 	// additional sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("addon")
 
 	// TODO: this is not how Sunsoft 5B clock signaling works!
 	// The board uses the CLK pin in reality, not hardcoded NTSC values!
-	MCFG_SOUND_ADD("ay", YM2149, (XTAL_21_4772MHz/12)/2) // divide by 2 for the internal divider
+	MCFG_SOUND_ADD("ay", YM2149, (XTAL(21'477'272)/12)/2) // divide by 2 for the internal divider
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "addon", 0.50)
 MACHINE_CONFIG_END

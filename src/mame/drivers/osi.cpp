@@ -706,7 +706,7 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( osi600 )
+MACHINE_CONFIG_START(sb2m600_state::osi600)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
 	MCFG_CPU_PROGRAM_MAP(osi600_mem)
@@ -737,7 +737,7 @@ static MACHINE_CONFIG_START( osi600 )
 	MCFG_RAM_EXTRA_OPTIONS("8K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( uk101 )
+MACHINE_CONFIG_START(uk101_state::uk101)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, UK101_X1/8) // 1 MHz
 	MCFG_CPU_PROGRAM_MAP(uk101_mem)
@@ -762,7 +762,7 @@ static MACHINE_CONFIG_START( uk101 )
 	MCFG_RAM_EXTRA_OPTIONS("8K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( c1p )
+MACHINE_CONFIG_START(c1p_state::c1p)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(M6502_TAG, M6502, X1/4) // .98304 MHz
 	MCFG_CPU_PROGRAM_MAP(c1p_mem)
@@ -799,7 +799,7 @@ static MACHINE_CONFIG_START( c1p )
 	MCFG_RAM_EXTRA_OPTIONS("20K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( c1pmf, c1p )
+MACHINE_CONFIG_DERIVED(c1pmf_state::c1pmf, c1p)
 	MCFG_CPU_MODIFY(M6502_TAG)
 	MCFG_CPU_PROGRAM_MAP(c1pmf_mem)
 
@@ -812,7 +812,7 @@ static MACHINE_CONFIG_DERIVED( c1pmf, c1p )
 	/* floppy ACIA */
 	MCFG_DEVICE_ADD("acia_1", ACIA6850, 0)
 
-	MCFG_DEVICE_ADD("floppy_clock", CLOCK, XTAL_4MHz/8) // 250 kHz
+	MCFG_DEVICE_ADD("floppy_clock", CLOCK, XTAL(4'000'000)/8) // 250 kHz
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("acia_1", acia6850_device, write_txc))
 
 	MCFG_FLOPPY_DRIVE_ADD("floppy0", osi_floppies, "ssdd", floppy_image_device::default_floppy_formats)

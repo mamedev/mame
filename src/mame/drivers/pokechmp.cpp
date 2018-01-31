@@ -95,8 +95,8 @@ static ADDRESS_MAP_START( pokechmp_map, AS_PROGRAM, 8, pokechmp_state )
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW") AM_WRITE(pokechmp_bank_w)
 
 	/* Extra on Poke Champ (not on Pocket Gal) */
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("fixed")
@@ -216,14 +216,14 @@ OKI M6295 (an AD65 on this board, note pin 7 is low): 1.5mhz
 
 */
 
-static MACHINE_CONFIG_START( pokechmp )
+MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_4MHz/4)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(4'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(pokechmp_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pokechmp_state,  nmi_line_pulse)
 
-	MCFG_CPU_ADD("audiocpu", M6502, XTAL_4MHz/4)
+	MCFG_CPU_ADD("audiocpu", M6502, XTAL(4'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(pokechmp_sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pokechmp_state,  irq0_line_hold)
 
@@ -245,13 +245,13 @@ static MACHINE_CONFIG_START( pokechmp )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_4MHz/4)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(4'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM3812, XTAL_24MHz/16)
+	MCFG_SOUND_ADD("ym2", YM3812, XTAL(24'000'000)/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/16, PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/16, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) /* sound fx */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_DEVICE_ADDRESS_MAP(0, pokechmp_oki_map)

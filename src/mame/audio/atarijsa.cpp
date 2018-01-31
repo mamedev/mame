@@ -77,7 +77,7 @@ ALL: the LPF (low pass filter) bit which selectively places a lowpass filter in 
 #include "audio/atarijsa.h"
 
 
-#define JSA_MASTER_CLOCK            XTAL_3_579545MHz
+#define JSA_MASTER_CLOCK            XTAL(3'579'545)
 
 
 //**************************************************************************
@@ -691,12 +691,12 @@ WRITE8_MEMBER( atari_jsa_i_device::pokey_w )
 //-------------------------------------------------
 
 // Fully populated JSA-I, not used by anyone
-MACHINE_CONFIG_MEMBER( atari_jsa_i_device::device_add_mconfig )
+MACHINE_CONFIG_START(atari_jsa_i_device::device_add_mconfig)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa1_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
@@ -821,12 +821,12 @@ READ8_MEMBER( atari_jsa_ii_device::rdio_r )
 //-------------------------------------------------
 
 // Fully populated JSA-II
-MACHINE_CONFIG_MEMBER( atari_jsa_ii_device::device_add_mconfig )
+MACHINE_CONFIG_START(atari_jsa_ii_device::device_add_mconfig)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa2_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
@@ -903,12 +903,12 @@ READ8_MEMBER( atari_jsa_iii_device::rdio_r )
 //-------------------------------------------------
 
 	// Fully populated JSA-III
-MACHINE_CONFIG_MEMBER( atari_jsa_iii_device::device_add_mconfig )
+MACHINE_CONFIG_START(atari_jsa_iii_device::device_add_mconfig)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("cpu", M6502, JSA_MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(atarijsa3_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, JSA_MASTER_CLOCK/4/16/16/14)
 
 	// sound hardware
 	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "cpu", WRITELINE(atari_jsa_base_device, main_int_write_line))
@@ -955,11 +955,13 @@ atari_jsa_iiis_device::atari_jsa_iiis_device(const machine_config &mconfig, cons
 //-------------------------------------------------
 
 // Fully populated JSA_IIIs
-MACHINE_CONFIG_MEMBER( atari_jsa_iiis_device::device_add_mconfig )
+MACHINE_CONFIG_START(atari_jsa_iiis_device::device_add_mconfig)
 
 	atari_jsa_iii_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("ym2151")
+	MCFG_SOUND_MODIFY("ym2151")
+	MCFG_SOUND_ROUTES_RESET()
+	MCFG_MIXER_ROUTE(0, DEVICE_SELF_OWNER, 0.60, 0)
 	MCFG_MIXER_ROUTE(1, DEVICE_SELF_OWNER, 0.60, 1)
 
 	MCFG_OKIM6295_ADD("oki2", JSA_MASTER_CLOCK/3, PIN7_HIGH)

@@ -43,4 +43,5 @@ public:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void funkybee(machine_config &config);
 };

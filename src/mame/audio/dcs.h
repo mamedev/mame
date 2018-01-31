@@ -206,7 +206,7 @@ protected:
 
 	/* timers */
 	uint8_t       m_timer_enable;
-	uint8_t       m_timer_ignore;
+	bool          m_timer_ignore;
 	uint64_t      m_timer_start_cycles;
 	uint32_t      m_timer_start_count;
 	uint32_t      m_timer_scale;

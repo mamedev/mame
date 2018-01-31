@@ -14,13 +14,13 @@ Sound: M6295 + [YM2413]
 -------------------------------------------------------------------------------------------------------------
 Year + Game                     PCB        CPU    Sound         Custom                Other
 -------------------------------------------------------------------------------------------------------------
-96  Shu Zi Le Yuan              NO-0131-4  Z180   M6295 YM2413  IGS017 8255           Battery
+96  Shuzi Leyuan                NO-0131-4  Z180   M6295 YM2413  IGS017 8255           Battery
 97  Mj Super Da Man Guan II     NO-0147-6  68000  M6295         IGS031 8255           Battery
 97  Mj Tian Jiang Shen Bing     NO-0157-2  Z180   M6295 YM2413  IGS017 IGS025         Battery
-97  Mj Man Guan Da Heng         NO-0252    68000  M6295         IGS031 IGS025 IGS???* Battery
-98  Mj Long Hu Zheng Ba 2       NO-0206    68000  M6295         IGS031 IGS025 IGS022* Battery
+97  Mj Man Guan Daheng          NO-0252    68000  M6295         IGS031 IGS025 IGS???* Battery
+98  Mj Long Hu Zhengba 2        NO-0206    68000  M6295         IGS031 IGS025 IGS022* Battery
 98  Mj Shuang Long Qiang Zhu 2  NO-0207    68000  M6295         IGS031 IGS025 IGS022  Battery
-98  Mj Man Guan Cai Shen        NO-0192-1  68000  M6295         IGS017 IGS025 IGS029  Battery
+98  Mj Man Guan Caishen         NO-0192-1  68000  M6295         IGS017 IGS025 IGS029  Battery
 99  Tarzan (V107)               NO-0228?   Z180   M6295         IGS031 IGS025 IGS029  Battery
 99  Tarzan (V109C)              NO-0248-1  Z180   M6295         IGS031 IGS025         Battery
 00? Super Tarzan (V100I)        NO-0230-1  Z180   M6295         IGS031 IGS025         Battery
@@ -197,6 +197,16 @@ public:
 	void slqz2_patch_rom();
 	void slqz2_decrypt_tiles();
 	void spkrform_decrypt_sprites();
+	void mgcs(machine_config &config);
+	void mgdha(machine_config &config);
+	void tjsb(machine_config &config);
+	void lhzb2a(machine_config &config);
+	void slqz2(machine_config &config);
+	void iqblocka(machine_config &config);
+	void lhzb2(machine_config &config);
+	void starzan(machine_config &config);
+	void spkrform(machine_config &config);
+	void sdmg2(machine_config &config);
 };
 
 void igs017_state::machine_reset()
@@ -3250,8 +3260,8 @@ MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 	m_input_select = 0;
 }
 
-static MACHINE_CONFIG_START( iqblocka )
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
+MACHINE_CONFIG_START(igs017_state::iqblocka)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(iqblocka_map)
 	MCFG_CPU_IO_MAP(iqblocka_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
@@ -3281,14 +3291,14 @@ static MACHINE_CONFIG_START( iqblocka )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000) / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( starzan, iqblocka )
+MACHINE_CONFIG_DERIVED(igs017_state::starzan, iqblocka)
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
@@ -3315,8 +3325,8 @@ MACHINE_RESET_MEMBER(igs017_state,mgcs)
 	memset(m_igs_magic, 0, sizeof(m_igs_magic));
 }
 
-static MACHINE_CONFIG_START( mgcs )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
+MACHINE_CONFIG_START(igs017_state::mgcs)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mgcs)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3346,7 +3356,7 @@ static MACHINE_CONFIG_START( mgcs )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000) / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3354,8 +3364,8 @@ MACHINE_CONFIG_END
 
 // lhzb2
 
-static MACHINE_CONFIG_START( lhzb2 )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
+MACHINE_CONFIG_START(igs017_state::lhzb2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(lhzb2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3392,7 +3402,7 @@ static MACHINE_CONFIG_START( lhzb2 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000) / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3406,8 +3416,8 @@ MACHINE_RESET_MEMBER(igs017_state,lhzb2a)
 	lhzb2a_input_addr_w(m_maincpu->space(AS_PROGRAM), 0, 0xf0);
 }
 
-static MACHINE_CONFIG_START( lhzb2a )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
+MACHINE_CONFIG_START(igs017_state::lhzb2a)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(lhzb2a)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3435,7 +3445,7 @@ static MACHINE_CONFIG_START( lhzb2a )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(22'000'000) / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3443,8 +3453,8 @@ MACHINE_CONFIG_END
 
 // slqz2
 
-static MACHINE_CONFIG_START( slqz2 )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
+MACHINE_CONFIG_START(igs017_state::slqz2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(slqz2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3479,7 +3489,7 @@ static MACHINE_CONFIG_START( slqz2 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000) / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3487,8 +3497,8 @@ MACHINE_CONFIG_END
 
 // sdmg2
 
-static MACHINE_CONFIG_START( sdmg2 )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
+MACHINE_CONFIG_START(igs017_state::sdmg2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(sdmg2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3517,7 +3527,7 @@ static MACHINE_CONFIG_START( sdmg2 )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(22'000'000) / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3535,8 +3545,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgdh_interrupt)
 		m_maincpu->set_input_line(3, HOLD_LINE); // lev 3 instead of 2
 }
 
-static MACHINE_CONFIG_START( mgdha )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
+MACHINE_CONFIG_START(igs017_state::mgdha)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mgdha_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgdh_interrupt, "screen", 0, 1)
 
@@ -3564,15 +3574,15 @@ static MACHINE_CONFIG_START( mgdha )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(22'000'000) / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
 // tjsb
 
-static MACHINE_CONFIG_START( tjsb )
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
+MACHINE_CONFIG_START(igs017_state::tjsb)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(tjsb_map)
 	MCFG_CPU_IO_MAP(tjsb_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
@@ -3604,18 +3614,18 @@ static MACHINE_CONFIG_START( tjsb )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000) / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 
 // spkrform
 
-static MACHINE_CONFIG_START( spkrform )
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
+MACHINE_CONFIG_START(igs017_state::spkrform)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(spkrform_map)
 	MCFG_CPU_IO_MAP(spkrform_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
@@ -3645,10 +3655,10 @@ static MACHINE_CONFIG_START( spkrform )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000) / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3660,6 +3670,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
 IQ Block (alt hardware)
+數字樂園 (Shùzì Lèyuán)
 IGS, 1996
 
 PCB Layout
@@ -3732,6 +3743,7 @@ ROM_END
 /***************************************************************************
 
 Mahjong Tian Jiang Shen Bing
+天將神兵 (Tiān Jiāng Shén Bīng)
 IGS, 1997
 
 This PCB is almost the same as IQBlock (IGS, 1996)
@@ -3793,7 +3805,8 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Man Guan Cai Shen
+Mahjong Man Guan Caishen
+满贯财神 (Mǎn Guàn Cáishén)
 IGS, 1998
 
 
@@ -3910,7 +3923,8 @@ ROM_END
 
 /***************************************************************************
 
-Mahjong Long Hu Zheng Ba 2
+Mahjong Long Hu Zhengba 2
+龙虎争霸 (Lóng Hǔ Zhēngbà)
 IGS, 1998
 
 PCB Layout
@@ -3987,6 +4001,7 @@ ROM_END
 /***************************************************************************
 
 Mahjong Shuang Long Qiang Zhu 2
+双龙抢珠 (Shuāng Lóng Qiǎng Zhū)
 IGS, 1998
 
 PCB Layout
@@ -4040,12 +4055,13 @@ ROM_START( slqz2 )
 	ROM_LOAD( "text.u6", 0x00000, 0x80000, CRC(40d21adf) SHA1(18b202d6330ac89026bec2c9c8224b52540dd48d) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "s1102.u20", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) ) // = s1102.u23 Mahjong Long Hu Zheng Ba 2
+	ROM_LOAD( "s1102.u20", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) ) // = s1102.u23 Mahjong Long Hu Zhengba 2
 ROM_END
 
 /***************************************************************************
 
-Mahjong Man Guan Da Heng (V123T1)
+Mahjong Man Guan Daheng (V123T1)
+滿貫大亨 (Mǎn Guàn Dàhēng)
 (c) 1997 IGS
 
 PCB Layout
@@ -4100,6 +4116,7 @@ ROM_END
 /***************************************************************************
 
 Mahjong Man Guan Da Heng (V125T1)
+滿貫大亨 (Mǎn Guàn Dàhēng)
 (c) 1997 IGS
 
 No hardware info, no sprites rom for this set.
@@ -4325,15 +4342,15 @@ ROM_START( spkrform )
 ROM_END
 
 
-GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, iqblocka, ROT0, "IGS",                      "Shu Zi Le Yuan (V127M)",                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1996,  iqblockf, iqblock,  iqblocka, iqblocka, igs017_state, iqblockf, ROT0, "IGS",                      "Shu Zi Le Yuan (V113FR)",                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1997,  mgdh,     0,        mgdha,    mgdh,     igs017_state, mgdh,     ROT0, "IGS",                      "Mahjong Man Guan Da Heng (Taiwan, V125T1)",   0 )
-GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, mgdha,    ROT0, "IGS",                      "Mahjong Man Guan Da Heng (Taiwan, V123T1)",   0 )
+GAME( 1996,  iqblocka, iqblock,  iqblocka, iqblocka, igs017_state, iqblocka, ROT0, "IGS",                      "Shuzi Leyuan (V127M)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996,  iqblockf, iqblock,  iqblocka, iqblocka, igs017_state, iqblockf, ROT0, "IGS",                      "Shuzi Leyuan (V113FR)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1997,  mgdh,     0,        mgdha,    mgdh,     igs017_state, mgdh,     ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V125T1)",    0 )
+GAME( 1997,  mgdha,    mgdh,     mgdha,    mgdh ,    igs017_state, mgdha,    ROT0, "IGS",                      "Mahjong Man Guan Daheng (Taiwan, V123T1)",    0 )
 GAME( 1997,  sdmg2,    0,        sdmg2,    sdmg2,    igs017_state, sdmg2,    ROT0, "IGS",                      "Mahjong Super Da Man Guan II (China, V754C)", 0 )
 GAME( 1997,  tjsb,     0,        tjsb,     tjsb,     igs017_state, tjsb,     ROT0, "IGS",                      "Mahjong Tian Jiang Shen Bing (V137C)",        MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, mgcs,     ROT0, "IGS",                      "Mahjong Man Guan Cai Shen (V103CS)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND )
-GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zheng Ba 2 (set 1)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zheng Ba 2 (VS221M)",         0 )
+GAME( 1998,  mgcs,     0,        mgcs,     mgcs,     igs017_state, mgcs,     ROT0, "IGS",                      "Mahjong Man Guan Caishen (V103CS)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND )
+GAME( 1998,  lhzb2,    0,        lhzb2,    lhzb2,    igs017_state, lhzb2,    ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (set 1)",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1998,  lhzb2a,   lhzb2,    lhzb2a,   lhzb2a,   igs017_state, lhzb2a,   ROT0, "IGS",                      "Mahjong Long Hu Zhengba 2 (VS221M)",          0 )
 GAME( 1998,  slqz2,    0,        slqz2,    slqz2,    igs017_state, slqz2,    ROT0, "IGS",                      "Mahjong Shuang Long Qiang Zhu 2 (VS203J)",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1999,  tarzanc,  0,        iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 1)",      MACHINE_NOT_WORKING )
 GAME( 1999,  tarzan,   tarzanc,  iqblocka, iqblocka, igs017_state, tarzan,   ROT0, "IGS",                      "Tarzan Chuang Tian Guan (V109C, set 2)",      MACHINE_NOT_WORKING )

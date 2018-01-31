@@ -84,4 +84,6 @@ public:
 	void starwars_mproc_reset();
 	void run_mproc();
 	void esb_slapstic_tweak(address_space &space, offs_t offset);
+	void starwars(machine_config &config);
+	void esb(machine_config &config);
 };

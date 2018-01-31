@@ -64,6 +64,20 @@ public:
 	DECLARE_WRITE8_MEMBER(hustler_ppi8255_1_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(stratgyx_coinage_r);
 
+	void mimonkey(machine_config &config);
+	void stratgyx(machine_config &config);
+	void type1(machine_config &config);
+	void type2(machine_config &config);
+	void rescueb(machine_config &config);
+	void minefldfe(machine_config &config);
+	void hustlerb4(machine_config &config);
+	void minefld(machine_config &config);
+	void hustler(machine_config &config);
+	void rescue(machine_config &config);
+	void darkplnt(machine_config &config);
+	void tazmani3(machine_config &config);
+	void hustlerb(machine_config &config);
+	void rescuefe(machine_config &config);
 private:
 	optional_shared_ptr<uint8_t> m_soundram;
 };
@@ -113,9 +127,7 @@ WRITE8_MEMBER(scobra_state::hustler_ppi8255_1_w){ m_ppi8255_1->write(space, offs
 static ADDRESS_MAP_START( type1_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(galaxold_videoram_w)  /* mirror */
-	AM_RANGE(0x8c00, 0x8fff) AM_READ(galaxold_videoram_r)   /* mirror */
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram") AM_MIRROR(0x0400)
 	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
 	AM_RANGE(0x9040, 0x905f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9060, 0x907f) AM_RAM AM_SHARE("bulletsram")
@@ -137,8 +149,7 @@ static ADDRESS_MAP_START( type2_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x8840, 0x885f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x8860, 0x887f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x8880, 0x88ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) /* mirror */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram") AM_MIRROR(0x0400)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(scobra_type2_ppi8255_0_r, scobra_type2_ppi8255_0_w)
 	AM_RANGE(0xa800, 0xa80f) AM_READWRITE(scobra_type2_ppi8255_1_r, scobra_type2_ppi8255_1_w)
@@ -157,8 +168,7 @@ static ADDRESS_MAP_START( tazmani3_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x8840, 0x885f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x8860, 0x887f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x8880, 0x88ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) /* mirror */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram") AM_MIRROR(0x0400)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
@@ -208,8 +218,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x8c00, 0x8fff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) /* mirror */
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram") AM_MIRROR(0x0400)
 	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(galaxold_attributesram_w) AM_SHARE("attributesram")
 	AM_RANGE(0x9040, 0x905f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9060, 0x907f) AM_RAM AM_SHARE("bulletsram")
@@ -826,7 +835,7 @@ static INPUT_PORTS_START( mimonsco )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( type1 )
+MACHINE_CONFIG_START(scobra_state::type1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
@@ -894,7 +903,7 @@ MACHINE_CONFIG_END
 
 /* Rescue, Minefield and Strategy X have extra colors, and custom video initialise */
 /* routines to set up the graduated color backgound they use */
-static MACHINE_CONFIG_DERIVED( rescue, type1 )
+MACHINE_CONFIG_DERIVED(scobra_state::rescue, type1)
 
 	/* basic machine hardware */
 
@@ -907,19 +916,19 @@ static MACHINE_CONFIG_DERIVED( rescue, type1 )
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,rescue)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rescuefe, rescue )
+MACHINE_CONFIG_DERIVED(scobra_state::rescuefe, rescue)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rescuefe_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rescueb, rescue )
+MACHINE_CONFIG_DERIVED(scobra_state::rescueb, rescue)
 	MCFG_DEVICE_MODIFY("ppi8255_1")
 	MCFG_I8255_IN_PORTC_CB(READ8(scobra_state, rescueb_a002_r)) // protection? must return 0xfc or the game jumps to 0x00
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( minefld, type1 )
+MACHINE_CONFIG_DERIVED(scobra_state::minefld, type1)
 
 	/* basic machine hardware */
 
@@ -932,13 +941,13 @@ static MACHINE_CONFIG_DERIVED( minefld, type1 )
 	MCFG_VIDEO_START_OVERRIDE(scobra_state,minefld)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( minefldfe, minefld )
+MACHINE_CONFIG_DERIVED(scobra_state::minefldfe, minefld)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(minefldfe_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mimonkey, type1 )
+MACHINE_CONFIG_DERIVED(scobra_state::mimonkey, type1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -949,14 +958,14 @@ static MACHINE_CONFIG_DERIVED( mimonkey, type1 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( type2, type1 )
+MACHINE_CONFIG_DERIVED(scobra_state::type2, type1)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(type2_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tazmani3, type2 )
+MACHINE_CONFIG_DERIVED(scobra_state::tazmani3, type2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -964,7 +973,7 @@ static MACHINE_CONFIG_DERIVED( tazmani3, type2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( stratgyx, type2 )
+MACHINE_CONFIG_DERIVED(scobra_state::stratgyx, type2)
 
 	/* basic machine hardware */
 
@@ -983,7 +992,7 @@ static MACHINE_CONFIG_DERIVED( stratgyx, type2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( darkplnt, type2 )
+MACHINE_CONFIG_DERIVED(scobra_state::darkplnt, type2)
 
 	/* basic machine hardware */
 
@@ -996,7 +1005,7 @@ static MACHINE_CONFIG_DERIVED( darkplnt, type2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hustler )
+MACHINE_CONFIG_START(scobra_state::hustler)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)    /* 3.072 MHz */
@@ -1055,7 +1064,7 @@ static MACHINE_CONFIG_START( hustler )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hustlerb, hustler )
+MACHINE_CONFIG_DERIVED(scobra_state::hustlerb, hustler)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1066,7 +1075,7 @@ static MACHINE_CONFIG_DERIVED( hustlerb, hustler )
 	MCFG_CPU_IO_MAP(hustlerb_sound_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hustlerb4, hustler )
+MACHINE_CONFIG_DERIVED(scobra_state::hustlerb4, hustler)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

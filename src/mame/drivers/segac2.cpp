@@ -87,8 +87,8 @@
 #include "speaker.h"
 
 
-#define XL1_CLOCK           XTAL_640kHz
-#define XL2_CLOCK           XTAL_53_693175MHz
+#define XL1_CLOCK           XTAL(640'000)
+#define XL2_CLOCK           XTAL(53'693'175)
 
 
 #define LOG_PROTECTION      1
@@ -213,6 +213,8 @@ public:
 	int prot_func_pclubjv2(int in);
 	int prot_func_pclubjv4(int in);
 	int prot_func_pclubjv5(int in);
+	void segac2(machine_config &config);
+	void segac(machine_config &config);
 };
 
 
@@ -526,7 +528,7 @@ WRITE8_MEMBER(segac2_state::control_w)
 /* protection chip reads */
 READ8_MEMBER(segac2_state::prot_r)
 {
-	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", space.device().safe_pcbase(), m_prot_read_buf);
+	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", m_maincpu->pcbase(), m_prot_read_buf);
 	return m_prot_read_buf | 0xf0;
 }
 
@@ -546,7 +548,7 @@ WRITE8_MEMBER(segac2_state::prot_w)
 
 	/* determine the value to return, should a read occur */
 	m_prot_read_buf = m_prot_func(table_index);
-	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", space.device().safe_pcbase(), data & 0x0f, m_prot_read_buf);
+	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", m_maincpu->pcbase(), data & 0x0f, m_prot_read_buf);
 
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != m_sp_palbase || new_bg_palbase != m_bg_palbase)
@@ -1533,7 +1535,7 @@ WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
 }
 
 
-static MACHINE_CONFIG_START( segac )
+MACHINE_CONFIG_START(segac2_state::segac)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)
@@ -1589,7 +1591,7 @@ static MACHINE_CONFIG_START( segac )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( segac2, segac )
+MACHINE_CONFIG_DERIVED(segac2_state::segac2, segac)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("io")

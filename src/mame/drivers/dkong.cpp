@@ -683,7 +683,7 @@ READ8_MEMBER(dkong_state::epos_decrypt_rom)
 WRITE8_MEMBER(dkong_state::s2650_data_w)
 {
 #if DEBUG_PROTECTION
-	logerror("write : pc = %04x, loopback = %02x\n",space.device().safe_pc(), data);
+	logerror("write : pc = %04x, loopback = %02x\n",m_maincpu->pc(), data);
 #endif
 
 	m_hunchloopback = data;
@@ -704,7 +704,7 @@ WRITE_LINE_MEMBER(dkong_state::s2650_fo_w)
 READ8_MEMBER(dkong_state::s2650_port0_r)
 {
 #if DEBUG_PROTECTION
-	logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",space.device().safe_pc(), m_hunchloopback, m_main_fo);
+	logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",m_maincpu->pc(), m_hunchloopback, m_main_fo);
 #endif
 
 	switch (m_protect_type)
@@ -721,14 +721,14 @@ READ8_MEMBER(dkong_state::s2650_port0_r)
 			else
 				return m_hunchloopback--;
 	}
-	fatalerror("Unhandled read from port 0 : pc = %4x\n",space.device().safe_pc());
+	fatalerror("Unhandled read from port 0 : pc = %4x\n",m_maincpu->pc());
 }
 
 
 READ8_MEMBER(dkong_state::s2650_port1_r)
 {
 #if DEBUG_PROTECTION
-	logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",space.device().safe_pc(), m_hunchloopback, m_main_fo);
+	logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",m_maincpu->pc(), m_hunchloopback, m_main_fo);
 #endif
 
 	switch (m_protect_type)
@@ -742,7 +742,7 @@ READ8_MEMBER(dkong_state::s2650_port1_r)
 			else
 				return ++m_prot_cnt;
 	}
-	fatalerror("Unhandled read from port 1 : pc = %4x\n",space.device().safe_pc());
+	fatalerror("Unhandled read from port 1 : pc = %4x\n",m_maincpu->pc());
 }
 
 
@@ -1685,7 +1685,7 @@ WRITE_LINE_MEMBER(dkong_state::busreq_w )
 		m_dma8257->hlda_w(state);
 }
 
-static MACHINE_CONFIG_START( dkong_base )
+MACHINE_CONFIG_START(dkong_state::dkong_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CLOCK_1H)
@@ -1716,7 +1716,7 @@ static MACHINE_CONFIG_START( dkong_base )
 	MCFG_VIDEO_START_OVERRIDE(dkong_state,dkong)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( radarscp, dkong_base )
+MACHINE_CONFIG_DERIVED(dkong_state::radarscp, dkong_base)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,radarscp)
@@ -1728,7 +1728,7 @@ static MACHINE_CONFIG_DERIVED( radarscp, dkong_base )
 	MCFG_FRAGMENT_ADD(radarscp_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( radarscp1, dkong_base )
+MACHINE_CONFIG_DERIVED(dkong_state::radarscp1, dkong_base)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,radarscp1)
@@ -1741,7 +1741,7 @@ static MACHINE_CONFIG_DERIVED( radarscp1, dkong_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dkong2b, dkong_base )
+MACHINE_CONFIG_DERIVED(dkong_state::dkong2b, dkong_base)
 
 	/* basic machine hardware */
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,dkong2b)
@@ -1752,15 +1752,15 @@ static MACHINE_CONFIG_DERIVED( dkong2b, dkong_base )
 	MCFG_FRAGMENT_ADD(dkong2b_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( braze, dkong2b )
+MACHINE_CONFIG_DERIVED(dkong_state::braze, dkong2b)
 
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dkong3 )
+MACHINE_CONFIG_START(dkong_state::dkong3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2) /* verified in schematics */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2) /* verified in schematics */
 	MCFG_CPU_PROGRAM_MAP(dkong3_map)
 	MCFG_CPU_IO_MAP(dkong3_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dkong_state, vblank_irq)
@@ -1788,7 +1788,7 @@ static MACHINE_CONFIG_START( dkong3 )
 	MCFG_FRAGMENT_ADD(dkong3_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dkongjr, dkong_base )
+MACHINE_CONFIG_DERIVED(dkong_state::dkongjr, dkong_base)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dkongjr_map)
@@ -1797,7 +1797,7 @@ static MACHINE_CONFIG_DERIVED( dkongjr, dkong_base )
 	MCFG_FRAGMENT_ADD(dkongjr_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pestplce, dkongjr )
+MACHINE_CONFIG_DERIVED(dkong_state::pestplce, dkongjr)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", pestplce)
@@ -1808,7 +1808,7 @@ static MACHINE_CONFIG_DERIVED( pestplce, dkongjr )
 	MCFG_SCREEN_UPDATE_DRIVER(dkong_state, screen_update_pestplce)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dkong3b, dkongjr )
+MACHINE_CONFIG_DERIVED(dkong_state::dkong3b, dkongjr)
 
 	/* basic machine hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -1821,7 +1821,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static MACHINE_CONFIG_DERIVED( s2650, dkong2b )
+MACHINE_CONFIG_DERIVED(dkong_state::s2650, dkong2b)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", S2650, CLOCK_1H / 2)    /* ??? */
@@ -1839,12 +1839,12 @@ static MACHINE_CONFIG_DERIVED( s2650, dkong2b )
 	MCFG_MACHINE_START_OVERRIDE(dkong_state,s2650)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( herbiedk, s2650 )
+MACHINE_CONFIG_DERIVED(dkong_state::herbiedk, s2650)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank)) MCFG_DEVCB_INVERT // ???
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( spclforc, herbiedk )
+MACHINE_CONFIG_DERIVED(dkong_state::spclforc, herbiedk)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("soundcpu")
@@ -1860,7 +1860,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static MACHINE_CONFIG_DERIVED( strtheat, dkong2b )
+MACHINE_CONFIG_DERIVED(dkong_state::strtheat, dkong2b)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1869,7 +1869,7 @@ static MACHINE_CONFIG_DERIVED( strtheat, dkong2b )
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,strtheat)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( drakton, dkong2b )
+MACHINE_CONFIG_DERIVED(dkong_state::drakton, dkong2b)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1878,7 +1878,7 @@ static MACHINE_CONFIG_DERIVED( drakton, dkong2b )
 	MCFG_MACHINE_RESET_OVERRIDE(dkong_state,drakton)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( drktnjr, dkongjr )
+MACHINE_CONFIG_DERIVED(dkong_state::drktnjr, dkongjr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

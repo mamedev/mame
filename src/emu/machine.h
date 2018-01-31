@@ -260,9 +260,6 @@ void retro_loop();
 	std::string compose_saveload_filename(std::string &&base_filename, const char **searchpath = nullptr);
 	std::string get_statename(const char *statename_opt) const;
 
-	// CPU information
-	cpu_device *            firstcpu;           // first CPU
-
 private:
 	// video-related information
 	screen_device *         primary_screen;     // the primary screen device, or nullptr if screenless

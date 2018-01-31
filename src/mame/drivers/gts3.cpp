@@ -36,11 +36,11 @@ ToDo:
 #include "machine/6522via.h"
 #include "gts3.lh"
 
-class gts3_state : public driver_device
+class gts3_state : public genpin_class
 {
 public:
 	gts3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_u4(*this, "u4")
 		, m_u5(*this, "u5")
@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER(u4b_w);
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
+	void gts3(machine_config &config);
 private:
 	bool m_dispclk;
 	bool m_lampclk;
@@ -274,9 +275,9 @@ DRIVER_INIT_MEMBER( gts3_state, gts3 )
 {
 }
 
-static MACHINE_CONFIG_START( gts3 )
+MACHINE_CONFIG_START(gts3_state::gts3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4MHz / 2)
+	MCFG_CPU_ADD("maincpu", M65C02, XTAL(4'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(gts3_map)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -286,7 +287,7 @@ static MACHINE_CONFIG_START( gts3 )
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 
-	MCFG_DEVICE_ADD("u4", VIA6522, XTAL_4MHz / 2)
+	MCFG_DEVICE_ADD("u4", VIA6522, XTAL(4'000'000) / 2)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
 	MCFG_VIA6522_READPA_HANDLER(READ8(gts3_state, u4a_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(gts3_state, u4b_r))
@@ -294,7 +295,7 @@ static MACHINE_CONFIG_START( gts3 )
 	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(gts3_state, u4ca2_w))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(gts3_state, nmi_w))
 
-	MCFG_DEVICE_ADD("u5", VIA6522, XTAL_4MHz / 2)
+	MCFG_DEVICE_ADD("u5", VIA6522, XTAL(4'000'000) / 2)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
 	//MCFG_VIA6522_READPA_HANDLER(READ8(gts3_state, u5a_r))
 	//MCFG_VIA6522_READPB_HANDLER(READ8(gts3_state, u5b_r))

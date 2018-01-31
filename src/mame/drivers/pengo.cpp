@@ -85,6 +85,10 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
+	void jrpacmbl(machine_config &config);
+	void pengoe(machine_config &config);
+	void pengou(machine_config &config);
+	void pengo(machine_config &config);
 };
 
 
@@ -366,7 +370,7 @@ INTERRUPT_GEN_MEMBER(pengo_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( pengo )
+MACHINE_CONFIG_START(pengo_state::pengo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
@@ -407,13 +411,13 @@ static MACHINE_CONFIG_START( pengo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pengou, pengo )
+MACHINE_CONFIG_DERIVED(pengo_state::pengou, pengo)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_OPCODES)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pengoe, pengo )
+MACHINE_CONFIG_DERIVED(pengo_state::pengoe, pengo)
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5010, MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(pengo_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -421,7 +425,7 @@ static MACHINE_CONFIG_DERIVED( pengoe, pengo )
 	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jrpacmbl, pengo )
+MACHINE_CONFIG_DERIVED(pengo_state::jrpacmbl, pengo)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

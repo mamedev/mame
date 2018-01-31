@@ -115,7 +115,7 @@ WRITE16_MEMBER(sf_state::protection_w)
 		}
 	default:
 		{
-			logerror("Write protection at %06x (%04x)\n", space.device().safe_pc(), data & 0xffff);
+			logerror("Write protection at %06x (%04x)\n", m_maincpu->pc(), data & 0xffff);
 			logerror("*** Unknown protection %d\n", space.read_byte(0xffc684));
 			break;
 		}
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( sfan_map, AS_PROGRAM, 16, sf_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("PUNCH")
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( sfus_map, AS_PROGRAM, 16, sf_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
 	AM_RANGE(0xc00004, 0xc00005) AM_READNOP
@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( sfjp_map, AS_PROGRAM, 16, sf_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x04ffff) AM_ROM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("IN2")
@@ -534,17 +534,17 @@ void sf_state::machine_reset()
 	m_fgscroll = 0;
 }
 
-static MACHINE_CONFIG_START( sfan )
+MACHINE_CONFIG_START(sf_state::sfan)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(sfan_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sf_state, irq1_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)  /* ? xtal is 3.579545MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))  /* ? xtal is 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_CPU_ADD("audio2", Z80, XTAL_3_579545MHz)    /* ? xtal is 3.579545MHz */
+	MCFG_CPU_ADD("audio2", Z80, XTAL(3'579'545))    /* ? xtal is 3.579545MHz */
 	MCFG_CPU_PROGRAM_MAP(sound2_map)
 	MCFG_CPU_IO_MAP(sound2_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(sf_state, irq0_line_hold, 8000) // ?
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( sfan )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
@@ -585,7 +585,7 @@ static MACHINE_CONFIG_START( sfan )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sfus, sfan )
+MACHINE_CONFIG_DERIVED(sf_state::sfus, sfan)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -593,7 +593,7 @@ static MACHINE_CONFIG_DERIVED( sfus, sfan )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sfjp, sfan )
+MACHINE_CONFIG_DERIVED(sf_state::sfjp, sfan)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -601,7 +601,7 @@ static MACHINE_CONFIG_DERIVED( sfjp, sfan )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sfp, sfan )
+MACHINE_CONFIG_DERIVED(sf_state::sfp, sfan)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

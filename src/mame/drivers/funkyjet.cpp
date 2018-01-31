@@ -133,7 +133,7 @@ WRITE16_MEMBER( funkyjet_state::funkyjet_protection_region_0_146_w )
 
 static ADDRESS_MAP_START( funkyjet_map, AS_PROGRAM, 16, funkyjet_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x143fff) AM_RAM
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(funkyjet_protection_region_0_146_r,funkyjet_protection_region_0_146_w) AM_SHARE("prot16ram") /* Protection device */ // unlikely to be cs0 region
@@ -310,14 +310,14 @@ void funkyjet_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( funkyjet )
+MACHINE_CONFIG_START(funkyjet_state::funkyjet)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/2) /* 28 MHz crystal */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000)/2) /* 28 MHz crystal */
 	MCFG_CPU_PROGRAM_MAP(funkyjet_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funkyjet_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", H6280, XTAL_32_22MHz/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
+	MCFG_CPU_ADD("audiocpu", H6280, XTAL(32'220'000)/4) /* Custom chip 45, Audio section crystal is 32.220 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 
@@ -344,7 +344,8 @@ static MACHINE_CONFIG_START( funkyjet )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -362,12 +363,12 @@ static MACHINE_CONFIG_START( funkyjet )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz/9)
+	MCFG_YM2151_ADD("ymsnd", XTAL(32'220'000)/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) // IRQ2
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_28MHz/28, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(28'000'000)/28, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END

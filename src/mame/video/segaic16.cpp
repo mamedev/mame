@@ -433,7 +433,7 @@ void segaic16_video_device::set_display_enable(int enable)
 	enable = (enable != 0);
 	if (m_display_enable != enable)
 	{
-		m_screen->update_partial(m_screen->vpos());
+		screen().update_partial(screen().vpos());
 		m_display_enable = enable;
 	}
 }
@@ -1047,7 +1047,7 @@ TIMER_CALLBACK_MEMBER( segaic16_video_device::tilemap_16b_latch_values )
 	}
 
 	/* set a timer to do this again next frame */
-	info->latch_timer->adjust(m_screen->time_until_pos(261), param);
+	info->latch_timer->adjust(screen().time_until_pos(261), param);
 }
 
 
@@ -1227,7 +1227,7 @@ void segaic16_video_device::tilemap_set_bank(int which, int banknum, int offset)
 
 	if (info->bank[banknum] != offset)
 	{
-		m_screen->update_partial(m_screen->vpos());
+		screen().update_partial(screen().vpos());
 		info->bank[banknum] = offset;
 		machine().tilemap().mark_all_dirty();
 	}
@@ -1249,7 +1249,7 @@ void segaic16_video_device::tilemap_set_flip(int which, int flip)
 	flip = (flip != 0);
 	if (info->flip != flip)
 	{
-		m_screen->update_partial(m_screen->vpos());
+		screen().update_partial(screen().vpos());
 		info->flip = flip;
 		info->textmap->set_flip(flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		for (pagenum = 0; pagenum < info->numpages; pagenum++)
@@ -1272,7 +1272,7 @@ void segaic16_video_device::tilemap_set_rowscroll(int which, int enable)
 	enable = (enable != 0);
 	if (info->rowscroll != enable)
 	{
-		m_screen->update_partial(m_screen->vpos());
+		screen().update_partial(screen().vpos());
 		info->rowscroll = enable;
 	}
 }
@@ -1292,7 +1292,7 @@ void segaic16_video_device::tilemap_set_colscroll(int which, int enable)
 	enable = (enable != 0);
 	if (info->colscroll != enable)
 	{
-		m_screen->update_partial(m_screen->vpos());
+		screen().update_partial(screen().vpos());
 		info->colscroll = enable;
 	}
 }
@@ -1328,7 +1328,7 @@ WRITE16_MEMBER( segaic16_video_device::textram_w )
 {
 	/* certain ranges need immediate updates */
 	if (offset >= 0xe80/2)
-		m_screen->update_partial(m_screen->vpos());
+		screen().update_partial(screen().vpos());
 
 	COMBINE_DATA(&m_textram[offset]);
 	m_bg_tilemap[0].textmap->mark_tile_dirty(offset);

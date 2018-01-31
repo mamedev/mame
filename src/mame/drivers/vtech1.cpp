@@ -55,7 +55,7 @@ Todo:
 #define LOG_VTECH1_LATCH 0
 
 #define VTECH1_CLK        3579500
-#define VZ300_XTAL1_CLK   XTAL_17_73447MHz
+#define VZ300_XTAL1_CLK   XTAL(17'734'470)
 
 
 /***************************************************************************
@@ -89,6 +89,11 @@ public:
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER( vtech1 );
 
+	void laser310(machine_config &config);
+	void laser200(machine_config &config);
+	void laser310h(machine_config &config);
+	void laser110(machine_config &config);
+	void laser210(machine_config &config);
 private:
 	static const uint8_t VZ_BASIC = 0xf0;
 	static const uint8_t VZ_MCODE = 0xf1;
@@ -419,7 +424,7 @@ INPUT_PORTS_END
 
 static const int16_t speaker_levels[] = {-32768, 0, 32767, 0};
 
-static MACHINE_CONFIG_START( laser110 )
+MACHINE_CONFIG_START(vtech1_state::laser110)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, VTECH1_CLK)  /* 3.57950 MHz */
@@ -429,7 +434,7 @@ static MACHINE_CONFIG_START( laser110 )
 	// video hardware
 	MCFG_SCREEN_MC6847_PAL_ADD("screen", "mc6847")
 
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
 	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
 	MCFG_MC6847_BW(true)
@@ -460,9 +465,9 @@ static MACHINE_CONFIG_START( laser110 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "vz_cass")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( laser200, laser110 )
+MACHINE_CONFIG_DERIVED(vtech1_state::laser200, laser110)
 	MCFG_DEVICE_REMOVE("mc6847")
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
 	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
 	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM1)
@@ -470,23 +475,23 @@ static MACHINE_CONFIG_DERIVED( laser200, laser110 )
 	// other lines not connected
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( laser210, laser200 )
+MACHINE_CONFIG_DERIVED(vtech1_state::laser210, laser200)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(laser210_mem)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( laser310, laser200 )
+MACHINE_CONFIG_DERIVED(vtech1_state::laser310, laser200)
 	MCFG_CPU_REPLACE("maincpu", Z80, VZ300_XTAL1_CLK / 5)  /* 3.546894 MHz */
 	MCFG_CPU_PROGRAM_MAP(laser310_mem)
 	MCFG_CPU_IO_MAP(vtech1_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( laser310h, laser310 )
+MACHINE_CONFIG_DERIVED(vtech1_state::laser310h, laser310)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(vtech1_shrg_io)
 
 	MCFG_DEVICE_REMOVE("mc6847")
-	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL_4_433619MHz)
+	MCFG_DEVICE_ADD("mc6847", MC6847_PAL, XTAL(4'433'619))
 	MCFG_MC6847_FSYNC_CALLBACK(INPUTLINE("maincpu", 0)) MCFG_DEVCB_INVERT
 	MCFG_MC6847_INPUT_CALLBACK(READ8(vtech1_state, mc6847_videoram_r))
 	MCFG_MC6847_FIXED_MODE(mc6847_pal_device::MODE_GM1)

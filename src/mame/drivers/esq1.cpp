@@ -425,6 +425,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 	void send_through_panel(uint8_t data);
+	void esq1(machine_config &config);
+	void sq80(machine_config &config);
 };
 
 
@@ -579,12 +581,12 @@ INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
 	}
 }
 
-static MACHINE_CONFIG_START( esq1 )
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_8MHz) // XTAL not directly attached to CPU
+MACHINE_CONFIG_START(esq1_state::esq1)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(8'000'000)) // XTAL not directly attached to CPU
 	MCFG_CPU_PROGRAM_MAP(esq1_map)
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_8MHz / 2)
-	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL_8MHz / 16, XTAL_8MHz / 16, XTAL_8MHz / 8, XTAL_8MHz / 8)
+	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(8'000'000) / 2)
+	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL(8'000'000) / 16, XTAL(8'000'000) / 16, XTAL(8'000'000) / 8, XTAL(8'000'000) / 8)
 	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M6809_IRQ_LINE))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_a))
 	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(esq1_state, duart_tx_b))
@@ -604,7 +606,7 @@ static MACHINE_CONFIG_START( esq1 )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_ES5503_ADD("es5503", XTAL_8MHz)
+	MCFG_ES5503_ADD("es5503", XTAL(8'000'000))
 	MCFG_ES5503_OUTPUT_CHANNELS(8)
 	MCFG_ES5503_IRQ_FUNC(WRITELINE(esq1_state, esq1_doc_irq))
 	MCFG_ES5503_ADC_FUNC(READ8(esq1_state, esq1_adc_read))
@@ -619,7 +621,7 @@ static MACHINE_CONFIG_START( esq1 )
 	MCFG_SOUND_ROUTE_EX(7, "filters", 1.0, 7)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(sq80, esq1)
+MACHINE_CONFIG_DERIVED(esq1_state::sq80, esq1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sq80_map)
 

@@ -32,7 +32,7 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK_X1 XTAL_1_9968MHz
+#define MAIN_CLOCK_X1 XTAL(1'996'800)
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE(PC9801_AMD98, pc9801_amd98_device, "pc9801_amd98", "pc9801_am
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( pc9801_amd98_device::device_add_mconfig )
+MACHINE_CONFIG_START(pc9801_amd98_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 	MCFG_SOUND_ADD("ay1", AY8910, MAIN_CLOCK_X1*2)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("OPN_PA1"))
@@ -102,7 +102,7 @@ ioport_constructor pc9801_amd98_device::device_input_ports() const
 
 pc9801_amd98_device::pc9801_amd98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC9801_AMD98, tag, owner, clock),
-//      m_maincpu(*this, "^maincpu"),
+		m_bus(*this, DEVICE_SELF_OWNER),
 		m_ay1(*this, "ay1"),
 		m_ay2(*this, "ay2"),
 		m_ay3(*this, "ay3")
@@ -125,17 +125,17 @@ void pc9801_amd98_device::device_validity_check(validity_checker &valid) const
 
 void pc9801_amd98_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
 {
-	int buswidth = machine().firstcpu->space_config(AS_IO)->m_data_width;
+	int buswidth = m_bus->io_space().data_width();
 	switch(buswidth)
 	{
 		case 8:
-			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, rhandler, whandler, 0);
+			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0);
 			break;
 		case 16:
-			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
+			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
 			break;
 		case 32:
-			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
+			m_bus->io_space().install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
 			break;
 		default:
 			fatalerror("PC-9801-AMD98: Bus width %d not supported\n", buswidth);

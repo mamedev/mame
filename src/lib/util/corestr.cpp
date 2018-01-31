@@ -119,23 +119,6 @@ bool core_iswildstr(const char *sp)
 
 
 /*-------------------------------------------------
-    core_strdup - string duplication via malloc
--------------------------------------------------*/
-
-char *core_strdup(const char *str)
-{
-	char *cpy = nullptr;
-	if (str != nullptr)
-	{
-		cpy = (char *)malloc(strlen(str) + 1);
-		if (cpy != nullptr)
-			strcpy(cpy, str);
-	}
-	return cpy;
-}
-
-
-/*-------------------------------------------------
     std::string helpers
 -------------------------------------------------*/
 

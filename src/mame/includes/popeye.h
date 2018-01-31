@@ -1,3 +1,5 @@
+#include "machine/eepromser.h"
+
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Couriersud
 // thanks-to: Marc Lafontaine
@@ -29,40 +31,42 @@ public:
 	required_region_ptr<uint8_t> m_color_prom;
 	required_region_ptr<uint8_t> m_color_prom_spr;
 
-	std::unique_ptr<uint8_t[]> m_bitmapram;
-	std::unique_ptr<bitmap_ind16> m_tmpbitmap2;
-	uint8_t m_invertmask;
-	uint8_t m_bitmap_type;
+	uint8_t m_bitmapram[0x1000];
+	std::unique_ptr<bitmap_ind16> m_sprite_bitmap;
 	tilemap_t *m_fg_tilemap;
-	uint8_t m_lastflip;
+	uint8_t m_last_palette;
 	int   m_field;
 
 	DECLARE_READ8_MEMBER(protection_r);
 	DECLARE_WRITE8_MEMBER(protection_w);
 	DECLARE_WRITE8_MEMBER(popeye_videoram_w);
 	DECLARE_WRITE8_MEMBER(popeye_colorram_w);
-	DECLARE_WRITE8_MEMBER(popeye_bitmap_w);
-	DECLARE_WRITE8_MEMBER(skyskipr_bitmap_w);
+	DECLARE_WRITE8_MEMBER(tpp2_bitmap_w);
+	DECLARE_WRITE8_MEMBER(tnx1_bitmap_w);
 	DECLARE_WRITE8_MEMBER(popeye_portB_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(dsw1_read);
-	DECLARE_DRIVER_INIT(skyskipr);
-	DECLARE_DRIVER_INIT(popeye);
+	DECLARE_DRIVER_INIT(tnx1);
+	DECLARE_DRIVER_INIT(tpp2);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	virtual void driver_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(popeye);
-	DECLARE_VIDEO_START(popeye);
+	DECLARE_PALETTE_INIT(tpp1);
+	DECLARE_VIDEO_START(tpp1);
 	DECLARE_PALETTE_INIT(popeyebl);
-	DECLARE_PALETTE_INIT(skyskipr);
-	uint32_t screen_update_popeye(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_PALETTE_INIT(tnx1);
+	uint32_t screen_update_tnx1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tpp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(popeye_interrupt);
 	DECLARE_CUSTOM_INPUT_MEMBER( pop_field_r );
-	void convert_color_prom(const uint8_t *color_prom);
-	void set_background_palette(int bank);
-	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void update_palette();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_field(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void tpp2(machine_config &config);
+	void tpp1(machine_config &config);
+	void tnx1(machine_config &config);
+	void popeyebl(machine_config &config);
 };

@@ -163,6 +163,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void _7smash(machine_config &config);
+	void luckgrln(machine_config &config);
 };
 
 
@@ -986,7 +988,7 @@ INTERRUPT_GEN_MEMBER(luckgrln_state::luckgrln_irq)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( luckgrln )
+MACHINE_CONFIG_START(luckgrln_state::luckgrln)
 	MCFG_CPU_ADD("maincpu", Z180,8000000)
 	MCFG_CPU_PROGRAM_MAP(mainmap)
 	MCFG_CPU_IO_MAP(portmap)
@@ -1011,7 +1013,7 @@ static MACHINE_CONFIG_START( luckgrln )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( _7smash, luckgrln )
+MACHINE_CONFIG_DERIVED(luckgrln_state::_7smash, luckgrln)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(_7smash_map)
 	MCFG_CPU_IO_MAP(_7smash_io)

@@ -76,6 +76,7 @@ public:
 	DECLARE_PALETTE_INIT(thedealr);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void thedealr(machine_config &config);
 };
 
 /***************************************************************************
@@ -524,14 +525,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedealr_state::thedealr_interrupt)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( thedealr )
+MACHINE_CONFIG_START(thedealr_state::thedealr)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", R65C02, XTAL_16MHz/8)   // 2 MHz?
+	MCFG_CPU_ADD("maincpu", R65C02, XTAL(16'000'000)/8)   // 2 MHz?
 	MCFG_CPU_PROGRAM_MAP(thedealr)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", thedealr_state, thedealr_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("subcpu", R65C02, XTAL_16MHz/8)    // 2 MHz?
+	MCFG_CPU_ADD("subcpu", R65C02, XTAL(16'000'000)/8)    // 2 MHz?
 	MCFG_CPU_PROGRAM_MAP(thedealr_sub)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thedealr_state, nmi_line_pulse)
 
@@ -561,7 +562,7 @@ static MACHINE_CONFIG_START( thedealr )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_16MHz/8)   // 2 MHz?
+	MCFG_SOUND_ADD("aysnd", YM2149, XTAL(16'000'000)/8)   // 2 MHz?
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

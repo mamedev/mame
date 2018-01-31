@@ -120,6 +120,8 @@ public:
 	void zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void zerotrgt_rearrange_gfx( int romsize, int romarea );
+	void cntsteer(machine_config &config);
+	void zerotrgt(machine_config &config);
 };
 
 
@@ -511,7 +513,7 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_sound_w)
 WRITE8_MEMBER(cntsteer_state::zerotrgt_ctrl_w)
 {
 	/*TODO: check this.*/
-	logerror("CTRL: %04x: %04x: %04x\n", space.device().safe_pc(), offset, data);
+	logerror("CTRL: %04x: %04x: %04x\n", m_maincpu->pc(), offset, data);
 //  if (offset == 0) m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this
@@ -904,7 +906,7 @@ MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 	MACHINE_RESET_CALL_MEMBER(zerotrgt);
 }
 
-static MACHINE_CONFIG_START( cntsteer )
+MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)      /* ? */
@@ -958,7 +960,7 @@ static MACHINE_CONFIG_START( cntsteer )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( zerotrgt )
+MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)      /* ? */

@@ -160,6 +160,7 @@ public:
 	uint32_t m_video_address;
 
 	uint32_t m_dsp_rom_address;
+	void taitopjc(machine_config &config);
 };
 
 void taitopjc_state::video_exit()
@@ -475,7 +476,7 @@ void taitopjc_state::print_display_list()
 
 WRITE64_MEMBER(taitopjc_state::dsp_w)
 {
-	//logerror("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask), space.device().safe_pc());
+	//logerror("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask), m_maincpu->pc());
 
 	if (offset == 0x7fe)
 	{
@@ -752,9 +753,9 @@ INTERRUPT_GEN_MEMBER(taitopjc_state::taitopjc_vbi)
 }
 
 
-static MACHINE_CONFIG_START( taitopjc )
+MACHINE_CONFIG_START(taitopjc_state::taitopjc)
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
-	MCFG_PPC_BUS_FREQUENCY(XTAL_66_6667MHz)    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)
 
 	/* TMP95C063F I/O CPU */

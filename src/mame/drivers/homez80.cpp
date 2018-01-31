@@ -39,6 +39,7 @@ public:
 	INTERRUPT_GEN_MEMBER(homez80_interrupt);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void homez80(machine_config &config);
 private:
 	bool m_irq;
 	virtual void machine_reset() override;
@@ -278,9 +279,9 @@ INTERRUPT_GEN_MEMBER(homez80_state::homez80_interrupt)
 	m_irq ^= 1;
 }
 
-static MACHINE_CONFIG_START( homez80 )
+MACHINE_CONFIG_START(homez80_state::homez80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(homez80_mem)
 	MCFG_CPU_IO_MAP(homez80_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(homez80_state, homez80_interrupt,  50)

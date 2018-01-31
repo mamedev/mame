@@ -105,6 +105,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void symbolics(machine_config &config);
 //protected:
 //  virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -314,13 +315,13 @@ void symbolics_state::machine_reset()
 	*/
 }
 
-static MACHINE_CONFIG_START( symbolics )
+MACHINE_CONFIG_START(symbolics_state::symbolics)
 	/* basic machine hardware */
 	// per page 159 of http://bitsavers.trailing-edge.com/pdf/symbolics/3600_series/Lisp_Machine_Hardware_Memos.pdf:
 	//XTALS: 16MHz @H11 (68k CPU clock)
 	//       4.9152MHz @J5 (driving the two MPSCs serial clocks)
 	//       66.67MHz @J10 (main lispcpu/system clock)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2) /* MC68000L8 @A27; clock is derived from the 16Mhz xtal @ H11, verified from patent */
 	MCFG_CPU_PROGRAM_MAP(m68k_mem)
 	MCFG_CPU_IO_MAP(m68k_io)
 

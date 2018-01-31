@@ -194,12 +194,12 @@ void msx_cart_disk_device::initialize_cartridge()
 }
 
 
-MACHINE_CONFIG_MEMBER( msx_cart_vy0010_device::device_add_mconfig )
+MACHINE_CONFIG_START(msx_cart_vy0010_device::device_add_mconfig)
 	// From VY-0010 schematic:
 	// HLT pulled high
 	// SSO/-ENMF + -DDEN + ENP + -5/8 - pulled low
 	// READY inverted in VY-0010 cartridge and pulled low on VY-0010/VY-0011 floppy drive
-	MCFG_WD2793_ADD("fdc", XTAL_4MHz / 4)
+	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 4)
 	MCFG_WD_FDC_FORCE_READY
 
 	// Single sided 3.5" floppy drive
@@ -213,8 +213,8 @@ MACHINE_CONFIG_MEMBER( msx_cart_vy0010_device::device_add_mconfig )
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_flop_list","msx1_flop")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( msx_cart_fsfd1_device::device_add_mconfig )
-	MCFG_WD2793_ADD("fdc", XTAL_4MHz / 4)
+MACHINE_CONFIG_START(msx_cart_fsfd1_device::device_add_mconfig)
+	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 4)
 
 	// Double sided 3.5" floppy drive
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", msx_floppies, "35dd", msx_cart_disk_device::floppy_formats)
@@ -228,7 +228,7 @@ MACHINE_CONFIG_MEMBER( msx_cart_fsfd1_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_MEMBER( msx_cart_fsfd1a_device::device_add_mconfig )
+MACHINE_CONFIG_START(msx_cart_fsfd1a_device::device_add_mconfig)
 	MCFG_TC8566AF_ADD("fdc")
 
 	// Double sided 3.5" floppy drive
@@ -243,8 +243,8 @@ MACHINE_CONFIG_MEMBER( msx_cart_fsfd1a_device::device_add_mconfig )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_MEMBER( msx_cart_fscf351_device::device_add_mconfig )
-	MCFG_MB8877_ADD("fdc", XTAL_4MHz / 4)
+MACHINE_CONFIG_START(msx_cart_fscf351_device::device_add_mconfig)
+	MCFG_MB8877_ADD("fdc", XTAL(4'000'000) / 4)
 	MCFG_WD_FDC_FORCE_READY
 
 	// Double sided 3.5" floppy drive

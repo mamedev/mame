@@ -77,4 +77,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(amerdart_audio_int_gen);
 	void register_state_save();
 	int amerdart_trackball_direction(int num, int data);
+	void _9ballsht(machine_config &config);
+	void coolpool(machine_config &config);
+	void amerdart(machine_config &config);
 };

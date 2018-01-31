@@ -17,6 +17,9 @@ public:
 		: genpin_class(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu") { }
 
+		void macp(machine_config &config);
+		void macpmsm(machine_config &config);
+		void macp0(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 };
@@ -44,7 +47,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( cicplay )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( macp )
+MACHINE_CONFIG_START(macp_state::macp)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(macp_map)
@@ -60,12 +63,12 @@ static MACHINE_CONFIG_START( macp )
 	MCFG_FRAGMENT_ADD( genpin_audio )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( macp0, macp)
+MACHINE_CONFIG_DERIVED(macp_state::macp0, macp)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(macp0_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( macpmsm, macp)
+MACHINE_CONFIG_DERIVED(macp_state::macpmsm, macp)
 	// MSM5205
 MACHINE_CONFIG_END
 

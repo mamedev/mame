@@ -61,6 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port3_w);
 	I8275_DRAW_CHARACTER_MEMBER(crtc_update_row);
 
+	void trs80dt1(machine_config &config);
 private:
 	bool m_bow;
 	virtual void machine_reset() override;
@@ -307,7 +308,7 @@ I8275_DRAW_CHARACTER_MEMBER( trs80dt1_state::crtc_update_row )
 }
 
 
-static MACHINE_CONFIG_START( trs80dt1 )
+MACHINE_CONFIG_START(trs80dt1_state::trs80dt1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, 7372800)
 	MCFG_CPU_PROGRAM_MAP(prg_map)

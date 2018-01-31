@@ -39,13 +39,13 @@
 
 // Atari ST
 
-#define Y1      XTAL_2_4576MHz
+#define Y1      XTAL(2'457'600)
 
 // STBook
 
-#define U517    XTAL_16MHz
-#define Y200    XTAL_2_4576MHz
-#define Y700    XTAL_10MHz
+#define U517    XTAL(16'000'000)
+#define Y200    XTAL(2'457'600)
+#define Y700    XTAL(10'000'000)
 
 #define DMA_STATUS_DRQ              0x04
 #define DMA_STATUS_SECTOR_COUNT     0x02
@@ -335,6 +335,7 @@ public:
 	required_device<palette_device> m_palette;
 	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
 
+	void st(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -348,6 +349,7 @@ public:
 
 	DECLARE_READ16_MEMBER( fpu_r );
 	DECLARE_WRITE16_MEMBER( fpu_w );
+	void megast(machine_config &config);
 };
 
 class ste_state : public st_state
@@ -427,6 +429,10 @@ public:
 	emu_timer *m_microwire_timer;
 	emu_timer *m_dmasound_timer;
 
+	void falcon40(machine_config &config);
+	void tt030(machine_config &config);
+	void falcon(machine_config &config);
+	void ste(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -444,6 +450,7 @@ public:
 	DECLARE_WRITE16_MEMBER( cache_w );
 
 	uint16_t m_cache;
+	void megaste(machine_config &config);
 };
 
 class stbook_state : public ste_state

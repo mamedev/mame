@@ -18,8 +18,6 @@
 #include "sound/beep.h"
 
 #include "bus/electron/exp.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 /* Interrupts */
 #define INT_HIGH_TONE       0x40
@@ -45,6 +43,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_cassette(*this, "cassette"),
 		m_beeper(*this, "beeper"),
+		m_region_basic(*this, "basic"),
 		m_keybd(*this, "LINE.%u", 0),
 		m_exp(*this, "exp"),
 		m_ram(*this, RAM_TAG)
@@ -84,9 +83,10 @@ public:
 	int m_map4[256];
 	int m_map16[256];
 	emu_timer *m_scanline_timer;
-	DECLARE_READ8_MEMBER(electron_read_keyboard);
 	DECLARE_READ8_MEMBER(electron_mem_r);
 	DECLARE_WRITE8_MEMBER(electron_mem_w);
+	DECLARE_READ8_MEMBER(electron_paged_r);
+	DECLARE_WRITE8_MEMBER(electron_paged_w);
 	DECLARE_READ8_MEMBER(electron_fred_r);
 	DECLARE_WRITE8_MEMBER(electron_fred_w);
 	DECLARE_READ8_MEMBER(electron_jim_r);
@@ -107,6 +107,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;
+	required_memory_region m_region_basic;
 	required_ioport_array<14> m_keybd;
 	required_device<electron_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;
@@ -115,6 +116,8 @@ public:
 	void electron_interrupt_handler(int mode, int interrupt);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
+	void electron(machine_config &config);
+	void btm2105(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

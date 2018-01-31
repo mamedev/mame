@@ -87,7 +87,7 @@ READ8_MEMBER(seicross_state::portB_r)
 
 WRITE8_MEMBER(seicross_state::portB_w)
 {
-	//logerror("PC %04x: 8910 port B = %02x\n", space.device().safe_pc(), data);
+	//logerror("PC %04x: 8910 port B = %02x\n", m_maincpu->pc(), data);
 	/* bit 0 is IRQ enable */
 	m_irq_mask = data & 1;
 
@@ -390,15 +390,15 @@ INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( no_nvram )
+MACHINE_CONFIG_START(seicross_state::no_nvram)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz / 6)   /* D780C, 3.072 MHz? */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000) / 6)   /* D780C, 3.072 MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seicross_state,  vblank_irq)
 
-	MCFG_CPU_ADD("mcu", NSC8105, XTAL_18_432MHz / 6)   /* ??? */
+	MCFG_CPU_ADD("mcu", NSC8105, XTAL(18'432'000) / 6)   /* ??? */
 	MCFG_CPU_PROGRAM_MAP(mcu_no_nvram_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))  /* 20 CPU slices per frame - an high value to ensure proper */
@@ -422,7 +422,7 @@ static MACHINE_CONFIG_START( no_nvram )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz / 12)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(18'432'000) / 12)
 	MCFG_AY8910_PORT_B_READ_CB(READ8(seicross_state, portB_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(seicross_state, portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
@@ -433,7 +433,7 @@ static MACHINE_CONFIG_START( no_nvram )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( nvram, no_nvram )
+MACHINE_CONFIG_DERIVED(seicross_state::nvram, no_nvram)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("mcu")
@@ -442,7 +442,7 @@ static MACHINE_CONFIG_DERIVED( nvram, no_nvram )
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", seicross_state, nvram_init)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( friskytb, nvram )
+MACHINE_CONFIG_DERIVED(seicross_state::friskytb, nvram)
 	MCFG_CPU_MODIFY("mcu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END

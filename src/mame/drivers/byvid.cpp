@@ -106,6 +106,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	DECLARE_WRITE8_MEMBER(granny_crtc_w);
 	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void babypac(machine_config &config);
+	void granny(machine_config &config);
 private:
 	uint8_t m_mpu_to_vid;
 	uint8_t m_vid_to_mpu;
@@ -741,15 +743,15 @@ uint32_t by133_state::screen_update_granny(screen_device &screen, bitmap_rgb32 &
 	return 0;
 }
 
-static MACHINE_CONFIG_START( babypac )
+MACHINE_CONFIG_START(by133_state::babypac)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_3_579545MHz/4) // no xtal, just 2 chips
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(3'579'545)/4) // no xtal, just 2 chips
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MCFG_CPU_ADD("videocpu", MC6809, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("videocpu", MC6809, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(video_map)
 
-	MCFG_CPU_ADD("audiocpu", M6803, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", M6803, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 
@@ -788,7 +790,7 @@ static MACHINE_CONFIG_START( babypac )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("babypac2", by133_state, u11_timer, attotime::from_hz(634)) // 555 timer*2
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "crtc", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "crtc", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("videocpu", M6809_IRQ_LINE))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
@@ -805,20 +807,20 @@ static MACHINE_CONFIG_START( babypac )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "beee", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( granny, babypac )
+MACHINE_CONFIG_DERIVED(by133_state::granny, babypac)
 	MCFG_DEVICE_REMOVE("videocpu")
-	MCFG_CPU_ADD("videocpu", MC6809, XTAL_8MHz) // MC68B09P (XTAL value hard to read)
+	MCFG_CPU_ADD("videocpu", MC6809, XTAL(8'000'000)) // MC68B09P (XTAL value hard to read)
 	MCFG_CPU_PROGRAM_MAP(granny_map)
 
 	MCFG_DEVICE_REMOVE("screen")
 
-	MCFG_DEVICE_ADD( "crtc2", TMS9928A, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "crtc2", TMS9928A, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("videocpu", M6809_IRQ_LINE))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS( XTAL_10_738635MHz / 2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
+	MCFG_SCREEN_RAW_PARAMS( XTAL(10'738'635) / 2, tms9928a_device::TOTAL_HORZ, tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START + 256 + 12, \
 			tms9928a_device::TOTAL_VERT_NTSC, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC + 192 + 12 )
 	MCFG_SCREEN_UPDATE_DRIVER(by133_state, screen_update_granny)
 MACHINE_CONFIG_END

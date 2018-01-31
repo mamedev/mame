@@ -236,7 +236,7 @@ READ16_MEMBER(topspeed_state::motor_r)
 			return 0;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read from motor cpu %03x\n", space.device().safe_pc(), offset);
+			logerror("CPU #0 PC %06x: warning - read from motor cpu %03x\n", m_subcpu->pc(), offset);
 			return 0;
 	}
 }
@@ -244,7 +244,7 @@ READ16_MEMBER(topspeed_state::motor_r)
 WRITE16_MEMBER(topspeed_state::motor_w)
 {
 	// Writes $900000-25 and $900200-219
-	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n", space.device().safe_pc(), data, offset);
+	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n", m_subcpu->pc(), data, offset);
 }
 
 WRITE8_MEMBER(topspeed_state::coins_w)
@@ -316,7 +316,7 @@ WRITE8_MEMBER(topspeed_state::msm5205_command_w)
 			break;
 
 		default:
-			logerror("Unhandled MSM5205 control write to %x with %x (PC:%.4x)\n", 0xb000 + offset, data, space.device().safe_pc());
+			logerror("Unhandled MSM5205 control write to %x with %x (PC:%.4x)\n", 0xb000 + offset, data, m_audiocpu->pc());
 			break;
 	}
 }
@@ -380,7 +380,7 @@ WRITE_LINE_MEMBER(topspeed_state::z80ctc_to0)
 static ADDRESS_MAP_START( cpua_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x600002, 0x600003) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
 	AM_RANGE(0x7e0002, 0x7e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
@@ -568,22 +568,22 @@ void topspeed_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( topspeed )
+MACHINE_CONFIG_START(topspeed_state::topspeed)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(cpua_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", topspeed_state, irq6_line_hold)
 
-	MCFG_CPU_ADD("subcpu", M68000, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("subcpu", M68000, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(cpub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", topspeed_state, irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(z80_prg)
 	MCFG_CPU_IO_MAP(z80_io)
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(16'000'000) / 4)
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(topspeed_state, z80ctc_to0))
 
 	MCFG_DEVICE_ADD("pc080sn_1", PC080SN, 0)
@@ -624,18 +624,18 @@ static MACHINE_CONFIG_START( topspeed )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_16MHz / 4)
+	MCFG_YM2151_ADD("ymsnd", XTAL(16'000'000) / 4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(topspeed_state, sound_bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "filter1l", 1.0)
 	MCFG_SOUND_ROUTE(1, "filter1r", 1.0)
 
-	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("msm1", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(topspeed_state, msm5205_1_vck)) // VCK function
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      // 8 kHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 1.0)
 
-	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("msm2", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)      // Slave mode, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 1.0)
 

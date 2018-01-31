@@ -324,7 +324,7 @@
 #include "fortecrd.lh"
 
 
-#define MASTER_CLOCK    XTAL_12MHz
+#define MASTER_CLOCK    XTAL(12'000'000)
 #define CPU_CLOCK       (MASTER_CLOCK/4)
 #define CRTC_CLOCK      (MASTER_CLOCK/8)
 #define AY_CLOCK        (MASTER_CLOCK/8)
@@ -357,6 +357,7 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void fortecar(machine_config &config);
 };
 
 
@@ -672,7 +673,7 @@ void fortecar_state::machine_reset()
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_CONFIG_START( fortecar )
+MACHINE_CONFIG_START(fortecar_state::fortecar)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)      /* 3 MHz, measured */
 	MCFG_CPU_PROGRAM_MAP(fortecar_map)

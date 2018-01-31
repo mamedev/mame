@@ -51,7 +51,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_corvfdc02_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_corvfdc02_device::device_add_mconfig)
 	MCFG_UPD765A_ADD(FDC02_FDC_TAG, true, false)
 	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(a2bus_corvfdc02_device, intrq_w))
 	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(a2bus_corvfdc02_device, drq_w))
@@ -96,9 +96,6 @@ a2bus_corvfdc02_device::a2bus_corvfdc02_device(const machine_config &mconfig, co
 
 void a2bus_corvfdc02_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(FDC02_ROM_REGION).c_str())->base();
 
 	m_timer = timer_alloc(0);

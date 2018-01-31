@@ -67,7 +67,7 @@
 #include "speaker.h"
 //#include "sound/ay8910.h"
 
-#define MAIN_CLOCK XTAL_5MHz
+#define MAIN_CLOCK XTAL(5'000'000)
 
 class apc_state : public driver_device
 {
@@ -153,6 +153,7 @@ public:
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	UPD7220_DRAW_TEXT_LINE_MEMBER( hgdc_draw_text );
 
+	void apc(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -909,7 +910,7 @@ static SLOT_INTERFACE_START( apc_floppies )
 	SLOT_INTERFACE( "8", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( apc )
+MACHINE_CONFIG_START(apc_state::apc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8086,MAIN_CLOCK)
@@ -945,7 +946,7 @@ static MACHINE_CONFIG_START( apc )
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(apc_state, apc_dack3_w))
 
 	MCFG_NVRAM_ADD_1FILL("cmos")
-	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NOOP, NOOP)
+	MCFG_UPD1990A_ADD("upd1990a", XTAL(32'768), NOOP, NOOP)
 
 	MCFG_UPD765A_ADD("upd765", true, true)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE("pic8259_slave", pic8259_device, ir4_w))

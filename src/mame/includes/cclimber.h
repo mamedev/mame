@@ -112,4 +112,14 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(bagmanf_vblank_irq);
+	void root(machine_config &config);
+	void swimmer(machine_config &config);
+	void guzzler(machine_config &config);
+	void toprollr(machine_config &config);
+	void cannonb(machine_config &config);
+	void yamato(machine_config &config);
+	void bagmanf(machine_config &config);
+	void cclimber(machine_config &config);
+	void cclimberx(machine_config &config);
+	void ckongb(machine_config &config);
 };

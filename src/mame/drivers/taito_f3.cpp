@@ -63,7 +63,7 @@ READ32_MEMBER(taito_f3_state::f3_control_r)
 {
 	if (offset<6)
 		return m_input[offset]->read();
-	else logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", space.device().safe_pc(), offset);
+	else logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", m_maincpu->pc(), offset);
 
 	return 0xffffffff;
 }
@@ -105,7 +105,7 @@ WRITE32_MEMBER(taito_f3_state::f3_control_w)
 			}
 			return;
 	}
-	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",space.device().safe_pc(),offset,data);
+	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",m_maincpu->pc(),offset,data);
 }
 
 WRITE32_MEMBER(taito_f3_state::f3_sound_reset_0_w)
@@ -457,10 +457,10 @@ MACHINE_RESET_MEMBER(taito_f3_state,f3)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( f3 )
+MACHINE_CONFIG_START(taito_f3_state::f3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(f3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state,  f3_interrupt2)
 
@@ -493,30 +493,30 @@ MACHINE_CONFIG_END
  of the games change the registers during the game (to do so would probably require
  monitor recalibration.)
 */
-static MACHINE_CONFIG_DERIVED( f3_224a, f3 )
+MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224a, f3)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( f3_224b, f3 )
+MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224b, f3)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 32, 32+224-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( f3_224c, f3 )
+MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224c, f3)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
 MACHINE_CONFIG_END
 
 /* recalh and gseeker need a default EEPROM to work */
-static MACHINE_CONFIG_DERIVED( f3_eeprom, f3 )
+MACHINE_CONFIG_DERIVED(taito_f3_state::f3_eeprom, f3)
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_EEPROM_SERIAL_DATA(recalh_eeprom, 128) //TODO: convert this into ROM
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( f3_224b_eeprom, f3_224b )
+MACHINE_CONFIG_DERIVED(taito_f3_state::f3_224b_eeprom, f3_224b)
 
 	MCFG_DEVICE_REMOVE("eeprom")
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -553,9 +553,9 @@ static GFXDECODE_START( bubsympb )
 	GFXDECODE_ENTRY( nullptr,           0x000000, pivotlayout,         0,  64 ) /* Dynamically modified */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( bubsympb )
+MACHINE_CONFIG_START(taito_f3_state::bubsympb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(bubsympb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taito_f3_state, f3_interrupt2)
 

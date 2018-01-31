@@ -62,6 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER( speaker_w );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
 	DECLARE_PALETTE_INIT(lcmate2);
+	void lcmate2(machine_config &config);
 };
 
 WRITE8_MEMBER( lcmate2_state::speaker_w )
@@ -223,9 +224,9 @@ static GFXDECODE_START( lcmate2 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( lcmate2 )
+MACHINE_CONFIG_START(lcmate2_state::lcmate2)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz) // confirmed
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545)) // confirmed
 	MCFG_CPU_PROGRAM_MAP(lcmate2_mem)
 	MCFG_CPU_IO_MAP(lcmate2_io)
 
@@ -254,7 +255,7 @@ static MACHINE_CONFIG_START( lcmate2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD("rtc", RP5C15, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RP5C15, XTAL(32'768))
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -267,4 +268,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    STATE          INIT  COMPANY  FULLNAME             FLAGS
-COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, 0,    "Vtech", "Laser Compumate 2", MACHINE_NOT_WORKING )
+COMP( 1984, lcmate2, 0,      0,      lcmate2, lcmate2, lcmate2_state, 0,    "VTech", "Laser Compumate 2", MACHINE_NOT_WORKING )

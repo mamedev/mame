@@ -22,7 +22,7 @@
  * 7C -> 100 => 256 - 124 = 132 ==> 264 Scanlines
  */
 
-#define MASTER_CLOCK            XTAL_24MHz
+#define MASTER_CLOCK            XTAL(24'000'000)
 #define PIXEL_CLOCK             (MASTER_CLOCK / 4)
 #define CLOCK_1H                (MASTER_CLOCK / 8)
 #define CLOCK_16H               (CLOCK_1H / 16)
@@ -36,10 +36,10 @@
 #define VBSTART                 (240)
 #define VBEND                   (16)
 
-#define Z80_MASTER_CLOCK        XTAL_8MHz
+#define Z80_MASTER_CLOCK        XTAL(8'000'000)
 #define Z80_CLOCK               (Z80_MASTER_CLOCK / 2) /* verified on pcb */
 
-#define I8035_MASTER_CLOCK      XTAL_11MHz /* verified on pcb: 730Khz */
+#define I8035_MASTER_CLOCK      XTAL(11'000'000) /* verified on pcb: 730Khz */
 #define I8035_CLOCK             (I8035_MASTER_CLOCK)
 
 class mario_state : public driver_device
@@ -138,11 +138,11 @@ public:
 	DECLARE_WRITE8_MEMBER(memory_write_byte);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void set_ea(int ea);
+	void mario_base(machine_config &config);
+	void masao(machine_config &config);
+	void masao_audio(machine_config &config);
+	void mario(machine_config &config);
+	void mario_audio(machine_config &config);
 };
-
-/*----------- defined in audio/mario.c -----------*/
-
-MACHINE_CONFIG_EXTERN( mario_audio );
-MACHINE_CONFIG_EXTERN( masao_audio );
 
 #endif /*MARIO_H_*/

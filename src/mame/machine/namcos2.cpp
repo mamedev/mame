@@ -73,13 +73,11 @@ READ16_MEMBER( namcos2_state::namcos2_finallap_prot_r )
 
 WRITE8_MEMBER(namcos2_shared_state::sound_reset_w)
 {
-	address_space &masterspace = m_maincpu->space(AS_PROGRAM);
-
 	if (data & 0x01)
 	{
 		/* Resume execution */
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-		masterspace.device().execute().yield();
+		m_maincpu->yield();
 	}
 	else
 	{
@@ -103,10 +101,7 @@ WRITE8_MEMBER(namcos2_shared_state::system_reset_w)
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 
 	if (data & 0x01)
-	{
-		address_space &masterspace = m_maincpu->space(AS_PROGRAM);
-		masterspace.device().execute().yield();
-	}
+		m_maincpu->yield();
 }
 
 void namcos2_shared_state::reset_all_subcpus(int state)
@@ -326,7 +321,6 @@ READ16_MEMBER( namcos2_state::namcos2_68k_key_r )
 		{
 	//  case 3: return 0x142;
 		case 4: return 0x142;
-	//  case 3: popmessage("blah %08x",space.device().safe_pc());
 		default: return machine().rand();
 		}
 

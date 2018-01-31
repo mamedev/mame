@@ -51,7 +51,7 @@ static const floppy_interface agat840k_hle_floppy_interface =
 	"floppy_5_25"
 };
 
-MACHINE_CONFIG_MEMBER( a2bus_agat840k_hle_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_agat840k_hle_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
 	MCFG_LEGACY_FLOPPY_CONFIG(agat840k_hle_floppy_interface)
 	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(a2bus_agat840k_hle_device, index_0_w))
@@ -133,9 +133,6 @@ void a2bus_agat840k_hle_device::index_callback(int unit, int state)
 
 void a2bus_agat840k_hle_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = device().machine().root_device().memregion(this->subtag(AGAT840K_ROM_REGION).c_str())->base();
 
 	m_mxcs = MXCSR_SYNC;

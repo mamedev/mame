@@ -285,6 +285,7 @@ public:
 
 	int m_ready_line;
 	int m_ready_line1;
+	void geneve_60hz(machine_config &config);
 };
 
 /*
@@ -331,6 +332,11 @@ static INPUT_PORTS_START(geneve)
 		PORT_CONFSETTING( 0x00, "32 KiB" )
 		PORT_CONFSETTING( 0x01, "64 KiB" )
 		PORT_CONFSETTING( 0x02, "384 KiB" )
+
+	PORT_START( "VRAM" )
+	PORT_CONFNAME( 0x01, 0x00, "Video RAM" )
+		PORT_CONFSETTING( 0x00, "128 KiB" )
+		PORT_CONFSETTING( 0x01, "192 KiB" )
 
 	PORT_START( "GENMODDIPS" )
 	PORT_DIPNAME( GENEVE_GM_TURBO, 0x00, "Genmod Turbo mode") PORT_CONDITION( "MODE", 0x01, EQUALS, GENMOD ) PORT_CHANGED_MEMBER(GENEVE_MAPPER_TAG, bus::ti99::internal::geneve_mapper_device, settings_changed, 1)
@@ -683,7 +689,7 @@ void geneve_state::machine_reset()
 	m_joyport->write_port(0x01);    // select Joystick 1
 }
 
-static MACHINE_CONFIG_START( geneve_60hz )
+MACHINE_CONFIG_START(geneve_state::geneve_60hz)
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, 12000000, memmap, crumap)
@@ -692,9 +698,9 @@ static MACHINE_CONFIG_START( geneve_60hz )
 	MCFG_TMS9995_DBIN_HANDLER( WRITELINE(geneve_state, dbin_line) )
 
 	// Video hardware
-	MCFG_V9938_ADD(TI_VDP_TAG, TI_SCREEN_TAG, 0x20000, XTAL_21_4772MHz)  /* typical 9938 clock, not verified */
+	MCFG_V9938_ADD(TI_VDP_TAG, TI_SCREEN_TAG, 0x20000, XTAL(21'477'272))  /* typical 9938 clock, not verified */
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(geneve_state, set_tms9901_INT2_from_v9938))
-	MCFG_V99X8_SCREEN_ADD_NTSC(TI_SCREEN_TAG, TI_VDP_TAG, XTAL_21_4772MHz)
+	MCFG_V99X8_SCREEN_ADD_NTSC(TI_SCREEN_TAG, TI_VDP_TAG, XTAL(21'477'272))
 
 	// Main board components
 	MCFG_DEVICE_ADD(TI_TMS9901_TAG, TMS9901, 3000000)

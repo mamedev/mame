@@ -312,10 +312,10 @@
 #include "luckyrlt.lh"
 
 
-#define WC81_MAIN_XTAL      XTAL_24MHz        /* Main crystal for Winners Circle 28*28 pins PCB's */
-#define WC82_MAIN_XTAL      XTAL_18_432MHz    /* Main crystal for Winners Circle 18*22 pins PCB's */
-#define RE_MAIN_XTAL        XTAL_16MHz        /* Main for roulette boards */
-#define VIDEO_XTAL          XTAL_20MHz        /* Video circuitry crystal (all) */
+#define WC81_MAIN_XTAL      XTAL(24'000'000)        /* Main crystal for Winners Circle 28*28 pins PCB's */
+#define WC82_MAIN_XTAL      XTAL(18'432'000)    /* Main crystal for Winners Circle 18*22 pins PCB's */
+#define RE_MAIN_XTAL        XTAL(16'000'000)        /* Main for roulette boards */
+#define VIDEO_XTAL          XTAL(20'000'000)        /* Video circuitry crystal (all) */
 #define AY_CLK1             1000000           /* AY-3-8912 clock for WC81 (28*28 PCB), measured */
 #define AY_CLK2             2000000           /* AY-3-8910 clock for 81b & 82 (18*22 PCB), guessed */
 #define VIDEOBUF_SIZE       512*512
@@ -360,6 +360,11 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
+	void winner81(machine_config &config);
+	void winner82(machine_config &config);
+	void rcirulet(machine_config &config);
+	void luckyrlt(machine_config &config);
+	void re800(machine_config &config);
 };
 
 
@@ -1343,7 +1348,7 @@ INPUT_PORTS_END
 *             Machine Drivers              *
 *******************************************/
 
-static MACHINE_CONFIG_START( winner81 )
+MACHINE_CONFIG_START(corona_state::winner81)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, WC81_MAIN_XTAL/8)  /* measured */
 	MCFG_CPU_PROGRAM_MAP(winner81_map)
@@ -1378,7 +1383,7 @@ static MACHINE_CONFIG_START( winner81 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( winner82 )
+MACHINE_CONFIG_START(corona_state::winner82)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, WC82_MAIN_XTAL/8)  /* measured */
 	MCFG_CPU_PROGRAM_MAP(winner82_map)
@@ -1412,7 +1417,7 @@ static MACHINE_CONFIG_START( winner82 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( re800 )
+MACHINE_CONFIG_START(corona_state::re800)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_map)
@@ -1447,7 +1452,7 @@ static MACHINE_CONFIG_START( re800 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rcirulet )
+MACHINE_CONFIG_START(corona_state::rcirulet)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(re800_map)
@@ -1481,7 +1486,7 @@ static MACHINE_CONFIG_START( rcirulet )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( luckyrlt )
+MACHINE_CONFIG_START(corona_state::luckyrlt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, RE_MAIN_XTAL/8)    /* measured 2MHz */
 	MCFG_CPU_PROGRAM_MAP(luckyrlt_map)

@@ -30,4 +30,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bg_select_w);
 	DECLARE_WRITE_LINE_MEMBER(tx_color_mode_w);
 	DECLARE_WRITE_LINE_MEMBER(bg_disable_w);
+	void dzigzag(machine_config &config);
+	void digdug(machine_config &config);
 };

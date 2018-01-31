@@ -250,6 +250,7 @@ public:
 	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
 	DECLARE_DRIVER_INIT(omegrace);
 	virtual void machine_reset() override;
+	void omegrace(machine_config &config);
 };
 
 
@@ -496,14 +497,14 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( omegrace )
+MACHINE_CONFIG_START(omegrace_state::omegrace)
 
 	/* basic machine hardware */
 
 	/* main CPU */
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 13 = divide by 4 */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(omegrace_state, irq0_line_hold, 250)
@@ -512,7 +513,7 @@ static MACHINE_CONFIG_START( omegrace )
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 12 = divide by 8 */
 	/* Fed to CPU as 1.5mhz though line J4-D */
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_port)
 	MCFG_CPU_PERIODIC_INT_DRIVER(omegrace_state, nmi_line_pulse, 250)
@@ -539,10 +540,10 @@ static MACHINE_CONFIG_START( omegrace )
 
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS92, Pin 8 = divide by 12 */
-	MCFG_SOUND_ADD("ay1", AY8912, XTAL_12MHz/12)
+	MCFG_SOUND_ADD("ay1", AY8912, XTAL(12'000'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8912, XTAL_12MHz/12)
+	MCFG_SOUND_ADD("ay2", AY8912, XTAL(12'000'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

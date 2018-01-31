@@ -39,6 +39,7 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void wyse(machine_config &config);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
@@ -54,7 +55,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( wyse )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wyse )
+MACHINE_CONFIG_START(wyse_state::wyse)
 	MCFG_CPU_ADD("maincpu", I8031, 11'000'000) // confirmed for WY-50
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -104,10 +105,10 @@ ROM_START( wy160 )
 	ROM_LOAD( "251167-06.bin",           0x00000, 0x10000, CRC(36e920df) SHA1(8fb7f51b4f47ef63b21d421227d6fef98001e4e9) )
 ROM_END
 
-COMP( 1984, wy50,  0,    0, wyse, wyse, wyse_state, 0, "Wyse", "WY-50",  MACHINE_IS_SKELETON )
-COMP( 199?, wy55,  wy50, 0, wyse, wyse, wyse_state, 0, "Wyse", "WY-55",  MACHINE_IS_SKELETON )
-COMP( 1986, wy60,  wy50, 0, wyse, wyse, wyse_state, 0, "Wyse", "WY-60",  MACHINE_IS_SKELETON )
-COMP( 1985, wy85,  wy50, 0, wyse, wyse, wyse_state, 0, "Wyse", "WY-85",  MACHINE_IS_SKELETON )
-COMP( 1988, wy150, wy50, 0, wyse, wyse, wyse_state, 0, "Wyse", "WY-150", MACHINE_IS_SKELETON )
-COMP( 1990, wy160, wy50, 0, wyse, wyse, wyse_state, 0, "Wyse", "WY-160", MACHINE_IS_SKELETON )
-COMP( 1991, wy30p, wy50, 0, wyse, wyse, wyse_state, 0, "Wyse", "WY-30+", MACHINE_IS_SKELETON )
+COMP( 1984, wy50,  0,    0, wyse, wyse, wyse_state, 0, "Wyse Technology", "WY-50",  MACHINE_IS_SKELETON )
+COMP( 1986, wy60,  wy50, 0, wyse, wyse, wyse_state, 0, "Wyse Technology", "WY-60",  MACHINE_IS_SKELETON )
+COMP( 1985, wy85,  wy50, 0, wyse, wyse, wyse_state, 0, "Wyse Technology", "WY-85",  MACHINE_IS_SKELETON )
+COMP( 1988, wy150, wy50, 0, wyse, wyse, wyse_state, 0, "Wyse Technology", "WY-150", MACHINE_IS_SKELETON )
+COMP( 1990, wy160, wy50, 0, wyse, wyse, wyse_state, 0, "Wyse Technology", "WY-160", MACHINE_IS_SKELETON )
+COMP( 1991, wy30p, wy50, 0, wyse, wyse, wyse_state, 0, "Wyse Technology", "WY-30+", MACHINE_IS_SKELETON )
+COMP( 1993, wy55,  wy50, 0, wyse, wyse, wyse_state, 0, "Wyse Technology", "WY-55",  MACHINE_IS_SKELETON )

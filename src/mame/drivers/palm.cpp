@@ -59,6 +59,13 @@ public:
 	required_ioport m_io_portd;
 
 	offs_t palm_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
+	void palmiii(machine_config &config);
+	void pilot1k(machine_config &config);
+	void palmvx(machine_config &config);
+	void palmv(machine_config &config);
+	void palm(machine_config &config);
+	void palmpro(machine_config &config);
+	void pilot5k(machine_config &config);
 };
 
 
@@ -167,7 +174,7 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( palm )
+MACHINE_CONFIG_START(palm_state::palm)
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", M68000, 32768*506 )        /* 16.580608 MHz */
 	MCFG_CPU_PROGRAM_MAP( palm_map)
@@ -418,7 +425,7 @@ ROM_START( spt1740 )
 	ROM_RELOAD(0x000000, 0x004000)
 ROM_END
 
-static MACHINE_CONFIG_DERIVED( pilot1k, palm )
+MACHINE_CONFIG_DERIVED(palm_state::pilot1k, palm)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -426,7 +433,7 @@ static MACHINE_CONFIG_DERIVED( pilot1k, palm )
 	MCFG_RAM_EXTRA_OPTIONS("512K,1M,2M,4M,8M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pilot5k, palm )
+MACHINE_CONFIG_DERIVED(palm_state::pilot5k, palm)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -434,7 +441,7 @@ static MACHINE_CONFIG_DERIVED( pilot5k, palm )
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,4M,8M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( palmpro, palm )
+MACHINE_CONFIG_DERIVED(palm_state::palmpro, palm)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -442,7 +449,7 @@ static MACHINE_CONFIG_DERIVED( palmpro, palm )
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M,8M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( palmiii, palm )
+MACHINE_CONFIG_DERIVED(palm_state::palmiii, palm)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -450,7 +457,7 @@ static MACHINE_CONFIG_DERIVED( palmiii, palm )
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( palmv, palm )
+MACHINE_CONFIG_DERIVED(palm_state::palmv, palm)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -458,7 +465,7 @@ static MACHINE_CONFIG_DERIVED( palmv, palm )
 	MCFG_RAM_EXTRA_OPTIONS("4M,8M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( palmvx, palm )
+MACHINE_CONFIG_DERIVED(palm_state::palmvx, palm)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

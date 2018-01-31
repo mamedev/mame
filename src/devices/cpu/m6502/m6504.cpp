@@ -23,9 +23,9 @@ m6504_device::m6504_device(const machine_config &mconfig, const char *tag, devic
 void m6504_device::device_start()
 {
 	if(direct_disabled)
-		mintf = new mi_6504_nd;
+		mintf = std::make_unique<mi_6504_nd>();
 	else
-		mintf = new mi_6504_normal;
+		mintf = std::make_unique<mi_6504_normal>();
 
 	init();
 }

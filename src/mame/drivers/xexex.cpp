@@ -226,7 +226,7 @@ READ16_MEMBER(xexex_state::xexex_waitskip_r)
 {
 	if (m_maincpu->pc() == 0x1158)
 	{
-		space.device().execute().spin_until_trigger(m_resume_trigger);
+		m_maincpu->spin_until_trigger(m_resume_trigger);
 		m_suspension_active = 1;
 	}
 
@@ -365,7 +365,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xexex_state )
 	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)
 	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD("k056832", k056832_device, rom_word_r)       // Passthrough to tile roms
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREAD("k053250", k053250_device, rom_r)
-	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 #if XE_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD("k056832", k056832_device, word_r)
@@ -465,14 +465,14 @@ void xexex_state::machine_reset()
 	m_k054539->init_flags(k054539_device::REVERSE_STEREO);
 }
 
-static MACHINE_CONFIG_START( xexex )
+MACHINE_CONFIG_START(xexex_state::xexex)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // 16MHz
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // 16MHz
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xexex_state, xexex_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/4) // Z80E 8Mhz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/4) // Z80E 8Mhz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1920))
@@ -482,8 +482,8 @@ static MACHINE_CONFIG_START( xexex )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-//  MCFG_SCREEN_REFRESH_RATE(XTAL_32MHz/4/512/288)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_32MHz/4, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255) // 8Mhz horizontal dotclock
+//  MCFG_SCREEN_REFRESH_RATE(XTAL(32'000'000)/4/512/288)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(32'000'000)/4, 384+33+40+55, 0, 383, 256+12+6+14, 0, 255) // 8Mhz horizontal dotclock
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 0, 0+256-1)
@@ -508,7 +508,7 @@ static MACHINE_CONFIG_START( xexex )
 
 	MCFG_K053251_ADD("k053251")
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4)
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
 
 	MCFG_DEVICE_ADD("k054338", K054338, 0)
 
@@ -517,13 +517,13 @@ static MACHINE_CONFIG_START( xexex )
 
 	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) // 4MHz
+	MCFG_YM2151_ADD("ymsnd", XTAL(32'000'000)/8) // 4MHz
 	MCFG_SOUND_ROUTE(0, "filter1l", 0.50)
 	MCFG_SOUND_ROUTE(0, "filter1r", 0.50)
 	MCFG_SOUND_ROUTE(1, "filter2l", 0.50)
 	MCFG_SOUND_ROUTE(1, "filter2r", 0.50)
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_APAN_CB(xexex_state, ym_set_mixing)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)

@@ -654,7 +654,7 @@ void mos6566_device::device_start()
 	m_write_aec.resolve_safe();
 	m_write_k.resolve_safe();
 
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	for (int i = 0; i < 256; i++)
 	{

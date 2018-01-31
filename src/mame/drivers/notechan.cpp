@@ -294,7 +294,7 @@
 #include "notechan.lh"
 
 
-#define MASTER_CLOCK     XTAL_8_448MHz
+#define MASTER_CLOCK     XTAL(8'448'000)
 #define CPU_CLOCK        MASTER_CLOCK / 2    // guess... not verified
 #define SND_CLOCK        MASTER_CLOCK / 8    // guess... not verified
 
@@ -314,6 +314,7 @@ public:
 	DECLARE_WRITE8_MEMBER(out_f9_w);
 	DECLARE_WRITE8_MEMBER(out_fa_w);
 	DECLARE_WRITE8_MEMBER(out_ff_w);
+	void notechan(machine_config &config);
 };
 
 
@@ -493,7 +494,7 @@ INPUT_PORTS_END
 *               Machine Config               *
 *********************************************/
 
-static MACHINE_CONFIG_START( notechan )
+MACHINE_CONFIG_START(notechan_state::notechan)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)  // unknown...
 	MCFG_CPU_PROGRAM_MAP(notechan_map)

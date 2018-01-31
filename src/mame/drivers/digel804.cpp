@@ -132,6 +132,8 @@ public:
 	uint8_t m_chipinsert_state;
 	uint8_t m_keyen_state;
 	uint8_t m_op41;
+	void ep804(machine_config &config);
+	void digel804(machine_config &config);
 };
 
 
@@ -584,9 +586,9 @@ WRITE_LINE_MEMBER( digel804_state::ep804_acia_irq_w )
 {
 }
 
-static MACHINE_CONFIG_START( digel804 )
+MACHINE_CONFIG_START(digel804_state::digel804)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'686'400)/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_4)
 	MCFG_CPU_IO_MAP(z80_io_1_4)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -605,7 +607,7 @@ static MACHINE_CONFIG_START( digel804 )
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_3_6864MHz/2)
+	MCFG_MOS6551_XTAL(XTAL(3'686'400)/2)
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(digel804_state, acia_irq_w))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -628,7 +630,7 @@ static MACHINE_CONFIG_START( digel804 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ep804, digel804 )
+MACHINE_CONFIG_DERIVED(digel804_state::ep804, digel804)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")  /* Z80, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_2)

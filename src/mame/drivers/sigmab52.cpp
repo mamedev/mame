@@ -177,6 +177,7 @@ public:
 	uint64_t      m_coin_start_cycles;
 	uint64_t      m_hopper_start_cycles;
 	int         m_audiocpu_cmd_irq;
+	void jwildb52(machine_config &config);
 };
 
 
@@ -316,8 +317,8 @@ static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
 
 	AM_RANGE(0xf720, 0xf727) AM_DEVREADWRITE("6840ptm_1", ptm6840_device, read, write)
 
-	AM_RANGE(0xf730, 0xf730) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
-	AM_RANGE(0xf731, 0xf731) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
+	AM_RANGE(0xf730, 0xf730) AM_DEVREADWRITE("hd63484", hd63484_device, status8_r, address8_w)
+	AM_RANGE(0xf731, 0xf731) AM_DEVREADWRITE("hd63484", hd63484_device, data8_r, data8_w)
 
 	AM_RANGE(0xf740, 0xf740) AM_READ(in0_r)
 	AM_RANGE(0xf741, 0xf741) AM_READ_PORT("IN1")
@@ -572,19 +573,19 @@ void sigmab52_state::machine_reset()
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( jwildb52 )
+MACHINE_CONFIG_START(sigmab52_state::jwildb52)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_8MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(jwildb52_map)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, XTAL_8MHz)
+	MCFG_CPU_ADD("audiocpu", MC6809, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(sound_prog_map)
 
-	MCFG_DEVICE_ADD("6840ptm_1", PTM6840, XTAL_8MHz/4) // FIXME
+	MCFG_DEVICE_ADD("6840ptm_1", PTM6840, XTAL(8'000'000)/4) // FIXME
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("6840ptm_2", PTM6840, XTAL_8MHz/8) // FIXME
+	MCFG_DEVICE_ADD("6840ptm_2", PTM6840, XTAL(8'000'000)/8) // FIXME
 	MCFG_PTM6840_IRQ_CB(WRITELINE(sigmab52_state, ptm2_irq))
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
@@ -597,7 +598,7 @@ static MACHINE_CONFIG_START( jwildb52 )
 	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_HD63484_ADD("hd63484", XTAL_8MHz, jwildb52_hd63484_map)
+	MCFG_HD63484_ADD("hd63484", XTAL(8'000'000), jwildb52_hd63484_map)
 
 	MCFG_PALETTE_ADD("palette", 16)
 
@@ -606,7 +607,7 @@ static MACHINE_CONFIG_START( jwildb52 )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END

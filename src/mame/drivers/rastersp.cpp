@@ -34,8 +34,8 @@
  *
  *************************************/
 
-#define SOUND_CLOCK             XTAL_12_288MHz
-#define PLL_CLOCK               XTAL_14_31818MHz
+#define SOUND_CLOCK             XTAL(12'288'000)
+#define PLL_CLOCK               XTAL(14'318'181)
 #define NVRAM_SIZE              0x8000
 
 #define USE_SPEEDUP_HACK        1
@@ -144,6 +144,8 @@ public:
 	void    update_irq(uint32_t which, uint32_t state);
 	void    upload_palette(uint32_t word1, uint32_t word2);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	static void ncr53c700(device_t *device);
+	void rastersp(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
@@ -645,11 +647,11 @@ WRITE32_MEMBER( rastersp_state::dsp_ctrl_w )
 WRITE32_MEMBER( rastersp_state::dsp_speedup_w )
 {
 	// 809e90  48fd, 48d5
-	if (space.device().safe_pc() == 0x809c23)
+	if (m_dsp->pc() == 0x809c23)
 	{
-		int32_t cycles_left = space.device().execute().cycles_remaining();
+		int32_t cycles_left = m_dsp->cycles_remaining();
 		data += cycles_left / 6;
-		space.device().execute().spin();
+		m_dsp->spin();
 	}
 
 	m_speedup_count = data;
@@ -829,12 +831,15 @@ WRITE32_MEMBER(rastersp_state::ncr53c700_write)
 	m_maincpu->space(AS_PROGRAM).write_dword(offset, data, mem_mask);
 }
 
-static MACHINE_CONFIG_START( ncr53c700 )
+void rastersp_state::ncr53c700(device_t *device)
+{
+	devcb_base *devcb;
+	(void)devcb;
 	MCFG_DEVICE_CLOCK(66000000)
 	MCFG_NCR53C7XX_IRQ_HANDLER(DEVWRITELINE(":", rastersp_state, scsi_irq))
 	MCFG_NCR53C7XX_HOST_READ(DEVREAD32(":", rastersp_state, ncr53c700_read))
 	MCFG_NCR53C7XX_HOST_WRITE(DEVWRITE32(":", rastersp_state, ncr53c700_write))
-MACHINE_CONFIG_END
+}
 
 static SLOT_INTERFACE_START( rastersp_scsi_devices )
 	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
@@ -848,7 +853,7 @@ SLOT_INTERFACE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( rastersp )
+MACHINE_CONFIG_START(rastersp_state::rastersp)
 	MCFG_CPU_ADD("maincpu", I486, 33330000)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -862,7 +867,7 @@ static MACHINE_CONFIG_START( rastersp )
 	/* Devices */
 	MCFG_TIMER_DRIVER_ADD("tms_timer1", rastersp_state, tms_timer1)
 	MCFG_TIMER_DRIVER_ADD("tms_tx_timer", rastersp_state, tms_tx_timer)
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_NSCSI_BUS_ADD("scsibus")

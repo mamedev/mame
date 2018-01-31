@@ -107,8 +107,7 @@ osd_interface &running_machine::osd() const
 //-------------------------------------------------
 
 running_machine::running_machine(const machine_config &_config, machine_manager &manager)
-	: firstcpu(nullptr),
-		primary_screen(nullptr),
+	: primary_screen(nullptr),
 		m_side_effect_disabled(0),
 		debug_flags(0),
 		m_config(_config),
@@ -145,12 +144,6 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		device.set_machine(*this);
 
 	// find devices
-	for (device_t &device : iter)
-		if (dynamic_cast<cpu_device *>(&device) != nullptr)
-		{
-			firstcpu = downcast<cpu_device *>(&device);
-			break;
-		}
 	primary_screen = screen_device_iterator(root_device()).first();
 
 	// fetch core options
@@ -377,7 +370,8 @@ int running_machine::run(bool quiet)
 
 		// save the NVRAM and configuration
 		sound().ui_mute(true);
-		nvram_save();
+		if (options().nvram_save())
+			nvram_save();
 		m_configuration->save_settings();
 	}
 	catch (emu_fatalerror &fatal)

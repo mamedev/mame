@@ -598,7 +598,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( qix_base )
+MACHINE_CONFIG_START(qix_state::qix_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK_OSC/4/4)  /* 1.25 MHz */
@@ -627,11 +627,11 @@ static MACHINE_CONFIG_START( qix_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( qix, qix_base )
+MACHINE_CONFIG_DERIVED(qix_state::qix, qix_base)
 	MCFG_FRAGMENT_ADD(qix_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kram3, qix )
+MACHINE_CONFIG_DERIVED(qix_state::kram3, qix)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kram3_main_map)
 	MCFG_MC6809E_LIC_CB(WRITELINE(qix_state, kram3_lic_maincpu_changed))
@@ -646,7 +646,7 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_DERIVED( mcu, qix )
+MACHINE_CONFIG_DERIVED(qix_state::mcu, qix)
 
 	/* basic machine hardware */
 
@@ -667,7 +667,7 @@ static MACHINE_CONFIG_DERIVED( mcu, qix )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( zookeep, mcu )
+MACHINE_CONFIG_DERIVED(qix_state::zookeep, mcu)
 
 	/* basic machine hardware */
 
@@ -687,7 +687,7 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_DERIVED( slither, qix_base )
+MACHINE_CONFIG_DERIVED(qix_state::slither, qix_base)
 
 	/* basic machine hardware */
 

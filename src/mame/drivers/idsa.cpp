@@ -63,6 +63,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ay2_a_w);
 	DECLARE_WRITE8_MEMBER(ay2_b_w);
 
+	void bsktbllp(machine_config &config);
+	void idsa(machine_config &config);
 private:
 	virtual void machine_reset() override;
 
@@ -324,13 +326,13 @@ void idsa_state::machine_reset()
 	m_irqcnt = 0;
 }
 
-static MACHINE_CONFIG_START( idsa )
+MACHINE_CONFIG_START(idsa_state::idsa)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 	MCFG_CPU_IO_MAP(maincpu_io_map)
 
-	MCFG_DEVICE_ADD("irqclk", CLOCK, XTAL_8MHz / 4 )
+	MCFG_DEVICE_ADD("irqclk", CLOCK, XTAL(8'000'000) / 4 )
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(idsa_state, clock_w))
 
 	/* video hardware */
@@ -353,7 +355,7 @@ static MACHINE_CONFIG_START( idsa )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bsktbllp, idsa )
+MACHINE_CONFIG_DERIVED(idsa_state::bsktbllp, idsa)
 	MCFG_DEVICE_MODIFY("aysnd1")
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(idsa_state, ppi_control_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(idsa_state, ppi_data_w))

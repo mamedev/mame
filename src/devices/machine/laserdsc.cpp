@@ -485,7 +485,7 @@ void laserdisc_device::set_slider_speed(int32_t tracks_per_vsync)
 	update_slider_pos();
 
 	// if 0, set the time to 0
-	attotime vsyncperiod = m_screen->frame_period();
+	attotime vsyncperiod = screen().frame_period();
 	if (tracks_per_vsync == 0)
 		m_attospertrack = 0;
 
@@ -792,7 +792,7 @@ void laserdisc_device::init_disc()
 void laserdisc_device::init_video()
 {
 	// register for VBLANK callbacks
-	m_screen->register_vblank_callback(vblank_state_delegate(&laserdisc_device::vblank_state_changed, this));
+	screen().register_vblank_callback(vblank_state_delegate(&laserdisc_device::vblank_state_changed, this));
 
 	// allocate palette for applying brightness/contrast/gamma
 	m_videopalette = palette_t::alloc(256);

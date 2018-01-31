@@ -65,4 +65,5 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	DECLARE_WRITE8_MEMBER(banking_callback);
+	void _88games(machine_config &config);
 };

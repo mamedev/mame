@@ -82,7 +82,7 @@ void cvs_state::set_pens(  )
 WRITE8_MEMBER(cvs_state::cvs_video_fx_w)
 {
 	if (data & 0xce)
-		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",space.device().safe_pc(), data & 0xce);
+		logerror("%4x : CVS: Unimplemented CVS video fx = %2x\n",m_maincpu->pc(), data & 0xce);
 
 	m_stars_on = data & 0x01;
 

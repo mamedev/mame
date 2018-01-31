@@ -301,7 +301,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( ohpaipee )
+MACHINE_CONFIG_START(nbmj8900_state::ohpaipee)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)    /* 5.00 MHz ? */
@@ -335,7 +335,7 @@ static MACHINE_CONFIG_START( ohpaipee )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( togenkyo, ohpaipee )
+MACHINE_CONFIG_DERIVED(nbmj8900_state::togenkyo, ohpaipee)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -377,7 +377,7 @@ tia_pal_video_device::tia_pal_video_device(const machine_config &mconfig, const 
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( tia_pal_video_device::device_add_mconfig )
+MACHINE_CONFIG_START(tia_pal_video_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", TIA_PALETTE_LENGTH)
 	MCFG_PALETTE_INIT_OWNER(tia_pal_video_device, tia_pal)
 MACHINE_CONFIG_END
@@ -398,7 +398,7 @@ tia_ntsc_video_device::tia_ntsc_video_device(const machine_config &mconfig, cons
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( tia_ntsc_video_device::device_add_mconfig )
+MACHINE_CONFIG_START(tia_ntsc_video_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", TIA_PALETTE_LENGTH)
 	MCFG_PALETTE_INIT_OWNER(tia_ntsc_video_device, tia_ntsc)
 MACHINE_CONFIG_END
@@ -415,9 +415,9 @@ void tia_video_device::device_start()
 	m_vsync_cb.resolve();
 
 
-	int cx = m_screen->width();
+	int cx = screen().width();
 
-	screen_height = m_screen->height();
+	screen_height = screen().height();
 	helper[0] = std::make_unique<bitmap_ind16>(cx, TIA_MAX_SCREEN_HEIGHT);
 	helper[1] = std::make_unique<bitmap_ind16>(cx, TIA_MAX_SCREEN_HEIGHT);
 	helper[2] = std::make_unique<bitmap_ind16>(cx, TIA_MAX_SCREEN_HEIGHT);
@@ -1022,8 +1022,8 @@ WRITE8_MEMBER( tia_video_device::VSYNC_w )
 
 			if ( curr_y > 5 )
 				update_bitmap(
-					m_screen->width(),
-					m_screen->height());
+					screen().width(),
+					screen().height());
 
 			if ( !m_vsync_cb.isnull() ) {
 				m_vsync_cb(0, curr_y, 0xFFFF );

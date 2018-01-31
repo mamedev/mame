@@ -171,7 +171,7 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( md_rom_ggenie_device::device_add_mconfig )
+MACHINE_CONFIG_START(md_rom_ggenie_device::device_add_mconfig)
 	MCFG_MD_CARTRIDGE_ADD("subslot", ggenie_sub_cart, nullptr)
 	MCFG_MD_CARTRIDGE_NOT_MANDATORY
 MACHINE_CONFIG_END

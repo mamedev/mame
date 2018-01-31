@@ -73,6 +73,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(nmi_source);
+	void skyarmy(machine_config &config);
 };
 
 void skyarmy_state::machine_start()
@@ -315,7 +316,7 @@ static GFXDECODE_START( skyarmy )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( skyarmy )
+MACHINE_CONFIG_START(skyarmy_state::skyarmy)
 
 	MCFG_CPU_ADD("maincpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(skyarmy_map)

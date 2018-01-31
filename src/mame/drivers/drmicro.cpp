@@ -238,7 +238,7 @@ void drmicro_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( drmicro )
+MACHINE_CONFIG_START(drmicro_state::drmicro)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MCLK/6) /* 3.072MHz? */

@@ -11,11 +11,11 @@
 #include "machine/ticket.h"
 #include "screen.h"
 
-#define VIDEO_CLOCK     XTAL_8MHz           /* video (pixel) clock */
-#define CPU_CLOCK       XTAL_12MHz          /* clock for 68000-based systems */
-#define CPU020_CLOCK    XTAL_25MHz          /* clock for 68EC020-based systems */
-#define SOUND_CLOCK     XTAL_16MHz          /* clock for sound board */
-#define TMS_CLOCK       XTAL_40MHz          /* TMS320C31 clocks on drivedge */
+#define VIDEO_CLOCK     XTAL(8'000'000)           /* video (pixel) clock */
+#define CPU_CLOCK       XTAL(12'000'000)          /* clock for 68000-based systems */
+#define CPU020_CLOCK    XTAL(25'000'000)          /* clock for 68EC020-based systems */
+#define SOUND_CLOCK     XTAL(16'000'000)          /* clock for sound board */
+#define TMS_CLOCK       XTAL(40'000'000)          /* TMS320C31 clocks on drivedge */
 
 
 class itech32_state : public driver_device
@@ -202,4 +202,9 @@ public:
 	void handle_video_command();
 	inline int determine_irq_state(int vint, int xint, int qint);
 	void itech32_update_interrupts(int vint, int xint, int qint);
+	void tourny(machine_config &config);
+	void sftm(machine_config &config);
+	void drivedge(machine_config &config);
+	void bloodstm(machine_config &config);
+	void timekill(machine_config &config);
 };

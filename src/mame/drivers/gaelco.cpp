@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x102000, 0x103fff) AM_RAM                                                         /* Screen RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                         /* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_DEVWRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    /* Palette */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    /* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                               /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW2")
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x102000, 0x103fff) AM_RAM                                                         /* Screen RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                         /* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    /* Palette */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    /* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                               /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( squash_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(gaelco_encrypted_w) AM_SHARE("screenram")                /* Screen RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                         /* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")    /* Palette */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")    /* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                               /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( thoop_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(thoop_encrypted_w) AM_SHARE("screenram")             /* Screen RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")                         /* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                     /* INT 6 ACK/Watchdog timer */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")        /* Palette */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")        /* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")                               /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
@@ -335,6 +335,116 @@ static INPUT_PORTS_START( biomtoy )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bioplayc )
+	PORT_INCLUDE( biomtoy )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:8,7,6,5")
+	PORT_DIPSETTING(    0x0e, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x08, "Free Play (if Coin A too)" )
+	PORT_DIPSETTING(    0x0c, "Free Play (if Coin A too)" )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too)" )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:4,3,2,1")
+	PORT_DIPSETTING(    0xe0, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x80, "Free Play (if Coin B too)" )
+	PORT_DIPSETTING(    0xc0, "Free Play (if Coin B too)" )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin B too)" )
+
+	PORT_MODIFY("DSW2")
+	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_LOW, "SW2:8" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5") /* Not Listed/shown in test mode */
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:4,3")
+	PORT_DIPSETTING(    0x10, "1" )
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x20, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( lastkm )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) // Pedal
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Gear Up
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Gear Down
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("P2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:8,7,6,5")
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0xd0, "Free Play (duplicate 1)" )
+	PORT_DIPSETTING(    0x00, "Free Play (duplicate 2)" )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
+
+	PORT_START("DSW2")
+	PORT_SERVICE_DIPLOC(  0x01, IP_ACTIVE_LOW, "SW2:1" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Master" ) PORT_DIPLOCATION("SW2:8") // presumably has a link feature?
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( squash )
@@ -500,7 +610,7 @@ void gaelco_state::machine_start()
 		membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-static MACHINE_CONFIG_START( bigkarnk )
+MACHINE_CONFIG_START(gaelco_state::bigkarnk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   /* MC68000P10, 10 MHz */
@@ -546,10 +656,10 @@ static MACHINE_CONFIG_START( bigkarnk )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( maniacsq )
+MACHINE_CONFIG_START(gaelco_state::maniacsq)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2 ) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2 ) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(maniacsq_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
@@ -571,15 +681,15 @@ static MACHINE_CONFIG_START( maniacsq )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) // pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( squash )
+MACHINE_CONFIG_START(gaelco_state::squash)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2 ) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2 ) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(squash_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
@@ -610,15 +720,15 @@ static MACHINE_CONFIG_START( squash )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) /* verified on pcb */
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) /* verified on pcb */
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( thoop )
+MACHINE_CONFIG_START(gaelco_state::thoop)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2 ) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2 ) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(thoop_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaelco_state,  irq6_line_hold)
 
@@ -649,7 +759,7 @@ static MACHINE_CONFIG_START( thoop )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH) // pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -838,6 +948,59 @@ ROM_START( biomtoyb ) /* PCB - REF.922804/2 */
 	ROM_LOAD( "c3", 0x080000, 0x080000, CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) )
 ROM_END
 
+ROM_START( bioplayc ) /* PCB - REF.922804/2??  -  Spanish version */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "T.d18",  0x000000, 0x080000, CRC(ec518c6c) SHA1(8b96313582d252bebb4bcce8f2d993f751ad0a74) ) /* v1.0.1823 */
+	ROM_LOAD16_BYTE( "T.d16",  0x000001, 0x080000, CRC(de4b031d) SHA1(d4bcdfedab1d48df0c48ffc775731a4981342c7a) ) /* v1.0.1823 */
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	/* weird gfx ordering */
+	ROM_LOAD( "toy-high-3.h6",  0x040000, 0x040000, CRC(ab19a1ce) SHA1(3cc896f8c20f692b02d43db8c30f410bd93fe3ca))
+	ROM_CONTINUE(               0x0c0000, 0x040000 )
+	ROM_LOAD( "toy-low-3.j6",   0x000000, 0x040000, CRC(927f5cd7) SHA1(ad5e75091146ca7935a18e5dd045410e28d8b170) )
+	ROM_CONTINUE(               0x080000, 0x040000 )
+	ROM_LOAD( "toy-high-2.h7",  0x140000, 0x040000, CRC(fd975d89) SHA1(89bb85ccb1ba0bb82f393ef27757c0778dd696b3) )
+	ROM_CONTINUE(               0x1c0000, 0x040000 )
+	ROM_LOAD( "toy-low-2.j7",   0x100000, 0x040000, CRC(6cbf9937) SHA1(77123a8afea3108df54f45033dfb7f86c1d0d1b8) )
+	ROM_CONTINUE(               0x180000, 0x040000 )
+	ROM_LOAD( "toy-high-1.h9",  0x240000, 0x040000, CRC(09de4799) SHA1(120b7bd8e20288c3aec62d3b2bf3f87e251c3eea) )
+	ROM_CONTINUE(               0x2c0000, 0x040000 )
+	ROM_LOAD( "toy-low-1.j9",   0x200000, 0x040000, CRC(57922c41) SHA1(ffbe5b418ed93e8705a7aabe69d3fad2919a160f) )
+	ROM_CONTINUE(               0x280000, 0x040000 )
+	ROM_LOAD( "toy-high-0.h10", 0x340000, 0x040000, CRC(5bee6df7) SHA1(ecf759de2f0909f793c84c71feb08801896e2474) )
+	ROM_CONTINUE(               0x3c0000, 0x040000 )
+	ROM_LOAD( "toy-low-0.j10",  0x300000, 0x040000, CRC(26c49ca2) SHA1(82079eaa2c9523c9acb72fccfbbe9493bc62e84f) )
+	ROM_CONTINUE(               0x380000, 0x040000 )
+
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	// Missing the audio rom, the board didn't have it populated. The programmer said it was not there because the audio was ripped from other games.
+	// however these roms, strangely from the newer revision not the older ones, give good sound for most situations.
+	ROM_LOAD( "c1", 0x000000, 0x080000, BAD_DUMP CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) )
+	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "c3", 0x080000, 0x080000, BAD_DUMP CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) )
+ROM_END
+
+ROM_START( lastkm ) /* PCB - REF 922804/2 */
+	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE(    "prog-bici-E-8.11.95.D18",  0x000000, 0x080000, CRC(1fc5fba0) SHA1(1f954fca9f25df7379eff4ea905810fa06fcebb0)) /*1.0.0275 */
+	ROM_LOAD16_BYTE(    "prog-bici-O-8.11.95.D16",  0x000001, 0x080000, CRC(b93e57e3) SHA1(df307191a214a32a26018ca2a9200742e39939d2)) /*1.0.0275 */
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_LOAD( "bici-F3.h6",     0x000000, 0x080000, CRC(0bf9f213) SHA1(052abef60df419d32bf8a86c89d87e5bb281b4eb))
+	ROM_RELOAD(0x80000,0x80000)
+
+	ROM_LOAD( "bici-F2.h7",     0x100000, 0x080000, CRC(c48d5376) SHA1(8e987839e7254e0fa631802733482726a289439c))
+	ROM_RELOAD(0x180000, 0x80000)
+
+	ROM_LOAD( "bici-F1.h9",     0x200000, 0x080000, CRC(e7958070) SHA1(7f065b429a500b714dfbf497b1353e90137abbd7))
+	ROM_RELOAD(0x280000, 0x80000)
+
+	ROM_LOAD( "bici-F0.h10",    0x300000, 0x080000, CRC(73d4b29f) SHA1(e2563562cb5fbaba7e0517ec9811645aca56f374))
+	ROM_RELOAD(0x380000, 0x80000)
+
+	ROM_REGION( 0x80000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_LOAD( "sonido-bici-0-8.11.95.C1", 0x000000, 0x080000, CRC(7380c963) SHA1(d1d90912f986b944cd95bd773c9f5502d837ce3e))
+ROM_END
 
 /*
 Squash (version 1.0)
@@ -948,6 +1111,8 @@ GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, gaelco_state, 0, ROT0, "Gael
 GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  gaelco_state, 0, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1885)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, biomtoya, biomtoy,  maniacsq, biomtoy,  gaelco_state, 0, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1884)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, biomtoyb, biomtoy,  maniacsq, biomtoy,  gaelco_state, 0, ROT0, "Gaelco", "Biomechanical Toy (Ver. 1.0.1878)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, maniacsp, maniacsq, maniacsq, maniacsq, gaelco_state, 0, ROT0, "Gaelco", "Maniac Square (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, bioplayc, biomtoy,  maniacsq, bioplayc, gaelco_state, 0, ROT0, "Gaelco", "Bioplaything Cop (Ver. 1.0.1823, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, maniacsp, maniacsq, maniacsq, maniacsq, gaelco_state, 0, ROT0, "Gaelco", "Maniac Square (prototype)", MACHINE_SUPPORTS_SAVE ) // sometimes listed as a 1992 proto?
+GAME( 1995, lastkm,   0,        maniacsq, lastkm,   gaelco_state, 0, ROT0, "Gaelco", "Last KM (Ver 1.0.0275)", MACHINE_SUPPORTS_SAVE ) // used on 'Salter' exercise bikes
 GAME( 1992, squash,   0,        squash,   squash,   gaelco_state, 0, ROT0, "Gaelco", "Squash (Ver. 1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, 0, ROT0, "Gaelco", "Thunder Hoop (Ver. 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, 0, ROT0, "Gaelco", "Thunder Hoop (Ver. 1, Checksum 02A09F7D)", MACHINE_SUPPORTS_SAVE ) // could be other versions, still Ver. 1 but different checksum listed on boot

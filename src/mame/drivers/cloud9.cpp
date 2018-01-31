@@ -415,7 +415,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cloud9 )
+MACHINE_CONFIG_START(cloud9_state::cloud9)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)

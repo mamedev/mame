@@ -28,8 +28,6 @@ Known Non-Issues (confirmed on Real Genesis)
 #include "speaker.h"
 
 
-MACHINE_CONFIG_EXTERN( megadriv );
-
 void md_base_state::megadriv_z80_bank_w(uint16_t data)
 {
 	m_genz80.z80_bank_addr = ((m_genz80.z80_bank_addr >> 1) | (data << 23)) & 0xff8000;
@@ -37,13 +35,13 @@ void md_base_state::megadriv_z80_bank_w(uint16_t data)
 
 WRITE16_MEMBER(md_base_state::megadriv_68k_z80_bank_write )
 {
-	//logerror("%06x: 68k writing bit to bank register %01x\n", space.device().safe_pc(),data&0x01);
+	//logerror("%06x: 68k writing bit to bank register %01x\n", m_maincpu->pc(),data&0x01);
 	megadriv_z80_bank_w(data & 0x01);
 }
 
 WRITE8_MEMBER(md_base_state::megadriv_z80_z80_bank_w)
 {
-	//logerror("%04x: z80 writing bit to bank register %01x\n", space.device().safe_pc(),data&0x01);
+	//logerror("%04x: z80 writing bit to bank register %01x\n", m_maincpu->pc(),data&0x01);
 	megadriv_z80_bank_w(data & 0x01);
 }
 
@@ -311,7 +309,7 @@ READ16_MEMBER(md_base_state::megadriv_68k_io_read )
 	switch (offset)
 	{
 		case 0:
-			logerror("%06x read version register\n", space.device().safe_pc());
+			logerror("%06x read version register\n", m_maincpu->pc());
 			retdata = m_version_hi_nibble | 0x01; // Version number contained in bits 3-0
 			break;
 
@@ -488,7 +486,7 @@ READ16_MEMBER(md_base_state::megadriv_68k_read_z80_ram )
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", space.device().safe_pc());
+		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", m_maincpu->pc());
 		return machine().rand();
 	}
 }
@@ -514,7 +512,7 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_write_z80_ram )
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access Z80 (write) address space without bus\n", space.device().safe_pc());
+		logerror("%06x: 68000 attempting to access Z80 (write) address space without bus\n", m_maincpu->pc());
 	}
 }
 
@@ -539,13 +537,13 @@ READ16_MEMBER(md_base_state::megadriv_68k_check_z80_bus )
 		if (m_genz80.z80_has_bus || m_genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
 		else retvalue = (nextvalue & 0xfeff);
 
-		//logerror("%06x: 68000 check z80 Bus (byte MSB access) returning %04x mask %04x\n", space.device().safe_pc(),retvalue, mem_mask);
+		//logerror("%06x: 68000 check z80 Bus (byte MSB access) returning %04x mask %04x\n", m_maincpu->pc(),retvalue, mem_mask);
 		return retvalue;
 
 	}
 	else if (!ACCESSING_BITS_8_15) // is this valid?
 	{
-		//logerror("%06x: 68000 check z80 Bus (byte LSB access) %04x\n", space.device().safe_pc(),mem_mask);
+		//logerror("%06x: 68000 check z80 Bus (byte LSB access) %04x\n", m_maincpu->pc(),mem_mask);
 		if (m_genz80.z80_has_bus || m_genz80.z80_is_reset) retvalue = 0x0001;
 		else retvalue = 0x0000;
 
@@ -553,11 +551,11 @@ READ16_MEMBER(md_base_state::megadriv_68k_check_z80_bus )
 	}
 	else
 	{
-		//logerror("%06x: 68000 check z80 Bus (word access) %04x\n", space.device().safe_pc(),mem_mask);
+		//logerror("%06x: 68000 check z80 Bus (word access) %04x\n", m_maincpu->pc(),mem_mask);
 		if (m_genz80.z80_has_bus || m_genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
 		else retvalue = (nextvalue & 0xfeff);
 
-	//  osd_printf_debug("%06x: 68000 check z80 Bus (word access) %04x %04x\n", space.device().safe_pc(),mem_mask, retvalue);
+	//  osd_printf_debug("%06x: 68000 check z80 Bus (word access) %04x %04x\n", m_maincpu->pc(),mem_mask, retvalue);
 		return retvalue;
 	}
 }
@@ -590,12 +588,12 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_req_z80_bus )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
+			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_has_bus = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
+			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_has_bus = 1;
 		}
 	}
@@ -603,12 +601,12 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_req_z80_bus )
 	{
 		if (data & 0x0001)
 		{
-			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
+			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_has_bus = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
+			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_has_bus = 1;
 		}
 	}
@@ -616,12 +614,12 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_req_z80_bus )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
+			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_has_bus = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
+			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_has_bus = 1;
 		}
 	}
@@ -637,12 +635,12 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_req_z80_reset )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
+			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_is_reset = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
+			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_is_reset = 1;
 		}
 	}
@@ -650,12 +648,12 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_req_z80_reset )
 	{
 		if (data & 0x0001)
 		{
-			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
+			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_is_reset = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
+			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_is_reset = 1;
 		}
 	}
@@ -663,12 +661,12 @@ WRITE16_MEMBER(md_base_state::megadriv_68k_req_z80_reset )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
+			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_is_reset = 0;
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", space.device().safe_pc(),data,mem_mask);
+			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", m_maincpu->pc(),data,mem_mask);
 			m_genz80.z80_is_reset = 1;
 		}
 	}
@@ -875,12 +873,12 @@ IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-MACHINE_CONFIG_START( megadriv_timers )
+MACHINE_CONFIG_START(md_base_state::megadriv_timers)
 	MCFG_TIMER_DEVICE_ADD("md_scan_timer", "gen_vdp", sega315_5313_device, megadriv_scanline_timer_callback)
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START( md_ntsc )
+MACHINE_CONFIG_START(md_base_state::md_ntsc)
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(megadriv_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)
@@ -927,7 +925,7 @@ MACHINE_CONFIG_START( md_ntsc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( dcat16_megadriv_base )
+MACHINE_CONFIG_START(md_cons_state::dcat16_megadriv_base)
 	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -937,7 +935,7 @@ MACHINE_CONFIG_END
 
 /************ PAL hardware has a different master clock *************/
 
-MACHINE_CONFIG_START( md_pal )
+MACHINE_CONFIG_START(md_base_state::md_pal)
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
 	MCFG_CPU_PROGRAM_MAP(megadriv_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(md_base_state,genesis_int_callback)

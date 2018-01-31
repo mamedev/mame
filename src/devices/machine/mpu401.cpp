@@ -85,7 +85,7 @@ DEFINE_DEVICE_TYPE(MPU401, mpu401_device, "mpu401", "Roland MPU-401 I/O box")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( mpu401_device::device_add_mconfig )
+MACHINE_CONFIG_START(mpu401_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6801_TAG, M6801, 4000000) /* 4 MHz as per schematics */
 	MCFG_CPU_PROGRAM_MAP(mpu401_map)
 	MCFG_CPU_IO_MAP(mpu401_io_map)
@@ -163,7 +163,7 @@ READ8_MEMBER(mpu401_device::regs_mode2_r)
 		case 6:
 		case 7:
 		case 0xf:
-//          printf("MPU401: read @ unk %x (PC=%x)\n", offset, space.device().safe_pc());
+//          logerror("MPU401: read @ unk %x %s\n", offset, machine().describe_context());
 			break;
 
 		default:
@@ -182,7 +182,7 @@ WRITE8_MEMBER(mpu401_device::regs_mode2_w)
 		case 6:
 		case 7:
 		case 0xf:
-//          printf("MPU401: %02x @ unk %x (PC=%x)\n", data, offset, space.device().safe_pc());
+//          logerror("MPU401: %02x @ unk %x %s\n", data, offset, machine().describe_context());
 			break;
 
 		default:
@@ -202,7 +202,7 @@ WRITE8_MEMBER(mpu401_device::port1_w)
 
 READ8_MEMBER(mpu401_device::port2_r)
 {
-//  printf("Read P2 (PC=%x)\n", space.device().safe_pc());
+//  printf("Read P2 %s\n", machine().describe_context());
 	return m_port2;
 }
 

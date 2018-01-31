@@ -33,9 +33,9 @@ m6502_device::m6502_device(const machine_config &mconfig, device_type type, cons
 void m6502_device::device_start()
 {
 	if(direct_disabled)
-		mintf = new mi_default_nd;
+		mintf = std::make_unique<mi_default_nd>();
 	else
-		mintf = new mi_default_normal;
+		mintf = std::make_unique<mi_default_normal>();
 
 	init();
 }

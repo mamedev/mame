@@ -345,7 +345,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( md_rom_svp_device::device_add_mconfig )
+MACHINE_CONFIG_START(md_rom_svp_device::device_add_mconfig)
 	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
 	MCFG_CPU_PROGRAM_MAP(md_svp_ssp_map)
 	MCFG_CPU_IO_MAP(md_svp_ext_map)

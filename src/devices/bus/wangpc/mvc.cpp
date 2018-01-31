@@ -136,7 +136,7 @@ WRITE_LINE_MEMBER( wangpc_mvc_device::vsync_w )
 //  MACHINE_CONFIG_START( wangpc_mvc )
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( wangpc_mvc_device::device_add_mconfig )
+MACHINE_CONFIG_START(wangpc_mvc_device::device_add_mconfig)
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(80*10, 25*12)
@@ -144,7 +144,7 @@ MACHINE_CONFIG_MEMBER( wangpc_mvc_device::device_add_mconfig )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_REFRESH_RATE(60)
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845_1, SCREEN_TAG, XTAL_14_31818MHz/16)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845_1, SCREEN_TAG, XTAL(14'318'181)/16)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(10)
 	MCFG_MC6845_UPDATE_ROW_CB(wangpc_mvc_device, crtc_update_row)

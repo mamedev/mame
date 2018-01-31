@@ -198,8 +198,8 @@ other supported games as well.
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_32MHz
-#define SOUND_CLOCK         XTAL_3_579545MHz
+#define MASTER_CLOCK        XTAL(32'000'000)
+#define SOUND_CLOCK         XTAL(3'579'545)
 
 
 
@@ -863,65 +863,100 @@ WRITE16_MEMBER(m72_state::soundram_w)
 		m_soundram[offset * 2 + 1] = data >> 8;
 }
 
-
-#define M72_CPU1_MEMORY(NAME,ROMSIZE,WORKRAM)                               \
-static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 , m72_state )      \
-	AM_RANGE(0x00000, ROMSIZE-1) AM_ROM                                 \
-	AM_RANGE(WORKRAM, WORKRAM+0x3fff) AM_RAM    /* work RAM */          \
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram") \
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")          \
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")     \
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")      \
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")      \
-	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)                         \
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM                                   \
+static ADDRESS_MAP_START( m72_cpu1_common_map, AS_PROGRAM, 16, m72_state )
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)
+	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-
-/*                            ROMSIZE  WORKRAM */
-M72_CPU1_MEMORY( m72,         0x80000, 0xa0000 )
-M72_CPU1_MEMORY( rtype,       0x40000, 0x40000 )
-M72_CPU1_MEMORY( xmultiplm72, 0x80000, 0x80000 )
-M72_CPU1_MEMORY( dbreedm72,   0x80000, 0x90000 )
-
-
-#define M81_CPU1_MEMORY(NAME,WORKRAM)                               \
-	static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 , m72_state )      \
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM                                 \
-	AM_RANGE(WORKRAM, WORKRAM+0x3fff) AM_RAM    /* work RAM */          \
-	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */ \
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram") \
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram") \
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2") \
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1") \
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2") \
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM \
+static ADDRESS_MAP_START( m72_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m72_cpu1_common_map )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0xa0000, 0xa3fff) AM_RAM    /* work RAM */
 ADDRESS_MAP_END
-/*                         WORKRAM */
-M81_CPU1_MEMORY( xmultipl, 0x9c000 )
-M81_CPU1_MEMORY( dbreed,   0x88000 )
-M81_CPU1_MEMORY( hharry,   0xa0000 )
 
-
-#define M84_CPU1_MEMORY(NAME,VIDEORAM,PALETTERAM1,PALETTERAM2) \
-	static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 , m72_state ) \
-	AM_RANGE(0x00000, 0x7ffff) AM_ROM \
-	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(irq_line_w) \
-	AM_RANGE(0xb4000, 0xb4001) AM_WRITENOP  /* ??? */ \
-	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(dmaon_w) \
-	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */ \
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram") \
-	AM_RANGE(VIDEORAM+0x0000, VIDEORAM+0x3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1") \
-	AM_RANGE(VIDEORAM+0x4000, VIDEORAM+0x7fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2") \
-	AM_RANGE(PALETTERAM1, PALETTERAM1+0xbff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram") \
-	AM_RANGE(PALETTERAM2, PALETTERAM2+0xbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2") \
-	AM_RANGE(0xe0000, 0xe3fff) AM_RAM   /* work RAM */ \
-	AM_RANGE(0xffff0, 0xfffff) AM_ROM \
+static ADDRESS_MAP_START( rtype_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m72_cpu1_common_map )
+	AM_RANGE(0x00000, 0x3ffff) AM_ROM
+	AM_RANGE(0x40000, 0x43fff) AM_RAM    /* work RAM */
 ADDRESS_MAP_END
-M84_CPU1_MEMORY( rtype2,  0xd0000, 0xc8000, 0xd8000 )
-M84_CPU1_MEMORY( hharryu, 0xd0000, 0xa0000, 0xa8000 )
-M84_CPU1_MEMORY( kengo,   0x80000, 0xa0000, 0xa8000 )
 
+static ADDRESS_MAP_START( xmultiplm72_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m72_cpu1_common_map )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0x80000, 0x83fff) AM_RAM    /* work RAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dbreedm72_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m72_cpu1_common_map )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0x90000, 0x93fff) AM_RAM    /* work RAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( m81_cpu1_common_map, AS_PROGRAM, 16, m72_state )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xffff0, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( xmultipl_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m81_cpu1_common_map )
+	AM_RANGE(0x9c000, 0x9ffff) AM_RAM    /* work RAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( dbreed_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m81_cpu1_common_map )
+	AM_RANGE(0x88000, 0x8bfff) AM_RAM    /* work RAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hharry_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m81_cpu1_common_map )
+	AM_RANGE(0xa0000, 0xa3fff) AM_RAM    /* work RAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( m84_cpu1_common_map, AS_PROGRAM, 16, m72_state )
+	AM_RANGE(0x00000, 0x7ffff) AM_ROM
+	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(irq_line_w)
+	AM_RANGE(0xb4000, 0xb4001) AM_WRITENOP  /* ??? */
+	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(dmaon_w)
+	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY /* leftover from protection?? */
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xe0000, 0xe3fff) AM_RAM   /* work RAM */
+	AM_RANGE(0xffff0, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rtype2_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m84_cpu1_common_map )
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hharryu_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m84_cpu1_common_map )
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( kengo_map, AS_PROGRAM, 16, m72_state)
+	AM_IMPORT_FROM( m84_cpu1_common_map )
+	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0x84000, 0x87fff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(palette1_r, palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(palette2_r, palette2_w) AM_SHARE("paletteram2")
+ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( m82_map, AS_PROGRAM, 16, m72_state )
@@ -1804,7 +1839,7 @@ static GFXDECODE_START( majtitle )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( m72_audio_chips )
+MACHINE_CONFIG_START(m72_state::m72_audio_chips)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
@@ -1821,7 +1856,7 @@ static MACHINE_CONFIG_START( m72_audio_chips )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( m72_base )
+MACHINE_CONFIG_START(m72_state::m72_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)    /* 16 MHz external freq (8MHz internal) */
@@ -1849,21 +1884,21 @@ static MACHINE_CONFIG_START( m72_base )
 	MCFG_FRAGMENT_ADD(m72_audio_chips)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( m72, m72_base )
+MACHINE_CONFIG_DERIVED(m72_state::m72, m72_base)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_PERIODIC_INT_DRIVER(m72_state, fake_nmi, 128*55)   /* clocked by V1? (Vigilante) */
 							/* IRQs are generated by main Z80 and YM2151 */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( m72_8751, m72_base )
+MACHINE_CONFIG_DERIVED(m72_state::m72_8751, m72_base)
 
-	MCFG_CPU_ADD("mcu",I8751, XTAL_8MHz) /* Uses its own XTAL */
+	MCFG_CPU_ADD("mcu",I8751, XTAL(8'000'000)) /* Uses its own XTAL */
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( rtype, m72_base )
+MACHINE_CONFIG_DERIVED(m72_state::rtype, m72_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rtype_map)
 
@@ -1874,7 +1909,7 @@ static MACHINE_CONFIG_DERIVED( rtype, m72_base )
 	MCFG_DEVICE_REMOVE("vref")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( m72_xmultipl, m72_8751 )
+MACHINE_CONFIG_DERIVED(m72_state::m72_xmultipl, m72_8751)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xmultiplm72_map)
 
@@ -1885,7 +1920,7 @@ static MACHINE_CONFIG_DERIVED( m72_xmultipl, m72_8751 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( m72_dbreed, m72_base )
+MACHINE_CONFIG_DERIVED(m72_state::m72_dbreed, m72_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dbreedm72_map)
 
@@ -1900,7 +1935,7 @@ MACHINE_CONFIG_END
 /****************************************** M81 ***********************************************/
 
 // M81 is closest to M72
-static MACHINE_CONFIG_DERIVED( m81_hharry, m72_base )
+MACHINE_CONFIG_DERIVED(m72_state::m81_hharry, m72_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hharry_map)
 	MCFG_CPU_IO_MAP(m81_portmap)
@@ -1916,7 +1951,7 @@ static MACHINE_CONFIG_DERIVED( m81_hharry, m72_base )
 	MCFG_SCREEN_UPDATE_DRIVER(m72_state, screen_update_m81)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( m81_xmultipl, m81_hharry )
+MACHINE_CONFIG_DERIVED(m72_state::m81_xmultipl, m81_hharry)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(xmultipl_map)
@@ -1924,7 +1959,7 @@ static MACHINE_CONFIG_DERIVED( m81_xmultipl, m81_hharry )
 	MCFG_VIDEO_START_OVERRIDE(m72_state,xmultipl) // different offsets
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( m81_dbreed, m81_xmultipl )
+MACHINE_CONFIG_DERIVED(m72_state::m81_dbreed, m81_xmultipl)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(dbreed_map)
 MACHINE_CONFIG_END
@@ -1932,7 +1967,7 @@ MACHINE_CONFIG_END
 /****************************************** M84 ***********************************************/
 
 // M84
-static MACHINE_CONFIG_START( rtype2 )
+MACHINE_CONFIG_START(m72_state::rtype2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)   /* 16 MHz external freq (8MHz internal) */
@@ -1964,7 +1999,7 @@ static MACHINE_CONFIG_START( rtype2 )
 MACHINE_CONFIG_END
 
 // not m72, different video system (less tiles regions?) (M84? M82?)
-static MACHINE_CONFIG_DERIVED( hharryu, rtype2 )
+MACHINE_CONFIG_DERIVED(m72_state::hharryu, rtype2)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hharryu_map)
@@ -1975,7 +2010,7 @@ MACHINE_CONFIG_END
 
 // M84
 
-static MACHINE_CONFIG_START( cosmccop )
+MACHINE_CONFIG_START(m72_state::cosmccop)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V35,MASTER_CLOCK/2)
@@ -2007,7 +2042,7 @@ static MACHINE_CONFIG_START( cosmccop )
 	MCFG_FRAGMENT_ADD(m72_audio_chips)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( kengo, cosmccop )
+MACHINE_CONFIG_DERIVED(m72_state::kengo, cosmccop)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_V25_CONFIG(gunforce_decryption_table)
 MACHINE_CONFIG_END
@@ -2021,7 +2056,7 @@ M82-A-A as the top board
 M82-B-A and as the bottom board
 
 */
-static MACHINE_CONFIG_START( m82 )
+MACHINE_CONFIG_START(m72_state::m82)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)   /* 16 MHz external freq (8MHz internal) */
@@ -2056,7 +2091,7 @@ MACHINE_CONFIG_END
   M85-A-B / M85-B
 */
 
-static MACHINE_CONFIG_START( poundfor )
+MACHINE_CONFIG_START(m72_state::poundfor)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)   /* 16 MHz external freq (8MHz internal) */

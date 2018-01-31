@@ -25,7 +25,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_6_144MHz
+static constexpr XTAL MAIN_CLOCK = 6.144_MHz_XTAL;
 
 class fp200_state : public driver_device
 {
@@ -68,6 +68,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(sid_r);
 
 	DECLARE_PALETTE_INIT(fp200);
+	void fp200(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -579,7 +580,7 @@ READ_LINE_MEMBER( fp200_state::sid_r )
 	return (ioport("KEYMOD")->read() >> m_keyb_mux) & 1;
 }
 
-static MACHINE_CONFIG_START( fp200 )
+MACHINE_CONFIG_START(fp200_state::fp200)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8085A,MAIN_CLOCK)

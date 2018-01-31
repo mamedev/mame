@@ -73,6 +73,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void m6805evs(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset() override;
@@ -98,9 +99,9 @@ void m6805evs_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( m6805evs )
+MACHINE_CONFIG_START(m6805evs_state::m6805evs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6805, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M6805, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 MACHINE_CONFIG_END
 

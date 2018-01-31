@@ -74,7 +74,7 @@ ADDRESS_MAP_END
 READ64_MEMBER(bebox_state::bb_slave_64be_r)
 {
 	// 2e94 is the real address, 2e84 is where the PC appears to be under full DRC
-	if ((space.device().safe_pc() == 0xfff02e94) || (space.device().safe_pc() == 0xfff02e84))
+	if ((m_ppc2->pc() == 0xfff02e94) || (m_ppc2->pc() == 0xfff02e84))
 	{
 		return 0x108000ff;  // indicate slave CPU
 	}
@@ -118,11 +118,11 @@ static SLOT_INTERFACE_START( bebox_floppies )
 	SLOT_INTERFACE( "35hd", FLOPPY_35_HD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( mpc105_config )
+void bebox_state::mpc105_config(device_t *device)
+{
 	MCFG_MPC105_CPU( "ppc1" )
 	MCFG_MPC105_BANK_BASE_DEFAULT( 0 )
-MACHINE_CONFIG_END
-
+}
 
 /*************************************
  *
@@ -141,7 +141,7 @@ static SLOT_INTERFACE_START( pci_devices )
 	SLOT_INTERFACE("cirrus", PCI_CIRRUS_SVGA)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( bebox )
+MACHINE_CONFIG_START(bebox_state::bebox)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("ppc1", PPC603, 66000000)  /* 66 MHz */
 	MCFG_CPU_PROGRAM_MAP(bebox_mem)
@@ -158,7 +158,7 @@ static MACHINE_CONFIG_START( bebox )
 	MCFG_PIT8253_CLK2(4772720/4) /* pio port c pin 4, and speaker polling enough */
 	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("kbdc", kbdc8042_device, write_out2))
 
-	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( "dma8237_1", AM9517A, XTAL(14'318'181)/3 )
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(bebox_state, bebox_dma_hrq_changed))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(bebox_state, bebox_dma8237_out_eop))
 	MCFG_I8237_IN_MEMR_CB(READ8(bebox_state, bebox_dma_read_byte))
@@ -170,7 +170,7 @@ static MACHINE_CONFIG_START( bebox )
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(bebox_state, pc_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(bebox_state, pc_dack3_w))
 
-	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL_14_31818MHz/3 )
+	MCFG_DEVICE_ADD( "dma8237_2", AM9517A, XTAL(14'318'181)/3 )
 
 	MCFG_DEVICE_ADD("pic8259_1", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(WRITELINE(bebox_state, bebox_pic8259_master_set_int_line))
@@ -187,8 +187,12 @@ static MACHINE_CONFIG_START( bebox )
 	MCFG_DEVICE_ADD( "ns16550_3", NS16550, 0 )   /* TODO: Verify model */
 
 	/* video hardware */
-	MCFG_FRAGMENT_ADD( pcvideo_cirrus_gd5428 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
+	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
 
+	MCFG_PALETTE_ADD("palette", 0x100)
+	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ym3812", YM3812, 3579545)
@@ -223,7 +227,7 @@ static MACHINE_CONFIG_START( bebox )
 	MCFG_UPD765_DRQ_CALLBACK(DEVWRITELINE("dma8237_1", am9517a_device, dreq2_w))
 	MCFG_FLOPPY_DRIVE_ADD("smc37c78:0", bebox_floppies, "35hd", bebox_state::floppy_formats)
 
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
 
 	MCFG_DEVICE_ADD("kbdc", KBDC8042, 0)
 	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_STANDARD)
@@ -236,7 +240,7 @@ static MACHINE_CONFIG_START( bebox )
 	MCFG_RAM_EXTRA_OPTIONS("8M,16M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bebox2, bebox )
+MACHINE_CONFIG_DERIVED(bebox_state::bebox2, bebox)
 	MCFG_CPU_REPLACE("ppc1", PPC603E, 133000000)    /* 133 MHz */
 	MCFG_CPU_PROGRAM_MAP(bebox_mem)
 

@@ -10,9 +10,12 @@
 -----
 TODO:
 - What does channel ATBL mean?
-- how triggered SAC (Simple Access Codes) playback ?
+- Simple Access mode. SACs is register / data lists same as SEQ. in 770C, when both /SEL and /CS pins goes low - will be run SAC with number set at data bus.
+  can not be used in CV1K (/SEL pin is NC, internally pulled to VCC), probably not used in PGM2 too.
  770:
-- sequencer timers and triggers not implemented (seems used in Deathsmiles ending tune)
+- sequencer timers implemented but seems unused, presumably because of design flaws or bugs, likely due to lack of automatic adding of sequencer # to register offset.
+  in result sequences uses very long chains of 32-sample wait commands instead, wasting a lot of ROM space.
+- sequencer triggers not implemented, not sure how they works (Deathsmiles ending tune starts sequence with TGST = 01h, likely a bug and don't affect tune playback)
  774:
 - 4 channel output
 - Equalizer
@@ -20,12 +23,16 @@ TODO:
 - sequencer off trigger (not used in games)
 
  known SPUs in this series:
-  YMZ770B  ????     Capcom medal hardware (alien.cpp), sample format is not AMM, in other parts looks like 770C
+  YMZ770B  AMMSL    Capcom medal hardware (alien.cpp), sample format is not AMM, in other parts looks like 770C
   YMZ770C  AMMS-A   Cave CV1000
-  YMZ773   AMMS2
+  YMZ771   SSGS3
+  YMZ773   AMMS2    Cron corp. video slots
   YMZ775   AMMS2B
   YMZ774   AMMS2C   IGS PGM2
   YMZ776   AMMS3    uses AM3 sample format (modified Ogg?)
+  YMZ778   AMMS3S
+  YMZ779   AMMS3D
+  YMZ870   AMMS3EX
 
 ***************************************************************************/
 
@@ -302,13 +309,16 @@ void ymz770_device::sequencer()
 				switch (reg)
 				{
 				case 0x0f:
+					for (int ch = 0; ch < 8; ch++) // might be wrong, ie not needed in case of loop
+						if (sequence.stopchan & (1 << ch))
+							m_channels[ch].is_playing = false;
 					if (sequence.loop)
 						sequence.offset = get_seq_offs(sequence.sequence); // loop sequence
 					else
 						sequence.is_playing = false;
 					break;
 				case 0x0e:
-					sequence.delay = 32 - 1;
+					sequence.delay = sequence.timer * 32 + 32 - 1;
 					break;
 				default:
 					internal_reg_write(reg, data);
@@ -408,22 +418,39 @@ void ymz770_device::internal_reg_write(uint8_t reg, uint8_t data)
 
 		switch (reg & 0x0f)
 		{
-			case 0:
+			case 0: // SQSN
 				m_sequences[ch].sequence = data;
 				break;
-			case 1:
+			case 1: // SQON SQLP
 				if ((data & 6) == 2 || ((data & 6) == 6 && !m_sequences[ch].is_playing)) // both KON bits 1 is "Keep Playing"
 				{
 					m_sequences[ch].offset = get_seq_offs(m_sequences[ch].sequence);
 					m_sequences[ch].delay = 0;
 					m_sequences[ch].is_playing = true;
 				}
-				else if ((data & 6) == 0)
+				else if ((data & 6) == 0 && m_sequences[ch].is_playing)
+				{
 					m_sequences[ch].is_playing = false;
+					for (int i = 0; i < 8; i++)
+						if (m_sequences[ch].stopchan & (1 << i))
+							m_channels[i].is_playing = false;
+				}
 
 				m_sequences[ch].loop = data & 1;
 				break;
-
+			case 2: // TMRH
+				m_sequences[ch].timer = (m_sequences[ch].timer & 0x00ff) | (data << 8);
+				break;
+			case 3: // TMRL
+				m_sequences[ch].timer = (m_sequences[ch].timer & 0xff00) | data;
+				break;
+			case 6: // SQOF
+				m_sequences[ch].stopchan = data;
+				break;
+			//case 4: // TGST "ON trigger playback channel selection bitmask"
+			//case 5: // TGEN "OFF trigger playback channel selection bitmask"
+			//case 7: // YMZ770: unused, but CV1K games write 1 here, must be game bugs or YMZ770C datasheet is wrong and have messed 7 and 8 registers ? ; YMZ771: SQOF_SSG
+			//case 8: // YMZ770: docs said "set to 01h" but CV1K games never write it, see above. ; YMZ771: TEMPO (wait timer speed control)
 			default:
 				if (data)
 					logerror("unimplemented write %02X %02X\n", reg, data);
@@ -733,7 +760,7 @@ void ymz774_device::sequencer()
 					}
 					break;
 				case 0xfe: // timer delay
-					sequence.delay = sequence.timer * 32; // possible needed -1 or +(32-1)
+					sequence.delay = sequence.timer * 32 + 32 - 1;
 					break;
 				case 0xf0:
 					sequence.bank = data & 1;

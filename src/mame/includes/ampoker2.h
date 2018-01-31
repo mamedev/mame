@@ -35,4 +35,6 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void sigma2k(machine_config &config);
+	void ampoker2(machine_config &config);
 };

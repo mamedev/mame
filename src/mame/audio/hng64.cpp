@@ -210,7 +210,7 @@ WRITE16_MEMBER(hng64_state::hng64_sound_port_0008_w)
 READ16_MEMBER(hng64_state::hng64_sound_port_0008_r)
 {
 	// read in irq5
-	//printf("%08x: hng64_sound_port_0008_r mask (%04x)\n", space.device().safe_pc(), mem_mask);
+	//logerror("%s: hng64_sound_port_0008_r mask (%04x)\n", machine().describe_context(), mem_mask);
 	return 0;
 }
 
@@ -386,7 +386,7 @@ WRITE_LINE_MEMBER(hng64_state::tcu_tm2_cb)
 
 
 
-MACHINE_CONFIG_START( hng64_audio )
+MACHINE_CONFIG_START(hng64_state::hng64_audio)
 	MCFG_CPU_ADD("audiocpu", V53A, 32000000/2)              // V53A, 16? mhz!
 	MCFG_CPU_PROGRAM_MAP(hng_sound_map)
 	MCFG_CPU_IO_MAP(hng_sound_io)

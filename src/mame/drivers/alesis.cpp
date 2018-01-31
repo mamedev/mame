@@ -355,9 +355,9 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 		bitmap.pix16(line*9 + y, pos*6 + x) = state;
 }
 
-static MACHINE_CONFIG_START( hr16 )
+MACHINE_CONFIG_START(alesis_state::hr16)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8031, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu",I8031, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(hr16_mem)
 	MCFG_CPU_IO_MAP(hr16_io)
 
@@ -382,12 +382,12 @@ static MACHINE_CONFIG_START( hr16 )
 	MCFG_HD44780_LCD_SIZE(2, 16)
 
 	/* sound hardware */
-	MCFG_ALESIS_DM3AG_ADD("dm3ag", XTAL_12MHz/2)
+	MCFG_ALESIS_DM3AG_ADD("dm3ag", XTAL(12'000'000)/2)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sr16, hr16 )
+MACHINE_CONFIG_DERIVED(alesis_state::sr16, hr16)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sr16_mem)
@@ -404,7 +404,7 @@ static MACHINE_CONFIG_DERIVED( sr16, hr16 )
 	MCFG_HD44780_PIXEL_UPDATE_CB(alesis_state, sr16_pixel_update)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mmt8, hr16 )
+MACHINE_CONFIG_DERIVED(alesis_state::mmt8, hr16)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mmt8_io)

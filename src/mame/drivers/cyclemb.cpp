@@ -144,6 +144,8 @@ public:
 	void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void skydest_i8741_reset();
+	void cyclemb(machine_config &config);
+	void skydest(machine_config &config);
 };
 
 
@@ -952,14 +954,14 @@ static GFXDECODE_START( cyclemb )
 	GFXDECODE_ENTRY( "sprite_data", 0, spritelayout_32x32,    0x00, 0x40 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( cyclemb )
+MACHINE_CONFIG_START(cyclemb_state::cyclemb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/3) // Z8400BPS
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'000'000)/3) // Z8400BPS
 	MCFG_CPU_PROGRAM_MAP(cyclemb_map)
 	MCFG_CPU_IO_MAP(cyclemb_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cyclemb_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'000'000)/6)
 	MCFG_CPU_PROGRAM_MAP(cyclemb_sound_map)
 	MCFG_CPU_IO_MAP(cyclemb_sound_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cyclemb_state,  irq0_line_hold, 60)
@@ -984,13 +986,13 @@ static MACHINE_CONFIG_START( cyclemb )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_18MHz/12)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(18'000'000)/12)
 //  MCFG_YM2203_IRQ_HANDLER(WRITELINE(cyclemb_state, ym_irq))
 //  MCFG_AY8910_PORT_B_READ_CB(IOPORT("UNK")) /* port B read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( skydest, cyclemb )
+MACHINE_CONFIG_DERIVED(cyclemb_state::skydest, cyclemb)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(skydest_io)
 

@@ -172,7 +172,7 @@ WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_w)
 		//"bnglngby" and "cluclu"
 	if( data & 0xfe )
 	{
-		logerror("vsnes_coin_counter_w: pc = 0x%04x - data = 0x%02x\n", space.device().safe_pc(), data);
+		logerror("vsnes_coin_counter_w: pc = 0x%04x - data = 0x%02x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -188,7 +188,7 @@ WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_1_w)
 	if( data & 0xfe ) //vsbball service mode
 	{
 	//do something?
-		logerror("vsnes_coin_counter_1_w: pc = 0x%04x - data = 0x%02x\n", space.device().safe_pc(), data);
+		logerror("vsnes_coin_counter_1_w: pc = 0x%04x - data = 0x%02x\n", m_subcpu->pc(), data);
 	}
 
 }
@@ -1698,7 +1698,7 @@ static INPUT_PORTS_START( supxevs )
 	PORT_DIPSETTING(    0xc0, "RP2C04-0004" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( vsnes )
+MACHINE_CONFIG_START(vsnes_state::vsnes)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
@@ -1729,7 +1729,7 @@ static MACHINE_CONFIG_START( vsnes )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( jajamaru, vsnes )
+MACHINE_CONFIG_DERIVED(vsnes_state::jajamaru, vsnes)
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_01_ADD("ppu1")
@@ -1738,7 +1738,7 @@ static MACHINE_CONFIG_DERIVED( jajamaru, vsnes )
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mightybj, vsnes )
+MACHINE_CONFIG_DERIVED(vsnes_state::mightybj, vsnes)
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_02_ADD("ppu1")
@@ -1747,7 +1747,7 @@ static MACHINE_CONFIG_DERIVED( mightybj, vsnes )
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vsgshoe, vsnes )
+MACHINE_CONFIG_DERIVED(vsnes_state::vsgshoe, vsnes)
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_03_ADD("ppu1")
@@ -1756,7 +1756,7 @@ static MACHINE_CONFIG_DERIVED( vsgshoe, vsnes )
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( topgun, vsnes )
+MACHINE_CONFIG_DERIVED(vsnes_state::topgun, vsnes)
 
 	MCFG_DEVICE_REMOVE( "ppu1" )
 	MCFG_PPU2C05_04_ADD("ppu1")
@@ -1765,7 +1765,7 @@ static MACHINE_CONFIG_DERIVED( topgun, vsnes )
 	MCFG_PPU2C0X_SET_NMI(vsnes_state, ppu_irq_1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vsdual )
+MACHINE_CONFIG_START(vsnes_state::vsdual)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
@@ -1815,7 +1815,7 @@ static MACHINE_CONFIG_START( vsdual )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( vsdual_pi, vsdual )
+MACHINE_CONFIG_DERIVED(vsnes_state::vsdual_pi, vsdual)
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 	// need high level of interleave to keep screens in sync in Balloon Fight.
 	// however vsmahjng doesn't like perfect interleave? you end up needing to reset it to boot? maybe something in a bad default state? watchdog?
@@ -1823,16 +1823,16 @@ static MACHINE_CONFIG_DERIVED( vsdual_pi, vsdual )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vsnes_bootleg )
+MACHINE_CONFIG_START(vsnes_state::vsnes_bootleg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502,XTAL_16MHz/4) // 4mhz? seems too high but flickers badly otherwise, issue elsewhere?
+	MCFG_CPU_ADD("maincpu", M6502,XTAL(16'000'000)/4) // 4mhz? seems too high but flickers badly otherwise, issue elsewhere?
 	MCFG_CPU_PROGRAM_MAP(vsnes_cpu1_bootleg_map)
 								/* some carts also trigger IRQs */
 	MCFG_MACHINE_RESET_OVERRIDE(vsnes_state,vsnes)
 	MCFG_MACHINE_START_OVERRIDE(vsnes_state,vsnes)
 
-	MCFG_CPU_ADD("sub", Z80,XTAL_16MHz/4)         /* ? MHz */ // Z8400APS-Z80CPU
+	MCFG_CPU_ADD("sub", Z80,XTAL(16'000'000)/4)         /* ? MHz */ // Z8400APS-Z80CPU
 	MCFG_CPU_PROGRAM_MAP(vsnes_bootleg_z80_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen1", vsnes_state,  irq0_line_hold)
 //  MCFG_CPU_PERIODIC_INT_DRIVER(vsnes_state, nmi_line_pulse)
@@ -1860,13 +1860,13 @@ static MACHINE_CONFIG_START( vsnes_bootleg )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// PCB has 2, code accesses 3? which 2 really exist?
-	MCFG_SOUND_ADD("sn1", SN76489, XTAL_16MHz/4)
+	MCFG_SOUND_ADD("sn1", SN76489, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489, XTAL_16MHz/4)
+	MCFG_SOUND_ADD("sn2", SN76489, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn3", SN76489, XTAL_16MHz/4)
+	MCFG_SOUND_ADD("sn3", SN76489, XTAL(16'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

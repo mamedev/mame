@@ -61,7 +61,7 @@
 /* only ROM from FF00-FFFF and DAT memory at FFF0-FFFF (write only) is guaranteed always*/
 
 static ADDRESS_MAP_START(mp09_mem, AS_PROGRAM, 8, swtpc09_state)
-	AM_RANGE(0x0000, 0xffef) AM_READWRITE(main_r, main_w)
+	AM_RANGE(0x0000, 0xfeff) AM_READWRITE(main_r, main_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0xff00)
 	AM_RANGE(0xff00, 0xff0f) AM_MIRROR(0xf0) AM_WRITEONLY AM_SHARE("dat")
 ADDRESS_MAP_END
@@ -159,9 +159,9 @@ SLOT_INTERFACE_END
 
 /* Machine driver */
 /* MPU09, MPID, MPS2 DMF2 */
-static MACHINE_CONFIG_START( swtpc09_base )
+MACHINE_CONFIG_START(swtpc09_state::swtpc09_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mp09_mem)
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
@@ -190,25 +190,25 @@ static MACHINE_CONFIG_START( swtpc09_base )
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(swtpc09_state, acia_interrupt))
 
-	MCFG_DEVICE_ADD("brg", MC14411, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("brg", MC14411, XTAL(1'843'200))
 	MCFG_MC14411_F1_CB(DEVWRITELINE("acia", acia6850_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("acia", acia6850_device, write_rxc))
 
-	MCFG_FD1793_ADD("fdc", XTAL_1MHz)
+	MCFG_FD1793_ADD("fdc", XTAL(1'000'000))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:2", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:3", swtpc09_floppies, "dd", swtpc09_state::floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( swtpc09, swtpc09_base )
+MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09, swtpc09_base)
 	MCFG_DEVICE_MODIFY("fdc")
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(swtpc09_state, fdc_drq_w))
 MACHINE_CONFIG_END
 
 /* MPU09, MPID, MPS2 DC4 PIAIDE*/
-static MACHINE_CONFIG_DERIVED( swtpc09i, swtpc09_base )
+MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09i, swtpc09_base)
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(flex_dc4_piaide_mem)
 
@@ -223,16 +223,16 @@ static MACHINE_CONFIG_DERIVED( swtpc09i, swtpc09_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( swtpc09u, swtpc09 )
+MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09u, swtpc09)
 	MCFG_DEVICE_MODIFY("bankdev")
 	MCFG_DEVICE_PROGRAM_MAP(uniflex_dmf2_mem)
 MACHINE_CONFIG_END
 
 
 /* MPU09, MPID, MPS2 DMF3 */
-static MACHINE_CONFIG_DERIVED( swtpc09d3, swtpc09_base )
+MACHINE_CONFIG_DERIVED(swtpc09_state::swtpc09d3, swtpc09_base)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_8MHz)
+	MCFG_CPU_CLOCK(XTAL(8'000'000))
 
 	MCFG_DEVICE_MODIFY("pia")
 	MCFG_DEVICE_CLOCK(2000000)
@@ -244,7 +244,7 @@ static MACHINE_CONFIG_DERIVED( swtpc09d3, swtpc09_base )
 	MCFG_DEVICE_MODIFY("acia")
 	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 4)
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 4)
 	MCFG_VIA6522_READPA_HANDLER(READ8(swtpc09_state, dmf3_via_read_porta))
 	MCFG_VIA6522_READPB_HANDLER(READ8(swtpc09_state, dmf3_via_read_portb))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(swtpc09_state, dmf3_via_write_porta))

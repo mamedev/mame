@@ -197,7 +197,7 @@ WRITE8_MEMBER(gaplus_state::freset_w)
 {
 	int bit = !BIT(offset, 11);
 
-	logerror("%04x: freset %d\n",space.device().safe_pc(), bit);
+	logerror("%04x: freset %d\n",m_maincpu->pc(), bit);
 
 	m_namco58xx->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
 	m_namco56xx->set_reset_line(bit ? CLEAR_LINE : ASSERT_LINE);
@@ -512,18 +512,18 @@ void gaplus_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( gaplus )
+MACHINE_CONFIG_START(gaplus_state::gaplus)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_24_576MHz/16)    /* 1.536 MHz */
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(24'576'000)/16)    /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  vblank_main_irq)
 
-	MCFG_CPU_ADD("sub", MC6809E, XTAL_24_576MHz/16)    /* 1.536 MHz */
+	MCFG_CPU_ADD("sub", MC6809E, XTAL(24'576'000)/16)    /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  vblank_sub_irq)
 
-	MCFG_CPU_ADD("sub2", MC6809E, XTAL_24_576MHz/16)    /* 1.536 MHz */
+	MCFG_CPU_ADD("sub2", MC6809E, XTAL(24'576'000)/16)    /* 1.536 MHz */
 	MCFG_CPU_PROGRAM_MAP(cpu3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gaplus_state,  vblank_sub2_irq)
 
@@ -571,7 +571,7 @@ static MACHINE_CONFIG_START( gaplus )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("namco", NAMCO_15XX, XTAL_24_576MHz/1024)
+	MCFG_SOUND_ADD("namco", NAMCO_15XX, XTAL(24'576'000)/1024)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -581,7 +581,7 @@ static MACHINE_CONFIG_START( gaplus )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gaplusd, gaplus )
+MACHINE_CONFIG_DERIVED(gaplus_state::gaplusd, gaplus)
 
 	MCFG_DEVICE_REPLACE("namcoio_1", NAMCO_58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
@@ -596,7 +596,7 @@ static MACHINE_CONFIG_DERIVED( gaplusd, gaplus )
 	MCFG_NAMCO56XX_IN_3_CB(IOPORT("DSWA_LOW"))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gapluso, gaplusd )
+MACHINE_CONFIG_DERIVED(gaplus_state::gapluso, gaplusd)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

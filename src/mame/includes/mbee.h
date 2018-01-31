@@ -122,6 +122,15 @@ public:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
 	required_device<palette_device> m_palette;
+	void mbee56(machine_config &config);
+	void mbeeppc(machine_config &config);
+	void mbee128(machine_config &config);
+	void mbee256(machine_config &config);
+	void mbee(machine_config &config);
+	void mbeett(machine_config &config);
+	void mbeeic(machine_config &config);
+	void mbeepc(machine_config &config);
+	void mbee128p(machine_config &config);
 private:
 	uint8_t *m_p_videoram;
 	uint8_t *m_p_gfxram;

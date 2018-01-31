@@ -256,7 +256,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( videobank1_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(K052109_r, K052109_w)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vendetta_state )
@@ -418,10 +418,10 @@ WRITE8_MEMBER( vendetta_state::banking_callback )
 		membank("bank1")->set_entry(data);
 }
 
-static MACHINE_CONFIG_START( vendetta )
+MACHINE_CONFIG_START(vendetta_state::vendetta)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)   /* 052001 (verified on pcb) */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/8)   /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", vendetta_state,  irq)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(vendetta_state, banking_callback))
@@ -440,7 +440,7 @@ static MACHINE_CONFIG_START( vendetta )
 	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified with PCB */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified with PCB */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 							/* interrupts are triggered by the main CPU */
 
@@ -477,17 +477,17 @@ static MACHINE_CONFIG_START( vendetta )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)  /* verified with PCB */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* verified with PCB */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_K053260_ADD("k053260", XTAL_3_579545MHz)    /* verified with PCB */
+	MCFG_K053260_ADD("k053260", XTAL(3'579'545))    /* verified with PCB */
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( esckids, vendetta )
+MACHINE_CONFIG_DERIVED(vendetta_state::esckids, vendetta)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

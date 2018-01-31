@@ -89,7 +89,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( cbm8000_hsg_a_device::device_add_mconfig )
+MACHINE_CONFIG_START(cbm8000_hsg_a_device::device_add_mconfig)
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(EF9365_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 512)
@@ -105,7 +105,7 @@ MACHINE_CONFIG_MEMBER( cbm8000_hsg_a_device::device_add_mconfig )
 	MCFG_EF936X_DISPLAYMODE(DISPLAY_MODE_512x512);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( cbm8000_hsg_b_device::device_add_mconfig )
+MACHINE_CONFIG_START(cbm8000_hsg_b_device::device_add_mconfig)
 	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(EF9366_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)

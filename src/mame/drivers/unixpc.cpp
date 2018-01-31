@@ -75,6 +75,7 @@ public:
 	required_shared_ptr<uint16_t> m_mapram;
 	required_shared_ptr<uint16_t> m_videoram;
 
+	void unixpc(machine_config &config);
 private:
 	uint16_t *m_ramptr;
 	uint32_t m_ramsize;
@@ -313,15 +314,15 @@ static SLOT_INTERFACE_START( unixpc_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( unixpc )
+MACHINE_CONFIG_START(unixpc_state::unixpc)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", M68010, XTAL_10MHz)
+	MCFG_CPU_ADD("maincpu", M68010, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(unixpc_mem)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(unixpc_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_20MHz, 896, 0, 720, 367, 0, 348)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000), 896, 0, 720, 367, 0, 348)
 	MCFG_SCREEN_PALETTE("palette")
 	// vsync should actually last 17264 pixels
 

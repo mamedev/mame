@@ -274,10 +274,10 @@
  *
  *************************************/
 
-#define MASTER_CLOCK        XTAL_48_66MHz
-#define SOUND_CLOCK         XTAL_4MHz
+static constexpr XTAL MASTER_CLOCK  = 48.66_MHz_XTAL;
+static constexpr XTAL SOUND_CLOCK   = 4_MHz_XTAL;
 
-#define PIXEL_CLOCK         (MASTER_CLOCK/8)
+static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK/8;
 
 #define HTOTAL              (384)
 #define HBEND               (0)
@@ -910,7 +910,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( root )
+MACHINE_CONFIG_START(zaxxon_state::root)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/16)
@@ -948,7 +948,7 @@ static MACHINE_CONFIG_START( root )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( zaxxon, root )
+MACHINE_CONFIG_DERIVED(zaxxon_state::zaxxon, root)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -957,13 +957,13 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( szaxxon, zaxxon )
+MACHINE_CONFIG_DERIVED(zaxxon_state::szaxxon, zaxxon)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( szaxxone, zaxxon )
+MACHINE_CONFIG_DERIVED(zaxxon_state::szaxxone, zaxxon)
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -973,7 +973,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( futspye, root )
+MACHINE_CONFIG_DERIVED(zaxxon_state::futspye, root)
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5061, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -994,7 +994,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( razmataze, root )
+MACHINE_CONFIG_DERIVED(zaxxon_state::razmataze, root)
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5098,  MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(ixion_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -1013,7 +1013,7 @@ static MACHINE_CONFIG_DERIVED( razmataze, root )
 	MCFG_SEGAUSBROM_ADD("usbsnd")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ixion, razmataze )
+MACHINE_CONFIG_DERIVED(zaxxon_state::ixion, razmataze)
 	MCFG_CPU_REPLACE("maincpu", SEGA_315_5013, MASTER_CLOCK/16)
 	MCFG_CPU_PROGRAM_MAP(ixion_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -1024,7 +1024,7 @@ static MACHINE_CONFIG_DERIVED( ixion, razmataze )
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // flip screen not used
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( congo, root )
+MACHINE_CONFIG_DERIVED(zaxxon_state::congo, root)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(congo_map)
@@ -1046,7 +1046,7 @@ static MACHINE_CONFIG_DERIVED( congo, root )
 
 	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(congo_sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(zaxxon_state, irq0_line_hold,  (double)SOUND_CLOCK/16/16/16/4)
+	MCFG_CPU_PERIODIC_INT_DRIVER(zaxxon_state, irq0_line_hold, SOUND_CLOCK/16/16/16/4)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")

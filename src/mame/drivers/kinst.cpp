@@ -230,6 +230,7 @@ public:
 	required_device<ata_interface_device> m_ata;
 	required_device<dcs_audio_2k_device> m_dcs;
 
+	void kinst(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -237,7 +238,7 @@ protected:
 
 
 /* constants */
-#define MASTER_CLOCK    XTAL_50MHz
+#define MASTER_CLOCK    XTAL(50'000'000)
 
 
 
@@ -397,8 +398,8 @@ READ32_MEMBER(kinst_state::control_r)
 
 		case 4:     /* $a0 */
 			result = ioport(portnames[offset])->read();
-			if (space.device().safe_pc() == 0x802d428)
-				space.device().execute().spin_until_interrupt();
+			if (m_maincpu->pc() == 0x802d428)
+				m_maincpu->spin_until_interrupt();
 			break;
 	}
 
@@ -691,7 +692,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( kinst )
+MACHINE_CONFIG_START(kinst_state::kinst)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R4600LE, MASTER_CLOCK*2)

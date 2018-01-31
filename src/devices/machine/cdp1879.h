@@ -71,7 +71,7 @@ private:
 		R_ALM_HOURS
 	};
 
-	u8 m_regs[10];
+	u8 m_regs[11];
 	bool m_comparator_state;
 
 	// timers

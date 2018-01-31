@@ -91,6 +91,10 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
 
+	void svi328n(machine_config &config);
+	void svi318(machine_config &config);
+	void svi318n(machine_config &config);
+	void svi328(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -518,9 +522,9 @@ DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( svi318 )
+MACHINE_CONFIG_START(svi3x8_state::svi318)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz / 3)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'738'635) / 3)
 	MCFG_CPU_PROGRAM_MAP(svi3x8_mem)
 	MCFG_CPU_IO_MAP(svi3x8_io)
 
@@ -539,7 +543,7 @@ static MACHINE_CONFIG_START( svi318 )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(svi3x8_state, ppi_port_c_w))
 
 	// video hardware
-	MCFG_DEVICE_ADD("vdp", TMS9929A, XTAL_10_738635MHz / 2)
+	MCFG_DEVICE_ADD("vdp", TMS9929A, XTAL(10'738'635) / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi3x8_state, intvdp_w))
 	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
@@ -551,7 +555,7 @@ static MACHINE_CONFIG_START( svi318 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("psg", AY8910, XTAL_10_738635MHz / 6)
+	MCFG_SOUND_ADD("psg", AY8910, XTAL(10'738'635) / 6)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JOY"))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(svi3x8_state, bank_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
@@ -579,23 +583,23 @@ static MACHINE_CONFIG_START( svi318 )
 	MCFG_SVI_EXPANDER_EXCSW_HANDLER(WRITE8(svi3x8_state, excs_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svi318n, svi318 )
+MACHINE_CONFIG_DERIVED(svi3x8_state::svi318n, svi318)
 	MCFG_DEVICE_REMOVE("vdp")
 	MCFG_DEVICE_REMOVE("screen")
-	MCFG_DEVICE_ADD("vdp", TMS9928A, XTAL_10_738635MHz / 2)
+	MCFG_DEVICE_ADD("vdp", TMS9928A, XTAL(10'738'635) / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(svi3x8_state, intvdp_w))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC("screen")
 	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9928a_device, screen_update)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svi328, svi318 )
+MACHINE_CONFIG_DERIVED(svi3x8_state::svi328, svi318)
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( svi328n, svi318n )
+MACHINE_CONFIG_DERIVED(svi3x8_state::svi328n, svi318n)
 	MCFG_DEVICE_REMOVE(RAM_TAG)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")

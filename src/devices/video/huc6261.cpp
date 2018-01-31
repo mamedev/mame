@@ -95,8 +95,8 @@ void huc6261_device::apply_pal_offs(uint16_t *pix_data)
 
 void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int vpos = m_screen->vpos();
-	int hpos = m_screen->hpos();
+	int vpos = screen().vpos();
+	int hpos = screen().hpos();
 	int h = m_last_h;
 	int v = m_last_v;
 	uint32_t *bitmap_line = &m_bmp->pix32(v);
@@ -219,7 +219,7 @@ void huc6261_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		}
 	}
 
-	m_timer->adjust( m_screen->time_until_pos( v, h ) );
+	m_timer->adjust( screen().time_until_pos( v, h ) );
 }
 
 
@@ -238,8 +238,8 @@ READ16_MEMBER( huc6261_device::read )
 		/* Status info */
 		case 0x00:
 			{
-				uint16_t vpos = m_screen->vpos();
-				uint16_t hpos = m_screen->hpos();
+				uint16_t vpos = screen().vpos();
+				uint16_t hpos = screen().hpos();
 
 				data = ( vpos << 5 ) | ( m_register & 0x1F);
 
@@ -455,7 +455,7 @@ void huc6261_device::device_reset()
 
 	memset(m_palette, 0, sizeof(m_palette));
 
-	m_last_v = m_screen->vpos();
-	m_last_h = m_screen->hpos();
-	m_timer->adjust( m_screen->time_until_pos( ( m_screen->vpos() + 1 ) % 263, 0 ) );
+	m_last_v = screen().vpos();
+	m_last_h = screen().hpos();
+	m_timer->adjust( screen().time_until_pos( ( screen().vpos() + 1 ) % 263, 0 ) );
 }

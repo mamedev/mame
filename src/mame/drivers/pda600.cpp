@@ -78,6 +78,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t *     m_video_ram;
+	void pda600(machine_config &config);
 };
 
 
@@ -196,9 +197,9 @@ static GFXDECODE_START( pda600 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( pda600 )
+MACHINE_CONFIG_START(pda600_state::pda600)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z180, XTAL_14_31818MHz)
+	MCFG_CPU_ADD("maincpu",Z180, XTAL(14'318'181))
 	MCFG_CPU_PROGRAM_MAP(pda600_mem)
 	MCFG_CPU_IO_MAP(pda600_io)
 
@@ -218,7 +219,7 @@ static MACHINE_CONFIG_START( pda600 )
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-	MCFG_DEVICE_ADD("rtc", HD64610, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", HD64610, XTAL(32'768))
 MACHINE_CONFIG_END
 
 /* ROM definition */

@@ -24,7 +24,7 @@
 #include "speaker.h"
 
 
-#define MAIN_CLOCK  XTAL_23_9616MHz
+#define MAIN_CLOCK  XTAL(23'961'600)
 
 #define MODEM_PORT_TAG "modem"
 #define PRINTER_PORT_TAG "printer"
@@ -126,6 +126,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(modem_dsr_w);
 	DECLARE_WRITE_LINE_MEMBER(modem_ri_w);
 	DECLARE_WRITE_LINE_MEMBER(comm_clk_a_w);
+	void osbexec(machine_config &config);
 };
 
 
@@ -557,7 +558,7 @@ static const z80_daisy_config osbexec_daisy_config[] =
 };
 
 
-static MACHINE_CONFIG_START( osbexec )
+MACHINE_CONFIG_START(osbexec_state::osbexec)
 	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK/6 )
 	MCFG_CPU_PROGRAM_MAP( osbexec_mem)
 	MCFG_CPU_IO_MAP( osbexec_io)

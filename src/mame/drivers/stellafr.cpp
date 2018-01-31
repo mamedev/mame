@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(duart_output_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
 
+	void stellafr(machine_config &config);
 protected:
 
 	// devices
@@ -86,7 +87,7 @@ static INPUT_PORTS_START( stellafr )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( stellafr )
+MACHINE_CONFIG_START(stellafr_state::stellafr)
 	MCFG_CPU_ADD("maincpu", M68000, 10000000 ) //?
 	MCFG_CPU_PROGRAM_MAP(stellafr_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(stellafr_state, irq_ack)

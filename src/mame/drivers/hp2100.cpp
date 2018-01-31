@@ -241,6 +241,7 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void hp2100(machine_config &config);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
@@ -251,7 +252,7 @@ private:
 static INPUT_PORTS_START( hp2100 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( hp2100 )
+MACHINE_CONFIG_START(hp2100_state::hp2100)
 MACHINE_CONFIG_END
 
 ROM_START( hp2100 )

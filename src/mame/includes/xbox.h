@@ -72,6 +72,7 @@ public:
 	} debugp[];
 	const debugger_constants *debugc_bios;
 
+	void xbox_base(machine_config &config);
 private:
 	void dump_string_command(int ref, const std::vector<std::string> &params);
 	void dump_process_command(int ref, const std::vector<std::string> &params);
@@ -96,6 +97,5 @@ private:
 
 ADDRESS_MAP_EXTERN(xbox_base_map, 32);
 ADDRESS_MAP_EXTERN(xbox_base_map_io, 32);
-MACHINE_CONFIG_EXTERN(xbox_base);
 
 #endif // MAME_INCLUDES_XBOX_H

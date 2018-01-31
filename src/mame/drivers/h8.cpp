@@ -81,6 +81,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_c);
 	TIMER_DEVICE_CALLBACK_MEMBER(h8_p);
 
+	void h8(machine_config &config);
 private:
 	uint8_t m_digit;
 	uint8_t m_segment;
@@ -97,7 +98,7 @@ private:
 };
 
 
-#define H8_CLOCK (XTAL_12_288MHz / 6)
+#define H8_CLOCK (XTAL(12'288'000) / 6)
 #define H8_BEEP_FRQ (H8_CLOCK / 1024)
 #define H8_IRQ_PULSE (H8_BEEP_FRQ / 2)
 
@@ -302,7 +303,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_p)
 	}
 }
 
-static MACHINE_CONFIG_START( h8 )
+MACHINE_CONFIG_START(h8_state::h8)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, H8_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(h8_mem)

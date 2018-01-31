@@ -49,7 +49,7 @@ READ8_MEMBER(k056230_device::read)
 		}
 	}
 
-//  osd_printf_debug("k056230_r: %d at %08X\n", offset, space.device().safe_pc());
+//  logerror("k056230_r: %d %s\n", offset, machine().describe_context());
 
 	return 0;
 }
@@ -91,17 +91,17 @@ WRITE8_MEMBER(k056230_device::write)
 			break;
 		}
 	}
-//  osd_printf_debug("k056230_w: %d, %02X at %08X\n", offset, data, space.device().safe_pc());
+//  logerror("k056230_w: %d, %02X at %08X\n", offset, data, machine().describe_context());
 }
 
 READ32_MEMBER(k056230_device::lanc_ram_r)
 {
-	//osd_printf_debug("LANC_RAM_r: %08X, %08X at %08X\n", offset, mem_mask, space.device().safe_pc());
+	//logerror("LANC_RAM_r: %08X, %08X %s\n", offset, mem_mask, machine().describe_context());
 	return m_ram[offset & 0x7ff];
 }
 
 WRITE32_MEMBER(k056230_device::lanc_ram_w)
 {
-	//osd_printf_debug("LANC_RAM_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
+	//logerror("LANC_RAM_w: %08X, %08X, %08X %s\n", data, offset, mem_mask, machine().describe_context());
 	COMBINE_DATA(m_ram + (offset & 0x7ff));
 }

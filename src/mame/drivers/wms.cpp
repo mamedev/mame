@@ -57,6 +57,9 @@
   The WMS CPU 1.5 Plus board has an upgrade: The WMS 360 / 550 Bluebird CPU NXT board,
   based on a Pentium processor.
 
+  About the dates: There is an internal string containing the game date, but wms seems to be quite
+  purposefully subtracted 1900 from the year and stored the result.
+
 ***************************************************************************************************
 
   Settings...
@@ -79,10 +82,10 @@
 #include "screen.h"
 
 
-#define MAIN_CLOCK        XTAL_40MHz          // Pletronics 40.000 MHz. Crystal. Used for CPU clock.
-#define VIDEO_CLOCK       XTAL_14_31818MHz    // Pletronics MP49 14.31818 MHz. Crystal. Used in common VGA ISA cards.
+#define MAIN_CLOCK        XTAL(40'000'000)          // Pletronics 40.000 MHz. Crystal. Used for CPU clock.
+#define VIDEO_CLOCK       XTAL(14'318'181)    // Pletronics MP49 14.31818 MHz. Crystal. Used in common VGA ISA cards.
 
-#define UART_CLOCK        XTAL_1_8432MHz      // Seems UART clock, since allows integer division to common baud rates.
+#define UART_CLOCK        XTAL(1'843'200)      // Seems UART clock, since allows integer division to common baud rates.
 												// (16 * 115200 baud, 192 * 9600 baud, 1536 * 1200 baud, etc...)
 
 
@@ -98,6 +101,7 @@ public:
 	DECLARE_READ8_MEMBER(test_r);
 		uint32_t screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+		void wms(machine_config &config);
 protected:
 
 	// devices
@@ -165,7 +169,7 @@ static GFXDECODE_START( wms )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( wms )
+MACHINE_CONFIG_START(wms_state::wms)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80188, MAIN_CLOCK )    // AMD N80C188-20, ( 40 MHz. internally divided by 2)
 	MCFG_CPU_PROGRAM_MAP(wms_map)
@@ -217,7 +221,7 @@ ROM_END
 // ----------------- Regular Sets ------------------
 
 
-ROM_START( btippers )    // Big Tippers (Russian)
+ROM_START( btippers )    // Big Tippers (Russian) / U5 03/09/01
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(96e362e3) SHA1(a0c35e9aa6bcbc5ffbf8750fa728294ef1e21b02) )
 
@@ -233,7 +237,7 @@ ROM_START( btippers )    // Big Tippers (Russian)
 ROM_END
 
 
-ROM_START( wmsboom )    // Boom (Russian)
+ROM_START( wmsboom )    // Boom (Russian) / U5 02/12/98
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(5008854d) SHA1(8d9d11775b6cbdef1c71683c4d92e64af26e8939) )
 
@@ -247,7 +251,7 @@ ROM_START( wmsboom )    // Boom (Russian)
 ROM_END
 
 
-ROM_START( cashcrop )    // Cash Crop (Russian)
+ROM_START( cashcrop )    // Cash Crop (Russian) / U5 09/05/100
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(e1918f25) SHA1(55c33c1f604a44caef65e712e69d21792161dfbc) )
 
@@ -291,7 +295,7 @@ ROM_START( filthyrr )    // Filthy Rich (Russian) / U4 09/03/97
 ROM_END
 
 
-ROM_START( hottop )    // Hot Toppings (English)
+ROM_START( hottop )    // Hot Toppings (English) / U5 04/22/103
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "hot_topping_9fbah.xu03", 0x0000, 0x100000, CRC(9da8d2d7) SHA1(722809ec9df83c866ec7cbcc83b619d65134b523) )
 
@@ -305,7 +309,7 @@ ROM_START( hottop )    // Hot Toppings (English)
 	ROM_LOAD( "hot_topping_1600h.xu18", 0x0000, 0x100000, CRC(2ad1b2e2) SHA1(47832422be66acace22fe411062010303b9ce899) )
 ROM_END
 
-ROM_START( hottopa )    // Hot Toppings (Russian?)
+ROM_START( hottopa )    // Hot Toppings (Russian?) / U5 06/26/101
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, NO_DUMP ) // missing
 
@@ -320,7 +324,7 @@ ROM_START( hottopa )    // Hot Toppings (Russian?)
 ROM_END
 
 
-ROM_START( inwinner )    // Instant Winner (Russian)
+ROM_START( inwinner )    // Instant Winner (Russian) / U5 11/25/98
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(f5c26579) SHA1(4ef22c0115417320ef17f0c3fc7550db24bdcb8c) )
 
@@ -334,7 +338,7 @@ ROM_START( inwinner )    // Instant Winner (Russian)
 ROM_END
 
 
-ROM_START( jptparty )    // Jackpot Party (Russian)
+ROM_START( jptparty )    // Jackpot Party (Russian) / U5 04/01/98
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(750bfd36) SHA1(161c98455cb2ceb1d7d1a35941b5bb0784129b25) )
 
@@ -348,7 +352,7 @@ ROM_START( jptparty )    // Jackpot Party (Russian)
 ROM_END
 
 
-ROM_START( leprgld )    // Leprechaun's Gold (Russian)
+ROM_START( leprgld )    // Leprechaun's Gold (Russian) / U5 08/20/101
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(0985d6b6) SHA1(291c124a9ae813942b14620789370b4a7b9cf85e) )
 
@@ -363,7 +367,7 @@ ROM_START( leprgld )    // Leprechaun's Gold (Russian)
 	ROM_LOAD( "xu-18.bin", 0x0000, 0x100000, CRC(a3f82467) SHA1(0971f32bff0d4bda43cd98e975e49710d73f9286) )
 ROM_END
 
-ROM_START( leprglds )    // Leprechaun's Gold (Spanish)
+ROM_START( leprglds )    // Leprechaun's Gold (Spanish) / U5 08/20/101
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "leprechaun's_gold.xu03", 0x0000, 0x100000, CRC(a750e5b9) SHA1(891bbfded9ece4d81aa8415cbb5a2728c118300e) )
 
@@ -379,7 +383,7 @@ ROM_START( leprglds )    // Leprechaun's Gold (Spanish)
 ROM_END
 
 
-ROM_START( lol )    // Life of Luxury (Russian)
+ROM_START( lol )    // Life of Luxury (Russian) / U3 08/30/100
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(28af87a0) SHA1(c94b98b6922b5f5551eff239226bfe007535fc21) )
 
@@ -391,7 +395,7 @@ ROM_START( lol )    // Life of Luxury (Russian)
 ROM_END
 
 
-ROM_START( lovewin )    // Love To Win (Russian)
+ROM_START( lovewin )    // Love To Win (Russian) / U5 04/18/101
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(b1b2c7da) SHA1(96430bfa062467bba1daaf2e6180068b3211a739) )
 
@@ -407,7 +411,7 @@ ROM_START( lovewin )    // Love To Win (Russian)
 ROM_END
 
 
-ROM_START( mtburn )    // Money To Burn (English)
+ROM_START( mtburn )    // Money To Burn (English) / U5 08/02/101
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "money_to_burn.xu3", 0x0000, 0x100000, CRC(92d94269) SHA1(8f7e342837067b6c2180c3a161bc34671c0fab72) )
 
@@ -421,7 +425,7 @@ ROM_START( mtburn )    // Money To Burn (English)
 ROM_END
 
 
-ROM_START( mtburnr )    // Money To Burn (Russian)
+ROM_START( mtburnr )    // Money To Burn (Russian) / U5 02/11/100
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(a329aff0) SHA1(2f631783bd15b8a695d92d0861e167130f914046) )
 
@@ -435,7 +439,7 @@ ROM_START( mtburnr )    // Money To Burn (Russian)
 ROM_END
 
 
-ROM_START( otchart )    // Off The Charts (Russian)
+ROM_START( otchart )    // Off The Charts (Russian) / U5 07/31/100
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(b1baee77) SHA1(9f8e87bb10499fa73d961bce4fd75d31c880ea51) )
 
@@ -449,7 +453,7 @@ ROM_START( otchart )    // Off The Charts (Russian)
 ROM_END
 
 
-ROM_START( perfect )    // Perfect Game (Russian)
+ROM_START( perfect )    // Perfect Game (Russian) / U5 03/17/100
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(1e90dc52) SHA1(6ac1762ce979e1259e03025d89271034565d8f4a) )
 
@@ -493,7 +497,7 @@ ROM_START( reeleminr )    // Reel 'Em In (Russian) / U4 01/22/97
 ROM_END
 
 
-ROM_START( sonoth )    // Something For Nothing (Russian)
+ROM_START( sonoth )    // Something For Nothing (Russian) / ???
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(a5afc1dd) SHA1(5743c630d382d1cc2f7720a2038b105f0dd49790) )
 
@@ -504,7 +508,7 @@ ROM_START( sonoth )    // Something For Nothing (Russian)
 ROM_END
 
 
-ROM_START( swingin )    // Swingin In The Green (Russian)
+ROM_START( swingin )    // Swingin In The Green (Russian) / U5 03/17/100
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(f0ee2385) SHA1(8269cf0a765228fd8a2512cefde715e3a7219d7a) )
 
@@ -518,7 +522,7 @@ ROM_START( swingin )    // Swingin In The Green (Russian)
 ROM_END
 
 
-ROM_START( wmstopb )    // Top Banana (Russian)
+ROM_START( wmstopb )    // Top Banana (Russian) / U4 04/30/99
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(dbbabd02) SHA1(6e85bb11222c593a326e282e6edfff3647379c78) )
 
@@ -531,7 +535,7 @@ ROM_START( wmstopb )    // Top Banana (Russian)
 ROM_END
 
 
-ROM_START( wdun )    // Who Dunnit (Russian)
+ROM_START( wdun )    // Who Dunnit (Russian) / U5 09/02/99
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(9c5f2a50) SHA1(8c591eb80276d460dd66bdf817778aed11d013ef) )
 
@@ -545,7 +549,7 @@ ROM_START( wdun )    // Who Dunnit (Russian)
 ROM_END
 
 
-ROM_START( winbid )    // Winning Bid (English)
+ROM_START( winbid )    // Winning Bid (English) / U5 10/09/100
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "winning_bid.xu3", 0x0000, 0x100000, CRC(a60afb19) SHA1(461e6b8ac1a8874ecd4ecd709ed0f0e6d9aab989) )
 
@@ -560,7 +564,7 @@ ROM_START( winbid )    // Winning Bid (English)
 ROM_END
 
 
-ROM_START( winbidr )    // Winning Bid (Russian)
+ROM_START( winbidr )    // Winning Bid (Russian) / U5 09/07/99
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(873eecfb) SHA1(35960c9a2a4efeac8b8cea94f1eac6ffb175b9a9) )
 
@@ -575,7 +579,7 @@ ROM_START( winbidr )    // Winning Bid (Russian)
 ROM_END
 
 
-ROM_START( wldstrek )    // Wild Streak (Russian)
+ROM_START( wldstrek )    // Wild Streak (Russian) / U4 04/11/100
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(6200c5e3) SHA1(fcf542875a11972974a9c72e171d4ca0686b0c0e) )
 
@@ -589,7 +593,7 @@ ROM_START( wldstrek )    // Wild Streak (Russian)
 ROM_END
 
 
-ROM_START( yukongld )    // Yukon Gold (Russian)
+ROM_START( yukongld )    // Yukon Gold (Russian) / U5 11/06/00
 	ROM_REGION(0x100000, "maincpu", 0)
 	ROM_LOAD( "xu-3.bin", 0x0000, 0x100000, CRC(7c12f7c7) SHA1(20eb1a5ff85e0fd36e669c7dc53b677f12446af3) )
 
@@ -624,30 +628,30 @@ GAME( 200?, wms,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS
 GAME( 200?, wmsa,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 2)",   MACHINE_IS_SKELETON )
 GAME( 200?, wmsb,       wms,      wms,     wms,      wms_state, wms,  ROT0, "WMS",   "WMS SetUp/Clear Chips (set 3)",   MACHINE_IS_SKELETON )
 
-GAME( 200?, btippers,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Big Tippers (Russian)",           MACHINE_IS_SKELETON )
-GAME( 200?, wmsboom,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Boom (Russian)",                  MACHINE_IS_SKELETON )
-GAME( 200?, cashcrop,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Cash Crop (Russian)",             MACHINE_IS_SKELETON )
+GAME( 2001, btippers,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Big Tippers (Russian)",           MACHINE_IS_SKELETON )  // U5 03/09/01
+GAME( 1998, wmsboom,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Boom (Russian)",                  MACHINE_IS_SKELETON )  // U5 02/12/98
+GAME( 2000, cashcrop,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Cash Crop (Russian)",             MACHINE_IS_SKELETON )  // U5 09/05/100
 GAME( 1997, filthyr,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (English)",           MACHINE_IS_SKELETON )  // U4 09/03/97
 GAME( 1997, filthyrr,   filthyr,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Filthy Rich (Russian)",           MACHINE_IS_SKELETON )  // U4 09/03/97
-GAME( 200?, hottop,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (English)",          MACHINE_IS_SKELETON )
-GAME( 200?, hottopa,    hottop,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (Russian?)",         MACHINE_IS_SKELETON )
-GAME( 200?, inwinner,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Instant Winner (Russian)",        MACHINE_IS_SKELETON )
-GAME( 200?, jptparty,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Jackpot Party (Russian)",         MACHINE_IS_SKELETON )
-GAME( 200?, leprgld,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Russian)",     MACHINE_IS_SKELETON )
-GAME( 200?, leprglds,   leprgld,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Spanish)",     MACHINE_IS_SKELETON )
-GAME( 200?, lol,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Life of Luxury (Russian)",        MACHINE_IS_SKELETON )
-GAME( 200?, lovewin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Love To Win (Russian)",           MACHINE_IS_SKELETON )
-GAME( 200?, mtburn,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (English)",         MACHINE_IS_SKELETON )
-GAME( 200?, mtburnr,    mtburn,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (Russian)",         MACHINE_IS_SKELETON )
-GAME( 200?, otchart,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Off The Charts (Russian)",        MACHINE_IS_SKELETON )
-GAME( 200?, perfect,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Perfect Game (Russian)",          MACHINE_IS_SKELETON )
+GAME( 2003, hottop,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (English)",          MACHINE_IS_SKELETON )  // U5 04/22/103
+GAME( 2001, hottopa,    hottop,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Hot Toppings (Russian?)",         MACHINE_IS_SKELETON )  // U5 06/26/101
+GAME( 1998, inwinner,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Instant Winner (Russian)",        MACHINE_IS_SKELETON )  // U5 11/25/98
+GAME( 1998, jptparty,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Jackpot Party (Russian)",         MACHINE_IS_SKELETON )  // U5 04/01/98
+GAME( 2001, leprgld,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Russian)",     MACHINE_IS_SKELETON )  // U5 08/20/101
+GAME( 2001, leprglds,   leprgld,  wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Leprechaun's Gold (Spanish)",     MACHINE_IS_SKELETON )  // U5 08/20/101
+GAME( 2000, lol,        0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Life of Luxury (Russian)",        MACHINE_IS_SKELETON )  // U3 08/30/100
+GAME( 2001, lovewin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Love To Win (Russian)",           MACHINE_IS_SKELETON )  // U5 04/18/101
+GAME( 2001, mtburn,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (English)",         MACHINE_IS_SKELETON )  // U5 08/02/101
+GAME( 2000, mtburnr,    mtburn,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Money To Burn (Russian)",         MACHINE_IS_SKELETON )  // U5 02/11/100
+GAME( 2000, otchart,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Off The Charts (Russian)",        MACHINE_IS_SKELETON )  // U5 07/31/100
+GAME( 2000, perfect,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Perfect Game (Russian)",          MACHINE_IS_SKELETON )  // U5 03/17/100
 GAME( 1997, reelemin,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (English)",           MACHINE_IS_SKELETON )  // U4 01/22/97
 GAME( 1997, reeleminr,  reelemin, wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Reel 'Em In (Russian)",           MACHINE_IS_SKELETON )  // U4 01/22/97
-GAME( 200?, sonoth,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Something For Nothing (Russian)", MACHINE_IS_SKELETON )
-GAME( 200?, swingin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Swingin In The Green (Russian)",  MACHINE_IS_SKELETON )
-GAME( 200?, wmstopb,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Top Banana (Russian)",            MACHINE_IS_SKELETON )
-GAME( 200?, wdun,       0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Who Dunnit (Russian)",            MACHINE_IS_SKELETON )
-GAME( 200?, winbid,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (English)",           MACHINE_IS_SKELETON )
-GAME( 200?, winbidr,    winbid,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (Russian)",           MACHINE_IS_SKELETON )
-GAME( 200?, wldstrek,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Wild Streak (Russian)",           MACHINE_IS_SKELETON )
-GAME( 200?, yukongld,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Yukon Gold (Russian)",            MACHINE_IS_SKELETON )
+GAME( 200?, sonoth,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Something For Nothing (Russian)", MACHINE_IS_SKELETON )  // ???
+GAME( 2000, swingin,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Swingin In The Green (Russian)",  MACHINE_IS_SKELETON )  // U5 03/17/100
+GAME( 1999, wmstopb,    0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Top Banana (Russian)",            MACHINE_IS_SKELETON )  // U4 04/30/99
+GAME( 1999, wdun,       0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Who Dunnit (Russian)",            MACHINE_IS_SKELETON )  // U5 09/02/99
+GAME( 2000, winbid,     0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (English)",           MACHINE_IS_SKELETON )  // U5 10/09/100
+GAME( 1999, winbidr,    winbid,   wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Winning Bid (Russian)",           MACHINE_IS_SKELETON )  // U5 09/07/99
+GAME( 2000, wldstrek,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Wild Streak (Russian)",           MACHINE_IS_SKELETON )  // U4 04/11/100
+GAME( 2000, yukongld,   0,        wms,     wms,      wms_state, wms,  ROT0, "WMS",   "Yukon Gold (Russian)",            MACHINE_IS_SKELETON )  // U5 11/06/00

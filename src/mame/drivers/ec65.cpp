@@ -44,6 +44,7 @@ public:
 	void kbd_put(u8 data);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void ec65(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<via6522_device> m_via_0;
@@ -61,6 +62,7 @@ public:
 		: driver_device(mconfig, type, tag)
 	{
 	}
+	void ec65k(machine_config &config);
 };
 
 static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8, ec65_state)
@@ -164,10 +166,10 @@ static GFXDECODE_START( ec65 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, ec65_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( ec65 )
+MACHINE_CONFIG_START(ec65_state::ec65)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502, XTAL_4MHz / 4)
+	MCFG_CPU_ADD("maincpu",M6502, XTAL(4'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(ec65_mem)
 
 	/* video hardware */
@@ -181,7 +183,7 @@ static MACHINE_CONFIG_START( ec65 )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ec65)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL_16MHz / 8)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL(16'000'000) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
 	MCFG_MC6845_UPDATE_ROW_CB(ec65_state, crtc_update_row)
@@ -191,21 +193,21 @@ static MACHINE_CONFIG_START( ec65 )
 
 	MCFG_DEVICE_ADD(ACIA6850_TAG, ACIA6850, 0)
 
-	MCFG_DEVICE_ADD(VIA6522_0_TAG, VIA6522, XTAL_4MHz / 4)
+	MCFG_DEVICE_ADD(VIA6522_0_TAG, VIA6522, XTAL(4'000'000) / 4)
 
-	MCFG_DEVICE_ADD(VIA6522_1_TAG, VIA6522, XTAL_4MHz / 4)
+	MCFG_DEVICE_ADD(VIA6522_1_TAG, VIA6522, XTAL(4'000'000) / 4)
 
 	MCFG_DEVICE_ADD(ACIA6551_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(PUT(ec65_state, kbd_put))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ec65k )
+MACHINE_CONFIG_START(ec65k_state::ec65k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",G65816, XTAL_4MHz) // can use 4,2 or 1 MHz
+	MCFG_CPU_ADD("maincpu",G65816, XTAL(4'000'000)) // can use 4,2 or 1 MHz
 	MCFG_CPU_PROGRAM_MAP(ec65k_mem)
 
 	/* video hardware */
@@ -219,7 +221,7 @@ static MACHINE_CONFIG_START( ec65k )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ec65)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL_16MHz / 8)
+	MCFG_MC6845_ADD(MC6845_TAG, MC6845, "screen", XTAL(16'000'000) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8) /*?*/
 MACHINE_CONFIG_END

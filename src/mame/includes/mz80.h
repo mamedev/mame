@@ -46,6 +46,9 @@ public:
 	uint32_t screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tempo_callback);
 
+	void mz80kj(machine_config &config);
+	void mz80k(machine_config &config);
+	void mz80a(machine_config &config);
 private:
 	bool m_mz80k_vertical;
 	bool m_mz80k_tempo_strobe;

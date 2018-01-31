@@ -51,6 +51,7 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void jackpool(machine_config &config);
 };
 
 
@@ -143,7 +144,7 @@ static ADDRESS_MAP_START( jackpool_mem, AS_PROGRAM, 16, jackpool_state )
 	AM_RANGE(0x340000, 0x347fff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x348000, 0x34ffff) AM_RAM //<- vram banks 2 & 3?
 
-	AM_RANGE(0x360000, 0x3603ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x360000, 0x3603ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x380000, 0x38002f) AM_READ8(jackpool_io_r, 0x00ff)
 	AM_RANGE(0x380030, 0x38003f) AM_DEVWRITE8("latch1", ls259_device, write_d0, 0x00ff)
 	AM_RANGE(0x380040, 0x38004f) AM_DEVWRITE8("latch2", ls259_device, write_d0, 0x00ff)
@@ -223,7 +224,7 @@ INTERRUPT_GEN_MEMBER(jackpool_state::jackpool_interrupt)
 }
 
 
-static MACHINE_CONFIG_START( jackpool )
+MACHINE_CONFIG_START(jackpool_state::jackpool)
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) // ?
 	MCFG_CPU_PROGRAM_MAP(jackpool_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jackpool_state, jackpool_interrupt)  // ?

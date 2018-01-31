@@ -81,6 +81,7 @@ public:
 	required_ioport m_in1;
 	required_ioport m_dsw;
 
+	void monzagp(machine_config &config);
 private:
 	uint8_t m_p1;
 	uint8_t m_p2;
@@ -386,7 +387,7 @@ WRITE8_MEMBER(monzagp_state::port_w)
 
 WRITE8_MEMBER(monzagp_state::port1_w)
 {
-//  printf("P1 %x = %x\n",space.device().safe_pc(),data);
+//  printf("P1 %x = %x\n",m_maincpu->pc(),data);
 	m_p1 = data;
 }
 
@@ -397,7 +398,7 @@ READ8_MEMBER(monzagp_state::port2_r)
 
 WRITE8_MEMBER(monzagp_state::port2_w)
 {
-//  printf("P2 %x = %x\n",space.device().safe_pc(),data);
+//  printf("P2 %x = %x\n",m_maincpu->pc(),data);
 	m_p2 = data;
 }
 
@@ -484,7 +485,7 @@ static GFXDECODE_START( monzagp )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, tile_layout,   0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( monzagp )
+MACHINE_CONFIG_START(monzagp_state::monzagp)
 	MCFG_CPU_ADD("maincpu", I8035, 12000000/4) /* 400KHz ??? - Main board Crystal is 12MHz */
 	MCFG_CPU_PROGRAM_MAP(monzagp_map)
 	MCFG_CPU_IO_MAP(monzagp_io)

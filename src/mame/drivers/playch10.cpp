@@ -304,6 +304,8 @@ Notes & Todo:
 #include "screen.h"
 #include "speaker.h"
 
+#include "playch10.lh"
+
 
 /******************************************************************************/
 
@@ -339,12 +341,9 @@ WRITE8_MEMBER(playch10_state::sprite_dma_w)
 
 WRITE8_MEMBER(playch10_state::time_w)
 {
-	if(data == 0xf)
-		data = 0;
+	constexpr static uint8_t DIGIT_MAP[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-	m_timedata[offset] = data;
-
-	popmessage("Time: %d%d%d%d",m_timedata[3],m_timedata[2],m_timedata[1],m_timedata[0]);
+	m_timedigits[offset] = DIGIT_MAP[data & 0x0f];
 }
 
 
@@ -368,7 +367,7 @@ static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, playch10_state )
 	AM_RANGE(0x03, 0x03) AM_READ(pc10_detectclr_r)
 	AM_RANGE(0x00, 0x07) AM_DEVWRITE("outlatch1", ls259_device, write_d0)
 	AM_RANGE(0x08, 0x0f) AM_DEVWRITE("outlatch2", ls259_device, write_d0)
-	AM_RANGE(0x10, 0x13) AM_WRITE(time_w) AM_SHARE("timedata")
+	AM_RANGE(0x10, 0x13) AM_WRITE(time_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8, playch10_state )
@@ -640,7 +639,7 @@ INTERRUPT_GEN_MEMBER(playch10_state::playch10_interrupt){
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( playch10 )
+MACHINE_CONFIG_START(playch10_state::playch10)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 8000000/2) // 4 MHz
 	MCFG_CPU_PROGRAM_MAP(bios_map)
@@ -669,7 +668,7 @@ static MACHINE_CONFIG_START( playch10 )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", playch10)
 	MCFG_PALETTE_ADD("palette", 256+8*4*16)
 	MCFG_PALETTE_INIT_OWNER(playch10_state, playch10)
-	MCFG_DEFAULT_LAYOUT(layout_dualhuov)
+	MCFG_DEFAULT_LAYOUT(layout_playch10)
 
 	MCFG_SCREEN_ADD("top", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -696,11 +695,11 @@ static MACHINE_CONFIG_START( playch10 )
 	MCFG_RP5H01_ADD("rp5h01")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( playchnv, playch10 )
+MACHINE_CONFIG_DERIVED(playch10_state::playchnv, playch10)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( playch10_hboard, playch10 )
+MACHINE_CONFIG_DERIVED(playch10_state::playch10_hboard, playch10)
 	MCFG_VIDEO_START_OVERRIDE(playch10_state,playch10_hboard)
 	MCFG_MACHINE_START_OVERRIDE(playch10_state,playch10_hboard)
 MACHINE_CONFIG_END

@@ -89,7 +89,7 @@ void i82730_device::set_cpu_tag(device_t &device, device_t *owner, const char *t
 void i82730_device::device_start()
 {
 	// register bitmap
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 
 	// resolve callbacks
 	m_sint_handler.resolve_safe();
@@ -224,13 +224,13 @@ void i82730_device::mode_set()
 	// setup screen mode
 	rectangle visarea(hbrdstrt * 16, hbrdstp * 16 - 1, m_vsyncstp, m_vfldstp + m_margin + 1 + m_lpr - 1);
 	attoseconds_t period = HZ_TO_ATTOSECONDS(clock() * 16) * line_length * 16 * frame_length;
-	m_screen->configure(line_length * 16, frame_length, visarea, period);
+	screen().configure(line_length * 16, frame_length, visarea, period);
 
 	// start display is now valid
 	m_mode_set = true;
 
 	// adjust timer for the new mode
-	m_row_timer->adjust(m_screen->time_until_pos(0));
+	m_row_timer->adjust(screen().time_until_pos(0));
 
 	// output some debug info
 	if (VERBOSE)
@@ -394,7 +394,7 @@ void i82730_device::load_row()
 
 TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 {
-	int y = m_screen->vpos();
+	int y = screen().vpos();
 
 	if (y == 0)
 	{
@@ -454,7 +454,7 @@ TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 		// todo: check ca
 
 		// frame interrupt?
-		if ((m_screen->frame_number() % m_frame_int_count) == 0)
+		if ((screen().frame_number() % m_frame_int_count) == 0)
 			m_status |= EONF;
 
 		// check interrupts
@@ -465,7 +465,7 @@ TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 		// vblank
 	}
 
-	m_row_timer->adjust(m_screen->time_until_pos((y + 1) % m_screen->height()));
+	m_row_timer->adjust(screen().time_until_pos((y + 1) % screen().height()));
 }
 
 WRITE_LINE_MEMBER( i82730_device::ca_w )

@@ -88,6 +88,7 @@ public:
 		output().set_digit_value((Dsp << 2) | offset, data);
 	}
 
+	void whousetc(machine_config &config);
 protected:
 	virtual void machine_reset() override
 	{
@@ -165,12 +166,12 @@ INPUT_PORTS_START(whousetc)
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(whousetc)
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_6_144MHz)
+MACHINE_CONFIG_START(whouse_testcons_state::whousetc)
+	MCFG_CPU_ADD("maincpu", I8085A, 6.144_MHz_XTAL)
 	MCFG_CPU_PROGRAM_MAP(program_map)
 	MCFG_CPU_IO_MAP(io_map)
 
-	MCFG_DEVICE_ADD("i8155", I8155, XTAL_6_144MHz)
+	MCFG_DEVICE_ADD("i8155", I8155, 6.144_MHz_XTAL)
 
 	MCFG_DEVICE_ADD("i8255", I8255, 0)
 

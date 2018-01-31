@@ -25,6 +25,7 @@ public:
 //      , m_maincpu(*this, "maincpu")
 	{ }
 
+void zt8802(machine_config &config);
 private:
 //  required_device<cpu_device> m_maincpu;
 };
@@ -36,7 +37,7 @@ private:
 static INPUT_PORTS_START( zt8802 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( zt8802 )
+MACHINE_CONFIG_START(zt8802_state::zt8802)
 MACHINE_CONFIG_END
 
 ROM_START( zt8802 )

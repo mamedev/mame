@@ -36,7 +36,7 @@ DECLARE_DEVICE_TYPE(SAMPLES, samples_device)
 #define SAMPLES_START_CB_MEMBER(_name) void _name()
 
 #define MCFG_SAMPLES_START_CB(_class, _method) \
-	samples_device::set_samples_start_callback(*device, samples_device::start_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	samples_device::set_samples_start_callback(*device, samples_device::start_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 //**************************************************************************
 //  TYPE DEFINITIONS

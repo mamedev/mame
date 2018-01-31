@@ -29,7 +29,7 @@ INTERRUPT_GEN_MEMBER(parodius_state::parodius_interrupt)
 WRITE8_MEMBER(parodius_state::parodius_videobank_w)
 {
 	if (data & 0xf8)
-		logerror("%04x: videobank = %02x\n",space.device().safe_pc(),data);
+		logerror("%04x: videobank = %02x\n",m_maincpu->pc(),data);
 
 	/* bit 0 = select palette or work RAM at 0000-07ff */
 	/* bit 1 = select 052109 or 053245 at 2000-27ff */
@@ -46,7 +46,7 @@ WRITE8_MEMBER(parodius_state::parodius_videobank_w)
 WRITE8_MEMBER(parodius_state::parodius_3fc0_w)
 {
 	if ((data & 0xf4) != 0x10)
-		logerror("%04x: 3fc0 = %02x\n",space.device().safe_pc(),data);
+		logerror("%04x: 3fc0 = %02x\n",m_maincpu->pc(),data);
 
 	/* bit 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -114,7 +114,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bank0000_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bank2000_map, AS_PROGRAM, 8, parodius_state )
@@ -224,7 +224,7 @@ WRITE8_MEMBER( parodius_state::banking_callback )
 	membank("bank1")->set_entry((data & 0x0f) ^ 0x0f);
 }
 
-static MACHINE_CONFIG_START( parodius )
+MACHINE_CONFIG_START(parodius_state::parodius)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", KONAMI, 3000000)        /* 053248 */

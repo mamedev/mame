@@ -61,6 +61,7 @@ public:
 	DECLARE_DRIVER_INIT(pesadelo);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void pesadelo(machine_config &config);
 };
 
 
@@ -117,15 +118,15 @@ void forte2_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( pesadelo )
+MACHINE_CONFIG_START(forte2_state::pesadelo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(program_mem)
 	MCFG_CPU_IO_MAP(io_mem)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tms9928a", TMS9928A, XTAL_10_738635MHz/2)
+	MCFG_DEVICE_ADD("tms9928a", TMS9928A, XTAL(10'738'635)/2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC("screen")
@@ -133,7 +134,7 @@ static MACHINE_CONFIG_START( pesadelo )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_3_579545MHz/2)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(3'579'545)/2)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(forte2_state, forte2_ay8910_read_input))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(forte2_state, forte2_ay8910_set_input_mask))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

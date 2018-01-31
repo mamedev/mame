@@ -102,7 +102,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_15_468MHz
+#define MASTER_CLOCK    XTAL(15'468'480)
 
 // Video timing
 // PCB measured: H = 15.61khz V = 60.99hz, +/- 0.01hz
@@ -291,7 +291,7 @@ INTERRUPT_GEN_MEMBER(bankp_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( bankp )
+MACHINE_CONFIG_START(bankp_state::bankp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)

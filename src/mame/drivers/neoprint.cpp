@@ -69,6 +69,8 @@ public:
 	uint32_t screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void neoprint(machine_config &config);
+	void nprsp(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -185,8 +187,8 @@ READ8_MEMBER(neoprint_state::neoprint_unk_r)
 
 	m_vblank = (m_screen->frame_number() & 0x1) ? 0x10 : 0x00;
 
-	//if(space.device().safe_pc() != 0x1504 && space.device().safe_pc() != 0x5f86 && space.device().safe_pc() != 0x5f90)
-	//  printf("%08x\n",space.device().safe_pc());
+	//if(m_maincpu->pc() != 0x1504 && m_maincpu->pc() != 0x5f86 && m_machine->safe_pc() != 0x5f90)
+	//  printf("%08x\n",m_maincpu->pc());
 
 	return m_vblank| 4 | 3;
 }
@@ -216,7 +218,7 @@ WRITE8_MEMBER(neoprint_state::audio_command_w)
 	/* boost the interleave to let the audio CPU read the command */
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 
-	//if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", space.device().safe_pc(), data, mem_mask);
+	//if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", m_maincpu->pc(), data, mem_mask);
 }
 
 
@@ -224,7 +226,7 @@ READ8_MEMBER(neoprint_state::audio_command_r)
 {
 	uint8_t ret = m_soundlatch->read(space, 0);
 
-	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", space.device().safe_pc(), ret);
+	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", m_audiocpu->pc(), ret);
 
 	/* this is a guess */
 	audio_cpu_clear_nmi_w(space, 0, 0);
@@ -236,7 +238,7 @@ READ8_MEMBER(neoprint_state::audio_command_r)
 
 WRITE8_MEMBER(neoprint_state::audio_result_w)
 {
-	//if (LOG_CPU_COMM && (m_audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", space.device().safe_pc(), data);
+	//if (LOG_CPU_COMM && (m_audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", m_audiocpu->pc(), data);
 
 	m_audio_result = data;
 }
@@ -247,7 +249,7 @@ static ADDRESS_MAP_START( neoprint_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_SHARE("npvidram")
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x600000, 0x600001) AM_READWRITE8(neoprint_audio_result_r, audio_command_w, 0xff00)
 	AM_RANGE(0x600002, 0x600003) AM_READWRITE8(neoprint_calendar_r, neoprint_calendar_w, 0xff00)
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM") AM_WRITENOP
@@ -484,7 +486,7 @@ void neoprint_state::machine_start()
 	m_upd4990a->c2_w(1);
 }
 
-static MACHINE_CONFIG_START( neoprint )
+MACHINE_CONFIG_START(neoprint_state::neoprint)
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(neoprint_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(neoprint_state, irq3_line_hold, 45) /* camera / printer irq, unknown timing */
@@ -494,7 +496,7 @@ static MACHINE_CONFIG_START( neoprint )
 	MCFG_CPU_PROGRAM_MAP(neoprint_audio_map)
 	MCFG_CPU_IO_MAP(neoprint_audio_io_map)
 
-	MCFG_UPD4990A_ADD("upd4990a", XTAL_32_768kHz, NOOP, NOOP)
+	MCFG_UPD4990A_ADD("upd4990a", XTAL(32'768), NOOP, NOOP)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", neoprint)
@@ -527,7 +529,7 @@ MACHINE_RESET_MEMBER(neoprint_state,nprsp)
 	m_bank_val = 0;
 }
 
-static MACHINE_CONFIG_START( nprsp )
+MACHINE_CONFIG_START(neoprint_state::nprsp)
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(nprsp_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(neoprint_state, irq3_line_hold, 45) /* camera / printer irq, unknown timing */
@@ -537,7 +539,7 @@ static MACHINE_CONFIG_START( nprsp )
 	MCFG_CPU_PROGRAM_MAP(neoprint_audio_map)
 	MCFG_CPU_IO_MAP(neoprint_audio_io_map)
 
-	MCFG_UPD4990A_ADD("upd4990a", XTAL_32_768kHz, NOOP, NOOP)
+	MCFG_UPD4990A_ADD("upd4990a", XTAL(32'768), NOOP, NOOP)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", neoprint)

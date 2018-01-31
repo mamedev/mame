@@ -35,6 +35,7 @@ public:
 		: driver_device(mconfig, type, tag)
 	{ }
 
+	void sawatte(machine_config &config);
 protected:
 };
 
@@ -43,7 +44,7 @@ static INPUT_PORTS_START( sawatte )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( sawatte )
+MACHINE_CONFIG_START(sawatte_state::sawatte)
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "sawatte")
 MACHINE_CONFIG_END
 

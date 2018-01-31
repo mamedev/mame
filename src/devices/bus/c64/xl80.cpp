@@ -123,7 +123,7 @@ GFXDECODE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( c64_xl80_device::device_add_mconfig )
+MACHINE_CONFIG_START(c64_xl80_device::device_add_mconfig)
 	MCFG_SCREEN_ADD_MONOCHROME(MC6845_SCREEN_TAG, RASTER, rgb_t::white())
 	MCFG_SCREEN_UPDATE_DEVICE(HD46505SP_TAG, h46505_device, screen_update)
 	MCFG_SCREEN_SIZE(80*8, 24*8)
@@ -133,7 +133,7 @@ MACHINE_CONFIG_MEMBER( c64_xl80_device::device_add_mconfig )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", c64_xl80)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(HD46505SP_TAG, H46505, MC6845_SCREEN_TAG, XTAL_14_31818MHz / 8)
+	MCFG_MC6845_ADD(HD46505SP_TAG, H46505, MC6845_SCREEN_TAG, XTAL(14'318'181) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(c64_xl80_device, crtc_update_row)

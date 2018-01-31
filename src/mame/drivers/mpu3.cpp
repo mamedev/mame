@@ -165,7 +165,7 @@ TODO: - Distinguish door switches using manual
 
 #include "video/awpvid.h"       //Fruit Machines Only
 
-#define MPU3_MASTER_CLOCK (XTAL_4MHz)
+#define MPU3_MASTER_CLOCK (XTAL(4'000'000))
 
 /* Lookup table for CHR data */
 
@@ -267,6 +267,7 @@ public:
 	required_device<stepper_device> m_reel3;
 	required_device<meters_device> m_meters;
 	optional_device<roc10937_device> m_vfd;
+	void mpu3base(machine_config &config);
 };
 
 #define DISPLAY_PORT 0
@@ -757,7 +758,7 @@ WRITE8_MEMBER(mpu3_state::characteriser_w)
 	int x;
 	int call=data;
 	if (!m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
+		fatalerror("No Characteriser Table @ %04x\n", m_maincpu->pcbase());
 
 	if (offset == 0)
 	{
@@ -785,7 +786,7 @@ WRITE8_MEMBER(mpu3_state::characteriser_w)
 READ8_MEMBER(mpu3_state::characteriser_r)
 {
 	if (!m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
+		fatalerror("No Characteriser Table @ %04x\n", m_maincpu->pcbase());
 
 	if (offset == 0)
 	{
@@ -848,7 +849,7 @@ ADDRESS_MAP_END
 	MCFG_STEPPER_INDEX_PATTERN(0x00)\
 	MCFG_STEPPER_INIT_PHASE(2)
 
-static MACHINE_CONFIG_START( mpu3base )
+MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	MCFG_CPU_ADD("maincpu", M6808, MPU3_MASTER_CLOCK)///4)
 	MCFG_CPU_PROGRAM_MAP(mpu3_basemap)
 

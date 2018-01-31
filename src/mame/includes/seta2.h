@@ -22,6 +22,7 @@ public:
 	seta2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
+		m_sub(*this,"sub"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -42,6 +43,7 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_sub;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -128,6 +130,22 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
 
 	void funcube_debug_outputs();
+	void seta2(machine_config &config);
+	void funcube(machine_config &config);
+	void funcube3(machine_config &config);
+	void funcube2(machine_config &config);
+	void grdians(machine_config &config);
+	void myangel(machine_config &config);
+	void mj4simai(machine_config &config);
+	void penbros(machine_config &config);
+	void pzlbowl(machine_config &config);
+	void myangel2(machine_config &config);
+	void reelquak(machine_config &config);
+	void ablastb(machine_config &config);
+	void gundamex(machine_config &config);
+	void telpacfl(machine_config &config);
+	void samshoot(machine_config &config);
+	void namcostr(machine_config &config);
 };
 
 
@@ -149,6 +167,7 @@ public:
 
 	uint32_t staraudi_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void staraudi(machine_config &config);
 protected:
 	virtual void driver_start() override;
 

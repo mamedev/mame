@@ -168,6 +168,7 @@
 #include "cpu/m68000/m68000.h"
 #include "bus/vme/vme.h"
 #include "machine/z80scc.h"
+#include "machine/z8536.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 
@@ -185,7 +186,7 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-#define BAUDGEN_CLOCK XTAL_19_6608MHz /* Raltron */
+#define BAUDGEN_CLOCK XTAL(19'660'800) /* Raltron */
 #define SCC_CLOCK (BAUDGEN_CLOCK / 4) /* through a 74LS393 counter */
 
 class hk68v10_state : public driver_device
@@ -208,6 +209,7 @@ DECLARE_WRITE16_MEMBER (bootvect_w);
 virtual void machine_start () override;
 virtual void machine_reset () override;
 
+void hk68v10(machine_config &config);
 protected:
 
 private:
@@ -226,7 +228,7 @@ AM_RANGE (0x000000, 0x000007) AM_RAM AM_WRITE (bootvect_w)       /* After first 
 AM_RANGE (0x000008, 0x1fffff) AM_RAM /* 2 Mb RAM */
 AM_RANGE (0xFC0000, 0xFC3fff) AM_ROM /* System EPROM Area 16Kb HBUG */
 AM_RANGE (0xFC4000, 0xFDffff) AM_ROM /* System EPROM Area an additional 112Kb for System ROM */
-AM_RANGE (0xFE9000, 0xFE9009) AM_RAM //AM_DEVREADWRITE8("scc", scc8530_device, ba_cd_r, ba_cd_w, 0xffff) /* Z80-PIO? */
+AM_RANGE (0xFE9000, 0xFE9007) AM_DEVREADWRITE8("cio", z8536_device, read, write, 0xff00)
 AM_RANGE (0xFEA000, 0xFEA001) AM_DEVREADWRITE8("scc", scc8530_device, ca_r, ca_w, 0xff00) /* Dual serial port Z80-SCC */
 AM_RANGE (0xFEA002, 0xFEA003) AM_DEVREADWRITE8("scc", scc8530_device, cb_r, cb_w, 0xff00) /* Dual serial port Z80-SCC */
 AM_RANGE (0xFEA004, 0xFEA005) AM_DEVREADWRITE8("scc", scc8530_device, da_r, da_w, 0xff00) /* Dual serial port Z80-SCC */
@@ -277,8 +279,8 @@ READ16_MEMBER (hk68v10_state::bootvect_r){
 
 WRITE16_MEMBER (hk68v10_state::bootvect_w){
 	LOG (("%s offset %08x, mask %08x, data %04x\n", FUNCNAME, offset, mem_mask, data));
-	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
@@ -332,10 +334,12 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (hk68v10)
+MACHINE_CONFIG_START(hk68v10_state::hk68v10)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68010, XTAL_10MHz)
+	MCFG_CPU_ADD ("maincpu", M68010, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP (hk68v10_mem)
+
+	MCFG_DEVICE_ADD("cio", Z8536, SCC_CLOCK)
 
 	/* Terminal Port config */
 	MCFG_SCC8530_ADD("scc", SCC_CLOCK, 0, 0, 0, 0 )

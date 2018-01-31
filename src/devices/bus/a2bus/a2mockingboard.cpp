@@ -38,7 +38,7 @@ DEFINE_DEVICE_TYPE(A2BUS_ECHOPLUS,     a2bus_echoplus_device,     "a2echop",  "S
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_ayboard_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_ayboard_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
@@ -56,7 +56,7 @@ MACHINE_CONFIG_MEMBER( a2bus_ayboard_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( a2bus_phasor_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_phasor_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
@@ -79,7 +79,7 @@ MACHINE_CONFIG_MEMBER( a2bus_phasor_device::device_add_mconfig )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker2", 1.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( a2bus_echoplus_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_echoplus_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(VIA1_TAG, VIA6522, 1022727)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(a2bus_ayboard_device, via1_out_b))
@@ -145,9 +145,6 @@ a2bus_echoplus_device::a2bus_echoplus_device(const machine_config &mconfig, cons
 
 void a2bus_ayboard_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	save_item(NAME(m_porta1));
 	save_item(NAME(m_porta2));
 }
@@ -163,7 +160,6 @@ void a2bus_ayboard_device::device_reset()
 
 uint8_t a2bus_ayboard_device::read_cnxx(uint8_t offset)
 {
-//    logerror("Mockingboard(%d): read @ Cn%02X (PC=%x)\n", m_slot, offset, space.device().safe_pc());
 	if (m_isPhasor)
 	{
 		uint8_t retVal = 0;
@@ -229,8 +225,6 @@ void a2bus_ayboard_device::write_cnxx(uint8_t offset, uint8_t data)
 				viaSel = (offset & 0x80) ? 2 : 1;
 			}
 
-//            logerror("Phasor(%d): write %02x to Cn%02X (PC=%x) (native %d viaSel %d)\n", m_slot, data, offset, space.device().safe_pc(), m_PhasorNative ? 1 : 0, viaSel);
-
 			if (viaSel & 1)
 			{
 				m_via1->write(machine().dummy_space(), offset&0xf, data);
@@ -253,7 +247,7 @@ void a2bus_ayboard_device::write_cnxx(uint8_t offset, uint8_t data)
 		}
 		else
 		{
-			logerror("Mockingboard(%d): unk write %02x to Cn%02X (%s)\n", m_slot, data, offset, machine().describe_context());
+			logerror("Mockingboard(%d): unk write %02x to Cn%02X (%s)\n", slotno(), data, offset, machine().describe_context());
 		}
 	}
 }

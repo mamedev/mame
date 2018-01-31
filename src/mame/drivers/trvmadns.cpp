@@ -124,6 +124,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint8_t> m_generic_paletteram_8;
+	void trvmadns(machine_config &config);
 };
 
 
@@ -239,12 +240,12 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
 {
 	if(offset==0)
 	{
-		if(space.device().safe_pcbase()==0x29e9)// || space.device().safe_pcbase()==0x1b3f) //29f5
+		if(m_maincpu->pcbase()==0x29e9)// || m_maincpu->pcbase()==0x1b3f) //29f5
 		{
 			m_maincpu->set_input_line(0, HOLD_LINE);
 		}
 //      else
-//          logerror("%x \n", space.device().safe_pcbase());
+//          logerror("%x \n", m_maincpu->pcbase());
 
 	}
 
@@ -379,8 +380,8 @@ void trvmadns_state::machine_reset()
 	m_old_data = -1;
 }
 
-static MACHINE_CONFIG_START( trvmadns )
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4) // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
+MACHINE_CONFIG_START(trvmadns_state::trvmadns)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/4) // Most likely 2.5MHz (less likely 5MHz (10MHz/2))
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", trvmadns_state,  nmi_line_pulse)
@@ -402,7 +403,7 @@ static MACHINE_CONFIG_START( trvmadns )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_10MHz/2/4) //?
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(10'000'000)/2/4) //?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

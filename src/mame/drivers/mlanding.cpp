@@ -164,6 +164,7 @@ public:
 	uint32_t exec_dma();
 	void msm5205_update(int chip);
 
+	void mlanding(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -717,7 +718,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("sub_com_ram")
 	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(dma_start_w)
 	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(dma_stop_w)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x240004, 0x240005) AM_READNOP // Watchdog
 	AM_RANGE(0x240006, 0x240007) AM_READ(input_r)
 	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(power_ram_r, power_ram_w)
@@ -908,7 +909,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mlanding )
+MACHINE_CONFIG_START(mlanding_state::mlanding)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // Appears to be 68000P8 in PCB photo

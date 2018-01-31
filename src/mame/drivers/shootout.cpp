@@ -70,7 +70,7 @@ WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	// Allow the other CPU to reply. This fixes the missing music on the title screen (parent set).
-	space.device ().execute ().spin_until_time (attotime :: from_usec (200));
+	m_maincpu->spin_until_time (attotime :: from_usec (200));
 }
 
 WRITE8_MEMBER(shootout_state::flipscreen_w)
@@ -273,20 +273,20 @@ void shootout_state::machine_reset ()
 	m_ccnt_old_val = 0x40;
 }
 
-static MACHINE_CONFIG_START( shootout )
+MACHINE_CONFIG_START(shootout_state::shootout)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO_222, XTAL_12MHz / 6) // 2 MHz?
+	MCFG_CPU_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz?
 	MCFG_CPU_PROGRAM_MAP(shootout_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8) // 1.5 MHz
+	MCFG_CPU_ADD("audiocpu", M6502, XTAL(12'000'000) / 8) // 1.5 MHz
 	MCFG_CPU_PROGRAM_MAP(shootout_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 
 	// Guessed parameters based on the 12 MHz XTAL, but they seem resonable (TODO: Real PCB measurements)
-	MCFG_SCREEN_RAW_PARAMS (XTAL_12MHz / 2, 384, 0, 256, 262, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS (XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248)
 
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootout)
 	MCFG_SCREEN_PALETTE("palette")
@@ -300,23 +300,23 @@ static MACHINE_CONFIG_START( shootout )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz / 8) // 1.5 MHz
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( shootouj )
+MACHINE_CONFIG_START(shootout_state::shootouj)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
 	MCFG_CPU_PROGRAM_MAP(shootouj_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 
 	// Guessed parameters based on the 12 MHz XTAL, but they seem resonable (TODO: Real PCB measurements)
-	MCFG_SCREEN_RAW_PARAMS (XTAL_12MHz / 2, 384, 0, 256, 262, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS (XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 248)
 
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootouj)
 	MCFG_SCREEN_PALETTE("palette")
@@ -330,17 +330,17 @@ static MACHINE_CONFIG_START( shootouj )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz / 8) // 1.5 MHz (Assuming the same XTAL as DE-0219 pcb)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000) / 8) // 1.5 MHz (Assuming the same XTAL as DE-0219 pcb)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(shootout_state, bankswitch_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(shootout_state, flipscreen_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shootouk, shootouj )
+MACHINE_CONFIG_DERIVED(shootout_state::shootouk, shootouj)
 	/* the Korean 'bootleg' has the usual DECO222 style encryption */
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", DECO_222, XTAL_12MHz / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
+	MCFG_CPU_ADD("maincpu", DECO_222, XTAL(12'000'000) / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
 	MCFG_CPU_PROGRAM_MAP(shootouj_map)
 MACHINE_CONFIG_END
 

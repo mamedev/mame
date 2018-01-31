@@ -225,10 +225,11 @@ public:
 	required_ioport m_dial;
 	required_ioport m_dsw1;
 	required_ioport m_dsw2;
+	void sfkick(machine_config &config);
 };
 
 
-#define MASTER_CLOCK    XTAL_21_4772MHz
+#define MASTER_CLOCK    XTAL(21'477'272)
 
 
 READ8_MEMBER(sfkick_state::ppi_port_b_r)
@@ -579,7 +580,7 @@ WRITE_LINE_MEMBER(sfkick_state::irqhandler)
 	m_soundcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
 
-static MACHINE_CONFIG_START( sfkick )
+MACHINE_CONFIG_START(sfkick_state::sfkick)
 
 	MCFG_CPU_ADD("maincpu",Z80,MASTER_CLOCK/6)
 	MCFG_CPU_PROGRAM_MAP(sfkick_map)

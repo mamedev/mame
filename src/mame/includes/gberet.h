@@ -69,4 +69,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void gberetb(machine_config &config);
+	void mrgoemon(machine_config &config);
+	void gberet(machine_config &config);
 };

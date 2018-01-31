@@ -41,6 +41,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
+	void ertictac(machine_config &config);
 };
 
 
@@ -218,19 +219,19 @@ INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 #define NVRAM_SIZE 256
 #define NVRAM_PAGE_SIZE 0   /* max size of one write request */
 
-static MACHINE_CONFIG_START( ertictac )
+MACHINE_CONFIG_START(ertictac_state::ertictac)
 
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_24MHz/3) /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(24'000'000)/3) /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
 	MCFG_CPU_PROGRAM_MAP(ertictac_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ertictac_state, ertictac_podule_irq, 60) // FIXME: timing of this
 
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_PAGE_SIZE(NVRAM_PAGE_SIZE)
 	MCFG_I2CMEM_DATA_SIZE(NVRAM_SIZE)
-//  MCFG_AAKART_ADD("kart", XTAL_24MHz/3) // TODO: frequency
+//  MCFG_AAKART_ADD("kart", XTAL(24'000'000)/3) // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz,1024,0,735,624/2,0,292) // RiscOS 3 default screen settings
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000),1024,0,735,624/2,0,292) // RiscOS 3 default screen settings
 	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x200)

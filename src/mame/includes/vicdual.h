@@ -158,6 +158,40 @@ public:
 	int get_vcounter();
 	int is_cabinet_color();
 	virtual pen_t choose_pen(uint8_t x, uint8_t y, pen_t back_pen);
+	void vicdual_root(machine_config &config);
+	void vicdual_dualgame_root(machine_config &config);
+	void heiankyo(machine_config &config);
+	void headon(machine_config &config);
+	void headon_audio(machine_config &config);
+	void sspacaho(machine_config &config);
+	void headonn(machine_config &config);
+	void invho2(machine_config &config);
+	void frogs(machine_config &config);
+	void frogs_audio(machine_config &config);
+	void headons(machine_config &config);
+	void invinco(machine_config &config);
+	void invinco_audio(machine_config &config);
+	void invds(machine_config &config);
+	void headon2(machine_config &config);
+	void carnival(machine_config &config);
+	void carnival_audio(machine_config &config);
+	void pulsar(machine_config &config);
+	void pulsar_audio(machine_config &config);
+	void spacetrk(machine_config &config);
+	void headon2bw(machine_config &config);
+	void safari(machine_config &config);
+	void brdrline(machine_config &config);
+	void brdrline_audio(machine_config &config);
+	void carnivalh(machine_config &config);
+	void samurai(machine_config &config);
+	void sspaceat(machine_config &config);
+	void digger(machine_config &config);
+	void depthch(machine_config &config);
+	void depthch_audio(machine_config &config);
+	void carhntds(machine_config &config);
+	void alphaho(machine_config &config);
+	void tranqgun(machine_config &config);
+	void tranqgun_audio(machine_config &config);
 };
 
 class nsub_state : public vicdual_state
@@ -186,4 +220,5 @@ public:
 	DECLARE_MACHINE_RESET(nsub);
 
 	virtual pen_t choose_pen(uint8_t x, uint8_t y, pen_t back_pen) override;
+	void nsub(machine_config &config);
 };

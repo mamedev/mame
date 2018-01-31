@@ -102,6 +102,8 @@
 #define OPTION_USE_BEZELS           "use_bezels"
 #define OPTION_USE_CPANELS          "use_cpanels"
 #define OPTION_USE_MARQUEES         "use_marquees"
+#define OPTION_FALLBACK_ARTWORK     "fallback_artwork"
+#define OPTION_OVERRIDE_ARTWORK     "override_artwork"
 
 // core screen options
 #define OPTION_BRIGHTNESS           "brightness"
@@ -168,6 +170,7 @@
 #define OPTION_UI_FONT              "uifont"
 #define OPTION_UI                   "ui"
 #define OPTION_RAMSIZE              "ramsize"
+#define OPTION_NVRAM_SAVE           "nvram_save"
 
 // core comm options
 #define OPTION_COMM_LOCAL_HOST      "comm_localhost"
@@ -380,6 +383,8 @@ public:
 	bool use_bezels() const { return bool_value(OPTION_USE_BEZELS); }
 	bool use_cpanels() const { return bool_value(OPTION_USE_CPANELS); }
 	bool use_marquees() const { return bool_value(OPTION_USE_MARQUEES); }
+	const char *fallback_artwork() const { return value(OPTION_FALLBACK_ARTWORK); }
+	const char *override_artwork() const { return value(OPTION_OVERRIDE_ARTWORK); }
 
 	// core screen options
 	float brightness() const { return float_value(OPTION_BRIGHTNESS); }
@@ -444,6 +449,7 @@ public:
 	const char *ui_font() const { return value(OPTION_UI_FONT); }
 	ui_option ui() const { return m_ui; }
 	const char *ram_size() const { return value(OPTION_RAMSIZE); }
+	bool nvram_save() const { return bool_value(OPTION_NVRAM_SAVE); }
 
 	// core comm options
 	const char *comm_localhost() const { return value(OPTION_COMM_LOCAL_HOST); }

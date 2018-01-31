@@ -55,6 +55,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
+	void bingowav(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -103,11 +104,12 @@ static INPUT_PORTS_START( bingowav )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( bingowav )
+MACHINE_CONFIG_START(bingowav_state::bingowav)
 	MCFG_CPU_ADD("maincpu", M68000, 12000000) // actually TMP63803F-16
 	MCFG_CPU_PROGRAM_MAP(bingowav_main_map)
 
 	MCFG_DEVICE_ADD("maintmp", TMP68301, 0) // wrong
+	MCFG_TMP68301_CPU("maincpu")
 
 	MCFG_DEVICE_ADD("mainioh", TE7750, 0)
 	MCFG_TE7750_IOS_CB(CONSTANT(5))
@@ -134,7 +136,7 @@ static MACHINE_CONFIG_START( bingowav )
 	MCFG_CPU_PROGRAM_MAP(bingowav_drive_map)
 	MCFG_DEVICE_DISABLE()
 
-	MCFG_CPU_ADD("ctrlcpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("ctrlcpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(bingowav_control_map)
 MACHINE_CONFIG_END
 

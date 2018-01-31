@@ -231,7 +231,7 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-#define DUSCC_CLOCK XTAL_14_7456MHz /* Verified */
+#define DUSCC_CLOCK XTAL(14'745'600) /* Verified */
 
 class cpu30_state : public driver_device
 {
@@ -292,6 +292,16 @@ cpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	DECLARE_DRIVER_INIT(cpu30lite4);
 	DECLARE_DRIVER_INIT(cpu30lite8);
 	DECLARE_DRIVER_INIT(cpu33);
+	void cpu30(machine_config &config);
+	void cpu30x(machine_config &config);
+	void cpu30zbe(machine_config &config);
+	void cpu30be8(machine_config &config);
+	void cpu30za(machine_config &config);
+	void cpu30lite4(machine_config &config);
+	void cpu30xa(machine_config &config);
+	void cpu33(machine_config &config);
+	void cpu30lite8(machine_config &config);
+	void cpu30be16(machine_config &config);
 protected:
 
 private:
@@ -414,8 +424,8 @@ READ32_MEMBER (cpu30_state::bootvect_r){
 
 WRITE32_MEMBER (cpu30_state::bootvect_w){
 	LOG("%s\n", FUNCNAME);
-	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
-	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] &= ~mem_mask;
+	m_sysram[offset % ARRAY_LENGTH(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcoming accesses to masking RAM until reset.
 }
 
@@ -643,9 +653,9 @@ SLOT_INTERFACE_END
 /*
  * Machine configuration
  */
-static MACHINE_CONFIG_START (cpu30)
+MACHINE_CONFIG_START(cpu30_state::cpu30)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68030, XTAL_25MHz)
+	MCFG_CPU_ADD ("maincpu", M68030, XTAL(25'000'000))
 	MCFG_CPU_PROGRAM_MAP (cpu30_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("fga002", fga002_device, iack)
 	MCFG_NVRAM_ADD_0FILL("nvram")
@@ -715,7 +725,7 @@ static MACHINE_CONFIG_START (cpu30)
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("duscc", duscc68562_device, ctsa_w))
 
 	/* PIT Parallel Interface and Timer device, assumed strapped for on board clock */
-	MCFG_DEVICE_ADD ("pit1", PIT68230, XTAL_16MHz / 2) // The PIT clock is not verified on schema but reversed from behaviour
+	MCFG_DEVICE_ADD ("pit1", PIT68230, XTAL(16'000'000) / 2) // The PIT clock is not verified on schema but reversed from behaviour
 	MCFG_PIT68230_PA_INPUT_CB(READ8(cpu30_state, rotary_rd))
 	MCFG_PIT68230_PB_INPUT_CB(READ8(cpu30_state, flop_dmac_r))
 	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(cpu30_state, flop_dmac_w))
@@ -723,7 +733,7 @@ static MACHINE_CONFIG_START (cpu30)
 	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(cpu30_state, pit1c_w))
 //  MCFG_PIT68230_TIMER_IRQ_CB(DEVWRITELINE("fga002", fga002_device, lirq2_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
-	MCFG_DEVICE_ADD ("pit2", PIT68230, XTAL_16MHz / 2) // Th PIT clock is not verified on schema but reversed from behaviour
+	MCFG_DEVICE_ADD ("pit2", PIT68230, XTAL(16'000'000) / 2) // Th PIT clock is not verified on schema but reversed from behaviour
 	MCFG_PIT68230_PB_INPUT_CB(READ8(cpu30_state, board_mem_id_rd))
 	MCFG_PIT68230_PA_INPUT_CB(READ8(cpu30_state, pit2a_r))
 	MCFG_PIT68230_PA_OUTPUT_CB(WRITE8(cpu30_state, pit2a_w))
@@ -738,7 +748,7 @@ static MACHINE_CONFIG_START (cpu30)
 	MCFG_FGA002_OUT_LIACK5_CB(DEVREAD8("duscc2",  duscc_device, iack))
 
 	// RTC
-	MCFG_DEVICE_ADD("rtc", RTC72423, XTAL_32_768kHz) // Fake crystal value, the 72423 uses it own internal crystal
+	MCFG_DEVICE_ADD("rtc", RTC72423, XTAL(32'768)) // Fake crystal value, the 72423 uses it own internal crystal
 	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("fga002", fga002_device, lirq0_w))
 
 	// dual ported ram
@@ -748,9 +758,9 @@ static MACHINE_CONFIG_START (cpu30)
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30X Part No.1 01300: 16.7 MHz 68030 based CPU board with 68882 FPCP, DMAC, 1 Mbyte Dual Ported RAM capacity and VMEPROM. */
-static MACHINE_CONFIG_DERIVED( cpu30x, cpu30 )
+MACHINE_CONFIG_DERIVED(cpu30_state::cpu30x, cpu30)
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL_16_777216MHz) /* 16.7 MHz  from description, crystal needs verification */
+	MCFG_DEVICE_CLOCK(XTAL(16'777'216)) /* 16.7 MHz  from description, crystal needs verification */
 
 //  MCFG_DEVICE_REMOVE("")
 
@@ -761,15 +771,15 @@ static MACHINE_CONFIG_DERIVED( cpu30x, cpu30 )
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30XA Part No.1 01301: 20.0 MHz 68030 based CPU board with 68882 FPCP, DMAC, 1 Mbyte Dual Ported RAM capacity and VMEPROM. Documentation included.*/
-static MACHINE_CONFIG_DERIVED( cpu30xa, cpu30x )
+MACHINE_CONFIG_DERIVED(cpu30_state::cpu30xa, cpu30x)
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL_20MHz) /* 20.0 MHz  from description, crystal needs verification */
+	MCFG_DEVICE_CLOCK(XTAL(20'000'000)) /* 20.0 MHz  from description, crystal needs verification */
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30ZA Part No.1 01302: 20.0 MHz 68030 based CPU board with 68882 FPCP, DMAC, 4 Mbyte Dual Ported RAM capacity and VMEPROM. Documentation included.*/
-static MACHINE_CONFIG_DERIVED( cpu30za, cpu30xa )
+MACHINE_CONFIG_DERIVED(cpu30_state::cpu30za, cpu30xa)
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL_20MHz) /* 20.0 MHz  from description, crystal needs verification */
+	MCFG_DEVICE_CLOCK(XTAL(20'000'000)) /* 20.0 MHz  from description, crystal needs verification */
 
 	// dual ported ram
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -778,9 +788,9 @@ static MACHINE_CONFIG_DERIVED( cpu30za, cpu30xa )
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30ZBE 68030/68882 CPU, 25 MHz,  4 Mbyte shared DRAM, 4 Mbyte Flash, SCSI, Ethernet, Floppy disk, 4 serial I/O ports, 32-bit VMEbus interface */
-static MACHINE_CONFIG_DERIVED( cpu30zbe, cpu30za )
+MACHINE_CONFIG_DERIVED(cpu30_state::cpu30zbe, cpu30za)
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL_25MHz) /* 25.0 MHz  from description, crystal needs verification */
+	MCFG_DEVICE_CLOCK(XTAL(25'000'000)) /* 25.0 MHz  from description, crystal needs verification */
 
 	// dual ported ram
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -789,9 +799,9 @@ static MACHINE_CONFIG_DERIVED( cpu30zbe, cpu30za )
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-33 */
-static MACHINE_CONFIG_DERIVED( cpu33, cpu30zbe )
+MACHINE_CONFIG_DERIVED(cpu30_state::cpu33, cpu30zbe)
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL_25MHz) /* 25.0 MHz  from description, crystal needs verification */
+	MCFG_DEVICE_CLOCK(XTAL(25'000'000)) /* 25.0 MHz  from description, crystal needs verification */
 
 	// dual ported ram
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -800,7 +810,7 @@ static MACHINE_CONFIG_DERIVED( cpu33, cpu30zbe )
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30BE/8 68030/68882 CPU, 25 MHz,  8 Mbyte shared DRAM, 4 Mbyte Flash, SCSI, Ethernet, Floppy disk, 4 serial I/O ports, 32-bit VMEbus interface, VMEPROM firmware*/
-static MACHINE_CONFIG_DERIVED( cpu30be8, cpu30zbe )
+MACHINE_CONFIG_DERIVED(cpu30_state::cpu30be8, cpu30zbe)
 	// dual ported ram
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8M")
@@ -808,7 +818,7 @@ static MACHINE_CONFIG_DERIVED( cpu30be8, cpu30zbe )
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30BE/16 68030/68882 CPU, 25 MHz, 16 Mbyte shared DRAM, 4 Mbyte Flash, SCSI, Ethernet, Floppy disk, 4 serial I/O ports, 32-bit VMEbus interface, VMEPROM firmware*/
-static MACHINE_CONFIG_DERIVED( cpu30be16, cpu30zbe )
+MACHINE_CONFIG_DERIVED(cpu30_state::cpu30be16, cpu30zbe)
 	// dual ported ram
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16M")
@@ -816,7 +826,7 @@ static MACHINE_CONFIG_DERIVED( cpu30be16, cpu30zbe )
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30Lite/4 68030 CPU, 25 MHz, 4 Mbyte shared DRAM, 4 Mbyte Flash, 4 serial ports, 32-bit VMEbus interface, VMEPROM firmware. */
-static MACHINE_CONFIG_DERIVED( cpu30lite4, cpu30zbe )
+MACHINE_CONFIG_DERIVED(cpu30_state::cpu30lite4, cpu30zbe)
 // Enable these when added to main config
 //  MCFG_DEVICE_REMOVE("fpu")
 //  MCFG_DEVICE_REMOVE("scsi")
@@ -829,7 +839,7 @@ static MACHINE_CONFIG_DERIVED( cpu30lite4, cpu30zbe )
 MACHINE_CONFIG_END
 
 /* SYS68K/CPU-30Lite/8 68030 CPU, 25 MHz, 4 Mbyte shared DRAM, 8 Mbyte Flash, 4 serial ports, 32-bit VMEbus interface, VMEPROM firmware. */
-static MACHINE_CONFIG_DERIVED( cpu30lite8, cpu30lite4 )
+MACHINE_CONFIG_DERIVED(cpu30_state::cpu30lite8, cpu30lite4)
 	// dual ported ram
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8M")

@@ -44,6 +44,8 @@ public:
 	DECLARE_PALETTE_INIT(rt1715);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 
+	void rt1715(machine_config &config);
+	void rt1715w(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -272,9 +274,9 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_START( rt1715 )
+MACHINE_CONFIG_START(rt1715_state::rt1715)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_2_4576MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(2'457'600))
 	MCFG_CPU_PROGRAM_MAP(rt1715_mem)
 	MCFG_CPU_IO_MAP(rt1715_io)
 	MCFG_Z80_DAISY_CHAIN(rt1715_daisy_chain)
@@ -297,17 +299,17 @@ static MACHINE_CONFIG_START( rt1715 )
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(rt1715_state, rt1715)
 
-	MCFG_DEVICE_ADD("a26", I8275, XTAL_2_4576MHz)
+	MCFG_DEVICE_ADD("a26", I8275, XTAL(2'457'600))
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(rt1715_state, crtc_display_pixels)
 
-	MCFG_DEVICE_ADD("a30", Z80CTC, XTAL_10MHz/4 /* ? */)
+	MCFG_DEVICE_ADD("a30", Z80CTC, XTAL(10'000'000)/4 /* ? */)
 
-	MCFG_DEVICE_ADD("a29", Z80SIO, XTAL_10MHz/4 /* ? */)
+	MCFG_DEVICE_ADD("a29", Z80SIO, XTAL(10'000'000)/4 /* ? */)
 
 	/* floppy */
-	MCFG_DEVICE_ADD("a71", Z80PIO, XTAL_10MHz/4 /* ? */)
-	MCFG_DEVICE_ADD("a72", Z80PIO, XTAL_10MHz/4 /* ? */)
+	MCFG_DEVICE_ADD("a71", Z80PIO, XTAL(10'000'000)/4 /* ? */)
+	MCFG_DEVICE_ADD("a72", Z80PIO, XTAL(10'000'000)/4 /* ? */)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -315,7 +317,7 @@ static MACHINE_CONFIG_START( rt1715 )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rt1715w, rt1715 )
+MACHINE_CONFIG_DERIVED(rt1715_state::rt1715w, rt1715)
 MACHINE_CONFIG_END
 
 

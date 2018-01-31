@@ -27,6 +27,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void neptunp2(machine_config &config);
 protected:
 
 	// devices
@@ -92,7 +93,7 @@ static GFXDECODE_START( neptunp2 )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( neptunp2 )
+MACHINE_CONFIG_START(neptunp2_state::neptunp2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I80188,20000000) // N80C188-20 AMD

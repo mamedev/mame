@@ -212,12 +212,6 @@
 ***************************************************************************/
 
 
-#define MASTER_CLOCK    XTAL_12MHz
-#define CPU_CLOCK       MASTER_CLOCK / 4
-#define PSG_CLOCK       MASTER_CLOCK / 4
-#define AY_CLOCK        MASTER_CLOCK / 8
-#define OKI_CLOCK       1056000     /* unverified resonator */
-
 #include "emu.h"
 #include "includes/goldstar.h"
 
@@ -253,6 +247,17 @@
 #include "skill98.lh"
 #include "tonypok.lh"
 #include "unkch.lh"
+
+namespace {
+
+constexpr XTAL MASTER_CLOCK = 12_MHz_XTAL;
+constexpr XTAL CPU_CLOCK    = MASTER_CLOCK / 4;
+constexpr XTAL PSG_CLOCK    = MASTER_CLOCK / 4;
+constexpr XTAL AY_CLOCK     = MASTER_CLOCK / 8;
+#define OKI_CLOCK       1056000      /* unverified resonator */
+
+}
+
 
 
 WRITE8_MEMBER(goldstar_state::protection_w)
@@ -353,7 +358,7 @@ static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xf900, 0xf900) AM_WRITE(p1_lamps_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
 	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xfd00, 0xfdff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xfd00, 0xfdff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
@@ -390,8 +395,6 @@ static ADDRESS_MAP_START( star100_map, AS_PROGRAM, 8, sanghopm_state )
 
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
-
-	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
 ADDRESS_MAP_END
 
@@ -882,6 +885,7 @@ static ADDRESS_MAP_START( lucky8_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb850, 0xb850) AM_WRITE(p1_lamps_w)
 	AM_RANGE(0xb860, 0xb860) AM_WRITE(p2_lamps_w)
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE("snsnd", sn76489_device, write)    /* sound */
+	AM_RANGE(0xc000, 0xf7ff) AM_ROM  // could be used by some sets like super972.
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1107,8 +1111,8 @@ ADDRESS_MAP_END
 /* newer / more capable hw */
 static ADDRESS_MAP_START( unkch_map, AS_PROGRAM, 8, unkch_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xc800, 0xc9ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
 
@@ -1257,7 +1261,6 @@ static ADDRESS_MAP_START( bonusch_map, AS_PROGRAM, 8, unkch_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM     // ok
 
 	AM_RANGE(0xd800, 0xdfff) AM_RAM //AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_SHARE("fg_vidram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_SHARE("fg_atrram")
@@ -8059,7 +8062,7 @@ WRITE8_MEMBER(goldstar_state::ay8910_outputb_w)
 }
 
 
-static MACHINE_CONFIG_START( goldstar )
+MACHINE_CONFIG_START(goldstar_state::goldstar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8096,7 +8099,7 @@ static MACHINE_CONFIG_START( goldstar )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( goldstbl )
+MACHINE_CONFIG_START(goldstar_state::goldstbl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8131,16 +8134,16 @@ static MACHINE_CONFIG_START( goldstbl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( moonlght, goldstbl )
+MACHINE_CONFIG_DERIVED(goldstar_state::moonlght, goldstbl)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", ml)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( goldfrui, goldstbl )
+MACHINE_CONFIG_DERIVED(goldstar_state::goldfrui, goldstbl)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", goldfrui)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( star100 )
+MACHINE_CONFIG_START(sanghopm_state::star100)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8179,7 +8182,7 @@ static MACHINE_CONFIG_START( star100 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( super9 )
+MACHINE_CONFIG_START(goldstar_state::super9)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8277,7 +8280,7 @@ PALETTE_INIT_MEMBER(goldstar_state, lucky8)
 }
 
 
-static MACHINE_CONFIG_START( ncb3 )
+MACHINE_CONFIG_START(cb3_state::ncb3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8326,28 +8329,28 @@ static MACHINE_CONFIG_START( ncb3 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cb3c, ncb3 )
+MACHINE_CONFIG_DERIVED(cb3_state::cb3c, ncb3)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cb3c)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cb3e, ncb3 )
+MACHINE_CONFIG_DERIVED(cb3_state::cb3e, ncb3)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cb3e)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chrygld, ncb3 )
+MACHINE_CONFIG_DERIVED(cb3_state::chrygld, ncb3)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", chry10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cherrys, ncb3 )
+MACHINE_CONFIG_DERIVED(cb3_state::cherrys, ncb3)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cherrys)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cm97, ncb3 )
+MACHINE_CONFIG_DERIVED(cb3_state::cm97, ncb3)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cm97)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( wcherry )
+MACHINE_CONFIG_START(goldstar_state::wcherry)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8396,7 +8399,7 @@ static MACHINE_CONFIG_START( wcherry )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cm )
+MACHINE_CONFIG_START(cmaster_state::cm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8438,12 +8441,12 @@ static MACHINE_CONFIG_START( cm )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( cmasterc, cm )
+MACHINE_CONFIG_DERIVED(cmaster_state::cmasterc, cm)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cmasterc)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cmast91 )
+MACHINE_CONFIG_START(goldstar_state::cmast91)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8493,7 +8496,7 @@ INTERRUPT_GEN_MEMBER(wingco_state::masked_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( lucky8 )
+MACHINE_CONFIG_START(wingco_state::lucky8)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8548,7 +8551,7 @@ static MACHINE_CONFIG_START( lucky8 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bingowng )
+MACHINE_CONFIG_START(wingco_state::bingowng)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8602,12 +8605,12 @@ static MACHINE_CONFIG_START( bingowng )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bingownga, bingowng )
+MACHINE_CONFIG_DERIVED(wingco_state::bingownga, bingowng)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bingownga)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( flam7_w4, lucky8 )
+MACHINE_CONFIG_DERIVED(wingco_state::flam7_w4, lucky8)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
@@ -8618,7 +8621,7 @@ static MACHINE_CONFIG_DERIVED( flam7_w4, lucky8 )
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
+MACHINE_CONFIG_DERIVED(wingco_state::flaming7, lucky8)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
@@ -8632,7 +8635,7 @@ static MACHINE_CONFIG_DERIVED( flaming7, lucky8 )
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( flam7_tw, lucky8 )
+MACHINE_CONFIG_DERIVED(wingco_state::flam7_tw, lucky8)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(flaming7_map)
@@ -8646,7 +8649,7 @@ static MACHINE_CONFIG_DERIVED( flam7_tw, lucky8 )
 	MCFG_DS2401_ADD("fl7w4_id")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbstar, lucky8 )
+MACHINE_CONFIG_DERIVED(wingco_state::mbstar, lucky8)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mbstar_map)
@@ -8670,7 +8673,7 @@ PALETTE_INIT_MEMBER(wingco_state, magodds)
 	}
 }
 
-static MACHINE_CONFIG_START( magodds )
+MACHINE_CONFIG_START(wingco_state::magodds)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8725,7 +8728,7 @@ static MACHINE_CONFIG_START( magodds )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( kkotnoli )
+MACHINE_CONFIG_START(goldstar_state::kkotnoli)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8769,7 +8772,7 @@ static MACHINE_CONFIG_START( kkotnoli )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ladylinr )
+MACHINE_CONFIG_START(goldstar_state::ladylinr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8812,7 +8815,7 @@ static MACHINE_CONFIG_START( ladylinr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( wcat3 )
+MACHINE_CONFIG_START(wingco_state::wcat3)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8869,7 +8872,7 @@ MACHINE_CONFIG_END
 
 
 /* diff with cm machine driver: gfxdecode, OKI & portmap */
-static MACHINE_CONFIG_START( amcoe1 )
+MACHINE_CONFIG_START(cmaster_state::amcoe1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8916,7 +8919,7 @@ MACHINE_CONFIG_END
 
 
 /* diff with cm machine driver: gfxdecode, OKI, portmap & tilemaps rect size/position */
-static MACHINE_CONFIG_DERIVED( amcoe1a, amcoe1 )
+MACHINE_CONFIG_DERIVED(cmaster_state::amcoe1a, amcoe1)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -8925,7 +8928,7 @@ MACHINE_CONFIG_END
 
 
 /* diff with cm machine driver: gfxdecode, AY8910 volume & portmap */
-static MACHINE_CONFIG_START( amcoe2 )
+MACHINE_CONFIG_START(cmaster_state::amcoe2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -8967,7 +8970,7 @@ static MACHINE_CONFIG_START( amcoe2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00) /* analyzed for clips */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nfm, amcoe2 )
+MACHINE_CONFIG_DERIVED(cmaster_state::nfm, amcoe2)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -8983,7 +8986,7 @@ INTERRUPT_GEN_MEMBER(unkch_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( unkch )
+MACHINE_CONFIG_START(unkch_state::unkch)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -9022,7 +9025,7 @@ MACHINE_CONFIG_END
 
 
 // hw unknown - should be somewhat similar to cm
-static MACHINE_CONFIG_START( pkrmast )
+MACHINE_CONFIG_START(goldstar_state::pkrmast)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -9055,7 +9058,7 @@ static MACHINE_CONFIG_START( pkrmast )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( megaline )
+MACHINE_CONFIG_START(unkch_state::megaline)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -9105,15 +9108,15 @@ static MACHINE_CONFIG_START( megaline )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bonusch )
+MACHINE_CONFIG_START(unkch_state::bonusch)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, 12_MHz_XTAL / 2)
 	MCFG_CPU_PROGRAM_MAP(bonusch_map)
 	MCFG_CPU_IO_MAP(bonusch_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goldstar_state,  nmi_line_pulse)
 
-	MCFG_CPU_ADD("mcu", I80C51, XTAL_12MHz)
+	MCFG_CPU_ADD("mcu", I80C51, 12_MHz_XTAL)
 	MCFG_DEVICE_DISABLE()
 
 	/* video hardware */
@@ -10836,7 +10839,7 @@ ROM_END
 
 */
 ROM_START( lucky8 )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8",   0x0000, 0x4000, CRC(a187573e) SHA1(864627502025dbc83a0049fc98505655cec7b181) )
 	ROM_LOAD( "9",   0x4000, 0x4000, CRC(6f62672e) SHA1(05662ef1a70f93b09e48de497b049a282f070735) )
 
@@ -10917,7 +10920,7 @@ Seems to be related to timing since once patched the game is very fast.
 
 */
 ROM_START( lucky8a )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	// we have to patch this, it might be bad
 	ROM_LOAD( "1",  0x0000, 0x8000, BAD_DUMP CRC(554cddff) SHA1(8a0678993c7010f70adc9e9443b51cf5929bf110) ) // sldh
 
@@ -10956,7 +10959,7 @@ ROM_END
 
 */
 ROM_START( lucky8b )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8.bin",  0x0000, 0x8000, CRC(ab7c58f2) SHA1(74782772bcc91178fa381074ddca99e0515f7693) ) // sldh
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -10986,7 +10989,7 @@ ROM_END
 
 
 ROM_START( lucky8c )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8.bin",   0x0000, 0x8000, CRC(6890f8d8) SHA1(7e9d974acf199c78972299bfa3e275a30a3f6eaa) ) // sldh
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -11017,7 +11020,7 @@ ROM_END
 
 
 ROM_START( lucky8d )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8-40%.bin",   0x0000, 0x4000, CRC(4c79db5a) SHA1(b959030856f54776841092c4c2bccc6565faa587) )
 	ROM_LOAD( "9-40%.bin",   0x4000, 0x4000, CRC(fb0d511f) SHA1(c2c1868339d4f20bf1f5d6b66802e8f8deed4611) )
 
@@ -11107,7 +11110,7 @@ but merged in only one 27128 EPROM instead of two.
 
 */
 ROM_START( lucky8e )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27256.8",   0x0000, 0x8000, CRC(65decc53) SHA1(100f26ef796557182ba894d1e30b18ac58a793be) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -11249,7 +11252,7 @@ ROM_END
 
 */
 ROM_START( ns8lines )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8.bin",  0x0000, 0x8000, CRC(ab7c58f2) SHA1(74782772bcc91178fa381074ddca99e0515f7693) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -11310,7 +11313,7 @@ ROM_END
 
 */
 ROM_START( ns8linew )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "f5-8.14b",   0x0000, 0x8000, CRC(63dd3005) SHA1(62d71dbfa0a00c6b050db067ad55e80225e1589d) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -11468,7 +11471,7 @@ ROM_END
 
 */
 ROM_START( ns8linewa )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8.13b",   0x0000, 0x8000, CRC(c5692077) SHA1(423e0fe49ac450f22e693d9ac5ac1c3c662b17d3) )  // no match...
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -11512,7 +11515,7 @@ ROM_END
   Program ROM is different.
 */
 ROM_START( ns8linesa )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "8__27c256_main.14b",  0x0000, 0x8000, CRC(a3574e81) SHA1(60b037d2cfbad495897fa3e0fe6f6b81143103c6) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -11542,6 +11545,45 @@ ROM_START( ns8linesa )
 
 	ROM_REGION( 0x20, "unkprom2", 0 )  // Taken from ns8lines. Seems to match 100%.
 	ROM_LOAD( "u1.bin", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+
+/*
+  Super 97-2
+
+  Code jumps above $C000, so offset range C000-F7FF was defined
+  as ROM space. However, the game isn't working due to the high
+  memory code looks strange. Maybe the program needs some sort
+  of address/data descramble...
+
+*/
+ROM_START( super972 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "subboard_27c512.bin",   0x0000, 0x10000, CRC(e5316735) SHA1(fc39a72e0146bb1190ccdeaec5eb59f779d0a3f7) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5_27c256.bin",  0x00000, 0x8000, CRC(19713d36) SHA1(ae04b8b72b0c9a279f24d7c4d619bac4629d9a4f) )
+	ROM_LOAD( "6_27c256.bin",  0x08000, 0x8000, CRC(576197b9) SHA1(22273365cfe181f95efb895a28825f388b901a49) )
+	ROM_LOAD( "7_27c256.bin",  0x10000, 0x8000, CRC(7a21f08b) SHA1(5795d06dcbbaee91e02dcc2e99451954ff45f768) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1_27c64.bin",  0x0000, 0x2000, CRC(b45f41e2) SHA1(890c94c802f5ada97bc73f5a7a09e69c3207966c) )
+	ROM_LOAD( "2_27c64.bin",  0x2000, 0x2000, CRC(0463413a) SHA1(061b8335fdd44767e8c1832f5b5101276ad0f689) )
+	ROM_LOAD( "3_27c64.bin",  0x4000, 0x2000, CRC(b4e58020) SHA1(5c0fcc4b5d484ca7de5f2bd568a391a45967a9cc) )
+	ROM_LOAD( "4_27c64.bin",  0x6000, 0x2000, CRC(0a25964b) SHA1(d41eda201bb01229fb6e2ff437196dd65eebe577) )
+
+	ROM_REGION( 0x200, "proms", 0 ) /* proper dumps */
+	ROM_LOAD( "dm74s287.g13", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "dm74s287.g14", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "dm74s288.d13", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "dm74s287.f3",  0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "dm74s288.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
 
@@ -11703,7 +11745,7 @@ ROM_END
     Game seems to be meant for progressive modes...
 */
 ROM_START( luckybar )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c256_subboard.ic4",   0x0000, 0x8000, CRC(b987115b) SHA1(1c2f6369170c9667996e5dde8ac93100a7234e19) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -11822,7 +11864,7 @@ ROM_END
 
 ******************************************************************************/
 ROM_START( luckylad )
-	ROM_REGION( 0x8000, "maincpu", 0 )  /* encrypted CPU */
+	ROM_REGION( 0x10000, "maincpu", 0 )  /* encrypted CPU */
 	ROM_LOAD( "18.b12",  0x0000, 0x4000, CRC(2d178126) SHA1(5fc490e115e5c9073a7e3f56894fe19be6adb2b5) )
 	ROM_LOAD( "19.b13",  0x4000, 0x4000, CRC(ad02b9fd) SHA1(1a85da2d418350e5cebdb889fa146565a72f37c4) )
 
@@ -11885,7 +11927,7 @@ ROM_END
 
 */
 ROM_START( bingowng )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bingo9.14b", 0x0000, 0x8000, CRC(e041092e) SHA1(2aa3e7af08c336e49bed817ddad7c3604398e296) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -11915,7 +11957,7 @@ ROM_END
 
 
 ROM_START( bingownga )  /* This set is coming from Dumping Union */
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bingo.14b",  0x0000, 0x8000, CRC(e041092e) SHA1(2aa3e7af08c336e49bed817ddad7c3604398e296) )  // identical halves, same original program
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
@@ -16085,6 +16127,7 @@ GAMEL( 198?, ns8lines,  0,        lucky8,   lucky8b,  wingco_state,   0,        
 GAMEL( 1985, ns8linesa, ns8lines, lucky8,   lucky8b,  wingco_state,   0,         ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,  ns8lines, lucky8,   ns8linew, wingco_state,   0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
 GAMEL( 198?, ns8linewa, ns8lines, lucky8,   ns8linwa, wingco_state,   0,         ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // only 1 control set...
+GAMEL( 198?, super972,  ns8lines, lucky8,   ns8linew, wingco_state,   0,         ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 MACHINE_NOT_WORKING,   layout_lucky8 )    // ???
 GAME(  198?, luckybar,  0,        lucky8,   ns8linew, wingco_state,   0,         ROT0, "<unknown>",         "Lucky Bar (W-4 with mc68705 MCU)",                         MACHINE_NOT_WORKING )  // MC68705 MCU
 GAME(  198?, chryangla, ncb3,     lucky8,   ns8linew, wingco_state,   0,         ROT0, "<unknown>",         "Cherry Angel (encrypted, W-4 hardware)",                   MACHINE_NOT_WORKING )
 GAMEL( 198?, kkotnoli,  0,        kkotnoli, kkotnoli, goldstar_state, 0,         ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )

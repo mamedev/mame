@@ -41,14 +41,14 @@
 #include "sound/volt_reg.h"
 
 
-#define NARC_MASTER_CLOCK       XTAL_8MHz
-#define NARC_FM_CLOCK           XTAL_3_579545MHz
+#define NARC_MASTER_CLOCK       XTAL(8'000'000)
+#define NARC_FM_CLOCK           XTAL(3'579'545)
 
-#define CVSD_MASTER_CLOCK       XTAL_8MHz
-#define CVSD_FM_CLOCK           XTAL_3_579545MHz
+#define CVSD_MASTER_CLOCK       XTAL(8'000'000)
+#define CVSD_FM_CLOCK           XTAL(3'579'545)
 
-#define ADPCM_MASTER_CLOCK      XTAL_8MHz
-#define ADPCM_FM_CLOCK          XTAL_3_579545MHz
+#define ADPCM_MASTER_CLOCK      XTAL(8'000'000)
+#define ADPCM_FM_CLOCK          XTAL(3'579'545)
 
 
 
@@ -174,7 +174,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( williams_cvsd_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(williams_cvsd_sound_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", MC6809E, CVSD_MASTER_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(williams_cvsd_map)
 
@@ -492,7 +492,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_MEMBER( williams_narc_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(williams_narc_sound_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu0", MC6809E, NARC_MASTER_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(williams_narc_master_map)
 
@@ -745,7 +745,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( williams_adpcm_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(williams_adpcm_sound_device::device_add_mconfig)
 	MCFG_CPU_ADD("cpu", MC6809E, ADPCM_MASTER_CLOCK / 4)
 	MCFG_CPU_PROGRAM_MAP(williams_adpcm_map)
 

@@ -233,6 +233,7 @@ public:
 	void supracan_suprnova_draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound/*, int columnscroll, uint32_t* scrollram*/, int transmask);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void supracan(machine_config &config);
 };
 
 
@@ -1127,7 +1128,7 @@ static ADDRESS_MAP_START( supracan_mem, AS_PROGRAM, 16, supracan_state )
 	AM_RANGE( 0xe90030, 0xe9003f ) AM_WRITE(dma_channel1_w)
 
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE(video_r, video_w)
-	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE( 0xf40000, 0xf5ffff ) AM_RAM_WRITE(vram_w) AM_SHARE("vram")
 	AM_RANGE( 0xfc0000, 0xfcffff ) AM_MIRROR(0x30000) AM_RAM /* System work ram */
 ADDRESS_MAP_END
@@ -1884,13 +1885,13 @@ INTERRUPT_GEN_MEMBER(supracan_state::supracan_sound_irq)
 	}
 }
 
-static MACHINE_CONFIG_START( supracan )
+MACHINE_CONFIG_START(supracan_state::supracan)
 
-	MCFG_CPU_ADD( "maincpu", M68000, XTAL_10_738635MHz )        /* Correct frequency unknown */
+	MCFG_CPU_ADD( "maincpu", M68000, XTAL(10'738'635) )        /* Correct frequency unknown */
 	MCFG_CPU_PROGRAM_MAP( supracan_mem )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_irq)
 
-	MCFG_CPU_ADD( "soundcpu", M6502, XTAL_3_579545MHz )     /* TODO: Verify actual clock */
+	MCFG_CPU_ADD( "soundcpu", M6502, XTAL(3'579'545) )     /* TODO: Verify actual clock */
 	MCFG_CPU_PROGRAM_MAP( supracan_sound_mem )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", supracan_state,  supracan_sound_irq)
 
@@ -1900,7 +1901,7 @@ static MACHINE_CONFIG_START( supracan )
 #endif
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
-	MCFG_SCREEN_RAW_PARAMS(XTAL_10_738635MHz/2, 348, 0, 256, 256, 0, 240 )  /* No idea if this is correct */
+	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, 348, 0, 256, 256, 0, 240 )  /* No idea if this is correct */
 	MCFG_SCREEN_UPDATE_DRIVER(supracan_state, screen_update_supracan)
 	MCFG_SCREEN_PALETTE("palette")
 

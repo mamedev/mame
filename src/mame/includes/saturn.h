@@ -612,8 +612,9 @@ public:
 };
 
 
-#define MASTER_CLOCK_352 XTAL_57_2727MHz
-#define MASTER_CLOCK_320 XTAL_53_693175MHz
+// These two clocks are synthesized by the 315-5746
+#define MASTER_CLOCK_352 XTAL(14'318'181)*4
+#define MASTER_CLOCK_320 XTAL(14'318'181)*3.75
 #define CEF_1   m_vdp1_regs[0x010/2]|=0x0002
 #define CEF_0   m_vdp1_regs[0x010/2]&=~0x0002
 #define BEF_1   m_vdp1_regs[0x010/2]|=0x0001

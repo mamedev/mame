@@ -66,6 +66,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sintr1_w);
 	DECLARE_WRITE8_MEMBER(ics_attn_w);
 	IRQ_CALLBACK_MEMBER(inta);
+	void altos8600(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -677,8 +678,8 @@ static SLOT_INTERFACE_START(altos8600_floppies)
 	SLOT_INTERFACE( "8dd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START(altos8600)
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
+MACHINE_CONFIG_START(altos8600_state::altos8600)
+	MCFG_CPU_ADD("maincpu", I8086, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(code_mem)
@@ -688,7 +689,7 @@ static MACHINE_CONFIG_START(altos8600)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(altos8600_state, inta)
 	MCFG_I8086_IF_HANDLER(WRITELINE(altos8600_state, cpuif_w))
 
-	MCFG_CPU_ADD("dmac", I8089, XTAL_5MHz)
+	MCFG_CPU_ADD("dmac", I8089, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(dmac_mem)
 	MCFG_CPU_IO_MAP(dmac_io)
 	MCFG_I8089_DATA_WIDTH(16)
@@ -712,7 +713,7 @@ static MACHINE_CONFIG_START(altos8600)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	//MCFG_RAM_EXTRA_OPTIONS("512K")
 
-	MCFG_DEVICE_ADD("uart8274", I8274_NEW, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD("uart8274", I8274_NEW, XTAL(16'000'000)/4)
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))

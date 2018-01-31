@@ -218,6 +218,11 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	void sq1(machine_config &config);
+	void vfx(machine_config &config);
+	void vfxsd(machine_config &config);
+	void eps(machine_config &config);
+	void vfx32(machine_config &config);
 private:
 	uint16_t  *m_rom, *m_ram;
 	uint16_t m_analog_values[8];
@@ -604,12 +609,12 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 }
 #endif
 
-static MACHINE_CONFIG_START( vfx )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
+MACHINE_CONFIG_START(esq5505_state::vfx)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
-	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
+	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000))
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X40_VFX_ADD("panel")
@@ -630,11 +635,11 @@ static MACHINE_CONFIG_START( vfx )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL_10MHz / (16 * 21))
+	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(10'000'000) / (16 * 21))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("otis", ES5505, XTAL_10MHz)
+	MCFG_SOUND_ADD("otis", ES5505, XTAL(10'000'000))
 	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5505_CHANNELS(4)          /* channels */
@@ -650,7 +655,7 @@ static MACHINE_CONFIG_START( vfx )
 	MCFG_SOUND_ROUTE_EX(7, "pump", 1.0, 7)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(eps, vfx)
+MACHINE_CONFIG_DERIVED(esq5505_state::eps, vfx)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(eps_map)
 
@@ -672,7 +677,7 @@ static MACHINE_CONFIG_DERIVED(eps, vfx)
 	MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(esq5505_state, fdc_write_byte))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(vfxsd, vfx)
+MACHINE_CONFIG_DERIVED(esq5505_state::vfxsd, vfx)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 
@@ -681,12 +686,12 @@ static MACHINE_CONFIG_DERIVED(vfxsd, vfx)
 MACHINE_CONFIG_END
 
 // 32-voice machines with the VFX-SD type config
-static MACHINE_CONFIG_START(vfx32)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_30_4761MHz / 2)
+MACHINE_CONFIG_START(esq5505_state::vfx32)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(30'476'100) / 2)
 	MCFG_CPU_PROGRAM_MAP(vfxsd_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(esq5505_state,maincpu_irq_acknowledge_callback)
 
-	MCFG_CPU_ADD("esp", ES5510, XTAL_10MHz)
+	MCFG_CPU_ADD("esp", ES5510, XTAL(10'000'000))
 	MCFG_DEVICE_DISABLE()
 
 	MCFG_ESQPANEL2X40_VFX_ADD("panel")
@@ -707,11 +712,11 @@ static MACHINE_CONFIG_START(vfx32)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL_30_4761MHz / (2 * 16 * 32))
+	MCFG_SOUND_ADD("pump", ESQ_5505_5510_PUMP, XTAL(30'476'100) / (2 * 16 * 32))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("otis", ES5505, XTAL_30_4761MHz / 2)
+	MCFG_SOUND_ADD("otis", ES5505, XTAL(30'476'100) / 2)
 	MCFG_ES5505_REGION0("waverom")  /* Bank 0 */
 	MCFG_ES5505_REGION1("waverom2") /* Bank 1 */
 	MCFG_ES5505_CHANNELS(4)          /* channels */
@@ -730,7 +735,7 @@ static MACHINE_CONFIG_START(vfx32)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", esq5505_state::floppy_formats)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED(sq1, vfx)
+MACHINE_CONFIG_DERIVED(esq5505_state::sq1, vfx)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(sq1_map)
 

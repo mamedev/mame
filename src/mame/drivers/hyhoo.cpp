@@ -224,7 +224,7 @@ static INPUT_PORTS_START( hyhoo2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( hyhoo )
+MACHINE_CONFIG_START(hyhoo_state::hyhoo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)   /* 5.00 MHz ?? */
@@ -260,7 +260,7 @@ static MACHINE_CONFIG_START( hyhoo )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hyhoo2, hyhoo )
+MACHINE_CONFIG_DERIVED(hyhoo_state::hyhoo2, hyhoo)
 	MCFG_DEVICE_MODIFY("nb1413m3")
 	MCFG_NB1413M3_TYPE( NB1413M3_HYHOO2 )
 MACHINE_CONFIG_END

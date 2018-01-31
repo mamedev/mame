@@ -176,7 +176,7 @@ image_init_result aim65_state::load_cart(device_image_interface &image, generic_
 }
 
 
-static MACHINE_CONFIG_START( aim65 )
+MACHINE_CONFIG_START(aim65_state::aim65)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, AIM65_CLOCK) /* 1 MHz */
 	MCFG_CPU_PROGRAM_MAP(aim65_mem)

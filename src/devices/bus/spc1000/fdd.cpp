@@ -77,10 +77,10 @@ SLOT_INTERFACE_END
 //  device_add_mconfig
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( spc1000_fdd_exp_device::device_add_mconfig )
+MACHINE_CONFIG_START(spc1000_fdd_exp_device::device_add_mconfig)
 
 	// sub CPU (5 inch floppy drive)
-	MCFG_CPU_ADD("fdccpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("fdccpu", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(sd725_mem)
 	MCFG_CPU_IO_MAP(sd725_io)
 

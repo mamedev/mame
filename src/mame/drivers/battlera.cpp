@@ -268,7 +268,7 @@ uint32_t battlera_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-static MACHINE_CONFIG_START( battlera )
+MACHINE_CONFIG_START(battlera_state::battlera)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280,21477200/3)

@@ -478,6 +478,16 @@ static INPUT_PORTS_START( intrepid )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( intrepidb )
+	PORT_INCLUDE(intrepid)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!6")
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( dockman )
 	PORT_INCLUDE(in0_real)
 
@@ -701,7 +711,7 @@ INTERRUPT_GEN_MEMBER(thepit_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( thepit )
+MACHINE_CONFIG_START(thepit_state::thepit)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
@@ -745,12 +755,12 @@ static MACHINE_CONFIG_START( thepit )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( fitter, thepit )
+MACHINE_CONFIG_DERIVED(thepit_state::fitter, thepit)
 	MCFG_DEVICE_MODIFY("mainlatch") // IC42
 	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(thepit_state, coin_lockout_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( desertdn, fitter )
+MACHINE_CONFIG_DERIVED(thepit_state::desertdn, fitter)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -763,7 +773,7 @@ static MACHINE_CONFIG_DERIVED( desertdn, fitter )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", intrepid)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( intrepid, fitter )
+MACHINE_CONFIG_DERIVED(thepit_state::intrepid, fitter)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -777,7 +787,7 @@ static MACHINE_CONFIG_DERIVED( intrepid, fitter )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( suprmous, intrepid )
+MACHINE_CONFIG_DERIVED(thepit_state::suprmous, intrepid)
 
 	/* basic machine hardware */
 
@@ -1318,9 +1328,9 @@ GAME( 1982, desertdn,   0,        desertdn, desertdn, thepit_state, 0,     ROT0,
 
 GAME( 1983, intrepid,   0,        intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, intrepid2,  intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games Ltd.",                             "Intrepid (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb,  intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb3, intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, intrepidb2, intrepid, intrepid, intrepid, thepit_state, 0,     ROT90, "bootleg (Loris)",                             "Intrepid (Loris bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb,  intrepid, intrepid, intrepidb,thepit_state, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb3, intrepid, intrepid, intrepidb,thepit_state, 0,     ROT90, "bootleg (Elsys)",                             "Intrepid (Elsys bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, intrepidb2, intrepid, intrepid, intrepidb,thepit_state, 0,     ROT90, "bootleg (Loris)",                             "Intrepid (Loris bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, zaryavos,   0,        intrepid, intrepid, thepit_state, 0,     ROT90, "Nova Games of Canada",                        "Zarya Vostoka", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 

@@ -267,6 +267,7 @@ public:
 	uint32_t get_stream_bits(int bits);
 
 	int write_dest_byte(uint8_t usedata);
+	void gunpey(machine_config &config);
 	//uint16_t main_m_vram[0x800][0x800];
 };
 
@@ -1439,7 +1440,7 @@ GFXDECODE_END
 
 
 /***************************************************************************************/
-static MACHINE_CONFIG_START( gunpey )
+MACHINE_CONFIG_START(gunpey_state::gunpey)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 57242400 / 4)
@@ -1458,11 +1459,11 @@ static MACHINE_CONFIG_START( gunpey )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16_9344MHz / 8, PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'934'400) / 8, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
 MACHINE_CONFIG_END

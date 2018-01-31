@@ -265,7 +265,7 @@ READ8_MEMBER(cvs_state::cvs_input_r)
 	case 0x04:  ret = ioport("IN3")->read(); break;
 	case 0x06:  ret = ioport("DSW3")->read(); break;
 	case 0x07:  ret = ioport("DSW2")->read(); break;
-	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", space.device().safe_pc(), offset & 0x0f); break;
+	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", m_maincpu->pc(), offset & 0x0f); break;
 	}
 
 	return ret;
@@ -363,13 +363,13 @@ WRITE8_MEMBER(cvs_state::cvs_speech_rom_address_lo_w)
 {
 	/* assuming that d0-d2 are cleared here */
 	m_speech_rom_bit_address = (m_speech_rom_bit_address & 0xf800) | (data << 3);
-	LOG(("%04x : CVS: Speech Lo %02x Address = %04x\n", space.device().safe_pc(), data, m_speech_rom_bit_address >> 3));
+	LOG(("%04x : CVS: Speech Lo %02x Address = %04x\n", m_speechcpu->pc(), data, m_speech_rom_bit_address >> 3));
 }
 
 WRITE8_MEMBER(cvs_state::cvs_speech_rom_address_hi_w)
 {
 	m_speech_rom_bit_address = (m_speech_rom_bit_address & 0x07ff) | (data << 11);
-	LOG(("%04x : CVS: Speech Hi %02x Address = %04x\n", space.device().safe_pc(), data, m_speech_rom_bit_address >> 3));
+	LOG(("%04x : CVS: Speech Hi %02x Address = %04x\n", m_speechcpu->pc(), data, m_speech_rom_bit_address >> 3));
 }
 
 
@@ -957,10 +957,10 @@ MACHINE_RESET_MEMBER(cvs_state,cvs)
 }
 
 
-static MACHINE_CONFIG_START( cvs )
+MACHINE_CONFIG_START(cvs_state::cvs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/16)
+	MCFG_CPU_ADD("maincpu", S2650, XTAL(14'318'181)/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_main_cpu_map)
 	MCFG_CPU_IO_MAP(cvs_main_cpu_io_map)
 	MCFG_CPU_DATA_MAP(cvs_main_cpu_data_map)
@@ -968,12 +968,12 @@ static MACHINE_CONFIG_START( cvs )
 	MCFG_S2650_SENSE_INPUT(DEVREADLINE("screen", screen_device, vblank))
 	MCFG_S2650_FLAG_OUTPUT(WRITELINE(cvs_state, write_s2650_flag))
 
-	MCFG_CPU_ADD("audiocpu", S2650, XTAL_14_31818MHz/16)
+	MCFG_CPU_ADD("audiocpu", S2650, XTAL(14'318'181)/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_dac_cpu_map)
 	/* doesn't look like it is used at all */
 	//MCFG_S2650_SENSE_INPUT(READLINE(cvs_state, cvs_393hz_clock_r))
 
-	MCFG_CPU_ADD("speechcpu", S2650, XTAL_14_31818MHz/16)
+	MCFG_CPU_ADD("speechcpu", S2650, XTAL(14'318'181)/16)
 	MCFG_CPU_PROGRAM_MAP(cvs_speech_cpu_map)
 	/* romclk is much more probable, 393 Hz results in timing issues */
 	//MCFG_S2650_SENSE_INPUT(READLINE(cvs_state, cvs_393hz_clock_r))
@@ -1022,7 +1022,7 @@ static MACHINE_CONFIG_START( cvs )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT)
 
-	MCFG_SOUND_ADD("tms", TMS5100, XTAL_640kHz)
+	MCFG_SOUND_ADD("tms", TMS5100, XTAL(640'000))
 	MCFG_TMS5110_DATA_CB(READLINE(cvs_state, speech_rom_read_bit))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END

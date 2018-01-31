@@ -184,7 +184,15 @@ function stable_sort(list, comp)
 		n = n - 1
 	end
 end
-stable_sort(sorted, function(a,b) if a.src and b.src then return a.src < b.src else return false end end)
+stable_sort(sorted, function(a,b)
+	if a.src and b.src then
+		return a.src < b.src
+	elseif not a.src then
+		return true
+	else
+		return false
+	end
+end)
 
 src = "error";
 

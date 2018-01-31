@@ -86,6 +86,7 @@ public:
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_DRIVER_INIT(pve500);
+	void pve500(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -330,9 +331,9 @@ WRITE8_MEMBER(pve500_state::io_sel_w)
 	}
 }
 
-static MACHINE_CONFIG_START( pve500 )
+MACHINE_CONFIG_START(pve500_state::pve500)
 	/* Main CPU */
-	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
+	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL(12'000'000) / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(maincpu_prg)
 	MCFG_CPU_IO_MAP(maincpu_io)
 	MCFG_Z80_DAISY_CHAIN(maincpu_daisy_chain)
@@ -341,16 +342,16 @@ static MACHINE_CONFIG_START( pve500 )
 	MCFG_TMPZ84C015_OUT_TXDA_CB(DEVWRITELINE("recorder", rs232_port_device, write_txd))
 	MCFG_TMPZ84C015_OUT_TXDB_CB(DEVWRITELINE("player1", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD("external_ctc", Z80CTC, XTAL_12MHz / 2)
+	MCFG_DEVICE_ADD("external_ctc", Z80CTC, XTAL(12'000'000) / 2)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("external_sio", Z80SIO0, XTAL_12MHz / 2)
+	MCFG_DEVICE_ADD("external_sio", Z80SIO0, XTAL(12'000'000) / 2)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("player2", rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("edl_inout", rs232_port_device, write_txd))
 
 	/* Secondary CPU */
-	MCFG_CPU_ADD("subcpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
+	MCFG_CPU_ADD("subcpu", TMPZ84C015, XTAL(12'000'000) / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(subcpu_prg)
 	MCFG_CPU_IO_MAP(subcpu_io)
 	MCFG_TMPZ84C015_OUT_DTRB_CB(WRITELINE(pve500_state, external_monitor_w))
@@ -370,8 +371,8 @@ static MACHINE_CONFIG_START( pve500 )
 	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(pve500_state, io_sel_w))
 
 	/* Search Dial MCUs */
-	MCFG_CPU_ADD("dial_mcu_left", MB88201, XTAL_4MHz) /* PLAYER DIAL MCU */
-	MCFG_CPU_ADD("dial_mcu_right", MB88201, XTAL_4MHz) /* RECORDER DIAL MCU */
+	MCFG_CPU_ADD("dial_mcu_left", MB88201, XTAL(4'000'000)) /* PLAYER DIAL MCU */
+	MCFG_CPU_ADD("dial_mcu_right", MB88201, XTAL(4'000'000)) /* RECORDER DIAL MCU */
 
 	/* Serial EEPROM (128 bytes, 8-bit data organization) */
 	/* The EEPROM stores the setup data */

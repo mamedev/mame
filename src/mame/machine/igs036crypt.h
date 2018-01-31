@@ -28,6 +28,5 @@ private:
 extern const uint8_t   m312cn_key[0x100];
 extern const uint8_t  cjddzsp_key[0x100];
 extern const uint8_t    cjdh2_key[0x100];
-extern const uint8_t     kov3_key[0x100];
 
 #endif

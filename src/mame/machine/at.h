@@ -29,6 +29,7 @@ public:
 
 	uint32_t a20_286(bool state);
 
+	void at_softlists(machine_config &config);
 protected:
 	void device_start() override;
 	void device_reset() override;
@@ -93,6 +94,5 @@ private:
 
 DECLARE_DEVICE_TYPE(AT_MB, at_mb_device)
 
-MACHINE_CONFIG_EXTERN(at_softlists);
 
 #endif // MAME_MACHINE_AT_H

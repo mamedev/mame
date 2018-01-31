@@ -46,7 +46,7 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( snes_multitap_device::device_add_mconfig )
+MACHINE_CONFIG_START(snes_multitap_device::device_add_mconfig)
 	MCFG_SNES_CONTROL_PORT_ADD("port1", snes_multitap, "joypad")
 	MCFG_SNES_CONTROL_PORT_ADD("port2", snes_multitap, "joypad")
 	MCFG_SNES_CONTROL_PORT_ADD("port3", snes_multitap, "joypad")

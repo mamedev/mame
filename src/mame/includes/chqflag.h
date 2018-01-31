@@ -46,6 +46,7 @@ public:
 	K051316_CB_MEMBER(zoom_callback_2);
 	K051960_CB_MEMBER(sprite_callback);
 	uint32_t screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void chqflag(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -41,8 +41,8 @@
 #define VERBOSE_KEYBOARD    0
 #define VERBOSE_DISK        0
 
-#define XTAL_X001  XTAL_10_738635MHz
-#define XTAL_X002  XTAL_8MHz
+#define XTAL_X001  XTAL(10'738'635)
+#define XTAL_X002  XTAL(8'000'000)
 
 #define IC_I001  "i001"  /* Z8400A */
 #define IC_I030  "i030"  /* AY-3-8910 */
@@ -107,6 +107,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ardy_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(strobe_callback);
 
+	void einstein(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -569,7 +570,7 @@ static SLOT_INTERFACE_START( einstein_floppies )
 	SLOT_INTERFACE("35dd", FLOPPY_35_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( einstein )
+MACHINE_CONFIG_START(einstein_state::einstein)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(IC_I001, Z80, XTAL_X002 / 2)
 	MCFG_CPU_PROGRAM_MAP(einstein_mem)
@@ -608,7 +609,7 @@ static MACHINE_CONFIG_START( einstein )
 	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(einstein_state, int_w<4>))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdp", TMS9129, XTAL_10_738635MHz / 2)
+	MCFG_DEVICE_ADD("vdp", TMS9129, XTAL(10'738'635) / 2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k RAM, provided by IC i040 and i041
 	MCFG_TMS9928A_SET_SCREEN("screen")
 	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")

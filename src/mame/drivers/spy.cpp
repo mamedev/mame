@@ -47,12 +47,12 @@ READ8_MEMBER(spy_state::spy_bankedram1_r)
 	{
 		if (m_pmcbank)
 		{
-			//logerror("%04x read pmcram %04x\n", space.device().safe_pc(), offset);
+			//logerror("%04x read pmcram %04x\n",m_maincpu->pc(), offset);
 			return m_pmcram[offset];
 		}
 		else
 		{
-			//logerror("%04x read pmc internal ram %04x\n", space.device().safe_pc(), offset);
+			//logerror("%04x read pmc internal ram %04x\n", m_maincpu->pc(), offset);
 			return 0;
 		}
 	}
@@ -64,17 +64,17 @@ WRITE8_MEMBER(spy_state::spy_bankedram1_w)
 {
 	if (m_rambank & 1)
 	{
-		m_palette->write(space,offset,data);
+		m_palette->write8(space,offset,data);
 	}
 	else if (m_rambank & 2)
 	{
 		if (m_pmcbank)
 		{
-			//logerror("%04x pmcram %04x = %02x\n", space.device().safe_pc(), offset, data);
+			//logerror("%04x pmcram %04x = %02x\n", m_maincpu->pc(), offset, data);
 			m_pmcram[offset] = data;
 		}
 		//else
-			//logerror("%04x pmc internal ram %04x = %02x\n", space.device().safe_pc(), offset, data);
+			//logerror("%04x pmc internal ram %04x = %02x\n", m_maincpu->pc(), offset, data);
 	}
 	else
 		m_ram[offset] = data;
@@ -303,7 +303,7 @@ WRITE8_MEMBER(spy_state::spy_3f90_w)
 	/* bit 7 = PMC-BK */
 	m_pmcbank = (data & 0x80) >> 7;
 
-//logerror("%04x: 3f90_w %02x\n", space.device().safe_pc(), data);
+//logerror("%04x: 3f90_w %02x\n", m_maincpu->pc(), data);
 	/* bit 6 = PMC-START */
 	if ((data & 0x40) && !(m_old_3f90 & 0x40))
 	{
@@ -492,14 +492,14 @@ void spy_state::machine_reset()
 	m_old_3f90 = -1;
 }
 
-static MACHINE_CONFIG_START( spy )
+MACHINE_CONFIG_START(spy_state::spy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_24MHz / 8) // 3 MHz? (divided by 051961)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(24'000'000) / 8) // 3 MHz? (divided by 051961)
 	MCFG_CPU_PROGRAM_MAP(spy_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spy_state,  spy_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(spy_sound_map) /* nmi by the sound chip */
 
 	MCFG_WATCHDOG_ADD("watchdog")

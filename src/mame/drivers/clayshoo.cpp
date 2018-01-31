@@ -49,6 +49,7 @@ public:
 	uint8_t difficulty_input_port_r( int bit );
 	void create_analog_timers(  );
 	required_device<cpu_device> m_maincpu;
+	void clayshoo(machine_config &config);
 };
 
 
@@ -130,8 +131,8 @@ WRITE8_MEMBER(clayshoo_state::analog_reset_w)
 
 	m_analog_port_val = 0xff;
 
-	m_analog_timer_1->adjust(compute_duration(&space.device(), ioport("AN1")->read()), 0x02);
-	m_analog_timer_2->adjust(compute_duration(&space.device(), ioport("AN2")->read()), 0x01);
+	m_analog_timer_1->adjust(compute_duration(m_maincpu.target(), ioport("AN1")->read()), 0x02);
+	m_analog_timer_2->adjust(compute_duration(m_maincpu.target(), ioport("AN2")->read()), 0x01);
 }
 
 
@@ -310,7 +311,7 @@ void clayshoo_state::machine_reset()
 	m_analog_port_val = 0;
 }
 
-static MACHINE_CONFIG_START( clayshoo )
+MACHINE_CONFIG_START(clayshoo_state::clayshoo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,5068000/4)      /* 5.068/4 Mhz (divider is a guess) */

@@ -38,7 +38,7 @@
 #include "formats/mz_cas.h"
 
 
-#define MASTER_CLOCK XTAL_17_73447MHz/5  /* TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support ... */
+#define MASTER_CLOCK XTAL(17'734'470)/5  /* TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support ... */
 
 #define UTF8_POUND "\xc2\xa3"
 #define UTF8_YEN "\xc2\xa5"
@@ -127,6 +127,8 @@ public:
 	DECLARE_READ8_MEMBER(mz2000_pio1_portb_r);
 	DECLARE_READ8_MEMBER(mz2000_pio1_porta_r);
 
+	void mz2000(machine_config &config);
+	void mz80b(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<mb8877_device> m_mb8877a;
@@ -861,7 +863,7 @@ static SLOT_INTERFACE_START( mz2000_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( mz2000 )
+MACHINE_CONFIG_START(mz2000_state::mz2000)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, MASTER_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(mz2000_map)
@@ -886,7 +888,7 @@ static MACHINE_CONFIG_START( mz2000 )
 	MCFG_PIT8253_CLK1(31250) /* needed by "Art Magic" to boot */
 	MCFG_PIT8253_CLK2(31250)
 
-	MCFG_MB8877_ADD("mb8877a", XTAL_1MHz)
+	MCFG_MB8877_ADD("mb8877a", XTAL(1'000'000))
 
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:0", mz2000_floppies, "dd", mz2000_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("mb8877a:1", mz2000_floppies, "dd", mz2000_state::floppy_formats)
@@ -923,7 +925,7 @@ static MACHINE_CONFIG_START( mz2000 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.15)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mz80b, mz2000 )
+MACHINE_CONFIG_DERIVED(mz2000_state::mz80b, mz2000)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(mz80b_io)
 MACHINE_CONFIG_END

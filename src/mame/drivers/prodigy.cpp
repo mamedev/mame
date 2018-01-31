@@ -164,6 +164,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_handler);
 
+	void prodigy(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_74145;
@@ -629,15 +630,15 @@ static INPUT_PORTS_START( prodigy )
 	PORT_BIT(0xc00, 0x00, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( prodigy )
+MACHINE_CONFIG_START(prodigy_state::prodigy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 	MCFG_DEFAULT_LAYOUT(layout_prodigy)
 
 	MCFG_DEVICE_ADD("io_74145", TTL74145, 0)
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL_2MHz)
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL(2'000'000))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(prodigy_state, irq_handler));
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(prodigy_state, via_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(prodigy_state, via_pb_w))
@@ -646,7 +647,7 @@ static MACHINE_CONFIG_START( prodigy )
 	MCFG_VIA6522_CB1_HANDLER(WRITELINE(prodigy_state, via_cb1_w))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(prodigy_state, via_cb2_w))
 
-	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, XTAL_2MHz * 30)
+	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, XTAL(2'000'000) * 30)
 	MCFG_NETLIST_SETUP(prodigy)
 
 	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cb1", "cb1.IN", 0)

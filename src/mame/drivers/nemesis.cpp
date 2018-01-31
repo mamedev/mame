@@ -417,7 +417,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( salamand_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
-	AM_RANGE(0x090000, 0x091fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x090000, 0x091fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
@@ -441,7 +441,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blkpnthr_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x081fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x080000, 0x081fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x090000, 0x097fff) AM_RAM
 	AM_RANGE(0x0a0000, 0x0a0001) AM_RAM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
@@ -467,7 +467,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( citybomb_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
-	AM_RANGE(0x0e0000, 0x0e1fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x0e0000, 0x0e1fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0002, 0x0f0003) AM_READ_PORT("IN2")
 	AM_RANGE(0x0f0004, 0x0f0005) AM_READ_PORT("IN1")
@@ -494,7 +494,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nyanpani_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x047fff) AM_RAM
-	AM_RANGE(0x060000, 0x061fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x060000, 0x061fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x070000, 0x070001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x070002, 0x070003) AM_READ_PORT("IN2")
 	AM_RANGE(0x070004, 0x070005) AM_READ_PORT("IN1")
@@ -568,7 +568,7 @@ static ADDRESS_MAP_START( hcrash_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
-	AM_RANGE(0x090000, 0x091fff) AM_DEVREADWRITE8("palette", palette_device, read, write, 0x00ff) AM_SHARE("palette")
+	AM_RANGE(0x090000, 0x091fff) AM_DEVREADWRITE8("palette", palette_device, read8, write8, 0x00ff) AM_SHARE("palette")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(salamand_control_port_word_w)     /* irq enable, flipscreen, etc. */
 	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
@@ -1446,7 +1446,7 @@ void nemesis_state::machine_reset()
 	m_irq_port_last = 0;
 }
 
-static MACHINE_CONFIG_START( nemesis )
+MACHINE_CONFIG_START(nemesis_state::nemesis)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1513,7 +1513,7 @@ static MACHINE_CONFIG_START( nemesis )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gx400 )
+MACHINE_CONFIG_START(nemesis_state::gx400)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
@@ -1586,7 +1586,7 @@ static MACHINE_CONFIG_START( gx400 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( konamigt )
+MACHINE_CONFIG_START(nemesis_state::konamigt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1653,7 +1653,7 @@ static MACHINE_CONFIG_START( konamigt )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rf2_gx400 )
+MACHINE_CONFIG_START(nemesis_state::rf2_gx400)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */
@@ -1726,7 +1726,7 @@ static MACHINE_CONFIG_START( rf2_gx400 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( salamand )
+MACHINE_CONFIG_START(nemesis_state::salamand)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)       /* 9.216MHz */
@@ -1777,7 +1777,7 @@ static MACHINE_CONFIG_START( salamand )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( blkpnthr )
+MACHINE_CONFIG_START(nemesis_state::blkpnthr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1823,7 +1823,7 @@ static MACHINE_CONFIG_START( blkpnthr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( citybomb )
+MACHINE_CONFIG_START(nemesis_state::citybomb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1873,7 +1873,7 @@ static MACHINE_CONFIG_START( citybomb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( nyanpani )
+MACHINE_CONFIG_START(nemesis_state::nyanpani)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)         /* 9.216 MHz? */
@@ -1923,7 +1923,7 @@ static MACHINE_CONFIG_START( nyanpani )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hcrash )
+MACHINE_CONFIG_START(nemesis_state::hcrash)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/3)         /* 6.144MHz */
@@ -2676,7 +2676,7 @@ Manual says SW4, 5, 6, 7 & 8 not used, leave off
 
 */
 
-static MACHINE_CONFIG_START( bubsys )
+MACHINE_CONFIG_START(nemesis_state::bubsys)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,18432000/2)     /* 9.216MHz */

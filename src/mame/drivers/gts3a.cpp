@@ -27,11 +27,11 @@ ToDo:
 #include "screen.h"
 
 
-class gts3a_state : public driver_device
+class gts3a_state : public genpin_class
 {
 public:
 	gts3a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: genpin_class(mconfig, type, tag)
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
 		, m_dmdcpu(*this, "dmdcpu")
@@ -52,6 +52,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	DECLARE_PALETTE_INIT(gts3a);
 	required_device<palette_device> m_palette;
+	void gts3a(machine_config &config);
 private:
 	bool m_dispclk;
 	bool m_lampclk;
@@ -330,13 +331,13 @@ MC6845_UPDATE_ROW( gts3a_state::crtc_update_row )
 	}
 }
 
-static MACHINE_CONFIG_START( gts3a )
+MACHINE_CONFIG_START(gts3a_state::gts3a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL_4MHz / 2)
+	MCFG_CPU_ADD("maincpu", M65C02, XTAL(4'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(gts3a_map)
 	MCFG_NVRAM_ADD_0FILL("nvram") // 6116LP + DS1210
 
-	MCFG_CPU_ADD("dmdcpu", M65C02, XTAL_3_579545MHz / 2)
+	MCFG_CPU_ADD("dmdcpu", M65C02, XTAL(3'579'545) / 2)
 	MCFG_CPU_PROGRAM_MAP(gts3a_dmd_map)
 
 	/* Video */
@@ -349,7 +350,7 @@ static MACHINE_CONFIG_START( gts3a )
 	MCFG_PALETTE_ADD( "palette", 2 )
 	MCFG_PALETTE_INIT_OWNER(gts3a_state, gts3a)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_3_579545MHz / 2)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(3'579'545) / 2)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(gts3a_state, crtc_update_row)
@@ -357,7 +358,7 @@ static MACHINE_CONFIG_START( gts3a )
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
 
-	MCFG_DEVICE_ADD("u4", VIA6522, XTAL_4MHz / 2)
+	MCFG_DEVICE_ADD("u4", VIA6522, XTAL(4'000'000) / 2)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
 	MCFG_VIA6522_READPA_HANDLER(READ8(gts3a_state, u4a_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(gts3a_state, u4b_r))
@@ -365,7 +366,7 @@ static MACHINE_CONFIG_START( gts3a )
 	//MCFG_VIA6522_CA2_HANDLER(WRITELINE(gts3a_state, u4ca2_w))
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(gts3a_state, nmi_w))
 
-	MCFG_DEVICE_ADD("u5", VIA6522, XTAL_4MHz / 2)
+	MCFG_DEVICE_ADD("u5", VIA6522, XTAL(4'000'000) / 2)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M65C02_IRQ_LINE))
 	//MCFG_VIA6522_READPA_HANDLER(READ8(gts3a_state, u5a_r))
 	//MCFG_VIA6522_READPB_HANDLER(READ8(gts3a_state, u5b_r))

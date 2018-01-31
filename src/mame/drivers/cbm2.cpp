@@ -221,6 +221,16 @@ public:
 
 	// timers
 	emu_timer *m_todclk_timer;
+	void _128k(machine_config &config);
+	void _256k(machine_config &config);
+	void cbm2lp_ntsc(machine_config &config);
+	void cbm2lp_pal(machine_config &config);
+	void cbm2hp_ntsc(machine_config &config);
+	void cbm2hp_pal(machine_config &config);
+	void cbm620(machine_config &config);
+	void b128(machine_config &config);
+	void b256(machine_config &config);
+	void cbm610(machine_config &config);
 };
 
 
@@ -235,6 +245,12 @@ public:
 		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4) override;
 
 	DECLARE_READ8_MEMBER( tpi2_pc_r );
+	void b256hp(machine_config &config);
+	void b128hp(machine_config &config);
+	void cbm710(machine_config &config);
+	void cbm730(machine_config &config);
+	void cbm720(machine_config &config);
+	void bx256hp(machine_config &config);
 };
 
 
@@ -300,6 +316,8 @@ public:
 
 	// interrupt state
 	int m_vic_irq;
+	void p500_pal(machine_config &config);
+	void p500_ntsc(machine_config &config);
 };
 
 
@@ -2258,7 +2276,7 @@ MACHINE_RESET_MEMBER( p500_state, p500 )
 //  MACHINE_CONFIG( 128k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( 128k )
+MACHINE_CONFIG_START(cbm2_state::_128k)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("256K")
@@ -2269,7 +2287,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( 256k )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( 256k )
+MACHINE_CONFIG_START(cbm2_state::_256k)
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")
 MACHINE_CONFIG_END
@@ -2279,18 +2297,18 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( p500_ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( p500_ntsc )
+MACHINE_CONFIG_START(p500_state::p500_ntsc)
 	MCFG_MACHINE_START_OVERRIDE(p500_state, p500_ntsc)
 	MCFG_MACHINE_RESET_OVERRIDE(p500_state, p500)
 
 	// basic hardware
-	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL_14_31818MHz/14)
+	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL(14'318'181)/14)
 	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_CPU_PROGRAM_MAP(p500_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(MOS6567_TAG, MOS6567, XTAL_14_31818MHz/14)
+	MCFG_DEVICE_ADD(MOS6567_TAG, MOS6567, XTAL(14'318'181)/14)
 	MCFG_MOS6566_CPU(M6509_TAG)
 	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(p500_state, vic_irq_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
@@ -2304,7 +2322,7 @@ static MACHINE_CONFIG_START( p500_ntsc )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL_14_31818MHz/14)
+	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL(14'318'181)/14)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(p500_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(p500_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -2326,13 +2344,13 @@ static MACHINE_CONFIG_START( p500_ntsc )
 	MCFG_TPI6525_IN_PC_CB(READ8(p500_state, tpi2_pc_r))
 	MCFG_TPI6525_OUT_PC_CB(WRITE8(p500_state, tpi2_pc_w))
 	MCFG_DEVICE_ADD(MOS6551A_TAG, MOS6551, VIC6567_CLOCK)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
 	MCFG_MOS6551_DTR_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_dtr))
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_rts))
 	MCFG_MOS6551_RXC_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_etc))
-	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL_14_31818MHz/14)
+	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL(14'318'181)/14)
 	MCFG_MOS6526_TOD(60)
 	MCFG_MOS6526_IRQ_CALLBACK(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i2_w))
 	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w))
@@ -2366,7 +2384,7 @@ static MACHINE_CONFIG_START( p500_ntsc )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(DEVWRITELINE(MOS6567_TAG, mos6567_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
-	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/14, cbm2_expansion_cards, nullptr)
+	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL(14'318'181)/14, cbm2_expansion_cards, nullptr)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, cbm2_user_port_cards, nullptr)
 	MCFG_CBM2_USER_PORT_IRQ_CALLBACK(WRITELINE(p500_state, user_irq_w))
 	MCFG_CBM2_USER_PORT_SP_CALLBACK(DEVWRITELINE(MOS6526_TAG, mos6526_device, sp_w))
@@ -2381,7 +2399,7 @@ static MACHINE_CONFIG_START( p500_ntsc )
 	MCFG_QUICKLOAD_ADD("quickload", p500_state, p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
-	MCFG_FRAGMENT_ADD(128k)
+	MCFG_FRAGMENT_ADD(_128k)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
@@ -2395,18 +2413,18 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( p500_pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( p500_pal )
+MACHINE_CONFIG_START(p500_state::p500_pal)
 	MCFG_MACHINE_START_OVERRIDE(p500_state, p500_pal)
 	MCFG_MACHINE_RESET_OVERRIDE(p500_state, p500)
 
 	// basic hardware
-	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL_17_734472MHz/18)
+	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL(17'734'472)/18)
 	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_CPU_PROGRAM_MAP(p500_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
 	// video hardware
-	MCFG_DEVICE_ADD(MOS6569_TAG, MOS6569, XTAL_17_734472MHz/18)
+	MCFG_DEVICE_ADD(MOS6569_TAG, MOS6569, XTAL(17'734'472)/18)
 	MCFG_MOS6566_CPU(M6509_TAG)
 	MCFG_MOS6566_IRQ_CALLBACK(WRITELINE(p500_state, vic_irq_w))
 	MCFG_VIDEO_SET_SCREEN(SCREEN_TAG)
@@ -2420,7 +2438,7 @@ static MACHINE_CONFIG_START( p500_pal )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL_17_734472MHz/18)
+	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL(17'734'472)/18)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(p500_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(p500_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -2442,10 +2460,10 @@ static MACHINE_CONFIG_START( p500_pal )
 	MCFG_TPI6525_IN_PC_CB(READ8(p500_state, tpi2_pc_r))
 	MCFG_TPI6525_OUT_PC_CB(WRITE8(p500_state, tpi2_pc_w))
 	MCFG_DEVICE_ADD(MOS6551A_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL_17_734472MHz/18)
+	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL(17'734'472)/18)
 	MCFG_MOS6526_TOD(50)
 	MCFG_MOS6526_IRQ_CALLBACK(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i2_w))
 	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w))
@@ -2479,7 +2497,7 @@ static MACHINE_CONFIG_START( p500_pal )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_CALLBACK(DEVWRITELINE(MOS6569_TAG, mos6569_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
-	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_17_734472MHz/18, cbm2_expansion_cards, nullptr)
+	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL(17'734'472)/18, cbm2_expansion_cards, nullptr)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, cbm2_user_port_cards, nullptr)
 	MCFG_CBM2_USER_PORT_IRQ_CALLBACK(WRITELINE(p500_state, user_irq_w))
 	MCFG_CBM2_USER_PORT_SP_CALLBACK(DEVWRITELINE(MOS6526_TAG, mos6526_device, sp_w))
@@ -2494,7 +2512,7 @@ static MACHINE_CONFIG_START( p500_pal )
 	MCFG_QUICKLOAD_ADD("quickload", p500_state, p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
-	MCFG_FRAGMENT_ADD(128k)
+	MCFG_FRAGMENT_ADD(_128k)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
@@ -2508,12 +2526,12 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2lp_ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm2lp_ntsc )
+MACHINE_CONFIG_START(cbm2_state::cbm2lp_ntsc)
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_ntsc)
 	MCFG_MACHINE_RESET_OVERRIDE(cbm2_state, cbm2)
 
 	// basic hardware
-	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL_18MHz/9)
+	MCFG_CPU_ADD(M6509_TAG, M6509, XTAL(18'000'000)/9)
 	MCFG_M6502_DISABLE_DIRECT() // address decoding is 100% dynamic, no RAM/ROM banks
 	MCFG_CPU_PROGRAM_MAP(cbm2_mem)
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
@@ -2529,14 +2547,14 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
-	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, SCREEN_TAG, XTAL_18MHz/9)
+	MCFG_MC6845_ADD(MC68B45_TAG, MC6845, SCREEN_TAG, XTAL(18'000'000)/9)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(9)
 	MCFG_MC6845_UPDATE_ROW_CB(cbm2_state, crtc_update_row)
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL_18MHz/9)
+	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, XTAL(18'000'000)/9)
 	MCFG_MOS6581_POTX_CALLBACK(READ8(cbm2_state, sid_potx_r))
 	MCFG_MOS6581_POTY_CALLBACK(READ8(cbm2_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
@@ -2555,10 +2573,10 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc )
 	MCFG_TPI6525_OUT_PB_CB(WRITE8(cbm2_state, tpi2_pb_w))
 	MCFG_TPI6525_IN_PC_CB(READ8(cbm2_state, tpi2_pc_r))
 	MCFG_DEVICE_ADD(MOS6551A_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
-	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL_18MHz/9)
+	MCFG_DEVICE_ADD(MOS6526_TAG, MOS6526A, XTAL(18'000'000)/9)
 	MCFG_MOS6526_TOD(60)
 	MCFG_MOS6526_IRQ_CALLBACK(DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i2_w))
 	MCFG_MOS6526_CNT_CALLBACK(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w))
@@ -2591,7 +2609,7 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc )
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, nullptr, DEVWRITELINE(MOS6526_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, nullptr)
-	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_18MHz/9, cbm2_expansion_cards, nullptr)
+	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL(18'000'000)/9, cbm2_expansion_cards, nullptr)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, cbm2_user_port_cards, nullptr)
 	MCFG_CBM2_USER_PORT_IRQ_CALLBACK(WRITELINE(cbm2_state, user_irq_w))
 	MCFG_CBM2_USER_PORT_SP_CALLBACK(DEVWRITELINE(MOS6526_TAG, mos6526_device, sp_w))
@@ -2617,8 +2635,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b128 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( b128, cbm2lp_ntsc )
-	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_DERIVED(cbm2_state::b128, cbm2lp_ntsc)
+	MCFG_FRAGMENT_ADD(_128k)
 MACHINE_CONFIG_END
 
 
@@ -2626,8 +2644,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b256 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( b256, cbm2lp_ntsc )
-	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_DERIVED(cbm2_state::b256, cbm2lp_ntsc)
+	MCFG_FRAGMENT_ADD(_256k)
 MACHINE_CONFIG_END
 
 
@@ -2635,7 +2653,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2lp_pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm2lp_pal, cbm2lp_ntsc )
+MACHINE_CONFIG_DERIVED(cbm2_state::cbm2lp_pal, cbm2lp_ntsc)
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	MCFG_DEVICE_MODIFY(MOS6526_TAG)
@@ -2647,8 +2665,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm610 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm610, cbm2lp_pal )
-	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_DERIVED(cbm2_state::cbm610, cbm2lp_pal)
+	MCFG_FRAGMENT_ADD(_128k)
 MACHINE_CONFIG_END
 
 
@@ -2656,8 +2674,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm620 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm620, cbm2lp_pal )
-	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_DERIVED(cbm2_state::cbm620, cbm2lp_pal)
+	MCFG_FRAGMENT_ADD(_256k)
 MACHINE_CONFIG_END
 
 
@@ -2665,7 +2683,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2hp_ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm2hp_ntsc, cbm2lp_ntsc )
+MACHINE_CONFIG_DERIVED(cbm2_state::cbm2hp_ntsc, cbm2lp_ntsc)
 	MCFG_DEVICE_MODIFY(MOS6525_2_TAG)
 	MCFG_TPI6525_IN_PC_CB(READ8(cbm2hp_state, tpi2_pc_r))
 MACHINE_CONFIG_END
@@ -2675,8 +2693,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b128hp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( b128hp, cbm2hp_ntsc )
-	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_DERIVED(cbm2hp_state::b128hp, cbm2hp_ntsc)
+	MCFG_FRAGMENT_ADD(_128k)
 MACHINE_CONFIG_END
 
 
@@ -2684,8 +2702,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b256hp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( b256hp, cbm2hp_ntsc )
-	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_DERIVED(cbm2hp_state::b256hp, cbm2hp_ntsc)
+	MCFG_FRAGMENT_ADD(_256k)
 MACHINE_CONFIG_END
 
 
@@ -2693,10 +2711,10 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( bx256hp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( bx256hp, b256hp )
+MACHINE_CONFIG_DERIVED(cbm2hp_state::bx256hp, b256hp)
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_ntsc)
 
-	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL_12MHz)
+	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(ext_mem)
 	MCFG_CPU_IO_MAP(ext_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(EXT_I8259A_TAG, pic8259_device, inta_cb)
@@ -2710,7 +2728,7 @@ static MACHINE_CONFIG_DERIVED( bx256hp, b256hp )
 	MCFG_TPI6525_OUT_PB_CB(WRITE8(cbm2_state, ext_tpi_pb_w))
 	MCFG_TPI6525_OUT_PC_CB(WRITE8(cbm2_state, ext_tpi_pc_w))
 
-	MCFG_DEVICE_ADD(EXT_MOS6526_TAG, MOS6526, XTAL_18MHz/9)
+	MCFG_DEVICE_ADD(EXT_MOS6526_TAG, MOS6526, XTAL(18'000'000)/9)
 	MCFG_MOS6526_TOD(60)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(cbm2_state, ext_cia_irq_w))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(DEVREAD8(EXT_MOS6525_TAG, tpi6525_device, pa_r))
@@ -2725,7 +2743,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2hp_pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm2hp_pal, cbm2hp_ntsc )
+MACHINE_CONFIG_DERIVED(cbm2_state::cbm2hp_pal, cbm2hp_ntsc)
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	// devices
@@ -2741,8 +2759,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm710 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm710, cbm2hp_pal )
-	MCFG_FRAGMENT_ADD(128k)
+MACHINE_CONFIG_DERIVED(cbm2hp_state::cbm710, cbm2hp_pal)
+	MCFG_FRAGMENT_ADD(_128k)
 MACHINE_CONFIG_END
 
 
@@ -2750,8 +2768,8 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm720 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm720, cbm2hp_pal )
-	MCFG_FRAGMENT_ADD(256k)
+MACHINE_CONFIG_DERIVED(cbm2hp_state::cbm720, cbm2hp_pal)
+	MCFG_FRAGMENT_ADD(_256k)
 MACHINE_CONFIG_END
 
 
@@ -2759,10 +2777,10 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm730 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED( cbm730, cbm720 )
+MACHINE_CONFIG_DERIVED(cbm2hp_state::cbm730, cbm720)
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_pal)
 
-	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL_12MHz)
+	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(ext_mem)
 	MCFG_CPU_IO_MAP(ext_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(EXT_I8259A_TAG, pic8259_device, inta_cb)
@@ -2776,7 +2794,7 @@ static MACHINE_CONFIG_DERIVED( cbm730, cbm720 )
 	MCFG_TPI6525_OUT_PB_CB(WRITE8(cbm2_state, ext_tpi_pb_w))
 	MCFG_TPI6525_OUT_PC_CB(WRITE8(cbm2_state, ext_tpi_pc_w))
 
-	MCFG_DEVICE_ADD(EXT_MOS6526_TAG, MOS6526, XTAL_18MHz/9)
+	MCFG_DEVICE_ADD(EXT_MOS6526_TAG, MOS6526, XTAL(18'000'000)/9)
 	MCFG_MOS6526_TOD(50)
 	MCFG_MOS6526_IRQ_CALLBACK(WRITELINE(cbm2_state, ext_cia_irq_w))
 	MCFG_MOS6526_PA_INPUT_CALLBACK(DEVREAD8(EXT_MOS6525_TAG, tpi6525_device, pa_r))

@@ -166,7 +166,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bank1000_map, AS_PROGRAM, 8, chqflag_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_READ(k051316_1_ramrom_r) AM_DEVWRITE("k051316_1", k051316_device, write)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 
@@ -325,13 +325,13 @@ WRITE_LINE_MEMBER(chqflag_state::background_brt_w)
 	}
 }
 
-static MACHINE_CONFIG_START( chqflag )
+MACHINE_CONFIG_START(chqflag_state::chqflag)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4)    /* 052001 (verified on pcb) */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4)    /* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(chqflag_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(chqflag_sound_map)
 
 	MCFG_DEVICE_ADD("bank1000", ADDRESS_MAP_BANK, 0)
@@ -347,9 +347,9 @@ static MACHINE_CONFIG_START( chqflag )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 96, 400, 256, 16, 240) // measured Vsync 59.17hz Hsync 15.13 / 15.19khz
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 96, 400, 256, 16, 240) // measured Vsync 59.17hz Hsync 15.13 / 15.19khz
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/4, 396, hbend, hbstart, 256, 16, 240)
+//  MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(chqflag_state, screen_update_chqflag)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -385,17 +385,17 @@ static MACHINE_CONFIG_START( chqflag )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-	MCFG_SOUND_ADD("k007232_1", K007232, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("k007232_1", K007232, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(chqflag_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MCFG_SOUND_ADD("k007232_2", K007232, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("k007232_2", K007232, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(chqflag_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.20)

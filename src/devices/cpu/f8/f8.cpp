@@ -2,64 +2,264 @@
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
- *   f8.c
- *   Portable F8 emulator (Fairchild 3850)
+ *  Portable F8 emulator (Fairchild 3850)
  *
  *  This work is based on Frank Palazzolo's F8 emulation in a standalone
  *  Fairchild Channel F emulator and the 'Fairchild F3850 CPU' data sheets.
  *
  *****************************************************************************/
 
-/* PeT 25.June 2001
-   added interrupt functionality
- */
-
 #include "emu.h"
 #include "f8.h"
 #include "f8dasm.h"
 #include "debugger.h"
 
-#define S   0x01
-#define C   0x02
-#define Z   0x04
-#define O   0x08
-#define I   0x10
 
-#define cS  4
-#define cL  6
+/* status flags */
+static constexpr u8 S = 0x01;
+static constexpr u8 C = 0x02;
+static constexpr u8 Z = 0x04;
+static constexpr u8 O = 0x08;
+static constexpr u8 I = 0x10;
 
+/* cycle (short/long) */
+static constexpr int cS = 4;
+static constexpr int cL = 6;
+
+
+DEFINE_DEVICE_TYPE(F8, f8_cpu_device, "f8", "Fairchild F8")
+
+
+f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: cpu_device(mconfig, F8, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
+	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
+	, m_pc0(0)
+	, m_pc1(0)
+	, m_dc0(0)
+	, m_dc1(0)
+	, m_a(0)
+	, m_w(0)
+	, m_is(0)
+	, m_debug_pc(0)
+{
+	memset(m_r, 0x00, sizeof(m_r));
+}
+
+device_memory_interface::space_config_vector f8_cpu_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
+}
+
+util::disasm_interface *f8_cpu_device::create_disassembler()
+{
+	return new f8_disassembler;
+}
+
+void f8_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
+{
+	switch (entry.index())
+	{
+		case STATE_GENFLAGS:
+			str = string_format("%c%c%c%c%c",
+					m_w & 0x10 ? 'I':'.',
+					m_w & 0x08 ? 'O':'.',
+					m_w & 0x04 ? 'Z':'.',
+					m_w & 0x02 ? 'C':'.',
+					m_w & 0x01 ? 'S':'.');
+			break;
+	}
+}
+
+void f8_cpu_device::device_start()
+{
+	m_program = &space(AS_PROGRAM);
+	m_direct = m_program->direct<0>();
+	m_iospace = &space(AS_IO);
+
+	save_item(NAME(m_debug_pc));
+	save_item(NAME(m_pc0));
+	save_item(NAME(m_pc1));
+	save_item(NAME(m_dc0));
+	save_item(NAME(m_dc1));
+	save_item(NAME(m_a));
+	save_item(NAME(m_w));
+	save_item(NAME(m_is));
+	save_item(NAME(m_dbus));
+	save_item(NAME(m_io));
+	save_item(NAME(m_irq_vector));
+	save_item(NAME(m_irq_request));
+	save_item(NAME(m_r));
+
+	state_add( F8_PC0, "PC0", m_pc0).formatstr("%04X");
+	state_add( F8_PC1, "PC1", m_pc1).formatstr("%04X");
+	state_add( F8_DC0, "DC0", m_dc0).formatstr("%04X");
+	state_add( F8_DC1, "DC1", m_dc1).formatstr("%04X");
+	state_add( F8_W,   "W",   m_w).formatstr("%02X");
+	state_add( F8_A,   "A",   m_a).formatstr("%02X");
+	state_add( F8_IS,  "IS",  m_is).mask(0x3f).formatstr("%02X");
+	state_add( F8_J,   "J",   m_r[9]).formatstr("%02X");
+	state_add( F8_HU,  "HU",  m_r[10]).formatstr("%02X");
+	state_add( F8_HL,  "HL",  m_r[11]).formatstr("%02X");
+	state_add( F8_KU,  "KU",  m_r[12]).formatstr("%02X");
+	state_add( F8_KL,  "KL",  m_r[13]).formatstr("%02X");
+	state_add( F8_QU,  "QU",  m_r[14]).formatstr("%02X");
+	state_add( F8_QL,  "QL",  m_r[15]).formatstr("%02X");
+	state_add( F8_R0,  "R0",  m_r[0]).formatstr("%02X");
+	state_add( F8_R1,  "R1",  m_r[1]).formatstr("%02X");
+	state_add( F8_R2,  "R2",  m_r[2]).formatstr("%02X");
+	state_add( F8_R3,  "R3",  m_r[3]).formatstr("%02X");
+	state_add( F8_R4,  "R4",  m_r[4]).formatstr("%02X");
+	state_add( F8_R5,  "R5",  m_r[5]).formatstr("%02X");
+	state_add( F8_R6,  "R6",  m_r[6]).formatstr("%02X");
+	state_add( F8_R7,  "R7",  m_r[7]).formatstr("%02X");
+	state_add( F8_R8,  "R8",  m_r[8]).formatstr("%02X");
+	state_add( F8_R16, "R16", m_r[16]).formatstr("%02X");
+	state_add( F8_R17, "R17", m_r[17]).formatstr("%02X");
+	state_add( F8_R18, "R18", m_r[18]).formatstr("%02X");
+	state_add( F8_R19, "R19", m_r[19]).formatstr("%02X");
+	state_add( F8_R20, "R20", m_r[20]).formatstr("%02X");
+	state_add( F8_R21, "R21", m_r[21]).formatstr("%02X");
+	state_add( F8_R22, "R22", m_r[22]).formatstr("%02X");
+	state_add( F8_R23, "R23", m_r[23]).formatstr("%02X");
+	state_add( F8_R24, "R24", m_r[24]).formatstr("%02X");
+	state_add( F8_R25, "R25", m_r[25]).formatstr("%02X");
+	state_add( F8_R26, "R26", m_r[26]).formatstr("%02X");
+	state_add( F8_R27, "R27", m_r[27]).formatstr("%02X");
+	state_add( F8_R28, "R28", m_r[28]).formatstr("%02X");
+	state_add( F8_R29, "R29", m_r[29]).formatstr("%02X");
+	state_add( F8_R30, "R30", m_r[30]).formatstr("%02X");
+	state_add( F8_R31, "R31", m_r[31]).formatstr("%02X");
+	state_add( F8_R32, "R32", m_r[32]).formatstr("%02X");
+	state_add( F8_R33, "R33", m_r[33]).formatstr("%02X");
+	state_add( F8_R34, "R34", m_r[34]).formatstr("%02X");
+	state_add( F8_R35, "R35", m_r[35]).formatstr("%02X");
+	state_add( F8_R36, "R36", m_r[36]).formatstr("%02X");
+	state_add( F8_R37, "R37", m_r[37]).formatstr("%02X");
+	state_add( F8_R38, "R38", m_r[38]).formatstr("%02X");
+	state_add( F8_R39, "R39", m_r[39]).formatstr("%02X");
+	state_add( F8_R40, "R40", m_r[40]).formatstr("%02X");
+	state_add( F8_R41, "R41", m_r[41]).formatstr("%02X");
+	state_add( F8_R42, "R42", m_r[42]).formatstr("%02X");
+	state_add( F8_R43, "R43", m_r[43]).formatstr("%02X");
+	state_add( F8_R44, "R44", m_r[44]).formatstr("%02X");
+	state_add( F8_R45, "R45", m_r[45]).formatstr("%02X");
+	state_add( F8_R46, "R46", m_r[46]).formatstr("%02X");
+	state_add( F8_R47, "R47", m_r[47]).formatstr("%02X");
+	state_add( F8_R48, "R48", m_r[48]).formatstr("%02X");
+	state_add( F8_R49, "R49", m_r[49]).formatstr("%02X");
+	state_add( F8_R50, "R50", m_r[50]).formatstr("%02X");
+	state_add( F8_R51, "R51", m_r[51]).formatstr("%02X");
+	state_add( F8_R52, "R52", m_r[52]).formatstr("%02X");
+	state_add( F8_R53, "R53", m_r[53]).formatstr("%02X");
+	state_add( F8_R54, "R54", m_r[54]).formatstr("%02X");
+	state_add( F8_R55, "R55", m_r[55]).formatstr("%02X");
+	state_add( F8_R56, "R56", m_r[56]).formatstr("%02X");
+	state_add( F8_R57, "R57", m_r[57]).formatstr("%02X");
+	state_add( F8_R58, "R58", m_r[58]).formatstr("%02X");
+	state_add( F8_R59, "R59", m_r[59]).formatstr("%02X");
+	state_add( F8_R60, "R60", m_r[60]).formatstr("%02X");
+	state_add( F8_R61, "R61", m_r[61]).formatstr("%02X");
+	state_add( F8_R62, "R62", m_r[62]).formatstr("%02X");
+	state_add( F8_R63, "R63", m_r[63]).formatstr("%02X");
+
+	state_add(STATE_GENPC, "GENPC", m_debug_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_debug_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_w).formatstr("%5s").noshow();
+
+	m_icountptr = &m_icount;
+}
+
+void f8_cpu_device::device_reset()
+{
+	m_debug_pc = 0;
+	m_pc0 = 0;
+	m_pc1 = 0;
+	m_dc0 = 0;
+	m_dc1 = 0;
+	m_a = 0;
+	m_w = 0;
+	m_is = 0;
+	m_dbus = 0;
+	m_io = 0;
+	m_irq_vector = 0;
+	memset(m_r, 0, sizeof(m_r));
+	m_irq_request = 0;
+
+	m_w&=~I;
+
+	/* save PC0 to PC1 and reset PC0 */
+	ROMC_08();
+	/* fetch the first opcode */
+	ROMC_00(cS);
+
+	/* initialize the timer shift register
+	 * this is an 8 bit polynomial counter which can be loaded parallel
+	 * with 0xff the outputs never change and thus the timer is disabled.
+	 * with 0xfe the shifter starts cycling through 255 states until it
+	 * reaches 0xfe again (and then issues an interrupt).
+	 * the counter output values are not sequential, but go like this:
+	 * 0xfe, 0xfd, 0xfb, 0xf7, 0xee, 0xdc ... etc. :-)
+	 * We have to build a lookup table to tell how many cycles a write
+
+	 */
+	u8 data = 0xfe;    /* initial value */
+	for (int i = 0; i < 256; i++)
+	{
+		timer_shifter[i] = data;
+		if ( (((data >> 3) ^ (data >> 4)) ^ ((data >> 5) ^ (data >> 7))) & 1 )
+		{
+			data <<= 1;
+		}
+		else
+		{
+			data = (data << 1) | 1;
+		}
+	}
+}
+
+
+void f8_cpu_device::execute_set_input( int inptnum, int state )
+{
+	m_irq_request = state;
+}
+
+/*****************************************************************************/
 
 /* clear all flags */
-#define CLR_OZCS                \
-	m_w &= ~(O|Z|C|S)
+inline void f8_cpu_device::CLR_OZCS()
+{
+	m_w &= ~(O|Z|C|S);
+}
 
 /* set sign and zero flags (note: the S flag is complementary) */
-#define SET_SZ(n)               \
-	if (n == 0)                 \
-		m_w |= Z | S;           \
-	else                        \
-	if (n < 128)                \
-		m_w |= S
+inline void f8_cpu_device::SET_SZ(u8 n)
+{
+	if (n == 0)
+		m_w |= Z;
+	if (~n & 0x80)
+		m_w |= S;
+}
 
 /* set overflow and carry flags */
-#define SET_OC(n,m)             \
-	if (n + m > 255)            \
-		m_w |= C;               \
-	if ((n&127)+(m&127) > 127)  \
-	{                           \
-		if (!(m_w & C))     \
-			m_w |= O;           \
-	}                           \
-	else                        \
-	{                           \
-		if (m_w & C)            \
-			m_w |= O;           \
-	}
+inline u8 f8_cpu_device::do_add(u8 n, u8 m, u8 c)
+{
+	u16 r = n + m + c;
+	if (r & 0x100)
+		m_w |= C;
+	if ((n^r) & (m^r) & 0x80)
+		m_w |= O;
+
+	return r & 0xff;
+}
 
 /* decimal add helper */
-uint8_t f8_cpu_device::do_ad(uint8_t augend, uint8_t addend)
+inline u8 f8_cpu_device::do_add_decimal(u8 augend, u8 addend)
 {
-	/* SKR from F8 Guide To programming description of AMD
+	/* From F8 Guide To programming description of AMD
 	 * binary add the addend to the binary sum of the augend and $66
 	 * *NOTE* the binary addition of the augend to $66 is done before AMD is called
 	 * record the status of the carry and intermediate carry
@@ -71,18 +271,18 @@ uint8_t f8_cpu_device::do_ad(uint8_t augend, uint8_t addend)
 	 * any carry from the low-order digit is suppressed
 	 * *NOTE* status flags are updated prior to the factor being added
 	 */
-	uint8_t tmp = augend + addend;
+	u8 tmp = augend + addend;
 
-	uint8_t c = 0; // high order carry
-	uint8_t ic = 0; // low order carry
+	u8 c = 0; // high order carry
+	u8 ic = 0; // low order carry
 
 	if (((augend + addend) & 0xff0) > 0xf0)
 		c = 1;
 	if ((augend & 0x0f) + (addend & 0x0f) > 0x0F)
 		ic = 1;
 
-	CLR_OZCS;
-	SET_OC(augend,addend);
+	CLR_OZCS();
+	do_add(augend,addend);
 	SET_SZ(tmp);
 
 	if (c == 0 && ic == 0)
@@ -96,34 +296,6 @@ uint8_t f8_cpu_device::do_ad(uint8_t augend, uint8_t addend)
 }
 
 
-DEFINE_DEVICE_TYPE(F8, f8_cpu_device, "f8", "Fairchild F8")
-
-
-f8_cpu_device::f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, F8, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
-	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
-	, m_pc0(0)
-	, m_pc1(0)
-	, m_dc0(0)
-	, m_dc1(0)
-	, m_a(0)
-	, m_w(0)
-	, m_is(0)
-	, m_pc(0)
-{
-	memset(m_r, 0x00, sizeof(m_r));
-}
-
-device_memory_interface::space_config_vector f8_cpu_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_IO,      &m_io_config)
-	};
-}
-
-
 /******************************************************************************
  * ROMC (ROM cycles)
  * This is what the Fairchild F8 CPUs use instead of an address bus
@@ -134,8 +306,7 @@ device_memory_interface::space_config_vector f8_cpu_device::memory_space_config(
  * Currently the emulation does not handle distinct PCs and DCs, but
  * only one instance inside the CPU context.
  ******************************************************************************/
-void f8_cpu_device::ROMC_00(int insttim) /* SKR - added parameter to tell if  */
-									/* it is long or short based on inst */
+void f8_cpu_device::ROMC_00(int insttim)
 {
 	/*
 	 * Instruction Fetch. The device whose address space includes the
@@ -146,8 +317,7 @@ void f8_cpu_device::ROMC_00(int insttim) /* SKR - added parameter to tell if  */
 
 	m_dbus = m_direct->read_byte(m_pc0);
 	m_pc0 += 1;
-	m_icount -= insttim;    /* SKR - ROMC00 is usually short, not short+long, */
-							/* but DS is long */
+	m_icount -= insttim; /* ROMC00 is usually short, not short+long, but DS is long */
 }
 
 void f8_cpu_device::ROMC_01()
@@ -159,7 +329,7 @@ void f8_cpu_device::ROMC_01()
 	 * on the data bus as signed binary number to PC0.
 	 */
 	m_dbus = m_direct->read_byte(m_pc0);
-	m_pc0 += (int8_t)m_dbus;
+	m_pc0 += (s8)m_dbus;
 	m_icount -= cL;
 }
 
@@ -176,8 +346,8 @@ void f8_cpu_device::ROMC_02()
 	m_icount -= cL;
 }
 
-void f8_cpu_device::ROMC_03(int insttim) /* SKR - added parameter to tell if  */
-{                                   /* it is long or short based on inst */
+void f8_cpu_device::ROMC_03(int insttim)
+{
 	/*
 	 * Similiar to 0x00, except that it is used for immediate operands
 	 * fetches (using PC0) instead of instruction fetches.
@@ -254,7 +424,7 @@ void f8_cpu_device::ROMC_0A()
 	 * All devices add the 8-bit value on the data bus, treated as
 	 * signed binary number, to the data counter.
 	 */
-	m_dc0 += (int8_t)m_dbus;
+	m_dc0 += (s8)m_dbus;
 	m_icount -= cL;
 }
 
@@ -453,8 +623,7 @@ void f8_cpu_device::ROMC_1B()
 	m_icount -= cL;
 }
 
-void f8_cpu_device::ROMC_1C(int insttim) /* SKR - added parameter to tell if  */
-									/* it is long or short based on inst */
+void f8_cpu_device::ROMC_1C(int insttim)
 {
 	/*
 	 * None.
@@ -468,7 +637,7 @@ void f8_cpu_device::ROMC_1D()
 	 * Devices with DC0 and DC1 registers must switch registers.
 	 * Devices without a DC1 register perform no operation.
 	 */
-	uint16_t tmp = m_dc0;
+	u16 tmp = m_dc0;
 	m_dc0 = m_dc1;
 	m_dc1 = tmp;
 	m_icount -= cS;
@@ -695,7 +864,7 @@ void f8_cpu_device::f8_lr_h_dc()
 void f8_cpu_device::f8_sr_1()
 {
 	m_a >>= 1;
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_SZ(m_a);
 }
 
@@ -706,7 +875,7 @@ void f8_cpu_device::f8_sr_1()
 void f8_cpu_device::f8_sl_1()
 {
 	m_a <<= 1;
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_SZ(m_a);
 }
 
@@ -717,7 +886,7 @@ void f8_cpu_device::f8_sl_1()
 void f8_cpu_device::f8_sr_4()
 {
 	m_a >>= 4;
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_SZ(m_a);
 }
 
@@ -728,7 +897,7 @@ void f8_cpu_device::f8_sr_4()
 void f8_cpu_device::f8_sl_4()
 {
 	m_a <<= 4;
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_SZ(m_a);
 }
 
@@ -759,7 +928,7 @@ void f8_cpu_device::f8_st()
 void f8_cpu_device::f8_com()
 {
 	m_a = ~m_a;
-	CLR_OZCS;
+	CLR_OZCS();
 	SET_SZ(m_a);
 }
 
@@ -769,16 +938,9 @@ void f8_cpu_device::f8_com()
  ***************************************************/
 void f8_cpu_device::f8_lnk()
 {
+	CLR_OZCS();
 	if (m_w & C)
-	{
-	CLR_OZCS;
-	SET_OC(m_a,1);
-	m_a += 1;
-	}
-	else
-	{
-	CLR_OZCS;
-	}
+		m_a = do_add(m_a,1);
 	SET_SZ(m_a);
 }
 
@@ -836,9 +998,8 @@ void f8_cpu_device::f8_lr_j_w()
  ***************************************************/
 void f8_cpu_device::f8_inc()
 {
-	CLR_OZCS;
-	SET_OC(m_a,1);
-	m_a += 1;
+	CLR_OZCS();
+	m_a = do_add(m_a,1);
 	SET_SZ(m_a);
 }
 
@@ -859,7 +1020,7 @@ void f8_cpu_device::f8_li()
 void f8_cpu_device::f8_ni()
 {
 	ROMC_03(cL);
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a &= m_dbus;
 	SET_SZ(m_a);
 }
@@ -871,7 +1032,7 @@ void f8_cpu_device::f8_ni()
 void f8_cpu_device::f8_oi()
 {
 	ROMC_03(cL);
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a |= m_dbus;
 	SET_SZ(m_a);
 }
@@ -883,7 +1044,7 @@ void f8_cpu_device::f8_oi()
 void f8_cpu_device::f8_xi()
 {
 	ROMC_03(cL);
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a ^= m_dbus;
 	SET_SZ(m_a);
 }
@@ -895,9 +1056,8 @@ void f8_cpu_device::f8_xi()
 void f8_cpu_device::f8_ai()
 {
 	ROMC_03(cL);
-	CLR_OZCS;
-	SET_OC(m_a,m_dbus);
-	m_a += m_dbus;
+	CLR_OZCS();
+	m_a = do_add(m_a,m_dbus);
 	SET_SZ(m_a);
 }
 
@@ -907,12 +1067,9 @@ void f8_cpu_device::f8_ai()
  ***************************************************/
 void f8_cpu_device::f8_ci()
 {
-	uint16_t tmp = ((uint8_t)~m_a) + 1;
 	ROMC_03(cL);
-	CLR_OZCS;
-	SET_OC(tmp,m_dbus);
-	tmp += m_dbus;
-	SET_SZ((uint8_t)tmp);
+	CLR_OZCS();
+	SET_SZ(do_add(~m_a,m_dbus,1));
 }
 
 /***************************************************
@@ -922,7 +1079,7 @@ void f8_cpu_device::f8_ci()
 void f8_cpu_device::f8_in()
 {
 	ROMC_03(cL);
-	CLR_OZCS;
+	CLR_OZCS();
 	ROMC_1B();
 	m_a = m_dbus;
 	SET_SZ(m_a);
@@ -1001,9 +1158,8 @@ void f8_cpu_device::f8_xdc()
  ***************************************************/
 void f8_cpu_device::f8_ds_r(int r)
 {
-	CLR_OZCS;
-	SET_OC(m_r[r], 0xff);
-	m_r[r] = m_r[r] + 0xff;
+	CLR_OZCS();
+	m_r[r] = do_add(m_r[r], 0xff);
 	SET_SZ(m_r[r]);
 }
 
@@ -1013,9 +1169,8 @@ void f8_cpu_device::f8_ds_r(int r)
  ***************************************************/
 void f8_cpu_device::f8_ds_isar()
 {
-	CLR_OZCS;
-	SET_OC(m_r[m_is], 0xff);
-	m_r[m_is] = m_r[m_is] + 0xff;
+	CLR_OZCS();
+	m_r[m_is] = do_add(m_r[m_is], 0xff);
 	SET_SZ(m_r[m_is]);
 }
 
@@ -1025,9 +1180,8 @@ void f8_cpu_device::f8_ds_isar()
  ***************************************************/
 void f8_cpu_device::f8_ds_isar_i()
 {
-	CLR_OZCS;
-	SET_OC(m_r[m_is], 0xff);
-	m_r[m_is] = m_r[m_is] + 0xff;
+	CLR_OZCS();
+	m_r[m_is] = do_add(m_r[m_is], 0xff);
 	SET_SZ(m_r[m_is]);
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
 }
@@ -1038,9 +1192,8 @@ void f8_cpu_device::f8_ds_isar_i()
  ***************************************************/
 void f8_cpu_device::f8_ds_isar_d()
 {
-	CLR_OZCS;
-	SET_OC(m_r[m_is], 0xff);
-	m_r[m_is] = m_r[m_is] + 0xff;
+	CLR_OZCS();
+	m_r[m_is] = do_add(m_r[m_is], 0xff);
 	SET_SZ(m_r[m_is]);
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
 }
@@ -1168,9 +1321,8 @@ void f8_cpu_device::f8_bt(int e)
 void f8_cpu_device::f8_am()
 {
 	ROMC_02();
-	CLR_OZCS;
-	SET_OC(m_a, m_dbus);
-	m_a += m_dbus;
+	CLR_OZCS();
+	m_a = do_add(m_a, m_dbus);
 	SET_SZ(m_a);
 }
 
@@ -1180,10 +1332,8 @@ void f8_cpu_device::f8_am()
  ***************************************************/
 void f8_cpu_device::f8_amd()
 {
-	uint8_t tmp = m_a;
 	ROMC_02();
-	tmp = do_ad(tmp, m_dbus);
-	m_a = tmp;
+	m_a = do_add_decimal(m_a, m_dbus);
 }
 
 /***************************************************
@@ -1193,7 +1343,7 @@ void f8_cpu_device::f8_amd()
 void f8_cpu_device::f8_nm()
 {
 	ROMC_02();
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a &= m_dbus;
 	SET_SZ(m_a);
 }
@@ -1205,7 +1355,7 @@ void f8_cpu_device::f8_nm()
 void f8_cpu_device::f8_om()
 {
 	ROMC_02();
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a |= m_dbus;
 	SET_SZ(m_a);
 }
@@ -1217,7 +1367,7 @@ void f8_cpu_device::f8_om()
 void f8_cpu_device::f8_xm()
 {
 	ROMC_02();
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a ^= m_dbus;
 	SET_SZ(m_a);
 }
@@ -1226,14 +1376,11 @@ void f8_cpu_device::f8_xm()
  *  O Z C S 1000 1101
  *  x x x x CM
  ***************************************************/
-void f8_cpu_device::f8_cm()    /* SKR changed to match f8_ci() */
+void f8_cpu_device::f8_cm()
 {
-	uint16_t tmp = ((uint8_t)~m_a) + 1;
 	ROMC_02();
-	CLR_OZCS;
-	SET_OC(tmp,m_dbus);
-	tmp += m_dbus;
-	SET_SZ((uint8_t)tmp);
+	CLR_OZCS();
+	SET_SZ(do_add(~m_a,m_dbus,1));
 }
 
 /***************************************************
@@ -1278,7 +1425,7 @@ void f8_cpu_device::f8_bf(int t)
 void f8_cpu_device::f8_ins_0(int n)
 {
 	ROMC_1C(cS);
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a = m_iospace->read_byte(n);
 	SET_SZ(m_a);
 }
@@ -1292,7 +1439,7 @@ void f8_cpu_device::f8_ins_1(int n)
 	ROMC_1C(cL);
 	m_io = n;
 	ROMC_1B();
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a = m_dbus;
 	SET_SZ(m_a);
 }
@@ -1325,9 +1472,8 @@ void f8_cpu_device::f8_outs_1(int n)
  ***************************************************/
 void f8_cpu_device::f8_as(int r)
 {
-	CLR_OZCS;
-	SET_OC(m_a, m_r[r]);
-	m_a += m_r[r];
+	CLR_OZCS();
+	m_a = do_add(m_a, m_r[r]);
 	SET_SZ(m_a);
 }
 
@@ -1337,9 +1483,8 @@ void f8_cpu_device::f8_as(int r)
  ***************************************************/
 void f8_cpu_device::f8_as_isar()
 {
-	CLR_OZCS;
-	SET_OC(m_a, m_r[m_is]);
-	m_a += m_r[m_is];
+	CLR_OZCS();
+	m_a = do_add(m_a, m_r[m_is]);
 	SET_SZ(m_a);
 }
 
@@ -1349,9 +1494,8 @@ void f8_cpu_device::f8_as_isar()
  ***************************************************/
 void f8_cpu_device::f8_as_isar_i()
 {
-	CLR_OZCS;
-	SET_OC(m_a, m_r[m_is]);
-	m_a += m_r[m_is];
+	CLR_OZCS();
+	m_a = do_add(m_a, m_r[m_is]);
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
 }
@@ -1362,9 +1506,8 @@ void f8_cpu_device::f8_as_isar_i()
  ***************************************************/
 void f8_cpu_device::f8_as_isar_d()
 {
-	CLR_OZCS;
-	SET_OC(m_a, m_r[m_is]);
-	m_a += m_r[m_is];
+	CLR_OZCS();
+	m_a = do_add(m_a, m_r[m_is]);
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
 }
@@ -1375,10 +1518,8 @@ void f8_cpu_device::f8_as_isar_d()
  ***************************************************/
 void f8_cpu_device::f8_asd(int r)
 {
-	uint8_t tmp = m_a;
 	ROMC_1C(cS);
-	tmp = do_ad(tmp, m_r[r]);
-	m_a = tmp;
+	m_a = do_add_decimal(m_a, m_r[r]);
 }
 
 /***************************************************
@@ -1387,10 +1528,8 @@ void f8_cpu_device::f8_asd(int r)
  ***************************************************/
 void f8_cpu_device::f8_asd_isar()
 {
-	uint8_t tmp = m_a;
 	ROMC_1C(cS);
-	tmp = do_ad(tmp, m_r[m_is]);
-	m_a = tmp;
+	m_a = do_add_decimal(m_a, m_r[m_is]);
 }
 
 /***************************************************
@@ -1399,10 +1538,8 @@ void f8_cpu_device::f8_asd_isar()
  ***************************************************/
 void f8_cpu_device::f8_asd_isar_i()
 {
-	uint8_t tmp = m_a;
 	ROMC_1C(cS);
-	tmp = do_ad(tmp, m_r[m_is]);
-	m_a = tmp;
+	m_a = do_add_decimal(m_a, m_r[m_is]);
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
 }
 
@@ -1412,10 +1549,8 @@ void f8_cpu_device::f8_asd_isar_i()
  ***************************************************/
 void f8_cpu_device::f8_asd_isar_d()
 {
-	uint8_t tmp = m_a;
 	ROMC_1C(cS);
-	tmp = do_ad(tmp, m_r[m_is]);
-	m_a = tmp;
+	m_a = do_add_decimal(m_a, m_r[m_is]);
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
 }
 
@@ -1425,7 +1560,7 @@ void f8_cpu_device::f8_asd_isar_d()
  ***************************************************/
 void f8_cpu_device::f8_xs(int r)
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a ^= m_r[r];
 	SET_SZ(m_a);
 }
@@ -1436,7 +1571,7 @@ void f8_cpu_device::f8_xs(int r)
  ***************************************************/
 void f8_cpu_device::f8_xs_isar()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a ^= m_r[m_is];
 	SET_SZ(m_a);
 }
@@ -1447,7 +1582,7 @@ void f8_cpu_device::f8_xs_isar()
  ***************************************************/
 void f8_cpu_device::f8_xs_isar_i()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a ^= m_r[m_is];
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
@@ -1459,7 +1594,7 @@ void f8_cpu_device::f8_xs_isar_i()
  ***************************************************/
 void f8_cpu_device::f8_xs_isar_d()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a ^= m_r[m_is];
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
@@ -1471,7 +1606,7 @@ void f8_cpu_device::f8_xs_isar_d()
  ***************************************************/
 void f8_cpu_device::f8_ns(int r)
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a &= m_r[r];
 	SET_SZ(m_a);
 }
@@ -1482,7 +1617,7 @@ void f8_cpu_device::f8_ns(int r)
  ***************************************************/
 void f8_cpu_device::f8_ns_isar()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a &= m_r[m_is];
 	SET_SZ(m_a);
 }
@@ -1493,7 +1628,7 @@ void f8_cpu_device::f8_ns_isar()
  ***************************************************/
 void f8_cpu_device::f8_ns_isar_i()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a &= m_r[m_is];
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is + 1) & 0x07);
@@ -1505,71 +1640,22 @@ void f8_cpu_device::f8_ns_isar_i()
  ***************************************************/
 void f8_cpu_device::f8_ns_isar_d()
 {
-	CLR_OZCS;
+	CLR_OZCS();
 	m_a &= m_r[m_is];
 	SET_SZ(m_a);
 	m_is = (m_is & 0x38) | ((m_is - 1) & 0x07);
 }
 
-void f8_cpu_device::device_reset()
-{
-	uint8_t data;
-	int i;
-
-	m_pc0 = 0;
-	m_pc1 = 0;
-	m_dc0 = 0;
-	m_dc1 = 0;
-	m_a = 0;
-	m_w = 0;
-	m_is = 0;
-	m_dbus = 0;
-	m_io = 0;
-	m_irq_vector = 0;
-	memset(m_r, 0, sizeof(m_r));
-	m_irq_request = 0;
-
-	m_w&=~I;
-
-	/* save PC0 to PC1 and reset PC0 */
-	ROMC_08();
-	/* fetch the first opcode */
-	ROMC_00(cS);
-
-	/* initialize the timer shift register
-	 * this is an 8 bit polynomial counter which can be loaded parallel
-	 * with 0xff the outputs never change and thus the timer is disabled.
-	 * with 0xfe the shifter starts cycling through 255 states until it
-	 * reaches 0xfe again (and then issues an interrupt).
-	 * the counter output values are not sequential, but go like this:
-	 * 0xfe, 0xfd, 0xfb, 0xf7, 0xee, 0xdc ... etc. :-)
-	 * We have to build a lookup table to tell how many cycles a write
-
-	 */
-	data = 0xfe;    /* initial value */
-	for (i = 0; i < 256; i++)
-	{
-		timer_shifter[i] = data;
-		if ( (((data >> 3) ^ (data >> 4)) ^ ((data >> 5) ^ (data >> 7))) & 1 )
-		{
-			data <<= 1;
-		}
-		else
-		{
-			data = (data << 1) | 1;
-		}
-	}
-}
 
 /* Execute cycles - returns number of cycles actually run */
 void f8_cpu_device::execute_run()
 {
 	do
 	{
-		uint8_t op=m_dbus;
+		u8 op = m_dbus;
 
-		m_pc = (m_pc0 - 1) & 0xffff;
-		debugger_instruction_hook(this, (m_pc0 - 1) & 0xffff);
+		m_debug_pc = (m_pc0 - 1) & 0xffff;
+		debugger_instruction_hook(this, m_debug_pc);
 
 		switch( op )
 		{
@@ -1862,7 +1948,7 @@ void f8_cpu_device::execute_run()
 					ROMC_0F();
 					ROMC_13();
 				}
-				if( ( op >= 0x30 ) && ( op <= 0x3f) )  /* SKR - DS is a long cycle inst */
+				if( ( op >= 0x30 ) && ( op <= 0x3f) )  /* DS is a long cycle inst */
 				{
 					ROMC_00(cL);
 				}
@@ -1873,131 +1959,4 @@ void f8_cpu_device::execute_run()
 				break;
 		}
 	} while( m_icount > 0 );
-}
-
-
-void f8_cpu_device::device_start()
-{
-	m_program = &space(AS_PROGRAM);
-	m_direct = m_program->direct<0>();
-	m_iospace = &space(AS_IO);
-
-	save_item(NAME(m_pc0));
-	save_item(NAME(m_pc1));
-	save_item(NAME(m_dc0));
-	save_item(NAME(m_dc1));
-	save_item(NAME(m_a));
-	save_item(NAME(m_w));
-	save_item(NAME(m_is));
-	save_item(NAME(m_dbus));
-	save_item(NAME(m_io));
-	save_item(NAME(m_irq_vector));
-	save_item(NAME(m_irq_request));
-	save_item(NAME(m_r));
-
-	state_add( F8_PC0, "PC0", m_pc0).formatstr("%04X");
-	state_add( F8_PC1, "PC1", m_pc1).formatstr("%04X");
-	state_add( F8_DC0, "DC0", m_dc0).formatstr("%04X");
-	state_add( F8_DC1, "DC1", m_dc1).formatstr("%04X");
-	state_add( F8_W,   "W",   m_w).formatstr("%02X");
-	state_add( F8_A,   "A",   m_a).formatstr("%02X");
-	state_add( F8_IS,  "IS",  m_is).mask(0x3f).formatstr("%02X");
-	state_add( F8_J,   "J",   m_r[9]).formatstr("%02X");
-	state_add( F8_HU,  "HU",  m_r[10]).formatstr("%02X");
-	state_add( F8_HL,  "HL",  m_r[11]).formatstr("%02X");
-	state_add( F8_KU,  "KU",  m_r[12]).formatstr("%02X");
-	state_add( F8_KL,  "KL",  m_r[13]).formatstr("%02X");
-	state_add( F8_QU,  "QU",  m_r[14]).formatstr("%02X");
-	state_add( F8_QL,  "QL",  m_r[15]).formatstr("%02X");
-	state_add( F8_R0,  "R0",  m_r[0]).formatstr("%02X");
-	state_add( F8_R1,  "R1",  m_r[1]).formatstr("%02X");
-	state_add( F8_R2,  "R2",  m_r[2]).formatstr("%02X");
-	state_add( F8_R3,  "R3",  m_r[3]).formatstr("%02X");
-	state_add( F8_R4,  "R4",  m_r[4]).formatstr("%02X");
-	state_add( F8_R5,  "R5",  m_r[5]).formatstr("%02X");
-	state_add( F8_R6,  "R6",  m_r[6]).formatstr("%02X");
-	state_add( F8_R7,  "R7",  m_r[7]).formatstr("%02X");
-	state_add( F8_R8,  "R8",  m_r[8]).formatstr("%02X");
-	state_add( F8_R16, "R16", m_r[16]).formatstr("%02X");
-	state_add( F8_R17, "R17", m_r[17]).formatstr("%02X");
-	state_add( F8_R18, "R18", m_r[18]).formatstr("%02X");
-	state_add( F8_R19, "R19", m_r[19]).formatstr("%02X");
-	state_add( F8_R20, "R20", m_r[20]).formatstr("%02X");
-	state_add( F8_R21, "R21", m_r[21]).formatstr("%02X");
-	state_add( F8_R22, "R22", m_r[22]).formatstr("%02X");
-	state_add( F8_R23, "R23", m_r[23]).formatstr("%02X");
-	state_add( F8_R24, "R24", m_r[24]).formatstr("%02X");
-	state_add( F8_R25, "R25", m_r[25]).formatstr("%02X");
-	state_add( F8_R26, "R26", m_r[26]).formatstr("%02X");
-	state_add( F8_R27, "R27", m_r[27]).formatstr("%02X");
-	state_add( F8_R28, "R28", m_r[28]).formatstr("%02X");
-	state_add( F8_R29, "R29", m_r[29]).formatstr("%02X");
-	state_add( F8_R30, "R30", m_r[30]).formatstr("%02X");
-	state_add( F8_R31, "R31", m_r[31]).formatstr("%02X");
-	state_add( F8_R32, "R32", m_r[32]).formatstr("%02X");
-	state_add( F8_R33, "R33", m_r[33]).formatstr("%02X");
-	state_add( F8_R34, "R34", m_r[34]).formatstr("%02X");
-	state_add( F8_R35, "R35", m_r[35]).formatstr("%02X");
-	state_add( F8_R36, "R36", m_r[36]).formatstr("%02X");
-	state_add( F8_R37, "R37", m_r[37]).formatstr("%02X");
-	state_add( F8_R38, "R38", m_r[38]).formatstr("%02X");
-	state_add( F8_R39, "R39", m_r[39]).formatstr("%02X");
-	state_add( F8_R40, "R40", m_r[40]).formatstr("%02X");
-	state_add( F8_R41, "R41", m_r[41]).formatstr("%02X");
-	state_add( F8_R42, "R42", m_r[42]).formatstr("%02X");
-	state_add( F8_R43, "R43", m_r[43]).formatstr("%02X");
-	state_add( F8_R44, "R44", m_r[44]).formatstr("%02X");
-	state_add( F8_R45, "R45", m_r[45]).formatstr("%02X");
-	state_add( F8_R46, "R46", m_r[46]).formatstr("%02X");
-	state_add( F8_R47, "R47", m_r[47]).formatstr("%02X");
-	state_add( F8_R48, "R48", m_r[48]).formatstr("%02X");
-	state_add( F8_R49, "R49", m_r[49]).formatstr("%02X");
-	state_add( F8_R50, "R50", m_r[50]).formatstr("%02X");
-	state_add( F8_R51, "R51", m_r[51]).formatstr("%02X");
-	state_add( F8_R52, "R52", m_r[52]).formatstr("%02X");
-	state_add( F8_R53, "R53", m_r[53]).formatstr("%02X");
-	state_add( F8_R54, "R54", m_r[54]).formatstr("%02X");
-	state_add( F8_R55, "R55", m_r[55]).formatstr("%02X");
-	state_add( F8_R56, "R56", m_r[56]).formatstr("%02X");
-	state_add( F8_R57, "R57", m_r[57]).formatstr("%02X");
-	state_add( F8_R58, "R58", m_r[58]).formatstr("%02X");
-	state_add( F8_R59, "R59", m_r[59]).formatstr("%02X");
-	state_add( F8_R60, "R60", m_r[60]).formatstr("%02X");
-	state_add( F8_R61, "R61", m_r[61]).formatstr("%02X");
-	state_add( F8_R62, "R62", m_r[62]).formatstr("%02X");
-	state_add( F8_R63, "R63", m_r[63]).formatstr("%02X");
-
-	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_w).formatstr("%5s").noshow();
-
-	m_icountptr = &m_icount;
-}
-
-
-void f8_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
-{
-	switch (entry.index())
-	{
-		case STATE_GENFLAGS:
-			str = string_format("%c%c%c%c%c",
-					m_w & 0x10 ? 'I':'.',
-					m_w & 0x08 ? 'O':'.',
-					m_w & 0x04 ? 'Z':'.',
-					m_w & 0x02 ? 'C':'.',
-					m_w & 0x01 ? 'S':'.');
-			break;
-	}
-}
-
-
-util::disasm_interface *f8_cpu_device::create_disassembler()
-{
-	return new f8_disassembler;
-}
-
-
-void f8_cpu_device::execute_set_input( int inptnum, int state )
-{
-	m_irq_request = state;
 }

@@ -31,6 +31,7 @@ public:
 
 	DECLARE_DRIVER_INIT(photoply);
 	virtual void machine_start() override;
+	void photoply(machine_config &config);
 };
 
 
@@ -114,7 +115,7 @@ static GFXDECODE_START( photoply )
 	//there's also a 8x16 entry (just after the 8x8)
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( photoply )
+MACHINE_CONFIG_START(photoply_state::photoply)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I486, 75000000) /* I486DX4, 75 or 100 Mhz */
 	MCFG_CPU_PROGRAM_MAP(photoply_map)

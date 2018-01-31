@@ -42,7 +42,7 @@ READ8_MEMBER(aeroboto_state::aeroboto_201_r)
 	/* serie of values to be returned from 3004, and display "PASS 201" if it is */
 	static const uint8_t res[4] = { 0xff, 0x9f, 0x1b, 0x03 };
 
-	logerror("PC %04x: read 3004\n", space.device().safe_pc());
+	logerror("PC %04x: read 3004\n", m_maincpu->pc());
 	return res[(m_count++) & 3];
 }
 
@@ -237,14 +237,14 @@ void aeroboto_state::machine_reset()
 	m_sy = 0;
 }
 
-static MACHINE_CONFIG_START( formatz )
+MACHINE_CONFIG_START(aeroboto_state::formatz)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_10MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(10'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aeroboto_state,  aeroboto_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", MC6809, XTAL_10MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", MC6809, XTAL(10'000'000)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aeroboto_state,  irq0_line_hold)
 
@@ -268,12 +268,12 @@ static MACHINE_CONFIG_START( formatz )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_10MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(10'000'000)/8) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch2", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_10MHz/16) /* verified on pcb */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(10'000'000)/16) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

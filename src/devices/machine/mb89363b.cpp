@@ -134,7 +134,7 @@ WRITE8_MEMBER( mb89363b_device::write )
 }
 
 
-MACHINE_CONFIG_MEMBER( mb89363b_device::device_add_mconfig )
+MACHINE_CONFIG_START(mb89363b_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("i8255_a", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(mb89363b_device, i8255_a_port_a_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(mb89363b_device, i8255_a_port_b_r))

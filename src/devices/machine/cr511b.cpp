@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(CR511B, cr511b_device, "cr511b", "CR-511-B CD-ROM drive")
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( cr511b_device::device_add_mconfig )
+MACHINE_CONFIG_START(cr511b_device::device_add_mconfig)
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("cdrom")
 	MCFG_SOUND_ADD("cdda", CDDA, 0)

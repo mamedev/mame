@@ -2,7 +2,6 @@
 // copyright-holders:Juergen Buchmueller
 /*****************************************************************************
  *
- *   f8.h
  *   Portable Fairchild F8 emulator interface
  *
  *****************************************************************************/
@@ -19,7 +18,7 @@ class f8_cpu_device : public cpu_device
 {
 public:
 	// construction/destruction
-	f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	f8_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	enum
@@ -41,9 +40,9 @@ protected:
 	virtual void device_reset() override;
 
 	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const override { return 4; }
-	virtual uint32_t execute_max_cycles() const override { return 26; }
-	virtual uint32_t execute_input_lines() const override { return 1; }
+	virtual u32 execute_min_cycles() const override { return 4; }
+	virtual u32 execute_max_cycles() const override { return 26; }
+	virtual u32 execute_input_lines() const override { return 1; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -60,29 +59,32 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
-	uint16_t  m_pc0;    /* program counter 0 */
-	uint16_t  m_pc1;    /* program counter 1 */
-	uint16_t  m_dc0;    /* data counter 0 */
-	uint16_t  m_dc1;    /* data counter 1 */
-	uint8_t   m_a;      /* accumulator */
-	uint8_t   m_w;      /* processor status */
-	uint8_t   m_is;     /* scratchpad pointer */
-	uint8_t   m_dbus;   /* data bus value */
-	uint16_t  m_io;     /* last I/O address */
-	uint16_t  m_irq_vector;
+	u16  m_pc0;    /* program counter 0 */
+	u16  m_pc1;    /* program counter 1 */
+	u16  m_dc0;    /* data counter 0 */
+	u16  m_dc1;    /* data counter 1 */
+	u8   m_a;      /* accumulator */
+	u8   m_w;      /* processor status */
+	u8   m_is;     /* scratchpad pointer */
+	u8   m_dbus;   /* data bus value */
+	u16  m_io;     /* last I/O address */
+	u16  m_irq_vector;
 	address_space *m_program;
 	direct_read_data<0> *m_direct;
 	address_space *m_iospace;
 	int m_icount;
-	uint8_t   m_r[64];  /* scratchpad RAM */
-	int     m_irq_request;
+	u8   m_r[64];  /* scratchpad RAM */
+	int m_irq_request;
 
 	/* timer shifter polynomial values (will be used for timer interrupts) */
-	uint8_t timer_shifter[256];
+	u8 timer_shifter[256];
 
-	uint16_t m_pc; // For the debugger
+	u16 m_debug_pc; // only for the MAME debugger
 
-	uint8_t do_ad(uint8_t augend, uint8_t addend);
+	inline void CLR_OZCS();
+	inline void SET_SZ(u8 n);
+	inline u8 do_add(u8 n, u8 m, u8 c = 0);
+	inline u8 do_add_decimal(u8 augend, u8 addend);
 
 	void ROMC_00(int insttim);
 	void ROMC_01();
@@ -183,7 +185,7 @@ private:
 	void f8_nm();
 	void f8_om();
 	void f8_xm();
-	void f8_cm();    /* SKR changed to match f8_ci(cpustate); */
+	void f8_cm();
 	void f8_adc();
 	void f8_br7();
 	void f8_bf(int t);

@@ -103,7 +103,7 @@ enum lisa_model_t
 {
 	/*lisa1,*/      /* twiggy floppy drive */
 	lisa2,      /* 3.5'' Sony floppy drive */
-	lisa210,    /* modified I/O board, and internal 10Meg drive */
+	lisa_210,   /* modified I/O board, and internal 10Meg drive */
 	mac_xl      /* same as above with modified video */
 };
 
@@ -918,7 +918,7 @@ DRIVER_INIT_MEMBER(lisa_state,lisa210)
 {
 	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
 	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
-	m_model = lisa210;
+	m_model = lisa_210;
 	m_features.has_fast_timers = 1;
 	m_features.floppy_hardware = sony_lisa210;
 	m_features.has_double_sided_floppy = 0;

@@ -22,7 +22,7 @@ sun_keyboard_adaptor_device::~sun_keyboard_adaptor_device()
 }
 
 
-MACHINE_CONFIG_MEMBER(sun_keyboard_adaptor_device::device_add_mconfig)
+MACHINE_CONFIG_START(sun_keyboard_adaptor_device::device_add_mconfig)
 	MCFG_SUNKBD_PORT_ADD("keyboard", default_sun_keyboard_devices, nullptr)
 	MCFG_SUNKBD_RXD_HANDLER(WRITELINE(sun_keyboard_adaptor_device, output_rxd))
 MACHINE_CONFIG_END

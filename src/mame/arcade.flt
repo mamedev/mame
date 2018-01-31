@@ -266,6 +266,7 @@ cv1k.cpp
 cvs.cpp
 cyberbal.cpp
 cybertnk.cpp
+cybstorm.cpp
 cyclemb.cpp
 d9final.cpp
 dacholer.cpp
@@ -637,6 +638,7 @@ looping.cpp
 lordgun.cpp
 lsasquad.cpp
 ltcasino.cpp
+luckybal.cpp
 ltd.cpp
 luckgrln.cpp
 lucky74.cpp
@@ -692,7 +694,7 @@ mcr68.cpp
 meadows.cpp
 meadwttl.cpp
 mediagx.cpp
-megadrvb.cpp
+megadriv_acbl.cpp
 megaphx.cpp
 megaplay.cpp
 megasys1.cpp
@@ -828,6 +830,7 @@ nitedrvr.cpp
 niyanpai.cpp
 nmg5.cpp
 nmk16.cpp
+nmkmedal.cpp
 norautp.cpp
 notechan.cpp
 nova2001.cpp
@@ -838,6 +841,7 @@ nss.cpp
 nwk-tr.cpp
 nycaptor.cpp
 nyny.cpp
+odyssey.cpp
 offtwall.cpp
 ohmygod.cpp
 ojankohs.cpp
@@ -934,6 +938,7 @@ quakeat.cpp
 quantum.cpp
 quasar.cpp
 queen.cpp
+quickpick5.cpp
 quizdna.cpp
 quizo.cpp
 quizpani.cpp
@@ -1141,6 +1146,7 @@ statriv2.cpp
 stellafr.cpp
 stfight.cpp
 stlforce.cpp
+strkzn.cpp
 strnskil.cpp
 stuntair.cpp
 stv.cpp

@@ -41,7 +41,7 @@
 #include "audio/nichisnd.h"
 
 #define USE_H8 0
-#define DVD_CLOCK XTAL_27MHz
+#define DVD_CLOCK XTAL(27'000'000)
 
 class csplayh5_state : public driver_device
 {
@@ -102,6 +102,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
 
 	void general_init(int patchaddress, int patchvalue);
+	void csplayh5(machine_config &config);
 };
 
 
@@ -352,7 +353,7 @@ WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
 }
 
 
-static MACHINE_CONFIG_START( csplayh5 )
+MACHINE_CONFIG_START(csplayh5_state::csplayh5)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
@@ -362,6 +363,7 @@ static MACHINE_CONFIG_START( csplayh5 )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_CPU("maincpu")
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(csplayh5_state, tmp68301_parallel_port_w))
 
 #if USE_H8
@@ -376,9 +378,9 @@ static MACHINE_CONFIG_START( csplayh5 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(csplayh5_state, csplayh5_vdp0_interrupt))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
 
 	/* sound hardware */
 	MCFG_NICHISND_ADD("nichisnd")
@@ -806,12 +808,11 @@ ROM_START( nuretemi )
 	DVD_BIOS
 
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
-	// identical to vol. 19, probably an attempt to fix a dead board.
-	ROM_LOAD( "11.ic51", 0x000000, 0x020000, BAD_DUMP CRC(d1ba05d6) SHA1(8d29cdbf00946e06e92225eb260a694d17d7b8d4) )
+	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(655ec499) SHA1(5cea38e998edc7833b9a644930daecd99933c277) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
 	ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(5c7af7f6) SHA1(78e58e3a81a6585c2c61f0026b7dc73a72c0d862) )
-	ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(335b6388) SHA1(c5427b42af011b5a5026d905b1740684b9f6f953) )
+	ROM_LOAD16_BYTE( "4.ic41", 0x000001, 0x080000, CRC(335b6388) SHA1(c5427b42af011b5a5026d905b1740684b9f6f953) )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "nb8016", 0, SHA1(607d9f390265da3f0c50753d0ea32257b12e8c08) )

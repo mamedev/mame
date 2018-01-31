@@ -22,7 +22,7 @@
  *
  *************************************/
 
-#define MAC_CLK             XTAL_10MHz
+#define MAC_CLK             XTAL(10'000'000)
 #define VTXROM_FMT(x)       (((x) << 14) | ((x) & (1 << 15) ? 0xc0000000 : 0))
 
 

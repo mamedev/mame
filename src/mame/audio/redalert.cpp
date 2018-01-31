@@ -22,16 +22,16 @@
 
 
 
-#define REDALERT_AUDIO_PCB_CLOCK    (XTAL_12_5MHz)
+#define REDALERT_AUDIO_PCB_CLOCK    (XTAL(12'500'000))
 #define REDALERT_AUDIO_CPU_CLOCK    (REDALERT_AUDIO_PCB_CLOCK / 12)
 #define REDALERT_AY8910_CLOCK       (REDALERT_AUDIO_PCB_CLOCK / 6)
-#define REDALERT_AUDIO_CPU_IRQ_FREQ (1000000000 / PERIOD_OF_555_ASTABLE_NSEC(RES_K(120), RES_K(2.7), CAP_U(0.01)))
+#define REDALERT_AUDIO_CPU_IRQ_FREQ (1000000000.0 / PERIOD_OF_555_ASTABLE_NSEC(RES_K(120), RES_K(2.7), CAP_U(0.01)))
 
-#define REDALERT_VOICE_PCB_CLOCK    (XTAL_6MHz)
+#define REDALERT_VOICE_PCB_CLOCK    (XTAL(6'000'000))
 #define REDALERT_VOICE_CPU_CLOCK    (REDALERT_VOICE_PCB_CLOCK)
 #define REDALERT_HC55516_CLOCK      (REDALERT_VOICE_PCB_CLOCK / 256)
 
-#define DEMONEYE_AUDIO_PCB_CLOCK    (XTAL_3_579545MHz)
+#define DEMONEYE_AUDIO_PCB_CLOCK    (XTAL(3'579'545))
 #define DEMONEYE_AUDIO_CPU_CLOCK    (DEMONEYE_AUDIO_PCB_CLOCK / 4)  /* what's the real divisor? */
 #define DEMONEYE_AY8910_CLOCK       (DEMONEYE_AUDIO_PCB_CLOCK / 2)  /* what's the real divisor? */
 
@@ -176,7 +176,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( redalert_audio_m37b )
+MACHINE_CONFIG_START(redalert_state::redalert_audio_m37b)
 
 	MCFG_CPU_ADD("audiocpu", M6502, REDALERT_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(redalert_audio_map)
@@ -199,7 +199,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( redalert_audio_voice )
+MACHINE_CONFIG_START(redalert_state::redalert_audio_voice)
 
 	MCFG_CPU_ADD("voice", I8085A, REDALERT_VOICE_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(redalert_voice_map)
@@ -218,7 +218,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( redalert_audio )
+MACHINE_CONFIG_START(redalert_state::redalert_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -235,7 +235,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( ww3_audio )
+MACHINE_CONFIG_START(redalert_state::ww3_audio)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -341,7 +341,7 @@ SOUND_START_MEMBER( redalert_state, demoneye )
  *
  *************************************/
 
-MACHINE_CONFIG_START( demoneye_audio )
+MACHINE_CONFIG_START(redalert_state::demoneye_audio)
 
 	MCFG_CPU_ADD("audiocpu", M6802, DEMONEYE_AUDIO_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(demoneye_audio_map)

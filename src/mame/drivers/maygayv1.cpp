@@ -148,10 +148,10 @@ Find lamps/reels after UPD changes.
  *
  *************************************/
 
-#define DUART_CLOCK     XTAL_3_6864MHz
+#define DUART_CLOCK     XTAL(3'686'400)
 #define PIXEL_CLOCK     0
-#define MASTER_CLOCK    XTAL_16MHz
-#define SOUND_CLOCK     XTAL_11_0592MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
+#define SOUND_CLOCK     XTAL(11'059'200)
 
 /*************************************
  *
@@ -256,6 +256,7 @@ public:
 	DECLARE_READ8_MEMBER(data_to_i8031);
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(duart_txa);
+	void maygayv1(machine_config &config);
 };
 
 
@@ -864,7 +865,7 @@ INTERRUPT_GEN_MEMBER(maygayv1_state::vsync_interrupt)
 }
 
 
-static MACHINE_CONFIG_START( maygayv1 )
+MACHINE_CONFIG_START(maygayv1_state::maygayv1)
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", maygayv1_state,  vsync_interrupt)

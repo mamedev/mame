@@ -117,6 +117,9 @@ public:
 	uint16_t* m_rom16;
 	uint8_t* m_rom8;
 
+	void spider(machine_config &config);
+	void twins(machine_config &config);
+	void twinsa(machine_config &config);
 };
 
 
@@ -130,7 +133,7 @@ void twins_state::machine_start()
 READ16_MEMBER(twins_state::twins_port4_r)
 {
 // doesn't work??
-//  printf("%08x: twins_port4_r %04x\n", space.device().safe_pc(), mem_mask);
+//  printf("%08x: twins_port4_r %04x\n", m_maincpu->pc(), mem_mask);
 //  return m_i2cmem->read_sda();// | 0xfffe;
 
 	return 0x0001;
@@ -138,7 +141,7 @@ READ16_MEMBER(twins_state::twins_port4_r)
 
 WRITE16_MEMBER(twins_state::twins_port4_w)
 {
-//  printf("%08x: twins_port4_w %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+//  printf("%08x: twins_port4_w %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 	int i2c_clk = BIT(data, 1);
 	int i2c_mem = BIT(data, 0);
 	m_i2cmem->write_scl(i2c_clk);
@@ -379,7 +382,7 @@ static INPUT_PORTS_START(twins)
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( twins )
+MACHINE_CONFIG_START(twins_state::twins)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(twins_map)
@@ -427,9 +430,9 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, twins_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( twinsa )
+MACHINE_CONFIG_START(twins_state::twinsa)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", V30, XTAL(16'000'000)/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(twins_map)
 	MCFG_CPU_IO_MAP(twinsa_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", twins_state,  nmi_line_pulse)
@@ -452,7 +455,7 @@ static MACHINE_CONFIG_START( twinsa )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_16MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(16'000'000)/8) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("P1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("P2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -556,7 +559,7 @@ ADDRESS_MAP_END
 
 
 
-static MACHINE_CONFIG_START( spider )
+MACHINE_CONFIG_START(twins_state::spider)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", V30, 8000000)
 	MCFG_CPU_PROGRAM_MAP(twins_map)

@@ -102,8 +102,8 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( ep64_exdos_device::device_add_mconfig )
-	MCFG_WD1770_ADD(WD1770_TAG, XTAL_8MHz)
+MACHINE_CONFIG_START(ep64_exdos_device::device_add_mconfig)
+	MCFG_WD1770_ADD(WD1770_TAG, XTAL(8'000'000))
 
 	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":0", ep64_exdos_floppies, "35dd", ep64_exdos_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(WD1770_TAG":1", ep64_exdos_floppies, nullptr,  ep64_exdos_device::floppy_formats)

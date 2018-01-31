@@ -146,6 +146,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void init_stats(const uint8_t *table, int table_len, int address);
+	void bmcbowl(machine_config &config);
 };
 
 
@@ -211,17 +212,17 @@ READ16_MEMBER(bmcbowl_state::bmc_random_read)
 
 READ16_MEMBER(bmcbowl_state::bmc_protection_r)
 {
-	switch(space.device().safe_pcbase())
+	switch(m_maincpu->pcbase())
 	{
 		case 0xca68:
-			switch(space.device().state().state_int(M68K_D2))
+			switch(m_maincpu->state_int(M68K_D2))
 			{
 				case 0:          return 0x37<<8;
 				case 0x1013: return 0;
 				default:         return 0x46<<8;
 			}
 	}
-	logerror("Protection read @ %X\n",space.device().safe_pcbase());
+	logerror("Protection read @ %X\n",m_maincpu->pcbase());
 	return machine().rand();
 }
 
@@ -450,8 +451,8 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, bmcbowl_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( bmcbowl )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_21_4772MHz / 2 )
+MACHINE_CONFIG_START(bmcbowl_state::bmcbowl)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(21'477'272) / 2 )
 	MCFG_CPU_PROGRAM_MAP(bmcbowl_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bmcbowl_state, irq2_line_hold)
 
@@ -470,11 +471,11 @@ static MACHINE_CONFIG_START( bmcbowl )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz )  // guessed chip type, clock not verified
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545) )  // guessed chip type, clock not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_3_579545MHz / 2)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(3'579'545) / 2)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(bmcbowl_state, dips1_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(bmcbowl_state, input_mux_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)

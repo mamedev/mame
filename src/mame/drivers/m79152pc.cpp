@@ -33,6 +33,7 @@ public:
 
 	uint32_t screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void m79152pc(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -119,9 +120,9 @@ static GFXDECODE_START( m79152pc )
 	GFXDECODE_ENTRY( "chargen", 0x0000, m79152pc_charlayout, 0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( m79152pc )
+MACHINE_CONFIG_START(m79152pc_state::m79152pc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
@@ -140,10 +141,10 @@ static MACHINE_CONFIG_START( m79152pc )
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", z80sio_device, txca_w))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", z80sio_device, rxca_w))
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_4MHz)
+	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL(4'000'000))
 	//MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 
-	MCFG_DEVICE_ADD("uart", Z80SIO, XTAL_4MHz)
+	MCFG_DEVICE_ADD("uart", Z80SIO, XTAL(4'000'000))
 	//MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))

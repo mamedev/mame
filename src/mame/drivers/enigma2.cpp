@@ -109,6 +109,8 @@ public:
 	inline int vysnc_chain_counter_to_vpos( uint16_t counter );
 	void create_interrupt_timers(  );
 	void start_interrupt_timers(  );
+	void enigma2(machine_config &config);
+	void enigma2a(machine_config &config);
 };
 
 
@@ -359,7 +361,7 @@ READ8_MEMBER(enigma2_state::dip_switch_r)
 {
 	uint8_t ret = 0x00;
 
-	if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, space.device().safe_pc(), m_protection_data);
+	if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, m_maincpu->pc(), m_protection_data);
 	switch (offset)
 	{
 	case 0x01:
@@ -372,7 +374,7 @@ READ8_MEMBER(enigma2_state::dip_switch_r)
 		break;
 
 	case 0x02:
-		if (space.device().safe_pc() == 0x07e5)
+		if (m_maincpu->pc() == 0x07e5)
 			ret = 0xaa;
 		else
 			ret = 0xf4;
@@ -589,7 +591,7 @@ static INPUT_PORTS_START( enigma2a )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( enigma2 )
+MACHINE_CONFIG_START(enigma2_state::enigma2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -617,7 +619,7 @@ static MACHINE_CONFIG_START( enigma2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( enigma2a )
+MACHINE_CONFIG_START(enigma2_state::enigma2a)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, CPU_CLOCK)

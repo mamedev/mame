@@ -115,8 +115,8 @@ video z80
 #include "speaker.h"
 
 
-#define MASTER_CLOCK XTAL_4MHz
-#define SOUND_CLOCK XTAL_14_31818MHz
+#define MASTER_CLOCK XTAL(4'000'000)
+#define SOUND_CLOCK XTAL(14'318'181)
 
 
 class mazerbla_state : public driver_device
@@ -183,6 +183,8 @@ public:
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	void greatgun(machine_config &config);
+	void mazerbla(machine_config &config);
 };
 
 
@@ -941,7 +943,7 @@ void mazerbla_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( mazerbla )
+MACHINE_CONFIG_START(mazerbla_state::mazerbla)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
@@ -986,7 +988,7 @@ static MACHINE_CONFIG_START( mazerbla )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( greatgun )
+MACHINE_CONFIG_START(mazerbla_state::greatgun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK)  /* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */

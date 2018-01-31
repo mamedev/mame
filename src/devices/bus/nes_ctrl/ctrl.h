@@ -90,7 +90,7 @@ DECLARE_DEVICE_TYPE(NES_CONTROL_PORT, nes_control_port_device)
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_NESCTRL_BRIGHTPIXEL_CB(_class, _method) \
-	nes_control_port_device::set_brightpixel_callback(*device, nesctrl_brightpixel_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	nes_control_port_device::set_brightpixel_callback(*device, nesctrl_brightpixel_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 SLOT_INTERFACE_EXTERN( nes_control_port1_devices );

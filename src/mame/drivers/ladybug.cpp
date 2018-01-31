@@ -514,7 +514,7 @@ MACHINE_START_MEMBER(ladybug_state,ladybug)
 {
 }
 
-static MACHINE_CONFIG_START( ladybug )
+MACHINE_CONFIG_START(ladybug_state::ladybug)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz */
@@ -551,7 +551,7 @@ static MACHINE_CONFIG_START( ladybug )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dorodon, ladybug )
+MACHINE_CONFIG_DERIVED(ladybug_state::dorodon, ladybug)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END

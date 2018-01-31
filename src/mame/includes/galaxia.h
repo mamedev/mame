@@ -33,4 +33,6 @@ public:
 	uint32_t screen_update_astrowar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxia_interrupt);
 	void init_common();
+	void astrowar(machine_config &config);
+	void galaxia(machine_config &config);
 };

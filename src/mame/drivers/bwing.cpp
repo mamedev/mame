@@ -358,7 +358,7 @@ void bwing_state::bwing_postload()
 }
 
 
-static MACHINE_CONFIG_START( bwing )
+MACHINE_CONFIG_START(bwing_state::bwing)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
@@ -400,10 +400,10 @@ static MACHINE_CONFIG_START( bwing )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8912, XTAL_24MHz / 2 / 8)
+	MCFG_SOUND_ADD("ay1", AY8912, XTAL(24'000'000) / 2 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_SOUND_ADD("ay2", AY8912, XTAL_24MHz / 2 / 8)
+	MCFG_SOUND_ADD("ay2", AY8912, XTAL(24'000'000) / 2 / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac", DAC08, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1)

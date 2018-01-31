@@ -61,6 +61,7 @@ public:
 	DECLARE_WRITE8_MEMBER(port_a_w);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_READ_LINE_MEMBER(cass_r);
+	void mk14(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -188,10 +189,10 @@ void mk14_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( mk14 )
+MACHINE_CONFIG_START(mk14_state::mk14)
 	/* basic machine hardware */
 	// IC1 1SP-8A/600 (8060) SC/MP Microprocessor
-	MCFG_CPU_ADD("maincpu", INS8060, XTAL_4_433619MHz)
+	MCFG_CPU_ADD("maincpu", INS8060, XTAL(4'433'619))
 	MCFG_SCMP_CONFIG(WRITELINE(mk14_state, cass_w), NOOP, READLINE(mk14_state, cass_r), NOOP, READLINE(mk14_state, cass_r), NOOP)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 

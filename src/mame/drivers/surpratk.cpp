@@ -29,7 +29,7 @@ INTERRUPT_GEN_MEMBER(surpratk_state::surpratk_interrupt)
 WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 {
 	if (data & 0xf8)
-		logerror("%04x: videobank = %02x\n",space.device().safe_pc(),data);
+		logerror("%04x: videobank = %02x\n",m_maincpu->pc(),data);
 
 	/* bit 0 = select 053245 at 0000-07ff */
 	/* bit 1 = select palette at 0000-07ff */
@@ -43,7 +43,7 @@ WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 WRITE8_MEMBER(surpratk_state::surpratk_5fc0_w)
 {
 	if ((data & 0xf4) != 0x10)
-		logerror("%04x: 3fc0 = %02x\n",space.device().safe_pc(),data);
+		logerror("%04x: 3fc0 = %02x\n",m_maincpu->pc(),data);
 
 	/* bit 0/1 = coin counters */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
@@ -79,7 +79,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bank0000_map, AS_PROGRAM, 8, surpratk_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("k053244", k05324x_device, k053245_r, k053245_w)
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 
@@ -166,10 +166,10 @@ WRITE8_MEMBER( surpratk_state::banking_callback )
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-static MACHINE_CONFIG_START( surpratk )
+MACHINE_CONFIG_START(surpratk_state::surpratk)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
+	MCFG_CPU_ADD("maincpu", KONAMI, XTAL(24'000'000)/2/4) /* 053248, the clock input is 12MHz, and internal CPU divider of 4 */
 	MCFG_CPU_PROGRAM_MAP(surpratk_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", surpratk_state,  surpratk_interrupt)
 	MCFG_KONAMICPU_LINE_CB(WRITE8(surpratk_state, banking_callback))
@@ -210,7 +210,7 @@ static MACHINE_CONFIG_START( surpratk )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("maincpu", KONAMI_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

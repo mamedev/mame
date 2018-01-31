@@ -132,6 +132,15 @@ const char *const amiga_state::s_custom_reg_names[0x100] =
 	"UNK1F8",       "UNK1FA",       "FMODE",        "UNK1FE"
 };
 
+constexpr XTAL amiga_state::CLK_28M_PAL;
+constexpr XTAL amiga_state::CLK_7M_PAL;
+constexpr XTAL amiga_state::CLK_C1_PAL;
+constexpr XTAL amiga_state::CLK_E_PAL;
+
+constexpr XTAL amiga_state::CLK_28M_NTSC;
+constexpr XTAL amiga_state::CLK_7M_NTSC;
+constexpr XTAL amiga_state::CLK_C1_NTSC;
+constexpr XTAL amiga_state::CLK_E_NTSC;
 
 
 /*************************************
@@ -1158,7 +1167,7 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 	uint16_t temp;
 
 	if (LOG_CUSTOM)
-		logerror("%06X:read from custom %s\n", space.device().safe_pc(), s_custom_reg_names[offset & 0xff]);
+		logerror("%06X:read from custom %s\n", m_maincpu->pc(), s_custom_reg_names[offset & 0xff]);
 
 	switch (offset & 0xff)
 	{
@@ -1272,7 +1281,7 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 	offset &= 0xff;
 
 	if (LOG_CUSTOM)
-		logerror("%06X:write to custom %s = %04X\n", space.device().safe_pc(), s_custom_reg_names[offset & 0xff], data);
+		logerror("%06X:write to custom %s = %04X\n", m_maincpu->pc(), s_custom_reg_names[offset & 0xff], data);
 
 	// paula will handle some of those registers
 	m_paula->reg_w(space, offset, data, mem_mask);

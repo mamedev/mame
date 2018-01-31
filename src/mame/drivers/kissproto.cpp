@@ -19,6 +19,7 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
+	void kissp(machine_config &config);
 protected:
 
 	// devices
@@ -46,7 +47,7 @@ DRIVER_INIT_MEMBER(kissp_state,kissp)
 {
 }
 
-static MACHINE_CONFIG_START( kissp )
+MACHINE_CONFIG_START(kissp_state::kissp)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8035, 6000000/15)
 	MCFG_CPU_PROGRAM_MAP(kissp_map)

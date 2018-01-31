@@ -45,8 +45,7 @@ public:
 		m_io_in1(*this, "IN1"),
 		m_io_in2(*this, "IN2"),
 		m_io_in3(*this, "IN3"),
-		m_palette(*this, "palette"),
-		m_generic_paletteram_32(*this, "paletteram")
+		m_palette(*this, "palette")
 	{ }
 
 	/* memory pointers */
@@ -75,7 +74,6 @@ public:
 	uint16_t    m_pf3_rowscroll[0x0800/2];
 	uint16_t    m_pf4_rowscroll[0x0800/2];
 	DECLARE_READ32_MEMBER(backfire_control2_r);
-	DECLARE_WRITE32_MEMBER(backfire_nonbuffered_palette_w);
 	DECLARE_READ32_MEMBER(backfire_pf1_rowscroll_r);
 	DECLARE_READ32_MEMBER(backfire_pf2_rowscroll_r);
 	DECLARE_READ32_MEMBER(backfire_pf3_rowscroll_r);
@@ -106,7 +104,7 @@ public:
 	required_ioport m_io_in2;
 	required_ioport m_io_in3;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+	void backfire(machine_config &config);
 };
 
 //uint32_t *backfire_180010, *backfire_188010;
@@ -210,14 +208,14 @@ READ32_MEMBER(backfire_state::backfire_eeprom_r)
 
 READ32_MEMBER(backfire_state::backfire_control2_r)
 {
-//  logerror("%08x:Read eprom %08x (%08x)\n", space.device().safe_pc(), offset << 1, mem_mask);
+//  logerror("%08x:Read eprom %08x (%08x)\n", m_maincpu->pc(), offset << 1, mem_mask);
 	return (m_eeprom->do_read() << 24) | m_io_in1->read() | (m_io_in1->read() << 16);
 }
 
 #ifdef UNUSED_FUNCTION
 READ32_MEMBER(backfire_state::backfire_control3_r)
 {
-//  logerror("%08x:Read eprom %08x (%08x)\n", space.device().safe_pc(), offset << 1, mem_mask);
+//  logerror("%08x:Read eprom %08x (%08x)\n", m_maincpu->pc(), offset << 1, mem_mask);
 	return (m_eeprom->do_read() << 24) | m_io_in2->read() | (m_io_in2->read() << 16);
 }
 #endif
@@ -234,12 +232,6 @@ WRITE32_MEMBER(backfire_state::backfire_eeprom_w)
 	}
 }
 
-
-WRITE32_MEMBER(backfire_state::backfire_nonbuffered_palette_w)
-{
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
-	m_palette->set_pen_color(offset,pal5bit(m_generic_paletteram_32[offset] >> 0),pal5bit(m_generic_paletteram_32[offset] >> 5),pal5bit(m_generic_paletteram_32[offset] >> 10));
-}
 
 /* map 32-bit writes to 16-bit */
 
@@ -311,7 +303,7 @@ static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32, backfire_state )
 	AM_RANGE(0x144000, 0x145fff) AM_DEVREADWRITE("tilegen2", deco16ic_device, pf2_data_dword_r, pf2_data_dword_w)
 	AM_RANGE(0x150000, 0x150fff) AM_READWRITE(backfire_pf3_rowscroll_r, backfire_pf3_rowscroll_w)
 	AM_RANGE(0x154000, 0x154fff) AM_READWRITE(backfire_pf4_rowscroll_r, backfire_pf4_rowscroll_w)
-	AM_RANGE(0x160000, 0x161fff) AM_WRITE(backfire_nonbuffered_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x160000, 0x161fff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0x170000, 0x177fff) AM_RAM AM_SHARE("mainram")// main ram
 
 //  AM_RANGE(0x180010, 0x180013) AM_RAM AM_SHARE("backfire_180010") // always 180010 ?
@@ -470,7 +462,7 @@ void backfire_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( backfire )
+MACHINE_CONFIG_START(backfire_state::backfire)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
@@ -482,6 +474,8 @@ static MACHINE_CONFIG_START( backfire )
 
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 2048)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", backfire)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -504,7 +498,8 @@ static MACHINE_CONFIG_START( backfire )
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SET_SCREEN("lscreen")
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -520,7 +515,8 @@ static MACHINE_CONFIG_START( backfire )
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SET_SCREEN("lscreen")
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x10)
@@ -702,10 +698,10 @@ void backfire_state::descramble_sound()
 
 READ32_MEMBER(backfire_state::backfire_speedup_r)
 {
-	//osd_printf_debug( "%08x\n",space.device().safe_pc());
+	//osd_printf_debug( "%08x\n",m_maincpu->pc());
 
-	if (space.device() .safe_pc()== 0xce44)  space.device().execute().spin_until_time(attotime::from_usec(400)); // backfire
-	if (space.device().safe_pc() == 0xcee4)  space.device().execute().spin_until_time(attotime::from_usec(400)); // backfirea
+	if (m_maincpu->pc() == 0xce44) m_maincpu->spin_until_time(attotime::from_usec(400)); // backfire
+	if (m_maincpu->pc() == 0xcee4) m_maincpu->spin_until_time(attotime::from_usec(400)); // backfirea
 
 	return m_mainram[0x18/4];
 }

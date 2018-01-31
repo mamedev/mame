@@ -28,7 +28,8 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(GENERIC_SOCKET, generic_slot_device, "generic_socket", "Generic ROM Socket / RAM Socket / Cartridge Slot")
+DEFINE_DEVICE_TYPE(GENERIC_SOCKET, generic_socket_device, "generic_socket", "Generic ROM Socket / RAM Socket")
+DEFINE_DEVICE_TYPE(GENERIC_CARTSLOT, generic_cartslot_device, "generic_cartslot", "Generic Cartridge Slot")
 
 
 //-------------------------------------------------
@@ -84,8 +85,8 @@ void device_generic_cart_interface::ram_alloc(uint32_t size)
 //-------------------------------------------------
 //  generic_slot_device - constructor
 //-------------------------------------------------
-generic_slot_device::generic_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, GENERIC_SOCKET, tag, owner, clock),
+generic_slot_device::generic_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	device_slot_interface(mconfig, *this),
 	m_interface(nullptr),
@@ -98,6 +99,15 @@ generic_slot_device::generic_slot_device(const machine_config &mconfig, const ch
 {
 }
 
+generic_socket_device::generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: generic_slot_device(mconfig, GENERIC_SOCKET, tag, owner, clock)
+{
+}
+
+generic_cartslot_device::generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: generic_slot_device(mconfig, GENERIC_CARTSLOT, tag, owner, clock)
+{
+}
 
 //-------------------------------------------------
 //  generic_slot_device - destructor

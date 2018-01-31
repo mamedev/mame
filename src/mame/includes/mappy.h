@@ -82,6 +82,16 @@ public:
 	void mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 	void phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram_base);
 
+	void mappy_common(machine_config &config);
+	void mappy(machine_config &config);
+	void phozon(machine_config &config);
+	void motos(machine_config &config);
+	void grobda(machine_config &config);
+	void digdug2(machine_config &config);
+	void pacnpal(machine_config &config);
+	void superpac_common(machine_config &config);
+	void superpac(machine_config &config);
+	void todruaga(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

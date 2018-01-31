@@ -98,7 +98,7 @@
 
 #include "skydiver.lh"
 
-#define MASTER_CLOCK (XTAL_12_096MHz)
+#define MASTER_CLOCK (XTAL(12'096'000))
 
 
 
@@ -346,7 +346,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( skydiver )
+MACHINE_CONFIG_START(skydiver_state::skydiver)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800,MASTER_CLOCK/16)     /* ???? */

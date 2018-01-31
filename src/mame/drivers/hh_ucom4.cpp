@@ -276,6 +276,7 @@ public:
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
+	void ufombs(machine_config &config);
 };
 
 // handlers
@@ -309,7 +310,6 @@ WRITE8_MEMBER(ufombs_state::speaker_w)
 	m_speaker->level_w(data & 3);
 }
 
-
 // config
 
 static INPUT_PORTS_START( ufombs )
@@ -329,7 +329,7 @@ INPUT_PORTS_END
 
 static const s16 ufombs_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( ufombs )
+MACHINE_CONFIG_START(ufombs_state::ufombs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -389,6 +389,7 @@ public:
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_b_r);
+	void ssfball(machine_config &config);
 };
 
 // handlers
@@ -431,7 +432,6 @@ READ8_MEMBER(ssfball_state::input_b_r)
 	// B: input port 2, where B3 is multiplexed
 	return m_inp_matrix[2]->read() | read_inputs(2);
 }
-
 
 // config
 
@@ -476,7 +476,7 @@ INPUT_PORTS_END
 
 static const s16 ssfball_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( ssfball )
+MACHINE_CONFIG_START(ssfball_state::ssfball)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, 400000) // approximation
@@ -533,6 +533,7 @@ public:
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_a_r);
+	void bmsoccer(machine_config &config);
 };
 
 // handlers
@@ -578,7 +579,6 @@ READ8_MEMBER(bmsoccer_state::input_a_r)
 	return read_inputs(2);
 }
 
-
 // config
 
 static INPUT_PORTS_START( bmsoccer )
@@ -604,7 +604,7 @@ static INPUT_PORTS_START( bmsoccer )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shoot")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bmsoccer )
+MACHINE_CONFIG_START(bmsoccer_state::bmsoccer)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -656,6 +656,7 @@ public:
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
+	void bmsafari(machine_config &config);
 };
 
 // handlers
@@ -694,7 +695,6 @@ WRITE8_MEMBER(bmsafari_state::speaker_w)
 	m_speaker->level_w(data & 1);
 }
 
-
 // config
 
 static INPUT_PORTS_START( bmsafari )
@@ -712,7 +712,7 @@ static INPUT_PORTS_START( bmsafari )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bmsafari )
+MACHINE_CONFIG_START(bmsafari_state::bmsafari)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -766,6 +766,7 @@ public:
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_READ8_MEMBER(input_b_r);
+	void splasfgt(machine_config &config);
 };
 
 // handlers
@@ -809,7 +810,6 @@ READ8_MEMBER(splasfgt_state::input_b_r)
 	// B: multiplexed buttons
 	return read_inputs(4);
 }
-
 
 // config
 
@@ -862,7 +862,7 @@ INPUT_PORTS_END
 
 static const s16 splasfgt_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
-static MACHINE_CONFIG_START( splasfgt )
+MACHINE_CONFIG_START(splasfgt_state::splasfgt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, 400000) // approximation
@@ -918,6 +918,7 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void bcclimbr(machine_config &config);
 };
 
 // handlers
@@ -949,7 +950,6 @@ WRITE8_MEMBER(bcclimbr_state::plate_w)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( bcclimbr )
@@ -966,10 +966,10 @@ static INPUT_PORTS_START( bcclimbr )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_RIGHT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( bcclimbr )
+MACHINE_CONFIG_START(bcclimbr_state::bcclimbr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(bcclimbr_state, plate_w))
@@ -1024,6 +1024,7 @@ public:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_WRITE8_MEMBER(input_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void tactix(machine_config &config);
 };
 
 // handlers
@@ -1053,7 +1054,6 @@ READ8_MEMBER(tactix_state::input_r)
 	// A: multiplexed inputs
 	return read_inputs(5);
 }
-
 
 // config
 
@@ -1089,7 +1089,7 @@ static INPUT_PORTS_START( tactix )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tactix )
+MACHINE_CONFIG_START(tactix_state::tactix)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D557L, 400000) // approximation
@@ -1136,6 +1136,7 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void invspace(machine_config &config);
 };
 
 // handlers
@@ -1167,7 +1168,6 @@ WRITE8_MEMBER(invspace_state::plate_w)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( invspace )
@@ -1183,10 +1183,10 @@ static INPUT_PORTS_START( invspace )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( invspace )
+MACHINE_CONFIG_START(invspace_state::invspace)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D552, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D552, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(invspace_state, grid_w))
@@ -1238,6 +1238,7 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void efball(machine_config &config);
 };
 
 // handlers
@@ -1267,7 +1268,6 @@ WRITE8_MEMBER(efball_state::plate_w)
 	m_plate = (m_plate & ~(0xf << shift)) | (data << shift);
 	prepare_display();
 }
-
 
 // config
 
@@ -1299,10 +1299,10 @@ static INPUT_PORTS_START( efball )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( efball )
+MACHINE_CONFIG_START(efball_state::efball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_READ_C_CB(IOPORT("IN.2"))
@@ -1351,6 +1351,8 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void galaxy2b(machine_config &config);
+	void galaxy2(machine_config &config);
 };
 
 // handlers
@@ -1382,7 +1384,6 @@ WRITE8_MEMBER(galaxy2_state::plate_w)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( galaxy2 )
@@ -1398,10 +1399,10 @@ static INPUT_PORTS_START( galaxy2 )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( galaxy2 )
+MACHINE_CONFIG_START(galaxy2_state::galaxy2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(galaxy2_state, grid_w))
@@ -1426,7 +1427,7 @@ static MACHINE_CONFIG_START( galaxy2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( galaxy2b, galaxy2 )
+MACHINE_CONFIG_DERIVED(galaxy2_state::galaxy2b, galaxy2)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1462,6 +1463,7 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void astrocmd(machine_config &config);
 };
 
 // handlers
@@ -1499,7 +1501,6 @@ WRITE8_MEMBER(astrocmd_state::plate_w)
 		prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( astrocmd )
@@ -1516,10 +1517,10 @@ static INPUT_PORTS_START( astrocmd )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( astrocmd )
+MACHINE_CONFIG_START(astrocmd_state::astrocmd)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(astrocmd_state, grid_w))
@@ -1571,6 +1572,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void edracula(machine_config &config);
 };
 
 // handlers
@@ -1595,7 +1597,6 @@ WRITE8_MEMBER(edracula_state::plate_w)
 	display_matrix(18, 8, m_plate, m_grid);
 }
 
-
 // config
 
 static INPUT_PORTS_START( edracula )
@@ -1612,10 +1613,10 @@ static INPUT_PORTS_START( edracula )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( edracula )
+MACHINE_CONFIG_START(edracula_state::edracula)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(edracula_state, grid_w))
@@ -1664,6 +1665,7 @@ public:
 
 	DECLARE_WRITE32_MEMBER(lcd_output_w);
 	DECLARE_WRITE8_MEMBER(lcd_w);
+	void mcompgin(machine_config &config);
 };
 
 // handlers
@@ -1684,7 +1686,6 @@ WRITE8_MEMBER(mcompgin_state::lcd_w)
 	m_lcd->write_clock(data >> 1 & 1);
 }
 
-
 // config
 
 static INPUT_PORTS_START( mcompgin )
@@ -1700,10 +1701,10 @@ static INPUT_PORTS_START( mcompgin )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mcompgin )
+MACHINE_CONFIG_START(mcompgin_state::mcompgin)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D650, XTAL_400kHz) // TDK FCR400K
+	MCFG_CPU_ADD("maincpu", NEC_D650, 400_kHz_XTAL) // TDK FCR400K
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_E_CB(WRITE8(mcompgin_state, lcd_w))
@@ -1741,6 +1742,7 @@ public:
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
 	DECLARE_WRITE8_MEMBER(speaker_w);
+	void mvbfree(machine_config &config);
 };
 
 // handlers
@@ -1779,7 +1781,6 @@ WRITE8_MEMBER(mvbfree_state::speaker_w)
 	m_speaker->level_w(data & 1);
 }
 
-
 // config
 
 static INPUT_PORTS_START( mvbfree )
@@ -1797,7 +1798,7 @@ static INPUT_PORTS_START( mvbfree )
 	PORT_CONFSETTING(    0x08, "3" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( mvbfree )
+MACHINE_CONFIG_START(mvbfree_state::mvbfree)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D553, 400000) // approximation
@@ -1852,6 +1853,7 @@ public:
 	DECLARE_WRITE8_MEMBER(speaker_w);
 	DECLARE_WRITE8_MEMBER(input_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void grobot9(machine_config &config);
 };
 
 // handlers
@@ -1884,7 +1886,6 @@ READ8_MEMBER(grobot9_state::input_r)
 	return read_inputs(5);
 }
 
-
 // config
 
 static INPUT_PORTS_START( grobot9 )
@@ -1916,7 +1917,7 @@ static INPUT_PORTS_START( grobot9 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, single_interrupt_line, nullptr) PORT_NAME("Start-Pitch")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( grobot9 )
+MACHINE_CONFIG_START(grobot9_state::grobot9)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D557L, 160000) // approximation
@@ -1962,6 +1963,7 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void tccombat(machine_config &config);
 };
 
 // handlers
@@ -1993,7 +1995,6 @@ WRITE8_MEMBER(tccombat_state::plate_w)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( tccombat )
@@ -2006,7 +2007,7 @@ static INPUT_PORTS_START( tccombat )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tccombat )
+MACHINE_CONFIG_START(tccombat_state::tccombat)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 400000) // approximation
@@ -2066,6 +2067,7 @@ public:
 
 	void set_clock();
 	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
+	void tmtennis(machine_config &config);
 
 protected:
 	virtual void machine_reset() override;
@@ -2103,7 +2105,6 @@ READ8_MEMBER(tmtennis_state::input_r)
 	// A,B: multiplexed buttons
 	return ~read_inputs(2) >> (offset*4);
 }
-
 
 // config
 
@@ -2163,7 +2164,7 @@ void tmtennis_state::machine_reset()
 	set_clock();
 }
 
-static MACHINE_CONFIG_START( tmtennis )
+MACHINE_CONFIG_START(tmtennis_state::tmtennis)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D552, 360000) // see set_clock
@@ -2224,6 +2225,7 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void tmpacman(machine_config &config);
 };
 
 // handlers
@@ -2255,7 +2257,6 @@ WRITE8_MEMBER(tmpacman_state::plate_w)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( tmpacman )
@@ -2272,10 +2273,10 @@ static INPUT_PORTS_START( tmpacman )
 	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tmpacman )
+MACHINE_CONFIG_START(tmpacman_state::tmpacman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_430kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 430_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(tmpacman_state, grid_w))
@@ -2329,6 +2330,7 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void tmscramb(machine_config &config);
 };
 
 // handlers
@@ -2359,7 +2361,6 @@ WRITE8_MEMBER(tmscramb_state::plate_w)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( tmscramb )
@@ -2375,10 +2376,10 @@ static INPUT_PORTS_START( tmscramb )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tmscramb )
+MACHINE_CONFIG_START(tmscramb_state::tmscramb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.1"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(tmscramb_state, grid_w))
@@ -2431,6 +2432,7 @@ public:
 	void prepare_display();
 	DECLARE_WRITE8_MEMBER(grid_w);
 	DECLARE_WRITE8_MEMBER(plate_w);
+	void tcaveman(machine_config &config);
 };
 
 // handlers
@@ -2462,7 +2464,6 @@ WRITE8_MEMBER(tcaveman_state::plate_w)
 	prepare_display();
 }
 
-
 // config
 
 static INPUT_PORTS_START( tcaveman )
@@ -2475,10 +2476,10 @@ static INPUT_PORTS_START( tcaveman )
 	PORT_CONFSETTING(    0x08, "Professional" )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( tcaveman )
+MACHINE_CONFIG_START(tcaveman_state::tcaveman)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(IOPORT("IN.0"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(tcaveman_state, grid_w))
 	MCFG_UCOM4_WRITE_D_CB(WRITE8(tcaveman_state, grid_w))
@@ -2530,6 +2531,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(output_w);
 	DECLARE_READ8_MEMBER(input_r);
+	void alnchase(machine_config &config);
 };
 
 // handlers
@@ -2566,7 +2568,6 @@ READ8_MEMBER(alnchase_state::input_r)
 	// A: multiplexed buttons
 	return read_inputs(2);
 }
-
 
 // config
 
@@ -2607,10 +2608,10 @@ static INPUT_PORTS_START( alnchase )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( alnchase )
+MACHINE_CONFIG_START(alnchase_state::alnchase)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", NEC_D553, XTAL_400kHz)
+	MCFG_CPU_ADD("maincpu", NEC_D553, 400_kHz_XTAL)
 	MCFG_UCOM4_READ_A_CB(READ8(alnchase_state, input_r))
 	MCFG_UCOM4_READ_B_CB(IOPORT("IN.2"))
 	MCFG_UCOM4_WRITE_C_CB(WRITE8(alnchase_state, output_w))

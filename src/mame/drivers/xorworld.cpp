@@ -151,7 +151,7 @@ static GFXDECODE_START( xorworld )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( xorworld )
+MACHINE_CONFIG_START(xorworld_state::xorworld)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)   // 10 MHz
 	MCFG_CPU_PROGRAM_MAP(xorworld_map)

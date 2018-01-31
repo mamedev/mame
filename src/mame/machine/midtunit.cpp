@@ -60,7 +60,7 @@ WRITE16_MEMBER(midtunit_state::midtunit_cmos_w)
 	}
 	else
 	{
-		logerror("%08X:Unexpected CMOS W @ %05X\n", space.device().safe_pc(), offset);
+		logerror("%08X:Unexpected CMOS W @ %05X\n", m_maincpu->pc(), offset);
 		popmessage("Bad CMOS write");
 	}
 }
@@ -526,7 +526,7 @@ READ16_MEMBER(midtunit_state::midtunit_sound_state_r)
 
 READ16_MEMBER(midtunit_state::midtunit_sound_r)
 {
-	logerror("%08X:Sound data read\n", space.device().safe_pc());
+	logerror("%08X:Sound data read\n", m_maincpu->pc());
 
 	if (m_chip_type == SOUND_DCS)
 		return m_dcs->data_r() & 0xff;
@@ -539,7 +539,7 @@ WRITE16_MEMBER(midtunit_state::midtunit_sound_w)
 	/* check for out-of-bounds accesses */
 	if (!offset)
 	{
-		logerror("%08X:Unexpected write to sound (lo) = %04X\n", space.device().safe_pc(), data);
+		logerror("%08X:Unexpected write to sound (lo) = %04X\n", m_maincpu->pc(), data);
 		return;
 	}
 
@@ -557,7 +557,7 @@ WRITE16_MEMBER(midtunit_state::midtunit_sound_w)
 				break;
 
 			case SOUND_DCS:
-				logerror("%08X:Sound write = %04X\n", space.device().safe_pc(), data);
+				logerror("%08X:Sound write = %04X\n", m_maincpu->pc(), data);
 				m_dcs->reset_w(~data & 0x100);
 				m_dcs->data_w(data & 0xff);
 				/* the games seem to check for $82 loops, so this should be just barely enough */

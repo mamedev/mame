@@ -55,12 +55,12 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(bbc_tube_zep100_device::device_add_mconfig )
-	MCFG_CPU_ADD("z80", Z80, XTAL_4MHz)
+MACHINE_CONFIG_START(bbc_tube_zep100_device::device_add_mconfig)
+	MCFG_CPU_ADD("z80", Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(tube_zep100_mem)
 	MCFG_CPU_IO_MAP(tube_zep100_io)
 
-	MCFG_DEVICE_ADD("via", VIA6522, XTAL_4MHz / 2)
+	MCFG_DEVICE_ADD("via", VIA6522, XTAL(4'000'000) / 2)
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(bbc_tube_zep100_device, via_pb_w))
 	MCFG_VIA6522_CB2_HANDLER(DEVWRITELINE("ppi", i8255_device, pc2_w))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE("ppi", i8255_device, pc6_w))

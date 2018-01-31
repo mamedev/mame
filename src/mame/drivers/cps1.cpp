@@ -377,7 +377,7 @@ READ16_MEMBER(cps_state::qsound_rom_r)
 	}
 	else
 	{
-		popmessage("%06x: read sound ROM byte %04x", space.device().safe_pc(), offset);
+		popmessage("%06x: read sound ROM byte %04x", m_maincpu->pc(), offset);
 		return 0;
 	}
 }
@@ -3336,15 +3336,15 @@ MACHINE_START_MEMBER(cps_state,qsound)
 	membank("bank1")->configure_entries(0, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
-static MACHINE_CONFIG_START( cps1_10MHz )
+MACHINE_CONFIG_START(cps_state::cps1_10MHz)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz )    /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000) )    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cps_state, cps1_int_ack)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)  /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,cps1)
@@ -3367,17 +3367,17 @@ static MACHINE_CONFIG_START( cps1_10MHz )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_YM2151_ADD("2151", XTAL_3_579545MHz)  /* verified on pcb */
+	MCFG_YM2151_ADD("2151", XTAL(3'579'545))  /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
 	/* CPS PPU is fed by a 16mhz clock,pin 117 outputs a 4mhz clock which is divided by 4 using 2 74ls74 */
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4/4, PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/4/4, PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( forgottn, cps1_10MHz )
+MACHINE_CONFIG_DERIVED(cps_state::forgottn, cps1_10MHz)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(forgottn_map)
 
@@ -3386,20 +3386,20 @@ static MACHINE_CONFIG_DERIVED( forgottn, cps1_10MHz )
 	MCFG_UPD4701_PORTY("DIAL1")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( cps1_12MHz, cps1_10MHz )
+MACHINE_CONFIG_DERIVED(cps_state::cps1_12MHz, cps1_10MHz)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK( XTAL_12MHz )    /* verified on pcb */
+	MCFG_CPU_CLOCK( XTAL(12'000'000) )    /* verified on pcb */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pang3, cps1_12MHz )
+MACHINE_CONFIG_DERIVED(cps_state::pang3, cps1_12MHz)
 
 	/* basic machine hardware */
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ganbare, cps1_10MHz )
+MACHINE_CONFIG_DERIVED(cps_state::ganbare, cps1_10MHz)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3408,15 +3408,15 @@ static MACHINE_CONFIG_DERIVED( ganbare, cps1_10MHz )
 	MCFG_M48T35_ADD("m48t35")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
+MACHINE_CONFIG_DERIVED(cps_state::qsound, cps1_12MHz)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_12MHz )    /* verified on pcb */
+	MCFG_CPU_REPLACE("maincpu", M68000, XTAL(12'000'000) )    /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(qsound_main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(cps_state, cps1_int_ack)
 
-	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL_8MHz)  /* verified on pcb */
+	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(qsound_decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cps_state, irq0_line_hold, 250) // measured (cps2.c)
@@ -3439,18 +3439,18 @@ static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wofhfh, cps1_12MHz )
+MACHINE_CONFIG_DERIVED(cps_state::wofhfh, cps1_12MHz)
 
 	/* basic machine hardware */
 	MCFG_EEPROM_SERIAL_93C46_8BIT_ADD("eeprom")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sf2m3, cps1_12MHz)
+MACHINE_CONFIG_DERIVED(cps_state::sf2m3, cps1_12MHz)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sf2m3_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sf2m10, cps1_12MHz)
+MACHINE_CONFIG_DERIVED(cps_state::sf2m10, cps1_12MHz)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sf2m10_map)
 MACHINE_CONFIG_END
@@ -10529,11 +10529,10 @@ ROM_START( wof )
 ROM_END
 
 /* B-Board 91635B-2 */
-/* FIXME Probably this set uses a patched program ROM coming from a desuicided board, or simply the original C-Board
-   is not a 92641C-1. A verification and a new fresh dump are needed to confirm if it's genuine or not. */
+/* Dumped from 2 different sets. Dumper's note for the second set: 'the c board was unmodified b21 with dead battery' */
 ROM_START( wofr1 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "tk2e_23b.8f", 0x000000, 0x80000, CRC(11fb2ed1) SHA1(19e09ad6f9edc7997b030cddfe1d9c96d88135f2) )  // patched?
+	ROM_LOAD16_WORD_SWAP( "tk2e_23b.8f", 0x000000, 0x80000, CRC(11fb2ed1) SHA1(19e09ad6f9edc7997b030cddfe1d9c96d88135f2) )
 	ROM_LOAD16_WORD_SWAP( "tk2e_22b.7f", 0x080000, 0x80000, CRC(479b3f24) SHA1(9fb8ae06856fe115addfb6794c28978a4f6716ec) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -12729,7 +12728,7 @@ GAME( 1993, dino,        0,        qsound,     dino,     cps_state,   dino,     
 GAME( 1993, dinou,       dino,     qsound,     dino,     cps_state,   dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (USA 930201)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, dinoa,       dino,     qsound,     dino,     cps_state,   dino,     ROT0,   "Capcom", "Cadillacs and Dinosaurs (Asia TW 930223)", MACHINE_SUPPORTS_SAVE ) // Title screen shows "distributed by Hung Hsi Enterprise". Hung Hsi produced some sf2 bootlegs.
 GAME( 1993, dinoj,       dino,     qsound,     dino,     cps_state,   dino,     ROT0,   "Capcom", "Cadillacs: Kyouryuu Shin Seiki (Japan 930201)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, dinohunt,    dino,     wofhfh,     dinoh,    cps_state,   dinohunt, ROT0,   "bootleg", "Dinosaur Hunter (Chinese bootleg of Cadillacs and Dinosaurs)", MACHINE_SUPPORTS_SAVE )  // 930223 -  based on Asia TW version, the original might still be undumped
+GAME( 1993, dinohunt,    dino,     wofhfh,     dinoh,    cps_state,   dinohunt, ROT0,   "bootleg", "Dinosaur Hunter (Chinese bootleg of Cadillacs and Dinosaurs)", MACHINE_SUPPORTS_SAVE )  // 930223 -  based on Asia TW version
 GAME( 1993, punisher,    0,        qsound,     punisher, cps_state,   punisher, ROT0,   "Capcom", "The Punisher (World 930422)", MACHINE_SUPPORTS_SAVE )   // "ETC"
 GAME( 1993, punisheru,   punisher, qsound,     punisher, cps_state,   punisher, ROT0,   "Capcom", "The Punisher (USA 930422)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, punisherh,   punisher, qsound,     punisher, cps_state,   punisher, ROT0,   "Capcom", "The Punisher (Hispanic 930422)", MACHINE_SUPPORTS_SAVE )

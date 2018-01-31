@@ -40,8 +40,8 @@ Boards:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_18_432MHz
-#define SOUND_CLOCK         XTAL_14_31818MHz
+#define MASTER_CLOCK        XTAL(18'432'000)
+#define SOUND_CLOCK         XTAL(14'318'181)
 
 
 INTERRUPT_GEN_MEMBER(pandoras_state::pandoras_master_interrupt)
@@ -305,7 +305,7 @@ READ8_MEMBER(pandoras_state::pandoras_portB_r)
 	return (m_audiocpu->total_cycles() / 512) & 0x0f;
 }
 
-static MACHINE_CONFIG_START( pandoras )
+MACHINE_CONFIG_START(pandoras_state::pandoras)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK/6)  /* CPU A */

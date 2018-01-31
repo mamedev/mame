@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(bankswitch1_w)
@@ -343,18 +343,18 @@ void wc90_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( wc90 )
+MACHINE_CONFIG_START(wc90_state::wc90)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz)     /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000))     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(wc90_map_1)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_8MHz)     /* verified on pcb */
+	MCFG_CPU_ADD("sub", Z80, XTAL(8'000'000))     /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(wc90_map_2)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", wc90_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)  /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	/* NMIs are triggered by the main CPU */
 
@@ -382,18 +382,18 @@ static MACHINE_CONFIG_START( wc90 )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL_8MHz)  /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL(8'000'000))  /* verified on pcb */
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( wc90t, wc90 )
+MACHINE_CONFIG_DERIVED(wc90_state::wc90t, wc90)
 	MCFG_VIDEO_START_OVERRIDE(wc90_state, wc90t )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pac90, wc90 )
+MACHINE_CONFIG_DERIVED(wc90_state::pac90, wc90)
 	MCFG_DEVICE_MODIFY("spritegen")
 	MCFG_TECMO_SPRITE_YOFFSET(16) // sprites need shifting, why?
 MACHINE_CONFIG_END

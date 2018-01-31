@@ -318,7 +318,7 @@ mephisto_display_modul_device::mephisto_display_modul_device(const machine_confi
 //  device_add_mconfig
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( mephisto_display_modul_device::device_add_mconfig )
+MACHINE_CONFIG_START(mephisto_display_modul_device::device_add_mconfig)
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(50)

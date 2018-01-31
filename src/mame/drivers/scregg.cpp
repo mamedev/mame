@@ -73,6 +73,8 @@ public:
 	DECLARE_MACHINE_START(scregg);
 	DECLARE_MACHINE_RESET(scregg);
 	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
+	void scregg(machine_config &config);
+	void dommy(machine_config &config);
 };
 
 
@@ -258,10 +260,10 @@ MACHINE_RESET_MEMBER(scregg_state,scregg)
 	m_btime_tilemap[3] = 0;
 }
 
-static MACHINE_CONFIG_START( dommy )
+MACHINE_CONFIG_START(scregg_state::dommy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(dommy_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq", scregg_state, scregg_interrupt, "screen", 0, 8)
 
@@ -270,7 +272,7 @@ static MACHINE_CONFIG_START( dommy )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 8, 248, 272, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -282,18 +284,18 @@ static MACHINE_CONFIG_START( dommy )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( scregg )
+MACHINE_CONFIG_START(scregg_state::scregg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/8)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(eggs_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("irq", scregg_state, scregg_interrupt, "screen", 0, 8)
 
@@ -302,7 +304,7 @@ static MACHINE_CONFIG_START( scregg )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 8, 248, 272, 8, 248)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 8, 248, 272, 8, 248)
 	MCFG_SCREEN_UPDATE_DRIVER(scregg_state, screen_update_eggs)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -314,10 +316,10 @@ static MACHINE_CONFIG_START( scregg )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
 MACHINE_CONFIG_END
 

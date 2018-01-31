@@ -250,6 +250,7 @@ public:
 	int mole_state_a[6];
 	int mole_state_b[6];
 
+	void kenseim(machine_config &config);
 };
 
 
@@ -470,10 +471,10 @@ static const z80_daisy_config daisy_chain_gamecpu[] =
 	{ nullptr }
 };
 
-static MACHINE_CONFIG_DERIVED( kenseim, cps1_12MHz )
+MACHINE_CONFIG_DERIVED(kenseim_state::kenseim, cps1_12MHz)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL_16MHz/2) // tmpz84c011-8
+	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL(16'000'000)/2) // tmpz84c011-8
 	MCFG_Z80_DAISY_CHAIN(daisy_chain_gamecpu)
 	MCFG_CPU_PROGRAM_MAP(kenseim_map)
 	MCFG_CPU_IO_MAP(kenseim_io_map)
