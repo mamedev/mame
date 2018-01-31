@@ -1800,6 +1800,11 @@ MACHINE_CONFIG_END
 #undef  CODE_SIZE
 #define CODE_SIZE   0x0400000
 
+/*
+NOTE: There is known to exist a Time Killer rom board P/N 1049 REV1 that uses 20 4Mbit EPROMs numbered GROM00 through GROM19
+instead of the 4 4Mbit EPROMs and 4 16Mbit MASK ROMs shown below as found on rom board P/N 1051 REV0
+*/
+
 ROM_START( timekill )
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "tk00_v1.32_u54.u54", 0x00000, 0x40000, CRC(68c74b81) SHA1(acdf677f82d7428acc6cf01076d43dd6330e9cb3) ) /* Labeled TK00 V1.32 (U54) */
