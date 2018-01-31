@@ -66,10 +66,12 @@
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/wd_fdc.h"
+#include "machine/pic8259.h"
 #include "video/tms9927.h"
 #include "sound/beep.h"
 #include "screen.h"
@@ -157,6 +159,7 @@ public:
 		m_crtc(*this, "crtc"),
 		m_fdc (*this, "fdc"),
 		m_floppy(*this, "fdc:%u", 0),
+		m_i8088(*this, "i8088"),
 		m_beep(*this, "beeper"),
 		m_keycols(*this, "COL.%u", 0),
 		m_palette(*this, "palette"),
@@ -182,8 +185,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
 	DECLARE_WRITE8_MEMBER(beep_w);
 	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_READ8_MEMBER(start88_r);
 
 	void alphatp3(machine_config &config);
+	void alphatp30(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -194,6 +199,7 @@ protected:
 	required_device<crt5037_device> m_crtc;
 	required_device<fd1791_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
+	optional_device<cpu_device> m_i8088;
 	required_device<beep_device> m_beep;
 	required_ioport_array<16> m_keycols;
 
@@ -267,11 +273,27 @@ static ADDRESS_MAP_START( alphatp3_io, AS_IO, 8, alphatp_34_state )
 	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("kbdmcu", i8041_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0x12, 0x12) AM_WRITE(beep_w)
+	AM_RANGE(0x40, 0x40) AM_READ(start88_r)
 	AM_RANGE(0x50, 0x53) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0x54, 0x54) AM_READWRITE(fdc_stat_r, fdc_cmd_w)
 	AM_RANGE(0x78, 0x78) AM_WRITE(bank_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( alphatp30_8088_map, AS_PROGRAM, 8, alphatp_34_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_RAM
+	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("16bit", 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( alphatp30_8088_io, AS_IO, 8, alphatp_34_state )
+	AM_RANGE(0xffe0, 0xffe1) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
+ADDRESS_MAP_END
+
+READ8_MEMBER(alphatp_34_state::start88_r)
+{
+	if(m_i8088)
+		m_i8088->resume(SUSPEND_REASON_DISABLE);
+	return 0;
+}
 
 WRITE8_MEMBER(alphatp_34_state::bank_w)
 {
@@ -1118,7 +1140,17 @@ MACHINE_CONFIG_START(alphatp_34_state::alphatp3)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", alphatp3_floppies, "525qd", floppy_image_device::default_floppy_formats)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_DERIVED(alphatp_34_state::alphatp30, alphatp3)
+	MCFG_CPU_ADD("i8088", I8088, 6000000) // unknown clock
+	MCFG_CPU_PROGRAM_MAP(alphatp30_8088_map)
+	MCFG_CPU_IO_MAP(alphatp30_8088_io)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
+	MCFG_DEVICE_DISABLE()
 
+	MCFG_DEVICE_ADD("pic8259", PIC8259, 0)
+	MCFG_PIC8259_OUT_INT_CB(INPUTLINE("i8088", 0))
+	MCFG_PIC8259_IN_SP_CB(GND)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  ROM DEFINITIONS
@@ -1222,4 +1254,4 @@ COMP( 198?, alphatp1,  alphatp2, 0,     alphatp2, alphatp2, alphatp_12_state, 0,
 COMP( 198?, alphatp2,  0,        0,     alphatp2, alphatp2, alphatp_12_state, 0,    "Triumph-Adler", "alphatronic P2", MACHINE_NOT_WORKING )
 COMP( 198?, alphatp2u, alphatp2, 0,     alphatp2u,alphatp3, alphatp_12_state, 0,    "Triumph-Adler", "alphatronic P2U", MACHINE_NOT_WORKING )
 COMP( 1982, alphatp3,  0,        0,     alphatp3, alphatp3, alphatp_34_state, 0,    "Triumph-Adler", "alphatronic P3", MACHINE_NOT_WORKING )
-COMP( 198?, alphatp30, alphatp3, 0,     alphatp3, alphatp3, alphatp_34_state, 0,    "Triumph-Adler", "alphatronic P30",MACHINE_NOT_WORKING )
+COMP( 198?, alphatp30, alphatp3, 0,     alphatp30, alphatp3, alphatp_34_state, 0,    "Triumph-Adler", "alphatronic P30",MACHINE_NOT_WORKING )
