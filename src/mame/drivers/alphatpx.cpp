@@ -701,10 +701,6 @@ static const gfx_layout charlayout =
 //  VIDEO - Alphatronic P1, P2, P2S, P2U and Hell 2069
 //**************************************************************************
 
-static GFXDECODE_START( alphatp2 )
-	GFXDECODE_ENTRY("gfx", 0, charlayout, 0, 1)
-GFXDECODE_END
-
 uint32_t alphatp_12_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();

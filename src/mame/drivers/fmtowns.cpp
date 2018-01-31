@@ -558,13 +558,15 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 			logerror("FDC: Data %02x\n",data);
 			break;
 		case 0x08:
+		{
 			// bit 5 - CLKSEL
-			if(m_towns_selected_drive != 0)
+			// docs are unclear about this but there's only one motor control line and turning on only the selected drive doesn't work properly.
+			for(int i = 0; i < 4; i++)
 			{
-				if(sel[m_towns_selected_drive-1] != nullptr)
+				if(sel[i] != nullptr)
 				{
-					sel[m_towns_selected_drive-1]->mon_w((~data & 0x10)>>4);
-					sel[m_towns_selected_drive-1]->ss_w((data & 0x04)>>2);
+					sel[i]->mon_w((~data & 0x10)>>4);
+					sel[i]->ss_w((data & 0x04)>>2);
 				}
 			}
 			m_fdc->dden_w(BIT(~data, 1));
@@ -573,6 +575,7 @@ WRITE8_MEMBER(towns_state::towns_floppy_w)
 			//logerror("FDC: Config drive%i %02x\n",m_towns_selected_drive-1,data);
 
 			break;
+		}
 		case 0x0c:  // drive select
 			switch(data & 0x0f)
 			{
