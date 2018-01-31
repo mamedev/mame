@@ -3,13 +3,28 @@
 # xavix opcodes
 
 callf_xa3
-	TMP = read_pc();
 	TMP2 = read_pc();
-	{
-	uint8_t TMP3 = read_pc();
-	logerror("%04x: XaviX far call pointing at %02x%02x%02x\n", PC, TMP, TMP3, TMP2);
-	}
+	TMP = read_pc();
+	TMP |= (read_pc()<<8);
+	read(SP);
+	write(SP, PC>>8);
+	dec_SP();
+	write(SP, PC);
+	dec_SP();
+	write(SP, m_farbank);
+	dec_SP();
+	m_farbank=TMP2;
+	PC = TMP;
 	prefetch();
 
 retf_imp
+	read_pc_noinc();
+	read(SP);
+	inc_SP();
+	TMP2 = read(SP);
+	inc_SP();
+	PC = read(SP);
+	inc_SP();
+	PC = set_h(PC, read(SP));
+	m_farbank = TMP2;
 	prefetch();

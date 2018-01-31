@@ -16,7 +16,8 @@
 DEFINE_DEVICE_TYPE(XAVIX, xavix_device, "xavix", "XaviX")
 
 xavix_device::xavix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, XAVIX, tag, owner, clock)
+	m6502_device(mconfig, XAVIX, tag, owner, clock),
+	XPC(0)
 {
 	program_config.m_addr_width = 24;
 	program_config.m_logaddr_width = 24;
@@ -39,11 +40,26 @@ void xavix_device::device_start()
 		mintf = std::make_unique<mi_xavix_normal>(this);
 
 	init();
+
+	state_add(STATE_GENPC, "GENPC", XPC).callexport().noshow();
+	state_add(STATE_GENPCBASE, "CURPC", XPC).callexport().noshow();
 }
+
+void xavix_device::state_export(const device_state_entry &entry)
+{
+	switch(entry.index()) {
+	case STATE_GENPC:
+	case STATE_GENPCBASE:
+		XPC = adr_with_bank(NPC);
+		break;
+	}
+}
+
 
 void xavix_device::device_reset()
 {
 	m_farbank = 0;
+	XPC = 0;
 	m6502_device::device_reset();
 }
 

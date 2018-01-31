@@ -52,6 +52,7 @@ protected:
 	};
 
 	uint8_t m_farbank;
+	uint32_t XPC;
 
 	uint8_t farbank_r() { return m_farbank; }
 	void farbank_w(uint8_t data) { m_farbank = data; }
@@ -60,6 +61,7 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void state_export(const device_state_entry &entry) override;
 
 };
 
