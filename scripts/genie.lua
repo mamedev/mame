@@ -1074,6 +1074,9 @@ configuration { "asmjs" }
 		"-x c++",
 		"-std=c++14",
 	}
+	linkoptions {
+		"-Wl,--start-group",
+	}
 	archivesplit_size "20"
 
 configuration { "android*" }
