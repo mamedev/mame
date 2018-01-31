@@ -30142,6 +30142,9 @@ okean240t                       //
 @source:olibochu.cpp
 olibochu                        // M47 (c) 1981 + "GDI presents"
 
+@source:olyboss.cpp
+olybossd                        // Olympia BOSS D
+
 @source:omegrace.cpp
 deltrace                        // bootleg
 omegrace                        // (c) 1981 Midway
@@ -30677,7 +30680,6 @@ pent1024                        //
 pentagon                        //
 
 @source:peoplepc.cpp
-olybossd						// Olympia BOSS D
 olypeopl                        // Olympia People PC
 
 @source:peplus.cpp
