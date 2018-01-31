@@ -778,7 +778,7 @@ WRITE8_MEMBER( x1_state::x1_fdc_w )
 
 		case 0x0ffc:
 			m_fdc_ctrl = data;
-			m_floppy[data & 0x03]->get_device(); break;
+			floppy = m_floppy[data & 0x03]->get_device();
 
 			m_fdc->set_floppy(floppy);
 
