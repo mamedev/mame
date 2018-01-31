@@ -294,9 +294,11 @@ u32 tv912_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	rectangle curs;
 	m_crtc->cursor_bounds(curs);
 
+	int scroll = m_crtc->upscroll_offset();
+
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		int row = y / 10;
+		int row = ((y / 10) + scroll) % 24;
 		int ra = y % 10;
 		int x = 0;
 		u8 *charbase = &m_p_chargen[(ra & 7) | BIT(videoctrl, 1) << 10];
