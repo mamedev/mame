@@ -49,6 +49,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void plan80(machine_config &config);
+	void plan80_io(address_map &map);
+	void plan80_mem(address_map &map);
 private:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	uint8_t m_kbd_row;
@@ -86,7 +88,7 @@ WRITE8_MEMBER( plan80_state::plan80_09_w )
 }
 
 
-static ADDRESS_MAP_START(plan80_mem, AS_PROGRAM, 8, plan80_state)
+ADDRESS_MAP_START(plan80_state::plan80_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xefff) AM_RAM
@@ -94,7 +96,7 @@ static ADDRESS_MAP_START(plan80_mem, AS_PROGRAM, 8, plan80_state)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(plan80_io, AS_IO, 8, plan80_state)
+ADDRESS_MAP_START(plan80_state::plan80_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_READ(plan80_04_r)

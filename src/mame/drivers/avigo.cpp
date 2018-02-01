@@ -165,7 +165,7 @@ void avigo_state::machine_start()
 	save_item(NAME(m_warm_start));
 }
 
-static ADDRESS_MAP_START(avigo_banked_map, AS_PROGRAM, 8, avigo_state)
+ADDRESS_MAP_START(avigo_state::avigo_banked_map)
 	AM_RANGE(0x0000000, 0x00fffff) AM_MIRROR(0x0300000) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
 	AM_RANGE(0x0400000, 0x041ffff) AM_MIRROR(0x03e0000) AM_RAM AM_SHARE("nvram")
 
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START(avigo_banked_map, AS_PROGRAM, 8, avigo_state)
 	AM_RANGE(0x1800000, 0x1803fff) AM_MIRROR(0x03fc000) AM_READWRITE(vid_memory_r, vid_memory_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( avigo_mem , AS_PROGRAM, 8, avigo_state)
+ADDRESS_MAP_START(avigo_state::avigo_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
 	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bank0", address_map_bank_device, read8, write8)
 	AM_RANGE(0x8000, 0xbfff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
@@ -496,7 +496,7 @@ READ8_MEMBER(avigo_state::port_04_r)
 
 
 
-static ADDRESS_MAP_START( avigo_io, AS_IO, 8, avigo_state)
+ADDRESS_MAP_START(avigo_state::avigo_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x001, 0x001) AM_READWRITE( key_data_read_r, set_key_line_w )

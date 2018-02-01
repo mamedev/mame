@@ -32,6 +32,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void kramermc(machine_config &config);
+	void kramermc_io(address_map &map);
+	void kramermc_mem(address_map &map);
 };
 
 /*----------- defined in video/kramermc.c -----------*/

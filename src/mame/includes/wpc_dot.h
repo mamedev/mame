@@ -35,6 +35,7 @@ public:
 	{ }
 
 	void wpc_dot(machine_config &config);
+	void wpc_dot_map(address_map &map);
 protected:
 
 	// devices

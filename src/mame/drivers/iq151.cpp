@@ -105,6 +105,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(iq151_break);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_timer);
 	void iq151(machine_config &config);
+	void iq151_io(address_map &map);
+	void iq151_mem(address_map &map);
 };
 
 READ8_MEMBER(iq151_state::keyboard_row_r)
@@ -204,7 +206,7 @@ WRITE8_MEMBER(iq151_state::cartslot_io_w)
 		elem->io_write(offset, data);
 }
 
-static ADDRESS_MAP_START(iq151_mem, AS_PROGRAM, 8, iq151_state)
+ADDRESS_MAP_START(iq151_state::iq151_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(cartslot_r, cartslot_w)
 
@@ -213,7 +215,7 @@ static ADDRESS_MAP_START(iq151_mem, AS_PROGRAM, 8, iq151_state)
 	AM_RANGE( 0xf000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(iq151_io, AS_IO, 8, iq151_state)
+ADDRESS_MAP_START(iq151_state::iq151_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0xff ) AM_READWRITE(cartslot_io_r, cartslot_io_w)

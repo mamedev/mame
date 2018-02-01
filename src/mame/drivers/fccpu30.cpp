@@ -302,6 +302,7 @@ cpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	void cpu33(machine_config &config);
 	void cpu30lite8(machine_config &config);
 	void cpu30be16(machine_config &config);
+	void cpu30_mem(address_map &map);
 protected:
 
 private:
@@ -327,7 +328,7 @@ private:
 	uint8_t m_board_id;
 };
 
-static ADDRESS_MAP_START (cpu30_mem, AS_PROGRAM, 32, cpu30_state)
+ADDRESS_MAP_START(cpu30_state::cpu30_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x00000000, 0x00000007) AM_RAM AM_WRITE (bootvect_w)   /* After first write we act as RAM */
 	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ  (bootvect_r)   /* ROM mirror just during reset */

@@ -86,6 +86,9 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	void carjmbre(machine_config &config);
+	void main_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -238,7 +241,7 @@ WRITE8_MEMBER(carjmbre_state::flipscreen_w)
 	flip_screen_set(data & 1);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, carjmbre_state )
+ADDRESS_MAP_START(carjmbre_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8803, 0x8803) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0x8805, 0x8805) AM_WRITE(bgcolor_w)
@@ -254,12 +257,12 @@ ADDRESS_MAP_END
 
 // audiocpu side
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, carjmbre_state )
+ADDRESS_MAP_START(carjmbre_state::sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM // 6116
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, carjmbre_state )
+ADDRESS_MAP_START(carjmbre_state::sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ay1", ay8910_device, address_data_w)

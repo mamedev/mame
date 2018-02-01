@@ -40,6 +40,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER(write) { term_write(data); }
 
+	void ie15_io(address_map &map);
+	void ie15_mem(address_map &map);
 protected:
 	ie15_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

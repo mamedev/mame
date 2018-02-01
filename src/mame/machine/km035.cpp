@@ -45,7 +45,7 @@ ROM_END
 //  ADDRESS_MAP
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( km035_map, AS_PROGRAM, 8, km035_device )
+ADDRESS_MAP_START(km035_device::km035_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 

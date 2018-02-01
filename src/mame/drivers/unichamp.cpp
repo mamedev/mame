@@ -82,6 +82,7 @@ public:
 	uint32_t screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void unichamp(machine_config &config);
+	void unichamp_mem(address_map &map);
 protected:
 	required_ioport m_ctrls;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -105,7 +106,7 @@ PALETTE_INIT_MEMBER(unichamp_state, unichamp)
 }
 
 
-static ADDRESS_MAP_START( unichamp_mem, AS_PROGRAM, 16, unichamp_state )
+ADDRESS_MAP_START(unichamp_state::unichamp_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFF) //B13/B14/B15 are grounded!
 	AM_RANGE(0x0000, 0x00FF) AM_READWRITE8(unichamp_gicram_r, unichamp_gicram_w, 0x00ff)
 	AM_RANGE(0x0100, 0x07FF) AM_READWRITE(unichamp_trapl_r, unichamp_trapl_w)

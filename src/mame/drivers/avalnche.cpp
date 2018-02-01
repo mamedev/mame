@@ -112,7 +112,7 @@ WRITE_LINE_MEMBER(avalnche_state::start_lamp_w)
 	output().set_led_value(2, state);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, avalnche_state )
+ADDRESS_MAP_START(avalnche_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0")
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, avalnche_state )
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( catch_map, AS_PROGRAM, 8, avalnche_state )
+ADDRESS_MAP_START(avalnche_state::catch_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0")

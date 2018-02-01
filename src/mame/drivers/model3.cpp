@@ -1825,7 +1825,7 @@ WRITE64_MEMBER(model3_state::daytona2_rombank_w)
 	}
 }
 
-static ADDRESS_MAP_START( model3_10_mem, AS_PROGRAM, 64, model3_state )
+ADDRESS_MAP_START(model3_state::model3_10_mem)
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("work_ram")    /* work RAM */
 
 	AM_RANGE(0x84000000, 0x8400003f) AM_READ(real3d_status_r )
@@ -1847,7 +1847,7 @@ static ADDRESS_MAP_START( model3_10_mem, AS_PROGRAM, 64, model3_state )
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( model3_mem, AS_PROGRAM, 64, model3_state )
+ADDRESS_MAP_START(model3_state::model3_mem)
 	AM_IMPORT_FROM( model3_10_mem )
 	AM_RANGE(0xc0000000, 0xc003ffff) AM_DEVICE32("comm_board", m3comm_device, m3_map, 0xffffffffffffffffU )
 ADDRESS_MAP_END
@@ -5753,7 +5753,7 @@ WRITE16_MEMBER(model3_state::model3snd_ctrl)
 	}
 }
 
-static ADDRESS_MAP_START( model3_snd, AS_PROGRAM, 16, model3_state )
+ADDRESS_MAP_START(model3_state::model3_snd)
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1", 0) AM_SHARE("soundram")
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp1", scsp_device, read, write)
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2", 0)

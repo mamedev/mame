@@ -42,6 +42,7 @@ public:
 	uint32_t screen_update_pv9234(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void pv9234(machine_config &config);
+	void pv9234_map(address_map &map);
 protected:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -104,7 +105,7 @@ WRITE32_MEMBER( pv9234_state::debug2_w )
 		logerror("debug2=%02x\n",data); // ignore the huge amount of zeroes here
 }
 
-static ADDRESS_MAP_START(pv9234_map, AS_PROGRAM, 32, pv9234_state)
+ADDRESS_MAP_START(pv9234_state::pv9234_map)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("maincpu",0) //FLASH ROM!
 	// AM_RANGE(0x00000000, 0x00000033) AM_WRITE something
 	// AM_RANGE(0x00000044, 0x00000047) AM_WRITE something

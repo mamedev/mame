@@ -47,6 +47,8 @@ public:
 	DECLARE_MACHINE_RESET(dps1);
 
 	void dps1(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	bool m_dma_dir;
 	uint16_t m_dma_adr;
@@ -56,12 +58,12 @@ private:
 	//required_device<floppy_connector> m_floppy1;
 };
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, dps1_state )
+ADDRESS_MAP_START(dps1_state::mem_map)
 	AM_RANGE(0x0000, 0x03ff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x0400, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, dps1_state )
+ADDRESS_MAP_START(dps1_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("uart", mc2661_device, read, write) // S2651

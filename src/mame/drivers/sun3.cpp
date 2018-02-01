@@ -272,6 +272,12 @@ public:
 	void sun3_60(machine_config &config);
 	void sun3200(machine_config &config);
 	void sun3_50(machine_config &config);
+	void sun3_mem(address_map &map);
+	void vmetype0space_map(address_map &map);
+	void vmetype0space_novram_map(address_map &map);
+	void vmetype1space_map(address_map &map);
+	void vmetype2space_map(address_map &map);
+	void vmetype3space_map(address_map &map);
 private:
 	uint32_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
@@ -713,24 +719,24 @@ WRITE32_MEMBER(sun3_state::parity_w)
 	}
 }
 
-static ADDRESS_MAP_START(sun3_mem, AS_PROGRAM, 32, sun3_state)
+ADDRESS_MAP_START(sun3_state::sun3_mem)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE( tl_mmu_r, tl_mmu_w )
 ADDRESS_MAP_END
 
 // type 0 device space
-static ADDRESS_MAP_START(vmetype0space_map, AS_PROGRAM, 32, sun3_state)
+ADDRESS_MAP_START(sun3_state::vmetype0space_map)
 	AM_RANGE(0x00000000, 0x08ffffff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM // not sure what's going on here (3/110)
 	AM_RANGE(0xff000000, 0xff03ffff) AM_RAM AM_SHARE("bw2_vram")
 ADDRESS_MAP_END
 
 // type 0 without VRAM (3/50)
-static ADDRESS_MAP_START(vmetype0space_novram_map, AS_PROGRAM, 32, sun3_state)
+ADDRESS_MAP_START(sun3_state::vmetype0space_novram_map)
 	AM_RANGE(0x00000000, 0x08ffffff) AM_READWRITE(ram_r, ram_w)
 ADDRESS_MAP_END
 
 // type 1 device space
-static ADDRESS_MAP_START(vmetype1space_map, AS_PROGRAM, 32, sun3_state)
+ADDRESS_MAP_START(sun3_state::vmetype1space_map)
 	AM_RANGE(0x00000000, 0x0000000f) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
 	AM_RANGE(0x00020000, 0x0002000f) AM_DEVREADWRITE8(SCC2_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00ff00)
 	AM_RANGE(0x00040000, 0x000407ff) AM_RAM AM_SHARE("nvram")   // type 2816 parallel EEPROM
@@ -742,11 +748,11 @@ static ADDRESS_MAP_START(vmetype1space_map, AS_PROGRAM, 32, sun3_state)
 ADDRESS_MAP_END
 
 // type 2 device space
-static ADDRESS_MAP_START(vmetype2space_map, AS_PROGRAM, 32, sun3_state)
+ADDRESS_MAP_START(sun3_state::vmetype2space_map)
 ADDRESS_MAP_END
 
 // type 3 device space
-static ADDRESS_MAP_START(vmetype3space_map, AS_PROGRAM, 32, sun3_state)
+ADDRESS_MAP_START(sun3_state::vmetype3space_map)
 ADDRESS_MAP_END
 
 READ32_MEMBER(sun3_state::irqctrl_r)

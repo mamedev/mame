@@ -29,6 +29,8 @@ public:
 	// construction/destruction
 	unidisk_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void unidisk_io(address_map &map);
+	void unidisk_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -85,7 +85,7 @@ void turrett_state::machine_reset()
  *
  *************************************/
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, turrett_state )
+ADDRESS_MAP_START(turrett_state::cpu_map)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM
 	AM_RANGE(0x02000010, 0x02000013) AM_RAM
 	AM_RANGE(0x02000040, 0x02000043) AM_RAM
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, turrett_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( turrett_sound_map, 0, 16, turrett_state )
+ADDRESS_MAP_START(turrett_state::turrett_sound_map)
 	AM_RANGE(0x0000000, 0x7ffffff) AM_RAM AM_SHARE("bank_a")
 	AM_RANGE(0x8000000, 0xfffffff) AM_RAM AM_SHARE("bank_b")
 ADDRESS_MAP_END

@@ -309,7 +309,7 @@ They can run the same software and accept the same devices and extensions.
 
 /* ------------ address maps ------------ */
 
-static ADDRESS_MAP_START ( to7, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to7)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE(to7_cartridge_w ) /* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to7_vram_w )
@@ -819,7 +819,7 @@ In arabic mode, Ctrl+E / Ctrl+X to start / stop typing in-line latin.
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( to770, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to770)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to7_cartridge_w ) /* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
@@ -1018,7 +1018,7 @@ Differences include:
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( mo5, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::mo5)
 
 	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to770_vram_w )
 	AM_RANGE ( 0x2000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK )
@@ -1239,7 +1239,7 @@ It was replaced quickly with the improved TO9+.
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( to9, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to9)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE(to9_cartridge_w )/* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to770_vram_w )
@@ -1567,7 +1567,7 @@ The TO8D is simply a TO8 with an integrated 3"1/2 floppy drive.
 **********************************************************************/
 
 
-static ADDRESS_MAP_START ( to8, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to8)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to8_cartridge_w ) /* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
@@ -1778,7 +1778,7 @@ The differences with the TO8 are:
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( to9p, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::to9p)
 
 	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to8_cartridge_w ) /* 4 * 16 KB */
 	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
@@ -1957,7 +1957,7 @@ a PC XT.
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( mo6, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::mo6)
 
 	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
 	AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE(to8_sys_lo_w )
@@ -2310,7 +2310,7 @@ Here are the differences between the MO6 and MO5NR:
 
 **********************************************************************/
 
-static ADDRESS_MAP_START ( mo5nr, AS_PROGRAM, 8, thomson_state )
+ADDRESS_MAP_START(thomson_state::mo5nr)
 
 	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
 	AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE(to8_sys_lo_w )

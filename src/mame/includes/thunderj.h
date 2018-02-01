@@ -38,4 +38,6 @@ public:
 
 	static const atari_motion_objects_config s_mob_config;
 	void thunderj(machine_config &config);
+	void extra_map(address_map &map);
+	void main_map(address_map &map);
 };

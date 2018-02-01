@@ -454,6 +454,7 @@ class dbox_state : public driver_device
 	DECLARE_WRITE8_MEMBER(write_pa);
 
 	void dbox(machine_config &config);
+	void dbox_map(address_map &map);
 
 #if LOCALFLASH
 	DECLARE_READ16_MEMBER (sysflash_r);
@@ -567,7 +568,7 @@ READ16_MEMBER (dbox_state::sysflash_r){
 /* End of flash emulation */
 #endif
 
-static ADDRESS_MAP_START( dbox_map, AS_PROGRAM, 32, dbox_state )
+ADDRESS_MAP_START(dbox_state::dbox_map)
 // CS0 - bootrom
 // 008004ee Address mask CS0 00000040, 003ffff5 (ffffffff) - Mask: 003fff00 FCM:0f DD:1 PS: 16-Bit
 // 008004f8 Base address CS0 00000044, 0000005b (ffffffff) - Base: 00000000 BFC:05 WP:1 FTE:0 NCS:1 Valid: Yes

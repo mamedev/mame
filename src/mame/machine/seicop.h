@@ -28,6 +28,7 @@ public:
 	DECLARE_READ16_MEMBER( d104_move_r );
 	DECLARE_WRITE16_MEMBER( d104_move_w );
 
+	void seibucopbl_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

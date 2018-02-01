@@ -339,6 +339,10 @@ public:
 	void crystal(machine_config &config);
 	void crzyddz2(machine_config &config);
 	void trivrus(machine_config &config);
+	void crospuzl_mem(address_map &map);
+	void crystal_mem(address_map &map);
+	void crzyddz2_mem(address_map &map);
+	void trivrus_mem(address_map &map);
 };
 
 void crystal_state::IntReq( int num )
@@ -646,7 +650,7 @@ WRITE32_MEMBER(crystal_state::DMA1_w)
 }
 
 
-static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
+ADDRESS_MAP_START(crystal_state::crystal_mem)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0x01200000, 0x0120000f) AM_READ(Input_r)
@@ -704,7 +708,7 @@ WRITE32_MEMBER(crystal_state::trivrus_input_w)
 		m_trivrus_input = data & 0xff;
 }
 
-static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
+ADDRESS_MAP_START(crystal_state::trivrus_mem)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_WRITENOP
 
 //  0x01280000 & 0x0000ffff (written at boot)
@@ -745,7 +749,7 @@ static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crospuzl_mem, AS_PROGRAM, 32, crystal_state )
+ADDRESS_MAP_START(crystal_state::crospuzl_mem)
 	AM_IMPORT_FROM( trivrus_mem )
 
 	AM_RANGE(0x01500000, 0x01500003) AM_READ(FlashCmd_r)
@@ -797,7 +801,7 @@ crzyddz2    in      out
 	return 0xffffff00 | data | m_crzyddz2_prot;
 }
 
-static ADDRESS_MAP_START( crzyddz2_mem, AS_PROGRAM, 32, crystal_state )
+ADDRESS_MAP_START(crystal_state::crzyddz2_mem)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0x01280000, 0x01280003) AM_WRITE(Banksw_w)

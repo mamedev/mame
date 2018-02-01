@@ -106,6 +106,9 @@ public:
 	MC6845_UPDATE_ROW(update_row);
 
 	void m20(machine_config &config);
+	void m20_data_mem(address_map &map);
+	void m20_io(address_map &map);
+	void m20_program_mem(address_map &map);
 private:
 	offs_t m_memsize;
 	uint8_t m_port21;
@@ -316,13 +319,13 @@ B/W, 128K cards, 3 cards => 512K of memory:
 */
 
 
-static ADDRESS_MAP_START(m20_program_mem, AS_PROGRAM, 16, m20_state)
+ADDRESS_MAP_START(m20_state::m20_program_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(m20_data_mem, AS_DATA, 16, m20_state)
+ADDRESS_MAP_START(m20_state::m20_data_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu", 0x00000)
@@ -696,7 +699,7 @@ void m20_state::install_memory()
 	}
 }
 
-static ADDRESS_MAP_START(m20_io, AS_IO, 16, m20_state)
+ADDRESS_MAP_START(m20_state::m20_io)
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0x00, 0x07) AM_DEVREADWRITE8("fd1797", fd1797_device, read, write, 0x00ff)

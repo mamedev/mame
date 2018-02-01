@@ -33,6 +33,7 @@ public:
 	DECLARE_READ8_MEMBER( nvram_r );
 	DECLARE_WRITE8_MEMBER( nvram_w );
 
+	void c64_fcc_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

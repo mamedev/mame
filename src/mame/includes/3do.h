@@ -180,6 +180,7 @@ public:
 
 	void _3do(machine_config &config);
 	void _3do_pal(machine_config &config);
+	void _3do_mem(address_map &map);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;

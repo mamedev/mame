@@ -22,7 +22,7 @@
 
 
 /* Address maps */
-static ADDRESS_MAP_START(bk0010_mem, AS_PROGRAM, 16, bk_state )
+ADDRESS_MAP_START(bk_state::bk0010_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAM  // RAM
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM  AM_SHARE("video_ram") // Video RAM
@@ -36,7 +36,7 @@ static ADDRESS_MAP_START(bk0010_mem, AS_PROGRAM, 16, bk_state )
 	AM_RANGE( 0xffce, 0xffcf ) AM_READWRITE(bk_key_press_r,bk_key_press_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(bk0010fd_mem, AS_PROGRAM, 16, bk_state )
+ADDRESS_MAP_START(bk_state::bk0010fd_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_RAM  // RAM
 	AM_RANGE( 0x4000, 0x7fff ) AM_RAM  AM_SHARE("video_ram") // Video RAM

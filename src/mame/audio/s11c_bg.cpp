@@ -26,7 +26,7 @@ s11c_bg_device::s11c_bg_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-static ADDRESS_MAP_START( s11c_bg_map, AS_PROGRAM, 8, s11c_bg_device )
+ADDRESS_MAP_START(s11c_bg_device::s11c_bg_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ym2151", ym2151_device, read, write)
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia40", pia6821_device, read, write)

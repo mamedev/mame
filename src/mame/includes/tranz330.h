@@ -55,6 +55,8 @@ public:
 	DECLARE_READ8_MEMBER( card_r );
 
 	void tranz330(machine_config &config);
+	void tranz330_mem(address_map &map);
+	void tranz330_io(address_map &map);
 private:
 	required_device<cpu_device>             m_cpu;
 	required_device<z80ctc_device>          m_ctc;

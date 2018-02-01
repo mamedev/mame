@@ -99,6 +99,9 @@ public:
 	int m_vic_irq;
 	int m_exp_irq;
 	void vic10(machine_config &config);
+	void vic10_mem(address_map &map);
+	void vic_colorram_map(address_map &map);
+	void vic_videoram_map(address_map &map);
 };
 
 
@@ -242,7 +245,7 @@ READ8_MEMBER( vic10_state::vic_colorram_r )
 //  ADDRESS_MAP( vic10_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic10_mem, AS_PROGRAM, 8, vic10_state )
+ADDRESS_MAP_START(vic10_state::vic10_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -251,7 +254,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_videoram_map, 0, 8, vic10_state )
+ADDRESS_MAP_START(vic10_state::vic_videoram_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
@@ -260,7 +263,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_colorram_map, 1, 8, vic10_state )
+ADDRESS_MAP_START(vic10_state::vic_colorram_map)
 	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 

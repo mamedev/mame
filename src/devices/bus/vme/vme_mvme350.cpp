@@ -164,7 +164,7 @@ DEFINE_DEVICE_TYPE(VME_MVME350, vme_mvme350_card_device, "mvme350", "Motorola MV
 #define MVME350_CPU_TAG "mvme350_cpu"
 #define MVME350_ROM "mvme350_rom"
 
-static ADDRESS_MAP_START( mvme350_mem, AS_PROGRAM, 16, vme_mvme350_card_device )
+ADDRESS_MAP_START(vme_mvme350_card_device::mvme350_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_REGION(MVME350_ROM, 0)
 	AM_RANGE(0x020000, 0x03ffff) AM_RAM

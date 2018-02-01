@@ -135,6 +135,8 @@ public:
 	void puzzlovek(machine_config &config);
 	void puzzlove(machine_config &config);
 	void silvmil(machine_config &config);
+	void silvmil_map(address_map &map);
+	void silvmil_sound_map(address_map &map);
 };
 
 
@@ -181,7 +183,7 @@ uint32_t silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind1
 }
 
 
-static ADDRESS_MAP_START( silvmil_map, AS_PROGRAM, 16, silvmil_state )
+ADDRESS_MAP_START(silvmil_state::silvmil_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(silvmil_tilebank1_w)
@@ -388,7 +390,7 @@ void silvmil_state::machine_reset()
 }
 
 
-static ADDRESS_MAP_START( silvmil_sound_map, AS_PROGRAM, 8, silvmil_state )
+ADDRESS_MAP_START(silvmil_state::silvmil_sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)

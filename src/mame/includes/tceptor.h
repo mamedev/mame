@@ -90,4 +90,10 @@ public:
 	inline uint8_t fix_input0(uint8_t in1, uint8_t in2);
 	inline uint8_t fix_input1(uint8_t in1, uint8_t in2);
 	void tceptor(machine_config &config);
+	void m6502_a_map(address_map &map);
+	void m6502_b_map(address_map &map);
+	void m6809_map(address_map &map);
+	void m68k_map(address_map &map);
+	void mcu_io_map(address_map &map);
+	void mcu_map(address_map &map);
 };

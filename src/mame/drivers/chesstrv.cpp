@@ -42,6 +42,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 	void chesstrv(machine_config &config);
 	void borisdpl(machine_config &config);
+	void borisdpl_io(address_map &map);
+	void chesstrv_io(address_map &map);
+	void chesstrv_mem(address_map &map);
 };
 
 WRITE8_MEMBER( chesstrv_state::ram_addr_w )
@@ -120,20 +123,20 @@ READ8_MEMBER( chesstrv_state::diplomat_keypad_r )
 }
 
 
-static ADDRESS_MAP_START( chesstrv_mem, AS_PROGRAM, 8, chesstrv_state )
+ADDRESS_MAP_START(chesstrv_state::chesstrv_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE( 0x0000, 0x07ff ) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( chesstrv_io, AS_IO, 8, chesstrv_state )
+ADDRESS_MAP_START(chesstrv_state::chesstrv_io)
 	AM_RANGE( 0x00, 0x00 ) AM_READWRITE( ram_addr_r, ram_addr_w )
 	AM_RANGE( 0x01, 0x01 ) AM_WRITE( display_w )
 	AM_RANGE( 0x04, 0x04 ) AM_READWRITE( ram_r, ram_w )
 	AM_RANGE( 0x05, 0x05 ) AM_READWRITE( keypad_r, matrix_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( borisdpl_io, AS_IO, 8, chesstrv_state )
+ADDRESS_MAP_START(chesstrv_state::borisdpl_io)
 	AM_RANGE( 0x00, 0x00 ) AM_READWRITE( diplomat_keypad_r, matrix_w )
 	AM_RANGE( 0x01, 0x01 ) AM_WRITE( diplomat_display_w )
 	AM_RANGE( 0x04, 0x04 ) AM_READWRITE( ram_r, ram_w )

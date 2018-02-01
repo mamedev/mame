@@ -40,6 +40,8 @@ public:
 	DECLARE_DRIVER_INIT(c10);
 
 	void c10(machine_config &config);
+	void c10_io(address_map &map);
+	void c10_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -50,7 +52,7 @@ private:
 
 
 
-static ADDRESS_MAP_START(c10_mem, AS_PROGRAM, 8, c10_state)
+ADDRESS_MAP_START(c10_state::c10_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0x7fff) AM_RAM
@@ -59,7 +61,7 @@ static ADDRESS_MAP_START(c10_mem, AS_PROGRAM, 8, c10_state)
 	AM_RANGE(0xf0a2, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( c10_io, AS_IO, 8, c10_state)
+ADDRESS_MAP_START(c10_state::c10_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 

@@ -175,6 +175,8 @@ public:
 	void intel82439tx_init();
 	void calchase(machine_config &config);
 	void hostinv(machine_config &config);
+	void calchase_io(address_map &map);
+	void calchase_map(address_map &map);
 };
 
 // Intel 82439TX System Controller (MTXC)
@@ -380,7 +382,7 @@ READ16_MEMBER(calchase_state::calchase_iocard5_r)
 }
 
 
-static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
+ADDRESS_MAP_START(calchase_state::calchase_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", trident_vga_device, mem_r, mem_w, 0xffffffff) // VGA VRAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
@@ -415,7 +417,7 @@ static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( calchase_io, AS_IO, 32, calchase_state )
+ADDRESS_MAP_START(calchase_state::calchase_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	//AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY

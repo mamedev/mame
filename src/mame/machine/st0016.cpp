@@ -9,7 +9,7 @@
 
 DEFINE_DEVICE_TYPE(ST0016_CPU, st0016_cpu_device, "st0016_cpu", "ST0016")
 
-static ADDRESS_MAP_START(st0016_cpu_internal_map, AS_PROGRAM, 8, st0016_cpu_device)
+ADDRESS_MAP_START(st0016_cpu_device::st0016_cpu_internal_map)
 	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
 	AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
@@ -18,7 +18,7 @@ static ADDRESS_MAP_START(st0016_cpu_internal_map, AS_PROGRAM, 8, st0016_cpu_devi
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(st0016_cpu_internal_io_map, AS_IO, 8, st0016_cpu_device)
+ADDRESS_MAP_START(st0016_cpu_device::st0016_cpu_internal_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
 	AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
@@ -39,8 +39,8 @@ st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *
 		spr_dx(0),
 		spr_dy(0),
 		st0016_ramgfx(0),
-		m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(st0016_cpu_internal_io_map)),
-		m_space_config("regs", ENDIANNESS_LITTLE, 8, 16, 0, ADDRESS_MAP_NAME(st0016_cpu_internal_map)),
+		m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::st0016_cpu_internal_io_map), this)),
+		m_space_config("regs", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::st0016_cpu_internal_map), this)),
 		m_screen(*this, ":screen"),
 		m_game_flag(-1)
 {

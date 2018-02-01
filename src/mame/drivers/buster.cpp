@@ -33,6 +33,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void buster(machine_config &config);
+	void mainmap(address_map &map);
 };
 
 
@@ -69,7 +70,7 @@ READ8_MEMBER(buster_state::test_r)
 }
 #endif
 
-static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, buster_state )
+ADDRESS_MAP_START(buster_state::mainmap)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM// AM_SHARE("rom")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("wram")
 	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_SHARE("vram")

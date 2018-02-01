@@ -156,6 +156,8 @@ public:
 	uint8_t m_kb;
 
 	void plus4(machine_config &config);
+	void plus4_mem(address_map &map);
+	void ted_videoram_map(address_map &map);
 };
 
 
@@ -480,7 +482,7 @@ READ8_MEMBER( plus4_state::ted_videoram_r )
 //  ADDRESS_MAP( plus4_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( plus4_mem, AS_PROGRAM, 8, plus4_state )
+ADDRESS_MAP_START(plus4_state::plus4_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -489,7 +491,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( ted_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( ted_videoram_map, 0, 8, plus4_state )
+ADDRESS_MAP_START(plus4_state::ted_videoram_map)
 	AM_RANGE(0x0000, 0xffff) AM_READ(ted_videoram_r)
 ADDRESS_MAP_END
 

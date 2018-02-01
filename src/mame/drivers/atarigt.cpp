@@ -596,7 +596,7 @@ WRITE32_MEMBER(atarigt_state::colorram_protection_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigt_state )
+ADDRESS_MAP_START(atarigt_state::main_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0xc00000, 0xc00003) AM_READWRITE(sound_data_r, sound_data_w)
 	AM_RANGE(0xd00014, 0xd00017) AM_READ(analog_port0_r)

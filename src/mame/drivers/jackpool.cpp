@@ -52,6 +52,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void jackpool(machine_config &config);
+	void jackpool_mem(address_map &map);
 };
 
 
@@ -137,7 +138,7 @@ WRITE_LINE_MEMBER(jackpool_state::map_vreg_w)
 	m_map_vreg = state;
 }
 
-static ADDRESS_MAP_START( jackpool_mem, AS_PROGRAM, 16, jackpool_state )
+ADDRESS_MAP_START(jackpool_state::jackpool_mem)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x120000, 0x1200ff) AM_RAM

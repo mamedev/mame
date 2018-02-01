@@ -276,12 +276,12 @@ WRITE8_MEMBER( scramble_state::ad2083_tms5110_ctrl_w )
 	m_tmsprom->enable_w(1);
 }
 
-static ADDRESS_MAP_START( ad2083_sound_map, AS_PROGRAM, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::ad2083_sound_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ad2083_sound_io_map, AS_IO, 8, scramble_state )
+ADDRESS_MAP_START(scramble_state::ad2083_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ad2083_tms5110_ctrl_w)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay1", ay8910_device, address_w)

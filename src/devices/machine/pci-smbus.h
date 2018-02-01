@@ -53,7 +53,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map, 32);
+	void map(address_map &map);
 
 	uint16_t slv_data;
 

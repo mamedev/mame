@@ -866,7 +866,7 @@ msx_cart_keyboard_master_device::msx_cart_keyboard_master_device(const machine_c
 }
 
 
-static ADDRESS_MAP_START( vlm_map, 0, 8, msx_cart_keyboard_master_device )
+ADDRESS_MAP_START(msx_cart_keyboard_master_device::vlm_map)
 	AM_RANGE(0x0000, 0xffff) AM_READ(read_vlm)
 ADDRESS_MAP_END
 

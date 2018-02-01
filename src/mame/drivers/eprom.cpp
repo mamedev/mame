@@ -145,7 +145,7 @@ template<bool maincpu> WRITE16_MEMBER(eprom_state::sync_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, eprom_state )
+ADDRESS_MAP_START(eprom_state::main_map)
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, eprom_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( guts_map, AS_PROGRAM, 16, eprom_state )
+ADDRESS_MAP_START(eprom_state::guts_map)
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
@@ -202,7 +202,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( extra_map, AS_PROGRAM, 16, eprom_state )
+ADDRESS_MAP_START(eprom_state::extra_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE(sync_r, sync_w<false>) AM_SHARE("sync_data")

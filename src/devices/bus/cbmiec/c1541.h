@@ -61,6 +61,10 @@ protected:
 
 	required_device<floppy_image_device> m_floppy;
 
+	void c1541_mem(address_map &map);
+	void c1541dd_mem(address_map &map);
+	void c1541pd_mem(address_map &map);
+
 private:
 	enum
 	{
@@ -261,6 +265,7 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	void c1541pdc_mem(address_map &map);
 protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

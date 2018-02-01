@@ -764,7 +764,7 @@ READ8_MEMBER(snookr10_state::port2000_8_r)
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( snookr10_map, AS_PROGRAM, 8, snookr10_state )
+ADDRESS_MAP_START(snookr10_state::snookr10_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed 6116 */
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")        /* IN0 */
@@ -779,7 +779,7 @@ static ADDRESS_MAP_START( snookr10_map, AS_PROGRAM, 8, snookr10_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tenballs_map, AS_PROGRAM, 8, snookr10_state )
+ADDRESS_MAP_START(snookr10_state::tenballs_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed 6116 */
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("IN0")        /* IN0 */
@@ -793,7 +793,7 @@ static ADDRESS_MAP_START( tenballs_map, AS_PROGRAM, 8, snookr10_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crystalc_map, AS_PROGRAM, 8, snookr10_state )
+ADDRESS_MAP_START(snookr10_state::crystalc_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")   /* battery backed 6116 */
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(output_port_0_w)  /* OUT0 */
 	AM_RANGE(0x1001, 0x1001) AM_WRITE(output_port_1_w)  /* OUT1 */

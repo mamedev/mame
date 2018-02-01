@@ -1410,7 +1410,7 @@ READ16_MEMBER(neogeo_state::banked_vectors_r)
  *
  *************************************/
 
-ADDRESS_MAP_START( neogeo_main_map, AS_PROGRAM, 16, neogeo_state )
+ADDRESS_MAP_START(neogeo_state::neogeo_main_map)
 
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM
 	/* some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too */
@@ -1432,7 +1432,7 @@ ADDRESS_MAP_START( neogeo_main_map, AS_PROGRAM, 16, neogeo_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_map_slot, AS_PROGRAM, 16, neogeo_state )
+ADDRESS_MAP_START(neogeo_state::main_map_slot)
 	AM_IMPORT_FROM( neogeo_main_map )
 	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
 ADDRESS_MAP_END
@@ -1447,7 +1447,7 @@ READ16_MEMBER(aes_state::aes_in2_r)
 	return ret;
 }
 
-static ADDRESS_MAP_START( aes_main_map, AS_PROGRAM, 16, aes_state )
+ADDRESS_MAP_START(aes_state::aes_main_map)
 	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x0f0000) AM_RAM
 	// some games have protection devices in the 0x200000 region, it appears to map to cart space, not surprising, the ROM is read here too
@@ -1474,7 +1474,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, neogeo_state )
+ADDRESS_MAP_START(neogeo_state::audio_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("audio_main")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("audio_8000")
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("audio_c000")
@@ -1491,7 +1491,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, neogeo_state )
+ADDRESS_MAP_START(neogeo_state::audio_io_map)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_SELECT(0x0010) AM_WRITE(audio_cpu_enable_nmi_w)

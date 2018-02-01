@@ -346,7 +346,7 @@ READ8_MEMBER(combatsc_state::unk_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
+ADDRESS_MAP_START(combatsc_state::combatsc_map)
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(combatsc_pf_control_w)
 	AM_RANGE(0x001f, 0x001f) AM_READ(unk_r)
 	AM_RANGE(0x0020, 0x005f) AM_READWRITE(combatsc_scrollram_r, combatsc_scrollram_w)
@@ -374,7 +374,7 @@ static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( combatscb_map, AS_PROGRAM, 8, combatsc_state )
+ADDRESS_MAP_START(combatsc_state::combatscb_map)
 	AM_RANGE(0x0000, 0x04ff) AM_RAM
 	AM_RANGE(0x0500, 0x0500) AM_WRITE(combatscb_bankselect_w)
 	AM_RANGE(0x0600, 0x06ff) AM_RAM_DEVWRITE("palette", palette_device, write_indirect) AM_SHARE("palette")
@@ -384,7 +384,7 @@ static ADDRESS_MAP_START( combatscb_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8, combatsc_state )
+ADDRESS_MAP_START(combatsc_state::combatsc_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                                             /* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                                             /* RAM */
 
@@ -410,7 +410,7 @@ WRITE8_MEMBER(combatsc_state::combatscb_sound_irq_ack)
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( combatscb_sound_map, AS_PROGRAM, 8, combatsc_state )
+ADDRESS_MAP_START(combatsc_state::combatscb_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                                     /* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                                     /* RAM */
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)   /* YM 2203 */

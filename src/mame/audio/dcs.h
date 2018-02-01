@@ -110,6 +110,24 @@ public:
 	int preprocess_stage_2(uint16_t data);
 	int preprocess_write(uint16_t data);
 
+	void dcs2_2104_data_map(address_map &map);
+	void dcs2_2104_program_map(address_map &map);
+	void dcs2_2115_data_map(address_map &map);
+	void dcs2_2115_program_map(address_map &map);
+	void dcs_2k_data_map(address_map &map);
+	void dcs_2k_program_map(address_map &map);
+	void dcs_2k_uart_data_map(address_map &map);
+	void dcs_8k_data_map(address_map &map);
+	void dcs_8k_program_map(address_map &map);
+	void dcs_wpc_program_map(address_map &map);
+	void denver_data_map(address_map &map);
+	void denver_io_map(address_map &map);
+	void denver_program_map(address_map &map);
+	void denver_rambank_map(address_map &map);
+	void dsio_data_map(address_map &map);
+	void dsio_io_map(address_map &map);
+	void dsio_program_map(address_map &map);
+	void dsio_rambank_map(address_map &map);
 protected:
 	// construction/destruction
 	dcs_audio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rev);
@@ -289,6 +307,7 @@ public:
 	// construction/destruction
 	dcs_audio_wpc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void dcs_wpc_data_map(address_map &map);
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;

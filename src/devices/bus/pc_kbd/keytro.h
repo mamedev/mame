@@ -40,6 +40,8 @@ public:
 	DECLARE_READ8_MEMBER( p3_read );
 	DECLARE_WRITE8_MEMBER( p3_write );
 
+	void keytronic_pc3270_io(address_map &map);
+	void keytronic_pc3270_program(address_map &map);
 protected:
 	pc_kbd_keytronic_pc3270_device(
 			machine_config const &mconfig,

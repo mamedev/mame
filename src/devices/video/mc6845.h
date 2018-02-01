@@ -447,6 +447,7 @@ public:
 
 	MC6845_UPDATE_ROW( vdc_update_row );
 
+	void mos8563_videoram_map(address_map &map);
 protected:
 	mos8563_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

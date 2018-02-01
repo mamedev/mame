@@ -20,7 +20,7 @@
 DEFINE_DEVICE_TYPE(ARM_AIC, arm_aic_device, "arm_aic", "ARM Advanced Interrupt Controller")
 
 
-DEVICE_ADDRESS_MAP_START( regs_map, 32, arm_aic_device )
+ADDRESS_MAP_START(arm_aic_device::regs_map)
 	AM_RANGE(0x000, 0x07f) AM_READWRITE(aic_smr_r, aic_smr_w) // AIC_SMR[32] (AIC_SMR)  Source Mode Register
 	AM_RANGE(0x080, 0x0ff) AM_READWRITE(aic_svr_r, aic_svr_w) // AIC_SVR[32] (AIC_SVR)  Source Vector Register
 	AM_RANGE(0x100, 0x103) AM_READ(irq_vector_r)      // AIC_IVR    IRQ Vector Register

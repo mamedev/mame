@@ -85,6 +85,8 @@ public:
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ts803(machine_config &config);
+	void ts803_io(address_map &map);
+	void ts803_mem(address_map &map);
 private:
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint8_t[]> m_56kram;
@@ -100,7 +102,7 @@ private:
 	required_ioport m_io_dsw;
 };
 
-static ADDRESS_MAP_START(ts803_mem, AS_PROGRAM, 8, ts803_state)
+ADDRESS_MAP_START(ts803_state::ts803_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bankr0") AM_WRITE_BANK("bankw0")
 	AM_RANGE(0x4000, 0xbfff) AM_RAMBANK("bank4")
 	AM_RANGE(0xc000, 0xffff) AM_RAM
@@ -129,7 +131,7 @@ Winchester Disk Controller                              B0-BF (WDC CE)
 Graphics Controller                                     C0-CF (GIO SEL)
 
 */
-static ADDRESS_MAP_START(ts803_io, AS_IO, 8, ts803_state)
+ADDRESS_MAP_START(ts803_state::ts803_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x0f) AM_READ_PORT("DSW")

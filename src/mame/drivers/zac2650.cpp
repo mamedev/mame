@@ -25,7 +25,7 @@
 
 /***********************************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zac2650_state )
+ADDRESS_MAP_START(zac2650_state::main_map)
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tinvader_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1c00, 0x1cff) AM_RAM

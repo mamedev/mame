@@ -68,26 +68,30 @@ public:
 	void chessmst(machine_config &config);
 	void chessmsta(machine_config &config);
 	void chessmstdm(machine_config &config);
+	void chessmst_io(address_map &map);
+	void chessmst_mem(address_map &map);
+	void chessmstdm(address_map &map);
+	void chessmstdm_io(address_map &map);
 private:
 	void update_display();
 };
 
 
-static ADDRESS_MAP_START(chessmst_mem, AS_PROGRAM, 8, chessmst_state)
+ADDRESS_MAP_START(chessmst_state::chessmst_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff) // A15 not connected
 	AM_RANGE( 0x0000, 0x27ff ) AM_ROM
 	AM_RANGE( 0x3400, 0x3bff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(chessmstdm, AS_PROGRAM, 8, chessmst_state)
+ADDRESS_MAP_START(chessmst_state::chessmstdm)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff ) AM_DEVREAD("cartslot", generic_slot_device, read_rom)
 	AM_RANGE( 0x8000, 0x8bff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chessmst_io , AS_IO, 8, chessmst_state)
+ADDRESS_MAP_START(chessmst_state::chessmst_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x00, 0x03) AM_MIRROR(0xf0) read/write in both, not used by the software
@@ -95,7 +99,7 @@ static ADDRESS_MAP_START( chessmst_io , AS_IO, 8, chessmst_state)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xf0) AM_DEVREADWRITE("z80pio2", z80pio_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chessmstdm_io , AS_IO, 8, chessmst_state)
+ADDRESS_MAP_START(chessmst_state::chessmstdm_io)
 	AM_IMPORT_FROM(chessmst_io)
 	AM_RANGE(0x4c, 0x4c) AM_WRITE(digits_w)
 ADDRESS_MAP_END

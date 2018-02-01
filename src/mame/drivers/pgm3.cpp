@@ -68,9 +68,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_pgm3);
 	required_device<cpu_device> m_maincpu;
 	void pgm3(machine_config &config);
+	void pgm3_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( pgm3_map, AS_PROGRAM, 32, pgm3_state )
+ADDRESS_MAP_START(pgm3_state::pgm3_map)
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 ADDRESS_MAP_END
 

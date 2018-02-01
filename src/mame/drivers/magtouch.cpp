@@ -104,6 +104,8 @@ public:
 	virtual void machine_start() override;
 	static void magtouch_sb_conf(device_t *device);
 	void magtouch(machine_config &config);
+	void magtouch_io(address_map &map);
+	void magtouch_map(address_map &map);
 };
 
 /*************************************
@@ -133,7 +135,7 @@ WRITE8_MEMBER(magtouch_state::magtouch_io_w)
 	}
 }
 
-static ADDRESS_MAP_START( magtouch_map, AS_PROGRAM, 32, magtouch_state )
+ADDRESS_MAP_START(magtouch_state::magtouch_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", trident_vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
@@ -143,7 +145,7 @@ static ADDRESS_MAP_START( magtouch_map, AS_PROGRAM, 32, magtouch_state )
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magtouch_io, AS_IO, 32, magtouch_state )
+ADDRESS_MAP_START(magtouch_state::magtouch_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x02e0, 0x02e7) AM_READWRITE8(magtouch_io_r, magtouch_io_w, 0xffffffff)
 	AM_RANGE(0x03b0, 0x03bf) AM_DEVREADWRITE8("vga", trident_vga_device, port_03b0_r, port_03b0_w, 0xffffffff)

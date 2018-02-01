@@ -69,6 +69,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
 	DECLARE_WRITE_LINE_MEMBER(cassette_w);
 	void amu880(machine_config &config);
+	void amu880_io(address_map &map);
+	void amu880_mem(address_map &map);
 };
 
 #endif

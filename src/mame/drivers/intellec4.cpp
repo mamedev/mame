@@ -102,6 +102,14 @@ public:
 
 	void intellec4(machine_config &config);
 
+	void intellec4_program_banks(address_map &map);
+	void intellec4_program_memory(address_map &map);
+	void intellec4_ram_memory(address_map &map);
+	void intellec4_ram_ports(address_map &map);
+	void intellec4_ram_status(address_map &map);
+	void intellec4_rom(address_map &map);
+	void intellec4_rom_port_banks(address_map &map);
+	void intellec4_rom_ports(address_map &map);
 protected:
 	intellec4_state(machine_config const &mconfig, device_type type, char const *tag)
 		: driver_device(mconfig, type, tag)
@@ -226,7 +234,7 @@ private:
   System address spaces
 ----------------------------------*/
 
-ADDRESS_MAP_START(intellec4_program_banks, mcs40_cpu_device_base::AS_ROM, 8, intellec4_state)
+ADDRESS_MAP_START(intellec4_state::intellec4_program_banks)
 	ADDRESS_MAP_UNMAP_LOW
 
 	// 0x0000...0x0fff MON
@@ -240,7 +248,7 @@ ADDRESS_MAP_START(intellec4_program_banks, mcs40_cpu_device_base::AS_ROM, 8, int
 	// 0x3000...0x3fff unmapped in case someone presses two mode switches at once
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(intellec4_rom_port_banks, mcs40_cpu_device_base::AS_ROM_PORTS, 8, intellec4_state)
+ADDRESS_MAP_START(intellec4_state::intellec4_rom_port_banks)
 	ADDRESS_MAP_UNMAP_HIGH
 
 	// 0x0000...0x07ff MON
@@ -263,32 +271,32 @@ ADDRESS_MAP_END
   CPU views of address spaces
 ---------------------------------*/
 
-ADDRESS_MAP_START(intellec4_rom, mcs40_cpu_device_base::AS_ROM, 8, intellec4_state)
+ADDRESS_MAP_START(intellec4_state::intellec4_rom)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x0fff) AM_DEVICE("prgbank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(intellec4_ram_memory, mcs40_cpu_device_base::AS_RAM_MEMORY, 8, intellec4_state)
+ADDRESS_MAP_START(intellec4_state::intellec4_ram_memory)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("memory") // 4 * 4002
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(intellec4_rom_ports, mcs40_cpu_device_base::AS_ROM_PORTS, 8, intellec4_state)
+ADDRESS_MAP_START(intellec4_state::intellec4_rom_ports)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_DEVICE("rpbank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(intellec4_ram_status, mcs40_cpu_device_base::AS_RAM_STATUS, 8, intellec4_state)
+ADDRESS_MAP_START(intellec4_state::intellec4_ram_status)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x003f) AM_RAM AM_SHARE("status") // 4 * 4002
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(intellec4_ram_ports, mcs40_cpu_device_base::AS_RAM_PORTS, 8, intellec4_state)
+ADDRESS_MAP_START(intellec4_state::intellec4_ram_ports)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ram0_out)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ram1_out)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START(intellec4_program_memory, mcs40_cpu_device_base::AS_PROGRAM_MEMORY, 8, intellec4_state)
+ADDRESS_MAP_START(intellec4_state::intellec4_program_memory)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x01ff) AM_READWRITE(pm_read, pm_write)
 ADDRESS_MAP_END

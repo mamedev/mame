@@ -103,6 +103,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void lastfght(machine_config &config);
+	void lastfght_map(address_map &map);
+	void ramdac_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -405,7 +407,7 @@ WRITE16_MEMBER(lastfght_state::sound_w)
                                 Memory Maps
 ***************************************************************************/
 
-static ADDRESS_MAP_START( lastfght_map, AS_PROGRAM, 16, lastfght_state )
+ADDRESS_MAP_START(lastfght_state::lastfght_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
@@ -436,7 +438,7 @@ static ADDRESS_MAP_START( lastfght_map, AS_PROGRAM, 16, lastfght_state )
 	AM_RANGE( 0xc00006, 0xc00007 ) AM_READWRITE(c00006_r, c00006_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, lastfght_state )
+ADDRESS_MAP_START(lastfght_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 

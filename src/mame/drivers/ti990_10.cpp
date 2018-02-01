@@ -107,6 +107,8 @@ public:
 	uint16_t m_intlines;
 	int m_ckon_state;
 	void ti990_10(machine_config &config);
+	void ti990_10_io(address_map &map);
+	void ti990_10_memmap(address_map &map);
 };
 
 
@@ -275,7 +277,7 @@ WRITE_LINE_MEMBER(ti990_10_state::key_interrupt)
   Memory map - see description above
 */
 
-static ADDRESS_MAP_START(ti990_10_memmap, AS_PROGRAM, 16, ti990_10_state )
+ADDRESS_MAP_START(ti990_10_state::ti990_10_memmap)
 
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM     /* let's say we have 1MB of RAM */
 	AM_RANGE(0x100000, 0x1ff7ff) AM_NOP     /* free TILINE space */
@@ -292,7 +294,7 @@ ADDRESS_MAP_END
   CRU map
 */
 
-static ADDRESS_MAP_START(ti990_10_io, AS_IO, 8, ti990_10_state )
+ADDRESS_MAP_START(ti990_10_state::ti990_10_io)
 	AM_RANGE(0x10, 0x11) AM_DEVREAD("vdt911", vdt911_device, cru_r)
 	AM_RANGE(0x80, 0x8f) AM_DEVWRITE("vdt911", vdt911_device, cru_w)
 	AM_RANGE(0x1fa, 0x1fb) AM_NOP // AM_READ(ti990_10_mapper_cru_r)

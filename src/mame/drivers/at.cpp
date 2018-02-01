@@ -146,6 +146,16 @@ public:
 
 	static void cfg_single_360K(device_t *device);
 	static void cfg_single_1200K(device_t *device);
+	void at16_io(address_map &map);
+	void at16_map(address_map &map);
+	void at16l_map(address_map &map);
+	void at32_io(address_map &map);
+	void at32_map(address_map &map);
+	void at32l_map(address_map &map);
+	void ficpio_io(address_map &map);
+	void ficpio_map(address_map &map);
+	void neat_io(address_map &map);
+	void ps1_16_io(address_map &map);
 };
 
 class megapc_state : public driver_device
@@ -175,24 +185,28 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( wd7600_spkr ) { m_speaker->level_w(state); }
 	void megapcpl(machine_config &config);
 	void megapc(machine_config &config);
+	void megapc_io(address_map &map);
+	void megapc_map(address_map &map);
+	void megapcpl_io(address_map &map);
+	void megapcpl_map(address_map &map);
 };
 
 
-static ADDRESS_MAP_START( at16_map, AS_PROGRAM, 16, at_state )
+ADDRESS_MAP_START(at_state::at16_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM AM_REGION("bios", 0)
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( at16l_map, AS_PROGRAM, 16, at_state )
+ADDRESS_MAP_START(at_state::at16l_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x09ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x0e0000, 0x0fffff) AM_ROM AM_REGION("bios", 0x20000)
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM AM_REGION("bios", 0x20000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( at32_map, AS_PROGRAM, 32, at_state )
+ADDRESS_MAP_START(at_state::at32_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("bios", 0)
@@ -200,7 +214,7 @@ static ADDRESS_MAP_START( at32_map, AS_PROGRAM, 32, at_state )
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( at32l_map, AS_PROGRAM, 32, at_state )
+ADDRESS_MAP_START(at_state::at32l_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROM AM_REGION("bios", 0x20000)
@@ -208,14 +222,14 @@ static ADDRESS_MAP_START( at32l_map, AS_PROGRAM, 32, at_state )
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0x20000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ficpio_map, AS_PROGRAM, 32, at_state )
+ADDRESS_MAP_START(at_state::ficpio_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("bank10")
 	AM_RANGE(0x00800000, 0x00800bff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("isa", 0x20000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( at16_io, AS_IO, 16, at_state )
+ADDRESS_MAP_START(at_state::at16_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
 ADDRESS_MAP_END
@@ -242,25 +256,25 @@ READ8_MEMBER( at_state::ps1_portb_r )
 	return data;
 }
 
-static ADDRESS_MAP_START(ps1_16_io, AS_IO, 16, at_state )
+ADDRESS_MAP_START(at_state::ps1_16_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
 	AM_RANGE(0x0060, 0x0061) AM_READ8(ps1_portb_r, 0xff00)
 	AM_RANGE(0x0102, 0x0105) AM_READWRITE(ps1_unk_r, ps1_unk_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( neat_io, AS_IO, 16, at_state )
+ADDRESS_MAP_START(at_state::neat_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
 	AM_RANGE(0x0022, 0x0023) AM_DEVICE("cs8221", cs8221_device, map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( at32_io, AS_IO, 32, at_state )
+ADDRESS_MAP_START(at_state::at32_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xffffffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ficpio_io, AS_IO, 32, at_state )
+ADDRESS_MAP_START(at_state::ficpio_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xffffffff)
 	AM_RANGE(0x00a8, 0x00af) AM_DEVREADWRITE8("chipset", vt82c496_device, read, write, 0xffffffff)
@@ -323,17 +337,17 @@ WRITE_LINE_MEMBER( megapc_state::wd7600_hold )
 	m_wd7600->hlda_w(state);
 }
 
-static ADDRESS_MAP_START( megapc_map, AS_PROGRAM, 16, at_state )
+ADDRESS_MAP_START(megapc_state::megapc_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megapcpl_map, AS_PROGRAM, 32, at_state )
+ADDRESS_MAP_START(megapc_state::megapcpl_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megapc_io, AS_IO, 16, at_state )
+ADDRESS_MAP_START(megapc_state::megapc_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megapcpl_io, AS_IO, 32, at_state )
+ADDRESS_MAP_START(megapc_state::megapcpl_io)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 

@@ -83,17 +83,17 @@ WRITE8_MEMBER(efo_zsu_device::sound_command_w)
 
 
 
-static ADDRESS_MAP_START( zsu_map, AS_PROGRAM, 8, efo_zsu_device )
+ADDRESS_MAP_START(efo_zsu_device::zsu_map)
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("rombank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cedar_magnet_sound_map, AS_PROGRAM, 8, cedar_magnet_sound_device )
+ADDRESS_MAP_START(cedar_magnet_sound_device::cedar_magnet_sound_map)
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zsu_io, AS_IO, 8, efo_zsu_device )
+ADDRESS_MAP_START(efo_zsu_device::zsu_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 

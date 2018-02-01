@@ -49,6 +49,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void patapata(machine_config &config);
+	void main_map(address_map &map);
 protected:
 	virtual void video_start() override;
 
@@ -180,7 +181,7 @@ also
 
 */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, patapata_state )
+ADDRESS_MAP_START(patapata_state::main_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN0")

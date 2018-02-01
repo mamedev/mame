@@ -6,7 +6,7 @@
 
 DEFINE_DEVICE_TYPE(NEXTKBD, nextkbd_device, "nextkbd", "NeXT Keyboard")
 
-DEVICE_ADDRESS_MAP_START(amap, 32, nextkbd_device)
+ADDRESS_MAP_START(nextkbd_device::amap)
 	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_snd_r, ctrl_snd_w, 0xff000000)
 	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_kms_r, ctrl_kms_w, 0x00ff0000)
 	AM_RANGE(0x0, 0x3) AM_READWRITE8(status_dma_r, ctrl_dma_w, 0x0000ff00)

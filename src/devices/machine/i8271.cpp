@@ -18,7 +18,7 @@ i8271_device::i8271_device(const machine_config &mconfig, const char *tag, devic
 	external_ready = false;
 }
 
-DEVICE_ADDRESS_MAP_START(map, 8, i8271_device)
+ADDRESS_MAP_START(i8271_device::map)
 	AM_RANGE(0x0, 0x0) AM_READWRITE(sr_r, cmd_w)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(rr_r, param_w)
 	AM_RANGE(0x2, 0x2) AM_WRITE(reset_w)

@@ -51,7 +51,7 @@ PALETTE_INIT_MEMBER(subs_state, subs)
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, subs_state )
+ADDRESS_MAP_START(subs_state::main_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(noise_reset_w)

@@ -77,7 +77,7 @@ WRITE8_MEMBER(xmen_state::sound_bankswitch_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xmen_state )
+ADDRESS_MAP_START(xmen_state::main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("k053246", k053247_device, k053247_word_r, k053247_word_w)
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x18fa00, 0x18fa01) AM_WRITE(xmen_18fa00_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xmen_state )
+ADDRESS_MAP_START(xmen_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("z80bank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xmen_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( 6p_main_map, AS_PROGRAM, 16, xmen_state )
+ADDRESS_MAP_START(xmen_state::_6p_main_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("spriteramleft")   /* sprites (screen 1) */
@@ -350,7 +350,7 @@ MACHINE_CONFIG_START(xmen_state::xmen6p)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
-	MCFG_CPU_PROGRAM_MAP(6p_main_map)
+	MCFG_CPU_PROGRAM_MAP(_6p_main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", xmen_state, xmen_scanline, "screen", 0, 1)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/2)

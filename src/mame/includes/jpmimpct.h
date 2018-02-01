@@ -151,4 +151,7 @@ public:
 	required_device<meters_device> m_meters;
 	void impctawp(machine_config &config);
 	void jpmimpct(machine_config &config);
+	void awp68k_program_map(address_map &map);
+	void m68k_program_map(address_map &map);
+	void tms_program_map(address_map &map);
 };

@@ -1694,7 +1694,7 @@ WRITE64_MEMBER(naomi_state::eeprom_93c46a_w )
  * Naomi 1 address map
  */
 
-static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, naomi_state )
+ADDRESS_MAP_START(naomi_state::naomi_map)
 	/* Area 0 */
 	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("rombase") // BIOS
 
@@ -1754,7 +1754,7 @@ WRITE32_MEMBER(naomi2_state::both_pvr2_ta_w)
 	space.write_dword(0x025f8000|offset*4,data,mem_mask);
 }
 
-static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi2_state )
+ADDRESS_MAP_START(naomi2_state::naomi2_map)
 	/* Area 0 */
 	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("rombase") // BIOS
 
@@ -1815,7 +1815,7 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, naomi2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( naomi_port, AS_IO, 64, naomi_state )
+ADDRESS_MAP_START(naomi_state::naomi_port)
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(eeprom_93c46a_r, eeprom_93c46a_w)
 ADDRESS_MAP_END
 
@@ -1929,7 +1929,7 @@ WRITE64_MEMBER(atomiswave_state::aw_modem_w )
 	osd_printf_verbose("%s",string_format("MODEM: [%08x=%x] write %x to %x, mask %x\n", 0x600000+reg*4, dat, data, offset, mem_mask).c_str());
 }
 
-static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, atomiswave_state )
+ADDRESS_MAP_START(atomiswave_state::aw_map)
 	/* Area 0 */
 	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE(aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
 	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE(aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
@@ -1984,11 +1984,11 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, atomiswave_state )
 	//AM_RANGE(0x1c000000, 0x1fffffff) AM_NOP // SH4 Internal
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aw_port, AS_IO, 64, atomiswave_state )
+ADDRESS_MAP_START(atomiswave_state::aw_port)
 //  ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_state )
+ADDRESS_MAP_START(dc_state::dc_audio_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("dc_sound_ram")                /* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE(dc_arm_aica_r, dc_arm_aica_w)
@@ -2698,8 +2698,6 @@ MACHINE_CONFIG_START(dc_state::naomi_aw_base)
 	MCFG_SH4_MD7(1)
 	MCFG_SH4_MD8(0)
 	MCFG_SH4_CLOCK(CPU_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(naomi_map)
-	MCFG_CPU_IO_MAP(naomi_port)
 	MCFG_CPU_FORCE_NO_DRC()
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dc_state, dc_scanline, "screen", 0, 1)
@@ -2730,6 +2728,10 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(naomi_state::naomi_base)
 	MCFG_FRAGMENT_ADD( naomi_aw_base )
+
+    MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(naomi_map)
+	MCFG_CPU_IO_MAP(naomi_port)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("main_eeprom")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0)
@@ -2796,6 +2798,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED((naomi2_state::naomi2, naomi)
     MCFG_CPU_MODIFY("maincpu")
     MCFG_CPU_PROGRAM_MAP(naomi2_map)
+	MCFG_CPU_IO_MAP(naomi_port)
 MACHINE_CONFIG_END
 */
 /*

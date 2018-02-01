@@ -177,6 +177,15 @@ public:
 
 	void sun2mbus(machine_config &config);
 	void sun2vme(machine_config &config);
+	void mbustype0space_map(address_map &map);
+	void mbustype1space_map(address_map &map);
+	void mbustype2space_map(address_map &map);
+	void mbustype3space_map(address_map &map);
+	void sun2_mem(address_map &map);
+	void vmetype0space_map(address_map &map);
+	void vmetype1space_map(address_map &map);
+	void vmetype2space_map(address_map &map);
+	void vmetype3space_map(address_map &map);
 private:
 	uint16_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
@@ -470,18 +479,18 @@ WRITE16_MEMBER( sun2_state::video_ctrl_w )
 	COMBINE_DATA(&m_bw2_ctrl);
 }
 
-static ADDRESS_MAP_START(sun2_mem, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::sun2_mem)
 	AM_RANGE(0x000000, 0xffffff) AM_READWRITE( tl_mmu_r, tl_mmu_w )
 ADDRESS_MAP_END
 
 // VME memory spaces
 // type 0 device space
-static ADDRESS_MAP_START(vmetype0space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::vmetype0space_map)
 	AM_RANGE(0x000000, 0x7fffff) AM_READWRITE(ram_r, ram_w)
 ADDRESS_MAP_END
 
 // type 1 device space
-static ADDRESS_MAP_START(vmetype1space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::vmetype1space_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_SHARE("bw2_vram")
 	AM_RANGE(0x020000, 0x020001) AM_READWRITE( video_ctrl_r, video_ctrl_w )
 	AM_RANGE(0x7f0000, 0x7f07ff) AM_ROM AM_REGION("bootprom", 0)    // uses MMU loophole to read 32k from a 2k window
@@ -499,16 +508,16 @@ static ADDRESS_MAP_START(vmetype1space_map, AS_PROGRAM, 16, sun2_state)
 ADDRESS_MAP_END
 
 // type 2 device space
-static ADDRESS_MAP_START(vmetype2space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::vmetype2space_map)
 ADDRESS_MAP_END
 
 // type 3 device space
-static ADDRESS_MAP_START(vmetype3space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::vmetype3space_map)
 ADDRESS_MAP_END
 
 // Multibus memory spaces
 // type 0 device space
-static ADDRESS_MAP_START(mbustype0space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::mbustype0space_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(ram_r, ram_w)
 	// 7f80000-7f807ff: Keyboard/mouse SCC8530
 	//AM_RANGE(0x7f8000, 0x7f8007) AM_DEVREADWRITE8(SCC1_TAG, z80scc_device, ba_cd_inv_r, ba_cd_inv_w, 0xff00)
@@ -517,7 +526,7 @@ static ADDRESS_MAP_START(mbustype0space_map, AS_PROGRAM, 16, sun2_state)
 ADDRESS_MAP_END
 
 // type 1 device space
-static ADDRESS_MAP_START(mbustype1space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::mbustype1space_map)
 	AM_RANGE(0x000000, 0x0007ff) AM_ROM AM_REGION("bootprom", 0)    // uses MMU loophole to read 32k from a 2k window
 	// 001000-0017ff: AM9518 encryption processor
 	// 001800-001fff: Parallel port
@@ -527,11 +536,11 @@ static ADDRESS_MAP_START(mbustype1space_map, AS_PROGRAM, 16, sun2_state)
 ADDRESS_MAP_END
 
 // type 2 device space (Multibus memory space)
-static ADDRESS_MAP_START(mbustype2space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::mbustype2space_map)
 ADDRESS_MAP_END
 
 // type 3 device space (Multibus I/O space)
-static ADDRESS_MAP_START(mbustype3space_map, AS_PROGRAM, 16, sun2_state)
+ADDRESS_MAP_START(sun2_state::mbustype3space_map)
 ADDRESS_MAP_END
 
 uint32_t sun2_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

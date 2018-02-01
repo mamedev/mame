@@ -140,7 +140,7 @@ TIMER_CALLBACK_MEMBER( deco_irq_device::scanline_callback )
 //  INTERFACE
 //**************************************************************************
 
-DEVICE_ADDRESS_MAP_START(map, 8, deco_irq_device)
+ADDRESS_MAP_START(deco_irq_device::map)
 	AM_RANGE(0x0, 0x0) AM_WRITE(control_w)
 	AM_RANGE(0x1, 0x1) AM_READWRITE(scanline_r, scanline_w)
 	AM_RANGE(0x2, 0x2) AM_READWRITE(raster_irq_ack_r, vblank_irq_ack_w)

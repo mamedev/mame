@@ -38,6 +38,8 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_multi16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void multi16(machine_config &config);
+	void multi16_io(address_map &map);
+	void multi16_map(address_map &map);
 };
 
 
@@ -90,7 +92,7 @@ uint32_t multi16_state::screen_update_multi16(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-static ADDRESS_MAP_START(multi16_map, AS_PROGRAM, 16, multi16_state)
+ADDRESS_MAP_START(multi16_state::multi16_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x7ffff) AM_RAM
 	AM_RANGE(0xd8000,0xdffff) AM_RAM AM_SHARE("p_vram")
@@ -110,7 +112,7 @@ WRITE8_MEMBER( multi16_state::multi16_6845_data_w )
 	m_crtc->register_w(space, offset, data);
 }
 
-static ADDRESS_MAP_START(multi16_io, AS_IO, 16, multi16_state)
+ADDRESS_MAP_START(multi16_state::multi16_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0xffff) // i8259
 	AM_RANGE(0x40, 0x41) AM_WRITE8(multi16_6845_address_w, 0x00ff)

@@ -351,6 +351,11 @@ class towns_state : public driver_device
 	void townsftv(machine_config &config);
 	void townshr(machine_config &config);
 	void townssj(machine_config &config);
+	void marty_mem(address_map &map);
+	void towns16_io(address_map &map);
+	void towns_io(address_map &map);
+	void towns_mem(address_map &map);
+	void ux_mem(address_map &map);
 private:
 	static const device_timer_id TIMER_FREERUN = 1;
 	static const device_timer_id TIMER_INTERVAL2 = 2;

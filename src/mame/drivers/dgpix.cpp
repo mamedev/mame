@@ -196,6 +196,8 @@ public:
 
 	uint32_t screen_update_dgpix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void dgpix(machine_config &config);
+	void cpu_map(address_map &map);
+	void io_map(address_map &map);
 };
 
 
@@ -322,7 +324,7 @@ READ32_MEMBER(dgpix_state::vblank_r)
 	return m_vblank->read();
 }
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, dgpix_state )
+ADDRESS_MAP_START(dgpix_state::cpu_map)
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM
 	AM_RANGE(0x40000000, 0x4003ffff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0xe0000000, 0xe1ffffff) AM_READWRITE(flash_r, flash_w)
@@ -330,7 +332,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, dgpix_state )
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("flash", 0x1c00000) AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 32, dgpix_state )
+ADDRESS_MAP_START(dgpix_state::io_map)
 	AM_RANGE(0x0200, 0x0203) AM_READNOP // used to sync with the protecion PIC? tested bits 0 and 1
 	AM_RANGE(0x0400, 0x0403) AM_READWRITE(vblank_r, vbuffer_w)
 	AM_RANGE(0x0a10, 0x0a13) AM_READ_PORT("INPUTS")

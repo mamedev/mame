@@ -29,11 +29,11 @@ o2_chess_device::o2_chess_device(const machine_config &mconfig, const char *tag,
 }
 
 
-static ADDRESS_MAP_START(chess_mem, AS_PROGRAM, 8, o2_chess_device)
+ADDRESS_MAP_START(o2_chess_device::chess_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_READ(read_rom04)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(chess_io, AS_IO, 8, o2_chess_device)
+ADDRESS_MAP_START(o2_chess_device::chess_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END

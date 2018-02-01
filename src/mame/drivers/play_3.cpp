@@ -94,6 +94,12 @@ public:
 	void sklflite(machine_config &config);
 	void play_3(machine_config &config);
 	void megaaton(machine_config &config);
+	void megaaton_io(address_map &map);
+	void play_3_audio_io(address_map &map);
+	void play_3_audio_map(address_map &map);
+	void play_3_io(address_map &map);
+	void play_3_map(address_map &map);
+	void sklflite_io(address_map &map);
 private:
 	u16 m_clockcnt;
 	u16 m_resetcnt;
@@ -117,12 +123,12 @@ private:
 };
 
 
-static ADDRESS_MAP_START( play_3_map, AS_PROGRAM, 8, play_3_state )
+ADDRESS_MAP_START(play_3_state::play_3_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x80ff) AM_RAM AM_SHARE("nvram") // pair of 5101, battery-backed
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( play_3_io, AS_IO, 8, play_3_state )
+ADDRESS_MAP_START(play_3_state::play_3_io)
 	AM_RANGE(0x01, 0x01) AM_WRITE(port01_w) // digits, scan-lines
 	AM_RANGE(0x02, 0x02) AM_WRITE(port02_w) // sound code
 	AM_RANGE(0x03, 0x03) AM_WRITE(port03_w) //
@@ -132,24 +138,24 @@ static ADDRESS_MAP_START( play_3_io, AS_IO, 8, play_3_state )
 	AM_RANGE(0x07, 0x07) AM_WRITE(port07_w) // flipflop clear
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megaaton_io, AS_IO, 8, play_3_state )
+ADDRESS_MAP_START(play_3_state::megaaton_io)
 	AM_IMPORT_FROM(play_3_io)
 	AM_RANGE(0x01, 0x01) AM_WRITE(megaaton_port01_w) // digits, scan-lines
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sklflite_io, AS_IO, 8, play_3_state )
+ADDRESS_MAP_START(play_3_state::sklflite_io)
 	AM_IMPORT_FROM(play_3_io)
 	AM_RANGE(0x03, 0x03) AM_WRITE(sklflite_port03_w) //
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( play_3_audio_map, AS_PROGRAM, 8, play_3_state )
+ADDRESS_MAP_START(play_3_state::play_3_audio_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("aysnd1", ay8910_device, data_r, address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("aysnd2", ay8910_device, data_r, address_data_w)
 	AM_RANGE(0x8000, 0x80ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( play_3_audio_io, AS_IO, 8, play_3_state )
+ADDRESS_MAP_START(play_3_state::play_3_audio_io)
 	AM_RANGE(0x01, 0x01) AM_WRITE(port01_a_w) // irq counter
 	AM_RANGE(0x02, 0x02) AM_READ(port02_a_r) // sound code
 ADDRESS_MAP_END

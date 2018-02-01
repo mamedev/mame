@@ -64,4 +64,8 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tp84(machine_config &config);
 	void tp84b(machine_config &config);
+	void audio_map(address_map &map);
+	void cpu2_map(address_map &map);
+	void tp84_cpu1_map(address_map &map);
+	void tp84b_cpu1_map(address_map &map);
 };

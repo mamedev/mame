@@ -316,6 +316,20 @@ public:
 	void dkongjr_audio(machine_config &config);
 	void dkong3_audio(machine_config &config);
 	void radarscp1_audio(machine_config &config);
+	void dkong3_io_map(address_map &map);
+	void dkong3_map(address_map &map);
+	void dkong3_sound1_map(address_map &map);
+	void dkong3_sound2_map(address_map &map);
+	void dkong_map(address_map &map);
+	void dkong_sound_io_map(address_map &map);
+	void dkong_sound_map(address_map &map);
+	void dkongjr_map(address_map &map);
+	void dkongjr_sound_io_map(address_map &map);
+	void epos_readport(address_map &map);
+	void radarscp1_sound_io_map(address_map &map);
+	void s2650_data_map(address_map &map);
+	void s2650_io_map(address_map &map);
+	void s2650_map(address_map &map);
 private:
 	// video/dkong.c
 	void radarscp_step(int line_cnt);

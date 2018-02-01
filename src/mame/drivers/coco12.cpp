@@ -54,7 +54,7 @@
 //  ADDRESS_MAP( coco_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( coco_mem, AS_PROGRAM, 8, coco_state )
+ADDRESS_MAP_START(coco_state::coco_mem)
 ADDRESS_MAP_END
 
 
@@ -398,7 +398,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG ( coco_floating )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START(coco_floating_map, AS_PROGRAM, 8, coco_state)
+ADDRESS_MAP_START(coco_state::coco_floating_map)
 	AM_RANGE(0x0000, 0xFFFF) AM_READ(floating_bus_read)
 ADDRESS_MAP_END
 

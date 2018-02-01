@@ -35,6 +35,8 @@ public:
 	uint32_t screen_update_inteladv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void inteladv(machine_config &config);
+	void inteladv_main(address_map &map);
+	void inteladv(address_map &map);
 
 protected:
 	virtual void machine_start() override;
@@ -58,7 +60,7 @@ uint32_t inteladv_state::screen_update_inteladv(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static ADDRESS_MAP_START( inteladv_main, AS_PROGRAM, 8, inteladv_state )
+ADDRESS_MAP_START(inteladv_state::inteladv_main)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM // zero page and stack
 	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("maincpu", 0x0000)    // boot code at 4000
 	AM_RANGE(0x8000, 0x8fff) AM_ROM AM_REGION("maincpu", 0x8000)    // fixed ROM region?

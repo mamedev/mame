@@ -144,6 +144,8 @@ public:
 	required_device<msm5205_device> m_adpcm;
 	required_device<palette_device> m_palette;
 	void jantotsu(machine_config &config);
+	void jantotsu_io(address_map &map);
+	void jantotsu_map(address_map &map);
 };
 
 
@@ -332,13 +334,13 @@ WRITE_LINE_MEMBER(jantotsu_state::jan_adpcm_int)
  *
  *************************************/
 
-static ADDRESS_MAP_START( jantotsu_map, AS_PROGRAM, 8, jantotsu_state )
+ADDRESS_MAP_START(jantotsu_state::jantotsu_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(jantotsu_bitmap_r, jantotsu_bitmap_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jantotsu_io, AS_IO, 8, jantotsu_state )
+ADDRESS_MAP_START(jantotsu_state::jantotsu_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_DEVWRITE("sn1", sn76489a_device, write)
 	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_DEVWRITE("sn2", sn76489a_device, write)

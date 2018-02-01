@@ -22,7 +22,7 @@
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START(kc85_4_io, AS_IO, 8, kc85_4_state)
+ADDRESS_MAP_START(kc85_4_state::kc85_4_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(expansion_io_read, expansion_io_write)
 
@@ -32,7 +32,7 @@ static ADDRESS_MAP_START(kc85_4_io, AS_IO, 8, kc85_4_state)
 	AM_RANGE(0x008c, 0x008f) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(kc85_4_mem, AS_PROGRAM, 8, kc85_4_state)
+ADDRESS_MAP_START(kc85_4_state::kc85_4_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_BANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_BANK("bank2")
@@ -42,7 +42,7 @@ static ADDRESS_MAP_START(kc85_4_mem, AS_PROGRAM, 8, kc85_4_state)
 	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(kc85_3_mem, AS_PROGRAM, 8, kc_state)
+ADDRESS_MAP_START(kc_state::kc85_3_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_BANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_BANK("bank2")
@@ -51,7 +51,7 @@ static ADDRESS_MAP_START(kc85_3_mem, AS_PROGRAM, 8, kc_state)
 	AM_RANGE(0xe000, 0xffff) AM_READ_BANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(kc85_3_io, AS_IO, 8, kc_state)
+ADDRESS_MAP_START(kc_state::kc85_3_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(expansion_io_read, expansion_io_write)
 

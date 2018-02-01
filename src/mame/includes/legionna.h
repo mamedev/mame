@@ -7,7 +7,7 @@
 #include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
 
-class legionna_state : public driver_device
+class legionna_state : public driver_device, protected seibu_sound_common
 {
 public:
 	legionna_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -23,6 +23,7 @@ public:
 			m_oki(*this, "oki"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette"),
+			m_crtc(*this, "crtc"),
 			m_raiden2cop(*this, "raiden2cop")
 	{
 		memset(scrollvals, 0, sizeof(uint16_t)*6);
@@ -96,6 +97,7 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<seibu_crtc_device> m_crtc;
 	optional_device<raiden2cop_device> m_raiden2cop;
 	void cupsocs(machine_config &config);
 	void heatbrl(machine_config &config);
@@ -104,4 +106,12 @@ public:
 	void legionna(machine_config &config);
 	void godzilla(machine_config &config);
 	void denjinmk(machine_config &config);
+	void cupsoc_mem(address_map &map);
+	void cupsocs_mem(address_map &map);
+	void denjinmk_map(address_map &map);
+	void godzilla_map(address_map &map);
+	void grainbow_map(address_map &map);
+	void heatbrl_map(address_map &map);
+	void legionna_cop_mem(address_map &map);
+	void legionna_map(address_map &map);
 };

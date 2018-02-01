@@ -347,7 +347,7 @@ CUSTOM_INPUT_MEMBER(snk6502_state::sasuke_count_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( sasuke_map, AS_PROGRAM, 8, snk6502_state )
+ADDRESS_MAP_START(snk6502_state::sasuke_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -366,7 +366,7 @@ static ADDRESS_MAP_START( sasuke_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( satansat_map, AS_PROGRAM, 8, snk6502_state )
+ADDRESS_MAP_START(snk6502_state::satansat_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -385,7 +385,7 @@ static ADDRESS_MAP_START( satansat_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vanguard_map, AS_PROGRAM, 8, snk6502_state )
+ADDRESS_MAP_START(snk6502_state::vanguard_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( vanguard_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fantasy_map, AS_PROGRAM, 8, snk6502_state )
+ADDRESS_MAP_START(snk6502_state::fantasy_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
@@ -427,7 +427,7 @@ static ADDRESS_MAP_START( fantasy_map, AS_PROGRAM, 8, snk6502_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pballoon_map, AS_PROGRAM, 8, snk6502_state )
+ADDRESS_MAP_START(snk6502_state::pballoon_map)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")

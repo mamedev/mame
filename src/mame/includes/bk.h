@@ -49,6 +49,8 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	void bk0010(machine_config &config);
 	void bk0010fd(machine_config &config);
+	void bk0010_mem(address_map &map);
+	void bk0010fd_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_BK_H

@@ -55,6 +55,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 	void atari_s2(machine_config &config);
 	void atari_s3(machine_config &config);
+	void atari_s2_map(address_map &map);
+	void atari_s3_map(address_map &map);
 private:
 	bool m_timer_sb;
 	uint8_t m_timer_s[5];
@@ -71,7 +73,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( atari_s2_map, AS_PROGRAM, 8, atari_s2_state )
+ADDRESS_MAP_START(atari_s2_state::atari_s2_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM
 	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("nvram") // battery backed
@@ -98,7 +100,7 @@ static ADDRESS_MAP_START( atari_s2_map, AS_PROGRAM, 8, atari_s2_state )
 	AM_RANGE(0x2800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( atari_s3_map, AS_PROGRAM, 8, atari_s2_state )
+ADDRESS_MAP_START(atari_s2_state::atari_s3_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM
 	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_SHARE("nvram") // battery backed

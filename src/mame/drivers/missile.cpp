@@ -426,6 +426,8 @@ public:
 	void missileb(machine_config &config);
 	void missile(machine_config &config);
 	void missilea(machine_config &config);
+	void bootleg_main_map(address_map &map);
+	void main_map(address_map &map);
 };
 
 
@@ -944,12 +946,12 @@ READ8_MEMBER(missile_state::bootleg_r)
  *************************************/
 
 /* complete memory map derived from schematics (implemented above) */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, missile_state )
+ADDRESS_MAP_START(missile_state::main_map)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(missile_r, missile_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 /* adjusted from the above to get the bootlegs to boot */
-static ADDRESS_MAP_START( bootleg_main_map, AS_PROGRAM, 8, missile_state )
+ADDRESS_MAP_START(missile_state::bootleg_main_map)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(bootleg_r, bootleg_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 

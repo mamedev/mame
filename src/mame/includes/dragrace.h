@@ -75,6 +75,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(dragrace_frame_callback);
 	void dragrace_update_misc_flags( address_space &space );
 	void dragrace(machine_config &config);
+	void dragrace_map(address_map &map);
 };
 
 /*----------- defined in audio/dragrace.c -----------*/

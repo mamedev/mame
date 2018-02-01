@@ -171,6 +171,26 @@ public:
 	void outzonecv(machine_config &config);
 	void hellfire(machine_config &config);
 	void zerowing(machine_config &config);
+	void DSP_io_map(address_map &map);
+	void DSP_program_map(address_map &map);
+	void demonwld_main_map(address_map &map);
+	void demonwld_sound_io_map(address_map &map);
+	void hellfire_main_map(address_map &map);
+	void hellfire_sound_io_map(address_map &map);
+	void outzone_main_map(address_map &map);
+	void outzone_sound_io_map(address_map &map);
+	void outzonecv_main_map(address_map &map);
+	void samesame_hd647180_io_map(address_map &map);
+	void samesame_hd647180_mem_map(address_map &map);
+	void samesame_main_map(address_map &map);
+	void toaplan1_sound_map(address_map &map);
+	void truxton_main_map(address_map &map);
+	void truxton_sound_io_map(address_map &map);
+	void vimana_hd647180_io_map(address_map &map);
+	void vimana_hd647180_mem_map(address_map &map);
+	void vimana_main_map(address_map &map);
+	void zerowing_main_map(address_map &map);
+	void zerowing_sound_io_map(address_map &map);
 };
 
 class toaplan1_rallybik_state : public toaplan1_state
@@ -193,4 +213,6 @@ public:
 
 	required_device<toaplan_scu_device> m_spritegen;
 	void rallybik(machine_config &config);
+	void rallybik_main_map(address_map &map);
+	void rallybik_sound_io_map(address_map &map);
 };

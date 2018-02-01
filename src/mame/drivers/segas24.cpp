@@ -1064,7 +1064,7 @@ fc-ff ramhi
 */
 
 
-static ADDRESS_MAP_START( system24_cpu1_map, AS_PROGRAM, 16, segas24_state )
+ADDRESS_MAP_START(segas24_state::system24_cpu1_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x040000) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x0c0000) AM_ROM AM_REGION("maincpu", 0)
@@ -1097,12 +1097,12 @@ static ADDRESS_MAP_START( system24_cpu1_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( roughrac_cpu1_map, AS_PROGRAM, 16, segas24_state )
+ADDRESS_MAP_START(segas24_state::roughrac_cpu1_map)
 	AM_IMPORT_FROM(system24_cpu1_map)
 	AM_RANGE(0xc00000, 0xc00007) AM_MIRROR(0x07ffe0) AM_DEVREAD8("upd4701", upd4701_device, read_xy, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotrod_cpu1_map, AS_PROGRAM, 16, segas24_state )
+ADDRESS_MAP_START(segas24_state::hotrod_cpu1_map)
 	AM_IMPORT_FROM(system24_cpu1_map)
 	AM_RANGE(0xc00000, 0xc00007) AM_MIRROR(0x07ffe0) AM_DEVREAD8("upd1", upd4701_device, read_xy, 0x00ff)
 	AM_RANGE(0xc00008, 0xc0000f) AM_MIRROR(0x07ffe0) AM_DEVREAD8("upd2", upd4701_device, read_xy, 0x00ff)
@@ -1118,7 +1118,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( system24_cpu2_map, AS_PROGRAM, 16, segas24_state )
+ADDRESS_MAP_START(segas24_state::system24_cpu2_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("subcpu")
 	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x0c0000) AM_ROM AM_REGION("maincpu", 0)
@@ -1151,12 +1151,12 @@ static ADDRESS_MAP_START( system24_cpu2_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( roughrac_cpu2_map, AS_PROGRAM, 16, segas24_state )
+ADDRESS_MAP_START(segas24_state::roughrac_cpu2_map)
 	AM_IMPORT_FROM(system24_cpu2_map)
 	AM_RANGE(0xc00000, 0xc00007) AM_MIRROR(0x07ffe0) AM_DEVREAD8("upd4701", upd4701_device, read_xy, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotrod_cpu2_map, AS_PROGRAM, 16, segas24_state )
+ADDRESS_MAP_START(segas24_state::hotrod_cpu2_map)
 	AM_IMPORT_FROM(system24_cpu2_map)
 	AM_RANGE(0xc00000, 0xc00007) AM_MIRROR(0x07ffe0) AM_DEVREAD8("upd1", upd4701_device, read_xy, 0x00ff)
 	AM_RANGE(0xc00008, 0xc0000f) AM_MIRROR(0x07ffe0) AM_DEVREAD8("upd2", upd4701_device, read_xy, 0x00ff)
@@ -1164,7 +1164,7 @@ static ADDRESS_MAP_START( hotrod_cpu2_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0xc00012, 0xc00013) AM_MIRROR(0x07ffec) AM_DEVREADWRITE8("adc2", msm6253_device, d7_r, select_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segas24_state )
+ADDRESS_MAP_START(segas24_state::decrypted_opcodes_map)
 	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -1951,7 +1951,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(segas24_state::system24_floppy_fd1094, system24_floppy)
 	MCFG_CPU_REPLACE("subcpu", FD1094, MASTER_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(system24_cpu2_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(segas24_state::system24_floppy_fd_upd, system24_floppy_fd1094)

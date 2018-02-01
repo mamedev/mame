@@ -2008,7 +2008,7 @@ inline void address_space::adjust_addresses(offs_t &start, offs_t &end, offs_t &
 	end &= ~mirror & m_addrmask;
 }
 
-void address_space::check_optimize_all(const char *function, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror)
+void address_space::check_optimize_all(const char *function, int width, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, u64 unitmask, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror, u64 &nunitmask)
 {
 	if (addrstart > addrend)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start address is after the end address.\n", function, addrstart, addrend, addrmask, addrmirror, addrselect);
@@ -2017,11 +2017,20 @@ void address_space::check_optimize_all(const char *function, offs_t addrstart, o
 	if (addrend & ~m_addrmask)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, m_addrmask, addrend & m_addrmask);
 
-	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
+	// Check the relative data widths
+	if (width > m_config.data_width())
+		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, cannot install a %d-bits wide handler in a %d-bits wide address space.\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, width, m_config.data_width());
+
+	// Check the validity of the addresses given their intrinsic width
+	// We assume that busses with non-zero address shift have a data width matching the shift (reality says yes)
+	offs_t default_lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
+	offs_t lowbits_mask = width && !m_config.m_addr_shift ? (width >> 3) - 1 : default_lowbits_mask;
+
 	if (addrstart & lowbits_mask)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start address has low bits set, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, addrstart & ~lowbits_mask);
 	if ((~addrend) & lowbits_mask)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, end address has low bits unset, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, addrend | lowbits_mask);
+
 
 	offs_t set_bits = addrstart | addrend;
 	offs_t changing_bits = addrstart ^ addrend;
@@ -2050,6 +2059,37 @@ void address_space::check_optimize_all(const char *function, offs_t addrstart, o
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, select touches a set address bit, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, addrselect & ~set_bits);
 	if (addrmirror & addrselect)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, mirror touches a select bit, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, addrmirror & ~addrselect);
+
+	// Check if the unitmask is structurally correct for the width
+	// Not sure what we can actually handle regularity-wise, so don't check that yet
+	if (width) {
+		// Check if the 1-blocks are of appropriate size
+		u64 block_mask = 0xffffffffffffffffU >> (64 - width);
+		for(int pos = 0; pos != 64; pos += width) {
+			u64 cmask = (unitmask >> pos) & block_mask;
+			if (cmask && cmask != block_mask)
+				fatalerror("%s: In range %x-%x mask %x mirror %x select %x, the unitmask of %s has incorrect granularity for a handler size of %d.\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, core_i64_hex_format(unitmask, 16), width);
+		}
+	}
+
+	// Check if we have to adjust the unitmask and addresses
+	nunitmask = unitmask ? unitmask : 0xffffffffffffffffU;
+	if ((addrstart & default_lowbits_mask) || ((~addrend) & default_lowbits_mask)) {
+		if ((addrstart ^ addrend) & ~default_lowbits_mask)
+			fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start or end is unaligned while the range spans more than one slot (granularity = %d).\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, default_lowbits_mask + 1);
+		offs_t lowbyte = m_config.addr2byte(addrstart & default_lowbits_mask);
+		offs_t highbyte = m_config.addr2byte((addrend & default_lowbits_mask) + 1);
+		if (m_config.endianness() == ENDIANNESS_LITTLE) {
+			u64 hmask = 0xffffffffffffffffU >> (64 - 8*highbyte);
+			nunitmask = (nunitmask << (8*lowbyte)) & hmask;
+		} else {
+			u64 hmask = 0xffffffffffffffffU >> ((64 - m_config.data_width()) + 8*lowbyte);
+			nunitmask = (nunitmask << (m_config.data_width() - 8*highbyte)) & hmask;
+		}
+
+		addrstart &= ~default_lowbits_mask;
+		addrend |= default_lowbits_mask;
+	}	
 
 	nstart = addrstart;
 	nend = addrend;
@@ -2151,7 +2191,7 @@ void address_space::prepare_map()
 	m_map = std::make_unique<address_map>(m_device, m_spacenum);
 
 	// merge in the submaps
-	m_map->uplift_submaps(m_manager.machine(), m_device.owner() ? *m_device.owner() : m_device, endianness());
+	m_map->import_submaps(m_manager.machine(), m_device.owner() ? *m_device.owner() : m_device, data_width(), endianness());
 
 	// extract global parameters specified by the map
 	m_unmap = (m_map->m_unmapval == 0) ? 0 : ~0;
@@ -2172,7 +2212,7 @@ void address_space::prepare_map()
 			if (m_manager.m_sharelist.find(fulltag.c_str()) == m_manager.m_sharelist.end())
 			{
 				VPRINTF(("Creating share '%s' of length 0x%X\n", fulltag.c_str(), entry.m_addrend + 1 - entry.m_addrstart));
-				m_manager.m_sharelist.emplace(fulltag.c_str(), std::make_unique<memory_share>(m_map->m_databits, address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness()));
+				m_manager.m_sharelist.emplace(fulltag.c_str(), std::make_unique<memory_share>(m_config.data_width(), address_to_byte(entry.m_addrend + 1 - entry.m_addrstart), endianness()));
 			}
 		}
 
@@ -2284,18 +2324,18 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 			if (readorwrite == read_or_write::READ)
 				switch (data.m_bits)
 				{
-					case 8:     install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read8_delegate(entry.m_rproto8, entry.m_devbase), data.m_mask); break;
-					case 16:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read16_delegate(entry.m_rproto16, entry.m_devbase), data.m_mask); break;
-					case 32:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read32_delegate(entry.m_rproto32, entry.m_devbase), data.m_mask); break;
-					case 64:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read64_delegate(entry.m_rproto64, entry.m_devbase), data.m_mask); break;
+					case 8:     install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read8_delegate(entry.m_rproto8, entry.m_devbase), entry.m_mask); break;
+					case 16:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read16_delegate(entry.m_rproto16, entry.m_devbase), entry.m_mask); break;
+					case 32:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read32_delegate(entry.m_rproto32, entry.m_devbase), entry.m_mask); break;
+					case 64:    install_read_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, read64_delegate(entry.m_rproto64, entry.m_devbase), entry.m_mask); break;
 				}
 			else
 				switch (data.m_bits)
 				{
-					case 8:     install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write8_delegate(entry.m_wproto8, entry.m_devbase), data.m_mask); break;
-					case 16:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write16_delegate(entry.m_wproto16, entry.m_devbase), data.m_mask); break;
-					case 32:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write32_delegate(entry.m_wproto32, entry.m_devbase), data.m_mask); break;
-					case 64:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write64_delegate(entry.m_wproto64, entry.m_devbase), data.m_mask); break;
+					case 8:     install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write8_delegate(entry.m_wproto8, entry.m_devbase), entry.m_mask); break;
+					case 16:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write16_delegate(entry.m_wproto16, entry.m_devbase), entry.m_mask); break;
+					case 32:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write32_delegate(entry.m_wproto32, entry.m_devbase), entry.m_mask); break;
+					case 64:    install_write_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask, entry.m_addrmirror, entry.m_addrselect, write64_delegate(entry.m_wproto64, entry.m_devbase), entry.m_mask); break;
 				}
 			break;
 
@@ -2323,7 +2363,7 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 void address_space::populate_map_entry_setoffset(const address_map_entry &entry)
 {
 	install_setoffset_handler(entry.m_addrstart, entry.m_addrend, entry.m_addrmask,
-		entry.m_addrmirror, entry.m_addrselect, setoffset_delegate(entry.m_soproto, entry.m_devbase), entry.m_setoffsethd.m_mask);
+		entry.m_addrmirror, entry.m_addrselect, setoffset_delegate(entry.m_soproto, entry.m_devbase), entry.m_mask);
 }
 
 //-------------------------------------------------
@@ -2559,11 +2599,11 @@ void address_space::unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrm
 //  of a live device into this address space
 //-------------------------------------------------
 
-void address_space::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_delegate &delegate, int bits, u64 unitmask)
+void address_space::install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &delegate, u64 unitmask)
 {
 	check_address("install_device_delegate", addrstart, addrend);
-	address_map map(*this, addrstart, addrend, bits, unitmask, m_device, delegate);
-	map.uplift_submaps(m_manager.machine(), device, endianness());
+	address_map map(*this, addrstart, addrend, unitmask, m_device, delegate);
+	map.import_submaps(m_manager.machine(), device, data_width(), endianness());
 	populate_from_map(&map);
 }
 
@@ -2766,9 +2806,10 @@ void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_
 				handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_read_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
+	u64 nunitmask;
+	check_optimize_all("install_read_handler", 8, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, nstart, nend, nmask, nmirror, nunitmask);
 
-	read().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	read().handler_map_range(nstart, nend, nmask, nmirror, nunitmask).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
@@ -2780,9 +2821,10 @@ void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs
 				handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
+	u64 nunitmask;
+	check_optimize_all("install_write_handler", 8, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, nstart, nend, nmask, nmirror, nunitmask);
 
-	write().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	write().handler_map_range(nstart, nend, nmask, nmirror, nunitmask).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
@@ -2801,16 +2843,18 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate handler, u64 unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_read_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	read().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	u64 nunitmask;
+	check_optimize_all("install_read_handler", 16, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, nstart, nend, nmask, nmirror, nunitmask);
+	read().handler_map_range(nstart, nend, nmask, nmirror, nunitmask).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
 void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16_delegate handler, u64 unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	write().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	u64 nunitmask;
+	check_optimize_all("install_write_handler", 16, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, nstart, nend, nmask, nmirror, nunitmask);
+	write().handler_map_range(nstart, nend, nmask, nmirror, nunitmask).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
@@ -2829,16 +2873,18 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate handler, u64 unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_read_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	read().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	u64 nunitmask;
+	check_optimize_all("install_read_handler", 32, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, nstart, nend, nmask, nmirror, nunitmask);
+	read().handler_map_range(nstart, nend, nmask, nmirror, nunitmask).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
 void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32_delegate handler, u64 unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	write().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	u64 nunitmask;
+	check_optimize_all("install_write_handler", 32, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, nstart, nend, nmask, nmirror, nunitmask);
+	write().handler_map_range(nstart, nend, nmask, nmirror, nunitmask).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
@@ -2857,16 +2903,18 @@ void address_space::install_readwrite_handler(offs_t addrstart, offs_t addrend, 
 void address_space::install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate handler, u64 unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_read_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	read().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	u64 nunitmask;
+	check_optimize_all("install_read_handler", 64, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, nstart, nend, nmask, nmirror, nunitmask);
+	read().handler_map_range(nstart, nend, nmask, nmirror, nunitmask).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
 void address_space::install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate handler, u64 unitmask)
 {
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_write_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	write().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	u64 nunitmask;
+	check_optimize_all("install_write_handler", 64, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, nstart, nend, nmask, nmirror, nunitmask);
+	write().handler_map_range(nstart, nend, nmask, nmirror, nunitmask).set_delegate(handler);
 	generate_memdump(m_manager.machine());
 }
 
@@ -2889,8 +2937,9 @@ void address_space::install_setoffset_handler(offs_t addrstart, offs_t addrend, 
 				handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
 
 	offs_t nstart, nend, nmask, nmirror;
-	check_optimize_all("install_setoffset_handler", addrstart, addrend, addrmask, addrmirror, addrselect, nstart, nend, nmask, nmirror);
-	setoffset().handler_map_range(nstart, nend, nmask, nmirror, unitmask).set_delegate(handler);
+	u64 nunitmask;
+	check_optimize_all("install_setoffset_handler", 8, addrstart, addrend, addrmask, addrmirror, addrselect, unitmask, nstart, nend, nmask, nmirror, nunitmask);
+	setoffset().handler_map_range(nstart, nend, nmask, nmirror, nunitmask).set_delegate(handler);
 }
 
 //**************************************************************************
@@ -4558,7 +4607,7 @@ void handler_entry::configure_subunits(u64 handlermask, int handlerbits, int &st
 			count++;
 	}
 	if (count == 0 || count > maxunits)
-		throw emu_fatalerror("Invalid subunit mask %s for %d-bit space", core_i64_hex_format(handlermask, m_datawidth / 4), m_datawidth);
+		throw emu_fatalerror("Invalid subunit mask %s for %d-bit handler in %d-bit space", core_i64_hex_format(handlermask, m_datawidth / 4), handlerbits, m_datawidth);
 
 	// make sure that the multiplier is a power of 2
 	int multiplier = count;

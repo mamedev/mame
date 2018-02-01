@@ -42,7 +42,7 @@ WRITE8_MEMBER( tmc600_state::page_ram_w )
 	m_color_ram[offset] = m_vismac_color_latch;
 }
 
-static ADDRESS_MAP_START( cdp1869_page_ram, 0, 8, tmc600_state )
+ADDRESS_MAP_START(tmc600_state::cdp1869_page_ram)
 	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM AM_SHARE("page_ram") AM_WRITE(page_ram_w)
 ADDRESS_MAP_END
 

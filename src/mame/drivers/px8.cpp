@@ -511,7 +511,7 @@ WRITE8_MEMBER( px8_state::ksc_w )
     ADDRESS_MAP( px8_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( px8_mem, AS_PROGRAM, 8, px8_state )
+ADDRESS_MAP_START(px8_state::px8_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank0")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank1")
@@ -521,7 +521,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( px8_io )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( px8_io, AS_IO, 8, px8_state )
+ADDRESS_MAP_START(px8_state::px8_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x0f)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(gah40m_r, gah40m_w)
@@ -535,7 +535,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( px8_slave_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( px8_slave_mem, AS_PROGRAM, 8, px8_state )
+ADDRESS_MAP_START(px8_state::px8_slave_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0020, 0x0023) AM_READWRITE(gah40s_r, gah40s_w)
 //  AM_RANGE(0x0024, 0x0027) AM_DEVREADWRITE_LEGACY(SED1320_TAG, )
@@ -549,7 +549,7 @@ ADDRESS_MAP_END
     ADDRESS_MAP( px8_slave_io )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( px8_slave_io, AS_IO, 8, px8_state )
+ADDRESS_MAP_START(px8_state::px8_slave_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(M6801_PORT1, M6801_PORT1)
 	AM_RANGE(M6801_PORT2, M6801_PORT2)

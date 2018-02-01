@@ -65,4 +65,9 @@ public:
 	void zerohour(machine_config &config);
 	void sraider(machine_config &config);
 	void redclash(machine_config &config);
+	void redclash_map(address_map &map);
+	void sraider_cpu1_map(address_map &map);
+	void sraider_cpu2_io_map(address_map &map);
+	void sraider_cpu2_map(address_map &map);
+	void zerohour_map(address_map &map);
 };

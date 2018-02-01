@@ -1134,7 +1134,7 @@ WRITE_LINE_MEMBER(x68k_state::x68k_scsi_drq)
 	// TODO
 }
 
-static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
+ADDRESS_MAP_START(x68k_state::x68k_map)
 	AM_RANGE(0x000000, 0xbffffb) AM_READWRITE(x68k_emptyram_r, x68k_emptyram_w)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w)
@@ -1172,7 +1172,7 @@ static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
+ADDRESS_MAP_START(x68k_state::x68kxvi_map)
 	AM_RANGE(0x000000, 0xbffffb) AM_READWRITE(x68k_emptyram_r, x68k_emptyram_w)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w)
@@ -1211,7 +1211,7 @@ static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
+ADDRESS_MAP_START(x68k_state::x68030_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)  // Still only has 24-bit address space
 	AM_RANGE(0x000000, 0xbffffb) AM_READWRITE16(x68k_emptyram_r, x68k_emptyram_w,0xffffffff)
 	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)

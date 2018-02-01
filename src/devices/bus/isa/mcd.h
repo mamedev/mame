@@ -24,7 +24,7 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_ADDRESS_MAP(map, 16);
+	void map(address_map &map);
 
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_READ8_MEMBER(flag_r);

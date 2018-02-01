@@ -157,7 +157,7 @@ WRITE_LINE_MEMBER(mermaid_state::nmi_mask_w)
 
 /* Memory Map */
 
-static ADDRESS_MAP_START( mermaid_map, AS_PROGRAM, 8, mermaid_state )
+ADDRESS_MAP_START(mermaid_state::mermaid_map)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(mermaid_videoram2_w) AM_SHARE("videoram2")

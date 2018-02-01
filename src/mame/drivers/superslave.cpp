@@ -67,6 +67,8 @@ public:
 	DECLARE_WRITE8_MEMBER( cmd_w );
 
 	void superslave(machine_config &config);
+	void superslave_io(address_map &map);
+	void superslave_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<com8116_device> m_dbrg;
@@ -253,7 +255,7 @@ WRITE8_MEMBER( superslave_state::cmd_w )
 //  ADDRESS_MAP( superslave_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( superslave_mem, AS_PROGRAM, 8, superslave_state )
+ADDRESS_MAP_START(superslave_state::superslave_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -262,7 +264,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( superslave_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( superslave_io, AS_IO, 8, superslave_state )
+ADDRESS_MAP_START(superslave_state::superslave_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80DART_0_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80DART_1_TAG, z80dart_device, ba_cd_r, ba_cd_w)

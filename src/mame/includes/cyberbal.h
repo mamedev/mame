@@ -101,6 +101,11 @@ public:
 	void cyberbalt(machine_config &config);
 	void cyberbal2p(machine_config &config);
 	void cyberbal(machine_config &config);
+	void cyberbal2p_map(address_map &map);
+	void extra_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_68k_map(address_map &map);
+	void sound_map(address_map &map);
 private:
 	void video_start_common(int screens);
 	void cyberbal_sound_reset();

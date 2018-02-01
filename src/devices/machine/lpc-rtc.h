@@ -34,8 +34,8 @@ protected:
 	void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map, 32);
-	DECLARE_ADDRESS_MAP(extmap, 32);
+	void map(address_map &map);
+	void extmap(address_map &map);
 
 	uint8_t cur_index, cur_extindex;
 	uint8_t ram[256];

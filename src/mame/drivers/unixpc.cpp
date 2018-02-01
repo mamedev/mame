@@ -76,6 +76,8 @@ public:
 	required_shared_ptr<uint16_t> m_videoram;
 
 	void unixpc(machine_config &config);
+	void ramrombank_map(address_map &map);
+	void unixpc_mem(address_map &map);
 private:
 	uint16_t *m_ramptr;
 	uint32_t m_ramsize;
@@ -273,7 +275,7 @@ uint32_t unixpc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( unixpc_mem, AS_PROGRAM, 16, unixpc_state )
+ADDRESS_MAP_START(unixpc_state::unixpc_mem)
 	AM_RANGE(0x000000, 0x3fffff) AM_DEVICE("ramrombank", address_map_bank_device, amap16)
 	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_SHARE("mapram")
 	AM_RANGE(0x420000, 0x427fff) AM_RAM AM_SHARE("videoram")
@@ -293,7 +295,7 @@ static ADDRESS_MAP_START( unixpc_mem, AS_PROGRAM, 16, unixpc_state )
 	// e70000 / e70002 = keyboard 6850 status/control and Rx data / Tx data
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramrombank_map, AS_PROGRAM, 16, unixpc_state )
+ADDRESS_MAP_START(unixpc_state::ramrombank_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0x400000, 0x7fffff) AM_READWRITE(ram_mmu_r, ram_mmu_w)
 ADDRESS_MAP_END

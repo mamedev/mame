@@ -142,7 +142,7 @@ READ8_MEMBER(bbc_state::bbc_fe_r)
 	return 0xfe;
 }
 
-static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::bbca_mem)
 	ADDRESS_MAP_UNMAP_HIGH                                                                                      /*  Hardware marked with a # is not present in a Model A        */
 
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)                                     /*    0000-3fff                 Regular Ram                     */
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8, bbc_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbc_base, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::bbc_base)
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0xc000, 0xfbff) AM_READ_BANK("bank7")                                                              /*    c000-fbff                 OS ROM                          */
@@ -193,7 +193,7 @@ static ADDRESS_MAP_START( bbc_base, AS_PROGRAM, 8, bbc_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::bbcb_mem)
 	AM_IMPORT_FROM(bbc_base)
 
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)                                     /*    0000-3fff                 Regular Ram                     */
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbcb_nofdc_mem, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::bbcb_nofdc_mem)
 	AM_IMPORT_FROM(bbc_base)
 
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)                                     /*    0000-3fff                 Regular Ram                     */
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( bbcb_nofdc_mem, AS_PROGRAM, 8, bbc_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::bbcbp_mem)
 	AM_IMPORT_FROM(bbc_base)
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)                    /*    0000-2fff                 Regular Ram                     */
 	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybp2_w)                    /*    3000-7fff                 Video/Shadow Ram                */
@@ -232,7 +232,7 @@ static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::bbcbp128_mem)
 	AM_IMPORT_FROM(bbc_base)
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)                    /*    0000-2fff                 Regular Ram                     */
 	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybp2_w)                    /*    3000-7fff                 Video/Shadow Ram                */
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( reutapm_mem, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::reutapm_mem)
 	AM_IMPORT_FROM(bbc_base)
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)                    /*    0000-2fff                 Regular Ram                     */
 	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybp2_w)                    /*    3000-7fff                 Video/Shadow Ram                */
@@ -283,7 +283,7 @@ ADDRESS_MAP_END
 ******************************************************************************/
 
 
-static ADDRESS_MAP_START(bbcm_mem, AS_PROGRAM, 8, bbc_state )
+ADDRESS_MAP_START(bbc_state::bbcm_mem)
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybm1_w)                    /*    0000-2fff                 Regular Ram                     */
 	AM_RANGE(0x3000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE(bbc_memorybm2_w)                    /*    3000-7fff                 Video/Shadow Ram                */
 	AM_RANGE(0x8000, 0x8fff) AM_READ_BANK("bank4") AM_WRITE(bbc_memorybm4_w)                    /*    8000-8fff                 Paged ROM/RAM or 4K of RAM ANDY */

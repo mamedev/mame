@@ -53,7 +53,7 @@
 
 DEFINE_DEVICE_TYPE(VME_HCPU30, vme_hcpu30_card_device, "hcpu30", "Besta HCPU30 CPU board")
 
-static ADDRESS_MAP_START(hcpu30_mem, AS_PROGRAM, 32, vme_hcpu30_card_device)
+ADDRESS_MAP_START(vme_hcpu30_card_device::hcpu30_mem)
 	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_WRITE(bootvect_w)   /* After first write we act as RAM */
 	AM_RANGE(0x00000000, 0x00000007) AM_ROM AM_READ(bootvect_r)   /* ROM mirror just during reset */
 	AM_RANGE(0x00000008, 0x001fffff) AM_RAM // local bus DRAM, 4MB

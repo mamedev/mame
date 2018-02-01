@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER(timeplt_audio_device::mute_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( timeplt_sound_map, AS_PROGRAM, 8, timeplt_audio_device )
+ADDRESS_MAP_START(timeplt_audio_device::timeplt_sound_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( timeplt_sound_map, AS_PROGRAM, 8, timeplt_audio_device
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( locomotn_sound_map, AS_PROGRAM, 8, timeplt_audio_device )
+ADDRESS_MAP_START(timeplt_audio_device::locomotn_sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(filter_w)

@@ -60,6 +60,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( store );
 	DECLARE_WRITE_LINE_MEMBER( recall );
 
+	void x2212_e2prom_map(address_map &map);
+	void x2212_sram_map(address_map &map);
 protected:
 	x2212_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int size_data);
 

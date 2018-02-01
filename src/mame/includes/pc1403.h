@@ -60,6 +60,10 @@ public:
 
 	void pc1403h(machine_config &config);
 	void pc1403(machine_config &config);
+	void pc1403_mem(address_map &map);
+	void pc1403h_mem(address_map &map);
+	void pc1421_readmem(address_map &map);
+	void pc1421_writemem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -230,7 +230,7 @@ WRITE8_MEMBER(renegade_state::coincounter_w)
 
 /********************************************************************************************/
 
-static ADDRESS_MAP_START( renegade_nomcu_map, AS_PROGRAM, 8, renegade_state )
+ADDRESS_MAP_START(renegade_state::renegade_nomcu_map)
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("spriteram")
@@ -248,13 +248,13 @@ static ADDRESS_MAP_START( renegade_nomcu_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( renegade_map, AS_PROGRAM, 8, renegade_state )
+ADDRESS_MAP_START(renegade_state::renegade_map)
 	AM_IMPORT_FROM(renegade_nomcu_map)
 	AM_RANGE(0x3804, 0x3804) AM_DEVREADWRITE("mcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0x3805, 0x3805) AM_READ(mcu_reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( renegade_sound_map, AS_PROGRAM, 8, renegade_state )
+ADDRESS_MAP_START(renegade_state::renegade_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(adpcm_start_w)

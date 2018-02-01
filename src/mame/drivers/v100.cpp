@@ -55,6 +55,8 @@ public:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void v100(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_start() override;
 
@@ -225,13 +227,13 @@ WRITE8_MEMBER(v100_state::ppi_porta_w)
 	//logerror("Writing %02X to PPI port A\n", data);
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, v100_state )
+ADDRESS_MAP_START(v100_state::mem_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, v100_state )
+ADDRESS_MAP_START(v100_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_DEVWRITE("vtac", crt5037_device, write)
 	AM_RANGE(0x10, 0x10) AM_WRITE(brg_w<0>)

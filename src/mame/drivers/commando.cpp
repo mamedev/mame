@@ -56,7 +56,7 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( commando_map, AS_PROGRAM, 8, commando_state )
+ADDRESS_MAP_START(commando_state::commando_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
@@ -76,11 +76,11 @@ static ADDRESS_MAP_START( commando_map, AS_PROGRAM, 8, commando_state )
 	AM_RANGE(0xff80, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, commando_state )
+ADDRESS_MAP_START(commando_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, commando_state )
+ADDRESS_MAP_START(commando_state::sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -253,7 +253,7 @@ MACHINE_CONFIG_START(commando_state::commando)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, PHI_MAIN)  // ???
 	MCFG_CPU_PROGRAM_MAP(commando_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", commando_state,  commando_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, PHI_B)    // 3 MHz

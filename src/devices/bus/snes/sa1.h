@@ -33,6 +33,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sa1_lo_w);
 	DECLARE_WRITE8_MEMBER(sa1_hi_w);
 
+	void sa1_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

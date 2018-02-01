@@ -33,7 +33,7 @@ public:
 	sh7604_wdt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-	DECLARE_ADDRESS_MAP( wdt_regs, 8 );
+	void wdt_regs(address_map &map);
 
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );

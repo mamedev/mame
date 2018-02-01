@@ -19,8 +19,8 @@
 
 DEFINE_DEVICE_TYPE(SIS85C496, sis85c496_host_device, "sis85c496", "SiS 85C496/497 chipset")
 
-DEVICE_ADDRESS_MAP_START(config_map, 32, sis85c496_host_device)
-	AM_INHERIT_FROM(pci_host_device::config_map)
+ADDRESS_MAP_START(sis85c496_host_device::config_map)
+	AM_IMPORT_FROM(pci_host_device::config_map)
 	AM_RANGE(0x40, 0x43) AM_READWRITE8(dram_config_r, dram_config_w, 0x000000ff)
 	AM_RANGE(0x44, 0x47) AM_READWRITE16(shadow_config_r, shadow_config_w, 0x0000ffff)
 	AM_RANGE(0x58, 0x5b) AM_READWRITE8(smram_ctrl_r, smram_ctrl_w, 0x00ff0000)
@@ -29,8 +29,8 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, sis85c496_host_device)
 	AM_RANGE(0xd0, 0xd3) AM_READWRITE8(isa_decoder_r, isa_decoder_w, 0x0000ff00)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(internal_io_map, 32, sis85c496_host_device)
-	AM_INHERIT_FROM(pci_host_device::io_configuration_access_map)
+ADDRESS_MAP_START(sis85c496_host_device::internal_io_map)
+	AM_IMPORT_FROM(pci_host_device::io_configuration_access_map)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254",   pit8254_device, read, write, 0xffffffff)

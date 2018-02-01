@@ -24,11 +24,11 @@ WRITE8_MEMBER(isa16_ide_device::ide16_alt_w )
 	m_ide->write_cs1(6/2, data, 0xff);
 }
 
-DEVICE_ADDRESS_MAP_START(map, 16, isa16_ide_device)
+ADDRESS_MAP_START(isa16_ide_device::map)
 	AM_RANGE(0x0, 0x7) AM_DEVREADWRITE("ide", ide_controller_device, read_cs0, write_cs0)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(alt_map, 8, isa16_ide_device)
+ADDRESS_MAP_START(isa16_ide_device::alt_map)
 	AM_RANGE(0x6, 0x6) AM_READWRITE(ide16_alt_r, ide16_alt_w)
 ADDRESS_MAP_END
 

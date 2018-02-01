@@ -143,6 +143,9 @@ public:
 	void pcw8256(machine_config &config);
 	void pcw8512(machine_config &config);
 	void pcw9512(machine_config &config);
+	void pcw9512_io(address_map &map);
+	void pcw_io(address_map &map);
+	void pcw_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_PCW_H

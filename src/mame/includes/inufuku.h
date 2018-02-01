@@ -68,6 +68,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_inufuku);
 	void inufuku(machine_config &config);
 	void _3on3dunk(machine_config &config);
+	void inufuku_map(address_map &map);
+	void inufuku_sound_io_map(address_map &map);
+	void inufuku_sound_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_INUFUKU_H

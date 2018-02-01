@@ -60,6 +60,11 @@ public:
 	void pc1255(machine_config &config);
 	void pc1251(machine_config &config);
 	void pc1250(machine_config &config);
+	void pc1250_mem(address_map &map);
+	void pc1251_mem(address_map &map);
+	void pc1255_mem(address_map &map);
+	void pc1260_mem(address_map &map);
+	void pc1261_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

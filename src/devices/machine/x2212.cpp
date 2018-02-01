@@ -16,11 +16,11 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-static ADDRESS_MAP_START( x2212_sram_map, 0, 8, x2212_device )
+ADDRESS_MAP_START(x2212_device::x2212_sram_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x2212_e2prom_map, 1, 8, x2212_device )
+ADDRESS_MAP_START(x2212_device::x2212_e2prom_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -48,8 +48,8 @@ x2212_device::x2212_device(const machine_config &mconfig, device_type type, cons
 	, device_memory_interface(mconfig, *this)
 	, device_nvram_interface(mconfig, *this)
 	, m_auto_save(false)
-	, m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_sram_map))
-	, m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_e2prom_map))
+	, m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, address_map_constructor(FUNC(x2212_device::x2212_sram_map), this))
+	, m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, address_map_constructor(FUNC(x2212_device::x2212_e2prom_map), this))
 	, m_store(false)
 	, m_array_recall(false)
 	, m_size_data(size_data)

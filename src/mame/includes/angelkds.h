@@ -68,4 +68,9 @@ public:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	void angelkds(machine_config &config);
 	void spcpostn(machine_config &config);
+	void decrypted_opcodes_map(address_map &map);
+	void main_map(address_map &map);
+	void main_portmap(address_map &map);
+	void sub_map(address_map &map);
+	void sub_portmap(address_map &map);
 };

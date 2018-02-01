@@ -622,6 +622,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(GDC_vblank_irq);
 
 	void rainbow(machine_config &config);
+	void rainbow8088_io(address_map &map);
+	void rainbow8088_map(address_map &map);
+	void rainbowz80_io(address_map &map);
+	void rainbowz80_mem(address_map &map);
+	void upd7220_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -899,7 +904,7 @@ void rainbow_state::machine_start()
 #endif
 }
 
-static ADDRESS_MAP_START(rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
+ADDRESS_MAP_START(rainbow_state::rainbow8088_map)
 ADDRESS_MAP_UNMAP_HIGH
 AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("sh_ram")
 AM_RANGE(0x10000, END_OF_RAM) AM_RAM AM_SHARE("ext_ram") AM_WRITE(ext_ram_w)
@@ -921,7 +926,7 @@ AM_RANGE(0xee000, 0xeffff) AM_RAM AM_SHARE("p_ram")
 AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(rainbow8088_io, AS_IO, 8, rainbow_state)
+ADDRESS_MAP_START(rainbow_state::rainbow8088_io)
 ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_GLOBAL_MASK(0x1ff)
 AM_RANGE(0x00, 0x00) AM_READWRITE(i8088_latch_r, i8088_latch_w)
@@ -1013,12 +1018,12 @@ AM_RANGE(0x69, 0x69) AM_READ(hd_status_69_r)
 // 0x10c -> (MHFU disable register handled by 0x0c + AM_SELECT)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(rainbowz80_mem, AS_PROGRAM, 8, rainbow_state)
+ADDRESS_MAP_START(rainbow_state::rainbowz80_mem)
 ADDRESS_MAP_UNMAP_HIGH
 AM_RANGE(0x0000, 0xffff) AM_READWRITE(share_z80_r, share_z80_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(rainbowz80_io, AS_IO, 8, rainbow_state)
+ADDRESS_MAP_START(rainbow_state::rainbowz80_io)
 ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_GLOBAL_MASK(0xff)
 AM_RANGE(0x00, 0x00) AM_READWRITE(z80_latch_r, z80_latch_w)
@@ -3174,7 +3179,7 @@ GFXDECODE_ENTRY("chargen", 0x0000, rainbow_charlayout, 0, 1)
 GFXDECODE_END
 
 // Allocate 512 K (4 x 64 K x 16 bit) of memory (GDC-NEW):
-static ADDRESS_MAP_START( upd7220_map, 0, 16, rainbow_state)
+ADDRESS_MAP_START(rainbow_state::upd7220_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(vram_r, vram_w) AM_SHARE("vram")
 ADDRESS_MAP_END
 

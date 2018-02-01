@@ -43,6 +43,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(function_in) { return m_sw_function; }
 	DECLARE_CUSTOM_INPUT_MEMBER(mode_in) { return m_sw_mode; }
 
+	void sk1_memory(address_map &map);
 protected:
 	virtual void driver_start() override;
 
@@ -79,7 +80,7 @@ void sk1_state::driver_start()
 }
 
 
-ADDRESS_MAP_START(sk1_memory, AS_PROGRAM, 8, sk1_state)
+ADDRESS_MAP_START(sk1_state::sk1_memory)
 	// chip selects are driven by decoding A13 and A15 with IC3 quad 2-input NOR gate
 	AM_RANGE(0x0000, 0x7fff)                   AM_ROM AM_REGION("lsi2", 0x0000)
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x4000) AM_RAM

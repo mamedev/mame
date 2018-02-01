@@ -81,6 +81,13 @@ public:
 	void scontra(machine_config &config);
 	void gbusters(machine_config &config);
 	void thunderx(machine_config &config);
+	void gbusters_map(address_map &map);
+	void scontra_bank5800_map(address_map &map);
+	void scontra_map(address_map &map);
+	void scontra_sound_map(address_map &map);
+	void thunderx_bank5800_map(address_map &map);
+	void thunderx_map(address_map &map);
+	void thunderx_sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

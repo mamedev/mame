@@ -54,6 +54,7 @@ public:
 	{ }
 
 	void konendev(machine_config &config);
+	void konendev_map(address_map &map);
 protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -211,7 +212,7 @@ WRITE32_MEMBER(konendev_state::sound_data_w)
 {
 }
 
-static ADDRESS_MAP_START( konendev_map, AS_PROGRAM, 32, konendev_state )
+ADDRESS_MAP_START(konendev_state::konendev_map)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM
 	AM_RANGE(0x78000000, 0x78000003) AM_READ(mcu2_r)
 	AM_RANGE(0x78080000, 0x7808000f) AM_READWRITE(rtc_r, rtc_w)

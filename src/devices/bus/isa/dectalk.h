@@ -32,6 +32,10 @@ public:
 	DECLARE_WRITE16_MEMBER(output_ctl_w);
 	DECLARE_WRITE16_MEMBER(irq_line_w);
 
+	void dectalk_cpu_io(address_map &map);
+	void dectalk_cpu_map(address_map &map);
+	void dectalk_dsp_io(address_map &map);
+	void dectalk_dsp_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -741,7 +741,7 @@ WRITE8_MEMBER(system1_state::nobb_outport24_w)
  *************************************/
 
 /* main memory map */
-static ADDRESS_MAP_START( system1_map, AS_PROGRAM, 8, system1_state )
+ADDRESS_MAP_START(system1_state::system1_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
@@ -754,7 +754,7 @@ static ADDRESS_MAP_START( system1_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0xfc00, 0xffff) AM_WRITE(system1_sprite_collision_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, system1_state )
+ADDRESS_MAP_START(system1_state::decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
@@ -762,7 +762,7 @@ static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 8, system1_state )
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( banked_decrypted_opcodes_map, AS_OPCODES, 8, system1_state )
+ADDRESS_MAP_START(system1_state::banked_decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank0d")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1d")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("ram")
@@ -771,7 +771,7 @@ static ADDRESS_MAP_START( banked_decrypted_opcodes_map, AS_OPCODES, 8, system1_s
 ADDRESS_MAP_END
 
 /* same as normal System 1 except address map is shuffled (RAM/collision are swapped) */
-static ADDRESS_MAP_START( nobo_map, AS_PROGRAM, 8, system1_state )
+ADDRESS_MAP_START(system1_state::nobo_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(system1_mixer_collision_r, system1_mixer_collision_w)
@@ -785,7 +785,7 @@ static ADDRESS_MAP_START( nobo_map, AS_PROGRAM, 8, system1_state )
 ADDRESS_MAP_END
 
 /* I/O map for systems with an 8255 PPI */
-static ADDRESS_MAP_START( system1_ppi_io_map, AS_IO, 8, system1_state )
+ADDRESS_MAP_START(system1_state::system1_ppi_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("P1")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("P2")
@@ -797,7 +797,7 @@ static ADDRESS_MAP_START( system1_ppi_io_map, AS_IO, 8, system1_state )
 ADDRESS_MAP_END
 
 /* I/O map for systems with a Z80 PIO chip */
-static ADDRESS_MAP_START( system1_pio_io_map, AS_IO, 8, system1_state )
+ADDRESS_MAP_START(system1_state::system1_pio_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("P1")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("P2")
@@ -816,7 +816,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, system1_state )
+ADDRESS_MAP_START(system1_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76489a_device, write)
@@ -832,14 +832,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, system1_state )
+ADDRESS_MAP_START(system1_state::mcu_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(mcu_control_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nob_mcu_io_map, AS_IO, 8, system1_state )
+ADDRESS_MAP_START(system1_state::nob_mcu_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_RAM AM_SHARE("nob_mcu_latch")
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITEONLY AM_SHARE("nob_mcu_status")
@@ -2217,19 +2217,19 @@ MACHINE_CONFIG_END
 
 #define ENCRYPTED_SYS1PPI_MAPS \
 	MCFG_CPU_PROGRAM_MAP(system1_map) \
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map) \
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map) \
 	MCFG_CPU_IO_MAP(system1_ppi_io_map) \
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
 
 #define ENCRYPTED_SYS1PIO_MAPS \
 	MCFG_CPU_PROGRAM_MAP(system1_map) \
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map) \
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map) \
 	MCFG_CPU_IO_MAP(system1_pio_io_map) \
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
 
 #define ENCRYPTED_SYS2_MC8123_MAPS \
 	MCFG_CPU_PROGRAM_MAP(system1_map) \
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map) \
+	MCFG_CPU_OPCODES_MAP(banked_decrypted_opcodes_map) \
 	MCFG_CPU_IO_MAP(system1_ppi_io_map) \
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", system1_state, irq0_line_hold)
 
@@ -2446,7 +2446,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(system1_state::sys2x, sys2)
 	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(system1_state::sys2_315_5177, sys2)
@@ -2481,7 +2481,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(system1_state::sys2xboot, sys2)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(banked_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(system1_state::sys2m, sys2)
@@ -2503,7 +2503,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(system1_state::sys2rowxboot, sys2row)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(banked_decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(banked_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(system1_state::sys2rowm, sys2row)

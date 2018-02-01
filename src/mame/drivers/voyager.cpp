@@ -57,6 +57,8 @@ public:
 	virtual void machine_reset() override;
 	void intel82439tx_init();
 	void voyager(machine_config &config);
+	void voyager_io(address_map &map);
+	void voyager_map(address_map &map);
 };
 
 
@@ -233,7 +235,7 @@ WRITE32_MEMBER(voyager_state::bios_ram_w)
 	}
 }
 
-static ADDRESS_MAP_START( voyager_map, AS_PROGRAM, 32, voyager_state )
+ADDRESS_MAP_START(voyager_state::voyager_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", trident_vga_device, mem_r, mem_w, 0xffffffff) // VGA VRAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
@@ -261,7 +263,7 @@ static ADDRESS_MAP_START( voyager_map, AS_PROGRAM, 32, voyager_state )
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( voyager_io, AS_IO, 32, voyager_state )
+ADDRESS_MAP_START(voyager_state::voyager_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 
 	//AM_RANGE(0x00e8, 0x00eb) AM_NOP

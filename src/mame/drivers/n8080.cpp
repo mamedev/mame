@@ -34,20 +34,20 @@ READ8_MEMBER(n8080_state::n8080_shift_r)
 	return m_shift_data >> (8 - m_shift_bits);
 }
 
-static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, n8080_state )
+ADDRESS_MAP_START(n8080_state::main_cpu_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( helifire_main_cpu_map, AS_PROGRAM, 8, n8080_state )
+ADDRESS_MAP_START(n8080_state::helifire_main_cpu_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("colorram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8, n8080_state )
+ADDRESS_MAP_START(n8080_state::main_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")

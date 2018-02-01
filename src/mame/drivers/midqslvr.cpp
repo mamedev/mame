@@ -63,6 +63,8 @@ public:
 	virtual void machine_reset() override;
 	void intel82439tx_init();
 	void midqslvr(machine_config &config);
+	void midqslvr_io(address_map &map);
+	void midqslvr_map(address_map &map);
 };
 
 
@@ -357,7 +359,7 @@ WRITE32_MEMBER(midqslvr_state::bios_ram_w)
 	}
 }
 
-static ADDRESS_MAP_START(midqslvr_map, AS_PROGRAM, 32, midqslvr_state)
+ADDRESS_MAP_START(midqslvr_state::midqslvr_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c3fff) AM_ROMBANK("video_bank1") AM_WRITE(isa_ram1_w)
@@ -371,7 +373,7 @@ static ADDRESS_MAP_START(midqslvr_map, AS_PROGRAM, 32, midqslvr_state)
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(midqslvr_io, AS_IO, 32, midqslvr_state)
+ADDRESS_MAP_START(midqslvr_state::midqslvr_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 

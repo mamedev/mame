@@ -19,7 +19,7 @@
 
 #include "lynx.lh"
 
-static ADDRESS_MAP_START( lynx_mem , AS_PROGRAM, 8, lynx_state )
+ADDRESS_MAP_START(lynx_state::lynx_mem)
 	AM_RANGE(0x0000, 0xfbff) AM_RAM AM_SHARE("mem_0000")
 	AM_RANGE(0xfc00, 0xfcff) AM_RAM AM_SHARE("mem_fc00")
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM AM_SHARE("mem_fd00")

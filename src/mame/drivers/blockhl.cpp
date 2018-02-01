@@ -59,6 +59,9 @@ public:
 	DECLARE_WRITE8_MEMBER(banking_callback);
 
 	void blockhl(machine_config &config);
+	void audio_map(address_map &map);
+	void bank5800_map(address_map &map);
+	void main_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -76,7 +79,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockhl_state )
+ADDRESS_MAP_START(blockhl_state::main_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x1f84, 0x1f84) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(sound_irq_w)
@@ -92,12 +95,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockhl_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank5800_map, AS_PROGRAM, 8, blockhl_state )
+ADDRESS_MAP_START(blockhl_state::bank5800_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, blockhl_state )
+ADDRESS_MAP_START(blockhl_state::audio_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)

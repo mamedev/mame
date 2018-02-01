@@ -130,7 +130,7 @@ WRITE8_MEMBER(sns_rom_sgb_device::gb_ie_w)
 
 
 
-static ADDRESS_MAP_START(supergb_map, AS_PROGRAM, 8, sns_rom_sgb_device )
+ADDRESS_MAP_START(sns_rom_sgb_device::supergb_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
 	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("sgb_ppu", sgb_ppu_device, vram_r, vram_w)  /* 8k VRAM */

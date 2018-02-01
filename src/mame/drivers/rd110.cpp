@@ -74,6 +74,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void d110(machine_config &config);
+	void d110_io(address_map &map);
+	void d110_map(address_map &map);
 private:
 
 	uint8_t  m_lcd_data_buffer[256];
@@ -214,7 +216,7 @@ PALETTE_INIT_MEMBER(d110_state, d110)
 	palette.set_pen_color(1, rgb_t(0, 0, 0));
 }
 
-static ADDRESS_MAP_START( d110_map, AS_PROGRAM, 8, d110_state )
+ADDRESS_MAP_START(d110_state::d110_map)
 	AM_RANGE(0x0100, 0x0100) AM_WRITE(bank_w)
 	AM_RANGE(0x0200, 0x0200) AM_WRITE(so_w)
 	AM_RANGE(0x021a, 0x021a) AM_READ_PORT("SC0") AM_WRITENOP
@@ -226,7 +228,7 @@ static ADDRESS_MAP_START( d110_map, AS_PROGRAM, 8, d110_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("fixed")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( d110_io, AS_IO, 16, d110_state )
+ADDRESS_MAP_START(d110_state::d110_io)
 	AM_RANGE(i8x9x_device::SERIAL, i8x9x_device::SERIAL) AM_WRITE(midi_w)
 	AM_RANGE(i8x9x_device::P0,     i8x9x_device::P0)     AM_READ(port0_r)
 ADDRESS_MAP_END

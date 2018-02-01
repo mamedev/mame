@@ -26,7 +26,7 @@
 DEFINE_DEVICE_TYPE(MIE,     mie_device,     "mie",     "Sega 315-6146 MIE")
 DEFINE_DEVICE_TYPE(MIE_JVS, mie_jvs_device, "mie_jvs", "JVS (MIE)")
 
-static ADDRESS_MAP_START( mie_map, AS_PROGRAM, 8, mie_device)
+ADDRESS_MAP_START(mie_device::mie_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x6fff) AM_READ(read_ff)
 	AM_RANGE(0x7000, 0x7002) AM_READWRITE(control_r, control_w) AM_MIRROR(0x07c0)
@@ -37,7 +37,7 @@ static ADDRESS_MAP_START( mie_map, AS_PROGRAM, 8, mie_device)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mie_port, AS_IO, 8, mie_device)
+ADDRESS_MAP_START(mie_device::mie_port)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(gpio_r, gpio_w)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(gpiodir_r, gpiodir_w)

@@ -41,6 +41,7 @@ public:
 	required_device<dac_1bit_device> m_dac;
 
 	void galeb(machine_config &config);
+	void galeb_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 

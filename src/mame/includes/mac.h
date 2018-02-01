@@ -417,6 +417,22 @@ public:
 	void macclas2(machine_config &config);
 	void macii(machine_config &config);
 	void maciihmu(machine_config &config);
+	void mac512ke_map(address_map &map);
+	void macii_map(address_map &map);
+	void maciici_map(address_map &map);
+	void maciifx_map(address_map &map);
+	void maclc3_map(address_map &map);
+	void maclc_map(address_map &map);
+	void macpb140_map(address_map &map);
+	void macpb160_map(address_map &map);
+	void macpb165c_map(address_map &map);
+	void macpd210_map(address_map &map);
+	void macplus_map(address_map &map);
+	void macprtb_map(address_map &map);
+	void macse30_map(address_map &map);
+	void macse_map(address_map &map);
+	void pwrmac_map(address_map &map);
+	void quadra700_map(address_map &map);
 private:
 	int has_adb();
 	void adb_reset();

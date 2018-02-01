@@ -175,7 +175,7 @@ READ16_MEMBER(mcatadv_state::mcat_wd_r)
 }
 
 
-static ADDRESS_MAP_START( mcatadv_map, AS_PROGRAM, 16, mcatadv_state )
+ADDRESS_MAP_START(mcatadv_state::mcatadv_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
@@ -214,7 +214,7 @@ WRITE8_MEMBER(mcatadv_state::mcatadv_sound_bw_w)
 }
 
 
-static ADDRESS_MAP_START( mcatadv_sound_map, AS_PROGRAM, 8, mcatadv_state )
+ADDRESS_MAP_START(mcatadv_state::mcatadv_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                     // ROM
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")                // ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM                     // RAM
@@ -222,19 +222,19 @@ static ADDRESS_MAP_START( mcatadv_sound_map, AS_PROGRAM, 8, mcatadv_state )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mcatadv_sound_bw_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcatadv_sound_io_map, AS_IO, 8, mcatadv_state )
+ADDRESS_MAP_START(mcatadv_state::mcatadv_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nost_sound_map, AS_PROGRAM, 8, mcatadv_state )
+ADDRESS_MAP_START(mcatadv_state::nost_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM                     // ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                // ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM                     // RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nost_sound_io_map, AS_IO, 8, mcatadv_state )
+ADDRESS_MAP_START(mcatadv_state::nost_sound_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVWRITE("ymsnd", ym2610_device, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREAD("ymsnd", ym2610_device, read)

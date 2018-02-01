@@ -53,6 +53,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 
 	void babbage(machine_config &config);
+	void babbage_io(address_map &map);
+	void babbage_map(address_map &map);
 private:
 	uint8_t m_segment;
 	uint8_t m_key;
@@ -73,13 +75,13 @@ private:
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( babbage_map, AS_PROGRAM, 8, babbage_state )
+ADDRESS_MAP_START(babbage_state::babbage_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1000, 0x17ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( babbage_io, AS_IO, 8, babbage_state )
+ADDRESS_MAP_START(babbage_state::babbage_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)

@@ -64,7 +64,7 @@ READ16_MEMBER(deadang_state::ghunter_trackball_high_r)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, deadang_state )
+ADDRESS_MAP_START(deadang_state::main_map)
 	AM_RANGE(0x00000, 0x037ff) AM_RAM
 	AM_RANGE(0x03800, 0x03fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, deadang_state )
+ADDRESS_MAP_START(deadang_state::sub_map)
 	AM_RANGE(0x00000, 0x037ff) AM_RAM
 	AM_RANGE(0x03800, 0x03fff) AM_RAM_WRITE(foreground_w) AM_SHARE("video_data")
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, deadang_state )
+ADDRESS_MAP_START(deadang_state::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, deadang_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_OPCODES, 8, deadang_state )
+ADDRESS_MAP_START(deadang_state::sound_decrypted_opcodes_map)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
@@ -278,7 +278,7 @@ MACHINE_CONFIG_START(deadang_state::deadang)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(sound_decrypted_opcodes_map)
 
 	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
 	MCFG_DEVICE_ROM("audiocpu")

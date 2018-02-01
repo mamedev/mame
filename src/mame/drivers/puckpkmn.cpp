@@ -213,7 +213,7 @@ static INPUT_PORTS_START( jzth )
 INPUT_PORTS_END
 
 
-static ADDRESS_MAP_START( puckpkmn_map, AS_PROGRAM, 16, md_boot_state )
+ADDRESS_MAP_START(md_boot_state::puckpkmn_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM                             /* Main 68k Program Roms */
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("P2")
 	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
@@ -237,7 +237,7 @@ static ADDRESS_MAP_START( puckpkmn_map, AS_PROGRAM, 16, md_boot_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jzth_map, AS_PROGRAM, 16, md_boot_state )
+ADDRESS_MAP_START(md_boot_state::jzth_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("P2")
 	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
@@ -269,7 +269,7 @@ READ16_MEMBER(md_boot_state::puckpkmna_4b2476_r)
 	return 0x3400;
 }
 
-static ADDRESS_MAP_START( puckpkmna_map, AS_PROGRAM, 16, md_boot_state )
+ADDRESS_MAP_START(md_boot_state::puckpkmna_map)
 	AM_IMPORT_FROM( puckpkmn_map )
 	AM_RANGE(0x4b2476, 0x4b2477) AM_READ(puckpkmna_4b2476_r)
 	AM_RANGE(0x70001c, 0x70001d) AM_READ(puckpkmna_70001c_r)

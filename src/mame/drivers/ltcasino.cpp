@@ -44,6 +44,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void ltcasino(machine_config &config);
+	void ltcasino_map(address_map &map);
 };
 
 
@@ -80,7 +81,7 @@ WRITE8_MEMBER(ltcasino_state::ltcasino_tile_atr_w)
 }
 
 
-static ADDRESS_MAP_START( ltcasino_map, AS_PROGRAM, 8, ltcasino_state )
+ADDRESS_MAP_START(ltcasino_state::ltcasino_map)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ltcasino_tile_num_w) AM_SHARE("tile_nuram")

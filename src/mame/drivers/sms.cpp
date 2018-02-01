@@ -264,7 +264,7 @@ DC00      - Selection buttons #2, 9-16 (R)
 #define MASTER_CLOCK_PAL    53203425.0  /* 12 * subcarrier freq. (4.43361875MHz) */
 
 
-static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8, sms_state )
+ADDRESS_MAP_START(sms_state::sms1_mem)
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(write_cart)
 	AM_RANGE(0x0000, 0x3fff) AM_READ(read_0000)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(read_4000)
@@ -274,7 +274,7 @@ static ADDRESS_MAP_START( sms1_mem, AS_PROGRAM, 8, sms_state )
 	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sms_mem, AS_PROGRAM, 8, sms_state )
+ADDRESS_MAP_START(sms_state::sms_mem)
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(write_cart)
 	AM_RANGE(0x0000, 0x3fff) AM_READ(read_0000)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(read_4000)
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( sms_mem, AS_PROGRAM, 8, sms_state )
 	AM_RANGE(0xfffc, 0xffff) AM_READWRITE(sms_mapper_r, sms_mapper_w)       /* Bankswitch control */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sms_store_mem, AS_PROGRAM, 8, smssdisp_state )
+ADDRESS_MAP_START(smssdisp_state::sms_store_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM                     /* BIOS */
 	AM_RANGE(0x4000, 0x47ff) AM_RAM                     /* RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_READ(store_cart_peek)
@@ -294,7 +294,7 @@ static ADDRESS_MAP_START( sms_store_mem, AS_PROGRAM, 8, smssdisp_state )
 ADDRESS_MAP_END
 
 // I/O ports $3E and $3F do not exist on Mark III
-static ADDRESS_MAP_START( sg1000m3_io, AS_IO, 8, sms_state )
+ADDRESS_MAP_START(sms_state::sg1000m3_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x40, 0x7f)                 AM_READWRITE(sms_count_r, sms_psg_w)
@@ -304,7 +304,7 @@ static ADDRESS_MAP_START( sg1000m3_io, AS_IO, 8, sms_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sms_io, AS_IO, 8, sms_state )
+ADDRESS_MAP_START(sms_state::sms_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(sms_mem_control_w)
@@ -321,7 +321,7 @@ ADDRESS_MAP_END
 // addresses.
 // At least the mirrors for I/O ports $3E/$3F don't seem to exist there.
 // Leaving the mirrors breaks the Korean cartridge bublboky.
-static ADDRESS_MAP_START( smskr_io, AS_IO, 8, sms_state )
+ADDRESS_MAP_START(sms_state::smskr_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x3e, 0x3e)                 AM_WRITE(sms_mem_control_w)
@@ -336,7 +336,7 @@ ADDRESS_MAP_END
 
 // Mirrors for I/O ports $3E/$3F don't exist on the Japanese SMS.
 // Also, $C0/$C1 are the only mirrors for I/O ports $DC/$DD.
-static ADDRESS_MAP_START( smsj_io, AS_IO, 8, sms_state )
+ADDRESS_MAP_START(sms_state::smsj_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x3e, 0x3e)                 AM_WRITE(sms_mem_control_w)
@@ -356,7 +356,7 @@ ADDRESS_MAP_END
 
 // It seems the mirrors for I/O ports $3E/$3F also don't seem to exist on the
 // Game Gear. Leaving the mirrors breaks 'gloc' (it freezes after 1st stage).
-static ADDRESS_MAP_START( gg_io, AS_IO, 8, sms_state )
+ADDRESS_MAP_START(sms_state::gg_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00)                 AM_READ(gg_input_port_00_r)

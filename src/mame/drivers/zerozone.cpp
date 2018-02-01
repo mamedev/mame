@@ -49,7 +49,7 @@ WRITE16_MEMBER( zerozone_state::sound_w )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, zerozone_state )
+ADDRESS_MAP_START(zerozone_state::main_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("INPUTS")
@@ -64,7 +64,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, zerozone_state )
 	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM     /* Never read from */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, zerozone_state )
+ADDRESS_MAP_START(zerozone_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)

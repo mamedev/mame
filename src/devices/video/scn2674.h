@@ -43,6 +43,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual space_config_vector memory_space_config() const override;
 
+	void scn2674_vram(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

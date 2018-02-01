@@ -260,14 +260,14 @@ READ8_MEMBER( vixen_state::port3_r )
 //-------------------------------------------------
 
 // when M1 is inactive: read and write of data
-static ADDRESS_MAP_START( vixen_mem, AS_PROGRAM, 8, vixen_state )
+ADDRESS_MAP_START(vixen_state::vixen_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4") AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 // when M1 is active: read opcodes
-static ADDRESS_MAP_START( bios_mem, AS_OPCODES, 8, vixen_state )
+ADDRESS_MAP_START(vixen_state::bios_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_READ(opram_r)
 	AM_RANGE(0xf000, 0xffff) AM_READ(oprom_r)
@@ -278,7 +278,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vixen_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vixen_io, AS_IO, 8, vixen_state )
+ADDRESS_MAP_START(vixen_state::vixen_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(FDC1797_TAG, fd1797_device, read, write)
@@ -741,7 +741,7 @@ MACHINE_CONFIG_START(vixen_state::vixen)
 	// basic machine hardware
 	MCFG_CPU_ADD(Z8400A_TAG, Z80, XTAL(23'961'600)/6)
 	MCFG_CPU_PROGRAM_MAP(vixen_mem)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(bios_mem)
+	MCFG_CPU_OPCODES_MAP(bios_mem)
 	MCFG_CPU_IO_MAP(vixen_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vixen_state,vixen_int_ack)
 

@@ -190,6 +190,7 @@ public:
 	static psxcpu_device *getcpu( device_t &device, const char *cputag );
 	void set_disable_rom_berr(bool mode);
 
+	void psxcpu_internal_map(address_map &map);
 protected:
 	static constexpr unsigned ICACHE_ENTRIES = 0x400;
 	static constexpr unsigned DCACHE_ENTRIES = 0x100;

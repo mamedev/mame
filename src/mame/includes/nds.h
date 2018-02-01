@@ -42,6 +42,10 @@ public:
 	DECLARE_WRITE32_MEMBER(wram_arm7mirror_w);
 
 	void nds(machine_config &config);
+	void nds7_wram_map(address_map &map);
+	void nds9_wram_map(address_map &map);
+	void nds_arm7_map(address_map &map);
+	void nds_arm9_map(address_map &map);
 protected:
 	required_device<arm7_cpu_device> m_arm7;
 	required_device<arm946es_cpu_device> m_arm9;

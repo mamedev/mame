@@ -80,6 +80,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	void nibble(machine_config &config);
+	void nibble_cru_map(address_map &map);
+	void nibble_map(address_map &map);
 };
 
 
@@ -150,7 +152,7 @@ void nibble_state::machine_reset()
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( nibble_map, AS_PROGRAM, 16, nibble_state )
+ADDRESS_MAP_START(nibble_state::nibble_map)
 //  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(nibble_videoram_w) AM_SHARE("videoram")   // placeholder
@@ -159,7 +161,7 @@ static ADDRESS_MAP_START( nibble_map, AS_PROGRAM, 16, nibble_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nibble_cru_map, AS_IO, 8, nibble_state )
+ADDRESS_MAP_START(nibble_state::nibble_cru_map)
 ADDRESS_MAP_END
 
 

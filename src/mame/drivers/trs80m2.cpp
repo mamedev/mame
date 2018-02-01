@@ -319,7 +319,7 @@ WRITE8_MEMBER( trs80m16_state::ual_w )
 //  ADDRESS_MAP( z80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, trs80m2_state )
+ADDRESS_MAP_START(trs80m2_state::z80_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -328,7 +328,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( z80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( z80_io, AS_IO, 8, trs80m2_state )
+ADDRESS_MAP_START(trs80m2_state::z80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 	AM_RANGE(0xe4, 0xe7) AM_READWRITE(fdc_r, fdc_w)
@@ -348,7 +348,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( m16_z80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( m16_z80_io, AS_IO, 8, trs80m16_state )
+ADDRESS_MAP_START(trs80m16_state::m16_z80_io)
 	AM_IMPORT_FROM(z80_io)
 	AM_RANGE(0xde, 0xde) AM_WRITE(tcl_w)
 	AM_RANGE(0xdf, 0xdf) AM_WRITE(ual_w)
@@ -359,7 +359,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( m68000_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( m68000_mem, AS_PROGRAM, 16, trs80m2_state )
+ADDRESS_MAP_START(trs80m2_state::m68000_mem)
 //  AM_RANGE(0x7800d0, 0x7800d1) 9519A (C/D = UDS)
 //  AM_RANGE(0x7800d2, 0x7800d3) limit/offset 2
 //  AM_RANGE(0x7800d4, 0x7800d5) limit/offset 1

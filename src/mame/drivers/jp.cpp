@@ -59,6 +59,8 @@ public:
 
 	void jp(machine_config &config);
 	void jps(machine_config &config);
+	void jp_map(address_map &map);
+	void jp_sound_map(address_map &map);
 private:
 	void update_display();
 	virtual void machine_start() override;
@@ -77,7 +79,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( jp_map, AS_PROGRAM, 8, jp_state )
+ADDRESS_MAP_START(jp_state::jp_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("nvram") // ram-"5128" battery backed
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1ffc) AM_DEVWRITE("ay", ay8910_device, address_w)
@@ -87,7 +89,7 @@ static ADDRESS_MAP_START( jp_map, AS_PROGRAM, 8, jp_state )
 	AM_RANGE(0xc000, 0xc007) AM_MIRROR(0x1ff8) AM_WRITE(out2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jp_sound_map, AS_PROGRAM, 8, jp_state )
+ADDRESS_MAP_START(jp_state::jp_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM // includes ADPCM data from 0x0400 to 0x3fff
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(sample_bank_w)

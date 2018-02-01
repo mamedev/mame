@@ -76,14 +76,14 @@ WRITE8_MEMBER(drmicro_state::pcm_set_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( drmicro_map, AS_PROGRAM, 8, drmicro_state )
+ADDRESS_MAP_START(drmicro_state::drmicro_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(drmicro_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, drmicro_state )
+ADDRESS_MAP_START(drmicro_state::io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76496_device, write)

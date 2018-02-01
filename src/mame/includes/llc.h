@@ -53,6 +53,10 @@ public:
 
 	void llc1(machine_config &config);
 	void llc2(machine_config &config);
+	void llc1_io(address_map &map);
+	void llc1_mem(address_map &map);
+	void llc2_io(address_map &map);
+	void llc2_mem(address_map &map);
 private:
 	bool m_rv;
 	uint8_t m_term_status;

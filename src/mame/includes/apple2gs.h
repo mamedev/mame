@@ -270,6 +270,7 @@ public:
 
 	void apple2gs(machine_config &config);
 	void apple2gsr1(machine_config &config);
+	void apple2gs_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_APPLE2GS_H

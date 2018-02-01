@@ -196,7 +196,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ti68k_state::ti68k_timer_callback)
 }
 
 
-static ADDRESS_MAP_START(ti92_mem, AS_PROGRAM, 16, ti68k_state)
+ADDRESS_MAP_START(ti68k_state::ti92_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x200000, 0x5fffff) AM_UNMAP   // ROM
@@ -204,7 +204,7 @@ static ADDRESS_MAP_START(ti92_mem, AS_PROGRAM, 16, ti68k_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(ti89_mem, AS_PROGRAM, 16, ti68k_state)
+ADDRESS_MAP_START(ti68k_state::ti89_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x200000, 0x3fffff) AM_READWRITE(flash_r, flash_w)
@@ -214,7 +214,7 @@ static ADDRESS_MAP_START(ti89_mem, AS_PROGRAM, 16, ti68k_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(ti92p_mem, AS_PROGRAM, 16, ti68k_state)
+ADDRESS_MAP_START(ti68k_state::ti92p_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x200000, 0x3fffff) AM_NOP
@@ -224,7 +224,7 @@ static ADDRESS_MAP_START(ti92p_mem, AS_PROGRAM, 16, ti68k_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(v200_mem, AS_PROGRAM, 16, ti68k_state)
+ADDRESS_MAP_START(ti68k_state::v200_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x200000, 0x5fffff) AM_READWRITE(flash_r, flash_w)
@@ -233,7 +233,7 @@ static ADDRESS_MAP_START(v200_mem, AS_PROGRAM, 16, ti68k_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(ti89t_mem, AS_PROGRAM, 16, ti68k_state)
+ADDRESS_MAP_START(ti68k_state::ti89t_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_MIRROR(0x200000) AM_SHARE("nvram")
 	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ti68k_io_r, ti68k_io_w)

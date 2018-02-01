@@ -269,6 +269,8 @@ public:
 	void aleste(machine_config &config);
 	void kccomp(machine_config &config);
 	void cpc464(machine_config &config);
+	void amstrad_io(address_map &map);
+	void amstrad_mem(address_map &map);
 protected:
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_user1;

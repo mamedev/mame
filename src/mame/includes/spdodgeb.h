@@ -88,4 +88,6 @@ public:
 	void mcu63705_update_inputs();
 	void spd_adpcm_int(msm5205_device *device, int chip);
 	void spdodgeb(machine_config &config);
+	void spdodgeb_map(address_map &map);
+	void spdodgeb_sound_map(address_map &map);
 };

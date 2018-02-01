@@ -34,6 +34,8 @@ public:
 		m_bpp_mode = bpp;	
 	}
 
+	void megaphx_tms_map(address_map &map);
+	void ramdac_map(address_map &map);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;

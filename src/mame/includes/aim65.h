@@ -70,6 +70,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(z15_load) { return load_cart(image, m_z15, "z15"); }
 
 	void aim65(machine_config &config);
+	void aim65_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 

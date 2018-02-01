@@ -67,6 +67,10 @@ public:
 	DECLARE_WRITE8_MEMBER(ay_pa_w);
 
 	void ron(machine_config &config);
+	void ron_audio_io(address_map &map);
+	void ron_audio_map(address_map &map);
+	void ron_io(address_map &map);
+	void ron_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -191,7 +195,7 @@ WRITE8_MEMBER(ron_state::sound_cmd_w)
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( ron_map, AS_PROGRAM, 8, ron_state )
+ADDRESS_MAP_START(ron_state::ron_map)
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM
@@ -199,7 +203,7 @@ static ADDRESS_MAP_START( ron_map, AS_PROGRAM, 8, ron_state )
 	AM_RANGE(0x8c00, 0x8fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ron_io, AS_IO, 8, ron_state )
+ADDRESS_MAP_START(ron_state::ron_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x01) AM_READ(p1_mux_r)
@@ -209,11 +213,11 @@ static ADDRESS_MAP_START( ron_io, AS_IO, 8, ron_state )
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(output_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ron_audio_map, AS_PROGRAM, 8, ron_state)
+ADDRESS_MAP_START(ron_state::ron_audio_map)
 	AM_RANGE(0x0000,0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ron_audio_io, AS_IO, 8, ron_state)
+ADDRESS_MAP_START(ron_state::ron_audio_io)
 
 ADDRESS_MAP_END
 

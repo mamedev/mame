@@ -144,7 +144,7 @@ MACHINE_CONFIG_START(at_mb_device::device_add_mconfig)
 MACHINE_CONFIG_END
 
 
-DEVICE_ADDRESS_MAP_START( map, 16, at_mb_device )
+ADDRESS_MAP_START(at_mb_device::map)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8254_device, read, write, 0xffff)

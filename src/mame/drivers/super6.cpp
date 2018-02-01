@@ -277,7 +277,7 @@ WRITE8_MEMBER( super6_state::baud_w )
 //  ADDRESS_MAP( super6_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( super6_mem, AS_PROGRAM, 8, super6_state )
+ADDRESS_MAP_START(super6_state::super6_mem)
 ADDRESS_MAP_END
 
 
@@ -285,7 +285,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( super6_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( super6_io, AS_IO, 8, super6_state )
+ADDRESS_MAP_START(super6_state::super6_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)

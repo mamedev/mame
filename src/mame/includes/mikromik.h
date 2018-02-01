@@ -130,6 +130,8 @@ public:
 	void mm1m6(machine_config &config);
 	void mm1m6_video(machine_config &config);
 	void mm1m7(machine_config &config);
+	void mm1_map(address_map &map);
+	void mm1_upd7220_map(address_map &map);
 };
 
 #endif

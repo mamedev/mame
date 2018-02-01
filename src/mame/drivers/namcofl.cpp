@@ -214,7 +214,7 @@ WRITE8_MEMBER(namcofl_state::namcofl_c116_w)
 	}
 }
 
-static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32, namcofl_state )
+ADDRESS_MAP_START(namcofl_state::namcofl_mem)
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAMBANK("bank1")
 	AM_RANGE(0x10000000, 0x100fffff) AM_RAMBANK("bank2")
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_REGION("data", 0)
@@ -311,13 +311,13 @@ READ8_MEMBER(namcofl_state::dac2_r){ return 0xff; }
 READ8_MEMBER(namcofl_state::dac1_r){ return 0xff; }
 READ8_MEMBER(namcofl_state::dac0_r){ return 0xff; }
 
-static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16, namcofl_state )
+ADDRESS_MAP_START(namcofl_state::namcoc75_am)
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(mcu_shared_w) AM_SHARE("shareram")
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( namcoc75_io, AS_IO, 8, namcofl_state )
+ADDRESS_MAP_START(namcofl_state::namcoc75_io)
 	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE(port6_r, port6_w)
 	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READ(port7_r)
 	AM_RANGE(M37710_ADC7_L, M37710_ADC7_L) AM_READ(dac7_r)

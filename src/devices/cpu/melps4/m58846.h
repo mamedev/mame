@@ -21,6 +21,8 @@ class m58846_device : public melps4_cpu_device
 public:
 	m58846_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void data_128x4(address_map &map);
+	void program_2kx9(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

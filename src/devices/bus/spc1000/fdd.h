@@ -26,6 +26,8 @@ public:
 	DECLARE_READ8_MEMBER(tc_r);
 	DECLARE_WRITE8_MEMBER(control_w);
 
+	void sd725_io(address_map &map);
+	void sd725_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

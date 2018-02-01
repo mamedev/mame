@@ -30,6 +30,7 @@ public:
 	DECLARE_READ8_MEMBER( dma_r );
 	DECLARE_WRITE8_MEMBER( dma_w );
 
+	void m6809_mem(address_map &map);
 protected:
 	a2bus_themill_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

@@ -158,4 +158,12 @@ public:
 	void slither(machine_config &config);
 	void slither_video(machine_config &config);
 	void slither_audio(machine_config &config);
+	void audio_map(address_map &map);
+	void kram3_main_map(address_map &map);
+	void kram3_video_map(address_map &map);
+	void main_map(address_map &map);
+	void qix_video_map(address_map &map);
+	void slither_video_map(address_map &map);
+	void zoo_main_map(address_map &map);
+	void zookeep_video_map(address_map &map);
 };

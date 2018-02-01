@@ -233,6 +233,7 @@ public:
 	DECLARE_WRITE32_MEMBER(pic_w);
 
 	void mpu5(machine_config &config);
+	void mpu5_map(address_map &map);
 protected:
 
 	// devices
@@ -526,7 +527,7 @@ WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
 
 }
 
-static ADDRESS_MAP_START( mpu5_map, AS_PROGRAM, 32, mpu5_state )
+ADDRESS_MAP_START(mpu5_state::mpu5_map)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(mpu5_mem_r, mpu5_mem_w)
 ADDRESS_MAP_END
 

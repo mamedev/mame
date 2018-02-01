@@ -153,6 +153,12 @@ public:
 	DECLARE_READ8_MEMBER(p1_r);
 	DECLARE_READ8_MEMBER(p2_r);
 
+	void data_6bit(address_map &map);
+	void data_7bit(address_map &map);
+	void data_8bit(address_map &map);
+	void program_10bit(address_map &map);
+	void program_11bit(address_map &map);
+	void program_12bit(address_map &map);
 protected:
 	typedef int (mcs48_cpu_device::*mcs48_ophandler)();
 

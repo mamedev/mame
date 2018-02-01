@@ -36,6 +36,9 @@ public:
 
 	bool halted() const { return m_z8000_halt; }
 
+	void z8000_data(address_map &map);
+	void z8000_io(address_map &map);
+	void z8000_prog(address_map &map);
 protected:
 	void device_start() override;
 	void device_reset() override;

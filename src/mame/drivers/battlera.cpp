@@ -141,7 +141,7 @@ READ8_MEMBER(battlera_state::control_data_r)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( battlera_map, AS_PROGRAM, 8, battlera_state )
+ADDRESS_MAP_START(battlera_state::battlera_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x1e0800, 0x1e0801) AM_WRITE(sound_w)
 	AM_RANGE(0x1e1000, 0x1e13ff) AM_DEVREADWRITE( "huc6260", huc6260_device, palette_direct_read, palette_direct_write) AM_SHARE("paletteram")
@@ -155,7 +155,7 @@ static ADDRESS_MAP_START( battlera_map, AS_PROGRAM, 8, battlera_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( battlera_portmap, AS_IO, 8, battlera_state )
+ADDRESS_MAP_START(battlera_state::battlera_portmap)
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
 ADDRESS_MAP_END
 
@@ -182,7 +182,7 @@ WRITE8_MEMBER(battlera_state::adpcm_reset_w)
 	m_msm->reset_w(0);
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, battlera_state )
+ADDRESS_MAP_START(battlera_state::sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_DEVWRITE("ymsnd", ym2203_device, write)
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(adpcm_data_w)

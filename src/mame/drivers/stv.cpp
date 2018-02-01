@@ -975,7 +975,7 @@ DRIVER_INIT_MEMBER(stv_state, hopper)
 	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::hop_ioga_w32),this));
 }
 
-static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
+ADDRESS_MAP_START(stv_state::stv_mem)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_MIRROR(0x20000000) AM_REGION("bios", 0) // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_DEVREADWRITE8("smpc", smpc_hle_device, read, write, 0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r,saturn_backupram_w,0xffffffff) AM_SHARE("share1")
@@ -1001,7 +1001,7 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, stv_state )
 	AM_RANGE(0xc0000000, 0xc00007ff) AM_RAM // cache RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16, stv_state )
+ADDRESS_MAP_START(stv_state::sound_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_SHARE("sound_ram")
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_device, read, write)
 ADDRESS_MAP_END

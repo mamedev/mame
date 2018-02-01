@@ -313,6 +313,13 @@ public:
 	void a600xl(machine_config &config);
 	void xegs(machine_config &config);
 	void a400(machine_config &config);
+	void a1200xl_mem(address_map &map);
+	void a130xe_mem(address_map &map);
+	void a400_mem(address_map &map);
+	void a5200_mem(address_map &map);
+	void a600xl_mem(address_map &map);
+	void a800xl_mem(address_map &map);
+	void xegs_mem(address_map &map);
 protected:
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
 	required_device<ram_device> m_ram;
@@ -551,7 +558,7 @@ WRITE8_MEMBER(a400_state::xegs_low_w)
  **************************************************************/
 
 
-static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8, a400_state)
+ADDRESS_MAP_START(a400_state::a400_mem)
 	AM_RANGE(0x0000, 0xbfff) AM_NOP // RAM installed at runtime
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
@@ -564,7 +571,7 @@ static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8, a400_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, a400_state)
+ADDRESS_MAP_START(a400_state::a600xl_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x5000, 0x57ff) AM_READ(a600xl_low_r)    // self test or NOP
 	AM_RANGE(0xa000, 0xbfff) AM_ROM // BASIC
@@ -579,7 +586,7 @@ static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, a400_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a1200xl_mem, AS_PROGRAM, 8, a400_state)
+ADDRESS_MAP_START(a400_state::a1200xl_mem)
 	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(a1200xl_low_r, xegs_low_w)
 	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -591,7 +598,7 @@ static ADDRESS_MAP_START(a1200xl_mem, AS_PROGRAM, 8, a400_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a800xl_mem, AS_PROGRAM, 8, a400_state)
+ADDRESS_MAP_START(a400_state::a800xl_mem)
 	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(a800xl_low_r, a800xl_low_w)
 	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -603,7 +610,7 @@ static ADDRESS_MAP_START(a800xl_mem, AS_PROGRAM, 8, a400_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a130xe_mem, AS_PROGRAM, 8, a400_state)
+ADDRESS_MAP_START(a400_state::a130xe_mem)
 	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(a130xe_low_r, a800xl_low_w)
 	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -615,7 +622,7 @@ static ADDRESS_MAP_START(a130xe_mem, AS_PROGRAM, 8, a400_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(xegs_mem, AS_PROGRAM, 8, a400_state)
+ADDRESS_MAP_START(a400_state::xegs_mem)
 	AM_RANGE(0x0000, 0xcfff) AM_READWRITE(xegs_low_r, xegs_low_w)
 	AM_RANGE(0xd000, 0xd0ff) AM_DEVREADWRITE("gtia", gtia_device, read, write)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
@@ -627,7 +634,7 @@ static ADDRESS_MAP_START(xegs_mem, AS_PROGRAM, 8, a400_state)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8, a400_state)
+ADDRESS_MAP_START(a400_state::a5200_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_NOP // ROM installed at machine start
 	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("gtia", gtia_device, read, write)

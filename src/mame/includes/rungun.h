@@ -110,4 +110,7 @@ public:
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
 	void rng(machine_config &config);
 	void rng_dual(machine_config &config);
+	void rungun_k054539_map(address_map &map);
+	void rungun_map(address_map &map);
+	void rungun_sound_map(address_map &map);
 };

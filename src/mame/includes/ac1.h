@@ -36,6 +36,9 @@ public:
 
 	void ac1_32(machine_config &config);
 	void ac1(machine_config &config);
+	void ac1_32_mem(address_map &map);
+	void ac1_io(address_map &map);
+	void ac1_mem(address_map &map);
 private:
 	required_device<cassette_image_device> m_cassette;
 	required_device<cpu_device> m_maincpu;

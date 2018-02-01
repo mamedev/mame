@@ -18,6 +18,7 @@ public:
 //  virtual DECLARE_READ16_MEMBER (read16) override;
 //  virtual DECLARE_WRITE16_MEMBER (write16) override;
 
+	void mvme350_mem(address_map &map);
 protected:
 	vme_mvme350_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

@@ -30,7 +30,7 @@ public:
 	template <class Object> static devcb_base &set_irq_handler(device_t &device, Object &&cb) { return downcast<ncr5380n_device &>(device).m_irq_handler.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_drq_handler(device_t &device, Object &&cb) { return downcast<ncr5380n_device &>(device).m_drq_handler.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	DECLARE_READ8_MEMBER(scsidata_r);
 	DECLARE_WRITE8_MEMBER(outdata_w);

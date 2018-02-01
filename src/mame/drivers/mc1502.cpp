@@ -228,12 +228,12 @@ MACHINE_RESET_MEMBER(mc1502_state, mc1502)
  * macros
  */
 
-static ADDRESS_MAP_START( mc1502_map, AS_PROGRAM, 8, mc1502_state )
+ADDRESS_MAP_START(mc1502_state::mc1502_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mc1502_io, AS_IO, 8, mc1502_state )
+ADDRESS_MAP_START(mc1502_state::mc1502_io)
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0028, 0x0028) AM_DEVREADWRITE("upd8251", i8251_device, data_r, data_w)
 	AM_RANGE(0x0029, 0x0029) AM_DEVREADWRITE("upd8251", i8251_device, status_r, control_w)

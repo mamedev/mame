@@ -55,6 +55,7 @@ public:
 	// construction/destruction
 	cbm2_hrg_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void hrg_a_map(address_map &map);
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
@@ -69,6 +70,7 @@ public:
 	// construction/destruction
 	cbm2_hrg_b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void hrg_b_map(address_map &map);
 protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;

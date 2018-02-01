@@ -17,7 +17,7 @@ public:
 	jasmin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~jasmin_device();
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 	DECLARE_INPUT_CHANGED_MEMBER(boot_pressed);
 	DECLARE_WRITE8_MEMBER(side_sel_w);
 	DECLARE_WRITE8_MEMBER(fdc_reset_w);

@@ -66,7 +66,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, inder_sb_device )
+ADDRESS_MAP_START(inder_sb_device::sound_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x0020, 0x0020) AM_SELECT(0x0006) AM_READ(vec_bankswitch_r)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
@@ -124,7 +124,7 @@ WRITE8_MEMBER(inder_sb_device::dac3_rombank_write)
 }
 
 
-static ADDRESS_MAP_START( sound_io, AS_IO, 8, inder_sb_device )
+ADDRESS_MAP_START(inder_sb_device::sound_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac0", dac_byte_interface, write)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("dac0vol", dac_byte_interface, write)

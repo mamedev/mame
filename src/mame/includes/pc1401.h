@@ -55,6 +55,8 @@ public:
 	required_device<palette_device> m_palette;
 	void pc1401(machine_config &config);
 	void pc1402(machine_config &config);
+	void pc1401_mem(address_map &map);
+	void pc1402_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -81,6 +81,8 @@ public:
 	void wallc(machine_config &config);
 	void wallca(machine_config &config);
 
+	void unkitpkr_map(address_map &map);
+	void wallc_map(address_map &map);
 protected:
 	virtual void video_start() override;
 
@@ -262,7 +264,7 @@ WRITE8_MEMBER(wallc_state::unkitpkr_out2_w)
 {
 }
 
-static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8, wallc_state )
+ADDRESS_MAP_START(wallc_state::wallc_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(videoram_w) AM_MIRROR(0xc00) AM_SHARE("videoram")   /* 2114, 2114 */
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM     /* 2114, 2114 */
@@ -279,7 +281,7 @@ static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8, wallc_state )
 	AM_RANGE(0xb600, 0xb600) AM_DEVWRITE("aysnd", ay8912_device, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( unkitpkr_map, AS_PROGRAM, 8, wallc_state )
+ADDRESS_MAP_START(wallc_state::unkitpkr_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(videoram_w) AM_MIRROR(0xc00) AM_SHARE("videoram")   /* 2114, 2114 */
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM     /* 2114, 2114 */

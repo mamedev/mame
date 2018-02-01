@@ -98,6 +98,7 @@ public:
 	TIMER_CALLBACK_MEMBER(quarter_callback);
 
 	void flyball(machine_config &config);
+	void flyball_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -294,7 +295,7 @@ WRITE_LINE_MEMBER(flyball_state::lamp_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( flyball_map, AS_PROGRAM, 8, flyball_state )
+ADDRESS_MAP_START(flyball_state::flyball_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x100) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_NOP

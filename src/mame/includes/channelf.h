@@ -53,6 +53,8 @@ public:
 	void sabavpl2(machine_config &config);
 	void sabavdpl(machine_config &config);
 	void channlf2(machine_config &config);
+	void channelf_io(address_map &map);
+	void channelf_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_CHANNELF_H

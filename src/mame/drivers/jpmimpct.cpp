@@ -585,7 +585,7 @@ WRITE16_MEMBER(jpmimpct_state::jpmio_w)
  *  Main CPU memory handlers
  *
  *************************************/
-static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16, jpmimpct_state )
+ADDRESS_MAP_START(jpmimpct_state::m68k_program_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
 	AM_RANGE(0x00100000, 0x001fffff) AM_ROM
 	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")
@@ -613,7 +613,7 @@ ADDRESS_MAP_END
  *  Main CPU memory handlers
  *
  *************************************/
-static ADDRESS_MAP_START( awp68k_program_map, AS_PROGRAM, 16, jpmimpct_state )
+ADDRESS_MAP_START(jpmimpct_state::awp68k_program_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // most games are 0x00000000 - 0x0003ffff, but some QPS ones go up to fffff, check for any mirroring etc.
 	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE(duart_1_r, duart_1_w)
@@ -651,7 +651,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, jpmimpct_state )
+ADDRESS_MAP_START(jpmimpct_state::tms_program_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0xf8000000) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0xf8000000) AM_ROM AM_REGION("user1", 0x100000)
 	AM_RANGE(0x02000000, 0x027fffff) AM_MIRROR(0xf8000000) AM_ROM AM_REGION("user1", 0)

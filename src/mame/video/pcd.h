@@ -16,7 +16,7 @@
 class pcdx_video_device : public device_t, public device_gfx_interface
 {
 public:
-	virtual DECLARE_ADDRESS_MAP(map, 16) = 0;
+	virtual void map(address_map &map) = 0;
 	DECLARE_READ8_MEMBER(detect_r);
 	DECLARE_WRITE8_MEMBER(detect_w);
 	DECLARE_PALETTE_INIT(pcdx);
@@ -35,7 +35,7 @@ class pcd_video_device : public pcdx_video_device
 public:
 	pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 16) override;
+	virtual void map(address_map &map) override;
 	DECLARE_WRITE8_MEMBER(vram_sw_w);
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
@@ -84,7 +84,7 @@ public:
 	pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	template <class Object> static devcb_base &set_txd_handler(device_t &device, Object &&cb) { return downcast<pcx_video_device &>(device).m_txd_handler.set_callback(std::forward<Object>(cb)); }
 
-	virtual DECLARE_ADDRESS_MAP(map, 16) override;
+	virtual void map(address_map &map) override;
 	DECLARE_READ8_MEMBER(term_r);
 	DECLARE_WRITE8_MEMBER(term_w);
 	DECLARE_READ8_MEMBER(term_mcu_r);
@@ -96,6 +96,9 @@ public:
 	DECLARE_READ8_MEMBER(unk_r);
 	DECLARE_WRITE8_MEMBER(p1_w);
 
+	void pcx_vid_io(address_map &map);
+	void pcx_vid_map(address_map &map);
+	void pcx_vram(address_map &map);
 protected:
 	void device_start() override;
 	void device_reset() override;

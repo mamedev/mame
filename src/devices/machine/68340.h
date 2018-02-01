@@ -102,6 +102,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( tin2_w )  { m_timer2->tin_w(state);  }
 	DECLARE_WRITE_LINE_MEMBER( tgate2_w ){ m_timer2->tgate_w(state); }
 
+	void m68340_internal_map(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

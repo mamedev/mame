@@ -100,6 +100,8 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void mycom(machine_config &config);
+	void mycom_io(address_map &map);
+	void mycom_map(address_map &map);
 private:
 	uint8_t m_0a;
 	uint16_t m_i_videoram;
@@ -214,14 +216,14 @@ WRITE8_MEMBER( mycom_state::vram_data_w )
 	m_p_videoram[m_i_videoram] = data;
 }
 
-static ADDRESS_MAP_START(mycom_map, AS_PROGRAM, 8, mycom_state)
+ADDRESS_MAP_START(mycom_state::mycom_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
 	AM_RANGE(0x1000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(mycom_upper_r,mycom_upper_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mycom_io, AS_IO, 8, mycom_state)
+ADDRESS_MAP_START(mycom_state::mycom_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(mycom_00_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(vram_data_r,vram_data_w)

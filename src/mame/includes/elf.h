@@ -65,6 +65,8 @@ public:
 	// display state
 	uint8_t m_data;
 	void elf2(machine_config &config);
+	void elf2_io(address_map &map);
+	void elf2_mem(address_map &map);
 };
 
 #endif

@@ -154,6 +154,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_beep_exp);
 
 	void hp2645(machine_config &config);
+	void cpu_io_map(address_map &map);
+	void cpu_mem_map(address_map &map);
 protected:
 	required_device<i8080a_cpu_device> m_cpu;
 	required_device<timer_device> m_timer_10ms;
@@ -951,7 +953,7 @@ static INPUT_PORTS_START(hp2645)
 	PORT_CONFSETTING(0x80, DEF_STR(Off))
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 8 , hp2645_state)
+ADDRESS_MAP_START(hp2645_state::cpu_mem_map)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000 , 0x57ff) AM_ROM
 	AM_RANGE(0x8100 , 0x8100) AM_READ(async_data_r)
@@ -971,7 +973,7 @@ static ADDRESS_MAP_START(cpu_mem_map , AS_PROGRAM , 8 , hp2645_state)
 	AM_RANGE(0xc000 , 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(cpu_io_map , AS_IO , 8 , hp2645_state)
+ADDRESS_MAP_START(hp2645_state::cpu_io_map)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x00 , 0xff) AM_WRITE(mode_byte_w)
 ADDRESS_MAP_END

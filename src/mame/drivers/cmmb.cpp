@@ -99,6 +99,7 @@ public:
 	uint32_t screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void cmmb(machine_config &config);
+	void cmmb_map(address_map &map);
 };
 
 
@@ -203,7 +204,7 @@ WRITE8_MEMBER(cmmb_state::flash_dbg_1_w)
 }
 
 /* overlap empty addresses */
-static ADDRESS_MAP_START( cmmb_map, AS_PROGRAM, 8, cmmb_state )
+ADDRESS_MAP_START(cmmb_state::cmmb_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM /* zero page address */
 //  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram

@@ -153,6 +153,8 @@ public:
 	void ti99_4a_60hz(machine_config &config);
 	void ti99_4a(machine_config &config);
 	void ti99_4_60hz(machine_config &config);
+	void cru_map(address_map &map);
+	void memmap(address_map &map);
 private:
 	void    set_keyboard_column(int number, int data);
 	int     m_keyboard_column;
@@ -214,7 +216,7 @@ enum
 /*
     Memory map. All of the work is done in the datamux (see datamux.c).
 */
-static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4x_state)
+ADDRESS_MAP_START(ti99_4x_state::memmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, read, write) AM_DEVSETOFFSET(TI99_DATAMUX_TAG, bus::ti99::internal::datamux_device, setoffset)
 ADDRESS_MAP_END
@@ -239,7 +241,7 @@ ADDRESS_MAP_END
 
     Write:0000 - 01ff corresponds to bit 0 of base address 0000 - 03fe
 */
-static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti99_4x_state)
+ADDRESS_MAP_START(ti99_4x_state::cru_map)
 	AM_RANGE(0x0000, 0x01ff) AM_READ(cruread)
 	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0x003c) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 

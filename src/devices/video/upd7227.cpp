@@ -21,7 +21,7 @@
 DEFINE_DEVICE_TYPE(UPD7227, upd7227_device, "upd7227", "NEC uPD7227")
 
 
-static ADDRESS_MAP_START( upd7227_map, AS_PROGRAM, 8, upd7227_device )
+ADDRESS_MAP_START(upd7227_device::upd7227_map)
 	AM_RANGE(0x00, 0x27) AM_RAM
 	AM_RANGE(0x40, 0x67) AM_RAM
 ADDRESS_MAP_END
@@ -39,7 +39,7 @@ ADDRESS_MAP_END
 upd7227_device::upd7227_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, UPD7227, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_space_config("videoram", ENDIANNESS_BIG, 8, 7, 0, *ADDRESS_MAP_NAME(upd7227_map))
+	, m_space_config("videoram", ENDIANNESS_BIG, 8, 7, 0, address_map_constructor(FUNC(upd7227_device::upd7227_map), this))
 	, m_cs(1)
 	, m_cd(1)
 	, m_sck(1)

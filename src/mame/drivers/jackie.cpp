@@ -133,6 +133,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 	void jackie(machine_config &config);
+	void jackie_io_map(address_map &map);
+	void jackie_prg_map(address_map &map);
 };
 
 
@@ -386,12 +388,12 @@ READ8_MEMBER(jackie_state::expram_r)
 }
 
 
-static ADDRESS_MAP_START( jackie_prg_map, AS_PROGRAM, 8, jackie_state )
+ADDRESS_MAP_START(jackie_state::jackie_prg_map)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("maincpu", 0xf000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jackie_io_map, AS_IO, 8, jackie_state )
+ADDRESS_MAP_START(jackie_state::jackie_io_map)
 	AM_RANGE(0x0520, 0x0524) AM_WRITE(unk_reg1_lo_w)
 	AM_RANGE(0x0d20, 0x0d24) AM_WRITE(unk_reg1_hi_w)
 	AM_RANGE(0x0560, 0x0564) AM_WRITE(unk_reg2_lo_w)

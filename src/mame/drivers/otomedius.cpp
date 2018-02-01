@@ -34,6 +34,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_konami_pc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void konami_pc(machine_config &config);
+	void konami_pc_map(address_map &map);
 };
 
 void konami_pc_state::video_start()
@@ -45,7 +46,7 @@ uint32_t konami_pc_state::screen_update_konami_pc(screen_device &screen, bitmap_
 	return 0;
 }
 
-static ADDRESS_MAP_START( konami_pc_map, AS_PROGRAM, 32, konami_pc_state )
+ADDRESS_MAP_START(konami_pc_state::konami_pc_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM AM_REGION("maincpu", 0x70000)
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)

@@ -41,6 +41,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof(void);
 
+	void mb_vcu_pal_ram(address_map &map);
+	void mb_vcu_vram(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;

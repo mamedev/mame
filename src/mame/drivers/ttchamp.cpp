@@ -142,6 +142,8 @@ public:
 
 	INTERRUPT_GEN_MEMBER(irq);
 	void ttchamp(machine_config &config);
+	void ttchamp_io(address_map &map);
+	void ttchamp_map(address_map &map);
 };
 
 ALLOW_SAVE_TYPE(ttchamp_state::picmode);
@@ -500,7 +502,7 @@ WRITE16_MEMBER(ttchamp_state::mem_w)
 
 
 
-static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16, ttchamp_state )
+ADDRESS_MAP_START(ttchamp_state::ttchamp_map)
 	AM_RANGE(0x00000, 0xfffff) AM_READWRITE(mem_r, mem_w)
 ADDRESS_MAP_END
 
@@ -542,7 +544,7 @@ WRITE16_MEMBER(ttchamp_state::port62_w)
 	m_rombank = 0;
 }
 
-static ADDRESS_MAP_START( ttchamp_io, AS_IO, 16, ttchamp_state )
+ADDRESS_MAP_START(ttchamp_state::ttchamp_io)
 	AM_RANGE(0x0000, 0x0001) AM_WRITENOP // startup only, nmi enable?
 
 	AM_RANGE(0x0002, 0x0003) AM_READ_PORT("SYSTEM")

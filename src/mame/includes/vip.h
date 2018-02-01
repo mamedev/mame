@@ -125,6 +125,8 @@ public:
 	uint8_t m_byteio_data;
 	void vp111(machine_config &config);
 	void vip(machine_config &config);
+	void vip_io(address_map &map);
+	void vip_mem(address_map &map);
 };
 
 #endif

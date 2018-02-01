@@ -124,7 +124,7 @@ const tiny_rom_entry *ecb_grip21_device::device_rom_region() const
 //  ADDRESS_MAP( grip_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( grip_mem, AS_PROGRAM, 8, ecb_grip21_device )
+ADDRESS_MAP_START(ecb_grip21_device::grip_mem)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("videoram")
@@ -135,7 +135,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( grip_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( grip_io, AS_IO, 8, ecb_grip21_device )
+ADDRESS_MAP_START(ecb_grip21_device::grip_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(cxstb_r, cxstb_w)
 //  AM_RANGE(0x10, 0x10) AM_WRITE(ccon_w)

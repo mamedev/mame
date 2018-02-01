@@ -126,7 +126,7 @@ READ16_MEMBER(cbuster_state::twocrude_control_r)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( twocrude_map, AS_PROGRAM, 16, cbuster_state )
+ADDRESS_MAP_START(cbuster_state::twocrude_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("ram")
 
@@ -153,7 +153,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cbuster_state )
+ADDRESS_MAP_START(cbuster_state::sound_map)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)

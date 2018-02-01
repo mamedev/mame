@@ -23,7 +23,7 @@ public:
 	template <class Object> static devcb_base &set_int_power_wr_callback(device_t &device, Object &&cb) { return downcast<nextkbd_device &>(device).int_power_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_int_nmi_wr_callback(device_t &device, Object &&cb) { return downcast<nextkbd_device &>(device).int_nmi_cb.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_ADDRESS_MAP(amap, 32);
+	void amap(address_map &map);
 
 	DECLARE_READ8_MEMBER(status_snd_r);
 	DECLARE_READ8_MEMBER(status_kms_r);

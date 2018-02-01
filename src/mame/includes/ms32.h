@@ -125,5 +125,8 @@ public:
 	required_device<palette_device> m_palette;
 	void ms32(machine_config &config);
 	void f1superb(machine_config &config);
+	void f1superb_map(address_map &map);
+	void ms32_map(address_map &map);
+	void ms32_sound_map(address_map &map);
 	optional_device<generic_latch_8_device> m_soundlatch; //not for bnstars.cpp
 };
