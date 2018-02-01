@@ -1314,11 +1314,11 @@ ROM_START(ews286 ) // Computer is brown/yellow-ish with Ericsson logo
 ROM_END
 
 // Nokia Data WS286
-ROM_START(nws286 ) // Computer is grey with Nokia logo.
-	ROM_REGION(0x20000,"bios", 0)
-	ROM_LOAD16_BYTE( "RYS_103_1002_R8A_3C00_IC-POS_71.BIN", 0x18000, 0x4000, NO_DUMP)
-	ROM_LOAD16_BYTE( "RYS_103_1003_R8A_8600_IC-POS_69.BIN", 0x18001, 0x4000, NO_DUMP)
-ROM_END
+//ROM_START(nws286 ) // Computer is grey with Nokia logo.
+//	ROM_REGION(0x20000,"bios", 0)
+//	ROM_LOAD16_BYTE( "RYS_103_1002_R8A_3C00_IC-POS_71.BIN", 0x18000, 0x4000, NO_DUMP)
+//	ROM_LOAD16_BYTE( "RYS_103_1003_R8A_8600_IC-POS_69.BIN", 0x18001, 0x4000, NO_DUMP)
+//ROM_END
 
 /***************************************************************************
 
@@ -1374,4 +1374,4 @@ COMP ( 199?, mbc28,     ibm5170, 0,       at386sx,   0,    at_state,      at,   
 COMP ( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,    at_state,      at,      "Siemens",  "PCD-2", MACHINE_NOT_WORKING )
 COMP ( 1987, comportiii,ibm5170, 0,       comportiii,0,    at_state,      at,      "Compaq",   "Portable III", MACHINE_NOT_WORKING )
 COMP ( 1986, ews286,    ibm5170, 0,       ews286,    0,    at_state,      at,      "Ericsson", "Ericsson WS286", MACHINE_NOT_WORKING )
-COMP ( 1988, nws286,    ibm5170,  0,      ews286,    0,    at_state,      at,      "Nokia Data", "Nokia Data WS286", MACHINE_NOT_WORKING )
+//COMP ( 1988, nws286,    ibm5170,  0,      ews286,    0,    at_state,      at,      "Nokia Data", "Nokia Data WS286", MACHINE_NOT_WORKING )
