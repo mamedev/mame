@@ -165,6 +165,11 @@ public:
 	required_device<palette_device> m_palette;
 	void _7smash(machine_config &config);
 	void luckgrln(machine_config &config);
+	void _7smash_io(address_map &map);
+	void _7smash_map(address_map &map);
+	void common_portmap(address_map &map);
+	void luckgrln_io(address_map &map);
+	void mainmap(address_map &map);
 };
 
 
@@ -394,7 +399,7 @@ uint32_t luckgrln_state::screen_update_luckgrln(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, luckgrln_state )
+ADDRESS_MAP_START(luckgrln_state::mainmap)
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
 	AM_RANGE(0x10000, 0x1ffff) AM_ROM AM_REGION("rom_data",0x10000)
 	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_REGION("rom_data",0x00000)
@@ -429,7 +434,7 @@ static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, luckgrln_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( _7smash_map, AS_PROGRAM, 8, luckgrln_state )
+ADDRESS_MAP_START(luckgrln_state::_7smash_map)
 	AM_IMPORT_FROM( mainmap )
 	AM_RANGE(0x00000, 0x0bfff) AM_ROM
 	AM_RANGE(0x10000, 0x2ffff) AM_UNMAP
@@ -548,7 +553,7 @@ WRITE8_MEMBER(luckgrln_state::counters_w)
 
 
 /* are some of these reads / writes mirrored? there seem to be far too many */
-static ADDRESS_MAP_START( common_portmap, AS_IO, 8, luckgrln_state )
+ADDRESS_MAP_START(luckgrln_state::common_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
 	AM_RANGE(0x0060, 0x0060) AM_WRITE(output_w)
@@ -600,7 +605,7 @@ static ADDRESS_MAP_START( common_portmap, AS_IO, 8, luckgrln_state )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( luckgrln_io, AS_IO, 8, luckgrln_state )
+ADDRESS_MAP_START(luckgrln_state::luckgrln_io)
 	AM_IMPORT_FROM( common_portmap )
 	AM_RANGE(0x0090, 0x009f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 ADDRESS_MAP_END
@@ -611,7 +616,7 @@ READ8_MEMBER(luckgrln_state::test_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( _7smash_io, AS_IO, 8, luckgrln_state )
+ADDRESS_MAP_START(luckgrln_state::_7smash_io)
 	AM_IMPORT_FROM( common_portmap )
 	AM_RANGE(0x66, 0x66) AM_READ(test_r)
 ADDRESS_MAP_END

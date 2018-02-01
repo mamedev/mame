@@ -65,6 +65,9 @@ public:
 	uint8_t m_segment;
 	void lc80_2(machine_config &config);
 	void lc80(machine_config &config);
+	void lc80_io(address_map &map);
+	void lc80_mem(address_map &map);
+	void sc80_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_LC80_H

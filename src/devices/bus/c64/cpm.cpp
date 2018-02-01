@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(C64_CPM, c64_cpm_cartridge_device, "c64_cpm", "C64 CP/M cartr
 //  ADDRESS_MAP( z80_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, c64_cpm_cartridge_device )
+ADDRESS_MAP_START(c64_cpm_cartridge_device::z80_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dma_r, dma_w)
 ADDRESS_MAP_END
 
@@ -49,7 +49,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( z80_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( z80_io, AS_IO, 8, c64_cpm_cartridge_device )
+ADDRESS_MAP_START(c64_cpm_cartridge_device::z80_io)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dma_r, dma_w)
 ADDRESS_MAP_END
 

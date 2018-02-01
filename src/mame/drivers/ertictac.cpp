@@ -42,6 +42,7 @@ public:
 	virtual void machine_reset() override;
 	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
 	void ertictac(machine_config &config);
+	void ertictac_map(address_map &map);
 };
 
 
@@ -61,7 +62,7 @@ READ32_MEMBER(ertictac_state::ertictac_podule_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( ertictac_map, AS_PROGRAM, 32, ertictac_state )
+ADDRESS_MAP_START(ertictac_state::ertictac_map)
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
 

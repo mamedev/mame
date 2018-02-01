@@ -57,6 +57,8 @@ public:
 	required_shared_ptr<uint16_t> m_mapram;
 
 	void miniframe(machine_config &config);
+	void miniframe_mem(address_map &map);
+	void ramrombank_map(address_map &map);
 private:
 	uint16_t *m_ramptr;
 	uint32_t m_ramsize;
@@ -186,7 +188,7 @@ uint32_t miniframe_state::screen_update(screen_device &screen, bitmap_ind16 &bit
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( miniframe_mem, AS_PROGRAM, 16, miniframe_state )
+ADDRESS_MAP_START(miniframe_state::miniframe_mem)
 	AM_RANGE(0x000000, 0x3fffff) AM_DEVICE("ramrombank", address_map_bank_device, amap16)
 	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_SHARE("mapram")
 	AM_RANGE(0x450000, 0x450001) AM_WRITE(general_ctrl_w)
@@ -196,7 +198,7 @@ static ADDRESS_MAP_START( miniframe_mem, AS_PROGRAM, 16, miniframe_state )
 	AM_RANGE(0xc90000, 0xc90003) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramrombank_map, AS_PROGRAM, 16, miniframe_state )
+ADDRESS_MAP_START(miniframe_state::ramrombank_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0x400000, 0x7fffff) AM_READWRITE(ram_mmu_r, ram_mmu_w)
 ADDRESS_MAP_END

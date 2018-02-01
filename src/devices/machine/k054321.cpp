@@ -37,7 +37,7 @@
 
 DEFINE_DEVICE_TYPE(K054321, k054321_device, "k054321", "K054321 Maincpu-Soundcpu interface")
 
-DEVICE_ADDRESS_MAP_START(main_map, 8, k054321_device)
+ADDRESS_MAP_START(k054321_device::main_map)
 	AM_RANGE(0x0, 0x0) AM_WRITE(active_w)
 	AM_RANGE(0x2, 0x2) AM_WRITE(volume_reset_w)
 	AM_RANGE(0x3, 0x3) AM_WRITE(volume_up_w)
@@ -48,7 +48,7 @@ DEVICE_ADDRESS_MAP_START(main_map, 8, k054321_device)
 	AM_RANGE(0xa, 0xa) AM_READ(sound1_r)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(sound_map, 8, k054321_device)
+ADDRESS_MAP_START(k054321_device::sound_map)
 	AM_RANGE(0x0, 0x0) AM_WRITE(sound1_w)
 	AM_RANGE(0x2, 0x2) AM_READ(main1_r)
 	AM_RANGE(0x3, 0x3) AM_READ(main2_r)

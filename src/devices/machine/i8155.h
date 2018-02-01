@@ -93,6 +93,7 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
+	void i8155(address_map &map);
 protected:
 	i8155_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

@@ -112,4 +112,16 @@ public:
 	void gunbird(machine_config &config);
 	void s1945(machine_config &config);
 	void s1945bl(machine_config &config);
+	void gunbird_map(address_map &map);
+	void gunbird_sound_io_map(address_map &map);
+	void gunbird_sound_map(address_map &map);
+	void psikyo_bootleg_map(address_map &map);
+	void psikyo_map(address_map &map);
+	void s1945_map(address_map &map);
+	void s1945_sound_io_map(address_map &map);
+	void s1945bl_oki_map(address_map &map);
+	void s1945jn_map(address_map &map);
+	void sngkace_map(address_map &map);
+	void sngkace_sound_io_map(address_map &map);
+	void sngkace_sound_map(address_map &map);
 };

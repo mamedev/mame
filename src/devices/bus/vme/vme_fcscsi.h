@@ -31,6 +31,7 @@ public:
 	DECLARE_READ8_MEMBER(scsi_r);
 	DECLARE_WRITE8_MEMBER(scsi_w);
 
+	void fcscsi1_mem(address_map &map);
 protected:
 	vme_fcscsi1_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

@@ -239,7 +239,7 @@ WRITE8_MEMBER(eolith_state::soundcpu_to_qs1000)
  *
  *************************************/
 
-static ADDRESS_MAP_START( eolith_map, AS_PROGRAM, 32, eolith_state )
+ADDRESS_MAP_START(eolith_state::eolith_map)
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM // fort2b wants ram here
 	AM_RANGE(0x40000000, 0x401fffff) AM_RAM
 	AM_RANGE(0x90000000, 0x9003ffff) AM_READWRITE(eolith_vram_r, eolith_vram_w)
@@ -259,11 +259,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_prg_map, AS_PROGRAM, 8, eolith_state )
+ADDRESS_MAP_START(eolith_state::sound_prg_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, eolith_state )
+ADDRESS_MAP_START(eolith_state::sound_io_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("sound_bank")
 	AM_RANGE(0x8000, 0x8000) AM_READ(sound_cmd_r)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(sound_p1_w)

@@ -87,4 +87,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(airbustr_scanline);
 	void airbustr(machine_config &config);
 	void airbustrb(machine_config &config);
+	void master_io_map(address_map &map);
+	void master_map(address_map &map);
+	void slave_io_map(address_map &map);
+	void slave_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 };

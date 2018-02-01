@@ -99,4 +99,7 @@ public:
 	void astrof_audio(machine_config &config);
 	void spfghmk2_audio(machine_config &config);
 	void tomahawk_audio(machine_config &config);
+	void astrof_map(address_map &map);
+	void spfghmk2_map(address_map &map);
+	void tomahawk_map(address_map &map);
 };

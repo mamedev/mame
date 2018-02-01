@@ -832,7 +832,7 @@ MACHINE_RESET_MEMBER(xevious_state,battles)
 
 
 /* the same memory map is used by all three CPUs; all RAM areas are shared */
-static ADDRESS_MAP_START( bosco_map, AS_PROGRAM, 8, bosco_state )
+ADDRESS_MAP_START(bosco_state::bosco_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP         /* the only area different for each CPU */
 	AM_RANGE(0x6800, 0x6807) AM_READ(bosco_dsw_r)
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
@@ -853,7 +853,7 @@ static ADDRESS_MAP_START( bosco_map, AS_PROGRAM, 8, bosco_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( galaga_map, AS_PROGRAM, 8, galaga_state )
+ADDRESS_MAP_START(galaga_state::galaga_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP         /* the only area different for each CPU */
 	AM_RANGE(0x6800, 0x6807) AM_READ(bosco_dsw_r)
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
@@ -868,13 +868,13 @@ static ADDRESS_MAP_START( galaga_map, AS_PROGRAM, 8, galaga_state )
 	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("videolatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gatsbee_main_map, AS_PROGRAM, 8, galaga_state )
+ADDRESS_MAP_START(galaga_state::gatsbee_main_map)
 	AM_IMPORT_FROM(galaga_map)
 	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x3ff8) AM_DEVWRITE("extralatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( xevious_map, AS_PROGRAM, 8, xevious_state )
+ADDRESS_MAP_START(xevious_state::xevious_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP         /* the only area different for each CPU */
 	AM_RANGE(0x6800, 0x6807) AM_READ(bosco_dsw_r)
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
@@ -895,7 +895,7 @@ static ADDRESS_MAP_START( xevious_map, AS_PROGRAM, 8, xevious_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( digdug_map, AS_PROGRAM, 8, digdug_state )
+ADDRESS_MAP_START(digdug_state::digdug_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP         /* the only area different for each CPU */
 	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0x6820, 0x6827) AM_DEVWRITE("misclatch", ls259_device, write_d0)
@@ -915,12 +915,12 @@ ADDRESS_MAP_END
 
 
 /* bootleg 4th CPU replacing the 5xXX chips */
-static ADDRESS_MAP_START( galaga_mem4, AS_PROGRAM, 8, galaga_state )
+ADDRESS_MAP_START(galaga_state::galaga_mem4)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x107f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( battles_mem4, AS_PROGRAM, 8, xevious_state )
+ADDRESS_MAP_START(xevious_state::battles_mem4)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x4003) AM_READ(battles_input_port_r)
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(battles_CPU4_coin_w)
@@ -930,7 +930,7 @@ static ADDRESS_MAP_START( battles_mem4, AS_PROGRAM, 8, xevious_state )
 	AM_RANGE(0x8000, 0x80ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dzigzag_mem4, AS_PROGRAM, 8, galaga_state )
+ADDRESS_MAP_START(galaga_state::dzigzag_mem4)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x107f) AM_RAM
 	AM_RANGE(0x4000, 0x4007) AM_READONLY    // dip switches? bits 0 & 1 used

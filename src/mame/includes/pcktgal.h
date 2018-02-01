@@ -49,4 +49,6 @@ public:
 	void bootleg(machine_config &config);
 	void pcktgal(machine_config &config);
 	void pcktgal2(machine_config &config);
+	void pcktgal_map(address_map &map);
+	void pcktgal_sound_map(address_map &map);
 };

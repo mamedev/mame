@@ -71,6 +71,8 @@ public:
 	DECLARE_READ8_MEMBER(portfc_r);
 
 	void hpz80unk(machine_config &config);
+	void hpz80unk_io(address_map &map);
+	void hpz80unk_mem(address_map &map);
 private:
 	uint8_t m_port02_data;
 	virtual void machine_reset() override;
@@ -138,13 +140,13 @@ READ8_MEMBER( hpz80unk_state::portfc_r )
 	return 0xfe; // or it halts
 }
 
-static ADDRESS_MAP_START( hpz80unk_mem, AS_PROGRAM, 8, hpz80unk_state )
+ADDRESS_MAP_START(hpz80unk_state::hpz80unk_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_SHARE("rom")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hpz80unk_io, AS_IO, 8, hpz80unk_state )
+ADDRESS_MAP_START(hpz80unk_state::hpz80unk_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(port00_r) // uart1 status

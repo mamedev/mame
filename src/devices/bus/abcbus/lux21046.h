@@ -64,6 +64,8 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	void luxor_55_21046_io(address_map &map);
+	void luxor_55_21046_mem(address_map &map);
 protected:
 	luxor_55_21046_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

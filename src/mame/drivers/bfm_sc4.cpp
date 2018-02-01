@@ -616,7 +616,7 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 	}
 }
 
-static ADDRESS_MAP_START( sc4_map, AS_PROGRAM, 16, sc4_state )
+ADDRESS_MAP_START(sc4_state::sc4_map)
 	AM_RANGE(0x0000000, 0xffffff) AM_READWRITE(sc4_mem_r, sc4_mem_w)
 	AM_RANGE(0x0000000, 0x0fffff) AM_READ(sc4_cs1_r) // technically we should be going through the cs handler, but this is always set to ROM, and assuming that is a lot faster
 ADDRESS_MAP_END
@@ -666,7 +666,7 @@ WRITE32_MEMBER(sc4_adder4_state::adder4_mem_w)
 
 }
 
-static ADDRESS_MAP_START( sc4_adder4_map, AS_PROGRAM, 32, sc4_adder4_state )
+ADDRESS_MAP_START(sc4_adder4_state::sc4_adder4_map)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(adder4_mem_r, adder4_mem_w)
 ADDRESS_MAP_END
 

@@ -30,7 +30,7 @@
 //  ADDRESS_MAP( coco3_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( coco3_mem, AS_PROGRAM, 8, coco3_state )
+ADDRESS_MAP_START(coco3_state::coco3_mem)
 	AM_RANGE(0x0000, 0x1FFF) AM_READ_BANK("rbank0") AM_WRITE_BANK("wbank0")
 	AM_RANGE(0x2000, 0x3FFF) AM_READ_BANK("rbank1") AM_WRITE_BANK("wbank1")
 	AM_RANGE(0x4000, 0x5FFF) AM_READ_BANK("rbank2") AM_WRITE_BANK("wbank2")

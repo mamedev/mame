@@ -115,6 +115,14 @@ public:
 	void alfa(machine_config &config);
 	void c2717(machine_config &config);
 	void mato(machine_config &config);
+	void alfa_mem(address_map &map);
+	void c2717_mem(address_map &map);
+	void mato_io_map(address_map &map);
+	void mato_mem(address_map &map);
+	void pmd852a_mem(address_map &map);
+	void pmd853_mem(address_map &map);
+	void pmd85_io_map(address_map &map);
+	void pmd85_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;

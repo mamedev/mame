@@ -131,6 +131,10 @@ public:
 	void ufo21(machine_config &config);
 	void newufo(machine_config &config);
 	void ufo800(machine_config &config);
+	void ex_ufo21_portmap(address_map &map);
+	void ex_ufo800_portmap(address_map &map);
+	void ufo_map(address_map &map);
+	void ufo_portmap(address_map &map);
 };
 
 
@@ -449,12 +453,12 @@ READ8_MEMBER(ufo_state::ex_upd_busy_r)
 
 /* Memory maps */
 
-static ADDRESS_MAP_START( ufo_map, AS_PROGRAM, 8, ufo_state )
+ADDRESS_MAP_START(ufo_state::ufo_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ufo_portmap, AS_IO, 8, ufo_state )
+ADDRESS_MAP_START(ufo_state::ufo_portmap)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit", pit8254_device, read, write)
@@ -464,7 +468,7 @@ static ADDRESS_MAP_START( ufo_portmap, AS_IO, 8, ufo_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ex_ufo21_portmap, AS_IO, 8, ufo_state )
+ADDRESS_MAP_START(ufo_state::ex_ufo21_portmap)
 	AM_IMPORT_FROM( ufo_portmap )
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("upd", upd7759_device, port_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(ex_upd_start_w) AM_READNOP
@@ -473,7 +477,7 @@ static ADDRESS_MAP_START( ex_ufo21_portmap, AS_IO, 8, ufo_state )
 //  AM_RANGE(0x68, 0x68) AM_WRITENOP // ?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ex_ufo800_portmap, AS_IO, 8, ufo_state )
+ADDRESS_MAP_START(ufo_state::ex_ufo800_portmap)
 	AM_IMPORT_FROM( ufo_portmap )
 //  AM_RANGE(0x60, 0x67) AM_NOP // unused?
 //  AM_RANGE(0x68, 0x68) AM_WRITENOP // ?

@@ -28,6 +28,7 @@ public:
 	// construction/destruction
 	bbc_tube_casper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void tube_casper_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -31,6 +31,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(superfx_w_bank2);
 	virtual DECLARE_WRITE8_MEMBER(superfx_w_bank3);
 
+	void sfx_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

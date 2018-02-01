@@ -203,6 +203,8 @@ public:
 
 	void tx0_64kw(machine_config &config);
 	void tx0_8kw(machine_config &config);
+	void tx0_64kw_map(address_map &map);
+	void tx0_8kw_map(address_map &map);
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

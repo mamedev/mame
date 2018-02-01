@@ -56,6 +56,8 @@ public:
 	DECLARE_DRIVER_INIT(photoply);
 	void photoply(machine_config &config);
 
+	void photoply_io(address_map &map);
+	void photoply_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -188,7 +190,7 @@ WRITE8_MEMBER(photoply_state::eeprom_w)
 	// Bits 4-7 are set for some writes, but may do nothing?
 }
 
-static ADDRESS_MAP_START( photoply_map, AS_PROGRAM, 32, photoply_state )
+ADDRESS_MAP_START(photoply_state::photoply_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", cirrus_gd5446_device, mem_r, mem_w, 0xffffffff)
 //	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
@@ -200,7 +202,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( photoply_io, AS_IO, 32, photoply_state )
+ADDRESS_MAP_START(photoply_state::photoply_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
 

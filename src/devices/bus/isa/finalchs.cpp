@@ -37,7 +37,7 @@ WRITE8_MEMBER( isa8_finalchs_device::io6000_write )
 	m_FCH_latch_data = data;
 }
 
-static ADDRESS_MAP_START(finalchs_mem , AS_PROGRAM, 8, isa8_finalchs_device)
+ADDRESS_MAP_START(isa8_finalchs_device::finalchs_mem)
 	AM_RANGE( 0x0000, 0x1fff ) AM_RAM
 	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_READ(io7ff8_read)
 	AM_RANGE( 0x7ff8, 0x7ff8 ) AM_WRITE(io7ff8_write)

@@ -115,6 +115,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void feversoc(machine_config &config);
+	void feversoc_map(address_map &map);
 };
 
 
@@ -192,7 +193,7 @@ WRITE16_MEMBER( feversoc_state::output2_w )
 }
 
 
-static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
+ADDRESS_MAP_START(feversoc_state::feversoc_map)
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
 	AM_RANGE(0x02000000, 0x0202ffff) AM_RAM AM_SHARE("workram1") //work ram
 	AM_RANGE(0x02030000, 0x0203ffff) AM_RAM AM_SHARE("nvram")

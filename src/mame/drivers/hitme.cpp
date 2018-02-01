@@ -220,7 +220,7 @@ WRITE8_MEMBER(hitme_state::output_port_1_w)
     upper 8 bits.
 */
 
-static ADDRESS_MAP_START( hitme_map, AS_PROGRAM, 8, hitme_state )
+ADDRESS_MAP_START(hitme_state::hitme_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x09ff) AM_ROM
 	AM_RANGE(0x0c00, 0x0eff) AM_RAM_WRITE(hitme_vidram_w) AM_SHARE("videoram")
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( hitme_map, AS_PROGRAM, 8, hitme_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hitme_portmap, AS_IO, 8, hitme_state )
+ADDRESS_MAP_START(hitme_state::hitme_portmap)
 	AM_RANGE(0x14, 0x14) AM_READ(hitme_port_0_r)
 	AM_RANGE(0x15, 0x15) AM_READ(hitme_port_1_r)
 	AM_RANGE(0x16, 0x16) AM_READ(hitme_port_2_r)

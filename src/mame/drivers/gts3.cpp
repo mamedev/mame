@@ -55,6 +55,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nmi_w);
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 	void gts3(machine_config &config);
+	void gts3_map(address_map &map);
 private:
 	bool m_dispclk;
 	bool m_lampclk;
@@ -70,7 +71,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( gts3_map, AS_PROGRAM, 8, gts3_state )
+ADDRESS_MAP_START(gts3_state::gts3_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x200f) AM_DEVREADWRITE("u4", via6522_device, read, write)
 	AM_RANGE(0x2010, 0x201f) AM_DEVREADWRITE("u5", via6522_device, read, write)

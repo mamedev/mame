@@ -24,6 +24,9 @@ public:
 	DECLARE_DRIVER_INIT(s11a);
 
 	void s11a(machine_config &config);
+	void s11a_audio_map(address_map &map);
+	void s11a_bg_map(address_map &map);
+	void s11a_main_map(address_map &map);
 protected:
 
 private:

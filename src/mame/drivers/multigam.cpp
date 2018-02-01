@@ -208,6 +208,10 @@ public:
 	void supergm3(machine_config &config);
 	void multigmt(machine_config &config);
 	void multigm3(machine_config &config);
+	void multigam_map(address_map &map);
+	void multigm3_map(address_map &map);
+	void multigmt_map(address_map &map);
+	void supergm3_map(address_map &map);
 };
 
 
@@ -398,7 +402,7 @@ WRITE8_MEMBER(multigam_state::multigam_mapper2_w)
 
 *******************************************************/
 
-static ADDRESS_MAP_START( multigam_map, AS_PROGRAM, 8, multigam_state )
+ADDRESS_MAP_START(multigam_state::multigam_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
@@ -414,7 +418,7 @@ static ADDRESS_MAP_START( multigam_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigam_mapper2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( multigmt_map, AS_PROGRAM, 8, multigam_state )
+ADDRESS_MAP_START(multigam_state::multigmt_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
@@ -677,7 +681,7 @@ WRITE8_MEMBER(multigam_state::multigm3_switch_prg_rom)
 
 *******************************************************/
 
-static ADDRESS_MAP_START( multigm3_map, AS_PROGRAM, 8, multigam_state )
+ADDRESS_MAP_START(multigam_state::multigm3_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
@@ -977,7 +981,7 @@ WRITE8_MEMBER(multigam_state::supergm3_chr_bank_w)
 
 *******************************************************/
 
-static ADDRESS_MAP_START( supergm3_map, AS_PROGRAM, 8, multigam_state )
+ADDRESS_MAP_START(multigam_state::supergm3_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)

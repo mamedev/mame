@@ -26,9 +26,10 @@ public:
 	uint32_t screen_update_tvcapcom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<ppc_device> m_maincpu;
 	void tvcapcom(machine_config &config);
+	void gc_map(address_map &map);
 };
 
-static ADDRESS_MAP_START( gc_map, AS_PROGRAM, 64, tvcapcom_state )
+ADDRESS_MAP_START(tvcapcom_state::gc_map)
 ADDRESS_MAP_END
 
 

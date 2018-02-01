@@ -1066,7 +1066,7 @@ WRITE_LINE_MEMBER(funworld_state::pia1_ca2_w)
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( funworld_map, AS_PROGRAM, 8, funworld_state )
+ADDRESS_MAP_START(funworld_state::funworld_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -1100,7 +1100,7 @@ WRITE8_MEMBER(funworld_state::question_bank_w)
 	funquiz_question_bank = data;
 }
 
-static ADDRESS_MAP_START( funquiz_map, AS_PROGRAM, 8, funworld_state )
+ADDRESS_MAP_START(funworld_state::funquiz_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -1118,7 +1118,7 @@ static ADDRESS_MAP_START( funquiz_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magicrd2_map, AS_PROGRAM, 8, funworld_state )
+ADDRESS_MAP_START(funworld_state::magicrd2_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -1134,7 +1134,7 @@ static ADDRESS_MAP_START( magicrd2_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cuoreuno_map, AS_PROGRAM, 8, funworld_state )
+ADDRESS_MAP_START(funworld_state::cuoreuno_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -1162,7 +1162,7 @@ READ8_MEMBER(funworld_state::chinatow_r_32f0)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( chinatow_map, AS_PROGRAM, 8, funworld_state )
+ADDRESS_MAP_START(funworld_state::chinatow_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -1178,7 +1178,7 @@ static ADDRESS_MAP_START( chinatow_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lunapark_map, AS_PROGRAM, 8, funworld_state ) // mirrored video RAM 4000/5000 to 6000/7000
+ADDRESS_MAP_START(funworld_state::lunapark_map) // mirrored video RAM 4000/5000 to 6000/7000
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -1191,7 +1191,7 @@ static ADDRESS_MAP_START( lunapark_map, AS_PROGRAM, 8, funworld_state ) // mirro
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( saloon_map, AS_PROGRAM, 8, funworld_state )
+ADDRESS_MAP_START(funworld_state::saloon_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0808, 0x0808) AM_READ_PORT("IN3") // maybe
@@ -1221,7 +1221,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( witchryl_map, AS_PROGRAM, 8, funworld_state )
+ADDRESS_MAP_START(funworld_state::witchryl_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
@@ -1235,7 +1235,7 @@ static ADDRESS_MAP_START( witchryl_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( intergames_map, AS_PROGRAM, 8, funworld_state )
+ADDRESS_MAP_START(funworld_state::intergames_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_device, data_r)           // WRONG. just a placeholder...
 	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_device, address_data_w)  // WRONG. just a placeholder...
@@ -1248,7 +1248,7 @@ static ADDRESS_MAP_START( intergames_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fw_a7_11_map, AS_PROGRAM, 8, funworld_state )
+ADDRESS_MAP_START(funworld_state::fw_a7_11_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)

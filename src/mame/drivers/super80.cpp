@@ -246,21 +246,21 @@ ToDo:
     This makes the H and E monitor commands show FF */
 READ8_MEMBER( super80_state::super80_read_ff ) { return 0xff; }
 
-static ADDRESS_MAP_START( super80_map, AS_PROGRAM, 8, super80_state )
+ADDRESS_MAP_START(super80_state::super80_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("boot") AM_REGION("maincpu", 0x0000)
 	AM_RANGE(0x4000, 0xbfff) AM_RAM AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0xc000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_READ(super80_read_ff) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80m_map, AS_PROGRAM, 8, super80_state )
+ADDRESS_MAP_START(super80_state::super80m_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("boot") AM_REGION("maincpu", 0x0000)
 	AM_RANGE(0x4000, 0xbfff) AM_RAM AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0xc000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("maincpu", 0xf000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80v_map, AS_PROGRAM, 8, super80_state)
+ADDRESS_MAP_START(super80_state::super80v_map)
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("boot")
 	AM_RANGE(0x4000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xefff) AM_ROM
@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( super80v_map, AS_PROGRAM, 8, super80_state)
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(super80v_high_r, super80v_high_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80_io, AS_IO, 8, super80_state )
+ADDRESS_MAP_START(super80_state::super80_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xdc, 0xdc) AM_DEVREAD("cent_status_in", input_buffer_device, read)
@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( super80_io, AS_IO, 8, super80_state )
 	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80e_io, AS_IO, 8, super80_state )
+ADDRESS_MAP_START(super80_state::super80e_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xbc, 0xbc) AM_DEVREAD("cent_status_in", input_buffer_device, read)
@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( super80e_io, AS_IO, 8, super80_state )
 	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80r_io, AS_IO, 8, super80_state )
+ADDRESS_MAP_START(super80_state::super80r_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( super80r_io, AS_IO, 8, super80_state )
 	AM_RANGE(0xf8, 0xfb) AM_MIRROR(0x04) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( super80v_io, AS_IO, 8, super80_state )
+ADDRESS_MAP_START(super80_state::super80v_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x10, 0x10) AM_WRITE(super80v_10_w)

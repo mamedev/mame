@@ -21,9 +21,9 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(map1, 32);
-	DECLARE_ADDRESS_MAP(map2, 32);
-	DECLARE_ADDRESS_MAP(map3, 32);
+	void map1(address_map &map);
+	void map2(address_map &map);
+	void map3(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(SEGA_LINDBERGH_BASEBOARD, sega_lindbergh_baseboard_device)

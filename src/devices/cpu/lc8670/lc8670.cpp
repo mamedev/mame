@@ -156,7 +156,7 @@ const uint16_t lc8670_cpu_device::s_irq_vectors[] =
 //  Internal memory map
 //**************************************************************************
 
-static ADDRESS_MAP_START( lc8670_internal_map, AS_DATA, 8, lc8670_cpu_device )
+ADDRESS_MAP_START(lc8670_cpu_device::lc8670_internal_map)
 	AM_RANGE(0x000, 0x0ff) AM_READWRITE(mram_r, mram_w)
 	AM_RANGE(0x100, 0x17f) AM_READWRITE(regs_r, regs_w)
 	AM_RANGE(0x180, 0x1ff) AM_READWRITE(xram_r, xram_w)
@@ -174,7 +174,7 @@ ADDRESS_MAP_END
 lc8670_cpu_device::lc8670_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, LC8670, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
-	, m_data_config("data", ENDIANNESS_BIG, 8, 9, 0, ADDRESS_MAP_NAME(lc8670_internal_map))
+	, m_data_config("data", ENDIANNESS_BIG, 8, 9, 0, address_map_constructor(FUNC(lc8670_cpu_device::lc8670_internal_map), this))
 	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0)
 	, m_pc(0)
 	, m_ppc(0)

@@ -57,4 +57,10 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_metalmx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void metalmx(machine_config &config);
+	void adsp_data_map(address_map &map);
+	void adsp_program_map(address_map &map);
+	void dsp32c_1_map(address_map &map);
+	void dsp32c_2_map(address_map &map);
+	void gsp_map(address_map &map);
+	void main_map(address_map &map);
 };

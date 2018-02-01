@@ -195,7 +195,7 @@ WRITE8_MEMBER(vsnes_state::vsnes_coin_counter_1_w)
 /******************************************************************************/
 
 
-static ADDRESS_MAP_START( vsnes_cpu1_map, AS_PROGRAM, 8, vsnes_state )
+ADDRESS_MAP_START(vsnes_state::vsnes_cpu1_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_0_w)
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( vsnes_cpu1_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vsnes_cpu2_map, AS_PROGRAM, 8, vsnes_state )
+ADDRESS_MAP_START(vsnes_state::vsnes_cpu2_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram_1")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu2", ppu2c0x_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_1_w)
@@ -244,7 +244,7 @@ READ8_MEMBER(vsnes_state::vsnes_bootleg_z80_data_r)
 
 
 // the bootleg still makes writes to the PSG addresses, it seems the Z80 should interpret them to play the sounds
-static ADDRESS_MAP_START( vsnes_cpu1_bootleg_map, AS_PROGRAM, 8, vsnes_state )
+ADDRESS_MAP_START(vsnes_state::vsnes_cpu1_bootleg_map)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("work_ram")
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu1", ppu2c0x_device, read, write)
 	AM_RANGE(0x4000, 0x4017) AM_WRITE(bootleg_sound_write)
@@ -261,7 +261,7 @@ READ8_MEMBER( vsnes_state::vsnes_bootleg_z80_latch_r )
 	return 0x00;
 }
 
-static ADDRESS_MAP_START( vsnes_bootleg_z80_map, AS_PROGRAM, 8, vsnes_state )
+ADDRESS_MAP_START(vsnes_state::vsnes_bootleg_z80_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 

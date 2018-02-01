@@ -521,7 +521,7 @@ Reference video: https://www.youtube.com/watch?v=R5OeC6Wc_yI
  *
  *************************************/
 
-static ADDRESS_MAP_START( defender_map, AS_PROGRAM, 8, williams_state )
+ADDRESS_MAP_START(williams_state::defender_map)
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xc000, 0xcfff) AM_DEVICE("bankc000", address_map_bank_device, amap8)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(defender_bank_select_w)
@@ -529,7 +529,7 @@ static ADDRESS_MAP_START( defender_map, AS_PROGRAM, 8, williams_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( defender_bankc000_map, AS_PROGRAM, 8, williams_state )
+ADDRESS_MAP_START(williams_state::defender_bankc000_map)
 	AM_RANGE(0x0000, 0x000f) AM_MIRROR(0x03e0) AM_WRITEONLY AM_SHARE("paletteram")
 	AM_RANGE(0x03ff, 0x03ff) AM_WRITE(williams_watchdog_reset_w)
 	AM_RANGE(0x0010, 0x001f) AM_MIRROR(0x03e0) AM_WRITE(defender_video_control_w)
@@ -549,7 +549,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( williams_map, AS_PROGRAM, 8, williams_state )
+ADDRESS_MAP_START(williams_state::williams_map)
 	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_SHARE("paletteram")
@@ -571,7 +571,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sinistar_map, AS_PROGRAM, 8, williams_state )
+ADDRESS_MAP_START(williams_state::sinistar_map)
 	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_SHARE("paletteram")
@@ -594,7 +594,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( blaster_map, AS_PROGRAM, 8, blaster_state )
+ADDRESS_MAP_START(blaster_state::blaster_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x8fff) AM_READ_BANK("bank2") AM_WRITEONLY
 	AM_RANGE(0xbb00, 0xbbff) AM_WRITEONLY AM_SHARE("blaster_pal0")
@@ -622,7 +622,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( williams2_common_map, AS_PROGRAM, 8, williams2_state )
+ADDRESS_MAP_START(williams2_state::williams2_common_map)
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_DEVICE("bank8000", address_map_bank_device, amap8)
@@ -643,14 +643,14 @@ static ADDRESS_MAP_START( williams2_common_map, AS_PROGRAM, 8, williams2_state )
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( williams2_bank8000_map, AS_PROGRAM, 8, williams2_state )
+ADDRESS_MAP_START(williams2_state::williams2_bank8000_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("vram8000")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(williams2_paletteram_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 
 /* mysticm and inferno: D000-DFFF is RAM */
-static ADDRESS_MAP_START( williams2_d000_ram_map, AS_PROGRAM, 8, williams2_state )
+ADDRESS_MAP_START(williams2_state::williams2_d000_ram_map)
 	AM_IMPORT_FROM(williams2_common_map)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -658,7 +658,7 @@ ADDRESS_MAP_END
 
 
 /* tshoot and joust2: D000-DFFF is ROM */
-static ADDRESS_MAP_START( williams2_d000_rom_map, AS_PROGRAM, 8, williams2_state )
+ADDRESS_MAP_START(williams2_state::williams2_d000_rom_map)
 	AM_IMPORT_FROM(williams2_common_map)
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -671,14 +671,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( defender_sound_map, AS_PROGRAM, 8, williams_state )
+ADDRESS_MAP_START(williams_state::defender_sound_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, williams_state )
+ADDRESS_MAP_START(williams_state::sound_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM     /* MC6810 RAM */
 	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
@@ -686,7 +686,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, williams_state )
 ADDRESS_MAP_END
 
 /* Same as above, but for second sound board */
-static ADDRESS_MAP_START( sound_map_b, AS_PROGRAM, 8, blaster_state )
+ADDRESS_MAP_START(blaster_state::sound_map_b)
 	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM     /* MC6810 RAM */
 	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2b", pia6821_device, read, write)
@@ -701,7 +701,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( williams2_sound_map, AS_PROGRAM, 8, williams2_state )
+ADDRESS_MAP_START(williams2_state::williams2_sound_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM     /* internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM     /* MC6810 RAM */
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)

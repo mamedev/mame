@@ -92,6 +92,9 @@ public:
 	void comx35_pal_video(machine_config &config);
 	void comx35_ntsc_video(machine_config &config);
 
+	void cdp1869_page_ram(address_map &map);
+	void comx35_io(address_map &map);
+	void comx35_mem(address_map &map);
 	// processor state
 	int m_clear;                // CPU mode
 	int m_q;                    // Q flag

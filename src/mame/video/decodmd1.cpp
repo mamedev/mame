@@ -188,13 +188,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type1_device::dmd_nmi)
 	m_cpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( decodmd1_map, AS_PROGRAM, 8, decodmd_type1_device )
+ADDRESS_MAP_START(decodmd_type1_device::decodmd1_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("dmdbank2") // last 16k of ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("dmdbank1")
 	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK("dmdram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decodmd1_io_map, AS_IO, 8, decodmd_type1_device )
+ADDRESS_MAP_START(decodmd_type1_device::decodmd1_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(dmd_port_r, dmd_port_w)
 ADDRESS_MAP_END

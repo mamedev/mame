@@ -60,7 +60,7 @@ WRITE_LINE_MEMBER(rocnrope_state::coin_counter_2_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( rocnrope_map, AS_PROGRAM, 8, rocnrope_state )
+ADDRESS_MAP_START(rocnrope_state::rocnrope_map)
 	AM_RANGE(0x3080, 0x3080) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3081, 0x3081) AM_READ_PORT("P1")
 	AM_RANGE(0x3082, 0x3082) AM_READ_PORT("P2")

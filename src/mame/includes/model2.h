@@ -273,6 +273,20 @@ public:
 	void sj25_0207_01(machine_config &config);
 	void srallyc(machine_config &config);
 	void stcc(machine_config &config);
+	void copro_sharc_map(address_map &map);
+	void copro_tgp_map(address_map &map);
+	void copro_tgpx4_map(address_map &map);
+	void drive_io_map(address_map &map);
+	void drive_map(address_map &map);
+	void geo_sharc_map(address_map &map);
+	void model2_base_mem(address_map &map);
+	void model2_snd(address_map &map);
+	void model2a_crx_mem(address_map &map);
+	void model2b_crx_mem(address_map &map);
+	void model2c_crx_mem(address_map &map);
+	void model2o_mem(address_map &map);
+	void rchase2_iocpu_map(address_map &map);
+	void rchase2_ioport_map(address_map &map);
 };
 
 

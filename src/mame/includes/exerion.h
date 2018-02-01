@@ -75,4 +75,6 @@ public:
 	uint32_t screen_update_exerion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void exerion(machine_config &config);
+	void main_map(address_map &map);
+	void sub_map(address_map &map);
 };

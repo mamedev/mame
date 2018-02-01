@@ -144,6 +144,12 @@ public:
 	void masao_audio(machine_config &config);
 	void mario(machine_config &config);
 	void mario_audio(machine_config &config);
+	void mario_io_map(address_map &map);
+	void mario_map(address_map &map);
+	void mario_sound_io_map(address_map &map);
+	void mario_sound_map(address_map &map);
+	void masao_map(address_map &map);
+	void masao_sound_map(address_map &map);
 };
 
 #endif // MAME_INCLUDES_MARIO_H

@@ -105,6 +105,8 @@ public:
 	void _32x_check_irqs();
 	void _32x_interrupt_cb(int scanline, int irq6);
 
+	void sh2_main_map(address_map &map);
+	void sh2_slave_map(address_map &map);
 protected:
 	sega_32x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

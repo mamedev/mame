@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(SH4BE, sh4be_device, "sh4be", "SH-4 (big)")
 
 #if 0
 /*When OC index mode is off (CCR.OIX = 0)*/
-static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64, sh4_base_device )
+ADDRESS_MAP_START(sh4_base_device::sh4_internal_map)
 	AM_RANGE(0x1C000000, 0x1C000FFF) AM_RAM AM_MIRROR(0x03FFD000)
 	AM_RANGE(0x1C002000, 0x1C002FFF) AM_RAM AM_MIRROR(0x03FFD000)
 	AM_RANGE(0xE0000000, 0xE000003F) AM_RAM AM_MIRROR(0x03FFFFC0)
@@ -50,7 +50,7 @@ ADDRESS_MAP_END
 #endif
 
 /*When OC index mode is on (CCR.OIX = 1)*/
-static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64, sh4_base_device )
+ADDRESS_MAP_START(sh4_base_device::sh4_internal_map)
 	AM_RANGE(0x1C000000, 0x1C000FFF) AM_RAM AM_MIRROR(0x01FFF000)
 	AM_RANGE(0x1E000000, 0x1E000FFF) AM_RAM AM_MIRROR(0x01FFF000)
 	AM_RANGE(0xE0000000, 0xE000003F) AM_RAM AM_MIRROR(0x03FFFFC0) // todo: store queues should be write only on DC's SH4, executing PREFM shouldn't cause an actual memory read access!
@@ -62,7 +62,7 @@ static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64, sh4_base_device )
 	AM_RANGE(0xFE000000, 0xFFFFFFFF) AM_READWRITE32(sh4_internal_r, sh4_internal_w, 0xffffffffffffffffU)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sh3_internal_map, AS_PROGRAM, 64, sh3_base_device )
+ADDRESS_MAP_START(sh3_base_device::sh3_internal_map)
 	AM_RANGE(SH3_LOWER_REGBASE, SH3_LOWER_REGEND) AM_READWRITE32(sh3_internal_r, sh3_internal_w, 0xffffffffffffffffU)
 	AM_RANGE(SH3_UPPER_REGBASE, SH3_UPPER_REGEND) AM_READWRITE32(sh3_internal_high_r, sh3_internal_high_w, 0xffffffffffffffffU)
 ADDRESS_MAP_END
@@ -97,7 +97,7 @@ device_memory_interface::space_config_vector sh34_base_device::memory_space_conf
 
 
 sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
-	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, ADDRESS_MAP_NAME(sh3_internal_map))
+	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, address_map_constructor(FUNC(sh3_base_device::sh3_internal_map), this))
 {
 	m_cpu_type = CPU_TYPE_SH3;
 	m_am = SH34_AM;
@@ -105,7 +105,7 @@ sh3_base_device::sh3_base_device(const machine_config &mconfig, device_type type
 
 
 sh4_base_device::sh4_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness)
-	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, ADDRESS_MAP_NAME(sh4_internal_map))
+	: sh34_base_device(mconfig, type, tag, owner, clock, endianness, address_map_constructor(FUNC(sh4_base_device::sh4_internal_map), this))
 {
 	m_cpu_type = CPU_TYPE_SH4;
 	m_am = SH34_AM;

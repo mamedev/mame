@@ -140,6 +140,14 @@ public:
 	void t1000sl2(machine_config &config);
 	void t1000hx(machine_config &config);
 	void t1000tx(machine_config &config);
+	void biosbank_map(address_map &map);
+	void tandy1000_16_io(address_map &map);
+	void tandy1000_286_map(address_map &map);
+	void tandy1000_bank_io(address_map &map);
+	void tandy1000_bank_map(address_map &map);
+	void tandy1000_io(address_map &map);
+	void tandy1000_map(address_map &map);
+	void tandy1000tx_io(address_map &map);
 };
 
 /* tandy 1000 eeprom
@@ -540,13 +548,13 @@ static INPUT_PORTS_START( t1000_101key )
 	PORT_INCLUDE(at_keyboard)
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START(tandy1000_map, AS_PROGRAM, 8, tandy1000_state )
+ADDRESS_MAP_START(tandy1000_state::tandy1000_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xb8000, 0xbffff) AM_DEVICE("pcvideo_t1000:vram", address_map_bank_device, amap8)
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tandy1000_io, AS_IO, 8, tandy1000_state )
+ADDRESS_MAP_START(tandy1000_state::tandy1000_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", t1000_mb_device, map)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE(tandy1000_pio_r, tandy1000_pio_w)
@@ -557,19 +565,19 @@ static ADDRESS_MAP_START(tandy1000_io, AS_IO, 8, tandy1000_state )
 	AM_RANGE(0x03d0, 0x03df) AM_DEVREAD("pcvideo_t1000", pcvideo_t1000_device, read) AM_DEVWRITE("pcvideo_t1000", pcvideo_t1000_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tandy1000_bank_map, AS_PROGRAM, 16, tandy1000_state )
+ADDRESS_MAP_START(tandy1000_state::tandy1000_bank_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xb8000, 0xbffff) AM_DEVICE8("pcvideo_t1000:vram", address_map_bank_device, amap8, 0xffff)
 	AM_RANGE(0xe0000, 0xeffff) AM_DEVICE("biosbank", address_map_bank_device, amap16)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION( "rom", 0x70000 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(biosbank_map, 0, 16, tandy1000_state)
+ADDRESS_MAP_START(tandy1000_state::biosbank_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80000, 0xfffff) AM_ROM AM_REGION("rom", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16, tandy1000_state )
+ADDRESS_MAP_START(tandy1000_state::tandy1000_16_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", t1000_mb_device, map, 0xffff)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(tandy1000_pio_r, tandy1000_pio_w, 0xffff)
@@ -582,19 +590,19 @@ static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16, tandy1000_state )
 	AM_RANGE(0xffe8, 0xffe9) AM_WRITE8(vram_bank_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tandy1000_bank_io, AS_IO, 16, tandy1000_state )
+ADDRESS_MAP_START(tandy1000_state::tandy1000_bank_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM(tandy1000_16_io)
 	AM_RANGE(0xffea, 0xffeb) AM_READWRITE8(tandy1000_bank_r, tandy1000_bank_w, 0xffff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tandy1000tx_io, AS_IO, 16, tandy1000_state )
+ADDRESS_MAP_START(tandy1000_state::tandy1000tx_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_IMPORT_FROM(tandy1000_16_io)
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8(nmi_vram_bank_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tandy1000_286_map, AS_PROGRAM, 16, tandy1000_state )
+ADDRESS_MAP_START(tandy1000_state::tandy1000_286_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x000fffff)
 	AM_RANGE(0xb8000, 0xbffff) AM_DEVICE8("pcvideo_t1000:vram", address_map_bank_device, amap8, 0xffff)

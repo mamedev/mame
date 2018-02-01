@@ -4,11 +4,12 @@
 
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
+#include "audio/seibu.h"
 #include "machine/nmk004.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 
-class nmk16_state : public driver_device
+class nmk16_state : public driver_device, protected seibu_sound_common
 {
 public:
 	nmk16_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -234,4 +235,38 @@ public:
 	void mustangb(machine_config &config);
 	void mustang(machine_config &config);
 	void vandykeb(machine_config &config);
+	void acrobatm_map(address_map &map);
+	void afega_map(address_map &map);
+	void afega_sound_cpu(address_map &map);
+	void atombjt_map(address_map &map);
+	void bioship_map(address_map &map);
+	void bjtwin_map(address_map &map);
+	void firehawk_map(address_map &map);
+	void firehawk_sound_cpu(address_map &map);
+	void gunnail_map(address_map &map);
+	void hachamf_map(address_map &map);
+	void macross2_map(address_map &map);
+	void macross2_sound_io_map(address_map &map);
+	void macross2_sound_map(address_map &map);
+	void macross_map(address_map &map);
+	void manybloc_map(address_map &map);
+	void mustang_map(address_map &map);
+	void mustangb_map(address_map &map);
+	void oki1_map(address_map &map);
+	void oki2_map(address_map &map);
+	void raphero_map(address_map &map);
+	void raphero_sound_mem_map(address_map &map);
+	void ssmissin_map(address_map &map);
+	void ssmissin_sound_map(address_map &map);
+	void strahl_map(address_map &map);
+	void tdragon3h_map(address_map &map);
+	void tdragon_map(address_map &map);
+	void tdragonb_map(address_map &map);
+	void tharrier_map(address_map &map);
+	void tharrier_sound_io_map(address_map &map);
+	void tharrier_sound_map(address_map &map);
+	void twinactn_map(address_map &map);
+	void twinactn_sound_cpu(address_map &map);
+	void vandyke_map(address_map &map);
+	void vandykeb_map(address_map &map);
 };

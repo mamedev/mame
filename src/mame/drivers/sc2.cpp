@@ -44,6 +44,8 @@ public:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	void sc2(machine_config &config);
+	void sc2_io(address_map &map);
+	void sc2_mem(address_map &map);
 };
 
 READ8_MEMBER( sc2_state::sc2_beep )
@@ -58,7 +60,7 @@ READ8_MEMBER( sc2_state::sc2_beep )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START(sc2_mem, AS_PROGRAM, 8, sc2_state)
+ADDRESS_MAP_START(sc2_state::sc2_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM
 	AM_RANGE( 0x1000, 0x13ff ) AM_RAM
@@ -66,7 +68,7 @@ static ADDRESS_MAP_START(sc2_mem, AS_PROGRAM, 8, sc2_state)
 	AM_RANGE( 0x3c00, 0x3c00 ) AM_READ(sc2_beep)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(sc2_io, AS_IO, 8, sc2_state)
+ADDRESS_MAP_START(sc2_state::sc2_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0xfc) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)

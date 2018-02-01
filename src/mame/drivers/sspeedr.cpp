@@ -81,14 +81,14 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_sound_w)
 }
 
 
-static ADDRESS_MAP_START( sspeedr_map, AS_PROGRAM, 8, sspeedr_state )
+ADDRESS_MAP_START(sspeedr_state::sspeedr_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x21ff) AM_RAM
 	AM_RANGE(0x7f00, 0x7f17) AM_WRITE(sspeedr_score_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sspeedr_io_map, AS_IO, 8, sspeedr_state )
+ADDRESS_MAP_START(sspeedr_state::sspeedr_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")

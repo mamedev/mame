@@ -68,7 +68,7 @@ WRITE16_MEMBER( lemmings_state::lem_protection_region_0_146_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( lemmings_map, AS_PROGRAM, 16, lemmings_state )
+ADDRESS_MAP_START(lemmings_state::lemmings_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, lemmings_state )
+ADDRESS_MAP_START(lemmings_state::sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)

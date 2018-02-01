@@ -760,6 +760,7 @@ public:
 	DECLARE_READ8_MEMBER( ppc4xx_spu_r );
 	DECLARE_WRITE8_MEMBER( ppc4xx_spu_w );
 
+	void internal_ppc4xx(address_map &map);
 protected:
 	ppc4xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, powerpc_flavor flavor, uint32_t cap, uint32_t tb_divisor);
 

@@ -56,4 +56,7 @@ public:
 	required_device<palette_device> m_palette;
 	void superchs(machine_config &config);
 	void chase3(machine_config &config);
+	void chase3_cpub_map(address_map &map);
+	void superchs_cpub_map(address_map &map);
+	void superchs_map(address_map &map);
 };

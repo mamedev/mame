@@ -17,6 +17,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( t0_w );
 
+	void pcd_keyboard_map(address_map &map);
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;

@@ -70,6 +70,12 @@ public:
 	DECLARE_WRITE8_MEMBER( omv_w );
 	void sg1000(machine_config &config);
 	void omv(machine_config &config);
+	void omv_io_map(address_map &map);
+	void omv_map(address_map &map);
+	void sc3000_io_map(address_map &map);
+	void sc3000_map(address_map &map);
+	void sg1000_io_map(address_map &map);
+	void sg1000_map(address_map &map);
 };
 
 class sc3000_state : public sg1000_state
@@ -107,6 +113,8 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	void sf7000(machine_config &config);
+	void sf7000_io_map(address_map &map);
+	void sf7000_map(address_map &map);
 };
 
 #endif

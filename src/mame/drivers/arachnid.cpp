@@ -110,6 +110,7 @@ public:
 
 	uint8_t read_keyboard(int pa);
 	void arachnid(machine_config &config);
+	void arachnid_map(address_map &map);
 };
 
 /***************************************************************************
@@ -120,7 +121,7 @@ public:
     ADDRESS_MAP( arachnid_map )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( arachnid_map, AS_PROGRAM, 8, arachnid_state )
+ADDRESS_MAP_START(arachnid_state::arachnid_map)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2007) AM_DEVREADWRITE(PTM6840_TAG, ptm6840_device, read, write)
 	AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE(PIA6821_U4_TAG, pia6821_device, read, write)

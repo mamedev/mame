@@ -43,6 +43,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( set_a9_12v );
 	DECLARE_WRITE_LINE_MEMBER( set_oe_12v );
 
+	void at28c16_map8(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

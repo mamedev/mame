@@ -34,6 +34,8 @@ public:
 	DECLARE_READ8_MEMBER( ibm_mfc_r );
 	DECLARE_WRITE8_MEMBER( ibm_mfc_w );
 
+	void io_map(address_map &map);
+	void prg_map(address_map &map);
 protected:
 	// Device-level overrides
 	virtual void                    device_start() override;

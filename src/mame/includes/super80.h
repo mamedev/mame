@@ -99,6 +99,13 @@ public:
 	void super80e(machine_config &config);
 	void super80d(machine_config &config);
 	void super80v(machine_config &config);
+	void super80_io(address_map &map);
+	void super80_map(address_map &map);
+	void super80e_io(address_map &map);
+	void super80m_map(address_map &map);
+	void super80r_io(address_map &map);
+	void super80v_io(address_map &map);
+	void super80v_map(address_map &map);
 private:
 	uint8_t m_s_options;
 	uint8_t m_portf0;

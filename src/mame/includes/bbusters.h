@@ -75,4 +75,9 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const uint16_t *source, int bank, int colval, int colmask);
 	void bbusters(machine_config &config);
 	void mechatt(machine_config &config);
+	void bbusters_map(address_map &map);
+	void mechatt_map(address_map &map);
+	void sound_map(address_map &map);
+	void sound_portmap(address_map &map);
+	void sounda_portmap(address_map &map);
 };

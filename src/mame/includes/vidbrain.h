@@ -99,6 +99,8 @@ public:
 	emu_timer *m_timer_ne555;
 	void vidbrain(machine_config &config);
 	void vidbrain_video(machine_config &config);
+	void vidbrain_io(address_map &map);
+	void vidbrain_mem(address_map &map);
 };
 
 #endif

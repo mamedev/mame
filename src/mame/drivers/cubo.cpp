@@ -358,6 +358,8 @@ public:
 	uint16_t m_potgo_value;
 
 	void cubo(machine_config &config);
+	void cubo_mem(address_map &map);
+	void overlay_2mb_map32(address_map &map);
 protected:
 	virtual void rs232_tx(int state) override;
 	virtual void potgo_w(uint16_t data) override;
@@ -414,13 +416,13 @@ WRITE8_MEMBER( cubo_state::akiko_cia_0_port_a_write )
 
 
 
-static ADDRESS_MAP_START( overlay_2mb_map32, AS_PROGRAM, 32, cubo_state )
+ADDRESS_MAP_START(cubo_state::overlay_2mb_map32)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cubo_mem, AS_PROGRAM, 32, cubo_state )
+ADDRESS_MAP_START(cubo_state::cubo_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap32)
 	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("DIPSW1")

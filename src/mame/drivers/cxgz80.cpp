@@ -91,6 +91,7 @@ public:
 	DECLARE_READ8_MEMBER(ch2001_input_r);
 	void ch2001(machine_config &config);
 
+	void ch2001_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -267,7 +268,7 @@ READ8_MEMBER(cxgz80_state::ch2001_input_r)
 
 // Chess 2001
 
-static ADDRESS_MAP_START( ch2001_map, AS_PROGRAM, 8, cxgz80_state )
+ADDRESS_MAP_START(cxgz80_state::ch2001_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x3fff) AM_READWRITE(ch2001_input_r, ch2001_leds_w)

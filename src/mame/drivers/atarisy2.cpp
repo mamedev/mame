@@ -753,7 +753,7 @@ WRITE8_MEMBER(atarisy2_state::coincount_w)
  *************************************/
 
 /* full memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy2_state )
+ADDRESS_MAP_START(atarisy2_state::main_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x11ff) AM_MIRROR(0x0200) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x1400, 0x1403) AM_MIRROR(0x007c) AM_READWRITE(adc_r, bankselect_w)
@@ -784,7 +784,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* full memory map derived from schematics */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, atarisy2_state )
+ADDRESS_MAP_START(atarisy2_state::sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_MIRROR(0x2000) AM_DEVREADWRITE("eeprom", eeprom_parallel_28xx_device, read, write)
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x2780) AM_DEVREADWRITE("pokey1", pokey_device, read, write)

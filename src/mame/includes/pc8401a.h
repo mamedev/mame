@@ -98,6 +98,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_keyboard_tick);
 	void pc8401a(machine_config &config);
 	void pc8401a_video(machine_config &config);
+	void pc8401a_io(address_map &map);
+	void pc8401a_lcdc(address_map &map);
+	void pc8401a_mem(address_map &map);
+	void pc8500_io(address_map &map);
+	void pc8500_lcdc(address_map &map);
 };
 
 class pc8500_state : public pc8401a_state

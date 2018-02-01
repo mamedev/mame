@@ -46,6 +46,8 @@ public:
 	DECLARE_WRITE8_MEMBER(oki_bank_w);
 	void ggconnie(machine_config &config);
 
+	void sgx_io(address_map &map);
+	void sgx_mem(address_map &map);
 private:
 	required_device <msm6242_device> m_rtc;
 	required_device <okim6295_device> m_oki;
@@ -68,7 +70,7 @@ WRITE8_MEMBER(ggconnie_state::oki_bank_w)
 }
 
 
-static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8, ggconnie_state )
+ADDRESS_MAP_START(ggconnie_state::sgx_mem)
 	AM_RANGE( 0x000000, 0x17ffff) AM_ROM
 	AM_RANGE( 0x180000, 0x1edfff) AM_NOP
 	AM_RANGE( 0x1ee800, 0x1effff) AM_NOP
@@ -91,7 +93,7 @@ static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8, ggconnie_state )
 	AM_RANGE( 0x1ff400, 0x1ff7ff) AM_DEVREADWRITE("maincpu", h6280_device, irq_status_r, irq_status_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sgx_io , AS_IO, 8, ggconnie_state )
+ADDRESS_MAP_START(ggconnie_state::sgx_io)
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6202", huc6202_device, io_read, io_write )
 ADDRESS_MAP_END
 

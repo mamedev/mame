@@ -139,6 +139,9 @@ public:
 
 	void igt_gameking(machine_config &config);
 	void igt_ms72c(machine_config &config);
+	void igt_gameking_map(address_map &map);
+	void igt_ms72c_map(address_map &map);
+	void ramdac_map(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -222,8 +225,7 @@ WRITE8_MEMBER(igt_gameking_state::unk_w)
 }
 
 
-
-static ADDRESS_MAP_START( igt_gameking_map, AS_PROGRAM, 32, igt_gameking_state )
+ADDRESS_MAP_START(igt_gameking_state::igt_gameking_map)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x08000000, 0x081fffff) AM_ROM AM_REGION("game", 0)
 	AM_RANGE(0x08200000, 0x083fffff) AM_ROM AM_REGION("plx", 0)
@@ -286,7 +288,7 @@ READ8_MEMBER(igt_gameking_state::timer_r)
 	return m_timer_count++;
 }
 
-static ADDRESS_MAP_START( igt_ms72c_map, AS_PROGRAM, 32, igt_gameking_state )
+ADDRESS_MAP_START(igt_gameking_state::igt_ms72c_map)
 	AM_IMPORT_FROM( igt_gameking_map )
 	AM_RANGE(0x18200000, 0x18200003) AM_READ16(version_r, 0x0000ffff)
 	AM_RANGE(0x28040038, 0x2804003b) AM_READ8(timer_r,0x00ff0000)
@@ -566,7 +568,7 @@ static GFXDECODE_START( igt_gameking )
 	GFXDECODE_ENTRY( "cg", 0, igt_gameking_layout,   0x0, 1  )
 GFXDECODE_END
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, igt_gameking_state )
+ADDRESS_MAP_START(igt_gameking_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

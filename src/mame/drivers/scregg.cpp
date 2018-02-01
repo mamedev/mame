@@ -75,6 +75,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
 	void scregg(machine_config &config);
 	void dommy(machine_config &config);
+	void dommy_map(address_map &map);
+	void eggs_map(address_map &map);
 };
 
 
@@ -97,7 +99,7 @@ READ8_MEMBER(scregg_state::scregg_irqack_r)
 }
 
 
-static ADDRESS_MAP_START( dommy_map, AS_PROGRAM, 8, scregg_state )
+ADDRESS_MAP_START(scregg_state::dommy_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_SHARE("colorram")
@@ -112,7 +114,7 @@ static ADDRESS_MAP_START( dommy_map, AS_PROGRAM, 8, scregg_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( eggs_map, AS_PROGRAM, 8, scregg_state )
+ADDRESS_MAP_START(scregg_state::eggs_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram")

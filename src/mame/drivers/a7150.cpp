@@ -95,6 +95,11 @@ public:
 	required_device<address_map_bank_device> m_video_bankdev;
 	required_device<palette_device> m_palette;
 	void a7150(machine_config &config);
+	void a7150_io(address_map &map);
+	void a7150_mem(address_map &map);
+	void k7070_cpu_banked(address_map &map);
+	void k7070_cpu_io(address_map &map);
+	void k7070_cpu_mem(address_map &map);
 };
 
 
@@ -276,13 +281,13 @@ WRITE8_MEMBER(a7150_state::a7150_kgs_w)
 }
 
 
-static ADDRESS_MAP_START(a7150_mem, AS_PROGRAM, 16, a7150_state)
+ADDRESS_MAP_START(a7150_state::a7150_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0xf7fff) AM_RAM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(a7150_io, AS_IO, 16, a7150_state)
+ADDRESS_MAP_START(a7150_state::a7150_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x004a, 0x004b) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff) // KES board
 	AM_RANGE(0x00c0, 0x00c3) AM_DEVREADWRITE8("pic8259", pic8259_device, read, write, 0x00ff)
@@ -295,7 +300,7 @@ static ADDRESS_MAP_START(a7150_io, AS_IO, 16, a7150_state)
 	AM_RANGE(0x0320, 0x033f) AM_UNMAP // ASP board #2
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(k7070_cpu_banked, AS_PROGRAM, 8, a7150_state)
+ADDRESS_MAP_START(a7150_state::k7070_cpu_banked)
 	ADDRESS_MAP_UNMAP_HIGH
 	// default map: IML=0, MSEL=0.  ROM + local RAM.
 	AM_RANGE(0x00000, 0x01fff) AM_ROM AM_REGION("user2", 0)
@@ -314,13 +319,13 @@ static ADDRESS_MAP_START(k7070_cpu_banked, AS_PROGRAM, 8, a7150_state)
 	AM_RANGE(0x38000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(k7070_cpu_mem, AS_PROGRAM, 8, a7150_state)
+ADDRESS_MAP_START(a7150_state::k7070_cpu_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_DEVREADWRITE("video_bankdev", address_map_bank_device, read8, write8)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(k7070_cpu_io, AS_IO, 8, a7150_state)
+ADDRESS_MAP_START(a7150_state::k7070_cpu_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x0003) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)

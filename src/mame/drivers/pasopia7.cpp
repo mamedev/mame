@@ -91,6 +91,8 @@ public:
 	void p7_base(machine_config &config);
 	void p7_lcd(machine_config &config);
 	void p7_raster(machine_config &config);
+	void pasopia7_io(address_map &map);
+	void pasopia7_mem(address_map &map);
 private:
 	uint8_t m_vram_sel;
 	uint8_t m_mio_sel;
@@ -696,7 +698,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 	}
 }
 
-static ADDRESS_MAP_START(pasopia7_mem, AS_PROGRAM, 8, pasopia7_state)
+ADDRESS_MAP_START(pasopia7_state::pasopia7_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x7fff ) AM_WRITE( ram_bank_w )
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROMBANK("bank1")
@@ -705,7 +707,7 @@ static ADDRESS_MAP_START(pasopia7_mem, AS_PROGRAM, 8, pasopia7_state)
 	AM_RANGE( 0xc000, 0xffff ) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(pasopia7_io, AS_IO, 8, pasopia7_state)
+ADDRESS_MAP_START(pasopia7_state::pasopia7_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xffff) AM_READWRITE( pasopia7_io_r, pasopia7_io_w )
 ADDRESS_MAP_END

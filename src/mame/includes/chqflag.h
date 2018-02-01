@@ -47,6 +47,9 @@ public:
 	K051960_CB_MEMBER(sprite_callback);
 	uint32_t screen_update_chqflag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void chqflag(machine_config &config);
+	void bank1000_map(address_map &map);
+	void chqflag_map(address_map &map);
+	void chqflag_sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

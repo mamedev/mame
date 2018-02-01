@@ -65,7 +65,7 @@ RSSENGO2.72   chr.
 #include "speaker.h"
 
 
-class sengokmj_state : public driver_device
+class sengokmj_state : public driver_device, protected seibu_sound_common
 {
 public:
 	sengokmj_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -123,6 +123,8 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sengokmj(machine_config &config);
+	void sengokmj_io_map(address_map &map);
+	void sengokmj_map(address_map &map);
 };
 
 
@@ -388,7 +390,7 @@ READ16_MEMBER(sengokmj_state::system_r)
 	return (ioport("SYSTEM")->read() & 0xffbf) | m_hopper_io;
 }
 
-static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16, sengokmj_state )
+ADDRESS_MAP_START(sengokmj_state::sengokmj_map)
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
 	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(seibucrtc_sc0vram_w) AM_SHARE("sc0_vram")
@@ -400,7 +402,7 @@ static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16, sengokmj_state )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sengokmj_io_map, AS_IO, 16, sengokmj_state )
+ADDRESS_MAP_START(sengokmj_state::sengokmj_io_map)
 	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
 	/*Areas from 8000-804f are for the custom Seibu CRTC.*/
 	AM_RANGE(0x8000, 0x804f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)

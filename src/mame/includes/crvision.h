@@ -66,6 +66,7 @@ public:
 
 	void creativision(machine_config &config);
 	void ntsc(machine_config &config);
+	void crvision_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 };
@@ -109,6 +110,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
 
 	void lasr2001(machine_config &config);
+	void lasr2001_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 };

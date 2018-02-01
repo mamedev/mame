@@ -299,11 +299,11 @@ WRITE8_MEMBER(pgm_state::z80_l3_w)
 
 /*** Z80 (sound CPU)**********************************************************/
 
-ADDRESS_MAP_START( pgm_z80_mem, AS_PROGRAM, 8, pgm_state )
+ADDRESS_MAP_START(pgm_state::pgm_z80_mem)
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("z80_mainram")
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( pgm_z80_io, AS_IO, 8, pgm_state )
+ADDRESS_MAP_START(pgm_state::pgm_z80_io)
 	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("ics", ics2115_device, read, write)
 	AM_RANGE(0x8100, 0x81ff) AM_DEVREAD("soundlatch3", generic_latch_8_device, read) AM_WRITE(z80_l3_w)
 	AM_RANGE(0x8200, 0x82ff) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, write)
@@ -312,7 +312,7 @@ ADDRESS_MAP_END
 
 /*** 68000 (main CPU) + variants for protection devices **********************/
 
-ADDRESS_MAP_START( pgm_base_mem, AS_PROGRAM, 16, pgm_state )
+ADDRESS_MAP_START(pgm_state::pgm_base_mem)
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_SHARE("sram") /* Main Ram */
@@ -336,12 +336,12 @@ ADDRESS_MAP_START( pgm_base_mem, AS_PROGRAM, 16, pgm_state )
 	AM_RANGE(0xc10000, 0xc1ffff) AM_READWRITE(z80_ram_r, z80_ram_w) /* Z80 Program */
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( pgm_mem, AS_PROGRAM, 16, pgm_state )
+ADDRESS_MAP_START(pgm_state::pgm_mem)
 	AM_IMPORT_FROM(pgm_base_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM   /* BIOS ROM */
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( pgm_basic_mem, AS_PROGRAM, 16, pgm_state )
+ADDRESS_MAP_START(pgm_state::pgm_basic_mem)
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK("bank1") /* Game ROM */
 ADDRESS_MAP_END

@@ -176,6 +176,9 @@ public:
 	void pal(machine_config &config);
 	void ntsc(machine_config &config);
 	void pet64(machine_config &config);
+	void c64_mem(address_map &map);
+	void vic_colorram_map(address_map &map);
+	void vic_videoram_map(address_map &map);
 };
 
 
@@ -533,7 +536,7 @@ READ8_MEMBER( c64_state::vic_colorram_r )
 //  ADDRESS_MAP( c64_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c64_mem, AS_PROGRAM, 8, c64_state )
+ADDRESS_MAP_START(c64_state::c64_mem)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -542,7 +545,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_videoram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_videoram_map, 0, 8, c64_state )
+ADDRESS_MAP_START(c64_state::vic_videoram_map)
 	AM_RANGE(0x0000, 0x3fff) AM_READ(vic_videoram_r)
 ADDRESS_MAP_END
 
@@ -551,7 +554,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( vic_colorram_map )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( vic_colorram_map, 1, 8, c64_state )
+ADDRESS_MAP_START(c64_state::vic_colorram_map)
 	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
 ADDRESS_MAP_END
 

@@ -53,6 +53,7 @@ public:
 	// input and output
 	void control_w(uint8_t data);
 
+	void pr8210_portmap(address_map &map);
 protected:
 	// timer IDs
 	enum
@@ -150,6 +151,7 @@ public:
 	// external controls
 	void set_external_audio_squelch(int state);
 
+	void simutrek_portmap(address_map &map);
 protected:
 	// timer IDs
 	enum

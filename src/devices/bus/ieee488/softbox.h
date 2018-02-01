@@ -37,6 +37,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER( dbrg_w );
 
+	void softbox_io(address_map &map);
+	void softbox_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -54,6 +54,7 @@ public:
 	DECLARE_MACHINE_RESET(votrtnt);
 
 	void votrtnt(machine_config &config);
+	void _6802_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<votrax_sc01_device> m_votrax;
@@ -79,7 +80,7 @@ private:
       x   1   1   x     *   *   *   *     *   *   *   *     *   *   *   *    R  ROM (2332 4kx8 Mask ROM, inside potted brick)
 */
 
-static ADDRESS_MAP_START(6802_mem, AS_PROGRAM, 8, votrtnt_state)
+ADDRESS_MAP_START(votrtnt_state::_6802_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x9c00) AM_RAM /* RAM, 2114*2 (0x400 bytes) mirrored 4x */
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x9ffe) AM_DEVREADWRITE("acia", acia6850_device, read, write)
@@ -136,7 +137,7 @@ MACHINE_RESET_MEMBER( votrtnt_state, votrtnt )
 MACHINE_CONFIG_START(votrtnt_state::votrtnt)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, XTAL(2'457'600))  /* 2.4576MHz XTAL, verified; divided by 4 inside the m6802*/
-	MCFG_CPU_PROGRAM_MAP(6802_mem)
+	MCFG_CPU_PROGRAM_MAP(_6802_mem)
 
 	MCFG_MACHINE_RESET_OVERRIDE(votrtnt_state, votrtnt)
 

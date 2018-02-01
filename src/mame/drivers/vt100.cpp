@@ -73,12 +73,16 @@ public:
 	void vt102(machine_config &config);
 	void vt100(machine_config &config);
 	void vt180(machine_config &config);
+	void vt100_io(address_map &map);
+	void vt100_mem(address_map &map);
+	void vt180_io(address_map &map);
+	void vt180_mem(address_map &map);
 };
 
 
 
 
-static ADDRESS_MAP_START(vt100_mem, AS_PROGRAM, 8, vt100_state)
+ADDRESS_MAP_START(vt100_state::vt100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM ( 4 * 2K)
 	AM_RANGE( 0x2000, 0x2bff ) AM_RAM AM_SHARE("p_ram") // Screen and scratch RAM
@@ -90,13 +94,13 @@ static ADDRESS_MAP_START(vt100_mem, AS_PROGRAM, 8, vt100_state)
 	// 0xc000, 0xffff is unassigned
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vt180_mem, AS_PROGRAM, 8, vt100_state)
+ADDRESS_MAP_START(vt100_state::vt180_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM
 	AM_RANGE( 0x2000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(vt180_io, AS_IO, 8, vt100_state)
+ADDRESS_MAP_START(vt100_state::vt180_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
@@ -153,7 +157,7 @@ WRITE8_MEMBER( vt100_state::vt100_nvr_latch_w )
 	m_nvr->data_w(BIT(data, 2) ? 0 : !BIT(data, 0));
 }
 
-static ADDRESS_MAP_START(vt100_io, AS_IO, 8, vt100_state)
+ADDRESS_MAP_START(vt100_state::vt100_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// 0x00, 0x01 PUSART  (Intel 8251)

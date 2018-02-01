@@ -55,6 +55,7 @@ public:
 
 	uint32_t screen_update_calcune(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void calcune(machine_config &config);
+	void calcune_map(address_map &map);
 private:
 	int vdp_state;
 
@@ -122,7 +123,7 @@ WRITE16_MEMBER(calcune_state::cal_vdp_w)
 		m_vdp2->vdp_w(space, offset, data, mem_mask);
 }
 
-static ADDRESS_MAP_START( calcune_map, AS_PROGRAM, 16, calcune_state )
+ADDRESS_MAP_START(calcune_state::calcune_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x700000, 0x700001) AM_READ(cal_700000_r)

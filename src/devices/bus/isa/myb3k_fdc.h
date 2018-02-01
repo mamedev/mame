@@ -53,7 +53,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(myb3k_inv_fdc_data_w);
 	DECLARE_READ8_MEMBER(myb3k_fdc_status);
 	DECLARE_WRITE8_MEMBER(myb3k_fdc_command);
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	required_device<mb8876_device> m_fdc;
 	required_device<floppy_connector> m_fdd0;
@@ -91,7 +91,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(myb3k_inv_fdc_data_w);
 	DECLARE_READ8_MEMBER(myb3k_fdc_status);
 	DECLARE_WRITE8_MEMBER(myb3k_fdc_command);
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	required_device<fd1791_device> m_fdc;
 	required_device<floppy_connector> m_fdd0;

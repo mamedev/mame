@@ -61,6 +61,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(togglekey_changed);
 
 	void hp9845_base(machine_config &config);
+	void global_mem_map(address_map &map);
+	void ppu_io_map(address_map &map);
 protected:
 	required_device<hp_5061_3001_cpu_device> m_lpu;
 	required_device<hp_5061_3001_cpu_device> m_ppu;

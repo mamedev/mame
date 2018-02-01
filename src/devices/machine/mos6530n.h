@@ -320,9 +320,9 @@ public:
 	// construction/destruction
 	mos6530_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(rom_map, 8);
-	virtual DECLARE_ADDRESS_MAP(ram_map, 8);
-	virtual DECLARE_ADDRESS_MAP(io_map, 8);
+	virtual void rom_map(address_map &map);
+	virtual void ram_map(address_map &map);
+	virtual void io_map(address_map &map);
 
 protected:
 	// device-level overrides
@@ -340,8 +340,8 @@ public:
 	// construction/destruction
 	mos6532_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(ram_map, 8);
-	virtual DECLARE_ADDRESS_MAP(io_map, 8);
+	virtual void ram_map(address_map &map);
+	virtual void io_map(address_map &map);
 
 	// is there a better way to access the memory map when not using AM_DEVICE?
 	DECLARE_READ8_MEMBER(io_r);

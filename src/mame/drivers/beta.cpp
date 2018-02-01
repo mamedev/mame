@@ -97,12 +97,13 @@ public:
 	emu_timer *m_led_refresh_timer;
 	TIMER_CALLBACK_MEMBER(led_refresh);
 	void beta(machine_config &config);
+	void beta_mem(address_map &map);
 };
 
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( beta_mem, AS_PROGRAM, 8, beta_state )
+ADDRESS_MAP_START(beta_state::beta_mem)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_new_device, ram_map)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x7f00) AM_DEVICE(M6532_TAG, mos6532_new_device, io_map)
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x7800) AM_ROM

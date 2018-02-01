@@ -161,7 +161,7 @@ DEFINE_DEVICE_TYPE(VME_FCISIO1, vme_fcisio1_card_device, "fcisio1", "Force Compu
 #define CPU_CLOCK XTAL(20'000'000) /* HCJ */
 #define DUSCC_CLOCK XTAL(14'745'600) /* HCJ */
 
-static ADDRESS_MAP_START (fcisio1_mem, AS_PROGRAM, 16, vme_fcisio1_card_device)
+ADDRESS_MAP_START(vme_fcisio1_card_device::fcisio1_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x000000, 0x01ffff) AM_RAM /* SRAM */
 	AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ (bootvect_r)       /* Vectors mapped from System EPROM */

@@ -22,7 +22,7 @@ const tiny_rom_entry *pcd_keyboard_device::device_rom_region() const
 	return ROM_NAME( pcd_keyboard );
 }
 
-static ADDRESS_MAP_START( pcd_keyboard_map, AS_PROGRAM, 8, pcd_keyboard_device )
+ADDRESS_MAP_START(pcd_keyboard_device::pcd_keyboard_map)
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 

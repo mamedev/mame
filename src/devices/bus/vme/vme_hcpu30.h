@@ -23,6 +23,7 @@ public:
 	DECLARE_READ32_MEMBER(bootvect_r);
 	DECLARE_WRITE32_MEMBER(bootvect_w);
 
+	void hcpu30_mem(address_map &map);
 protected:
 	vme_hcpu30_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 

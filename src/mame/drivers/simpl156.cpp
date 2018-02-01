@@ -221,7 +221,7 @@ WRITE32_MEMBER(simpl156_state::simpl156_pf2_rowscroll_w)
 /* Memory Map controled by PALs */
 
 /* Joe and Mac Returns */
-static ADDRESS_MAP_START( joemacr_map, AS_PROGRAM, 32, simpl156_state )
+ADDRESS_MAP_START(simpl156_state::joemacr_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_SHARE("mainram") // main ram
@@ -243,7 +243,7 @@ ADDRESS_MAP_END
 
 
 /* Chain Reaction */
-static ADDRESS_MAP_START( chainrec_map, AS_PROGRAM, 32, simpl156_state )
+ADDRESS_MAP_START(simpl156_state::chainrec_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM // rom (32-bit)
 	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("IN0")
@@ -265,7 +265,7 @@ ADDRESS_MAP_END
 
 
 /* Magical Drop */
-static ADDRESS_MAP_START( magdrop_map, AS_PROGRAM, 32, simpl156_state )
+ADDRESS_MAP_START(simpl156_state::magdrop_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("IN0")
@@ -287,7 +287,7 @@ ADDRESS_MAP_END
 
 
 /* Magical Drop Plus 1 */
-static ADDRESS_MAP_START( magdropp_map, AS_PROGRAM, 32, simpl156_state )
+ADDRESS_MAP_START(simpl156_state::magdropp_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("IN0")
@@ -309,7 +309,7 @@ ADDRESS_MAP_END
 
 
 /* Mitchell MT5601-0 PCB (prtytime, charlien, osman) */
-static ADDRESS_MAP_START( mitchell156_map, AS_PROGRAM, 32, simpl156_state )
+ADDRESS_MAP_START(simpl156_state::mitchell156_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8("okisfx", okim6295_device, read, write, 0x000000ff)

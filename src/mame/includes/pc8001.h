@@ -77,6 +77,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 	UPD3301_DRAW_CHARACTER_MEMBER( pc8001_display_pixels );
 	void pc8001(machine_config &config);
+	void pc8001_io(address_map &map);
+	void pc8001_mem(address_map &map);
 };
 
 class pc8001mk2_state : public pc8001_state
@@ -91,6 +93,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER( port31_w );
 	void pc8001mk2(machine_config &config);
+	void pc8001mk2_io(address_map &map);
+	void pc8001mk2_mem(address_map &map);
 };
 
 #endif

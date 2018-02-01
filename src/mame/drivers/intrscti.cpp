@@ -40,6 +40,10 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_intrscti(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void intrscti(machine_config &config);
+	void intrscti_io_map(address_map &map);
+	void intrscti_map(address_map &map);
+	void intrscti_sub_io_map(address_map &map);
+	void intrscti_sub_map(address_map &map);
 };
 
 void intrscti_state::video_start()
@@ -81,27 +85,27 @@ uint32_t intrscti_state::screen_update_intrscti(screen_device &screen, bitmap_in
 }
 
 
-static ADDRESS_MAP_START( intrscti_map, AS_PROGRAM, 8, intrscti_state )
+ADDRESS_MAP_START(intrscti_state::intrscti_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x8000, 0x8fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( intrscti_io_map, AS_IO, 8, intrscti_state )
+ADDRESS_MAP_START(intrscti_state::intrscti_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( intrscti_sub_map, AS_PROGRAM, 8, intrscti_state )
+ADDRESS_MAP_START(intrscti_state::intrscti_sub_map)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 //  AM_RANGE(0x0000, 0xffff) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( intrscti_sub_io_map, AS_IO, 8, intrscti_state )
+ADDRESS_MAP_START(intrscti_state::intrscti_sub_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0xff) AM_NOP
 ADDRESS_MAP_END

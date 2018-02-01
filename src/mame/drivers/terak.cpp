@@ -31,6 +31,7 @@ public:
 	uint32_t screen_update_terak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void terak(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	uint8_t m_unit;
 	uint8_t m_cmd;
@@ -68,7 +69,7 @@ WRITE16_MEMBER( terak_state::terak_fdc_data_w )
 	logerror("terak_fdc_data_w %04x\n",data);
 }
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, terak_state)
+ADDRESS_MAP_START(terak_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000,  0xf5ff ) AM_RAM // RAM
 

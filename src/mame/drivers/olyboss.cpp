@@ -71,6 +71,8 @@ public:
 	DECLARE_READ8_MEMBER( dma_mem_r );
 	
 	void olybossd(machine_config &config);
+	void olyboss_io(address_map &map);
+	void olyboss_mem(address_map &map);
 	
 private:
 	required_device<cpu_device> m_maincpu;
@@ -89,14 +91,14 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START(olyboss_mem, AS_PROGRAM, 8, olyboss_state)
+ADDRESS_MAP_START(olyboss_state::olyboss_mem)
 	AM_RANGE(0x0000, 0x7ff ) AM_ROM AM_REGION("mainrom", 0)
 	AM_RANGE(0x800,  0xbffd) AM_RAM
 	AM_RANGE(0xbffe, 0xbfff) AM_READ(keyboard_read)
 	AM_RANGE(0xc000,  0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(olyboss_io, AS_IO, 8, olyboss_state)
+ADDRESS_MAP_START(olyboss_state::olyboss_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0, 0x8) AM_DEVREADWRITE(I8257_TAG, i8257_device, read, write)

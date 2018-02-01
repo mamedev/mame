@@ -80,6 +80,10 @@ public:
 	void pce(machine_config &config);
 	void tg16(machine_config &config);
 	void sgx(machine_config &config);
+	void pce_io(address_map &map);
+	void pce_mem(address_map &map);
+	void sgx_io(address_map &map);
+	void sgx_mem(address_map &map);
 };
 
 #endif // MAME_INCLUDES_PCE_H

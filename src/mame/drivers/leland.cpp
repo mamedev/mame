@@ -82,7 +82,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map_program, AS_PROGRAM, 8, leland_state )
+ADDRESS_MAP_START(leland_state::master_map_program)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE(leland_battery_ram_w) AM_SHARE("battery")
@@ -91,13 +91,13 @@ static ADDRESS_MAP_START( master_map_program, AS_PROGRAM, 8, leland_state )
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_master_video_addr_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_map_io, AS_IO, 8, leland_state )
+ADDRESS_MAP_START(leland_state::master_map_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(leland_master_alt_bankswitch_w)
 	AM_RANGE(0xfd, 0xff) AM_READWRITE(leland_master_analog_key_r, leland_master_analog_key_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_redline_map_io, AS_IO, 8, leland_state )
+ADDRESS_MAP_START(leland_state::master_redline_map_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(leland_master_alt_bankswitch_w)
 	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("custom", leland_80186_sound_device, leland_80186_response_r, leland_80186_command_lo_w)
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( master_redline_map_io, AS_IO, 8, leland_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( master_map_program_2, AS_PROGRAM, 8, leland_state )
+ADDRESS_MAP_START(leland_state::master_map_program_2)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE(ataxx_battery_ram_w) AM_SHARE("battery")
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( master_map_program_2, AS_PROGRAM, 8, leland_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( master_map_io_2, AS_IO, 8, leland_state )
+ADDRESS_MAP_START(leland_state::master_map_io_2)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("custom", leland_80186_sound_device, leland_80186_response_r)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE("custom", leland_80186_sound_device, leland_80186_command_hi_w)
@@ -134,7 +134,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( slave_small_map_program, AS_PROGRAM, 8, leland_state )
+ADDRESS_MAP_START(leland_state::slave_small_map_program)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0xdfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( slave_small_map_program, AS_PROGRAM, 8, leland_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slave_large_map_program, AS_PROGRAM, 8, leland_state )
+ADDRESS_MAP_START(leland_state::slave_large_map_program)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(leland_slave_large_banksw_w)
@@ -154,14 +154,14 @@ static ADDRESS_MAP_START( slave_large_map_program, AS_PROGRAM, 8, leland_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slave_map_io, AS_IO, 8, leland_state )
+ADDRESS_MAP_START(leland_state::slave_map_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_READWRITE(leland_svram_port_r, leland_svram_port_w)
 	AM_RANGE(0x40, 0x5f) AM_READWRITE(leland_svram_port_r, leland_svram_port_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slave_map_program, AS_PROGRAM, 8, leland_state )
+ADDRESS_MAP_START(leland_state::slave_map_program)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank3")
 	AM_RANGE(0xa000, 0xdfff) AM_ROM
@@ -172,11 +172,59 @@ static ADDRESS_MAP_START( slave_map_program, AS_PROGRAM, 8, leland_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slave_map_io_2, AS_IO, 8, leland_state )
+ADDRESS_MAP_START(leland_state::slave_map_io_2)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x60, 0x7f) AM_READWRITE(ataxx_svram_port_r, ataxx_svram_port_w)
 ADDRESS_MAP_END
 
+/*************************************
+ *
+ *  Sound CPU memory handlers
+ *
+ *************************************/
+
+ADDRESS_MAP_START(leland_state::leland_80186_map_program)
+	AM_RANGE(0x00000, 0x03fff) AM_MIRROR(0x1c000) AM_RAM
+	AM_RANGE(0x20000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(leland_state::ataxx_80186_map_io)
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START(leland_state::redline_80186_map_io)
+	AM_RANGE(0x0000, 0xffff) AM_DEVWRITE("custom", redline_80186_sound_device, redline_dac_w)
+ADDRESS_MAP_END
+
+
+ADDRESS_MAP_START(leland_state::leland_80186_map_io)
+	AM_RANGE(0x0000, 0xffff) AM_DEVWRITE("custom", leland_80186_sound_device, dac_w)
+ADDRESS_MAP_END
+
+
+/************************************************************************
+
+Memory configurations:
+
+    Redline Racer:
+        FFDF7:80186 upper chip select = E03C        -> E0000-FFFFF, 128k long
+        FFDF7:80186 lower chip select = 00FC        -> 00000-00FFF, 4k long
+        FFDF7:80186 peripheral chip select = 013C   -> 01000, 01080, 01100, 01180, 01200, 01280, 01300
+        FFDF7:80186 middle chip select = 81FC       -> 80000-C0000, 64k chunks, 256k total
+        FFDF7:80186 middle P chip select = A0FC
+
+    Quarterback, Team Quarterback, AAFB, Super Offroad, Track Pack, Pigout, Viper:
+        FFDFA:80186 upper chip select = E03C        -> E0000-FFFFF, 128k long
+        FFDFA:80186 peripheral chip select = 203C   -> 20000, 20080, 20100, 20180, 20200, 20280, 20300
+        FFDFA:80186 middle chip select = 01FC       -> 00000-7FFFF, 128k chunks, 512k total
+        FFDFA:80186 middle P chip select = C0FC
+
+    Ataxx, Indy Heat, World Soccer Finals:
+        FFD9D:80186 upper chip select = E03C        -> E0000-FFFFF, 128k long
+        FFD9D:80186 peripheral chip select = 043C   -> 04000, 04080, 04100, 04180, 04200, 04280, 04300
+        FFD9D:80186 middle chip select = 01FC       -> 00000-7FFFF, 128k chunks, 512k total
+        FFD9D:80186 middle P chip select = C0BC
+
+************************************************************************/
 
 
 /*************************************

@@ -155,7 +155,7 @@ WRITE16_MEMBER(realbrk_state::backup_ram_w)
 ***************************************************************************/
 
 /*Basic memory map for this HW*/
-static ADDRESS_MAP_START( base_mem, AS_PROGRAM, 16, realbrk_state )
+ADDRESS_MAP_START(realbrk_state::base_mem)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM                                         // ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM                   AM_SHARE("spriteram") // Sprites
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")   // Palette
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( base_mem, AS_PROGRAM, 16, realbrk_state )
 ADDRESS_MAP_END
 
 /*realbrk specific memory map*/
-static ADDRESS_MAP_START( realbrk_mem, AS_PROGRAM, 16, realbrk_state )
+ADDRESS_MAP_START(realbrk_state::realbrk_mem)
 	AM_IMPORT_FROM(base_mem)
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff) //
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")                            // P1 & P2 (Inputs)
@@ -180,7 +180,7 @@ static ADDRESS_MAP_START( realbrk_mem, AS_PROGRAM, 16, realbrk_state )
 ADDRESS_MAP_END
 
 /*pkgnsh specific memory map*/
-static ADDRESS_MAP_START( pkgnsh_mem, AS_PROGRAM, 16, realbrk_state )
+ADDRESS_MAP_START(realbrk_state::pkgnsh_mem)
 	AM_IMPORT_FROM(base_mem)
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)   // YM2413
 	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnsh_input_r             )   // P1 & P2 (Inputs)
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( pkgnsh_mem, AS_PROGRAM, 16, realbrk_state )
 ADDRESS_MAP_END
 
 /*pkgnshdx specific memory map*/
-static ADDRESS_MAP_START( pkgnshdx_mem, AS_PROGRAM, 16, realbrk_state )
+ADDRESS_MAP_START(realbrk_state::pkgnshdx_mem)
 	AM_IMPORT_FROM(base_mem)
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0x00ff) //
 	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnshdx_input_r               )   // P1 & P2 (Inputs)
@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( pkgnshdx_mem, AS_PROGRAM, 16, realbrk_state )
 ADDRESS_MAP_END
 
 /*dai2kaku specific memory map*/
-static ADDRESS_MAP_START( dai2kaku_mem, AS_PROGRAM, 16, realbrk_state )
+ADDRESS_MAP_START(realbrk_state::dai2kaku_mem)
 	AM_IMPORT_FROM(base_mem)
 	AM_RANGE(0x605000, 0x6053ff) AM_RAM AM_SHARE("vram_0ras")   // rasterinfo   (0)
 	AM_RANGE(0x605400, 0x6057ff) AM_RAM AM_SHARE("vram_1ras")   // rasterinfo   (1)

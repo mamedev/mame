@@ -69,4 +69,8 @@ public:
 	void tpp1(machine_config &config);
 	void tnx1(machine_config &config);
 	void popeyebl(machine_config &config);
+	void popeye_io_map(address_map &map);
+	void popeyebl_map(address_map &map);
+	void tnx1_map(address_map &map);
+	void tpp2_map(address_map &map);
 };

@@ -110,6 +110,7 @@ public:
 	DECLARE_DRIVER_INIT(megaphx);
 
 	void megaphx(machine_config &config);
+	void megaphx_68k_map(address_map &map);
 
 protected:
 	virtual void machine_reset() override;
@@ -150,7 +151,7 @@ void hamboy_state::machine_reset()
 	m_indervid->set_bpp(4);
 }
 
-static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
+ADDRESS_MAP_START(megaphx_state::megaphx_68k_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("boot", 0x00000) // or the rom doesn't map here? it contains the service mode grid amongst other things..
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("mainram") // maps over part of the rom??
 	AM_RANGE(0x040000, 0x040007) AM_DEVREADWRITE("inder_vid:tms", tms34010_device, host_r, host_w)

@@ -340,7 +340,7 @@ READ8_MEMBER(lethal_state::gunsaux_r)
 	return res;
 }
 
-static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
+ADDRESS_MAP_START(lethal_state::le_main)
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM             // work RAM
 	AM_RANGE(0x4000, 0x7fff) AM_DEVICE("bank4000", address_map_bank_device, amap8)
@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("maincpu", 0x38000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bank4000_map, AS_PROGRAM, 8, lethal_state )
+ADDRESS_MAP_START(lethal_state::bank4000_map)
 	// VRD = 0 or 1, CBNK = 0
 	AM_RANGE(0x0840, 0x084f) AM_MIRROR(0x8000) AM_DEVREADWRITE("k053244", k05324x_device, k053244_r, k053244_w)
 	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x8000) AM_DEVREADWRITE("k054000", k054000_device, read, write)
@@ -380,7 +380,7 @@ static ADDRESS_MAP_START( bank4000_map, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( le_sound, AS_PROGRAM, 8, lethal_state )
+ADDRESS_MAP_START(lethal_state::le_sound)
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)

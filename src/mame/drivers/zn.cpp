@@ -160,6 +160,29 @@ public:
 	void coh1002e(machine_config &config);
 	void coh3002c(machine_config &config);
 	void coh1002c(machine_config &config);
+	void atlus_snd_map(address_map &map);
+	void bam2_map(address_map &map);
+	void cbaj_z80_map(address_map &map);
+	void cbaj_z80_port_map(address_map &map);
+	void coh1000a_map(address_map &map);
+	void coh1000c_map(address_map &map);
+	void coh1000ta_map(address_map &map);
+	void coh1000tb_map(address_map &map);
+	void coh1000w_map(address_map &map);
+	void coh1001l_map(address_map &map);
+	void coh1002e_map(address_map &map);
+	void coh1002m_map(address_map &map);
+	void coh1002ml_link_map(address_map &map);
+	void coh1002ml_link_port_map(address_map &map);
+	void coh1002msnd_map(address_map &map);
+	void coh1002v_map(address_map &map);
+	void fx1a_sound_map(address_map &map);
+	void jdredd_map(address_map &map);
+	void nbajamex_map(address_map &map);
+	void psarc_snd_map(address_map &map);
+	void qsound_map(address_map &map);
+	void qsound_portmap(address_map &map);
+	void zn_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -324,7 +347,7 @@ WRITE8_MEMBER(zn_state::coin_w)
 	}
 }
 
-static ADDRESS_MAP_START( zn_map, AS_PROGRAM, 32, zn_state )
+ADDRESS_MAP_START(zn_state::zn_map)
 	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
 	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
 	AM_RANGE(0x1fa00200, 0x1fa00203) AM_READ_PORT("SERVICE")
@@ -569,7 +592,7 @@ WRITE8_MEMBER(zn_state::zn_qsound_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START(coh1000c_map, AS_PROGRAM, 32, zn_state)
+ADDRESS_MAP_START(zn_state::coh1000c_map)
 	AM_IMPORT_FROM(zn_map)
 
 	AM_RANGE(0x1f000000, 0x1f3fffff) AM_ROM AM_REGION("maskroms", 0)
@@ -595,7 +618,7 @@ MACHINE_RESET_MEMBER(zn_state,glpracr)
 	MACHINE_RESET_CALL_MEMBER(coh1000c);
 }
 
-static ADDRESS_MAP_START( qsound_map, AS_PROGRAM, 8, zn_state )
+ADDRESS_MAP_START(zn_state::qsound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")       /* banked (contains music data) */
 	AM_RANGE(0xd000, 0xd002) AM_DEVWRITE("qsound", qsound_device, qsound_w)
@@ -604,7 +627,7 @@ static ADDRESS_MAP_START( qsound_map, AS_PROGRAM, 8, zn_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qsound_portmap, AS_IO, 8, zn_state )
+ADDRESS_MAP_START(zn_state::qsound_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
@@ -1036,7 +1059,7 @@ WRITE8_MEMBER(zn_state::fx1a_sound_bankswitch_w)
 	m_soundbank->set_entry( ( data - 1 ) & 0x07 );
 }
 
-static ADDRESS_MAP_START(coh1000ta_map, AS_PROGRAM, 32, zn_state)
+ADDRESS_MAP_START(zn_state::coh1000ta_map)
 	AM_IMPORT_FROM(zn_map)
 
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
@@ -1054,7 +1077,7 @@ MACHINE_RESET_MEMBER(zn_state,coh1000ta)
 	m_soundbank->set_entry( 0 );
 }
 
-static ADDRESS_MAP_START( fx1a_sound_map, AS_PROGRAM, 8, zn_state )
+ADDRESS_MAP_START(zn_state::fx1a_sound_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -1100,7 +1123,7 @@ READ8_MEMBER(zn_state::fx1b_fram_r)
 	return m_fx1b_fram[offset];
 }
 
-static ADDRESS_MAP_START(coh1000tb_map, AS_PROGRAM, 32, zn_state)
+ADDRESS_MAP_START(zn_state::coh1000tb_map)
 	AM_IMPORT_FROM(zn_map)
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fb00000, 0x1fb003ff) AM_READWRITE8(fx1b_fram_r, fx1b_fram_w, 0x00ff00ff)
@@ -1382,7 +1405,7 @@ DRIVER_INIT_MEMBER(zn_state,primrag2)
 	save_item(NAME(m_vt83c461_latch));
 }
 
-static ADDRESS_MAP_START(coh1000w_map, AS_PROGRAM, 32, zn_state)
+ADDRESS_MAP_START(zn_state::coh1000w_map)
 	AM_IMPORT_FROM(zn_map)
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x1f000000, 0x1f000003) AM_WRITENOP
@@ -1564,7 +1587,7 @@ WRITE8_MEMBER(zn_state::coh1002e_sound_irq_w)
 	m_audiocpu->set_input_line(2, HOLD_LINE); // irq 2 on the 68k
 }
 
-static ADDRESS_MAP_START(coh1002e_map, AS_PROGRAM, 32, zn_state)
+ADDRESS_MAP_START(zn_state::coh1002e_map)
 	AM_IMPORT_FROM(zn_map)
 
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
@@ -1579,7 +1602,7 @@ MACHINE_RESET_MEMBER(zn_state,coh1002e)
 	m_bankedroms->set_entry( 0 );
 }
 
-static ADDRESS_MAP_START( psarc_snd_map, AS_PROGRAM, 16, zn_state )
+ADDRESS_MAP_START(zn_state::psarc_snd_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_RAM
 	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8("ymf", ymf271_device, read, write, 0x00ff )
@@ -1700,7 +1723,7 @@ READ16_MEMBER(zn_state::bam2_unk_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START(bam2_map, AS_PROGRAM, 32, zn_state)
+ADDRESS_MAP_START(zn_state::bam2_map)
 	AM_IMPORT_FROM(zn_map)
 
 	AM_RANGE(0x1f000000, 0x1f3fffff) AM_ROM AM_REGION("bankedroms", 0)
@@ -2005,13 +2028,13 @@ WRITE8_MEMBER(zn_state::nbajamex_backup_w)
 
 
 
-static ADDRESS_MAP_START(coh1000a_map, AS_PROGRAM, 32, zn_state)
+ADDRESS_MAP_START(zn_state::coh1000a_map)
 	AM_IMPORT_FROM(zn_map)
 	AM_RANGE(0x1fbfff00, 0x1fbfff03) AM_WRITE16(acpsx_00_w, 0xffffffff)
 	AM_RANGE(0x1fbfff10, 0x1fbfff13) AM_WRITE16(acpsx_10_w, 0xffff0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(nbajamex_map, AS_PROGRAM, 32, zn_state)
+ADDRESS_MAP_START(zn_state::nbajamex_map)
 	AM_IMPORT_FROM(coh1000a_map)
 
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROMBANK("bankedroms")
@@ -2042,7 +2065,7 @@ DRIVER_INIT_MEMBER(zn_state,jdredd)
 	save_item(NAME(m_jdredd_gun_mux));
 }
 
-static ADDRESS_MAP_START(jdredd_map, AS_PROGRAM, 32, zn_state)
+ADDRESS_MAP_START(zn_state::jdredd_map)
 	AM_IMPORT_FROM(coh1000a_map)
 
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROM AM_REGION("roms", 0)
@@ -2208,7 +2231,7 @@ WRITE8_MEMBER(zn_state::coh1001l_bank_w)
 	m_bankedroms->set_entry( data & 3 );
 }
 
-static ADDRESS_MAP_START(coh1001l_map, AS_PROGRAM, 32, zn_state)
+ADDRESS_MAP_START(zn_state::coh1001l_map)
 	AM_IMPORT_FROM(zn_map)
 
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
@@ -2222,7 +2245,7 @@ MACHINE_RESET_MEMBER(zn_state,coh1001l)
 	m_bankedroms->set_entry( 0 );
 }
 
-static ADDRESS_MAP_START( atlus_snd_map, AS_PROGRAM, 16, zn_state )
+ADDRESS_MAP_START(zn_state::atlus_snd_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREAD("soundlatch16", generic_latch_16_device, read) AM_WRITE(coh1001l_sound_unk_w)
 	AM_RANGE(0x200000, 0x200003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff)
@@ -2265,7 +2288,7 @@ WRITE8_MEMBER(zn_state::coh1002v_bank_w)
 	m_bankedroms->set_entry( data );
 }
 
-static ADDRESS_MAP_START(coh1002v_map, AS_PROGRAM, 32, zn_state)
+ADDRESS_MAP_START(zn_state::coh1002v_map)
 	AM_IMPORT_FROM(zn_map)
 	AM_RANGE(0x1f000000, 0x1f27ffff) AM_ROM AM_REGION("fixedroms", 0)
 	AM_RANGE(0x1fb00000, 0x1fbfffff) AM_ROMBANK("bankedroms")
@@ -2449,7 +2472,7 @@ WRITE8_MEMBER(zn_state::coh1002m_bank_w)
 	m_bankedroms->set_entry( data );
 }
 
-static ADDRESS_MAP_START(coh1002m_map, AS_PROGRAM, 32, zn_state)
+ADDRESS_MAP_START(zn_state::coh1002m_map)
 	AM_IMPORT_FROM(zn_map)
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fb00004, 0x1fb00007) AM_WRITE8(coh1002m_bank_w, 0x00ff0000)
@@ -2474,7 +2497,7 @@ READ8_MEMBER(zn_state::cbaj_sound_main_status_r)
 	return m_cbaj_fifo2->ef_r() << 1;
 }
 
-static ADDRESS_MAP_START(coh1002msnd_map, AS_PROGRAM, 32, zn_state)
+ADDRESS_MAP_START(zn_state::coh1002msnd_map)
 	AM_IMPORT_FROM(coh1002m_map)
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVREAD8("cbaj_fifo2", fifo7200_device, data_byte_r, 0x000000ff)
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVWRITE8("cbaj_fifo1", fifo7200_device, data_byte_w, 0x000000ff)
@@ -2487,12 +2510,12 @@ READ8_MEMBER(zn_state::cbaj_sound_z80_status_r)
 	return m_cbaj_fifo1->ef_r() << 1;
 }
 
-static ADDRESS_MAP_START( cbaj_z80_map, AS_PROGRAM, 8, zn_state )
+ADDRESS_MAP_START(zn_state::cbaj_z80_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cbaj_z80_port_map, AS_IO, 8, zn_state )
+ADDRESS_MAP_START(zn_state::cbaj_z80_port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x84, 0x85) AM_DEVREADWRITE("ymz", ymz280b_device, read, write)
 	AM_RANGE(0x90, 0x90) AM_DEVREAD("cbaj_fifo1", fifo7200_device, data_byte_r)
@@ -2500,12 +2523,12 @@ static ADDRESS_MAP_START( cbaj_z80_port_map, AS_IO, 8, zn_state )
 	AM_RANGE(0x91, 0x91) AM_READ(cbaj_sound_z80_status_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( coh1002ml_link_map, AS_PROGRAM, 8, zn_state )
+ADDRESS_MAP_START(zn_state::coh1002ml_link_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( coh1002ml_link_port_map, AS_IO, 8, zn_state )
+ADDRESS_MAP_START(zn_state::coh1002ml_link_port_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 

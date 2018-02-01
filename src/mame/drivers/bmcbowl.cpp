@@ -147,6 +147,8 @@ public:
 	uint32_t screen_update_bmcbowl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void init_stats(const uint8_t *table, int table_len, int address);
 	void bmcbowl(machine_config &config);
+	void bmcbowl_mem(address_map &map);
+	void ramdac_map(address_map &map);
 };
 
 
@@ -310,7 +312,7 @@ void bmcbowl_state::machine_reset()
 #endif
 }
 
-static ADDRESS_MAP_START( bmcbowl_mem, AS_PROGRAM, 16, bmcbowl_state )
+ADDRESS_MAP_START(bmcbowl_state::bmcbowl_mem)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
 	AM_RANGE(0x090000, 0x090001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
@@ -447,7 +449,7 @@ WRITE8_MEMBER(bmcbowl_state::input_mux_w)
 	m_bmc_input=data;
 }
 
-static ADDRESS_MAP_START( ramdac_map, 0, 8, bmcbowl_state )
+ADDRESS_MAP_START(bmcbowl_state::ramdac_map)
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

@@ -37,7 +37,7 @@ public:
 
 	// cpu
 	WRITE8_MEMBER( int2_w );
-	WRITE8_MEMBER( irq_ack_w );
+	WRITE8_MEMBER( irq_ack8_w );
 
 	// zorro slot
 	DECLARE_READ16_MEMBER( shared_ram_r );
@@ -71,6 +71,7 @@ public:
 	DECLARE_READ8_MEMBER( cia_r );
 	DECLARE_WRITE8_MEMBER( cia_w );
 
+	void iocpu_map(address_map &map);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;

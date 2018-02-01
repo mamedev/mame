@@ -134,6 +134,28 @@ public:
 	void racingb(machine_config &config);
 	void bsharkjjs(machine_config &config);
 	void enforce(machine_config &config);
+	void aquajack_cpub_map(address_map &map);
+	void aquajack_map(address_map &map);
+	void bshark_cpub_map(address_map &map);
+	void bshark_map(address_map &map);
+	void bsharkjjs_map(address_map &map);
+	void chasehq_map(address_map &map);
+	void chq_cpub_map(address_map &map);
+	void contcirc_cpub_map(address_map &map);
+	void contcirc_map(address_map &map);
+	void dblaxle_cpub_map(address_map &map);
+	void dblaxle_map(address_map &map);
+	void enforce_cpub_map(address_map &map);
+	void enforce_map(address_map &map);
+	void nightstr_cpub_map(address_map &map);
+	void nightstr_map(address_map &map);
+	void racingb_cpub_map(address_map &map);
+	void racingb_map(address_map &map);
+	void sci_cpub_map(address_map &map);
+	void sci_map(address_map &map);
+	void spacegun_cpub_map(address_map &map);
+	void spacegun_map(address_map &map);
+	void z80_sound_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

@@ -133,6 +133,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
 	DECLARE_READ16_MEMBER(esq5506_read_adc);
 	void kt(machine_config &config);
+	void kt_map(address_map &map);
 };
 
 void esqkt_state::machine_reset()
@@ -140,7 +141,7 @@ void esqkt_state::machine_reset()
 	m_bCalibSecondByte = false;
 }
 
-static ADDRESS_MAP_START( kt_map, AS_PROGRAM, 32, esqkt_state )
+ADDRESS_MAP_START(esqkt_state::kt_map)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("osrom", 0)
 	AM_RANGE(0x200000, 0x20003f) AM_DEVREADWRITE8("ensoniq", es5506_device, read, write, 0xffffffff)
 	AM_RANGE(0x240000, 0x24003f) AM_DEVREADWRITE8("ensoniq2", es5506_device, read, write, 0xffffffff)

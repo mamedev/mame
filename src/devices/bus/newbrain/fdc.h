@@ -33,6 +33,8 @@ public:
 	DECLARE_READ8_MEMBER( fdc_control_r );
 	DECLARE_WRITE8_MEMBER( io_dec_w );
 
+	void newbrain_fdc_io(address_map &map);
+	void newbrain_fdc_mem(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

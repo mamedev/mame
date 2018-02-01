@@ -670,6 +670,8 @@ public:
 	DECLARE_READ8_MEMBER( internal_r );
 	DECLARE_WRITE8_MEMBER( internal_w );
 
+	void tmp95c061_mem16(address_map &map);
+	void tmp95c061_mem8(address_map &map);
 protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
@@ -805,6 +807,8 @@ public:
 	template <class Object> static devcb_base &set_an6_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an6_read.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_an7_read(device_t &device, Object &&cb) { return downcast<tmp95c063_device &>(device).m_an7_read.set_callback(std::forward<Object>(cb)); }
 
+	void tmp95c063_mem16(address_map &map);
+	void tmp95c063_mem8(address_map &map);
 protected:
 	virtual void device_config_complete() override;
 	virtual void device_start() override;

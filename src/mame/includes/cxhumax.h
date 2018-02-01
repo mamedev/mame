@@ -167,6 +167,7 @@ public:
 	uint32_t screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_tick);
 	void cxhumax(machine_config &config);
+	void cxhumax_map(address_map &map);
 };
 
 #define INTDEST         0   // Interrupt destination (1=IRQ, 0=FIQ)

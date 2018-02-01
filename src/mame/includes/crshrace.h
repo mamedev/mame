@@ -66,4 +66,7 @@ public:
 	void draw_bg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void crshrace(machine_config &config);
+	void crshrace_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
 };

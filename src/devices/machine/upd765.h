@@ -88,7 +88,7 @@ public:
 	 * interface, is not eligible as a result.
 	 */
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) = 0;
+	virtual void map(address_map &map) = 0;
 
 	virtual uint8_t dma_r() = 0;
 	virtual void dma_w(uint8_t data) = 0;
@@ -105,7 +105,7 @@ public:
 	template <class Object> static devcb_base &set_drq_wr_callback(device_t &device, Object &&cb) { return downcast<upd765_family_device &>(device).drq_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_hdl_wr_callback(device_t &device, Object &&cb) { return downcast<upd765_family_device &>(device).hdl_cb.set_callback(std::forward<Object>(cb)); }
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override = 0;
+	virtual void map(address_map &map) override = 0;
 
 	DECLARE_READ8_MEMBER (sra_r);
 	DECLARE_READ8_MEMBER (srb_r);
@@ -435,28 +435,28 @@ class upd765a_device : public upd765_family_device {
 public:
 	upd765a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 };
 
 class upd765b_device : public upd765_family_device {
 public:
 	upd765b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 };
 
 class i8272a_device : public upd765_family_device {
 public:
 	i8272a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 };
 
 class i82072_device : public upd765_family_device {
 public:
 	i82072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 
 protected:
 	virtual void device_start() override;
@@ -485,49 +485,49 @@ class smc37c78_device : public upd765_family_device {
 public:
 	smc37c78_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 };
 
 class upd72065_device : public upd765_family_device {
 public:
 	upd72065_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 };
 
 class n82077aa_device : public upd765_family_device {
 public:
 	n82077aa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 };
 
 class pc_fdc_superio_device : public upd765_family_device {
 public:
 	pc_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 };
 
 class dp8473_device : public upd765_family_device {
 public:
 	dp8473_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 };
 
 class pc8477a_device : public upd765_family_device {
 public:
 	pc8477a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 };
 
 class wd37c65c_device : public upd765_family_device {
 public:
 	wd37c65c_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 };
 
 class mcs3201_device : public upd765_family_device {
@@ -537,7 +537,7 @@ public:
 	// static configuration helpers
 	template <class Object> static devcb_base &set_input_handler(device_t &device, Object &&cb) { return downcast<mcs3201_device &>(device).m_input_handler.set_callback(std::forward<Object>(cb)); }
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 	DECLARE_READ8_MEMBER( input_r );
 
 protected:
@@ -551,7 +551,7 @@ class tc8566af_device : public upd765_family_device {
 public:
 	tc8566af_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_ADDRESS_MAP(map, 8) override;
+	virtual void map(address_map &map) override;
 
 	DECLARE_WRITE8_MEMBER(cr1_w);
 

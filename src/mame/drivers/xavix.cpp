@@ -104,6 +104,7 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
+	void xavix_map(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -412,7 +413,7 @@ READ8_MEMBER(xavix_state::xavix_75f5_r)
 
 // DATA reads from 0x8000-0xffff are banked by byte 0xff of 'ram'
 
-static ADDRESS_MAP_START( xavix_map, AS_PROGRAM, 8, xavix_state )
+ADDRESS_MAP_START(xavix_state::xavix_map)
 	AM_RANGE(0x000000, 0x0001ff) AM_RAM
 	AM_RANGE(0x000200, 0x003fff) AM_RAM
 

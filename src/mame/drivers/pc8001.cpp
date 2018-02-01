@@ -166,13 +166,13 @@ WRITE8_MEMBER( pc8001_state::port40_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( pc8001_mem, AS_PROGRAM, 8, pc8001_state )
+ADDRESS_MAP_START(pc8001_state::pc8001_mem)
 	AM_RANGE(0x0000, 0x5fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8001_io, AS_IO, 8, pc8001_state )
+ADDRESS_MAP_START(pc8001_state::pc8001_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("Y0")
@@ -219,14 +219,14 @@ static ADDRESS_MAP_START( pc8001_io, AS_IO, 8, pc8001_state )
 	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(I8255A_TAG, i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8001mk2_mem, AS_PROGRAM, 8, pc8001mk2_state )
+ADDRESS_MAP_START(pc8001mk2_state::pc8001mk2_mem)
 	AM_RANGE(0x0000, 0x5fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pc8001mk2_io, AS_IO, 8, pc8001mk2_state )
+ADDRESS_MAP_START(pc8001mk2_state::pc8001mk2_io)
 	AM_IMPORT_FROM(pc8001_io)
 	AM_RANGE(0x30, 0x30) AM_WRITE(port30_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(port31_w)

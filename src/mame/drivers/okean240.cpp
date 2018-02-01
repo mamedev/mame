@@ -97,6 +97,10 @@ public:
 	void okean240a(machine_config &config);
 	void okean240t(machine_config &config);
 	void okean240(machine_config &config);
+	void okean240_io(address_map &map);
+	void okean240_mem(address_map &map);
+	void okean240a_io(address_map &map);
+	void okean240t_io(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -215,7 +219,7 @@ WRITE8_MEMBER(okean240_state::scroll_w)
 	m_scroll = data;
 }
 
-static ADDRESS_MAP_START(okean240_mem, AS_PROGRAM, 8, okean240_state)
+ADDRESS_MAP_START(okean240_state::okean240_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0x3fff) AM_RAM
@@ -224,7 +228,7 @@ static ADDRESS_MAP_START(okean240_mem, AS_PROGRAM, 8, okean240_state)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(okean240_io, AS_IO, 8, okean240_state)
+ADDRESS_MAP_START(okean240_state::okean240_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppikbd", i8255_device, read, write)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pit", pit8253_device, read, write)
@@ -236,7 +240,7 @@ static ADDRESS_MAP_START(okean240_io, AS_IO, 8, okean240_state)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("ppie", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(okean240a_io, AS_IO, 8, okean240_state)
+ADDRESS_MAP_START(okean240_state::okean240a_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppikbd", i8255_device, read, write)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pit", pit8253_device, read, write)
@@ -258,7 +262,7 @@ static ADDRESS_MAP_START(okean240a_io, AS_IO, 8, okean240_state)
 	// AM_RANGE(0xe0, 0xff)=ppaE0.data
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(okean240t_io, AS_IO, 8, okean240_state)
+ADDRESS_MAP_START(okean240_state::okean240t_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x23) AM_WRITENOP
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppikbd", i8255_device, read, write)

@@ -128,6 +128,7 @@ public:
 
 	void rabbit(machine_config &config);
 
+	void rabbit_map(address_map &map);
 protected:
 	virtual void video_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -712,7 +713,7 @@ WRITE32_MEMBER(rabbit_state::eeprom_write)
 	}
 }
 
-static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32, rabbit_state )
+ADDRESS_MAP_START(rabbit_state::rabbit_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x000000, 0x000003) AM_WRITENOP // bug in code / emulation?
 	AM_RANGE(0x000010, 0x000013) AM_WRITENOP // bug in code / emulation?

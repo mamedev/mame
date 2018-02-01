@@ -75,7 +75,7 @@ public:
 	smpc_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
-//  DECLARE_ADDRESS_MAP( io_map, 8);
+//  void io_map(address_map &map);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -121,6 +121,7 @@ public:
 	static void static_set_region_code(device_t &device, uint8_t rgn);
 	static void static_set_control_port_tags(device_t &device, const char *tag1, const char *tag2);
 
+	void smpc_regs(address_map &map);
 protected:
 	// device-level overrides
 //  virtual void device_validity_check(validity_checker &valid) const override;

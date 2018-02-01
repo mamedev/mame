@@ -124,6 +124,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
 	int gp3_is_alpha_pen(int pen);
 	void galpani3(machine_config &config);
+	void galpani3_map(address_map &map);
 };
 
 
@@ -465,7 +466,7 @@ WRITE16_MEMBER(galpani3_state::galpani3_priority_buffer_scrolly_w)
 
 
 
-static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
+ADDRESS_MAP_START(galpani3_state::galpani3_map)
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // area [B] - Work RAM

@@ -81,6 +81,11 @@ public:
 	// video state
 	required_shared_ptr<uint8_t> m_video_ram;
 	void tdv2324(machine_config &config);
+	void tdv2324_fdc_mem(address_map &map);
+	void tdv2324_io(address_map &map);
+	void tdv2324_mem(address_map &map);
+	void tdv2324_sub_io(address_map &map);
+	void tdv2324_sub_mem(address_map &map);
 };
 
 

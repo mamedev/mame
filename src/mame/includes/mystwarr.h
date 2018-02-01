@@ -111,4 +111,13 @@ public:
 	void viostorm(machine_config &config);
 	void gaiapols(machine_config &config);
 	void metamrph(machine_config &config);
+	void dadandrn_map(address_map &map);
+	void gaiapols_map(address_map &map);
+	void martchmp_map(address_map &map);
+	void martchmp_sound_map(address_map &map);
+	void metamrph_map(address_map &map);
+	void mystwarr_k054539_map(address_map &map);
+	void mystwarr_map(address_map &map);
+	void mystwarr_sound_map(address_map &map);
+	void viostorm_map(address_map &map);
 };

@@ -98,6 +98,7 @@ public:
 	required_device<palette_device> m_palette;
 	void pyl601(machine_config &config);
 	void pyl601a(machine_config &config);
+	void pyl601_mem(address_map &map);
 };
 
 
@@ -253,7 +254,7 @@ READ8_MEMBER(pyl601_state::floppy_r)
 	return m_floppy_ctrl;
 }
 
-static ADDRESS_MAP_START(pyl601_mem, AS_PROGRAM, 8, pyl601_state )
+ADDRESS_MAP_START(pyl601_state::pyl601_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xbfff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0xc000, 0xdfff ) AM_RAMBANK("bank2")

@@ -91,6 +91,9 @@ public:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 
 	void beezer(machine_config &config);
+	void banked_map(address_map &map);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -130,7 +133,7 @@ private:
 //  ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, beezer_state )
+ADDRESS_MAP_START(beezer_state::main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xc000, 0xcfff) AM_DEVICE("sysbank", address_map_bank_device, amap8)
 	AM_RANGE(0xd000, 0xdfff) AM_ROM AM_REGION("maincpu", 0x0000) AM_WRITE(bankswitch_w) // g1
@@ -138,7 +141,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, beezer_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x2000) // g5
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( banked_map, AS_PROGRAM, 8, beezer_state )
+ADDRESS_MAP_START(beezer_state::banked_map)
 	AM_RANGE(0x0600, 0x0600) AM_MIRROR(0x1ff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x1f0) AM_WRITE(palette_w)
 	AM_RANGE(0x0a00, 0x0a00) AM_MIRROR(0x1ff) AM_READ(line_r)
@@ -152,7 +155,7 @@ static ADDRESS_MAP_START( banked_map, AS_PROGRAM, 8, beezer_state )
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("rombank_f7")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, beezer_state )
+ADDRESS_MAP_START(beezer_state::sound_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM // 0d
 	AM_RANGE(0x0800, 0x0fff) AM_RAM // 2d, optional (can be rom)
 	AM_RANGE(0x1000, 0x1007) AM_MIRROR(0x07f8) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)

@@ -31,7 +31,7 @@ public:
 	template <class Object> static devcb_base &set_tx_drq_wr_callback(device_t &device, Object &&cb) { return downcast<mb8795_device &>(device).drq_tx_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_rx_drq_wr_callback(device_t &device, Object &&cb) { return downcast<mb8795_device &>(device).drq_rx_cb.set_callback(std::forward<Object>(cb)); }
 
-	DECLARE_ADDRESS_MAP(map, 8);
+	void map(address_map &map);
 
 	DECLARE_READ8_MEMBER(txstat_r);
 	DECLARE_WRITE8_MEMBER(txstat_w);

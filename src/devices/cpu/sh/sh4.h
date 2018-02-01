@@ -750,6 +750,7 @@ public:
 	DECLARE_WRITE32_MEMBER( sh3_internal_high_w );
 	DECLARE_READ32_MEMBER( sh3_internal_high_r );
 
+	void sh3_internal_map(address_map &map);
 protected:
 	// construction/destruction
 	sh3_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);
@@ -777,6 +778,7 @@ public:
 	virtual uint32_t sh4_getsqremap(uint32_t address) override;
 	sh4_utlb m_utlb[64];
 
+	void sh4_internal_map(address_map &map);
 protected:
 	// construction/destruction
 	sh4_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness);

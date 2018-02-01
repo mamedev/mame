@@ -69,6 +69,8 @@ public:
 	IRQ_CALLBACK_MEMBER(int_ack);
 
 	void dai(machine_config &config);
+	void dai_io(address_map &map);
+	void dai_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

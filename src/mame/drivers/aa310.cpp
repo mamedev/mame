@@ -135,6 +135,7 @@ public:
 	void aa540(machine_config &config);
 	void aa440(machine_config &config);
 	void aa4201(machine_config &config);
+	void aa310_mem(address_map &map);
 protected:
 	required_device<ram_device> m_ram;
 };
@@ -187,7 +188,7 @@ void aa310_state::machine_reset()
 	archimedes_reset();
 }
 
-static ADDRESS_MAP_START( aa310_mem, AS_PROGRAM, 32, aa310_state )
+ADDRESS_MAP_START(aa310_state::aa310_mem)
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
 	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)

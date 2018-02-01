@@ -48,6 +48,7 @@ public:
 
 
 	void maygayep(machine_config &config);
+	void maygayep_map(address_map &map);
 protected:
 
 	// devices
@@ -57,7 +58,7 @@ public:
 };
 
 // bp 29e58 in ep_simp reads the 'INITIALISE . . .' string
-static ADDRESS_MAP_START( maygayep_map, AS_PROGRAM, 16, maygayep_state )
+ADDRESS_MAP_START(maygayep_state::maygayep_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE( 0xfe0000, 0xffffff ) AM_RAM // merln at least?

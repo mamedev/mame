@@ -56,6 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(uart_status_update);
 
 	void ampex(machine_config &config);
+	void mem_map(address_map &map);
 private:
 	virtual void machine_start() override;
 
@@ -164,7 +165,7 @@ WRITE8_MEMBER(ampex_state::uart_status_update)
 	// DAV should generate RST 7
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, ampex_state )
+ADDRESS_MAP_START(ampex_state::mem_map)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x4000, 0x43ff) AM_RAM // main RAM
 	AM_RANGE(0x4400, 0x57ff) AM_RAM // expansion RAM

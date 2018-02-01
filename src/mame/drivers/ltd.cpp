@@ -75,6 +75,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
 	void ltd4(machine_config &config);
 	void ltd3(machine_config &config);
+	void ltd3_map(address_map &map);
+	void ltd4_io(address_map &map);
+	void ltd4_map(address_map &map);
 private:
 	bool m_timer_r;
 	bool m_clear;
@@ -89,14 +92,14 @@ private:
 };
 
 
-static ADDRESS_MAP_START( ltd3_map, AS_PROGRAM, 8, ltd_state )
+ADDRESS_MAP_START(ltd_state::ltd3_map)
 	AM_RANGE(0x0000, 0x007f) AM_RAM AM_SHARE("nvram") // internal to the cpu
 	AM_RANGE(0x0080, 0x0087) AM_MIRROR(0x78) AM_READ(io_r)
 	AM_RANGE(0x0800, 0x2fff) AM_WRITE(io_w)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM AM_MIRROR(0x3000) AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ltd4_map, AS_PROGRAM, 8, ltd_state )
+ADDRESS_MAP_START(ltd_state::ltd4_map)
 	AM_RANGE(0x0000, 0x001f) AM_RAM // internal to the cpu
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("nvram")
@@ -111,7 +114,7 @@ static ADDRESS_MAP_START( ltd4_map, AS_PROGRAM, 8, ltd_state )
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_MIRROR(0x2000) AM_REGION("roms", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ltd4_io, AS_IO, 8, ltd_state )
+ADDRESS_MAP_START(ltd_state::ltd4_io)
 	AM_RANGE(0x0100, 0x0100) AM_READWRITE(port1_r,port1_w)
 	AM_RANGE(0x0101, 0x0101) AM_READWRITE(port2_r,port2_w)
 ADDRESS_MAP_END

@@ -71,6 +71,13 @@ public:
 	void pow3000(machine_config &config);
 	void ts1500(machine_config &config);
 	void zx80(machine_config &config);
+	void pc8300_io_map(address_map &map);
+	void pow3000_io_map(address_map &map);
+	void ula_map(address_map &map);
+	void zx80_io_map(address_map &map);
+	void zx80_map(address_map &map);
+	void zx81_io_map(address_map &map);
+	void zx81_map(address_map &map);
 protected:
 	enum
 	{

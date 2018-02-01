@@ -294,7 +294,7 @@ INPUT_PORTS_END
 /*****************************************************************************/
 /* Main CPU */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bigevglf_state )
+ADDRESS_MAP_START(bigevglf_state::main_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK("bank1")
@@ -305,7 +305,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bigevglf_state )
 	AM_RANGE(0xf840, 0xf8ff) AM_RAM AM_SHARE("spriteram2")  /* spriteram (x,y,offset in spriteram1,palette) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigevglf_portmap, AS_IO, 8, bigevglf_state )
+ADDRESS_MAP_START(bigevglf_state::bigevglf_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP    /* video ram enable ???*/
 	AM_RANGE(0x01, 0x01) AM_WRITE(bigevglf_gfxcontrol_w)  /* plane select */
@@ -320,7 +320,7 @@ ADDRESS_MAP_END
 /*********************************************************************************/
 /* Sub CPU */
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, bigevglf_state )
+ADDRESS_MAP_START(bigevglf_state::sub_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1") /* shared with main CPU */
@@ -343,7 +343,7 @@ READ8_MEMBER(bigevglf_state::sub_cpu_mcu_coin_port_r)
 		m_mcu_coin_bit5;  /* bit 0 and bit 1 - coin inputs */
 }
 
-static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8, bigevglf_state )
+ADDRESS_MAP_START(bigevglf_state::bigevglf_sub_portmap)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("PORT00")
 	AM_RANGE(0x01, 0x01) AM_READNOP
@@ -369,7 +369,7 @@ ADDRESS_MAP_END
 /*********************************************************************************/
 /* Sound CPU */
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bigevglf_state )
+ADDRESS_MAP_START(bigevglf_state::sound_map)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ym2149_device, address_data_w)

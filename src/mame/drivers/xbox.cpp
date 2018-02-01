@@ -36,6 +36,8 @@ public:
 	{ }
 
 	void xbox(machine_config &config);
+	void xbox_map(address_map &map);
+	void xbox_map_io(address_map &map);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -53,12 +55,12 @@ void xbox_state::video_start()
 {
 }
 
-static ADDRESS_MAP_START(xbox_map, AS_PROGRAM, 32, xbox_state)
+ADDRESS_MAP_START(xbox_state::xbox_map)
 	AM_IMPORT_FROM(xbox_base_map)
 	AM_RANGE(0xff000000, 0xff0fffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f00000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32, xbox_state)
+ADDRESS_MAP_START(xbox_state::xbox_map_io)
 	AM_IMPORT_FROM(xbox_base_map_io)
 ADDRESS_MAP_END
 

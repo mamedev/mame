@@ -843,6 +843,9 @@ public:
 	void cobra_video_exit();
 	int decode_debug_state_value(int v);
 	void cobra(machine_config &config);
+	void cobra_gfx_map(address_map &map);
+	void cobra_main_map(address_map &map);
+	void cobra_sub_map(address_map &map);
 };
 
 void cobra_renderer::render_color_scan(int32_t scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
@@ -1737,7 +1740,7 @@ WRITE32_MEMBER(cobra_state::main_cpu_dc_store)
 	}
 }
 
-static ADDRESS_MAP_START( cobra_main_map, AS_PROGRAM, 64, cobra_state )
+ADDRESS_MAP_START(cobra_state::cobra_main_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x07c00000, 0x07ffffff) AM_RAM
 	AM_RANGE(0x80000cf8, 0x80000cff) AM_READWRITE(main_mpc106_r, main_mpc106_w)
@@ -2077,7 +2080,7 @@ WRITE8_MEMBER(cobra_state::sub_jvs_w)
 	}
 }
 
-static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
+ADDRESS_MAP_START(cobra_state::cobra_sub_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("sub_ram")                       // Main RAM
 	AM_RANGE(0x70000000, 0x7003ffff) AM_READWRITE(sub_comram_r, sub_comram_w)         // Double buffered shared RAM between Main and Sub
 //  AM_RANGE(0x78000000, 0x780000ff) AM_NOP                                           // SCSI controller (unused)
@@ -3183,7 +3186,7 @@ WRITE64_MEMBER(cobra_state::gfx_debug_state_w)
 	}
 }
 
-static ADDRESS_MAP_START( cobra_gfx_map, AS_PROGRAM, 64, cobra_state )
+ADDRESS_MAP_START(cobra_state::cobra_gfx_map)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("gfx_main_ram_0")
 	AM_RANGE(0x07c00000, 0x07ffffff) AM_RAM AM_SHARE("gfx_main_ram_1")
 	AM_RANGE(0x10000000, 0x100007ff) AM_WRITE(gfx_fifo0_w)

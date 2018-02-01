@@ -45,7 +45,7 @@ TODO: Emulated sound
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START( gotya_map, AS_PROGRAM, 8, gotya_state )
+ADDRESS_MAP_START(gotya_state::gotya_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("P1")

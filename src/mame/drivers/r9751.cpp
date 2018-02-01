@@ -114,6 +114,7 @@ public:
 	DECLARE_DRIVER_INIT(r9751);
 
 	void r9751(machine_config &config);
+	void r9751_mem(address_map &map);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pdc_device> m_pdc;
@@ -618,7 +619,7 @@ WRITE32_MEMBER( r9751_state::r9751_mmio_fff8_w )
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(r9751_mem, AS_PROGRAM, 32, r9751_state)
+ADDRESS_MAP_START(r9751_state::r9751_mem)
 	//ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000,0x00ffffff) AM_RAM AM_SHARE("main_ram") // 16MB
 	AM_RANGE(0x08000000,0x0800ffff) AM_ROM AM_REGION("prom", 0)

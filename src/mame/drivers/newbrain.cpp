@@ -577,7 +577,7 @@ READ_LINE_MEMBER( newbrain_state::tdi_r )
 //  ADDRESS_MAP( newbrain_mreq )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( newbrain_mreq, AS_PROGRAM, 8, newbrain_state )
+ADDRESS_MAP_START(newbrain_state::newbrain_mreq)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mreq_r, mreq_w)
 ADDRESS_MAP_END
@@ -587,7 +587,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( newbrain_iorq )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( newbrain_iorq, AS_IO, 8, newbrain_state )
+ADDRESS_MAP_START(newbrain_state::newbrain_iorq)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(iorq_r, iorq_w)
 ADDRESS_MAP_END

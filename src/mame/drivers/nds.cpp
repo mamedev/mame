@@ -582,7 +582,7 @@ WRITE32_MEMBER(nds_state::arm9_io_w)
 	}
 }
 
-static ADDRESS_MAP_START( nds_arm7_map, AS_PROGRAM, 32, nds_state )
+ADDRESS_MAP_START(nds_state::nds_arm7_map)
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM AM_REGION("arm7", 0)
 	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_MIRROR(0x00400000) AM_SHARE("mainram")
 	AM_RANGE(0x03000000, 0x03007fff) AM_MIRROR(0x007f8000) AM_DEVICE("nds7wram", address_map_bank_device, amap32)
@@ -590,7 +590,7 @@ static ADDRESS_MAP_START( nds_arm7_map, AS_PROGRAM, 32, nds_state )
 	AM_RANGE(0x04000000, 0x0410ffff) AM_READWRITE(arm7_io_r, arm7_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nds_arm9_map, AS_PROGRAM, 32, nds_state )
+ADDRESS_MAP_START(nds_state::nds_arm9_map)
 	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_MIRROR(0x00400000) AM_SHARE("mainram")
 	AM_RANGE(0x03000000, 0x03007fff) AM_MIRROR(0x00ff8000) AM_DEVICE("nds9wram", address_map_bank_device, amap32)
 	AM_RANGE(0x04000000, 0x0410ffff) AM_READWRITE(arm9_io_r, arm9_io_w)
@@ -598,7 +598,7 @@ static ADDRESS_MAP_START( nds_arm9_map, AS_PROGRAM, 32, nds_state )
 ADDRESS_MAP_END
 
 // ARM7 views of WRAM
-static ADDRESS_MAP_START( nds7_wram_map, AS_PROGRAM, 32, nds_state )
+ADDRESS_MAP_START(nds_state::nds7_wram_map)
 	AM_RANGE(0x00000, 0x07fff) AM_READWRITE(wram_arm7mirror_r, wram_arm7mirror_w)
 	AM_RANGE(0x08000, 0x0bfff) AM_READWRITE(wram_first_half_r, wram_first_half_w)
 	AM_RANGE(0x0c000, 0x0ffff) AM_READWRITE(wram_first_half_r, wram_first_half_w)
@@ -608,7 +608,7 @@ static ADDRESS_MAP_START( nds7_wram_map, AS_PROGRAM, 32, nds_state )
 ADDRESS_MAP_END
 
 // ARM9 views of WRAM
-static ADDRESS_MAP_START( nds9_wram_map, AS_PROGRAM, 32, nds_state )
+ADDRESS_MAP_START(nds_state::nds9_wram_map)
 	AM_RANGE(0x00000, 0x07fff) AM_READWRITE(wram_first_half_r, wram_first_half_w)
 	AM_RANGE(0x08000, 0x0bfff) AM_READWRITE(wram_second_half_r, wram_second_half_w)
 	AM_RANGE(0x0c000, 0x0ffff) AM_READWRITE(wram_second_half_r, wram_second_half_w)

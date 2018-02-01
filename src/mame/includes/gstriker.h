@@ -86,6 +86,10 @@ public:
 	void twc94(machine_config &config);
 	void gstriker(machine_config &config);
 	void vgoal(machine_config &config);
+	void gstriker_map(address_map &map);
+	void sound_io_map(address_map &map);
+	void sound_map(address_map &map);
+	void twcup94_map(address_map &map);
 };
 
 #endif

@@ -117,6 +117,7 @@ public:
 	HD44780_PIXEL_UPDATE(ti95_pixel_update);
 	void ti74(machine_config &config);
 	void ti95(machine_config &config);
+	void main_map(address_map &map);
 };
 
 
@@ -265,7 +266,7 @@ WRITE8_MEMBER(ti74_state::bankswitch_w)
 	// d3: N/C
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ti74_state )
+ADDRESS_MAP_START(ti74_state::main_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("sysram.ic3")

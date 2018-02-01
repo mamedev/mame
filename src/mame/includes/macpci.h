@@ -140,6 +140,7 @@ public:
 
 	DECLARE_DRIVER_INIT(pippin);
 	void pippin(machine_config &config);
+	void pippin_mem(address_map &map);
 private:
 	// wait states for accessing the VIA
 	int m_via_cycles;

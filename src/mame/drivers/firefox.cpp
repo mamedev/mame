@@ -128,6 +128,8 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_soundlatch2;
 	void firefox(machine_config &config);
+	void audio_map(address_map &map);
+	void main_map(address_map &map);
 };
 
 
@@ -545,7 +547,7 @@ void firefox_state::machine_start()
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, firefox_state )
+ADDRESS_MAP_START(firefox_state::main_map)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(tileram_w) AM_SHARE("tileram")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("spriteram")
@@ -584,7 +586,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, firefox_state )
+ADDRESS_MAP_START(firefox_state::audio_map)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0700) AM_RAM /* RIOT ram */
 	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x0760) AM_DEVREADWRITE("riot", riot6532_device, read, write)

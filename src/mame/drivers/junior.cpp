@@ -56,12 +56,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(junior_update_leds);
 	required_device<cpu_device> m_maincpu;
 	void junior(machine_config &config);
+	void junior_mem(address_map &map);
 };
 
 
 
 
-static ADDRESS_MAP_START(junior_mem, AS_PROGRAM, 8, junior_state)
+ADDRESS_MAP_START(junior_state::junior_mem)
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFF)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM // 1K RAM

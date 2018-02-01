@@ -28,6 +28,7 @@ public:
 	DECLARE_READ32_MEMBER (bootvect_r);
 	DECLARE_WRITE32_MEMBER (bootvect_w);
 
+	void cpu20_mem(address_map &map);
 protected:
 	// PIT port C Board ID bits
 	static constexpr unsigned CPU20 = 0x40;

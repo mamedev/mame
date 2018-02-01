@@ -85,6 +85,8 @@ public:
 		return m_p_chargen[(ch * 16 + line) & 0xfff];
 	}
 	void fc100(machine_config &config);
+	void fc100_io(address_map &map);
+	void fc100_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -116,7 +118,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( fc100_mem, AS_PROGRAM, 8, fc100_state )
+ADDRESS_MAP_START(fc100_state::fc100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM AM_REGION("roms", 0)
 	//AM_RANGE(0x6000, 0x6fff)      // mapped by the cartslot
@@ -125,7 +127,7 @@ static ADDRESS_MAP_START( fc100_mem, AS_PROGRAM, 8, fc100_state )
 	AM_RANGE( 0xc000, 0xffff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fc100_io, AS_IO, 8, fc100_state )
+ADDRESS_MAP_START(fc100_state::fc100_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0F) AM_READ(port00_r)

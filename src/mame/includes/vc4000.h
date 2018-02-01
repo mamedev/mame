@@ -134,6 +134,8 @@ public:
 	void h21(machine_config &config);
 	void rwtrntcs(machine_config &config);
 	void elektor(machine_config &config);
+	void elektor_mem(address_map &map);
+	void vc4000_mem(address_map &map);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

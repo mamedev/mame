@@ -97,6 +97,11 @@ public:
 	void mmt8(machine_config &config);
 	void hr16(machine_config &config);
 	void sr16(machine_config &config);
+	void hr16_io(address_map &map);
+	void hr16_mem(address_map &map);
+	void mmt8_io(address_map &map);
+	void sr16_io(address_map &map);
+	void sr16_mem(address_map &map);
 private:
 	uint8_t       m_kb_matrix;
 	uint8_t       m_leds;

@@ -63,4 +63,7 @@ public:
 	void zeropnt2(machine_config &config);
 	void zeropnt(machine_config &config);
 	void burglarx(machine_config &config);
+	void burglarx_map(address_map &map);
+	void zeropnt2_map(address_map &map);
+	void zeropnt_map(address_map &map);
 };

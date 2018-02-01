@@ -20,7 +20,7 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEVICE_ADDRESS_MAP_START(map, 32, mpcb963_device)
+ADDRESS_MAP_START(mpcb963_device::map)
 	AM_RANGE(0x00000000, 0x0000007f) AM_READ(idprom_r)
 	AM_RANGE(0x00000080, 0x0000008f) AM_DEVICE8("ramdac0", bt459_device, map, 0xff)
 	AM_RANGE(0x000000b0, 0x000000b3) AM_READWRITE16(control_r, control_w, 0xffff)
@@ -29,7 +29,7 @@ DEVICE_ADDRESS_MAP_START(map, 32, mpcb963_device)
 	AM_RANGE(0x00400000, 0x005fffff) AM_READWRITE(vram_r, vram_w)
 ADDRESS_MAP_END
 
-DEVICE_ADDRESS_MAP_START(map, 32, mpcba79_device)
+ADDRESS_MAP_START(mpcba79_device::map)
 	AM_RANGE(0x00000000, 0x0000007f) AM_READ(idprom_r)
 	AM_RANGE(0x00000080, 0x0000008f) AM_DEVICE8("ramdac0", bt459_device, map, 0xff)
 	AM_RANGE(0x00000090, 0x0000009f) AM_DEVICE8("ramdac1", bt459_device, map, 0xff)
@@ -111,7 +111,7 @@ WRITE16_MEMBER(mpcb963_device::control_w)
 	m_control = data;
 }
 
-READ32_MEMBER(mpcb963_device::vram_r) const
+READ32_MEMBER(mpcb963_device::vram_r)
 {
 	return ((u32 *)m_screen[(offset >> 19) & 1].vram.get())[offset & 0x7ffff];
 }
@@ -162,7 +162,7 @@ WRITE16_MEMBER(mpcba79_device::control_w)
 	m_control = data;
 }
 
-READ32_MEMBER(mpcba79_device::vram_r) const
+READ32_MEMBER(mpcba79_device::vram_r)
 {
 	return ((u32 *)m_screen[(offset >> 19) & 1].vram.get())[offset & 0x7ffff];
 }

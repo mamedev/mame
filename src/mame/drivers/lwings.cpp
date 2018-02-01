@@ -285,7 +285,7 @@ WRITE8_MEMBER(lwings_state::msm5205_w)
 	m_msm->vclk_w(0);
 }
 
-static ADDRESS_MAP_START( avengers_map, AS_PROGRAM, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::avengers_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
@@ -309,7 +309,7 @@ static ADDRESS_MAP_START( avengers_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lwings_map, AS_PROGRAM, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::lwings_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
@@ -330,7 +330,7 @@ static ADDRESS_MAP_START( lwings_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trojan_map, AS_PROGRAM, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::trojan_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
@@ -354,7 +354,7 @@ static ADDRESS_MAP_START( trojan_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lwings_sound_map, AS_PROGRAM, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::lwings_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -366,7 +366,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( fball_map, AS_PROGRAM, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::fball_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
@@ -398,13 +398,13 @@ WRITE8_MEMBER(lwings_state::fball_oki_bank_w)
 	membank("samplebank")->set_entry((data >> 1) & 0x7);
 }
 
-static ADDRESS_MAP_START( fball_oki_map, 0, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::fball_oki_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("samplebank")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fball_sound_map, AS_PROGRAM, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::fball_sound_map)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
@@ -417,17 +417,17 @@ static ADDRESS_MAP_START( fball_sound_map, AS_PROGRAM, 8, lwings_state )
 ADDRESS_MAP_END
 
 /* Yes, _no_ ram */
-static ADDRESS_MAP_START( trojan_adpcm_map, AS_PROGRAM, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::trojan_adpcm_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( avengers_adpcm_io_map, AS_IO, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::avengers_adpcm_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(avengers_adpcm_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trojan_adpcm_io_map, AS_IO, 8, lwings_state )
+ADDRESS_MAP_START(lwings_state::trojan_adpcm_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)

@@ -157,7 +157,7 @@ WRITE32_MEMBER(silkroad_state::silk_coin_counter_w)
 	}
 }
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, silkroad_state )
+ADDRESS_MAP_START(silkroad_state::cpu_map)
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x40c000, 0x40cfff) AM_RAM AM_SHARE("sprram") // sprites
 	AM_RANGE(0x600000, 0x603fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_SHARE("paletteram") // palette

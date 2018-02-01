@@ -42,7 +42,7 @@ public:
 	ide_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	required_device<bus_master_ide_controller_device> m_ide;
 	required_device<bus_master_ide_controller_device> m_ide2;
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+	virtual void config_map(address_map &map) override;
 	DECLARE_READ32_MEMBER(ide_read_cs1);
 	DECLARE_WRITE32_MEMBER(ide_write_cs1);
 	DECLARE_READ32_MEMBER(ide2_read_cs1);
@@ -78,11 +78,11 @@ private:
 	uint32_t m_pif;
 
 	uint32_t m_config_data[0x10];
-	DECLARE_ADDRESS_MAP(chan1_data_command_map, 32);
-	DECLARE_ADDRESS_MAP(chan1_control_map, 32);
-	DECLARE_ADDRESS_MAP(chan2_data_command_map, 32);
-	DECLARE_ADDRESS_MAP(chan2_control_map, 32);
-	DECLARE_ADDRESS_MAP(bus_master_map, 32);
+	void chan1_data_command_map(address_map &map);
+	void chan1_control_map(address_map &map);
+	void chan2_data_command_map(address_map &map);
+	void chan2_control_map(address_map &map);
+	void bus_master_map(address_map &map);
 };
 
 DECLARE_DEVICE_TYPE(IDE_PCI, ide_pci_device)

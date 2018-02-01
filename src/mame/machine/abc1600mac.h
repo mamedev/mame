@@ -49,7 +49,7 @@ public:
 
 	void set_cpu_tag(const char *cpu_tag) { m_cpu_tag = cpu_tag; }
 
-	virtual DECLARE_ADDRESS_MAP(map, 8);
+	virtual void map(address_map &map);
 
 	DECLARE_READ8_MEMBER( cause_r );
 	DECLARE_WRITE8_MEMBER( task_w );
@@ -72,6 +72,7 @@ public:
 	DECLARE_READ8_MEMBER( dma2_iorq_r ) { return dma_iorq_r(DMAMAP_R2_LO, offset); }
 	DECLARE_WRITE8_MEMBER( dma2_iorq_w ) { dma_iorq_w(DMAMAP_R2_LO, offset, data); }
 
+	void program_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

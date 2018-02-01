@@ -64,6 +64,10 @@ public:
 	void kristall(machine_config &config);
 	void radio99(machine_config &config);
 	void mikro80(machine_config &config);
+	void kristall_io(address_map &map);
+	void mikro80_io(address_map &map);
+	void mikro80_mem(address_map &map);
+	void radio99_io(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<i8255_device> m_ppi8255;

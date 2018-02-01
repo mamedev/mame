@@ -1318,7 +1318,7 @@ WRITE8_MEMBER(dummy_space_device::write)
 	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }
 
-static ADDRESS_MAP_START(dummy, 0, 8, dummy_space_device)
+ADDRESS_MAP_START(dummy_space_device::dummy)
 	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -1327,7 +1327,7 @@ DEFINE_DEVICE_TYPE(DUMMY_SPACE, dummy_space_device, "dummy_space", "Dummy Space"
 dummy_space_device::dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, DUMMY_SPACE, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
-	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, nullptr, *ADDRESS_MAP_NAME(dummy))
+	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, address_map_constructor(), address_map_constructor(FUNC(dummy_space_device::dummy), this))
 {
 }
 

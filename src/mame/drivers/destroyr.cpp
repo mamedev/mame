@@ -84,6 +84,7 @@ public:
 	TIMER_CALLBACK_MEMBER(frame_callback);
 
 	void destroyr(machine_config &config);
+	void destroyr_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -286,7 +287,7 @@ READ8_MEMBER(destroyr_state::scanline_r)
 }
 
 
-static ADDRESS_MAP_START( destroyr_map, AS_PROGRAM, 8, destroyr_state )
+ADDRESS_MAP_START(destroyr_state::destroyr_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0xf00) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_MIRROR(0xffe) AM_READ(input_r)

@@ -29,6 +29,8 @@ public:
 	virtual DECLARE_READ32_MEMBER(necdsp_prg_r);
 	virtual DECLARE_READ16_MEMBER(necdsp_data_r);
 
+	void dsp_data_map_lorom(address_map &map);
+	void dsp_prg_map_lorom(address_map &map);
 protected:
 	static constexpr device_timer_id TIMER_EVENT = 0;
 

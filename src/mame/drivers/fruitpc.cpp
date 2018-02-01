@@ -45,6 +45,8 @@ public:
 	DECLARE_WRITE8_MEMBER(dma8237_1_dack_w);
 	static void fruitpc_sb_conf(device_t *device);
 	void fruitpc(machine_config &config);
+	void fruitpc_io(address_map &map);
+	void fruitpc_map(address_map &map);
 };
 
 READ8_MEMBER(fruitpc_state::fruit_inp_r)
@@ -63,7 +65,7 @@ READ8_MEMBER(fruitpc_state::fruit_inp_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( fruitpc_map, AS_PROGRAM, 32, fruitpc_state )
+ADDRESS_MAP_START(fruitpc_state::fruitpc_map)
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff) // VGA VRAM
 	AM_RANGE(0x000c0000, 0x000dffff) AM_ROM AM_REGION("bios", 0)
@@ -73,7 +75,7 @@ static ADDRESS_MAP_START( fruitpc_map, AS_PROGRAM, 32, fruitpc_state )
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)    /* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fruitpc_io, AS_IO, 32, fruitpc_state )
+ADDRESS_MAP_START(fruitpc_state::fruitpc_io)
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)
 	AM_RANGE(0x0310, 0x0313) AM_READ8(fruit_inp_r, 0xffffffff)

@@ -128,6 +128,15 @@ public:
 	void getrivia(machine_config &config);
 	void amuse(machine_config &config);
 	void sprtauth(machine_config &config);
+	void amuse1_map(address_map &map);
+	void amuse_map(address_map &map);
+	void findout_map(address_map &map);
+	void gepoker_map(address_map &map);
+	void getrivia_map(address_map &map);
+	void gselect_map(address_map &map);
+	void quizvid_map(address_map &map);
+	void sprtauth_map(address_map &map);
+	void suprpokr_map(address_map &map);
 protected:
 	virtual void video_start() override;
 
@@ -335,7 +344,7 @@ WRITE8_MEMBER(gei_state::signature_w)
 	}
 }
 
-static ADDRESS_MAP_START( getrivia_map, AS_PROGRAM, 8, gei_state )
+ADDRESS_MAP_START(gei_state::getrivia_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
@@ -357,7 +366,7 @@ static ADDRESS_MAP_START( getrivia_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gselect_map, AS_PROGRAM, 8, gei_state )
+ADDRESS_MAP_START(gei_state::gselect_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
@@ -372,7 +381,7 @@ static ADDRESS_MAP_START( gselect_map, AS_PROGRAM, 8, gei_state )
 ADDRESS_MAP_END
 
 // TODO: where are mapped the lower 0x2000 bytes of the banks?
-static ADDRESS_MAP_START( amuse_map, AS_PROGRAM, 8, gei_state )
+ADDRESS_MAP_START(gei_state::amuse_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
@@ -388,7 +397,7 @@ static ADDRESS_MAP_START( amuse_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gepoker_map, AS_PROGRAM, 8, gei_state )
+ADDRESS_MAP_START(gei_state::gepoker_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
@@ -405,7 +414,7 @@ static ADDRESS_MAP_START( gepoker_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amuse1_map, AS_PROGRAM, 8, gei_state )
+ADDRESS_MAP_START(gei_state::amuse1_map)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("rombank")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram")
@@ -422,7 +431,7 @@ static ADDRESS_MAP_START( amuse1_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( findout_map, AS_PROGRAM, 8, gei_state )
+ADDRESS_MAP_START(gei_state::findout_map)
 	AM_RANGE(0x0000, 0xffff) AM_READ(catchall)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
@@ -443,7 +452,7 @@ static ADDRESS_MAP_START( findout_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quizvid_map, AS_PROGRAM, 8, gei_state )
+ADDRESS_MAP_START(gei_state::quizvid_map)
 	AM_RANGE(0x0000, 0xffff) AM_READ(catchall)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
@@ -461,7 +470,7 @@ static ADDRESS_MAP_START( quizvid_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( suprpokr_map, AS_PROGRAM, 8, gei_state )
+ADDRESS_MAP_START(gei_state::suprpokr_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
@@ -473,7 +482,7 @@ static ADDRESS_MAP_START( suprpokr_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sprtauth_map, AS_PROGRAM, 8, gei_state )
+ADDRESS_MAP_START(gei_state::sprtauth_map)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)

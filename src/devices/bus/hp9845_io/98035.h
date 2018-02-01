@@ -44,6 +44,8 @@ public:
 	DECLARE_READ8_MEMBER(clr_inten_r);
 	DECLARE_WRITE8_MEMBER(clr_inten_w);
 
+	void np_io_map(address_map &map);
+	void np_program_map(address_map &map);
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

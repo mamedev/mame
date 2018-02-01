@@ -52,6 +52,8 @@ public:
 	int m_pio1_a5;
 	int m_pio1_brdy;
 	void c80(machine_config &config);
+	void c80_io(address_map &map);
+	void c80_mem(address_map &map);
 };
 
 #endif

@@ -51,4 +51,10 @@ public:
 	void shinygld(machine_config &config);
 	void sderby(machine_config &config);
 	void luckboom(machine_config &config);
+	void luckboom_map(address_map &map);
+	void roulette_map(address_map &map);
+	void sderby_map(address_map &map);
+	void sderbya_map(address_map &map);
+	void shinygld_map(address_map &map);
+	void spacewin_map(address_map &map);
 };

@@ -65,6 +65,8 @@ public:
 
 	void bsktbllp(machine_config &config);
 	void idsa(machine_config &config);
+	void maincpu_io_map(address_map &map);
+	void maincpu_map(address_map &map);
 private:
 	virtual void machine_reset() override;
 
@@ -75,13 +77,13 @@ private:
 	optional_device_array<i8255_device, 2> m_ppi;
 };
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, idsa_state )
+ADDRESS_MAP_START(idsa_state::maincpu_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maincpu_io_map, AS_IO, 8, idsa_state )
+ADDRESS_MAP_START(idsa_state::maincpu_io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x0f) AM_READ_PORT("X0")

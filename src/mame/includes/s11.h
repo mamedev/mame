@@ -81,6 +81,9 @@ public:
 	DECLARE_MACHINE_RESET(s11);
 	DECLARE_DRIVER_INIT(s11);
 	void s11(machine_config &config);
+	void s11_audio_map(address_map &map);
+	void s11_bg_map(address_map &map);
+	void s11_main_map(address_map &map);
 protected:
 	// devices
 	required_device<cpu_device> m_maincpu;

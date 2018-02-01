@@ -91,6 +91,9 @@ public:
 	void trisport(machine_config &config);
 	void pigskin(machine_config &config);
 	void archrivl(machine_config &config);
+	void mcr68_map(address_map &map);
+	void pigskin_map(address_map &map);
+	void trisport_map(address_map &map);
 private:
 	required_device<ptm6840_device> m_ptm;
 };

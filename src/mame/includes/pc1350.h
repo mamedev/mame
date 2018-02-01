@@ -54,6 +54,7 @@ public:
 	required_device<ram_device> m_ram;
 
 	void pc1350(machine_config &config);
+	void pc1350_mem(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

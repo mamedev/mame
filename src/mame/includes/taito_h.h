@@ -49,4 +49,9 @@ public:
 	void syvalion(machine_config &config);
 	void dleague(machine_config &config);
 	void tetristh(machine_config &config);
+	void dleague_map(address_map &map);
+	void recordbr_map(address_map &map);
+	void sound_map(address_map &map);
+	void syvalion_map(address_map &map);
+	void tetristh_map(address_map &map);
 };

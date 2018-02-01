@@ -123,6 +123,9 @@ public:
 	void alphatp2(machine_config &config);
 	void alphatp2u(machine_config &config);
 
+	void alphatp2_io(address_map &map);
+	void alphatp2_map(address_map &map);
+	void alphatp2_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -190,6 +193,11 @@ public:
 	void alphatp3(machine_config &config);
 	void alphatp30(machine_config &config);
 
+	void alphatp30_8088_io(address_map &map);
+	void alphatp30_8088_map(address_map &map);
+	void alphatp3_io(address_map &map);
+	void alphatp3_map(address_map &map);
+	void alphatp3_mem(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -217,11 +225,11 @@ private:
 //  ADDRESS MAPS - Alphatronic P1, P2, P2S, P2U and Hell 2069
 //**************************************************************************
 
-static ADDRESS_MAP_START( alphatp2_mem, AS_PROGRAM, 8, alphatp_12_state )
+ADDRESS_MAP_START(alphatp_12_state::alphatp2_mem)
 	AM_RANGE(0x0000, 0xffff) AM_DEVICE("bankdev", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alphatp2_map, AS_PROGRAM, 8, alphatp_12_state )
+ADDRESS_MAP_START(alphatp_12_state::alphatp2_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("ram_0000")
 	AM_RANGE(0x00000, 0x017ff) AM_ROM AM_REGION("boot", 0)  // P2  0x0000 , 0x17ff -hw 6kB, P3 only 4 kB
 	AM_RANGE(0x01800, 0x01c00) AM_RAM // boot rom variables
@@ -231,7 +239,7 @@ static ADDRESS_MAP_START( alphatp2_map, AS_PROGRAM, 8, alphatp_12_state )
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alphatp2_io, AS_IO, 8, alphatp_12_state )
+ADDRESS_MAP_START(alphatp_12_state::alphatp2_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
@@ -253,11 +261,11 @@ WRITE8_MEMBER(alphatp_12_state::bank_w)
 //  ADDRESS MAPS - Alphatronic P3, P4, P30 and P40
 //**************************************************************************
 
-static ADDRESS_MAP_START( alphatp3_mem, AS_PROGRAM, 8, alphatp_34_state )
+ADDRESS_MAP_START(alphatp_34_state::alphatp3_mem)
 	AM_RANGE(0x0000, 0xffff) AM_DEVICE("bankdev", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alphatp3_map, AS_PROGRAM, 8, alphatp_34_state )
+ADDRESS_MAP_START(alphatp_34_state::alphatp3_map)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAMBANK("ram_0000")
 	AM_RANGE(0x00000, 0x017ff) AM_ROM AM_REGION("boot", 0)  // P2  0x0000 , 0x17ff -hw 6kB, P3 only 4 kB
 	AM_RANGE(0x01800, 0x01c00) AM_RAM // boot rom variables
@@ -267,7 +275,7 @@ static ADDRESS_MAP_START( alphatp3_map, AS_PROGRAM, 8, alphatp_34_state )
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alphatp3_io, AS_IO, 8, alphatp_34_state )
+ADDRESS_MAP_START(alphatp_34_state::alphatp3_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
@@ -279,12 +287,12 @@ static ADDRESS_MAP_START( alphatp3_io, AS_IO, 8, alphatp_34_state )
 	AM_RANGE(0x78, 0x78) AM_WRITE(bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alphatp30_8088_map, AS_PROGRAM, 8, alphatp_34_state )
+ADDRESS_MAP_START(alphatp_34_state::alphatp30_8088_map)
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("16bit", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( alphatp30_8088_io, AS_IO, 8, alphatp_34_state )
+ADDRESS_MAP_START(alphatp_34_state::alphatp30_8088_io)
 	AM_RANGE(0xffe0, 0xffe1) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 ADDRESS_MAP_END
 

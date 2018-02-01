@@ -46,6 +46,7 @@ public:
 	// control lines -- all lines are specified as active-high (even CS2)
 	void set_control(uint8_t cs1, uint8_t cs2, uint8_t c1, uint8_t c2, uint8_t ck);
 
+	void er2055_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

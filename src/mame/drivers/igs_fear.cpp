@@ -31,6 +31,7 @@ public:
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	void igs_fear(machine_config &config);
+	void igs_igs_fear_map(address_map &map);
 };
 
 
@@ -44,7 +45,7 @@ uint32_t igs_fear_state::screen_update_igs_fear(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static ADDRESS_MAP_START( igs_igs_fear_map, AS_PROGRAM, 32, igs_fear_state )
+ADDRESS_MAP_START(igs_fear_state::igs_igs_fear_map)
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM /* Internal ROM */
 	AM_RANGE(0x08000000, 0x0807ffff) AM_ROM AM_REGION("user1", 0)/* Game ROM */
 ADDRESS_MAP_END

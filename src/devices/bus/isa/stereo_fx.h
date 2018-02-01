@@ -43,6 +43,8 @@ public:
 	DECLARE_READ8_MEMBER( invalid_r );
 	DECLARE_WRITE8_MEMBER( invalid_w );
 
+	void stereo_fx_io(address_map &map);
+	void stereo_fx_rom(address_map &map);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

@@ -34,6 +34,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
 
 	void stellafr(machine_config &config);
+	void stellafr_map(address_map &map);
 protected:
 
 	// devices
@@ -70,7 +71,7 @@ WRITE8_MEMBER(stellafr_state::ay8910_portb_w)
 
 
 
-static ADDRESS_MAP_START( stellafr_map, AS_PROGRAM, 16, stellafr_state )
+ADDRESS_MAP_START(stellafr_state::stellafr_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x8000c0, 0x8000c1) AM_WRITE8(write_8000c1, 0x00ff)
 	AM_RANGE(0x800100, 0x800101) AM_READWRITE8(read_800101, write_800101, 0x00ff)

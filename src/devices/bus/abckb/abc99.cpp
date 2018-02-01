@@ -106,7 +106,7 @@ const tiny_rom_entry *abc99_device::device_rom_region() const
 //  ADDRESS_MAP( abc99_z2_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc99_z2_mem, AS_PROGRAM, 8, abc99_device )
+ADDRESS_MAP_START(abc99_device::abc99_z2_mem)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(I8035_Z2_TAG, 0)
 ADDRESS_MAP_END
 
@@ -115,7 +115,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc99_z2_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc99_z2_io, AS_IO, 8, abc99_device )
+ADDRESS_MAP_START(abc99_device::abc99_z2_io)
 	AM_RANGE(0x21, 0x21) AM_WRITE(z2_led_w)
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("X0") AM_WRITENOP
 	AM_RANGE(0x31, 0x31) AM_READ_PORT("X1") AM_WRITENOP
@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( abc99_z5_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc99_z5_mem, AS_PROGRAM, 8, abc99_device )
+ADDRESS_MAP_START(abc99_device::abc99_z5_mem)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION(I8035_Z5_TAG, 0)
 ADDRESS_MAP_END
 

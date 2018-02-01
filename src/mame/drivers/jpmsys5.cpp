@@ -277,7 +277,7 @@ READ16_MEMBER(jpmsys5_state::jpm_upd7759_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( jpm_sys5_common_map, AS_PROGRAM, 16, jpmsys5_state )
+ADDRESS_MAP_START(jpmsys5_state::jpm_sys5_common_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("nvram")
@@ -292,19 +292,19 @@ static ADDRESS_MAP_START( jpm_sys5_common_map, AS_PROGRAM, 16, jpmsys5_state )
 	AM_RANGE(0x04c000, 0x04c0ff) AM_READ(mux_r) AM_WRITE(mux_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 68000_awp_map, AS_PROGRAM, 16, jpmsys5_state )
+ADDRESS_MAP_START(jpmsys5_state::m68000_awp_map)
 	AM_IMPORT_FROM(jpm_sys5_common_map)
 	AM_RANGE(0x0460a0, 0x0460a3) AM_DEVWRITE8("ym2413", ym2413_device, write, 0x00ff)
 	AM_RANGE(0x04c100, 0x04c105) AM_READWRITE(jpm_upd7759_r, jpm_upd7759_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 68000_awp_map_saa, AS_PROGRAM, 16, jpmsys5_state )
+ADDRESS_MAP_START(jpmsys5_state::m68000_awp_map_saa)
 	AM_IMPORT_FROM(jpm_sys5_common_map)
 	AM_RANGE(0x0460a0, 0x0460a3) AM_DEVWRITE8("saa", saa1099_device, write, 0x00ff)
 	AM_RANGE(0x04c100, 0x04c105) AM_READWRITE(jpm_upd7759_r, jpm_upd7759_w) // do the SAA boards have the UPD?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 68000_map, AS_PROGRAM, 16, jpmsys5_state )
+ADDRESS_MAP_START(jpmsys5_state::m68000_map)
 	AM_IMPORT_FROM(jpm_sys5_common_map)
 	AM_RANGE(0x01fffe, 0x01ffff) AM_WRITE(rombank_w) // extra on video system (rom board?) (although regular games do write here?)
 	AM_RANGE(0x020000, 0x03ffff) AM_ROMBANK("bank1") // extra on video system (rom board?)
@@ -618,7 +618,7 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5v)
 
 MACHINE_CONFIG_START(jpmsys5_state::jpmsys5v)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(68000_map)
+	MCFG_CPU_PROGRAM_MAP(m68000_map)
 
 	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(jpmsys5_state, a0_tx_w))
@@ -835,7 +835,7 @@ MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)
 MACHINE_CONFIG_START(jpmsys5_state::jpmsys5_ym)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
 
-	MCFG_CPU_PROGRAM_MAP(68000_awp_map)
+	MCFG_CPU_PROGRAM_MAP(m68000_awp_map)
 
 	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(jpmsys5_state, a0_tx_w))
@@ -888,7 +888,7 @@ MACHINE_CONFIG_END
 // the first rev PCB used an SAA1099
 MACHINE_CONFIG_START(jpmsys5_state::jpmsys5)
 	MCFG_CPU_ADD("maincpu", M68000, XTAL(8'000'000))
-	MCFG_CPU_PROGRAM_MAP(68000_awp_map_saa)
+	MCFG_CPU_PROGRAM_MAP(m68000_awp_map_saa)
 
 	MCFG_DEVICE_ADD("acia6850_0", ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(WRITELINE(jpmsys5_state, a0_tx_w))

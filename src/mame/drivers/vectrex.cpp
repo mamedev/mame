@@ -24,7 +24,7 @@ Bruce Tomlin (hardware info)
 #include "speaker.h"
 
 
-static ADDRESS_MAP_START(vectrex_map, AS_PROGRAM, 8, vectrex_state )
+ADDRESS_MAP_START(vectrex_state::vectrex_map)
 	AM_RANGE(0x0000, 0x7fff) AM_NOP // cart area, handled at machine_start
 	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_SHARE("gce_vectorram")
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(vectrex_via_r, vectrex_via_w)
@@ -187,7 +187,7 @@ ROM_END
 
 *****************************************************************/
 
-static ADDRESS_MAP_START(raaspec_map , AS_PROGRAM, 8, vectrex_state )
+ADDRESS_MAP_START(vectrex_state::raaspec_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(raaspec_led_w)

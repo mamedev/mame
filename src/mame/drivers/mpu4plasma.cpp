@@ -35,11 +35,12 @@ public:
 	}
 	uint32_t screen_update_mpu4plasma(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void mpu4plasma(machine_config &config);
+	void mpu4plasma_map(address_map &map);
 };
 
 INPUT_PORTS_EXTERN( mpu4 );
 
-static ADDRESS_MAP_START( mpu4plasma_map, AS_PROGRAM, 16, mpu4plasma_state )
+ADDRESS_MAP_START(mpu4plasma_state::mpu4plasma_map)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 	// why does it test this much ram, just sloppy code expecting mirroring?

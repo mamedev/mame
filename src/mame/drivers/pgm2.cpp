@@ -513,7 +513,7 @@ READ32_MEMBER(pgm2_state::pio_pdsr_r)
 	return (module_data_r() == ASSERT_LINE ? 1 : 0) << 8; // fpga data read and status (bit 7, must be 0)
 }
 
-static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
+ADDRESS_MAP_START(pgm2_state::pgm2_map)
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM //AM_REGION("user1", 0x00000) // internal ROM
 
 	AM_RANGE(0x02000000, 0x0200ffff) AM_RAM AM_SHARE("sram") // 'battery ram' (in CPU?)
@@ -576,18 +576,18 @@ static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pgm2_rom_map, AS_PROGRAM, 32, pgm2_state )
+ADDRESS_MAP_START(pgm2_state::pgm2_rom_map)
 	AM_IMPORT_FROM(pgm2_map)
 	AM_RANGE(0x10000000, 0x10ffffff) AM_ROM AM_REGION("user1", 0) // external ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pgm2_ram_rom_map, AS_PROGRAM, 32, pgm2_state )
+ADDRESS_MAP_START(pgm2_state::pgm2_ram_rom_map)
 	AM_IMPORT_FROM(pgm2_map)
 	AM_RANGE(0x10000000, 0x101fffff) AM_RAM AM_SHARE("romboard_ram") // we should also probably decrypt writes once the encryption is enabled, but the game never writes with it turned on anyway
 	AM_RANGE(0x10200000, 0x103fffff) AM_ROM AM_REGION("user1", 0) // external ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pgm2_module_rom_map, AS_PROGRAM, 32, pgm2_state )
+ADDRESS_MAP_START(pgm2_state::pgm2_module_rom_map)
 	AM_IMPORT_FROM(pgm2_rom_map)
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE16(module_rom_w, 0xffffffff)
 	AM_RANGE(0x10000000, 0x1000000f) AM_READ16(module_rom_r, 0xffffffff)

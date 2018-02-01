@@ -53,6 +53,8 @@ public:
 	void write_reg(uint16_t data);
 	void write_data(uint16_t data);
 
+	void tms_io_map(address_map &map);
+	void tms_program_map(address_map &map);
 protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const override;

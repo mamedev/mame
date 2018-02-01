@@ -81,6 +81,8 @@ public:
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 	void kongambl(machine_config &config);
+	void kongamaud_map(address_map &map);
+	void kongambl_map(address_map &map);
 };
 
 
@@ -206,7 +208,7 @@ WRITE8_MEMBER(kongambl_state::kongambl_ff_w)
 //  printf("%02x\n",data);
 }
 
-static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
+ADDRESS_MAP_START(kongambl_state::kongambl_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM // main program
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM // work RAM
 
@@ -259,7 +261,7 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 	//AM_RANGE(0x780004, 0x780007) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kongamaud_map, AS_PROGRAM, 16, kongambl_state )
+ADDRESS_MAP_START(kongambl_state::kongamaud_map)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM // main program (mirrored?)
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // work RAM
 	AM_RANGE(0x180000, 0x180001) AM_WRITENOP

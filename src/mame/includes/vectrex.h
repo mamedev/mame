@@ -125,6 +125,8 @@ public:
 
 	void vectrex(machine_config &config);
 	void raaspec(machine_config &config);
+	void raaspec_map(address_map &map);
+	void vectrex_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

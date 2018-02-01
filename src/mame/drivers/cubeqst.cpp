@@ -87,6 +87,9 @@ public:
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
 	void swap_linecpu_banks();
 	void cubeqst(machine_config &config);
+	void line_sound_map(address_map &map);
+	void m68k_program_map(address_map &map);
+	void rotate_map(address_map &map);
 };
 
 
@@ -422,7 +425,7 @@ WRITE16_MEMBER(cubeqst_state::write_sndram)
 	m_soundcpu->sndram_w(space, offset, data, mem_mask);
 }
 
-static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16, cubeqst_state )
+ADDRESS_MAP_START(cubeqst_state::m68k_program_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x03ffff)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x027fff) AM_READWRITE(read_rotram, write_rotram)
@@ -439,11 +442,11 @@ ADDRESS_MAP_END
 
 
 /* For the bit-sliced CPUs */
-static ADDRESS_MAP_START( rotate_map, AS_PROGRAM, 64, cubeqst_state )
+ADDRESS_MAP_START(cubeqst_state::rotate_map)
 	AM_RANGE(0x000, 0x1ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( line_sound_map, AS_PROGRAM, 64, cubeqst_state )
+ADDRESS_MAP_START(cubeqst_state::line_sound_map)
 	AM_RANGE(0x000, 0x0ff) AM_ROM
 ADDRESS_MAP_END
 

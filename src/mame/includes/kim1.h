@@ -58,6 +58,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(kim1_update_leds);
 
 	void kim1(machine_config &config);
+	void kim1_map(address_map &map);
 protected:
 	required_ioport m_row0;
 	required_ioport m_row1;

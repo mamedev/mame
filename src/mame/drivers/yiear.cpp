@@ -138,7 +138,7 @@ INTERRUPT_GEN_MEMBER(yiear_state::yiear_nmi_interrupt)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, yiear_state )
+ADDRESS_MAP_START(yiear_state::main_map)
 	AM_RANGE(0x0000, 0x0000) AM_READ(yiear_speech_r)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(yiear_control_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(konami_SN76496_latch_w)
@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, yiear_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( vlm_map, 0, 8, yiear_state )
+ADDRESS_MAP_START(yiear_state::vlm_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END

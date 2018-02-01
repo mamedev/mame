@@ -52,6 +52,8 @@ public:
 	void kbd_put(u8 data);
 
 	void dms86(machine_config &config);
+	void io_map(address_map &map);
+	void mem_map(address_map &map);
 private:
 	u8 m_term_data;
 	virtual void machine_reset() override;
@@ -79,13 +81,13 @@ READ16_MEMBER( dms86_state::port9c_r )
 }
 
 
-static ADDRESS_MAP_START(mem_map, AS_PROGRAM, 16, dms86_state)
+ADDRESS_MAP_START(dms86_state::mem_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION("roms",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(io_map, AS_IO, 16, dms86_state)
+ADDRESS_MAP_START(dms86_state::io_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x82, 0x83) AM_READ(port82_r)

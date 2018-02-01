@@ -59,6 +59,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
 	void st_mp100(machine_config &config);
+	void st_mp100_map(address_map &map);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -89,7 +90,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( st_mp100_map, AS_PROGRAM, 8, st_mp100_state )
+ADDRESS_MAP_START(st_mp100_state::st_mp100_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM // internal to the cpu
 	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)

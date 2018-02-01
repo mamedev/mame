@@ -283,38 +283,38 @@ WRITE8_MEMBER(cinemat_state::qb3_ram_bank_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( program_map_4k, AS_PROGRAM, 8, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::program_map_4k)
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( program_map_8k, AS_PROGRAM, 8, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::program_map_8k)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0x1000) AM_ROM AM_REGION("maincpu", 0x1000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( program_map_16k, AS_PROGRAM, 8, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::program_map_16k)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( program_map_32k, AS_PROGRAM, 8, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::program_map_32k)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( data_map, AS_DATA, 16, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::data_map)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( data_map_qb3, AS_DATA, 16, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::data_map_qb3)
 	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1") AM_SHARE("rambase")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::io_map)
 	AM_RANGE(0x00, 0x0f) AM_READ(inputs_r)
 	AM_RANGE(0x10, 0x16) AM_READ(switches_r)
 	AM_RANGE(0x17, 0x17) AM_READ(coin_input_r)
@@ -322,7 +322,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, cinemat_state )
 	AM_RANGE(0x00, 0x07) AM_DEVWRITE("outlatch", ls259_device, write_d0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map_qb3, AS_IO, 8, cinemat_state )
+ADDRESS_MAP_START(cinemat_state::io_map_qb3)
 	AM_IMPORT_FROM(io_map)
 	// Some of the outputs here are definitely not mapped through the LS259, since they use multiple bits of data
 	AM_RANGE(0x00, 0x00) AM_WRITE(qb3_ram_bank_w)

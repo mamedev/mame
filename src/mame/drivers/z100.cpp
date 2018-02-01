@@ -220,6 +220,8 @@ public:
 	uint32_t screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	void z100(machine_config &config);
+	void z100_io(address_map &map);
+	void z100_mem(address_map &map);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -306,7 +308,7 @@ WRITE8_MEMBER( z100_state::z100_vram_w )
 	}
 }
 
-static ADDRESS_MAP_START(z100_mem, AS_PROGRAM, 8, z100_state)
+ADDRESS_MAP_START(z100_state::z100_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x3ffff) AM_RAM // 128*2 KB RAM
 //  AM_RANGE(0xb0000,0xbffff) AM_ROM // expansion ROM
@@ -382,7 +384,7 @@ WRITE8_MEMBER( z100_state::floppy_motor_w )
 		m_floppy->mon_w(!BIT(data, 1));
 }
 
-static ADDRESS_MAP_START(z100_io, AS_IO, 8, z100_state)
+ADDRESS_MAP_START(z100_state::z100_io)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE (0x00, 0x3f) reserved for non-ZDS vendors

@@ -47,7 +47,7 @@ WRITE8_MEMBER(ikki_state::ikki_coin_counters)
  *
  *************************************/
 
-static ADDRESS_MAP_START( ikki_cpu1, AS_PROGRAM, 8, ikki_state )
+ADDRESS_MAP_START(ikki_state::ikki_cpu1)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( ikki_cpu1, AS_PROGRAM, 8, ikki_state )
 	AM_RANGE(0xe00a, 0xe00b) AM_WRITEONLY AM_SHARE("scroll")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ikki_cpu2, AS_PROGRAM, 8, ikki_state )
+ADDRESS_MAP_START(ikki_state::ikki_cpu2)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")

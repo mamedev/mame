@@ -61,6 +61,11 @@ public:
 	void alg_r2(machine_config &config);
 	void picmatic(machine_config &config);
 	void alg_r1(machine_config &config);
+	void a500_mem(address_map &map);
+	void main_map_picmatic(address_map &map);
+	void main_map_r1(address_map &map);
+	void main_map_r2(address_map &map);
+	void overlay_512kb_map(address_map &map);
 protected:
 	// amiga_state overrides
 	virtual void potgo_w(uint16_t data) override;
@@ -170,13 +175,13 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_holster_r)
  *
  *************************************/
 
-static ADDRESS_MAP_START( overlay_512kb_map, AS_PROGRAM, 16, alg_state )
+ADDRESS_MAP_START(alg_state::overlay_512kb_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_MIRROR(0x180000) AM_RAM AM_SHARE("chip_ram")
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, alg_state )
+ADDRESS_MAP_START(alg_state::a500_mem)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_DEVICE("overlay", address_map_bank_device, amap16)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cia_r, cia_w)
@@ -189,19 +194,19 @@ static ADDRESS_MAP_START( a500_mem, AS_PROGRAM, 16, alg_state )
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("kickstart", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map_r1, AS_PROGRAM, 16, alg_state )
+ADDRESS_MAP_START(alg_state::main_map_r1)
 	AM_IMPORT_FROM(a500_mem)
 	AM_RANGE(0xf00000, 0xf1ffff) AM_ROM AM_REGION("user2", 0)           /* Custom ROM */
 	AM_RANGE(0xf54000, 0xf55fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map_r2, AS_PROGRAM, 16, alg_state )
+ADDRESS_MAP_START(alg_state::main_map_r2)
 	AM_IMPORT_FROM(a500_mem)
 	AM_RANGE(0xf00000, 0xf3ffff) AM_ROM AM_REGION("user2", 0)           /* Custom ROM */
 	AM_RANGE(0xf7c000, 0xf7dfff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map_picmatic, AS_PROGRAM, 16, alg_state )
+ADDRESS_MAP_START(alg_state::main_map_picmatic)
 	AM_IMPORT_FROM(a500_mem)
 	AM_RANGE(0xf00000, 0xf1ffff) AM_ROM AM_REGION("user2", 0)           /* Custom ROM */
 	AM_RANGE(0xf40000, 0xf41fff) AM_RAM AM_SHARE("nvram")

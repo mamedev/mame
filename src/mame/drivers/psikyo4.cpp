@@ -321,7 +321,7 @@ WRITE32_MEMBER(psikyo4_state::io_select_w)
 		logerror("Unk ioselect write %x mask %x\n", data, mem_mask);
 }
 
-static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
+ADDRESS_MAP_START(psikyo4_state::ps4_map)
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM     // program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROM AM_REGION("maincpu", 0x100000) // data ROM
 	AM_RANGE(0x03000000, 0x030037ff) AM_RAM AM_SHARE("spriteram")
@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_SHARE("ram") // main RAM (1 meg)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ps4_ymf_map, 0, 8, psikyo4_state )
+ADDRESS_MAP_START(psikyo4_state::ps4_ymf_map)
 	AM_RANGE(0x000000, 0x0fffff) AM_ROMBANK("ymfbank0")
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("ymfbank1")
 	AM_RANGE(0x200000, 0x2fffff) AM_ROMBANK("ymfbank2")

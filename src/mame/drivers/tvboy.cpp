@@ -31,6 +31,8 @@ public:
 	void tvboyii(machine_config &config);
 	void supertvboy(machine_config &config);
 
+	void rom_map(address_map &map);
+	void tvboy_mem(address_map &map);
 private:
 	required_device<address_map_bank_device> m_crom;
 	required_region_ptr<uint8_t> m_rom;
@@ -49,7 +51,7 @@ WRITE8_MEMBER(tvboy_state::bank_write) {
 		m_crom->set_bank(data);
 }
 
-static ADDRESS_MAP_START(tvboy_mem, AS_PROGRAM, 8, tvboy_state ) // 6507 has 13-bit address space, 0x0000 - 0x1fff
+ADDRESS_MAP_START(tvboy_state::tvboy_mem) // 6507 has 13-bit address space, 0x0000 - 0x1fff
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0f00) AM_DEVREADWRITE("tia_video", tia_video_device, read, write)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0d00) AM_RAM AM_SHARE("riot_ram")
 #if USE_NEW_RIOT
@@ -61,7 +63,7 @@ static ADDRESS_MAP_START(tvboy_mem, AS_PROGRAM, 8, tvboy_state ) // 6507 has 13-
 	AM_RANGE(0x1000, 0x1fff) AM_DEVICE("crom", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rom_map, AS_PROGRAM, 8, tvboy_state )
+ADDRESS_MAP_START(tvboy_state::rom_map)
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM AM_REGION("mainrom", 0)
 ADDRESS_MAP_END
 

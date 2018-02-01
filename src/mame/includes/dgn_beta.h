@@ -233,6 +233,7 @@ public:
 	offs_t dgnbeta_dasm_override(std::ostream &stream, offs_t pc, const util::disasm_interface::data_buffer &opcodes, const util::disasm_interface::data_buffer &params);
 
 	void dgnbeta(machine_config &config);
+	void dgnbeta_map(address_map &map);
 private:
 	void execute_beta_key_dump(int ref, const std::vector<std::string> &params);
 	void execute_beta_dat_log(int ref, const std::vector<std::string> &params);

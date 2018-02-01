@@ -34,6 +34,8 @@ public:
 	DECLARE_WRITE8_MEMBER(ym_porta_w);
 
 	void gokidetor(machine_config &config);
+	void main_map(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 
@@ -84,7 +86,7 @@ WRITE8_MEMBER(gokidetor_state::ym_porta_w)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, gokidetor_state )
+ADDRESS_MAP_START(gokidetor_state::main_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM // probably banked
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
@@ -106,7 +108,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, gokidetor_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gokidetor_state )
+ADDRESS_MAP_START(gokidetor_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)

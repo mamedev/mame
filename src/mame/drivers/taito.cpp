@@ -84,6 +84,12 @@ public:
 	void taito4(machine_config &config);
 	void taito5(machine_config &config);
 	void taito_ay_audio(machine_config &config);
+	void shock_map(address_map &map);
+	void shock_sub_map(address_map &map);
+	void taito_map(address_map &map);
+	void taito_sub_map(address_map &map);
+	void taito_sub_map2(address_map &map);
+	void taito_sub_map5(address_map &map);
 private:
 	uint8_t m_out_offs;
 	uint8_t m_sndcmd;
@@ -98,7 +104,7 @@ private:
 };
 
 
-static ADDRESS_MAP_START( taito_map, AS_PROGRAM, 8, taito_state )
+ADDRESS_MAP_START(taito_state::taito_map)
 	AM_RANGE(0x0000, 0x27ff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x0080) AM_READ_PORT("X0")
 	AM_RANGE(0x2801, 0x2801) AM_MIRROR(0x0080) AM_READ_PORT("X1")
@@ -124,21 +130,21 @@ static ADDRESS_MAP_START( taito_map, AS_PROGRAM, 8, taito_state )
 	AM_RANGE(0x4800, 0x48ff) AM_ROM AM_REGION("roms", 0x2000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( taito_sub_map, AS_PROGRAM, 8, taito_state )
+ADDRESS_MAP_START(taito_state::taito_sub_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM // internal to the cpu
 	AM_RANGE(0x0400, 0x0403) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0x0800, 0x1fff) AM_ROM AM_REGION("cpu2", 0x0800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( taito_sub_map2, AS_PROGRAM, 8, taito_state )
+ADDRESS_MAP_START(taito_state::taito_sub_map2)
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM // internal to the cpu
 	AM_RANGE(0x0400, 0x0403) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM AM_REGION("cpu2", 0x2000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( taito_sub_map5, AS_PROGRAM, 8, taito_state )
+ADDRESS_MAP_START(taito_state::taito_sub_map5)
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM // internal to the cpu
 	AM_RANGE(0x0400, 0x0403) AM_DEVREADWRITE("pia", pia6821_device, read, write)
@@ -153,7 +159,7 @@ static ADDRESS_MAP_START( taito_sub_map5, AS_PROGRAM, 8, taito_state )
 	AM_RANGE(0x2000, 0x7fff) AM_ROM AM_REGION("cpu2", 0x2000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shock_map, AS_PROGRAM, 8, taito_state )
+ADDRESS_MAP_START(taito_state::shock_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x1000, 0x100f) AM_RAM AM_SHARE("ram")
@@ -174,7 +180,7 @@ static ADDRESS_MAP_START( shock_map, AS_PROGRAM, 8, taito_state )
 	AM_RANGE(0x1800, 0x1bff) AM_ROM AM_REGION("roms", 0x1800)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shock_sub_map, AS_PROGRAM, 8, taito_state )
+ADDRESS_MAP_START(taito_state::shock_sub_map)
 	ADDRESS_MAP_GLOBAL_MASK(0x0fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM // internal to the cpu
 	AM_RANGE(0x0400, 0x0403) AM_DEVREADWRITE("pia", pia6821_device, read, write)

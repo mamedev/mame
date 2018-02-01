@@ -396,7 +396,7 @@ void segahang_state::sharrier_i8751_sim()
 //  MAIN CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( hangon_map, AS_PROGRAM, 16, segahang_state )
+ADDRESS_MAP_START(segahang_state::hangon_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x20c000, 0x20ffff) AM_RAM AM_SHARE("workram")
@@ -410,12 +410,12 @@ static ADDRESS_MAP_START( hangon_map, AS_PROGRAM, 16, segahang_state )
 	AM_RANGE(0xe00000, 0xffffff) AM_READWRITE(hangon_io_r, hangon_io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decrypted_opcodes_map, AS_OPCODES, 16, segahang_state )
+ADDRESS_MAP_START(segahang_state::decrypted_opcodes_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sharrier_map, AS_PROGRAM, 16, segahang_state )
+ADDRESS_MAP_START(segahang_state::sharrier_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("workram")
@@ -435,7 +435,7 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 	// On Super Hang On there is a memory mapper, like the System16 one, todo: emulate it!
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segahang_state )
+ADDRESS_MAP_START(segahang_state::sub_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -443,7 +443,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segahang_state )
 	AM_RANGE(0x07c000, 0x07ffff) AM_RAM AM_SHARE("subram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fd1094_decrypted_opcodes_map, AS_OPCODES, 16, segahang_state )
+ADDRESS_MAP_START(segahang_state::fd1094_decrypted_opcodes_map)
 	AM_RANGE(0x00000, 0xfffff) AM_ROMBANK("fd1094_decrypted_opcodes")
 ADDRESS_MAP_END
 
@@ -451,7 +451,7 @@ ADDRESS_MAP_END
 //  SOUND CPU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( sound_map_2203, AS_PROGRAM, 8, segahang_state )
+ADDRESS_MAP_START(segahang_state::sound_map_2203)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x0800) AM_RAM
@@ -459,27 +459,27 @@ static ADDRESS_MAP_START( sound_map_2203, AS_PROGRAM, 8, segahang_state )
 	AM_RANGE(0xe000, 0xe0ff) AM_MIRROR(0x0f00) AM_DEVREADWRITE("pcm", segapcm_device, sega_pcm_r, sega_pcm_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap_2203, AS_IO, 8, segahang_state )
+ADDRESS_MAP_START(segahang_state::sound_portmap_2203)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map_2151, AS_PROGRAM, 8, segahang_state )
+ADDRESS_MAP_START(segahang_state::sound_map_2151)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x700) AM_DEVREADWRITE("pcm", segapcm_device, sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap_2151, AS_IO, 8, segahang_state )
+ADDRESS_MAP_START(segahang_state::sound_portmap_2151)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap_2203x2, AS_IO, 8, segahang_state )
+ADDRESS_MAP_START(segahang_state::sound_portmap_2203x2)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
@@ -493,7 +493,7 @@ ADDRESS_MAP_END
 //  I8751 MCU ADDRESS MAPS
 //**************************************************************************
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, segahang_state )
+ADDRESS_MAP_START(segahang_state::mcu_io_map)
 ADDRESS_MAP_END
 
 
@@ -933,7 +933,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(segahang_state::shangonro, shangupb)
 	MCFG_CPU_REPLACE("subcpu", FD1094, 10000000)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(fd1094_decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(fd1094_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
@@ -971,7 +971,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(segahang_state::endurobl, sharrier_base)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 
 	MCFG_FRAGMENT_ADD(sound_board_2203)
 MACHINE_CONFIG_END
@@ -979,7 +979,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(segahang_state::endurob2, sharrier_base)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_OPCODES_MAP(decrypted_opcodes_map)
 
 	MCFG_FRAGMENT_ADD(sound_board_2203x2)
 MACHINE_CONFIG_END

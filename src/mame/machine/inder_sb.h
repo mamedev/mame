@@ -42,6 +42,8 @@ public:
 	DECLARE_READ16_MEMBER(megaphx_0x050002_r);
 	DECLARE_WRITE16_MEMBER(megaphx_0x050000_w);
 
+	void sound_io(address_map &map);
+	void sound_map(address_map &map);
 protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual void device_start() override;

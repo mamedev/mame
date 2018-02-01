@@ -47,6 +47,7 @@ public:
 
 	//DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	void fd2000_mem(address_map &map);
 protected:
 	fd2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -78,6 +79,7 @@ public:
 	// construction/destruction
 	fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void fd4000_mem(address_map &map);
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;

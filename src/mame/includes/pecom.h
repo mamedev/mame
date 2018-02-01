@@ -61,6 +61,9 @@ public:
 	CDP1869_PCB_READ_MEMBER(pecom_pcb_r);
 	void pecom64(machine_config &config);
 	void pecom_video(machine_config &config);
+	void cdp1869_page_ram(address_map &map);
+	void pecom64_io(address_map &map);
+	void pecom64_mem(address_map &map);
 protected:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;

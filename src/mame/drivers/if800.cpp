@@ -33,6 +33,9 @@ public:
 	required_device<palette_device> m_palette;
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	void if800(machine_config &config);
+	void if800_io(address_map &map);
+	void if800_map(address_map &map);
+	void upd7220_map(address_map &map);
 };
 
 UPD7220_DISPLAY_PIXELS_MEMBER( if800_state::hgdc_display_pixels )
@@ -52,13 +55,13 @@ UPD7220_DISPLAY_PIXELS_MEMBER( if800_state::hgdc_display_pixels )
 	}
 }
 
-static ADDRESS_MAP_START(if800_map, AS_PROGRAM, 16, if800_state)
+ADDRESS_MAP_START(if800_state::if800_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x0ffff) AM_RAM
 	AM_RANGE(0xfe000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(if800_io, AS_IO, 16, if800_state)
+ADDRESS_MAP_START(if800_state::if800_io)
 	ADDRESS_MAP_UNMAP_HIGH
 //  AM_RANGE(0x0640, 0x065f) dma?
 	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8("upd7220", upd7220_device, read, write,0x00ff)
@@ -77,7 +80,7 @@ void if800_state::machine_reset()
 {
 }
 
-static ADDRESS_MAP_START( upd7220_map, 0, 16, if800_state )
+ADDRESS_MAP_START(if800_state::upd7220_map)
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 

@@ -136,6 +136,9 @@ public:
 	void dlair_pr7820(machine_config &config);
 	void dleuro(machine_config &config);
 	void dlair_ldv1000(machine_config &config);
+	void dleuro_io_map(address_map &map);
+	void dleuro_map(address_map &map);
+	void dlus_map(address_map &map);
 };
 
 
@@ -365,7 +368,7 @@ WRITE8_MEMBER(dlair_state::laserdisc_w)
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( dlus_map, AS_PROGRAM, 8, dlair_state )
+ADDRESS_MAP_START(dlair_state::dlus_map)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fc7) AM_DEVREAD("aysnd", ay8910_device, data_r)
@@ -389,7 +392,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( dleuro_map, AS_PROGRAM, 8, dlair_state )
+ADDRESS_MAP_START(dlair_state::dleuro_map)
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("videoram")
@@ -409,7 +412,7 @@ ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( dleuro_io_map, AS_IO, 8, dlair_state )
+ADDRESS_MAP_START(dlair_state::dleuro_io_map)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7c) AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_DEVREADWRITE("sio", z80sio_device, ba_cd_r, ba_cd_w)

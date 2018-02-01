@@ -62,6 +62,8 @@ public:
 	};
 
 	void softbox(machine_config &config);
+	void softbox_io(address_map &map);
+	void softbox_mem(address_map &map);
 	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
 };
 

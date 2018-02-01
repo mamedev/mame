@@ -56,6 +56,7 @@ public:
 	DECLARE_DRIVER_INIT(jupiter2);
 
 	void jupiter2(machine_config &config);
+	void jupiter2_mem(address_map &map);
 private:
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -82,6 +83,8 @@ public:
 	DECLARE_READ8_MEMBER(ff_r);
 
 	void jupiter3(machine_config &config);
+	void jupiter3_io(address_map &map);
+	void jupiter3_mem(address_map &map);
 private:
 	virtual void machine_reset() override;
 	uint8_t m_term_data;
@@ -101,7 +104,7 @@ private:
 //  ADDRESS_MAP( jupiter_m6800_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( jupiter2_mem, AS_PROGRAM, 8, jupiter2_state )
+ADDRESS_MAP_START(jupiter2_state::jupiter2_mem)
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM  // Video RAM
 	AM_RANGE(0xf000, 0xff00) AM_ROM AM_REGION(MCM6571AP_TAG, 0)
@@ -129,7 +132,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( jupiter3_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( jupiter3_mem, AS_PROGRAM, 8, jupiter3_state )
+ADDRESS_MAP_START(jupiter3_state::jupiter3_mem)
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION(Z80_TAG, 0)
@@ -141,7 +144,7 @@ ADDRESS_MAP_END
 //  ADDRESS_MAP( jupiter3_io )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( jupiter3_io, AS_IO, 8, jupiter3_state )
+ADDRESS_MAP_START(jupiter3_state::jupiter3_io)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xa1, 0xa4) AM_READ(ff_r)
 	AM_RANGE(0xb0, 0xb0) AM_READ(status_r)

@@ -24,7 +24,7 @@
 #include "includes/megadriv_rad.h"
 
 // todo, use actual MD map, easier once maps are part of base class.
-static ADDRESS_MAP_START( megadriv_radica_map, AS_PROGRAM, 16, megadriv_radica_state )
+ADDRESS_MAP_START(megadriv_radica_state::megadriv_radica_map)
 	AM_RANGE(0x000000, 0x3fffff) AM_READ(read) /* Cartridge Program Rom */
 	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram, megadriv_68k_write_z80_ram)
 	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)

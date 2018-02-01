@@ -338,6 +338,8 @@ public:
 	void handle_lightpen();
 
 	void peplus(machine_config &config);
+	void peplus_iomap(address_map &map);
+	void peplus_map(address_map &map);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -997,11 +999,11 @@ GFXDECODE_END
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( peplus_map, AS_PROGRAM, 8, peplus_state )
+ADDRESS_MAP_START(peplus_state::peplus_map)
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("prograram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
+ADDRESS_MAP_START(peplus_state::peplus_iomap)
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM_WRITE(peplus_cmos_w) AM_SHARE("cmos")
 

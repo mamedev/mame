@@ -125,6 +125,8 @@ public:
 	void common(machine_config &config);
 	void bw14(machine_config &config);
 	void bw12(machine_config &config);
+	void bw12_io(address_map &map);
+	void bw12_mem(address_map &map);
 };
 
 #endif

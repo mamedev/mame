@@ -32,7 +32,7 @@ public:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
+	virtual void config_map(address_map &map) override;
 
 	virtual DECLARE_READ8_MEMBER(capptr_r) override;
 
@@ -85,7 +85,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(agp_translation_map, 32);
+	void agp_translation_map(address_map &map);
 
 	const char *cpu_tag;
 	int ram_size;
@@ -126,7 +126,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	DECLARE_ADDRESS_MAP(overflow_map, 32);
+	void overflow_map(address_map &map);
 
 	uint8_t dram_row_boundary[8], dram_row_attribute[4];
 	uint32_t dram_timing, dram_controller_mode;

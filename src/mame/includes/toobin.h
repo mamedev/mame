@@ -51,4 +51,5 @@ public:
 
 	static const atari_motion_objects_config s_mob_config;
 	void toobin(machine_config &config);
+	void main_map(address_map &map);
 };

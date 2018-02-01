@@ -168,6 +168,8 @@ public:
 	void jb3000(machine_config &config);
 	void myb3k(machine_config &config);
 
+	void myb3k_io(address_map &map);
+	void myb3k_map(address_map &map);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -561,7 +563,7 @@ WRITE8_MEMBER( myb3k_state::myb3k_video_mode_w )
  *       OFF ON  - ?
  *       ON  ON  - ?
  **********************************************************/
-static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8, myb3k_state)
+ADDRESS_MAP_START(myb3k_state::myb3k_map)
 	ADDRESS_MAP_UNMAP_HIGH
 	//AM_RANGE(0x00000,0x3ffff) AM_RAM // It's either 128Kb or 256Kb RAM installed by machine_start()
 	AM_RANGE(0x40000,0x7ffff) AM_NOP
@@ -570,7 +572,7 @@ static ADDRESS_MAP_START(myb3k_map, AS_PROGRAM, 8, myb3k_state)
 	AM_RANGE(0xf0000,0xfffff) AM_ROM AM_REGION("ipl", 0) // Area 7, 8 x 8Kb
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(myb3k_io, AS_IO, 8, myb3k_state)
+ADDRESS_MAP_START(myb3k_state::myb3k_io)
 	ADDRESS_MAP_UNMAP_LOW
 	/* Main Unit 0-0x7ff */
 	// 0-3 8255A PPI parallel port

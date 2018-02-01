@@ -70,6 +70,8 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	void pc6001(machine_config &config);
+	void pc6001_io(address_map &map);
+	void pc6001_map(address_map &map);
 protected:
 	required_device<i8255_device> m_ppi;
 	optional_shared_ptr<uint8_t> m_ram;
@@ -176,6 +178,8 @@ public:
 
 	uint32_t screen_update_pc6001mk2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void pc6001mk2_io(address_map &map);
+	void pc6001mk2_map(address_map &map);
 protected:
 	uint8_t m_bgcol_bank;
 	uint8_t m_gfx_bank_on;
@@ -215,6 +219,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fdc_w);
 
 	void pc6601(machine_config &config);
+	void pc6601_io(address_map &map);
 };
 
 class pc6001sr_state : public pc6601_state
@@ -251,6 +256,8 @@ public:
 
 	void pc6001sr(machine_config &config);
 
+	void pc6001sr_io(address_map &map);
+	void pc6001sr_map(address_map &map);
 protected:
 	virtual void video_start() override; 
 	virtual void machine_reset() override;

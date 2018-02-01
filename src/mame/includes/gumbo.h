@@ -34,4 +34,7 @@ public:
 	void mspuzzle(machine_config &config);
 	void dblpoint(machine_config &config);
 	void gumbo(machine_config &config);
+	void dblpoint_map(address_map &map);
+	void gumbo_map(address_map &map);
+	void mspuzzle_map(address_map &map);
 };

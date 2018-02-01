@@ -292,7 +292,7 @@ TODO:
  *  Address maps
  *
  *************************************/
-static ADDRESS_MAP_START( common_maincpu_map, AS_PROGRAM, 8, bublbobl_state )
+ADDRESS_MAP_START(bublbobl_state::common_maincpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_SHARE("videoram")
@@ -301,7 +301,7 @@ static ADDRESS_MAP_START( common_maincpu_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bublbobl_maincpu_map, AS_PROGRAM, 8, bublbobl_state )
+ADDRESS_MAP_START(bublbobl_state::bublbobl_maincpu_map)
 	AM_IMPORT_FROM(common_maincpu_map)
 	AM_RANGE(0xfa00, 0xfa00) AM_MIRROR(0x007c) AM_DEVREAD("sound_to_main", generic_latch_8_device, read) AM_DEVWRITE("main_to_sound", generic_latch_8_device, write)
 	AM_RANGE(0xfa01, 0xfa01) AM_MIRROR(0x007c) AM_READ(common_sound_semaphores_r)
@@ -312,7 +312,7 @@ static ADDRESS_MAP_START( bublbobl_maincpu_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_SHARE("mcu_sharedram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( subcpu_map, AS_PROGRAM, 8, bublbobl_state )
+ADDRESS_MAP_START(bublbobl_state::subcpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -343,7 +343,7 @@ Sound cpu semaphores are both active low:
  74ls74@ic9 [1/2] 'sound_has_written', appears on d0
  74ls74@ic10 [2/2] 'maincpu_has_written', appears on d1
 */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bublbobl_state )
+ADDRESS_MAP_START(bublbobl_state::sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
@@ -354,7 +354,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM // space for diagnostic ROM?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, bublbobl_state )
+ADDRESS_MAP_START(bublbobl_state::mcu_map)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(bublbobl_mcu_ddr1_r, bublbobl_mcu_ddr1_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(bublbobl_mcu_ddr2_r, bublbobl_mcu_ddr2_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bublbobl_mcu_port1_r, bublbobl_mcu_port1_w)
@@ -367,7 +367,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, bublbobl_state )
+ADDRESS_MAP_START(bublbobl_state::bootleg_map)
 	AM_IMPORT_FROM(common_maincpu_map)
 	AM_RANGE(0xfa00, 0xfa00) AM_MIRROR(0x007c) AM_DEVREAD("sound_to_main", generic_latch_8_device, read) AM_DEVWRITE("main_to_sound", generic_latch_8_device, write)
 	AM_RANGE(0xfa01, 0xfa01) AM_MIRROR(0x007c) AM_READ(common_sound_semaphores_r)
@@ -389,7 +389,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, bublbobl_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tokio_map, AS_PROGRAM, 8, bublbobl_state )
+ADDRESS_MAP_START(bublbobl_state::tokio_map)
 	AM_IMPORT_FROM(common_maincpu_map)
 	AM_RANGE(0xfa00, 0xfa00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xfa03, 0xfa03) AM_READ_PORT("DSW0")
@@ -403,23 +403,23 @@ static ADDRESS_MAP_START( tokio_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xfc00, 0xfc00) AM_DEVREAD("sound_to_main", generic_latch_8_device, read) AM_DEVWRITE("main_to_sound", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tokio_map_mcu, AS_PROGRAM, 8, bublbobl_state )
+ADDRESS_MAP_START(bublbobl_state::tokio_map_mcu)
 	AM_IMPORT_FROM(tokio_map)
 	AM_RANGE(0xfe00, 0xfe00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tokio_map_bootleg, AS_PROGRAM, 8, bublbobl_state )
+ADDRESS_MAP_START(bublbobl_state::tokio_map_bootleg)
 	AM_IMPORT_FROM(tokio_map)
 	AM_RANGE(0xfe00, 0xfe00) AM_READ( tokiob_mcu_r )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tokio_subcpu_map, AS_PROGRAM, 8, bublbobl_state )
+ADDRESS_MAP_START(bublbobl_state::tokio_subcpu_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tokio_sound_map, AS_PROGRAM, 8, bublbobl_state )
+ADDRESS_MAP_START(bublbobl_state::tokio_sound_map)
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVREAD("main_to_sound", generic_latch_8_device, read) AM_DEVWRITE("sound_to_main", generic_latch_8_device, write)

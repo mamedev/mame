@@ -134,6 +134,10 @@ public:
 	uint8_t m_op41;
 	void ep804(machine_config &config);
 	void digel804(machine_config &config);
+	void z80_io_1_2(address_map &map);
+	void z80_io_1_4(address_map &map);
+	void z80_mem_804_1_2(address_map &map);
+	void z80_mem_804_1_4(address_map &map);
 };
 
 
@@ -428,7 +432,7 @@ WRITE8_MEMBER( digel804_state::acia_control_w )
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(z80_mem_804_1_4, AS_PROGRAM, 8, digel804_state)
+ADDRESS_MAP_START(digel804_state::z80_mem_804_1_4)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM // 3f in mapper = rom J3
 	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("main_ram") // 6f in mapper = RAM D43 (6164)
@@ -442,7 +446,7 @@ static ADDRESS_MAP_START(z80_mem_804_1_4, AS_PROGRAM, 8, digel804_state)
 	// f800-ffff is open bus in mapper, 7f
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z80_mem_804_1_2, AS_PROGRAM, 8, digel804_state)
+ADDRESS_MAP_START(digel804_state::z80_mem_804_1_2)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM // 3f in mapper = rom D41
 	AM_RANGE(0x2000, 0x3fff) AM_ROM // 5f in mapper = rom D42
@@ -457,7 +461,7 @@ static ADDRESS_MAP_START(z80_mem_804_1_2, AS_PROGRAM, 8, digel804_state)
 	// d800-ffff is open bus in mapper, 7f
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z80_io_1_4, AS_IO, 8, digel804_state)
+ADDRESS_MAP_START(digel804_state::z80_io_1_4)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// io bits: x 1 x x x * * *
@@ -485,7 +489,7 @@ static ADDRESS_MAP_START(z80_io_1_4, AS_IO, 8, digel804_state)
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z80_io_1_2, AS_IO, 8, digel804_state)
+ADDRESS_MAP_START(digel804_state::z80_io_1_2)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// io bits: x 1 x x x * * *
