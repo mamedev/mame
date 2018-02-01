@@ -7,17 +7,26 @@ Universal Commandline Options
 This section contains configuration options that are applicable to *all* MAME sub-builds (both SDL and Windows native).
 
 
+Commands and Verbs
+------------------
+
+Commands include **mame** itself as well as various tools included with the MAME distribution such as **romcmp** and **srcclean**.
+
+Verbs are actions to take upon something with the command (e.g. **mame -validate pacman** has *mame* as a command and *-validate* as a verb)
+
+
+
 Patterns
 --------
 
-Many commands support the use of *patterns*, which are either a system or device short name (e.g. **a2600**, **zorba_kbd**) or a glob pattern that matches either (e.g. **zorba_\***)
+Many verbs support the use of *patterns*, which are either a system or device short name (e.g. **a2600**, **zorba_kbd**) or a glob pattern that matches either (e.g. **zorba_\***)
 
-Depending on the command you're using the pattern with, pattern matching may match systems or systems and devices.
+Depending on the command you're using the pattern with, pattern matching may match systems or systems and devices. It is advised to put quotes around your patterns to avoid having your shell try to expand them against filenames. (e.g. **mame -validate "pac\*"**)
 
 
 
-Core Commands
--------------
+Core Verbs
+----------
 
 .. _mame-commandline-help:
 
@@ -34,19 +43,19 @@ Core Commands
 	violated any of the core system rules.
 
 	If a pattern is specified, it will validate systems matching
-	the pattern, otherwise it will validate all systems.
+	the pattern, otherwise it will validate all systems and devices.
 
 
 
-Configuration Commands
-----------------------
+Configuration Verbs
+-------------------
 
 .. _mame-commandline-createconfig:
 
 **-createconfig** / **-cc**
 
 	Creates the default mame.ini file. All the configuration options
-	(not commands) described below can be permanently changed by editing
+	(not verbs) described below can be permanently changed by editing
 	this configuration file.
 
 .. _mame-commandline-showconfig:
@@ -70,10 +79,10 @@ Configuration Commands
 
 
 
-Frontend Commands
------------------
+Frontend Verbs
+--------------
 
-Note: By default, all the '**-list**' commands below write info to the screen. If you wish to write the info to a textfile instead, add this to the end of your command:
+Note: By default, all the '**-list**' verbs below write info to the screen. If you wish to write the info to a textfile instead, add this to the end of your command:
 
   **> filename**
 
@@ -705,17 +714,19 @@ Core Video Options
 |
 |	Specifies which video subsystem to use for drawing. Options here depend on the operating system and whether this is an SDL-compiled version of MAME.
 |
-|	On Windows:
+|   Generally Available:
 |
 |	Using '**bgfx**' specifies the new hardware accelerated renderer.
-|   Using '**gdi**' here, tells MAME to render video using older standard Windows graphics drawing calls. This is the slowest but most compatible option on older versions of Windows.
-|   Using '**d3d**' tells MAME to use Direct3D for rendering. This produces the better quality output than gdi and enables additional rendering options. It is recommended if you have a semi-recent (2002+) video card or onboard Intel video of the HD3000 line or better. 
 |   Using '**opengl**' tells MAME to render video using OpenGL acceleration.
-|   Using '**none**' displays no windows and does no drawing. This is primarily present for doing CPU benchmarks without the overhead of the video system. The default is *d3d*.
+|   Using '**none**' displays no windows and does no drawing. This is primarily present for doing CPU benchmarks without the overhead of the video system.
+|
+|	On Windows:
+|
+|   Using '**gdi**' here, tells MAME to render video using older standard Windows graphics drawing calls. This is the slowest but most compatible option on older versions of Windows.
+|   Using '**d3d**' tells MAME to use Direct3D for rendering. This produces the better quality output than gdi and enables additional rendering options. It is recommended if you have a semi-recent (2002+) video card or onboard Intel video of the HD3000 line or better.
 |
 |   On other platforms (including SDL on Windows):
 |
-|   Using '**opengl**' tells MAME to render video using OpenGL acceleration. This may not work on all platforms due to wildly varying quality of stack and drivers.
 |	Using '**accel**' tells MAME to render video using SDL's 2D acceleration if possible.
 |   Using '**soft**' uses software rendering for video output. This isn't as fast or as nice as OpenGL but will work on any platform.
 |
@@ -967,7 +978,7 @@ Core Vector Options
 Core Video OpenGL Debugging Options
 -----------------------------------
 
-These 4 options are for compatibility in **-video opengl**.  If you report rendering artifacts you may be asked to try messing with them by the devs, but normally they should be left at their defaults which results in the best possible video performance.	
+These options are for compatibility in **-video opengl**. If you report rendering artifacts you may be asked to try messing with them by the devs, but normally they should be left at their defaults which results in the best possible video performance.
 
 .. _mame-commandline-glforcepow2texture:
 
@@ -985,13 +996,13 @@ These 4 options are for compatibility in **-video opengl**.  If you report rende
 
 **-[no]gl_vbo**
 
-    Enable OpenGL VBO,  if available (default *on*)
+    Enable OpenGL VBO (Vertex Buffer Objects), if available (default *on*)
 
 .. _mame-commandline-glpbo:
 
 **-[no]gl_pbo**
 
-    Enable OpenGL PBO,  if available (default *on*)
+    Enable OpenGL PBO (Pixel Buffer Objects), if available (default *on*)
 
 
 Core Video OpenGL GLSL Options
@@ -1008,7 +1019,7 @@ Core Video OpenGL GLSL Options
 
 **-gl_glsl_filter**
 
-	Enable OpenGL GLSL filtering instead of FF filtering -- *0-plain, 1-bilinear* (default is *1*)
+	Enable OpenGL GLSL filtering instead of FF filtering -- *0-plain, 1-bilinear, 2-bicubic* (default is *1*)
 
 .. _mame-commandline-glslshadermame:
 
@@ -1200,7 +1211,20 @@ Core Input Options
 
 **\-natural**
 
-        Allows user to specify whether or not to use a natural keyboard or not. This allows you to start your  system in a 'native' mode, depending on your region, allowing compatability for non-"QWERTY" style keyboards. The default is OFF (*-nonatural*)
+	Allows user to specify whether or not to use a natural keyboard or not. This allows you to start your system in a 'native' mode, depending on your region, allowing compatability for non-"QWERTY" style keyboards. The default is OFF (*-nonatural*)
+
+	In "emulated keyboard" mode (the default mode), MAME translates pressing/releasing host keys/buttons to emulated keystrokes. When you press/release a key/button mapped to an emulated key, MAME presses/releases the emulated key.
+
+	In "natural keyboard" mode, MAME attempts to translate characters to keystrokes. The OS translates keystrokes to characters (similarly when you type into a text editor), and MAME attempts to translate these characters to emulated keystrokes.
+
+	**There are a number of unavoidable limitations in "natural keyboard" mode:**
+
+	* The emulated system driver and/or keyboard device or has to support it.
+	* The selected keyboard *must* match the keyboard layout selected in the emulated OS!
+	* Keystrokes that don't produce characters can't be translated. (e.g. pressing a modifier on its own such as **shift**, **ctrl**, or **alt**)
+	* Holding a key until the character repeats will cause the emulated key to be pressed repeatedly as opposed to being held down.
+	* Dead key sequences are cumbersome to use at best.
+	* It won't work at all if IME edit is involved. (e.g. for Chinese/Japanese/Korean)
 
 .. _mame-commandline-joystickcontradictory:
 
@@ -1307,7 +1331,7 @@ Debugging Options
 	Specifies the name of the font to use for debugger windows.
 
 	The Windows default font is *Lucida Console*.
-	The Mac (Cocoa) default font is system default.
+	The Mac (Cocoa) default font is system fixed-pitch font default (typically *Monaco*).
 	The Qt default font is *Courier New*.
 
 .. _mame-commandline-debuggerfontsize:
@@ -1356,13 +1380,13 @@ Core Misc Options
 .. _mame-commandline-drc:
 
 **-[no]drc**
-	Enable DRC cpu core if available. The default is ON (*-drc*).
+	Enable DRC (dynamic recompiler) CPU core if available for maximum speed. The default is ON (*-drc*).
 
 .. _mame-commandline-drcusec:
 
 **\-drc_use_c**
 
-	Force DRC use the C code backend. The default is OFF (*-nodrc_use_c*).
+	Force DRC to use the C code backend. The default is OFF (*-nodrc_use_c*).
 
 .. _mame-commandline-drcloguml:
 
