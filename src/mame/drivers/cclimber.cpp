@@ -440,14 +440,14 @@ static ADDRESS_MAP_START( bagmanf_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM             /* Crazy Kong only */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P1")
-	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("P2")
 	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_SHARE("bigspriteram") // wrong
+	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("P2")
 	AM_RANGE(0x8900, 0x8bff) AM_RAM             /* not used, but initialized */
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xffe0, 0xffff) AM_RAM AM_SHARE("column_scroll") // wrong, is this area even connected?
 	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x9800, 0x981f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_SHARE("bigspritectrl") // wrong
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM  /* not used, but initialized */
 	AM_RANGE(0xa000, 0xa000) AM_READ(bagmanf_a000_r)
