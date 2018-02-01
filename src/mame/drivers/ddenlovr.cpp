@@ -2390,8 +2390,8 @@ READ8_MEMBER(ddenlovr_state::mmpanic_link_r){ return 0xff; }
 /* Main CPU */
 
 static ADDRESS_MAP_START( mmpanic_map, AS_PROGRAM, 8, ddenlovr_state )
-	AM_RANGE(0x0051, 0x0051) AM_READ(magic_r)                                   // ?
 	AM_RANGE(0x0000, 0x5fff) AM_ROM                                             // ROM
+	AM_RANGE(0x0051, 0x0051) AM_READ(magic_r)                                   // ?
 	AM_RANGE(0x6000, 0x6fff) AM_RAM                                             // RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")                                // RAM (Banked)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")                                // ROM (Banked)
@@ -3180,8 +3180,8 @@ static ADDRESS_MAP_START( hginga_map, AS_PROGRAM, 8, ddenlovr_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM                         // ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM                         // RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")            // RAM (Banked)
-	AM_RANGE(0xf601, 0xf601) AM_READ(hginga_protection_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")            // ROM/RAM (Banked)
+	AM_RANGE(0xf601, 0xf601) AM_READ(hginga_protection_r)
 	AM_RANGE(0xf000, 0xf1ff) AM_WRITE(rongrong_palette_w)   // RAM enabled by bit 4 of rombank
 	AM_RANGE(0xf700, 0xf706) AM_WRITENOP
 ADDRESS_MAP_END
@@ -3401,9 +3401,9 @@ static ADDRESS_MAP_START( hgokou_map, AS_PROGRAM, 8, ddenlovr_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM                         // ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM                         // RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")            // RAM (Banked)
-	AM_RANGE(0xe601, 0xe601) AM_READ(hgokou_protection_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")            // ROM (Banked)
 	AM_RANGE(0xe000, 0xe1ff) AM_WRITE(rongrong_palette_w)
+	AM_RANGE(0xe601, 0xe601) AM_READ(hgokou_protection_r)
 	AM_RANGE(0xe700, 0xe706) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -4458,8 +4458,8 @@ static ADDRESS_MAP_START( daimyojn_portmap, AS_IO, 8, ddenlovr_state )
 	AM_RANGE(0x32, 0x32) AM_READ(hanakanz_dsw_r)
 	AM_RANGE(0x40, 0x40) AM_WRITE(daimyojn_blitter_data_palette_w)
 	AM_RANGE(0x42, 0x44) AM_READ(hanakanz_gfxrom_r)
-	AM_RANGE(0x8a, 0x8b) AM_READ(daimyojn_year_hack_r)  // ?
 	AM_RANGE(0x80, 0x8f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+	AM_RANGE(0x8a, 0x8b) AM_READ(daimyojn_year_hack_r)  // ?
 	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ym2413", ym2413_device, write)
 	AM_RANGE(0xa2, 0xa2) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xa8, 0xa8) AM_READ_PORT("SYSTEM")

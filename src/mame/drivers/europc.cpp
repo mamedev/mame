@@ -501,8 +501,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(europc_io, AS_IO, 8, europc_pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r, europc_pio_w)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r, europc_pio_w)
 	AM_RANGE(0x0250, 0x025f) AM_READWRITE(europc_jim_r, europc_jim_w)
 	AM_RANGE(0x02e0, 0x02e0) AM_READ(europc_jim2_r)
 ADDRESS_MAP_END

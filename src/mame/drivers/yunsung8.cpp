@@ -83,9 +83,9 @@ WRITE8_MEMBER(yunsung8_state::main_irq_ack_w)
 */
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, yunsung8_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(bankswitch_w)    // ROM Bank (again?)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("mainbank")    // Banked ROM
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(videoram_r, videoram_w) // Video RAM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END

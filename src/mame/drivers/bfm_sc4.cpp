@@ -617,8 +617,8 @@ WRITE16_MEMBER(sc4_state::sc4_mem_w)
 }
 
 static ADDRESS_MAP_START( sc4_map, AS_PROGRAM, 16, sc4_state )
-	AM_RANGE(0x0000000, 0x0fffff) AM_READ(sc4_cs1_r) // technically we should be going through the cs handler, but this is always set to ROM, and assuming that is a lot faster
 	AM_RANGE(0x0000000, 0xffffff) AM_READWRITE(sc4_mem_r, sc4_mem_w)
+	AM_RANGE(0x0000000, 0x0fffff) AM_READ(sc4_cs1_r) // technically we should be going through the cs handler, but this is always set to ROM, and assuming that is a lot faster
 ADDRESS_MAP_END
 
 

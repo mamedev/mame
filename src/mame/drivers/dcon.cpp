@@ -60,8 +60,8 @@ static ADDRESS_MAP_START( dcon_map, AS_PROGRAM, 16, dcon_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sdgndmps_map, AS_PROGRAM, 16, dcon_state )
-	AM_RANGE(0xa0000, 0xa000d) AM_READ8(sdgndmps_sound_comms_r, 0x00ff)
 	AM_IMPORT_FROM(dcon_map)
+	AM_RANGE(0xa0000, 0xa000d) AM_READ8(sdgndmps_sound_comms_r, 0x00ff)
 ADDRESS_MAP_END
 
 /******************************************************************************/

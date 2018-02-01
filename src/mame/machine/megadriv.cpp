@@ -468,8 +468,8 @@ ADDRESS_MAP_END
 
 
 ADDRESS_MAP_START( dcat16_megadriv_map, AS_PROGRAM, 16, md_base_state )
-	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_IMPORT_FROM(megadriv_map)
+	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 ADDRESS_MAP_END
 
 

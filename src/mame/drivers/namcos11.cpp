@@ -496,10 +496,10 @@ static ADDRESS_MAP_START( rom8_64_map, AS_PROGRAM, 32, namcos11_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ptblank2ua_map, AS_PROGRAM, 32, namcos11_state )
+	AM_IMPORT_FROM(rom8_64_map)
+
 	AM_RANGE(0x1f780000, 0x1f78000f) AM_READ16(lightgun_r, 0xffffffff)
 	AM_RANGE(0x1f788000, 0x1f788003) AM_WRITE16(lightgun_w, 0xffffffff)
-
-	AM_IMPORT_FROM(rom8_64_map)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( c76_map, AS_PROGRAM, 16, namcos11_state )

@@ -1204,8 +1204,8 @@ static ADDRESS_MAP_START( sc9_map, AS_PROGRAM, 8, fidel6502_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sc9d_map, AS_PROGRAM, 8, fidel6502_state )
-	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x1ff8) AM_READ(sc9d_input_r)
 	AM_IMPORT_FROM( sc9_map )
+	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x1ff8) AM_READ(sc9d_input_r)
 ADDRESS_MAP_END
 
 
@@ -1274,8 +1274,8 @@ static ADDRESS_MAP_START( chesster_map, AS_PROGRAM, 8, fidel6502_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kishon_map, AS_PROGRAM, 8, fidel6502_state )
-	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(fdesdis_input_r, kishon_control_w)
 	AM_IMPORT_FROM( chesster_map )
+	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(fdesdis_input_r, kishon_control_w)
 ADDRESS_MAP_END
 
 

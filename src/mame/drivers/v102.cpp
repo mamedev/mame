@@ -10,6 +10,7 @@ Skeleton driver for Visual 102 display terminal.
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/eeprompar.h"
+#include "machine/input_merger.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
@@ -85,8 +86,13 @@ MACHINE_CONFIG_START(v102_state::v102)
 	MCFG_EEPROM_2804_ADD("eeprom")
 
 	MCFG_DEVICE_ADD("mpsc", UPD7201_NEW, XTAL(18'575'000) / 5) // divider not verified
+	MCFG_Z80SIO_OUT_INT_CB(DEVWRITELINE("mainirq", input_merger_device, in_w<0>))
 
 	MCFG_DEVICE_ADD("usart", I8251, XTAL(18'575'000) / 5) // divider not verified
+	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("mainirq", input_merger_device, in_w<1>))
+
+	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", 0))
 
 	MCFG_DEVICE_ADD("pit", PIT8253, 0)
 

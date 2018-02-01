@@ -161,9 +161,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( esb_main_map, AS_PROGRAM, 8, starwars_state )
+	AM_IMPORT_FROM(main_map)
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(esb_slapstic_r, esb_slapstic_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROMBANK("bank2")
-	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
 

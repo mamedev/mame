@@ -184,11 +184,11 @@ static ADDRESS_MAP_START(ccs2810_io, AS_IO, 8, ccs_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ccs2422_io, AS_IO, 8, ccs_state)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_read, io_write)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff00) AM_READWRITE(port04_r,port04_w)
 	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff00) AM_DEVREADWRITE("fdc", mb8877_device, read, write)
 	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_READWRITE(port34_r,port34_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0xff00) AM_WRITE(port40_w)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_read, io_write)
 ADDRESS_MAP_END
 
 /* Input ports */

@@ -73,8 +73,8 @@ WRITE8_MEMBER(scramble_state::scramble_soundram_w)
 
 static ADDRESS_MAP_START( scramble_sound_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scramble_soundram_r, scramble_soundram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_SHARE("soundram")  /* only here to initialize pointer */
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scramble_soundram_r, scramble_soundram_w)
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scramble_filter_w)
 ADDRESS_MAP_END
 
@@ -251,8 +251,8 @@ static ADDRESS_MAP_START( mimonscr_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x5040, 0x505f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5060, 0x507f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x5080, 0x50ff) AM_RAM
-	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x6800, 0x6802) AM_WRITE(galaxold_gfxbank_w)
+	AM_RANGE(0x6801, 0x6801) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x6806, 0x6806) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x6807, 0x6807) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)

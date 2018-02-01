@@ -152,10 +152,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, yiear_state )
 	AM_RANGE(0x4e02, 0x4e02) AM_READ_PORT("P2")
 	AM_RANGE(0x4e03, 0x4e03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x4f00, 0x4f00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
+	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x5000, 0x502f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5400, 0x542f) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0x5800, 0x5fff) AM_WRITE(yiear_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

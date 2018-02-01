@@ -198,8 +198,8 @@ static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (pentagon_switch, AS_OPCODES, 8, pentagon_state)
+	AM_RANGE(0x0000, 0x3fff) AM_READ(beta_neutral_r) // Overlap with next because we want real addresses on the 3e00-3fff range
 	AM_RANGE(0x3d00, 0x3dff) AM_READ(beta_enable_r)
-	AM_RANGE(0x0000, 0x3fff) AM_READ(beta_neutral_r) // Overlap with previous because we want real addresses on the 3e00-3fff range
 	AM_RANGE(0x4000, 0xffff) AM_READ(beta_disable_r)
 ADDRESS_MAP_END
 

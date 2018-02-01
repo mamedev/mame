@@ -116,18 +116,18 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
-	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(sound_irq_trigger_word_w) // fix coin insertion
 	AM_RANGE(0xe8000, 0xe800d) AM_DEVREADWRITE8("seibu_sound", seibu_sound_device, main_r, main_w, 0x00ff)
+	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(sound_irq_trigger_word_w) // fix coin insertion
 ADDRESS_MAP_END
 
 
 
 static ADDRESS_MAP_START( trackball_main_map, AS_PROGRAM, 16, cabal_state )
+	AM_IMPORT_FROM(main_map)
 	AM_RANGE(0xa0008, 0xa000f) AM_DEVREAD8("upd4701l", upd4701_device, read_xy, 0x00ff)
 	AM_RANGE(0xa0008, 0xa000f) AM_DEVREAD8("upd4701h", upd4701_device, read_xy, 0xff00)
 	AM_RANGE(0xc0000, 0xc0001) AM_DEVWRITE8("upd4701l", upd4701_device, reset_xy, 0x00ff)
 	AM_RANGE(0xc0000, 0xc0001) AM_DEVWRITE8("upd4701h", upd4701_device, reset_xy, 0xff00)
-	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
 

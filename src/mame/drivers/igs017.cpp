@@ -1186,9 +1186,9 @@ READ8_MEMBER(igs017_state::input_r)
 }
 
 static ADDRESS_MAP_START( iqblocka_io, AS_IO, 8, igs017_state )
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
-
 	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
+
+	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
 	AM_RANGE( 0x8000, 0x8000 ) AM_WRITE(input_select_w )
 	AM_RANGE( 0x8001, 0x8001 ) AM_READ(input_r )
@@ -1728,10 +1728,9 @@ static ADDRESS_MAP_START( tjsb_map, AS_PROGRAM, 8, igs017_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tjsb_io, AS_IO, 8, igs017_state )
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
-
 	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
 
+	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
 	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
@@ -1744,8 +1743,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spkrform_map, AS_PROGRAM, 8, igs017_state )
 	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
-	AM_RANGE( 0x0e9bf, 0x0e9bf ) AM_NOP // hack: uncomment to switch to Formosa
 	AM_RANGE( 0x0e000, 0x0efff ) AM_RAM
+	AM_RANGE( 0x0e9bf, 0x0e9bf ) AM_NOP // hack: uncomment to switch to Formosa
 	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
 ADDRESS_MAP_END
@@ -1769,9 +1768,9 @@ READ8_MEMBER(igs017_state::spkrform_input_r)
 }
 
 static ADDRESS_MAP_START( spkrform_io, AS_IO, 8, igs017_state )
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
-
 	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
+
+	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
 	AM_RANGE( 0x8000, 0x8000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
@@ -1852,7 +1851,7 @@ static ADDRESS_MAP_START( lhzb2, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x910000, 0x910003) AM_WRITE( lhzb2_magic_w )
 	AM_RANGE(0x910002, 0x910003) AM_READ( lhzb2_magic_r )
 
-	AM_RANGE( 0xb00000, 0xb0ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
 
 	AM_RANGE(0xb10000, 0xb10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 ADDRESS_MAP_END
@@ -2159,17 +2158,18 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 }
 
 static ADDRESS_MAP_START( lhzb2a, AS_PROGRAM, 16, igs017_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+
 	// prot2
 	AM_RANGE(0x003200, 0x003201) AM_WRITE( lhzb2a_prot2_reset_w )
 	AM_RANGE(0x003202, 0x003203) AM_WRITE( lhzb2a_prot2_dec_w )
 	AM_RANGE(0x003206, 0x003207) AM_WRITE( lhzb2a_prot2_inc_w )
 	AM_RANGE(0x00320a, 0x00320b) AM_READ( lhzb2a_prot2_r )
 
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
 //  AM_RANGE(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
 
-	AM_RANGE( 0xb00000, 0xb0ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
 
 	AM_RANGE(0xb10000, 0xb10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE(0xb12000, 0xb12001) AM_WRITE( lhzb2a_input_select_w )

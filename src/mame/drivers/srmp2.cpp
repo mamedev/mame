@@ -520,11 +520,11 @@ WRITE8_MEMBER(srmp2_state::rmgoldyh_rombank_w)
 
 static ADDRESS_MAP_START( rmgoldyh_io_map, AS_IO, 8, srmp2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_IMPORT_FROM(srmp3_io_map)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x60, 0x60) AM_WRITE(rmgoldyh_rombank_w)                       /* ROM bank select */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW4")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("DSW3")
-	AM_IMPORT_FROM(srmp3_io_map)
 ADDRESS_MAP_END
 
 /***************************************************************************
