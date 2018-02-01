@@ -756,7 +756,7 @@ ADDRESS_MAP_END
 
 
 /*************************************************************/
-/* C140 SOUND CHIP Memory declarations                        */
+/* C140 SOUND CHIP Memory declarations                       */
 /*************************************************************/
 
 // unused c140 bank bit 3-4

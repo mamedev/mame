@@ -598,7 +598,7 @@ WRITE16_MEMBER(namcona1_state::na1mcu_shared_w)
 READ16_MEMBER(namcona1_state::snd_r)
 {
 	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
-	return m_c219->c219_r(space,offset*2+1) | m_c219->c219_r(space,offset*2)<<8;
+	return m_c219->c140_r(space,offset*2+1) | m_c219->c140_r(space,offset*2)<<8;
 }
 
 WRITE16_MEMBER(namcona1_state::snd_w)
@@ -606,12 +606,12 @@ WRITE16_MEMBER(namcona1_state::snd_w)
 	/* can't use DEVREADWRITE8 for this because it is opposite endianness to the CPU for some reason */
 	if (ACCESSING_BITS_0_7)
 	{
-		m_c219->c219_w(space,(offset*2)+1, data);
+		m_c219->c140_w(space,(offset*2)+1, data);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		m_c219->c219_w(space,(offset*2), data>>8);
+		m_c219->c140_w(space,(offset*2), data>>8);
 	}
 }
 
@@ -624,8 +624,14 @@ static ADDRESS_MAP_START( namcona1_mcu_map, AS_PROGRAM, 16, namcona1_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( namcona1_c219_map, 0, 16, namcona1_state )
-	AM_RANGE(0x00000, 0x7ffff) AM_RAM AM_SHARE("workram")
+READ8_MEMBER(namcona1_state::na1_c219_ram_r)
+{
+	if (offset & 1) { return m_workram[offset] & 0xff; }
+	else            { return (m_workram[offset] >> 8) & 0xff; }
+}
+
+static ADDRESS_MAP_START( namcona1_c219_map, 0, 8, namcona1_state )
+	AM_RANGE(0x00000, 0x7ffff) AM_READ(na1_c219_ram_r)
 ADDRESS_MAP_END
 
 

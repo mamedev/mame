@@ -44,6 +44,7 @@ public:
 	DECLARE_WRITE16_MEMBER(mcu_mailbox_w_mcu);
 	DECLARE_READ16_MEMBER(na1mcu_shared_r);
 	DECLARE_WRITE16_MEMBER(na1mcu_shared_w);
+	DECLARE_READ8_MEMBER(na1_c219_ram_r);
 	DECLARE_READ8_MEMBER(port4_r);
 	DECLARE_WRITE8_MEMBER(port4_w);
 	DECLARE_READ8_MEMBER(port5_r);
@@ -111,7 +112,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<c219_device> m_c219;
+	required_device<c140_device> m_c219;
 
 	required_ioport_array<4> m_muxed_inputs;
 	required_ioport          m_io_p3;
