@@ -75,9 +75,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void namcona2(machine_config &config);
-	void namcona1w(machine_config &config);
-	void namcona2w(machine_config &config);
 	void namcona1(machine_config &config);
 
 protected:
@@ -174,6 +171,8 @@ public:
 	DECLARE_DRIVER_INIT(emeralda);
 	DECLARE_DRIVER_INIT(numanath);
 	DECLARE_DRIVER_INIT(quiztou);
+	
+	void namcona2(machine_config &config);
 };
 
 class xday2_namcona2_state : public namcona2_state
