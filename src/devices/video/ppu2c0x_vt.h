@@ -33,7 +33,8 @@
 enum vtxx_pal_mode {
 	PAL_MODE_VT0x,
 	PAL_MODE_NEW_RGB,
-	PAL_MODE_NEW_VG
+	PAL_MODE_NEW_VG,
+	PAL_MODE_NEW_RGB12,
 };
 
 class ppu_vt03_device : public ppu2c0x_device {

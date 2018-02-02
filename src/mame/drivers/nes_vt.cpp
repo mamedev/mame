@@ -75,6 +75,7 @@ public:
 	nes_vt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: nes_base_state(mconfig, type, tag)
 		, m_ntram(nullptr)
+		, m_chrram(nullptr)
 		, m_ppu(*this, "ppu")
 		, m_apu(*this, "apu")
 		, m_prg(*this, "prg")
@@ -118,11 +119,18 @@ public:
 	DECLARE_WRITE8_MEMBER(vtfp_411e_w);
 	DECLARE_WRITE8_MEMBER(vtfp_4a00_w);
 	DECLARE_WRITE8_MEMBER(vtfp_412c_w);
+	DECLARE_WRITE8_MEMBER(vtfa_412c_w);
 	DECLARE_READ8_MEMBER(vtfp_412d_r);
+	DECLARE_WRITE8_MEMBER(vtfp_411d_w);
+	DECLARE_WRITE8_MEMBER(vtfp_4242_w);
+
+	DECLARE_READ8_MEMBER(vtfa_412c_r);
 
 	/* OneBus read callbacks for getting sprite and tile data during rendering*/
 	DECLARE_READ8_MEMBER(spr_r);
 	DECLARE_READ8_MEMBER(chr_r);
+
+	DECLARE_WRITE8_MEMBER(chr_w);
 
 	void nes_vt(machine_config &config);
 	void nes_vt_xx(machine_config &config);
@@ -132,11 +140,14 @@ public:
 	void nes_vt_bt(machine_config &config);
 	void nes_vt_vg(machine_config &config);
 	void nes_vt_fp(machine_config &config);
+	void nes_vt_fa(machine_config &config);
 
 private:
 
 	/* expansion nametable - todo, see if we can refactor NES code to be reusable without having to add full NES bus etc. */
 	std::unique_ptr<uint8_t[]> m_ntram;
+	std::unique_ptr<uint8_t[]> m_chrram;
+
 	DECLARE_READ8_MEMBER(nt_r);
 	DECLARE_WRITE8_MEMBER(nt_w);
 
@@ -145,7 +156,7 @@ private:
 	void video_irq(bool hblank, int scanline, int vblank, int blanked);
 
 	uint8_t m_410x[0xc];
-	uint8_t m_411c;
+	uint8_t m_411c, m_411d, m_4242;
 	uint32_t m_ahigh;
 	uint8_t m_vdma_ctrl;
 
@@ -360,6 +371,36 @@ WRITE8_MEMBER(nes_vt_state::vtfp_412c_w)
 	update_banks();
 }
 
+WRITE8_MEMBER(nes_vt_state::vtfp_4242_w)
+{
+	logerror("vtfp_4242_w %02x\n", data);
+	m_4242 = data;
+}
+
+
+WRITE8_MEMBER(nes_vt_state::vtfp_411d_w)
+{
+	logerror("vtfp_411d_w  %02x\n", data);
+	m_411d = data;
+	update_banks();
+}
+
+WRITE8_MEMBER(nes_vt_state::vtfa_412c_w)
+{
+	logerror("vtfp_412c_w %02x\n", data);
+	m_ahigh = 0;
+	m_ahigh |= (data & 0x01) ? (1 << 25) : 0x0;
+	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
+
+  //m_ahigh |= (m_csel->read() == 0x01) ? (1 << 25) : 0x0;
+	update_banks();
+}
+
+READ8_MEMBER(nes_vt_state::vtfa_412c_r)
+{
+	return m_csel->read();
+}
+
 READ8_MEMBER(nes_vt_state::vtfp_412d_r)
 {
 	return m_csel->read();
@@ -408,14 +449,33 @@ uint32_t nes_vt_state::screen_update_vt(screen_device &screen, bitmap_ind16 &bit
 
 READ8_MEMBER(nes_vt_state::spr_r)
 {
-	int realaddr = calculate_real_video_address(offset, 0, 1);
-	return m_prgrom[realaddr & (m_romsize-1)];
+	if(m_4242 & 0x1 || m_411d & 0x04) {
+		return m_chrram[offset];
+	} else {
+		int realaddr = calculate_real_video_address(offset, 0, 1);
+		return m_prgrom[realaddr & (m_romsize-1)];
+	}
 }
 
 READ8_MEMBER(nes_vt_state::chr_r)
 {
-	int realaddr = calculate_real_video_address(offset, 1, 0);
-	return m_prgrom[realaddr &  (m_romsize-1)];
+	if(m_4242 & 0x1  || m_411d & 0x04) {
+		return m_chrram[offset];
+	} else {
+		int realaddr = calculate_real_video_address(offset, 1, 0);
+		return m_prgrom[realaddr &  (m_romsize-1)];
+	}
+}
+
+
+WRITE8_MEMBER(nes_vt_state::chr_w)
+{
+	if(m_4242 & 0x1 || m_411d & 0x04) {
+		logerror("vram write %04x %02x\n", offset, data);
+		m_chrram[offset] = data;
+	}
+	/*int realaddr = calculate_real_video_address(offset, 1, 0);
+	return m_prgrom[realaddr &  (m_romsize-1)];*/
 }
 
 WRITE8_MEMBER(nes_vt_state::vtfp_411e_w) {
@@ -486,6 +546,7 @@ READ8_MEMBER(nes_vt_state::nt_r)
 
 WRITE8_MEMBER(nes_vt_state::nt_w)
 {
+	//logerror("nt wr %04x %02x", offset, data);
 	m_ntram[decode_nt_addr(offset)] = data;
 }
 
@@ -511,12 +572,18 @@ void nes_vt_state::machine_start()
 	m_ntram = std::make_unique<uint8_t[]>(0x2000);
 	save_pointer(NAME(m_ntram.get()), 0x2000);
 
+	m_chrram = std::make_unique<uint8_t[]>(0x2000);
+	save_pointer(NAME(m_chrram.get()), 0x2000);
+
 	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(nes_vt_state::scanline_irq),this));
 	m_ppu->set_hblank_callback(ppu2c0x_device::scanline_delegate(FUNC(nes_vt_state::hblank_irq),this));
 
 // m_ppu->set_hblank_callback(ppu2c0x_device::hblank_delegate(FUNC(device_nes_cart_interface::hblank_irq),m_cartslot->m_cart));
 //  m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),m_cartslot->m_cart), write8_delegate(FUNC(device_nes_cart_interface::chr_w),m_cartslot->m_cart));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(nes_vt_state::nt_r),this), write8_delegate(FUNC(nes_vt_state::nt_w),this));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(nes_vt_state::chr_r),this), write8_delegate(FUNC(nes_vt_state::chr_w),this));
+
+
 }
 
 void nes_vt_state::machine_reset()
@@ -535,7 +602,10 @@ void nes_vt_state::machine_reset()
 	m_410x[0xa] = 0x00;
 	m_410x[0xb] = 0x00;
 	m_411c = 0x00;
-	m_ahigh = 0x00;
+	m_411d = 0x00;
+	m_4242 = 0x00;
+
+	m_ahigh = (m_csel->read() == 0x01) ? (1 << 25) : 0x0;
 	m_timer_irq_enabled = 0;
 	m_timer_running = 0;
 	m_timer_val = 0;
@@ -764,72 +834,88 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 // MMC3 compatibility mode
 WRITE8_MEMBER(nes_vt_state::vt03_8000_w)
 {
-	//logerror("%s: vt03_8000_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
 	uint16_t addr = offset + 0x8000;
-	if((addr < 0xA000) && !(addr & 0x01)) {
-		// Bank select
-		m_8000_addr_latch = data & 0x07;
-		// Bank config
-		m_410x[0x05] &= 0x3F;
-		m_410x[0x05] |= (data & 0xC0);
+
+	if(m_411d & 0x01) {
+		//MMC1 compat, TODO
+		logerror("%s: vtxx_mmc1_8000_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
+
+	} else if(m_411d & 0x02) {
+		//UNROM compat
+		logerror("%s: vtxx_unrom_8000_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
+
+		m_410x[0x7] = ((data & 0x0F) << 1);
+		m_410x[0x8] = ((data & 0x0F) << 1) + 1;
 		update_banks();
-	} else if((addr < 0xA000) && (addr & 0x01)) {
-		switch(m_8000_addr_latch) {
-			case 0x00:
-				m_ppu->set_201x_reg(0x6, data);
-				break;
-
-			case 0x01:
-				m_ppu->set_201x_reg(0x7, data);
-				break;
-
-			case 0x02: // hand?
-				m_ppu->set_201x_reg(0x2, data);
-				break;
-
-			case 0x03: // dog?
-				m_ppu->set_201x_reg(0x3, data);
-				break;
-
-			case 0x04: // ball thrown
-				m_ppu->set_201x_reg(0x4, data);
-				break;
-
-			case 0x05: // ball thrown
-				m_ppu->set_201x_reg(0x5, data);
-				break;
-			case 0x06:
-				m_410x[0x7] = data;
-				//m_410x[0x9] = data;
-				update_banks();
-				break;
-
-			case 0x07:
-				m_410x[0x8] = data;
-				update_banks();
-				break;
-		}
-	} else if((addr >= 0xA000) && (addr < 0xC000) && !(addr & 0x01)) {
-		// Mirroring
-		m_410x[0x6] &= 0xFE;
-		m_410x[0x6] |= data & 0x01;
-	} else if((addr >= 0xA000) && (addr < 0xC000) && (addr & 0x01)) {
-		// PRG RAM control, ignore
-	} else if((addr >= 0xC000) && (addr < 0xE000) && !(addr & 0x01)) {
-		// IRQ latch
-		vt03_410x_w(space, 1, data);
-	} else if((addr >= 0xC000) && (addr < 0xE000) && (addr & 0x01)) {
-		// IRQ reload
-		vt03_410x_w(space, 2, data);
-	} else if((addr >= 0xE000) && !(addr & 0x01)) {
-		// IRQ disable
-		vt03_410x_w(space, 3, data);
-	} else if((addr >= 0xE000) && (addr & 0x01)) {
-		// IRQ enable
-		vt03_410x_w(space, 4, data);
 	} else {
+		//MMC3 compat
+		if((addr < 0xA000) && !(addr & 0x01)) {
+			// Bank select
+			m_8000_addr_latch = data & 0x07;
+			// Bank config
+			m_410x[0x05] &= 0x3F;
+			m_410x[0x05] |= (data & 0xC0);
+			update_banks();
+		} else if((addr < 0xA000) && (addr & 0x01)) {
+			switch(m_8000_addr_latch) {
+				case 0x00:
+					m_ppu->set_201x_reg(0x6, data);
+					break;
 
+				case 0x01:
+					m_ppu->set_201x_reg(0x7, data);
+					break;
+
+				case 0x02: // hand?
+					m_ppu->set_201x_reg(0x2, data);
+					break;
+
+				case 0x03: // dog?
+					m_ppu->set_201x_reg(0x3, data);
+					break;
+
+				case 0x04: // ball thrown
+					m_ppu->set_201x_reg(0x4, data);
+					break;
+
+				case 0x05: // ball thrown
+					m_ppu->set_201x_reg(0x5, data);
+					break;
+				case 0x06:
+					m_410x[0x7] = data;
+					//m_410x[0x9] = data;
+					update_banks();
+					break;
+
+				case 0x07:
+					m_410x[0x8] = data;
+					update_banks();
+					break;
+			}
+		} else if((addr >= 0xA000) && (addr < 0xC000) && !(addr & 0x01)) {
+			// Mirroring
+			m_410x[0x6] &= 0xFE;
+			m_410x[0x6] |= data & 0x01;
+		} else if((addr >= 0xA000) && (addr < 0xC000) && (addr & 0x01)) {
+			// PRG RAM control, ignore
+		} else if((addr >= 0xC000) && (addr < 0xE000) && !(addr & 0x01)) {
+			// IRQ latch
+			vt03_410x_w(space, 1, data);
+		} else if((addr >= 0xC000) && (addr < 0xE000) && (addr & 0x01)) {
+			// IRQ reload
+			vt03_410x_w(space, 2, data);
+		} else if((addr >= 0xE000) && !(addr & 0x01)) {
+			// IRQ disable
+			vt03_410x_w(space, 3, data);
+		} else if((addr >= 0xE000) && (addr & 0x01)) {
+			// IRQ enable
+			vt03_410x_w(space, 4, data);
+		} else {
+
+		}
 	}
+	//logerror("%s: vt03_8000_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
+	
 
 }
 
@@ -880,6 +966,9 @@ void nes_vt_state::do_dma(uint8_t data, bool broken)
 	}
 	uint16_t src_addr = (data << 8) | (src_nib_74 << 4);
 	logerror("vthh dma start ctrl=%02x addr=%04x\n", m_vdma_ctrl, src_addr);
+	if(dma_mode == 1) {
+		logerror("vdma dest %04x\n", m_ppu->get_vram_dest());
+	}
 	if(broken && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00)
 		&& !(m_ppu->get_201x_reg(0x1) & 0x80)) {
 		length -= 1;
@@ -988,13 +1077,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nes_vt_fp_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_IMPORT_FROM(nes_vt_hh_map)
+	AM_RANGE(0x411d, 0x411d) AM_WRITE(vtfp_411d_w)
 	AM_RANGE(0x411e, 0x411e) AM_WRITE(vtfp_411e_w)
 	AM_RANGE(0x4a00, 0x4a00) AM_WRITE(vtfp_4a00_w)
 	AM_RANGE(0x412c, 0x412c) AM_WRITE(vtfp_412c_w)
-	AM_RANGE(0x412d, 0x412d) AM_READ(vtfp_412d_r)
+	AM_RANGE(0x412d, 0x412d) AM_READ(vtfp_412d_r) 
+	AM_RANGE(0x4242, 0x4242) AM_WRITE(vtfp_4242_w) 
 
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( nes_vt_fa_map, AS_PROGRAM, 8, nes_vt_state )
+	AM_RANGE(0x412c, 0x412c) AM_READ(vtfa_412c_r) AM_WRITE(vtfa_412c_w) 
+
+	AM_IMPORT_FROM(nes_vt_fp_map)
+
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("prg_bank0")
@@ -1151,6 +1248,7 @@ MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_hh, nes_vt_xx)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( nes_vt )
+PORT_START("CARTSEL")
 INPUT_PORTS_END
 
 MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_fp, nes_vt_hh)
@@ -1158,8 +1256,15 @@ MCFG_CPU_MODIFY("maincpu")
 MCFG_CPU_PROGRAM_MAP(nes_vt_fp_map)
 
 MCFG_PPU_VT03_MODIFY("ppu")
-MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_RGB);
+MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_RGB12);
 MACHINE_CONFIG_END
+
+MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_fa, nes_vt_xx)
+MCFG_CPU_MODIFY("maincpu")
+MCFG_CPU_PROGRAM_MAP(nes_vt_fa_map)
+
+MACHINE_CONFIG_END
+
 
 static INPUT_PORTS_START( nes_vt_fp )
 	PORT_START("CARTSEL")
@@ -1167,6 +1272,14 @@ static INPUT_PORTS_START( nes_vt_fp )
 	PORT_DIPSETTING(    0x00, "472-in-1" )
 	PORT_DIPSETTING(    0x06, "128-in-1" )
 MACHINE_CONFIG_END
+
+static INPUT_PORTS_START( nes_vt_fa )
+	PORT_START("CARTSEL")
+	PORT_DIPNAME( 0x01, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
+	PORT_DIPSETTING(    0x00, "508-in-1" )
+	PORT_DIPSETTING(    0x01, "130-in-1" )
+MACHINE_CONFIG_END
+
 
 ROM_START( vdogdeme )
 	ROM_REGION( 0x100000, "mainrom", 0 )
@@ -1418,6 +1531,12 @@ ROM_START( mog_m320 )
 	ROM_LOAD( "W25Q64FV.bin", 0x00000, 0x800000, CRC(3c5e1b36) SHA1(4bcbf35ebf2b1714ccde5de758a89a6a39528f89) )
 ROM_END
 
+ROM_START( fapocket )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "S29GL512N.bin", 0x00000, 0x4000000, CRC(37d0fb06) SHA1(0146a2fae32e23b65d4032c508f0d12cedd399c3) )
+ROM_END
+
+
 // earlier version of vdogdemo
 CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
 
@@ -1448,7 +1567,7 @@ CONS( 200?, dgun2500,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEA
 // (no visible tiles in ROM using standard decodes tho, might need moving out of here)
 // dgun2561 at least boots, but no visible gfx due to missing PPU features
 CONS( 2012, dgun2561,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
-CONS( 2015, dgun2573,  0,  0,  nes_vt_fp,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Gamer V Portable Gaming System (DGUN-2573)", MACHINE_NOT_WORKING )
+CONS( 2015, dgun2573,  0,  0,  nes_vt_fp, nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Gamer V Portable Gaming System (DGUN-2573)", MACHINE_NOT_WORKING )
 CONS( 200?, lexcyber,  0,  0,  nes_vt_cy, nes_vt, nes_vt_state,  0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
 
 // these are VT1682 based and have scrambled CPU opcodes. Will need VT1682 CPU and PPU
@@ -1515,4 +1634,7 @@ CONS( 201?, dvnimbus,  	0, 				0,  nes_vt_vg,    nes_vt, nes_vt_state,  0, "<unk
 CONS( 201?, mc_tv200,  	0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "Thumbs Up", 	"200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2016, fcpocket,  	0,        0,  nes_vt_fp,    nes_vt_fp, nes_vt_state,  0, "<unknown>", 	"FC Pocket 600 in 1", MACHINE_NOT_WORKING )
+CONS( 2017, fapocket,  	0,        0,  nes_vt_fa,    nes_vt_fa, nes_vt_state,  0, "<unknown>", 	"Family Pocket 638 in 1", MACHINE_NOT_WORKING )
+
+
 CONS( 2016, mog_m320,  	0, 				0,  nes_vt_hh,    nes_vt, nes_vt_state,  0, "MOGIS", 	"MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )

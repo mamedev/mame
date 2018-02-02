@@ -46,6 +46,12 @@ void ppu_vt03_device::set_new_pen(int i)
 		uint8_t green = (rgbval & 0x3e0) >> 2;
 		uint8_t red  = (rgbval & 0x7C00) >> 7;
 		m_palette->set_pen_color(i & 0x7f, rgb_t(red, green, blue));
+	} else if(m_pal_mode == PAL_MODE_NEW_RGB12) {
+		uint16_t rgbval = (m_newpal[i&0x7f] & 0x3f) | ((m_newpal[(i&0x7f)+0x80] & 0x3f)<<6);
+		uint8_t blue = (rgbval & 0x000f) << 4;
+		uint8_t green = (rgbval & 0x0f0);
+		uint8_t red  = (rgbval & 0xf00) >> 4;
+		m_palette->set_pen_color(i & 0x7f, rgb_t(red, green, blue));
 	} else {
 		// TODO: should this be tidied up?
 		uint16_t palval = (m_newpal[i&0x7f] & 0x3f) | ((m_newpal[(i&0x7f)+0x80] & 0x3f)<<6);
