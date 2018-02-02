@@ -469,7 +469,6 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 		*  tmap3   ffec00  ffee00
 		*/
 		const uint16_t *scroll = &m_scroll[which * 0x400/2];
-		const pen_t *paldata = &m_palette->pen(m_bg_tilemap[which]->palette_offset());
 		rectangle clip = cliprect;
 		int xadjust = 0x3a - which*2;
 		int scrollx = 0;
@@ -496,11 +495,16 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 
 			if (line >= cliprect.min_y && line <= cliprect.max_y)
 			{
+				// TODO: not convinced about this trigger
 				if( xdata == 0xc001 )
 				{
-					/* This is a simplification, but produces the correct behavior for the only game that uses this
+				   /* This is a simplification, but produces the correct behavior for the only game that uses this
 					* feature, Numan Athletics.
 					*/
+					// TODO: with this it breaks colors in VS Express event, likely pal bank is somewhere else in this mode, assuming it has one anyway?
+					//const pen_t *paldata = &m_palette->pen(m_bg_tilemap[which]->palette_offset());
+					const pen_t *paldata = &m_palette->pen(0);
+
 					draw_pixel_line(&bitmap.pix16(line),
 								&screen.priority().pix8(line),
 								m_videoram + ydata + 25,
