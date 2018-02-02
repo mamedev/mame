@@ -510,7 +510,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Hangs after the intro -->
+	<!-- Recreated protection on disk 1 by hand -->
 	<software name="brandish" supported="no">
 		<description>Brandish</description>
 		<year>1991</year>
@@ -518,7 +518,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<info name="release" value="199112xx" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
-				<rom name="brandish (disk 1).hdm" size="1261568" crc="d41db5b4" sha1="c64aa555bd2beb0b32458cab8d38803acaf982dd" offset="0" />
+				<rom name="brandish (disk 1).d88" size="1282688" crc="f97219d3" sha1="4b416caf3426b6673bada95c02f49ab8c7606689" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
