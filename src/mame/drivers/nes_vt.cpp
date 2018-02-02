@@ -65,7 +65,7 @@
 #include "cpu/m6502/n2a03.h"
 #include "machine/bankdev.h"
 #include "video/ppu2c0x_vt.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m6502_vtscr.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -83,6 +83,8 @@ public:
 		, m_prgbank2(*this, "prg_bank2")
 		, m_prgbank3(*this, "prg_bank3")
 		, m_prgrom(*this, "mainrom")
+		, m_csel(*this, "CARTSEL")
+
 		{ }
 
 	/* APU handling */
@@ -112,6 +114,11 @@ public:
 
 	DECLARE_WRITE8_MEMBER(vt03_48ax_w);
 	DECLARE_READ8_MEMBER(vt03_48ax_r);
+	DECLARE_READ8_MEMBER(vthh_414a_r);
+	DECLARE_WRITE8_MEMBER(vtfp_411e_w);
+	DECLARE_WRITE8_MEMBER(vtfp_4a00_w);
+	DECLARE_WRITE8_MEMBER(vtfp_412c_w);
+	DECLARE_READ8_MEMBER(vtfp_412d_r);
 
 	/* OneBus read callbacks for getting sprite and tile data during rendering*/
 	DECLARE_READ8_MEMBER(spr_r);
@@ -124,6 +131,7 @@ public:
 	void nes_vt_dg(machine_config &config);
 	void nes_vt_bt(machine_config &config);
 	void nes_vt_vg(machine_config &config);
+	void nes_vt_fp(machine_config &config);
 
 private:
 
@@ -138,7 +146,7 @@ private:
 
 	uint8_t m_410x[0xc];
 	uint8_t m_411c;
-	uint8_t m_412c;
+	uint32_t m_ahigh;
 	uint8_t m_vdma_ctrl;
 
 	int m_timer_irq_enabled;
@@ -167,6 +175,9 @@ private:
 	required_memory_bank m_prgbank3;
 	required_region_ptr<uint8_t> m_prgrom;
 
+	optional_ioport m_csel;
+
+
 	uint16_t decode_nt_addr(uint16_t addr);
 	void do_dma(uint8_t data, bool broken);
 };
@@ -191,7 +202,7 @@ uint32_t nes_vt_state::get_banks(uint8_t bnk)
 // 8000 needs to bank in 60000  ( bank 0x30 )
 void nes_vt_state::update_banks()
 {
-	uint32_t amod = (m_412c & 0x04) ? 0x800 : 0x0;
+	uint32_t amod = m_ahigh >> 13;
 
 	uint8_t bank;
 
@@ -338,9 +349,22 @@ WRITE8_MEMBER(nes_vt_state::vt03_411c_w)
 WRITE8_MEMBER(nes_vt_state::vt03_412c_w)
 {
 	logerror("vt03_412c_w %02x\n", data);
-	m_412c = data;
+	m_ahigh = (data & 0x04) ? (1 << 24) : 0x0;
 	update_banks();
 }
+
+WRITE8_MEMBER(nes_vt_state::vtfp_412c_w)
+{
+	logerror("vtfp_412c_w %02x\n", data);
+	m_ahigh = (data & 0x01) ? (1 << 25) : 0x0;
+	update_banks();
+}
+
+READ8_MEMBER(nes_vt_state::vtfp_412d_r)
+{
+	return m_csel->read();
+}
+
 
 READ8_MEMBER(nes_vt_state::vt03_41bx_r)
 {
@@ -369,6 +393,11 @@ READ8_MEMBER(nes_vt_state::vt03_48ax_r)
 	}
 }
 
+READ8_MEMBER(nes_vt_state::vthh_414a_r)
+{
+	return 0x80;
+}
+
 
 uint32_t nes_vt_state::screen_update_vt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -388,6 +417,21 @@ READ8_MEMBER(nes_vt_state::chr_r)
 	int realaddr = calculate_real_video_address(offset, 1, 0);
 	return m_prgrom[realaddr &  (m_romsize-1)];
 }
+
+WRITE8_MEMBER(nes_vt_state::vtfp_411e_w) {
+	logerror("411e_w %02x\n", data);
+	if(data == 0x05)
+		dynamic_cast<m6502_vtscr&>(*m_maincpu).set_next_scramble(true);
+	else if(data == 0x00)
+		dynamic_cast<m6502_vtscr&>(*m_maincpu).set_next_scramble(false);
+}
+
+WRITE8_MEMBER(nes_vt_state::vtfp_4a00_w) {
+	logerror("4a00_w %02x\n", data);
+	//if(data == 0x80)
+	//	dynamic_cast<m6502_vtscr&>(*m_maincpu).set_scramble(false);
+}
+
 
 PALETTE_INIT_MEMBER(nes_vt_state, nesvt)
 {
@@ -491,7 +535,7 @@ void nes_vt_state::machine_reset()
 	m_410x[0xa] = 0x00;
 	m_410x[0xb] = 0x00;
 	m_411c = 0x00;
-	m_412c = 0x00;
+	m_ahigh = 0x00;
 	m_timer_irq_enabled = 0;
 	m_timer_running = 0;
 	m_timer_val = 0;
@@ -705,8 +749,7 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 
 		}
 	}
-	uint32_t amod = (m_412c & 0x04) ? (1 << 24) : 0x0;
-	return amod | finaladdr;
+	return m_ahigh | finaladdr;
 }
 
 /*
@@ -916,6 +959,9 @@ static ADDRESS_MAP_START( nes_vt_hh_map, AS_PROGRAM, 8, nes_vt_state )
 
 	AM_RANGE(0x4034, 0x4034) AM_WRITE(vt03_4034_w)
 	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(vt_hh_sprite_dma_w)
+	
+	AM_RANGE(0x414A, 0x414A) AM_READ(vthh_414a_r)
+	
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -939,6 +985,16 @@ static ADDRESS_MAP_START( nes_vt_dg_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(nes_vh_sprite_dma_w)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( nes_vt_fp_map, AS_PROGRAM, 8, nes_vt_state )
+	AM_IMPORT_FROM(nes_vt_hh_map)
+	AM_RANGE(0x411e, 0x411e) AM_WRITE(vtfp_411e_w)
+	AM_RANGE(0x4a00, 0x4a00) AM_WRITE(vtfp_4a00_w)
+	AM_RANGE(0x412c, 0x412c) AM_WRITE(vtfp_412c_w)
+	AM_RANGE(0x412d, 0x412d) AM_READ(vtfp_412d_r)
+
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("prg_bank0")
@@ -995,7 +1051,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(nes_vt_state::nes_vt)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, NTSC_APU_CLOCK) // selectable speed?
+	MCFG_CPU_ADD("maincpu", M6502_VTSCR, NTSC_APU_CLOCK) // selectable speed?
 	MCFG_CPU_PROGRAM_MAP(nes_vt_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1097,7 +1153,20 @@ MACHINE_CONFIG_END
 static INPUT_PORTS_START( nes_vt )
 INPUT_PORTS_END
 
+MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_fp, nes_vt_hh)
+MCFG_CPU_MODIFY("maincpu")
+MCFG_CPU_PROGRAM_MAP(nes_vt_fp_map)
 
+MCFG_PPU_VT03_MODIFY("ppu")
+MCFG_PPU_VT03_SET_PAL_MODE(PAL_MODE_NEW_RGB);
+MACHINE_CONFIG_END
+
+static INPUT_PORTS_START( nes_vt_fp )
+	PORT_START("CARTSEL")
+	PORT_DIPNAME( 0x06, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
+	PORT_DIPSETTING(    0x00, "472-in-1" )
+	PORT_DIPSETTING(    0x06, "128-in-1" )
+MACHINE_CONFIG_END
 
 ROM_START( vdogdeme )
 	ROM_REGION( 0x100000, "mainrom", 0 )
@@ -1339,6 +1408,16 @@ ROM_START( mc_tv200 )
 	ROM_LOAD( "S29GL064N90.bin", 0x00000, 0x800000, CRC(ae1905d2) SHA1(11582055713ba937c1ad32c4ada8683eebc1c83c) )
 ROM_END
 
+ROM_START( fcpocket )
+	ROM_REGION( 0x8000000, "mainrom", 0 )
+	ROM_LOAD( "S29GL01GP.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) )
+ROM_END
+
+ROM_START( mog_m320 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "W25Q64FV.bin", 0x00000, 0x800000, CRC(3c5e1b36) SHA1(4bcbf35ebf2b1714ccde5de758a89a6a39528f89) )
+ROM_END
+
 // earlier version of vdogdemo
 CONS( 200?, vdogdeme,  0,  0,  nes_vt,    nes_vt, nes_vt_state,  0, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
 
@@ -1369,7 +1448,7 @@ CONS( 200?, dgun2500,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEA
 // (no visible tiles in ROM using standard decodes tho, might need moving out of here)
 // dgun2561 at least boots, but no visible gfx due to missing PPU features
 CONS( 2012, dgun2561,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
-CONS( 2015, dgun2573,  0,  0,  nes_vt_hh,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Gamer V Portable Gaming System (DGUN-2573)", MACHINE_NOT_WORKING )
+CONS( 2015, dgun2573,  0,  0,  nes_vt_fp,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Gamer V Portable Gaming System (DGUN-2573)", MACHINE_NOT_WORKING )
 CONS( 200?, lexcyber,  0,  0,  nes_vt_cy, nes_vt, nes_vt_state,  0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
 
 // these are VT1682 based and have scrambled CPU opcodes. Will need VT1682 CPU and PPU
@@ -1434,3 +1513,6 @@ CONS( 201?, mc_hh210,  	0, 				0,  nes_vt_xx,    nes_vt, nes_vt_state,  0, "<unk
 CONS( 201?, dvnimbus,  	0, 				0,  nes_vt_vg,    nes_vt, nes_vt_state,  0, "<unknown>", 	"DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
 
 CONS( 201?, mc_tv200,  	0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "Thumbs Up", 	"200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2016, fcpocket,  	0,        0,  nes_vt_fp,    nes_vt_fp, nes_vt_state,  0, "<unknown>", 	"FC Pocket 600 in 1", MACHINE_NOT_WORKING )
+CONS( 2016, mog_m320,  	0, 				0,  nes_vt_hh,    nes_vt, nes_vt_state,  0, "MOGIS", 	"MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
