@@ -574,8 +574,8 @@ void vgmplay_device::execute_run()
 			case 0xd2:
 			{
 				uint32_t offset = m_file->read_byte(m_pc+1) << 1;
-				m_io->write_byte(A_K051649 + offset | 0, m_file->read_byte(m_pc+2));
-				m_io->write_byte(A_K051649 + offset | 1, m_file->read_byte(m_pc+3));
+				m_io->write_byte(A_K051649 + (offset | 0), m_file->read_byte(m_pc+2));
+				m_io->write_byte(A_K051649 + (offset | 1), m_file->read_byte(m_pc+3));
 				m_pc += 4;
 				break;
 			}

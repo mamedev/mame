@@ -139,6 +139,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 {
 	// zap the contents of the mixer buffer
 	std::fill(m_mixer_buffer.begin(), m_mixer_buffer.end(), 0);
+	short *mix;
 
 	for (sound_channel &voice : m_channel_list)
 	{
@@ -150,7 +151,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			int c=voice.counter;
 			int step = ((int64_t(m_mclock) << FREQ_BITS) / float((voice.frequency + 1) * 16 * (m_rate / 32))) + 0.5f;
 
-			short *mix = &m_mixer_buffer[0];
+			mix = &m_mixer_buffer[0];
 
 			// add our contribution
 			for (int i = 0; i < samples; i++)
@@ -169,7 +170,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 	// mix it down
 	stream_sample_t *buffer = outputs[0];
-	short *mix = &m_mixer_buffer[0];
+	mix = &m_mixer_buffer[0];
 	for (int i = 0; i < samples; i++)
 		*buffer++ = m_mixer_lookup[*mix++];
 }
