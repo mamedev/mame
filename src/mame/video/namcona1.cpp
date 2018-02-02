@@ -428,7 +428,7 @@ void namcona1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 } /* draw_sprites */
 
-static void draw_pixel_line( uint16_t *pDest, uint8_t *pPri, uint16_t *pSource, const pen_t *paldata )
+void namcona1_state::draw_pixel_line( uint16_t *pDest, uint8_t *pPri, uint16_t *pSource, const pen_t *paldata )
 {
 	int x;
 	for( x=0; x<38*8; x+=2 )
@@ -528,6 +528,10 @@ uint32_t namcona1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	/* int flipscreen = m_vreg[0x98/2]; (TBA) */
 
+	screen.priority().fill(0, cliprect );
+
+	bitmap.fill(0xff, cliprect ); /* background color? */
+	
 	if( m_vreg[0x8e/2] )
 	{ /* gfx enabled */
 		if( m_palette_is_dirty )
@@ -544,10 +548,6 @@ uint32_t namcona1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			m_bg_tilemap[which]->set_palette_offset((m_vreg[0xb0/2 + which] & 0xf) * 256);
 
 		m_bg_tilemap[4]->set_palette_offset((m_vreg[0xba/2] & 0xf) * 256);
-
-		screen.priority().fill(0, cliprect );
-
-		bitmap.fill(0xff, cliprect ); /* background color? */
 
 		for( priority = 0; priority<8; priority++ )
 		{
