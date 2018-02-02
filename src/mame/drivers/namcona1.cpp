@@ -711,6 +711,7 @@ void namcona1_state::machine_reset()
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
+	m_mcu_port4 = 0;
 	m_mcu_port5 = 1;
 }
 
