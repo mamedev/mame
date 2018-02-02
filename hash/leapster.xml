@@ -569,7 +569,7 @@
 		<info name="serial" value="500-13472-A" />
 		<part name="cart" interface="leapster_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="500-13472-A - Star Wars - Jedi Reading (US).bin" size="4194304" crc="6239a178" sha1="55c09dbeaabfd21a12369aefa8eae6b7a8d7c1f3" offset="0" />
+				<rom name="500-13472-A - Star Wars - Jedi Reading (US).bin" size="8388608" crc="6239a178" sha1="55c09dbeaabfd21a12369aefa8eae6b7a8d7c1f3" offset="0" />
 			</dataarea>
 		</part>
 	</software>

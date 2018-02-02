@@ -705,8 +705,8 @@ this is probably not a lossless process. Keep your original images.
             </diskarea>
         </part>
         <part interface="dc_gdrom" name="gdrom2">
-            <diskarea name="gdrom">
-            <feature name="part_id" value="Kaze no Form"/>
+           <feature name="part_id" value="Kaze no Form"/>
+           <diskarea name="gdrom">
                 <disk name="after... wasureenu kizuna shokai genteiban (jpn) (kaze no form)" sha1="73b40fb8f44cbe621cec7b89a173e4f3ab45bf46" status="baddump"/>
             </diskarea>
         </part>
