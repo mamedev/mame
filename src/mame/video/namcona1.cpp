@@ -562,7 +562,7 @@ uint32_t namcona1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	bitmap.fill(0xff, cliprect ); /* background color? */
 	
-	if( m_vreg[0x8e/2] && screen_enabled(display_rect) == true)
+	if( m_vreg[0x8e/2] && screen_enabled(display_rect) == true )
 	{
 		/* gfx enabled */
 		if( m_palette_is_dirty )

@@ -340,6 +340,11 @@ int namcona1_state::transfer_dword( uint32_t dest, uint32_t source )
 	{
 		m_spriteram[(dest-0xfff000)/2] = data;
 	}
+	// xday2 writes to 0x1e01200 / 0x1e01400, assume it's just a mirror for paletteram transfer
+	else if( dest>=0xf00000*2 && dest<0xf02000*2 )
+	{
+		paletteram_w(space, (dest-0xf00000*2)/2, data, 0xffff );
+	}
 	else
 	{
 		logerror( "bad blit dest %08x\n", dest );
@@ -557,9 +562,9 @@ static ADDRESS_MAP_START( namcona1_main_map, AS_PROGRAM, 16, namcona1_state )
 	AM_RANGE(0xf00000, 0xf01fff) AM_RAM_WRITE(paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(gfxram_r, gfxram_w) AM_SHARE("cgram")
 	AM_RANGE(0xff0000, 0xffbfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM 						/* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM AM_SHARE("scroll")      /* scroll registers */
-	AM_RANGE(0xfff000, 0xffffff) AM_RAM AM_SHARE("spriteram")           /* spriteram */
+	AM_RANGE(0xfff000, 0xffffff) AM_RAM AM_SHARE("spriteram")   /* spriteram */
 ADDRESS_MAP_END
 
 
@@ -1342,7 +1347,7 @@ ROM_START( xday2 )
 ROM_END
 
 // NA-1 (C69 MCU)
-GAME( 1992, bkrtmaq,    0,        namcona1,  namcona1_quiz, namcona1_state, bkrtmaq,  ROT0, "Namco", "Bakuretsu Quiz Ma-Q Dai Bouken (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, bkrtmaq,    0,        namcona1, namcona1_quiz, namcona1_state, bkrtmaq,  ROT0, "Namco", "Bakuretsu Quiz Ma-Q Dai Bouken (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, cgangpzl,   0,        namcona1,  namcona1_joy,  namcona1_state, cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, cgangpzlj,  cgangpzl, namcona1,  namcona1_joy,  namcona1_state, cgangpzl, ROT0, "Namco", "Cosmo Gang the Puzzle (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, exvania,    0,        namcona1,  namcona1_joy,  namcona1_state, exvania,  ROT0, "Namco", "Exvania (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
