@@ -152,6 +152,7 @@ private:
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int primask );
 	void tilemap_get_info(tile_data &tileinfo, int tile_index, const uint16_t *tilemap_videoram, bool use_4bpp_gfx);
 	void blit_setup( int format, int *bytes_per_row, int *pitch, int mode );
+	void draw_pixel_line( uint16_t *pDest, uint8_t *pPri, uint16_t *pSource, const pen_t *paldata );
 	TILE_GET_INFO_MEMBER(tilemap_get_info0);
 	TILE_GET_INFO_MEMBER(tilemap_get_info1);
 	TILE_GET_INFO_MEMBER(tilemap_get_info2);

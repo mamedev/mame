@@ -428,7 +428,7 @@ void namcona1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 } /* draw_sprites */
 
-static void draw_pixel_line( uint16_t *pDest, uint8_t *pPri, uint16_t *pSource, const pen_t *paldata )
+void namcona1_state::draw_pixel_line( uint16_t *pDest, uint8_t *pPri, uint16_t *pSource, const pen_t *paldata )
 {
 	int x;
 	for( x=0; x<38*8; x+=2 )
@@ -469,7 +469,6 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 		*  tmap3   ffec00  ffee00
 		*/
 		const uint16_t *scroll = &m_scroll[which * 0x400/2];
-		const pen_t *paldata = &m_palette->pen(m_bg_tilemap[which]->palette_offset());
 		rectangle clip = cliprect;
 		int xadjust = 0x3a - which*2;
 		int scrollx = 0;
@@ -496,11 +495,16 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 
 			if (line >= cliprect.min_y && line <= cliprect.max_y)
 			{
+				// TODO: not convinced about this trigger
 				if( xdata == 0xc001 )
 				{
-					/* This is a simplification, but produces the correct behavior for the only game that uses this
+				   /* This is a simplification, but produces the correct behavior for the only game that uses this
 					* feature, Numan Athletics.
 					*/
+					// TODO: with this it breaks colors in VS Express event, likely pal bank is somewhere else in this mode, assuming it has one anyway?
+					//const pen_t *paldata = &m_palette->pen(m_bg_tilemap[which]->palette_offset());
+					const pen_t *paldata = &m_palette->pen(0);
+
 					draw_pixel_line(&bitmap.pix16(line),
 								&screen.priority().pix8(line),
 								m_videoram + ydata + 25,
@@ -524,6 +528,10 @@ uint32_t namcona1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	/* int flipscreen = m_vreg[0x98/2]; (TBA) */
 
+	screen.priority().fill(0, cliprect );
+
+	bitmap.fill(0xff, cliprect ); /* background color? */
+	
 	if( m_vreg[0x8e/2] )
 	{ /* gfx enabled */
 		if( m_palette_is_dirty )
@@ -540,10 +548,6 @@ uint32_t namcona1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			m_bg_tilemap[which]->set_palette_offset((m_vreg[0xb0/2 + which] & 0xf) * 256);
 
 		m_bg_tilemap[4]->set_palette_offset((m_vreg[0xba/2] & 0xf) * 256);
-
-		screen.priority().fill(0, cliprect );
-
-		bitmap.fill(0xff, cliprect ); /* background color? */
 
 		for( priority = 0; priority<8; priority++ )
 		{
