@@ -30332,7 +30332,10 @@ pacheart                        // hack
 pacman                          // (c) 1980 Midway
 pacmanf                         // hack
 pacmanjpm                       // bootleg
-pacmansp                        // hack
+pacmanpe                        //
+pacmanso                        //
+pacmansp                        // hack (Video Game SA)
+pacmanvg                        // bootleg (Video Game SA)
 pacmod                          // (c) 1981 Midway
 pacplus                         // (c) 1982 Namco (Midway license)
 pacuman                         // bootleg
@@ -30352,8 +30355,6 @@ puckmanb                        // bootleg
 puckmanf                        // hack
 puckmanh                        // hack
 puckmod                         // (c) 1981 Namco
-pacmanso                        //
-pacmanpe                        //
 rocktrv2                        // (c) 1986 Triumph Software Inc
 shootbul                        // (c) 1985 Bally Midway
 sprglbpg                        // German bootleg
@@ -36577,6 +36578,7 @@ stepstag                        // (c) 1999 Jaleco
 tetrisp2                        // (c) 1997 Jaleco
 tetrisp2j                       // (c) 1997 Jaleco
 tetrisp2ja                      // (c) 1997 Jaleco
+vjdash                          // (c) 1999 Jaleco
 
 @source:tg100.cpp
 tg100                           // (c) 1991
@@ -37797,8 +37799,8 @@ vsmileg                         //
 walle                           //
 wirels60                        // Wireless 60
 zone60                          // Zone 60
-rad_skat						//
-rad_skatp						//
+rad_skat                        //
+rad_skatp                       //
 
 @source:vsmilepro.cpp
 vsmilpro

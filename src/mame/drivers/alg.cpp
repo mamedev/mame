@@ -4,7 +4,7 @@
 
     American Laser Game Hardware
 
-    Amiga 500 + sony ldp1450 laserdisc palyer
+    Amiga 500 + sony ldp1450 laserdisc player
 
     Games Supported:
 
