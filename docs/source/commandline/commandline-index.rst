@@ -54,7 +54,6 @@ OSD-related Options
 
 | :ref:`uimodekey <mame-commandline-uimodekey>`
 | :ref:`uifontprovider <mame-commandline-uifontprovider>`
-| :ref:`menu <mame-commandline-menu>`
 | :ref:`keyboardprovider <mame-commandline-keyboardprovider>`
 | :ref:`mouseprovider <mame-commandline-mouseprovider>`
 | :ref:`lightgunprovider <mame-commandline-lightgunprovider>`
@@ -215,6 +214,25 @@ Core Vector Options
 | :ref:`flicker <mame-commandline-flicker>`
 
 
+Core Video OpenGL Debugging Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`[no]gl_forcepow2texture <mame-commandline-glforcepow2texture>`
+| :ref:`[no]gl_notexturerect <mame-commandline-glnotexturerect>`
+| :ref:`[no]gl_vbo <mame-commandline-glvbo>`
+| :ref:`[no]gl_pbo <mame-commandline-glpbo>`
+
+
+Core Video OpenGL GLSL Options
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+| :ref:`gl_glsl <mame-commandline-glglsl>`
+| :ref:`gl_glsl_filter <mame-commandline-glglslfilter>`
+| :ref:`glsl_shader_mame[0-9] <mame-commandline-glslshadermame>`
+| :ref:`glsl_shader_screen[0-9] <mame-commandline-glslshaderscreen>`
+| :ref:`gl_glsl_vid_attr <mame-commandline-glglslvidattr>`
+
+
 Core Sound Options
 ~~~~~~~~~~~~~~~~~~
 
@@ -270,6 +288,8 @@ Core Debugging Options
 | :ref:`debugscript <mame-commandline-debugscript>`
 | :ref:`[no]update_in_pause <mame-commandline-updateinpause>`
 | :ref:`watchdog <mame-commandline-watchdog>`
+| :ref:`debugger_font <mame-commandline-debuggerfont>`
+| :ref:`debugger_font_size <mame-commandline-debuggerfontsize>`
 
 
 Core Communication Options
@@ -303,12 +323,6 @@ Core Misc Options
 
 Windows-Specific Commandline Options
 ------------------------------------
-
-Windows Debugging options
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-| :ref:`debugger_font <mame-wcommandline-debuggerfont>`
-| :ref:`debugger_font_size <mame-wcommandline-debuggerfontsize>`
 
 
 Windows Performance Options
@@ -356,25 +370,6 @@ SDL Video Soft-Specific Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 | :ref:`scalemode <mame-scommandline-scalemode>`
-
-
-SDL Video OpenGL Debugging Options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-| :ref:`[no]gl_forcepow2texture <mame-scommandline-glforcepow2texture>`
-| :ref:`[no]gl_notexturerect <mame-scommandline-glnotexturerect>`
-| :ref:`[no]gl_vbo <mame-scommandline-glvbo>`
-| :ref:`[no]gl_pbo <mame-scommandline-glpbo>`
-
-
-SDL Video OpenGL GLSL Options
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-| :ref:`gl_glsl <mame-scommandline-glglsl>`
-| :ref:`gl_glsl_filter <mame-scommandline-glglslfilter>`
-| :ref:`glsl_shader_mame[0-9] <mame-scommandline-glslshadermame>`
-| :ref:`glsl_shader_screen[0-9] <mame-scommandline-glslshaderscreen>`
-| :ref:`gl_glsl_vid_attr <mame-scommandline-glglslvidattr>`
 
 
 SDL Keyboard Mapping

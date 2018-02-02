@@ -532,8 +532,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map_mbutrfly, AS_IO, 8, skylncr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x60, 0x60) AM_WRITE(mbutrfly_prot_w)
 	AM_IMPORT_FROM(io_map_skylncr)
+	AM_RANGE(0x60, 0x60) AM_WRITE(mbutrfly_prot_w)
 ADDRESS_MAP_END
 
 

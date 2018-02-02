@@ -2840,11 +2840,11 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(aquastge_h1_map, AS_PROGRAM, 32, coolridr_state)
+	AM_IMPORT_FROM(system_h1_map)
 	AM_RANGE(0x03c00000, 0x03c0ffff) AM_MIRROR(0x00200000) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") /* mostly mapped at 0x03e00000 */
 	AM_RANGE(0x03f50000, 0x03f5ffff) AM_RAM // video registers
 	AM_RANGE(0x03e10000, 0x03e1ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM  /*Communication area RAM*/
-	AM_IMPORT_FROM(system_h1_map)
 ADDRESS_MAP_END
 
 READ16_MEMBER( coolridr_state::h1_soundram_r)
@@ -3013,11 +3013,11 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aquastge_submap, AS_PROGRAM, 32, coolridr_state )
-	AM_RANGE(0x05210000, 0x0521ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
+	AM_IMPORT_FROM(coolridr_submap)
 	AM_RANGE(0x05200000, 0x0537ffff) AM_RAM
+	AM_RANGE(0x05210000, 0x0521ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x06000200, 0x06000207) AM_WRITENOP // program bug?
 	AM_RANGE(0x06100018, 0x0610001b) AM_READ_PORT("IN7")
-	AM_IMPORT_FROM(coolridr_submap)
 ADDRESS_MAP_END
 
 /* TODO: what is this for, volume mixing? MIDI? */

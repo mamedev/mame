@@ -95,13 +95,13 @@ static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16, mmodular_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, mmodular_state)
+	AM_IMPORT_FROM(alm16_mem)
+
 	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM
 
 //  AM_RANGE( 0xe80004, 0xe80005 )  AM_WRITE(write_unknown2 )   // Bavaria sensors
 //  AM_RANGE( 0xe80002, 0xe80003 )  AM_READ(read_unknown1 )     // Bavaria sensors
 //  AM_RANGE( 0xe80006, 0xe80007 )  AM_READ(read_unknown3 )     // Bavaria sensors
-
-	AM_IMPORT_FROM(alm16_mem)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, mmodular_state)
@@ -122,13 +122,13 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32, mmodular_state)
+	AM_IMPORT_FROM(alm32_mem)
+
 	AM_RANGE( 0x00000000, 0x0003ffff ) AM_ROM
 
 //  AM_RANGE( 0x98000008, 0x9800000b )  AM_WRITE(write_unknown2 )   // Bavaria sensors
 //  AM_RANGE( 0x98000004, 0x98000007 )  AM_READ(read_unknown1 ) // Bavaria sensors
 //  AM_RANGE( 0x9800000c, 0x9800000f )  AM_READ(read_unknown3 ) // Bavaria sensors
-
-	AM_IMPORT_FROM(alm32_mem)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, mmodular_state)

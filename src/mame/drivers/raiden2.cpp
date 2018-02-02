@@ -963,9 +963,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( raiden2_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM
 
-	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP //irq ack / sprite buffering?
-
 	AM_IMPORT_FROM( raiden2_cop_mem )
+
+	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP //irq ack / sprite buffering?
 
 	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
 
@@ -991,22 +991,22 @@ static ADDRESS_MAP_START( raiden2_mem, AS_PROGRAM, 16, raiden2_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raidendx_mem, AS_PROGRAM, 16, raiden2_state )
+	AM_IMPORT_FROM( raiden2_mem )
 	AM_RANGE(0x00470, 0x00471) AM_READWRITE(cop_tile_bank_2_r,raidendx_cop_bank_2_w)
 	AM_RANGE(0x004d0, 0x004d7) AM_RAM //???
 	AM_RANGE(0x00600, 0x0063f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read_alt, write_alt)
 //  AM_RANGE(0x006ca, 0x006cb) AM_WRITENOP
-	AM_IMPORT_FROM( raiden2_mem )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zeroteam_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM
 
+	AM_IMPORT_FROM( raiden2_cop_mem )
+
 	AM_RANGE(0x00470, 0x00471) AM_WRITENOP
 	AM_RANGE(0x006cc, 0x006cd) AM_WRITENOP
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // irq ack / sprite buffering?
-
-	AM_IMPORT_FROM( raiden2_cop_mem )
 
 	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
 
@@ -1032,12 +1032,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( xsedae_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM
 
+	AM_IMPORT_FROM( raiden2_cop_mem )
+
 	AM_RANGE(0x00470, 0x00471) AM_WRITENOP
 	AM_RANGE(0x006cc, 0x006cd) AM_WRITENOP
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP //irq ack / sprite buffering?
-
-	AM_IMPORT_FROM( raiden2_cop_mem )
 
 	AM_RANGE(0x00700, 0x0071f) AM_DEVREADWRITE8_MOD("seibu_sound", seibu_sound_device, main_r, main_w, rshift<1>, 0x00ff)
 

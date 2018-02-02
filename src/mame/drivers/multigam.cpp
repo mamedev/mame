@@ -405,8 +405,8 @@ static ADDRESS_MAP_START( multigam_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
 	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)      /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5000, 0x5ffe) AM_ROM
+	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 	AM_RANGE(0x6fff, 0x6fff) AM_WRITE(multigam_switch_prg_rom)
@@ -417,14 +417,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( multigmt_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(multigam_switch_prg_rom)
 	AM_RANGE(0x3fff, 0x3fff) AM_WRITE(multigam_switch_gfx_rom)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
 	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)     /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5000, 0x5ffe) AM_ROM
+	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigam_mapper2_w)

@@ -280,8 +280,8 @@ WRITE8_MEMBER( sfcbox_state::snes_map_1_w )
 }
 
 static ADDRESS_MAP_START( sfcbox_io, AS_IO, 8, sfcbox_state )
-	AM_RANGE(0x0b, 0x0b) AM_DEVWRITE("mb90082",mb90082_device,write)
 	AM_RANGE(0x00, 0x3f) AM_RAM // internal i/o
+	AM_RANGE(0x0b, 0x0b) AM_DEVWRITE("mb90082",mb90082_device,write)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("KEY") AM_WRITE(port_80_w) // Keyswitch and Button Inputs / SNES Transfer and Misc Output
 	AM_RANGE(0x81, 0x81) AM_READWRITE(port_81_r,port_81_w) // SNES Transfer and Misc Input / Misc Output
 //  AM_RANGE(0x82, 0x82) // Unknown/unused

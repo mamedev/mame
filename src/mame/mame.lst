@@ -30142,6 +30142,9 @@ okean240t                       //
 @source:olibochu.cpp
 olibochu                        // M47 (c) 1981 + "GDI presents"
 
+@source:olyboss.cpp
+olybossd                        // Olympia BOSS D
+
 @source:omegrace.cpp
 deltrace                        // bootleg
 omegrace                        // (c) 1981 Midway
@@ -30329,7 +30332,10 @@ pacheart                        // hack
 pacman                          // (c) 1980 Midway
 pacmanf                         // hack
 pacmanjpm                       // bootleg
-pacmansp                        // hack
+pacmanpe                        //
+pacmanso                        //
+pacmansp                        // hack (Video Game SA)
+pacmanvg                        // bootleg (Video Game SA)
 pacmod                          // (c) 1981 Midway
 pacplus                         // (c) 1982 Namco (Midway license)
 pacuman                         // bootleg
@@ -30349,8 +30355,6 @@ puckmanb                        // bootleg
 puckmanf                        // hack
 puckmanh                        // hack
 puckmod                         // (c) 1981 Namco
-pacmanso                        //
-pacmanpe                        //
 rocktrv2                        // (c) 1986 Triumph Software Inc
 shootbul                        // (c) 1985 Bally Midway
 sprglbpg                        // German bootleg
@@ -30405,8 +30409,9 @@ paradisee                       // (c) 1994 Yun Sung (Escape license)
 paradlx                         // (c) >1994 Yun Sung
 penky                           // (c) 1995 Yun Sung
 penkyi                          // (c) 1995 Yun Sung (Impeuropex license)
+tgtbal96                        // (c) 1996 Yun Sung
 tgtball                         // (c) 1995 Yun Sung
-tgtballa                        // (c) 1995 Yun Sung
+tgtballn                        // (c) 1995 Yun Sung
 torus                           // (c) 1996 Yun Sung
 
 @source:paranoia.cpp
@@ -30677,7 +30682,6 @@ pent1024                        //
 pentagon                        //
 
 @source:peoplepc.cpp
-olybossd						// Olympia BOSS D
 olypeopl                        // Olympia People PC
 
 @source:peplus.cpp
@@ -36574,6 +36578,7 @@ stepstag                        // (c) 1999 Jaleco
 tetrisp2                        // (c) 1997 Jaleco
 tetrisp2j                       // (c) 1997 Jaleco
 tetrisp2ja                      // (c) 1997 Jaleco
+vjdash                          // (c) 1999 Jaleco
 
 @source:tg100.cpp
 tg100                           // (c) 1991
@@ -37794,8 +37799,8 @@ vsmileg                         //
 walle                           //
 wirels60                        // Wireless 60
 zone60                          // Zone 60
-rad_skat						//
-rad_skatp						//
+rad_skat                        //
+rad_skatp                       //
 
 @source:vsmilepro.cpp
 vsmilpro

@@ -95,6 +95,8 @@ WRITE8_MEMBER(parodius_state::sound_arm_nmi_w)
 static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0x0000, 0x07ff) AM_DEVICE("bank0000", address_map_bank_device, amap8)
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
+	AM_RANGE(0x2000, 0x27ff) AM_DEVICE("bank2000", address_map_bank_device, amap8)
 	AM_RANGE(0x3f8c, 0x3f8c) AM_READ_PORT("P1")
 	AM_RANGE(0x3f8d, 0x3f8d) AM_READ_PORT("P2")
 	AM_RANGE(0x3f8e, 0x3f8e) AM_READ_PORT("DSW3")
@@ -106,8 +108,6 @@ static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0x3fc4, 0x3fc4) AM_WRITE(parodius_videobank_w)
 	AM_RANGE(0x3fc8, 0x3fc8) AM_WRITE(parodius_sh_irqtrigger_w)
 	AM_RANGE(0x3fcc, 0x3fcd) AM_DEVREADWRITE("k053260", k053260_device, main_read, main_write)
-	AM_RANGE(0x2000, 0x27ff) AM_DEVICE("bank2000", address_map_bank_device, amap8)
-	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE("k052109", k052109_device, read, write)
 	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")            /* banked ROM */
 	AM_RANGE(0xa000, 0xffff) AM_ROM AM_REGION("maincpu", 0x3a000)
 ADDRESS_MAP_END

@@ -75,8 +75,8 @@ WRITE8_MEMBER(aeroboto_state::aeroboto_1a2_w)
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aeroboto_state )
-	AM_RANGE(0x01a2, 0x01a2) AM_WRITE(aeroboto_1a2_w)           // affects IRQ line (more protection?)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("mainram") // main  RAM
+	AM_RANGE(0x01a2, 0x01a2) AM_WRITE(aeroboto_1a2_w)           // affects IRQ line (more protection?)
 	AM_RANGE(0x0800, 0x08ff) AM_RAM                             // tile color buffer; copied to 0x2000
 	AM_RANGE(0x0900, 0x09ff) AM_WRITEONLY                       // a backup of default tile colors
 	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(aeroboto_videoram_w) AM_SHARE("videoram")     // tile RAM

@@ -176,14 +176,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(compc_io, AS_IO, 8, compc_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(pio_r, pio_w)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE(pio_r, pio_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(compciii_io, AS_IO, 8, compc_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(pioiii_r, pioiii_w)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE(pioiii_r, pioiii_w)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(compc_state::compc)

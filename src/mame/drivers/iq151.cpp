@@ -206,21 +206,21 @@ WRITE8_MEMBER(iq151_state::cartslot_io_w)
 
 static ADDRESS_MAP_START(iq151_mem, AS_PROGRAM, 8, iq151_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(cartslot_r, cartslot_w)
+
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("boot")
 	AM_RANGE( 0x0800, 0x7fff ) AM_RAM
 	AM_RANGE( 0xf000, 0xffff ) AM_ROM
-
-	AM_RANGE( 0x0000, 0xffff ) AM_READWRITE(cartslot_r, cartslot_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(iq151_io, AS_IO, 8, iq151_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE( 0x00, 0xff ) AM_READWRITE(cartslot_io_r, cartslot_io_w)
+
 	AM_RANGE( 0x80, 0x80 ) AM_WRITE(boot_bank_w)
 	AM_RANGE( 0x84, 0x87 ) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE( 0x88, 0x89 ) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
-
-	AM_RANGE( 0x00, 0xff ) AM_READWRITE(cartslot_io_r, cartslot_io_w)
 ADDRESS_MAP_END
 
 

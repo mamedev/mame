@@ -213,7 +213,8 @@
 		</part>
 	</software>
 
-	<software name="necdemo">
+	<!-- Was "Executng", guess a typo? -->
+	<software name="necdemo" supported="no">
 		<description>NEC APC Self Executng Demo</description>
 		<year>198?</year>
 		<publisher>NEC</publisher>

@@ -135,15 +135,15 @@ static ADDRESS_MAP_START(rpc86_io, AS_IO, 16, isbc_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(isbc8605_io, AS_IO, 16, isbc_state)
-	AM_RANGE(0x0000, 0x002f) AM_DEVICE8("isbc_208", isbc_208_device, map, 0xffff)
 	AM_IMPORT_FROM(rpc86_io)
+	AM_RANGE(0x0000, 0x002f) AM_DEVICE8("isbc_208", isbc_208_device, map, 0xffff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(isbc8630_io, AS_IO, 16, isbc_state)
+	AM_IMPORT_FROM(rpc86_io)
 	AM_RANGE(0x00c0, 0x00c7) AM_WRITE8(edge_intr_clear_w, 0xff00)
 	AM_RANGE(0x00c8, 0x00df) AM_WRITE8(status_register_w, 0xff00)
 	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("isbc_215g", isbc_215g_device, write, 0x00ff)
-	AM_IMPORT_FROM(rpc86_io)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(isbc86_mem, AS_PROGRAM, 16, isbc_state)

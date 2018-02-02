@@ -244,8 +244,8 @@ ADDRESS_MAP_END
 
 /* only difference is taitosj_fake_ replaced with taitosj_mcu_ */
 static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8, taitosj_state )
-	AM_RANGE(0x8800, 0x8801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("bmcu", taito_sj_security_mcu_device, data_r, data_w)
 	AM_IMPORT_FROM( taitosj_main_nomcu_map )
+	AM_RANGE(0x8800, 0x8801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("bmcu", taito_sj_security_mcu_device, data_r, data_w)
 ADDRESS_MAP_END
 
 

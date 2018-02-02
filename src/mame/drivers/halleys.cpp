@@ -1637,6 +1637,8 @@ static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0x1000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xfeff) AM_RAM                 // work ram
 
+	AM_RANGE(0xff00, 0xffbf) AM_RAM AM_SHARE("io_ram")  // I/O write fall-through
+
 	AM_RANGE(0xff66, 0xff66) AM_READ(collision_id_r) // HACK: collision detection bypass(Halley's Comet only)
 	AM_RANGE(0xff71, 0xff71) AM_READ(blitter_status_r)
 	AM_RANGE(0xff80, 0xff83) AM_READ(io_mirror_r)
@@ -1650,7 +1652,6 @@ static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0xff96, 0xff96) AM_READ_PORT("DSW2")   // dipswitch 3
 	AM_RANGE(0xff97, 0xff97) AM_READ_PORT("DSW3")   // dipswitch 2
 	AM_RANGE(0xff9c, 0xff9c) AM_WRITE(firq_ack_w)
-	AM_RANGE(0xff00, 0xffbf) AM_RAM AM_SHARE("io_ram")  // I/O write fall-through
 
 	AM_RANGE(0xffc0, 0xffdf) AM_READWRITE(paletteram_r, paletteram_w)
 	AM_RANGE(0xffe0, 0xffff) AM_READ(vector_r)

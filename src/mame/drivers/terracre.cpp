@@ -270,8 +270,8 @@ static ADDRESS_MAP_START( amazon_base_map, AS_PROGRAM, 16, terracre_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amazon_1412m2_map, AS_PROGRAM, 16, terracre_state)
-	AM_RANGE(0x070000, 0x070003) AM_READWRITE(amazon_protection_r, amazon_protection_w)
 	AM_IMPORT_FROM( amazon_base_map )
+	AM_RANGE(0x070000, 0x070003) AM_READWRITE(amazon_protection_r, amazon_protection_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, terracre_state )

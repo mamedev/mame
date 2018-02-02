@@ -192,10 +192,10 @@ static ADDRESS_MAP_START( by35_map, AS_PROGRAM, 8, by35_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nuovo_map, AS_PROGRAM, 8, by35_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 //  AM_RANGE(0x0000, 0x007f) AM_RAM     // Schematics infer that the M6802 internal RAM is disabled.
 	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
 	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

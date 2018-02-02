@@ -351,8 +351,8 @@ static ADDRESS_MAP_START( 68030_2_map, AS_PROGRAM, 32, skimaxx_state )
 //  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfffc0000, 0xfffcffff) AM_RAM AM_SHARE("share1")
 //  AM_RANGE(0xfffe0000, 0xffffffff) AM_RAM // I think this is banked with the shared RAM? (see CPU sync routines)
-	AM_RANGE(0xfffe0010, 0xfffeffff) AM_RAM             // HACK
 	AM_RANGE(0xfffe0000, 0xfffeffff) AM_RAM AM_SHARE("share1")  // HACK
+	AM_RANGE(0xfffe0010, 0xfffeffff) AM_RAM             // HACK
 	AM_RANGE(0xffff0000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -364,8 +364,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, skimaxx_state )
-	AM_RANGE(0x00000000, 0x000100ff) AM_RAM
-	AM_RANGE(0x00008000, 0x0003ffff) AM_RAM
+	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM
 	AM_RANGE(0x00050000, 0x0005ffff) AM_RAM
 	AM_RANGE(0x00220000, 0x003fffff) AM_RAM AM_SHARE("fg_buffer")
 	AM_RANGE(0x02000000, 0x0200000f) AM_RAM

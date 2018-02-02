@@ -430,8 +430,8 @@ static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, luckgrln_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( _7smash_map, AS_PROGRAM, 8, luckgrln_state )
-	AM_RANGE(0x00000, 0x0bfff) AM_ROM
 	AM_IMPORT_FROM( mainmap )
+	AM_RANGE(0x00000, 0x0bfff) AM_ROM
 	AM_RANGE(0x10000, 0x2ffff) AM_UNMAP
 	AM_RANGE(0xf0000, 0xfffff) AM_UNMAP
 ADDRESS_MAP_END
@@ -636,8 +636,8 @@ READ8_MEMBER(luckgrln_state::test_r)
 }
 
 static ADDRESS_MAP_START( _7smash_io, AS_IO, 8, luckgrln_state )
-	AM_RANGE(0x66, 0x66) AM_READ(test_r)
 	AM_IMPORT_FROM( portmap )
+	AM_RANGE(0x66, 0x66) AM_READ(test_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( luckgrln )

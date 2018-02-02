@@ -63,19 +63,14 @@ public:
 	DECLARE_WRITE16_MEMBER(snd_w);
 
 	DECLARE_DRIVER_INIT(bkrtmaq);
-	DECLARE_DRIVER_INIT(quiztou);
-	DECLARE_DRIVER_INIT(emeralda);
-	DECLARE_DRIVER_INIT(numanath);
 	DECLARE_DRIVER_INIT(fa);
 	DECLARE_DRIVER_INIT(cgangpzl);
 	DECLARE_DRIVER_INIT(tinklpit);
 	DECLARE_DRIVER_INIT(swcourt);
-	DECLARE_DRIVER_INIT(knckhead);
-	DECLARE_DRIVER_INIT(xday2);
-	DECLARE_DRIVER_INIT(exbania);
+	DECLARE_DRIVER_INIT(exvania);
 	DECLARE_DRIVER_INIT(emeraldj);
 	DECLARE_DRIVER_INIT(swcourtb);
-
+	
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
@@ -84,19 +79,19 @@ public:
 	void namcona1w(machine_config &config);
 	void namcona2w(machine_config &config);
 	void namcona1(machine_config &config);
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-private:
 	enum
 	{
 		NAMCO_CGANGPZL,
 		NAMCO_EMERALDA,
 		NAMCO_KNCKHEAD,
 		NAMCO_BKRTMAQ,
-		NAMCO_EXBANIA,
+		NAMCO_EXVANIA,
 		NAMCO_QUIZTOU,
 		NAMCO_SWCOURT,
 		NAMCO_TINKLPIT,
@@ -105,6 +100,10 @@ private:
 		NAMCO_XDAY2,
 		NAMCO_SWCOURTB
 	};
+
+	int m_gametype;
+
+private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
@@ -131,7 +130,6 @@ private:
 	std::vector<uint8_t> m_shaperam;
 
 	int m_mEnableInterrupts;
-	int m_gametype;
 	uint16_t m_count;
 	uint32_t m_keyval;
 	uint16_t m_mcu_mailbox[8];
@@ -153,6 +151,7 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int primask );
 	void tilemap_get_info(tile_data &tileinfo, int tile_index, const uint16_t *tilemap_videoram, bool use_4bpp_gfx);
+	void blit_setup( int format, int *bytes_per_row, int *pitch, int mode );
 	TILE_GET_INFO_MEMBER(tilemap_get_info0);
 	TILE_GET_INFO_MEMBER(tilemap_get_info1);
 	TILE_GET_INFO_MEMBER(tilemap_get_info2);
@@ -160,4 +159,29 @@ private:
 	TILE_GET_INFO_MEMBER(roz_get_info);
 
 	void postload();
+};
+
+class namcona2_state : public namcona1_state
+{
+public:
+	namcona2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: namcona1_state(mconfig, type, tag)
+	{}
+	
+	DECLARE_DRIVER_INIT(knckhead);
+	DECLARE_DRIVER_INIT(emeralda);
+	DECLARE_DRIVER_INIT(numanath);
+	DECLARE_DRIVER_INIT(quiztou);
+};
+
+class xday2_namcona2_state : public namcona2_state
+{
+public:
+	xday2_namcona2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: namcona2_state(mconfig, type, tag)
+	{}
+	
+	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
+
+	DECLARE_DRIVER_INIT(xday2);
 };
