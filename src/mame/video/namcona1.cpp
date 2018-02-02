@@ -476,7 +476,7 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 		const uint16_t *scroll = &m_scroll[which * 0x400/2];
 		rectangle clip = cliprect;
 		int xadjust = 0x3a - which*2;
-		int scrollx = 0;
+		int scrollx = xadjust;
 		int scrolly = 0;
 
 		for( int line = 0; line < 256; line++ )
@@ -489,7 +489,10 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 			if( xdata )
 			{
 				/* screenwise linescroll */
-				scrollx = xadjust+xdata;
+				if(xdata & 0x4000) // resets current xscroll value (knuckle head)
+					scrollx = xadjust+xdata;
+				else
+					scrollx += xdata & 0x1ff;
 			}
 
 			if( ydata&0x4000 )
@@ -560,8 +563,10 @@ uint32_t namcona1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	screen.priority().fill(0, cliprect );
 
-	bitmap.fill(0xff, cliprect ); /* background color? */
-	
+	// guess for X-Day 2 (flames in attract), seems wrong for Emeraldia but unsure
+//	bitmap.fill(0xff, cliprect ); /* background color? */
+	bitmap.fill((m_vreg[0xba/2] & 0xf) * 256, cliprect );
+
 	if( m_vreg[0x8e/2] && screen_enabled(display_rect) == true )
 	{
 		/* gfx enabled */
