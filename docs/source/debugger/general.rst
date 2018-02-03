@@ -144,7 +144,7 @@ printf
 |
 | Prints PC=<pcval> where <pcval> is displayed in hexadecimal with 4 digits with zero-fill.
 |
-|  printf "A=%d, B=%d\nC=%d",a,b,a+b
+|  printf "A=%d, B=%d\\nC=%d",a,b,a+b
 |
 | Prints A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.
 |
@@ -171,7 +171,7 @@ logerror
 |
 | Logs PC=<pcval> where <pcval> is displayed in hexadecimal with 4 digits with zero-fill.
 |
-|  logerror "A=%d, B=%d\nC=%d",a,b,a+b
+|  logerror "A=%d, B=%d\\nC=%d",a,b,a+b
 |
 | Logs A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.
 |
@@ -193,7 +193,7 @@ tracelog
 |
 | Outputs PC=<pcval> where <pcval> is displayed in hexadecimal with 4 digits with zero-fill.
 |
-|  printf "A=%d, B=%d\nC=%d",a,b,a+b
+|  printf "A=%d, B=%d\\nC=%d",a,b,a+b
 |
 | Outputs A=<aval>, B=<bval> on one line, and C=<a+bval> on a second line.
 |

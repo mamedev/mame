@@ -4074,7 +4074,7 @@ ROM_START( segawski ) /* Sega Water Ski Revision A, Model 2C, Sega Game ID# 833-
 	ROM_LOAD("mpr-19989.34", 0x400000, 0x400000, CRC(8074a4b3) SHA1(98dc1d122ffb9b5c52994dea2b5d8c4f004a5f8e) )
 ROM_END
 
-ROM_START( hotd ) /* House of the Dead, Model 2C, Sega Game ID# 610-0396-13054 */
+ROM_START( hotd ) /* House of the Dead, Model 2C, Sega Game ID# 610-0396-13054, ROM board ID# 834-13055 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-19696.15", 0x000000, 0x080000, CRC(03da5623) SHA1(be0bd34a9216375c7204445f084f6c74c4d3b0c8) )
 	ROM_LOAD32_WORD("epr-19697.16", 0x000002, 0x080000, CRC(a9722d87) SHA1(0b14f9a81272f79a5b294bc024711042c5fb2637) )

@@ -92,12 +92,12 @@ static ADDRESS_MAP_START( diamond_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(gng_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(gng_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0x3000, 0x33ff) AM_NOP // faulty POST?
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P1")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P2")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3004, 0x3004) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3000, 0x33ff) AM_NOP // faulty POST?
 	AM_RANGE(0x3800, 0x38ff) AM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x3900, 0x39ff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)

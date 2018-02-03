@@ -2319,6 +2319,7 @@ pcd2                            // Siemens PCD-2
 ct386sx                         //
 ec1842                          //
 ec1849                          //
+ews286                          // 1986 Ericsson WS286
 ficpio2                         // 1995 FIC 486-PIO-2
 ftsserv                         // 1991 Apricot FTs (Scorpion)
 ibm5162                         // 1986 IBM XT 5162 (XT w/80286)
@@ -2330,6 +2331,7 @@ megapc                          // 1992 Amstrad plc
 megapcpl                        //
 megapcpla                       // AMI BIOS version with Winbond WINBUS chipset
 neat                            // 1989 New Enhanced AT chipset, AMI BIOS
+//nws286                          // 1988 Nokia WS286
 pc2386                          //
 qi600                           // 1988 Apricot Qi 600 (Neptune Motherboard
 qi900                           // 1990 Apricot Qi 900 (Scorpion Motherboard)
@@ -17459,6 +17461,7 @@ konin                           //
 
 @source:konmedal.cpp
 ddboy
+ddboya
 shuriboy
 tsukande
 
@@ -37798,6 +37801,8 @@ vsmilef                         //
 vsmileg                         //
 walle                           //
 wirels60                        // Wireless 60
+wlsair60						// Wireless Air 60
+zone40							// Zone 40
 zone60                          // Zone 60
 rad_skat                        //
 rad_skatp                       //
@@ -38054,6 +38059,7 @@ warpsped                        // 197?
 bombbee                         // [1979] Namco
 cutieq                          // (c) 1979 Namco
 geebee                          // [1978] Namco
+geebeea                         // [1978] Namco (Alca license)
 geebeeb                         // [1978] Namco (F.lli Bertolino license)
 geebeeg                         // [1978] Gremlin
 kaitei                          // [1980] K.K. Tokki

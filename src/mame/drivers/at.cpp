@@ -52,6 +52,14 @@ On board: Serial, Parallel, RTC, RGBI (external Monitor), keyboard
 Options: 80827, Expansion box with 2 ISA slots, 300/1200Baud internal Modem, Compaq EGA Board
 To-Do: Emulate Graphics card fully
 
+Ericsson/Nokia Data/ICL WS286
+=============================
+Links: http://oju.mbnet.fi/retro/EricssonPC_eng.html
+Info: WS286 was introduced 1986 as first 8Mhz AT in the world a few weeks ahead competition, aquired by Nokia Data 1988 which in turn was aquired by ICL 1990
+Form factor: Desktop PC
+CPU: Intel 286, 8MHz
+RAM: 640KB
+Mass storage: Floppy: 5.25" 1.2Mb, HDD: 40Mb
 ***************************************************************************/
 
 #include "emu.h"
@@ -120,6 +128,7 @@ public:
 	void atvga(machine_config &config);
 	void ibmps1(machine_config &config);
 	void at386(machine_config &config);
+	void ews286(machine_config &config);
 
 	static void cfg_single_1200K(device_t *device);
 };
@@ -390,6 +399,17 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(at_state::ibm5170a, ibm5170)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(XTAL(16'000'000)/2)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_DERIVED(at_state::ews286, ibm5170)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(XTAL(16'000'000)/2) // Exact crystal needs to be verified, 8 MHz according to specification
+
+	MCFG_DEVICE_MODIFY("isa2")
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_1200K) // From pictures but also with a 3.5" as second floppy
+
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(at_state::ec1842, ibm5170)
@@ -1286,6 +1306,20 @@ ROM_START( comportiii )
 	ROMX_LOAD( "109737-002.bin", 0x10001, 0x8000, CRC(8463cc41) SHA1(cb9801591e4a2cd13bbcc40739c9e675ba84c079), ROM_SKIP(1) | ROM_BIOS(2) )
 ROM_END
 
+// Ericsson WS286
+ROM_START(ews286 ) // Computer is brown/yellow-ish with Ericsson logo
+	ROM_REGION(0x20000,"bios", 0)
+	ROM_LOAD16_BYTE( "RYS_103_1002_R8A_3C00_IC-POS_71.BIN", 0x18000, 0x4000, CRC(af179e56) SHA1(58b1df46d6e68eef472a0529cb9317abaf17880f)) // Last ROM set and has Nokia
+	ROM_LOAD16_BYTE( "RYS_103_1003_R8A_8600_IC-POS_69.BIN", 0x18001, 0x4000, CRC(555502cb) SHA1(1977fe54b69c5e52731bf3eb8bdabe777aac014b)) // copyright patched in both roms
+ROM_END
+
+// Nokia Data WS286
+//ROM_START(nws286 ) // Computer is grey with Nokia logo.
+//	ROM_REGION(0x20000,"bios", 0)
+//	ROM_LOAD16_BYTE( "RYS_103_1002_R8A_3C00_IC-POS_71.BIN", 0x18000, 0x4000, NO_DUMP)
+//	ROM_LOAD16_BYTE( "RYS_103_1003_R8A_8600_IC-POS_69.BIN", 0x18001, 0x4000, NO_DUMP)
+//ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -1339,4 +1373,5 @@ COMP ( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,    at_state,      at,   
 COMP ( 199?, mbc28,     ibm5170, 0,       at386sx,   0,    at_state,      at,      "Sanyo",  "MBC-28", MACHINE_NOT_WORKING )
 COMP ( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,    at_state,      at,      "Siemens",  "PCD-2", MACHINE_NOT_WORKING )
 COMP ( 1987, comportiii,ibm5170, 0,       comportiii,0,    at_state,      at,      "Compaq",   "Portable III", MACHINE_NOT_WORKING )
-
+COMP ( 1986, ews286,    ibm5170, 0,       ews286,    0,    at_state,      at,      "Ericsson", "Ericsson WS286", MACHINE_NOT_WORKING )
+//COMP ( 1988, nws286,    ibm5170,  0,      ews286,    0,    at_state,      at,      "Nokia Data", "Nokia Data WS286", MACHINE_NOT_WORKING )

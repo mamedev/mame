@@ -517,7 +517,7 @@ bool d88_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 				sects[i].size        = hs[3];
 				sects[i].actual_size = size;
 				sects[i].deleted     = hs[7] != 0;
-				sects[i].bad_crc     = false;
+				sects[i].bad_crc     = hs[8] == 0xb0;  // according to hxc
 
 				if(size) {
 					sects[i].data    = sect_data + sdatapos;

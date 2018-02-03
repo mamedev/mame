@@ -3,9 +3,18 @@
 /*  Namco System NA1/2 Video Hardware */
 
 /*
+Notes:
+- fa/fghtatck: Global screen window effect cut one line from top/bottom of screen, especially noticeable with credit display. 
+  It's a btanb according to a PCB video I've seen -AS.
+
 TODO:
-- dynamic screen resolution (changes between emeralda test mode and normal game)
+- background color currently follows what xday2 tries to set up, it's not sure if this is correct for everything else.
+  Maybe there's a setting that actually switches between that and black pen?
 - non-shadow pixels for sprites flagged to enable shadows have bad colors
+- xday2: after choosing life (right) mode and set up date of birth, a joystick screen shows up.
+  Bottom yellow frame doesn't show up correctly.
+- xday2: at the end of life event, there's an unemulated screen shutdown event (might be posirq?)
+
 */
 
 #include "emu.h"
@@ -428,16 +437,18 @@ void namcona1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 } /* draw_sprites */
 
-void namcona1_state::draw_pixel_line( uint16_t *pDest, uint8_t *pPri, uint16_t *pSource, const pen_t *paldata )
+void namcona1_state::draw_pixel_line( const rectangle &cliprect, uint16_t *pDest, uint8_t *pPri, uint16_t *pSource, const pen_t *paldata )
 {
 	int x;
 	for( x=0; x<38*8; x+=2 )
-	{
+	{			
 		uint16_t data = *pSource++;
 		pPri[x+0] = 0xff;
 		pPri[x+1] = 0xff;
-		pDest[x+0] = paldata[data>>8];
-		pDest[x+1] = paldata[data&0xff];
+		if(x >= cliprect.min_x && x <= cliprect.max_x)
+			pDest[x+0] = paldata[data>>8];
+		if(x+1 >= cliprect.min_x && x+1 <= cliprect.max_x)
+			pDest[x+1] = paldata[data&0xff];
 	} /* next x */
 } /* draw_pixel_line */
 
@@ -471,7 +482,7 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 		const uint16_t *scroll = &m_scroll[which * 0x400/2];
 		rectangle clip = cliprect;
 		int xadjust = 0x3a - which*2;
-		int scrollx = 0;
+		int scrollx = xadjust;
 		int scrolly = 0;
 
 		for( int line = 0; line < 256; line++ )
@@ -484,7 +495,10 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 			if( xdata )
 			{
 				/* screenwise linescroll */
-				scrollx = xadjust+xdata;
+				if(xdata & 0x4000) // resets current xscroll value (knuckle head)
+					scrollx = xadjust+xdata;
+				else
+					scrollx += xdata & 0x1ff;
 			}
 
 			if( ydata&0x4000 )
@@ -497,7 +511,7 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 			{
 				// TODO: not convinced about this trigger
 				if( xdata == 0xc001 )
-				{
+				{						
 				   /* This is a simplification, but produces the correct behavior for the only game that uses this
 					* feature, Numan Athletics.
 					*/
@@ -505,7 +519,7 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 					//const pen_t *paldata = &m_palette->pen(m_bg_tilemap[which]->palette_offset());
 					const pen_t *paldata = &m_palette->pen(0);
 
-					draw_pixel_line(&bitmap.pix16(line),
+					draw_pixel_line(cliprect, &bitmap.pix16(line),
 								&screen.priority().pix8(line),
 								m_videoram + ydata + 25,
 								paldata );
@@ -521,19 +535,47 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 	}
 } /* draw_background */
 
+// CRTC safety checks
+bool namcona1_state::screen_enabled(const rectangle &cliprect)
+{
+	if(cliprect.min_x < 0)
+		return false;
+
+	if(cliprect.max_x < 0)
+		return false;
+	
+	if(cliprect.min_x > cliprect.max_x)
+		return false;
+	
+	if(cliprect.min_y > cliprect.max_y)
+		return false;
+
+	return true;
+}
+
 uint32_t namcona1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int which;
 	int priority;
+	// CRTC visible area parameters 
+	// (used mostly by Numan Athletics for global screen window effects, cfr. start of events/title screen to demo mode transitions)
+	rectangle display_rect;
+	display_rect.min_x = m_vreg[0x80/2]-0x48;
+	display_rect.max_x = m_vreg[0x82/2]-0x48-1;
+	display_rect.min_y = std::max((int)m_vreg[0x84/2],   cliprect.min_y);
+	display_rect.max_y = std::min((int)m_vreg[0x86/2]-1, cliprect.max_y);
 
 	/* int flipscreen = m_vreg[0x98/2]; (TBA) */
 
 	screen.priority().fill(0, cliprect );
 
-	bitmap.fill(0xff, cliprect ); /* background color? */
-	
-	if( m_vreg[0x8e/2] )
-	{ /* gfx enabled */
+	// guess for X-Day 2 (flames in attract), seems wrong for Emeraldia but unsure
+//	bitmap.fill(0xff, cliprect ); /* background color? */
+	bitmap.fill((m_vreg[0xba/2] & 0xf) * 256, cliprect );
+
+	if( m_vreg[0x8e/2] && screen_enabled(display_rect) == true )
+	{
+		/* gfx enabled */
 		if( m_palette_is_dirty )
 		{
 			/* palette updates are delayed when graphics are disabled */
@@ -564,12 +606,12 @@ uint32_t namcona1_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				}
 				if( pri == priority )
 				{
-					draw_background(screen,bitmap,cliprect,which,priority);
+					draw_background(screen,bitmap,display_rect,which,priority);
 				}
 			} /* next tilemap */
 		} /* next priority level */
 
-		draw_sprites(screen,bitmap,cliprect);
+		draw_sprites(screen,bitmap,display_rect);
 	} /* gfx enabled */
 	return 0;
 }
