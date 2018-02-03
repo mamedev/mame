@@ -115,6 +115,12 @@ public:
 
 	DECLARE_WRITE8_MEMBER(vt03_48ax_w);
 	DECLARE_READ8_MEMBER(vt03_48ax_r);
+		
+	DECLARE_WRITE8_MEMBER(vt03_413x_w);
+	DECLARE_READ8_MEMBER(vt03_413x_r);
+	DECLARE_READ8_MEMBER(vt03_414f_r);
+	DECLARE_READ8_MEMBER(vt03_415c_r);
+
 	DECLARE_READ8_MEMBER(vthh_414a_r);
 	DECLARE_WRITE8_MEMBER(vtfp_411e_w);
 	DECLARE_WRITE8_MEMBER(vtfp_4a00_w);
@@ -123,6 +129,7 @@ public:
 	DECLARE_READ8_MEMBER(vtfp_412d_r);
 	DECLARE_WRITE8_MEMBER(vtfp_411d_w);
 	DECLARE_WRITE8_MEMBER(vtfp_4242_w);
+	DECLARE_READ8_MEMBER(vtfp_4119_r);
 
 	DECLARE_READ8_MEMBER(vtfa_412c_r);
 
@@ -156,6 +163,8 @@ private:
 	void video_irq(bool hblank, int scanline, int vblank, int blanked);
 
 	uint8_t m_410x[0xc];
+	uint8_t m_413x[8];
+
 	uint8_t m_411c, m_411d, m_4242;
 	uint32_t m_ahigh;
 	uint8_t m_vdma_ctrl;
@@ -406,6 +415,11 @@ READ8_MEMBER(nes_vt_state::vtfp_412d_r)
 	return m_csel->read();
 }
 
+READ8_MEMBER(nes_vt_state::vtfp_4119_r)
+{
+	return 0x00;
+}
+
 
 READ8_MEMBER(nes_vt_state::vt03_41bx_r)
 {
@@ -432,6 +446,47 @@ READ8_MEMBER(nes_vt_state::vt03_48ax_r)
 		default:
 			return 0x00;
 	}
+}
+
+WRITE8_MEMBER(nes_vt_state::vt03_413x_w)
+{
+	logerror("vt03_413x_w %02x %02x\n", offset, data);
+	// VT168 style ALU ??
+	m_413x[offset] = data;
+	if(offset == 0x5) {
+		uint32_t res = uint32_t((m_413x[5] << 8) | m_413x[4]) * uint32_t((m_413x[1] << 8) | m_413x[0]);
+		m_413x[0] = res & 0xFF;
+		m_413x[1] = (res >> 8) & 0xFF;
+		m_413x[2] = (res >> 16) & 0xFF;
+		m_413x[3] = (res >> 24) & 0xFF;
+		m_413x[6] = 0x00;
+
+	} else if(offset == 0x6) {
+		/*uint32_t res = uint32_t((m_413x[5] << 8) | m_413x[4]) * uint32_t((m_413x[1] << 8) | m_413x[0]);
+		m_413x[0] = res & 0xFF;
+		m_413x[1] = (res >> 8) & 0xFF;
+		m_413x[2] = (res >> 16) & 0xFF;
+		m_413x[3] = (res >> 24) & 0xFF;*/
+		m_413x[6] = 0x00;
+	}
+
+}
+
+
+READ8_MEMBER(nes_vt_state::vt03_413x_r)
+{
+	logerror("vt03_413x_r %02x\n", offset);
+	return m_413x[offset];
+}
+
+READ8_MEMBER(nes_vt_state::vt03_414f_r)
+{
+	return 0xff;
+}
+
+READ8_MEMBER(nes_vt_state::vt03_415c_r)
+{
+	return 0xff;
 }
 
 READ8_MEMBER(nes_vt_state::vthh_414a_r)
@@ -563,6 +618,8 @@ void nes_vt_state::machine_start()
 	m_prgbank3->configure_entries(0, m_numbanks, &m_prgrom[0x00000], 0x2000);
 
 	save_item(NAME(m_410x));
+	save_item(NAME(m_413x));
+
 	save_item(NAME(m_8000_addr_latch));
 
 	save_item(NAME(m_timer_irq_enabled));
@@ -835,8 +892,17 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
 WRITE8_MEMBER(nes_vt_state::vt03_8000_w)
 {
 	uint16_t addr = offset + 0x8000;
+	if((m_411d & 0x01) && (m_411d & 0x03)) {
+		//CNROM compat
+		logerror("%s: vtxx_cnrom_8000_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
+		m_ppu->set_201x_reg(0x6, data * 8);
+		m_ppu->set_201x_reg(0x7, data * 8 + 2);
+		m_ppu->set_201x_reg(0x2, data * 8 + 4);
+		m_ppu->set_201x_reg(0x3, data * 8 + 5);
+		m_ppu->set_201x_reg(0x4, data * 8 + 6);
+		m_ppu->set_201x_reg(0x5, data * 8 + 7);
 
-	if(m_411d & 0x01) {
+	} else if(m_411d & 0x01) {
 		//MMC1 compat, TODO
 		logerror("%s: vtxx_mmc1_8000_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
 
@@ -914,7 +980,7 @@ WRITE8_MEMBER(nes_vt_state::vt03_8000_w)
 
 		}
 	}
-	//logerror("%s: vt03_8000_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
+	logerror("%s: vt03_8000_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
 	
 
 }
@@ -923,7 +989,8 @@ WRITE8_MEMBER(nes_vt_state::vt03_8000_w)
 
 READ8_MEMBER(nes_vt_state::psg1_4014_r)
 {
-	return m_apu->read(space, 0x14);
+	//return m_apu->read(space, 0x14);
+	return 0x00;
 }
 
 READ8_MEMBER(nes_vt_state::psg1_4015_r)
@@ -973,6 +1040,11 @@ void nes_vt_state::do_dma(uint8_t data, bool broken)
 		&& !(m_ppu->get_201x_reg(0x1) & 0x80)) {
 		length -= 1;
 		src_addr += 1;
+	} else if((dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F01)
+		&& !(m_ppu->get_201x_reg(0x1) & 0x80)) {
+		// Legacy mode for DGUN-2573 compat
+		m_ppu->set_vram_dest(0x3F00);
+		ppu_vt03_device::set_palette_mode(*m_ppu, PAL_MODE_VT0x);
 	}
 	for (int i = 0; i < length; i++)
 	{
@@ -982,7 +1054,7 @@ void nes_vt_state::do_dma(uint8_t data, bool broken)
 		} else {
 			m_maincpu->space(AS_PROGRAM).write_byte(0x2004, spriteData);
 		}
-		if(((src_addr + i) & 0xFF) == length) break;
+		//if(((src_addr + i) & 0xFF) == length && (i != 0)) break;
 	}
 
 	// should last (length * 4 - 1) CPU cycles.
@@ -992,6 +1064,7 @@ void nes_vt_state::do_dma(uint8_t data, bool broken)
 
 WRITE8_MEMBER(nes_vt_state::vt03_4034_w)
 {
+	logerror("vt03_4034_w %02x\n", data);
 	m_vdma_ctrl = data;
 }
 
@@ -1024,6 +1097,10 @@ static ADDRESS_MAP_START( nes_vt_cy_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_IMPORT_FROM(nes_vt_xx_map)
 	AM_RANGE(0x41b0, 0x41bf) AM_READ(vt03_41bx_r) AM_WRITE(vt03_41bx_w)
 	AM_RANGE(0x48a0, 0x48af) AM_READ(vt03_48ax_r) AM_WRITE(vt03_48ax_w)
+	AM_RANGE(0x4130, 0x4136) AM_READ(vt03_413x_r) AM_WRITE(vt03_413x_w) 
+	AM_RANGE(0x414F, 0x414F) AM_READ(vt03_414f_r) 
+	AM_RANGE(0x415C, 0x415C	) AM_READ(vt03_415c_r) 
+
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nes_vt_bt_map, AS_PROGRAM, 8, nes_vt_state )
@@ -1050,7 +1127,8 @@ static ADDRESS_MAP_START( nes_vt_hh_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(vt_hh_sprite_dma_w)
 	
 	AM_RANGE(0x414A, 0x414A) AM_READ(vthh_414a_r)
-	
+	AM_RANGE(0x411d, 0x411d) AM_WRITE(vtfp_411d_w)
+
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1077,19 +1155,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nes_vt_fp_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_IMPORT_FROM(nes_vt_hh_map)
-	AM_RANGE(0x411d, 0x411d) AM_WRITE(vtfp_411d_w)
 	AM_RANGE(0x411e, 0x411e) AM_WRITE(vtfp_411e_w)
 	AM_RANGE(0x4a00, 0x4a00) AM_WRITE(vtfp_4a00_w)
 	AM_RANGE(0x412c, 0x412c) AM_WRITE(vtfp_412c_w)
 	AM_RANGE(0x412d, 0x412d) AM_READ(vtfp_412d_r) 
 	AM_RANGE(0x4242, 0x4242) AM_WRITE(vtfp_4242_w) 
+	AM_RANGE(0x4119, 0x4119) AM_READ(vtfp_4119_r)
 
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nes_vt_fa_map, AS_PROGRAM, 8, nes_vt_state )
 	AM_RANGE(0x412c, 0x412c) AM_READ(vtfa_412c_r) AM_WRITE(vtfa_412c_w) 
+	AM_RANGE(0x4242, 0x4242) AM_WRITE(vtfp_4242_w) 
 
-	AM_IMPORT_FROM(nes_vt_fp_map)
+	AM_IMPORT_FROM(nes_vt_dg_map)
 
 ADDRESS_MAP_END
 
@@ -1251,7 +1330,7 @@ static INPUT_PORTS_START( nes_vt )
 PORT_START("CARTSEL")
 INPUT_PORTS_END
 
-MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_fp, nes_vt_hh)
+MACHINE_CONFIG_DERIVED(nes_vt_state::nes_vt_fp, nes_vt_xx)
 MCFG_CPU_MODIFY("maincpu")
 MCFG_CPU_PROGRAM_MAP(nes_vt_fp_map)
 
@@ -1478,7 +1557,7 @@ ROM_END
 #endif
 ROM_START( dgun2573 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "dgun2573.bin", 0x00000, 0x2000000, CRC(cde71a53) SHA1(d0d4c1965876291861781ecde46b1142b062f1f3) )
+	ROM_LOAD( "dgun2573.bin", 0x00000, 0x2000000, BAD_DUMP CRC(cde71a53) SHA1(d0d4c1965876291861781ecde46b1142b062f1f3) )
 ROM_END
 
 ROM_START( bittboy )
@@ -1563,12 +1642,15 @@ CONS( 200?, vgpmini,   0,  0,  nes_vt_vg, nes_vt, nes_vt_state,  0, "<unknown>",
 // emulation
 CONS( 200?, dgun2500,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
-// these are NOT VT03, but something newer but based around the same basic designs
-// (no visible tiles in ROM using standard decodes tho, might need moving out of here)
-// dgun2561 at least boots, but no visible gfx due to missing PPU features
-CONS( 2012, dgun2561,  0,  0,  nes_vt_dg,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
-CONS( 2015, dgun2573,  0,  0,  nes_vt_fp, nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Gamer V Portable Gaming System (DGUN-2573)", MACHINE_NOT_WORKING )
+// don't even get to menu. very enhanced chipset, VT368/9?
+CONS( 2012, dgun2561,  0,  0,  nes_vt_cy,    nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Portable Gaming System (DGUN-2561)", MACHINE_NOT_WORKING )
 CONS( 200?, lexcyber,  0,  0,  nes_vt_cy, nes_vt, nes_vt_state,  0, "Lexibook", "Lexibook Compact Cyber Arcade", MACHINE_NOT_WORKING )
+
+// boots, same platform with scrambled opcodes as FC pocket
+// palette issues in some games because they actually use the old VT style palette
+// but no way to switch?
+// some menu gfx broken, probably because this is a bad dump
+CONS( 2015, dgun2573,  0,  0,  nes_vt_fp, nes_vt, nes_vt_state,  0, "dreamGEAR", "dreamGEAR My Arcade Gamer V Portable Gaming System (DGUN-2573)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // these are VT1682 based and have scrambled CPU opcodes. Will need VT1682 CPU and PPU
 // to be emulated
@@ -1613,28 +1695,32 @@ CONS( 2004, mc_dcat8,   0,        0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unk
 CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Runs well, minor GFX issues in intro
-CONS( 2017, sy889,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-889 300 in 1 Handheld", MACHINE_NOT_WORKING )
-CONS( 2016, sy888b,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-888B 288 in 1 Handheld", MACHINE_NOT_WORKING )
+CONS( 2017, sy889,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-889 300 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2016, sy888b,  		0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "SY Corp", 	"SY-888B 288 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
 
 // Same hardware as SY-889
-CONS( 201?, mc_cb280,  	0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "CoolBoy", 	"Coolboy RS-18 (280 in 1)", MACHINE_NOT_WORKING )
+CONS( 201?, mc_cb280,  	0, 				0,  nes_vt_hh, nes_vt, nes_vt_state,  0, "CoolBoy", 	"Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Runs well, only issues in SMB3 which crashes
 CONS( 2017, bittboy,  	0, 				0,  nes_vt_bt,    nes_vt, nes_vt_state,  0, "BittBoy", 	"BittBoy Mini FC 300 in 1", MACHINE_NOT_WORKING )
 // Runs well, all games seem to work
-CONS( 201?, mc_89in1,  	0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", 	"89 in 1 Mini Game Console (060-92023011V1.0)", MACHINE_NOT_WORKING )
+CONS( 201?, mc_89in1,  	0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "<unknown>", 	"89 in 1 Mini Game Console (060-92023011V1.0)", MACHINE_IMPERFECT_GRAPHICS )
 // Broken GFX, investigate
 CONS( 201?, mc_pg150,  	0, 				0,  nes_vt_bt,    nes_vt, nes_vt_state,  0, "<unknown>", 	"Pocket Games 150 in 1", MACHINE_NOT_WORKING )
 // No title screen, but press start and menu and games run fine. Makes odd
 // memory accesses which probably explain broken title screen
 CONS( 201?, mc_hh210,  	0, 				0,  nes_vt_xx,    nes_vt, nes_vt_state,  0, "<unknown>", 	"Handheld 210 in 1", MACHINE_NOT_WORKING )
-
+// First half of games don't work, probably bad dump
 CONS( 201?, dvnimbus,  	0, 				0,  nes_vt_vg,    nes_vt, nes_vt_state,  0, "<unknown>", 	"DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
-
+// Works fine, VT02 based
 CONS( 201?, mc_tv200,  	0, 				0,  nes_vt,    nes_vt, nes_vt_state,  0, "Thumbs Up", 	"200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
+// New platform with scrambled opcodes, same as DGUN-2561. Runs fine with minor GFX and sound issues in menu
+// Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
+CONS( 2016, fcpocket,  	0,        0,  nes_vt_fp,    nes_vt_fp, nes_vt_state,  0, "<unknown>", 	"FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// Probably VT09 or similar
+// Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a ROM high address bit
+// (which can also be overriden by GPIO)
+CONS( 2017, fapocket,  	0,        0,  nes_vt_fa,    nes_vt_fa, nes_vt_state,  0, "<unknown>", 	"Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2016, fcpocket,  	0,        0,  nes_vt_fp,    nes_vt_fp, nes_vt_state,  0, "<unknown>", 	"FC Pocket 600 in 1", MACHINE_NOT_WORKING )
-CONS( 2017, fapocket,  	0,        0,  nes_vt_fa,    nes_vt_fa, nes_vt_state,  0, "<unknown>", 	"Family Pocket 638 in 1", MACHINE_NOT_WORKING )
-
-
+// Plays intro music but then crashes. New platform which makes some odd accesses.
 CONS( 2016, mog_m320,  	0, 				0,  nes_vt_hh,    nes_vt, nes_vt_state,  0, "MOGIS", 	"MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
