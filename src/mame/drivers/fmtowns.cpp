@@ -1581,7 +1581,7 @@ void towns_state::towns_delay_cdda(cdrom_image_device* dev)
 void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 {
 	towns_cdrom_set_irq(TOWNS_CD_IRQ_MPU,0); // TODO: this isn't sufficiently tested
-	if(device->get_cdrom_file() == nullptr)
+	if((device->get_cdrom_file() == nullptr) && (m_towns_cd.command != 0xa0))
 	{  // No CD in drive
 		if(m_towns_cd.command & 0x20)
 		{
