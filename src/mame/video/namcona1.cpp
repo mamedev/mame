@@ -7,8 +7,14 @@ Notes:
 - fa/fghtatck: Global screen window effect cut one line from top/bottom of screen, especially noticeable with credit display. 
   It's a btanb according to a PCB video I've seen -AS.
 
-TODO: 
+TODO:
+- background color currently follows what xday2 tries to set up, it's not sure if this is correct for everything else.
+  Maybe there's a setting that actually switches between that and black pen?
 - non-shadow pixels for sprites flagged to enable shadows have bad colors
+- xday2: after choosing life (right) mode and set up date of birth, a joystick screen shows up.
+  Bottom yellow frame doesn't show up correctly.
+- xday2: at the end of life event, there's an unemulated screen shutdown event (might be posirq?)
+
 */
 
 #include "emu.h"
