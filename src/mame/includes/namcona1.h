@@ -8,6 +8,7 @@
 
 #include "machine/eeprompar.h"
 #include "machine/timer.h"
+#include "machine/msm6242.h"
 #include "sound/c140.h"
 #include "screen.h"
 
@@ -44,7 +45,6 @@ public:
 	DECLARE_WRITE16_MEMBER(mcu_mailbox_w_mcu);
 	DECLARE_READ16_MEMBER(na1mcu_shared_r);
 	DECLARE_WRITE16_MEMBER(na1mcu_shared_w);
-	DECLARE_READ8_MEMBER(na1_c219_ram_r);
 	DECLARE_READ8_MEMBER(port4_r);
 	DECLARE_WRITE8_MEMBER(port4_w);
 	DECLARE_READ8_MEMBER(port5_r);
@@ -76,9 +76,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void namcona2(machine_config &config);
-	void namcona1w(machine_config &config);
-	void namcona2w(machine_config &config);
 	void namcona1(machine_config &config);
 
 protected:
@@ -111,7 +108,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<c140_device> m_c219;
+	required_device<c219_device> m_c219;
 
 	required_ioport_array<4> m_muxed_inputs;
 	required_ioport          m_io_p3;
@@ -153,6 +150,8 @@ private:
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int primask );
 	void tilemap_get_info(tile_data &tileinfo, int tile_index, const uint16_t *tilemap_videoram, bool use_4bpp_gfx);
 	void blit_setup( int format, int *bytes_per_row, int *pitch, int mode );
+	void draw_pixel_line( const rectangle &cliprect, uint16_t *pDest, uint8_t *pPri, uint16_t *pSource, const pen_t *paldata );
+	bool screen_enabled( const rectangle &cliprect);
 	TILE_GET_INFO_MEMBER(tilemap_get_info0);
 	TILE_GET_INFO_MEMBER(tilemap_get_info1);
 	TILE_GET_INFO_MEMBER(tilemap_get_info2);
@@ -173,16 +172,25 @@ public:
 	DECLARE_DRIVER_INIT(emeralda);
 	DECLARE_DRIVER_INIT(numanath);
 	DECLARE_DRIVER_INIT(quiztou);
+	
+	void namcona2(machine_config &config);
 };
 
 class xday2_namcona2_state : public namcona2_state
 {
 public:
 	xday2_namcona2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcona2_state(mconfig, type, tag)
+		: namcona2_state(mconfig, type, tag),
+		m_rtc(*this, "rtc")
 	{}
 	
 	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
 
+	required_device <msm6242_device> m_rtc;
+	
+	DECLARE_READ8_MEMBER(printer_r);
+	DECLARE_WRITE8_MEMBER(printer_w);
+
 	DECLARE_DRIVER_INIT(xday2);
+	void xday2(machine_config &config);
 };

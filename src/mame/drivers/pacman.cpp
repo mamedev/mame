@@ -547,12 +547,8 @@ WRITE8_MEMBER(pacman_state::alibaba_sound_w)
 {
 	/* since the sound region in Ali Baba is not contiguous, translate the
 	   offset into the 0-0x1f range */
-	if (offset < 0x10)
-		m_namco_sound->pacman_sound_w(space, offset, data);
-	else if (offset < 0x20)
-		m_spriteram2[offset - 0x10] = data;
-	else
-		m_namco_sound->pacman_sound_w(space, offset - 0x10, data);
+	offset = (offset >> 1 & 0x10) | (offset & 0x0f);
+	m_namco_sound->pacman_sound_w(space, offset, data);
 }
 
 READ8_MEMBER(pacman_state::alibaba_mystery_1_r)
@@ -1131,8 +1127,8 @@ static ADDRESS_MAP_START( alibaba_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x4f00, 0x4fff) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x5000, 0x5007) AM_MIRROR(0xaf38) AM_DEVWRITE("latch1", ls259_device, write_d0)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x5040, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(alibaba_sound_w)  /* the sound region is not contiguous */
-	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2") /* actually at 5050-505f, here to point to free RAM */
+	AM_RANGE(0x5040, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(alibaba_sound_w) /* the sound region is not contiguous */
+	AM_RANGE(0x5050, 0x505f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
 	AM_RANGE(0x50c0, 0x50c7) AM_MIRROR(0xaf00) AM_DEVWRITE("latch2", ls259_device, write_d0)
