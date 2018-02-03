@@ -1,0 +1,30 @@
+# license:BSD-3-Clause
+# copyright-holders:David Haywood
+# xavix opcodes
+
+callf_xa3
+	TMP2 = read_pc();
+	TMP = read_pc();
+	TMP |= (read_pc()<<8);
+	read(SP);
+	write(SP, PC>>8);
+	dec_SP();
+	write(SP, PC);
+	dec_SP();
+	write(SP, m_farbank);
+	dec_SP();
+	m_farbank=TMP2;
+	PC = TMP;
+	prefetch();
+
+retf_imp
+	read_pc_noinc();
+	read(SP);
+	inc_SP();
+	TMP2 = read(SP);
+	inc_SP();
+	PC = read(SP);
+	inc_SP();
+	PC = set_h(PC, read(SP));
+	m_farbank = TMP2;
+	prefetch();

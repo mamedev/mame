@@ -240,11 +240,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(superchs_state::superchs)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_40MHz/2) /* 20MHz - verified */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(40'000'000)/2) /* 20MHz - verified */
 	MCFG_CPU_PROGRAM_MAP(superchs_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL_32MHz/2) /* 16MHz - verified */
+	MCFG_CPU_ADD("sub", M68000, XTAL(32'000'000)/2) /* 16MHz - verified */
 	MCFG_CPU_PROGRAM_MAP(superchs_cpub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", superchs_state,  irq4_line_hold)
 

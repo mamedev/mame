@@ -634,9 +634,9 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_DEVREADWRITE8("taito_en:dpram", mb8421_device, left_r, left_w, 0xff000000)
 	AM_RANGE(0x06c00000, 0x06c0001f) AM_READWRITE8(jc_lan_r, jc_lan_w, 0x00ff0000)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_SHARE("main_ram")
+	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE16(dsp_shared_r, dsp_shared_w, 0xffff0000)
 	AM_RANGE(0x10001ff8, 0x10001ffb) AM_READ16(dsp_to_main_7fe_r, 0xffff0000)
 	AM_RANGE(0x10001ffc, 0x10001fff) AM_WRITE16(main_to_dsp_7ff_w, 0xffff0000)
-	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE16(dsp_shared_r, dsp_shared_w, 0xffff0000)
 ADDRESS_MAP_END
 
 
@@ -669,10 +669,10 @@ WRITE8_MEMBER(taitojc_state::dendego_brakemeter_w)
 }
 
 static ADDRESS_MAP_START( dendego_map, AS_PROGRAM, 32, taitojc_state )
+	AM_IMPORT_FROM( taitojc_map )
 	AM_RANGE(0x06e00000, 0x06e00003) AM_WRITE8(dendego_speedmeter_w, 0x00ff0000)
 	AM_RANGE(0x06e00004, 0x06e00007) AM_WRITE8(dendego_brakemeter_w, 0x00ff0000)
 	AM_RANGE(0x06e0000c, 0x06e0000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff0000)
-	AM_IMPORT_FROM( taitojc_map )
 ADDRESS_MAP_END
 
 
@@ -864,8 +864,8 @@ static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
 	AM_RANGE(0x701d, 0x701d) AM_READ(dsp_math_projection_y_r)
 	AM_RANGE(0x701f, 0x701f) AM_READ(dsp_math_projection_x_r)
 	AM_RANGE(0x7022, 0x7022) AM_READ(dsp_math_unk_r)
-	AM_RANGE(0x7ffe, 0x7ffe) AM_WRITE(dsp_to_main_7fe_w)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("dsp_shared")
+	AM_RANGE(0x7ffe, 0x7ffe) AM_WRITE(dsp_to_main_7fe_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1071,16 +1071,16 @@ void taitojc_state::machine_start()
 MACHINE_CONFIG_START(taitojc_state::taitojc)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68040, XTAL_10MHz*2) // 20MHz, clock source = CY7C991
+	MCFG_CPU_ADD("maincpu", M68040, XTAL(10'000'000)*2) // 20MHz, clock source = CY7C991
 	MCFG_CPU_PROGRAM_MAP(taitojc_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitojc_state, taitojc_vblank)
 
-	MCFG_CPU_ADD("sub", MC68HC11, XTAL_16MHz/2) // 8MHz, MC68HC11M0
+	MCFG_CPU_ADD("sub", MC68HC11, XTAL(16'000'000)/2) // 8MHz, MC68HC11M0
 	MCFG_CPU_PROGRAM_MAP(hc11_pgm_map)
 	MCFG_CPU_IO_MAP(hc11_io_map)
 	MCFG_MC68HC11_CONFIG( 1, 1280, 0x00 )
 
-	MCFG_CPU_ADD("dsp", TMS32051, XTAL_10MHz*4) // 40MHz, clock source = CY7C991
+	MCFG_CPU_ADD("dsp", TMS32051, XTAL(10'000'000)*4) // 40MHz, clock source = CY7C991
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 	MCFG_CPU_DATA_MAP(tms_data_map)
 

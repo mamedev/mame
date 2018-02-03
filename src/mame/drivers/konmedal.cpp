@@ -7,7 +7,7 @@
  Tsukande Toru Chicchi (つかんでとるちっち)
  (c) 1995 Konami
 
- Dam Dam Boy
+ Dam Dam Boy (ダムダム　ボーイ)
  (c) 1995 Konami
 
  Driver by R. Belmont
@@ -383,7 +383,7 @@ void konmedal_state::machine_reset()
 
 MACHINE_CONFIG_START(konmedal_state::tsukande)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(medal_main)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
 
@@ -409,14 +409,14 @@ MACHINE_CONFIG_START(konmedal_state::tsukande)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL_16_9344MHz) // 16.9344MHz xtal verified on PCB
+	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400)) // 16.9344MHz xtal verified on PCB
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(konmedal_state::ddboy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(14'318'181)/2) // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	MCFG_CPU_PROGRAM_MAP(ddboy_main)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", konmedal_state, konmedal_interrupt)
 
@@ -441,11 +441,11 @@ MACHINE_CONFIG_START(konmedal_state::ddboy)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_14_31818MHz/14, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(14'318'181)/14, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 
-	MCFG_K051649_ADD("k051649", XTAL_14_31818MHz/8)
+	MCFG_K051649_ADD("k051649", XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
@@ -543,7 +543,7 @@ WRITE8_MEMBER(konmedal_state::shuri_vrom_bank_w)
 
 MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 3) // divisor unknown
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000) / 3) // divisor unknown
 	MCFG_CPU_PROGRAM_MAP(shuriboy_main)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", konmedal_state, scanline, "screen", 0, 1)
 
@@ -570,7 +570,7 @@ MACHINE_CONFIG_START(konmedal_state::shuriboy)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_K051649_ADD("k051649", XTAL_24MHz / 12) // divisor unknown
+	MCFG_K051649_ADD("k051649", XTAL(24'000'000) / 12) // divisor unknown
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
 	// upd7759c
@@ -587,9 +587,13 @@ ROM_START( tsukande )
 	ROM_LOAD32_BYTE( "441-a06.4p",   0x000001, 0x020000, CRC(947a8c45) SHA1(16e3dceb304266bbd2bddc2cec832ebff04e4c71) )
 
 	ROM_REGION( 0x400, "proms", 0 )
+	// R
 	ROM_LOAD( "441a07.20k",   0x000000, 0x000100, CRC(7d0c53c2) SHA1(f357e0cb3d53374208ad1670e70be03b399a4c02) )
+	// G
 	ROM_LOAD( "441a08.21k",   0x000100, 0x000100, CRC(e2c3e853) SHA1(36a3008dde714ade53b9a01ac9d94c6cc655c293) )
+	// B
 	ROM_LOAD( "441a09.23k",   0x000200, 0x000100, CRC(3daca33a) SHA1(38644f574beaa593f3348b49eabea9e03d722013) )
+	// P(riority?)
 	ROM_LOAD( "441a10.21m",   0x000300, 0x000100, CRC(063722ff) SHA1(7ba43acfdccb02e7913dc000c4f9c57c54b1315f) )
 
 	ROM_REGION( 0x100000, "ymz", 0 )
@@ -611,9 +615,39 @@ ROM_START( ddboy )
 	ROM_LOAD( "342_a01.27c010.8b", 0x000000, 0x020000, CRC(e9ce569c) SHA1(ce9b3e60eac3543aca9e82a9ccf77c53a6aff504) )
 
 	ROM_REGION( 0x400, "proms", 0 )
+	// R
 	ROM_LOAD( "342_a07.82s129.13f", 0x000000, 0x000100, CRC(f8c11f4d) SHA1(95061d0af7c8bac702aa48e16c0711719250653f) )
+	// G
 	ROM_LOAD( "342_a08.82s129.14f", 0x000100, 0x000100, CRC(1814db4b) SHA1(08b25f96dc3af15b3fa3c88b2884845abd3ff620) )
+	// B
 	ROM_LOAD( "342_a09.82s129.15f", 0x000200, 0x000100, CRC(21e2dd13) SHA1(721c7fa1a01c810a7ce35b4331d280704b4e04fd) )
+	// P(riority?)
+	ROM_LOAD( "342_a10.82s129.14g", 0x000300, 0x000100, CRC(1fa443f9) SHA1(84b0a36a4e49bf75bda1871bf52090ee5a75cd03) )
+ROM_END
+
+// this is a slightly different version on the same PCB as tsukande
+ROM_START( ddboya )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* main program */
+	ROM_LOAD( "342-f02-4g-(p).bin", 0x000000, 0x020000, CRC(563dfd4f) SHA1(a50544735a9d6f448b969b9fd84e6cdca303d7a0) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )   /* tilemaps */
+	ROM_LOAD32_BYTE( "342_a03.27c010.4f", 0x000002, 0x020000, CRC(424f80dd) SHA1(fb7648960ce0951aebcf5cf4465a9acb3ab49cd8) )
+	ROM_LOAD32_BYTE( "342_a04.27c010.4g", 0x000003, 0x020000, CRC(a4d4e15e) SHA1(809afab3f2adc58ca5d18e2413b40a6f33bd0cfa) )
+	ROM_LOAD32_BYTE( "342_a05.27c010.4h", 0x000000, 0x020000, CRC(e7e50901) SHA1(5e01377a3ad8ccb2a2b56610e8225b9b6bf15122) )
+	ROM_LOAD32_BYTE( "342_a06.27c010.4j", 0x000001, 0x020000, CRC(49f35d66) SHA1(3d5cf3b6eb6a3497609117acd002169a31130418) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "342-a11-10d-(s1).bin", 0x000000, 0x080000, CRC(b523bced) SHA1(87a814035af4dcf24454667d4346d301303d697e) )
+	ROM_LOAD( "342-a12-10e-(s2).bin", 0x080000, 0x080000, CRC(6febafe7) SHA1(69e550dd067f326b4d20a859345f193b43a5af99) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	// R
+	ROM_LOAD( "342_a07.82s129.13f", 0x000000, 0x000100, CRC(f8c11f4d) SHA1(95061d0af7c8bac702aa48e16c0711719250653f) )
+	// G
+	ROM_LOAD( "342_a08.82s129.14f", 0x000100, 0x000100, CRC(1814db4b) SHA1(08b25f96dc3af15b3fa3c88b2884845abd3ff620) )
+	// B
+	ROM_LOAD( "342_a09.82s129.15f", 0x000200, 0x000100, CRC(21e2dd13) SHA1(721c7fa1a01c810a7ce35b4331d280704b4e04fd) )
+	// P(riority?)
 	ROM_LOAD( "342_a10.82s129.14g", 0x000300, 0x000100, CRC(1fa443f9) SHA1(84b0a36a4e49bf75bda1871bf52090ee5a75cd03) )
 ROM_END
 
@@ -632,6 +666,7 @@ ROM_START( shuriboy )
 ROM_END
 
 GAME( 1995, tsukande,    0, tsukande, konmedal,  konmedal_state, 0, ROT0, "Konami", "Tsukande Toru Chicchi", MACHINE_NOT_WORKING)
-GAME( 1995, ddboy,       0, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy", MACHINE_NOT_WORKING)
+GAME( 1995, ddboy,       0, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy (on dedicated PCB)", MACHINE_NOT_WORKING)
+GAME( 1995, ddboya,  ddboy, ddboy,    konmedal,  konmedal_state, 0, ROT0, "Konami", "Dam Dam Boy (on Tsukande Tori Chicchi PCB)", MACHINE_NOT_WORKING)
 GAME( 1993, shuriboy,    0, shuriboy, konmedal,  konmedal_state, 0, ROT0, "Konami", "Shuriken Boy", MACHINE_NOT_WORKING)
 

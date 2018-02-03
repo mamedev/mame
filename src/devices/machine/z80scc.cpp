@@ -513,13 +513,9 @@ void z80scc_device::device_start()
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
-void z80scc_device::device_reset()
+void z80scc_device::device_reset_after_children()
 {
 	LOG("%s %s \n",tag(), FUNCNAME);
-
-	// Do channel reset on both channels
-	m_chanA->reset();
-	m_chanB->reset();
 
 	// Hardware reset values for registers where it differs from channel reset values
 	m_wr9  &= 0x3c;
@@ -2160,14 +2156,14 @@ void z80scc_channel::do_sccreg_wr9(uint8_t data)
 		if (m_uart->m_variant & z80scc_device::SET_Z80X30)
 		{
 			uint8_t tmp_wr0 = m_wr0; // Save the Shift Left/Shift Right bits
-			m_uart->device_reset();
+			m_uart->reset();
 			// Restore the Shift Left/Shift Right bits
 			m_wr0 &= 0xfc;
 			m_wr0 |= (tmp_wr0 & 0x03);
 		}
 		else
 		{
-			m_uart->device_reset();
+			m_uart->reset();
 		}
 		// Set the MIE, Status High/Status Low and DLC bits as given in this command
 		m_uart->m_wr9 &=        ~(WR9_BIT_MIE | WR9_BIT_SHSL | WR9_BIT_DLC );

@@ -38,8 +38,8 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK_40MHz      (XTAL_40MHz)
-#define MASTER_CLOCK_25MHz      (XTAL_25MHz)
+#define MASTER_CLOCK_40MHz      (XTAL(40'000'000))
+#define MASTER_CLOCK_25MHz      (XTAL(25'000'000))
 
 
 /*************************************

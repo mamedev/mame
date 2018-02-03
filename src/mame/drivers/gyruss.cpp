@@ -73,8 +73,8 @@ and 1 SFX channel controlled by an 8039:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_18_432MHz
-#define SOUND_CLOCK     XTAL_14_31818MHz
+#define MASTER_CLOCK    XTAL(18'432'000)
+#define SOUND_CLOCK     XTAL(14'318'181)
 
 // Video timing
 // PCB measured: H = 15.50khz V = 60.56hz, +/- 0.01hz
@@ -486,7 +486,7 @@ MACHINE_CONFIG_START(gyruss_state::gyruss)
 	MCFG_CPU_PROGRAM_MAP(audio_cpu1_map)
 	MCFG_CPU_IO_MAP(audio_cpu1_io_map)
 
-	MCFG_CPU_ADD("audio2", I8039, XTAL_8MHz)
+	MCFG_CPU_ADD("audio2", I8039, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(audio_cpu2_map)
 	MCFG_CPU_IO_MAP(audio_cpu2_io_map)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(gyruss_state, gyruss_dac_w))

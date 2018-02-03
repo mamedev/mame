@@ -388,7 +388,7 @@ void chanbara_state::machine_reset()
 
 MACHINE_CONFIG_START(chanbara_state::chanbara)
 
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz/8)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL(12'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(chanbara_map)
 
 
@@ -399,7 +399,7 @@ MACHINE_CONFIG_START(chanbara_state::chanbara)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	// DECO video CRTC
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,16,240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,16,240)
 	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
 	MCFG_SCREEN_PALETTE("palette")
 

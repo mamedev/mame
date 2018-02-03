@@ -464,7 +464,7 @@ void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int
 MACHINE_CONFIG_START(laserbat_state_base::laserbat_base)
 
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", S2650, XTAL_14_31818MHz/4)
+	MCFG_CPU_ADD("maincpu", S2650, XTAL(14'318'181)/4)
 	MCFG_CPU_PROGRAM_MAP(laserbat_map)
 	MCFG_CPU_IO_MAP(laserbat_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", laserbat_state_base, laserbat_interrupt)
@@ -472,21 +472,21 @@ MACHINE_CONFIG_START(laserbat_state_base::laserbat_base)
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 227*4, 43*4-1, 227*4-1, 312, 8, 255)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181), 227*4, 43*4-1, 227*4-1, 312, 8, 255)
 	MCFG_SCREEN_UPDATE_DRIVER(laserbat_state_base, screen_update_laserbat)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PLS100_ADD("gfxmix")
 
-	MCFG_DEVICE_ADD("pvi1", S2636, XTAL_14_31818MHz/3)
+	MCFG_DEVICE_ADD("pvi1", S2636, XTAL(14'318'181)/3)
 	MCFG_S2636_OFFSETS(-8, -16)
 	MCFG_S2636_DIVIDER(3)
 
-	MCFG_DEVICE_ADD("pvi2", S2636, XTAL_14_31818MHz/3)
+	MCFG_DEVICE_ADD("pvi2", S2636, XTAL(14'318'181)/3)
 	MCFG_S2636_OFFSETS(-8, -16)
 	MCFG_S2636_DIVIDER(3)
 
-	MCFG_DEVICE_ADD("pvi3", S2636, XTAL_14_31818MHz/3)
+	MCFG_DEVICE_ADD("pvi3", S2636, XTAL(14'318'181)/3)
 	MCFG_S2636_OFFSETS(-8, -16)
 	MCFG_S2636_DIVIDER(3)
 
@@ -518,10 +518,10 @@ MACHINE_CONFIG_DERIVED(laserbat_state::laserbat, laserbat_base)
 	MCFG_SN76477_ENVELOPE_PARAMS(0, 1)              // GND, Vreg
 	MCFG_SN76477_ENABLE(0)                          // AB SOUND
 
-	MCFG_TMS3615_ADD("synth_low", XTAL_4MHz/16/2) // from the other one's /2 clock output
+	MCFG_TMS3615_ADD("synth_low", 4_MHz_XTAL/16/2) // from the other one's /2 clock output
 	MCFG_SOUND_ROUTE(tms3615_device::FOOTAGE_8, "speaker", 1.0)
 
-	MCFG_TMS3615_ADD("synth_high", XTAL_4MHz/16) // 4MHz divided down with a 74LS161
+	MCFG_TMS3615_ADD("synth_high", 4_MHz_XTAL/16) // 4MHz divided down with a 74LS161
 	MCFG_SOUND_ROUTE(tms3615_device::FOOTAGE_8, "speaker", 1.0)
 
 MACHINE_CONFIG_END

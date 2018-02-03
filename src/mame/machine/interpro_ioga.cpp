@@ -1052,7 +1052,7 @@ WRITE32_MEMBER(interpro_ioga_device::timer3_w)
 		LOGMASKED(LOG_TIMER3, "timer3_w data 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
 
 		// theory: timer 3 is 12.5MHz (typical value of 12500 giving a delay of 1ms)
-		m_timer3->adjust(attotime::zero, false, attotime::from_hz(XTAL_12_5MHz));
+		m_timer3->adjust(attotime::zero, false, attotime::from_hz(XTAL(12'500'000)));
 	}
 }
 

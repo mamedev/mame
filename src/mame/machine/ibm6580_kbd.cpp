@@ -33,7 +33,7 @@ const tiny_rom_entry *dw_keyboard_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(dw_keyboard_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", I8049, XTAL_6MHz)   // XXX RC oscillator
+	MCFG_CPU_ADD("mcu", I8049, XTAL(6'000'000))   // XXX RC oscillator
 	MCFG_MCS48_PORT_BUS_IN_CB(READ8(dw_keyboard_device, bus_r))
 	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(dw_keyboard_device, bus_w))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(dw_keyboard_device, p1_w))

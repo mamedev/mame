@@ -35,7 +35,7 @@ TODO:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_19_968MHz
+#define MASTER_CLOCK    XTAL(19'968'000)
 
 class nightgal_state : public driver_device
 {
@@ -394,8 +394,8 @@ static ADDRESS_MAP_START( sweetgal_map, AS_PROGRAM, 8, nightgal_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sexygal_map, AS_PROGRAM, 8, nightgal_state )
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(sexygal_audioff_w)
 	AM_IMPORT_FROM(sweetgal_map)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(sexygal_audioff_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( common_sexygal_io, AS_IO, 8, nightgal_state )

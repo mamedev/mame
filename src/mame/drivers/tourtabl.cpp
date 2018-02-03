@@ -34,7 +34,7 @@ public:
 };
 
 
-#define MASTER_CLOCK    XTAL_3_579545MHz
+#define MASTER_CLOCK    XTAL(3'579'545)
 
 
 WRITE8_MEMBER(tourtabl_state::tourtabl_led_w)

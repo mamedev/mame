@@ -4958,7 +4958,7 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 			const uint32_t k = (banshee.io[io_pllCtrl0] >> 0) & 0x3;
 			const uint32_t m = (banshee.io[io_pllCtrl0] >> 2) & 0x3f;
 			const uint32_t n = (banshee.io[io_pllCtrl0] >> 8) & 0xff;
-			const double video_clock = XTAL_14_31818MHz * (n + 2) / double((m + 2) << k);
+			const double video_clock = (XTAL(14'318'181) * (n + 2) / ((m + 2) << k)).dvalue();
 			const double frame_period = vtotal * htotal / video_clock;
 			//osd_printf_info("k: %d m: %d n: %d clock: %f period: %f rate: %.2f\n", k, m, n, video_clock, frame_period, 1.0 / frame_period);
 

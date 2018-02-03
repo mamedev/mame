@@ -184,11 +184,11 @@ static ADDRESS_MAP_START(ccs2810_io, AS_IO, 8, ccs_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ccs2422_io, AS_IO, 8, ccs_state)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_read, io_write)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff00) AM_READWRITE(port04_r,port04_w)
 	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff00) AM_DEVREADWRITE("fdc", mb8877_device, read, write)
 	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_READWRITE(port34_r,port34_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0xff00) AM_WRITE(port40_w)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(io_read, io_write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -898,7 +898,7 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(ccs_state::ccs2810)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(ccs2810_mem)
 	MCFG_CPU_IO_MAP(ccs2810_io)
 
@@ -906,7 +906,7 @@ MACHINE_CONFIG_START(ccs_state::ccs2810)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -922,7 +922,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ccs_state::ccs2422)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(ccs2810_mem)
 	MCFG_CPU_IO_MAP(ccs2422_io)
 
@@ -930,7 +930,7 @@ MACHINE_CONFIG_START(ccs_state::ccs2422)
 	MCFG_RAM_DEFAULT_SIZE("64K")
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL_1_8432MHz)
+	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL(1'843'200))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
@@ -943,7 +943,7 @@ MACHINE_CONFIG_START(ccs_state::ccs2422)
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ins8250", ins8250_device, dsr_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ins8250", ins8250_device, cts_w))
 
-	MCFG_MB8877_ADD("fdc", XTAL_16MHz / 8) // UB1793 or MB8877
+	MCFG_MB8877_ADD("fdc", XTAL(16'000'000) / 8) // UB1793 or MB8877
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ccs_floppies, "8sssd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END

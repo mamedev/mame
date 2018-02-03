@@ -90,9 +90,9 @@ private:
 	void vprogdis_command(int ref, const std::vector<std::string> &params);
 	void help_command(int ref, const std::vector<std::string> &params);
 	void xbox_debug_commands(int ref, const std::vector<std::string> &params);
-	int find_bios_index(running_machine &mach);
-	bool find_bios_hash(running_machine &mach, int bios, uint32_t &crc32);
-	void find_debug_params(running_machine &mach);
+	int find_bios_index();
+	bool find_bios_hash(int bios, uint32_t &crc32);
+	void find_debug_params();
 };
 
 ADDRESS_MAP_EXTERN(xbox_base_map, 32);

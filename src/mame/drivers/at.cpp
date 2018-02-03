@@ -52,6 +52,14 @@ On board: Serial, Parallel, RTC, RGBI (external Monitor), keyboard
 Options: 80827, Expansion box with 2 ISA slots, 300/1200Baud internal Modem, Compaq EGA Board
 To-Do: Emulate Graphics card fully
 
+Ericsson/Nokia Data/ICL WS286
+=============================
+Links: http://oju.mbnet.fi/retro/EricssonPC_eng.html
+Info: WS286 was introduced 1986 as first 8Mhz AT in the world a few weeks ahead competition, aquired by Nokia Data 1988 which in turn was aquired by ICL 1990
+Form factor: Desktop PC
+CPU: Intel 286, 8MHz
+RAM: 640KB
+Mass storage: Floppy: 5.25" 1.2Mb, HDD: 40Mb
 ***************************************************************************/
 
 #include "emu.h"
@@ -120,6 +128,7 @@ public:
 	void atvga(machine_config &config);
 	void ibmps1(machine_config &config);
 	void at386(machine_config &config);
+	void ews286(machine_config &config);
 
 	static void cfg_single_1200K(device_t *device);
 };
@@ -220,15 +229,15 @@ READ8_MEMBER( at_state::ps1_portb_r )
 
 static ADDRESS_MAP_START(ps1_16_io, AS_IO, 16, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0060, 0x0061) AM_READ8(ps1_portb_r, 0xff00)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
+	AM_RANGE(0x0060, 0x0061) AM_READ8(ps1_portb_r, 0xff00)
 	AM_RANGE(0x0102, 0x0105) AM_READWRITE(ps1_unk_r, ps1_unk_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( neat_io, AS_IO, 16, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0022, 0x0023) AM_DEVICE("cs8221", cs8221_device, map)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
+	AM_RANGE(0x0022, 0x0023) AM_DEVICE("cs8221", cs8221_device, map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( at32_io, AS_IO, 32, at_state )
@@ -238,8 +247,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ficpio_io, AS_IO, 32, at_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00a8, 0x00af) AM_DEVREADWRITE8("chipset", vt82c496_device, read, write, 0xffffffff)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE16("mb", at_mb_device, map, 0xffffffff)
+	AM_RANGE(0x00a8, 0x00af) AM_DEVREADWRITE8("chipset", vt82c496_device, read, write, 0xffffffff)
 	AM_RANGE(0x0170, 0x0177) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs0, write_cs0)
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_controller_32_device, read_cs0, write_cs0)
 	AM_RANGE(0x0370, 0x0377) AM_DEVREADWRITE("ide2", ide_controller_32_device, read_cs1, write_cs1)
@@ -364,7 +373,7 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(at_state::ibm5170)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL_12MHz/2 /*6000000*/)
+	MCFG_CPU_ADD("maincpu", I80286, XTAL(12'000'000)/2 /*6000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
@@ -389,7 +398,18 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(at_state::ibm5170a, ibm5170)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_16MHz/2)
+	MCFG_CPU_CLOCK(XTAL(16'000'000)/2)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_DERIVED(at_state::ews286, ibm5170)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(XTAL(16'000'000)/2) // Exact crystal needs to be verified, 8 MHz according to specification
+
+	MCFG_DEVICE_MODIFY("isa2")
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("fdc", cfg_single_1200K) // From pictures but also with a 3.5" as second floppy
+
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("640K")
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(at_state::ec1842, ibm5170)
@@ -407,7 +427,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(at_state::ibmps1, ibm5170)
 	MCFG_MACHINE_START_OVERRIDE(at_state, vrom_fix)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_10MHz)
+	MCFG_CPU_CLOCK(XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(at16l_map)
 	MCFG_CPU_IO_MAP(ps1_16_io)
 	MCFG_DEVICE_MODIFY("isa1")
@@ -513,7 +533,7 @@ MACHINE_CONFIG_END
 // Commodore PC 30-III
 MACHINE_CONFIG_DERIVED(at_state::pc30iii, ibm5170)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000) // should be XTAL_24MHz/2, but doesn't post with that setting
+	MCFG_CPU_CLOCK(6000000) // should be XTAL(24'000'000)/2, but doesn't post with that setting
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be ATI EGA Wonder 800+
 MACHINE_CONFIG_END
@@ -521,18 +541,18 @@ MACHINE_CONFIG_END
 // Commodore PC 40-III
 MACHINE_CONFIG_DERIVED(at_state::pc40iii, ibm5170)
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(6000000) // should be XTAL_24MHz/2, but doesn't post with that setting
+	MCFG_CPU_CLOCK(6000000) // should be XTAL(24'000'000)/2, but doesn't post with that setting
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa16_cards, "vga", false) // should be onboard Paradise VGA, see ROM declarations
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(megapc_state::megapc)
-	MCFG_CPU_ADD("maincpu", I386SX, XTAL_50MHz / 2)
+	MCFG_CPU_ADD("maincpu", I386SX, XTAL(50'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(megapc_map)
 	MCFG_CPU_IO_MAP(megapc_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("wd7600", wd7600_device, intack_cb)
 
-	MCFG_WD7600_ADD("wd7600",XTAL_50MHz / 2, ":maincpu", ":isa", ":bios", ":keybc")
+	MCFG_WD7600_ADD("wd7600",XTAL(50'000'000) / 2, ":maincpu", ":isa", ":bios", ":keybc")
 	MCFG_WD7600_HOLD(WRITELINE(megapc_state, wd7600_hold));
 	MCFG_WD7600_NMI(INPUTLINE("maincpu", INPUT_LINE_NMI));
 	MCFG_WD7600_INTR(INPUTLINE("maincpu", INPUT_LINE_IRQ0));
@@ -575,7 +595,7 @@ MACHINE_CONFIG_START(megapc_state::megapc)
 	// ISA cards
 	MCFG_ISA16_SLOT_ADD("isabus","isa1", pc_isa16_cards, nullptr, false)
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL_12MHz)
+	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
 	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(DEVWRITELINE("wd7600", wd7600_device, kbrst_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(DEVWRITELINE("wd7600", wd7600_device, gatea20_w))
 	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(DEVWRITELINE("wd7600", wd7600_device, irq01_w))
@@ -689,7 +709,7 @@ MACHINE_CONFIG_END
 // Compaq Portable III
 MACHINE_CONFIG_START(at_state::comportiii)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80286, XTAL_48MHz/4 /*12000000*/)
+	MCFG_CPU_ADD("maincpu", I80286, XTAL(48'000'000)/4 /*12000000*/)
 	MCFG_CPU_PROGRAM_MAP(at16_map)
 	MCFG_CPU_IO_MAP(at16_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259_master", pic8259_device, inta_cb)
@@ -1286,6 +1306,20 @@ ROM_START( comportiii )
 	ROMX_LOAD( "109737-002.bin", 0x10001, 0x8000, CRC(8463cc41) SHA1(cb9801591e4a2cd13bbcc40739c9e675ba84c079), ROM_SKIP(1) | ROM_BIOS(2) )
 ROM_END
 
+// Ericsson WS286
+ROM_START(ews286 ) // Computer is brown/yellow-ish with Ericsson logo
+	ROM_REGION(0x20000,"bios", 0)
+	ROM_LOAD16_BYTE( "RYS_103_1002_R8A_3C00_IC-POS_71.BIN", 0x18000, 0x4000, CRC(af179e56) SHA1(58b1df46d6e68eef472a0529cb9317abaf17880f)) // Last ROM set and has Nokia
+	ROM_LOAD16_BYTE( "RYS_103_1003_R8A_8600_IC-POS_69.BIN", 0x18001, 0x4000, CRC(555502cb) SHA1(1977fe54b69c5e52731bf3eb8bdabe777aac014b)) // copyright patched in both roms
+ROM_END
+
+// Nokia Data WS286
+//ROM_START(nws286 ) // Computer is grey with Nokia logo.
+//	ROM_REGION(0x20000,"bios", 0)
+//	ROM_LOAD16_BYTE( "RYS_103_1002_R8A_3C00_IC-POS_71.BIN", 0x18000, 0x4000, NO_DUMP)
+//	ROM_LOAD16_BYTE( "RYS_103_1003_R8A_8600_IC-POS_69.BIN", 0x18001, 0x4000, NO_DUMP)
+//ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -1339,4 +1373,5 @@ COMP ( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,    at_state,      at,   
 COMP ( 199?, mbc28,     ibm5170, 0,       at386sx,   0,    at_state,      at,      "Sanyo",  "MBC-28", MACHINE_NOT_WORKING )
 COMP ( 1986, pcd2,      ibm5170, 0,       ibm5170,   0,    at_state,      at,      "Siemens",  "PCD-2", MACHINE_NOT_WORKING )
 COMP ( 1987, comportiii,ibm5170, 0,       comportiii,0,    at_state,      at,      "Compaq",   "Portable III", MACHINE_NOT_WORKING )
-
+COMP ( 1986, ews286,    ibm5170, 0,       ews286,    0,    at_state,      at,      "Ericsson", "Ericsson WS286", MACHINE_NOT_WORKING )
+//COMP ( 1988, nws286,    ibm5170,  0,      ews286,    0,    at_state,      at,      "Nokia Data", "Nokia Data WS286", MACHINE_NOT_WORKING )

@@ -343,7 +343,7 @@ WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
 	}
 	else if (addr == 0x2100e4)                  // Timer Source Clock Selection
 	{
-		uint32_t timers_clk = XTAL_27MHz / ((data & 0xff) + 1);
+		const auto timers_clk = XTAL(27'000'000) / ((data & 0xff) + 1);
 		m_update_timer->adjust(attotime::from_hz(timers_clk), 0, attotime::from_hz(timers_clk));
 	}
 	else if(addr == 0x130020)                   // I2C configuration
@@ -360,7 +360,7 @@ WRITE32_MEMBER(hyperscan_state::spg290_regs_w)
 	else if(addr == 0x130028)                   // I2C clock setting
 	{
 		COMBINE_DATA(&m_i2c.clock);
-		uint32_t i2c_clk = XTAL_27MHz / ((m_i2c.clock & 0x3ff) + 1);
+		const auto i2c_clk = XTAL(27'000'000) / ((m_i2c.clock & 0x3ff) + 1);
 		m_i2c_timer->adjust(attotime::from_hz(i2c_clk), 0, attotime::from_hz(i2c_clk));
 	}
 	else if(addr == 0x13002c)                   // I2C ID
@@ -619,7 +619,7 @@ void hyperscan_state::machine_reset()
 
 MACHINE_CONFIG_START(hyperscan_state::hyperscan)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", SCORE7, XTAL_27MHz * 4)   // 108MHz S+core 7
+	MCFG_CPU_ADD("maincpu", SCORE7, XTAL(27'000'000) * 4)   // 108MHz S+core 7
 	MCFG_CPU_PROGRAM_MAP(spg290_mem)
 
 	/* video hardware */

@@ -50,7 +50,7 @@ http://blogs.yahoo.co.jp/nadegatayosoyuki/59285865.html
 
 #include "30test.lh"
 
-#define MAIN_CLOCK XTAL_16MHz
+#define MAIN_CLOCK XTAL(16'000'000)
 
 class namco_30test_state : public driver_device
 {
@@ -139,9 +139,9 @@ WRITE8_MEMBER(namco_30test_state::hc11_okibank_w)
 
 static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8, namco_30test_state )
 	AM_RANGE(0x0000, 0x003f) AM_RAM // internal I/O
+	AM_RANGE(0x0040, 0x007f) AM_RAM // more internal I/O, HC11 change pending
 	AM_RANGE(0x007c, 0x007c) AM_READWRITE(hc11_mux_r,hc11_mux_w)
 	AM_RANGE(0x007e, 0x007e) AM_READWRITE(hc11_okibank_r,hc11_okibank_w)
-	AM_RANGE(0x0040, 0x007f) AM_RAM // more internal I/O, HC11 change pending
 	AM_RANGE(0x0080, 0x037f) AM_RAM // internal RAM
 	AM_RANGE(0x0d80, 0x0dbf) AM_RAM // EEPROM read-back data goes there
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("oki", okim6295_device, read, write)

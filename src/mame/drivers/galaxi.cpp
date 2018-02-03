@@ -42,8 +42,8 @@
 
 #include "galaxi.lh"
 
-#define CPU_CLOCK       (XTAL_10MHz)
-#define SND_CLOCK       (XTAL_16MHz)/16
+#define CPU_CLOCK       (XTAL(10'000'000))
+#define SND_CLOCK       (XTAL(16'000'000))/16
 
 class galaxi_state : public driver_device
 {

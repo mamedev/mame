@@ -66,7 +66,7 @@ const tiny_rom_entry *plus4_sid_cartridge_device::device_rom_region() const
 
 MACHINE_CONFIG_START(plus4_sid_cartridge_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD(MOS8580_TAG, MOS8580, XTAL_17_73447MHz/20)
+	MCFG_SOUND_ADD(MOS8580_TAG, MOS8580, XTAL(17'734'470)/20)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, nullptr)

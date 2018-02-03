@@ -292,7 +292,7 @@ static INPUT_PORTS_START( t4490 )
 INPUT_PORTS_END
 
 MACHINE_CONFIG_START(t4490_state::t4490)
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_8MHz/4) // divided by a MC6875
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(8'000'000)/4) // divided by a MC6875
 	MCFG_CPU_PROGRAM_MAP(t4490_map)
 
 	/* devices */

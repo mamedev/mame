@@ -401,11 +401,11 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_START(silvmil_state::silvmil)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* Verified */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) /* Verified */
 	MCFG_CPU_PROGRAM_MAP(silvmil_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", silvmil_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4_096MHz) /* Verified */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'096'000)) /* Verified */
 	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
 
 
@@ -433,30 +433,30 @@ MACHINE_CONFIG_START(silvmil_state::silvmil)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4) /* Verified */
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4) /* Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_4_096MHz/4, PIN7_HIGH) /* Verified */
+	MCFG_OKIM6295_ADD("oki", XTAL(4'096'000)/4, PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(silvmil_state::puzzlove, silvmil)
 	MCFG_DEVICE_REMOVE("audiocpu")
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz) /* Verified */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(4'000'000)) /* Verified */
 	MCFG_CPU_PROGRAM_MAP(silvmil_sound_map)
 
 	MCFG_DEVICE_MODIFY("spritegen")
 	MCFG_DECO_SPRITE_BOOTLEG_TYPE(1)
 
 	MCFG_DEVICE_REMOVE("oki")
-	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, PIN7_HIGH) /* Verified */
+	MCFG_OKIM6295_ADD("oki", XTAL(4'000'000)/4, PIN7_HIGH) /* Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(silvmil_state::puzzlovek, puzzlove)
 		MCFG_DEVICE_REMOVE("ymsnd")
-		MCFG_YM2151_ADD("ymsnd", XTAL_15MHz/4) /* Verified */
+		MCFG_YM2151_ADD("ymsnd", XTAL(15'000'000)/4) /* Verified */
 		MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 		MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

@@ -967,7 +967,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcg850v_state::pcg815)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz ) // 3.54MHz
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000) ) // 3.54MHz
 	MCFG_CPU_PROGRAM_MAP(pce220_mem)
 	MCFG_CPU_IO_MAP(pcg850v_io)
 
@@ -1003,7 +1003,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(pcg850v_state::pcg850v)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz ) // CMOS-SC7852
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000) ) // CMOS-SC7852
 	MCFG_CPU_PROGRAM_MAP(pce220_mem)
 	MCFG_CPU_IO_MAP(pcg850v_io)
 

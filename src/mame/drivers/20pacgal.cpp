@@ -100,7 +100,7 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
  *
  *************************************/
 
-#define MASTER_CLOCK        (XTAL_73_728MHz)
+#define MASTER_CLOCK        (XTAL(73'728'000))
 #define MAIN_CPU_CLOCK      (MASTER_CLOCK / 4)  /* divider is either 3 or 4 */
 #define NAMCO_AUDIO_CLOCK   (MASTER_CLOCK / 4 /  6 / 32)
 
@@ -187,6 +187,8 @@ WRITE8_MEMBER(_20pacgal_state::sprite_lookup_w)
 // likewise the sound table.. is it being uploaded in a different format at 0x0c000?
 // we also need the palette data because there is only a single rom on this pcb?
 static ADDRESS_MAP_START( 25pacman_map, AS_PROGRAM, 8, _25pacman_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("flash", amd_29lv200t_device, read, write )  // (always fall through if nothing else is mapped?)
+
 	AM_RANGE(0x04000, 0x047ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x04800, 0x05fff) AM_RAM
 	AM_RANGE(0x06000, 0x06fff) AM_WRITEONLY AM_SHARE("char_gfx_ram")
@@ -197,8 +199,6 @@ static ADDRESS_MAP_START( 25pacman_map, AS_PROGRAM, 8, _25pacman_state )
 	AM_RANGE(0x0c000, 0x0dfff) AM_WRITENOP // is this the sound waveforms in a different format?
 	AM_RANGE(0x0e000, 0x0ffff) AM_WRITENOP
 	AM_RANGE(0x1c000, 0x1ffff) AM_WRITENOP
-	AM_RANGE(0x00000, 0x3ffff) AM_DEVREADWRITE("flash", amd_29lv200t_device, read, write )  // (always fall through if nothing else is mapped?)
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 20pacgal_map, AS_PROGRAM, 8, _20pacgal_state )
@@ -208,8 +208,8 @@ static ADDRESS_MAP_START( 20pacgal_map, AS_PROGRAM, 8, _20pacgal_state )
 	AM_RANGE(0x0a000, 0x0ffff) AM_MIRROR(0x40000) AM_ROM
 	AM_RANGE(0x10000, 0x3ffff) AM_ROM
 	AM_RANGE(0x44000, 0x447ff) AM_RAM AM_SHARE("video_ram")
-	AM_RANGE(0x45040, 0x4505f) AM_DEVWRITE("namco", namco_cus30_device, pacman_sound_w)
 	AM_RANGE(0x44800, 0x45eff) AM_RAM
+	AM_RANGE(0x45040, 0x4505f) AM_DEVWRITE("namco", namco_cus30_device, pacman_sound_w)
 	AM_RANGE(0x45f00, 0x45fff) AM_DEVWRITE("namco", namco_cus30_device, namcos1_cus30_w)
 	AM_RANGE(0x46000, 0x46fff) AM_WRITEONLY AM_SHARE("char_gfx_ram")
 	AM_RANGE(0x47100, 0x47100) AM_RAM   /* leftover from original Galaga code */

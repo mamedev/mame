@@ -153,8 +153,8 @@
 #include "roundup5.lh"
 
 
-#define CLOCK_1     XTAL_16MHz
-#define CLOCK_2     XTAL_50MHz
+#define CLOCK_1     XTAL(16'000'000)
+#define CLOCK_2     XTAL(50'000'000)
 
 
 /***************************************************************************/

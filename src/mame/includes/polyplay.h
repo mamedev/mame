@@ -9,7 +9,7 @@
 #include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 
-#define POLYPLAY_MAIN_CLOCK XTAL_9_8304MHz
+#define POLYPLAY_MAIN_CLOCK XTAL(9'830'400)
 
 #define Z80CPU_TAG     "maincpu"
 #define Z80CTC_TAG     "z80ctc"

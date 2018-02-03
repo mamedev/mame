@@ -298,7 +298,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(cfrogger_state::cfrogger)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M58846, XTAL_600kHz)
+	MCFG_CPU_ADD("maincpu", M58846, 600_kHz_XTAL)
 	MCFG_MELPS4_READ_K_CB(READ16(cfrogger_state, input_r))
 	MCFG_MELPS4_WRITE_S_CB(WRITE8(cfrogger_state, plate_w))
 	MCFG_MELPS4_WRITE_F_CB(WRITE8(cfrogger_state, plate_w))
@@ -414,7 +414,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(gjungler_state::gjungler)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M58846, XTAL_600kHz)
+	MCFG_CPU_ADD("maincpu", M58846, 600_kHz_XTAL)
 	MCFG_MELPS4_READ_K_CB(READ16(gjungler_state, input_r))
 	MCFG_MELPS4_WRITE_S_CB(WRITE8(gjungler_state, plate_w))
 	MCFG_MELPS4_WRITE_F_CB(WRITE8(gjungler_state, plate_w))

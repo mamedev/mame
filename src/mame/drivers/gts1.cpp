@@ -129,12 +129,13 @@ static ADDRESS_MAP_START( gts1_data, AS_DATA, 8, gts1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gts1_io, AS_IO, 8, gts1_state )
+	AM_RANGE(0x0000, 0x00ff) AM_READ ( gts1_io_r ) AM_WRITE( gts1_io_w )         // catch undecoded I/O accesss
+
 	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE ( "u4", ra17xx_device, io_r, io_w ) // (U4) solenoid
 	AM_RANGE(0x0030, 0x003f) AM_DEVREADWRITE ( "u3", r10696_device, io_r, io_w ) // (U3) solenoid + dips
 	AM_RANGE(0x0040, 0x004f) AM_DEVREADWRITE ( "u5", ra17xx_device, io_r, io_w ) // (U5) switch matrix
 	AM_RANGE(0x0060, 0x006f) AM_DEVREADWRITE ( "u2", r10696_device, io_r, io_w ) // (U2) NVRAM io chip
 	AM_RANGE(0x00d0, 0x00df) AM_DEVREADWRITE ( "u6", r10788_device, io_r, io_w ) // (U6) display chip
-	AM_RANGE(0x0000, 0x00ff) AM_READ ( gts1_io_r ) AM_WRITE( gts1_io_w )         // catch undecoded I/O accesss
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gts1_dips )
@@ -678,7 +679,7 @@ WRITE8_MEMBER(gts1_state::gts1_do_w)
 
 MACHINE_CONFIG_START(gts1_state::gts1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPS4_2, XTAL_3_579545MHz)  // divided by 18 in the CPU
+	MCFG_CPU_ADD("maincpu", PPS4_2, XTAL(3'579'545))  // divided by 18 in the CPU
 	MCFG_CPU_PROGRAM_MAP(gts1_map)
 	MCFG_CPU_DATA_MAP(gts1_data)
 	MCFG_CPU_IO_MAP(gts1_io)
@@ -710,7 +711,7 @@ MACHINE_CONFIG_START(gts1_state::gts1)
 					WRITE8(gts1_state,gts1_lamp_apm_w) )
 
 	/* 10788 General Purpose Display and Keyboard */
-	MCFG_DEVICE_ADD( "u6", R10788, XTAL_3_579545MHz / 18 )  // divided in the circuit
+	MCFG_DEVICE_ADD( "u6", R10788, XTAL(3'579'545) / 18 )  // divided in the circuit
 	MCFG_R10788_UPDATE( WRITE8(gts1_state,gts1_display_w) )
 
 	/* Video */

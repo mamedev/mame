@@ -79,8 +79,8 @@ private:
 
 	epson_sio_device *m_sio_input;
 
-	static const int XTAL_CR1 = XTAL_8MHz;
-	static const int XTAL_CR2 = XTAL_4_9152MHz;
+	static constexpr XTAL XTAL_CR1 = XTAL(8'000'000);
+	static constexpr XTAL XTAL_CR2 = XTAL(4'915'200);
 };
 
 

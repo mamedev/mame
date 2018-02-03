@@ -40,8 +40,8 @@ Boards:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_18_432MHz
-#define SOUND_CLOCK         XTAL_14_31818MHz
+#define MASTER_CLOCK        XTAL(18'432'000)
+#define SOUND_CLOCK         XTAL(14'318'181)
 
 
 INTERRUPT_GEN_MEMBER(pandoras_state::pandoras_master_interrupt)

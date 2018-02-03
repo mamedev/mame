@@ -404,7 +404,7 @@ void dai3wksi_state::machine_reset()
 MACHINE_CONFIG_START(dai3wksi_state::dai3wksi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dai3wksi_state,  irq0_line_hold)
 

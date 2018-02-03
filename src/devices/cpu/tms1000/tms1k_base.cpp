@@ -6,6 +6,9 @@
 
   TODO:
   - accurate INIT pin (currently, just use INPUT_LINE_RESET)
+  - emulate newer die revisions? TMS1xxx rev. E and up have 4 cycles
+    per opcode instead of 6. But which steps go where, is unknown.
+    For now, just overclock the MCU instead.
 
 
 The TMS0980 and TMS1000-family MCU cores are very similar. The TMS0980 has a

@@ -54,8 +54,8 @@ static ADDRESS_MAP_START( kyugo_main_map, AS_PROGRAM, 8, kyugo_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gyrodine_main_map, AS_PROGRAM, 8, kyugo_state )
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_IMPORT_FROM(kyugo_main_map)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 
@@ -510,12 +510,12 @@ INTERRUPT_GEN_MEMBER(kyugo_state::vblank_irq)
 MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)  /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(kyugo_main_map)
 	MCFG_CPU_IO_MAP(kyugo_main_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", kyugo_state,  vblank_irq)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_18_432MHz/6)  /* verified on pcb */
+	MCFG_CPU_ADD("sub", Z80, XTAL(18'432'000)/6)  /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gyrodine_sub_map)
 	MCFG_CPU_IO_MAP(gyrodine_sub_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(kyugo_state, irq0_line_hold, 4*60)
@@ -542,12 +542,12 @@ MACHINE_CONFIG_START(kyugo_state::kyugo_base)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)  /* verified on pcb */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)  /* verified on pcb */
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(18'432'000)/12)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

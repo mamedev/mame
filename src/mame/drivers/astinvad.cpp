@@ -26,8 +26,8 @@ DIP locations verified for:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK         XTAL_2MHz
-#define VIDEO_CLOCK          XTAL_4_9152MHz
+#define MASTER_CLOCK         XTAL(2'000'000)
+#define VIDEO_CLOCK          XTAL(4'915'200)
 
 
 /* sample sound IDs - must match sample file name table below */

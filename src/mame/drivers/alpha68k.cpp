@@ -1903,7 +1903,7 @@ MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
 
 
 // Pixel clock, assuming that it can't be 4 MHz because 4 MHz / 15,20 KHz = 263 HTOTAL (VERY unlikely).
-#define ALPHA68K_PIXEL_CLOCK XTAL_24MHz/4
+#define ALPHA68K_PIXEL_CLOCK XTAL(24'000'000)/4
 #define ALPHA68K_HTOTAL 394
 #define ALPHA68K_HBEND 0
 #define ALPHA68K_HBSTART 256
@@ -1975,12 +1975,12 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(alpha68k_state::kyros)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)   /* Verified on bootleg PCB */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/4)   /* Verified on bootleg PCB */
 	MCFG_CPU_PROGRAM_MAP(kyros_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq1_line_hold)
 	MCFG_CPU_PERIODIC_INT_DRIVER(alpha68k_state, irq2_line_hold, 60) // MCU irq
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6) /* Verified on bootleg PCB */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(24'000'000)/6) /* Verified on bootleg PCB */
 	MCFG_CPU_PROGRAM_MAP(kyros_sound_map)
 	MCFG_CPU_IO_MAP(kyros_sound_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", alpha68k_state, irq0_line_hold)
@@ -2010,13 +2010,13 @@ MACHINE_CONFIG_START(alpha68k_state::kyros)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_24MHz/12)    /* Verified on bootleg PCB */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(24'000'000)/12)    /* Verified on bootleg PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_24MHz/12)    /* Verified on bootleg PCB */
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(24'000'000)/12)    /* Verified on bootleg PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
-	MCFG_SOUND_ADD("ym3", YM2203, XTAL_24MHz/12)    /* Verified on bootleg PCB */
+	MCFG_SOUND_ADD("ym3", YM2203, XTAL(24'000'000)/12)    /* Verified on bootleg PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9)
 
 	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC

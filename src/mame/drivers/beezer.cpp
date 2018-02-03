@@ -452,7 +452,7 @@ void beezer_state::machine_reset()
 	bankswitch_w(machine().dummy_space(), 0, 0);
 
 	// start timer
-	m_timer_count->adjust(attotime::zero, 0, attotime::from_hz((XTAL_4MHz / 4) / 16));
+	m_timer_count->adjust(attotime::zero, 0, attotime::from_hz((XTAL(4'000'000) / 4) / 16));
 }
 
 
@@ -462,7 +462,7 @@ void beezer_state::machine_reset()
 
 MACHINE_CONFIG_START(beezer_state::beezer)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", MC6809, XTAL_12MHz / 3)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(12'000'000) / 3)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	MCFG_DEVICE_ADD("sysbank", ADDRESS_MAP_BANK, 0)
@@ -474,7 +474,7 @@ MACHINE_CONFIG_START(beezer_state::beezer)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", beezer_state, scanline_cb, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("via_u6", VIA6522, XTAL_12MHz / 12)
+	MCFG_DEVICE_ADD("via_u6", VIA6522, XTAL(12'000'000) / 12)
 	MCFG_VIA6522_READPA_HANDLER(READ8(beezer_state, via_system_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(beezer_state, via_system_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(beezer_state, via_system_pa_w))
@@ -498,13 +498,13 @@ MACHINE_CONFIG_START(beezer_state::beezer)
 	MCFG_PALETTE_INIT_OWNER(beezer_state, beezer)
 
 	// sound hardware
-	MCFG_CPU_ADD("audiocpu", MC6809, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_INPUT_MERGER_ANY_HIGH("audio_irqs")
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("via_u18", VIA6522, XTAL_4MHz / 4)
+	MCFG_DEVICE_ADD("via_u18", VIA6522, XTAL(4'000'000) / 4)
 	MCFG_VIA6522_READPA_HANDLER(READ8(beezer_state, via_audio_pa_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(beezer_state, via_audio_pa_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(beezer_state, via_audio_pb_w))
@@ -513,7 +513,7 @@ MACHINE_CONFIG_START(beezer_state::beezer)
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(beezer_state, dmod_data_w))
 	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("audio_irqs", input_merger_device, in_w<0>))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL_4MHz / 4)
+	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL(4'000'000) / 4)
 	MCFG_PTM6840_OUT0_CB(WRITELINE(beezer_state, ptm_out0_w))
 	MCFG_PTM6840_OUT1_CB(WRITELINE(beezer_state, ptm_out1_w))
 	MCFG_PTM6840_OUT2_CB(WRITELINE(beezer_state, ptm_out2_w))

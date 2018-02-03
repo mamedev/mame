@@ -74,8 +74,8 @@ ROM_END
 qsound_device::qsound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, QSOUND, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
+		device_rom_interface(mconfig, *this, 24),
 		m_cpu(*this, "qsound"),
-		m_sample_rom(*this, DEVICE_SELF),
 		m_data(0),
 		m_stream(nullptr)
 {
@@ -98,10 +98,20 @@ const tiny_rom_entry *qsound_device::device_rom_region() const
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(qsound_device::device_add_mconfig)
-	MCFG_CPU_ADD("qsound", DSP16, QSOUND_CLOCK)
+	MCFG_CPU_ADD("qsound", DSP16, DERIVED_CLOCK(1, 1))
 	MCFG_CPU_PROGRAM_MAP(dsp16_program_map)
 	MCFG_CPU_DATA_MAP(dsp16_data_map)
 MACHINE_CONFIG_END
+
+
+//-------------------------------------------------
+//  rom_bank_updated - the rom bank has changed
+//-------------------------------------------------
+
+void qsound_device::rom_bank_updated()
+{
+	m_stream->update();
+}
 
 
 //-------------------------------------------------

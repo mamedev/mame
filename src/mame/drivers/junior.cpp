@@ -216,7 +216,7 @@ void junior_state::machine_reset()
 
 MACHINE_CONFIG_START(junior_state::junior)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6502, XTAL_1MHz)
+	MCFG_CPU_ADD("maincpu",M6502, XTAL(1'000'000))
 	MCFG_CPU_PROGRAM_MAP(junior_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(50))
 
@@ -224,7 +224,7 @@ MACHINE_CONFIG_START(junior_state::junior)
 	MCFG_DEFAULT_LAYOUT( layout_junior )
 
 	/* Devices */
-	MCFG_DEVICE_ADD("riot", MOS6532_NEW, XTAL_1MHz)
+	MCFG_DEVICE_ADD("riot", MOS6532_NEW, XTAL(1'000'000))
 	MCFG_MOS6530n_IN_PA_CB(READ8(junior_state, junior_riot_a_r))
 	MCFG_MOS6530n_OUT_PA_CB(WRITE8(junior_state, junior_riot_a_w))
 	MCFG_MOS6530n_IN_PB_CB(READ8(junior_state, junior_riot_b_r))

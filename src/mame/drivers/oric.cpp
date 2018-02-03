@@ -189,17 +189,18 @@ protected:
 
 /* Ram is 64K, with 16K hidden by the rom.  The 300-3ff is also hidden by the i/o */
 static ADDRESS_MAP_START(oric_mem, AS_PROGRAM, 8, oric_state )
+	AM_RANGE( 0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522", via6522_device, read, write) AM_MIRROR(0xf0)
 	AM_RANGE( 0xc000, 0xdfff) AM_READ_BANK("bank_c000_r") AM_WRITE_BANK("bank_c000_w")
 	AM_RANGE( 0xe000, 0xf7ff) AM_READ_BANK("bank_e000_r") AM_WRITE_BANK("bank_e000_w")
 	AM_RANGE( 0xf800, 0xffff) AM_READ_BANK("bank_f800_r") AM_WRITE_BANK("bank_f800_w")
-	AM_RANGE( 0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
 /*
 The telestrat has the memory regions split into 16k blocks.
 Memory region &c000-&ffff can be ram or rom. */
 static ADDRESS_MAP_START(telestrat_mem, AS_PROGRAM, 8, telestrat_state )
+	AM_RANGE( 0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522", via6522_device, read, write)
 	AM_RANGE( 0x0310, 0x0313) AM_DEVREADWRITE("fdc", fd1793_device, read, write)
 	AM_RANGE( 0x0314, 0x0314) AM_READWRITE(port_314_r, port_314_w)
@@ -207,7 +208,6 @@ static ADDRESS_MAP_START(telestrat_mem, AS_PROGRAM, 8, telestrat_state )
 	AM_RANGE( 0x031c, 0x031f) AM_DEVREADWRITE("acia", mos6551_device, read, write)
 	AM_RANGE( 0x0320, 0x032f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)
 	AM_RANGE( 0xc000, 0xffff) AM_READ_BANK("bank_c000_r") AM_WRITE_BANK("bank_c000_w")
-	AM_RANGE( 0x0000, 0xffff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
 uint32_t oric_state::screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -772,13 +772,13 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(oric_state::oric)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz/12)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(12'000'000)/12)
 	MCFG_CPU_PROGRAM_MAP(oric_mem)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 64*6, 0, 40*6, 312, 0, 28*8) // 260 lines in 60 Hz mode
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 64*6, 0, 40*6, 312, 0, 28*8) // 260 lines in 60 Hz mode
 	MCFG_SCREEN_UPDATE_DRIVER(oric_state, screen_update_oric)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(oric_state, vblank_w))
 
@@ -788,7 +788,7 @@ MACHINE_CONFIG_START(oric_state::oric)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("ay8912", AY8912, XTAL_12MHz/12)
+	MCFG_SOUND_ADD("ay8912", AY8912, XTAL(12'000'000)/12)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)
 	MCFG_AY8910_RES_LOADS(4700, 4700, 4700)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(oric_state, psg_a_w))
@@ -807,7 +807,7 @@ MACHINE_CONFIG_START(oric_state::oric)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("tape_timer", oric_state, update_tape, attotime::from_hz(4800))
 
 	/* via */
-	MCFG_DEVICE_ADD( "via6522", VIA6522, XTAL_12MHz/12 )
+	MCFG_DEVICE_ADD( "via6522", VIA6522, XTAL(12'000'000)/12 )
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(oric_state, via_a_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(oric_state, via_b_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(oric_state, via_ca2_w))
@@ -835,11 +835,11 @@ MACHINE_CONFIG_DERIVED(telestrat_state::telstrat, oric)
 
 	/* acia */
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(telestrat_state, acia_irq_w))
 
 	/* via */
-	MCFG_DEVICE_ADD( "via6522_2", VIA6522, XTAL_12MHz/12 )
+	MCFG_DEVICE_ADD( "via6522_2", VIA6522, XTAL(12'000'000)/12 )
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(telestrat_state, via2_a_w))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(telestrat_state, via2_b_w))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(telestrat_state, via2_ca2_w))
@@ -847,7 +847,7 @@ MACHINE_CONFIG_DERIVED(telestrat_state::telstrat, oric)
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(telestrat_state, via2_irq_w))
 
 	/* microdisc */
-	MCFG_FD1793_ADD("fdc", XTAL_8MHz/8)
+	MCFG_FD1793_ADD("fdc", XTAL(8'000'000)/8)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(telestrat_state, fdc_irq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(telestrat_state, fdc_drq_w))
 	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(telestrat_state, fdc_hld_w))

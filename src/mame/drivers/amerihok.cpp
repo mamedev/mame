@@ -75,7 +75,7 @@ void amerihok_state::machine_reset()
 MACHINE_CONFIG_START(amerihok_state::amerihok)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z8681, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu", Z8681, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(amerihok_map)
 	MCFG_CPU_DATA_MAP(amerihok_data_map)
 

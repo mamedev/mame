@@ -95,7 +95,7 @@ public:
 };
 
 
-#define CRTC_CLOCK XTAL_3_579545MHz
+#define CRTC_CLOCK XTAL(3'579'545)
 
 void hitpoker_state::video_start()
 {
@@ -256,6 +256,9 @@ READ8_MEMBER(hitpoker_state::test_r)
 
 /* overlap empty rom addresses */
 static ADDRESS_MAP_START( hitpoker_map, AS_PROGRAM, 8, hitpoker_state )
+	AM_RANGE(0x0000, 0xbdff) AM_ROM
+	AM_RANGE(0xbf00, 0xffff) AM_ROM
+
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // stack ram
 	AM_RANGE(0x1000, 0x103f) AM_RAM // internal I/O
 	AM_RANGE(0x8000, 0xb5ff) AM_READWRITE(hitpoker_vram_r,hitpoker_vram_w)
@@ -273,8 +276,6 @@ static ADDRESS_MAP_START( hitpoker_map, AS_PROGRAM, 8, hitpoker_state )
 //  AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(hitpoker_cram_r,hitpoker_cram_w)
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(hitpoker_paletteram_r,hitpoker_paletteram_w)
-	AM_RANGE(0x0000, 0xbdff) AM_ROM
-	AM_RANGE(0xbf00, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hitpoker_io, AS_IO, 8, hitpoker_state )

@@ -212,7 +212,7 @@
 #include "screen.h"
 
 
-#define MASTER_CLOCK    XTAL_6MHz   /* confirmed */
+#define MASTER_CLOCK    XTAL(6'000'000)   /* confirmed */
 
 
 class tmspoker_state : public driver_device

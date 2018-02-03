@@ -978,8 +978,8 @@ static ADDRESS_MAP_START( igrosoft_gamble_portmap, AS_IO, 8, igrosoft_gamble_sta
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rollfr_portmap, AS_IO, 8, igrosoft_gamble_state )
-	AM_RANGE(0x33, 0x33) AM_WRITE(rollfr_hopper_w)
 	AM_IMPORT_FROM(igrosoft_gamble_portmap)
+	AM_RANGE(0x33, 0x33) AM_WRITE(rollfr_hopper_w)
 ADDRESS_MAP_END
 
 static const gfx_layout tiles16x16_layout =
@@ -1022,7 +1022,7 @@ void igrosoft_gamble_state::machine_reset()
 
 MACHINE_CONFIG_START(igrosoft_gamble_state::igrosoft_gamble)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(24'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(igrosoft_gamble_map)
 	MCFG_CPU_IO_MAP(igrosoft_gamble_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igrosoft_gamble_state, irq0_line_hold)

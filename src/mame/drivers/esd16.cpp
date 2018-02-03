@@ -608,11 +608,11 @@ DECOSPR_PRIORITY_CB_MEMBER(esd16_state::hedpanic_pri_callback)
 MACHINE_CONFIG_START(esd16_state::esd16)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz)  /* 16MHz */
+	MCFG_CPU_ADD("maincpu",M68000, XTAL(16'000'000))  /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(multchmp_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", esd16_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* 4MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(multchmp_sound_map)
 	MCFG_CPU_IO_MAP(multchmp_sound_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(esd16_state, nmi_line_pulse, 32*60)    /* IRQ By Main CPU */
@@ -644,10 +644,10 @@ MACHINE_CONFIG_START(esd16_state::esd16)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)   /* 4MHz */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)   /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* 1MHz */
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* 1MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
@@ -660,14 +660,14 @@ MACHINE_CONFIG_DERIVED(esd16_state::jumppop, esd16)
 	MCFG_CPU_PROGRAM_MAP(jumppop_map)
 
 	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_CLOCK( XTAL_14MHz/4) /* 3.5MHz - Verified */
+	MCFG_CPU_CLOCK( XTAL(14'000'000)/4) /* 3.5MHz - Verified */
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", jumppop)
 
-	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL_14MHz/4) /* 3.5MHz - Verified */
+	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL(14'000'000)/4) /* 3.5MHz - Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_REPLACE("oki", XTAL_14MHz/16, PIN7_HIGH) /* 875kHz - Verified */
+	MCFG_OKIM6295_REPLACE("oki", XTAL(14'000'000)/16, PIN7_HIGH) /* 875kHz - Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 

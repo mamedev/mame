@@ -424,14 +424,14 @@ MACHINE_CONFIG_START(sgi_ip2_state::sgi_ip2)
 	MCFG_CPU_ADD("maincpu", M68020, 16000000)
 	MCFG_CPU_PROGRAM_MAP(sgi_ip2_map)
 
-	MCFG_DEVICE_ADD( "duart68681a", MC68681, XTAL_3_6864MHz ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
+	MCFG_DEVICE_ADD( "duart68681a", MC68681, XTAL(3'686'400) ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(sgi_ip2_state, duarta_irq_handler))
 	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 
-	MCFG_DEVICE_ADD( "duart68681b", MC68681, XTAL_3_6864MHz ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
+	MCFG_DEVICE_ADD( "duart68681b", MC68681, XTAL(3'686'400) ) /* Y3 3.6864MHz Xtal ??? copy-over from dectalk */
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(sgi_ip2_state, duartb_irq_handler))
 
-	MCFG_MC146818_ADD( "rtc", XTAL_4_194304Mhz )
+	MCFG_MC146818_ADD( "rtc", XTAL(4'194'304) )
 
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart68681a", mc68681_device, rx_b_w))

@@ -550,7 +550,7 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith_state, eolith_speedup, "screen", 0, 1)
 
 	/* Sound CPU */
-	MCFG_CPU_ADD("soundcpu", I8032, XTAL_12MHz)
+	MCFG_CPU_ADD("soundcpu", I8032, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(sound_prg_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 	MCFG_MCS51_SERIAL_TX_CB(WRITE8(eolith_state, soundcpu_to_qs1000)) // Sound CPU -> QS1000 CPU serial link
@@ -581,7 +581,7 @@ MACHINE_CONFIG_START(eolith_state::eolith45)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("qs1000", QS1000, XTAL_24MHz)
+	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
 	MCFG_QS1000_IN_P1_CB(READ8(eolith_state, qs1000_p1_r))
 	MCFG_QS1000_OUT_P1_CB(WRITE8(eolith_state, qs1000_p1_w))

@@ -626,7 +626,7 @@
 #include "snookr10.lh"
 
 
-#define MASTER_CLOCK    XTAL_16MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
 
 /**********************
 * Read/Write Handlers *

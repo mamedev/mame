@@ -634,7 +634,7 @@ MACHINE_CONFIG_DERIVED(trs80_state::model1, trs80)      // model I, level II
 
 	MCFG_QUICKLOAD_ADD("quickload", trs80_state, trs80_cmd, "cmd", 0.5)
 
-	MCFG_FD1793_ADD("fdc", XTAL_1MHz) // todo: should be fd1771
+	MCFG_FD1793_ADD("fdc", XTAL(1'000'000)) // todo: should be fd1771
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(trs80_state,trs80_fdc_intrq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", trs80_floppies, "sssd", trs80_state::floppy_formats)

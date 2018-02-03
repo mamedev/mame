@@ -43,6 +43,7 @@
 
 DEFINE_DEVICE_TYPE(CIRRUS_GD5428, cirrus_gd5428_device, "clgd5428", "Cirrus Logic GD5428")
 DEFINE_DEVICE_TYPE(CIRRUS_GD5430, cirrus_gd5430_device, "clgd5430", "Cirrus Logic GD5430")
+DEFINE_DEVICE_TYPE(CIRRUS_GD5446, cirrus_gd5446_device, "clgd5446", "Cirrus Logic GD5446")
 
 
 cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -57,6 +58,11 @@ cirrus_gd5428_device::cirrus_gd5428_device(const machine_config &mconfig, device
 
 cirrus_gd5430_device::cirrus_gd5430_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cirrus_gd5428_device(mconfig, CIRRUS_GD5430, tag, owner, clock)
+{
+}
+
+cirrus_gd5446_device::cirrus_gd5446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cirrus_gd5428_device(mconfig, CIRRUS_GD5446, tag, owner, clock)
 {
 }
 
@@ -95,6 +101,13 @@ void cirrus_gd5430_device::device_start()
 	cirrus_gd5428_device::device_start();
 	m_chip_id = 0xa0;  // GD5430 - Rev 0
 }
+
+void cirrus_gd5446_device::device_start()
+{
+	cirrus_gd5428_device::device_start();
+	m_chip_id = 0x80 | 0x39;  // GD5446
+}
+
 
 void cirrus_gd5428_device::device_reset()
 {
@@ -198,6 +211,7 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 {
 	uint8_t divisor = 1;
 	float clock;
+	const XTAL xtal = XTAL(14'318'181);
 	uint8_t clocksel = (vga.miscellaneous_output & 0xc) >> 2;
 
 	svga.rgb8_en = 0;
@@ -207,14 +221,13 @@ void cirrus_gd5428_device::cirrus_define_video_mode()
 	svga.rgb32_en = 0;
 
 	if(gc_locked || m_vclk_num[clocksel] == 0 || m_vclk_denom[clocksel] == 0)
-		clock = (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz;
+		clock = ((vga.miscellaneous_output & 0xc) ? xtal*2: xtal*1.75).dvalue();
 	else
 	{
 		int numerator = m_vclk_num[clocksel] & 0x7f;
 		int denominator = (m_vclk_denom[clocksel] & 0x3e) >> 1;
 		int mul = m_vclk_denom[clocksel] & 0x01 ? 2 : 1;
-		clock = 14.31818f * ((float)numerator / ((float)denominator * mul));
-		clock *= 1000000;
+		clock = (xtal * numerator / denominator / mul).dvalue();
 	}
 
 	if (!gc_locked && (vga.sequencer.data[0x07] & 0x01))

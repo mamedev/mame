@@ -275,7 +275,7 @@ void mosaic_state::machine_reset()
 MACHINE_CONFIG_START(mosaic_state::mosaic)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12_288MHz/2)  /* 6.144MHz */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'288'000)/2)  /* 6.144MHz */
 	MCFG_CPU_PROGRAM_MAP(mosaic_map)
 	MCFG_CPU_IO_MAP(mosaic_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mosaic_state,  irq0_line_hold)
@@ -298,7 +298,7 @@ MACHINE_CONFIG_START(mosaic_state::mosaic)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12_288MHz/4) /* 3.072MHz or 3.579545MHz (14.31818MHz/4)? */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'288'000)/4) /* 3.072MHz or 3.579545MHz (14.31818MHz/4)? */
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

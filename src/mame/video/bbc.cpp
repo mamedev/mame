@@ -175,13 +175,13 @@ WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 
 		m_hd6845->set_hpixels_per_column(m_pixels_per_byte);
 		if (m_video_ula.clock_rate_6845)
-			m_hd6845->set_clock(XTAL_16MHz / 8);
+			m_hd6845->set_clock(XTAL(16'000'000) / 8);
 		else
-			m_hd6845->set_clock(XTAL_16MHz / 16);
+			m_hd6845->set_clock(XTAL(16'000'000) / 16);
 
 		// FIXME: double clock for MODE7 until interlace is implemented
 		if (m_video_ula.teletext_normal_select)
-			m_hd6845->set_clock(XTAL_16MHz / 8);
+			m_hd6845->set_clock(XTAL(16'000'000) / 8);
 		break;
 	// Set a palette register in the Video ULA
 	case 1:

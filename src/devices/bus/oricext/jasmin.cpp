@@ -71,7 +71,7 @@ const tiny_rom_entry *jasmin_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(jasmin_device::device_add_mconfig)
-	MCFG_WD1770_ADD("fdc", XTAL_8MHz)
+	MCFG_WD1770_ADD("fdc", XTAL(8'000'000))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(oricext_device, irq_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", jasmin_floppies, "3dsdd", jasmin_device::floppy_formats)

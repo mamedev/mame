@@ -128,12 +128,12 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 #include "machine/jalcrpt.h"
 #include "speaker.h"
 
-#define SYS_A_CPU_CLOCK     (XTAL_12MHz / 2)    /* clock for main 68000 */
-#define SYS_B_CPU_CLOCK     XTAL_8MHz       /* clock for main 68000 */
-#define SYS_C_CPU_CLOCK     (XTAL_24MHz / 2)    /* clock for main 68000 */
-#define SYS_D_CPU_CLOCK     XTAL_8MHz       /* clock for main 68000 */
-#define SOUND_CPU_CLOCK     XTAL_7MHz       /* clock for sound 68000 */
-#define OKI4_SOUND_CLOCK    XTAL_4MHz
+#define SYS_A_CPU_CLOCK     (XTAL(12'000'000) / 2)    /* clock for main 68000 */
+#define SYS_B_CPU_CLOCK     XTAL(8'000'000)       /* clock for main 68000 */
+#define SYS_C_CPU_CLOCK     (XTAL(24'000'000) / 2)    /* clock for main 68000 */
+#define SYS_D_CPU_CLOCK     XTAL(8'000'000)       /* clock for main 68000 */
+#define SOUND_CPU_CLOCK     XTAL(7'000'000)       /* clock for sound 68000 */
+#define OKI4_SOUND_CLOCK    XTAL(4'000'000)
 
 
 MACHINE_RESET_MEMBER(megasys1_state,megasys1)
@@ -221,13 +221,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
+	AM_IMPORT_FROM(megasys1Z_map)
 	AM_RANGE(0x080008, 0x080009) AM_DEVREAD("soundlatch2", generic_latch_16_device, read)    /* from sound cpu */
 	AM_RANGE(0x084000, 0x084001) AM_WRITE(active_layers_w)
 	AM_RANGE(0x084008, 0x08400d) AM_DEVWRITE("scroll2", megasys1_tilemap_device, scroll_w)
 	AM_RANGE(0x084100, 0x084101) AM_READWRITE(sprite_flag_r, sprite_flag_w)
 	AM_RANGE(0x084308, 0x084309) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x098000, 0x09bfff) AM_RAM_DEVWRITE("scroll2", megasys1_tilemap_device, write) AM_SHARE("scroll2")
-	AM_IMPORT_FROM(megasys1Z_map)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -321,17 +321,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megasys1B_edfbl_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
+	AM_IMPORT_FROM(megasys1B_map)
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("P1")
 	AM_RANGE(0x0e0006, 0x0e0007) AM_READ_PORT("P2")
 	AM_RANGE(0x0e0008, 0x0e0009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0e000a, 0x0e000b) AM_READ_PORT("DSW2")
 	//AM_RANGE(0x0e000e, 0x0e000f) AM_WRITE(soundlatch_w)
-	AM_IMPORT_FROM(megasys1B_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megasys1B_monkelf_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
+	AM_IMPORT_FROM(megasys1B_map)
 	AM_RANGE(0x044200, 0x044205) AM_WRITE(monkelf_scroll0_w)
 	AM_RANGE(0x044208, 0x04420d) AM_WRITE(monkelf_scroll1_w)
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("P1")
@@ -339,7 +340,6 @@ static ADDRESS_MAP_START( megasys1B_monkelf_map, AS_PROGRAM, 16, megasys1_state 
 	AM_RANGE(0x0e0006, 0x0e0007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0e0008, 0x0e0009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0e000a, 0x0e000b) AM_READ_PORT("SYSTEM")
-	AM_IMPORT_FROM(megasys1B_map)
 ADDRESS_MAP_END
 
 

@@ -137,7 +137,7 @@ Notes:
 #include "geebee.lh"
 #include "navarone.lh"
 
-#define MASTER_CLOCK        XTAL_18_432MHz
+#define MASTER_CLOCK        XTAL(18'432'000)
 
 void warpwarp_state::machine_start()
 {
@@ -819,6 +819,18 @@ ROM_START( geebee )
 	ROM_RELOAD(               0x0400, 0x0400 )
 ROM_END
 
+ROM_START( geebeea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "132",    0x0000, 0x0400, CRC(23252fc7) SHA1(433f0f435ff741a789942194356aaec53192608a) )
+	ROM_LOAD( "133",    0x0400, 0x0400, CRC(0bc4d4ca) SHA1(46028ce1dbf46e49b921cfabec78cded914af358) )
+	ROM_LOAD( "134",    0x0800, 0x0400, CRC(7899b4c1) SHA1(70f609f9873f1a4d9c8a90361c7519bdd24ad9ea) )
+	ROM_LOAD( "135",    0x0c00, 0x0400, CRC(0b6e6fcb) SHA1(e7c3e8a13e3d2be6cfb6675fb57cc4a2fda6bec2) )
+
+	ROM_REGION( 0x800, "gfx1", 0 )
+	ROM_LOAD( "a_136",  0x0000, 0x0400, CRC(bd01437d) SHA1(4324c68472f762a13f978e54b3c4a7984cc7195a) )
+	ROM_RELOAD(         0x0400, 0x0400 )
+ROM_END
+
 ROM_START( geebeeb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1.1m",    0x0000, 0x0400, CRC(23252fc7) SHA1(433f0f435ff741a789942194356aaec53192608a) )
@@ -997,6 +1009,7 @@ DRIVER_INIT_MEMBER(warpwarp_state,warpwarp)
 
 /* B & W games */
 GAMEL(1978, geebee,     0,        geebee,   geebee,    warpwarp_state, geebee,   ROT90, "Namco", "Gee Bee (Japan)", MACHINE_SUPPORTS_SAVE, layout_geebee )
+GAMEL(1978, geebeea,    geebee,   geebeeb,  geebeeb,   warpwarp_state, geebee,   ROT90, "Namco (Alca license)", "Gee Bee (UK)", MACHINE_SUPPORTS_SAVE, layout_geebee )
 GAMEL(1978, geebeeb,    geebee,   geebeeb,  geebeeb,   warpwarp_state, geebee,   ROT90, "Namco (F.lli Bertolino license)", "Gee Bee (Europe)", MACHINE_SUPPORTS_SAVE, layout_geebee ) // Fratelli Bertolino
 GAMEL(1978, geebeeg,    geebee,   geebee,   geebee,    warpwarp_state, geebee,   ROT90, "Namco (Gremlin license)", "Gee Bee (US)", MACHINE_SUPPORTS_SAVE, layout_geebee )
 

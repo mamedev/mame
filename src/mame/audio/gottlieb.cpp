@@ -16,9 +16,9 @@
 #include "sound/volt_reg.h"
 
 
-#define SOUND1_CLOCK        XTAL_3_579545MHz
-#define SOUND2_CLOCK        XTAL_4MHz
-#define SOUND2_SPEECH_CLOCK XTAL_3_12MHz
+#define SOUND1_CLOCK        XTAL(3'579'545)
+#define SOUND2_CLOCK        XTAL(4'000'000)
+#define SOUND2_SPEECH_CLOCK XTAL(3'120'000)
 
 
 //**************************************************************************

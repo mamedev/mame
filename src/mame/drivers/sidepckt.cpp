@@ -215,9 +215,9 @@ static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8, sidepckt_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sidepcktb_map, AS_PROGRAM, 8, sidepckt_state )
+	AM_IMPORT_FROM( sidepckt_map )
 	AM_RANGE(0x3014, 0x3014) AM_READNOP
 	AM_RANGE(0x3018, 0x3018) AM_WRITENOP
-	AM_IMPORT_FROM( sidepckt_map )
 ADDRESS_MAP_END
 
 

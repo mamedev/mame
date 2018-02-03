@@ -82,22 +82,20 @@ READ8_MEMBER(mexico86_state::kiki_ym2203_r)
 
 static ADDRESS_MAP_START( mexico86_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                    /* banked roms */
-	AM_RANGE(0xc000, 0xe7ff) AM_RAM AM_SHARE("share1")                  /* shared with sound cpu */
-	AM_RANGE(0xd500, 0xd7ff) AM_RAM AM_SHARE("objectram")
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                /* banked roms */
+	AM_RANGE(0xc000, 0xe7ff) AM_RAM AM_SHARE("mainram")         /* shared with sound cpu */
 	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_SHARE("protection_ram")  /* shared with mcu */
 	AM_RANGE(0xe900, 0xefff) AM_RAM
-	AM_RANGE(0xc000, 0xd4ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mexico86_bankswitch_w)    /* program and gfx ROM banks */
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(mexico86_f008_w)          /* cpu reset lines + other unknown stuff */
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN3")
 	AM_RANGE(0xf018, 0xf018) AM_WRITENOP                        /* watchdog? */
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")                  /* communication ram - to connect 4 players's subboard */
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("subram")          /* communication ram - to connect 4 players's subboard */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mexico86_sound_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xa7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x8000, 0xa7ff) AM_RAM AM_SHARE("mainram")  /* shared with main */
 	AM_RANGE(0xa800, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_READ(kiki_ym2203_r) AM_DEVWRITE("ymsnd", ym2203_device, write)
 ADDRESS_MAP_END
@@ -113,7 +111,7 @@ WRITE8_MEMBER(mexico86_state::mexico86_sub_output_w)
 static ADDRESS_MAP_START( mexico86_sub_cpu_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM /* sub cpu ram */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2")  /* shared with main */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("subram")  /* shared with main */
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN4")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN5")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN6")

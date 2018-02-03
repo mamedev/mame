@@ -1166,7 +1166,7 @@
 #include "speaker.h"
 
 
-#define SS22_MASTER_CLOCK   (XTAL_49_152MHz)    /* info from Guru */
+#define SS22_MASTER_CLOCK   (XTAL(49'152'000))    /* info from Guru */
 
 #define PIXEL_CLOCK         (SS22_MASTER_CLOCK/2)
 
@@ -1977,8 +1977,8 @@ READ32_MEMBER(namcos22_state::namcos22_gun_r)
 }
 
 static ADDRESS_MAP_START( timecris_am, AS_PROGRAM, 32, namcos22_state )
-	AM_RANGE(0x430000, 0x43000f) AM_READ(namcos22_gun_r)
 	AM_IMPORT_FROM( namcos22s_am )
+	AM_RANGE(0x430000, 0x43000f) AM_READ(namcos22_gun_r)
 ADDRESS_MAP_END
 
 
@@ -2010,9 +2010,9 @@ WRITE32_MEMBER(namcos22_state::alpinesa_prot_w)
 }
 
 static ADDRESS_MAP_START( alpinesa_am, AS_PROGRAM, 32, namcos22_state )
+	AM_IMPORT_FROM( namcos22s_am )
 	AM_RANGE(0x200000, 0x200003) AM_READ(alpinesa_prot_r)
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(alpinesa_prot_w)
-	AM_IMPORT_FROM( namcos22s_am )
 ADDRESS_MAP_END
 
 
@@ -2955,8 +2955,8 @@ WRITE8_MEMBER(namcos22_state::alpine_mcu_port5_w)
 }
 
 static ADDRESS_MAP_START( alpine_io_map, AS_IO, 8, namcos22_state )
-	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_WRITE(alpine_mcu_port5_w)
 	AM_IMPORT_FROM( mcu_io )
+	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_WRITE(alpine_mcu_port5_w)
 ADDRESS_MAP_END
 
 
@@ -2972,8 +2972,8 @@ WRITE8_MEMBER(namcos22_state::propcycle_mcu_port5_w)
 }
 
 static ADDRESS_MAP_START( propcycl_io_map, AS_IO, 8, namcos22_state )
-	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_WRITE(propcycle_mcu_port5_w)
 	AM_IMPORT_FROM( mcu_io )
+	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_WRITE(propcycle_mcu_port5_w)
 ADDRESS_MAP_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_interrupt)
@@ -3765,7 +3765,7 @@ MACHINE_CONFIG_START(namcos22_state::namcos22)
 	MCFG_CPU_PROGRAM_MAP( mcu_s22_program)
 	MCFG_CPU_IO_MAP( mcu_s22_io)
 
-	MCFG_CPU_ADD("iomcu", NAMCO_C74, XTAL_6_144MHz) // 6.144MHz XTAL on I/O board, not sure if it has a divider
+	MCFG_CPU_ADD("iomcu", NAMCO_C74, XTAL(6'144'000)) // 6.144MHz XTAL on I/O board, not sure if it has a divider
 	MCFG_CPU_PROGRAM_MAP( iomcu_s22_program)
 	MCFG_CPU_IO_MAP( iomcu_s22_io)
 

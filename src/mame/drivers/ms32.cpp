@@ -412,6 +412,8 @@ WRITE32_MEMBER(ms32_state::ms32_irq5_guess_w)
 }
 
 static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
+	AM_IMPORT_FROM(ms32_map)
+
 	AM_RANGE(0xfd0d0000, 0xfd0d0003) AM_READ_PORT("DSW2") // MB-93159
 	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3) AM_WRITENOP // writes 7-led seg at very least
 
@@ -432,8 +434,6 @@ static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
 
 	AM_RANGE(0xfdc00000, 0xfdc1ffff) AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) AM_SHARE("f1sb_extraram") // definitely line ram
 	AM_RANGE(0xfde00000, 0xfde1ffff) AM_RAM // scroll info for lineram?
-
-	AM_IMPORT_FROM(ms32_map)
 ADDRESS_MAP_END
 
 /* F1 Super Battle speculation from nuapete

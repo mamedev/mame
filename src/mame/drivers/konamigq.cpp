@@ -93,7 +93,8 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_dasp(*this, "dasp"),
 		m_am53cf96(*this, "am53cf96"),
-		m_k056800(*this, "k056800")
+		m_k056800(*this, "k056800"),
+		m_pcmram(*this, "pcmram")
 	{
 	}
 
@@ -102,6 +103,7 @@ public:
 	required_device<tms57002_device> m_dasp;
 	required_device<am53cf96_device> m_am53cf96;
 	required_device<k056800_device> m_k056800;
+	required_shared_ptr<uint8_t> m_pcmram;
 
 	uint8_t *m_p_n_pcmram;
 	uint8_t m_sector_buffer[ 512 ];
@@ -151,12 +153,12 @@ WRITE16_MEMBER(konamigq_state::eeprom_w)
 
 WRITE8_MEMBER(konamigq_state::pcmram_w)
 {
-	m_p_n_pcmram[ offset ] = data;
+	m_pcmram[ offset ] = data;
 }
 
 READ8_MEMBER(konamigq_state::pcmram_r)
 {
-	return m_p_n_pcmram[ offset ];
+	return m_pcmram[ offset ];
 }
 
 /* Video */
@@ -242,6 +244,13 @@ static ADDRESS_MAP_START( konamigq_dasp_map, AS_DATA, 8, konamigq_state )
 ADDRESS_MAP_END
 
 
+/* K058141 memory handling */
+static ADDRESS_MAP_START( konamigq_k054539_map, 0, 8, konamigq_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM AM_REGION("k054539", 0)
+	AM_RANGE(0x080000, 0x3fffff) AM_RAM AM_SHARE("pcmram")
+ADDRESS_MAP_END
+
+
 /* 058141 */
 WRITE_LINE_MEMBER(konamigq_state::k054539_irq_gen)
 {
@@ -297,12 +306,10 @@ void konamigq_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, i
 
 DRIVER_INIT_MEMBER(konamigq_state,konamigq)
 {
-	m_p_n_pcmram = memregion( "shared" )->base() + 0x80000;
 }
 
 MACHINE_START_MEMBER(konamigq_state,konamigq)
 {
-	save_pointer(NAME(m_p_n_pcmram), 0x380000);
 	save_item(NAME(m_sector_buffer));
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_intck));
@@ -314,7 +321,7 @@ MACHINE_RESET_MEMBER(konamigq_state,konamigq)
 
 MACHINE_CONFIG_START(konamigq_state::konamigq)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", CXD8530BQ, XTAL_67_7376MHz)
+	MCFG_CPU_ADD("maincpu", CXD8530BQ, XTAL(67'737'600))
 	MCFG_CPU_PROGRAM_MAP(konamigq_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -323,10 +330,10 @@ MACHINE_CONFIG_START(konamigq_state::konamigq)
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&konamigq_state::scsi_dma_read, this ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&konamigq_state::scsi_dma_write, this ) )
 
-	MCFG_CPU_ADD("soundcpu", M68000, XTAL_32MHz/4) /* 8MHz - measured */
+	MCFG_CPU_ADD("soundcpu", M68000, XTAL(32'000'000)/4) /* 8MHz - measured */
 	MCFG_CPU_PROGRAM_MAP(konamigq_sound_map)
 
-	MCFG_CPU_ADD("dasp", TMS57002, XTAL_48MHz/2) /* 24MHz - measured */
+	MCFG_CPU_ADD("dasp", TMS57002, XTAL(48'000'000)/2) /* 24MHz - measured */
 	MCFG_CPU_DATA_MAP(konamigq_dasp_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(konamigq_state, tms_sync, 48000)
 
@@ -345,22 +352,22 @@ MACHINE_CONFIG_START(konamigq_state::konamigq)
 	MCFG_AM53CF96_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD("maincpu", "gpu", CXD8538Q, 0x200000, XTAL_53_693175MHz)
+	MCFG_PSXGPU_ADD("maincpu", "gpu", CXD8538Q, 0x200000, XTAL(53'693'175))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_K056800_ADD("k056800", XTAL_18_432MHz)
+	MCFG_K056800_ADD("k056800", XTAL(18'432'000))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("soundcpu", M68K_IRQ_1))
 
-	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
-	MCFG_K054539_REGION_OVERRRIDE("shared")
+	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADDRESS_MAP(0, konamigq_k054539_map)
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(konamigq_state, k054539_irq_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL_18_432MHz)
-	MCFG_K054539_REGION_OVERRRIDE("shared")
+	MCFG_DEVICE_ADD("k054539_2", K054539, XTAL(18'432'000))
+	MCFG_DEVICE_ADDRESS_MAP(0, konamigq_k054539_map)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -453,7 +460,7 @@ ROM_START( cryptklr )
 	ROM_REGION( 0x80000, "soundcpu", 0 ) /* 68000 sound program */
 	ROM_LOAD16_WORD_SWAP( "420a01.2g", 0x000000, 0x080000, CRC(84fc2613) SHA1(e06f4284614d33c76529eb43b168d095200a9eac) )
 
-	ROM_REGION( 0x400000, "shared", 0 )
+	ROM_REGION( 0x80000, "k054539", 0 )
 	ROM_LOAD( "420a02.3m",    0x000000, 0x080000, CRC(2169c3c4) SHA1(6d525f10385791e19eb1897d18f0bab319640162) )
 
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) /* bios */

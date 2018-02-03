@@ -184,7 +184,7 @@ DRIVER_INIT_MEMBER( microdec_state, microdec )
 
 MACHINE_CONFIG_START(microdec_state::microdec)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(microdec_mem)
 	MCFG_CPU_IO_MAP(microdec_io)
 

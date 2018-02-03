@@ -124,8 +124,8 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsoccr94_io_map, AS_IO, 16, m107_state )
-	AM_RANGE(0x06, 0x07) AM_WRITE8(bankswitch_w, 0x00ff)
 	AM_IMPORT_FROM(main_portmap)
+	AM_RANGE(0x06, 0x07) AM_WRITE8(bankswitch_w, 0x00ff)
 ADDRESS_MAP_END
 
 /* same as M107 but with an extra i/o board */
@@ -140,17 +140,17 @@ WRITE16_MEMBER(m107_state::wpksoc_output_w)
 }
 
 static ADDRESS_MAP_START( wpksoc_map, AS_PROGRAM, 16, m107_state )
+	AM_IMPORT_FROM(main_map)
 	AM_RANGE(0xf0000, 0xf0001) AM_READ_PORT("WPK_DSW0")
 	AM_RANGE(0xf0002, 0xf0003) AM_READ_PORT("WPK_DSW1")
 	AM_RANGE(0xf0004, 0xf0005) AM_READ_PORT("WPK_DSW2")
-	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wpksoc_io_map, AS_IO, 16, m107_state )
+	AM_IMPORT_FROM(main_portmap)
 	AM_RANGE(0x22, 0x23) AM_WRITE(wpksoc_output_w)
 	AM_RANGE(0xc0, 0xc1) AM_READ_PORT("WPK_IN0")
 	AM_RANGE(0xc2, 0xc3) AM_READ_PORT("WPK_IN1")
-	AM_IMPORT_FROM(main_portmap)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -714,12 +714,12 @@ GFXDECODE_END
 MACHINE_CONFIG_START(m107_state::firebarr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V33, XTAL_28MHz/2)    /* NEC V33, 28MHz clock */
+	MCFG_CPU_ADD("maincpu", V33, XTAL(28'000'000)/2)    /* NEC V33, 28MHz clock */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_portmap)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("upd71059c", pic8259_device, inta_cb)
 
-	MCFG_CPU_ADD("soundcpu", V35, XTAL_14_31818MHz)
+	MCFG_CPU_ADD("soundcpu", V35, XTAL(14'318'181))
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 
@@ -752,12 +752,12 @@ MACHINE_CONFIG_START(m107_state::firebarr)
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(DEVWRITELINE("upd71059c", pic8259_device, ir3_w))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
+	MCFG_YM2151_ADD("ymsnd", XTAL(14'318'181)/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_IREMGA20_ADD("irem", XTAL_14_31818MHz/4)
+	MCFG_IREMGA20_ADD("irem", XTAL(14'318'181)/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

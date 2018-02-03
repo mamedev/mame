@@ -182,7 +182,7 @@ VSIS-20V3
                    12   Z80
 
 Frequencies: 68k is XTAL_32MHZ/2
-             z80 is XTAL_20MHz/4
+             z80 is XTAL(20'000'000)/4
 
 ******************************************************************************/
 
@@ -265,8 +265,8 @@ static ADDRESS_MAP_START( twcup94_map, AS_PROGRAM, 16, gstriker_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gstriker_map, AS_PROGRAM, 16, gstriker_state )
-	AM_RANGE(0x200060, 0x200063) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
 	AM_IMPORT_FROM(twcup94_map)
+	AM_RANGE(0x200060, 0x200063) AM_DEVREADWRITE8("acia", acia6850_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gstriker_state )

@@ -14,9 +14,9 @@
 
 #define FE_FP ((m_cpu->m_core->global_regs[1] & 0xfe000000) >> 25)
 #define FE_FL (m_cpu->m_core->fl_lut[((m_cpu->m_core->global_regs[1] >> 21) & 0xf)])
-#define FE_DST_CODE	((op & 0xf0) >> 4)
-#define FE_SRC_CODE	(op & 0x0f)
-#define SR_CODE		(1 << 1)
+#define FE_DST_CODE ((op & 0xf0) >> 4)
+#define FE_SRC_CODE (op & 0x0f)
+#define SR_CODE     (1 << 1)
 
 /***************************************************************************
     INSTRUCTION PARSERS

@@ -186,7 +186,7 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-#define BAUDGEN_CLOCK XTAL_19_6608MHz /* Raltron */
+#define BAUDGEN_CLOCK XTAL(19'660'800) /* Raltron */
 #define SCC_CLOCK (BAUDGEN_CLOCK / 4) /* through a 74LS393 counter */
 
 class hk68v10_state : public driver_device
@@ -223,8 +223,8 @@ required_device<scc8530_device> m_sccterm;
 
 static ADDRESS_MAP_START (hk68v10_mem, AS_PROGRAM, 16, hk68v10_state)
 ADDRESS_MAP_UNMAP_HIGH
-AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ  (bootvect_r)       /* ROM mirror just durin reset */
 AM_RANGE (0x000000, 0x000007) AM_RAM AM_WRITE (bootvect_w)       /* After first write we act as RAM */
+AM_RANGE (0x000000, 0x000007) AM_ROM AM_READ  (bootvect_r)       /* ROM mirror just durin reset */
 AM_RANGE (0x000008, 0x1fffff) AM_RAM /* 2 Mb RAM */
 AM_RANGE (0xFC0000, 0xFC3fff) AM_ROM /* System EPROM Area 16Kb HBUG */
 AM_RANGE (0xFC4000, 0xFDffff) AM_ROM /* System EPROM Area an additional 112Kb for System ROM */
@@ -336,7 +336,7 @@ SLOT_INTERFACE_END
  */
 MACHINE_CONFIG_START(hk68v10_state::hk68v10)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68010, XTAL_10MHz)
+	MCFG_CPU_ADD ("maincpu", M68010, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP (hk68v10_mem)
 
 	MCFG_DEVICE_ADD("cio", Z8536, SCC_CLOCK)

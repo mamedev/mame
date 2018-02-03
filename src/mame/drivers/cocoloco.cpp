@@ -199,7 +199,7 @@
 #include "netlist/devices/net_lib.h"
 
 
-#define MASTER_CLOCK    XTAL_20MHz           /* confirmed */
+#define MASTER_CLOCK    XTAL(20'000'000)           /* confirmed */
 #define CPU_CLOCK       MASTER_CLOCK / 16    /* confirmed */
 #define SND_CLOCK       MASTER_CLOCK / 8     /* confirmed */
 

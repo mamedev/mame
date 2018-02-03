@@ -2,9 +2,9 @@
 // copyright-holders:Sergey Svishchev
 /***************************************************************************
 
-	Toshiba 1000 Backup RAM
+    Toshiba 1000 Backup RAM
 
-	Simulation of interface provided by 80C50 keyboard controller.
+    Simulation of interface provided by 80C50 keyboard controller.
 
 ***************************************************************************/
 

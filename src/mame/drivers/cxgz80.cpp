@@ -396,7 +396,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(cxgz80_state::ch2001)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, 8_MHz_XTAL/2)
 	MCFG_CPU_PROGRAM_MAP(ch2001_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", cxgz80_state, irq_on, attotime::from_hz(484)) // theoretical frequency from 555 timer (22nF, 100K+33K, 1K2), measurement was 568Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(484) - attotime::from_nsec(18300)) // active for 18.3us

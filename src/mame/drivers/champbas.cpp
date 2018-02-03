@@ -201,46 +201,46 @@ ADDRESS_MAP_END
 
 // base map + ALPHA-8x0x protection
 static ADDRESS_MAP_START( champbasj_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("alpha_8201", alpha_8201_device, ext_ram_r, ext_ram_w)
 	AM_IMPORT_FROM( champbas_map )
+	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("alpha_8201", alpha_8201_device, ext_ram_r, ext_ram_w)
 ADDRESS_MAP_END
 
 // different protection for champbasja
 static ADDRESS_MAP_START( champbasja_map, AS_PROGRAM, 8, champbas_state )
+	AM_IMPORT_FROM( champbas_map )
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_protection_r)
-	AM_IMPORT_FROM( champbas_map )
 ADDRESS_MAP_END
 
 // champbasjb appears to have no protection
 static ADDRESS_MAP_START( champbasjb_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_IMPORT_FROM( champbas_map )
+	AM_RANGE(0x6000, 0x63ff) AM_RAM
 ADDRESS_MAP_END
 
 // champbb2
 static ADDRESS_MAP_START( champbb2_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x7800, 0x7fff) AM_ROM
 	AM_IMPORT_FROM( champbasj_map )
+	AM_RANGE(0x7800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tbasebal_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0x7800, 0x7fff) AM_ROM
 	AM_IMPORT_FROM( champbas_map )
+	AM_RANGE(0x7800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 // more sprites in exctsccr
 static ADDRESS_MAP_START( exctsccr_map, AS_PROGRAM, 8, champbas_state )
+	AM_IMPORT_FROM( champbasj_map )
 	AM_RANGE(0x7000, 0x7001) AM_UNMAP // aysnd is controlled by audiocpu
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM
 	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
-	AM_IMPORT_FROM( champbasj_map )
 ADDRESS_MAP_END
 
 // exctsccrb
 static ADDRESS_MAP_START( exctsccrb_map, AS_PROGRAM, 8, champbas_state )
-	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_IMPORT_FROM( champbasj_map )
+	AM_RANGE(0xa040, 0xa04f) AM_WRITEONLY AM_SHARE("spriteram2")
 ADDRESS_MAP_END
 
 
@@ -512,7 +512,7 @@ INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
 MACHINE_CONFIG_START(champbas_state::talbot)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(champbasj_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
@@ -526,7 +526,7 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(champbas_state, mcu_start_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(champbas_state, mcu_switch_w))
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_18_432MHz/6/8)
+	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -551,7 +551,7 @@ MACHINE_CONFIG_START(champbas_state::talbot)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
@@ -559,7 +559,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(champbas_state::champbas)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
@@ -573,7 +573,7 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // no MCU
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // no MCU
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sound_map)
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -598,7 +598,7 @@ MACHINE_CONFIG_START(champbas_state::champbas)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC
@@ -616,7 +616,7 @@ MACHINE_CONFIG_DERIVED(champbas_state::champbasj, champbas)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(champbas_state, mcu_start_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(champbas_state, mcu_switch_w))
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_18_432MHz/6/8) // note: 8302 rom on champbb2 (same device!)
+	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // note: 8302 rom on champbb2 (same device!)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 MACHINE_CONFIG_END
 
@@ -649,7 +649,7 @@ MACHINE_CONFIG_DERIVED(champbas_state::tbasebal, champbas)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tbasebal_map)
 
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL_18_432MHz/6) // ?Mhz
+	MCFG_CPU_ADD("mcu", M68705P3, XTAL(18'432'000)/6) // ?Mhz
 MACHINE_CONFIG_END
 
 
@@ -657,7 +657,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(champbas_state::exctsccr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6 )
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6 )
 	MCFG_CPU_PROGRAM_MAP(exctsccr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
@@ -671,7 +671,7 @@ MACHINE_CONFIG_START(champbas_state::exctsccr)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(champbas_state, mcu_start_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(champbas_state, mcu_switch_w))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4 )
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4 )
 	MCFG_CPU_PROGRAM_MAP(exctsccr_sound_map)
 	MCFG_CPU_IO_MAP(exctsccr_sound_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(champbas_state, nmi_line_pulse, 4000) // 4 kHz, updates the dac
@@ -679,7 +679,7 @@ MACHINE_CONFIG_START(champbas_state::exctsccr)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("exc_snd_irq", champbas_state, exctsccr_sound_irq, attotime::from_hz(75)) // irq source unknown, determines music tempo
 	MCFG_TIMER_START_DELAY(attotime::from_hz(75))
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_18_432MHz/6/8) // note: 8302 rom, or 8303 on exctscc2 (same device!)
+	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // note: 8302 rom, or 8303 on exctscc2 (same device!)
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -708,13 +708,13 @@ MACHINE_CONFIG_START(champbas_state::exctsccr)
 	MCFG_SOUND_ADD("ay1", AY8910, 1940000) /* VR has a factory mark and this is the value read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
 
-	MCFG_SOUND_ADD("ay4", AY8910, XTAL_14_31818MHz/8)
+	MCFG_SOUND_ADD("ay4", AY8910, XTAL(14'318'181)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.08)
 
 	MCFG_SOUND_ADD("dac1", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
@@ -728,7 +728,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(champbas_state::exctsccrb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(exctsccrb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", champbas_state, vblank_irq)
 
@@ -742,10 +742,10 @@ MACHINE_CONFIG_START(champbas_state::exctsccrb)
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(champbas_state, mcu_start_w))
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(champbas_state, mcu_switch_w))
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'432'000)/6)
 	MCFG_CPU_PROGRAM_MAP(champbas_sound_map)
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_18_432MHz/6/8) // champbasj 8201 on pcb, though unused
+	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(18'432'000)/6/8) // champbasj 8201 on pcb, though unused
 	MCFG_QUANTUM_PERFECT_CPU("alpha_8201:mcu")
 
 	MCFG_WATCHDOG_ADD("watchdog")
@@ -770,7 +770,7 @@ MACHINE_CONFIG_START(champbas_state::exctsccrb)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(18'432'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 
 	MCFG_SOUND_ADD("dac", DAC_6BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7) // unknown DAC

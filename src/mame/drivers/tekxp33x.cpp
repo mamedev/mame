@@ -92,11 +92,11 @@ void tekxp330_state::machine_start()
 
 MACHINE_CONFIG_START(tekxp330_state::tekxp330)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3052, XTAL_20MHz) /* IDT 79R3052E, clock unknown */
+	MCFG_CPU_ADD("maincpu", R3052, XTAL(20'000'000)) /* IDT 79R3052E, clock unknown */
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
 
-	MCFG_CPU_ADD("tms", TMS34010, XTAL_40MHz) /* clock unknown */
+	MCFG_CPU_ADD("tms", TMS34010, XTAL(40'000'000)) /* clock unknown */
 	MCFG_CPU_PROGRAM_MAP(tms_map)
 
 	/* video hardware */

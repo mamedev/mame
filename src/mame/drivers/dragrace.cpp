@@ -285,7 +285,7 @@ void dragrace_state::machine_reset()
 MACHINE_CONFIG_START(dragrace_state::dragrace)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 12)
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(12'096'000) / 12)
 	MCFG_CPU_PROGRAM_MAP(dragrace_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(dragrace_state, irq0_line_hold,  4*60)
 

@@ -364,15 +364,15 @@ INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
 MACHINE_CONFIG_START(shougi_state::shougi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_10MHz/4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(10'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shougi_state, vblank_nmi)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_10MHz/4)
+	MCFG_CPU_ADD("sub", Z80, XTAL(10'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_IO_MAP(readport_sub)
 
-	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_10MHz/4/8)
+	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL(10'000'000)/4/8)
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // 0: sharedram = sub, 1: sharedram = main (TODO!)
@@ -402,7 +402,7 @@ MACHINE_CONFIG_START(shougi_state::shougi)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_10MHz/8)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(10'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

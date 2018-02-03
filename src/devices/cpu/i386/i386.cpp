@@ -269,8 +269,13 @@ void i386_device::i386_load_segment_descriptor(int segment )
 		m_sreg[segment].d = 0;
 		m_sreg[segment].valid = true;
 
-		if( segment == CS && !m_performed_intersegment_jump )
-			m_sreg[segment].base |= 0xfff00000;
+		if( segment == CS )
+		{
+			if( !m_performed_intersegment_jump )
+				m_sreg[segment].base |= 0xfff00000;
+			if(m_cpu_version < 0x5000)
+				m_sreg[segment].flags = 0x93;
+		}
 	}
 }
 
@@ -3739,12 +3744,12 @@ void i386_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x9b;
+	m_sreg[CS].flags    = 0x93;
 	m_sreg[CS].valid    = true;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 	m_sreg[DS].valid = m_sreg[ES].valid = m_sreg[FS].valid = m_sreg[GS].valid = m_sreg[SS].valid =true;
 
 	m_idtr.base = 0;
@@ -3854,7 +3859,7 @@ void i386_device::pentium_smi()
 	m_sreg[CS].selector = 0x3000; // pentium only, ppro sel = smbase >> 4
 	m_sreg[CS].base = m_smbase;
 	m_sreg[CS].limit = 0xffffffff;
-	m_sreg[CS].flags = 0x809b;
+	m_sreg[CS].flags = 0x8093;
 	m_sreg[CS].valid = true;
 	m_cr[4] = 0;
 	m_dr[7] = 0x400;
@@ -4035,11 +4040,11 @@ void i486_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -4101,11 +4106,11 @@ void pentium_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -4173,11 +4178,11 @@ void mediagx_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -4236,11 +4241,11 @@ void pentium_pro_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -4309,11 +4314,11 @@ void pentium_mmx_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -4380,11 +4385,11 @@ void pentium2_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -4445,11 +4450,11 @@ void pentium3_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -4512,11 +4517,11 @@ void pentium4_device::device_reset()
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
 	m_sreg[CS].limit    = 0xffff;
-	m_sreg[CS].flags    = 0x009b;
+	m_sreg[CS].flags    = 0x0093;
 
 	m_sreg[DS].base = m_sreg[ES].base = m_sreg[FS].base = m_sreg[GS].base = m_sreg[SS].base = 0x00000000;
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffff;
-	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0092;
+	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x0093;
 
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;

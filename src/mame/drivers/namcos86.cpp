@@ -337,9 +337,9 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, namcos86_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_WRITE(videoram1_w) AM_SHARE("videoram1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_WRITE(videoram2_w) AM_SHARE("videoram2")
 
-	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
-
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_WRITE(spriteram_w) AM_SHARE("spriteram")
+
+	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
 
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1050,15 +1050,15 @@ GFXDECODE_END
 MACHINE_CONFIG_START(namcos86_state::hopmappy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("cpu1", MC6809E, XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("cpu1", MC6809E, XTAL(49'152'000)/32)
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("cpu2", MC6809E, XTAL_49_152MHz/32)
+	MCFG_CPU_ADD("cpu2", MC6809E, XTAL(49'152'000)/32)
 	MCFG_CPU_PROGRAM_MAP(hopmappy_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL_49_152MHz/8)    /* or compatible 6808 with extra instructions */
+	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8)    /* or compatible 6808 with extra instructions */
 	MCFG_CPU_PROGRAM_MAP(hopmappy_mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos86_state,  irq0_line_hold)   /* ??? */
@@ -1069,7 +1069,7 @@ MACHINE_CONFIG_START(namcos86_state::hopmappy)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 3+8*8, 3+44*8, 264, 2*8, 30*8)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 3+8*8, 3+44*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(namcos86_state, screen_update)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(namcos86_state, screen_vblank))
 	MCFG_SCREEN_PALETTE("palette")
@@ -1085,7 +1085,7 @@ MACHINE_CONFIG_START(namcos86_state::hopmappy)
 	MCFG_SOUND_ROUTE(0, "mono", 0.0)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)   /* only right channel is connected */
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL_49_152MHz/2048)
+	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

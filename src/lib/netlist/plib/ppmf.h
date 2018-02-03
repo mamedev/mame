@@ -181,7 +181,19 @@ namespace plib {
 			function_ptr t = *reinterpret_cast<function_ptr *>(&m_func);
 			return (obj->*t)(std::forward<Targs>(args)...);
 		}
-		bool is_set() { return m_func != nullptr; }
+		bool is_set() {
+#if defined(_MSC_VER) || (defined (__INTEL_COMPILER) && defined (_M_X64))
+			int *p = reinterpret_cast<int *>(&m_func);
+			int *e = p + sizeof(generic_function) / sizeof(int);
+			for (; p < e; p++)
+				if (*p != 0)
+					return true;
+			
+			return false;
+#else
+			return m_func != nullptr;
+#endif
+		}
 	private:
 		generic_function m_func;
 #if 0 && defined(_MSC_VER)

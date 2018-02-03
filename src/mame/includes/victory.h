@@ -9,9 +9,9 @@
 #include "screen.h"
 
 
-#define VICTORY_MAIN_CPU_CLOCK      (XTAL_8MHz / 2)
+#define VICTORY_MAIN_CPU_CLOCK      (XTAL(8'000'000) / 2)
 
-#define VICTORY_PIXEL_CLOCK             (XTAL_11_289MHz / 2)
+#define VICTORY_PIXEL_CLOCK             (XTAL(11'289'000) / 2)
 #define VICTORY_HTOTAL                  (0x150)
 #define VICTORY_HBEND                       (0x000)
 #define VICTORY_HBSTART                 (0x100)

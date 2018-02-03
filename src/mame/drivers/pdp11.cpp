@@ -165,7 +165,7 @@ static ADDRESS_MAP_START(pdp11_mem, AS_PROGRAM, 16, pdp11_state)
 	AM_RANGE( 0xea00, 0xfeff ) AM_ROM
 	AM_RANGE( 0xff70, 0xff77 ) AM_READWRITE(teletype_ctrl_r,teletype_ctrl_w)
 
-	AM_RANGE( 0xfe78, 0xfe7b ) AM_DEVREADWRITE("rx01", rx01_device, read, write)
+	AM_RANGE( 0xfe78, 0xfe7b ) AM_DEVWRITE("rx01", rx01_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pdp11qb_mem, AS_PROGRAM, 16, pdp11_state)
@@ -351,7 +351,7 @@ void pdp11_state::kbd_put(u8 data)
 
 MACHINE_CONFIG_START(pdp11_state::pdp11)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
+	MCFG_CPU_ADD("maincpu",T11, XTAL(4'000'000)) // Need proper CPU here
 	MCFG_T11_INITIAL_MODE(6 << 13)
 	MCFG_CPU_PROGRAM_MAP(pdp11_mem)
 

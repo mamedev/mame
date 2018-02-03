@@ -496,10 +496,10 @@ static ADDRESS_MAP_START( rom8_64_map, AS_PROGRAM, 32, namcos11_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ptblank2ua_map, AS_PROGRAM, 32, namcos11_state )
+	AM_IMPORT_FROM(rom8_64_map)
+
 	AM_RANGE(0x1f780000, 0x1f78000f) AM_READ16(lightgun_r, 0xffffffff)
 	AM_RANGE(0x1f788000, 0x1f788003) AM_WRITE16(lightgun_w, 0xffffffff)
-
-	AM_IMPORT_FROM(rom8_64_map)
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( c76_map, AS_PROGRAM, 16, namcos11_state )
@@ -593,7 +593,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_adc_cb)
 }
 
 MACHINE_CONFIG_START(namcos11_state::coh110)
-	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
 	MCFG_CPU_PROGRAM_MAP( namcos11_map )
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -608,7 +608,7 @@ MACHINE_CONFIG_START(namcos11_state::coh110)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_irq2", namcos11_state, mcu_irq2_cb, attotime::from_hz(60))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("mcu_adc", namcos11_state, mcu_adc_cb, attotime::from_hz(60))
 
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -622,13 +622,13 @@ MACHINE_CONFIG_START(namcos11_state::coh110)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(namcos11_state::coh100, coh110)
-	MCFG_CPU_REPLACE( "maincpu", CXD8530AQ, XTAL_67_7376MHz )
+	MCFG_CPU_REPLACE( "maincpu", CXD8530AQ, XTAL(67'737'600) )
 	MCFG_CPU_PROGRAM_MAP( namcos11_map )
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8538Q, 0x200000, XTAL(53'693'175) )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(namcos11_state::tekken, coh100)

@@ -461,8 +461,8 @@ static ADDRESS_MAP_START( hikaru_map, AS_PROGRAM, 64, hikaru_state )
 	AM_RANGE(0x14000000, 0x140000ff) AM_NOP // Master/Slave COMM
 	AM_RANGE(0x14000100, 0x143fffff) AM_RAM // GPU command RAM
 	AM_RANGE(0x15000000, 0x150000ff) AM_NOP // GPU Regs
-	AM_RANGE(0x16001000, 0x163fffff) AM_RAM // ? \ these two overlap [selected by 040000xx = 0x04,0x06,0x40]
 	AM_RANGE(0x16010000, 0x17ffffff) AM_RAM // Slave Work RAM
+	AM_RANGE(0x16001000, 0x163fffff) AM_RAM // ? \ these two overlap [selected by 040000xx = 0x04,0x06,0x40]
 //  Area 6
 	AM_RANGE(0x18001000, 0x1800101f) AM_NOP // unknown
 	AM_RANGE(0x1a000000, 0x1a000107) AM_NOP // GPU Regs

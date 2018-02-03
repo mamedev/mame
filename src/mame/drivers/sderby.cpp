@@ -695,7 +695,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(sderby_state::shinygld)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) // verified
+	MCFG_CPU_ADD("maincpu", M68000, 24_MHz_XTAL / 2) // verified
 	MCFG_CPU_PROGRAM_MAP(shinygld_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sderby_state, irq4_line_hold)
 
@@ -714,7 +714,7 @@ MACHINE_CONFIG_START(sderby_state::shinygld)
 	MCFG_PALETTE_FORMAT(RRRRRGGGGGBBBBBx)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) /* clock frequency & pin 7 verified */
+	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH) /* clock frequency & pin 7 verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

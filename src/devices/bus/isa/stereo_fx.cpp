@@ -115,12 +115,12 @@ const tiny_rom_entry *stereo_fx_device::device_rom_region() const
 }
 
 MACHINE_CONFIG_START(stereo_fx_device::device_add_mconfig)
-	MCFG_CPU_ADD("stereo_fx_cpu", I80C31, XTAL_30MHz)
+	MCFG_CPU_ADD("stereo_fx_cpu", I80C31, XTAL(30'000'000))
 	MCFG_CPU_IO_MAP(stereo_fx_io)
 	MCFG_CPU_PROGRAM_MAP(stereo_fx_rom)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ym3812", YM3812, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym3812", YM3812, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 	/* no CM/S support (empty sockets) */

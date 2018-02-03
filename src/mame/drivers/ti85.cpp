@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( ti83p_io, AS_IO, 8, ti85_state )
 	AM_RANGE(0x0007, 0x0007) AM_READWRITE(ti86_port_0006_r, ti83p_port_0007_w )
 	AM_RANGE(0x0010, 0x0010) AM_DEVREADWRITE("t6a04", t6a04_device, control_read, control_write)
 	AM_RANGE(0x0011, 0x0011) AM_DEVREADWRITE("t6a04", t6a04_device, data_read, data_write)
-	AM_RANGE(0x0007, 0x0007) AM_WRITE(ti83p_port_0014_w )
+//  AM_RANGE(0x0014, 0x0014) AM_WRITE(ti83p_port_0014_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ti83pse_io, AS_IO, 8, ti85_state )

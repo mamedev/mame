@@ -26,7 +26,7 @@
 #define RS232B_TAG  "modem"
 
 // IIgs clocks as marked on the schematics
-#define APPLE2GS_28M  (XTAL_28_63636MHz) // IIGS master clock
+#define APPLE2GS_28M  (XTAL(28'636'363)) // IIGS master clock
 #define APPLE2GS_14M  (APPLE2GS_28M/2)
 #define APPLE2GS_7M   (APPLE2GS_28M/4)
 

@@ -68,10 +68,10 @@
 #define RS232A_TAG  "rs232a"
 #define RS232B_TAG  "rs232b"
 
-#define SCC_PCLK    XTAL_10MHz
-#define SCC_RXA_CLK XTAL_3_6864MHz // Needs verification
+#define SCC_PCLK    XTAL(10'000'000)
+#define SCC_RXA_CLK XTAL(3'686'400) // Needs verification
 #define SCC_TXA_CLK 0
-#define SCC_RXB_CLK XTAL_3_6864MHz // Needs verification
+#define SCC_RXB_CLK XTAL(3'686'400) // Needs verification
 #define SCC_TXB_CLK 0
 
 #define MCFG_IOC2_GUINNESS_ADD(_tag)  \
@@ -183,7 +183,7 @@ ioport_constructor ioc2_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_START(ioc2_device::device_add_mconfig)
-	MCFG_SCC85230_ADD(SCC_TAG, SCC_PCLK, SCC_RXA_CLK, SCC_TXA_CLK, SCC_RXB_CLK, SCC_TXB_CLK)
+	MCFG_SCC85230_ADD(SCC_TAG, SCC_PCLK, SCC_RXA_CLK.value(), SCC_TXA_CLK, SCC_RXB_CLK.value(), SCC_TXB_CLK)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_rts))

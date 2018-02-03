@@ -258,7 +258,7 @@ void gamecom_state::recompute_lcd_params()
 
 	H_timing = ((m_lch_reg & 0x1f) + 1) * 200/4;
 	V_timing = (m_lcv_reg & 0x1f);
-	pixel_clock = (XTAL_11_0592MHz / 2); // TODO: divisor actually settable
+	pixel_clock = (XTAL(11'059'200) / 2).value(); // TODO: divisor actually settable
 
 	rectangle visarea(0, 200-1, 0, 160-1); // TODO: check settings
 

@@ -871,16 +871,16 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 
 MACHINE_CONFIG_START(dectalk_state::dectalk)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* E74 20MHz OSC (/2) */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2) /* E74 20MHz OSC (/2) */
 	MCFG_CPU_PROGRAM_MAP(m68k_mem)
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_3_6864MHz) // MC2681 DUART ; Y3 3.6864MHz xtal */
+	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400)) // MC2681 DUART ; Y3 3.6864MHz xtal */
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(dectalk_state, duart_irq_handler))
 	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(dectalk_state, duart_txa))
 	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MC68681_INPORT_CALLBACK(READ8(dectalk_state, duart_input))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(dectalk_state, duart_output))
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL_20MHz) /* Y1 20MHz xtal */
+	MCFG_CPU_ADD("dsp", TMS32010, XTAL(20'000'000)) /* Y1 20MHz xtal */
 	MCFG_CPU_PROGRAM_MAP(tms32010_mem)
 	MCFG_CPU_IO_MAP(tms32010_io)
 	MCFG_TMS32010_BIO_IN_CB(READLINE(dectalk_state, spc_semaphore_r)) //read infifo-has-data-in-it fifo readable status

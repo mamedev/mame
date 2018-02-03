@@ -50,8 +50,8 @@ static ADDRESS_MAP_START(data_64x4, AS_DATA, 8, tms1k_base_device)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_32x4, AS_DATA, 8, tms1k_base_device)
-	AM_RANGE(0x08, 0x0f) AM_MIRROR(0x30) AM_NOP // override
 	AM_RANGE(0x00, 0x3f) AM_RAM
+	AM_RANGE(0x08, 0x0f) AM_MIRROR(0x30) AM_NOP // override
 ADDRESS_MAP_END
 
 

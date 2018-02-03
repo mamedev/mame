@@ -15,6 +15,9 @@ Other games known to be on this hardware (if ever finished):
 - Tiger Odds (c) The Game Room
 - one other unnamed/unfinished game
 
+Notes:
+- calchase: type boot to load game
+
 TODO:
 - get Win 98 to boot (most of Windows 98 copy is damaged inside current HDD dump);
 - Various graphics bugs (title screen uses ROZ?);
@@ -392,7 +395,7 @@ static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
 	AM_RANGE(0x000d0024, 0x000d0027) AM_DEVWRITE16("ldac", dac_word_interface, write, 0x0000ffff)
 	AM_RANGE(0x000d0028, 0x000d002b) AM_DEVWRITE16("rdac", dac_word_interface, write, 0x0000ffff)
 	AM_RANGE(0x000d0800, 0x000d0fff) AM_ROM AM_REGION("nvram",0) //
-	AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
+//  AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
 
 	//GRULL AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	//GRULL-AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
@@ -457,20 +460,47 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( calchase )
 	PORT_START("pc_keyboard_0")
 	PORT_BIT ( 0x0001, 0x0000, IPT_UNUSED )     /* unused scancode 0 */
-	AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
+//  AT_KEYB_HELPER( 0x0002, "Esc",          KEYCODE_Q           ) /* Esc                         01  81 */
+	// 0x0004, KEYCODE_0
+	// 0x0008, KEYCODE_1
+	// 0x0010, KEYCODE_2
+	// 0x0020, KEYCODE_3
+	// 0x0040, KEYCODE_4
+	// 0x0080, KEYCODE_5
+	// 0x0100, KEYCODE_6
+	// 0x0200, KEYCODE_7
+	// 0x0400, KEYCODE_8
+	// 0x0800, KEYCODE_9
+	// 0x1000, KEYCODE_MINUS
+	// 0x2000, KEYCODE_EQUAL
+	// 0x4000, KEYCODE_BACKSPACE
+	// 0x8000, KEYCODE_TAB
 
 	PORT_START("pc_keyboard_1")
+	// 0x0001, KEYCODE_Q
+	// 0x0002, KEYCODE_W
+	AT_KEYB_HELPER( 0x0004, "E",            KEYCODE_E           )
+	AT_KEYB_HELPER( 0x0008, "R",            KEYCODE_R           )
 	AT_KEYB_HELPER( 0x0010, "T",            KEYCODE_T           ) /* T                           14  94 */
 	AT_KEYB_HELPER( 0x0020, "Y",            KEYCODE_Y           ) /* Y                           15  95 */
+	// 0x0040, KEYCODE_U
+	AT_KEYB_HELPER( 0x0080, "I",            KEYCODE_I           )
 	AT_KEYB_HELPER( 0x0100, "O",            KEYCODE_O           ) /* O                           18  98 */
+	// 0x0200, KEYCODE_P
 	AT_KEYB_HELPER( 0x1000, "Enter",        KEYCODE_ENTER       ) /* Enter                       1C  9C */
+	AT_KEYB_HELPER( 0x4000, "A",            KEYCODE_A          )
+	AT_KEYB_HELPER( 0x8000, "S",            KEYCODE_S           )
 
 	PORT_START("pc_keyboard_2")
+	AT_KEYB_HELPER( 0x0001, "D",            KEYCODE_D           )
+	AT_KEYB_HELPER( 0x0002, "F",            KEYCODE_F           )
+
 
 	PORT_START("pc_keyboard_3")
 	AT_KEYB_HELPER( 0x0001, "B",            KEYCODE_B           ) /* B                           30  B0 */
 	AT_KEYB_HELPER( 0x0002, "N",            KEYCODE_N           ) /* N                           31  B1 */
-	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_S           ) /* F1                          3B  BB */
+	AT_KEYB_HELPER( 0x0200, "SPACE",        KEYCODE_SPACE       ) /* N                           31  B1 */
+	AT_KEYB_HELPER( 0x0800, "F1",           KEYCODE_F1          ) /* F1                          3B  BB */
 //  AT_KEYB_HELPER( 0x8000, "F5",           KEYCODE_F5          )
 
 	PORT_START("pc_keyboard_4")
@@ -478,14 +508,15 @@ static INPUT_PORTS_START( calchase )
 
 	PORT_START("pc_keyboard_5")
 
+
 	PORT_START("pc_keyboard_6")
 	AT_KEYB_HELPER( 0x0040, "(MF2)Cursor Up",       KEYCODE_UP          ) /* Up                          67  e7 */
 	AT_KEYB_HELPER( 0x0080, "(MF2)Page Up",         KEYCODE_PGUP        ) /* Page Up                     68  e8 */
 	AT_KEYB_HELPER( 0x0100, "(MF2)Cursor Left",     KEYCODE_LEFT        ) /* Left                        69  e9 */
-	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",        KEYCODE_RIGHT       ) /* Right                       6a  ea */
+	AT_KEYB_HELPER( 0x0200, "(MF2)Cursor Right",    KEYCODE_RIGHT       ) /* Right                       6a  ea */
 	AT_KEYB_HELPER( 0x0800, "(MF2)Cursor Down",     KEYCODE_DOWN        ) /* Down                        6c  ec */
 	AT_KEYB_HELPER( 0x1000, "(MF2)Page Down",       KEYCODE_PGDN        ) /* Page Down                   6d  ed */
-	AT_KEYB_HELPER( 0x4000, "Del",                      KEYCODE_A           ) /* Delete                      6f  ef */
+	AT_KEYB_HELPER( 0x4000, "Del",                  KEYCODE_DEL           ) /* Delete                      6f  ef */
 
 	PORT_START("pc_keyboard_7")
 

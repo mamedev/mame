@@ -1077,7 +1077,7 @@ MACHINE_CONFIG_START(stv_state::stv)
 	MCFG_SEGA_SCU_ADD("scu")
 	sega_scu_device::static_set_hostcpu(*device, "maincpu");
 
-	MCFG_SMPC_HLE_ADD("smpc", XTAL_4MHz)
+	MCFG_SMPC_HLE_ADD("smpc", XTAL(4'000'000))
 	smpc_hle_device::static_set_region_code(*device, 0);
 	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(stv_state, pdr1_input_r))
 	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(stv_state, pdr2_input_r))

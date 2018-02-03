@@ -214,6 +214,7 @@ protected:
 
 public:
 	static void set_bus_frequency(device_t &device, uint32_t bus_frequency) { downcast<ppc_device &>(device).c_bus_frequency = bus_frequency; }
+	static void set_bus_frequency(device_t &device, const XTAL &xtal) { set_bus_frequency(device, xtal.value()); }
 
 	void ppc_set_dcstore_callback(write32_delegate callback);
 

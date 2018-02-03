@@ -47,7 +47,7 @@ ioport_constructor spectrum_fuller_device::device_input_ports() const
 MACHINE_CONFIG_START(spectrum_fuller_device::device_add_mconfig)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8912", AY8912, XTAL_3_579545MHz / 2) // unverified clock
+	MCFG_SOUND_ADD("ay8912", AY8912, XTAL(3'579'545) / 2) // unverified clock
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* passthru */

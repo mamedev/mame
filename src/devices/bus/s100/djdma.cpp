@@ -77,7 +77,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(s100_djdma_device::device_add_mconfig)
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(djdma_mem)
 	MCFG_CPU_IO_MAP(djdma_io)
 MACHINE_CONFIG_END

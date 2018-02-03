@@ -216,7 +216,7 @@ void hpz80unk_state::machine_reset()
 
 MACHINE_CONFIG_START(hpz80unk_state::hpz80unk)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(hpz80unk_mem)
 	MCFG_CPU_IO_MAP(hpz80unk_io)
 

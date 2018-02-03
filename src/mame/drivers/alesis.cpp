@@ -155,6 +155,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mmt8_io, AS_IO, 8, alesis_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0xffff) AM_RAM     AM_SHARE("nvram")   // 2x32Kx8 SRAM, (battery-backed)
 	AM_RANGE(0xff02, 0xff02) AM_WRITE(track_led_w)
 	AM_RANGE(0xff04, 0xff04) AM_READWRITE(mmt8_led_r, mmt8_led_w)
 	AM_RANGE(0xff06, 0xff06) AM_WRITE(kb_matrix_w)
@@ -163,7 +164,6 @@ static ADDRESS_MAP_START(mmt8_io, AS_IO, 8, alesis_state)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(kb_r)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITENOP
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(mmt8_p3_r, mmt8_p3_w)
-	AM_RANGE(0x0000, 0xffff) AM_RAM     AM_SHARE("nvram")   // 2x32Kx8 SRAM, (battery-backed)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -357,7 +357,7 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 
 MACHINE_CONFIG_START(alesis_state::hr16)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8031, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu",I8031, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(hr16_mem)
 	MCFG_CPU_IO_MAP(hr16_io)
 
@@ -382,7 +382,7 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	MCFG_HD44780_LCD_SIZE(2, 16)
 
 	/* sound hardware */
-	MCFG_ALESIS_DM3AG_ADD("dm3ag", XTAL_12MHz/2)
+	MCFG_ALESIS_DM3AG_ADD("dm3ag", XTAL(12'000'000)/2)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END

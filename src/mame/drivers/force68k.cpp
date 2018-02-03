@@ -536,7 +536,7 @@ SLOT_INTERFACE_END
  */
 MACHINE_CONFIG_START(force68k_state::fccpu1)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68000, XTAL_16MHz / 2)
+	MCFG_CPU_ADD ("maincpu", M68000, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 
 	/* P3/Host Port config
@@ -568,7 +568,7 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 	MCFG_DEVICE_ADD ("aciaremt", ACIA6850, 0)
 
 	/* Bit Rate Generator */
-	MCFG_MC14411_ADD ("brg", XTAL_1_8432MHz)
+	MCFG_MC14411_ADD ("brg", XTAL(1'843'200))
 	MCFG_MC14411_F1_CB(WRITELINE (force68k_state, write_f1_clock))
 	MCFG_MC14411_F3_CB(WRITELINE (force68k_state, write_f3_clock))
 	MCFG_MC14411_F5_CB(WRITELINE (force68k_state, write_f5_clock))
@@ -580,10 +580,10 @@ MACHINE_CONFIG_START(force68k_state::fccpu1)
 	MCFG_MC14411_F15_CB(WRITELINE (force68k_state, write_f15_clock))
 
 	/* RTC Real Time Clock device */
-	MCFG_DEVICE_ADD ("rtc", MM58167, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD ("rtc", MM58167, XTAL(32'768))
 
 	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
-	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL_16MHz / 2)
+	MCFG_DEVICE_ADD ("pit", PIT68230, XTAL(16'000'000) / 2)
 	MCFG_PIT68230_PA_OUTPUT_CB (DEVWRITE8 ("cent_data_out", output_latch_device, write))
 	MCFG_PIT68230_H2_CB (DEVWRITELINE ("centronics", centronics_device, write_strobe))
 
@@ -608,27 +608,27 @@ MACHINE_CONFIG_END
        * such as an optional 68881 FPU
        */
 MACHINE_CONFIG_START (force68k_state::fccpu6)
-	MCFG_CPU_ADD ("maincpu", M68000, XTAL_8MHz)         /* Jumper B10 Mode B */
+	MCFG_CPU_ADD ("maincpu", M68000, XTAL(8'000'000))         /* Jumper B10 Mode B */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START (force68k_state::fccpu6a)
-	MCFG_CPU_ADD ("maincpu", M68000, XTAL_12_5MHz)        /* Jumper B10 Mode A */
+	MCFG_CPU_ADD ("maincpu", M68000, XTAL(12'500'000))        /* Jumper B10 Mode A */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START (force68k_state::fccpu6v)
-	MCFG_CPU_ADD ("maincpu", M68010, XTAL_8MHz)         /* Jumper B10 Mode B */
+	MCFG_CPU_ADD ("maincpu", M68010, XTAL(8'000'000))         /* Jumper B10 Mode B */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START (force68k_state::fccpu6va)
-	MCFG_CPU_ADD ("maincpu", M68010, XTAL_12_5MHz)        /* Jumper B10 Mode A */
+	MCFG_CPU_ADD ("maincpu", M68010, XTAL(12'500'000))        /* Jumper B10 Mode A */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START (force68k_state::fccpu6vb)
-	MCFG_CPU_ADD ("maincpu", M68010, XTAL_12_5MHz)        /* Jumper B10 Mode A */
+	MCFG_CPU_ADD ("maincpu", M68010, XTAL(12'500'000))        /* Jumper B10 Mode A */
 	MCFG_CPU_PROGRAM_MAP (force68k_mem)
 MACHINE_CONFIG_END
 #endif

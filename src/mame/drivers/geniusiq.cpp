@@ -148,87 +148,6 @@ PCB - German Version:
  +------+    +--------------------------------------+    +-----------------------------------+    +----------+
 
 
-IQ Unlimited - GERMAN:
-      +------------------------------------------------------------------------------+
-      |                                                                              |
-+-----+                                                                              |
-|                                                                                    |
-|                                                                                    |
-|                                                                                    |
-|  +----+                                                +---+                       |
-|  | A2 |                +----+                          |   |                       |
-|  |    |                | A4 |                          |A1 |        +-+            |
-|  +----+                +----+                          |   |        | |            |
-|                                                        |   |        +-+            |
-|                                                        |   |                       |
-|                                                        +---+                    +--+
-|                                                                                 |
-|                                                       +-------+                 |
-+--+                                                    |65C5L5K|            +----+
-   |                                                    | HC374 |            |
-+--+                         +----------+               +-------+            +--+
-|                            |DragonBall|                                       |
-| C         +----+           |EZ        |               +-------+             C |
-| A         | A3 |           |          |               |65C5L5K|             A |
-| R         +----+           |LSC414328P|               | HC374 |             R |
-| T                          |U16  IJ75C|               +-------+             T |
-| R                          | HHAV984S |                                     R |
-| I                          +----------+                                     I |
-| D  CARD 1 +------------+                                            CARD 0  D |
-| G         | AM29F0400  |                                                    G |
-| E         |            |     +------+                +--------+             E |
-|           +------------+     | LGS  |                |LHMN5KR7|               |
-| S                            |      |                |        |             S |
-| L                            |GM71C1|                |  1998  |             L |
-| O       GER                  |8163CJ|                |        |             O |
-| T       038                  |6     |                |27-06126|             T |
-|                              |      |                |-007    |               |
-+--+                           |      |                |        |            +--+
-   |                           |      |                |  VTECH |            |
-   |                           +------+                +--------+            |
-   |                                                   35-19600-200  703139-G|
-   +-------------------------------------------------------------------------+
-
-A1 = 98AHCLT / 27-05992-0-0 / VTech
-A2 = 9932 HBL / C807U-1442 / 35016B / Japan
-A3 = ACT139
-A4 = MAX232
-
-
-Leader 8008 CX (German version)
-
-+---+-----------+-----+-----------------------+-----+-----+-----+
-|   |SERIAL PORT|     |PARALLEL PORT (PRINTER)|     |MOUSE|     |
-|   +-----------+     +-----------------------+     +-----+     |
-|                                                               |
-|                                                               |
-|                                                               |
-|                                                               |
-|   +----+                                                      |
-|   | A0 |                                                      |
-|   +----+                                                      |
-|                                                               |
-|                                                               |
-|                                        +--------+             |
-|                                        |        |             |
-|                              CPU       | VTECH  |   +------+  |
-|                                        |LHMV5GNS|   |      |  |
-|                                        |        |   |GM76U8|  |
-|                                        |1999    |   |128CLF|  |
-|                                        |27-6393-|   |W85   |  |
-|       +-----------+                    |11      |   |      |  |
-|       |27-6296-0-0|                    |        |   |      |  |
-|       |47C241M NH7|                    |        |   +------+  |
-|       +-----------+                    +--------+             |
-|                                                               |
-|                                                               |
-|                                                               |
-|                                                               |
-+---------------------------------------------------------------+
-
-CPU = epoxy blob
-GM76U8128CLFW85 = LGS / Hynix 131,072 WORDS x 8 BIT CMOS SRAM
-TMP47C241MG = TCLS-47 series 4-bit CPU with 2048x8 internal ROM
 
 ****************************************************************************/
 
@@ -312,19 +231,6 @@ private:
 	} m_keyboard;
 };
 
-class gl8008cx_state : public driver_device
-{
-public:
-	gl8008cx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
-	{ }
-
-	required_device<cpu_device> m_maincpu;
-
-	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void gl8008cx(machine_config &config);
-};
 
 PALETTE_INIT_MEMBER(geniusiq_state, geniusiq)
 {
@@ -353,10 +259,6 @@ PALETTE_INIT_MEMBER(geniusiq_state, geniusiq)
 		palette.set_pen_color(i, palette_val[i*3], palette_val[i*3+1], palette_val[i*3+2]);
 }
 
-uint32_t gl8008cx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return 0;
-}
 
 uint32_t geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -511,10 +413,6 @@ INPUT_CHANGED_MEMBER( geniusiq_state::send_input )
 	queue_input(data);
 }
 
-static ADDRESS_MAP_START(gl8008cx_mem, AS_PROGRAM, 16, gl8008cx_state)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1FFFFF) AM_ROM
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(geniusiq_mem, AS_PROGRAM, 16, geniusiq_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -743,8 +641,6 @@ static INPUT_PORTS_START( geniusiq_de )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_1 )         PORT_CHAR('1')  PORT_CHAR('!')  PORT_CHANGED_MEMBER( DEVICE_SELF, geniusiq_state, send_input, 0x66 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( gl8008cx )
-INPUT_PORTS_END
 
 void geniusiq_state::machine_start()
 {
@@ -797,7 +693,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state,iq128_cart)
 
 MACHINE_CONFIG_START(geniusiq_state::iq128)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // The main crystal is at 32MHz, not sure whats the CPU freq
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // The main crystal is at 32MHz, not sure whats the CPU freq
 	MCFG_CPU_PROGRAM_MAP(geniusiq_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(geniusiq_state, irq6_line_hold,  125)  // the internal clock is increased by 1 sec every 125 interrupts
 
@@ -831,20 +727,6 @@ MACHINE_CONFIG_DERIVED(geniusiq_state::iqtv512, iq128)
 	MCFG_AMD_29F040_ADD("flash")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(gl8008cx_state::gl8008cx)
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // TODO wrong CPU and frequency
-	MCFG_CPU_PROGRAM_MAP(gl8008cx_mem)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER( gl8008cx_state, screen_update )
-MACHINE_CONFIG_END
-
 /* ROM definition */
 
 ROM_START( iq128 )
@@ -862,35 +744,9 @@ ROM_START( iqtv512 )
 	ROM_LOAD( "27-06171-000.bin", 0x0000, 0x200000, CRC(2597af70) SHA1(9db8151a84517407d380424410b6fa0003ceb1eb) )
 ROM_END
 
-ROM_START( gl8008cx )
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD( "27-6393-11.u1", 0x0000, 0x200000, CRC(fd49db46) SHA1(fc55bb31f42068f9d6cc8e2c2f419c3c4edb4fe6) )
-
-	ROM_REGION(0x800, "subcpu", 0)
-	ROM_LOAD( "27-6296-0-0.u3", 0x000, 0x800, NO_DUMP )
-ROM_END
-
-ROM_START( bs9009cx )
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD( "27-6603-01.u1", 0x0000, 0x200000, CRC(2c299f65) SHA1(44b37007a7c4087d7c2bd8c24907402bfe445ba4) )
-
-	ROM_REGION(0x800, "subcpu", 0)
-	ROM_LOAD( "mcu.u5", 0x000, 0x800, NO_DUMP )
-ROM_END
-
 ROM_START( itunlim )
 	ROM_REGION(0x200000, "maincpu", 0)
 	ROM_LOAD( "27-06124-002.u3", 0x000000, 0x200000, CRC(0c0753ce) SHA1(d22504d583ca8d6a9d2f56fbaa3e1d52c442a1e9) )
-ROM_END
-
-ROM_START( iqunlim )
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD16_WORD_SWAP( "27-06126-007.bin", 0x000000, 0x200000, CRC(af38c743) SHA1(5b91748536905812e6de7145638699acb375865a) )
-ROM_END
-
-ROM_START( glmmc )
-	ROM_REGION(0x200000, "maincpu", 0)
-	ROM_LOAD( "27-5889-00.bin", 0x000000, 0x080000, CRC(5e2c6359) SHA1(cc01c7bd5c87224b63dd1044db5a36a5cb7824f1) )
 ROM_END
 
 /* Driver */
@@ -899,8 +755,4 @@ ROM_END
 COMP( 1997, iq128,      0,      0,      iq128,     geniusiq_de, geniusiq_state, 0,    "Video Technology", "Genius IQ 128 (Germany)",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 1997, iq128_fr,   iq128,  0,      iq128,     geniusiq,    geniusiq_state, 0,    "Video Technology", "Genius IQ 128 (France)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 1998, iqtv512,    0,      0,      iqtv512,   geniusiq_de, geniusiq_state, 0,    "Video Technology", "Genius IQ TV 512 (Germany)",                MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1999, gl8008cx,   0,      0,      gl8008cx,  gl8008cx,    gl8008cx_state, 0,    "Video Technology", "Genius Leader 8008 CX (Germany)",           MACHINE_IS_SKELETON)
-COMP( 1999, bs9009cx,   0,      0,      gl8008cx,  gl8008cx,    gl8008cx_state, 0,    "Video Technology", "BrainStation 9009 CXL (Germany)",           MACHINE_IS_SKELETON)
 COMP( 1998, itunlim,    0,      0,      iq128,     geniusiq_de, geniusiq_state, 0,    "Video Technology", "VTech IT Unlimited (UK)",                   MACHINE_NO_SOUND)
-COMP( 19??, iqunlim,    0,      0,      iq128,     geniusiq_de, geniusiq_state, 0,    "Video Technology", "VTech IQ Unlimited (Germany)",              MACHINE_IS_SKELETON)
-COMP( 19??, glmmc,      0,      0,      iq128,     geniusiq_de, geniusiq_state, 0,    "Video Technology", "Genius Leader Master Mega Color (Germany)", MACHINE_IS_SKELETON)

@@ -51,7 +51,7 @@ OSC @ 72.576MHz
 #include "machine/at29x.h"
 #include "screen.h"
 
-#define MAIN_CLOCK XTAL_72_576MHz
+#define MAIN_CLOCK XTAL(72'576'000)
 
 class cmmb_state : public driver_device
 {
@@ -200,10 +200,10 @@ static ADDRESS_MAP_START( cmmb_map, AS_PROGRAM, 8, cmmb_state )
 	//AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w)
 	//AM_RANGE(0x4900, 0x4900) AM_READ(kludge_r)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 	AM_RANGE(0xa000, 0xafff) AM_RAM
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(cmmb_charram_r,cmmb_charram_w)
 	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(cmmb_input_r,cmmb_output_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM
 	// debugging, to be removed
 	AM_RANGE(0x2aaa, 0x2aaa) AM_WRITE(flash_dbg_0_w)
 	AM_RANGE(0x5555, 0x5555) AM_WRITE(flash_dbg_1_w)

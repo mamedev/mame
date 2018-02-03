@@ -377,6 +377,7 @@ WRITE8_MEMBER(spy_state::k052109_051960_w)
 static ADDRESS_MAP_START( spy_map, AS_PROGRAM, 8, spy_state )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(spy_bankedram1_r, spy_bankedram1_w) AM_SHARE("ram")
 	AM_RANGE(0x0800, 0x1aff) AM_RAM
+	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x3f90, 0x3f90) AM_WRITE(spy_3f90_w)
 	AM_RANGE(0x3fa0, 0x3fa0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
@@ -387,7 +388,6 @@ static ADDRESS_MAP_START( spy_map, AS_PROGRAM, 8, spy_state )
 	AM_RANGE(0x3fd2, 0x3fd2) AM_READ_PORT("P2")
 	AM_RANGE(0x3fd3, 0x3fd3) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3fe0, 0x3fe0) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -495,11 +495,11 @@ void spy_state::machine_reset()
 MACHINE_CONFIG_START(spy_state::spy)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_24MHz / 8) // 3 MHz? (divided by 051961)
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(24'000'000) / 8) // 3 MHz? (divided by 051961)
 	MCFG_CPU_PROGRAM_MAP(spy_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spy_state,  spy_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(spy_sound_map) /* nmi by the sound chip */
 
 	MCFG_WATCHDOG_ADD("watchdog")

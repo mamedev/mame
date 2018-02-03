@@ -734,7 +734,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(prestige_state::irq_timer)
 
 MACHINE_CONFIG_START(prestige_state::prestige_base)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz)  // Z84C008
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(8'000'000))  // Z84C008
 	MCFG_CPU_PROGRAM_MAP(prestige_mem)
 	MCFG_CPU_IO_MAP(prestige_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(prestige_state,prestige_int_ack)

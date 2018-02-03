@@ -185,8 +185,8 @@ READ8_MEMBER(baraduke_state::soundkludge_r)
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, baraduke_state )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE("mcu", hd63701_cpu_device, m6801_io_r,m6801_io_w)/* internal registers */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM                             /* built in RAM */
-	AM_RANGE(0x1105, 0x1105) AM_READ(soundkludge_r)             /* cures speech */
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namco_cus30_device, namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
+	AM_RANGE(0x1105, 0x1105) AM_READ(soundkludge_r)             /* cures speech */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM                             /* MCU external ROM */
 	AM_RANGE(0x8000, 0x8000) AM_WRITENOP                        /* watchdog reset? */
 	AM_RANGE(0x8800, 0x8800) AM_WRITENOP                        /* irq acknoledge? */
@@ -373,11 +373,11 @@ GFXDECODE_END
 MACHINE_CONFIG_START(baraduke_state::baraduke)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", MC6809E, XTAL_49_152MHz/32) // 68A09E
+	MCFG_CPU_ADD("maincpu", MC6809E, XTAL(49'152'000)/32) // 68A09E
 	MCFG_CPU_PROGRAM_MAP(baraduke_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", baraduke_state,  irq0_line_assert)
 
-	MCFG_CPU_ADD("mcu", HD63701, XTAL_49_152MHz/8)
+	MCFG_CPU_ADD("mcu", HD63701, XTAL(49'152'000)/8)
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_port_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", baraduke_state,  irq0_line_hold)
@@ -388,7 +388,7 @@ MACHINE_CONFIG_START(baraduke_state::baraduke)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_49_152MHz/8, 384, 0, 36*8, 264, 2*8, 30*8)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(49'152'000)/8, 384, 0, 36*8, 264, 2*8, 30*8)
 	MCFG_SCREEN_UPDATE_DRIVER(baraduke_state, screen_update_baraduke)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(baraduke_state, screen_vblank_baraduke))
 	MCFG_SCREEN_PALETTE("palette")
@@ -400,7 +400,7 @@ MACHINE_CONFIG_START(baraduke_state::baraduke)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL_49_152MHz/2048)
+	MCFG_SOUND_ADD("namco", NAMCO_CUS30, XTAL(49'152'000)/2048)
 	MCFG_NAMCO_AUDIO_VOICES(8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

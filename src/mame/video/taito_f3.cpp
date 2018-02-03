@@ -82,7 +82,8 @@ Line ram memory map:
     0x5000: Clip plane 0 (low bits)
     0x5200: Clip plane 1 (low bits)
     0x5400: Unused?
-    0x5600: Unused?
+    0x5600: Used by quizhuhu (taito logo and ingame text), and landmakr (winning text),
+            special clip used in tandem with b*00 bit 11? [unemulated]
 
     0x6000: Sync register
     0x6004: Sprite alpha control
@@ -668,8 +669,6 @@ VIDEO_START_MEMBER(taito_f3_state,f3)
 	m_gfxdecode->gfx(0)->set_source((uint8_t *)m_f3_vram.get());
 	m_gfxdecode->gfx(3)->set_source((uint8_t *)m_f3_pivot_ram.get());
 
-	m_f3_skip_this_frame=0;
-
 	m_sprite_lag=m_f3_game_config->sprite_lag;
 
 	init_alpha_blend_func();
@@ -830,12 +829,17 @@ READ16_MEMBER(taito_f3_state::f3_lineram_r)
 
 WRITE16_MEMBER(taito_f3_state::f3_lineram_w)
 {
+	#ifdef UNUSED_FUNCTION
 	/* DariusGX has an interesting bug at the start of Round D - the clearing of lineram
 	(0xa000->0x0xa7ff) overflows into priority RAM (0xb000) and creates garbage priority
 	values.  I'm not sure what the real machine would do with these values, and this
 	emulation certainly doesn't like it, so I've chosen to catch the bug here, and prevent
 	the trashing of priority ram.  If anyone has information on what the real machine does,
 	please let me know! */
+	/* Update: this doesn't seem to occur anymore, I'll leave this snippet in but commented out.
+	 *         fwiw PC=0x1768a0/0x1768a4 is where the game clears lineram in round D, which is a
+	 *         move.w Dn, (An,D7.w*2) , a kind of opcode that could've been bugged back then.
+	 */
 	if (m_f3_game==DARIUSG) {
 		if (m_f3_skip_this_frame)
 			return;
@@ -844,6 +848,7 @@ WRITE16_MEMBER(taito_f3_state::f3_lineram_w)
 			return;
 		}
 	}
+	#endif
 
 	COMBINE_DATA(&m_f3_line_ram[offset]);
 }
@@ -3147,7 +3152,6 @@ uint32_t taito_f3_state::screen_update_f3(screen_device &screen, bitmap_rgb32 &b
 {
 	uint32_t sy_fix[5],sx_fix[5];
 
-	m_f3_skip_this_frame=0;
 	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	/* Setup scroll */

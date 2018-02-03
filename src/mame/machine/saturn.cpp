@@ -377,9 +377,7 @@ WRITE_LINE_MEMBER(saturn_state::system_halt_w)
 
 WRITE_LINE_MEMBER(saturn_state::dot_select_w)
 {
-	uint32_t xtal;
-
-	xtal = state ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
+	const XTAL &xtal = state ? MASTER_CLOCK_320 : MASTER_CLOCK_352;
 
 	machine().device("maincpu")->set_unscaled_clock(xtal/2);
 	machine().device("slave")->set_unscaled_clock(xtal/2);

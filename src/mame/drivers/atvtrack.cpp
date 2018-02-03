@@ -550,7 +550,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( atvtrack )
 INPUT_PORTS_END
 
-#define ATV_CPU_CLOCK XTAL_33MHz*6
+#define ATV_CPU_CLOCK XTAL(33'000'000)*6
 
 MACHINE_CONFIG_START(atvtrack_state::atvtrack)
 	/* basic machine hardware */

@@ -648,8 +648,8 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE8(equites_fg_videoram_r, equites_fg_videoram_w, 0x00ff)
 	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x0c0200, 0x0c0fff) AM_RAM
-	AM_RANGE(0x100000, 0x100001) AM_READ(equites_spriteram_kludge_r)
 	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x100000, 0x100001) AM_READ(equites_spriteram_kludge_r)
 	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE8(mcu_ram_r, mcu_ram_w, 0x00ff)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x180000, 0x180001) AM_SELECT(0x03c000) AM_DEVWRITE8_MOD("mainlatch", ls259_device, write_a3, rshift<13>, 0xff00)
@@ -659,9 +659,9 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gekisou_map, AS_PROGRAM, 16, equites_state )
+	AM_IMPORT_FROM( equites_map )
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram") // mainram is battery-backed
 	AM_RANGE(0x580000, 0x580001) AM_SELECT(0x020000) AM_WRITE(gekisou_unknown_bit_w)
-	AM_IMPORT_FROM( equites_map )
 ADDRESS_MAP_END
 
 
@@ -1030,7 +1030,7 @@ static const char *const alphamc07_sample_names[] =
 // the sound board is the same in all games
 MACHINE_CONFIG_START(equites_state::common_sound)
 
-	MCFG_CPU_ADD("audiocpu", I8085A, XTAL_6_144MHz) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", I8085A, 6.144_MHz_XTAL) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_I8085A_CLK_OUT_DEVICE("audio8155")
@@ -1061,7 +1061,7 @@ MACHINE_CONFIG_START(equites_state::common_sound)
 	MCFG_SOUND_ROUTE(9, "speaker", 1.0)        // pin 2 SOLO 16' (this actually feeds an analog section)
 	MCFG_SOUND_ROUTE(10,"speaker", 0.12)       // pin 22 Noise Output (this actually feeds an analog section)
 
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_6_144MHz/4) /* verified on pcb */
+	MCFG_SOUND_ADD("aysnd", AY8910, 6.144_MHz_XTAL/4) /* verified on pcb */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(equites_state, equites_8910porta_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(equites_state, equites_8910portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
@@ -1130,7 +1130,7 @@ void equites_state::machine_reset()
 MACHINE_CONFIG_START(equites_state::equites)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, 12_MHz_XTAL/4) /* 68000P8 running at 3mhz! verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(equites_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, equites_scanline, "screen", 0, 1)
 
@@ -1180,7 +1180,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(equites_state::splndrbt)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, 24_MHz_XTAL/4) /* 68000P8 running at 6mhz, verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(splndrbt_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", equites_state, splndrbt_scanline, "screen", 0, 1)
 

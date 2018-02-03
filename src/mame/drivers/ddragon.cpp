@@ -65,8 +65,8 @@ Dip locations verified with manual for ddragon & ddragon2
 #include "speaker.h"
 
 
-#define MAIN_CLOCK      XTAL_12MHz
-#define SOUND_CLOCK     XTAL_3_579545MHz
+#define MAIN_CLOCK      XTAL(12'000'000)
+#define SOUND_CLOCK     XTAL(3'579'545)
 #define MCU_CLOCK       MAIN_CLOCK / 3
 #define PIXEL_CLOCK     MAIN_CLOCK / 2
 
@@ -542,7 +542,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(ddragon_hd63701_internal_registers_r, ddragon_hd63701_internal_registers_w)
-	AM_RANGE(0x001f, 0x0fff) AM_RAM
+	AM_RANGE(0x0020, 0x0fff) AM_RAM
 	AM_RANGE(0x8000, 0x81ff) AM_RAM AM_SHARE("comram")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -1108,7 +1108,7 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(darktowr_state::darktowr, ddragon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL_4MHz)
+	MCFG_CPU_ADD("mcu", M68705P3, XTAL(4'000'000))
 	MCFG_M68705_PORTA_W_CB(WRITE8(darktowr_state, mcu_port_a_w))
 
 	/* video hardware */

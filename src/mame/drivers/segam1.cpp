@@ -207,8 +207,8 @@ static ADDRESS_MAP_START( segam1_sound_map, AS_PROGRAM, 8, segam1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( unkm1_sound_map, AS_PROGRAM, 8, segam1_state )
-	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_IMPORT_FROM(segam1_sound_map)
+	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( segam1_sound_io_map, AS_IO, 8, segam1_state )
@@ -338,7 +338,7 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_START(segam1_state::segam1)
 
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(segam1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segam1_state, irq4_line_hold)
 

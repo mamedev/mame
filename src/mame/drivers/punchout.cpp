@@ -236,10 +236,10 @@ WRITE8_MEMBER(punchout_state::spunchout_rp5h01_clock_w)
 }
 
 static ADDRESS_MAP_START( spnchout_io_map, AS_IO, 8, punchout_state )
+	AM_IMPORT_FROM( punchout_io_map )
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0xf0) AM_WRITE(spunchout_rp5h01_reset_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xf0) AM_WRITE(spunchout_rp5h01_clock_w)
 	AM_RANGE(0x07, 0x07) AM_SELECT(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w) // protection ports
-	AM_IMPORT_FROM( punchout_io_map )
 ADDRESS_MAP_END
 
 // 2A03 (sound)
@@ -617,7 +617,7 @@ MACHINE_RESET_MEMBER(punchout_state, spnchout)
 MACHINE_CONFIG_START(punchout_state::punchout)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(punchout_map)
 	MCFG_CPU_IO_MAP(punchout_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("top", punchout_state, vblank_irq)

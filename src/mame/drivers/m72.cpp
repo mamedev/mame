@@ -198,8 +198,8 @@ other supported games as well.
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_32MHz
-#define SOUND_CLOCK         XTAL_3_579545MHz
+#define MASTER_CLOCK        XTAL(32'000'000)
+#define SOUND_CLOCK         XTAL(3'579'545)
 
 
 
@@ -1892,7 +1892,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(m72_state::m72_8751, m72_base)
 
-	MCFG_CPU_ADD("mcu",I8751, XTAL_8MHz) /* Uses its own XTAL */
+	MCFG_CPU_ADD("mcu",I8751, XTAL(8'000'000)) /* Uses its own XTAL */
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
 MACHINE_CONFIG_END

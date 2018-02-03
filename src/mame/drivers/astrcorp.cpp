@@ -489,7 +489,7 @@ static const uint16_t showhand_default_eeprom[15] =   {0x0001,0x0007,0x000a,0x00
 TODO: understand if later hardware uses different parameters (XTAL is almost surely NOT 20 MHz so ...). Also, weirdly enough, there's an unused
 6x PAL XTAL according to notes, but VSync = 58,85 Hz?
 */
-#define ASTROCORP_PIXEL_CLOCK XTAL_20MHz/2
+#define ASTROCORP_PIXEL_CLOCK XTAL(20'000'000)/2
 #define ASTROCORP_HTOTAL 651
 #define ASTROCORP_HBEND 0
 //#define ASTROCORP_HBSTART 320
@@ -500,7 +500,7 @@ TODO: understand if later hardware uses different parameters (XTAL is almost sur
 MACHINE_CONFIG_START(astrocorp_state::showhand)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(20'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(showhand_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", astrocorp_state,  irq4_line_hold)
 
@@ -527,7 +527,7 @@ MACHINE_CONFIG_START(astrocorp_state::showhand)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_20MHz/20, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000)/20, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -552,7 +552,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::skilldrp_scanline)
 MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) // JX-1689F1028N GRX586.V5
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000) / 2) // JX-1689F1028N GRX586.V5
 	MCFG_CPU_PROGRAM_MAP(skilldrp_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", astrocorp_state, skilldrp_scanline, "screen", 0, 1)
 
@@ -581,7 +581,7 @@ MACHINE_CONFIG_START(astrocorp_state::skilldrp)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/24, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/24, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

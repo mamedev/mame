@@ -73,32 +73,32 @@ static ADDRESS_MAP_START(tms7002_mem, AS_PROGRAM, 8, tms7000_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0) // 2kB internal ROM
 	AM_IMPORT_FROM( tms7000_mem )
+	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0) // 2kB internal ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms7040_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0) // 4kB internal ROM
 	AM_IMPORT_FROM( tms7000_mem )
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0) // 4kB internal ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms7041_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0)
 	AM_IMPORT_FROM( tms7001_mem )
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms7042_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0)
 	AM_IMPORT_FROM( tms7002_mem )
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms70c46_mem, AS_PROGRAM, 8, tms70c46_device )
+	AM_IMPORT_FROM( tms7040_mem )
 	AM_RANGE(0x010c, 0x010c) AM_READWRITE(e_bus_data_r, e_bus_data_w)
 	AM_RANGE(0x010d, 0x010d) AM_NOP // ? always writes $FF before checking keyboard... maybe INT3 ack?
 	AM_RANGE(0x010e, 0x010e) AM_READWRITE(dockbus_data_r, dockbus_data_w)
 	AM_RANGE(0x010f, 0x010f) AM_READWRITE(dockbus_status_r, dockbus_status_w)
 	AM_RANGE(0x0118, 0x0118) AM_READWRITE(control_r, control_w)
-	AM_IMPORT_FROM( tms7040_mem )
 ADDRESS_MAP_END
 
 

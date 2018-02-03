@@ -287,11 +287,11 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stfight_cpu1_map, AS_PROGRAM, 8, stfight_state )
+	AM_IMPORT_FROM(cpu1_map)
 	AM_RANGE(0xc807, 0xc807) AM_DEVWRITE("stfight_vid", stfight_video_device, stfight_sprite_bank_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("stfight_vid", stfight_video_device, stfight_text_char_w) AM_SHARE("txram")
 	AM_RANGE(0xd800, 0xd808) AM_RAM_DEVWRITE("stfight_vid", stfight_video_device, stfight_vh_latch_w) AM_SHARE("vregs")
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("sprite_ram")
-	AM_IMPORT_FROM(cpu1_map)
 ADDRESS_MAP_END
 
 
@@ -301,12 +301,12 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cshooter_cpu1_map, AS_PROGRAM, 8, stfight_state )
+	AM_IMPORT_FROM(cpu1_map)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(stfight_bank_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device, txram_w) AM_SHARE("txram")
 	AM_RANGE(0xd800, 0xd80f) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device, vregs_w) AM_SHARE("vregs") // wrong?
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("sprite_ram")
-	AM_IMPORT_FROM(cpu1_map)
 ADDRESS_MAP_END
 
 
@@ -451,15 +451,15 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(stfight_state::stfight_base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("stfight_vid:screen", stfight_state,  stfight_vb_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz / 4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(stfight_state, irq0_line_hold, 120)
 
-	MCFG_CPU_ADD("mcu", M68705P5, XTAL_12MHz / 4)
+	MCFG_CPU_ADD("mcu", M68705P5, XTAL(12'000'000) / 4)
 	MCFG_M68705_PORTB_R_CB(READ8(stfight_state, stfight_68705_port_b_r));
 	MCFG_M68705_PORTA_W_CB(WRITE8(stfight_state, stfight_68705_port_a_w));
 	MCFG_M68705_PORTB_W_CB(WRITE8(stfight_state, stfight_68705_port_b_w));
@@ -474,19 +474,19 @@ MACHINE_CONFIG_START(stfight_state::stfight_base)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// YM2203_PITCH_HACK - These should be clocked at 1.5Mhz (see TODO list)
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8 * 3)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(12'000'000) / 8 * 3)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz / 8 * 3)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(12'000'000) / 8 * 3)
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
 	MCFG_SOUND_ROUTE(1, "mono", 0.15)
 	MCFG_SOUND_ROUTE(2, "mono", 0.15)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(stfight_state, stfight_adpcm_int)) // Interrupt function
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  // 8KHz, 4-bit
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

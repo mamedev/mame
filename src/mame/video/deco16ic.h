@@ -14,6 +14,10 @@
 #pragma once
 
 
+#define DECO_32x32  0
+#define DECO_64x32  1
+#define DECO_32x64  2
+#define DECO_64x64  3
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -34,7 +38,8 @@ public:
 	static void set_bank1_callback(device_t &device, deco16_bank_cb_delegate callback) { downcast<deco16ic_device &>(device).m_bank1_cb = callback; }
 	static void set_bank2_callback(device_t &device, deco16_bank_cb_delegate callback) { downcast<deco16ic_device &>(device).m_bank2_cb = callback; }
 	static void set_split(device_t &device, int split) { downcast<deco16ic_device &>(device).m_split = split; }
-	static void set_full_width(device_t &device, int width) { downcast<deco16ic_device &>(device).m_tilemapsizes = width; }
+	static void set_pf1_size(device_t &device, int size) { downcast<deco16ic_device &>(device).m_pf1_size = size; }
+	static void set_pf2_size(device_t &device, int size) { downcast<deco16ic_device &>(device).m_pf2_size = size; }
 	static void set_pf1_trans_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf1_trans_mask = mask; }
 	static void set_pf2_trans_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf2_trans_mask = mask; }
 	static void set_pf1_col_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf1_colourmask = mask; }
@@ -142,7 +147,8 @@ private:
 	int m_pf1_8bpp_mode;
 
 	int m_split;
-	int m_tilemapsizes;
+	int m_pf1_size;
+	int m_pf2_size;
 	int m_pf1_trans_mask, m_pf2_trans_mask;
 	int m_pf1_colour_bank, m_pf2_colour_bank;
 	int m_pf1_colourmask, m_pf2_colourmask;
@@ -175,8 +181,11 @@ DECLARE_DEVICE_TYPE(DECO16IC, deco16ic_device)
 #define MCFG_DECO16IC_SPLIT(_split) \
 	deco16ic_device::set_split(*device, _split);
 
-#define MCFG_DECO16IC_WIDTH12(_width) \
-	deco16ic_device::set_full_width(*device, _width);
+#define MCFG_DECO16IC_PF1_SIZE(_size) \
+	deco16ic_device::set_pf1_size(*device, _size);
+
+#define MCFG_DECO16IC_PF2_SIZE(_size) \
+	deco16ic_device::set_pf2_size(*device, _size);
 
 #define MCFG_DECO16IC_PF1_TRANS_MASK(_mask) \
 	deco16ic_device::set_pf1_trans_mask(*device, _mask);

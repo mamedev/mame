@@ -65,10 +65,9 @@ static ADDRESS_MAP_START( ertictac_map, AS_PROGRAM, 32, ertictac_state )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
+	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
 	AM_RANGE(0x03340000, 0x0334001f) AM_READ(ertictac_podule_r)
 	AM_RANGE(0x033c0000, 0x033c001f) AM_READ(ertictac_podule_r)
-
-	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
 	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE(archimedes_vidc_r, archimedes_vidc_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
 	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_memc_page_w)
@@ -221,17 +220,17 @@ INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
 
 MACHINE_CONFIG_START(ertictac_state::ertictac)
 
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_24MHz/3) /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(24'000'000)/3) /* guess, 12MHz 8MHz or 6MHz, what's the correct divider 2, 3 or 4? */
 	MCFG_CPU_PROGRAM_MAP(ertictac_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ertictac_state, ertictac_podule_irq, 60) // FIXME: timing of this
 
 	MCFG_I2CMEM_ADD("i2cmem")
 	MCFG_I2CMEM_PAGE_SIZE(NVRAM_PAGE_SIZE)
 	MCFG_I2CMEM_DATA_SIZE(NVRAM_SIZE)
-//  MCFG_AAKART_ADD("kart", XTAL_24MHz/3) // TODO: frequency
+//  MCFG_AAKART_ADD("kart", XTAL(24'000'000)/3) // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz,1024,0,735,624/2,0,292) // RiscOS 3 default screen settings
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000),1024,0,735,624/2,0,292) // RiscOS 3 default screen settings
 	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x200)

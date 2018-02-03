@@ -38,7 +38,7 @@
 
 #include "logmacro.h"
 
-#define MAIN_CLOCK           XTAL_4MHz
+#define MAIN_CLOCK           XTAL(4'000'000)
 #define VIDEO_CLOCK          MAIN_CLOCK / 8     /* 1.75 Mhz */
 #define CPU_CLOCK            MAIN_CLOCK / 4     /* 1 Mhz */
 
@@ -197,7 +197,7 @@ static ADDRESS_MAP_START(goupil_g2_mem, AS_PROGRAM, 8, goupil_g2_state)
 
 	AM_RANGE(0xE8F0,0xE8FF) AM_DEVREADWRITE("fd1791", fd1791_device, read, write)
 	AM_RANGE(0xEC00,0xF3FF) AM_READWRITE(visu24x80_ram_r, visu24x80_ram_w)
-	AM_RANGE(0xF000,0xF7FF) AM_ROM AM_REGION("maincpu", 0xF000) // Monitor (MON 1)
+	AM_RANGE(0xF400,0xF7FF) AM_ROM AM_REGION("maincpu", 0xF400) // Monitor (MON 1)
 	AM_RANGE(0xF800,0xFFFF) AM_ROM AM_REGION("maincpu", 0xF800) // Monitor (MON 2)
 ADDRESS_MAP_END
 
@@ -566,7 +566,7 @@ MACHINE_CONFIG_START(goupil_g1_state::goupil_g1)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
 	/* Floppy */
-	MCFG_FD1791_ADD("fd1791", XTAL_8MHz )
+	MCFG_FD1791_ADD("fd1791", XTAL(8'000'000) )
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:0", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:1", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 
@@ -611,7 +611,7 @@ MACHINE_CONFIG_START(goupil_g2_state::goupil_g2)
 	MCFG_SCREEN_VISIBLE_AREA(0, (80*8)-1, 0, (24*(8+4))-1)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_14_31818MHz/8)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(14'318'181)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(goupil_g2_state, crtc_update_row)
@@ -629,7 +629,7 @@ MACHINE_CONFIG_START(goupil_g2_state::goupil_g2)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6808_IRQ_LINE))
 
 	/* Floppy */
-	MCFG_FD1791_ADD("fd1791", XTAL_8MHz )
+	MCFG_FD1791_ADD("fd1791", XTAL(8'000'000) )
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:0", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fd1791:1", goupil_floppies, "525qd", floppy_image_device::default_floppy_formats)
 

@@ -55,8 +55,6 @@ a2bus_sam_device::a2bus_sam_device(const machine_config &mconfig, const char *ta
 
 void a2bus_sam_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
 }
 
 void a2bus_sam_device::device_reset()

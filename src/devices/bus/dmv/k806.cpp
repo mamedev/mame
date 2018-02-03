@@ -101,7 +101,7 @@ void dmv_k806_device::device_reset()
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(dmv_k806_device::device_add_mconfig)
-	MCFG_CPU_ADD("mcu", I8741, XTAL_6MHz)
+	MCFG_CPU_ADD("mcu", I8741, XTAL(6'000'000))
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(dmv_k806_device, port1_r))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(dmv_k806_device, port2_w))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(dmv_k806_device, portt1_r))

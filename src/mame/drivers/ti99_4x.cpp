@@ -240,11 +240,11 @@ ADDRESS_MAP_END
     Write:0000 - 01ff corresponds to bit 0 of base address 0000 - 03fe
 */
 static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti99_4x_state)
-	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0x003c) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 	AM_RANGE(0x0000, 0x01ff) AM_READ(cruread)
+	AM_RANGE(0x0000, 0x0003) AM_MIRROR(0x003c) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 
-	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0x01e0) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(cruwrite)
+	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0x01e0) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 ADDRESS_MAP_END
 
 
@@ -913,7 +913,7 @@ MACHINE_CONFIG_END
     US version: 60 Hz, NTSC
 */
 MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4_60hz, ti99_4)
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918, XTAL_10_738635MHz / 2 )                  \
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918, XTAL(10'738'635) / 2 )                  \
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in)) \
 	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
@@ -925,7 +925,7 @@ MACHINE_CONFIG_END
     European version: 50 Hz, PAL
 */
 MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4_50hz, ti99_4)
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9929, XTAL_10_738635MHz / 2 ) \
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9929, XTAL(10'738'635) / 2 ) \
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))   \
 	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
@@ -1029,7 +1029,7 @@ MACHINE_CONFIG_END
     US version: 60 Hz, NTSC
 */
 MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4a_60hz, ti99_4a)
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918A, XTAL_10_738635MHz / 2 )                  \
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918A, XTAL(10'738'635) / 2 )                  \
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in)) \
 	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
@@ -1041,7 +1041,7 @@ MACHINE_CONFIG_END
     European version: 50 Hz, PAL
 */
 MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4a_50hz, ti99_4a)
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9929A, XTAL_10_738635MHz / 2 ) \
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9929A, XTAL(10'738'635) / 2 ) \
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in))   \
 	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
@@ -1074,7 +1074,7 @@ MACHINE_CONFIG_END
     There were no European versions.
 */
 MACHINE_CONFIG_DERIVED(ti99_4x_state::ti99_4qi_60hz, ti99_4qi)
-	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918A, XTAL_10_738635MHz / 2 )                  \
+	MCFG_DEVICE_ADD( TI_VDP_TAG, TMS9918A, XTAL(10'738'635) / 2 )                  \
 	MCFG_TMS9928A_VRAM_SIZE(0x4000) \
 	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(ti99_4x_state, video_interrupt_in)) \
 	MCFG_TMS9928A_OUT_GROMCLK_CB(WRITELINE(ti99_4x_state, gromclk_in)) \
@@ -1107,7 +1107,7 @@ MACHINE_RESET_MEMBER(ti99_4x_state, ti99_4ev)
 	m_int1 = CLEAR_LINE;
 	m_int2 = CLEAR_LINE;
 	m_int12 = CLEAR_LINE;
-	m_gromclk_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL_10_738635MHz/24));
+	m_gromclk_timer->adjust(attotime::zero, 0, attotime::from_hz(XTAL(10'738'635)/24));
 }
 
 MACHINE_CONFIG_START(ti99_4x_state::ti99_4ev_60hz)

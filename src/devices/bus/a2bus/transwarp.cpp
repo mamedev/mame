@@ -151,9 +151,6 @@ a2bus_transwarp_device::a2bus_transwarp_device(const machine_config &mconfig, co
 
 void a2bus_transwarp_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_timer = timer_alloc(0);
 
 	save_item(NAME(m_bEnabled));

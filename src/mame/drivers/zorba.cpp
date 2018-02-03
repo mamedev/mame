@@ -135,7 +135,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(zorba_state::zorba)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz / 6)
+	MCFG_CPU_ADD("maincpu", Z80, 24_MHz_XTAL / 6)
 	MCFG_CPU_PROGRAM_MAP(zorba_mem)
 	MCFG_CPU_IO_MAP(zorba_io)
 	MCFG_MACHINE_RESET_OVERRIDE(zorba_state, zorba)
@@ -160,7 +160,7 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(zorba_state, irq_w<2>))
 
 	/* devices */
-	MCFG_DEVICE_ADD("dma", Z80DMA, XTAL_24MHz/6)
+	MCFG_DEVICE_ADD("dma", Z80DMA, 24_MHz_XTAL / 6)
 	// busack on cpu connects to bai pin
 	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(zorba_state, busreq_w))  //connects to busreq on cpu
 	MCFG_Z80DMA_OUT_INT_CB(DEVWRITELINE("irq0", input_merger_device, in_w<0>))
@@ -208,9 +208,9 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 
 	// PIT
 	MCFG_DEVICE_ADD("pit", PIT8254, 0)
-	MCFG_PIT8253_CLK0(XTAL_24MHz / 3)
-	MCFG_PIT8253_CLK1(XTAL_24MHz / 3)
-	MCFG_PIT8253_CLK2(XTAL_24MHz / 3)
+	MCFG_PIT8253_CLK0(24_MHz_XTAL / 3)
+	MCFG_PIT8253_CLK1(24_MHz_XTAL / 3)
+	MCFG_PIT8253_CLK2(24_MHz_XTAL / 3)
 	MCFG_PIT8253_OUT0_HANDLER(WRITELINE(zorba_state, br1_w))
 	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("uart1", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart1", i8251_device, write_rxc))
@@ -218,7 +218,7 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart2", i8251_device, write_rxc))
 
 	// CRTC
-	MCFG_DEVICE_ADD("crtc", I8275, XTAL_14_31818MHz/7)
+	MCFG_DEVICE_ADD("crtc", I8275, 14.318'181_MHz_XTAL / 7)
 	MCFG_I8275_CHARACTER_WIDTH(8)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(zorba_state, zorba_update_chr)
 	MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("dma", z80dma_device, rdy_w))
@@ -226,7 +226,7 @@ MACHINE_CONFIG_START(zorba_state::zorba)
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	// Floppies
-	MCFG_FD1793_ADD("fdc", XTAL_24MHz / 24)
+	MCFG_FD1793_ADD("fdc", 24_MHz_XTAL / 24)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("irq2", input_merger_device, in_w<0>))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("irq2", input_merger_device, in_w<1>))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", zorba_floppies, "525dd", floppy_image_device::default_floppy_formats)

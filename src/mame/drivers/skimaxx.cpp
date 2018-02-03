@@ -351,8 +351,8 @@ static ADDRESS_MAP_START( 68030_2_map, AS_PROGRAM, 32, skimaxx_state )
 //  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfffc0000, 0xfffcffff) AM_RAM AM_SHARE("share1")
 //  AM_RANGE(0xfffe0000, 0xffffffff) AM_RAM // I think this is banked with the shared RAM? (see CPU sync routines)
-	AM_RANGE(0xfffe0010, 0xfffeffff) AM_RAM             // HACK
 	AM_RANGE(0xfffe0000, 0xfffeffff) AM_RAM AM_SHARE("share1")  // HACK
+	AM_RANGE(0xfffe0010, 0xfffeffff) AM_RAM             // HACK
 	AM_RANGE(0xffff0000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -364,8 +364,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, skimaxx_state )
-	AM_RANGE(0x00000000, 0x000100ff) AM_RAM
-	AM_RANGE(0x00008000, 0x0003ffff) AM_RAM
+	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM
 	AM_RANGE(0x00050000, 0x0005ffff) AM_RAM
 	AM_RANGE(0x00220000, 0x003fffff) AM_RAM AM_SHARE("fg_buffer")
 	AM_RANGE(0x02000000, 0x0200000f) AM_RAM
@@ -495,16 +494,16 @@ void skimaxx_state::machine_reset()
  *************************************/
 
 MACHINE_CONFIG_START(skimaxx_state::skimaxx)
-	MCFG_CPU_ADD("maincpu", M68EC030, XTAL_40MHz)
+	MCFG_CPU_ADD("maincpu", M68EC030, XTAL(40'000'000))
 	MCFG_CPU_PROGRAM_MAP(68030_1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", skimaxx_state,  irq3_line_hold)    // 1,3,7 are identical, rest is RTE
 
-	MCFG_CPU_ADD("subcpu", M68EC030, XTAL_40MHz)
+	MCFG_CPU_ADD("subcpu", M68EC030, XTAL(40'000'000))
 	MCFG_CPU_PROGRAM_MAP(68030_2_map)
 
 
 	/* video hardware */
-	MCFG_CPU_ADD("tms", TMS34010, XTAL_50MHz)
+	MCFG_CPU_ADD("tms", TMS34010, XTAL(50'000'000))
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(50000000/8) /* pixel clock */
@@ -530,16 +529,16 @@ MACHINE_CONFIG_START(skimaxx_state::skimaxx)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_4MHz, PIN7_LOW)     // ?
+	MCFG_OKIM6295_ADD("oki1", XTAL(4'000'000), PIN7_LOW)     // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_4MHz/2, PIN7_HIGH)  // ?
+	MCFG_OKIM6295_ADD("oki2", XTAL(4'000'000)/2, PIN7_HIGH)  // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki3", XTAL_4MHz, PIN7_LOW)     // ?
+	MCFG_OKIM6295_ADD("oki3", XTAL(4'000'000), PIN7_LOW)     // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_OKIM6295_ADD("oki4", XTAL_4MHz/2, PIN7_HIGH)  // ?
+	MCFG_OKIM6295_ADD("oki4", XTAL(4'000'000)/2, PIN7_HIGH)  // ?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 

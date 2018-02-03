@@ -20,10 +20,10 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define SSIO_CLOCK          XTAL_16MHz
-#define SOUNDSGOOD_CLOCK    XTAL_16MHz
-#define TURBOCS_CLOCK       XTAL_8MHz
-#define SQUAWKTALK_CLOCK    XTAL_3_579545MHz
+#define SSIO_CLOCK          XTAL(16'000'000)
+#define SOUNDSGOOD_CLOCK    XTAL(16'000'000)
+#define TURBOCS_CLOCK       XTAL(8'000'000)
+#define SQUAWKTALK_CLOCK    XTAL(3'579'545)
 
 
 

@@ -651,6 +651,7 @@ static ADDRESS_MAP_START(dmac_mem, AS_PROGRAM, 16, altos8600_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(dmac_io, AS_IO, 16, altos8600_state)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmi_r, nmi_w)
 	AM_RANGE(0x0000, 0x0007) AM_READ(fault_r)
 	AM_RANGE(0x0008, 0x000f) AM_WRITE(clear_w)
 	AM_RANGE(0x0010, 0x0017) AM_READ(errlo_r)
@@ -671,7 +672,6 @@ static ADDRESS_MAP_START(dmac_io, AS_IO, 16, altos8600_state)
 	AM_RANGE(0x0078, 0x0079) AM_WRITE8(ics_attn_w, 0xffff)
 	AM_RANGE(0x0200, 0x03ff) AM_READWRITE(mmuflags_r, mmuflags_w)
 	AM_RANGE(0x0400, 0x05ff) AM_READWRITE(mmuaddr_r, mmuaddr_w)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(nmi_r, nmi_w)
 ADDRESS_MAP_END
 
 static SLOT_INTERFACE_START(altos8600_floppies)
@@ -679,7 +679,7 @@ static SLOT_INTERFACE_START(altos8600_floppies)
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(altos8600_state::altos8600)
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_5MHz)
+	MCFG_CPU_ADD("maincpu", I8086, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(cpu_mem)
 	MCFG_CPU_IO_MAP(cpu_io)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(code_mem)
@@ -689,7 +689,7 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(altos8600_state, inta)
 	MCFG_I8086_IF_HANDLER(WRITELINE(altos8600_state, cpuif_w))
 
-	MCFG_CPU_ADD("dmac", I8089, XTAL_5MHz)
+	MCFG_CPU_ADD("dmac", I8089, XTAL(5'000'000))
 	MCFG_CPU_PROGRAM_MAP(dmac_mem)
 	MCFG_CPU_IO_MAP(dmac_io)
 	MCFG_I8089_DATA_WIDTH(16)
@@ -713,7 +713,7 @@ MACHINE_CONFIG_START(altos8600_state::altos8600)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	//MCFG_RAM_EXTRA_OPTIONS("512K")
 
-	MCFG_DEVICE_ADD("uart8274", I8274_NEW, XTAL_16MHz/4)
+	MCFG_DEVICE_ADD("uart8274", I8274_NEW, XTAL(16'000'000)/4)
 	MCFG_Z80SIO_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))

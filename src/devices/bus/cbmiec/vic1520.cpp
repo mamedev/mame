@@ -94,7 +94,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_START(vic1520_device::device_add_mconfig)
-	MCFG_CPU_ADD(M6500_1_TAG, M6502, XTAL_2MHz) // M6500/1
+	MCFG_CPU_ADD(M6500_1_TAG, M6502, XTAL(2'000'000)) // M6500/1
 	MCFG_CPU_PROGRAM_MAP(vic1520_mem)
 MACHINE_CONFIG_END
 

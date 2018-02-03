@@ -132,9 +132,9 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK        XTAL_20MHz
-#define SOUND_CLOCK         XTAL_14_31818MHz
-#define VIDEO_CLOCK         XTAL_32MHz
+#define MASTER_CLOCK        XTAL(20'000'000)
+#define SOUND_CLOCK         XTAL(14'318'181)
+#define VIDEO_CLOCK         XTAL(32'000'000)
 
 
 
@@ -771,8 +771,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy2_state )
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(videoram_r, videoram_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("rombank1")
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("rombank2")
-	AM_RANGE(0x8000, 0x81ff) AM_READWRITE(slapstic_r, slapstic_w) AM_SHARE("slapstic_base")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
+	AM_RANGE(0x8000, 0x81ff) AM_READWRITE(slapstic_r, slapstic_w) AM_SHARE("slapstic_base")
 ADDRESS_MAP_END
 
 
@@ -1195,7 +1195,7 @@ MACHINE_CONFIG_START(atarisy2_state::atarisy2)
 
 	MCFG_CPU_ADD("audiocpu", M6502, SOUND_CLOCK/8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, (double)MASTER_CLOCK/2/16/16/16/10)
+	MCFG_DEVICE_PERIODIC_INT_DEVICE("soundcomm", atari_sound_comm_device, sound_irq_gen, MASTER_CLOCK/2/16/16/16/10)
 
 	MCFG_MACHINE_START_OVERRIDE(atarisy2_state,atarisy2)
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)

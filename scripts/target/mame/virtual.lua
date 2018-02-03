@@ -17,6 +17,7 @@ CPUS["M6502"] = true
 CPUS["H6280"] = true
 CPUS["MCS48"] = true
 CPUS["Z80"] = true
+CPUS["DSP16"] = true -- for qsound
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -27,6 +28,7 @@ SOUNDS["NES_APU"] = true
 SOUNDS["YM2612"] = true
 SOUNDS["YM2151"] = true
 SOUNDS["YM2413"] = true
+SOUNDS["YM2608"] = true
 SOUNDS["YM2203"] = true
 SOUNDS["AY8910"] = true
 SOUNDS["YM3526"] = true
@@ -36,12 +38,14 @@ SOUNDS["YMZ280B"] = true
 SOUNDS["C6280"] = true
 SOUNDS["SN76496"] = true
 SOUNDS["K053260"] = true
+SOUNDS["K054539"] = true
 SOUNDS["SEGAPCM"] = true
 SOUNDS["MULTIPCM"] = true
 SOUNDS["GB_SOUND"] = true
 SOUNDS["POKEY"] = true
 SOUNDS["C352"] = true
 SOUNDS["OKIM6295"] = true
+SOUNDS["QSOUND"] = true
 SOUNDS["WAVE"] = true
 
 --------------------------------------------------

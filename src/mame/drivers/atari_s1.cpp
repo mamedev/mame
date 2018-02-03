@@ -56,7 +56,7 @@ ToDo:
 #include "atari_s1.lh"
 
 
-#define MASTER_CLK XTAL_4MHz / 4
+#define MASTER_CLK XTAL(4'000'000) / 4
 #define DMA_CLK MASTER_CLK / 2
 #define AUDIO_CLK DMA_CLK / 4
 #define DMA_INT DMA_CLK / 128

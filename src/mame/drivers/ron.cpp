@@ -26,9 +26,9 @@ Debug cheats:
 #include "debugger.h"
 
 // TBD
-#define MAIN_CLOCK (XTAL_15_468MHz / 4)
-#define VIDEO_CLOCK (XTAL_15_468MHz / 3)
-#define SOUND_CLOCK XTAL_3_579545MHz
+#define MAIN_CLOCK (XTAL(15'468'480) / 4)
+#define VIDEO_CLOCK (XTAL(15'468'480) / 3)
+#define SOUND_CLOCK XTAL(3'579'545)
 
 class ron_state : public driver_device
 {

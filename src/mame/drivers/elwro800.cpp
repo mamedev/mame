@@ -375,8 +375,8 @@ static ADDRESS_MAP_START(elwro800_io, AS_IO, 8, elwro800_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(elwro800_m1, AS_OPCODES, 8, elwro800_state)
-	AM_RANGE(0x0066, 0x0066) AM_READ(nmi_r)
 	AM_RANGE(0x0000, 0x1fff) AM_DEVICE("bank1", address_map_bank_device, amap8)
+	AM_RANGE(0x0066, 0x0066) AM_READ(nmi_r)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVICE("bank2", address_map_bank_device, amap8)
 	AM_RANGE(0x4000, 0xffff) AM_RAMBANK("rambank3")
 ADDRESS_MAP_END

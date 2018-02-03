@@ -772,7 +772,7 @@ WRITE_LINE_MEMBER( swyft_state::write_acia_clock )
 MACHINE_CONFIG_START(swyft_state::swyft)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68008, XTAL_15_8976MHz/2) //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
+	MCFG_CPU_ADD("maincpu",M68008, XTAL(15'897'600)/2) //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
 	MCFG_CPU_PROGRAM_MAP(swyft_mem)
 
 	MCFG_MACHINE_START_OVERRIDE(swyft_state,swyft)
@@ -793,10 +793,10 @@ MACHINE_CONFIG_START(swyft_state::swyft)
 
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
 	// acia rx and tx clocks come from one of the VIA pins and are tied together, fix this below? acia e clock comes from 68008
-	MCFG_DEVICE_ADD("acia_clock", CLOCK, (XTAL_15_8976MHz/2)/5) // out e clock from 68008, ~ 10in clocks per out clock
+	MCFG_DEVICE_ADD("acia_clock", CLOCK, (XTAL(15'897'600)/2)/5) // out e clock from 68008, ~ 10in clocks per out clock
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swyft_state, write_acia_clock))
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, (XTAL_15_8976MHz/2)/5) // out e clock from 68008
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, (XTAL(15'897'600)/2)/5) // out e clock from 68008
 	MCFG_VIA6522_READPA_HANDLER(READ8(swyft_state, via0_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(swyft_state, via0_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(swyft_state, via0_pa_w))
@@ -806,7 +806,7 @@ MACHINE_CONFIG_START(swyft_state::swyft)
 	MCFG_VIA6522_CB2_HANDLER(WRITELINE(swyft_state, via0_cb2_w))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(swyft_state, via0_int_w))
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, (XTAL_15_8976MHz/2)/5) // out e clock from 68008
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, (XTAL(15'897'600)/2)/5) // out e clock from 68008
 	MCFG_VIA6522_READPA_HANDLER(READ8(swyft_state, via1_pa_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(swyft_state, via1_pb_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(swyft_state, via1_pa_w))

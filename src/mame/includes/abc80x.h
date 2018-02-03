@@ -25,8 +25,8 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define ABC800_X01  XTAL_12MHz
-#define ABC806_X02  XTAL_32_768kHz
+#define ABC800_X01  XTAL(12'000'000)
+#define ABC806_X02  XTAL(32'768)
 
 #define ABC802_AT0  0x01
 #define ABC802_AT1  0x02

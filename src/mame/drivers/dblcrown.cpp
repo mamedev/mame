@@ -40,7 +40,7 @@
 ***************************************************************************/
 
 
-#define MAIN_CLOCK          XTAL_28_63636MHz
+#define MAIN_CLOCK          XTAL(28'636'363)
 #define CPU_CLOCK           MAIN_CLOCK / 6
 #define SND_CLOCK           MAIN_CLOCK / 12
 
@@ -346,10 +346,10 @@ static ADDRESS_MAP_START( dblcrown_map, AS_PROGRAM, 8, dblcrown_state )
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(palette_r, palette_w)
 	AM_RANGE(0xfe00, 0xfeff) AM_RAM // ???
+	AM_RANGE(0xff00, 0xffff) AM_RAM // ???, intentional fall-through
 	AM_RANGE(0xff00, 0xff01) AM_READWRITE(vram_bank_r, vram_bank_w)
 	AM_RANGE(0xff04, 0xff04) AM_READWRITE(irq_source_r,irq_source_w)
 
-	AM_RANGE(0xff00, 0xffff) AM_RAM // ???, intentional fall-through
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dblcrown_io, AS_IO, 8, dblcrown_state )

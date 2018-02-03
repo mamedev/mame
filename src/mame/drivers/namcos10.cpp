@@ -490,10 +490,10 @@ static ADDRESS_MAP_START( namcos10_map, AS_PROGRAM, 32, namcos10_state )
 	AM_RANGE(0x9f500000, 0x9f501fff) AM_RAM AM_SHARE("share3") /* ram? stores block numbers */
 	AM_RANGE(0xbf500000, 0xbf501fff) AM_RAM AM_SHARE("share3") /* ram? stores block numbers */
 
+	AM_RANGE(0x1fba0000, 0x1fba000f) AM_READWRITE16(control_r, control_w, 0xffffffff)
 	AM_RANGE(0x1fba0000, 0x1fba0003) AM_READWRITE16(sprot_r, sprot_w, 0xffff0000)
 	AM_RANGE(0x1fba0008, 0x1fba000b) AM_READWRITE16(i2c_clock_r, i2c_clock_w, 0x0000ffff)
 	AM_RANGE(0x1fba0008, 0x1fba000b) AM_READWRITE16(i2c_data_r,  i2c_data_w,  0xffff0000)
-	AM_RANGE(0x1fba0000, 0x1fba000f) AM_READWRITE16(control_r, control_w, 0xffffffff)
 ADDRESS_MAP_END
 
 
@@ -672,11 +672,11 @@ void namcos10_state::i2c_update()
 }
 
 static ADDRESS_MAP_START( namcos10_memm_map, AS_PROGRAM, 32, namcos10_state )
+	AM_IMPORT_FROM(namcos10_map)
+
 	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(crypto_switch_w, 0x0000ffff)
 	AM_RANGE(0x1f400000, 0x1f5fffff) AM_READ16(range_r, 0xffffffff)
 	AM_RANGE(0x1fb40000, 0x1fb4000f) AM_WRITE16(bank_w, 0xffffffff)
-
-	AM_IMPORT_FROM(namcos10_map)
 ADDRESS_MAP_END
 
 
@@ -767,6 +767,8 @@ READ16_MEMBER(namcos10_state::nand_block_r)
 }
 
 static ADDRESS_MAP_START( namcos10_memn_map, AS_PROGRAM, 32, namcos10_state )
+	AM_IMPORT_FROM(namcos10_map)
+
 	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(crypto_switch_w, 0x0000ffff)
 	AM_RANGE(0x1f380000, 0x1f380003) AM_WRITE16(crypto_switch_w, 0x0000ffff)
 	AM_RANGE(0x1f400000, 0x1f400003) AM_READ16(nand_status_r, 0x0000ffff)
@@ -776,8 +778,6 @@ static ADDRESS_MAP_START( namcos10_memn_map, AS_PROGRAM, 32, namcos10_state )
 	AM_RANGE(0x1f440000, 0x1f440003) AM_WRITE8(nand_address4_w, 0x000000ff)
 	AM_RANGE(0x1f450000, 0x1f450003) AM_READ16(nand_data_r, 0x0000ffff)
 	AM_RANGE(0x1fb60000, 0x1fb60003) AM_READWRITE16(nand_block_r, nand_block_w, 0x0000ffff)
-
-	AM_IMPORT_FROM(namcos10_map)
 ADDRESS_MAP_END
 
 void namcos10_state::memn_driver_init(  )
@@ -910,7 +910,7 @@ MACHINE_RESET_MEMBER(namcos10_state,namcos10)
 
 MACHINE_CONFIG_START(namcos10_state::namcos10_memm)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL_101_4912MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL(101'491'200) )
 	MCFG_CPU_PROGRAM_MAP( namcos10_memm_map )
 
 	// The bios first configures the rom window as 80000-big, then
@@ -926,7 +926,7 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memm)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10 )
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL(53'693'175) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -934,7 +934,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(namcos10_state::namcos10_memn)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL_101_4912MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8606BQ, XTAL(101'491'200) )
 	MCFG_CPU_PROGRAM_MAP( namcos10_memn_map )
 
 	// The bios first configures the rom window as 80000-big, then
@@ -950,7 +950,7 @@ MACHINE_CONFIG_START(namcos10_state::namcos10_memn)
 	MCFG_MACHINE_RESET_OVERRIDE(namcos10_state, namcos10 )
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561CQ, 0x200000, XTAL(53'693'175) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

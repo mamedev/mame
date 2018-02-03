@@ -1071,7 +1071,7 @@ static SLOT_INTERFACE_START(agat7_cards)
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(agat7_state::agat7)
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_14_3MHz / 14)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL(14'300'000) / 14)
 	MCFG_CPU_PROGRAM_MAP(agat7_map)
 	MCFG_CPU_VBLANK_INT_DRIVER(A7_VIDEO_TAG ":a7screen", agat7_state, agat_vblank)
 

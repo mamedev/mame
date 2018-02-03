@@ -135,58 +135,6 @@ INTERRUPT_GEN_MEMBER(polygonet_state::polygonet_interrupt)
 		device.execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
 }
 
-/* sound CPU communications */
-READ8_MEMBER(polygonet_state::sound_comms_r)
-{
-	switch (offset)
-	{
-		case 0:
-			// unknown
-			return 0;
-
-		case 2:
-			return m_soundlatch->read(space, 0);
-
-		default:
-			break;
-	}
-
-	return 0;
-}
-
-WRITE8_MEMBER(polygonet_state::sound_comms_w)
-{
-	switch (offset)
-	{
-		case 0:
-			// unknown, writes once at boot
-			break;
-
-		case 2:
-			// TODO: reset global volume
-			break;
-
-		case 3:
-			// TODO: increase global volume
-			break;
-
-		case 4:
-			// unknown
-			break;
-
-		case 6:
-			m_soundlatch2->write(space, 0, data);
-			break;
-
-		case 7:
-			m_soundlatch3->write(space, 0, data);
-			break;
-
-		default:
-			break;
-	}
-}
-
 WRITE32_MEMBER(polygonet_state::sound_irq_w)
 {
 	// Auto-acknowledged interrupt
@@ -479,8 +427,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, polygonet_state )
 	AM_RANGE(0x541000, 0x54101f) AM_RAM
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM
 	AM_RANGE(0x580800, 0x580803) AM_READ(network_r) AM_WRITENOP /* network RAM | registers? */
-	AM_RANGE(0x600000, 0x600007) AM_WRITE8(sound_comms_w, 0xffffffff)
-	AM_RANGE(0x600008, 0x60000b) AM_READ8(sound_comms_r, 0xffffffff)
+	AM_RANGE(0x600000, 0x60000f) AM_DEVICE8("k054321", k054321_device, main_map, 0xffffffff)
 	AM_RANGE(0x640000, 0x640003) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x680000, 0x680003) AM_DEVWRITE("watchdog", watchdog_timer_device, reset32_w)
 	AM_RANGE(0x700000, 0x73ffff) AM_ROM AM_REGION("gfx2", 0)
@@ -529,13 +476,11 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, polygonet_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539_1", k054539_device, read, write)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
 	AM_RANGE(0xe400, 0xe62f) AM_READNOP AM_WRITENOP // Second 054539 (not present)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf002, 0xf002) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
-	AM_RANGE(0xf003, 0xf003) AM_DEVREAD("soundlatch3", generic_latch_8_device, read)
+	AM_RANGE(0xf000, 0xf003) AM_DEVICE("k054321", k054321_device, sound_map)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_ctrl_w)
 ADDRESS_MAP_END
 
@@ -605,11 +550,11 @@ WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)
 
 MACHINE_CONFIG_START(polygonet_state::plygonet)
 
-	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", polygonet_state, polygonet_interrupt)
 
-	MCFG_CPU_ADD("dsp", DSP56156, XTAL_40MHz)
+	MCFG_CPU_ADD("dsp", DSP56156, XTAL(40'000'000))
 	MCFG_CPU_PROGRAM_MAP(dsp_program_map)
 	MCFG_CPU_DATA_MAP(dsp_data_map)
 
@@ -641,12 +586,9 @@ MACHINE_CONFIG_START(polygonet_state::plygonet)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
+	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
-	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
-	MCFG_K054539_REGION_OVERRRIDE("shared")
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_K054539_TIMER_HANDLER(WRITELINE(polygonet_state, k054539_nmi_gen))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
@@ -747,7 +689,7 @@ ROM_START( plygonet )
 	ROM_REGION( 0x40000, "gfx2", 0 ) /* '936 tiles */
 	ROM_LOAD( "305b07.20d", 0x000000, 0x40000, CRC(e4320bc3) SHA1(b0bb2dac40d42f97da94516d4ebe29b1c3d77c37) )
 
-	ROM_REGION( 0x200000, "shared", 0 ) /* sound data */
+	ROM_REGION( 0x200000, "k054539", 0 ) /* sound data */
 	ROM_LOAD( "305b08.2e", 0x000000, 0x200000, CRC(874607df) SHA1(763b44a80abfbc355bcb9be8bf44373254976019) )
 
 	ROM_REGION( 0x80, "eeprom", ROMREGION_ERASEFF )
@@ -770,7 +712,7 @@ ROM_START( polynetw )
 	ROM_REGION( 0x40000, "gfx2", 0 ) /* '936 tiles */
 	ROM_LOAD( "305a07.20d", 0x000000, 0x020000, CRC(0959283b) SHA1(482caf96e8e430b87810508b1a1420cd3b58f203) )
 
-	ROM_REGION( 0x400000, "shared", 0 ) /* sound data */
+	ROM_REGION( 0x400000, "k054539", 0 ) /* sound data */
 	ROM_LOAD( "305a08.2e", 0x000000, 0x200000, CRC(7ddb8a52) SHA1(3199b347fc433ffe0de8521001df77672d40771e) )
 	ROM_LOAD( "305a09.3e", 0x200000, 0x200000, CRC(6da1be58) SHA1(d63ac16ac551193ff8a6036724fb59e1d702e06b) )
 

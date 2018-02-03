@@ -313,7 +313,7 @@ DRIVER_INIT_MEMBER( s9_state, s9 )
 
 MACHINE_CONFIG_START(s9_state::s9)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6808, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", M6808, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(s9_main_map)
 	MCFG_MACHINE_RESET_OVERRIDE(s9_state, s9)
 
@@ -358,7 +358,7 @@ MACHINE_CONFIG_START(s9_state::s9)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* Add the soundcard */
-	MCFG_CPU_ADD("audiocpu", M6808, XTAL_4MHz)
+	MCFG_CPU_ADD("audiocpu", M6808, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(s9_audio_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("speaker")

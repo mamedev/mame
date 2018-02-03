@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( virus_map, AS_PROGRAM, 8, acvirus_state )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(acvirus_state::virus)
-	MCFG_CPU_ADD("maincpu", I8052, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu", I8052, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(virus_map)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

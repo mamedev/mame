@@ -86,13 +86,13 @@ static GFXDECODE_START( sagitta180 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, sagitta180_charlayout, 0, 1 )
 GFXDECODE_END
 
-I8275_DRAW_CHARACTER_MEMBER(sagitta180_state::crtc_display_pixels) 
-{ 
+I8275_DRAW_CHARACTER_MEMBER(sagitta180_state::crtc_display_pixels)
+{
 	unsigned i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	uint8_t chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
 	uint8_t pixels;
- 
+
 	if (lten) {
 		pixels = ~0;
 	} else if (vsp != 0 || (linecount & 8) != 0) {
@@ -118,7 +118,7 @@ void sagitta180_state::machine_reset()
 static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, sagitta180_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-//	AM_RANGE(0x0800, 0x17ff) AM_ROM
+//  AM_RANGE(0x0800, 0x17ff) AM_ROM
 	AM_RANGE(0x1800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -169,12 +169,12 @@ READ8_MEMBER(sagitta180_state::memory_read_byte)
 MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_10MHz) /* guessed ! */
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(10'000'000)) /* guessed ! */
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)
 	MCFG_CPU_IO_MAP(maincpu_io_map)
 //        MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("intlatch", i8212_device, inta_cb)
 
-	MCFG_DEVICE_ADD("dma", I8257, XTAL_14_7456MHz) /* guessed xtal */
+	MCFG_DEVICE_ADD("dma", I8257, XTAL(14'745'600)) /* guessed xtal */
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("crtc", i8275_device, dack_w))
 	MCFG_I8257_OUT_HRQ_CB(WRITELINE(sagitta180_state, hrq_w))
 	MCFG_I8257_IN_MEMR_CB(READ8(sagitta180_state, memory_read_byte))
@@ -193,10 +193,10 @@ MACHINE_CONFIG_START(sagitta180_state::sagitta180)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 
-//	MCFG_DEVICE_ADD("intlatch", I8212, 0)
-//	MCFG_I8212_MD_CALLBACK(GND) // guessed !
-//	MCFG_I8212_DI_CALLBACK(DEVREAD8("picu", i8214_device, vector_r))
-//	MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE)) // guessed !
+//  MCFG_DEVICE_ADD("intlatch", I8212, 0)
+//  MCFG_I8212_MD_CALLBACK(GND) // guessed !
+//  MCFG_I8212_DI_CALLBACK(DEVREAD8("picu", i8214_device, vector_r))
+//  MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE)) // guessed !
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

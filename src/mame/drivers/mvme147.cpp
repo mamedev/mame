@@ -184,7 +184,7 @@
 #endif
 
 /* from documentataion: http://www.m88k.com/Docs/147/147aih.pdf but crystal and divider not known */
-#define BAUDGEN_CLOCK XTAL_5MHz
+#define BAUDGEN_CLOCK XTAL(5'000'000)
 #define SCC_CLOCK (BAUDGEN_CLOCK) /* This gives prompt at the RS232 terminal device (9600) */
 
 class mvme147_state : public driver_device
@@ -236,8 +236,8 @@ private:
 
 static ADDRESS_MAP_START (mvme147_mem, AS_PROGRAM, 32, mvme147_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ  (bootvect_r)       /* ROM mirror just during reset */
 	AM_RANGE (0x00000000, 0x00000007) AM_RAM AM_WRITE (bootvect_w)       /* After first write we act as RAM */
+	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ  (bootvect_r)       /* ROM mirror just during reset */
 	AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* 4 Mb RAM */
 	AM_RANGE (0xff800000, 0xff9fffff) AM_ROM AM_REGION("roms", 0x800000) //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 1 - 147bug */
 	AM_RANGE (0xffa00000, 0xffbfffff) AM_ROM AM_REGION("roms", 0xa00000) //AM_MIRROR(0x00780000) /* ROM/EEPROM bank 2 - unpopulated */
@@ -647,7 +647,7 @@ SLOT_INTERFACE_END
  */
 MACHINE_CONFIG_START(mvme147_state::mvme147)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68030, XTAL_16MHz)
+	MCFG_CPU_ADD ("maincpu", M68030, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP (mvme147_mem)
 	MCFG_VME_DEVICE_ADD("vme")
 	MCFG_VME_SLOT_ADD ("vme", 1, mvme147_vme_cards, nullptr)

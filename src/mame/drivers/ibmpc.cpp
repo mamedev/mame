@@ -291,7 +291,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 MACHINE_CONFIG_START(ibmpc_state::ibm5150)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
 	MCFG_CPU_IO_MAP(pc8_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
@@ -328,7 +328,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(ibmpc_state::ibm5160)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)
 	MCFG_CPU_PROGRAM_MAP(pc8_map)
 	MCFG_CPU_IO_MAP(pc8_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)

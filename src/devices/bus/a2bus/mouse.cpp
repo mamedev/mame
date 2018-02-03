@@ -180,9 +180,6 @@ a2bus_mouse_device::a2bus_mouse_device(const machine_config &mconfig, const char
 
 void a2bus_mouse_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	// register save state variables
 	save_item(NAME(m_port_a_in));
 	save_item(NAME(m_port_b_in));

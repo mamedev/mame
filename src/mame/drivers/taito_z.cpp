@@ -3576,14 +3576,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitoz_state::dblaxle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(dblaxle_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("sub", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(dblaxle_cpub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
@@ -3591,7 +3591,7 @@ MACHINE_CONFIG_START(taitoz_state::dblaxle)
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	// make quantum time to be a multiple of the xtal (fixes road layer stuck on continue)
-	MCFG_QUANTUM_TIME(attotime::from_hz(XTAL_32MHz/1024))
+	MCFG_QUANTUM_TIME(attotime::from_hz(XTAL(32'000'000)/1024))
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
@@ -3627,7 +3627,7 @@ MACHINE_CONFIG_START(taitoz_state::dblaxle)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(32'000'000)/4)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -3654,14 +3654,14 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(taitoz_state::racingb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(racingb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  sci_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("sub", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(racingb_cpub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
@@ -3703,7 +3703,7 @@ MACHINE_CONFIG_START(taitoz_state::racingb)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(32'000'000)/4)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)

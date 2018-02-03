@@ -443,7 +443,7 @@ READ8_MEMBER(novag6502_state::sexpert_input2_r)
 void novag6502_state::sexpert_set_cpu_freq()
 {
 	// machines were released with either 5MHz or 6MHz CPU
-	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (XTAL_12MHz/2) : (XTAL_10MHz/2));
+	m_maincpu->set_unscaled_clock((ioport("FAKE")->read() & 1) ? (12_MHz_XTAL/2) : (10_MHz_XTAL/2));
 }
 
 MACHINE_RESET_MEMBER(novag6502_state, sexpert)
@@ -512,9 +512,9 @@ static ADDRESS_MAP_START( supercon_map, AS_PROGRAM, 8, novag6502_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cforte_map, AS_PROGRAM, 8, novag6502_state )
+	AM_IMPORT_FROM( supercon_map )
 	AM_RANGE(0x1e00, 0x1e00) AM_READWRITE(supercon_input2_r, cforte_mux_w)
 	AM_RANGE(0x1f00, 0x1f00) AM_READWRITE(supercon_input1_r, cforte_control_w)
-	AM_IMPORT_FROM( supercon_map )
 ADDRESS_MAP_END
 
 
@@ -534,11 +534,11 @@ static ADDRESS_MAP_START( sforte_map, AS_PROGRAM, 8, novag6502_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sexpert_map, AS_PROGRAM, 8, novag6502_state )
+	AM_IMPORT_FROM( sforte_map )
 	AM_RANGE(0x1ff4, 0x1ff4) AM_WRITE(sexpert_leds_w)
 	AM_RANGE(0x1ff5, 0x1ff5) AM_WRITE(sexpert_mux_w)
 	AM_RANGE(0x1ff6, 0x1ff6) AM_WRITE(sexpert_lcd_control_w)
 	AM_RANGE(0x1ff7, 0x1ff7) AM_WRITE(sexpert_lcd_data_w)
-	AM_IMPORT_FROM( sforte_map )
 ADDRESS_MAP_END
 
 
@@ -857,7 +857,7 @@ INPUT_PORTS_END
 MACHINE_CONFIG_START(novag6502_state::supercon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, XTAL_8MHz/2)
+	MCFG_CPU_ADD("maincpu", M6502, 8_MHz_XTAL/2)
 	MCFG_CPU_PERIODIC_INT_DRIVER(novag6502_state, irq0_line_hold, 600) // guessed
 	MCFG_CPU_PROGRAM_MAP(supercon_map)
 
@@ -875,11 +875,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_START(novag6502_state::cforte)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R65C02, XTAL_10MHz/2)
+	MCFG_CPU_ADD("maincpu", R65C02, 10_MHz_XTAL/2)
 	MCFG_CPU_PROGRAM_MAP(cforte_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(XTAL_32_768kHz/128)) // 256Hz
-	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_32_768kHz/128) - attotime::from_usec(11)) // active for 11us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(XTAL_32_768kHz/128))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
+	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for 11us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -892,21 +892,21 @@ MACHINE_CONFIG_START(novag6502_state::cforte)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, XTAL_32_768kHz/32) // 1024Hz
+	MCFG_SOUND_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(novag6502_state::sexpert)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M65C02, XTAL_10MHz/2) // or XTAL_12MHz/2
+	MCFG_CPU_ADD("maincpu", M65C02, 10_MHz_XTAL/2) // or 12_MHz_XTAL/2
 	MCFG_CPU_PROGRAM_MAP(sexpert_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(XTAL_32_768kHz/128)) // 256Hz
-	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_32_768kHz/128) - attotime::from_nsec(21500)) // active for 21.5us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(XTAL_32_768kHz/128))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", novag6502_state, irq_on, attotime::from_hz(32.768_kHz_XTAL/128)) // 256Hz
+	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_nsec(21500)) // active for 21.5us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", novag6502_state, irq_off, attotime::from_hz(32.768_kHz_XTAL/128))
 
 	MCFG_DEVICE_ADD("acia", MOS6551, 0) // R65C51P2 - RTS to CTS, DCD to GND
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
 	MCFG_MOS6551_IRQ_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
 	MCFG_MOS6551_RTS_HANDLER(DEVWRITELINE("acia", mos6551_device, write_cts))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
@@ -939,7 +939,7 @@ MACHINE_CONFIG_START(novag6502_state::sexpert)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, XTAL_32_768kHz/32) // 1024Hz
+	MCFG_SOUND_ADD("beeper", BEEP, 32.768_kHz_XTAL/32) // 1024Hz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -949,7 +949,7 @@ MACHINE_CONFIG_DERIVED(novag6502_state::sforte, sexpert)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sforte_map)
 	MCFG_TIMER_MODIFY("irq_on")
-	MCFG_TIMER_START_DELAY(attotime::from_hz(XTAL_32_768kHz/128) - attotime::from_usec(11)) // active for ?us (assume same as cforte)
+	MCFG_TIMER_START_DELAY(attotime::from_hz(32.768_kHz_XTAL/128) - attotime::from_usec(11)) // active for ?us (assume same as cforte)
 
 	MCFG_DEFAULT_LAYOUT(layout_novag_sforte)
 MACHINE_CONFIG_END

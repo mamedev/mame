@@ -384,7 +384,7 @@ QUICKLOAD_LOAD_MEMBER( d6800_state, d6800 )
 
 MACHINE_CONFIG_START(d6800_state::d6800)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6800, XTAL_4MHz/4)
+	MCFG_CPU_ADD("maincpu",M6800, XTAL(4'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(d6800_map)
 
 	/* video hardware */

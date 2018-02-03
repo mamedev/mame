@@ -77,7 +77,7 @@ Merit Riviera Notes - There are several known versions:
 #include "screen.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK            (XTAL_10MHz)
+#define MASTER_CLOCK            (XTAL(10'000'000))
 #define CPU_CLOCK               (MASTER_CLOCK / 4)
 #define PIXEL_CLOCK             (MASTER_CLOCK / 1)
 #define CRTC_CLOCK              (MASTER_CLOCK / 8)
@@ -431,8 +431,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( misdraw_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("cpunvram") // overlays other NVRAM? or is it banked?
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("cpunvram") // overlays other NVRAM? or is it banked?
 	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write) // swapped compared to other set?
 	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)

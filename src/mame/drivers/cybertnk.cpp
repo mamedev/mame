@@ -643,9 +643,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, cybertnk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", y8950_device, read, write)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xa005, 0xa006) AM_NOP
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", y8950_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", y8950_device, read, write)
 ADDRESS_MAP_END
 
@@ -833,15 +833,15 @@ GFXDECODE_END
 
 
 MACHINE_CONFIG_START(cybertnk_state::cybertnk)
-	MCFG_CPU_ADD("maincpu", M68000,XTAL_20MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000,XTAL(20'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(master_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("slave", M68000,XTAL_20MHz/2)
+	MCFG_CPU_ADD("slave", M68000,XTAL(20'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(slave_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", cybertnk_state,  irq3_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80,XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(sound_mem)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000))//arbitrary value,needed to get the communication to work
@@ -874,11 +874,11 @@ MACHINE_CONFIG_START(cybertnk_state::cybertnk)
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ym1", Y8950, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym1", Y8950, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("ym2", Y8950, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym2", Y8950, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END

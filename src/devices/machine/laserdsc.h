@@ -87,7 +87,7 @@ enum laserdisc_field_code
 	laserdisc_device::static_set_screen(*device, _tag); \
 	MCFG_SCREEN_ADD(_tag, RASTER) \
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz*2, 910, 0, 704, 525, 44, 524) \
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524) \
 	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update)
 
 #define MCFG_LASERDISC_SCREEN_ADD_PAL(_tag, _ldtag) \
@@ -95,7 +95,7 @@ enum laserdisc_field_code
 	laserdisc_device::static_set_screen(*device, _tag); \
 	MCFG_SCREEN_ADD(_tag, RASTER) \
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
-	MCFG_SCREEN_RAW_PARAMS(XTAL_17_73447MHz*2, 1135, 0, 768, 625, 48, 624) \
+	MCFG_SCREEN_RAW_PARAMS(XTAL(17'734'470)*2, 1135, 0, 768, 625, 48, 624) \
 	MCFG_SCREEN_UPDATE_DEVICE(_ldtag, laserdisc_device, screen_update)
 
 

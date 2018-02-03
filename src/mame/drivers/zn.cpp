@@ -344,7 +344,7 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -368,14 +368,14 @@ MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 	MCFG_ZNMCU_ANALOG2_HANDLER(IOPORT(":ANALOG2"))
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
+	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 
@@ -383,13 +383,13 @@ MACHINE_CONFIG_START(zn_state::zn1_1mb_vram)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(zn_state::zn1_2mb_vram, zn1_1mb_vram)
-	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_REPLACE( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL(53'693'175) )
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(zn_state::zn2)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL(100'000'000) )
 	MCFG_CPU_PROGRAM_MAP( zn_map)
 
 	MCFG_RAM_MODIFY("maincpu:ram")
@@ -413,14 +413,14 @@ MACHINE_CONFIG_START(zn_state::zn2)
 	MCFG_ZNMCU_ANALOG2_HANDLER(IOPORT(":ANALOG2"))
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL(53'693'175) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
+	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 
@@ -570,6 +570,8 @@ WRITE8_MEMBER(zn_state::zn_qsound_w)
 }
 
 static ADDRESS_MAP_START(coh1000c_map, AS_PROGRAM, 32, zn_state)
+	AM_IMPORT_FROM(zn_map)
+
 	AM_RANGE(0x1f000000, 0x1f3fffff) AM_ROM AM_REGION("maskroms", 0)
 	AM_RANGE(0x1f400000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(bank_coh1000c_w, 0x000000ff)
@@ -577,8 +579,6 @@ static ADDRESS_MAP_START(coh1000c_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1fb40020, 0x1fb40023) AM_READ16(capcom_kickharness_r, 0x0000ffff)
 	AM_RANGE(0x1fb80000, 0x1fbfffff) AM_ROM AM_REGION("countryrom", 0)
 	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE8(zn_qsound_w, 0x000000ff)
-
-	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1000c)
@@ -613,7 +613,7 @@ MACHINE_CONFIG_DERIVED(zn_state::coh1000c, zn1_1mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(qsound_map)
 	MCFG_CPU_IO_MAP(qsound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
@@ -633,7 +633,7 @@ MACHINE_CONFIG_DERIVED(zn_state::coh1002c, zn1_2mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(qsound_map)
 	MCFG_CPU_IO_MAP(qsound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
@@ -790,7 +790,7 @@ MACHINE_CONFIG_DERIVED(zn_state::coh3002c, zn2)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000c_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000))
 	MCFG_CPU_PROGRAM_MAP(qsound_map)
 	MCFG_CPU_IO_MAP(qsound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(zn_state, qsound_interrupt, 250) // measured (cps2.cpp)
@@ -1037,12 +1037,12 @@ WRITE8_MEMBER(zn_state::fx1a_sound_bankswitch_w)
 }
 
 static ADDRESS_MAP_START(coh1000ta_map, AS_PROGRAM, 32, zn_state)
+	AM_IMPORT_FROM(zn_map)
+
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fb40000, 0x1fb40003) AM_WRITE8(bank_coh1000t_w, 0x000000ff)
 	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x000000ff)
 	AM_RANGE(0x1fb80000, 0x1fb80003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff0000)
-
-	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1000ta)
@@ -1055,8 +1055,8 @@ MACHINE_RESET_MEMBER(zn_state,coh1000ta)
 }
 
 static ADDRESS_MAP_START( fx1a_sound_map, AS_PROGRAM, 8, zn_state )
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("soundbank")   /* Fallthrough */
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
@@ -1072,11 +1072,11 @@ MACHINE_CONFIG_DERIVED(zn_state::coh1000ta, zn1_1mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1000ta_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz / 4)    /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)    /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(fx1a_sound_map)
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1000ta)
 
-	MCFG_SOUND_ADD("ymsnd", YM2610B, XTAL_16MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM2610B, XTAL(16'000'000)/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -1101,6 +1101,7 @@ READ8_MEMBER(zn_state::fx1b_fram_r)
 }
 
 static ADDRESS_MAP_START(coh1000tb_map, AS_PROGRAM, 32, zn_state)
+	AM_IMPORT_FROM(zn_map)
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fb00000, 0x1fb003ff) AM_READWRITE8(fx1b_fram_r, fx1b_fram_w, 0x00ff00ff)
 	AM_RANGE(0x1fb40000, 0x1fb40003) AM_WRITE8(bank_coh1000t_w, 0x000000ff)
@@ -1109,7 +1110,6 @@ static ADDRESS_MAP_START(coh1000tb_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1fba0000, 0x1fba0003) AM_DEVWRITE16("taito_zoom", taito_zoom_device, sound_irq_w, 0x0000ffff)
 	AM_RANGE(0x1fbc0000, 0x1fbc0003) AM_DEVREAD16("taito_zoom", taito_zoom_device, sound_irq_r, 0x0000ffff)
 	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_DEVREADWRITE8("taito_zoom", taito_zoom_device, shared_ram_r, shared_ram_w, 0x00ff00ff) // M66220FP for comm with the MN10200
-	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(zn_state,coh1000tb)
@@ -1383,12 +1383,12 @@ DRIVER_INIT_MEMBER(zn_state,primrag2)
 }
 
 static ADDRESS_MAP_START(coh1000w_map, AS_PROGRAM, 32, zn_state)
+	AM_IMPORT_FROM(zn_map)
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x1f000000, 0x1f000003) AM_WRITENOP
 	AM_RANGE(0x1f7e8000, 0x1f7e8003) AM_NOP
 	AM_RANGE(0x1f7e4000, 0x1f7e4fff) AM_READWRITE16(vt83c461_16_r, vt83c461_16_w, 0xffffffff)
 	AM_RANGE(0x1f7f4000, 0x1f7f4fff) AM_READWRITE16(vt83c461_32_r, vt83c461_32_w, 0xffffffff)
-	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_DERIVED(zn_state::coh1000w, zn1_2mb_vram)
@@ -1565,12 +1565,12 @@ WRITE8_MEMBER(zn_state::coh1002e_sound_irq_w)
 }
 
 static ADDRESS_MAP_START(coh1002e_map, AS_PROGRAM, 32, zn_state)
+	AM_IMPORT_FROM(zn_map)
+
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fa10300, 0x1fa10303) AM_WRITE8(coh1002e_bank_w, 0x000000ff)
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x000000ff)
 	AM_RANGE(0x1fb00004, 0x1fb00007) AM_WRITE8(coh1002e_sound_irq_w, 0x000000ff)
-
-	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1002e)
@@ -1592,12 +1592,12 @@ MACHINE_CONFIG_DERIVED(zn_state::coh1002e, zn1_2mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1002e_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(psarc_snd_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1002e)
 
-	MCFG_SOUND_ADD("ymf", YMF271, XTAL_16_9344MHz)
+	MCFG_SOUND_ADD("ymf", YMF271, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -1701,12 +1701,12 @@ READ16_MEMBER(zn_state::bam2_unk_r)
 }
 
 static ADDRESS_MAP_START(bam2_map, AS_PROGRAM, 32, zn_state)
+	AM_IMPORT_FROM(zn_map)
+
 	AM_RANGE(0x1f000000, 0x1f3fffff) AM_ROM AM_REGION("bankedroms", 0)
 	AM_RANGE(0x1f400000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fa20000, 0x1fa20003) AM_READ16(bam2_unk_r, 0x0000ffff)
 	AM_RANGE(0x1fb00000, 0x1fb00007) AM_READWRITE16(bam2_mcu_r, bam2_mcu_w, 0xffffffff)
-
-	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(zn_state,bam2)
@@ -2006,20 +2006,19 @@ WRITE8_MEMBER(zn_state::nbajamex_backup_w)
 
 
 static ADDRESS_MAP_START(coh1000a_map, AS_PROGRAM, 32, zn_state)
+	AM_IMPORT_FROM(zn_map)
 	AM_RANGE(0x1fbfff00, 0x1fbfff03) AM_WRITE16(acpsx_00_w, 0xffffffff)
 	AM_RANGE(0x1fbfff10, 0x1fbfff13) AM_WRITE16(acpsx_10_w, 0xffff0000)
-
-	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(nbajamex_map, AS_PROGRAM, 32, zn_state)
+	AM_IMPORT_FROM(coh1000a_map)
+
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1f200000, 0x1f207fff) AM_WRITE8(nbajamex_backup_w, 0xffffffff)
 	AM_RANGE(0x1fbfff00, 0x1fbfff07) AM_WRITE16(nbajamex_bank_w, 0xffffffff)
 	AM_RANGE(0x1fbfff08, 0x1fbfff0b) AM_READ16(nbajamex_08_r, 0xffff)
 	AM_RANGE(0x1fbfff80, 0x1fbfff83) AM_READWRITE16(nbajamex_80_r, nbajamex_80_w, 0xffff)
-
-	AM_IMPORT_FROM(coh1000a_map)
 ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(zn_state,nbajamex)
@@ -2044,11 +2043,11 @@ DRIVER_INIT_MEMBER(zn_state,jdredd)
 }
 
 static ADDRESS_MAP_START(jdredd_map, AS_PROGRAM, 32, zn_state)
+	AM_IMPORT_FROM(coh1000a_map)
+
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROM AM_REGION("roms", 0)
 	AM_RANGE(0x1fbfff80, 0x1fbfff8f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs1, write_cs1, 0xffffffff)
 	AM_RANGE(0x1fbfff90, 0x1fbfff9f) AM_DEVREADWRITE16("ata", ata_interface_device, read_cs0, write_cs0, 0xffffffff)
-
-	AM_IMPORT_FROM(coh1000a_map)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_DERIVED(zn_state::coh1000a, zn1_2mb_vram)
@@ -2210,11 +2209,11 @@ WRITE8_MEMBER(zn_state::coh1001l_bank_w)
 }
 
 static ADDRESS_MAP_START(coh1001l_map, AS_PROGRAM, 32, zn_state)
+	AM_IMPORT_FROM(zn_map)
+
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE16(coh1001l_latch_w, 0x0000ffff)
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(coh1001l_bank_w, 0x00ff0000)
-
-	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1001l)
@@ -2235,14 +2234,14 @@ MACHINE_CONFIG_DERIVED(zn_state::coh1001l, zn1_2mb_vram)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1001l_map)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL_10MHz)
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL(10'000'000))
 	MCFG_CPU_PROGRAM_MAP(atlus_snd_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, coh1001l)
 
 	MCFG_GENERIC_LATCH_16_ADD("soundlatch16")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_YMZ280B_IRQ_HANDLER(INPUTLINE("audiocpu", 2))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
@@ -2267,11 +2266,10 @@ WRITE8_MEMBER(zn_state::coh1002v_bank_w)
 }
 
 static ADDRESS_MAP_START(coh1002v_map, AS_PROGRAM, 32, zn_state)
+	AM_IMPORT_FROM(zn_map)
 	AM_RANGE(0x1f000000, 0x1f27ffff) AM_ROM AM_REGION("fixedroms", 0)
 	AM_RANGE(0x1fb00000, 0x1fbfffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITE8(coh1002v_bank_w, 0x000000ff)
-
-	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1002v)
@@ -2452,10 +2450,9 @@ WRITE8_MEMBER(zn_state::coh1002m_bank_w)
 }
 
 static ADDRESS_MAP_START(coh1002m_map, AS_PROGRAM, 32, zn_state)
+	AM_IMPORT_FROM(zn_map)
 	AM_RANGE(0x1f000000, 0x1f7fffff) AM_ROMBANK("bankedroms")
 	AM_RANGE(0x1fb00004, 0x1fb00007) AM_WRITE8(coh1002m_bank_w, 0x00ff0000)
-
-	AM_IMPORT_FROM(zn_map)
 ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(zn_state,coh1002m)
@@ -2478,11 +2475,10 @@ READ8_MEMBER(zn_state::cbaj_sound_main_status_r)
 }
 
 static ADDRESS_MAP_START(coh1002msnd_map, AS_PROGRAM, 32, zn_state)
+	AM_IMPORT_FROM(coh1002m_map)
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVREAD8("cbaj_fifo2", fifo7200_device, data_byte_r, 0x000000ff)
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_DEVWRITE8("cbaj_fifo1", fifo7200_device, data_byte_w, 0x000000ff)
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_READ8(cbaj_sound_main_status_r, 0xff000000)
-
-	AM_IMPORT_FROM(coh1002m_map)
 ADDRESS_MAP_END
 
 READ8_MEMBER(zn_state::cbaj_sound_z80_status_r)
@@ -2519,7 +2515,7 @@ MACHINE_CONFIG_DERIVED(zn_state::coh1002msnd, coh1002m)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(coh1002msnd_map)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(cbaj_z80_map)
 	MCFG_CPU_IO_MAP(cbaj_z80_port_map)
 
@@ -2529,7 +2525,7 @@ MACHINE_CONFIG_DERIVED(zn_state::coh1002msnd, coh1002m)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
 	/* sound hardware */
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'934'400))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 MACHINE_CONFIG_END

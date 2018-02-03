@@ -31,8 +31,8 @@
 
 #include "screen.h"
 
-#define HARDDRIV_MASTER_CLOCK   XTAL_32MHz
-#define HARDDRIV_GSP_CLOCK      XTAL_48MHz
+#define HARDDRIV_MASTER_CLOCK   XTAL(32'000'000)
+#define HARDDRIV_GSP_CLOCK      XTAL(48'000'000)
 
 DECLARE_DEVICE_TYPE(HARDDRIV_BOARD,               harddriv_board_device_state)
 DECLARE_DEVICE_TYPE(HARDDRIVC_BOARD,              harddrivc_board_device_state)

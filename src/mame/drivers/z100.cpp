@@ -668,7 +668,7 @@ SLOT_INTERFACE_END
 
 MACHINE_CONFIG_START(z100_state::z100)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8088, XTAL_14_31818MHz/3)
+	MCFG_CPU_ADD("maincpu",I8088, XTAL(14'318'181)/3)
 	MCFG_CPU_PROGRAM_MAP(z100_mem)
 	MCFG_CPU_IO_MAP(z100_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
@@ -685,7 +685,7 @@ MACHINE_CONFIG_START(z100_state::z100)
 	MCFG_PALETTE_ADD("palette", 8)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_14_31818MHz/8)    /* unknown clock, hand tuned to get ~50/~60 fps */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(14'318'181)/8)    /* unknown clock, hand tuned to get ~50/~60 fps */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
@@ -706,7 +706,7 @@ MACHINE_CONFIG_START(z100_state::z100)
 
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
 
-	MCFG_FD1797_ADD("z207_fdc", XTAL_1MHz)
+	MCFG_FD1797_ADD("z207_fdc", XTAL(1'000'000))
 
 	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:0", z100_floppies, "dd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("z207_fdc:1", z100_floppies, "dd", floppy_image_device::default_floppy_formats)

@@ -66,7 +66,7 @@ ROM_END
 
 MACHINE_CONFIG_START(electron_plus3_device::device_add_mconfig)
 	/* fdc */
-	MCFG_WD1770_ADD("fdc", XTAL_16MHz / 2)
+	MCFG_WD1770_ADD("fdc", 16_MHz_XTAL / 2)
 	MCFG_FLOPPY_DRIVE_ADD_FIXED("fdc:0", electron_floppies, "35dd", floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", electron_floppies, nullptr, floppy_formats)
@@ -120,7 +120,7 @@ uint8_t electron_plus3_device::expbus_r(address_space &space, offs_t offset, uin
 	{
 		if (m_romsel == 4)
 		{
-			data = memregion("exp_rom")->base()[offset & 0x3fff];
+			data = m_exp_rom->base()[offset & 0x3fff];
 		}
 	}
 	else if (offset == 0xfcc0)

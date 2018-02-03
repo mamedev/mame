@@ -8,6 +8,10 @@
   TODO:
   - why does h2hbaskb(and clones) need a workaround on writing L pins?
   - plus1: which sensor position is which colour?
+  - vidchal: Add screen and gun cursor with brightness detection callback,
+    and softwarelist for the video tapes. We'd also need a VHS player device.
+    The emulated lightgun itself appears to be working fine(eg. add a 30hz
+    timer to IN3 to score +100)
 
 ***************************************************************************/
 
@@ -36,6 +40,7 @@
 #include "mdallas.lh"
 #include "qkracer.lh"
 #include "unkeinv.lh"
+#include "vidchal.lh"
 
 //#include "hh_cop400_test.lh" // common test-layout - use external artwork
 
@@ -358,7 +363,6 @@ public:
 	DECLARE_WRITE8_MEMBER(write_g);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_READ8_MEMBER(read_in);
-	DECLARE_WRITE_LINE_MEMBER(write_so);
 	void h2hsoccer(machine_config &config);
 	void h2hbaskb(machine_config &config);
 	void h2hhockey(machine_config &config);
@@ -762,7 +766,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_so);
 	DECLARE_READ_LINE_MEMBER(read_si);
 	void lchicken(machine_config &config);
-	
+
 protected:
 	virtual void machine_start() override;
 };
@@ -1573,7 +1577,7 @@ MACHINE_CONFIG_START(bship82_state::bship82)
 	MCFG_CPU_ADD("maincpu", COP420, 750000) // approximation - RC osc. R=14K, C=100pF
 	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(bship82_state, write_d))
-	MCFG_COP400_WRITE_G_CB(DEVWRITE8("dac", dac_byte_interface, write)) // G: 4-bit signed DAC
+	MCFG_COP400_WRITE_G_CB(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_COP400_READ_L_CB(READ8(bship82_state, read_l))
 	MCFG_COP400_READ_IN_CB(READ8(bship82_state, read_in))
 	MCFG_COP400_WRITE_SO_CB(WRITELINE(bship82_state, write_so))
@@ -1584,7 +1588,7 @@ MACHINE_CONFIG_START(bship82_state::bship82)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // unknown DAC
+	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // see above
 	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
@@ -1722,6 +1726,101 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Select Merchandise Video Challenger
+  * COP420 MCU label COP420-TDX/N
+  * 6-digit 7seg led display, 3 other leds, 4-bit sound
+
+  This is a lightgun with scorekeeping. The "games" themselves were released
+  on VHS tapes. To determine scoring, the lightgun detects strobe lighting
+  from objects in the video.
+
+  known releases:
+  - Japan: Video Challenger, published by Takara
+  - UK: Video Challenger, published by Bandai
+  - Canada: Video Challenger, published by Irwin
+
+***************************************************************************/
+
+class vidchal_state : public hh_cop400_state
+{
+public:
+	vidchal_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_cop400_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(write_d);
+	DECLARE_WRITE8_MEMBER(write_l);
+	DECLARE_WRITE_LINE_MEMBER(write_sk);
+	void vidchal(machine_config &config);
+};
+
+// handlers
+
+void vidchal_state::prepare_display()
+{
+	set_display_segmask(0x3f, 0xff);
+	display_matrix(8, 7, m_l, m_d | m_sk << 6);
+}
+
+WRITE8_MEMBER(vidchal_state::write_d)
+{
+	// D: CD4028BE to digit select
+	m_d = 1 << data & 0x3f;
+	prepare_display();
+}
+
+WRITE8_MEMBER(vidchal_state::write_l)
+{
+	// L: digit segment data
+	m_l = bitswap<8>(data,0,3,1,5,4,7,2,6);
+	prepare_display();
+}
+
+WRITE_LINE_MEMBER(vidchal_state::write_sk)
+{
+	// SK: hit led
+	m_sk = state;
+	prepare_display();
+}
+
+// config
+
+static INPUT_PORTS_START( vidchal )
+	PORT_START("IN.0") // port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // TODO: light sensor
+INPUT_PORTS_END
+
+MACHINE_CONFIG_START(vidchal_state::vidchal)
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", COP420, 900000) // approximation
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_COP400_WRITE_D_CB(WRITE8(vidchal_state, write_d))
+	MCFG_COP400_WRITE_G_CB(DEVWRITE8("dac", dac_byte_interface, write))
+	MCFG_COP400_WRITE_L_CB(WRITE8(vidchal_state, write_l))
+	MCFG_COP400_READ_IN_CB(IOPORT("IN.0"))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(vidchal_state, write_sk))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_vidchal)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("dac", DAC_4BIT_BINARY_WEIGHTED_SIGN_MAGNITUDE, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.125) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Game driver(s)
 
 ***************************************************************************/
@@ -1811,6 +1910,12 @@ ROM_START( qkracer )
 ROM_END
 
 
+ROM_START( vidchal )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop420-tdx_n", 0x0000, 0x0400, CRC(c9bd041c) SHA1(ab0dcaf4741620fa4c28ab75337a23d646af7626) )
+ROM_END
+
+
 
 //    YEAR  NAME       PARENT   CMP MACHINE    INPUT      STATE          INIT COMPANY, FULLNAME, FLAGS
 CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   ctstein_state,   0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -1834,6 +1939,8 @@ CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  lightfgt_state,  0, "M
 CONS( 1982, bship82,   bship,    0, bship82,   bship82,   bship82_state,   0, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
 CONS( 1978, qkracer,   0,        0, qkracer,   qkracer,   qkracer_state,   0, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
+CONS( 1987, vidchal,   0,        0, vidchal,   vidchal,   vidchal_state,   0, "Select Merchandise", "Video Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

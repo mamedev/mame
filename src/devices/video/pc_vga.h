@@ -38,6 +38,8 @@ public:
 	virtual WRITE8_MEMBER(mem_linear_w);
 	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
 
+	void set_offset(uint16_t val) { vga.crtc.offset = val; }
+
 protected:
 	enum
 	{
@@ -280,8 +282,12 @@ public:
 
 	void enabled();
 
+	bool is_8514a_enabled() { return ibm8514.enabled; }
+	bool is_passthrough_set() { return ibm8514.passthrough; }
+
 	READ16_MEMBER(ibm8514_gpstatus_r);
 	WRITE16_MEMBER(ibm8514_cmd_w);
+	WRITE16_MEMBER(ibm8514_display_ctrl_w);
 	READ16_MEMBER(ibm8514_line_error_r);
 	WRITE16_MEMBER(ibm8514_line_error_w);
 	READ8_MEMBER(ibm8514_status_r);
@@ -324,6 +330,8 @@ public:
 	WRITE16_MEMBER(ibm8514_read_mask_w);
 	READ16_MEMBER(ibm8514_write_mask_r);
 	WRITE16_MEMBER(ibm8514_write_mask_w);
+	WRITE16_MEMBER(ibm8514_advfunc_w);
+
 	void ibm8514_wait_draw();
 	struct
 	{
@@ -333,6 +341,7 @@ public:
 		uint16_t vsync;
 		uint16_t subctrl;
 		uint16_t substatus;
+		uint8_t display_ctrl;
 		uint16_t ssv;
 		uint16_t ec0;
 		uint16_t ec1;
@@ -369,6 +378,9 @@ public:
 		uint16_t multifunc_misc;
 		uint32_t read_mask;
 		uint32_t write_mask;
+		uint16_t advfunction_ctrl;
+		bool enabled;
+		bool passthrough;
 
 		int state;
 		uint8_t wait_vector_len;
@@ -442,13 +454,21 @@ public:
 	WRITE16_MEMBER(mach8_ext_leftscissor_w);
 	WRITE16_MEMBER(mach8_ext_topscissor_w);
 	READ16_MEMBER(mach8_clksel_r) { return mach8.clksel; }
+	WRITE16_MEMBER(mach8_crt_pitch_w);
+	WRITE16_MEMBER(mach8_patt_data_w) { logerror("Mach8: Pattern Data write (unimplemented)\n"); }
 	WRITE16_MEMBER(mach8_ge_offset_l_w);
 	WRITE16_MEMBER(mach8_ge_offset_h_w);
 	WRITE16_MEMBER(mach8_ge_pitch_w);
+	READ16_MEMBER(mach8_ge_ext_config_r) { return mach8.ge_ext_config; }
+	WRITE16_MEMBER(mach8_ge_ext_config_w);  // TODO: handle 8-bit I/O
 	WRITE16_MEMBER(mach8_scan_x_w);
 	WRITE16_MEMBER(mach8_dp_config_w);
 	READ16_MEMBER(mach8_readonly_r) { return 0; }
 	WRITE16_MEMBER(mach8_pixel_xfer_w);
+	WRITE16_MEMBER(mach8_clksel_w) { mach8.ati_mode = true; ibm8514.passthrough = data & 0x0001; mach8.clksel = data; }  // read only on the mach8
+	WRITE16_MEMBER(mach8_advfunc_w) { mach8.ati_mode = false; ibm8514_advfunc_w(space,offset,data,mem_mask); }
+	uint16_t get_ext_config() { return mach8.ge_ext_config; }
+	uint16_t offset() { if(mach8.ati_mode) return mach8.ge_pitch; else return 128; }
 
 protected:
 	mach8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -459,10 +479,13 @@ protected:
 		uint16_t scratch1;
 		uint16_t linedraw;
 		uint16_t clksel;
+		uint16_t crt_pitch;
 		uint16_t dp_config;
 		uint32_t ge_offset;
 		uint16_t ge_pitch;
+		uint16_t ge_ext_config;  // usage varies between the mach8 and mach32 (except for 8514/A monitor alias)
 		uint16_t scan_x;
+		bool ati_mode;
 	} mach8;
 
 private:
@@ -552,6 +575,8 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void ati_define_video_mode();
+	void set_dot_clock();
 	struct
 	{
 		uint8_t ext_reg[64];
@@ -560,7 +585,6 @@ protected:
 	} ati;
 
 private:
-	void ati_define_video_mode();
 	mach8_device* m_8514;
 };
 

@@ -79,7 +79,7 @@ uint32_t vt520_state::screen_update_vt520(screen_device &screen, bitmap_ind16 &b
 
 MACHINE_CONFIG_START(vt520_state::vt420)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C31, XTAL_43_320MHz / 3) // SCN8031HCFN40 (divider not verified)
+	MCFG_CPU_ADD("maincpu", I80C31, XTAL(43'320'000) / 3) // SCN8031HCFN40 (divider not verified)
 	MCFG_CPU_PROGRAM_MAP(vt520_mem)
 	MCFG_CPU_IO_MAP(vt520_io)
 
@@ -97,7 +97,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(vt520_state::vt520)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I80C32, XTAL_20MHz) // Philips P80C32IBPN
+	MCFG_CPU_ADD("maincpu", I80C32, XTAL(20'000'000)) // Philips P80C32IBPN
 	MCFG_CPU_PROGRAM_MAP(vt520_mem)
 	MCFG_CPU_IO_MAP(vt520_io)
 

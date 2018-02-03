@@ -1,13 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi,Brad Oliver
+#ifndef MAME_INCLUDES_PLAYCH10_H
+#define MAME_INCLUDES_PLAYCH10_H
+
+#pragma once
+
 #include "machine/rp5h01.h"
 #include "video/ppu2c0x.h"
-
-struct chr_bank
-{
-	int writable;   // 1 for RAM, 0 for ROM
-	uint8_t* chr;     // direct access to the memory
-};
 
 class playch10_state : public driver_device
 {
@@ -19,12 +18,100 @@ public:
 		, m_rp5h01(*this, "rp5h01")
 		, m_ram_8w(*this, "ram_8w")
 		, m_videoram(*this, "videoram")
-		, m_timedata(*this, "timedata")
 		, m_work_ram(*this, "work_ram")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_vrom_region(*this, "gfx2")
+		, m_timedigits(*this, "digit_%u", 0U)
 	{
 	}
+
+	DECLARE_WRITE_LINE_MEMBER(up8w_w);
+	DECLARE_READ8_MEMBER(ram_8w_r);
+	DECLARE_WRITE8_MEMBER(ram_8w_w);
+	DECLARE_WRITE8_MEMBER(sprite_dma_w);
+	DECLARE_WRITE8_MEMBER(time_w);
+	DECLARE_WRITE_LINE_MEMBER(sdcs_w);
+	DECLARE_WRITE_LINE_MEMBER(cntrl_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(disp_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(sound_mask_w);
+	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
+	DECLARE_WRITE_LINE_MEMBER(dog_di_w);
+	DECLARE_WRITE_LINE_MEMBER(ppu_reset_w);
+	DECLARE_READ8_MEMBER(pc10_detectclr_r);
+	DECLARE_WRITE8_MEMBER(cart_sel_w);
+	DECLARE_READ8_MEMBER(pc10_prot_r);
+	DECLARE_WRITE8_MEMBER(pc10_prot_w);
+	DECLARE_WRITE8_MEMBER(pc10_in0_w);
+	DECLARE_READ8_MEMBER(pc10_in0_r);
+	DECLARE_READ8_MEMBER(pc10_in1_r);
+	DECLARE_WRITE8_MEMBER(pc10_nt_w);
+	DECLARE_READ8_MEMBER(pc10_nt_r);
+	DECLARE_WRITE8_MEMBER(pc10_chr_w);
+	DECLARE_READ8_MEMBER(pc10_chr_r);
+	DECLARE_WRITE8_MEMBER(mmc1_rom_switch_w);
+	DECLARE_WRITE8_MEMBER(aboard_vrom_switch_w);
+	DECLARE_WRITE8_MEMBER(bboard_rom_switch_w);
+	DECLARE_WRITE8_MEMBER(cboard_vrom_switch_w);
+	DECLARE_WRITE8_MEMBER(eboard_rom_switch_w);
+	DECLARE_WRITE8_MEMBER(gboard_rom_switch_w);
+	DECLARE_WRITE8_MEMBER(iboard_rom_switch_w);
+	DECLARE_WRITE8_MEMBER(hboard_rom_switch_w);
+	DECLARE_WRITE8_MEMBER(playch10_videoram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(pc10_int_detect_r);
+
+	DECLARE_DRIVER_INIT(playch10);
+	DECLARE_DRIVER_INIT(pc_gun);
+	DECLARE_DRIVER_INIT(pcaboard);
+	DECLARE_DRIVER_INIT(pcbboard);
+	DECLARE_DRIVER_INIT(pccboard);
+	DECLARE_DRIVER_INIT(pcdboard);
+	DECLARE_DRIVER_INIT(pcdboard_2);
+	DECLARE_DRIVER_INIT(pceboard);
+	DECLARE_DRIVER_INIT(pcfboard);
+	DECLARE_DRIVER_INIT(pcfboard_2);
+	DECLARE_DRIVER_INIT(virus);
+	DECLARE_DRIVER_INIT(ttoon);
+	DECLARE_DRIVER_INIT(pcgboard);
+	DECLARE_DRIVER_INIT(pcgboard_type2);
+	DECLARE_DRIVER_INIT(pchboard);
+	DECLARE_DRIVER_INIT(pciboard);
+	DECLARE_DRIVER_INIT(pckboard);
+	DECLARE_DRIVER_INIT(pc_hrz);
+
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+	// machine configuration builders
+	void playch10(machine_config &config);
+	void playchnv(machine_config &config);
+	void playch10_hboard(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
+private:
+	struct chr_bank
+	{
+		int writable;   // 1 for RAM, 0 for ROM
+		uint8_t* chr;     // direct access to the memory
+	};
+
+	DECLARE_PALETTE_INIT(playch10);
+	DECLARE_MACHINE_START(playch10_hboard);
+	DECLARE_VIDEO_START(playch10_hboard);
+	INTERRUPT_GEN_MEMBER(playch10_interrupt);
+
+	void pc10_set_videorom_bank( int first, int count, int bank, int size );
+	void set_videoram_bank( int first, int count, int bank, int size );
+	void gboard_scanline_cb( int scanline, int vblank, int blanked );
+	void ppu_irq(int *ppu_regs);
+	void mapper9_latch(offs_t offset);
+	void pc10_set_mirroring(int mirroring);
+
+	uint32_t screen_update_playch10_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_playch10_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_playch10_single(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
@@ -32,11 +119,12 @@ public:
 
 	required_shared_ptr<uint8_t> m_ram_8w;
 	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_timedata;
 	required_shared_ptr<uint8_t> m_work_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	optional_memory_region m_vrom_region;
+
+	output_finder<4> m_timedigits;
 
 	int m_up_8w;
 	int m_pc10_nmi_enable;
@@ -72,75 +160,6 @@ public:
 	int m_IRQ_enable;
 	int m_pc10_bios;
 	tilemap_t *m_bg_tilemap;
-	DECLARE_WRITE_LINE_MEMBER(up8w_w);
-	DECLARE_READ8_MEMBER(ram_8w_r);
-	DECLARE_WRITE8_MEMBER(ram_8w_w);
-	DECLARE_WRITE8_MEMBER(sprite_dma_w);
-	DECLARE_WRITE8_MEMBER(time_w);
-	DECLARE_WRITE_LINE_MEMBER(sdcs_w);
-	DECLARE_WRITE_LINE_MEMBER(cntrl_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(disp_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(sound_mask_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_enable_w);
-	DECLARE_WRITE_LINE_MEMBER(dog_di_w);
-	DECLARE_WRITE_LINE_MEMBER(ppu_reset_w);
-	DECLARE_READ8_MEMBER(pc10_detectclr_r);
-	DECLARE_WRITE8_MEMBER(cart_sel_w);
-	DECLARE_READ8_MEMBER(pc10_prot_r);
-	DECLARE_WRITE8_MEMBER(pc10_prot_w);
-	DECLARE_WRITE8_MEMBER(pc10_in0_w);
-	DECLARE_READ8_MEMBER(pc10_in0_r);
-	DECLARE_READ8_MEMBER(pc10_in1_r);
-	DECLARE_WRITE8_MEMBER(pc10_nt_w);
-	DECLARE_READ8_MEMBER(pc10_nt_r);
-	DECLARE_WRITE8_MEMBER(pc10_chr_w);
-	DECLARE_READ8_MEMBER(pc10_chr_r);
-	DECLARE_WRITE8_MEMBER(mmc1_rom_switch_w);
-	DECLARE_WRITE8_MEMBER(aboard_vrom_switch_w);
-	DECLARE_WRITE8_MEMBER(bboard_rom_switch_w);
-	DECLARE_WRITE8_MEMBER(cboard_vrom_switch_w);
-	DECLARE_WRITE8_MEMBER(eboard_rom_switch_w);
-	DECLARE_WRITE8_MEMBER(gboard_rom_switch_w);
-	DECLARE_WRITE8_MEMBER(iboard_rom_switch_w);
-	DECLARE_WRITE8_MEMBER(hboard_rom_switch_w);
-	void pc10_set_mirroring(int mirroring);
-	DECLARE_WRITE8_MEMBER(playch10_videoram_w);
-	DECLARE_CUSTOM_INPUT_MEMBER(pc10_int_detect_r);
-	DECLARE_DRIVER_INIT(playch10);
-	DECLARE_DRIVER_INIT(pc_gun);
-	DECLARE_DRIVER_INIT(pcaboard);
-	DECLARE_DRIVER_INIT(pcbboard);
-	DECLARE_DRIVER_INIT(pccboard);
-	DECLARE_DRIVER_INIT(pcdboard);
-	DECLARE_DRIVER_INIT(pcdboard_2);
-	DECLARE_DRIVER_INIT(pceboard);
-	DECLARE_DRIVER_INIT(pcfboard);
-	DECLARE_DRIVER_INIT(pcfboard_2);
-	DECLARE_DRIVER_INIT(virus);
-	DECLARE_DRIVER_INIT(ttoon);
-	DECLARE_DRIVER_INIT(pcgboard);
-	DECLARE_DRIVER_INIT(pcgboard_type2);
-	DECLARE_DRIVER_INIT(pchboard);
-	DECLARE_DRIVER_INIT(pciboard);
-	DECLARE_DRIVER_INIT(pckboard);
-	DECLARE_DRIVER_INIT(pc_hrz);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(playch10);
-	DECLARE_MACHINE_START(playch10_hboard);
-	DECLARE_VIDEO_START(playch10_hboard);
-	uint32_t screen_update_playch10_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_playch10_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_playch10_single(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(playch10_interrupt);
-	void pc10_set_videorom_bank( int first, int count, int bank, int size );
-	void set_videoram_bank( int first, int count, int bank, int size );
-	void gboard_scanline_cb( int scanline, int vblank, int blanked );
-	void ppu_irq(int *ppu_regs);
-	void mapper9_latch(offs_t offset);
-	void playch10(machine_config &config);
-	void playchnv(machine_config &config);
-	void playch10_hboard(machine_config &config);
 };
+
+#endif // MAME_INCLUDES_PLAYCH10_H

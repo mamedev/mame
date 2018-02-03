@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( mouser_map, AS_PROGRAM, 8, mouser_state )
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x8800, 0x88ff) AM_WRITENOP /* unknown */
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x9cff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa000, 0xa007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)

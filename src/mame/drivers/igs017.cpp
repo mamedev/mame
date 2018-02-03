@@ -1186,9 +1186,9 @@ READ8_MEMBER(igs017_state::input_r)
 }
 
 static ADDRESS_MAP_START( iqblocka_io, AS_IO, 8, igs017_state )
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
-
 	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
+
+	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
 	AM_RANGE( 0x8000, 0x8000 ) AM_WRITE(input_select_w )
 	AM_RANGE( 0x8001, 0x8001 ) AM_READ(input_r )
@@ -1728,10 +1728,9 @@ static ADDRESS_MAP_START( tjsb_map, AS_PROGRAM, 8, igs017_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tjsb_io, AS_IO, 8, igs017_state )
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
-
 	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
 
+	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
 	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
@@ -1744,8 +1743,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spkrform_map, AS_PROGRAM, 8, igs017_state )
 	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
-	AM_RANGE( 0x0e9bf, 0x0e9bf ) AM_NOP // hack: uncomment to switch to Formosa
 	AM_RANGE( 0x0e000, 0x0efff ) AM_RAM
+	AM_RANGE( 0x0e9bf, 0x0e9bf ) AM_NOP // hack: uncomment to switch to Formosa
 	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
 ADDRESS_MAP_END
@@ -1769,9 +1768,9 @@ READ8_MEMBER(igs017_state::spkrform_input_r)
 }
 
 static ADDRESS_MAP_START( spkrform_io, AS_IO, 8, igs017_state )
-	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
-
 	AM_RANGE( 0x0000, 0x7fff ) AM_DEVREADWRITE("igs017_igs031", igs017_igs031_device, read,write)
+
+	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
 	AM_RANGE( 0x8000, 0x8000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
@@ -1852,7 +1851,7 @@ static ADDRESS_MAP_START( lhzb2, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x910000, 0x910003) AM_WRITE( lhzb2_magic_w )
 	AM_RANGE(0x910002, 0x910003) AM_READ( lhzb2_magic_r )
 
-	AM_RANGE( 0xb00000, 0xb0ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
 
 	AM_RANGE(0xb10000, 0xb10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 ADDRESS_MAP_END
@@ -2159,17 +2158,18 @@ WRITE16_MEMBER(igs017_state::lhzb2a_input_select_w)
 }
 
 static ADDRESS_MAP_START( lhzb2a, AS_PROGRAM, 16, igs017_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+
 	// prot2
 	AM_RANGE(0x003200, 0x003201) AM_WRITE( lhzb2a_prot2_reset_w )
 	AM_RANGE(0x003202, 0x003203) AM_WRITE( lhzb2a_prot2_dec_w )
 	AM_RANGE(0x003206, 0x003207) AM_WRITE( lhzb2a_prot2_inc_w )
 	AM_RANGE(0x00320a, 0x00320b) AM_READ( lhzb2a_prot2_r )
 
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM
 //  AM_RANGE(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
 
-	AM_RANGE( 0xb00000, 0xb0ffff ) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
+	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE8("igs017_igs031", igs017_igs031_device, read,write, 0x00ff)
 
 	AM_RANGE(0xb10000, 0xb10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE(0xb12000, 0xb12001) AM_WRITE( lhzb2a_input_select_w )
@@ -3261,7 +3261,7 @@ MACHINE_RESET_MEMBER(igs017_state,iqblocka)
 }
 
 MACHINE_CONFIG_START(igs017_state::iqblocka)
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(iqblocka_map)
 	MCFG_CPU_IO_MAP(iqblocka_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
@@ -3291,10 +3291,10 @@ MACHINE_CONFIG_START(igs017_state::iqblocka)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000) / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3326,7 +3326,7 @@ MACHINE_RESET_MEMBER(igs017_state,mgcs)
 }
 
 MACHINE_CONFIG_START(igs017_state::mgcs)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mgcs)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3356,7 +3356,7 @@ MACHINE_CONFIG_START(igs017_state::mgcs)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000) / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3365,7 +3365,7 @@ MACHINE_CONFIG_END
 // lhzb2
 
 MACHINE_CONFIG_START(igs017_state::lhzb2)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(lhzb2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3402,7 +3402,7 @@ MACHINE_CONFIG_START(igs017_state::lhzb2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000) / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3417,7 +3417,7 @@ MACHINE_RESET_MEMBER(igs017_state,lhzb2a)
 }
 
 MACHINE_CONFIG_START(igs017_state::lhzb2a)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(lhzb2a)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3445,7 +3445,7 @@ MACHINE_CONFIG_START(igs017_state::lhzb2a)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(22'000'000) / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3454,7 +3454,7 @@ MACHINE_CONFIG_END
 // slqz2
 
 MACHINE_CONFIG_START(igs017_state::slqz2)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(slqz2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3489,7 +3489,7 @@ MACHINE_CONFIG_START(igs017_state::slqz2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_8MHz / 8, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(8'000'000) / 8, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3498,7 +3498,7 @@ MACHINE_CONFIG_END
 // sdmg2
 
 MACHINE_CONFIG_START(igs017_state::sdmg2)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(sdmg2)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgcs_interrupt, "screen", 0, 1)
 
@@ -3527,7 +3527,7 @@ MACHINE_CONFIG_START(igs017_state::sdmg2)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(22'000'000) / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3546,7 +3546,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgdh_interrupt)
 }
 
 MACHINE_CONFIG_START(igs017_state::mgdha)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(22'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(mgdha_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, mgdh_interrupt, "screen", 0, 1)
 
@@ -3574,7 +3574,7 @@ MACHINE_CONFIG_START(igs017_state::mgdha)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_22MHz / 22, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(22'000'000) / 22, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3582,7 +3582,7 @@ MACHINE_CONFIG_END
 // tjsb
 
 MACHINE_CONFIG_START(igs017_state::tjsb)
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(tjsb_map)
 	MCFG_CPU_IO_MAP(tjsb_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
@@ -3614,10 +3614,10 @@ MACHINE_CONFIG_START(igs017_state::tjsb)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000) / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
@@ -3625,7 +3625,7 @@ MACHINE_CONFIG_END
 // spkrform
 
 MACHINE_CONFIG_START(igs017_state::spkrform)
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(spkrform_map)
 	MCFG_CPU_IO_MAP(spkrform_io)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", igs017_state, iqblocka_interrupt, "screen", 0, 1)
@@ -3655,10 +3655,10 @@ MACHINE_CONFIG_START(igs017_state::spkrform)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz / 16, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000) / 16, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 

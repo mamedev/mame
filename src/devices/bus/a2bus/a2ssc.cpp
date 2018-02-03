@@ -98,7 +98,7 @@ ioport_constructor a2bus_ssc_device::device_input_ports() const
 
 MACHINE_CONFIG_START(a2bus_ssc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD(SSC_ACIA_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(XTAL(1'843'200))
 	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(a2bus_ssc_device, acia_irq_w))
 	MCFG_MOS6551_TXD_HANDLER(DEVWRITELINE(SSC_RS232_TAG, rs232_port_device, write_txd))
 
@@ -143,9 +143,6 @@ a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type ty
 
 void a2bus_ssc_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	m_rom = machine().root_device().memregion(this->subtag(SSC_ROM_REGION).c_str())->base();
 }
 

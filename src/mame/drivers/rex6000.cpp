@@ -875,7 +875,7 @@ GFXDECODE_END
 
 MACHINE_CONFIG_START(rex6000_state::rex6000)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) //Toshiba microprocessor Z80 compatible at 4.3MHz
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000)) //Toshiba microprocessor Z80 compatible at 4.3MHz
 	MCFG_CPU_PROGRAM_MAP(rex6000_mem)
 	MCFG_CPU_IO_MAP(rex6000_io)
 
@@ -909,7 +909,7 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x2000)
 
-	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL_1_8432MHz )
+	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(1'843'200) )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
@@ -925,7 +925,7 @@ MACHINE_CONFIG_START(rex6000_state::rex6000)
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", rex6000_state, rex6000, "rex,ds2", 0)
 
-	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL(32'768))
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(rex6000_state, alarm_irq))
 
 	/*
@@ -952,7 +952,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_START(oz750_state::oz750)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_9_8304MHz) //Toshiba microprocessor Z80 compatible at 9.8MHz
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(9'830'400)) //Toshiba microprocessor Z80 compatible at 9.8MHz
 	MCFG_CPU_PROGRAM_MAP(rex6000_mem)
 	MCFG_CPU_IO_MAP(oz750_io)
 
@@ -960,7 +960,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer1", rex6000_state, irq_timer1, attotime::from_hz(64))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_timer2", rex6000_state, irq_timer2, attotime::from_hz(8192))
 
-	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL_9_8304MHz / 4 )
+	MCFG_DEVICE_ADD( "ns16550", NS16550, XTAL(9'830'400) / 4 )
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport", rs232_port_device, write_rts))
@@ -1001,7 +1001,7 @@ MACHINE_CONFIG_START(oz750_state::oz750)
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", oz750_state, oz750, "wzd", 0)
 
-	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD(TC8521_TAG, TC8521, XTAL(32'768))
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(rex6000_state, alarm_irq))
 
 	MCFG_SHARP_LH28F016S_ADD("flash0a")
