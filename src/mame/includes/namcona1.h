@@ -8,6 +8,7 @@
 
 #include "machine/eeprompar.h"
 #include "machine/timer.h"
+#include "machine/msm6242.h"
 #include "sound/c140.h"
 #include "screen.h"
 
@@ -179,10 +180,17 @@ class xday2_namcona2_state : public namcona2_state
 {
 public:
 	xday2_namcona2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: namcona2_state(mconfig, type, tag)
+		: namcona2_state(mconfig, type, tag),
+		m_rtc(*this, "rtc")
 	{}
 	
 	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
 
+	required_device <msm6242_device> m_rtc;
+	
+	DECLARE_READ8_MEMBER(printer_r);
+	DECLARE_WRITE8_MEMBER(printer_w);
+
 	DECLARE_DRIVER_INIT(xday2);
+	void xday2(machine_config &config);
 };
