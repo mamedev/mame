@@ -567,14 +567,28 @@ static ADDRESS_MAP_START( namcona1_main_map, AS_PROGRAM, 16, namcona1_state )
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM AM_SHARE("spriteram")   /* spriteram */
 ADDRESS_MAP_END
 
+READ8_MEMBER(xday2_namcona2_state::printer_r)
+{
+	// --xx ---- printer status related, if bit 5 held 1 long enough causes printer error
+	// ---- --11 battery ok, any other setting causes ng
+	return 3;
+}
 
-static ADDRESS_MAP_START( namcona2_main_map, AS_PROGRAM, 16, namcona1_state )
+WRITE8_MEMBER(xday2_namcona2_state::printer_w)
+{
+	// ...
+}
+
+static ADDRESS_MAP_START( xday2_main_map, AS_PROGRAM, 16, xday2_namcona2_state )
 	AM_IMPORT_FROM(namcona1_main_map)
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP /* xday: serial out? */
-	AM_RANGE(0xd40000, 0xd40001) AM_WRITENOP /* xday: serial out? */
-	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP /* xday: serial out? */
-	AM_RANGE(0xdc0000, 0xdc001f) AM_WRITENOP /* xday: serial config? */
-	/* xday: additional battery-backed ram at 00E024FA? */
+	// these two seems lamps and flash related (mux too?)
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP
+	AM_RANGE(0xd40000, 0xd40001) AM_WRITENOP
+	AM_RANGE(0xd80000, 0xd80001) AM_READWRITE8(printer_r,printer_w,0x00ff) /* xday: serial out? */
+	AM_RANGE(0xdc0000, 0xdc001f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff) /* RTC device */
+
+	// seems bigger than standard na1 (otherwise you won't get proper ranking defaults)
+	AM_RANGE(0xe00000, 0xe03fff) AM_DEVREADWRITE8("eeprom", eeprom_parallel_28xx_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -981,12 +995,23 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED(namcona2_state::namcona2, namcona1)
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(namcona2_main_map)
+//	MCFG_CPU_MODIFY("maincpu")
+//	MCFG_CPU_PROGRAM_MAP(namcona2_main_map)
 
 	MCFG_CPU_REPLACE("mcu", NAMCO_C70, MASTER_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(namcona1_mcu_map)
 	MCFG_CPU_IO_MAP( namcona1_mcu_io_map)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_DERIVED(xday2_namcona2_state::xday2, namcona2)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(xday2_main_map)
+
+	MCFG_DEVICE_REMOVE("eeprom")
+	MCFG_EEPROM_2864_ADD("eeprom")
+
+	// TODO: unknown sub type
+	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL(32'768))
 MACHINE_CONFIG_END
 
  /* NA-1 Hardware */
@@ -1369,4 +1394,4 @@ GAME( 1993, emeralda,   0,        namcona2,  namcona1_joy,  namcona2_state, emer
 GAME( 1993, numanath,   0,        namcona2,  namcona1_joy,  namcona2_state, numanath, ROT0, "Namco", "Numan Athletics (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1993, numanathj,  numanath, namcona2,  namcona1_joy,  namcona2_state, numanath, ROT0, "Namco", "Numan Athletics (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1993, quiztou,    0,        namcona2,  namcona1_quiz, namcona2_state, quiztou,  ROT0, "Namco", "Nettou! Gekitou! Quiztou!! (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1995, xday2,      0,        namcona2,  namcona1_joy,  xday2_namcona2_state, xday2,    ROT0, "Namco", "X-Day 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1995, xday2,      0,        xday2,     namcona1_joy,  xday2_namcona2_state, xday2,    ROT0, "Namco", "X-Day 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
