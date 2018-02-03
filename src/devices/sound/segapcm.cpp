@@ -33,8 +33,6 @@ segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, d
 
 void segapcm_device::device_start()
 {
-	int mask;
-
 	m_stream = stream_alloc(0, 2, clock() / 128);
 	
 	std::fill(std::begin(m_ram), std::end(m_ram), 0xff);
