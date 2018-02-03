@@ -515,6 +515,8 @@ static ADDRESS_MAP_START( fastinvaders_io_base, AS_IO, 8, fastinvaders_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fastinvaders_6845_io, AS_IO, 8, fastinvaders_state )
+	AM_IMPORT_FROM(fastinvaders_io_base)
+
 	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("dma8257", i8257_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("6845", mc6845_device, address_w)
 	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("6845", mc6845_device, register_r, register_w)
@@ -531,12 +533,12 @@ static ADDRESS_MAP_START( fastinvaders_6845_io, AS_IO, 8, fastinvaders_state )
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(io_d0_w)  //ds13 irq5 clear
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(io_e0_w)  //ds14 irq4 clear
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(io_f0_w)  //ds15 irq6 clear
-
-	AM_IMPORT_FROM(fastinvaders_io_base)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( fastinvaders_8275_io, AS_IO, 8, fastinvaders_state )
+	AM_IMPORT_FROM(fastinvaders_io_base)
+
 	AM_RANGE( 0x20, 0x21 ) AM_DEVREADWRITE("8275", i8275_device, read, write)
 
 AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("dma8257", i8257_device, read, write)
@@ -554,7 +556,6 @@ AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE("dma8257", i8257_device, read, write)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(io_d0_w)  //ds13 irq5 clear
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(io_e0_w)  //ds14 irq4 clear
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(io_f0_w)  //ds15 irq6 clear
-	AM_IMPORT_FROM(fastinvaders_io_base)
 ADDRESS_MAP_END
 
 

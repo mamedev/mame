@@ -978,8 +978,8 @@ static ADDRESS_MAP_START( igrosoft_gamble_portmap, AS_IO, 8, igrosoft_gamble_sta
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rollfr_portmap, AS_IO, 8, igrosoft_gamble_state )
-	AM_RANGE(0x33, 0x33) AM_WRITE(rollfr_hopper_w)
 	AM_IMPORT_FROM(igrosoft_gamble_portmap)
+	AM_RANGE(0x33, 0x33) AM_WRITE(rollfr_hopper_w)
 ADDRESS_MAP_END
 
 static const gfx_layout tiles16x16_layout =

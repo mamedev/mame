@@ -287,11 +287,11 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stfight_cpu1_map, AS_PROGRAM, 8, stfight_state )
+	AM_IMPORT_FROM(cpu1_map)
 	AM_RANGE(0xc807, 0xc807) AM_DEVWRITE("stfight_vid", stfight_video_device, stfight_sprite_bank_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("stfight_vid", stfight_video_device, stfight_text_char_w) AM_SHARE("txram")
 	AM_RANGE(0xd800, 0xd808) AM_RAM_DEVWRITE("stfight_vid", stfight_video_device, stfight_vh_latch_w) AM_SHARE("vregs")
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("sprite_ram")
-	AM_IMPORT_FROM(cpu1_map)
 ADDRESS_MAP_END
 
 
@@ -301,12 +301,12 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cshooter_cpu1_map, AS_PROGRAM, 8, stfight_state )
+	AM_IMPORT_FROM(cpu1_map)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(stfight_bank_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device, txram_w) AM_SHARE("txram")
 	AM_RANGE(0xd800, 0xd80f) AM_RAM_DEVWRITE("airraid_vid", airraid_video_device, vregs_w) AM_SHARE("vregs") // wrong?
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("sprite_ram")
-	AM_IMPORT_FROM(cpu1_map)
 ADDRESS_MAP_END
 
 

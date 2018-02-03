@@ -2321,8 +2321,8 @@ segas32_regular_state::segas32_regular_state(const machine_config &mconfig, cons
 
 static ADDRESS_MAP_START( system32_analog_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xc00050, 0xc00057) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("adc", msm6253_device, d7_r, address_w, 0x00ff)
 	AM_IMPORT_FROM(system32_map)
+	AM_RANGE(0xc00050, 0xc00057) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("adc", msm6253_device, d7_r, address_w, 0x00ff)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(segas32_analog_state::device_add_mconfig)
@@ -2356,11 +2356,11 @@ segas32_analog_state::segas32_analog_state(const machine_config &mconfig, device
 
 static ADDRESS_MAP_START( system32_trackball_map, AS_PROGRAM, 16, segas32_trackball_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_IMPORT_FROM(system32_map)
 	//AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_READWRITE8(sonic_custom_io_r, sonic_custom_io_w, 0x00ff)
 	AM_RANGE(0xc00040, 0xc00047) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("upd1", upd4701_device, read_xy, reset_xy, 0x00ff)
 	AM_RANGE(0xc00048, 0xc0004f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("upd2", upd4701_device, read_xy, reset_xy, 0x00ff)
 	AM_RANGE(0xc00050, 0xc00057) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("upd3", upd4701_device, read_xy, reset_xy, 0x00ff)
-	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(segas32_trackball_state::device_add_mconfig)
@@ -2397,8 +2397,8 @@ segas32_trackball_state::segas32_trackball_state(const machine_config &mconfig, 
 
 static ADDRESS_MAP_START( system32_4player_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xc00060, 0xc00067) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
 	AM_IMPORT_FROM(system32_map)
+	AM_RANGE(0xc00060, 0xc00067) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(segas32_4player_state::device_add_mconfig)
@@ -2431,8 +2431,8 @@ segas32_4player_state::segas32_4player_state(const machine_config &mconfig, devi
 
 static ADDRESS_MAP_START( ga2_main_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("dpram", mb8421_device, right_r, right_w, 0x00ff)
 	AM_IMPORT_FROM(system32_4player_map)
+	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("dpram", mb8421_device, right_r, right_w, 0x00ff)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(segas32_v25_state::device_add_mconfig)
@@ -2508,13 +2508,13 @@ WRITE_LINE_MEMBER(segas32_cd_state::scsi_drq_w)
 
 static ADDRESS_MAP_START( system32_cd_map, AS_PROGRAM, 16, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_IMPORT_FROM(system32_map)
 	#if S32_KOKOROJI_TEST_CD
 	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("mb89352", mb89352_device, mb89352_r, mb89352_w, 0x00ff)
 	#else
 	AM_RANGE(0xc00040, 0xc0005f) AM_MIRROR(0x0fff80) AM_NOP
 	#endif
 	AM_RANGE(0xc00060, 0xc0006f) AM_MIRROR(0x0fff80) AM_DEVREADWRITE8("cxdio", cxd1095_device, read, write, 0x00ff)
-	AM_IMPORT_FROM(system32_map)
 ADDRESS_MAP_END
 
 void segas32_cd_state::cdrom_config(device_t *device)
@@ -2644,9 +2644,9 @@ sega_multi32_state::sega_multi32_state(const machine_config &mconfig, device_typ
 static ADDRESS_MAP_START( multi32_analog_map, AS_PROGRAM, 32, sega_multi32_analog_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
+	AM_IMPORT_FROM(multi32_map)
 	AM_RANGE(0xc00050, 0xc00057) AM_MIRROR(0x07ff80) AM_DEVREADWRITE8("adc", msm6253_device, d7_r, address_w, 0x00ff00ff)
 	AM_RANGE(0xc00060, 0xc00063) AM_MIRROR(0x07ff80) AM_WRITE8(analog_bank_w, 0x000000ff)
-	AM_IMPORT_FROM(multi32_map)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(sega_multi32_analog_state::device_add_mconfig)
@@ -2689,8 +2689,8 @@ sega_multi32_analog_state::sega_multi32_analog_state(const machine_config &mconf
 static ADDRESS_MAP_START( multi32_6player_map, AS_PROGRAM, 32, segas32_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0xc00060, 0xc00067) AM_MIRROR(0x07ff80) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff00ff)
 	AM_IMPORT_FROM(multi32_map)
+	AM_RANGE(0xc00060, 0xc00067) AM_MIRROR(0x07ff80) AM_DEVREADWRITE8("ppi", i8255_device, read, write, 0x00ff00ff)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_START(sega_multi32_6player_state::device_add_mconfig)

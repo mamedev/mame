@@ -527,8 +527,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( greatgun_cpu3_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE("vcu", mb_vcu_device, vbank_clear_w)
 	AM_IMPORT_FROM( mazerbla_cpu3_io_map )
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("vcu", mb_vcu_device, vbank_clear_w)
 ADDRESS_MAP_END
 
 

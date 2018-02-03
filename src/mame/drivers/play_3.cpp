@@ -133,13 +133,13 @@ static ADDRESS_MAP_START( play_3_io, AS_IO, 8, play_3_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megaaton_io, AS_IO, 8, play_3_state )
-	AM_RANGE(0x01, 0x01) AM_WRITE(megaaton_port01_w) // digits, scan-lines
 	AM_IMPORT_FROM(play_3_io)
+	AM_RANGE(0x01, 0x01) AM_WRITE(megaaton_port01_w) // digits, scan-lines
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sklflite_io, AS_IO, 8, play_3_state )
-	AM_RANGE(0x03, 0x03) AM_WRITE(sklflite_port03_w) //
 	AM_IMPORT_FROM(play_3_io)
+	AM_RANGE(0x03, 0x03) AM_WRITE(sklflite_port03_w) //
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( play_3_audio_map, AS_PROGRAM, 8, play_3_state )

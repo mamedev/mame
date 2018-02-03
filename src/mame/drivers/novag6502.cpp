@@ -512,9 +512,9 @@ static ADDRESS_MAP_START( supercon_map, AS_PROGRAM, 8, novag6502_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cforte_map, AS_PROGRAM, 8, novag6502_state )
+	AM_IMPORT_FROM( supercon_map )
 	AM_RANGE(0x1e00, 0x1e00) AM_READWRITE(supercon_input2_r, cforte_mux_w)
 	AM_RANGE(0x1f00, 0x1f00) AM_READWRITE(supercon_input1_r, cforte_control_w)
-	AM_IMPORT_FROM( supercon_map )
 ADDRESS_MAP_END
 
 
@@ -534,11 +534,11 @@ static ADDRESS_MAP_START( sforte_map, AS_PROGRAM, 8, novag6502_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sexpert_map, AS_PROGRAM, 8, novag6502_state )
+	AM_IMPORT_FROM( sforte_map )
 	AM_RANGE(0x1ff4, 0x1ff4) AM_WRITE(sexpert_leds_w)
 	AM_RANGE(0x1ff5, 0x1ff5) AM_WRITE(sexpert_mux_w)
 	AM_RANGE(0x1ff6, 0x1ff6) AM_WRITE(sexpert_lcd_control_w)
 	AM_RANGE(0x1ff7, 0x1ff7) AM_WRITE(sexpert_lcd_data_w)
-	AM_IMPORT_FROM( sforte_map )
 ADDRESS_MAP_END
 
 

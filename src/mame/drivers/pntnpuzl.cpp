@@ -285,10 +285,10 @@ static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16, pntnpuzl_state )
 	AM_RANGE(0x100000, 0x100001) AM_READ(irq2_ack_r)
 	AM_RANGE(0x180000, 0x180001) AM_READ(irq4_ack_r)
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(pntnpuzl_200000_w)
+	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("via", via6522_device, read, write, 0xff00)
 	AM_RANGE(0x280014, 0x280015) AM_READ(pntnpuzl_280014_r)
 	AM_RANGE(0x280018, 0x280019) AM_WRITE(pntnpuzl_280018_w)
 	AM_RANGE(0x28001a, 0x28001b) AM_READ(pntnpuzl_28001a_r)
-	AM_RANGE(0x280000, 0x28001f) AM_DEVREADWRITE8("via", via6522_device, read, write, 0xff00)
 
 	/* standard VGA */
 	AM_RANGE(0x3a0000, 0x3bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffff)

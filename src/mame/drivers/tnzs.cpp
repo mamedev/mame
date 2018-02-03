@@ -734,10 +734,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tnzs_base_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prompal_main_map, AS_PROGRAM, 8, extrmatn_state )
+	AM_IMPORT_FROM(main_map)
 	/* arknoid2, extrmatn, plumppop and drtoppel have PROMs instead of RAM */
 	/* drtoppel writes here anyway! (maybe leftover from tests during development) */
 	AM_RANGE(0xf800, 0xfbff) AM_WRITENOP
-	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnzsb_main_map, AS_PROGRAM, 8, tnzsb_state )
@@ -764,31 +764,31 @@ static ADDRESS_MAP_START( base_sub_map, AS_PROGRAM, 8, tnzs_base_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnzs_sub_map, AS_PROGRAM, 8, tnzs_mcu_state )
+	AM_IMPORT_FROM(base_sub_map)
 	AM_RANGE(0xc000, 0xc001) AM_READWRITE(mcu_r, mcu_w)   /* not present in insectx */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(bankswitch1_w)
 	AM_RANGE(0xf000, 0xf003) AM_READ(analog_r) /* paddles in arkanoid2/plumppop. The ports are */
 											   /* read but not used by the other games, and are not read at */
 											   /* all by insectx. */
-	AM_IMPORT_FROM(base_sub_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( arknoid2_sub_map, AS_PROGRAM, 8, arknoid2_state )
-	AM_RANGE(0xc000, 0xc001) AM_READWRITE(mcu_r, mcu_w)
 	AM_IMPORT_FROM(tnzs_sub_map)
+	AM_RANGE(0xc000, 0xc001) AM_READWRITE(mcu_r, mcu_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kageki_sub_map, AS_PROGRAM, 8, kageki_state )
+	AM_IMPORT_FROM(base_sub_map)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
-	AM_IMPORT_FROM(base_sub_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( insectx_sub_map, AS_PROGRAM, 8, insectx_state )
+	AM_IMPORT_FROM(base_sub_map)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
-	AM_IMPORT_FROM(base_sub_map)
 ADDRESS_MAP_END
 
 /* the later board is different, it has a third CPU (and of course no mcu) */
@@ -808,14 +808,14 @@ static ADDRESS_MAP_START( tnzsb_base_sub_map, AS_PROGRAM, 8, tnzsb_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnzsb_sub_map, AS_PROGRAM, 8, tnzsb_state )
+	AM_IMPORT_FROM(tnzsb_base_sub_map)
 	AM_RANGE(0xf000, 0xf003) AM_READONLY
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
-	AM_IMPORT_FROM(tnzsb_base_sub_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kabukiz_sub_map, AS_PROGRAM, 8, kabukiz_state )
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_IMPORT_FROM(tnzsb_base_sub_map)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnzsb_cpu2_map, AS_PROGRAM, 8, tnzsb_state )

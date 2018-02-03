@@ -49,8 +49,8 @@ static ADDRESS_MAP_START( mt420_mem_map, AS_PROGRAM, 8, microterm_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x9000, 0x9000) AM_WRITENOP
 	AM_RANGE(0xc000, 0xc000) AM_READ(c000_r) AM_WRITENOP
-	AM_RANGE(0xeff8, 0xefff) AM_DEVREADWRITE("avdc", scn2674_device, read, write)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
+	AM_RANGE(0xeff8, 0xefff) AM_DEVREADWRITE("avdc", scn2674_device, read, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 

@@ -502,8 +502,8 @@ static ADDRESS_MAP_START( fghtbskt_map, AS_PROGRAM, 8, m63_state )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(snd_irq_w)
 	AM_RANGE(0xf001, 0xf001) AM_WRITENOP
 	AM_RANGE(0xf002, 0xf002) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(fghtbskt_samples_w) // FIXME
 	AM_RANGE(0xf800, 0xf807) AM_DEVWRITE("outlatch", ls259_device, write_d0)
+	AM_RANGE(0xf807, 0xf807) AM_WRITE(fghtbskt_samples_w) // FIXME
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_map, AS_PROGRAM, 8, m63_state )

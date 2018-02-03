@@ -888,8 +888,8 @@ MACHINE_RESET_MEMBER(ngcd_state,neocd)
 
 static ADDRESS_MAP_START( neocd_main_map, AS_PROGRAM, 16, ngcd_state )
 //  AM_RANGE(0x000000, 0x00007f) AM_READ_BANK("vectors") // writes will fall through to area below
-	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_REGION("maincpu", 0x00000)
+	AM_RANGE(0x000000, 0x00007f) AM_READ(banked_vectors_r)
 
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01fffe) AM_DEVREAD8("ctrl1", neogeo_control_port_device, ctrl_r, 0xff00)
 	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("AUDIO") AM_WRITE8(audio_command_w, 0xff00)

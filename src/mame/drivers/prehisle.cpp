@@ -38,8 +38,8 @@ static ADDRESS_MAP_START( prehisle_map, AS_PROGRAM, 16, prehisle_state )
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(fg_vram_w) AM_SHARE("fg_vram")
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x0e0000, 0x0e00ff) AM_READ(control_r)
-	AM_RANGE(0x0f0070, 0x0ff071) AM_WRITE(soundcmd_w)
 	AM_RANGE(0x0f0000, 0x0ff0ff) AM_WRITE(control_w)
+	AM_RANGE(0x0f0070, 0x0ff071) AM_WRITE(soundcmd_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/

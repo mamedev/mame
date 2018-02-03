@@ -30,6 +30,7 @@ void i6300esb_watchdog_device::device_reset()
 
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, i6300esb_lpc_device)
+	AM_INHERIT_FROM(pci_device::config_map)
 	AM_RANGE(0x40, 0x43) AM_READWRITE  (pmbase_r,               pmbase_w)
 	AM_RANGE(0x44, 0x47) AM_READWRITE8 (acpi_cntl_r,            acpi_cntl_w,            0x000000ff)
 	AM_RANGE(0x4c, 0x4f) AM_READWRITE16(bios_cntl_r,            bios_cntl_w,            0xffff0000)
@@ -70,8 +71,6 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i6300esb_lpc_device)
 	AM_RANGE(0xf4, 0xf7) AM_READWRITE  (etr1_r,                 etr1_w)
 	AM_RANGE(0xf8, 0xfb) AM_READ       (mfid_r)
 	AM_RANGE(0xfc, 0xff) AM_READWRITE  (unk_fc_r,               unk_fc_w)
-
-	AM_INHERIT_FROM(pci_device::config_map)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i6300esb_lpc_device)

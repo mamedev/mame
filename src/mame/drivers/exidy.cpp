@@ -218,32 +218,32 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sidetrac_map, AS_PROGRAM, 8, exidy_state )
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_SHARE("characterram")
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
 	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( targ_map, AS_PROGRAM, 8, exidy_state )
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
 	AM_RANGE(0x5201, 0x5201) AM_WRITE(targ_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spectar_map, AS_PROGRAM, 8, exidy_state )
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
 	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
@@ -270,23 +270,24 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( venture_map, AS_PROGRAM, 8, exidy_state )
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( pepper2_map, AS_PROGRAM, 8, exidy_state )
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x4800, 0x4fff) AM_NOP
 	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( fax_map, AS_PROGRAM, 8, exidy_state )
+	AM_IMPORT_FROM(exidy_map)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("IN4")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("IN3")
@@ -296,7 +297,6 @@ static ADDRESS_MAP_START( fax_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x5213, 0x5217) AM_WRITENOP        /* empty control lines on color/sound board */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("characterram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
-	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
 
 
