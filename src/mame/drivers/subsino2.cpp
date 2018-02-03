@@ -1049,8 +1049,8 @@ static ADDRESS_MAP_START( new2001_base_map, AS_PROGRAM, 16, subsino2_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( new2001_map, AS_PROGRAM, 16, subsino2_state )
-	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(new2001_outputs_w ) AM_SHARE("outputs16")
 	AM_IMPORT_FROM(new2001_base_map)
+	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(new2001_outputs_w ) AM_SHARE("outputs16")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1085,8 +1085,8 @@ WRITE16_MEMBER(subsino2_state::humlan_outputs_w)
 }
 
 static ADDRESS_MAP_START( humlan_map, AS_PROGRAM, 16, subsino2_state )
-	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(humlan_outputs_w ) AM_SHARE("outputs16")
 	AM_IMPORT_FROM(new2001_base_map)
+	AM_RANGE( 0xc00008, 0xc00009 ) AM_WRITE(humlan_outputs_w ) AM_SHARE("outputs16")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1480,17 +1480,17 @@ WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 }
 
 static ADDRESS_MAP_START( expcard_io, AS_IO, 8, subsino2_state )
+	AM_IMPORT_FROM( xplan_io )
+
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	AM_RANGE(0x0306, 0x0309) AM_WRITE(expcard_outputs_w ) AM_SHARE("outputs")
-
-	AM_IMPORT_FROM( xplan_io )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xtrain_io, AS_IO, 8, subsino2_state )
+	AM_IMPORT_FROM( xplan_io )
+
 	// 306 = d, 307 = c, 308 = b, 309 = a
 	AM_RANGE(0x0306, 0x0309) AM_WRITE(xtrain_outputs_w ) AM_SHARE("outputs")
-
-	AM_IMPORT_FROM( xplan_io )
 ADDRESS_MAP_END
 
 

@@ -287,11 +287,11 @@ static ADDRESS_MAP_START(memmap, AS_PROGRAM, 16, ti99_4p_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(cru_map, AS_IO, 8, ti99_4p_state)
-	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 	AM_RANGE(0x0000, 0x01ff) AM_READ( cruread )
+	AM_RANGE(0x0000, 0x003f) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 
-	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE( cruwrite )
+	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 ADDRESS_MAP_END
 
 /*

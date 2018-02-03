@@ -197,8 +197,8 @@ WRITE8_MEMBER(joctronic_state::bldyrolr_unknown_w)
 }
 
 static ADDRESS_MAP_START( bldyrolr_maincpu_map, AS_PROGRAM, 8, joctronic_state )
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(bldyrolr_unknown_r, bldyrolr_unknown_w)
 	AM_IMPORT_FROM(slalom03_maincpu_map)
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(bldyrolr_unknown_r, bldyrolr_unknown_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maincpu_io_map, AS_IO, 8, joctronic_state )

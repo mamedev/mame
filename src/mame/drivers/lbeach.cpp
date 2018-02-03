@@ -217,8 +217,8 @@ READ8_MEMBER(lbeach_state::lbeach_in2_r)
 
 static ADDRESS_MAP_START( lbeach_map, AS_PROGRAM, 8, lbeach_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4000, 0x4000) AM_READ(lbeach_in1_r)
 	AM_RANGE(0x4000, 0x41ff) AM_RAM_WRITE(lbeach_bg_vram_w) AM_SHARE("bg_vram")
+	AM_RANGE(0x4000, 0x4000) AM_READ(lbeach_in1_r)
 	AM_RANGE(0x4200, 0x43ff) AM_RAM
 	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(lbeach_fg_vram_w) AM_SHARE("fg_vram")
 	AM_RANGE(0x8000, 0x8000) AM_READ(lbeach_in2_r)

@@ -1537,6 +1537,8 @@ READ8_MEMBER(model2_state::model2o_in_r)
 
 /* original Model 2 overrides */
 static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
+	AM_IMPORT_FROM(model2_base_mem)
+
 	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM
 	AM_RANGE(0x00220000, 0x0023ffff) AM_ROM AM_REGION("maincpu", 0x20000)
 
@@ -1559,8 +1561,6 @@ static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01c00110, 0x01c00113) AM_READ8(virtuacop_lightgun_offscreen_r, 0x00ff00ff)
 	AM_RANGE(0x01c00200, 0x01c002ff) AM_RAM AM_SHARE("backup2")
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w)
-
-	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
 
 /* TODO: read by Sonic the Fighters (bit 1), unknown purpose */
@@ -1574,6 +1574,8 @@ READ32_MEMBER(model2_state::copro_status_r)
 
 /* 2A-CRX overrides */
 static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
+	AM_IMPORT_FROM(model2_base_mem)
+
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
 
 	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
@@ -1597,12 +1599,12 @@ static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01c0001c, 0x01c0001f) AM_WRITE(analog_2b_w)
 	AM_RANGE(0x01c00040, 0x01c00043) AM_WRITENOP
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w)
-
-	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
 
 /* 2B-CRX overrides */
 static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32, model2_state )
+	AM_IMPORT_FROM(model2_base_mem)
+
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
 
 	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
@@ -1634,12 +1636,12 @@ static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01c0001c, 0x01c0001f) AM_WRITE(analog_2b_w)
 	AM_RANGE(0x01c00040, 0x01c00043) AM_WRITENOP
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w)
-
-	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
 
 /* 2C-CRX overrides */
 static ADDRESS_MAP_START( model2c_crx_mem, AS_PROGRAM, 32, model2_state )
+	AM_IMPORT_FROM(model2_base_mem)
+
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
 
 	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
@@ -1660,8 +1662,6 @@ static ADDRESS_MAP_START( model2c_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01c00014, 0x01c00017) AM_WRITE(hotd_lightgun_w)
 	AM_RANGE(0x01c0001c, 0x01c0001f) AM_WRITE(analog_2b_w)
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE(model2_serial_r, model2_serial_w )
-
-	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
 
 /* Input definitions */
@@ -4074,7 +4074,7 @@ ROM_START( segawski ) /* Sega Water Ski Revision A, Model 2C, Sega Game ID# 833-
 	ROM_LOAD("mpr-19989.34", 0x400000, 0x400000, CRC(8074a4b3) SHA1(98dc1d122ffb9b5c52994dea2b5d8c4f004a5f8e) )
 ROM_END
 
-ROM_START( hotd ) /* House of the Dead, Model 2C, Sega Game ID# 610-0396-13054 */
+ROM_START( hotd ) /* House of the Dead, Model 2C, Sega Game ID# 610-0396-13054, ROM board ID# 834-13055 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-19696.15", 0x000000, 0x080000, CRC(03da5623) SHA1(be0bd34a9216375c7204445f084f6c74c4d3b0c8) )
 	ROM_LOAD32_WORD("epr-19697.16", 0x000002, 0x080000, CRC(a9722d87) SHA1(0b14f9a81272f79a5b294bc024711042c5fb2637) )

@@ -53,8 +53,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(k235_io, AS_IO, 8, dmv_k230_device)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x90, 0x91 ) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE( 0x00, 0xff ) AM_READWRITE(io_r, io_w)
+	AM_RANGE( 0x90, 0x91 ) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dmv_k235 )

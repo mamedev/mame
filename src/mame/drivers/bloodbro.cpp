@@ -235,8 +235,8 @@ void bloodbro_state::weststry_soundnmi_update()
 }
 
 static ADDRESS_MAP_START( weststry_sound_map, AS_PROGRAM, 8, bloodbro_state )
-	AM_RANGE(0x4002, 0x4002) AM_WRITE(weststry_soundnmi_ack_w)
 	AM_IMPORT_FROM(seibu_sound_map)
+	AM_RANGE(0x4002, 0x4002) AM_WRITE(weststry_soundnmi_ack_w)
 ADDRESS_MAP_END
 
 /* Input Ports */

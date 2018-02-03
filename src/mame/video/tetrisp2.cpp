@@ -711,17 +711,14 @@ uint32_t tetrisp2_state::screen_update_rocknms_right(screen_device &screen, bitm
 // of code_hi, one of the CPUs probably reads them and writes the actual tile codes somewhere.
 TILE_GET_INFO_MEMBER(tetrisp2_state::stepstag_get_tile_info_fg)
 {
-	uint16_t code_hi = m_vram_fg[ 2 * tile_index + 0];
-	uint16_t code_lo = m_vram_fg[ 2 * tile_index + 1];
-
-	// ASCII -> tile codes
-	code_hi = (code_hi & 0xff00) >> 8;
-	code_hi = (code_hi & 0x0f) + (code_hi & 0xf0)*2;
-	code_hi += 0xbd6c;
-
-	SET_TILE_INFO_MEMBER(2,
+	uint16_t const code_hi = m_vram_fg[ 2 * tile_index ] >> 8;
+	uint16_t const code_lo = m_vram_fg[ 2 * tile_index ] & 0xf;
+   	//logerror("tile_idx[$%2x]=$%3x, palette=$%2x\n", tile_index, code_hi, code_lo);////
+	if (m_vram_fg[2 * tile_index + 1] != 0)
+		logerror("VRAM ASCII Haut-Mot Non-Zero!!!\n");/////////
+	SET_TILE_INFO_MEMBER(3,
 			code_hi,
-			code_lo & 0xf,
+			code_lo,
 			0);
 }
 
@@ -730,7 +727,6 @@ VIDEO_START_MEMBER(stepstag_state,stepstag)
 	m_flipscreen_old = -1;
 
 	m_tilemap_bg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_bg),this),TILEMAP_SCAN_ROWS,16,16,NX_0,NY_0);
-	// Temporary hack
 	m_tilemap_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tetrisp2_state::stepstag_get_tile_info_fg),this),TILEMAP_SCAN_ROWS,8,8,NX_1,NY_1);
 	m_tilemap_rot = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tetrisp2_state::get_tile_info_rot),this),TILEMAP_SCAN_ROWS,16,16,NX_0*2,NY_0*2);
 	m_tilemap_bg->set_transparent_pen(0);
@@ -740,38 +736,120 @@ VIDEO_START_MEMBER(stepstag_state,stepstag)
 	// should be smaller and mirrored like m32 I guess
 	m_priority = std::make_unique<uint8_t[]>(0x40000);
 
-	ms32_rearrange_sprites(machine(), "sprites_horiz");
-	ms32_rearrange_sprites(machine(), "sprites_vert");
+	ms32_rearrange_sprites(machine(), "sprites_left");
+	ms32_rearrange_sprites(machine(), "sprites_mid");
+	ms32_rearrange_sprites(machine(), "sprites_right");
 }
 
-uint32_t stepstag_state::screen_update_stepstag_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t stepstag_state::screen_update_stepstag_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
-	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
-							m_spriteram, m_spriteram.bytes(), m_gfxdecode->gfx(1), (m_systemregs[0x00] & 0x02)    );
+	tetrisp2_draw_sprites(
+			bitmap, screen.priority(), cliprect, m_priority.get(),
+			m_spriteram1, m_spriteram1.bytes(), m_vj_gfxdecode_l->gfx(0), (m_systemregs[0x00] & 0x02));
+
 	return 0;
 }
+
+uint32_t stepstag_state::screen_update_stepstag_mid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0, cliprect);
+	screen.priority().fill(0);
+
+	tetrisp2_draw_sprites(
+			bitmap, screen.priority(), cliprect, m_priority.get(),
+			m_spriteram2, m_spriteram2.bytes(), m_vj_gfxdecode_m->gfx(0), (m_systemregs[0x00] & 0x02));
+
+//  m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
+//  m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
+	m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
+
+	return 0;
+}
+
 uint32_t stepstag_state::screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
-	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
-							m_spriteram3, m_spriteram3.bytes(), m_gfxdecode->gfx(1), (m_systemregs[0x00] & 0x02)  );
+	tetrisp2_draw_sprites(
+			bitmap, screen.priority(), cliprect, m_priority.get(),
+			m_spriteram3, m_spriteram3.bytes(), m_vj_gfxdecode_r->gfx(0), (m_systemregs[0x00] & 0x02));
+
 	return 0;
 }
 
-uint32_t stepstag_state::screen_update_stepstag_mid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t stepstag_state::screen_update_stepstag_main(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bool const flipscreen = bool(m_systemregs[0x00] & 0x02);
+
+	/* Black background color */
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0);
 
-	tetrisp2_draw_sprites(bitmap, screen.priority(), cliprect, m_priority.get(),
-							m_spriteram2, m_spriteram2.bytes(), m_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02)  );
+	/* Flip Screen */
+	if (flipscreen != m_flipscreen_old)
+	{
+		m_flipscreen_old = flipscreen;
+		machine().tilemap().set_flip_all(flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	}
 
-	m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
+	/* Flip Screen */
+	int const rot_ofsx = flipscreen ? 0x053f : 0x400;
+	int const rot_ofsy = flipscreen ? 0x04df : 0x400;
+
+	m_tilemap_bg->set_scrollx(0, (((m_scroll_bg[ 0 ] + 0x0014) + m_scroll_bg[ 2 ] ) & 0xffff));
+	m_tilemap_bg->set_scrolly(0, (((m_scroll_bg[ 3 ] + 0x0000) + m_scroll_bg[ 5 ] ) & 0xffff));
+
+	m_tilemap_fg->set_scrollx(0, m_scroll_fg[ 2 ]);
+	m_tilemap_fg->set_scrolly(0, m_scroll_fg[ 5 ]);
+
+	m_tilemap_rot->set_scrollx(0, (m_rotregs[ 0 ] - rot_ofsx));
+	m_tilemap_rot->set_scrolly(0, (m_rotregs[ 2 ] - rot_ofsy));
+
+	int asc_pri = 0, scr_pri = 0, rot_pri = 0;
+
+	if ((m_priority[0x2b00 / 2] & 0x00ff) == 0x0034)
+		asc_pri++;
+	else
+		rot_pri++;
+
+	if ((m_priority[0x2e00 / 2] & 0x00ff) == 0x0034)
+		asc_pri++;
+	else
+		scr_pri++;
+
+	if ((m_priority[0x3a00 / 2] & 0x00ff) == 0x000c)
+		scr_pri++;
+	else
+		rot_pri++;
+
+	if (rot_pri == 0)
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
+	else if (scr_pri == 0)
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
+	else if (asc_pri == 0)
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
+
+	if (rot_pri == 1)
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
+	else if (scr_pri == 1)
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
+	else if (asc_pri == 1)
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
+
+	if (rot_pri == 2)
+		m_tilemap_rot->draw(screen, bitmap, cliprect, 0, 1 << 1);
+	else if (scr_pri == 2)
+		m_tilemap_bg->draw(screen, bitmap, cliprect, 0, 1 << 0);
+	else if (asc_pri == 2)
+		m_tilemap_fg->draw(screen, bitmap, cliprect, 0, 1 << 2);
+
+	tetrisp2_draw_sprites(
+			bitmap, screen.priority(), cliprect, m_priority.get(),
+			m_spriteram, m_spriteram.bytes(), m_gfxdecode->gfx(0), (m_systemregs[0x00] & 0x02));
 
 	return 0;
 }

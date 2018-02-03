@@ -165,29 +165,27 @@ void electron_romboxp_device::device_reset()
 
 uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset, uint8_t data)
 {
-	if (offset >= 0x8000 && offset < 0xc000)
+	switch (offset >> 12)
 	{
+	case 0x8:
+	case 0x9:
+	case 0xa:
+	case 0xb:
 		switch (m_romsel)
 		{
 		case 0:
 		case 1:
-			if (m_cart[1]->exists())
-			{
-				data = m_cart[1]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
-			}
+			data = m_cart[1]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
 			break;
 		case 2:
 		case 3:
-			if (m_cart[0]->exists())
-			{
-				data = m_cart[0]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
-			}
+			data = m_cart[0]->read(space, offset & 0x3fff, 0, 0, m_romsel & 0x01);
 			break;
 		case 4:
 		case 5:
 		case 6:
 		case 7:
-			if (m_rom_base == 4 && m_rom[m_romsel - 4]->exists())
+			if (m_rom_base == 4)
 			{
 				data = m_rom[m_romsel - 4]->read_rom(space, offset & 0x3fff);
 			}
@@ -198,27 +196,32 @@ uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset, u
 		case 13:
 		case 14:
 		case 15:
-			if (m_rom_base == 12 && m_rom[m_romsel - 12]->exists())
+			if (m_rom_base == 12)
 			{
 				data = m_rom[m_romsel - 12]->read_rom(space, offset & 0x3fff);
 			}
 			break;
 		}
-	}
-	else if ((offset & 0xfc00) == 0xfc00)
-	{
-		data &= m_cart[0]->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
-		data &= m_cart[1]->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
+		break;
 
-		if (offset == 0xfc72)
+	case 0xf:
+		switch (offset >> 8)
 		{
-			data &= status_r(space, offset);
+		case 0xfc:
+			data &= m_cart[0]->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
+			data &= m_cart[1]->read(space, offset & 0xff, 1, 0, m_romsel & 0x01);
+
+			if (offset == 0xfc72)
+			{
+				data &= status_r(space, offset);
+			}
+			break;
+
+		case 0xfd:
+			data &= m_cart[0]->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
+			data &= m_cart[1]->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
+			break;
 		}
-	}
-	else if ((offset & 0xfd00) == 0xfd00)
-	{
-		data &= m_cart[0]->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
-		data &= m_cart[1]->read(space, offset & 0xff, 0, 1, m_romsel & 0x01);
 	}
 
 	return data;
@@ -230,44 +233,50 @@ uint8_t electron_romboxp_device::expbus_r(address_space &space, offs_t offset, u
 
 void electron_romboxp_device::expbus_w(address_space &space, offs_t offset, uint8_t data)
 {
-	if (offset >= 0x8000 && offset < 0xc000)
+	switch (offset >> 12)
 	{
+	case 0x8:
+	case 0x9:
+	case 0xa:
+	case 0xb:
 		switch (m_romsel)
 		{
 		case 0:
 		case 1:
-			if (m_cart[1]->exists())
-			{
-				m_cart[1]->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
-			}
+			m_cart[1]->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
 			break;
 		case 2:
 		case 3:
-			if (m_cart[0]->exists())
+			m_cart[0]->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
+			break;
+		}
+		break;
+
+	case 0xf:
+		switch (offset >> 8)
+		{
+		case 0xfc:
+			m_cart[0]->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
+			m_cart[1]->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
+
+			if (offset == 0xfc71)
 			{
-				m_cart[0]->write(space, offset & 0x3fff, data, 0, 0, m_romsel & 0x01);
+				m_cent_data_out->write(data);
+			}
+			break;
+
+		case 0xfd:
+			m_cart[0]->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
+			m_cart[1]->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
+			break;
+
+		case 0xfe:
+			if (offset == 0xfe05)
+			{
+				m_romsel = data & 0x0f;
 			}
 			break;
 		}
-	}
-	else if ((offset & 0xfc00) == 0xfc00)
-	{
-		m_cart[0]->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
-		m_cart[1]->write(space, offset & 0xff, data, 1, 0, m_romsel & 0x01);
-
-		if (offset == 0xfc71)
-		{
-			m_cent_data_out->write(data);
-		}
-		else if (offset == 0xfe05)
-		{
-			m_romsel = data & 0x0f;
-		}
-	}
-	else if ((offset & 0xfd00) == 0xfd00)
-	{
-		m_cart[0]->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
-		m_cart[1]->write(space, offset & 0xff, data, 0, 1, m_romsel & 0x01);
 	}
 }
 

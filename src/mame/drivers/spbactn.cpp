@@ -231,7 +231,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spbactnp_extra_map, AS_PROGRAM, 8, spbactn_state )
-	AM_RANGE(0x0000, 0xefff) AM_ROM
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("extraram2")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE( extraram_w ) AM_SHARE("extraram")

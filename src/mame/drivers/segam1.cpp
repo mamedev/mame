@@ -207,8 +207,8 @@ static ADDRESS_MAP_START( segam1_sound_map, AS_PROGRAM, 8, segam1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( unkm1_sound_map, AS_PROGRAM, 8, segam1_state )
-	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_IMPORT_FROM(segam1_sound_map)
+	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( segam1_sound_io_map, AS_IO, 8, segam1_state )

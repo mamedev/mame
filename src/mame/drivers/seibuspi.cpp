@@ -997,6 +997,7 @@ WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)
 
 
 static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00000400, 0x0000043f) AM_DEVREADWRITE16("crtc", seibu_crtc_device, read, write, 0xffffffff)
 	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
@@ -1007,7 +1008,6 @@ static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000604, 0x00000607) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ_PORT("EXCH")
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
 ADDRESS_MAP_END
@@ -1029,6 +1029,7 @@ static ADDRESS_MAP_START( rise_map, AS_PROGRAM, 32, seibuspi_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( sei252_map )
 	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP // ?
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff)
@@ -1043,10 +1044,10 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
 	AM_RANGE(0x00a00000, 0x013fffff) AM_ROM AM_REGION("sound01", 0)
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rdft2_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP // ?
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff)
@@ -1061,10 +1062,10 @@ static ADDRESS_MAP_START( rdft2_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
 	AM_RANGE(0x00a00000, 0x013fffff) AM_ROM AM_REGION("sound01", 0)
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sxx2e_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( sei252_map )
 	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
@@ -1076,10 +1077,10 @@ static ADDRESS_MAP_START( sxx2e_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_clk_w, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sxx2f_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
@@ -1087,19 +1088,19 @@ static ADDRESS_MAP_START( sxx2f_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000688, 0x0000068b) AM_NOP // ?
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
 	AM_RANGE(0x00000690, 0x00000693) AM_WRITENOP // ?
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys386i_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(oki_bank_w, 0xff000000)
 	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff)
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys386f_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x00000010, 0x00000013) AM_READ8(spi_status_r, 0x000000ff)
 	AM_RANGE(0x00000400, 0x00000403) AM_READ_PORT("SYSTEM") AM_WRITE(ejsakura_input_select_w)
@@ -1110,7 +1111,6 @@ static ADDRESS_MAP_START( sys386f_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
 	AM_RANGE(0x00000600, 0x00000607) AM_DEVREAD8("ymz", ymz280b_device, read, 0x000000ff)
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(ejsakura_keyboard_r)
-	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
 ADDRESS_MAP_END
@@ -1171,9 +1171,9 @@ static ADDRESS_MAP_START( sxx2e_soundmap, AS_PROGRAM, 8, seibuspi_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spi_soundmap, AS_PROGRAM, 8, seibuspi_state )
+	AM_IMPORT_FROM( sxx2e_soundmap )
 	AM_RANGE(0x4008, 0x4008) AM_DEVWRITE("soundfifo2", fifo7200_device, data_byte_w)
 	AM_RANGE(0x400a, 0x400a) AM_READ_PORT("JUMPERS") // TO DO: get these to actually work
-	AM_IMPORT_FROM( sxx2e_soundmap )
 ADDRESS_MAP_END
 
 

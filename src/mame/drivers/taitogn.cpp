@@ -676,13 +676,13 @@ static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 16, taitogn_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( taitogn_mp_map, AS_PROGRAM, 32, taitogn_state )
-	AM_RANGE(0x1fa10100, 0x1fa10103) AM_READ8(gnet_mahjong_panel_r, 0x000000ff)
 	AM_IMPORT_FROM(taitogn_map)
+	AM_RANGE(0x1fa10100, 0x1fa10103) AM_READ8(gnet_mahjong_panel_r, 0x000000ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( taitogn_mn_map, AS_PROGRAM, 16, taitogn_state )
-	AM_RANGE(0x080000, 0x0fffff) AM_DEVREAD(":pgmflash", intelfsh16_device, read)
 	AM_IMPORT_FROM( taitozoom_mn_map )
+	AM_RANGE(0x080000, 0x0fffff) AM_DEVREAD(":pgmflash", intelfsh16_device, read)
 ADDRESS_MAP_END
 
 SLOT_INTERFACE_START(slot_ataflash)

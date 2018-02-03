@@ -71,8 +71,8 @@
 DEFINE_DEVICE_TYPE(VRC4373, vrc4373_device, "vrc4373", "NEC VRC4373 System Controller")
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, vrc4373_device)
-	AM_RANGE(0x40, 0x43) AM_READWRITE  (pcictrl_r,  pcictrl_w)
 	AM_INHERIT_FROM(pci_bridge_device::config_map)
+	AM_RANGE(0x40, 0x43) AM_READWRITE  (pcictrl_r,  pcictrl_w)
 ADDRESS_MAP_END
 
 // cpu i/f map

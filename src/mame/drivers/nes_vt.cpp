@@ -877,8 +877,8 @@ static ADDRESS_MAP_START( nes_vt_map, AS_PROGRAM, 8, nes_vt_state )
 
 	AM_RANGE(0x4100, 0x410b) AM_WRITE(vt03_410x_w)
 
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
 	AM_RANGE(0x8000, 0xffff) AM_DEVICE("prg", address_map_bank_device, amap8)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -911,8 +911,8 @@ static ADDRESS_MAP_START( nes_vt_hh_map, AS_PROGRAM, 8, nes_vt_state )
 
 	AM_RANGE(0x4100, 0x410b) AM_WRITE(vt03_410x_w)
 
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
 	AM_RANGE(0x8000, 0xffff) AM_DEVICE("prg", address_map_bank_device, amap8)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
 
 	AM_RANGE(0x4034, 0x4034) AM_WRITE(vt03_4034_w)
 	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(vt_hh_sprite_dma_w)
@@ -932,8 +932,8 @@ static ADDRESS_MAP_START( nes_vt_dg_map, AS_PROGRAM, 8, nes_vt_state )
 
 	AM_RANGE(0x411c, 0x411c) AM_WRITE(vt03_411c_w)
 
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
 	AM_RANGE(0x8000, 0xffff) AM_DEVICE("prg", address_map_bank_device, amap8)
+	AM_RANGE(0x8000, 0xffff) AM_WRITE(vt03_8000_w)
 
 	AM_RANGE(0x4034, 0x4034) AM_WRITE(vt03_4034_w)
 	AM_RANGE(0x4014, 0x4014) AM_READ(psg1_4014_r) AM_WRITE(nes_vh_sprite_dma_w)

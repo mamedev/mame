@@ -3190,8 +3190,8 @@ READ8_MEMBER(namcos23_state::iob_gun_r)
 }
 
 static ADDRESS_MAP_START( timecrs2iobrdmap, AS_PROGRAM, 16, namcos23_state )
-	AM_RANGE(0x7000, 0x700f) AM_READ8(iob_gun_r, 0xffff)
 	AM_IMPORT_FROM( s23iobrdmap )
+	AM_RANGE(0x7000, 0x700f) AM_READ8(iob_gun_r, 0xffff)
 ADDRESS_MAP_END
 
 

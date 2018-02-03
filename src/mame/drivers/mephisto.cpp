@@ -222,8 +222,8 @@ WRITE8_MEMBER( mephisto_state::write_led_mm2 )
 static ADDRESS_MAP_START( rebel5_mem, AS_PROGRAM, 8, mephisto_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_RAM                        // AM_BASE(m_p_ram)
 	AM_RANGE( 0x2000, 0x2007) AM_WRITE(write_led)           // Status LEDs+ buzzer
-	AM_RANGE( 0x3000, 0x3007) AM_READ(read_keys)            // Rebel 5.0
 	AM_RANGE( 0x3000, 0x4000) AM_DEVREAD("board", mephisto_board_device, input_r)
+	AM_RANGE( 0x3000, 0x3007) AM_READ(read_keys)            // Rebel 5.0
 	AM_RANGE( 0x5000, 0x5000) AM_WRITE(write_lcd)
 	AM_RANGE( 0x6000, 0x6000) AM_DEVWRITE("board", mephisto_board_device, led_w)
 	AM_RANGE( 0x7000, 0x7000) AM_DEVWRITE("board", mephisto_board_device, mux_w)

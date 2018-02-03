@@ -461,8 +461,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
 	AM_RANGE(0x60c0, 0x60cf) AM_DEVREADWRITE("pokey1", pokey_device, read, write)
 	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE("pokey2", pokey_device, read, write)
 	AM_RANGE(0x60e0, 0x60e0) AM_WRITE(tempest_led_w)
-	AM_RANGE(0xae1f, 0xae1f) AM_READ(rom_ae1f_r)
 	AM_RANGE(0x9000, 0xdfff) AM_ROM
+	AM_RANGE(0xae1f, 0xae1f) AM_READ(rom_ae1f_r)
 	AM_RANGE(0xf000, 0xffff) AM_ROM /* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 

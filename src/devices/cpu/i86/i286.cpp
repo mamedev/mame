@@ -204,7 +204,7 @@ void i80286_cpu_device::device_reset()
 	m_sregs[DS] = m_sregs[SS] = m_sregs[ES] = 0;
 	m_base[DS] = m_base[SS] = m_base[ES] = 0;
 	m_rights[DS] = m_rights[SS] = m_rights[ES] = 0x93;
-	m_rights[CS] = 0x9b;
+	m_rights[CS] = 0x93;
 	m_valid[CS] = m_valid[SS] = m_valid[DS] = m_valid[ES] = true;
 	m_idtr.base = 0;
 	m_idtr.limit = 0x3ff;
@@ -866,7 +866,7 @@ void i80286_cpu_device::code_descriptor(uint16_t selector, uint16_t offset, int 
 		m_ip = offset;
 		m_sregs[CS]=selector;
 		m_base[CS]=selector<<4;
-		m_rights[CS]=0x9b;
+		m_rights[CS]=0x93;
 		m_limit[CS]=0xffff;
 	}
 }
@@ -2021,7 +2021,7 @@ uint16_t i80286_cpu_device::far_return(int iret, int bytes)
 		m_regs.w[SP] += (iret ? 6 : 4) + bytes;
 		m_sregs[CS] = sel;
 		m_base[CS] = sel << 4;
-		m_rights[CS] = 0x9b;
+		m_rights[CS] = 0x93;
 		m_limit[CS] = 0xffff;
 		m_ip = off;
 	}

@@ -366,10 +366,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( filetto_io, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
 	AM_RANGE(0x0060, 0x0060) AM_READ(port_a_r)  //not a real 8255
 	AM_RANGE(0x0061, 0x0061) AM_READWRITE(port_b_r, port_b_w)
 	AM_RANGE(0x0062, 0x0062) AM_READ(port_c_r)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
 	AM_RANGE(0x0201, 0x0201) AM_READ_PORT("COIN") //game port
 	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
 	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only

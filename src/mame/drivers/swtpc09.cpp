@@ -67,6 +67,7 @@ static ADDRESS_MAP_START(mp09_mem, AS_PROGRAM, 8, swtpc09_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(flex_dmf2_mem, AS_PROGRAM, 8, swtpc09_state)
+	AM_RANGE(0x00000, 0xfffff) AM_RAM AM_SHARE("mainram") // by default everything is ram, 1MB ram emulated
 	AM_RANGE(0xe000, 0xe003) AM_MIRROR(0xf0000) AM_NOP
 	AM_RANGE(0xe004, 0xe005) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xe080, 0xe083) AM_MIRROR(0xf000c) AM_DEVREADWRITE("pia", pia6821_device, read, write)
@@ -77,10 +78,10 @@ static ADDRESS_MAP_START(flex_dmf2_mem, AS_PROGRAM, 8, swtpc09_state)
 	AM_RANGE(0xf024, 0xf03f) AM_MIRROR(0xf0000) AM_READWRITE(dmf2_control_reg_r, dmf2_control_reg_w)
 	//AM_RANGE(0xf042, 0xf7ff) AM_MIRROR(0xf0000) AM_NOP
 	AM_RANGE(0xf800, 0xffff) AM_MIRROR(0xf0000) AM_ROM AM_REGION("maincpu", 0xf800)
-	AM_RANGE(0x00000, 0xfffff) AM_RAM AM_SHARE("mainram") // all the rest is treated as ram, 1MB ram emulated
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(flex_dc4_piaide_mem, AS_PROGRAM, 8, swtpc09_state)
+	AM_RANGE(0x00000, 0xfffff) AM_RAM AM_SHARE("mainram") // by default everything is ram, 1MB ram emulated
 	AM_RANGE(0xe000, 0xe003) AM_MIRROR(0xf0000) AM_NOP
 	AM_RANGE(0xe004, 0xe005) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xe014, 0xe014) AM_MIRROR(0xf0000) AM_WRITE(dc4_control_reg_w)
@@ -98,10 +99,10 @@ static ADDRESS_MAP_START(flex_dc4_piaide_mem, AS_PROGRAM, 8, swtpc09_state)
 	//AM_RANGE(0xf040, 0xf041) AM_MIRROR(0xf0000) AM_READWRITE(dmf2_dma_address_reg_r, dmf2_dma_address_reg_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_MIRROR(0xf0000) AM_RAM AM_SHARE("s09ram") // 2k ram for piaide on s09 board
 	AM_RANGE(0xf800, 0xffff) AM_MIRROR(0xf0000) AM_ROM AM_REGION("maincpu", 0xf800)
-	AM_RANGE(0x00000, 0xfffff) AM_RAM AM_SHARE("mainram") // all the rest is treated as ram, 1MB ram emulated
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(uniflex_dmf2_mem, AS_PROGRAM, 8, swtpc09_state)
+	AM_RANGE(0x00000, 0xfffff) AM_RAM AM_SHARE("mainram") // by default everything is ram, 1MB ram emulated
 	AM_RANGE(0xe000, 0xe001) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xe002, 0xe07f) AM_MIRROR(0xf0000) AM_NOP
 	AM_RANGE(0xe080, 0xe083) AM_MIRROR(0xf000c) AM_DEVREADWRITE("pia", pia6821_device, read, write)
@@ -112,10 +113,10 @@ static ADDRESS_MAP_START(uniflex_dmf2_mem, AS_PROGRAM, 8, swtpc09_state)
 	AM_RANGE(0xf024, 0xf03f) AM_MIRROR(0xf0000) AM_READWRITE(dmf2_control_reg_r, dmf2_control_reg_w)
 	//AM_RANGE(0xf042, 0xf7ff) AM_MIRROR(0xf0000) AM_NOP
 	AM_RANGE(0xf800, 0xffff) AM_MIRROR(0xf0000) AM_ROM AM_REGION("maincpu", 0xf800)
-	AM_RANGE(0x00000, 0xfffff) AM_RAM AM_SHARE("mainram") // all the rest is treated as ram, 1MB ram emulated
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(uniflex_dmf3_mem, AS_PROGRAM, 8, swtpc09_state)
+	AM_RANGE(0x00000, 0xfffff) AM_RAM AM_SHARE("mainram") // by default everything is ram, 1MB ram emulated
 	AM_RANGE(0xe000, 0xe001) AM_MIRROR(0xf0000) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0xe002, 0xe07f) AM_MIRROR(0xf0000) AM_NOP
 	AM_RANGE(0xe080, 0xe083) AM_MIRROR(0xf000c) AM_DEVREADWRITE("pia", pia6821_device, read, write)
@@ -129,7 +130,6 @@ static ADDRESS_MAP_START(uniflex_dmf3_mem, AS_PROGRAM, 8, swtpc09_state)
 	AM_RANGE(0xf040, 0xf04f) AM_MIRROR(0xf0000) AM_DEVREADWRITE("via", via6522_device, read, write)
 	//AM_RANGE(0xf050, 0xf7ff) AM_MIRROR(0xf0000) AM_NOP
 	AM_RANGE(0xf800, 0xffff) AM_MIRROR(0xf0000) AM_ROM AM_REGION("maincpu", 0xf800)
-	AM_RANGE(0x00000, 0xfffff) AM_RAM AM_SHARE("mainram") // all the rest is treated as ram, 1MB ram emulated
 ADDRESS_MAP_END
 
 
