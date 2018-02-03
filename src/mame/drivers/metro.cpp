@@ -1222,9 +1222,9 @@ static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x580000, 0x580003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)
 
 	// TODO: !!! i4300 !!!
+	AM_RANGE(0x700000, 0x77ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x7788a2, 0x7788a3) AM_WRITE(metro_irq_cause_w)                            // IRQ Cause
 	AM_RANGE(0x7788a4, 0x7788a5) AM_WRITE(puzzlet_irq_enable_w) AM_SHARE("irq_enable")  // IRQ Enable
-	AM_RANGE(0x700000, 0x77ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 
 	AM_RANGE(0x7f2000, 0x7f3fff) AM_RAM
 

@@ -467,6 +467,9 @@ static ADDRESS_MAP_START(hp_ipc_mem_outer, AS_PROGRAM, 16, hp_ipc_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(hp_ipc_mem_inner, AS_PROGRAM, 16, hp_ipc_state)
+// bus error handler
+	AM_RANGE(0x0000000, 0x1FFFFFF) AM_READWRITE(trap_r, trap_w)
+
 // user mode
 	AM_RANGE(0x1000000, 0x17FFFFF) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x1800000, 0x187FFFF) AM_ROM AM_REGION("maincpu", 0)
@@ -490,8 +493,6 @@ static ADDRESS_MAP_START(hp_ipc_mem_inner, AS_PROGRAM, 16, hp_ipc_state)
 	AM_RANGE(0x0700000, 0x07FFFFF) AM_UNMAP     // External I/O
 	AM_RANGE(0x0800000, 0x0FFFFFF) AM_READWRITE(ram_r, ram_w)
 
-// bus error handler
-	AM_RANGE(0x0000000, 0x1FFFFFF) AM_READWRITE(trap_r, trap_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(hp_ipc)

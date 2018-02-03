@@ -254,6 +254,20 @@
 		</part>
 	</software>
 
+	<software name="sp64" supported="partial">
+		<description>Stop Press 64</description>
+		<year>1991</year>
+		<publisher>Slogger</publisher>
+		<info name="usage" value="Requires Master RAM board" />
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="sp64" />
+			<dataarea name="rom" size="32768">
+				<rom name="stoppress64-1.00.rom" size="32768" crc="4918221c" sha1="f185873106e7e7225b2e0c718803dc1ec4ebc685" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="8192" />
+		</part>
+	</software>
+
 	<software name="view">
 		<description>View</description>
 		<year>1984</year>
@@ -283,7 +297,7 @@
 	<software name="abr">
 		<description>Advanced Battery-Backed RAM</description>
 		<year>1987</year>
-		<publisher>P.R.E.S.</publisher>
+		<publisher>Advanced Computer Products</publisher>
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="abr" />
 			<dataarea name="nvram" size="32768">
@@ -292,9 +306,9 @@
 		</part>
 	</software>
 
-	<software name="ap3" cloneof="ap34" supported="no">
+	<software name="ap3" cloneof="ap34">
 		<description>Advanced Plus 3</description>
-		<year>1988</year>
+		<year>1987</year>
 		<publisher>P.R.E.S.</publisher>
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="ap34" />
@@ -317,8 +331,8 @@
 		</part>
 	</software>
 
-	<software name="ap34" supported="no">
-		<description>Advanced Plus 34</description>
+	<software name="ap34" supported="partial">
+		<description>Advanced Plus 3/4</description>
 		<year>1988</year>
 		<publisher>P.R.E.S.</publisher>
 		<part name="cart" interface="electron_cart">
@@ -333,51 +347,52 @@
 		</part>
 	</software>
 
-	<software name="aqr" supported="no">
+	<software name="aqr">
 		<description>Advanced Quarter Meg RAM</description>
-		<year>1988</year>
-		<publisher>P.R.E.S.</publisher>
+		<year>1987</year>
+		<publisher>Advanced Computer Products</publisher>
 		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="aqr" />
 			<dataarea name="ram" size="262144" />
 		</part>
 	</software>
 
-	<software name="cumana100" cloneof="cumana" supported="no">
+	<software name="cumana100" cloneof="cumana" supported="partial">
 		<description>Cumana Floppy Disc System v1.00</description>
-		<year>1984</year>
+		<year>1985</year>
 		<publisher>Cumana</publisher>
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="cumana" />
 			<dataarea name="rom" size="16384">
 				<rom name="cumana-dfs-1.00.rom" size="16384" crc="3d351cee" sha1="d6f7af671bf78b3ea7b9a235d47ef8b22b9bee31" offset="0" />
 			</dataarea>
-			<dataarea name="ram" size="2048" />
+			<dataarea name="nvram" size="2048" />
 		</part>
 	</software>
 
-	<software name="cumana101" cloneof="cumana" supported="no">
+	<software name="cumana101" cloneof="cumana" supported="partial">
 		<description>Cumana Floppy Disc System v1.01</description>
-		<year>1984</year>
+		<year>1985</year>
 		<publisher>Cumana</publisher>
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="cumana" />
 			<dataarea name="rom" size="16384">
 				<rom name="cumana-dfs-1.01.rom" size="16384" crc="bc02e94a" sha1="8cbdbcc91516b4bbe6904db482f9fdaa34ca029d" offset="0" />
 			</dataarea>
-			<dataarea name="ram" size="2048" />
+			<dataarea name="nvram" size="2048" />
 		</part>
 	</software>
 
-	<software name="cumana" supported="no">
+	<software name="cumana" supported="partial">
 		<description>Cumana Floppy Disc System v1.02</description>
-		<year>1984</year>
+		<year>1985</year>
 		<publisher>Cumana</publisher>
 		<part name="cart" interface="electron_cart">
 			<feature name="slot" value="cumana" />
 			<dataarea name="rom" size="16384">
 				<rom name="cumana-dfs-1.02.rom" size="16384" crc="44b21e47" sha1="1c5112d2e629f0e093a961c6348456e4ceac86e3" offset="0" />
 			</dataarea>
-			<dataarea name="ram" size="2048" />
+			<dataarea name="nvram" size="2048" />
 		</part>
 	</software>
 
@@ -407,7 +422,7 @@
 		</part>
 	</software>
 
-	<software name="seds100" cloneof="seds" supported="no">
+	<software name="seds100" cloneof="seds">
 		<description>Slogger Electron Disk System v1.00</description>
 		<year>1986</year>
 		<publisher>Slogger</publisher>
@@ -416,11 +431,11 @@
 			<dataarea name="rom" size="16384">
 				<rom name="sedfs-1.00.rom" size="16384" crc="4f28b0a6" sha1="e94aa15b2884c1fd2f7bfe81acc5942aa1faceb5" offset="0" />
 			</dataarea>
-			<dataarea name="ram" size="2048" />
+			<dataarea name="nvram" size="2048" />
 		</part>
 	</software>
 
-	<software name="seds102" cloneof="seds" supported="no">
+	<software name="seds102" cloneof="seds">
 		<description>Slogger Electron Disk System v1.02</description>
 		<year>1986</year>
 		<publisher>Slogger</publisher>
@@ -429,11 +444,11 @@
 			<dataarea name="rom" size="16384">
 				<rom name="sedfs-1.02.rom" size="16384" crc="0a9570f4" sha1="84072e99aa755bec32165b04f5f19f4499e0ba4b" offset="0" />
 			</dataarea>
-			<dataarea name="ram" size="2048" />
+			<dataarea name="nvram" size="2048" />
 		</part>
 	</software>
 
-	<software name="seds" supported="no">
+	<software name="seds">
 		<description>Slogger Electron Disk System v1.03</description>
 		<year>1986</year>
 		<publisher>Slogger</publisher>
@@ -442,29 +457,46 @@
 			<dataarea name="rom" size="16384">
 				<rom name="sedfs-1.03.rom" size="16384" crc="186e84dd" sha1="7cb350b3291447331aaaed2c590f719115a7bfed" offset="0" />
 			</dataarea>
-			<dataarea name="ram" size="2048" />
+			<dataarea name="nvram" size="2048" />
+		</part>
+	</software>
+
+	<software name="stlefs" supported="partial">
+		<description>Solidisk EFS 2.1E</description>
+		<year>1985</year>
+		<publisher>Solidisk</publisher>
+		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="stlefs" />
+			<dataarea name="rom" size="32768">
+				<rom name="stl-adfs-2.1e.rom" size="32768" crc="8582c9d9" sha1="4ceda3b551ae0198638b07c2b40b3a5ebffb1314" offset="0" />
+			</dataarea>
+			<dataarea name="ram" size="16384" />
 		</part>
 	</software>
 
 	<software name="sndexp" supported="no">
-		<description>Sound Expansion v1</description>
+		<description>Sound Expansion</description>
 		<year>1988</year>
 		<publisher>Project Expansions</publisher>
 		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="sndexp" />
 			<dataarea name="rom" size="8192">
 				<rom name="sound_expansion-v1.00.rom" size="8192" crc="01a43480" sha1="9f570abbff97e6615a29c9d2de5ec9f37d22c564" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="8192" />
 		</part>
 	</software>
 
-	<software name="sndexpc" supported="no">
+	<software name="sndexp3">
 		<description>Sound Expansion v3</description>
 		<year>1989</year>
 		<publisher>Complex Software Systems</publisher>
 		<part name="cart" interface="electron_cart">
+			<feature name="slot" value="sndexp3" />
 			<dataarea name="rom" size="16384">
 				<rom name="sound_expansion-v3.00.rom" size="16384" crc="65ebfb98" sha1="2e409b92c97cda34ff25c2951e5f799125fe7e32" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="8192" />
 		</part>
 	</software>
 

@@ -305,11 +305,11 @@ ADDRESS_MAP_END
     bits are usually routed through the mapper first.
 */
 static ADDRESS_MAP_START(crumap, AS_IO, 8, geneve_state)
-	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 	AM_RANGE(0x0000, 0x0fff) AM_READ( cruread )
+	AM_RANGE(0x0000, 0x0003) AM_DEVREAD(TI_TMS9901_TAG, tms9901_device, read)
 
-	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE( cruwrite )
+	AM_RANGE(0x0000, 0x001f) AM_DEVWRITE(TI_TMS9901_TAG, tms9901_device, write)
 ADDRESS_MAP_END
 
 /* TI joysticks. The keyboard is implemented in genboard.c. */

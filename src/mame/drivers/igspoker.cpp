@@ -385,6 +385,7 @@ static ADDRESS_MAP_START( igspoker_prg_map, AS_PROGRAM, 8, igspoker_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( igspoker_io_map, AS_IO, 8, igspoker_state )
+	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
@@ -401,7 +402,6 @@ static ADDRESS_MAP_START( igspoker_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x6800, 0x6fff) AM_RAM_WRITE(bg_tile_w )  AM_SHARE("bg_tile_ram")
 	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
-	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 ADDRESS_MAP_END
 
 
@@ -1137,6 +1137,7 @@ INPUT_PORTS_END
 
 
 static ADDRESS_MAP_START( number10_io_map, AS_IO, 8, igspoker_state )
+	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
@@ -1156,10 +1157,10 @@ static ADDRESS_MAP_START( number10_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
-	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpokerpk_io_map, AS_IO, 8, igspoker_state )
+	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")           /* DSW1 */
@@ -1178,7 +1179,6 @@ static ADDRESS_MAP_START( cpokerpk_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
-	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( number10 )

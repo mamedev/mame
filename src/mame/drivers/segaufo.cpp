@@ -465,18 +465,18 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ex_ufo21_portmap, AS_IO, 8, ufo_state )
+	AM_IMPORT_FROM( ufo_portmap )
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("upd", upd7759_device, port_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(ex_upd_start_w) AM_READNOP
 	AM_RANGE(0x61, 0x61) AM_READ(ex_upd_busy_r)
 	AM_RANGE(0x64, 0x65) AM_WRITE(ex_ufo21_lamps_w) AM_READNOP
 //  AM_RANGE(0x68, 0x68) AM_WRITENOP // ?
-	AM_IMPORT_FROM( ufo_portmap )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ex_ufo800_portmap, AS_IO, 8, ufo_state )
+	AM_IMPORT_FROM( ufo_portmap )
 //  AM_RANGE(0x60, 0x67) AM_NOP // unused?
 //  AM_RANGE(0x68, 0x68) AM_WRITENOP // ?
-	AM_IMPORT_FROM( ufo_portmap )
 ADDRESS_MAP_END
 
 

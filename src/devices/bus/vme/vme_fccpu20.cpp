@@ -228,8 +228,8 @@ DEFINE_DEVICE_TYPE(VME_FCCPU21YB, vme_fccpu21yb_card_device, "fccpu21yb", "Force
 
 static ADDRESS_MAP_START (cpu20_mem, AS_PROGRAM, 32, vme_fccpu20_device)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ (bootvect_r)   /* ROM mirror just during reset */
 	AM_RANGE (0x00000000, 0x00000007) AM_RAM AM_WRITE (bootvect_w)   /* After first write we act as RAM */
+	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ (bootvect_r)   /* ROM mirror just during reset */
 	AM_RANGE (0x00000008, 0x0007ffff) AM_RAM /* Local SRAM */
 	AM_RANGE (0x00080000, 0x000fffff) AM_RAM /* SRAM-22 installed */
 	AM_RANGE (0xff040000, 0xff04ffff) AM_RAM

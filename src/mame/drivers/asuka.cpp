@@ -386,8 +386,8 @@ static ADDRESS_MAP_START( eto_map, AS_PROGRAM, 16   /* N.B. tc100scn mirror over
 	AM_RANGE(0x4a0000, 0x4a0003) AM_WRITE(asuka_spritectrl_w)
 	AM_RANGE(0x4e0000, 0x4e0001) AM_READNOP AM_DEVWRITE8("ciu", pc060ha_device, master_port_w, 0x00ff)
 	AM_RANGE(0x4e0002, 0x4e0003) AM_DEVREADWRITE8("ciu", pc060ha_device, master_comm_r, master_comm_w, 0x00ff)
-	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)  /* sprite ram */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVWRITE("tc0100scn", tc0100scn_device, word_w)
+	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("pc090oj", pc090oj_device, word_r, word_w)  /* sprite ram */
 	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 ADDRESS_MAP_END

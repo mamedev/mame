@@ -356,8 +356,8 @@ static ADDRESS_MAP_START( flashbank_map, AS_PROGRAM, 32, funkball_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(funkball_io, AS_IO, 32, funkball_state)
-	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
 	AM_IMPORT_FROM(pcat32_io_common)
+	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP
 
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE16("ide", ide_controller_device, read_cs0, write_cs0, 0xffffffff)

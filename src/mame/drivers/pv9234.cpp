@@ -105,6 +105,7 @@ WRITE32_MEMBER( pv9234_state::debug2_w )
 }
 
 static ADDRESS_MAP_START(pv9234_map, AS_PROGRAM, 32, pv9234_state)
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("maincpu",0) //FLASH ROM!
 	// AM_RANGE(0x00000000, 0x00000033) AM_WRITE something
 	// AM_RANGE(0x00000044, 0x00000047) AM_WRITE something
 	// AM_RANGE(0x00000060, 0x0000006b) AM_WRITE something
@@ -116,7 +117,6 @@ static ADDRESS_MAP_START(pv9234_map, AS_PROGRAM, 32, pv9234_state)
 	AM_RANGE(0x000080cc, 0x000080cf) AM_WRITE(debug_w)
 	// AM_RANGE(0x000080d0, 0x000080d3) AM_WRITE something
 	AM_RANGE(0x0003e000, 0x0003efff) AM_RAM AM_SHARE("p_ram")
-	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("maincpu",0) //FLASH ROM!
 	AM_RANGE(0x00080000, 0x00087fff) AM_MIRROR(0x78000) AM_RAM AM_SHARE("share1")//mirror is a guess, writes a prg at 0xc0200 then it jumps at b0200 (!)
 	AM_RANGE(0xe0000000, 0xe0007fff) AM_MIRROR(0x0fff8000) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xffffff00, 0xffffffff) AM_RAM //i/o? stack ram?

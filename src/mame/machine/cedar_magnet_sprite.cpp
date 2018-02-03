@@ -49,10 +49,9 @@ READ8_MEMBER(cedar_magnet_sprite_device::exzisus_hack_r)
 
 
 static ADDRESS_MAP_START( cedar_magnet_sprite_map, AS_PROGRAM, 8, cedar_magnet_sprite_device )
-	AM_RANGE(0x00400, 0x007ff) AM_READ(exzisus_hack_r)
-
 	AM_RANGE(0x00000, 0x0ffff) AM_DEVICE("sp_sub_ram", address_map_bank_device, amap8)
 
+	AM_RANGE(0x00400, 0x007ff) AM_READ(exzisus_hack_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cedar_magnet_sprite_io, AS_IO, 8, cedar_magnet_sprite_device )

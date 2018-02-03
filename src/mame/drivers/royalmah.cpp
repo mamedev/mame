@@ -584,9 +584,9 @@ static ADDRESS_MAP_START( mjapinky_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITENOP
 	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x7800, 0x7fff ) AM_RAM
-	AM_RANGE( 0x8000, 0x8000 ) AM_READ(mjapinky_dsw_r )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "mainbank" )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_SHARE("videoram")
+	AM_RANGE( 0x8000, 0x8000 ) AM_READ(mjapinky_dsw_r )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tahjong_map, AS_PROGRAM, 8, royalmah_state )

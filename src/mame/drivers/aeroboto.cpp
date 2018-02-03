@@ -75,14 +75,14 @@ WRITE8_MEMBER(aeroboto_state::aeroboto_1a2_w)
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aeroboto_state )
-	AM_RANGE(0x01a2, 0x01a2) AM_WRITE(aeroboto_1a2_w)           // affects IRQ line (more protection?)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("mainram") // main  RAM
+	AM_RANGE(0x01a2, 0x01a2) AM_WRITE(aeroboto_1a2_w)           // affects IRQ line (more protection?)
 	AM_RANGE(0x0800, 0x08ff) AM_RAM                             // tile color buffer; copied to 0x2000
 	AM_RANGE(0x0900, 0x09ff) AM_WRITEONLY                       // a backup of default tile colors
 	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(aeroboto_videoram_w) AM_SHARE("videoram")     // tile RAM
 	AM_RANGE(0x1800, 0x183f) AM_RAM AM_SHARE("hscroll") // horizontal scroll regs
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(aeroboto_tilecolor_w) AM_SHARE("tilecolor")   // tile color RAM
 	AM_RANGE(0x1840, 0x27ff) AM_WRITENOP                    // cleared during custom LSI test
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(aeroboto_tilecolor_w) AM_SHARE("tilecolor")   // tile color RAM
 	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_SHARE("spriteram")   // sprite RAM
 	AM_RANGE(0x2900, 0x2fff) AM_WRITENOP                    // cleared along with sprite RAM
 	AM_RANGE(0x2973, 0x2973) AM_READ(aeroboto_2973_r)           // protection read

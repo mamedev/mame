@@ -121,8 +121,8 @@
 DEFINE_DEVICE_TYPE(VRC5074, vrc5074_device, "vrc5074", "NEC VRC5074 System Controller")
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, vrc5074_device)
-	AM_RANGE(0x00000018, 0x00000027) AM_READWRITE(sdram_addr_r, sdram_addr_w)
 	AM_INHERIT_FROM(pci_bridge_device::config_map)
+	AM_RANGE(0x00000018, 0x00000027) AM_READWRITE(sdram_addr_r, sdram_addr_w)
 ADDRESS_MAP_END
 
 // cpu i/f map

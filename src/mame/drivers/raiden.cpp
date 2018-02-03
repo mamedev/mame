@@ -158,6 +158,7 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( raiden_sound_map, AS_PROGRAM, 8, raiden_state )
+	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
@@ -171,7 +172,6 @@ static ADDRESS_MAP_START( raiden_sound_map, AS_PROGRAM, 8, raiden_state )
 	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
 	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raiden_sound_decrypted_opcodes_map, AS_OPCODES, 8, raiden_state )

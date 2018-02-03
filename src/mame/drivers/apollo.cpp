@@ -679,6 +679,8 @@ WRITE32_MEMBER(apollo_state::apollo_f8_w){
  ***************************************************************************/
 
 static ADDRESS_MAP_START(dn3500_map, AS_PROGRAM, 32, apollo_state )
+		AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
+
 		AM_RANGE(0x000000, 0x00ffff) AM_ROM /* boot ROM  */
 		AM_RANGE(0x000000, 0x00ffff) AM_WRITE(apollo_rom_w)
 		AM_RANGE(0x010000, 0x0100ff) AM_READWRITE16(apollo_csr_status_register_r, apollo_csr_status_register_w, 0xffffffff)
@@ -719,10 +721,10 @@ static ADDRESS_MAP_START(dn3500_map, AS_PROGRAM, 32, apollo_state )
 //      AM_RANGE(0x0e000000, 0x0fffffff) FPA address space
 
 //      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
-		AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32, apollo_state )
+		AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 		AM_RANGE(0x000000, 0x00ffff) AM_ROM /* boot ROM  */
 		AM_RANGE(0x000000, 0x00ffff) AM_WRITE(apollo_rom_w)
 		AM_RANGE(0x010000, 0x0100ff) AM_READWRITE16(apollo_csr_status_register_r, apollo_csr_status_register_w, 0xffffffff)
@@ -751,10 +753,11 @@ static ADDRESS_MAP_START(dsp3500_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE16(apollo_atbus_memory_r, apollo_atbus_memory_w, 0xffffffff)
 
 //      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
-		AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(dn3000_map, AS_PROGRAM, 32, apollo_state )
+		AM_RANGE(0x000000, 0xffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
+
 		AM_RANGE(0x000000, 0x007fff) AM_ROM /* boot ROM  */
 		AM_RANGE(0x000000, 0x007fff) AM_WRITE(apollo_rom_w)
 		AM_RANGE(0x008000, 0x0080ff) AM_READWRITE16(apollo_csr_status_register_r, apollo_csr_status_register_w, 0xffffffff)
@@ -783,11 +786,11 @@ static ADDRESS_MAP_START(dn3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_SHARE("messram")
 
 		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE16(apollo_atbus_memory_r, apollo_atbus_memory_w, 0xffffffff)
-
-		AM_RANGE(0x000000, 0xffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(dsp3000_map, AS_PROGRAM, 32, apollo_state )
+		AM_RANGE(0x000000, 0xffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
+
 		AM_RANGE(0x000000, 0x007fff) AM_ROM /* boot ROM  */
 		AM_RANGE(0x000000, 0x007fff) AM_WRITE(apollo_rom_w)
 		AM_RANGE(0x008000, 0x0080ff) AM_READWRITE16(apollo_csr_status_register_r, apollo_csr_status_register_w, 0xffffffff)
@@ -811,12 +814,11 @@ static ADDRESS_MAP_START(dsp3000_map, AS_PROGRAM, 32, apollo_state )
 		AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM_WRITE(ram_with_parity_w) AM_SHARE("messram")
 
 		AM_RANGE(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END) AM_READWRITE16(apollo_atbus_memory_r, apollo_atbus_memory_w, 0xffffffff)
-
-		AM_RANGE(0x000000, 0xffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32, apollo_state )
+	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM /* boot ROM  */
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(apollo_rom_w)
 	AM_RANGE(0x010000, 0x0100ff) AM_READWRITE16(apollo_csr_status_register_r, apollo_csr_status_register_w, 0xffffffff)
@@ -860,10 +862,10 @@ static ADDRESS_MAP_START(dn5500_map, AS_PROGRAM, 32, apollo_state )
 //  AM_RANGE(0x0e000000, 0x0fffffff) FPA address space
 
 //  AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32, apollo_state )
+	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM /* boot ROM  */
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(apollo_rom_w)
 	AM_RANGE(0x010000, 0x0100ff) AM_READWRITE16(apollo_csr_status_register_r, apollo_csr_status_register_w, 0xffffffff)
@@ -896,7 +898,6 @@ static ADDRESS_MAP_START(dsp5500_map, AS_PROGRAM, 32, apollo_state )
 
 	AM_RANGE(0x07000000, 0x0700FFFF) AM_READWRITE8(dn5500_io_protection_map_r, dn5500_io_protection_map_w, 0xffffffff )
 //  AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(apollo_unmapped_r, apollo_unmapped_w)
 ADDRESS_MAP_END
 
 /***************************************************************************

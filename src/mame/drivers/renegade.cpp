@@ -249,9 +249,9 @@ static ADDRESS_MAP_START( renegade_nomcu_map, AS_PROGRAM, 8, renegade_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renegade_map, AS_PROGRAM, 8, renegade_state )
+	AM_IMPORT_FROM(renegade_nomcu_map)
 	AM_RANGE(0x3804, 0x3804) AM_DEVREADWRITE("mcu", taito68705_mcu_device, data_r, data_w)
 	AM_RANGE(0x3805, 0x3805) AM_READ(mcu_reset_r)
-	AM_IMPORT_FROM(renegade_nomcu_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renegade_sound_map, AS_PROGRAM, 8, renegade_state )

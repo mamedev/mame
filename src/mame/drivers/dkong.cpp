@@ -836,19 +836,19 @@ static ADDRESS_MAP_START( dkongjr_map, AS_PROGRAM, 8, dkong_state )
 
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_DEVWRITE("ls174.3d", latch8_device, write)    /* IN0, sound interface */
 
-	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(dkongjr_gfxbank_w)
 	AM_RANGE(0x7c80, 0x7c87) AM_DEVWRITE("ls259.4h", latch8_device, bit0_w)     /* latch for sound and signals above */
+	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(dkongjr_gfxbank_w)
 
 	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkongjr_in2_r)                             /* IN2 */
 	AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE("ls259.6h", latch8_device, bit0_w)      /* Sound addrs */
 
+	AM_RANGE(0x7d80, 0x7d87) AM_DEVWRITE("ls259.5h", latch8_device, bit0_w)     /* latch for sound and signals above*/
 	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)   /* DSW0 */
 	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
 	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)                       /* 2 PSL Signal */
 	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x7d85, 0x7d85) AM_WRITE(p8257_drq_w)        /* P8257 ==> /DRQ0 /DRQ1 */
 	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
-	AM_RANGE(0x7d80, 0x7d87) AM_DEVWRITE("ls259.5h", latch8_device, bit0_w)     /* latch for sound and signals above*/
 
 	AM_RANGE(0x8000, 0x9fff) AM_ROM                                             /* bootleg DKjr only */
 	AM_RANGE(0xb000, 0xbfff) AM_ROM                                             /* pestplce only */

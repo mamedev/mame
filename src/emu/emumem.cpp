@@ -2237,14 +2237,8 @@ void address_space::populate_from_map(address_map *map)
 		return;
 
 	// install the handlers, using the original, unadjusted memory map
-	const address_map_entry *last_entry = nullptr;
-	while (last_entry != map->m_entrylist.first())
+	for (const address_map_entry *entry = map->m_entrylist.first(); entry; entry = entry->next())
 	{
-		// find the entry before the last one we processed
-		const address_map_entry *entry;
-		for (entry = map->m_entrylist.first(); entry->next() != last_entry; entry = entry->next()) { };
-		last_entry = entry;
-
 		// map both read and write halves
 		populate_map_entry(*entry, read_or_write::READ);
 		populate_map_entry(*entry, read_or_write::WRITE);

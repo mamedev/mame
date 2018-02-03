@@ -1004,6 +1004,8 @@ WRITE16_MEMBER( spg2xx_game_state::spriteram_w )
 */
 
 static ADDRESS_MAP_START( vii_mem, AS_PROGRAM, 16, spg2xx_game_state )
+	AM_RANGE( 0x000000, 0x3fffff ) AM_ROMBANK("cart")
+
 	AM_RANGE( 0x000000, 0x0027ff ) AM_RAM AM_SHARE("p_ram")
 	AM_RANGE( 0x002800, 0x0028ff ) AM_READWRITE(video_r, video_w)
 	AM_RANGE( 0x002900, 0x002aff ) AM_RAM AM_SHARE("p_rowscroll")
@@ -1011,7 +1013,6 @@ static ADDRESS_MAP_START( vii_mem, AS_PROGRAM, 16, spg2xx_game_state )
 	AM_RANGE( 0x002c00, 0x002fff ) AM_RAM AM_SHARE("p_spriteram")
 	AM_RANGE( 0x003000, 0x0037ff ) AM_READWRITE(audio_r, audio_w)
 	AM_RANGE( 0x003d00, 0x003eff ) AM_READWRITE(io_r,    io_w)
-	AM_RANGE( 0x000000, 0x3fffff ) AM_ROMBANK("cart")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vii )
@@ -1395,6 +1396,11 @@ ROM_START( walle )
 	//ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, CRC(6bc90b16) SHA1(184d72de059057aae7800da510fcf05ed1da9ec9))
 ROM_END
 
+ROM_START( zone40 )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_LOAD16_WORD_SWAP( "zone40.bin", 0x0000, 0x4000000, CRC(4ba1444f) SHA1(de83046ab93421486668a247972ad6d3cda19440) )
+ROM_END
+
 ROM_START( zone60 )
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF )     
 	ROM_LOAD16_WORD_SWAP( "zone60.bin", 0x0000, 0x4000000, CRC(4cb637d1) SHA1(1f97cbdb4299ac0fbafc2a3aa592066cb0727066))
@@ -1413,6 +1419,34 @@ ROM_END
 ROM_START( rad_skatp ) // rom was dumped from the NTSC version, but region comes from an io port, so ROM is probably the same
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )     
 	ROM_LOAD16_WORD_SWAP( "skateboarder.bin", 0x000000, 0x400000, CRC(08b9ab91) SHA1(6665edc4740804956136c68065890925a144626b) )
+ROM_END
+
+/*
+Wireless Air 60
+(info provided with dump)
+
+System: Wireless Air 60
+ROM: Toshiba TC58NVG0S3ETA00
+RAM: ESMT M12L128168A
+
+This is a RAW NAND FLASH DUMP
+
+Interesting Strings:
+
+GPnandnand; (GP is General Plus, which is Sunplus by another name)
+GLB_GP-F_5B_USBD_1.0.0
+SP_ToneMaker
+GLB_GP-FS1_0405L_SPU_1.0.2.3
+SPF2ALP
+
+"GPnandnand" as a required signature appears to be referenced right here, in page 19 of a GeneralPlus document;
+http://www.lcis.com.tw/paper_store/paper_store/GPL162004A-507A_162005A-707AV10_code_reference-20147131205102.pdf
+
+*/
+
+ROM_START( wlsair60 )
+	ROM_REGION( 0x8400000, "maincpu", ROMREGION_ERASEFF )     
+	ROM_LOAD16_WORD_SWAP( "wlsair60.nand", 0x0000, 0x8400000, CRC(eec23b97) SHA1(1bb88290cf54579a5bb51c08a02d793cd4d79f7a) )
 ROM_END
 
 //    YEAR  NAME      PARENT    COMPAT    MACHINE      INPUT     STATE              INIT      COMPANY                                              FULLNAME             FLAGS
@@ -1436,3 +1470,9 @@ CONS( 2008, walle,    0,        0,        batman,      walle,    spg2xx_game_sta
 // Radica TV games
 CONS( 2006, rad_skat,  0,       0,        spg2xx_base, rad_skat, spg2xx_game_state, rad_skat, "Radica",                                            "Play TV Skateboarder (NTSC)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2006, rad_skatp, rad_skat,0,        spg2xx_basep,rad_skatp,spg2xx_game_state, rad_skat, "Radica",                                            "Connectv Skateboarder (PAL)",       MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// might not fit here.  First 0x8000 bytes are blank (not too uncommon for these) then rest of rom looks like it's probably encrypted at least
+CONS( 200?, zone40,    0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft",                                      "Zone 40", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// might not fit here, NAND dump, has internal bootstrap at least, see above.
+CONS( 200?, wlsair60,  0,        0,        spg2xx_base, wirels60, spg2xx_game_state, wirels60, "Jungle Soft",                                      "Wireless Air 60", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+

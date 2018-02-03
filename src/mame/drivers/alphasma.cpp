@@ -167,12 +167,12 @@ WRITE8_MEMBER(alphasmart_state::port_d_w)
 
 static ADDRESS_MAP_START(alphasmart_mem, AS_PROGRAM, 8, alphasmart_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("rambank")
 	AM_RANGE( 0x0000, 0x003f ) AM_NOP   // internal registers
 	AM_RANGE( 0x0040, 0x00ff ) AM_RAM   // internal RAM
-	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("rambank")
+	AM_RANGE( 0x8000, 0xffff ) AM_ROM   AM_REGION("maincpu", 0)
 	AM_RANGE( 0x8000, 0x8000 ) AM_READWRITE(kb_r, kb_matrixh_w)
 	AM_RANGE( 0xc000, 0xc000 ) AM_WRITE(kb_matrixl_w)
-	AM_RANGE( 0x8000, 0xffff ) AM_ROM   AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(alphasmart_io, AS_IO, 8, alphasmart_state)
@@ -227,11 +227,11 @@ WRITE8_MEMBER(asma2k_state::port_a_w)
 
 static ADDRESS_MAP_START(asma2k_mem, AS_PROGRAM, 8, asma2k_state)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("rambank")
 	AM_RANGE( 0x0000, 0x003f ) AM_NOP   // internal registers
 	AM_RANGE( 0x0040, 0x00ff ) AM_RAM AM_SHARE("internal_ram")   // internal RAM
-	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("rambank")
-	AM_RANGE( 0x9000, 0x9000 ) AM_WRITE(kb_matrixl_w)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM   AM_REGION("maincpu", 0)
+	AM_RANGE( 0x9000, 0x9000 ) AM_WRITE(kb_matrixl_w)
 ADDRESS_MAP_END
 
 /* Input ports */

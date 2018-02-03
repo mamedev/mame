@@ -509,8 +509,8 @@ WRITE16_MEMBER(wecleman_state::blitter_w)
 
 static ADDRESS_MAP_START( wecleman_map, AS_PROGRAM, 16, wecleman_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM // ROM (03c000-03ffff used as RAM sometimes!)
-	AM_RANGE(0x040494, 0x040495) AM_WRITE(wecleman_videostatus_w) AM_SHARE("videostatus")   // cloud blending control (HACK)
 	AM_RANGE(0x040000, 0x043fff) AM_RAM // RAM
+	AM_RANGE(0x040494, 0x040495) AM_WRITE(wecleman_videostatus_w) AM_SHARE("videostatus")   // cloud blending control (HACK)
 	AM_RANGE(0x060000, 0x060005) AM_WRITE(wecleman_protection_w) AM_SHARE("protection_ram")
 	AM_RANGE(0x060006, 0x060007) AM_READ(wecleman_protection_r) // MCU read
 	AM_RANGE(0x080000, 0x080011) AM_RAM_WRITE(blitter_w) AM_SHARE("blitter_regs")   // Blitter

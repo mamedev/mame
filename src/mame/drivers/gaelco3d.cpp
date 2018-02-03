@@ -684,8 +684,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gaelco3d_state )
 	AM_RANGE(0x510102, 0x510103) AM_SELECT(0x000038) AM_DEVWRITE8_MOD("mainlatch", ls259_device, write_d0, rshift<2>, 0x00ff)
 	AM_RANGE(0x510104, 0x510105) AM_DEVWRITE8("serial", gaelco_serial_device, data_w, 0x00ff)
 	AM_RANGE(0x510106, 0x510107) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<3>, 0x00ff)
-	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE(tms_comm_w) AM_SHARE("tms_comm_base")
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("m68k_ram_base")
+	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE(tms_comm_w) AM_SHARE("tms_comm_base")
 ADDRESS_MAP_END
 
 
@@ -703,8 +703,8 @@ static ADDRESS_MAP_START( main020_map, AS_PROGRAM, 32, gaelco3d_state )
 	AM_RANGE(0x510100, 0x510103) AM_SELECT(0x000038) AM_DEVWRITE8_MOD("mainlatch", ls259_device, write_d0, rshift<1>, 0x000000ff)
 	AM_RANGE(0x510104, 0x510107) AM_DEVWRITE8("serial", gaelco_serial_device, data_w, 0x00ff0000)
 	AM_RANGE(0x510104, 0x510107) AM_SELECT(0x000070) AM_DEVWRITE8_MOD("outlatch", ls259_device, write_d0, rshift<2>, 0x000000ff)
-	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE16(tms_comm_w, 0xffffffff) AM_SHARE("tms_comm_base")
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_SHARE("m68k_ram_base")
+	AM_RANGE(0xfe7f80, 0xfe7fff) AM_WRITE16(tms_comm_w, 0xffffffff) AM_SHARE("tms_comm_base")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 32, gaelco3d_state )
