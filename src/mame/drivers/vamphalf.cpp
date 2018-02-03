@@ -85,14 +85,13 @@ public:
 			m_wram(*this,"wram"),
 			m_tiles32(*this,"tiles32"),
 			m_wram32(*this,"wram32"),
-			m_oki(*this, "oki%u", 1),
+			m_okiregion(*this, "oki%u", 1),
 			m_okibank(*this,"okibank") {
 			m_has_extra_gfx = 0;
 		}
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<qs1000_device> m_qs1000;
-	optional_device<okim6295_device> m_oki2;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
