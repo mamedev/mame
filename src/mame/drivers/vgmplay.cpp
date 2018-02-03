@@ -1052,6 +1052,7 @@ READ8_MEMBER(vgmplay_device::c352_rom_r)
 
 vgmplay_state::vgmplay_state(const machine_config &mconfig, device_type type, const char *tag)
 	: driver_device(mconfig, type, tag)
+	, m_vgmplay(*this, "vgmplay")
 	, m_file(*this, "file")
 	, m_ym2612(*this, "ym2612")
 	, m_ym2151(*this, "ym2151")
