@@ -29,6 +29,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ym2149(*this, "ym2149_%u", 1),
+		m_oki(*this, "oki%u", 1),
 		m_view2(*this, "view2_%u", 0),
 		m_kaneko_spr(*this, "kan_spr"),
 		m_palette(*this, "palette"),
@@ -43,6 +44,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device_array<ym2149_device, 2> m_ym2149;
+	optional_device_array<okim6295_device, 2> m_oki;
 	optional_device_array<kaneko_view2_tilemap_device, 2> m_view2;
 	required_device<kaneko16_sprite_device> m_kaneko_spr;
 	required_device<palette_device> m_palette;
@@ -52,14 +54,13 @@ public:
 	optional_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint16_t> m_mainram;
 	
-	optional_memory_bank_array<2> m_okiregion;
-	optional_memory_region_array<2> m_okibank;
+	optional_memory_region_array<2> m_okiregion;
+	optional_memory_bank_array<2> m_okibank;
 
 	uint16_t m_disp_enable;
 
 	int m_VIEW2_2_pri;
 	
-	void kaneko16_common_oki_bank_w(int bankno, int bank, size_t fixedsize, size_t bankedsize);
 	void kaneko16_common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize);
 	DECLARE_WRITE16_MEMBER(kaneko16_coin_lockout_w);
 	DECLARE_WRITE16_MEMBER(kaneko16_soundlatch_w);
@@ -69,7 +70,8 @@ public:
 
 	template<int Chip> DECLARE_READ16_MEMBER(kaneko16_ay_YM2149_r);
 	template<int Chip> DECLARE_WRITE16_MEMBER(kaneko16_ay_YM2149_w);
-	template<int Bankno, int Mask, int FixedSize, int BankedSize> DECLARE_WRITE8_MEMBER(oki_bank_w);
+	template<int Mask> DECLARE_WRITE8_MEMBER(oki_bank0_w);
+	template<int Mask> DECLARE_WRITE8_MEMBER(oki_bank1_w);
 
 	DECLARE_READ8_MEMBER(eeprom_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
@@ -102,7 +104,7 @@ class kaneko16_gtmr_state : public kaneko16_state
 {
 public:
 	kaneko16_gtmr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: kaneko16_state(mconfig, type, tag),
+		: kaneko16_state(mconfig, type, tag)
 	{
 	}
 
@@ -178,7 +180,6 @@ public:
 	}
 
 	DECLARE_WRITE16_MEMBER(shogwarr_oki_bank_w);
-	DECLARE_WRITE16_MEMBER(brapboys_oki_bank_w);
 
 	DECLARE_DRIVER_INIT(shogwarr);
 	DECLARE_DRIVER_INIT(brapboys);

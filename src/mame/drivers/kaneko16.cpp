@@ -160,16 +160,6 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_coin_lockout_w)
 
 ***************************************************************************/
 
-void kaneko16_state::kaneko16_common_oki_bank_w(int bankno, int bank, size_t fixedsize, size_t bankedsize)
-{
-	size_t length = (m_okiregion[bankno]->bytes() - fixedsize) / bankedsize;
-
-	if (bank < length)
-	{
-		m_okibank[bankno]->set_entry(bank);
-	}
-}
-
 WRITE16_MEMBER(kaneko16_state::kaneko16_soundlatch_w)
 {
 	if (ACCESSING_BITS_8_15)
@@ -199,10 +189,17 @@ WRITE16_MEMBER(kaneko16_state::kaneko16_ay_YM2149_w)
 	else                m_ym2149[Chip]->data_w(space,0,(data >> 8) & 0xff);
 }
 
-template<int Bankno, int Mask, int FixedSize, int BankedSize>
-WRITE8_MEMBER(kaneko16_state::oki_bank_w)
+template<int Mask>
+WRITE8_MEMBER(kaneko16_state::oki_bank0_w)
 {
-	kaneko16_common_oki_bank_w(Bankno, (data & Mask), FixedSize, BankedSize);
+	m_okibank[0]->set_entry(data & Mask);
+//	logerror("%s:Selecting OKI bank %02X\n",machine().describe_context(),data&0xff);
+}
+
+template<int Mask>
+WRITE8_MEMBER(kaneko16_state::oki_bank1_w)
+{
+	m_okibank[1]->set_entry(data & Mask);
 //	logerror("%s:Selecting OKI bank %02X\n",machine().describe_context(),data&0xff);
 }
 
@@ -345,7 +342,7 @@ static ADDRESS_MAP_START( bakubrkr, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM     // Work RAM
 	AM_RANGE(0x400000, 0x40001f) AM_READ(kaneko16_ay_YM2149_r<0>) // Sound
 	AM_RANGE(0x400000, 0x40001d) AM_WRITE(kaneko16_ay_YM2149_w<0>)
-	AM_RANGE(0x40001e, 0x40001f) AM_WRITE8(oki_bank_w<0,7,0x20000,0x20000>, 0x00ff) // OKI bank Switch
+	AM_RANGE(0x40001e, 0x40001f) AM_WRITE8(oki_bank0_w<7>, 0x00ff) // OKI bank Switch
 	AM_RANGE(0x400200, 0x40021f) AM_READWRITE(kaneko16_ay_YM2149_r<1>,kaneko16_ay_YM2149_w<1>)          // Sound
 	AM_RANGE(0x400400, 0x400401) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)  //
 	AM_RANGE(0x500000, 0x503fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
@@ -430,8 +427,8 @@ static ADDRESS_MAP_START( bloodwar, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(bloodwar_coin_lockout_w)  // Coin Lockout
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank_w<0,0xf,0x00000,0x10000>, 0x00ff)
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank_w<1,0x3,0x00000,0x40000>, 0x00ff)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank0_w<0xf>, 0x00ff)
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank1_w<0x3>, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -465,8 +462,8 @@ static ADDRESS_MAP_START( bonkadv, AS_PROGRAM, 16, kaneko16_gtmr_state )
 	AM_RANGE(0xb80000, 0xb80001) AM_WRITE(bloodwar_coin_lockout_w)  // Coin Lockout
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(kaneko16_display_enable)
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank_w<0,0xf,0x00000,0x10000>, 0x00ff)
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank_w<1,0xf,0x00000,0x40000>, 0x00ff)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank0_w<0xf>, 0x00ff)
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank1_w<0xf>, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -528,8 +525,8 @@ static ADDRESS_MAP_START( gtmr_map, AS_PROGRAM, 16, kaneko16_gtmr_state )
 
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
 
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank_w<0,0xf,0x00000,0x10000>, 0x00ff)                                        // Samples Bankswitching
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank_w<0,0x1,0x00000,0x40000>, 0x00ff)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank0_w<0xf>, 0x00ff)                                        // Samples Bankswitching
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank1_w<0x1>, 0x00ff)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -596,8 +593,8 @@ static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16, kaneko16_gtmr_state )
 
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREAD( "toybox", kaneko_toybox_device, mcu_status_r)
 
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank_w<0,0xf,0x00000,0x10000>, 0x00ff)    // Samples Bankswitching
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank_w<0,0x1,0x00000,0x40000>, 0x00ff)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE8(oki_bank0_w<0xf>, 0x00ff)    // Samples Bankswitching
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE8(oki_bank1_w<0x1>, 0x00ff)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -634,17 +631,8 @@ WRITE16_MEMBER(kaneko16_shogwarr_state::shogwarr_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		kaneko16_common_oki_bank_w(0, (data >> 4) & 0xf, 0x30000, 0x10000);
-		kaneko16_common_oki_bank_w(1, (data & 0xf)     , 0x00000, 0x40000);
-	}
-}
-
-WRITE16_MEMBER(kaneko16_shogwarr_state::brapboys_oki_bank_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		kaneko16_common_oki_bank_w(0, (data >> 4) & 0xf, 0x30000, 0x10000);
-		kaneko16_common_oki_bank_w(1, (data & 0xf)     , 0x20000, 0x20000);
+		m_okibank[0]->set_entry((data >> 4) & 0xf);
+		m_okibank[1]->set_entry((data & 0xf));
 	}
 }
 
@@ -673,13 +661,6 @@ static ADDRESS_MAP_START( shogwarr, AS_PROGRAM, 16, kaneko16_shogwarr_state )
 	AM_RANGE(0xd00000, 0xd00001) AM_NOP                         // ? (bit 0)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(shogwarr_oki_bank_w)  // Samples Bankswitching
 ADDRESS_MAP_END
-
-// sample banking is different on brap boys for the music, why? GALs / PALs ?
-static ADDRESS_MAP_START( brapboys, AS_PROGRAM, 16, kaneko16_shogwarr_state )
-	AM_IMPORT_FROM(shogwarr)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(brapboys_oki_bank_w)  // Samples Bankswitching
-ADDRESS_MAP_END
-
 
 /***************************************************************************
 
@@ -715,7 +696,7 @@ static ADDRESS_MAP_START( wingforc_soundport, AS_IO, 8, kaneko16_state )
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x0a, 0x0a) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(oki_bank_w<0,0x3,0x20000,0x20000>)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(oki_bank0_w<0x3>)
 ADDRESS_MAP_END
 
 
@@ -2381,9 +2362,6 @@ static ADDRESS_MAP_START( brapboys_oki2_map, 0, 8, kaneko16_shogwarr_state )
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_DERIVED(kaneko16_shogwarr_state::brapboys, shogwarr)
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(brapboys)
-
 	MCFG_SOUND_MODIFY("oki2")
 	MCFG_DEVICE_ADDRESS_MAP(0, brapboys_oki2_map)
 
@@ -2429,9 +2407,21 @@ void kaneko16_state::kaneko16_common_oki_bank_install(int bankno, size_t fixedsi
 {
 	assert((m_okibank[bankno].found()) && (m_okiregion[bankno].found()));
 	uint8_t *sample  = m_okiregion[bankno]->base();
-	size_t length = m_okiregion[bankno]->bytes() - fixedsize;
+	size_t length = m_okiregion[bankno]->bytes();
 
-	m_okibank[bankno]->configure_entries(0, length / bankedsize, &sample[fixedsize], bankedsize);
+	if (fixedsize > 0)
+	{
+		int max_bank = (length - fixedsize) / bankedsize;
+		m_okibank[bankno]->configure_entries(0, max_bank, &sample[fixedsize], bankedsize);
+		for (int i = max_bank; i < length / bankedsize; i++)
+		{
+			m_okibank[bankno]->configure_entry(i, &sample[length - bankedsize]);
+		}
+	}
+	else
+	{
+		m_okibank[bankno]->configure_entries(0, length / bankedsize, &sample[0], bankedsize);
+	}
 }
 
 void kaneko16_gtmr_state::kaneko16_common_oki_bank_install(int bankno, size_t fixedsize, size_t bankedsize)
@@ -2440,18 +2430,19 @@ void kaneko16_gtmr_state::kaneko16_common_oki_bank_install(int bankno, size_t fi
 	uint8_t *sample  = m_okiregion[bankno]->base();
 	size_t length = m_okiregion[bankno]->bytes();
 
+	/* bank 0 maps to itself, so we just leave it alone */
 	if (fixedsize > 0)
 	{
-		int i = 0;
-		while (i < fixedsize / bankedsize)
+		int bank_offs = fixedsize / bankedsize;
+		for (int i = 0; i < bank_offs; i++)
 		{
-			m_okibank[bankno]->configure_entry(i++, &sample[fixedsize]);
+			m_okibank[bankno]->configure_entry(i, &sample[fixedsize]);
 		}
-		m_okibank[bankno]->configure_entries(i, (length - fixedsize)/bankedsize, &sample[fixedsize], bankedsize);
+		m_okibank[bankno]->configure_entries(bank_offs, (length - fixedsize) / bankedsize, &sample[fixedsize], bankedsize);
 	}
 	else
 	{
-		m_okibank[bankno]->configure_entries(0, length/bankedsize, &sample[0], bankedsize);
+		m_okibank[bankno]->configure_entries(0, length / bankedsize, &sample[0], bankedsize);
 	}
 }
 
