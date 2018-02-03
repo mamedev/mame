@@ -778,6 +778,10 @@ GLC1-SND-DATA1  4/5H    27c1000     DATA1.BIN
 
 */
 
+#define NAMCOS21_SNDROM_LOAD_512K(romname,start,chksum)\
+	ROM_LOAD( romname       , (start + 0x000000), 0x080000, chksum )\
+	ROM_RELOAD(               (start + 0x080000), 0x080000 )
+
 
 ROM_START( gal3 )
 	/********* CPU-MST board x1 *********/
@@ -850,13 +854,13 @@ ROM_START( gal3 )
 	ROM_LOAD16_BYTE( "glc1-snd-prg1.2h", 0x000001, 0x20000, CRC(3b98c175) SHA1(26e59700347bab7fa10f029e781f993f3a97d257) )
 	ROM_LOAD16_BYTE( "glc1-snd-data1.4h",0x040001, 0x20000, CRC(8c7135f5) SHA1(b8c3866c70ac1c431140d6cfe50d9273db7d9b68) )
 
-	ROM_REGION( 0x200000, "c140", ROMREGION_ERASE00 )
-	ROM_LOAD( "glc1-snd-voi0.13a", 0x000000, 0x80000, CRC(ef3bda56) SHA1(2cdfec1860a6d2bd645d83b42cc232643818a699) )
-	ROM_LOAD( "glc1-snd-voi2.13c", 0x000000, 0x80000, CRC(ef3bda56) SHA1(2cdfec1860a6d2bd645d83b42cc232643818a699) ) // == voi0
-	ROM_LOAD( "glc1-snd-voi8.10g", 0x000000, 0x80000, CRC(bba0c15b) SHA1(b0abc22fd1ae8a9970ad45d9ebdb38e6b06033a7) )
-	ROM_LOAD( "glc1-snd-voi9.11g", 0x080000, 0x80000, CRC(dd1b1ee4) SHA1(b69af15acaa9c3d79d7758adc8722ff5c1129b76) )
-	ROM_LOAD( "glc1-snd-voi10.13g",0x100000, 0x80000, CRC(1c1dedf4) SHA1(b6b9dac68103ff2206d731d409a557a71afd98f7) )
-	ROM_LOAD( "glc1-snd-voi11.14g",0x180000, 0x80000, CRC(559e2a8a) SHA1(9a2f28305c6073a0b9b80a5d9617cc25a921e9d0))
+	ROM_REGION( 0x400000, "c140", ROMREGION_ERASE00 )
+	NAMCOS21_SNDROM_LOAD_512K( "glc1-snd-voi0.13a", 0x000000, CRC(ef3bda56) SHA1(2cdfec1860a6d2bd645d83b42cc232643818a699) )
+	NAMCOS21_SNDROM_LOAD_512K( "glc1-snd-voi2.13c", 0x000000, CRC(ef3bda56) SHA1(2cdfec1860a6d2bd645d83b42cc232643818a699) ) // == voi0
+	NAMCOS21_SNDROM_LOAD_512K( "glc1-snd-voi8.10g", 0x000000, CRC(bba0c15b) SHA1(b0abc22fd1ae8a9970ad45d9ebdb38e6b06033a7) )
+	NAMCOS21_SNDROM_LOAD_512K( "glc1-snd-voi9.11g", 0x100000, CRC(dd1b1ee4) SHA1(b69af15acaa9c3d79d7758adc8722ff5c1129b76) )
+	NAMCOS21_SNDROM_LOAD_512K( "glc1-snd-voi10.13g",0x200000, CRC(1c1dedf4) SHA1(b6b9dac68103ff2206d731d409a557a71afd98f7) )
+	NAMCOS21_SNDROM_LOAD_512K( "glc1-snd-voi11.14g",0x300000, CRC(559e2a8a) SHA1(9a2f28305c6073a0b9b80a5d9617cc25a921e9d0))
 
 	/********* Laserdiscs *********/
 	/* used 2 apparently, no idea what they connect to */
