@@ -517,7 +517,7 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="release" value="199112xx" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
+			<dataarea name="flop" size="1282688">
 				<rom name="brandish (disk 1).d88" size="1282688" crc="f97219d3" sha1="4b416caf3426b6673bada95c02f49ab8c7606689" offset="0" status="baddump" />
 			</dataarea>
 		</part>
@@ -533,15 +533,15 @@ Zurukamashi Ver 2.0                                           Nikkonren Kikaku  
 		</part>
 	</software>
 
-	<!-- Triggers copy protection -->
-	<software name="columns" supported="no">
+	<!-- Recreated protection by hand -->
+	<software name="columns">
 		<description>Columns</description>
 		<year>1990</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="release" value="199012xx" />
 		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="1261568">
-				<rom name="columns.hdm" size="1261568" crc="4ad9c624" sha1="8fc4fc56767c94864e8aceb2ae77a23cf5781e74" offset="0" />
+			<dataarea name="flop" size="1282512">
+				<rom name="columns.d88" size="1282512" crc="ee75f23b" sha1="a6f5593b2ad2b763455784d403fa50ec4f8f64c5" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
