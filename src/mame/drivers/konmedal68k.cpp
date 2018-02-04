@@ -45,6 +45,7 @@ public:
 	{ }
 
 	uint32_t screen_update_konmedal68k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cliprect, int pen_idx, int mode);
 
 	void kzaurus(machine_config &config);
 
@@ -98,7 +99,7 @@ void konmedal68k_state::video_start()
 {
 	m_k056832->set_layer_offs(0, -12, -8);  // title on title screen
 	m_k056832->set_layer_offs(1, 20, 8);    // konami logo on title screen
-	m_k056832->set_layer_offs(2, 4, -8);
+	m_k056832->set_layer_offs(2, -28, -8);
 	m_k056832->set_layer_offs(3, 6, -16);
 }
 
@@ -122,41 +123,58 @@ K056832_CB_MEMBER(konmedal68k_state::tile_callback)
 {
 }
 
-uint32_t konmedal68k_state::screen_update_konmedal68k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+// modified from version in mame/video/k054338.cpp
+void konmedal68k_state::fill_backcolor(bitmap_ind16 &bitmap, const rectangle &cliprect, int pen_idx, int mode)
 {
-	int enables = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
-	int pri[NUM_LAYERS];
-	int order[NUM_LAYERS];
-	int i, j;
-
-	bitmap.fill(0, cliprect);
-	screen.priority().fill(0, cliprect);
-
-	for (i = 0; i < NUM_LAYERS; i++)
+	if ((mode & 0x02) == 0) // solid fill
 	{
-		pri[i] = m_k055555->K055555_read_register(K55_PRIINP_0 + i * 3);
+		bitmap.fill(pen_idx, cliprect);
 	}
-
-	for (i = 0; i < NUM_LAYERS; i++)
+	else
 	{
-		order[i] = i;
-	}
+		uint16_t *dst_ptr = &bitmap.pix16(cliprect.min_y);
+		int dst_pitch = bitmap.rowpixels();
 
-	for (i = 0; i < NUM_LAYERS; i++)
-	{
-		for (j = i; j < NUM_LAYERS; j++)
+		if ((mode & 0x01) == 0) // vertical gradient fill
 		{
-			if (pri[order[i]] > pri[order[j]])
+			pen_idx += cliprect.min_y;
+			for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			{
-				int temp = order[i];
+				for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				{
+					dst_ptr[x] = pen_idx;
+				}
 
-				order[i] = order[j];
-				order[j] = temp;
+				pen_idx++;
+				dst_ptr += dst_pitch;
+			}
+		}
+		else    // horizontal gradient fill
+		{
+			pen_idx += cliprect.min_x;
+			dst_ptr += cliprect.min_x;
+			for(int y = cliprect.min_y; y<= cliprect.max_y; y++)
+			{
+				for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				{
+					dst_ptr[x] = pen_idx;
+				}
+				dst_ptr += dst_pitch;
 			}
 		}
 	}
+}
 
-	for (i = 0; i < NUM_LAYERS; i++)
+uint32_t konmedal68k_state::screen_update_konmedal68k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	static const int order[4] = { 0, 1, 3, 2 };
+	int enables = m_k055555->K055555_read_register(K55_INPUT_ENABLES);
+
+	screen.priority().fill(0, cliprect);
+
+	fill_backcolor(bitmap, cliprect, (m_k055555->K055555_read_register(0) << 9), m_k055555->K055555_read_register(1));
+
+	for (int i = 0; i < NUM_LAYERS; i++)
 	{
 		int layer = order[i];
 
