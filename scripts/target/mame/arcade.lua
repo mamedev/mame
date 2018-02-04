@@ -1597,8 +1597,6 @@ files {
 	MAME_DIR .. "src/mame/audio/madalien.cpp",
 	MAME_DIR .. "src/mame/video/madalien.cpp",
 	MAME_DIR .. "src/mame/drivers/madmotor.cpp",
-	MAME_DIR .. "src/mame/includes/madmotor.h",
-	MAME_DIR .. "src/mame/video/madmotor.cpp",
 	MAME_DIR .. "src/mame/drivers/metlclsh.cpp",
 	MAME_DIR .. "src/mame/includes/metlclsh.h",
 	MAME_DIR .. "src/mame/video/metlclsh.cpp",
