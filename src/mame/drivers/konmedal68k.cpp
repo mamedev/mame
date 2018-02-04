@@ -97,10 +97,10 @@ private:
 
 void konmedal68k_state::video_start()
 {
-	m_k056832->set_layer_offs(0, -12, -8);  // title on title screen
-	m_k056832->set_layer_offs(1, 20, 8);    // konami logo on title screen
-	m_k056832->set_layer_offs(2, -28, -8);
-	m_k056832->set_layer_offs(3, 6, -16);
+	m_k056832->set_layer_offs(0, -4, -8);  // title on title screen
+	m_k056832->set_layer_offs(1, 12, 8);    // konami logo on title screen
+	m_k056832->set_layer_offs(2, 6, -8);
+	m_k056832->set_layer_offs(3, 6, -8);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(konmedal68k_state::scanline)
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( kzaurus_main, AS_PROGRAM, 16, konmedal68k_state )
 	AM_RANGE(0x800006, 0x800007) AM_READ_PORT("IN1")
 	AM_RANGE(0x800008, 0x800009) AM_READ_PORT("IN0")
 	AM_RANGE(0x810000, 0x810001) AM_WRITE(control2_w)
-	AM_RANGE(0x830000, 0x83003f) AM_DEVWRITE("k056832", k056832_device, word_w) // this game does read these registers, but does the chip allow it?
+	AM_RANGE(0x830000, 0x83003f) AM_DEVREADWRITE("k056832", k056832_device, word_r, word_w)
 	AM_RANGE(0x840000, 0x84000f) AM_DEVWRITE("k056832", k056832_device, b_word_w)
 	AM_RANGE(0x85001c, 0x85001f) AM_WRITENOP
 	AM_RANGE(0x870000, 0x87005f) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)
@@ -301,7 +301,7 @@ MACHINE_CONFIG_START(konmedal68k_state::kzaurus)
 	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 360-1, 16, 240-1)
+	MCFG_SCREEN_VISIBLE_AREA(40, 400-1, 16, 240-1)
 	MCFG_SCREEN_UPDATE_DRIVER(konmedal68k_state, screen_update_konmedal68k)
 	MCFG_SCREEN_PALETTE("palette")
 
