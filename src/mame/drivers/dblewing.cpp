@@ -135,6 +135,7 @@ uint32_t dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_in
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */

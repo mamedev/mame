@@ -81,10 +81,12 @@ WRITE8_MEMBER(thedeep_state::protection_w)
 	{
 		case 0x11:
 			flip_screen_set(1);
+			m_spritegen->set_flip_screen(true);
 		break;
 
 		case 0x20:
 			flip_screen_set(0);
+			m_spritegen->set_flip_screen(false);
 		break;
 
 		case 0x30:
@@ -190,7 +192,8 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(thedeep_state::p1_w)
 {
-	flip_screen_set((data & 1) ^ 1);
+	flip_screen_set(!BIT(data, 0));
+	m_spritegen->set_flip_screen(!BIT(data, 0));
 	membank("bank1")->set_entry((data & 6) >> 1);
 	logerror("P1 %02x\n",data);
 }

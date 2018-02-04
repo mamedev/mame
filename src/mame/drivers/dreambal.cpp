@@ -28,7 +28,6 @@ lamps?
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
-#include "video/decospr.h"
 #include "screen.h"
 #include "speaker.h"
 

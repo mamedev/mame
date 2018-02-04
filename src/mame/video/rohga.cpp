@@ -26,8 +26,11 @@ uint32_t rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &b
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	uint16_t priority = m_decocomn->priority_r();
 
-	/* Update playfields */
+	// sprites are flipped relative to tilemaps
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen1->set_flip_screen(!BIT(flip, 7));
+
+	/* Update playfields */
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
@@ -63,7 +66,7 @@ uint32_t rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &b
 		break;
 	}
 
-	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -129,12 +132,16 @@ uint32_t rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	uint16_t priority = m_decocomn->priority_r();
 
+	// sprites are flipped relative to tilemaps
+	flip_screen_set(BIT(flip, 7));
+	m_sprgen1->set_flip_screen(!BIT(flip, 7));
+	m_sprgen2->set_flip_screen(!BIT(flip, 7));
+
 	/* draw sprite gfx to temp bitmaps */
-	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);
-	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400);
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 
 	/* Update playfields */
-	flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(nullptr, nullptr);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
@@ -328,14 +335,17 @@ uint32_t rohga_state::screen_update_nitrobal(screen_device &screen, bitmap_rgb32
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	uint16_t priority = m_decocomn->priority_r();
 
+	flip_screen_set(BIT(flip, 7));
+	m_sprgen1->set_flip_screen(BIT(flip, 7));
+	m_sprgen2->set_flip_screen(BIT(flip, 7));
+
 	/* draw sprite gfx to temp bitmaps */
 	m_sprgen1->set_alt_format(true);
 	m_sprgen2->set_alt_format(true);
-	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, false);
-	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, false);
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400);
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 
 	/* Update playfields */
-	flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 

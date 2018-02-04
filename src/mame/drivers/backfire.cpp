@@ -135,8 +135,8 @@ void backfire_state::video_start()
 
 uint32_t backfire_state::screen_update_backfire_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(1);
+	// sprites are flipped relative to tilemaps
+	m_sprgen->set_flip_screen(true);
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */
@@ -166,8 +166,8 @@ uint32_t backfire_state::screen_update_backfire_left(screen_device &screen, bitm
 
 uint32_t backfire_state::screen_update_backfire_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(1);
+	// sprites are flipped relative to tilemaps
+	m_sprgen2->set_flip_screen(true);
 
 	/* screen 1 uses pf1 as the forground and pf3 as the background */
 	/* screen 2 uses pf2 as the foreground and pf4 as the background */

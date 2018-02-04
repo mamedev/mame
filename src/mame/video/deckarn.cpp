@@ -33,6 +33,9 @@ void deco_karnovsprites_device::static_set_gfxdecode_tag(device_t &device, const
 
 void deco_karnovsprites_device::device_start()
 {
+	m_flip_screen = false;
+
+	save_item(NAME(m_flip_screen));
 }
 
 void deco_karnovsprites_device::device_reset()
@@ -82,7 +85,7 @@ void deco_karnovsprites_device::draw_sprites( bitmap_ind16 &bitmap, const rectan
 		y = (y + 16) % 0x200;
 		x = 256 - x;
 		y = 256 - y;
-		if (machine().driver_data()->flip_screen())
+		if (m_flip_screen)
 		{
 			y = 240 - y;
 			x = 240 - x;

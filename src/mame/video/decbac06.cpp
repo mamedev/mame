@@ -118,6 +118,7 @@ void deco_bac06_device::device_start()
 	m_bppmult = 0x10;
 	m_bppmask = 0x0f;
 	m_rambank = 0;
+	m_flip_screen = false;
 
 	save_pointer(NAME(m_pf_data.get()), 0x4000/2);
 	save_pointer(NAME(m_pf_rowscroll.get()), 0x2000/2);
@@ -126,6 +127,7 @@ void deco_bac06_device::device_start()
 	save_item(NAME(m_pf_control_1));
 	save_item(NAME(m_gfxcolmask));
 	save_item(NAME(m_rambank));
+	save_item(NAME(m_flip_screen));
 }
 
 void deco_bac06_device::device_reset()
@@ -280,7 +282,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 	doesn't affect any games.
 	*/
 
-	if (machine().driver_data()->flip_screen())
+	if (m_flip_screen)
 		src_y = (src_bitmap.height() - 256) - scrolly;
 	else
 		src_y = scrolly;
@@ -291,7 +293,7 @@ void deco_bac06_device::custom_tilemap_draw(bitmap_ind16 &bitmap,
 		else
 			src_x=scrollx;
 
-		if (machine().driver_data()->flip_screen())
+		if (m_flip_screen)
 			src_x=(src_bitmap.width() - 256) - src_x;
 
 		for (x=0; x<=cliprect.max_x; x++) {

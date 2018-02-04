@@ -131,6 +131,7 @@ uint32_t captaven_state::screen_update_captaven(screen_device &screen, bitmap_in
 	address_space &space = machine().dummy_space();
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	flip_screen_set(BIT(flip, 7));
+	m_sprgen->set_flip_screen(BIT(flip, 7));
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x000), cliprect); // Palette index not confirmed
@@ -203,7 +204,9 @@ uint32_t fghthist_state::screen_update_fghthist(screen_device &screen, bitmap_rg
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 	m_deco_tilegen2->pf_update(m_pf3_rowscroll, m_pf4_rowscroll);
 
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x800, true);
+	// sprites are flipped relative to tilemaps
+	m_sprgen->set_flip_screen(true);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x800);
 
 	/* Draw screen */
 	m_deco_tilegen2->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
@@ -384,8 +387,11 @@ uint32_t nslasher_state::screen_update_nslasher(screen_device &screen, bitmap_rg
 	m_sprgen1->set_pix_raw_shift(8);
 	m_sprgen2->set_pix_raw_shift(8);
 
-	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x800, true);
-	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram16_2_buffered, 0x800, true);
+	// sprites are flipped relative to tilemaps
+	m_sprgen1->set_flip_screen(true);
+	m_sprgen2->set_flip_screen(true);
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x800);
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram16_2_buffered, 0x800);
 
 
 	/* Render alpha-blended tilemap to separate buffer for proper mixing */
