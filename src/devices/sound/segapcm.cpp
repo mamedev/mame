@@ -21,9 +21,9 @@ segapcm_device::segapcm_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, SEGAPCM, tag, owner, clock),
 		device_sound_interface(mconfig, *this),
 		device_rom_interface(mconfig, *this, 21),
+		m_ram(nullptr),
 		m_stream(nullptr)
 {
-	std::fill(std::begin(m_ram), std::end(m_ram), 0);
 }
 
 
@@ -35,10 +35,20 @@ void segapcm_device::device_start()
 {
 	m_stream = stream_alloc(0, 2, clock() / 128);
 	
-	std::fill(std::begin(m_ram), std::end(m_ram), 0xff);
+	m_ram = make_unique_clear<uint8_t[]>(0x800);
 
 	save_item(NAME(m_low));
-	save_pointer(NAME(m_ram), 0x800);
+	save_pointer(NAME(m_ram.get()), 0x800);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void segapcm_device::device_reset()
+{
+	std::fill(&m_ram[0], &m_ram[0x800], 0xff);
 }
 
 

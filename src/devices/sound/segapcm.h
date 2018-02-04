@@ -37,6 +37,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual void device_post_load() override;
 	virtual void device_clock_changed() override;
 
@@ -47,7 +48,7 @@ protected:
 	virtual void rom_bank_updated() override;
 
 private:
-	uint8_t m_ram[0x800];
+	std::unique_ptr<uint8_t[]> m_ram;
 	uint8_t m_low[16];
 	sound_stream* m_stream;
 };
