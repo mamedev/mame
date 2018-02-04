@@ -11,9 +11,6 @@ all:
 	$(GENIE) --gcc=android-arm gmake
 	$(GENIE) --gcc=android-mips gmake
 	$(GENIE) --gcc=android-x86 gmake
-	$(GENIE) --gcc=nacl gmake
-	$(GENIE) --gcc=nacl-arm gmake
-	$(GENIE) --gcc=pnacl gmake
 	$(GENIE) --gcc=mingw-gcc gmake
 	$(GENIE) --gcc=linux-gcc gmake
 	$(GENIE) --gcc=osx gmake
@@ -86,34 +83,6 @@ mingw-clang: mingw-clang-debug32 mingw-clang-release32 mingw-clang-debug64 mingw
 
 .build/projects/vs2013:
 	$(GENIE) vs2013
-
-.build/projects/gmake-nacl:
-	$(GENIE) --gcc=nacl gmake
-nacl-debug32: .build/projects/gmake-nacl
-	make -R -C .build/projects/gmake-nacl config=debug32
-nacl-release32: .build/projects/gmake-nacl
-	make -R -C .build/projects/gmake-nacl config=release32
-nacl-debug64: .build/projects/gmake-nacl
-	make -R -C .build/projects/gmake-nacl config=debug64
-nacl-release64: .build/projects/gmake-nacl
-	make -R -C .build/projects/gmake-nacl config=release64
-nacl: nacl-debug32 nacl-release32 nacl-debug64 nacl-release64
-
-.build/projects/gmake-nacl-arm:
-	$(GENIE) --gcc=nacl-arm gmake
-nacl-arm-debug: .build/projects/gmake-nacl-arm
-	make -R -C .build/projects/gmake-nacl-arm config=debug
-nacl-arm-release: .build/projects/gmake-nacl-arm
-	make -R -C .build/projects/gmake-nacl-arm config=release
-nacl-arm: nacl-arm-debug32 nacl-arm-release32
-
-.build/projects/gmake-pnacl:
-	$(GENIE) --gcc=pnacl gmake
-pnacl-debug: .build/projects/gmake-pnacl
-	make -R -C .build/projects/gmake-pnacl config=debug
-pnacl-release: .build/projects/gmake-pnacl
-	make -R -C .build/projects/gmake-pnacl config=release
-pnacl: pnacl-debug pnacl-release
 
 .build/projects/gmake-osx:
 	$(GENIE) --gcc=osx gmake

@@ -4,9 +4,6 @@
 
     Rockwell 6522 VIA interface and emulation
 
-    This function emulates the functionality of up to 8 6522
-    versatile interface adapters.
-
     This is based on the M6821 emulation in MAME.
 
     To do:
@@ -210,12 +207,6 @@ void via6522_device::device_start()
 	m_ca2_timer = timer_alloc(TIMER_CA2);
 	m_shift_timer = timer_alloc(TIMER_SHIFT);
 	m_shift_irq_timer = timer_alloc(TIMER_SHIFT_IRQ);
-
-	/* Default clock is from CPU1 */
-	if (clock() == 0)
-	{
-		set_unscaled_clock(machine().firstcpu->clock());
-	}
 
 	/* save state register */
 	save_item(NAME(m_in_a));

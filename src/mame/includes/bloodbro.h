@@ -66,4 +66,7 @@ public:
 	void weststry_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_DRIVER_INIT(weststry);
+	void bloodbro(machine_config &config);
+	void skysmash(machine_config &config);
+	void weststry(machine_config &config);
 };

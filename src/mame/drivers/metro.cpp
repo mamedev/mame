@@ -67,23 +67,14 @@ no PCB number but all look identical to each other.
 
 To Do:
 
--   Tilemaps/sprites offsets may be emulated understanding what appear to be CRT registers
-    at c78880 (sequence of 4 values), c78890 (sequence of 5 values) and c788a0 (start sequence).
--   Wrong color bars in service mode (e.g. balcube, toride2g).
-    They use solid color tiles (80xx), but the right palette is not at 00-ff.
-    Related to the unknown table in the RAM mapped just before the palette?
+-   For video related issues @see devices/video/imagetek_i4100.cpp
 -   Most games, in service mode, seem to require that you press start1&2 *exactly at once*
     in order to advance to the next screen (e.g. holding 1 then pressing 2 doesn't work).
 -   Coin lockout
--   Some gfx problems in ladykill, 3kokushi, puzzli, gakusai,
-    seem related to how we handle windows and wrapping
 -   Interrupt timing needs figuring out properly, having it incorrect
     causes scrolling glitches in some games.  Test cases Mouse Go Go
     title screen, GunMaster title screen.  Changing it can cause
     excessive slowdown in said games however.
--   Bang Bang Ball / Bubble Buster slow to a crawl when you press a
-    button between levels, on a real PCB it speeds up instead (related
-    to above?)
 -   vmetal: ES8712 actually controls a M6585 and an unknown logic selector chip.
 
 Notes:
@@ -124,7 +115,11 @@ READ16_MEMBER(metro_state::metro_irq_cause_r)
 	/* interrupt cause, used by
 
 	int[0] vblank
-	int[1] ?            DAITORIDE, BALCUBE, KARATOUR, MOUJA
+	int[1] hblank (bangball for faster intermission skip,
+	               puzzli for gameplay water effect,
+	               blzntrnd title screen scroll (enabled all the time then?),
+	               unused/empty in balcube, daitoride, karatour,
+	               unchecked mouja & other i4300 games )
 	int[2] blitter
 	int[3] ?            KARATOUR
 	int[4] ?
@@ -184,7 +179,7 @@ IRQ_CALLBACK_MEMBER(metro_state::metro_irq_callback)
 
 WRITE16_MEMBER(metro_state::metro_irq_cause_w)
 {
-	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", space.device().safe_pc(), data);
+	//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n", m_maincpu->pc(), data);
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -228,7 +223,7 @@ INTERRUPT_GEN_MEMBER(metro_state::metro_periodic_interrupt)
 TIMER_DEVICE_CALLBACK_MEMBER(metro_state::bangball_scanline)
 {
 	int scanline = param;
-	
+
 	// vblank irq
 	if(scanline == 224)
 	{
@@ -296,7 +291,7 @@ WRITE16_MEMBER(metro_state::metro_soundlatch_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-		space.device().execute().spin_until_interrupt();
+		m_maincpu->spin_until_interrupt();
 		m_busy_sndcpu = 1;
 	}
 }
@@ -458,23 +453,24 @@ WRITE8_MEMBER(metro_state::daitorid_portb_w)
 
 ***************************************************************************/
 
-/* IT DOESN'T WORK PROPERLY */
-
 WRITE16_MEMBER(metro_state::metro_coin_lockout_1word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-//      machine().bookkeeping().coin_lockout_w(0, data & 1);
-//      machine().bookkeeping().coin_lockout_w(1, data & 2);
+		machine().bookkeeping().coin_counter_w(0, data & 1);
+		machine().bookkeeping().coin_counter_w(1, data & 2);
 	}
-	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
+	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
 }
 
-
+// value written doesn't matter, also each counted coin gets reported after one full second.
+// TODO: maybe the counter also controls lockout?
 WRITE16_MEMBER(metro_state::metro_coin_lockout_4words_w)
 {
+	machine().bookkeeping().coin_counter_w((offset >> 1) & 1, offset & 1);
 //  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
-	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", space.device().safe_pc(), data);
+
+	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
 }
 
 WRITE_LINE_MEMBER(metro_state::vdp_blit_end_w)
@@ -543,7 +539,7 @@ READ16_MEMBER(metro_state::balcube_dsw_r)
 		case 0x17FFE:   return BIT(dsw2, 6) ? 0x40 : 0;
 		case 0x0FFFE:   return BIT(dsw2, 7) ? 0x40 : 0;
 	}
-	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n", m_maincpu->pc(), offset);
 	return 0xffff;
 }
 
@@ -720,7 +716,7 @@ static ADDRESS_MAP_START( kokushi_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0") AM_WRITE(metro_soundstatus_w)  // To Sound CPU
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")                                // Inputs
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("DSW0")                               //
-	AM_RANGE(0xc00002, 0xc00009) AM_WRITE(metro_coin_lockout_4words_w   )           // Coin Lockout
+	AM_RANGE(0xc00002, 0xc00009) AM_WRITE(metro_coin_lockout_4words_w)              // Coin Lockout
 ADDRESS_MAP_END
 
 
@@ -1226,9 +1222,9 @@ static ADDRESS_MAP_START( puzzlet_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x580000, 0x580003) AM_DEVWRITE8("ymsnd", ym2413_device, write, 0xff00)
 
 	// TODO: !!! i4300 !!!
+	AM_RANGE(0x700000, 0x77ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 	AM_RANGE(0x7788a2, 0x7788a3) AM_WRITE(metro_irq_cause_w)                            // IRQ Cause
 	AM_RANGE(0x7788a4, 0x7788a5) AM_WRITE(puzzlet_irq_enable_w) AM_SHARE("irq_enable")  // IRQ Enable
-	AM_RANGE(0x700000, 0x77ffff) AM_DEVICE("vdp2", imagetek_i4220_device, v2_map)
 
 	AM_RANGE(0x7f2000, 0x7f3fff) AM_RAM
 
@@ -2151,9 +2147,9 @@ static INPUT_PORTS_START( lastfort )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-//	PORT_DIPNAME( 0x0080, 0x0080, "Tiles" )             PORT_DIPLOCATION("SW2:8")
-//	PORT_DIPSETTING(      0x0080, "Mahjong" )
-//	PORT_DIPSETTING(      0x0000, "Cards" )             // Not working - See notes
+//  PORT_DIPNAME( 0x0080, 0x0080, "Tiles" )             PORT_DIPLOCATION("SW2:8")
+//  PORT_DIPSETTING(      0x0080, "Mahjong" )
+//  PORT_DIPSETTING(      0x0000, "Cards" )             // Not working - See notes
 	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )
 
 	PORT_START("IN3")   // $c0000e
@@ -3041,8 +3037,8 @@ void metro_state::machine_start()
 	save_item(NAME(m_gakusai_oki_bank_hi));
 }
 
-static MACHINE_CONFIG_START( i4100_config )
-	MCFG_DEVICE_ADD("vdp", I4100, XTAL_26_666MHz)
+MACHINE_CONFIG_START(metro_state::i4100_config)
+	MCFG_DEVICE_ADD("vdp", I4100, XTAL(26'666'000))
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3057,8 +3053,8 @@ static MACHINE_CONFIG_START( i4100_config )
 	MCFG_GFXDECODE_ADD("gfxdecode", ":vdp:palette", i4100)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( i4220_config )
-	MCFG_DEVICE_ADD("vdp2", I4220, XTAL_26_666MHz)
+MACHINE_CONFIG_START(metro_state::i4220_config)
+	MCFG_DEVICE_ADD("vdp2", I4220, XTAL(26'666'000))
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3073,8 +3069,8 @@ static MACHINE_CONFIG_START( i4220_config )
 	MCFG_GFXDECODE_ADD("gfxdecode", ":vdp2:palette", i4220)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( i4300_config )
-	MCFG_DEVICE_ADD("vdp3", I4300, XTAL_26_666MHz)
+MACHINE_CONFIG_START(metro_state::i4300_config)
+	MCFG_DEVICE_ADD("vdp3", I4300, XTAL(26'666'000))
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3090,23 +3086,23 @@ static MACHINE_CONFIG_START( i4300_config )
 MACHINE_CONFIG_END
 
 // TODO: these comes from the CRTC inside the i4100
-static MACHINE_CONFIG_START( i4100_config_360x224 )
+MACHINE_CONFIG_START(metro_state::i4100_config_360x224)
 	MCFG_FRAGMENT_ADD( i4100_config )
-	
+
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(360, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, 360-1, 0, 224-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( i4220_config_320x240 )
+MACHINE_CONFIG_START(metro_state::i4220_config_320x240)
 	MCFG_FRAGMENT_ADD( i4220_config )
-	
+
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_SIZE(320, 240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( i4220_config_304x224 )
+MACHINE_CONFIG_START(metro_state::i4220_config_304x224)
 	MCFG_FRAGMENT_ADD( i4220_config )
 
 	MCFG_DEVICE_MODIFY("screen")
@@ -3114,7 +3110,7 @@ static MACHINE_CONFIG_START( i4220_config_304x224 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 224-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( i4300_config_384x224 )
+MACHINE_CONFIG_START(metro_state::i4300_config_384x224)
 	MCFG_FRAGMENT_ADD( i4300_config )
 
 	MCFG_DEVICE_MODIFY("screen")
@@ -3122,7 +3118,7 @@ static MACHINE_CONFIG_START( i4300_config_384x224 )
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( i4300_config_320x240 )
+MACHINE_CONFIG_START(metro_state::i4300_config_320x240)
 	MCFG_FRAGMENT_ADD( i4300_config )
 
 	MCFG_DEVICE_MODIFY("screen")
@@ -3131,10 +3127,10 @@ static MACHINE_CONFIG_START( i4300_config_320x240 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( msgogo )
+MACHINE_CONFIG_START(metro_state::msgogo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(msgogo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt) // timing is off, shaking sprites in intro
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  60) // ?
@@ -3153,21 +3149,21 @@ static MACHINE_CONFIG_START( msgogo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( balcube, msgogo )
+MACHINE_CONFIG_DERIVED(metro_state::balcube, msgogo)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(balcube_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( daitoa, msgogo )
+MACHINE_CONFIG_DERIVED(metro_state::daitoa, msgogo)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(daitoa_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bangball, msgogo )
+MACHINE_CONFIG_DERIVED(metro_state::bangball, msgogo)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bangball_map)
 	MCFG_CPU_VBLANK_INT_REMOVE()
@@ -3179,21 +3175,21 @@ static MACHINE_CONFIG_DERIVED( bangball, msgogo )
 	MCFG_SCREEN_REFRESH_RATE(60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( batlbubl, msgogo )
+MACHINE_CONFIG_DERIVED(metro_state::batlbubl, msgogo)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(batlbubl_map)
 	MCFG_CPU_VBLANK_INT_REMOVE()
 	MCFG_CPU_PERIODIC_INT_REMOVE()
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", metro_state, bangball_scanline, "screen", 0, 1)
-	
+
 	// doesn't like 58.2 Hz
 	MCFG_DEVICE_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(60)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( metro_upd7810_sound )
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_24MHz/2)
+MACHINE_CONFIG_START(metro_state::metro_upd7810_sound)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL(24'000'000)/2)
 	MCFG_UPD7810_RXD(READLINE(metro_state, metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_UPD7810_PORTA_READ_CB(READ8(metro_state, metro_porta_r))
@@ -3202,8 +3198,8 @@ static MACHINE_CONFIG_START( metro_upd7810_sound )
 	MCFG_UPD7810_PORTC_WRITE_CB(WRITE8(metro_state, metro_sound_rombank_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( daitorid_upd7810_sound )
-	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL_12MHz)
+MACHINE_CONFIG_START(metro_state::daitorid_upd7810_sound)
+	MCFG_CPU_ADD("audiocpu", UPD7810, XTAL(12'000'000))
 	MCFG_UPD7810_RXD(READLINE(metro_state, metro_rxd_r))
 	MCFG_CPU_PROGRAM_MAP(metro_sound_map)
 	MCFG_UPD7810_PORTA_READ_CB(READ8(metro_state, metro_porta_r))
@@ -3213,10 +3209,10 @@ static MACHINE_CONFIG_START( daitorid_upd7810_sound )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( daitorid )
+MACHINE_CONFIG_START(metro_state::daitorid)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(daitorid_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3233,7 +3229,7 @@ static MACHINE_CONFIG_START( daitorid )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
@@ -3242,10 +3238,10 @@ static MACHINE_CONFIG_START( daitorid )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dharma )
+MACHINE_CONFIG_START(metro_state::dharma)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(dharma_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3254,29 +3250,29 @@ static MACHINE_CONFIG_START( dharma )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(i4220_config)
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // sample rate =  M6295 clock / 132
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // sample rate =  M6295 clock / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( karatour )
+MACHINE_CONFIG_START(metro_state::karatour)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(karatour_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
-	
+
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(i4100_config)
 
@@ -3285,18 +3281,18 @@ static MACHINE_CONFIG_START( karatour )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( 3kokushi )
+MACHINE_CONFIG_START(metro_state::_3kokushi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(kokushi_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3305,24 +3301,24 @@ static MACHINE_CONFIG_START( 3kokushi )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( i4220_config_320x240 )
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( lastfort )
+MACHINE_CONFIG_START(metro_state::lastfort)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(lastfort_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3337,17 +3333,17 @@ static MACHINE_CONFIG_START( lastfort )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_LOW) // sample rate =  M6295 clock / 165
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_LOW) // sample rate =  M6295 clock / 165
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lastforg )
+MACHINE_CONFIG_START(metro_state::lastforg)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(lastforg_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3361,17 +3357,17 @@ static MACHINE_CONFIG_START( lastforg )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dokyusei )
+MACHINE_CONFIG_START(metro_state::dokyusei)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(dokyusei_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
@@ -3385,14 +3381,14 @@ static MACHINE_CONFIG_START( dokyusei )
 	MCFG_OKIM6295_ADD("oki", 1056000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dokyusp )
+MACHINE_CONFIG_START(metro_state::dokyusp)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(dokyusp_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
@@ -3403,19 +3399,19 @@ static MACHINE_CONFIG_START( dokyusp )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( i4300_config_384x224 )
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gakusai )
+MACHINE_CONFIG_START(metro_state::gakusai)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
@@ -3429,19 +3425,19 @@ static MACHINE_CONFIG_START( gakusai )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( i4300_config_320x240 )
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gakusai2 )
+MACHINE_CONFIG_START(metro_state::gakusai2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 26.6660MHz/2?, OSCs listed are 26.6660MHz & 3.579545MHz */
@@ -3462,15 +3458,15 @@ static MACHINE_CONFIG_START( gakusai2 )
 	MCFG_OKIM6295_ADD("oki", 2112000, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pangpoms )
+MACHINE_CONFIG_START(metro_state::pangpoms)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(pangpoms_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3485,18 +3481,18 @@ static MACHINE_CONFIG_START( pangpoms )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( poitto )
+MACHINE_CONFIG_START(metro_state::poitto)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(poitto_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3511,18 +3507,18 @@ static MACHINE_CONFIG_START( poitto )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // was /128.. so pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // was /128.. so pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pururun )
+MACHINE_CONFIG_START(metro_state::pururun)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)       /* Not confirmed */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)       /* Not confirmed */
 	MCFG_CPU_PROGRAM_MAP(pururun_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3531,31 +3527,31 @@ static MACHINE_CONFIG_START( pururun )
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( i4220_config )
-	
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)  /* Confirmed match to reference video */
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))  /* Confirmed match to reference video */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", UPD7810_INTF2))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_3_579545MHz/3, PIN7_HIGH) // sample rate =  M6295 clock / 132
+	MCFG_OKIM6295_ADD("oki", XTAL(3'579'545)/3, PIN7_HIGH) // sample rate =  M6295 clock / 132
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( skyalert )
+MACHINE_CONFIG_START(metro_state::skyalert)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(skyalert_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
 	MCFG_FRAGMENT_ADD(metro_upd7810_sound)
-	
+
 	MCFG_FRAGMENT_ADD(i4100_config_360x224)
 
 
@@ -3564,18 +3560,18 @@ static MACHINE_CONFIG_START( skyalert )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_LOW) // sample rate =  M6295 clock / 165
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_LOW) // sample rate =  M6295 clock / 165
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( toride2g )
+MACHINE_CONFIG_START(metro_state::toride2g)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(24'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(toride2g_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3590,18 +3586,18 @@ static MACHINE_CONFIG_START( toride2g )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_24MHz/20, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(24'000'000)/20, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mouja )
+MACHINE_CONFIG_START(metro_state::mouja)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(mouja_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(metro_state,metro_irq_callback)
@@ -3613,19 +3609,19 @@ static MACHINE_CONFIG_START( mouja )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/1024*132, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/1024*132, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_DEVICE_ADDRESS_MAP(0, mouja_okimap)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vmetal )
+MACHINE_CONFIG_START(metro_state::vmetal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(vmetal_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  metro_vblank_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
@@ -3640,7 +3636,7 @@ static MACHINE_CONFIG_START( vmetal )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(1'000'000), PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_ES8712_ADD("essnd", 12000)
@@ -3651,20 +3647,20 @@ static MACHINE_CONFIG_START( vmetal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( blzntrnd )
+MACHINE_CONFIG_START(metro_state::blzntrnd)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  karatour_interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(metro_state, metro_periodic_interrupt,  8*60) // ?
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/2)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(blzntrnd_sound_map)
 	MCFG_CPU_IO_MAP(blzntrnd_sound_io_map)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdp2", I4220, XTAL_26_666MHz)
+	MCFG_DEVICE_ADD("vdp2", I4220, XTAL(26'666'000))
 	MCFG_I4100_GFXDECODE("gfxdecode")
 	MCFG_I4100_BLITTER_END_CALLBACK(WRITELINE(metro_state,vdp_blit_end_w))
 
@@ -3688,29 +3684,29 @@ static MACHINE_CONFIG_START( blzntrnd )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000)/2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gstrik2, blzntrnd )
+MACHINE_CONFIG_DERIVED(metro_state::gstrik2, blzntrnd)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gstrik2)
 	MCFG_VIDEO_START_OVERRIDE(metro_state,gstrik2)
 
 	MCFG_DEVICE_MODIFY("k053936")
 	MCFG_K053936_OFFSETS(-77, -19)
-	
+
 	MCFG_DEVICE_MODIFY("vdp2")
 	MCFG_I4100_TILEMAP_XOFFSETS(0,-8,0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( puzzlet )
+MACHINE_CONFIG_START(metro_state::puzzlet)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", H83007, XTAL_20MHz) // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
+	MCFG_CPU_ADD("maincpu", H83007, XTAL(20'000'000)) // H8/3007 - Hitachi HD6413007F20 CPU. Clock 20MHz
 	MCFG_CPU_PROGRAM_MAP(puzzlet_map)
 	MCFG_CPU_IO_MAP(puzzlet_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", metro_state,  puzzlet_interrupt)
@@ -3729,10 +3725,10 @@ static MACHINE_CONFIG_START( puzzlet )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_20MHz/5, PIN7_LOW)
+	MCFG_OKIM6295_ADD("oki", XTAL(20'000'000)/5, PIN7_LOW)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_20MHz/5)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(20'000'000)/5)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 MACHINE_CONFIG_END
 
@@ -5539,7 +5535,7 @@ DRIVER_INIT_MEMBER(metro_state,balcube)
 
 	for (unsigned i = 0; i < len; i+=2)
 	{
-		ROM[i]  = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
+		ROM[i]  = bitswap<8>(ROM[i],0,1,2,3,4,5,6,7);
 	}
 
 	metro_common();
@@ -5556,11 +5552,11 @@ DRIVER_INIT_MEMBER(metro_state,dharmak)
 	{
 		uint8_t dat;
 		dat = src[i + 1];
-		dat = BITSWAP8(dat, 7,3,2,4, 5,6,1,0);
+		dat = bitswap<8>(dat, 7,3,2,4, 5,6,1,0);
 		src[i + 1] = dat;
 
 		dat = src[i + 3];
-		dat = BITSWAP8(dat, 7,2,5,4, 3,6,1,0);
+		dat = bitswap<8>(dat, 7,2,5,4, 3,6,1,0);
 		src[i + 3] = dat;
 	}
 
@@ -5651,7 +5647,7 @@ GAME( 1995, dokyusp,   0,        dokyusp,  gakusai,  metro_state, gakusai,  ROT0
 GAME( 1995, msgogo,    0,        msgogo,   msgogo,   metro_state, balcube,  ROT0,   "Metro",                                           "Mouse Shooter GoGo",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pururun,   0,        pururun,  pururun,  metro_state, daitorid, ROT0,   "Metro / Banpresto",                               "Pururun",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1995, puzzli,    0,        daitorid, puzzli,   metro_state, daitorid, ROT0,   "Metro / Banpresto",                               "Puzzli",                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, 3kokushi,  0,        3kokushi, 3kokushi, metro_state, karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, 3kokushi,  0,        _3kokushi,3kokushi, metro_state, karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)",                     MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, balcube,   0,        balcube,  balcube,  metro_state, balcube,  ROT0,   "Metro",                                           "Bal Cube",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1996, bangball,  0,        bangball, bangball, metro_state, balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse",          "Bang Bang Ball (v1.05)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1996, gstrik2,   0,        gstrik2,  gstrik2,  metro_state, blzntrnd, ROT0,   "Human Amusement",                                 "Grand Striker 2 (Europe and Oceania)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

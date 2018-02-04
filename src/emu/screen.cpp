@@ -189,14 +189,15 @@ void screen_device::svg_renderer::render_state(std::vector<u32> &dest, const std
 
 void screen_device::svg_renderer::blit(bitmap_rgb32 &bitmap, const cached_bitmap &src) const
 {
-	const u32 *s = &src.image[0];
-	for(int y=0; y<src.sy; y++) {
-		u32 *d = &bitmap.pix(y + src.y, src.x);
-		for(int x=0; x<src.sx; x++) {
-			u32 c = *s++;
-			if(c)
-				*d = c;
-			d++;
+	if(src.sy) {
+		const u32 *s = &src.image[0];
+		for(int y=0; y<src.sy; y++) {
+			u32 *d = &bitmap.pix(y + src.y, src.x);
+			for(int x=0; x<src.sx; x++, d++) {
+				const u32 c = *s++;
+				if(c)
+					*d = c;
+			}
 		}
 	}
 }

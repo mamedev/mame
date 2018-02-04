@@ -52,6 +52,7 @@ public:
 
 	DECLARE_READ8_MEMBER( qtsbc_43_r );
 
+	void qtsbc(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -98,15 +99,15 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( qtsbc )
+MACHINE_CONFIG_START(qtsbc_state::qtsbc)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz) // Mostek MK3880
+	MCFG_CPU_ADD("maincpu",Z80, XTAL(4'000'000)) // Mostek MK3880
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 
 	/* video hardware */
 	MCFG_DEVICE_ADD("pit", PIT8253, 0) // U9
-	MCFG_PIT8253_CLK0(XTAL_4MHz / 2) /* Timer 0: baud rate gen for 8251 */
+	MCFG_PIT8253_CLK0(XTAL(4'000'000) / 2) /* Timer 0: baud rate gen for 8251 */
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("uart", i8251_device, write_txc))
 	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("uart", i8251_device, write_rxc))
 

@@ -60,14 +60,14 @@ READ16_MEMBER(shangha3_state::shangha3_prot_r)
 {
 	static const int result[] = { 0x0,0x1,0x3,0x7,0xf,0xe,0xc,0x8,0x0};
 
-	logerror("PC %04x: read 20004e\n",space.device().safe_pc());
+	logerror("PC %04x: read 20004e\n",m_maincpu->pc());
 
 	return result[m_prot_count++ % 9];
 }
 
 WRITE16_MEMBER(shangha3_state::shangha3_prot_w)
 {
-	logerror("PC %04x: write %02x to 20004e\n",space.device().safe_pc(),data);
+	logerror("PC %04x: write %02x to 20004e\n",m_maincpu->pc(),data);
 }
 
 WRITE16_MEMBER(shangha3_state::shangha3_coinctrl_w)
@@ -117,7 +117,7 @@ WRITE16_MEMBER(shangha3_state::irq_ack_w)
 
 static ADDRESS_MAP_START( shangha3_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x200008, 0x200009) AM_WRITE(blitter_go_w)
@@ -135,7 +135,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( heberpop_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("DSW")
@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( blocken_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x10000a, 0x10000b) AM_READNOP AM_WRITE(irq_ack_w) // r -> unknown purpose (value doesn't matter, left-over?)
 	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(blocken_coinctrl_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("ram") /* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(gfxlist_addr_w)
@@ -443,10 +443,10 @@ static GFXDECODE_START( shangha3 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( shangha3 )
+MACHINE_CONFIG_START(shangha3_state::shangha3)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_48MHz/3) // TMP68HC000N-16
+	MCFG_CPU_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16
 	MCFG_CPU_PROGRAM_MAP(shangha3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
@@ -456,7 +456,7 @@ static MACHINE_CONFIG_START( shangha3 )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 //  MCFG_SCREEN_SIZE(24*16, 16*16)
 //  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_48MHz/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
+	MCFG_SCREEN_RAW_PARAMS(48_MHz_XTAL/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
@@ -470,24 +470,24 @@ static MACHINE_CONFIG_START( shangha3 )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", YM2149, XTAL_48MHz/32) // 1.5MHz
+	MCFG_SOUND_ADD("aysnd", YM2149, 48_MHz_XTAL/32) // 1.5MHz
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( heberpop )
+MACHINE_CONFIG_START(shangha3_state::heberpop)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_48MHz/3) // TMP68HC000N-16 like the others??
+	MCFG_CPU_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16 like the others??
 	MCFG_CPU_PROGRAM_MAP(heberpop_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_48MHz/8)  /* 6 MHz ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, 48_MHz_XTAL/8)  /* 6 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(heberpop_sound_map)
 	MCFG_CPU_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
 
@@ -497,7 +497,7 @@ static MACHINE_CONFIG_START( heberpop )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 //  MCFG_SCREEN_SIZE(24*16, 16*16)
 //  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_48MHz/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
+	MCFG_SCREEN_RAW_PARAMS(48_MHz_XTAL/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
@@ -514,24 +514,24 @@ static MACHINE_CONFIG_START( heberpop )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ymsnd", YM3438, XTAL_48MHz/6) /* 8 MHz? */
+	MCFG_SOUND_ADD("ymsnd", YM3438, 48_MHz_XTAL/6) /* 8 MHz? */
 	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) // pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH) // pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( blocken )
+MACHINE_CONFIG_START(shangha3_state::blocken)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_48MHz/3) // TMP68HC000N-16
+	MCFG_CPU_ADD("maincpu", M68000, 48_MHz_XTAL/3) // TMP68HC000N-16
 	MCFG_CPU_PROGRAM_MAP(blocken_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shangha3_state,  irq4_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_48MHz/8)   /* 6 MHz? */
+	MCFG_CPU_ADD("audiocpu", Z80, 48_MHz_XTAL/8)   /* 6 MHz? */
 	MCFG_CPU_PROGRAM_MAP(heberpop_sound_map)
 	MCFG_CPU_IO_MAP(heberpop_sound_io_map)  /* NMI triggered by YM3438 */
 
@@ -541,7 +541,7 @@ static MACHINE_CONFIG_START( blocken )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 //  MCFG_SCREEN_SIZE(24*16, 16*16)
 //  MCFG_SCREEN_VISIBLE_AREA(0*16, 24*16-1, 1*16, 15*16-1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_48MHz/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
+	MCFG_SCREEN_RAW_PARAMS(48_MHz_XTAL/6,512,0,24*16,263,1*16,15*16) /* refresh rate is unknown */
 
 	MCFG_SCREEN_UPDATE_DRIVER(shangha3_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
@@ -558,12 +558,12 @@ static MACHINE_CONFIG_START( blocken )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
-	MCFG_SOUND_ADD("ymsnd", YM3438, XTAL_48MHz/6) /* 8 MHz? */
+	MCFG_SOUND_ADD("ymsnd", YM3438, 48_MHz_XTAL/6) /* 8 MHz? */
 	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

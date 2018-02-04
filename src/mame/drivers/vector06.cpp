@@ -157,7 +157,7 @@ SLOT_INTERFACE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( vector06 )
+MACHINE_CONFIG_START(vector06_state::vector06)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 3000000)     // actual speed is wrong due to unemulated latency
 	MCFG_CPU_PROGRAM_MAP(vector06_mem)
@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( vector06 )
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 
-	MCFG_KR1818VG93_ADD("wd1793", XTAL_1MHz)
+	MCFG_KR1818VG93_ADD("wd1793", XTAL(1'000'000))
 
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:0", vector06_floppies, "qd", vector06_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("wd1793:1", vector06_floppies, "qd", vector06_state::floppy_formats)

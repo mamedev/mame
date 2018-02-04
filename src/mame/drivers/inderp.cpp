@@ -36,6 +36,7 @@ public:
 	DECLARE_WRITE8_MEMBER(inputs_w);
 	DECLARE_READ8_MEMBER(inputs_r);
 
+	void inderp(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_ioport_array<10> m_inputs;
@@ -192,7 +193,7 @@ WRITE_LINE_MEMBER( inderp_state::clock_tick )
 		m_maincpu->set_input_line(M6504_IRQ_LINE, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( inderp )
+MACHINE_CONFIG_START(inderp_state::inderp)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6504, 434000) // possible calculation of frequency-derived time constant 100k res and 10pf cap
 	MCFG_CPU_PROGRAM_MAP(maincpu_map)

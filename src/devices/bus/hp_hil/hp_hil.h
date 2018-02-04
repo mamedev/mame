@@ -90,7 +90,7 @@
 #define MCFG_HP_HIL_SLOT_ADD(_mlc_tag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, HP_HIL_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	hp_hil_slot_device::static_set_hp_hil_slot(*device, owner, _mlc_tag);
+	hp_hil_slot_device::static_set_hp_hil_slot(*device, this, _mlc_tag);
 
 //**************************************************************************
 //  TYPE DEFINITIONS

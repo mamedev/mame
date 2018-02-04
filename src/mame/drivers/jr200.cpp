@@ -75,6 +75,7 @@ public:
 	uint32_t screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_d_callback);
 
+	void jr200(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beeper;
@@ -358,7 +359,7 @@ WRITE8_MEMBER(jr200_state::mn1271_io_w)
 	{
 		case 0xc805: break; //LPT printer port W
 		case 0xc816: if (data!=0) {
-					m_timer_d->adjust(attotime::zero, 0, attotime::from_hz(XTAL_14_31818MHz) * (m_mn1271_ram[0x17]*0x100 + m_mn1271_ram[0x18]));
+					m_timer_d->adjust(attotime::zero, 0, attotime::from_hz(XTAL(14'318'181)) * (m_mn1271_ram[0x17]*0x100 + m_mn1271_ram[0x18]));
 				} else {
 					m_timer_d->adjust(attotime::zero, 0,  attotime::zero);
 				}
@@ -532,9 +533,9 @@ void jr200_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( jr200 )
+MACHINE_CONFIG_START(jr200_state::jr200)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6802, XTAL_14_31818MHz / 4) /* MN1800A, ? Mhz assumption that it is same as JR-100*/
+	MCFG_CPU_ADD("maincpu", M6802, XTAL(14'318'181) / 4) /* MN1800A, ? Mhz assumption that it is same as JR-100*/
 	MCFG_CPU_PROGRAM_MAP(jr200_mem)
 
 //  MCFG_CPU_ADD("mn1544", MN1544, ?)

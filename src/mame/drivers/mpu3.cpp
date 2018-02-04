@@ -165,7 +165,7 @@ TODO: - Distinguish door switches using manual
 
 #include "video/awpvid.h"       //Fruit Machines Only
 
-#define MPU3_MASTER_CLOCK (XTAL_4MHz)
+#define MPU3_MASTER_CLOCK (XTAL(4'000'000))
 
 /* Lookup table for CHR data */
 
@@ -267,6 +267,7 @@ public:
 	required_device<stepper_device> m_reel3;
 	required_device<meters_device> m_meters;
 	optional_device<roc10937_device> m_vfd;
+	void mpu3base(machine_config &config);
 };
 
 #define DISPLAY_PORT 0
@@ -757,7 +758,7 @@ WRITE8_MEMBER(mpu3_state::characteriser_w)
 	int x;
 	int call=data;
 	if (!m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
+		fatalerror("No Characteriser Table @ %04x\n", m_maincpu->pcbase());
 
 	if (offset == 0)
 	{
@@ -785,7 +786,7 @@ WRITE8_MEMBER(mpu3_state::characteriser_w)
 READ8_MEMBER(mpu3_state::characteriser_r)
 {
 	if (!m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", space.device().safe_pcbase());
+		fatalerror("No Characteriser Table @ %04x\n", m_maincpu->pcbase());
 
 	if (offset == 0)
 	{
@@ -831,13 +832,12 @@ READ8_MEMBER(mpu3_state::mpu3ptm_r)
 
 static ADDRESS_MAP_START( mpu3_basemap, AS_PROGRAM, 8, mpu3_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x1000, 0xffff) AM_ROM
 	AM_RANGE(0x8800, 0x881f) AM_READWRITE(mpu3ptm_r, mpu3ptm_w)/* PTM6840 IC2 */
 	AM_RANGE(0x9000, 0x9003) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)        /* PIA6821 IC3 */
 	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE("pia_ic4", pia6821_device, read, write)        /* PIA6821 IC4 */
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("pia_ic5", pia6821_device, read, write)        /* PIA6821 IC5 */
 	AM_RANGE(0xa800, 0xa803) AM_DEVREADWRITE("pia_ic6", pia6821_device, read, write)        /* PIA6821 IC6 */
-
-	AM_RANGE(0x1000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 #define MCFG_MPU3_REEL_ADD(_tag)\
@@ -848,7 +848,7 @@ ADDRESS_MAP_END
 	MCFG_STEPPER_INDEX_PATTERN(0x00)\
 	MCFG_STEPPER_INIT_PHASE(2)
 
-static MACHINE_CONFIG_START( mpu3base )
+MACHINE_CONFIG_START(mpu3_state::mpu3base)
 	MCFG_CPU_ADD("maincpu", M6808, MPU3_MASTER_CLOCK)///4)
 	MCFG_CPU_PROGRAM_MAP(mpu3_basemap)
 

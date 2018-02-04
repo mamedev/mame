@@ -162,10 +162,10 @@ static GFXDECODE_START( higemaru )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( higemaru )
+MACHINE_CONFIG_START(higemaru_state::higemaru)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)  /* 3 MHz Sharp LH0080A Z80A-CPU-D */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)  /* 3 MHz Sharp LH0080A Z80A-CPU-D */
 	MCFG_CPU_PROGRAM_MAP(higemaru_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", higemaru_state, higemaru_scanline, "screen", 0, 1)
 
@@ -187,10 +187,10 @@ static MACHINE_CONFIG_START( higemaru )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

@@ -72,12 +72,27 @@ c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconf
 
 
 //-------------------------------------------------
+//  device_validity_check -
+//-------------------------------------------------
+
+void c64_expansion_slot_device::device_validity_check(validity_checker &valid) const
+{
+	device_t *const carddev = get_card_device();
+	if (carddev && !dynamic_cast<device_c64_expansion_card_interface *>(carddev))
+		osd_printf_error("Card device %s (%s) does not implement device_c64_expansion_card_interface\n", carddev->tag(), carddev->name());
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void c64_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_c64_expansion_card_interface *>(get_card_device());
+	device_t *const carddev = get_card_device();
+	m_card = dynamic_cast<device_c64_expansion_card_interface *>(carddev);
+	if (carddev && !m_card)
+		fatalerror("Card device %s (%s) does not implement device_c64_expansion_card_interface\n", carddev->tag(), carddev->name());
 
 	// resolve callbacks
 	m_read_dma_cd.resolve_safe(0);
@@ -103,10 +118,6 @@ void c64_expansion_slot_device::device_start()
 
 void c64_expansion_slot_device::device_reset()
 {
-	if (get_card_device())
-	{
-		get_card_device()->reset();
-	}
 }
 
 

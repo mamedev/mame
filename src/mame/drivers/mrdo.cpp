@@ -30,8 +30,8 @@ There's a chance that certain bootlegs might have the different 8/20 MHz XTALS.
 #include "speaker.h"
 
 
-#define MAIN_CLOCK      XTAL_8_2MHz
-#define VIDEO_CLOCK     XTAL_19_6MHz
+#define MAIN_CLOCK      XTAL(8'200'000)
+#define VIDEO_CLOCK     XTAL(19'600'000)
 
 
 
@@ -41,7 +41,7 @@ READ8_MEMBER(mrdo_state::mrdo_SECRE_r)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
 
-	return RAM[space.device().state().state_int(Z80_HL)];
+	return RAM[m_maincpu->state_int(Z80_HL)];
 }
 
 
@@ -170,7 +170,7 @@ static GFXDECODE_START( mrdo )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( mrdo )
+MACHINE_CONFIG_START(mrdo_state::mrdo)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK/2)  /* Verified */
@@ -198,7 +198,7 @@ static MACHINE_CONFIG_START( mrdo )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mrlo, mrdo )
+MACHINE_CONFIG_DERIVED(mrdo_state::mrlo, mrdo)
 	//MCFG_DEVICE_REMOVE("pal16r6")
 MACHINE_CONFIG_END
 

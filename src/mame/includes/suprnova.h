@@ -164,4 +164,10 @@ public:
 	void hit_recalc();
 	void init_drc();
 	void set_drc_pcflush(uint32_t addr);
+	void sknsk(machine_config &config);
+	void sknsu(machine_config &config);
+	void sknsa(machine_config &config);
+	void sknsj(machine_config &config);
+	void sknse(machine_config &config);
+	void skns(machine_config &config);
 };

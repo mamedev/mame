@@ -147,7 +147,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( aztarac )
+MACHINE_CONFIG_START(aztarac_state::aztarac)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)

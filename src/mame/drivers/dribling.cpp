@@ -266,7 +266,7 @@ void dribling_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( dribling )
+MACHINE_CONFIG_START(dribling_state::dribling)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5000000)

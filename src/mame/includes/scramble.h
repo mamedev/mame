@@ -93,6 +93,23 @@ public:
 	DECLARE_WRITE8_MEMBER( mrkougar_sh_irqtrigger_w );
 	IRQ_CALLBACK_MEMBER( scramble_sh_irq_callback );
 
+	void scramble(machine_config &config);
+	void hncholms(machine_config &config);
+	void cavelon(machine_config &config);
+	void harem(machine_config &config);
+	void ad2083(machine_config &config);
+	void ad2083_audio(machine_config &config);
+	void mrkougar(machine_config &config);
+	void mars(machine_config &config);
+	void hunchbks(machine_config &config);
+	void hotshock(machine_config &config);
+	void mariner(machine_config &config);
+	void devilfsh(machine_config &config);
+	void triplep(machine_config &config);
+	void newsin7(machine_config &config);
+	void mimonscr(machine_config &config);
+	void ckongs(machine_config &config);
+	void mrkougb(machine_config &config);
 private:
 	void cavelon_banksw();
 	inline int bit(int i,int n);
@@ -108,7 +125,3 @@ private:
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_data;
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_opcodes;
 };
-
-/*----------- defined in audio/scramble.cpp -----------*/
-
-MACHINE_CONFIG_EXTERN( ad2083_audio );

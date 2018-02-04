@@ -1006,7 +1006,7 @@ static SLOT_INTERFACE_START(pcw16_com)
 	SLOT_INTERFACE("msystems_mouse", MSYSTEM_SERIAL_MOUSE)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pcw16 )
+MACHINE_CONFIG_START(pcw16_state::pcw16)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 16000000)
 	MCFG_CPU_PROGRAM_MAP(pcw16_map)
@@ -1014,7 +1014,7 @@ static MACHINE_CONFIG_START( pcw16 )
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 
-	MCFG_DEVICE_ADD( "ns16550_1", NS16550, XTAL_1_8432MHz )     /* TODO: Verify uart model */
+	MCFG_DEVICE_ADD( "ns16550_1", NS16550, XTAL(1'843'200) )     /* TODO: Verify uart model */
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport1", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport1", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport1", rs232_port_device, write_rts))
@@ -1026,7 +1026,7 @@ static MACHINE_CONFIG_START( pcw16 )
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ns16550_1", ins8250_uart_device, cts_w))
 
-	MCFG_DEVICE_ADD( "ns16550_2", NS16550, XTAL_1_8432MHz )     /* TODO: Verify uart model */
+	MCFG_DEVICE_ADD( "ns16550_2", NS16550, XTAL(1'843'200) )     /* TODO: Verify uart model */
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("serport2", rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("serport2", rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("serport2", rs232_port_device, write_rts))

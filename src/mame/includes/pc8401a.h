@@ -96,6 +96,8 @@ public:
 
 	uint8_t m_key_latch;
 	TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_keyboard_tick);
+	void pc8401a(machine_config &config);
+	void pc8401a_video(machine_config &config);
 };
 
 class pc8500_state : public pc8401a_state
@@ -107,11 +109,8 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void pc8500(machine_config &config);
+	void pc8500_video(machine_config &config);
 };
-
-// ---------- defined in video/pc8401a.c ----------
-
-MACHINE_CONFIG_EXTERN( pc8401a_video );
-MACHINE_CONFIG_EXTERN( pc8500_video );
 
 #endif

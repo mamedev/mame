@@ -118,6 +118,8 @@ public:
 	DECLARE_VIDEO_START(gp98);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void gp98(machine_config &config);
+	void jingbell(machine_config &config);
 };
 
 
@@ -389,7 +391,7 @@ WRITE8_MEMBER(igs009_state::nmi_and_coins_w)
 {
 	if ((m_nmi_enable ^ data) & (~0xdd))
 	{
-		logerror("PC %06X: nmi_and_coins = %02x\n",space.device().safe_pc(),data);
+		logerror("PC %06X: nmi_and_coins = %02x\n",m_maincpu->pc(),data);
 //      popmessage("%02x",data);
 	}
 
@@ -445,7 +447,7 @@ WRITE8_MEMBER(igs009_state::magic_w)
 
 		default:
 //          popmessage("magic %x <- %04x",m_igs_magic[0],data);
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", space.device().safe_pc(), m_igs_magic[0], data);
+			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", m_maincpu->pc(), m_igs_magic[0], data);
 	}
 }
 
@@ -459,11 +461,11 @@ READ8_MEMBER(igs009_state::magic_r)
 			if ( !(m_igs_magic[1] & 0x04) ) return ioport("DSW3")->read();
 			if ( !(m_igs_magic[1] & 0x08) ) return ioport("DSW4")->read();
 			if ( !(m_igs_magic[1] & 0x10) ) return ioport("DSW5")->read();
-			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", space.device().safe_pc(), m_igs_magic[1]);
+			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", m_maincpu->pc(), m_igs_magic[1]);
 			break;
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", space.device().safe_pc(), m_igs_magic[0]);
+			logerror("%06x: warning, reading with igs_magic = %02x\n", m_maincpu->pc(), m_igs_magic[0]);
 	}
 
 	return 0;
@@ -480,8 +482,8 @@ static ADDRESS_MAP_START( jingbell_portmap, AS_IO, 8, igs009_state )
 
 	AM_RANGE( 0x1000, 0x11ff ) AM_RAM_WRITE(bg_scroll_w ) AM_SHARE("bg_scroll")
 
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE(reel1_ram_w )  AM_SHARE("reel1_ram")
 	AM_RANGE( 0x3400, 0x37ff ) AM_RAM_WRITE(reel2_ram_w )  AM_SHARE("reel2_ram")
@@ -514,8 +516,8 @@ static ADDRESS_MAP_START( gp98_portmap, AS_IO, 8, igs009_state )
 
 	AM_RANGE( 0x1000, 0x11ff ) AM_RAM_WRITE(bg_scroll_w ) AM_SHARE("bg_scroll")
 
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 
 	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE(reel1_ram_w )  AM_SHARE("reel1_ram")
 	AM_RANGE( 0x3400, 0x37ff ) AM_RAM_WRITE(reel2_ram_w )  AM_SHARE("reel2_ram")
@@ -808,9 +810,9 @@ INTERRUPT_GEN_MEMBER(igs009_state::interrupt)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( jingbell )
+MACHINE_CONFIG_START(igs009_state::jingbell)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)   /* HD64180RP8, 8 MHz? */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 2)   /* HD64180RP8, 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(jingbell_map)
 	MCFG_CPU_IO_MAP(jingbell_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", igs009_state, interrupt)
@@ -842,15 +844,15 @@ static MACHINE_CONFIG_START( jingbell )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz / 12, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000) / 12, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gp98, jingbell )
+MACHINE_CONFIG_DERIVED(igs009_state::gp98, jingbell)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(gp98_portmap)

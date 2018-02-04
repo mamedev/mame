@@ -12,102 +12,55 @@ All rights reserved.
 
 */
 
-
 #include "emu.h"
 #include "g65816ds.h"
 
-#ifdef SEC
-#undef SEC
-#endif
-
-#define ADDRESS_65816(A) ((A)&0xffffff)
-
-
-namespace {
-
-class g65816_opcode_struct
+g65816_disassembler::g65816_disassembler(config *conf) : m_config(conf)
 {
-public:
-	const char *name() const
-	{
-			return s_opnames[unsigned(m_name)];
-	}
+}
 
-	bool is_call() const
-	{
-		switch (m_name)
-		{
-		case op::JSR:
-		case op::JSL:
-			return true;
-		default:
-			return false;
-		}
-	}
-
-	bool is_return() const
-	{
-		switch (m_name)
-		{
-		case op::RTI:
-		case op::RTL:
-		case op::RTS:
-			return true;
-		default:
-			return false;
-		}
-	}
-
-	static const g65816_opcode_struct &get(unsigned char ins)
-	{
-		return s_opcodes[ins];
-	}
-
-	unsigned char flag;
-	unsigned char ea;
-
-protected:
-	enum class op : unsigned
-	{
-		ADC ,  AND ,  ASL ,  BCC ,  BCS ,  BEQ ,  BIT ,  BMI ,  BNE ,  BPL ,  BRA ,
-		BRK ,  BRL ,  BVC ,  BVS ,  CLC ,  CLD ,  CLI ,  CLV ,  CMP ,  COP ,  CPX ,
-		CPY ,  DEA ,  DEC ,  DEX ,  DEY ,  EOR ,  INA ,  INC ,  INX ,  INY ,  JML ,
-		JMP ,  JSL ,  JSR ,  LDA ,  LDX ,  LDY ,  LSR ,  MVN ,  MVP ,  NOP ,  ORA ,
-		PEA ,  PEI ,  PER ,  PHA ,  PHB ,  PHD ,  PHK ,  PHP ,  PHX ,  PHY ,  PLA ,
-		PLB ,  PLD ,  PLP ,  PLX ,  PLY ,  REP ,  ROL ,  ROR ,  RTI ,  RTL ,  RTS ,
-		SBC ,  SEC ,  SED ,  SEI ,  SEP ,  STA ,  STP ,  STX ,  STY ,  STZ ,  TAX ,
-		TAY ,  TCS ,  TCD ,  TDC ,  TRB ,  TSB ,  TSC ,  TSX ,  TXA ,  TXS ,  TXY ,
-		TYA ,  TYX ,  WAI ,  WDM ,  XBA ,  XCE
-	};
-
-	g65816_opcode_struct(op n, unsigned char f, unsigned char e)
-		: flag(f)
-		, ea(e)
-		, m_name(n)
-	{
-	}
-
-	op m_name;
-
-	static const char *const s_opnames[];
-	static const g65816_opcode_struct s_opcodes[256];
-};
-
-enum
+u32 g65816_disassembler::opcode_alignment() const
 {
-	IMP , ACC , RELB, RELW, IMM , A   , AI  , AL  , ALX , AX  , AXI ,
-	AY  , D   , DI  , DIY , DLI , DLIY, DX  , DXI , DY  , S   , SIY ,
-	SIG , MVN , MVP , PEA , PEI , PER
-};
+	return 1;
+}
 
-enum
+const char *g65816_disassembler::opcode_struct::name() const
 {
-	I, /* ignore */
-	M, /* check m bit */
-	X  /* check x bit */
-};
+	return g65816_disassembler::s_opnames[unsigned(m_name)];
+}
 
-const char *const g65816_opcode_struct::s_opnames[] =
+bool g65816_disassembler::opcode_struct::is_call() const
+{
+	switch (m_name)
+	{
+	case op::JSR:
+	case op::JSL:
+		return true;
+	default:
+		return false;
+	}
+}
+
+bool g65816_disassembler::opcode_struct::is_return() const
+{
+	switch (m_name)
+	{
+	case op::RTI:
+	case op::RTL:
+	case op::RTS:
+		return true;
+	default:
+		return false;
+	}
+}
+
+g65816_disassembler::opcode_struct::opcode_struct(op n, u8 f, u8 e) : m_name(n), flag(f), ea(e)
+{
+}
+
+
+
+const char *const g65816_disassembler::s_opnames[] =
 {
 	"ADC", "AND", "ASL", "BCC", "BCS", "BEQ", "BIT", "BMI", "BNE", "BPL", "BRA",
 	"BRK", "BRL", "BVC", "BVS", "CLC", "CLD", "CLI", "CLV", "CMP", "COP", "CPX",
@@ -120,7 +73,7 @@ const char *const g65816_opcode_struct::s_opnames[] =
 	"TYA", "TYX", "WAI", "WDM", "XBA", "XCE"
 };
 
-const g65816_opcode_struct g65816_opcode_struct::s_opcodes[256] =
+const g65816_disassembler::opcode_struct g65816_disassembler::s_opcodes[256] =
 {
 	{op::BRK, I, SIG }, {op::ORA, M, DXI }, {op::COP, I, SIG }, {op::ORA, M, S   },
 	{op::TSB, M, D   }, {op::ORA, M, D   }, {op::ASL, M, D   }, {op::ORA, M, DLI },
@@ -188,83 +141,38 @@ const g65816_opcode_struct g65816_opcode_struct::s_opcodes[256] =
 	{op::JSR, I, AXI }, {op::SBC, M, AX  }, {op::INC, M, AX  }, {op::SBC, M, ALX }
 };
 
-} // anonymous namespace
-
-static const uint8_t *base_oprom;
-static uint32_t base_pc;
-
-static inline unsigned int read_8(unsigned int address)
+std::string g65816_disassembler::int_8_str(u8 val)
 {
-	address = ADDRESS_65816(address);
-	return base_oprom[address - base_pc];
-}
-
-static inline unsigned int read_16(unsigned int address)
-{
-	unsigned int val = read_8(address);
-	return val | (read_8(address+1)<<8);
-}
-
-static inline unsigned int read_24(unsigned int address)
-{
-	unsigned int val = read_8(address);
-	val |= (read_8(address+1)<<8);
-	return val | (read_8(address+2)<<16);
-}
-
-static inline char* int_8_str(unsigned int val)
-{
-	static char str[20];
-
-	val &= 0xff;
-
 	if(val & 0x80)
-		sprintf(str, "-$%x", (0-val) & 0x7f);
+		return util::string_format("-$%x", (0-val) & 0x7f);
 	else
-		sprintf(str, "$%x", val & 0x7f);
-
-	return str;
+		return util::string_format("$%x", val & 0x7f);
 }
 
-static inline char* int_16_str(unsigned int val)
+std::string g65816_disassembler::int_16_str(u16 val)
 {
-	static char str[20];
-
-	val &= 0xffff;
-
 	if(val & 0x8000)
-		sprintf(str, "-$%x", (0-val) & 0x7fff);
+		return util::string_format("-$%x", (0-val) & 0x7fff);
 	else
-		sprintf(str, "$%x", val & 0x7fff);
-
-	return str;
+		return util::string_format("$%x", val & 0x7fff);
 }
 
 
-unsigned g65816_disassemble(std::ostream &stream, unsigned int pc, unsigned int pb, const uint8_t *oprom, int m_flag, int x_flag)
+offs_t g65816_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	unsigned int instruction;
-	const g65816_opcode_struct* opcode;
 	int var;
 	int length = 1;
-	unsigned int address;
-	unsigned dasm_flags;
+	offs_t dasm_flags;
 
-	pb <<= 16;
-	address = pc | pb;
-
-	base_oprom = oprom;
-	base_pc = address;
-
-	instruction = read_8(address);
-	opcode = &g65816_opcode_struct::get(instruction);
+	u8 instruction = opcodes.r8(pc & 0xffffff);
+	const opcode_struct *opcode = &s_opcodes[instruction];
 
 	stream << opcode->name();
 
 	if (opcode->is_call())
-		dasm_flags = DASMFLAG_STEP_OVER;
+		dasm_flags = STEP_OVER;
 	else if (opcode->is_return())
-		dasm_flags = DASMFLAG_STEP_OUT;
+		dasm_flags = STEP_OUT;
 	else
 		dasm_flags = 0;
 
@@ -276,113 +184,108 @@ unsigned g65816_disassemble(std::ostream &stream, unsigned int pc, unsigned int 
 			util::stream_format(stream, "A");
 			break;
 		case RELB:
-			var = (int8_t) read_8(address+1);
+			var = (int8_t) opcodes.r8((pc+1) & 0xffffff);
 			length++;
-			util::stream_format(stream, " %06x (%s)", pb | ((pc + length + var)&0xffff), int_8_str(var));
+			util::stream_format(stream, " %06x (%s)", (pc & 0xff0000) | ((pc + length + var)&0xffff), int_8_str(var));
 			break;
 		case RELW:
 		case PER :
-			var = read_16(address+1);
+			var = opcodes.r16((pc+1) & 0xffffff);
 			length += 2;
-			util::stream_format(stream, " %06x (%s)", pb | ((pc + length + var)&0xffff), int_16_str(var));
+			util::stream_format(stream, " %06x (%s)", (pc & 0xff0000) | ((pc + length + var)&0xffff), int_16_str(var));
 			break;
 		case IMM :
-			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
+			if((opcode->flag == M && !m_config->get_m_flag()) || (opcode->flag == X && !m_config->get_x_flag()))
 			{
-				util::stream_format(stream, " #$%04x", read_16(address+1));
+				util::stream_format(stream, " #$%04x", opcodes.r16((pc+1) & 0xffffff));
 				length += 2;
 			}
 			else
 			{
-				util::stream_format(stream, " #$%02x", read_8(address+1));
+				util::stream_format(stream, " #$%02x", opcodes.r8((pc+1) & 0xffffff));
 				length++;
 			}
 			break;
 		case A   :
 		case PEA :
-			util::stream_format(stream, " $%04x", read_16(address+1));
+			util::stream_format(stream, " $%04x", opcodes.r16((pc+1) & 0xffffff));
 			length += 2;
 			break;
 		case AI  :
-			util::stream_format(stream, " ($%04x)", read_16(address+1));
+			util::stream_format(stream, " ($%04x)", opcodes.r16((pc+1) & 0xffffff));
 			length += 2;
 			break;
 		case AL  :
-			util::stream_format(stream, " $%06x", read_24(address+1));
+			util::stream_format(stream, " $%06x", opcodes.r32((pc+1) & 0xffffff) & 0xffffff);
 			length += 3;
 			break;
 		case ALX :
-			util::stream_format(stream, " $%06x,X", read_24(address+1));
+			util::stream_format(stream, " $%06x,X", opcodes.r32((pc+1) & 0xffffff) & 0xffffff);
 			length += 3;
 			break;
 		case AX  :
-			util::stream_format(stream, " $%04x,X", read_16(address+1));
+			util::stream_format(stream, " $%04x,X", opcodes.r16((pc+1) & 0xffffff));
 			length += 2;
 			break;
 		case AXI :
-			util::stream_format(stream, " ($%04x,X)", read_16(address+1));
+			util::stream_format(stream, " ($%04x,X)", opcodes.r16((pc+1) & 0xffffff));
 			length += 2;
 			break;
 		case AY  :
-			util::stream_format(stream, " $%04x,Y", read_16(address+1));
+			util::stream_format(stream, " $%04x,Y", opcodes.r16((pc+1) & 0xffffff));
 			length += 2;
 			break;
 		case D   :
-			util::stream_format(stream, " $%02x", read_8(address+1));
+			util::stream_format(stream, " $%02x", opcodes.r8((pc+1) & 0xffffff));
 			length++;
 			break;
 		case DI  :
 		case PEI :
-			util::stream_format(stream, " ($%02x)", read_8(address+1));
+			util::stream_format(stream, " ($%02x)", opcodes.r8((pc+1) & 0xffffff));
 			length++;
 			break;
 		case DIY :
-			util::stream_format(stream, " ($%02x),Y", read_8(address+1));
+			util::stream_format(stream, " ($%02x),Y", opcodes.r8((pc+1) & 0xffffff));
 			length++;
 			break;
 		case DLI :
-			util::stream_format(stream, " [$%02x]", read_8(address+1));
+			util::stream_format(stream, " [$%02x]", opcodes.r8((pc+1) & 0xffffff));
 			length++;
 			break;
 		case DLIY:
-			util::stream_format(stream, " [$%02x],Y", read_8(address+1));
+			util::stream_format(stream, " [$%02x],Y", opcodes.r8((pc+1) & 0xffffff));
 			length++;
 			break;
 		case DX  :
-			util::stream_format(stream, " $%02x,X", read_8(address+1));
+			util::stream_format(stream, " $%02x,X", opcodes.r8((pc+1) & 0xffffff));
 			length++;
 			break;
 		case DXI :
-			util::stream_format(stream, " ($%02x,X)", read_8(address+1));
+			util::stream_format(stream, " ($%02x,X)", opcodes.r8((pc+1) & 0xffffff));
 			length++;
 			break;
 		case DY  :
-			util::stream_format(stream, " $%02x,Y", read_8(address+1));
+			util::stream_format(stream, " $%02x,Y", opcodes.r8((pc+1) & 0xffffff));
 			length++;
 			break;
 		case S   :
-			util::stream_format(stream, " %s,S", int_8_str(read_8(address+1)));
+			util::stream_format(stream, " %s,S", int_8_str(opcodes.r8((pc+1) & 0xffffff)));
 			length++;
 			break;
 		case SIY :
-			util::stream_format(stream, " (%s,S),Y", int_8_str(read_8(address+1)));
+			util::stream_format(stream, " (%s,S),Y", int_8_str(opcodes.r8((pc+1) & 0xffffff)));
 			length++;
 			break;
 		case SIG :
-			util::stream_format(stream, " #$%02x", read_8(address+1));
+			util::stream_format(stream, " #$%02x", opcodes.r8((pc+1) & 0xffffff));
 			length++;
 			break;
 		case MVN :
 		case MVP :
-			util::stream_format(stream, " $%02x, $%02x", read_8(address+2), read_8(address+1));
+			util::stream_format(stream, " $%02x, $%02x", opcodes.r8((pc+2) & 0xffffff), opcodes.r8((pc+1) & 0xffffff));
 			length += 2;
 			break;
 	}
 
-	return length | DASMFLAG_SUPPORTED | dasm_flags;
-}
-
-CPU_DISASSEMBLE( g65816_generic )
-{
-	return g65816_disassemble(stream, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, 0, 0);
+	return length | SUPPORTED | dasm_flags;
 }

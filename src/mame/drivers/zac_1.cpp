@@ -53,6 +53,8 @@ public:
 	DECLARE_WRITE8_MEMBER(reset_int_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
+	void locomotp(machine_config &config);
+	void zac_1(machine_config &config);
 protected:
 
 	// devices
@@ -247,7 +249,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_outtimer)
 	}
 }
 
-static MACHINE_CONFIG_START( zac_1 )
+MACHINE_CONFIG_START(zac_1_state::zac_1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 6000000/2) // no xtal, just 2 chips forming a random oscillator
 	MCFG_CPU_PROGRAM_MAP(zac_1_map)
@@ -291,7 +293,7 @@ READ8_MEMBER( zac_1_state::reset_int_r )
 	return 0;
 }
 
-static MACHINE_CONFIG_DERIVED( locomotp, zac_1 )
+MACHINE_CONFIG_DERIVED(zac_1_state::locomotp, zac_1)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(locomotp_map)

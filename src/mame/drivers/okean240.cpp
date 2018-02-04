@@ -94,6 +94,9 @@ public:
 	DECLARE_DRIVER_INIT(okean240);
 	uint32_t screen_update_okean240(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void okean240a(machine_config &config);
+	void okean240t(machine_config &config);
+	void okean240(machine_config &config);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -225,8 +228,8 @@ static ADDRESS_MAP_START(okean240_io, AS_IO, 8, okean240_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppikbd", i8255_device, read, write)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(okean240_kbd_status_r)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("pic", pic8259_device, read, write)
+	AM_RANGE(0x80, 0x80) AM_READ(okean240_kbd_status_r)
 	AM_RANGE(0xa0, 0xa0) AM_READ(term_r)
 	AM_RANGE(0xa1, 0xa1) AM_READ(term_status_r)
 	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppic", i8255_device, read, write)
@@ -237,8 +240,8 @@ static ADDRESS_MAP_START(okean240a_io, AS_IO, 8, okean240_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppikbd", i8255_device, read, write)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(okean240a_kbd_status_r)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("pic", pic8259_device, read, write)
+	AM_RANGE(0x80, 0x80) AM_READ(okean240a_kbd_status_r)
 	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppic", i8255_device, read, write)
@@ -260,8 +263,8 @@ static ADDRESS_MAP_START(okean240t_io, AS_IO, 8, okean240_state)
 	AM_RANGE(0x20, 0x23) AM_WRITENOP
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("ppikbd", i8255_device, read, write)
 	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("pit", pit8253_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(okean240_kbd_status_r)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("pic", pic8259_device, read, write)
+	AM_RANGE(0x80, 0x80) AM_READ(okean240_kbd_status_r)
 	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("uart", i8251_device, data_r, data_w)
 	AM_RANGE(0xa1, 0xa1) AM_DEVREADWRITE("uart", i8251_device, status_r, control_w)
 	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE("ppic", i8255_device, read, write)
@@ -492,9 +495,9 @@ static GFXDECODE_START( okean240a )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( okean240t )
+MACHINE_CONFIG_START(okean240_state::okean240t)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_12MHz / 6)
+	MCFG_CPU_ADD("maincpu",I8080, XTAL(12'000'000) / 6)
 	MCFG_CPU_PROGRAM_MAP(okean240_mem)
 	MCFG_CPU_IO_MAP(okean240t_io)
 
@@ -537,7 +540,7 @@ static MACHINE_CONFIG_START( okean240t )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( okean240a, okean240t )
+MACHINE_CONFIG_DERIVED(okean240_state::okean240a, okean240t)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(okean240a_io)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240a)
@@ -556,7 +559,7 @@ static MACHINE_CONFIG_DERIVED( okean240a, okean240t )
 	MCFG_PIT8253_CLK1(1536000) // artificial rate
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( okean240, okean240t )
+MACHINE_CONFIG_DERIVED(okean240_state::okean240, okean240t)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(okean240_io)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", okean240)

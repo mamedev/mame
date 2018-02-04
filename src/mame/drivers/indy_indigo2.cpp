@@ -68,10 +68,10 @@
 #define RS232A_TAG  "rs232a"
 #define RS232B_TAG  "rs232b"
 
-#define SCC_PCLK    XTAL_10MHz
-#define SCC_RXA_CLK XTAL_3_6864MHz // Needs verification
+#define SCC_PCLK    XTAL(10'000'000)
+#define SCC_RXA_CLK XTAL(3'686'400) // Needs verification
 #define SCC_TXA_CLK 0
-#define SCC_RXB_CLK XTAL_3_6864MHz // Needs verification
+#define SCC_RXB_CLK XTAL(3'686'400) // Needs verification
 #define SCC_TXB_CLK 0
 
 #define MCFG_IOC2_GUINNESS_ADD(_tag)  \
@@ -182,8 +182,8 @@ ioport_constructor ioc2_device::device_input_ports() const
 	return INPUT_PORTS_NAME(front_panel);
 }
 
-MACHINE_CONFIG_MEMBER( ioc2_device::device_add_mconfig )
-	MCFG_SCC85230_ADD(SCC_TAG, SCC_PCLK, SCC_RXA_CLK, SCC_TXA_CLK, SCC_RXB_CLK, SCC_TXB_CLK)
+MACHINE_CONFIG_START(ioc2_device::device_add_mconfig)
+	MCFG_SCC85230_ADD(SCC_TAG, SCC_PCLK, SCC_RXA_CLK.value(), SCC_TXA_CLK, SCC_RXB_CLK.value(), SCC_TXB_CLK)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
 	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_rts))
@@ -661,6 +661,10 @@ public:
 
 	TIMER_CALLBACK_MEMBER(ip22_dma);
 
+	static void cdrom_config(device_t *device);
+	void ip225015(machine_config &config);
+	void ip224613(machine_config &config);
+	void ip244415(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -779,7 +783,7 @@ READ32_MEMBER(ip22_state::hpc3_hd0_r)
 			return 0;
 		}
 	default:
-		//verboselog((machine, 0, "Unknown HPC3 HD0 Read: %08x (%08x) [%x] PC=%x\n", 0x1fbc0000 + ( offset << 2 ), mem_mask, offset, space.device().safe_pc() );
+		//verboselog((machine, 0, "Unknown HPC3 HD0 Read: %08x (%08x) [%x] PC=%x\n", 0x1fbc0000 + ( offset << 2 ), mem_mask, offset, m_maincpu->pc() );
 		return 0;
 	}
 }
@@ -1471,13 +1475,14 @@ static INPUT_PORTS_START( ip225015 )
 	PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( cdrom_config )
-	MCFG_DEVICE_MODIFY( "cdda" )
-	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 1.0 )
-	MCFG_SOUND_ROUTE( 1, "^^^^rspeaker", 1.0 )
-MACHINE_CONFIG_END
+void ip22_state::cdrom_config(device_t *device)
+{
+	device = device->subdevice("cdda");
+	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
+}
 
-static MACHINE_CONFIG_START( ip225015 )
+MACHINE_CONFIG_START(ip22_state::ip225015)
 	MCFG_CPU_ADD( "maincpu", R5000BE, 50000000*3 )
 	//MCFG_MIPS3_ICACHE_SIZE(32768)
 	//MCFG_MIPS3_DCACHE_SIZE(32768)
@@ -1517,14 +1522,14 @@ static MACHINE_CONFIG_START( ip225015 )
 	MCFG_DS1386_8K_ADD(RTC_TAG, 32768)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ip224613, ip225015 )
+MACHINE_CONFIG_DERIVED(ip22_state::ip224613, ip225015)
 	MCFG_CPU_REPLACE( "maincpu", R4600BE, 133333333 )
 	//MCFG_MIPS3_ICACHE_SIZE(32768)
 	//MCFG_MIPS3_DCACHE_SIZE(32768)
 	MCFG_CPU_PROGRAM_MAP( ip225015_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ip244415, ip225015 )
+MACHINE_CONFIG_DERIVED(ip22_state::ip244415, ip225015)
 	MCFG_CPU_REPLACE( "maincpu", R4600BE, 150000000 )
 	//MCFG_MIPS3_ICACHE_SIZE(32768)
 	//MCFG_MIPS3_DCACHE_SIZE(32768)

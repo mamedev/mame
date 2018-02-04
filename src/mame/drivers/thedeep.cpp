@@ -125,7 +125,7 @@ WRITE8_MEMBER(thedeep_state::protection_w)
 		break;
 
 		default:
-			logerror( "pc %04x: protection_command %02x\n", space.device().safe_pc(),m_protection_command);
+			logerror( "pc %04x: protection_command %02x\n", m_maincpu->pc(),m_protection_command);
 	}
 }
 
@@ -143,7 +143,7 @@ READ8_MEMBER(thedeep_state::protection_r)
 WRITE8_MEMBER(thedeep_state::e100_w)
 {
 	if (data != 1)
-		logerror("pc %04x: e100 = %02x\n", space.device().safe_pc(),data);
+		logerror("pc %04x: e100 = %02x\n", m_maincpu->pc(),data);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, thedeep_state )
@@ -404,19 +404,19 @@ INTERRUPT_GEN_MEMBER(thedeep_state::mcu_irq)
 	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( thedeep )
+MACHINE_CONFIG_START(thedeep_state::thedeep)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)      /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)      /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", thedeep_state, interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", M65C02, XTAL_12MHz/8)      /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", M65C02, XTAL(12'000'000)/8)      /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
 	/* MCU is a i8751 running at 8Mhz (8mhz xtal)*/
-	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", thedeep_state, mcu_irq) // unknown source, but presumably vblank
 	MCFG_DEVICE_DISABLE()
@@ -446,7 +446,7 @@ static MACHINE_CONFIG_START( thedeep )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)  /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/4)  /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END

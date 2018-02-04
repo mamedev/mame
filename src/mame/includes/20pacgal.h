@@ -70,6 +70,8 @@ public:
 	void draw_sprite(bitmap_rgb32 &bitmap, int y, int x,
 						uint8_t code, uint8_t color, int flip_y, int flip_x);
 	void common_save_state();
+	void _20pacgal(machine_config &config);
+	void _20pacgal_video(machine_config &config);
 };
 
 
@@ -82,7 +84,5 @@ public:
 
 	DECLARE_READ8_MEMBER( _25pacman_io_87_r );
 	virtual void machine_start() override;
+	void _25pacman(machine_config &config);
 };
-
-/*----------- defined in video/20pacgal.c -----------*/
-MACHINE_CONFIG_EXTERN( 20pacgal_video );

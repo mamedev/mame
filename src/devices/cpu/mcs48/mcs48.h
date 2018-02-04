@@ -30,6 +30,7 @@ enum
 	MCS48_A,
 	MCS48_TC,
 	MCS48_TPRE,
+	MCS48_P0,   // 8021/8022 only
 	MCS48_P1,
 	MCS48_P2,
 	MCS48_R0,
@@ -41,9 +42,9 @@ enum
 	MCS48_R6,
 	MCS48_R7,
 	MCS48_EA,
-	MCS48_STS,  /* UPI-41 systems only */
-	MCS48_DBBO, /* UPI-41 systems only */
-	MCS48_DBBI  /* UPI-41 systems only */
+	MCS48_STS,  // UPI-41 only
+	MCS48_DBBO, // UPI-41 only
+	MCS48_DBBI  // UPI-41 only
 };
 
 
@@ -153,8 +154,10 @@ public:
 	DECLARE_READ8_MEMBER(p2_r);
 
 protected:
+	typedef int (mcs48_cpu_device::*mcs48_ophandler)();
+
 	// construction/destruction
-	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask = 0);
+	mcs48_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size, uint8_t feature_mask, const mcs48_ophandler *opcode_table);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -180,9 +183,7 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 protected:
 	address_space_config m_program_config;
@@ -230,7 +231,7 @@ protected:
 
 	/* Memory spaces */
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_data;
 	address_space *m_io;
 
@@ -239,15 +240,18 @@ protected:
 
 	uint8_t       m_rtemp;              /* temporary for import/export */
 
-	typedef int (mcs48_cpu_device::*mcs48_ophandler)();
-	static const mcs48_ophandler s_opcode_table[256];
+	static const mcs48_ophandler s_mcs48_opcodes[256];
+	static const mcs48_ophandler s_upi41_opcodes[256];
+	static const mcs48_ophandler s_i8021_opcodes[256];
+	static const mcs48_ophandler s_i8022_opcodes[256];
+	const mcs48_ophandler *const m_opcode_table;
 
 	/* ROM is mapped to AS_PROGRAM */
-    uint8_t program_r(offs_t a)         { return m_program->read_byte(a); }
+	uint8_t program_r(offs_t a)         { return m_program->read_byte(a); }
 
 	/* RAM is mapped to AS_DATA */
-    uint8_t ram_r(offs_t a)             { return m_data->read_byte(a); }
-    void    ram_w(offs_t a, uint8_t v)  { m_data->write_byte(a, v); }
+	uint8_t ram_r(offs_t a)             { return m_data->read_byte(a); }
+	void    ram_w(offs_t a, uint8_t v)  { m_data->write_byte(a, v); }
 
 	/* ports are mapped to AS_IO and callbacks */
 	uint8_t ext_r(offs_t a)             { return m_io->read_byte(a); }
@@ -357,6 +361,7 @@ protected:
 	int en_dma();
 	int en_flags();
 	int ent0_clk();
+	int in_a_p0();
 	int in_a_p1();
 	int in_a_p2();
 	int ins_a_bus();
@@ -473,6 +478,7 @@ protected:
 	int orld_p6_a();
 	int orld_p7_a();
 	int outl_bus_a();
+	int outl_p0_a();
 	int outl_p1_a();
 	int outl_p2_a();
 	int out_dbb_a();
@@ -513,21 +519,6 @@ protected:
 	int xrl_a_xr0();
 	int xrl_a_xr1();
 	int xrl_a_n();
-	int split_02();
-	int split_08();
-	int split_22();
-	int split_75();
-	int split_80();
-	int split_81();
-	int split_86();
-	int split_88();
-	int split_90();
-	int split_91();
-	int split_98();
-	int split_d6();
-	int split_e5();
-	int split_f5();
-
 };
 
 class i8021_device : public mcs48_cpu_device
@@ -649,8 +640,6 @@ public:
 protected:
 	// construction/destruction
 	upi41_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int rom_size, int ram_size);
-
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	TIMER_CALLBACK_MEMBER( master_callback );
 };

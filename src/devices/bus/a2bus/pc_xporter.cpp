@@ -113,7 +113,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_pcxporter_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_pcxporter_device::device_add_mconfig)
 	MCFG_CPU_ADD("v30", V30, A2BUS_7M_CLOCK)    // 7.16 MHz as per manual
 	MCFG_CPU_PROGRAM_MAP(pc_map)
 	MCFG_CPU_IO_MAP(pc_io)
@@ -202,9 +202,6 @@ a2bus_pcxporter_device::a2bus_pcxporter_device(const machine_config &mconfig, co
 
 void a2bus_pcxporter_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	memset(m_ram, 0, 768*1024);
 	memset(m_regs, 0, 0x400);
 	m_offset = 0;
@@ -232,12 +229,12 @@ void a2bus_pcxporter_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-uint8_t a2bus_pcxporter_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_pcxporter_device::read_c0nx(uint8_t offset)
 {
 	switch (offset)
 	{
 		default:
-			printf("Read c0n%x (PC=%x)\n", offset, space.device().safe_pc());
+			logerror("Read c0n%x (%s)\n", offset, machine().describe_context());
 			break;
 	}
 
@@ -249,12 +246,12 @@ uint8_t a2bus_pcxporter_device::read_c0nx(address_space &space, uint8_t offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_pcxporter_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_pcxporter_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
 		default:
-			printf("Write %02x to c0n%x (PC=%x)\n", data, offset, space.device().safe_pc());
+			logerror("Write %02x to c0n%x (%s)\n", data, offset, machine().describe_context());
 			break;
 	}
 }
@@ -263,24 +260,24 @@ void a2bus_pcxporter_device::write_c0nx(address_space &space, uint8_t offset, ui
     read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
-uint8_t a2bus_pcxporter_device::read_cnxx(address_space &space, uint8_t offset)
+uint8_t a2bus_pcxporter_device::read_cnxx(uint8_t offset)
 {
 	// read only to trigger C800?
 	return 0xff;
 }
 
-void a2bus_pcxporter_device::write_cnxx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_pcxporter_device::write_cnxx(uint8_t offset, uint8_t data)
 {
-	printf("Write %02x to cn%02x (PC=%x)\n", data, offset, space.device().safe_pc());
+	logerror("Write %02x to cn%02x (%s)\n", data, offset, machine().describe_context());
 }
 
 /*-------------------------------------------------
     read_c800 - called for reads from this card's c800 space
 -------------------------------------------------*/
 
-uint8_t a2bus_pcxporter_device::read_c800(address_space &space, uint16_t offset)
+uint8_t a2bus_pcxporter_device::read_c800(uint16_t offset)
 {
-//  printf("Read C800 at %x\n", offset + 0xc800);
+//  logerror("Read C800 at %x\n", offset + 0xc800);
 
 	if (offset < 0x400)
 	{
@@ -315,18 +312,18 @@ uint8_t a2bus_pcxporter_device::read_c800(address_space &space, uint16_t offset)
 				return rv;
 
 			default:
-				//printf("Read $C800 at %x\n", offset + 0xc800);
+				//logerror("Read $C800 at %x\n", offset + 0xc800);
 				break;
 		}
 
-		return m_regs[offset];
+		return m_regs[offset & 0x3ff];
 	}
 }
 
 /*-------------------------------------------------
     write_c800 - called for writes to this card's c800 space
 -------------------------------------------------*/
-void a2bus_pcxporter_device::write_c800(address_space &space, uint16_t offset, uint8_t data)
+void a2bus_pcxporter_device::write_c800(uint16_t offset, uint8_t data)
 {
 	if (offset < 0x400)
 	{
@@ -339,19 +336,19 @@ void a2bus_pcxporter_device::write_c800(address_space &space, uint16_t offset, u
 			case 0x700:
 				m_offset &= ~0xff;
 				m_offset |= data;
-//              printf("offset now %x (PC=%x)\n", m_offset, space.device().safe_pc());
+//              logerror("offset now %x (%s)\n", m_offset, machine().describe_context());
 				break;
 
 			case 0x701:
 				m_offset &= ~0xff00;
 				m_offset |= (data<<8);
-//              printf("offset now %x (PC=%x)\n", m_offset, space.device().safe_pc());
+//              logerror("offset now %x (%s)\n", m_offset, machine().describe_context());
 				break;
 
 			case 0x702:
 				m_offset &= ~0xff0000;
 				m_offset |= (data<<16);
-//              printf("offset now %x (PC=%x)\n", m_offset, space.device().safe_pc());
+//              logerror("offset now %x (%s)\n", m_offset, machine().describe_context());
 				break;
 
 			case 0x703: // write w/increment
@@ -435,8 +432,8 @@ void a2bus_pcxporter_device::write_c800(address_space &space, uint16_t offset, u
 				break;
 
 			default:
-//              printf("%02x to C800 at %x\n", data, offset + 0xc800);
-				m_regs[offset] = data;
+//              logerror("%02x to C800 at %x\n", data, offset + 0xc800);
+				m_regs[offset & 0x3ff] = data;
 				break;
 		}
 	}

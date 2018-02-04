@@ -2,7 +2,7 @@
 
 ## Table of Contents
 
-* Predefined Variables
+* Predefined variables
     * [_ACTION](#_action)
     * [_ARGS](#_args)
     * [_OPTIONS](#_options)
@@ -10,7 +10,7 @@
     * [_PREMAKE_VERSION](#_premake_version)
     * [_SCRIPT](#_script)
     * [_WORKING_DIR](#_working_dir)
-* Script Functions
+* Build script functions
     * [buildaction](#buildactionaction)
     * [buildoptions](#buildoptionsoptions)
     * [configuration](#configurationkeywords)
@@ -25,7 +25,7 @@
     * [files](#filesfiles)
     * [flags](#flagsflags)
     * [framework](#frameworkversion)
-    * [iif](#iifcondition-trueval-falseval)
+    * [group](#groupname)
     * [imageoptions](#imageoptionsoptions)
     * [imagepath](#imagepathpath)
     * [implibdir](#implibdir)
@@ -41,10 +41,39 @@
     * [linkoptions](#linkoptionsoptions)
     * [links](#linksreferences)
     * [location](#locationpath)
+    * [messageskip](#messageskipoptions)
     * [newaction](#newactiondescription)
     * [newoption](#newoptionsdescription)
     * [nopch](#nopch)
     * [objdir](#objdirpath)
+    * [pchheader](#pchheaderfile)
+    * [pchsource](#pchsourcefile)
+    * [platforms](#platformsidentifiers)
+    * [postbuildcommands](#postbuildcommandscommands)
+    * [postcompiletasks](#postcompiletaskstasks)
+    * [prebuildcommands](#prebuildcommandscommands)
+    * [prelinkcommands](#prelinkcommandscommands)
+    * [project](#projectname)
+    * [removefiles](#removefilesfiles)
+    * [removeflags](#removeflagsflags)
+    * [removelinks](#removelinkslinks)
+    * [removeplatforms](#removeplatformsplatforms)
+    * [resdefines](#resdefinessymbols)
+    * [resincludedirs](#resincludedirspaths)
+    * [resoptions](#resoptionsoptions)
+    * [solution](#solutionname)
+    * [startproject](#startprojectname)
+    * [targetdir](#targetdirpath)
+    * [targetextension](#targetextensionext)
+    * [targetname](#targetnamename)
+    * [targetprefix](#targetprefixprefix)
+    * [targetsubdir](#targetsubdirpath)
+    * [targetsuffix](#targetsuffixsuffix)
+    * [userincludedirs](#userincludedirspaths)
+    * [uuid](#uuidprojectuuid)
+    * [vpaths](#vpathsgroup--pattern)
+* Utility functions
+    * [iif](#iifcondition-trueval-falseval)
     * [os.chdir](#oschdirpath)
     * [os.copyfile](#oscopyfilesource-destination)
     * [os.findlib](#osfindliblibname)
@@ -62,7 +91,7 @@
     * [os.pathsearch](#ospathsearchfname-paths)
     * [os.rmdir](#osrmdirpath)
     * [os.stat](#osstatpath)
-    * [os.uuid](#osuuid)
+    * [os.uuid](#osuuidname)
     * [path.getabsolute](#pathgetabsolutepath)
     * [path.getbasename](#pathgetbasenamepath)
     * [path.getdirectory](#pathgetdirectorypath)
@@ -77,34 +106,14 @@
     * [path.join](#pathjoinleading-trailing)
     * [path.rebase](#pathrebasepath-oldbase-newbase)
     * [path.translate](#pathtranslatepath-newsep)
-    * [pchheader](#pchheaderfile)
-    * [pchsource](#pchsourcefile)
-    * [platforms](#platformsidentifiers)
-    * [postbuildcommands](#postbuildcommandscommands)
-    * [postcompiletasks](#postcompiletaskstasks)
-    * [prebuildcommands](#prebuildcommandscommands)
-    * [prelinkcommands](#prelinkcommandscommands)
     * [printf](#printfformat-args)
-    * [project](#projectname)
-    * [resdefines](#resdefinessymbols)
-    * [resincludedirs](#resincludedirspaths)
-    * [resoptions](#resoptionsoptions)
-    * [solution](#solutionname)
     * [string.endswith](#stringendswithhaystack-needle)
     * [string.explode](#stringexplodestr-pattern)
     * [string.findlast](#stringfindlaststr-pattern-plain)
     * [string.startswith](#stringstartswithhaystack-needle)
     * [table.contains](#tablecontainsarray-value)
     * [table.implode](#tableimplodearray-before-after-between)
-    * [targetdir](#targetdirpath)
-    * [targetextension](#targetextensionext)
-    * [targetname](#targetnamename)
-    * [targetprefix](#targetprefixprefix)
-    * [targetsuffix](#targetsuffixsuffix)
-    * [userincludedirs](#userincludedirspaths)
-    * [uuid](#uuidprojectuuid)
-    * [vpaths](#vpathsgroup--pattern)
-* Additional Information
+* Additional information
     * [Wildcards](#wildcards)
 
 ---
@@ -184,7 +193,7 @@ Current working directory.
 
 ---
 
-## Script Functions
+## Build script functions
 
 ### buildaction(_action_)
 Specifies what action should be performed on a set of files during compilation. Usually paired with a configuration filter to select a file set. If no build action is specified for a file, a default action will be used (chosen based on the file's extension).
@@ -213,6 +222,16 @@ configuration "**.png"
 Passes arguments direction to the compiler command line. Multiple calls in a project will be concatenated in order.
 
 **Scope:** solutions, projects, configurations
+
+You may also use one of these functions to configure buildoptions for each individual file extension:
+
+* `buildoptions_asm` for .asm files
+* `buildoptions_c` for .c files
+* `buildoptions_cpp` for .cpp files
+* `buildoptions_objc` for .m files
+* `buildoptions_objcpp` for .mm files
+* `buildoptions_swift` for .swift files
+* `buildoptions_vala` for .vala files
 
 #### Arguments
 _options_ - list of compiler flags
@@ -457,7 +476,7 @@ _options_ - list of arguments
 
 ---
 ### excludes({_files_...})
-Removes files added with the [`files`](#files) function. Multiple calls are concatenated.
+Excludes files from the project. This is different from [removefiles](#removefilesfiles) in that it may keep them in the project (Visual Studio) while still excluding them from the build. Multiple calls are concatenated.
 
 **Note:** May be set on the solution, project, or configuration, but only project-level file lists are currently supported.
 
@@ -517,6 +536,7 @@ Specifies build flags to modify the compiling or linking process. Multiple calls
 #### Arguments
 _flags_ - List of flag names from list below. Names are case-insensitive and ignored if not supported on a platform.
 
+* _C7DebugInfo_ - Enables C7 compatible debug info for MSVC builds.
 * _EnableSSE, EnableSSE2, EnableAVX, EnableAVX2_ - Enable SSE/AVX instruction sets
 * _ExtraWarnings_ - Sets compiler's max warning level.
 * _FatalWarnings_ - Treat warnings as errors.
@@ -534,20 +554,25 @@ _flags_ - List of flag names from list below. Names are case-insensitive and ign
 * _NoIncrementalLink_ - Disable support for Visual Studio's incremental linking feature.
 * _NoImportLib_ - Prevent the generation of an import library for a Windows DLL.
 * _NoManifest_ - Prevent the generation of a manifest for Windows executables and shared libraries.
-* _NoMinimalRebuild_ - Disable Visual Studio's minimal rebuild feature.
+* _NoMultiProcessorCompilation_ - Disables Visual Studio's and FastBuild's multiprocessor compilation.
+* _EnableMinimalRebuild_ - Enable Visual Studio's minimal rebuild feature.
 * _NoPCH_ - Disable precompiled headers.
 * _NoRTTI_ - Disable C++ runtime type information.
 * _NoWinMD_ - Disables Generation of Windows Metadata.
 * _NoWinRT_ - Disables Windows RunTime Extension for project.
+* _ObjcARC_ - Enable automatic reference counting for Object-C and Objective-C++.
 * _Optimize_ - Perform a balanced set of optimizations.
 * _OptimizeSize_ - Optimize for the smallest file size.
 * _OptimizeSpeed_ - Optimize for the best performance.
+* _PedanticWarnings_ - Enables the pedantic warning flags.
 * _SEH_ - Enable structured exception handling.
+* _SingleOutputDir_ - Allow source files in the same project to have the same name.
 * _StaticRuntime_ - Perform a static link against the standard runtime libraries.
 * _Symbols_ - Generate debugging information.
 * _Unicode_ - Enable Unicode strings. If not specified, the default toolset behavior is used.
 * _Unsafe_ - Enable the use of unsafe code in .NET applications.
 * _UseFullPaths_ - Enable absolute paths for `__FILE__`. 
+* _UnsignedChar_ - Force `char`s to be `unsigned` by default.
 * _WinMain_ - Use WinMain() as the entry point for Windows applications, rather than main().
 
 **Note:** When not set, options will default to the tool default.
@@ -591,22 +616,25 @@ framework "3.0"
 [Back to top](#table-of-contents)
 
 ---
-### iif(_condition_, _trueval_, _falseval_)
-Implements an immediate `if` clause, returning one of two possible values.
+### group(_name_)
+Creates a solution folder for Visual Studio solutions.
+
+**Scope:** solutions
 
 #### Arguments
-_condition_ - logical condition to test  
-_trueval_ - value to return if _condition_ evaluates to `true`  
-_falseval_ - value to return if _condition_ evaluates to `false`
+_name_ - the name of the solution folder
 
 #### Examples
 ```lua
-result = iif(os.is("windows"), "is windows", "is not windows")
-```
-
-Note that all expressions are evaluated before the condition is checked. The following expression cannot be implemented with an `iif` because it may try to concatenate a string value.
-```lua
-result = iif(x -= nil, "x is " .. x, "x is nil")
+solution "MySolution"
+    group "MyGroup1"
+        project "Project1"
+        -- ...
+        project "Project2"
+        -- ...
+    group "MyGroup2"
+        project "Project3"
+        -- ...
 ```
 [Back to top](#table-of-contents)
 
@@ -914,6 +942,21 @@ location ("../build/" .. _ACTION)
 [Back to top](#table-of-contents)
 
 ---
+### messageskip(_options_)
+Skips certain messages in ninja and Makefile generated projects.
+
+**Scope:** solutions
+
+#### Arguments
+_options_ - one or several of "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage"
+
+#### Examples
+```lua
+messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
+```
+[Back to top](#table-of-contents)
+
+---
 ### newaction(_description_)
 Registers a new command-line action argument.
 
@@ -1011,6 +1054,572 @@ configuration "Debug"
 
 configuration "Release"
     objdir "../obj_release"
+```
+[Back to top](#table-of-contents)
+
+---
+### pchheader(_file_)
+Sets the main header file for precompiled header support.
+
+**Scope:** projects
+
+#### Arguments
+_file_ - name of the header file, as it is specified in your `#include` statements
+
+#### Examples
+```lua
+pchheader "afxwin.h"
+pchsource "afxwin.cpp"
+```
+[Back to top](#table-of-contents)
+
+---
+### pchsource(_file_)
+Sets the main source file for precompiled header support. Only used by Visual Studio.
+
+**Scope:** projects
+
+#### Arguments
+_file_ - name of the source file, relative to the currently-executing script file
+
+#### Examples
+```lua
+pchheader "afxwin.h"
+pchsource "afxwin.cpp"
+```
+[Back to top](#table-of-contents)
+
+---
+### platforms({_identifiers_...})
+Specifies a set of target hardware platforms for a solution.
+
+_Platform support is a new, experimental feature. The syntax and behavior described here might change as we sort out the details_
+
+**Scope:** solutions
+
+#### Arguments
+_identifiers_ - list of hardware platform specifiers from this list:
+
+* _Native_ - general build not targeting any particular platform. If your project can be built in a generic fashion, you should include this as the first platform option
+* _x32_ - 32-bit environment
+* _x64_ - 64-bit environment
+* _Universal_ - OS X universal binary, target both 32- and 64-bit versions of x86 and PPC. Automated dependency generation must be turned off, and always do a clean build. Not supported by Visual Studio.
+* _Universal32_ - like _Universal_ above, but targeting only 32-bit platforms
+* _Universal64_ - like _Universal_ above, but targeting only 64-bit platforms
+* _PS3_ - Playstation 3
+* _WiiDev_ - Wii
+* _Xbox360_ - Xbox 360 compiler and linker under Visual Studio
+* _PowerPC_ - PowerPC processors
+* _ARM_ - ARM-based processors
+* _Orbis_ - Playstation 4
+* _Durango_ - Xbox One
+
+#### Return Value
+Current list of target platforms for the active solution
+
+#### Examples
+Generic build, as well as OS X Universal build
+```lua
+solution "MySolution"
+    configurations { "Debug", "Release" }
+    platforms { "native", "universal" }
+```
+Prove 32- and 64-bit specific build targets. No generic build is provided so one of these two platforms must always be used. Do this only if your software requires knowledge of the underlying architecture at build time; otherwise, include _native_ to provide a generic build.
+```lua
+solution "MySolution"
+    configurations { "Debug", "Release" }
+    platforms { "x32", "x64" }
+```
+
+You can retrieve the current list of platforms by calling the function with no parameters
+```lua
+local p = platforms()
+```
+
+Once you have defined a list of platforms, you may use those identifiers to set up configuration filters and apply platform-specific settings.
+```lua
+configuration "x64"
+    defines "IS_64BIT"
+
+-- You can also mix platforms with other configuration selectors
+configuration { "Debug", "x64" }
+    defines "IS_64BIT_DEBUG"
+```
+[Back to top](#table-of-contents)
+
+---
+### postbuildcommands({_commands_...})
+Specifies shell commands to run after build is finished
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_commands_ - one or more shell commands
+
+#### Examples
+```lua
+configuration "windows"
+    postbuildcommands { "copy default.config bin\\project.config" }
+
+configuration "not windows"
+    postbuildcommands { "cp default.config bin/project.config" }
+```
+[Back to top](#table-of-contents)
+
+---
+### postcompiletasks({_commands_...})
+Specifies shell commands to run after compile of file is finished
+(GMAKE specific)
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_commands_ - one or more shell commands
+
+#### Examples
+```lua
+    postcompiletasks { "rm $(@:%.o=%.d)" }
+```
+[Back to top](#table-of-contents)
+
+---
+### prebuildcommands({_commands_...})
+Specifies shell commands to run before each build
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_commands_ - one or more shell commands
+
+#### Examples
+```lua
+configuration "windows"
+    prebuildcommands { "copy default.config bin\\project.config" }
+
+configuration "not windows"
+    prebuildcommands { "cp default.config bin/project.config" }
+```
+[Back to top](#table-of-contents)
+
+---
+### prelinkcommands({_commands_...})
+Specifies shell commands to run after source files have been compiled, but before the link step
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_commands_ - one or more shell commands
+
+#### Examples
+```lua
+configuration "windows"
+    prelinkcommands { "copy default.config bin\\project.config" }
+
+configuration "not windows"
+    prelinkcommands { "cp default.config bin/project.config" }
+```
+[Back to top](#table-of-contents)
+
+
+---
+### project(_name_)
+Creates a new project and makes it active. Projects contain all of the settings necessary to build a single binary target, and are synonymous with a Visual Studio Project. These settings include the list of source code files, the programming language used by those files, compiler flags, include directories, and which libraries to link against.
+
+Every project belongs to a solution.
+
+#### Arguments
+_name_ - a unique name for the project. If a project with the given name already exists, it is made active and returned. The project name will be used as the file name of the generated solution file.
+
+#### Return Value
+The active project object.
+
+#### The `project` Object
+Every project is represented in Lua as a table of key-value pairs. You should treat this object as read-only and use the GENie API to make any changes.
+
+* _basedir_  - directory where the project was originally defined. Root for relative paths.
+* _blocks_   - list of configuration blocks
+* _language_ - project language, if set
+* _location_ - output directory for generated project file
+* _name_     - name of the project
+* _solution_ - solution which contains the project
+* _uuid_     - unique identifier
+
+#### Examples
+Create a new project named "MyProject". Note that a solution must exist to contain the project. The indentation is for readability and is optional.
+```lua
+solution "MySolution"
+    configurations { "Debug", "Release" }
+
+    project "MyProject"
+```
+
+You can retrieve the currently active project by calling `project` with no parameters.
+```lua
+local prj = project()
+```
+
+You can retrieve the list of projects associated with a solution using the `projects` field of the solution object, which may then be iterated over.
+```lua
+local prjs = solution().projects
+for i, prj in ipairs(prjs) do
+    print(prj.name)
+end
+```
+[Back to top](#table-of-contents)
+
+---
+### removefiles({_files_...})
+Removes files from the project. This is different from [excludes](#excludesfiles) in that it completely removes them from the project, not only from the build. Multiple calls are concatenated.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_files_ - list of files to remove.
+
+[Back to top](#table-of-contents)
+
+---
+### removeflags({_flags_...})
+Removes flags from the flag list.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_flags_ - list of flags to remove from the flag list. They must be valid flags.
+
+[Back to top](#table-of-contents)
+
+---
+### removelinks({_references_...})
+
+Removes flags from the flag list.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_references_ - list of libraries and project names to remove from the links list.
+
+[Back to top](#table-of-contents)
+
+---
+### removeplatforms({_platforms_...})
+
+Removes platforms from the platform list.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_platforms_ - list of platforms to remove from the platforms list.
+
+[Back to top](#table-of-contents)
+
+---
+### resdefines({_symbols_...})
+Specifies preprocessor symbols for the resource compiler. Multiple calls are concatenated.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_symbols_ - list of symbols to be defined
+
+#### Examples
+```lua
+resdefines { "DEBUG", "TRACE" }
+```
+
+```lua
+resdefines { "CALLSPEC=__dllexport" }
+```
+[Back to top](#table-of-contents)
+
+---
+### resincludedirs({_paths_...})
+Specifies the include file search paths for the resource compiler. Multiple calls are concatenated.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_paths_ - list of include file search directories, relative to the currently executing script file
+
+#### Examples
+```lua
+resincludedirs { "../lua/include", "../zlib" }
+```
+
+May use wildcards
+```lua
+resincludedirs { "../includes/**" }
+```
+[Back to top](#table-of-contents)
+
+---
+### resoptions({_options_...})
+Passes arguments directly to the resource compiler. Multiple calls are concatenated.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_options_ - list of resource compiler flags and options
+
+#### Examples
+```lua
+configuration { "linux", "gmake" }
+    resoptions { "`wx-config --cxxflags`", "-ansi", "-pedantic" }
+```
+[Back to top](#table-of-contents)
+
+---
+### solution(_name_)
+Creates a new solution and makes it active. Solutions are the top-level objects in a GENie build script, and are synonymous with a Visual Studio solution. Each solution contains one or more projects, which in turn contain the settings to generate a single binary target.
+
+#### Arguments
+_name_ - unique name for the solution. If a solution with the given name already exists, it is made active and returned. This value will be used as the file name of the generated solution file.
+
+#### Return Value
+The active `solution` object.
+
+#### The `solution` Object
+Represented as a Lua table key-value pairs, containing the following values. You should treat this object as read-only and use the GENie API to make any changes.
+
+* _basedir_        - directory where the original project was defined; acts as a root for relative paths
+* _configurations_ - list of valid configuration names
+* _blocks_         - list of configuration blocks
+* _language_       - solution language, if set
+* _location_       - output directory for the generated solution file
+* _name_           - name of the solution
+* _platforms_      - list of target platforms
+* _projects_       - list of projects contained by the solution
+
+#### Examples
+```lua
+solution "MySolution"
+```
+
+You can retrieve the currently active solution object by calling `solution` with no parameters.
+```lua
+local sln = solution()
+```
+
+You can use the global variable `_SOLUTIONS` to list out all of the currently defined solutions.
+```lua
+for i, sln in ipairs(_SOLUTIONS) do
+    print(sln.name)
+end
+```
+[Back to top](#table-of-contents)
+
+---
+###  startproject(_name_)
+Sets the start (default) project for the solution. Works for VS, QBS and Xcode.
+
+**Scope:** solutions
+
+#### Arguments
+_name_ - name of the project to set as the start project.
+
+### Examples
+```lua
+solution "MySolution"
+    startproject "MyProjectFoo"
+    -- [...]
+
+project "MyProjectFoo"
+-- [...]
+
+project "MyProjectBar"
+-- [...]
+```
+[Back to top](#table-of-contents)
+
+---
+### targetdir(_path_)
+Sets the destination directory for the compiled binary target. By default, generated project files will place their compiled output in the same directory as the script.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_path_ - file system path to the directory where the compiled target file should be stored, relative to the currently executing script file.
+
+#### Examples
+```lua
+project "MyProject"
+
+    configuration "Debug"
+        targetdir "bin/debug"
+
+    configuration "Release"
+        targetdir "bin/release"
+```
+[Back to top](#table-of-contents)
+
+---
+### targetextension(_ext_)
+Specifies the file extension for the compiled binary target. By default, the project will use the system's normal naming conventions: ".exe" for Windows executables, ".so" for Linux shared libraries, etc.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_ext_ - new file extension, including leading dot
+
+#### Examples
+```lua
+targetextension ".zmf"
+```
+[Back to top](#table-of-contents)
+
+---
+### targetname(_name_)
+Specifies the base file name for the compiled binary target. By default, the project name will be used as the file name of the compiled binary target.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_name_ - new base file name
+
+#### Examples
+```lua
+targetname "mytarget"
+```
+[Back to top](#table-of-contents)
+
+---
+### targetprefix(_prefix_)
+Specifies the file name prefix for the compiled binary target. By default, system naming conventions will be used: "lib" for POSIX libraries (e.g. "libMyProject.so") and no prefix elsewhere.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_prefix_ - new file name prefix
+
+#### Examples
+```lua
+targetprefix "plugin"
+```
+
+The prefix may also be set to an empty string for no prefix
+```lua
+targetprefix ""
+```
+[Back to top](#table-of-contents)
+
+---
+### targetsubdir(_path_)
+Sets a subdirectory inside the target directory for the compiled binary target.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_path_ - name of the subdirectory.
+
+[Back to top](#table-of-contents)
+
+---
+### targetsuffix(_suffix_)
+Specifies a file name suffix for the compiled binary target.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_suffix_ - new filename suffix
+
+#### Examples
+```lua
+--- Add "-d" to debug versions of files
+configuration "Debug"
+    targetsuffix "-d"
+```
+[Back to top](#table-of-contents)
+
+---
+### uuid(_projectuuid_)
+Sets the UUID for a project. GENie automatically assigns a UUID to each project, which is used by the Visual Studio generators to identify the project within a solution. This UUID is essentially random and will change each time the project file is generated. If you are storing the generated Visual Studio project files in a version control system, this will create a lot of unnecessary deltas. Using the `uuid` function, you can assign a fixed UUID to each project which never changes.
+
+**Scope:** projects
+
+#### Arguments
+_projectuuid_ - UUID for the current project
+
+### Return Value
+Current project UUID or `nil` if no UUID has been set
+
+#### Examples
+```lua
+uuid "XXXXXXXX-XXXX-XXXX-XXXXXXXXXXXX"
+```
+[Back to top](#table-of-contents)
+
+---
+### vpaths({[_group_] = {_pattern_...}})
+Places files into groups for "virtual paths", rather than mirroring the filesystem. This allows you to, for instance, put all header files in a group called "Headers", no matter where they appeared in the source tree.
+
+**Note:** May be set on the solution, project, or configuration, but only project-level file lists are currently supported.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+Table of values, where keys (_groups_) are strings and values (_pattern_) are lists of file system patterns.
+
+_group_   - name for the new group  
+_pattern_ - file system pattern for matching file names
+
+#### Examples
+
+Place all header files into a virtual path called "Headers". Any directory information is removed, "src/lua/lua.h" will appear in the IDE as "Headers/lua.h"
+```lua
+vpaths { ["Headers"] = "**.h" }
+```
+
+You may specify multiple file patterns using table syntax
+```lua
+vpaths {
+    ["Headers"] = { "**.h", "**.hxx", "**.hpp" }
+}
+```
+
+It is also possible to include the file's path in the virtual group. Using this rule, "src/lua/lua.h" will appear in the IDE as "Headers/src/lua/lua.h".
+```lua
+vpaths { ["Headers/*"] = "**.h" }
+```
+
+Any directory information explicitly provided in the pattern will be removed from the replacement. Using this rule, "src/lua/lua.h" will appear in the IDE as "Headers/lua/lua.h".
+```lua
+vpaths { ["Headers/*"] = "src/**.h" }
+```
+
+You can also use virtual paths to remove extra directories from the IDE. Using this rule, "src/lua/lua.h" will appear in the IDE as "lua/lua.h".
+```lua
+vpaths { ["*"] = "src" }
+```
+
+You may specify more than one rule at a time
+```lua
+vpaths {
+    ["Headers"]   = "**.h",
+    ["Sources/*"] = {"**.c", "**.cpp"},
+    ["Docs"]      = "**.txt"
+}
+```
+[Back to top](#table-of-contents)
+
+---
+## Utility functions
+
+### iif(_condition_, _trueval_, _falseval_)
+Implements an immediate `if` clause, returning one of two possible values.
+
+#### Arguments
+_condition_ - logical condition to test  
+_trueval_ - value to return if _condition_ evaluates to `true`  
+_falseval_ - value to return if _condition_ evaluates to `false`
+
+#### Examples
+```lua
+result = iif(os.is("windows"), "is windows", "is not windows")
+```
+
+Note that all expressions are evaluated before the condition is checked. The following expression cannot be implemented with an `iif` because it may try to concatenate a string value.
+```lua
+result = iif(x -= nil, "x is " .. x, "x is nil")
 ```
 [Back to top](#table-of-contents)
 
@@ -1305,11 +1914,14 @@ userincludedirs { "../includes/**" }
 [Back to top](#table-of-contents)
 
 ---
-### os.uuid()
+### os.uuid(_name_)
 Returns a Universally Unique Identifier
 
+#### Arguments
+_name_ - (optional) string to be hashed
+
 #### Return Value
-A new UUID, a string value with the format `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+A new UUID, a string value with the format `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`, generated from _name_ if it is provided, otherwise generated from random data
 
 [Back to top](#table-of-contents)
 
@@ -1321,7 +1933,7 @@ Converts relative path to absolute path
 _path_ - the relative path to be converted
 
 #### Return Value
-new absolute path, calculated from the current working directory
+New absolute path, calculated from the current working directory
 
 [Back to top](#table-of-contents)
 
@@ -1502,171 +2114,8 @@ _newsep_ - new path separator. Defaults to current environment default.
 Modified path
 
 [Back to top](#table-of-contents)
-
 ---
-### pchheader(_file_)
-Sets the main header file for precompiled header support.
 
-**Scope:** projects
-
-#### Arguments
-_file_ - name of the header file, as it is specified in your `#include` statements
-
-#### Examples
-```lua
-pchheader "afxwin.h"
-pchsource "afxwin.cpp"
-```
-[Back to top](#table-of-contents)
-
----
-### pchsource(_file_)
-Sets the main source file for precompiled header support. Only used by Visual Studio.
-
-**Scope:** projects
-
-#### Arguments
-_file_ - name of the source file, relative to the currently-executing script file
-
-#### Examples
-```lua
-pchheader "afxwin.h"
-pchsource "afxwin.cpp"
-```
-[Back to top](#table-of-contents)
-
----
-### platforms({_identifiers_...})
-Specifies a set of target hardware platforms for a solution.
-
-_Platform support is a new, experimental feature. The syntax and behavior described here might change as we sort out the details_
-
-**Scope:** solutions
-
-#### Arguments
-_identifiers_ - list of hardware platform specifiers from this list:
-
-* _Native_ - general build not targeting any particular platform. If your project can be built in a generic fashion, you should include this as the first platform option
-* _x32_ - 32-bit environment
-* _x64_ - 64-bit environment
-* _Universal_ - OS X universal binary, target both 32- and 64-bit versions of x86 and PPC. Automated dependency generation must be turned off, and always do a clean build. Not supported by Visual Studio.
-* _Universal32_ - like _Universal_ above, but targeting only 32-bit platforms
-* _Universal64_ - like _Universal_ above, but targeting only 64-bit platforms
-* _PS3_ - Playstation 3
-* _WiiDev_ - Wii
-* _Xbox360_ - Xbox 360 compiler and linker under Visual Studio
-* _PowerPC_ - PowerPC processors
-* _ARM_ - ARM-based processors
-* _Orbis_ - Playstation 4
-* _Durango_ - Xbox One
-
-#### Return Value
-Current list of target platforms for the active solution
-
-#### Examples
-Generic build, as well as OS X Universal build
-```lua
-solution "MySolution"
-    configurations { "Debug", "Release" }
-    platforms { "native", "universal" }
-```
-Prove 32- and 64-bit specific build targets. No generic build is provided so one of these two platforms must always be used. Do this only if your software requires knowledge of the underlying architecture at build time; otherwise, include _native_ to provide a generic build.
-```lua
-solution "MySolution"
-    configurations { "Debug", "Release" }
-    platforms { "x32", "x64" }
-```
-
-You can retrieve the current list of platforms by calling the function with no parameters
-```lua
-local p = platforms()
-```
-
-Once you have defined a list of platforms, you may use those identifiers to set up configuration filters and apply platform-specific settings.
-```lua
-configuration "x64"
-    defines "IS_64BIT"
-
--- You can also mix platforms with other configuration selectors
-configuration { "Debug", "x64" }
-    defines "IS_64BIT_DEBUG"
-```
-[Back to top](#table-of-contents)
-
----
-### postbuildcommands({_commands_...})
-Specifies shell commands to run after build is finished
-
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-_commands_ - one or more shell commands
-
-#### Examples
-```lua
-configuration "windows"
-    postbuildcommands { "copy default.config bin\\project.config" }
-
-configuration "not windows"
-    postbuildcommands { "cp default.config bin/project.config" }
-```
-[Back to top](#table-of-contents)
-
----
-### postcompiletasks({_commands_...})
-Specifies shell commands to run after compile of file is finished
-(GMAKE specific)
-
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-_commands_ - one or more shell commands
-
-#### Examples
-```lua
-    postcompiletasks { "rm $(@:%.o=%.d)" }
-```
-[Back to top](#table-of-contents)
-
----
-### prebuildcommands({_commands_...})
-Specifies shell commands to run before each build
-
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-_commands_ - one or more shell commands
-
-#### Examples
-```lua
-configuration "windows"
-    prebuildcommands { "copy default.config bin\\project.config" }
-
-configuration "not windows"
-    prebuildcommands { "cp default.config bin/project.config" }
-```
-[Back to top](#table-of-contents)
-
----
-### prelinkcommands({_commands_...})
-Specifies shell commands to run after source files have been compiled, but before the link step
-
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-_commands_ - one or more shell commands
-
-#### Examples
-```lua
-configuration "windows"
-    prelinkcommands { "copy default.config bin\\project.config" }
-
-configuration "not windows"
-    prelinkcommands { "cp default.config bin/project.config" }
-```
-[Back to top](#table-of-contents)
-
----
 ### printf(_format_, _args_...)
 Prints a formatted string
 
@@ -1674,147 +2123,6 @@ Prints a formatted string
 _format_ - formatting string, containing C `printf()` formatting codes  
 _args_ - arguments to be substituted into the format string
 
-[Back to top](#table-of-contents)
-
----
-### project(_name_)
-Creates a new project and makes it active. Projects contain all of the settings necessary to build a single binary target, and are synonymous with a Visual Studio Project. These settings include the list of source code files, the programming language used by those files, compiler flags, include directories, and which libraries to link against.
-
-Every project belongs to a solution.
-
-#### Arguments
-_name_ - a unique name for the project. If a project with the given name already exists, it is made active and returned. The project name will be used as the file name of the generated solution file.
-
-#### Return Value
-The active project object.
-
-#### The `project` Object
-Every project is represented in Lua as a table of key-value pairs. You should treat this object as read-only and use the GENie API to make any changes.
-
-* _basedir_  - directory where the project was originally defined. Root for relative paths.
-* _blocks_   - list of configuration blocks
-* _language_ - project language, if set
-* _location_ - output directory for generated project file
-* _name_     - name of the project
-* _solution_ - solution which contains the project
-* _uuid_     - unique identifier
-
-#### Examples
-Create a new project named "MyProject". Note that a solution must exist to contain the project. The indentation is for readability and is optional.
-```lua
-solution "MySolution"
-    configurations { "Debug", "Release" }
-
-    project "MyProject"
-```
-
-You can retrieve the currently active project by calling `project` with no parameters.
-```lua
-local prj = project()
-```
-
-You can retrieve the list of projects associated with a solution using the `projects` field of the solution object, which may then be iterated over.
-```lua
-local prjs = solution().projects
-for i, prj in ipairs(prjs) do
-    print(prj.name)
-end
-```
-[Back to top](#table-of-contents)
-
----
-### resdefines({_symbols_...})
-Specifies preprocessor symbols for the resource compiler. Multiple calls are concatenated.
-
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-_symbols_ - list of symbols to be defined
-
-#### Examples
-```lua
-resdefines { "DEBUG", "TRACE" }
-```
-
-```lua
-resdefines { "CALLSPEC=__dllexport" }
-```
-[Back to top](#table-of-contents)
-
----
-### resincludedirs({_paths_...})
-Specifies the include file search paths for the resource compiler. Multiple calls are concatenated.
-
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-_paths_ - list of include file search directories, relative to the currently executing script file
-
-#### Examples
-```lua
-resincludedirs { "../lua/include", "../zlib" }
-```
-
-May use wildcards
-```lua
-resincludedirs { "../includes/**" }
-```
-[Back to top](#table-of-contents)
-
----
-### resoptions({_options_...})
-Passes arguments directly to the resource compiler. Multiple calls are concatenated.
-
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-_options_ - list of resource compiler flags and options
-
-#### Examples
-```lua
-configuration { "linux", "gmake" }
-    resoptions { "`wx-config --cxxflags`", "-ansi", "-pedantic" }
-```
-[Back to top](#table-of-contents)
-
----
-### solution(_name_)
-Creates a new solution and makes it active. Solutions are the top-level objects in a GENie build script, and are synonymous with a Visual Studio solution. Each solution contains one or more projects, which in turn contain the settings to generate a single binary target.
-
-#### Arguments
-_name_ - unique name for the solution. If a solution with the given name already exists, it is made active and returned. This value will be used as the file name of the generated solution file.
-
-#### Return Value
-The active `solution` object.
-
-#### The `solution` Object
-Represented as a Lua table key-value pairs, containing the following values. You should treat this object as read-only and use the GENie API to make any changes.
-
-* _basedir_        - directory where the original project was defined; acts as a root for relative paths
-* _configurations_ - list of valid configuration names
-* _blocks_         - list of configuration blocks
-* _language_       - solution language, if set
-* _location_       - output directory for the generated solution file
-* _name_           - name of the solution
-* _platforms_      - list of target platforms
-* _projects_       - list of projects contained by the solution
-
-#### Examples
-```lua
-solution "MySolution"
-```
-
-You can retrieve the currently active solution object by calling `solution` with no parameters.
-```lua
-local sln = solution()
-```
-
-You can use the global variable `_SOLUTIONS` to list out all of the currently defined solutions.
-```lua
-for i, sln in ipairs(_SOLUTIONS) do
-    print(sln.name)
-end
-```
 [Back to top](#table-of-contents)
 
 ---
@@ -1902,167 +2210,8 @@ Formatted string
 [Back to top](#table-of-contents)
 
 ---
-### targetdir(_path_)
-Sets the destination directory for the compiled binary target. By default, generated project files will place their compiled output in the same directory as the script.
 
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-_path_ - file system path to the directory where the compiled target file should be stored, relative to the currently executing script file.
-
-#### Examples
-```lua
-project "MyProject"
-
-    configuration "Debug"
-        targetdir "bin/debug"
-
-    configuration "Release"
-        targetdir "bin/release"
-```
-[Back to top](#table-of-contents)
-
----
-### targetextension(_ext_)
-Specifies the file extension for the compiled binary target. By default, the project will use the system's normal naming conventions: ".exe" for Windows executables, ".so" for Linux shared libraries, etc.
-
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-_ext_ - new file extension, including leading dot
-
-#### Examples
-```lua
-targetextension ".zmf"
-```
-[Back to top](#table-of-contents)
-
----
-### targetname(_name_)
-Specifies the base file name for the compiled binary target. By default, the project name will be used as the file name of the compiled binary target.
-
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-_name_ - new base file name
-
-#### Examples
-```lua
-targetname "mytarget"
-```
-[Back to top](#table-of-contents)
-
----
-### targetprefix(_prefix_)
-Specifies the file name prefix for the compiled binary target. By default, system naming conventions will be used: "lib" for POSIX libraries (e.g. "libMyProject.so") and no prefix elsewhere.
-
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-_prefix_ - new file name prefix
-
-#### Examples
-```lua
-targetprefix "plugin"
-```
-
-The prefix may also be set to an empty string for no prefix
-```lua
-targetprefix ""
-```
-[Back to top](#table-of-contents)
-
----
-### targetsuffix(_suffix_)
-Specifies a file name suffix for the compiled binary target.
-
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-_suffix_ - new filename suffix
-
-#### Examples
-```lua
---- Add "-d" to debug versions of files
-configuration "Debug"
-    targetsuffix "-d"
-```
-[Back to top](#table-of-contents)
-
----
-### uuid(_projectuuid_)
-Sets the UUID for a project. GENie automatically assigns a UUID to each project, which is used by the Visual Studio generators to identify the project within a solution. This UUID is essentially random and will change each time the project file is generated. If you are storing the generated Visual Studio project files in a version control system, this will create a lot of unnecessary deltas. Using the `uuid` function, you can assign a fixed UUID to each project which never changes.
-
-**Scope:** projects
-
-#### Arguments
-_projectuuid_ - UUID for the current project
-
-### Return Value
-Current project UUID or `nil` if no UUID has been set
-
-#### Examples
-```lua
-uuid "XXXXXXXX-XXXX-XXXX-XXXXXXXXXXXX"
-```
-[Back to top](#table-of-contents)
-
----
-### vpaths({[_group_] = {_pattern_...}})
-Places files into groups for "virtual paths", rather than mirroring the filesystem. This allows you to, for instance, put all header files in a group called "Headers", no matter where they appeared in the source tree.
-
-**Note:** May be set on the solution, project, or configuration, but only project-level file lists are currently supported.
-
-**Scope:** solutions, projects, configurations
-
-#### Arguments
-Table of values, where keys (_groups_) are strings and values (_pattern_) are lists of file system patterns.
-
-_group_   - name for the new group  
-_pattern_ - file system pattern for matching file names
-
-#### Examples
-
-Place all header files into a virtual path called "Headers". Any directory information is removed, "src/lua/lua.h" will appear in the IDE as "Headers/lua.h"
-```lua
-vpaths { ["Headers"] = "**.h" }
-```
-
-You may specify multiple file patterns using table syntax
-```lua
-vpaths {
-    ["Headers"] = { "**.h", "**.hxx", "**.hpp" }
-}
-```
-
-It is also possible to include the file's path in the virtual group. Using this rule, "src/lua/lua.h" will appear in the IDE as "Headers/src/lua/lua.h".
-```lua
-vpaths { ["Headers/*"] = "**.h" }
-```
-
-Any directory information explicitly provided in the pattern will be removed from the replacement. Using this rule, "src/lua/lua.h" will appear in the IDE as "Headers/lua/lua.h".
-```lua
-vpaths { ["Headers/*"] = "src/**.h" }
-```
-
-You can also use virtual paths to remove extra directories from the IDE. Using this rule, "src/lua/lua.h" will appear in the IDE as "lua/lua.h".
-```lua
-vpaths { ["*"] = "src" }
-```
-
-You may specify more than one rule at a time
-```lua
-vpaths {
-    ["Headers"]   = "**.h",
-    ["Sources/*"] = {"**.c", "**.cpp"},
-    ["Docs"]      = "**.txt"
-}
-```
-[Back to top](#table-of-contents)
-
----
-
-## Additional Information
+## Additional information
 
 ### Wildcards
 

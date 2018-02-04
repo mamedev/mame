@@ -15,6 +15,7 @@
 #include "debug/debugcpu.h"
 #include "divtlb.h"
 
+#include "i386dasm.h"
 
 #define INPUT_LINE_A20      1
 #define INPUT_LINE_SMI      2
@@ -27,9 +28,12 @@
 #define MCFG_I386_SMIACT(_devcb) \
 	devcb = &i386_device::set_smiact(*device, DEVCB_##_devcb);
 
+#define MCFG_I486_FERR_HANDLER(_devcb) \
+	devcb = &i386_device::set_ferr(*device, DEVCB_##_devcb);
+
 #define X86_NUM_CPUS        4
 
-class i386_device : public cpu_device, public device_vtlb_interface
+class i386_device : public cpu_device, public device_vtlb_interface, public i386_disassembler::config
 {
 public:
 	// construction/destruction
@@ -37,6 +41,7 @@ public:
 
 	// static configuration helpers
 	template <class Object> static devcb_base &set_smiact(device_t &device, Object &&cb) { return downcast<i386_device &>(device).m_smiact.set_callback(std::forward<Object>(cb)); }
+	template <class Object> static devcb_base &set_ferr(device_t &device, Object &&cb) { return downcast<i386_device &>(device).m_ferr_handler.set_callback(std::forward<Object>(cb)); }
 
 	uint64_t debug_segbase(symbol_table &table, int params, const uint64_t *param);
 	uint64_t debug_seglimit(symbol_table &table, int params, const uint64_t *param);
@@ -68,9 +73,8 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 15; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
+	virtual int get_mode() const override;
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -212,7 +216,7 @@ protected:
 
 	uint8_t m_irq_state;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 	address_space *m_io;
 	uint32_t m_a20_mask;
 
@@ -283,6 +287,7 @@ protected:
 	bool m_nmi_latched;
 	uint32_t m_smbase;
 	devcb_write_line m_smiact;
+	devcb_write_line m_ferr_handler;
 	bool m_lock;
 
 	// bytes in current opcode, debug only
@@ -1386,6 +1391,8 @@ protected:
 	void x87_fincstp(uint8_t modrm);
 	void x87_fclex(uint8_t modrm);
 	void x87_ffree(uint8_t modrm);
+	void x87_fdisi(uint8_t modrm);
+	void x87_feni(uint8_t modrm);
 	void x87_finit(uint8_t modrm);
 	void x87_fldcw(uint8_t modrm);
 	void x87_fstcw(uint8_t modrm);

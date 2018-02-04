@@ -91,4 +91,7 @@ public:
 	uint32_t screen_update_fastfred(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void jumpcoas(machine_config &config);
+	void imago(machine_config &config);
+	void fastfred(machine_config &config);
 };

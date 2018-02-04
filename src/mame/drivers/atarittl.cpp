@@ -117,6 +117,7 @@ public:
 	required_device<netlist_mame_device> m_maincpu;
 	required_device<fixedfreq_device> m_video;
 
+	void atarikee(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -163,6 +164,7 @@ public:
 
 	uint32_t screen_update_stuntcyc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void stuntcyc(machine_config &config);
 protected:
 
 	// driver_device overrides
@@ -306,7 +308,7 @@ uint32_t stuntcyc_state::screen_update_stuntcyc(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-static MACHINE_CONFIG_START( atarikee )
+MACHINE_CONFIG_START(atarikee_state::atarikee)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
 	MCFG_NETLIST_SETUP(atarikee)
@@ -323,7 +325,7 @@ MACHINE_CONFIG_END
 //#define STUNTCYC_NL_CLOCK (14318181*69)
 #define STUNTCYC_NL_CLOCK (SC_HTOTAL*SC_VTOTAL*60*140)
 
-static MACHINE_CONFIG_START( stuntcyc )
+MACHINE_CONFIG_START(stuntcyc_state::stuntcyc)
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, STUNTCYC_NL_CLOCK)
 	MCFG_NETLIST_SETUP(stuntcyc)

@@ -129,8 +129,8 @@ public:
 	DECLARE_WRITE8_MEMBER(skydest_i8741_0_w);
 	DECLARE_READ8_MEMBER(skydest_i8741_1_r);
 	DECLARE_WRITE8_MEMBER(skydest_i8741_1_w);
-//	DECLARE_WRITE_LINE_MEMBER(ym_irq);
-	
+//  DECLARE_WRITE_LINE_MEMBER(ym_irq);
+
 	DECLARE_DRIVER_INIT(skydest);
 	DECLARE_DRIVER_INIT(cyclemb);
 	virtual void machine_start() override;
@@ -144,6 +144,8 @@ public:
 	void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void skydest_i8741_reset();
+	void cyclemb(machine_config &config);
+	void skydest(machine_config &config);
 };
 
 
@@ -606,23 +608,23 @@ READ8_MEMBER(cyclemb_state::skydest_i8741_1_r)
 	// status
 	if(offset == 1)
 		return 1;
-	
+
 	if(m_mcu[1].rst == 1)
 		return 0x40;
-	
+
 	return m_soundlatch->read(space,0);
 }
 
 WRITE8_MEMBER(cyclemb_state::skydest_i8741_1_w)
 {
-//	printf("%02x %02x\n",offset,data);
+//  printf("%02x %02x\n",offset,data);
 	if(offset == 1)
 	{
 		if(data == 0xf0)
 			m_mcu[1].rst = 1;
 	}
 	//else
-	//	m_soundlatch->clear_w(space, 0, 0);
+	//  m_soundlatch->clear_w(space, 0, 0);
 }
 
 
@@ -856,11 +858,11 @@ static INPUT_PORTS_START( skydest )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x10, "Lives" )
-        PORT_DIPSETTING(    0x00, "4" )
-        PORT_DIPSETTING(    0x08, "3" )
-        PORT_DIPSETTING(    0x10, "2" )
-        PORT_DIPSETTING(    0x18, "1" )
+	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x18, "1" )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW2")
@@ -882,7 +884,7 @@ static INPUT_PORTS_START( skydest )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "Demo_Sounds" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Free_Play ) )
@@ -901,7 +903,7 @@ static INPUT_PORTS_START( skydest )
 	PORT_DIPNAME( 0x80, 0x00, "Invincibility (Cheat)" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	
+
 
 INPUT_PORTS_END
 
@@ -952,14 +954,14 @@ static GFXDECODE_START( cyclemb )
 	GFXDECODE_ENTRY( "sprite_data", 0, spritelayout_32x32,    0x00, 0x40 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( cyclemb )
+MACHINE_CONFIG_START(cyclemb_state::cyclemb)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/3) // Z8400BPS
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(18'000'000)/3) // Z8400BPS
 	MCFG_CPU_PROGRAM_MAP(cyclemb_map)
 	MCFG_CPU_IO_MAP(cyclemb_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cyclemb_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(18'000'000)/6)
 	MCFG_CPU_PROGRAM_MAP(cyclemb_sound_map)
 	MCFG_CPU_IO_MAP(cyclemb_sound_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cyclemb_state,  irq0_line_hold, 60)
@@ -984,13 +986,13 @@ static MACHINE_CONFIG_START( cyclemb )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_18MHz/12)
-//	MCFG_YM2203_IRQ_HANDLER(WRITELINE(cyclemb_state, ym_irq))
-//	MCFG_AY8910_PORT_B_READ_CB(IOPORT("UNK")) /* port B read */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(18'000'000)/12)
+//  MCFG_YM2203_IRQ_HANDLER(WRITELINE(cyclemb_state, ym_irq))
+//  MCFG_AY8910_PORT_B_READ_CB(IOPORT("UNK")) /* port B read */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( skydest, cyclemb )
+MACHINE_CONFIG_DERIVED(cyclemb_state::skydest, cyclemb)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(skydest_io)
 
@@ -1081,10 +1083,10 @@ ROM_END
 DRIVER_INIT_MEMBER(cyclemb_state,cyclemb)
 {
 	uint8_t *rom = memregion("audiocpu")->base();
-	
+
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x760;
-	
+
 	// patch audio CPU crash + ROM checksum
 	rom[0x282] = 0x00;
 	rom[0x283] = 0x00;
@@ -1097,10 +1099,10 @@ DRIVER_INIT_MEMBER(cyclemb_state,cyclemb)
 DRIVER_INIT_MEMBER(cyclemb_state,skydest)
 {
 	uint8_t *rom = memregion("audiocpu")->base();
-	
+
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x554;
-	
+
 	// patch audio CPU crash + ROM checksum
 	rom[0x286] = 0x00;
 	rom[0x287] = 0x00;

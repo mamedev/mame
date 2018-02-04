@@ -4,8 +4,8 @@
 #ifndef BWIDOW_H_
 #define BWIDOW_H_
 
-#define MASTER_CLOCK (XTAL_12_096MHz)
-#define CLOCK_3KHZ   ((double)MASTER_CLOCK / 4096)
+#define MASTER_CLOCK (XTAL(12'096'000))
+#define CLOCK_3KHZ   (MASTER_CLOCK / 4096)
 
 
 class bwidow_state : public driver_device
@@ -29,12 +29,13 @@ public:
 	optional_ioport m_in3;
 	optional_ioport m_in4;
 	optional_ioport m_dsw2;
+	void spacduel(machine_config &config);
+	void gravitar(machine_config &config);
+	void bwidowp(machine_config &config);
+	void bwidow(machine_config &config);
+	void lunarbat(machine_config &config);
+	void bwidow_audio(machine_config &config);
+	void gravitar_audio(machine_config &config);
 };
-
-
-/*----------- defined in audio/bwidow.c -----------*/
-
-MACHINE_CONFIG_EXTERN( bwidow_audio );
-MACHINE_CONFIG_EXTERN( gravitar_audio );
 
 #endif /* BWIDOW_H_ */

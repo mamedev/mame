@@ -77,9 +77,9 @@ public:
 
 	// control lines
 	DECLARE_WRITE_LINE_MEMBER(oe_w);
-	DECLARE_WRITE8_MEMBER(unlock_write);
-	DECLARE_WRITE16_MEMBER(unlock_write);
-	DECLARE_WRITE32_MEMBER(unlock_write);
+	DECLARE_WRITE8_MEMBER(unlock_write8);
+	DECLARE_WRITE16_MEMBER(unlock_write16);
+	DECLARE_WRITE32_MEMBER(unlock_write32);
 
 protected:
 	// construction/destruction

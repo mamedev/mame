@@ -893,7 +893,7 @@ Notes:
 
 
 // default values written to CRTC (note: SYS386F does not have this chip)
-#define PIXEL_CLOCK  (XTAL_28_63636MHz/4)
+#define PIXEL_CLOCK  (XTAL(28'636'363)/4)
 
 #define SPI_HTOTAL   (448)
 #define SPI_HBEND    (0)
@@ -997,6 +997,7 @@ WRITE32_MEMBER(seibuspi_state::ejsakura_input_select_w)
 
 
 static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00000400, 0x0000043f) AM_DEVREADWRITE16("crtc", seibu_crtc_device, read, write, 0xffffffff)
 	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
 	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
@@ -1007,7 +1008,6 @@ static ADDRESS_MAP_START( base_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000604, 0x00000607) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x00000608, 0x0000060b) AM_READ_PORT("EXCH")
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
 ADDRESS_MAP_END
@@ -1029,6 +1029,7 @@ static ADDRESS_MAP_START( rise_map, AS_PROGRAM, 32, seibuspi_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( sei252_map )
 	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP // ?
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff)
@@ -1043,10 +1044,10 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
 	AM_RANGE(0x00a00000, 0x013fffff) AM_ROM AM_REGION("sound01", 0)
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rdft2_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP // ?
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVREAD8("soundfifo2", fifo7200_device, data_byte_r, 0x000000ff)
@@ -1061,10 +1062,10 @@ static ADDRESS_MAP_START( rdft2_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
 	AM_RANGE(0x00a00000, 0x013fffff) AM_ROM AM_REGION("sound01", 0)
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sxx2e_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( sei252_map )
 	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
@@ -1076,10 +1077,10 @@ static ADDRESS_MAP_START( sxx2e_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_device, ds2404_clk_w, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_device, ds2404_data_r, 0x000000ff)
 	AM_RANGE(0x000006dc, 0x000006df) AM_READ8(spi_ds2404_unknown_r, 0x0000ff00)
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sxx2f_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x00000680, 0x00000683) AM_READ8(sb_coin_r, 0x000000ff)
 	AM_RANGE(0x00000680, 0x00000683) AM_DEVWRITE8("soundfifo1", fifo7200_device, data_byte_w, 0x000000ff)
@@ -1087,19 +1088,19 @@ static ADDRESS_MAP_START( sxx2f_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000688, 0x0000068b) AM_NOP // ?
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
 	AM_RANGE(0x00000690, 0x00000693) AM_WRITENOP // ?
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys386i_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_IMPORT_FROM( base_map )
 	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(spi_layerbanks_eeprom_w, 0x00ff0000)
 	AM_RANGE(0x0000068c, 0x0000068f) AM_WRITE8(oki_bank_w, 0xff000000)
 	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff)
-	AM_IMPORT_FROM( base_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys386f_map, AS_PROGRAM, 32, seibuspi_state )
+	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_IMPORT_FROM( rise_map )
 	AM_RANGE(0x00000010, 0x00000013) AM_READ8(spi_status_r, 0x000000ff)
 	AM_RANGE(0x00000400, 0x00000403) AM_READ_PORT("SYSTEM") AM_WRITE(ejsakura_input_select_w)
@@ -1110,7 +1111,6 @@ static ADDRESS_MAP_START( sys386f_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
 	AM_RANGE(0x00000600, 0x00000607) AM_DEVREAD8("ymz", ymz280b_device, read, 0x000000ff)
 	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(ejsakura_keyboard_r)
-	AM_RANGE(0x00000000, 0x0003ffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share1")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share1") // ROM location in real-mode
 ADDRESS_MAP_END
@@ -1171,9 +1171,9 @@ static ADDRESS_MAP_START( sxx2e_soundmap, AS_PROGRAM, 8, seibuspi_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spi_soundmap, AS_PROGRAM, 8, seibuspi_state )
+	AM_IMPORT_FROM( sxx2e_soundmap )
 	AM_RANGE(0x4008, 0x4008) AM_DEVWRITE("soundfifo2", fifo7200_device, data_byte_w)
 	AM_RANGE(0x400a, 0x400a) AM_READ_PORT("JUMPERS") // TO DO: get these to actually work
-	AM_IMPORT_FROM( sxx2e_soundmap )
 ADDRESS_MAP_END
 
 
@@ -1863,15 +1863,15 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 	m_z80_prg_transfer_pos = 0;
 }
 
-static MACHINE_CONFIG_START( spi )
+MACHINE_CONFIG_START(seibuspi_state::spi)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // AMD or Intel 386DX, 25MHz
+	MCFG_CPU_ADD("maincpu", I386, XTAL(50'000'000)/2) // AMD or Intel 386DX, 25MHz
 	MCFG_CPU_PROGRAM_MAP(spi_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28_63636MHz/4) // Z84C0008PEC, 7.159MHz
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'636'363)/4) // Z84C0008PEC, 7.159MHz
 	MCFG_CPU_PROGRAM_MAP(spi_soundmap)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
@@ -1904,7 +1904,7 @@ static MACHINE_CONFIG_START( spi )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymf", YMF271, XTAL_16_9344MHz)
+	MCFG_SOUND_ADD("ymf", YMF271, XTAL(16'934'400))
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, ymf_irqhandler))
 	MCFG_YMF271_EXT_READ_HANDLER(READ8(seibuspi_state, flashrom_read))
 	MCFG_YMF271_EXT_WRITE_HANDLER(WRITE8(seibuspi_state, flashrom_write))
@@ -1913,13 +1913,13 @@ static MACHINE_CONFIG_START( spi )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( ejanhs, spi )
+MACHINE_CONFIG_DERIVED(seibuspi_state::ejanhs, spi)
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(seibuspi_state, ejanhs)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rdft2, spi )
+MACHINE_CONFIG_DERIVED(seibuspi_state::rdft2, spi)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(rdft2_map)
 MACHINE_CONFIG_END
@@ -1934,7 +1934,7 @@ MACHINE_RESET_MEMBER(seibuspi_state,sxx2e)
 	m_sb_coin_latch = 0;
 }
 
-static MACHINE_CONFIG_DERIVED( sxx2e, spi )
+MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2e, spi)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1951,14 +1951,14 @@ static MACHINE_CONFIG_DERIVED( sxx2e, spi )
 	MCFG_DEVICE_REMOVE("soundfifo2")
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL_16_9344MHz)
+	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL(16'934'400))
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, ymf_irqhandler))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sxx2f, sxx2e )
+MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2f, sxx2e)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1972,17 +1972,17 @@ static MACHINE_CONFIG_DERIVED( sxx2f, sxx2e )
 	// clock is unknown, possibly slower than 7.159MHz
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sxx2g, sxx2f ) // clocks differ, but otherwise same hw as sxx2f
+MACHINE_CONFIG_DERIVED(seibuspi_state::sxx2g, sxx2f) // clocks differ, but otherwise same hw as sxx2f
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu") // AMD AM386DX/DX-40, 28.63636MHz
-	MCFG_CPU_CLOCK(XTAL_28_63636MHz)
+	MCFG_CPU_CLOCK(XTAL(28'636'363))
 
 	MCFG_CPU_MODIFY("audiocpu") // Z84C0004PCS, 4.9152MHz
-	MCFG_CPU_CLOCK(XTAL_4_9152MHz)
+	MCFG_CPU_CLOCK(XTAL(4'915'200))
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL_16_384MHz) // 16.384MHz(!)
+	MCFG_SOUND_REPLACE("ymf", YMF271, XTAL(16'384'000)) // 16.384MHz(!)
 	MCFG_YMF271_IRQ_HANDLER(WRITELINE(seibuspi_state, ymf_irqhandler))
 
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1992,10 +1992,10 @@ MACHINE_CONFIG_END
 
 /* SYS386I */
 
-static MACHINE_CONFIG_START( sys386i )
+MACHINE_CONFIG_START(seibuspi_state::sys386i)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, XTAL_40MHz) // AMD 386DX, 40MHz
+	MCFG_CPU_ADD("maincpu", I386, XTAL(40'000'000)) // AMD 386DX, 40MHz
 	MCFG_CPU_PROGRAM_MAP(sys386i_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
@@ -2020,10 +2020,10 @@ static MACHINE_CONFIG_START( sys386i )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/20, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki1", XTAL(28'636'363)/20, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/20, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki2", XTAL(28'636'363)/20, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -2049,10 +2049,10 @@ DRIVER_INIT_MEMBER(seibuspi_state,sys386f)
 	}
 }
 
-static MACHINE_CONFIG_START( sys386f )
+MACHINE_CONFIG_START(seibuspi_state::sys386f)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I386, XTAL_50MHz/2) // Intel i386DX, 25MHz
+	MCFG_CPU_ADD("maincpu", I386, XTAL(50'000'000)/2) // Intel i386DX, 25MHz
 	MCFG_CPU_PROGRAM_MAP(sys386f_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", seibuspi_state, spi_interrupt)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(seibuspi_state,spi_irq_callback)
@@ -2076,7 +2076,7 @@ static MACHINE_CONFIG_START( sys386f )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_384MHz)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL(16'384'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -2150,27 +2150,27 @@ DRIVER_INIT_MEMBER(seibuspi_state,rfjet)
 
 READ32_MEMBER(seibuspi_state::senkyu_speedup_r)
 {
-	if (space.device().safe_pc()==0x00305bb2) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x00305bb2) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018cb4/4];
 }
 
 READ32_MEMBER(seibuspi_state::senkyua_speedup_r)
 {
-	if (space.device().safe_pc()== 0x30582e) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()== 0x30582e) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018c9c/4];
 }
 
 READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 {
-//  printf("space.device().safe_pc() %06x\n", space.device().safe_pc());
+//  printf("m_maincpu->pc() %06x\n", m_maincpu->pc());
 
 	/* batlbalu */
-	if (space.device().safe_pc()==0x00305996) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x00305996) m_maincpu->spin_until_interrupt(); // idle
 
 	/* batlball */
-	if (space.device().safe_pc()==0x003058aa) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x003058aa) m_maincpu->spin_until_interrupt(); // idle
 
 	return m_mainram[0x0018db4/4];
 }
@@ -2178,15 +2178,15 @@ READ32_MEMBER(seibuspi_state::batlball_speedup_r)
 READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 {
 	/* viprp1 */
-	if (space.device().safe_pc()==0x0202769) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0202769) m_maincpu->spin_until_interrupt(); // idle
 
 	/* viprp1s */
-	if (space.device().safe_pc()==0x02027e9) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x02027e9) m_maincpu->spin_until_interrupt(); // idle
 
 	/* viprp1ot */
-	if (space.device().safe_pc()==0x02026bd) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x02026bd) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 
 	return m_mainram[0x001e2e0/4];
 }
@@ -2194,8 +2194,8 @@ READ32_MEMBER(seibuspi_state::viprp1_speedup_r)
 READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 {
 	/* viperp1o */
-	if (space.device().safe_pc()==0x0201f99) space.device().execute().spin_until_interrupt(); // idle
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+	if (m_maincpu->pc()==0x0201f99) m_maincpu->spin_until_interrupt(); // idle
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 	return m_mainram[0x001d49c/4];
 }
 
@@ -2203,8 +2203,8 @@ READ32_MEMBER(seibuspi_state::viprp1o_speedup_r)
 // causes input problems?
 READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 {
-// osd_printf_debug("%08x\n",space.device().safe_pc());
-	if (space.device().safe_pc()==0x03032c7) space.device().execute().spin_until_interrupt(); // idle
+// osd_printf_debug("%08x\n",m_maincpu->pc());
+	if (m_maincpu->pc()==0x03032c7) m_maincpu->spin_until_interrupt(); // idle
 	return m_mainram[0x002d224/4];
 }
 #endif
@@ -2212,27 +2212,27 @@ READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 {
 	/* rdft */
-	if (space.device().safe_pc()==0x0203f06) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f06) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftj? */
-	if (space.device().safe_pc()==0x0203f0a) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f0a) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftau */
-	if (space.device().safe_pc()==0x0203f16) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f16) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftja? */
-	if (space.device().safe_pc()==0x0203f22) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f22) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdfta, rdftadi, rdftam, rdftit */
-	if (space.device().safe_pc()==0x0203f46) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f46) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftu */
-	if (space.device().safe_pc()==0x0203f3a) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f3a) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdftauge */
-	if (space.device().safe_pc()==0x0203f6e) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203f6e) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 
 	return m_mainram[0x00298d0/4];
 }
@@ -2240,18 +2240,18 @@ READ32_MEMBER(seibuspi_state::rdft_speedup_r)
 READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 {
 	/* rdft22kc */
-	if (space.device().safe_pc()==0x0203926) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0203926) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdft2, rdft2j */
-	if (space.device().safe_pc()==0x0204372) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0204372) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdft2us */
-	if (space.device().safe_pc()==0x020420e) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x020420e) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rdft2a */
-	if (space.device().safe_pc()==0x0204366) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0204366) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 
 	return m_mainram[0x0282ac/4];
 }
@@ -2259,22 +2259,22 @@ READ32_MEMBER(seibuspi_state::rf2_speedup_r)
 READ32_MEMBER(seibuspi_state::rfjet_speedup_r)
 {
 	/* rfjet, rfjetu, rfjeta */
-	if (space.device().safe_pc()==0x0206082) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0206082) m_maincpu->spin_until_interrupt(); // idle
 
 	/* rfjetus */
-	if (space.device().safe_pc()==0x0205b39)
+	if (m_maincpu->pc()==0x0205b39)
 	{
 		uint32_t r;
-		space.device().execute().spin_until_interrupt(); // idle
+		m_maincpu->spin_until_interrupt(); // idle
 		// Hack to enter test mode
 		r = m_mainram[0x002894c/4] & (~0x400);
 		return r | (((ioport("SYSTEM")->read() ^ 0xff)<<8) & 0x400);
 	}
 
 	/* rfjetj */
-	if (space.device().safe_pc()==0x0205f2e) space.device().execute().spin_until_interrupt(); // idle
+	if (m_maincpu->pc()==0x0205f2e) m_maincpu->spin_until_interrupt(); // idle
 
-//  osd_printf_debug("%08x\n",space.device().safe_pc());
+//  osd_printf_debug("%08x\n",m_maincpu->pc());
 
 	return m_mainram[0x002894c/4];
 }

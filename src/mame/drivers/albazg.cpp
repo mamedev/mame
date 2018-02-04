@@ -44,7 +44,7 @@ PCB:
 #include "screen.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK XTAL_12MHz
+#define MASTER_CLOCK XTAL(12'000'000)
 
 class albazg_state : public driver_device
 {
@@ -84,6 +84,7 @@ public:
 	uint32_t screen_update_yumefuda(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void yumefuda(machine_config &config);
 };
 
 TILE_GET_INFO_MEMBER(albazg_state::y_get_bg_tile_info)
@@ -142,13 +143,13 @@ WRITE8_MEMBER(albazg_state::yumefuda_cram_w)
 /*Custom RAM (Thrash Protection)*/
 READ8_MEMBER(albazg_state::custom_ram_r)
 {
-//  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, space.device().safe_pc());
+//  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, m_maincpu->space(AS_PROGRAM).pc());
 	return m_cus_ram[offset];// ^ 0x55;
 }
 
 WRITE8_MEMBER(albazg_state::custom_ram_w)
 {
-//  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, space.device().safe_pc());
+//  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, m_maincpu->space(AS_PROGRAM).pc());
 	if(m_prot_lock)
 		m_cus_ram[offset] = data;
 }
@@ -156,7 +157,7 @@ WRITE8_MEMBER(albazg_state::custom_ram_w)
 /*this might be used as NVRAM commands btw*/
 WRITE8_MEMBER(albazg_state::prot_lock_w)
 {
-//  logerror("PC %04x Prot lock value written %02x\n", space.device().safe_pc(), data);
+//  logerror("PC %04x Prot lock value written %02x\n", m_maincpu->space(AS_PROGRAM).pc(), data);
 	m_prot_lock = data;
 }
 
@@ -211,8 +212,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, albazg_state )
 	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE(prot_lock_w)
 	AM_RANGE(0xa7ff, 0xa7ff) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0xaf80, 0xafff) AM_READWRITE(custom_ram_r, custom_ram_w) AM_SHARE("cus_ram")
-	AM_RANGE(0xb000, 0xb07f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xb080, 0xb0ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xb000, 0xb07f) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0xb080, 0xb0ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(yumefuda_vram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(yumefuda_cram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
@@ -346,7 +347,7 @@ void albazg_state::machine_reset()
 	m_prot_lock = 0;
 }
 
-static MACHINE_CONFIG_START( yumefuda )
+MACHINE_CONFIG_START(albazg_state::yumefuda)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80 , MASTER_CLOCK/2) /* xtal is 12 Mhz, unknown divider*/

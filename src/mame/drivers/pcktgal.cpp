@@ -221,7 +221,7 @@ void pcktgal_state::machine_start()
 	save_item(NAME(m_toggle));
 }
 
-static MACHINE_CONFIG_START( pcktgal )
+MACHINE_CONFIG_START(pcktgal_state::pcktgal)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 2000000)
@@ -269,13 +269,13 @@ static MACHINE_CONFIG_START( pcktgal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bootleg, pcktgal )
+MACHINE_CONFIG_DERIVED(pcktgal_state::bootleg, pcktgal)
 	MCFG_GFXDECODE_MODIFY("gfxdecode", bootleg)
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(pcktgal_state, screen_update_pcktgalb)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pcktgal2, pcktgal )
+MACHINE_CONFIG_DERIVED(pcktgal_state::pcktgal2, pcktgal)
 	MCFG_DEVICE_REMOVE("audiocpu")
 	MCFG_CPU_ADD("audiocpu", M6502, 1500000) /* doesn't use the encrypted 222 */
 	MCFG_CPU_PROGRAM_MAP(pcktgal_sound_map)

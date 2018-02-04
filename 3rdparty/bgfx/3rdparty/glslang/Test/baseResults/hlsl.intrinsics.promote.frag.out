@@ -1,5 +1,5 @@
 hlsl.intrinsics.promote.frag
-Shader version: 450
+Shader version: 500
 gl_FragCoord origin is upper left
 0:? Sequence
 0:20  Function Definition: @main( ( temp structure{ temp 4-component vector of float color})
@@ -341,8 +341,8 @@ gl_FragCoord origin is upper left
 0:51        move second child to first child ( temp float)
 0:51          'r50' ( temp float)
 0:51          Construct float ( temp float)
-0:?             imageLoad ( temp 4-component vector of float)
-0:51              'g_tTexbfs' (layout( r32f) readonly uniform imageBuffer)
+0:?             textureFetch ( temp 4-component vector of float)
+0:51              'g_tTexbfs' (layout( r32f) uniform textureBuffer)
 0:51              Convert uint to int ( temp int)
 0:51                upos: direct index for structure ( uniform uint)
 0:51                  'anon@0' (layout( row_major std140) uniform block{ uniform int i,  uniform uint u,  uniform float f,  uniform bool b,  uniform 2-component vector of int i2,  uniform 2-component vector of uint u2,  uniform 2-component vector of float f2,  uniform 2-component vector of bool b2,  uniform uint upos,  uniform float fpos})
@@ -352,8 +352,8 @@ gl_FragCoord origin is upper left
 0:52        move second child to first child ( temp float)
 0:52          'r51' ( temp float)
 0:52          Construct float ( temp float)
-0:?             imageLoad ( temp 4-component vector of float)
-0:52              'g_tTexbfs' (layout( r32f) readonly uniform imageBuffer)
+0:?             textureFetch ( temp 4-component vector of float)
+0:52              'g_tTexbfs' (layout( r32f) uniform textureBuffer)
 0:52              Convert float to int ( temp int)
 0:52                fpos: direct index for structure ( uniform float)
 0:52                  'anon@0' (layout( row_major std140) uniform block{ uniform int i,  uniform uint u,  uniform float f,  uniform bool b,  uniform 2-component vector of int i2,  uniform 2-component vector of uint u2,  uniform 2-component vector of float f2,  uniform 2-component vector of bool b2,  uniform uint upos,  uniform float fpos})
@@ -430,22 +430,22 @@ gl_FragCoord origin is upper left
 0:?     Sequence
 0:20      Sequence
 0:20        move second child to first child ( temp 4-component vector of float)
-0:?           'color' (layout( location=0) out 4-component vector of float)
+0:?           '@entryPointOutput.color' (layout( location=0) out 4-component vector of float)
 0:20          color: direct index for structure ( temp 4-component vector of float)
 0:20            Function Call: @main( ( temp structure{ temp 4-component vector of float color})
 0:20            Constant:
 0:20              0 (const int)
 0:?   Linker Objects
 0:?     'anon@0' (layout( row_major std140) uniform block{ uniform int i,  uniform uint u,  uniform float f,  uniform bool b,  uniform 2-component vector of int i2,  uniform 2-component vector of uint u2,  uniform 2-component vector of float f2,  uniform 2-component vector of bool b2,  uniform uint upos,  uniform float fpos})
-0:?     'g_tTexbfs' (layout( r32f) readonly uniform imageBuffer)
+0:?     'g_tTexbfs' (layout( r32f) uniform textureBuffer)
 0:?     'g_tTex1df4' ( uniform texture1D)
-0:?     'color' (layout( location=0) out 4-component vector of float)
+0:?     '@entryPointOutput.color' (layout( location=0) out 4-component vector of float)
 
 
 Linked fragment stage:
 
 
-Shader version: 450
+Shader version: 500
 gl_FragCoord origin is upper left
 0:? Sequence
 0:20  Function Definition: @main( ( temp structure{ temp 4-component vector of float color})
@@ -787,8 +787,8 @@ gl_FragCoord origin is upper left
 0:51        move second child to first child ( temp float)
 0:51          'r50' ( temp float)
 0:51          Construct float ( temp float)
-0:?             imageLoad ( temp 4-component vector of float)
-0:51              'g_tTexbfs' (layout( r32f) readonly uniform imageBuffer)
+0:?             textureFetch ( temp 4-component vector of float)
+0:51              'g_tTexbfs' (layout( r32f) uniform textureBuffer)
 0:51              Convert uint to int ( temp int)
 0:51                upos: direct index for structure ( uniform uint)
 0:51                  'anon@0' (layout( row_major std140) uniform block{ uniform int i,  uniform uint u,  uniform float f,  uniform bool b,  uniform 2-component vector of int i2,  uniform 2-component vector of uint u2,  uniform 2-component vector of float f2,  uniform 2-component vector of bool b2,  uniform uint upos,  uniform float fpos})
@@ -798,8 +798,8 @@ gl_FragCoord origin is upper left
 0:52        move second child to first child ( temp float)
 0:52          'r51' ( temp float)
 0:52          Construct float ( temp float)
-0:?             imageLoad ( temp 4-component vector of float)
-0:52              'g_tTexbfs' (layout( r32f) readonly uniform imageBuffer)
+0:?             textureFetch ( temp 4-component vector of float)
+0:52              'g_tTexbfs' (layout( r32f) uniform textureBuffer)
 0:52              Convert float to int ( temp int)
 0:52                fpos: direct index for structure ( uniform float)
 0:52                  'anon@0' (layout( row_major std140) uniform block{ uniform int i,  uniform uint u,  uniform float f,  uniform bool b,  uniform 2-component vector of int i2,  uniform 2-component vector of uint u2,  uniform 2-component vector of float f2,  uniform 2-component vector of bool b2,  uniform uint upos,  uniform float fpos})
@@ -876,19 +876,19 @@ gl_FragCoord origin is upper left
 0:?     Sequence
 0:20      Sequence
 0:20        move second child to first child ( temp 4-component vector of float)
-0:?           'color' (layout( location=0) out 4-component vector of float)
+0:?           '@entryPointOutput.color' (layout( location=0) out 4-component vector of float)
 0:20          color: direct index for structure ( temp 4-component vector of float)
 0:20            Function Call: @main( ( temp structure{ temp 4-component vector of float color})
 0:20            Constant:
 0:20              0 (const int)
 0:?   Linker Objects
 0:?     'anon@0' (layout( row_major std140) uniform block{ uniform int i,  uniform uint u,  uniform float f,  uniform bool b,  uniform 2-component vector of int i2,  uniform 2-component vector of uint u2,  uniform 2-component vector of float f2,  uniform 2-component vector of bool b2,  uniform uint upos,  uniform float fpos})
-0:?     'g_tTexbfs' (layout( r32f) readonly uniform imageBuffer)
+0:?     'g_tTexbfs' (layout( r32f) uniform textureBuffer)
 0:?     'g_tTex1df4' ( uniform texture1D)
-0:?     'color' (layout( location=0) out 4-component vector of float)
+0:?     '@entryPointOutput.color' (layout( location=0) out 4-component vector of float)
 
 // Module Version 10000
-// Generated by (magic number): 80001
+// Generated by (magic number): 80002
 // Id's are bound by 322
 
                               Capability Shader
@@ -899,6 +899,7 @@ gl_FragCoord origin is upper left
                               MemoryModel Logical GLSL450
                               EntryPoint Fragment 4  "main" 319
                               ExecutionMode 4 OriginUpperLeft
+                              Source HLSL 500
                               Name 4  "main"
                               Name 8  "PS_OUTPUT"
                               MemberName 8(PS_OUTPUT) 0  "color"
@@ -950,7 +951,7 @@ gl_FragCoord origin is upper left
                               Name 297  "NumberOfLevelsI"
                               Name 301  "sizeQueryTemp"
                               Name 310  "ps_output"
-                              Name 319  "color"
+                              Name 319  "@entryPointOutput.color"
                               MemberDecorate 19($Global) 0 Offset 0
                               MemberDecorate 19($Global) 1 Offset 4
                               MemberDecorate 19($Global) 2 Offset 8
@@ -964,9 +965,8 @@ gl_FragCoord origin is upper left
                               Decorate 19($Global) Block
                               Decorate 21 DescriptorSet 0
                               Decorate 258(g_tTexbfs) DescriptorSet 0
-                              Decorate 258(g_tTexbfs) NonWritable
                               Decorate 277(g_tTex1df4) DescriptorSet 0
-                              Decorate 319(color) Location 0
+                              Decorate 319(@entryPointOutput.color) Location 0
                2:             TypeVoid
                3:             TypeFunction 2
                6:             TypeFloat 32
@@ -1013,7 +1013,7 @@ gl_FragCoord origin is upper left
              107:   16(ivec2) ConstantComposite 44 44
              109:     14(int) Constant 4
              110:             TypePointer Uniform 16(ivec2)
-             256:             TypeImage 6(float) Buffer nonsampled format:R32f
+             256:             TypeImage 6(float) Buffer sampled format:R32f
              257:             TypePointer UniformConstant 256
   258(g_tTexbfs):    257(ptr) Variable UniformConstant
              260:     14(int) Constant 8
@@ -1025,12 +1025,12 @@ gl_FragCoord origin is upper left
              309:             TypePointer Function 8(PS_OUTPUT)
              313:             TypePointer Function 7(fvec4)
              318:             TypePointer Output 7(fvec4)
-      319(color):    318(ptr) Variable Output
+319(@entryPointOutput.color):    318(ptr) Variable Output
          4(main):           2 Function None 3
                5:             Label
              320:8(PS_OUTPUT) FunctionCall 10(@main()
              321:    7(fvec4) CompositeExtract 320 0
-                              Store 319(color) 321
+                              Store 319(@entryPointOutput.color) 321
                               Return
                               FunctionEnd
       10(@main():8(PS_OUTPUT) Function None 9
@@ -1275,14 +1275,14 @@ gl_FragCoord origin is upper left
              261:     23(ptr) AccessChain 21 260
              262:     15(int) Load 261
              263:     14(int) Bitcast 262
-             264:    7(fvec4) ImageRead 259 263
+             264:    7(fvec4) ImageFetch 259 263
              265:    6(float) CompositeExtract 264 0
                               Store 255(r50) 265
              267:         256 Load 258(g_tTexbfs)
              269:     33(ptr) AccessChain 21 268
              270:    6(float) Load 269
              271:     14(int) ConvertFToS 270
-             272:    7(fvec4) ImageRead 267 271
+             272:    7(fvec4) ImageFetch 267 271
              273:    6(float) CompositeExtract 272 0
                               Store 266(r51) 273
              278:         275 Load 277(g_tTex1df4)

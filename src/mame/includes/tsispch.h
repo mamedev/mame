@@ -41,6 +41,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p0_w);
 	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p1_w);
 
+	void prose2k(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 

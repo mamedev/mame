@@ -337,6 +337,7 @@ public:
 	DECLARE_PALETTE_INIT(peplus);
 	void handle_lightpen();
 
+	void peplus(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
@@ -1325,9 +1326,9 @@ void peplus_state::machine_reset()
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( peplus )
+MACHINE_CONFIG_START(peplus_state::peplus)
 	// basic machine hardware
-	MCFG_CPU_ADD("maincpu", I80C32, XTAL_20MHz/2) /* 10MHz */
+	MCFG_CPU_ADD("maincpu", I80C32, XTAL(20'000'000)/2) /* 10MHz */
 	MCFG_CPU_PROGRAM_MAP(peplus_map)
 	MCFG_CPU_IO_MAP(peplus_iomap)
 
@@ -1345,7 +1346,7 @@ static MACHINE_CONFIG_START( peplus )
 	MCFG_PALETTE_ADD("palette", 16*16*2)
 	MCFG_PALETTE_INIT_OWNER(peplus_state, peplus)
 
-	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL_20MHz/8/3)
+	MCFG_MC6845_ADD("crtc", R6545_1, "screen", XTAL(20'000'000)/8/3)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_ADDR_CHANGED_CB(peplus_state, crtc_addr)
@@ -1356,7 +1357,7 @@ static MACHINE_CONFIG_START( peplus )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_20MHz/12)
+	MCFG_SOUND_ADD("aysnd", AY8912, XTAL(20'000'000)/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
@@ -8313,7 +8314,7 @@ ROM_START( peps0239 ) /* Normal board : Jackpot Jewels Slots (PS0239) - Payout 9
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg1151.u72",   0x00000, 0x8000, BAD_DUMP CRC(596f1207) SHA1(d66acfa509e33e9fe2dce89ef4c19909a578b3bf) ) /*  08/24/92   @ IGT  MN */
-	ROM_LOAD( "mgo-cg1151.u73",   0x08000, 0x8000, BAD_DUMP CRC(aa4984ca) SHA1(2bbf2eba739b6cac7459a8021535967520c198ba) ) 
+	ROM_LOAD( "mgo-cg1151.u73",   0x08000, 0x8000, BAD_DUMP CRC(aa4984ca) SHA1(2bbf2eba739b6cac7459a8021535967520c198ba) )
 	ROM_LOAD( "mbo-cg1151.u74",   0x10000, 0x8000, BAD_DUMP CRC(cf13bf00) SHA1(beaaa9acf660bb2c59d68f9f971b1e8f11bd81e9) ) /* one of these four roms are bad as there are 7 rogue */
 	ROM_LOAD( "mxo-cg1151.u75",   0x18000, 0x8000, BAD_DUMP CRC(659d72db) SHA1(973ccd71a7993d1885f1dbd0f877f18133650616) ) /* "green" dots in the single BAR with Diamond graphic */
 

@@ -918,7 +918,7 @@ DEFINE_DEVICE_TYPE(ISA8_HDC_EC1841, isa8_hdc_ec1841_device, "isa_hdc_ec1841", "E
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa8_hdc_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_hdc_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("hdc",XT_HDC,0)
 	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(isa8_hdc_device,irq_w))
 	MCFG_XTHDC_DRQ_HANDLER(WRITELINE(isa8_hdc_device,drq_w))
@@ -926,7 +926,7 @@ MACHINE_CONFIG_MEMBER( isa8_hdc_device::device_add_mconfig )
 	MCFG_HARDDISK_ADD("hdc:slave")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( isa8_hdc_ec1841_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_hdc_ec1841_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("hdc",EC1841_HDC,0)
 	MCFG_XTHDC_IRQ_HANDLER(WRITELINE(isa8_hdc_ec1841_device,irq_w))
 	MCFG_XTHDC_DRQ_HANDLER(WRITELINE(isa8_hdc_ec1841_device,drq_w))

@@ -912,8 +912,10 @@ void aica_device::w16(address_space &space,unsigned int addr,unsigned short val)
 		//DSP
 		if(addr<0x3200) //COEF
 			*((unsigned short *) (m_DSP.COEF+(addr-0x3000)/2))=val;
-		else if(addr<0x3400)
+		else if(addr<0x3300)
 			*((unsigned short *) (m_DSP.MADRS+(addr-0x3200)/2))=val;
+		else if(addr<0x3400)
+			popmessage("AICADSP write to undocumented reg %04x -> %04x", addr, val);
 		else if(addr<0x3c00)
 		{
 			*((unsigned short *) (m_DSP.MPRO+(addr-0x3400)/2))=val;
@@ -972,6 +974,8 @@ unsigned short aica_device::r16(address_space &space, unsigned int addr)
 		{
 			v = m_EFSPAN[addr&0x7f];
 		}
+		else if (addr < 0x2800)
+			popmessage("AICA read undocumented reg %04x", addr);
 		else if (addr < 0x28be)
 		{
 			UpdateRegR(space, addr&0xff);
@@ -992,15 +996,14 @@ unsigned short aica_device::r16(address_space &space, unsigned int addr)
 	{
 		if(addr<0x3200) //COEF
 			v= *((unsigned short *) (m_DSP.COEF+(addr-0x3000)/2));
-		else if(addr<0x3400)
+		else if(addr<0x3300)
 			v= *((unsigned short *) (m_DSP.MADRS+(addr-0x3200)/2));
+		else if(addr<0x3400)
+			popmessage("AICADSP read undocumented reg %04x", addr);
 		else if(addr<0x3c00)
 			v= *((unsigned short *) (m_DSP.MPRO+(addr-0x3400)/2));
 		else if(addr<0x4000)
-		{
-			v= 0xffff;
-			popmessage("AICADSP read to undocumented reg %04x",addr);
-		}
+			popmessage("AICADSP read undocumented reg %04x",addr);
 		else if(addr<0x4400)
 		{
 			if(addr & 4)

@@ -149,6 +149,15 @@ public:
 	TIMER_CALLBACK_MEMBER(dma_callback);
 	TIMER_CALLBACK_MEMBER(autoerase_line);
 
+	void term2(machine_config &config);
+	void yunit_cvsd_4bit_fast(machine_config &config);
+	void yunit_adpcm_6bit_fast(machine_config &config);
+	void yunit_cvsd_6bit_slow(machine_config &config);
+	void yunit_cvsd_4bit_slow(machine_config &config);
+	void mkyawdim(machine_config &config);
+	void yunit_core(machine_config &config);
+	void zunit(machine_config &config);
+	void yunit_adpcm_6bit_faster(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void dma_draw(uint16_t command);

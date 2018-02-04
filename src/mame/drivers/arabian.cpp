@@ -55,7 +55,7 @@
 
 
 /* constants */
-#define MAIN_OSC        XTAL_12MHz
+#define MAIN_OSC        XTAL(12'000'000)
 
 
 /*************************************
@@ -353,7 +353,7 @@ void arabian_state::machine_reset()
 	m_video_control = 0;
 }
 
-static MACHINE_CONFIG_START( arabian )
+MACHINE_CONFIG_START(arabian_state::arabian)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_OSC/4)

@@ -162,7 +162,7 @@ WRITE16_MEMBER(darius_state::cpua_ctrl_w)
 
 	parse_control();
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n", space.device().safe_pc(), data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n", m_maincpu->pc(), data);
 }
 
 
@@ -210,7 +210,7 @@ static ADDRESS_MAP_START( darius_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0xd20000, 0xd20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
 	AM_RANGE(0xd40000, 0xd40003) AM_DEVWRITE("pc080sn", pc080sn_device, xscroll_word_w)
 	AM_RANGE(0xd50000, 0xd50003) AM_DEVWRITE("pc080sn", pc080sn_device, ctrl_word_w)
-	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* palette */
+	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")/* palette */
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("fg_ram")
@@ -221,7 +221,7 @@ static ADDRESS_MAP_START( darius_cpub_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM             /* local RAM */
 	AM_RANGE(0xc00050, 0xc00051) AM_NOP // unknown, written by both cpus - always 0?
-	AM_RANGE(0xd80000, 0xd80fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd80000, 0xd80fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("fg_ram")
@@ -698,21 +698,21 @@ void darius_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( darius )
+MACHINE_CONFIG_START(darius_state::darius)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)  /* 8 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(16'000'000)/2)  /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(darius_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", darius_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2) /* 4 MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* 4 MHz */
 	MCFG_CPU_PROGRAM_MAP(darius_sound_map)
 
-	MCFG_CPU_ADD("cpub", M68000, XTAL_16MHz/2) /* 8 MHz */
+	MCFG_CPU_ADD("cpub", M68000, XTAL(16'000'000)/2) /* 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(darius_cpub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", darius_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("adpcm", Z80, XTAL_8MHz/2) /* 4 MHz */  /* ADPCM player using MSM5205 */
+	MCFG_CPU_ADD("adpcm", Z80, XTAL(8'000'000)/2) /* 4 MHz */  /* ADPCM player using MSM5205 */
 	MCFG_CPU_PROGRAM_MAP(darius_sound2_map)
 	MCFG_CPU_IO_MAP(darius_sound2_io_map)
 
@@ -760,7 +760,7 @@ static MACHINE_CONFIG_START( darius )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_8MHz/2) /* 4 MHz */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(8'000'000)/2) /* 4 MHz */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) /* assumes Z80 sandwiched between 68Ks */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(darius_state, darius_write_portA0))  /* portA write */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(darius_state, darius_write_portB0))  /* portB write */
@@ -773,7 +773,7 @@ static MACHINE_CONFIG_START( darius )
 	MCFG_SOUND_ROUTE(3, "filter0.3l", 0.60)
 	MCFG_SOUND_ROUTE(3, "filter0.3r", 0.60)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_8MHz/2) /* 4 MHz */
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(8'000'000)/2) /* 4 MHz */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(darius_state, darius_write_portA1))  /* portA write */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(darius_state, darius_write_portB1))  /* portB write */
 	MCFG_SOUND_ROUTE(0, "filter1.0l", 0.08)
@@ -785,7 +785,7 @@ static MACHINE_CONFIG_START( darius )
 	MCFG_SOUND_ROUTE(3, "filter1.3l", 0.60)
 	MCFG_SOUND_ROUTE(3, "filter1.3r", 0.60)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(darius_state, darius_adpcm_int))   /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)      /* 8KHz   */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.l", 1.0)

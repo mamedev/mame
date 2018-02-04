@@ -86,6 +86,7 @@ public:
 
 	DECLARE_READ8_MEMBER(unknown_r) { return machine().rand(); }
 
+	void midcoin24cdjuke(machine_config &config);
 private:
 	uint8_t m_kb_col;
 };
@@ -116,7 +117,7 @@ WRITE8_MEMBER(midcoin24cdjuke_state::digit_w)
 {
 	uint16_t char_data = m_charset[((data & 0x60) << 1) | (data & 0x1f)];
 
-	char_data = BITSWAP16(char_data, 13,11,9,15,14,10,12,8,7,6,5,4,3,2,1,0);
+	char_data = bitswap<16>(char_data, 13,11,9,15,14,10,12,8,7,6,5,4,3,2,1,0);
 
 	output().set_digit_value(offset, char_data ^ 0xffff);
 }
@@ -273,7 +274,7 @@ void midcoin24cdjuke_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( midcoin24cdjuke )
+MACHINE_CONFIG_START(midcoin24cdjuke_state::midcoin24cdjuke)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,6000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(midcoin24cdjuke_map)

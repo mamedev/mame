@@ -66,6 +66,13 @@ public:
 	void primo_setup_pp (uint8_t* quickload_data, uint32_t quickload_size);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( primo );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( primo );
+	void primob32(machine_config &config);
+	void primob64(machine_config &config);
+	void primoa32(machine_config &config);
+	void primob48(machine_config &config);
+	void primoa64(machine_config &config);
+	void primoc64(machine_config &config);
+	void primoa48(machine_config &config);
 };
 
 

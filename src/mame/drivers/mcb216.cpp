@@ -52,6 +52,8 @@ public:
 	DECLARE_MACHINE_RESET(mcb216);
 	DECLARE_MACHINE_RESET(cb308);
 
+	void mcb216(machine_config &config);
+	void cb308(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;
@@ -131,7 +133,7 @@ MACHINE_RESET_MEMBER( mcb216_state, cb308 )
 	m_maincpu->set_state_int(Z80_PC, 0xe000);
 }
 
-static MACHINE_CONFIG_START( mcb216 )
+MACHINE_CONFIG_START(mcb216_state::mcb216)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(mcb216_mem)
@@ -147,7 +149,7 @@ static MACHINE_CONFIG_START( mcb216 )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cb308 )
+MACHINE_CONFIG_START(mcb216_state::cb308)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(cb308_mem)

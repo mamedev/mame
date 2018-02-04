@@ -71,4 +71,8 @@ public:
 	uint32_t screen_update_sauro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sauro_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void trckydoc_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void trckydoc(machine_config &config);
+	void tecfri(machine_config &config);
+	void sauro(machine_config &config);
+	void saurob(machine_config &config);
 };

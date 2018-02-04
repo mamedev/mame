@@ -25,10 +25,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::fastlane_scanline)
 {
 	int scanline = param;
 
-	address_space &space = generic_space();
-	if(scanline == 240 && m_k007121->ctrlram_r(space, 7) & 0x02) // vblank irq
+	if(scanline == 240 && m_k007121->ctrlram_r(7) & 0x02) // vblank irq
 		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
-	else if(((scanline % 32) == 0) && m_k007121->ctrlram_r(space, 7) & 0x01) // timer irq
+	else if(((scanline % 32) == 0) && m_k007121->ctrlram_r(7) & 0x01) // timer irq
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -199,10 +198,10 @@ void fastlane_state::machine_start()
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_CONFIG_START( fastlane )
+MACHINE_CONFIG_START(fastlane_state::fastlane)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", HD6309, XTAL_24MHz/2) // 3MHz(XTAL_24MHz/8) internally
+	MCFG_CPU_ADD("maincpu", HD6309, XTAL(24'000'000)/2) // 3MHz(XTAL(24'000'000)/8) internally
 	MCFG_CPU_PROGRAM_MAP(fastlane_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", fastlane_state, fastlane_scanline, "screen", 0, 1)
 
@@ -230,12 +229,12 @@ static MACHINE_CONFIG_START( fastlane )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("k007232_1", K007232, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("k007232_1", K007232, XTAL(3'579'545))
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(fastlane_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MCFG_SOUND_ADD("k007232_2", K007232, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("k007232_2", K007232, XTAL(3'579'545))
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(fastlane_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)

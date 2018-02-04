@@ -99,6 +99,7 @@ public:
 	uint32_t screen_update_gamecstl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
 	void intel82439tx_init();
+	void gamecstl(machine_config &config);
 };
 
 
@@ -428,7 +429,7 @@ void gamecstl_state::machine_reset()
 	membank("bank1")->set_base(memregion("bios")->base() + 0x30000);
 }
 
-static MACHINE_CONFIG_START( gamecstl )
+MACHINE_CONFIG_START(gamecstl_state::gamecstl)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 200000000)
 	MCFG_CPU_PROGRAM_MAP(gamecstl_map)

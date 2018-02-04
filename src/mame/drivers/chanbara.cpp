@@ -104,6 +104,7 @@ public:
 	DECLARE_PALETTE_INIT(chanbara);
 	uint32_t screen_update_chanbara(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void chanbara(machine_config &config);
 };
 
 
@@ -385,20 +386,20 @@ void chanbara_state::machine_reset()
 	m_scrollhi = 0;
 }
 
-static MACHINE_CONFIG_START( chanbara )
+MACHINE_CONFIG_START(chanbara_state::chanbara)
 
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_12MHz/8)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL(12'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(chanbara_map)
 
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//	MCFG_SCREEN_REFRESH_RATE(57.4122)
-//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-//	MCFG_SCREEN_SIZE(32*8, 32*8)
-//	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+//  MCFG_SCREEN_REFRESH_RATE(57.4122)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 	// DECO video CRTC
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,272,16,240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2,384,0,256,272,16,240)
 	MCFG_SCREEN_UPDATE_DRIVER(chanbara_state, screen_update_chanbara)
 	MCFG_SCREEN_PALETTE("palette")
 

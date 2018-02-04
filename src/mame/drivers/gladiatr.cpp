@@ -141,7 +141,7 @@ Address          Dir Data     Name      Description
 --------111-----   W xxxxxxxx ADCS      command to 6809
 
 
-Third CPU (6809)
+Third CPU (HD6809)
 ----------------
 
 Address          Dir Data     Name      Description
@@ -299,7 +299,7 @@ READ8_MEMBER(gladiatr_state::cctl_p2_r)
 
 READ8_MEMBER(gladiatr_state::ucpu_p2_r)
 {
-	return BITSWAP8(m_dsw1->read(), 0,1,2,3,4,5,6,7);
+	return bitswap<8>(m_dsw1->read(), 0,1,2,3,4,5,6,7);
 }
 
 WRITE8_MEMBER(gladiatr_state::ccpu_p2_w)
@@ -356,7 +356,7 @@ WRITE8_MEMBER(gladiatr_state::csnd_p1_w)
 
 READ8_MEMBER(gladiatr_state::csnd_p2_r)
 {
-	return BITSWAP8(m_dsw2->read(), 2,3,4,5,6,7,1,0);
+	return bitswap<8>(m_dsw2->read(), 2,3,4,5,6,7,1,0);
 }
 
 
@@ -397,27 +397,27 @@ READ8_MEMBER(ppking_state::ppking_f1_r)
  *
  * Ping Pong King MCU simulation
  *
- * 0x8ad = 
+ * 0x8ad =
  * 0x8f6 = IO check (must return 0x40)
- * 
+ *
  **********************************/
 
 //#include "debugger.h"
- 
+
 inline bool ppking_state::mcu_parity_check()
 {
 	int i;
 	uint8_t res = 0;
-	
+
 	for(i=0;i<8;i++)
 	{
 		if(m_mcu[0].rxd & (1 << i))
 			res++;
 	}
-	
+
 	if(res % 2)
 		return false;
-	
+
 	return true;
 }
 
@@ -442,7 +442,7 @@ inline void ppking_state::mcu_input_check()
 
 READ8_MEMBER(ppking_state::ppking_qx0_r)
 {
-	// status 
+	// status
 	if(offset == 1)
 		return 1;
 
@@ -461,11 +461,11 @@ READ8_MEMBER(ppking_state::ppking_qx0_r)
 				else
 				{
 					m_mcu[0].rxd = ((ioport("SYSTEM")->read()) & 0x9f);
-				}				
+				}
 
 				break;
 			}
-			
+
 			case 2:
 			{
 				m_mcu[0].packet_type^=1;
@@ -479,10 +479,10 @@ READ8_MEMBER(ppking_state::ppking_qx0_r)
 					m_mcu[0].rxd = ((ioport("P1")->read()) & 0x3f);
 					m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
 				}
-				
+
 				break;
 			}
-			
+
 			case 3:
 			{
 				m_mcu[0].packet_type^=1;
@@ -496,22 +496,22 @@ READ8_MEMBER(ppking_state::ppking_qx0_r)
 					m_mcu[0].rxd = ((ioport("P2")->read()) & 0x3f);
 					m_mcu[0].rxd |= ((ioport("SYSTEM")->read()) & 0x80);
 				}
-				
+
 				break;
 			}
 		}
-		
+
 		if(mcu_parity_check() == false)
 			m_mcu[0].rxd |= 0x40;
 	}
 
 	//printf("%04x rst %d\n",m_maincpu->pc(),m_mcu[0].rst);
-	
+
 	return m_mcu[0].rxd;
 }
 
 WRITE8_MEMBER(ppking_state::ppking_qx0_w)
-{	
+{
 	if(offset == 1)
 	{
 		switch(data)
@@ -580,10 +580,10 @@ READ8_MEMBER(ppking_state::ppking_qx1_r)
 	// status
 	if(offset == 1)
 		return 1;
-	
+
 	if(m_mcu[1].rst == 1)
 		return 0x40;
-	
+
 	return m_soundlatch2->read(space,0);
 }
 
@@ -591,7 +591,7 @@ READ8_MEMBER(ppking_state::ppking_qx3_r)
 {
 	if(offset == 1)
 		return 1;
-	
+
 	return 0;
 }
 
@@ -602,7 +602,7 @@ READ8_MEMBER(ppking_state::ppking_qxcomu_r)
 {
 	if(offset == 1)
 		return 1;
-	
+
 	return 0;
 }
 
@@ -612,7 +612,7 @@ WRITE8_MEMBER(ppking_state::ppking_qxcomu_w)
 }
 
 MACHINE_RESET_MEMBER(ppking_state, ppking)
-{	
+{
 	// yes, it expects to read DSW1 without sending commands first ...
 	m_mcu[0].rxd = (ioport("DSW1")->read() & 0x1f) << 2;;
 	m_mcu[0].rst = 0;
@@ -640,7 +640,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, ppking_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
-//	AM_RANGE(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
+//  AM_RANGE(0xc004, 0xc004) AM_NOP // WRITE(ppking_irq_patch_w)
 	AM_RANGE(0xc09e, 0xc09f) AM_READ(ppking_qx0_r) AM_WRITE(ppking_qx0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP // watchdog
 	AM_RANGE(0xc0c0, 0xc0c1) AM_READ(ppking_qxcomu_r) AM_WRITE(ppking_qxcomu_w)
@@ -683,8 +683,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8, gladiatr_state )
-	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
 	AM_RANGE(0xc000, 0xc007) AM_DEVWRITE("mainlatch", ls259_device, write_d0)
+	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
 	AM_RANGE(0xc09e, 0xc09f) AM_DEVREADWRITE("ucpu", upi41_cpu_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP // watchdog_reset_w doesn't work
 ADDRESS_MAP_END
@@ -708,9 +708,9 @@ static INPUT_PORTS_START( ppking )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) 
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
@@ -734,7 +734,7 @@ static INPUT_PORTS_START( ppking )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
-	
+
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:7,6")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
@@ -749,7 +749,7 @@ static INPUT_PORTS_START( ppking )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_START("DSW2")
 	// TODO: coinage not working (controlled by MCU)
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:8,7")
@@ -766,7 +766,7 @@ static INPUT_PORTS_START( ppking )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	
+
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
@@ -933,20 +933,20 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( ppking )
+MACHINE_CONFIG_START(ppking_state::ppking)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, 12_MHz_XTAL/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(ppking_cpu1_map)
 	MCFG_CPU_IO_MAP(ppking_cpu1_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ppking_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("sub", Z80, 12_MHz_XTAL/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(ppking_cpu2_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ppking_state,  irq0_line_assert, 60)
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(ppking_cpu3_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
@@ -956,20 +956,20 @@ static MACHINE_CONFIG_START( ppking )
 
 	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // 5L on main board
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(ppking_state, spritebuffer_w))
-//	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gladiatr_state, spritebank_w))
-//	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(MEMBANK("bank1"))
-//	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ppking_state, nmi_mask_w))
-//	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
+//  MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(gladiatr_state, spritebank_w))
+//  MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(MEMBANK("bank1"))
+//  MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(ppking_state, nmi_mask_w))
+//  MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
 //  Q6 used
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(ppking_state, flipscreen_w))
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-//	MCFG_SCREEN_REFRESH_RATE(60)
-//	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//	MCFG_SCREEN_SIZE(32*8, 32*8)
-//	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2,384,0,256,264,16,240) // assume same as Arkanoid
+//  MCFG_SCREEN_REFRESH_RATE(60)
+//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+//  MCFG_SCREEN_SIZE(32*8, 32*8)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_RAW_PARAMS(12_MHz_XTAL/2,384,0,256,264,16,240) // assume same as Arkanoid
 	MCFG_SCREEN_UPDATE_DRIVER(ppking_state, screen_update_ppking)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -984,7 +984,7 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, 12_MHz_XTAL/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, ym_irq))
 	MCFG_AY8910_PORT_A_READ_CB(READ8(ppking_state, ppking_f1_r))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
@@ -993,24 +993,24 @@ static MACHINE_CONFIG_START( ppking )
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
+	MCFG_SOUND_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gladiatr )
+MACHINE_CONFIG_START(gladiatr_state::gladiatr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", Z80, 12_MHz_XTAL/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu1_map)
 	MCFG_CPU_IO_MAP(gladiatr_cpu1_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gladiatr_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("sub", Z80, 12_MHz_XTAL/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(gladiatr_cpu2_io)
 
-	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", MC6809, 12_MHz_XTAL/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu3_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
@@ -1023,27 +1023,27 @@ static MACHINE_CONFIG_START( gladiatr )
 	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("sub", INPUT_LINE_RESET)) // shadowed by aforementioned hack
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(gladiatr_state, flipscreen_w))
 
-	MCFG_DEVICE_ADD("cctl", I8741, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_DEVICE_ADD("cctl", I8741, 12_MHz_XTAL/2) /* verified on pcb */
 	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(3)
 	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(2)
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, cctl_p1_r))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, cctl_p2_r))
 
-	MCFG_DEVICE_ADD("ccpu", I8741, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_DEVICE_ADD("ccpu", I8741, 12_MHz_XTAL/2) /* verified on pcb */
 	MCFG_MCS48_PORT_P1_IN_CB(IOPORT("IN0"))
 	MCFG_MCS48_PORT_P2_IN_CB(IOPORT("IN1"))
 	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(gladiatr_state, ccpu_p2_w))
 	MCFG_MCS48_PORT_T0_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(1)
 	MCFG_MCS48_PORT_T1_IN_CB(IOPORT("COINS")) MCFG_DEVCB_RSHIFT(0)
 
-	MCFG_DEVICE_ADD("ucpu", I8741, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_DEVICE_ADD("ucpu", I8741, 12_MHz_XTAL/2) /* verified on pcb */
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, ucpu_p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(gladiatr_state, ucpu_p1_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, ucpu_p2_r))
 	MCFG_MCS48_PORT_T0_IN_CB(READLINE(gladiatr_state, tclk_r))
 	MCFG_MCS48_PORT_T1_IN_CB(READLINE(gladiatr_state, ucpu_t1_r))
 
-	MCFG_DEVICE_ADD("csnd", I8741, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_DEVICE_ADD("csnd", I8741, 12_MHz_XTAL/2) /* verified on pcb */
 	MCFG_MCS48_PORT_P1_IN_CB(READ8(gladiatr_state, csnd_p1_r))
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(gladiatr_state, csnd_p1_w))
 	MCFG_MCS48_PORT_P2_IN_CB(READ8(gladiatr_state, csnd_p2_r))
@@ -1053,7 +1053,7 @@ static MACHINE_CONFIG_START( gladiatr )
 	/* lazy way to make polled serial between MCUs work */
 	MCFG_QUANTUM_PERFECT_CPU("ucpu")
 
-	MCFG_CLOCK_ADD("tclk", XTAL_12MHz/8/128/2) /* verified on pcb */
+	MCFG_CLOCK_ADD("tclk", 12_MHz_XTAL/8/128/2) /* verified on pcb */
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(gladiatr_state, tclk_w));
 
 	/* video hardware */
@@ -1075,7 +1075,7 @@ static MACHINE_CONFIG_START( gladiatr )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_ADD("ymsnd", YM2203, 12_MHz_XTAL/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state_base, ym_irq))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3")) /* port B read */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(gladiatr_state, gladiator_int_control_w)) /* port A write */
@@ -1084,7 +1084,7 @@ static MACHINE_CONFIG_START( gladiatr )
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)
 	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
+	MCFG_SOUND_ADD("msm", MSM5205, 455_kHz_XTAL) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
@@ -1115,7 +1115,7 @@ ROM_START( ppking )
 	ROM_RELOAD(                 0x08000, 0x2000 )
 	ROM_LOAD( "q0_18.5m",       0x0e000, 0x2000, CRC(89ba64f8) SHA1(fa01316ea744b4277ee64d5f14cb6d7e3a949f2b) )
 	ROM_RELOAD(                 0x0c000, 0x2000 )
-	
+
 	ROM_REGION( 0x02000, "gfx1", 0 )
 	ROM_LOAD( "q0_15.1r",       0x00000, 0x2000, CRC(fbd33219) SHA1(78b9bb327ededaa818d26c41c5e8fd1c041ef142) )
 

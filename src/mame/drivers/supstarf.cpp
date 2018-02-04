@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lights_a_w);
 	DECLARE_WRITE8_MEMBER(lights_b_w);
 
+	void supstarf(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -163,14 +164,14 @@ void supstarf_state::machine_start()
 	save_item(NAME(m_port1_data));
 }
 
-static MACHINE_CONFIG_START(supstarf)
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
+MACHINE_CONFIG_START(supstarf_state::supstarf)
+	MCFG_CPU_ADD("maincpu", I8085A, XTAL(5'068'800))
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_I8085A_SID(READLINE(supstarf_state, contacts_r))
 	MCFG_I8085A_SOD(WRITELINE(supstarf_state, displays_w))
 
-	MCFG_CPU_ADD("soundcpu", I8035, XTAL_5_0688MHz / 2) // from 8085 pin 37 (CLK OUT)
+	MCFG_CPU_ADD("soundcpu", I8035, XTAL(5'068'800) / 2) // from 8085 pin 37 (CLK OUT)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(supstarf_state, port1_w))
@@ -188,12 +189,12 @@ static MACHINE_CONFIG_START(supstarf)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("psg1", AY8910, XTAL_5_0688MHz / 6) // from 8035 pin 1 (T0)
+	MCFG_SOUND_ADD("psg1", AY8910, XTAL(5'068'800) / 6) // from 8035 pin 1 (T0)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(supstarf_state, lights_a_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(supstarf_state, lights_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("psg2", AY8910, XTAL_5_0688MHz / 6) // from 8035 pin 1 (T0)
+	MCFG_SOUND_ADD("psg2", AY8910, XTAL(5'068'800) / 6) // from 8035 pin 1 (T0)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("JO"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("I1"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)

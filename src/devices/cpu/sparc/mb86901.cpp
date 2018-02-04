@@ -43,7 +43,6 @@ const int mb86901_device::NWINDOWS = 7;
 mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, MB86901, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 32, 32)
-	, m_dasm(this, 7)
 {
 }
 
@@ -257,7 +256,7 @@ void mb86901_device::device_start()
 	state_add(SPARC_WIM,        "WIM",      m_wim).formatstr("%08X");
 	state_add(SPARC_TBR,        "TBR",      m_tbr).formatstr("%08X");
 	state_add(SPARC_Y,          "Y",        m_y).formatstr("%08X");
-	state_add(SPARC_ANNUL,      "ANNUL",    m_annul).formatstr("%01d");
+	state_add(SPARC_ANNUL,      "ANNUL",    m_annul).formatstr("%01u");
 	state_add(SPARC_ICC,        "icc",      m_icc).formatstr("%4s");
 	state_add(SPARC_CWP,        "CWP",      m_cwp).formatstr("%2d");
 	char regname[3] = "g0";
@@ -286,12 +285,12 @@ void mb86901_device::device_start()
 		state_add(SPARC_I0 + i, regname, m_dbgregs[16+i]).formatstr("%08X");
 	}
 
-	state_add(SPARC_EC,     "EC",       m_ec).formatstr("%1d");
-	state_add(SPARC_EF,     "EF",       m_ef).formatstr("%1d");
-	state_add(SPARC_ET,     "ET",       m_et).formatstr("%1d");
+	state_add(SPARC_EC,     "EC",       m_ec).formatstr("%1u");
+	state_add(SPARC_EF,     "EF",       m_ef).formatstr("%1u");
+	state_add(SPARC_ET,     "ET",       m_et).formatstr("%1u");
 	state_add(SPARC_PIL,    "PIL",      m_pil).formatstr("%2d");
-	state_add(SPARC_S,      "S",        m_s).formatstr("%1d");
-	state_add(SPARC_PS,     "PS",       m_ps).formatstr("%1d");
+	state_add(SPARC_S,      "S",        m_s).formatstr("%1u");
+	state_add(SPARC_PS,     "PS",       m_ps).formatstr("%1u");
 
 	char rname[5];
 	for (int i = 0; i < 120; i++)
@@ -520,36 +519,15 @@ void mb86901_device::state_string_export(const device_state_entry &entry, std::s
 
 
 //-------------------------------------------------
-//  disasm_min_opcode_bytes - return the length
-//  of the shortest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t mb86901_device::disasm_min_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_max_opcode_bytes - return the length
-//  of the longest instruction, in bytes
-//-------------------------------------------------
-
-uint32_t mb86901_device::disasm_max_opcode_bytes() const
-{
-	return 4;
-}
-
-
-//-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t mb86901_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *mb86901_device::create_disassembler()
 {
-	uint32_t op = *reinterpret_cast<const uint32_t *>(oprom);
-	return m_dasm.dasm(stream, pc, big_endianize_int32(op));
+	auto dasm = new sparc_disassembler(this, 7);
+	m_asi_desc_adder(dasm);
+	return dasm;
 }
 
 

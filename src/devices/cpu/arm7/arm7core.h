@@ -163,7 +163,7 @@ struct arm_state
 	int m_icount;
 	endianness_t m_endian;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<0> *m_direct;
 
 	/* Coprocessor Registers */
 	uint32_t m_control;
@@ -469,11 +469,6 @@ enum
 	COND_AL,              /*  1           always                  */
 	COND_NV               /*  0           never                   */
 };
-
-#define LSL(v, s) ((v) << (s))
-#define LSR(v, s) ((v) >> (s))
-#define ROL(v, s) (LSL((v), (s)) | (LSR((v), 32u - (s))))
-#define ROR(v, s) (LSR((v), (s)) | (LSL((v), 32u - (s))))
 
 /* Convenience Macros */
 #define R15                     m_r[eR15]

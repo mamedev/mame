@@ -27,6 +27,7 @@ public:
 	DECLARE_READ16_MEMBER(keyin_r);
 	DECLARE_READ16_MEMBER(status_r);
 
+	void lft(machine_config &config);
 private:
 	uint8_t m_term_data;
 	virtual void machine_reset() override;
@@ -83,7 +84,7 @@ void lft_state::machine_reset()
 	m_term_data = 0;
 }
 
-static MACHINE_CONFIG_START( lft )
+MACHINE_CONFIG_START(lft_state::lft)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80186, 4000000) // no idea
 	MCFG_CPU_PROGRAM_MAP(lft_mem)

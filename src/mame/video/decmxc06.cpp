@@ -140,7 +140,7 @@ void deco_mxc06_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cli
 			{
 				{
 					int draw = 0;
-					if (!flash || (m_screen->frame_number() & 1))
+					if (!flash || (screen().frame_number() & 1))
 					{
 						if (m_priority_type == 0) // most cases
 						{

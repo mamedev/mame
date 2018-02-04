@@ -2,49 +2,9 @@
 // copyright-holders:Wilbert Pol
 
 #include "emu.h"
+#include "hcd62121d.h"
 
-enum
-{
-	ARG_NONE=0,    /* no argument or unknown */
-	ARG_REG,       /* register */
-	ARG_REGREG,    /* register1, register2, or register2, register1 or register1, imm byte */
-	ARG_IRG,       /* register indirect */
-	ARG_IRGREG,    /* 2 register indirect */
-	ARG_A16,       /* 16bit address */
-	ARG_A24,       /* seg:address */
-	ARG_F,         /* flag register */
-	ARG_CS,        /* cs register */
-	ARG_DS,        /* ds register */
-	ARG_SS,        /* ss register */
-	ARG_PC,        /* program counter */
-	ARG_SP,        /* stack pointer */
-	ARG_I8,        /* immediate 8 bit value */
-	ARG_I16,       /* immediate 16 bit value */
-	ARG_I64,       /* immediate 64 bit value */
-	ARG_I80,       /* immediate 80 bit value */
-	ARG_ILR,       /* indirect last address register access */
-	ARG_LAR,       /* last address register */
-	ARG_DSZ,       /* dsize register? */
-	ARG_OPT,       /* OPTx (output) pins */
-	ARG_PORT,      /* PORTx (output) pins */
-	ARG_TIM,       /* timing related register? */
-	ARG_KLO,       /* KO1 - KO8 output lines */
-	ARG_KHI,       /* KO9 - KO14(?) output lines */
-	ARG_KI,        /* K input lines */
-	ARG_S1,        /* shift by 1 */
-	ARG_S4,        /* shift by 4 */
-	ARG_S8,        /* shift by 8 */
-};
-
-struct hcd62121_dasm
-{
-	const char *str;
-	u8       arg1;
-	u8       arg2;
-};
-
-
-static const hcd62121_dasm hcd62121_ops[256] =
+const hcd62121_disassembler::dasm hcd62121_disassembler::ops[256] =
 {
 	/* 0x00 */
 	{ "sh?b",    ARG_REG,    ARG_S8 },   { "sh?w",    ARG_REG,    ARG_S8   },
@@ -207,30 +167,34 @@ static const hcd62121_dasm hcd62121_ops[256] =
 	{ "unFE?",   ARG_NONE,   ARG_NONE }, { "nop",     ARG_NONE,   ARG_NONE }
 };
 
+u32 hcd62121_disassembler::opcode_alignment() const
+{
+	return 1;
+}
 
-CPU_DISASSEMBLE(hcd62121)
+offs_t hcd62121_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	u8 op;
 	u8 op1;
 	u8 op2;
-	u32 pos = 0;
-	const hcd62121_dasm *inst;
+	offs_t base_pc = pc;
+	const dasm *inst;
 
-	op = oprom[pos++];
+	op = opcodes.r8(pc++);
 
-	inst = &hcd62121_ops[op];
+	inst = &ops[op];
 
 	/* Special cases for shift and rotate instructions */
 	if (inst->arg2 == ARG_S4 || inst->arg2 == ARG_S8)
-		util::stream_format(stream, "%c%c%c%c    ", inst->str[0], inst->str[1], (oprom[pos] & 0x80) ? 'r' : 'l', inst->str[3]);
+		util::stream_format(stream, "%c%c%c%c    ", inst->str[0], inst->str[1], (opcodes.r8(pc) & 0x80) ? 'r' : 'l', inst->str[3]);
 	else
 		util::stream_format(stream, "%-8s", inst->str);
 
 	switch(inst->arg1)
 	{
 	case ARG_REGREG:
-		op1 = oprom[pos++];
-		op2 = oprom[pos++];
+		op1 = opcodes.r8(pc++);
+		op2 = opcodes.r8(pc++);
 		if (op1 & 0x80)
 		{
 			util::stream_format(stream, "r%02x,0x%02x", op1 & 0x7f, op2);
@@ -244,12 +208,12 @@ CPU_DISASSEMBLE(hcd62121)
 		}
 		break;
 	case ARG_REG:
-		util::stream_format(stream, "r%02x", oprom[pos++] & 0x7f);
+		util::stream_format(stream, "r%02x", opcodes.r8(pc++) & 0x7f);
 		break;
 	case ARG_IRGREG:
 		/* bit 6 = direction. 0 - regular, 1 - reverse */
-		op1 = oprom[pos++];
-		op2 = oprom[pos++];
+		op1 = opcodes.r8(pc++);
+		op2 = opcodes.r8(pc++);
 		if (op1 & 0x80)
 		{
 			util::stream_format(stream, "(r%02x),0x%02x", 0x40 | (op1 & 0x3f), op2);
@@ -264,7 +228,7 @@ CPU_DISASSEMBLE(hcd62121)
 		break;
 	case ARG_IRG:
 		/* bit 6 = direction. 0 - regular, 1 - reverse */
-		op1 = oprom[pos++];
+		op1 = opcodes.r8(pc++);
 		util::stream_format(stream, "(r%02x%s)", 0x40 | (op1 & 0x3f), (op1 & 0x40) ? ".r" : "");
 		break;
 	case ARG_F:
@@ -286,43 +250,43 @@ CPU_DISASSEMBLE(hcd62121)
 		util::stream_format(stream, "SP");
 		break;
 	case ARG_I8:
-		util::stream_format(stream, "0x%02x", oprom[pos++]);
+		util::stream_format(stream, "0x%02x", opcodes.r8(pc++));
 		break;
 	case ARG_I16:
 	case ARG_A16:
-		util::stream_format(stream, "0x%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
+		util::stream_format(stream, "0x%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
 		break;
 	case ARG_I64:
-		util::stream_format(stream, "0x%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
+		util::stream_format(stream, "0x%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
 		break;
 	case ARG_I80:
-		util::stream_format(stream, "0x%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
+		util::stream_format(stream, "0x%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
 		break;
 	case ARG_A24:
-		util::stream_format(stream, "0x%02x:", oprom[pos++]);
-		util::stream_format(stream, "0x%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
+		util::stream_format(stream, "0x%02x:", opcodes.r8(pc++));
+		util::stream_format(stream, "0x%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
 		break;
 	case ARG_ILR:
-		op1 = oprom[pos++];
-		op2 = oprom[pos++];
+		op1 = opcodes.r8(pc++);
+		op2 = opcodes.r8(pc++);
 		if ((op1 & 0x80) || (op2 & 0x80))
 		{
 			if (op1 & 0x80)
@@ -370,7 +334,7 @@ CPU_DISASSEMBLE(hcd62121)
 	switch(inst->arg2)
 	{
 	case ARG_REG:
-		util::stream_format(stream, ",r%02x", oprom[pos++] & 0x7f);
+		util::stream_format(stream, ",r%02x", opcodes.r8(pc++) & 0x7f);
 		break;
 	case ARG_F:
 		util::stream_format(stream, ",F");
@@ -391,43 +355,43 @@ CPU_DISASSEMBLE(hcd62121)
 		util::stream_format(stream, ",SP");
 		break;
 	case ARG_I8:
-		util::stream_format(stream, ",0x%02x", oprom[pos++]);
+		util::stream_format(stream, ",0x%02x", opcodes.r8(pc++));
 		break;
 	case ARG_I16:
-		util::stream_format(stream, ",0x%02x", oprom[pos+1]);
-		util::stream_format(stream, "%02x", oprom[pos]);
-		pos += 2;
+		util::stream_format(stream, ",0x%02x", opcodes.r8(pc+1));
+		util::stream_format(stream, "%02x", opcodes.r8(pc));
+		pc += 2;
 		break;
 	case ARG_A16:
-		util::stream_format(stream, ",0x%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
+		util::stream_format(stream, ",0x%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
 		break;
 	case ARG_I64:
-		util::stream_format(stream, ",0x%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
+		util::stream_format(stream, ",0x%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
 		break;
 	case ARG_I80:
-		util::stream_format(stream, ",0x%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
+		util::stream_format(stream, ",0x%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
 		break;
 	case ARG_A24:
-		util::stream_format(stream, ",0x%02x:", oprom[pos++]);
-		util::stream_format(stream, "0x%02x", oprom[pos++]);
-		util::stream_format(stream, "%02x", oprom[pos++]);
+		util::stream_format(stream, ",0x%02x:", opcodes.r8(pc++));
+		util::stream_format(stream, "0x%02x", opcodes.r8(pc++));
+		util::stream_format(stream, "%02x", opcodes.r8(pc++));
 		break;
 	case ARG_ILR:
 		/* Implemented by ARG_ILR section for arg1 */
@@ -460,6 +424,6 @@ CPU_DISASSEMBLE(hcd62121)
 		break;
 	}
 
-	return pos | DASMFLAG_SUPPORTED;
+	return (pc - base_pc) | SUPPORTED;
 }
 

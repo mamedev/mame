@@ -304,7 +304,7 @@ PALETTE_INIT_MEMBER(gamate_video_device, gamate)
     frame rate is 60.8093Hz.
 */
 
-MACHINE_CONFIG_MEMBER( gamate_video_device::device_add_mconfig )
+MACHINE_CONFIG_START(gamate_video_device::device_add_mconfig)
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(60.8093)
 	MCFG_SCREEN_SIZE(160, 150)

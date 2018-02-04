@@ -19,6 +19,7 @@
 
 #include "emu.h"
 #include "tms7000.h"
+#include "7000dasm.h"
 
 // TMS7000 is the most basic one, 128 bytes internal RAM and no internal ROM.
 // TMS7020 and TMS7040 are same, but with 2KB and 4KB internal ROM respectively.
@@ -72,32 +73,32 @@ static ADDRESS_MAP_START(tms7002_mem, AS_PROGRAM, 8, tms7000_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms7020_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0) // 2kB internal ROM
 	AM_IMPORT_FROM( tms7000_mem )
+	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0) // 2kB internal ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms7040_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0) // 4kB internal ROM
 	AM_IMPORT_FROM( tms7000_mem )
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0) // 4kB internal ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms7041_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0)
 	AM_IMPORT_FROM( tms7001_mem )
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms7042_mem, AS_PROGRAM, 8, tms7000_device )
-	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0)
 	AM_IMPORT_FROM( tms7002_mem )
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(DEVICE_SELF, 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(tms70c46_mem, AS_PROGRAM, 8, tms70c46_device )
+	AM_IMPORT_FROM( tms7040_mem )
 	AM_RANGE(0x010c, 0x010c) AM_READWRITE(e_bus_data_r, e_bus_data_w)
 	AM_RANGE(0x010d, 0x010d) AM_NOP // ? always writes $FF before checking keyboard... maybe INT3 ack?
 	AM_RANGE(0x010e, 0x010e) AM_READWRITE(dockbus_data_r, dockbus_data_w)
 	AM_RANGE(0x010f, 0x010f) AM_READWRITE(dockbus_status_r, dockbus_status_w)
 	AM_RANGE(0x0118, 0x0118) AM_READWRITE(control_r, control_w)
-	AM_IMPORT_FROM( tms7040_mem )
 ADDRESS_MAP_END
 
 
@@ -187,7 +188,7 @@ void tms7000_device::device_start()
 {
 	// init/zerofill
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 
 	m_icountptr = &m_icount;
 
@@ -273,10 +274,9 @@ void tms7000_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-offs_t tms7000_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *tms7000_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( tms7000 );
-	return CPU_DISASSEMBLE_NAME(tms7000)(this, stream, pc, oprom, opram, options);
+	return new tms7000_disassembler;
 }
 
 

@@ -44,6 +44,7 @@ public:
 	DECLARE_DRIVER_INIT(dps1);
 	DECLARE_MACHINE_RESET(dps1);
 
+	void dps1(machine_config &config);
 private:
 	bool m_dma_dir;
 	uint16_t m_dma_adr;
@@ -181,7 +182,7 @@ static SLOT_INTERFACE_START( floppies )
 	SLOT_INTERFACE( "floppy0", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( dps1 )
+MACHINE_CONFIG_START(dps1_state::dps1)
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
@@ -189,7 +190,7 @@ static MACHINE_CONFIG_START( dps1 )
 	MCFG_MACHINE_RESET_OVERRIDE(dps1_state, dps1)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("uart", MC2661, XTAL_5_0688MHz)
+	MCFG_DEVICE_ADD("uart", MC2661, XTAL(5'068'800))
 	MCFG_MC2661_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_MC2661_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_MC2661_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))

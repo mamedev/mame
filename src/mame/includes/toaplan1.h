@@ -163,6 +163,14 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	void demonwld(machine_config &config);
+	void samesame(machine_config &config);
+	void truxton(machine_config &config);
+	void outzone(machine_config &config);
+	void vimana(machine_config &config);
+	void outzonecv(machine_config &config);
+	void hellfire(machine_config &config);
+	void zerowing(machine_config &config);
 };
 
 class toaplan1_rallybik_state : public toaplan1_state
@@ -184,4 +192,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_rallybik);
 
 	required_device<toaplan_scu_device> m_spritegen;
+	void rallybik(machine_config &config);
 };

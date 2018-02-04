@@ -65,4 +65,5 @@ public:
 	uint32_t screen_update_crshrace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_fg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void crshrace(machine_config &config);
 };

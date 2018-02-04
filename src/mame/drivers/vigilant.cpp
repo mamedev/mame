@@ -471,7 +471,7 @@ static GFXDECODE_START( kikcubic )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( vigilant )
+MACHINE_CONFIG_START(vigilant_state::vigilant)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3579645)          /* 3.579645 MHz */
@@ -514,7 +514,7 @@ static MACHINE_CONFIG_START( vigilant )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( buccanrs )
+MACHINE_CONFIG_START(vigilant_state::buccanrs)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 5688800)          /* 5.688800 MHz */
@@ -573,7 +573,7 @@ static MACHINE_CONFIG_START( buccanrs )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kikcubic )
+MACHINE_CONFIG_START(vigilant_state::kikcubic)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3579645)          /* 3.579645 MHz */

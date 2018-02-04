@@ -437,7 +437,7 @@ MACHINE_RESET_MEMBER(phoenix_state,phoenix)
 }
 
 
-static MACHINE_CONFIG_START( phoenix )
+MACHINE_CONFIG_START(phoenix_state::phoenix)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, CPU_CLOCK)  /* 2.75 MHz */
@@ -475,7 +475,7 @@ static MACHINE_CONFIG_START( phoenix )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pleiads, phoenix )
+MACHINE_CONFIG_DERIVED(phoenix_state::pleiads, phoenix)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -506,7 +506,7 @@ MACHINE_CONFIG_END
 
 /* Same as Phoenix, but uses an AY8910 and an extra visible line (column) */
 
-static MACHINE_CONFIG_START( survival )
+MACHINE_CONFIG_START(phoenix_state::survival)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8085A, CPU_CLOCK)  /* 5.50 MHz */
@@ -542,7 +542,7 @@ MACHINE_CONFIG_END
 
 
 /* Uses a Z80 */
-static MACHINE_CONFIG_DERIVED( condor, phoenix )
+MACHINE_CONFIG_DERIVED(phoenix_state::condor, phoenix)
 
 	/* basic machine hardware */
 	/* FIXME: Verify clock. This is most likely 11MHz/2 */

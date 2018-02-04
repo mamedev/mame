@@ -185,6 +185,9 @@ public:
 	DECLARE_DRIVER_INIT(mk3snes);
 	DECLARE_DRIVER_INIT(legendsb);
 	DECLARE_MACHINE_RESET(ffight2b);
+	void mk3snes(machine_config &config);
+	void ffight2b(machine_config &config);
+	void kinstb(machine_config &config);
 };
 
 
@@ -219,14 +222,14 @@ READ8_MEMBER(snesb_state::sb2b_6a6xxx_r)
 		case 0xfb7: return 0x47;
 	}
 
-	logerror("Unknown protection read read %x @ %x\n",offset, space.device().safe_pc());
+	logerror("Unknown protection read read %x @ %x\n",offset, m_maincpu->pc());
 
 	return 0;
 }
 
 READ8_MEMBER(snesb_state::sb2b_7xxx_r)
 {
-	return space.read_byte(0xc07000 + offset);
+	return m_maincpu->space(AS_PROGRAM).read_byte(0xc07000 + offset);
 }
 
 
@@ -243,7 +246,7 @@ READ8_MEMBER(snesb_state::endless_580xxx_r)
 		case 0xe83: return 0x6b;
 	}
 
-	logerror("Unknown protection read read %x @ %x\n",offset, space.device().safe_pc());
+	logerror("Unknown protection read read %x @ %x\n",offset, m_maincpu->pc());
 
 	return 0;
 }
@@ -686,14 +689,15 @@ static INPUT_PORTS_START( endless )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( kinstb )
+MACHINE_CONFIG_START(snesb_state::kinstb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
 	MCFG_CPU_PROGRAM_MAP(snesb_map)
 
 	/* audio CPU */
-	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2) /* 2.048 Mhz, but internal divider */
+	// runs at 24.576 MHz / 12 = 2.048 MHz
+	MCFG_CPU_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
 	MCFG_CPU_PROGRAM_MAP(spc_mem)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
@@ -718,9 +722,9 @@ static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, snesb_state )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_DERIVED( mk3snes, kinstb )
+MACHINE_CONFIG_DERIVED(snesb_state::mk3snes, kinstb)
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_8MHz)
+	MCFG_CPU_ADD("mcu", I8751, XTAL(8'000'000))
 	MCFG_CPU_IO_MAP(mcu_io_map)
 MACHINE_CONFIG_END
 
@@ -734,7 +738,7 @@ MACHINE_RESET_MEMBER( snesb_state, ffight2b )
 	cpu0space.write_byte(0x7eadce, 0x00);
 }
 
-static MACHINE_CONFIG_DERIVED( ffight2b, kinstb )
+MACHINE_CONFIG_DERIVED(snesb_state::ffight2b, kinstb)
 	MCFG_MACHINE_RESET_OVERRIDE( snesb_state, ffight2b )
 MACHINE_CONFIG_END
 
@@ -745,7 +749,7 @@ DRIVER_INIT_MEMBER(snesb_state,kinstb)
 
 	for (i = 0; i < 0x400000; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 5, 0, 6, 1, 7, 4, 3, 2);
+		rom[i] = bitswap<8>(rom[i], 5, 0, 6, 1, 7, 4, 3, 2);
 	}
 
 	m_shared_ram = std::make_unique<int8_t[]>(0x100);
@@ -775,23 +779,23 @@ DRIVER_INIT_MEMBER(snesb_state,ffight2b)
 
 		if (i < 0x10000) /* 0x00000 - 0x0ffff */
 		{
-			rom[i] = BITSWAP8(rom[i],3,1,6,4,7,0,2,5);
+			rom[i] = bitswap<8>(rom[i],3,1,6,4,7,0,2,5);
 		}
 		else if (i < 0x20000) /* 0x10000 - 0x1ffff */
 		{
-			rom[i] = BITSWAP8(rom[i],3,7,0,5,1,6,2,4);
+			rom[i] = bitswap<8>(rom[i],3,7,0,5,1,6,2,4);
 		}
 		else if (i < 0x30000) /* 0x20000 - 0x2ffff */
 		{
-			rom[i] = BITSWAP8(rom[i],1,7,6,4,5,2,3,0);
+			rom[i] = bitswap<8>(rom[i],1,7,6,4,5,2,3,0);
 		}
 		else if (i < 0x40000) /* 0x30000 - 0x3ffff */
 		{
-			rom[i] = BITSWAP8(rom[i],0,3,2,5,4,6,7,1);
+			rom[i] = bitswap<8>(rom[i],0,3,2,5,4,6,7,1);
 		}
 		else if (i < 0x150000)
 		{
-			rom[i] = BITSWAP8(rom[i],6,4,0,5,1,3,2,7);
+			rom[i] = bitswap<8>(rom[i],6,4,0,5,1,3,2,7);
 		}
 	}
 
@@ -816,11 +820,11 @@ DRIVER_INIT_MEMBER(snesb_state,iron)
 	{
 		if(i < 0x80000)
 		{
-			rom[i] = BITSWAP8(rom[i]^0xff,2,7,1,6,3,0,5,4);
+			rom[i] = bitswap<8>(rom[i]^0xff,2,7,1,6,3,0,5,4);
 		}
 		else
 		{
-			rom[i] = BITSWAP8(rom[i],6,3,0,5,1,4,7,2);
+			rom[i] = bitswap<8>(rom[i],6,3,0,5,1,4,7,2);
 		}
 	}
 
@@ -842,12 +846,12 @@ DRIVER_INIT_MEMBER(snesb_state,denseib)
 		rom[i] = rom[i] ^ 0xff;
 		switch (i >> 16)
 		{
-			case 0x00: rom[i] = BITSWAP8(rom[i],1,7,0,6,3,4,5,2); break;
-			case 0x01: rom[i] = BITSWAP8(rom[i],3,4,7,2,0,6,5,1); break;
-			case 0x02: rom[i] = BITSWAP8(rom[i],5,4,2,1,7,0,6,3); break;
-			case 0x03: rom[i] = BITSWAP8(rom[i],0,1,3,7,2,6,5,4); break;
+			case 0x00: rom[i] = bitswap<8>(rom[i],1,7,0,6,3,4,5,2); break;
+			case 0x01: rom[i] = bitswap<8>(rom[i],3,4,7,2,0,6,5,1); break;
+			case 0x02: rom[i] = bitswap<8>(rom[i],5,4,2,1,7,0,6,3); break;
+			case 0x03: rom[i] = bitswap<8>(rom[i],0,1,3,7,2,6,5,4); break;
 
-			default:   rom[i] = BITSWAP8(rom[i],4,5,1,0,2,3,7,6); break;
+			default:   rom[i] = bitswap<8>(rom[i],4,5,1,0,2,3,7,6); break;
 		}
 	}
 
@@ -872,15 +876,15 @@ DRIVER_INIT_MEMBER(snesb_state,legendsb)
 		u8 val = rom[i] ^ 0xff;
 
 		if (i < 0x10000)
-			rom[i] = BITSWAP8(val,6,5,4,2,1,0,3,7); // 0x00000 - 0x0ffff
+			rom[i] = bitswap<8>(val,6,5,4,2,1,0,3,7); // 0x00000 - 0x0ffff
 		else if (i < 0x20000)
-			rom[i] = BITSWAP8(val,6,1,3,5,2,0,7,4); // 0x10000 - 0x1ffff
+			rom[i] = bitswap<8>(val,6,1,3,5,2,0,7,4); // 0x10000 - 0x1ffff
 		else if (i < 0x30000)
-			rom[i] = BITSWAP8(val,2,6,3,0,4,5,7,1); // 0x20000 - 0x2ffff
+			rom[i] = bitswap<8>(val,2,6,3,0,4,5,7,1); // 0x20000 - 0x2ffff
 		else if (i < 0x40000)
-			rom[i] = BITSWAP8(val,5,4,2,7,0,3,6,1); // 0x30000 - 0x3ffff
+			rom[i] = bitswap<8>(val,5,4,2,7,0,3,6,1); // 0x30000 - 0x3ffff
 		else
-			rom[i] = BITSWAP8(val,3,6,0,5,1,4,7,2); // 0x40000 - 0xfffff
+			rom[i] = bitswap<8>(val,3,6,0,5,1,4,7,2); // 0x40000 - 0xfffff
 	}
 
 	// boot vector
@@ -926,19 +930,19 @@ DRIVER_INIT_MEMBER(snesb_state,sblast2b)
 
 		if (newAddress < 0x10000)
 		{
-			plainText = BITSWAP8(plainText, 6,3,5,4,2,0,7,1) ^ 0xff;
+			plainText = bitswap<8>(plainText, 6,3,5,4,2,0,7,1) ^ 0xff;
 		}
 		else if (newAddress < 0x20000)
 		{
-			plainText = BITSWAP8(plainText, 4,0,7,6,3,1,2,5) ^ 0xff;
+			plainText = bitswap<8>(plainText, 4,0,7,6,3,1,2,5) ^ 0xff;
 		}
 		else if (newAddress < 0x30000)
 		{
-			plainText = BITSWAP8(plainText, 5,7,6,1,4,3,0,2);
+			plainText = bitswap<8>(plainText, 5,7,6,1,4,3,0,2);
 		}
 		else if (newAddress < 0x40000)
 		{
-			plainText = BITSWAP8(plainText, 3,1,2,0,5,6,4,7) ^ 0xff;
+			plainText = bitswap<8>(plainText, 3,1,2,0,5,6,4,7) ^ 0xff;
 		}
 		dst[newAddress] = plainText;
 	}
@@ -996,19 +1000,19 @@ DRIVER_INIT_MEMBER(snesb_state,endless)
 		dst[i] = data_high[src[j]>>4] | data_low[src[j]&0xf];
 
 		if (i >= 0x00000 && i < 0x10000) {
-			dst[i] = BITSWAP8(dst[i],2,3,4,1,7,0,6,5);
+			dst[i] = bitswap<8>(dst[i],2,3,4,1,7,0,6,5);
 		}
 
 		if (i >= 0x10000 && i < 0x20000) {
-			dst[i] = BITSWAP8(dst[i],1,5,6,0,2,4,7,3) ^ 0xff;
+			dst[i] = bitswap<8>(dst[i],1,5,6,0,2,4,7,3) ^ 0xff;
 		}
 
 		if (i >= 0x20000 && i < 0x30000) {
-			dst[i] = BITSWAP8(dst[i],3,0,1,6,4,5,2,7);
+			dst[i] = bitswap<8>(dst[i],3,0,1,6,4,5,2,7);
 		}
 
 		if (i >= 0x30000 && i < 0x40000) {
-			dst[i] = BITSWAP8(dst[i],0,4,2,3,5,6,7,1) ^ 0xff;
+			dst[i] = bitswap<8>(dst[i],0,4,2,3,5,6,7,1) ^ 0xff;
 		}
 	}
 

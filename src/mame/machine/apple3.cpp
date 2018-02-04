@@ -203,7 +203,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			slotdevice = m_a2bus->get_a2bus_card(1);
 			if (slotdevice != nullptr)
 			{
-				result = slotdevice->read_c0nx(space, offset&0xf);
+				result = slotdevice->read_c0nx(offset&0xf);
 			}
 			break;
 
@@ -214,7 +214,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			slotdevice = m_a2bus->get_a2bus_card(2);
 			if (slotdevice != nullptr)
 			{
-				result = slotdevice->read_c0nx(space, offset&0xf);
+				result = slotdevice->read_c0nx(offset&0xf);
 			}
 			break;
 
@@ -225,7 +225,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			slotdevice = m_a2bus->get_a2bus_card(3);
 			if (slotdevice != nullptr)
 			{
-				result = slotdevice->read_c0nx(space, offset&0xf);
+				result = slotdevice->read_c0nx(offset&0xf);
 			}
 			break;
 
@@ -236,14 +236,14 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			slotdevice = m_a2bus->get_a2bus_card(4);
 			if (slotdevice != nullptr)
 			{
-				result = slotdevice->read_c0nx(space, offset&0xf);
+				result = slotdevice->read_c0nx(offset&0xf);
 			}
 			break;
 
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3:
 		case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 			/* external drive stuff */
-			m_fdc->read_c0dx(space, offset&0xf);
+			m_fdc->read_c0dx(offset&0xf);
 			result = 0x00;
 			break;
 
@@ -277,24 +277,24 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 			break;
 
 		case 0xe0: case 0xe1:
-			result = m_fdc->read(space, offset&0xf);
+			result = m_fdc->read(offset&0xf);
 			m_va = offset & 1;
 			break;
 
 		case 0xe2: case 0xe3:
-			result = m_fdc->read(space, offset&0xf);
+			result = m_fdc->read(offset&0xf);
 			m_vb = offset & 1;
 			break;
 
 		case 0xe4: case 0xe5:
-			result = m_fdc->read(space, offset&0xf);
+			result = m_fdc->read(offset&0xf);
 			m_vc = offset & 1;
 			break;
 
 		case 0xe6: case 0xe7: case 0xe8: case 0xe9:
 		case 0xea: case 0xeb: case 0xec: case 0xed:
 		case 0xee: case 0xef:
-			result = m_fdc->read(space, offset&0xf);
+			result = m_fdc->read(offset&0xf);
 			break;
 
 		case 0xf0:
@@ -383,7 +383,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			slotdevice = m_a2bus->get_a2bus_card(1);
 			if (slotdevice != nullptr)
 			{
-				slotdevice->write_c0nx(space, offset&0xf, data);
+				slotdevice->write_c0nx(offset&0xf, data);
 			}
 			break;
 
@@ -394,7 +394,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			slotdevice = m_a2bus->get_a2bus_card(2);
 			if (slotdevice != nullptr)
 			{
-				slotdevice->write_c0nx(space, offset&0xf, data);
+				slotdevice->write_c0nx(offset&0xf, data);
 			}
 			break;
 
@@ -405,7 +405,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			slotdevice = m_a2bus->get_a2bus_card(3);
 			if (slotdevice != nullptr)
 			{
-				slotdevice->write_c0nx(space, offset&0xf, data);
+				slotdevice->write_c0nx(offset&0xf, data);
 			}
 			break;
 
@@ -416,14 +416,14 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 			slotdevice = m_a2bus->get_a2bus_card(4);
 			if (slotdevice != nullptr)
 			{
-				slotdevice->write_c0nx(space, offset&0xf, data);
+				slotdevice->write_c0nx(offset&0xf, data);
 			}
 			break;
 
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3:
 		case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 			/* external drive stuff */
-			m_fdc->write_c0dx(space, offset&0xf, data);
+			m_fdc->write_c0dx(offset&0xf, data);
 			break;
 
 		case 0xd8: case 0xd9:
@@ -459,7 +459,7 @@ WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 		case 0xe4: case 0xe5: case 0xe6: case 0xe7:
 		case 0xe8: case 0xe9: case 0xea: case 0xeb:
 		case 0xec: case 0xed: case 0xee: case 0xef:
-			m_fdc->write(space, offset&0xf, data);
+			m_fdc->write(offset&0xf, data);
 			break;
 
 		case 0xf0:
@@ -860,7 +860,7 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 					m_cnxx_slot = ((offset>>8) & 7);
 				}
 
-				return slotdevice->read_cnxx(space, offset&0xff);
+				return slotdevice->read_cnxx(offset&0xff);
 			}
 		}
 	}
@@ -887,7 +887,7 @@ READ8_MEMBER(apple3_state::apple3_memory_r)
 
 				if (slotdevice != nullptr)
 				{
-					rv = slotdevice->read_c800(space, offset&0x7ff);
+					rv = slotdevice->read_c800(offset&0x7ff);
 				}
 			}
 		}
@@ -992,7 +992,7 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 					m_cnxx_slot = ((offset>>8) & 7);
 				}
 
-				slotdevice->write_cnxx(space, offset&0xff, data);
+				slotdevice->write_cnxx(offset&0xff, data);
 			}
 		}
 	}
@@ -1025,7 +1025,7 @@ WRITE8_MEMBER(apple3_state::apple3_memory_w)
 
 				if (slotdevice != nullptr)
 				{
-					slotdevice->write_c800(space, offset&0x7ff, data);
+					slotdevice->write_c800(offset&0x7ff, data);
 				}
 			}
 		}

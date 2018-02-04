@@ -61,6 +61,10 @@ public:
 	void robotbwl_draw_bowling_alley( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void robotbwl_draw_ball( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void crash_draw_car( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void robotbwl(machine_config &config);
+	void ripcord(machine_config &config);
+	void crash(machine_config &config);
+	void circus(machine_config &config);
 };
 /*----------- defined in audio/circus.c -----------*/
 

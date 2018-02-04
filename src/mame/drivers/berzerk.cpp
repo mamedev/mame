@@ -93,10 +93,12 @@ public:
 	void create_nmi_timer();
 	void start_nmi_timer();
 	void get_pens(rgb_t *pens);
+	void berzerk(machine_config &config);
+	void frenzy(machine_config &config);
 };
 
 
-#define MASTER_CLOCK                (XTAL_10MHz)
+#define MASTER_CLOCK                (XTAL(10'000'000))
 #define MAIN_CPU_CLOCK              (MASTER_CLOCK / 4)
 #define PIXEL_CLOCK                 (MASTER_CLOCK / 2)
 #define S14001_CLOCK                (MASTER_CLOCK / 4)
@@ -392,7 +394,7 @@ WRITE8_MEMBER(berzerk_state::magicram_w)
 	uint8_t shift_flop_output = (((uint16_t)m_last_shift_data << 8) | data) >> (m_magicram_control & 0x07);
 
 	if (m_magicram_control & 0x08)
-		shift_flop_output = BITSWAP8(shift_flop_output, 0, 1, 2, 3, 4, 5, 6, 7);
+		shift_flop_output = bitswap<8>(shift_flop_output, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	/* collision detection - AND gate output goes to the K pin of the flip-flop,
 	   while J is LO, therefore, it only resets, never sets */
@@ -1103,7 +1105,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( berzerk )
+MACHINE_CONFIG_START(berzerk_state::berzerk)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
@@ -1130,7 +1132,7 @@ static MACHINE_CONFIG_START( berzerk )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( frenzy, berzerk )
+MACHINE_CONFIG_DERIVED(berzerk_state::frenzy, berzerk)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -72,7 +72,8 @@ Super System Card:
 #include "speaker.h"
 
 
-/* todo: alternate forms of input (multitap, mouse, etc.) */
+// TODO: slotify this mess, also add alternate forms of input (multitap, mouse, pachinko controller etc.)
+//       hucard pachikun gives you option to select pachinko controller after pressing start, likely because it doesn't have a true header id
 static INPUT_PORTS_START( pce )
 
 	PORT_START("JOY_P.0")
@@ -96,7 +97,10 @@ static INPUT_PORTS_START( pce )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)                       PORT_CONDITION("JOY_TYPE", 0x000c, EQUALS, 0x0000)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)                       PORT_CONDITION("JOY_TYPE", 0x000c, EQUALS, 0x0000)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)                      PORT_CONDITION("JOY_TYPE", 0x000c, EQUALS, 0x0000)
+	// pachinko controller paddle maps here (!?) with this arrangement
+	//PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,0x5f) PORT_SENSITIVITY(15) PORT_KEYDELTA(15) PORT_CENTERDELTA(0) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M)
 
+	
 	PORT_START("JOY_P.2")
 	/* II is left of I on the original pad so we map them in reverse order */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P3 Button I") PORT_PLAYER(3)    PORT_CONDITION("JOY_TYPE", 0x0030, EQUALS, 0x0000)
@@ -305,7 +309,7 @@ static SLOT_INTERFACE_START(pce_cart)
 	SLOT_INTERFACE_INTERNAL("sf2", PCE_ROM_SF2)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( pce_common )
+MACHINE_CONFIG_START(pce_state::pce_common)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(pce_mem)
@@ -343,19 +347,19 @@ static MACHINE_CONFIG_START( pce_common )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pce, pce_common )
+MACHINE_CONFIG_DERIVED(pce_state::pce, pce_common)
 	MCFG_PCE_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pce")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tg16, pce_common )
+MACHINE_CONFIG_DERIVED(pce_state::tg16, pce_common)
 	MCFG_TG16_CARTRIDGE_ADD("cartslot", pce_cart, nullptr)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","tg16")
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sgx )
+MACHINE_CONFIG_START(pce_state::sgx)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
 	MCFG_CPU_PROGRAM_MAP(sgx_mem)

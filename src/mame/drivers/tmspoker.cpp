@@ -212,7 +212,7 @@
 #include "screen.h"
 
 
-#define MASTER_CLOCK    XTAL_6MHz   /* confirmed */
+#define MASTER_CLOCK    XTAL(6'000'000)   /* confirmed */
 
 
 class tmspoker_state : public driver_device
@@ -239,6 +239,7 @@ public:
 	INTERRUPT_GEN_MEMBER(tmspoker_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void tmspoker(machine_config &config);
 };
 
 
@@ -550,7 +551,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( tmspoker )
+MACHINE_CONFIG_START(tmspoker_state::tmspoker)
 
 	// CPU TMS9980A; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9980A, MASTER_CLOCK/4, tmspoker_map, tmspoker_cru_map)

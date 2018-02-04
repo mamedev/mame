@@ -252,7 +252,7 @@ WRITE16_MEMBER(namcofl_state::mcu_shared_w)
 	// C75 BIOS has a very short window on the CPU sync signal, so immediately let the i960 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		space.device().execute().yield();
+		m_mcu->yield();
 	}
 }
 
@@ -577,7 +577,7 @@ MACHINE_RESET_MEMBER(namcofl_state,namcofl)
 }
 
 
-static MACHINE_CONFIG_START( namcofl )
+MACHINE_CONFIG_START(namcofl_state::namcofl)
 	MCFG_CPU_ADD("maincpu", I960, 20000000) // i80960KA-20 == 20 MHz part
 	MCFG_CPU_PROGRAM_MAP(namcofl_mem)
 

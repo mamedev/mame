@@ -267,19 +267,19 @@ TMS340X0_TO_SHIFTREG_CB_MEMBER(btoads_state::to_shiftreg)
 
 	/* reads from this first region are usual shift register reads */
 	if (address >= 0xa0000000 && address <= 0xa3ffffff)
-		memcpy(shiftreg, &m_vram_fg_display[TOWORD(address & 0x3fffff)], TOBYTE(0x1000));
+		memcpy(shiftreg, &m_vram_fg_display[(address & 0x3fffff) >> 4], 0x200);
 
 	/* reads from this region set the sprite destination address */
 	else if (address >= 0xa4000000 && address <= 0xa7ffffff)
 	{
-		m_sprite_dest_base = &m_vram_fg_draw[TOWORD(address & 0x3fc000)];
+		m_sprite_dest_base = &m_vram_fg_draw[(address & 0x3fc000) >> 4];
 		m_sprite_dest_offs = (address & 0x003fff) >> 5;
 	}
 
 	/* reads from this region set the sprite source address */
 	else if (address >= 0xa8000000 && address <= 0xabffffff)
 	{
-		memcpy(shiftreg, &m_vram_fg_data[TOWORD(address & 0x7fc000)], TOBYTE(0x2000));
+		memcpy(shiftreg, &m_vram_fg_data[(address & 0x7fc000) >> 4], 0x400);
 		m_sprite_source_offs = (address & 0x003fff) >> 3;
 	}
 
@@ -294,7 +294,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(btoads_state::from_shiftreg)
 
 	/* writes to this first region are usual shift register writes */
 	if (address >= 0xa0000000 && address <= 0xa3ffffff)
-		memcpy(&m_vram_fg_display[TOWORD(address & 0x3fc000)], shiftreg, TOBYTE(0x1000));
+		memcpy(&m_vram_fg_display[(address & 0x3fc000) >> 4], shiftreg, 0x200);
 
 	/* writes to this region are ignored for our purposes */
 	else if (address >= 0xa4000000 && address <= 0xa7ffffff)
@@ -302,7 +302,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(btoads_state::from_shiftreg)
 
 	/* writes to this region copy standard data */
 	else if (address >= 0xa8000000 && address <= 0xabffffff)
-		memcpy(&m_vram_fg_data[TOWORD(address & 0x7fc000)], shiftreg, TOBYTE(0x2000));
+		memcpy(&m_vram_fg_data[(address & 0x7fc000) >> 4], shiftreg, 0x400);
 
 	/* writes to this region render the current sprite data */
 	else if (address >= 0xac000000 && address <= 0xafffffff)

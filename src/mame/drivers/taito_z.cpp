@@ -993,7 +993,7 @@ void taitoz_state::parse_cpu_control(  )
 
 WRITE16_MEMBER(taitoz_state::cpua_ctrl_w)
 {
-	//logerror("CPU #0 PC %06x: write %04x to cpu control\n", space.device().safe_pc(), data);
+	//logerror("CPU #0 PC %06x: write %04x to cpu control\n", m_maincpu->pc(), data);
 
 	if (mem_mask == 0xff00) data >>= 8;
 	data &= 0xff;
@@ -1177,7 +1177,7 @@ READ16_MEMBER(taitoz_state::bshark_stick_r)
 			return ioport("Y_ADJUST")->read();
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", m_maincpu->pc(), offset);
 
 	return 0xff;
 }
@@ -1200,7 +1200,7 @@ READ16_MEMBER(taitoz_state::nightstr_stick_r)
 			return ioport("Y_ADJUST")->read();
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", m_maincpu->pc(), offset);
 
 	return 0xff;
 }
@@ -1213,7 +1213,7 @@ WRITE16_MEMBER(taitoz_state::bshark_stick_w)
 	   but we don't want CPUA to have an int6 before int4 is over (?)
 	*/
 
-	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_TAITOZ_INTERRUPT6);
+	timer_set(m_maincpu->cycles_to_attotime(10000), TIMER_TAITOZ_INTERRUPT6);
 }
 
 
@@ -1230,7 +1230,7 @@ READ16_MEMBER(taitoz_state::sci_steer_input_r)
 			return (steer & 0xff00) >> 8;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %06x\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %06x\n", m_maincpu->pc(), offset);
 
 	return 0xff;
 }
@@ -1266,7 +1266,7 @@ WRITE16_MEMBER(taitoz_state::spacegun_lightgun_w)
 	   Four lightgun interrupts happen before the collected coords
 	   are moved to shared ram where CPUA can use them. */
 
-	timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), TIMER_TAITOZ_CPUB_INTERRUPT5);
+	timer_set(m_subcpu->cycles_to_attotime(10000), TIMER_TAITOZ_CPUB_INTERRUPT5);
 }
 
 WRITE16_MEMBER(taitoz_state::spacegun_gun_output_w)
@@ -1289,7 +1289,7 @@ READ16_MEMBER(taitoz_state::dblaxle_steer_input_r)
 			return steer & 0xff;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %02x\n", space.device().safe_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %02x\n", m_maincpu->pc(), offset);
 
 	return 0x00;
 }
@@ -1306,7 +1306,7 @@ READ16_MEMBER(taitoz_state::chasehq_motor_r)
 			return 0x55;    /* motor cpu status ? */
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",space.device().safe_pc(),offset);
+			logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",m_maincpu->pc(),offset);
 			return 0;
 	}
 }
@@ -1324,7 +1324,7 @@ WRITE16_MEMBER(taitoz_state::chasehq_motor_w)
 			break;
 	}
 
-	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",space.device().safe_pc(),data,offset);
+	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",m_maincpu->pc(),data,offset);
 }
 
 
@@ -1532,7 +1532,7 @@ static ADDRESS_MAP_START( bshark_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x800000, 0x800007) AM_READWRITE(bshark_stick_r, bshark_stick_w)
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
@@ -1545,7 +1545,7 @@ static ADDRESS_MAP_START( bsharkjjs_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x400000, 0x40000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_device, read, write, 0x00ff)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(cpua_ctrl_w)
 //  AM_RANGE(0x800000, 0x800007) AM_READWRITE(bshark_stick_r, bshark_stick_w) /* No analog stick, this is the Joystick version */
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
@@ -1573,7 +1573,7 @@ static ADDRESS_MAP_START( sci_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x200010, 0x20001f) AM_READ(sci_steer_input_r)
 //  AM_RANGE(0x400000, 0x400001) AM_WRITE(cpua_ctrl_w)  // ?? doesn't seem to fit what's written
 	AM_RANGE(0x420000, 0x420003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, word_r, word_w)    /* tilemaps */
 	AM_RANGE(0xa20000, 0xa2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_SHARE("spriteram")
@@ -1667,7 +1667,7 @@ static ADDRESS_MAP_START( dblaxle_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x400010, 0x40001f) AM_READ(dblaxle_steer_input_r)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(dblaxle_cpua_ctrl_w)  /* could this be causing int6 ? */
 	AM_RANGE(0x620000, 0x620003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)      /* tilemap mirror */
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)      /* tilemaps */
 	AM_RANGE(0xa30000, 0xa3002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
@@ -1692,7 +1692,7 @@ static ADDRESS_MAP_START( racingb_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x300010, 0x30001f) AM_READ(dblaxle_steer_input_r)
 	AM_RANGE(0x500002, 0x500003) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x520000, 0x520003) AM_READWRITE(taitoz_sound_r, taitoz_sound_w)
-	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x700000, 0x701fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, word_r, word_w)      /* tilemaps */
 	AM_RANGE(0x930000, 0x93002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_device, ctrl_word_r, ctrl_word_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM AM_SHARE("spriteram") /* mostly unused ? */
@@ -2946,7 +2946,7 @@ MACHINE_RESET_MEMBER(taitoz_state,taitoz)
 
 /* Contcirc vis area seems narrower than the other games... */
 
-static MACHINE_CONFIG_START( contcirc )
+MACHINE_CONFIG_START(taitoz_state::contcirc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3025,7 +3025,7 @@ static MACHINE_CONFIG_START( contcirc )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( chasehq )
+MACHINE_CONFIG_START(taitoz_state::chasehq)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3104,7 +3104,7 @@ static MACHINE_CONFIG_START( chasehq )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( enforce )
+MACHINE_CONFIG_START(taitoz_state::enforce)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3184,7 +3184,7 @@ static MACHINE_CONFIG_START( enforce )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bshark )
+MACHINE_CONFIG_START(taitoz_state::bshark)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3253,7 +3253,7 @@ static MACHINE_CONFIG_START( bshark )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bsharkjjs, bshark )
+MACHINE_CONFIG_DERIVED(taitoz_state::bsharkjjs, bshark)
 
 	/* basic machine hardware */
 
@@ -3263,7 +3263,7 @@ static MACHINE_CONFIG_DERIVED( bsharkjjs, bshark )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sci )
+MACHINE_CONFIG_START(taitoz_state::sci)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3340,7 +3340,7 @@ static MACHINE_CONFIG_START( sci )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( nightstr )
+MACHINE_CONFIG_START(taitoz_state::nightstr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3421,7 +3421,7 @@ static MACHINE_CONFIG_START( nightstr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( aquajack )
+MACHINE_CONFIG_START(taitoz_state::aquajack)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
@@ -3501,7 +3501,7 @@ static MACHINE_CONFIG_START( aquajack )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( spacegun )
+MACHINE_CONFIG_START(taitoz_state::spacegun)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz ??? */
@@ -3573,17 +3573,17 @@ static MACHINE_CONFIG_START( spacegun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dblaxle )
+MACHINE_CONFIG_START(taitoz_state::dblaxle)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(dblaxle_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("sub", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(dblaxle_cpub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
@@ -3591,7 +3591,7 @@ static MACHINE_CONFIG_START( dblaxle )
 	MCFG_MACHINE_RESET_OVERRIDE(taitoz_state,taitoz)
 
 	// make quantum time to be a multiple of the xtal (fixes road layer stuck on continue)
-	MCFG_QUANTUM_TIME(attotime::from_hz(XTAL_32MHz/1024))
+	MCFG_QUANTUM_TIME(attotime::from_hz(XTAL(32'000'000)/1024))
 
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
@@ -3627,7 +3627,7 @@ static MACHINE_CONFIG_START( dblaxle )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(32'000'000)/4)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
@@ -3651,17 +3651,17 @@ static MACHINE_CONFIG_START( dblaxle )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( racingb )
+MACHINE_CONFIG_START(taitoz_state::racingb)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(racingb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  sci_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(32'000'000)/8)
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 
-	MCFG_CPU_ADD("sub", M68000, XTAL_32MHz/2)
+	MCFG_CPU_ADD("sub", M68000, XTAL(32'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(racingb_cpub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoz_state,  irq4_line_hold)
 
@@ -3703,7 +3703,7 @@ static MACHINE_CONFIG_START( racingb )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(32'000'000)/4)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)

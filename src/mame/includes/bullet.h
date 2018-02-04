@@ -83,6 +83,7 @@ public:
 	DECLARE_READ8_MEMBER(io_read_byte);
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 
+	void bullet(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -159,6 +160,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cstrb_w );
 	DECLARE_WRITE_LINE_MEMBER( req_w );
 
+	void bulletf(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

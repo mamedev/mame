@@ -91,6 +91,7 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank);
 	DECLARE_INPUT_CHANGED_MEMBER(color);
+	void tv990(machine_config &config);
 private:
 	uint16_t tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer;
@@ -367,7 +368,7 @@ void tv990_state::device_post_load()
 	m_screen->set_visible_area(0, m_width * 16 - 1, 0, m_height * m_rowh - 1);
 }
 
-static MACHINE_CONFIG_START( tv990 )
+MACHINE_CONFIG_START(tv990_state::tv990)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14967500)   // verified (59.86992/4)
 	MCFG_CPU_PROGRAM_MAP(tv990_mem)
@@ -380,13 +381,13 @@ static MACHINE_CONFIG_START( tv990 )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
 
-	MCFG_DEVICE_ADD( UART0_TAG, NS16450, XTAL_3_6864MHz )
+	MCFG_DEVICE_ADD( UART0_TAG, NS16450, XTAL(3'686'400) )
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_INT_CB(WRITELINE(tv990_state, uart0_irq))
 
-	MCFG_DEVICE_ADD( UART1_TAG, NS16450, XTAL_3_6864MHz )
+	MCFG_DEVICE_ADD( UART1_TAG, NS16450, XTAL(3'686'400) )
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_dtr))
 	MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_rts))
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))

@@ -1965,7 +1965,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( system16a )
+MACHINE_CONFIG_START(segas16a_state::system16a)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)
@@ -2025,31 +2025,31 @@ static MACHINE_CONFIG_START( system16a )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1089a, system16a )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1089a, system16a)
 	MCFG_CPU_REPLACE("maincpu", FD1089A, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1089b, system16a )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1089b, system16a)
 	MCFG_CPU_REPLACE("maincpu", FD1089B, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1094, system16a )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1094, system16a)
 	MCFG_CPU_REPLACE("maincpu", FD1094, 10000000)
 	MCFG_CPU_PROGRAM_MAP(system16a_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", segas16a_state, irq4_line_hold)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aceattaca_fd1094, system16a_fd1094 )
+MACHINE_CONFIG_DERIVED(segas16a_state::aceattaca_fd1094, system16a_fd1094)
 	MCFG_DEVICE_ADD("cxdio", CXD1095, 0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system16a_i8751, system16a )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_i8751, system16a)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", segas16a_state, i8751_main_cpu_vblank)
 
@@ -2059,7 +2059,7 @@ static MACHINE_CONFIG_DERIVED( system16a_i8751, system16a )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( system16a_no7751, system16a )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_no7751, system16a)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
@@ -2071,7 +2071,7 @@ static MACHINE_CONFIG_DERIVED( system16a_no7751, system16a )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_no7751p, system16a_no7751 )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_no7751p, system16a_no7751)
 	MCFG_CPU_REPLACE("soundcpu", SEGA_315_5177, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
@@ -2090,7 +2090,7 @@ static MACHINE_CONFIG_DERIVED( system16a_i8751_no7751, system16a_i8751 )
 MACHINE_CONFIG_END
 */
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1089a_no7751, system16a_fd1089a )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1089a_no7751, system16a_fd1089a)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
@@ -2102,7 +2102,7 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1089a_no7751, system16a_fd1089a )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1089b_no7751, system16a_fd1089b )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1089b_no7751, system16a_fd1089b)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
@@ -2114,7 +2114,7 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1089b_no7751, system16a_fd1089b )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( system16a_fd1094_no7751, system16a_fd1094 )
+MACHINE_CONFIG_DERIVED(segas16a_state::system16a_fd1094_no7751, system16a_fd1094)
 	MCFG_CPU_MODIFY("soundcpu")
 	MCFG_CPU_IO_MAP(sound_no7751_portmap)
 
@@ -2308,7 +2308,7 @@ ROM_START( afighterc )
 	ROM_LOAD( "epr-10284.12", 0x00000, 0x8000, CRC(8ff09116) SHA1(8b99b6d2499897cfbd037a7e7cf5bc53bce8a63a) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
 ROM_END
 
 ROM_START( afighterd )
@@ -2339,7 +2339,7 @@ ROM_START( afighterd )
 	ROM_LOAD( "epr-10284.12", 0x00000, 0x8000, CRC(8ff09116) SHA1(8b99b6d2499897cfbd037a7e7cf5bc53bce8a63a) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 ) // decryption key
-	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, NO_DUMP )
+	ROM_LOAD( "317-unknown.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -3933,8 +3933,8 @@ GAME( 1988, aceattaca,  aceattac, aceattaca_fd1094,         aceattaca,  segas16a
 GAME( 1986, afighter,    0,        system16a_fd1089a_no7751, afighter,          segas16a_state,           generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-0018)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, afightera,   afighter, system16a_no7751,         afighter,          segas16a_state,           generic,     ROT270, "Sega", "Action Fighter (unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, afighterb,   afighter, system16a_no7751,         afighter_analog,   afighter_16a_analog_state,generic,     ROT270, "Sega", "Action Fighter (unprotected, analog controls)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, afighterc,   afighter, system16a_fd1089a_no7751, afighter,          segas16a_state,           generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-unknown)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // encrypted version of afightera
-GAME( 1986, afighterd,   afighter, system16a_fd1089a_no7751, afighter_analog,   afighter_16a_analog_state,generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-unknown, analog controls)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // encrypted version of afighterb
+GAME( 1986, afighterc,   afighter, system16a_fd1089b_no7751, afighter,          segas16a_state,           generic,     ROT270, "Sega", "Action Fighter (FD1089B 317-unknown)", MACHINE_SUPPORTS_SAVE ) // encrypted version of afightera (maybe 317-0017)
+GAME( 1986, afighterd,   afighter, system16a_fd1089b_no7751, afighter_analog,   afighter_16a_analog_state,generic,     ROT270, "Sega", "Action Fighter (FD1089B 317-unknown, analog controls)", MACHINE_SUPPORTS_SAVE ) // encrypted version of afighterb
 
 GAME( 1986, alexkidd,   0,        system16a,                alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 2, unprotected)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", MACHINE_SUPPORTS_SAVE )

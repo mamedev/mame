@@ -70,9 +70,9 @@
 
 /* Master Clock2 is for Asylum, Ataxx, Brute Force, Danny Sullivan's Indy Heat, World Soccer Finals */
 #define MASTER_CLOCK2       XTAL_28_63636MHZ
-#define MASTER_CLOCK        XTAL_12MHz
-#define VIDEO_CLOCK         XTAL_14_31818MHz
-#define MCU_CLOCK           XTAL_16MHz
+#define MASTER_CLOCK        XTAL(12'000'000)
+#define VIDEO_CLOCK         XTAL(14'318'181)
+#define MCU_CLOCK           XTAL(16'000'000)
 
 
 
@@ -940,7 +940,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( leland )
+MACHINE_CONFIG_START(leland_state::leland)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", Z80, MASTER_CLOCK/2)
@@ -986,7 +986,7 @@ static MACHINE_CONFIG_START( leland )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( redline, leland )
+MACHINE_CONFIG_DERIVED(leland_state::redline, leland)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("master")
@@ -1002,7 +1002,7 @@ static MACHINE_CONFIG_DERIVED( redline, leland )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( quarterb, redline )
+MACHINE_CONFIG_DERIVED(leland_state::quarterb, redline)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")
@@ -1014,7 +1014,7 @@ static MACHINE_CONFIG_DERIVED( quarterb, redline )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lelandi, quarterb )
+MACHINE_CONFIG_DERIVED(leland_state::lelandi, quarterb)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("slave")
@@ -1022,7 +1022,7 @@ static MACHINE_CONFIG_DERIVED( lelandi, quarterb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ataxx )
+MACHINE_CONFIG_START(leland_state::ataxx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("master", Z80, 6000000)
@@ -1033,7 +1033,7 @@ static MACHINE_CONFIG_START( ataxx )
 	MCFG_CPU_PROGRAM_MAP(slave_map_program)
 	MCFG_CPU_IO_MAP(slave_map_io_2)
 
-	MCFG_CPU_ADD("audiocpu", I80186, XTAL_16MHz)
+	MCFG_CPU_ADD("audiocpu", I80186, XTAL(16'000'000))
 	MCFG_CPU_PROGRAM_MAP(leland_80186_map_program)
 	MCFG_CPU_IO_MAP(ataxx_80186_map_io)
 	MCFG_80186_CHIP_SELECT_CB(DEVWRITE16("custom", leland_80186_sound_device, peripheral_ctrl))
@@ -1055,7 +1055,7 @@ static MACHINE_CONFIG_START( ataxx )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wsf, ataxx )
+MACHINE_CONFIG_DERIVED(leland_state::wsf, ataxx)
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_80186_TMROUT1_HANDLER(DEVWRITELINE("custom", leland_80186_sound_device, i80186_tmr1_w))
 

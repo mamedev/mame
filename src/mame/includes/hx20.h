@@ -143,6 +143,8 @@ public:
 	// sio state
 	int m_sio_rx;
 	int m_sio_pin;
+	void cm6000(machine_config &config);
+	void hx20(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_HX20_H

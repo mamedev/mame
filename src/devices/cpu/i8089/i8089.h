@@ -22,8 +22,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_I8089_DATABUS_WIDTH(_databus_width) \
-	i8089_device::set_databus_width(*device, _databus_width);
+#define MCFG_I8089_DATA_WIDTH(_data_width) \
+	i8089_device::set_data_width(*device, _data_width);
 
 #define MCFG_I8089_SINTR1(_sintr1) \
 	devcb = &downcast<i8089_device *>(device)->set_sintr1_callback(DEVCB_##_sintr1);
@@ -54,7 +54,7 @@ public:
 	template <class Object> devcb_base &set_sintr2_callback(Object &&sintr2) { return m_write_sintr2.set_callback(std::forward<Object>(sintr2)); }
 
 	// static configuration helpers
-	static void set_databus_width(device_t &device, uint8_t databus_width) { downcast<i8089_device &>(device).m_databus_width = databus_width; }
+	static void set_data_width(device_t &device, uint8_t data_width) { downcast<i8089_device &>(device).m_data_width = data_width; }
 
 	// input lines
 	DECLARE_WRITE_LINE_MEMBER( ca_w );
@@ -82,9 +82,7 @@ protected:
 	address_space_config m_io_config;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 7; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
@@ -114,7 +112,7 @@ private:
 
 	void initialize();
 
-	uint8_t m_databus_width;
+	uint8_t m_data_width;
 	address_space *m_mem;
 	address_space *m_io;
 

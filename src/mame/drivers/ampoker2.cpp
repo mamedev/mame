@@ -374,7 +374,7 @@
 *********************************************************************************/
 
 
-#define MASTER_CLOCK    XTAL_6MHz
+#define MASTER_CLOCK    XTAL(6'000'000)
 
 #include "emu.h"
 #include "includes/ampoker2.h"
@@ -730,7 +730,7 @@ static INPUT_PORTS_START( ampoker2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 
 	PORT_START("IN7")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* not used */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Remote Credit") PORT_IMPULSE(12) PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_IMPULSE(2)
 	PORT_DIPNAME( 0x08, 0x08, "Jackpot" )        PORT_DIPLOCATION("SW1:8") /* DSW8 */
@@ -1139,7 +1139,7 @@ GFXDECODE_END
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( ampoker2 )
+MACHINE_CONFIG_START(ampoker2_state::ampoker2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/2)        /* 3 MHz */
@@ -1173,7 +1173,7 @@ static MACHINE_CONFIG_START( ampoker2 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sigma2k, ampoker2 )
+MACHINE_CONFIG_DERIVED(ampoker2_state::sigma2k, ampoker2)
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", sigma2k)
@@ -1392,7 +1392,7 @@ DRIVER_INIT_MEMBER(ampoker2_state, rabbitpk)
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 1, 2, 5, 4, 3, 0, 7, 6) ^ dec_base[(i >> 2) & 0x1f];
+		rom[i] = bitswap<8>(rom[i], 1, 2, 5, 4, 3, 0, 7, 6) ^ dec_base[(i >> 2) & 0x1f];
 	}
 }
 
@@ -1456,4 +1456,4 @@ GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, ampoker2_state, 0,        R
 GAMEL( 1990, rabbitpk, ampoker2, ampoker2, ampoker2, ampoker2_state, rabbitpk, ROT0, "bootleg",           "Rabbit Poker (Arizona Poker v1.1?)", MACHINE_SUPPORTS_SAVE,  layout_ampoker2 )
 GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, ampoker2_state, 0,        ROT0, "Sigma Inc.",        "Sigma Poker",                        MACHINE_SUPPORTS_SAVE,  layout_sigmapkr )
 GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k,  ampoker2_state, 0,        ROT0, "Sigma Inc.",        "Sigma Poker 2000",                   MACHINE_SUPPORTS_SAVE,  layout_sigmapkr )
-GAME(  1990, piccolop, ampoker2, ampoker2, piccolop, ampoker2_state, piccolop, ROT0, "Admiral/Novomatic", "Piccolo Poker 100",                  MACHINE_SUPPORTS_SAVE )
+GAME(  1991, piccolop, ampoker2, ampoker2, piccolop, ampoker2_state, piccolop, ROT0, "Admiral/Novomatic", "Piccolo Poker 100",                  MACHINE_SUPPORTS_SAVE )

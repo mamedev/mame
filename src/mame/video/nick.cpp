@@ -127,7 +127,7 @@ nick_device::nick_device(const machine_config &mconfig, const char *tag, device_
 
 void nick_device::device_start()
 {
-	m_screen->register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap);
 	calc_visible_clocks(ENTERPRISE_SCREEN_WIDTH);
 
 	// initialize palette
@@ -138,7 +138,7 @@ void nick_device::device_start()
 
 	// allocate timers
 	m_timer_scanline = timer_alloc();
-	m_timer_scanline->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->scan_period());
+	m_timer_scanline->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
 
 	// state saving
 	save_item(NAME(m_scanline_count));
@@ -184,7 +184,7 @@ void nick_device::device_reset()
 
 void nick_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	int scanline = m_screen->vpos();
+	int scanline = screen().vpos();
 
 	if (scanline < ENTERPRISE_SCREEN_HEIGHT)
 	{
@@ -1012,7 +1012,7 @@ void nick_device::do_line()
 
 	if (m_virq && !(m_LPT.MB & NICK_MB_VIRQ))
 	{
-		m_timer_scanline->adjust(m_screen->time_until_pos(0, 0), 0, m_screen->scan_period());
+		m_timer_scanline->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
 	}
 
 	m_virq = (m_LPT.MB & NICK_MB_VIRQ) ? 1 : 0;

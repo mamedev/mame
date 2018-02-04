@@ -26,9 +26,9 @@ Debug cheats:
 #include "debugger.h"
 
 // TBD
-#define MAIN_CLOCK (XTAL_15_468MHz / 4)
-#define VIDEO_CLOCK (XTAL_15_468MHz / 3)
-#define SOUND_CLOCK XTAL_3_579545MHz
+#define MAIN_CLOCK (XTAL(15'468'480) / 4)
+#define VIDEO_CLOCK (XTAL(15'468'480) / 3)
+#define SOUND_CLOCK XTAL(3'579'545)
 
 class ron_state : public driver_device
 {
@@ -66,6 +66,7 @@ public:
 	DECLARE_READ_LINE_MEMBER(audio_T1_r);
 	DECLARE_WRITE8_MEMBER(ay_pa_w);
 
+	void ron(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -472,7 +473,7 @@ WRITE8_MEMBER(ron_state::ay_pa_w)
 {
 }
 
-static MACHINE_CONFIG_START( ron )
+MACHINE_CONFIG_START(ron_state::ron)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK)

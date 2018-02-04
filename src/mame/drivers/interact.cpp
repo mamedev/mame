@@ -76,11 +76,17 @@ public:
 	DECLARE_MACHINE_START(interact);
 	DECLARE_MACHINE_RESET(interact);
 	uint32_t screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void hector1(machine_config &config);
+	void interact(machine_config &config);
 };
 
 
 static ADDRESS_MAP_START(interact_mem, AS_PROGRAM, 8, interact_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	/* Main ROM page*/
+	AM_RANGE(0x0000,0x3fff) AM_ROM  /*BANK(2)*/
+	/*   AM_RANGE(0x1000,0x3fff) AM_RAM*/
+
 	/* Hardware address mapping*/
 /*  AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)// Bank management not udsed in BR machine*/
 	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
@@ -89,10 +95,6 @@ static ADDRESS_MAP_START(interact_mem, AS_PROGRAM, 8, interact_state )
 	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
 	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
 	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
-
-	/* Main ROM page*/
-	AM_RANGE(0x0000,0x3fff) AM_ROM  /*BANK(2)*/
-	/*   AM_RANGE(0x1000,0x3fff) AM_RAM*/
 
 	/* Video br mapping*/
 	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
@@ -120,10 +122,10 @@ uint32_t interact_state::screen_update_interact(screen_device &screen, bitmap_in
 	return 0;
 }
 
-static MACHINE_CONFIG_START( interact )
+MACHINE_CONFIG_START(interact_state::interact)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(interact_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
 
@@ -157,10 +159,10 @@ static MACHINE_CONFIG_START( interact )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hector1 )
+MACHINE_CONFIG_START(interact_state::hector1)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_1_75MHz)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(1'750'000))
 	MCFG_CPU_PROGRAM_MAP(interact_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(interact_state, irq0_line_hold, 50) /*  put on the I8080 irq in Hz*/
 

@@ -1903,7 +1903,7 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_w)
 {
 	if(offset) {
 		m_copro_w = (m_copro_w & 0x0000ffff) | (data << 16);
-		m_pushpc = space.device().safe_pc();
+		m_pushpc = m_maincpu->pc();
 		fifoin_push(m_copro_w);
 	} else
 		m_copro_w = (m_copro_w & 0xffff0000) | data;
@@ -1922,7 +1922,7 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_adr_w)
 READ16_MEMBER(model1_state::model1_tgp_copro_ram_r)
 {
 	if(!offset) {
-		logerror("TGP f0 ram read %04x, %08x (%f) (%x)\n", m_ram_adr, m_ram_data[m_ram_adr], u2f(m_ram_data[m_ram_adr]), space.device().safe_pc());
+		logerror("TGP f0 ram read %04x, %08x (%f) (%x)\n", m_ram_adr, m_ram_data[m_ram_adr], u2f(m_ram_data[m_ram_adr]), m_maincpu->pc());
 		return m_ram_data[m_ram_adr];
 	} else
 		return m_ram_data[m_ram_adr++] >> 16;
@@ -1933,7 +1933,7 @@ WRITE16_MEMBER(model1_state::model1_tgp_copro_ram_w)
 	COMBINE_DATA(m_ram_latch+offset);
 	if(offset) {
 		uint32_t v = m_ram_latch[0]|(m_ram_latch[1]<<16);
-		logerror("TGP f0 ram write %04x, %08x (%f) (%x)\n", m_ram_adr, v, u2f(v), space.device().safe_pc());
+		logerror("TGP f0 ram write %04x, %08x (%f) (%x)\n", m_ram_adr, v, u2f(v), m_maincpu->pc());
 		m_ram_data[m_ram_adr] = v;
 		m_ram_adr++;
 	}
@@ -2100,7 +2100,7 @@ READ16_MEMBER(model1_state::model1_tgp_vr_adr_r)
 	if ( m_ram_adr == 0 && m_copro_fifoin_num != 0 )
 	{
 		/* spin the main cpu and let the TGP catch up */
-		space.device().execute().spin_until_time(attotime::from_usec(100));
+		m_maincpu->spin_until_time(attotime::from_usec(100));
 	}
 
 	return m_ram_adr;
@@ -2126,7 +2126,7 @@ READ16_MEMBER(model1_state::model1_vr_tgp_ram_r)
 		if ( m_ram_adr == 0 && r == 0xffff )
 		{
 			/* if the TGP is busy, spin some more */
-			space.device().execute().spin_until_time(attotime::from_usec(100));
+			m_maincpu->spin_until_time(attotime::from_usec(100));
 		}
 
 		if ( m_ram_adr & 0x8000 )

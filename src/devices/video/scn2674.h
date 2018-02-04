@@ -16,7 +16,7 @@
 	scn2674_device::static_set_gfx_character_width(*device, _value);
 
 #define MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	scn2674_device::static_set_display_callback(*device, scn2674_device::draw_character_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	scn2674_device::static_set_display_callback(*device, scn2674_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define SCN2674_DRAW_CHARACTER_MEMBER(_name) void _name(bitmap_rgb32 &bitmap, int x, int y, uint8_t linecount, uint8_t charcode, uint16_t address, uint8_t cursor, uint8_t dw, uint8_t lg, uint8_t ul, uint8_t blink)
 

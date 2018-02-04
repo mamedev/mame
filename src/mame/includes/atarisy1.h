@@ -107,4 +107,11 @@ public:
 	DECLARE_WRITE16_MEMBER( atarisy1_priority_w );
 
 	static const atari_motion_objects_config s_mob_config;
+	void atarisy1(machine_config &config);
+	void indytemp(machine_config &config);
+	void roadb110(machine_config &config);
+	void peterpak(machine_config &config);
+	void roadrunn(machine_config &config);
+	void roadb109(machine_config &config);
+	void marble(machine_config &config);
 };

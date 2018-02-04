@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "sfx_dasm.h"
 
 enum
 {
@@ -92,7 +93,7 @@ enum
 	devcb = &superfx_device::set_out_irq_func(*device, DEVCB_##_devcb);
 
 
-class superfx_device :  public cpu_device
+class superfx_device :  public cpu_device, public superfx_disassembler::config
 {
 public:
 	// construction/destruction
@@ -106,6 +107,8 @@ public:
 	void add_clocks(int32_t clocks);
 	int access_ram();
 	int access_rom();
+
+	virtual u16 get_alt() const override;
 
 protected:
 	// device-level overrides
@@ -126,9 +129,7 @@ protected:
 	virtual void state_export(const device_state_entry &entry) override;
 
 	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 3; }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 
 private:
 	address_space_config m_program_config;
@@ -215,7 +216,5 @@ private:
 
 
 DECLARE_DEVICE_TYPE(SUPERFX, superfx_device)
-
-offs_t superfx_dasm_one(std::ostream &stream, offs_t pc, uint8_t op, uint8_t param0, uint8_t param1, uint16_t alt);
 
 #endif // MAME_CPU_SUPERFX_SUPERFX_H

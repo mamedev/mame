@@ -162,7 +162,7 @@ WRITE32_MEMBER(policetr_state::control_w)
 
 	/* log any unknown bits */
 	if (data & 0x4f1fffff)
-		logerror("%08X: control_w = %08X & %08X\n", space.device().safe_pcbase(), data, mem_mask);
+		logerror("%08X: control_w = %08X & %08X\n", m_maincpu->pcbase(), data, mem_mask);
 }
 
 
@@ -213,7 +213,7 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 	COMBINE_DATA(m_speedup_data);
 
 	/* see if the PC matches */
-	if ((space.device().safe_pcbase() & 0x1fffffff) == m_speedup_pc)
+	if ((m_maincpu->pcbase() & 0x1fffffff) == m_speedup_pc)
 	{
 		uint64_t curr_cycles = m_maincpu->total_cycles();
 
@@ -224,7 +224,7 @@ WRITE32_MEMBER(policetr_state::speedup_w)
 
 			/* more than 2 in a row and we spin */
 			if (m_loop_count > 2)
-				space.device().execute().spin_until_interrupt();
+				m_maincpu->spin_until_interrupt();
 		}
 		else
 			m_loop_count = 0;
@@ -397,7 +397,7 @@ void policetr_state::machine_start()
  *
  *************************************/
 
-static MACHINE_CONFIG_START( policetr )
+MACHINE_CONFIG_START(policetr_state::policetr)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R3041, MASTER_CLOCK/2)
@@ -428,7 +428,7 @@ static MACHINE_CONFIG_START( policetr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sshooter, policetr )
+MACHINE_CONFIG_DERIVED(policetr_state::sshooter, policetr)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

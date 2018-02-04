@@ -23,6 +23,7 @@ public:
 	DECLARE_MACHINE_RESET(s11a);
 	DECLARE_DRIVER_INIT(s11a);
 
+	void s11a(machine_config &config);
 protected:
 
 private:

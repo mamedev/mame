@@ -80,4 +80,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<generic_latch_8_device> m_soundlatch;
+	void deniam16c(machine_config &config);
+	void deniam16b(machine_config &config);
 };

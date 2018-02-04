@@ -38,6 +38,7 @@ public:
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void sys9002(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -115,9 +116,9 @@ static DEVICE_INPUT_DEFAULTS_START( uart2 )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( sys9002 )
+MACHINE_CONFIG_START(sys9002_state::sys9002)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8085A, XTAL_2MHz) // XTAL not visible on images
+	MCFG_CPU_ADD("maincpu",I8085A, XTAL(2'000'000)) // XTAL not visible on images
 	MCFG_CPU_PROGRAM_MAP(sys9002_mem)
 	MCFG_CPU_IO_MAP(sys9002_io)
 
@@ -132,7 +133,7 @@ static MACHINE_CONFIG_START( sys9002 )
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_2MHz) // clk unknown
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(2'000'000)) // clk unknown
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(sys9002_state, crtc_update_row)

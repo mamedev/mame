@@ -68,6 +68,7 @@ public:
 	required_device<eeprom_serial_93cxx_device> m_eeprom0;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint64_t> m_vram;
+	void aristmk6(machine_config &config);
 };
 
 
@@ -315,10 +316,10 @@ static INPUT_PORTS_START( aristmk6 )
 INPUT_PORTS_END
 
 // ?
-#define ARISTMK6_CPU_CLOCK XTAL_200MHz
+#define ARISTMK6_CPU_CLOCK XTAL(200'000'000)
 // ?
 
-static MACHINE_CONFIG_START( aristmk6 )
+MACHINE_CONFIG_START(aristmk6_state::aristmk6)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH4LE, ARISTMK6_CPU_CLOCK)
 	MCFG_SH4_MD0(1)
@@ -337,8 +338,8 @@ static MACHINE_CONFIG_START( aristmk6 )
 	MCFG_CPU_FORCE_NO_DRC()
 //  MCFG_DEVICE_DISABLE()
 
-	MCFG_DEVICE_ADD( "uart0", NS16550, XTAL_8MHz )
-	MCFG_DEVICE_ADD( "uart1", NS16550, XTAL_8MHz )
+	MCFG_DEVICE_ADD( "uart0", NS16550, XTAL(8'000'000) )
+	MCFG_DEVICE_ADD( "uart1", NS16550, XTAL(8'000'000) )
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom0")
 	MCFG_EEPROM_SERIAL_DEFAULT_VALUE(0xFF)

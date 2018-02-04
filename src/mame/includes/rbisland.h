@@ -78,6 +78,9 @@ public:
 	void request_world_data(  );
 	void request_goalin_data(  );
 	void rbisland_cchip_init( int version );
+	void jumping(machine_config &config);
+	void rbisland(machine_config &config);
+	void jumpingi(machine_config &config);
 };
 
 

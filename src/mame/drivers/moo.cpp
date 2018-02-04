@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( moo_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  /* Graphic planes */
 	AM_RANGE(0x1a2000, 0x1a3fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  /* Graphic planes mirror */
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_DEVREAD("k056832", k056832_device, rom_word_r)   /* Passthrough to tile roms */
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 #if MOO_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD("k056832", k056832_device, word_r)
 	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVREAD("k053246", k053247_device, k053246_reg_word_r)
@@ -356,7 +356,7 @@ static ADDRESS_MAP_START( moobl_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w) /* Graphic planes */
 	AM_RANGE(0x1a2000, 0x1a3fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  /* Graphic planes mirror */
 	AM_RANGE(0x1b0000, 0x1b1fff) AM_DEVREAD("k056832", k056832_device, rom_word_r)   /* Passthrough to tile roms */
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bucky_map, AS_PROGRAM, 16, moo_state )
@@ -384,7 +384,7 @@ static ADDRESS_MAP_START( bucky_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  /* Graphic planes mirror */
 	AM_RANGE(0x184000, 0x187fff) AM_RAM                         /* extra tile RAM? */
 	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD("k056832", k056832_device, rom_word_r)   /* Passthrough to tile roms */
-	AM_RANGE(0x1b0000, 0x1b3fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x1b0000, 0x1b3fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x200000, 0x23ffff) AM_ROM                         /* data */
 #if MOO_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD("k056832", k056832_device, word_r)
@@ -490,14 +490,14 @@ MACHINE_RESET_MEMBER(moo_state,moo)
 	m_sprite_colorbase = 0;
 }
 
-static MACHINE_CONFIG_START( moo )
+MACHINE_CONFIG_START(moo_state::moo)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) // 16MHz verified
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(32'000'000)/2) // 16MHz verified
 	MCFG_CPU_PROGRAM_MAP(moo_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", moo_state,  moo_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_32MHz/4) // 8MHz verified
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(32'000'000)/4) // 8MHz verified
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(moo_state,moo)
@@ -505,7 +505,7 @@ static MACHINE_CONFIG_START( moo )
 
 	MCFG_EEPROM_SERIAL_ER5911_8BIT_ADD("eeprom")
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL_32MHz/4) // 8MHz
+	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4) // 8MHz
 	MCFG_K053252_OFFSETS(40, 16)
 
 	/* video hardware */
@@ -543,16 +543,16 @@ static MACHINE_CONFIG_START( moo )
 
 	MCFG_K054321_ADD("k054321", ":lspeaker", ":rspeaker")
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) // 4MHz verified
+	MCFG_YM2151_ADD("ymsnd", XTAL(32'000'000)/8) // 4MHz verified
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
+	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( moobl )
+MACHINE_CONFIG_START(moo_state::moobl)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16100000)
@@ -602,7 +602,7 @@ static MACHINE_CONFIG_START( moobl )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bucky, moo )
+MACHINE_CONFIG_DERIVED(moo_state::bucky, moo)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bucky_map)

@@ -108,7 +108,7 @@ void kc_d002_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( kc_d002_device::device_add_mconfig )
+MACHINE_CONFIG_START(kc_d002_device::device_add_mconfig)
 	MCFG_DEVICE_ADD("m0", KCCART_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(kc85_cart, nullptr, false)
 	MCFG_KCCART_SLOT_NEXT_SLOT("m4")

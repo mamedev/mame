@@ -58,6 +58,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
 	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
+	void st_mp100(machine_config &config);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -700,7 +701,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( st_mp100_state::u11_timer )
 	m_pia_u11->ca1_w(m_u11_timer);
 }
 
-static MACHINE_CONFIG_START( st_mp100 )
+MACHINE_CONFIG_START(st_mp100_state::st_mp100)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 1000000) // no xtal, just 2 chips forming a random oscillator
 	MCFG_CPU_PROGRAM_MAP(st_mp100_map)

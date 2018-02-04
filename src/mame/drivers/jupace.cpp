@@ -128,6 +128,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ald_w);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( ace );
 
+	void ace(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi;
@@ -746,9 +747,9 @@ void ace_state::machine_start()
 //  MACHINE_CONFIG( ace )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( ace )
+MACHINE_CONFIG_START(ace_state::ace)
 	// basic machine hardware
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_6_5MHz/2)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(6'500'000)/2)
 	MCFG_CPU_PROGRAM_MAP(ace_mem)
 	MCFG_CPU_IO_MAP(ace_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -756,7 +757,7 @@ static MACHINE_CONFIG_START( ace )
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(ace_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_6_5MHz, 416, 0, 336, 312, 0, 304)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(6'500'000), 416, 0, 336, 312, 0, 304)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("set_irq", ace_state, set_irq, SCREEN_TAG, 31*8, 264)
@@ -773,10 +774,10 @@ static MACHINE_CONFIG_START( ace )
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL_6_5MHz/2)
+	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL(6'500'000)/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD(SP0256AL2_TAG, SP0256, XTAL_3MHz)
+	MCFG_SOUND_ADD(SP0256AL2_TAG, SP0256, XTAL(3'000'000))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -791,7 +792,7 @@ static MACHINE_CONFIG_START( ace )
 	MCFG_I8255_IN_PORTB_CB(READ8(ace_state, sby_r))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(ace_state, ald_w))
 
-	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_6_5MHz/2)
+	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL(6'500'000)/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(ace_state, pio_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(ace_state, pio_pa_w))

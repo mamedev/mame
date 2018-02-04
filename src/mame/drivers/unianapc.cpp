@@ -41,6 +41,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void unianapc(machine_config &config);
 };
 
 void unianapc_state::video_start()
@@ -67,7 +68,7 @@ void unianapc_state::machine_reset()
 {
 }
 
-static MACHINE_CONFIG_START( unianapc )
+MACHINE_CONFIG_START(unianapc_state::unianapc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PENTIUM3, 100000000) // actually a Celeron at 1.70 GHz

@@ -82,6 +82,8 @@ public:
 
 	void pgm_create_dummy_internal_arm_region(void);
 
+	void igs_m036_tt(machine_config &config);
+	void igs_m036(machine_config &config);
 };
 
 
@@ -245,7 +247,7 @@ void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 
 #define IGS036_CPU ARM7
 
-static MACHINE_CONFIG_START( igs_m036 )
+MACHINE_CONFIG_START(igs_m036_state::igs_m036)
 	MCFG_CPU_ADD("maincpu",IGS036_CPU, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_m036_map)
@@ -264,7 +266,7 @@ static MACHINE_CONFIG_START( igs_m036 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( igs_m036_tt )
+MACHINE_CONFIG_START(igs_m036_state::igs_m036_tt)
 	MCFG_CPU_ADD("maincpu",IGS036_CPU, 20000000)
 
 	MCFG_CPU_PROGRAM_MAP(igs_m036_map)
@@ -294,7 +296,7 @@ DRIVER_INIT_MEMBER(igs_m036_state, cjdh2)
 	DRIVER_INIT_CALL(igs_m036);
 
 	igs036_decryptor decrypter(cjdh2_key);
-	decrypter.decrypter_rom(memregion("user1"));
+	decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0);
 }
 
 DRIVER_INIT_MEMBER(igs_m036_state, cjddzsp)
@@ -302,7 +304,7 @@ DRIVER_INIT_MEMBER(igs_m036_state, cjddzsp)
 	DRIVER_INIT_CALL(igs_m036);
 
 	igs036_decryptor decrypter(cjddzsp_key);
-	decrypter.decrypter_rom(memregion("user1"));
+	decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0);
 }
 
 DRIVER_INIT_MEMBER(igs_m036_state, igsm312)
@@ -310,7 +312,7 @@ DRIVER_INIT_MEMBER(igs_m036_state, igsm312)
 	DRIVER_INIT_CALL(igs_m036);
 
 	igs036_decryptor decrypter(m312cn_key);
-	decrypter.decrypter_rom(memregion("user1"));
+	decrypter.decrypter_rom((uint16_t*)memregion("user1")->base(), memregion("user1")->bytes(), 0);
 }
 
 /***************************************************************************

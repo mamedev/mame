@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "ppccom.h"
 #include "ppcfe.h"
-
+#include "ppc_dasm.h"
 
 /***************************************************************************
     DEBUGGING
@@ -710,7 +710,7 @@ void ppc_device::device_start()
 	m_cache_line_size = 32;
 	m_cpu_clock = clock();
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_system_clock = c_bus_frequency != 0 ? c_bus_frequency : clock();
 	m_dcr_read_func = read32_delegate();
 	m_dcr_write_func = write32_delegate();
@@ -1165,11 +1165,9 @@ void ppc_device::device_reset()
     CPU
 -------------------------------------------------*/
 
-offs_t ppc_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *ppc_device::create_disassembler()
 {
-	uint32_t op = *(uint32_t *)oprom;
-	op = big_endianize_int32(op);
-	return ppc_dasm_one(stream, pc, op);
+	return new powerpc_disassembler;
 }
 
 

@@ -835,7 +835,7 @@ WRITE_LINE_MEMBER(jpmimpct_state::tms_irq)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( jpmimpct )
+MACHINE_CONFIG_START(jpmimpct_state::jpmimpct)
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(m68k_program_map)
 
@@ -1307,7 +1307,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( impctawp )
+MACHINE_CONFIG_START(jpmimpct_state::impctawp)
 	MCFG_CPU_ADD("maincpu",M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(awp68k_program_map)
 

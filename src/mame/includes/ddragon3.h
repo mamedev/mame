@@ -86,6 +86,9 @@ public:
 
 	int vblank_level;
 	int raster_level;
+	void ctribe(machine_config &config);
+	void ddragon3b(machine_config &config);
+	void ddragon3(machine_config &config);
 };
 
 
@@ -124,4 +127,6 @@ public:
 	DECLARE_VIDEO_START(wwfwfstb);
 	uint32_t screen_update_wwfwfest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void wwfwfest(machine_config &config);
+	void wwfwfstb(machine_config &config);
 };

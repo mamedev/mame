@@ -1344,7 +1344,7 @@ WRITE16_MEMBER(raiden2cop_device::LEGACY_cop_cmd_w)
 	int command;
 
 
-	//seibu_cop_log("%06x: COPX execute table macro command %04x | regs %08x %08x %08x %08x %08x\n", m_host_space.device().safe_pc(), data,  cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3], cop_regs[4]);
+	//seibu_cop_log("%s: COPX execute table macro command %04x | regs %08x %08x %08x %08x %08x\n", machine().describe_context(), data,  cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3], cop_regs[4]);
 
 
 	command = find_trigger_match(data, 0xf800);

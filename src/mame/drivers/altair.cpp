@@ -43,6 +43,7 @@ public:
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(altair);
 
+	void altair(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -62,8 +63,7 @@ static ADDRESS_MAP_START(io_map, AS_IO, 8, altair_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// TODO: Remove AM_MIRROR() and use SIO address S0-S7
-	AM_RANGE( 0x00, 0x00 ) AM_MIRROR(0x10) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE( 0x01, 0x01 ) AM_MIRROR(0x10) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x10) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -91,9 +91,9 @@ void altair_state::machine_reset()
 	m_maincpu->set_state_int(i8080_cpu_device::I8085_PC, 0xFD00);
 }
 
-static MACHINE_CONFIG_START( altair )
+MACHINE_CONFIG_START(altair_state::altair)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_2MHz)
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(2'000'000))
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 

@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8, srumbler_state )
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("6000") /* Banked ROM */
 	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP        /* Video RAM 2 ??? (not used) */
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("7000") /* Banked ROM */
-	AM_RANGE(0x7000, 0x73ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x7000, 0x73ff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("8000") /* Banked ROM */
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("9000") /* Banked ROM */
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("a000") /* Banked ROM */
@@ -243,10 +243,10 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( srumbler )
+MACHINE_CONFIG_START(srumbler_state::srumbler)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz (?) */
+	MCFG_CPU_ADD("maincpu", MC6809, 6000000)        /* HD68B09P at 6 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(srumbler_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", srumbler_state, interrupt, "screen", 0, 1)
 

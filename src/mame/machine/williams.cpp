@@ -302,27 +302,6 @@ WRITE8_MEMBER(williams2_state::williams2_snd_cmd_w)
 
 
 
-/*************************************
- *
- *  General input port handlers
- *
- *************************************/
-
-WRITE_LINE_MEMBER(williams_state::williams_port_select_w)
-{
-	m_port_select = state;
-}
-
-CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
-{
-	const char *tag = (const char *)param;
-
-	if (m_port_select != 0)
-		tag += strlen(tag) + 1;
-
-	return ioport(tag)->read();
-}
-
 /*
  *  Williams 49-way joystick
  *
@@ -352,15 +331,6 @@ READ8_MEMBER(williams_state::williams_49way_port_0_r)
 {
 	static const uint8_t translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
 	return (translate49[ioport("49WAYX")->read() >> 4] << 4) | translate49[ioport("49WAYY")->read() >> 4];
-}
-
-
-READ8_MEMBER(williams_state::williams_input_port_49way_0_5_r)
-{
-	if (m_port_select)
-		return williams_49way_port_0_r(space, 0);
-	else
-		return ioport("IN3")->read();
 }
 
 
@@ -610,23 +580,21 @@ WRITE_LINE_MEMBER(williams_state::lottofun_coin_lock_w)
  *
  *************************************/
 
-READ8_MEMBER(williams2_state::tshoot_input_port_0_3_r)
+CUSTOM_INPUT_MEMBER(tshoot_state::gun_r)
 {
-	/* merge in the gun inputs with the standard data */
-	int data = ioport("IN0")->read();
-	int gun = (data & 0x3f) ^ ((data & 0x3f) >> 1);
-	return (data & 0xc0) | gun;
+	int data = m_gun[(uintptr_t)param]->read();
+	return (data & 0x3f) ^ ((data & 0x3f) >> 1);
 }
 
 
-WRITE_LINE_MEMBER(williams2_state::tshoot_maxvol_w)
+WRITE_LINE_MEMBER(tshoot_state::maxvol_w)
 {
 	/* something to do with the sound volume */
 	logerror("tshoot maxvol = %d (%s)\n", state, machine().describe_context());
 }
 
 
-WRITE8_MEMBER(williams2_state::tshoot_lamp_w)
+WRITE8_MEMBER(tshoot_state::lamp_w)
 {
 	/* set the grenade lamp */
 	output().set_value("Grenade_lamp", (~data & 0x4)>>2 );

@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bishi_state )
 	AM_RANGE(0x870000, 0x8700ff) AM_DEVWRITE("k055555", k055555_device, K055555_word_w)  // PCU2
 	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff00)
 	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("k056832", k056832_device, ram_word_r, ram_word_w)  // Graphic planes
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xb04000, 0xb047ff) AM_READ(bishi_mirror_r)    // bug in the ram/rom test?
 	AM_RANGE(0xc00000, 0xc01fff) AM_READ(bishi_K056832_rom_r)
 ADDRESS_MAP_END
@@ -363,7 +363,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dobouchn )
 	PORT_INCLUDE( bishi )
-	
+
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -371,14 +371,14 @@ static INPUT_PORTS_START( dobouchn )
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Shoot")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
-	
+
 	PORT_MODIFY("SYSTEM")
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("M. Ack") // ???
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Coin 2 (Medal)")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(    0x00, "5 Coins / 2 Credits" )
@@ -425,7 +425,7 @@ static INPUT_PORTS_START( dobouchn )
 	PORT_DIPSETTING(    0x3000, "12 seconds" )
 	// TODO: needs NVRAM hookup and default hookup
 	PORT_DIPNAME( 0x4000, 0x0000, "Backup RAM clear" ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(      0x4000, DEF_STR( No ) ) 
+	PORT_DIPSETTING(      0x4000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
@@ -444,7 +444,7 @@ void bishi_state::machine_reset()
 	m_cur_control2 = 0;
 }
 
-static MACHINE_CONFIG_START( bishi )
+MACHINE_CONFIG_START(bishi_state::bishi)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK) /* 12MHz (24MHz OSC / 2 ) */
@@ -484,10 +484,10 @@ static MACHINE_CONFIG_START( bishi )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( dobouchn, bishi )
+MACHINE_CONFIG_DERIVED(bishi_state::dobouchn, bishi)
 //  TODO: change accordingly (ASCII charset definitely not 8bpp, 5bpp perhaps?)
 	MCFG_DEVICE_MODIFY("k056832")
-//	MCFG_K056832_CB(bishi_state, dobouchn_tile_callback)
+//  MCFG_K056832_CB(bishi_state, dobouchn_tile_callback)
 	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8, 1, 0, "none")
 MACHINE_CONFIG_END
 

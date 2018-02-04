@@ -94,6 +94,7 @@ public:
 	uint32_t screen_update_meyc8080(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
+	void meyc8080(machine_config &config);
 };
 
 
@@ -579,10 +580,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( meyc8080 )
+MACHINE_CONFIG_START(meyc8080_state::meyc8080)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080, XTAL_20MHz / 10) // divider guessed
+	MCFG_CPU_ADD("maincpu", I8080, XTAL(20'000'000) / 10) // divider guessed
 	MCFG_CPU_PROGRAM_MAP(meyc8080_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")

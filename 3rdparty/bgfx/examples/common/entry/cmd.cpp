@@ -4,8 +4,9 @@
  */
 
 #include <bx/allocator.h>
-#include <bx/hash.h>
 #include <bx/commandline.h>
+#include <bx/hash.h>
+#include <bx/string.h>
 
 #include "dbg.h"
 #include "cmd.h"
@@ -28,7 +29,7 @@ struct CmdContext
 
 	void add(const char* _name, ConsoleFn _fn, void* _userData)
 	{
-		uint32_t cmd = bx::hashMurmur2A(_name, (uint32_t)bx::strnlen(_name) );
+		uint32_t cmd = bx::hash<bx::HashMurmur2A>(_name, (uint32_t)bx::strLen(_name) );
 		BX_CHECK(m_lookup.end() == m_lookup.find(cmd), "Command \"%s\" already exist.", _name);
 		Func fn = { _fn, _userData };
 		m_lookup.insert(stl::make_pair(cmd, fn) );
@@ -46,7 +47,7 @@ struct CmdContext
 			if (argc > 0)
 			{
 				int err = -1;
-				uint32_t cmd = bx::hashMurmur2A(argv[0], (uint32_t)bx::strnlen(argv[0]) );
+				uint32_t cmd = bx::hash<bx::HashMurmur2A>(argv[0], (uint32_t)bx::strLen(argv[0]) );
 				CmdLookup::iterator it = m_lookup.find(cmd);
 				if (it != m_lookup.end() )
 				{
@@ -104,7 +105,14 @@ void cmdAdd(const char* _name, ConsoleFn _fn, void* _userData)
 	s_cmdContext->add(_name, _fn, _userData);
 }
 
-void cmdExec(const char* _cmd)
+void cmdExec(const char* _format, ...)
 {
-	s_cmdContext->exec(_cmd);
+	char tmp[2048];
+
+	va_list argList;
+	va_start(argList, _format);
+	bx::vsnprintf(tmp, BX_COUNTOF(tmp), _format, argList);
+	va_end(argList);
+
+	s_cmdContext->exec(tmp);
 }

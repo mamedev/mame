@@ -165,6 +165,7 @@ DEFINE_DEVICE_TYPE(SAPPHIRE_IOGA, sapphire_ioga_device, "ioga_s", "I/O Gate Arra
 
 interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_memory_tag(nullptr)
 	, m_memory_space(nullptr)
 	, m_out_nmi_func(*this)
 	, m_out_irq_func(*this)
@@ -192,13 +193,22 @@ sapphire_ioga_device::sapphire_ioga_device(const machine_config &mconfig, const 
 {
 }
 
+void interpro_ioga_device::static_set_memory(device_t &device, const char *const tag, const int spacenum)
+{
+	interpro_ioga_device &ioga = dynamic_cast<interpro_ioga_device &>(device);
+
+	ioga.m_memory_tag = tag;
+	ioga.m_memory_spacenum = spacenum;
+}
+
 void interpro_ioga_device::device_start()
 {
-	// TODO: parameterise the cammu name and space number
-	// grab the main memory space from the mmu so we can do DMA to/from it
-	device_memory_interface *mmu;
-	siblingdevice("mmu")->interface(mmu);
-	m_memory_space = &mmu->space(0);
+	assert_always(m_memory_tag != nullptr, "memory tag and address space number must be configured");
+
+	// get the memory space
+	device_memory_interface *memory;
+	siblingdevice(m_memory_tag)->interface(memory);
+	m_memory_space = &memory->space(m_memory_spacenum);
 
 	// resolve callbacks
 	m_out_nmi_func.resolve();
@@ -1042,7 +1052,7 @@ WRITE32_MEMBER(interpro_ioga_device::timer3_w)
 		LOGMASKED(LOG_TIMER3, "timer3_w data 0x%08x mask 0x%08x (%s)\n", data, mem_mask, machine().describe_context());
 
 		// theory: timer 3 is 12.5MHz (typical value of 12500 giving a delay of 1ms)
-		m_timer3->adjust(attotime::zero, false, attotime::from_hz(XTAL_12_5MHz));
+		m_timer3->adjust(attotime::zero, false, attotime::from_hz(XTAL(12'500'000)));
 	}
 }
 
@@ -1200,7 +1210,7 @@ WRITE16_MEMBER(turquoise_ioga_device::eth_w)
 	m_memory_space->write_word(address, data, mem_mask);
 }
 
-READ16_MEMBER(turquoise_ioga_device::eth_r) const
+READ16_MEMBER(turquoise_ioga_device::eth_r)
 {
 	const u32 address = m_eth_base | ((offset << 1) & ~ETH_BASE_MASK);
 
@@ -1281,7 +1291,7 @@ WRITE32_MEMBER(sapphire_ioga_device::eth_w)
 	m_memory_space->write_dword(address, data, mem_mask);
 }
 
-READ32_MEMBER(sapphire_ioga_device::eth_r) const
+READ32_MEMBER(sapphire_ioga_device::eth_r)
 {
 	// top two bits give channel (0=A, 4=B, 8=C, f=?)
 	const int channel = offset >> 28;

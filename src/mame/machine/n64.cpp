@@ -987,7 +987,7 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 TIMER_CALLBACK_MEMBER(n64_periphs::vi_scanline_callback)
 {
 	signal_rcp_interrupt(VI_INTERRUPT);
-	vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr));
+	vi_scanline_timer->adjust(screen().time_until_pos(vi_intr));
 }
 
 // Video Interface
@@ -1000,7 +1000,7 @@ void n64_periphs::vi_recalculate_resolution()
 	int width = ((vi_xscale & 0x00000fff) * (x_end - x_start)) / 0x400;
 	int height = ((vi_yscale & 0x00000fff) * (y_end - y_start)) / 0x400;
 
-	rectangle visarea = m_screen->visible_area();
+	rectangle visarea = screen().visible_area();
 	// DACRATE is the quarter pixel clock and period will be for a field, not a frame
 	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC) / 2;
 
@@ -1026,7 +1026,7 @@ void n64_periphs::vi_recalculate_resolution()
 
 	visarea.max_x = width - 1;
 	visarea.max_y = height - 1;
-	m_screen->configure((vi_hsync & 0x00000fff)>>2, (vi_vsync & 0x00000fff), visarea, period);
+	screen().configure((vi_hsync & 0x00000fff)>>2, (vi_vsync & 0x00000fff), visarea, period);
 }
 
 READ32_MEMBER( n64_periphs::vi_reg_r )
@@ -1051,7 +1051,7 @@ READ32_MEMBER( n64_periphs::vi_reg_r )
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
-			ret = (m_screen->vpos() & 0x3FE) + field;
+			ret = (screen().vpos() & 0x3FE) + field;
 			break;
 
 		case 0x14/4:        // VI_BURST_REG
@@ -1123,7 +1123,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 
 		case 0x0c/4:        // VI_INTR_REG
 			vi_intr = data;
-			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr));
+			vi_scanline_timer->adjust(screen().time_until_pos(vi_intr));
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG

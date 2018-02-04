@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="stepone_flop" description="Ericsson PC step/one diskettes">
+
+	<!-- OS -->
+	<!-- https://www.youtube.com/watch?v=0EzeMt2F-kU -->
+	<software name="dos125">
+		<description>MS-DOS v1.25</description>
+		<year>1982</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="10734">
+				<rom name="BASIC.IMD" size="167674" crc="6789a422" sha1="2db2140562f1e033719dd68befd27ef34e6ef539" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Apps -->
+	<software name="combi" supported="no">
+		<description>Custom integrated office suite</description>
+		<year>1983</year>
+		<publisher>OMS - Office Management Systems AB</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="526850">
+				<rom name="CMBSTBM.IMD" size="526850" crc="9a93f2e4" sha1="2b4b6cbce1534a67ba4eca275ef018637261c3ed" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="282664">
+				<rom name="CMBSTPE1.IMD" size="282664" crc="8a71d87f" sha1="b442573aed547fb7748c60d055405e2e92995fd8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="316889">
+				<rom name="CMBSTPE2.IMD" size="316889" crc="c839115b" sha1="d8054d3e7d3516a7cdee33b02c0ae79ae0279caf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="527874">
+				<rom name="CMBSTPO1.IMD" size="527874" crc="80eb83d0" sha1="b81bfa66ae477afd087b8d54c21fe98c778e032f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="683218">
+				<rom name="CMBSTPO2.IMD" size="683218" crc="5357135d" sha1="cce5e51be38180003b926704d79990021e918bd0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multip14">
+		<description>Microsoft Multiplan v1.04</description>
+		<year>1982</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="118615">
+				<rom name="MULTIPL.IMD" size="118615" crc="756368a3" sha1="9bbd27d5ac37ac2ef40f68a21a4a9cd93c1c5648" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pasc311">
+		<description>Microsoft Pascal v3.11</description>
+		<year>1983</year>
+		<publisher>Ericsson/Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="705796">
+				<rom name="PASCAL1.IMD" size="705796" crc="c4fb00a0" sha1="8b3a6e40b7d198aef6ec04eeff8c634c137d9cc5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="596955">
+				<rom name="PASCAL2.IMD" size="596955" crc="1091c2f4" sha1="b54569167d1263632535244d1b4aff811c2f4c91" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rjev10m">
+		<description>RJE - IBM 3780 Remote Batch Terminal Emulator v1.0M</description>
+		<year>1982</year>
+		<publisher>InterCom Inc/Matsushita</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="36358">
+				<rom name="RJE3780.IMD" size="36358" crc="22365c54" sha1="3e4c30701eb36809b08eefbec5c808aa1d758795" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wstar324">
+		<description>Wordstar v3.24</description>
+		<year>1982</year>
+		<publisher>MicroPro International Corporation</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="103798">
+				<rom name="WORDSTAR.IMD" size="103798" crc="a9b57ef8" sha1="8253ec46818b0855d8bab860d6afd2ddfc0996a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spel">
+		<description>Collections of small games</description>
+		<year>1987</year>
+		<publisher>Various authors</publisher>
+		<part name="spel1" interface="floppy_5_25">
+			<dataarea name="flop" size="666392">
+				<rom name="SPEL1.IMD" size="666392" crc="62eae5c0" sha1="e33e9e901a649114312c75780fefbd9bb27a18c7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="spel2" interface="floppy_5_25">
+			<dataarea name="flop" size="509004">
+				<rom name="SPEL2.IMD" size="509004" crc="07abdac4" sha1="a665d8862f80234ca85a9dc14ae89ff202c70860" offset="0" />
+			</dataarea>
+		</part>
+		<part name="spel3" interface="floppy_5_25">
+			<dataarea name="flop" size="461481">
+				<rom name="SPEL3.IMD" size="461481" crc="771eafc3" sha1="1bc8879355dee5877ea8bb1c16256fa28eb10547" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

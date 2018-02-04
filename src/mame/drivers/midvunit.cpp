@@ -237,13 +237,13 @@ READ32_MEMBER(midvunit_state::tms32031_control_r)
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
 		int32_t result = (m_timer[which]->time_elapsed() * m_timer_rate).as_double();
-//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", space.device().safe_pc(), offset, result);
+//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
 		return result;
 	}
 
 	/* log anything else except the memory control register */
 	if (offset != 0x64)
-		logerror("%06X:tms32031_control_r(%02X)\n", space.device().safe_pc(), offset);
+		logerror("%06X:tms32031_control_r(%02X)\n", m_maincpu->pc(), offset);
 
 	return m_tms32031_control[offset];
 }
@@ -261,7 +261,7 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 	else if (offset == 0x20 || offset == 0x30)
 	{
 		int which = (offset >> 4) & 1;
-//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", space.device().safe_pc(), offset, data);
+//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 		if (data & 0x40)
 			m_timer[which]->reset();
 
@@ -272,7 +272,7 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 			m_timer_rate = 10000000.;
 	}
 	else
-		logerror("%06X:tms32031_control_w(%02X) = %08X\n", space.device().safe_pc(), offset, data);
+		logerror("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -519,7 +519,7 @@ READ32_MEMBER(midvunit_state::midvplus_misc_r)
 	}
 
 	if (offset != 0 && offset != 3)
-		logerror("%06X:midvplus_misc_r(%d) = %08X\n", space.device().safe_pc(), offset, result);
+		logerror("%06X:midvplus_misc_r(%d) = %08X\n", m_maincpu->pc(), offset, result);
 	return result;
 }
 
@@ -548,7 +548,7 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 	}
 
 	if (logit)
-		logerror("%06X:midvplus_misc_w(%d) = %08X\n", space.device().safe_pc(), offset, data);
+		logerror("%06X:midvplus_misc_w(%d) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -1127,7 +1127,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( midvcommon )
+MACHINE_CONFIG_START(midvunit_state::midvcommon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS32031, CPU_CLOCK)
@@ -1156,27 +1156,27 @@ static MACHINE_CONFIG_START( midvcommon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( midvunit, midvcommon )
+MACHINE_CONFIG_DERIVED(midvunit_state::midvunit, midvcommon)
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( crusnwld, midvunit )
+MACHINE_CONFIG_DERIVED(midvunit_state::crusnwld, midvunit)
 	/* valid values are 450 or 460 */
 	MCFG_DEVICE_ADD("serial_pic", MIDWAY_SERIAL_PIC, 0)
 	MCFG_MIDWAY_SERIAL_PIC_UPPER(450)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( offroadc, midvunit )
+MACHINE_CONFIG_DERIVED(midvunit_state::offroadc, midvunit)
 	/* valid values are 230 or 234 */
 	MCFG_DEVICE_ADD("serial_pic2", MIDWAY_SERIAL_PIC2, 0)
 	MCFG_MIDWAY_SERIAL_PIC2_UPPER(230)
 	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
+MACHINE_CONFIG_DERIVED(midvunit_state::midvplus, midvcommon)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1856,7 +1856,7 @@ ROM_END
 
 READ32_MEMBER(midvunit_state::generic_speedup_r)
 {
-	space.device().execute().eat_cycles(100);
+	m_maincpu->eat_cycles(100);
 	return m_generic_speedup[offset];
 }
 

@@ -123,7 +123,7 @@ INTERRUPT_GEN_MEMBER(gcpinbal_state::gcpinbal_interrupt)
 
 WRITE16_MEMBER(gcpinbal_state::d80010_w)
 {
-	//logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", space.device().safe_pc(), offset, data);
+	//logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", m_maincpu->pc(), offset, data);
 	COMBINE_DATA(&m_d80010_ram[offset]);
 }
 
@@ -134,7 +134,7 @@ WRITE8_MEMBER(gcpinbal_state::d80040_w)
 
 WRITE16_MEMBER(gcpinbal_state::d80060_w)
 {
-	//logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", space.device().safe_pc(), offset, data);
+	//logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", m_maincpu->pc(), offset, data);
 	COMBINE_DATA(&m_d80060_ram[offset]);
 }
 
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( gcpinbal_map, AS_PROGRAM, 16, gcpinbal_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_SHARE("tilemapram")
 	AM_RANGE(0xc80000, 0xc81fff) AM_DEVREADWRITE8("spritegen", excellent_spr_device, read, write, 0x00ff)
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xd80010, 0xd8002f) AM_RAM_WRITE(d80010_w) AM_SHARE("d80010")
 	AM_RANGE(0xd80040, 0xd8005b) AM_WRITE8(d80040_w, 0x00ff)
 	AM_RANGE(0xd80060, 0xd80077) AM_RAM_WRITE(d80060_w) AM_SHARE("d80060")
@@ -449,10 +449,10 @@ void gcpinbal_state::machine_reset()
 	m_msm_bank = 0;
 }
 
-static MACHINE_CONFIG_START( gcpinbal )
+MACHINE_CONFIG_START(gcpinbal_state::gcpinbal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2) /* 16 MHz */
+	MCFG_CPU_ADD("maincpu", M68000, 32_MHz_XTAL/2) /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(gcpinbal_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gcpinbal_state,  gcpinbal_interrupt)
 
@@ -479,13 +479,13 @@ static MACHINE_CONFIG_START( gcpinbal )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MCFG_DEVICE_ADD("adpcm_select", HCT157, 0)
 	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm6585_device, data_w))
 
-	MCFG_SOUND_ADD("msm", MSM6585, XTAL_640kHz)
+	MCFG_SOUND_ADD("msm", MSM6585, 640_kHz_XTAL)
 	MCFG_MSM6585_VCK_CALLBACK(WRITELINE(gcpinbal_state, gcp_adpcm_int))
 	MCFG_MSM6585_PRESCALER_SELECTOR(S40)         /* 16 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

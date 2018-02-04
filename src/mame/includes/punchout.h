@@ -90,4 +90,7 @@ public:
 	void drawbs2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void punchout_copy_top_palette(int bank);
 	void punchout_copy_bot_palette(int bank);
+	void spnchout(machine_config &config);
+	void armwrest(machine_config &config);
+	void punchout(machine_config &config);
 };

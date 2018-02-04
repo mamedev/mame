@@ -71,6 +71,7 @@ public:
 	uint32_t screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_meyc8088);
 	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
+	void meyc8088(machine_config &config);
 };
 
 
@@ -344,20 +345,20 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( meyc8088 )
+MACHINE_CONFIG_START(meyc8088_state::meyc8088)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, (XTAL_15MHz / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
+	MCFG_CPU_ADD("maincpu", I8088, (XTAL(15'000'000) / 3) * 0.95) // NOTE: underclocked to prevent errors on diagnostics, MAME i8088 cycle timing is probably inaccurate
 	MCFG_CPU_PROGRAM_MAP(meyc8088_map)
 
-	MCFG_DEVICE_ADD("i8155_1", I8155, XTAL_15MHz / (3*1))
+	MCFG_DEVICE_ADD("i8155_1", I8155, XTAL(15'000'000) / (3*1))
 	// all ports set to input
 	MCFG_I8155_IN_PORTA_CB(READ8(meyc8088_state, meyc8088_input_r))
 	MCFG_I8155_IN_PORTB_CB(IOPORT("SW"))
 	MCFG_I8155_IN_PORTC_CB(READ8(meyc8088_state, meyc8088_status_r))
 	// i8251A trigger txc/rxc (debug related, unpopulated on sold boards)
 
-	MCFG_DEVICE_ADD("i8155_2", I8155, XTAL_15MHz / (3*32))
+	MCFG_DEVICE_ADD("i8155_2", I8155, XTAL(15'000'000) / (3*32))
 	// all ports set to output
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(meyc8088_state, meyc8088_lights2_w))
 	MCFG_I8155_OUT_PORTB_CB(WRITE8(meyc8088_state, meyc8088_lights1_w))
@@ -370,7 +371,7 @@ static MACHINE_CONFIG_START( meyc8088 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_15MHz/3, 320, 0, 256, 261, 0, 224)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(15'000'000)/3, 320, 0, 256, 261, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(meyc8088_state, screen_update_meyc8088)
 	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(meyc8088_state, screen_vblank_meyc8088))
 	MCFG_SCREEN_PALETTE("palette")

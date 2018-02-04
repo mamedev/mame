@@ -102,6 +102,7 @@ public:
 	DECLARE_DRIVER_INIT(lastfght);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void lastfght(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -199,11 +200,11 @@ uint32_t lastfght_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 WRITE16_MEMBER(lastfght_state::hi_w)
 {
 	if (ACCESSING_BITS_8_15)
-		logerror("%06x: 600000.b = %02x\n", space.device().safe_pc(), data >> 8);
+		logerror("%06x: 600000.b = %02x\n", m_maincpu->pc(), data >> 8);
 	if (ACCESSING_BITS_0_7)
 	{
 		m_hi = data << 8;
-		//logerror("%06x: hi  = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: hi  = %02x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -211,11 +212,11 @@ WRITE16_MEMBER(lastfght_state::hi_w)
 WRITE16_MEMBER(lastfght_state::x_w)
 {
 	if (ACCESSING_BITS_8_15)
-		logerror("%06x: 800008.b = %02x\n", space.device().safe_pc(), data >> 8);
+		logerror("%06x: 800008.b = %02x\n", m_maincpu->pc(), data >> 8);
 	if (ACCESSING_BITS_0_7)
 	{
 		m_x = m_hi | data;
-		//logerror("%06x: x   = %02x\n", space.device().safe_pc(),data);
+		//logerror("%06x: x   = %02x\n", m_maincpu->pc(),data);
 	}
 }
 
@@ -225,12 +226,12 @@ WRITE16_MEMBER(lastfght_state::yw_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_y = m_hi | (data >> 8);
-		//logerror("%06x: y   = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: y   = %02x\n", m_maincpu->pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_w = m_hi | data;
-		//logerror("%06x: w   = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: w   = %02x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -240,10 +241,10 @@ WRITE16_MEMBER(lastfght_state::h_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_h = m_hi | (data >> 8);
-		//logerror("%06x: h   = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: h   = %02x\n", m_maincpu->pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x: 80000d.b = %02x\n", space.device().safe_pc(), data);
+		logerror("%06x: 80000d.b = %02x\n", m_maincpu->pc(), data);
 }
 
 // source delta x << 6, source x << 6
@@ -252,12 +253,12 @@ WRITE16_MEMBER(lastfght_state::sx_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_dsx = m_hi | (data >> 8);
-		//logerror("%06x: dsx = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: dsx = %02x\n", m_maincpu->pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_sx = m_hi | data;
-		//logerror("%06x: sx  = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: sx  = %02x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -267,12 +268,12 @@ WRITE16_MEMBER(lastfght_state::sy_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_sy = m_hi | (data >> 8);
-		//logerror("%06x: sy  = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: sy  = %02x\n", m_maincpu->pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_sy1 = m_hi | data;
-		//logerror("%06x: sy1 = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: sy1 = %02x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -282,12 +283,12 @@ WRITE16_MEMBER(lastfght_state::sr_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_sp = (m_hi >> 8) >> 4;
-		//logerror("%06x: sp  = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: sp  = %02x\n", m_maincpu->pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_sr = data;
-		//logerror("%06x: sr  = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: sr  = %02x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -297,12 +298,12 @@ WRITE16_MEMBER(lastfght_state::sd_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_sx1 = m_hi | (data >> 8);
-		//logerror("%06x: sx1 = %02x\n", space.device().safe_pc(), data >> 8);
+		//logerror("%06x: sx1 = %02x\n", m_maincpu->pc(), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		m_dsy = m_hi | data;
-		//logerror("%06x: dsy = %02x\n", space.device().safe_pc(), data);
+		//logerror("%06x: dsy = %02x\n", m_maincpu->pc(), data);
 	}
 }
 
@@ -316,7 +317,7 @@ WRITE16_MEMBER(lastfght_state::blit_w)
 		bitmap_ind16 &dest = m_bitmap[m_dest];
 
 #if 0
-		logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, sx %03x.%02x, sx1 %03x.%02x, dsx %03x.%02x, sy %03x.%02x, sy1 %03x.%02x, dsy %03x.%02x, sp %02x, sr %02x, data %02x\n", space.device().safe_pc(),
+		logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, sx %03x.%02x, sx1 %03x.%02x, dsx %03x.%02x, sy %03x.%02x, sy1 %03x.%02x, dsy %03x.%02x, sp %02x, sr %02x, data %02x\n", m_maincpu->pc(),
 				m_x, m_y, m_w + 1, m_h + 1,
 				m_sx >> 6, m_sx & 0x3f, m_sx1 >> 6, m_dsx & 0x3f, m_sx1 >> 6, m_sx1 & 0x3f,
 				m_sy >> 6, m_sy & 0x3f, m_sy1 >> 6, m_dsy & 0x3f, m_sy1 >> 6, m_sy1 & 0x3f,
@@ -340,7 +341,7 @@ WRITE16_MEMBER(lastfght_state::blit_w)
 		}
 	}
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x: 600007.b = %02x\n", space.device().safe_pc(), data);
+		logerror("%06x: 600007.b = %02x\n", m_maincpu->pc(), data);
 }
 
 // toggle framebuffer
@@ -395,9 +396,9 @@ READ16_MEMBER(lastfght_state::sound_r)
 WRITE16_MEMBER(lastfght_state::sound_w)
 {
 	if (ACCESSING_BITS_8_15)
-		logerror("%06x: sound_w msb = %02x\n", space.device().safe_pc(), data >> 8);
+		logerror("%06x: sound_w msb = %02x\n", m_maincpu->pc(), data >> 8);
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x: sound_w lsb = %02x\n", space.device().safe_pc(), data);
+		logerror("%06x: sound_w lsb = %02x\n", m_maincpu->pc(), data);
 }
 
 /***************************************************************************
@@ -545,7 +546,7 @@ void lastfght_state::machine_reset()
 	m_c00006 = 0;
 }
 
-static MACHINE_CONFIG_START( lastfght )
+MACHINE_CONFIG_START(lastfght_state::lastfght)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83044, 32000000/2)

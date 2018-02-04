@@ -113,7 +113,7 @@ INTERRUPT_GEN_MEMBER(lwings_state::avengers_interrupt)
 
 WRITE8_MEMBER(lwings_state::avengers_protection_w)
 {
-	int pc = space.device().safe_pc();
+	int pc = m_maincpu->pc();
 
 	if (pc == 0x2eeb)
 	{
@@ -243,7 +243,7 @@ READ8_MEMBER(lwings_state::avengers_protection_r)
 	int x, y;
 	int dx, dy, dist, dir;
 
-	if (space.device().safe_pc() == 0x7c7)
+	if (m_maincpu->pc() == 0x7c7)
 	{
 		/* palette data */
 		return avengers_fetch_paldata();
@@ -293,8 +293,8 @@ static ADDRESS_MAP_START( avengers_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xdf80, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_SHARE("bg1videoram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(lwings_bg1_scrollx_w)
 	AM_RANGE(0xf802, 0xf803) AM_WRITE(lwings_bg1_scrolly_w)
 	AM_RANGE(0xf804, 0xf804) AM_WRITE(trojan_bg2_scrollx_w)
@@ -316,8 +316,8 @@ static ADDRESS_MAP_START( lwings_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_SHARE("bg1videoram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("P1")
@@ -338,8 +338,8 @@ static ADDRESS_MAP_START( trojan_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xdf80, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_SHARE("bg1videoram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(lwings_bg1_scrollx_w)
 	AM_RANGE(0xf802, 0xf803) AM_WRITE(lwings_bg1_scrolly_w)
@@ -373,8 +373,8 @@ static ADDRESS_MAP_START( fball_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_SHARE("bg1videoram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 
 	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("P1")
@@ -916,14 +916,14 @@ void lwings_state::machine_reset()
 	m_adpcm = 0;
 }
 
-static MACHINE_CONFIG_START( lwings )
+MACHINE_CONFIG_START(lwings_state::lwings)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* verified on PCB */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(lwings_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lwings_state,  lwings_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_12MHz/4) /* verified on PCB */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(12'000'000)/4) /* verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(lwings_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222) // approximation from pcb music recording - where is the frequency actually derived from??
 
@@ -951,13 +951,13 @@ static MACHINE_CONFIG_START( lwings )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("2203a", YM2203, XTAL_12MHz/8)   /* verified on PCB */
+	MCFG_SOUND_ADD("2203a", YM2203, XTAL(12'000'000)/8)   /* verified on PCB */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
 	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MCFG_SOUND_ADD("2203b", YM2203, XTAL_12MHz/8)   /* verified on PCB */
+	MCFG_SOUND_ADD("2203b", YM2203, XTAL(12'000'000)/8)   /* verified on PCB */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
 	MCFG_SOUND_ROUTE(2, "mono", 0.20)
@@ -972,14 +972,14 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_START( fball )
+MACHINE_CONFIG_START(lwings_state::fball)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)
 	MCFG_CPU_PROGRAM_MAP(fball_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lwings_state,  avengers_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, XTAL_12MHz/4) // ?
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(12'000'000)/4) // ?
 	MCFG_CPU_PROGRAM_MAP(fball_sound_map)
 //  MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold, 222)
 
@@ -1007,24 +1007,24 @@ static MACHINE_CONFIG_START( fball )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(0, fball_oki_map)
 
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( trojan, lwings )
+MACHINE_CONFIG_DERIVED(lwings_state::trojan, lwings)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_CLOCK(XTAL_12MHz/4)            /* verified on PCB */
+	MCFG_CPU_CLOCK(XTAL(12'000'000)/4)            /* verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(trojan_map)
 
 	MCFG_CPU_MODIFY("soundcpu")
-	MCFG_CPU_CLOCK(XTAL_12MHz/4)            /* verified on PCB */
+	MCFG_CPU_CLOCK(XTAL(12'000'000)/4)            /* verified on PCB */
 
-	MCFG_CPU_ADD("adpcm", Z80, XTAL_12MHz/4)    /* verified on PCB */
+	MCFG_CPU_ADD("adpcm", Z80, XTAL(12'000'000)/4)    /* verified on PCB */
 	MCFG_CPU_PROGRAM_MAP(trojan_adpcm_map)
 	MCFG_CPU_IO_MAP(trojan_adpcm_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(lwings_state, irq0_line_hold,  4000)
@@ -1040,12 +1040,12 @@ static MACHINE_CONFIG_DERIVED( trojan, lwings )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("5205", MSM5205, XTAL_384kHz)    /* verified on PCB */
+	MCFG_SOUND_ADD("5205", MSM5205, XTAL(384'000))    /* verified on PCB */
 	MCFG_MSM5205_PRESCALER_SELECTOR(SEX_4B)  /* slave mode */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( avengers, trojan )
+MACHINE_CONFIG_DERIVED(lwings_state::avengers, trojan)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1059,7 +1059,7 @@ static MACHINE_CONFIG_DERIVED( avengers, trojan )
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengers)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( avengersb, avengers )
+MACHINE_CONFIG_DERIVED(lwings_state::avengersb, avengers)
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengersb)
 MACHINE_CONFIG_END

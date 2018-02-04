@@ -72,6 +72,7 @@ public:
 	TIMER_CALLBACK_MEMBER(firq_timer_tick);
 	void expand_pixels();
 	void poly17_init();
+	void gridlee(machine_config &config);
 };
 
 

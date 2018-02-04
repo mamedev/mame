@@ -82,4 +82,8 @@ public:
 	INTERRUPT_GEN_MEMBER(wiz_sound_interrupt);
 	void draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int charbank, int colortype);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int set, int charbank);
+	void wiz(machine_config &config);
+	void kungfut(machine_config &config);
+	void scion(machine_config &config);
+	void stinger(machine_config &config);
 };

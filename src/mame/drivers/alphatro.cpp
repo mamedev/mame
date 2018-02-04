@@ -45,7 +45,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_4MHz
+#define MAIN_CLOCK XTAL(4'000'000)
 
 
 class alphatro_state : public driver_device
@@ -105,6 +105,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
+	void alphatro(machine_config &config);
 private:
 	uint8_t *m_ram_ptr;
 	required_device<ram_device> m_ram;
@@ -686,7 +687,7 @@ static SLOT_INTERFACE_START( alphatro_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( alphatro )
+MACHINE_CONFIG_START(alphatro_state::alphatro)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(alphatro_map)
@@ -726,7 +727,7 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_I8257_OUT_IOW_2_CB(DEVWRITE8("fdc", upd765a_device, mdma_w))
 	MCFG_I8257_OUT_TC_CB(DEVWRITELINE("fdc", upd765a_device, tc_line_w))
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8) // clk unknown
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(12'288'000) / 8) // clk unknown
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(alphatro_state, crtc_update_row)
@@ -759,21 +760,21 @@ static MACHINE_CONFIG_START( alphatro )
 	MCFG_DEVICE_ADD("lowbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(rombank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x6000)
 
 	/* A000 banking */
 	MCFG_DEVICE_ADD("cartbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(cartbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	/* F000 banking */
 	MCFG_DEVICE_ADD("monbank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(monbank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
 MACHINE_CONFIG_END
 

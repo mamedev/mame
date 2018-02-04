@@ -77,6 +77,7 @@ public:
 	DECLARE_READ8_MEMBER(rom_r);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
 
+	void pokemini(machine_config &config);
 protected:
 	enum
 	{
@@ -524,7 +525,7 @@ WRITE8_MEMBER(pokemini_state::hwreg_w)
 	static const int timer_to_cycles_fast[8] = { 2, 8, 32, 64, 128, 256, 1024, 4096 };
 	static const int timer_to_cycles_slow[8] = { 128, 256, 512, 1024, 2048, 4096, 8192, 16384 };
 
-	//logerror( "%0X: Write to hardware address: %02X, %02X\n", space.device() .safe_pc( ), offset, data );
+	//logerror( "%0X: Write to hardware address: %02X, %02X\n", m_maincpu->pc(), offset, data );
 
 	switch( offset )
 	{
@@ -1753,7 +1754,7 @@ uint32_t pokemini_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-static MACHINE_CONFIG_START( pokemini )
+MACHINE_CONFIG_START(pokemini_state::pokemini)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MINX, 4000000)
 	MCFG_CPU_PROGRAM_MAP(pokemini_mem_map)

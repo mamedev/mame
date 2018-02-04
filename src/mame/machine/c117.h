@@ -74,7 +74,7 @@ private:
 
 	// cpu interfaces
 	device_execute_interface * m_cpuexec[2];
-	direct_read_data *         m_cpudirect[2];
+	direct_read_data<0> *      m_cpudirect[2];
 
 	// configuration
 	const char *               m_maincpu_tag;

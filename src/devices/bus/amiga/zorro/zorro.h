@@ -159,7 +159,7 @@
 #define MCFG_ZORRO_SLOT_ADD(_zorrotag, _tag, _slot_intf, _def_slot) \
 	MCFG_DEVICE_ADD(_tag, ZORRO_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false) \
-	zorro_slot_device::set_zorro_slot(*device, owner, _zorrotag);
+	zorro_slot_device::set_zorro_slot(*device, this, _zorrotag);
 
 // ======================> expansion slot
 

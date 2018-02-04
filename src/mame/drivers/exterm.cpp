@@ -93,13 +93,13 @@ void exterm_state::machine_start()
 
 WRITE16_MEMBER(exterm_state::exterm_host_data_w)
 {
-	m_slave->host_w(space,offset / TOWORD(0x00100000), data, 0xffff);
+	m_slave->host_w(space,offset / 0x0010000, data, 0xffff);
 }
 
 
 READ16_MEMBER(exterm_state::exterm_host_data_r)
 {
-	return m_slave->host_r(space,offset / TOWORD(0x00100000), 0xffff);
+	return m_slave->host_r(space,offset / 0x0010000, 0xffff);
 }
 
 
@@ -265,7 +265,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16, exterm_state )
 	AM_RANGE(0x01500000, 0x0153ffff) AM_MIRROR(0xfc000000) AM_WRITE(exterm_output_port_0_w)
 	AM_RANGE(0x01580000, 0x015bffff) AM_MIRROR(0xfc000000) AM_WRITE8(sound_latch_w, 0x00ff)
 	AM_RANGE(0x015c0000, 0x015fffff) AM_MIRROR(0xfc000000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
-	AM_RANGE(0x01800000, 0x01807fff) AM_MIRROR(0xfc7f8000) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x01800000, 0x01807fff) AM_MIRROR(0xfc7f8000) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x02800000, 0x02807fff) AM_MIRROR(0xfc7f8000) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x03000000, 0x03ffffff) AM_MIRROR(0xfc000000) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -382,7 +382,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( exterm )
+MACHINE_CONFIG_START(exterm_state::exterm)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)

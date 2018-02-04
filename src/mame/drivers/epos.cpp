@@ -56,7 +56,7 @@ WRITE8_MEMBER(epos_state::dealer_decrypt_rom)
 	else
 		m_counter = (m_counter - 1) & 0x03;
 
-//  logerror("PC %08x: ctr=%04x\n",space.device().safe_pc(), m_counter);
+//  logerror("PC %08x: ctr=%04x\n",m_maincpu->pc(), m_counter);
 
 	membank("bank1")->set_entry(m_counter);
 
@@ -453,10 +453,10 @@ MACHINE_START_MEMBER(epos_state,dealer)
 	MACHINE_START_CALL_MEMBER(epos);
 }
 
-static MACHINE_CONFIG_START( epos ) /* EPOS TRISTAR 8000 PCB */
+MACHINE_CONFIG_START(epos_state::epos) /* EPOS TRISTAR 8000 PCB */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_11MHz/4)    /* 2.75 MHz schematics confirm 11MHz XTAL (see notes) */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(11'000'000)/4)    /* 2.75 MHz schematics confirm 11MHz XTAL (see notes) */
 	MCFG_CPU_PROGRAM_MAP(epos_map)
 	MCFG_CPU_IO_MAP(epos_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
@@ -476,15 +476,15 @@ static MACHINE_CONFIG_START( epos ) /* EPOS TRISTAR 8000 PCB */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_11MHz/16) /*  0.6875 MHz, confirmed from schematics */
+	MCFG_SOUND_ADD("aysnd", AY8912, XTAL(11'000'000)/16) /*  0.6875 MHz, confirmed from schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dealer ) /* EPOS TRISTAR 9000 PCB */
+MACHINE_CONFIG_START(epos_state::dealer) /* EPOS TRISTAR 9000 PCB */
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_22_1184MHz/8)    /* 2.7648 MHz (measured) */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(22'118'400)/8)    /* 2.7648 MHz (measured) */
 	MCFG_CPU_PROGRAM_MAP(dealer_map)
 	MCFG_CPU_IO_MAP(dealer_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
@@ -513,7 +513,7 @@ static MACHINE_CONFIG_START( dealer ) /* EPOS TRISTAR 9000 PCB */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_22_1184MHz/32)    /* 0.6912 MHz (measured) */
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL(22'118'400)/32)    /* 0.6912 MHz (measured) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(epos_state, ay_porta_mpx_r))
 	// port a writes?
@@ -740,19 +740,19 @@ DRIVER_INIT_MEMBER(epos_state,dealer)
 
 	/* Key 0 */
 	for (A = 0; A < 0x8000; A++)
-		rom[A] = BITSWAP8(rom[A] ^ 0xbd, 2,6,4,0,5,7,1,3 );
+		rom[A] = bitswap<8>(rom[A] ^ 0xbd, 2,6,4,0,5,7,1,3 );
 
 	/* Key 1 */
 	for (A = 0; A < 0x8000; A++)
-		rom[A + 0x10000] = BITSWAP8(rom[A], 7,5,4,6,3,2,1,0 );
+		rom[A + 0x10000] = bitswap<8>(rom[A], 7,5,4,6,3,2,1,0 );
 
 	/* Key 2 */
 	for (A = 0; A < 0x8000; A++)
-		rom[A + 0x20000] = BITSWAP8(rom[A] ^ 1, 7,6,5,4,3,0,2,1 );
+		rom[A + 0x20000] = bitswap<8>(rom[A] ^ 1, 7,6,5,4,3,0,2,1 );
 
 	/* Key 3 */
 	for (A = 0; A < 0x8000; A++)
-		rom[A + 0x30000] = BITSWAP8(rom[A] ^ 1, 7,5,4,6,3,0,2,1 );
+		rom[A + 0x30000] = bitswap<8>(rom[A] ^ 1, 7,5,4,6,3,0,2,1 );
 
 	/*
 	    there is not enough data to determine key 3.

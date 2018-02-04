@@ -437,6 +437,11 @@ public:
 	int jvs_encode_data(uint8_t *in, int length);
 	int jvs_decode_data(uint8_t *in, uint8_t *out, int length);
 	void jamma_jvs_cmd_exec();
+	void terabrst(machine_config &config);
+	void sscope2(machine_config &config);
+	void hornet_2board(machine_config &config);
+	void hornet_2board_v2(machine_config &config);
+	void hornet(machine_config &config);
 };
 
 
@@ -1004,17 +1009,17 @@ ADC12138_IPT_CONVERT_CB(hornet_state::adc12138_input_callback)
 	return (double)(value) / 2047.0;
 }
 
-static MACHINE_CONFIG_START( hornet )
+MACHINE_CONFIG_START(hornet_state::hornet)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL_64MHz/2)   /* PowerPC 403GA 32MHz */
+	MCFG_CPU_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
 	MCFG_CPU_PROGRAM_MAP(hornet_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(hornet_state, irq1_line_assert,  1000)
 
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL_64MHz/4)    /* 16MHz */
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_memmap)
 
-	MCFG_CPU_ADD("dsp", ADSP21062, XTAL_36MHz)
+	MCFG_CPU_ADD("dsp", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(sharc0_map)
 
@@ -1047,12 +1052,12 @@ static MACHINE_CONFIG_START( hornet )
 	MCFG_K037122_ADD("k037122_1", "screen")
 	MCFG_K037122_PALETTE("palette")
 
-	MCFG_K056800_ADD("k056800", XTAL_16_9344MHz)
+	MCFG_K056800_ADD("k056800", XTAL(16'934'400))
 	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_RF5C400_ADD("rfsnd", XTAL_16_9344MHz)  // value from Guru readme, gives 44100 Hz sample rate
+	MCFG_RF5C400_ADD("rfsnd", XTAL(16'934'400))  // value from Guru readme, gives 44100 Hz sample rate
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
@@ -1066,9 +1071,9 @@ static MACHINE_CONFIG_START( hornet )
 	MCFG_KONPPC_CGBOARD_TYPE(HORNET)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
+MACHINE_CONFIG_DERIVED(hornet_state::hornet_2board, hornet)
 
-	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL_36MHz)
+	MCFG_CPU_ADD("dsp2", ADSP21062, XTAL(36'000'000))
 	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
 	MCFG_CPU_DATA_MAP(sharc1_map)
 
@@ -1123,13 +1128,13 @@ static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
 	MCFG_KONPPC_CGBOARD_TYPE(HORNET)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( terabrst, hornet )
+MACHINE_CONFIG_DERIVED(hornet_state::terabrst, hornet)
 
-	MCFG_CPU_ADD("gn680", M68000, XTAL_32MHz/2)   /* 16MHz */
+	MCFG_CPU_ADD("gn680", M68000, XTAL(32'000'000)/2)   /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(gn680_memmap)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( hornet_2board_v2, hornet_2board )
+MACHINE_CONFIG_DERIVED(hornet_state::hornet_2board_v2, hornet_2board)
 	MCFG_DEVICE_REMOVE("voodoo0")
 	MCFG_DEVICE_ADD("voodoo0", VOODOO_2, STD_VOODOO_2_CLOCK)
 	MCFG_VOODOO_FBMEM(2)
@@ -1147,7 +1152,7 @@ static MACHINE_CONFIG_DERIVED( hornet_2board_v2, hornet_2board )
 	MCFG_VOODOO_VBLANK_CB(WRITELINE(hornet_state,voodoo_vblank_1))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sscope2, hornet_2board_v2)
+MACHINE_CONFIG_DERIVED(hornet_state::sscope2, hornet_2board_v2)
 
 	MCFG_DS2401_ADD("lan_serial_id")
 	MCFG_EEPROM_SERIAL_93C46_ADD("lan_eeprom")

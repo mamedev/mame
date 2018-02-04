@@ -37,6 +37,7 @@ public:
 	required_ioport_array<6> m_row;
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
 	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_outtimer);
+	void zac_2(machine_config &config);
 protected:
 
 	// devices
@@ -204,7 +205,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_outtimer)
 	}
 }
 
-static MACHINE_CONFIG_START( zac_2 )
+MACHINE_CONFIG_START(zac_2_state::zac_2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", S2650, 6000000/2)
 	MCFG_CPU_PROGRAM_MAP(zac_2_map)

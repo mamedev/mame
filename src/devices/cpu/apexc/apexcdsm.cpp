@@ -10,9 +10,7 @@
 
 
 #include "emu.h"
-#include "debugger.h"
-
-#include "apexc.h"
+#include "apexcdsm.h"
 
 /*
     Here is the format used for debugger output.
@@ -63,15 +61,8 @@
     The X value shows where the data word is located, and the Y value is the
     address of the next instruction.
 */
-enum format_type {branch, shiftl, shiftr, multiply, store, swap, one_address, two_address};
 
-struct instr_desc
-{
-	const char *mnemonic;
-	format_type format; /* -> X and Y are format */
-};
-
-static const instr_desc instructions[16] =
+const apexc_disassembler::instr_desc apexc_disassembler::instructions[16] =
 {
 	{ "Stop",   one_address },  { "I",      one_address },
 	{ "P",      one_address },  { "B",      branch },
@@ -83,7 +74,12 @@ static const instr_desc instructions[16] =
 	{ "A",      store },        { "S",      swap }
 };
 
-CPU_DISASSEMBLE(apexc)
+u32 apexc_disassembler::opcode_alignment() const
+{
+	return 4;
+}
+
+offs_t apexc_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t instruction;         /* 32-bit machine instruction */
 	int x, y, function, c6, vector; /* instruction fields */
@@ -92,7 +88,7 @@ CPU_DISASSEMBLE(apexc)
 	char mnemonic[9];           /* storage for generated mnemonic */
 
 	/* read the instruction to disassemble */
-	instruction = oprom[0] << 24 | oprom[1] << 16 | oprom[2] << 8 | oprom[3];
+	instruction = opcodes.r32(pc);
 
 	/* isolate the instruction fields */
 	x = (instruction >> 22) & 0x3FF;

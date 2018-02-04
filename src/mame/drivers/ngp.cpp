@@ -203,6 +203,9 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ngp_cart);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ngp_cart );
 
+	void ngp_common(machine_config &config);
+	void ngp(machine_config &config);
+	void ngpc(machine_config &config);
 protected:
 	bool m_nvram_loaded;
 	required_ioport m_io_controls;
@@ -816,19 +819,19 @@ void ngp_state::nvram_write(emu_file &file)
 }
 
 
-static MACHINE_CONFIG_START( ngp_common )
+MACHINE_CONFIG_START(ngp_state::ngp_common)
 
-	MCFG_CPU_ADD( "maincpu", TMP95C061, XTAL_6_144MHz )
+	MCFG_CPU_ADD( "maincpu", TMP95C061, 6.144_MHz_XTAL )
 	MCFG_TLCS900H_AM8_16(1)
 	MCFG_CPU_PROGRAM_MAP( ngp_mem)
 	MCFG_TMP95C061_PORTA_WRITE(WRITE8(ngp_state,ngp_tlcs900_porta))
 
-	MCFG_CPU_ADD( "soundcpu", Z80, XTAL_6_144MHz/2 )
+	MCFG_CPU_ADD( "soundcpu", Z80, 6.144_MHz_XTAL/2 )
 	MCFG_CPU_PROGRAM_MAP( z80_mem)
 	MCFG_CPU_IO_MAP( z80_io)
 
 	MCFG_SCREEN_ADD( "screen", LCD )
-	MCFG_SCREEN_RAW_PARAMS( XTAL_6_144MHz, 515, 0, 160 /*480*/, 199, 0, 152 )
+	MCFG_SCREEN_RAW_PARAMS( 6.144_MHz_XTAL, 515, 0, 160 /*480*/, 199, 0, 152 )
 	MCFG_SCREEN_UPDATE_DRIVER(ngp_state, screen_update_ngp)
 
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
@@ -836,7 +839,7 @@ static MACHINE_CONFIG_START( ngp_common )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker","rspeaker" )
 
-	MCFG_SOUND_ADD( "t6w28", T6W28, XTAL_6_144MHz/2 )
+	MCFG_SOUND_ADD( "t6w28", T6W28, 6.144_MHz_XTAL/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.50 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.50 )
 
@@ -848,9 +851,9 @@ static MACHINE_CONFIG_START( ngp_common )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ngp, ngp_common )
+MACHINE_CONFIG_DERIVED(ngp_state::ngp, ngp_common)
 
-	MCFG_K1GE_ADD( "k1ge", XTAL_6_144MHz, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
+	MCFG_K1GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_PALETTE("k1ge:palette")
@@ -866,8 +869,8 @@ static MACHINE_CONFIG_DERIVED( ngp, ngp_common )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ngpc, ngp_common )
-	MCFG_K2GE_ADD( "k1ge", XTAL_6_144MHz, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
+MACHINE_CONFIG_DERIVED(ngp_state::ngpc, ngp_common)
+	MCFG_K2GE_ADD( "k1ge", 6.144_MHz_XTAL, "screen", WRITELINE( ngp_state, ngp_vblank_pin_w ), WRITELINE( ngp_state, ngp_hblank_pin_w ) )
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_PALETTE("k1ge:palette")

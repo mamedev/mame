@@ -104,6 +104,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_READ8_MEMBER(irq_callback);
 
+	void rc759(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -524,7 +525,7 @@ static SLOT_INTERFACE_START( rc759_floppies )
 	SLOT_INTERFACE("hd", FLOPPY_525_HD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( rc759 )
+MACHINE_CONFIG_START(rc759_state::rc759)
 	MCFG_CPU_ADD("maincpu", I80186, 6000000)
 	MCFG_CPU_PROGRAM_MAP(rc759_map)
 	MCFG_CPU_IO_MAP(rc759_io)
@@ -546,7 +547,7 @@ static MACHINE_CONFIG_START( rc759 )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(rc759_state, ppi_portc_w))
 
 	// rtc
-	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
 	MCFG_MM58167_IRQ_CALLBACK(DEVWRITELINE("pic", pic8259_device, ir3_w))
 
 	// video
@@ -571,7 +572,7 @@ static MACHINE_CONFIG_START( rc759 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("snd", SN76489A, XTAL_20MHz / 10)
+	MCFG_SOUND_ADD("snd", SN76489A, XTAL(20'000'000) / 10)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	// internal centronics

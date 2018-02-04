@@ -114,7 +114,7 @@ PALETTE_INIT_MEMBER(champbas_state,exctsccr)
 	/* characters / sprites (3bpp) */
 	for (int i = 0; i < 0x100; i++)
 	{
-		int swapped_i = BITSWAP8(i, 2, 7, 6, 5, 4, 3, 1, 0);
+		int swapped_i = bitswap<8>(i, 2, 7, 6, 5, 4, 3, 1, 0);
 		uint8_t ctabentry = (color_prom[swapped_i] & 0x0f) | ((i & 0x80) >> 3);
 		palette.set_pen_indirect(i, ctabentry);
 	}

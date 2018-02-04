@@ -1,22 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:ElSemi
 #include "emu.h"
-#include "debugger.h"
-#include "se3208.h"
-
-
-static struct
-{
-	uint32_t PC;
-	uint32_t SR;
-	uint32_t ER;
-} Context;
+#include "se3208dis.h"
 
 #define FLAG_E      0x0800
 
-#define CLRFLAG(f)  Context.SR&=~(f);
-#define SETFLAG(f)  Context.SR|=(f);
-#define TESTFLAG(f) (Context.SR&(f))
+#define CLRFLAG(f)  SR&=~(f);
+#define SETFLAG(f)  SR|=(f);
+#define TESTFLAG(f) (SR&(f))
 
 #define EXTRACT(val,sbit,ebit)  (((val)>>sbit)&((1<<((ebit-sbit)+1))-1))
 #define SEX8(val)   ((val&0x80)?(val|0xFFFFFF00):(val&0xFF))
@@ -25,8 +16,8 @@ static struct
 #define ZEX16(val)  ((val)&0xFFFF)
 #define SEX(bits,val)   ((val)&(1<<(bits-1))?((val)|(~((1<<bits)-1))):(val&((1<<bits)-1)))
 
-typedef uint32_t (*_OP)(uint16_t Opcode, std::ostream &stream);
-#define INST(a) static uint32_t a(uint16_t Opcode, std::ostream &stream)
+#define INST(a) uint32_t se3208_disassembler::a(uint16_t Opcode, std::ostream &stream)
+
 
 
 INST(INVALIDOP)
@@ -42,7 +33,7 @@ INST(LDB)
 	uint32_t SrcDst=EXTRACT(Opcode,8,10);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
 		util::stream_format(stream, "LDB   (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
@@ -60,7 +51,7 @@ INST(STB)
 	uint32_t SrcDst=EXTRACT(Opcode,8,10);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
 		util::stream_format(stream, "STB   %%R%d,(%%R%d,0x%x)",SrcDst,Index,Offset);
@@ -80,7 +71,7 @@ INST(LDS)
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
 		util::stream_format(stream, "LDS   (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
@@ -100,7 +91,7 @@ INST(STS)
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
 		util::stream_format(stream, "STS   %%R%d,(%%R%d,0x%x)",SrcDst,Index,Offset);
@@ -120,7 +111,7 @@ INST(LD)
 	Offset<<=2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
 		util::stream_format(stream, "LD    (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
@@ -140,7 +131,7 @@ INST(ST)
 	Offset<<=2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
 		util::stream_format(stream, "ST    %%R%d,(%%R%d,0x%x)",SrcDst,Index,Offset);
@@ -158,7 +149,7 @@ INST(LDBU)
 	uint32_t SrcDst=EXTRACT(Opcode,8,10);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
 		util::stream_format(stream, "LDBU  (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
@@ -178,7 +169,7 @@ INST(LDSU)
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
 		util::stream_format(stream, "LDSU  (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
@@ -195,12 +186,12 @@ INST(LERI)
 	uint32_t Imm=EXTRACT(Opcode,0,13);
 
 	if(TESTFLAG(FLAG_E))
-		Context.ER=(EXTRACT(Context.ER,0,17)<<14)|Imm;
+		ER=(EXTRACT(ER,0,17)<<14)|Imm;
 	else
-		Context.ER=SEX(14,Imm);
+		ER=SEX(14,Imm);
 
-	//util::stream_format(stream, "LERI  0x%x\t\tER=%08X",Imm,Context.ER);
-	util::stream_format(stream, "LERI  0x%x",Imm/*,Context.ER*/);
+	//util::stream_format(stream, "LERI  0x%x\t\tER=%08X",Imm,ER);
+	util::stream_format(stream, "LERI  0x%x",Imm/*,ER*/);
 
 	SETFLAG(FLAG_E);
 	return 0;
@@ -214,7 +205,7 @@ INST(LDSP)
 	Offset<<=2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	util::stream_format(stream, "LD    (%%SP,0x%x),%%R%d",Offset,SrcDst);
 
@@ -230,7 +221,7 @@ INST(STSP)
 	Offset<<=2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	util::stream_format(stream, "ST    %%R%d,(%%SP,0x%x)",SrcDst,Offset);
 
@@ -306,7 +297,7 @@ INST(POP)
 	if(Ret)
 		strcat(str,"\n");
 	stream << str;
-	return Ret ? DASMFLAG_STEP_OUT : 0;
+	return Ret ? STEP_OUT : 0;
 }
 
 INST(LEATOSP)
@@ -315,7 +306,7 @@ INST(LEATOSP)
 	uint32_t Index=EXTRACT(Opcode,3,5);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 	else
 		Offset=SEX(4,Offset);
 
@@ -334,7 +325,7 @@ INST(LEAFROMSP)
 	uint32_t Index=EXTRACT(Opcode,3,5);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 	else
 		Offset=SEX(4,Offset);
 
@@ -351,7 +342,7 @@ INST(LEASPTOSP)
 	Offset<<=2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,23)<<8)|(Offset&0xff);
+		Offset=(EXTRACT(ER,0,23)<<8)|(Offset&0xff);
 	else
 		Offset=SEX(10,Offset);
 
@@ -380,7 +371,7 @@ INST(LDI)
 	uint32_t Imm=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(Context.ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX8(Imm);
 
@@ -396,7 +387,7 @@ INST(LDBSP)
 	uint32_t SrcDst=EXTRACT(Opcode,4,6);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	util::stream_format(stream, "LDB   (%%SP,0x%x),%%R%d",Offset,SrcDst);
 
@@ -410,7 +401,7 @@ INST(STBSP)
 	uint32_t SrcDst=EXTRACT(Opcode,4,6);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	util::stream_format(stream, "STB   %%R%d,(%%SP,0x%x)",SrcDst,Offset);
 
@@ -426,7 +417,7 @@ INST(LDSSP)
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	util::stream_format(stream, "LDS   (%%SP,0x%x),%%R%d",Offset,SrcDst);
 
@@ -442,7 +433,7 @@ INST(STSSP)
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	util::stream_format(stream, "STS   %%R%d,(%%SP,0x%x)",SrcDst,Offset);
 
@@ -456,7 +447,7 @@ INST(LDBUSP)
 	uint32_t SrcDst=EXTRACT(Opcode,4,6);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	util::stream_format(stream, "LDBU  (%%SP,0x%x),%%R%d",Offset,SrcDst);
 
@@ -472,7 +463,7 @@ INST(LDSUSP)
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(ER,0,27)<<4)|(Offset&0xf);
 
 	util::stream_format(stream, "LDSU  (%%SP,0x%x),%%R%d",Offset,SrcDst);
 
@@ -488,7 +479,7 @@ INST(ADDI)
 	uint32_t Imm2=Imm;
 
 	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(Context.ER,0,27)<<4)|(Imm2&0xf);
+		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
 	else
 		Imm2=SEX(4,Imm2);
 
@@ -506,7 +497,7 @@ INST(SUBI)
 	uint32_t Imm2=Imm;
 
 	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(Context.ER,0,27)<<4)|(Imm2&0xf);
+		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
 	else
 		Imm2=SEX(4,Imm2);
 
@@ -525,7 +516,7 @@ INST(ADCI)
 	uint32_t Imm2=Imm;
 
 	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(Context.ER,0,27)<<4)|(Imm2&0xf);
+		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
 	else
 		Imm2=SEX(4,Imm2);
 
@@ -543,7 +534,7 @@ INST(SBCI)
 	uint32_t Imm2=Imm;
 
 	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(Context.ER,0,27)<<4)|(Imm2&0xf);
+		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
 	else
 		Imm2=SEX(4,Imm2);
 
@@ -561,7 +552,7 @@ INST(ANDI)
 	uint32_t Imm2=Imm;
 
 	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(Context.ER,0,27)<<4)|(Imm2&0xf);
+		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
 	else
 		Imm2=SEX(4,Imm2);
 
@@ -579,7 +570,7 @@ INST(ORI)
 	uint32_t Imm2=Imm;
 
 	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(Context.ER,0,27)<<4)|(Imm2&0xf);
+		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
 	else
 		Imm2=SEX(4,Imm2);
 
@@ -597,7 +588,7 @@ INST(XORI)
 	uint32_t Imm2=Imm;
 
 	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(Context.ER,0,27)<<4)|(Imm2&0xf);
+		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
 	else
 		Imm2=SEX(4,Imm2);
 
@@ -614,7 +605,7 @@ INST(CMPI)
 	uint32_t Imm2=Imm;
 
 	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(Context.ER,0,27)<<4)|(Imm2&0xf);
+		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
 	else
 		Imm2=SEX(4,Imm2);
 
@@ -631,7 +622,7 @@ INST(TSTI)
 	uint32_t Imm2=Imm;
 
 	if(TESTFLAG(FLAG_E))
-		Imm2=(EXTRACT(Context.ER,0,27)<<4)|(Imm2&0xf);
+		Imm2=(EXTRACT(ER,0,27)<<4)|(Imm2&0xf);
 	else
 		Imm2=SEX(4,Imm2);
 
@@ -756,14 +747,14 @@ INST(CALL)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "CALL  0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "CALL  0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
-	return DASMFLAG_STEP_OVER;
+	return STEP_OVER;
 }
 
 INST(JV)
@@ -772,11 +763,11 @@ INST(JV)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JV    0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JV    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -788,11 +779,11 @@ INST(JNV)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JNV   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JNV   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -804,11 +795,11 @@ INST(JC)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JC    0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JC    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -820,11 +811,11 @@ INST(JNC)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JNC   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JNC   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -836,11 +827,11 @@ INST(JP)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JP    0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JP    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -852,11 +843,11 @@ INST(JM)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JM    0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JM    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -868,11 +859,11 @@ INST(JNZ)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JNZ   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JNZ   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -884,11 +875,11 @@ INST(JZ)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JZ    0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JZ    0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -900,11 +891,11 @@ INST(JGE)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JGE   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JGE   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -916,11 +907,11 @@ INST(JLE)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JLE   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JLE   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -932,11 +923,11 @@ INST(JHI)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JHI   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JHI   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -948,11 +939,11 @@ INST(JLS)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JLS   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JLS   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -964,11 +955,11 @@ INST(JGT)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JGT   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JGT   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -980,11 +971,11 @@ INST(JLT)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JLT   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JLT   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -998,11 +989,11 @@ INST(JMP)
 	uint32_t Offset2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset2=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset2=(EXTRACT(ER,0,22)<<8)|Offset;
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	util::stream_format(stream, "JMP   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JMP   0x%x",PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1025,7 +1016,7 @@ INST(CALLR)
 	util::stream_format(stream, "CALLR %%R%d",Src);
 
 	CLRFLAG(FLAG_E);
-	return DASMFLAG_STEP_OVER;
+	return STEP_OVER;
 }
 
 INST(ASR)
@@ -1144,7 +1135,7 @@ INST(MVFC)
 	return 0;
 }
 
-static _OP DecodeOp(uint16_t Opcode)
+se3208_disassembler::_OP se3208_disassembler::DecodeOp(uint16_t Opcode)
 {
 	switch(EXTRACT(Opcode,14,15))
 	{
@@ -1154,38 +1145,38 @@ static _OP DecodeOp(uint16_t Opcode)
 				switch(Op)
 				{
 					case 0x0:
-						return LDB;
+						return &se3208_disassembler::LDB;
 					case 0x1:
-						return LDS;
+						return &se3208_disassembler::LDS;
 					case 0x2:
-						return LD;
+						return &se3208_disassembler::LD;
 					case 0x3:
-						return LDBU;
+						return &se3208_disassembler::LDBU;
 					case 0x4:
-						return STB;
+						return &se3208_disassembler::STB;
 					case 0x5:
-						return STS;
+						return &se3208_disassembler::STS;
 					case 0x6:
-						return ST;
+						return &se3208_disassembler::ST;
 					case 0x7:
-						return LDSU;
+						return &se3208_disassembler::LDSU;
 				}
 			}
 			break;
 		case 0x1:
-			return LERI;
+			return &se3208_disassembler::LERI;
 		case 0x2:
 			{
 				switch(EXTRACT(Opcode,11,13))
 				{
 					case 0:
-						return LDSP;
+						return &se3208_disassembler::LDSP;
 					case 1:
-						return STSP;
+						return &se3208_disassembler::STSP;
 					case 2:
-						return PUSH;
+						return &se3208_disassembler::PUSH;
 					case 3:
-						return POP;
+						return &se3208_disassembler::POP;
 					case 4:
 					case 5:
 					case 6:
@@ -1201,30 +1192,30 @@ static _OP DecodeOp(uint16_t Opcode)
 						switch(EXTRACT(Opcode,6,8))
 						{
 							case 0:
-								return ADDI;
+								return &se3208_disassembler::ADDI;
 							case 1:
-								return ADCI;
+								return &se3208_disassembler::ADCI;
 							case 2:
-								return SUBI;
+								return &se3208_disassembler::SUBI;
 							case 3:
-								return SBCI;
+								return &se3208_disassembler::SBCI;
 							case 4:
-								return ANDI;
+								return &se3208_disassembler::ANDI;
 							case 5:
-								return ORI;
+								return &se3208_disassembler::ORI;
 							case 6:
-								return XORI;
+								return &se3208_disassembler::XORI;
 							case 7:
 								switch(EXTRACT(Opcode,0,2))
 								{
 									case 0:
-										return CMPI;
+										return &se3208_disassembler::CMPI;
 									case 1:
-										return TSTI;
+										return &se3208_disassembler::TSTI;
 									case 2:
-										return LEATOSP;
+										return &se3208_disassembler::LEATOSP;
 									case 3:
-										return LEAFROMSP;
+										return &se3208_disassembler::LEAFROMSP;
 								}
 								break;
 						}
@@ -1239,30 +1230,30 @@ static _OP DecodeOp(uint16_t Opcode)
 					switch(EXTRACT(Opcode,6,8))
 					{
 						case 0:
-							return ADD;
+							return &se3208_disassembler::ADD;
 						case 1:
-							return ADC;
+							return &se3208_disassembler::ADC;
 						case 2:
-							return SUB;
+							return &se3208_disassembler::SUB;
 						case 3:
-							return SBC;
+							return &se3208_disassembler::SBC;
 						case 4:
-							return AND;
+							return &se3208_disassembler::AND;
 						case 5:
-							return OR;
+							return &se3208_disassembler::OR;
 						case 6:
-							return XOR;
+							return &se3208_disassembler::XOR;
 						case 7:
 							switch(EXTRACT(Opcode,0,2))
 							{
 								case 0:
-									return CMP;
+									return &se3208_disassembler::CMP;
 								case 1:
-									return TST;
+									return &se3208_disassembler::TST;
 								case 2:
-									return MOV;
+									return &se3208_disassembler::MOV;
 								case 3:
-									return NEG;
+									return &se3208_disassembler::NEG;
 							}
 							break;
 					}
@@ -1271,42 +1262,42 @@ static _OP DecodeOp(uint16_t Opcode)
 					switch(EXTRACT(Opcode,8,11))
 					{
 						case 0x0:
-							return JNV;
+							return &se3208_disassembler::JNV;
 						case 0x1:
-							return JV;
+							return &se3208_disassembler::JV;
 						case 0x2:
-							return JP;
+							return &se3208_disassembler::JP;
 						case 0x3:
-							return JM;
+							return &se3208_disassembler::JM;
 						case 0x4:
-							return JNZ;
+							return &se3208_disassembler::JNZ;
 						case 0x5:
-							return JZ;
+							return &se3208_disassembler::JZ;
 						case 0x6:
-							return JNC;
+							return &se3208_disassembler::JNC;
 						case 0x7:
-							return JC;
+							return &se3208_disassembler::JC;
 						case 0x8:
-							return JGT;
+							return &se3208_disassembler::JGT;
 						case 0x9:
-							return JLT;
+							return &se3208_disassembler::JLT;
 						case 0xa:
-							return JGE;
+							return &se3208_disassembler::JGE;
 						case 0xb:
-							return JLE;
+							return &se3208_disassembler::JLE;
 						case 0xc:
-							return JHI;
+							return &se3208_disassembler::JHI;
 						case 0xd:
-							return JLS;
+							return &se3208_disassembler::JLS;
 						case 0xe:
-							return JMP;
+							return &se3208_disassembler::JMP;
 						case 0xf:
-							return CALL;
+							return &se3208_disassembler::CALL;
 					}
 					break;
 				case 2:
 					if(Opcode&(1<<11))
-						return LDI;
+						return &se3208_disassembler::LDI;
 					else    //SP Ops
 					{
 						if(Opcode&(1<<10))
@@ -1314,24 +1305,24 @@ static _OP DecodeOp(uint16_t Opcode)
 							switch(EXTRACT(Opcode,7,9))
 							{
 								case 0:
-									return LDBSP;
+									return &se3208_disassembler::LDBSP;
 								case 1:
-									return LDSSP;
+									return &se3208_disassembler::LDSSP;
 								case 3:
-									return LDBUSP;
+									return &se3208_disassembler::LDBUSP;
 								case 4:
-									return STBSP;
+									return &se3208_disassembler::STBSP;
 								case 5:
-									return STSSP;
+									return &se3208_disassembler::STSSP;
 								case 7:
-									return LDSUSP;
+									return &se3208_disassembler::LDSUSP;
 							}
 						}
 						else
 						{
 							if(Opcode&(1<<9))
 							{
-								return LEASPTOSP;
+								return &se3208_disassembler::LEASPTOSP;
 							}
 							else
 							{
@@ -1343,21 +1334,21 @@ static _OP DecodeOp(uint16_t Opcode)
 									switch(EXTRACT(Opcode,4,7))
 									{
 										case 0:
-											return EXTB;
+											return &se3208_disassembler::EXTB;
 										case 1:
-											return EXTS;
+											return &se3208_disassembler::EXTS;
 										case 8:
-											return JR;
+											return &se3208_disassembler::JR;
 										case 9:
-											return CALLR;
+											return &se3208_disassembler::CALLR;
 										case 10:
-											return SET;
+											return &se3208_disassembler::SET;
 										case 11:
-											return CLR;
+											return &se3208_disassembler::CLR;
 										case 12:
-											return SWI;
+											return &se3208_disassembler::SWI;
 										case 13:
-											return HALT;
+											return &se3208_disassembler::HALT;
 									}
 								}
 							}
@@ -1374,40 +1365,45 @@ static _OP DecodeOp(uint16_t Opcode)
 							switch(EXTRACT(Opcode,3,4))
 							{
 								case 0:
-									return ASR;
+									return &se3208_disassembler::ASR;
 								case 1:
-									return LSR;
+									return &se3208_disassembler::LSR;
 								case 2:
-									return ASL;
+									return &se3208_disassembler::ASL;
 								//case 3:
-								//  return LSL;
+								//  return &se3208_disassembler::LSL;
 							}
 							break;
 						case 4:
-							return MULS;
+							return &se3208_disassembler::MULS;
 						case 6:
 							if(Opcode&(1<<3))
-								return MVFC;
+								return &se3208_disassembler::MVFC;
 							else
-								return MVTC;
+								return &se3208_disassembler::MVTC;
 					}
 					break;
 			}
 			break;
 
 	}
-	return INVALIDOP;
+	return &se3208_disassembler::INVALIDOP;
 }
 
 
-CPU_DISASSEMBLE(se3208)
+u32 se3208_disassembler::opcode_alignment() const
+{
+	return 2;
+}
+
+offs_t se3208_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint16_t Opcode;
 
 	CLRFLAG(FLAG_E);
-	Context.ER=0;
+	ER=0;
 
-	Context.PC=pc;
-	Opcode=oprom[0] | (oprom[1] << 8);
-	return 2 | ((*DecodeOp(Opcode))(Opcode, stream)) | DASMFLAG_SUPPORTED;
+	PC=pc;
+	Opcode=opcodes.r16(pc);
+	return 2 | ((this->*DecodeOp(Opcode))(Opcode, stream)) | SUPPORTED;
 }

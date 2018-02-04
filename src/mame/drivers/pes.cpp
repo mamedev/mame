@@ -61,7 +61,7 @@ Address map:
 #include "speaker.h"
 
 
-#define CPU_CLOCK       XTAL_10_245MHz
+#define CPU_CLOCK       XTAL(10'245'000)
 
 #undef DEBUG_FIFO
 #undef DEBUG_SERIAL_CB
@@ -245,7 +245,7 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-static MACHINE_CONFIG_START( pes )
+MACHINE_CONFIG_START(pes_state::pes)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I80C31, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(i80c31_mem)

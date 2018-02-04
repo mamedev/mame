@@ -109,6 +109,7 @@ public:
 
 	DECLARE_DRIVER_INIT(megaphx);
 
+	void megaphx(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_mainram;
@@ -127,8 +128,8 @@ private:
 
 
 static ADDRESS_MAP_START( megaphx_68k_map, AS_PROGRAM, 16, megaphx_state )
-	AM_RANGE(0x000000, 0x0013ff) AM_RAM AM_SHARE("mainram") // maps over part of the rom??
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_REGION("roms67", 0x00000) // or the rom doesn't map here? it contains the service mode grid amongst other things..
+	AM_RANGE(0x000000, 0x0013ff) AM_RAM AM_SHARE("mainram") // maps over part of the rom??
 	AM_RANGE(0x040000, 0x040007) AM_DEVREADWRITE("inder_vid:tms", tms34010_device, host_r, host_w)
 	AM_RANGE(0x050000, 0x050001) AM_DEVWRITE("inder_sb", inder_sb_device, megaphx_0x050000_w)
 	AM_RANGE(0x050002, 0x050003) AM_DEVREAD("inder_sb", inder_sb_device, megaphx_0x050002_r)
@@ -301,7 +302,7 @@ WRITE_LINE_MEMBER( megaphx_state::dsw_w )
 	m_dsw_data = state;
 }
 
-static MACHINE_CONFIG_START( megaphx )
+MACHINE_CONFIG_START(megaphx_state::megaphx)
 	MCFG_CPU_ADD("maincpu", M68000, 8000000) // ??  can't read xtal due to reflections, CPU is an 8Mhz part
 	MCFG_CPU_PROGRAM_MAP(megaphx_68k_map)
 

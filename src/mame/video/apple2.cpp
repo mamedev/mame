@@ -529,7 +529,7 @@ void apple2_state::apple2_video_start(const uint8_t *vram, const uint8_t *aux_vr
 		int len = memregion("gfx1")->bytes();
 		for (i = 0; i < len; i++)
 		{
-			apple2_font[i] = BITSWAP8(apple2_font[i],  7, 7, 6, 5, 4, 3, 2, 1);
+			apple2_font[i] = bitswap<8>(apple2_font[i],  7, 7, 6, 5, 4, 3, 2, 1);
 		}
 	}
 
@@ -544,7 +544,7 @@ void apple2_state::apple2_video_start(const uint8_t *vram, const uint8_t *aux_vr
 		int len = memregion("gfx1")->bytes();
 		for (i = 0; i < len; i++)
 		{
-			apple2_font[i] = BITSWAP8(apple2_font[i], 7, 0, 1, 2, 3, 4, 5, 6);
+			apple2_font[i] = bitswap<8>(apple2_font[i], 7, 0, 1, 2, 3, 4, 5, 6);
 		}
 	}
 

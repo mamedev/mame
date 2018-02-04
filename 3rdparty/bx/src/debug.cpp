@@ -3,13 +3,17 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
+#include "bx_p.h"
 #include <bx/debug.h>
-#include <bx/string.h> // isPrint
-#include <inttypes.h>  // PRIx*
+#include <bx/string.h>       // isPrint
+#include <bx/readerwriter.h> // WriterI
+#include <inttypes.h>        // PRIx*
 
 #if BX_PLATFORM_ANDROID
 #	include <android/log.h>
-#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT \
+	|| BX_PLATFORM_XBOXONE
 extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(const char* _str);
 #elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
 #	if defined(__OBJC__)
@@ -33,7 +37,7 @@ namespace bx
 #elif BX_CPU_ARM
 		__builtin_trap();
 //		asm("bkpt 0");
-#elif !BX_PLATFORM_NACL && BX_CPU_X86 && (BX_COMPILER_GCC || BX_COMPILER_CLANG)
+#elif BX_CPU_X86 && (BX_COMPILER_GCC || BX_COMPILER_CLANG)
 		// NaCl doesn't like int 3:
 		// NativeClient: NaCl module load failed: Validation failure. File violates Native Client safety rules.
 		__asm__ ("int $3");
@@ -50,7 +54,9 @@ namespace bx
 #		define BX_ANDROID_LOG_TAG ""
 #	endif // BX_ANDROID_LOG_TAG
 		__android_log_write(ANDROID_LOG_DEBUG, BX_ANDROID_LOG_TAG, _out);
-#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT \
+	|| BX_PLATFORM_XBOXONE
 		OutputDebugStringA(_out);
 #elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
 #	if defined(__OBJC__)
@@ -125,7 +131,7 @@ namespace bx
 					ascii[asciiPos] = '\0';
 					debugPrintf("\t" DBG_ADDRESS "\t" HEX_DUMP_FORMAT "\t%s\n", data, hex, ascii);
 					data += asciiPos;
-					hexPos = 0;
+					hexPos   = 0;
 					asciiPos = 0;
 				}
 			}
@@ -140,6 +146,34 @@ namespace bx
 #undef HEX_DUMP_WIDTH
 #undef HEX_DUMP_SPACE_WIDTH
 #undef HEX_DUMP_FORMAT
+	}
+
+	class DebugWriter : public WriterI
+	{
+		virtual int32_t write(const void* _data, int32_t _size, Error* _err) override
+		{
+			BX_UNUSED(_err);
+
+			int32_t total = 0;
+
+			char temp[4096];
+			while (total != _size)
+			{
+				uint32_t len = bx::uint32_min(sizeof(temp)-1, _size-total);
+				memCopy(temp, _data, len);
+				temp[len] = '\0';
+				debugOutput(temp);
+				total += len;
+			}
+
+			return total;
+		}
+	};
+
+	WriterI* getDebugOut()
+	{
+		static DebugWriter s_debugOut;
+		return &s_debugOut;
 	}
 
 } // namespace bx

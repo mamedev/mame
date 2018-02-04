@@ -41,6 +41,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void anes(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -149,9 +150,9 @@ void anes_state::machine_start()
 
 
 
-static MACHINE_CONFIG_START( anes )
+MACHINE_CONFIG_START(anes_state::anes)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 2) // Z0840008PSC
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(16'000'000) / 2) // Z0840008PSC
 	MCFG_CPU_PROGRAM_MAP(prg_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", anes_state, irq0_line_hold)
@@ -169,7 +170,7 @@ static MACHINE_CONFIG_START( anes )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ym", YM2413, XTAL_3_579545MHz)
+	MCFG_SOUND_ADD("ym", YM2413, XTAL(3'579'545))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 

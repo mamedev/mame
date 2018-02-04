@@ -40,6 +40,7 @@ public:
 	DECLARE_PALETTE_INIT(eolith16);
 
 	uint32_t screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void eolith16(machine_config &config);
 };
 
 
@@ -172,7 +173,7 @@ PALETTE_INIT_MEMBER(eolith16_state,eolith16)
 
 
 
-static MACHINE_CONFIG_START( eolith16 )
+MACHINE_CONFIG_START(eolith16_state::eolith16)
 	MCFG_CPU_ADD("maincpu", E116T, 60000000)        /* no internal multiplier */
 	MCFG_CPU_PROGRAM_MAP(eolith16_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", eolith16_state, eolith_speedup, "screen", 0, 1)

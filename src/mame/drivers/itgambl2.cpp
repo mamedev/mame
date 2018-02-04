@@ -59,8 +59,8 @@
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK  XTAL_16MHz
-#define SND_CLOCK   XTAL_14_31818MHz
+#define MAIN_CLOCK  XTAL(16'000'000)
+#define SND_CLOCK   XTAL(14'318'181)
 
 
 class itgambl2_state : public driver_device
@@ -80,6 +80,7 @@ public:
 	uint32_t screen_update_itgambl2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
+	void itgambl2(machine_config &config);
 };
 
 
@@ -270,7 +271,7 @@ PALETTE_INIT_MEMBER(itgambl2_state, itgambl2)
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( itgambl2 )
+MACHINE_CONFIG_START(itgambl2_state::itgambl2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", H83337, MAIN_CLOCK)

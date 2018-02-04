@@ -201,6 +201,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(tx0_io_reset_callback);
 	void magtape_callback();
 
+	void tx0_64kw(machine_config &config);
+	void tx0_8kw(machine_config &config);
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;

@@ -106,6 +106,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	uint16_t m_intlines;
 	int m_ckon_state;
+	void ti990_10(machine_config &config);
 };
 
 
@@ -311,7 +312,7 @@ WRITE_LINE_MEMBER(ti990_10_state::tape_interrupt)
 	// set_int9(state);
 }
 
-static MACHINE_CONFIG_START( ti990_10 )
+MACHINE_CONFIG_START(ti990_10_state::ti990_10)
 	/* basic machine hardware */
 	/* TI990/10 CPU @ 4.0(???) MHz */
 	MCFG_TMS99xx_ADD("maincpu", TI990_10, 4000000, ti990_10_memmap, ti990_10_io )

@@ -25,8 +25,29 @@
 #define S_BIT_CONST(val) ((val & 0x4000) >> 14)
 #define DD(val)          ((val & 0x3000) >> 12)
 
+#define S_BIT                   ((OP & 0x100) >> 8)
+#define D_BIT                   ((OP & 0x200) >> 9)
+#define N_VALUE                 (((OP & 0x100) >> 4) | (OP & 0x0f))
+#define HI_N_VALUE              (0x10 | (OP & 0x0f))
+#define LO_N_VALUE              (OP & 0x0f)
+#define N_OP_MASK               (m_op & 0x10f)
+#define DRC_HI_N_VALUE          (0x10 | (op & 0x0f))
+#define DRC_LO_N_VALUE          (op & 0x0f)
+#define DRC_N_OP_MASK           (op & 0x10f)
+#define DST_CODE                ((OP & 0xf0) >> 4)
+#define SRC_CODE                (OP & 0x0f)
+#define SIGN_BIT(val)           ((val & 0x80000000) >> 31)
+#define SIGN_TO_N(val)          ((val & 0x80000000) >> 29)
+#define SIGN64_TO_N(val)        ((val & 0x8000000000000000ULL) >> 61)
 
 /* Extended DSP instructions */
+#define EHMAC           0x02a
+#define EHMACD          0x02e
+#define EHCMULD         0x046
+#define EHCMACD         0x04e
+#define EHCSUMD         0x086
+#define EHCFFTD         0x096
+#define EMUL_N          0x100
 #define EMUL            0x102
 #define EMULU           0x104
 #define EMULS           0x106
@@ -34,12 +55,6 @@
 #define EMACD           0x10e
 #define EMSUB           0x11a
 #define EMSUBD          0x11e
-#define EHMAC           0x02a
-#define EHMACD          0x02e
-#define EHCMULD         0x046
-#define EHCMACD         0x04e
-#define EHCSUMD         0x086
-#define EHCFFTD         0x096
 #define EHCFFTSD        0x296
 
 /* IRQ numbers */
@@ -54,15 +69,15 @@
 /* Trap numbers */
 #define TRAPNO_IO2                  48
 #define TRAPNO_IO1                  49
-#define TRAPNO_INT4             50
-#define TRAPNO_INT3             51
-#define TRAPNO_INT2             52
-#define TRAPNO_INT1             53
+#define TRAPNO_INT4                 50
+#define TRAPNO_INT3                 51
+#define TRAPNO_INT2                 52
+#define TRAPNO_INT1                 53
 #define TRAPNO_IO3                  54
 #define TRAPNO_TIMER                55
 #define TRAPNO_RESERVED1            56
 #define TRAPNO_TRACE_EXCEPTION      57
-#define TRAPNO_PARITY_ERROR     58
+#define TRAPNO_PARITY_ERROR         58
 #define TRAPNO_EXTENDED_OVERFLOW    59
 #define TRAPNO_RANGE_ERROR          60
 #define TRAPNO_PRIVILEGE_ERROR      TRAPNO_RANGE_ERROR
@@ -115,7 +130,7 @@
 #define IO_WRITE_W(addr, data)  m_io->write_dword(((addr) >> 11) & 0x7ffc, data)
 
 
-#define READ_OP(addr)          m_direct->read_word((addr), m_opcodexor)
+#define READ_OP(addr)          m_direct->read_word((addr), m_core->opcodexor)
 
 // set C in adds/addsi/subs/sums
 #define SETCARRYS 0
@@ -125,43 +140,22 @@
 
 /* Internal registers */
 
-#define SREG  decode.src_value
-#define SREGF decode.next_src_value
-#define DREG  decode.dst_value
-#define DREGF decode.next_dst_value
-#define EXTRA_U decode.extra.u
-#define EXTRA_S decode.extra.s
-
-#define SET_SREG( _data_ )  (decode.src_is_local ? set_local_register(decode.src, (uint32_t)_data_) : set_global_register(decode.src, (uint32_t)_data_))
-#define SET_SREGF( _data_ ) (decode.src_is_local ? set_local_register(decode.src + 1, (uint32_t)_data_) : set_global_register(decode.src + 1, (uint32_t)_data_))
-#define SET_DREG( _data_ )  (decode.dst_is_local ? set_local_register(decode.dst, (uint32_t)_data_) : set_global_register(decode.dst, (uint32_t)_data_))
-#define SET_DREGF( _data_ ) (decode.dst_is_local ? set_local_register(decode.dst + 1, (uint32_t)_data_) : set_global_register(decode.dst + 1, (uint32_t)_data_))
-
-#define SRC_IS_PC      (!decode.src_is_local && decode.src == PC_REGISTER)
-#define DST_IS_PC      (!decode.dst_is_local && decode.dst == PC_REGISTER)
-#define SRC_IS_SR      (!decode.src_is_local && decode.src == SR_REGISTER)
-#define DST_IS_SR      (!decode.dst_is_local && decode.dst == SR_REGISTER)
-#define SAME_SRC_DST   decode.same_src_dst
-#define SAME_SRC_DSTF  decode.same_src_dstf
-#define SAME_SRCF_DST  decode.same_srcf_dst
-
-
 #define OP              m_op
-#define PC              m_global_regs[0] //Program Counter
-#define SR              m_global_regs[1] //Status Register
-#define FER             m_global_regs[2] //Floating-Point Exception Register
+#define PC              m_core->global_regs[0] //Program Counter
+#define SR              m_core->global_regs[1] //Status Register
+#define FER             m_core->global_regs[2] //Floating-Point Exception Register
 // 03 - 15  General Purpose Registers
 // 16 - 17  Reserved
-#define SP              m_global_regs[18] //Stack Pointer
-#define UB              m_global_regs[19] //Upper Stack Bound
-#define BCR             m_global_regs[20] //Bus Control Register
-#define TPR             m_global_regs[21] //Timer Prescaler Register
-#define TCR             m_global_regs[22] //Timer Compare Register
+#define SP              m_core->global_regs[18] //Stack Pointer
+#define UB              m_core->global_regs[19] //Upper Stack Bound
+#define BCR             m_core->global_regs[20] //Bus Control Register
+#define TPR             m_core->global_regs[21] //Timer Prescaler Register
+#define TCR             m_core->global_regs[22] //Timer Compare Register
 #define TR              compute_tr() //Timer Register
-#define WCR             m_global_regs[24] //Watchdog Compare Register
-#define ISR             m_global_regs[25] //Input Status Register
-#define FCR             m_global_regs[26] //Function Control Register
-#define MCR             m_global_regs[27] //Memory Control Register
+#define WCR             m_core->global_regs[24] //Watchdog Compare Register
+#define ISR             m_core->global_regs[25] //Input Status Register
+#define FCR             m_core->global_regs[26] //Function Control Register
+#define MCR             m_core->global_regs[27] //Memory Control Register
 // 28 - 31  Reserved
 
 #define C_MASK                  0x00000001
@@ -175,6 +169,13 @@
 #define T_MASK                  0x00010000
 #define P_MASK                  0x00020000
 #define S_MASK                  0x00040000
+#define ILC_MASK                0x00180000
+
+#define C_SHIFT                 0
+#define Z_SHIFT                 1
+#define N_SHIFT                 2
+#define V_SHIFT                 3
+#define S_SHIFT                 18
 
 /* SR flags */
 #define GET_C                   ( SR & C_MASK)          // bit 0 //CARRY
@@ -193,7 +194,7 @@
 #define GET_S                   ((SR & S_MASK)>>18)     // bit 18 //SUPERVISOR STATE
 #define GET_ILC                 ((SR & 0x00180000)>>19) // bits 20 - 19 //INSTRUCTION-LENGTH
 /* if FL is zero it is always interpreted as 16 */
-#define GET_FL                  m_fl_lut[((SR >> 21) & 0xf)] // bits 24 - 21 //FRAME LENGTH
+#define GET_FL                  m_core->fl_lut[((SR >> 21) & 0xf)] // bits 24 - 21 //FRAME LENGTH
 #define GET_FP                  ((SR & 0xfe000000)>>25) // bits 31 - 25 //FRAME POINTER
 
 #define SET_C(val)              (SR = (SR & ~C_MASK) | (val))
@@ -220,17 +221,11 @@
 #define SET_LOW_SR(val)         (SR = (SR & 0xffff0000) | ((val) & 0x0000ffff)) // when SR is addressed, only low 16 bits can be changed
 
 
-#define CHECK_C(x)              (SR = (SR & ~0x00000001) | (uint32_t)((x & 0x100000000L) >> 32))
-#define CHECK_VADD(x,y,z)       (SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & 0x80000000) >> 29))
-#define CHECK_VADD3(x,y,w,z)    (SR = (SR & ~0x00000008) | ((((x) ^ (z)) & ((y) ^ (z)) & ((w) ^ (z)) & 0x80000000) >> 29))
-#define CHECK_VSUB(x,y,z)       (SR = (SR & ~0x00000008) | (((z ^ y) & (y ^ x) & 0x80000000) >> 29))
-
-
 /* FER flags */
 #define GET_ACCRUED             (FER & 0x0000001f) //bits  4 - 0 //Floating-Point Accrued Exceptions
 #define GET_ACTUAL              (FER & 0x00001f00) //bits 12 - 8 //Floating-Point Actual  Exceptions
 //other bits are reversed, in particular 7 - 5 for the operating system.
-//the user program can only changes the above 2 flags
+//the user program can only change the above 2 flags
 
 
 #endif // MAME_CPU_E132XS_XS32DEFS_H

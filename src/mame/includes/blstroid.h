@@ -46,6 +46,7 @@ public:
 
 	static const atari_motion_objects_config s_mob_config;
 
+	void blstroid(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

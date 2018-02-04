@@ -41,7 +41,7 @@
 #include "audio/nichisnd.h"
 
 #define USE_H8 0
-#define DVD_CLOCK XTAL_27MHz
+#define DVD_CLOCK XTAL(27'000'000)
 
 class csplayh5_state : public driver_device
 {
@@ -94,6 +94,7 @@ public:
 	DECLARE_DRIVER_INIT(renaimj);
 	DECLARE_DRIVER_INIT(sengomjk);
 	DECLARE_DRIVER_INIT(thenanpa);
+	DECLARE_DRIVER_INIT(torarech);
 	DECLARE_DRIVER_INIT(tsuwaku);
 
 	virtual void machine_reset() override;
@@ -101,6 +102,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
 
 	void general_init(int patchaddress, int patchvalue);
+	void csplayh5(machine_config &config);
 };
 
 
@@ -351,7 +353,7 @@ WRITE16_MEMBER(csplayh5_state::tmp68301_parallel_port_w)
 }
 
 
-static MACHINE_CONFIG_START( csplayh5 )
+MACHINE_CONFIG_START(csplayh5_state::csplayh5)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,16000000) /* TMP68301-16 */
@@ -361,6 +363,7 @@ static MACHINE_CONFIG_START( csplayh5 )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", csplayh5_state, csplayh5_irq, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("tmp68301", TMP68301, 0)
+	MCFG_TMP68301_CPU("maincpu")
 	MCFG_TMP68301_OUT_PARALLEL_CB(WRITE16(csplayh5_state, tmp68301_parallel_port_w))
 
 #if USE_H8
@@ -375,9 +378,9 @@ static MACHINE_CONFIG_START( csplayh5 )
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL_21_4772MHz) // typical 9958 clock, not verified
+	MCFG_V9958_ADD("v9958", "screen", 0x20000, XTAL(21'477'272)) // typical 9958 clock, not verified
 	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(csplayh5_state, csplayh5_vdp0_interrupt))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL_21_4772MHz)
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9958", XTAL(21'477'272))
 
 	/* sound hardware */
 	MCFG_NICHISND_ADD("nichisnd")
@@ -427,6 +430,7 @@ DRIVER_INIT_MEMBER(csplayh5_state,pokoachu)  { general_init(0x7b1e/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,renaimj)   { general_init(0x568c/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,sengomjk)  { general_init(0x5226/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,thenanpa)  { general_init(0x69ec/2, 0x6018); }
+DRIVER_INIT_MEMBER(csplayh5_state,torarech)  { general_init(0x9384/2, 0x6018); }
 DRIVER_INIT_MEMBER(csplayh5_state,tsuwaku)   { general_init(0x856e/2, 0x6018); }
 
 
@@ -804,12 +808,11 @@ ROM_START( nuretemi )
 	DVD_BIOS
 
 	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
-	// identical to vol. 19, probably an attempt to fix a dead board.
-	ROM_LOAD( "11.ic51", 0x000000, 0x020000, BAD_DUMP CRC(d1ba05d6) SHA1(8d29cdbf00946e06e92225eb260a694d17d7b8d4) )
+	ROM_LOAD( "11.ic51", 0x000000, 0x020000, CRC(655ec499) SHA1(5cea38e998edc7833b9a644930daecd99933c277) )
 
 	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
 	ROM_LOAD16_BYTE( "3.ic40", 0x000000, 0x080000, CRC(5c7af7f6) SHA1(78e58e3a81a6585c2c61f0026b7dc73a72c0d862) )
-	ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(335b6388) SHA1(c5427b42af011b5a5026d905b1740684b9f6f953) )
+	ROM_LOAD16_BYTE( "4.ic41", 0x000001, 0x080000, CRC(335b6388) SHA1(c5427b42af011b5a5026d905b1740684b9f6f953) )
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE_READONLY( "nb8016", 0, SHA1(607d9f390265da3f0c50753d0ea32257b12e8c08) )
@@ -837,6 +840,27 @@ ROM_START( tsuwaku )
 
 	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8h.020", 0x000000, 0x040000, CRC(ac5c9495) SHA1(1c54ecf6dedbf8c3a29207c1c91b52e2ff394d9d) )
+ROM_END
+
+ROM_START( torarech )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+	ROM_LOAD16_BYTE( "2.ic3",            0x000000, 0x020000, CRC(a7fda49b) SHA1(a7891e574b4d2ae3bcdc40f76b6e67e67d6e72bd) )
+	ROM_LOAD16_BYTE( "1.ic2",            0x000001, 0x020000, CRC(887c1a0d) SHA1(a594e3ef6514ed48f097e742633c19e51c10b730) )
+
+	DVD_BIOS
+
+	ROM_REGION( 0x20000, ":nichisnd:audiorom", 0 ) // z80
+	ROM_LOAD( "11.ic51",           0x000000, 0x020000, CRC(bd785d10) SHA1(ceb91c0f13eafabb8d48384857af6fc555d48951) )
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+	ROM_LOAD16_BYTE( "3.ic40",            0x000000, 0x080000, CRC(cbbbab5c) SHA1(ab8ae64b1f2acfab55ba7cbb173f3036a46001e6) )
+	ROM_LOAD16_BYTE( "4.ic41",            0x000001, 0x080000, CRC(18412fd8) SHA1(6907ce2739549519e1f3dcee2186f6add219a3c2) )
+
+	DISK_REGION( "ide:0:hdd:image" )
+	DISK_IMAGE_READONLY( "nb8018", 0, SHA1(cf8758bb2caaba6377b354694123ddec71a4f8e1) )
+
+	ROM_REGION( 0x040000, "gal", ROMREGION_ERASE00 )
+	ROM_LOAD( "palce16v8h.020", 0x000000, 0xbb2, BAD_DUMP CRC(c8e8605a) SHA1(02e43d9de73256e5c73d6f99834a23cef321d56b) )
 ROM_END
 
 ROM_START( nichisel )
@@ -916,9 +940,9 @@ GAME( 1998, nichidvd,   0,   csplayh5,  csplayh5, csplayh5_state,  0,           
 /* 15 */ GAME( 2000, fuudol,    nichidvd,   csplayh5,  csplayh5, csplayh5_state,  fuudol,    ROT0, "Nichibutsu/eic", "Fuudol (Japan)", MACHINE_NOT_WORKING )
 /* 16 */ GAME( 2000, nuretemi,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nuretemi,  ROT0, "Nichibutsu/Love Factory", "Nurete Mitaino... - Net Idol Hen (Japan)", MACHINE_NOT_WORKING )
 /* 17 */ GAME( 2000, tsuwaku,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  tsuwaku,   ROT0, "Nichibutsu/Love Factory/Just&Just", "Tsuugakuro no Yuuwaku (Japan)", MACHINE_NOT_WORKING )
-// 18 : Torarechattano - AV Kantoku Hen : Nichibutsu/Love Factory/M Friend
+/* 18 */ GAME( 2000, torarech,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  torarech, ROT0,  "Nichibutsu/Love Factory/M Friend", "Torarechattano - AV Kantoku Hen (Japan)", MACHINE_NOT_WORKING )
 /* sp */ GAME( 2000, nichisel,  nichidvd,   csplayh5,  csplayh5, csplayh5_state,  nichisel,  ROT0, "Nichibutsu", "DVD Select (Japan)", MACHINE_NOT_WORKING )
 
 // 2001
 /* 19 */ GAME( 2001, konhaji,   nichidvd,   csplayh5,  csplayh5, csplayh5_state,  konhaji,   ROT0, "Nichibutsu/Love Factory", "Konnano Hajimete! (Japan)", MACHINE_NOT_WORKING )
-// 20 : Uwasa no Deaikei Site : Nichibutsu/Love Factory/eic
+/* 20 */ // Uwasa no Deaikei Site : Nichibutsu/Love Factory/eic

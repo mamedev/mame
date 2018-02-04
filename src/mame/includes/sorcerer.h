@@ -83,6 +83,8 @@ public:
 	DECLARE_SNAPSHOT_LOAD_MEMBER( sorcerer );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( sorcerer);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sorcerer(machine_config &config);
+	void sorcererd(machine_config &config);
 private:
 	uint8_t m_fe;
 	uint8_t m_keyboard_line;

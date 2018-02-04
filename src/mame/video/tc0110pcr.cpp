@@ -115,7 +115,7 @@ READ16_MEMBER(tc0110pcr_device::word_r )
 			return m_ram[m_addr];
 
 		default:
-//logerror("PC %06x: warning - read TC0110PCR address %02x\n",space.device().safe_pc(),offset);
+//logerror("%s: warning - read TC0110PCR address %02x\n",m_maincpu->pc(),offset);
 			return 0xff;
 	}
 }
@@ -137,7 +137,7 @@ WRITE16_MEMBER(tc0110pcr_device::word_w )
 			break;
 
 		default:
-//logerror("PC %06x: warning - write %04x to TC0110PCR address %02x\n",space.device().safe_pc(),data,offset);
+//logerror("%s: warning - write %04x to TC0110PCR address %02x\n",m_maincpu->pc(),data,offset);
 			break;
 	}
 }
@@ -158,7 +158,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_word_w )
 			break;
 
 		default:
-//logerror("PC %06x: warning - write %04x to TC0110PCR address %02x\n",space.device().safe_pc(),data,offset);
+//logerror("%s: warning - write %04x to TC0110PCR address %02x\n",m_maincpu->pc(),data,offset);
 			break;
 	}
 }
@@ -181,7 +181,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_rbswap_word_w )
 			break;
 
 		default:
-//logerror("PC %06x: warning - write %04x to TC0110PCR offset %02x\n",space.device().safe_pc(),data,offset);
+//logerror("%s: warning - write %04x to TC0110PCR offset %02x\n",m_maincpu->pc(),data,offset);
 			break;
 	}
 }
@@ -204,7 +204,7 @@ WRITE16_MEMBER(tc0110pcr_device::step1_4bpg_word_w )
 			break;
 
 		default:
-//logerror("PC %06x: warning - write %04x to TC0110PCR address %02x\n",space.device().safe_pc(),data,offset);
+//logerror("%s: warning - write %04x to TC0110PCR address %02x\n",m_maincpu->pc(),data,offset);
 			break;
 	}
 }

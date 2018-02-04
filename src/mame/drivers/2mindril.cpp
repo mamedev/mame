@@ -70,6 +70,8 @@ public:
 	//INTERRUPT_GEN_MEMBER(drill_device_irq);
 	void tile_decode();
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+
+	void drill(machine_config &config);
 	#ifdef UNUSED_FUNCTION
 	enum
 	{
@@ -86,7 +88,6 @@ protected:
 READ8_MEMBER(_2mindril_state::arm_pwr_r)
 {
 	int arm_pwr = m_in0->read();//throw
-	//popmessage("PC=%08x %02x",space.device().safe_pc(),arm_pwr);
 
 	if(arm_pwr > 0xe0) return ~0x18;
 	if(arm_pwr > 0xc0) return ~0x14;
@@ -203,7 +204,7 @@ static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16, _2mindril_state )
 	AM_RANGE(0x430000, 0x43ffff) AM_READWRITE(f3_pivot_r,f3_pivot_w)
 	AM_RANGE(0x460000, 0x46000f) AM_WRITE(f3_control_0_w)
 	AM_RANGE(0x460010, 0x46001f) AM_WRITE(f3_control_1_w)
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x502022, 0x502023) AM_WRITENOP //countinously switches between 0 and 2
 	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8("ymsnd", ym2610_device, read, write, 0x00ff)
 	AM_RANGE(0x60000c, 0x60000d) AM_READWRITE(drill_irq_r,drill_irq_w)
@@ -349,7 +350,7 @@ MACHINE_RESET_MEMBER(_2mindril_state,drill)
 	m_irq_reg = 0;
 }
 
-static MACHINE_CONFIG_START( drill )
+MACHINE_CONFIG_START(_2mindril_state::drill)
 
 	MCFG_CPU_ADD("maincpu", M68000, 16000000 )
 	MCFG_CPU_PROGRAM_MAP(drill_map)

@@ -129,6 +129,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 
+	void pg685_backplane(machine_config &config);
+	void pg685_module(machine_config &config);
+	void pg685(machine_config &config);
+	void pg675(machine_config &config);
+	void pg685oua12(machine_config &config);
 private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -380,31 +385,31 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 //  MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START(pg685_backplane)
+MACHINE_CONFIG_START(pg685_state::pg685_backplane)
 	MCFG_DEVICE_ADD("bppit", PIT8253, 0)
 
 	MCFG_DEVICE_ADD("bppic", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(NOOP) // ???
 
-	MCFG_DEVICE_ADD("bpuart", MC2661, XTAL_4_9152MHz) // internal clock
+	MCFG_DEVICE_ADD("bpuart", MC2661, XTAL(4'915'200)) // internal clock
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START(pg685_module)
-	MCFG_DEVICE_ADD("fdc", FD1797, XTAL_4MHz / 2) // divider guessed
+MACHINE_CONFIG_START(pg685_state::pg685_module)
+	MCFG_DEVICE_ADD("fdc", FD1797, XTAL(4'000'000) / 2) // divider guessed
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("mainpic", pic8259_device, ir4_w))
 
 	MCFG_DEVICE_ADD("modppi1", I8255, 0)
 	MCFG_DEVICE_ADD("modppi2", I8255, 0)
 
-	MCFG_DEVICE_ADD("moduart", I8251, XTAL_4MHz / 2) // divider guessed
+	MCFG_DEVICE_ADD("moduart", I8251, XTAL(4'000'000) / 2) // divider guessed
 
-	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pg675 )
+MACHINE_CONFIG_START(pg685_state::pg675)
 	// main cpu
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_15MHz / 3)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(15'000'000) / 3)
 	MCFG_CPU_PROGRAM_MAP(pg675_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
@@ -431,12 +436,12 @@ static MACHINE_CONFIG_START( pg675 )
 	// devices
 	MCFG_FRAGMENT_ADD(pg685_module)
 
-	MCFG_DEVICE_ADD("mainuart", I8251, XTAL_12_288MHz / 6) // divider guessed
+	MCFG_DEVICE_ADD("mainuart", I8251, XTAL(12'288'000) / 6) // divider guessed
 
 	// rs232 port
 
 	// keyboard
-	MCFG_DEVICE_ADD("kbdc", I8279, XTAL_12_288MHz / 6) // divider guessed
+	MCFG_DEVICE_ADD("kbdc", I8279, XTAL(12'288'000) / 6) // divider guessed
 	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir0_w))
 
 	// printer
@@ -451,9 +456,9 @@ static MACHINE_CONFIG_START( pg675 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pg685 )
+MACHINE_CONFIG_START(pg685_state::pg685)
 	// main cpu
-	MCFG_CPU_ADD("maincpu", V20, XTAL_15MHz / 3)
+	MCFG_CPU_ADD("maincpu", V20, XTAL(15'000'000) / 3)
 	MCFG_CPU_PROGRAM_MAP(pg685_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
@@ -481,12 +486,12 @@ static MACHINE_CONFIG_START( pg685 )
 	MCFG_FRAGMENT_ADD(pg685_backplane)
 	MCFG_FRAGMENT_ADD(pg685_module)
 
-	MCFG_DEVICE_ADD("mainuart", I8251, XTAL_12_288MHz / 6) // divider guessed
+	MCFG_DEVICE_ADD("mainuart", I8251, XTAL(12'288'000) / 6) // divider guessed
 
 	// rs232 port
 
 	// keyboard
-	MCFG_DEVICE_ADD("kbdc", I8279, XTAL_12_288MHz / 6) // divider guessed
+	MCFG_DEVICE_ADD("kbdc", I8279, XTAL(12'288'000) / 6) // divider guessed
 	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir0_w))
 
 	// printer
@@ -498,13 +503,13 @@ static MACHINE_CONFIG_START( pg685 )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// harddisk
-	MCFG_DEVICE_ADD("hdc", WD2010, XTAL_10MHz / 2) // divider guessed
+	MCFG_DEVICE_ADD("hdc", WD2010, XTAL(10'000'000) / 2) // divider guessed
 	MCFG_WD2010_OUT_INTRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir3_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pg685oua12 )
+MACHINE_CONFIG_START(pg685_state::pg685oua12)
 	// main cpu
-	MCFG_CPU_ADD("maincpu", I80286, XTAL_20MHz / 2)
+	MCFG_CPU_ADD("maincpu", I80286, XTAL(20'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(pg685oua12_mem)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
 
@@ -549,7 +554,7 @@ static MACHINE_CONFIG_START( pg685oua12 )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// harddisk
-	MCFG_DEVICE_ADD("hdc", WD2010, XTAL_10MHz / 2) // divider guessed
+	MCFG_DEVICE_ADD("hdc", WD2010, XTAL(10'000'000) / 2) // divider guessed
 	MCFG_WD2010_OUT_INTRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir3_w))
 
 MACHINE_CONFIG_END

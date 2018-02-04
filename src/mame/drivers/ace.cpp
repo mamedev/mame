@@ -45,7 +45,7 @@ A1                   2101            2101
 
 #include "ace.lh"
 
-#define MASTER_CLOCK XTAL_18MHz
+#define MASTER_CLOCK XTAL(18'000'000)
 
 
 class aceal_state : public driver_device
@@ -82,6 +82,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ace_postload();
+	void ace(machine_config &config);
 };
 
 
@@ -316,7 +317,7 @@ void aceal_state::machine_reset()
 		elem = 0;
 }
 
-static MACHINE_CONFIG_START( ace )
+MACHINE_CONFIG_START(aceal_state::ace)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* 2 MHz ? */

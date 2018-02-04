@@ -355,14 +355,14 @@ void jackal_state::machine_reset()
 	m_irq_enable = 0;
 }
 
-static MACHINE_CONFIG_START( jackal )
+MACHINE_CONFIG_START(jackal_state::jackal)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("master", M6809, MASTER_CLOCK/12) // verified on pcb
+	MCFG_CPU_ADD("master", MC6809E, MASTER_CLOCK/12) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(master_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", jackal_state,  jackal_interrupt)
 
-	MCFG_CPU_ADD("slave", M6809, MASTER_CLOCK/12) // verified on pcb
+	MCFG_CPU_ADD("slave", MC6809E, MASTER_CLOCK/12) // verified on pcb
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))

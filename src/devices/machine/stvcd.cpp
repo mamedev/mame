@@ -100,7 +100,7 @@ int saturn_state::get_track_index(uint32_t fad)
 
 int saturn_state::sega_cdrom_get_adr_control(cdrom_file *file, int track)
 {
-	return BITSWAP8(cdrom_get_adr_control(file, cur_track),3,2,1,0,7,6,5,4);
+	return bitswap<8>(cdrom_get_adr_control(file, cur_track),3,2,1,0,7,6,5,4);
 }
 
 void saturn_state::cr_standard_return(uint16_t cur_status)
@@ -608,9 +608,9 @@ void saturn_state::cd_exec_command( void )
 				}
 				else
 				{
-					if (parm < 0x24)
+					if (parm < MAX_FILTERS)
 					{
-						cddevice = &filters[(cr3>>8)];
+						cddevice = &filters[parm];
 					}
 				}
 
@@ -1229,7 +1229,7 @@ void saturn_state::cd_exec_command( void )
 
 //          read_dir = ((cr3&0xff)<<16)|cr4;
 
-			if((cr3 >> 8) < 0x24)
+			if((cr3 >> 8) < MAX_FILTERS)
 				cddevice = &filters[cr3 >> 8];
 			else
 				cddevice = (filterT *)nullptr;
@@ -1324,7 +1324,7 @@ void saturn_state::cd_exec_command( void )
 			cd_stat = CD_STAT_PLAY|0x80;    // set "cd-rom" bit
 			cd_curfad = (curdir[file_id].firstfad + file_offset);
 			fadstoplay = file_size;
-			if(file_filter < 0x24)
+			if(file_filter < MAX_FILTERS)
 				cddevice = &filters[file_filter];
 			else
 				cddevice = (filterT *)nullptr;

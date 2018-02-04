@@ -1,10 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 #include "emu.h"
-#include "superfx.h"
+#include "sfx_dasm.h"
 
-offs_t superfx_dasm_one(std::ostream &stream, offs_t pc, uint8_t op, uint8_t param0, uint8_t param1, uint16_t alt)
+superfx_disassembler::superfx_disassembler(config *conf) : m_config(conf)
 {
+}
+
+u32 superfx_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t superfx_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	uint8_t  op = opcodes.r8(pc);
+	uint8_t  param0 = opcodes.r8(pc+1);
+	uint8_t  param1 = opcodes.r8(pc+2);
+	uint16_t alt = m_config->get_alt();
+
 	uint8_t bytes_consumed = 1;
 
 	switch(op)
@@ -409,5 +423,5 @@ offs_t superfx_dasm_one(std::ostream &stream, offs_t pc, uint8_t op, uint8_t par
 			break;
 	}
 
-	return bytes_consumed | DASMFLAG_SUPPORTED;
+	return bytes_consumed | SUPPORTED;
 }

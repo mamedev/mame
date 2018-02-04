@@ -57,4 +57,7 @@ public:
 	int draw_layer_daikaiju( bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int  * previd, int type );
 	void drawbg( bitmap_ind16 &bitmap, const rectangle &cliprect, int type );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t priority );
+	void lsasquad(machine_config &config);
+	void daikaiju(machine_config &config);
+	void storming(machine_config &config);
 };

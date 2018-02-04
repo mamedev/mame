@@ -617,6 +617,8 @@ public:
 	void video_reg_w(uint32_t reg, uint32_t data);
 	void init_taitotz_152();
 	void init_taitotz_111a();
+	void taitotz(machine_config &config);
+	void landhigh(machine_config &config);
 };
 
 class taitotz_renderer : public poly_manager<float, taitotz_polydata, 6, 50000>
@@ -1725,7 +1727,7 @@ WRITE64_MEMBER(taitotz_state::video_chip_w)
 					case 0xb:
 					{
 						m_video_ram_ptr = m_video_reg & 0xfffffff;
-						//logerror("video_chip_ram sel %08X at %08X\n", m_video_reg & 0x0fffffff, space.device().safe_pc());
+						//logerror("video_chip_ram sel %08X at %08X\n", m_video_reg & 0x0fffffff, m_maincpu->pc());
 						break;
 					}
 					case 0x0:
@@ -1814,7 +1816,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 			if (m_video_fifo_ptr >= 8)
 			{
 				m_renderer->push_direct_poly_fifo((uint32_t)(data >> 32));
-				//logerror("FIFO packet w: %08X at %08X\n", (uint32_t)(data >> 32), space.device().safe_pc());
+				//logerror("FIFO packet w: %08X at %08X\n", (uint32_t)(data >> 32), m_maincpu->pc());
 			}
 			m_video_fifo_ptr++;
 		}
@@ -1823,7 +1825,7 @@ WRITE64_MEMBER(taitotz_state::video_fifo_w)
 			if (m_video_fifo_ptr >= 8)
 			{
 				m_renderer->push_direct_poly_fifo((uint32_t)(data));
-				//logerror("FIFO packet w: %08X at %08X\n", (uint32_t)(data), space.device().safe_pc());
+				//logerror("FIFO packet w: %08X at %08X\n", (uint32_t)(data), m_maincpu->pc());
 			}
 			m_video_fifo_ptr++;
 		}
@@ -2176,7 +2178,7 @@ WRITE8_MEMBER(taitotz_state::tlcs_rtc_w)
 
 READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 {
-	uint16_t d = m_ata->read_cs0(space, offset, mem_mask);
+	uint16_t d = m_ata->read_cs0(offset, mem_mask);
 	if (offset == 7)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2185,7 +2187,7 @@ READ16_MEMBER(taitotz_state::tlcs_ide0_r)
 
 READ16_MEMBER(taitotz_state::tlcs_ide1_r)
 {
-	uint16_t d = m_ata->read_cs1(space, offset, mem_mask);
+	uint16_t d = m_ata->read_cs1(offset, mem_mask);
 	if (offset == 6)
 		d &= ~0x2;      // Type Zero doesn't like the index bit. It's defined as vendor-specific, so it probably shouldn't be up...
 						// The status check explicitly checks for 0x50 (drive ready, seek complete).
@@ -2557,10 +2559,10 @@ WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
 	m_iocpu->set_input_line(TLCS900_INT2, state);
 }
 
-static MACHINE_CONFIG_START( taitotz )
+MACHINE_CONFIG_START(taitotz_state::taitotz)
 	/* IBM EMPPC603eBG-100 */
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
-	MCFG_PPC_BUS_FREQUENCY(XTAL_66_6667MHz)    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
+	MCFG_PPC_BUS_FREQUENCY(XTAL(66'666'700))    /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)
 
 	/* TMP95C063F I/O CPU */
@@ -2599,7 +2601,7 @@ static MACHINE_CONFIG_START( taitotz )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( landhigh, taitotz )
+MACHINE_CONFIG_DERIVED(taitotz_state::landhigh, taitotz)
 	MCFG_CPU_MODIFY("iocpu")
 	MCFG_CPU_PROGRAM_MAP(landhigh_tlcs900h_mem)
 MACHINE_CONFIG_END
@@ -2949,9 +2951,9 @@ ROM_START( styphp )
 ROM_END
 
 GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, 0,        ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT)
-GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, landhigh, ROT0, "Taito", "Landing High Japan  (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, landhigha,ROT0, "Taito", "Landing High Japan  (Ver 2.02 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1998, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, landhigh, ROT0, "Taito", "Landing High Japan (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, landhigha,ROT0, "Taito", "Landing High Japan (Ver 2.02 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 1999/8/5 19:13:35
 GAME( 1999, pwrshovla, pwrshovl, taitotz,  pwrshovl, taitotz_state, pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (v2.07J, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // seem to be some differences in drive content, but identifies as the same revision, is it just user data changes??
 GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, batlgr2,  ROT0, "Taito", "Battle Gear 2 (v2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

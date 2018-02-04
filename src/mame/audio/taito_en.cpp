@@ -128,7 +128,7 @@ WRITE16_MEMBER( taito_en_device::es5510_dsp_w )
 	uint8_t *snd_mem = (uint8_t *)memregion(":ensoniq.0")->base();
 
 //  if (offset>4 && offset!=0x80  && offset!=0xa0  && offset!=0xc0  && offset!=0xe0)
-//      logerror("%06x: DSP write offset %04x %04x\n",space.device().safe_pc(),offset,data);
+//      logerror("%06x: DSP write offset %04x %04x\n",m_audiocpu->pc(),offset,data);
 
 	COMBINE_DATA(&m_es5510_dsp_ram[offset]);
 
@@ -270,14 +270,14 @@ WRITE_LINE_MEMBER(taito_en_device::duart_irq_handler)
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( taito_en_device::device_add_mconfig )
+MACHINE_CONFIG_START(taito_en_device::device_add_mconfig)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("audiocpu", M68000, XTAL_30_4761MHz / 2)
+	MCFG_CPU_ADD("audiocpu", M68000, XTAL(30'476'100) / 2)
 	MCFG_CPU_PROGRAM_MAP(en_sound_map)
 
-	MCFG_DEVICE_ADD("duart68681", MC68681, XTAL_16MHz / 4)
-	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL_16MHz/2/8, XTAL_16MHz/2/16, XTAL_16MHz/2/16, XTAL_16MHz/2/8)
+	MCFG_DEVICE_ADD("duart68681", MC68681, XTAL(16'000'000) / 4)
+	MCFG_MC68681_SET_EXTERNAL_CLOCKS(XTAL(16'000'000)/2/8, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/16, XTAL(16'000'000)/2/8)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(taito_en_device, duart_irq_handler))
 
 	MCFG_DEVICE_ADD("mb87078", MB87078, 0)
@@ -287,7 +287,7 @@ MACHINE_CONFIG_MEMBER( taito_en_device::device_add_mconfig )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_30_4761MHz / 2)
+	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL(30'476'100) / 2)
 	MCFG_ES5505_REGION0("ensoniq.0")
 	MCFG_ES5505_REGION1("ensoniq.0")
 	MCFG_ES5506_CHANNELS(1)

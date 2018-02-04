@@ -629,16 +629,16 @@ static SLOT_INTERFACE_START( mbee_floppies )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( mbee )
+MACHINE_CONFIG_START(mbee_state::mbee)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 6)         /* 2 MHz */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 6)         /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(mbee_mem)
 	MCFG_CPU_IO_MAP(mbee_io)
 	MCFG_Z80_DAISY_CHAIN(mbee_daisy_chain)
 
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee)
 
-	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL_12MHz / 6)
+	MCFG_DEVICE_ADD("z80pio", Z80PIO, XTAL(12'000'000) / 6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(mbee_state, pio_ardy))
@@ -667,7 +667,7 @@ static MACHINE_CONFIG_START( mbee )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL_12MHz / 8)
+	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", XTAL(12'000'000) / 8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(mbee_state, crtc_update_row)
@@ -688,7 +688,7 @@ static MACHINE_CONFIG_START( mbee )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mbeeic )
+MACHINE_CONFIG_START(mbee_state::mbeeic)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_5MHz / 4)         /* 3.37500 MHz */
 	MCFG_CPU_PROGRAM_MAP(mbeeic_mem)
@@ -746,13 +746,13 @@ static MACHINE_CONFIG_START( mbeeic )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbeepc, mbeeic )
+MACHINE_CONFIG_DERIVED(mbee_state::mbeepc, mbeeic)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbeepc_mem)
 	MCFG_CPU_IO_MAP(mbeepc_io)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
+MACHINE_CONFIG_DERIVED(mbee_state::mbeeppc, mbeeic)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbeeppc_mem)
 	MCFG_CPU_IO_MAP(mbeeppc_io)
@@ -760,16 +760,16 @@ static MACHINE_CONFIG_DERIVED( mbeeppc, mbeeic )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", premium)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(mbee_state, premium)
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(mbee_state, rtc_irq_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
+MACHINE_CONFIG_DERIVED(mbee_state::mbee56, mbeeic)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee56_mem)
 	MCFG_CPU_IO_MAP(mbee56_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee56)
-	MCFG_WD2793_ADD("fdc", XTAL_4MHz / 2)
+	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mbee_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mbee_state, fdc_drq_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
@@ -779,21 +779,21 @@ static MACHINE_CONFIG_DERIVED( mbee56, mbeeic )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbee128, mbee56 )
+MACHINE_CONFIG_DERIVED(mbee_state::mbee128, mbee56)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
-	MCFG_MC146818_ADD( "rtc", XTAL_32_768kHz )
+	MCFG_MC146818_ADD( "rtc", XTAL(32'768) )
 	MCFG_MC146818_IRQ_HANDLER(WRITELINE(mbee_state, rtc_irq_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbee128p, mbeeppc )
+MACHINE_CONFIG_DERIVED(mbee_state::mbee128p, mbeeppc)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee128_io)
 	MCFG_MACHINE_RESET_OVERRIDE(mbee_state, mbee128)
-	MCFG_WD2793_ADD("fdc", XTAL_4MHz / 2)
+	MCFG_WD2793_ADD("fdc", XTAL(4'000'000) / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(mbee_state, fdc_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(mbee_state, fdc_drq_w))
 	MCFG_WD_FDC_ENMF_CALLBACK(GND)
@@ -803,7 +803,7 @@ static MACHINE_CONFIG_DERIVED( mbee128p, mbeeppc )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbee256, mbee128p )
+MACHINE_CONFIG_DERIVED(mbee_state::mbee256, mbee128p)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbee256_mem)
 	MCFG_CPU_IO_MAP(mbee256_io)
@@ -817,7 +817,7 @@ static MACHINE_CONFIG_DERIVED( mbee256, mbee128p )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( mbeett, mbeeppc )
+MACHINE_CONFIG_DERIVED(mbee_state::mbeett, mbeeppc)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP(mbeett_mem)
 	MCFG_CPU_IO_MAP(mbeett_io)

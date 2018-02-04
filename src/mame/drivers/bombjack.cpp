@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bombjack_state )
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(bombjack_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x9820, 0x987f) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITENOP
-	AM_RANGE(0x9c00, 0x9cff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x9c00, 0x9cff) AM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
 	AM_RANGE(0x9e00, 0x9e00) AM_WRITE(bombjack_background_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("P1")
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(irq_mask_w)
@@ -342,14 +342,14 @@ INTERRUPT_GEN_MEMBER(bombjack_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( bombjack )
+MACHINE_CONFIG_START(bombjack_state::bombjack)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)     /* Confirmed from PCB */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000))     /* Confirmed from PCB */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bombjack_state,  vblank_irq)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/4) /* Confirmed from PCB */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/4) /* Confirmed from PCB */
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_IO_MAP(audio_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bombjack_state,  nmi_line_pulse)
@@ -373,13 +373,13 @@ static MACHINE_CONFIG_START( bombjack )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8) /* Confirmed from PCB */
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL(12'000'000)/8) /* Confirmed from PCB */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
 
-	MCFG_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
 
-	MCFG_SOUND_ADD("ay3", AY8910, XTAL_12MHz/8)
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL(12'000'000)/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.13)
 MACHINE_CONFIG_END
 

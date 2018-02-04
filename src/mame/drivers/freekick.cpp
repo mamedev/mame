@@ -717,8 +717,8 @@ MACHINE_RESET_MEMBER(freekick_state,oigas)
 	m_cnt = 0;
 }
 
-static MACHINE_CONFIG_START( omega )
-	MCFG_CPU_ADD("maincpu", MC8123, XTAL_18_432MHz/6) // unknown divisor
+MACHINE_CONFIG_START(freekick_state::omega)
+	MCFG_CPU_ADD("maincpu", MC8123, XTAL(18'432'000)/6) // unknown divisor
 	MCFG_CPU_PROGRAM_MAP(omega_map)
 	MCFG_CPU_IO_MAP(omega_io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -734,7 +734,7 @@ static MACHINE_CONFIG_START( omega )
 
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_18_432MHz/3, 768/2, 0, 512/2, 263, 0+16, 224+16) // unknown divisor
+	MCFG_SCREEN_RAW_PARAMS(XTAL(18'432'000)/3, 768/2, 0, 512/2, 263, 0+16, 224+16) // unknown divisor
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -744,23 +744,23 @@ static MACHINE_CONFIG_START( omega )
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_18_432MHz/6) // unknown divisor
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(18'432'000)/6) // unknown divisor
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, XTAL_18_432MHz/6) // unknown divisor
+	MCFG_SOUND_ADD("sn2", SN76489A, XTAL(18'432'000)/6) // unknown divisor
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn3", SN76489A, XTAL_18_432MHz/6) // unknown divisor
+	MCFG_SOUND_ADD("sn3", SN76489A, XTAL(18'432'000)/6) // unknown divisor
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn4", SN76489A, XTAL_18_432MHz/6) // unknown divisor
+	MCFG_SOUND_ADD("sn4", SN76489A, XTAL(18'432'000)/6) // unknown divisor
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( base )
+MACHINE_CONFIG_START(freekick_state::base)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(pbillrd_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
@@ -772,7 +772,7 @@ static MACHINE_CONFIG_START( base )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 768/2, 0, 512/2, 263, 0+16, 224+16)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 768/2, 0, 512/2, 263, 0+16, 224+16)
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_pbillrd)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -782,20 +782,20 @@ static MACHINE_CONFIG_START( base )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_12MHz/4)
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL(12'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn2", SN76489A, XTAL_12MHz/4)
+	MCFG_SOUND_ADD("sn2", SN76489A, XTAL(12'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn3", SN76489A, XTAL_12MHz/4)
+	MCFG_SOUND_ADD("sn3", SN76489A, XTAL(12'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("sn4", SN76489A, XTAL_12MHz/4)
+	MCFG_SOUND_ADD("sn4", SN76489A, XTAL(12'000'000)/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pbillrd, base )
+MACHINE_CONFIG_DERIVED(freekick_state::pbillrd, base)
 	MCFG_DEVICE_MODIFY("outlatch") // 10K
 	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(freekick_state, flipscreen_x_w))
 	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(freekick_state, flipscreen_y_w))
@@ -805,15 +805,15 @@ static MACHINE_CONFIG_DERIVED( pbillrd, base )
 	MCFG_MACHINE_RESET_OVERRIDE(freekick_state,freekick)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( pbillrdm, pbillrd )
-	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL_12MHz/4)
+MACHINE_CONFIG_DERIVED(freekick_state::pbillrdm, pbillrd)
+	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(12'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(pbillrd_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(freekick_state, irq0_line_hold, 120) // measured on PCB
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", freekick_state,  freekick_irqgen)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( freekick, base )
+MACHINE_CONFIG_DERIVED(freekick_state::freekick, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -842,7 +842,7 @@ static MACHINE_CONFIG_DERIVED( freekick, base )
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_freekick)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gigas, base )
+MACHINE_CONFIG_DERIVED(freekick_state::gigas, base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -862,10 +862,10 @@ static MACHINE_CONFIG_DERIVED( gigas, base )
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gigasm, base )
+MACHINE_CONFIG_DERIVED(freekick_state::gigasm, base)
 
 	/* basic machine hardware */
-	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL_12MHz/4)
+	MCFG_CPU_REPLACE("maincpu", MC8123, XTAL(12'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(gigas_map)
 	MCFG_CPU_IO_MAP(gigas_io_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
@@ -884,7 +884,7 @@ static MACHINE_CONFIG_DERIVED( gigasm, base )
 	MCFG_SCREEN_UPDATE_DRIVER(freekick_state, screen_update_gigas)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( oigas, gigas )
+MACHINE_CONFIG_DERIVED(freekick_state::oigas, gigas)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

@@ -71,7 +71,7 @@
  * 555     - analog timer circuit
  * 6800    - 8 bit CPU
  * 6821    - PIA paralell interface
- * 6850    - ACIA serial interface 
+ * 6850    - ACIA serial interface
  * 7400    - Quad 2 input NAND gates
  * 7402    - Quad 2 input NOR gates
  * 7408    - Quad 2 input AND gates
@@ -81,15 +81,15 @@
  * 7476    - Dual JK flip flops with preset and clear
  * 7490    - Decade Counters, divide by 2 and divide by 5 outputs
  * 74116   - Dual 4-bit latches
- * 74138   - 3 to 8 line decoder/demultiplexer 
- * 74139   - Dual 2 to 4 line decoder/demultiplexer 
+ * 74138   - 3 to 8 line decoder/demultiplexer
+ * 74139   - Dual 2 to 4 line decoder/demultiplexer
  * 74154   - 4 line to 16 line decoders/multiplexers
  * 74164   - 8 bit paralell output serial shift register
  * 74174   - 6 D-type flip flops
  * 74240   - Inverted 3-state outputs
  * 74244   - Non-inverted 3-state outputs
  * AY3600  - Keyboard Controller
- * CA339   - Quad Voltage Comparators 
+ * CA339   - Quad Voltage Comparators
  * CD4050B - CMOS Hex Non-Inverting Buffer and Converter
  * CIC2414 - CMOS RAM suspects
  * DS1210  - NVRAM controller, inhibits access and supply battery power on power down
@@ -265,9 +265,10 @@ public:
 	//,m_brg(*this, "brg")
 	//,m_ay3600(*this, "ay3600")
 	{ }
+	void t4490(machine_config &config);
 private:
 	required_device<m6800_cpu_device> m_maincpu;
-  //	virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
+  //    virtual void machine_reset() override { m_maincpu->reset(); LOG("--->%s()\n", FUNCNAME); };
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
 	//required_device<pia6821_device> m_pia3;
@@ -280,8 +281,7 @@ static ADDRESS_MAP_START( t4490_map, AS_PROGRAM, 8, t4490_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x3000)
 	AM_RANGE(0x9500, 0x95ff) AM_RAM
-	AM_RANGE(0x9030, 0x9030) AM_DEVREADWRITE("acia", acia6850_device, status_r, control_w)
-	AM_RANGE(0x9031, 0x9031) AM_DEVREADWRITE("acia", acia6850_device, data_r, data_w)
+	AM_RANGE(0x9030, 0x9031) AM_DEVREADWRITE("acia", acia6850_device, read, write)
 	AM_RANGE(0x9034, 0x9037) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x9038, 0x903b) AM_DEVREADWRITE("pia2", pia6821_device, read, write)
 	AM_RANGE(0xa000, 0xffff) AM_ROM AM_REGION("maincpu", 0xa000)
@@ -291,8 +291,8 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( t4490 )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( t4490 )
-	MCFG_CPU_ADD("maincpu", M6800, XTAL_8MHz/4) // divided by a MC6875
+MACHINE_CONFIG_START(t4490_state::t4490)
+	MCFG_CPU_ADD("maincpu", M6800, XTAL(8'000'000)/4) // divided by a MC6875
 	MCFG_CPU_PROGRAM_MAP(t4490_map)
 
 	/* devices */

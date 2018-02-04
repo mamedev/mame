@@ -94,6 +94,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
+	void guab(machine_config &config);
 protected:
 	virtual void machine_start() override;
 
@@ -121,10 +122,8 @@ static ADDRESS_MAP_START( guab_map, AS_PROGRAM, 16, guab_state )
 	AM_RANGE(0x0c0020, 0x0c0027) AM_DEVREADWRITE8("i8255_2", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x0c0040, 0x0c0047) AM_DEVREADWRITE8("i8255_3", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x0c0060, 0x0c0067) AM_DEVREADWRITE8("i8255_4", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0080, 0x0c0081) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x0c0082, 0x0c0083) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
-	AM_RANGE(0x0c00a0, 0x0c00a1) AM_DEVREADWRITE8("acia6850_2", acia6850_device, status_r, control_w, 0x00ff)
-	AM_RANGE(0x0c00a2, 0x0c00a3) AM_DEVREADWRITE8("acia6850_2", acia6850_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x0c0080, 0x0c0083) AM_DEVREADWRITE8("acia6850_1", acia6850_device, read, write, 0x00ff)
+	AM_RANGE(0x0c00a0, 0x0c00a3) AM_DEVREADWRITE8("acia6850_2", acia6850_device, read, write, 0x00ff)
 	AM_RANGE(0x0c00c0, 0x0c00cf) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0x00ff)
 	AM_RANGE(0x0c00e0, 0x0c00e7) AM_DEVREADWRITE8("fdc", wd1773_device, read, write, 0x00ff)
 	AM_RANGE(0x080000, 0x080fff) AM_RAM
@@ -449,7 +448,7 @@ SLOT_INTERFACE_END
 //  MACHINE DEFINTIONS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( guab )
+MACHINE_CONFIG_START(guab_state::guab)
 	/* TODO: Verify clock */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
 	MCFG_CPU_PROGRAM_MAP(guab_map)

@@ -45,6 +45,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	void dorachan(machine_config &config);
 };
 
 
@@ -200,7 +201,7 @@ void dorachan_state::machine_reset()
 	m_flip_screen = 0;
 }
 
-static MACHINE_CONFIG_START( dorachan )
+MACHINE_CONFIG_START(dorachan_state::dorachan)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 2000000)

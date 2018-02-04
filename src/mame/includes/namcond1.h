@@ -46,4 +46,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( vblank_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( raster_irq_w );
 	INTERRUPT_GEN_MEMBER(mcu_interrupt);
+	void abcheck(machine_config &config);
+	void namcond1(machine_config &config);
 };

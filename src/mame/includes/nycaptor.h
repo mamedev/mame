@@ -94,4 +94,7 @@ public:
 	uint32_t screen_update_nycaptor(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int nycaptor_spot(  );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
+	void nycaptor(machine_config &config);
+	void cyclshtg(machine_config &config);
+	void bronx(machine_config &config);
 };

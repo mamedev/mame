@@ -65,8 +65,6 @@ public:
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(ultennis_hack_r);
 	DECLARE_WRITE16_MEMBER(protection_bit_w);
-	DECLARE_READ16_MEMBER(shtstar_unk_r);
-	DECLARE_READ16_MEMBER(shtstar_unk_2_r);
 	DECLARE_READ16_MEMBER(artmagic_blitter_r);
 	DECLARE_WRITE16_MEMBER(artmagic_blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(m68k_gen_int);
@@ -87,6 +85,10 @@ public:
 	void update_irq_state();
 	inline uint16_t *address_to_vram(offs_t *address);
 
+	void cheesech(machine_config &config);
+	void artmagic(machine_config &config);
+	void shtstar(machine_config &config);
+	void stonebal(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

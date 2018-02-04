@@ -40,6 +40,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( bartop_interrupt );
 
 	virtual void machine_reset() override;
+	void a5200(machine_config &config);
 };
 
 
@@ -120,7 +121,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( bartop52_state::bartop_interrupt )
 	m_antic->generic_interrupt(4);
 }
 
-static MACHINE_CONFIG_START( a5200 )
+MACHINE_CONFIG_START(bartop52_state::a5200)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
 	MCFG_CPU_PROGRAM_MAP(a5200_mem)

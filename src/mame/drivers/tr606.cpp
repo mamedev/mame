@@ -16,7 +16,6 @@
 
 #include "emu.h"
 #include "includes/hh_ucom4.h"
-#include "machine/timer.h"
 
 #include "tr606.lh"
 
@@ -32,6 +31,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clear) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 
 	virtual void machine_start() override;
+	void tr606(machine_config &config);
 };
 
 // TP2 to MCU CLK: LC circuit(TI S74230), stable sine wave, 2.2us interval
@@ -78,7 +78,7 @@ void tr606_state::machine_start()
 	// register for savestates
 }
 
-static MACHINE_CONFIG_START( tr606 )
+MACHINE_CONFIG_START(tr606_state::tr606)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", NEC_D650, TP2_HZ)

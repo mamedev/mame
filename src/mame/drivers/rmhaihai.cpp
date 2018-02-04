@@ -76,6 +76,9 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void themj(machine_config &config);
+	void rmhaisei(machine_config &config);
+	void rmhaihai(machine_config &config);
 };
 
 
@@ -123,8 +126,8 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1" };
 
-	logerror("%04x: keyboard_r\n",space.device().safe_pc());
-	switch(space.device().safe_pc())
+	logerror("%04x: keyboard_r\n",m_maincpu->pc());
+	switch(m_maincpu->pc())
 	{
 		/* read keyboard */
 		case 0x0280:
@@ -173,7 +176,7 @@ READ8_MEMBER(rmhaihai_state::keyboard_r)
 
 WRITE8_MEMBER(rmhaihai_state::keyboard_w)
 {
-logerror("%04x: keyboard_w %02x\n",space.device().safe_pc(),data);
+logerror("%04x: keyboard_w %02x\n",m_maincpu->pc(),data);
 	m_keyboard_cmd = data;
 }
 
@@ -471,7 +474,7 @@ static GFXDECODE_START( themj )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( rmhaihai )
+MACHINE_CONFIG_START(rmhaihai_state::rmhaihai)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,20000000/4)  /* 5 MHz ??? */
@@ -507,7 +510,7 @@ static MACHINE_CONFIG_START( rmhaihai )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rmhaisei, rmhaihai )
+MACHINE_CONFIG_DERIVED(rmhaihai_state::rmhaisei, rmhaihai)
 
 	/* basic machine hardware */
 
@@ -517,7 +520,7 @@ static MACHINE_CONFIG_DERIVED( rmhaisei, rmhaihai )
 	MCFG_PALETTE_ENTRIES(0x200)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( themj, rmhaihai )
+MACHINE_CONFIG_DERIVED(rmhaihai_state::themj, rmhaihai)
 
 	/* basic machine hardware */
 

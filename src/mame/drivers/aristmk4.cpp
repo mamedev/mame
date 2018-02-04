@@ -315,7 +315,7 @@
 
 ***********************************************************************************************************************************************/
 
-#define MAIN_CLOCK  XTAL_12MHz
+#define MAIN_CLOCK  XTAL(12'000'000)
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
@@ -432,6 +432,9 @@ public:
 	TIMER_CALLBACK_MEMBER(hopper_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_pf);
 	inline void uBackgroundColour();
+	void aristmk4_poker(machine_config &config);
+	void aristmk4(machine_config &config);
+	void _86lions(machine_config &config);
 };
 
 /* Partial Cashcade protocol */
@@ -1745,9 +1748,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_state::aristmk4_pf)
 	}
 }
 
-static MACHINE_CONFIG_START( aristmk4 )
+MACHINE_CONFIG_START(aristmk4_state::aristmk4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8) // 1.5mhz
+	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK/8) // M68B09E @ 1.5 MHz
 	MCFG_CPU_PROGRAM_MAP(aristmk4_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", aristmk4_state,  irq0_line_hold)
 
@@ -1772,7 +1775,7 @@ static MACHINE_CONFIG_START( aristmk4 )
 	MCFG_I8255_IN_PORTB_CB(READ8(aristmk4_state, pb1_r))
 	MCFG_I8255_IN_PORTC_CB(READ8(aristmk4_state, pc1_r))
 
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 0) /* 1 MHz.(only 1 or 2 MHz.are valid) */
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, MAIN_CLOCK/8) // R65C22P2
 	MCFG_VIA6522_READPA_HANDLER(READ8(aristmk4_state, via_a_r))
 	MCFG_VIA6522_READPB_HANDLER(READ8(aristmk4_state, via_b_r))
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(aristmk4_state, via_a_w))
@@ -1795,7 +1798,7 @@ static MACHINE_CONFIG_START( aristmk4 )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(4)
 
-	MCFG_MC146818_ADD( "rtc", XTAL_4_194304Mhz )
+	MCFG_MC146818_ADD( "rtc", XTAL(4'194'304) )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -1817,7 +1820,7 @@ static MACHINE_CONFIG_START( aristmk4 )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aristmk4_poker, aristmk4 )
+MACHINE_CONFIG_DERIVED(aristmk4_state::aristmk4_poker, aristmk4)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(aristmk4_poker_map)
@@ -1847,7 +1850,7 @@ PALETTE_INIT_MEMBER(aristmk4_state,lions)
 	}
 }
 
-static MACHINE_CONFIG_DERIVED( 86lions, aristmk4 )
+MACHINE_CONFIG_DERIVED(aristmk4_state::_86lions, aristmk4)
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_INIT_OWNER(aristmk4_state,lions)
 MACHINE_CONFIG_END
@@ -2499,7 +2502,7 @@ ROM_START( 86lions )
 	//  ROM_LOAD( "prom.x", 0x00, 0x20, NO_DUMP )
 ROM_END
 
-GAMEL( 1985, 86lions,  0,        86lions,  aristmk4, aristmk4_state, aristmk4, ROT0, "Aristocrat", "86 Lions", MACHINE_NOT_WORKING, layout_topgear )
+GAMEL( 1985, 86lions,  0,        _86lions, aristmk4, aristmk4_state, aristmk4, ROT0, "Aristocrat", "86 Lions", MACHINE_NOT_WORKING, layout_topgear )
 GAMEL( 1996, eforest,  0,        aristmk4, eforest,  aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (12XF528902, US)",         0, layout_eforest  ) // 92.778%
 GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (4VXFC818, NSW)",          0, layout_aristmk4 ) // 10c, $1 = 10 credits, 90.483%
 GAMEL( 1996, eforestb, eforest,  aristmk4, arimk4nz, aristmk4_state, aristmk4, ROT0, "Aristocrat", "Enchanted Forest (3VXFC5343, New Zealand)", 0, layout_arimk4nz ) // 5c, $2 = 40 credits, 88.43%

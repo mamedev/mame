@@ -225,6 +225,24 @@ public:
 	void screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_sms1);
 
+	void sms_base(machine_config &config);
+	void sms_ntsc_base(machine_config &config);
+	void sms_pal_base(machine_config &config);
+	void sms_paln_base(machine_config &config);
+	void sms_br_base(machine_config &config);
+	void sms3_br(machine_config &config);
+	void sg1000m3(machine_config &config);
+	void smsj(machine_config &config);
+	void sms1_paln(machine_config &config);
+	void sms1_ntsc(machine_config &config);
+	void gamegear(machine_config &config);
+	void sms3_paln(machine_config &config);
+	void sms1_pal(machine_config &config);
+	void sms2_pal(machine_config &config);
+	void sms2_kr(machine_config &config);
+	void sms1_br(machine_config &config);
+	void sms2_ntsc(machine_config &config);
+	void sms1_kr(machine_config &config);
 protected:
 	uint8_t read_bus(address_space &space, unsigned int bank, uint16_t base_addr, uint16_t offset);
 	void setup_bios();
@@ -253,6 +271,7 @@ public:
 	DECLARE_READ8_MEMBER(store_cart_peek);
 
 	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
+	void sms_sdisp(machine_config &config);
 };
 
 

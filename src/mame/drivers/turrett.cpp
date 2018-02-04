@@ -24,7 +24,7 @@
  *
  *************************************/
 
-#define R3041_CLOCK         XTAL_25MHz
+#define R3041_CLOCK         XTAL(25'000'000)
 
 
 
@@ -349,7 +349,7 @@ SLOT_INTERFACE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( turrett )
+MACHINE_CONFIG_START(turrett_state::turrett)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R3041, R3041_CLOCK)

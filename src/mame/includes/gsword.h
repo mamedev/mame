@@ -96,6 +96,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void gsword(machine_config &config);
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<msm5205_device>         m_msm;
@@ -134,6 +135,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+	void josvolly(machine_config &config);
 private:
 	bool    m_cpu2_nmi_enable;
 	u8      m_mcu1_p1;

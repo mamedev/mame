@@ -49,6 +49,7 @@ public:
 	DECLARE_VIDEO_START(vega);
 
 	uint32_t screen_update_vega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void vega(machine_config &config);
 };
 
 READ8_MEMBER( vegaeo_state::qs1000_p1_r )
@@ -138,7 +139,7 @@ static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 32, vegaeo_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
 	AM_RANGE(0x80000000, 0x80013fff) AM_READWRITE(vega_vram_r, vega_vram_w)
 	AM_RANGE(0xfc000000, 0xfc0000ff) AM_DEVREADWRITE8("at28c16", at28c16_device, read, write, 0x000000ff)
-	AM_RANGE(0xfc200000, 0xfc2003ff) AM_DEVREADWRITE16("palette", palette_device, read, write, 0x0000ffff) AM_SHARE("palette")
+	AM_RANGE(0xfc200000, 0xfc2003ff) AM_DEVREADWRITE16("palette", palette_device, read16, write16, 0x0000ffff) AM_SHARE("palette")
 	AM_RANGE(0xfc400000, 0xfc40005b) AM_WRITENOP // crt registers ?
 	AM_RANGE(0xfc600000, 0xfc600003) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xfca00000, 0xfca00003) AM_WRITE(vega_misc_w)
@@ -217,8 +218,8 @@ uint32_t vegaeo_state::screen_update_vega(screen_device &screen, bitmap_ind16 &b
 }
 
 
-static MACHINE_CONFIG_START( vega )
-	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL_55MHz)
+MACHINE_CONFIG_START(vegaeo_state::vega)
+	MCFG_CPU_ADD("maincpu", GMS30C2132, XTAL(55'000'000))
 	MCFG_CPU_PROGRAM_MAP(vega_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", vegaeo_state, eolith_speedup, "screen", 0, 1)
 
@@ -244,7 +245,7 @@ static MACHINE_CONFIG_START( vega )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("qs1000", QS1000, XTAL_24MHz)
+	MCFG_SOUND_ADD("qs1000", QS1000, XTAL(24'000'000))
 	MCFG_QS1000_EXTERNAL_ROM(true)
 	MCFG_QS1000_IN_P1_CB(READ8(vegaeo_state, qs1000_p1_r))
 	MCFG_QS1000_OUT_P1_CB(WRITE8(vegaeo_state, qs1000_p1_w))

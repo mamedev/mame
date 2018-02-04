@@ -48,7 +48,7 @@
 	i8275_device::static_set_character_width(*device, _value);
 
 #define MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(_class, _method) \
-	i8275_device::static_set_display_callback(*device, i8275_device::draw_character_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	i8275_device::static_set_display_callback(*device, i8275_device::draw_character_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_I8275_DRQ_CALLBACK(_write) \
 	devcb = &i8275_device::set_drq_wr_callback(*device, DEVCB_##_write);
@@ -197,6 +197,7 @@ protected:
 	uint8_t m_fifo[2][16];
 	int m_buffer_idx;
 	int m_fifo_idx;
+	int m_dma_idx;
 	bool m_fifo_next;
 	int m_buffer_dma;
 

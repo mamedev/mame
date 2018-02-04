@@ -26,9 +26,9 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual void op_br() override;
-	virtual void op_call() override;
-	virtual void op_retn() override;
+	virtual void op_br() override { op_br3(); } // 3-level stack
+	virtual void op_call() override { op_call3(); } // "
+	virtual void op_retn() override { op_retn3(); } // "
 
 	virtual void op_setr() override { tms1k_base_device::op_setr(); } // no anomaly with MSB of X register
 	virtual void op_rstr() override { tms1k_base_device::op_rstr(); } // "

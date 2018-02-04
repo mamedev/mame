@@ -65,4 +65,5 @@ public:
 	void draw_status( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void mnchmobl(machine_config &config);
 };

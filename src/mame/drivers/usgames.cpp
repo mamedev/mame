@@ -217,7 +217,7 @@ static GFXDECODE_START( usgames )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( usg32 )
+MACHINE_CONFIG_START(usgames_state::usg32)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000) /* ?? */
@@ -239,7 +239,7 @@ static MACHINE_CONFIG_START( usg32 )
 	MCFG_PALETTE_ADD("palette", 2*256)
 	MCFG_PALETTE_INIT_OWNER(usgames_state, usgames)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_18MHz / 16)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(18'000'000) / 16)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
@@ -250,7 +250,7 @@ static MACHINE_CONFIG_START( usg32 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( usg185, usg32 )
+MACHINE_CONFIG_DERIVED(usgames_state::usg185, usg32)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(usg185_map)
 MACHINE_CONFIG_END

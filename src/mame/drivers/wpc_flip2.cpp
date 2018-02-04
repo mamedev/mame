@@ -186,7 +186,7 @@ DRIVER_INIT_MEMBER(wpc_flip2_state,wpc_flip2)
 	wpc_flip1_state::init_wpc_flip1();
 }
 
-static MACHINE_CONFIG_START( wpc_flip2 )
+MACHINE_CONFIG_START(wpc_flip2_state::wpc_flip2)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6809, 2000000)
 	MCFG_CPU_PROGRAM_MAP(wpc_flip2_map)
@@ -332,6 +332,19 @@ ROM_START(cftbl_l3)
 	ROM_LOAD("bl_u14.l1", 0x000000, 0x80000, CRC(6b02bee4) SHA1(4f852b897dbf0ec2d5b17eed2ff70d9360b12213))
 	ROM_LOAD("bl_u15.l1", 0x080000, 0x80000, CRC(15477d6f) SHA1(3ed7942828630bc9111d2e602fee931ef67db2ce))
 	ROM_LOAD("u18-sp1.rom", 0x100000, 0x20000, CRC(07198d93) SHA1(d91eb7ae7bd11340b0daf4edd2cd2e87acadeda4))
+	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
+	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
+	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
+ROM_END
+
+ROM_START(cftbl_l2)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x80000, "code", 0)
+	ROM_LOAD("cftbl_l2.u6", 0x00000, 0x80000, CRC(f3097f42) SHA1(f15cda9c74b806f13b81aa1e99588ba9139b2969))
+	ROM_REGION(0x180000, "sound1", 0)
+	ROM_LOAD("bl_u14.l1", 0x000000, 0x80000, CRC(6b02bee4) SHA1(4f852b897dbf0ec2d5b17eed2ff70d9360b12213))
+	ROM_LOAD("bl_u15.l1", 0x080000, 0x80000, CRC(15477d6f) SHA1(3ed7942828630bc9111d2e602fee931ef67db2ce))
+	ROM_LOAD("bl_u18.l1", 0x100000, 0x20000, CRC(87267bcc) SHA1(3e733437bce3491c216a8627810897f6123f0679))
 	ROM_RELOAD( 0x100000 + 0x20000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x40000, 0x20000)
 	ROM_RELOAD( 0x100000 + 0x60000, 0x20000)
@@ -845,6 +858,7 @@ GAME(1993,  drac_l1,    0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_
 GAME(1993,  drac_p11,   drac_l1,    wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Williams",  "Bram Stoker's Dracula (P-11)",                             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  cftbl_l4,   0,          wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Creature from the Black Lagoon (L-4)",                     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1993,  cftbl_l3,   cftbl_l4,   wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Creature from the Black Lagoon (L-3,SP-1)",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1993,  cftbl_l2,   cftbl_l4,   wpc_flip2,  wpc_flip2, wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Creature from the Black Lagoon (L-2)",                     MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  dw_l2,      0,          wpc_flip2,  wpc_dw,    wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Doctor Who (L-2)",                                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  dw_l1,      dw_l2,      wpc_flip2,  wpc_dw,    wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Doctor Who (L-1)",                                         MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1992,  dw_p5,      dw_l2,      wpc_flip2,  wpc_dw,    wpc_flip2_state, wpc_flip2,  ROT0,   "Bally",     "Doctor Who (P-5)",                                         MACHINE_IS_SKELETON_MECHANICAL)

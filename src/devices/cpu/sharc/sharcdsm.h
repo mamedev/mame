@@ -1,79 +1,68 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-static const char ureg_names[256][16] =
+
+#ifndef MAME_CPU_SHARC_SHARCDSM_H
+#define MAME_CPU_SHARC_SHARCDSM_H
+
+#pragma once
+
+class sharc_disassembler : public util::disasm_interface
 {
-	"R0",       "R1",       "R2",       "R3",       "R4",       "R5",       "R6",       "R7",
-	"R8",       "R9",       "R10",      "R11",      "R12",      "R13",      "R14",      "R15",
-	"I0",       "I1",       "I2",       "I3",       "I4",       "I5",       "I6",       "I7",
-	"I8",       "I9",       "I10",      "I11",      "I12",      "I13",      "I14",      "I15",
-	"M0",       "M1",       "M2",       "M3",       "M4",       "M5",       "M6",       "M7",
-	"M8",       "M9",       "M10",      "M11",      "M12",      "M13",      "M14",      "M15",
-	"L0",       "L1",       "L2",       "L3",       "L4",       "L5",       "L6",       "L7",
-	"L8",       "L9",       "L10",      "L11",      "L12",      "L13",      "L14",      "L15",
-	"B0",       "B1",       "B2",       "B3",       "B4",       "B5",       "B6",       "B7",
-	"B8",       "B9",       "B10",      "B11",      "B12",      "B13",      "B14",      "B15",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"FADDR",    "DADDR",    "???",      "PC",       "PCSTK",    "PCSTKP",   "LADDR",    "CURLCNTR",
-	"LCNTR",    "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"USTAT1",   "USTAT2",   "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "IRPTL",    "MODE2",    "MODE1",    "ASTAT",    "IMASK",    "STKY",     "IMASKP",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "PX",       "PX1",      "PX2",      "TPERIOD",  "TCOUNT",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???",
-	"???",      "???",      "???",      "???",      "???",      "???",      "???",      "???"
+public:
+	sharc_disassembler();
+	virtual ~sharc_disassembler() = default;
+
+	virtual u32 opcode_alignment() const override;
+	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
+
+private:
+	struct SHARC_DASM_OP
+	{
+		uint32_t op_mask;
+		uint32_t op_bits;
+		uint32_t (sharc_disassembler::*handler)(std::ostream &, uint32_t, uint64_t);
+	};
+
+	static const char ureg_names[256][16];
+	static const char bopnames[8][8];
+	static const char condition_codes_if[32][32];
+	static const char condition_codes_do[32][32];
+	static const char mr_regnames[16][8];
+	static const SHARC_DASM_OP sharc_dasm_ops[];
+
+	uint32_t (sharc_disassembler::*sharcdasm_table[256])(std::ostream &, uint32_t, uint64_t);
+
+	void compute(std::ostream &stream, uint32_t opcode);
+	void get_if_condition(std::ostream &stream, int cond);
+	void pm_dm_ureg(std::ostream &stream, int g, int d, int i, int m, int ureg, int update);
+	void pm_dm_imm_dreg(std::ostream &stream, int g, int d, int i, int data, int dreg, int update);
+	void pm_dm_dreg(std::ostream &stream, int g, int d, int i, int m, int dreg);
+	void shiftop(std::ostream &stream, int shift, int data, int rn, int rx);
+
+	uint32_t dasm_compute_dreg_dmpm(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_compute(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_compute_uregdmpm_regmod(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_compute_dregdmpm_immmod(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_compute_ureg_ureg(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_immshift_dregdmpm(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_immshift_dregdmpm_nodata(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_compute_modify(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_direct_jump(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_indirect_jump_compute(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_indirect_jump_compute_dregdm(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_rts_compute(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_do_until_counter(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_do_until(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_immmove_uregdmpm(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_immmove_uregdmpm_indirect(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_immmove_immdata_dmpm(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_immmove_immdata_ureg(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_sysreg_bitop(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_ireg_modify(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_misc(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_idlenop(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_cjump_rframe(std::ostream &stream, uint32_t pc, uint64_t opcode);
+	uint32_t dasm_invalid(std::ostream &stream, uint32_t pc, uint64_t opcode);
 };
 
-static const char bopnames[8][8] =
-{
-	"SET",      "CLEAR",    "TOGGLE",   "???",      "TEST",     "XOR",      "???",      "???"
-};
-
-static const char condition_codes_if[32][32] =
-{
-	"EQ",           "LT",           "LE",           "AC",
-	"AV",           "MV",           "MS",           "SV",
-	"SZ",           "FLAG0_IN",     "FLAG1_IN",     "FLAG2_IN",
-	"FLAG3_IN",     "TF",           "BM",           "NOT LCE",
-	"NE",           "GE",           "GT",           "NOT AC",
-	"NOT AV",       "NOT MV",       "NOT MS",       "NOT SV",
-	"NOT SZ",       "NOT FLAG0_IN", "NOT FLAG1_IN", "NOT FLAG2_IN",
-	"NOT FLAG3_IN", "NOT TF",       "NBM",          ""
-};
-
-static const char condition_codes_do[32][32] =
-{
-	"EQ",           "LT",           "LE",           "AC",
-	"AV",           "MV",           "MS",           "SV",
-	"SZ",           "FLAG0_IN",     "FLAG1_IN",     "FLAG2_IN",
-	"FLAG3_IN",     "TF",           "BM",           "LCE",
-	"NE",           "GE",           "GT",           "NOT AC",
-	"NOT AV",       "NOT MV",       "NOT MS",       "NOT SV",
-	"NOT SZ",       "NOT FLAG0_IN", "NOT FLAG1_IN", "NOT FLAG2_IN",
-	"NOT FLAG3_IN", "NOT TF",       "NBM",          "FOREVER"
-};
-
-static const char mr_regnames[16][8] =
-{
-	"MR0F", "MR1F", "MR2F", "MR0B", "MR1B", "MR2B", "???",  "???",
-	"???",  "???",  "???",  "???",  "???",  "???",  "???",  "???"
-};
-
-struct SHARC_DASM_OP
-{
-	uint32_t op_mask;
-	uint32_t op_bits;
-	uint32_t (* handler)(uint32_t, uint64_t);
-};
+#endif

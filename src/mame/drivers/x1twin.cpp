@@ -34,18 +34,63 @@ public:
 	uint32_t screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
+	void x1twin(machine_config &config);
 };
 
 
-#define X1_MAIN_CLOCK XTAL_16MHz
-#define VDP_CLOCK  XTAL_42_9545MHz
-#define MCU_CLOCK  XTAL_6MHz
+#define X1_MAIN_CLOCK XTAL(16'000'000)
+#define VDP_CLOCK  XTAL(42'954'545)
+#define MCU_CLOCK  XTAL(6'000'000)
 #define PCE_MAIN_CLOCK      VDP_CLOCK / 2
 
 uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
+
+static ADDRESS_MAP_START( x1_io_banks_common, AS_IO, 8, x1_state )
+	ADDRESS_MAP_UNMAP_HIGH
+
+	AM_RANGE(0x0e00, 0x0e02)                   AM_WRITE(x1_rom_w)
+	AM_RANGE(0x0e03, 0x0e03)                   AM_READ(x1_rom_r)
+
+	AM_RANGE(0x0ff8, 0x0fff)                   AM_READWRITE(x1_fdc_r, x1_fdc_w)
+
+	AM_RANGE(0x1300, 0x1300) AM_MIRROR(0x00ff) AM_WRITE(x1_pri_w)
+	AM_RANGE(0x1400, 0x17ff)                   AM_READWRITE(x1_pcg_r, x1_pcg_w)
+
+	AM_RANGE(0x1800, 0x1801)                   AM_WRITE(x1_6845_w)
+
+	AM_RANGE(0x1900, 0x1900) AM_MIRROR(0x00ff) AM_READWRITE(x1_sub_io_r, x1_sub_io_w)
+	AM_RANGE(0x1a00, 0x1a03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x1b00, 0x1b00) AM_MIRROR(0x00ff) AM_DEVREADWRITE("ay", ay8910_device, data_r, data_w)
+	AM_RANGE(0x1c00, 0x1c00) AM_MIRROR(0x00ff) AM_DEVWRITE("ay", ay8910_device, address_w)
+	AM_RANGE(0x1d00, 0x1d00) AM_MIRROR(0x00ff) AM_WRITE(x1_rom_bank_1_w)
+	AM_RANGE(0x1e00, 0x1e00) AM_MIRROR(0x00ff) AM_WRITE(x1_rom_bank_0_w)
+
+	AM_RANGE(0x1fa0, 0x1fa3)                   AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+	AM_RANGE(0x1fa8, 0x1fab)                   AM_DEVREADWRITE("ctc", z80ctc_device, read, write)
+
+	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("avram")
+
+	AM_RANGE(0x4000, 0xffff)                   AM_READWRITE_BANK("bitmapbank")
+
+	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(x1_ex_gfxram_r, x1_ex_gfxram_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( x1_io_banks, AS_IO, 8, x1_state )
+	AM_IMPORT_FROM(x1_io_banks_common)
+
+//  AM_RANGE(0x0700, 0x0701) TODO: user could install ym2151 on plain X1 too
+
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x00ff) AM_WRITE(x1_pal_b_w)
+	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x00ff) AM_WRITE(x1_pal_r_w)
+	AM_RANGE(0x1200, 0x1200) AM_MIRROR(0x00ff) AM_WRITE(x1_pal_g_w)
+
+	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("tvram") // Ys checks if it's a x1/x1turbo machine by checking if this area is a mirror
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( x1_mem, AS_PROGRAM, 8, x1twin_state )
 	ADDRESS_MAP_UNMAP_HIGH
@@ -54,7 +99,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( x1_io, AS_IO, 8, x1twin_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(x1_io_r, x1_io_w)
+	AM_RANGE(0x0000, 0xffff) AM_DEVICE("iobank", address_map_bank_device, amap8)
 ADDRESS_MAP_END
 
 #if 0
@@ -401,12 +446,19 @@ static SLOT_INTERFACE_START( x1_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( x1twin )
+MACHINE_CONFIG_START(x1twin_state::x1twin)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("x1_cpu", Z80, X1_MAIN_CLOCK/4)
 	MCFG_CPU_PROGRAM_MAP(x1_mem)
 	MCFG_CPU_IO_MAP(x1_io)
 	MCFG_Z80_DAISY_CHAIN(x1_daisy)
+
+	MCFG_DEVICE_ADD("iobank", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(x1_io_banks)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(17)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, MAIN_CLOCK/4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("x1_cpu", INPUT_LINE_IRQ0))
@@ -436,7 +488,7 @@ static MACHINE_CONFIG_START( x1twin )
 
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 	/* video hardware */
-	MCFG_SCREEN_ADD("x1_screen", RASTER)
+	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)
@@ -449,8 +501,8 @@ static MACHINE_CONFIG_START( x1twin )
 	MCFG_SCREEN_RAW_PARAMS(PCE_MAIN_CLOCK/2, huc6260_device::WPF, 70, 70 + 512 + 32, huc6260_device::LPF, 14, 14+242)
 	MCFG_SCREEN_UPDATE_DRIVER(x1twin_state, screen_update_x1pce)
 
-	MCFG_MC6845_ADD("crtc", H46505, "x1_screen", (VDP_CLOCK/48)) //unknown divider
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_ADD("crtc", H46505, "screen", (VDP_CLOCK/48)) //unknown divider
+	MCFG_MC6845_SHOW_BORDER_AREA(true)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	MCFG_PALETTE_ADD("palette", 0x10+0x1000)
@@ -461,6 +513,8 @@ static MACHINE_CONFIG_START( x1twin )
 	MCFG_VIDEO_START_OVERRIDE(x1twin_state,x1)
 
 	MCFG_MB8877_ADD("fdc", MAIN_CLOCK / 16)
+	// TODO: guesswork, try to implicitily start the motor
+	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(x1_state, hdl_w))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", x1_floppies, "dd", x1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", x1_floppies, "dd", x1_state::floppy_formats)

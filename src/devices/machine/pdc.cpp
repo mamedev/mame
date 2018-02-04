@@ -251,9 +251,9 @@ FLOPPY_FORMATS_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( pdc_device::device_add_mconfig )
+MACHINE_CONFIG_START(pdc_device::device_add_mconfig)
 	/* CPU - Zilog Z0840006PSC */
-	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz / 2)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL(10'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(pdc_mem)
 	MCFG_CPU_IO_MAP(pdc_io)
 	//MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
@@ -269,7 +269,7 @@ MACHINE_CONFIG_MEMBER( pdc_device::device_add_mconfig )
 	/* DMA Controller - Intel P8237A-5 */
 	/* Channel 0: uPD765a Floppy Disk Controller */
 	/* Channel 1: M68K main system memory */
-	MCFG_DEVICE_ADD(FDCDMA_TAG, AM9517A, XTAL_10MHz / 2)
+	MCFG_DEVICE_ADD(FDCDMA_TAG, AM9517A, XTAL(10'000'000) / 2)
 	MCFG_I8237_OUT_HREQ_CB(WRITELINE(pdc_device, i8237_hreq_w))
 	MCFG_I8237_OUT_EOP_CB(WRITELINE(pdc_device, i8237_eop_w))
 	MCFG_I8237_IN_MEMR_CB(READ8(pdc_device, i8237_dma_mem_r))
@@ -516,7 +516,7 @@ WRITE8_MEMBER(pdc_device::fdd_68k_w)
 			}
 			break;
 		default:
-			if(TRACE_PDC_FDC) logerror("(!)PDC: Port %02X WRITE: %02X, PC: %X\n", address, data, space.device().safe_pc());
+			if(TRACE_PDC_FDC) logerror("(!)PDC: Port %02X WRITE: %02X %s\n", address, data, machine().describe_context());
 			break;
 	}
 }
@@ -531,7 +531,7 @@ WRITE8_MEMBER(pdc_device::p38_w)
 READ8_MEMBER(pdc_device::p38_r)
 {
 	reg_p38 ^= 0x20; /* Invert bit 5 (32) */
-	if(TRACE_PDC_CMD) logerror("PDC: Port 0x38 READ: %02X, PC: %X\n", reg_p38, space.device().safe_pc());
+	if(TRACE_PDC_CMD) logerror("PDC: Port 0x38 READ: %02X %s\n", reg_p38, machine().describe_context());
 	return reg_p38;
 }
 
@@ -539,7 +539,7 @@ READ8_MEMBER(pdc_device::p39_r)
 {
 	uint8_t data = 1;
 	if(b_fdc_irq) data |= 8; // Set bit 3
-	if(TRACE_PDC_CMD) logerror("PDC: Port 0x39 READ: %02X, PC: %X\n", data, space.device().safe_pc());
+	if(TRACE_PDC_CMD) logerror("PDC: Port 0x39 READ: %02X %s\n", data, machine().describe_context());
 	return data;
 }
 
@@ -552,15 +552,15 @@ WRITE8_MEMBER(pdc_device::p50_5f_w)
 			switch(data)
 			{
 				case 0x00:
-					if(TRACE_PDC_FDC) logerror("PDC: FDD (all) Motor off. PC: %X\n", space.device().safe_pc());
+					if(TRACE_PDC_FDC) logerror("PDC: FDD (all) Motor off. %s\n", machine().describe_context());
 					m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(1);
 					break;
 				case 0x80:
-					if(TRACE_PDC_FDC) logerror("PDC: FDD (all) Motor on. PC: %X\n", space.device().safe_pc());
+					if(TRACE_PDC_FDC) logerror("PDC: FDD (all) Motor on. %s\n", machine().describe_context());
 					m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(0);
 					break;
 				default:
-					if(TRACE_PDC_FDC) logerror("PDC: Port 0x52 WRITE: %x\n PC: %X\n", data, space.device().safe_pc());
+					if(TRACE_PDC_FDC) logerror("PDC: Port 0x52 WRITE: %x %s\n", data, machine().describe_context());
 			}
 			break;
 		case 0x53: /* Probably set_rate here */
@@ -570,7 +570,7 @@ WRITE8_MEMBER(pdc_device::p50_5f_w)
 			switch(data)
 			{
 				case 0x00:
-					if(TRACE_PDC_FDC) logerror("PDC: FDD 1 Motor off. PC: %X\n", space.device().safe_pc());
+					if(TRACE_PDC_FDC) logerror("PDC: FDD 1 Motor off. %s\n", machine().describe_context());
 					m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(1);
 					break;
 				case 0x80:

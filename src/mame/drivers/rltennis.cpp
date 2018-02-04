@@ -74,7 +74,7 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 
 #define RLT_REFRESH_RATE   60
 #define RLT_TIMER_FREQ     (RLT_REFRESH_RATE*256)
-#define RLT_XTAL           XTAL_12MHz
+#define RLT_XTAL           XTAL(12'000'000)
 
 READ16_MEMBER(rltennis_state::io_r)
 {
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, rltennis_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( rltennis )
+MACHINE_CONFIG_START(rltennis_state::rltennis)
 
 	MCFG_CPU_ADD("maincpu", M68000, RLT_XTAL/2) /* 68000P8  ??? */
 	MCFG_CPU_PROGRAM_MAP(rltennis_main)

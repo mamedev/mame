@@ -54,4 +54,5 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void lucky74(machine_config &config);
 };

@@ -53,6 +53,7 @@ public:
 	DECLARE_PALETTE_INIT(quizo);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void quizo(machine_config &config);
 };
 
 
@@ -135,7 +136,7 @@ WRITE8_MEMBER(quizo_state::port60_w)
 {
 	if(data>9)
 	{
-		logerror("ROMBANK %x @ %x\n", data, space.device().safe_pc());
+		logerror("ROMBANK %x @ %x\n", data, m_maincpu->pc());
 		data=0;
 	}
 	m_port60=data;
@@ -210,7 +211,7 @@ static INPUT_PORTS_START( quizo )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( quizo )
+MACHINE_CONFIG_START(quizo_state::quizo)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL1/2)
 	MCFG_CPU_PROGRAM_MAP(memmap)

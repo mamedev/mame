@@ -48,4 +48,6 @@ public:
 	DECLARE_PALETTE_INIT(strnskil);
 	uint32_t screen_update_strnskil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void strnskil(machine_config &config);
+	void banbam(machine_config &config);
 };

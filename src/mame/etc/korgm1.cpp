@@ -17,7 +17,7 @@
 #include "machine/cxd1095.h"
 //#include "sound/ay8910.h"
 
-#define MAIN_CLOCK XTAL_16MHz // Unknown clock
+#define MAIN_CLOCK XTAL(16'000'000) // Unknown clock
 
 class korgm1_state : public driver_device
 {
@@ -32,6 +32,8 @@ public:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void korgm1(machine_config &config);
 
 protected:
 	// driver_device overrides
@@ -160,7 +162,7 @@ PALETTE_INIT_MEMBER(korgm1_state, korgm1)
 {
 }
 
-static MACHINE_CONFIG_START( korgm1, korgm1_state )
+MACHINE_CONFIG_START(korgm1_state::korgm1)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",V30,MAIN_CLOCK) // V50 actually

@@ -76,7 +76,7 @@ WRITE_LINE_MEMBER( tmc600_state::prd_w )
 		case 8:
 			m_maincpu->int_w(CLEAR_LINE);
 			break;
-		
+
 		case 16:
 			m_maincpu->int_w(m_rtc_int);
 			m_blink = !m_blink;
@@ -115,7 +115,7 @@ static GFXDECODE_START( tmc600 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, tmc600_charlayout, 0, 36 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START( tmc600_video )
+MACHINE_CONFIG_START(tmc600_state::tmc600_video)
 	// video hardware
 	MCFG_CDP1869_SCREEN_PAL_ADD(CDP1869_TAG, SCREEN_TAG, cdp1869_device::DOT_CLK_PAL)
 

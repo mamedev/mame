@@ -87,8 +87,10 @@ uint8_t apollo_get_ram_config_byte(void);
 //apollo_get_node_id - get the node id
 uint32_t apollo_get_node_id(void);
 
+#if 0
 	// should be called by the CPU core before executing each instruction
 int apollo_instruction_hook(m68000_base_device *device, offs_t curpc);
+#endif
 
 void apollo_set_cache_status_register(device_t *device,uint8_t mask, uint8_t data);
 
@@ -252,6 +254,23 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(apollo_reset_instr_callback);
 	DECLARE_READ32_MEMBER(apollo_instruction_hook);
 
+	void common(machine_config &config);
+	void apollo(machine_config &config);
+	void apollo_terminal(machine_config &config);
+	void apollo_graphics(machine_config &config);
+	void apollo_mono19i(machine_config &config);
+	void dn3500(machine_config &config);
+	void dn5500_19i(machine_config &config);
+	void dn3000(machine_config &config);
+	void dn3000_15i(machine_config &config);
+	void dn3000_19i(machine_config &config);
+	void dn3500_15i(machine_config &config);
+	void dsp3000(machine_config &config);
+	void dsp3500(machine_config &config);
+	void dsp5500(machine_config &config);
+	void dn5500(machine_config &config);
+	void dn5500_15i(machine_config &config);
+	void dn3500_19i(machine_config &config);
 private:
 	uint32_t ptm_counter;
 	uint8_t sio_output_data;
@@ -259,9 +278,6 @@ private:
 	bool m_cur_eop;
 	emu_timer *m_dn3000_timer;
 };
-
-MACHINE_CONFIG_EXTERN( apollo );
-MACHINE_CONFIG_EXTERN( apollo_terminal );
 
 /*----------- machine/apollo_config.c -----------*/
 
@@ -635,8 +651,6 @@ DECLARE_DEVICE_TYPE(APOLLO_GRAPHICS, apollo_graphics_15i)
 	MCFG_FRAGMENT_ADD(apollo_graphics) \
 	MCFG_DEVICE_ADD(_tag, APOLLO_GRAPHICS, 0)
 
-MACHINE_CONFIG_EXTERN( apollo_graphics );
-
 class apollo_graphics_19i : public apollo_graphics_15i
 {
 public:
@@ -655,8 +669,6 @@ DECLARE_DEVICE_TYPE(APOLLO_MONO19I, apollo_graphics_19i)
 #define MCFG_APOLLO_MONO19I_ADD(_tag) \
 	MCFG_FRAGMENT_ADD(apollo_mono19i) \
 	MCFG_DEVICE_ADD(_tag, APOLLO_MONO19I, 0)
-
-MACHINE_CONFIG_EXTERN( apollo_mono19i );
 
 #ifdef APOLLO_XXL
 

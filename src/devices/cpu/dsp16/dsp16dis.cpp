@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrew Gardner
 #include "emu.h"
-#include "dsp16.h"
+#include "dsp16dis.h"
 
-std::string disasmF1Field(const uint8_t& F1, const uint8_t& D, const uint8_t& S)
+std::string dsp16a_disassembler::disasmF1Field(const uint8_t& F1, const uint8_t& D, const uint8_t& S)
 {
 	switch (F1)
 	{
@@ -28,7 +28,7 @@ std::string disasmF1Field(const uint8_t& F1, const uint8_t& D, const uint8_t& S)
 	}
 }
 
-std::string disasmYField(const uint8_t& Y)
+std::string dsp16a_disassembler::disasmYField(const uint8_t& Y)
 {
 	switch (Y)
 	{
@@ -58,7 +58,7 @@ std::string disasmYField(const uint8_t& Y)
 	//return "";
 }
 
-std::string disasmZField(const uint8_t& Z)
+std::string dsp16a_disassembler::disasmZField(const uint8_t& Z)
 {
 	switch (Z)
 	{
@@ -88,7 +88,7 @@ std::string disasmZField(const uint8_t& Z)
 	//return "";
 }
 
-std::string disasmF2Field(const uint8_t& F2, const uint8_t& D, const uint8_t& S)
+std::string dsp16a_disassembler::disasmF2Field(const uint8_t& F2, const uint8_t& D, const uint8_t& S)
 {
 	std::string ret = "";
 	switch (F2)
@@ -116,7 +116,7 @@ std::string disasmF2Field(const uint8_t& F2, const uint8_t& D, const uint8_t& S)
 	return ret;
 }
 
-std::string disasmCONField(const uint8_t& CON)
+std::string dsp16a_disassembler::disasmCONField(const uint8_t& CON)
 {
 	switch (CON)
 	{
@@ -145,7 +145,7 @@ std::string disasmCONField(const uint8_t& CON)
 	//return "";
 }
 
-std::string disasmBField(const uint8_t& B)
+std::string dsp16a_disassembler::disasmBField(const uint8_t& B)
 {
 	switch (B)
 	{
@@ -164,7 +164,7 @@ std::string disasmBField(const uint8_t& B)
 	//return "";
 }
 
-std::string disasmRImmediateField(const uint8_t& R)
+std::string dsp16a_disassembler::disasmRImmediateField(const uint8_t& R)
 {
 	switch (R)
 	{
@@ -183,7 +183,7 @@ std::string disasmRImmediateField(const uint8_t& R)
 	//return "";
 }
 
-std::string disasmRField(const uint8_t& R)
+std::string dsp16a_disassembler::disasmRField(const uint8_t& R)
 {
 	switch (R)
 	{
@@ -222,7 +222,7 @@ std::string disasmRField(const uint8_t& R)
 	//return "";
 }
 
-std::string disasmIField(const uint8_t& I)
+std::string dsp16a_disassembler::disasmIField(const uint8_t& I)
 {
 	switch (I)
 	{
@@ -237,7 +237,7 @@ std::string disasmIField(const uint8_t& I)
 	//return "";
 }
 
-bool disasmSIField(const uint8_t& SI)
+bool dsp16a_disassembler::disasmSIField(const uint8_t& SI)
 {
 	switch (SI)
 	{
@@ -248,12 +248,17 @@ bool disasmSIField(const uint8_t& SI)
 }
 
 
-CPU_DISASSEMBLE(dsp16a)
+u32 dsp16a_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t dsp16a_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint8_t opSize = 1;
 	uint32_t dasmflags = 0;
-	uint16_t op  = oprom[0] | (oprom[1] << 8);
-	uint16_t op2 = oprom[2] | (oprom[3] << 8);
+	uint16_t op  = opcodes.r16(pc);
+	uint16_t op2 = opcodes.r16(pc+1);
 
 	// TODO: Test for previous "if CON" instruction and tab the next instruction in?
 
@@ -582,5 +587,5 @@ CPU_DISASSEMBLE(dsp16a)
 		}
 	}
 
-	return opSize | dasmflags | DASMFLAG_SUPPORTED;
+	return opSize | dasmflags | SUPPORTED;
 }

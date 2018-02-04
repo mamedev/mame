@@ -170,7 +170,7 @@ protected:
 
 private:
 	// devices
-	required_device<m6809e_device> m_cpu;
+	required_device<mc6809e_device> m_cpu;
 	required_device<pia6821_device> m_pia;
 	required_device<dac_word_interface> m_dac;
 

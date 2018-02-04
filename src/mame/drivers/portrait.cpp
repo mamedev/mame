@@ -247,7 +247,7 @@ static GFXDECODE_START( portrait )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( portrait )
+MACHINE_CONFIG_START(portrait_state::portrait)
 	MCFG_CPU_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
 	MCFG_CPU_PROGRAM_MAP(portrait_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", portrait_state,  irq0_line_hold)

@@ -65,8 +65,8 @@ f5d6    print 7 digit BCD number: d0.l to (a1)+ color $3000
 #include "speaker.h"
 
 
-#define MAIN_CLOCK XTAL_6MHz
-#define SOUND_CLOCK XTAL_3_579545MHz
+#define MAIN_CLOCK XTAL(6'000'000)
+#define SOUND_CLOCK XTAL(3'579'545)
 
 
 /*
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( ginganin_map, AS_PROGRAM, 16, ginganin_state )
 	AM_RANGE(0x020000, 0x023fff) AM_RAM
 	AM_RANGE(0x030000, 0x0307ff) AM_RAM_WRITE(ginganin_txtram16_w) AM_SHARE("txtram")
 	AM_RANGE(0x040000, 0x0407ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x050000, 0x0507ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x050000, 0x0507ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x060000, 0x06000f) AM_RAM_WRITE(ginganin_vregs16_w) AM_SHARE("vregs")
 	AM_RANGE(0x068000, 0x06bfff) AM_RAM_WRITE(ginganin_fgram16_w) AM_SHARE("fgram")
 	AM_RANGE(0x070000, 0x070001) AM_READ_PORT("P1_P2")
@@ -243,14 +243,14 @@ WRITE_LINE_MEMBER(ginganin_state::ptm_irq)
 }
 
 
-static MACHINE_CONFIG_START( ginganin )
+MACHINE_CONFIG_START(ginganin_state::ginganin)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(ginganin_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ginganin_state,  irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
 
-	MCFG_CPU_ADD("audiocpu", M6809, SOUND_CLOCK)
+	MCFG_CPU_ADD("audiocpu", MC6809, SOUND_CLOCK) // MBL68B09?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 

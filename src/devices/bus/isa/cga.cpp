@@ -240,8 +240,8 @@ MC6845_UPDATE_ROW( isa8_cga_pc1512_device::crtc_update_row )
 }
 
 
-#define CGA_HCLK (XTAL_14_31818MHz/8)
-#define CGA_LCLK (XTAL_14_31818MHz/16)
+#define CGA_HCLK (XTAL(14'318'181)/8)
+#define CGA_LCLK (XTAL(14'318'181)/16)
 
 
 ROM_START( cga )
@@ -261,14 +261,14 @@ DEFINE_DEVICE_TYPE(ISA8_CGA, isa8_cga_device, "cga", "IBM Color/Graphics Monitor
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa8_cga_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_cga_device::device_add_mconfig)
 	MCFG_SCREEN_ADD(CGA_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,262,0,200)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181),912,0,640,262,0,200)
 	MCFG_SCREEN_UPDATE_DEVICE( DEVICE_SELF, isa8_cga_device, screen_update )
 
 	MCFG_PALETTE_ADD("palette", /* CGA_PALETTE_SETS * 16*/ 65536 )
 
-	MCFG_MC6845_ADD(CGA_MC6845_NAME, MC6845, CGA_SCREEN_NAME, XTAL_14_31818MHz/8)
+	MCFG_MC6845_ADD(CGA_MC6845_NAME, MC6845, CGA_SCREEN_NAME, XTAL(14'318'181)/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(isa8_cga_device, crtc_update_row)
@@ -1356,7 +1356,7 @@ void isa8_cga_pc1512_device::device_start()
 	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_cga_pc1512_device::io_read), this ), write8_delegate( FUNC(isa8_cga_pc1512_device::io_write), this ) );
 	m_isa->install_bank(0xb8000, 0xbbfff, "bank1", &m_vram[0]);
 
-	address_space &space = machine().firstcpu->space( AS_PROGRAM );
+	address_space &space = m_isa->memspace();
 
 	space.install_write_handler( 0xb8000, 0xbbfff, write8_delegate( FUNC(isa8_cga_pc1512_device::vram_w), this ) );
 	space.install_write_handler( 0xbc000, 0xbffff, write8_delegate( FUNC(isa8_cga_pc1512_device::vram_w), this ) );
@@ -1701,11 +1701,11 @@ const tiny_rom_entry *isa8_cga_mc1502_device::device_rom_region() const
 
 DEFINE_DEVICE_TYPE(ISA8_CGA_M24, isa8_cga_m24_device, "cga_m24", "Olivetti M24 CGA")
 
-MACHINE_CONFIG_MEMBER( isa8_cga_m24_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_cga_m24_device::device_add_mconfig)
 	isa8_cga_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY(CGA_SCREEN_NAME)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz,912,0,640,462,0,400)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(14'318'181),912,0,640,462,0,400)
 	MCFG_DEVICE_MODIFY(CGA_MC6845_NAME)
 	MCFG_MC6845_RECONFIGURE_CB(isa8_cga_m24_device, reconfigure)
 MACHINE_CONFIG_END
@@ -1813,7 +1813,10 @@ READ8_MEMBER( isa8_cga_m24_device::io_read )
 MC6845_UPDATE_ROW(isa8_cga_m24_device::crtc_update_row)
 {
 	if(m_mode2 & 1)
+	{
 		m24_gfx_1bpp_m24_update_row(bitmap, cliprect, ma, ra, y, x_count, cursor_x, de, hbp, vbp);
+		return;
+	}
 
 	if (m_update_row_type == -1)
 		return;
@@ -1893,7 +1896,7 @@ MC6845_UPDATE_ROW( isa8_cga_m24_device::m24_gfx_1bpp_m24_update_row )
 
 DEFINE_DEVICE_TYPE(ISA8_CGA_CPORTIII, isa8_cga_cportiii_device, "cga_cportiii", "Compaq Portable III CGA")
 
-MACHINE_CONFIG_MEMBER( isa8_cga_cportiii_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_cga_cportiii_device::device_add_mconfig)
 	isa8_cga_m24_device::device_add_mconfig(config);
 
 	MCFG_DEVICE_MODIFY(CGA_SCREEN_NAME)

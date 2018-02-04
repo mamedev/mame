@@ -76,7 +76,6 @@ void taitoh_state::syvalion_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
 
-	address_space &space = machine().dummy_space();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, ex, zx;
 	int ysize;
@@ -87,11 +86,11 @@ void taitoh_state::syvalion_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 
 	for (offs = 0x03f8 / 2; offs >= 0; offs -= 0x008 / 2)
 	{
-		x0        =  m_tc0080vco->sprram_r(space, offs + 1, 0xffff) & 0x3ff;
-		y0        =  m_tc0080vco->sprram_r(space, offs + 0, 0xffff) & 0x3ff;
-		zoomx     = (m_tc0080vco->sprram_r(space, offs + 2, 0xffff) & 0x7f00) >> 8;
-		tile_offs = (m_tc0080vco->sprram_r(space, offs + 3, 0xffff) & 0x1fff) << 2;
-		ysize     = size[(m_tc0080vco->sprram_r(space, offs, 0xffff) & 0x0c00) >> 10];
+		x0        =  m_tc0080vco->sprram_r(offs + 1) & 0x3ff;
+		y0        =  m_tc0080vco->sprram_r(offs + 0) & 0x3ff;
+		zoomx     = (m_tc0080vco->sprram_r(offs + 2) & 0x7f00) >> 8;
+		tile_offs = (m_tc0080vco->sprram_r(offs + 3) & 0x1fff) << 2;
+		ysize     = size[(m_tc0080vco->sprram_r(offs) & 0x0c00) >> 10];
 
 		if (tile_offs)
 		{
@@ -135,10 +134,10 @@ void taitoh_state::syvalion_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 					{
 						int tile, color, flipx, flipy;
 
-						tile  = m_tc0080vco->cram_0_r(space, tile_offs, 0xffff) & 0x7fff;
-						color = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x001f;
-						flipx = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x0040;
-						flipy = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x0080;
+						tile  = m_tc0080vco->cram_0_r(tile_offs) & 0x7fff;
+						color = m_tc0080vco->cram_1_r(tile_offs) & 0x001f;
+						flipx = m_tc0080vco->cram_1_r(tile_offs) & 0x0040;
+						flipy = m_tc0080vco->cram_1_r(tile_offs) & 0x0080;
 
 						if (m_tc0080vco->flipscreen_r())
 						{
@@ -169,7 +168,6 @@ void taitoh_state::recordbr_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
 
-	address_space &space = machine().dummy_space();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
 	int ysize;
@@ -183,12 +181,12 @@ void taitoh_state::recordbr_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 		if (offs <  0x01b0 && priority == 0)    continue;
 		if (offs >= 0x01b0 && priority == 1)    continue;
 
-		x0        =  m_tc0080vco->sprram_r(space, offs + 1, 0xffff) & 0x3ff;
-		y0        =  m_tc0080vco->sprram_r(space, offs + 0, 0xffff) & 0x3ff;
-		zoomx     = (m_tc0080vco->sprram_r(space, offs + 2, 0xffff) & 0x7f00) >> 8;
-		zoomy     = (m_tc0080vco->sprram_r(space, offs + 2, 0xffff) & 0x007f);
-		tile_offs = (m_tc0080vco->sprram_r(space, offs + 3, 0xffff) & 0x1fff) << 2;
-		ysize     = size[(m_tc0080vco->sprram_r(space, offs, 0xffff) & 0x0c00) >> 10];
+		x0        =  m_tc0080vco->sprram_r(offs + 1) & 0x3ff;
+		y0        =  m_tc0080vco->sprram_r(offs + 0) & 0x3ff;
+		zoomx     = (m_tc0080vco->sprram_r(offs + 2) & 0x7f00) >> 8;
+		zoomy     = (m_tc0080vco->sprram_r(offs + 2) & 0x007f);
+		tile_offs = (m_tc0080vco->sprram_r(offs + 3) & 0x1fff) << 2;
+		ysize     = size[(m_tc0080vco->sprram_r(offs) & 0x0c00) >> 10];
 
 		if (tile_offs)
 		{
@@ -247,10 +245,10 @@ void taitoh_state::recordbr_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 					{
 						int tile, color, flipx, flipy;
 
-						tile  = m_tc0080vco->cram_0_r(space, tile_offs, 0xffff) & 0x7fff;
-						color = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x001f;
-						flipx = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x0040;
-						flipy = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x0080;
+						tile  = m_tc0080vco->cram_0_r(tile_offs) & 0x7fff;
+						color = m_tc0080vco->cram_1_r(tile_offs) & 0x001f;
+						flipx = m_tc0080vco->cram_1_r(tile_offs) & 0x0040;
+						flipy = m_tc0080vco->cram_1_r(tile_offs) & 0x0080;
 
 						if (m_tc0080vco->flipscreen_r())
 						{
@@ -281,7 +279,6 @@ void taitoh_state::dleague_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
 
-	address_space &space = machine().dummy_space();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, ex, zx;
 	int ysize;
@@ -293,12 +290,12 @@ void taitoh_state::dleague_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 
 	for (offs = 0x03f8 / 2; offs >= 0; offs -= 0x008 / 2)
 	{
-		x0        =  m_tc0080vco->sprram_r(space, offs + 1, 0xffff) & 0x3ff;
-		y0        =  m_tc0080vco->sprram_r(space, offs + 0, 0xffff) & 0x3ff;
-		zoomx     = (m_tc0080vco->sprram_r(space, offs + 2, 0xffff) & 0x7f00) >> 8;
-		tile_offs = (m_tc0080vco->sprram_r(space, offs + 3, 0xffff) & 0x1fff) << 2;
-		pribit    = (m_tc0080vco->sprram_r(space, offs + 0, 0xffff) & 0x1000) >> 12;
-		ysize     = size[(m_tc0080vco->sprram_r(space, offs, 0xffff) & 0x0c00) >> 10];
+		x0        =  m_tc0080vco->sprram_r(offs + 1) & 0x3ff;
+		y0        =  m_tc0080vco->sprram_r(offs + 0) & 0x3ff;
+		zoomx     = (m_tc0080vco->sprram_r(offs + 2) & 0x7f00) >> 8;
+		tile_offs = (m_tc0080vco->sprram_r(offs + 3) & 0x1fff) << 2;
+		pribit    = (m_tc0080vco->sprram_r(offs + 0) & 0x1000) >> 12;
+		ysize     = size[(m_tc0080vco->sprram_r(offs) & 0x0c00) >> 10];
 
 		if (tile_offs)
 		{
@@ -318,7 +315,7 @@ void taitoh_state::dleague_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 				zx = (dx + ex) << 12;
 			}
 
-			if (m_tc0080vco->scrram_r(space, 0x0002, 0xffff) & 0x8000)
+			if (m_tc0080vco->scrram_r(0x0002) & 0x8000)
 				pribit = 1;
 
 			if (x0 >= 0x200) x0 -= 0x400;
@@ -348,10 +345,10 @@ void taitoh_state::dleague_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 						{
 							int tile, color, flipx, flipy;
 
-							tile  = m_tc0080vco->cram_0_r(space, tile_offs, 0xffff) & 0x7fff;
-							color = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x001f;
-							flipx = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x0040;
-							flipy = m_tc0080vco->cram_1_r(space, tile_offs, 0xffff) & 0x0080;
+							tile  = m_tc0080vco->cram_0_r(tile_offs) & 0x7fff;
+							color = m_tc0080vco->cram_1_r(tile_offs) & 0x001f;
+							flipx = m_tc0080vco->cram_1_r(tile_offs) & 0x0040;
+							flipy = m_tc0080vco->cram_1_r(tile_offs) & 0x0080;
 
 
 							if (m_tc0080vco->flipscreen_r())

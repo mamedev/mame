@@ -295,7 +295,7 @@ Notes:
 
 READ32_MEMBER(macrossp_state::macrossp_soundstatus_r)
 {
-	//  logerror("%08x read soundstatus\n", space.device().safe_pc());
+	//  logerror("%08x read soundstatus\n", m_maincpu->pc());
 
 	/* bit 1 is sound status */
 	/* bit 0 unknown - it is expected to toggle, vblank? */
@@ -309,18 +309,18 @@ WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		//logerror("%08x write soundcmd %08x (%08x)\n",space.device().safe_pc(),data,mem_mask);
+		//logerror("%08x write soundcmd %08x (%08x)\n",m_maincpu->pc(),data,mem_mask);
 		m_soundlatch->write(space, 0, data >> 16, 0xffff);
 		m_sndpending = 1;
 		m_audiocpu->set_input_line(2, HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
-		space.device().execute().spin_until_time(attotime::from_usec(50));
+		m_maincpu->spin_until_time(attotime::from_usec(50));
 	}
 }
 
 READ16_MEMBER(macrossp_state::macrossp_soundcmd_r)
 {
-	//  logerror("%06x read soundcmd\n",space.device().safe_pc());
+	//  logerror("%06x read soundcmd\n",m_audiocpu->pc());
 	m_sndpending = 0;
 	return m_soundlatch->read(space, offset, mem_mask);
 }
@@ -358,7 +358,7 @@ static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32, macrossp_state )
 	AM_RANGE(0x91c200, 0x91c3ff) AM_RAM AM_SHARE("text_linezoom") /* W/O? */
 	AM_RANGE(0x91d000, 0x91d00b) AM_RAM AM_SHARE("text_videoregs") /* W/O? */
 
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 
 	AM_RANGE(0xb00000, 0xb00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xb00004, 0xb00007) AM_READ(macrossp_soundstatus_r) AM_WRITENOP // irq related?
@@ -539,7 +539,7 @@ void macrossp_state::machine_reset()
 	m_snd_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( macrossp )
+MACHINE_CONFIG_START(macrossp_state::macrossp)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68EC020, 50000000/2)   /* 25 MHz */
@@ -580,7 +580,7 @@ static MACHINE_CONFIG_START( macrossp )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizmoon, macrossp )
+MACHINE_CONFIG_DERIVED(macrossp_state::quizmoon, macrossp)
 
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, 24*16-1, 0*8, 14*16-1)
@@ -699,14 +699,14 @@ PC :00018110 018110: beq     18104
 */
 
 	COMBINE_DATA(&m_mainram[0x10158 / 4]);
-	if (space.device().safe_pc() == 0x001810A) space.device().execute().spin_until_interrupt();
+	if (m_maincpu->pc() == 0x001810A) m_maincpu->spin_until_interrupt();
 }
 
 #ifdef UNUSED_FUNCTION
 WRITE32_MEMBER(macrossp_state::quizmoon_speedup_w)
 {
 	COMBINE_DATA(&m_mainram[0x00020 / 4]);
-	if (space.device().safe_pc() == 0x1cc) space.device().execute().spin_until_interrupt();
+	if (m_maincpu->pc() == 0x1cc) m_maincpu->spin_until_interrupt();
 }
 #endif
 

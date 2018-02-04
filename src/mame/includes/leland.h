@@ -208,6 +208,14 @@ public:
 	void keycard_w(int data);
 	void leland_rotate_memory(const char *cpuname);
 	void init_master_ports(uint8_t mvram_base, uint8_t io_base);
+	void ataxx(machine_config &config);
+	void redline(machine_config &config);
+	void lelandi(machine_config &config);
+	void leland(machine_config &config);
+	void quarterb(machine_config &config);
+	void wsf(machine_config &config);
+	void leland_video(machine_config &config);
+	void ataxx_video(machine_config &config);
 };
 
 
@@ -216,11 +224,5 @@ public:
 #define SERIAL_TYPE_ADD_XOR     2
 #define SERIAL_TYPE_ENCRYPT     3
 #define SERIAL_TYPE_ENCRYPT_XOR 4
-
-
-/*----------- defined in video/leland.c -----------*/
-
-MACHINE_CONFIG_EXTERN( leland_video );
-MACHINE_CONFIG_EXTERN( ataxx_video );
 
 #endif // MAME_INCLUDES_LELAND_H

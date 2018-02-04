@@ -52,6 +52,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
 
+	void wpc_dcs(machine_config &config);
 protected:
 	// devices
 	required_device<cpu_device> maincpu;
@@ -420,12 +421,12 @@ static INPUT_PORTS_START( wpc_dcs )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( wpc_dcs )
+MACHINE_CONFIG_START(wpc_dcs_state::wpc_dcs)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, XTAL_8MHz/4)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL(8'000'000)/4)
 	MCFG_CPU_PROGRAM_MAP(wpc_dcs_map)
 
-	MCFG_CPU_PERIODIC_INT_DRIVER(wpc_dcs_state, irq0_line_assert, XTAL_8MHz/8192.0)
+	MCFG_CPU_PERIODIC_INT_DRIVER(wpc_dcs_state, irq0_line_assert, XTAL(8'000'000)/8192.0)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("zero_crossing", wpc_dcs_state, zc_timer, attotime::from_hz(120)) // Mains power zero crossing
 
 	MCFG_WPC_LAMP_ADD("lamp")

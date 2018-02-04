@@ -19,6 +19,7 @@
 enum ay31015_input_pin_t
 {
 	AY31015_SWE = 16,         /* -SWE  - Pin 16 - Status word enable */
+	AY31015_RCP = 17,         /*  RCP  - Pin 17 - Receiver clock pulse */
 	AY31015_RDAV = 18,        /* -RDAV - Pin 18 - Reset data available */
 	AY31015_SI = 20,          /*  SI   - Pin 20 - Serial input */
 	AY31015_XR = 21,          /*  XR   - Pin 21 - External reset */
@@ -27,7 +28,8 @@ enum ay31015_input_pin_t
 	AY31015_TSB = 36,         /*  TSB  - Pin 36 - Number of stop bits */
 	AY31015_NB2 = 37,         /*  NB2  - Pin 37 - Number of bits #2 */
 	AY31015_NB1 = 38,         /*  NB1  - Pin 38 - Number of bits #1 */
-	AY31015_EPS = 39          /*  EPS  - Pin 39 - Odd/Even parity select */
+	AY31015_EPS = 39,         /*  EPS  - Pin 39 - Odd/Even parity select */
+	AY31015_TCP = 40          /*  TCP  - Pin 40 - Transmitter clock pulse */
 };
 
 
@@ -53,7 +55,9 @@ public:
 	ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_tx_clock(device_t &device, double tx_clock) { downcast<ay31015_device &>(device).m_tx_clock = tx_clock; }
+	static void set_tx_clock(device_t &device, const XTAL &xtal) { set_tx_clock(device, xtal.dvalue()); }
 	static void set_rx_clock(device_t &device, double rx_clock) { downcast<ay31015_device &>(device).m_rx_clock = rx_clock; }
+	static void set_rx_clock(device_t &device, const XTAL &xtal) { set_rx_clock(device, xtal.dvalue()); }
 	template <class Object> static devcb_base &set_read_si_callback(device_t &device, Object &&cb) { return downcast<ay31015_device &>(device).m_read_si_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_write_so_callback(device_t &device, Object &&cb) { return downcast<ay31015_device &>(device).m_write_so_cb.set_callback(std::forward<Object>(cb)); }
 	template <class Object> static devcb_base &set_status_changed_callback(device_t &device, Object &&cb) { return downcast<ay31015_device &>(device).m_status_changed_cb.set_callback(std::forward<Object>(cb)); }

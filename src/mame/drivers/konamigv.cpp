@@ -159,6 +159,12 @@ public:
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 
+	static void cdrom_config(device_t *device);
+	void tmosh(machine_config &config);
+	void simpbowl(machine_config &config);
+	void kdeadeye(machine_config &config);
+	void btchamp(machine_config &config);
+	void konamigv(machine_config &config);
 protected:
 	virtual void driver_start() override;
 
@@ -307,22 +313,23 @@ void konamigv_state::driver_start()
 	save_item(NAME(m_flash_address));
 }
 
-static MACHINE_CONFIG_START( cdrom_config )
-	MCFG_DEVICE_MODIFY( "cdda" )
-	MCFG_SOUND_ROUTE( 0, "^^^^lspeaker", 1.0 )
-	MCFG_SOUND_ROUTE( 1, "^^^^rspeaker", 1.0 )
-MACHINE_CONFIG_END
+void konamigv_state::cdrom_config(device_t *device)
+{
+	device = device->subdevice("cdda");
+	MCFG_SOUND_ROUTE(0, "^^^^lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "^^^^rspeaker", 1.0)
+}
 
-static MACHINE_CONFIG_START( konamigv )
+MACHINE_CONFIG_START(konamigv_state::konamigv)
 	/* basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", CXD8530BQ, XTAL_67_7376MHz )
+	MCFG_CPU_ADD( "maincpu", CXD8530BQ, XTAL(67'737'600) )
 	MCFG_CPU_PROGRAM_MAP( konamigv_map )
 
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("2M")
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&konamigv_state::scsi_dma_read, (konamigv_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&konamigv_state::scsi_dma_write, (konamigv_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psxdma_device::read_delegate(&konamigv_state::scsi_dma_read, this ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psxdma_device::write_delegate(&konamigv_state::scsi_dma_write, this ) )
 
 	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -336,12 +343,12 @@ static MACHINE_CONFIG_START( konamigv )
 	MCFG_AM53CF96_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
 
 	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0x100000, XTAL_53_693175MHz )
+	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8514Q, 0x100000, XTAL(53'693'175) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SPU_ADD( "spu", XTAL_67_7376MHz/2 )
+	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
 	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.75 )
 	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.75 )
 MACHINE_CONFIG_END
@@ -472,7 +479,7 @@ DRIVER_INIT_MEMBER(konamigv_state,simpbowl)
 	m_flash8[3] = machine().device<fujitsu_29f016a_device>("flash3");
 }
 
-static MACHINE_CONFIG_DERIVED( simpbowl, konamigv )
+MACHINE_CONFIG_DERIVED(konamigv_state::simpbowl, konamigv)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( simpbowl_map )
 
@@ -501,7 +508,7 @@ INPUT_PORTS_END
 
 WRITE16_MEMBER(konamigv_state::btc_trackball_w)
 {
-//  osd_printf_debug( "w %08x %08x %08x %08x\n", space.device().safe_pc(), offset, data, mem_mask );
+//  osd_printf_debug( "w %08x %08x %08x %08x\n", m_maincpu->pc(), offset, data, mem_mask );
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -511,7 +518,7 @@ WRITE16_MEMBER(konamigv_state::btc_trackball_w)
 	}
 }
 
-static MACHINE_CONFIG_DERIVED( btchamp, konamigv )
+MACHINE_CONFIG_DERIVED(konamigv_state::btchamp, konamigv)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( btchamp_map )
 
@@ -568,7 +575,7 @@ WRITE16_MEMBER(konamigv_state::tokimeki_serial_w)
 
 }
 
-static MACHINE_CONFIG_DERIVED( tmosh, konamigv )
+MACHINE_CONFIG_DERIVED(konamigv_state::tmosh, konamigv)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( tmosh_map )
 MACHINE_CONFIG_END
@@ -583,7 +590,7 @@ CD:
     A01
 */
 
-static MACHINE_CONFIG_DERIVED( kdeadeye, konamigv )
+MACHINE_CONFIG_DERIVED(konamigv_state::kdeadeye, konamigv)
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP( kdeadeye_map )
 

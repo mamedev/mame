@@ -692,7 +692,7 @@ void combatsc_state::machine_reset()
 }
 
 /* combat school (original) */
-static MACHINE_CONFIG_START( combatsc )
+MACHINE_CONFIG_START(combatsc_state::combatsc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */
@@ -714,7 +714,7 @@ static MACHINE_CONFIG_START( combatsc )
 //  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz/3, 528, 0, 256, 256, 16, 240) // not accurate, assuming same to other Konami games (59.17)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(24'000'000)/3, 528, 0, 256, 256, 16, 240) // not accurate, assuming same to other Konami games (59.17)
 	MCFG_SCREEN_UPDATE_DRIVER(combatsc_state, screen_update_combatsc)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -746,7 +746,7 @@ MACHINE_CONFIG_END
 
 
 /* combat school (bootleg on different hardware) */
-static MACHINE_CONFIG_START( combatscb )
+MACHINE_CONFIG_START(combatsc_state::combatscb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, 3000000*4)  /* 3 MHz? */

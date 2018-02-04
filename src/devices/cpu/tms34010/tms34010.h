@@ -115,13 +115,13 @@ enum
 #define TMS340X0_SCANLINE_IND16_CB_MEMBER(_name) void _name(screen_device &screen, bitmap_ind16 &bitmap, int scanline, const tms340x0_device::display_params *params)
 
 #define MCFG_TMS340X0_SCANLINE_IND16_CB(_class, _method) \
-		tms340x0_device::set_scanline_ind16_callback(*device, tms340x0_device::scanline_ind16_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+		tms340x0_device::set_scanline_ind16_callback(*device, tms340x0_device::scanline_ind16_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 #define TMS340X0_SCANLINE_RGB32_CB_MEMBER(_name) void _name(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms340x0_device::display_params *params)
 
 #define MCFG_TMS340X0_SCANLINE_RGB32_CB(_class, _method) \
-		tms340x0_device::set_scanline_rgb32_callback(*device, tms340x0_device::scanline_rgb32_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+		tms340x0_device::set_scanline_rgb32_callback(*device, tms340x0_device::scanline_rgb32_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 #define MCFG_TMS340X0_OUTPUT_INT_CB(_devcb) \
@@ -131,13 +131,13 @@ enum
 #define TMS340X0_TO_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, uint16_t *shiftreg)
 
 #define MCFG_TMS340X0_TO_SHIFTREG_CB(_class, _method) \
-		tms340x0_device::set_to_shiftreg_callback(*device, tms340x0_device::to_shiftreg_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+		tms340x0_device::set_to_shiftreg_callback(*device, tms340x0_device::to_shiftreg_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 #define TMS340X0_FROM_SHIFTREG_CB_MEMBER(_name) void _name(address_space &space, offs_t address, uint16_t *shiftreg)
 
 #define MCFG_TMS340X0_FROM_SHIFTREG_CB(_class, _method) \
-		tms340x0_device::set_from_shiftreg_callback(*device, tms340x0_device::from_shiftreg_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+		tms340x0_device::set_from_shiftreg_callback(*device, tms340x0_device::from_shiftreg_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 class tms340x0_device : public cpu_device,
@@ -162,6 +162,7 @@ public:
 
 	static void set_halt_on_reset(device_t &device, bool halt_on_reset) { downcast<tms340x0_device &>(device).m_halt_on_reset = halt_on_reset; }
 	static void set_pixel_clock(device_t &device, uint32_t pixclock) { downcast<tms340x0_device &>(device).m_pixclock = pixclock; }
+	static void set_pixel_clock(device_t &device, const XTAL &xtal) { set_pixel_clock(device, xtal.value()); }
 	static void set_pixels_per_clock(device_t &device, int pixperclock) { downcast<tms340x0_device &>(device).m_pixperclock = pixperclock; }
 	static void set_scanline_ind16_callback(device_t &device, scanline_ind16_cb_delegate callback) { downcast<tms340x0_device &>(device).m_scanline_ind16_cb = callback; }
 	static void set_scanline_rgb32_callback(device_t &device, scanline_rgb32_cb_delegate callback) { downcast<tms340x0_device &>(device).m_scanline_rgb32_cb = callback; }
@@ -276,10 +277,6 @@ protected:
 	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
-	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
-	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; }
-
 	typedef void (tms340x0_device::*pixel_write_func)(offs_t offset, uint32_t data);
 	typedef uint32_t (tms340x0_device::*pixel_read_func)(offs_t offset);
 	typedef uint32_t (tms340x0_device::*raster_op_func)(uint32_t newpix, uint32_t oldpix);
@@ -327,7 +324,7 @@ protected:
 	uint8_t            m_external_host_access;
 	uint8_t            m_executing;
 	address_space *m_program;
-	direct_read_data *m_direct;
+	direct_read_data<3> *m_direct;
 	uint32_t  m_pixclock;                           /* the pixel clock (0 means don't adjust screen size) */
 	int     m_pixperclock;                        /* pixels per clock */
 	emu_timer *m_scantimer;
@@ -1025,7 +1022,7 @@ public:
 protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 8 - 1) / 8; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 8); }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 };
 
 DECLARE_DEVICE_TYPE(TMS34010, tms34010_device)
@@ -1042,7 +1039,7 @@ public:
 protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const override { return (clocks + 4 - 1) / 4; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const override { return (cycles * 4); }
-	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual util::disasm_interface *create_disassembler() override;
 };
 
 DECLARE_DEVICE_TYPE(TMS34020, tms34020_device)
@@ -1054,13 +1051,5 @@ DECLARE_DEVICE_TYPE(TMS34020, tms34020_device)
 #define TMS34010_HOST_ADDRESS_H     1
 #define TMS34010_HOST_DATA          2
 #define TMS34010_HOST_CONTROL       3
-
-/* Use this macro in the memory definitions to specify bit-based addresses */
-#define TOBYTE(bitaddr) ((offs_t)(bitaddr) >> 3)
-#define TOWORD(bitaddr) ((offs_t)(bitaddr) >> 4)
-
-
-CPU_DISASSEMBLE( tms34010 );
-CPU_DISASSEMBLE( tms34020 );
 
 #endif // MAME_CPU_TMS34010_TMS34010_H

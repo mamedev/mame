@@ -21,10 +21,10 @@
     CONSTANTS
 ***************************************************************************/
 
-#define ATARI_CLOCK_14MHz   XTAL_14_31818MHz
-#define ATARI_CLOCK_20MHz   XTAL_20MHz
-#define ATARI_CLOCK_32MHz   XTAL_32MHz
-#define ATARI_CLOCK_50MHz   XTAL_50MHz
+#define ATARI_CLOCK_14MHz   XTAL(14'318'181)
+#define ATARI_CLOCK_20MHz   XTAL(20'000'000)
+#define ATARI_CLOCK_32MHz   XTAL(32'000'000)
+#define ATARI_CLOCK_50MHz   XTAL(50'000'000)
 
 
 

@@ -367,6 +367,7 @@ public:
 	{
 		return 0;
 	}
+	void anzterm(machine_config &config);
 };
 
 
@@ -408,7 +409,7 @@ ADDRESS_MAP_START( anzterm, AS_PROGRAM, 8, anzterm_state )
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_START( anzterm )
+MACHINE_CONFIG_START(anzterm_state::anzterm)
 	MCFG_CPU_ADD("maincpu", M6809, 15974400/4)
 	MCFG_CPU_PROGRAM_MAP(anzterm)
 

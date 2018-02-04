@@ -76,6 +76,9 @@ public:
 	uint32_t screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void homelab3(machine_config &config);
+	void brailab4(machine_config &config);
+	void homelab(machine_config &config);
 private:
 	const uint8_t *m_p_videoram;
 	bool m_nmi;
@@ -732,9 +735,9 @@ QUICKLOAD_LOAD_MEMBER( homelab_state,homelab)
 }
 
 /* Machine driver */
-static MACHINE_CONFIG_START( homelab )
+MACHINE_CONFIG_START(homelab_state::homelab)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(homelab2_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", homelab_state,  homelab_frame)
 
@@ -764,9 +767,9 @@ static MACHINE_CONFIG_START( homelab )
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( homelab3 )
+MACHINE_CONFIG_START(homelab_state::homelab3)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(homelab3_mem)
 	MCFG_CPU_IO_MAP(homelab3_io)
 	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,homelab3)
@@ -797,9 +800,9 @@ static MACHINE_CONFIG_START( homelab3 )
 	MCFG_QUICKLOAD_ADD("quickload", homelab_state, homelab, "htp", 2)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( brailab4 )
+MACHINE_CONFIG_START(homelab_state::brailab4)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz / 4)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000) / 4)
 	MCFG_CPU_PROGRAM_MAP(brailab4_mem)
 	MCFG_CPU_IO_MAP(brailab4_io)
 	MCFG_MACHINE_RESET_OVERRIDE(homelab_state,brailab4)

@@ -42,13 +42,16 @@ s2650_device::s2650_device(const machine_config &mconfig, const char *tag, devic
 	memset(m_reg, 0x00, sizeof(m_reg));
 }
 
-
-offs_t s2650_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+bool s2650_device::get_z80_mnemonics_mode() const
 {
-	extern CPU_DISASSEMBLE( s2650 );
-	return CPU_DISASSEMBLE_NAME(s2650)(this, stream, pc, oprom, opram, options);
+	// Needs to become configurable live
+	return false;
 }
 
+util::disasm_interface *s2650_device::create_disassembler()
+{
+	return new s2650_disassembler(this);
+}
 
 device_memory_interface::space_config_vector s2650_device::memory_space_config() const
 {
@@ -823,7 +826,7 @@ void s2650_device::device_start()
 	m_flag_handler.resolve_safe();
 	m_intack_handler.resolve_safe();
 
-	m_direct = &space(AS_PROGRAM).direct();
+	m_direct = space(AS_PROGRAM).direct<0>();
 
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_page));

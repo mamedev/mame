@@ -296,7 +296,7 @@ INPUT_PORTS_START( segasp )
 
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_DERIVED( segasp, naomi_aw_base )
+MACHINE_CONFIG_DERIVED(segasp_state::segasp, naomi_aw_base)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(segasp_map)
 	MCFG_CPU_IO_MAP(onchip_port)

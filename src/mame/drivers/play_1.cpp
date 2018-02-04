@@ -54,6 +54,8 @@ public:
 	DECLARE_READ_LINE_MEMBER(ef4_r);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
 
+	void chance(machine_config &config);
+	void play_1(machine_config &config);
 private:
 	uint16_t m_resetcnt;
 	uint16_t m_clockcnt;
@@ -457,7 +459,7 @@ WRITE_LINE_MEMBER( play_1_state::clock_w )
 	}
 }
 
-static MACHINE_CONFIG_START( play_1 )
+MACHINE_CONFIG_START(play_1_state::play_1)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", CDP1802, 400000) // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
 	MCFG_CPU_PROGRAM_MAP(play_1_map)
@@ -485,7 +487,7 @@ static MACHINE_CONFIG_START( play_1 )
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("speaker", speaker_sound_device, level_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( chance, play_1 )
+MACHINE_CONFIG_DERIVED(play_1_state::chance, play_1)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(chance_map)
 MACHINE_CONFIG_END

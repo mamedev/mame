@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tigeroad_state )
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITEONLY    /* fe800e = watchdog or IRQ acknowledge */
 	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_SHARE("videoram")
 
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xff8000, 0xff87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("ram16")
 ADDRESS_MAP_END
 
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( bballs_map, AS_PROGRAM, 16, pushman_state )
 	AM_RANGE(0xe800e, 0xe800f) AM_WRITENOP /* ? */
 	AM_RANGE(0xec000, 0xec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_SHARE("videoram")
 
-	AM_RANGE(0xf8000, 0xf87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0xf8000, 0xf87ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0xfc000, 0xfffff) AM_RAM AM_SHARE("ram16")
 ADDRESS_MAP_END
 
@@ -182,7 +182,7 @@ static INPUT_PORTS_START( tigeroad )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DIPA:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
@@ -191,7 +191,7 @@ static INPUT_PORTS_START( tigeroad )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DIPA:4,5,6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
@@ -200,29 +200,29 @@ static INPUT_PORTS_START( tigeroad )
 	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_6C ) )
-	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ))
+	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW ) PORT_DIPLOCATION("DIPA:7")
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DIPA:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("DIPB:1,2")
 	PORT_DIPSETTING(      0x0300, "3" )
 	PORT_DIPSETTING(      0x0200, "4" )
 	PORT_DIPSETTING(      0x0100, "5" )
 	PORT_DIPSETTING(      0x0000, "7" )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ))
-	PORT_DIPSETTING(      0x0400, DEF_STR( Cocktail ))
-	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DIPB:3")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("DIPB:4,5")
 	PORT_DIPSETTING(      0x1800, "20000 70000 70000" )
 	PORT_DIPSETTING(      0x1000, "20000 80000 80000" )
 	PORT_DIPSETTING(      0x0800, "30000 80000 80000" )
 	PORT_DIPSETTING(      0x0000, "30000 90000 90000" )
-	PORT_DIPNAME( 0x6000, 0x6000, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Very_Easy) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x6000, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Difficult ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x6000, 0x6000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DIPB:6,7")
+	PORT_DIPSETTING(      0x2000, "Very Easy (Level 0)")
+	PORT_DIPSETTING(      0x4000, "Easy (Level 10)")
+	PORT_DIPSETTING(      0x6000, "Normal (Level 20)")
+	PORT_DIPSETTING(      0x0000, "Difficult (Level 30)")
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DIPB:8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -335,7 +335,7 @@ static INPUT_PORTS_START( f1dream )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DIPA:1,2,3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
@@ -344,7 +344,7 @@ static INPUT_PORTS_START( f1dream )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_A ) )  PORT_DIPLOCATION("DIPA:4,5,6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
@@ -353,30 +353,30 @@ static INPUT_PORTS_START( f1dream )
 	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_6C ) )
-	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
+	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW ) PORT_DIPLOCATION("DIPA:7")
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DIPA:8")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ))
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("DIPB:1,2") // "Not Used" according to Romstar manual
 	PORT_DIPSETTING(      0x0300, "3" )
 	PORT_DIPSETTING(      0x0200, "4" )
 	PORT_DIPSETTING(      0x0100, "5" )
 	PORT_DIPSETTING(      0x0000, "7" )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DIPB:3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ))
 	PORT_DIPSETTING(      0x0400, DEF_STR( Cocktail ))
-	PORT_DIPNAME( 0x1800, 0x1800, "F1 Up Point" )
+	PORT_DIPNAME( 0x1800, 0x1800, "F1 Up Point" ) PORT_DIPLOCATION("DIPB:4,5")
 	PORT_DIPSETTING(      0x1800, "12" )
 	PORT_DIPSETTING(      0x1000, "16" )
 	PORT_DIPSETTING(      0x0800, "18" )
 	PORT_DIPSETTING(      0x0000, "20" )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DIPB:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Difficult ) )
-	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Version ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Version ) ) PORT_DIPLOCATION("DIPB:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( World ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Japan ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DIPB:8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Yes ) )
 INPUT_PORTS_END
@@ -574,14 +574,14 @@ static GFXDECODE_START( tigeroad )
 	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 0x200, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tigeroad )
+MACHINE_CONFIG_START(tigeroad_state::tigeroad)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(10'000'000)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tigeroad_state,  irq2_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_port_map)
 
@@ -612,17 +612,17 @@ static MACHINE_CONFIG_START( tigeroad )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL(3'579'545)) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
 /* same as above but with additional Z80 for samples playback */
-static MACHINE_CONFIG_DERIVED( toramich, tigeroad )
+MACHINE_CONFIG_DERIVED(tigeroad_state::toramich, tigeroad)
 
 	/* basic machine hardware */
 
@@ -638,7 +638,7 @@ static MACHINE_CONFIG_DERIVED( toramich, tigeroad )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( f1dream_comad )
+MACHINE_CONFIG_START(tigeroad_state::f1dream_comad)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 8000000)
@@ -695,7 +695,7 @@ void pushman_state::machine_start()
 	save_item(NAME(m_mcu_latch_ctl));
 }
 
-static MACHINE_CONFIG_DERIVED(pushman, f1dream_comad)
+MACHINE_CONFIG_DERIVED(pushman_state::pushman, f1dream_comad)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pushman_map)
 
@@ -706,7 +706,7 @@ static MACHINE_CONFIG_DERIVED(pushman, f1dream_comad)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED(bballs, pushman)
+MACHINE_CONFIG_DERIVED(pushman_state::bballs, pushman)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(bballs_map)
 MACHINE_CONFIG_END

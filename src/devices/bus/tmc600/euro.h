@@ -53,7 +53,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define TMC600_EURO_BUS_TAG		"bus"
+#define TMC600_EURO_BUS_TAG     "bus"
 
 
 

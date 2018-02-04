@@ -7,13 +7,15 @@
     Plugin options manager.
 
 ***************************************************************************/
-#include <fstream>
 #include "emu.h"
 #include "pluginopts.h"
 
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 #include <rapidjson/istreamwrapper.h>
+
+#include <fstream>
+
 
 //**************************************************************************
 //  PLUGIN OPTIONS
@@ -75,7 +77,8 @@ void plugin_options::parse_json(std::string path)
 
 						if (type=="plugin")
 						{
-							add_entry({ std::move(plugin_name) }, core_strdup(description.c_str()), option_type::BOOLEAN, start ? "1" : "0");
+							auto const it = m_descriptions.emplace(m_descriptions.end(), std::move(description));
+							add_entry({ std::move(plugin_name) }, it->c_str(), option_type::BOOLEAN, start ? "1" : "0");
 						}
 					}
 

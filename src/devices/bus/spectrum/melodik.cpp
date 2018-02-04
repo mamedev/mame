@@ -21,10 +21,10 @@ DEFINE_DEVICE_TYPE(SPECTRUM_MELODIK, spectrum_melodik_device, "spectrum_melodik"
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER(spectrum_melodik_device::device_add_mconfig)
+MACHINE_CONFIG_START(spectrum_melodik_device::device_add_mconfig)
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8912", AY8912, XTAL_3_579545MHz / 2)
+	MCFG_SOUND_ADD("ay8912", AY8912, XTAL(3'579'545) / 2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* passthru */

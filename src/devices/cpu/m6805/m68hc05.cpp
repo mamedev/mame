@@ -18,6 +18,7 @@ certain value.
 #include "emu.h"
 #include "m68hc05.h"
 #include "m6805defs.h"
+#include "6805dasm.h"
 
 
 /****************************************************************************
@@ -541,15 +542,9 @@ u64 m68hc05_device::execute_cycles_to_clocks(u64 cycles) const
 	return cycles * 2;
 }
 
-
-offs_t m68hc05_device::disasm_disassemble(
-		std::ostream &stream,
-		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
-		u32 options)
+util::disasm_interface *m68hc05_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options);
+	return new m68hc05_disassembler;
 }
 
 
@@ -777,14 +772,9 @@ void m68hc05c4_device::device_start()
 }
 
 
-offs_t m68hc05c4_device::disasm_disassemble(
-		std::ostream &stream,
-		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
-		u32 options)
+util::disasm_interface *m68hc05c4_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options, m68hc05c4_syms);
+	return new m68hc05_disassembler(m68hc05c4_syms);
 }
 
 
@@ -845,15 +835,10 @@ void m68hc05c8_device::device_start()
 }
 
 
-offs_t m68hc05c8_device::disasm_disassemble(
-		std::ostream &stream,
-		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
-		u32 options)
+util::disasm_interface *m68hc05c8_device::create_disassembler()
 {
 	// same I/O registers as MC68HC05C4
-	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options, m68hc05c4_syms);
+	return new m68hc05_disassembler(m68hc05c4_syms);
 }
 
 
@@ -937,12 +922,7 @@ void m68hc705c8a_device::device_reset()
 }
 
 
-offs_t m68hc705c8a_device::disasm_disassemble(
-		std::ostream &stream,
-		offs_t pc,
-		const u8 *oprom,
-		const u8 *opram,
-		u32 options)
+util::disasm_interface *m68hc705c8a_device::create_disassembler()
 {
-	return CPU_DISASSEMBLE_NAME(m68hc05)(this, stream, pc, oprom, opram, options, m68hc705c8a_syms);
+	return new m68hc05_disassembler(m68hc705c8a_syms);
 }

@@ -278,7 +278,6 @@ private:
 
 	// internal helpers
 	void prepare_for_step_overout(offs_t pc);
-	u32 dasm_wrapped(std::string &buffer, offs_t pc);
 	void errorlog_write_line(const char *line);
 
 	// breakpoint and watchpoint helpers
@@ -289,14 +288,12 @@ private:
 	void hotspot_check(address_space &space, offs_t address);
 
 	// symbol get/set callbacks
-	static u64 get_current_pc(symbol_table &table, void *ref);
-	static u64 get_cycles(symbol_table &table, void *ref);
-	static u64 get_totalcycles(symbol_table &table, void *ref);
-	static u64 get_lastinstructioncycles(symbol_table &table, void *ref);
-	static u64 get_logunmap(symbol_table &table, void *ref);
-	static void set_logunmap(symbol_table &table, void *ref, u64 value);
-	static u64 get_state(symbol_table &table, void *ref);
-	static void set_state(symbol_table &table, void *ref, u64 value);
+	static u64 get_current_pc(symbol_table &table);
+	static u64 get_cycles(symbol_table &table);
+	static u64 get_totalcycles(symbol_table &table);
+	static u64 get_lastinstructioncycles(symbol_table &table);
+	static u64 get_state(symbol_table &table, int index);
+	static void set_state(symbol_table &table, int index, u64 value);
 
 	// basic device information
 	device_t &                 m_device;                // device we are attached to
@@ -586,10 +583,10 @@ private:
 	device_t* expression_get_device(const char *tag);
 
 	/* variable getters/setters */
-	u64 get_cpunum(symbol_table &table, void *ref);
-	u64 get_beamx(symbol_table &table, void *ref);
-	u64 get_beamy(symbol_table &table, void *ref);
-	u64 get_frame(symbol_table &table, void *ref);
+	u64 get_cpunum(symbol_table &table);
+	u64 get_beamx(symbol_table &table, screen_device *screen);
+	u64 get_beamy(symbol_table &table, screen_device *screen);
+	u64 get_frame(symbol_table &table, screen_device *screen);
 
 	/* internal helpers */
 	void on_vblank(screen_device &device, bool vblank_state);

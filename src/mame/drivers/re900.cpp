@@ -83,8 +83,8 @@
 #include "re900.lh"
 
 
-#define MAIN_CLOCK      XTAL_11_0592MHz
-#define VDP_CLOCK       XTAL_10_730MHz
+#define MAIN_CLOCK      XTAL(11'059'200)
+#define VDP_CLOCK       XTAL(10'730'000)
 #define TMS_CLOCK       VDP_CLOCK / 24
 
 
@@ -120,6 +120,8 @@ public:
 	DECLARE_WRITE8_MEMBER(re_mux_port_B_w);
 
 	DECLARE_DRIVER_INIT(re900);
+	void re900(machine_config &config);
+	void bs94(machine_config &config);
 };
 
 
@@ -249,11 +251,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mem_io, AS_IO, 8, re900_state )
 	AM_RANGE(0x0000, 0xbfff) AM_READ(rom_r)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("tms9128", tms9928a_device, vram_write)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("tms9128", tms9928a_device, register_write)
 	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE("ay_re900", ay8910_device, address_data_w)
 	AM_RANGE(0xe802, 0xe802) AM_DEVREAD("ay_re900", ay8910_device, data_r)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_WRITE(cpu_port_0_w)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_NOP
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_NOP
@@ -377,7 +379,7 @@ INPUT_PORTS_END
 *      Machine Driver      *
 ***************************/
 
-static MACHINE_CONFIG_START( re900 )
+MACHINE_CONFIG_START(re900_state::re900)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8051, MAIN_CLOCK)
@@ -385,7 +387,7 @@ static MACHINE_CONFIG_START( re900 )
 	MCFG_CPU_IO_MAP(mem_io)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD( "tms9128", TMS9128, XTAL_10_738635MHz / 2 )   /* TMS9128NL on the board */
+	MCFG_DEVICE_ADD( "tms9128", TMS9128, XTAL(10'738'635) / 2 )   /* TMS9128NL on the board */
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
@@ -403,7 +405,7 @@ static MACHINE_CONFIG_START( re900 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bs94, re900 )
+MACHINE_CONFIG_DERIVED(re900_state::bs94, re900)
 
 	/* sound hardware   */
 	MCFG_SOUND_MODIFY("ay_re900")

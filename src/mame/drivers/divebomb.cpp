@@ -251,7 +251,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(divebomb_state::rozcpu_bank_w)
 {
-	uint32_t bank = BITSWAP8(data, 4, 5, 6, 7, 3, 2, 1, 0) >> 4;
+	uint32_t bank = bitswap<8>(data, 4, 5, 6, 7, 3, 2, 1, 0) >> 4;
 	m_bank1->set_entry(bank);
 
 	if (data & 0x0f)
@@ -445,7 +445,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( divebomb )
+MACHINE_CONFIG_START(divebomb_state::divebomb)
 
 	MCFG_CPU_ADD("fgcpu", Z80,XTAL1/4) // ?
 	MCFG_CPU_PROGRAM_MAP(divebomb_fgcpu_map)

@@ -550,7 +550,7 @@ void atarifb_state::machine_reset()
 	m_counter_y_in2b = 0;
 }
 
-static MACHINE_CONFIG_START( atarifb )
+MACHINE_CONFIG_START(atarifb_state::atarifb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 750000)
@@ -581,7 +581,7 @@ static MACHINE_CONFIG_START( atarifb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( atarifb4, atarifb )
+MACHINE_CONFIG_DERIVED(atarifb_state::atarifb4, atarifb)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -589,7 +589,7 @@ static MACHINE_CONFIG_DERIVED( atarifb4, atarifb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( abaseb, atarifb )
+MACHINE_CONFIG_DERIVED(atarifb_state::abaseb, atarifb)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -606,7 +606,7 @@ static MACHINE_CONFIG_DERIVED( abaseb, atarifb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( soccer, atarifb )
+MACHINE_CONFIG_DERIVED(atarifb_state::soccer, atarifb)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

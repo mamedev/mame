@@ -662,7 +662,7 @@ void othunder_state::machine_reset()
 	m_ad_irq = 0;
 }
 
-static MACHINE_CONFIG_START( othunder )
+MACHINE_CONFIG_START(othunder_state::othunder)
 
 	/* basic machine hardware */
 //  MCFG_CPU_ADD("maincpu", M68000, 24000000/2 )   /* 12 MHz */

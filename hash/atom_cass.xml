@@ -5,7 +5,7 @@
 
 <softwarelist name="atom_cass" description="Acorn Atom cassettes">
 
-	<software name="747">
+	<software name="747" supported="no">
 		<description>747 (12K)</description>
 		<year>1981</year>
 		<publisher>Bug Byte</publisher>
@@ -16,7 +16,7 @@
 		</part>
 	</software>
 
-	<software name="adventre">
+	<software name="adventre" supported="no">
 		<description>Adventure (12K)</description>
 		<year>1981</year>
 		<publisher>Program Power</publisher>
@@ -27,7 +27,7 @@
 		</part>
 	</software>
 
-	<software name="adventrs">
+	<software name="adventrs" supported="no">
 		<description>Adventures (Adventure/Dungeon/House/Intergalactic)</description>
 		<year>1981</year>
 		<publisher>Acornsoft</publisher>
@@ -38,7 +38,7 @@
 		</part>
 	</software>
 
-	<software name="africadi">
+	<software name="africadi" supported="no">
 		<description>The Africa Diamond (10K)</description>
 		<year>1982</year>
 		<publisher>Ramtronics</publisher>
@@ -49,7 +49,7 @@
 		</part>
 	</software>
 
-	<software name="atdbase">
+	<software name="atdbase" supported="no">
 		<description>Atom Database</description>
 		<year>1980</year>
 		<publisher>Acornsoft</publisher>
@@ -60,7 +60,7 @@
 		</part>
 	</software>
 
-	<software name="atstore">
+	<software name="atstore" supported="no">
 		<description>AtomStore (12K)</description>
 		<year>1981</year>
 		<publisher>Program Power</publisher>
@@ -71,7 +71,7 @@
 		</part>
 	</software>
 
-	<software name="atsynth">
+	<software name="atsynth" supported="no">
 		<description>Atom Synthesiser (5K)</description>
 		<year>1981</year>
 		<publisher>Acornsoft</publisher>
@@ -82,7 +82,7 @@
 		</part>
 	</software>
 
-	<software name="backgamm">
+	<software name="backgamm" supported="no">
 		<description>Backgammon</description>
 		<year>1981</year>
 		<publisher>Bug Byte</publisher>
@@ -93,7 +93,7 @@
 		</part>
 	</software>
 
-	<software name="breakout">
+	<software name="breakout" supported="no">
 		<description>Breakout (4K)</description>
 		<year>1981</year>
 		<publisher>Bug Byte</publisher>
@@ -104,7 +104,7 @@
 		</part>
 	</software>
 
-	<software name="busgame">
+	<software name="busgame" supported="no">
 		<description>Business Game</description>
 		<year>1982</year>
 		<publisher>Program Power</publisher>
@@ -115,7 +115,7 @@
 		</part>
 	</software>
 
-	<software name="centiped">
+	<software name="centiped" supported="no">
 		<description>Centipede</description>
 		<year>198?</year>
 		<publisher>Micromania</publisher>
@@ -126,7 +126,7 @@
 		</part>
 	</software>
 
-	<software name="chuckie">
+	<software name="chuckie" supported="no">
 		<description>Atomic Chuckie Egg (32K)</description>
 		<year>2012</year>
 		<publisher>Retro Software</publisher>
@@ -146,7 +146,7 @@
 		</part>
 	</software>
 
-	<software name="cylonatt">
+	<software name="cylonatt" supported="no">
 		<description>Cylon Attack</description>
 		<year>1982</year>
 		<publisher>A&amp;F Software</publisher>
@@ -157,7 +157,7 @@
 		</part>
 	</software>
 
-	<software name="deathsat">
+	<software name="deathsat" supported="no">
 		<description>Death Satellite (12K)</description>
 		<year>1982</year>
 		<publisher>A&amp;F Software</publisher>
@@ -168,7 +168,7 @@
 		</part>
 	</software>
 
-	<software name="defender">
+	<software name="defender" supported="no">
 		<description>Defender</description>
 		<year>1982</year>
 		<publisher>Micromania</publisher>
@@ -179,7 +179,7 @@
 		</part>
 	</software>
 
-	<software name="demondun">
+	<software name="demondun" supported="no">
 		<description>Demon Dungeon (5K)</description>
 		<year>1980</year>
 		<publisher>Program Power</publisher>
@@ -190,7 +190,7 @@
 		</part>
 	</software>
 
-	<software name="earlywar">
+	<software name="earlywar" supported="no">
 		<description>Early Warning</description>
 		<year>1982</year>
 		<publisher>A&amp;F Software</publisher>
@@ -201,7 +201,7 @@
 		</part>
 	</software>
 
-	<software name="gala">
+	<software name="gala" supported="no">
 		<description>Galaforce (32K)</description>
 		<year>2012</year>
 		<publisher>Retro Software</publisher>
@@ -221,7 +221,7 @@
 		</part>
 	</software>
 
-	<software name="galaxian">
+	<software name="galaxian" supported="no">
 		<description>Galaxian (12K)</description>
 		<year>1981</year>
 		<publisher>Bug Byte</publisher>
@@ -232,7 +232,7 @@
 		</part>
 	</software>
 
-	<software name="gamepk1">
+	<software name="gamepk1" supported="no">
 		<description>Games Pack 1 (Asteroids/Sub Hunt/Breakout)</description>
 		<year>1981</year>
 		<publisher>Acornsoft</publisher>
@@ -243,7 +243,7 @@
 		</part>
 	</software>
 
-	<software name="gamepk3">
+	<software name="gamepk3" supported="no">
 		<description>Games Pack 3 (Rat Trap/Lunar Lander/Black Box)</description>
 		<year>1981</year>
 		<publisher>Acornsoft</publisher>
@@ -254,7 +254,7 @@
 		</part>
 	</software>
 
-	<software name="gamepk4">
+	<software name="gamepk4" supported="no">
 		<description>Games Pack 4 (Star Trek/Four Row/Space Attack)</description>
 		<year>1981</year>
 		<publisher>Acornsoft</publisher>
@@ -265,7 +265,7 @@
 		</part>
 	</software>
 
-	<software name="gamepk8">
+	<software name="gamepk8" supported="no">
 		<description>Games Pack 8 (Stargate/Gomoku/Robots)</description>
 		<year>1981</year>
 		<publisher>Acornsoft</publisher>
@@ -276,7 +276,7 @@
 		</part>
 	</software>
 
-	<software name="gamepk9">
+	<software name="gamepk9" supported="no">
 		<description>Games Pack 9 (Snapper/Minotaur/Babies)</description>
 		<year>1981</year>
 		<publisher>Acornsoft</publisher>
@@ -287,7 +287,7 @@
 		</part>
 	</software>
 
-	<software name="gamepk10">
+	<software name="gamepk10" supported="no">
 		<description>Games Pack 10 (Breakout/Mastermind/Snake/Simon/Moon/Hectic/Ski-Run/Track/Squash/Bombs-Away)</description>
 		<year>1981</year>
 		<publisher>Acornsoft</publisher>
@@ -298,7 +298,7 @@
 		</part>
 	</software>
 
-	<software name="hardhath">
+	<software name="hardhath" supported="no">
 		<description>Hard Hat Harry (32K)</description>
 		<year>2011</year>
 		<publisher>Retro Software</publisher>
@@ -311,7 +311,7 @@
 		</part>
 	</software>
 
-	<software name="hyperfir">
+	<software name="hyperfir" supported="no">
 		<description>Hyperfire (12K)</description>
 		<year>1982</year>
 		<publisher>Program Power</publisher>
@@ -322,7 +322,7 @@
 		</part>
 	</software>
 
-	<software name="hypervpr">
+	<software name="hypervpr" supported="no">
 		<description>Hyper Viper (12K)</description>
 		<year>2011</year>
 		<publisher>Retro Software</publisher>
@@ -342,7 +342,7 @@
 		</part>
 	</software>
 
-	<software name="jetsetmn">
+	<software name="jetsetmn" supported="no">
 		<description>Jet Set Miner (12K)</description>
 		<year>2009</year>
 		<publisher>Retro Software</publisher>
@@ -362,7 +362,7 @@
 		</part>
 	</software>
 
-	<software name="joeblade">
+	<software name="joeblade" supported="no">
 		<description>Atomic Joe Blade (32K)</description>
 		<year>2014</year>
 		<publisher>Retro Software</publisher>
@@ -375,7 +375,7 @@
 		</part>
 	</software>
 
-	<software name="jungle">
+	<software name="jungle" supported="no">
 		<description>Jungle Journey (32K)</description>
 		<year>2012</year>
 		<publisher>Retro Software</publisher>
@@ -388,7 +388,7 @@
 		</part>
 	</software>
 
-	<software name="labyrint">
+	<software name="labyrint" supported="no">
 		<description>Labyrinth (12K)</description>
 		<year>1981</year>
 		<publisher>Bug Byte</publisher>
@@ -399,7 +399,7 @@
 		</part>
 	</software>
 
-	<software name="minefld">
+	<software name="minefld" supported="no">
 		<description>Minefield</description>
 		<year>1982</year>
 		<publisher>A&amp;F Software</publisher>
@@ -410,7 +410,7 @@
 		</part>
 	</software>
 
-	<software name="omegamis">
+	<software name="omegamis" supported="no">
 		<description>Omega Mission</description>
 		<year>1982</year>
 		<publisher>Micromania</publisher>
@@ -421,7 +421,7 @@
 		</part>
 	</software>
 
-	<software name="peekocom">
+	<software name="peekocom" supported="no">
 		<description>Peeko-Computer</description>
 		<year>1981</year>
 		<publisher>Acornsoft</publisher>
@@ -432,7 +432,7 @@
 		</part>
 	</software>
 
-	<software name="pinball">
+	<software name="pinball" supported="no">
 		<description>Pinball (6K)</description>
 		<year>1980</year>
 		<publisher>Bug Byte</publisher>
@@ -443,7 +443,7 @@
 		</part>
 	</software>
 
-	<software name="protectr">
+	<software name="protectr" supported="no">
 		<description>The Protector</description>
 		<year>1982</year>
 		<publisher>Micromania</publisher>
@@ -454,7 +454,7 @@
 		</part>
 	</software>
 
-	<software name="repton">
+	<software name="repton" supported="no">
 		<description>Repton (32K)</description>
 		<year>2013</year>
 		<publisher>Retro Software</publisher>
@@ -467,7 +467,7 @@
 		</part>
 	</software>
 
-	<software name="spfightr">
+	<software name="spfightr" supported="no">
 		<description>Space Fighter (6K)</description>
 		<year>1981</year>
 		<publisher>Program Power</publisher>
@@ -478,7 +478,7 @@
 		</part>
 	</software>
 
-	<software name="swarm">
+	<software name="swarm" supported="no">
 		<description>Swarm</description>
 		<year>1981</year>
 		<publisher>Program Power</publisher>
@@ -489,7 +489,7 @@
 		</part>
 	</software>
 
-	<software name="tangled">
+	<software name="tangled" supported="no">
 		<description>Tangled</description>
 		<year>1982</year>
 		<publisher>A&amp;F Software</publisher>
@@ -500,7 +500,7 @@
 		</part>
 	</software>
 
-	<software name="typist">
+	<software name="typist" supported="no">
 		<description>Atom Typist (7K)</description>
 		<year>1981</year>
 		<publisher>Bug Byte</publisher>
@@ -511,7 +511,7 @@
 		</part>
 	</software>
 
-	<software name="ufobombr">
+	<software name="ufobombr" supported="no">
 		<description>UFO Bomber (7K)</description>
 		<year>1981</year>
 		<publisher>Bug Byte</publisher>
@@ -522,7 +522,7 @@
 		</part>
 	</software>
 
-	<software name="zodiac">
+	<software name="zodiac" supported="no">
 		<description>Zodiac (12K)</description>
 		<year>1981</year>
 		<publisher>A&amp;F Software</publisher>

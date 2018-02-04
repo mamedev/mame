@@ -25,7 +25,7 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK            (XTAL_10MHz)
+#define MASTER_CLOCK            (XTAL(10'000'000))
 #define CPU_CLOCK               (MASTER_CLOCK / 4)
 #define PIXEL_CLOCK             (MASTER_CLOCK / 1)
 #define CRTC_CLOCK              (MASTER_CLOCK / 8)
@@ -59,6 +59,7 @@ public:
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	void slotcarn(machine_config &config);
 };
 
 
@@ -535,7 +536,7 @@ void slotcarn_state::machine_start()
 *          Machine Driver          *
 ***********************************/
 
-static MACHINE_CONFIG_START( slotcarn )
+MACHINE_CONFIG_START(slotcarn_state::slotcarn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?

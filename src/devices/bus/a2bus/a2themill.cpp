@@ -52,7 +52,7 @@ ADDRESS_MAP_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( a2bus_themill_device::device_add_mconfig )
+MACHINE_CONFIG_START(a2bus_themill_device::device_add_mconfig)
 	MCFG_CPU_ADD(M6809_TAG, M6809, 1021800)   // M6809 runs at ~1 MHz as per Stellation Two's print ads
 	MCFG_CPU_PROGRAM_MAP(m6809_mem)
 MACHINE_CONFIG_END
@@ -79,9 +79,6 @@ a2bus_themill_device::a2bus_themill_device(const machine_config &mconfig, const 
 
 void a2bus_themill_device::device_start()
 {
-	// set_a2bus_device makes m_slot valid
-	set_a2bus_device();
-
 	save_item(NAME(m_bEnabled));
 	save_item(NAME(m_flipAddrSpace));
 	save_item(NAME(m_6809Mode));
@@ -98,12 +95,12 @@ void a2bus_themill_device::device_reset()
 	m_6809->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-uint8_t a2bus_themill_device::read_c0nx(address_space &space, uint8_t offset)
+uint8_t a2bus_themill_device::read_c0nx(uint8_t offset)
 {
 	return m_status;
 }
 
-void a2bus_themill_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
+void a2bus_themill_device::write_c0nx(uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{

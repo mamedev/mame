@@ -220,7 +220,7 @@ WRITE16_MEMBER(taitoair_state::system_control_w)
 	m_dsp->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
 	m_gradbank = (data & 0x40);
-	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", space.device().safe_pcbase(), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
+	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n", m_maincpu->pcbase(), data, ((data & 4) ? "Clear" : "Assert"), ((data & 1) ? "Clear" : "Assert"));
 }
 
 READ16_MEMBER(taitoair_state::lineram_r)
@@ -251,7 +251,7 @@ WRITE16_MEMBER(taitoair_state::dspram_w)
 READ16_MEMBER(taitoair_state::dsp_HOLD_signal_r)
 {
 	/* HOLD signal is active low */
-	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", space.device().safe_pcbase(), m_dsp_hold_signal);
+	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n", m_dsp->pcbase(), m_dsp_hold_signal);
 
 	return m_dsp_hold_signal;
 }
@@ -259,7 +259,7 @@ READ16_MEMBER(taitoair_state::dsp_HOLD_signal_r)
 WRITE16_MEMBER(taitoair_state::dsp_HOLDA_signal_w)
 {
 	if (offset)
-		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n", space.device().safe_pcbase(), data);
+		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n", m_dsp->pcbase(), data);
 }
 
 
@@ -697,17 +697,17 @@ void taitoair_state::machine_reset()
 	}
 }
 
-static MACHINE_CONFIG_START( airsys )
+MACHINE_CONFIG_START(taitoair_state::airsys)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) // MC68000P12
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000)) // MC68000P12
 	MCFG_CPU_PROGRAM_MAP(airsys_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", taitoair_state,  irq5_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz / 4)   // Z8400AB1
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000) / 4)   // Z8400AB1
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MCFG_CPU_ADD("dsp", TMS32025, XTAL_36MHz) // Unverified
+	MCFG_CPU_ADD("dsp", TMS32025, XTAL(36'000'000)) // Unverified
 	MCFG_CPU_PROGRAM_MAP(DSP_map_program)
 	MCFG_CPU_DATA_MAP(DSP_map_data)
 	MCFG_TMS32025_HOLD_IN_CB(READ16(taitoair_state, dsp_HOLD_signal_r))
@@ -750,7 +750,7 @@ static MACHINE_CONFIG_START( airsys )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz / 2)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL(16'000'000) / 2)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)

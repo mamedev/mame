@@ -66,4 +66,5 @@ public:
 	DECLARE_WRITE8_MEMBER(volume_callback);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
+	void gradius3(machine_config &config);
 };

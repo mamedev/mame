@@ -493,6 +493,10 @@ public:
 	required_device<saturn_control_port_device> m_ctrl1;
 	required_device<saturn_control_port_device> m_ctrl2;
 
+	void saturn(machine_config &config);
+	void saturnjp(machine_config &config);
+	void saturneu(machine_config &config);
+	void saturnus(machine_config &config);
 };
 
 
@@ -778,7 +782,7 @@ uint8_t sat_console_state::smpc_direct_mode(uint16_t in_value,bool which)
 	return 0x80 | 0x10 | ((in_value >> shift_bit[hshake]) & 0xf);
 }
 
-static MACHINE_CONFIG_START( saturn )
+MACHINE_CONFIG_START(sat_console_state::saturn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
@@ -800,7 +804,7 @@ static MACHINE_CONFIG_START( saturn )
 //  SH-1
 
 //  SMPC MCU, running at 4 MHz (+ custom RTC device that runs at 32.768 KHz)
-	MCFG_SMPC_HLE_ADD("smpc", XTAL_4MHz)
+	MCFG_SMPC_HLE_ADD("smpc", XTAL(4'000'000))
 	smpc_hle_device::static_set_control_port_tags(*device, "ctrl1", "ctrl2");
 	MCFG_SMPC_HLE_PDR1_IN_CB(READ8(sat_console_state, saturn_pdr1_direct_r))
 	MCFG_SMPC_HLE_PDR2_IN_CB(READ8(sat_console_state, saturn_pdr2_direct_r))
@@ -860,7 +864,7 @@ static SLOT_INTERFACE_START(saturn_cart)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_DERIVED( saturnus, saturn )
+MACHINE_CONFIG_DERIVED(sat_console_state::saturnus, saturn)
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
@@ -876,7 +880,7 @@ MACHINE_CONFIG_DERIVED( saturnus, saturn )
 
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( saturneu, saturn )
+MACHINE_CONFIG_DERIVED(sat_console_state::saturneu, saturn)
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)
@@ -891,7 +895,7 @@ MACHINE_CONFIG_DERIVED( saturneu, saturn )
 	smpc_hle_device::static_set_region_code(*device, 12);
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( saturnjp, saturn )
+MACHINE_CONFIG_DERIVED(sat_console_state::saturnjp, saturn)
 	MCFG_CDROM_ADD( "cdrom" )
 	MCFG_CDROM_INTERFACE("sat_cdrom")
 	MCFG_DEVICE_ADD("saturn_cdb", SATURN_CDB, 16000000)

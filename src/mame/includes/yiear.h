@@ -52,4 +52,5 @@ public:
 	INTERRUPT_GEN_MEMBER(yiear_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(yiear_nmi_interrupt);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void yiear(machine_config &config);
 };

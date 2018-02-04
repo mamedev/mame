@@ -163,9 +163,9 @@ Notes:
 #include "speaker.h"
 
 
-#define MASTER_CLOCK    XTAL_20MHz
-#define CPU_CLOCK       MASTER_CLOCK / 2
-#define PIXEL_CLOCK     MASTER_CLOCK / 4
+static constexpr XTAL MASTER_CLOCK  = 20_MHz_XTAL;
+static constexpr XTAL CPU_CLOCK     = MASTER_CLOCK / 2;
+static constexpr XTAL PIXEL_CLOCK   = MASTER_CLOCK / 4;
 
 
 /*******************************************************************************
@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfsstar_state )
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(fg0_videoram_w) AM_SHARE("fg0_videoram") /* FG0 Ram */
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(bg0_videoram_w) AM_SHARE("bg0_videoram") /* BG0 Ram */
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM AM_SHARE("spriteram")       /* SPR Ram */
-	AM_RANGE(0x140000, 0x140fff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x140000, 0x140fff) AM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x180000, 0x180003) AM_WRITE(irqack_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW2")
@@ -411,14 +411,14 @@ GFXDECODE_END
  Machine Driver(s)
 *******************************************************************************/
 
-static MACHINE_CONFIG_START( wwfsstar )
+MACHINE_CONFIG_START(wwfsstar_state::wwfsstar)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", wwfsstar_state, scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
@@ -437,12 +437,12 @@ static MACHINE_CONFIG_START( wwfsstar )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 
-	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
+	MCFG_YM2151_ADD("ymsnd", XTAL(3'579'545))
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1.056_MHz_XTAL, PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
 MACHINE_CONFIG_END

@@ -114,10 +114,11 @@ public:
 	required_device<ticket_dispenser_device> m_hopper;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void feversoc(machine_config &config);
 };
 
 
-#define MASTER_CLOCK XTAL_28_63636MHz
+#define MASTER_CLOCK XTAL(28'636'363)
 
 
 uint32_t feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -204,7 +205,7 @@ static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
 	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff0000)
 	//AM_RANGE(0x06010000, 0x0601007f) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write) AM_RAM
 	AM_RANGE(0x06010060, 0x06010063) AM_WRITENOP // sprite buffering
-	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_DEVWRITE("palette",  palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_DEVWRITE("palette",  palette_device, write32) AM_SHARE("palette")
 ADDRESS_MAP_END
 
 static const gfx_layout spi_spritelayout =
@@ -273,7 +274,7 @@ WRITE16_MEMBER(feversoc_state::feversoc_irq_ack)
 	m_maincpu->set_input_line(8, CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( feversoc )
+MACHINE_CONFIG_START(feversoc_state::feversoc)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",SH2,MASTER_CLOCK)
@@ -301,7 +302,7 @@ static MACHINE_CONFIG_START( feversoc )
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom")
 
-	MCFG_JRC6355E_ADD("rtc", XTAL_32_768kHz)
+	MCFG_JRC6355E_ADD("rtc", XTAL(32'768))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

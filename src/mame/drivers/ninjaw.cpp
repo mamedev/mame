@@ -344,7 +344,7 @@ WRITE16_MEMBER(ninjaw_state::cpua_ctrl_w)
 
 	parse_control();
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n", space.device().safe_pc(), data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n", m_maincpu->pc(), data);
 }
 
 
@@ -728,7 +728,7 @@ void ninjaw_state::machine_reset()
 	machine().sound().system_enable(true);  /* mixer enabled */
 }
 
-static MACHINE_CONFIG_START( ninjaw )
+MACHINE_CONFIG_START(ninjaw_state::ninjaw)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */
@@ -853,7 +853,7 @@ static MACHINE_CONFIG_START( ninjaw )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( darius2 )
+MACHINE_CONFIG_START(ninjaw_state::darius2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,16000000/2)  /* 8 MHz ? */

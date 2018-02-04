@@ -50,6 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER(diablo68k_leds_w);
 	DECLARE_READ8_MEMBER(diablo68k_input1_r);
 	DECLARE_READ8_MEMBER(diablo68k_input2_r);
+	void diablo68k(machine_config &config);
 };
 
 
@@ -178,15 +179,15 @@ INPUT_PORTS_END
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( diablo68k )
+MACHINE_CONFIG_START(novag68k_state::diablo68k)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, 16_MHz_XTAL)
 	MCFG_CPU_PERIODIC_INT_DRIVER(novag68k_state, irq2_line_hold, 256) // guessed
 	MCFG_CPU_PROGRAM_MAP(diablo68k_map)
 
 	MCFG_DEVICE_ADD("acia", MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL_1_8432MHz)
+	MCFG_MOS6551_XTAL(1.8432_MHz_XTAL)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

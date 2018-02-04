@@ -415,6 +415,7 @@ public:
 
 	emu_timer *m_bus_error_timer;
 
+	void hp_ipc(machine_config &config);
 private:
 	required_device<m68000_device> m_maincpu;
 	required_device<address_map_bank_device> m_bankdev;
@@ -466,6 +467,9 @@ static ADDRESS_MAP_START(hp_ipc_mem_outer, AS_PROGRAM, 16, hp_ipc_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(hp_ipc_mem_inner, AS_PROGRAM, 16, hp_ipc_state)
+// bus error handler
+	AM_RANGE(0x0000000, 0x1FFFFFF) AM_READWRITE(trap_r, trap_w)
+
 // user mode
 	AM_RANGE(0x1000000, 0x17FFFFF) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x1800000, 0x187FFFF) AM_ROM AM_REGION("maincpu", 0)
@@ -489,8 +493,6 @@ static ADDRESS_MAP_START(hp_ipc_mem_inner, AS_PROGRAM, 16, hp_ipc_state)
 	AM_RANGE(0x0700000, 0x07FFFFF) AM_UNMAP     // External I/O
 	AM_RANGE(0x0800000, 0x0FFFFFF) AM_READWRITE(ram_r, ram_w)
 
-// bus error handler
-	AM_RANGE(0x0000000, 0x1FFFFFF) AM_READWRITE(trap_r, trap_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(hp_ipc)
@@ -709,15 +711,15 @@ SLOT_INTERFACE_END
  *  2   HP-HIL devices (keyboard, mouse)
  *  1   Real-time clock
  */
-static MACHINE_CONFIG_START(hp_ipc)
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_15_92MHz / 2)
+MACHINE_CONFIG_START(hp_ipc_state::hp_ipc)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(15'920'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(hp_ipc_mem_outer)
 
 	MCFG_DEVICE_ADD("bankdev", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(hp_ipc_mem_inner)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(25)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(25)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
 
 	// horizontal time = 60 us (min)
@@ -725,9 +727,9 @@ static MACHINE_CONFIG_START(hp_ipc)
 	// ver.period = 16.7ms (~60 hz)
 	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DEVICE("gpu", hp1ll3_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_6MHz * 2, 720, 0, 512, 278, 0, 256)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(6'000'000) * 2, 720, 0, 512, 278, 0, 256)
 //  when _desktop == 0:
-//  MCFG_SCREEN_RAW_PARAMS(XTAL_6MHz * 2, 720, 0, 640, 480, 0, 400)
+//  MCFG_SCREEN_RAW_PARAMS(XTAL(6'000'000) * 2, 720, 0, 640, 480, 0, 400)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("mlc", hp_hil_mlc_device, ap_w)) // XXX actually it's driven by 555 (U59)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
@@ -740,17 +742,17 @@ static MACHINE_CONFIG_START(hp_ipc)
 
 	// XXX actual clock is 1MHz; remove this workaround (and change 2000 to 100 in hp_ipc_dsk.cpp)
 	// XXX when floppy code correctly handles 600 rpm drives.
-	MCFG_WD2797_ADD("fdc", XTAL_2MHz)
+	MCFG_WD2797_ADD("fdc", XTAL(2'000'000))
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(hp_ipc_state, irq_5))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", hp_ipc_floppies, "35dd", hp_ipc_state::floppy_formats)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list","hp_ipc")
 
-	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
 	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(hp_ipc_state, irq_1))
 //  MCFG_MM58167_STANDBY_IRQ_CALLBACK(WRITELINE(hp_ipc_state, irq_6))
 
-	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, XTAL_15_92MHz/2)
+	MCFG_DEVICE_ADD("mlc", HP_HIL_MLC, XTAL(15'920'000)/2)
 	MCFG_HP_HIL_INT_CALLBACK(WRITELINE(hp_ipc_state, irq_2))
 	MCFG_HP_HIL_NMI_CALLBACK(WRITELINE(hp_ipc_state, irq_7))
 	MCFG_HP_HIL_SLOT_ADD("mlc", "hil1", hp_hil_devices, "hp_ipc_kbd")

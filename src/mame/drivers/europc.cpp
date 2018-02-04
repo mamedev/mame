@@ -84,6 +84,10 @@ public:
 	{
 		TIMER_RTC
 	};
+	static void cfg_builtin_720K(device_t *device);
+	void europc(machine_config &config);
+	void europc2(machine_config &config);
+	void euroxt(machine_config &config);
 };
 
 /*
@@ -497,24 +501,22 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(europc_io, AS_IO, 8, europc_pc_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r, europc_pio_w)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE(europc_pio_r, europc_pio_w)
 	AM_RANGE(0x0250, 0x025f) AM_READWRITE(europc_jim_r, europc_jim_w)
 	AM_RANGE(0x02e0, 0x02e0) AM_READ(europc_jim2_r)
 ADDRESS_MAP_END
 
 /* single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive */
-static MACHINE_CONFIG_START( cfg_builtin_720K )
-	MCFG_DEVICE_MODIFY("fdc:0")
-	MCFG_SLOT_DEFAULT_OPTION("35dd")
-	MCFG_SLOT_FIXED(true)
-
-	MCFG_DEVICE_MODIFY("fdc:1")
-	MCFG_SLOT_DEFAULT_OPTION("")
-MACHINE_CONFIG_END
+void europc_pc_state::cfg_builtin_720K(device_t *device)
+{
+	device_slot_interface::static_set_default_option(*device->subdevice("fdc:0"), "35dd");
+	device_slot_interface::static_set_fixed(*device->subdevice("fdc:0"), true);
+	device_slot_interface::static_set_default_option(*device->subdevice("fdc:1"), "");
+}
 
 //Euro PC
-static MACHINE_CONFIG_START( europc )
+MACHINE_CONFIG_START(europc_pc_state::europc)
 	MCFG_CPU_ADD("maincpu", I8088, 4772720*2)
 	MCFG_CPU_PROGRAM_MAP(europc_map)
 	MCFG_CPU_IO_MAP(europc_io)
@@ -544,13 +546,13 @@ static MACHINE_CONFIG_START( europc )
 MACHINE_CONFIG_END
 
 //Euro PC II
-static MACHINE_CONFIG_DERIVED ( europc2, europc )
+MACHINE_CONFIG_DERIVED(europc_pc_state::europc2, europc)
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("768K") // could be configured by the BIOS as 640K, 640K+128K EMS or 512K+256K EMS
 MACHINE_CONFIG_END
 
 //Euro XT
-static MACHINE_CONFIG_DERIVED ( euroxt, europc )
+MACHINE_CONFIG_DERIVED(europc_pc_state::euroxt, europc)
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("768K")
 	MCFG_DEVICE_MODIFY("isa2")

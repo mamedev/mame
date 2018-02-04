@@ -96,4 +96,12 @@ public:
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void arkanoid_bootleg_init(  );
 
+	void bootleg(machine_config &config);
+	void p3mcuay(machine_config &config);
+	void aysnd(machine_config &config);
+	void hexa(machine_config &config);
+	void brixian(machine_config &config);
+	void hexaa(machine_config &config);
+	void p3mcu(machine_config &config);
+	void arkanoid(machine_config &config);
 };

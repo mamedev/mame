@@ -174,6 +174,8 @@ public:
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void sun2mbus(machine_config &config);
+	void sun2vme(machine_config &config);
 private:
 	uint16_t *m_rom_ptr, *m_ram_ptr;
 	uint8_t *m_idprom_ptr;
@@ -207,7 +209,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 			switch (offset & 7)
 			{
 				case 4:
-					//printf("sun2: Read IDPROM @ %x (PC=%x)\n", offset<<1, m_maincpu->pc);
+					//printf("sun2: Read IDPROM @ %x (PC=%x)\n", offset<<1, m_maincpu->pc());
 					return m_idprom_ptr[(offset>>10) & 0x1f]<<8;
 
 				case 5:
@@ -215,7 +217,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 					return m_diagreg;
 
 				case 6:
-					//printf("sun2: Read bus error @ PC %x\n", m_maincpu->pc);
+					//printf("sun2: Read bus error @ PC %x\n", m_maincpu->pc());
 					return m_buserror;
 
 				case 7:
@@ -325,7 +327,7 @@ READ16_MEMBER( sun2_state::tl_mmu_r )
 		if (!machine().side_effect_disabled()) printf("sun2: pagemap entry not valid!\n");
 	}
 
-	if (!machine().side_effect_disabled()) printf("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", offset<<1, fc, mem_mask, m_maincpu->pc, offset>>15);
+	if (!machine().side_effect_disabled()) printf("sun2: Unmapped read @ %08x (FC %d, mask %04x, PC=%x, seg %x)\n", offset<<1, fc, mem_mask, m_maincpu->pc(), offset>>15);
 
 	return 0xffff;
 }
@@ -334,7 +336,7 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 {
 	uint8_t fc = m_maincpu->get_fc();
 
-	//printf("sun2: Write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc, offset<<1);
+	//printf("sun2: Write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<1);
 
 	if (fc == 3)
 	{
@@ -348,7 +350,7 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 
 				case 5:
 					// XOR to match Table 2-1 in the 2/50 Field Service Manual
-					printf("sun2: CPU LEDs to %02x (PC=%x) => ", (data & 0xff) ^ 0xff, m_maincpu->pc);
+					printf("sun2: CPU LEDs to %02x (PC=%x) => ", (data & 0xff) ^ 0xff, m_maincpu->pc());
 					m_diagreg = data & 0xff;
 					for (int i = 0; i < 8; i++)
 					{
@@ -396,11 +398,11 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 						m_pagemap[page] &= 0x0000ffff;
 						m_pagemap[page] |= (data<<16);
 					}
-					//printf("entry now %08x (adr %08x  PC=%x)\n", m_pagemap[page], (m_pagemap[page] & 0xfffff) << 11, m_maincpu->pc);
+					//printf("entry now %08x (adr %08x  PC=%x)\n", m_pagemap[page], (m_pagemap[page] & 0xfffff) << 11, m_maincpu->pc());
 					return;
 
 				case 2: // segment map
-					//printf("sun2: Write %02x to segment map at %x (entry %d, user ctx %d PC=%x)\n", data & 0xff, offset<<1, offset>>14, m_context & 7, m_maincpu->pc);
+					//printf("sun2: Write %02x to segment map at %x (entry %d, user ctx %d PC=%x)\n", data & 0xff, offset<<1, offset>>14, m_context & 7, m_maincpu->pc());
 					m_segmap[m_context & 7][offset >> 14] = data & 0xff;
 					return;
 
@@ -452,7 +454,7 @@ WRITE16_MEMBER( sun2_state::tl_mmu_w )
 		if (!machine().side_effect_disabled()) printf("sun2: pagemap entry not valid!\n");
 	}
 
-	printf("sun2: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc, offset<<1);
+	printf("sun2: Unmapped write %04x (FC %d, mask %04x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc(), offset<<1);
 }
 
 // BW2 video control
@@ -587,9 +589,9 @@ void sun2_state::machine_reset()
 	m_maincpu->reset();
 }
 
-static MACHINE_CONFIG_START( sun2vme )
+MACHINE_CONFIG_START(sun2_state::sun2vme)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, XTAL_19_6608MHz / 2) // or XTAL_24MHz / 2 by jumper setting
+	MCFG_CPU_ADD("maincpu", M68010, XTAL(19'660'800) / 2) // or XTAL(24'000'000) / 2 by jumper setting
 	MCFG_CPU_PROGRAM_MAP(sun2_mem)
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -601,28 +603,28 @@ static MACHINE_CONFIG_START( sun2vme )
 	MCFG_DEVICE_ADD("type0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vmetype0space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
 
 	// MMU Type 1 device space
 	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vmetype1space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
 
 	// MMU Type 2 device space
 	MCFG_DEVICE_ADD("type2", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vmetype2space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
 
 	// MMU Type 3 device space
 	MCFG_DEVICE_ADD("type3", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vmetype3space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
 
 	MCFG_SCREEN_ADD("bwtwo", RASTER)
@@ -631,7 +633,7 @@ static MACHINE_CONFIG_START( sun2vme )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MCFG_DEVICE_ADD("timer", AM9513A, XTAL_19_6608MHz / 4)
+	MCFG_DEVICE_ADD("timer", AM9513A, XTAL(19'660'800) / 4)
 	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("timer", am9513_device, gate1_w))
 	MCFG_AM9513_OUT1_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
 	MCFG_AM9513_OUT2_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<0>))
@@ -642,8 +644,8 @@ static MACHINE_CONFIG_START( sun2vme )
 	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_19_6608MHz / 4, 0, 0, 0, 0)
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_19_6608MHz / 4, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(19'660'800) / 4, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(19'660'800) / 4, 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_6))
@@ -659,9 +661,9 @@ static MACHINE_CONFIG_START( sun2vme )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC2_TAG, z80scc_device, ctsb_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sun2mbus )
+MACHINE_CONFIG_START(sun2_state::sun2mbus)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68010, XTAL_39_3216MHz / 4)
+	MCFG_CPU_ADD("maincpu", M68010, XTAL(39'321'600) / 4)
 	MCFG_CPU_PROGRAM_MAP(sun2_mem)
 
 	MCFG_RAM_ADD(RAM_TAG)
@@ -673,28 +675,28 @@ static MACHINE_CONFIG_START( sun2mbus )
 	MCFG_DEVICE_ADD("type0", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mbustype0space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
 
 	// MMU Type 1 device space
 	MCFG_DEVICE_ADD("type1", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mbustype1space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
 
 	// MMU Type 2 device space
 	MCFG_DEVICE_ADD("type2", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mbustype2space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
 
 	// MMU Type 3 device space
 	MCFG_DEVICE_ADD("type3", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(mbustype3space_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000000)
 
 	MCFG_SCREEN_ADD("bwtwo", RASTER)
@@ -703,7 +705,7 @@ static MACHINE_CONFIG_START( sun2mbus )
 	MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 900-1)
 	MCFG_SCREEN_REFRESH_RATE(72)
 
-	MCFG_DEVICE_ADD("timer", AM9513, XTAL_39_3216MHz / 8)
+	MCFG_DEVICE_ADD("timer", AM9513, XTAL(39'321'600) / 8)
 	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("timer", am9513_device, gate1_w))
 	MCFG_AM9513_OUT1_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_7))
 	MCFG_AM9513_OUT2_CALLBACK(DEVWRITELINE("irq5", input_merger_device, in_w<0>))
@@ -714,8 +716,8 @@ static MACHINE_CONFIG_START( sun2mbus )
 	MCFG_INPUT_MERGER_ANY_HIGH("irq5") // 74LS05 open collectors
 	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M68K_IRQ_5))
 
-	MCFG_SCC8530_ADD(SCC1_TAG, XTAL_39_3216MHz / 8, 0, 0, 0, 0)
-	MCFG_SCC8530_ADD(SCC2_TAG, XTAL_39_3216MHz / 8, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC1_TAG, XTAL(39'321'600) / 8, 0, 0, 0, 0)
+	MCFG_SCC8530_ADD(SCC2_TAG, XTAL(39'321'600) / 8, 0, 0, 0, 0)
 	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
 	MCFG_Z80SCC_OUT_INT_CB(INPUTLINE("maincpu", M68K_IRQ_6))

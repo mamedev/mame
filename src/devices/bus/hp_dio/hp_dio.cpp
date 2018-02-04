@@ -147,7 +147,7 @@ void dio16_device::device_start()
 
 	m_maincpu = subdevice<cpu_device>(m_cputag);
 	m_prgspace = &m_maincpu->space(AS_PROGRAM);
-	m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
+	m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
 }
 
 //-------------------------------------------------

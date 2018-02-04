@@ -246,7 +246,7 @@ void copsnrob_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( copsnrob )
+MACHINE_CONFIG_START(copsnrob_state::copsnrob)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502,14318180/16)      /* 894886.25 kHz */

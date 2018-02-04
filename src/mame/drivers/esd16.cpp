@@ -90,7 +90,7 @@ WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(0, ASSERT_LINE);      // Generate an IRQ
-		space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
+		m_maincpu->spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
 	}
 }
 
@@ -110,7 +110,7 @@ READ16_MEMBER(esd16_state::esd_eeprom_r)
 		return ((m_eeprom->do_read() & 0x01) << 15);
 	}
 
-//  logerror("(0x%06x) unk EEPROM read: %04x\n", space.device().safe_pc(), mem_mask);
+//  logerror("(0x%06x) unk EEPROM read: %04x\n", m_maincpu->pc(), mem_mask);
 	return 0;
 }
 
@@ -119,7 +119,7 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 	if (ACCESSING_BITS_8_15)
 		ioport("EEPROMOUT")->write(data, 0xffff);
 
-//  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", space.device().safe_pc(), data, mem_mask);
+//  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", m_maincpu->pc(), data, mem_mask);
 }
 
 
@@ -149,7 +149,7 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 	AM_RANGE(_BASE + 0xc, _BASE + 0xd) AM_WRITENOP \
 	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITEONLY AM_SHARE("head_layersize")
 #define ESD16_PALETTE_AREA( _BASE ) \
-	AM_RANGE(_BASE + 0x000, _BASE + 0xfff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(_BASE + 0x000, _BASE + 0xfff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 #define ESD16_SPRITE_AREA( _BASE ) \
 	AM_RANGE(_BASE + 0x000, _BASE + 0x7ff) AM_WRITEONLY AM_SHARE("spriteram") AM_MIRROR(0x000800)
 #define ESD16_VRAM_AREA( _BASE ) \
@@ -605,14 +605,14 @@ DECOSPR_PRIORITY_CB_MEMBER(esd16_state::hedpanic_pri_callback)
 		return 0; // above everything
 }
 
-static MACHINE_CONFIG_START( esd16 )
+MACHINE_CONFIG_START(esd16_state::esd16)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M68000, XTAL_16MHz)  /* 16MHz */
+	MCFG_CPU_ADD("maincpu",M68000, XTAL(16'000'000))  /* 16MHz */
 	MCFG_CPU_PROGRAM_MAP(multchmp_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", esd16_state,  irq6_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4) /* 4MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(16'000'000)/4) /* 4MHz */
 	MCFG_CPU_PROGRAM_MAP(multchmp_sound_map)
 	MCFG_CPU_IO_MAP(multchmp_sound_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(esd16_state, nmi_line_pulse, 32*60)    /* IRQ By Main CPU */
@@ -644,15 +644,15 @@ static MACHINE_CONFIG_START( esd16 )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)   /* 4MHz */
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(16'000'000)/4)   /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, PIN7_HIGH) /* 1MHz */
+	MCFG_OKIM6295_ADD("oki", XTAL(16'000'000)/16, PIN7_HIGH) /* 1MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( jumppop, esd16 )
+MACHINE_CONFIG_DERIVED(esd16_state::jumppop, esd16)
 
 	/* basic machine hardware */
 
@@ -660,20 +660,20 @@ static MACHINE_CONFIG_DERIVED( jumppop, esd16 )
 	MCFG_CPU_PROGRAM_MAP(jumppop_map)
 
 	MCFG_CPU_MODIFY("audiocpu")
-	MCFG_CPU_CLOCK( XTAL_14MHz/4) /* 3.5MHz - Verified */
+	MCFG_CPU_CLOCK( XTAL(14'000'000)/4) /* 3.5MHz - Verified */
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", jumppop)
 
-	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL_14MHz/4) /* 3.5MHz - Verified */
+	MCFG_SOUND_REPLACE("ymsnd", YM3812, XTAL(14'000'000)/4) /* 3.5MHz - Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_OKIM6295_REPLACE("oki", XTAL_14MHz/16, PIN7_HIGH) /* 875kHz - Verified */
+	MCFG_OKIM6295_REPLACE("oki", XTAL(14'000'000)/16, PIN7_HIGH) /* 875kHz - Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 /* The ESD 05-28-99 PCB adds an EEPROM */
 
-static MACHINE_CONFIG_DERIVED( hedpanio, esd16 )
+MACHINE_CONFIG_DERIVED(esd16_state::hedpanio, esd16)
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hedpanic_map)
@@ -683,19 +683,19 @@ MACHINE_CONFIG_END
 
 /* The ESD 08-26-1999 PCBs take that further and modify the sprite offsets */
 
-static MACHINE_CONFIG_DERIVED( hedpanic, hedpanio )
+MACHINE_CONFIG_DERIVED(esd16_state::hedpanic, hedpanio)
 	MCFG_DEVICE_MODIFY("spritegen")
 	MCFG_DECO_SPRITE_OFFSETS(-0x18, -0x100)
 MACHINE_CONFIG_END
 
 /* ESD 08-26-1999 PCBs with different memory maps */
 
-static MACHINE_CONFIG_DERIVED( mchampdx, hedpanic )
+MACHINE_CONFIG_DERIVED(esd16_state::mchampdx, hedpanic)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(mchampdx_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( tangtang, hedpanic )
+MACHINE_CONFIG_DERIVED(esd16_state::tangtang, hedpanic)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(tangtang_map)
 MACHINE_CONFIG_END
@@ -933,6 +933,9 @@ ROM_START( mchampdx )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "ver0106_esd4.su10", 0x00000, 0x40000, CRC(ac8ae009) SHA1(2c1c30cc4b3e34a5f14d7dfb6f6e18ff21f526f5) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(646b2f53) SHA1(f6673f68084b63a69c612a03c58f57435d5a9496) )
 ROM_END
 
 ROM_START( mchampdxa )
@@ -956,6 +959,9 @@ ROM_START( mchampdxa )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x40000, CRC(2fbe94ab) SHA1(1bc4a33ec93a80fb598722d2b50bdf3ccaaa984a) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(646b2f53) SHA1(f6673f68084b63a69c612a03c58f57435d5a9496) )
 ROM_END
 
 ROM_START( mchampdxb )
@@ -979,6 +985,9 @@ ROM_START( mchampdxb )
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x40000, CRC(2fbe94ab) SHA1(1bc4a33ec93a80fb598722d2b50bdf3ccaaa984a) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom1114", 0x0000, 0x0080, CRC(427d90d2) SHA1(39983f9b22b1e9221f7f745f7e84ddcf44d03a08) )
 ROM_END
 
 /***************************************************************************
@@ -1248,6 +1257,9 @@ ROM_START( deluxe5 ) /* Deluxe 5 */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(4539a8a0) SHA1(b882110b489e61ac5421fbe3551d9ee323b5d86b) )
 ROM_END
 
 ROM_START( deluxe5a ) /* Deluxe 5 */
@@ -1271,6 +1283,9 @@ ROM_START( deluxe5a ) /* Deluxe 5 */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(4539a8a0) SHA1(b882110b489e61ac5421fbe3551d9ee323b5d86b) )
 ROM_END
 
 ROM_START( deluxe5b ) /* Deluxe 5 */
@@ -1294,6 +1309,9 @@ ROM_START( deluxe5b ) /* Deluxe 5 */
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(4539a8a0) SHA1(b882110b489e61ac5421fbe3551d9ee323b5d86b) )
 ROM_END
 
 
@@ -1318,6 +1336,9 @@ ROM_START( deluxe4u ) /* Deluxe 4 U - Removes Blackjack game, but otherwise same
 
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
+	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(4539a8a0) SHA1(b882110b489e61ac5421fbe3551d9ee323b5d86b) )
 ROM_END
 
 

@@ -93,7 +93,7 @@ VBlank = 58Hz
 #include "sound/okim6295.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK      XTAL_12MHz
+#define MAIN_CLOCK      XTAL(12'000'000)
 #define CPU_CLOCK           MAIN_CLOCK / 6
 #define PIXEL_CLOCK     MAIN_CLOCK / 2
 
@@ -186,13 +186,13 @@ WRITE8_MEMBER(vball_state::scrollx_hi_w)
 	m_scrollx_hi = (data & 0x02) << 7;
 	bgprombank_w((data >> 2) & 0x07);
 	spprombank_w((data >> 5) & 0x07);
-	//logerror("%04x: scrollx_hi = %d\n", space.device().safe_pcbase(), m_scrollx_hi);
+	//logerror("%04x: scrollx_hi = %d\n", m_maincpu->pcbase(), m_scrollx_hi);
 }
 
 WRITE8_MEMBER(vball_state::scrollx_lo_w)
 {
 	m_scrollx_lo = data;
-	//logerror("%04x: scrollx_lo =%d\n", space.device().safe_pcbase(), m_scrollx_lo);
+	//logerror("%04x: scrollx_lo =%d\n", m_maincpu->pcbase(), m_scrollx_lo);
 }
 
 
@@ -394,7 +394,7 @@ static GFXDECODE_START( vb )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( vball )
+MACHINE_CONFIG_START(vball_state::vball)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)   /* 2 MHz - measured by guru but it makes the game far far too slow ?! */

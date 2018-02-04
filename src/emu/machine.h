@@ -229,6 +229,11 @@ public:
 	void immediate_save(const char *filename);
 	void immediate_load(const char *filename);
 
+	// rewind operations
+	bool rewind_capture();
+	bool rewind_step();
+	void rewind_invalidate();
+
 	// scheduled operations
 	void schedule_exit();
 	void schedule_hard_reset();
@@ -251,9 +256,6 @@ public:
 	std::string describe_context() const;
 	std::string compose_saveload_filename(std::string &&base_filename, const char **searchpath = nullptr);
 	std::string get_statename(const char *statename_opt) const;
-
-	// CPU information
-	cpu_device *            firstcpu;           // first CPU
 
 private:
 	// video-related information

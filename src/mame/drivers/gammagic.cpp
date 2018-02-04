@@ -45,6 +45,7 @@ public:
 		: pcat_base_state(mconfig, type, tag) { }
 
 	virtual void machine_start() override;
+	void gammagic(machine_config &config);
 };
 
 // Memory is mostly handled by the chipset
@@ -122,7 +123,7 @@ void gammagic_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( gammagic )
+MACHINE_CONFIG_START(gammagic_state::gammagic)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 133000000) // Intel Pentium 133
 	MCFG_CPU_PROGRAM_MAP(gammagic_map)
 	MCFG_CPU_IO_MAP(gammagic_io)

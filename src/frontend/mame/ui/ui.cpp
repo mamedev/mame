@@ -1200,9 +1200,14 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	// pause single step
 	if (machine().ui_input().pressed(IPT_UI_PAUSE_SINGLE))
 	{
+		machine().rewind_capture();
 		set_single_step(true);
 		machine().resume();
 	}
+
+	// rewind single step
+	if (machine().ui_input().pressed(IPT_UI_REWIND_SINGLE))
+		machine().rewind_step();
 
 	// handle a toggle cheats request
 	if (machine().ui_input().pressed(IPT_UI_TOGGLE_CHEAT))

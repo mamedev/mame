@@ -53,6 +53,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( usart_clock_tick );
 
+	void sdk80(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8251_device> m_usart;
@@ -115,9 +116,9 @@ static DEVICE_INPUT_DEFAULTS_START( terminal ) // set up terminal to default to 
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_1 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( sdk80 )
+MACHINE_CONFIG_START(sdk80_state::sdk80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8080A, XTAL_18_432MHz/9)
+	MCFG_CPU_ADD("maincpu", I8080A, XTAL(18'432'000)/9)
 	MCFG_CPU_PROGRAM_MAP(sdk80_mem)
 	MCFG_CPU_IO_MAP(sdk80_io)
 
@@ -135,7 +136,7 @@ static MACHINE_CONFIG_START( sdk80 )
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(I8251A_TAG, i8251_device, write_cts))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
-	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL_18_432MHz/60)
+	MCFG_DEVICE_ADD("usart_clock", CLOCK, XTAL(18'432'000)/60)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(sdk80_state, usart_clock_tick))
 MACHINE_CONFIG_END
 

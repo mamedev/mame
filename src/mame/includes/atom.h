@@ -38,8 +38,8 @@
 #define BASERAM_TAG     "baseram"
 
 
-#define X1  XTAL_3_579545MHz    // MC6847 Clock
-#define X2  XTAL_4MHz           // CPU Clock - a divider reduces it to 1MHz
+#define X1  XTAL(3'579'545)    // MC6847 Clock
+#define X2  XTAL(4'000'000)           // CPU Clock - a divider reduces it to 1MHz
 
 class atom_state : public driver_device
 {
@@ -118,6 +118,8 @@ public:
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
 	DECLARE_QUICKLOAD_LOAD_MEMBER(atom_atm);
+	void atombb(machine_config &config);
+	void atom(machine_config &config);
 };
 
 class atomeb_state : public atom_state
@@ -164,6 +166,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(af_load) { return load_cart(image, m_ext[0xf]); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e0_load) { return load_cart(image, m_e0); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e1_load) { return load_cart(image, m_e1); }
+	void atomeb(machine_config &config);
 };
 
 #endif // MAME_INCLUDES_ATOM_H

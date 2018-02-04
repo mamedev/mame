@@ -57,6 +57,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pb_w);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
+	void mkit09a(machine_config &config);
+	void mkit09(machine_config &config);
 private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
@@ -173,7 +175,7 @@ WRITE8_MEMBER( mkit09_state::pa_w )
 	data ^= 0xff;
 	if (m_keydata > 3)
 	{
-		output().set_digit_value(m_keydata, BITSWAP8(data, 7, 0, 5, 6, 4, 2, 1, 3));
+		output().set_digit_value(m_keydata, bitswap<8>(data, 7, 0, 5, 6, 4, 2, 1, 3));
 		m_keydata = 0;
 	}
 
@@ -189,9 +191,9 @@ WRITE8_MEMBER( mkit09_state::pb_w )
 }
 
 
-static MACHINE_CONFIG_START( mkit09 )
+MACHINE_CONFIG_START(mkit09_state::mkit09)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mkit09_mem)
 	MCFG_CPU_IO_MAP(mkit09_io)
 
@@ -215,9 +217,9 @@ static MACHINE_CONFIG_START( mkit09 )
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mkit09a )
+MACHINE_CONFIG_START(mkit09_state::mkit09a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",M6809E, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", MC6809, XTAL(4'000'000))
 	MCFG_CPU_PROGRAM_MAP(mkit09a_mem)
 	MCFG_CPU_IO_MAP(mkit09_io)
 

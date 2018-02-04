@@ -95,7 +95,7 @@ WRITE8_MEMBER(speedspn_state::okibank_w)
 
 static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, speedspn_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") /* RAM COLOUR */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette") /* RAM COLOUR */
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(attram_w) AM_SHARE("attram")
 	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(vidram_r, vidram_w)  /* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
@@ -277,7 +277,7 @@ void speedspn_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( speedspn )
+MACHINE_CONFIG_START(speedspn_state::speedspn)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,6000000)      /* 6 MHz */

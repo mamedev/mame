@@ -166,7 +166,7 @@ static SLOT_INTERFACE_START(coco_cart_slot4)
 SLOT_INTERFACE_END
 
 
-MACHINE_CONFIG_MEMBER(coco_multipak_device::device_add_mconfig)
+MACHINE_CONFIG_START(coco_multipak_device::device_add_mconfig)
 	MCFG_COCO_CARTRIDGE_ADD(SLOT1_TAG, coco_cart_slot1_3, nullptr)
 	MCFG_COCO_CARTRIDGE_CART_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_cart_w))
 	MCFG_COCO_CARTRIDGE_NMI_CB(DEVWRITELINE(DEVICE_SELF, coco_multipak_device, multi_slot1_nmi_w))

@@ -68,7 +68,7 @@ DEFINE_DEVICE_TYPE(ISA8_GAME_BLASTER, isa8_gblaster_device, "isa_gblaster", "Gam
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa8_gblaster_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_gblaster_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SAA1099_ADD("saa1099.1", 7159090)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)

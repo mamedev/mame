@@ -212,7 +212,7 @@
 
 **********************************************************************************/
 
-#define MASTER_CLOCK    XTAL_18MHz
+#define MASTER_CLOCK    XTAL(18'000'000)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -250,6 +250,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void mgames(machine_config &config);
 };
 
 
@@ -632,7 +633,7 @@ static GFXDECODE_START( mgames )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( mgames )
+MACHINE_CONFIG_START(mgames_state::mgames)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)      /* 3 MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)

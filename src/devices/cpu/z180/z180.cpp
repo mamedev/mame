@@ -52,6 +52,7 @@ Hitachi HD647180 series:
 
 #include "emu.h"
 #include "z180.h"
+#include "z180dasm.h"
 #include "debugger.h"
 
 //#define VERBOSE 1
@@ -89,13 +90,10 @@ z180_device::z180_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-
-offs_t z180_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *z180_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( z180 );
-	return CPU_DISASSEMBLE_NAME(z180)(this, stream, pc, oprom, opram, options);
+	return new z180_disassembler;
 }
-
 
 #define CF  0x01
 #define NF  0x02
@@ -683,7 +681,7 @@ bool z180_device::get_tend1()
 
 /* 36 refresh control register */
 #define Z180_RCR_REFE           0x80
-#define Z180_RCR_REFW           0x80
+#define Z180_RCR_REFW           0x40
 #define Z180_RCR_CYC            0x03
 
 #define Z180_RCR_RESET          0xc0
@@ -1602,6 +1600,7 @@ int z180_device::z180_dma0(int max_cycles)
 
 	while (count > 0)
 	{
+		m_extra_cycles = 0;
 		/* last transfer happening now? */
 		if (bcr0 == 1)
 		{
@@ -1611,20 +1610,24 @@ int z180_device::z180_dma0(int max_cycles)
 		{
 		case 0x00:  /* memory SAR0+1 to memory DAR0+1 */
 			m_program->write_byte(dar0++, m_program->read_byte(sar0++));
+			cycles += (IO_DCNTL >> 6) * 2; // memory wait states
 			bcr0--;
 			break;
 		case 0x04:  /* memory SAR0-1 to memory DAR0+1 */
 			m_program->write_byte(dar0++, m_program->read_byte(sar0--));
+			cycles += (IO_DCNTL >> 6) * 2; // memory wait states
 			bcr0--;
 			break;
 		case 0x08:  /* memory SAR0 fixed to memory DAR0+1 */
 			m_program->write_byte(dar0++, m_program->read_byte(sar0));
+			cycles += (IO_DCNTL >> 6) * 2; // memory wait states
 			bcr0--;
 			break;
 		case 0x0c:  /* I/O SAR0 fixed to memory DAR0+1 */
 			if (m_iol & Z180_DREQ0)
 			{
 				m_program->write_byte(dar0++, IN(sar0));
+				cycles += IO_DCNTL >> 6; // memory wait states
 				bcr0--;
 				/* edge sensitive DREQ0 ? */
 				if (IO_DCNTL & Z180_DCNTL_DMS0)
@@ -1636,20 +1639,24 @@ int z180_device::z180_dma0(int max_cycles)
 			break;
 		case 0x10:  /* memory SAR0+1 to memory DAR0-1 */
 			m_program->write_byte(dar0--, m_program->read_byte(sar0++));
+			cycles += (IO_DCNTL >> 6) * 2; // memory wait states
 			bcr0--;
 			break;
 		case 0x14:  /* memory SAR0-1 to memory DAR0-1 */
 			m_program->write_byte(dar0--, m_program->read_byte(sar0--));
+			cycles += (IO_DCNTL >> 6) * 2; // memory wait states
 			bcr0--;
 			break;
 		case 0x18:  /* memory SAR0 fixed to memory DAR0-1 */
 			m_program->write_byte(dar0--, m_program->read_byte(sar0));
+			cycles += (IO_DCNTL >> 6) * 2; // memory wait states
 			bcr0--;
 			break;
 		case 0x1c:  /* I/O SAR0 fixed to memory DAR0-1 */
 			if (m_iol & Z180_DREQ0)
 			{
 				m_program->write_byte(dar0--, IN(sar0));
+				cycles += IO_DCNTL >> 6; // memory wait states
 				bcr0--;
 				/* edge sensitive DREQ0 ? */
 				if (IO_DCNTL & Z180_DCNTL_DMS0)
@@ -1661,10 +1668,12 @@ int z180_device::z180_dma0(int max_cycles)
 			break;
 		case 0x20:  /* memory SAR0+1 to memory DAR0 fixed */
 			m_program->write_byte(dar0, m_program->read_byte(sar0++));
+			cycles += (IO_DCNTL >> 6) * 2; // memory wait states
 			bcr0--;
 			break;
 		case 0x24:  /* memory SAR0-1 to memory DAR0 fixed */
 			m_program->write_byte(dar0, m_program->read_byte(sar0--));
+			cycles += (IO_DCNTL >> 6) * 2; // memory wait states
 			bcr0--;
 			break;
 		case 0x28:  /* reserved */
@@ -1675,6 +1684,7 @@ int z180_device::z180_dma0(int max_cycles)
 			if (m_iol & Z180_DREQ0)
 			{
 				OUT(dar0, m_program->read_byte(sar0++));
+				cycles += IO_DCNTL >> 6; // memory wait states
 				bcr0--;
 				/* edge sensitive DREQ0 ? */
 				if (IO_DCNTL & Z180_DCNTL_DMS0)
@@ -1688,6 +1698,7 @@ int z180_device::z180_dma0(int max_cycles)
 			if (m_iol & Z180_DREQ0)
 			{
 				OUT(dar0, m_program->read_byte(sar0--));
+				cycles += IO_DCNTL >> 6; // memory wait states
 				bcr0--;
 				/* edge sensitive DREQ0 ? */
 				if (IO_DCNTL & Z180_DCNTL_DMS0)
@@ -1703,7 +1714,7 @@ int z180_device::z180_dma0(int max_cycles)
 			break;
 		}
 		count--;
-		cycles += 6;
+		cycles += 6 + m_extra_cycles; // use extra_cycles for I/O wait states
 		if (cycles > max_cycles)
 			break;
 	}
@@ -1756,6 +1767,8 @@ int z180_device::z180_dma1()
 		m_iol |= Z180_TEND1;
 	}
 
+	m_extra_cycles = 0;
+
 	switch (IO_DCNTL & (Z180_DCNTL_DIM1 | Z180_DCNTL_DIM0))
 	{
 	case 0x00:  /* memory MAR1+1 to I/O IAR1 fixed */
@@ -1771,6 +1784,9 @@ int z180_device::z180_dma1()
 		m_program->write_byte(mar1--, m_iospace->read_byte(iar1));
 		break;
 	}
+
+	cycles += IO_DCNTL >> 6; // memory wait states
+	cycles += m_extra_cycles; // use extra_cycles for I/O wait states
 
 	/* edge sensitive DREQ1 ? */
 	if (IO_DCNTL & Z180_DCNTL_DIM1)
@@ -1919,7 +1935,6 @@ void z180_device::z180_write_iolines(uint32_t data)
 	}
 }
 
-
 void z180_device::device_start()
 {
 	int i, p;
@@ -2001,9 +2016,9 @@ void z180_device::device_start()
 	}
 
 	m_program = &space(AS_PROGRAM);
-	m_direct = &m_program->direct();
+	m_direct = m_program->direct<0>();
 	m_oprogram = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	m_odirect = &m_oprogram->direct();
+	m_odirect = m_oprogram->direct<0>();
 	m_iospace = &space(AS_IO);
 
 	/* set up the state table */
@@ -2503,14 +2518,16 @@ again:
  ****************************************************************************/
 void z180_device::execute_burn(int32_t cycles)
 {
+	int extra_cycles = IO_DCNTL >> 6; // memory wait states
+
 	/* FIXME: This is not appropriate for dma */
 	while ( (cycles > 0) )
 	{
-		handle_io_timers(3);
+		handle_io_timers(3 + extra_cycles);
 		/* NOP takes 3 cycles per instruction */
 		m_R += 1;
-		m_icount -= 3;
-		cycles -= 3;
+		m_icount -= 3 + extra_cycles;
+		cycles -= 3 + extra_cycles;
 	}
 }
 

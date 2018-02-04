@@ -45,6 +45,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ppi0b_w);
 	DECLARE_WRITE8_MEMBER(sndcmd_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	void jeutel(machine_config &config);
 private:
 	bool m_timer_a;
 	uint8_t m_sndcmd;
@@ -184,7 +185,7 @@ DRIVER_INIT_MEMBER( jeutel_state, jeutel )
 {
 }
 
-static MACHINE_CONFIG_START( jeutel )
+MACHINE_CONFIG_START(jeutel_state::jeutel)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 3300000)
 	MCFG_CPU_PROGRAM_MAP(jeutel_map)

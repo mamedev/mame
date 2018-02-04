@@ -31,11 +31,11 @@ public:
 	DECLARE_WRITE8_MEMBER(shared_ram_w);
 	DECLARE_READ8_MEMBER(tms_ctrl_r);
 	DECLARE_WRITE8_MEMBER(tms_ctrl_w);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	// inherited devices/pointers
@@ -49,8 +49,6 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(TAITO_ZOOM, taito_zoom_device)
-
-MACHINE_CONFIG_EXTERN( taito_zoom_sound );
 
 #define MCFG_TAITO_ZOOM_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, TAITO_ZOOM, 0)

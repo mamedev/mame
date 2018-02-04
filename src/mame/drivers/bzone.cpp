@@ -535,7 +535,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( bzone_base )
+MACHINE_CONFIG_START(bzone_state::bzone_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
@@ -560,7 +560,7 @@ static MACHINE_CONFIG_START( bzone_base )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( bzone, bzone_base )
+MACHINE_CONFIG_DERIVED(bzone_state::bzone, bzone_base)
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(bzone_audio)
@@ -569,7 +569,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( redbaron, bzone_base )
+MACHINE_CONFIG_DERIVED(bzone_state::redbaron, bzone_base)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

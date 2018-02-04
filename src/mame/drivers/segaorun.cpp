@@ -287,9 +287,9 @@ Notes:
 //  CONSTANTS
 //**************************************************************************
 
-const uint32_t MASTER_CLOCK = XTAL_40MHz;
-const uint32_t SOUND_CLOCK = XTAL_16MHz;
-const uint32_t MASTER_CLOCK_25MHz = XTAL_25_1748MHz;
+const auto MASTER_CLOCK = XTAL(40'000'000);
+const auto SOUND_CLOCK = XTAL(16'000'000);
+const auto MASTER_CLOCK_25MHz = XTAL(25'174'800);
 
 //**************************************************************************
 //  PPI READ/WRITE CALLBACKS
@@ -508,7 +508,7 @@ READ16_MEMBER( segaorun_state::misc_io_r )
 	if (!m_custom_io_r.isnull())
 		return m_custom_io_r(space, offset, mem_mask);
 
-	logerror("%06X:misc_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
+	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return open_bus_r(space, 0, mem_mask);
 }
 
@@ -525,7 +525,7 @@ WRITE16_MEMBER( segaorun_state::misc_io_w )
 		return;
 	}
 
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -705,7 +705,7 @@ READ16_MEMBER( segaorun_state::outrun_custom_io_r )
 			break;
 	}
 
-	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
+	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return open_bus_r(space, 0, mem_mask);
 }
 
@@ -757,7 +757,7 @@ WRITE16_MEMBER( segaorun_state::outrun_custom_io_w )
 			break;
 	}
 
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -788,7 +788,7 @@ READ16_MEMBER( segaorun_state::shangon_custom_io_r )
 			break;
 	}
 
-	logerror("%06X:misc_io_r - unknown read access to address %04X\n", space.device().safe_pc(), offset * 2);
+	logerror("%06X:misc_io_r - unknown read access to address %04X\n", m_maincpu->pc(), offset * 2);
 	return open_bus_r(space,0,mem_mask);
 }
 
@@ -840,7 +840,7 @@ WRITE16_MEMBER( segaorun_state::shangon_custom_io_w )
 			break;
 	}
 
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", space.device().safe_pc(), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", m_maincpu->pc(), offset * 2, data, mem_mask);
 }
 
 
@@ -1183,7 +1183,7 @@ GFXDECODE_END
 //  GENERIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_START( outrun_base )
+MACHINE_CONFIG_START(segaorun_state::outrun_base)
 
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -1244,7 +1244,7 @@ MACHINE_CONFIG_END
 //  GAME-SPECIFIC MACHINE DRIVERS
 //**************************************************************************
 
-static MACHINE_CONFIG_DERIVED( outrundx, outrun_base )
+MACHINE_CONFIG_DERIVED(segaorun_state::outrundx, outrun_base)
 
 	// basic machine hardware
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("bankmotor", segaorun_state, bankmotor_update, attotime::from_msec(10))
@@ -1253,13 +1253,13 @@ static MACHINE_CONFIG_DERIVED( outrundx, outrun_base )
 	MCFG_SEGA_OUTRUN_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( outrun, outrundx )
+MACHINE_CONFIG_DERIVED(segaorun_state::outrun, outrundx)
 
 	// basic machine hardware
 	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( outrun_fd1094, outrun )
+MACHINE_CONFIG_DERIVED(segaorun_state::outrun_fd1094, outrun)
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1094, MASTER_CLOCK/4)
@@ -1267,7 +1267,7 @@ static MACHINE_CONFIG_DERIVED( outrun_fd1094, outrun )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( outrun_fd1089a, outrun )
+MACHINE_CONFIG_DERIVED(segaorun_state::outrun_fd1089a, outrun)
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1089A, MASTER_CLOCK/4)
@@ -1275,7 +1275,7 @@ static MACHINE_CONFIG_DERIVED( outrun_fd1089a, outrun )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( shangon, outrun_base )
+MACHINE_CONFIG_DERIVED(segaorun_state::shangon, outrun_base)
 
 	// basic machine hardware
 	MCFG_DEVICE_REMOVE("i8255")
@@ -1297,7 +1297,7 @@ static MACHINE_CONFIG_DERIVED( shangon, outrun_base )
 	MCFG_SEGA_SYS16B_SPRITES_ADD("sprites")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( shangon_fd1089b, shangon )
+MACHINE_CONFIG_DERIVED(segaorun_state::shangon_fd1089b, shangon)
 
 	// basic machine hardware
 	MCFG_CPU_REPLACE("maincpu", FD1089B, MASTER_CLOCK/4)
@@ -2964,13 +2964,13 @@ DRIVER_INIT_MEMBER(segaorun_state,outrunb)
 	uint16_t *word = (uint16_t *)memregion("maincpu")->base();
 	uint32_t length = memregion("maincpu")->bytes() / 2;
 	for (uint32_t i = 0; i < length; i++)
-		word[i] = BITSWAP16(word[i], 15,14,11,12,13,10,9,8,6,7,5,4,3,2,1,0);
+		word[i] = bitswap<16>(word[i], 15,14,11,12,13,10,9,8,6,7,5,4,3,2,1,0);
 
 	// sub CPU: swap bits 14,15 and 2,3
 	word = (uint16_t *)memregion("subcpu")->base();
 	length = memregion("subcpu")->bytes() / 2;
 	for (uint32_t i = 0; i < length; i++)
-		word[i] = BITSWAP16(word[i], 14,15,13,12,11,10,9,8,7,6,5,4,2,3,1,0);
+		word[i] = bitswap<16>(word[i], 14,15,13,12,11,10,9,8,7,6,5,4,2,3,1,0);
 
 	// road gfx
 	// rom a-2.bin: swap bits 6,7
@@ -2979,15 +2979,15 @@ DRIVER_INIT_MEMBER(segaorun_state,outrunb)
 	length = memregion("gfx3")->bytes() / 2;
 	for (uint32_t i = 0; i < length; i++)
 	{
-		byte[i]        = BITSWAP8(byte[i],        6,7,5,4,3,2,1,0);
-		byte[i+length] = BITSWAP8(byte[i+length], 7,5,6,4,3,2,1,0);
+		byte[i]        = bitswap<8>(byte[i],        6,7,5,4,3,2,1,0);
+		byte[i+length] = bitswap<8>(byte[i+length], 7,5,6,4,3,2,1,0);
 	}
 
 	// Z80 code: swap bits 5,6
 	byte = memregion("soundcpu")->base();
 	length = memregion("soundcpu")->bytes();
 	for (uint32_t i = 0; i < length; i++)
-		byte[i] = BITSWAP8(byte[i], 7,5,6,4,3,2,1,0);
+		byte[i] = bitswap<8>(byte[i], 7,5,6,4,3,2,1,0);
 }
 
 DRIVER_INIT_MEMBER(segaorun_state,shangon)

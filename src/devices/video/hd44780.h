@@ -22,7 +22,7 @@
 	hd44780_device::static_set_lcd_size(*device, _lines, _chars);
 
 #define MCFG_HD44780_PIXEL_UPDATE_CB(_class, _method) \
-	hd44780_device::static_set_pixel_update_cb(*device, hd44780_device::pixel_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	hd44780_device::static_set_pixel_update_cb(*device, hd44780_device::pixel_update_delegate(&_class::_method, #_class "::" #_method, this));
 
 //**************************************************************************
 //  TYPE DEFINITIONS

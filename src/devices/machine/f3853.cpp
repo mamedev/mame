@@ -53,19 +53,11 @@ f3853_device::f3853_device(const machine_config &mconfig, const char *tag, devic
 
 void f3853_device::device_start()
 {
-	uint8_t reg = 0xfe;
-	for(int32_t i=254 /* Known to get 0xfe after 255 cycles */; i >= 0; i--)
+	uint8_t reg = 0xfe; // Known to get 0xfe after 255 cycles
+	for(int i = reg; i >= 0; i--)
 	{
-		int32_t o7 = (reg & 0x80) ? true : false;
-		int32_t o5 = (reg & 0x20) ? true : false;
-		int32_t o4 = (reg & 0x10) ? true : false;
-		int32_t o3 = (reg & 0x08) ? true : false;
 		m_value_to_cycle[reg] = i;
-		reg <<= 1;
-		if (!((o7 != o5) != (o4 != o3)))
-		{
-			reg |= 1;
-		}
+		reg = reg << 1 | (BIT(reg,7) ^ BIT(reg,5) ^ BIT(reg,4) ^ BIT(reg,3) ^ 1);
 	}
 
 	m_interrupt_req_cb.bind_relative_to(*owner());

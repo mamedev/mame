@@ -115,6 +115,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( exelvision_cartridge );
+	void exeltel(machine_config &config);
+	void exl100(machine_config &config);
 };
 
 
@@ -473,10 +475,10 @@ MACHINE_START_MEMBER( exelv_state, exeltel)
 }
 
 
-static MACHINE_CONFIG_START( exl100 )
+MACHINE_CONFIG_START(exelv_state::exl100)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS7020_EXL, XTAL_4_9152MHz)
+	MCFG_CPU_ADD("maincpu", TMS7020_EXL, XTAL(4'915'200))
 	MCFG_CPU_PROGRAM_MAP(tms7020_mem)
 	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7020_porta_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7020_portb_w))
@@ -484,7 +486,7 @@ static MACHINE_CONFIG_START( exl100 )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exl100)
 
-	MCFG_CPU_ADD("tms7041", TMS7041, XTAL_4_9152MHz)
+	MCFG_CPU_ADD("tms7041", TMS7041, XTAL(4'915'200))
 	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7041_porta_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7041_portb_w))
 	MCFG_TMS7000_IN_PORTC_CB(READ8(exelv_state, tms7041_portc_r))
@@ -529,10 +531,10 @@ static MACHINE_CONFIG_START( exl100 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( exeltel )
+MACHINE_CONFIG_START(exelv_state::exeltel)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS7040, XTAL_4_9152MHz)
+	MCFG_CPU_ADD("maincpu", TMS7040, XTAL(4'915'200))
 	MCFG_CPU_PROGRAM_MAP(tms7040_mem)
 	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7020_porta_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7020_portb_w))
@@ -540,7 +542,7 @@ static MACHINE_CONFIG_START( exeltel )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", exelv_state, exelv_hblank_interrupt, "screen", 0, 1)
 	MCFG_MACHINE_START_OVERRIDE(exelv_state, exeltel)
 
-	MCFG_CPU_ADD("tms7042", TMS7042, XTAL_4_9152MHz)
+	MCFG_CPU_ADD("tms7042", TMS7042, XTAL(4'915'200))
 	MCFG_TMS7000_IN_PORTA_CB(READ8(exelv_state, tms7041_porta_r))
 	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(exelv_state, tms7041_portb_w))
 	MCFG_TMS7000_IN_PORTC_CB(READ8(exelv_state, tms7041_portc_r))

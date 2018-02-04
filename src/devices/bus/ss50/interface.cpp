@@ -1,0 +1,222 @@
+// license:BSD-3-Clause
+// copyright-holders:AJR
+/**********************************************************************
+
+    SWTPC SS-50 I/O port interface
+
+    The SS-50 bus is actually two buses in one: a 50-pin master bus
+    used by RAM boards and such, and a 30-pin I/O bus derived from it
+    either on the motherboard or a dedicated interface board, which
+    provides each of eight "interface" cards with its specific chip
+    select line and only a few address lines for register selection.
+    This 30-pin bus is what is emulated here.
+
+    As originally introduced in the 6800 Computer System, the
+    interface bus only included two register select lines, just enough
+    to drive one MC6820 PIA. No defined signals were placed on the
+    first two lines, which cards were permitted to use for any
+    purpose. The original MP-B motherboard also quite wastefully
+    reserved 8K (technically 4K) of address space to map a maximum of
+    32 read/write registers. The later MC6809-oriented systems not
+    only reduced the I/O segment to a selectable 1K, but appropriated
+    the two formerly undefined lines for two additional register
+    select lines, making it possible to use more complex interface
+    cards but breaking compatibility with some earlier ones.
+
+    An unusual feature of the SS-50 bus is the presence of five baud
+    rate frequencies, selected from among the (inverted) outputs of
+    a MC14411 Bit Rate Generator. The 6800 Computer System provided
+    only rates between 110 and 1200 (multiplied by 16), and also used
+    the MC14411's master frequency to generate the CPU clocks. The
+    MP-09 CPU board retained the MC14411 at first, but provided an
+    independent XTAL for the MC6809 and jumpers to select higher
+    baud rates. Later the MC14411 was removed from the CPU board so
+    the five baud rate lines on the 50-pin bus could be reused to
+    provide 20-bit addressing and DMA. This was accomplished by
+    adding a separate MP-ID Interface Driver Board to decode I/O
+    accesses (and optionally slow them down to allow old 1 MHz
+    peripherals to be used with a faster CPU), generate the baud
+    rates (whose selection was changed yet again) from a dedicated
+    MC14411, and provide a few I/O functions of its own.
+
+***********************************************************************
+
+                        +-+
+                        |o| RS2 (originally UD3)
+                        |o| RS3 (originally UD4)
+                        |o| -16V (originally -12V)
+                        |o| +16V (originally +12V)
+                        |o| GND
+                        |o| GND
+                        |o| INDEX
+                        |o| /FIRQ (6800: /NMI)
+                        |o| /IRQ
+                        |o| RS0
+                        |o| RS1
+                        |o| D0
+                        |o| D1
+                        |o| D2
+                        |o| D3
+                        |o| D4
+                        |o| D5
+                        |o| D6
+                        |o| D7
+                        |o| E (6800: ϕ2)
+                        |o| R/W
+                        |o| +8V (unregulated)
+                        |o| +8V (unregulated)
+                        |o| 600b/1200b (originally 1200b)
+                        |o| 4800b (originally 600b)
+                        |o| 300b
+                        |o| 150b/9600b (originally 150b)
+                        |o| 110b
+                        |o| /RESET
+                        |o| I/O #
+                        +-+
+
+**********************************************************************/
+
+#include "emu.h"
+#include "bus/ss50/interface.h"
+
+#include "bus/ss50/mpc.h"
+//#include "bus/ss50/mpl.h"
+//#include "bus/ss50/mpr.h"
+#include "bus/ss50/mps.h"
+//#include "bus/ss50/mpt.h"
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// device type definition
+DEFINE_DEVICE_TYPE(SS50_INTERFACE, ss50_interface_port_device, "ss50_interface", "SS-50 Interface Port")
+
+//**************************************************************************
+//  SS-50 INTERFACE PORT DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  ss50_interface_port_device - construction
+//-------------------------------------------------
+
+ss50_interface_port_device::ss50_interface_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, SS50_INTERFACE, tag, owner, clock),
+		device_slot_interface(mconfig, *this),
+		m_irq_cb(*this),
+		m_firq_cb(*this),
+		m_card(nullptr)
+{
+}
+
+//-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void ss50_interface_port_device::device_resolve_objects()
+{
+	logerror("Resolving objects...\n");
+
+	m_irq_cb.resolve_safe();
+	m_firq_cb.resolve_safe();
+
+	m_card = dynamic_cast<ss50_card_interface *>(get_card_device());
+	if (m_card != nullptr)
+		m_card->m_slot = this;
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ss50_interface_port_device::device_start()
+{
+}
+
+//-------------------------------------------------
+//  read - interface read access (pre-decoded)
+//-------------------------------------------------
+
+READ8_MEMBER(ss50_interface_port_device::read)
+{
+	if (m_card == nullptr)
+	{
+		logerror("%s: Read from unspecified interface (RS = %X)\n", machine().describe_context(), offset);
+		return space.unmap();
+	}
+
+	return m_card->register_read(space, offset);
+}
+
+//-------------------------------------------------
+//  write - interface write access (pre-decoded)
+//-------------------------------------------------
+
+WRITE8_MEMBER(ss50_interface_port_device::write)
+{
+	if (m_card == nullptr)
+	{
+		logerror("%s: Write to unspecified interface (RS = %X, D = %02X)\n", machine().describe_context(), offset, data);
+		return;
+	}
+
+	m_card->register_write(space, offset, data);
+}
+
+//-------------------------------------------------
+//  fN_w - baud rate clocks for serial interfaces
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER(ss50_interface_port_device::f110_w)
+{
+	if (m_card != nullptr)
+		m_card->f110_w(state);
+}
+
+WRITE_LINE_MEMBER(ss50_interface_port_device::f150_9600_w)
+{
+	if (m_card != nullptr)
+		m_card->f150_9600_w(state);
+}
+
+WRITE_LINE_MEMBER(ss50_interface_port_device::f300_w)
+{
+	if (m_card != nullptr)
+		m_card->f300_w(state);
+}
+
+WRITE_LINE_MEMBER(ss50_interface_port_device::f600_4800_w)
+{
+	if (m_card != nullptr)
+		m_card->f600_4800_w(state);
+}
+
+WRITE_LINE_MEMBER(ss50_interface_port_device::f600_1200_w)
+{
+	if (m_card != nullptr)
+		m_card->f600_1200_w(state);
+}
+
+//**************************************************************************
+//  SS-50 CARD INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  ss50_card_interface - construction
+//-------------------------------------------------
+
+ss50_card_interface::ss50_card_interface(const machine_config &mconfig, device_t &device)
+	: device_slot_card_interface(mconfig, device),
+		m_slot(nullptr)
+{
+}
+
+SLOT_INTERFACE_START(ss50_default_2rs_devices)
+	SLOT_INTERFACE("mpc", SS50_MPC)
+	//SLOT_INTERFACE("mpl", SS50_MPL)
+	//SLOT_INTERFACE("mpn", SS50_MPN)
+	SLOT_INTERFACE("mps", SS50_MPS)
+	//SLOT_INTERFACE("mpt", SS50_MPT)
+SLOT_INTERFACE_END

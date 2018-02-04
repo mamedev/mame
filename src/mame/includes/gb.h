@@ -89,6 +89,11 @@ public:
 	DECLARE_WRITE8_MEMBER(gb_echo_w);
 	optional_device<gb_cart_slot_device> m_cartslot;
 
+	void supergb(machine_config &config);
+	void supergb2(machine_config &config);
+	void gbcolor(machine_config &config);
+	void gbpocket(machine_config &config);
+	void gameboy(machine_config &config);
 protected:
 	enum {
 		SIO_ENABLED = 0x80,
@@ -142,6 +147,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bank1_w);
 	DECLARE_WRITE8_MEMBER(bank2_w);
 	optional_device<megaduck_cart_slot_device> m_cartslot;
+	void megaduck(machine_config &config);
 };
 
 

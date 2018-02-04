@@ -204,6 +204,10 @@ public:
 	void multigm3_decrypt(uint8_t* mem, int memsize, const uint8_t* decode_nibble);
 	void multigam3_mmc3_scanline_cb(int scanline, int vblank, int blanked);
 	void ppu_irq(int *ppu_regs);
+	void multigam(machine_config &config);
+	void supergm3(machine_config &config);
+	void multigmt(machine_config &config);
+	void multigm3(machine_config &config);
 };
 
 
@@ -401,8 +405,8 @@ static ADDRESS_MAP_START( multigam_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
 	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)      /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5000, 0x5ffe) AM_ROM
+	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 	AM_RANGE(0x6fff, 0x6fff) AM_WRITE(multigam_switch_prg_rom)
@@ -413,14 +417,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( multigmt_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM /* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(multigam_switch_prg_rom)
 	AM_RANGE(0x3fff, 0x3fff) AM_WRITE(multigam_switch_gfx_rom)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)   /* IN0 - input port 1 */
 	AM_RANGE(0x4017, 0x4017) AM_READ(multigam_IN1_r)     /* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5000, 0x5ffe) AM_ROM
+	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigam_mapper2_w)
@@ -1212,7 +1216,7 @@ MACHINE_START_MEMBER(multigam_state,supergm3)
 	m_multigmc_mmc3_6000_ram = std::make_unique<uint8_t[]>(0x2000);
 }
 
-static MACHINE_CONFIG_START( multigam )
+MACHINE_CONFIG_START(multigam_state::multigam)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(multigam_map)
@@ -1238,7 +1242,7 @@ static MACHINE_CONFIG_START( multigam )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( multigm3, multigam )
+MACHINE_CONFIG_DERIVED(multigam_state::multigm3, multigam)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(multigm3_map)
 
@@ -1246,12 +1250,12 @@ static MACHINE_CONFIG_DERIVED( multigm3, multigam )
 	MCFG_MACHINE_RESET_OVERRIDE(multigam_state, multigm3 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( multigmt, multigam )
+MACHINE_CONFIG_DERIVED(multigam_state::multigmt, multigam)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(multigmt_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( supergm3, multigam )
+MACHINE_CONFIG_DERIVED(multigam_state::supergm3, multigam)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(supergm3_map)
 
@@ -1433,7 +1437,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 	memcpy(&buf[0], rom, size);
 	for (i = 0; i < size; i++)
 	{
-		addr = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
+		addr = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
 		rom[i] = buf[addr];
 	}
 
@@ -1442,7 +1446,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 	memcpy(&buf[0], rom, size);
 	for (i = 0; i < size; i++)
 	{
-		addr = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
+		addr = bitswap<24>(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
 		rom[i] = buf[addr];
 	}
 	rom = memregion("gfx1")->base();
@@ -1450,8 +1454,8 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 	memcpy(&buf[0], rom, size);
 	for (i = 0; i < size; i++)
 	{
-		addr = BITSWAP24(i,23,22,21,20,19,18,17,15,16,11,10,12,13,14,8,9,1,3,5,7,6,4,2,0);
-		rom[i] = BITSWAP8(buf[addr], 4, 7, 3, 2, 5, 1, 6, 0);
+		addr = bitswap<24>(i,23,22,21,20,19,18,17,15,16,11,10,12,13,14,8,9,1,3,5,7,6,4,2,0);
+		rom[i] = bitswap<8>(buf[addr], 4, 7, 3, 2, 5, 1, 6, 0);
 	}
 
 	multigam_switch_prg_rom(space, 0x0, 0x01);

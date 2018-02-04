@@ -40,8 +40,8 @@
 #include "speaker.h"
 
 
-#define MASTER_CLOCK (XTAL_12_096MHz)
-#define CLOCK_3KHZ   ((double)MASTER_CLOCK / 4096)
+#define MASTER_CLOCK (XTAL(12'096'000))
+#define CLOCK_3KHZ   (MASTER_CLOCK / 4096)
 
 
 WRITE8_MEMBER(starwars_state::quad_pokeyn_w)
@@ -161,9 +161,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( esb_main_map, AS_PROGRAM, 8, starwars_state )
+	AM_IMPORT_FROM(main_map)
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(esb_slapstic_r, esb_slapstic_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROMBANK("bank2")
-	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
 
@@ -299,17 +299,17 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( starwars )
+MACHINE_CONFIG_START(starwars_state::starwars)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 8)
+	MCFG_CPU_ADD("maincpu", MC6809E, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(starwars_state, irq0_line_assert, CLOCK_3KHZ / 12)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 128))
 
-	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK / 8)
+	MCFG_CPU_ADD("audiocpu", MC6809E, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_DEVICE_ADD("riot", RIOT6532, MASTER_CLOCK / 8)
@@ -370,7 +370,7 @@ static MACHINE_CONFIG_START( starwars )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( esb, starwars )
+MACHINE_CONFIG_DERIVED(starwars_state::esb, starwars)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(esb_main_map)
 

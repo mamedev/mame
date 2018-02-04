@@ -58,12 +58,12 @@ SLOT_INTERFACE_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( nes_horitwin_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_horitwin_device::device_add_mconfig)
 	MCFG_FC_EXPANSION_PORT_ADD("port1", hori_adapter, "joypad")
 	MCFG_FC_EXPANSION_PORT_ADD("port2", hori_adapter, "joypad")
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_MEMBER( nes_hori4p_device::device_add_mconfig )
+MACHINE_CONFIG_START(nes_hori4p_device::device_add_mconfig)
 	MCFG_FC_EXPANSION_PORT_ADD("port1", hori_adapter, "joypad")
 	MCFG_FC_EXPANSION_PORT_ADD("port2", hori_adapter, "joypad")
 	MCFG_FC_EXPANSION_PORT_ADD("port3", hori_adapter, "joypad")

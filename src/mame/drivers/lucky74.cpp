@@ -773,7 +773,7 @@
 #include "lucky74.lh"
 
 
-#define MASTER_CLOCK        XTAL_12MHz      /* confirmed */
+#define MASTER_CLOCK        XTAL(12'000'000)      /* confirmed */
 
 /* custom 06B49P clocks */
 #define C_06B49P_CLKOUT_01  (MASTER_CLOCK/2)        /* 6 MHz. */
@@ -1461,7 +1461,7 @@ WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( lucky74 )
+MACHINE_CONFIG_START(lucky74_state::lucky74)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, C_06B49P_CLKOUT_03)    /* 3 MHz. */

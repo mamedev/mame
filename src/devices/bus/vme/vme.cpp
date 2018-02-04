@@ -266,7 +266,7 @@ void vme_device::device_start()
 		LOG(" - using owner memory spaces for %s\n", m_cputag);
 		m_maincpu = owner()->subdevice<cpu_device>(m_cputag);
 		m_prgspace = &m_maincpu->space(AS_PROGRAM);
-		m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
+		m_prgwidth = m_maincpu->space_config(AS_PROGRAM)->m_data_width;
 		LOG(" - Done at %d width\n", m_prgwidth);
 	}
 }

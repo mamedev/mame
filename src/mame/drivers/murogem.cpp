@@ -137,6 +137,7 @@ public:
 	DECLARE_PALETTE_INIT(murogem);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void murogem(machine_config &config);
 };
 
 
@@ -245,7 +246,7 @@ uint32_t murogem_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-static MACHINE_CONFIG_START( murogem )
+MACHINE_CONFIG_START(murogem_state::murogem)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6802, 8000000)      /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(murogem_map)

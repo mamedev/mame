@@ -17,7 +17,7 @@
 	MCFG_DEVICE_REPLACE(_tag, CEM3394, _clock)
 
 #define MCFG_CEM3394_EXT_INPUT_CB(_class, _method) \
-	cem3394_device::set_ext_input_callback(*device, cem3394_device::ext_input_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	cem3394_device::set_ext_input_callback(*device, cem3394_device::ext_input_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_CEM3394_VCO_ZERO(_freq) \
 	cem3394_device::set_vco_zero_freq(*device, _freq);

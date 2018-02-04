@@ -13,7 +13,7 @@ Template for skeleton drivers
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_8MHz
+#define MAIN_CLOCK XTAL(8'000'000)
 
 class xxx_state : public driver_device
 {
@@ -27,6 +27,8 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(xxx);
+
+	void xxx(machine_config &config);
 
 protected:
 	// driver_device overrides
@@ -141,7 +143,7 @@ PALETTE_INIT_MEMBER(xxx_state, xxx)
 {
 }
 
-static MACHINE_CONFIG_START( xxx )
+MACHINE_CONFIG_START(xxx_state::xxx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80,MAIN_CLOCK/2)
@@ -156,7 +158,7 @@ static MACHINE_CONFIG_START( xxx )
 //  MCFG_SCREEN_SIZE(32*8, 32*8)
 //  MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK/2, 442, 0, 320, 264, 0, 240)          /* generic NTSC video timing at 320x240 */
-	//MCFG_SCREEN_RAW_PARAMS(XTAL_12MHz/2, 384, 0, 256, 264, 16, 240)  /* generic NTSC video timing at 256x224 */
+	//MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000)/2, 384, 0, 256, 264, 16, 240)  /* generic NTSC video timing at 256x224 */
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xxx)

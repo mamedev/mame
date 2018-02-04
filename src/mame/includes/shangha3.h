@@ -60,4 +60,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void shangha3(machine_config &config);
+	void heberpop(machine_config &config);
+	void blocken(machine_config &config);
 };

@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x112000, 0x1127ff) AM_RAM AM_SHARE("pf2_rowscroll")
 
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x130000, 0x130fff) AM_RAM_DEVWRITE("deco_common", decocomn_device, nonbuffered_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x130000, 0x130fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 
 	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
 	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8("oki1", okim6295_device, read, 0x00ff)
@@ -138,7 +138,7 @@ READ16_MEMBER(pktgaldx_state::pckgaldx_unknown_r)
 
 READ16_MEMBER(pktgaldx_state::pckgaldx_protection_r)
 {
-	logerror("pckgaldx_protection_r address %06x\n",space.device().safe_pc());
+	logerror("pckgaldx_protection_r address %06x\n",m_maincpu->pc());
 	return -1;
 }
 
@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 
 	AM_RANGE(0x300000, 0x30000f) AM_RAM // ??
 
-	AM_RANGE(0x330000, 0x330bff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette") // extra colours?
+	AM_RANGE(0x330000, 0x330bff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette") // extra colours?
 ADDRESS_MAP_END
 
 
@@ -333,7 +333,7 @@ void pktgaldx_state::machine_start()
 {
 }
 
-static MACHINE_CONFIG_START( pktgaldx )
+MACHINE_CONFIG_START(pktgaldx_state::pktgaldx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 14000000)
@@ -355,12 +355,10 @@ static MACHINE_CONFIG_START( pktgaldx )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pktgaldx)
 
-	MCFG_DECOCOMN_ADD("deco_common")
-	MCFG_DECOCOMN_PALETTE("palette")
-
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x00)
@@ -396,7 +394,7 @@ static MACHINE_CONFIG_START( pktgaldx )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( pktgaldb )
+MACHINE_CONFIG_START(pktgaldx_state::pktgaldb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)

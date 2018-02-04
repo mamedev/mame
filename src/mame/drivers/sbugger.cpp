@@ -212,7 +212,7 @@ INPUT_PORTS_END
 /* machine driver */
 
 
-static MACHINE_CONFIG_START( sbugger )
+MACHINE_CONFIG_START(sbugger_state::sbugger)
 
 	MCFG_CPU_ADD("maincpu", I8085A, 6000000)        /* 3.00 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(sbugger_map)

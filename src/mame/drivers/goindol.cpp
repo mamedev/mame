@@ -55,7 +55,7 @@ READ8_MEMBER(goindol_state::prot_f422_r)
 
 WRITE8_MEMBER(goindol_state::prot_fc44_w)
 {
-	logerror("%04x: prot_fc44_w(%02x)\n", space.device().safe_pc(), data);
+	logerror("%04x: prot_fc44_w(%02x)\n", m_maincpu->pc(), data);
 	m_ram[0x0419] = 0x5b;
 	m_ram[0x041a] = 0x3f;
 	m_ram[0x041b] = 0x6d;
@@ -63,19 +63,19 @@ WRITE8_MEMBER(goindol_state::prot_fc44_w)
 
 WRITE8_MEMBER(goindol_state::prot_fd99_w)
 {
-	logerror("%04x: prot_fd99_w(%02x)\n", space.device().safe_pc(), data);
+	logerror("%04x: prot_fd99_w(%02x)\n", m_maincpu->pc(), data);
 	m_ram[0x0421] = 0x3f;
 }
 
 WRITE8_MEMBER(goindol_state::prot_fc66_w)
 {
-	logerror("%04x: prot_fc66_w(%02x)\n", space.device().safe_pc(), data);
+	logerror("%04x: prot_fc66_w(%02x)\n", m_maincpu->pc(), data);
 	m_ram[0x0423] = 0x06;
 }
 
 WRITE8_MEMBER(goindol_state::prot_fcb0_w)
 {
-	logerror("%04x: prot_fcb0_w(%02x)\n", space.device().safe_pc(), data);
+	logerror("%04x: prot_fcb0_w(%02x)\n", m_maincpu->pc(), data);
 	m_ram[0x0425] = 0x06;
 }
 
@@ -233,14 +233,14 @@ void goindol_state::machine_reset()
 	m_prot_toggle = 0;
 }
 
-static MACHINE_CONFIG_START( goindol )
+MACHINE_CONFIG_START(goindol_state::goindol)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* XTAL confirmed, divisor is not */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(12'000'000)/2)  /* XTAL confirmed, divisor is not */
 	MCFG_CPU_PROGRAM_MAP(goindol_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goindol_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2) /* XTAL confirmed, divisor is not */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(12'000'000)/2) /* XTAL confirmed, divisor is not */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(goindol_state, irq0_line_hold, 4*60)
 
@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( goindol )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8)   /* Confirmed pitch from recording */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(12'000'000)/8)   /* Confirmed pitch from recording */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

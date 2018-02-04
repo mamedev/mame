@@ -7,23 +7,29 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "score.h"
+#include "scoredsm.h"
 #include "scorem.h"
 
-const char *const score7_cpu_device::m_cond[16]   = { "cs", "cc", "gtu", "leu", "eq", "ne", "gt", "le", "ge", "lt", "mi", "pl", "vs", "vc", "cnz", "" };
-const char *const score7_cpu_device::m_tcs[4]     = { "teq", "tmi", "", ""};
-const char *const score7_cpu_device::m_rix1_op[8] = { "lw" ,"lh" ,"lhu" ,"lb" ,"sw" ,"sh" ,"lbu" ,"sb" };
-const char *const score7_cpu_device::m_rix2_op[8] = { "lw", "lh", "lhu", "lb", "sw", "sh", "lbu", "sb" };
-const char *const score7_cpu_device::m_r2_op[16]  = { "add", "sub", "neg", "cmp", "and", "or", "not", "xor", "lw", "lh", "pop", "lbu", "sw", "sh", "push", "sb" };
-const char *const score7_cpu_device::m_i1_op[8]   = { "addi", "", "cmpi", "", "andi", "ori", "ldi", "" };
-const char *const score7_cpu_device::m_i2_op[8]   = { "addis", "", "cmpis", "", "andis", "oris", "ldis", "" };
-const char *const score7_cpu_device::m_ls_op[8]   = { "lw", "lh", "lhu", "lb", "sw", "sh", "lbu", "sb" };
-const char *const score7_cpu_device::m_i1a_op[8]  = { "addei", "slli", "sdbbp", "srli", "bitclr", "bitset", "bittst", "" };
-const char *const score7_cpu_device::m_i1b_op[8]  = { "lwp", "lhp", "", "lbup", "swp", "shp", "", "sbp" };
-const char *const score7_cpu_device::m_cr_op[2]   = { "mtcr", "mfcr" };
+const char *const score7_disassembler::m_cond[16]   = { "cs", "cc", "gtu", "leu", "eq", "ne", "gt", "le", "ge", "lt", "mi", "pl", "vs", "vc", "cnz", "" };
+const char *const score7_disassembler::m_tcs[4]     = { "teq", "tmi", "", ""};
+const char *const score7_disassembler::m_rix1_op[8] = { "lw" ,"lh" ,"lhu" ,"lb" ,"sw" ,"sh" ,"lbu" ,"sb" };
+const char *const score7_disassembler::m_rix2_op[8] = { "lw", "lh", "lhu", "lb", "sw", "sh", "lbu", "sb" };
+const char *const score7_disassembler::m_r2_op[16]  = { "add", "sub", "neg", "cmp", "and", "or", "not", "xor", "lw", "lh", "pop", "lbu", "sw", "sh", "push", "sb" };
+const char *const score7_disassembler::m_i1_op[8]   = { "addi", "", "cmpi", "", "andi", "ori", "ldi", "" };
+const char *const score7_disassembler::m_i2_op[8]   = { "addis", "", "cmpis", "", "andis", "oris", "ldis", "" };
+const char *const score7_disassembler::m_ls_op[8]   = { "lw", "lh", "lhu", "lb", "sw", "sh", "lbu", "sb" };
+const char *const score7_disassembler::m_i1a_op[8]  = { "addei", "slli", "sdbbp", "srli", "bitclr", "bitset", "bittst", "" };
+const char *const score7_disassembler::m_i1b_op[8]  = { "lwp", "lhp", "", "lbup", "swp", "shp", "", "sbp" };
+const char *const score7_disassembler::m_cr_op[2]   = { "mtcr", "mfcr" };
 
+int32_t score7_disassembler::sign_extend(uint32_t data, uint8_t len)
+{
+	data &= (1 << len) - 1;
+	uint32_t sign = 1 << (len - 1);
+	return (data ^ sign) - sign;
+}
 
-void score7_cpu_device::disasm32(std::ostream &stream, offs_t pc, uint32_t opcode)
+void score7_disassembler::disasm32(std::ostream &stream, offs_t pc, uint32_t opcode)
 {
 	switch((opcode >> 25) & 0x1f)
 	{
@@ -178,7 +184,7 @@ void score7_cpu_device::disasm32(std::ostream &stream, offs_t pc, uint32_t opcod
 	}
 }
 
-void score7_cpu_device::disasm16(std::ostream &stream, offs_t pc, uint16_t opcode)
+void score7_disassembler::disasm16(std::ostream &stream, offs_t pc, uint16_t opcode)
 {
 	switch((opcode >> 12) & 0x07)
 	{
@@ -252,7 +258,7 @@ void score7_cpu_device::disasm16(std::ostream &stream, offs_t pc, uint16_t opcod
 	}
 }
 
-offs_t score7_cpu_device::disasm(std::ostream &stream, offs_t pc, uint32_t opcode)
+offs_t score7_disassembler::disasm(std::ostream &stream, offs_t pc, uint32_t opcode)
 {
 	uint8_t p = (pc & 0x02) ? 0 : (((opcode>>30) & 2) | ((opcode>>15) & 1));
 
@@ -278,13 +284,16 @@ offs_t score7_cpu_device::disasm(std::ostream &stream, offs_t pc, uint32_t opcod
 
 
 //-------------------------------------------------
-//  disasm_disassemble - call the disassembly
+//  disassemble - call the disassembly
 //  helper function
 //-------------------------------------------------
 
-offs_t score7_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t score7_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	uint32_t opcode = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
+	return disasm(stream, pc, opcodes.r32(pc));
+}
 
-	return disasm(stream, pc, opcode);
+u32 score7_disassembler::opcode_alignment() const
+{
+	return 2;
 }

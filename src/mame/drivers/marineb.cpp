@@ -46,7 +46,7 @@ write
 #include "screen.h"
 #include "speaker.h"
 
-#define MASTER_CLOCK (XTAL_12MHz)
+#define MASTER_CLOCK (XTAL(12'000'000))
 #define CPU_CLOCK (MASTER_CLOCK/4)
 #define SOUND_CLOCK (MASTER_CLOCK/8)
 
@@ -526,7 +526,7 @@ INTERRUPT_GEN_MEMBER(marineb_state::wanted_vblank_irq)
 }
 
 
-static MACHINE_CONFIG_START( marineb )
+MACHINE_CONFIG_START(marineb_state::marineb)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)   /* 3 MHz? */
@@ -559,7 +559,7 @@ static MACHINE_CONFIG_START( marineb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( changes, marineb )
+MACHINE_CONFIG_DERIVED(marineb_state::changes, marineb)
 
 	/* basic machine hardware */
 
@@ -570,7 +570,7 @@ static MACHINE_CONFIG_DERIVED( changes, marineb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( springer, marineb )
+MACHINE_CONFIG_DERIVED(marineb_state::springer, marineb)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("outlatch")
@@ -583,7 +583,7 @@ static MACHINE_CONFIG_DERIVED( springer, marineb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hoccer, marineb )
+MACHINE_CONFIG_DERIVED(marineb_state::hoccer, marineb)
 
 	/* basic machine hardware */
 
@@ -594,7 +594,7 @@ static MACHINE_CONFIG_DERIVED( hoccer, marineb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( wanted, marineb )
+MACHINE_CONFIG_DERIVED(marineb_state::wanted, marineb)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -615,7 +615,7 @@ static MACHINE_CONFIG_DERIVED( wanted, marineb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( hopprobo, marineb )
+MACHINE_CONFIG_DERIVED(marineb_state::hopprobo, marineb)
 
 	/* basic machine hardware */
 
@@ -626,7 +626,7 @@ static MACHINE_CONFIG_DERIVED( hopprobo, marineb )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( bcruzm12, wanted )
+MACHINE_CONFIG_DERIVED(marineb_state::bcruzm12, wanted)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_MODIFY("outlatch")

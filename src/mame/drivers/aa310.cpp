@@ -121,6 +121,20 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 
+	void aa5000a(machine_config &config);
+	void aa305(machine_config &config);
+	void aa310(machine_config &config);
+	void aa3000(machine_config &config);
+	void aa5000(machine_config &config);
+	void aa4101(machine_config &config);
+	void aa3020(machine_config &config);
+	void aa4401(machine_config &config);
+	void aa3010(machine_config &config);
+	void aa4(machine_config &config);
+	void aa4000(machine_config &config);
+	void aa540(machine_config &config);
+	void aa440(machine_config &config);
+	void aa4201(machine_config &config);
 protected:
 	required_device<ram_device> m_ram;
 };
@@ -383,9 +397,9 @@ WRITE_LINE_MEMBER( archimedes_state::a310_kart_rx_w )
 		archimedes_clear_irq_b(ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
 }
 
-static MACHINE_CONFIG_START( aa310 )
+MACHINE_CONFIG_START(aa310_state::aa310)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM, XTAL_24MHz / 3)        /* ARM2 8 MHz */
+	MCFG_CPU_ADD("maincpu", ARM, XTAL(24'000'000) / 3)        /* ARM2 8 MHz */
 	MCFG_CPU_PROGRAM_MAP(aa310_mem)
 	MCFG_ARM_COPRO(VL86C020)
 
@@ -398,7 +412,7 @@ static MACHINE_CONFIG_START( aa310 )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz,1024,0,735,624/2,0,292) // RiscOS 3 default screen settings
+	MCFG_SCREEN_RAW_PARAMS(XTAL(16'000'000),1024,0,735,624/2,0,292) // RiscOS 3 default screen settings
 	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 32768)
@@ -439,13 +453,13 @@ static MACHINE_CONFIG_START( aa310 )
 	/* Expansion slots - 2-card backplane */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aa305, aa310 )
+MACHINE_CONFIG_DERIVED(aa310_state::aa305, aa310)
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("1M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aa440, aa310 )
+MACHINE_CONFIG_DERIVED(aa310_state::aa440, aa310)
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
@@ -454,13 +468,13 @@ static MACHINE_CONFIG_DERIVED( aa440, aa310 )
 	/* Expansion slots - 4-card backplane */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aa3000, aa310 )
+MACHINE_CONFIG_DERIVED(aa310_state::aa3000, aa310)
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_EXTRA_OPTIONS("2M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aa4101, aa310 )
+MACHINE_CONFIG_DERIVED(aa310_state::aa4101, aa310)
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_EXTRA_OPTIONS("2M,4M")
@@ -468,7 +482,7 @@ static MACHINE_CONFIG_DERIVED( aa4101, aa310 )
 	/* Expansion slots - 4-card backplane */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aa4201, aa310 )
+MACHINE_CONFIG_DERIVED(aa310_state::aa4201, aa310)
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M")
@@ -478,7 +492,7 @@ static MACHINE_CONFIG_DERIVED( aa4201, aa310 )
 	/* Expansion slots - 4-card backplane */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aa4401, aa310 )
+MACHINE_CONFIG_DERIVED(aa310_state::aa4401, aa310)
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
 	MCFG_RAM_EXTRA_OPTIONS("8M")
@@ -488,9 +502,9 @@ static MACHINE_CONFIG_DERIVED( aa4401, aa310 )
 	/* Expansion slots - 4-card backplane */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aa540, aa310 )
+MACHINE_CONFIG_DERIVED(aa310_state::aa540, aa310)
 	MCFG_CPU_MODIFY("maincpu") // ARM3
-	MCFG_CPU_CLOCK(XTAL_52MHz / 2)
+	MCFG_CPU_CLOCK(XTAL(52'000'000) / 2)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -501,9 +515,9 @@ static MACHINE_CONFIG_DERIVED( aa540, aa310 )
 	/* Expansion slots - 4-card backplane */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aa5000, aa310 )
+MACHINE_CONFIG_DERIVED(aa310_state::aa5000, aa310)
 	MCFG_CPU_MODIFY("maincpu") // ARM3
-	MCFG_CPU_CLOCK(XTAL_50MHz / 2)
+	MCFG_CPU_CLOCK(XTAL(50'000'000) / 2)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
@@ -514,9 +528,9 @@ static MACHINE_CONFIG_DERIVED( aa5000, aa310 )
 	/* Expansion slots - 4-card backplane */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aa4, aa5000 )
+MACHINE_CONFIG_DERIVED(aa310_state::aa4, aa5000)
 	MCFG_CPU_MODIFY("maincpu") // ARM3
-	MCFG_CPU_CLOCK(XTAL_24MHz)
+	MCFG_CPU_CLOCK(XTAL(24'000'000))
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -527,27 +541,27 @@ static MACHINE_CONFIG_DERIVED( aa4, aa5000 )
 	/* 60MB HDD */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aa5000a, aa5000 )
+MACHINE_CONFIG_DERIVED(aa310_state::aa5000a, aa5000)
 	MCFG_CPU_MODIFY("maincpu") // ARM3
 	MCFG_CPU_CLOCK(33000000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aa3010, aa310 )
+MACHINE_CONFIG_DERIVED(aa310_state::aa3010, aa310)
 	MCFG_CPU_MODIFY("maincpu") // ARM250
-	MCFG_CPU_CLOCK(XTAL_72MHz / 6)
+	MCFG_CPU_CLOCK(XTAL(72'000'000) / 6)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("1M")
 	MCFG_RAM_EXTRA_OPTIONS("2M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aa3020, aa3010 )
+MACHINE_CONFIG_DERIVED(aa310_state::aa3020, aa3010)
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( aa4000, aa3010 )
+MACHINE_CONFIG_DERIVED(aa310_state::aa4000, aa3010)
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
 	MCFG_RAM_EXTRA_OPTIONS("4M")

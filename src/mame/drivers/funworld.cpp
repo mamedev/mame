@@ -983,7 +983,7 @@
 
 ****************************************************************************************/
 
-#define MASTER_CLOCK    XTAL_16MHz
+#define MASTER_CLOCK    XTAL(16'000'000)
 #define CPU_CLOCK      (MASTER_CLOCK/8)
 #define SND_CLOCK      (MASTER_CLOCK/8)
 #define CRTC_CLOCK     (MASTER_CLOCK/8)
@@ -3054,7 +3054,7 @@ MACHINE_RESET_MEMBER(funworld_state, lunapark)
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( fw1stpal )
+MACHINE_CONFIG_START(funworld_state::fw1stpal)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, CPU_CLOCK)    /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funworld_map)
@@ -3101,7 +3101,7 @@ static MACHINE_CONFIG_START( fw1stpal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fw2ndpal, fw1stpal )
+MACHINE_CONFIG_DERIVED(funworld_state::fw2ndpal, fw1stpal)
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funworld_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
@@ -3110,7 +3110,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( funquiz, fw1stpal )
+MACHINE_CONFIG_DERIVED(funworld_state::funquiz, fw1stpal)
 //  MCFG_FRAGMENT_ADD(fw2ndpal)
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(funquiz_map)
@@ -3124,7 +3124,7 @@ static MACHINE_CONFIG_DERIVED( funquiz, fw1stpal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( magicrd2, fw1stpal )
+MACHINE_CONFIG_DERIVED(funworld_state::magicrd2, fw1stpal)
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
@@ -3143,42 +3143,42 @@ static MACHINE_CONFIG_DERIVED( magicrd2, fw1stpal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( royalcd1, fw1stpal )
+MACHINE_CONFIG_DERIVED(funworld_state::royalcd1, fw1stpal)
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* (G65SC02P in pro version) 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( royalcd2, fw2ndpal )
+MACHINE_CONFIG_DERIVED(funworld_state::royalcd2, fw2ndpal)
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(magicrd2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( cuoreuno, fw1stpal )
+MACHINE_CONFIG_DERIVED(funworld_state::cuoreuno, fw1stpal)
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(cuoreuno_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( saloon, fw1stpal )
+MACHINE_CONFIG_DERIVED(funworld_state::saloon, fw1stpal)
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(saloon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( witchryl, fw1stpal )
+MACHINE_CONFIG_DERIVED(funworld_state::witchryl, fw1stpal)
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(witchryl_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( lunapark, fw1stpal )
+MACHINE_CONFIG_DERIVED(funworld_state::lunapark, fw1stpal)
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(lunapark_map)  // mirrored video RAM (4000/5000 to 6000/7000).
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
@@ -3187,14 +3187,14 @@ static MACHINE_CONFIG_DERIVED( lunapark, fw1stpal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( chinatow, fw2ndpal )
+MACHINE_CONFIG_DERIVED(funworld_state::chinatow, fw2ndpal)
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(chinatow_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
 	MCFG_VIDEO_START_OVERRIDE(funworld_state, chinatow)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( rcdino4, fw1stpal )
+MACHINE_CONFIG_DERIVED(funworld_state::rcdino4, fw1stpal)
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(chinatow_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
@@ -3202,7 +3202,7 @@ static MACHINE_CONFIG_DERIVED( rcdino4, fw1stpal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( intrgmes, fw1stpal )
+MACHINE_CONFIG_DERIVED(funworld_state::intrgmes, fw1stpal)
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(intergames_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
@@ -3210,7 +3210,7 @@ static MACHINE_CONFIG_DERIVED( intrgmes, fw1stpal )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fw_a7_11, fw1stpal )
+MACHINE_CONFIG_DERIVED(funworld_state::fw_a7_11, fw1stpal)
 	MCFG_CPU_REPLACE("maincpu", R65C02, CPU_CLOCK) /* 2MHz */
 	MCFG_CPU_PROGRAM_MAP(fw_a7_11_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funworld_state, nmi_line_pulse)
@@ -3658,14 +3658,40 @@ ROM_END
 
    This PCB has an Altera EP910PC CPLD on board
 
-   to init nvram dsw must be
-   ON OFF OFF OFF OFF OFF OFF
+   To init NVRAM, DSW must be:
+   OFF ON ON ON ON ON ON ON
 
-   then service1+service2 and reset,
+   Then (SERVICE1 + SERVICE2) and reset,
    then another reset.
 
    Q is remote (x100)
    W is payout.
+
+-------------------------------------
+
+   Complete specs:
+
+   1x Empty CPU place (surely Rockwell 65C02 bitwise family)
+
+   1x GI AY-3-8910 Sound Processor.
+
+   2x Motorola MC68B21P for I/O.
+   1x GoldStar GM68B45S CRTC.
+   1x Altera EP910PC-40.
+
+   1x KM6264AL-10
+   1x Dallas DS1220Y nonvolatile SRAM.
+
+   2x M27C512 (ROMs 6 & 7)
+   1x MBM27256 (ROM 5)
+
+   1x N82S147N Bipolar PROM (undumped)
+
+   1x Xtal 16 MHz.
+   1x 8 DIP Switches bank.
+   1x Jamma edge connector.
+   1x Unknown POT between two caps, maybe for sound amp stage.
+
 */
 ROM_START( jolycdid )   /* Altera EP910PC CPLD */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3687,10 +3713,10 @@ ROM_END
 
 /*  Jolly Card Italian bootleg...
 
-   to init nvram dsw must be
+   To init NVRAM, DSW must be:
    OFF ON ON ON ON ON ON ON
 
-   then service1+service2 and reset,
+   Then (SERVICE1 + SERVICE2) and reset,
    then another reset.
 
    This set has spam graphics, but seems
@@ -3711,6 +3737,59 @@ ROM_START( jolycdie )   /* Bootleg PCB, NON encrypted graphics */
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(fc9a8aa3) SHA1(6f0a98bd0c7a64281bb1cce35de11b76978d7123) ) // sldh
 ROM_END
+
+/* Jolly Card Italian bootleg...
+
+   This PCB has an Altera EP910PC CPLD on board
+
+   This set doesn't need any NVRAM initialization.
+
+   5 & 6 are coins.
+   W is payout.
+*/
+ROM_START( jolycdif )   /* Altera EP910PC CPLD */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin", 0x8000, 0x8000, CRC(80983f6a) SHA1(222ce5d4800887de92a73decbad31e96f8da3b4a) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "2.bin", 0x0000, 0x8000, CRC(a4452751) SHA1(a0b32a8801ebaee7ede7873b244f1a424433fe94) )
+	ROM_CONTINUE( 0x0000, 0x8000) /* Discarding 1nd half 1ST AND 2ND HALF IDENTICAL*/
+	ROM_LOAD( "3.bin", 0x8000, 0x8000, CRC(2856c82d) SHA1(7ce835bc2246ffede180cff0d8d0d4528afcc297) )
+	ROM_CONTINUE( 0x8000, 0x8000) /* Discarding 1nd half 1ST AND 2ND HALF IDENTICAL*/
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) ) // proper dump
+ROM_END
+
+
+/* Jolly Card Italian bootleg...
+
+   This PCB has a TI EP910DC-30 CPLD,
+   like others italian bootlegs that
+   have an Altera EP910PC CPLD on board.
+
+   To init NVRAM, DSW must be:
+   OFF ON ON ON ON ON ON ON
+
+   Then (SERVICE1 + SERVICE2) and reset,
+   then another reset.
+
+   Once NVRAM is initialized, the hardware still complains about it. Need to be analyzed.
+*/
+ROM_START( jolycdig )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // TI EP910DC-30 CPLD (DIP-40 Ceramic)
+	ROM_LOAD( "3__27c256.bin", 0x8000, 0x8000, CRC(e939ed2a) SHA1(a413623499971517569bcf97860caad65ff5535f) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "2__27c512.bin", 0x0000, 0x8000, CRC(a4452751) SHA1(a0b32a8801ebaee7ede7873b244f1a424433fe94) )
+	ROM_CONTINUE( 0x0000, 0x8000) /* Discarding 1nd half 1ST AND 2ND HALF IDENTICAL*/
+	ROM_LOAD( "1__27c512.bin", 0x8000, 0x8000, CRC(8b64d4c6) SHA1(8106cba31cd3fbda0855e6070182d248e3d52495) )
+	ROM_CONTINUE( 0x8000, 0x8000) /* Discarding 1nd half 1ST AND 2ND HALF IDENTICAL*/
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "27s29pc.bin", 0x0000, 0x0200, CRC(5ebc5659) SHA1(8d59011a181399682ab6e8ed14f83101e9bfa0c6) )
+ROM_END
+
 
 ROM_START( sjcd2kx3 )   /* Super Joly 2000 3x */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -6439,7 +6518,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 0, 1, 2);
+		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 3, 0, 1, 2);
 	}
 
 	{
@@ -6451,7 +6530,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 		for (i = start; i < size; i++)
 		{
-			a = ((i & 0xff00) | BITSWAP8(i & 0xff, 2, 0, 1, 3, 4, 5, 6, 7));
+			a = ((i & 0xff00) | bitswap<8>(i & 0xff, 2, 0, 1, 3, 4, 5, 6, 7));
 			rom[a] = buffer[i];
 		}
 	}
@@ -6469,7 +6548,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 		for (i = startg; i < sizeg; i++)
 		{
-			a = BITSWAP16(i, 15, 14, 13, 12, 11, 6, 7, 5, 8, 4, 10, 3, 9, 0, 1, 2);
+			a = bitswap<16>(i, 15, 14, 13, 12, 11, 6, 7, 5, 8, 4, 10, 3, 9, 0, 1, 2);
 			gfxrom[a] = buffer[i];
 		}
 	}
@@ -6483,7 +6562,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 	for (i = startp; i < sizep; i++)
 	{
-		prom[i] = BITSWAP8(prom[i], 2, 3, 5, 4, 6, 7, 1, 0);
+		prom[i] = bitswap<8>(prom[i], 2, 3, 5, 4, 6, 7, 1, 0);
 	}
 
 	{
@@ -6495,7 +6574,7 @@ DRIVER_INIT_MEMBER(funworld_state, saloon)
 
 		for (i = startp; i < sizep; i++)
 		{
-			a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 4, 8, 7, 6, 5, 2, 0, 1, 3);
+			a = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 4, 8, 7, 6, 5, 2, 0, 1, 3);
 			prom[a] = buffer[i];
 		}
 	}
@@ -6521,7 +6600,7 @@ DRIVER_INIT_MEMBER(funworld_state, multiwin)
 		ROM[x] = ROM[x] ^ 0x91;
 		uint8_t code;
 
-		ROM[x] = BITSWAP8(ROM[x],5,6,7,2,3,0,1,4);
+		ROM[x] = bitswap<8>(ROM[x],5,6,7,2,3,0,1,4);
 
 		code = ROM[x];
 
@@ -6553,7 +6632,7 @@ DRIVER_INIT_MEMBER(funworld_state, royalcdc)
 		uint8_t code;
 
 		// this seems correct for the data, plaintext decrypts fine
-		ROM[x] = BITSWAP8(ROM[x],2,6,7,4,3,1,5,0);
+		ROM[x] = bitswap<8>(ROM[x],2,6,7,4,3,1,5,0);
 
 		// the code uses different encryption, there are conflicts here
 		// so it's probably address based
@@ -6618,7 +6697,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
+		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
 	}
 
 	{
@@ -6630,7 +6709,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 
 		for (i = start; i < size; i++)
 		{
-			a = BITSWAP16(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+			a = bitswap<16>(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 			rom[a] = buffer[i];
 		}
 	}
@@ -6648,7 +6727,7 @@ DRIVER_INIT_MEMBER(funworld_state, dino4)
 
 		for (i = startg; i < sizeg; i++)
 		{
-			a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
+			a = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
 			gfxrom[a] = buffer[i];
 		}
 	}
@@ -6678,7 +6757,7 @@ DRIVER_INIT_MEMBER(funworld_state, ctunk)
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 5, 6, 7, 3, 4, 0, 1, 2);
+		rom[i] = bitswap<8>(rom[i], 5, 6, 7, 3, 4, 0, 1, 2);
 	}
 
 	//buffer = std::make_unique<uint8_t[]>(size);
@@ -6722,7 +6801,7 @@ static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, 
 
 	for (i = start; i < size; i++)
 	{
-		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
+		rom[i] = bitswap<8>(rom[i], 7, 6, 5, 4, 3, 1, 2, 0);
 	}
 
 	{
@@ -6734,7 +6813,7 @@ static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, 
 
 		for (i = start; i < size; i++)
 		{
-			a = BITSWAP16(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
+			a = bitswap<16>(i, 15, 13, 14, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
 			rom[a] = buffer[i];
 		}
 
@@ -6752,7 +6831,7 @@ static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, 
 
 		for (i = startg; i < sizeg; i++)
 		{
-			a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
+			a = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
 			gfxrom[a] = buffer[i];
 		}
 	}
@@ -6763,7 +6842,7 @@ static void decrypt_rcdino4(uint8_t *rom, int size, uint8_t *gfxrom, int sizeg, 
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{
-		src[x] = BITSWAP8(src[x], 7, 6, 4, 5, 3, 2, 1, 0);
+		src[x] = bitswap<8>(src[x], 7, 6, 4, 5, 3, 2, 1, 0);
 		src[x] = src[x] ^ 0x81;
 	}
 
@@ -7025,7 +7104,9 @@ GAMEL( 1985, sjcd2kx3,  jollycrd, fw1stpal, funworld,  funworld_state, 0,       
 GAME(  1986, jolycdab,  jollycrd, fw1stpal, funworld,  funworld_state, 0,        ROT0, "Inter Games",     "Jolly Card (Austrian, Fun World, bootleg)",       MACHINE_NOT_WORKING )
 GAMEL( 1992, jolycdsp,  jollycrd, cuoreuno, jolycdit,  funworld_state, ctunk,    ROT0, "TAB Austria",     "Jolly Card (Spanish, blue TAB board, encrypted)", 0,                       layout_royalcrd )
 GAMEL( 1990, jolycdid,  jollycrd, cuoreuno, jolycdcr,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 1)",   0,                       layout_jollycrd ) // italian, CPLD, different colors.
-GAMEL( 1990, jolycdie,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 2)",   0,                       layout_jollycrd ) // not from TAB blue PCB
+GAMEL( 1990, jolycdie,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, different colors, set 2)",   0,                       layout_jollycrd ) // not from TAB blue PCB.
+GAMEL( 1990, jolycdif,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, bootleg, set 1)",            0,                       layout_jollycrd ) // italian, CPLD. doesn't need nvram init.
+GAME ( 1993, jolycdig,  jollycrd, cuoreuno, jolycdib,  funworld_state, 0,        ROT0, "bootleg",         "Jolly Card (Italian, bootleg, set 2)",            MACHINE_NOT_WORKING )
 
 // Bonus Card based...
 GAMEL( 1986, bonuscrd,  0,        fw2ndpal, bonuscrd,  funworld_state, 0,        ROT0, "Fun World",       "Bonus Card (Austrian)",                           MACHINE_IMPERFECT_COLORS,   layout_bonuscrd ) // use fw1stpal machine for green background

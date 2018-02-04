@@ -116,7 +116,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midxunit_state )
 	AM_RANGE(0x60c00060, 0x60c0007f) AM_READ_PORT("DSW")
 	AM_RANGE(0x60c00080, 0x60c000df) AM_WRITE(midxunit_io_w)
 	AM_RANGE(0x60c000e0, 0x60c000ff) AM_READWRITE(midxunit_security_r, midxunit_security_w)
-	AM_RANGE(0x80800000, 0x8080000f) AM_DEVREADWRITE8("adc", adc0848_device, read, write, 0x00ff)
+	AM_RANGE(0x80800000, 0x8080000f) AM_DEVREAD8("adc", adc0848_device, read, 0x00ff) AM_DEVWRITE8("adc", adc0848_device, write, 0x00ff)
 	AM_RANGE(0x80800010, 0x8080001f) AM_NOP
 	AM_RANGE(0x80c00000, 0x80c000ff) AM_READWRITE(midxunit_uart_r, midxunit_uart_w)
 	AM_RANGE(0xa0440000, 0xa047ffff) AM_READWRITE(midxunit_cmos_r, midxunit_cmos_w) AM_SHARE("nvram")
@@ -240,7 +240,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( midxunit )
+MACHINE_CONFIG_START(midxunit_state::midxunit)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34020, 40000000)

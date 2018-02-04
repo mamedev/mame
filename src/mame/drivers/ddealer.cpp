@@ -173,6 +173,7 @@ public:
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_sim);
 	void draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy);
+	void ddealer(machine_config &config);
 };
 
 
@@ -477,7 +478,7 @@ static ADDRESS_MAP_START( ddealer, AS_PROGRAM, 16, ddealer_state )
 	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("UNK")
 	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x084000, 0x084003) AM_DEVWRITE8("ymsnd", ym2203_device, write, 0x00ff) // ym ?
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08c000, 0x08cfff) AM_RAM AM_SHARE("vregs") // palette ram
 
 	/* this might actually be 1 tilemap with some funky rowscroll / columnscroll enabled, I'm not sure */
@@ -616,9 +617,9 @@ INTERRUPT_GEN_MEMBER(ddealer_state::interrupt)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( ddealer )
+MACHINE_CONFIG_START(ddealer_state::ddealer)
 
-	MCFG_CPU_ADD("maincpu" , M68000, XTAL_16MHz/2) /* 8MHz */
+	MCFG_CPU_ADD("maincpu" , M68000, XTAL(16'000'000)/2) /* 8MHz */
 	MCFG_CPU_PROGRAM_MAP(ddealer)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", ddealer_state,  interrupt)
 	MCFG_CPU_PERIODIC_INT_DRIVER(ddealer_state, irq1_line_hold,  90)//guess, controls music tempo, 112 is way too fast
@@ -642,7 +643,7 @@ static MACHINE_CONFIG_START( ddealer )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("coinsim", ddealer_state, mcu_sim, attotime::from_hz(10000))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_6MHz / 8) /* 7.5KHz */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(6'000'000) / 8) /* 7.5KHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 

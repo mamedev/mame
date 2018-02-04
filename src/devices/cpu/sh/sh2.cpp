@@ -95,7 +95,7 @@
 #include "emu.h"
 #include "sh2.h"
 #include "sh2comn.h"
-
+#include "sh_dasm.h"
 #include "debugger.h"
 
 //#define VERBOSE 1
@@ -134,14 +134,14 @@ static ADDRESS_MAP_START( sh7604_map, AS_PROGRAM, 32, sh2_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sh7021_map, AS_PROGRAM, 32, sh2a_device )
+//  fall-back
+	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7021_r,sh7021_w,0xffffffff) // SH-7032H internal i/o
 //  overrides
 	AM_RANGE(0x05ffff40, 0x05ffff43) AM_READWRITE(dma_sar0_r, dma_sar0_w)
 	AM_RANGE(0x05ffff44, 0x05ffff47) AM_READWRITE(dma_dar0_r, dma_dar0_w)
 	AM_RANGE(0x05ffff48, 0x05ffff4b) AM_READWRITE16(dmaor_r, dmaor_w,0xffff0000)
 	AM_RANGE(0x05ffff48, 0x05ffff4b) AM_READWRITE16(dma_tcr0_r, dma_tcr0_w,0x0000ffff)
 	AM_RANGE(0x05ffff4c, 0x05ffff4f) AM_READWRITE16(dma_chcr0_r, dma_chcr0_w, 0x0000ffff)
-//  fall-back
-	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7021_r,sh7021_w,0xffffffff) // SH-7032H internal i/o
 //  AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
 //  AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
 ADDRESS_MAP_END
@@ -200,12 +200,10 @@ device_memory_interface::space_config_vector sh2_device::memory_space_config() c
 		};
 }
 
-offs_t sh2_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+util::disasm_interface *sh2_device::create_disassembler()
 {
-	extern CPU_DISASSEMBLE( sh2 );
-	return CPU_DISASSEMBLE_NAME( sh2 )(this, stream, pc, oprom, opram, options);
+	return new sh_disassembler(false);
 }
-
 
 uint8_t sh2_device::RB(offs_t A)
 {
@@ -443,7 +441,7 @@ void sh2_device::device_start()
 	m_ftcsr_read_cb.bind_relative_to(*owner());
 
 	m_decrypted_program = has_space(AS_OPCODES) ? &space(AS_OPCODES) : &space(AS_PROGRAM);
-	m_direct = &m_decrypted_program->direct();
+	m_direct = m_decrypted_program->direct<0>();
 	m_internal = &space(AS_PROGRAM);
 
 	save_item(NAME(m_cpu_off));

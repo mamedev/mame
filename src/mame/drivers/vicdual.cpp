@@ -53,12 +53,6 @@
 
 #include "emu.h"
 #include "includes/vicdual.h"
-#include "audio/carnival.h"
-#include "audio/depthch.h"
-#include "audio/invinco.h"
-#include "audio/pulsar.h"
-#include "audio/tranqgun.h"
-#include "audio/vicdual.h"
 #include "audio/vicdual-97271p.h"
 #include "video/vicdual-97269pb.h"
 
@@ -69,7 +63,7 @@
 #include "depthch.lh"
 
 
-#define VICDUAL_MASTER_CLOCK                (XTAL_15_468MHz)
+#define VICDUAL_MASTER_CLOCK                (XTAL(15'468'480))
 #define VICDUAL_MAIN_CPU_CLOCK              (VICDUAL_MASTER_CLOCK/8)
 #define VICDUAL_PIXEL_CLOCK                 (VICDUAL_MASTER_CLOCK/3)
 
@@ -256,7 +250,7 @@ void vicdual_state::machine_start()
 }
 
 
-static MACHINE_CONFIG_START( vicdual_root )
+MACHINE_CONFIG_START(vicdual_state::vicdual_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, VICDUAL_MAIN_CPU_CLOCK)
@@ -333,7 +327,7 @@ static INPUT_PORTS_START( depthch )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( depthch, vicdual_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::depthch, vicdual_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", I8080, VICDUAL_MAIN_CPU_CLOCK)
@@ -420,7 +414,7 @@ static INPUT_PORTS_START( safari )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( safari, vicdual_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::safari, vicdual_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -524,7 +518,7 @@ static INPUT_PORTS_START( frogs )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( frogs, vicdual_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::frogs, vicdual_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -676,23 +670,26 @@ static INPUT_PORTS_START( supcrash )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) // both this and the following switch seem to select between 5 and 6 lives? but in combination with 0x02 of IN1 you can get 3 and 4 lives?
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_4WAY
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, get_timer_value, nullptr)
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) // see comment above
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, "Rom Test" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x7a, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
+	PORT_BIT( 0x78, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state, read_coin_status, nullptr)
 
 	PORT_COIN_DEFAULT
@@ -765,7 +762,7 @@ static INPUT_PORTS_START( sspaceat )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( headon, vicdual_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::headon, vicdual_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -781,7 +778,7 @@ static MACHINE_CONFIG_DERIVED( headon, vicdual_root )
 	MCFG_FRAGMENT_ADD(headon_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( headons, headon )
+MACHINE_CONFIG_DERIVED(vicdual_state::headons, headon)
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -789,7 +786,7 @@ static MACHINE_CONFIG_DERIVED( headons, headon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sspaceat, vicdual_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::sspaceat, vicdual_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -982,7 +979,7 @@ MACHINE_RESET_MEMBER( vicdual_state, headon2 )
 }
 
 
-static MACHINE_CONFIG_DERIVED( headon2, vicdual_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::headon2, vicdual_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -1000,7 +997,7 @@ static MACHINE_CONFIG_DERIVED( headon2, vicdual_root )
 	MCFG_FRAGMENT_ADD(headon_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( headon2bw, headon2 )
+MACHINE_CONFIG_DERIVED(vicdual_state::headon2bw, headon2)
 
 	/* basic machine hardware */
 	/* video hardware */
@@ -1009,7 +1006,7 @@ static MACHINE_CONFIG_DERIVED( headon2bw, headon2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( digger, vicdual_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::digger, vicdual_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2040,7 +2037,7 @@ static INPUT_PORTS_START( headonn )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( vicdual_dualgame_root, vicdual_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::vicdual_dualgame_root, vicdual_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2053,7 +2050,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( invho2, vicdual_dualgame_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::invho2, vicdual_dualgame_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2067,7 +2064,7 @@ MACHINE_CONFIG_END
 
 
 
-static MACHINE_CONFIG_DERIVED( invds, vicdual_dualgame_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::invds, vicdual_dualgame_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2078,7 +2075,7 @@ static MACHINE_CONFIG_DERIVED( invds, vicdual_dualgame_root )
 	MCFG_FRAGMENT_ADD(invinco_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( carhntds, vicdual_dualgame_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::carhntds, vicdual_dualgame_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2087,7 +2084,7 @@ static MACHINE_CONFIG_DERIVED( carhntds, vicdual_dualgame_root )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( sspacaho, vicdual_dualgame_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::sspacaho, vicdual_dualgame_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2099,7 +2096,7 @@ static MACHINE_CONFIG_DERIVED( sspacaho, vicdual_dualgame_root )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( spacetrk, vicdual_dualgame_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::spacetrk, vicdual_dualgame_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2107,7 +2104,7 @@ static MACHINE_CONFIG_DERIVED( spacetrk, vicdual_dualgame_root )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( carnival, vicdual_dualgame_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::carnival, vicdual_dualgame_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2120,7 +2117,7 @@ static MACHINE_CONFIG_DERIVED( carnival, vicdual_dualgame_root )
 	MCFG_FRAGMENT_ADD(carnival_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( carnivalh, carnival )
+MACHINE_CONFIG_DERIVED(vicdual_state::carnivalh, carnival)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2128,7 +2125,7 @@ static MACHINE_CONFIG_DERIVED( carnivalh, carnival )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( tranqgun, vicdual_dualgame_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::tranqgun, vicdual_dualgame_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2140,7 +2137,7 @@ static MACHINE_CONFIG_DERIVED( tranqgun, vicdual_dualgame_root )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( brdrline, vicdual_dualgame_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::brdrline, vicdual_dualgame_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2152,7 +2149,7 @@ static MACHINE_CONFIG_DERIVED( brdrline, vicdual_dualgame_root )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( pulsar, vicdual_dualgame_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::pulsar, vicdual_dualgame_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2164,7 +2161,7 @@ static MACHINE_CONFIG_DERIVED( pulsar, vicdual_dualgame_root )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( heiankyo, vicdual_dualgame_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::heiankyo, vicdual_dualgame_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2172,7 +2169,7 @@ static MACHINE_CONFIG_DERIVED( heiankyo, vicdual_dualgame_root )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( alphaho, vicdual_dualgame_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::alphaho, vicdual_dualgame_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2180,7 +2177,7 @@ static MACHINE_CONFIG_DERIVED( alphaho, vicdual_dualgame_root )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( headonn, vicdual_dualgame_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::headonn, vicdual_dualgame_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2308,7 +2305,7 @@ MACHINE_START_MEMBER(vicdual_state,samurai)
 	machine_start();
 }
 
-static MACHINE_CONFIG_DERIVED( samurai, vicdual_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::samurai, vicdual_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -2493,7 +2490,7 @@ MACHINE_RESET_MEMBER(nsub_state, nsub)
 	machine_reset();
 }
 
-static MACHINE_CONFIG_START( nsub )
+MACHINE_CONFIG_START(nsub_state::nsub)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, VICDUAL_MAIN_CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(nsub_map)
@@ -2601,7 +2598,7 @@ static INPUT_PORTS_START( invinco )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_DERIVED( invinco, vicdual_root )
+MACHINE_CONFIG_DERIVED(vicdual_state::invinco, vicdual_root)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -3781,7 +3778,7 @@ GAME( 1979, headonn,    headon,   headonn,   headonn,   vicdual_state, 0, ROT270
 GAME( 1979, headons,    headon,   headons,   headons,   vicdual_state, 0, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headonsa,   headon,   headons,   headons,   vicdual_state, 0, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // won't coin up?
 GAME( 1979, headonmz,   headon,   headon,    headonmz,  vicdual_state, 0, ROT0,   "bootleg", "Head On (bootleg, alt maze)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, supcrash,   headon,   headons,   supcrash,  vicdual_state, 0, ROT0,   "bootleg", "Super Crash (bootleg of Head On)", MACHINE_NO_SOUND  | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, supcrash,   headon,   headons,   supcrash,  vicdual_state, 0, ROT0,   "bootleg (VGG)", "Super Crash (bootleg of Head On)", MACHINE_NO_SOUND  | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, hocrash,    headon,   headons,   headons,   vicdual_state, 0, ROT0,   "bootleg (Fraber)", "Crash (bootleg of Head On)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2,    0,        headon2,   headon2,   vicdual_state, 0, ROT0,   "Sega", "Head On 2",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, headon2s,   headon2,  headon2bw, car2,      vicdual_state, 0, ROT0,   "bootleg (Sidam)", "Head On 2 (Sidam bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // won't coin up?
@@ -3803,7 +3800,7 @@ GAME( 1981, brdrline,   0,        brdrline,  brdrline,  vicdual_state, 0, ROT270
 GAME( 1981, starrkr,    brdrline, brdrline,  starrkr,   vicdual_state, 0, ROT270, "Sega", "Star Raker", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, brdrlins,   brdrline, brdrline,  brdrline,  vicdual_state, 0, ROT270, "bootleg (Sidam)", "Borderline (Sidam bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, brdrlinb,   brdrline, brdrline,  brdrline,  vicdual_state, 0, ROT270, "bootleg (Karateco)", "Borderline (Karateco bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, brdrlinet,  brdrline, tranqgun,  tranqgun,  vicdual_state, 0, ROT270, "Sega", "Borderline (Tranquillizer Gun conversion)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // official factory conversion
+GAME( 1981, brdrlinet,  brdrline, tranqgun,  tranqgun,  vicdual_state, 0, ROT270, "Sega", "Borderline (Tranquillizer Gun conversion)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // official factory conversion
 GAME( 198?, startrks,   0,        headons,   headons,   vicdual_state, 0, ROT0,   "bootleg (Sidam)", "Star Trek (Head On hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, digger,     0,        digger,    digger,    vicdual_state, 0, ROT270, "Sega", "Digger", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pulsar,     0,        pulsar,    pulsar,    vicdual_state, 0, ROT270, "Sega", "Pulsar", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

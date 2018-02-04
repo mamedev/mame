@@ -48,6 +48,7 @@ public:
 	DECLARE_READ8_MEMBER(input_r);
 	DECLARE_WRITE8_MEMBER(input_select_w);
 
+	void bbcbc(machine_config &config);
 private:
 	uint8_t m_input_select;
 	virtual void machine_start() override;
@@ -57,7 +58,7 @@ private:
 };
 
 
-#define MAIN_CLOCK XTAL_4_433619MHz
+#define MAIN_CLOCK XTAL(4'433'619)
 
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, bbcbc_state )
@@ -105,7 +106,7 @@ static const z80_daisy_config bbcbc_daisy_chain[] =
 };
 
 
-static MACHINE_CONFIG_START( bbcbc )
+MACHINE_CONFIG_START(bbcbc_state::bbcbc)
 	MCFG_CPU_ADD( "maincpu", Z80, MAIN_CLOCK / 8 )
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
@@ -117,7 +118,7 @@ static MACHINE_CONFIG_START( bbcbc )
 	MCFG_Z80PIO_IN_PB_CB(READ8(bbcbc_state, input_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(bbcbc_state, input_select_w))
 
-	MCFG_DEVICE_ADD( "tms9129", TMS9129, XTAL_10_738635MHz / 2 )
+	MCFG_DEVICE_ADD( "tms9129", TMS9129, XTAL(10'738'635) / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
 	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", 0))
 	MCFG_TMS9928A_SCREEN_ADD_PAL( "screen" )

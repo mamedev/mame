@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Flower custom sound chip
+    Flower custom sound chip
 
 ***************************************************************************/
 
@@ -18,8 +18,8 @@
 // ======================> flower_sound_device
 
 class flower_sound_device : public device_t,
-				            public device_sound_interface,
-						    public device_memory_interface
+							public device_sound_interface,
+							public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -28,8 +28,8 @@ public:
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( lower_write );
 	DECLARE_WRITE8_MEMBER( upper_write );
-//	virtual DECLARE_ADDRESS_MAP(lower_map, 8);
-//	virtual DECLARE_ADDRESS_MAP(upper_map, 8);
+//  virtual DECLARE_ADDRESS_MAP(lower_map, 8);
+//  virtual DECLARE_ADDRESS_MAP(upper_map, 8);
 	DECLARE_WRITE8_MEMBER( frequency_w );
 	DECLARE_WRITE8_MEMBER( repeat_w );
 	DECLARE_WRITE8_MEMBER( unk_w );

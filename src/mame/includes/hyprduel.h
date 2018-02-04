@@ -67,6 +67,8 @@ public:
 	TIMER_CALLBACK_MEMBER(blit_done);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
+	void magerror(machine_config &config);
+	void hyprduel(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 

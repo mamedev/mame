@@ -55,6 +55,7 @@ public:
 	required_device<palette_device> m_palette;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void chsuper(machine_config &config);
 protected:
 	// driver_device overrides
 	//virtual void machine_start();
@@ -351,10 +352,10 @@ ADDRESS_MAP_END
 *     Machine Drivers      *
 ***************************/
 
-static MACHINE_CONFIG_START( chsuper )
+MACHINE_CONFIG_START(chsuper_state::chsuper)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z180, XTAL_12MHz / 4)   /* HD64180RP8, 8 MHz? */
+	MCFG_CPU_ADD("maincpu", Z180, XTAL(12'000'000) / 4)   /* HD64180RP8, 8 MHz? */
 	MCFG_CPU_PROGRAM_MAP(chsuper_prg_map)
 	MCFG_CPU_IO_MAP(chsuper_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", chsuper_state,  irq0_line_hold)
@@ -528,9 +529,9 @@ DRIVER_INIT_MEMBER(chsuper_state,chmpnum)
 
 		j = i ^ (m_tilexor << 5);
 
-		j = BITSWAP24(j,23,22,21,20,19,18,17,13, 15,14,16,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
-		j = BITSWAP24(j,23,22,21,20,19,18,17,14, 15,16,13,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
-		j = BITSWAP24(j,23,22,21,20,19,18,17,15, 16,14,13,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
+		j = bitswap<24>(j,23,22,21,20,19,18,17,13, 15,14,16,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
+		j = bitswap<24>(j,23,22,21,20,19,18,17,14, 15,16,13,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
+		j = bitswap<24>(j,23,22,21,20,19,18,17,15, 16,14,13,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
 
 		buffer[j] = rom[i];
 	}

@@ -104,7 +104,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 
 #define X2_CLOCK_PAL    59000000
 #define X2_CLOCK_NTSC   49090000
-#define X601_CLOCK      XTAL_16_9344MHz
+#define X601_CLOCK      XTAL(16'934'400)
 
 
 static ADDRESS_MAP_START( 3do_mem, AS_PROGRAM, 32, _3do_state )
@@ -154,10 +154,10 @@ void _3do_state::machine_reset()
 	m_clio.cstatbits = 0x01; /* bit 0 = reset of clio caused by power on */
 }
 
-static MACHINE_CONFIG_START( 3do )
+MACHINE_CONFIG_START(_3do_state::_3do)
 
 	/* Basic machine hardware */
-	MCFG_CPU_ADD( "maincpu", ARM7_BE, XTAL_50MHz/4 )
+	MCFG_CPU_ADD( "maincpu", ARM7_BE, XTAL(50'000'000)/4 )
 	MCFG_CPU_PROGRAM_MAP( 3do_mem)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -174,10 +174,10 @@ static MACHINE_CONFIG_START( 3do )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( 3do_pal )
+MACHINE_CONFIG_START(_3do_state::_3do_pal)
 
 	/* Basic machine hardware */
-	MCFG_CPU_ADD("maincpu", ARM7_BE, XTAL_50MHz/4 )
+	MCFG_CPU_ADD("maincpu", ARM7_BE, XTAL(50'000'000)/4 )
 	MCFG_CPU_PROGRAM_MAP( 3do_mem)
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
@@ -249,8 +249,8 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   STATE       INIT    COMPANY             FULLNAME        FLAGS */
-CONS( 1991, 3do,        0,      0,      3do,        3do,    _3do_state, 0,      "The 3DO Company",  "3DO (NTSC)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1991, 3do_pal,    3do,    0,      3do_pal,    3do,    _3do_state, 0,      "The 3DO Company",  "3DO (PAL)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1991, 3do,        0,      0,      _3do,        3do,    _3do_state, 0,      "The 3DO Company",  "3DO (NTSC)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1991, 3do_pal,    3do,    0,      _3do_pal,    3do,    _3do_state, 0,      "The 3DO Company",  "3DO (PAL)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 1991, 3dobios,    0,      3do,    3do, _3do_state, 0, ROT0,     "The 3DO Company",  "3DO Bios",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
-GAME( 199?, orbatak,    3dobios,3do,    3do, _3do_state, 0, ROT0,     "<unknown>",        "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1991, 3dobios,    0,      _3do,    3do, _3do_state, 0, ROT0,     "The 3DO Company",  "3DO Bios",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME( 199?, orbatak,    3dobios,_3do,    3do, _3do_state, 0, ROT0,     "<unknown>",        "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

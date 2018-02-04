@@ -97,6 +97,7 @@ public:
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void init_mediagx();
+	void mediagx(machine_config &config);
 };
 
 // Display controller registers
@@ -486,8 +487,8 @@ static ADDRESS_MAP_START( mediagx_map, AS_PROGRAM, 32, pinball2k_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mediagx_io, AS_IO, 32, pinball2k_state )
-	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
 	AM_IMPORT_FROM(pcat32_io_common)
+	AM_RANGE(0x0020, 0x0023) AM_READWRITE8(io20_r, io20_w, 0xffff0000)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP     // I/O delay port
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
 	AM_RANGE(0x0400, 0x0403) AM_READWRITE(port400_r, port400_w)
@@ -591,7 +592,7 @@ static ADDRESS_MAP_START( ramdac_map, 0, 8, pinball2k_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( mediagx )
+MACHINE_CONFIG_START(pinball2k_state::mediagx)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MEDIAGX, 166000000)

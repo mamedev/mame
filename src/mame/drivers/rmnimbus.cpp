@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( nimbus_iocpu_io , AS_IO, 8, rmnimbus_state )
 	AM_RANGE(0x20000, 0x20004) AM_READWRITE(nimbus_pc8031_port_r, nimbus_pc8031_port_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( nimbus )
+MACHINE_CONFIG_START(rmnimbus_state::nimbus)
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, I80186, 16000000) // the cpu is a 10Mhz part but the serial clocks are wrong unless it runs at 8Mhz
 	MCFG_CPU_PROGRAM_MAP(nimbus_mem)
@@ -115,7 +115,7 @@ static MACHINE_CONFIG_START( nimbus )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL_4_433619MHz*2,650,0,640,260,0,250)
+	MCFG_SCREEN_RAW_PARAMS( XTAL(4'433'619)*2,650,0,640,260,0,250)
 	MCFG_SCREEN_UPDATE_DRIVER(rmnimbus_state, screen_update_nimbus)
 	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 	MCFG_SCREEN_PALETTE("palette")

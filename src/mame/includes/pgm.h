@@ -115,6 +115,8 @@ public:
 	void draw_sprites( bitmap_ind16& spritebitmap, uint16_t *sprite_source, bitmap_ind8& priority_bitmap );
 	void expand_colourdata();
 	void pgm_basic_init( bool set_bank = true);
+	void pgm(machine_config &config);
+	void pgmbase(machine_config &config);
 };
 
 
@@ -124,9 +126,6 @@ public:
 INPUT_PORTS_EXTERN( pgm );
 
 GFXDECODE_EXTERN( pgm );
-
-MACHINE_CONFIG_EXTERN( pgm );
-MACHINE_CONFIG_EXTERN( pgmbase );
 
 ADDRESS_MAP_EXTERN( pgm_z80_mem, 8 );
 ADDRESS_MAP_EXTERN( pgm_z80_io, 8 );

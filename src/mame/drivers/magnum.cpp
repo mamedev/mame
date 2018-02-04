@@ -29,6 +29,7 @@ public:
 	DECLARE_WRITE8_MEMBER(beep_w);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void magnum(machine_config &config);
 protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -143,12 +144,12 @@ static ADDRESS_MAP_START( magnum_io, AS_IO, 16, magnum_state )
 	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE8("rtc", cdp1879_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( magnum )
-	MCFG_CPU_ADD("maincpu", I80186, XTAL_12MHz / 2)
+MACHINE_CONFIG_START(magnum_state::magnum)
+	MCFG_CPU_ADD("maincpu", I80186, XTAL(12'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(magnum_map)
 	MCFG_CPU_IO_MAP(magnum_io)
 
-	MCFG_DEVICE_ADD("rtc", CDP1879, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", CDP1879, XTAL(32'768))
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_UPDATE_DRIVER(magnum_state, screen_update)

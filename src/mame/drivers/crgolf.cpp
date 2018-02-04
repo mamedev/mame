@@ -180,7 +180,7 @@ WRITE8_MEMBER(crgolf_state::switch_input_select_w)
 
 WRITE8_MEMBER(crgolf_state::unknown_w)
 {
-	logerror("%04X:unknown_w = %02X\n", space.device().safe_pc(), data);
+	logerror("%04X:unknown_w = %02X\n", m_audiocpu->pc(), data);
 }
 
 
@@ -513,7 +513,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( crgolf )
+MACHINE_CONFIG_START(crgolf_state::crgolf)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/3/2)
@@ -536,8 +536,8 @@ static MACHINE_CONFIG_START( crgolf )
 	MCFG_DEVICE_ADD("vrambank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(vrambank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(16)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x8000) /* technically 0x6000, but powers of 2 makes the memory map / address masking cleaner. */
 
 	MCFG_PALETTE_ADD("palette", 0x20)
@@ -559,7 +559,7 @@ static MACHINE_CONFIG_START( crgolf )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( crgolfhi, crgolf )
+MACHINE_CONFIG_DERIVED(crgolf_state::crgolfhi, crgolf)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(crgolf_state, vck_callback))
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_DERIVED( crgolfhi, crgolf )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( mastrglf, crgolfhi )
+MACHINE_CONFIG_DERIVED(crgolf_state::mastrglf, crgolfhi)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -831,4 +831,4 @@ GAME( 1984, crgolfc,  crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "N
 GAME( 1984, crgolfbt, crgolf, crgolf,   crgolf, crgolf_state, 0,        ROT0, "bootleg",     "Champion Golf (bootleg)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1985, crgolfhi, 0,      crgolfhi, crgolf, crgolf_state, crgolfhi, ROT0, "Nasco Japan", "Crowns Golf in Hawaii",     MACHINE_SUPPORTS_SAVE )
 
-GAME( 198?, mastrglf, 0,      mastrglf, crgolf, crgolf_state, 0,        ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1985, mastrglf, 0,      mastrglf, crgolf, crgolf_state, 0,        ROT0, "Nasco",       "Master's Golf",             MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

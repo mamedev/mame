@@ -116,4 +116,13 @@ public:
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_nmi);
+	void tigerhb2(machine_config &config);
+	void tigerhb1(machine_config &config);
+	void tigerh(machine_config &config);
+	void getstarb2(machine_config &config);
+	void slapfighb2(machine_config &config);
+	void getstarb1(machine_config &config);
+	void perfrman(machine_config &config);
+	void slapfigh(machine_config &config);
+	void slapfighb1(machine_config &config);
 };

@@ -19,7 +19,7 @@ typedef device_delegate<void (int *code, int *color, int *priority, int *shadow)
 #define K051960_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority, int *shadow)
 
 #define MCFG_K051960_CB(_class, _method) \
-	k051960_device::set_k051960_callback(*device, k051960_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	k051960_device::set_k051960_callback(*device, k051960_cb_delegate(&_class::_method, #_class "::" #_method, this));
 
 #define MCFG_K051960_PLANEORDER(_order) \
 	k051960_device::set_plane_order(*device, _order);
@@ -58,7 +58,7 @@ public:
 	template <class Object> static devcb_base &set_vreg_contrast_handler(device_t &device, Object &&cb)
 	{ return downcast<k051960_device &>(device).m_vreg_contrast_handler.set_callback(std::forward<Object>(cb)); }
 
-	
+
 	// static configuration
 	static void set_k051960_callback(device_t &device, k051960_cb_delegate callback) { downcast<k051960_device &>(device).m_k051960_cb = callback; }
 	static void set_plane_order(device_t &device, int order);

@@ -32,6 +32,8 @@ public:
 	DECLARE_READ8_MEMBER(scsi_dack_r);
 	DECLARE_WRITE8_MEMBER(scsi_dack_w);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	void lb186(machine_config &config);
+	static void ncr5380(device_t *device);
 };
 
 WRITE8_MEMBER(lb186_state::scsi_dack_w)
@@ -103,11 +105,14 @@ static SLOT_INTERFACE_START( lb186_floppies )
 	SLOT_INTERFACE("525dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-static MACHINE_CONFIG_START( ncr5380 )
+void lb186_state::ncr5380(device_t *device)
+{
+	devcb_base *devcb;
+	(void)devcb;
 	MCFG_DEVICE_CLOCK(10000000)
 	MCFG_NCR5380N_IRQ_HANDLER(DEVWRITELINE(":maincpu", i80186_cpu_device, int1_w))
 	MCFG_NCR5380N_DRQ_HANDLER(DEVWRITELINE(":maincpu", i80186_cpu_device, drq0_w))
-MACHINE_CONFIG_END
+}
 
 static SLOT_INTERFACE_START( scsi_devices )
 	SLOT_INTERFACE("harddisk", NSCSI_HARDDISK)
@@ -119,12 +124,12 @@ FLOPPY_FORMATS_MEMBER( lb186_state::floppy_formats )
 	FLOPPY_NASLITE_FORMAT
 FLOPPY_FORMATS_END
 
-static MACHINE_CONFIG_START( lb186 )
-	MCFG_CPU_ADD("maincpu", I80186, XTAL_16MHz / 2)
+MACHINE_CONFIG_START(lb186_state::lb186)
+	MCFG_CPU_ADD("maincpu", I80186, XTAL(16'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(lb186_map)
 	MCFG_CPU_IO_MAP(lb186_io)
 
-	MCFG_DEVICE_ADD("duart", SCN2681, XTAL_3_6864MHz)
+	MCFG_DEVICE_ADD("duart", SCN2681, XTAL(3'686'400))
 	MCFG_MC68681_IRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int0_w))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232_1", rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("rs232_2", rs232_port_device, write_txd))
@@ -135,7 +140,7 @@ static MACHINE_CONFIG_START( lb186 )
 	MCFG_RS232_PORT_ADD("rs232_2", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("duart", scn2681_device, rx_b_w))
 
-	MCFG_WD1772_ADD("fdc", XTAL_16MHz/2)
+	MCFG_WD1772_ADD("fdc", XTAL(16'000'000)/2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, int2_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("maincpu", i80186_cpu_device, drq0_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", lb186_floppies, "525dd", lb186_state::floppy_formats)
@@ -152,7 +157,7 @@ static MACHINE_CONFIG_START( lb186 )
 	MCFG_NSCSI_ADD("scsibus:5", scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:6", scsi_devices, nullptr, false)
 	MCFG_NSCSI_ADD("scsibus:7", scsi_devices, "ncr5380", true)
-	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5380", ncr5380)
+	MCFG_DEVICE_CARD_MACHINE_CONFIG("ncr5380", lb186_state::ncr5380)
 MACHINE_CONFIG_END
 
 ROM_START( lb186 )

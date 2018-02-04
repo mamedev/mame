@@ -338,7 +338,7 @@ void ef9365_device::device_start()
 		palette[i] = rgb_t(255, 255, 255);
 	}
 
-	m_screen_out.allocate( bitplane_xres, m_screen->height() );
+	m_screen_out.allocate( bitplane_xres, screen().height() );
 
 	save_item(NAME(m_border));
 	save_item(NAME(m_registers));
@@ -472,12 +472,12 @@ void ef9365_device::set_video_mode(void)
 {
 	uint16_t new_width = bitplane_xres;
 
-	if (m_screen->width() != new_width)
+	if (screen().width() != new_width)
 	{
-		rectangle visarea = m_screen->visible_area();
+		rectangle visarea = screen().visible_area();
 		visarea.max_x = new_width - 1;
 
-		m_screen->configure(new_width, m_screen->height(), visarea, m_screen->frame_period().attoseconds());
+		screen().configure(new_width, screen().height(), visarea, screen().frame_period().attoseconds());
 	}
 
 	//border color

@@ -138,6 +138,10 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_as2888);
+	void by35(machine_config &config);
+	void nuovo(machine_config &config);
+	void as2888(machine_config &config);
+	void as2888_audio(machine_config &config);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -188,10 +192,10 @@ static ADDRESS_MAP_START( by35_map, AS_PROGRAM, 8, by35_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nuovo_map, AS_PROGRAM, 8, by35_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 //  AM_RANGE(0x0000, 0x007f) AM_RAM     // Schematics infer that the M6802 internal RAM is disabled.
 	AM_RANGE(0x0088, 0x008b) AM_DEVREADWRITE("pia_u10", pia6821_device, read, write)
 	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia_u11", pia6821_device, read, write)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -885,7 +889,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by35_state::timer_as2888 )
 	{
 		m_snd_sel = m_snd_prom[offs];
 //      logerror("SndSel read %02x from PROM addr %02x\n",m_snd_sel, offs );
-		m_snd_sel = BITSWAP8(m_snd_sel,0,1,2,3,4,5,6,7);
+		m_snd_sel = bitswap<8>(m_snd_sel,0,1,2,3,4,5,6,7);
 
 		m_snd_tone_gen = m_snd_sel;
 //      logerror("SndSel=%02x, Tone=%02x, Div=%02x\n",m_snd_sel, m_snd_tone_gen, m_snd_div);
@@ -1075,7 +1079,7 @@ DISCRETE_SOUND_END
 
 
 
-static MACHINE_CONFIG_START( by35 )
+MACHINE_CONFIG_START(by35_state::by35)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 530000) // No xtal, just 2 chips forming a multivibrator oscillator around 530KHz
 	MCFG_CPU_PROGRAM_MAP(by35_map)
@@ -1119,7 +1123,7 @@ static MACHINE_CONFIG_START( by35 )
 	MCFG_TIMER_DRIVER_ADD("timer_d_pulse", by35_state, timer_d_pulse)                             // 555 Active pulse length
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( as2888_audio )
+MACHINE_CONFIG_START(by35_state::as2888_audio)
 
 	MCFG_MACHINE_START_OVERRIDE( by35_state, as2888 )
 
@@ -1137,13 +1141,13 @@ MACHINE_CONFIG_START( as2888_audio )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( as2888, by35 )
+MACHINE_CONFIG_DERIVED(by35_state::as2888, by35)
 
 	MCFG_FRAGMENT_ADD( as2888_audio  )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( nuovo, by35 )
+MACHINE_CONFIG_DERIVED(by35_state::nuovo, by35)
 
 	MCFG_CPU_REPLACE("maincpu", M6802, 2000000) // ? MHz ?  Large crystal next to CPU, schematics don't indicate speed.
 	MCFG_CPU_PROGRAM_MAP(nuovo_map)

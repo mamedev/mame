@@ -52,4 +52,5 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	inline void read_vectorram(uint16_t *vectorram, int addr, int *x, int *y, int *c);
+	void aztarac(machine_config &config);
 };

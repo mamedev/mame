@@ -2,13 +2,13 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Flower custom sound chip
+    Flower custom sound chip
 
-	Similar to Wiping and Namco 15xx designs
+    Similar to Wiping and Namco 15xx designs
 
-	TODO:
-	- several unknown registers (effects and unknown register tied to repeat port);
-	- repeat certainly needs a cutoff, which is unknown about how it works;
+    TODO:
+    - several unknown registers (effects and unknown register tied to repeat port);
+    - repeat certainly needs a cutoff, which is unknown about how it works;
 
 ***************************************************************************/
 
@@ -47,10 +47,10 @@ flower_sound_device::flower_sound_device(const machine_config &mconfig, const ch
 	  device_memory_interface(mconfig, *this),
 	  m_io_space_config("io", ENDIANNESS_LITTLE, 8, 7, 0, *ADDRESS_MAP_NAME(regs_map)),
 	  m_stream(nullptr),
-  	  m_mixer_table(nullptr),
+	  m_mixer_table(nullptr),
 	  m_mixer_lookup(nullptr),
- 	  m_mixer_buffer(nullptr),
-   	  m_last_channel(nullptr)
+	  m_mixer_buffer(nullptr),
+	  m_last_channel(nullptr)
 {
 }
 

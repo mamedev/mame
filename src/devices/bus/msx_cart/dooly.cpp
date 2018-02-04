@@ -45,7 +45,7 @@ READ8_MEMBER(msx_cart_dooly_device::read_cart)
 		switch (m_prot)
 		{
 			case 0x04:
-				data = BITSWAP8(data, 7, 6, 5, 4, 3, 1, 0, 2);
+				data = bitswap<8>(data, 7, 6, 5, 4, 3, 1, 0, 2);
 				break;
 		}
 		return data;

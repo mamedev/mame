@@ -55,4 +55,5 @@ public:
 	K007342_CALLBACK_MEMBER(rockrage_tile_callback);
 	K007420_CALLBACK_MEMBER(rockrage_sprite_callback);
 
+	void rockrage(machine_config &config);
 };

@@ -528,7 +528,7 @@ DEFINE_DEVICE_TYPE(ISA8_EGA, isa8_ega_device, "ega", "IBM Enhanced Graphics Adap
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( isa8_ega_device::device_add_mconfig )
+MACHINE_CONFIG_START(isa8_ega_device::device_add_mconfig)
 	MCFG_SCREEN_ADD(EGA_SCREEN_NAME, RASTER)
 	MCFG_SCREEN_RAW_PARAMS(16257000,912,0,640,262,0,200)
 	MCFG_SCREEN_UPDATE_DEVICE(EGA_CRTC_NAME, crtc_ega_device, screen_update)
@@ -940,7 +940,7 @@ void isa8_ega_device::change_mode()
 	}
 
 	/* Check for changes to the crtc input clock and number of pixels per clock */
-	clock = ( ( m_misc_output & 0x0c ) ? 16257000 : XTAL_14_31818MHz );
+	clock = ( ( m_misc_output & 0x0c ) ? 16257000 : 14318181 );
 	pixels = ( ( m_sequencer.data[0x01] & 0x01 ) ? 8 : 9 );
 
 	if ( m_sequencer.data[0x01] & 0x08 )

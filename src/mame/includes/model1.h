@@ -33,7 +33,7 @@ public:
 	model1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_m1audio(*this, "m1audio")
+		, m_m1audio(*this, M1AUDIO_TAG)
 		, m_m1uart(*this, "m1uart")
 		, m_m1comm(*this, "m1comm")
 		, m_dsbz80(*this, DSBZ80_TAG)
@@ -182,6 +182,10 @@ public:
 		lightparam_t lightparams[32];
 	};
 
+	void model1(machine_config &config);
+	void swa(machine_config &config);
+	void netmerc(machine_config &config);
+	void model1_vr(machine_config &config);
 private:
 	// Machine
 	void irq_raise(int level);

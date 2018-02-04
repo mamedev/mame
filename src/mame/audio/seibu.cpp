@@ -217,8 +217,8 @@ WRITE8_MEMBER( seibu_sound_device::bank_w )
 
 WRITE8_MEMBER( seibu_sound_device::coin_w )
 {
-	space.machine().bookkeeping().coin_counter_w(0, data & 1);
-	space.machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	machine().bookkeeping().coin_counter_w(1, data & 2);
 }
 
 READ8_MEMBER( seibu_sound_device::soundlatch_r )
@@ -245,7 +245,7 @@ WRITE8_MEMBER( seibu_sound_device::pending_w )
 
 READ8_MEMBER( seibu_sound_device::main_r )
 {
-	//logerror("%06x: seibu_main_r(%x)\n",space.device().safe_pc(),offset);
+	//logerror("%s: seibu_main_r(%x)\n",machine().describe_context(),offset);
 	switch (offset)
 	{
 		case 2:
@@ -254,14 +254,13 @@ READ8_MEMBER( seibu_sound_device::main_r )
 		case 5:
 			return m_main2sub_pending ? 1 : 0;
 		default:
-			//logerror("%06x: seibu_main_r(%x)\n",space.device().safe_pc(),offset);
+			//logerror("%s: seibu_main_r(%x)\n",machine().describe_context(),offset);
 			return 0xff;
 	}
 }
 
 WRITE8_MEMBER( seibu_sound_device::main_w )
 {
-	//printf("%06x: seibu_main_w(%x,%02x)\n",space.device().safe_pc(),offset,data);
 	switch (offset)
 	{
 		case 0:
@@ -278,7 +277,7 @@ WRITE8_MEMBER( seibu_sound_device::main_w )
 			m_main2sub_pending = 1;
 			break;
 		default:
-			//logerror("%06x: seibu_main_w(%x,%02x)\n",space.device().safe_pc(),offset,data);
+			//logerror("%s: seibu_main_w(%x,%02x)\n",machine().describe_context(),offset,data);
 			break;
 	}
 }
@@ -337,8 +336,8 @@ READ8_MEMBER(sei80bu_device::data_r)
 	if ( BIT(a,13) & ~BIT(a,6) &  BIT(a,4)) src ^= 0x02;
 	if (~BIT(a,11) &  BIT(a,9) &  BIT(a,2)) src ^= 0x01;
 
-	if (BIT(a,13) &  BIT(a,4)) src = BITSWAP8(src,7,6,5,4,3,2,0,1);
-	if (BIT(a, 8) &  BIT(a,4)) src = BITSWAP8(src,7,6,5,4,2,3,1,0);
+	if (BIT(a,13) &  BIT(a,4)) src = bitswap<8>(src,7,6,5,4,3,2,0,1);
+	if (BIT(a, 8) &  BIT(a,4)) src = bitswap<8>(src,7,6,5,4,2,3,1,0);
 
 	return src;
 }
@@ -357,10 +356,10 @@ READ8_MEMBER(sei80bu_device::opcode_r)
 	if ( BIT(a,13) & ~BIT(a,6) &  BIT(a,4)) src ^= 0x02;
 	if (~BIT(a,11) &  BIT(a,9) &  BIT(a,2)) src ^= 0x01;
 
-	if (BIT(a,13) &  BIT(a,4)) src = BITSWAP8(src,7,6,5,4,3,2,0,1);
-	if (BIT(a, 8) &  BIT(a,4)) src = BITSWAP8(src,7,6,5,4,2,3,1,0);
-	if (BIT(a,12) &  BIT(a,9)) src = BITSWAP8(src,7,6,4,5,3,2,1,0);
-	if (BIT(a,11) & ~BIT(a,6)) src = BITSWAP8(src,6,7,5,4,3,2,1,0);
+	if (BIT(a,13) &  BIT(a,4)) src = bitswap<8>(src,7,6,5,4,3,2,0,1);
+	if (BIT(a, 8) &  BIT(a,4)) src = bitswap<8>(src,7,6,5,4,2,3,1,0);
+	if (BIT(a,12) &  BIT(a,9)) src = bitswap<8>(src,7,6,4,5,3,2,1,0);
+	if (BIT(a,11) & ~BIT(a,6)) src = bitswap<8>(src,6,7,5,4,3,2,1,0);
 
 	return src;
 }
@@ -410,7 +409,7 @@ void seibu_adpcm_device::decrypt()
 {
 	for (int i = 0; i < m_base.length(); i++)
 	{
-		m_base[i] = BITSWAP8(m_base[i], 7, 5, 3, 1, 6, 4, 2, 0);
+		m_base[i] = bitswap<8>(m_base[i], 7, 5, 3, 1, 6, 4, 2, 0);
 	}
 }
 

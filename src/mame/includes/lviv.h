@@ -60,6 +60,7 @@ public:
 	image_verify_result lviv_verify_snapshot(uint8_t * data, uint32_t size);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( lviv );
 	DECLARE_INPUT_CHANGED_MEMBER(lviv_reset);
+	void lviv(machine_config &config);
 };
 
 /*----------- defined in video/lviv.c -----------*/

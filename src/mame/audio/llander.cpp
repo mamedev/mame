@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "includes/asteroid.h"
-#include "audio/llander.h"
 #include "sound/discrete.h"
 #include "speaker.h"
 
@@ -99,7 +98,7 @@ WRITE8_MEMBER(asteroid_state::llander_sounds_w)
 }
 
 
-MACHINE_CONFIG_START( llander_sound )
+MACHINE_CONFIG_START(asteroid_state::llander_sound)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("discrete", DISCRETE, 0)

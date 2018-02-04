@@ -185,7 +185,7 @@ SLOT_INTERFACE_END
 
 
 /* Machine driver */
-static MACHINE_CONFIG_START( b2m )
+MACHINE_CONFIG_START(b2m_state::b2m)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(b2m_mem)
@@ -238,7 +238,7 @@ static MACHINE_CONFIG_START( b2m )
 	/* uart */
 	MCFG_DEVICE_ADD("uart", I8251, 0)
 
-	MCFG_FD1793_ADD("fd1793", XTAL_8MHz / 8)
+	MCFG_FD1793_ADD("fd1793", XTAL(8'000'000) / 8)
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(b2m_state, b2m_fdc_drq))
 
 	MCFG_FLOPPY_DRIVE_ADD("fd0", b2m_floppies, "525qd", b2m_state::b2m_floppy_formats)
@@ -251,7 +251,7 @@ static MACHINE_CONFIG_START( b2m )
 	MCFG_RAM_DEFAULT_VALUE(0x00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( b2mrom, b2m )
+MACHINE_CONFIG_DERIVED(b2m_state::b2mrom, b2m)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(b2m_rom_io)
 MACHINE_CONFIG_END

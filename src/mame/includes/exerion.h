@@ -8,7 +8,7 @@
 #include "screen.h"
 
 
-#define EXERION_MASTER_CLOCK      (XTAL_19_968MHz)   /* verified on pcb */
+#define EXERION_MASTER_CLOCK      (XTAL(19'968'000))   /* verified on pcb */
 #define EXERION_CPU_CLOCK         (EXERION_MASTER_CLOCK / 6)
 #define EXERION_AY8910_CLOCK      (EXERION_CPU_CLOCK / 2)
 #define EXERION_PIXEL_CLOCK       (EXERION_MASTER_CLOCK / 3)
@@ -74,4 +74,5 @@ public:
 	DECLARE_PALETTE_INIT(exerion);
 	uint32_t screen_update_exerion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void exerion(machine_config &config);
 };

@@ -21,13 +21,13 @@
 
 #define MCFG_I82730_ADD(_tag, _cpu_tag, _clock) \
 	MCFG_DEVICE_ADD(_tag, I82730, _clock) \
-	i82730_device::set_cpu_tag(*device, owner, _cpu_tag);
+	i82730_device::set_cpu_tag(*device, this, _cpu_tag);
 
 #define MCFG_I82730_SINT_HANDLER(_devcb) \
 	devcb = &i82730_device::set_sint_handler(*device, DEVCB_##_devcb);
 
 #define MCFG_I82730_UPDATE_ROW_CB(_class, _method) \
-	i82730_device::set_update_row_callback(*device, i82730_device::update_row_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
+	i82730_device::set_update_row_callback(*device, i82730_device::update_row_delegate(&_class::_method, #_class "::" #_method, this));
 
 
 //**************************************************************************

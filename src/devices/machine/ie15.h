@@ -57,6 +57,8 @@ protected:
 
 	void term_write(uint8_t data) { m_serial_rx_char = data; m_serial_rx_ready = IE_FALSE; }
 
+	void ie15core(machine_config &config);
+
 public:
 	DECLARE_WRITE16_MEMBER(kbd_put);
 	DECLARE_WRITE_LINE_MEMBER(serial_rx_callback);

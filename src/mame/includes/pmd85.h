@@ -108,6 +108,13 @@ public:
 	DECLARE_WRITE8_MEMBER(pmd85_ppi_3_portc_w);
 	DECLARE_INPUT_CHANGED_MEMBER(pmd85_reset);
 
+	void pmd85(machine_config &config);
+	void pmd851(machine_config &config);
+	void pmd853(machine_config &config);
+	void pmd852a(machine_config &config);
+	void alfa(machine_config &config);
+	void c2717(machine_config &config);
+	void mato(machine_config &config);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;

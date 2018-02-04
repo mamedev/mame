@@ -49,6 +49,7 @@ public:
 
 	DECLARE_READ8_MEMBER(pic_slave_ack);
 
+	void seattle(machine_config &config);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pic8259_device, 2> m_pic;
@@ -97,9 +98,9 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
 
-static MACHINE_CONFIG_START( seattle )
+MACHINE_CONFIG_START(seattle_comp_state::seattle)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8086, XTAL_24MHz / 3) // 8 MHz or 4 MHz selectable
+	MCFG_CPU_ADD("maincpu", I8086, XTAL(24'000'000) / 3) // 8 MHz or 4 MHz selectable
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic1", pic8259_device, inta_cb)
@@ -111,7 +112,7 @@ static MACHINE_CONFIG_START( seattle )
 	MCFG_DEVICE_ADD("pic2", PIC8259, 0)
 	MCFG_PIC8259_OUT_INT_CB(DEVWRITELINE("pic1", pic8259_device, ir1_w))
 
-	MCFG_DEVICE_ADD("stc", AM9513, XTAL_4MHz) // dedicated XTAL
+	MCFG_DEVICE_ADD("stc", AM9513, XTAL(4'000'000)) // dedicated XTAL
 	MCFG_AM9513_OUT2_CALLBACK(DEVWRITELINE("pic2", pic8259_device, ir0_w))
 	MCFG_AM9513_OUT3_CALLBACK(DEVWRITELINE("pic2", pic8259_device, ir4_w))
 	MCFG_AM9513_OUT4_CALLBACK(DEVWRITELINE("pic2", pic8259_device, ir7_w))
@@ -120,7 +121,7 @@ static MACHINE_CONFIG_START( seattle )
 	MCFG_AM9513_FOUT_CALLBACK(DEVWRITELINE("stc", am9513_device, source1_w))
 	// FOUT not shown on schematics, which inexplicably have Source 1 tied to Gate 5
 
-	MCFG_DEVICE_ADD("uart", I8251, XTAL_24MHz / 12) // CLOCK on line 49
+	MCFG_DEVICE_ADD("uart", I8251, XTAL(24'000'000) / 12) // CLOCK on line 49
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))

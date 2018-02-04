@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM
 	AM_RANGE(0x02000, 0x027ff) AM_RAM_WRITE(raiden_background_w) AM_SHARE("back_data")
 	AM_RANGE(0x02800, 0x02fff) AM_RAM_WRITE(raiden_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x03000, 0x03fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x03000, 0x03fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x07ffe, 0x07fff) AM_WRITENOP // ?
 	AM_RANGE(0x08000, 0x08001) AM_WRITENOP // watchdog?
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( raidenu_sub_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x05fff) AM_RAM
 	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE(raiden_background_w) AM_SHARE("back_data")
 	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE(raiden_foreground_w) AM_SHARE("fore_data")
-	AM_RANGE(0x07000, 0x07fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x07000, 0x07fff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x0a000, 0x0a001) AM_WRITENOP // ?
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITENOP // watchdog?
@@ -158,6 +158,7 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( raiden_sound_map, AS_PROGRAM, 8, raiden_state )
+	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
@@ -171,7 +172,6 @@ static ADDRESS_MAP_START( raiden_sound_map, AS_PROGRAM, 8, raiden_state )
 	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
 	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raiden_sound_decrypted_opcodes_map, AS_OPCODES, 8, raiden_state )
@@ -318,18 +318,18 @@ INTERRUPT_GEN_MEMBER(raiden_state::raiden_interrupt)
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); /* VBL */
 }
 
-static MACHINE_CONFIG_START( raiden )
+MACHINE_CONFIG_START(raiden_state::raiden)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
+	MCFG_CPU_ADD("maincpu", V30,XTAL(20'000'000)/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden_state, raiden_interrupt)
 
-	MCFG_CPU_ADD("sub", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
+	MCFG_CPU_ADD("sub", V30,XTAL(20'000'000)/2) /* NEC V30 CPU, 20MHz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden_state, raiden_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(14'318'181)/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
@@ -353,11 +353,11 @@ static MACHINE_CONFIG_START( raiden )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_14_31818MHz/4)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(14'318'181)/4)
 	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, PIN7_HIGH) // frequency and pin 7 verified
+	MCFG_OKIM6295_ADD("oki", XTAL(12'000'000)/12, PIN7_HIGH) // frequency and pin 7 verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
@@ -367,7 +367,7 @@ static MACHINE_CONFIG_START( raiden )
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( raidene, raiden )
+MACHINE_CONFIG_DERIVED(raiden_state::raidene, raiden)
 	MCFG_DEVICE_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(raiden_sound_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(raiden_sound_decrypted_opcodes_map)
@@ -376,7 +376,7 @@ static MACHINE_CONFIG_DERIVED( raidene, raiden )
 	MCFG_DEVICE_PROGRAM_MAP(sei80bu_encrypted_full_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( raidenu, raidene )
+MACHINE_CONFIG_DERIVED(raiden_state::raidenu, raidene)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -391,7 +391,7 @@ WRITE16_MEMBER( raiden_state::raidenb_layer_scroll_w )
 	COMBINE_DATA(&m_raidenb_scroll_ram[offset]);
 }
 
-static MACHINE_CONFIG_DERIVED( raidenb, raiden )
+MACHINE_CONFIG_DERIVED(raiden_state::raidenb, raiden)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -741,7 +741,7 @@ void raiden_state::common_decrypt()
 		static const uint16_t xor_table[] = { 0x200e,0x0006,0x000a,0x0002,0x240e,0x000e,0x04c2,0x00c2,0x008c,0x0004,0x0088,0x0000,0x048c,0x000c,0x04c0,0x00c0 };
 		uint16_t data = RAM[0xc0000/2 + i];
 		data ^= xor_table[i & 0x0f];
-		data = BITSWAP16(data, 15,14,10,12,11,13,9,8,3,2,5,4,7,1,6,0);
+		data = bitswap<16>(data, 15,14,10,12,11,13,9,8,3,2,5,4,7,1,6,0);
 		RAM[0xc0000/2 + i] = data;
 	}
 
@@ -752,7 +752,7 @@ void raiden_state::common_decrypt()
 		static const uint16_t xor_table[] = { 0x0080,0x0080,0x0244,0x0288,0x0288,0x0288,0x1041,0x1009 };
 		uint16_t data = RAM[0xc0000/2 + i];
 		data ^= xor_table[i & 0x07];
-		data = BITSWAP16(data, 15,14,13,9,11,10,12,8,2,0,5,4,7,3,1,6);
+		data = bitswap<16>(data, 15,14,13,9,11,10,12,8,2,0,5,4,7,3,1,6);
 		RAM[0xc0000/2 + i] = data;
 	}
 }

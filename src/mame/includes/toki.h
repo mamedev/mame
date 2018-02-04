@@ -76,4 +76,7 @@ public:
 	uint32_t screen_update_tokib(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void toki_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void tokib_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void toki(machine_config &config);
+	void jujuba(machine_config &config);
+	void tokib(machine_config &config);
 };

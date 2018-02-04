@@ -57,7 +57,7 @@ bool mm1_keyboard_device::first_time = true;
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( mm1_keyboard_device::device_add_mconfig )
+MACHINE_CONFIG_START(mm1_keyboard_device::device_add_mconfig)
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("keyboard_and_chassis_sounds", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(2)

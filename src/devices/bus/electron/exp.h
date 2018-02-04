@@ -139,6 +139,9 @@ public:
 	template <class Object> static devcb_base &set_nmi_handler(device_t &device, Object &&cb)
 	{ return downcast<electron_expansion_slot_device &>(device).m_nmi_handler.set_callback(std::forward<Object>(cb)); }
 
+	uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data);
+	void expbus_w(address_space &space, offs_t offset, uint8_t data);
+
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
 
@@ -162,6 +165,9 @@ class device_electron_expansion_interface : public device_slot_card_interface
 public:
 	// construction/destruction
 	virtual ~device_electron_expansion_interface();
+
+	virtual uint8_t expbus_r(address_space &space, offs_t offset, uint8_t data) { return data; }
+	virtual void expbus_w(address_space &space, offs_t offset, uint8_t data) { }
 
 protected:
 	device_electron_expansion_interface(const machine_config &mconfig, device_t &device);

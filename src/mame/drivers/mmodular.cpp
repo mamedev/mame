@@ -52,6 +52,11 @@ public:
 	{ }
 
 	DECLARE_DRIVER_INIT(gen32);
+	void alm32(machine_config &config);
+	void van32(machine_config &config);
+	void van16(machine_config &config);
+	void alm16(machine_config &config);
+	void gen32(machine_config &config);
 };
 
 
@@ -66,6 +71,7 @@ public:
 
 	DECLARE_READ8_MEMBER(berlinp_input_r);
 
+	void berlinp(machine_config &config);
 private:
 	required_device<mephisto_board_device> m_board;
 	required_ioport m_keys;
@@ -89,13 +95,13 @@ static ADDRESS_MAP_START(alm16_mem, AS_PROGRAM, 16, mmodular_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, mmodular_state)
+	AM_IMPORT_FROM(alm16_mem)
+
 	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM
 
 //  AM_RANGE( 0xe80004, 0xe80005 )  AM_WRITE(write_unknown2 )   // Bavaria sensors
 //  AM_RANGE( 0xe80002, 0xe80003 )  AM_READ(read_unknown1 )     // Bavaria sensors
 //  AM_RANGE( 0xe80006, 0xe80007 )  AM_READ(read_unknown3 )     // Bavaria sensors
-
-	AM_IMPORT_FROM(alm16_mem)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, mmodular_state)
@@ -116,13 +122,13 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(van32_mem, AS_PROGRAM, 32, mmodular_state)
+	AM_IMPORT_FROM(alm32_mem)
+
 	AM_RANGE( 0x00000000, 0x0003ffff ) AM_ROM
 
 //  AM_RANGE( 0x98000008, 0x9800000b )  AM_WRITE(write_unknown2 )   // Bavaria sensors
 //  AM_RANGE( 0x98000004, 0x98000007 )  AM_READ(read_unknown1 ) // Bavaria sensors
 //  AM_RANGE( 0x9800000c, 0x9800000f )  AM_READ(read_unknown3 ) // Bavaria sensors
-
-	AM_IMPORT_FROM(alm32_mem)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(gen32_mem, AS_PROGRAM, 32, mmodular_state)
@@ -232,8 +238,8 @@ DRIVER_INIT_MEMBER(mmodular_state, gen32)
 		rom[0x870] = 0x38;
 }
 
-static MACHINE_CONFIG_START( alm16 )
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+MACHINE_CONFIG_START(mmodular_state::alm16)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(alm16_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 600)
 
@@ -243,14 +249,14 @@ static MACHINE_CONFIG_START( alm16 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( van16, alm16 )
+MACHINE_CONFIG_DERIVED(mmodular_state::van16, alm16)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(van16_mem)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( alm32 )
-	MCFG_CPU_ADD("maincpu", M68020, XTAL_12MHz)
+MACHINE_CONFIG_START(mmodular_state::alm32)
+	MCFG_CPU_ADD("maincpu", M68020, XTAL(12'000'000))
 	MCFG_CPU_PROGRAM_MAP(alm32_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq6_line_hold, 750)
 
@@ -262,14 +268,14 @@ static MACHINE_CONFIG_START( alm32 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( van32, alm32 )
+MACHINE_CONFIG_DERIVED(mmodular_state::van32, alm32)
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(van32_mem)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( gen32 )
-	MCFG_CPU_ADD("maincpu", M68030, XTAL_33_333MHz)
+MACHINE_CONFIG_START(mmodular_state::gen32)
+	MCFG_CPU_ADD("maincpu", M68030, XTAL(33'333'000))
 	MCFG_CPU_PROGRAM_MAP(gen32_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mmodular_state, irq2_line_hold, 375)
 
@@ -281,8 +287,8 @@ static MACHINE_CONFIG_START( gen32 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( berlinp )
-	MCFG_CPU_ADD("maincpu", M68020, XTAL_24_576MHz)
+MACHINE_CONFIG_START(berlinp_state::berlinp)
+	MCFG_CPU_ADD("maincpu", M68020, XTAL(24'576'000))
 	MCFG_CPU_PROGRAM_MAP(berlinp_mem)
 	MCFG_CPU_PERIODIC_INT_DRIVER(berlinp_state, irq2_line_hold, 750)
 

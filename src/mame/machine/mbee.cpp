@@ -279,7 +279,7 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 	data &= 0x3f; // (bits 0-5 are referred to as S0-S5)
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	uint8_t *prom = memregion("pals")->base();
-	uint8_t b_data = BITSWAP8(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
+	uint8_t b_data = bitswap<8>(data, 7,5,3,2,4,6,1,0) & 0x3b; // arrange data bits to S0,S1,-,S4,S2,S3
 	uint8_t b_bank, b_byte, b_byte_t, b_addr, p_bank = 1;
 	uint16_t b_vid;
 	char banktag[10];
@@ -291,11 +291,11 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 		for (b_bank = 0; b_bank < 16; b_bank++)
 		{
 			b_vid = b_bank << 12;
-			b_addr = BITSWAP8(b_bank, 7,4,5,3,1,2,6,0) & 0x1f; // arrange address bits to A12,-,A14,A13,A15
+			b_addr = bitswap<8>(b_bank, 7,4,5,3,1,2,6,0) & 0x1f; // arrange address bits to A12,-,A14,A13,A15
 
 			// Calculate read-bank
 			b_byte_t = prom[b_addr | (b_data << 8) | 0x82]; // read-bank (RDS and MREQ are low, RFSH is high)
-			b_byte = BITSWAP8(b_byte_t, 7,5,0,3,6,2,1,4); // rearrange so that bits 0-2 are rambank, bit 3 = rom select, bit 4 = video select, others not used
+			b_byte = bitswap<8>(b_byte_t, 7,5,0,3,6,2,1,4); // rearrange so that bits 0-2 are rambank, bit 3 = rom select, bit 4 = video select, others not used
 
 			if (first_time || (b_byte != m_bank_array[p_bank]))
 			{
@@ -327,7 +327,7 @@ void mbee_state::setup_banks(uint8_t data, bool first_time, uint8_t b_mask)
 
 			// Calculate write-bank
 			b_byte_t = prom[b_addr | (b_data << 8) | 0xc0]; // write-bank (XWR and MREQ are low, RFSH is high)
-			b_byte = BITSWAP8(b_byte_t, 7,5,0,3,6,2,1,4); // rearrange so that bits 0-2 are rambank, bit 3 = rom select, bit 4 = video select, others not used
+			b_byte = bitswap<8>(b_byte_t, 7,5,0,3,6,2,1,4); // rearrange so that bits 0-2 are rambank, bit 3 = rom select, bit 4 = video select, others not used
 
 			if (first_time || (b_byte != m_bank_array[p_bank]))
 			{

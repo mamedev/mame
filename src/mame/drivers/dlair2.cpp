@@ -35,7 +35,7 @@ http://www.dragons-lair-project.com/tech/pages/dl2.asp
 #include "screen.h"
 #include "speaker.h"
 
-#define MAIN_CLOCK XTAL_30MHz
+#define MAIN_CLOCK XTAL(30'000'000)
 
 class dlair2_state : public driver_device
 {
@@ -53,6 +53,7 @@ public:
 	INTERRUPT_GEN_MEMBER(dlair2_timer_irq);
 	DECLARE_PALETTE_INIT(dlair2);
 
+	void dlair2(machine_config &config);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -173,7 +174,7 @@ INTERRUPT_GEN_MEMBER(dlair2_state::dlair2_timer_irq)
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x20/4);
 }
 
-static MACHINE_CONFIG_START( dlair2 )
+MACHINE_CONFIG_START(dlair2_state::dlair2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8088 , MAIN_CLOCK/3)   /* Schematics show I8088 "max" CPU */

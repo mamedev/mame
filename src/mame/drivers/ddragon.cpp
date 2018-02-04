@@ -65,8 +65,8 @@ Dip locations verified with manual for ddragon & ddragon2
 #include "speaker.h"
 
 
-#define MAIN_CLOCK      XTAL_12MHz
-#define SOUND_CLOCK     XTAL_3_579545MHz
+#define MAIN_CLOCK      XTAL(12'000'000)
+#define SOUND_CLOCK     XTAL(3'579'545)
 #define MCU_CLOCK       MAIN_CLOCK / 3
 #define PIXEL_CLOCK     MAIN_CLOCK / 2
 
@@ -199,7 +199,7 @@ WRITE8_MEMBER(toffy_state::toffy_bankswitch_w)
 
 READ8_MEMBER(darktowr_state::darktowr_mcu_bank_r)
 {
-	// logerror("BankRead %05x %08x\n",space.device().safe_pc(),offset);
+	// logerror("BankRead %05x %08x\n",m_maincpu->pc(),offset);
 
 	/* Horrible hack - the alternate TStrike set is mismatched against the MCU,
 	so just hack around the protection here.  (The hacks are 'right' as I have
@@ -208,9 +208,9 @@ READ8_MEMBER(darktowr_state::darktowr_mcu_bank_r)
 	if (!strcmp(machine().system().name, "tstrike"))
 	{
 		/* Static protection checks at boot-up */
-		if (space.device().safe_pc() == 0x9ace)
+		if (m_maincpu->pc() == 0x9ace)
 			return 0;
-		if (space.device().safe_pc() == 0x9ae4)
+		if (m_maincpu->pc() == 0x9ae4)
 			return 0x63;
 
 		/* Just return whatever the code is expecting */
@@ -227,11 +227,11 @@ READ8_MEMBER(darktowr_state::darktowr_mcu_bank_r)
 
 WRITE8_MEMBER(darktowr_state::darktowr_mcu_bank_w)
 {
-	logerror("BankWrite %05x %08x %08x\n", space.device().safe_pc(), offset, data);
+	logerror("BankWrite %05x %08x %08x\n", m_maincpu->pc(), offset, data);
 
 	if (offset == 0x1400 || offset == 0)
 	{
-		uint8_t const value(BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7));
+		uint8_t const value(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 		m_mcu->pb_w(space, 0, value);
 		logerror("MCU PORT 1 -> %04x (from %04x)\n", value, data);
 	}
@@ -253,9 +253,9 @@ WRITE8_MEMBER(darktowr_state::darktowr_bankswitch_w)
 
 	membank("bank1")->set_entry(newbank);
 	if (newbank == 4 && oldbank != 4)
-		space.install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(darktowr_state::darktowr_mcu_bank_r),this), write8_delegate(FUNC(darktowr_state::darktowr_mcu_bank_w),this));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(darktowr_state::darktowr_mcu_bank_r),this), write8_delegate(FUNC(darktowr_state::darktowr_mcu_bank_w),this));
 	else if (newbank != 4 && oldbank == 4)
-		space.install_readwrite_bank(0x4000, 0x7fff, "bank1");
+		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x4000, 0x7fff, "bank1");
 }
 
 
@@ -356,14 +356,14 @@ CUSTOM_INPUT_MEMBER(ddragon_state::subcpu_bus_free)
 
 WRITE8_MEMBER(darktowr_state::mcu_port_a_w)
 {
-	logerror("McuWrite %05x %08x %08x\n", space.device().safe_pc(), offset, data);
+	logerror("%s: McuWrite %08x %08x\n", machine().describe_context(), offset, data);
 	m_mcu_port_a_out = data;
 }
 
 
 READ8_MEMBER(ddragon_state::ddragon_hd63701_internal_registers_r)
 {
-	logerror("%04x: read %d\n", space.device().safe_pc(), offset);
+	logerror("%s: read %d\n", machine().describe_context(), offset);
 	return 0;
 }
 
@@ -491,8 +491,8 @@ READ8_MEMBER(ddragon_state::dd_adpcm_status_r)
 
 static ADDRESS_MAP_START( ddragon_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("rambase")
-	AM_RANGE(0x1000, 0x11ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x1200, 0x13ff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x1000, 0x11ff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x1200, 0x13ff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(ddragon_fgvideoram_w) AM_SHARE("fgvideoram")
 	AM_RANGE(0x2000, 0x21ff) AM_READWRITE(ddragon_comram_r, ddragon_comram_w) AM_SHARE("comram") AM_MIRROR(0x0600)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
@@ -526,8 +526,8 @@ static ADDRESS_MAP_START( dd2_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x3809, 0x3809) AM_WRITEONLY AM_SHARE("scrollx_lo")
 	AM_RANGE(0x380a, 0x380a) AM_WRITEONLY AM_SHARE("scrolly_lo")
 	AM_RANGE(0x380b, 0x380f) AM_READWRITE(ddragon_interrupt_r, ddragon_interrupt_w)
-	AM_RANGE(0x3c00, 0x3dff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x3e00, 0x3fff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
+	AM_RANGE(0x3c00, 0x3dff) AM_RAM_DEVWRITE("palette", palette_device, write8) AM_SHARE("palette")
+	AM_RANGE(0x3e00, 0x3fff) AM_RAM_DEVWRITE("palette", palette_device, write8_ext) AM_SHARE("palette_ext")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -542,7 +542,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(ddragon_hd63701_internal_registers_r, ddragon_hd63701_internal_registers_w)
-	AM_RANGE(0x001f, 0x0fff) AM_RAM
+	AM_RANGE(0x0020, 0x0fff) AM_RAM
 	AM_RANGE(0x8000, 0x81ff) AM_RAM AM_SHARE("comram")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -936,7 +936,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( ddragon )
+MACHINE_CONFIG_START(ddragon_state::ddragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)     /* 12 MHz / 4 internally */
@@ -946,7 +946,7 @@ static MACHINE_CONFIG_START( ddragon )
 	MCFG_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)    /* 6 MHz / 4 internally */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8) /* 1.5 MHz */
+	MCFG_CPU_ADD("soundcpu", MC6809, MAIN_CLOCK / 2) /* 6 MHz / 4 internally */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
@@ -989,7 +989,7 @@ static MACHINE_CONFIG_START( ddragon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ddragonb, ddragon )
+MACHINE_CONFIG_DERIVED(ddragon_state::ddragonb, ddragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)  /* 1.5MHz */
@@ -997,7 +997,7 @@ static MACHINE_CONFIG_DERIVED( ddragonb, ddragon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( ddragonba, ddragon )
+MACHINE_CONFIG_DERIVED(ddragon_state::ddragonba, ddragon)
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)  /* 6MHz / 4 internally */
@@ -1006,17 +1006,17 @@ static MACHINE_CONFIG_DERIVED( ddragonba, ddragon )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ddragon6809 )
+MACHINE_CONFIG_START(ddragon_state::ddragon6809)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)  /* 1.5 MHz */
+	MCFG_CPU_ADD("maincpu", MC6809E, MAIN_CLOCK / 8)  /* 1.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(ddragon_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ddragon_state, ddragon_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)  /* 1.5 Mhz */
+	MCFG_CPU_ADD("sub", MC6809E, MAIN_CLOCK / 8)  /* 1.5 Mhz */
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MCFG_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8) /* 1.5 MHz */
+	MCFG_CPU_ADD("soundcpu", MC6809E, MAIN_CLOCK / 8) /* 1.5 MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60000)) /* heavy interleaving to sync up sprite<->main CPUs */
@@ -1059,7 +1059,7 @@ static MACHINE_CONFIG_START( ddragon6809 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( ddragon2 )
+MACHINE_CONFIG_START(ddragon_state::ddragon2)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)     /* 12 MHz / 4 internally */
@@ -1105,17 +1105,17 @@ static MACHINE_CONFIG_START( ddragon2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( darktowr, ddragon )
+MACHINE_CONFIG_DERIVED(darktowr_state::darktowr, ddragon)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("mcu", M68705P3, XTAL_4MHz)
+	MCFG_CPU_ADD("mcu", M68705P3, XTAL(4'000'000))
 	MCFG_M68705_PORTA_W_CB(WRITE8(darktowr_state, mcu_port_a_w))
 
 	/* video hardware */
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( toffy, ddragon )
+MACHINE_CONFIG_DERIVED(toffy_state::toffy, ddragon)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_REMOVE("sub")
@@ -2116,27 +2116,27 @@ DRIVER_INIT_MEMBER(toffy_state, toffy)
 	rom = memregion("maincpu")->base();
 	length = memregion("maincpu")->bytes();
 	for (i = 0; i < length; i++)
-		rom[i] = BITSWAP8(rom[i], 6,7,5,4,3,2,1,0);
+		rom[i] = bitswap<8>(rom[i], 6,7,5,4,3,2,1,0);
 
 	/* and the fg gfx ... */
 	rom = memregion("gfx1")->base();
 	length = memregion("gfx1")->bytes();
 	for (i = 0; i < length; i++)
-		rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0);
+		rom[i] = bitswap<8>(rom[i], 7,6,5,3,4,2,1,0);
 
 	/* and the sprites gfx */
 	rom = memregion("gfx2")->base();
 	length = memregion("gfx2")->bytes();
 	for (i = 0; i < length; i++)
-		rom[i] = BITSWAP8(rom[i], 7,6,5,4,3,2,0,1);
+		rom[i] = bitswap<8>(rom[i], 7,6,5,4,3,2,0,1);
 
 	/* and the bg gfx */
 	rom = memregion("gfx3")->base();
 	length = memregion("gfx3")->bytes();
 	for (i = 0; i < length / 2; i++)
 	{
-		rom[i + 0*length/2] = BITSWAP8(rom[i + 0*length/2], 7,6,1,4,3,2,5,0);
-		rom[i + 1*length/2] = BITSWAP8(rom[i + 1*length/2], 7,6,2,4,3,5,1,0);
+		rom[i + 0*length/2] = bitswap<8>(rom[i + 0*length/2], 7,6,1,4,3,2,5,0);
+		rom[i + 1*length/2] = bitswap<8>(rom[i + 1*length/2], 7,6,2,4,3,5,1,0);
 	}
 
 	/* should the sound rom be bitswapped too? */

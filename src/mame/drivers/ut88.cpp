@@ -183,7 +183,7 @@ static INPUT_PORTS_START( ut88mini )
 INPUT_PORTS_END
 
 /* Machine driver */
-static MACHINE_CONFIG_START( ut88 )
+MACHINE_CONFIG_START(ut88_state::ut88)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(ut88_mem)
@@ -226,7 +226,7 @@ static MACHINE_CONFIG_START( ut88 )
 	MCFG_SOFTWARE_LIST_ADD("cass_list","ut88")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ut88mini )
+MACHINE_CONFIG_START(ut88_state::ut88mini)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8080, 2000000)
 	MCFG_CPU_PROGRAM_MAP(ut88mini_mem)

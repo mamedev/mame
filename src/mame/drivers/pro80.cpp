@@ -45,6 +45,7 @@ public:
 	DECLARE_READ8_MEMBER(kp_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
 
+	void pro80(machine_config &config);
 private:
 	uint8_t m_digit_sel;
 	uint8_t m_cass_in;
@@ -165,9 +166,9 @@ void pro80_state::machine_reset()
 	m_cass_in = 0;
 }
 
-static MACHINE_CONFIG_START( pro80 )
+MACHINE_CONFIG_START(pro80_state::pro80)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz / 2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(4'000'000) / 2)
 	MCFG_CPU_PROGRAM_MAP(pro80_mem)
 	MCFG_CPU_IO_MAP(pro80_io)
 
@@ -181,7 +182,7 @@ static MACHINE_CONFIG_START( pro80 )
 
 	/* Devices */
 	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL_4MHz / 2)
+	MCFG_DEVICE_ADD("pio", Z80PIO, XTAL(4'000'000) / 2)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", pro80_state, timer_p, attotime::from_hz(40000)) // cass read
 MACHINE_CONFIG_END
 

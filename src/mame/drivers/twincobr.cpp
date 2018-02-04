@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 16, twincobr_state )
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
 	AM_RANGE(0x030000, 0x033fff) AM_RAM     /* 68K and DSP shared RAM */
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("spriteram16")
-	AM_RANGE(0x050000, 0x050dff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x050000, 0x050dff) AM_RAM_DEVWRITE("palette", palette_device, write16) AM_SHARE("palette")
 	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0x00ff)
 	AM_RANGE(0x060002, 0x060003) AM_DEVWRITE8("crtc", mc6845_device, register_w, 0x00ff)
 	AM_RANGE(0x070000, 0x070003) AM_WRITE(twincobr_txscroll_w)  /* text layer scroll */
@@ -655,18 +655,18 @@ static GFXDECODE_START( twincobr )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( twincobr )
+MACHINE_CONFIG_START(twincobr_state::twincobr)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_28MHz/4)       /* 7MHz - Main board Crystal is 28MHz */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL(28'000'000)/4)       /* 7MHz - Main board Crystal is 28MHz */
 	MCFG_CPU_PROGRAM_MAP(main_program_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", twincobr_state,  twincobr_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28MHz/8)         /* 3.5MHz */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(28'000'000)/8)         /* 3.5MHz */
 	MCFG_CPU_PROGRAM_MAP(sound_program_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MCFG_CPU_ADD("dsp", TMS32010, XTAL_28MHz/2)         /* 14MHz CLKin */
+	MCFG_CPU_ADD("dsp", TMS32010, XTAL(28'000'000)/2)         /* 14MHz CLKin */
 	MCFG_CPU_PROGRAM_MAP(DSP_program_map)
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(DSP_io_map)
@@ -691,7 +691,7 @@ static MACHINE_CONFIG_START( twincobr )
 	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(twincobr_state, coin_lockout_2_w))
 
 	/* video hardware */
-	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL_28MHz/8) /* 3.5MHz measured on CLKin */
+	MCFG_MC6845_ADD("crtc", HD6845, "screen", XTAL(28'000'000)/8) /* 3.5MHz measured on CLKin */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(2)
 
@@ -701,7 +701,7 @@ static MACHINE_CONFIG_START( twincobr )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz/4, 446, 0, 320, 286, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(XTAL(28'000'000)/4, 446, 0, 320, 286, 0, 240)
 	MCFG_SCREEN_UPDATE_DRIVER(twincobr_state, screen_update_toaplan0)
 	MCFG_SCREEN_VBLANK_CALLBACK(DEVWRITELINE("spriteram16", buffered_spriteram16_device, vblank_copy_rising))
 	MCFG_SCREEN_PALETTE("palette")
@@ -715,13 +715,13 @@ static MACHINE_CONFIG_START( twincobr )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL(28'000'000)/8)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fshark, twincobr )
+MACHINE_CONFIG_DERIVED(twincobr_state::fshark, twincobr)
 	MCFG_DEVICE_MODIFY("mainlatch")
 	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP)
 
@@ -733,9 +733,9 @@ static MACHINE_CONFIG_DERIVED( fshark, twincobr )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( fsharkbt, fshark )
+MACHINE_CONFIG_DERIVED(twincobr_state::fsharkbt, fshark)
 
-	MCFG_CPU_ADD("mcu", I8741, XTAL_28MHz/16)
+	MCFG_CPU_ADD("mcu", I8741, XTAL(28'000'000)/16)
 	/* Program Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(fsharkbt_i8741_io_map)
 	MCFG_DEVICE_DISABLE()       /* Internal program code is not dumped */

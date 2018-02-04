@@ -116,8 +116,8 @@ static ADDRESS_MAP_START( blueprnt_map, AS_PROGRAM, 8, blueprnt_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( grasspin_map, AS_PROGRAM, 8, blueprnt_state )
-	AM_RANGE(0xc003, 0xc003) AM_READ(grasspin_sh_dipsw_r)
 	AM_IMPORT_FROM( blueprnt_map )
+	AM_RANGE(0xc003, 0xc003) AM_READ(grasspin_sh_dipsw_r)
 ADDRESS_MAP_END
 
 
@@ -342,7 +342,7 @@ void blueprnt_state::machine_reset()
 }
 
 
-static MACHINE_CONFIG_START( blueprnt )
+MACHINE_CONFIG_START(blueprnt_state::blueprnt)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, 7000000/2) // 3.5 MHz
@@ -389,7 +389,7 @@ static MACHINE_CONFIG_START( blueprnt )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( grasspin, blueprnt )
+MACHINE_CONFIG_DERIVED(blueprnt_state::grasspin, blueprnt)
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")

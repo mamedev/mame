@@ -109,10 +109,45 @@ public:
 	IRQ_CALLBACK_MEMBER(metro_irq_callback);
 	DECLARE_READ_LINE_MEMBER(metro_rxd_r);
 
+	void i4100_config(machine_config &config);
+	void i4100_config_360x224(machine_config &config);
+	void i4220_config(machine_config &config);
+	void i4220_config_320x240(machine_config &config);
+	void i4220_config_304x224(machine_config &config);
+	void i4300_config(machine_config &config);
+	void i4300_config_384x224(machine_config &config);
+	void i4300_config_320x240(machine_config &config);
+	void metro_upd7810_sound(machine_config &config);
+	void daitorid_upd7810_sound(machine_config &config);
+	void poitto(machine_config &config);
+	void blzntrnd(machine_config &config);
+	void _3kokushi(machine_config &config);
+	void mouja(machine_config &config);
+	void toride2g(machine_config &config);
+	void karatour(machine_config &config);
+	void skyalert(machine_config &config);
+	void gakusai(machine_config &config);
+	void batlbubl(machine_config &config);
+	void pururun(machine_config &config);
+	void vmetal(machine_config &config);
+	void daitorid(machine_config &config);
+	void pangpoms(machine_config &config);
+	void dokyusp(machine_config &config);
+	void dokyusei(machine_config &config);
+	void daitoa(machine_config &config);
+	void lastfort(machine_config &config);
+	void puzzlet(machine_config &config);
+	void gakusai2(machine_config &config);
+	void balcube(machine_config &config);
+	void msgogo(machine_config &config);
+	void gstrik2(machine_config &config);
+	void lastforg(machine_config &config);
+	void bangball(machine_config &config);
+	void dharma(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	
+
 private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -158,7 +193,7 @@ private:
 	/* misc */
 	int         m_gakusai_oki_bank_lo;
 	int         m_gakusai_oki_bank_hi;
-	
+
 	void update_irq_state();
 	void metro_common();
 	void gakusai_oki_bank_set();

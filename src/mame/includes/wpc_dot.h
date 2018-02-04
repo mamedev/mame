@@ -34,6 +34,7 @@ public:
 			m_dmdbank6(*this, "dmdbank6")
 	{ }
 
+	void wpc_dot(machine_config &config);
 protected:
 
 	// devices

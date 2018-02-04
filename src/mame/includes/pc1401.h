@@ -53,6 +53,8 @@ public:
 	required_device<sc61860_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void pc1401(machine_config &config);
+	void pc1402(machine_config &config);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

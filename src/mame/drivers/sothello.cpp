@@ -30,7 +30,7 @@
 |                                                                                 |
 +---------------------------------------------------------------------------------+
 
-CPU  : Z80A(x2) 68B09
+CPU  : Z80A(x2) HD68B09P
 Sound: YM2203?(surface scratched) + M5205
 OSC  : 8.0000MHz(X1)   21.477 MHz(X2)   384kHz(X3)
 
@@ -73,6 +73,7 @@ public:
 	DECLARE_WRITE8_MEMBER(msm_cfg_w);
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 
+	void sothello(machine_config &config);
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -97,12 +98,7 @@ private:
 
 #define VDP_MEM             0x40000
 
-#define MAIN_CLOCK          (XTAL_21_4772MHz)
-#define MAINCPU_CLOCK       (XTAL_21_4772MHz/6)
-#define SOUNDCPU_CLOCK      (XTAL_21_4772MHz/6)
-#define YM_CLOCK            (XTAL_21_4772MHz/12)
-#define MSM_CLOCK           (XTAL_384kHz)
-#define SUBCPU_CLOCK        (XTAL_8MHz/4)
+
 
 
 /* main Z80 */
@@ -198,7 +194,7 @@ WRITE8_MEMBER(sothello_state::msm_cfg_w)
      bit 2 = S2    1
      bit 3 = S1    2
 */
-	m_msm->playmode_w(BITSWAP8((data>>1), 7,6,5,4,3,0,1,2));
+	m_msm->playmode_w(bitswap<8>((data>>1), 7,6,5,4,3,0,1,2));
 	m_msm->reset_w(data & 1);
 }
 
@@ -349,33 +345,33 @@ void sothello_state::machine_reset()
 	m_msm_data = 0;
 }
 
-static MACHINE_CONFIG_START( sothello )
+MACHINE_CONFIG_START(sothello_state::sothello)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MAINCPU_CLOCK)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(21'477'272) / 6)
 	MCFG_CPU_PROGRAM_MAP(maincpu_mem_map)
 	MCFG_CPU_IO_MAP(maincpu_io_map)
 
-	MCFG_CPU_ADD("soundcpu", Z80, SOUNDCPU_CLOCK)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL(21'477'272) / 6)
 	MCFG_CPU_PROGRAM_MAP(soundcpu_mem_map)
 	MCFG_CPU_IO_MAP(soundcpu_io_map)
 
-	MCFG_CPU_ADD("subcpu", M6809, SUBCPU_CLOCK)
+	MCFG_CPU_ADD("subcpu", MC6809, XTAL(8'000'000)) // divided by 4 internally
 	MCFG_CPU_PROGRAM_MAP(subcpu_mem_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	/* video hardware */
-	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
+	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, XTAL(21'477'272))
 	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
+	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", XTAL(21'477'272))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, YM_CLOCK)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL(21'477'272) / 12)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("subcpu", 0))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
@@ -386,7 +382,7 @@ static MACHINE_CONFIG_START( sothello )
 
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("msm", MSM5205, MSM_CLOCK)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL(384'000))
 	MCFG_MSM5205_VCLK_CB(WRITELINE(sothello_state, adpcm_int))      /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)  /* changed on the fly */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

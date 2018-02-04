@@ -19,7 +19,7 @@
 #include "includes/konamipt.h"
 
 #include "cpu/z80/z80.h"
-#include "cpu/m6809/m6809.h"
+#include "cpu/m6809/hd6309.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
@@ -90,7 +90,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram2_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset + 0x2000, data);
 	else
-		m_palette->write(space, offset, data);
+		m_palette->write8(space, offset, data);
 }
 
 WRITE8_MEMBER(bottom9_state::bankswitch_w)
@@ -160,6 +160,7 @@ WRITE8_MEMBER(bottom9_state::sound_bank_w)
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bottom9_state )
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bottom9_bankedram1_r, bottom9_bankedram1_w)
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x1f90, 0x1f90) AM_WRITE(bottom9_1f90_w)
@@ -173,7 +174,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bottom9_state )
 	AM_RANGE(0x1fe0, 0x1fe0) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1ff0, 0x1fff) AM_DEVWRITE("k051316", k051316_device, ctrl_w)
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(bottom9_bankedram2_r, bottom9_bankedram2_w) AM_SHARE("palette")
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -298,14 +298,14 @@ void bottom9_state::machine_reset()
 	m_nmienable = 0;
 }
 
-static MACHINE_CONFIG_START( bottom9 )
+MACHINE_CONFIG_START(bottom9_state::bottom9)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6809, 2000000) /* ? */
+	MCFG_CPU_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) // 63C09E
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bottom9_state,  bottom9_interrupt)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL(3'579'545))
 	MCFG_CPU_PROGRAM_MAP(audio_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(bottom9_state, bottom9_sound_interrupt, 8*60)  /* irq is triggered by the main CPU */
 
@@ -324,7 +324,7 @@ static MACHINE_CONFIG_START( bottom9 )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0)
+	MCFG_DEVICE_ADD("k052109", K052109, 0) // 051961 on schematics
 	MCFG_GFX_PALETTE("palette")
 	MCFG_K052109_CB(bottom9_state, tile_callback)
 
@@ -342,12 +342,12 @@ static MACHINE_CONFIG_START( bottom9 )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232_1", K007232, XTAL(3'579'545))
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(bottom9_state, volume_callback0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_SOUND_ADD("k007232_2", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232_2", K007232, XTAL(3'579'545))
 	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(bottom9_state, volume_callback1))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)

@@ -165,6 +165,7 @@ public:
 	DECLARE_WRITE8_MEMBER(irl_w);
 	DECLARE_WRITE8_MEMBER(halt_w);
 
+	void hp85(machine_config &config);
 protected:
 	required_device<capricorn_cpu_device> m_cpu;
 	required_device<screen_device> m_screen;
@@ -1195,7 +1196,7 @@ void hp85_state::prt_do_printing()
 	m_prt_busy_timer->adjust(attotime::from_msec(PRT_BUSY_MSEC));
 }
 
-#define IOP_MASK(x)	BIT_MASK<ioport_value>((x))
+#define IOP_MASK(x) BIT_MASK<ioport_value>((x))
 
 static INPUT_PORTS_START(hp85)
 	// Keyboard is arranged in a matrix of 10 rows and 8 columns. In addition there are 3 keys with
@@ -1323,7 +1324,7 @@ static ADDRESS_MAP_START(rombank_mem_map , AS_PROGRAM , 8 , hp85_state)
 	AM_RANGE(0x0000 , 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START(hp85)
+MACHINE_CONFIG_START(hp85_state::hp85)
 	MCFG_CPU_ADD("cpu" , HP_CAPRICORN , MASTER_CLOCK / 16)
 	MCFG_CPU_PROGRAM_MAP(cpu_mem_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(hp85_state , irq_callback)
@@ -1331,8 +1332,8 @@ static MACHINE_CONFIG_START(hp85)
 	MCFG_DEVICE_ADD("rombank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(rombank_mem_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(21)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(21)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(HP80_OPTROM_SIZE)
 
 	MCFG_SCREEN_ADD("screen" , RASTER)

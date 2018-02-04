@@ -10,8 +10,8 @@
 #include "machine/mathbox.h"
 #include "sound/discrete.h"
 
-#define BZONE_MASTER_CLOCK (XTAL_12_096MHz)
-#define BZONE_CLOCK_3KHZ   ((double)BZONE_MASTER_CLOCK / 4096)
+#define BZONE_MASTER_CLOCK (XTAL(12'096'000))
+#define BZONE_CLOCK_3KHZ   (BZONE_MASTER_CLOCK / 4096)
 
 class bzone_state : public driver_device
 {
@@ -42,8 +42,8 @@ public:
 	DECLARE_MACHINE_START(redbaron);
 	INTERRUPT_GEN_MEMBER(bzone_interrupt);
 	DECLARE_WRITE8_MEMBER(bzone_sounds_w);
+	void bzone_base(machine_config &config);
+	void redbaron(machine_config &config);
+	void bzone(machine_config &config);
+	void bzone_audio(machine_config &config);
 };
-
-
-/*----------- defined in audio/bzone.c -----------*/
-MACHINE_CONFIG_EXTERN( bzone_audio );

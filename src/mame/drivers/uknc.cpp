@@ -24,6 +24,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_uknc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
+	void uknc(machine_config &config);
 };
 
 
@@ -57,7 +58,7 @@ uint32_t uknc_state::screen_update_uknc(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-static MACHINE_CONFIG_START( uknc )
+MACHINE_CONFIG_START(uknc_state::uknc)
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", K1801VM2, 8000000)
 	MCFG_T11_INITIAL_MODE(0x8000)

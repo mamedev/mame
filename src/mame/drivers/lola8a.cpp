@@ -56,6 +56,7 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
+	void lola8a(machine_config &config);
 private:
 	uint8_t m_portb;
 	virtual void machine_reset() override { m_maincpu->set_pc(0x8000); }
@@ -257,16 +258,16 @@ WRITE_LINE_MEMBER(lola8a_state::crtc_vsync)
 	m_maincpu->set_input_line(I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( lola8a )
+MACHINE_CONFIG_START(lola8a_state::lola8a)
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8085A, XTAL_4_9152MHz)
+	MCFG_CPU_ADD("maincpu", I8085A, XTAL(4'915'200))
 	MCFG_CPU_PROGRAM_MAP(lola8a_mem)
 	MCFG_CPU_IO_MAP(lola8a_io)
 	MCFG_I8085A_SID(READLINE(lola8a_state, cass_r))
 	MCFG_I8085A_SOD(WRITELINE(lola8a_state, cass_w))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL_4_9152MHz / 4)
+	MCFG_SOUND_ADD(AY8910_TAG, AY8910, XTAL(4'915'200) / 4)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(lola8a_state, lola8a_port_a_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(lola8a_state, lola8a_port_b_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS,"mono",1.0)
@@ -279,7 +280,7 @@ static MACHINE_CONFIG_START( lola8a )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MCFG_MC6845_ADD(HD46505SP_TAG, HD6845, "screen", XTAL_8MHz / 8) // HD6845 == HD46505S
+	MCFG_MC6845_ADD(HD46505SP_TAG, HD6845, "screen", XTAL(8'000'000) / 8) // HD6845 == HD46505S
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(lola8a_state, crtc_update_row)

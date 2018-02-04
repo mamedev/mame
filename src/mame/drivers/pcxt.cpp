@@ -93,6 +93,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pc_noppi_mb_device> m_mb;
 	optional_device<address_map_bank_device> m_bank;
+	void tetriskr(machine_config &config);
+	void filetto(machine_config &config);
 };
 
 
@@ -236,7 +238,7 @@ const tiny_rom_entry *isa8_cga_tetriskr_device::device_rom_region() const
 
 READ8_MEMBER(pcxt_state::disk_iobank_r)
 {
-	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,space.device().safe_pc());
+	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,m_maincpu->pc());
 	//if(offset == 0) return ioport("DSW")->read();
 	if(offset == 1) return ioport("IN1")->read();
 
@@ -364,10 +366,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( filetto_io, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
+	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
 	AM_RANGE(0x0060, 0x0060) AM_READ(port_a_r)  //not a real 8255
 	AM_RANGE(0x0061, 0x0061) AM_READWRITE(port_b_r, port_b_w)
 	AM_RANGE(0x0062, 0x0062) AM_READ(port_c_r)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", pc_noppi_mb_device, map)
 	AM_RANGE(0x0201, 0x0201) AM_READ_PORT("COIN") //game port
 	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
 	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
@@ -480,8 +482,8 @@ static SLOT_INTERFACE_START( filetto_isa8_cards )
 SLOT_INTERFACE_END
 
 
-static MACHINE_CONFIG_START( filetto )
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
+MACHINE_CONFIG_START(pcxt_state::filetto)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)
 	MCFG_CPU_PROGRAM_MAP(filetto_map)
 	MCFG_CPU_IO_MAP(filetto_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
@@ -496,13 +498,13 @@ static MACHINE_CONFIG_START( filetto )
 	MCFG_DEVICE_ADD("bank", ADDRESS_MAP_BANK, 0)
 	MCFG_DEVICE_PROGRAM_MAP(bank_map)
 	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(18)
+	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(18)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x10000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tetriskr )
-	MCFG_CPU_ADD("maincpu", I8088, XTAL_14_31818MHz/3)
+MACHINE_CONFIG_START(pcxt_state::tetriskr)
+	MCFG_CPU_ADD("maincpu", I8088, XTAL(14'318'181)/3)
 	MCFG_CPU_PROGRAM_MAP(tetriskr_map)
 	MCFG_CPU_IO_MAP(tetriskr_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)

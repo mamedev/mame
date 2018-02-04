@@ -784,7 +784,7 @@ ioport_constructor asr733_device::device_input_ports() const
 //-------------------------------------------------
 
 
-MACHINE_CONFIG_MEMBER( asr733_device::device_add_mconfig )
+MACHINE_CONFIG_START(asr733_device::device_add_mconfig)
 	MCFG_PALETTE_ADD("palette", 2)
 	MCFG_PALETTE_INIT_OWNER(asr733_device, asr733)
 

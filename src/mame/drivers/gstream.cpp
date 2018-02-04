@@ -208,6 +208,8 @@ public:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void x2222(machine_config &config);
+	void gstream(machine_config &config);
 };
 
 CUSTOM_INPUT_MEMBER(gstream_state::x2222_toggle_r) // or the game hangs when starting, might be a status flag for the sound?
@@ -289,7 +291,7 @@ static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32, gstream_state )
 	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION("user2",0) // main game rom
 	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE(gstream_tilemap3_scrollx_w)
 	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE(gstream_tilemap3_scrolly_w)
-	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_DEVWRITE("palette", palette_device, write32) AM_SHARE("palette")
 	AM_RANGE(0x4F800000, 0x4F800003) AM_WRITE(gstream_tilemap1_scrollx_w)
 	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE(gstream_tilemap1_scrolly_w)
 	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)
@@ -866,7 +868,7 @@ void gstream_state::machine_reset()
 	m_oki_bank_2 = 0;
 }
 
-static MACHINE_CONFIG_START( gstream )
+MACHINE_CONFIG_START(gstream_state::gstream)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */
@@ -901,7 +903,7 @@ static MACHINE_CONFIG_START( gstream )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( x2222 )
+MACHINE_CONFIG_START(gstream_state::x2222)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", E132XT, 16000000*4) /* 4x internal multiplier */

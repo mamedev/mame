@@ -12,6 +12,8 @@
 #include "segasnd.h"
 
 #include "sound/sp0250.h"
+#include "includes/segag80r.h"
+#include "includes/segag80v.h"
 
 #include <cmath>
 
@@ -173,7 +175,7 @@ TIMER_CALLBACK_MEMBER( speech_sound_device::delayed_speech_w )
 
 WRITE8_MEMBER( speech_sound_device::data_w )
 {
-	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(speech_sound_device::delayed_speech_w), this), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(speech_sound_device::delayed_speech_w), this), data);
 }
 
 
@@ -215,7 +217,26 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_CONFIG_START( sega_speech_board )
+MACHINE_CONFIG_START(segag80r_state::sega_speech_board)
+
+	/* CPU for the speech board */
+	MCFG_CPU_ADD("audiocpu", I8035, SPEECH_MASTER_CLOCK)        /* divide by 15 in CPU */
+	MCFG_CPU_PROGRAM_MAP(speech_map)
+	MCFG_CPU_IO_MAP(speech_portmap)
+	MCFG_MCS48_PORT_P1_IN_CB(DEVREAD8("segaspeech", speech_sound_device, p1_r))
+	MCFG_MCS48_PORT_P1_OUT_CB(DEVWRITE8("segaspeech", speech_sound_device, p1_w))
+	MCFG_MCS48_PORT_P2_OUT_CB(DEVWRITE8("segaspeech", speech_sound_device, p2_w))
+	MCFG_MCS48_PORT_T0_IN_CB(DEVREADLINE("segaspeech", speech_sound_device, t0_r))
+	MCFG_MCS48_PORT_T1_IN_CB(DEVREADLINE("segaspeech", speech_sound_device, t1_r))
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("segaspeech", SEGASPEECH, 0)
+	MCFG_SOUND_ADD("speech", SP0250, SPEECH_MASTER_CLOCK)
+	MCFG_SP0250_DRQ_CALLBACK(DEVWRITELINE("segaspeech", speech_sound_device, drq_w))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START(segag80v_state::sega_speech_board)
 
 	/* CPU for the speech board */
 	MCFG_CPU_ADD("audiocpu", I8035, SPEECH_MASTER_CLOCK)        /* divide by 15 in CPU */
@@ -418,10 +439,10 @@ TIMER_CALLBACK_MEMBER( usb_sound_device::delayed_usb_data_w )
 WRITE8_MEMBER( usb_sound_device::data_w )
 {
 	LOG("%04X:usb_data_w = %02X\n", m_maincpu->safe_pc(), data);
-	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(usb_sound_device::delayed_usb_data_w), this), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(usb_sound_device::delayed_usb_data_w), this), data);
 
 	/* boost the interleave so that sequences can be sent */
-	space.machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
 }
 
 
@@ -857,7 +878,7 @@ ADDRESS_MAP_END
 // device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_MEMBER( usb_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(usb_sound_device::device_add_mconfig)
 
 	/* CPU for the usb board */
 	MCFG_CPU_ADD("ourcpu", I8035, USB_MASTER_CLOCK)     /* divide by 15 in CPU */
@@ -883,7 +904,7 @@ static ADDRESS_MAP_START( usb_map_rom, AS_PROGRAM, 8, usb_sound_device )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION(":usbcpu", 0)
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_MEMBER( usb_rom_sound_device::device_add_mconfig )
+MACHINE_CONFIG_START(usb_rom_sound_device::device_add_mconfig)
 	usb_sound_device::device_add_mconfig(config);
 
 	/* CPU for the usb board */

@@ -186,10 +186,8 @@ public:
 	emu_timer *m_blink_timer;
 	emu_timer *m_vsync_on_timer;
 	emu_timer *m_vsync_off_timer;
+	void abc80(machine_config &config);
+	void abc80_video(machine_config &config);
 };
-
-//----------- defined in video/abc80.c -----------
-
-MACHINE_CONFIG_EXTERN( abc80_video );
 
 #endif // MAME_INCLUDES_ABC80_H

@@ -494,6 +494,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
+	void mastboy(machine_config &config);
 };
 
 
@@ -840,7 +841,7 @@ void mastboy_state::machine_reset()
 
 
 
-static MACHINE_CONFIG_START( mastboy )
+MACHINE_CONFIG_START(mastboy_state::mastboy)
 	MCFG_CPU_ADD("maincpu", Z180, 12000000/2)   /* HD647180X0CP6-1M1R */
 	MCFG_CPU_PROGRAM_MAP(mastboy_map)
 	MCFG_CPU_IO_MAP(mastboy_io_map)

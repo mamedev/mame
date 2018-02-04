@@ -15,11 +15,12 @@ class solbourne_state : public driver_device
 public:
 	solbourne_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-//		, m_maincpu(*this, "maincpu")
+//      , m_maincpu(*this, "maincpu")
 	{ }
 
+void solbourne(machine_config &config);
 private:
-//	required_device<cpu_device> m_maincpu;
+//  required_device<cpu_device> m_maincpu;
 };
 
 //static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, solbourne_state )
@@ -28,7 +29,7 @@ private:
 static INPUT_PORTS_START( solbourne )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( solbourne )
+MACHINE_CONFIG_START(solbourne_state::solbourne)
 MACHINE_CONFIG_END
 
 ROM_START( sols5e )

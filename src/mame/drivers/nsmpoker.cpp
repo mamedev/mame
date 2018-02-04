@@ -64,7 +64,7 @@
 #include "screen.h"
 
 
-#define MASTER_CLOCK    XTAL_22_1184MHz
+#define MASTER_CLOCK    XTAL(22'118'400)
 
 
 class nsmpoker_state : public driver_device
@@ -91,6 +91,7 @@ public:
 	INTERRUPT_GEN_MEMBER(nsmpoker_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	void nsmpoker(machine_config &config);
 };
 
 
@@ -400,14 +401,16 @@ GFXDECODE_END
 void nsmpoker_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
+	tms9995_device* cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
+	cpu->ready_line(ASSERT_LINE);
+	cpu->reset_line(ASSERT_LINE);
 }
 
 /*************************
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( nsmpoker )
+MACHINE_CONFIG_START(nsmpoker_state::nsmpoker)
 
 	// CPU TMS9995, standard variant; no line connections
 	MCFG_TMS99xx_ADD("maincpu", TMS9995, MASTER_CLOCK/2, nsmpoker_map, nsmpoker_portmap)

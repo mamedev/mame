@@ -38,6 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mw18w_led_display_w);
 	DECLARE_WRITE8_MEMBER(mw18w_irq0_clear_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
+	void mw18w(machine_config &config);
 };
 
 
@@ -265,10 +266,10 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mw18w )
+MACHINE_CONFIG_START(mw18w_state::mw18w)
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_19_968MHz/8)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL(19'968'000)/8)
 	MCFG_CPU_PERIODIC_INT_DRIVER(mw18w_state, irq0_line_assert, 960.516) // 555 IC
 	MCFG_CPU_PROGRAM_MAP(mw18w_map)
 	MCFG_CPU_IO_MAP(mw18w_portmap)

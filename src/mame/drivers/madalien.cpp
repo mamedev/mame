@@ -18,7 +18,7 @@
 #include "speaker.h"
 
 
-#define SOUND_CLOCK XTAL_4MHz
+#define SOUND_CLOCK XTAL(4'000'000)
 
 
 INPUT_CHANGED_MEMBER(madalien_state::coin_inserted)
@@ -43,11 +43,11 @@ READ8_MEMBER(madalien_state::shift_r)
 READ8_MEMBER(madalien_state::shift_rev_r)
 {
 	uint8_t hi = *m_shift_hi ^ 0x07;
-	uint8_t lo = BITSWAP8(*m_shift_lo,0,1,2,3,4,5,6,7);
+	uint8_t lo = bitswap<8>(*m_shift_lo,0,1,2,3,4,5,6,7);
 
 	uint8_t ret = shift_common(hi, lo);
 
-	return BITSWAP8(ret,7,0,1,2,3,4,5,6) & 0x7f;
+	return bitswap<8>(ret,7,0,1,2,3,4,5,6) & 0x7f;
 }
 
 
@@ -148,7 +148,7 @@ static INPUT_PORTS_START( madalien )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( madalien )
+MACHINE_CONFIG_START(madalien_state::madalien)
 
 	/* main CPU */
 	MCFG_CPU_ADD("maincpu", M6502, MADALIEN_MAIN_CLOCK / 8) /* 1324kHz */

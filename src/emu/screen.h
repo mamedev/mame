@@ -189,6 +189,7 @@ public:
 	// inline configuration helpers
 	static void static_set_type(device_t &device, screen_type_enum type);
 	static void static_set_raw(device_t &device, u32 pixclock, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart);
+	static void static_set_raw(device_t &device, const XTAL &xtal, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart) { static_set_raw(device, xtal.value(), htotal, hbend, hbstart, vtotal, vbend, vbstart); }
 	static void static_set_refresh(device_t &device, attoseconds_t rate);
 	static void static_set_vblank_time(device_t &device, attoseconds_t time);
 	static void static_set_size(device_t &device, u16 width, u16 height);

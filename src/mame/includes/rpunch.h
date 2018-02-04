@@ -70,4 +70,7 @@ public:
 	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int stop);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void svolley(machine_config &config);
+	void rpunch(machine_config &config);
+	void svolleybl(machine_config &config);
 };

@@ -23,9 +23,14 @@ m740_device::m740_device(const machine_config &mconfig, device_type type, const 
 {
 }
 
-offs_t m740_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+u32 m740_device::get_state_base() const
 {
-	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
+	return inst_state_base;
+}
+
+util::disasm_interface *m740_device::create_disassembler()
+{
+	return new m740_disassembler(this);
 }
 
 void m740_device::device_start()

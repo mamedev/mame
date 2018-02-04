@@ -239,7 +239,7 @@ WRITE8_MEMBER( k05324x_device::k053244_w )
 //          popmessage("053244 reg 05 = %02x",data);
 		/* bit 2 = unknown, Parodius uses it */
 		/* bit 5 = unknown, Rollergames uses it */
-//      logerror("%s: write %02x to 053244 address 5\n", space.machine().describe_context(), data);
+//      logerror("%s: write %02x to 053244 address 5\n", machine().describe_context(), data);
 		break;
 
 	case 0x06:

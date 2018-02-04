@@ -179,7 +179,7 @@ WRITE8_MEMBER(tmpz84c015_device::irq_priority_w)
 	}
 }
 
-MACHINE_CONFIG_MEMBER( tmpz84c015_device::device_add_mconfig )
+MACHINE_CONFIG_START(tmpz84c015_device::device_add_mconfig)
 
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("tmpz84c015_sio", Z80SIO0, DERIVED_CLOCK(1,1))

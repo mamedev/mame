@@ -98,6 +98,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	void lgp(machine_config &config);
 };
 
 
@@ -397,7 +398,7 @@ PALETTE_INIT_MEMBER(lgp_state, lgp)
 }
 
 /* DRIVER */
-static MACHINE_CONFIG_START( lgp )
+MACHINE_CONFIG_START(lgp_state::lgp)
 	/* main cpu */
 	MCFG_CPU_ADD("maincpu", Z80, CPU_PCB_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_program_map)

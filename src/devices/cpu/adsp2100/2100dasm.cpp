@@ -1,32 +1,32 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 #include "emu.h"
-#include "adsp2100.h"
+#include "2100dasm.h"
 
-static const char *const flag_change[] = { "", "TOGGLE %s ", "RESET %s ", "SET %s " };
-static const char *const mode_change[] = { "", "", "DIS %s ", "ENA %s " };
+const char *const adsp21xx_disassembler::flag_change[] = { "", "TOGGLE %s ", "RESET %s ", "SET %s " };
+const char *const adsp21xx_disassembler::mode_change[] = { "", "", "DIS %s ", "ENA %s " };
 
-static const char *const alu_xop[] = { "AX0", "AX1", "AR", "MR0", "MR1", "MR2", "SR0", "SR1" };
-static const char *const alu_yop[] = { "AY0", "AY1", "AF", "0" };
-static const char *const alu_dst[] = { "AR", "AF", "NONE" };
+const char *const adsp21xx_disassembler::alu_xop[] = { "AX0", "AX1", "AR", "MR0", "MR1", "MR2", "SR0", "SR1" };
+const char *const adsp21xx_disassembler::alu_yop[] = { "AY0", "AY1", "AF", "0" };
+const char *const adsp21xx_disassembler::alu_dst[] = { "AR", "AF", "NONE" };
 
-static const char *const mac_xop[] = { "MX0", "MX1", "AR", "MR0", "MR1", "MR2", "SR0", "SR1" };
-static const char *const mac_yop[] = { "MY0", "MY1", "MF", "0" };
-static const char *const mac_dst[] = { "MR", "MF", "NONE" };
+const char *const adsp21xx_disassembler::mac_xop[] = { "MX0", "MX1", "AR", "MR0", "MR1", "MR2", "SR0", "SR1" };
+const char *const adsp21xx_disassembler::mac_yop[] = { "MY0", "MY1", "MF", "0" };
+const char *const adsp21xx_disassembler::mac_dst[] = { "MR", "MF", "NONE" };
 
-static const char *const shift_xop[] = { "SI", "??", "AR", "MR0", "MR1", "MR2", "SR0", "SR1" };
+const char *const adsp21xx_disassembler::shift_xop[] = { "SI", "??", "AR", "MR0", "MR1", "MR2", "SR0", "SR1" };
 
-static const char *const reg_grp[][16] =
+const char *const adsp21xx_disassembler::reg_grp[][16] =
 {
 	{ "AX0", "AX1", "MX0", "MX1", "AY0", "AY1", "MY0", "MY1", "SI", "SE", "AR", "MR0", "MR1", "MR2", "SR0", "SR1" },
 	{ "I0", "I1", "I2", "I3", "M0", "M1", "M2", "M3", "L0", "L1", "L2", "L3", "??", "??", "PMOVLAY", "DMOVLAY" },
 	{ "I4", "I5", "I6", "I7", "M4", "M5", "M6", "M7", "L4", "L5", "L6", "L7", "??", "??", "??", "??" },
 	{ "ASTAT", "MSTAT", "SSTAT", "IMASK", "ICNTL", "CNTR", "SB", "PX", "RX0", "TX0", "RX1", "TX1", "IFC", "OWRCNTR", "??", "??" }
 };
-static const char *const dual_xreg[] = { "AX0", "AX1", "MX0", "MX1" };
-static const char *const dual_yreg[] = { "AY0", "AY1", "MY0", "MY1" };
+const char *const adsp21xx_disassembler::dual_xreg[] = { "AX0", "AX1", "MX0", "MX1" };
+const char *const adsp21xx_disassembler::dual_yreg[] = { "AY0", "AY1", "MY0", "MY1" };
 
-static const char *const condition[] =
+const char *const adsp21xx_disassembler::condition[] =
 {
 	"IF EQ ",
 	"IF NE ",
@@ -46,7 +46,7 @@ static const char *const condition[] =
 	""
 };
 
-static const char *const do_condition[] =
+const char *const adsp21xx_disassembler::do_condition[] =
 {
 	"NE",
 	"EQ",
@@ -66,7 +66,7 @@ static const char *const do_condition[] =
 	"FOREVER"
 };
 
-static const char *const alumac_op[][2] =
+const char *const adsp21xx_disassembler::alumac_op[][2] =
 {
 	{ "",                            "" },
 	{ "%s = %s * %s (RND)",          "%s = %s * %s (RND)" },
@@ -103,7 +103,7 @@ static const char *const alumac_op[][2] =
 	{ "%s = ABS %s",                 "%s = ABS %s" }
 };
 
-static const char *const shift_op[] =
+const char *const adsp21xx_disassembler::shift_op[] =
 {
 	"SR = LSHIFT %s (HI)",
 	"SR = SR OR LSHIFT %s (HI)",
@@ -123,7 +123,7 @@ static const char *const shift_op[] =
 	"SB = EXPADJ %s",
 };
 
-static const char *const shift_by_op[] =
+const char *const adsp21xx_disassembler::shift_by_op[] =
 {
 	"SR = LSHIFT %s BY %d (HI)",
 	"SR = SR OR LSHIFT %s BY %d (HI)",
@@ -143,7 +143,7 @@ static const char *const shift_by_op[] =
 	"???"
 };
 
-static const char *const constants[] =
+const char *const adsp21xx_disassembler::constants[] =
 {
 	"$0001",
 	"$FFFE",
@@ -180,9 +180,7 @@ static const char *const constants[] =
 };
 
 
-
-
-static void alumac(std::ostream &stream, int dest, int op)
+void adsp21xx_disassembler::alumac(std::ostream &stream, int dest, int op)
 {
 	int opindex = (op >> 13) & 31;
 	const char *xop, *yop, *dst, *opstring;
@@ -207,7 +205,7 @@ static void alumac(std::ostream &stream, int dest, int op)
 }
 
 
-static void aluconst(std::ostream &stream, int dest, int op)
+void adsp21xx_disassembler::aluconst(std::ostream &stream, int dest, int op)
 {
 	int opindex = (op >> 13) & 31;
 	const char *xop, *dst, *cval, *opstring;
@@ -232,10 +230,9 @@ static void aluconst(std::ostream &stream, int dest, int op)
 }
 
 
-/* execute instructions on this CPU until icount expires */
-CPU_DISASSEMBLE(adsp21xx)
+offs_t adsp21xx_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
-	unsigned int op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16);
+	unsigned int op = opcodes.r32(pc);
 	unsigned dasmflags = 0;
 	int temp;
 
@@ -281,7 +278,7 @@ CPU_DISASSEMBLE(adsp21xx)
 			if (op & 1)
 			{
 				util::stream_format(stream, "%s", "CALL ");
-				dasmflags = DASMFLAG_STEP_OVER;
+				dasmflags = STEP_OVER;
 			}
 			else
 				util::stream_format(stream, "%s", "JUMP ");
@@ -295,7 +292,7 @@ CPU_DISASSEMBLE(adsp21xx)
 				if (op & 0x000010)
 				{
 					util::stream_format(stream, "%s", "POP PC ");
-					dasmflags = DASMFLAG_STEP_OUT;
+					dasmflags = STEP_OUT;
 				}
 				if (op & 0x000008) util::stream_format(stream, "%s", "POP LOOP ");
 				if (op & 0x000004) util::stream_format(stream, "%s", "POP CNTR ");
@@ -349,7 +346,7 @@ CPU_DISASSEMBLE(adsp21xx)
 					util::stream_format(stream, "%s", "RTI");
 				else
 					util::stream_format(stream, "%s", "RTS");
-				dasmflags = DASMFLAG_STEP_OUT;
+				dasmflags = STEP_OUT;
 			}
 			else
 				util::stream_format(stream, "??? (%06X)", op);
@@ -362,7 +359,7 @@ CPU_DISASSEMBLE(adsp21xx)
 				if (op & 0x000010)
 				{
 					util::stream_format(stream, "CALL (I%d)", 4 + ((op >> 6) & 3));
-					dasmflags = DASMFLAG_STEP_OVER;
+					dasmflags = STEP_OVER;
 				}
 				else
 					util::stream_format(stream, "JUMP (I%d)", 4 + ((op >> 6) & 3));
@@ -440,7 +437,7 @@ CPU_DISASSEMBLE(adsp21xx)
 			if (op & 0x040000)
 			{
 				util::stream_format(stream, "%sCALL $%04X", condition[op & 15], (op >> 4) & 0x3fff);
-				dasmflags = DASMFLAG_STEP_OVER;
+				dasmflags = STEP_OVER;
 			}
 			else
 				util::stream_format(stream, "%sJUMP $%04X", condition[op & 15], (op >> 4) & 0x3fff);
@@ -549,5 +546,10 @@ CPU_DISASSEMBLE(adsp21xx)
 			break;
 	}
 
-	return 1 | dasmflags | DASMFLAG_SUPPORTED;
+	return 1 | dasmflags | SUPPORTED;
+}
+
+uint32_t adsp21xx_disassembler::opcode_alignment() const
+{
+	return 1;
 }

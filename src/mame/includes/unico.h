@@ -60,4 +60,7 @@ public:
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
 	optional_shared_ptr<uint32_t> m_generic_paletteram_32;
+	void zeropnt2(machine_config &config);
+	void zeropnt(machine_config &config);
+	void burglarx(machine_config &config);
 };

@@ -142,4 +142,16 @@ public:
 	required_device<palette_device> m_spr_palette;
 	required_device<palette_device> m_chr_palette;
 	required_device<irem_audio_device> m_audio;
+	void ldrun2(machine_config &config);
+	void lotlot(machine_config &config);
+	void ldrun3(machine_config &config);
+	void battroad(machine_config &config);
+	void horizon(machine_config &config);
+	void ldrun4(machine_config &config);
+	void spelunk2(machine_config &config);
+	void youjyudn(machine_config &config);
+	void kungfum(machine_config &config);
+	void spelunkr(machine_config &config);
+	void ldrun(machine_config &config);
+	void kidniki(machine_config &config);
 };

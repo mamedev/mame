@@ -136,7 +136,7 @@ WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)
 READ16_MEMBER( sshangha_state::sshangha_protection_region_d_146_r )
 {
 	int real_address = 0x3f4000 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
@@ -145,7 +145,7 @@ READ16_MEMBER( sshangha_state::sshangha_protection_region_d_146_r )
 WRITE16_MEMBER( sshangha_state::sshangha_protection_region_d_146_w )
 {
 	int real_address = 0x3f4000 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
@@ -153,7 +153,7 @@ WRITE16_MEMBER( sshangha_state::sshangha_protection_region_d_146_w )
 READ16_MEMBER( sshangha_state::sshangha_protection_region_8_146_r )
 {
 	int real_address = 0x3e0000 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
@@ -162,7 +162,7 @@ READ16_MEMBER( sshangha_state::sshangha_protection_region_8_146_r )
 WRITE16_MEMBER( sshangha_state::sshangha_protection_region_8_146_w )
 {
 	int real_address = 0x3e0000 + (offset *2);
-	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
+	int deco146_addr = bitswap<32>(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
 	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
@@ -378,7 +378,7 @@ DECO16IC_BANK_CB_MEMBER(sshangha_state::bank_callback)
 	return (bank >> 4) * 0x1000;
 }
 
-static MACHINE_CONFIG_START( sshangha )
+MACHINE_CONFIG_START(sshangha_state::sshangha)
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
@@ -403,7 +403,8 @@ static MACHINE_CONFIG_START( sshangha )
 
 	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_WIDTH12(1)
+	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
+	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
 	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
 	MCFG_DECO16IC_PF1_COL_BANK(0x10)
@@ -442,7 +443,7 @@ static MACHINE_CONFIG_START( sshangha )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.27)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( sshanghb, sshangha )
+MACHINE_CONFIG_DERIVED(sshangha_state::sshanghb, sshangha)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(sshanghb_map)
