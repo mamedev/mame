@@ -1682,6 +1682,9 @@ static INPUT_PORTS_START( pc9801rs )
 	PORT_DIPNAME( 0x08, 0x00, "Graphic Function" ) // DSW 1-8
 	PORT_DIPSETTING(      0x08, "Basic (8 Colors)" )
 	PORT_DIPSETTING(      0x00, "Expanded (16/4096 Colors)"  )
+	PORT_DIPNAME( 0x10, 0x10, "Display Type" ) // LCD display, 98DO Demo explicitly wants it to be non-Plasma
+	PORT_DIPSETTING(      0x10, "RGB" )
+	PORT_DIPSETTING(      0x00, "Plasma" )
 
 	PORT_MODIFY("ROM_LOAD")
 	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_UNUSED )
